@@ -12,7 +12,7 @@
 
 #include "ascendc_tool_log.h"
 #include "file_utils.h"
-#include "staged_file_replacement.h"
+#include "atomic_file_writer.h"
 
 #include <boost/filesystem.hpp>
 #include <boost/system/error_code.hpp>
@@ -111,9 +111,9 @@ aclError KernelCompilationWorkspace::CreateOutputDirectoriesAndApplySourcePatche
                 return ACLRTC_ERROR_FAILURE;
             }
         }
-        StagedFileReplacement patchedSource;
-        if (!patchedSource.StageTextFile(filePatches.first.string(), patchedSourceText) ||
-            !patchedSource.ReplaceDestinationAtomically()) {
+        AtomicFileWriter patchedSourceWriter;
+        if (!patchedSourceWriter.WriteTextToTemporaryFile(filePatches.first.string(), patchedSourceText) ||
+            !patchedSourceWriter.ReplaceDestinationAtomically()) {
             return ACLRTC_ERROR_FAILURE;
         }
     }

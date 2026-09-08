@@ -8,9 +8,10 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#ifndef ASCENDC_COMMON_STAGED_FILE_REPLACEMENT_H
-#define ASCENDC_COMMON_STAGED_FILE_REPLACEMENT_H
+#ifndef ASCENDC_COMMON_ATOMIC_FILE_WRITER_H
+#define ASCENDC_COMMON_ATOMIC_FILE_WRITER_H
 
+#include <cstdint>
 #include <string>
 #include <sys/types.h>
 
@@ -18,28 +19,28 @@ namespace ascendc {
 
 // Owns a same-directory temporary file until replacement succeeds. Destruction
 // removes any unpublished file, including during exception unwinding.
-class StagedFileReplacement final {
+class AtomicFileWriter final {
 public:
-    StagedFileReplacement() = default;
-    ~StagedFileReplacement() noexcept;
-    StagedFileReplacement(const StagedFileReplacement&) = delete;
-    StagedFileReplacement& operator=(const StagedFileReplacement&) = delete;
+    AtomicFileWriter() = default;
+    ~AtomicFileWriter() noexcept;
+    AtomicFileWriter(const AtomicFileWriter&) = delete;
+    AtomicFileWriter& operator=(const AtomicFileWriter&) = delete;
 
-    // Each object stages one replacement. Success means all I/O is complete and
-    // all descriptors are closed; the destination remains untouched until commit.
-    bool StageTextFile(const std::string& destinationPath, const std::string& text);
-    bool StageFileCopy(const std::string& sourcePath, const std::string& destinationPath);
+    // Each object writes one temporary file. Success means all I/O is complete and
+    // all descriptors are closed; the destination remains untouched until ReplaceDestinationAtomically succeeds.
+    bool WriteTextToTemporaryFile(const std::string& destinationPath, const std::string& text);
+    bool CopyFileToTemporaryFile(const std::string& sourcePath, const std::string& destinationPath);
     bool ReplaceDestinationAtomically() noexcept;
 
 private:
-    int CreateTemporaryFile(const std::string& destinationPath, mode_t mode);
+    int32_t CreateUniqueTemporaryFile(const std::string& destinationPath, mode_t permissions);
 
     std::string canonicalDestinationPath_;
-    std::string ownedTemporaryPath_;
+    std::string ownedTemporaryFilePath_;
     bool ownsTemporaryFile_{false};
-    bool readyForReplacement_{false};
+    bool temporaryFileWriteSucceeded_{false};
 };
 
 } // namespace ascendc
 
-#endif // ASCENDC_COMMON_STAGED_FILE_REPLACEMENT_H
+#endif // ASCENDC_COMMON_ATOMIC_FILE_WRITER_H

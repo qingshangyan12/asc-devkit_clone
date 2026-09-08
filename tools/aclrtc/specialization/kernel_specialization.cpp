@@ -10,7 +10,7 @@
 
 #include "kernel_specialization.h"
 
-#include "staged_file_replacement.h"
+#include "atomic_file_writer.h"
 #include "compilation_plan_executor.h"
 #include "kernel_compilation_plan_builder.h"
 #include "compilation_manifest_parser.h"
@@ -154,15 +154,15 @@ aclError KernelSpecializationSession::PublishKernelElf(
     const fs::path& linkedKernelElfPath, const fs::path& outputElfPath,
     KernelCompilationWorkspace& compilationWorkspace) const
 {
-    StagedFileReplacement outputElf;
-    if (!outputElf.StageFileCopy(linkedKernelElfPath.string(), outputElfPath.string())) {
+    AtomicFileWriter outputElfWriter;
+    if (!outputElfWriter.CopyFileToTemporaryFile(linkedKernelElfPath.string(), outputElfPath.string())) {
         return ACLRTC_ERROR_FAILURE;
     }
     const aclError cleanupStatus = compilationWorkspace.CleanupWorktreeBeforeElfPublication();
     if (cleanupStatus != ACLRTC_SUCCESS) {
         return cleanupStatus;
     }
-    if (!outputElf.ReplaceDestinationAtomically()) {
+    if (!outputElfWriter.ReplaceDestinationAtomically()) {
         return ACLRTC_ERROR_FAILURE;
     }
     return ACLRTC_SUCCESS;

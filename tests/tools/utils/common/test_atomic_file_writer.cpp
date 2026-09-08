@@ -8,7 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#include "staged_file_replacement.h"
+#include "atomic_file_writer.h"
 #include "../asc_compile_exporter/test_support.h"
 
 #include <boost/filesystem.hpp>
@@ -21,32 +21,32 @@ using asc_compile_exporter_test::ModuleTest;
 using asc_compile_exporter_test::ReadTestFile;
 using asc_compile_exporter_test::WriteTestFile;
 
-TEST_F(ModuleTest, StagedTextReplacesDestinationOnlyOnExplicitCommit)
+TEST_F(ModuleTest, AtomicFileWriterKeepsOriginalUntilReplacement)
 {
     const std::string destination = root_ + "/output.txt";
     WriteTestFile(destination, "original");
-    StagedFileReplacement replacement;
+    AtomicFileWriter writer;
     const std::string content("a\0b", 3U);
     const mode_t previousMask = umask(0022);
-    const bool staged = replacement.StageTextFile(destination, content);
+    const bool writeSucceeded = writer.WriteTextToTemporaryFile(destination, content);
     umask(previousMask);
-    ASSERT_TRUE(staged);
+    ASSERT_TRUE(writeSucceeded);
     EXPECT_EQ(ReadTestFile(destination), "original");
-    ASSERT_TRUE(replacement.ReplaceDestinationAtomically());
+    ASSERT_TRUE(writer.ReplaceDestinationAtomically());
     EXPECT_EQ(ReadTestFile(destination), content);
-    EXPECT_FALSE(replacement.ReplaceDestinationAtomically());
+    EXPECT_FALSE(writer.ReplaceDestinationAtomically());
     struct stat status {};
     ASSERT_EQ(stat(destination.c_str(), &status), 0);
     EXPECT_EQ(status.st_mode & 0777U, 0600U);
 }
 
-TEST_F(ModuleTest, StagedReplacementRemovesTemporaryFileDuringExceptionUnwinding)
+TEST_F(ModuleTest, AtomicFileWriterRemovesTemporaryFileOnException)
 {
     const std::string destination = root_ + "/output.txt";
     WriteTestFile(destination, "original");
     try {
-        StagedFileReplacement replacement;
-        ASSERT_TRUE(replacement.StageTextFile(destination, "new"));
+        AtomicFileWriter writer;
+        ASSERT_TRUE(writer.WriteTextToTemporaryFile(destination, "new"));
         throw std::runtime_error("simulated caller failure");
     } catch (const std::runtime_error&) {
     }
@@ -54,26 +54,26 @@ TEST_F(ModuleTest, StagedReplacementRemovesTemporaryFileDuringExceptionUnwinding
     EXPECT_EQ(std::distance(fs::directory_iterator(root_), fs::directory_iterator()), 1);
 }
 
-TEST_F(ModuleTest, StagedCopyCanBePublishedAfterSourceWorktreeIsRemoved)
+TEST_F(ModuleTest, AtomicFileWriterReplacesDestinationAfterSourceRemoval)
 {
     const std::string source = root_ + "/worktree/linked.elf";
     const std::string destination = root_ + "/output.elf";
     const std::string bytes(150000U, 'x');
     WriteTestFile(source, bytes);
-    StagedFileReplacement replacement;
+    AtomicFileWriter writer;
     const mode_t previousMask = umask(0027);
-    const bool staged = replacement.StageFileCopy(source, destination);
+    const bool writeSucceeded = writer.CopyFileToTemporaryFile(source, destination);
     umask(previousMask);
-    ASSERT_TRUE(staged);
+    ASSERT_TRUE(writeSucceeded);
     ASSERT_TRUE(FileUtils::RemoveAll(root_ + "/worktree"));
-    ASSERT_TRUE(replacement.ReplaceDestinationAtomically());
+    ASSERT_TRUE(writer.ReplaceDestinationAtomically());
     EXPECT_EQ(ReadTestFile(destination), bytes);
     struct stat status {};
     ASSERT_EQ(stat(destination.c_str(), &status), 0);
     EXPECT_EQ(status.st_mode & 0777U, 0640U);
 }
 
-TEST_F(ModuleTest, StagedReplacementCommitsToTheOriginalCanonicalParent)
+TEST_F(ModuleTest, AtomicFileWriterUsesOriginalCanonicalParentForReplacement)
 {
     const std::string first = root_ + "/first";
     const std::string second = root_ + "/second";
@@ -81,59 +81,59 @@ TEST_F(ModuleTest, StagedReplacementCommitsToTheOriginalCanonicalParent)
     ASSERT_TRUE(FileUtils::CreateDirectories(first));
     ASSERT_TRUE(FileUtils::CreateDirectories(second));
     ASSERT_EQ(symlink(first.c_str(), alias.c_str()), 0);
-    StagedFileReplacement replacement;
-    ASSERT_TRUE(replacement.StageTextFile(alias + "/output", "new"));
+    AtomicFileWriter writer;
+    ASSERT_TRUE(writer.WriteTextToTemporaryFile(alias + "/output", "new"));
     ASSERT_EQ(unlink(alias.c_str()), 0);
     ASSERT_EQ(symlink(second.c_str(), alias.c_str()), 0);
-    ASSERT_TRUE(replacement.ReplaceDestinationAtomically());
+    ASSERT_TRUE(writer.ReplaceDestinationAtomically());
     EXPECT_EQ(ReadTestFile(first + "/output"), "new");
     EXPECT_FALSE(FileUtils::PathExists(second + "/output"));
 }
 
-TEST_F(ModuleTest, StagedReplacementCleansUpWhenRenameFails)
+TEST_F(ModuleTest, AtomicFileWriterRemovesTemporaryFileWhenRenameFails)
 {
     const std::string destination = root_ + "/output";
     {
-        StagedFileReplacement replacement;
-        ASSERT_TRUE(replacement.StageTextFile(destination, "new"));
+        AtomicFileWriter writer;
+        ASSERT_TRUE(writer.WriteTextToTemporaryFile(destination, "new"));
         ASSERT_TRUE(FileUtils::CreateDirectories(destination));
-        EXPECT_FALSE(replacement.ReplaceDestinationAtomically());
+        EXPECT_FALSE(writer.ReplaceDestinationAtomically());
     }
     EXPECT_TRUE(FileUtils::IsDirectory(destination));
     EXPECT_EQ(std::distance(fs::directory_iterator(root_), fs::directory_iterator()), 1);
 }
 
-TEST_F(ModuleTest, StagedReplacementDoesNotRemoveUnownedFilesWhenTemporaryNamesCollide)
+TEST_F(ModuleTest, AtomicFileWriterKeepsExistingFilesWhenTemporaryNamesCollide)
 {
     const std::string destination = root_ + "/output";
     const std::string victim = root_ + "/victim";
     WriteTestFile(victim, "preserve");
-    for (size_t sequence = 0U; sequence < 128U; ++sequence) {
+    for (uint64_t sequence = 0U; sequence < 128U; ++sequence) {
         const std::string collision =
             destination + ".asc_tmp_" + std::to_string(getpid()) + "_" + std::to_string(sequence);
         ASSERT_EQ(symlink(victim.c_str(), collision.c_str()), 0);
     }
     {
-        StagedFileReplacement replacement;
-        EXPECT_FALSE(replacement.StageTextFile(destination, "unexpected"));
-        EXPECT_FALSE(replacement.ReplaceDestinationAtomically());
+        AtomicFileWriter writer;
+        EXPECT_FALSE(writer.WriteTextToTemporaryFile(destination, "unexpected"));
+        EXPECT_FALSE(writer.ReplaceDestinationAtomically());
     }
     EXPECT_EQ(ReadTestFile(victim), "preserve");
     EXPECT_EQ(std::distance(fs::directory_iterator(root_), fs::directory_iterator()), 129);
     EXPECT_FALSE(FileUtils::PathExists(destination));
 }
 
-TEST_F(ModuleTest, StagedReplacementRejectsMissingInputAndMultipleStaging)
+TEST_F(ModuleTest, AtomicFileWriterRejectsMissingInputAndRepeatedWrites)
 {
     const std::string destination = root_ + "/output";
-    StagedFileReplacement missing;
-    EXPECT_FALSE(missing.StageFileCopy(root_ + "/missing", destination));
+    AtomicFileWriter missing;
+    EXPECT_FALSE(missing.CopyFileToTemporaryFile(root_ + "/missing", destination));
     EXPECT_FALSE(missing.ReplaceDestinationAtomically());
     EXPECT_FALSE(FileUtils::PathExists(destination));
-    StagedFileReplacement replacement;
-    ASSERT_TRUE(replacement.StageTextFile(destination, "first"));
-    EXPECT_FALSE(replacement.StageTextFile(destination, "second"));
-    ASSERT_TRUE(replacement.ReplaceDestinationAtomically());
+    AtomicFileWriter writer;
+    ASSERT_TRUE(writer.WriteTextToTemporaryFile(destination, "first"));
+    EXPECT_FALSE(writer.WriteTextToTemporaryFile(destination, "second"));
+    ASSERT_TRUE(writer.ReplaceDestinationAtomically());
     EXPECT_EQ(ReadTestFile(destination), "first");
 }
 
