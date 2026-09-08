@@ -1,0 +1,235 @@
+/**
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
+#ifndef IMPL_C_API_REG_BASE_IMPL_UB_SCATTER_INTF_IMPL_H
+#define IMPL_C_API_REG_BASE_IMPL_UB_SCATTER_INTF_IMPL_H
+
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#pragma message( \
+    "impl/c_api/reg_base_impl/ub_scatter_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_UB_SCATTER_INTF_IMPL_H
+#endif
+
+#include "c_api/defs/defs.h"
+#include "impl/c_api/reg_base_impl/common_impl.h"
+
+__simd_callee__ inline void asc_scatter_impl(
+    __ubuf__ int8_t* dst, vector_int8_t src, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_scatter_impl(
+    __ubuf__ uint8_t* dst, vector_uint8_t src, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_scatter_impl(
+    __ubuf__ int16_t* dst, vector_int16_t src, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_scatter_impl(
+    __ubuf__ uint16_t* dst, vector_uint16_t src, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_scatter_impl(
+    __ubuf__ int32_t* dst, vector_int32_t src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_scatter_impl(
+    __ubuf__ uint32_t* dst, vector_uint32_t src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_scatter_impl(
+    __ubuf__ bfloat16_t* dst, vector_bfloat16_t src, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_scatter_impl(
+    __ubuf__ half* dst, vector_half src, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_scatter_impl(
+    __ubuf__ float* dst, vector_float src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
+}
+
+// asc_scatter int8_t
+__simd_callee__ inline void asc_scatter_impl(
+    vector_int8_t& src, __ubuf__ int8_t* dst, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
+}
+
+// asc_scatter uint8_t
+__simd_callee__ inline void asc_scatter_impl(
+    vector_uint8_t& src, __ubuf__ uint8_t* dst, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
+}
+
+// asc_scatter int16_t
+__simd_callee__ inline void asc_scatter_impl(
+    vector_int16_t& src, __ubuf__ int16_t* dst, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
+}
+
+// asc_scatter uint16_t
+__simd_callee__ inline void asc_scatter_impl(
+    vector_uint16_t& src, __ubuf__ uint16_t* dst, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
+}
+
+// asc_scatter int32_t
+__simd_callee__ inline void asc_scatter_impl(
+    vector_int32_t& src, __ubuf__ int32_t* dst, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
+}
+
+// asc_scatter uint32_t
+__simd_callee__ inline void asc_scatter_impl(
+    vector_uint32_t& src, __ubuf__ uint32_t* dst, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
+}
+
+// asc_scatter bfloat16_t
+__simd_callee__ inline void asc_scatter_impl(
+    vector_bfloat16_t& src, __ubuf__ bfloat16_t* dst, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
+}
+
+// asc_scatter float16_t
+__simd_callee__ inline void asc_scatter_impl(
+    vector_half& src, __ubuf__ half* dst, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
+}
+
+// asc_scatter float32_t
+__simd_callee__ inline void asc_scatter_impl(
+    vector_float& src, __ubuf__ float* dst, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
+}
+
+//==============asc_scatter=============
+__simd_callee__ inline void asc_scatter(
+    __ubuf__ int8_t* dst, vector_int8_t src, vector_uint16_t index, vector_bool mask)
+{
+    asc_scatter_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_scatter(
+    __ubuf__ uint8_t* dst, vector_uint8_t src, vector_uint16_t index, vector_bool mask)
+{
+    asc_scatter_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_scatter(
+    __ubuf__ int16_t* dst, vector_int16_t src, vector_uint16_t index, vector_bool mask)
+{
+    asc_scatter_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_scatter(
+    __ubuf__ uint16_t* dst, vector_uint16_t src, vector_uint16_t index, vector_bool mask)
+{
+    asc_scatter_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_scatter(
+    __ubuf__ int32_t* dst, vector_int32_t src, vector_uint32_t index, vector_bool mask)
+{
+    asc_scatter_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_scatter(
+    __ubuf__ uint32_t* dst, vector_uint32_t src, vector_uint32_t index, vector_bool mask)
+{
+    asc_scatter_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_scatter(
+    __ubuf__ bfloat16_t* dst, vector_bfloat16_t src, vector_uint16_t index, vector_bool mask)
+{
+    asc_scatter_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_scatter(__ubuf__ half* dst, vector_half src, vector_uint16_t index, vector_bool mask)
+{
+    asc_scatter_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_scatter(__ubuf__ float* dst, vector_float src, vector_uint32_t index, vector_bool mask)
+{
+    asc_scatter_impl(dst, src, index, mask);
+}
+
+#if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_UB_SCATTER_INTF_IMPL_H)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_UB_SCATTER_INTF_IMPL_H
+#endif
+
+#endif // IMPL_C_API_REG_BASE_IMPL_UB_SCATTER_INTF_IMPL_H

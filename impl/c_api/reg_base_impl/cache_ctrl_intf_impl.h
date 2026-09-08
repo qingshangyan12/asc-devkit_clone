@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/utils_intf_impl.h"
+#include "impl/c_api/reg_base_impl/common_impl.h"
 
 __aicore__ inline void asc_icache_preload_impl(const void* addr, int64_t prefetch_len) { preload(addr, prefetch_len); }
 
@@ -31,6 +31,8 @@ __aicore__ inline void asc_datacache_preload_impl(__gm__ uint64_t* address, int6
 namespace __asc_aicore {
 __aicore__ inline void asc_dcci_single_impl(__gm__ void* dst) { dcci(dst, cache_line_t::SINGLE_CACHE_LINE); }
 } // namespace __asc_aicore
+
+// namespace __asc_aicore
 
 // namespace __asc_aicore
 
@@ -54,16 +56,6 @@ __aicore__ inline void asc_dcci_entire_atomic_impl()
 __aicore__ inline int64_t asc_get_icache_preload_status_impl() { return get_icache_prl_st(); }
 
 __aicore__ inline void asc_dci_impl() { dci(); }
-
-union ctrl_scalar_cache_bits {
-    uint64_t value;
-    struct {
-        uint64_t reserved0 : 16;
-        uint64_t scalar_load_cache_mode : 4;
-        uint64_t scalar_store_cache_mode : 4;
-        uint64_t reserved1 : 40;
-    };
-};
 
 __aicore__ inline void asc_set_scalar_cache_mode_impl(asc_load_l2_cache_mode l2_cache_mode)
 {
@@ -110,6 +102,8 @@ __aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t o
 namespace __asc_aicore {
 __aicore__ inline void asc_dcci_single(__gm__ void* dst) { asc_dcci_single_impl(dst); }
 } // namespace __asc_aicore
+
+// namespace __asc_aicore
 
 // namespace __asc_aicore
 

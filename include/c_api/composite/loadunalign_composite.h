@@ -22,7 +22,7 @@
 #include "c_api/defs/defs.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/reg_base_impl/composite_intf_impl.h"
+#include "impl/c_api/reg_base_impl/loadunalign_composite_intf_impl.h"
 #endif
 
 // ========== return-value load APIs ==========

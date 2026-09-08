@@ -177,16 +177,21 @@ asc-devkit/
 ├── impl/
 │   └── c_api/                    # C API implementation
 │       ├── CMakeLists.txt
-│       ├── memory_base_impl/     # 2201 implementations, flat category headers
-│       │   ├── vector_compute_intf_impl.h
+│       ├── memory_base_impl/     # 2201 implementations, one file per public interface header
+│       │   ├── common_impl.h     # Shared internal helpers
+│       │   ├── datamove_atomic_intf_impl.h
+│       │   ├── scalar_atomic_intf_impl.h
+│       │   ├── vector_arith_intf_impl.h
 │       │   ├── vector_datamove_intf_impl.h
 │       │   └── ...
 │       └── reg_base_impl/        # Shared regbase implementations
-│           ├── reg_compute_intf_impl.h
+│           ├── common_impl.h
+│           ├── reg_arith_intf_impl.h
+│           ├── loadalign_intf_impl.h
 │           ├── vector_datamove_intf_impl.h
 │           ├── ...
 │           └── npu_arch_3510/    # Deprecated 3510 interfaces and exclusive helpers only
-│               ├── reg_compute_intf_impl.h
+│               ├── reg_convert_intf_impl.h
 │               └── ...
 │
 ├── tests/

@@ -19,8 +19,8 @@
 #endif
 
 #include "c_api/defs/defs.h"
+#include "impl/c_api/reg_base_impl/common_impl.h"
 #include "impl/c_api/reg_base_impl/spr_intf_impl.h"
-#include "impl/c_api/reg_base_impl/utils_intf_impl.h"
 
 [[deprecated("NOTICE: asc_get_ar_spr is deprecated. "
              "Please use asc_get_squeeze_status instead.")]] __aicore__ inline int64_t

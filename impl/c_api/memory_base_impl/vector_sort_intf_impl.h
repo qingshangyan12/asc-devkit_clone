@@ -1,0 +1,113 @@
+/**
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
+#ifndef IMPL_C_API_MEMORY_BASE_IMPL_VECTOR_SORT_INTF_IMPL_H
+#define IMPL_C_API_MEMORY_BASE_IMPL_VECTOR_SORT_INTF_IMPL_H
+
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#pragma message( \
+    "impl/c_api/memory_base_impl/vector_sort_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define ASCENDC_C_API_INTERNAL_IMPL_C_API_MEMORY_BASE_IMPL_VECTOR_SORT_INTF_IMPL_H
+#endif
+
+#include "c_api/defs/defs.h"
+#include "impl/c_api/memory_base_impl/common_impl.h"
+
+__aicore__ inline void asc_bitsort_impl_half(
+    __ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat)
+{
+    if ASC_IS_AIV {
+        vbitsort(dst, src0, src1, repeat);
+    }
+}
+
+__aicore__ inline void asc_bitsort_impl_float(
+    __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, int32_t repeat)
+{
+    if ASC_IS_AIV {
+        vbitsort(dst, src0, src1, repeat);
+    }
+}
+
+__aicore__ inline void asc_get_vms4_sr_impl(uint16_t sorted_num[ASC_C_API_MRGSORT_ELEMENT_LEN])
+{
+    if ASC_IS_AIV {
+        *(reinterpret_cast<uint64_t*>(sorted_num)) = (uint64_t)get_vms4_sr();
+    }
+}
+
+// repeat == 1, no limit
+// repeat > 1, limit: len0==len1==len2==len3, valid_bit==0xb1111, if_exhausted_suspension==false
+__aicore__ inline void asc_mrgsort4_impl(
+    __ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0,
+    uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension,
+    uint8_t valid_bit)
+{
+    if ASC_IS_AIV {
+        vmrgsort4(
+            dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
+            if_exhausted_suspension, valid_bit);
+    }
+}
+
+__aicore__ inline void asc_mrgsort4_impl(
+    __ubuf__ float* dst, __ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0,
+    uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension,
+    uint8_t valid_bit)
+{
+    if ASC_IS_AIV {
+        vmrgsort4(
+            dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
+            if_exhausted_suspension, valid_bit);
+    }
+}
+
+// ==========asc_bitsort(half/float)==========
+__aicore__ inline void asc_bitsort(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat)
+{
+    asc_bitsort_impl_half(dst, src0, src1, repeat);
+}
+
+__aicore__ inline void asc_bitsort(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, int32_t repeat)
+{
+    asc_bitsort_impl_float(dst, src0, src1, repeat);
+}
+
+// ==========asc_get_vms4_sr==========
+__aicore__ inline void asc_get_vms4_sr(uint16_t sorted_num[4]) { asc_get_vms4_sr_impl(sorted_num); }
+
+// ==========asc_mrgsort4(half/float)==========
+__aicore__ inline void asc_mrgsort4(
+    __ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0,
+    uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension,
+    uint8_t valid_bit)
+{
+    asc_mrgsort4_impl(
+        dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
+        if_exhausted_suspension, valid_bit);
+}
+
+__aicore__ inline void asc_mrgsort4(
+    __ubuf__ float* dst, __ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0,
+    uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension,
+    uint8_t valid_bit)
+{
+    asc_mrgsort4_impl(
+        dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
+        if_exhausted_suspension, valid_bit);
+}
+
+#if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_MEMORY_BASE_IMPL_VECTOR_SORT_INTF_IMPL_H)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef ASCENDC_C_API_INTERNAL_IMPL_C_API_MEMORY_BASE_IMPL_VECTOR_SORT_INTF_IMPL_H
+#endif
+
+#endif // IMPL_C_API_MEMORY_BASE_IMPL_VECTOR_SORT_INTF_IMPL_H

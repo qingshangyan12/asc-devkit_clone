@@ -23,7 +23,7 @@
 #include "c_api/defs/defs.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/reg_base_impl/scalar_compute_intf_impl.h"
+#include "impl/c_api/reg_base_impl/scalar_store_intf_impl.h"
 #endif
 
 __aicore__ inline void asc_store_dev(__gm__ int8_t* addr, int8_t value);

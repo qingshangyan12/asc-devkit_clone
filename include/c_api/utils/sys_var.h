@@ -21,10 +21,10 @@
 #define INCLUDE_C_API_UTILS_SYS_VAR_H
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-#include "impl/c_api/memory_base_impl/utils_intf_impl.h"
+#include "impl/c_api/memory_base_impl/sys_var_intf_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/reg_base_impl/npu_arch_3510/utils_intf_impl.h"
-#include "impl/c_api/reg_base_impl/utils_intf_impl.h"
+#include "impl/c_api/reg_base_impl/sys_var_intf_impl.h"
+#include "impl/c_api/reg_base_impl/npu_arch_3510/sys_var_intf_impl.h"
 #endif
 
 #include "c_api/defs/defs.h"

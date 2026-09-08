@@ -24,8 +24,8 @@
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "impl/c_api/memory_base_impl/spr_intf_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/reg_base_impl/npu_arch_3510/spr_intf_impl.h"
 #include "impl/c_api/reg_base_impl/spr_intf_impl.h"
+#include "impl/c_api/reg_base_impl/npu_arch_3510/spr_intf_impl.h"
 #endif
 
 __aicore__ inline int64_t asc_get_ctrl();
