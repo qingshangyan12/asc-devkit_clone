@@ -28,7 +28,7 @@ __simd_callee__ inline void init_debug_buffer(__ubuf__ BlockVFBufInfo* blockInfo
     blockInfo->flag = 0;
     blockInfo->finish = 0;
     blockInfo->blockIdx = blockIdx;
-    blockInfo->assertFlag = BlockVFBufInfo::AssertState::IDLE;
+    blockInfo->assertFlag = 0;
     blockInfo->resv2 = 0;
     blockInfo->readLen = 0;
 }

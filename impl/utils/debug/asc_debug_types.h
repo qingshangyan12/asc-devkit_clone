@@ -23,12 +23,6 @@
 #define ASCENDC_SIMD_VF_MAGIC_NUMBER 0xF0A00B0F
 
 struct BlockVFBufInfo {
-    enum class AssertState : uint8_t {
-        IDLE = 0U,
-        RAISED = 1U,
-        DRAINED = 2U,
-    };
-
     uint32_t magic = ASCENDC_SIMD_VF_MAGIC_NUMBER;
     uint32_t length = ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE;
     uint32_t writeLen = 0;
@@ -36,7 +30,7 @@ struct BlockVFBufInfo {
     uint8_t flag = 0; // 0: normal, nonzero: overflow
     uint8_t finish = 0;
     uint16_t blockIdx = 0;
-    AssertState assertFlag = AssertState::IDLE;
+    uint8_t assertFlag = 0; // 0: normal, 1: assert TLV published
     uint8_t resv2 = 0;
     uint32_t readLen = 0;
     uint8_t buffer[ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE];

@@ -42,7 +42,7 @@ static __attribute__((noinline)) __simd_callee__ void __assert_fail(
     __ubuf__ const char* function) noexcept
 {
     printf_impl_assert("[ASSERT] %s:%u: %s: Assertion '%s' failed.\n", file, line, function, assertion);
-    wait_vf_assert_handshake();
+    wait_vf_assert_published();
     __trap();
 }
 
@@ -53,7 +53,7 @@ static __attribute__((noinline)) __simd_callee__ void __assert_fail_msg(
     __ubuf__ const char* fmt, Args&&... args) noexcept
 {
     printf_impl_assert_msg(assertion, file, line, function, fmt, args...);
-    wait_vf_assert_handshake();
+    wait_vf_assert_published();
     __trap();
 }
 #endif
