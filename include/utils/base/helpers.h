@@ -24,7 +24,7 @@
 #include "../../../impl/utils/base/helpers_impl.h"
 
 template <auto func_ptr, typename... Args>
-__aicore__ inline void asc_vf_call(Args&&... args)
+__aicore__ __attribute__((always_inline)) inline void asc_vf_call(Args&&... args)
 {
     if ASCEND_IS_AIV {
         asc::details::asc_vf_call_impl<func_ptr>(args...);

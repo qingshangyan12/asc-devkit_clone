@@ -49,8 +49,9 @@ __simd_callee__ constexpr inline uint32_t align_up(uint32_t a, uint32_t b) { ret
 
 __simd_callee__ inline void wait_vf_debug_buffer_drained(__ubuf__ BlockVFBufInfo* block_info)
 {
+    __ubuf__ volatile BlockVFBufInfo* vInfo = block_info;
     // flag != 0: the consumer stopped draining, readLen will never catch up.
-    while (block_info->readLen != block_info->writeLen && block_info->flag == 0) {
+    while (vInfo->readLen != vInfo->writeLen && vInfo->flag == 0) {
         __asm__ __volatile__("");
     }
 }

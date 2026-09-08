@@ -36,11 +36,22 @@ __simd_callee__ inline void __trap()
 }
 
 #if !defined(ASCENDC_CPU_DEBUG)
+__simd_callee__ inline bool is_assert_handshake_drained()
+{
+    __ubuf__ volatile BlockVFBufInfo* blockInfo = get_printf_ubuf_addr(0);
+    return blockInfo->assertFlag == BlockVFBufInfo::AssertState::DRAINED;
+}
+
 __ASC_USE_RESERVED_UBUF__(3510, "assert is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 static __attribute__((noinline)) __simd_callee__ void __assert_fail(
     __ubuf__ const char* assertion, __ubuf__ const char* file, unsigned int line,
     __ubuf__ const char* function) noexcept
 {
+    // The AICore consumer exits after acknowledging the first assertion in this asc_vf_call.
+    if (is_assert_handshake_drained()) {
+        __trap();
+        return;
+    }
     printf_impl_assert("[ASSERT] %s:%u: %s: Assertion '%s' failed.\n", file, line, function, assertion);
     wait_vf_assert_handshake();
     __trap();
@@ -52,6 +63,10 @@ static __attribute__((noinline)) __simd_callee__ void __assert_fail_msg(
     __ubuf__ const char* assertion, __ubuf__ const char* file, unsigned int line, __ubuf__ const char* function,
     __ubuf__ const char* fmt, Args&&... args) noexcept
 {
+    if (is_assert_handshake_drained()) {
+        __trap();
+        return;
+    }
     printf_impl_assert_msg(assertion, file, line, function, fmt, args...);
     wait_vf_assert_handshake();
     __trap();

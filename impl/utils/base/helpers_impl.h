@@ -23,7 +23,7 @@
 namespace asc {
 namespace details {
 template <auto funcPtr, typename DebugTag = AscendC::Internal::SimdVfDebugTag, typename... Args>
-__aicore__ static inline void asc_vf_call_impl(Args&&... args)
+__aicore__ static __attribute__((always_inline)) inline void asc_vf_call_impl(Args&&... args)
 {
     if constexpr (AscendC::Internal::SimdVfDebugTraits<DebugTag>::enabled) {
         AscVFDebugInitUb();
