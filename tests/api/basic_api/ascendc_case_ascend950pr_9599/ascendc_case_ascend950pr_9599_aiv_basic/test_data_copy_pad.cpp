@@ -18,8 +18,8 @@ using namespace std;
 using namespace AscendC;
 
 static_assert(
-    std::is_same<decltype(DataCopyExtParams::blockCount), int32_t>::value,
-    "DataCopyExtParams::blockCount must be int32_t on NPU architecture 3510");
+    std::is_same<decltype(DataCopyExtParams::blockCount), uint16_t>::value,
+    "DataCopyExtParams::blockCount must be uint16_t on NPU architecture 3510");
 
 struct TestDataCopyPadParams {
     uint32_t dataSize;
@@ -106,9 +106,9 @@ TEST_P(TestDataCopyPadSuite, TestDataCopyPadCases)
     SetGCoreType(0);
 }
 
-TEST(DataCopyExtParamsSuite, BlockCountSupports21BitValue)
+TEST(DataCopyExtParamsSuite, BlockCountSupports16BitValue)
 {
-    constexpr int32_t blockCount = (1 << 21) - 1;
+    constexpr uint16_t blockCount = UINT16_MAX;
     DataCopyExtParams copyParams{blockCount, 1, 0, 0, 0};
 
     EXPECT_EQ(copyParams.blockCount, blockCount);

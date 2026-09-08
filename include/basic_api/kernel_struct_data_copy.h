@@ -209,12 +209,12 @@ struct DataCopyExtParams {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
                               (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
     __aicore__ DataCopyExtParams(
-        const int32_t count, const uint32_t len, const int64_t srcStrideIn, const int64_t dstStrideIn,
+        const uint16_t count, const uint32_t len, const int64_t srcStrideIn, const int64_t dstStrideIn,
         const uint32_t rsvIn)
         : blockCount(count), blockLen(len), srcStride(srcStrideIn), dstStride(dstStrideIn), rsv(rsvIn)
     {}
 
-    int32_t blockCount = DEFAULT_DATA_COPY_NBURST;
+    uint16_t blockCount = DEFAULT_DATA_COPY_NBURST;
     uint32_t blockLen = 0;
     int64_t srcStride = static_cast<int64_t>(DEFAULT_DATA_COPY_STRIDE);
     int64_t dstStride = static_cast<int64_t>(DEFAULT_DATA_COPY_STRIDE);

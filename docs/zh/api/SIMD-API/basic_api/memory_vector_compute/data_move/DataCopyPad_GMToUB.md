@@ -127,7 +127,7 @@
 
 | 参数名 | 描述 |
 | :--- | :--- |
-| blockCount | 搬运的数据块个数，数据类型为int32_t，取值范围：blockCount∈[0, $2^{21}−1$]，默认值为1。 |
+| blockCount | 搬运的数据块个数，数据类型为uint16_t，取值范围：blockCount∈[0, 65535]，默认值为1。 |
 | blockLen | 搬运的每个数据块长度，数据类型为uint32_t，取值范围：blockLen∈[0, $2^{21}−1$]，单位：1B。<br>**注：blockLen必须是sizeof(T)的整数倍，需要注意不要超过UB空间大小。** |
 | srcStride | 源操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），数据类型为int64_t，取值范围：srcStride∈[-blockLen, $2^{40}−1$]，单位：1B。当srcStride = -blockLen时，表示每次传输的连续数据块均为同一块，即重复搬运第一个数据块。 |
 | dstStride | 目的操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），数据类型为int64_t，取值范围：dstStride∈[0, 65535]，单位：dataBlock（32B）。若PaddingMode为Compact模式，该参数无效，默认值为0，取默认值即可。<br>**注：需要注意不要超过UB空间大小**。 |
@@ -286,7 +286,7 @@
 
     | 参数名 | 数据类型 | 取值范围 |
     | --- | --- | --- |
-    | blockCount | int32_t | [0, $2^{21}−1$] |
+    | blockCount | uint16_t | [0, 65535] |
     | blockLen | uint32_t | [0, $2^{21}−1$] |
     | srcStride | int64_t | [-blockLen, $2^{40}−1$] |
     | dstStride | int64_t | [0, 65535] |
