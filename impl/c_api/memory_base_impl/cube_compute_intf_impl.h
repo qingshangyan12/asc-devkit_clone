@@ -68,6 +68,7 @@ __aicore__ inline void asc_set_hf32_round_mode(asc_hf32_round_mode hf32_round_mo
     }
 }
 
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_set_hf32_round_mode)
 __aicore__ inline void asc_enable_hf32_trans(uint32_t mode)
 {
     constexpr int32_t HF32_TRANS_MODE_BIT = 47;
