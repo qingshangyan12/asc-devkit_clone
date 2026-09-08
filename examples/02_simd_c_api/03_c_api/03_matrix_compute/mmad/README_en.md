@@ -142,7 +142,7 @@ This example selects scenarios through the compilation parameter `SCENARIO_NUM`.
   1. `asc_copy_gm2l1_nd2nz` + `asc_set_gm2l1_nz_para`: Transfer A, B, Bias from GM to L1 (ND -> Nz);
   2. `asc_copy_l12l0a`: Transfer A from L1 to L0A; `asc_copy_l12l0b_trans`: Transfer B from L1 to L0B with transposition; `asc_copy_l12bt`: Transfer Bias from L1 to BT;
   3. `asc_mmad`: Matrix multiply-add, C matrix initial value from BT;
-  4. `asc_copy_l0c2gm` + `asc_set_l0c2gm_nz2nd`: Transfer result from L0C to GM (Nz -> ND);
+   4. `asc_copy_l0c2gm` + `asc_set_l0c_copy_nz_para`: Transfer result from L0C to GM (Nz -> ND);
 - Description: For int8_t type input with B matrix not transposed, the N axis aligns to 2 * 16, filling a 32 * 16 fractal with all invalid data. As shown in Figure 1 below, if `right_width = N` is set, it would read fractals numbered 3 and 7 while failing to read fractals numbered 9 and 10 that contain valid data. Therefore, set: `right_width = CeilAlign(N, BLOCK_CUBE * fractalNum)`, which reads all fractals. Although the matrix computation result includes results from invalid data participation, the `asc_copy_l0c2gm` instruction ensures that results from invalid data are not transferred out by setting `n_size = N` during data transfer.
 <p align="center">
   <img src="figures/mmad_s8_L0B_转置.png" width="700">
@@ -161,7 +161,7 @@ Figure 1: int8_t type, B not transposed, N axis actual alignment requirement dif
   1. `asc_copy_gm2l1_nd2nz` + `asc_set_gm2l1_nz_para`: Transfer A, B from GM to L1 (B is stored in GM with transposed ND layout);
   2. `asc_copy_l12l0a`: Transfer A from L1 to L0A; `asc_copy_l12l0b`: Transfer B directly from L1 to L0B (B is already transposed to Nz layout in L1);
   3. `asc_mmad`: Called twice. The first call with `c_matrix_init_val = true` initializes C to 0 and computes A x B; the second call with `c_matrix_init_val = false` and `c_matrix_source = false` uses CO1 as initial value to accumulate the second A x B;
-  4. `asc_copy_l0c2gm` + `asc_set_l0c2gm_nz2nd`: Transfer result from L0C to GM;
+   4. `asc_copy_l0c2gm` + `asc_set_l0c_copy_nz_para`: Transfer result from L0C to GM;
 
 ### Matrix Multiplication (Mmad)
 
