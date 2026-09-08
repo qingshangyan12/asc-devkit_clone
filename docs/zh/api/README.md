@@ -158,7 +158,6 @@
                 -   [Gemm（废弃）](SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Gemm_deprecated.md)
             -   [Mmad计算关键特性说明](SIMD-API/basic_api/cube_compute_ISASI/mmad_compute_key_features/mmad_compute_key_features.md)
                 -   [GEMV](SIMD-API/basic_api/cube_compute_ISASI/mmad_compute_key_features/GEMV.md)
-
                 -   [HF32](SIMD-API/basic_api/cube_compute_ISASI/mmad_compute_key_features/HF32.md)
                 -   [UnitFlag](SIMD-API/basic_api/cube_compute_ISASI/mmad_compute_key_features/UnitFlag.md)
                 -   [K方向对齐约束](SIMD-API/basic_api/cube_compute_ISASI/mmad_compute_key_features/k_direction_alignment_constraint.md)
@@ -348,6 +347,9 @@
             -   [数据重排（ISASI）](SIMD-API/basic_api/memory_vector_compute/data_rearrange_ISASI/data_rearrange_ISASI.md)
                 -   [Interleave](SIMD-API/basic_api/memory_vector_compute/data_rearrange_ISASI/Interleave.md)
                 -   [DeInterleave](SIMD-API/basic_api/memory_vector_compute/data_rearrange_ISASI/DeInterleave.md)
+            -   [废弃接口](SIMD-API/basic_api/deprecated_interface/deprecated_interface.md)
+                -   [WriteGmByPassDCache\(ISASI\)（废弃）](SIMD-API/basic_api/deprecated_interface/WriteGmByPassDCache_ISASI_deprecated.md)
+                -   [ReadGmByPassDCache\(ISASI\)（废弃）](SIMD-API/basic_api/deprecated_interface/ReadGmByPassDCache_ISASI_deprecated.md)
 
         -   [Reg矢量计算](SIMD-API/basic_api/reg_vector_compute/reg_vector_compute.md)
             -   [概述](SIMD-API/basic_api/reg_vector_compute/overview.md)
@@ -495,8 +497,8 @@
             -   [Cast（float转bfloat16\_t）](SIMD-API/basic_api/scalar_compute/Cast_float_to_bfloat16.md)
             -   [Cast（多类型转float）](SIMD-API/basic_api/scalar_compute/Cast_multi_type_to_float.md)
             -   [Nop](SIMD-API/basic_api/scalar_compute/Nop.md)
-            -   [WriteGmByPassDCache\(ISASI\)](SIMD-API/basic_api/scalar_compute/WriteGmByPassDCache_ISASI.md)
-            -   [ReadGmByPassDCache\(ISASI\)](SIMD-API/basic_api/scalar_compute/ReadGmByPassDCache_ISASI.md)
+            -   [WriteGmBypassDCache\(ISASI\)](SIMD-API/basic_api/scalar_compute/WriteGmBypassDCache_ISASI.md)
+            -   [ReadGmBypassDCache\(ISASI\)](SIMD-API/basic_api/scalar_compute/ReadGmBypassDCache_ISASI.md)
 
         -   [资源管理](SIMD-API/basic_api/resource_management/resource_management.md)
             -   [TPipe](SIMD-API/basic_api/resource_management/TPipe/TPipe.md)
@@ -833,7 +835,6 @@
             -   [asc_set_l0c_copy_relu_alpha](SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_relu_alpha.md)
             -   [asc_set_l0c_copy_params](SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_params.md)
             -   [asc_set_l0c_copy_prequant](SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_prequant.md)
-            -   [asc_set_l12l0b_3d_padding](SIMD-API/c_api/cube_datamove/asc_set_l12l0b_3d_padding.md)
             -   [asc_set_l13d_fmatrix](SIMD-API/c_api/cube_datamove/asc_set_l13d_fmatrix.md)
             -   [asc_set_l13d_fmatrix_b](SIMD-API/c_api/cube_datamove/asc_set_l13d_fmatrix_b.md)
             -   [asc_set_l12l0a_3d_padding](SIMD-API/c_api/cube_datamove/asc_set_l12l0a_3d_padding.md)
