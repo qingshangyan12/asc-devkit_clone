@@ -12,7 +12,6 @@
 
 #include "ascendc_tool_log.h"
 #include "file_utils.h"
-#include "atomic_file_writer.h"
 
 #include <boost/filesystem.hpp>
 #include <boost/system/error_code.hpp>
@@ -111,9 +110,7 @@ aclError KernelCompilationWorkspace::CreateOutputDirectoriesAndApplySourcePatche
                 return ACLRTC_ERROR_FAILURE;
             }
         }
-        AtomicFileWriter patchedSourceWriter;
-        if (!patchedSourceWriter.WriteTextToTemporaryFile(filePatches.first.string(), patchedSourceText) ||
-            !patchedSourceWriter.ReplaceDestinationAtomically()) {
+        if (!FileUtils::WriteTextFileAtomically(filePatches.first.string(), patchedSourceText)) {
             return ACLRTC_ERROR_FAILURE;
         }
     }

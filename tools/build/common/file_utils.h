@@ -13,6 +13,7 @@
 
 #include <cstdint>
 #include <fstream>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -54,6 +55,13 @@ public:
 
     static bool ReadRegularFile(const std::string& path, uintmax_t maximum, std::vector<uint8_t>& data);
     static bool FinalizeOutput(std::ofstream& output);
+    static bool WriteTextFileAtomically(const std::string& destinationPath, const std::string& text);
+    // Runs beforeReplacement after copying and closing both files, before replacing
+    // the destination. A false result or exception leaves the destination unchanged;
+    // exceptions propagate after temporary-file cleanup. An empty callback is a no-op.
+    static bool CopyFileAtomically(
+        const std::string& sourcePath, const std::string& destinationPath,
+        const std::function<bool()>& beforeReplacement = {});
     static bool CopyFile(const std::string& source, const std::string& destination) noexcept;
 };
 
