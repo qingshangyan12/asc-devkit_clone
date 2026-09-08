@@ -18,14 +18,47 @@
 
 namespace mc2_ops_hccl {
 
-CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
-    ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable sliceSize,
-    ccu::Variable sliceSizePerJetty, ccu::Variable lastSliceSizePerJetty, ccu::Variable repeatNumInv,
-    ccu::Variable inputSliceStride, ccu::Variable outputSliceStride, ccu::Variable inputRepeatStride,
-    ccu::Variable outputRepeatStride, ccu::Variable isInputOutputEqual, ccu::Variable goSize0, ccu::Variable goSize1,
-    ccu::Variable goSize2, ccu::Variable goSize3, const ChannelHandle channels[], uint32_t channelCount,
-    uint32_t rankSize, uint32_t rankId, uint32_t jettyNum, const std::vector<KfcNhrStepInfo>& stepInfoVector,
-    const std::map<uint32_t, uint32_t>& rank2ChannelIdx);
+struct CcuKernelArgKfcAllGatherNHR1DMultiJettyMem2Mem : CcuKernelArgBase {
+    uint64_t rankSize = 0;
+    uint32_t rankId = 0;
+    uint32_t jettyNum = 4;
+    OpParam opParam;
+    std::vector<KfcNhrStepInfo> stepInfoVector;
+    std::map<uint32_t, uint32_t> rank2ChannelIdx;
+    std::vector<std::vector<uint32_t>> subCommRanks;
+};
+
+struct KfcAllGatherNhrContext : CcuKernelCtxBase {
+    const ChannelHandle* channels = nullptr;
+    uint32_t channelCount = 0;
+    uint32_t rankSize = 0;
+    uint32_t rankId = 0;
+    uint32_t jettyNum = 1;
+    const std::vector<KfcNhrStepInfo>* stepInfoVector = nullptr;
+    const std::map<uint32_t, uint32_t>* rank2ChannelIdx = nullptr;
+
+    ccu::Variable input;
+    std::vector<ccu::Variable> output;
+    std::vector<ccu::Variable> token;
+    ccu::Variable sliceSize;
+    ccu::Variable sliceSizePerJetty;
+    ccu::Variable lastSliceSizePerJetty;
+    ccu::Variable repeatNumInv;
+    ccu::Variable inputSliceStride;
+    ccu::Variable outputSliceStride;
+    ccu::Variable inputRepeatStride;
+    ccu::Variable outputRepeatStride;
+    ccu::Variable isInputOutputEqual;
+    GroupOpSizeVars goSize;
+    std::vector<ccu::Variable> outputSliceOffset;
+    ccu::Variable myRankInputSliceOffset;
+    ccu::Variable repeatFlag;
+    ccu::Variable repeatNum;
+    ccu::Variable constVar1;
+    ccu::Event event;
+};
+
+CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(CcuKernelArg arg);
 
 } // namespace mc2_ops_hccl
 
