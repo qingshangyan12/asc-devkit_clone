@@ -176,27 +176,18 @@ asc-devkit/
 │
 ├── impl/
 │   └── c_api/                    # C API implementation
-│       ├── instr_impl/           # Instruction implementation
-│       │   ├── npu_arch_2201/    # NPU ARCH 220X architecture
-│       │   │   ├── vector_compute_impl/
-│       │   │   │   ├── asc_abs_impl.h
-│       │   │   │   └── ...
-│       │   │   ├── vector_datamove_impl/
-│       │   │   │   ├── asc_copy_gm2ub_align_impl.h
-│       │   │   │   └── ...
-│       │   │   ├── vector_compute_impl.h
-│       │   │   ├── vector_datamove_impl.h
-│       │   │   └── ...
-│       │   └── npu_arch_3510/    # NPU ARCH 351X architecture
-│       │       ├── vector_compute_impl/
-│       │       │   ├── asc_abs_impl.h
-│       │       │   └── ...
-│       │       ├── vector_compute_impl.h
-│       │       └── ...
-│       ├── utils/
-│       │   └── c_api_utils_impl.cpp
-│       └── stub/                 # Stub
-│           └── cce_stub.h
+│       ├── CMakeLists.txt
+│       ├── memory_base_impl/     # 2201 implementations, flat category headers
+│       │   ├── vector_compute_intf_impl.h
+│       │   ├── vector_datamove_intf_impl.h
+│       │   └── ...
+│       └── reg_base_impl/        # Shared regbase implementations
+│           ├── reg_compute_intf_impl.h
+│           ├── vector_datamove_intf_impl.h
+│           ├── ...
+│           └── npu_arch_3510/    # Deprecated 3510 interfaces and exclusive helpers only
+│               ├── reg_compute_intf_impl.h
+│               └── ...
 │
 ├── tests/
 │   └── api/

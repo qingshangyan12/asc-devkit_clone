@@ -176,27 +176,18 @@ asc-devkit/
 │
 ├── impl/
 │   └── c_api/                    # C API实现
-│       ├── instr_impl/           # 指令实现
-│       │   ├── npu_arch_2201/    # NPU ARCH 220X架构
-│       │   │   ├── vector_compute_impl/
-│       │   │   │   ├── asc_abs_impl.h
-│       │   │   │   └── ...
-│       │   │   ├── vector_datamove_impl/
-│       │   │   │   ├── asc_copy_gm2ub_align_impl.h
-│       │   │   │   └── ...
-│       │   │   ├── vector_compute_impl.h
-│       │   │   ├── vector_datamove_impl.h
-│       │   │   └── ...
-│       │   └── npu_arch_3510/    # NPU ARCH 351X架构
-│       │       ├── vector_compute_impl/
-│       │       │   ├── asc_abs_impl.h
-│       │       │   └── ...
-│       │       ├── vector_compute_impl.h
-│       │       └── ...
-│       ├── utils/
-│       │   └── c_api_utils_impl.cpp
-│       └── stub/                 # Stub
-│           └── cce_stub.h
+│       ├── CMakeLists.txt
+│       ├── memory_base_impl/     # 2201实现，目录下只有分类头
+│       │   ├── vector_compute_intf_impl.h
+│       │   ├── vector_datamove_intf_impl.h
+│       │   └── ...
+│       └── reg_base_impl/        # regbase公共实现
+│           ├── reg_compute_intf_impl.h
+│           ├── vector_datamove_intf_impl.h
+│           ├── ...
+│           └── npu_arch_3510/    # 仅3510废弃接口及专用辅助实现
+│               ├── reg_compute_intf_impl.h
+│               └── ...
 │
 ├── tests/
 │   └── api/
