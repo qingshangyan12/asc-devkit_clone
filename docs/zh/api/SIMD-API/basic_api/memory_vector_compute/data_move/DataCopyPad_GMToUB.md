@@ -114,14 +114,14 @@
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数，类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor_intro.md)，存储位置为UB，目的地址需要32字节对齐。 |
 | src | 输入 | 源操作数，类型为[GlobalTensor](../../data_structures/GlobalTensor/GlobalTensor_intro.md)，存储位置为Global Memory，源地址需要1字节对齐。 |
-| dataCopyParams | 输入 | 搬运参数。DataCopyExtParams类型，结构体参数说明请参考[表3](#table_gm2ub_pad_3)、[表4](#table_gm2ub_pad_4)。 |
+| dataCopyParams | 输入 | 搬运参数。DataCopyExtParams类型，具体参数说明见下文。 |
 | padParams | 输入 | 从Global Memory搬运数据至Local Memory时，可以根据开发者需要，在搬运数据左边或右边填充数据。padParams是用于控制数据填充过程的参数。DataCopyPadExtParams类型，具体参数请参考[表5](#table_gm2ub_pad_5)。 |
 
 下文表格中列出的结构体参数定义请参考`${INSTALL_DIR}/asc/include/basic_api/kernel_struct_data_copy.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。
 
 <!-- npu="950" id30 -->
 
-针对Ascend 950PR/Ascend 950DT：
+针对Ascend 950PR/Ascend 950DT，DataCopyExtParams结构体参数定义请参考[表3](#table_gm2ub_pad_3)。
 
 **表3**  DataCopyExtParams结构体参数定义<a name="table_gm2ub_pad_3"></a>
 
@@ -137,7 +137,17 @@
 
 <!-- npu="A3,910b,310b" id31 -->
 
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas 200I/500 A2 推理产品：
+针对如下型号，DataCopyExtParams结构体参数定义请参考[表4](#table_gm2ub_pad_4)：
+
+<!-- npu="A3" id33 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+<!-- end id33 -->
+<!-- npu="910b" id34 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+<!-- end id34 -->
+<!-- npu="310b" id35 -->
+- Atlas 200I/500 A2 推理产品
+<!-- end id35 -->
 
 **表4**  DataCopyExtParams结构体参数定义<a name="table_gm2ub_pad_4"></a>
 
@@ -293,7 +303,16 @@
 
 <!-- end id29 -->
 <!-- npu="A3,910b,310b" id32 -->
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas 200I/500 A2 推理产品，DataCopyExtParams结构体参数的数据类型和取值范围如下：
+- 针对如下型号，DataCopyExtParams结构体参数的数据类型和取值范围如下：
+  <!-- npu="A3" id36 -->
+  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+  <!-- end id36 -->
+  <!-- npu="910b" id37 -->
+  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  <!-- end id37 -->
+  <!-- npu="310b" id38 -->
+  - Atlas 200I/500 A2 推理产品
+  <!-- end id38 -->
 
     **表7**  DataCopyExtParams结构体参数的数据类型和取值范围
 
