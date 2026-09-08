@@ -26,10 +26,16 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/load/loadalign.h"`。
+
 从Unified Buffer（UB）中32字节对齐的起始地址读取连续数据并进行2倍下采样。接口采用Post Update模式，搬运完成后自动更新源地址指针。
 
 - 当`dst`为矢量数据寄存器时，读取2×VL（512字节）长度数据，保留偶数下标元素后写入VL长度数据。
 - 当`dst`为掩码寄存器时，读取VL/4（64字节）长度数据，保留偶数下标bit后写入VL/8长度数据。
+
+**图1** 下采样搬入掩码寄存器
+
+![](../../figures/capi_loadalign_mask_downsample.png)
 
 本接口仅在AIV上生效，非AIV调用直接返回。
 

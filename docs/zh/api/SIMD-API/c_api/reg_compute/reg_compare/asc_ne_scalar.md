@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/compute/reg_compare.h"`。
+
 根据`mask`将源操作数`src`按元素与标量`value`进行比较，若$src_i \neq value$，则对应结果位为1，否则为0。每个元素的比较结果占一个比特。计算公式如下：
 
 $$
@@ -39,12 +41,12 @@ $$
 ## 函数原型
 
 ```c
-// 通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_bool asc_ne_scalar(vector_<dtype> src,
                                                   <dtype> value,
                                                   vector_bool mask)
 
-// 通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_ne_scalar(vector_bool& dst,
                                           vector_<dtype> src,
                                           <dtype> value,

@@ -11,7 +11,7 @@
 #define __TESTS_C_API_STUB__
 #include <cstdint>
 #include "stub_fun.h"
-#include "c_api/utils/enum.h"
+#include "c_api/defs/enum.h"
 
 template <typename C, typename A, typename B>
 inline void mad(
@@ -88,6 +88,10 @@ mock_copy_matrix_cc_to_gm(int8_t, int32_t);
 #ifndef __biasbuf__
 #define __biasbuf__
 #endif
+
+inline void sprsts(Literal, __ubuf__ uint32_t*, int32_t) {}
+
+inline void sprsts(Literal, __ubuf__ uint32_t*&, int32_t, Literal) {}
 
 void vsts(
     vector_f8e4m3 data, __ubuf__ fp8_e4m3fn_t* base, int32_t offset, Literal dist, vector_bool mask, Literal mode);

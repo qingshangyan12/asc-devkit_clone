@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/vector_datamove/vector_datamove.h"`。
+
 将数据从Unified Buffer（UB）搬运到UB。
 
 ## 函数原型
@@ -51,6 +53,7 @@ __aicore__ inline void asc_copy_ub2ub_sync(__ubuf__ void* dst, __ubuf__ void* sr
 ## 参数说明
 
 **表1** 参数说明
+
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
 | dst | 输出 | 目的UB地址。 |

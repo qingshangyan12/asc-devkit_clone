@@ -60,7 +60,7 @@ HcclResult InsTempReduceScatterOmniPipeNHR::KernelRun(
 }
 
 HcclResult InsTempReduceScatterOmniPipeNHR::DoLocalCopy(
-    const TemplateDataParams& tempAlgParams, const std::vector<ThreadHandle>& threads)
+    const TemplateDataParams& tempAlgParams, const std::vector<ThreadHandle>& threads) const
 {
     HCCL_INFO("[InsTempReduceScatterOmniPipeNHR][DoLocalCopy] DoLocalCopy myRank_ = [%u]", myRank_);
     u32 rankIdx = 0;
@@ -101,7 +101,7 @@ HcclResult InsTempReduceScatterOmniPipeNHR::DoLocalCopy(
 HcclResult InsTempReduceScatterOmniPipeNHR::GetNHRDataSize(
     const AicpuNHRStepInfo& st, const u32 channelIdx, void* sendCclBuffAddr, void* recvCclBuffAddr,
     const u32 dataTypeSize, const u64 rptNum, std::vector<DataSlice>& txSrcSlices, std::vector<DataSlice>& txDstSlices,
-    std::vector<DataSlice>& rxSrcSlices, std::vector<DataSlice>& rxDstSlices)
+    std::vector<DataSlice>& rxSrcSlices, std::vector<DataSlice>& rxDstSlices) const
 {
     for (u32 i = 0; i < st.nSlices; ++i) {
         const u32 txIdx = st.txSliceIdxs[i]; // 算法序
@@ -199,7 +199,7 @@ HcclResult InsTempReduceScatterOmniPipeNHR::RunNHR(const std::vector<ThreadHandl
 }
 
 //  计算每轮收发的对端以及slice编号
-HcclResult InsTempReduceScatterOmniPipeNHR::GetStepInfoList(std::vector<AicpuNHRStepInfo>& stepInfoList)
+HcclResult InsTempReduceScatterOmniPipeNHR::GetStepInfoList(std::vector<AicpuNHRStepInfo>& stepInfoList) const
 {
     // 将本 rank 号转换成算法使用的索引号
     u32 u32x = 0;

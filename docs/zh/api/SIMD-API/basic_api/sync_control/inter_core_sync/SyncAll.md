@@ -103,8 +103,8 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 
 - 硬件同步接口：
     用于多个核之间的同步控制，支持以下同步场景：
-    - 纯Vector算子的全核同步，可参考[CrossCoreSetFlag的模式0](key_features.md#ZH-CN_TOPIC_0000002586300741)。
-    - 融合算子的全核同步，一次性实现三个核间同步能力（参考[CrossCoreSetFlag的关键特性说明](key_features.md#ZH-CN_TOPIC_0000002586300741)）：首先完成单个AI Core内，AIC与所有AIV同步（AIC等AIV）；接着完成多个AI Core间，所有AIC的同步；最后完成单个AI Core内，所有AIV与AIC同步（AIV等AIC）。
+    - 纯Vector算子的全核同步，可参考[CrossCoreSetFlag的模式0](key_features.md)。
+    - 融合算子的全核同步，一次性实现三个核间同步能力（参考[CrossCoreSetFlag的关键特性说明](key_features.md)）：首先完成单个AI Core内，AIC与所有AIV同步（AIC等AIV）；接着完成多个AI Core间，所有AIC的同步；最后完成单个AI Core内，所有AIV与AIC同步（AIV等AIC）。
 
 - 软件同步接口：
     仅支持纯Vector算子的多核（参与同步的核数可通过入参指定）同步。每一个AIV都向全局内存对应位置写入信号值1，接着每一个AIV都持续轮询全局内存中所有AIV对应的信号值，直到所有AIV核对应的信号值都变为1。
@@ -194,6 +194,7 @@ SyncAll硬件同步和软件同步接口的内部实现不同，约束条件也�
             | isAIVOnly=true | 14 | AIV：14 |
             | isAIVOnly=false（核函数（Kernel）使用`__mix__(1, 1)`修饰时） | 11、12、13 | AIC：11、12、13；AIV：12、13 |
             | isAIVOnly=false（核函数（Kernel）使用`__mix__(1, 2)`修饰时） | 11、12、13、28、29 | AIC：11、12、13、28、29；AIV：12、13 |
+
         <!-- end id28 -->
         <!-- npu="A3,910b" id29 -->
         - 针对[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)，SyncAll硬件同步接口的flagId占用情况如表4所示：
@@ -204,6 +205,7 @@ SyncAll硬件同步和软件同步接口的内部实现不同，约束条件也�
             | :--- | :--- | :--- |
             | isAIVOnly=true | 14 | AIV：14 |
             | isAIVOnly=false | 11、12、13 | AIC：11、12、13；AIV：12、13 |
+
         <!-- end id29 -->
 
 - 硬件同步接口和软件同步接口公共约束：使用该接口进行多核控制时，算子调用时指定的逻辑AI Core核数numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致核函数（Kernel）“卡死”现象。
