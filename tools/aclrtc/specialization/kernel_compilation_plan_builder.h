@@ -28,8 +28,9 @@ public:
 
 private:
     aclError CheckResourceWorktreeDirectory() const;
-    bool ExpandManifestText(const std::string& text, const std::string& location, std::string& resolvedText) const;
-    aclError BindConstantSources(KernelCompilationPlan& plan) const;
+    bool ExpandPathAndEnvironmentReferences(
+        const std::string& text, const std::string& location, std::string& resolvedText) const;
+    aclError BuildConstantSourcePatches(KernelCompilationPlan& plan) const;
     aclError BindManifestCommand(const ManifestCommand& spec, CompilationCommand& command) const;
     aclError BindLinkCommand(const CompilationManifest& manifest, KernelCompilationPlan& plan) const;
 

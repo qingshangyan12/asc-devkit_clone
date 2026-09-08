@@ -21,7 +21,7 @@ using Json = nlohmann::json;
 constexpr char SCHEMA_VERSION[] = "1.0";
 constexpr char OPTIONS_PREFIX[] = "${options:";
 
-bool ReadNonnegativeInteger(const Json& value, uint64_t maximum, uint64_t& result)
+bool ReadBoundedNonnegativeInteger(const Json& value, uint64_t maximum, uint64_t& result)
 {
     if (!value.is_number_integer() || (!value.is_number_unsigned() && value.get<int64_t>() < 0)) {
         return false;
@@ -87,7 +87,7 @@ aclError CompilationManifestParser::ParseCommand(
     spec.diagnosticLabel = objectName + "/" + type + "[" + std::to_string(index) + "]";
     if (command.contains("stage")) {
         uint64_t stage = 0U;
-        if (!ReadNonnegativeInteger(command.at("stage"), std::numeric_limits<uint32_t>::max(), stage)) {
+        if (!ReadBoundedNonnegativeInteger(command.at("stage"), std::numeric_limits<uint32_t>::max(), stage)) {
             ASCENDLOGE("Manifest command %s has invalid stage", spec.diagnosticLabel.c_str());
             return ACLRTC_ERROR_FAILURE;
         }

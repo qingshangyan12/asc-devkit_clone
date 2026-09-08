@@ -30,8 +30,7 @@ public:
     uint64_t GetBoundByteSize() const { return boundByteSize_; }
 
 private:
-    enum class State { Unparsed, Parsed, Bound };
-    State state_{State::Unparsed};
+    bool definitionParsed_{false};
     std::string name_;
     uint64_t parameterIndex_{0U};
     // Zero means the byte size must be obtained from the bound argument.

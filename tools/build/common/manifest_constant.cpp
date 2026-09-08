@@ -84,14 +84,14 @@ bool ManifestConstant::ParseDefinition(const Json& constant)
     result.name_ = constant.at("name").get<std::string>();
     result.targetFile_ = constant.at("file").get<std::string>();
     result.templateText_ = constant.at("template").get<std::string>();
-    result.state_ = State::Parsed;
+    result.definitionParsed_ = true;
     *this = std::move(result);
     return true;
 }
 
 bool ManifestConstant::BindArgument(uint64_t argsCount, const void* const* argsAddr, const uint64_t* argsBytes)
 {
-    if (state_ == State::Unparsed) {
+    if (!definitionParsed_) {
         ASCENDLOGE("Constant definition must be parsed before binding an argument");
         return false;
     }
@@ -119,7 +119,6 @@ bool ManifestConstant::BindArgument(uint64_t argsCount, const void* const* argsA
     }
     borrowedData_ = argsAddr[parameterIndex_];
     boundByteSize_ = byteSize;
-    state_ = State::Bound;
     return true;
 }
 

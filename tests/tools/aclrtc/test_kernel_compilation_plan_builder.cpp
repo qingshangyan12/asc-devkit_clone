@@ -273,7 +273,7 @@ TEST(KernelCompilationPlanBuilderTest, BuildsBasicPlanFromOnlySelectedManifestFi
     EXPECT_EQ(compileCommand.commandKind, CompilationCommandKind::Compile);
     EXPECT_EQ(compileCommand.executablePath, workspace.ToolchainPath() / "bin/bisheng");
     EXPECT_EQ(
-        compileCommand.commandArguments,
+        compileCommand.arguments,
         (std::vector<std::string>{
             "-I", workspace.SourceDirectoryPath().string(), "-I" + (workspace.ToolchainPath() / "include").string(),
             (workspace.ResourcePath() / "resources/src/basic.cpp").string(), "-g", "-DVALUE=1", "-o",
@@ -388,10 +388,8 @@ TEST(KernelCompilationPlanBuilderTest, PreservesExplicitStagesAndManifestCommand
     EXPECT_EQ(plan.compilationCommands[2].parallelStage, 1U);
     EXPECT_FALSE(plan.compilationCommands[3].parallelStage.has_value());
     EXPECT_NE(
-        std::find(
-            plan.compilationCommands[1].commandArguments.begin(), plan.compilationCommands[1].commandArguments.end(),
-            "-g"),
-        plan.compilationCommands[1].commandArguments.end());
+        std::find(plan.compilationCommands[1].arguments.begin(), plan.compilationCommands[1].arguments.end(), "-g"),
+        plan.compilationCommands[1].arguments.end());
 }
 
 TEST(KernelCompilationPlanBuilderTest, SelectsAllRequestedObjectsInManifestOrder)
@@ -434,7 +432,7 @@ TEST(KernelCompilationPlanBuilderTest, SelectsAllRequestedObjectsInManifestOrder
     EXPECT_EQ(plan.compilationCommands[5].diagnosticLabel, "sk_aux/objcopy[1]");
     EXPECT_EQ(plan.compilationCommands[6].diagnosticLabel, "link");
 
-    const std::vector<std::string>& linkArguments = plan.compilationCommands.back().commandArguments;
+    const std::vector<std::string>& linkArguments = plan.compilationCommands.back().arguments;
     EXPECT_NE(
         std::find(
             linkArguments.begin(), linkArguments.end(),
@@ -534,13 +532,9 @@ TEST(KernelCompilationPlanBuilderTest, DoesNotRecursivelyExpandEnvironmentOrUser
     KernelCompilationPlan plan;
     ASSERT_EQ(
         BuildPlanFromManifest(request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath(), plan), 0);
-    const std::vector<std::string>& commandArguments = plan.compilationCommands.front().commandArguments;
-    EXPECT_NE(
-        std::find(commandArguments.begin(), commandArguments.end(), "${options:not_reexpanded}"),
-        commandArguments.end());
-    EXPECT_NE(
-        std::find(commandArguments.begin(), commandArguments.end(), "${env:USER_OPTION_STAYS_LITERAL}"),
-        commandArguments.end());
+    const std::vector<std::string>& arguments = plan.compilationCommands.front().arguments;
+    EXPECT_NE(std::find(arguments.begin(), arguments.end(), "${options:not_reexpanded}"), arguments.end());
+    EXPECT_NE(std::find(arguments.begin(), arguments.end(), "${env:USER_OPTION_STAYS_LITERAL}"), arguments.end());
 }
 
 TEST(KernelCompilationPlanBuilderTest, AcceptsKernelWithoutLinkOptions)
@@ -792,20 +786,20 @@ TEST(KernelCompilationPlanBuilderTest, ExpandsCommandPrefixAndRejectsInvalidComm
             request, CreateManifest(), workspace.ResourcePath(), workspace.SourceDirectoryPath(), expectedPlan),
         ascendc::aclrtc::ACLRTC_SUCCESS);
     Json commandPrefixManifest = CreateManifest();
-    auto& commandArguments = commandPrefixManifest["kernels"][1]["objects"][0]["commands"][0]["cmd"];
-    Json commandPrefix = Json::array({commandArguments[0]});
+    auto& arguments = commandPrefixManifest["kernels"][1]["objects"][0]["commands"][0]["cmd"];
+    Json commandPrefix = Json::array({arguments[0]});
     for (const auto& argument : commandPrefixManifest["options"]["common_compile"]) {
         commandPrefix.push_back(argument);
     }
     commandPrefixManifest["options"]["command_prefix"] = std::move(commandPrefix);
-    commandArguments.erase(0);
-    commandArguments[0] = "${options:command_prefix}";
+    arguments.erase(0);
+    arguments[0] = "${options:command_prefix}";
     ASSERT_EQ(
         BuildPlanFromManifest(
             request, commandPrefixManifest, workspace.ResourcePath(), workspace.SourceDirectoryPath(), plan),
         ascendc::aclrtc::ACLRTC_SUCCESS);
     EXPECT_EQ(plan.compilationCommands[0].executablePath, expectedPlan.compilationCommands[0].executablePath);
-    EXPECT_EQ(plan.compilationCommands[0].commandArguments, expectedPlan.compilationCommands[0].commandArguments);
+    EXPECT_EQ(plan.compilationCommands[0].arguments, expectedPlan.compilationCommands[0].arguments);
 
     Json relativeExecutableManifest = CreateManifest();
     relativeExecutableManifest["kernels"][1]["objects"][0]["commands"][0]["cmd"][0] = "bisheng";
@@ -851,8 +845,7 @@ TEST(KernelCompilationPlanBuilderTest, RequiresBasicAndFallsBackWhenSuperKernelI
     ASSERT_EQ(plan.compilationCommands.size(), basicPlan.compilationCommands.size());
     for (size_t index = 0; index < plan.compilationCommands.size(); ++index) {
         EXPECT_EQ(plan.compilationCommands[index].executablePath, basicPlan.compilationCommands[index].executablePath);
-        EXPECT_EQ(
-            plan.compilationCommands[index].commandArguments, basicPlan.compilationCommands[index].commandArguments);
+        EXPECT_EQ(plan.compilationCommands[index].arguments, basicPlan.compilationCommands[index].arguments);
     }
 }
 

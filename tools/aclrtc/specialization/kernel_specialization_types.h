@@ -64,7 +64,7 @@ struct CompilationCommand {
     std::optional<uint32_t> parallelStage;
     std::string diagnosticLabel;
     boost::filesystem::path executablePath;
-    std::vector<std::string> commandArguments;
+    std::vector<std::string> arguments;
 };
 
 struct KernelCompilationPlan {
