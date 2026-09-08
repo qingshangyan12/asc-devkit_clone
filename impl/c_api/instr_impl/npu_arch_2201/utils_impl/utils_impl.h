@@ -26,7 +26,7 @@
 #include "c_api/utils_intf.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_type.h"
 #include "impl/utils/common_types.h"
-#include "impl/utils/sys_macros.h"
+#include "impl/utils/sys_macros_impl.h"
 #include "utils/base/sys_constants.h"
 
 constexpr uint32_t C_API_AIC_TYPE = AscendC::AIC;
@@ -99,7 +99,10 @@ __aicore__ inline void asc_set_mask_count_end()
     }
 }
 
-__aicore__ inline void asc_sync_post_process() { pipe_barrier(pipe_t::PIPE_ALL); }
+__aicore__ inline void asc_sync_post_process()
+{
+    pipe_barrier(pipe_t::PIPE_ALL);
+}
 
 union asc_capi_arch_version {
     uint64_t full;

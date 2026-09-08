@@ -17,8 +17,8 @@
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
 #endif
 
-#ifndef INCLUDE_C_API_SYS_VAR_SYS_VAR_H
-#define INCLUDE_C_API_SYS_VAR_SYS_VAR_H
+#ifndef INCLUDE_C_API_UTILS_SYS_VAR_H
+#define INCLUDE_C_API_UTILS_SYS_VAR_H
 #include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)

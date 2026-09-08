@@ -20,7 +20,7 @@
 #ifndef INCLUDE_C_API_REG_COMPUTE_REG_VECTOR_H
 #define INCLUDE_C_API_REG_COMPUTE_REG_VECTOR_H
 #include "impl/utils/common_types.h"
-#include "c_api/utils/enum.h"
+#include "c_api/defs/enum.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_type.h"
 
@@ -98,14 +98,14 @@ __simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset0, uint32
 
 __simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset0, uint32_t offset1, uint32_t offset2);
 
-__simd_callee__ inline addr_reg asc_update_addr_reg_b32(
-    uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
+__simd_callee__ inline addr_reg asc_update_addr_reg_b32(uint32_t offset0, uint32_t offset1, uint32_t offset2,
+                                                        uint32_t offset3);
 
-__simd_callee__ inline addr_reg asc_update_addr_reg_b16(
-    uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
+__simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset0, uint32_t offset1, uint32_t offset2,
+                                                        uint32_t offset3);
 
-__simd_callee__ inline addr_reg asc_update_addr_reg_b8(
-    uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
+__simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset0, uint32_t offset1, uint32_t offset2,
+                                                       uint32_t offset3);
 
 // ==========asc_create_iter_reg (deprecated, please use asc_update_addr_reg instead)=========
 [[deprecated("NOTICE: asc_create_iter_reg_b32 is deprecated. Please use asc_update_addr_reg_b32 "
@@ -174,8 +174,8 @@ __simd_callee__ inline void asc_sub(vector_int16_t& dst, vector_int16_t src0, ve
 
 __simd_callee__ inline void asc_sub(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
 
-__simd_callee__ inline void asc_sub(
-    vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+__simd_callee__ inline void asc_sub(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1,
+                                    vector_bool mask);
 
 __simd_callee__ inline void asc_sub(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
 
@@ -183,13 +183,12 @@ __simd_callee__ inline void asc_sub(vector_int32_t& dst, vector_int32_t src0, ve
 
 __simd_callee__ inline void asc_sub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
 
-__simd_callee__ inline void asc_sub(
-    vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
+__simd_callee__ inline void asc_sub(vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0,
+                                    vector_uint32_t src1, vector_bool mask);
 
 // ==========asc_subc(uint32_t)==========
-__simd_callee__ inline void asc_subc(
-    vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool carry_src,
-    vector_bool mask);
+__simd_callee__ inline void asc_subc(vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0,
+                                     vector_uint32_t src1, vector_bool carry_src, vector_bool mask);
 
 // ==========asc_and(bool/uint8_t/int8_t/uint16_t/int16_t/half/bfloat16_t/uint32_t/int32_t/float)==========
 __simd_callee__ inline void asc_and(vector_bool& dst, vector_bool src0, vector_bool src1, vector_bool mask);
@@ -198,11 +197,11 @@ __simd_callee__ inline void asc_and(vector_uint8_t& dst, vector_uint8_t src0, ve
 
 __simd_callee__ inline void asc_and(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask);
 
-__simd_callee__ inline void asc_and(
-    vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1, vector_bool mask);
+__simd_callee__ inline void asc_and(vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1,
+                                    vector_bool mask);
 
-__simd_callee__ inline void asc_and(
-    vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1, vector_bool mask);
+__simd_callee__ inline void asc_and(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1,
+                                    vector_bool mask);
 
 __simd_callee__ inline void asc_and(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask);
 
@@ -210,8 +209,8 @@ __simd_callee__ inline void asc_and(vector_int16_t& dst, vector_int16_t src0, ve
 
 __simd_callee__ inline void asc_and(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
 
-__simd_callee__ inline void asc_and(
-    vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+__simd_callee__ inline void asc_and(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1,
+                                    vector_bool mask);
 
 __simd_callee__ inline void asc_and(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
 
@@ -220,42 +219,42 @@ __simd_callee__ inline void asc_and(vector_int32_t& dst, vector_int32_t src0, ve
 __simd_callee__ inline void asc_and(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
 
 // ==========asc_shiftleft_scalar(uint8_t/int8_t/uint16_t/int16_t/uint32_t/int32_t)==========
-__simd_callee__ inline void asc_shiftleft_scalar(
-    vector_uint8_t& dst, vector_uint8_t src, int16_t value, vector_bool mask);
+__simd_callee__ inline void asc_shiftleft_scalar(vector_uint8_t& dst, vector_uint8_t src, int16_t value,
+                                                 vector_bool mask);
 
-__simd_callee__ inline void asc_shiftleft_scalar(
-    vector_int8_t& dst, vector_int8_t src, int16_t value, vector_bool mask);
+__simd_callee__ inline void asc_shiftleft_scalar(vector_int8_t& dst, vector_int8_t src, int16_t value,
+                                                 vector_bool mask);
 
-__simd_callee__ inline void asc_shiftleft_scalar(
-    vector_uint16_t& dst, vector_uint16_t src, int16_t value, vector_bool mask);
+__simd_callee__ inline void asc_shiftleft_scalar(vector_uint16_t& dst, vector_uint16_t src, int16_t value,
+                                                 vector_bool mask);
 
-__simd_callee__ inline void asc_shiftleft_scalar(
-    vector_int16_t& dst, vector_int16_t src, int16_t value, vector_bool mask);
+__simd_callee__ inline void asc_shiftleft_scalar(vector_int16_t& dst, vector_int16_t src, int16_t value,
+                                                 vector_bool mask);
 
-__simd_callee__ inline void asc_shiftleft_scalar(
-    vector_uint32_t& dst, vector_uint32_t src, int16_t value, vector_bool mask);
+__simd_callee__ inline void asc_shiftleft_scalar(vector_uint32_t& dst, vector_uint32_t src, int16_t value,
+                                                 vector_bool mask);
 
-__simd_callee__ inline void asc_shiftleft_scalar(
-    vector_int32_t& dst, vector_int32_t src, int16_t value, vector_bool mask);
+__simd_callee__ inline void asc_shiftleft_scalar(vector_int32_t& dst, vector_int32_t src, int16_t value,
+                                                 vector_bool mask);
 
 // ==========asc_shiftright_scalar(uint8_t/int8_t/uint16_t/int16_t/uint32_t/int32_t)==========
-__simd_callee__ inline void asc_shiftright_scalar(
-    vector_uint8_t& dst, vector_uint8_t src, int16_t value, vector_bool mask);
+__simd_callee__ inline void asc_shiftright_scalar(vector_uint8_t& dst, vector_uint8_t src, int16_t value,
+                                                  vector_bool mask);
 
-__simd_callee__ inline void asc_shiftright_scalar(
-    vector_int8_t& dst, vector_int8_t src, int16_t value, vector_bool mask);
+__simd_callee__ inline void asc_shiftright_scalar(vector_int8_t& dst, vector_int8_t src, int16_t value,
+                                                  vector_bool mask);
 
-__simd_callee__ inline void asc_shiftright_scalar(
-    vector_uint16_t& dst, vector_uint16_t src, int16_t value, vector_bool mask);
+__simd_callee__ inline void asc_shiftright_scalar(vector_uint16_t& dst, vector_uint16_t src, int16_t value,
+                                                  vector_bool mask);
 
-__simd_callee__ inline void asc_shiftright_scalar(
-    vector_int16_t& dst, vector_int16_t src, int16_t value, vector_bool mask);
+__simd_callee__ inline void asc_shiftright_scalar(vector_int16_t& dst, vector_int16_t src, int16_t value,
+                                                  vector_bool mask);
 
-__simd_callee__ inline void asc_shiftright_scalar(
-    vector_uint32_t& dst, vector_uint32_t src, int16_t value, vector_bool mask);
+__simd_callee__ inline void asc_shiftright_scalar(vector_uint32_t& dst, vector_uint32_t src, int16_t value,
+                                                  vector_bool mask);
 
-__simd_callee__ inline void asc_shiftright_scalar(
-    vector_int32_t& dst, vector_int32_t src, int16_t value, vector_bool mask);
+__simd_callee__ inline void asc_shiftright_scalar(vector_int32_t& dst, vector_int32_t src, int16_t value,
+                                                  vector_bool mask);
 
 // ==========asc_select(bool/uint8_t/int8_t/uint16_t/int16_t/half/bfloat16_t/uint32_t/int32_t/float)==========
 __simd_callee__ inline void asc_select(vector_bool& dst, vector_bool src0, vector_bool src1, vector_bool mask);
@@ -264,27 +263,27 @@ __simd_callee__ inline void asc_select(vector_uint8_t& dst, vector_uint8_t src0,
 
 __simd_callee__ inline void asc_select(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask);
 
-__simd_callee__ inline void asc_select(
-    vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1, vector_bool mask);
+__simd_callee__ inline void asc_select(vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1,
+                                       vector_bool mask);
 
-__simd_callee__ inline void asc_select(
-    vector_hifloat8_t& dst, vector_hifloat8_t src0, vector_hifloat8_t src1, vector_bool mask);
+__simd_callee__ inline void asc_select(vector_hifloat8_t& dst, vector_hifloat8_t src0, vector_hifloat8_t src1,
+                                       vector_bool mask);
 
-__simd_callee__ inline void asc_select(
-    vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1, vector_bool mask);
+__simd_callee__ inline void asc_select(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1,
+                                       vector_bool mask);
 
-__simd_callee__ inline void asc_select(
-    vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask);
+__simd_callee__ inline void asc_select(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1,
+                                       vector_bool mask);
 
 __simd_callee__ inline void asc_select(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask);
 
 __simd_callee__ inline void asc_select(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
 
-__simd_callee__ inline void asc_select(
-    vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+__simd_callee__ inline void asc_select(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1,
+                                       vector_bool mask);
 
-__simd_callee__ inline void asc_select(
-    vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
+__simd_callee__ inline void asc_select(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1,
+                                       vector_bool mask);
 
 __simd_callee__ inline void asc_select(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask);
 
@@ -380,8 +379,8 @@ __simd_callee__ inline void asc_min(vector_uint32_t& dst, vector_uint32_t src0, 
 
 __simd_callee__ inline void asc_min(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
 
-__simd_callee__ inline void asc_min(
-    vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+__simd_callee__ inline void asc_min(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1,
+                                    vector_bool mask);
 
 __simd_callee__ inline void asc_min(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
 
@@ -490,11 +489,11 @@ __simd_callee__ inline void asc_abs(vector_half& dst, vector_half src, vector_bo
 __simd_callee__ inline void asc_abs(vector_float& dst, vector_float src, vector_bool mask);
 
 // ==========asc_mull(uint32_t/int32_t)==========
-__simd_callee__ inline void asc_mull(
-    vector_uint32_t& dst0, vector_uint32_t& dst1, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
+__simd_callee__ inline void asc_mull(vector_uint32_t& dst0, vector_uint32_t& dst1, vector_uint32_t src0,
+                                     vector_uint32_t src1, vector_bool mask);
 
-__simd_callee__ inline void asc_mull(
-    vector_int32_t& dst0, vector_int32_t& dst1, vector_int32_t src0, vector_int32_t src1, vector_bool mask);
+__simd_callee__ inline void asc_mull(vector_int32_t& dst0, vector_int32_t& dst1, vector_int32_t src0,
+                                     vector_int32_t src1, vector_bool mask);
 
 // ==========asc_le(uint8_t/int8_t/uint16_t/int16_t/uint32_t/int32_t/half/float)==========
 __simd_callee__ inline void asc_le(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask);
@@ -633,8 +632,8 @@ __simd_callee__ inline void asc_squeeze_with_status(vector_bfloat16_t& dst, vect
 
 __simd_callee__ inline void asc_squeeze_with_status(vector_hifloat8_t& dst, vector_hifloat8_t src, vector_bool mask);
 
-__simd_callee__ inline void asc_squeeze_with_status(
-    vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src, vector_bool mask);
+__simd_callee__ inline void asc_squeeze_with_status(vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src,
+                                                    vector_bool mask);
 
 __simd_callee__ inline void asc_squeeze_with_status(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src, vector_bool mask);
 
@@ -647,41 +646,41 @@ __simd_callee__ inline void asc_intlv_b16(vector_bool& dst0, vector_bool& dst1, 
 
 __simd_callee__ inline void asc_intlv_b32(vector_bool& dst0, vector_bool& dst1, vector_bool src0, vector_bool src1);
 
-__simd_callee__ inline void asc_intlv(
-    vector_uint8_t& dst0, vector_uint8_t& dst1, vector_uint8_t src0, vector_uint8_t src1);
+__simd_callee__ inline void asc_intlv(vector_uint8_t& dst0, vector_uint8_t& dst1, vector_uint8_t src0,
+                                      vector_uint8_t src1);
 
 __simd_callee__ inline void asc_intlv(vector_int8_t& dst0, vector_int8_t& dst1, vector_int8_t src0, vector_int8_t src1);
 
-__simd_callee__ inline void asc_intlv(
-    vector_uint16_t& dst0, vector_uint16_t& dst1, vector_uint16_t src0, vector_uint16_t src1);
+__simd_callee__ inline void asc_intlv(vector_uint16_t& dst0, vector_uint16_t& dst1, vector_uint16_t src0,
+                                      vector_uint16_t src1);
 
-__simd_callee__ inline void asc_intlv(
-    vector_int16_t& dst0, vector_int16_t& dst1, vector_int16_t src0, vector_int16_t src1);
+__simd_callee__ inline void asc_intlv(vector_int16_t& dst0, vector_int16_t& dst1, vector_int16_t src0,
+                                      vector_int16_t src1);
 
-__simd_callee__ inline void asc_intlv(
-    vector_uint32_t& dst0, vector_uint32_t& dst1, vector_uint32_t src0, vector_uint32_t src1);
+__simd_callee__ inline void asc_intlv(vector_uint32_t& dst0, vector_uint32_t& dst1, vector_uint32_t src0,
+                                      vector_uint32_t src1);
 
-__simd_callee__ inline void asc_intlv(
-    vector_int32_t& dst0, vector_int32_t& dst1, vector_int32_t src0, vector_int32_t src1);
+__simd_callee__ inline void asc_intlv(vector_int32_t& dst0, vector_int32_t& dst1, vector_int32_t src0,
+                                      vector_int32_t src1);
 
 __simd_callee__ inline void asc_intlv(vector_half& dst0, vector_half& dst1, vector_half src0, vector_half src1);
 
 __simd_callee__ inline void asc_intlv(vector_float& dst0, vector_float& dst1, vector_float src0, vector_float src1);
 
-__simd_callee__ inline void asc_intlv(
-    vector_fp8_e8m0_t& dst0, vector_fp8_e8m0_t& dst1, vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1);
+__simd_callee__ inline void asc_intlv(vector_fp8_e8m0_t& dst0, vector_fp8_e8m0_t& dst1, vector_fp8_e8m0_t src0,
+                                      vector_fp8_e8m0_t src1);
 
-__simd_callee__ inline void asc_intlv(
-    vector_fp8_e5m2_t& dst0, vector_fp8_e5m2_t& dst1, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1);
+__simd_callee__ inline void asc_intlv(vector_fp8_e5m2_t& dst0, vector_fp8_e5m2_t& dst1, vector_fp8_e5m2_t src0,
+                                      vector_fp8_e5m2_t src1);
 
-__simd_callee__ inline void asc_intlv(
-    vector_fp8_e4m3fn_t& dst0, vector_fp8_e4m3fn_t& dst1, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1);
+__simd_callee__ inline void asc_intlv(vector_fp8_e4m3fn_t& dst0, vector_fp8_e4m3fn_t& dst1, vector_fp8_e4m3fn_t src0,
+                                      vector_fp8_e4m3fn_t src1);
 
-__simd_callee__ inline void asc_intlv(
-    vector_hifloat8_t& dst0, vector_hifloat8_t& dst1, vector_hifloat8_t src0, vector_hifloat8_t src1);
+__simd_callee__ inline void asc_intlv(vector_hifloat8_t& dst0, vector_hifloat8_t& dst1, vector_hifloat8_t src0,
+                                      vector_hifloat8_t src1);
 
-__simd_callee__ inline void asc_intlv(
-    vector_bfloat16_t& dst0, vector_bfloat16_t& dst1, vector_bfloat16_t src0, vector_bfloat16_t src1);
+__simd_callee__ inline void asc_intlv(vector_bfloat16_t& dst0, vector_bfloat16_t& dst1, vector_bfloat16_t src0,
+                                      vector_bfloat16_t src1);
 
 // ==========asc_unsqueeze(uint8_t/int8_t/uint16_t/int16_t/uint32_t/int32_t)==========
 __simd_callee__ inline void asc_unsqueeze(vector_uint8_t& dst, vector_bool mask);
@@ -764,8 +763,8 @@ __simd_callee__ inline void asc_mul(vector_uint16_t& dst, vector_uint16_t src0, 
 
 __simd_callee__ inline void asc_mul(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
 
-__simd_callee__ inline void asc_mul(
-    vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+__simd_callee__ inline void asc_mul(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1,
+                                    vector_bool mask);
 
 __simd_callee__ inline void asc_mul(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask);
 
@@ -846,53 +845,52 @@ __simd_callee__ inline void asc_add(vector_int32_t& dst, vector_int32_t src0, ve
 
 __simd_callee__ inline void asc_add(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
 
-__simd_callee__ inline void asc_add(
-    vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+__simd_callee__ inline void asc_add(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1,
+                                    vector_bool mask);
 
-__simd_callee__ inline void asc_add(
-    vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
+__simd_callee__ inline void asc_add(vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0,
+                                    vector_uint32_t src1, vector_bool mask);
 
 // // ==========asc_addc(uint32_t)==========
-__simd_callee__ inline void asc_addc(
-    vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool carry_src,
-    vector_bool mask);
+__simd_callee__ inline void asc_addc(vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0,
+                                     vector_uint32_t src1, vector_bool carry_src, vector_bool mask);
 
 // ==========asc_shiftleft(u8/s8/u16/s16/u32/s32)==========
-__simd_callee__ inline void asc_shiftleft(
-    vector_uint8_t& dst, vector_uint8_t src0, vector_int8_t src1, vector_bool mask);
+__simd_callee__ inline void asc_shiftleft(vector_uint8_t& dst, vector_uint8_t src0, vector_int8_t src1,
+                                          vector_bool mask);
 
 __simd_callee__ inline void asc_shiftleft(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask);
 
-__simd_callee__ inline void asc_shiftleft(
-    vector_uint16_t& dst, vector_uint16_t src0, vector_int16_t src1, vector_bool mask);
+__simd_callee__ inline void asc_shiftleft(vector_uint16_t& dst, vector_uint16_t src0, vector_int16_t src1,
+                                          vector_bool mask);
 
-__simd_callee__ inline void asc_shiftleft(
-    vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask);
+__simd_callee__ inline void asc_shiftleft(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1,
+                                          vector_bool mask);
 
-__simd_callee__ inline void asc_shiftleft(
-    vector_uint32_t& dst, vector_uint32_t src0, vector_int32_t src1, vector_bool mask);
+__simd_callee__ inline void asc_shiftleft(vector_uint32_t& dst, vector_uint32_t src0, vector_int32_t src1,
+                                          vector_bool mask);
 
-__simd_callee__ inline void asc_shiftleft(
-    vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask);
+__simd_callee__ inline void asc_shiftleft(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1,
+                                          vector_bool mask);
 
 // ==========asc_shiftright(u8/s8/u16/s16/u32/s32)==========
-__simd_callee__ inline void asc_shiftright(
-    vector_uint8_t& dst, vector_uint8_t src0, vector_int8_t src1, vector_bool mask);
+__simd_callee__ inline void asc_shiftright(vector_uint8_t& dst, vector_uint8_t src0, vector_int8_t src1,
+                                           vector_bool mask);
 
-__simd_callee__ inline void asc_shiftright(
-    vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask);
+__simd_callee__ inline void asc_shiftright(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1,
+                                           vector_bool mask);
 
-__simd_callee__ inline void asc_shiftright(
-    vector_uint16_t& dst, vector_uint16_t src0, vector_int16_t src1, vector_bool mask);
+__simd_callee__ inline void asc_shiftright(vector_uint16_t& dst, vector_uint16_t src0, vector_int16_t src1,
+                                           vector_bool mask);
 
-__simd_callee__ inline void asc_shiftright(
-    vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask);
+__simd_callee__ inline void asc_shiftright(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1,
+                                           vector_bool mask);
 
-__simd_callee__ inline void asc_shiftright(
-    vector_uint32_t& dst, vector_uint32_t src0, vector_int32_t src1, vector_bool mask);
+__simd_callee__ inline void asc_shiftright(vector_uint32_t& dst, vector_uint32_t src0, vector_int32_t src1,
+                                           vector_bool mask);
 
-__simd_callee__ inline void asc_shiftright(
-    vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask);
+__simd_callee__ inline void asc_shiftright(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1,
+                                           vector_bool mask);
 
 // ==========asc_not(u8/s8/u16/s16/half/u32/s32/f32/bool)==========
 __simd_callee__ inline void asc_not(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask);
@@ -1020,8 +1018,8 @@ __simd_callee__ inline void asc_max(vector_float& dst, vector_float src0, vector
 
 __simd_callee__ inline void asc_max(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
 
-__simd_callee__ inline void asc_max(
-    vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+__simd_callee__ inline void asc_max(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1,
+                                    vector_bool mask);
 
 //================asc_min_scalar=================
 __simd_callee__ inline void asc_min_scalar(vector_int32_t& dst, vector_int32_t src, int32_t value, vector_bool mask);
@@ -1040,8 +1038,8 @@ __simd_callee__ inline void asc_min_scalar(vector_float& dst, vector_float src, 
 
 __simd_callee__ inline void asc_min_scalar(vector_half& dst, vector_half src, half value, vector_bool mask);
 
-__simd_callee__ inline void asc_min_scalar(
-    vector_bfloat16_t& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
+__simd_callee__ inline void asc_min_scalar(vector_bfloat16_t& dst, vector_bfloat16_t src, bfloat16_t value,
+                                           vector_bool mask);
 
 //==================asc_reduce_max_datablock====================
 __simd_callee__ inline void asc_reduce_max_datablock(vector_half& dst, vector_half src, vector_bool mask);
@@ -1072,8 +1070,8 @@ __simd_callee__ inline void asc_add_scalar(vector_uint16_t& dst, vector_uint16_t
 
 __simd_callee__ inline void asc_add_scalar(vector_half& dst, vector_half src, half value, vector_bool mask);
 
-__simd_callee__ inline void asc_add_scalar(
-    vector_bfloat16_t& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
+__simd_callee__ inline void asc_add_scalar(vector_bfloat16_t& dst, vector_bfloat16_t src, bfloat16_t value,
+                                           vector_bool mask);
 
 __simd_callee__ inline void asc_add_scalar(vector_int32_t& dst, vector_int32_t src, int32_t value, vector_bool mask);
 
@@ -1130,13 +1128,13 @@ __simd_callee__ inline void asc_pack_to_high(vector_bool& dst, vector_bool src);
 __simd_callee__ inline void asc_exp_sub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
 
 // ==========asc_exp_sub_half2float==========
-__simd_callee__ inline void asc_exp_sub_half2float(
-    vector_float& dst, vector_half src0, vector_half src1, vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos);
+__simd_callee__ inline void
+asc_exp_sub_half2float(vector_float& dst, vector_half src0, vector_half src1, vector_bool mask,
+                       std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos);
 
-__simd_callee__ inline void asc_exp_sub_half2float(
-    vector_float& dst, vector_half src0, vector_half src1, vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos);
+__simd_callee__ inline void
+asc_exp_sub_half2float(vector_float& dst, vector_half src0, vector_half src1, vector_bool mask,
+                       std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos);
 
 // ==========asc_ln(half/float)==========
 __simd_callee__ inline void asc_ln(vector_half& dst, vector_half src, vector_bool mask);
@@ -1173,8 +1171,8 @@ __simd_callee__ inline void asc_max_scalar(vector_half& dst, vector_half src, ha
 
 __simd_callee__ inline void asc_max_scalar(vector_float& dst, vector_float src, float value, vector_bool mask);
 
-__simd_callee__ inline void asc_max_scalar(
-    vector_bfloat16_t& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
+__simd_callee__ inline void asc_max_scalar(vector_bfloat16_t& dst, vector_bfloat16_t src, bfloat16_t value,
+                                           vector_bool mask);
 
 // ==========asc_ne(uint8_t/int8_t/uint16_t/int16_t/uint32_t/int32_t/half/bfloat16_t/float)==========
 __simd_callee__ inline void asc_ne(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask);
@@ -1215,38 +1213,38 @@ __simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_float src, fl
 __simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
 
 // ==========asc_deintlv(int32_t/uint32_t/int16_t/uint16_t/int8_t/uint8_t/fp8_e4m3fn/fp8_e5m2/fp8_e8m0/bfloat16_t/float/half)==========
-__simd_callee__ inline void asc_deintlv(
-    vector_int32_t& dst0, vector_int32_t& dst1, vector_int32_t src0, vector_int32_t src1);
+__simd_callee__ inline void asc_deintlv(vector_int32_t& dst0, vector_int32_t& dst1, vector_int32_t src0,
+                                        vector_int32_t src1);
 
-__simd_callee__ inline void asc_deintlv(
-    vector_uint32_t& dst0, vector_uint32_t& dst1, vector_uint32_t src0, vector_uint32_t src1);
+__simd_callee__ inline void asc_deintlv(vector_uint32_t& dst0, vector_uint32_t& dst1, vector_uint32_t src0,
+                                        vector_uint32_t src1);
 
-__simd_callee__ inline void asc_deintlv(
-    vector_int16_t& dst0, vector_int16_t& dst1, vector_int16_t src0, vector_int16_t src1);
+__simd_callee__ inline void asc_deintlv(vector_int16_t& dst0, vector_int16_t& dst1, vector_int16_t src0,
+                                        vector_int16_t src1);
 
-__simd_callee__ inline void asc_deintlv(
-    vector_uint16_t& dst0, vector_uint16_t& dst1, vector_uint16_t src0, vector_uint16_t src1);
+__simd_callee__ inline void asc_deintlv(vector_uint16_t& dst0, vector_uint16_t& dst1, vector_uint16_t src0,
+                                        vector_uint16_t src1);
 
-__simd_callee__ inline void asc_deintlv(
-    vector_int8_t& dst0, vector_int8_t& dst1, vector_int8_t src0, vector_int8_t src1);
+__simd_callee__ inline void asc_deintlv(vector_int8_t& dst0, vector_int8_t& dst1, vector_int8_t src0,
+                                        vector_int8_t src1);
 
-__simd_callee__ inline void asc_deintlv(
-    vector_uint8_t& dst0, vector_uint8_t& dst1, vector_uint8_t src0, vector_uint8_t src1);
+__simd_callee__ inline void asc_deintlv(vector_uint8_t& dst0, vector_uint8_t& dst1, vector_uint8_t src0,
+                                        vector_uint8_t src1);
 
-__simd_callee__ inline void asc_deintlv(
-    vector_fp8_e4m3fn_t& dst0, vector_fp8_e4m3fn_t& dst1, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1);
+__simd_callee__ inline void asc_deintlv(vector_fp8_e4m3fn_t& dst0, vector_fp8_e4m3fn_t& dst1, vector_fp8_e4m3fn_t src0,
+                                        vector_fp8_e4m3fn_t src1);
 
-__simd_callee__ inline void asc_deintlv(
-    vector_hifloat8_t& dst0, vector_hifloat8_t& dst1, vector_hifloat8_t src0, vector_hifloat8_t src1);
+__simd_callee__ inline void asc_deintlv(vector_hifloat8_t& dst0, vector_hifloat8_t& dst1, vector_hifloat8_t src0,
+                                        vector_hifloat8_t src1);
 
-__simd_callee__ inline void asc_deintlv(
-    vector_fp8_e5m2_t& dst0, vector_fp8_e5m2_t& dst1, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1);
+__simd_callee__ inline void asc_deintlv(vector_fp8_e5m2_t& dst0, vector_fp8_e5m2_t& dst1, vector_fp8_e5m2_t src0,
+                                        vector_fp8_e5m2_t src1);
 
-__simd_callee__ inline void asc_deintlv(
-    vector_fp8_e8m0_t& dst0, vector_fp8_e8m0_t& dst1, vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1);
+__simd_callee__ inline void asc_deintlv(vector_fp8_e8m0_t& dst0, vector_fp8_e8m0_t& dst1, vector_fp8_e8m0_t src0,
+                                        vector_fp8_e8m0_t src1);
 
-__simd_callee__ inline void asc_deintlv(
-    vector_bfloat16_t& dst0, vector_bfloat16_t& dst1, vector_bfloat16_t src0, vector_bfloat16_t src1);
+__simd_callee__ inline void asc_deintlv(vector_bfloat16_t& dst0, vector_bfloat16_t& dst1, vector_bfloat16_t src0,
+                                        vector_bfloat16_t src1);
 
 __simd_callee__ inline void asc_deintlv(vector_float& dst0, vector_float& dst1, vector_float src0, vector_float src1);
 

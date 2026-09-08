@@ -22,14 +22,15 @@
 #ifndef IMPL_TENSOR_API_ATOM_CUBE_COPY_L12BT_H
 #define IMPL_TENSOR_API_ATOM_CUBE_COPY_L12BT_H
 
-#include "impl/tensor_api/arch/cube/l1_to_bt/copy.h"
+#include "impl/tensor_api/arch/cube/l1_to_bt/l1_to_bt_copy.h"
 #include "impl/tensor_api/atom/copy_traits_impl.h"
 
 namespace asc {
 namespace te {
 
 template <typename Traits>
-struct copy_traits<copy_l1_to_biastable, Traits> : public copy_traits<copy_l1_to_biastable, Traits, copy_l1_to_biastable, Traits> {};
+struct copy_traits<copy_l1_to_biastable, Traits>
+    : public copy_traits<copy_l1_to_biastable, Traits, copy_l1_to_biastable, Traits> {};
 
 template <>
 struct copy_traits<copy_l1_to_biastable> : public copy_traits<copy_l1_to_biastable, l1_to_biastable_trait_default> {};

@@ -8,8 +8,8 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#ifndef INCLUDE_C_API_UTILS_C_API_ENUM_H
-#define INCLUDE_C_API_UTILS_C_API_ENUM_H
+#ifndef INCLUDE_C_API_DEFS_ENUM_H
+#define INCLUDE_C_API_DEFS_ENUM_H
 
 #include <cstdint>
 #include <type_traits>
