@@ -25,7 +25,7 @@
 
 ## 功能说明
 
-**`asc_set_l0c2gm_config`接口已废弃。请使用`asc_set_l0c_copy_config`接口替代。TODO：替代接口文档待补齐。**
+**`asc_set_l0c2gm_config`接口已废弃。请使用[asc_set_l0c_copy_config](../cube_datamove/asc_set_l0c_copy_config.md)接口替代。**
 
 数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的矢量量化参数。
 
