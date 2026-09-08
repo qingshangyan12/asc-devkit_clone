@@ -12,7 +12,6 @@
 
 #include "ccu_all_to_all_v.h"
 #include "ccu_kernel_all_to_all_v_mesh1d.h"
-#include "ccu_kernel_kfc_server.h"
 #include "ccu_primitives_stub.h"
 #include "ccu_temp_all_to_all_v_mesh_1D.h"
 
@@ -72,14 +71,14 @@ Result CaptureAllToAllVMesh1DKernel(void* kernelArg)
         return Result::PARAM_ERROR;
     }
     CompilerContext::Current().ConfigureProgram(config.rankId, config.rankSize, config.channels);
-    mc2_ops_hccl::CcuKernelArgKfcServer kfcArg{};
-    kfcArg.channelCount = static_cast<uint32_t>(config.channels.size());
-    for (uint32_t i = 0; i < kfcArg.channelCount; ++i) {
-        kfcArg.channels[i] = config.channels[i];
+    mc2_ops_hccl::CcuKernelArgAlltoAllVMesh1D kernelArg{};
+    kernelArg.channelCount = static_cast<uint32_t>(config.channels.size());
+    for (uint32_t i = 0; i < kernelArg.channelCount; ++i) {
+        kernelArg.channels[i] = config.channels[i];
     }
-    kfcArg.rankSize = config.rankSize;
-    kfcArg.rankId = config.rankId;
-    const CcuResult result = mc2_ops_hccl::CcuAlltoAllVMesh1DKernel(&kfcArg);
+    kernelArg.rankSize = config.rankSize;
+    kernelArg.rankId = config.rankId;
+    const CcuResult result = mc2_ops_hccl::CcuAlltoAllVMesh1DKernel(&kernelArg);
     return result == CCU_SUCCESS ? Result::SUCCESS : Result::CONTRACT_ERROR;
 }
 
