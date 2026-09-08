@@ -69,11 +69,11 @@ constexpr uint32_t len_burst = 2;
 constexpr uint8_t left_padding_count = 1;
 constexpr uint8_t right_padding_count = 0;
 constexpr bool data_select_bit = false;
-constexpr uint8_t l2_cache_ctl = 0;
+constexpr asc_load_l2_cache_mode l2_cache_mode = asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM;
 constexpr uint64_t burst_src_stride = 0;
 constexpr uint32_t burst_dst_stride = 0;
 // src表示源操作数的起始地址
 __cbuf__ half dst[256];
-asc_copy_gm2l1_align(dst, src, n_burst, len_burst,  left_padding_count, right_padding_count, data_select_bit, l2_cache_ctl, burst_src_stride, burst_dst_stride);
+asc_copy_gm2l1_align(dst, src, n_burst, len_burst,  left_padding_count, right_padding_count, data_select_bit, l2_cache_mode, burst_src_stride, burst_dst_stride);
 asc_set_gm2l1_loop_size(1, 1);
 ```
