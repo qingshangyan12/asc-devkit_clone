@@ -352,6 +352,13 @@ __aicore__ inline void DataCopyL12FBImpl(uint64_t dst, __cbuf__ T* src, const Da
 }
 
 template <typename T>
+__aicore__ inline __in_pipe__(FIX)
+    __out_pipe__(FIX) void DataCopyL12FBImpl(__fbuf__ T* dst, __cbuf__ T* src, const DataCopyParams& intriParams)
+{
+    ASSERT(false && "unsupported data type of copy from cbuf to fbuf on current device");
+}
+
+template <typename T>
 __aicore__ inline void DataCopyL12PTImpl(const uint64_t dst, __cbuf__ T* src, const DataCopyParams& intriParams)
 {
     copy_cbuf_to_pt(

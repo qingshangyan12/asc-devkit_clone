@@ -416,8 +416,7 @@ __aicore__ inline void DataCopy(
             CheckTensorAlign<T>(
                 src, ONE_BLK_SIZE, "src",
                 "DataCopy from L1 Buffer(A1/B1/C1) to Fixpipe Buffer(C2PIPE2GM)"); // 32B align
-            // DataCopyL12FBImpl((__fbuf__ PrimType*)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(),
-            // repeatParams);
+            DataCopyL12FBImpl((__fbuf__ PrimType*)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(), repeatParams);
 #endif
 #if (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
         } else if (dstHWPos == Hardware::PT) {
@@ -1669,9 +1668,9 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     CheckDataCopyPadTensor(dst, src, dataCopyParams, padParams, "DataCopyPad from GM to UB(VECIN/VECOUT)");
 #endif
 #endif
-    // if ASCEND_IS_AIC { // chengn
-    //     return;
-    // }
+    if ASCEND_IS_AIC {
+        return;
+    }
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncDataCopyPad(dst, src, dataCopyParams, padParams, "DataCopyPad from GM to UB(VECIN/VECOUT)")) {
         ASCENDC_REPORT_CHECK_ERROR("DataCopyPad from GM to UB(VECIN/VECOUT)", KernelFuncType::NONE_MODE);
@@ -1757,7 +1756,8 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
     const uint8_t cacheMode = ExtractCacheMode(dst);
     if (srcHWPos == Hardware::UB) {
-#if (__NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5165))
         DataCopyPadUB2GMImpl<T, mode>(
             (__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), dataCopyParams);
 #else
@@ -1791,7 +1791,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
         dst, src, dataCopyParams, "DataCopyPad from LocalTensor to GlobalTensor with DataCopyExtParams");
 #endif
 #endif
-    if ASCEND_IS_AIC { // chengn
+    if ASCEND_IS_AIC {
         return;
     }
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyPadTensorSizeOverflow(dst, src, dataCopyParams)));
