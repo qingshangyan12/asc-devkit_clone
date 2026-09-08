@@ -205,11 +205,11 @@ __simd_vf__ inline void load_align_post_update_vf(__ubuf__ half* dst, __ubuf__ h
 
 **表5**  非对齐搬入接口的配合关系
 
-| 搬入方式 | 调用顺序与缓存复用规则 | 接口 |
+| 主搬入方式 | 配套接口 | 说明 |
 | --- | --- | --- |
-| 手动更新源地址 | 每次搬入前均调用预处理接口，且预处理接口与紧随其后的搬入接口必须使用相同的源地址。 | 依次调用[asc_loadunalign_pre](asc_loadunalign_pre.md)、[asc_loadunalign](asc_loadunalign.md) |
-| 连续自动更新 | 首次搬入前调用预处理接口。后续搬入继续使用接口自动更新后的源地址时，可复用更新后的非对齐寄存器；源地址被另行修改后，必须重新预处理。 | 依次调用[asc_loadunalign_pre](asc_loadunalign_pre.md)、[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md) |
-| 地址寄存器偏移 | 每次循环迭代先生成起始偏移，再使用相同的源地址和偏移预处理。迭代内继续使用接口按`inc`更新后的偏移时，可复用非对齐寄存器；源地址或偏移被另行修改后，必须重新预处理。 | 依次调用[asc_update_addr_reg](../reg_addr_reg/asc_update_addr_reg.md)、[asc_loadunalign_pre](asc_loadunalign_pre.md)、[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md) |
+| [asc_loadunalign](asc_loadunalign.md) | [asc_loadunalign_pre](asc_loadunalign_pre.md) | 用户手动更新源地址。每次搬入前均需调用预处理接口，且两个接口必须使用相同的源地址。 |
+| [asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)的立即数偏移模式 | [asc_loadunalign_pre](asc_loadunalign_pre.md) | 接口自动更新源地址。首次搬入前调用预处理接口；后续连续搬入可复用更新后的非对齐寄存器，源地址被另行修改后必须重新预处理。 |
+| [asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)的地址寄存器偏移模式 | [asc_update_addr_reg](../reg_addr_reg/asc_update_addr_reg.md)、[asc_loadunalign_pre](asc_loadunalign_pre.md) | 接口自动更新地址寄存器偏移。每次循环迭代先生成起始偏移，再使用相同的源地址和偏移进行预处理；迭代内连续搬入可复用更新后的非对齐寄存器，源地址或偏移被另行修改后必须重新预处理。 |
 
 ### 非对齐搬出原理
 
@@ -231,7 +231,7 @@ __simd_vf__ inline void load_align_post_update_vf(__ubuf__ half* dst, __ubuf__ h
 
 **表6**  非对齐搬出接口的配合关系
 
-| 主搬出方式 | 配套后处理接口 | 说明 |
+| 主搬出方式 | 配套接口 | 说明 |
 | --- | --- | --- |
 | [asc_storeunalign](../store/asc_storeunalign.md) | [asc_storeunalign_post](../store/asc_storeunalign_post.md) | 用户手动更新目的地址。 |
 | [asc_storeunalign_postupdate](../store/asc_storeunalign_postupdate.md)的立即数偏移模式 | [asc_storeunalign_post_postupdate](../store/asc_storeunalign_post_postupdate.md) | 接口自动更新目的地址。 |
