@@ -41,6 +41,11 @@ enum class HcclTilingVersion : uint8_t {
     INVALID_TILING_VERSION
 };
 
+enum class Mc2LaunchVersion : uint32_t {
+    MC2_CCU_LAUNCH_VERSION = 1U,
+    MC2_AICPU_LAUNCH_VERSION = 2U,
+};
+
 struct V0MsgAdditionInfo {
     AscendC::HcclDataType hcclDataType;
     uint32_t p2pSrcDestRankId; // RankId of the peer end of send/recv, destRank for send, srcRank for recv
@@ -233,6 +238,33 @@ struct OpResCtx {
     uint32_t opType[HCCL_API_MAX_OP_NUM];
     uint32_t algorithmType[HCCL_API_MAX_OP_NUM];
     uint64_t opParamSize[HCCL_API_MAX_OP_NUM];
+    bool isKfc[HCCL_API_MAX_OP_NUM];
+};
+
+struct Mc2CcuLaunchCtx {
+    uint64_t version;
+    uint64_t workspace;
+    uint64_t workspaceSize;
+    uint64_t rankId;
+    uint64_t rankSize;
+    AlgInfo algInfo[HCCL_ALG_MAX_NUM];
+    uint64_t xnAddr;
+    uint64_t ckeAddr;
+    uint64_t sprAddr;
+    uint64_t res[HCCL_API_MAX_OP_NUM];
+    uint64_t resCtx;
+    uint32_t opType[HCCL_API_MAX_OP_NUM];
+    uint32_t algorithmType[HCCL_API_MAX_OP_NUM];
+    uint64_t opParamSize[HCCL_API_MAX_OP_NUM];
+    bool isKfc[HCCL_API_MAX_OP_NUM];
+    uint64_t comm;
+    uint32_t commEngine;
+    uint32_t ccArgsVersion;
+    uint32_t srcDataType;
+    uint32_t dstDataType;
+    uint32_t reduceType;
+    uint32_t reserved0;
+    uint64_t reserved1[4];
 };
 } // namespace HcclApi
 
