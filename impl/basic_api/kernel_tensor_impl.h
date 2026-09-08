@@ -1057,7 +1057,7 @@ __aicore__ inline TTagType LocalTensor<T>::GetUserTag() const
 
 template <typename T>
 template <typename U>
-__aicore__ inline void LocalTensor<T>::CreateTensor(AscendC::TPosition pos, uint32_t addr, uint32_t tileSize)
+__aicore__ inline constexpr void LocalTensor<T>::CreateTensor(AscendC::TPosition pos, uint32_t addr, uint32_t tileSize)
 {
 #if ASCENDC_CPU_DEBUG
     ASCENDC_DEBUG_ASSERT(
@@ -1099,14 +1099,14 @@ __aicore__ inline void LocalTensor<T>::CreateTensor(AscendC::TPosition pos, uint
 }
 
 template <typename T>
-__aicore__ inline LocalTensor<T>::LocalTensor(AscendC::TPosition pos, uint32_t addr, uint32_t tileSize)
+__aicore__ inline constexpr LocalTensor<T>::LocalTensor(AscendC::TPosition pos, uint32_t addr, uint32_t tileSize)
 {
     static_assert(!is_tensorTrait_v<T>, "currently not support TensorTrait type!!");
     CreateTensor<T>(pos, addr, tileSize);
 }
 
 template <typename T>
-__aicore__ inline LocalTensor<T>::LocalTensor(uint32_t addr)
+__aicore__ inline constexpr LocalTensor<T>::LocalTensor(uint32_t addr)
 {
     static_assert(is_tensorTrait_v<T>, "only support TensorTrait type Tensor!");
     static_assert(
@@ -1120,7 +1120,7 @@ __aicore__ inline LocalTensor<T>::LocalTensor(uint32_t addr)
 
 template <typename T>
 template <typename U>
-__aicore__ inline LocalTensor<T>::LocalTensor(uint32_t addr, const U& layout)
+__aicore__ inline constexpr LocalTensor<T>::LocalTensor(uint32_t addr, const U& layout)
 {
     static_assert(is_tensorTrait_v<T>, "only support TensorTrait type Tensor!");
     static_assert(
