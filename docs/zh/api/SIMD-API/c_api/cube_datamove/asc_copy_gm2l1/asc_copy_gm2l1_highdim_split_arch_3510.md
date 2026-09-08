@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为："c_api/cube_datamove/cube_datamove.h"。
+
 将数据从Global Memory搬运到L1 Buffer，数据搬运时格式和内容保持不变。高维切分是指能够通过配置数据块个数、单个数据块长度、地址偏移等搬运参数实现非连续搬运。并且此接口支持在搬运过程中按通道padding模式对32字节粒度的数据插入或移除padding。其中padding值需要通过[asc_set_gm2l1_pad](../asc_set_gm2l1_pad.md)设置。
 
 本接口仅在AIC上执行有效。
@@ -80,7 +82,7 @@ PIPE_MTE2
 - `len_burst`取值范围为[1, $2^{17}-1$]，超出取值范围的值会被截断，导致搬运结果不符合预期。
 - `src_stride`取值范围为[0, $2^{36}-1$]，超出取值范围的值会被截断，导致搬运结果不符合预期。
 - `dst_stride`取值范围为[0, $2^{17}-1$]，超出取值范围的值会被截断，导致搬运结果不符合预期。
-- `pad_mode`使用`asc_channel_pad_mode`的有效枚举值；padding值需要通过[asc_set_gm2l1_pad](../asc_set_gm2l1_pad.md)设置。
+- `pad_mode`使用[asc_channel_pad_mode](../../defs/enum/asc_channel_pad_mode.md)的有效枚举值。使用填充模式时，通道填充值需要通过[asc_set_gm2l1_padding](../asc_set_gm2l1_padding.md)设置；该填充值区别于[asc_set_gm2l1_pad](../asc_set_gm2l1_pad.md)配置的burst左右填充。
 - 对于插入padding值的场景：
   - `len_burst`的单位为32个字节的指的是写入L1 Buffer的实际数据数，它必须设置为`1`，此时一次仅从GM里读取1/2/4/8/16个字节的数据。
   - 每一次burst都是从GM中连续读取，`src_stride`设置为`0`即可。
