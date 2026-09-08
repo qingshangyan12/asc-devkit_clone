@@ -30,7 +30,6 @@ using Json = nlohmann::json;
 using ascendc::aclrtc::CompilationCommandKind;
 using ascendc::aclrtc::KernelCompilationPlan;
 using ascendc::aclrtc::KernelCompilationPlanBuilder;
-using ascendc::aclrtc::KernelCompilationVariant;
 using ascendc::aclrtc::NormalizedKernelSpecializationRequest;
 
 class ScopedEnvironmentVariable final {
@@ -180,7 +179,7 @@ aclError BuildPlanFromManifest(
 {
     ascendc::aclrtc::CompilationManifest manifest;
     const aclError status = ascendc::aclrtc::CompilationManifestParser(json).ParseSelected(
-        request.kernelName, request.compilationVariant, manifest);
+        request.kernelName, request.enableSuperKernel, manifest);
     if (status != ascendc::aclrtc::ACLRTC_SUCCESS) {
         return status;
     }
@@ -192,20 +191,12 @@ TEST(CompilationManifestParserTest, RepeatedSelectionsDoNotRetainPartialResults)
     const Json json = CreateManifest();
     ascendc::aclrtc::CompilationManifestParser parser(json);
     ascendc::aclrtc::CompilationManifest manifest;
-    EXPECT_EQ(
-        parser.ParseSelected("missing", KernelCompilationVariant::Basic, manifest),
-        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
-    ASSERT_EQ(
-        parser.ParseSelected("add_custom_100000", KernelCompilationVariant::BasicWithSuperKernel, manifest),
-        ascendc::aclrtc::ACLRTC_SUCCESS);
+    EXPECT_EQ(parser.ParseSelected("missing", false, manifest), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    ASSERT_EQ(parser.ParseSelected("add_custom_100000", true, manifest), ascendc::aclrtc::ACLRTC_SUCCESS);
     ASSERT_EQ(manifest.commands.size(), 3U);
-    EXPECT_EQ(
-        parser.ParseSelected("missing", KernelCompilationVariant::Basic, manifest),
-        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_EQ(parser.ParseSelected("missing", false, manifest), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
     EXPECT_EQ(manifest.commands.size(), 3U);
-    ASSERT_EQ(
-        parser.ParseSelected("add_custom_100000", KernelCompilationVariant::Basic, manifest),
-        ascendc::aclrtc::ACLRTC_SUCCESS);
+    ASSERT_EQ(parser.ParseSelected("add_custom_100000", false, manifest), ascendc::aclrtc::ACLRTC_SUCCESS);
     EXPECT_EQ(manifest.commands.size(), 1U);
     EXPECT_EQ(manifest.constants.size(), 1U);
 }
@@ -222,7 +213,7 @@ TEST(KernelCompilationPlanBuilderTest, BuildsRepeatedPlansWithoutMutatingParsedC
     const Json json = CreateManifest();
     ASSERT_EQ(
         ascendc::aclrtc::CompilationManifestParser(json).ParseSelected(
-            request.kernelName, request.compilationVariant, manifest),
+            request.kernelName, request.enableSuperKernel, manifest),
         ascendc::aclrtc::ACLRTC_SUCCESS);
     KernelCompilationPlanBuilder builder(request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath());
     KernelCompilationPlan plan;
@@ -241,8 +232,7 @@ TEST(CompilationManifestParserTest, OwnsSelectedFieldsWithoutResolvingRuntimeEnv
     manifest["options"]["unused"] = 7;
     ascendc::aclrtc::CompilationManifest spec;
     ASSERT_EQ(
-        ascendc::aclrtc::CompilationManifestParser(manifest).ParseSelected(
-            "add_custom_100000", KernelCompilationVariant::Basic, spec),
+        ascendc::aclrtc::CompilationManifestParser(manifest).ParseSelected("add_custom_100000", false, spec),
         ascendc::aclrtc::ACLRTC_SUCCESS);
     manifest.clear();
     ASSERT_EQ(spec.constants.size(), 1U);
@@ -380,7 +370,7 @@ TEST(KernelCompilationPlanBuilderTest, PreservesExplicitStagesAndManifestCommand
     const void* argumentAddresses[] = {tilingBytes};
     const uint64_t argumentByteCounts[] = {sizeof(tilingBytes)};
     NormalizedKernelSpecializationRequest request = CreateRequest(workspace, argumentAddresses, argumentByteCounts);
-    request.compilationVariant = KernelCompilationVariant::BasicWithSuperKernel;
+    request.enableSuperKernel = true;
     request.compilerOptions.superKernelOptions = {"-g"};
 
     KernelCompilationPlan plan;
@@ -414,7 +404,7 @@ TEST(KernelCompilationPlanBuilderTest, SelectsAllRequestedObjectsInManifestOrder
     const void* argumentAddresses[] = {tilingBytes};
     const uint64_t argumentByteCounts[] = {sizeof(tilingBytes)};
     NormalizedKernelSpecializationRequest request = CreateRequest(workspace, argumentAddresses, argumentByteCounts);
-    request.compilationVariant = KernelCompilationVariant::BasicWithSuperKernel;
+    request.enableSuperKernel = true;
 
     Json manifest = CreateManifest();
     Json secondBasicObject = manifest["kernels"][1]["objects"][0];
@@ -474,7 +464,7 @@ TEST(KernelCompilationPlanBuilderTest, RequiresOnlyEnvironmentUsedBySelectedObje
             request, CreateManifest(), workspace.ResourcePath(), workspace.SourceDirectoryPath(), plan),
         0);
 
-    request.compilationVariant = KernelCompilationVariant::BasicWithSuperKernel;
+    request.enableSuperKernel = true;
     EXPECT_EQ(
         BuildPlanFromManifest(
             request, CreateManifest(), workspace.ResourcePath(), workspace.SourceDirectoryPath(), plan),
@@ -696,9 +686,10 @@ TEST(KernelCompilationPlanBuilderTest, RejectsInvalidInputsBeforeReadingAnyConst
                     constant["parameter_index"] = 1U;
                     kernel["constant_infos"].push_back(constant);
                 } else if (invalidInputKind == 1) {
-                    kernel["objects"][0]["commands"][0]["cmd"] = Json::array();
+                    kernel["objects"][0]["commands"][0]["cmd"][0] = "/aclrtc-test-missing-compiler";
                 } else {
-                    kernel["link_options"] = Json::array({1});
+                    unsetenv("ACLRTC_TEST_MISSING_LINK_OPTION");
+                    kernel["link_options"] = Json::array({"${env:ACLRTC_TEST_MISSING_LINK_OPTION}"});
                 }
                 KernelCompilationPlan plan;
                 plan.linkedKernelElfPath = "unchanged.elf";
@@ -843,7 +834,7 @@ TEST(KernelCompilationPlanBuilderTest, RequiresBasicAndFallsBackWhenSuperKernelI
             request, manifestWithoutBasic, workspace.ResourcePath(), workspace.SourceDirectoryPath(), plan),
         ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 
-    request.compilationVariant = KernelCompilationVariant::BasicWithSuperKernel;
+    request.enableSuperKernel = true;
     request.compilerOptions.superKernelOptions = {"--sk-only-test-option"};
     Json manifestWithoutSuperKernel = CreateManifest();
     manifestWithoutSuperKernel["kernels"][1]["objects"].erase(1);
@@ -851,7 +842,7 @@ TEST(KernelCompilationPlanBuilderTest, RequiresBasicAndFallsBackWhenSuperKernelI
         BuildPlanFromManifest(
             request, manifestWithoutSuperKernel, workspace.ResourcePath(), workspace.SourceDirectoryPath(), plan),
         ascendc::aclrtc::ACLRTC_SUCCESS);
-    request.compilationVariant = KernelCompilationVariant::Basic;
+    request.enableSuperKernel = false;
     KernelCompilationPlan basicPlan;
     ASSERT_EQ(
         BuildPlanFromManifest(

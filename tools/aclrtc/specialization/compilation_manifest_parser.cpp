@@ -118,7 +118,7 @@ aclError CompilationManifestParser::ParseCommand(
 }
 
 aclError CompilationManifestParser::ParseSelectedObjects(
-    const Json& kernel, KernelCompilationVariant variant, CompilationManifest& spec) const
+    const Json& kernel, bool enableSuperKernel, CompilationManifest& spec) const
 {
     bool foundBasic = false;
     bool foundSuperKernel = false;
@@ -135,7 +135,7 @@ aclError CompilationManifestParser::ParseSelectedObjects(
             kind = ManifestObjectKind::Basic;
         } else if (type == "sk") {
             foundSuperKernel = true;
-            if (variant != KernelCompilationVariant::BasicWithSuperKernel) {
+            if (!enableSuperKernel) {
                 continue;
             }
             kind = ManifestObjectKind::SuperKernel;
@@ -163,14 +163,14 @@ aclError CompilationManifestParser::ParseSelectedObjects(
         ASCENDLOGE("Selected kernel is missing a required basic object");
         return ACLRTC_ERROR_FAILURE;
     }
-    if (variant == KernelCompilationVariant::BasicWithSuperKernel && !foundSuperKernel) {
+    if (enableSuperKernel && !foundSuperKernel) {
         ASCENDLOGI("Selected kernel has no sk object; compiling basic only despite --enable-super-kernel");
     }
     return ACLRTC_SUCCESS;
 }
 
 aclError CompilationManifestParser::ParseSelected(
-    const std::string& kernelName, KernelCompilationVariant variant, CompilationManifest& parsedManifest) const
+    const std::string& kernelName, bool enableSuperKernel, CompilationManifest& parsedManifest) const
 {
     try {
         if (borrowedManifest_.at("schema_version").get<std::string>() != SCHEMA_VERSION) {
@@ -198,7 +198,7 @@ aclError CompilationManifestParser::ParseSelected(
         if (result != ACLRTC_SUCCESS) {
             return result;
         }
-        result = ParseSelectedObjects(*selectedKernel, variant, spec);
+        result = ParseSelectedObjects(*selectedKernel, enableSuperKernel, spec);
         if (result != ACLRTC_SUCCESS) {
             return result;
         }

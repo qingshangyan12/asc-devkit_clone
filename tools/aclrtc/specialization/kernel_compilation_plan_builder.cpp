@@ -135,9 +135,10 @@ bool KernelCompilationPlanBuilder::ExpandManifestText(
     return ExpandEnvironmentVariablePlaceholders(pathResolvedText, location, resolvedText);
 }
 
-aclError KernelCompilationPlanBuilder::BindConstantSources(
-    std::vector<ManifestConstant>& constants, KernelCompilationPlan& plan) const
+aclError KernelCompilationPlanBuilder::BindConstantSources(KernelCompilationPlan& plan) const
 {
+    auto constants = borrowedManifest_.constants;
+    std::vector<KernelSourcePatch> patches;
     for (ManifestConstant& constant : constants) {
         if (!constant.BindArgument(
                 specializationRequest_.kernelArgumentCount, specializationRequest_.borrowedKernelArgumentDataPointers,
@@ -148,8 +149,14 @@ aclError KernelCompilationPlanBuilder::BindConstantSources(
         if (!ExpandManifestText(constant.GetTargetFile(), constant.GetName(), targetFile)) {
             return ACLRTC_ERROR_FAILURE;
         }
-        plan.sourcePatches.push_back({targetFile, constant.GetTemplateText(), {}});
+        patches.push_back({targetFile, constant.GetTemplateText(), {}});
     }
+    // Avoid reading caller-owned buffers if any constant binding or target expansion fails.
+    for (size_t index = 0; index < constants.size(); ++index) {
+        patches[index].replacementText =
+            FormatBytesAsCppInitializerList(constants[index].GetBoundData(), constants[index].GetBoundByteSize());
+    }
+    plan.sourcePatches = std::move(patches);
     return ACLRTC_SUCCESS;
 }
 
@@ -285,12 +292,7 @@ aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPla
     if (result != ACLRTC_SUCCESS) {
         return result;
     }
-    auto constants = borrowedManifest_.constants;
     KernelCompilationPlan plan;
-    result = BindConstantSources(constants, plan);
-    if (result != ACLRTC_SUCCESS) {
-        return result;
-    }
     for (const ManifestCommand& spec : borrowedManifest_.commands) {
         CompilationCommand command;
         result = BindManifestCommand(spec, command);
@@ -303,10 +305,9 @@ aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPla
     if (result != ACLRTC_SUCCESS) {
         return result;
     }
-    // Read constant bytes only after all selected manifest fields and runtime inputs are resolved.
-    for (size_t index = 0; index < constants.size(); ++index) {
-        plan.sourcePatches[index].replacementText =
-            FormatBytesAsCppInitializerList(constants[index].GetBoundData(), constants[index].GetBoundByteSize());
+    result = BindConstantSources(plan);
+    if (result != ACLRTC_SUCCESS) {
+        return result;
     }
     compilationPlan = std::move(plan);
     return ACLRTC_SUCCESS;

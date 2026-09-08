@@ -20,8 +20,7 @@ namespace aclrtc {
 class CompilationManifestParser final {
 public:
     explicit CompilationManifestParser(const nlohmann::json& manifest) : borrowedManifest_(manifest) {}
-    aclError ParseSelected(
-        const std::string& kernelName, KernelCompilationVariant variant, CompilationManifest& result) const;
+    aclError ParseSelected(const std::string& kernelName, bool enableSuperKernel, CompilationManifest& result) const;
 
 private:
     aclError ParseConstants(const nlohmann::json& kernel, std::vector<ManifestConstant>& constants) const;
@@ -31,7 +30,7 @@ private:
         const nlohmann::json& command, const std::string& objectName, ManifestObjectKind objectKind, size_t index,
         ManifestCommand& result) const;
     aclError ParseSelectedObjects(
-        const nlohmann::json& kernel, KernelCompilationVariant variant, CompilationManifest& result) const;
+        const nlohmann::json& kernel, bool enableSuperKernel, CompilationManifest& result) const;
 
     const nlohmann::json& borrowedManifest_;
 };

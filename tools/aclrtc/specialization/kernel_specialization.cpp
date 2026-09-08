@@ -207,7 +207,7 @@ aclError KernelSpecializationSession::RunSpecializationWithMaterializedResource(
     CompilationManifest manifest;
     aclError specializationStatus =
         CompilationManifestParser(compilationResource.manifest)
-            .ParseSelected(specializationRequest.kernelName, specializationRequest.compilationVariant, manifest);
+            .ParseSelected(specializationRequest.kernelName, specializationRequest.enableSuperKernel, manifest);
     if (specializationStatus != ACLRTC_SUCCESS) {
         return ReportSpecializationStatus(specializationRequest, diagnostics, specializationStatus);
     }
