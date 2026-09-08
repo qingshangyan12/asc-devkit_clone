@@ -43,14 +43,9 @@
 namespace AscendC {
 namespace Reg {
 #if defined(__NPU_ARCH__) &&                                                                                      \
-        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) || \
+        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) ||  \
+         (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5165)) || \
     defined(__ASC_NPU_HOST__)
-template <typename T = DefaultType, GatherMaskMode store = GatherMaskMode::NO_STORE_REG, typename U>
-__simd_callee__ inline void GatherMask(U& dstReg, U& srcReg, MaskReg& mask)
-{
-    GatherMaskImpl<T, store, U>(dstReg, srcReg, mask);
-}
-
 template <typename T, GatherMaskMode store, typename U>
 __simd_callee__ inline void Squeeze(U& dstReg, U& srcReg, MaskReg& mask)
 {
