@@ -150,7 +150,7 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void vector_muladd_atomic(
 
 **累加类场景优先考虑用原子加完成累加**：当目标地址的旧值仅用于累加、不参与其他计算时，改用原子加可以省去线程读出旧值的那条指令，减少指令数。
 
-**注意适用前提**：本优化的收益来自线程少发一条指令，而非原子性，也不是数据搬运量的减少。若访问地址存在竞争，同地址上的原子操作只能串行执行，反而会带来显著的性能损失（详见[atomic_histogram样例](../atomic_histogram)与[atomic_add_perf样例](../../../02_features/01_api_features/02_atomic_operation/atomic_add_perf/README.md)）。使用前需确认各线程写入`a`的地址互不重叠。
+**注意适用前提**：本优化的收益来自线程少发一条指令，而非原子性，也不是数据搬运量的减少。若访问地址存在竞争，同地址上的原子操作只能串行执行，反而会带来显著的性能损失（详见[atomic_histogram样例](../atomic_histogram)与[atomic_add_perf样例](../../../02_features/01_api_features/02_atomic_operation/atomic_add_perf/README.md)）。使用前需确认各线程原子操作的目标地址互不重叠。
 
 
 ## 编译运行
