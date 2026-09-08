@@ -29,6 +29,9 @@ DEFINE_WEAK_FUNC(CcuResult, HcommCcuQueryRemainResDesc, HcommCcuResDescHandle re
 DEFINE_WEAK_FUNC(
     CcuResult, HcommCcuKernelQueryResReq, const void* kernelFunc, const void** kernelArgs, uint32_t argNum,
     HcommCcuResDescHandle resDesc);
+DEFINE_WEAK_FUNC(
+    CcuResult, HcommCcuKernelQueryResReqV2, const void* kernelFunc, const void** kernelArgs, uint32_t argNum,
+    const CcuKernelRegisterCfg* cfg, HcommCcuResDescHandle resDesc);
 
 // 初始化
 void CcuResDlInit(void* libHcommHandle)
@@ -43,4 +46,5 @@ void CcuResDlInit(void* libHcommHandle)
     INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuInsQueryResDesc);
     INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuQueryRemainResDesc);
     INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuKernelQueryResReq);
+    INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuKernelQueryResReqV2);
 }
