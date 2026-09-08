@@ -382,8 +382,13 @@ def add_op_param_to_workspace(
         if opinfo.param_type_list[io_index] == "dynamic":
             if dtype_int[io_index]:
                 if has_storage_shape:
-                    source += "    if (!hasOomStorageShape || !AscendC::OOMTryRegisterTensorListWithStorageShape(oomStorageShapeCursor, {}, {})) {{\n".format(
-                        op_param.get("param_name"), dtype_int[io_index]
+                    source += (
+                        "    if (!hasOomStorageShape || "
+                        "!AscendC::OOMTryRegisterTensorListWithStorageShape("
+                        "oomStorageShapeCursor, {}, {})) {{\n"
+                    ).format(
+                        op_param.get("param_name"),
+                        dtype_int[io_index]
                     )
                     source += (
                         "        AscendC::OOMCheckTensorListRange({}, {});\n".format(
@@ -405,8 +410,13 @@ def add_op_param_to_workspace(
                 input_shape_len = "*((__gm__ uint64_t *)((__gm__ uint8_t *)tiling + tmpTilingSizeForOOM))"
             if has_storage_shape:
                 element_size = INPUT_OUTPUT_DTYPE_LEN.get(op_param.get("dtype"), 0)
-                source += "    if (!hasOomStorageShape || !AscendC::OOMTryRegisterTensorWithStorageShape(oomStorageShapeCursor, {}, {})) {{\n".format(
-                    op_param.get("param_name"), element_size
+                source += (
+                    "    if (!hasOomStorageShape || "
+                    "!AscendC::OOMTryRegisterTensorWithStorageShape("
+                    "oomStorageShapeCursor, {}, {})) {{\n"
+                ).format(
+                    op_param.get("param_name"),
+                    element_size
                 )
                 source += "        AscendC::OOMCheckAddrRange({}, {});\n".format(
                     op_param.get("param_name"), input_shape_len
