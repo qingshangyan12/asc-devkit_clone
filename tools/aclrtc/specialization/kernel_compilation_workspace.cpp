@@ -12,9 +12,8 @@
 
 #include "ascendc_tool_log.h"
 #include "file_utils.h"
+#include "staged_file_replacement.h"
 
-#include <cstdio>
-#include <cstdlib>
 #include <boost/filesystem.hpp>
 #include <boost/system/error_code.hpp>
 #include <cerrno>
@@ -22,7 +21,6 @@
 #include <fstream>
 #include <map>
 #include <sstream>
-#include <unistd.h>
 
 namespace ascendc {
 namespace aclrtc {
@@ -31,17 +29,8 @@ namespace fs = boost::filesystem;
 
 bool ReadSourceFileContents(const fs::path& sourceFilePath, std::string& sourceFileContents)
 {
-    std::string canonicalSourcePath;
-    if (!FileUtils::ResolveCanonicalPath(sourceFilePath.string(), canonicalSourcePath) ||
-        !FileUtils::IsRegularFile(canonicalSourcePath)) {
-        return false;
-    }
-    std::ifstream inputStream(canonicalSourcePath, std::ios::in | std::ios::binary);
-    if (!inputStream) {
-        const int openError = errno;
-        ASCENDLOGE(
-            "Failed to open source patch file: path=%s errno=%d message=%s", sourceFilePath.c_str(), openError,
-            std::strerror(openError));
+    std::ifstream inputStream;
+    if (!FileUtils::OpenRegularFileForRead(sourceFilePath.string(), inputStream)) {
         return false;
     }
     std::ostringstream sourceFileContentsStream;
@@ -70,48 +59,6 @@ bool ReplaceAllSourceTemplateOccurrences(
     return replacedAtLeastOnce;
 }
 
-bool WritePatchedSourceFileAtomically(const fs::path& sourceFilePath, const std::string& patchedSourceFileContents)
-{
-    std::string canonicalSourcePath;
-    if (!FileUtils::ResolveRegularFilePathForWrite(sourceFilePath.string(), canonicalSourcePath)) {
-        return false;
-    }
-    // mkstemp creates a private file exclusively and never follows an existing symlink.
-    std::string temporaryFileTemplate = canonicalSourcePath + ".aclrtc_patch_XXXXXX";
-    const int temporaryFileDescriptor = mkstemp(temporaryFileTemplate.data());
-    if (temporaryFileDescriptor < 0) {
-        ASCENDLOGE(
-            "Failed to create temporary source patch file: path=%s errno=%d", canonicalSourcePath.c_str(), errno);
-        return false;
-    }
-    // Keep cleanup paths allocation-free after acquiring the descriptor.
-    FILE* outputStream = fdopen(temporaryFileDescriptor, "wb");
-    if (outputStream == nullptr) {
-        (void)close(temporaryFileDescriptor);
-        (void)unlink(temporaryFileTemplate.c_str());
-        return false;
-    }
-    const size_t writtenBytes =
-        fwrite(patchedSourceFileContents.data(), 1U, patchedSourceFileContents.size(), outputStream);
-    const bool closeSucceeded = fclose(outputStream) == 0;
-    if (writtenBytes != patchedSourceFileContents.size() || !closeSucceeded) {
-        ASCENDLOGE("Failed to write or close temporary source patch file: path=%s", temporaryFileTemplate.c_str());
-        (void)unlink(temporaryFileTemplate.c_str());
-        return false;
-    }
-    const fs::path temporaryFilePath(temporaryFileTemplate);
-    boost::system::error_code renameError;
-    fs::rename(temporaryFilePath, fs::path(canonicalSourcePath), renameError);
-    if (renameError) {
-        ASCENDLOGE(
-            "Failed to replace patched source file: source=%s target=%s error=%d message=%s", temporaryFilePath.c_str(),
-            sourceFilePath.c_str(), renameError.value(), renameError.message().c_str());
-        boost::system::error_code ignoredError;
-        fs::remove(temporaryFilePath, ignoredError);
-        return false;
-    }
-    return true;
-}
 } // namespace
 
 KernelCompilationWorkspace::KernelCompilationWorkspace(fs::path worktreePath, WorktreeRetentionPolicy retentionPolicy)
@@ -164,7 +111,9 @@ aclError KernelCompilationWorkspace::CreateOutputDirectoriesAndApplySourcePatche
                 return ACLRTC_ERROR_FAILURE;
             }
         }
-        if (!WritePatchedSourceFileAtomically(filePatches.first, patchedSourceText)) {
+        StagedFileReplacement patchedSource;
+        if (!patchedSource.StageTextFile(filePatches.first.string(), patchedSourceText) ||
+            !patchedSource.ReplaceDestinationAtomically()) {
             return ACLRTC_ERROR_FAILURE;
         }
     }

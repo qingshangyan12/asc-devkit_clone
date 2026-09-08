@@ -45,33 +45,6 @@ std::string QuoteArgumentForReplayScript(const std::string& argument)
     return quotedArgument;
 }
 
-bool WriteDiagnosticTextFile(const fs::path& filePath, const std::string& text, std::ios::openmode writeMode)
-{
-    std::string canonicalFilePath;
-    if (!FileUtils::ResolveRegularFilePathForWrite(filePath.string(), canonicalFilePath)) {
-        return false;
-    }
-    std::ofstream outputStream(canonicalFilePath, std::ios::out | writeMode);
-    if (!outputStream) {
-        const int openError = errno;
-        ASCENDLOGW(
-            "Failed to open diagnostic file for writing: path=%s errno=%d message=%s", filePath.c_str(), openError,
-            std::strerror(openError));
-        return false;
-    }
-
-    outputStream << text;
-    outputStream.close();
-    if (outputStream) {
-        return true;
-    }
-    const int writeError = errno;
-    ASCENDLOGW(
-        "Failed to write diagnostic file: path=%s errno=%d message=%s", filePath.c_str(), writeError,
-        std::strerror(writeError));
-    return false;
-}
-
 void RemoveIncompleteReplayScript(const fs::path& replayScriptPath) noexcept
 {
     boost::system::error_code removalError;
@@ -87,7 +60,7 @@ bool CreateExecutableReplayScript(const fs::path& replayScriptPath, const fs::pa
 {
     const std::string replayScriptHeader =
         "#!/bin/sh\nset -eu\ncd " + QuoteArgumentForReplayScript(compilationWorkingDirectoryPath.string()) + "\n";
-    if (!WriteDiagnosticTextFile(replayScriptPath, replayScriptHeader, std::ios::trunc)) {
+    if (!FileUtils::WriteTextFile(replayScriptPath.string(), replayScriptHeader, std::ios::trunc)) {
         RemoveIncompleteReplayScript(replayScriptPath);
         return false;
     }
@@ -137,8 +110,8 @@ void KernelSpecializationDiagnostics::WriteManifestSnapshot(const nlohmann::json
     constexpr int diagnosticJsonIndentationWidth = 2;
     try {
         const fs::path manifestPath = resourceWorktreePath_ / DIAGNOSTIC_MANIFEST_FILE_NAME;
-        WriteDiagnosticTextFile(
-            manifestPath, resourceManifest.dump(diagnosticJsonIndentationWidth) + '\n', std::ios::trunc);
+        FileUtils::WriteTextFile(
+            manifestPath.string(), resourceManifest.dump(diagnosticJsonIndentationWidth) + '\n', std::ios::trunc);
     } catch (...) {
         ASCENDLOGW(
             "Failed to record specialization manifest: resource_worktree=%s file=%s", resourceWorktreePath_.c_str(),
@@ -241,7 +214,8 @@ void KernelSpecializationDiagnostics::WriteSpecializationResult(
             {"output_published", publicationStatus == KernelElfPublicationStatus::Published},
         };
         const fs::path resultPath = resourceWorktreePath_ / DIAGNOSTIC_RESULT_FILE_NAME;
-        WriteDiagnosticTextFile(resultPath, resultJson.dump(diagnosticJsonIndentationWidth) + '\n', std::ios::trunc);
+        FileUtils::WriteTextFile(
+            resultPath.string(), resultJson.dump(diagnosticJsonIndentationWidth) + '\n', std::ios::trunc);
     } catch (...) {
         ASCENDLOGW(
             "Failed to record specialization result: resource_worktree=%s file=%s", resourceWorktreePath_.c_str(),
@@ -256,7 +230,7 @@ void KernelSpecializationDiagnostics::AppendTextToDiagnosticFile(
         return;
     }
     try {
-        WriteDiagnosticTextFile(filePath, text, std::ios::app);
+        FileUtils::WriteTextFile(filePath.string(), text, std::ios::app);
     } catch (...) {
         ASCENDLOGW("Failed to append diagnostic file: path=%s", filePath.c_str());
     }

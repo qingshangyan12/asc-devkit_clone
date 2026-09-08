@@ -117,7 +117,7 @@ std::vector<char*> BuildCStringPointers(std::vector<std::string>& strings)
     std::vector<char*> pointers;
     pointers.reserve(strings.size() + 1U);
     for (std::string& string : strings) {
-        pointers.push_back(string.data());
+        pointers.push_back(&string[0]);
     }
     pointers.push_back(nullptr);
     return pointers;
@@ -413,14 +413,7 @@ void OpenMirroredOutputLog(const std::string& outputLogFilePath, std::ofstream& 
         return;
     }
     try {
-        std::string canonicalLogPath;
-        if (!FileUtils::ResolveRegularFilePathForWrite(outputLogFilePath, canonicalLogPath)) {
-            ASCENDLOGW(
-                "Invalid process output log path; compilation will continue: path=%s", outputLogFilePath.c_str());
-            return;
-        }
-        outputLog.open(canonicalLogPath, std::ios::out | std::ios::binary | std::ios::app);
-        if (outputLog.is_open()) {
+        if (FileUtils::OpenRegularFileForWrite(outputLogFilePath, outputLog, std::ios::app)) {
             return;
         }
     } catch (...) {

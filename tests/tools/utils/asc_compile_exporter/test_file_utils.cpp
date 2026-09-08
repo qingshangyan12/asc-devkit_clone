@@ -135,6 +135,39 @@ TEST_F(ModuleTest, FileUtilsRejectsInvalidOutputNamesAndSpecialFiles)
     EXPECT_EQ(ReadTestFile(regular), "keep");
 }
 
+TEST_F(ModuleTest, FileUtilsOpensCanonicalInputAndRejectsInvalidInputWithoutOpening)
+{
+    const std::string source = root_ + "/source";
+    const std::string alias = root_ + "/alias";
+    WriteTestFile(source, "source-text");
+    ASSERT_EQ(symlink(source.c_str(), alias.c_str()), 0);
+    std::ifstream input;
+    ASSERT_TRUE(FileUtils::OpenRegularFileForRead(alias, input));
+    std::string text;
+    input >> text;
+    EXPECT_EQ(text, "source-text");
+    EXPECT_FALSE(FileUtils::OpenRegularFileForRead(source, input));
+    input.close();
+    for (const std::string& path :
+         std::vector<std::string>{"", root_, root_ + "/missing", source + std::string("\0x", 2U)}) {
+        std::ifstream invalidInput;
+        EXPECT_FALSE(FileUtils::OpenRegularFileForRead(path, invalidInput));
+        EXPECT_FALSE(invalidInput.is_open());
+    }
+}
+
+TEST_F(ModuleTest, FileUtilsWritesAndAppendsTextThroughTheSameCheckedOpen)
+{
+    const std::string destination = root_ + "/log";
+    const std::string alias = root_ + "/alias";
+    ASSERT_TRUE(FileUtils::WriteTextFile(destination, "first", std::ios::trunc));
+    ASSERT_TRUE(FileUtils::WriteTextFile(destination, "second", std::ios::app));
+    EXPECT_EQ(ReadTestFile(destination), "firstsecond");
+    ASSERT_EQ(symlink(destination.c_str(), alias.c_str()), 0);
+    EXPECT_FALSE(FileUtils::WriteTextFile(alias, "unexpected", std::ios::trunc));
+    EXPECT_EQ(ReadTestFile(destination), "firstsecond");
+}
+
 TEST_F(ModuleTest, FileUtilsCreatesAndRemovesDirectoryTrees)
 {
     EXPECT_TRUE(FileUtils::CreateDirectories(""));

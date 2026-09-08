@@ -137,6 +137,63 @@ bool FileUtils::ResolveCanonicalPath(const std::string& path, std::string& resol
     return true;
 }
 
+bool FileUtils::ResolveRegularFilePathForRead(const std::string& path, std::string& resolved)
+{
+    resolved.clear();
+    if (path.empty() || path.find('\0') != std::string::npos) {
+        ASCENDLOGE("Input file path must be nonempty and contain no embedded NUL");
+        return false;
+    }
+    if (!ResolveCanonicalPath(path, resolved)) {
+        return false;
+    }
+    if (!IsRegularFile(resolved)) {
+        ASCENDLOGE("Rejected non-regular input file: path=%s", path.c_str());
+        resolved.clear();
+        return false;
+    }
+    return true;
+}
+
+bool FileUtils::OpenRegularFileForRead(const std::string& path, std::ifstream& borrowedInput)
+{
+    std::string canonicalPath;
+    if (borrowedInput.is_open() || !ResolveRegularFilePathForRead(path, canonicalPath)) {
+        return false;
+    }
+    borrowedInput.open(canonicalPath, std::ios::in | std::ios::binary);
+    if (!borrowedInput) {
+        ASCENDLOGE("Failed to open regular input file: path=%s", path.c_str());
+        return false;
+    }
+    return true;
+}
+
+bool FileUtils::OpenRegularFileForWrite(
+    const std::string& path, std::ofstream& borrowedOutput, std::ios::openmode writeMode)
+{
+    std::string canonicalPath;
+    if (borrowedOutput.is_open() || !ResolveRegularFilePathForWrite(path, canonicalPath)) {
+        return false;
+    }
+    borrowedOutput.open(canonicalPath, std::ios::out | std::ios::binary | writeMode);
+    if (!borrowedOutput) {
+        ASCENDLOGE("Failed to open regular output file: path=%s", path.c_str());
+        return false;
+    }
+    return true;
+}
+
+bool FileUtils::WriteTextFile(const std::string& path, const std::string& text, std::ios::openmode writeMode)
+{
+    std::ofstream output;
+    if (!OpenRegularFileForWrite(path, output, writeMode)) {
+        return false;
+    }
+    output << text;
+    return FinalizeOutput(output);
+}
+
 bool FileUtils::ResolveRegularFilePathForWrite(const std::string& path, std::string& resolved)
 {
     resolved.clear();
@@ -280,7 +337,7 @@ bool FileUtils::ReadRegularFile(const std::string& path, uintmax_t maximum, std:
         return false;
     }
     std::string canonicalPath;
-    if (!ResolveCanonicalPath(normalizedPath.string(), canonicalPath)) {
+    if (!ResolveRegularFilePathForRead(normalizedPath.string(), canonicalPath)) {
         return false;
     }
     const uintmax_t fileSize = fs::file_size(fs::path(canonicalPath), error);
