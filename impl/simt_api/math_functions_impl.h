@@ -985,34 +985,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float frexpf(float x, __gm__ int* exp) { _
 #endif
 #endif
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float ldexpf(float x, int exp)
-{
-    if (x == 0.0f || isinf(x) || isnan(x) || exp == 0) {
-        return x;
-    }
-    if (exp > 280) { // 280: 1e-45*(2^280) = inf
-        return copysignf(ASCRT_INF_F, x);
-    }
-    if (exp < -280) { // -280: 3.4028234e+38*(2^-280) = 0
-        return copysignf(0.0f, x);
-    }
-    int32_t shift = 30;
-    if (exp > 0) {
-        while (exp > shift) {
-            x *= (1 << shift);
-            exp -= shift;
-        }
-        x *= (1 << exp);
-    } else {
-        while (exp < -30) { // -30: exp < -30, move 30
-            x *= 1.0f / (1 << shift);
-            exp += shift;
-        }
-        x *= 1.0f / (1 << (-exp));
-    }
-    return x;
-}
-
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float hypotf(float x, float y)
 {
     float abs_x = fabsf(x);
@@ -3344,6 +3316,34 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float tgammaf(float x)
     }
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float ldexpf(float x, int exp)
+{
+    if (x == 0.0f || isinf(x) || isnan(x) || exp == 0) {
+        return x;
+    }
+    if (exp > 280) { // 280: 1e-45*(2^280) = inf
+        return copysignf(ASCRT_INF_F, x);
+    }
+    if (exp < -280) { // -280: 3.4028234e+38*(2^-280) = 0
+        return copysignf(0.0f, x);
+    }
+    int32_t shift = 30;
+    if (exp > 0) {
+        while (exp > shift) {
+            x *= (1 << shift);
+            exp -= shift;
+        }
+        x *= (1 << exp);
+    } else {
+        while (exp < -30) { // -30: exp < -30, move 30
+            x *= 1.0f / (1 << shift);
+            exp += shift;
+        }
+        x *= 1.0f / (1 << (-exp));
+    }
+    return x;
+}
+
 #else
 
 /**
@@ -3524,7 +3524,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ static inline int32_t __asc_float_mantissa_expone
     // Return the exponent aligned to the mantissa integer returned above.
     // Subnormals are treated as exponent -149, normals as unbiased exponent minus 23.
     const uint32_t exponent_bits = bits & ASCRT_EXP_BIT_FLOAT_U;
-    return exponent_bits == 0U ? -149 : (static_cast<int32_t>(exponent_bits >> 23U) - 150);
+    return exponent_bits == 0U ?
+               -149 :
+               (static_cast<int32_t>(exponent_bits >> 23U) - 150); // 150 = 127 bias + 23 mantissa bits.
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ static inline int32_t __asc_uint_floor_log2(uint32_t x)
@@ -3546,19 +3548,21 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __asc_make_float_from_mantiss
         const int32_t mantissa_log2 = __asc_uint_floor_log2(mantissa);
         const int32_t result_exponent = exponent + mantissa_log2;
         // Clamp to fp32 range before reconstructing the final bit pattern.
-        if (result_exponent > 127) {
+        if (result_exponent > 127) { // 127: largest unbiased fp32 exponent before overflow to inf.
             result = ASCRT_INF_F;
-        } else if (result_exponent < -149) {
+        } else if (result_exponent < -149) { // -149: smallest fp32 subnormal exponent after mantissa alignment.
             result = 0.0f;
-        } else if (result_exponent >= -126) {
+        } else if (result_exponent >= -126) { // -126: smallest normal unbiased fp32 exponent.
             // Normal result: normalize mantissa and pack signless fp32 bits.
-            const uint32_t normalized_mantissa = mantissa << static_cast<uint32_t>(23 - mantissa_log2);
-            const uint32_t bits =
-                (static_cast<uint32_t>(result_exponent + 127) << 23U) | (normalized_mantissa & ASCRT_MAN_BIT_FLOAT_U);
+            const uint32_t normalized_mantissa =
+                mantissa << static_cast<uint32_t>(23 - mantissa_log2);                    // 23: fp32 mantissa width.
+            const uint32_t bits = (static_cast<uint32_t>(result_exponent + 127) << 23U) | // 127: fp32 exponent bias.
+                                  (normalized_mantissa & ASCRT_MAN_BIT_FLOAT_U);
             result = __uint_as_float(bits);
         } else {
             // Subnormal result: shift mantissa directly into the denormal field.
-            const uint32_t subnormal_shift = static_cast<uint32_t>(exponent + 149);
+            const uint32_t subnormal_shift =
+                static_cast<uint32_t>(exponent + 149); // 149: smallest subnormal exponent offset.
             result = __uint_as_float(mantissa << subnormal_shift);
         }
     }
@@ -3856,15 +3860,15 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_sincospif_core(float x, fl
     cos_value = fmaf(reduced2, cos_value, 1.0f);
 
     // Select sin/cos branches and restore the correct signs for the quadrant.
-    float selected_sin = ((quadrant & 1) != 0) ? cos_value : sin_value;
-    float selected_cos = ((quadrant & 1) != 0) ? sin_value : cos_value;
-    if ((quadrant & 2) != 0) {
+    float selected_sin = ((quadrant & 1) != 0) ? cos_value : sin_value; // bit 0: swap sin/cos for odd quadrants.
+    float selected_cos = ((quadrant & 1) != 0) ? sin_value : cos_value; // bit 0: swap sin/cos for odd quadrants.
+    if ((quadrant & 2) != 0) {                                          // bit 1: flip sine sign in quadrants 2 and 3.
         selected_sin = -selected_sin;
     }
-    if (((quadrant + 1) & 2) != 0) {
+    if (((quadrant + 1) & 2) != 0) { // bit 1 of quadrant+1: flip cosine sign in quadrants 1 and 2.
         selected_cos = -selected_cos;
     }
-    if (is_integer) {
+    if (is_integer) { // Exact integer x => sin(pi * x) should be signed zero.
         selected_sin = 0.0f * safe_x;
     }
 
@@ -4218,7 +4222,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinpif(float x)
         result = fmaf(poly, reduced * reduced2, reduced * pi_hi);
     }
 
-    // Quadrant parity determines the final sign.
+    // Bit 1 of the quadrant index selects whether the final result is negated.
     if ((quadrant & 2) != 0) {
         result = -result;
     }
@@ -5657,6 +5661,37 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t ilogbf(float x)
     }
 
     return __internal_ilogbf_finite_abs(ax);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float ldexpf(float x, int exp)
+{
+    if (x == 0.0f || isinf(x) || isnan(x) || exp == 0) {
+        return x;
+    }
+    if (exp > 278) { // 278: beyond this positive shift, x * 2^exp overflows to +inf/-inf.
+        return copysignf(ASCRT_INF_F, x);
+    }
+    if (exp < -278) { // -278: beyond this negative shift, x * 2^exp underflows to signed zero.
+        return copysignf(0.0f, x);
+    }
+    const int32_t abs_exp = (exp < 0) ? -exp : exp;
+    if (abs_exp >= 101) { // 101: switch to the multi-stage scaling path for larger exponent magnitudes.
+        // Match the compiled SIMT path: split the exponent into q / r form,
+        // then apply one larger scale followed by three equal scale factors.
+        const uint32_t exp_bits = static_cast<uint32_t>(exp + 508); // 508: bias used by the compiled path.
+        const uint32_t q = exp_bits >> 2;
+        const uint32_t r = exp_bits - (q << 2);
+        const float scale_q = __uint_as_float(q << 23);        // 23: float32 mantissa bits; exponent starts at bit 23.
+        const float scale_qr = __uint_as_float((q + r) << 23); // q + r: first-stage exponent chunk.
+        x *= scale_qr;
+        x *= scale_q;
+        x *= scale_q;
+        x *= scale_q;
+        return x;
+    }
+    return x *
+           __uint_as_float(
+               static_cast<uint32_t>(exp + 127) << 23); // 23: float32 exponent starts at bit 23; 127: exponent bias.
 }
 
 #endif // ASCENDC_USE_LEGACY_PRECISION
