@@ -30,7 +30,7 @@ private:
     aclError ParseCommand(
         const nlohmann::json& command, const std::string& objectName, ManifestObjectKind objectKind, size_t index,
         ManifestCommand& result) const;
-    aclError ParseObjects(
+    aclError ParseSelectedObjects(
         const nlohmann::json& kernel, KernelCompilationVariant variant, CompilationManifest& result) const;
 
     const nlohmann::json& borrowedManifest_;

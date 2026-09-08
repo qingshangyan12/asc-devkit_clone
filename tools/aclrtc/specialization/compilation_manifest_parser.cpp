@@ -118,7 +118,7 @@ aclError CompilationManifestParser::ParseCommand(
     return ACLRTC_SUCCESS;
 }
 
-aclError CompilationManifestParser::ParseObjects(
+aclError CompilationManifestParser::ParseSelectedObjects(
     const Json& kernel, KernelCompilationVariant variant, CompilationManifest& spec) const
 {
     bool foundBasic = false;
@@ -160,9 +160,12 @@ aclError CompilationManifestParser::ParseObjects(
         const auto outputs = object.at("outputs").get<std::vector<std::string>>();
         spec.linkInputs.insert(spec.linkInputs.end(), outputs.begin(), outputs.end());
     }
-    if (!foundBasic || (variant == KernelCompilationVariant::BasicWithSuperKernel && !foundSuperKernel)) {
-        ASCENDLOGE("Selected kernel is missing a required basic or sk object");
+    if (!foundBasic) {
+        ASCENDLOGE("Selected kernel is missing a required basic object");
         return ACLRTC_ERROR_FAILURE;
+    }
+    if (variant == KernelCompilationVariant::BasicWithSuperKernel && !foundSuperKernel) {
+        ASCENDLOGI("Selected kernel has no sk object; compiling basic only despite --enable-super-kernel");
     }
     return ACLRTC_SUCCESS;
 }
@@ -196,7 +199,7 @@ aclError CompilationManifestParser::ParseSelected(
         if (result != ACLRTC_SUCCESS) {
             return result;
         }
-        result = ParseObjects(*selectedKernel, variant, spec);
+        result = ParseSelectedObjects(*selectedKernel, variant, spec);
         if (result != ACLRTC_SUCCESS) {
             return result;
         }

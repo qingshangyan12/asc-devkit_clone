@@ -801,7 +801,7 @@ TEST(KernelCompilationPlanBuilderTest, RejectsMalformedManifestCommands)
         ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 }
 
-TEST(KernelCompilationPlanBuilderTest, RequiresBasicAndRequestedSuperKernelObjects)
+TEST(KernelCompilationPlanBuilderTest, RequiresBasicAndFallsBackWhenSuperKernelIsAbsent)
 {
     KernelPlanTestWorkspace workspace;
     ScopedEnvironmentVariable toolchainEnvironment("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
@@ -821,12 +821,25 @@ TEST(KernelCompilationPlanBuilderTest, RequiresBasicAndRequestedSuperKernelObjec
         ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 
     request.compilationVariant = KernelCompilationVariant::BasicWithSuperKernel;
+    request.compilerOptions.superKernelOptions = {"--sk-only-test-option"};
     Json manifestWithoutSuperKernel = CreateManifest();
     manifestWithoutSuperKernel["kernels"][1]["objects"].erase(1);
-    EXPECT_EQ(
+    ASSERT_EQ(
         BuildPlanFromManifest(
             request, manifestWithoutSuperKernel, workspace.ResourcePath(), workspace.SourceDirectoryPath(), plan),
-        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+        ascendc::aclrtc::ACLRTC_SUCCESS);
+    request.compilationVariant = KernelCompilationVariant::Basic;
+    KernelCompilationPlan basicPlan;
+    ASSERT_EQ(
+        BuildPlanFromManifest(
+            request, manifestWithoutSuperKernel, workspace.ResourcePath(), workspace.SourceDirectoryPath(), basicPlan),
+        ascendc::aclrtc::ACLRTC_SUCCESS);
+    ASSERT_EQ(plan.compilationCommands.size(), basicPlan.compilationCommands.size());
+    for (size_t index = 0; index < plan.compilationCommands.size(); ++index) {
+        EXPECT_EQ(plan.compilationCommands[index].executablePath, basicPlan.compilationCommands[index].executablePath);
+        EXPECT_EQ(
+            plan.compilationCommands[index].commandArguments, basicPlan.compilationCommands[index].commandArguments);
+    }
 }
 
 TEST(KernelCompilationPlanBuilderTest, RejectsUnresolvableLinkInputs)
