@@ -22,33 +22,12 @@ __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst,
                                       uint32_t n_burst,
                                       uint32_t len_burst,
                                       asc_channel_pad_mode pad_mode,
-                                      uint64_t src_stride,
-                                      uint32_t dst_stride)
-```
-
-```cpp
-__aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst,
-                                      __gm__ void* src,
-                                      uint32_t n_burst,
-                                      uint32_t len_burst,
-                                      asc_channel_pad_mode pad_mode,
                                       bool enable_pre_load_ignore_sync,
                                       uint64_t src_stride,
                                       uint32_t dst_stride)
 ```
 
 ### 2D矩阵搬运
-
-```cpp
-__aicore__ inline void asc_copy_gm2l1(__cbuf__ <dtype>* dst,
-                                      __gm__ <dtype>* src,
-                                      uint32_t m_start_position,
-                                      uint32_t k_start_position,
-                                      uint16_t dst_stride,
-                                      uint16_t m_step,
-                                      uint16_t k_step,
-                                      asc_load_l2_cache_mode l2_cache_mode)
-```
 
 ```cpp
 __aicore__ inline void asc_copy_gm2l1(__cbuf__ <dtype>* dst,
@@ -72,7 +51,7 @@ __aicore__ inline void asc_copy_gm2l1(__cbuf__ <dtype>* dst,
 |---|---|---|
 | dst | 输出 | 目的操作数，存储位置为L1 Buffer。起始地址需32字节对齐。 |
 | src | 输入 | 源操作数，存储位置为GM。起始地址需1字节对齐。 |
-| enable_pre_load_ignore_sync | 输入 | 是否开启预加载忽略同步功能。`false`表示关闭；`true`表示开启。未提供该参数的重载等价于设置为`false`。 |
+| enable_pre_load_ignore_sync | 输入 | 是否开启预加载忽略同步功能。`false`表示关闭；`true`表示开启。 |
 
 **表2** 连续数据块搬运参数说明
 

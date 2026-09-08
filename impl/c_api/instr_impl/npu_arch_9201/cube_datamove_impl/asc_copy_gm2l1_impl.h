@@ -24,16 +24,6 @@ constexpr uint8_t ASC_GM2L1_DECOMP_MODE_DEFAULT = 0;
 
 __aicore__ inline void asc_copy_gm2l1_impl(
     __cbuf__ void* dst, __gm__ void* src, uint32_t n_burst, uint32_t len_burst, asc_channel_pad_mode pad_mode,
-    uint64_t src_stride, uint32_t dst_stride)
-{
-    if ASC_IS_AIC {
-        copy_gm_to_cbuf_v2(dst, src, 0, n_burst, len_burst, static_cast<uint8_t>(pad_mode), 0, src_stride,
-            dst_stride, false);
-    }
-}
-
-__aicore__ inline void asc_copy_gm2l1_impl(
-    __cbuf__ void* dst, __gm__ void* src, uint32_t n_burst, uint32_t len_burst, asc_channel_pad_mode pad_mode,
     bool enable_pre_load_ignore_sync, uint64_t src_stride, uint32_t dst_stride)
 {
     if ASC_IS_AIC {
@@ -44,17 +34,6 @@ __aicore__ inline void asc_copy_gm2l1_impl(
 
 __aicore__ inline void asc_copy_gm2l1_impl(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t m_start_position, uint32_t k_start_position,
-    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
-{
-    if ASC_IS_AIC {
-        load_gm_to_cbuf_2dv2(
-            dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, ASC_GM2L1_SID_DEFAULT,
-            ASC_GM2L1_DECOMP_MODE_DEFAULT, false, static_cast<uint8_t>(l2_cache_mode));
-    }
-}
-
-__aicore__ inline void asc_copy_gm2l1_impl(
-    __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, bool enable_pre_load_ignore_sync,
     asc_load_l2_cache_mode l2_cache_mode)
 {
@@ -62,17 +41,6 @@ __aicore__ inline void asc_copy_gm2l1_impl(
         load_gm_to_cbuf_2dv2(
             dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, ASC_GM2L1_SID_DEFAULT,
             ASC_GM2L1_DECOMP_MODE_DEFAULT, enable_pre_load_ignore_sync, static_cast<uint8_t>(l2_cache_mode));
-    }
-}
-
-__aicore__ inline void asc_copy_gm2l1_impl(
-    __cbuf__ float* dst, __gm__ float* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
-    uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
-{
-    if ASC_IS_AIC {
-        load_gm_to_cbuf_2dv2(
-            dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, ASC_GM2L1_SID_DEFAULT,
-            ASC_GM2L1_DECOMP_MODE_DEFAULT, false, static_cast<uint8_t>(l2_cache_mode));
     }
 }
 
@@ -90,17 +58,6 @@ __aicore__ inline void asc_copy_gm2l1_impl(
 
 __aicore__ inline void asc_copy_gm2l1_impl(
     __cbuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint32_t m_start_position, uint32_t k_start_position,
-    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
-{
-    if ASC_IS_AIC {
-        load_gm_to_cbuf_2dv2(
-            dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, ASC_GM2L1_SID_DEFAULT,
-            ASC_GM2L1_DECOMP_MODE_DEFAULT, false, static_cast<uint8_t>(l2_cache_mode));
-    }
-}
-
-__aicore__ inline void asc_copy_gm2l1_impl(
-    __cbuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, bool enable_pre_load_ignore_sync,
     asc_load_l2_cache_mode l2_cache_mode)
 {
@@ -108,17 +65,6 @@ __aicore__ inline void asc_copy_gm2l1_impl(
         load_gm_to_cbuf_2dv2(
             dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, ASC_GM2L1_SID_DEFAULT,
             ASC_GM2L1_DECOMP_MODE_DEFAULT, enable_pre_load_ignore_sync, static_cast<uint8_t>(l2_cache_mode));
-    }
-}
-
-__aicore__ inline void asc_copy_gm2l1_impl(
-    __cbuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint32_t m_start_position, uint32_t k_start_position,
-    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
-{
-    if ASC_IS_AIC {
-        load_gm_to_cbuf_2dv2(
-            dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, ASC_GM2L1_SID_DEFAULT,
-            ASC_GM2L1_DECOMP_MODE_DEFAULT, false, static_cast<uint8_t>(l2_cache_mode));
     }
 }
 
@@ -136,17 +82,6 @@ __aicore__ inline void asc_copy_gm2l1_impl(
 
 __aicore__ inline void asc_copy_gm2l1_impl(
     __cbuf__ half* dst, __gm__ half* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
-    uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
-{
-    if ASC_IS_AIC {
-        load_gm_to_cbuf_2dv2(
-            dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, ASC_GM2L1_SID_DEFAULT,
-            ASC_GM2L1_DECOMP_MODE_DEFAULT, false, static_cast<uint8_t>(l2_cache_mode));
-    }
-}
-
-__aicore__ inline void asc_copy_gm2l1_impl(
-    __cbuf__ half* dst, __gm__ half* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
     uint16_t m_step, uint16_t k_step, bool enable_pre_load_ignore_sync,
     asc_load_l2_cache_mode l2_cache_mode)
 {
@@ -154,17 +89,6 @@ __aicore__ inline void asc_copy_gm2l1_impl(
         load_gm_to_cbuf_2dv2(
             dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, ASC_GM2L1_SID_DEFAULT,
             ASC_GM2L1_DECOMP_MODE_DEFAULT, enable_pre_load_ignore_sync, static_cast<uint8_t>(l2_cache_mode));
-    }
-}
-
-__aicore__ inline void asc_copy_gm2l1_impl(
-    __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint32_t m_start_position, uint32_t k_start_position,
-    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
-{
-    if ASC_IS_AIC {
-        load_gm_to_cbuf_2dv2(
-            dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, ASC_GM2L1_SID_DEFAULT,
-            ASC_GM2L1_DECOMP_MODE_DEFAULT, false, static_cast<uint8_t>(l2_cache_mode));
     }
 }
 
@@ -182,17 +106,6 @@ __aicore__ inline void asc_copy_gm2l1_impl(
 
 __aicore__ inline void asc_copy_gm2l1_impl(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint32_t m_start_position, uint32_t k_start_position,
-    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
-{
-    if ASC_IS_AIC {
-        load_gm_to_cbuf_2dv2(
-            dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, ASC_GM2L1_SID_DEFAULT,
-            ASC_GM2L1_DECOMP_MODE_DEFAULT, false, static_cast<uint8_t>(l2_cache_mode));
-    }
-}
-
-__aicore__ inline void asc_copy_gm2l1_impl(
-    __cbuf__ int16_t* dst, __gm__ int16_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, bool enable_pre_load_ignore_sync,
     asc_load_l2_cache_mode l2_cache_mode)
 {
@@ -200,17 +113,6 @@ __aicore__ inline void asc_copy_gm2l1_impl(
         load_gm_to_cbuf_2dv2(
             dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, ASC_GM2L1_SID_DEFAULT,
             ASC_GM2L1_DECOMP_MODE_DEFAULT, enable_pre_load_ignore_sync, static_cast<uint8_t>(l2_cache_mode));
-    }
-}
-
-__aicore__ inline void asc_copy_gm2l1_impl(
-    __cbuf__ int32_t* dst, __gm__ int32_t* src, uint32_t m_start_position, uint32_t k_start_position,
-    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
-{
-    if ASC_IS_AIC {
-        load_gm_to_cbuf_2dv2(
-            dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, ASC_GM2L1_SID_DEFAULT,
-            ASC_GM2L1_DECOMP_MODE_DEFAULT, false, static_cast<uint8_t>(l2_cache_mode));
     }
 }
 
@@ -228,17 +130,6 @@ __aicore__ inline void asc_copy_gm2l1_impl(
 
 __aicore__ inline void asc_copy_gm2l1_impl(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
-    uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
-{
-    if ASC_IS_AIC {
-        load_gm_to_cbuf_2dv2(
-            dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, ASC_GM2L1_SID_DEFAULT,
-            ASC_GM2L1_DECOMP_MODE_DEFAULT, false, static_cast<uint8_t>(l2_cache_mode));
-    }
-}
-
-__aicore__ inline void asc_copy_gm2l1_impl(
-    __cbuf__ int8_t* dst, __gm__ int8_t* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
     uint16_t m_step, uint16_t k_step, bool enable_pre_load_ignore_sync,
     asc_load_l2_cache_mode l2_cache_mode)
 {
@@ -246,17 +137,6 @@ __aicore__ inline void asc_copy_gm2l1_impl(
         load_gm_to_cbuf_2dv2(
             dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, ASC_GM2L1_SID_DEFAULT,
             ASC_GM2L1_DECOMP_MODE_DEFAULT, enable_pre_load_ignore_sync, static_cast<uint8_t>(l2_cache_mode));
-    }
-}
-
-__aicore__ inline void asc_copy_gm2l1_impl(
-    __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t m_start_position, uint32_t k_start_position,
-    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
-{
-    if ASC_IS_AIC {
-        load_gm_to_cbuf_2dv2(
-            dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, ASC_GM2L1_SID_DEFAULT,
-            ASC_GM2L1_DECOMP_MODE_DEFAULT, false, static_cast<uint8_t>(l2_cache_mode));
     }
 }
 
@@ -274,17 +154,6 @@ __aicore__ inline void asc_copy_gm2l1_impl(
 
 __aicore__ inline void asc_copy_gm2l1_impl(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t m_start_position, uint32_t k_start_position,
-    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
-{
-    if ASC_IS_AIC {
-        load_gm_to_cbuf_2dv2(
-            dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, ASC_GM2L1_SID_DEFAULT,
-            ASC_GM2L1_DECOMP_MODE_DEFAULT, false, static_cast<uint8_t>(l2_cache_mode));
-    }
-}
-
-__aicore__ inline void asc_copy_gm2l1_impl(
-    __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, bool enable_pre_load_ignore_sync,
     asc_load_l2_cache_mode l2_cache_mode)
 {
@@ -292,17 +161,6 @@ __aicore__ inline void asc_copy_gm2l1_impl(
         load_gm_to_cbuf_2dv2(
             dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, ASC_GM2L1_SID_DEFAULT,
             ASC_GM2L1_DECOMP_MODE_DEFAULT, enable_pre_load_ignore_sync, static_cast<uint8_t>(l2_cache_mode));
-    }
-}
-
-__aicore__ inline void asc_copy_gm2l1_impl(
-    __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t m_start_position, uint32_t k_start_position,
-    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
-{
-    if ASC_IS_AIC {
-        load_gm_to_cbuf_2dv2(
-            dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, ASC_GM2L1_SID_DEFAULT,
-            ASC_GM2L1_DECOMP_MODE_DEFAULT, false, static_cast<uint8_t>(l2_cache_mode));
     }
 }
 
@@ -320,17 +178,6 @@ __aicore__ inline void asc_copy_gm2l1_impl(
 
 __aicore__ inline void asc_copy_gm2l1_impl(
     __cbuf__ fp4x2_e1m2_t* dst, __gm__ fp4x2_e1m2_t* src, uint32_t m_start_position, uint32_t k_start_position,
-    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
-{
-    if ASC_IS_AIC {
-        load_gm_to_cbuf_2dv2_s4(
-            dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, ASC_GM2L1_SID_DEFAULT,
-            ASC_GM2L1_DECOMP_MODE_DEFAULT, false, static_cast<uint8_t>(l2_cache_mode));
-    }
-}
-
-__aicore__ inline void asc_copy_gm2l1_impl(
-    __cbuf__ fp4x2_e1m2_t* dst, __gm__ fp4x2_e1m2_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, bool enable_pre_load_ignore_sync,
     asc_load_l2_cache_mode l2_cache_mode)
 {
@@ -343,17 +190,6 @@ __aicore__ inline void asc_copy_gm2l1_impl(
 
 __aicore__ inline void asc_copy_gm2l1_impl(
     __cbuf__ fp4x2_e2m1_t* dst, __gm__ fp4x2_e2m1_t* src, uint32_t m_start_position, uint32_t k_start_position,
-    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
-{
-    if ASC_IS_AIC {
-        load_gm_to_cbuf_2dv2_s4(
-            dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, ASC_GM2L1_SID_DEFAULT,
-            ASC_GM2L1_DECOMP_MODE_DEFAULT, false, static_cast<uint8_t>(l2_cache_mode));
-    }
-}
-
-__aicore__ inline void asc_copy_gm2l1_impl(
-    __cbuf__ fp4x2_e2m1_t* dst, __gm__ fp4x2_e2m1_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, bool enable_pre_load_ignore_sync,
     asc_load_l2_cache_mode l2_cache_mode)
 {
@@ -361,17 +197,6 @@ __aicore__ inline void asc_copy_gm2l1_impl(
         load_gm_to_cbuf_2dv2_s4(
             dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, ASC_GM2L1_SID_DEFAULT,
             ASC_GM2L1_DECOMP_MODE_DEFAULT, enable_pre_load_ignore_sync, static_cast<uint8_t>(l2_cache_mode));
-    }
-}
-
-__aicore__ inline void asc_copy_gm2l1_impl(
-    __cbuf__ void* dst, __gm__ void* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
-    uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
-{
-    if ASC_IS_AIC {
-        load_gm_to_cbuf_2dv2_s4(
-            dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, ASC_GM2L1_SID_DEFAULT,
-            ASC_GM2L1_DECOMP_MODE_DEFAULT, false, static_cast<uint8_t>(l2_cache_mode));
     }
 }
 
@@ -389,17 +214,6 @@ __aicore__ inline void asc_copy_gm2l1_impl(
 
 __aicore__ inline void asc_copy_gm2l1_impl(
     __cbuf__ hif4_scale* dst, __gm__ hif4_scale* src, uint32_t m_start_position, uint32_t k_start_position,
-    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
-{
-    if ASC_IS_AIC {
-        load_gm_to_cbuf_2dv2_s4(
-            dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, ASC_GM2L1_SID_DEFAULT,
-            ASC_GM2L1_DECOMP_MODE_DEFAULT, false, static_cast<uint8_t>(l2_cache_mode));
-    }
-}
-
-__aicore__ inline void asc_copy_gm2l1_impl(
-    __cbuf__ hif4_scale* dst, __gm__ hif4_scale* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, bool enable_pre_load_ignore_sync,
     asc_load_l2_cache_mode l2_cache_mode)
 {
@@ -409,7 +223,6 @@ __aicore__ inline void asc_copy_gm2l1_impl(
             ASC_GM2L1_DECOMP_MODE_DEFAULT, enable_pre_load_ignore_sync, static_cast<uint8_t>(l2_cache_mode));
     }
 }
-
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)

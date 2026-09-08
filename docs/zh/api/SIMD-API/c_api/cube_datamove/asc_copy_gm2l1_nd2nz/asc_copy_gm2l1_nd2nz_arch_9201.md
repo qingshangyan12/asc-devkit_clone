@@ -24,17 +24,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(__cbuf__ <dtype>* dst,
                                             uint16_t n_value,
                                             uint32_t d_value,
                                             uint64_t src_nd_matrix_stride,
-                                            bool enable_small_c0)
-```
-
-```cpp
-__aicore__ inline void asc_copy_gm2l1_nd2nz(__cbuf__ <dtype>* dst,
-                                            __gm__ <dtype>* src,
-                                            uint64_t src_d_value,
-                                            asc_load_l2_cache_mode l2_cache_mode,
-                                            uint16_t n_value,
-                                            uint32_t d_value,
-                                            uint64_t src_nd_matrix_stride,
                                             bool enable_small_c0,
                                             bool enable_pre_load_ignore_sync)
 ```
@@ -55,7 +44,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(__cbuf__ <dtype>* dst,
 | d_value | 输入 | 单个ND矩阵的列数，单位为元素。取值范围：[1, $2^{21}-1$]。当$d\_value \times \mathrm{sizeof}(\mathrm{dtype})$不满足32字节对齐时，硬件在目的矩阵中自动补0至32字节对齐。 |
 | src_nd_matrix_stride | 输入 | 源端相邻ND矩阵起始地址之间的偏移，单位为字节。取值范围：[0, $2^{40}-1$]。搬运一个ND矩阵时设置为0；搬运多个ND矩阵且设置为0时，将重复读取第一个ND矩阵。 |
 | enable_small_c0 | 输入 | SmallC0模式开关。`false`表示按标准Nz格式的C0（32字节）排布；`true`表示开启SmallC0模式，仅当$d\_value \le 4$时可开启。 |
-| enable_pre_load_ignore_sync | 输入 | 是否开启预加载忽略同步功能。`false`表示关闭；`true`表示开启。未提供该参数的重载等价于设置为`false`。 |
+| enable_pre_load_ignore_sync | 输入 | 是否开启预加载忽略同步功能。`false`表示关闭；`true`表示开启。 |
 
 **表2** `l2_cache_mode`取值说明<a id="l2-cache-mode"></a>
 

@@ -13,7 +13,7 @@
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
 
-template <typename DTYPE, bool EXPECT_ENABLE_PRE_LOAD_IGNORE_SYNC>
+template <typename DTYPE>
 __aicore__ inline void copy_gm_to_cbuf_align_v2_stub(
     __cbuf__ DTYPE* dst, __gm__ DTYPE* src, uint8_t sid, uint32_t n_burst, uint32_t len_burst,
     uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit, bool enable_pre_load_ignore_sync,
@@ -27,7 +27,7 @@ __aicore__ inline void copy_gm_to_cbuf_align_v2_stub(
     EXPECT_EQ(left_padding_count, static_cast<uint8_t>(55));
     EXPECT_EQ(right_padding_count, static_cast<uint8_t>(66));
     EXPECT_EQ(data_select_bit, static_cast<bool>(false));
-    EXPECT_EQ(enable_pre_load_ignore_sync, EXPECT_ENABLE_PRE_LOAD_IGNORE_SYNC);
+    EXPECT_TRUE(enable_pre_load_ignore_sync);
     EXPECT_EQ(l2_cache_ctl, static_cast<uint8_t>(4));
     EXPECT_EQ(burst_src_stride, static_cast<uint64_t>(88));
     EXPECT_EQ(burst_dst_stride, static_cast<uint32_t>(99));
@@ -43,13 +43,6 @@ protected:
                                                                                                                 \
     TEST_F(TEST_COPY_GM_TO_L1_ALIGN, TEST_COPY_GM_TO_L1_ALIGN_##dtype)                                          \
     {                                                                                                           \
-        MOCKER_CPP(                                                                                             \
-            copy_gm_to_cbuf_align_v2, void(                                                                     \
-                                          __cbuf__ dtype*, __gm__ dtype*, uint8_t, uint32_t, uint32_t, uint8_t, \
-                                          uint8_t, bool, bool, uint8_t, uint64_t, uint32_t))                    \
-            .times(1)                                                                                           \
-            .will(invoke(copy_gm_to_cbuf_align_v2_stub<dtype, false>));                                         \
-                                                                                                                \
         __cbuf__ dtype* dst = reinterpret_cast<__cbuf__ dtype*>(11);                                            \
         __gm__ dtype* src = reinterpret_cast<__gm__ dtype*>(22);                                                \
                                                                                                                 \
@@ -62,17 +55,12 @@ protected:
         uint64_t burst_src_stride = 88;                                                                         \
         uint32_t burst_dst_stride = 99;                                                                         \
                                                                                                                 \
-        asc_copy_gm2l1_align(                                                                                   \
-            dst, src, n_burst, len_burst, left_padding_count, right_padding_count, data_select_bit,            \
-            l2_cache_mode, burst_src_stride, burst_dst_stride);                                                 \
-        GlobalMockObject::verify();                                                                             \
-                                                                                                                \
         MOCKER_CPP(                                                                                             \
             copy_gm_to_cbuf_align_v2, void(                                                                     \
                                           __cbuf__ dtype*, __gm__ dtype*, uint8_t, uint32_t, uint32_t, uint8_t, \
                                           uint8_t, bool, bool, uint8_t, uint64_t, uint32_t))                    \
             .times(1)                                                                                           \
-            .will(invoke(copy_gm_to_cbuf_align_v2_stub<dtype, true>));                                          \
+            .will(invoke(copy_gm_to_cbuf_align_v2_stub<dtype>));                                                \
                                                                                                                 \
         asc_copy_gm2l1_align(                                                                                   \
             dst, src, n_burst, len_burst, left_padding_count, right_padding_count, data_select_bit, true,      \
