@@ -62,7 +62,7 @@ __aicore__ inline void asc_copy_gm2l1(__cbuf__ <dtype>* dst,
                                       asc_load_l2_cache_mode l2_cache_mode)
 ```
 
-`dtype`支持的数据类型为`int8_t`、`uint8_t`、`fp4x2_e1m2_t`、`fp4x2_e2m1_t`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`void`。
+`dtype`支持的数据类型为`int8_t`、`uint8_t`、`fp4x2_e1m2_t`、`fp4x2_e2m1_t`、`hif4_scale`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`void`。
 
 ## 参数说明
 
