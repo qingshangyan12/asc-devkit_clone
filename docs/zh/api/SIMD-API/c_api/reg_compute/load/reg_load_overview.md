@@ -61,11 +61,11 @@ Reg数据搬入接口用于将Unified Buffer（UB）中的数据搬入矢量数�
 | 接口名称 | 模式 | 功能简述 | 地址对齐要求 |
 | --- | --- | --- | --- |
 | [asc_load](asc_load.md) | 连续非对齐搬入模式 | 搬入一个VL长度的数据，由用户更新源地址。该接口为易用性接口。 | 按dtype对齐 |
-| [asc_loadunalign_pre](asc_loadunalign_pre.md) | 源地址预处理模式 | 根据源地址初始化非对齐寄存器。 | 传入地址按dtype对齐 |
-| [asc_loadunalign_pre](asc_loadunalign_pre.md) | 地址寄存器偏移预处理模式 | 根据源地址和地址寄存器偏移初始化非对齐寄存器。 | 实际访问地址按dtype对齐 |
+| [asc_loadunalign_pre](asc_loadunalign_pre.md) | 源地址预处理模式 | 根据源地址初始化非对齐寄存器。 | 按dtype对齐 |
+| [asc_loadunalign_pre](asc_loadunalign_pre.md) | 地址寄存器偏移预处理模式 | 根据源地址和地址寄存器偏移初始化非对齐寄存器。 | 按dtype对齐 |
 | [asc_loadunalign](asc_loadunalign.md) | 连续非对齐搬入模式 | 使用预处理结果搬入一个VL长度的数据，由用户更新源地址。 | 按dtype对齐 |
 | [asc_loadunalign_postupdate](asc_loadunalign_postupdate.md) | 连续非对齐搬入模式 | 使用预处理结果搬入指定数量的元素，并自动更新源地址和非对齐寄存器。 | 按dtype对齐 |
-| [asc_loadunalign_postupdate](asc_loadunalign_postupdate.md) | 地址寄存器偏移搬入模式 | 从地址寄存器偏移位置搬入数据，并自动更新偏移和非对齐寄存器。 | 实际访问地址按dtype对齐 |
+| [asc_loadunalign_postupdate](asc_loadunalign_postupdate.md) | 地址寄存器偏移搬入模式 | 从地址寄存器偏移位置搬入数据，并自动更新偏移和非对齐寄存器。 | 按dtype对齐 |
 
 `asc_load`为易用性接口。对性能有要求的连续非对齐搬入场景，可使用`asc_loadunalign`或`asc_loadunalign_postupdate`。
 
@@ -207,9 +207,9 @@ __simd_vf__ inline void load_align_post_update_vf(__ubuf__ half* dst, __ubuf__ h
 
 | 搬入方式 | 调用顺序与缓存复用规则 | 接口 |
 | --- | --- | --- |
-| 手动更新源地址 | 每次搬入前均调用预处理接口，且预处理接口与紧随其后的搬入接口必须使用相同的源地址。 | [asc_loadunalign_pre](asc_loadunalign_pre.md) -> [asc_loadunalign](asc_loadunalign.md) |
-| 连续自动更新 | 首次搬入前调用预处理接口。后续搬入继续使用接口自动更新后的源地址时，可复用更新后的非对齐寄存器；源地址被另行修改后，必须重新预处理。 | [asc_loadunalign_pre](asc_loadunalign_pre.md) -> [asc_loadunalign_postupdate](asc_loadunalign_postupdate.md) |
-| 地址寄存器偏移 | 每次循环迭代先生成起始偏移，再使用相同的源地址和偏移预处理。迭代内继续使用接口按`inc`更新后的偏移时，可复用非对齐寄存器；源地址或偏移被另行修改后，必须重新预处理。 | [asc_update_addr_reg](../reg_addr_reg/asc_update_addr_reg.md) -> [asc_loadunalign_pre](asc_loadunalign_pre.md) -> [asc_loadunalign_postupdate](asc_loadunalign_postupdate.md) |
+| 手动更新源地址 | 每次搬入前均调用预处理接口，且预处理接口与紧随其后的搬入接口必须使用相同的源地址。 | 依次调用[asc_loadunalign_pre](asc_loadunalign_pre.md)、[asc_loadunalign](asc_loadunalign.md) |
+| 连续自动更新 | 首次搬入前调用预处理接口。后续搬入继续使用接口自动更新后的源地址时，可复用更新后的非对齐寄存器；源地址被另行修改后，必须重新预处理。 | 依次调用[asc_loadunalign_pre](asc_loadunalign_pre.md)、[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md) |
+| 地址寄存器偏移 | 每次循环迭代先生成起始偏移，再使用相同的源地址和偏移预处理。迭代内继续使用接口按`inc`更新后的偏移时，可复用非对齐寄存器；源地址或偏移被另行修改后，必须重新预处理。 | 依次调用[asc_update_addr_reg](../reg_addr_reg/asc_update_addr_reg.md)、[asc_loadunalign_pre](asc_loadunalign_pre.md)、[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md) |
 
 ### 非对齐搬出原理
 
