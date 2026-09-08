@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/common_impl.h"
+#include "impl/c_api/reg_base_impl/utils_impl.h"
 
 __simd_callee__ inline void asc_loadunalign_pre_impl(vector_load_unalign& dst, __ubuf__ int8_t* src)
 {

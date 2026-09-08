@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/common_impl.h"
+#include "impl/c_api/reg_base_impl/utils_impl.h"
 
 __aicore__ inline void asc_set_ub2gm_loop_size_impl(uint32_t loop1_size, uint32_t loop2_size)
 {

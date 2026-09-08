@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/memory_base_impl/common_impl.h"
+#include "impl/c_api/memory_base_impl/utils_impl.h"
 
 __aicore__ inline void asc_mmad_sparse_impl(
     __cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag,

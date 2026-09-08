@@ -8,14 +8,14 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#ifndef IMPL_C_API_MEMORY_BASE_IMPL_COMMON_IMPL_H
-#define IMPL_C_API_MEMORY_BASE_IMPL_COMMON_IMPL_H
+#ifndef IMPL_C_API_MEMORY_BASE_IMPL_UTILS_IMPL_H
+#define IMPL_C_API_MEMORY_BASE_IMPL_UTILS_IMPL_H
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #pragma message( \
-    "impl/c_api/memory_base_impl/common_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
+    "impl/c_api/memory_base_impl/utils_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define ASCENDC_C_API_INTERNAL_IMPL_C_API_MEMORY_BASE_IMPL_COMMON_IMPL_H
+#define ASCENDC_C_API_INTERNAL_IMPL_C_API_MEMORY_BASE_IMPL_UTILS_IMPL_H
 #endif
 
 #include "c_api/defs/defs.h"
@@ -123,11 +123,9 @@ union asc_scalar_bitcode {
     uint64_t output;
 };
 
-constexpr int64_t SYSTEM_CLOCK_FREQ_MHZ = 50;
-
-#if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_MEMORY_BASE_IMPL_COMMON_IMPL_H)
+#if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_MEMORY_BASE_IMPL_UTILS_IMPL_H)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef ASCENDC_C_API_INTERNAL_IMPL_C_API_MEMORY_BASE_IMPL_COMMON_IMPL_H
+#undef ASCENDC_C_API_INTERNAL_IMPL_C_API_MEMORY_BASE_IMPL_UTILS_IMPL_H
 #endif
 
-#endif // IMPL_C_API_MEMORY_BASE_IMPL_COMMON_IMPL_H
+#endif // IMPL_C_API_MEMORY_BASE_IMPL_UTILS_IMPL_H

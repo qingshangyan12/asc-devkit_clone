@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/common_impl.h"
+#include "impl/c_api/reg_base_impl/utils_impl.h"
 #include "impl/c_api/reg_base_impl/storeunalign_intf_impl.h"
 
 __simd_callee__ inline void asc_select_impl(vector_bool& dst, vector_bool src0, vector_bool src1, vector_bool mask)

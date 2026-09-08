@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/common_impl.h"
+#include "impl/c_api/reg_base_impl/utils_impl.h"
 
 __aicore__ inline void asc_set_vector_mask_impl(uint64_t mask_high, uint64_t mask_low)
 {

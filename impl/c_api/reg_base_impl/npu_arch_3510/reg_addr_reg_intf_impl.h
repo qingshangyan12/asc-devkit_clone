@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/common_impl.h"
+#include "impl/c_api/reg_base_impl/utils_impl.h"
 #include "impl/c_api/reg_base_impl/reg_addr_reg_intf_impl.h"
 
 // ==========asc_create_iter_reg (deprecated, please use asc_update_addr_reg instead)=========

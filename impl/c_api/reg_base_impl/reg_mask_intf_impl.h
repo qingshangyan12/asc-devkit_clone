@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/common_impl.h"
+#include "impl/c_api/reg_base_impl/utils_impl.h"
 
 __simd_callee__ inline vector_bool asc_update_mask_b8_impl(uint32_t& value)
 {

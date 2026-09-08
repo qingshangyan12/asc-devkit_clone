@@ -19,7 +19,65 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/common_impl.h"
+#include "impl/c_api/reg_base_impl/utils_impl.h"
+
+constexpr uint8_t ASC_L13D_RPT_REPEAT_TIMES_SHIFT = 16;
+
+constexpr uint8_t ASC_L13D_RPT_DIRECTION_SHIFT = 24;
+
+constexpr uint8_t ASC_L13D_RPT_DST_STRIDE_K_SHIFT = 32;
+
+constexpr uint8_t ASC_L13D_RPT_DST_START_POS_M_SHIFT = 48;
+
+constexpr uint8_t ASC_L13D_FMATRIX_H_SHIFT = 16;
+
+constexpr uint8_t ASC_L13D_FMATRIX_PAD_LEFT_SHIFT = 32;
+
+constexpr uint8_t ASC_L13D_FMATRIX_PAD_RIGHT_SHIFT = 40;
+
+constexpr uint8_t ASC_L13D_FMATRIX_PAD_TOP_SHIFT = 48;
+
+constexpr uint8_t ASC_L13D_FMATRIX_PAD_BOTTOM_SHIFT = 56;
+
+constexpr uint8_t ASC_L13D_FMATRIX_B_H_SHIFT = 16;
+
+constexpr uint8_t ASC_L13D_FMATRIX_B_PAD_LEFT_SHIFT = 32;
+
+constexpr uint8_t ASC_L13D_FMATRIX_B_PAD_RIGHT_SHIFT = 40;
+
+constexpr uint8_t ASC_L13D_FMATRIX_B_PAD_TOP_SHIFT = 48;
+
+constexpr uint8_t ASC_L13D_FMATRIX_B_PAD_BOTTOM_SHIFT = 56;
+
+constexpr uint8_t ASC_GM2L1_SID_DEFAULT = 0;
+
+constexpr uint8_t ASC_GM2L1_DECOMP_MODE_DEFAULT = 0;
+
+constexpr uint8_t ASC_3D_PADDING_SHIFT_BIT = 8;
+
+constexpr uint8_t ASC_L0C_COPY_CHANNEL_PARA_SHIFT = 48;
+
+constexpr uint8_t ASC_L0C_COPY_NZ_PARA_SRC_SHIFT = 16;
+
+constexpr uint8_t ASC_L0C_COPY_NZ_PARA_DST_SHIFT = 32;
+
+constexpr uint8_t ASC_3D_PADDING_B_SHIFT_BIT = 8;
+
+constexpr uint8_t ASC_L3D_RPT_B_REPEAT_TIMES_SHIFT = 16;
+
+constexpr uint8_t ASC_L3D_RPT_B_DIRECTION_SHIFT = 24;
+
+constexpr uint8_t ASC_L3D_RPT_B_DST_STRIDE_K_SHIFT = 32;
+
+constexpr uint8_t ASC_L3D_RPT_B_DST_START_POS_M_SHIFT = 48;
+
+constexpr uint8_t RELU_POST_DEFAULT = 0;
+
+constexpr bool CLIP_RELU_POST_DEFAULT = false;
+
+constexpr uint8_t ELTWISE_OP_DEFAULT = 0;
+
+constexpr uint64_t QUANT_POST_DEFAULT = 0;
 
 // half  float
 __aicore__ inline void asc_copy_l0c2l1_impl(

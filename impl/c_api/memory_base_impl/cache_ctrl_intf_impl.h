@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/memory_base_impl/common_impl.h"
+#include "impl/c_api/memory_base_impl/utils_impl.h"
 
 __aicore__ inline int64_t asc_get_icache_preload_status_impl() { return get_icache_prl_st(); }
 

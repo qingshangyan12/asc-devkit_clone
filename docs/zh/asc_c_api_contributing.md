@@ -178,14 +178,14 @@ asc-devkit/
 │   └── c_api/                    # C API实现
 │       ├── CMakeLists.txt
 │       ├── memory_base_impl/     # 2201实现，与公开接口头逐文件对应
-│       │   ├── common_impl.h     # 共享的内部辅助实现
+│       │   ├── utils_impl.h      # 共享的内部辅助实现
 │       │   ├── datamove_atomic_intf_impl.h
 │       │   ├── scalar_atomic_intf_impl.h
 │       │   ├── vector_arith_intf_impl.h
 │       │   ├── vector_datamove_intf_impl.h
 │       │   └── ...
 │       └── reg_base_impl/        # regbase公共实现
-│           ├── common_impl.h
+│           ├── utils_impl.h
 │           ├── reg_arith_intf_impl.h
 │           ├── loadalign_intf_impl.h
 │           ├── vector_datamove_intf_impl.h

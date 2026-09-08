@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/common_impl.h"
+#include "impl/c_api/reg_base_impl/utils_impl.h"
 
 // vdup
 __simd_callee__ inline void asc_duplicate_scalar_impl(vector_uint8_t& dst, uint8_t value, vector_bool mask)

@@ -19,7 +19,23 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/common_impl.h"
+#include "impl/c_api/reg_base_impl/utils_impl.h"
+
+union asc_store_align_config {
+    int32_t config;
+    struct {
+        uint32_t repeat_stride : 16;
+        uint32_t block_stride : 16;
+    };
+};
+
+union asc_store_align_config_post {
+    int32_t config;
+    struct {
+        uint32_t repeat_stride : 16;
+        uint32_t block_stride : 16;
+    };
+};
 
 // ==========偏移固定传入0，由用户自行更新目的操作数的地址=========
 // storealign

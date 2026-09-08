@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/common_impl.h"
+#include "impl/c_api/reg_base_impl/utils_impl.h"
 
 __simd_callee__ inline void asc_ge_impl(vector_bool& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
 {

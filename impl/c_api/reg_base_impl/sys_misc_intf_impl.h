@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/common_impl.h"
+#include "impl/c_api/reg_base_impl/utils_impl.h"
 
 namespace __asc_aicore {
 __aicore__ inline void asc_nop_impl() { asm volatile("nop"); }

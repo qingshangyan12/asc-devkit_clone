@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/common_impl.h"
+#include "impl/c_api/reg_base_impl/utils_impl.h"
 
 __simd_callee__ inline void asc_relu_impl(vector_half& dst, vector_half src, vector_bool mask)
 {

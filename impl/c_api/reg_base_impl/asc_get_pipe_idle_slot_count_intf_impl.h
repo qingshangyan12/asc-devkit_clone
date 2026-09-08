@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/common_impl.h"
+#include "impl/c_api/reg_base_impl/utils_impl.h"
 
 __aicore__ inline uint8_t asc_get_pipe_mte2_idle_slot_count() { return static_cast<uint8_t>(get_iqent(PIPE_MTE2)); }
 

@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/memory_base_impl/common_impl.h"
+#include "impl/c_api/memory_base_impl/utils_impl.h"
 #include "impl/c_api/memory_base_impl/vector_arith_intf_impl.h"
 #include "impl/c_api/memory_base_impl/vector_broadcast_intf_impl.h"
 #include "impl/c_api/memory_base_impl/vector_compare_intf_impl.h"

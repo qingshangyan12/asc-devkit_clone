@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/common_impl.h"
+#include "impl/c_api/reg_base_impl/utils_impl.h"
 
 // ==========源操作数为起初地址，目的数为寄存器=========
 __simd_callee__ inline void asc_gather_impl(

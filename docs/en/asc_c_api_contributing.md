@@ -178,14 +178,14 @@ asc-devkit/
 │   └── c_api/                    # C API implementation
 │       ├── CMakeLists.txt
 │       ├── memory_base_impl/     # 2201 implementations, one file per public interface header
-│       │   ├── common_impl.h     # Shared internal helpers
+│       │   ├── utils_impl.h      # Shared internal helpers
 │       │   ├── datamove_atomic_intf_impl.h
 │       │   ├── scalar_atomic_intf_impl.h
 │       │   ├── vector_arith_intf_impl.h
 │       │   ├── vector_datamove_intf_impl.h
 │       │   └── ...
 │       └── reg_base_impl/        # Shared regbase implementations
-│           ├── common_impl.h
+│           ├── utils_impl.h
 │           ├── reg_arith_intf_impl.h
 │           ├── loadalign_intf_impl.h
 │           ├── vector_datamove_intf_impl.h

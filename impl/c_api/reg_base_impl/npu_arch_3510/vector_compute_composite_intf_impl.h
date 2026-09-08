@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/common_impl.h"
+#include "impl/c_api/reg_base_impl/utils_impl.h"
 #include "impl/c_api/reg_base_impl/vector_datamove_intf_impl.h"
 #include "impl/c_api/reg_base_impl/vector_permute_sel_intf_impl.h"
 #include "impl/c_api/reg_base_impl/vector_sort_intf_impl.h"

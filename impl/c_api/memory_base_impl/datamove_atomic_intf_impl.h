@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/memory_base_impl/common_impl.h"
+#include "impl/c_api/memory_base_impl/utils_impl.h"
 
 __aicore__ inline void asc_disable_dma_atomic_impl() { set_atomic_none(); }
 

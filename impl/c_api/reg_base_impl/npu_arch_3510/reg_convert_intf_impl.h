@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/common_impl.h"
+#include "impl/c_api/reg_base_impl/utils_impl.h"
 #include "impl/c_api/reg_base_impl/reg_convert_intf_impl.h"
 
 __simd_callee__ inline void asc_float2half_rd_v2_impl(vector_half& dst, vector_float src, vector_bool mask)

@@ -19,7 +19,17 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/common_impl.h"
+#include "impl/c_api/reg_base_impl/utils_impl.h"
+
+union ctrl_scalar_cache_bits {
+    uint64_t value;
+    struct {
+        uint64_t reserved0 : 16;
+        uint64_t scalar_load_cache_mode : 4;
+        uint64_t scalar_store_cache_mode : 4;
+        uint64_t reserved1 : 40;
+    };
+};
 
 __aicore__ inline void asc_icache_preload_impl(const void* addr, int64_t prefetch_len) { preload(addr, prefetch_len); }
 

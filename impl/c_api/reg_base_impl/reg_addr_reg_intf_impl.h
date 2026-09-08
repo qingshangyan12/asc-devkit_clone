@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/common_impl.h"
+#include "impl/c_api/reg_base_impl/utils_impl.h"
 
 #define ASC_DEFINE_UPDATE_ADDR_REG_IMPL(bxx)                                                             \
     __simd_callee__ inline addr_reg asc_update_addr_reg_##bxx##_impl(uint32_t offset)                    \
