@@ -4,6 +4,7 @@
 - **[asc_dual_dst_mode](asc_dual_dst_mode.md)**
 - **[asc_hf32_round_mode](asc_hf32_round_mode.md)**
 - **[asc_l13d_repeat_direction](asc_l13d_repeat_direction.md)**
+- **[asc_channel_pad_mode](asc_channel_pad_mode.md)**
 - **[asc_load_l2_cache_mode](asc_load_l2_cache_mode.md)**
 - **[asc_mutex_execute_mode](asc_mutex_execute_mode.md)**
 - **[asc_override_strategy](asc_override_strategy.md)**
