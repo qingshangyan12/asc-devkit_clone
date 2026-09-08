@@ -13,6 +13,7 @@
 #include <hccl/hccl_types.h>
 #include <hccl/hccl_res.h>
 #include <ccu/ccu_types.h>
+#include <acl/acl_base_rt.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -111,6 +112,19 @@ extern HcclResult __attribute__((visibility("default"))) CheckOpResSufficient(
     HcclComm comm, void* stream, void* mc2Tiling);
 
 extern CcuResult CcuKernelLaunch(HcclComm comm, void* opResCtx);
+
+/**
+ * @brief Launch the MC2 AICPU KFC server kernel (Mc2ServerKernel) with the device-side OpResCtx
+ * @param blockDim AICPU block number for the kernel, 0 is treated as 1.
+ * @param stream Stream used to launch the kernel.
+ * @param opResCtx Device-side OpResCtx address created by HcclAllocComResourceByTiling, passed to the
+ *                 kernel as launch args; no extra H2D copy is performed since it already resides on device.
+ * @param opResCtxSize Size of the OpResCtx in bytes, must not be smaller than sizeof(OpResCtx).
+ * @return HcclResult - HCCL_SUCCESS on success, error code otherwise.
+ * @note The kernel exit timeout is assembled internally from op execute timeout and HCCL_EXEC_TIMEOUT,
+ *       then clamped to the uint16_t timeout field used by the launch API.
+ */
+extern HcclResult Mc2AicpuKernelLaunch(uint32_t blockDim, aclrtStream stream, void* opResCtx, uint64_t opResCtxSize);
 
 #ifdef __cplusplus
 }
