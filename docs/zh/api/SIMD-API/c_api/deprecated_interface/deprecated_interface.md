@@ -1,5 +1,9 @@
 # 废弃接口
 
+## 矩阵数据搬运
+
+- **[asc_copy_gm2l1_align（废弃）](asc_copy_gm2l1_align_deprecated.md)**（旧常规重载和同步接口）
+
 ## 矩阵计算
 
 - **[asc_set_l0c2gm_quant_post（废弃）](asc_set_l0c2gm_quant_post_deprecated.md)**

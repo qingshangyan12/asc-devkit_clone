@@ -666,13 +666,13 @@ __aicore__ inline void asc_set_hf32_round_mode(asc_hf32_round_mode hf32_round_mo
     asc_set_hf32_round_mode_impl(hf32_round_mode);
 }
 
-[[deprecated("NOTICE: asc_enable_hf32_trans is deprecated. There is no replacement.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", none)
 __aicore__ inline void asc_enable_hf32_trans(uint32_t mode)
 {
     asc_enable_hf32_trans_impl(mode);
 }
 
-[[deprecated("NOTICE: asc_set_fp32_mode is deprecated. Please use asc_disable_hf32 instead.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_disable_hf32)
 __aicore__ inline void asc_set_fp32_mode()
 {
     asc_set_fp32_mode_impl();
@@ -684,7 +684,7 @@ __aicore__ inline void asc_enable_hif8() { asc_enable_hif8_impl(); }
 
 __aicore__ inline void asc_disable_hif8() { asc_disable_hif8_impl(); }
 
-[[deprecated("NOTICE: asc_enable_fp8 is deprecated. Please use asc_disable_hif8 instead.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_disable_hif8)
 __aicore__ inline void asc_enable_fp8()
 {
     asc_enable_fp8_impl();
