@@ -46,13 +46,18 @@ public:
 
     __aicore__ static inline void InitCoupledArchSpr()
     {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
         set_padding(static_cast<uint64_t>(0));
         set_vector_mask(static_cast<uint64_t>(-1), static_cast<uint64_t>(-1));
         uint64_t loopSizePara = (1uL << 21) | 1uL;
         set_loop_size_ubtoout(loopSizePara);
         set_loop_size_outtoub(loopSizePara);
         set_st_atomic_cfg(0b00100100);
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+        set_vector_mask(static_cast<uint64_t>(-1), static_cast<uint64_t>(-1));
+        uint64_t loopSizePara = (1uL << 21) | 1uL;
+        set_loop_size_ubtoout(loopSizePara);
+        set_loop_size_outtoub(loopSizePara);
 #endif
     }
 
@@ -86,7 +91,7 @@ public:
         } else {
             set_vector_mask(static_cast<uint64_t>(-1), static_cast<uint64_t>(-1));
         }
-#elif (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#elif (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
         set_mask_norm();
         Internal::g_deqValue = static_cast<half>(1);
         uint64_t prevCtrl = get_ctrl() & 0x1000000000000;
