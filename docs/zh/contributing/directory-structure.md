@@ -42,9 +42,9 @@ asc-devkit/
 |-------------|----------|------|
 | `include/basic_api/xxx.h` | 无对应 `xxx_impl.h`（如 `kernel_common.h`）；部分头文件有对应 `xxx_impl.h`（如 `kernel_tensor.h` → `kernel_tensor_impl.h`） | 自包含的仅有少数基础工具头 |
 | `include/basic_api/xxx_intf.h` | `impl/basic_api/xxx_intf_impl.h` | 接口 → 架构分发实现 |
-| `include/adv_api/math/xxx.h` | `impl/adv_api/detail/math/xxx/xxx_utils_impl.h` | |
+| `include/adv_api/math/xxx.h` | `impl/adv_api/detail/math/xxx/xxx_common_impl.h` | |
 | `include/adv_api/math/xxx_tiling.h` | `impl/adv_api/tiling/math/xxx_tiling_impl.cpp` | |
-| `include/adv_api/<cat>/xxx.h` | `impl/adv_api/detail/<cat>/xxx/xxx_utils_impl.h` | |
+| `include/adv_api/<cat>/xxx.h` | `impl/adv_api/detail/<cat>/xxx/xxx_common_impl.h` | |
 | `include/c_api/<category>/[子目录/]<header>.h` | `impl/c_api/memory_base_impl/<header>_intf_impl.h`、`impl/c_api/reg_base_impl/<header>_intf_impl.h` | 每个实际声明接口的公开头对应一个扁平实现头；3510废弃接口放在`reg_base_impl/npu_arch_3510/`下的同名实现头中，内部公共辅助代码放在各架构组的`utils_impl.h`中 |
 
 ---
@@ -63,7 +63,7 @@ asc-devkit/
 | `_tiling_impl.cpp` | Tiling宿主侧实现 | `impl/adv_api/tiling/` |
 | `_tiling.cpp` | Tiling实现（无 `_impl` 后缀的变体） | `impl/adv_api/tiling/` |
 | `_struct_*.h` | 类型/结构体定义 | `include/` |
-| `_utils_impl.h` | 通用算法实现 | `impl/adv_api/detail/` |
+| `_common_impl.h` | 通用算法实现 | `impl/adv_api/detail/` |
 | `_check.h` | 参数校验逻辑 | `impl/adv_api/detail/api_check/` |
 | `_config.h` | 配置参数定义 | `include/` 或 `impl/` |
 | `_utils.h` | 工具函数 | `include/` 或 `impl/` |
@@ -81,7 +81,7 @@ asc-devkit/
 kernel_operator_vec_binary_intf.h
 kernel_struct_fixpipe.h
 kernel_operator_common_intf_impl.h
-axpy_utils_impl.h
+axpy_common_impl.h
 exp_check_common.h
 ```
 
@@ -90,7 +90,7 @@ exp_check_common.h
 | API类型 | 头文件 | 实现文件 | 示例 |
 |---------|--------|---------|------|
 | 基础API | `kernel_<name>_intf.h` | 分发层：`kernel_<name>_intf_impl.h`；架构实现：`dav_<arch>/kernel_<name>_impl.h` | `kernel_operator_vec_binary_intf.h` |
-| 高阶API | `<name>.h` | `<name>_utils_impl.h` | `axpy.h` / `axpy_utils_impl.h` |
+| 高阶API | `<name>.h` | `<name>_common_impl.h` | `axpy.h` / `axpy_common_impl.h` |
 | C API | `<category>.h` | `asc_<api>_impl.h` | `vector_compute.h` / `asc_add_impl.h` |
 | Tiling | `<name>_tiling.h` | `<name>_tiling_impl.cpp` | `axpy_tiling.h` |
 
@@ -119,9 +119,9 @@ exp_check_common.h
 
 ```cpp
 #if __NPU_ARCH__ == 2201
-#include "dav_c220/kernel_operator_utils_impl.h"
+#include "dav_c220/kernel_operator_common_impl.h"
 #elif __NPU_ARCH__ == 3510
-#include "dav_3510/kernel_operator_utils_impl.h"
+#include "dav_3510/kernel_operator_common_impl.h"
 #endif
 ```
 
@@ -144,7 +144,7 @@ impl/adv_api/
 │   ├── common/               # 公共工具
 │   ├── math/                 # 数学运算（50+子目录）
 │   │   └── exp/
-│   │       ├── exp_utils_impl.h
+│   │       ├── exp_common_impl.h
 │   │       └── exp_3510_impl.h
 │   ├── matmul/               # 矩阵乘
 │   ├── normalization/        # 归一化
@@ -171,8 +171,8 @@ impl/adv_api/
 □ include/adv_api/<category>/<api>_tiling.h
     Tiling接口声明（如API需要临时空间）
 
-□ impl/adv_api/detail/<category>/<api>/<api>_utils_impl.h和/或<api>_<arch>_impl.h
-    核心算法实现（通用实现用_utils_impl.h，架构专用实现用<api>_<arch>_impl.h）
+□ impl/adv_api/detail/<category>/<api>/<api>_common_impl.h和/或<api>_<arch>_impl.h
+    核心算法实现（通用实现用_common_impl.h，架构专用实现用<api>_<arch>_impl.h）
 
 □ impl/adv_api/detail/api_check/kernel_check/<category>/<api>/<api>_check.h
     参数校验逻辑（CHECK_FUNC_HIGHLEVEL_API依赖）
@@ -246,7 +246,7 @@ impl/adv_api/
     仅放3510废弃接口及专用辅助实现；混合弃用状态的重载分别归属
     新增category时还需在对应公开入口中注册公开头
 
-    聚合头、纯类型头和无独立实现的宏别名不创建空impl；共享内部辅助代码放在各架构组的utils_impl.h中
+    聚合头、纯类型头和无独立实现的宏别名不创建空impl；共享内部辅助代码放在各架构组的common_impl.h中
 
 □ tests/api/c_api/npu_arch_<arch>/<category>/test_asc_<api>.cpp
     Mock测试
