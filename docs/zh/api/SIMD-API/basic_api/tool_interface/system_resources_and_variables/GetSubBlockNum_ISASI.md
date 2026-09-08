@@ -49,9 +49,9 @@ __aicore__ inline int64_t GetSubBlockNum()
 
 ## 返回值说明
 
-在融合编译场景下，不同[算子类型](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#section1074418132518)在AIC和AIV上调用该接口的返回值如下：
+在核函数（Kernel）直调工程场景下，不同[算子类型](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#section1074418132518)在AIC和AIV上调用该接口的返回值如下：
 
-**表1** 融合编译场景返回值列表
+**表1** 核函数（Kernel）直调工程场景返回值列表
 
 | 算子类型 | 限定符 | AIC | AIV |
 | --- | --- | --- | --- |
@@ -71,7 +71,7 @@ __aicore__ inline int64_t GetSubBlockNum()
 | AIV | 1 | - | 2 | 1 | - | 1 |
 | AIC | - | 1 | 1 | 1 | 1 | - |
 
-**注意，两种场景中返回值的含义相同，仅设置类型的方式不同，编写算子时推荐使用融合编译。**
+**注意，两种场景中返回值的含义相同，仅设置类型的方式不同，编写算子时推荐使用核函数（Kernel）直调工程。**
 
 ## 约束说明
 
