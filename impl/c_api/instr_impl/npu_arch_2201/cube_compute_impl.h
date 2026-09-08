@@ -35,6 +35,7 @@ __aicore__ inline void asc_set_hf32_round_mode(asc_hf32_round_mode hf32_round_mo
     asc_set_hf32_round_mode_impl(hf32_round_mode);
 }
 
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_set_hf32_round_mode)
 __aicore__ inline void asc_enable_hf32_trans(uint32_t mode) { asc_enable_hf32_trans_impl(mode); }
 
 __aicore__ inline void asc_mmad_sparse(
@@ -59,6 +60,7 @@ __aicore__ inline void asc_mmad_sparse_sync(
     asc_mmad_sparse_sync_impl(c, a, b, m, k, n, unit_flag, c_matrix_source, c_matrix_init_val);
 }
 
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_disable_hf32)
 __aicore__ inline void asc_set_fp32_mode() { asc_set_fp32_mode_impl(); }
 
 __aicore__ inline void asc_set_mmad_direction_m() { asc_set_mmad_direction_m_impl(); }

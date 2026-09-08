@@ -112,9 +112,11 @@ __aicore__ inline void asc_set_mmad_direction_m();
 __aicore__ inline void asc_set_mmad_direction_n();
 __aicore__ inline void asc_set_hf32_round_mode(asc_hf32_round_mode hf32_round_mode);
 __aicore__ inline void asc_disable_hif8();
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_set_hf32_round_mode)
 __aicore__ inline void asc_enable_hf32_trans(uint32_t mode);
 __aicore__ inline void asc_enable_hf32();
 __aicore__ inline void asc_disable_hf32();
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_disable_hf32)
 __aicore__ inline void asc_set_fp32_mode();
 // ==========mmad_mx(e1m2/e1m2, e4m3/e5m2)==========
 __aicore__ inline void asc_mmad_mx(
@@ -339,6 +341,7 @@ __aicore__ inline void asc_mmad_mx(
     uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv);
 
 __aicore__ inline void asc_enable_hif8();
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_disable_hif8)
 __aicore__ inline void asc_enable_fp8();
 
 #endif
