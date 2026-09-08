@@ -1,6 +1,10 @@
 # 废弃接口
 
-## 矩阵计算和搬运
+## 矩阵数据搬运
+
+- **[asc_copy_gm2l1_align（废弃）](asc_copy_gm2l1_align_deprecated.md)**（旧常规重载和同步接口）
+
+## 矩阵计算
 
 - **[asc_enable_fp8（废弃）](asc_enable_fp8_deprecated.md)**
 - **[asc_enable_hf32_trans（废弃）](asc_enable_hf32_trans_deprecated.md)**
@@ -16,7 +20,6 @@
 - **[asc_set_l0c2gm_relu_alpha（废弃）](asc_set_l0c2gm_relu_alpha_deprecated.md)**
 - **[asc_set_l12l0_padding_val（废弃）](asc_set_l12l0_padding_val_deprecated.md)**
 - **[asc_set_l13d_padding（废弃）](asc_set_l13d_padding_deprecated.md)**
-- **[asc_copy_gm2l1_align（废弃）](asc_copy_gm2l1_align_deprecated.md)**
 - **[asc_copy_gm2l1_dn2nz（废弃）](asc_copy_gm2l1_dn2nz_deprecated.md)**
 - **[asc_copy_gm2l1_nd2nz（废弃）](asc_copy_gm2l1_nd2nz_deprecated.md)**
 - **[asc_copy_gm2l1（高维切分旧形式，废弃）](asc_copy_gm2l1_highdim_deprecated.md)**

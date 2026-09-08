@@ -162,7 +162,7 @@ __aicore__ inline void asc_fill_l0b_sync(__cb__ bfloat16_t* dst, half value, con
 ASC_DEPRECATED(9.2.0, "2028/09/03", asc_fill_l0b and asc_sync)
 __aicore__ inline void asc_fill_l0b_sync(__cb__ bfloat16_t* dst, uint32_t value, const asc_fill_value_config& config);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1 and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ void* dst, __gm__ void* src, uint32_t size);
 
 ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_pad1 and asc_sync)
@@ -189,81 +189,81 @@ __aicore__ inline void asc_copy_gm2l1_pad7_sync(__cbuf__ void* dst, __gm__ void*
 ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_pad8 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_pad8_sync(__cbuf__ void* dst, __gm__ void* src, uint32_t size);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1 and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1 and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ half* dst, __gm__ half* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1 and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ float* dst, __gm__ float* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1 and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1 and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1 and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1 and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_nd2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
     uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride,
     uint16_t dst_nz_matrix_stride);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_nd2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
     uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride,
     uint16_t dst_nz_matrix_stride);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_nd2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
     uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride,
     uint16_t dst_nz_matrix_stride);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_nd2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ half* dst, __gm__ half* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
     uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride,
     uint16_t dst_nz_matrix_stride);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_nd2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
     uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride,
     uint16_t dst_nz_matrix_stride);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_nd2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ float* dst, __gm__ float* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
     uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride,
     uint16_t dst_nz_matrix_stride);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_nd2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
     uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride,
     uint16_t dst_nz_matrix_stride);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_nd2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
     uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride,
@@ -1188,187 +1188,187 @@ __aicore__ inline void asc_copy_l12l0b_sync(
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_align and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_align and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_align_sync(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
     uint32_t burst_dst_stride);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_align and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_align and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_align_sync(
     __cbuf__ half* dst, __gm__ half* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
     uint32_t burst_dst_stride);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_align and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_align and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_align_sync(
     __cbuf__ float* dst, __gm__ float* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
     uint32_t burst_dst_stride);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_align and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_align and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_align_sync(
     __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
     uint32_t burst_dst_stride);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_align and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_align and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_align_sync(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
     uint32_t burst_dst_stride);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_align and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_align and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_align_sync(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
     uint32_t burst_dst_stride);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_align and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_align and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_align_sync(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
     uint32_t burst_dst_stride);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_align and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_align and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_align_sync(
     __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
     uint32_t burst_dst_stride);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_align and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_align and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_align_sync(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
     uint32_t burst_dst_stride);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_align and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_align and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_align_sync(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
     uint32_t burst_dst_stride);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_dn2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_dn2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_dn2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_dn2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     __cbuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
     uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_dn2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_dn2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     __cbuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_dn2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_dn2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     __cbuf__ half* dst, __gm__ half* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_dn2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_dn2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     __cbuf__ float* dst, __gm__ float* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_dn2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_dn2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_dn2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_dn2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_dn2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_dn2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_dn2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_dn2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_dn2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_dn2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_dn2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_dn2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_dn2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_dn2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_nd2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_nd2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
     uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_nd2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_nd2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ half* dst, __gm__ half* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_nd2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ float* dst, __gm__ float* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_nd2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_nd2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_nd2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_nd2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_nd2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_nd2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1_nd2nz and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1 and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ void* dst, __gm__ void* src, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode,
     uint64_t src_stride, uint32_t dst_stride);
@@ -1385,7 +1385,7 @@ __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ float* src, ui
 ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_l12bt and asc_sync)
 __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ int32_t* src, uint32_t size);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_l12ub and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12ub and asc_sync)
 __aicore__ inline void asc_copy_l12ub_sync(
     __ubuf__ void* dst_addr, __cbuf__ void* src_addr, bool sub_blockid, uint16_t n_burst, uint16_t len_burst,
     uint16_t src_gap, uint16_t dst_gap);
@@ -1630,77 +1630,77 @@ __aicore__ inline void asc_copy_l0c2ub_sync(
     uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, bool eltwise_antq_en, bool c0_pad_en, bool broadcast_en,
     bool enable_nz2dn);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1 and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1 and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ float* dst, __gm__ float* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
     uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1 and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1 and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1 and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ half* dst, __gm__ half* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
     uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1 and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1 and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1 and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1 and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
     uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1 and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1 and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1 and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1 and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ fp4x2_e1m2_t* dst, __gm__ fp4x2_e1m2_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1 and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ fp4x2_e2m1_t* dst, __gm__ fp4x2_e2m1_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
-ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2l1 and asc_sync)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ void* dst, __gm__ void* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
     uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);

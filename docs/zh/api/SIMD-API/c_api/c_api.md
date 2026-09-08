@@ -721,7 +721,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_set_l13d_padding（废弃）](deprecated_interface/asc_set_l13d_padding_deprecated.md)|请使用[asc_set_l12l0a_3d_padding](cube_datamove/asc_set_l12l0a_3d_padding.md)。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c2gm_relu_alpha（废弃）](deprecated_interface/asc_set_l0c2gm_relu_alpha_deprecated.md)|请使用[asc_set_l0c_copy_relu_alpha](cube_datamove/asc_set_l0c_copy_relu_alpha.md)。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c2gm_lrelu_alpha（废弃）](deprecated_interface/asc_set_l0c2gm_lrelu_alpha_deprecated.md)|请使用[asc_set_l0c_copy_lrelu_alpha](cube_datamove/asc_set_l0c_copy_lrelu_alpha.md)。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_copy_gm2l1_align（废弃）](deprecated_interface/asc_copy_gm2l1_align_deprecated.md)|旧重载及`_sync`已废弃，请使用类型化L2 Cache参数。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_copy_gm2l1_align（废弃）](deprecated_interface/asc_copy_gm2l1_align_deprecated.md)|旧常规重载和`asc_copy_gm2l1_align_sync`已废弃，请使用类型化L2 Cache参数和`asc_sync`。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_copy_gm2l1_dn2nz（废弃）](deprecated_interface/asc_copy_gm2l1_dn2nz_deprecated.md)|旧重载及`_sync`已废弃，请使用类型化L2 Cache参数。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_copy_gm2l1_nd2nz（废弃）](deprecated_interface/asc_copy_gm2l1_nd2nz_deprecated.md)|旧重载及`_sync`已废弃，请使用类型化L2 Cache参数。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_copy_gm2l1（高维切分旧形式，废弃）](deprecated_interface/asc_copy_gm2l1_highdim_deprecated.md)|请使用`asc_channel_pad_mode`参数。|`c_api/cube_datamove/cube_datamove.h`|
