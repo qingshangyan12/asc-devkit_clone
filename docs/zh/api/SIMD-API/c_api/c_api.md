@@ -80,8 +80,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_enable_hf32](cube_compute/asc_enable_hf32.md)|用于设置Mmad计算开启HF32模式，开启该模式后L0A Buffer/L0B Buffer中的FP32数据将在参与Mmad计算之前被舍入为HF32。|`c_api/cube_compute/cube_compute.h`|
 |[asc_enable_hf32_trans](cube_compute/asc_enable_hf32_trans.md)|设置HF32模式取整方式，需要先使用asc_enable_hf32开启HF32取整模式。|`c_api/cube_compute/cube_compute.h`|
 |[asc_enable_hif8](cube_compute/asc_enable_hif8.md)|开启HiF8模式。左矩阵A和右矩阵B均为fp8_e4m3fn_t类型时，数据参与矩阵乘法运算前转换为hifloat8_t类型。|`c_api/cube_compute/cube_compute.h`|
-|[asc_disable_hif8](cube_compute/asc_disable_hif8.md)|关闭HiF8模式。左矩阵A和右矩阵B均为fp8_e4m3fn_t类型时，数据不转换为hifloat8_t类型，直接以fp8_e4m3fn_t类型参与矩阵乘法运算。|`c_api/cube_compute/cube_compute.h`|
-|[asc_disable_hif8](cube_compute/asc_disable_hif8.md)|用于设置Mmad计算关闭HiF8模式，设置该模式后L0A Buffer/L0B Buffer中的FP8数据在参与Mmad计算之前不会被转化为hifloat8_t类型数据。|`c_api/cube_compute/cube_compute.h`|
+|[asc_disable_hif8](cube_compute/asc_disable_hif8.md)|用于设置Mmad计算关闭HiF8模式。左矩阵A和右矩阵B均为fp8_e4m3fn_t类型时，数据不转换为hifloat8_t类型，直接以fp8_e4m3fn_t类型参与矩阵乘法运算。|`c_api/cube_compute/cube_compute.h`|
 |[asc_disable_hf32](cube_compute/asc_disable_hf32.md)|用于设置Mmad计算关闭HF32模式，设置该模式后L0A Buffer/L0B Buffer中的FP32数据在参与Mmad计算之前不做舍入处理。|`c_api/cube_compute/cube_compute.h`|
 |[asc_mmad](cube_compute/asc_mmad.md)|完成矩阵乘加操作。|`c_api/cube_compute/cube_compute.h`|
 |[asc_mmad_mx](cube_compute/asc_mmad_mx.md)|完成包含放缩功能的矩阵乘加操作。|`c_api/cube_compute/cube_compute.h`|

@@ -110,7 +110,7 @@ __global__ __cube__ void asc_set_l0c_copy_lrelu_alpha_kernel(
     asc_mmad(c_l0, a_l0, b_l0, DIM, DIM, DIM, asc_unit_flag_mode::DISABLE, false, false, true);
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
-    
+
     asc_set_l0c_copy_lrelu_alpha(0.5f);
     asc_set_l0c_copy_nz_para(1, 0, 0);
     asc_copy_l0c2gm(reinterpret_cast<__gm__ half*>(output), c_l0, DIM, DIM, DIM, DIM,
