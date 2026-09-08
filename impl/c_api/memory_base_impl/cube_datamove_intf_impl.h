@@ -19,8 +19,49 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/memory_base_impl/cube_compute_intf_impl.h"
-#include "impl/c_api/memory_base_impl/utils_intf_impl.h"
+#include "impl/c_api/memory_base_impl/common_impl.h"
+
+__aicore__ inline void asc_set_l0c2gm_config_impl(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag)
+{
+    if ASC_IS_AIC {
+        asc_capi_fpc_reg_config config;
+        config.config = 0;
+        config.relu_units = relu_pre;
+        config.quant_units = quant_pre;
+        config.unit_flag = enable_unit_flag;
+        set_fpc(config.config);
+    }
+}
+
+__aicore__ inline uint64_t asc_get_l0c2gm_relu_impl()
+{
+    if ASC_IS_AIC {
+        asc_capi_fpc_reg_config config;
+        config.config = get_fpc();
+        return static_cast<uint64_t>(config.relu_units);
+    }
+    return 0;
+}
+
+__aicore__ inline uint64_t asc_get_l0c2gm_prequant_impl()
+{
+    if ASC_IS_AIC {
+        asc_capi_fpc_reg_config config;
+        config.config = get_fpc();
+        return static_cast<uint64_t>(config.quant_units);
+    }
+    return 0;
+}
+
+__aicore__ inline uint64_t asc_get_l0c2gm_unitflag_impl()
+{
+    if ASC_IS_AIC {
+        asc_capi_fpc_reg_config config;
+        config.config = get_fpc();
+        return static_cast<uint64_t>(config.unit_flag);
+    }
+    return 0;
+}
 
 __aicore__ inline void asc_copy_l12l0b_sparse_impl(
     __cb__ int8_t* dst, __cbuf__ int8_t* src, __cbuf__ int8_t* index, uint16_t start_index, uint8_t repeat)

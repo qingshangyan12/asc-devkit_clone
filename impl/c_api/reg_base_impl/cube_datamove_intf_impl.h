@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/utils_intf_impl.h"
+#include "impl/c_api/reg_base_impl/common_impl.h"
 
 // half  float
 __aicore__ inline void asc_copy_l0c2l1_impl(
@@ -1766,14 +1766,6 @@ __aicore__ inline void asc_copy_l12l0b_mx_impl(
     }
 }
 
-constexpr uint8_t ASC_L13D_RPT_REPEAT_TIMES_SHIFT = 16;
-
-constexpr uint8_t ASC_L13D_RPT_DIRECTION_SHIFT = 24;
-
-constexpr uint8_t ASC_L13D_RPT_DST_STRIDE_K_SHIFT = 32;
-
-constexpr uint8_t ASC_L13D_RPT_DST_START_POS_M_SHIFT = 48;
-
 __aicore__ inline void asc_set_l13d_rpt_impl(asc_load3d_v2_config& config)
 {
     if ASC_IS_AIC {
@@ -1795,16 +1787,6 @@ __aicore__ inline void asc_set_l13d_rpt_impl(
     }
 }
 
-constexpr uint8_t ASC_L13D_FMATRIX_H_SHIFT = 16;
-
-constexpr uint8_t ASC_L13D_FMATRIX_PAD_LEFT_SHIFT = 32;
-
-constexpr uint8_t ASC_L13D_FMATRIX_PAD_RIGHT_SHIFT = 40;
-
-constexpr uint8_t ASC_L13D_FMATRIX_PAD_TOP_SHIFT = 48;
-
-constexpr uint8_t ASC_L13D_FMATRIX_PAD_BOTTOM_SHIFT = 56;
-
 __aicore__ inline void asc_set_l13d_fmatrix_impl(asc_l13d_fmatrix_config& config)
 {
     if ASC_IS_AIC {
@@ -1825,16 +1807,6 @@ __aicore__ inline void asc_set_l13d_fmatrix_impl(
         set_fmatrix(config);
     }
 }
-
-constexpr uint8_t ASC_L13D_FMATRIX_B_H_SHIFT = 16;
-
-constexpr uint8_t ASC_L13D_FMATRIX_B_PAD_LEFT_SHIFT = 32;
-
-constexpr uint8_t ASC_L13D_FMATRIX_B_PAD_RIGHT_SHIFT = 40;
-
-constexpr uint8_t ASC_L13D_FMATRIX_B_PAD_TOP_SHIFT = 48;
-
-constexpr uint8_t ASC_L13D_FMATRIX_B_PAD_BOTTOM_SHIFT = 56;
 
 __aicore__ inline void asc_set_l13d_fmatrix_b_impl(asc_l13d_fmatrix_config& config)
 {
@@ -2794,10 +2766,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_impl(
     }
 }
 
-constexpr uint8_t ASC_GM2L1_SID_DEFAULT = 0;
-
-constexpr uint8_t ASC_GM2L1_DECOMP_MODE_DEFAULT = 0;
-
 __aicore__ inline void asc_copy_gm2l1_impl(
     __cbuf__ void* dst, __gm__ void* src, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode,
     uint64_t src_stride, uint32_t dst_stride)
@@ -3376,8 +3344,6 @@ __aicore__ inline void asc_set_gm2l1_nz_para_impl(
     }
 }
 
-constexpr uint8_t ASC_3D_PADDING_SHIFT_BIT = 8;
-
 __aicore__ inline void asc_set_l12l0a_3d_padding_impl(uint64_t config)
 {
     if ASC_IS_AIC {
@@ -3496,8 +3462,6 @@ __aicore__ inline void asc_set_gm2l1_padding_impl(float padding_value)
     asc_set_l12l0a_3d_padding_impl(padding_value);
 }
 
-constexpr uint8_t ASC_L0C_COPY_CHANNEL_PARA_SHIFT = 48;
-
 __aicore__ inline void asc_set_l0c2gm_channel_para_impl(uint64_t config)
 {
     if ASC_IS_AIC {
@@ -3560,10 +3524,6 @@ __aicore__ inline void asc_set_l0c_copy_config_impl(
     }
 }
 
-constexpr uint8_t ASC_L0C_COPY_NZ_PARA_SRC_SHIFT = 16;
-
-constexpr uint8_t ASC_L0C_COPY_NZ_PARA_DST_SHIFT = 32;
-
 __aicore__ inline void asc_set_l0c_copy_nz_para_impl(
     uint16_t matrix_num, uint16_t src_nz_matrix_stride, uint32_t dst_matrix_stride)
 {
@@ -3587,8 +3547,6 @@ __aicore__ inline void asc_set_l12l0_padding_val_impl(uint64_t config)
         set_padding_b(config);
     }
 }
-
-constexpr uint8_t ASC_3D_PADDING_B_SHIFT_BIT = 8;
 
 __aicore__ inline void asc_set_l12l0b_3d_padding_impl(uint64_t config)
 {
@@ -3702,14 +3660,6 @@ __aicore__ inline void asc_set_l13d_padding_impl(uint16_t config)
     }
 }
 
-constexpr uint8_t ASC_L3D_RPT_B_REPEAT_TIMES_SHIFT = 16;
-
-constexpr uint8_t ASC_L3D_RPT_B_DIRECTION_SHIFT = 24;
-
-constexpr uint8_t ASC_L3D_RPT_B_DST_STRIDE_K_SHIFT = 32;
-
-constexpr uint8_t ASC_L3D_RPT_B_DST_START_POS_M_SHIFT = 48;
-
 __aicore__ inline void asc_set_l3d_rpt_b_impl(uint64_t config)
 {
     if ASC_IS_AIC {
@@ -3730,14 +3680,6 @@ __aicore__ inline void asc_set_l3d_rpt_b_impl(
         set_l3d_rpt_b(config);
     }
 }
-
-constexpr uint8_t RELU_POST_DEFAULT = 0;
-
-constexpr bool CLIP_RELU_POST_DEFAULT = false;
-
-constexpr uint8_t ELTWISE_OP_DEFAULT = 0;
-
-constexpr uint64_t QUANT_POST_DEFAULT = 0;
 
 __aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag)
 {

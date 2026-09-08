@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/memory_base_impl/utils_intf_impl.h"
+#include "impl/c_api/memory_base_impl/common_impl.h"
 
 __aicore__ inline void asc_mmad_sparse_impl(
     __cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag,
@@ -350,48 +350,6 @@ __aicore__ inline void asc_mmad_s4(
     asc_mmad_s4_impl(
         c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, feat_offset, smask_offset, unit_flag,
         k_direction_align, is_weight_offset, c_matrix_source, c_matrix_init_val);
-}
-
-__aicore__ inline void asc_set_l0c2gm_config_impl(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag)
-{
-    if ASC_IS_AIC {
-        asc_capi_fpc_reg_config config;
-        config.config = 0;
-        config.relu_units = relu_pre;
-        config.quant_units = quant_pre;
-        config.unit_flag = enable_unit_flag;
-        set_fpc(config.config);
-    }
-}
-
-__aicore__ inline uint64_t asc_get_l0c2gm_relu_impl()
-{
-    if ASC_IS_AIC {
-        asc_capi_fpc_reg_config config;
-        config.config = get_fpc();
-        return static_cast<uint64_t>(config.relu_units);
-    }
-    return 0;
-}
-
-__aicore__ inline uint64_t asc_get_l0c2gm_prequant_impl()
-{
-    if ASC_IS_AIC {
-        asc_capi_fpc_reg_config config;
-        config.config = get_fpc();
-        return static_cast<uint64_t>(config.quant_units);
-    }
-    return 0;
-}
-
-__aicore__ inline uint64_t asc_get_l0c2gm_unitflag_impl()
-{
-    if ASC_IS_AIC {
-        asc_capi_fpc_reg_config config;
-        config.config = get_fpc();
-        return static_cast<uint64_t>(config.unit_flag);
-    }
-    return 0;
 }
 
 #if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_MEMORY_BASE_IMPL_CUBE_COMPUTE_INTF_IMPL_H)

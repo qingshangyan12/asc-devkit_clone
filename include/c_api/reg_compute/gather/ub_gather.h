@@ -22,8 +22,7 @@
 #include "c_api/defs/defs.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/reg_base_impl/npu_arch_3510/reg_compute_intf_impl.h"
-#include "impl/c_api/reg_base_impl/reg_compute_intf_impl.h"
+#include "impl/c_api/reg_base_impl/ub_gather_intf_impl.h"
 #endif
 
 __simd_callee__ inline vector_int8_t asc_gather(__ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask);

@@ -22,7 +22,7 @@
 #include "c_api/defs/defs.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-#include "impl/c_api/memory_base_impl/vector_compute_intf_impl.h"
+#include "impl/c_api/memory_base_impl/vector_logic_intf_impl.h"
 #endif
 __aicore__ inline void asc_shiftleft(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint32_t distance, uint8_t repeat, uint16_t dst_block_stride,

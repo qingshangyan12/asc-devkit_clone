@@ -45,7 +45,7 @@ asc-devkit/
 | `include/adv_api/math/xxx.h` | `impl/adv_api/detail/math/xxx/xxx_common_impl.h` | |
 | `include/adv_api/math/xxx_tiling.h` | `impl/adv_api/tiling/math/xxx_tiling_impl.cpp` | |
 | `include/adv_api/<cat>/xxx.h` | `impl/adv_api/detail/<cat>/xxx/xxx_common_impl.h` | |
-| `include/c_api/<category>/<category>.h` | `impl/c_api/memory_base_impl/<category>_intf_impl.h`、`impl/c_api/reg_base_impl/<category>_intf_impl.h` | 2201与regbase分别按功能合并实现；3510废弃接口放在`reg_base_impl/npu_arch_3510/`下 |
+| `include/c_api/<category>/[子目录/]<header>.h` | `impl/c_api/memory_base_impl/<header>_intf_impl.h`、`impl/c_api/reg_base_impl/<header>_intf_impl.h` | 每个实际声明接口的公开头对应一个扁平实现头；3510废弃接口放在`reg_base_impl/npu_arch_3510/`下的同名实现头中，内部公共辅助代码放在各架构组的`common_impl.h`中 |
 
 ---
 
@@ -234,17 +234,19 @@ impl/adv_api/
 ### C API清单
 
 ```text
-□ include/c_api/<category>/<category>.h或添加函数声明到现有文件
+□ include/c_api/<category>/[子目录/]<header>.h或添加函数声明到现有文件
 
-□ impl/c_api/memory_base_impl/<category>_intf_impl.h
-    2201实现，公开接口包装与内部辅助实现合并在同一分类头中
+□ impl/c_api/memory_base_impl/<header>_intf_impl.h
+    2201实现，公开接口包装与专用辅助实现放在对应公开头的实现文件中
 
-□ impl/c_api/reg_base_impl/<category>_intf_impl.h
-    regbase公共实现，公开头直接包含分类实现头
+□ impl/c_api/reg_base_impl/<header>_intf_impl.h
+    regbase公共实现，公开头只直接包含同名接口实现头
 
-□ impl/c_api/reg_base_impl/npu_arch_3510/<category>_intf_impl.h
+□ impl/c_api/reg_base_impl/npu_arch_3510/<header>_intf_impl.h
     仅放3510废弃接口及专用辅助实现；混合弃用状态的重载分别归属
     新增category时还需在对应公开入口中注册公开头
+
+    聚合头、纯类型头和无独立实现的宏别名不创建空impl；共享内部辅助代码放在各架构组的common_impl.h中
 
 □ tests/api/c_api/npu_arch_<arch>/<category>/test_asc_<api>.cpp
     Mock测试

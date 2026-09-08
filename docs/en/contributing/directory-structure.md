@@ -45,7 +45,7 @@ The `include/` and `impl/` top-level directory structures have a one-to-one corr
 | `include/adv_api/math/xxx.h` | `impl/adv_api/detail/math/xxx/xxx_common_impl.h` | |
 | `include/adv_api/math/xxx_tiling.h` | `impl/adv_api/tiling/math/xxx_tiling_impl.cpp` | |
 | `include/adv_api/<cat>/xxx.h` | `impl/adv_api/detail/<cat>/xxx/xxx_common_impl.h` | |
-| `include/c_api/<category>/<category>.h` | `impl/c_api/memory_base_impl/<category>_intf_impl.h`, `impl/c_api/reg_base_impl/<category>_intf_impl.h` | Implementations are grouped by category; deprecated 3510 interfaces reside in `reg_base_impl/npu_arch_3510/` |
+| `include/c_api/<category>/[subdirectory/]<header>.h` | `impl/c_api/memory_base_impl/<header>_intf_impl.h`, `impl/c_api/reg_base_impl/<header>_intf_impl.h` | Each public interface header has a matching flat implementation header; deprecated 3510 interfaces use the same filename under `reg_base_impl/npu_arch_3510/`. Shared internal helpers belong in each architecture group's `common_impl.h`. |
 
 ---
 
@@ -234,17 +234,20 @@ When adding a complete API, create and modify files according to the following c
 ### C API Checklist
 
 ```text
-□ include/c_api/<category>/<category>.h or add function declarations to existing file
+□ include/c_api/<category>/[subdirectory/]<header>.h or add function declarations to existing file
 
-□ impl/c_api/memory_base_impl/<category>_intf_impl.h
-    2201 public wrappers and internal helpers in one implementation header per category
+□ impl/c_api/memory_base_impl/<header>_intf_impl.h
+    2201 public wrappers and exclusive helpers in the matching public header's implementation file
 
-□ impl/c_api/reg_base_impl/<category>_intf_impl.h
-    Shared regbase implementations, included directly by public headers
+□ impl/c_api/reg_base_impl/<header>_intf_impl.h
+    Shared regbase implementations, included directly by the matching public header
 
-□ impl/c_api/reg_base_impl/npu_arch_3510/<category>_intf_impl.h
+□ impl/c_api/reg_base_impl/npu_arch_3510/<header>_intf_impl.h
     Deprecated 3510 interfaces and their exclusive helpers only; split mixed overload sets
     Register new public categories in the corresponding public entry headers
+
+    Do not create empty implementations for aggregate headers, type headers or macro aliases.
+    Shared internal helpers belong in each architecture group's common_impl.h.
 
 □ tests/api/c_api/npu_arch_<arch>/<category>/test_asc_<api>.cpp
     Mock test

@@ -12,7 +12,6 @@
 #include <mockcpp/mockcpp.hpp>
 #include "tests/api/c_api/stub/cce_stub.h"
 #include "include/c_api/utils/sys_var.h"
-#include "impl/c_api/reg_base_impl/utils_intf_impl.h"
 
 class TestSysVarGetVfLen : public testing::Test {
 protected:

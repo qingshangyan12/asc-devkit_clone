@@ -177,16 +177,21 @@ asc-devkit/
 ├── impl/
 │   └── c_api/                    # C API实现
 │       ├── CMakeLists.txt
-│       ├── memory_base_impl/     # 2201实现，目录下只有分类头
-│       │   ├── vector_compute_intf_impl.h
+│       ├── memory_base_impl/     # 2201实现，与公开接口头逐文件对应
+│       │   ├── common_impl.h     # 共享的内部辅助实现
+│       │   ├── datamove_atomic_intf_impl.h
+│       │   ├── scalar_atomic_intf_impl.h
+│       │   ├── vector_arith_intf_impl.h
 │       │   ├── vector_datamove_intf_impl.h
 │       │   └── ...
 │       └── reg_base_impl/        # regbase公共实现
-│           ├── reg_compute_intf_impl.h
+│           ├── common_impl.h
+│           ├── reg_arith_intf_impl.h
+│           ├── loadalign_intf_impl.h
 │           ├── vector_datamove_intf_impl.h
 │           ├── ...
 │           └── npu_arch_3510/    # 仅3510废弃接口及专用辅助实现
-│               ├── reg_compute_intf_impl.h
+│               ├── reg_convert_intf_impl.h
 │               └── ...
 │
 ├── tests/

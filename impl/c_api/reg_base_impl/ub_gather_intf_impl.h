@@ -1,0 +1,1153 @@
+/**
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
+#ifndef IMPL_C_API_REG_BASE_IMPL_UB_GATHER_INTF_IMPL_H
+#define IMPL_C_API_REG_BASE_IMPL_UB_GATHER_INTF_IMPL_H
+
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#pragma message( \
+    "impl/c_api/reg_base_impl/ub_gather_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_UB_GATHER_INTF_IMPL_H
+#endif
+
+#include "c_api/defs/defs.h"
+#include "impl/c_api/reg_base_impl/common_impl.h"
+
+// ==========源操作数为起初地址，目的数为寄存器=========
+__simd_callee__ inline void asc_gather_impl(
+    vector_int16_t& dst, __ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgather2(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_impl(
+    vector_uint16_t& dst, __ubuf__ uint8_t* src, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgather2(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_impl(
+    vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        __ubuf__ float8_e5m2_t* src_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(src);
+        vgather2(reinterpret_cast<vector_fp8_e5m2_t&>(dst), src_tmp, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_impl(
+    vector_uint8_t& dst, __ubuf__ uint8_t* src, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        __ubuf__ float8_e5m2_t* src_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(src);
+        vgather2(reinterpret_cast<vector_fp8_e5m2_t&>(dst), src_tmp, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_impl(
+    vector_int16_t& dst, __ubuf__ int16_t* src, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgather2(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_impl(
+    vector_uint16_t& dst, __ubuf__ uint16_t* src, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgather2(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_impl(
+    vector_int32_t& dst, __ubuf__ int32_t* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgather2(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_impl(
+    vector_uint32_t& dst, __ubuf__ uint32_t* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgather2(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_impl(
+    vector_half& dst, __ubuf__ half* src, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgather2(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_impl(
+    vector_float& dst, __ubuf__ float* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgather2(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_impl(
+    vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgather2(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_impl(
+    vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgather2(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_impl(
+    vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        __ubuf__ float8_e5m2_t* src_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(src);
+        vgather2(reinterpret_cast<vector_fp8_e5m2_t&>(dst), src_tmp, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_impl(
+    vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgather2(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_impl(
+    vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgather2(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_impl(
+    vector_int16_t& dst, __ubuf__ int16_t* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgather2_bc(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_impl(
+    vector_uint16_t& dst, __ubuf__ uint16_t* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgather2_bc(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_impl(
+    vector_half& dst, __ubuf__ half* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgather2_bc(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_impl(
+    vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgather2_bc(dst, src, index, mask);
+    }
+}
+
+// ==========有mask参数=========
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_uint8_t& dst, __ubuf__ uint8_t* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_int16_t& dst, __ubuf__ int16_t* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_uint16_t& dst, __ubuf__ uint16_t* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_int32_t& dst, __ubuf__ int32_t* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_uint32_t& dst, __ubuf__ uint32_t* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_int64_t& dst, __ubuf__ int64_t* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_uint64_t& dst, __ubuf__ uint64_t* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_half& dst, __ubuf__ half* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_float& dst, __ubuf__ float* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        __ubuf__ uint8_t* src_tmp = reinterpret_cast<__ubuf__ uint8_t*>(src);
+        vgatherb(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_int4x2_t& dst, __ubuf__ int4b_t* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        __ubuf__ float4_e1m2x2_t* src_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2_t*>(src);
+        vgatherb(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index, mask);
+    }
+}
+
+// ==========无mask参数=========
+__simd_callee__ inline void asc_gather_datablock_impl(vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint32_t index)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(vector_uint8_t& dst, __ubuf__ uint8_t* src, vector_uint32_t index)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(vector_int16_t& dst, __ubuf__ int16_t* src, vector_uint32_t index)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_uint16_t& dst, __ubuf__ uint16_t* src, vector_uint32_t index)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(vector_int32_t& dst, __ubuf__ int32_t* src, vector_uint32_t index)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_uint32_t& dst, __ubuf__ uint32_t* src, vector_uint32_t index)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(vector_int64_t& dst, __ubuf__ int64_t* src, vector_uint32_t index)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_uint64_t& dst, __ubuf__ uint64_t* src, vector_uint32_t index)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(vector_half& dst, __ubuf__ half* src, vector_uint32_t index)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(vector_float& dst, __ubuf__ float* src, vector_uint32_t index)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint32_t index)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, vector_uint32_t index)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, vector_uint32_t index)
+{
+    if ASC_IS_AIV {
+        vgatherb(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), index);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, vector_uint32_t index)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, vector_uint32_t index)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, vector_uint32_t index)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_int4x2_t& dst, __ubuf__ int4b_t* src, vector_uint32_t index)
+{
+    if ASC_IS_AIV {
+        __ubuf__ float4_e1m2x2_t* src_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2_t*>(src);
+        vgatherb(reinterpret_cast<vector_fp4x2_e1m2_t&>(dst), src_tmp, index);
+    }
+}
+
+__simd_callee__ inline void asc_gather_datablock_impl(
+    vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint32_t index)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index);
+    }
+}
+
+// ==========源操作数为起初地址，目的数为寄存器=========
+// ==========asc_gather(u8/s8/half/u16/s16/float/u32/s32/bf16/e4m3/e5m2/e8m0)=========
+
+__simd_callee__ inline vector_int8_t asc_gather(__ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask)
+{
+    vector_int8_t dst;
+    asc_gather_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_uint8_t asc_gather(__ubuf__ uint8_t* src, vector_uint16_t index, vector_bool mask)
+{
+    vector_uint8_t dst;
+    asc_gather_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_int16_t asc_gather(__ubuf__ int16_t* src, vector_uint16_t index, vector_bool mask)
+{
+    vector_int16_t dst;
+    asc_gather_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_uint16_t asc_gather(__ubuf__ uint16_t* src, vector_uint16_t index, vector_bool mask)
+{
+    vector_uint16_t dst;
+    asc_gather_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_int32_t asc_gather(__ubuf__ int32_t* src, vector_uint32_t index, vector_bool mask)
+{
+    vector_int32_t dst;
+    asc_gather_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_uint32_t asc_gather(__ubuf__ uint32_t* src, vector_uint32_t index, vector_bool mask)
+{
+    vector_uint32_t dst;
+    asc_gather_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_half asc_gather(__ubuf__ half* src, vector_uint16_t index, vector_bool mask)
+{
+    vector_half dst;
+    asc_gather_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_float asc_gather(__ubuf__ float* src, vector_uint32_t index, vector_bool mask)
+{
+    vector_float dst;
+    asc_gather_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bfloat16_t asc_gather(__ubuf__ bfloat16_t* src, vector_uint16_t index, vector_bool mask)
+{
+    vector_bfloat16_t dst;
+    asc_gather_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_fp8_e4m3fn_t asc_gather(
+    __ubuf__ fp8_e4m3fn_t* src, vector_uint16_t index, vector_bool mask)
+{
+    vector_fp8_e4m3fn_t dst;
+    asc_gather_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_hifloat8_t asc_gather(__ubuf__ hifloat8_t* src, vector_uint16_t index, vector_bool mask)
+{
+    vector_hifloat8_t dst;
+    asc_gather_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_fp8_e5m2_t asc_gather(__ubuf__ fp8_e5m2_t* src, vector_uint16_t index, vector_bool mask)
+{
+    vector_fp8_e5m2_t dst;
+    asc_gather_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_fp8_e8m0_t asc_gather(__ubuf__ fp8_e8m0_t* src, vector_uint16_t index, vector_bool mask)
+{
+    vector_fp8_e8m0_t dst;
+    asc_gather_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_int16_t asc_gather(__ubuf__ int16_t* src, vector_uint32_t index, vector_bool mask)
+{
+    vector_int16_t dst;
+    asc_gather_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_uint16_t asc_gather(__ubuf__ uint16_t* src, vector_uint32_t index, vector_bool mask)
+{
+    vector_uint16_t dst;
+    asc_gather_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_half asc_gather(__ubuf__ half* src, vector_uint32_t index, vector_bool mask)
+{
+    vector_half dst;
+    asc_gather_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bfloat16_t asc_gather(__ubuf__ bfloat16_t* src, vector_uint32_t index, vector_bool mask)
+{
+    vector_bfloat16_t dst;
+    asc_gather_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline void asc_gather(
+    vector_int16_t& dst, __ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask)
+{
+    asc_gather_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather(
+    vector_uint16_t& dst, __ubuf__ uint8_t* src, vector_uint16_t index, vector_bool mask)
+{
+    asc_gather_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather(
+    vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask)
+{
+    asc_gather_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather(
+    vector_uint8_t& dst, __ubuf__ uint8_t* src, vector_uint16_t index, vector_bool mask)
+{
+    asc_gather_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather(
+    vector_int16_t& dst, __ubuf__ int16_t* src, vector_uint16_t index, vector_bool mask)
+{
+    asc_gather_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather(
+    vector_uint16_t& dst, __ubuf__ uint16_t* src, vector_uint16_t index, vector_bool mask)
+{
+    asc_gather_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather(
+    vector_int32_t& dst, __ubuf__ int32_t* src, vector_uint32_t index, vector_bool mask)
+{
+    asc_gather_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather(
+    vector_uint32_t& dst, __ubuf__ uint32_t* src, vector_uint32_t index, vector_bool mask)
+{
+    asc_gather_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather(vector_half& dst, __ubuf__ half* src, vector_uint16_t index, vector_bool mask)
+{
+    asc_gather_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather(vector_float& dst, __ubuf__ float* src, vector_uint32_t index, vector_bool mask)
+{
+    asc_gather_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather(
+    vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint16_t index, vector_bool mask)
+{
+    asc_gather_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather(
+    vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, vector_uint16_t index, vector_bool mask)
+{
+    asc_gather_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather(
+    vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, vector_uint16_t index, vector_bool mask)
+{
+    asc_gather_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather(
+    vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, vector_uint16_t index, vector_bool mask)
+{
+    asc_gather_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather(
+    vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint16_t index, vector_bool mask)
+{
+    asc_gather_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather(
+    vector_int16_t& dst, __ubuf__ int16_t* src, vector_uint32_t index, vector_bool mask)
+{
+    asc_gather_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather(
+    vector_uint16_t& dst, __ubuf__ uint16_t* src, vector_uint32_t index, vector_bool mask)
+{
+    asc_gather_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather(vector_half& dst, __ubuf__ half* src, vector_uint32_t index, vector_bool mask)
+{
+    asc_gather_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather(
+    vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint32_t index, vector_bool mask)
+{
+    asc_gather_impl(dst, src, index, mask);
+}
+
+// ==========有mask参数=========
+// ==========asc_gather_datablock(u8/s8/half/u16/s16/float/u32/s32/u64/s64/bf16/e4m3/e5m2/e2m1/e1m2/e8m0)=========
+
+__simd_callee__ inline vector_int8_t asc_gather_datablock(__ubuf__ int8_t* src, vector_uint32_t index, vector_bool mask)
+{
+    vector_int8_t dst;
+    asc_gather_datablock_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_uint8_t asc_gather_datablock(
+    __ubuf__ uint8_t* src, vector_uint32_t index, vector_bool mask)
+{
+    vector_uint8_t dst;
+    asc_gather_datablock_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_int16_t asc_gather_datablock(
+    __ubuf__ int16_t* src, vector_uint32_t index, vector_bool mask)
+{
+    vector_int16_t dst;
+    asc_gather_datablock_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_uint16_t asc_gather_datablock(
+    __ubuf__ uint16_t* src, vector_uint32_t index, vector_bool mask)
+{
+    vector_uint16_t dst;
+    asc_gather_datablock_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_int32_t asc_gather_datablock(
+    __ubuf__ int32_t* src, vector_uint32_t index, vector_bool mask)
+{
+    vector_int32_t dst;
+    asc_gather_datablock_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_uint32_t asc_gather_datablock(
+    __ubuf__ uint32_t* src, vector_uint32_t index, vector_bool mask)
+{
+    vector_uint32_t dst;
+    asc_gather_datablock_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_half asc_gather_datablock(__ubuf__ half* src, vector_uint32_t index, vector_bool mask)
+{
+    vector_half dst;
+    asc_gather_datablock_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_float asc_gather_datablock(__ubuf__ float* src, vector_uint32_t index, vector_bool mask)
+{
+    vector_float dst;
+    asc_gather_datablock_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bfloat16_t asc_gather_datablock(
+    __ubuf__ bfloat16_t* src, vector_uint32_t index, vector_bool mask)
+{
+    vector_bfloat16_t dst;
+    asc_gather_datablock_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_fp8_e4m3fn_t asc_gather_datablock(
+    __ubuf__ fp8_e4m3fn_t* src, vector_uint32_t index, vector_bool mask)
+{
+    vector_fp8_e4m3fn_t dst;
+    asc_gather_datablock_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_hifloat8_t asc_gather_datablock(
+    __ubuf__ hifloat8_t* src, vector_uint32_t index, vector_bool mask)
+{
+    vector_hifloat8_t dst;
+    asc_gather_datablock_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_fp8_e5m2_t asc_gather_datablock(
+    __ubuf__ fp8_e5m2_t* src, vector_uint32_t index, vector_bool mask)
+{
+    vector_fp8_e5m2_t dst;
+    asc_gather_datablock_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_fp4x2_e2m1_t asc_gather_datablock(
+    __ubuf__ fp4x2_e2m1_t* src, vector_uint32_t index, vector_bool mask)
+{
+    vector_fp4x2_e2m1_t dst;
+    asc_gather_datablock_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_fp4x2_e1m2_t asc_gather_datablock(
+    __ubuf__ fp4x2_e1m2_t* src, vector_uint32_t index, vector_bool mask)
+{
+    vector_fp4x2_e1m2_t dst;
+    asc_gather_datablock_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_int4x2_t asc_gather_datablock(
+    __ubuf__ int4b_t* src, vector_uint32_t index, vector_bool mask)
+{
+    vector_int4x2_t dst;
+    asc_gather_datablock_impl(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_fp8_e8m0_t asc_gather_datablock(
+    __ubuf__ fp8_e8m0_t* src, vector_uint32_t index, vector_bool mask)
+{
+    vector_fp8_e8m0_t dst;
+    asc_gather_datablock_impl(dst, src, index, mask);
+    return dst;
+}
+
+// ==========无mask参数=========
+// ==========asc_gather_datablock(u8/s8/half/u16/s16/float/u32/s32/s64/bf16/e4m3/e5m2/e2m1/e1m2/e8m0)=========
+
+__simd_callee__ inline vector_int8_t asc_gather_datablock(__ubuf__ int8_t* src, vector_uint32_t index)
+{
+    vector_int8_t dst;
+    asc_gather_datablock_impl(dst, src, index);
+    return dst;
+}
+
+__simd_callee__ inline vector_uint8_t asc_gather_datablock(__ubuf__ uint8_t* src, vector_uint32_t index)
+{
+    vector_uint8_t dst;
+    asc_gather_datablock_impl(dst, src, index);
+    return dst;
+}
+
+__simd_callee__ inline vector_int16_t asc_gather_datablock(__ubuf__ int16_t* src, vector_uint32_t index)
+{
+    vector_int16_t dst;
+    asc_gather_datablock_impl(dst, src, index);
+    return dst;
+}
+
+__simd_callee__ inline vector_uint16_t asc_gather_datablock(__ubuf__ uint16_t* src, vector_uint32_t index)
+{
+    vector_uint16_t dst;
+    asc_gather_datablock_impl(dst, src, index);
+    return dst;
+}
+
+__simd_callee__ inline vector_int32_t asc_gather_datablock(__ubuf__ int32_t* src, vector_uint32_t index)
+{
+    vector_int32_t dst;
+    asc_gather_datablock_impl(dst, src, index);
+    return dst;
+}
+
+__simd_callee__ inline vector_uint32_t asc_gather_datablock(__ubuf__ uint32_t* src, vector_uint32_t index)
+{
+    vector_uint32_t dst;
+    asc_gather_datablock_impl(dst, src, index);
+    return dst;
+}
+
+__simd_callee__ inline vector_half asc_gather_datablock(__ubuf__ half* src, vector_uint32_t index)
+{
+    vector_half dst;
+    asc_gather_datablock_impl(dst, src, index);
+    return dst;
+}
+
+__simd_callee__ inline vector_float asc_gather_datablock(__ubuf__ float* src, vector_uint32_t index)
+{
+    vector_float dst;
+    asc_gather_datablock_impl(dst, src, index);
+    return dst;
+}
+
+__simd_callee__ inline vector_bfloat16_t asc_gather_datablock(__ubuf__ bfloat16_t* src, vector_uint32_t index)
+{
+    vector_bfloat16_t dst;
+    asc_gather_datablock_impl(dst, src, index);
+    return dst;
+}
+
+__simd_callee__ inline vector_fp8_e4m3fn_t asc_gather_datablock(__ubuf__ fp8_e4m3fn_t* src, vector_uint32_t index)
+{
+    vector_fp8_e4m3fn_t dst;
+    asc_gather_datablock_impl(dst, src, index);
+    return dst;
+}
+
+__simd_callee__ inline vector_hifloat8_t asc_gather_datablock(__ubuf__ hifloat8_t* src, vector_uint32_t index)
+{
+    vector_hifloat8_t dst;
+    asc_gather_datablock_impl(dst, src, index);
+    return dst;
+}
+
+__simd_callee__ inline vector_fp8_e5m2_t asc_gather_datablock(__ubuf__ fp8_e5m2_t* src, vector_uint32_t index)
+{
+    vector_fp8_e5m2_t dst;
+    asc_gather_datablock_impl(dst, src, index);
+    return dst;
+}
+
+__simd_callee__ inline vector_fp4x2_e2m1_t asc_gather_datablock(__ubuf__ fp4x2_e2m1_t* src, vector_uint32_t index)
+{
+    vector_fp4x2_e2m1_t dst;
+    asc_gather_datablock_impl(dst, src, index);
+    return dst;
+}
+
+__simd_callee__ inline vector_fp4x2_e1m2_t asc_gather_datablock(__ubuf__ fp4x2_e1m2_t* src, vector_uint32_t index)
+{
+    vector_fp4x2_e1m2_t dst;
+    asc_gather_datablock_impl(dst, src, index);
+    return dst;
+}
+
+__simd_callee__ inline vector_int4x2_t asc_gather_datablock(__ubuf__ int4b_t* src, vector_uint32_t index)
+{
+    vector_int4x2_t dst;
+    asc_gather_datablock_impl(dst, src, index);
+    return dst;
+}
+
+__simd_callee__ inline vector_fp8_e8m0_t asc_gather_datablock(__ubuf__ fp8_e8m0_t* src, vector_uint32_t index)
+{
+    vector_fp8_e8m0_t dst;
+    asc_gather_datablock_impl(dst, src, index);
+    return dst;
+}
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint32_t index, vector_bool mask)
+{
+    asc_gather_datablock_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_uint8_t& dst, __ubuf__ uint8_t* src, vector_uint32_t index, vector_bool mask)
+{
+    asc_gather_datablock_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_int16_t& dst, __ubuf__ int16_t* src, vector_uint32_t index, vector_bool mask)
+{
+    asc_gather_datablock_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_uint16_t& dst, __ubuf__ uint16_t* src, vector_uint32_t index, vector_bool mask)
+{
+    asc_gather_datablock_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_int32_t& dst, __ubuf__ int32_t* src, vector_uint32_t index, vector_bool mask)
+{
+    asc_gather_datablock_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_uint32_t& dst, __ubuf__ uint32_t* src, vector_uint32_t index, vector_bool mask)
+{
+    asc_gather_datablock_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_int64_t& dst, __ubuf__ int64_t* src, vector_uint32_t index, vector_bool mask)
+{
+    asc_gather_datablock_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_uint64_t& dst, __ubuf__ uint64_t* src, vector_uint32_t index, vector_bool mask)
+{
+    asc_gather_datablock_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_half& dst, __ubuf__ half* src, vector_uint32_t index, vector_bool mask)
+{
+    asc_gather_datablock_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_float& dst, __ubuf__ float* src, vector_uint32_t index, vector_bool mask)
+{
+    asc_gather_datablock_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint32_t index, vector_bool mask)
+{
+    asc_gather_datablock_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, vector_uint32_t index, vector_bool mask)
+{
+    asc_gather_datablock_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, vector_uint32_t index, vector_bool mask)
+{
+    asc_gather_datablock_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, vector_uint32_t index, vector_bool mask)
+{
+    asc_gather_datablock_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, vector_uint32_t index, vector_bool mask)
+{
+    asc_gather_datablock_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, vector_uint32_t index, vector_bool mask)
+{
+    asc_gather_datablock_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_int4x2_t& dst, __ubuf__ int4b_t* src, vector_uint32_t index, vector_bool mask)
+{
+    asc_gather_datablock_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint32_t index, vector_bool mask)
+{
+    asc_gather_datablock_impl(dst, src, index, mask);
+}
+
+__simd_callee__ inline void asc_gather_datablock(vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint32_t index)
+{
+    asc_gather_datablock_impl(dst, src, index);
+}
+
+__simd_callee__ inline void asc_gather_datablock(vector_uint8_t& dst, __ubuf__ uint8_t* src, vector_uint32_t index)
+{
+    asc_gather_datablock_impl(dst, src, index);
+}
+
+__simd_callee__ inline void asc_gather_datablock(vector_int16_t& dst, __ubuf__ int16_t* src, vector_uint32_t index)
+{
+    asc_gather_datablock_impl(dst, src, index);
+}
+
+__simd_callee__ inline void asc_gather_datablock(vector_uint16_t& dst, __ubuf__ uint16_t* src, vector_uint32_t index)
+{
+    asc_gather_datablock_impl(dst, src, index);
+}
+
+__simd_callee__ inline void asc_gather_datablock(vector_int32_t& dst, __ubuf__ int32_t* src, vector_uint32_t index)
+{
+    asc_gather_datablock_impl(dst, src, index);
+}
+
+__simd_callee__ inline void asc_gather_datablock(vector_uint32_t& dst, __ubuf__ uint32_t* src, vector_uint32_t index)
+{
+    asc_gather_datablock_impl(dst, src, index);
+}
+
+__simd_callee__ inline void asc_gather_datablock(vector_int64_t& dst, __ubuf__ int64_t* src, vector_uint32_t index)
+{
+    asc_gather_datablock_impl(dst, src, index);
+}
+
+__simd_callee__ inline void asc_gather_datablock(vector_uint64_t& dst, __ubuf__ uint64_t* src, vector_uint32_t index)
+{
+    asc_gather_datablock_impl(dst, src, index);
+}
+
+__simd_callee__ inline void asc_gather_datablock(vector_half& dst, __ubuf__ half* src, vector_uint32_t index)
+{
+    asc_gather_datablock_impl(dst, src, index);
+}
+
+__simd_callee__ inline void asc_gather_datablock(vector_float& dst, __ubuf__ float* src, vector_uint32_t index)
+{
+    asc_gather_datablock_impl(dst, src, index);
+}
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint32_t index)
+{
+    asc_gather_datablock_impl(dst, src, index);
+}
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, vector_uint32_t index)
+{
+    asc_gather_datablock_impl(dst, src, index);
+}
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, vector_uint32_t index)
+{
+    asc_gather_datablock_impl(dst, src, index);
+}
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, vector_uint32_t index)
+{
+    asc_gather_datablock_impl(dst, src, index);
+}
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, vector_uint32_t index)
+{
+    asc_gather_datablock_impl(dst, src, index);
+}
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, vector_uint32_t index)
+{
+    asc_gather_datablock_impl(dst, src, index);
+}
+
+__simd_callee__ inline void asc_gather_datablock(vector_int4x2_t& dst, __ubuf__ int4b_t* src, vector_uint32_t index)
+{
+    asc_gather_datablock_impl(dst, src, index);
+}
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint32_t index)
+{
+    asc_gather_datablock_impl(dst, src, index);
+}
+
+#if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_UB_GATHER_INTF_IMPL_H)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_UB_GATHER_INTF_IMPL_H
+#endif
+
+#endif // IMPL_C_API_REG_BASE_IMPL_UB_GATHER_INTF_IMPL_H
