@@ -123,7 +123,7 @@ __simd_vf__ inline void VecUnaryLevel2ImplFloat(__ubuf__ T* dst, __ubuf__ T* src
         Reg::Duplicate(regOne, 1.0f, maskFull);
         Reg::Duplicate(regOneHalf, oneHalf, maskFull);
 
-        Reg::CompareScalar<T, CMPMODE::LT>(cmpMask, srcReg, subnormalBound, mask);
+        Reg::Compares<T, CMPMODE::LT>(cmpMask, srcReg, subnormalBound, mask);
         Reg::Muls(tmpReg, srcReg, multiplyFactor0, mask);
         Reg::Select(srcReg, tmpReg, srcReg, cmpMask);
 
@@ -147,11 +147,11 @@ __simd_vf__ inline void VecUnaryLevel2ImplFloat(__ubuf__ T* dst, __ubuf__ T* src
         Reg::Muls(tmpReg, resReg, multiplyFactor1, mask);
         Reg::Select(dstReg, tmpReg, resReg, cmpMask);
 
-        Reg::CompareScalar(isInfMask, (Reg::RegTensor<uint32_t>&)srcReg, posInf, mask);
+        Reg::Compares(isInfMask, (Reg::RegTensor<uint32_t>&)srcReg, posInf, mask);
         Reg::Select(dstReg, regZero, dstReg, isInfMask);
-        Reg::CompareScalar(isPosZeroMask, (Reg::RegTensor<uint32_t>&)srcReg, posZero, mask);
+        Reg::Compares(isPosZeroMask, (Reg::RegTensor<uint32_t>&)srcReg, posZero, mask);
         Reg::Select(dstReg, posInfReg, dstReg, isPosZeroMask);
-        Reg::CompareScalar(isNegZeroMask, (Reg::RegTensor<uint32_t>&)srcReg, negZero, mask);
+        Reg::Compares(isNegZeroMask, (Reg::RegTensor<uint32_t>&)srcReg, negZero, mask);
         Reg::Select(dstReg, negInfReg, dstReg, isNegZeroMask);
 
         Reg::StoreAlign(dst + i * sregLower, dstReg, mask);
@@ -174,13 +174,13 @@ __simd_vf__ inline void VecUnaryLevel2ImplB64(__ubuf__ T* dst, __ubuf__ T* src, 
         Reg::Duplicate(vRegZero, T(0), preg);
         Reg::Duplicate(vRegF, static_cast<T>(0xffffffffffffffff), preg);
         Reg::LoadAlign(vSrcReg0, src + i * sregLower);
-        Reg::CompareScalar(maskZero, vSrcReg0, T(0), preg);
+        Reg::Compares(maskZero, vSrcReg0, T(0), preg);
         Reg::Select(vDstReg0, vRegF, vRegZero, maskZero);
-        Reg::CompareScalar(maskOne, vSrcReg0, T(1), preg);
+        Reg::Compares(maskOne, vSrcReg0, T(1), preg);
         Reg::Select(vDstReg0, vRegOne, vDstReg0, maskOne);
         if constexpr (IsSameType<T, int64_t>::value) {
             Reg::Duplicate(vRegNegOne, T(-1), preg);
-            Reg::CompareScalar(maskNegOne, vSrcReg0, T(-1), preg);
+            Reg::Compares(maskNegOne, vSrcReg0, T(-1), preg);
             Reg::Select(vDstReg0, vRegNegOne, vDstReg0, maskNegOne);
         }
         Reg::StoreAlign(dst + i * sregLower, vDstReg0, preg);
@@ -462,7 +462,7 @@ __simd_callee__ inline void Rsqrt(RegT& dstReg, RegT& srcReg, Reg::MaskReg& mask
 {
     Reg::MaskReg cmpMask;
     Reg::Duplicate(dstReg, static_cast<T>(1.0f), mask);
-    Reg::CompareScalar<T, CMPMODE::LT>(cmpMask, srcReg, static_cast<T>(0.0f), mask);
+    Reg::Compares<T, CMPMODE::LT>(cmpMask, srcReg, static_cast<T>(0.0f), mask);
     if constexpr (!precisionMode) {
         Reg::Sqrt(srcReg, srcReg, mask);
         Reg::Div(dstReg, dstReg, srcReg, mask);

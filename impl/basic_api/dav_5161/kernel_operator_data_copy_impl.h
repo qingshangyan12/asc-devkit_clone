@@ -149,8 +149,8 @@ __aicore__ inline void CopyCbufToGmAlignV2(
     uint32_t burstLength = blockLen * BYTE_32_ALIGN;
     uint32_t actSrcStride = srcStride * BYTE_32_ALIGN + burstLength;
     uint64_t actDstStride = dstStride * BYTE_32_ALIGN + burstLength;
-    // copy_cbuf_to_gm_align_v2(
-    //     (__gm__ T*)dst, (__cbuf__ T*)src, sid, blockCount, burstLength, actDstStride, actSrcStride);
+    copy_cbuf_to_gm_align_v2(
+        (__gm__ T*)dst, (__cbuf__ T*)src, sid, blockCount, burstLength, actDstStride, actSrcStride);
 }
 
 template <typename T>

@@ -844,7 +844,7 @@ __simd_vf__ inline void FusedMulsCastImpl(__ubuf__ T* dst, __ubuf__ U* src0, __u
     for (uint16_t i = 0; i < repeatTime; ++i) {
         mask = Reg::UpdateMask<U>(sreg);
         Reg::LoadAlign(vSrcReg, src0 + i * sregLower);
-        Reg::FusedMulsCast(vDstReg, vSrcReg, scalar, mask);
+        Reg::MulsCast(vDstReg, vSrcReg, scalar, mask);
         Reg::StoreAlign<T, Reg::StoreDist::DIST_PACK_B32>(dst + i * sregLower, vDstReg, mask);
     }
 }
@@ -865,7 +865,7 @@ __simd_vf__ inline void FusedMulsCastImpl(__ubuf__ T* dst, __ubuf__ U* src, U sc
     for (uint16_t i = 0; i < repeatTime; ++i) {
         mask = Reg::UpdateMask<U>(sreg);
         Reg::LoadAlign(vSrcReg, src + i * sregLower);
-        Reg::FusedMulsCast(vDstReg, vSrcReg, scalar, mask);
+        Reg::MulsCast(vDstReg, vSrcReg, scalar, mask);
         Reg::StoreAlign<T, Reg::StoreDist::DIST_PACK_B32>(dst + i * sregLower, vDstReg, mask);
     }
 }
