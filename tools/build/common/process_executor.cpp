@@ -416,8 +416,16 @@ void OpenMirroredOutputLog(const std::string& outputLogFilePath, std::ofstream& 
         if (FileUtils::OpenRegularFileForWrite(outputLogFilePath, outputLog, std::ios::app)) {
             return;
         }
+    } catch (const std::exception& exception) {
+        ASCENDLOGW(
+            "Exception while opening process output log; compilation will continue: path=%s message=%s",
+            outputLogFilePath.c_str(), exception.what());
+        return;
     } catch (...) {
-        // Path resolution and log allocation are diagnostic-only failures too.
+        ASCENDLOGW(
+            "Unknown exception while opening process output log; compilation will continue: path=%s",
+            outputLogFilePath.c_str());
+        return;
     }
     ASCENDLOGW("Failed to open process output log; compilation will continue: path=%s", outputLogFilePath.c_str());
 }
