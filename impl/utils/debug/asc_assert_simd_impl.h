@@ -25,17 +25,8 @@
 
 #if !defined(ASCENDC_CPU_DEBUG)
 #include "impl/utils/debug/asc_simd_printf_impl.h"
-#endif
 
 namespace __asc_simd_vf {
-__simd_callee__ inline void __trap()
-{
-#if !defined(ASCENDC_CPU_DEBUG)
-    *((volatile __ubuf__ uint8_t*)-1) = 0;
-#endif
-}
-
-#if !defined(ASCENDC_CPU_DEBUG)
 __ASC_USE_RESERVED_UBUF__(3510, "assert is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 static __attribute__((noinline)) __simd_callee__ void __assert_fail(
     __ubuf__ const char* assertion, __ubuf__ const char* file, unsigned int line,
@@ -43,7 +34,7 @@ static __attribute__((noinline)) __simd_callee__ void __assert_fail(
 {
     printf_impl_assert("[ASSERT] %s:%u: %s: Assertion '%s' failed.\n", file, line, function, assertion);
     wait_vf_assert_handshake();
-    __trap();
+    __asm__ volatile("send");
 }
 
 template <typename... Args>
@@ -54,10 +45,10 @@ static __attribute__((noinline)) __simd_callee__ void __assert_fail_msg(
 {
     printf_impl_assert_msg(assertion, file, line, function, fmt, args...);
     wait_vf_assert_handshake();
-    __trap();
+    __asm__ volatile("send");
 }
-#endif
 } // namespace __asc_simd_vf
+#endif
 
 #endif // IMPL_UTILS_DEBUG_ASC_ASSERT_SIMD_IMPL_H
 
