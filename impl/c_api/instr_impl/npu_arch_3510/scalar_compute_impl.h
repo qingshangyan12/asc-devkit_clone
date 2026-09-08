@@ -9,7 +9,8 @@
  */
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-
+#pragma message( \
+    "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please include c_api/asc_simd.h and use public functions or variables defined in interface header files.")
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
@@ -23,6 +24,7 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_ffs_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_store_dev_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_load_dev_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_float2half_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_float2int32_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_sflbits_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_ffz_impl.h"
@@ -80,6 +82,9 @@ __aicore__ inline uint32_t asc_load_dev(__gm__ uint32_t* addr) { return asc_load
 __aicore__ inline int64_t asc_load_dev(__gm__ int64_t* addr) { return asc_load_dev_impl(addr); }
 
 __aicore__ inline uint64_t asc_load_dev(__gm__ uint64_t* addr) { return asc_load_dev_impl(addr); }
+
+// ==========asc_float2half (ro)==========
+__aicore__ inline half asc_float2half_ro(float value) { return asc_float2half_ro_impl(value); }
 
 // ==========asc_float2int32 (rd/ru/rn/rna)==========
 __aicore__ inline int32_t asc_float2int32_rd(float value) { return asc_float2int32_rd_impl(value); }

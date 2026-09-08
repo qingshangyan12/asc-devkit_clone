@@ -23,6 +23,7 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/data_compression/Pack_res.md#id1 -->
 
 
 ## 功能说明<a name="section16390191715619"></a>
@@ -68,6 +69,7 @@ __simd_callee__ inline void Pack(S& dstReg, V& srcReg)
 ## 数据类型
 
 **表 3**  源操作数和目的操作数的数据类型对应表<a id="table3"></a>
+
 | T数据类型 | U数据类型 |
 | ------ | ------ |
 | uint8_t | int16_t |

@@ -29,6 +29,7 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030：支持
 <!-- end id9 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM_res.md#id1 -->
 
 ## 功能说明<a id="zh-cn_topic_0000002542828493_section106841136114319"></a>
 
@@ -186,6 +187,7 @@
 | ---------- | ---------- |
 | float | int8_t、uint8_t、hifloat8_t、fp8_e4m3fn_t、half、bfloat16_t、float。 |
 | int32_t | int8_t、uint8_t、half、bfloat16_t、int32_t。 |
+
 <!-- end id19 -->
 
 <!-- npu="A3" id20 -->
@@ -195,6 +197,7 @@
 | ---------- | ---------- |
 | float | int8_t、uint8_t、half、bfloat16_t、float。 |
 | int32_t | int8_t、uint8_t、half、int32_t。 |
+
 <!-- end id20 -->
 
 <!-- npu="910b" id21 -->
@@ -204,6 +207,7 @@
 | ---------- | ---------- |
 | float | int8_t、uint8_t、half、bfloat16_t、float。 |
 | int32_t | int8_t、uint8_t、half、int32_t。 |
+
 <!-- end id21 -->
 
 <!-- npu="310b" id22 -->
@@ -213,6 +217,7 @@
 | ---------- | ---------- |
 | float | int8_t、uint8_t、half、bfloat16_t、float。 |
 | int32_t | int8_t、uint8_t、half、int32_t。 |
+
 <!-- end id22 -->
 
 <!-- npu="x90" id23 -->
@@ -222,6 +227,7 @@
 | ---------- | ---------- |
 | float | int8_t、half。 |
 | int32_t | int8_t、half、int32_t。 |
+
 <!-- end id23 -->
 
 <!-- npu="9030" id24 -->
@@ -231,6 +237,7 @@
 | ---------- | ---------- |
 | float | half |
 | int32_t | half |
+
 <!-- end id24 -->
 
 ## 返回值说明

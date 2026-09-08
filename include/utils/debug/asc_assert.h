@@ -21,9 +21,9 @@
 #endif
 
 #include <cassert>
-#include "impl/utils/sys_macros.h"
-#include "simt_api/device_types.h"
+#include "impl/utils/sys_macros_impl.h"
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#include "simt_api/device_types.h"
 #include "impl/utils/debug/asc_assert_simt_impl.h"
 
 namespace __asc_simt_vf {

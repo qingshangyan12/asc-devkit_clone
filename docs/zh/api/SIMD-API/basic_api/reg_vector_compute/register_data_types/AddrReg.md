@@ -23,6 +23,7 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/register_data_types/AddrReg_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -103,10 +104,6 @@ __simd_callee__ inline AddrReg CreateAddrReg(uint16_t index0, uint32_t stride0, 
 | stride1 | 每次循环，第二层循环轴对应的地址偏移量，单位为element。 |
 | stride2 | 每次循环，第三层循环轴对应的地址偏移量，单位为element。 |
 | stride3 | 每次循环，第四层循环轴对应的地址偏移量，单位为element。 |
-
-## 支持的型号<a name="section156721693504"></a>
-
-Ascend 950PR/Ascend 950DT
 
 ## 约束说明<a name="section11585101304320"></a>
 

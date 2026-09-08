@@ -10,6 +10,8 @@
 
 - **[Mmad接口边界值汇总](mmad_interface_boundary_value_summary.md)**
 
+- **[MmadMx接口边界值汇总](mmad_mx_interface_boundary_value_summary.md)**
+
 - **[矩阵计算搬出相关接口边界值汇总](matrix_compute_move_out_interface_boundary_value_summary.md)**
 
 - **[Memory矢量计算接口边界值汇总](memory_vector_compute_interface_boundary_value_summary.md)**
@@ -33,6 +35,8 @@
 - **[SIMT接口软仿情况汇总](SIMT_interface_soft_simulation_summary.md)**
 
 - **[SIMT接口精度标准汇总](SIMT_interface_precision_standard_summary.md)**
+
+- **[SIMT指令理论性能汇总](SIMT_instruction_theoretical_perf_summary.md)**
 
 - **[废弃接口](deprecated_interface.md)**
 

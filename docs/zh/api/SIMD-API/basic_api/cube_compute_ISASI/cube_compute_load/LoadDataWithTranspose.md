@@ -29,6 +29,7 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030：不支持
 <!-- end id9 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadDataWithTranspose_res.md#id1 -->
 
 ## 功能说明<a id="zh-cn_topic_0000002543851571_section106841136114319"></a>
 
@@ -110,6 +111,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 | dstFracGap | 输入 | 每个迭代内目的操作数转置前一个分形结束地址与后一个分形起始地址的间隔，单位为512字节，仅在数据类型为float/int32_t/uint32_t/uint8_t/int8_t/int4b_t时有效。 |
 | srcFracGap | 输入 | 每个迭代内源操作数前一个分形结束地址与后一个分形起始地址的间隔，单位为512字节，仅在数据类型为float/int32_t/uint32_t/uint8_t/int8_t/int4b_t时有效。 |
 | addrMode | 输入 | 控制地址更新方式，默认为false：<br>&nbsp;&nbsp;&bull; true：递减，每次迭代在前一个地址的基础上减去srcStride。<br>&nbsp;&nbsp;&bull; false：递增，每次迭代在前一个地址的基础上加上srcStride。 |
+
 <!-- end id13 -->
 
 ## 数据类型<a id="zh-cn_topic_0000002543851571_section4219135304818"></a>

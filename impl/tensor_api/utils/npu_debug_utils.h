@@ -167,6 +167,7 @@ struct debug_tuple_flat_6 {};
 struct debug_tuple_nested_2x2 {};
 struct debug_tuple_leading_scalar_flat_2 {};
 struct debug_tuple_leading_scalar_nested_2x2 {};
+struct debug_tuple_leading_scalar_two_flat_2 {};
 
 template <size_t size>
 struct debug_flat_tuple_format {
@@ -225,6 +226,14 @@ struct debug_tuple_format<
         debug_tuple_leading_scalar_nested_2x2, debug_tuple_unsupported>;
 };
 
+template <typename LeadingType, typename Value00Type, typename Value01Type, typename Value10Type, typename Value11Type>
+struct debug_tuple_format<
+    Std::tuple<LeadingType, Std::tuple<Value00Type, Value01Type>, Std::tuple<Value10Type, Value11Type>>> {
+    using type = Std::conditional_t<
+        are_debug_scalar_values_v<LeadingType, Value00Type, Value01Type, Value10Type, Value11Type>,
+        debug_tuple_leading_scalar_two_flat_2, debug_tuple_unsupported>;
+};
+
 template <typename ValueType>
 using debug_tuple_format_t = typename debug_tuple_format<Std::remove_cvref_t<ValueType>>::type;
 
@@ -241,7 +250,7 @@ template <typename FormatType>
 constexpr bool is_debug_slice_same_format_v = is_one_of_attr_v<
     FormatType, debug_tuple_flat_1, debug_tuple_flat_2, debug_tuple_flat_3, debug_tuple_flat_4, debug_tuple_flat_5,
     debug_tuple_flat_6, debug_tuple_nested_2x2, debug_tuple_leading_scalar_flat_2,
-    debug_tuple_leading_scalar_nested_2x2>;
+    debug_tuple_leading_scalar_nested_2x2, debug_tuple_leading_scalar_two_flat_2>;
 
 template <typename SourceFormatType, typename CoordFormatType, typename SliceFormatType>
 struct debug_slice_format_category {
@@ -252,12 +261,12 @@ struct debug_slice_format_category {
         Std::is_same_v<SourceFormatType, debug_tuple_flat_2> && Std::is_same_v<CoordFormatType, SliceFormatType> &&
         is_one_of_attr_v<
             CoordFormatType, debug_tuple_nested_2x2, debug_tuple_leading_scalar_flat_2,
-            debug_tuple_leading_scalar_nested_2x2>;
-    static constexpr bool is_nested_source = Std::is_same_v<SourceFormatType, debug_tuple_nested_2x2> &&
-                                             Std::is_same_v<CoordFormatType, SliceFormatType> &&
-                                             is_one_of_attr_v<
-                                                 CoordFormatType, debug_tuple_flat_2, debug_tuple_leading_scalar_flat_2,
-                                                 debug_tuple_leading_scalar_nested_2x2>;
+            debug_tuple_leading_scalar_nested_2x2, debug_tuple_leading_scalar_two_flat_2>;
+    static constexpr bool is_nested_source =
+        Std::is_same_v<SourceFormatType, debug_tuple_nested_2x2> && Std::is_same_v<CoordFormatType, SliceFormatType> &&
+        is_one_of_attr_v<
+            CoordFormatType, debug_tuple_flat_2, debug_tuple_leading_scalar_flat_2,
+            debug_tuple_leading_scalar_nested_2x2, debug_tuple_leading_scalar_two_flat_2>;
     static constexpr bool is_rank_expanded =
         (Std::is_same_v<SourceFormatType, debug_tuple_flat_3> && Std::is_same_v<CoordFormatType, debug_tuple_flat_4> &&
          Std::is_same_v<SliceFormatType, debug_tuple_flat_4>) ||
@@ -353,6 +362,19 @@ __aicore__ inline constexpr auto get_debug_layout_pattern_name()
     }
 }
 
+struct debug_layout_index {
+    static constexpr size_t batch = 0;
+    static constexpr size_t data_shape = 1;
+    static constexpr size_t first_non_batch_dimension = 1;
+    static constexpr size_t second_non_batch_dimension = 2;
+    static constexpr size_t third_non_batch_dimension = 3;
+    static constexpr size_t fourth_non_batch_dimension = 4;
+    static constexpr size_t fifth_non_batch_dimension = 5;
+    static constexpr size_t first_nested_dimension = 0;
+    static constexpr size_t second_nested_dimension = 1;
+    static constexpr size_t nested_dimension_value = 1;
+};
+
 template <typename LayoutType>
 struct debug_layout_view {
     using layout_type = Std::remove_cvref_t<LayoutType>;
@@ -382,34 +404,51 @@ struct debug_layout_view {
 
     __aicore__ inline static constexpr decltype(auto) batch(const layout_type& layout)
     {
-        return get<0>(layout.shape());
+        return get<debug_layout_index::batch>(layout.shape());
     }
 
     __aicore__ inline static constexpr decltype(auto) batch_stride(const layout_type& layout)
     {
-        return get<0>(layout.stride());
+        return get<debug_layout_index::batch>(layout.stride());
     }
 
     __aicore__ inline static constexpr auto shape(const layout_type& layout)
     {
         if constexpr (is_flat_matrix_pattern && Std::is_same_v<shape_format_type, debug_tuple_leading_scalar_flat_2>) {
-            return get<1>(layout.shape());
+            return get<debug_layout_index::data_shape>(layout.shape());
         } else if constexpr (is_ext_matrix_pattern && is_debug_batch_ext_shape_v<shape_type>) {
-            return make_shape(get<1, 0, 1>(layout.shape()), get<1, 1, 1>(layout.shape()));
+            return make_shape(
+                get<debug_layout_index::data_shape, debug_layout_index::first_nested_dimension,
+                    debug_layout_index::nested_dimension_value>(layout.shape()),
+                get<debug_layout_index::data_shape, debug_layout_index::second_nested_dimension,
+                    debug_layout_index::nested_dimension_value>(layout.shape()));
         } else if constexpr (is_ext_matrix_pattern && is_debug_ext_shape_v<shape_type>) {
-            return make_shape(get<0, 1>(layout.shape()), get<1, 1>(layout.shape()));
+            return make_shape(
+                get<debug_layout_index::first_nested_dimension, debug_layout_index::nested_dimension_value>(
+                    layout.shape()),
+                get<debug_layout_index::second_nested_dimension, debug_layout_index::nested_dimension_value>(
+                    layout.shape()));
         } else if constexpr (
             is_fractal_matrix_pattern && Std::is_same_v<shape_format_type, debug_tuple_leading_scalar_nested_2x2>) {
-            return get<1>(layout.shape());
+            return get<debug_layout_index::data_shape>(layout.shape());
         } else if constexpr (is_conv_4d_pattern && Std::is_same_v<shape_format_type, debug_tuple_flat_4>) {
-            return make_shape(get<1>(layout.shape()), get<2>(layout.shape()), get<3>(layout.shape()));
+            return make_shape(
+                get<debug_layout_index::first_non_batch_dimension>(layout.shape()),
+                get<debug_layout_index::second_non_batch_dimension>(layout.shape()),
+                get<debug_layout_index::third_non_batch_dimension>(layout.shape()));
         } else if constexpr (is_conv_5d_pattern && Std::is_same_v<shape_format_type, debug_tuple_flat_5>) {
             return make_shape(
-                get<1>(layout.shape()), get<2>(layout.shape()), get<3>(layout.shape()), get<4>(layout.shape()));
+                get<debug_layout_index::first_non_batch_dimension>(layout.shape()),
+                get<debug_layout_index::second_non_batch_dimension>(layout.shape()),
+                get<debug_layout_index::third_non_batch_dimension>(layout.shape()),
+                get<debug_layout_index::fourth_non_batch_dimension>(layout.shape()));
         } else if constexpr (is_conv_6d_pattern && Std::is_same_v<shape_format_type, debug_tuple_flat_6>) {
             return make_shape(
-                get<1>(layout.shape()), get<2>(layout.shape()), get<3>(layout.shape()), get<4>(layout.shape()),
-                get<5>(layout.shape()));
+                get<debug_layout_index::first_non_batch_dimension>(layout.shape()),
+                get<debug_layout_index::second_non_batch_dimension>(layout.shape()),
+                get<debug_layout_index::third_non_batch_dimension>(layout.shape()),
+                get<debug_layout_index::fourth_non_batch_dimension>(layout.shape()),
+                get<debug_layout_index::fifth_non_batch_dimension>(layout.shape()));
         } else {
             return layout.shape();
         }
@@ -418,23 +457,40 @@ struct debug_layout_view {
     __aicore__ inline static constexpr auto stride(const layout_type& layout)
     {
         if constexpr (is_flat_matrix_pattern && Std::is_same_v<shape_format_type, debug_tuple_leading_scalar_flat_2>) {
-            return get<1>(layout.stride());
+            return get<debug_layout_index::data_shape>(layout.stride());
         } else if constexpr (is_ext_matrix_pattern && is_debug_batch_ext_shape_v<shape_type>) {
-            return make_stride(get<1, 0, 1>(layout.stride()), get<1, 1, 1>(layout.stride()));
+            return make_stride(
+                get<debug_layout_index::data_shape, debug_layout_index::first_nested_dimension,
+                    debug_layout_index::nested_dimension_value>(layout.stride()),
+                get<debug_layout_index::data_shape, debug_layout_index::second_nested_dimension,
+                    debug_layout_index::nested_dimension_value>(layout.stride()));
         } else if constexpr (is_ext_matrix_pattern && is_debug_ext_shape_v<shape_type>) {
-            return make_stride(get<0, 1>(layout.stride()), get<1, 1>(layout.stride()));
+            return make_stride(
+                get<debug_layout_index::first_nested_dimension, debug_layout_index::nested_dimension_value>(
+                    layout.stride()),
+                get<debug_layout_index::second_nested_dimension, debug_layout_index::nested_dimension_value>(
+                    layout.stride()));
         } else if constexpr (
             is_fractal_matrix_pattern && Std::is_same_v<shape_format_type, debug_tuple_leading_scalar_nested_2x2>) {
-            return get<1>(layout.stride());
+            return get<debug_layout_index::data_shape>(layout.stride());
         } else if constexpr (is_conv_4d_pattern && Std::is_same_v<shape_format_type, debug_tuple_flat_4>) {
-            return make_stride(get<1>(layout.stride()), get<2>(layout.stride()), get<3>(layout.stride()));
+            return make_stride(
+                get<debug_layout_index::first_non_batch_dimension>(layout.stride()),
+                get<debug_layout_index::second_non_batch_dimension>(layout.stride()),
+                get<debug_layout_index::third_non_batch_dimension>(layout.stride()));
         } else if constexpr (is_conv_5d_pattern && Std::is_same_v<shape_format_type, debug_tuple_flat_5>) {
             return make_stride(
-                get<1>(layout.stride()), get<2>(layout.stride()), get<3>(layout.stride()), get<4>(layout.stride()));
+                get<debug_layout_index::first_non_batch_dimension>(layout.stride()),
+                get<debug_layout_index::second_non_batch_dimension>(layout.stride()),
+                get<debug_layout_index::third_non_batch_dimension>(layout.stride()),
+                get<debug_layout_index::fourth_non_batch_dimension>(layout.stride()));
         } else if constexpr (is_conv_6d_pattern && Std::is_same_v<shape_format_type, debug_tuple_flat_6>) {
             return make_stride(
-                get<1>(layout.stride()), get<2>(layout.stride()), get<3>(layout.stride()), get<4>(layout.stride()),
-                get<5>(layout.stride()));
+                get<debug_layout_index::first_non_batch_dimension>(layout.stride()),
+                get<debug_layout_index::second_non_batch_dimension>(layout.stride()),
+                get<debug_layout_index::third_non_batch_dimension>(layout.stride()),
+                get<debug_layout_index::fourth_non_batch_dimension>(layout.stride()),
+                get<debug_layout_index::fifth_non_batch_dimension>(layout.stride()));
         } else {
             return layout.stride();
         }

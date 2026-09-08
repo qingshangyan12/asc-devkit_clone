@@ -84,30 +84,32 @@ struct OpResCtx {
     bool isKfc[Hccl::MC2_MAX_OP_NUM]; // 用于标记是否走kfcServer
 };
 
-enum AlgorithmType {
+enum class AlgorithmType {
     CcuAllGatherMesh1D = 0,
-    CcuAllGatherMeshMem2Mem1D,
-    CcuAllGatherMesh2D,
+    CcuAllGatherMeshMem2Mem1D = 1,
+    CcuAllGatherMesh2D = 2,
     CcuSchedAllGatherConcurMeshNHRMultiLink = 3,
     CcuReduceScatterMesh1D = 50,
-    CcuReduceScatterMeshMem2Mem1D,
-    CcuReduceScatterMesh2D,
+    CcuReduceScatterMeshMem2Mem1D = 51,
+    CcuReduceScatterMesh2D = 52,
     CcuAllReduceMesh1D = 100,
-    CcuAllReduceMeshMem2Mem1D,
-    CcuAllReduceMesh2DOneShot,
+    CcuAllReduceMeshMem2Mem1D = 101,
+    CcuAllReduceMesh2DOneShot = 102,
     CcuSchedAllToAllSoleMesh = 150,
-    CcuSchedAllToAllVSoleMesh,
+    CcuSchedAllToAllVSoleMesh = 151,
+    CcuSchedAllGatherSoleMesh = 152,
 };
 
 static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
-    {"CcuAllGatherMesh1DMem2Mem", CcuAllGatherMeshMem2Mem1D},
-    {"CcuAllGatherMeshMem2Mem1D", CcuAllGatherMeshMem2Mem1D},
-    {"CcuSchedAllGatherConcurMeshNHRMultiLink", CcuSchedAllGatherConcurMeshNHRMultiLink},
-    {"CcuSchedReduceScatterSoleMesh", CcuReduceScatterMeshMem2Mem1D},
-    {"CcuSchedAllToAllSoleMesh", CcuSchedAllToAllSoleMesh},
-    {"CcuSchedAllToAllVSoleMesh", CcuSchedAllToAllVSoleMesh},
-    {"CcuSchedAllReduceSoleMesh", CcuAllReduceMeshMem2Mem1D},
-    {"CcuSchedAllGatherMesh1DMem2Mem", CcuAllGatherMeshMem2Mem1D}};
+    {"CcuAllGatherMesh1DMem2Mem", AlgorithmType::CcuAllGatherMeshMem2Mem1D},
+    {"CcuAllGatherMeshMem2Mem1D", AlgorithmType::CcuAllGatherMeshMem2Mem1D},
+    {"CcuSchedAllGatherConcurMeshNHRMultiLink", AlgorithmType::CcuSchedAllGatherConcurMeshNHRMultiLink},
+    {"CcuSchedReduceScatterSoleMesh", AlgorithmType::CcuReduceScatterMeshMem2Mem1D},
+    {"CcuSchedAllToAllSoleMesh", AlgorithmType::CcuSchedAllToAllSoleMesh},
+    {"CcuSchedAllToAllVSoleMesh", AlgorithmType::CcuSchedAllToAllVSoleMesh},
+    {"CcuSchedAllReduceSoleMesh", AlgorithmType::CcuAllReduceMeshMem2Mem1D},
+    {"CcuSchedAllGatherMesh1DMem2Mem", AlgorithmType::CcuAllGatherMeshMem2Mem1D},
+    {"CcuSchedAllGatherSoleMesh", AlgorithmType::CcuSchedAllGatherSoleMesh}};
 
 typedef HcclResult (*OpParamPrepareFunc)(
     HcclComm comm, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& param);
@@ -130,7 +132,7 @@ HcclResult CheckCcuKfcFlow(const void* mc2Tiling, const void* ccTilingList[], ui
 HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSize, u32 userRank, OpResCtx& opResCtx);
 
 HcclResult HcclAllocOpResCtx(
-    HcclComm comm, const std::string& ctxTag, const std::vector<OpParam>& opParamVec, void* mc2Tiling,
+    const HcclComm comm, const std::string& ctxTag, const std::vector<OpParam>& opParamVec, const void* mc2Tiling,
     const void* ccTilingList[], void** opResCtxPtr);
 
 // AllToAll适配AllToAllV
@@ -198,8 +200,9 @@ HcclResult GetOpParam(
 HcclResult CcuSelectAlgCheck(const Mc2CcTilingInner* ccTiling, uint32_t tilingIndex);
 
 // CCU路径逐算子：算法选择 + 资源准备（参照GetOpParam形式）
+// checkOnly为true时逐算子走真实资源链探测资源是否充足（UNAVAIL统一映射为HCCL_E_RES_NOT_SUFFICIENT）
 HcclResult CcuSelectAlg(
     HcclComm comm, void* stream, const std::string topoTag[], const void* ccTilingList[], uint32_t tilingNum,
-    void* mc2Tiling, OpResCtx& opResCtx);
+    void* mc2Tiling, OpResCtx& opResCtx, bool checkOnly = false);
 
 #endif

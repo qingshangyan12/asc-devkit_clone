@@ -23,6 +23,7 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/scalar_compute/Cast_multi_type_to_float_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -77,6 +78,7 @@ __aicore__ constexpr inline U Cast(T bVal)
 | ------ | ------ |
 | T | 操作数数据类型。 |
 | U | 返回值数据类型。 |
+
 <!-- end id11 -->
 
 **表2**  接口参数说明

@@ -25,7 +25,9 @@
 
 ## 功能说明
 
-将浮点数四舍五入取整，并遵循CAST\_TRUNC模式。
+头文件路径为：`"simt_api/device_functions.h"`。
+
+将浮点数向零取整，并遵循CAST\_TRUNC模式。
 
 ## 函数原型
 
@@ -62,32 +64,34 @@ inline float __float2float_rz(const float x)
 
 无
 
-## 需要包含的头文件
+## 调用示例
 
-使用该接口需要包含`simt_api/device_functions.h`头文件。
+- SIMT编程场景：
 
 ```cpp
 #include "simt_api/device_functions.h"
-```
 
-## 调用示例
-
--   SIMT编程场景：
-
-```cpp
-__global__ __launch_bounds__(1024) void kernel__float2float_rz(float* dst, float* x)
+__global__ __launch_bounds__(1024) void kernel__float2float_rz(float* dst, float* x, uint32_t total_length)
 {
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
+    if (idx >= total_length) {
+        return;
+    }
     dst[idx] = __float2float_rz(x[idx]);
 }
 ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
 ```cpp
-__simt_vf__ __launch_bounds__(1024) inline void kernel__float2float_rz(__gm__ float* dst, __gm__ float* x)
+#include "simt_api/device_functions.h"
+
+__simt_vf__ __launch_bounds__(1024) inline void kernel__float2float_rz(__gm__ float* dst, __gm__ float* x, uint32_t total_length)
 {
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
+    if (idx >= total_length) {
+        return;
+    }
     dst[idx] = __float2float_rz(x[idx]);
 }
 ```

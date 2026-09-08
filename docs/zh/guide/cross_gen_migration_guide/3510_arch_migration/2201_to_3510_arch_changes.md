@@ -10,13 +10,14 @@
 -   AIV核采用Regbase架构，与[NPU架构版本2201](../../programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)的Membase架构相比，可以直接对芯片的Vector寄存器Register进行操作，实现更大的灵活性和更好的性能。
 
 **图1**  3510架构图<a name="fig1097417534526"></a>  
-![](../../figures/hw_arch.png "硬件架构")
+![](../../figures/npu_3510_hw_arch.png "硬件架构")
 
 具体来说，3510架构的主要变更如下各表所示。除此之外，3510架构还扩展了支持的数据类型，具体可参考[数据类型介绍](../../../api/SIMD-API/basic_api/data_structures/builtin_data_types.md)。
 
 - 搬运单元<a name="section_2201_to_3510_data_move_unit_changes"></a>
 
     **表1**  搬运单元变更
+
     | 3510变更 | 产生的影响 | 影响的API接口 |
     |----------|------------|---------------|
     | 删除L1 Buffer到GM的数据通路。 | 现有接口不支持从L1 Buffer直接搬运数据到GM。开发者需要在L1 Buffer分配一块空间存放单位矩阵，利用MMAD矩阵乘法计算输出到L0C Buffer，从L0C Buffer通过[Fixpipe（L0C到GM数据搬运）](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM.md)将数据搬运到GM。 | DataCopy/DumpTensor |
@@ -33,12 +34,13 @@
 - 计算单元<a name="section_2201_to_3510_compute_unit_changes"></a>
 
     **表2**  计算单元变更
+
     | 3510变更 | 产生的影响 | 影响的API接口 |
     |----------|------------|---------------|
     | Cube计算单元不支持s4类型。 | 对于int4b_t数据类型的矩阵乘计算，开发者需要先将int4b_t的数据Cast转换为int8_t类型，再进行Cube计算。 | Mmad |
     | Cube计算单元不支持L0A上ZZ到ZN的分形变化。 | L0A切分场景下，矩阵乘需要重新计算左矩阵的L0A地址。 | LoadData/LoadDataWithTranspose |
     | Vector Core Membase架构切换到Regbase架构。 | 基础API部分场景性能降低。 | 基础API高维切分模式 |
-    | 硬件不支持Subnormal功能，当前使用软仿实现的Subnormal功能。 | 开发者需要通过设置config模板参数来配置Subnormal计算模式，具体请参考[矢量计算](./2201_to_3510_guide/basic_api_migration.md#section7364115741514)。 | Ln/Sqrt/Rsqrt/Div/Reciprocal/Exp |
+    | 硬件不支持Subnormal功能，基础API和部分高阶API通过软件仿真实现Subnormal功能。 | 对于支持config参数的基础API，开发者可以通过设置config模板参数配置Subnormal计算模式；对于调用时未传入config参数的部分基础API和高阶API，处理方式受编译选项`--cce-ftz`影响，该选项默认为`true`。具体请参考[矢量计算](./2201_to_3510_guide/basic_api_migration.md#vector-compute)。 | Ln/Sqrt/Rsqrt/Div/Reciprocal/Exp及相关高阶API |
     | 不支持4:2稀疏矩阵的计算。 | 开发者需要利用Vector Core的能力，进行矩阵稠密转稀疏操作。 | LoadDataWithSparse/MmadWithSparse |
 
 - 存储单元<a name="section_2201_to_3510_storage_unit_changes"></a>

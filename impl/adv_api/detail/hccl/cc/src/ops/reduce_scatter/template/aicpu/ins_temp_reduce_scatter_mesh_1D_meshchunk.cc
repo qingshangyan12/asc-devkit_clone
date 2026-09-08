@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "ins_temp_reduce_scatter_mesh_1D_meshchunk.h"
+#include <limits>
 
 namespace mc2_ops_hccl {
 InsTempReduceScatterMesh1DMeshChunk::InsTempReduceScatterMesh1DMeshChunk(
@@ -22,6 +23,7 @@ HcclResult InsTempReduceScatterMesh1DMeshChunk::CalcRes(
     HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
     AlgResourceRequest& resourceRequest)
 {
+    CHK_PRT_RET(templateRankSize_ < 2, HCCL_ERROR("MeshChunk requires at least two ranks"), HCCL_E_PARA);
     u32 threadNum = templateRankSize_ > 1 ? templateRankSize_ - 1 : 1;
     resourceRequest.slaveThreadNum = threadNum - 1;
     const u32 NOTIFY_NUM_PER_SLAVE_THREAD = 2;
@@ -46,6 +48,9 @@ u64 InsTempReduceScatterMesh1DMeshChunk::CalcScratchMultiple(BufferType inBuffTy
 
 HcclResult InsTempReduceScatterMesh1DMeshChunk::CalcSliceInfoVec(const u64& dataSize, RankSliceInfo& sliceInfoVec)
 {
+    CHK_PRT_RET(
+        templateRankSize_ < 2 || subCommRanks_.empty() || dataSize > UINT64_MAX / templateRankSize_,
+        HCCL_ERROR("Invalid MeshChunk rank count or slice span"), HCCL_E_PARA);
     std::vector<SliceInfo> tmp(subCommRanks_.size());
     sliceInfoVec.resize(templateRankSize_, tmp);
     u64 accumOff = 0;
@@ -69,15 +74,15 @@ HcclResult InsTempReduceScatterMesh1DMeshChunk::KernelRun(
     processSize_ = tempAlgParams.sliceSize;
     count_ = tempAlgParams.count;
     dataType_ = param.DataDes.dataType;
-    dataTypeSize_ = DATATYPE_SIZE_TABLE[dataType_];
     CHK_PRT_RET(
-        templateRankSize_ == 0, HCCL_ERROR("[InsTempReduceScatterMesh1DMeshChunk] templateRankSize_ is 0"),
-        HCCL_E_INTERNAL);
+        static_cast<u32>(dataType_) >= HCCL_DATA_TYPE_RESERVED, HCCL_ERROR("Invalid MeshChunk datatype"), HCCL_E_PARA);
+    dataTypeSize_ = DATATYPE_SIZE_TABLE[dataType_];
+    CHK_RET(PrepareSlicesAndValidate(tempAlgParams, templateResource));
     CHK_RET(GetAlgRank(myRank_, subCommRanks_[0], rankIdx_));
     RankSliceInfo sliceInfoVec;
     CHK_RET(CalcSliceInfoVec(tempAlgParams.sliceSize, sliceInfoVec));
     HCCL_INFO("[InsTempReduceScatterMesh1DMeshChunk] Run Start");
-    PreCopy(tempAlgParams, templateResource.threads);
+    CHK_RET(PreCopy(tempAlgParams, templateResource.threads));
     if (threadNum_ > 1) {
         std::vector<ThreadHandle> subThreads(templateResource.threads.begin() + 1, templateResource.threads.end());
         GetNotifyIdxMainToSub(notifyIdxMainToSub_);
@@ -91,8 +96,71 @@ HcclResult InsTempReduceScatterMesh1DMeshChunk::KernelRun(
         GetNotifyIdxSubToMain(notifyIdxSubToMain_);
         CHK_RET(PostSyncInterThreads(templateResource.threads[0], subThreads, notifyIdxSubToMain_));
     }
-    PostCopy(tempAlgParams, templateResource.threads);
+    CHK_RET(PostCopy(tempAlgParams, templateResource.threads));
     return HcclResult::HCCL_SUCCESS;
+}
+
+HcclResult InsTempReduceScatterMesh1DMeshChunk::PrepareSlicesAndValidate(
+    const TemplateDataParams& params, const TemplateResource& resources)
+{
+    CHK_PRT_RET(
+        templateRankSize_ < 2 || subCommRanks_.size() != 1 || subCommRanks_[0].size() != templateRankSize_ ||
+            dataTypeSize_ == 0 || processSize_ % dataTypeSize_ != 0 || params.repeatNum == 0 ||
+            resources.threads.size() != templateRankSize_ - 1,
+        HCCL_ERROR("Invalid MeshChunk rank, datatype, slice or thread configuration"), HCCL_E_PARA);
+    const u64 chunkNum = templateRankSize_ - 1;
+    constexpr u64 CHUNK_ALIGN = 4096;
+    const u64 alignedSize = processSize_ / chunkNum / CHUNK_ALIGN * CHUNK_ALIGN;
+    chunkSizes_.assign(chunkNum, 0);
+    if (chunkNum >= 2 && alignedSize > 0) {
+        // Only offsets WITHIN a rank block change. Never round up or transfer padding.
+        std::fill(chunkSizes_.begin(), chunkSizes_.end(), alignedSize);
+        chunkSizes_.back() = processSize_ - alignedSize * (chunkNum - 1);
+    } else {
+        const u64 count = processSize_ / dataTypeSize_;
+        for (u64 i = 0; i < chunkNum; ++i) {
+            chunkSizes_[i] = (count / chunkNum + (i < count % chunkNum ? 1 : 0)) * dataTypeSize_;
+        }
+    }
+    u64 total = 0;
+    for (auto size : chunkSizes_) {
+        CHK_PRT_RET(
+            size % dataTypeSize_ != 0 || size > processSize_ - total, HCCL_ERROR("Invalid MeshChunk chunk size"),
+            HCCL_E_PARA);
+        total += size;
+    }
+    CHK_PRT_RET(total != processSize_, HCCL_ERROR("MeshChunk length is not conserved"), HCCL_E_PARA);
+
+    // Validate all address arithmetic before PreCopy or any remote task is submitted.
+    auto checkSpan = [](const void* base, u64 offset, u64 stride, u64 steps, u64 size) {
+        const u64 address = reinterpret_cast<uintptr_t>(base);
+        if (base == nullptr || offset > UINT64_MAX - address || size > UINT64_MAX - address - offset) {
+            return false;
+        }
+        return steps == 0 || stride <= (UINT64_MAX - address - offset - size) / steps;
+    };
+    CHK_PRT_RET(
+        !checkSpan(
+            params.buffInfo.inputPtr, params.buffInfo.inBuffBaseOff, params.inputSliceStride, chunkNum, processSize_) ||
+            !checkSpan(params.buffInfo.outputPtr, params.buffInfo.outBuffBaseOff, 0, 0, processSize_) ||
+            !checkSpan(params.buffInfo.hcclBuff.addr, params.buffInfo.hcclBuffBaseOff, 0, 0, processSize_),
+        HCCL_ERROR("MeshChunk buffer offset overflow"), HCCL_E_PARA);
+    const u64 lastInputOffset = params.buffInfo.inBuffBaseOff + chunkNum * params.inputSliceStride;
+    CHK_PRT_RET(
+        !checkSpan(
+            params.buffInfo.inputPtr, lastInputOffset, params.inputRepeatStride, params.repeatNum - 1, processSize_),
+        HCCL_ERROR("MeshChunk repeat offset overflow"), HCCL_E_PARA);
+    for (auto rank : subCommRanks_[0]) {
+        if (rank == myRank_) {
+            continue;
+        }
+        auto it = resources.channels.find(rank);
+        CHK_PRT_RET(
+            it == resources.channels.end() || it->second.empty() || it->second[0].handle == 0 ||
+                !checkSpan(it->second[0].remoteCclMem.addr, params.buffInfo.hcclBuffBaseOff, 0, 0, processSize_),
+            HCCL_ERROR("Missing or invalid MeshChunk peer channel"), HCCL_E_PARA);
+    }
+    return HCCL_SUCCESS;
 }
 
 HcclResult InsTempReduceScatterMesh1DMeshChunk::PreCopy(
@@ -120,33 +188,7 @@ HcclResult InsTempReduceScatterMesh1DMeshChunk::RunReduceScatter(
     u32 myAlgRank = 0;
     CHK_RET(GetAlgRank(myRank_, subCommRanks_[0], myAlgRank));
 
-    uint64_t sliceNum = templateRankSize_ - 1;
-    uint64_t mySliceSize = sliceInfoVec[myAlgRank][0].size; // 获取本rank需要处理的数据量，executor已按4K对齐
-    uint64_t mySliceCount = mySliceSize / DATATYPE_SIZE_TABLE[dataType_];
-
-    std::vector<uint64_t> sliceSize;
-    // 数据切分为sliceNum块，前sliceNum-1块每块按4K向下对齐，最后一块取余数(无需对齐)。
-    // 选向下对齐是为了保证DoMeshChunk第0步接收区[mySliceSize-lastBlock, mySliceSize-lastBlock+sliceSize[0])
-    // 不越界(需sliceSize[0] <= lastBlock)；若向上对齐则sliceSize[0] > lastBlock，会跨块越界读取。
-    uint64_t alignSliceSize = (mySliceSize / sliceNum) / AICPU_ALIGN_SIZE * AICPU_ALIGN_SIZE;
-    if (sliceNum >= 2 && alignSliceSize > 0) {
-        for (uint64_t i = 0; i < sliceNum - 1; i++) {
-            sliceSize.push_back(alignSliceSize);
-        }
-        sliceSize.push_back(mySliceSize - alignSliceSize * (sliceNum - 1));
-    } else {
-        // 数据量过小无法按4K对齐切分时，回退到原有按元素均分(大/小块)逻辑，避免0尺寸分块
-        uint64_t bigDataSliceNum = mySliceCount % sliceNum;
-        uint64_t bigDataSliceSize = (mySliceCount / sliceNum + 1) * DATATYPE_SIZE_TABLE[dataType_];
-        uint64_t smallDataSliceNum = sliceNum - mySliceCount % sliceNum;
-        uint64_t smallDataSliceSize = mySliceCount / sliceNum * DATATYPE_SIZE_TABLE[dataType_];
-        for (uint64_t i = 0; i < bigDataSliceNum; i++) {
-            sliceSize.push_back(bigDataSliceSize);
-        }
-        for (uint64_t i = 0; i < smallDataSliceNum; i++) {
-            sliceSize.push_back(smallDataSliceSize);
-        }
-    }
+    const auto& sliceSize = chunkSizes_; // Prepared and checked before the first task.
     uint64_t sliceRecvBaseOffset = 0;
     uint16_t rankNum = 2;
     for (uint16_t i = 0; i < (templateRankSize_ - rankNum); i++) {
@@ -154,9 +196,9 @@ HcclResult InsTempReduceScatterMesh1DMeshChunk::RunReduceScatter(
     }
     uint64_t sliceSendOffset_;
     uint64_t sliceRecvOffset_;
-    DoMeshChunk(
+    CHK_RET(DoMeshChunk(
         channels, threads, tempAlgParams, sliceSize, tempAlgParams.repeatNum, myAlgRank, sliceSendOffset_,
-        sliceRecvOffset_, sliceRecvBaseOffset);
+        sliceRecvOffset_, sliceRecvBaseOffset));
     return HcclResult::HCCL_SUCCESS;
 }
 
@@ -197,10 +239,12 @@ HcclResult InsTempReduceScatterMesh1DMeshChunk::DoMeshChunk(
                     tempAlgParams.buffInfo.inputPtr,
                     tempAlgParams.buffInfo.inBuffBaseOff + repeatIdx * tempAlgParams.inputRepeatStride +
                         myAlgRank * tempAlgParams.inputSliceStride + sliceRecvOffset_,
-                    sliceSize[i], sliceSize[i] / dataTypeSize_); // 接收源
+                    sliceSize[templateRankSize_ - 2 - i],
+                    sliceSize[templateRankSize_ - 2 - i] / dataTypeSize_); // 接收源：逆序片段
                 DataSlice rxDstSlice = DataSlice(
                     tempAlgParams.buffInfo.hcclBuff.addr, tempAlgParams.buffInfo.hcclBuffBaseOff + sliceRecvOffset_,
-                    sliceSize[i], sliceSize[i] / dataTypeSize_); // 接收目标
+                    sliceSize[templateRankSize_ - 2 - i],
+                    sliceSize[templateRankSize_ - 2 - i] / dataTypeSize_); // 接收目标
                 DataSlice txSrcSlice = DataSlice(
                     tempAlgParams.buffInfo.inputPtr,
                     tempAlgParams.buffInfo.inBuffBaseOff + repeatIdx * tempAlgParams.inputRepeatStride +
@@ -218,10 +262,7 @@ HcclResult InsTempReduceScatterMesh1DMeshChunk::DoMeshChunk(
             SendRecvReduceInfo sendRecvReduceInfo{
                 {linkSend, linkRecv}, {{txSrcSlices, txDstSlices}, {rxSrcSlices, rxDstSlices}}, dataType_, reduceOp_};
 
-            CHK_PRT_RET(
-                SendRecvBatchWriteReduce(sendRecvReduceInfo, threads[queIdx]),
-                HCCL_ERROR("[InsTempReduceScatterMesh1DMeshChunk] RunReduceScatter SendRecvReduce failed"),
-                HcclResult::HCCL_E_INTERNAL);
+            CHK_RET(SendRecvBatchWriteReduce(sendRecvReduceInfo, threads[queIdx], true));
 
             sliceSendOffset_ += sliceSize[i];
             if (templateRankSize_ > rankNum && i < (templateRankSize_ - rankNum)) {

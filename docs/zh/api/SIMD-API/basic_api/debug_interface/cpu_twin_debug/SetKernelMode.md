@@ -29,6 +29,7 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030：支持
 <!-- end id9 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/debug_interface/cpu_twin_debug/SetKernelMode_res.md#id1 -->
 
 ## 功能说明<a name="zh-cn_topic_0000001963639310_zh-cn_topic_0000001656094169_section259105813316"></a>
 
@@ -43,6 +44,7 @@ void SetKernelMode(KernelMode mode)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001963639310_zh-cn_topic_0000001656094169_section158061867342"></a>
+
 | 参数名称 | 输入/输出 | 描述 |
 | ------ | ------ | ------ |
 | mode | 输入 | 内核模式，用于AIC/AIV/MIX算子的CPU调试。<br>enum class KernelMode {&#10;    MIX_MODE = 0,&#10;    AIC_MODE,&#10;    AIV_MODE&#10;}; |

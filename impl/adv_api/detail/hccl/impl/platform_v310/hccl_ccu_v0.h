@@ -273,7 +273,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
             CcuPrepareForAllGatherM2M(&handleParamGM_[handleId]);
         }
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLREDUCE) {
-        ccuUsedXnNum_ = 18;
+        ccuUsedXnNum_ = 26;
         CcuPrepareForAllReduceM2M(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALL) {
         ccuUsedXnNum_ = 11;
@@ -388,10 +388,21 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
 
     HcclHandle handleId = curHandleId_;
 
-    ASCENDC_HCCL_API_ASSERT(
-        handleId < HCCL_MAX_HANDLE_ID, { return INVALID_HANDLE_ID; },
-        "Call Prepare[%d] failed, Prepare interface call num is[%d], expected less than[%d].",
-        static_cast<int32_t>(commonPrepareParam.commType.prepareType), handleId + 1, HCCL_MAX_HANDLE_ID);
+    const uint64_t dataTypeSize = GetHcclDataTypeSize(commonPrepareParam.dataType);
+    const bool invalidPrepareParam =
+        (dataTypeSize == 0U) || (commonPrepareParam.count > CCU_MAX_COMM_DATA / dataTypeSize);
+    ascendc_assert(
+        !invalidPrepareParam, "Call Prepare failed, param dataType is %d or data size exceeds %llu.",
+        static_cast<int32_t>(commonPrepareParam.dataType), static_cast<unsigned long long>(CCU_MAX_COMM_DATA));
+
+    const bool invalidHandleId = (handleId >= HCCL_MAX_HANDLE_ID);
+    ascendc_assert(
+        !invalidHandleId, "Call Prepare failed, Prepare interface call num is expected less than HCCL_MAX_HANDLE_ID.");
+
+    // Return early for invalid type, oversized payload, or handle overflow.
+    if (unlikely(invalidPrepareParam || invalidHandleId)) {
+        return INVALID_HANDLE_ID;
+    }
 
     InitHandleInfo(handleId);
     uint64_t reqId = handleId == 0 ? 0 : handleReqId_[handleId - 1] + handleRepeatCnt_[handleId - 1];
@@ -461,7 +472,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         KERNEL_INFO,
         "ApiClient CcuSendMsg ccuMsg_.xnAddr, Id0: 0x%llx, Id1: 0x%llx, Id2: 0x%llx, Id3: 0x%llx, Id4: 0x%llx, Id5: "
         "0x%llx, Id6: 0x%llx, Id7: 0x%llx, Id8: 0x%llx, Id9: 0x%llx, Id10: 0x%llx, Id11: 0x%llx, Id12: 0x%llx, Id13: "
-        "0x%llx, Id14: 0x%llx, Id15: 0x%llx, Id16: 0x%llx, Id17: 0x%llx",
+        "0x%llx, Id14: 0x%llx, Id15: 0x%llx, Id16: 0x%llx, Id17: 0x%llx, Id18: 0x%llx, Id19: 0x%llx, Id20: 0x%llx, "
+        "Id21: 0x%llx, Id22: 0x%llx, Id23: 0x%llx, Id24: 0x%llx, Id25: 0x%llx",
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr), *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 8),
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 16),
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 24),
@@ -478,7 +490,15 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 112),
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 120),
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 128),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 136));
+        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 136),
+        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 144),
+        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 152),
+        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 160),
+        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 168),
+        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 176),
+        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 184),
+        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 192),
+        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 200));
 
     const uint8_t missionNum = GetKfcMissionNum(handleId);
     for (uint8_t mission = 0; mission < missionNum; ++mission) {
