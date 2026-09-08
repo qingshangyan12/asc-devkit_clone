@@ -93,7 +93,6 @@ static void test_host_c_api_cube_datamove_2()
     using ::asc_set_gm2l1_loop_size;
     using ::asc_set_gm2l1_nz_para;
     using ::asc_set_gm2l1_pad;
-    using ::asc_set_l0c2gm_quant_post;
     using ::asc_set_l0c_copy_channel_para;
     using ::asc_set_l0c_copy_config;
     using ::asc_set_l0c_copy_lrelu_alpha;

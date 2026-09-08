@@ -5,6 +5,7 @@
 - **[asc_enable_fp8（废弃）](asc_enable_fp8_deprecated.md)**
 - **[asc_enable_hf32_trans（废弃）](asc_enable_hf32_trans_deprecated.md)**
 - **[asc_set_fp32_mode（废弃）](asc_set_fp32_mode_deprecated.md)**
+- **[asc_set_l0c2gm_quant_post（废弃）](asc_set_l0c2gm_quant_post_deprecated.md)**
 - **[asc_mmad（废弃）](asc_mmad_deprecated.md)**
 - **[asc_mmad_mx（废弃）](asc_mmad_mx_deprecated.md)**
 - **[asc_mmad_sparse（废弃）](asc_mmad_sparse_deprecated.md)**

@@ -826,7 +826,6 @@
             -   [asc_set_gm2l1_nz_para](SIMD-API/c_api/cube_datamove/asc_set_gm2l1_nz_para.md)
             -   [asc_set_gm2l1_pad](SIMD-API/c_api/cube_datamove/asc_set_gm2l1_pad.md)
             -   [asc_set_gm2l1_padding](SIMD-API/c_api/cube_datamove/asc_set_gm2l1_padding.md)
-            -   [asc_set_l0c2gm_quant_post](SIMD-API/c_api/cube_datamove/asc_set_l0c2gm_quant_post.md)
             -   [asc_set_l0c_copy_nz_para](SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_nz_para.md)
             -   [asc_set_l0c_copy_channel_para](SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_channel_para.md)
             -   [asc_set_l0c_copy_config](SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_config.md)

@@ -30,8 +30,6 @@
 - **[asc_set_l0c_copy_config](./asc_set_l0c_copy_config.md)**
 - **[asc_set_l0c_copy_lrelu_alpha](asc_set_l0c_copy_lrelu_alpha.md)**
 - **[asc_set_l0c_copy_relu_alpha](asc_set_l0c_copy_relu_alpha.md)**
-- **[asc_set_l0c2gm_quant_post](asc_set_l0c2gm_quant_post.md)**
-- **[asc_set_gm2l1_padding](asc_set_gm2l1_padding.md)**
 - **[asc_set_l0c_copy_params](asc_set_l0c_copy_params.md)**
 - **[asc_set_l0c_copy_prequant](asc_set_l0c_copy_prequant.md)**
 - **[asc_set_l13d_fmatrix](asc_set_l13d_fmatrix.md)**

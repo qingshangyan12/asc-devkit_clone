@@ -112,6 +112,7 @@ __aicore__ inline void asc_set_gm2l1_padding(float padding_value);
 [[deprecated("NOTICE: asc_set_l12l0_padding_val is deprecated. Please use asc_set_l12l0b_3d_padding instead.")]]
 __aicore__ inline void asc_set_l12l0_padding_val(uint64_t config);
 
+[[deprecated("NOTICE: asc_set_l0c2gm_quant_post is deprecated. There is no replacement.")]]
 __aicore__ inline void asc_set_l0c2gm_quant_post(uint64_t config);
 
 [[deprecated("NOTICE: asc_set_l0c2gm_relu_alpha is deprecated. Please use asc_set_l0c_copy_relu_alpha instead.")]]
