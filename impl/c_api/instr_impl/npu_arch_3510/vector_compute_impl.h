@@ -1960,10 +1960,7 @@ asc_int162float_v2(vector_float& dst, vector_int16_t src, vector_bool mask)
 }
 
 // ==========asc_int4x22int16==========
-[[deprecated("NOTICE: asc_int4x22int16(vector_int16_t& dst, vector_int4x2_t src, vector_bool mask) is deprecated. "
-             "Please use asc_int4x22int16(vector_int16_t& dst, vector_int4x2_t src, vector_bool mask, "
-             "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
-asc_int4x22int16(vector_int16_t& dst, vector_int4x2_t src, vector_bool mask)
+__simd_callee__ inline void asc_int4x22int16(vector_int16_t& dst, vector_int4x2_t src, vector_bool mask)
 {
     asc_int4x22int16_impl(dst, src, mask);
 }
@@ -4526,11 +4523,7 @@ asc_bfloat162float_v2(vector_float& dst, vector_bfloat16_t src, vector_bool mask
 }
 
 // ==========asc_int4x22bfloat16==========
-[[deprecated(
-    "NOTICE: asc_int4x22bfloat16(vector_bfloat16_t& dst, vector_int4x2_t src, vector_bool mask) is deprecated. "
-    "Please use asc_int4x22bfloat16(vector_bfloat16_t& dst, vector_int4x2_t src, vector_bool mask, "
-    "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
-asc_int4x22bfloat16(vector_bfloat16_t& dst, vector_int4x2_t src, vector_bool mask)
+__simd_callee__ inline void asc_int4x22bfloat16(vector_bfloat16_t& dst, vector_int4x2_t src, vector_bool mask)
 {
     asc_int4x22bfloat16_impl(dst, src, mask);
 }
@@ -5112,18 +5105,12 @@ asc_hif82half_v2(vector_half& dst, vector_hifloat8_t src, vector_bool mask)
 }
 
 // rd - sat:dis/en - v1 v2 v3 v4
-[[deprecated("NOTICE: asc_half2int4x2_rd(vector_int4x2_t& dst, vector_half src, vector_bool mask) is deprecated. "
-             "Please use asc_half2int4x2_rd(vector_int4x2_t& dst, vector_half src, vector_bool mask, "
-             "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
-asc_half2int4x2_rd(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rd(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2int4x2_rd_impl(dst, src, mask);
 }
 
-[[deprecated("NOTICE: asc_half2int4x2_rd_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask) is deprecated. "
-             "Please use asc_half2int4x2_rd_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, "
-             "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
-asc_half2int4x2_rd_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rd_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2int4x2_rd_sat_impl(dst, src, mask);
 }
@@ -5174,18 +5161,12 @@ asc_half2int4x2_rd_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mas
 }
 
 // ru - sat:dis/en - v1 v2 v3 v4
-[[deprecated("NOTICE: asc_half2int4x2_ru(vector_int4x2_t& dst, vector_half src, vector_bool mask) is deprecated. "
-             "Please use asc_half2int4x2_ru(vector_int4x2_t& dst, vector_half src, vector_bool mask, "
-             "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
-asc_half2int4x2_ru(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_ru(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2int4x2_ru_impl(dst, src, mask);
 }
 
-[[deprecated("NOTICE: asc_half2int4x2_ru_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask) is deprecated. "
-             "Please use asc_half2int4x2_ru_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, "
-             "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
-asc_half2int4x2_ru_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_ru_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2int4x2_ru_sat_impl(dst, src, mask);
 }
@@ -5236,18 +5217,12 @@ asc_half2int4x2_ru_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mas
 }
 
 // rz - sat:dis/en - v1 v2 v3 v4
-[[deprecated("NOTICE: asc_half2int4x2_rz(vector_int4x2_t& dst, vector_half src, vector_bool mask) is deprecated. "
-             "Please use asc_half2int4x2_rz(vector_int4x2_t& dst, vector_half src, vector_bool mask, "
-             "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
-asc_half2int4x2_rz(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rz(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2int4x2_rz_impl(dst, src, mask);
 }
 
-[[deprecated("NOTICE: asc_half2int4x2_rz_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask) is deprecated. "
-             "Please use asc_half2int4x2_rz_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, "
-             "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
-asc_half2int4x2_rz_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rz_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2int4x2_rz_sat_impl(dst, src, mask);
 }
@@ -5298,18 +5273,12 @@ asc_half2int4x2_rz_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mas
 }
 
 // rn - sat:dis/en - v1 v2 v3 v4
-[[deprecated("NOTICE: asc_half2int4x2_rn(vector_int4x2_t& dst, vector_half src, vector_bool mask) is deprecated. "
-             "Please use asc_half2int4x2_rn(vector_int4x2_t& dst, vector_half src, vector_bool mask, "
-             "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
-asc_half2int4x2_rn(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rn(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2int4x2_rn_impl(dst, src, mask);
 }
 
-[[deprecated("NOTICE: asc_half2int4x2_rn_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask) is deprecated. "
-             "Please use asc_half2int4x2_rn_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, "
-             "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
-asc_half2int4x2_rn_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rn_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2int4x2_rn_sat_impl(dst, src, mask);
 }
@@ -5360,18 +5329,12 @@ asc_half2int4x2_rn_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mas
 }
 
 // rna - sat:dis/en - v1 v2 v3 v4
-[[deprecated("NOTICE: asc_half2int4x2_rna(vector_int4x2_t& dst, vector_half src, vector_bool mask) is deprecated. "
-             "Please use asc_half2int4x2_rna(vector_int4x2_t& dst, vector_half src, vector_bool mask, "
-             "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
-asc_half2int4x2_rna(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rna(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2int4x2_rna_impl(dst, src, mask);
 }
 
-[[deprecated("NOTICE: asc_half2int4x2_rna_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask) is deprecated. "
-             "Please use asc_half2int4x2_rna_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, "
-             "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
-asc_half2int4x2_rna_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rna_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2int4x2_rna_sat_impl(dst, src, mask);
 }
@@ -6195,10 +6158,7 @@ __simd_callee__ inline void asc_int162half_rz(vector_half& dst, vector_int16_t s
 }
 
 //================asc_int4x22half==============
-[[deprecated("NOTICE: asc_int4x22half(vector_half& dst, vector_int4x2_t src, vector_bool mask) is deprecated. "
-             "Please use asc_int4x22half(vector_half& dst, vector_int4x2_t src, vector_bool mask, "
-             "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
-asc_int4x22half(vector_half& dst, vector_int4x2_t src, vector_bool mask)
+__simd_callee__ inline void asc_int4x22half(vector_half& dst, vector_int4x2_t src, vector_bool mask)
 {
     asc_int4x22half_impl(dst, src, mask);
 }
