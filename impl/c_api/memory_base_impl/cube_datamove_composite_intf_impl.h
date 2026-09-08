@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/memory_base_impl/common_impl.h"
+#include "impl/c_api/memory_base_impl/utils_impl.h"
 #include "impl/c_api/memory_base_impl/cube_datamove_intf_impl.h"
 
 __aicore__ inline void asc_copy_l12l0b_sparse_sync_impl(

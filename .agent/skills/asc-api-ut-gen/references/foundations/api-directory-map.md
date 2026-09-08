@@ -66,7 +66,7 @@
 
 ## C API 子目录映射
 
-实现目录保持扁平，每个实际声明接口的公开头 `<header>.h` 对应 `<header>_intf_impl.h`。下表列出各类代表文件；atomic 另有 `scalar_atomic_intf_impl.h`，scalar_compute 按 bit/convert/load/store 拆分，vector_compute 按各公开头拆分。公共内部辅助代码位于各架构组的 `common_impl.h`；聚合头、纯类型头和无独立函数实现的宏别名不生成空实现头。
+实现目录保持扁平，每个实际声明接口的公开头 `<header>.h` 对应 `<header>_intf_impl.h`。下表列出各类代表文件；atomic 另有 `scalar_atomic_intf_impl.h`，scalar_compute 按 bit/convert/load/store 拆分，vector_compute 按各公开头拆分。公共内部辅助代码位于各架构组的 `utils_impl.h`；聚合头、纯类型头和无独立函数实现的宏别名不生成空实现头。
 
 | C API 子类 | 声明目录 | 2201 实现/UT | 3510 实现/UT |
 |-----------|----------|--------------|--------------|

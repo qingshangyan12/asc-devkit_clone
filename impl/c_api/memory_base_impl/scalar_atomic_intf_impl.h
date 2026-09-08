@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/memory_base_impl/common_impl.h"
+#include "impl/c_api/memory_base_impl/utils_impl.h"
 
 __aicore__ inline void asc_get_store_atomic_config_impl(asc_store_atomic_config& config)
 {

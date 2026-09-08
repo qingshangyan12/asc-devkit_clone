@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/common_impl.h"
+#include "impl/c_api/reg_base_impl/utils_impl.h"
 #include "impl/c_api/reg_base_impl/reg_logic_intf_impl.h"
 
 [[deprecated("NOTICE: asc_and floating-point overloads are deprecated since 9.2.0. Floating-point data types are not "

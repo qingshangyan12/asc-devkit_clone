@@ -19,7 +19,9 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/common_impl.h"
+#include "impl/c_api/reg_base_impl/utils_impl.h"
+
+constexpr int64_t SYSTEM_CLOCK_FREQ_MHZ = 1000;
 
 __aicore__ inline int64_t asc_get_program_counter_impl() { return get_pc(); }
 

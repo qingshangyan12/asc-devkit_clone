@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/common_impl.h"
+#include "impl/c_api/reg_base_impl/utils_impl.h"
 
 __simd_callee__ inline void asc_scatter_impl(
     __ubuf__ int8_t* dst, vector_int8_t src, vector_uint16_t index, vector_bool mask)

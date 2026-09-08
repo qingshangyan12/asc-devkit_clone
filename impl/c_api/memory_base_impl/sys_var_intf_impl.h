@@ -19,7 +19,9 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/memory_base_impl/common_impl.h"
+#include "impl/c_api/memory_base_impl/utils_impl.h"
+
+constexpr int64_t SYSTEM_CLOCK_FREQ_MHZ = 50;
 
 __aicore__ inline int64_t asc_get_core_id_impl() { return get_coreid(); }
 

@@ -19,7 +19,7 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/common_impl.h"
+#include "impl/c_api/reg_base_impl/utils_impl.h"
 
 // ==========源操作数和目的数都为寄存器=========
 __simd_callee__ inline void asc_gather_impl(vector_int8_t& dst, vector_int8_t src, vector_uint8_t index)

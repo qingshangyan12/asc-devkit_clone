@@ -19,7 +19,9 @@
 #endif
 
 #include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/common_impl.h"
+#include "impl/c_api/reg_base_impl/utils_impl.h"
+
+constexpr int16_t ASC_C_API_LOAD_DEV_DEFAULT_OFFSET = 0;
 
 __aicore__ inline int8_t asc_load_dev_impl(__gm__ int8_t* addr)
 {
