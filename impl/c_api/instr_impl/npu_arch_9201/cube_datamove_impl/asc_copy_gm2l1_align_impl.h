@@ -259,6 +259,30 @@ __aicore__ inline void asc_copy_gm2l1_align_impl(
     }
 }
 
+__aicore__ inline void asc_copy_gm2l1_align_impl(
+    __cbuf__ hif4_scale* dst, __gm__ hif4_scale* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count,
+    uint8_t right_padding_count, bool enable_data_select, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
+    uint32_t dst_stride)
+{
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_align_v2(
+            dst, src, 0, burst_count, burst_len, left_padding_count, right_padding_count, enable_data_select,
+            false, static_cast<uint8_t>(l2_cache_mode), src_stride, dst_stride);
+    }
+}
+
+__aicore__ inline void asc_copy_gm2l1_align_impl(
+    __cbuf__ hif4_scale* dst, __gm__ hif4_scale* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count,
+    uint8_t right_padding_count, bool enable_data_select, bool enable_pre_load_ignore_sync,
+    asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride, uint32_t dst_stride)
+{
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_align_v2(
+            dst, src, 0, burst_count, burst_len, left_padding_count, right_padding_count, enable_data_select,
+            enable_pre_load_ignore_sync, static_cast<uint8_t>(l2_cache_mode), src_stride, dst_stride);
+    }
+}
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)

@@ -295,6 +295,29 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_impl(
     }
 }
 
+__aicore__ inline void asc_copy_gm2l1_nd2nz_impl(
+    __cbuf__ hif4_scale* dst, __gm__ hif4_scale* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
+    uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
+{
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_nd2nz(
+            dst, src, 0, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
+            enable_small_c0, false);
+    }
+}
+
+__aicore__ inline void asc_copy_gm2l1_nd2nz_impl(
+    __cbuf__ hif4_scale* dst, __gm__ hif4_scale* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
+    uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0,
+    bool enable_pre_load_ignore_sync)
+{
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_nd2nz(
+            dst, src, 0, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
+            enable_small_c0, enable_pre_load_ignore_sync);
+    }
+}
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
