@@ -10,6 +10,7 @@
 
 #include "kernel_specialization.h"
 
+#include "file_utils.h"
 #include "compilation_plan_executor.h"
 #include "kernel_compilation_plan_builder.h"
 #include "compilation_manifest_parser.h"
@@ -78,11 +79,15 @@ bool CopyFileDescriptorContents(
 bool CreateUniqueTemporaryOutputFile(
     const fs::path& outputElfPath, fs::path& temporaryOutputPath, int& temporaryOutputFileDescriptor)
 {
+    std::string canonicalOutputPath;
+    if (!FileUtils::ResolveRegularFilePathForWrite(outputElfPath.string(), canonicalOutputPath)) {
+        return false;
+    }
     constexpr size_t maxTemporaryFileAttempts = 32U;
     constexpr mode_t temporaryOutputFileMode = 0644;
     static std::atomic<uint64_t> temporaryOutputFileSequence{0};
     for (size_t attempt = 0U; attempt < maxTemporaryFileAttempts; ++attempt) {
-        temporaryOutputPath = outputElfPath.string() + ".aclrtc_tmp_" + std::to_string(getpid()) + "_" +
+        temporaryOutputPath = canonicalOutputPath + ".aclrtc_tmp_" + std::to_string(getpid()) + "_" +
                               std::to_string(temporaryOutputFileSequence.fetch_add(1U, std::memory_order_relaxed));
         temporaryOutputFileDescriptor =
             open(temporaryOutputPath.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC, temporaryOutputFileMode);
@@ -192,7 +197,7 @@ aclError KernelSpecializationSession::RunKernelSpecialization(
 
 aclError KernelSpecializationSession::RunSpecializationWithMaterializedResource(
     const NormalizedKernelSpecializationRequest& specializationRequest,
-    MaterializedKernelCompilationResource compilationResource)
+    MaterializedKernelCompilationResource compilationResource) const
 {
     const bool saveKernelMetaEnabled = IsKernelMetaSavingEnabled();
     KernelCompilationWorkspace compilationWorkspace(
@@ -239,7 +244,12 @@ aclError KernelSpecializationSession::PublishKernelElf(
     const fs::path& linkedKernelElfPath, const fs::path& outputElfPath,
     KernelCompilationWorkspace& compilationWorkspace) const
 {
-    const int linkedKernelFileDescriptor = open(linkedKernelElfPath.c_str(), O_RDONLY | O_CLOEXEC);
+    std::string canonicalLinkedKernelPath;
+    if (!FileUtils::ResolveCanonicalPath(linkedKernelElfPath.string(), canonicalLinkedKernelPath) ||
+        !FileUtils::IsRegularFile(canonicalLinkedKernelPath)) {
+        return ACLRTC_ERROR_FAILURE;
+    }
+    const int linkedKernelFileDescriptor = open(canonicalLinkedKernelPath.c_str(), O_RDONLY | O_CLOEXEC);
     if (linkedKernelFileDescriptor < 0) {
         const int openError = errno;
         ASCENDLOGE(

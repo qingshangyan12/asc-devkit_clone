@@ -69,6 +69,27 @@ TEST(KernelCompilationWorkspaceTest, CreatesOutputDirectoriesAndAppliesAllPatche
     fs::remove_all(worktreePath, ignoredError);
 }
 
+TEST(KernelCompilationWorkspaceTest, DoesNotOverwritePreexistingTemporaryPatchSymlinks)
+{
+    const fs::path worktreePath = CreateWorkspacePath("aclrtc_workspace_patch_collision");
+    const fs::path sourcePath = worktreePath / "constants.h";
+    const fs::path victimPath = worktreePath / "preserve.txt";
+    WriteFile(sourcePath, "VALUE=@@VALUE@@;");
+    WriteFile(victimPath, "preserve");
+    for (size_t sequence = 0U; sequence < 64U; ++sequence) {
+        const fs::path collisionPath =
+            sourcePath.string() + ".aclrtc_patch_" + std::to_string(getpid()) + "_" + std::to_string(sequence);
+        fs::create_symlink(victimPath, collisionPath);
+    }
+    KernelCompilationPlan plan;
+    plan.sourcePatches = {{sourcePath, "@@VALUE@@", "{0x01}"}};
+    KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RemoveAfterCompilation);
+
+    EXPECT_EQ(workspace.CreateOutputDirectoriesAndApplySourcePatches(plan), ascendc::aclrtc::ACLRTC_SUCCESS);
+    EXPECT_EQ(ReadFile(sourcePath), "VALUE={0x01};");
+    EXPECT_EQ(ReadFile(victimPath), "preserve");
+}
+
 TEST(KernelCompilationWorkspaceTest, ReplacesEveryOccurrenceOfTheSameSourceTemplate)
 {
     const fs::path worktreePath = CreateWorkspacePath("aclrtc_workspace_repeated_template");

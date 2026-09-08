@@ -34,6 +34,9 @@ public:
     static bool IsRegularFile(const std::string& path) noexcept;
     static bool IsSymlink(const std::string& path) noexcept;
     static bool ResolveCanonicalPath(const std::string& path, std::string& resolved);
+    // Resolves an existing regular file or a new filename under an existing canonical parent.
+    // Rejects symlinks and special files at the final component; does not create the file.
+    static bool ResolveRegularFilePathForWrite(const std::string& path, std::string& resolved);
     static bool ResolveDirectory(const std::string& path, std::string& resolved);
     static bool ResolveSubdirectory(const std::string& path, const std::string& root, std::string& resolved);
 

@@ -11,6 +11,7 @@
 #include "kernel_specialization_diagnostics.h"
 
 #include "ascendc_tool_log.h"
+#include "file_utils.h"
 #include "process_executor.h"
 
 #include <boost/filesystem.hpp>
@@ -46,7 +47,11 @@ std::string QuoteArgumentForReplayScript(const std::string& argument)
 
 bool WriteDiagnosticTextFile(const fs::path& filePath, const std::string& text, std::ios::openmode writeMode)
 {
-    std::ofstream outputStream(filePath.string(), std::ios::out | writeMode);
+    std::string canonicalFilePath;
+    if (!FileUtils::ResolveRegularFilePathForWrite(filePath.string(), canonicalFilePath)) {
+        return false;
+    }
+    std::ofstream outputStream(canonicalFilePath, std::ios::out | writeMode);
     if (!outputStream) {
         const int openError = errno;
         ASCENDLOGW(
@@ -245,7 +250,7 @@ void KernelSpecializationDiagnostics::WriteSpecializationResult(
 }
 
 void KernelSpecializationDiagnostics::AppendTextToDiagnosticFile(
-    const fs::path& filePath, const std::string& text) noexcept
+    const fs::path& filePath, const std::string& text) const noexcept
 {
     if (!diagnosticsEnabled_) {
         return;

@@ -137,6 +137,35 @@ bool FileUtils::ResolveCanonicalPath(const std::string& path, std::string& resol
     return true;
 }
 
+bool FileUtils::ResolveRegularFilePathForWrite(const std::string& path, std::string& resolved)
+{
+    resolved.clear();
+    if (path.empty() || path.find('\0') != std::string::npos) {
+        ASCENDLOGE("Output file path must be nonempty and contain no embedded NUL");
+        return false;
+    }
+    const fs::path inputPath(path);
+    const fs::path filename = inputPath.filename();
+    if (filename.empty() || filename == "." || filename == "..") {
+        ASCENDLOGE("Output path must name a file: path=%s", path.c_str());
+        return false;
+    }
+    boost::system::error_code error;
+    const fs::path parent = fs::canonical(inputPath.has_parent_path() ? inputPath.parent_path() : fs::path("."), error);
+    if (error || !fs::is_directory(parent, error) || error) {
+        ASCENDLOGE("Failed to resolve output parent directory: path=%s", path.c_str());
+        return false;
+    }
+    const fs::path candidate = parent / filename;
+    const fs::file_status status = fs::symlink_status(candidate, error);
+    if (status.type() != fs::file_not_found && (error || !fs::is_regular_file(status))) {
+        ASCENDLOGE("Rejected non-regular output file: path=%s", path.c_str());
+        return false;
+    }
+    resolved = candidate.string();
+    return true;
+}
+
 bool FileUtils::ResolveDirectory(const std::string& path, std::string& resolved)
 {
     ASCENDLOGD("Resolving directory: path=%s", path.c_str());

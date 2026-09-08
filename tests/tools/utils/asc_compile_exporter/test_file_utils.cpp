@@ -92,6 +92,49 @@ TEST_F(ModuleTest, FileUtilsInspectsAndResolvesPaths)
     EXPECT_FALSE(FileUtils::ResolveSubdirectory("/tmp", root_, resolved));
 }
 
+TEST_F(ModuleTest, FileUtilsResolvesNewOutputUnderCanonicalParentWithoutCreatingIt)
+{
+    const std::string directory = FileUtils::JoinPath(root_, "output");
+    const std::string alias = FileUtils::JoinPath(root_, "output-alias");
+    ASSERT_TRUE(FileUtils::CreateDirectories(directory));
+    ASSERT_EQ(symlink(directory.c_str(), alias.c_str()), 0);
+    std::string resolved;
+    ASSERT_TRUE(FileUtils::ResolveRegularFilePathForWrite(alias + "/./new.log", resolved));
+    EXPECT_EQ(resolved, directory + "/new.log");
+    EXPECT_FALSE(FileUtils::PathExists(resolved));
+    WriteTestFile(resolved, "keep");
+    ASSERT_TRUE(FileUtils::ResolveRegularFilePathForWrite(alias + "/new.log", resolved));
+    EXPECT_EQ(ReadTestFile(resolved), "keep");
+}
+
+TEST_F(ModuleTest, FileUtilsRejectsInvalidOutputNamesAndSpecialFiles)
+{
+    const std::string regular = FileUtils::JoinPath(root_, "regular");
+    const std::string link = FileUtils::JoinPath(root_, "link");
+    const std::string danglingLink = FileUtils::JoinPath(root_, "dangling");
+    WriteTestFile(regular, "keep");
+    ASSERT_EQ(symlink(regular.c_str(), link.c_str()), 0);
+    ASSERT_EQ(symlink("missing", danglingLink.c_str()), 0);
+    const std::vector<std::string> invalidPaths{
+        "",
+        root_,
+        root_ + "/.",
+        root_ + "/..",
+        root_ + "/missing/file",
+        regular + "/file",
+        link,
+        danglingLink,
+        "/dev/null",
+        regular + std::string("\0suffix", 7U),
+        root_ + "/" + std::string(5000U, 'x')};
+    for (const std::string& path : invalidPaths) {
+        std::string resolved = "stale";
+        EXPECT_FALSE(FileUtils::ResolveRegularFilePathForWrite(path, resolved)) << path;
+        EXPECT_TRUE(resolved.empty()) << path;
+    }
+    EXPECT_EQ(ReadTestFile(regular), "keep");
+}
+
 TEST_F(ModuleTest, FileUtilsCreatesAndRemovesDirectoryTrees)
 {
     EXPECT_TRUE(FileUtils::CreateDirectories(""));
