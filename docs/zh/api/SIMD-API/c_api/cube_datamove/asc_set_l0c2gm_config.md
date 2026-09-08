@@ -1,5 +1,4 @@
-# asc_set_l0c2gm_config（废弃）
-
+# asc_set_l0c2gm_config
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
@@ -27,8 +26,6 @@
 ## 功能说明
 
 头文件路径为：`"c_api/cube_datamove/cube_datamove.h"`。
-
-**该接口已废弃，请使用[asc_set_l0c_copy_config](../cube_datamove/asc_set_l0c_copy_config.md)替代。**
 
 数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的矢量量化参数。
 
@@ -59,7 +56,6 @@ PIPE_S
 ## 约束说明
 
 支持以下三种传参形式：
-
 - 同时设置relu_pre和quant_pre。
 - 仅传入relu_pre，quant_pre传入0。
 - 仅传入quant_pre，relu_pre传入0。

@@ -1,4 +1,4 @@
-# asc_set_fp32_mode（废弃）
+# asc_enable_hf32_trans
 
 ## 产品支持情况
 
@@ -28,19 +28,21 @@
 
 头文件路径为：`"c_api/cube_compute/cube_compute.h"`。
 
-**该接口已废弃，请使用[asc_disable_hf32](../cube_compute/asc_disable_hf32.md)替代。**
-
-本接口用于设置Mmad计算关闭HF32模式，其作用与[asc_enable_hf32](../cube_compute/asc_enable_hf32.md)相反，两个接口不同时生效。关闭HF32模式后，L0A Buffer与L0B Buffer中的`float`数据在参与Mmad计算之前不做舍入处理。
+本接口用于设置HF32模式舍入方式，使用该接口前需要先使用[asc_enable_hf32](asc_enable_hf32.md)开启HF32模式。
 
 ## 函数原型
 
 ```c
-__aicore__ inline void asc_set_fp32_mode()
+__aicore__ inline void asc_enable_hf32_trans(uint32_t mode)
 ```
 
 ## 参数说明
 
-无
+**表1** 参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+|:-------|:----------|:------|
+| mode | 输入 | HF32舍入模式控制参数，uint32_t类型，支持如下2种取值：<br>&nbsp;&nbsp;&bull; 0：FP32将以向最接近的值舍入，平局时向偶数舍入的方式舍入为HF32。<br>&nbsp;&nbsp;&bull; 1：FP32将以向最接近的值舍入，平局时远离零的方式舍入为HF32。 |
 
 ## 返回值说明
 
@@ -52,8 +54,9 @@ PIPE_S
 
 ## 约束说明
 
-- 本接口需在矩阵乘加指令（[asc_mmad](../cube_compute/asc_mmad.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。
-- FP32模式启用后会持续生效，不会自动关闭。后续矩阵乘加指令若不显式重新配置，将沿用当前模式。如需开启HF32模式，请重新调用[asc_enable_hf32](../cube_compute/asc_enable_hf32.md)接口。
+- 本接口需在矩阵乘加指令（[asc_mmad](asc_mmad.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。
+- 本接口配置的舍入模式仅在HF32模式开启期间生效，需先开启HF32模式再调用本接口，否则舍入模式配置不产生实际作用。
+- 舍入模式配置后会持续生效，HF32模式关闭后再次开启仍将沿用上次的舍入模式配置，如需切换舍入模式，请重新调用本接口。
 
 <!-- npu="950" id8 -->
 ## 调用示例
@@ -69,7 +72,6 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 以下调用示例代码仅Ascend 950PR/Ascend 950DT产品支持。
 
 ```cpp
-#include <cmath>
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -79,14 +81,14 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 namespace {
 constexpr uint32_t DIM = 16, ELEMENTS = DIM * DIM;
 
-__global__ __cube__ void asc_set_fp32_mode_kernel(
-    __gm__ float* a, __gm__ float* b, __gm__ float* hf32_output, __gm__ float* fp32_output)
+__global__ __cube__ void asc_enable_hf32_trans_kernel(
+    __gm__ float* a, __gm__ float* b, __gm__ float* output, uint32_t nearest_away)
 {
     asc_init();
     __cbuf__ float a_l1[ELEMENTS], b_l1[ELEMENTS];
     __ca__ float a_l0[ELEMENTS];
     __cb__ float b_l0[ELEMENTS];
-    __cc__ float hf32_l0[ELEMENTS], fp32_l0[ELEMENTS];
+    __cc__ float c_l0[ELEMENTS];
     asc_set_gm2l1_nz_para(1, 1, 16, 0);
     asc_copy_gm2l1_nd2nz(a_l1, a, DIM * sizeof(float), 0, DIM, DIM, 0, false);
     asc_set_gm2l1_nz_para(1, 1, 16, 0);
@@ -98,20 +100,12 @@ __global__ __cube__ void asc_set_fp32_mode_kernel(
     asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
     asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);
     asc_enable_hf32();
-    asc_set_hf32_round_mode(asc_hf32_round_mode::NEAREST_EVEN);
-    asc_mmad(hf32_l0, a_l0, b_l0, DIM, DIM, DIM, 0, true, false, true);
-    asc_sync_pipe(PIPE_M);
-    asc_set_fp32_mode();
-    asc_mmad(fp32_l0, a_l0, b_l0, DIM, DIM, DIM, 0, true, false, true);
-    asc_sync_pipe(PIPE_M);
+    asc_enable_hf32_trans(nearest_away ? 1 : 0);
+    asc_mmad(c_l0, a_l0, b_l0, DIM, DIM, DIM, 0, true, false, true);
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_set_l0c_copy_nz_para(1, 0, 0);
-    asc_copy_l0c2gm(hf32_output, hf32_l0, DIM, DIM, DIM, DIM, 0, 0, 0,
-        static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
-        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
-    asc_set_l0c_copy_nz_para(1, 0, 0);
-    asc_copy_l0c2gm(fp32_output, fp32_l0, DIM, DIM, DIM, DIM, 0, 0, 0,
+    asc_copy_l0c2gm(output, c_l0, DIM, DIM, DIM, DIM, 0, 0, 0,
         static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
         static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
     asc_sync_pipe(PIPE_ALL);
@@ -127,32 +121,37 @@ void print_row(const char* label, const std::vector<float>& data)
 
 int main()
 {
-    std::vector<float> a(ELEMENTS), b(ELEMENTS), hf32(ELEMENTS), fp32(ELEMENTS), golden(ELEMENTS);
+    constexpr float tie = 1.0f + 0.5f / 1024.0f;
+    std::vector<float> a(ELEMENTS), b(ELEMENTS), nearest_away(ELEMENTS), nearest_even(ELEMENTS);
+    std::vector<float> away_golden(ELEMENTS), even_golden(ELEMENTS);
     for (uint32_t i = 0; i < DIM; ++i) {
-        a[i * DIM + i] = golden[i * DIM + i] = 1.0003f;
+        a[i * DIM + i] = tie;
         b[i * DIM + i] = 1.0f;
+        away_golden[i * DIM + i] = 1.0f + 1.0f / 1024.0f;
+        even_golden[i * DIM + i] = 1.0f;
     }
     aclInit(nullptr);
     aclrtSetDevice(0);
-    float *a_device = nullptr, *b_device = nullptr, *hf32_device = nullptr, *fp32_device = nullptr;
+    float *a_device = nullptr, *b_device = nullptr, *away_device = nullptr, *even_device = nullptr;
     aclrtMalloc(reinterpret_cast<void**>(&a_device), ELEMENTS * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc(reinterpret_cast<void**>(&b_device), ELEMENTS * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMalloc(reinterpret_cast<void**>(&hf32_device), ELEMENTS * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMalloc(reinterpret_cast<void**>(&fp32_device), ELEMENTS * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&away_device), ELEMENTS * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&even_device), ELEMENTS * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(a_device, ELEMENTS * sizeof(float), a.data(), ELEMENTS * sizeof(float), ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(b_device, ELEMENTS * sizeof(float), b.data(), ELEMENTS * sizeof(float), ACL_MEMCPY_HOST_TO_DEVICE);
-    asc_set_fp32_mode_kernel<<<1, 0>>>(a_device, b_device, hf32_device, fp32_device);
+    asc_enable_hf32_trans_kernel<<<1, 0>>>(a_device, b_device, away_device, 1);
     aclrtSynchronizeDevice();
-    aclrtMemcpy(hf32.data(), ELEMENTS * sizeof(float), hf32_device, ELEMENTS * sizeof(float), ACL_MEMCPY_DEVICE_TO_HOST);
-    aclrtMemcpy(fp32.data(), ELEMENTS * sizeof(float), fp32_device, ELEMENTS * sizeof(float), ACL_MEMCPY_DEVICE_TO_HOST);
-    print_row("Input A row 0", a);
-    print_row("HF32 output row 0", hf32);
-    print_row("Restored FP32 output row 0", fp32);
-    print_row("FP32 golden row 0", golden);
-    bool passed = fp32 == golden && std::fabs(hf32[0] - fp32[0]) > 1e-5f;
-    std::cout << (passed ? "[Success] asc_set_fp32_mode restores full-precision MMAD."
-                         : "[Failed] asc_set_fp32_mode result mismatch.") << std::endl;
-    aclrtFree(a_device); aclrtFree(b_device); aclrtFree(hf32_device); aclrtFree(fp32_device);
+    asc_enable_hf32_trans_kernel<<<1, 0>>>(a_device, b_device, even_device, 0);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(nearest_away.data(), ELEMENTS * sizeof(float), away_device, ELEMENTS * sizeof(float), ACL_MEMCPY_DEVICE_TO_HOST);
+    aclrtMemcpy(nearest_even.data(), ELEMENTS * sizeof(float), even_device, ELEMENTS * sizeof(float), ACL_MEMCPY_DEVICE_TO_HOST);
+    print_row("Input tie row 0", a);
+    print_row("NEAREST_AWAY row 0", nearest_away);
+    print_row("NEAREST_EVEN row 0", nearest_even);
+    const bool passed = nearest_away == away_golden && nearest_even == even_golden;
+    std::cout << (passed ? "[Success] asc_enable_hf32_trans selects tie rounding."
+                         : "[Failed] asc_enable_hf32_trans result mismatch.") << std::endl;
+    aclrtFree(a_device); aclrtFree(b_device); aclrtFree(away_device); aclrtFree(even_device);
     aclrtResetDevice(0);
     aclFinalize();
     return passed ? 0 : 1;
