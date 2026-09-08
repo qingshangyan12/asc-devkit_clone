@@ -82,7 +82,7 @@ PIPE_MTE2
 - `len_burst`取值范围为[1, $2^{17}-1$]，超出取值范围的值会被截断，导致搬运结果不符合预期。
 - `src_stride`取值范围为[0, $2^{36}-1$]，超出取值范围的值会被截断，导致搬运结果不符合预期。
 - `dst_stride`取值范围为[0, $2^{17}-1$]，超出取值范围的值会被截断，导致搬运结果不符合预期。
-- `pad_mode`使用[asc_channel_pad_mode](../../defs/enum/asc_channel_pad_mode.md)的有效枚举值。使用填充模式时，通道填充值需要通过[asc_set_gm2l1_padding](../asc_set_gm2l1_padding.md)设置；该填充值区别于[asc_set_gm2l1_pad](../asc_set_gm2l1_pad.md)配置的burst左右填充。
+- `pad_mode`使用`asc_channel_pad_mode`的有效枚举值；padding值需要通过[asc_set_gm2l1_pad](../asc_set_gm2l1_pad.md)设置。
 - 对于插入padding值的场景：
   - `len_burst`的单位为32个字节的指的是写入L1 Buffer的实际数据数，它必须设置为`1`，此时一次仅从GM里读取1/2/4/8/16个字节的数据。
   - 每一次burst都是从GM中连续读取，`src_stride`设置为`0`即可。
