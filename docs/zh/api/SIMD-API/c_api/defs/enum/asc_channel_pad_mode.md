@@ -1,6 +1,12 @@
 # asc_channel_pad_mode
 
-asc_channel_pad_mode用于表示从GM搬运到L1 Buffer时的通道padding模式，可用于[asc_copy_gm2l1](../../cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md)高维切分数据搬运接口。
+asc_channel_pad_mode用于表示从GM搬运到L1 Buffer时的通道填充或删除数据模式，可用于[asc_copy_gm2l1](../../cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md)高维切分数据搬运接口。该模式为硬件`pad_func_mode`的类型化定义，对每个32字节通道数据块生效，取值范围为[0, 8]。
+
+`EXPAND_*`为写路径的填充模式，在目的数据中插入padding值。通道填充值通过[asc_set_gm2l1_padding](../../cube_datamove/asc_set_gm2l1_padding.md)设置。
+
+`COMPACT_*`为读路径的删除模式，从每个32字节源数据块中移除高位部分数据，仅保留低位有效区域。
+
+该枚举控制的是通道块内部的填充或删除，区别于通过[asc_set_gm2l1_pad](../../cube_datamove/asc_set_gm2l1_pad.md)配置的burst左右填充。
 
 ## 枚举类具体定义
 
@@ -22,14 +28,14 @@ enum class asc_channel_pad_mode : uint8_t {
 
 **表1** 枚举值说明
 
-|枚举值|通道padding模式|
-|------|-----------|
-| NONE | 不进行padding，每个32字节通道块保持不变。 |
-| EXPAND_1B | 每读取1字节源数据，插入31个padding值。 |
-| EXPAND_2B | 每读取2字节源数据，插入15个padding值。 |
-| EXPAND_4B | 每读取4字节源数据，插入14个padding值。 |
-| EXPAND_8B | 每读取8字节源数据，插入12个padding值。 |
-| EXPAND_16B | 每读取16字节源数据，插入8个padding值。 |
-| COMPACT_4B | 每个32字节源数据块丢弃高28字节，保留低4字节。 |
-| COMPACT_8B | 每个32字节源数据块丢弃高24字节，保留低8字节。 |
-| COMPACT_16B | 每个32字节源数据块丢弃高16字节，保留低16字节。 |
+|枚举值|数值|通道填充或删除数据模式|
+|------|---|-----------|
+| NONE | 0 | 不做padding，每个32字节通道数据块保持不变。 |
+| EXPAND_1B | 1 | 每有1个源字节，插入31个padding值，其中插入的每个padding的位宽为b8。 |
+| EXPAND_2B | 2 | 每有2个源字节，插入15个padding值，其中插入的每个padding的位宽为b16。 |
+| EXPAND_4B | 3 | 每有4个源字节，插入14个padding值，其中插入的每个padding的位宽为b16。 |
+| EXPAND_8B | 4 | 每有8个源字节，插入12个padding值，其中插入的每个padding的位宽为b16。 |
+| EXPAND_16B | 5 | 每有16个源字节，插入8个padding值，其中插入的每个padding的位宽为b16。 |
+| COMPACT_4B | 6 | 每个32字节源数据块移除28个最高有效位字节，只保留4个最低有效位字节。 |
+| COMPACT_8B | 7 | 每个32字节源数据块移除24个最高有效位字节，只保留8个最低有效位字节。 |
+| COMPACT_16B | 8 | 每个32字节源数据块移除16个最高有效位字节，只保留16个最低有效位字节。 |
