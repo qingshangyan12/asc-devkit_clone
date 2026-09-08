@@ -28,69 +28,92 @@
 
 namespace mc2_ops_hccl {
 
-template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1, typename InsAlgTemplate2, typename InsAlgTemplate3>
+template <
+    typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1, typename InsAlgTemplate2,
+    typename InsAlgTemplate3>
 class InsAllReduceParallelExecutor : public InsCollAlgBase {
 public:
     explicit InsAllReduceParallelExecutor();
     ~InsAllReduceParallelExecutor() override = default;
 
-    std::string Describe() const override
-    {
-        return "Instruction based AllReduce Parallel Executor.";
-    }
+    std::string Describe() const override { return "Instruction based AllReduce Parallel Executor."; }
 
-    HcclResult CalcRes(HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo, const AlgHierarchyInfoForAllLevel& algHierarchyInfo,
-                       AlgResourceRequest& resourceRequest) override;
+    HcclResult CalcRes(
+        HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+        const AlgHierarchyInfoForAllLevel& algHierarchyInfo, AlgResourceRequest& resourceRequest) override;
     HcclResult Orchestrate(const OpParam& param, const AlgResourceCtxSerializable& resCtx) override;
-    HcclResult CalcAlgHierarchyInfo(HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo, AlgHierarchyInfoForAllLevel& algHierarchyInfo) override;
+    HcclResult CalcAlgHierarchyInfo(
+        HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo, AlgHierarchyInfoForAllLevel& algHierarchyInfo) override;
 
 private:
     static u32 CalcRankIdInter(u32 i, u32 j, u32 part2);
     static u32 CalcRankIdIntra(u32 i, u32 j, u32 part1);
-    void FillDataMap(const u64 sliceCount, const u32 part1, const u32 part2, std::map<u32, std::pair<u64, u64>>& dataMap, bool isInter);
-    void FillOffsetMaps(const std::map<u32, std::pair<u64, u64>>& dataMap, const u32 part1, const u32 part2, std::map<u32, u64>& agMap, bool isInter);
+    void FillDataMap(
+        const u64 sliceCount, const u32 part1, const u32 part2, std::map<u32, std::pair<u64, u64>>& dataMap,
+        bool isInter);
+    void FillOffsetMaps(
+        const std::map<u32, std::pair<u64, u64>>& dataMap, const u32 part1, const u32 part2, std::map<u32, u64>& agMap,
+        bool isInter);
     void GetParallelDataSplit(std::vector<float>& splitDataSize) const;
     uint64_t GetRankSize(const std::vector<std::vector<u32>>& vTopo);
-    HcclResult PrepareResForTemplate(InsAlgTemplate0& tempAlgIntra, InsAlgTemplate1& tempAlgInter, InsAlgTemplate2& tempAlgIntra1);
-    HcclResult PrepareResForTemplate23(InsAlgTemplate0& tempAlgIntra, InsAlgTemplate2& tempAlgIntra1, InsAlgTemplate3& tempAlgInter1);
-    HcclResult PrepareResForTemplateResource(const OpParam& param, const AlgResourceCtxSerializable& resCtx, TemplateResource& intraTempAlgRes,
-                                             TemplateResource& interTempAlgRes, bool isRsStage);
-    void GenDataParamsBufferType(const BufferType inBuffType, const BufferType outBuffType, const BufferType hcclBuffType,
-                                 TemplateDataParams& dataParams) const;
-    void GenDataParamstempAlg(const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset, const u64 sliceCount,
-                              const u64 scratchOffsetCount, TemplateDataParams& dataParams, const u32 LocalRankSize,
-                              const u64 inputOffset, const u64 outputOffset, const u64 hcclBuffOffset) const;
-    void CalcInterDataAllRank(const u64 sliceCount, const u32 LocalRankSizePart1, const u32 LocalRankSizePart2, std::map<u32, std::pair<u64, u64>>& dataMap);
-    void CalcIntraDataAllRank(const u64 sliceCount, const u32 LocalRankSizePart1, const u32 LocalRankSizePart2, std::map<u32, std::pair<u64, u64>>& dataMap);
+    HcclResult PrepareResForTemplate(
+        InsAlgTemplate0& tempAlgIntra, InsAlgTemplate1& tempAlgInter, InsAlgTemplate2& tempAlgIntra1);
+    HcclResult PrepareResForTemplate23(
+        InsAlgTemplate0& tempAlgIntra, InsAlgTemplate2& tempAlgIntra1, InsAlgTemplate3& tempAlgInter1);
+    HcclResult PrepareResForTemplateResource(
+        const OpParam& param, const AlgResourceCtxSerializable& resCtx, TemplateResource& intraTempAlgRes,
+        TemplateResource& interTempAlgRes, bool isRsStage);
+    void GenDataParamsBufferType(
+        const BufferType inBuffType, const BufferType outBuffType, const BufferType hcclBuffType,
+        TemplateDataParams& dataParams) const;
+    void GenDataParamstempAlg(
+        const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset, const u64 sliceCount,
+        const u64 scratchOffsetCount, TemplateDataParams& dataParams, const u32 LocalRankSize, const u64 inputOffset,
+        const u64 outputOffset, const u64 hcclBuffOffset) const;
+    void CalcInterDataAllRank(
+        const u64 sliceCount, const u32 LocalRankSizePart1, const u32 LocalRankSizePart2,
+        std::map<u32, std::pair<u64, u64>>& dataMap);
+    void CalcIntraDataAllRank(
+        const u64 sliceCount, const u32 LocalRankSizePart1, const u32 LocalRankSizePart2,
+        std::map<u32, std::pair<u64, u64>>& dataMap);
     void PrePareDataParamstempAlgIntra(const u64 dataOffset, const u64 currCountPart, const u64 scratchOffsetCount);
     void PrePareDataParamstempAlgInter(const u64 dataOffset, const u64 currCountPart, const u64 scratchOffsetCount);
     void GenDataParamsAllRank(const u64 sliceCount, const u32 LocalRankSize, TemplateDataParams& dataParams) const;
-    HcclResult RunTemplateIntra0(const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset,
-                                  const u64 currCountPart, const u64 scratchOffsetCount, TemplateDataParams& dataParams,
-                                  TemplateResource& templateResource, InsAlgTemplate0& tempAlgInter);
-    HcclResult RunTemplateIntra1(const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset,
-                                  const u64 currCountPart, const u64 scratchOffsetCount, TemplateDataParams& dataParams,
-                                  TemplateResource& templateResource, InsAlgTemplate0& tempAlgInter);
-    HcclResult RunTemplateInter0(const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset,
-                                  const u64 currCountPart, const u64 scratchOffsetCount, TemplateDataParams& dataParams,
-                                  TemplateResource& templateResource, InsAlgTemplate1& tempAlgInter);
-    HcclResult RunTemplateInter1(const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset,
-                                  const u64 currCountPart, const u64 scratchOffsetCount, TemplateDataParams& dataParams,
-                                  TemplateResource& templateResource, InsAlgTemplate1& tempAlgInter);
-    HcclResult RunTemplateInter01(const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset,
-                                  const u64 currCountPart, const u64 scratchOffsetCount, TemplateDataParams& dataParams,
-                                  TemplateResource& templateResource, InsAlgTemplate3& tempAlgInter1);
-    HcclResult RunTemplateIntra01(const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset,
-                                        const u64 currCountPart, const u64 scratchOffsetCount, TemplateDataParams& dataParams,
-                                        TemplateResource& templateResource, InsAlgTemplate2& tempAlgIntra1);
-    HcclResult RunTemplateIntra11(const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset,
-                                  const u64 currCountPart, const u64 scratchOffsetCount, TemplateDataParams& dataParams,
-                                  TemplateResource& templateResource, InsAlgTemplate2& tempAlgInter1);
-    HcclResult RunTemplateInter11(const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset,
-                                        const u64 currCountPart, const u64 scratchOffsetCount, TemplateDataParams& dataParams,
-                                        TemplateResource& templateResource, InsAlgTemplate3& tempAlgInter1);
-    HcclResult GenInsQues(const OpParam& param, const AlgResourceCtxSerializable& resCtx, InsAlgTemplate0& tempAlgIntra0,
-                          InsAlgTemplate1& tempAlgInter0, InsAlgTemplate2& tempAlgIntra1, InsAlgTemplate3& tempAlgInter1);
+    HcclResult RunTemplateIntra0(
+        const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset, const u64 currCountPart,
+        const u64 scratchOffsetCount, TemplateDataParams& dataParams, TemplateResource& templateResource,
+        InsAlgTemplate0& tempAlgInter);
+    HcclResult RunTemplateIntra1(
+        const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset, const u64 currCountPart,
+        const u64 scratchOffsetCount, TemplateDataParams& dataParams, TemplateResource& templateResource,
+        InsAlgTemplate0& tempAlgInter);
+    HcclResult RunTemplateInter0(
+        const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset, const u64 currCountPart,
+        const u64 scratchOffsetCount, TemplateDataParams& dataParams, TemplateResource& templateResource,
+        InsAlgTemplate1& tempAlgInter);
+    HcclResult RunTemplateInter1(
+        const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset, const u64 currCountPart,
+        const u64 scratchOffsetCount, TemplateDataParams& dataParams, TemplateResource& templateResource,
+        InsAlgTemplate1& tempAlgInter);
+    HcclResult RunTemplateInter01(
+        const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset, const u64 currCountPart,
+        const u64 scratchOffsetCount, TemplateDataParams& dataParams, TemplateResource& templateResource,
+        InsAlgTemplate3& tempAlgInter1);
+    HcclResult RunTemplateIntra01(
+        const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset, const u64 currCountPart,
+        const u64 scratchOffsetCount, TemplateDataParams& dataParams, TemplateResource& templateResource,
+        InsAlgTemplate2& tempAlgIntra1);
+    HcclResult RunTemplateIntra11(
+        const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset, const u64 currCountPart,
+        const u64 scratchOffsetCount, TemplateDataParams& dataParams, TemplateResource& templateResource,
+        InsAlgTemplate2& tempAlgInter1);
+    HcclResult RunTemplateInter11(
+        const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset, const u64 currCountPart,
+        const u64 scratchOffsetCount, TemplateDataParams& dataParams, TemplateResource& templateResource,
+        InsAlgTemplate3& tempAlgInter1);
+    HcclResult GenInsQues(
+        const OpParam& param, const AlgResourceCtxSerializable& resCtx, InsAlgTemplate0& tempAlgIntra0,
+        InsAlgTemplate1& tempAlgInter0, InsAlgTemplate2& tempAlgIntra1, InsAlgTemplate3& tempAlgInter1);
     inline u64 RoundDown(u64 dividend, u64 divisor) const
     {
         if (divisor == 0) {
