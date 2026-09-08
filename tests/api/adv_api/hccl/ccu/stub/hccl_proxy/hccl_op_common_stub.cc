@@ -216,6 +216,12 @@ HcclResult SetCommEngine(OpParam& param)
 
 HcclResult InitEnvConfig() { return HcclResult::HCCL_SUCCESS; }
 
+bool GetExternalInputExecTimeout(double& execTimeOut)
+{
+    execTimeOut = 0;
+    return false;
+}
+
 static bool ReadEnvVarCcuMSMode()
 {
     const char* envValue = std::getenv("HCCL_OP_EXPANSION_MODE");
