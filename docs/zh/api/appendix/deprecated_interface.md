@@ -498,7 +498,7 @@
 - [asc_set_l13d_padding（废弃）](../SIMD-API/c_api/deprecated_interface/asc_set_l13d_padding_deprecated.md)接口：请使用[asc_set_l12l0a_3d_padding](../SIMD-API/c_api/cube_datamove/asc_set_l12l0a_3d_padding.md)接口。
 - [asc_set_l0c2gm_relu_alpha（废弃）](../SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_relu_alpha_deprecated.md)接口：请使用[asc_set_l0c_copy_relu_alpha](../SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_relu_alpha.md)接口。
 - [asc_set_l0c2gm_lrelu_alpha（废弃）](../SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_lrelu_alpha_deprecated.md)接口：请使用[asc_set_l0c_copy_lrelu_alpha](../SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_lrelu_alpha.md)接口。
-- [asc_copy_gm2l1_align（废弃）](../SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_align_deprecated.md)接口：旧常规重载及`asc_copy_gm2l1_align_sync`已废弃。
+- [asc_copy_gm2l1_align（废弃）](../SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_align_deprecated.md)接口（旧常规重载和同步接口）：请使用[asc_copy_gm2l1_align](../SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_align.md)接口和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口替代。
 - [asc_copy_gm2l1_dn2nz（废弃）](../SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_dn2nz_deprecated.md)接口：旧常规重载及`asc_copy_gm2l1_dn2nz_sync`已废弃。
 - [asc_copy_gm2l1_nd2nz（废弃）](../SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_nd2nz_deprecated.md)接口：旧常规重载及`asc_copy_gm2l1_nd2nz_sync`已废弃。
 - [asc_copy_gm2l1（高维切分旧形式，废弃）](../SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_highdim_deprecated.md)接口：请使用`asc_channel_pad_mode`参数。
