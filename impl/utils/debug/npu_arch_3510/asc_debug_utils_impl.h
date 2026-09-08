@@ -124,20 +124,10 @@ __simd_callee__ __ubuf__ inline BlockVFBufInfo* get_printf_ubuf_addr(uint64_t ad
     return bufInfo;
 }
 
-__simd_callee__ inline void wait_vf_assert_handshake()
+__simd_callee__ inline void wait_vf_assert_published()
 {
-    __ubuf__ BlockVFBufInfo* block_info = get_printf_ubuf_addr(0);
-    wait_vf_debug_buffer_drained(block_info);
-    // Nobody left to acknowledge the handshake; drop the message but still let the caller trap.
-    if (block_info->flag != 0) {
-        return;
-    }
-    __ubuf__ volatile BlockVFBufInfo::AssertState* assertFlag = &block_info->assertFlag;
-    *assertFlag = BlockVFBufInfo::AssertState::RAISED;
-    while (*assertFlag != BlockVFBufInfo::AssertState::DRAINED) {
-        if (block_info->flag != 0) {
-            break;
-        }
+    __ubuf__ volatile BlockVFBufInfo* blockInfo = get_printf_ubuf_addr(0);
+    while (blockInfo->assertFlag == 0 && blockInfo->flag == 0) {
         __asm__ __volatile__("");
     }
 }
@@ -294,7 +284,8 @@ __aicore__ inline void update_write_info(
     asc_entire_dcci_impl(reinterpret_cast<__gm__ uint64_t*>(writeInfo));
 }
 
-__aicore__ static bool count_vf_tlv_packages(__ubuf__ uint8_t* tlv, uint32_t tlvLen, uint32_t& packageNum)
+__aicore__ static bool inspect_vf_tlv_packages(
+    __ubuf__ uint8_t* tlv, uint32_t tlvLen, uint32_t& packageNum, bool& hasAssert)
 {
     constexpr uint32_t tlvHeadLen = 2 * sizeof(uint32_t);
 
@@ -308,6 +299,7 @@ __aicore__ static bool count_vf_tlv_packages(__ubuf__ uint8_t* tlv, uint32_t tlv
             return false;
         }
 
+        hasAssert = hasAssert || head[0] == static_cast<uint32_t>(DumpType::DUMP_ASSERT);
         offset += tlvHeadLen + payloadLen;
         packageNum += 1;
     }
@@ -322,7 +314,8 @@ __aicore__ inline void asc_vf_debug_publish(
     __ubuf__ uint8_t* tlv = reinterpret_cast<__ubuf__ uint8_t*>(blockInfo->buffer) + curReadLen;
 
     uint32_t packageNum = 0;
-    if (!count_vf_tlv_packages(tlv, tlvLen, packageNum)) {
+    bool hasAssert = false;
+    if (!inspect_vf_tlv_packages(tlv, tlvLen, packageNum, hasAssert)) {
         blockInfo->flag = 1;
         return;
     }
@@ -334,10 +327,18 @@ __aicore__ inline void asc_vf_debug_publish(
     if (tlvLen > blockRingBufInfo->ringBufLen || sizeof(SkipTlv) >= blockRingBufInfo->ringBufLen) {
         blockInfo->readLen = curWriteLen;
         blockInfo->flag = 1;
+        if (hasAssert) {
+            trap();
+        }
         return;
     }
     // Remaining failures are transient (RTS lagging); keep retrying.
     if (!check_ringbuf_space(debugBlockInfo, tlvLen)) {
+        if (hasAssert) {
+            blockInfo->readLen = curWriteLen;
+            blockInfo->flag = 1;
+            trap();
+        }
         return;
     }
     __gm__ uint8_t* dstTlv = reinterpret_cast<__gm__ uint8_t*>(call_get_ring_buf_tlv(blockRingBufInfo));
@@ -357,6 +358,10 @@ __aicore__ inline void asc_vf_debug_publish(
     __gm__ RingBufWriteInfo* writeInfo = get_ring_buf_write_info(blockRingBufInfo);
     update_write_info(writeInfo, tlvLen, packageNum);
     blockInfo->readLen = curWriteLen;
+    if (hasAssert) {
+        blockInfo->assertFlag = 1;
+        trap();
+    }
 }
 
 __aicore__ inline bool asc_vf_debug_ub2gm()
@@ -383,15 +388,10 @@ __aicore__ inline bool asc_vf_debug_ub2gm()
 
         if (curReadLen < curWriteLen) {
             asc_vf_debug_publish(blockInfo, curWriteLen, curReadLen);
-            if (blockInfo->flag != 0) {
+            if (blockInfo->flag != 0 || blockInfo->assertFlag != 0) {
                 break;
             }
             continue;
-        }
-
-        if (vInfo->assertFlag == BlockVFBufInfo::AssertState::RAISED) {
-            vInfo->assertFlag = BlockVFBufInfo::AssertState::DRAINED;
-            break;
         }
 
         if (vInfo->finish == 1) {
