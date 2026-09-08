@@ -69,75 +69,45 @@ quant_pre_mode量化模式参数支持的枚举值如下：
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_copy_l0c2l1(
-    __cbuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
-    uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
-    uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
-__aicore__ inline void asc_copy_l0c2l1(
-    __cbuf__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
-    uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
-    uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
-__aicore__ inline void asc_copy_l0c2l1(
-    __cbuf__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
-    uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
-    uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
-__aicore__ inline void asc_copy_l0c2l1(
-    __cbuf__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
-    uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
-    uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
-__aicore__ inline void asc_copy_l0c2l1(
-    __cbuf__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
-    uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
-    uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
-__aicore__ inline void asc_copy_l0c2l1(
-    __cbuf__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
-    uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
-    uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
-__aicore__ inline void asc_copy_l0c2l1(
-    __cbuf__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
-    uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
-    uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
-__aicore__ inline void asc_copy_l0c2l1(
-    __cbuf__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
-    uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
-    uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
-__aicore__ inline void asc_copy_l0c2l1(
-    __cbuf__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
-    uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
-    uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
-__aicore__ inline void asc_copy_l0c2l1(
-    __cbuf__ int4b_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
-    uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
-    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
-    uint64_t quant_post, uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op,
-    bool eltwise_antq_en, bool c0_pad_en, bool broadcast_en, bool enable_nz2dn)
-__aicore__ inline void asc_copy_l0c2l1_sync(
-    __cbuf__ int4b_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
-    uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
-    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
-    uint64_t quant_post, uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op,
-    bool eltwise_antq_en, bool c0_pad_en, bool broadcast_en, bool enable_nz2dn)
-__aicore__ inline void asc_copy_l0c2l1(
-    __cbuf__ int4b_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
-    uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
-    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
-    uint64_t quant_post, uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op,
-    bool eltwise_antq_en, bool c0_pad_en, bool broadcast_en, bool enable_nz2dn)
-__aicore__ inline void asc_copy_l0c2l1_sync(
-    __cbuf__ int4b_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
-    uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
-    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
-    uint64_t quant_post, uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op,
-    bool eltwise_antq_en, bool c0_pad_en, bool broadcast_en, bool enable_nz2dn)
+__aicore__ inline void asc_copy_l0c2l1(__cbuf__ <dst_dtype>* dst,
+                                       __cc__ <src_dtype>* src,
+                                       uint16_t n_size,
+                                       uint16_t m_size,
+                                       uint32_t dst_stride,
+                                       uint16_t src_stride,
+                                       asc_unit_flag_mode unit_flag_mode,
+                                       asc_quant_mode quant_pre_mode,
+                                       asc_relu_pre_mode relu_pre_mode,
+                                       bool enable_channel_split,
+                                       bool enable_nz2nd,
+                                       bool enable_nz2dn,
+                                       bool enable_clip_relu_pre)
+```
+
+### dtype支持的数据类型
+
+src dtype与dst dtype支持以下组合：
+
+- `src_dtype`为`int32_t`时，`dst_dtype`支持`int4b_t`、`int8_t`、`uint8_t`、`half`、`bfloat16_t`、`int32_t`。
+- `src_dtype`为`float`时，`dst_dtype`支持`int4b_t`、`int8_t`、`uint8_t`、`fp8_e4m3fn_t`、`hifloat8_t`、`half`、`bfloat16_t`、`float`。
+
+### 函数原型典型示例
+
+```cpp
+// 示例：将float类型数据转换为bfloat16_t类型后搬运。
+__aicore__ inline void asc_copy_l0c2l1(__cbuf__ bfloat16_t* dst,
+                                       __cc__ float* src,
+                                       uint16_t n_size,
+                                       uint16_t m_size,
+                                       uint32_t dst_stride,
+                                       uint16_t src_stride,
+                                       asc_unit_flag_mode unit_flag_mode,
+                                       asc_quant_mode quant_pre_mode,
+                                       asc_relu_pre_mode relu_pre_mode,
+                                       bool enable_channel_split,
+                                       bool enable_nz2nd,
+                                       bool enable_nz2dn,
+                                       bool enable_clip_relu_pre)
 ```
 
 ## 参数说明
@@ -152,21 +122,13 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
 | m_size | 输入 | 源NZ矩阵在M方向上的大小。<br>&nbsp;&nbsp;&bull; 不开启NZ2ND功能，取值范围：[1, 65535]；<br>&nbsp;&nbsp;&bull; 开启NZ2ND功能，取值范围：[1, 8192]。 |
 | dst_stride | 输入 | &nbsp;&nbsp;&bull; 若不开启NZ2ND功能，dst_stride表示目的NZ矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：element。<br>&nbsp;&nbsp;&bull; 若开启NZ2ND/NZ2DN功能，dst_stride表示目的ND矩阵每一行中的元素个数，取值不为0，单位：element。 |
 | src_stride | 输入 | 源NZ矩阵中相邻Z排布的起始地址偏移，取值范围：[0, 65535]，单位：C0_Size(16*sizeof(T)，T为src的数据类型)。 |
-| l2_cache_mode | 输入 | 无效参数，用户无需关注，传入0即可。 |
-| enable_clip_relu_pre | 输入 | 是否开启Clip ReLU，需搭配Normal ReLU一起使用，且需要开启量化功能，取值如下：<br>&nbsp;&nbsp;&bull; 0：不开启Clip ReLU；<br>&nbsp;&nbsp;&bull; 1：开启Clip ReLU（scalar 模式）。 |
-| unit_flag_mode | 输入 | unit_flag是mmad类指令和矩阵搬出类指令细粒度的并行功能，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：<br>&nbsp;&nbsp;&bull; 0：不开启unit_flag；<br>&nbsp;&nbsp;&bull; 2：开启unit_flag，硬件执行完指令之后，不复位单元标记位；<br>&nbsp;&nbsp;&bull; 3：开启unitFlag，硬件执行完指令之后，复位单元标记位。<br>开启该功能时，须将mmad类指令和矩阵搬出类指令的unit_flag值设置为2或3。 |
+| unit_flag_mode | 输入 | unit_flag是mmad类指令和矩阵搬出类指令细粒度的并行功能，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：<br>&nbsp;&nbsp;&bull; `asc_unit_flag_mode::DISABLE`：不开启unit_flag；<br>&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_KEEP`：开启unit_flag，硬件执行完指令之后，不复位单元标记位；<br>&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_UPDATE`：开启unitFlag，硬件执行完指令之后，复位单元标记位。<br>开启该功能时，须将mmad类指令和矩阵搬出类指令的unit_flag值设置为`asc_unit_flag_mode::ENABLE_KEEP`或`asc_unit_flag_mode::ENABLE_UPDATE`。 |
 | quant_pre_mode | 输入 | 预处理阶段量化参数。取值见[功能说明](#功能说明)。 |
-| relu_pre_mode | 输入 | 预处理阶段ReLU模式控制，取值如下：<br>&nbsp;&nbsp;&bull; 0：不开启ReLU；<br>&nbsp;&nbsp;&bull; 1：开启Normal ReLU；<br>&nbsp;&nbsp;&bull; 2：开启Scalar ReLU；<br>&nbsp;&nbsp;&bull; 3：开启Vector ReLU。 |
+| relu_pre_mode | 输入 | 预处理阶段ReLU模式控制，取值如下：<br>&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NONE`：不开启ReLU；<br>&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NORMAL`：开启Normal ReLU；<br>&nbsp;&nbsp;&bull; `asc_relu_pre_mode::SCALAR`：开启Scalar ReLU；<br>&nbsp;&nbsp;&bull; `asc_relu_pre_mode::VECTOR`：开启Vector ReLU。 |
 | enable_channel_split | 输入 | 是否开启通道拆分的功能。仅在src和dst都为float时才能开启Channel Split，且不能同时开启Channel Split和NZ2ND功能。<br>&nbsp;&nbsp;&bull; false：不开启；<br>&nbsp;&nbsp;&bull; true：开启。 |
 | enable_nz2nd | 输入 | 是否开启NZ2ND功能。<br>&nbsp;&nbsp;&bull; false：不开启；<br>&nbsp;&nbsp;&bull; true：开启。 |
-| quant_post | 输入 | 无效参数，用户无需关注，传入0即可。 |
-| relu_post | 输入 | 无效参数，用户无需关注，传入0即可。 |
-| clip_relu_post | 输入 | 无效参数，用户无需关注，传入false即可。 |
-| eltwise_op | 输入 | 无效参数，用户无需关注，传入0即可。 |
-| eltwise_antq_en | 输入 | 无效参数，用户无需关注，传入false或0即可。 |
-| c0_pad_en | 输入 | 无效参数，用户无需关注，传入false即可。 |
-| broadcast_en | 输入 | 无效参数，用户无需关注，传入false即可。 |
 | enable_nz2dn | 输入 | 是否开启NZ2DN功能。<br>&nbsp;&nbsp;&bull; false：不开启；<br>&nbsp;&nbsp;&bull; true：开启。 |
+| enable_clip_relu_pre | 输入 | 是否开启Clip ReLU，需搭配Normal ReLU一起使用，且需要开启量化功能，取值如下：<br>&nbsp;&nbsp;&bull; `false`：不开启Clip ReLU；<br>&nbsp;&nbsp;&bull; `true`：开启Clip ReLU（scalar 模式）。 |
 
 ## 返回值说明
 
@@ -192,20 +154,14 @@ uint16_t n_size = 64;
 uint16_t m_size = 128;
 uint32_t dst_stride = 2048;
 uint16_t src_stride = 128;
-uint8_t enable_clip_relu_pre = 0;
-uint8_t unit_flag_mode = 0;
-uint64_t quant_pre_mode = QuantMode_t::NoQuant;
-uint8_t relu_pre_mode = 0;
+asc_unit_flag_mode unit_flag_mode = asc_unit_flag_mode::DISABLE;
+asc_quant_mode quant_pre_mode = asc_quant_mode::NoQuant;
+asc_relu_pre_mode relu_pre_mode = asc_relu_pre_mode::NONE;
 bool enable_channel_split = false;
 bool enable_nz2nd = false;
-uint64_t quant_post = 0;  // 无效参数
-uint8_t relu_post = 0;  // 无效参数
-bool clip_relu_post = false;  // 无效参数
-uint8_t eltwise_op = 0;  // 无效参数
-uint8_t eltwise_antq_en = 0;  // 无效参数
-bool c0_pad_en = false;  // 无效参数
+bool enable_nz2dn = false;
+bool enable_clip_relu_pre = false;
 asc_copy_l0c2l1(
-    dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode,
-    quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, quant_post, relu_post,
-    clip_relu_post, eltwise_op, eltwise_antq_en, c0_pad_en);
+    dst, src, n_size, m_size, dst_stride, src_stride, unit_flag_mode, quant_pre_mode, relu_pre_mode,
+    enable_channel_split, enable_nz2nd, enable_nz2dn, enable_clip_relu_pre);
 ```
