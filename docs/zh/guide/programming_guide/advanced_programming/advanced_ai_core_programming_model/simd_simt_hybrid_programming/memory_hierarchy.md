@@ -52,13 +52,23 @@ UB内存空间总大小为256KB。UB按功能划分为四个主要区域，从�
 
 > [!NOTE]说明
 >
-> 用户可选择禁用预留空间，禁用方法为：编译时增加[--cce-disable-vf-stack-reserved-ubuf](../../../compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#ZH-CN_TOPIC_0000002462746461)选项。开启该选项后，编译器不再预留该部分UB空间，该空间可作为普通UB空间使用，Data Cache空间可按如下公式估算：
+> 用户可选择禁用预留空间，禁用方法为编译时增加如下编译选项：
+>
+>- [--cce-disable-vf-stack-reserved-ubuf](../../../compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#ZH-CN_TOPIC_0000002462746461): 关闭VF栈参数中转空间(6KB)
+>- [--cce-disable-asc-reserved-ubuf](../../../compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#ZH-CN_TOPIC_0000002462746461): 关闭Ascend C SIMD接口使用预留空间(2KB)
+>
+> 以上编译选项可独立使用，也可同时使用。开启后，编译器不再预留对应部分UB空间，该空间可作为普通UB空间使用。
+>
+> 例如，若同时增加以上两个编译选项，Data Cache空间计算公式为：
 > ```
-> Data Cache空间大小 = min(UB总大小（256KB） - 静态内存 - 动态内存 - 预留空间（8KB）, 128KB)
+> Data Cache空间大小 = min(UB总大小（256KB） - 静态内存 - 动态内存, 128KB)
 > ```
-> 使用该选项时，仍需保证Data Cache空间不小于32KB，且Data Cache空间上限仍为128KB。开启该选项后，编译器将无法使用预留UB空间作为寄存器溢出的缓存空间，开发者需保证不会发生寄存器溢出。
+> 另外，开发者需要自行确认禁用预留空间的影响：
+>
+>- 开启`--cce-disable-vf-stack-reserved-ubuf`后，编译器将无法使用预留UB空间作为寄存器溢出的缓存空间，开发者需保证不会发生寄存器溢出。
+>- 开启`--cce-disable-vf-stack-reserved-ubuf`后，[使用预留UB空间的API](../../../programming_model/ai_core_simd_programming/cpp_tensor_programming/static_tensor_programming.md#使用预留ub空间的api范围)无法正常使用，需要手动调整API调用方式或替换为不依赖预留UB空间的实现。
 
-混合编程模式下，可在SIMT VF、SIMD VF和MainScalar执行空间申使用动静态内存。MainScalar是指Device侧在VF函数外部的执行空间。下图为不同执行空间申请内存时对应的UB内存排布示意图。
+混合编程模式下，可在SIMT VF、SIMD VF和MainScalar执行空间中使用动静态内存。MainScalar是指Device侧在VF函数外部的执行空间。下图为不同执行空间申请内存时对应的UB内存排布示意图。
 
 **图3** 不同执行空间的UB内存排布  
 <img src="../../../../figures/simt_layout.png" alt="内存排布">
