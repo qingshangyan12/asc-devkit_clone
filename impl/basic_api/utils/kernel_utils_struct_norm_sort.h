@@ -248,7 +248,7 @@ template <typename T>
 constexpr __aicore__ inline half GetScalarBitcodeToHalf(T scalarValue)
 {
     union ScalarBitcode {
-        // __callee__ ScalarBitcode() {}
+        __callee__ ScalarBitcode() {}
         T input;
         half output;
     } data;
