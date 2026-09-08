@@ -21,7 +21,6 @@
 #include "impl/c_api/reg_base_impl/utils_intf_impl.h"
 #include "impl/c_api/reg_base_impl/vector_datamove_intf_impl.h"
 
-// asc_set_gm2ub_pad_impl.h
 __aicore__ inline void asc_set_gm2ub_pad_impl(uint32_t pad_val)
 {
     if ASC_IS_AIV {
@@ -29,7 +28,6 @@ __aicore__ inline void asc_set_gm2ub_pad_impl(uint32_t pad_val)
     }
 }
 
-// vector_datamove_impl.h
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
              "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_ndim_copy_gm2ub(

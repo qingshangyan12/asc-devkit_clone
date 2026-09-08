@@ -21,16 +21,13 @@
 #include "impl/c_api/reg_base_impl/atomic_intf_impl.h"
 #include "impl/c_api/reg_base_impl/utils_intf_impl.h"
 
-// asc_set_atomic_none_impl.h
 __aicore__ inline void asc_set_atomic_none_impl() { set_atomic_none(); }
 
-// asc_get_store_atomic_config_impl.h
 __aicore__ inline void asc_get_store_atomic_config_impl(asc_store_atomic_config& config)
 {
     config.config = get_st_atomic_cfg();
 }
 
-// asc_set_store_atomic_config_impl.h
 __aicore__ inline void asc_set_store_atomic_config_v2_impl(uint16_t type, uint16_t op)
 {
     constexpr uint64_t type_mask = 0x15;
@@ -40,28 +37,24 @@ __aicore__ inline void asc_set_store_atomic_config_v2_impl(uint16_t type, uint16
     set_st_atomic_cfg(config);
 }
 
-// asc_set_atomic_add_int_impl.h
 __aicore__ inline void asc_set_atomic_add_int_impl()
 {
     set_atomic_add();
     set_atomic_s32();
 }
 
-// asc_set_atomic_max_int_impl.h
 __aicore__ inline void asc_set_atomic_max_int_impl()
 {
     set_atomic_max();
     set_atomic_s32();
 }
 
-// asc_set_atomic_min_int_impl.h
 __aicore__ inline void asc_set_atomic_min_int_impl()
 {
     set_atomic_min();
     set_atomic_s32();
 }
 
-// atomic_impl.h
 [[deprecated("NOTICE: asc_set_atomic_none is deprecated. Please use asc_disable_dma_atomic instead.")]]
 __aicore__ inline void asc_set_atomic_none()
 {

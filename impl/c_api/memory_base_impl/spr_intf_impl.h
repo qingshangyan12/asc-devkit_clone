@@ -20,13 +20,10 @@
 #include "c_api/defs/defs.h"
 #include "impl/c_api/memory_base_impl/utils_intf_impl.h"
 
-// asc_get_ctrl_impl.h
 __aicore__ inline int64_t asc_get_ctrl_impl() { return get_ctrl(); }
 
-// asc_set_ctrl_impl.h
 __aicore__ inline void asc_set_ctrl_impl(uint64_t config) { set_ctrl(config); }
 
-// sys_var_impl.h
 __aicore__ inline int64_t asc_get_ctrl() { return asc_get_ctrl_impl(); }
 
 __aicore__ inline void asc_set_ctrl(uint64_t config) { asc_set_ctrl_impl(config); }

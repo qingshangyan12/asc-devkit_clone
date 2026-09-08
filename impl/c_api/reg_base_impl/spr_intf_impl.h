@@ -20,18 +20,14 @@
 #include "c_api/defs/defs.h"
 #include "impl/c_api/reg_base_impl/utils_intf_impl.h"
 
-// asc_get_ar_spr_impl.h
 __aicore__ inline int64_t asc_get_ar_spr_impl() { return get_ar(); }
 
 __aicore__ inline int64_t asc_get_squeeze_status_impl() { return asc_get_ar_spr_impl(); }
 
-// asc_set_ctrl_impl.h
 __aicore__ inline void asc_set_ctrl_impl(uint64_t config) { set_ctrl(config); }
 
-// asc_get_ctrl_impl.h
 __aicore__ inline int64_t asc_get_ctrl_impl() { return get_ctrl(); }
 
-// asc_set_saturation_flag_impl.h
 __aicore__ inline void asc_set_saturation_flag_impl(asc_saturation_mode saturation_mode, bool enable_sat)
 {
     // Enum underlying values are CTRL bit indices. INT: 1=sat; FLOAT/FLOAT8/CAST: 0=sat.
@@ -40,7 +36,6 @@ __aicore__ inline void asc_set_saturation_flag_impl(asc_saturation_mode saturati
     set_ctrl(is_bit_set ? sbitset1(get_ctrl(), bit) : sbitset0(get_ctrl(), bit));
 }
 
-// asc_get_saturation_flag_impl.h
 __aicore__ inline bool asc_get_saturation_flag_impl(asc_saturation_mode saturation_mode)
 {
     // Enum underlying values are CTRL bit indices. INT: 1=sat; FLOAT/FLOAT8/CAST: 0=sat.
@@ -49,7 +44,6 @@ __aicore__ inline bool asc_get_saturation_flag_impl(asc_saturation_mode saturati
     return (saturation_mode == asc_saturation_mode::INT) ? is_bit_set : !is_bit_set;
 }
 
-// asc_set_saturation_strategy_impl.h
 __aicore__ inline void asc_set_saturation_strategy_impl(asc_override_strategy strategy)
 {
     // CTRL[60]: 0 => USE_API, 1 => USE_GLOBAL. Aligns with AscendC::SetSaturationStrategy.
@@ -60,7 +54,6 @@ __aicore__ inline void asc_set_saturation_strategy_impl(asc_override_strategy st
                                                      sbitset1(ctrl_value, SATURATION_STRATEGY_BIT));
 }
 
-// asc_get_saturation_strategy_impl.h
 __aicore__ inline asc_override_strategy asc_get_saturation_strategy_impl()
 {
     // CTRL[60]: 0 => USE_API, 1 => USE_GLOBAL. Aligns with AscendC::GetSaturationStrategy.
@@ -68,7 +61,6 @@ __aicore__ inline asc_override_strategy asc_get_saturation_strategy_impl()
     return value == 0 ? asc_override_strategy::USE_API : asc_override_strategy::USE_GLOBAL;
 }
 
-// sys_var_impl.h
 __aicore__ inline int64_t asc_get_squeeze_status() { return asc_get_squeeze_status_impl(); }
 
 __aicore__ inline void asc_set_ctrl(uint64_t config) { asc_set_ctrl_impl(config); }

@@ -20,7 +20,6 @@
 #include "c_api/defs/defs.h"
 #include "impl/c_api/reg_base_impl/utils_intf_impl.h"
 
-// asc_set_vector_mask_impl.h
 __aicore__ inline void asc_set_vector_mask_impl(uint64_t mask_high, uint64_t mask_low)
 {
     if ASC_IS_AIV {
@@ -28,7 +27,6 @@ __aicore__ inline void asc_set_vector_mask_impl(uint64_t mask_high, uint64_t mas
     }
 }
 
-// asc_bitsort_impl.h
 __aicore__ inline void asc_bitsort_impl(
     __ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat)
 {
@@ -47,7 +45,6 @@ __aicore__ inline void asc_bitsort_impl(
     }
 }
 
-// asc_mrgsort4_impl.h
 __aicore__ inline void asc_mrgsort4_impl(
     __ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0,
     uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension,
@@ -72,7 +69,6 @@ __aicore__ inline void asc_mrgsort4_impl(
     }
 }
 
-// asc_transpose_impl.h
 __aicore__ inline void asc_transpose_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src)
 {
     if ASC_IS_AIV {
@@ -87,7 +83,6 @@ __aicore__ inline void asc_transpose_impl(__ubuf__ uint16_t* dst, __ubuf__ uint1
     }
 }
 
-// asc_transto5hd_impl.h
 #define ASC_TRANSTO5HD_B8_CALL(dst_va, src_va, repeat, dst_stride, src_stride, dst_high_half, src_high_half) \
     do {                                                                                                     \
         if (!(dst_high_half)) {                                                                              \
@@ -226,7 +221,6 @@ __aicore__ inline void asc_transto5hd_b32_impl(
     }
 }
 
-// asc_set_va_reg_impl.h
 __aicore__ inline void asc_set_va_reg_impl(ub_addr8_t addr, __ubuf__ int8_t** src_array)
 {
     if ASC_IS_AIV {
@@ -315,7 +309,6 @@ __aicore__ inline void asc_set_va_reg_impl(ub_addr8_t addr, __ubuf__ float** src
     }
 }
 
-// vector_compute_impl.h
 // ==========asc_set_vector_mask==========
 __aicore__ inline void asc_set_vector_mask(uint64_t mask_high, uint64_t mask_low)
 {

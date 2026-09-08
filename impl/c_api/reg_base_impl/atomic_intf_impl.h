@@ -20,136 +20,116 @@
 #include "c_api/defs/defs.h"
 #include "impl/c_api/reg_base_impl/utils_intf_impl.h"
 
-// asc_set_atomic_add_float16_impl.h
 __aicore__ inline void asc_set_atomic_add_float16_impl()
 {
     set_atomic_add();
     set_atomic_f16();
 }
 
-// asc_set_atomic_max_float_impl.h
 __aicore__ inline void asc_set_atomic_max_float_impl()
 {
     set_atomic_max();
     set_atomic_f32();
 }
 
-// asc_set_atomic_add_bfloat_impl.h
 __aicore__ inline void asc_set_atomic_add_bfloat_impl()
 {
     set_atomic_add();
     set_atomic_bf16();
 }
 
-// asc_set_atomic_min_float_impl.h
 __aicore__ inline void asc_set_atomic_min_float_impl()
 {
     set_atomic_min();
     set_atomic_f32();
 }
 
-// asc_disable_dma_atomic_impl.h
 __aicore__ inline void asc_disable_dma_atomic_impl() { set_atomic_none(); }
 
-// asc_set_atomic_add_float_impl.h
 __aicore__ inline void asc_set_atomic_add_float_impl()
 {
     set_atomic_f32();
     set_atomic_add();
 }
 
-// asc_set_atomic_max_float16_impl.h
 __aicore__ inline void asc_set_atomic_max_float16_impl()
 {
     set_atomic_f16();
     set_atomic_max();
 }
 
-// asc_set_atomic_min_bfloat_impl.h
 __aicore__ inline void asc_set_atomic_min_bfloat_impl()
 {
     set_atomic_min();
     set_atomic_bf16();
 }
 
-// asc_set_atomic_max_bfloat_impl.h
 __aicore__ inline void asc_set_atomic_max_bfloat_impl()
 {
     set_atomic_max();
     set_atomic_bf16();
 }
 
-// asc_set_atomic_min_float16_impl.h
 __aicore__ inline void asc_set_atomic_min_float16_impl()
 {
     set_atomic_min();
     set_atomic_f16();
 }
 
-// asc_set_atomic_add_int8_impl.h
 __aicore__ inline void asc_set_atomic_add_int8_impl()
 {
     set_atomic_add();
     set_atomic_s8();
 }
 
-// asc_set_atomic_add_int16_impl.h
 __aicore__ inline void asc_set_atomic_add_int16_impl()
 {
     set_atomic_add();
     set_atomic_s16();
 }
 
-// asc_set_atomic_max_int8_impl.h
 __aicore__ inline void asc_set_atomic_max_int8_impl()
 {
     set_atomic_max();
     set_atomic_s8();
 }
 
-// asc_set_atomic_max_int16_impl.h
 __aicore__ inline void asc_set_atomic_max_int16_impl()
 {
     set_atomic_max();
     set_atomic_s16();
 }
 
-// asc_set_atomic_min_int8_impl.h
 __aicore__ inline void asc_set_atomic_min_int8_impl()
 {
     set_atomic_min();
     set_atomic_s8();
 }
 
-// asc_set_atomic_min_int16_impl.h
 __aicore__ inline void asc_set_atomic_min_int16_impl()
 {
     set_atomic_min();
     set_atomic_s16();
 }
 
-// asc_set_atomic_add_int32_impl.h
 __aicore__ inline void asc_set_atomic_add_int32_impl()
 {
     set_atomic_add();
     set_atomic_s32();
 }
 
-// asc_set_atomic_max_int32_impl.h
 __aicore__ inline void asc_set_atomic_max_int32_impl()
 {
     set_atomic_max();
     set_atomic_s32();
 }
 
-// asc_set_atomic_min_int32_impl.h
 __aicore__ inline void asc_set_atomic_min_int32_impl()
 {
     set_atomic_min();
     set_atomic_s32();
 }
 
-// atomic_impl.h
 /// Enables atomic add for data transfer from Unified Buffer/L0C Buffer/L1 Buffer to
 /// Global Memory with half precision (half).
 __aicore__ inline void asc_set_atomic_add_float16() { asc_set_atomic_add_float16_impl(); }
@@ -225,7 +205,6 @@ __aicore__ inline void asc_set_atomic_min_int16() { asc_set_atomic_min_int16_imp
 /// Global Memory with 32-bit signed integer (int32_t).
 __aicore__ inline void asc_set_atomic_min_int32() { asc_set_atomic_min_int32_impl(); }
 
-// asc_atomic_add_impl.h
 namespace __asc_aicore {
 __aicore__ inline int32_t asc_atomic_add_impl(__gm__ int32_t* address, int32_t val) { return atomicAdd(address, val); }
 } // namespace __asc_aicore
@@ -252,7 +231,6 @@ __aicore__ inline uint64_t asc_atomic_add_impl(__gm__ uint64_t* address, uint64_
 }
 } // namespace __asc_aicore
 
-// asc_atomic_sub_impl.h
 namespace __asc_aicore {
 __aicore__ inline int32_t asc_atomic_sub_impl(__gm__ int32_t* address, int32_t val) { return atomicSub(address, val); }
 } // namespace __asc_aicore
@@ -279,7 +257,6 @@ __aicore__ inline uint64_t asc_atomic_sub_impl(__gm__ uint64_t* address, uint64_
 }
 } // namespace __asc_aicore
 
-// asc_atomic_exch_impl.h
 namespace __asc_aicore {
 __aicore__ inline int32_t asc_atomic_exch_impl(__gm__ int32_t* address, int32_t val)
 {
@@ -312,7 +289,6 @@ __aicore__ inline uint64_t asc_atomic_exch_impl(__gm__ uint64_t* address, uint64
 }
 } // namespace __asc_aicore
 
-// asc_atomic_max_impl.h
 namespace __asc_aicore {
 __aicore__ inline int32_t asc_atomic_max_impl(__gm__ int32_t* address, int32_t val) { return atomicMax(address, val); }
 } // namespace __asc_aicore
@@ -339,7 +315,6 @@ __aicore__ inline uint64_t asc_atomic_max_impl(__gm__ uint64_t* address, uint64_
 }
 } // namespace __asc_aicore
 
-// asc_atomic_min_impl.h
 namespace __asc_aicore {
 __aicore__ inline int32_t asc_atomic_min_impl(__gm__ int32_t* address, int32_t val) { return atomicMin(address, val); }
 } // namespace __asc_aicore
@@ -366,7 +341,6 @@ __aicore__ inline uint64_t asc_atomic_min_impl(__gm__ uint64_t* address, uint64_
 }
 } // namespace __asc_aicore
 
-// asc_atomic_cas_impl.h
 namespace __asc_aicore {
 __aicore__ inline int32_t asc_atomic_cas_impl(__gm__ int32_t* address, int32_t compare, int32_t val)
 {
@@ -402,7 +376,6 @@ __aicore__ inline uint64_t asc_atomic_cas_impl(__gm__ uint64_t* address, uint64_
 }
 } // namespace __asc_aicore
 
-// asc_atomic_and_impl.h
 namespace __asc_aicore {
 __aicore__ inline int32_t asc_atomic_and_impl(__gm__ int32_t* address, int32_t val) { return atomicAnd(address, val); }
 } // namespace __asc_aicore
@@ -425,7 +398,6 @@ __aicore__ inline uint64_t asc_atomic_and_impl(__gm__ uint64_t* address, uint64_
 }
 } // namespace __asc_aicore
 
-// asc_atomic_or_impl.h
 namespace __asc_aicore {
 __aicore__ inline int32_t asc_atomic_or_impl(__gm__ int32_t* address, int32_t val) { return atomicOr(address, val); }
 } // namespace __asc_aicore
@@ -442,7 +414,6 @@ namespace __asc_aicore {
 __aicore__ inline uint64_t asc_atomic_or_impl(__gm__ uint64_t* address, uint64_t val) { return atomicOr(address, val); }
 } // namespace __asc_aicore
 
-// asc_atomic_xor_impl.h
 namespace __asc_aicore {
 __aicore__ inline int32_t asc_atomic_xor_impl(__gm__ int32_t* address, int32_t val) { return atomicXOr(address, val); }
 } // namespace __asc_aicore
@@ -465,7 +436,6 @@ __aicore__ inline uint64_t asc_atomic_xor_impl(__gm__ uint64_t* address, uint64_
 }
 } // namespace __asc_aicore
 
-// asc_atomic_inc_impl.h
 namespace __asc_aicore {
 __aicore__ inline uint32_t asc_atomic_inc_impl(__gm__ uint32_t* address, uint32_t val)
 {
@@ -480,7 +450,6 @@ __aicore__ inline uint64_t asc_atomic_inc_impl(__gm__ uint64_t* address, uint64_
 }
 } // namespace __asc_aicore
 
-// asc_atomic_dec_impl.h
 namespace __asc_aicore {
 __aicore__ inline uint32_t asc_atomic_dec_impl(__gm__ uint32_t* address, uint32_t val)
 {
@@ -495,7 +464,6 @@ __aicore__ inline uint64_t asc_atomic_dec_impl(__gm__ uint64_t* address, uint64_
 }
 } // namespace __asc_aicore
 
-// scalar_compute_impl.h
 namespace __asc_aicore {
 // ==========asc_atomic_add==========
 __aicore__ inline int32_t asc_atomic_add(__gm__ int32_t* address, int32_t val)

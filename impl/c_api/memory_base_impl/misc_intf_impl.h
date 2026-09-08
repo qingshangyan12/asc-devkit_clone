@@ -20,7 +20,6 @@
 #include "c_api/defs/defs.h"
 #include "impl/c_api/memory_base_impl/utils_intf_impl.h"
 
-// init_soc_state_impl.h
 __aicore__ inline void asc_init_soc_state_impl()
 {
     if ASC_IS_AIV {
@@ -30,7 +29,6 @@ __aicore__ inline void asc_init_soc_state_impl()
     }
 }
 
-// misc_impl.h
 __aicore__ inline void asc_init() { asc_init_soc_state_impl(); }
 
 #if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_MEMORY_BASE_IMPL_MISC_INTF_IMPL_H)

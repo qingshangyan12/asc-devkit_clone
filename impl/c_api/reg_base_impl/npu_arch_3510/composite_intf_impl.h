@@ -24,7 +24,6 @@
 #include "impl/c_api/reg_base_impl/vector_compute_intf_impl.h"
 #include "impl/c_api/reg_base_impl/vector_datamove_intf_impl.h"
 
-// asc_mmad_mx_impl.h
 __aicore__ inline void asc_mmad_mx_sync_impl(
     __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __cb__ fp4x2_e1m2_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -113,7 +112,6 @@ __aicore__ inline void asc_mmad_mx_sync_impl(
     asc_sync_post_process();
 }
 
-// asc_mmad_impl.h
 __aicore__ inline void asc_mmad_sync_impl(
     __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ bfloat16_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -210,7 +208,6 @@ __aicore__ inline void asc_mmad_sync_impl(
     asc_sync_post_process();
 }
 
-// cube_compute_impl.h
 ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad_mx and asc_sync)
 __aicore__ inline void asc_mmad_mx_sync(
     __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __cb__ fp4x2_e1m2_t* b_matrix, uint16_t left_height,
@@ -395,7 +392,6 @@ __aicore__ inline void asc_mmad_sync(
         c_matrix_init_val);
 }
 
-// asc_copy_l0c2l1_impl.h
 __aicore__ inline void asc_copy_l0c2l1_sync_impl(
     __cbuf__ int4b_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -424,7 +420,6 @@ __aicore__ inline void asc_copy_l0c2l1_sync_impl(
     asc_sync_post_process();
 }
 
-// asc_copy_l12l0a_impl.h
 __aicore__ inline void asc_copy_l12l0a_sync_impl(
     __ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -824,7 +819,6 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync_impl(
     asc_sync_post_process();
 }
 
-// asc_copy_l0c2gm_impl.h
 __aicore__ inline void asc_copy_l0c2gm_sync_impl(
     __gm__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -1014,7 +1008,6 @@ __aicore__ inline void asc_copy_l0c2gm_sync_impl(
     asc_sync_post_process();
 }
 
-// asc_copy_l0c2ub_impl.h
 __aicore__ inline void asc_copy_l0c2ub_sync_impl(
     __ubuf__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -1211,7 +1204,6 @@ __aicore__ inline void asc_copy_l0c2ub_sync_impl(
     asc_sync_post_process();
 }
 
-// asc_copy_l12l0a_mx_impl.h
 __aicore__ inline void asc_copy_l12l0a_mx_sync_impl(
     uint64_t dst, __cbuf__ fp8_e8m0_t* src, uint16_t x_start_pos, uint16_t y_start_pos, uint8_t x_step, uint8_t y_step,
     uint16_t src_stride, uint16_t dst_stride)
@@ -1220,7 +1212,6 @@ __aicore__ inline void asc_copy_l12l0a_mx_sync_impl(
     asc_sync_post_process();
 }
 
-// asc_copy_l12l0b_impl.h
 __aicore__ inline void asc_copy_l12l0b_sync_impl(
     __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1620,7 +1611,6 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync_impl(
     asc_sync_post_process();
 }
 
-// asc_copy_l12l0b_mx_impl.h
 __aicore__ inline void asc_copy_l12l0b_mx_sync_impl(
     uint64_t dst, __cbuf__ fp8_e8m0_t* src, uint16_t x_start_pos, uint16_t y_start_pos, uint8_t x_step, uint8_t y_step,
     uint16_t src_stride, uint16_t dst_stride)
@@ -1629,7 +1619,6 @@ __aicore__ inline void asc_copy_l12l0b_mx_sync_impl(
     asc_sync_post_process();
 }
 
-// asc_copy_l12l0b_trans_impl.h
 __aicore__ inline void asc_copy_l12l0b_trans_sync_impl(
     __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
@@ -1734,7 +1723,6 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync_impl(
     asc_sync_post_process();
 }
 
-// asc_copy_gm2l1_align_impl.h
 __aicore__ inline void asc_copy_gm2l1_align_sync_impl(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count,
     uint8_t right_padding_count, bool enable_data_select, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
@@ -1955,7 +1943,6 @@ __aicore__ inline void asc_copy_gm2l1_align_sync_impl(
     asc_sync_post_process();
 }
 
-// asc_copy_gm2l1_dn2nz_impl.h
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync_impl(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2052,7 +2039,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync_impl(
     asc_sync_post_process();
 }
 
-// asc_copy_gm2l1_nd2nz_impl.h
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync_impl(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2149,7 +2135,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync_impl(
     asc_sync_post_process();
 }
 
-// asc_copy_gm2l1_impl.h
 __aicore__ inline void asc_copy_gm2l1_sync_impl(
     __cbuf__ void* dst, __gm__ void* src, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode,
     uint64_t src_stride, uint32_t dst_stride)
@@ -2293,14 +2278,12 @@ __aicore__ inline void asc_copy_gm2l1_sync_impl(
     asc_sync_post_process();
 }
 
-// asc_copy_l12fb_impl.h
 __aicore__ inline void asc_copy_l12fb_sync_impl(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size)
 {
     asc_copy_l12fb_impl(dst, src, size);
     asc_sync_post_process();
 }
 
-// asc_copy_l12bt_impl.h
 __aicore__ inline void asc_copy_l12bt_sync_impl(uint64_t dst, __cbuf__ void* src, uint32_t size)
 {
     asc_copy_l12bt_impl(dst, src, size);
@@ -2331,7 +2314,6 @@ __aicore__ inline void asc_copy_l12bt_sync_impl(uint64_t dst, __cbuf__ int32_t* 
     asc_sync_post_process();
 }
 
-// asc_copy_l12ub_impl.h
 __aicore__ inline void asc_copy_l12ub_sync_impl(
     __ubuf__ void* dst_addr, __cbuf__ void* src_addr, bool sub_blockid, uint16_t n_burst, uint16_t len_burst,
     uint16_t src_gap, uint16_t dst_gap)
@@ -2340,7 +2322,6 @@ __aicore__ inline void asc_copy_l12ub_sync_impl(
     asc_sync_post_process();
 }
 
-// asc_fill_l1_impl.h
 __aicore__ inline void asc_fill_l1_sync_impl(__cbuf__ half* dst, half value, const asc_fill_value_config& config)
 {
     asc_fill_l1_impl(dst, value, config);
@@ -2435,7 +2416,6 @@ __aicore__ inline void asc_fill_l1_sync_impl(
     asc_sync_post_process();
 }
 
-// cube_datamove_impl.h
 ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_l12l0a_mx and asc_sync)
 __aicore__ inline void asc_copy_l12l0a_mx_sync(
     uint64_t dst, __cbuf__ fp8_e8m0_t* src, uint16_t x_start_pos, uint16_t y_start_pos, uint8_t x_step, uint8_t y_step,
@@ -4370,7 +4350,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ bfloat16_t* dst, uint32_t value
     asc_fill_l1_sync_impl(dst, value, config);
 }
 
-// asc_bitsort_impl.h
 __aicore__ inline void asc_bitsort_sync_impl(
     __ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat)
 {
@@ -4385,7 +4364,6 @@ __aicore__ inline void asc_bitsort_sync_impl(
     asc_sync_post_process();
 }
 
-// asc_mrgsort4_impl.h
 __aicore__ inline void asc_mrgsort4_sync_impl(
     __ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0,
     uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension,
@@ -4408,7 +4386,6 @@ __aicore__ inline void asc_mrgsort4_sync_impl(
     asc_sync_post_process();
 }
 
-// asc_transpose_impl.h
 __aicore__ inline void asc_transpose_sync_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src)
 {
     asc_transpose_impl(dst, src);
@@ -4421,7 +4398,6 @@ __aicore__ inline void asc_transpose_sync_impl(__ubuf__ uint16_t* dst, __ubuf__ 
     asc_sync_post_process();
 }
 
-// asc_transto5hd_impl.h
 __aicore__ inline void asc_transto5hd_b8_sync_impl(
     ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride, bool dst_high_half,
     bool src_high_half)
@@ -4444,7 +4420,6 @@ __aicore__ inline void asc_transto5hd_b32_sync_impl(
     asc_sync_post_process();
 }
 
-// vector_compute_impl.h
 ASC_DEPRECATED(9.2.0, "2028/09/03", asc_bitsort and asc_sync)
 __aicore__ inline void asc_bitsort_sync(
     __ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat)
@@ -4518,21 +4493,18 @@ __aicore__ inline void asc_transto5hd_b32_sync(
     asc_transto5hd_b32_sync_impl(dst, src, repeat, dst_stride, src_stride);
 }
 
-// asc_copy_gm2ub_impl.h
 __aicore__ inline void asc_copy_gm2ub_sync_impl(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
 {
     asc_copy_gm2ub_impl(dst, src, size);
     asc_sync_post_process();
 }
 
-// asc_copy_ub2gm_impl.h
 __aicore__ inline void asc_copy_ub2gm_sync_impl(__gm__ void* dst, __ubuf__ void* src, uint32_t size)
 {
     asc_copy_ub2gm_impl(dst, src, size);
     asc_sync_post_process();
 }
 
-// asc_copy_gm2ub_align_impl.h
 __aicore__ inline void asc_copy_gm2ub_align_sync_impl(__ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t size)
 {
     asc_copy_gm2ub_align_impl(dst, src, size);
@@ -4606,7 +4578,6 @@ __aicore__ inline void asc_copy_gm2ub_align_sync_impl(__ubuf__ fp8_e5m2_t* dst, 
     asc_sync_post_process();
 }
 
-// asc_copy_ub2gm_align_impl.h
 __aicore__ inline void asc_copy_ub2gm_align_sync_impl(__gm__ uint8_t* dst, __ubuf__ uint8_t* src, uint32_t size)
 {
     asc_copy_ub2gm_align_impl(dst, src, size);
@@ -4680,21 +4651,18 @@ __aicore__ inline void asc_copy_ub2gm_align_sync_impl(__gm__ fp8_e5m2_t* dst, __
     asc_sync_post_process();
 }
 
-// asc_copy_ub2l1_impl.h
 __aicore__ inline void asc_copy_ub2l1_sync_impl(__cbuf__ void* dst, __ubuf__ void* src, uint32_t size)
 {
     asc_copy_ub2l1_impl(dst, src, size);
     asc_sync_post_process();
 }
 
-// asc_copy_ub2ub_impl.h
 __aicore__ inline void asc_copy_ub2ub_sync_impl(__ubuf__ void* dst, __ubuf__ void* src, uint32_t size)
 {
     asc_copy_ub2ub_impl(dst, src, size);
     asc_sync_post_process();
 }
 
-// vector_datamove_impl.h
 ASC_DEPRECATED(9.2.0, "2028/09/03", asc_copy_gm2ub_align and asc_sync)
 __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t size)
 {
