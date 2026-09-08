@@ -183,8 +183,8 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void vector_muladd_atomic(
 
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构：本样例仅支持dav-3510（Ascend 950PR/Ascend 950DT） |
-  | `SKIP_VALIDATION` | `ON`/`OFF` | 是否跳过结果校验，默认`OFF`。使用`msopprof`采集性能时建议设为`ON` |
+  | CMAKE_ASC_ARCHITECTURES | dav-3510 | NPU架构：本样例仅支持dav-3510（Ascend 950PR/Ascend 950DT） |
+  | SKIP_VALIDATION | ON/OFF | 是否跳过结果校验，默认OFF。使用msopprof采集性能时建议设为ON |
 
   执行结果如下，说明精度对比成功。
 
