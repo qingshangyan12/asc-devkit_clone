@@ -1,6 +1,6 @@
 # asc_store_atomic_config
 
-asc_store_atomic_config参数包含原子操作启用位与原子操作类型，用于[asc_get_store_atomic_config](../../atomic/scalar_atomic/asc_get_store_atomic_config.md)接口使用。
+asc_store_atomic_config参数包含原子操作启用位与原子操作类型，用于[asc_get_store_atomic_config](../../deprecated_interface/asc_get_store_atomic_config_deprecated.md)接口使用。
 
 ## 结构体具体定义
 

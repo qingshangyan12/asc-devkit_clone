@@ -86,6 +86,33 @@ __simd_callee__ inline void asc_bfloat162int32_rn(vector_int32_t& dst,
                                                   vector_bool mask)
 ```
 
+<!-- deprecated-overload-list-start -->
+### 废弃接口清单
+
+下列接口名均指本页函数原型章节所述的三参数旧原型：
+
+- `asc_bfloat162int32_rd`
+- `asc_bfloat162int32_rd_sat`
+- `asc_bfloat162int32_rd_sat_v2`
+- `asc_bfloat162int32_rd_v2`
+- `asc_bfloat162int32_rn`
+- `asc_bfloat162int32_rn_sat`
+- `asc_bfloat162int32_rn_sat_v2`
+- `asc_bfloat162int32_rn_v2`
+- `asc_bfloat162int32_rna`
+- `asc_bfloat162int32_rna_sat`
+- `asc_bfloat162int32_rna_sat_v2`
+- `asc_bfloat162int32_rna_v2`
+- `asc_bfloat162int32_ru`
+- `asc_bfloat162int32_ru_sat`
+- `asc_bfloat162int32_ru_sat_v2`
+- `asc_bfloat162int32_ru_v2`
+- `asc_bfloat162int32_rz`
+- `asc_bfloat162int32_rz_sat`
+- `asc_bfloat162int32_rz_sat_v2`
+- `asc_bfloat162int32_rz_v2`
+<!-- deprecated-overload-list-end -->
+
 ## 参数说明
 
 **表2** 参数说明
