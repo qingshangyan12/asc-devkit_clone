@@ -177,131 +177,108 @@ __simd_vf__ inline void GetExclusiveSum(
         exclusiveSum, exclusiveSumP1, GetVecLen() / sizeof(uint16_t), b16FullMask);
 }
 
+__simd_callee__ inline void PartitionTwoBits(
+    RegTensor<uint8_t>& key, RegTensor<uint8_t>& index, RegTensor<int8_t>& shift,
+    RegTensor<uint8_t>& bitMask, MaskReg& mask, __ubuf__ uint8_t*& dst, UnalignReg& unalign)
+{
+    RegTensor<uint8_t> digit, packed;
+    ShiftRight(digit, key, shift, mask);
+    And(digit, digit, bitMask, mask);
+    MaskReg bucket0, bucket1, bucket2, bucket3;
+    CompareScalar<uint8_t, CMPMODE::EQ>(bucket0, digit, 0, mask);
+    CompareScalar<uint8_t, CMPMODE::EQ>(bucket1, digit, 1, mask);
+    CompareScalar<uint8_t, CMPMODE::EQ>(bucket2, digit, 2, mask);
+    CompareScalar<uint8_t, CMPMODE::EQ>(bucket3, digit, 3, mask);
+    GatherMask<uint8_t, GatherMaskMode::STORE_REG>(packed, index, bucket0);
+    Reg::StoreUnAlign(dst, packed, unalign);
+    GatherMask<uint8_t, GatherMaskMode::STORE_REG>(packed, index, bucket1);
+    Reg::StoreUnAlign(dst, packed, unalign);
+    GatherMask<uint8_t, GatherMaskMode::STORE_REG>(packed, index, bucket2);
+    Reg::StoreUnAlign(dst, packed, unalign);
+    GatherMask<uint8_t, GatherMaskMode::STORE_REG>(packed, index, bucket3);
+    Reg::StoreUnAlign(dst, packed, unalign);
+}
+
+__simd_callee__ inline void StoreSortedByteBlock(
+    RegTensor<uint8_t>& key, RegTensor<uint8_t>& index, RegTensor<uint8_t>& zero,
+    RegTensor<uint16_t>& offset, MaskReg& mask, MaskReg& fullMaskU16, uint32_t& remainingIndex,
+    __ubuf__ uint8_t*& dstKey, __ubuf__ uint16_t*& dstIndex)
+{
+    Reg::StoreAlign<uint8_t, PostLiteral::POST_MODE_UPDATE>(dstKey, key, GetVecLen(), mask);
+    RegTensor<uint8_t> low, high;
+    Interleave(low, high, index, zero);
+    Add((RegTensor<uint16_t>&)low, (RegTensor<uint16_t>&)low, offset, fullMaskU16);
+    Add((RegTensor<uint16_t>&)high, (RegTensor<uint16_t>&)high, offset, fullMaskU16);
+    MaskReg lowMask = UpdateMask<uint16_t>(remainingIndex);
+    MaskReg highMask = UpdateMask<uint16_t>(remainingIndex);
+    Reg::StoreAlign<uint16_t, PostLiteral::POST_MODE_UPDATE>(
+        dstIndex, (RegTensor<uint16_t>&)low, GetVecLen() / sizeof(uint16_t), lowMask);
+    Reg::StoreAlign<uint16_t, PostLiteral::POST_MODE_UPDATE>(
+        dstIndex, (RegTensor<uint16_t>&)high, GetVecLen() / sizeof(uint16_t), highMask);
+    Adds(offset, offset, GetVecLen(), fullMaskU16);
+}
+
+template <bool firstPass>
+__simd_callee__ inline void PartitionBytePass(
+    __ubuf__ uint8_t* original, __ubuf__ uint8_t* permutation, RegTensor<uint8_t>& initialIndex,
+    RegTensor<int8_t>& shift, RegTensor<uint8_t>& bitMask, uint32_t count)
+{
+    const uint16_t repeatTime = DivCeil(count, GetVecLen());
+    __ubuf__ uint8_t* indexLoad = permutation;
+    __ubuf__ uint8_t* indexStore = permutation;
+    MaskReg fullMask = CreateMask<uint8_t>();
+    UnalignReg unalign;
+    for (uint16_t block = 0; block < repeatTime; ++block) {
+        MaskReg mask = UpdateMask<uint8_t>(count);
+        RegTensor<uint8_t> originalKey, key, index;
+        Reg::LoadAlign<uint8_t, PostLiteral::POST_MODE_UPDATE>(originalKey, original, GetVecLen());
+        if constexpr (firstPass) {
+            Copy(index, initialIndex, fullMask);
+            Copy(key, originalKey, fullMask);
+        } else {
+            Reg::LoadAlign<uint8_t, PostLiteral::POST_MODE_UPDATE>(index, indexLoad, GetVecLen());
+            Gather(key, originalKey, index);
+        }
+        PartitionTwoBits(key, index, shift, bitMask, mask, indexStore, unalign);
+    }
+    Reg::StoreUnAlignPost(indexStore, unalign);
+    LocalMemBar<MemType::VEC_STORE, MemType::VEC_LOAD>();
+    ClearSpr<SpecialPurposeReg::AR>();
+}
+
 __simd_vf__ inline void EightBitsSort(
     __ubuf__ uint8_t* srcValueU8, __ubuf__ uint8_t* srcValueU8Back, __ubuf__ uint8_t* inputIndexAddr,
     __ubuf__ uint16_t* inputIndexU16Addr, uint32_t count)
 {
-    uint16_t repeatTime = DivCeil(count, GetVecLen());
-    __ubuf__ uint8_t* srcAddr = srcValueU8;
-    __ubuf__ uint8_t* srcAddrTmp = srcValueU8;
-    __ubuf__ uint8_t* indexAddr = inputIndexAddr;
-    __ubuf__ uint8_t* indexAddrTmp = inputIndexAddr;
-    RegTensor<uint8_t> srcReg;
-    RegTensor<uint8_t> indexReg;
-    RegTensor<int8_t> shiftOffset;
-    RegTensor<uint8_t> last2BitsMask;
-    constexpr uint8_t last2BitMaskVal = 3;
-    MaskReg fullMaskB8 = CreateMask<uint8_t>();
-
-    RegTensor<int8_t> bucketIndex;
-    Arange(bucketIndex, 0);
-
-    __ubuf__ uint8_t* outputIndex = inputIndexAddr;
-    uint32_t tmpCount = count;
-    for (uint16_t j = 0; j < repeatTime; ++j) {
-        MaskReg reg = UpdateMask<uint8_t>(tmpCount);
-        Reg::StoreAlign<uint8_t, PostLiteral::POST_MODE_UPDATE>(
-            outputIndex, (RegTensor<uint8_t>&)bucketIndex, GetVecLen(), reg);
-    }
-
-    LocalMemBar<MemType::VEC_STORE, MemType::VEC_LOAD>();
-    ClearSpr<SpecialPurposeReg::AR>();
-
-    Duplicate(shiftOffset, 0, fullMaskB8);
-    Duplicate(last2BitsMask, last2BitMaskVal, fullMaskB8);
-    srcAddr = srcValueU8;
-
-    // Clear AR to make sure GatherMask not affected by other operations.
-    ClearSpr<SpecialPurposeReg::AR>();
-    // Makes 4 times 2 bits sort for 8 bits sort.
-    for (uint16_t i = 0; i < 4; ++i) {
-        indexAddr = inputIndexAddr;
-        UnalignReg unalignIndex;
-        uint32_t currCount = count;
-        for (uint16_t j = 0; j < repeatTime; ++j) {
-            MaskReg maskReg = UpdateMask<uint8_t>(currCount);
-
-            Reg::LoadAlign<uint8_t, PostLiteral::POST_MODE_UPDATE>(srcReg, (__ubuf__ uint8_t*&)srcAddr, GetVecLen());
-            Reg::LoadAlign<uint8_t, PostLiteral::POST_MODE_UPDATE>(
-                indexReg, (__ubuf__ uint8_t*&)indexAddr, GetVecLen());
-            RegTensor<uint8_t> shift2BitsReg;
-            ShiftRight(shift2BitsReg, srcReg, shiftOffset, maskReg);
-
-            And(shift2BitsReg, shift2BitsReg, last2BitsMask, maskReg);
-            MaskReg cmpMask0, cmpMask1, cmpMask2, cmpMask3;
-            CompareScalar<uint8_t, CMPMODE::EQ>(cmpMask0, shift2BitsReg, 0, maskReg);
-            CompareScalar<uint8_t, CMPMODE::EQ>(cmpMask1, shift2BitsReg, 1, maskReg);
-            CompareScalar<uint8_t, CMPMODE::EQ>(cmpMask2, shift2BitsReg, 2, maskReg);
-            CompareScalar<uint8_t, CMPMODE::EQ>(cmpMask3, shift2BitsReg, 3, maskReg);
-            RegTensor<uint8_t> gatherRes0;
-            RegTensor<uint8_t> gatherRes1;
-            RegTensor<uint8_t> gatherRes2;
-            RegTensor<uint8_t> gatherRes3;
-
-            GatherMask<uint8_t, GatherMaskMode::STORE_REG>(gatherRes0, indexReg, cmpMask0);
-            Reg::StoreUnAlign(indexAddrTmp, gatherRes0, unalignIndex);
-            GatherMask<uint8_t, GatherMaskMode::STORE_REG>(gatherRes1, indexReg, cmpMask1);
-            Reg::StoreUnAlign(indexAddrTmp, gatherRes1, unalignIndex);
-            GatherMask<uint8_t, GatherMaskMode::STORE_REG>(gatherRes2, indexReg, cmpMask2);
-            Reg::StoreUnAlign(indexAddrTmp, gatherRes2, unalignIndex);
-            GatherMask<uint8_t, GatherMaskMode::STORE_REG>(gatherRes3, indexReg, cmpMask3);
-            Reg::StoreUnAlign(indexAddrTmp, gatherRes3, unalignIndex);
-        }
-        Reg::StoreUnAlignPost(indexAddrTmp, unalignIndex);
-        LocalMemBar<MemType::VEC_STORE, MemType::VEC_LOAD>();
-        indexAddr = inputIndexAddr;
-        srcAddr = srcValueU8;
-        srcAddrTmp = srcValueU8;
-        __ubuf__ uint8_t* tmpSrcAddr = srcValueU8Back;
-        currCount = count;
-        for (uint16_t j = 0; j < repeatTime; ++j) {
-            MaskReg maskReg = UpdateMask<uint8_t>(currCount);
-            RegTensor<uint8_t> selectData, tmpIndexReg;
-            Reg::LoadAlign<uint8_t, PostLiteral::POST_MODE_UPDATE>(srcReg, (__ubuf__ uint8_t*&)tmpSrcAddr, GetVecLen());
-            Reg::LoadAlign<uint8_t, PostLiteral::POST_MODE_UPDATE>(
-                tmpIndexReg, (__ubuf__ uint8_t*&)indexAddr, GetVecLen());
-            Gather(selectData, srcReg, tmpIndexReg);
-            Reg::StoreAlign<uint8_t, PostLiteral::POST_MODE_UPDATE>(srcAddrTmp, selectData, GetVecLen(), maskReg);
-        }
-        LocalMemBar<MemType::VEC_STORE, MemType::VEC_LOAD>();
-        ClearSpr<SpecialPurposeReg::AR>();
-        Adds(shiftOffset, shiftOffset, 2, fullMaskB8);
-        srcAddr = srcValueU8;
-    }
-
-    // Obtain sorted local u8 index and src values.
-    __ubuf__ uint8_t* tmpIndexLoad = inputIndexAddr;
-    __ubuf__ uint16_t* tmpIndexStore = inputIndexU16Addr;
-
-    MaskReg fullB16Mask = CreateMask<uint16_t>();
-
-    RegTensor<uint8_t> zeroReg;
-    Duplicate(zeroReg, 0, fullMaskB8);
-
+    MaskReg fullMask = CreateMask<uint8_t>();
+    MaskReg fullMaskU16 = CreateMask<uint16_t>();
+    RegTensor<uint8_t> bitMask, zero, initialIndex;
+    RegTensor<int8_t> shift;
     RegTensor<uint16_t> offset;
-    Duplicate(offset, 0, fullB16Mask);
+    Duplicate(bitMask, 3, fullMask);
+    Duplicate(zero, 0, fullMask);
+    Duplicate(shift, 0, fullMask);
+    Duplicate(offset, 0, fullMaskU16);
+    Arange((RegTensor<int8_t>&)initialIndex, 0);
+    ClearSpr<SpecialPurposeReg::AR>();
 
-    uint32_t indexUpdateCount = count;
-    // Sorts per block elements and convert index representing overall offset.
-    for (uint16_t j = 0; j < repeatTime; ++j) {
-        MaskReg maskReg0 = UpdateMask<uint16_t>(indexUpdateCount);
-        MaskReg maskReg1 = UpdateMask<uint16_t>(indexUpdateCount);
+    // Reconstruct keys from their original register and current permutation instead of spilling each pass.
+    PartitionBytePass<true>(srcValueU8Back, inputIndexAddr, initialIndex, shift, bitMask, count);
+    for (uint16_t pass = 1; pass < 4; ++pass) {
+        Adds(shift, shift, 2, fullMask);
+        PartitionBytePass<false>(srcValueU8Back, inputIndexAddr, initialIndex, shift, bitMask, count);
+    }
 
-        RegTensor<uint8_t> sortedRes;
-        Reg::LoadAlign<uint8_t, PostLiteral::POST_MODE_UPDATE>(
-            sortedRes, (__ubuf__ uint8_t*&)tmpIndexLoad, GetVecLen());
-        // zero extend to u16
-        RegTensor<uint8_t> sortedRes0, sortedRes1;
-        Interleave(sortedRes0, sortedRes1, sortedRes, zeroReg);
-        // add group offset
-        RegTensor<uint16_t> sortedVal0, sortedVal1;
-        Add(sortedVal0, (RegTensor<uint16_t>&)sortedRes0, offset, fullB16Mask);
-        Add(sortedVal1, (RegTensor<uint16_t>&)sortedRes1, offset, fullB16Mask);
-        Reg::StoreAlign<uint16_t, PostLiteral::POST_MODE_UPDATE>(
-            tmpIndexStore, sortedVal0, GetVecLen() / sizeof(uint16_t), maskReg0);
-        Reg::StoreAlign<uint16_t, PostLiteral::POST_MODE_UPDATE>(
-            tmpIndexStore, sortedVal1, GetVecLen() / sizeof(uint16_t), maskReg1);
-        Adds(offset, offset, GetVecLen(), fullB16Mask);
+    const uint16_t repeatTime = DivCeil(count, GetVecLen());
+    uint32_t remainingIndex = count;
+    for (uint16_t block = 0; block < repeatTime; ++block) {
+        MaskReg mask = UpdateMask<uint8_t>(count);
+        RegTensor<uint8_t> original, key, index;
+        Reg::LoadAlign<uint8_t, PostLiteral::POST_MODE_UPDATE>(original, srcValueU8Back, GetVecLen());
+        Reg::LoadAlign<uint8_t, PostLiteral::POST_MODE_UPDATE>(index, inputIndexAddr, GetVecLen());
+        Gather(key, original, index);
+        StoreSortedByteBlock(key, index, zero, offset, mask, fullMaskU16, remainingIndex,
+            srcValueU8, inputIndexU16Addr);
     }
 }
 
@@ -429,17 +406,19 @@ __simd_callee__ inline void GatherAndStoreB64Elements(
     RegTensor<uint32_t>& localOffset, MaskReg& maskReg, __ubuf__ uint32_t* gatherIdxAddr, __ubuf__ uint32_t* storedAddr)
 {
     MaskReg maskLow, maskHigh;
-    RegTensor<uint32_t> indexLow;
-    RegTensor<uint32_t> indexHigh;
+    RegTensor<uint32_t> offsetLow;
+    RegTensor<uint32_t> offsetHigh;
     RegTensor<uint32_t> indexMergedLow;
     RegTensor<uint32_t> indexMergedHigh;
+    RegTensor<uint32_t> localOffsetLow;
     RegTensor<uint32_t> localOffsetHigh;
     MaskInterleave<uint32_t>(maskLow, maskHigh, maskReg, maskReg);
-    Muls(localOffsetHigh, localOffset, 2, maskReg);
-    Reg::Gather(indexLow, gatherIdxAddr, localOffsetHigh, maskReg);
-    Adds(localOffsetHigh, localOffsetHigh, 1, maskReg);
-    Reg::Gather(indexHigh, gatherIdxAddr, localOffsetHigh, maskReg);
-    Interleave(indexMergedLow, indexMergedHigh, indexLow, indexHigh);
+    Muls(localOffsetLow, localOffset, 2, maskReg);
+    Adds(localOffsetHigh, localOffsetLow, 1, maskReg);
+    // Gather adjacent halves together so the results already have the stored B64 layout.
+    Interleave(offsetLow, offsetHigh, localOffsetLow, localOffsetHigh);
+    Reg::Gather(indexMergedLow, gatherIdxAddr, offsetLow, maskLow);
+    Reg::Gather(indexMergedHigh, gatherIdxAddr, offsetHigh, maskHigh);
     Reg::StoreAlign<uint32_t>(storedAddr, indexMergedLow, maskLow);
     Reg::StoreAlign<uint32_t>(storedAddr + GetVecLen() / sizeof(uint32_t), indexMergedHigh, maskHigh);
 }
