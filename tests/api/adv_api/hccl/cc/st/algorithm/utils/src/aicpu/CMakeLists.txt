@@ -65,6 +65,7 @@ list(APPEND INCLUDE_LIST
 
 add_library(${HCCL_CHECKER_SELECTOR_TARGET} STATIC
     ${HCCL_DEV_BASE}/src/ops/all_gather/selector/all_gather_auto_selector.cc
+    ${HCCL_DEV_BASE}/src/ops/all_reduce/selector/all_reduce_auto_selector.cc
     ${HCCL_DEV_BASE}/src/ops/reduce_scatter/selector/reduce_scatter_auto_selector.cc
     ${HCCL_DEV_BASE}/src/ops/all_to_all_v/selector/alltoall_auto_selector.cc
     ${HCCL_DEV_BASE}/src/ops/all_to_all_v/selector/alltoallv_auto_selector.cc
@@ -89,7 +90,9 @@ target_compile_definitions(${HCCL_CHECKER_SELECTOR_TARGET} PRIVATE
 
 add_library(${HCCL_CHECKER_EXECUTOR_TARGET} STATIC
     ${HCCL_DEV_BASE}/src/ops/op_common/topo/topo_match_pcie_mix.cc
+    ${HCCL_DEV_BASE}/src/ops/op_common/topo/topo_match_multilevel.cc
     ${HCCL_DEV_BASE}/src/ops/op_common/topo/topo_match_ubx_1d.cc
+    ${HCCL_DEV_BASE}/src/ops/all_reduce/executor/ins_v2_all_reduce_parallel_executor.cc
     ${HCCL_DEV_BASE}/src/ops/reduce_scatter/executor/ins_v2_reduce_scatter_sole_executor.cc
     ${HCCL_DEV_BASE}/src/ops/reduce_scatter/executor/ins_reduce_scatter_parallel_executor.cc
     ${HCCL_DEV_BASE}/src/ops/reduce_scatter/executor/ins_v2_reduce_scatter_sequence_executor.cc
