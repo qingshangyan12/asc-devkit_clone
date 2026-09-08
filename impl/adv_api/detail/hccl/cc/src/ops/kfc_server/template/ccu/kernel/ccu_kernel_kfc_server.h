@@ -20,24 +20,17 @@
 #include "kfc_server_protocol.h"
 
 namespace mc2_ops_hccl {
+struct CcuKernelArgKfcServer : CcuKernelArgBase {
+    HcclCMDType opType = HcclCMDType::HCCL_CMD_INVALID;
+    KfcServerRole role = KfcServerRole::DEFAULT;
+    uint32_t missionIndex = 0;
+};
+
 constexpr uint64_t INVALID_U64 = UINT64_MAX;
 constexpr uint32_t CCU_PARAM_NUM_PER_DIE = 32;
 constexpr uint32_t CCU_PARAM_NUM_MAX = CCU_PARAM_NUM_PER_DIE * 2;
 constexpr uint32_t CCU_ONE_PARAM_SIZE = 8;
 constexpr uint32_t CCU_TASK_NUM_MAX = 64;
-
-// new---20260603
-struct CcuKernelArgKfcServer : CcuKernelArgBase {
-    uint64_t rankSize = 0;
-    uint32_t rankId = 0;
-    bool loadFromMem = false;
-    KfcServerRole role = KfcServerRole::DEFAULT;
-    uint32_t jettyNum = 4;
-    OpParam opParam;
-    std::vector<std::vector<uint32_t>> subCommRanks;
-    std::vector<KfcNhrStepInfo> nhrStepInfoVector;
-    std::map<uint32_t, uint32_t> nhrRank2ChannelIdx;
-};
 
 // 多mission由Host使用独立start/done区域调度；Server之间不在CCU侧同步。
 struct KfcServerContext : CcuKernelCtxBase {
@@ -53,6 +46,7 @@ struct KfcServerContext : CcuKernelCtxBase {
 
     ccu::Variable missionNum;
     ccu::Variable missionIndex;
+    ccu::Variable subKernelPc;
 
     // 用于Die间同步信号[missionId=0]
     const char* exportDieSig;

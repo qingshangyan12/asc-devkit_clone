@@ -18,19 +18,6 @@ constexpr int AG_POST_SYNC_CKE_IDX = 0;
 constexpr int AG_OUTPUT_CKE_IDX = 1;
 constexpr int AG_TOKEN_CKE_IDX = 2;
 
-struct KfcAllGatherMesh1DContext : CcuKernelCtxBase {
-    const ChannelHandle* channels{nullptr};
-    uint32_t channelCount{0};
-    uint32_t rankSize{0};
-    uint32_t rankId{0};
-
-    ccu::Variable input;
-    std::vector<ccu::Variable> output;
-    std::vector<ccu::Variable> token;
-    ccu::Variable offset;
-    ccu::Variable sliceSize;
-};
-
 static CcuResult InitResource(KfcAllGatherMesh1DContext& ctx)
 {
     uint32_t channelIdx = 0;

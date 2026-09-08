@@ -46,7 +46,6 @@ HcclResult CcuTempAlltoAllMesh1D::CalcRes(
 
     CHK_SAFETY_FUNC_RET(
         strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelAlltoAllMesh1D"));
-    kernelInfo.kernelFunc = reinterpret_cast<void*>(CcuAlltoAllMesh1DKernel);
     std::vector<HcclChannelDesc> channelDescs;
     CHK_RET(CalcChannelRequestMesh1D(comm, param, topoInfo, subCommRanks_, channelDescs));
     auto kernelArg = std::make_shared<CcuKernelArgAlltoAllMesh1D>();
