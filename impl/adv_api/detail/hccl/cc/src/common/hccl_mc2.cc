@@ -19,6 +19,14 @@
 #include "hccl_ccu_res.h"
 #include "adapter_acl.h"
 #include "kfc_server_protocol.h"
+#include "hcomm_host_profiling_dl.h"
+#include "rt_external.h"
+#include "runtime/rt.h"
+#include "mmpa_api.h"
+#include <cmath>
+#include <cstddef>
+#include <limits>
+#include <memory>
 
 using namespace mc2_ops_hccl;
 
@@ -628,4 +636,125 @@ CcuResult CcuKernelLaunch(const HcclComm comm, void* opResCtx)
         }
     }
     return CCU_SUCCESS;
+}
+
+namespace {
+constexpr uint16_t MC2_AICPU_HCCL_DEFAULT_TIME = 1836U;
+constexpr uint32_t MC2_AICPU_PARAM_LEN = 32U;
+constexpr char MC2_AICPU_SERVER_SO_NAME[] = "libmc2_server.so";
+constexpr char MC2_AICPU_SERVER_KERNEL_NAME[] = "Mc2ServerKernel";
+
+constexpr uint64_t MC2_AICPU_SIMPLE_CTX_PROTOCOL = 4U;
+
+struct Mc2AicpuHostArgs {
+    uint64_t ctxArgs[2];
+    char soName[MC2_AICPU_PARAM_LEN];
+    char kernelName[MC2_AICPU_PARAM_LEN];
+    char opName[MC2_AICPU_PARAM_LEN];
+};
+static_assert(offsetof(Mc2AicpuHostArgs, soName) == sizeof(uint64_t) * 2U, "ctxArgs must precede soName");
+
+HcclResult Mc2GetAicpuTimeout(uint16_t* time)
+{
+    CHK_PTR_NULL(time);
+    CHK_RET(InitEnvConfig());
+
+    uint32_t opExecuteTimeoutMs = 0;
+    if (aclrtGetOpExecuteTimeout(&opExecuteTimeoutMs) != ACL_SUCCESS) {
+        HCCL_ERROR("[Mc2GetAicpuTimeout, %s] failed to get op execute timeout.", __func__);
+        return HCCL_E_RUNTIME;
+    }
+    const double opExecuteTimeoutS = static_cast<double>(opExecuteTimeoutMs) / 1000.0;
+
+    double hcclTimeoutS = static_cast<double>(MC2_AICPU_HCCL_DEFAULT_TIME);
+    double externalHcclTimeoutS = 0.0;
+    if (GetExternalInputExecTimeout(externalHcclTimeoutS)) {
+        hcclTimeoutS = externalHcclTimeoutS;
+    }
+
+    const double totalTimeoutS = opExecuteTimeoutS + hcclTimeoutS;
+    constexpr uint16_t maxLaunchTimeout = std::numeric_limits<uint16_t>::max() - 1U;
+    const double maxTimeout = static_cast<double>(maxLaunchTimeout);
+    const uint16_t launchTimeout =
+        totalTimeoutS >= maxTimeout ? maxLaunchTimeout : static_cast<uint16_t>(std::lround(totalTimeoutS));
+    if (totalTimeoutS > maxTimeout) {
+        HCCL_WARNING(
+            "[Mc2GetAicpuTimeout] timeout[%f]s exceeds max[%u]s, clamp to %u.", totalTimeoutS, maxLaunchTimeout,
+            launchTimeout);
+    }
+    *time = launchTimeout;
+    HCCL_INFO(
+        "[Mc2GetAicpuTimeout] opExecuteTimeout is %ums, hcclTimeout is %fs, launchTimeout is %us.", opExecuteTimeoutMs,
+        hcclTimeoutS, *time);
+    return HCCL_SUCCESS;
+}
+
+HcclResult Mc2PrepareAicpuHostArgs(Mc2AicpuHostArgs& hostArgs, void* opResCtx)
+{
+    hostArgs = {};
+    hostArgs.ctxArgs[0] = MC2_AICPU_SIMPLE_CTX_PROTOCOL;
+    hostArgs.ctxArgs[1] = reinterpret_cast<uint64_t>(opResCtx);
+
+    int32_t soRet = strcpy_s(hostArgs.soName, sizeof(hostArgs.soName), MC2_AICPU_SERVER_SO_NAME);
+    int32_t kernelRet = strcpy_s(hostArgs.kernelName, sizeof(hostArgs.kernelName), MC2_AICPU_SERVER_KERNEL_NAME);
+    int32_t opRet = strcpy_s(hostArgs.opName, sizeof(hostArgs.opName), MC2_AICPU_SERVER_KERNEL_NAME);
+    CHK_PRT_RET(
+        (soRet != EOK) || (kernelRet != EOK) || (opRet != EOK),
+        HCCL_ERROR(
+            "[%s] fill so/kernel/op name failed, soRet[%d], kernelRet[%d], opRet[%d].", __func__, soRet, kernelRet,
+            opRet),
+        HCCL_E_INTERNAL);
+    return HCCL_SUCCESS;
+}
+} // namespace
+
+HcclResult __attribute__((visibility("default"))) Mc2AicpuKernelLaunch(
+    uint32_t blockDim, aclrtStream stream, void* opResCtx, uint64_t opResCtxSize)
+{
+    CHK_PTR_NULL(opResCtx);
+    CHK_PTR_NULL(stream);
+    CHK_PRT_RET(
+        opResCtxSize < sizeof(OpResCtx),
+        HCCL_ERROR(
+            "[%s] opResCtxSize[%llu] is smaller than sizeof(OpResCtx)[%zu].", __func__,
+            static_cast<unsigned long long>(opResCtxSize), sizeof(OpResCtx)),
+        HCCL_E_PARA);
+
+    std::unique_ptr<Mc2AicpuHostArgs> hostArgs = std::make_unique<Mc2AicpuHostArgs>();
+    CHK_RET(Mc2PrepareAicpuHostArgs(*hostArgs, opResCtx));
+
+    rtAicpuArgsEx_t aicpuArgs = {};
+    aicpuArgs.args = hostArgs.get();
+    aicpuArgs.argsSize = static_cast<uint32_t>(sizeof(Mc2AicpuHostArgs));
+    aicpuArgs.soNameAddrOffset = static_cast<uint32_t>(offsetof(Mc2AicpuHostArgs, soName));
+    aicpuArgs.kernelNameAddrOffset = static_cast<uint32_t>(offsetof(Mc2AicpuHostArgs, kernelName));
+    aicpuArgs.isNoNeedH2DCopy = false;
+
+    uint16_t time = 0;
+    CHK_RET(Mc2GetAicpuTimeout(&time));
+    aicpuArgs.timeout = time;
+
+    const uint32_t launchBlocks = blockDim == 0U ? 1U : blockDim;
+    const uint64_t launchBeginTime = HcommGetProfilingSysCycleTime();
+    rtError_t rtRet = rtAicpuKernelLaunchExWithArgs(
+        KERNEL_TYPE_AICPU_KFC, MC2_AICPU_SERVER_KERNEL_NAME, launchBlocks, &aicpuArgs, nullptr, stream,
+        RT_KERNEL_USE_SPECIAL_TIMEOUT);
+    CHK_PRT_RET(
+        rtRet != RT_ERROR_NONE,
+        HCCL_ERROR(
+            "[%s] rtAicpuKernelLaunchExWithArgs failed, ret[%d], kernelName[%s], numBlocks[%u], stream[%p].", __func__,
+            rtRet, MC2_AICPU_SERVER_KERNEL_NAME, launchBlocks, stream),
+        HCCL_E_RUNTIME);
+
+    HcclResult reportRet = HcommProfilingReportKernel(launchBeginTime, MC2_AICPU_SERVER_KERNEL_NAME);
+    if (reportRet != HCCL_SUCCESS) {
+        HCCL_WARNING(
+            "[%s] HcommProfilingReportKernel failed, ret[%d], kernelName[%s].", __func__, reportRet,
+            MC2_AICPU_SERVER_KERNEL_NAME);
+    }
+
+    HCCL_INFO(
+        "[Mc2AicpuKernelLaunch] %s launch successfully, numBlocks is %u, ctx is %p.", MC2_AICPU_SERVER_KERNEL_NAME,
+        launchBlocks, opResCtx);
+    return HCCL_SUCCESS;
 }
