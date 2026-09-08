@@ -69,6 +69,30 @@ typedef struct {
     uint32_t eventOffset;
 } CcuLoopGroupConfig;
 
+#define CCU_CFG_MAGIC_WORD 0xCC0CF000u
+#define CCU_KERNEL_REGISTER_CFG_VERSION 1u
+#define CCU_TASK_CALL_ARG_MAX 32u
+#define CCU_TASK_CALL_DEPTH_MAX 4u
+
+typedef struct {
+    uint32_t magic;
+    uint32_t version;
+    uint32_t size;
+    uint32_t reserved;
+} CcuCfgHeader;
+
+typedef enum {
+    CCU_KERNEL_ROLE_NORMAL = 0,
+    CCU_KERNEL_ROLE_CALLER = 1,
+    CCU_KERNEL_ROLE_CALLABLE_TASK = 2,
+} CcuKernelRole;
+
+typedef struct {
+    CcuCfgHeader header;
+    CcuKernelRole role;
+    uint32_t reserved[7];
+} CcuKernelRegisterCfg;
+
 typedef uint64_t CcuInsHandle;
 
 typedef uint64_t CcuKernelHandle;
@@ -90,6 +114,18 @@ typedef void* CcuKernelArg;
 typedef CcuResult (*CcuKernelFunc)(CcuKernelArg arg);
 
 #ifdef __cplusplus
+}
+
+static inline void CcuKernelRegisterCfgInit(CcuKernelRegisterCfg* cfg)
+{
+    cfg->header.magic = CCU_CFG_MAGIC_WORD;
+    cfg->header.version = CCU_KERNEL_REGISTER_CFG_VERSION;
+    cfg->header.size = static_cast<uint32_t>(sizeof(CcuKernelRegisterCfg));
+    cfg->header.reserved = 0u;
+    cfg->role = CCU_KERNEL_ROLE_NORMAL;
+    for (uint32_t i = 0; i < 7; ++i) {
+        cfg->reserved[i] = 0u;
+    }
 }
 #endif // __cplusplus
 

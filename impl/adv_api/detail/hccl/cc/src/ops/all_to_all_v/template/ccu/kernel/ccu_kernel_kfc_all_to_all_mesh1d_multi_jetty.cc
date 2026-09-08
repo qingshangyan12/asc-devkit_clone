@@ -9,6 +9,7 @@
  */
 
 #include "ccu_kernel_kfc_all_to_all_mesh1d_multi_jetty.h"
+#include "kfc_callable_task_registry.h"
 
 namespace mc2_ops_hccl {
 namespace {
@@ -16,25 +17,6 @@ constexpr uint16_t A2A_OUTPUT_XN_ID = 1U;
 constexpr uint16_t A2A_TOKEN_XN_ID = 2U;
 constexpr uint16_t A2A_POST_SYNC_BIT = static_cast<uint16_t>(1U << 5U);
 constexpr uint16_t A2A_CKE_IDX = 0U;
-
-struct KfcAllToAllContext : CcuKernelCtxBase {
-    const ChannelHandle* channels = nullptr;
-    uint32_t channelCount = 0;
-    uint32_t rankSize = 0;
-    uint32_t rankId = 0;
-
-    ccu::Variable input;
-    ccu::Variable output;
-    ccu::Variable token;
-    std::vector<ccu::Variable> peerOutput;
-    std::vector<ccu::Variable> peerToken;
-    ccu::Variable sliceSize;
-    ccu::Variable srcStride;
-    ccu::Variable srcOffset;
-    ccu::Variable dstOffset;
-    GroupOpSizeVars goSize;
-    ccu::Event event;
-};
 
 CcuResult InitResource(KfcAllToAllContext& ctx)
 {
@@ -56,6 +38,23 @@ CcuResult InitResource(KfcAllToAllContext& ctx)
         ++channelIdx;
     }
     ctx.resourceAllocated = false;
+    return CCU_SUCCESS;
+}
+
+CcuResult LoadArgs(KfcAllToAllContext& ctx)
+{
+    uint32_t argId = 0;
+    CCU_CHK_RET(ccu::LoadArg(ctx.input, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.output, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.token, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.sliceSize, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.srcStride, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.srcOffset, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.dstOffset, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.goSize.addrOffset, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.goSize.loopParam, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.goSize.parallelParam, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.goSize.residual, argId++));
     return CCU_SUCCESS;
 }
 
@@ -136,36 +135,26 @@ CcuResult DoAllToAll(KfcAllToAllContext& ctx)
 }
 } // namespace
 
-CcuResult CcuKfcAllToAllMesh1DMultiJettyKernel(
-    ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable sliceSize,
-    ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset, ccu::Variable goSize0,
-    ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3, const ChannelHandle channels[],
-    uint32_t channelCount, uint32_t rankSize, uint32_t rankId)
+CcuResult CcuKfcAllToAllMesh1DMultiJettyKernel(CcuKernelArg arg)
 {
+    const auto* kernelArg = static_cast<CcuKernelArgKfcAllToAllMesh1DMultiJetty*>(arg);
     KfcAllToAllContext ctx;
-    ctx.channels = channels;
-    ctx.channelCount = channelCount;
-    ctx.rankSize = rankSize;
-    ctx.rankId = rankId;
+    ctx.channels = kernelArg->channels;
+    ctx.channelCount = kernelArg->channelCount;
+    ctx.rankSize = static_cast<uint32_t>(kernelArg->rankSize);
+    ctx.rankId = kernelArg->rankId;
     InitCcuKernelCtxBase(ctx);
     CCU_CHK_RET(InitResource(ctx));
-
-    ctx.input = inputAddr;
-    ctx.output = outputAddr;
-    ctx.token = tokenInfo;
-    ctx.sliceSize = sliceSize;
-    ctx.srcStride = srcStride;
-    ctx.srcOffset = srcOffset;
-    ctx.dstOffset = dstOffset;
-    ctx.goSize.addrOffset = goSize0;
-    ctx.goSize.loopParam = goSize1;
-    ctx.goSize.parallelParam = goSize2;
-    ctx.goSize.residual = goSize3;
+    CCU_CHK_RET(LoadArgs(ctx));
 
     CCU_CHK_RET(PreSync(ctx));
     CCU_CHK_RET(DoAllToAll(ctx));
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
 }
+
+REGISTER_KFC_CALLABLE_TASK(
+    HcclCMDType::HCCL_CMD_ALLTOALL, KfcServerRole::ALL_TO_ALL_MULTI_JETTY, CcuKernelKfcAllToAllMesh1DMultiJetty,
+    CcuKfcAllToAllMesh1DMultiJettyKernel);
 
 } // namespace mc2_ops_hccl

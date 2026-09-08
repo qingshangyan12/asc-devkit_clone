@@ -13,16 +13,9 @@
 
 #include "utils.h"
 #include "ccu_alg_template_base.h"
+#include "kernel/ccu_kernel_all_to_all_v_mesh1d.h"
 
 namespace mc2_ops_hccl {
-
-struct CcuKernelArgAlltoAllVMesh1D : CcuKernelArgBase {
-    uint64_t rankSize;
-    uint32_t rankId;
-    bool loadFromMem;
-    OpParam opParam;
-    std::vector<std::vector<uint32_t>> subCommRanks;
-};
 
 class CcuTempAlltoAllVMesh1D : public CcuAlgTemplateBase {
 public:
