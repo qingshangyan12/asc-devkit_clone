@@ -22,7 +22,7 @@
 #ifndef IMPL_UTILS_DEBUG_ASC_PRINTF_SIMT_IMPL_H
 #define IMPL_UTILS_DEBUG_ASC_PRINTF_SIMT_IMPL_H
 
-#include "impl/utils/sys_macros.h"
+#include "impl/utils/sys_macros_impl.h"
 
 #ifndef __SIMT_DEVICE_FUNCTIONS_DECL__
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
@@ -36,6 +36,8 @@
 #define __simt_gm__ __gm__
 #else
 #include "__clang_cce_simt_atomic.h"
+#include "__clang_cce_simt_fp16.h"
+#include "__clang_cce_simt_bf16.h"
 #define __simt_gm__
 #endif
 

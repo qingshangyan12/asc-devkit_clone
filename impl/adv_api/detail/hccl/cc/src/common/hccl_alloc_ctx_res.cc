@@ -185,7 +185,7 @@ HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSi
 {
     // 1. 分配workspace、scratch、comParam（XN）、comSync（CKE）
     constexpr uint32_t comSyncNum = KFC_SERVER_SIGNAL_REGION_NUM;
-    constexpr uint64_t scratchSize = Hccl::MC2_WORKSPACE_SIZE;
+    constexpr uint64_t scratchSize = 4 * Hccl::MC2_WORKSPACE_SIZE; // 调试: 16MB->64MB，与AIV侧对齐
     uint64_t comParamBufSize = Hccl::CCU_TASK_NUM_MAX * Hccl::CCU_PARAM_NUM_MAX * Hccl::CCU_ONE_PARAM_SIZE;
     uint64_t comSyncBufSize = Hccl::CCU_TASK_NUM_MAX * comSyncNum * Hccl::CCU_ONE_PARAM_SIZE;
 
@@ -347,7 +347,7 @@ HcclResult AllocAndCopyOpResCtx(
 } // namespace
 
 HcclResult HcclAllocOpResCtx(
-    HcclComm comm, const std::string& ctxTag, const std::vector<OpParam>& opParamVec, const void* mc2Tiling,
+    const HcclComm comm, const std::string& ctxTag, const std::vector<OpParam>& opParamVec, const void* mc2Tiling,
     const void* ccTilingList[], void** opResCtxPtr)
 {
     CHK_PTR_NULL(opResCtxPtr);
@@ -643,7 +643,15 @@ HcclResult CheckForcedAlgResource(
         HCCL_E_NOT_SUPPORT);
 
     AlgHierarchyInfoForAllLevel algHierarchyInfo;
-    HcclResult ret = executor->CalcAlgHierarchyInfo(comm, topoInfo, algHierarchyInfo);
+    HcclResult ret;
+    if (UseCannBridge(opParam)) {
+        // Match HcclGetAlgRes: bridge executors need the selected algorithm's topology metadata.
+        // opParam.algName is filled later, so use the explicit forced algorithm name here.
+        AlgAttrs algAttrs = executor->GetAlgoMeta(algName);
+        ret = executor->CalcAlgHierarchyInfoV2(topoInfo, algHierarchyInfo, algAttrs);
+    } else {
+        ret = executor->CalcAlgHierarchyInfo(comm, topoInfo, algHierarchyInfo);
+    }
     CHK_PRT_RET(
         ret != HCCL_SUCCESS,
         HCCL_WARNING(
