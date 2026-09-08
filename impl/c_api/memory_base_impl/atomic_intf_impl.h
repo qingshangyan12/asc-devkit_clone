@@ -20,19 +20,15 @@
 #include "c_api/defs/defs.h"
 #include "impl/c_api/memory_base_impl/utils_intf_impl.h"
 
-// asc_disable_dma_atomic_impl.h
 __aicore__ inline void asc_disable_dma_atomic_impl() { set_atomic_none(); }
 
-// asc_set_atomic_none_impl.h
 __aicore__ inline void asc_set_atomic_none_impl() { set_atomic_none(); }
 
-// asc_get_store_atomic_config_impl.h
 __aicore__ inline void asc_get_store_atomic_config_impl(asc_store_atomic_config& config)
 {
     config.config = get_st_atomic_cfg();
 }
 
-// asc_set_store_atomic_config_impl.h
 __aicore__ inline void asc_set_store_atomic_config_v1_impl(uint16_t type, uint16_t op)
 {
     constexpr uint64_t type_mask = 0x7;
@@ -42,154 +38,132 @@ __aicore__ inline void asc_set_store_atomic_config_v1_impl(uint16_t type, uint16
     set_st_atomic_cfg(config);
 }
 
-// asc_set_atomic_add_bfloat_impl.h
 __aicore__ inline void asc_set_atomic_add_bfloat_impl()
 {
     set_atomic_add();
     set_atomic_bf16();
 }
 
-// asc_set_atomic_add_float_impl.h
 __aicore__ inline void asc_set_atomic_add_float_impl()
 {
     set_atomic_add();
     set_atomic_f32();
 }
 
-// asc_set_atomic_add_float16_impl.h
 __aicore__ inline void asc_set_atomic_add_float16_impl()
 {
     set_atomic_add();
     set_atomic_f16();
 }
 
-// asc_set_atomic_add_int_impl.h
 __aicore__ inline void asc_set_atomic_add_int_impl()
 {
     set_atomic_add();
     set_atomic_s32();
 }
 
-// asc_set_atomic_add_int8_impl.h
 __aicore__ inline void asc_set_atomic_add_int8_impl()
 {
     set_atomic_add();
     set_atomic_s8();
 }
 
-// asc_set_atomic_add_int16_impl.h
 __aicore__ inline void asc_set_atomic_add_int16_impl()
 {
     set_atomic_add();
     set_atomic_s16();
 }
 
-// asc_set_atomic_max_bfloat_impl.h
 __aicore__ inline void asc_set_atomic_max_bfloat_impl()
 {
     set_atomic_max();
     set_atomic_bf16();
 }
 
-// asc_set_atomic_max_float_impl.h
 __aicore__ inline void asc_set_atomic_max_float_impl()
 {
     set_atomic_max();
     set_atomic_f32();
 }
 
-// asc_set_atomic_max_float16_impl.h
 __aicore__ inline void asc_set_atomic_max_float16_impl()
 {
     set_atomic_max();
     set_atomic_f16();
 }
 
-// asc_set_atomic_max_int_impl.h
 __aicore__ inline void asc_set_atomic_max_int_impl()
 {
     set_atomic_max();
     set_atomic_s32();
 }
 
-// asc_set_atomic_max_int8_impl.h
 __aicore__ inline void asc_set_atomic_max_int8_impl()
 {
     set_atomic_max();
     set_atomic_s8();
 }
 
-// asc_set_atomic_max_int16_impl.h
 __aicore__ inline void asc_set_atomic_max_int16_impl()
 {
     set_atomic_max();
     set_atomic_s16();
 }
 
-// asc_set_atomic_min_bfloat_impl.h
 __aicore__ inline void asc_set_atomic_min_bfloat_impl()
 {
     set_atomic_min();
     set_atomic_bf16();
 }
 
-// asc_set_atomic_min_float_impl.h
 __aicore__ inline void asc_set_atomic_min_float_impl()
 {
     set_atomic_min();
     set_atomic_f32();
 }
 
-// asc_set_atomic_min_float16_impl.h
 __aicore__ inline void asc_set_atomic_min_float16_impl()
 {
     set_atomic_min();
     set_atomic_f16();
 }
 
-// asc_set_atomic_min_int_impl.h
 __aicore__ inline void asc_set_atomic_min_int_impl()
 {
     set_atomic_min();
     set_atomic_s32();
 }
 
-// asc_set_atomic_min_int8_impl.h
 __aicore__ inline void asc_set_atomic_min_int8_impl()
 {
     set_atomic_min();
     set_atomic_s8();
 }
 
-// asc_set_atomic_min_int16_impl.h
 __aicore__ inline void asc_set_atomic_min_int16_impl()
 {
     set_atomic_min();
     set_atomic_s16();
 }
 
-// asc_set_atomic_add_int32_impl.h
 __aicore__ inline void asc_set_atomic_add_int32_impl()
 {
     set_atomic_add();
     set_atomic_s32();
 }
 
-// asc_set_atomic_max_int32_impl.h
 __aicore__ inline void asc_set_atomic_max_int32_impl()
 {
     set_atomic_max();
     set_atomic_s32();
 }
 
-// asc_set_atomic_min_int32_impl.h
 __aicore__ inline void asc_set_atomic_min_int32_impl()
 {
     set_atomic_min();
     set_atomic_s32();
 }
 
-// atomic_impl.h
 __aicore__ inline void asc_disable_dma_atomic() { asc_disable_dma_atomic_impl(); }
 
 [[deprecated("NOTICE: asc_set_atomic_none is deprecated. Please use asc_disable_dma_atomic instead.")]]

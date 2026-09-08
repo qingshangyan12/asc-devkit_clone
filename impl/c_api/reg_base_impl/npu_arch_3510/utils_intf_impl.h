@@ -20,13 +20,10 @@
 #include "c_api/defs/defs.h"
 #include "impl/c_api/reg_base_impl/utils_intf_impl.h"
 
-// asc_get_block_idx_impl.h
 __aicore__ inline int64_t asc_get_block_idx_impl() { return get_block_idx(); }
 
-// asc_get_block_num_impl.h
 __aicore__ inline int64_t asc_get_block_num_impl() { return get_block_num(); }
 
-// sys_var_impl.h
 [[deprecated("NOTICE: asc_get_block_idx is deprecated. "
              "Please use block_idx for pure Vector, pure Cube, and Mix(1, 1). "
              "For Mix(1, 2), please use block_idx on the Cube core and "

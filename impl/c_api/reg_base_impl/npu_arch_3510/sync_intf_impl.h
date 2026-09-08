@@ -21,7 +21,6 @@
 #include "impl/c_api/reg_base_impl/sync_intf_impl.h"
 #include "impl/c_api/reg_base_impl/utils_intf_impl.h"
 
-// sync_impl.h
 [[deprecated("NOTICE: asc_sync_vec() is deprecated. "
              "Please use asc_sync() instead")]]
 __aicore__ inline void asc_sync_vec()

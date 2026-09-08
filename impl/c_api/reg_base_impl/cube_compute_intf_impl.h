@@ -20,7 +20,6 @@
 #include "c_api/defs/defs.h"
 #include "impl/c_api/reg_base_impl/utils_intf_impl.h"
 
-// asc_mmad_mx_impl.h
 __aicore__ inline void asc_mmad_mx_impl(
     __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __cb__ fp4x2_e1m2_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -213,7 +212,6 @@ __aicore__ inline void asc_mmad_mx_impl(
     }
 }
 
-// asc_mmad_impl.h
 __aicore__ inline void asc_mmad_impl(
     __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ bfloat16_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -409,14 +407,12 @@ __aicore__ inline void asc_mmad_impl(
     }
 }
 
-// asc_enable_hf32_impl.h
 __aicore__ inline void asc_enable_hf32_impl()
 {
     constexpr int32_t HF32_MODE_BIT = 46;
     set_ctrl(sbitset1(get_ctrl(), HF32_MODE_BIT));
 }
 
-// asc_set_hf32_round_mode_impl.h
 __aicore__ inline void asc_set_hf32_round_mode_impl(asc_hf32_round_mode hf32_round_mode)
 {
     constexpr int32_t HF32_TRANS_MODE_BIT = 47;
@@ -427,7 +423,6 @@ __aicore__ inline void asc_set_hf32_round_mode_impl(asc_hf32_round_mode hf32_rou
     }
 }
 
-// asc_enable_hf32_trans_impl.h
 __aicore__ inline void asc_enable_hf32_trans_impl(uint32_t mode)
 {
     constexpr int32_t HF32_TRANS_MODE_BIT = 47;
@@ -438,56 +433,48 @@ __aicore__ inline void asc_enable_hf32_trans_impl(uint32_t mode)
     }
 }
 
-// asc_set_fp32_mode_impl.h
 __aicore__ inline void asc_set_fp32_mode_impl()
 {
     constexpr int32_t HF32_MODE_BIT = 46;
     set_ctrl(sbitset0(get_ctrl(), HF32_MODE_BIT));
 }
 
-// asc_disable_hf32_impl.h
 __aicore__ inline void asc_disable_hf32_impl()
 {
     constexpr int32_t HF32_MODE_BIT = 46;
     set_ctrl(sbitset0(get_ctrl(), HF32_MODE_BIT));
 }
 
-// asc_enable_hif8_impl.h
 __aicore__ inline void asc_enable_hif8_impl()
 {
     constexpr int32_t HIF8_MODE_BIT = 45;
     set_ctrl(sbitset1(get_ctrl(), HIF8_MODE_BIT));
 }
 
-// asc_enable_fp8_impl.h
 __aicore__ inline void asc_enable_fp8_impl()
 {
     constexpr int32_t HIF8_MODE_BIT = 45;
     set_ctrl(sbitset0(get_ctrl(), HIF8_MODE_BIT));
 }
 
-// asc_disable_hif8_impl.h
 __aicore__ inline void asc_disable_hif8_impl()
 {
     constexpr int32_t HIF8_MODE_BIT = 45;
     set_ctrl(sbitset0(get_ctrl(), HIF8_MODE_BIT));
 }
 
-// asc_set_mmad_direction_m_impl.h
 __aicore__ inline void asc_set_mmad_direction_m_impl()
 {
     constexpr int32_t capi_mm_layout_mode_bit = 51;
     set_ctrl(sbitset0(get_ctrl(), capi_mm_layout_mode_bit));
 }
 
-// asc_set_mmad_direction_n_impl.h
 __aicore__ inline void asc_set_mmad_direction_n_impl()
 {
     constexpr int32_t capi_mm_layout_mode_bit = 51;
     set_ctrl(sbitset1(get_ctrl(), capi_mm_layout_mode_bit));
 }
 
-// cube_compute_impl.h
 // ==========mmad_mx(e1m2/e1m2, e4m3/e5m2)==========
 __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __cb__ fp4x2_e1m2_t* b_matrix, uint16_t m, uint16_t k,

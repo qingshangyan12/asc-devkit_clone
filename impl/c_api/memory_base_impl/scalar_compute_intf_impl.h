@@ -20,31 +20,22 @@
 #include "c_api/defs/defs.h"
 #include "impl/c_api/memory_base_impl/utils_intf_impl.h"
 
-// asc_clz_impl.h
 __aicore__ inline int64_t asc_clz_impl(uint64_t value_in) { return clz(value_in); }
 
-// ffs_impl.h
 __aicore__ inline int64_t asc_ffs_impl(uint64_t value) { return sff1(value); }
 
-// asc_sflbits_impl.h
 __aicore__ inline int64_t asc_sflbits_impl(int64_t value) { return sflbits(value); }
 
-// asc_zero_bits_cnt_impl.h
 __aicore__ inline int64_t asc_zero_bits_cnt_impl(uint64_t value) { return bcnt0(value); }
 
-// asc_ffz_impl.h
 __aicore__ inline int64_t asc_ffz_impl(uint64_t value) { return sff0(value); }
 
-// asc_popc_impl.h
 __aicore__ inline int64_t asc_popc_impl(uint64_t value) { return bcnt1(value); }
 
-// asc_set_nthbit_impl.h
 __aicore__ inline uint64_t asc_set_nthbit_impl(uint64_t bits, int64_t idx) { return sbitset1(bits, idx); }
 
-// asc_clear_nthbit_impl.h
 __aicore__ inline uint64_t asc_clear_nthbit_impl(uint64_t bits, int64_t idx) { return sbitset0(bits, idx); }
 
-// scalar_compute_impl.h
 __aicore__ inline int64_t asc_clz(uint64_t value_in) { return asc_clz_impl(value_in); }
 
 __aicore__ inline int64_t asc_ffs(uint64_t value) { return asc_ffs_impl(value); }

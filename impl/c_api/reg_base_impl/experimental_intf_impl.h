@@ -20,7 +20,6 @@
 #include "c_api/defs/defs.h"
 #include "impl/c_api/reg_base_impl/utils_intf_impl.h"
 
-// asc_get_pipe_idle_slot_count_impl.h
 __aicore__ inline uint8_t asc_get_pipe_mte2_idle_slot_count() { return static_cast<uint8_t>(get_iqent(PIPE_MTE2)); }
 
 __aicore__ inline uint8_t asc_get_pipe_mte3_idle_slot_count()

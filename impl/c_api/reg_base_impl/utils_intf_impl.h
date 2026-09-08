@@ -23,7 +23,6 @@
 #include "impl/utils/sys_macros_impl.h"
 #include "utils/base/sys_constants.h"
 
-// utils_impl.h
 constexpr uint32_t C_API_AIC_TYPE = AscendC::AIC;
 
 constexpr uint32_t C_API_AIV_TYPE = AscendC::AIV;
@@ -100,51 +99,38 @@ union asc_gm2ub_loop_stride_config {
     };
 };
 
-// asc_get_program_counter_impl.h
 __aicore__ inline int64_t asc_get_program_counter_impl() { return get_pc(); }
 
-// asc_get_system_cycle_impl.h
 constexpr int64_t SYSTEM_CLOCK_FREQ_MHZ = 1000;
 
 __aicore__ inline int64_t asc_get_system_cycle_impl() { return get_sys_cnt(); }
 
 __aicore__ inline int64_t asc_get_system_clock_impl() { return get_sys_cnt() / SYSTEM_CLOCK_FREQ_MHZ; }
 
-// asc_get_phy_buf_addr_impl.h
 __aicore__ inline uint64_t asc_get_phy_buf_addr_impl(uint64_t offset) { return get_imm(offset); }
 
-// asc_get_vf_len_impl.h
 __aicore__ inline constexpr int64_t asc_get_vf_len_impl()
 {
     constexpr int64_t VECTOR_REG_WIDTH_3510 = 256;
     return VECTOR_REG_WIDTH_3510;
 }
 
-// asc_get_arch_ver_impl.h
 __aicore__ inline void asc_get_arch_ver_impl(uint32_t& core_version) { core_version = 3510U; }
 
-// asc_get_core_id_impl.h
 __aicore__ inline int64_t asc_get_core_id_impl() { return get_coreid(); }
 
-// asc_get_smmu_tag_version_impl.h
 __aicore__ inline int64_t asc_get_smmu_tag_version_impl() { return get_smmu_tag_ver(); }
 
-// asc_get_phy_stack_base_impl.h
 __aicore__ inline int64_t asc_get_phy_stack_base_impl() { return get_stack_phy_base(); }
 
-// asc_get_status_impl.h
 __aicore__ inline int64_t asc_get_status_impl() { return get_status(); }
 
-// asc_get_sub_block_id_impl.h
 __aicore__ inline int64_t asc_get_sub_block_id_impl() { return get_subblockid(); }
 
-// asc_get_sub_block_num_impl.h
 __aicore__ inline int64_t asc_get_sub_block_num_impl() { return get_subblockdim(); }
 
-// asc_get_sys_virtual_base_impl.h
 __aicore__ inline int64_t asc_get_sys_virtual_base_impl() { return get_sys_va_base(); }
 
-// sys_var_impl.h
 __aicore__ inline int64_t asc_get_program_counter() { return asc_get_program_counter_impl(); }
 
 __aicore__ inline int64_t asc_get_sub_block_num() { return asc_get_sub_block_num_impl(); }

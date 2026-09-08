@@ -20,7 +20,6 @@
 #include "c_api/defs/defs.h"
 #include "impl/c_api/reg_base_impl/utils_intf_impl.h"
 
-// asc_sync_notify_impl.h
 __aicore__ inline void asc_sync_notify_impl_aic(pipe_t pipe, pipe_t tpipe, event_t id)
 {
     if (pipe == pipe_t::PIPE_S) {
@@ -110,7 +109,6 @@ __aicore__ inline void asc_sync_notify_impl(pipe_t pipe, pipe_t tpipe, event_t i
     }
 }
 
-// asc_sync_wait_impl.h
 __aicore__ inline void asc_sync_wait_impl_aic(pipe_t pipe, pipe_t tpipe, event_t id)
 {
     if (pipe == pipe_t::PIPE_S) {
@@ -200,7 +198,6 @@ __aicore__ inline void asc_sync_wait_impl(pipe_t pipe, pipe_t tpipe, event_t id)
     }
 }
 
-// asc_sync_pipe_impl.h
 __aicore__ inline void asc_sync_pipe_impl(pipe_t pipe)
 {
     if ASC_IS_AIC {
@@ -258,7 +255,6 @@ __aicore__ inline void asc_sync_mte3_impl(int id)
 
 __aicore__ inline void asc_sync_impl() { pipe_barrier(pipe_t::PIPE_ALL); }
 
-// asc_sync_block_arrive_impl.h
 __aicore__ inline void asc_sync_block_arrive_impl(pipe_t pipe, int64_t flag_id)
 {
     constexpr uint16_t SYNC_MODE_SHIFT_VALUE = 4;
@@ -287,7 +283,6 @@ __aicore__ inline void asc_sync_block_arrive_impl(pipe_t pipe, int64_t flag_id)
     }
 }
 
-// asc_sync_inter_arrive_impl.h
 __aicore__ inline void asc_sync_inter_arrive_impl(pipe_t pipe, int64_t flag_id)
 {
     constexpr uint16_t SYNC_MODE_SHIFT_VALUE = 4;
@@ -316,7 +311,6 @@ __aicore__ inline void asc_sync_inter_arrive_impl(pipe_t pipe, int64_t flag_id)
     }
 }
 
-// asc_sync_subblock_arrive_impl.h
 __aicore__ inline void asc_sync_subblock_arrive_impl(pipe_t pipe, int64_t flag_id)
 {
     constexpr uint16_t SYNC_MODE_SHIFT_VALUE = 4;
@@ -345,7 +339,6 @@ __aicore__ inline void asc_sync_subblock_arrive_impl(pipe_t pipe, int64_t flag_i
     }
 }
 
-// asc_sync_data_barrier_impl.h
 __aicore__ inline void asc_sync_data_barrier_impl(mem_dsb_t arg)
 {
     if ASC_IS_AIV {
@@ -369,7 +362,6 @@ __aicore__ inline void asc_sync_data_barrier_impl(mem_dsb_t arg)
     }
 }
 
-// asc_lock_impl.h
 __aicore__ inline void asc_lock_impl(pipe_t pipe, uint8_t mutex_id, const asc_mutex_execute_mode mode)
 {
     if (mode == ASC_LOCK_BLOCK) {
@@ -425,7 +417,6 @@ __aicore__ inline void asc_lock_impl(pipe_t pipe, uint8_t mutex_id, const asc_mu
 
 __aicore__ inline void asc_lock_impl(pipe_t pipe, uint8_t mutex_id) { asc_lock_impl(pipe, mutex_id, ASC_LOCK_BLOCK); }
 
-// asc_unlock_impl.h
 __aicore__ inline void asc_unlock_impl(pipe_t pipe, uint8_t mutex_id, const asc_mutex_execute_mode mode)
 {
     if (mode == ASC_LOCK_BLOCK) {
@@ -484,7 +475,6 @@ __aicore__ inline void asc_unlock_impl(pipe_t pipe, uint8_t mutex_id)
     asc_unlock_impl(pipe, mutex_id, ASC_LOCK_BLOCK);
 }
 
-// asc_sync_block_wait_impl.h
 __aicore__ inline void asc_sync_block_wait_impl(pipe_t pipe, int64_t flag_id)
 {
     if ASC_IS_AIC {
@@ -512,7 +502,6 @@ __aicore__ inline void asc_sync_block_wait_impl(pipe_t pipe, int64_t flag_id)
     }
 }
 
-// asc_sync_inter_wait_impl.h
 __aicore__ inline void asc_sync_inter_wait_impl(pipe_t pipe, int64_t flag_id)
 {
     if ASC_IS_AIC {
@@ -540,7 +529,6 @@ __aicore__ inline void asc_sync_inter_wait_impl(pipe_t pipe, int64_t flag_id)
     }
 }
 
-// asc_sync_subblock_wait_impl.h
 __aicore__ inline void asc_sync_subblock_wait_impl(pipe_t pipe, int64_t flag_id)
 {
     if ASC_IS_AIC {
@@ -568,7 +556,6 @@ __aicore__ inline void asc_sync_subblock_wait_impl(pipe_t pipe, int64_t flag_id)
     }
 }
 
-// asc_sync_intra_wait_impl.h
 __aicore__ inline void asc_sync_intra_wait_impl(pipe_t pipe, uint64_t sync_id)
 {
     if ASC_IS_AIC {
@@ -596,7 +583,6 @@ __aicore__ inline void asc_sync_intra_wait_impl(pipe_t pipe, uint64_t sync_id)
     }
 }
 
-// asc_sync_intra_arrive_impl.h
 __aicore__ inline void asc_sync_intra_arrive_impl(pipe_t pipe, uint64_t sync_id)
 {
     if ASC_IS_AIC {
@@ -624,7 +610,6 @@ __aicore__ inline void asc_sync_intra_arrive_impl(pipe_t pipe, uint64_t sync_id)
     }
 }
 
-// sync_impl.h
 __aicore__ inline void asc_sync_vec(int id) { asc_sync_vec_impl(id); }
 
 __aicore__ inline void asc_sync_pipe(pipe_t pipe) { asc_sync_pipe_impl(pipe); }

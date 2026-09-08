@@ -20,7 +20,6 @@
 #include "c_api/defs/defs.h"
 #include "impl/c_api/reg_base_impl/utils_intf_impl.h"
 
-// init_soc_state_impl.h
 __aicore__ inline void asc_init_soc_state_impl()
 {
     set_atomic_none();
@@ -39,12 +38,10 @@ __aicore__ inline void asc_init_soc_state_impl()
     set_st_atomic_cfg(0b00100100);
 }
 
-// asc_nop_impl.h
 namespace __asc_aicore {
 __aicore__ inline void asc_nop_impl() { asm volatile("nop"); }
 } // namespace __asc_aicore
 
-// misc_impl.h
 __aicore__ inline void asc_init() { asc_init_soc_state_impl(); }
 
 namespace __asc_aicore {

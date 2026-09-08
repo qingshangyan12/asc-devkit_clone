@@ -20,7 +20,6 @@
 #include "c_api/defs/defs.h"
 #include "impl/c_api/reg_base_impl/utils_intf_impl.h"
 
-// asc_relu_impl.h
 __simd_callee__ inline void asc_relu_impl(vector_half& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -42,7 +41,6 @@ __simd_callee__ inline void asc_relu_impl(vector_float& dst, vector_float src, v
     }
 }
 
-// asc_update_addr_reg_impl.h
 #define ASC_DEFINE_UPDATE_ADDR_REG_IMPL(bxx)                                                                    \
     __simd_callee__ inline addr_reg asc_update_addr_reg_##bxx##_impl(uint32_t offset)                    \
     {                                                                                                    \
@@ -81,7 +79,6 @@ ASC_DEFINE_UPDATE_ADDR_REG_IMPL(b8)
 
 #undef ASC_DEFINE_UPDATE_ADDR_REG_IMPL
 
-// asc_sub_impl.h
 __simd_callee__ inline void asc_sub_impl(
     vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
 {
@@ -167,7 +164,6 @@ __simd_callee__ inline void asc_sub_impl(
     }
 }
 
-// asc_subc_impl.h
 __simd_callee__ inline void asc_subc_impl(
     vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool carry_src,
     vector_bool mask)
@@ -186,7 +182,6 @@ __simd_callee__ inline void asc_subc_impl(
     }
 }
 
-// asc_and_impl.h
 __simd_callee__ inline void asc_and_impl(vector_bool& dst, vector_bool src0, vector_bool src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -279,7 +274,6 @@ __simd_callee__ inline void asc_and_impl(vector_float& dst, vector_float src0, v
     }
 }
 
-// asc_shiftleft_scalar_impl.h
 __simd_callee__ inline void asc_shiftleft_scalar_impl(
     vector_uint8_t& dst, vector_uint8_t src, int16_t shift, vector_bool mask)
 {
@@ -370,7 +364,6 @@ __simd_callee__ inline vector_int32_t asc_shiftleft_scalar_impl(vector_int32_t s
     return dst;
 }
 
-// asc_shiftright_scalar_impl.h
 __simd_callee__ inline void asc_shiftright_scalar_impl(
     vector_uint8_t& dst, vector_uint8_t src, int16_t shift, vector_bool mask)
 {
@@ -461,7 +454,6 @@ __simd_callee__ inline vector_int32_t asc_shiftright_scalar_impl(vector_int32_t 
     return dst;
 }
 
-// asc_select_impl.h
 __simd_callee__ inline void asc_select_impl(vector_bool& dst, vector_bool src0, vector_bool src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -565,7 +557,6 @@ __simd_callee__ inline void asc_select_impl(vector_float& dst, vector_float src0
     }
 }
 
-// asc_float2half_rd_impl.h
 __simd_callee__ inline void asc_float2half_rd_impl(vector_half& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -649,7 +640,6 @@ __simd_callee__ inline vector_half asc_float2half_rd_sat_impl(
     return dst;
 }
 
-// asc_float2half_rn_impl.h
 __simd_callee__ inline void asc_float2half_rn_impl(vector_half& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -733,7 +723,6 @@ __simd_callee__ inline vector_half asc_float2half_rn_sat_impl(
     return dst;
 }
 
-// asc_float2half_rna_impl.h
 __simd_callee__ inline void asc_float2half_rna_impl(vector_half& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -817,7 +806,6 @@ __simd_callee__ inline vector_half asc_float2half_rna_sat_impl(
     return dst;
 }
 
-// asc_float2half_ro_impl.h
 __simd_callee__ inline void asc_float2half_ro_impl(vector_half& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -901,7 +889,6 @@ __simd_callee__ inline vector_half asc_float2half_ro_sat_impl(
     return dst;
 }
 
-// asc_float2half_ru_impl.h
 __simd_callee__ inline void asc_float2half_ru_impl(vector_half& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -985,7 +972,6 @@ __simd_callee__ inline vector_half asc_float2half_ru_sat_impl(
     return dst;
 }
 
-// asc_float2half_rz_impl.h
 __simd_callee__ inline void asc_float2half_rz_impl(vector_half& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1069,7 +1055,6 @@ __simd_callee__ inline vector_half asc_float2half_rz_sat_impl(
     return dst;
 }
 
-// asc_bfloat162half_rd_impl.h
 __simd_callee__ inline void asc_bfloat162half_rd_impl(vector_half& dst, vector_bfloat16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1084,7 +1069,6 @@ __simd_callee__ inline void asc_bfloat162half_rd_sat_impl(vector_half& dst, vect
     }
 }
 
-// asc_bfloat162half_rn_impl.h
 __simd_callee__ inline void asc_bfloat162half_rn_impl(vector_half& dst, vector_bfloat16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1099,7 +1083,6 @@ __simd_callee__ inline void asc_bfloat162half_rn_sat_impl(vector_half& dst, vect
     }
 }
 
-// asc_bfloat162half_rna_impl.h
 __simd_callee__ inline void asc_bfloat162half_rna_impl(vector_half& dst, vector_bfloat16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1114,7 +1097,6 @@ __simd_callee__ inline void asc_bfloat162half_rna_sat_impl(vector_half& dst, vec
     }
 }
 
-// asc_bfloat162half_ru_impl.h
 __simd_callee__ inline void asc_bfloat162half_ru_impl(vector_half& dst, vector_bfloat16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1129,7 +1111,6 @@ __simd_callee__ inline void asc_bfloat162half_ru_sat_impl(vector_half& dst, vect
     }
 }
 
-// asc_bfloat162half_rz_impl.h
 __simd_callee__ inline void asc_bfloat162half_rz_impl(vector_half& dst, vector_bfloat16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1144,7 +1125,6 @@ __simd_callee__ inline void asc_bfloat162half_rz_sat_impl(vector_half& dst, vect
     }
 }
 
-// asc_uint322int16_impl.h
 // part_even
 __simd_callee__ inline void asc_uint322int16_impl(vector_int16_t& dst, vector_uint32_t src, vector_bool mask)
 {
@@ -1229,7 +1209,6 @@ __simd_callee__ inline vector_int16_t asc_uint322int16_sat_impl(
     return dst;
 }
 
-// asc_half2bfloat16_rd_impl.h
 __simd_callee__ inline void asc_half2bfloat16_rd_impl(vector_bfloat16_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1237,7 +1216,6 @@ __simd_callee__ inline void asc_half2bfloat16_rd_impl(vector_bfloat16_t& dst, ve
     }
 }
 
-// asc_half2bfloat16_rn_impl.h
 __simd_callee__ inline void asc_half2bfloat16_rn_impl(vector_bfloat16_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1245,7 +1223,6 @@ __simd_callee__ inline void asc_half2bfloat16_rn_impl(vector_bfloat16_t& dst, ve
     }
 }
 
-// asc_half2bfloat16_rna_impl.h
 __simd_callee__ inline void asc_half2bfloat16_rna_impl(vector_bfloat16_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1253,7 +1230,6 @@ __simd_callee__ inline void asc_half2bfloat16_rna_impl(vector_bfloat16_t& dst, v
     }
 }
 
-// asc_half2bfloat16_ru_impl.h
 __simd_callee__ inline void asc_half2bfloat16_ru_impl(vector_bfloat16_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1261,7 +1237,6 @@ __simd_callee__ inline void asc_half2bfloat16_ru_impl(vector_bfloat16_t& dst, ve
     }
 }
 
-// asc_half2bfloat16_rz_impl.h
 __simd_callee__ inline void asc_half2bfloat16_rz_impl(vector_bfloat16_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1269,7 +1244,6 @@ __simd_callee__ inline void asc_half2bfloat16_rz_impl(vector_bfloat16_t& dst, ve
     }
 }
 
-// asc_float2e5m2_rn_impl.h
 __simd_callee__ inline void asc_float2e5m2_rn_impl(vector_fp8_e5m2_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1445,7 +1419,6 @@ __simd_callee__ inline vector_fp8_e5m2_t asc_float2e5m2_rn_sat_impl(
     return dst;
 }
 
-// asc_half2float_impl.h
 __simd_callee__ inline void asc_half2float_impl(vector_float& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1488,7 +1461,6 @@ __simd_callee__ inline vector_float asc_half2float_impl(
     return dst;
 }
 
-// asc_e4m32float_impl.h
 __simd_callee__ inline void asc_e4m32float_impl(vector_float& dst, vector_fp8_e4m3fn_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1577,7 +1549,6 @@ __simd_callee__ inline vector_float asc_e4m32float_impl(
     return dst;
 }
 
-// asc_int162float_impl.h
 __simd_callee__ inline void asc_int162float_impl(vector_float& dst, vector_int16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1620,7 +1591,6 @@ __simd_callee__ inline vector_float asc_int162float_impl(
     return dst;
 }
 
-// asc_int4x22int16_impl.h
 __simd_callee__ inline void asc_int4x22int16_impl(vector_int16_t& dst, vector_int4x2_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1628,7 +1598,6 @@ __simd_callee__ inline void asc_int4x22int16_impl(vector_int16_t& dst, vector_in
     }
 }
 
-// asc_int322int16_impl.h
 __simd_callee__ inline void asc_int322int16_impl(vector_int16_t& dst, vector_int32_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1712,7 +1681,6 @@ __simd_callee__ inline vector_int16_t asc_int322int16_sat_impl(
     return dst;
 }
 
-// asc_int322uint8_impl.h
 __simd_callee__ inline void asc_int322uint8_impl(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1888,7 +1856,6 @@ __simd_callee__ inline vector_uint8_t asc_int322uint8_sat_impl(
     return dst;
 }
 
-// asc_duplicate_scalar_impl.h
 // vdup
 __simd_callee__ inline void asc_duplicate_scalar_impl(vector_uint8_t& dst, uint8_t value, vector_bool mask)
 {
@@ -2145,7 +2112,6 @@ __simd_callee__ inline void asc_duplicate_scalar_impl(vector_fp8_e8m0_t& dst, fp
     }
 }
 
-// asc_duplicate_impl.h
 __simd_callee__ inline void asc_duplicate_impl(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -2491,7 +2457,6 @@ __simd_callee__ inline void asc_duplicate_highest_merge_impl(vector_float& dst, 
     }
 }
 
-// asc_abs_sub_impl.h
 __simd_callee__ inline void asc_abs_sub_impl(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -2506,7 +2471,6 @@ __simd_callee__ inline void asc_abs_sub_impl(vector_float& dst, vector_float src
     }
 }
 
-// asc_min_impl.h
 __simd_callee__ inline void asc_min_impl(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -2576,7 +2540,6 @@ __simd_callee__ inline void asc_min_impl(vector_float& dst, vector_float src0, v
     }
 }
 
-// asc_neg_impl.h
 __simd_callee__ inline void asc_neg_impl(vector_int8_t& dst, vector_int8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -2612,7 +2575,6 @@ __simd_callee__ inline void asc_neg_impl(vector_float& dst, vector_float src, ve
     }
 }
 
-// asc_ge_impl.h
 __simd_callee__ inline void asc_ge_impl(vector_bool& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -2677,7 +2639,6 @@ __simd_callee__ inline void asc_ge_impl(vector_bool& dst, vector_float src0, vec
     }
 }
 
-// asc_ge_scalar_impl.h
 __simd_callee__ inline void asc_ge_scalar_impl(vector_bool& dst, vector_int8_t src, int8_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -2742,7 +2703,6 @@ __simd_callee__ inline void asc_ge_scalar_impl(vector_bool& dst, vector_float sr
     }
 }
 
-// asc_reduce_max_impl.h
 __simd_callee__ inline void asc_reduce_max_impl(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -2785,7 +2745,6 @@ __simd_callee__ inline void asc_reduce_max_impl(vector_float& dst, vector_float 
     }
 }
 
-// asc_reduce_min_impl.h
 __simd_callee__ inline void asc_reduce_min_impl(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -2828,7 +2787,6 @@ __simd_callee__ inline void asc_reduce_min_impl(vector_float& dst, vector_float 
     }
 }
 
-// asc_reduce_min_datablock_impl.h
 __simd_callee__ inline void asc_reduce_min_datablock_impl(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -2871,7 +2829,6 @@ __simd_callee__ inline void asc_reduce_min_datablock_impl(vector_float& dst, vec
     }
 }
 
-// asc_axpy_impl.h
 __simd_callee__ inline void asc_axpy_impl(vector_half& dst, vector_half src, half value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -2886,7 +2843,6 @@ __simd_callee__ inline void asc_axpy_impl(vector_float& dst, vector_float src, f
     }
 }
 
-// asc_abs_impl.h
 __simd_callee__ inline void asc_abs_impl(vector_int8_t& dst, vector_int8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -2922,7 +2878,6 @@ __simd_callee__ inline void asc_abs_impl(vector_float& dst, vector_float src, ve
     }
 }
 
-// asc_arange_impl.h
 __simd_callee__ inline void asc_arange_impl(vector_int8_t& dst, int8_t value)
 {
     if ASC_IS_AIV {
@@ -2993,7 +2948,6 @@ __simd_callee__ inline void asc_arange_descend_impl(vector_float& dst, float val
     }
 }
 
-// asc_cumulative_histogram_impl.h
 __simd_callee__ inline void asc_cumulative_histogram_bin0_impl(
     vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
 {
@@ -3010,7 +2964,6 @@ __simd_callee__ inline void asc_cumulative_histogram_bin1_impl(
     }
 }
 
-// asc_le_impl.h
 __simd_callee__ inline void asc_le_impl(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -3075,7 +3028,6 @@ __simd_callee__ inline void asc_le_impl(
     }
 }
 
-// asc_le_scalar_impl.h
 __simd_callee__ inline void asc_le_scalar_impl(vector_bool& dst, vector_uint8_t src, uint8_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -3140,7 +3092,6 @@ __simd_callee__ inline void asc_le_scalar_impl(
     }
 }
 
-// asc_frequency_histogram_impl.h
 __simd_callee__ inline void asc_frequency_histogram_bin0_impl(
     vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
 {
@@ -3157,7 +3108,6 @@ __simd_callee__ inline void asc_frequency_histogram_bin1_impl(
     }
 }
 
-// asc_intlv_impl.h
 __simd_callee__ inline void asc_intlv_b8_impl(vector_bool& dst0, vector_bool& dst1, vector_bool src0, vector_bool src1)
 {
     if ASC_IS_AIV {
@@ -3283,7 +3233,6 @@ __simd_callee__ inline void asc_intlv_impl(
     }
 }
 
-// asc_mull_impl.h
 __simd_callee__ inline void asc_mull_impl(
     vector_uint32_t& dst0, vector_uint32_t& dst1, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
 {
@@ -3300,7 +3249,6 @@ __simd_callee__ inline void asc_mull_impl(
     }
 }
 
-// asc_squeeze_impl.h
 __simd_callee__ inline void asc_squeeze_impl(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -3392,7 +3340,6 @@ __simd_callee__ inline void asc_squeeze_impl(vector_fp8_e8m0_t& dst, vector_fp8_
     }
 }
 
-// asc_unsqueeze_impl.h
 __simd_callee__ inline void asc_unsqueeze_impl(vector_uint8_t& dst, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -3435,7 +3382,6 @@ __simd_callee__ inline void asc_unsqueeze_impl(vector_int32_t& dst, vector_bool 
     }
 }
 
-// asc_update_mask_impl.h
 __simd_callee__ inline vector_bool asc_update_mask_b8_impl(uint32_t& value)
 {
     if ASC_IS_AIV {
@@ -3460,7 +3406,6 @@ __simd_callee__ inline vector_bool asc_update_mask_b32_impl(uint32_t& value)
     return vector_bool{};
 }
 
-// asc_bfloat162float_impl.h
 __simd_callee__ inline void asc_bfloat162float_impl(vector_float& dst, vector_bfloat16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -3503,7 +3448,6 @@ __simd_callee__ inline vector_float asc_bfloat162float_impl(
     return dst;
 }
 
-// asc_half2hif8_impl.h
 __simd_callee__ inline void asc_half2hif8_rh_impl(vector_hifloat8_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -3669,7 +3613,6 @@ __simd_callee__ inline vector_hifloat8_t asc_half2hif8_rna_sat_impl(
     return dst;
 }
 
-// asc_half2int8_impl.h
 __simd_callee__ inline void asc_half2int8_rd_impl(vector_int8_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -4081,7 +4024,6 @@ __simd_callee__ inline vector_int8_t asc_half2int8_rz_sat_impl(
     return dst;
 }
 
-// asc_int162uint32_impl.h
 __simd_callee__ inline void asc_int162uint32_impl(vector_uint32_t& dst, vector_int16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -4124,7 +4066,6 @@ __simd_callee__ inline vector_uint32_t asc_int162uint32_impl(
     return dst;
 }
 
-// asc_int322float_impl.h
 __simd_callee__ inline void asc_int322float_rd_impl(vector_float& dst, vector_int32_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -4160,7 +4101,6 @@ __simd_callee__ inline void asc_int322float_rna_impl(vector_float& dst, vector_i
     }
 }
 
-// asc_int4x22bfloat16_impl.h
 __simd_callee__ inline void asc_int4x22bfloat16_impl(vector_bfloat16_t& dst, vector_int4x2_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -4168,7 +4108,6 @@ __simd_callee__ inline void asc_int4x22bfloat16_impl(vector_bfloat16_t& dst, vec
     }
 }
 
-// asc_uint162uint8_impl.h
 __simd_callee__ inline void asc_uint162uint8_impl(vector_uint8_t& dst, vector_uint16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -4252,7 +4191,6 @@ __simd_callee__ inline vector_uint8_t asc_uint162uint8_sat_impl(
     return dst;
 }
 
-// asc_half2int4x2_rd_impl.h
 // rd - sat:dis/en - v1 v2 v3 v4
 __simd_callee__ inline void asc_half2int4x2_rd_impl(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
@@ -4268,7 +4206,6 @@ __simd_callee__ inline void asc_half2int4x2_rd_sat_impl(vector_int4x2_t& dst, ve
     }
 }
 
-// asc_half2int4x2_rn_impl.h
 // rn - sat:dis/en - v1 v2 v3 v4
 __simd_callee__ inline void asc_half2int4x2_rn_impl(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
@@ -4284,7 +4221,6 @@ __simd_callee__ inline void asc_half2int4x2_rn_sat_impl(vector_int4x2_t& dst, ve
     }
 }
 
-// asc_half2int4x2_rna_impl.h
 // rna - sat:dis/en - v1 v2 v3 v4
 __simd_callee__ inline void asc_half2int4x2_rna_impl(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
@@ -4300,7 +4236,6 @@ __simd_callee__ inline void asc_half2int4x2_rna_sat_impl(vector_int4x2_t& dst, v
     }
 }
 
-// asc_half2int4x2_ru_impl.h
 // ru - sat:dis/en - v1 v2 v3 v4
 __simd_callee__ inline void asc_half2int4x2_ru_impl(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
@@ -4316,7 +4251,6 @@ __simd_callee__ inline void asc_half2int4x2_ru_sat_impl(vector_int4x2_t& dst, ve
     }
 }
 
-// asc_half2int4x2_rz_impl.h
 // rz - sat:dis/en - v1 v2 v3 v4
 __simd_callee__ inline void asc_half2int4x2_rz_impl(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
@@ -4332,7 +4266,6 @@ __simd_callee__ inline void asc_half2int4x2_rz_sat_impl(vector_int4x2_t& dst, ve
     }
 }
 
-// asc_hif82float_impl.h
 __simd_callee__ inline void asc_hif82float_impl(vector_float& dst, vector_hifloat8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -4421,7 +4354,6 @@ __simd_callee__ inline vector_float asc_hif82float_impl(
     return dst;
 }
 
-// asc_hif82half_impl.h
 __simd_callee__ inline void asc_hif82half_impl(vector_half& dst, vector_hifloat8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -4464,7 +4396,6 @@ __simd_callee__ inline vector_half asc_hif82half_impl(
     return dst;
 }
 
-// asc_uint82half_impl.h
 __simd_callee__ inline void asc_uint82half_impl(vector_half& dst, vector_uint8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -4507,7 +4438,6 @@ __simd_callee__ inline vector_half asc_uint82half_impl(
     return dst;
 }
 
-// asc_uint162uint32_impl.h
 __simd_callee__ inline void asc_uint162uint32_impl(vector_uint32_t& dst, vector_uint16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -4550,7 +4480,6 @@ __simd_callee__ inline vector_uint32_t asc_uint162uint32_impl(
     return dst;
 }
 
-// asc_add_impl.h
 __simd_callee__ inline void asc_add_impl(
     vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
 {
@@ -4636,7 +4565,6 @@ __simd_callee__ inline void asc_add_impl(
     }
 }
 
-// asc_addc_impl.h
 __simd_callee__ inline void asc_addc_impl(
     vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool carry_src,
     vector_bool mask)
@@ -4655,7 +4583,6 @@ __simd_callee__ inline void asc_addc_impl(
     }
 }
 
-// asc_shiftleft_impl.h
 __simd_callee__ inline void asc_shiftleft_impl(
     vector_uint8_t& dst, vector_uint8_t src, vector_int8_t shift, vector_bool mask)
 {
@@ -4746,7 +4673,6 @@ __simd_callee__ inline vector_int32_t asc_shiftleft_impl(vector_int32_t src, vec
     return dst;
 }
 
-// asc_shiftright_impl.h
 __simd_callee__ inline void asc_shiftright_impl(
     vector_uint8_t& dst, vector_uint8_t src, vector_int8_t shift, vector_bool mask)
 {
@@ -4837,7 +4763,6 @@ __simd_callee__ inline vector_int32_t asc_shiftright_impl(vector_int32_t src, ve
     return dst;
 }
 
-// asc_not_impl.h
 __simd_callee__ inline void asc_not_impl(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -4901,7 +4826,6 @@ __simd_callee__ inline void asc_not_impl(vector_bool& dst, vector_bool src, vect
     }
 }
 
-// asc_lt_impl.h
 __simd_callee__ inline void asc_lt_impl(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -4966,7 +4890,6 @@ __simd_callee__ inline void asc_lt_impl(
     }
 }
 
-// asc_lt_scalar_impl.h
 __simd_callee__ inline void asc_lt_scalar_impl(vector_bool& dst, vector_uint8_t src, uint8_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -5031,7 +4954,6 @@ __simd_callee__ inline void asc_lt_scalar_impl(vector_bool& dst, vector_float sr
     }
 }
 
-// asc_madd_impl.h
 __simd_callee__ inline void asc_madd_impl(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -5054,7 +4976,6 @@ __simd_callee__ inline void asc_madd_impl(
     }
 }
 
-// asc_pair_reduce_sum_impl.h
 __simd_callee__ inline void asc_pair_reduce_sum_impl(vector_half& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -5069,7 +4990,6 @@ __simd_callee__ inline void asc_pair_reduce_sum_impl(vector_float& dst, vector_f
     }
 }
 
-// asc_max_impl.h
 // asc_max uint8_t
 __simd_callee__ inline void asc_max_impl(
     vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
@@ -5148,7 +5068,6 @@ __simd_callee__ inline void asc_max_impl(
     }
 }
 
-// asc_min_scalar_impl.h
 // asc_min_scalar int32_t
 __simd_callee__ inline void asc_min_scalar_impl(
     vector_int32_t& dst, vector_int32_t src, int32_t value, vector_bool mask)
@@ -5227,7 +5146,6 @@ __simd_callee__ inline void asc_min_scalar_impl(
     }
 }
 
-// asc_gt_impl.h
 // asc_gt(vcmp) uint8_t
 __simd_callee__ inline void asc_gt_impl(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
 {
@@ -5301,7 +5219,6 @@ __simd_callee__ inline void asc_gt_impl(
     }
 }
 
-// asc_gt_scalar_impl.h
 // uint8_t
 __simd_callee__ inline void asc_gt_scalar_impl(vector_bool& dst, vector_uint8_t src, uint8_t value, vector_bool mask)
 {
@@ -5375,7 +5292,6 @@ __simd_callee__ inline void asc_gt_scalar_impl(vector_bool& dst, vector_float sr
     }
 }
 
-// asc_reduce_max_datablock_impl.h
 // asc_reduce_max_datablock half
 __simd_callee__ inline void asc_reduce_max_datablock_impl(vector_half& dst, vector_half src, vector_bool mask)
 {
@@ -5424,7 +5340,6 @@ __simd_callee__ inline void asc_reduce_max_datablock_impl(vector_int32_t& dst, v
     }
 }
 
-// asc_leakyrelu_impl.h
 // asc_leakyrelu float
 __simd_callee__ inline void asc_leakyrelu_impl(vector_float& dst, vector_float src, float alpha, vector_bool mask)
 {
@@ -5457,7 +5372,6 @@ __simd_callee__ inline vector_half asc_leakyrelu_impl(vector_half src, half alph
     return dst;
 }
 
-// asc_half2uint8_rd_impl.h
 __simd_callee__ inline void asc_half2uint8_rd_impl(vector_uint8_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -5541,7 +5455,6 @@ __simd_callee__ inline vector_uint8_t asc_half2uint8_rd_sat_impl(
     return dst;
 }
 
-// asc_half2uint8_rn_impl.h
 __simd_callee__ inline void asc_half2uint8_rn_impl(vector_uint8_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -5625,7 +5538,6 @@ __simd_callee__ inline vector_uint8_t asc_half2uint8_rn_sat_impl(
     return dst;
 }
 
-// asc_half2uint8_rna_impl.h
 __simd_callee__ inline void asc_half2uint8_rna_impl(vector_uint8_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -5709,7 +5621,6 @@ __simd_callee__ inline vector_uint8_t asc_half2uint8_rna_sat_impl(
     return dst;
 }
 
-// asc_half2uint8_ru_impl.h
 __simd_callee__ inline void asc_half2uint8_ru_impl(vector_uint8_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -5793,7 +5704,6 @@ __simd_callee__ inline vector_uint8_t asc_half2uint8_ru_sat_impl(
     return dst;
 }
 
-// asc_half2uint8_rz_impl.h
 __simd_callee__ inline void asc_half2uint8_rz_impl(vector_uint8_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -5877,7 +5787,6 @@ __simd_callee__ inline vector_uint8_t asc_half2uint8_rz_sat_impl(
     return dst;
 }
 
-// asc_int162half_rd_impl.h
 __simd_callee__ inline void asc_int162half_rd_impl(vector_half& dst, vector_int16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -5885,7 +5794,6 @@ __simd_callee__ inline void asc_int162half_rd_impl(vector_half& dst, vector_int1
     }
 }
 
-// asc_int162half_rn_impl.h
 __simd_callee__ inline void asc_int162half_rn_impl(vector_half& dst, vector_int16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -5893,7 +5801,6 @@ __simd_callee__ inline void asc_int162half_rn_impl(vector_half& dst, vector_int1
     }
 }
 
-// asc_int162half_rna_impl.h
 __simd_callee__ inline void asc_int162half_rna_impl(vector_half& dst, vector_int16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -5901,7 +5808,6 @@ __simd_callee__ inline void asc_int162half_rna_impl(vector_half& dst, vector_int
     }
 }
 
-// asc_int162half_ru_impl.h
 __simd_callee__ inline void asc_int162half_ru_impl(vector_half& dst, vector_int16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -5909,7 +5815,6 @@ __simd_callee__ inline void asc_int162half_ru_impl(vector_half& dst, vector_int1
     }
 }
 
-// asc_int162half_rz_impl.h
 __simd_callee__ inline void asc_int162half_rz_impl(vector_half& dst, vector_int16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -5917,7 +5822,6 @@ __simd_callee__ inline void asc_int162half_rz_impl(vector_half& dst, vector_int1
     }
 }
 
-// asc_int4x22half_impl.h
 __simd_callee__ inline void asc_int4x22half_impl(vector_half& dst, vector_int4x2_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -5925,7 +5829,6 @@ __simd_callee__ inline void asc_int4x22half_impl(vector_half& dst, vector_int4x2
     }
 }
 
-// asc_int82int16_impl.h
 __simd_callee__ inline void asc_int82int16_impl(vector_int16_t& dst, vector_int8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -5968,7 +5871,6 @@ __simd_callee__ inline vector_int16_t asc_int82int16_impl(
     return dst;
 }
 
-// asc_int162uint8_impl.h
 __simd_callee__ inline void asc_int162uint8_impl(vector_uint8_t& dst, vector_int16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -6052,7 +5954,6 @@ __simd_callee__ inline vector_uint8_t asc_int162uint8_sat_impl(
     return dst;
 }
 
-// asc_bfloat162int32_rn_impl.h
 __simd_callee__ inline void asc_bfloat162int32_rn_impl(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -6136,7 +6037,6 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rn_sat_impl(
     return dst;
 }
 
-// asc_bfloat162int32_rna_impl.h
 __simd_callee__ inline void asc_bfloat162int32_rna_impl(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -6221,7 +6121,6 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rna_sat_impl(
     return dst;
 }
 
-// asc_bfloat162int32_rd_impl.h
 __simd_callee__ inline void asc_bfloat162int32_rd_impl(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -6305,7 +6204,6 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rd_sat_impl(
     return dst;
 }
 
-// asc_bfloat162int32_ru_impl.h
 __simd_callee__ inline void asc_bfloat162int32_ru_impl(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -6389,7 +6287,6 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_ru_sat_impl(
     return dst;
 }
 
-// asc_bfloat162int32_rz_impl.h
 __simd_callee__ inline void asc_bfloat162int32_rz_impl(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -6473,7 +6370,6 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rz_sat_impl(
     return dst;
 }
 
-// asc_half2int16_rn_impl.h
 __simd_callee__ inline void asc_half2int16_rn_impl(vector_int16_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -6488,7 +6384,6 @@ __simd_callee__ inline void asc_half2int16_rn_sat_impl(vector_int16_t& dst, vect
     }
 }
 
-// asc_half2int16_rna_impl.h
 __simd_callee__ inline void asc_half2int16_rna_impl(vector_int16_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -6503,7 +6398,6 @@ __simd_callee__ inline void asc_half2int16_rna_sat_impl(vector_int16_t& dst, vec
     }
 }
 
-// asc_half2int16_rd_impl.h
 __simd_callee__ inline void asc_half2int16_rd_impl(vector_int16_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -6518,7 +6412,6 @@ __simd_callee__ inline void asc_half2int16_rd_sat_impl(vector_int16_t& dst, vect
     }
 }
 
-// asc_half2int16_ru_impl.h
 __simd_callee__ inline void asc_half2int16_ru_impl(vector_int16_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -6533,7 +6426,6 @@ __simd_callee__ inline void asc_half2int16_ru_sat_impl(vector_int16_t& dst, vect
     }
 }
 
-// asc_half2int16_rz_impl.h
 __simd_callee__ inline void asc_half2int16_rz_impl(vector_int16_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -6548,7 +6440,6 @@ __simd_callee__ inline void asc_half2int16_rz_sat_impl(vector_int16_t& dst, vect
     }
 }
 
-// asc_int642float_rn_impl.h
 __simd_callee__ inline void asc_int642float_rn_impl(vector_float& dst, vector_int64_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -6591,7 +6482,6 @@ __simd_callee__ inline vector_float asc_int642float_rn_impl(
     return dst;
 }
 
-// asc_int642float_rna_impl.h
 __simd_callee__ inline void asc_int642float_rna_impl(vector_float& dst, vector_int64_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -6634,7 +6524,6 @@ __simd_callee__ inline vector_float asc_int642float_rna_impl(
     return dst;
 }
 
-// asc_int642float_rd_impl.h
 __simd_callee__ inline void asc_int642float_rd_impl(vector_float& dst, vector_int64_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -6677,7 +6566,6 @@ __simd_callee__ inline vector_float asc_int642float_rd_impl(
     return dst;
 }
 
-// asc_int642float_ru_impl.h
 __simd_callee__ inline void asc_int642float_ru_impl(vector_float& dst, vector_int64_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -6720,7 +6608,6 @@ __simd_callee__ inline vector_float asc_int642float_ru_impl(
     return dst;
 }
 
-// asc_int642float_rz_impl.h
 __simd_callee__ inline void asc_int642float_rz_impl(vector_float& dst, vector_int64_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -6763,7 +6650,6 @@ __simd_callee__ inline vector_float asc_int642float_rz_impl(
     return dst;
 }
 
-// asc_int82half_impl.h
 __simd_callee__ inline void asc_int82half_impl(vector_half& dst, vector_int8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -6806,7 +6692,6 @@ __simd_callee__ inline vector_half asc_int82half_impl(
     return dst;
 }
 
-// asc_int162int32_impl.h
 __simd_callee__ inline void asc_int162int32_impl(vector_int32_t& dst, vector_int16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -6849,7 +6734,6 @@ __simd_callee__ inline vector_int32_t asc_int162int32_impl(
     return dst;
 }
 
-// asc_uint322uint8_impl.h
 __simd_callee__ inline void asc_uint322uint8_impl(vector_uint8_t& dst, vector_uint32_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -7025,7 +6909,6 @@ __simd_callee__ inline vector_uint8_t asc_uint322uint8_sat_impl(
     return dst;
 }
 
-// asc_sqrt_impl.h
 __simd_callee__ inline void asc_sqrt_impl(vector_float& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -7040,7 +6923,6 @@ __simd_callee__ inline void asc_sqrt_impl(vector_half& dst, vector_half src, vec
     }
 }
 
-// asc_or_impl.h
 __simd_callee__ inline void asc_or_impl(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -7106,7 +6988,6 @@ __simd_callee__ inline void asc_or_impl(vector_bool& dst, vector_bool src0, vect
     }
 }
 
-// asc_mul_impl.h
 __simd_callee__ inline void asc_mul_impl(
     vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
 {
@@ -7161,7 +7042,6 @@ __simd_callee__ inline void asc_mul_impl(
     }
 }
 
-// asc_mul_scalar_impl.h
 __simd_callee__ inline void asc_mul_scalar_impl(
     vector_int32_t& dst, vector_int32_t src, int32_t value, vector_bool mask)
 {
@@ -7208,7 +7088,6 @@ __simd_callee__ inline void asc_mul_scalar_impl(vector_half& dst, vector_half sr
     }
 }
 
-// asc_eq_impl.h
 __simd_callee__ inline void asc_eq_impl(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -7273,7 +7152,6 @@ __simd_callee__ inline void asc_eq_impl(
     }
 }
 
-// asc_eq_scalar_impl.h
 __simd_callee__ inline void asc_eq_scalar_impl(vector_bool& dst, vector_uint8_t src0, uint8_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -7338,7 +7216,6 @@ __simd_callee__ inline void asc_eq_scalar_impl(vector_bool& dst, vector_float sr
     }
 }
 
-// asc_float2int16_rd_impl.h
 __simd_callee__ inline void asc_float2int16_rd_impl(vector_int16_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -7422,7 +7299,6 @@ __simd_callee__ inline vector_int16_t asc_float2int16_rd_sat_impl(
     return dst;
 }
 
-// asc_float2int16_rn_impl.h
 __simd_callee__ inline void asc_float2int16_rn_impl(vector_int16_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -7506,7 +7382,6 @@ __simd_callee__ inline vector_int16_t asc_float2int16_rn_sat_impl(
     return dst;
 }
 
-// asc_float2int16_rna_impl.h
 __simd_callee__ inline void asc_float2int16_rna_impl(vector_int16_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -7590,7 +7465,6 @@ __simd_callee__ inline vector_int16_t asc_float2int16_rna_sat_impl(
     return dst;
 }
 
-// asc_float2int16_ru_impl.h
 __simd_callee__ inline void asc_float2int16_ru_impl(vector_int16_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -7674,7 +7548,6 @@ __simd_callee__ inline vector_int16_t asc_float2int16_ru_sat_impl(
     return dst;
 }
 
-// asc_float2int16_rz_impl.h
 __simd_callee__ inline void asc_float2int16_rz_impl(vector_int16_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -7758,7 +7631,6 @@ __simd_callee__ inline vector_int16_t asc_float2int16_rz_sat_impl(
     return dst;
 }
 
-// asc_float2int32_rd_impl.h
 __simd_callee__ inline void asc_float2int32_rd_impl(vector_int32_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -7773,7 +7645,6 @@ __simd_callee__ inline void asc_float2int32_rd_sat_impl(vector_int32_t& dst, vec
     }
 }
 
-// asc_float2int32_rn_impl.h
 __simd_callee__ inline void asc_float2int32_rn_impl(vector_int32_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -7788,7 +7659,6 @@ __simd_callee__ inline void asc_float2int32_rn_sat_impl(vector_int32_t& dst, vec
     }
 }
 
-// asc_float2int32_rna_impl.h
 __simd_callee__ inline void asc_float2int32_rna_sat_impl(vector_int32_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -7803,7 +7673,6 @@ __simd_callee__ inline void asc_float2int32_rna_impl(vector_int32_t& dst, vector
     }
 }
 
-// asc_float2int32_rz_impl.h
 __simd_callee__ inline void asc_float2int32_rz_sat_impl(vector_int32_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -7818,7 +7687,6 @@ __simd_callee__ inline void asc_float2int32_rz_impl(vector_int32_t& dst, vector_
     }
 }
 
-// asc_float2int32_ru_impl.h
 __simd_callee__ inline void asc_float2int32_ru_sat_impl(vector_int32_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -7833,7 +7701,6 @@ __simd_callee__ inline void asc_float2int32_ru_impl(vector_int32_t& dst, vector_
     }
 }
 
-// asc_bfloat162e2m1x2_rd_impl.h
 __simd_callee__ inline void asc_bfloat162e2m1x2_rd_impl(
     vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
@@ -7923,7 +7790,6 @@ __simd_callee__ inline vector_fp4x2_e2m1_t asc_bfloat162e2m1x2_rd_impl(
     return dst;
 }
 
-// asc_bfloat162e2m1x2_rn_impl.h
 __simd_callee__ inline void asc_bfloat162e2m1x2_rn_impl(
     vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
@@ -8013,7 +7879,6 @@ __simd_callee__ inline vector_fp4x2_e2m1_t asc_bfloat162e2m1x2_rn_impl(
     return dst;
 }
 
-// asc_bfloat162e2m1x2_rna_impl.h
 __simd_callee__ inline void asc_bfloat162e2m1x2_rna_impl(
     vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
@@ -8103,7 +7968,6 @@ __simd_callee__ inline vector_fp4x2_e2m1_t asc_bfloat162e2m1x2_rna_impl(
     return dst;
 }
 
-// asc_bfloat162e2m1x2_ru_impl.h
 __simd_callee__ inline void asc_bfloat162e2m1x2_ru_impl(
     vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
@@ -8193,7 +8057,6 @@ __simd_callee__ inline vector_fp4x2_e2m1_t asc_bfloat162e2m1x2_ru_impl(
     return dst;
 }
 
-// asc_bfloat162e2m1x2_rz_impl.h
 __simd_callee__ inline void asc_bfloat162e2m1x2_rz_impl(
     vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
@@ -8283,7 +8146,6 @@ __simd_callee__ inline vector_fp4x2_e2m1_t asc_bfloat162e2m1x2_rz_impl(
     return dst;
 }
 
-// asc_float2hif8_rh_impl.h
 __simd_callee__ inline void asc_float2hif8_rh_sat_impl(vector_hifloat8_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -8459,7 +8321,6 @@ __simd_callee__ inline vector_hifloat8_t asc_float2hif8_rh_sat_impl(
     return dst;
 }
 
-// asc_float2hif8_rna_impl.h
 __simd_callee__ inline void asc_float2hif8_rna_sat_impl(vector_hifloat8_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -8635,7 +8496,6 @@ __simd_callee__ inline vector_hifloat8_t asc_float2hif8_rna_sat_impl(
     return dst;
 }
 
-// asc_ceil_impl.h
 __simd_callee__ inline void asc_ceil_impl(vector_half& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -8657,7 +8517,6 @@ __simd_callee__ inline void asc_ceil_impl(vector_float& dst, vector_float src, v
     }
 }
 
-// asc_e2m1x22bfloat16_impl.h
 __simd_callee__ inline void asc_e2m1x22bfloat16_impl(vector_bfloat16_t& dst, vector_fp4x2_e2m1_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -8746,7 +8605,6 @@ __simd_callee__ inline vector_bfloat16_t asc_e2m1x22bfloat16_impl(
     return dst;
 }
 
-// asc_floor_impl.h
 __simd_callee__ inline void asc_floor_impl(vector_half& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -8768,7 +8626,6 @@ __simd_callee__ inline void asc_floor_impl(vector_float& dst, vector_float src, 
     }
 }
 
-// asc_rint_impl.h
 __simd_callee__ inline void asc_rint_impl(vector_half& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -8790,7 +8647,6 @@ __simd_callee__ inline void asc_rint_impl(vector_float& dst, vector_float src, v
     }
 }
 
-// asc_round_impl.h
 __simd_callee__ inline void asc_round_impl(vector_half& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -8812,7 +8668,6 @@ __simd_callee__ inline void asc_round_impl(vector_float& dst, vector_float src, 
     }
 }
 
-// asc_trunc_impl.h
 __simd_callee__ inline void asc_trunc_impl(vector_half& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -8834,7 +8689,6 @@ __simd_callee__ inline void asc_trunc_impl(vector_float& dst, vector_float src, 
     }
 }
 
-// asc_uint82uint32_impl.h
 __simd_callee__ inline void asc_uint82uint32_impl(vector_uint32_t& dst, vector_uint8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -8923,7 +8777,6 @@ __simd_callee__ inline vector_uint32_t asc_uint82uint32_impl(
     return dst;
 }
 
-// asc_uint322uint16_impl.h
 __simd_callee__ inline void asc_uint322uint16_sat_impl(vector_uint16_t& dst, vector_uint32_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -9007,7 +8860,6 @@ __simd_callee__ inline vector_uint16_t asc_uint322uint16_sat_impl(
     return dst;
 }
 
-// asc_muls_impl.h
 __simd_callee__ inline void asc_muls_impl(vector_half& dst, vector_float src, float value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -9015,7 +8867,6 @@ __simd_callee__ inline void asc_muls_impl(vector_half& dst, vector_float src, fl
     }
 }
 
-// asc_mul_scalar_float2half_rn_impl.h
 __simd_callee__ inline void asc_mul_scalar_float2half_rn_impl(
     vector_half& dst, vector_float src, float value, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
@@ -9034,7 +8885,6 @@ __simd_callee__ inline void asc_mul_scalar_float2half_rn_impl(
     }
 }
 
-// asc_exp_impl.h
 __simd_callee__ inline void asc_exp_impl(vector_half& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -9049,7 +8899,6 @@ __simd_callee__ inline void asc_exp_impl(vector_float& dst, vector_float src, ve
     }
 }
 
-// asc_add_scalar_impl.h
 __simd_callee__ inline void asc_add_scalar_impl(vector_int8_t& dst, vector_int8_t src, int8_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -9119,7 +8968,6 @@ __simd_callee__ inline void asc_add_scalar_impl(vector_float& dst, vector_float 
     }
 }
 
-// asc_float2bfloat16_rd_impl.h
 __simd_callee__ inline void asc_float2bfloat16_rd_impl(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -9203,7 +9051,6 @@ __simd_callee__ inline vector_bfloat16_t asc_float2bfloat16_rd_sat_impl(
     return dst;
 }
 
-// asc_float2bfloat16_rn_impl.h
 __simd_callee__ inline void asc_float2bfloat16_rn_impl(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -9287,7 +9134,6 @@ __simd_callee__ inline vector_bfloat16_t asc_float2bfloat16_rn_sat_impl(
     return dst;
 }
 
-// asc_float2bfloat16_rna_impl.h
 __simd_callee__ inline void asc_float2bfloat16_rna_impl(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -9371,7 +9217,6 @@ __simd_callee__ inline vector_bfloat16_t asc_float2bfloat16_rna_sat_impl(
     return dst;
 }
 
-// asc_float2bfloat16_ru_impl.h
 __simd_callee__ inline void asc_float2bfloat16_ru_impl(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -9455,7 +9300,6 @@ __simd_callee__ inline vector_bfloat16_t asc_float2bfloat16_ru_sat_impl(
     return dst;
 }
 
-// asc_float2bfloat16_rz_impl.h
 __simd_callee__ inline void asc_float2bfloat16_rz_impl(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -9539,7 +9383,6 @@ __simd_callee__ inline vector_bfloat16_t asc_float2bfloat16_rz_sat_impl(
     return dst;
 }
 
-// asc_float2int64_rd_impl.h
 __simd_callee__ inline void asc_float2int64_rd_impl(vector_int64_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -9623,7 +9466,6 @@ __simd_callee__ inline vector_int64_t asc_float2int64_rd_sat_impl(
     return dst;
 }
 
-// asc_float2int64_rn_impl.h
 __simd_callee__ inline void asc_float2int64_rn_impl(vector_int64_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -9707,7 +9549,6 @@ __simd_callee__ inline vector_int64_t asc_float2int64_rn_sat_impl(
     return dst;
 }
 
-// asc_float2int64_rna_impl.h
 __simd_callee__ inline void asc_float2int64_rna_impl(vector_int64_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -9791,7 +9632,6 @@ __simd_callee__ inline vector_int64_t asc_float2int64_rna_sat_impl(
     return dst;
 }
 
-// asc_float2int64_ru_impl.h
 __simd_callee__ inline void asc_float2int64_ru_impl(vector_int64_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -9875,7 +9715,6 @@ __simd_callee__ inline vector_int64_t asc_float2int64_ru_sat_impl(
     return dst;
 }
 
-// asc_float2int64_rz_impl.h
 __simd_callee__ inline void asc_float2int64_rz_impl(vector_int64_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -9959,7 +9798,6 @@ __simd_callee__ inline vector_int64_t asc_float2int64_rz_sat_impl(
     return dst;
 }
 
-// asc_half2int32_rd_impl.h
 __simd_callee__ inline void asc_half2int32_rd_impl(vector_int32_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -10002,7 +9840,6 @@ __simd_callee__ inline vector_int32_t asc_half2int32_rd_impl(
     return dst;
 }
 
-// asc_half2int32_rn_impl.h
 __simd_callee__ inline void asc_half2int32_rn_impl(vector_int32_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -10045,7 +9882,6 @@ __simd_callee__ inline vector_int32_t asc_half2int32_rn_impl(
     return dst;
 }
 
-// asc_half2int32_rna_impl.h
 __simd_callee__ inline void asc_half2int32_rna_impl(vector_int32_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -10088,7 +9924,6 @@ __simd_callee__ inline vector_int32_t asc_half2int32_rna_impl(
     return dst;
 }
 
-// asc_half2int32_ru_impl.h
 __simd_callee__ inline void asc_half2int32_ru_impl(vector_int32_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -10131,7 +9966,6 @@ __simd_callee__ inline vector_int32_t asc_half2int32_ru_impl(
     return dst;
 }
 
-// asc_half2int32_rz_impl.h
 __simd_callee__ inline void asc_half2int32_rz_impl(vector_int32_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -10174,7 +10008,6 @@ __simd_callee__ inline vector_int32_t asc_half2int32_rz_impl(
     return dst;
 }
 
-// asc_e5m22float_impl.h
 __simd_callee__ inline void asc_e5m22float_impl(vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -10263,7 +10096,6 @@ __simd_callee__ inline vector_float asc_e5m22float_impl(
     return dst;
 }
 
-// asc_float2e4m3_impl.h
 __simd_callee__ inline void asc_float2e4m3_rn_sat_impl(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -10439,7 +10271,6 @@ __simd_callee__ inline vector_fp8_e4m3fn_t asc_float2e4m3_rn_sat_impl(
     return dst;
 }
 
-// asc_int322int64_impl.h
 __simd_callee__ inline void asc_int322int64_impl(vector_int64_t& dst, vector_int32_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -10482,7 +10313,6 @@ __simd_callee__ inline vector_int64_t asc_int322int64_impl(
     return dst;
 }
 
-// asc_int322uint16_impl.h
 __simd_callee__ inline void asc_int322uint16_impl(vector_uint16_t& dst, vector_int32_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -10566,7 +10396,6 @@ __simd_callee__ inline vector_uint16_t asc_int322uint16_sat_impl(
     return dst;
 }
 
-// asc_int642int32_impl.h
 __simd_callee__ inline void asc_int642int32_impl(vector_int32_t& dst, vector_int64_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -10650,7 +10479,6 @@ __simd_callee__ inline vector_int32_t asc_int642int32_sat_impl(
     return dst;
 }
 
-// asc_uint82uint16_impl.h
 __simd_callee__ inline void asc_uint82uint16_impl(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -10693,7 +10521,6 @@ __simd_callee__ inline vector_uint16_t asc_uint82uint16_impl(
     return dst;
 }
 
-// asc_pack_impl.h
 __simd_callee__ inline void asc_pack_impl(vector_uint8_t& dst, vector_uint16_t src)
 {
     if ASC_IS_AIV {
@@ -10764,7 +10591,6 @@ __simd_callee__ inline void asc_pack_v2_impl(vector_bool& dst, vector_bool src)
     }
 }
 
-// asc_exp_sub_impl.h
 __simd_callee__ inline void asc_exp_sub_impl(vector_float& dst, vector_half src0, vector_half src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -10822,7 +10648,6 @@ __simd_callee__ inline vector_float asc_exp_sub_impl(vector_float src0, vector_f
     return dst;
 }
 
-// asc_ln_impl.h
 __simd_callee__ inline void asc_ln_impl(vector_half& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -10837,7 +10662,6 @@ __simd_callee__ inline void asc_ln_impl(vector_float& dst, vector_float src, vec
     }
 }
 
-// asc_div_impl.h
 __simd_callee__ inline void asc_div_impl(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -10884,7 +10708,6 @@ __simd_callee__ inline void asc_div_impl(
     }
 }
 
-// asc_max_scalar.h
 __simd_callee__ inline void asc_max_scalar_impl(vector_int8_t& dst, vector_int8_t src, int8_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -10954,7 +10777,6 @@ __simd_callee__ inline void asc_max_scalar_impl(
     }
 }
 
-// asc_ne.h
 __simd_callee__ inline void asc_ne_impl(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -11019,7 +10841,6 @@ __simd_callee__ inline void asc_ne_impl(vector_bool& dst, vector_float src0, vec
     }
 }
 
-// asc_ne_scalar.h
 __simd_callee__ inline void asc_ne_scalar_impl(vector_bool& dst, vector_uint8_t src, uint8_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -11084,7 +10905,6 @@ __simd_callee__ inline void asc_ne_scalar_impl(
     }
 }
 
-// asc_deintlv_impl.h
 __simd_callee__ inline void asc_deintlv_impl(
     vector_int32_t& dst0, vector_int32_t& dst1, vector_int32_t src0, vector_int32_t src1)
 {
@@ -11214,7 +11034,6 @@ __simd_callee__ inline void asc_deintlv_b32_impl(
     }
 }
 
-// asc_reduce_sum.h
 __simd_callee__ inline void asc_reduce_sum_impl(vector_int32_t& dst, vector_int16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -11257,7 +11076,6 @@ __simd_callee__ inline void asc_reduce_sum_impl(vector_float& dst, vector_float 
     }
 }
 
-// asc_reduce_sum_datablock.h
 __simd_callee__ inline void asc_reduce_sum_datablock_impl(vector_half& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -11300,7 +11118,6 @@ __simd_callee__ inline void asc_reduce_sum_datablock_impl(vector_int32_t& dst, v
     }
 }
 
-// asc_unpack_impl.h
 __simd_callee__ inline void asc_unpack_upper_impl(vector_uint16_t& dst, vector_uint8_t src)
 {
     if ASC_IS_AIV {
@@ -11371,7 +11188,6 @@ __simd_callee__ inline void asc_unpack_lower_impl(vector_bool& dst, vector_bool 
     }
 }
 
-// asc_copy_impl.h
 __simd_callee__ inline void asc_copy_impl(vector_int8_t& dst, vector_int8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -11463,7 +11279,6 @@ __simd_callee__ inline void asc_copy_impl(vector_bool& dst, vector_uint32_t src,
     }
 }
 
-// asc_bfloat162e1m2x2_rd_impl.h
 __simd_callee__ inline void asc_bfloat162e1m2x2_rd_impl(
     vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
@@ -11553,7 +11368,6 @@ __simd_callee__ inline vector_fp4x2_e1m2_t asc_bfloat162e1m2x2_rd_impl(
     return dst;
 }
 
-// asc_bfloat162e1m2x2_rn_impl.h
 __simd_callee__ inline void asc_bfloat162e1m2x2_rn_impl(
     vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
@@ -11643,7 +11457,6 @@ __simd_callee__ inline vector_fp4x2_e1m2_t asc_bfloat162e1m2x2_rn_impl(
     return dst;
 }
 
-// asc_bfloat162e1m2x2_rna_impl.h
 __simd_callee__ inline void asc_bfloat162e1m2x2_rna_impl(
     vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
@@ -11733,7 +11546,6 @@ __simd_callee__ inline vector_fp4x2_e1m2_t asc_bfloat162e1m2x2_rna_impl(
     return dst;
 }
 
-// asc_bfloat162e1m2x2_ru_impl.h
 __simd_callee__ inline void asc_bfloat162e1m2x2_ru_impl(
     vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
@@ -11823,7 +11635,6 @@ __simd_callee__ inline vector_fp4x2_e1m2_t asc_bfloat162e1m2x2_ru_impl(
     return dst;
 }
 
-// asc_bfloat162e1m2x2_rz_impl.h
 __simd_callee__ inline void asc_bfloat162e1m2x2_rz_impl(
     vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
@@ -11913,7 +11724,6 @@ __simd_callee__ inline vector_fp4x2_e1m2_t asc_bfloat162e1m2x2_rz_impl(
     return dst;
 }
 
-// asc_e1m2x22bfloat16_impl.h
 __simd_callee__ inline void asc_e1m2x22bfloat16_impl(vector_bfloat16_t& dst, vector_fp4x2_e1m2_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -12002,7 +11812,6 @@ __simd_callee__ inline vector_bfloat16_t asc_e1m2x22bfloat16_impl(
     return dst;
 }
 
-// asc_int82int32_impl.h
 __simd_callee__ inline void asc_int82int32_impl(vector_int32_t& dst, vector_int8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -12091,7 +11900,6 @@ __simd_callee__ inline vector_int32_t asc_int82int32_impl(
     return dst;
 }
 
-// asc_xor_impl.h
 // asc_xor(vxor) int32_t
 __simd_callee__ inline void asc_xor_impl(
     vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
@@ -12153,7 +11961,6 @@ __simd_callee__ inline void asc_xor_impl(vector_bool& dst, vector_bool src0, vec
     }
 }
 
-// asc_prelu_impl.h
 __simd_callee__ inline void asc_prelu_impl(vector_float& dst, vector_float src0, vector_float alpha, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -12182,7 +11989,6 @@ __simd_callee__ inline vector_half asc_prelu_impl(vector_half src0, vector_half 
     return dst;
 }
 
-// asc_clear_ar_spr_impl.h
 __simd_callee__ inline void asc_clear_ar_spr_impl()
 {
     if ASC_IS_AIV {
@@ -12190,7 +11996,6 @@ __simd_callee__ inline void asc_clear_ar_spr_impl()
     }
 }
 
-// asc_mula_impl.h
 __simd_callee__ inline void asc_mula_impl(
     vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
 {
@@ -12245,7 +12050,6 @@ __simd_callee__ inline void asc_mula_impl(vector_float& dst, vector_float src0, 
     }
 }
 
-// asc_fma_impl.h
 __simd_callee__ inline void asc_fma_impl(
     vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
@@ -12268,7 +12072,6 @@ __simd_callee__ inline void asc_fma_impl(vector_float& dst, vector_float src0, v
     }
 }
 
-// vector_compute_impl.h
 // ==========asc_update_addr_reg(b8/b16/b32)=========
 #define ASC_DEFINE_UPDATE_ADDR_REG_API(bxx)                                                                         \
     __simd_callee__ inline addr_reg asc_update_addr_reg_##bxx(uint32_t offset)                                      \
@@ -24083,12 +23886,10 @@ __simd_callee__ inline vector_float asc_int642float_rna(
     return dst;
 }
 
-// asc_get_mask_spr_impl.h
 __simd_callee__ inline vector_bool asc_get_mask_spr_b16_impl() { return movp_b16(); }
 
 __simd_callee__ inline vector_bool asc_get_mask_spr_b32_impl() { return movp_b32(); }
 
-// asc_loadalign_impl.h
 // offset = 0, norm
 __simd_callee__ inline void asc_loadalign_impl(vector_int8_t& dst, __ubuf__ int8_t* src)
 {
@@ -26618,7 +26419,6 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock_impl(
     asc_loadalign_brc_v3_impl(dst, src, offset);
 }
 
-// asc_loadalign_v2_impl.h
 // =========asc_loadalign(fp4x2_e2m1/fp4x2_e1m2/u8/s8/f8_e4m3/fp8_e5m2/fp8_e8m0/u16/s16/bf16/half/u32/s32/float/u64/s64)=========
 __simd_callee__ inline void asc_loadalign_impl(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
@@ -27850,7 +27650,6 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock_impl(
     asc_loadalign_brc_v3_impl(dst, src, offset);
 }
 
-// asc_loadalign_postupdate_impl.h
 // postupdate, norm
 __simd_callee__ inline void asc_loadalign_postupdate_impl(vector_int8_t& dst, __ubuf__ int8_t*& src, int32_t offset)
 {
@@ -29314,7 +29113,6 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock_postupdate_impl(
     asc_loadalign_brc_postupdate_v3_impl(dst, src, offset);
 }
 
-// asc_loadunalign_pre_impl.h
 __simd_callee__ inline void asc_loadunalign_pre_impl(vector_load_unalign& dst, __ubuf__ int8_t* src)
 {
     if ASC_IS_AIV {
@@ -29562,7 +29360,6 @@ __simd_callee__ inline void asc_loadunalign_pre_impl(vector_load_unalign& dst, _
     }
 }
 
-// asc_storealign_impl.h
 // ==========偏移固定传入0，由用户自行更新目的操作数的地址=========
 // storealign
 __simd_callee__ inline void asc_storealign_impl(__ubuf__ int8_t* dst, vector_int8_t src, vector_bool mask)
@@ -31843,7 +31640,6 @@ __simd_callee__ inline void asc_storealign_pack_quarter_postupdate_impl(
     asc_storealign_pack_postupdate_v2_impl(dst, src, offset, mask);
 }
 
-// asc_storealign_squeeze_status_impl.h
 __simd_callee__ inline void asc_storealign_squeeze_status_impl(__ubuf__ uint32_t* dst, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -31863,7 +31659,6 @@ __simd_callee__ inline void asc_storealign_squeeze_status_postupdate_impl(__ubuf
     }
 }
 
-// asc_storeunalign_impl.h
 __simd_callee__ inline void asc_storeunalign_impl(
     __ubuf__ int8_t* dst, vector_store_unalign& src0, vector_int8_t src1, uint32_t count)
 {
@@ -32001,7 +31796,6 @@ __simd_callee__ inline void asc_storeunalign_impl(
     }
 }
 
-// asc_storeunalign_postupdate_impl.h
 // ==========偏移固定传入0，由用户自行更新目的操作数的地址=========
 __simd_callee__ inline void asc_storeunalign_postupdate_impl(
     __ubuf__ int8_t*& dst, vector_store_unalign& src0, vector_int8_t src1, uint32_t count)
@@ -32436,7 +32230,6 @@ __simd_callee__ inline void asc_storeunalign_postupdate_impl(
     }
 }
 
-// asc_squeeze_and_storeunalign_impl.h
 __simd_callee__ inline void asc_squeeze_and_storeunalign_impl(
     __ubuf__ int8_t* dst_addr, vector_int8_t& dst, vector_store_unalign& src0, vector_int8_t src1,
     vector_bool squeeze_mask)
@@ -32587,7 +32380,6 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign_impl(
     }
 }
 
-// asc_gather_impl.h
 // ==========源操作数为起初地址，目的数为寄存器=========
 __simd_callee__ inline void asc_gather_impl(
     vector_int16_t& dst, __ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask)
@@ -32836,7 +32628,6 @@ __simd_callee__ inline void asc_gather_impl(vector_fp8_e8m0_t& dst, vector_fp8_e
     }
 }
 
-// asc_gather_datablock_impl.h
 // ==========有mask参数=========
 __simd_callee__ inline void asc_gather_datablock_impl(
     vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint32_t index, vector_bool mask)
@@ -33123,7 +32914,6 @@ __simd_callee__ inline void asc_gather_datablock_impl(
     }
 }
 
-// asc_loadunalign_postupdate_impl.h
 __simd_callee__ inline void asc_loadunalign_postupdate_impl(
     vector_int8_t& dst, vector_load_unalign& src0, __ubuf__ int8_t*& src1, uint32_t count)
 {
@@ -33403,7 +33193,6 @@ __simd_callee__ inline void asc_loadunalign_postupdate_impl(
     }
 }
 
-// asc_loadunalign_impl.h
 __simd_callee__ inline void asc_loadunalign_impl(vector_int8_t& dst, vector_load_unalign& src0, __ubuf__ int8_t* src1)
 {
     if ASC_IS_AIV {
@@ -33534,7 +33323,6 @@ __simd_callee__ inline void asc_loadunalign_impl(
     }
 }
 
-// asc_storeunalign_post_impl.h
 __simd_callee__ inline void asc_storeunalign_post_impl(__ubuf__ int8_t* dst, vector_store_unalign src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -33904,7 +33692,6 @@ __simd_callee__ inline void asc_storeunalign_post_impl(__ubuf__ int4b_t* dst, ve
     }
 }
 
-// asc_storeunalign_post_postupdate_impl.h
 __simd_callee__ inline void asc_storeunalign_post_postupdate_impl(
     __ubuf__ int8_t*& dst, vector_store_unalign src, int32_t offset)
 {
@@ -34042,7 +33829,6 @@ __simd_callee__ inline void asc_storeunalign_post_postupdate_impl(
     }
 }
 
-// asc_scatter_impl.h
 __simd_callee__ inline void asc_scatter_impl(
     __ubuf__ int8_t* dst, vector_int8_t src, vector_uint16_t index, vector_bool mask)
 {
@@ -34115,7 +33901,6 @@ __simd_callee__ inline void asc_scatter_impl(
     }
 }
 
-// asc_scatter_impl.h
 // asc_scatter int8_t
 __simd_callee__ inline void asc_scatter_impl(
     vector_int8_t& src, __ubuf__ int8_t* dst, vector_uint16_t index, vector_bool mask)
@@ -34197,7 +33982,6 @@ __simd_callee__ inline void asc_scatter_impl(
     }
 }
 
-// vector_datamove_impl.h
 // ==========偏移固定传入0，由用户自行更新目的操作数的地址=========
 // ==========asc_storealign(u8/s8/half/u16/s16/float/u32/s32/bf16/e4m3/e5m2/e8m0/e1m2/e2m1)=========
 __simd_callee__ inline void asc_storealign(__ubuf__ int8_t* dst, vector_int8_t src, vector_bool mask)

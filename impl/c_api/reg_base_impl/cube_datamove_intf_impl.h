@@ -20,7 +20,6 @@
 #include "c_api/defs/defs.h"
 #include "impl/c_api/reg_base_impl/utils_intf_impl.h"
 
-// asc_copy_l0c2l1_impl.h
 // half  float
 __aicore__ inline void asc_copy_l0c2l1_impl(
     __cbuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
@@ -424,7 +423,6 @@ __aicore__ inline void asc_copy_l0c2l1_impl(
     }
 }
 
-// asc_copy_l12l0a_impl.h
 __aicore__ inline void asc_copy_l12l0a_impl(
     __ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -853,7 +851,6 @@ __aicore__ inline void asc_copy_l12l0a_transpose_impl(
     }
 }
 
-// asc_copy_l0c2gm_impl.h
 // bfloat16_t  float
 __aicore__ inline void asc_copy_l0c2gm_impl(
     __gm__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
@@ -1085,7 +1082,6 @@ __aicore__ inline void asc_copy_l0c2gm_impl(
     }
 }
 
-// asc_copy_l0c2ub_impl.h
 // bfloat16_t  float
 __aicore__ inline void asc_copy_l0c2ub_impl(
     __ubuf__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
@@ -1324,7 +1320,6 @@ __aicore__ inline void asc_copy_l0c2ub_impl(
     }
 }
 
-// asc_copy_l12l0a_mx_impl.h
 __aicore__ inline void asc_copy_l12l0a_mx_impl(
     uint64_t dst, __cbuf__ fp8_e8m0_t* src, uint16_t x_start_pos, uint16_t y_start_pos, uint8_t x_step, uint8_t y_step,
     uint16_t src_stride, uint16_t dst_stride)
@@ -1334,7 +1329,6 @@ __aicore__ inline void asc_copy_l12l0a_mx_impl(
     }
 }
 
-// asc_copy_l12l0b_impl.h
 __aicore__ inline void asc_copy_l12l0b_impl(
     __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1762,7 +1756,6 @@ __aicore__ inline void asc_copy_l12l0b_transpose_impl(
     }
 }
 
-// asc_copy_l12l0b_mx_impl.h
 __aicore__ inline void asc_copy_l12l0b_mx_impl(
     uint64_t dst, __cbuf__ fp8_e8m0_t* src, uint16_t x_start_pos, uint16_t y_start_pos, uint8_t x_step, uint8_t y_step,
     uint16_t src_stride, uint16_t dst_stride)
@@ -1772,7 +1765,6 @@ __aicore__ inline void asc_copy_l12l0b_mx_impl(
     }
 }
 
-// asc_set_l13d_rpt_impl.h
 constexpr uint8_t ASC_L13D_RPT_REPEAT_TIMES_SHIFT = 16;
 
 constexpr uint8_t ASC_L13D_RPT_DIRECTION_SHIFT = 24;
@@ -1802,7 +1794,6 @@ __aicore__ inline void asc_set_l13d_rpt_impl(
     }
 }
 
-// asc_set_l13d_fmatrix_impl.h
 constexpr uint8_t ASC_L13D_FMATRIX_H_SHIFT = 16;
 
 constexpr uint8_t ASC_L13D_FMATRIX_PAD_LEFT_SHIFT = 32;
@@ -1834,7 +1825,6 @@ __aicore__ inline void asc_set_l13d_fmatrix_impl(
     }
 }
 
-// asc_set_l13d_fmatrix_b_impl.h
 constexpr uint8_t ASC_L13D_FMATRIX_B_H_SHIFT = 16;
 
 constexpr uint8_t ASC_L13D_FMATRIX_B_PAD_LEFT_SHIFT = 32;
@@ -1866,7 +1856,6 @@ __aicore__ inline void asc_set_l13d_fmatrix_b_impl(
     }
 }
 
-// asc_set_l0c2gm_lrelu_alpha_impl.h
 __aicore__ inline void asc_set_l0c2gm_lrelu_alpha_impl(half& config)
 {
     if ASC_IS_AIC {
@@ -1881,7 +1870,6 @@ __aicore__ inline void asc_set_l0c2gm_lrelu_alpha_impl(float& config)
     }
 }
 
-// asc_set_l0c_copy_lrelu_alpha_impl.h
 __aicore__ inline void asc_set_l0c_copy_lrelu_alpha_impl(float scalar_relu_pre_alpha)
 {
     if ASC_IS_AIC {
@@ -1889,7 +1877,6 @@ __aicore__ inline void asc_set_l0c_copy_lrelu_alpha_impl(float scalar_relu_pre_a
     }
 }
 
-// asc_set_l0c_copy_prequant_impl.h
 __aicore__ inline void asc_set_l0c_copy_prequant_impl(uint64_t config)
 {
     if ASC_IS_AIC {
@@ -1906,7 +1893,6 @@ __aicore__ inline void asc_set_l0c_copy_prequant_impl(float scale, uint16_t offs
     }
 }
 
-// asc_set_gm2l1_loop_size_impl.h
 __aicore__ inline void asc_set_gm2l1_loop_size_impl(uint64_t loop1_size, uint64_t loop2_size)
 {
     if ASC_IS_AIC {
@@ -1917,7 +1903,6 @@ __aicore__ inline void asc_set_gm2l1_loop_size_impl(uint64_t loop1_size, uint64_
     }
 }
 
-// asc_set_gm2l1_loop1_stride_impl.h
 __aicore__ inline void asc_set_gm2l1_loop1_stride_impl(uint64_t loop1_src_stride, uint64_t loop1_dst_stride)
 {
     if ASC_IS_AIC {
@@ -1928,7 +1913,6 @@ __aicore__ inline void asc_set_gm2l1_loop1_stride_impl(uint64_t loop1_src_stride
     }
 }
 
-// asc_set_gm2l1_loop2_stride_impl.h
 __aicore__ inline void asc_set_gm2l1_loop2_stride_impl(uint64_t loop2_src_stride, uint64_t loop2_dst_stride)
 {
     if ASC_IS_AIC {
@@ -1939,7 +1923,6 @@ __aicore__ inline void asc_set_gm2l1_loop2_stride_impl(uint64_t loop2_src_stride
     }
 }
 
-// asc_set_gm2l1_pad_impl.h
 __aicore__ inline void asc_set_gm2l1_pad_impl(uint32_t pad_val)
 {
     if ASC_IS_AIC {
@@ -1947,7 +1930,6 @@ __aicore__ inline void asc_set_gm2l1_pad_impl(uint32_t pad_val)
     }
 }
 
-// asc_copy_l12l0b_trans_impl.h
 __aicore__ inline void asc_copy_l12l0b_trans_impl(
     __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
@@ -2067,7 +2049,6 @@ __aicore__ inline void asc_copy_l12l0b_trans_impl(
     }
 }
 
-// asc_copy_gm2l1_align_impl.h
 __aicore__ inline void asc_copy_gm2l1_align_impl(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count,
     uint8_t right_padding_count, bool enable_data_select, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
@@ -2308,7 +2289,6 @@ __aicore__ inline void asc_copy_gm2l1_align_impl(
     }
 }
 
-// asc_copy_gm2l1_dn2nz_impl.h
 __aicore__ inline void asc_copy_gm2l1_dn2nz_impl(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
@@ -2561,7 +2541,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_impl(
     }
 }
 
-// asc_copy_gm2l1_nd2nz_impl.h
 __aicore__ inline void asc_copy_gm2l1_nd2nz_impl(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
@@ -2814,7 +2793,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_impl(
     }
 }
 
-// asc_copy_gm2l1_impl.h
 constexpr uint8_t ASC_GM2L1_SID_DEFAULT = 0;
 
 constexpr uint8_t ASC_GM2L1_DECOMP_MODE_DEFAULT = 0;
@@ -3167,7 +3145,6 @@ __aicore__ inline void asc_copy_gm2l1_impl(
     }
 }
 
-// asc_copy_l12fb_impl.h
 __aicore__ inline void asc_copy_l12fb_impl(
     __fbuf__ void* dst, __cbuf__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap_size,
     uint16_t dst_gap_size)
@@ -3182,7 +3159,6 @@ __aicore__ inline void asc_copy_l12fb_impl(__fbuf__ void* dst, __cbuf__ void* sr
     asc_copy_l12fb_impl(dst, src, 1, size / ASC_C_API_ONE_DATABLOCK_SIZE, 0, 0);
 }
 
-// asc_copy_l12bt_impl.h
 // ========== void -> uint64_t ==========
 __aicore__ inline void asc_copy_l12bt_impl(
     uint64_t dst, __cbuf__ void* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst, uint16_t source_gap,
@@ -3258,7 +3234,6 @@ __aicore__ inline void asc_copy_l12bt_impl(uint64_t dst, __cbuf__ int32_t* src, 
     asc_copy_l12bt_impl(dst, src, 0, 1, size / ASC_C_API_ONE_DATABLOCK_SIZE, 0, 0);
 }
 
-// asc_copy_l12ub_impl.h
 __aicore__ inline void asc_copy_l12ub_impl(
     __ubuf__ void* dst_addr, __cbuf__ void* src_addr, int8_t sub_blockid, uint16_t burst_count, uint16_t burst_len,
     uint16_t src_gap, uint16_t dst_gap)
@@ -3268,7 +3243,6 @@ __aicore__ inline void asc_copy_l12ub_impl(
     }
 }
 
-// asc_fill_l1_impl.h
 // asc_fill_l1_value half
 __aicore__ inline void asc_fill_l1_impl(__cbuf__ half* dst, half value, const asc_fill_value_config& config)
 {
@@ -3383,7 +3357,6 @@ __aicore__ inline void asc_fill_l1_impl(__cbuf__ bfloat16_t* dst, uint32_t value
     }
 }
 
-// asc_set_gm2l1_nz_para_impl.h
 __aicore__ inline void asc_set_gm2l1_nz_para_impl(uint64_t config)
 {
     if ASC_IS_AIC {
@@ -3402,7 +3375,6 @@ __aicore__ inline void asc_set_gm2l1_nz_para_impl(
     }
 }
 
-// asc_set_l12l0a_3d_padding_impl.h
 constexpr uint8_t ASC_3D_PADDING_SHIFT_BIT = 8;
 
 __aicore__ inline void asc_set_l12l0a_3d_padding_impl(uint64_t config)
@@ -3479,7 +3451,6 @@ __aicore__ inline void asc_set_l12l0a_3d_padding_impl(float padding_value)
     asc_set_l12l0a_3d_padding_impl(bitcode.output);
 }
 
-// asc_set_gm2l1_padding_impl.h
 __aicore__ inline void asc_set_gm2l1_padding_impl(uint64_t config) { asc_set_l12l0a_3d_padding_impl(config); }
 
 __aicore__ inline void asc_set_gm2l1_padding_impl(int8_t padding_value)
@@ -3524,7 +3495,6 @@ __aicore__ inline void asc_set_gm2l1_padding_impl(float padding_value)
     asc_set_l12l0a_3d_padding_impl(padding_value);
 }
 
-// asc_set_l0c2gm_channel_para_impl.h
 constexpr uint8_t ASC_L0C_COPY_CHANNEL_PARA_SHIFT = 48;
 
 __aicore__ inline void asc_set_l0c2gm_channel_para_impl(uint64_t config)
@@ -3542,7 +3512,6 @@ __aicore__ inline void asc_set_l0c_copy_channel_para_impl(uint16_t src_nz_fracta
     }
 }
 
-// asc_set_l0c2gm_config_impl.h
 __aicore__ inline void asc_set_l0c2gm_config_impl(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag)
 {
     if ASC_IS_AIC {
@@ -3555,7 +3524,6 @@ __aicore__ inline void asc_set_l0c2gm_config_impl(uint64_t relu_pre, uint64_t qu
     }
 }
 
-// asc_set_l0c2gm_nz2nd_impl.h
 __aicore__ inline void asc_set_l0c2gm_nz2nd_impl(uint64_t nd_num, uint64_t src_nd_stride, uint64_t dst_nd_stride)
 {
     if ASC_IS_AIC {
@@ -3564,7 +3532,6 @@ __aicore__ inline void asc_set_l0c2gm_nz2nd_impl(uint64_t nd_num, uint64_t src_n
     }
 }
 
-// asc_set_l0c2gm_quant_post_impl.h
 __aicore__ inline void asc_set_l0c2gm_quant_post_impl(uint64_t config)
 {
     if ASC_IS_AIC {
@@ -3572,7 +3539,6 @@ __aicore__ inline void asc_set_l0c2gm_quant_post_impl(uint64_t config)
     }
 }
 
-// asc_set_l0c2gm_relu_alpha_impl.h
 __aicore__ inline void asc_set_l0c2gm_relu_alpha_impl(uint64_t config)
 {
     if ASC_IS_AIC {
@@ -3580,7 +3546,6 @@ __aicore__ inline void asc_set_l0c2gm_relu_alpha_impl(uint64_t config)
     }
 }
 
-// asc_set_l0c_copy_config_impl.h
 __aicore__ inline void asc_set_l0c_copy_config_impl(
     uint64_t relu_pre_addr, uint64_t quant_pre_addr, bool is_clean_unit_flag)
 {
@@ -3594,7 +3559,6 @@ __aicore__ inline void asc_set_l0c_copy_config_impl(
     }
 }
 
-// asc_set_l0c_copy_nz_para_impl.h
 constexpr uint8_t ASC_L0C_COPY_NZ_PARA_SRC_SHIFT = 16;
 
 constexpr uint8_t ASC_L0C_COPY_NZ_PARA_DST_SHIFT = 32;
@@ -3609,7 +3573,6 @@ __aicore__ inline void asc_set_l0c_copy_nz_para_impl(
     }
 }
 
-// asc_set_l0c_copy_relu_alpha_impl.h
 __aicore__ inline void asc_set_l0c_copy_relu_alpha_impl(float scalar_relu_pre_alpha)
 {
     if ASC_IS_AIC {
@@ -3617,7 +3580,6 @@ __aicore__ inline void asc_set_l0c_copy_relu_alpha_impl(float scalar_relu_pre_al
     }
 }
 
-// asc_set_l12l0_padding_val_impl.h
 __aicore__ inline void asc_set_l12l0_padding_val_impl(uint64_t config)
 {
     if ASC_IS_AIC {
@@ -3625,7 +3587,6 @@ __aicore__ inline void asc_set_l12l0_padding_val_impl(uint64_t config)
     }
 }
 
-// asc_set_l12l0b_3d_padding_impl.h
 constexpr uint8_t ASC_3D_PADDING_B_SHIFT_BIT = 8;
 
 __aicore__ inline void asc_set_l12l0b_3d_padding_impl(uint64_t config)
@@ -3703,7 +3664,6 @@ __aicore__ inline void asc_set_l12l0b_3d_padding_impl(float padding_value)
     asc_set_l12l0b_3d_padding_impl(bitcode.output);
 }
 
-// asc_set_l13d_padding_impl.h
 __aicore__ inline void asc_set_l13d_padding_impl(uint64_t config)
 {
     if ASC_IS_AIC {
@@ -3741,7 +3701,6 @@ __aicore__ inline void asc_set_l13d_padding_impl(uint16_t config)
     }
 }
 
-// asc_set_l3d_rpt_b_impl.h
 constexpr uint8_t ASC_L3D_RPT_B_REPEAT_TIMES_SHIFT = 16;
 
 constexpr uint8_t ASC_L3D_RPT_B_DIRECTION_SHIFT = 24;
@@ -3771,7 +3730,6 @@ __aicore__ inline void asc_set_l3d_rpt_b_impl(
     }
 }
 
-// cube_datamove_impl.h
 constexpr uint8_t RELU_POST_DEFAULT = 0;
 
 constexpr bool CLIP_RELU_POST_DEFAULT = false;

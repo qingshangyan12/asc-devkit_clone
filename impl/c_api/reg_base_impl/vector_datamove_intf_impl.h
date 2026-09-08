@@ -20,7 +20,6 @@
 #include "c_api/defs/defs.h"
 #include "impl/c_api/reg_base_impl/utils_intf_impl.h"
 
-// asc_set_ub2gm_loop_size_impl.h
 __aicore__ inline void asc_set_ub2gm_loop_size_impl(uint32_t loop1_size, uint32_t loop2_size)
 {
     if ASC_IS_AIV {
@@ -30,7 +29,6 @@ __aicore__ inline void asc_set_ub2gm_loop_size_impl(uint32_t loop1_size, uint32_
     }
 }
 
-// asc_set_ub2gm_loop1_stride_impl.h
 __aicore__ inline void asc_set_ub2gm_loop1_stride_impl(uint64_t loop1_src_stride, uint64_t loop1_dst_stride)
 {
     if ASC_IS_AIV {
@@ -40,7 +38,6 @@ __aicore__ inline void asc_set_ub2gm_loop1_stride_impl(uint64_t loop1_src_stride
     }
 }
 
-// asc_set_ub2gm_loop2_stride_impl.h
 __aicore__ inline void asc_set_ub2gm_loop2_stride_impl(uint64_t loop2_src_stride, uint64_t loop2_dst_stride)
 {
     if ASC_IS_AIV {
@@ -50,7 +47,6 @@ __aicore__ inline void asc_set_ub2gm_loop2_stride_impl(uint64_t loop2_src_stride
     }
 }
 
-// asc_set_gm2ub_loop_size_impl.h
 __aicore__ inline void asc_set_gm2ub_loop_size_impl(uint64_t loop1_size, uint64_t loop2_size)
 {
     if ASC_IS_AIV {
@@ -61,7 +57,6 @@ __aicore__ inline void asc_set_gm2ub_loop_size_impl(uint64_t loop1_size, uint64_
     }
 }
 
-// asc_set_gm2ub_loop1_stride_impl.h
 __aicore__ inline void asc_set_gm2ub_loop1_stride_impl(uint64_t loop1_src_stride, uint64_t loop1_dst_stride)
 {
     if ASC_IS_AIV {
@@ -72,7 +67,6 @@ __aicore__ inline void asc_set_gm2ub_loop1_stride_impl(uint64_t loop1_src_stride
     }
 }
 
-// asc_set_gm2ub_loop2_stride_impl.h
 __aicore__ inline void asc_set_gm2ub_loop2_stride_impl(uint64_t loop2_src_stride, uint64_t loop2_dst_stride)
 {
     if ASC_IS_AIV {
@@ -83,7 +77,6 @@ __aicore__ inline void asc_set_gm2ub_loop2_stride_impl(uint64_t loop2_src_stride
     }
 }
 
-// asc_set_ndim_loop_stride_impl.h
 __aicore__ inline void asc_set_ndim_loop0_stride_impl(uint64_t dst_stride, uint64_t src_stride)
 {
     if ASC_IS_AIV {
@@ -124,7 +117,6 @@ __aicore__ inline void asc_set_ndim_loop4_stride_impl(uint64_t dst_stride, uint6
     }
 }
 
-// asc_ndim_copy_gm2ub_impl.h
 //===========asc_ndim_copy_gm2ub(int8/uint8/e2m1/e1m2/e8m0/e5m2/e4m3fn/int16/uint16/half/bfloat16/int32/uint32/float)===========
 __aicore__ inline void asc_ndim_copy_gm2ub_impl(
     __ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
@@ -462,7 +454,6 @@ __aicore__ inline void asc_ndim_copy_gm2ub_impl(
     }
 }
 
-// asc_set_ndim_pad_count_impl.h
 __aicore__ inline void asc_set_ndim_pad_count_impl(asc_ndim_pad_count_config& config)
 {
     if ASC_IS_AIV {
@@ -470,7 +461,6 @@ __aicore__ inline void asc_set_ndim_pad_count_impl(asc_ndim_pad_count_config& co
     }
 }
 
-// asc_set_ndim_pad_value_impl.h
 //===========asc_set_ndim_pad_value(int8/uint8/e2m1/e1m2/e8m0/e5m2/e4m3fn/int16/uint16/half/bfloat16/int32/uint32/float)===========
 __aicore__ inline void asc_set_ndim_pad_value_impl(int8_t pad_value)
 {
@@ -535,7 +525,6 @@ __aicore__ inline void asc_set_ndim_pad_value_impl(float pad_value)
     }
 }
 
-// asc_set_copy_pad_val_impl.h
 //===========asc_set_copy_pad_val(int8/uint8/e2m1/e1m2/e8m0/e5m2/e4m3fn/int16/uint16/half/bfloat16/int32/uint32/float)===========
 __aicore__ inline void asc_set_copy_pad_val_impl(int8_t pad_value)
 {
@@ -600,7 +589,6 @@ __aicore__ inline void asc_set_copy_pad_val_impl(float pad_value)
     }
 }
 
-// asc_copy_gm2ub_impl.h
 __aicore__ inline void asc_copy_gm2ub_impl(
     __ubuf__ void* dst, __gm__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_stride,
     uint16_t dst_stride)
@@ -617,7 +605,6 @@ __aicore__ inline void asc_copy_gm2ub_impl(__ubuf__ void* dst, __gm__ void* src,
     asc_copy_gm2ub_impl(dst, src, 1, size, 0, 0);
 }
 
-// asc_copy_ub2gm_impl.h
 __aicore__ inline void asc_copy_ub2gm_impl(
     __gm__ void* dst, __ubuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t dst_stride,
     uint16_t src_stride)
@@ -632,7 +619,6 @@ __aicore__ inline void asc_copy_ub2gm_impl(__gm__ void* dst, __ubuf__ void* src,
     asc_copy_ub2gm_impl(dst, src, 1, size, 0, 0);
 }
 
-// asc_copy_gm2ub_align_impl.h
 #ifndef ASC_C_API_DEFAULT_ZERO_VALUE
 #define ASC_C_API_DEFAULT_ZERO_VALUE 0
 #endif
@@ -1017,7 +1003,6 @@ __aicore__ inline void asc_copy_gm2ub_align_impl(__ubuf__ fp8_e5m2_t* dst, __gm_
 
 #undef ASC_C_API_DEFAULT_NBURST
 
-// asc_copy_ub2gm_align_impl.h
 #ifndef ASC_C_API_DEFAULT_ZERO_VALUE
 #define ASC_C_API_DEFAULT_ZERO_VALUE 0
 #endif
@@ -1366,7 +1351,6 @@ __aicore__ inline void asc_copy_ub2gm_align_impl(__gm__ fp8_e5m2_t* dst, __ubuf_
 
 #undef ASC_C_API_DEFAULT_NBURST
 
-// asc_copy_ub2l1_impl.h
 __aicore__ inline void asc_copy_ub2l1_impl(
     __cbuf__ void* dst, __ubuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap,
     uint16_t dst_gap)
@@ -1381,7 +1365,6 @@ __aicore__ inline void asc_copy_ub2l1_impl(__cbuf__ void* dst, __ubuf__ void* sr
     asc_copy_ub2l1_impl(dst, src, 1, size / ASC_C_API_ONE_DATABLOCK_SIZE, 0, 0);
 }
 
-// asc_copy_ub2ub_impl.h
 __aicore__ inline void asc_copy_ub2ub_impl(
     __ubuf__ void* dst, __ubuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap,
     uint16_t dst_gap)
@@ -1396,7 +1379,6 @@ __aicore__ inline void asc_copy_ub2ub_impl(__ubuf__ void* dst, __ubuf__ void* sr
     asc_copy_ub2ub_impl(dst, src, 1, size / ASC_C_API_ONE_DATABLOCK_SIZE, 0, 0);
 }
 
-// asc_ndim_copy_dci_impl.h
 __aicore__ inline void asc_ndim_copy_dci_impl()
 {
     if ASC_IS_AIV {
@@ -1404,7 +1386,6 @@ __aicore__ inline void asc_ndim_copy_dci_impl()
     }
 }
 
-// vector_datamove_impl.h
 //===========asc_set_ub2gm_loop_size=============
 __aicore__ inline void asc_set_ub2gm_loop_size(uint32_t loop1_size, uint32_t loop2_size)
 {

@@ -20,7 +20,6 @@
 #include "c_api/defs/defs.h"
 #include "impl/c_api/memory_base_impl/utils_intf_impl.h"
 
-// asc_mmad_sparse_impl.h
 __aicore__ inline void asc_mmad_sparse_impl(
     __cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag,
     bool c_matrix_source, bool c_matrix_init_val)
@@ -30,14 +29,12 @@ __aicore__ inline void asc_mmad_sparse_impl(
     }
 }
 
-// asc_set_fp32_mode_impl.h
 __aicore__ inline void asc_set_fp32_mode_impl()
 {
     constexpr int32_t HF32_MODE_BIT = 46;
     set_ctrl(sbitset0(get_ctrl(), HF32_MODE_BIT));
 }
 
-// asc_mmad_impl.h
 __aicore__ inline void asc_mmad_impl(
     __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ bfloat16_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source,
@@ -146,28 +143,24 @@ __aicore__ inline void asc_mmad_s4_impl(
     }
 }
 
-// asc_set_mmad_direction_m_impl.h
 __aicore__ inline void asc_set_mmad_direction_m_impl()
 {
     constexpr int32_t capi_mm_layout_mode_bit = 51;
     set_ctrl(sbitset0(get_ctrl(), capi_mm_layout_mode_bit));
 }
 
-// asc_set_mmad_direction_n_impl.h
 __aicore__ inline void asc_set_mmad_direction_n_impl()
 {
     constexpr int32_t capi_mm_layout_mode_bit = 51;
     set_ctrl(sbitset1(get_ctrl(), capi_mm_layout_mode_bit));
 }
 
-// asc_enable_hf32_impl.h
 __aicore__ inline void asc_enable_hf32_impl()
 {
     constexpr int32_t HF32_MODE_BIT = 46;
     set_ctrl(sbitset1(get_ctrl(), HF32_MODE_BIT));
 }
 
-// asc_set_hf32_round_mode_impl.h
 __aicore__ inline void asc_set_hf32_round_mode_impl(asc_hf32_round_mode hf32_round_mode)
 {
     constexpr int32_t HF32_TRANS_MODE_BIT = 47;
@@ -178,7 +171,6 @@ __aicore__ inline void asc_set_hf32_round_mode_impl(asc_hf32_round_mode hf32_rou
     }
 }
 
-// asc_enable_hf32_trans_impl.h
 __aicore__ inline void asc_enable_hf32_trans_impl(uint32_t mode)
 {
     constexpr int32_t HF32_TRANS_MODE_BIT = 47;
@@ -189,7 +181,6 @@ __aicore__ inline void asc_enable_hf32_trans_impl(uint32_t mode)
     }
 }
 
-// cube_compute_impl.h
 __aicore__ inline void asc_enable_hf32() { asc_enable_hf32_impl(); }
 
 __aicore__ inline void asc_set_hf32_round_mode(asc_hf32_round_mode hf32_round_mode)
@@ -360,7 +351,6 @@ __aicore__ inline void asc_mmad_s4(
         k_direction_align, is_weight_offset, c_matrix_source, c_matrix_init_val);
 }
 
-// asc_set_l0c2gm_config_impl.h
 __aicore__ inline void asc_set_l0c2gm_config_impl(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag)
 {
     if ASC_IS_AIC {
@@ -373,7 +363,6 @@ __aicore__ inline void asc_set_l0c2gm_config_impl(uint64_t relu_pre, uint64_t qu
     }
 }
 
-// asc_get_l0c2gm_config_impl.h
 __aicore__ inline uint64_t asc_get_l0c2gm_relu_impl()
 {
     if ASC_IS_AIC {

@@ -20,7 +20,6 @@
 #include "c_api/defs/defs.h"
 #include "impl/c_api/memory_base_impl/utils_intf_impl.h"
 
-// asc_set_flag_impl.h
 __aicore__ inline void asc_sync_notify_impl_aic(pipe_t pipe, pipe_t tpipe, event_t id)
 {
     if (pipe == pipe_t::PIPE_S) {
@@ -132,7 +131,6 @@ __aicore__ inline void asc_sync_notify_impl(pipe_t pipe, pipe_t tpipe, event_t i
     }
 }
 
-// asc_wait_flag_impl.h
 __aicore__ inline void asc_sync_wait_impl_aic(pipe_t pipe, pipe_t tpipe, event_t id)
 {
     if (pipe == pipe_t::PIPE_S) {
@@ -244,7 +242,6 @@ __aicore__ inline void asc_sync_wait_impl(pipe_t pipe, pipe_t tpipe, event_t id)
     }
 }
 
-// asc_pipe_barrier_impl.h
 __aicore__ inline void asc_sync_pipe_impl(pipe_t pipe)
 {
     if ASC_IS_AIC {
@@ -307,7 +304,6 @@ __aicore__ inline void asc_sync_mte3_impl(int id)
 
 __aicore__ inline void asc_sync_impl() { pipe_barrier(pipe_t::PIPE_ALL); }
 
-// asc_sync_data_barrier_impl.h
 __aicore__ inline void asc_sync_data_barrier_impl(mem_dsb_t arg)
 {
     if (arg == mem_dsb_t::DSB_ALL) {
@@ -321,7 +317,6 @@ __aicore__ inline void asc_sync_data_barrier_impl(mem_dsb_t arg)
     }
 }
 
-// asc_sync_block_arrive_impl.h
 __aicore__ inline void asc_sync_block_arrive_impl(pipe_t pipe, int64_t flag_id)
 {
     constexpr uint16_t SYNC_MODE_SHIFT_VALUE = 4;
@@ -348,7 +343,6 @@ __aicore__ inline void asc_sync_block_arrive_impl(pipe_t pipe, int64_t flag_id)
     }
 }
 
-// asc_sync_inter_arrive_impl.h
 __aicore__ inline void asc_sync_inter_arrive_impl(pipe_t pipe, int64_t flag_id)
 {
     constexpr uint16_t SYNC_MODE_SHIFT_VALUE = 4;
@@ -375,7 +369,6 @@ __aicore__ inline void asc_sync_inter_arrive_impl(pipe_t pipe, int64_t flag_id)
     }
 }
 
-// asc_sync_subblock_arrive_impl.h
 __aicore__ inline void asc_sync_subblock_arrive_impl(pipe_t pipe, int64_t flag_id)
 {
     constexpr uint16_t SYNC_MODE_SHIFT_VALUE = 4;
@@ -402,16 +395,12 @@ __aicore__ inline void asc_sync_subblock_arrive_impl(pipe_t pipe, int64_t flag_i
     }
 }
 
-// asc_sync_inter_wait_impl.h
 __aicore__ inline void asc_sync_inter_wait_impl(pipe_t pipe, int64_t flag_id) { wait_flag_dev(flag_id); }
 
-// asc_sync_block_wait_impl.h
 __aicore__ inline void asc_sync_block_wait_impl(pipe_t pipe, int64_t flag_id) { wait_flag_dev(flag_id); }
 
-// asc_sync_subblock_wait_impl.h
 __aicore__ inline void asc_sync_subblock_wait_impl(pipe_t pipe, int64_t flag_id) { wait_flag_dev(flag_id); }
 
-// sync_impl.h
 __aicore__ inline void asc_sync_vec(int id) { asc_sync_vec_impl(id); }
 
 [[deprecated("NOTICE: asc_sync_vec() is deprecated. "

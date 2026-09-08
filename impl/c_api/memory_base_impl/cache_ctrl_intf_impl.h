@@ -20,16 +20,13 @@
 #include "c_api/defs/defs.h"
 #include "impl/c_api/memory_base_impl/utils_intf_impl.h"
 
-// asc_get_icache_preload_status_impl.h
 __aicore__ inline int64_t asc_get_icache_preload_status_impl() { return get_icache_prl_st(); }
 
-// asc_data_cache_preload_impl.h
 __aicore__ inline void asc_datacache_preload_impl(__gm__ uint64_t* address, int64_t offset)
 {
     dc_preload(address, offset);
 }
 
-// asc_dcci_impl.h
 namespace __asc_aicore {
 __aicore__ inline void asc_dcci_single_impl(__gm__ void* dst) { dcci(dst, cache_line_t::SINGLE_CACHE_LINE); }
 } // namespace __asc_aicore
@@ -58,10 +55,8 @@ __aicore__ inline void asc_dcci_entire_atomic_impl()
     dcci((__gm__ int64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_ATOMIC);
 }
 
-// asc_icache_preload_impl.h
 __aicore__ inline void asc_icache_preload_impl(const void* addr, int64_t prefetch_len) { preload(addr, prefetch_len); }
 
-// cache_ctrl_impl.h
 namespace __asc_aicore {
 __aicore__ inline void asc_dcci_single(__gm__ void* dst) { asc_dcci_single_impl(dst); }
 } // namespace __asc_aicore

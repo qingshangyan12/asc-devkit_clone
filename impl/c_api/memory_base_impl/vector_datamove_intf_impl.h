@@ -20,7 +20,6 @@
 #include "c_api/defs/defs.h"
 #include "impl/c_api/memory_base_impl/utils_intf_impl.h"
 
-// asc_copy_ub2ub_impl.h
 __aicore__ inline void asc_copy_ub2ub_impl(
     __ubuf__ void* dst, __ubuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap,
     uint16_t dst_gap)
@@ -35,7 +34,6 @@ __aicore__ inline void asc_copy_ub2ub_impl(__ubuf__ void* dst, __ubuf__ void* sr
     asc_copy_ub2ub_impl(dst, src, 1, size / ASC_C_API_ONE_DATABLOCK_SIZE, 0, 0);
 }
 
-// asc_copy_gm2ub_impl.h
 __aicore__ inline void asc_copy_gm2ub_impl(
     __ubuf__ void* dst, __gm__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
 {
@@ -49,7 +47,6 @@ __aicore__ inline void asc_copy_gm2ub_impl(__ubuf__ void* dst, __gm__ void* src,
     asc_copy_gm2ub_impl(dst, src, 1, size / ASC_C_API_ONE_DATABLOCK_SIZE, 0, 0);
 }
 
-// asc_copy_ub2gm_impl.h
 __aicore__ inline void asc_copy_ub2gm_impl(
     __gm__ void* dst, __ubuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
 {
@@ -63,7 +60,6 @@ __aicore__ inline void asc_copy_ub2gm_impl(__gm__ void* dst, __ubuf__ void* src,
     asc_copy_ub2gm_impl(dst, src, 1, size / ASC_C_API_ONE_DATABLOCK_SIZE, 0, 0);
 }
 
-// asc_copy_gm2ub_align_impl.h
 #ifndef ASC_C_API_DEFAULT_ZERO_VALUE
 #define ASC_C_API_DEFAULT_ZERO_VALUE 0
 #endif
@@ -247,7 +243,6 @@ __aicore__ inline void asc_copy_gm2ub_align_impl(__ubuf__ float* dst, __gm__ flo
 
 #undef ASC_C_API_DEFAULT_NBURST
 
-// asc_copy_ub2gm_align_impl.h
 #ifndef ASC_C_API_DEFAULT_ZERO_VALUE
 #define ASC_C_API_DEFAULT_ZERO_VALUE 0
 #endif
@@ -476,7 +471,6 @@ __aicore__ inline void asc_copy_ub2gm_align_impl(__gm__ uint64_t* dst, __ubuf__ 
 
 #undef ASC_C_API_DEFAULT_NBURST
 
-// asc_set_copy_pad_val_impl.h
 //===========asc_set_copy_pad_val(int8/uint8/int16/uint16/half/bfloat16/int32/uint32/float)===========
 __aicore__ inline void asc_set_copy_pad_val_impl(int8_t pad_value)
 {
@@ -541,7 +535,6 @@ __aicore__ inline void asc_set_copy_pad_val_impl(float pad_value)
     }
 }
 
-// vector_datamove_impl.h
 __aicore__ inline void asc_copy_ub2ub(
     __ubuf__ void* dst, __ubuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap,
     uint16_t dst_gap)
