@@ -20,6 +20,9 @@ constexpr uint32_t KFC_SIGNAL_REGIONS_PER_MISSION = 2U;
 constexpr uint32_t KFC_SIGNAL_REGION_NUM = KFC_MAX_MISSION_NUM * KFC_SIGNAL_REGIONS_PER_MISSION;
 constexpr uint32_t KFC_COMMIT_REGION_INDEX = 0U;
 constexpr uint32_t KFC_WAIT_REGION_INDEX = 1U;
+// A Mesh1D AllGather queue entry can cover this many equal-sized contiguous
+// slices. Keep it in sync with the event groups emitted by the KFC sub-kernel.
+constexpr uint32_t KFC_ALL_GATHER_MESH_MAX_REPEAT = 16U;
 
 enum KfcConcurrentAllGatherParamIndex : uint32_t {
     KFC_CONCURRENT_AG_OP_ID = 0,

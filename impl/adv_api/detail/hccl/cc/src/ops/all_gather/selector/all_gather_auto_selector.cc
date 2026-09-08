@@ -81,8 +81,9 @@ SelectorStatus AllGatherAutoSelector::SelectCcuScheduleLevel0Algo(
     if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS) {
         return SelectCcuScheduleUBXAlgo(topoInfo, selectAlgName, dataSize);
     }
-    // Temporary KFC convergence: route only regular Mesh1D to the KFC Mem2Mem implementation.
-    if (topoInfo->level0Topo != Level0Shape::MESH_1D || topoInfo->level0MeshType != Level0MeshType::SINGLE_DIE) {
+    // The KFC Mesh kernel supports both single-die and regular two-die Mesh1D.
+    if (topoInfo->level0Topo != Level0Shape::MESH_1D ||
+        topoInfo->level0MeshType == Level0MeshType::TWO_DIE_NOT_REGULAR) {
         HCCL_DEBUG(
             "[AllGatherAutoSelector] level0Topo[%d], level0MeshType[%d] is not supported for ccu schedule mode.",
             topoInfo->level0Topo, topoInfo->level0MeshType);

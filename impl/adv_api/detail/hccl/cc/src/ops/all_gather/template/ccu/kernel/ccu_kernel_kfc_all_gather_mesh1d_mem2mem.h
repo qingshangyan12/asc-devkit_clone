@@ -11,11 +11,12 @@
 #define HCCL_CCU_KERNEL_KFC_ALL_GATHER_MESH_1D_MEM2MEM_H
 
 #include "ccu_kernel_alg_base.h"
+#include "kfc_server_protocol.h"
 
 namespace mc2_ops_hccl {
 
-// 每个 repeat 批次最多展开 16 次 Write/LocalCopy/Wait 三阶段流水。
-constexpr uint32_t AG_M2M_UNROLL_NUM = 1;
+// 每个 repeat 批次最多展开 16 次 Write/GroupCopy/Wait 三阶段流水。
+constexpr uint32_t AG_M2M_UNROLL_NUM = HcclKfcProtocol::KFC_ALL_GATHER_MESH_MAX_REPEAT;
 
 CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable outputOffset,
