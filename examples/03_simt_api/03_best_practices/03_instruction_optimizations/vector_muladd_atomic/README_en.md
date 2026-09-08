@@ -180,8 +180,8 @@ Run the following steps in the root directory of this sample to build and execut
 
   | Option | Values | Description |
   |------|--------|------|
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this sample only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
-  | `SKIP_VALIDATION` | `ON`/`OFF` | Whether to skip result validation, default `OFF`. Recommended to set to `ON` when collecting performance with `msopprof` |
+  | CMAKE_ASC_ARCHITECTURES | dav-3510 | NPU architecture: this sample only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
+  | SKIP_VALIDATION | ON/OFF | Whether to skip result validation, default OFF. Recommended to set to ON when collecting performance with msopprof |
 
   The following output indicates that the accuracy verification is successful.
 
