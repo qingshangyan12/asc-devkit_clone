@@ -1099,13 +1099,16 @@ __simd_callee__ inline void asc_half2bfloat16_ru(vector_bfloat16_t& dst, vector_
 __simd_callee__ inline void asc_half2bfloat16_rz(vector_bfloat16_t& dst, vector_half src, vector_bool mask);
 
 // ==========asc_int4x22int16==========
-[[deprecated("NOTICE: asc_int4x22int16 is deprecated. "
-             "Currently asc_int4x22int16 is an unsupported API on current device.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_int4x22int16(vector_int16_t& dst, vector_int4x2_t src, vector_bool mask) is deprecated. "
+             "Please use asc_int4x22int16(vector_int16_t& dst, vector_int4x2_t src, vector_bool mask, "
+             "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
 asc_int4x22int16(vector_int16_t& dst, vector_int4x2_t src, vector_bool mask);
 
 // ==========asc_int4x22bfloat16==========
-[[deprecated("NOTICE: asc_int4x22bfloat16 is deprecated. "
-             "Currently asc_int4x22bfloat16 is an unsupported API on current device.")]] __simd_callee__ inline void
+[[deprecated(
+    "NOTICE: asc_int4x22bfloat16(vector_bfloat16_t& dst, vector_int4x2_t src, vector_bool mask) is deprecated. "
+    "Please use asc_int4x22bfloat16(vector_bfloat16_t& dst, vector_int4x2_t src, vector_bool mask, "
+    "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
 asc_int4x22bfloat16(vector_bfloat16_t& dst, vector_int4x2_t src, vector_bool mask);
 
 // ==========asc_int322float(rd/ru/rz/rn/rna)==========
@@ -1162,48 +1165,58 @@ __simd_callee__ inline void asc_half2int16_rz_sat(vector_int16_t& dst, vector_ha
 
 // ==========asc_half2int4x2==========
 // rd - sat:dis/en - v1 v2 v3 v4
-[[deprecated("NOTICE: asc_half2int4x2_rd is deprecated. "
-             "Currently asc_half2int4x2_rd is an unsupported API on current device.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_half2int4x2_rd(vector_int4x2_t& dst, vector_half src, vector_bool mask) is deprecated. "
+             "Please use asc_half2int4x2_rd(vector_int4x2_t& dst, vector_half src, vector_bool mask, "
+             "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
 asc_half2int4x2_rd(vector_int4x2_t& dst, vector_half src, vector_bool mask);
 
-[[deprecated("NOTICE: asc_half2int4x2_rd_sat is deprecated. "
-             "Currently asc_half2int4x2_rd_sat is an unsupported API on current device.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_half2int4x2_rd_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask) is deprecated. "
+             "Please use asc_half2int4x2_rd_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, "
+             "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
 asc_half2int4x2_rd_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask);
 
 // ru - sat:dis/en - v1 v2 v3 v4
-[[deprecated("NOTICE: asc_half2int4x2_ru is deprecated. "
-             "Currently asc_half2int4x2_ru is an unsupported API on current device.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_half2int4x2_ru(vector_int4x2_t& dst, vector_half src, vector_bool mask) is deprecated. "
+             "Please use asc_half2int4x2_ru(vector_int4x2_t& dst, vector_half src, vector_bool mask, "
+             "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
 asc_half2int4x2_ru(vector_int4x2_t& dst, vector_half src, vector_bool mask);
 
-[[deprecated("NOTICE: asc_half2int4x2_ru_sat is deprecated. "
-             "Currently asc_half2int4x2_ru_sat is an unsupported API on current device.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_half2int4x2_ru_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask) is deprecated. "
+             "Please use asc_half2int4x2_ru_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, "
+             "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
 asc_half2int4x2_ru_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask);
 
 // rz - sat:dis/en - v1 v2 v3 v4
-[[deprecated("NOTICE: asc_half2int4x2_rz is deprecated. "
-             "Currently asc_half2int4x2_rz is an unsupported API on current device.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_half2int4x2_rz(vector_int4x2_t& dst, vector_half src, vector_bool mask) is deprecated. "
+             "Please use asc_half2int4x2_rz(vector_int4x2_t& dst, vector_half src, vector_bool mask, "
+             "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
 asc_half2int4x2_rz(vector_int4x2_t& dst, vector_half src, vector_bool mask);
 
-[[deprecated("NOTICE: asc_half2int4x2_rz_sat is deprecated. "
-             "Currently asc_half2int4x2_rz_sat is an unsupported API on current device.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_half2int4x2_rz_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask) is deprecated. "
+             "Please use asc_half2int4x2_rz_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, "
+             "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
 asc_half2int4x2_rz_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask);
 
 // rn - sat:dis/en - v1 v2 v3 v4
-[[deprecated("NOTICE: asc_half2int4x2_rn is deprecated. "
-             "Currently asc_half2int4x2_rn is an unsupported API on current device.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_half2int4x2_rn(vector_int4x2_t& dst, vector_half src, vector_bool mask) is deprecated. "
+             "Please use asc_half2int4x2_rn(vector_int4x2_t& dst, vector_half src, vector_bool mask, "
+             "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
 asc_half2int4x2_rn(vector_int4x2_t& dst, vector_half src, vector_bool mask);
 
-[[deprecated("NOTICE: asc_half2int4x2_rn_sat is deprecated. "
-             "Currently asc_half2int4x2_rn_sat is an unsupported API on current device.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_half2int4x2_rn_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask) is deprecated. "
+             "Please use asc_half2int4x2_rn_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, "
+             "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
 asc_half2int4x2_rn_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask);
 
 // rna - sat:dis/en - v1 v2 v3 v4
-[[deprecated("NOTICE: asc_half2int4x2_rna is deprecated. "
-             "Currently asc_half2int4x2_rna is an unsupported API on current device.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_half2int4x2_rna(vector_int4x2_t& dst, vector_half src, vector_bool mask) is deprecated. "
+             "Please use asc_half2int4x2_rna(vector_int4x2_t& dst, vector_half src, vector_bool mask, "
+             "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
 asc_half2int4x2_rna(vector_int4x2_t& dst, vector_half src, vector_bool mask);
 
-[[deprecated("NOTICE: asc_half2int4x2_rna_sat is deprecated. "
-             "Currently asc_half2int4x2_rna_sat is an unsupported API on current device.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_half2int4x2_rna_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask) is deprecated. "
+             "Please use asc_half2int4x2_rna_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, "
+             "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
 asc_half2int4x2_rna_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask);
 
 //===================asc_int162half=================
@@ -1218,8 +1231,9 @@ __simd_callee__ inline void asc_int162half_ru(vector_half& dst, vector_int16_t s
 __simd_callee__ inline void asc_int162half_rz(vector_half& dst, vector_int16_t src, vector_bool mask);
 
 //================asc_int4x22half==============
-[[deprecated("NOTICE: asc_int4x22half is deprecated. "
-             "Currently asc_int4x22half is an unsupported API on current device.")]] __simd_callee__ inline void
+[[deprecated("NOTICE: asc_int4x22half(vector_half& dst, vector_int4x2_t src, vector_bool mask) is deprecated. "
+             "Please use asc_int4x22half(vector_half& dst, vector_int4x2_t src, vector_bool mask, "
+             "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
 asc_int4x22half(vector_half& dst, vector_int4x2_t src, vector_bool mask);
 
 // ==========asc_float2int32_rd/ru/rz/rn/rna)==========
