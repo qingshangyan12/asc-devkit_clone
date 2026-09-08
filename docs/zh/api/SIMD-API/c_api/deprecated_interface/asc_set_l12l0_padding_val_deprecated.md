@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-**`asc_set_l12l0_padding_val`接口已废弃。请使用`asc_set_l12l0b_3d_padding`接口替代。TODO：替代接口文档待补齐。**
+**`asc_set_l12l0_padding_val`接口已废弃。请使用[asc_set_l12l0b_3d_padding](../cube_datamove/asc_set_l12l0b_3d_padding.md)接口替代。**
 
 对PADDING_B寄存器中的值进行设置，这是一个64bit的寄存器，用于存储搬运过程中padding的值。
 其中各bit含义如下：

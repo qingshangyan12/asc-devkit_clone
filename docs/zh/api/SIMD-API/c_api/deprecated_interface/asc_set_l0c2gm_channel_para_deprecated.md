@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-**`asc_set_l0c2gm_channel_para`接口已废弃。请使用`asc_set_l0c_copy_channel_para`接口替代。TODO：替代接口文档待补齐。**
+**`asc_set_l0c2gm_channel_para`接口已废弃。请使用[asc_set_l0c_copy_channel_para](../cube_datamove/asc_set_l0c_copy_channel_para.md)接口替代。**
 
 本接口用于在L0C Buffer搬出并执行Nz2DN格式转换时，配置源Nz矩阵中相邻行的地址偏移。配置写入后，由后续开启Nz2DN功能的[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)接口使用；未开启Nz2DN功能时，本配置不生效。
 

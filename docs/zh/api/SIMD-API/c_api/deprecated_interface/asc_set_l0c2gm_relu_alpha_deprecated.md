@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-**`asc_set_l0c2gm_relu_alpha`接口已废弃。请使用`asc_set_l0c_copy_relu_alpha`接口替代。TODO：替代接口文档待补齐。**
+**`asc_set_l0c2gm_relu_alpha`接口已废弃。请使用[asc_set_l0c_copy_relu_alpha](../cube_datamove/asc_set_l0c_copy_relu_alpha.md)接口替代。**
 
 对RELU_ALPHA寄存器中的值进行设置。这是一个64bit的寄存器，存储在fixpipe或cube指令中进行Scalar ReLU时使用的alpha值。
 

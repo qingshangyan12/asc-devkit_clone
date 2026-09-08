@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-**`asc_set_l0c2gm_nz2nd`接口已废弃。请使用`asc_set_l0c_copy_nz_para`接口替代。TODO：替代接口文档待补齐。**
+**`asc_set_l0c2gm_nz2nd`接口已废弃。请使用[asc_set_l0c_copy_nz_para](../cube_datamove/asc_set_l0c_copy_nz_para.md)接口替代。**
 
 本接口用于在L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)启用随路Nz转ND格式功能时，配置格式转换所需的相关参数。
 
