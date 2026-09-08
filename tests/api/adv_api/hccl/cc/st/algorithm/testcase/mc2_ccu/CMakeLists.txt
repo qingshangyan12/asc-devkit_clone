@@ -35,6 +35,12 @@ set(HCCL_SELECTOR_PRODUCT_SOURCES
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_v_mesh1d.cc
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/selector/reduce_scatter_auto_selector.cc
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/executor/ins_v2_reduce_scatter_sole_executor.cc
+    # aicpu 模板含 out-of-line 虚函数（key function）：executor 注册项经 vtable 急切实例化引用其符号，必须编入
+    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/aicpu/ins_temp_reduce_scatter_mesh_1D.cc
+    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/aicpu/ins_temp_reduce_scatter_mesh_1D_meshchunk.cc
+    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/aicpu/ins_temp_reduce_scatter_nhr.cc
+    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/aicpu/ins_temp_reduce_scatter_aicpu_reduce_nhr.cc
+    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/aicpu/ins_temp_reduce_scatter_mesh_1D_Z_axis_detour.cc
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem.cc
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.cc
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu/kernel/ccu_kernel_kfc_all_to_all_mesh1d_multi_jetty.cc
@@ -126,6 +132,7 @@ target_include_directories(
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu/kernel
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/selector
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/executor
+    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/aicpu
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/kernel
