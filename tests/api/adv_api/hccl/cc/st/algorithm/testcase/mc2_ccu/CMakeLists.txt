@@ -41,7 +41,6 @@ set(HCCL_SELECTOR_PRODUCT_SOURCES
     ${HCCL_CC_SRC_DIR}/ops/all_reduce/template/aicpu/ins_temp_all_reduce_mesh_1D_one_shot.cc
     ${HCCL_CC_SRC_DIR}/ops/all_reduce/template/aicpu/ins_temp_all_reduce_aicpu_reduce_nhr.cc
     ${HCCL_CC_SRC_DIR}/ops/all_reduce/template/aicpu/ins_temp_all_reduce_mesh_1D_two_shot_mesh_chunk.cc
-    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.cc
     ${HCCL_CC_SRC_DIR}/ops/kfc_server/executor/ins_kfc_server_sole_executor.cc
     ${HCCL_CC_SRC_DIR}/ops/kfc_server/template/ccu/ccu_temp_kfc_server.cc
     ${HCCL_CC_SRC_DIR}/ops/kfc_server/template/ccu/kernel/ccu_kernel_kfc_server.cc
@@ -108,6 +107,8 @@ target_include_directories(
     ${UTILS_DIR}/ccu_scenario
     ${HCCL_CC_SRC_DIR}
     ${HCCL_CC_SRC_DIR}/common
+    ${HCCL_CC_SRC_DIR}/common/hcomm_dlsym
+    ${HCCL_CC_SRC_DIR}/common/hcomm_dlsym/ccu
     ${HCCL_CC_SRC_DIR}/ops/all_gather/selector
     ${HCCL_CC_SRC_DIR}/ops/all_gather/executor
     ${HCCL_CC_SRC_DIR}/ops/all_gather/template/ccu
