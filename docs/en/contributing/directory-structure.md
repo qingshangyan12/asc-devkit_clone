@@ -42,9 +42,9 @@ The `include/` and `impl/` top-level directory structures have a one-to-one corr
 |-------------|----------|------|
 | `include/basic_api/xxx.h` | No matching `xxx_impl.h` (e.g. `kernel_common.h`); some have corresponding `xxx_impl.h` (e.g. `kernel_tensor.h` → `kernel_tensor_impl.h`) | Only a few basic utility headers are self-contained |
 | `include/basic_api/xxx_intf.h` | `impl/basic_api/xxx_intf_impl.h` | Interface → architecture dispatch implementation |
-| `include/adv_api/math/xxx.h` | `impl/adv_api/detail/math/xxx/xxx_utils_impl.h` | |
+| `include/adv_api/math/xxx.h` | `impl/adv_api/detail/math/xxx/xxx_common_impl.h` | |
 | `include/adv_api/math/xxx_tiling.h` | `impl/adv_api/tiling/math/xxx_tiling_impl.cpp` | |
-| `include/adv_api/<cat>/xxx.h` | `impl/adv_api/detail/<cat>/xxx/xxx_utils_impl.h` | |
+| `include/adv_api/<cat>/xxx.h` | `impl/adv_api/detail/<cat>/xxx/xxx_common_impl.h` | |
 | `include/c_api/<category>/[subdirectory/]<header>.h` | `impl/c_api/memory_base_impl/<header>_intf_impl.h`, `impl/c_api/reg_base_impl/<header>_intf_impl.h` | Each public interface header has a matching flat implementation header; deprecated 3510 interfaces use the same filename under `reg_base_impl/npu_arch_3510/`. Shared internal helpers belong in each architecture group's `utils_impl.h`. |
 
 ---
@@ -63,7 +63,7 @@ The `include/` and `impl/` top-level directory structures have a one-to-one corr
 | `_tiling_impl.cpp` | Tiling host-side implementation | `impl/adv_api/tiling/` |
 | `_tiling.cpp` | Tiling implementation (variant without `_impl` suffix) | `impl/adv_api/tiling/` |
 | `_struct_*.h` | Type/struct definitions | `include/` |
-| `_utils_impl.h` | Common algorithm implementation | `impl/adv_api/detail/` |
+| `_common_impl.h` | Common algorithm implementation | `impl/adv_api/detail/` |
 | `_check.h` | Parameter validation logic | `impl/adv_api/detail/api_check/` |
 | `_config.h` | Configuration parameter definitions | `include/` or `impl/` |
 | `_utils.h` | Utility functions | `include/` or `impl/` |
@@ -81,7 +81,7 @@ The `include/` and `impl/` top-level directory structures have a one-to-one corr
 kernel_operator_vec_binary_intf.h
 kernel_struct_fixpipe.h
 kernel_operator_common_intf_impl.h
-axpy_utils_impl.h
+axpy_common_impl.h
 exp_check_common.h
 ```
 
@@ -90,7 +90,7 @@ exp_check_common.h
 | API type | Header file | Implementation file | Example |
 |---------|--------|---------|------|
 | Basic API | `kernel_<name>_intf.h` | Dispatch: `kernel_<name>_intf_impl.h`; arch impl: `dav_<arch>/kernel_<name>_impl.h` | `kernel_operator_vec_binary_intf.h` |
-| High-level API | `<name>.h` | `<name>_utils_impl.h` | `axpy.h` / `axpy_utils_impl.h` |
+| High-level API | `<name>.h` | `<name>_common_impl.h` | `axpy.h` / `axpy_common_impl.h` |
 | C API | `<category>.h` | `asc_<api>_impl.h` | `vector_compute.h` / `asc_add_impl.h` |
 | Tiling | `<name>_tiling.h` | `<name>_tiling_impl.cpp` | `axpy_tiling.h` |
 
@@ -119,9 +119,9 @@ In impl header files, use an `#if / #elif / #endif` chain to select the implemen
 
 ```cpp
 #if __NPU_ARCH__ == 2201
-#include "dav_c220/kernel_operator_utils_impl.h"
+#include "dav_c220/kernel_operator_common_impl.h"
 #elif __NPU_ARCH__ == 3510
-#include "dav_3510/kernel_operator_utils_impl.h"
+#include "dav_3510/kernel_operator_common_impl.h"
 #endif
 ```
 
@@ -144,7 +144,7 @@ impl/adv_api/
 │   ├── common/               # Common utilities
 │   ├── math/                 # Math operations (50+ subdirectories)
 │   │   └── exp/
-│   │       ├── exp_utils_impl.h
+│   │       ├── exp_common_impl.h
 │   │       └── exp_3510_impl.h
 │   ├── matmul/               # Matmul
 │   ├── normalization/        # Normalization
@@ -171,8 +171,8 @@ When adding a complete API, create and modify files according to the following c
 □ include/adv_api/<category>/<api>_tiling.h
     Tiling interface declaration (if the API needs temporary space)
 
-□ impl/adv_api/detail/<category>/<api>/<api>_utils_impl.h and/or <api>_<arch>_impl.h
-    Core algorithm implementation (common impl uses _utils_impl.h; arch-specific impl uses <api>_<arch>_impl.h)
+□ impl/adv_api/detail/<category>/<api>/<api>_common_impl.h and/or <api>_<arch>_impl.h
+    Core algorithm implementation (common impl uses _common_impl.h; arch-specific impl uses <api>_<arch>_impl.h)
 
 □ impl/adv_api/detail/api_check/kernel_check/<category>/<api>/<api>_check.h
     Parameter validation logic (required by CHECK_FUNC_HIGHLEVEL_API)
