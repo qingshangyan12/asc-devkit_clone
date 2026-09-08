@@ -61,7 +61,7 @@ static __aicore__ inline void Unlock(MutexID id)
 
 ## 约束说明<a name="section184751024101111"></a>
 
-参考[Lock约束说明](Lock.md#section184751024101111)。
+调用`Lock`/`Unlock`时，如果由开发者自行管理MutexID，不得同时使用[Lock约束说明](Lock.md#section184751024101111)中列出的资源管理接口。同时使用上述资源管理接口和`Lock`/`Unlock`时，`Lock`/`Unlock`使用的MutexID必须通过[AllocMutexID](AllocMutexID_ISASI.md)申请，并在使用结束后通过[ReleaseMutexID](ReleaseMutexID_ISASI.md)释放。其他约束也请参考[Lock约束说明](Lock.md#section184751024101111)。
 
 ## 调用示例<a name="section123275308128"></a>
 
