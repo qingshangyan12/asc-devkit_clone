@@ -25,7 +25,7 @@ public:
 
 private:
     aclError ParseConstants(const nlohmann::json& kernel, std::vector<ManifestConstant>& constants) const;
-    aclError ParseArgument(
+    aclError ExpandOptionsReference(
         const std::string& argument, const std::string& location, std::vector<std::string>& arguments) const;
     aclError ParseCommand(
         const nlohmann::json& command, const std::string& objectName, ManifestObjectKind objectKind, size_t index,

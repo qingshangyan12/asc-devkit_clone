@@ -50,7 +50,7 @@ aclError CompilationManifestParser::ParseConstants(const Json& kernel, std::vect
     return ACLRTC_SUCCESS;
 }
 
-aclError CompilationManifestParser::ParseArgument(
+aclError CompilationManifestParser::ExpandOptionsReference(
     const std::string& argument, const std::string& location, std::vector<std::string>& arguments) const
 {
     if (argument.compare(0, sizeof(OPTIONS_PREFIX) - 1U, OPTIONS_PREFIX) != 0 ||
@@ -98,23 +98,22 @@ aclError CompilationManifestParser::ParseCommand(
         ASCENDLOGE("Manifest command %s has an empty cmd array", spec.diagnosticLabel.c_str());
         return ACLRTC_ERROR_FAILURE;
     }
-    std::vector<std::string> executable;
-    aclError result = ParseArgument(argv.front(), spec.diagnosticLabel + ".cmd[0]", executable);
-    if (result != ACLRTC_SUCCESS) {
-        return result;
-    }
-    if (executable.size() != 1U) {
-        ASCENDLOGE("Manifest command %s executable must resolve to exactly one argument", spec.diagnosticLabel.c_str());
-        return ACLRTC_ERROR_FAILURE;
-    }
-    spec.executable = std::move(executable.front());
-    for (size_t argumentIndex = 1U; argumentIndex < argv.size(); ++argumentIndex) {
-        result = ParseArgument(
-            argv[argumentIndex], spec.diagnosticLabel + ".cmd[" + std::to_string(argumentIndex) + "]", spec.arguments);
+    std::vector<std::string> expandedArguments;
+    for (size_t argumentIndex = 0U; argumentIndex < argv.size(); ++argumentIndex) {
+        const aclError result = ExpandOptionsReference(
+            argv[argumentIndex], spec.diagnosticLabel + ".cmd[" + std::to_string(argumentIndex) + "]",
+            expandedArguments);
         if (result != ACLRTC_SUCCESS) {
             return result;
         }
     }
+    if (expandedArguments.empty()) {
+        ASCENDLOGE("Manifest command %s expands to an empty cmd array", spec.diagnosticLabel.c_str());
+        return ACLRTC_ERROR_FAILURE;
+    }
+    spec.executable = std::move(expandedArguments.front());
+    expandedArguments.erase(expandedArguments.begin());
+    spec.arguments = std::move(expandedArguments);
     return ACLRTC_SUCCESS;
 }
 

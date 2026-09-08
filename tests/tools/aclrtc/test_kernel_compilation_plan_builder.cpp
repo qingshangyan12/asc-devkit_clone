@@ -760,7 +760,7 @@ TEST(KernelCompilationPlanBuilderTest, RejectsMissingResourceWorktree)
         ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 }
 
-TEST(KernelCompilationPlanBuilderTest, RejectsMalformedManifestCommands)
+TEST(KernelCompilationPlanBuilderTest, ExpandsCommandPrefixAndRejectsInvalidCommands)
 {
     KernelPlanTestWorkspace workspace;
     ScopedEnvironmentVariable toolchainEnvironment("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
@@ -787,11 +787,34 @@ TEST(KernelCompilationPlanBuilderTest, RejectsMalformedManifestCommands)
         ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 
     Json expandedExecutableManifest = CreateManifest();
-    expandedExecutableManifest["kernels"][1]["objects"][0]["commands"][0]["cmd"][0] = "${options:common_compile}";
+    expandedExecutableManifest["options"]["common_compile"] = Json::array();
+    expandedExecutableManifest["kernels"][1]["objects"][0]["commands"][0]["cmd"] =
+        Json::array({"${options:common_compile}"});
     EXPECT_EQ(
         BuildPlanFromManifest(
             request, expandedExecutableManifest, workspace.ResourcePath(), workspace.SourceDirectoryPath(), plan),
         ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+
+    KernelCompilationPlan expectedPlan;
+    ASSERT_EQ(
+        BuildPlanFromManifest(
+            request, CreateManifest(), workspace.ResourcePath(), workspace.SourceDirectoryPath(), expectedPlan),
+        ascendc::aclrtc::ACLRTC_SUCCESS);
+    Json commandPrefixManifest = CreateManifest();
+    auto& commandArguments = commandPrefixManifest["kernels"][1]["objects"][0]["commands"][0]["cmd"];
+    Json commandPrefix = Json::array({commandArguments[0]});
+    for (const auto& argument : commandPrefixManifest["options"]["common_compile"]) {
+        commandPrefix.push_back(argument);
+    }
+    commandPrefixManifest["options"]["command_prefix"] = std::move(commandPrefix);
+    commandArguments.erase(0);
+    commandArguments[0] = "${options:command_prefix}";
+    ASSERT_EQ(
+        BuildPlanFromManifest(
+            request, commandPrefixManifest, workspace.ResourcePath(), workspace.SourceDirectoryPath(), plan),
+        ascendc::aclrtc::ACLRTC_SUCCESS);
+    EXPECT_EQ(plan.compilationCommands[0].executablePath, expectedPlan.compilationCommands[0].executablePath);
+    EXPECT_EQ(plan.compilationCommands[0].commandArguments, expectedPlan.compilationCommands[0].commandArguments);
 
     Json relativeExecutableManifest = CreateManifest();
     relativeExecutableManifest["kernels"][1]["objects"][0]["commands"][0]["cmd"][0] = "bisheng";
