@@ -1,4 +1,4 @@
-# asc_set_l0c2gm_lrelu_alpha
+# asc_set_l0c2gm_lrelu_alpha（废弃）
 
 ## 产品支持情况
 
@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-头文件路径为：`"c_api/cube_datamove/cube_datamove.h"`。
+**`asc_set_l0c2gm_lrelu_alpha`接口已废弃。请使用[asc_set_l0c_copy_lrelu_alpha](../cube_datamove/asc_set_l0c_copy_lrelu_alpha.md)接口替代。**
 
 用于设置asc_copy_l0c2l1或asc_copy_l0c2gm接口计算过程中使用的Leaky ReLU alpha值。该值只支持half和float两种数据类型。
 
