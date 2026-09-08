@@ -2,7 +2,9 @@
 
 ## 概述
 
-本样例演示在SIMT编程下使用`assert()`接口实现上板进行功能调试的方法。
+本样例演示在SIMT编程下使用`assert()`与`ascendc_assert()`接口实现上板进行功能调试的方法。
+
+`ascendc_assert()`支持消息形式：断言条件不成立时，除标准断言头外还输出用户自定义的格式化消息（与`printf`同风格的格式串与变长实参），便于携带业务上下文定位问题。
 
 ## 支持的产品
 
@@ -24,7 +26,7 @@
 
 - 算子功能:
 
-  本样例详细展示了在SIMT实现函数中使用```assert()```接口的实践方式，实现对算子执行过程中断言的调试。
+  本样例详细展示了在SIMT实现函数中使用```assert()```与```ascendc_assert()```接口的实践方式，实现对算子执行过程中断言的调试。其中`ascendc_assert()`演示消息形式（携带格式串与实参）的用法。
 
 
 - 算子实现:
@@ -41,11 +43,19 @@
           printf("[SIMT] %s\n", "trap check 1!");
       } else if(threadIdx.x < 5) {
           printf("[SIMT] %s\n", "trap check 2!");
-          assert(in_shape > 1);
+          // 消息形式：断言失败时在断言头之后输出用户自定义消息，随后trap终止核函数
+          ascendc_assert(in_shape >= MIN_SHAPE, "in_shape %u must be >= %u\n", in_shape, MIN_SHAPE);
+          ascendc_assert(input != nullptr, "input tensor of thread %u is nullptr\n", threadIdx.x);
           printf("[SIMT] %s\n", "trap check 3!");
       }
   }
   ```
+
+- 运行模式:
+
+  样例通过命令行参数控制`in_shape`，演示断言的不同路径：
+  - 不带参数（默认`in_shape=128`）：`ascendc_assert()`条件成立不触发，`assert()`条件不成立触发（无消息形式，仅输出断言条件文本）。
+  - `./demo 32`（`in_shape=32 < 64`）：触发消息形式断言，输出断言头与用户自定义消息后trap终止。
 
 ## 编译运行
 
@@ -89,12 +99,6 @@
   ```
   [SIMT] trap check 2!
   [SIMT] trap check 2!
-  [SIMT] trap check 2!
-  [SIMT] trap check 2!
-  [SIMT] trap check 2!
-  [SIMT] trap check 2!
-  [SIMT] trap check 2!
-  [SIMT] trap check 2!
   [SIMT] trap check start 1!
   [SIMT] trap check start 1!
   [SIMT] trap check start 2!
@@ -103,4 +107,9 @@
   [SIMT] trap check start 3!
   [ASSERT] xxx/assert.asc:32: void simt_assert(float *, uint32_t): Assertion `in_shape < 1' failed.
   [ASSERT] xxx/assert.asc:32: void simt_assert(float *, uint32_t): Assertion `in_shape < 1' failed.
+  ```
+
+  传入小于64的参数（如`./demo 32`）触发消息形式断言，输出断言头与用户自定义消息（末尾`in_shape 32 must be >= 64`即用户消息）：
+  ```
+  [ASSERT] xxx/assert.asc:43: void simt_assert(float *, uint32_t): Assertion `in_shape >= MIN_SHAPE' failed. in_shape 32 must be >= 64
   ```
