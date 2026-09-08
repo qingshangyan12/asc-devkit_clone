@@ -211,7 +211,7 @@ __simd_vf__ inline void load_align_post_update_vf(__ubuf__ half* dst, __ubuf__ h
 | [asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)的立即数偏移模式 | [asc_loadunalign_pre](asc_loadunalign_pre.md) | 接口自动更新源地址。首次搬入前调用预处理接口；后续连续搬入可复用更新后的非对齐寄存器，源地址被另行修改后必须重新预处理。 |
 | [asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)的地址寄存器偏移模式 | [asc_update_addr_reg](../reg_addr_reg/asc_update_addr_reg.md)、[asc_loadunalign_pre](asc_loadunalign_pre.md) | 接口自动更新地址寄存器偏移。每次循环迭代先生成起始偏移，再使用相同的源地址和偏移进行预处理；迭代内连续搬入可复用更新后的非对齐寄存器，源地址或偏移被另行修改后必须重新预处理。 |
 
-### 非对齐搬出原理
+#### 非对齐搬出原理
 
 非对齐搬出将矢量数据寄存器中的连续数据写入非32字节对齐的UB地址。每次主搬出会将可以直接写入的主块写入UB，并将末尾不能构成32字节对齐块的数据保存在非对齐寄存器。后续连续搬出时，接口将该尾块与本次主块的起始数据拼接后写入UB，并更新本次尾块。
 
@@ -237,7 +237,7 @@ __simd_vf__ inline void load_align_post_update_vf(__ubuf__ half* dst, __ubuf__ h
 | [asc_storeunalign_postupdate](../store/asc_storeunalign_postupdate.md)的立即数偏移模式 | [asc_storeunalign_post_postupdate](../store/asc_storeunalign_post_postupdate.md) | 接口自动更新目的地址。 |
 | [asc_storeunalign_postupdate](../store/asc_storeunalign_postupdate.md)的地址寄存器偏移模式 | [asc_storeunalign_post](../store/asc_storeunalign_post.md) | 主搬出和后处理接口需复用同一个非对齐寄存器及地址寄存器。 |
 
-### 非对齐搬入搬出示例
+#### 非对齐搬入搬出示例
 
 下图以`uint32_t`数据为例，展示连续非对齐搬入后再连续非对齐搬出的过程。搬入前置初始化和搬出后处理均位于循环外：连续搬入时，`asc_loadunalign_postupdate`更新的非对齐寄存器可供下一次搬入使用；连续搬出时，`asc_storeunalign_postupdate`将尾块保存在非对齐寄存器，最后一次循环结束后再统一写回。
 
@@ -274,7 +274,7 @@ __simd_vf__ inline void load_store_unalign_vf(__ubuf__ uint32_t* dst, __ubuf__ u
 
 示例中`count`为每次搬运的元素个数。`src`和`dst`分别由搬入、搬出接口自动更新，循环内需要复用各自的非对齐寄存器。`count`不超过单个矢量数据寄存器可容纳的元素个数，且搬入、搬出地址范围必须位于实际可用UB空间内。
 
-### b64数据类型
+### b64数据类型的搬运
 
 以下接口支持b64数据类型。
 
