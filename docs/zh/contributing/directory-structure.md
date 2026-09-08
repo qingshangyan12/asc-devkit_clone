@@ -45,7 +45,7 @@ asc-devkit/
 | `include/adv_api/math/xxx.h` | `impl/adv_api/detail/math/xxx/xxx_common_impl.h` | |
 | `include/adv_api/math/xxx_tiling.h` | `impl/adv_api/tiling/math/xxx_tiling_impl.cpp` | |
 | `include/adv_api/<cat>/xxx.h` | `impl/adv_api/detail/<cat>/xxx/xxx_common_impl.h` | |
-| `include/c_api/<category>/<category>.h` | `impl/c_api/instr_impl/npu_arch_<NNNN>/<category>_impl/asc_<api>_impl.h` | C API使用 `npu_arch_` 前缀目录 |
+| `include/c_api/<category>/<category>.h` | `impl/c_api/memory_base_impl/<category>_intf_impl.h`、`impl/c_api/reg_base_impl/<category>_intf_impl.h` | 2201与regbase分别按功能合并实现；3510废弃接口放在`reg_base_impl/npu_arch_3510/`下 |
 
 ---
 
@@ -236,12 +236,15 @@ impl/adv_api/
 ```text
 □ include/c_api/<category>/<category>.h或添加函数声明到现有文件
 
-□ impl/c_api/instr_impl/npu_arch_<NNNN>/<category>_impl/asc_<api>_impl.h
-    架构特定实现
+□ impl/c_api/memory_base_impl/<category>_intf_impl.h
+    2201实现，公开接口包装与内部辅助实现合并在同一分类头中
 
-□ impl/c_api/instr_impl/npu_arch_<NNNN>/<category>_impl.h
-    在聚合头中添加#include "<category>_impl/asc_<api>_impl.h"
-    （新增category时还需在include/c_api/asc_simd.h中注册公开头）
+□ impl/c_api/reg_base_impl/<category>_intf_impl.h
+    regbase公共实现，公开头直接包含分类实现头
+
+□ impl/c_api/reg_base_impl/npu_arch_3510/<category>_intf_impl.h
+    仅放3510废弃接口及专用辅助实现；混合弃用状态的重载分别归属
+    新增category时还需在对应公开入口中注册公开头
 
 □ tests/api/c_api/npu_arch_<arch>/<category>/test_asc_<api>.cpp
     Mock测试
