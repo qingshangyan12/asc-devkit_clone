@@ -28,20 +28,14 @@
 
 头文件路径为：`"c_api/sync/sync.h"`。
 
-**无入参函数原型`asc_sync_vec()`接口已废弃，请使用[asc_sync](asc_sync.md)执行针对所有流水的同步操作。**
-
 针对`PIPE_V`执行同步操作。其作用是保证`PIPE_V`中前序指令（如矢量计算）全部完成后，`PIPE_MTE2`、`PIPE_MTE3`与`PIPE_S`的后续指令才能开始执行。
 
 本接口为易用性接口，用于简化手工同步的编码。
 
 ## 函数原型
 
-```c
-// 有入参函数原型
+```cpp
 __aicore__ inline void asc_sync_vec(int id)
-
-// 无入参函数原型
-__aicore__ inline void asc_sync_vec()
 ```
 
 ## 参数说明

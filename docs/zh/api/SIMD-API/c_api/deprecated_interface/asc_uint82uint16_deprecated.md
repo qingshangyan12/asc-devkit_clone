@@ -67,6 +67,15 @@ __simd_callee__ inline void asc_uint82uint16(vector_uint16_t& dst,
                                              std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
 ```
 
+<!-- deprecated-overload-list-start -->
+### 废弃接口清单
+
+下列接口名均指本页函数原型章节所述的三参数旧原型：
+
+- `asc_uint82uint16`
+- `asc_uint82uint16_v2`
+<!-- deprecated-overload-list-end -->
+
 ## 参数说明
 
 **表1** 参数说明

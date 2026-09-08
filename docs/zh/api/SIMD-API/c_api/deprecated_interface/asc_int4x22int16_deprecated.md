@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/reg_compute/reg_convert.h"`。
 
-**该接口已废弃，后续版本将不再支持。**
+**仅带位置后缀的`asc_int4x22int16_v2`、`asc_int4x22int16_v3`和`asc_int4x22int16_v4`接口已废弃。上述接口没有直接等价替代；仅需读取索引0位置时，请使用[无后缀入口](../reg_compute/reg_convert/reg_convert.md)。**
 
 将int4x2_t类型转化为int16_t类型。
 
@@ -37,8 +37,6 @@
 ## 函数原型
 
 ```cpp
-// 数据读取索引0的位置
-__simd_callee__ inline void asc_int4x22int16(vector_int16_t& dst, vector_int4x2_t src, vector_bool mask)
 // 数据读取索引1的位置
 __simd_callee__ inline void asc_int4x22int16_v2(vector_int16_t& dst, vector_int4x2_t src, vector_bool mask)
 // 数据读取索引2的位置
@@ -78,5 +76,5 @@ vector_int4x2_t src;
 vector_int16_t dst;
 vector_bool mask = asc_create_mask_b8(PAT_ALL);
 asc_loadalign(src, src_addr); // src_addr是外部输入的Unified Buffer（UB）内存空间地址。
-asc_int4x22int16(dst, src, mask);
+asc_int4x22int16_v2(dst, src, mask);
 ```

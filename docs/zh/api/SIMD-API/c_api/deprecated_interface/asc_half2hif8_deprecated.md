@@ -89,6 +89,21 @@ __simd_callee__ inline void asc_half2hif8_rna(vector_hifloat8_t& dst,
                                               vector_bool mask)
 ```
 
+<!-- deprecated-overload-list-start -->
+### 废弃接口清单
+
+下列接口名均指本页函数原型章节所述的三参数旧原型：
+
+- `asc_half2hif8_rh`
+- `asc_half2hif8_rh_sat`
+- `asc_half2hif8_rh_sat_v2`
+- `asc_half2hif8_rh_v2`
+- `asc_half2hif8_rna`
+- `asc_half2hif8_rna_sat`
+- `asc_half2hif8_rna_sat_v2`
+- `asc_half2hif8_rna_v2`
+<!-- deprecated-overload-list-end -->
+
 ## 参数说明
 
 **表2** 参数说明

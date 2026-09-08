@@ -88,3 +88,13 @@ PIPE_M
 - 原始稀疏矩阵B每4个元素中最多包含2个非零元素；如果存在3个或更多非零元素，则仅使用前2个非零元素。
 - `m`、`k`、`n`中的任意一个值为0时，接口将被视为NOP（空操作）。
 - 稀疏矩阵的数据准备、稠密算法及其他约束请参见[asc_mmad_sparse](../cube_compute/asc_mmad_sparse.md)。
+
+## 调用示例
+
+```cpp
+__ca__ int8_t a[128];
+__cb__ int8_t b[128];
+__cc__ int32_t c[128];
+asc_mmad_sparse(c, a, b, 2, 2, 1, asc_unit_flag_mode::DISABLE, false, true);
+asc_sync();
+```
