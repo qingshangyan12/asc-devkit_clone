@@ -72,10 +72,19 @@ PIPE_S
 ```cpp
 // loop1执行2次，loop2执行2次。
 asc_set_gm2l1_loop_size(2, 2);
-asc_set_gm2l1_loop1_stride(64, 32);
-// 外层循环：相邻迭代在GM相隔128B，在L1相隔64B。
-asc_set_gm2l1_loop2_stride(128, 64);
-asc_copy_gm2l1_align(dst, src, 1, 32, 0, 0, false, 4, 0, 32);
-// 搬运结束后复位循环次数。
+asc_set_gm2l1_loop1_stride(96, 128);
+asc_set_gm2l1_loop2_stride(192, 288);
+constexpr uint32_t burst_count = 2;
+constexpr uint32_t burst_len = 2;
+constexpr uint8_t left_padding_count = 0;
+constexpr uint8_t right_padding_count = 0;
+constexpr bool enable_data_select = false;
+constexpr asc_load_l2_cache_mode l2_cache_mode = asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM;
+constexpr uint64_t src_stride = 0;
+constexpr uint32_t dst_stride = 0;
+// src表示源操作数的起始地址
+__cbuf__ half dst[256];
+asc_copy_gm2l1_align(dst, src, burst_count, burst_len, left_padding_count, right_padding_count, enable_data_select,
+    l2_cache_mode, src_stride, dst_stride);
 asc_set_gm2l1_loop_size(1, 1);
 ```

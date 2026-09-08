@@ -30,10 +30,10 @@
 
 用于设置[asc_copy_gm2l1_align](asc_copy_gm2l1_align.md)接口的常量填充值。调用`asc_copy_gm2l1_align`时，以下场景使用本接口设置的值：
 
-- `data_select_bit`设置为`true`，且`left_padding_count`与`right_padding_count`均为`0`时，Normal填充模式或Compact填充模式的填充数据使用本接口设置的值。
-- `left_padding_count`或`right_padding_count`非`0`时，进入左右填充模式。此时硬件强制使用本接口设置的值，`data_select_bit`设置无效。
+- `enable_data_select`设置为`true`，且`left_padding_count`与`right_padding_count`均为`0`时，Normal填充模式或Compact填充模式的填充数据使用本接口设置的值。
+- `left_padding_count`或`right_padding_count`非`0`时，进入左右填充模式。此时硬件强制使用本接口设置的值，`enable_data_select`设置无效。
 
-当`data_select_bit`设置为`false`且未开启左右填充模式时，填充数据取每个连续数据块的首元素，本接口设置的值不生效。
+当`enable_data_select`设置为`false`且未开启左右填充模式时，填充数据取每个连续数据块的首元素，本接口设置的值不生效。
 
 本接口仅在AIC上生效。
 
@@ -81,23 +81,22 @@ bisheng examples.asc -o main --npu-arch=dav-3510
 以下示例搬运3个48B的`uint8_t`数据块，使用常量`0xA5`填充每个数据块尾部的16B，使每个数据块按64B步长写入L1 Buffer。
 
 ```cpp
-#include <cstdint>
-#include "c_api/asc_simd.h"
-
-// 该核函数在AIC上执行GM到L1的搬运。
-__global__ __cube__ void Gm2L1AlignPadExample(__gm__ uint8_t* src)
-{
-    asc_init();
-    __cbuf__ uint8_t dst[192];
-
-    uint8_t PAD_VALUE = 0xA5;
-    constexpr uint32_t N_BURST = 3;
-    constexpr uint32_t LEN_BURST = 48;
-    constexpr uint32_t DST_STRIDE = 64;
-    constexpr uint8_t L2_CACHE_CTL = 4;
-    // 配置常量填充值；uint8_t填充字节为0xA5，实参会提升为接口要求的uint32_t类型。
-    asc_set_gm2l1_pad(*reinterpret_cast<uint8_t*>(&PAD_VALUE));
-    // data_select_bit=true，Normal模式每个48B数据块的尾部填充16B常量值。
-    asc_copy_gm2l1_align(dst, src, N_BURST, LEN_BURST, 0, 0, true, L2_CACHE_CTL, LEN_BURST, DST_STRIDE);
-}
+asc_set_gm2l1_loop_size(2, 2);
+asc_set_gm2l1_loop1_stride(96, 128);
+asc_set_gm2l1_loop2_stride(192, 288);
+// 源操作数非对齐，需要填补数据
+asc_set_gm2l1_pad(0);
+constexpr uint32_t burst_count = 2;
+constexpr uint32_t burst_len = 2;
+constexpr uint8_t left_padding_count = 1;
+constexpr uint8_t right_padding_count = 0;
+constexpr bool enable_data_select = false;
+constexpr asc_load_l2_cache_mode l2_cache_mode = asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM;
+constexpr uint64_t src_stride = 0;
+constexpr uint32_t dst_stride = 0;
+// src表示源操作数的起始地址
+__cbuf__ half dst[256];
+asc_copy_gm2l1_align(dst, src, burst_count, burst_len, left_padding_count, right_padding_count, enable_data_select,
+    l2_cache_mode, src_stride, dst_stride);
+asc_set_gm2l1_loop_size(1, 1);
 ```
