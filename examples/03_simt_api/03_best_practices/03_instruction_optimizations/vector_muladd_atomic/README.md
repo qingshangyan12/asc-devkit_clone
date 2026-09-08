@@ -54,17 +54,16 @@
 
 本样例通过2个Case构成优化对比，各Case的核函数、累加方式如下表所示。
 
-| Case | 核函数 | 计算方式 | 
+| Case | 核函数 | 计算方式 |
 |---|---|---|
-| 0 | vector_muladd_plain | a[index] += b[index] * c[index] | 
-| 1 | vector_muladd_atomic | asc_atomic_add(&a[index], b[index] * c[index]) | 
+| 0 | vector_muladd_plain | a[index] += b[index] * c[index] |
+| 1 | vector_muladd_atomic | asc_atomic_add(&a[index], b[index] * c[index]) |
 
 ### 性能指标说明
 
 | 指标 | 说明 |
 | --- | --- |
 | Task Duration（μs） | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间 |
-| 循环体指令数 | 循环体编译后的指令条数，决定每个Warp每次迭代需要发射多少条指令 |
 
 ---
 
@@ -72,9 +71,9 @@
 
 **样例目标**：各线程直接进行`a[index] += b[index] * c[index]`计算，作为性能基线。
 
-**核心实现**：启动64个线程块，每个线程块2048个线程。各线程以总线程数`gridDim.x * blockDim.x`为固定步长遍历整个数组，每处理一个元素，都执行一次乘加：算出`b[i] * c[i]`，累加到`a[i]`的旧值上，写回`a[i]`。
+**核心实现**：启动64个线程块（64为本次代码运行时实际查询到的AIV核数），每个线程块2048个线程。各线程以总线程数`gridDim.x * blockDim.x`为固定步长遍历整个数组，每处理一个元素，都执行一次乘加：算出`b[i] * c[i]`，累加到`a[i]`的旧值上，写回`a[i]`。
 
-线程必须先把`a[i]`的旧值读出来才能参与累加，因此每个元素产生**3次读（a、b、c）、1次写（a）**。
+线程必须先把`a[i]`的旧值读出来才能参与累加，因此每次循环产生**3次读（a、b、c）、1次写（a）**。
 
 对应的核函数实现如下。
 
@@ -92,9 +91,9 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void vector_muladd_plain(
 
 **性能数据**：
 
-| Case | Task Duration（μs） | 
+| Case | Task Duration（μs） |
 |:---:|:---:|
-| 0 | 51.70 | 
+| 0 | 51.70 |
 
 
 ---
@@ -105,7 +104,7 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void vector_muladd_plain(
 
 **核心实现**：线程块数量、线程数、遍历方式与Case 0完全相同。各线程只算出`b[i] * c[i]`的乘积，再对`a[i]`发起一次原子加，`a[i]`的旧值不必读出。
 
-每个元素的读取从3次降为**2次（b、c）**，写仍为1次。
+每次循环的读取从3次降为**2次（b、c）**，写仍为1次。
 
 > **说明：** 本Case中各线程访问互不重叠的地址，不存在同地址竞争。使用原子加并非出于原子性的功能需求，而是借用原子加“就地完成累加、线程无需读出旧值”的特性来减少循环体的指令条数。这与[atomic_histogram样例](../atomic_histogram)形成对照：后者的原子性是功能必需，且因高竞争而需要优化掉GM原子操作；本样例则是主动引入原子操作作为优化手段。
 
@@ -125,13 +124,13 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void vector_muladd_atomic(
 
 **性能数据**：
 
-| Case | Task Duration（μs） | 
+| Case | Task Duration（μs） |
 |:---:|:---:|
-| 1 | 47.72 | 
+| 1 | 47.72 |
 
 **分析**：
 
-- **循环体指令数减少**。Case 0的循环体包含3次读、1次写；Case 1减少了一次读`a[i]`的读指令，包含2次读、1次写。
+- **读写指令数减少**。Case 0的循环体包含3次读、1次写；Case 1减少了一次读`a[i]`的读指令，包含2次读、1次写。
 - **耗时减少7.7%**，从51.70μs降至47.72μs。
 
 **结论**：把累加交给原子加完成，线程省去了读出`a[i]`旧值的那条读指令，耗时下降7.7%。收益来自线程少发一条读指令。
@@ -140,10 +139,10 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void vector_muladd_atomic(
 
 ## 性能对比总结
 
-| Case | 累加方式  | 线程读取次数 | Task Duration（μs） | 相对基线 |
+| Case | 累加方式  | 线程读取次数 | Task Duration（μs） | 耗时相对基线 |
 |:---:|:---:|:---:|:---:|:---:|
 | 0 | a[i] += b[i] * c[i] |  3 | 51.70 | 1× |
-| 1 | asc_atomic_add | 2 | 47.72 | **1.08×** |
+| 1 | asc_atomic_add | 2 | 47.72 | **0.92×** |
 
 耗时降幅7.7%。线程读取次数从3次降为2次，降幅看似应有33%，实际只有7.7%，原因如下：
 
@@ -194,7 +193,7 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void vector_muladd_atomic(
 
   ```text
   Case 0 (plain update): 4194304 elements, 64 blocks, 2048 threads per block
-  [Success] Case accuracy is verification passed.
+  [Success] Case accuracy verification passed.
   ```
 
 ## 性能分析
