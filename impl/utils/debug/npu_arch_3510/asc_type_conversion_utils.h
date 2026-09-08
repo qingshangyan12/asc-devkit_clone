@@ -250,7 +250,10 @@ __aicore__ __callee__ inline bool fp8e4m3_is_nan(const int8_t& x)
 
 __aicore__ __callee__ inline uint16_t fp8e4m3_extract_sign(uint8_t x) { return (((x) >> 7) & 0x1); }
 
-__aicore__ __callee__ inline uint16_t fp8e4m3_extract_exp(uint8_t x) { return (((x) >> CONST_FP8E4M3_MAN_LEN) & 0xF); }
+__aicore__ __callee__ inline uint16_t fp8e4m3_extract_exp(uint8_t x)
+{
+    return (((x) >> CONST_FP8E4M3_MAN_LEN) & 0xF);
+}
 
 __aicore__ __callee__ inline uint16_t fp8e4m3_extract_man(uint8_t x)
 {
