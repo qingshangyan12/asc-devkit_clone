@@ -96,6 +96,7 @@ TEST_F(TestDMAOom, TestOOMCheckTensorListRange)
 
 TEST_F(TestDMAOom, TestOOMStorageShapeTensorDescriptor)
 {
+    EXPECT_EQ(g_oomStorageShapeMagic, 0x4FU);
     uint8_t* metadata = static_cast<uint8_t*>(AscendC::GmAlloc(64));
     uint8_t* tensor = static_cast<uint8_t*>(AscendC::GmAlloc(128));
     WritePacked<uint8_t>(metadata, g_oomStorageShapeMagic);
@@ -115,9 +116,9 @@ TEST_F(TestDMAOom, TestOOMStorageShapeTensorDescriptor)
     EXPECT_EQ(g_oomAddrArange.len[0], 64);
 
     OOMInit();
-    uint8_t* noMagicCursor = metadata;
-    WritePacked<uint8_t>(metadata, 0);
-    EXPECT_FALSE(OOMHasStorageShapeHeader(noMagicCursor));
+    uint8_t* legacyMagicCursor = metadata;
+    WritePacked<uint8_t>(metadata, 1U);
+    EXPECT_FALSE(OOMHasStorageShapeHeader(legacyMagicCursor));
     EXPECT_EQ(g_oomAddrArange.count, 0);
     AscendC::GmFree(metadata);
     AscendC::GmFree(tensor);

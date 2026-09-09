@@ -82,7 +82,7 @@ git diff -- impl/basic_api/utils/kernel_utils_macros.h \
 
 Expected: all `TestDMAOom` tests pass, `git diff --check` reports no errors, and the source diff contains only the constant update plus the focused test assertions.
 
-- [ ] **Step 6: Commit the implementation**
+- [x] **Step 6: Commit the implementation**
 
 ```bash
 git add impl/basic_api/utils/kernel_utils_macros.h \
