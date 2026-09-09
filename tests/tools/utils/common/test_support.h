@@ -8,8 +8,8 @@
  * See LICENSE in the root of the software repository for the full text of the LICENSE.
  */
 
-#ifndef ASC_COMPILE_EXPORTER_TEST_SUPPORT_H
-#define ASC_COMPILE_EXPORTER_TEST_SUPPORT_H
+#ifndef ASCENDC_COMMON_TEST_SUPPORT_H
+#define ASCENDC_COMMON_TEST_SUPPORT_H
 
 #include <gtest/gtest.h>
 
@@ -27,7 +27,7 @@
 
 #include "file_utils.h"
 
-namespace asc_compile_exporter_test {
+namespace ascendc_common_test {
 
 inline std::runtime_error SystemError(const std::string& operation)
 {
@@ -104,7 +104,7 @@ protected:
     {
         const char* temporary = std::getenv("TMPDIR");
         const std::string parent = temporary == nullptr || temporary[0] == '\0' ? "/tmp" : temporary;
-        std::string pathTemplate = ascendc::FileUtils::JoinPath(parent, "asc_compile_exporter_module_ut_XXXXXX");
+        std::string pathTemplate = ascendc::FileUtils::JoinPath(parent, "ascendc_common_ut_XXXXXX");
         std::vector<char> buffer(pathTemplate.begin(), pathTemplate.end());
         buffer.push_back('\0');
         char* created = mkdtemp(buffer.data());
@@ -114,19 +114,9 @@ protected:
 
     void TearDown() override { (void)ascendc::FileUtils::RemoveAll(root_); }
 
-    void CreateManifest(const std::string& unit, const std::string& name) const
-    {
-        WriteTestFile(
-            ascendc::FileUtils::JoinPath(unit, name + "_manifest.json"),
-            "{\"resource_id\":\"" + name +
-                "\",\"soc_version\":\"test\",\"resource_path\":\"resources\",\"kernels\":[{\"kernel_name\":\"" + name +
-                "\",\"objects\":[{\"object_name\":\"kernel.o\",\"object_type\":\"basic\",\"commands\":[{\"type\":"
-                "\"compile\",\"cmd\":[\"${output}/kernel.o\"]}],\"outputs\":[\"${output}/kernel.o\"]}]}]}");
-    }
-
     std::string root_;
 };
 
-} // namespace asc_compile_exporter_test
+} // namespace ascendc_common_test
 
-#endif // ASC_COMPILE_EXPORTER_TEST_SUPPORT_H
+#endif // ASCENDC_COMMON_TEST_SUPPORT_H

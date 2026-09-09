@@ -22,10 +22,10 @@
 namespace ascendc {
 namespace {
 
-using asc_compile_exporter_test::LstatPathExists;
-using asc_compile_exporter_test::ModuleTest;
-using asc_compile_exporter_test::ReadTestFile;
-using asc_compile_exporter_test::WriteTestFile;
+using ascendc_common_test::LstatPathExists;
+using ascendc_common_test::ModuleTest;
+using ascendc_common_test::ReadTestFile;
+using ascendc_common_test::WriteTestFile;
 
 TEST_F(ModuleTest, FileUtilsBuildsAndComparesPaths)
 {
