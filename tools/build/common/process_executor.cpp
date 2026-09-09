@@ -222,7 +222,9 @@ private:
         if (!outputLog_) {
             // Mirroring is diagnostic only; a log I/O failure must not turn a
             // successfully running compiler process into an executor failure.
-            ASCENDLOGW("Failed to save process output; compilation will continue");
+            ASCENDLOGW(
+                "Failed to save process output; compilation will continue: executable=%s stream=%s",
+                executablePath_.c_str(), GetOutputKindName());
             outputLog_.close();
         }
     }

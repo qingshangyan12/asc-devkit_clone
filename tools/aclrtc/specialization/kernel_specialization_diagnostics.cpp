@@ -17,6 +17,7 @@
 #include <boost/filesystem.hpp>
 #include <cerrno>
 #include <cstring>
+#include <exception>
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>
@@ -94,6 +95,11 @@ KernelSpecializationDiagnostics::KernelSpecializationDiagnostics(
         if (!CreateExecutableReplayScript(replayScriptPath, fs::current_path())) {
             diagnosticsEnabled_ = false;
         }
+    } catch (const std::exception& exception) {
+        diagnosticsEnabled_ = false;
+        ASCENDLOGW(
+            "Failed to initialize specialization diagnostics in resource worktree: session=%s path=%s message=%s",
+            specializationSessionId_.c_str(), resourceWorktreePath_.c_str(), exception.what());
     } catch (...) {
         diagnosticsEnabled_ = false;
         ASCENDLOGW(
@@ -112,6 +118,10 @@ void KernelSpecializationDiagnostics::WriteManifestSnapshot(const nlohmann::json
         const fs::path manifestPath = resourceWorktreePath_ / DIAGNOSTIC_MANIFEST_FILE_NAME;
         FileUtils::WriteTextFile(
             manifestPath.string(), resourceManifest.dump(diagnosticJsonIndentationWidth) + '\n', std::ios::trunc);
+    } catch (const std::exception& exception) {
+        ASCENDLOGW(
+            "Failed to record specialization manifest: resource_worktree=%s file=%s message=%s",
+            resourceWorktreePath_.c_str(), DIAGNOSTIC_MANIFEST_FILE_NAME, exception.what());
     } catch (...) {
         ASCENDLOGW(
             "Failed to record specialization manifest: resource_worktree=%s file=%s", resourceWorktreePath_.c_str(),
@@ -131,6 +141,11 @@ void KernelSpecializationDiagnostics::AppendCommandToReplayScript(const Compilat
         }
         replayLine += '\n';
         AppendTextToDiagnosticFile(resourceWorktreePath_ / DIAGNOSTIC_REPLAY_SCRIPT_FILE_NAME, replayLine);
+    } catch (const std::exception& exception) {
+        ASCENDLOGW(
+            "Failed to record command %s: resource_worktree=%s file=%s message=%s",
+            compilationCommand.diagnosticLabel.c_str(), resourceWorktreePath_.c_str(),
+            DIAGNOSTIC_REPLAY_SCRIPT_FILE_NAME, exception.what());
     } catch (...) {
         ASCENDLOGW(
             "Failed to record command %s: resource_worktree=%s file=%s", compilationCommand.diagnosticLabel.c_str(),
@@ -153,6 +168,10 @@ void KernelSpecializationDiagnostics::AppendCommandExecutionHeaderToLog(
         AppendTextToDiagnosticFile(
             resourceWorktreePath_ / DIAGNOSTIC_COMPILE_LOG_FILE_NAME,
             "[" + compilationCommand.diagnosticLabel + "] output:\n");
+    } catch (const std::exception& exception) {
+        ASCENDLOGW(
+            "Failed to record command output header: command=%s resource_worktree=%s message=%s",
+            compilationCommand.diagnosticLabel.c_str(), resourceWorktreePath_.c_str(), exception.what());
     } catch (...) {
         ASCENDLOGW(
             "Failed to record command output header: command=%s resource_worktree=%s",
@@ -173,6 +192,11 @@ void KernelSpecializationDiagnostics::AppendCommandExecutionResultToLog(
                    << " code=" << executorResult.terminationCode << " elapsed_ms=" << executorResult.elapsedTime.count()
                    << '\n';
         AppendTextToDiagnosticFile(resourceWorktreePath_ / DIAGNOSTIC_COMPILE_LOG_FILE_NAME, resultText.str());
+    } catch (const std::exception& exception) {
+        ASCENDLOGW(
+            "Failed to record result for command %s: resource_worktree=%s file=%s message=%s",
+            compilationCommand.diagnosticLabel.c_str(), resourceWorktreePath_.c_str(), DIAGNOSTIC_COMPILE_LOG_FILE_NAME,
+            exception.what());
     } catch (...) {
         ASCENDLOGW(
             "Failed to record result for command %s: resource_worktree=%s file=%s",
@@ -195,8 +219,14 @@ void KernelSpecializationDiagnostics::LogCommandFailureRecoveryHint() const noex
             "Compilation diagnostics saved: compile_log=%s replay_script=%s; inspect the log or run the replay "
             "script to reproduce the failed command",
             compilationLogPath.c_str(), replayScriptPath.c_str());
+    } catch (const std::exception& exception) {
+        ASCENDLOGW(
+            "Failed to format diagnostic recovery paths: resource_worktree=%s message=%s",
+            resourceWorktreePath_.c_str(), exception.what());
     } catch (...) {
-        ASCENDLOGI("Compilation diagnostics were enabled; inspect the retained resource worktree");
+        ASCENDLOGW(
+            "Unknown exception while formatting diagnostic recovery paths: resource_worktree=%s",
+            resourceWorktreePath_.c_str());
     }
 }
 
@@ -216,6 +246,10 @@ void KernelSpecializationDiagnostics::WriteSpecializationResult(
         const fs::path resultPath = resourceWorktreePath_ / DIAGNOSTIC_RESULT_FILE_NAME;
         FileUtils::WriteTextFile(
             resultPath.string(), resultJson.dump(diagnosticJsonIndentationWidth) + '\n', std::ios::trunc);
+    } catch (const std::exception& exception) {
+        ASCENDLOGW(
+            "Failed to record specialization result: resource_worktree=%s file=%s message=%s",
+            resourceWorktreePath_.c_str(), DIAGNOSTIC_RESULT_FILE_NAME, exception.what());
     } catch (...) {
         ASCENDLOGW(
             "Failed to record specialization result: resource_worktree=%s file=%s", resourceWorktreePath_.c_str(),
@@ -231,6 +265,8 @@ void KernelSpecializationDiagnostics::AppendTextToDiagnosticFile(
     }
     try {
         FileUtils::WriteTextFile(filePath.string(), text, std::ios::app);
+    } catch (const std::exception& exception) {
+        ASCENDLOGW("Failed to append diagnostic file: path=%s message=%s", filePath.c_str(), exception.what());
     } catch (...) {
         ASCENDLOGW("Failed to append diagnostic file: path=%s", filePath.c_str());
     }
