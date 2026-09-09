@@ -24,6 +24,7 @@
 - **[asc_half2hif8](asc_half2hif8.md)**
 - **[asc_half2int16](asc_half2int16.md)**
 - **[asc_half2int32](asc_half2int32.md)**
+- **[asc_half2int4x2](asc_half2int4x2.md)**
 - **[asc_half2int8](asc_half2int8.md)**
 - **[asc_half2uint8](asc_half2uint8.md)**
 - **[asc_hif82float](asc_hif82float.md)**
@@ -43,6 +44,9 @@
 - **[asc_int82half](asc_int82half.md)**
 - **[asc_int82int16](asc_int82int16.md)**
 - **[asc_int82int32](asc_int82int32.md)**
+- **[asc_int4x22bfloat16](asc_int4x22bfloat16.md)**
+- **[asc_int4x22half](asc_int4x22half.md)**
+- **[asc_int4x22int16](asc_int4x22int16.md)**
 - **[asc_rint](asc_rint.md)**
 - **[asc_round](asc_round.md)**
 - **[asc_trunc](asc_trunc.md)**
