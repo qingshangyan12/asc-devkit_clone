@@ -291,8 +291,14 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         FlushDataCache(reinterpret_cast<__gm__ uint8_t*>(&handleParamGM_[handleId]) + MAX_DCCI_CNT);
         CcuPrepareForAllToAllVWrite(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
-        ccuUsedXnNum_ = 24;
-        CcuPrepareForReduceScatterM2M(&handleParamGM_[handleId]);
+        if (GetKfcAlgorithmType(handleId) ==
+            static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterSoleNHRMultiLink)) {
+            ccuUsedXnNum_ = KFC_RS_SOLE_NHR_PARAM_NUM;
+            CcuPrepareForReduceScatterSoleNhrM2M(&handleParamGM_[handleId]);
+        } else {
+            ccuUsedXnNum_ = 24;
+            CcuPrepareForReduceScatterM2M(&handleParamGM_[handleId]);
+        }
     }
 }
 
@@ -508,7 +514,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 }
 
 template <const auto& config>
-__aicore__ inline uint8_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::GetKfcMissionNum(
+__aicore__ inline uint32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::GetKfcAlgorithmType(
     HcclHandle handleId) const
 {
     uint32_t prepareType = UINT32_MAX;
@@ -523,6 +529,14 @@ __aicore__ inline uint8_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
             }
         }
     }
+    return algorithmType;
+}
+
+template <const auto& config>
+__aicore__ inline uint8_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::GetKfcMissionNum(
+    HcclHandle handleId) const
+{
+    const uint32_t algorithmType = GetKfcAlgorithmType(handleId);
     uint8_t missionNum = 1U;
     if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherConcurMeshNHRMultiLink)) {
         missionNum = KFC_MAX_MISSION_NUM;
