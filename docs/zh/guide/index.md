@@ -296,6 +296,7 @@
                 -   [避免bank冲突（NPU架构版本2201）](operator_practice/simd_operator_optimization/memory_access/avoid_ub_bank_conflict/avoid_bank_conflict_npu_arch_2201.md)
                 -   [避免bank冲突（NPU架构版本3510）](operator_practice/simd_operator_optimization/memory_access/avoid_ub_bank_conflict/avoid_bank_conflict_npu_arch_3510.md)
             -   [L2 Cache切分](operator_practice/simd_operator_optimization/memory_access/l2_cache_split.md)
+            -   [使能PreAllocation减少double buffer场景的bubble](operator_practice/simd_operator_optimization/memory_access/enable_pre_allocation.md)
 
         -   [矢量计算](operator_practice/simd_operator_optimization/vector_compute/vector_compute.md)
             -   [通过Unified Buffer融合实现连续vector计算](operator_practice/simd_operator_optimization/vector_compute/ub_fusion_vector_compute.md)
