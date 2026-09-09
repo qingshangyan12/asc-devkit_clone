@@ -63,8 +63,7 @@ HcclResult CcuTempKfcReduceScatterMesh1DMem2MemPeerOnly::KernelRun(
     return HcclResult::HCCL_SUCCESS;
 }
 
-u64 CcuTempKfcReduceScatterMesh1DMem2MemPeerOnly::CalcScratchMultiple(
-    BufferType inBuffType, BufferType outBuffType)
+u64 CcuTempKfcReduceScatterMesh1DMem2MemPeerOnly::CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType)
 {
     (void)inBuffType;
     (void)outBuffType;
