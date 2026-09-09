@@ -14,7 +14,6 @@
 #include "file_utils.h"
 
 #include <boost/filesystem.hpp>
-#include <boost/system/error_code.hpp>
 #include <cerrno>
 #include <cstring>
 #include <fstream>
@@ -80,12 +79,7 @@ aclError KernelCompilationWorkspace::CreateOutputDirectoriesAndApplySourcePatche
     const KernelCompilationPlan& compilationPlan) const
 {
     for (const fs::path& outputDirectoryPath : compilationPlan.requiredOutputDirectoryPaths) {
-        boost::system::error_code directoryError;
-        fs::create_directories(outputDirectoryPath, directoryError);
-        if (directoryError) {
-            ASCENDLOGE(
-                "Failed to create compilation output directory: path=%s error=%d message=%s",
-                outputDirectoryPath.c_str(), directoryError.value(), directoryError.message().c_str());
+        if (!FileUtils::CreateDirectories(outputDirectoryPath.string())) {
             return ACLRTC_ERROR_FAILURE;
         }
     }

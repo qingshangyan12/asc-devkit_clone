@@ -461,24 +461,23 @@ bool FileUtils::ResolveDirectory(const std::string& path, std::string& resolved)
         resolved.clear();
         return false;
     }
-    const fs::path canonical = fs::canonical(fs::path(path), error);
-    if (error) {
-        ASCENDLOGE("Failed to resolve directory: path=%s error=%s", path.c_str(), error.message().c_str());
+    std::string canonicalPath;
+    if (!ResolveCanonicalPath(path, canonicalPath)) {
         resolved.clear();
         return false;
     }
-    if (!fs::is_directory(canonical, error) || error) {
+    if (!fs::is_directory(fs::path(canonicalPath), error) || error) {
         if (error) {
             ASCENDLOGE(
-                "Failed to inspect resolved directory: path=%s error=%s", canonical.string().c_str(),
+                "Failed to inspect resolved directory: path=%s error=%s", canonicalPath.c_str(),
                 error.message().c_str());
         } else {
-            ASCENDLOGE("Resolved path is not a directory: path=%s resolved=%s", path.c_str(), canonical.c_str());
+            ASCENDLOGE("Resolved path is not a directory: path=%s resolved=%s", path.c_str(), canonicalPath.c_str());
         }
         resolved.clear();
         return false;
     }
-    resolved = canonical.string();
+    resolved = canonicalPath;
     ASCENDLOGD("Resolved directory: path=%s resolved=%s", path.c_str(), resolved.c_str());
     return true;
 }
