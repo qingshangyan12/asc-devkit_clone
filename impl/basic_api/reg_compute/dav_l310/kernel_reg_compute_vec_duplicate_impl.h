@@ -15,7 +15,7 @@
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/basic/reg_compute/dav_l300/kernel_reg_compute_vec_duplicate_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use \"#include \"reg_compute/kernel_reg_compute_vec_duplicate_intf.h\"\" and use public functions or variables defined in interface headers files.")
+    "impl/basic/reg_compute/dav_l310/kernel_reg_compute_vec_duplicate_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use \"#include \"reg_compute/kernel_reg_compute_vec_duplicate_intf.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_VEC_DUPLICATE_IMPL__
 #endif
@@ -24,7 +24,7 @@
 #define ASCENDC_MODULE_REG_COMPUTE_VEC_DUPLICATE_IMPL_H
 
 #include "kernel_reg_compute_common_impl.h"
-#include "../../../basic_api/dav_l300/kernel_operator_common_impl.h"
+#include "../../../basic_api/dav_l310/kernel_operator_common_impl.h"
 
 namespace AscendC {
 namespace Reg {

@@ -62,7 +62,7 @@ __BLOCK_LOCAL__ __inline__ uint64_t g_rptConfig;
 #endif
 
 #if defined(__NPU_ARCH__) &&                                                                         \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3103 || __NPU_ARCH__ == 3113 || \
      __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 namespace Internal {
 // global variables g_cmpMaskLow and g_cmpMaskHigh are used to simulate the register CMPMASK in 1971
@@ -91,7 +91,7 @@ __BLOCK_LOCAL__ __inline__ uint64_t g_aippDtcVar;
 __BLOCK_LOCAL__ __inline__ uint64_t g_aippPaddingVal;
 __BLOCK_LOCAL__ __inline__ uint64_t g_aippArgs;
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3103 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
                               __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 __BLOCK_LOCAL__ __inline__ int64_t g_accVal;
 #endif
