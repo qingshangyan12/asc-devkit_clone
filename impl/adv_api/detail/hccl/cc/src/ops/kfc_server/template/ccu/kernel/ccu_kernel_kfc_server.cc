@@ -33,6 +33,9 @@ static_assert(
     KFC_CONCURRENT_AG_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE,
     "Concurrent AllGather parameters exceed the KFC server load width");
 static_assert(
+    KFC_PARALLEL_AG_STORAGE_NUM <= CCU_PARAM_NUM_PER_DIE,
+    "Parallel AllGather parameters exceed the KFC server load width");
+static_assert(
     KFC_CONCURRENT_A2A_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE,
     "Concurrent AllToAll parameters exceed the KFC server load width");
 static_assert(KFC_MAX_MISSION_NUM == 2U, "KFC server CKE partitioning expects two missions");
@@ -173,7 +176,36 @@ CcuResult LoadFuncParamFromMemory(
 static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerContext& ctx)
 {
     if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLGATHER) {
-        if (ctx.arg->role == KfcServerRole::ALL_GATHER_NHR) {
+        if (ctx.arg->parallelAllGather && ctx.arg->role == KfcServerRole::ALL_GATHER_NHR) {
+            CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemKernel(
+                param[KFC_PARALLEL_AG_INPUT], param[KFC_PARALLEL_AG_OUTPUT], ctx.token,
+                param[KFC_PARALLEL_AG_OUTPUT_STRIDE], param[KFC_PARALLEL_AG_PART0_SIZE],
+                param[KFC_PARALLEL_AG_PART1_SIZE], param[KFC_PARALLEL_AG_PART1_OFFSET],
+                param[KFC_PARALLEL_AG_MESH_PHASE_DONE_ADDR], param[KFC_PARALLEL_AG_NHR_PHASE_DONE_ADDR],
+                param[KFC_PARALLEL_AG_PART0_SLICE_PER_JETTY],
+                param[KFC_PARALLEL_AG_PART0_LAST_SLICE_PER_JETTY],
+                param[KFC_PARALLEL_AG_PART1_SLICE_PER_JETTY],
+                param[KFC_PARALLEL_AG_PART1_LAST_SLICE_PER_JETTY], param[KFC_PARALLEL_AG_PART0_GO_SIZE_0],
+                param[KFC_PARALLEL_AG_PART0_GO_SIZE_1], param[KFC_PARALLEL_AG_PART0_GO_SIZE_2],
+                param[KFC_PARALLEL_AG_PART0_GO_SIZE_3], param[KFC_PARALLEL_AG_PART1_GO_SIZE_0],
+                param[KFC_PARALLEL_AG_PART1_GO_SIZE_1], param[KFC_PARALLEL_AG_PART1_GO_SIZE_2],
+                param[KFC_PARALLEL_AG_PART1_GO_SIZE_3], ctx.arg->channels, ctx.arg->channelCount,
+                ctx.arg->rankSizeLevel0, ctx.arg->rankIdxLevel0, ctx.arg->rankSizeLevel1,
+                ctx.arg->rankIdxLevel1, ctx.arg->jettyNum, ctx.arg->nhrStepInfoVector,
+                ctx.arg->nhrRank2ChannelIdx);
+        } else if (ctx.arg->parallelAllGather) {
+            CcuKfcParallelAllGatherMesh1DMem2MemKernel(
+                param[KFC_PARALLEL_AG_INPUT], param[KFC_PARALLEL_AG_OUTPUT], ctx.token,
+                param[KFC_PARALLEL_AG_OUTPUT_STRIDE], param[KFC_PARALLEL_AG_PART0_SIZE],
+                param[KFC_PARALLEL_AG_PART1_SIZE], param[KFC_PARALLEL_AG_PART1_OFFSET],
+                param[KFC_PARALLEL_AG_MESH_PHASE_DONE_ADDR], param[KFC_PARALLEL_AG_NHR_PHASE_DONE_ADDR],
+                param[KFC_PARALLEL_AG_PART0_GO_SIZE_0], param[KFC_PARALLEL_AG_PART0_GO_SIZE_1],
+                param[KFC_PARALLEL_AG_PART0_GO_SIZE_2], param[KFC_PARALLEL_AG_PART0_GO_SIZE_3],
+                param[KFC_PARALLEL_AG_PART1_GO_SIZE_0], param[KFC_PARALLEL_AG_PART1_GO_SIZE_1],
+                param[KFC_PARALLEL_AG_PART1_GO_SIZE_2], param[KFC_PARALLEL_AG_PART1_GO_SIZE_3],
+                ctx.arg->channels, ctx.arg->channelCount, ctx.arg->rankSizeLevel0, ctx.arg->rankIdxLevel0,
+                ctx.arg->rankSizeLevel1, ctx.arg->rankIdxLevel1);
+        } else if (ctx.arg->role == KfcServerRole::ALL_GATHER_NHR) {
             CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
                 param[KFC_CONCURRENT_AG_NHR_INPUT], param[KFC_CONCURRENT_AG_NHR_OUTPUT], ctx.token,
                 param[KFC_CONCURRENT_AG_NHR_SLICE_SIZE], param[KFC_CONCURRENT_AG_NHR_SLICE_SIZE_PER_JETTY],

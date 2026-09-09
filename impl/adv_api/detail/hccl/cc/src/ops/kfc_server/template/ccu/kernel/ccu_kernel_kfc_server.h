@@ -33,13 +33,19 @@ struct CcuKernelArgKfcServer : CcuKernelArgBase {
     bool loadFromMem = false;
     KfcServerRole role = KfcServerRole::DEFAULT;
     uint32_t jettyNum = 4;
+    bool parallelAllGather = false;
+    uint32_t rankSizeLevel0 = 1;
+    uint32_t rankIdxLevel0 = 0;
+    uint32_t rankSizeLevel1 = 1;
+    uint32_t rankIdxLevel1 = 0;
     OpParam opParam;
     std::vector<std::vector<uint32_t>> subCommRanks;
     std::vector<KfcNhrStepInfo> nhrStepInfoVector;
     std::map<uint32_t, uint32_t> nhrRank2ChannelIdx;
 };
 
-// 多mission由Host使用独立start/done区域调度；Server之间不在CCU侧同步。
+// 每个 mission 仍由 Host 的独立 start/done 区域调度；需要中间阶段汇合的算法
+// （如 Parallel AllGather）通过请求记录中的 GM flag 在两个 CCU mission 间同步。
 struct KfcServerContext : CcuKernelCtxBase {
     const CcuKernelArgKfcServer* arg;
 
