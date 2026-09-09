@@ -41,6 +41,8 @@
 #include "../../../impl/basic_api/reg_compute/dav_l300/kernel_reg_compute_datatype_impl.h"
 #elif __NPU_ARCH__ == 3103
 #include "../../../impl/basic_api/reg_compute/dav_l310/kernel_reg_compute_datatype_impl.h"
+#elif __NPU_ARCH__ == 3103
+#include "../../../impl/basic_api/reg_compute/dav_l310/kernel_reg_compute_datatype_impl.h"
 #elif __NPU_ARCH__ == 3113
 #include "../../../impl/basic_api/reg_compute/dav_l311/kernel_reg_compute_datatype_impl.h"
 #elif (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5165)
@@ -66,7 +68,7 @@ struct RegTensor {
     static constexpr RegTrait trait = regTrait;
     static constexpr int REG_NUM = trait.REG_NUM;
 #if defined(__NPU_ARCH__) &&                                                                                     \
-        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
          (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5163) || \
          (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)) ||                          \
     defined(__ASC_NPU_HOST__)
@@ -88,7 +90,7 @@ struct RegTensor {
 } // namespace AscendC
 
 #if defined(__NPU_ARCH__) &&                                                                                     \
-        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
          (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5163) || \
          (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)) ||                          \
     defined(__ASC_NPU_HOST__)

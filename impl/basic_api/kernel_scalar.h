@@ -204,7 +204,7 @@ __aicore__ inline U CastImpl(T valueIn)
 {
 #if defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
-     (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5101) || \
+     (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5101) || \
      (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 9201) || \
      (__NPU_ARCH__ == 9202))
     if constexpr (std::is_same<U, half>::value) {
@@ -227,7 +227,7 @@ __aicore__ inline U ScalarCastImpl(T valueIn)
 {
 #if defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
-     (__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3003) || \
+     (__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
      (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || \
      (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     return CastImpl<T, U, roundMode>(valueIn);
