@@ -20,1056 +20,11 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
-__simd_callee__ inline void asc_ge_impl(vector_bool& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_ge(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ge_impl(vector_bool& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_ge(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ge_impl(vector_bool& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_ge(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ge_impl(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_ge(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ge_impl(vector_bool& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_ge(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ge_impl(vector_bool& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_ge(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ge_impl(vector_bool& dst, vector_half src0, vector_half src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_ge(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ge_impl(
-    vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_ge(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ge_impl(vector_bool& dst, vector_float src0, vector_float src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_ge(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ge_scalar_impl(vector_bool& dst, vector_int8_t src, int8_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_ge(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ge_scalar_impl(vector_bool& dst, vector_int16_t src, int16_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_ge(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ge_scalar_impl(vector_bool& dst, vector_int32_t src, int32_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_ge(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ge_scalar_impl(vector_bool& dst, vector_uint8_t src, uint8_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_ge(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ge_scalar_impl(vector_bool& dst, vector_uint16_t src, uint16_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_ge(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ge_scalar_impl(vector_bool& dst, vector_uint32_t src, uint32_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_ge(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ge_scalar_impl(vector_bool& dst, vector_half src, half value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_ge(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ge_scalar_impl(
-    vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_ge(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ge_scalar_impl(vector_bool& dst, vector_float src, float value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_ge(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_le_impl(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_le(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_le_impl(vector_bool& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_le(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_le_impl(vector_bool& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_le(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_le_impl(vector_bool& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_le(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_le_impl(vector_bool& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_le(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_le_impl(vector_bool& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_le(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_le_impl(vector_bool& dst, vector_half src0, vector_half src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_le(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_le_impl(vector_bool& dst, vector_float src0, vector_float src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_le(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_le_impl(
-    vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_le(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_le_scalar_impl(vector_bool& dst, vector_uint8_t src, uint8_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_le(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_le_scalar_impl(vector_bool& dst, vector_int8_t src, int8_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_le(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_le_scalar_impl(vector_bool& dst, vector_uint16_t src, uint16_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_le(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_le_scalar_impl(vector_bool& dst, vector_int16_t src, int16_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_le(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_le_scalar_impl(vector_bool& dst, vector_uint32_t src, uint32_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_le(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_le_scalar_impl(vector_bool& dst, vector_int32_t src, int32_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_le(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_le_scalar_impl(vector_bool& dst, vector_half src, half value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_le(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_le_scalar_impl(vector_bool& dst, vector_float src, float value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_le(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_le_scalar_impl(
-    vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_le(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_lt_impl(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_lt(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_lt_impl(vector_bool& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_lt(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_lt_impl(vector_bool& dst, vector_half src0, vector_half src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_lt(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_lt_impl(vector_bool& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_lt(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_lt_impl(vector_bool& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_lt(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_lt_impl(vector_bool& dst, vector_float src0, vector_float src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_lt(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_lt_impl(vector_bool& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_lt(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_lt_impl(vector_bool& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_lt(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_lt_impl(
-    vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_lt(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_lt_scalar_impl(vector_bool& dst, vector_uint8_t src, uint8_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_lt(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_lt_scalar_impl(vector_bool& dst, vector_int8_t src, int8_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_lt(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_lt_scalar_impl(
-    vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_lt(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_lt_scalar_impl(vector_bool& dst, vector_uint16_t src, uint16_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_lt(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_lt_scalar_impl(vector_bool& dst, vector_int16_t src, int16_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_lt(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_lt_scalar_impl(vector_bool& dst, vector_half src, half value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_lt(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_lt_scalar_impl(vector_bool& dst, vector_uint32_t src, uint32_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_lt(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_lt_scalar_impl(vector_bool& dst, vector_int32_t src, int32_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_lt(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_lt_scalar_impl(vector_bool& dst, vector_float src, float value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_lt(dst, src, value, mask);
-    }
-}
-
-// asc_gt(vcmp) uint8_t
-__simd_callee__ inline void asc_gt_impl(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_gt(dst, src0, src1, mask);
-    }
-}
-
-// asc_gt(vcmp) int8_t
-__simd_callee__ inline void asc_gt_impl(vector_bool& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_gt(dst, src0, src1, mask);
-    }
-}
-
-// asc_gt(vcmp) half
-__simd_callee__ inline void asc_gt_impl(vector_bool& dst, vector_half src0, vector_half src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_gt(dst, src0, src1, mask);
-    }
-}
-
-// asc_gt(vcmp) float
-__simd_callee__ inline void asc_gt_impl(vector_bool& dst, vector_float src0, vector_float src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_gt(dst, src0, src1, mask);
-    }
-}
-
-// asc_gt(vcmp) uint16_t
-__simd_callee__ inline void asc_gt_impl(vector_bool& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_gt(dst, src0, src1, mask);
-    }
-}
-
-// asc_gt(vcmp) int16_t
-__simd_callee__ inline void asc_gt_impl(vector_bool& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_gt(dst, src0, src1, mask);
-    }
-}
-
-// asc_gt(vcmp) uint32_t
-__simd_callee__ inline void asc_gt_impl(vector_bool& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_gt(dst, src0, src1, mask);
-    }
-}
-
-// asc_gt(vcmp) int32_t
-__simd_callee__ inline void asc_gt_impl(vector_bool& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_gt(dst, src0, src1, mask);
-    }
-}
-
-// asc_gt(vcmp) bfloat16
-__simd_callee__ inline void asc_gt_impl(
-    vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_gt(dst, src0, src1, mask);
-    }
-}
-
-// uint8_t
-__simd_callee__ inline void asc_gt_scalar_impl(vector_bool& dst, vector_uint8_t src, uint8_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_gt(dst, src, value, mask);
-    }
-}
-
-// int8_t
-__simd_callee__ inline void asc_gt_scalar_impl(vector_bool& dst, vector_int8_t src, int8_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_gt(dst, src, value, mask);
-    }
-}
-
-// bfloat16
-__simd_callee__ inline void asc_gt_scalar_impl(
-    vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_gt(dst, src, value, mask);
-    }
-}
-
-// uint16_t
-__simd_callee__ inline void asc_gt_scalar_impl(vector_bool& dst, vector_uint16_t src, uint16_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_gt(dst, src, value, mask);
-    }
-}
-
-// int16_t
-__simd_callee__ inline void asc_gt_scalar_impl(vector_bool& dst, vector_int16_t src, int16_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_gt(dst, src, value, mask);
-    }
-}
-
-// uint32_t
-__simd_callee__ inline void asc_gt_scalar_impl(vector_bool& dst, vector_uint32_t src, uint32_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_gt(dst, src, value, mask);
-    }
-}
-
-// int32_t
-__simd_callee__ inline void asc_gt_scalar_impl(vector_bool& dst, vector_int32_t src, int32_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_gt(dst, src, value, mask);
-    }
-}
-
-// half
-__simd_callee__ inline void asc_gt_scalar_impl(vector_bool& dst, vector_half src, half value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_gt(dst, src, value, mask);
-    }
-}
-
-// float32
-__simd_callee__ inline void asc_gt_scalar_impl(vector_bool& dst, vector_float src, float value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_gt(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_eq_impl(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_eq(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_eq_impl(vector_bool& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_eq(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_eq_impl(vector_bool& dst, vector_half src0, vector_half src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_eq(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_eq_impl(vector_bool& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_eq(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_eq_impl(vector_bool& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_eq(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_eq_impl(vector_bool& dst, vector_float src0, vector_float src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_eq(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_eq_impl(vector_bool& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_eq(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_eq_impl(vector_bool& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_eq(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_eq_impl(
-    vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_eq(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_eq_scalar_impl(vector_bool& dst, vector_uint8_t src0, uint8_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_eq(dst, src0, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_eq_scalar_impl(vector_bool& dst, vector_int8_t src0, int8_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_eq(dst, src0, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_eq_scalar_impl(
-    vector_bool& dst, vector_bfloat16_t src0, bfloat16_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_eq(dst, src0, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_eq_scalar_impl(vector_bool& dst, vector_uint16_t src0, uint16_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_eq(dst, src0, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_eq_scalar_impl(vector_bool& dst, vector_int16_t src0, int16_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_eq(dst, src0, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_eq_scalar_impl(vector_bool& dst, vector_half src0, half value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_eq(dst, src0, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_eq_scalar_impl(vector_bool& dst, vector_uint32_t src0, uint32_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_eq(dst, src0, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_eq_scalar_impl(vector_bool& dst, vector_int32_t src0, int32_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_eq(dst, src0, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_eq_scalar_impl(vector_bool& dst, vector_float src0, float value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_eq(dst, src0, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ne_impl(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_ne(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ne_impl(vector_bool& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_ne(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ne_impl(vector_bool& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_ne(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ne_impl(vector_bool& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_ne(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ne_impl(vector_bool& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_ne(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ne_impl(vector_bool& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_ne(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ne_impl(vector_bool& dst, vector_half src0, vector_half src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_ne(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ne_impl(
-    vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_ne(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ne_impl(vector_bool& dst, vector_float src0, vector_float src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_ne(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ne_scalar_impl(vector_bool& dst, vector_uint8_t src, uint8_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_ne(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ne_scalar_impl(vector_bool& dst, vector_int8_t src, int8_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_ne(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ne_scalar_impl(vector_bool& dst, vector_uint16_t src, uint16_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_ne(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ne_scalar_impl(vector_bool& dst, vector_int16_t src, int16_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_ne(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ne_scalar_impl(vector_bool& dst, vector_uint32_t src, uint32_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_ne(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ne_scalar_impl(vector_bool& dst, vector_int32_t src, int32_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_ne(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ne_scalar_impl(vector_bool& dst, vector_half src, half value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_ne(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ne_scalar_impl(vector_bool& dst, vector_float src, float value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_ne(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_ne_scalar_impl(
-    vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_ne(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline void asc_lt(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_lt(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline vector_bool asc_lt(vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_lt_impl(dst, src0, src1, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_lt(vector_bool& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_lt(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline vector_bool asc_lt(vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_lt_impl(dst, src0, src1, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_lt(vector_bool& dst, vector_half src0, vector_half src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_lt(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline vector_bool asc_lt(vector_half src0, vector_half src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_lt_impl(dst, src0, src1, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_lt(vector_bool& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_lt(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline vector_bool asc_lt(vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_lt_impl(dst, src0, src1, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_lt(vector_bool& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_lt(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline vector_bool asc_lt(vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_lt_impl(dst, src0, src1, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_lt(vector_bool& dst, vector_float src0, vector_float src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_lt(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline vector_bool asc_lt(vector_float src0, vector_float src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_lt_impl(dst, src0, src1, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_lt(vector_bool& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_lt(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline vector_bool asc_lt(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_lt_impl(dst, src0, src1, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_lt(vector_bool& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_lt(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline vector_bool asc_lt(vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_lt_impl(dst, src0, src1, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_lt(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_lt(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline vector_bool asc_lt(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_lt_impl(dst, src0, src1, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_uint8_t src, uint8_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_lt(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline vector_bool asc_lt_scalar(vector_uint8_t src, uint8_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_lt_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_int8_t src, int8_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_lt(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline vector_bool asc_lt_scalar(vector_int8_t src, int8_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_lt_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_lt(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline vector_bool asc_lt_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_lt_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_uint16_t src, uint16_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_lt(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline vector_bool asc_lt_scalar(vector_uint16_t src, uint16_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_lt_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_int16_t src, int16_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_lt(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline vector_bool asc_lt_scalar(vector_int16_t src, int16_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_lt_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_half src, half value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_lt(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline vector_bool asc_lt_scalar(vector_half src, half value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_lt_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_uint32_t src, uint32_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_lt(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline vector_bool asc_lt_scalar(vector_uint32_t src, uint32_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_lt_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_int32_t src, int32_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_lt(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline vector_bool asc_lt_scalar(vector_int32_t src, int32_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_lt_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_float src, float value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_lt(dst, src, value, mask);
-    }
-}
-
-__simd_callee__ inline vector_bool asc_lt_scalar(vector_float src, float value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_lt_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
 __simd_callee__ inline void asc_ge(vector_bool& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmp_ge(dst, src0, src1, mask);
     }
-}
-
-__simd_callee__ inline vector_bool asc_ge(vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ge_impl(dst, src0, src1, mask);
-    return dst;
 }
 
 __simd_callee__ inline void asc_ge(vector_bool& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
@@ -1079,25 +34,11 @@ __simd_callee__ inline void asc_ge(vector_bool& dst, vector_int16_t src0, vector
     }
 }
 
-__simd_callee__ inline vector_bool asc_ge(vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ge_impl(dst, src0, src1, mask);
-    return dst;
-}
-
 __simd_callee__ inline void asc_ge(vector_bool& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmp_ge(dst, src0, src1, mask);
     }
-}
-
-__simd_callee__ inline vector_bool asc_ge(vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ge_impl(dst, src0, src1, mask);
-    return dst;
 }
 
 __simd_callee__ inline void asc_ge(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
@@ -1107,25 +48,11 @@ __simd_callee__ inline void asc_ge(vector_bool& dst, vector_uint8_t src0, vector
     }
 }
 
-__simd_callee__ inline vector_bool asc_ge(vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ge_impl(dst, src0, src1, mask);
-    return dst;
-}
-
 __simd_callee__ inline void asc_ge(vector_bool& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmp_ge(dst, src0, src1, mask);
     }
-}
-
-__simd_callee__ inline vector_bool asc_ge(vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ge_impl(dst, src0, src1, mask);
-    return dst;
 }
 
 __simd_callee__ inline void asc_ge(vector_bool& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
@@ -1135,25 +62,11 @@ __simd_callee__ inline void asc_ge(vector_bool& dst, vector_uint32_t src0, vecto
     }
 }
 
-__simd_callee__ inline vector_bool asc_ge(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ge_impl(dst, src0, src1, mask);
-    return dst;
-}
-
 __simd_callee__ inline void asc_ge(vector_bool& dst, vector_half src0, vector_half src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmp_ge(dst, src0, src1, mask);
     }
-}
-
-__simd_callee__ inline vector_bool asc_ge(vector_half src0, vector_half src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ge_impl(dst, src0, src1, mask);
-    return dst;
 }
 
 __simd_callee__ inline void asc_ge(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
@@ -1163,25 +76,11 @@ __simd_callee__ inline void asc_ge(vector_bool& dst, vector_bfloat16_t src0, vec
     }
 }
 
-__simd_callee__ inline vector_bool asc_ge(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ge_impl(dst, src0, src1, mask);
-    return dst;
-}
-
 __simd_callee__ inline void asc_ge(vector_bool& dst, vector_float src0, vector_float src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmp_ge(dst, src0, src1, mask);
     }
-}
-
-__simd_callee__ inline vector_bool asc_ge(vector_float src0, vector_float src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ge_impl(dst, src0, src1, mask);
-    return dst;
 }
 
 __simd_callee__ inline void asc_ge_scalar(vector_bool& dst, vector_int8_t src, int8_t value, vector_bool mask)
@@ -1247,81 +146,11 @@ __simd_callee__ inline void asc_ge_scalar(vector_bool& dst, vector_float src, fl
     }
 }
 
-__simd_callee__ inline vector_bool asc_ge_scalar(vector_int8_t src, int8_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ge_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline vector_bool asc_ge_scalar(vector_int16_t src, int16_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ge_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline vector_bool asc_ge_scalar(vector_int32_t src, int32_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ge_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline vector_bool asc_ge_scalar(vector_uint8_t src, uint8_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ge_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline vector_bool asc_ge_scalar(vector_uint16_t src, uint16_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ge_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline vector_bool asc_ge_scalar(vector_uint32_t src, uint32_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ge_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline vector_bool asc_ge_scalar(vector_half src, half value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ge_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline vector_bool asc_ge_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ge_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline vector_bool asc_ge_scalar(vector_float src, float value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ge_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
 __simd_callee__ inline void asc_le(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmp_le(dst, src0, src1, mask);
     }
-}
-
-__simd_callee__ inline vector_bool asc_le(vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_le_impl(dst, src0, src1, mask);
-    return dst;
 }
 
 __simd_callee__ inline void asc_le(vector_bool& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
@@ -1331,25 +160,11 @@ __simd_callee__ inline void asc_le(vector_bool& dst, vector_int8_t src0, vector_
     }
 }
 
-__simd_callee__ inline vector_bool asc_le(vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_le_impl(dst, src0, src1, mask);
-    return dst;
-}
-
 __simd_callee__ inline void asc_le(vector_bool& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmp_le(dst, src0, src1, mask);
     }
-}
-
-__simd_callee__ inline vector_bool asc_le(vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_le_impl(dst, src0, src1, mask);
-    return dst;
 }
 
 __simd_callee__ inline void asc_le(vector_bool& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
@@ -1359,25 +174,11 @@ __simd_callee__ inline void asc_le(vector_bool& dst, vector_int16_t src0, vector
     }
 }
 
-__simd_callee__ inline vector_bool asc_le(vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_le_impl(dst, src0, src1, mask);
-    return dst;
-}
-
 __simd_callee__ inline void asc_le(vector_bool& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmp_le(dst, src0, src1, mask);
     }
-}
-
-__simd_callee__ inline vector_bool asc_le(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_le_impl(dst, src0, src1, mask);
-    return dst;
 }
 
 __simd_callee__ inline void asc_le(vector_bool& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
@@ -1387,25 +188,11 @@ __simd_callee__ inline void asc_le(vector_bool& dst, vector_int32_t src0, vector
     }
 }
 
-__simd_callee__ inline vector_bool asc_le(vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_le_impl(dst, src0, src1, mask);
-    return dst;
-}
-
 __simd_callee__ inline void asc_le(vector_bool& dst, vector_half src0, vector_half src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmp_le(dst, src0, src1, mask);
     }
-}
-
-__simd_callee__ inline vector_bool asc_le(vector_half src0, vector_half src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_le_impl(dst, src0, src1, mask);
-    return dst;
 }
 
 __simd_callee__ inline void asc_le(vector_bool& dst, vector_float src0, vector_float src1, vector_bool mask)
@@ -1415,25 +202,11 @@ __simd_callee__ inline void asc_le(vector_bool& dst, vector_float src0, vector_f
     }
 }
 
-__simd_callee__ inline vector_bool asc_le(vector_float src0, vector_float src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_le_impl(dst, src0, src1, mask);
-    return dst;
-}
-
 __simd_callee__ inline void asc_le(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmp_le(dst, src0, src1, mask);
     }
-}
-
-__simd_callee__ inline vector_bool asc_le(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_le_impl(dst, src0, src1, mask);
-    return dst;
 }
 
 __simd_callee__ inline void asc_le_scalar(vector_bool& dst, vector_uint8_t src, uint8_t value, vector_bool mask)
@@ -1443,25 +216,11 @@ __simd_callee__ inline void asc_le_scalar(vector_bool& dst, vector_uint8_t src, 
     }
 }
 
-__simd_callee__ inline vector_bool asc_le_scalar(vector_uint8_t src, uint8_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_le_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
 __simd_callee__ inline void asc_le_scalar(vector_bool& dst, vector_int8_t src, int8_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmps_le(dst, src, value, mask);
     }
-}
-
-__simd_callee__ inline vector_bool asc_le_scalar(vector_int8_t src, int8_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_le_scalar_impl(dst, src, value, mask);
-    return dst;
 }
 
 __simd_callee__ inline void asc_le_scalar(vector_bool& dst, vector_uint16_t src, uint16_t value, vector_bool mask)
@@ -1471,25 +230,11 @@ __simd_callee__ inline void asc_le_scalar(vector_bool& dst, vector_uint16_t src,
     }
 }
 
-__simd_callee__ inline vector_bool asc_le_scalar(vector_uint16_t src, uint16_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_le_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
 __simd_callee__ inline void asc_le_scalar(vector_bool& dst, vector_int16_t src, int16_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmps_le(dst, src, value, mask);
     }
-}
-
-__simd_callee__ inline vector_bool asc_le_scalar(vector_int16_t src, int16_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_le_scalar_impl(dst, src, value, mask);
-    return dst;
 }
 
 __simd_callee__ inline void asc_le_scalar(vector_bool& dst, vector_uint32_t src, uint32_t value, vector_bool mask)
@@ -1499,25 +244,11 @@ __simd_callee__ inline void asc_le_scalar(vector_bool& dst, vector_uint32_t src,
     }
 }
 
-__simd_callee__ inline vector_bool asc_le_scalar(vector_uint32_t src, uint32_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_le_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
 __simd_callee__ inline void asc_le_scalar(vector_bool& dst, vector_int32_t src, int32_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmps_le(dst, src, value, mask);
     }
-}
-
-__simd_callee__ inline vector_bool asc_le_scalar(vector_int32_t src, int32_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_le_scalar_impl(dst, src, value, mask);
-    return dst;
 }
 
 __simd_callee__ inline void asc_le_scalar(vector_bool& dst, vector_half src, half value, vector_bool mask)
@@ -1527,25 +258,11 @@ __simd_callee__ inline void asc_le_scalar(vector_bool& dst, vector_half src, hal
     }
 }
 
-__simd_callee__ inline vector_bool asc_le_scalar(vector_half src, half value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_le_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
 __simd_callee__ inline void asc_le_scalar(vector_bool& dst, vector_float src, float value, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmps_le(dst, src, value, mask);
     }
-}
-
-__simd_callee__ inline vector_bool asc_le_scalar(vector_float src, float value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_le_scalar_impl(dst, src, value, mask);
-    return dst;
 }
 
 __simd_callee__ inline void asc_le_scalar(vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
@@ -1555,13 +272,133 @@ __simd_callee__ inline void asc_le_scalar(vector_bool& dst, vector_bfloat16_t sr
     }
 }
 
-__simd_callee__ inline vector_bool asc_le_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
+__simd_callee__ inline void asc_lt(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
 {
-    vector_bool dst;
-    asc_le_scalar_impl(dst, src, value, mask);
-    return dst;
+    if ASC_IS_AIV {
+        vcmp_lt(dst, src0, src1, mask);
+    }
 }
 
+__simd_callee__ inline void asc_lt(vector_bool& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vcmp_lt(dst, src0, src1, mask);
+    }
+}
+
+__simd_callee__ inline void asc_lt(vector_bool& dst, vector_half src0, vector_half src1, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vcmp_lt(dst, src0, src1, mask);
+    }
+}
+
+__simd_callee__ inline void asc_lt(vector_bool& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vcmp_lt(dst, src0, src1, mask);
+    }
+}
+
+__simd_callee__ inline void asc_lt(vector_bool& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vcmp_lt(dst, src0, src1, mask);
+    }
+}
+
+__simd_callee__ inline void asc_lt(vector_bool& dst, vector_float src0, vector_float src1, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vcmp_lt(dst, src0, src1, mask);
+    }
+}
+
+__simd_callee__ inline void asc_lt(vector_bool& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vcmp_lt(dst, src0, src1, mask);
+    }
+}
+
+__simd_callee__ inline void asc_lt(vector_bool& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vcmp_lt(dst, src0, src1, mask);
+    }
+}
+
+__simd_callee__ inline void asc_lt(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vcmp_lt(dst, src0, src1, mask);
+    }
+}
+
+__simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_uint8_t src, uint8_t value, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vcmps_lt(dst, src, value, mask);
+    }
+}
+
+__simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_int8_t src, int8_t value, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vcmps_lt(dst, src, value, mask);
+    }
+}
+
+__simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vcmps_lt(dst, src, value, mask);
+    }
+}
+
+__simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_uint16_t src, uint16_t value, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vcmps_lt(dst, src, value, mask);
+    }
+}
+
+__simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_int16_t src, int16_t value, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vcmps_lt(dst, src, value, mask);
+    }
+}
+
+__simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_half src, half value, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vcmps_lt(dst, src, value, mask);
+    }
+}
+
+__simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_uint32_t src, uint32_t value, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vcmps_lt(dst, src, value, mask);
+    }
+}
+
+__simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_int32_t src, int32_t value, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vcmps_lt(dst, src, value, mask);
+    }
+}
+
+__simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_float src, float value, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vcmps_lt(dst, src, value, mask);
+    }
+}
+
+// asc_gt(vcmp) uint8_t
 __simd_callee__ inline void asc_gt(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1569,13 +406,7 @@ __simd_callee__ inline void asc_gt(vector_bool& dst, vector_uint8_t src0, vector
     }
 }
 
-__simd_callee__ inline vector_bool asc_gt(vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_gt_impl(dst, src0, src1, mask);
-    return dst;
-}
-
+// asc_gt(vcmp) int8_t
 __simd_callee__ inline void asc_gt(vector_bool& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1583,13 +414,7 @@ __simd_callee__ inline void asc_gt(vector_bool& dst, vector_int8_t src0, vector_
     }
 }
 
-__simd_callee__ inline vector_bool asc_gt(vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_gt_impl(dst, src0, src1, mask);
-    return dst;
-}
-
+// asc_gt(vcmp) half
 __simd_callee__ inline void asc_gt(vector_bool& dst, vector_half src0, vector_half src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1597,13 +422,7 @@ __simd_callee__ inline void asc_gt(vector_bool& dst, vector_half src0, vector_ha
     }
 }
 
-__simd_callee__ inline vector_bool asc_gt(vector_half src0, vector_half src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_gt_impl(dst, src0, src1, mask);
-    return dst;
-}
-
+// asc_gt(vcmp) float
 __simd_callee__ inline void asc_gt(vector_bool& dst, vector_float src0, vector_float src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1611,13 +430,7 @@ __simd_callee__ inline void asc_gt(vector_bool& dst, vector_float src0, vector_f
     }
 }
 
-__simd_callee__ inline vector_bool asc_gt(vector_float src0, vector_float src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_gt_impl(dst, src0, src1, mask);
-    return dst;
-}
-
+// asc_gt(vcmp) uint16_t
 __simd_callee__ inline void asc_gt(vector_bool& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1625,13 +438,7 @@ __simd_callee__ inline void asc_gt(vector_bool& dst, vector_uint16_t src0, vecto
     }
 }
 
-__simd_callee__ inline vector_bool asc_gt(vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_gt_impl(dst, src0, src1, mask);
-    return dst;
-}
-
+// asc_gt(vcmp) int16_t
 __simd_callee__ inline void asc_gt(vector_bool& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1639,13 +446,7 @@ __simd_callee__ inline void asc_gt(vector_bool& dst, vector_int16_t src0, vector
     }
 }
 
-__simd_callee__ inline vector_bool asc_gt(vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_gt_impl(dst, src0, src1, mask);
-    return dst;
-}
-
+// asc_gt(vcmp) uint32_t
 __simd_callee__ inline void asc_gt(vector_bool& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1653,13 +454,7 @@ __simd_callee__ inline void asc_gt(vector_bool& dst, vector_uint32_t src0, vecto
     }
 }
 
-__simd_callee__ inline vector_bool asc_gt(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_gt_impl(dst, src0, src1, mask);
-    return dst;
-}
-
+// asc_gt(vcmp) int32_t
 __simd_callee__ inline void asc_gt(vector_bool& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1667,13 +462,7 @@ __simd_callee__ inline void asc_gt(vector_bool& dst, vector_int32_t src0, vector
     }
 }
 
-__simd_callee__ inline vector_bool asc_gt(vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_gt_impl(dst, src0, src1, mask);
-    return dst;
-}
-
+// asc_gt(vcmp) bfloat16
 __simd_callee__ inline void asc_gt(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1681,13 +470,7 @@ __simd_callee__ inline void asc_gt(vector_bool& dst, vector_bfloat16_t src0, vec
     }
 }
 
-__simd_callee__ inline vector_bool asc_gt(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_gt_impl(dst, src0, src1, mask);
-    return dst;
-}
-
+// uint8_t
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_uint8_t src, uint8_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1695,6 +478,7 @@ __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_uint8_t src, 
     }
 }
 
+// int8_t
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_int8_t src, int8_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1702,6 +486,7 @@ __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_int8_t src, i
     }
 }
 
+// bfloat16
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1709,6 +494,7 @@ __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_bfloat16_t sr
     }
 }
 
+// uint16_t
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_uint16_t src, uint16_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1716,6 +502,7 @@ __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_uint16_t src,
     }
 }
 
+// int16_t
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_int16_t src, int16_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1723,6 +510,7 @@ __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_int16_t src, 
     }
 }
 
+// uint32_t
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_uint32_t src, uint32_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1730,6 +518,7 @@ __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_uint32_t src,
     }
 }
 
+// int32_t
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_int32_t src, int32_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1737,6 +526,7 @@ __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_int32_t src, 
     }
 }
 
+// half
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_half src, half value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1744,88 +534,12 @@ __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_half src, hal
     }
 }
 
+// float32
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_float src, float value, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmps_gt(dst, src, value, mask);
     }
-}
-
-__simd_callee__ inline vector_bool asc_gt_scalar(vector_uint8_t src, uint8_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_gt_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline vector_bool asc_gt_scalar(vector_int8_t src, int8_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_gt_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline vector_bool asc_gt_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_gt_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline vector_bool asc_gt_scalar(vector_uint16_t src, uint16_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_gt_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline vector_bool asc_gt_scalar(vector_int16_t src, int16_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_gt_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline vector_bool asc_gt_scalar(vector_uint32_t src, uint32_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_gt_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline vector_bool asc_gt_scalar(vector_int32_t src, int32_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_gt_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline vector_bool asc_gt_scalar(vector_half src, half value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_gt_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline vector_bool asc_gt_scalar(vector_float src, float value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_gt_scalar_impl(dst, src, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_eq(vector_bool& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_eq(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline vector_bool asc_eq(vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_eq_impl(dst, src0, src1, mask);
-    return dst;
 }
 
 __simd_callee__ inline void asc_eq(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
@@ -1835,39 +549,11 @@ __simd_callee__ inline void asc_eq(vector_bool& dst, vector_uint8_t src0, vector
     }
 }
 
-__simd_callee__ inline vector_bool asc_eq(vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_eq_impl(dst, src0, src1, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_eq(vector_bool& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
+__simd_callee__ inline void asc_eq(vector_bool& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmp_eq(dst, src0, src1, mask);
     }
-}
-
-__simd_callee__ inline vector_bool asc_eq(vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_eq_impl(dst, src0, src1, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_eq(vector_bool& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_eq(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline vector_bool asc_eq(vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_eq_impl(dst, src0, src1, mask);
-    return dst;
 }
 
 __simd_callee__ inline void asc_eq(vector_bool& dst, vector_half src0, vector_half src1, vector_bool mask)
@@ -1877,53 +563,18 @@ __simd_callee__ inline void asc_eq(vector_bool& dst, vector_half src0, vector_ha
     }
 }
 
-__simd_callee__ inline vector_bool asc_eq(vector_half src0, vector_half src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_eq_impl(dst, src0, src1, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_eq(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
+__simd_callee__ inline void asc_eq(vector_bool& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmp_eq(dst, src0, src1, mask);
     }
 }
 
-__simd_callee__ inline vector_bool asc_eq(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_eq_impl(dst, src0, src1, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_eq(vector_bool& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
+__simd_callee__ inline void asc_eq(vector_bool& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmp_eq(dst, src0, src1, mask);
     }
-}
-
-__simd_callee__ inline vector_bool asc_eq(vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_eq_impl(dst, src0, src1, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_eq(vector_bool& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmp_eq(dst, src0, src1, mask);
-    }
-}
-
-__simd_callee__ inline vector_bool asc_eq(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_eq_impl(dst, src0, src1, mask);
-    return dst;
 }
 
 __simd_callee__ inline void asc_eq(vector_bool& dst, vector_float src0, vector_float src1, vector_bool mask)
@@ -1933,25 +584,25 @@ __simd_callee__ inline void asc_eq(vector_bool& dst, vector_float src0, vector_f
     }
 }
 
-__simd_callee__ inline vector_bool asc_eq(vector_float src0, vector_float src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_eq_impl(dst, src0, src1, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_int8_t src0, int8_t value, vector_bool mask)
+__simd_callee__ inline void asc_eq(vector_bool& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
-        vcmps_eq(dst, src0, value, mask);
+        vcmp_eq(dst, src0, src1, mask);
     }
 }
 
-__simd_callee__ inline vector_bool asc_eq_scalar(vector_int8_t src0, int8_t value, vector_bool mask)
+__simd_callee__ inline void asc_eq(vector_bool& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
 {
-    vector_bool dst;
-    asc_eq_scalar_impl(dst, src0, value, mask);
-    return dst;
+    if ASC_IS_AIV {
+        vcmp_eq(dst, src0, src1, mask);
+    }
+}
+
+__simd_callee__ inline void asc_eq(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vcmp_eq(dst, src0, src1, mask);
+    }
 }
 
 __simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_uint8_t src0, uint8_t value, vector_bool mask)
@@ -1961,53 +612,11 @@ __simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_uint8_t src0,
     }
 }
 
-__simd_callee__ inline vector_bool asc_eq_scalar(vector_uint8_t src0, uint8_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_eq_scalar_impl(dst, src0, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_int16_t src0, int16_t value, vector_bool mask)
+__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_int8_t src0, int8_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmps_eq(dst, src0, value, mask);
     }
-}
-
-__simd_callee__ inline vector_bool asc_eq_scalar(vector_int16_t src0, int16_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_eq_scalar_impl(dst, src0, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_uint16_t src0, uint16_t value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_eq(dst, src0, value, mask);
-    }
-}
-
-__simd_callee__ inline vector_bool asc_eq_scalar(vector_uint16_t src0, uint16_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_eq_scalar_impl(dst, src0, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_half src0, half value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vcmps_eq(dst, src0, value, mask);
-    }
-}
-
-__simd_callee__ inline vector_bool asc_eq_scalar(vector_half src0, half value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_eq_scalar_impl(dst, src0, value, mask);
-    return dst;
 }
 
 __simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_bfloat16_t src0, bfloat16_t value, vector_bool mask)
@@ -2017,25 +626,25 @@ __simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_bfloat16_t sr
     }
 }
 
-__simd_callee__ inline vector_bool asc_eq_scalar(vector_bfloat16_t src0, bfloat16_t value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_eq_scalar_impl(dst, src0, value, mask);
-    return dst;
-}
-
-__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_int32_t src0, int32_t value, vector_bool mask)
+__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_uint16_t src0, uint16_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmps_eq(dst, src0, value, mask);
     }
 }
 
-__simd_callee__ inline vector_bool asc_eq_scalar(vector_int32_t src0, int32_t value, vector_bool mask)
+__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_int16_t src0, int16_t value, vector_bool mask)
 {
-    vector_bool dst;
-    asc_eq_scalar_impl(dst, src0, value, mask);
-    return dst;
+    if ASC_IS_AIV {
+        vcmps_eq(dst, src0, value, mask);
+    }
+}
+
+__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_half src0, half value, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vcmps_eq(dst, src0, value, mask);
+    }
 }
 
 __simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_uint32_t src0, uint32_t value, vector_bool mask)
@@ -2045,11 +654,11 @@ __simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_uint32_t src0
     }
 }
 
-__simd_callee__ inline vector_bool asc_eq_scalar(vector_uint32_t src0, uint32_t value, vector_bool mask)
+__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_int32_t src0, int32_t value, vector_bool mask)
 {
-    vector_bool dst;
-    asc_eq_scalar_impl(dst, src0, value, mask);
-    return dst;
+    if ASC_IS_AIV {
+        vcmps_eq(dst, src0, value, mask);
+    }
 }
 
 __simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_float src0, float value, vector_bool mask)
@@ -2059,25 +668,11 @@ __simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_float src0, f
     }
 }
 
-__simd_callee__ inline vector_bool asc_eq_scalar(vector_float src0, float value, vector_bool mask)
-{
-    vector_bool dst;
-    asc_eq_scalar_impl(dst, src0, value, mask);
-    return dst;
-}
-
 __simd_callee__ inline void asc_ne(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmp_ne(dst, src0, src1, mask);
     }
-}
-
-__simd_callee__ inline vector_bool asc_ne(vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ne_impl(dst, src0, src1, mask);
-    return dst;
 }
 
 __simd_callee__ inline void asc_ne(vector_bool& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
@@ -2087,25 +682,11 @@ __simd_callee__ inline void asc_ne(vector_bool& dst, vector_int8_t src0, vector_
     }
 }
 
-__simd_callee__ inline vector_bool asc_ne(vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ne_impl(dst, src0, src1, mask);
-    return dst;
-}
-
 __simd_callee__ inline void asc_ne(vector_bool& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmp_ne(dst, src0, src1, mask);
     }
-}
-
-__simd_callee__ inline vector_bool asc_ne(vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ne_impl(dst, src0, src1, mask);
-    return dst;
 }
 
 __simd_callee__ inline void asc_ne(vector_bool& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
@@ -2115,25 +696,11 @@ __simd_callee__ inline void asc_ne(vector_bool& dst, vector_int16_t src0, vector
     }
 }
 
-__simd_callee__ inline vector_bool asc_ne(vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ne_impl(dst, src0, src1, mask);
-    return dst;
-}
-
 __simd_callee__ inline void asc_ne(vector_bool& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmp_ne(dst, src0, src1, mask);
     }
-}
-
-__simd_callee__ inline vector_bool asc_ne(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ne_impl(dst, src0, src1, mask);
-    return dst;
 }
 
 __simd_callee__ inline void asc_ne(vector_bool& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
@@ -2143,25 +710,11 @@ __simd_callee__ inline void asc_ne(vector_bool& dst, vector_int32_t src0, vector
     }
 }
 
-__simd_callee__ inline vector_bool asc_ne(vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ne_impl(dst, src0, src1, mask);
-    return dst;
-}
-
 __simd_callee__ inline void asc_ne(vector_bool& dst, vector_half src0, vector_half src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmp_ne(dst, src0, src1, mask);
     }
-}
-
-__simd_callee__ inline vector_bool asc_ne(vector_half src0, vector_half src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ne_impl(dst, src0, src1, mask);
-    return dst;
 }
 
 __simd_callee__ inline void asc_ne(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
@@ -2171,25 +724,11 @@ __simd_callee__ inline void asc_ne(vector_bool& dst, vector_bfloat16_t src0, vec
     }
 }
 
-__simd_callee__ inline vector_bool asc_ne(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ne_impl(dst, src0, src1, mask);
-    return dst;
-}
-
 __simd_callee__ inline void asc_ne(vector_bool& dst, vector_float src0, vector_float src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vcmp_ne(dst, src0, src1, mask);
     }
-}
-
-__simd_callee__ inline vector_bool asc_ne(vector_float src0, vector_float src1, vector_bool mask)
-{
-    vector_bool dst;
-    asc_ne_impl(dst, src0, src1, mask);
-    return dst;
 }
 
 __simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_uint8_t src, uint8_t value, vector_bool mask)
@@ -2255,66 +794,759 @@ __simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_bfloat16_t sr
     }
 }
 
+__simd_callee__ inline vector_bool asc_lt(vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_lt(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_lt(vector_int8_t src0, vector_int8_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_lt(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_lt(vector_half src0, vector_half src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_lt(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_lt(vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_lt(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_lt(vector_int16_t src0, vector_int16_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_lt(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_lt(vector_float src0, vector_float src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_lt(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_lt(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_lt(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_lt(vector_int32_t src0, vector_int32_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_lt(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_lt(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_lt(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_lt_scalar(vector_uint8_t src, uint8_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_lt_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_lt_scalar(vector_int8_t src, int8_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_lt_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_lt_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_lt_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_lt_scalar(vector_uint16_t src, uint16_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_lt_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_lt_scalar(vector_int16_t src, int16_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_lt_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_lt_scalar(vector_half src, half value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_lt_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_lt_scalar(vector_uint32_t src, uint32_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_lt_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_lt_scalar(vector_int32_t src, int32_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_lt_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_lt_scalar(vector_float src, float value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_lt_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ge(vector_int8_t src0, vector_int8_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ge(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ge(vector_int16_t src0, vector_int16_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ge(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ge(vector_int32_t src0, vector_int32_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ge(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ge(vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ge(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ge(vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ge(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ge(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ge(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ge(vector_half src0, vector_half src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ge(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ge(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ge(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ge(vector_float src0, vector_float src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ge(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ge_scalar(vector_int8_t src, int8_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ge_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ge_scalar(vector_int16_t src, int16_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ge_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ge_scalar(vector_int32_t src, int32_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ge_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ge_scalar(vector_uint8_t src, uint8_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ge_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ge_scalar(vector_uint16_t src, uint16_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ge_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ge_scalar(vector_uint32_t src, uint32_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ge_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ge_scalar(vector_half src, half value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ge_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ge_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ge_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ge_scalar(vector_float src, float value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ge_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_le(vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_le(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_le(vector_int8_t src0, vector_int8_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_le(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_le(vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_le(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_le(vector_int16_t src0, vector_int16_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_le(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_le(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_le(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_le(vector_int32_t src0, vector_int32_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_le(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_le(vector_half src0, vector_half src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_le(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_le(vector_float src0, vector_float src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_le(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_le(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_le(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_le_scalar(vector_uint8_t src, uint8_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_le_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_le_scalar(vector_int8_t src, int8_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_le_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_le_scalar(vector_uint16_t src, uint16_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_le_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_le_scalar(vector_int16_t src, int16_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_le_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_le_scalar(vector_uint32_t src, uint32_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_le_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_le_scalar(vector_int32_t src, int32_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_le_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_le_scalar(vector_half src, half value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_le_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_le_scalar(vector_float src, float value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_le_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_le_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_le_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_gt(vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_gt(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_gt(vector_int8_t src0, vector_int8_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_gt(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_gt(vector_half src0, vector_half src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_gt(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_gt(vector_float src0, vector_float src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_gt(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_gt(vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_gt(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_gt(vector_int16_t src0, vector_int16_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_gt(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_gt(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_gt(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_gt(vector_int32_t src0, vector_int32_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_gt(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_gt(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_gt(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_gt_scalar(vector_uint8_t src, uint8_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_gt_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_gt_scalar(vector_int8_t src, int8_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_gt_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_gt_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_gt_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_gt_scalar(vector_uint16_t src, uint16_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_gt_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_gt_scalar(vector_int16_t src, int16_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_gt_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_gt_scalar(vector_uint32_t src, uint32_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_gt_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_gt_scalar(vector_int32_t src, int32_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_gt_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_gt_scalar(vector_half src, half value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_gt_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_gt_scalar(vector_float src, float value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_gt_scalar(dst, src, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_eq(vector_int8_t src0, vector_int8_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_eq(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_eq(vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_eq(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_eq(vector_int16_t src0, vector_int16_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_eq(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_eq(vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_eq(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_eq(vector_half src0, vector_half src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_eq(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_eq(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_eq(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_eq(vector_int32_t src0, vector_int32_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_eq(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_eq(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_eq(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_eq(vector_float src0, vector_float src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_eq(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_eq_scalar(vector_int8_t src0, int8_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_eq_scalar(dst, src0, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_eq_scalar(vector_uint8_t src0, uint8_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_eq_scalar(dst, src0, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_eq_scalar(vector_int16_t src0, int16_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_eq_scalar(dst, src0, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_eq_scalar(vector_uint16_t src0, uint16_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_eq_scalar(dst, src0, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_eq_scalar(vector_half src0, half value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_eq_scalar(dst, src0, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_eq_scalar(vector_bfloat16_t src0, bfloat16_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_eq_scalar(dst, src0, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_eq_scalar(vector_int32_t src0, int32_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_eq_scalar(dst, src0, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_eq_scalar(vector_uint32_t src0, uint32_t value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_eq_scalar(dst, src0, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_eq_scalar(vector_float src0, float value, vector_bool mask)
+{
+    vector_bool dst;
+    asc_eq_scalar(dst, src0, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ne(vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ne(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ne(vector_int8_t src0, vector_int8_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ne(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ne(vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ne(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ne(vector_int16_t src0, vector_int16_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ne(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ne(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ne(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ne(vector_int32_t src0, vector_int32_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ne(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ne(vector_half src0, vector_half src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ne(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ne(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ne(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bool asc_ne(vector_float src0, vector_float src1, vector_bool mask)
+{
+    vector_bool dst;
+    asc_ne(dst, src0, src1, mask);
+    return dst;
+}
+
 __simd_callee__ inline vector_bool asc_ne_scalar(vector_uint8_t src, uint8_t value, vector_bool mask)
 {
     vector_bool dst;
-    asc_ne_scalar_impl(dst, src, value, mask);
+    asc_ne_scalar(dst, src, value, mask);
     return dst;
 }
 
 __simd_callee__ inline vector_bool asc_ne_scalar(vector_int8_t src, int8_t value, vector_bool mask)
 {
     vector_bool dst;
-    asc_ne_scalar_impl(dst, src, value, mask);
+    asc_ne_scalar(dst, src, value, mask);
     return dst;
 }
 
 __simd_callee__ inline vector_bool asc_ne_scalar(vector_uint16_t src, uint16_t value, vector_bool mask)
 {
     vector_bool dst;
-    asc_ne_scalar_impl(dst, src, value, mask);
+    asc_ne_scalar(dst, src, value, mask);
     return dst;
 }
 
 __simd_callee__ inline vector_bool asc_ne_scalar(vector_int16_t src, int16_t value, vector_bool mask)
 {
     vector_bool dst;
-    asc_ne_scalar_impl(dst, src, value, mask);
+    asc_ne_scalar(dst, src, value, mask);
     return dst;
 }
 
 __simd_callee__ inline vector_bool asc_ne_scalar(vector_uint32_t src, uint32_t value, vector_bool mask)
 {
     vector_bool dst;
-    asc_ne_scalar_impl(dst, src, value, mask);
+    asc_ne_scalar(dst, src, value, mask);
     return dst;
 }
 
 __simd_callee__ inline vector_bool asc_ne_scalar(vector_int32_t src, int32_t value, vector_bool mask)
 {
     vector_bool dst;
-    asc_ne_scalar_impl(dst, src, value, mask);
+    asc_ne_scalar(dst, src, value, mask);
     return dst;
 }
 
 __simd_callee__ inline vector_bool asc_ne_scalar(vector_half src, half value, vector_bool mask)
 {
     vector_bool dst;
-    asc_ne_scalar_impl(dst, src, value, mask);
+    asc_ne_scalar(dst, src, value, mask);
     return dst;
 }
 
 __simd_callee__ inline vector_bool asc_ne_scalar(vector_float src, float value, vector_bool mask)
 {
     vector_bool dst;
-    asc_ne_scalar_impl(dst, src, value, mask);
+    asc_ne_scalar(dst, src, value, mask);
     return dst;
 }
 
 __simd_callee__ inline vector_bool asc_ne_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
 {
     vector_bool dst;
-    asc_ne_scalar_impl(dst, src, value, mask);
+    asc_ne_scalar(dst, src, value, mask);
     return dst;
 }
 

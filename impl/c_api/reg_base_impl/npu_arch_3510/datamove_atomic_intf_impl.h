@@ -18,8 +18,6 @@
 #ifndef IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_DATAMOVE_ATOMIC_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_DATAMOVE_ATOMIC_INTF_IMPL_H
 
-__aicore__ inline void asc_set_atomic_none_impl() { set_atomic_none(); }
-
 [[deprecated("NOTICE: asc_set_atomic_none is deprecated. Please use asc_disable_dma_atomic instead.")]]
 __aicore__ inline void asc_set_atomic_none()
 {

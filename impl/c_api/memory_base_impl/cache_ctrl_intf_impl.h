@@ -18,8 +18,6 @@
 #ifndef IMPL_C_API_MEMORY_BASE_IMPL_CACHE_CTRL_INTF_IMPL_H
 #define IMPL_C_API_MEMORY_BASE_IMPL_CACHE_CTRL_INTF_IMPL_H
 
-namespace __asc_aicore {} // namespace __asc_aicore
-
 namespace __asc_aicore {
 __aicore__ inline void asc_dcci_single(__gm__ void* dst) { dcci(dst, cache_line_t::SINGLE_CACHE_LINE); }
 } // namespace __asc_aicore

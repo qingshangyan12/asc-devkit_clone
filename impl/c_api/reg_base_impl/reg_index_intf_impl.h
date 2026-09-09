@@ -20,111 +20,6 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
-__simd_callee__ inline void asc_arange_impl(vector_int8_t& dst, int8_t value)
-{
-    if ASC_IS_AIV {
-        vci(dst, value, INC_ORDER);
-    }
-}
-
-__simd_callee__ inline void asc_arange_impl(vector_int16_t& dst, int16_t value)
-{
-    if ASC_IS_AIV {
-        vci(dst, value, INC_ORDER);
-    }
-}
-
-__simd_callee__ inline void asc_arange_impl(vector_int32_t& dst, int32_t value)
-{
-    if ASC_IS_AIV {
-        vci(dst, value, INC_ORDER);
-    }
-}
-
-__simd_callee__ inline void asc_arange_impl(vector_half& dst, half value)
-{
-    if ASC_IS_AIV {
-        vci(dst, value, INC_ORDER);
-    }
-}
-
-__simd_callee__ inline void asc_arange_impl(vector_float& dst, float value)
-{
-    if ASC_IS_AIV {
-        vci(dst, value, INC_ORDER);
-    }
-}
-
-__simd_callee__ inline void asc_arange_descend_impl(vector_int8_t& dst, int8_t value)
-{
-    if ASC_IS_AIV {
-        vci(dst, value, DEC_ORDER);
-    }
-}
-
-__simd_callee__ inline void asc_arange_descend_impl(vector_int16_t& dst, int16_t value)
-{
-    if ASC_IS_AIV {
-        vci(dst, value, DEC_ORDER);
-    }
-}
-
-__simd_callee__ inline void asc_arange_descend_impl(vector_int32_t& dst, int32_t value)
-{
-    if ASC_IS_AIV {
-        vci(dst, value, DEC_ORDER);
-    }
-}
-
-__simd_callee__ inline void asc_arange_descend_impl(vector_half& dst, half value)
-{
-    if ASC_IS_AIV {
-        vci(dst, value, DEC_ORDER);
-    }
-}
-
-__simd_callee__ inline void asc_arange_descend_impl(vector_float& dst, float value)
-{
-    if ASC_IS_AIV {
-        vci(dst, value, DEC_ORDER);
-    }
-}
-
-__simd_callee__ inline vector_int8_t asc_arange(int8_t value)
-{
-    vector_int8_t dst;
-    asc_arange_impl(dst, value);
-    return dst;
-}
-
-__simd_callee__ inline vector_int16_t asc_arange(int16_t value)
-{
-    vector_int16_t dst;
-    asc_arange_impl(dst, value);
-    return dst;
-}
-
-__simd_callee__ inline vector_int32_t asc_arange(int32_t value)
-{
-    vector_int32_t dst;
-    asc_arange_impl(dst, value);
-    return dst;
-}
-
-__simd_callee__ inline vector_half asc_arange(half value)
-{
-    vector_half dst;
-    asc_arange_impl(dst, value);
-    return dst;
-}
-
-__simd_callee__ inline vector_float asc_arange(float value)
-{
-    vector_float dst;
-    asc_arange_impl(dst, value);
-    return dst;
-}
-
 __simd_callee__ inline void asc_arange(vector_int8_t& dst, int8_t value)
 {
     if ASC_IS_AIV {
@@ -160,41 +55,6 @@ __simd_callee__ inline void asc_arange(vector_float& dst, float value)
     }
 }
 
-__simd_callee__ inline vector_int8_t asc_arange_descend(int8_t value)
-{
-    vector_int8_t dst;
-    asc_arange_descend_impl(dst, value);
-    return dst;
-}
-
-__simd_callee__ inline vector_int16_t asc_arange_descend(int16_t value)
-{
-    vector_int16_t dst;
-    asc_arange_descend_impl(dst, value);
-    return dst;
-}
-
-__simd_callee__ inline vector_int32_t asc_arange_descend(int32_t value)
-{
-    vector_int32_t dst;
-    asc_arange_descend_impl(dst, value);
-    return dst;
-}
-
-__simd_callee__ inline vector_half asc_arange_descend(half value)
-{
-    vector_half dst;
-    asc_arange_descend_impl(dst, value);
-    return dst;
-}
-
-__simd_callee__ inline vector_float asc_arange_descend(float value)
-{
-    vector_float dst;
-    asc_arange_descend_impl(dst, value);
-    return dst;
-}
-
 __simd_callee__ inline void asc_arange_descend(vector_int8_t& dst, int8_t value)
 {
     if ASC_IS_AIV {
@@ -228,6 +88,76 @@ __simd_callee__ inline void asc_arange_descend(vector_float& dst, float value)
     if ASC_IS_AIV {
         vci(dst, value, DEC_ORDER);
     }
+}
+
+__simd_callee__ inline vector_int8_t asc_arange(int8_t value)
+{
+    vector_int8_t dst;
+    asc_arange(dst, value);
+    return dst;
+}
+
+__simd_callee__ inline vector_int16_t asc_arange(int16_t value)
+{
+    vector_int16_t dst;
+    asc_arange(dst, value);
+    return dst;
+}
+
+__simd_callee__ inline vector_int32_t asc_arange(int32_t value)
+{
+    vector_int32_t dst;
+    asc_arange(dst, value);
+    return dst;
+}
+
+__simd_callee__ inline vector_half asc_arange(half value)
+{
+    vector_half dst;
+    asc_arange(dst, value);
+    return dst;
+}
+
+__simd_callee__ inline vector_float asc_arange(float value)
+{
+    vector_float dst;
+    asc_arange(dst, value);
+    return dst;
+}
+
+__simd_callee__ inline vector_int8_t asc_arange_descend(int8_t value)
+{
+    vector_int8_t dst;
+    asc_arange_descend(dst, value);
+    return dst;
+}
+
+__simd_callee__ inline vector_int16_t asc_arange_descend(int16_t value)
+{
+    vector_int16_t dst;
+    asc_arange_descend(dst, value);
+    return dst;
+}
+
+__simd_callee__ inline vector_int32_t asc_arange_descend(int32_t value)
+{
+    vector_int32_t dst;
+    asc_arange_descend(dst, value);
+    return dst;
+}
+
+__simd_callee__ inline vector_half asc_arange_descend(half value)
+{
+    vector_half dst;
+    asc_arange_descend(dst, value);
+    return dst;
+}
+
+__simd_callee__ inline vector_float asc_arange_descend(float value)
+{
+    vector_float dst;
+    asc_arange_descend(dst, value);
+    return dst;
 }
 
 #endif

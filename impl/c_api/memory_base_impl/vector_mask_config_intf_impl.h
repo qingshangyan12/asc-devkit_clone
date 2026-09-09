@@ -30,7 +30,7 @@ __aicore__ inline void asc_set_mask_count()
 __aicore__ inline void asc_set_mask_norm()
 {
     if ASC_IS_AIV {
-        set_mask_norm();
+        asc_set_mask_count_end();
     }
 }
 

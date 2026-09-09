@@ -21,7 +21,7 @@
 #include "impl/c_api/memory_base_impl/utils_impl.h"
 
 // asc_select half
-__aicore__ inline void asc_select_impl(
+__aicore__ inline void asc_select(
     __ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride)
@@ -33,10 +33,10 @@ __aicore__ inline void asc_select_impl(
     }
 }
 
-__aicore__ inline void asc_select_impl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
+__aicore__ inline void asc_select(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_select_impl(
+    asc_select(
         dst, src0, src1, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8,
         ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT_STRIDE.U8,
         ASC_C_API_DEFAULT_REPEAT_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT_STRIDE.U8);
@@ -44,7 +44,7 @@ __aicore__ inline void asc_select_impl(__ubuf__ half* dst, __ubuf__ half* src0, 
 }
 
 // asc_select float
-__aicore__ inline void asc_select_impl(
+__aicore__ inline void asc_select(
     __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride)
@@ -56,24 +56,24 @@ __aicore__ inline void asc_select_impl(
     }
 }
 
-__aicore__ inline void asc_select_impl(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
+__aicore__ inline void asc_select(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_select_impl(
+    asc_select(
         dst, src0, src1, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8,
         ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT_STRIDE.U8,
         ASC_C_API_DEFAULT_REPEAT_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT_STRIDE.U8);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_transpose_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src)
+__aicore__ inline void asc_transpose(__ubuf__ int16_t* dst, __ubuf__ int16_t* src)
 {
     if ASC_IS_AIV {
         vtranspose(dst, src);
     }
 }
 
-__aicore__ inline void asc_transpose_impl(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src)
+__aicore__ inline void asc_transpose(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src)
 {
     if ASC_IS_AIV {
         vtranspose(dst, src);
@@ -95,50 +95,9 @@ __aicore__ inline void asc_transpose_impl(__ubuf__ uint16_t* dst, __ubuf__ uint1
         }                                                                                                    \
     } while (0)
 
-__aicore__ inline void asc_transto5hd_b8_impl(
-    ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride, bool dst_high_half,
-    bool src_high_half)
-{
-    if ASC_IS_AIV {
-        if (dst == ub_addr8_t::VA0) {
-            if (src == ub_addr8_t::VA2) {
-                ASC_TRANSTO5HD_B8_CALL(VA0, VA2, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
-            } else if (src == ub_addr8_t::VA4) {
-                ASC_TRANSTO5HD_B8_CALL(VA0, VA4, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
-            } else if (src == ub_addr8_t::VA6) {
-                ASC_TRANSTO5HD_B8_CALL(VA0, VA6, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
-            }
-        } else if (dst == ub_addr8_t::VA2) {
-            if (src == ub_addr8_t::VA0) {
-                ASC_TRANSTO5HD_B8_CALL(VA2, VA0, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
-            } else if (src == ub_addr8_t::VA4) {
-                ASC_TRANSTO5HD_B8_CALL(VA2, VA4, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
-            } else if (src == ub_addr8_t::VA6) {
-                ASC_TRANSTO5HD_B8_CALL(VA2, VA6, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
-            }
-        } else if (dst == ub_addr8_t::VA4) {
-            if (src == ub_addr8_t::VA0) {
-                ASC_TRANSTO5HD_B8_CALL(VA4, VA0, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
-            } else if (src == ub_addr8_t::VA2) {
-                ASC_TRANSTO5HD_B8_CALL(VA4, VA2, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
-            } else if (src == ub_addr8_t::VA6) {
-                ASC_TRANSTO5HD_B8_CALL(VA4, VA6, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
-            }
-        } else if (dst == ub_addr8_t::VA6) {
-            if (src == ub_addr8_t::VA0) {
-                ASC_TRANSTO5HD_B8_CALL(VA6, VA0, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
-            } else if (src == ub_addr8_t::VA2) {
-                ASC_TRANSTO5HD_B8_CALL(VA6, VA2, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
-            } else if (src == ub_addr8_t::VA4) {
-                ASC_TRANSTO5HD_B8_CALL(VA6, VA4, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
-            }
-        }
-    }
-}
-
 #undef ASC_TRANSTO5HD_B8_CALL
 
-__aicore__ inline void asc_transto5hd_b16_impl(
+__aicore__ inline void asc_transto5hd_b16(
     ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride)
 {
     if ASC_IS_AIV {
@@ -178,7 +137,7 @@ __aicore__ inline void asc_transto5hd_b16_impl(
     }
 }
 
-__aicore__ inline void asc_transto5hd_b32_impl(
+__aicore__ inline void asc_transto5hd_b32(
     ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride)
 {
     if ASC_IS_AIV {
@@ -215,64 +174,6 @@ __aicore__ inline void asc_transto5hd_b32_impl(
                 scatter_vnchwconv_b32(VA6, VA4, repeat, dst_stride, src_stride);
             }
         }
-    }
-}
-
-__aicore__ inline void asc_select(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
-{
-    asc_set_mask_count_begin(count);
-    asc_select_impl(
-        dst, src0, src1, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8,
-        ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT_STRIDE.U8,
-        ASC_C_API_DEFAULT_REPEAT_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT_STRIDE.U8);
-    asc_set_mask_count_end();
-}
-
-__aicore__ inline void asc_select(
-    __ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
-    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
-    uint8_t src1_repeat_stride)
-{
-    if ASC_IS_AIV {
-        vsel(
-            dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride,
-            src0_repeat_stride, src1_repeat_stride);
-    }
-}
-
-__aicore__ inline void asc_select(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
-{
-    asc_set_mask_count_begin(count);
-    asc_select_impl(
-        dst, src0, src1, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8,
-        ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT_STRIDE.U8,
-        ASC_C_API_DEFAULT_REPEAT_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT_STRIDE.U8);
-    asc_set_mask_count_end();
-}
-
-__aicore__ inline void asc_select(
-    __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
-    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
-    uint8_t src1_repeat_stride)
-{
-    if ASC_IS_AIV {
-        vsel(
-            dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride,
-            src0_repeat_stride, src1_repeat_stride);
-    }
-}
-
-__aicore__ inline void asc_transpose(__ubuf__ int16_t* dst, __ubuf__ int16_t* src)
-{
-    if ASC_IS_AIV {
-        vtranspose(dst, src);
-    }
-}
-
-__aicore__ inline void asc_transpose(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src)
-{
-    if ASC_IS_AIV {
-        vtranspose(dst, src);
     }
 }
 
@@ -456,86 +357,6 @@ __aicore__ inline void asc_transto5hd_b8(
                         scatter_vnchwconv_b8(VA6, VA4, repeat, dst_stride, src_stride, true, true);
                     }
                 } while (0);
-            }
-        }
-    }
-}
-
-__aicore__ inline void asc_transto5hd_b16(
-    ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride)
-{
-    if ASC_IS_AIV {
-        if (dst == ub_addr8_t::VA0) {
-            if (src == ub_addr8_t::VA2) {
-                scatter_vnchwconv_b16(VA0, VA2, repeat, dst_stride, src_stride);
-            } else if (src == ub_addr8_t::VA4) {
-                scatter_vnchwconv_b16(VA0, VA4, repeat, dst_stride, src_stride);
-            } else if (src == ub_addr8_t::VA6) {
-                scatter_vnchwconv_b16(VA0, VA6, repeat, dst_stride, src_stride);
-            }
-        } else if (dst == ub_addr8_t::VA2) {
-            if (src == ub_addr8_t::VA0) {
-                scatter_vnchwconv_b16(VA2, VA0, repeat, dst_stride, src_stride);
-            } else if (src == ub_addr8_t::VA4) {
-                scatter_vnchwconv_b16(VA2, VA4, repeat, dst_stride, src_stride);
-            } else if (src == ub_addr8_t::VA6) {
-                scatter_vnchwconv_b16(VA2, VA6, repeat, dst_stride, src_stride);
-            }
-        } else if (dst == ub_addr8_t::VA4) {
-            if (src == ub_addr8_t::VA0) {
-                scatter_vnchwconv_b16(VA4, VA0, repeat, dst_stride, src_stride);
-            } else if (src == ub_addr8_t::VA2) {
-                scatter_vnchwconv_b16(VA4, VA2, repeat, dst_stride, src_stride);
-            } else if (src == ub_addr8_t::VA6) {
-                scatter_vnchwconv_b16(VA4, VA6, repeat, dst_stride, src_stride);
-            }
-        } else if (dst == ub_addr8_t::VA6) {
-            if (src == ub_addr8_t::VA0) {
-                scatter_vnchwconv_b16(VA6, VA0, repeat, dst_stride, src_stride);
-            } else if (src == ub_addr8_t::VA2) {
-                scatter_vnchwconv_b16(VA6, VA2, repeat, dst_stride, src_stride);
-            } else if (src == ub_addr8_t::VA4) {
-                scatter_vnchwconv_b16(VA6, VA4, repeat, dst_stride, src_stride);
-            }
-        }
-    }
-}
-
-__aicore__ inline void asc_transto5hd_b32(
-    ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride)
-{
-    if ASC_IS_AIV {
-        if (dst == ub_addr8_t::VA0) {
-            if (src == ub_addr8_t::VA2) {
-                scatter_vnchwconv_b32(VA0, VA2, repeat, dst_stride, src_stride);
-            } else if (src == ub_addr8_t::VA4) {
-                scatter_vnchwconv_b32(VA0, VA4, repeat, dst_stride, src_stride);
-            } else if (src == ub_addr8_t::VA6) {
-                scatter_vnchwconv_b32(VA0, VA6, repeat, dst_stride, src_stride);
-            }
-        } else if (dst == ub_addr8_t::VA2) {
-            if (src == ub_addr8_t::VA0) {
-                scatter_vnchwconv_b32(VA2, VA0, repeat, dst_stride, src_stride);
-            } else if (src == ub_addr8_t::VA4) {
-                scatter_vnchwconv_b32(VA2, VA4, repeat, dst_stride, src_stride);
-            } else if (src == ub_addr8_t::VA6) {
-                scatter_vnchwconv_b32(VA2, VA6, repeat, dst_stride, src_stride);
-            }
-        } else if (dst == ub_addr8_t::VA4) {
-            if (src == ub_addr8_t::VA0) {
-                scatter_vnchwconv_b32(VA4, VA0, repeat, dst_stride, src_stride);
-            } else if (src == ub_addr8_t::VA2) {
-                scatter_vnchwconv_b32(VA4, VA2, repeat, dst_stride, src_stride);
-            } else if (src == ub_addr8_t::VA6) {
-                scatter_vnchwconv_b32(VA4, VA6, repeat, dst_stride, src_stride);
-            }
-        } else if (dst == ub_addr8_t::VA6) {
-            if (src == ub_addr8_t::VA0) {
-                scatter_vnchwconv_b32(VA6, VA0, repeat, dst_stride, src_stride);
-            } else if (src == ub_addr8_t::VA2) {
-                scatter_vnchwconv_b32(VA6, VA2, repeat, dst_stride, src_stride);
-            } else if (src == ub_addr8_t::VA4) {
-                scatter_vnchwconv_b32(VA6, VA4, repeat, dst_stride, src_stride);
             }
         }
     }

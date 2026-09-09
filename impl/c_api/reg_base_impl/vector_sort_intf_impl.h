@@ -20,48 +20,6 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
-__aicore__ inline void asc_bitsort_impl(
-    __ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat)
-{
-    if ASC_IS_AIV {
-        uint64_t config = (static_cast<uint64_t>(repeat) & 0xff) << 56;
-        vbs(dst, src0, src1, config);
-    }
-}
-
-__aicore__ inline void asc_bitsort_impl(
-    __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, int32_t repeat)
-{
-    if ASC_IS_AIV {
-        uint64_t config = (static_cast<uint64_t>(repeat) & 0xff) << 56;
-        vbs(dst, src0, src1, config);
-    }
-}
-
-__aicore__ inline void asc_mrgsort4_impl(
-    __ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0,
-    uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension,
-    uint8_t valid_bit)
-{
-    if ASC_IS_AIV {
-        vmrgsort4(
-            dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
-            if_exhausted_suspension, valid_bit);
-    }
-}
-
-__aicore__ inline void asc_mrgsort4_impl(
-    __ubuf__ float* dst, __ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0,
-    uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension,
-    uint8_t valid_bit)
-{
-    if ASC_IS_AIV {
-        vmrgsort4(
-            dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
-            if_exhausted_suspension, valid_bit);
-    }
-}
-
 __aicore__ inline void asc_bitsort(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat)
 {
     if ASC_IS_AIV {
@@ -83,9 +41,11 @@ __aicore__ inline void asc_mrgsort4(
     uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension,
     uint8_t valid_bit)
 {
-    asc_mrgsort4_impl(
-        dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
-        if_exhausted_suspension, valid_bit);
+    if ASC_IS_AIV {
+        vmrgsort4(
+            dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
+            if_exhausted_suspension, valid_bit);
+    }
 }
 
 __aicore__ inline void asc_mrgsort4(
@@ -93,9 +53,11 @@ __aicore__ inline void asc_mrgsort4(
     uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension,
     uint8_t valid_bit)
 {
-    asc_mrgsort4_impl(
-        dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
-        if_exhausted_suspension, valid_bit);
+    if ASC_IS_AIV {
+        vmrgsort4(
+            dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
+            if_exhausted_suspension, valid_bit);
+    }
 }
 
 #endif

@@ -20,7 +20,6 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
-// ==========asc_cumulative_histogram/asc_frequency_histogram==========
 __simd_callee__ inline void asc_cumulative_histogram_bin0(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {

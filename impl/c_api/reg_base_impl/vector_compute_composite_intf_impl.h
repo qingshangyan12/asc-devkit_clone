@@ -18,12 +18,6 @@
 #ifndef IMPL_C_API_REG_BASE_IMPL_VECTOR_COMPUTE_COMPOSITE_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_VECTOR_COMPUTE_COMPOSITE_INTF_IMPL_H
 
-#include "impl/c_api/reg_base_impl/vector_sort_intf_impl.h"
-
-#include "impl/c_api/reg_base_impl/vector_permute_sel_intf_impl.h"
-
-#include "impl/c_api/reg_base_impl/vector_datamove_intf_impl.h"
-
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/reg_base_impl/npu_arch_3510/vector_compute_composite_intf_impl.h"
 #endif

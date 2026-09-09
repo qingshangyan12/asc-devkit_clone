@@ -28,8 +28,6 @@ union ctrl_scalar_cache_bits {
     };
 };
 
-namespace __asc_aicore {} // namespace __asc_aicore
-
 // Enum underlying values match HW encodings; cast is used as-is (illegal codes are not normalized).
 
 __aicore__ inline void asc_icache_preload(const void* addr, int64_t prefetch_len) { preload(addr, prefetch_len); }
@@ -78,7 +76,6 @@ __aicore__ inline void asc_set_scalar_cache_mode(asc_store_l2_cache_mode l2_cach
     set_ctrl(static_cast<int64_t>(ctrl.value));
 }
 
-//==============asc_get_scalar_load/store_cache_mode===============
 __aicore__ inline asc_load_l2_cache_mode asc_get_scalar_load_cache_mode()
 {
     constexpr uint8_t start_bit = 16; // READ mode: CTRL[19:16]
