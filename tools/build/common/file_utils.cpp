@@ -422,15 +422,19 @@ bool FileUtils::ResolveRegularFilePathForWrite(const std::string& path, std::str
         ASCENDLOGE("Output path must name a file: path=%s", path.c_str());
         return false;
     }
+    const std::string parentPath = inputPath.has_parent_path() ? inputPath.parent_path().string() : ".";
+    std::string canonicalParentPath;
+    if (!ResolveCanonicalPath(parentPath, canonicalParentPath)) {
+        return false;
+    }
     boost::system::error_code error;
-    const fs::path parent = fs::canonical(inputPath.has_parent_path() ? inputPath.parent_path() : fs::path("."), error);
-    if (error || !fs::is_directory(parent, error) || error) {
+    if (!fs::is_directory(fs::path(canonicalParentPath), error) || error) {
         ASCENDLOGE(
             "Failed to resolve output parent directory: path=%s error=%d message=%s", path.c_str(), error.value(),
             error ? error.message().c_str() : "parent is not a directory");
         return false;
     }
-    const fs::path candidate = parent / filename;
+    const fs::path candidate = fs::path(canonicalParentPath) / filename;
     const fs::file_status status = fs::symlink_status(candidate, error);
     if (status.type() != fs::file_not_found && (error || !fs::is_regular_file(status))) {
         ASCENDLOGE(
