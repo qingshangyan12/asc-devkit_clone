@@ -31,6 +31,26 @@
 using namespace mc2_ops_hccl;
 
 namespace {
+struct Mc2CcArgs {
+    static constexpr uint32_t GROUP_NAME_SIZE = 128U;
+    static constexpr uint32_t ALG_CONFIG_SIZE = 128U;
+
+    HcclDataType srcDataType;
+    HcclDataType dstDataType;
+    HcclReduceOp reduceType;
+    char groupName[GROUP_NAME_SIZE];
+    char algConfig[ALG_CONFIG_SIZE];
+    uint8_t commEngine;
+
+    void Init()
+    {
+        srcDataType = HCCL_DATA_TYPE_FP16;
+        dstDataType = HCCL_DATA_TYPE_FP16;
+        reduceType = HCCL_REDUCE_SUM;
+        groupName[0] = '\0';
+    }
+};
+
 const char* GetMc2OpTypeName(HcclCMDType opType)
 {
     switch (opType) {
@@ -49,156 +69,6 @@ const char* GetMc2OpTypeName(HcclCMDType opType)
     }
 }
 } // namespace
-
-constexpr uint32_t ALG_CONFIG_SIZE = 128;
-struct HcclOpArgs {
-    HcclDataType srcDataType;
-    HcclDataType dstDataType;
-    HcclReduceOp reduceType;
-    uint64_t count;
-    char algConfig[ALG_CONFIG_SIZE];
-    CommEngine commEngine;
-    uint64_t reverse;
-
-    void Init()
-    {
-        srcDataType = HCCL_DATA_TYPE_FP16;
-        dstDataType = HCCL_DATA_TYPE_FP16;
-        reduceType = HCCL_REDUCE_SUM;
-        count = 0;
-    }
-};
-
-HcclResult Mc2KfcAllocOpArgs(void** opArgs)
-{
-    CHK_PTR_NULL(opArgs);
-
-    HcclOpArgs* opArgsMem = (HcclOpArgs*)malloc(sizeof(HcclOpArgs));
-    if (opArgsMem == nullptr) {
-        HCCL_ERROR("[Mc2KfcAllocOpArgs] malloc HcclOpArgs mem failed, please check.");
-        return HCCL_E_INTERNAL;
-    }
-    opArgsMem->Init();
-    *opArgs = opArgsMem;
-    HCCL_RUN_INFO("[Mc2KfcAllocOpArgs] malloc HcclOpArgs success, please fill mem[%p->%p] in it.", opArgs, *opArgs);
-
-    return HCCL_SUCCESS;
-}
-
-HcclResult Mc2KfcFreeOpArgs(void* opArgs)
-{
-    CHK_PTR_NULL(opArgs);
-
-    free(opArgs);
-    opArgs = nullptr;
-
-    return HCCL_SUCCESS;
-}
-
-HcclResult Mc2KfcOpArgsSetSrcDataType(void* opArgs, uint8_t srcDataType)
-{
-    CHK_PTR_NULL(opArgs);
-    CHK_RET(HcomCheckDataType(static_cast<HcclDataType>(srcDataType)));
-
-    HcclOpArgs* opArgsPtr = static_cast<HcclOpArgs*>(opArgs);
-    opArgsPtr->srcDataType = static_cast<HcclDataType>(srcDataType);
-
-    return HCCL_SUCCESS;
-}
-
-HcclResult Mc2KfcOpArgsSetDstDataType(void* opArgs, uint8_t dstDataType)
-{
-    CHK_PTR_NULL(opArgs);
-    CHK_RET(HcomCheckDataType(static_cast<HcclDataType>(dstDataType)));
-
-    HcclOpArgs* opArgsPtr = static_cast<HcclOpArgs*>(opArgs);
-    opArgsPtr->dstDataType = static_cast<HcclDataType>(dstDataType);
-
-    return HCCL_SUCCESS;
-}
-
-HcclResult Mc2KfcOpArgsSetReduceType(void* opArgs, uint32_t reduceType)
-{
-    CHK_PTR_NULL(opArgs);
-    CHK_RET(HcomCheckReductionOp(static_cast<HcclReduceOp>(reduceType)));
-
-    HcclOpArgs* opArgsPtr = static_cast<HcclOpArgs*>(opArgs);
-    opArgsPtr->reduceType = static_cast<HcclReduceOp>(reduceType);
-
-    return HCCL_SUCCESS;
-}
-
-HcclResult Mc2KfcOpArgsSetCount(void* opArgs, uint64_t count)
-{
-    CHK_PTR_NULL(opArgs);
-    if (count > SYS_MAX_COUNT) {
-        HCCL_ERROR("[%s] count[%llu] is invalid (bigger than MAX count[%lu])", __func__, count, SYS_MAX_COUNT);
-        return HCCL_E_PARA;
-    }
-
-    HcclOpArgs* opArgsPtr = static_cast<HcclOpArgs*>(opArgs);
-    opArgsPtr->count = count;
-
-    return HCCL_SUCCESS;
-}
-
-HcclResult Mc2KfcOpArgsSetAlgConfig(void* opArgs, char* algConfig)
-{
-    CHK_PTR_NULL(opArgs);
-    CHK_PTR_NULL(algConfig);
-
-    HcclOpArgs* opArgsPtr = static_cast<HcclOpArgs*>(opArgs);
-    s32 ret = strcpy_s(opArgsPtr->algConfig, ALG_CONFIG_SIZE, algConfig);
-    if (ret != EOK) {
-        HCCL_ERROR("[%s] strcpy_s algConfig failed, ret[%d]", __func__, ret);
-        return HCCL_E_PARA;
-    }
-
-    return HCCL_SUCCESS;
-}
-
-HcclResult Mc2KfcOpArgsSetCommEngine(void* opArgs, uint8_t commEngine)
-{
-    CHK_PTR_NULL(opArgs);
-    // A3只支持AICPU和AIV场景
-    if (commEngine != COMM_ENGINE_AICPU && commEngine != COMM_ENGINE_AIV) {
-        HCCL_ERROR("[%s] commEngine[%u] not supported", __func__, commEngine);
-        return HCCL_E_NOT_SUPPORT;
-    }
-
-    HcclOpArgs* opArgsPtr = static_cast<HcclOpArgs*>(opArgs);
-    opArgsPtr->commEngine = static_cast<CommEngine>(commEngine);
-
-    return HCCL_SUCCESS;
-}
-
-HcclResult Mc2CreateOpResCtx(HcclComm comm, uint8_t opType, void* opArgs, void** opResCtx)
-{
-    CHK_PTR_NULL(comm);
-    CHK_PTR_NULL(opArgs);
-    CHK_PTR_NULL(opResCtx);
-    if (opType >= static_cast<uint8_t>(HcclCMDType::HCCL_CMD_MAX)) {
-        HCCL_ERROR("[%s] invalid opType[%u]", __func__, opType);
-        return HCCL_E_PARA;
-    }
-
-    CHK_RET(InitEnvConfig());
-
-    HcclOpArgs* opArgsPtr = static_cast<HcclOpArgs*>(opArgs);
-    if (GetExternalInputHcclEnableEntryLog()) {
-        HCCL_RUN_INFO(
-            "Entry-Mc2KfcCreateOpResCtx, opType[%u], opArgs[%p], srcDataType[%u], dstDataType[%u], reduceType[%u], "
-            "count[%llu], algConfig[%s], commEngine[%u], opResCtx[%p]",
-            opType, opArgs, opArgsPtr->srcDataType, opArgsPtr->dstDataType, opArgsPtr->reduceType, opArgsPtr->count,
-            opArgsPtr->algConfig, opArgsPtr->commEngine, opResCtx);
-    }
-
-    CHK_RET(HcclCreateOpResCtxInner(
-        comm, opType, opArgsPtr->srcDataType, opArgsPtr->dstDataType, opArgsPtr->reduceType, opArgsPtr->count,
-        opArgsPtr->algConfig, opArgsPtr->commEngine, opResCtx));
-
-    return HCCL_SUCCESS;
-}
 
 // 公共逻辑：构造topoTag/ctxTag并校验ccTiling参数
 HcclResult BuildTagsAndValidate(
@@ -434,6 +304,7 @@ HcclResult HcclAllocComResourceByTilingImpl(
         comm, stream, mc2Tiling, ccTilingList, tilingNum, commName, rankSize, userRank, commEngine, opResCtx, checkOnly,
         startut);
 }
+
 } // namespace
 
 HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTiling(
@@ -459,6 +330,247 @@ extern "C" HcclResult __attribute__((visibility("default"))) HcclAllocComResourc
         "comm[%p], stream[%p], tiling[%p].",
         comm, stream, mc2Tiling);
     return HcclAllocComResourceByTilingImpl(comm, stream, mc2Tiling, opResCtx);
+}
+
+HcclResult Mc2GetCcArgs(void** ccArgs)
+{
+    CHK_PTR_NULL(ccArgs);
+
+    Mc2CcArgs* ccArgsMem = static_cast<Mc2CcArgs*>(malloc(sizeof(Mc2CcArgs)));
+    if (ccArgsMem == nullptr) {
+        HCCL_ERROR("[Mc2GetCcArgs] malloc Mc2CcArgs mem failed, please check.");
+        return HCCL_E_INTERNAL;
+    }
+    ccArgsMem->Init();
+    *ccArgs = ccArgsMem;
+    HCCL_RUN_INFO("[Mc2GetCcArgs] malloc Mc2CcArgs success, please fill mem[%p->%p] in it.", ccArgs, *ccArgs);
+
+    return HCCL_SUCCESS;
+}
+
+HcclResult Mc2FreeCcArgs(void* ccArgs)
+{
+    CHK_PTR_NULL(ccArgs);
+
+    free(ccArgs);
+    ccArgs = nullptr;
+
+    return HCCL_SUCCESS;
+}
+
+HcclResult Mc2SetCcSrcDataType(void* ccArgs, uint8_t srcDataType)
+{
+    CHK_PTR_NULL(ccArgs);
+    CHK_RET(HcomCheckDataType(static_cast<HcclDataType>(srcDataType)));
+
+    Mc2CcArgs* ccArgsPtr = static_cast<Mc2CcArgs*>(ccArgs);
+    ccArgsPtr->srcDataType = static_cast<HcclDataType>(srcDataType);
+
+    return HCCL_SUCCESS;
+}
+
+HcclResult Mc2SetCcDstDataType(void* ccArgs, uint8_t dstDataType)
+{
+    CHK_PTR_NULL(ccArgs);
+    CHK_RET(HcomCheckDataType(static_cast<HcclDataType>(dstDataType)));
+
+    Mc2CcArgs* ccArgsPtr = static_cast<Mc2CcArgs*>(ccArgs);
+    ccArgsPtr->dstDataType = static_cast<HcclDataType>(dstDataType);
+
+    return HCCL_SUCCESS;
+}
+
+HcclResult Mc2SetCcReduceType(void* ccArgs, uint32_t reduceType)
+{
+    CHK_PTR_NULL(ccArgs);
+    CHK_RET(HcomCheckReductionOp(static_cast<HcclReduceOp>(reduceType)));
+
+    Mc2CcArgs* ccArgsPtr = static_cast<Mc2CcArgs*>(ccArgs);
+    ccArgsPtr->reduceType = static_cast<HcclReduceOp>(reduceType);
+
+    return HCCL_SUCCESS;
+}
+
+HcclResult Mc2SetCcAlgConfig(void* ccArgs, char* algConfig)
+{
+    CHK_PTR_NULL(ccArgs);
+    CHK_PTR_NULL(algConfig);
+
+    Mc2CcArgs* ccArgsPtr = static_cast<Mc2CcArgs*>(ccArgs);
+    s32 ret = strcpy_s(ccArgsPtr->algConfig, sizeof(ccArgsPtr->algConfig), algConfig);
+    if (ret != EOK) {
+        HCCL_ERROR("[%s] strcpy_s algConfig failed, ret[%d]", __func__, ret);
+        return HCCL_E_PARA;
+    }
+
+    return HCCL_SUCCESS;
+}
+
+HcclResult Mc2SetCcCommEngine(void* ccArgs, uint8_t commEngine)
+{
+    CHK_PTR_NULL(ccArgs);
+    if (commEngine != static_cast<uint8_t>(OpExecuteConfig::CCU_MS) &&
+        commEngine != static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED) &&
+        commEngine != static_cast<uint8_t>(OpExecuteConfig::AICPU) &&
+        commEngine != static_cast<uint8_t>(OpExecuteConfig::AICPU_TS)) {
+        HCCL_ERROR("[%s] commEngine[%u] not supported", __func__, commEngine);
+        return HCCL_E_NOT_SUPPORT;
+    }
+
+    Mc2CcArgs* ccArgsPtr = static_cast<Mc2CcArgs*>(ccArgs);
+    ccArgsPtr->commEngine = commEngine;
+
+    return HCCL_SUCCESS;
+}
+
+HcclResult Mc2SetCcGroupName(void* ccArgs, char* groupName)
+{
+    CHK_PTR_NULL(ccArgs);
+    CHK_PTR_NULL(groupName);
+
+    Mc2CcArgs* ccArgsPtr = static_cast<Mc2CcArgs*>(ccArgs);
+    s32 ret = strcpy_s(ccArgsPtr->groupName, sizeof(ccArgsPtr->groupName), groupName);
+    if (ret != EOK) {
+        HCCL_ERROR("[%s] strcpy_s groupName failed, ret[%d]", __func__, ret);
+        return HCCL_E_PARA;
+    }
+    return HCCL_SUCCESS;
+}
+
+namespace {
+HcclResult ValidateCcType(uint8_t ccType)
+{
+    switch (static_cast<HcclCMDType>(ccType)) {
+        case HcclCMDType::HCCL_CMD_ALLGATHER:
+        case HcclCMDType::HCCL_CMD_ALLREDUCE:
+        case HcclCMDType::HCCL_CMD_REDUCE_SCATTER:
+        case HcclCMDType::HCCL_CMD_ALLTOALL:
+        case HcclCMDType::HCCL_CMD_ALLTOALLV:
+            break;
+        default:
+            HCCL_ERROR("[%s] unsupported ccType[%u]", __func__, ccType);
+            return HCCL_E_NOT_SUPPORT;
+    }
+    return HCCL_SUCCESS;
+}
+
+HcclResult PrepareCcOpParam(
+    uint8_t ccType, const Mc2CcArgs& args, const std::string& topoTag, const char* commName, uint32_t rankSize,
+    OpParam& opParam)
+{
+    opParam.opType = static_cast<HcclCMDType>(ccType);
+    const bool isReduce =
+        opParam.opType == HcclCMDType::HCCL_CMD_ALLREDUCE || opParam.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
+    CHK_RET(CheckDataType(args.srcDataType, isReduce));
+    CHK_RET(PrepareOpsCommParam(topoTag, opParam));
+    CHK_SAFETY_FUNC_RET(strcpy_s(opParam.commName, sizeof(opParam.commName), commName));
+    opParam.stream = nullptr;
+    opParam.engine = OpExecuteConfigToCommEngine(args.commEngine);
+    opParam.opExecuteConfig = static_cast<OpExecuteConfig>(args.commEngine);
+    opParam.commOpExpansionMode = HcclOpExpansionMode::HCCL_OP_EXPANSION_MODE_AI_CPU;
+    opParam.reduceType = isReduce ? args.reduceType : HCCL_REDUCE_SUM;
+
+    if (opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALL || opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
+        opParam.varMemSize = ALL_TO_ALL_V_VECTOR_NUM * rankSize * sizeof(uint64_t);
+        opParam.all2AllVDataDes.sendType = args.srcDataType;
+        opParam.all2AllVDataDes.recvType = args.dstDataType;
+        opParam.all2AllVDataDes.sendCounts = nullptr;
+        opParam.all2AllVDataDes.recvCounts = nullptr;
+        opParam.all2AllVDataDes.sdispls = nullptr;
+        opParam.all2AllVDataDes.rdispls = nullptr;
+    } else {
+        opParam.DataDes.dataType = args.srcDataType;
+        opParam.DataDes.count = 0;
+        if (opParam.opType == HcclCMDType::HCCL_CMD_ALLREDUCE) {
+            opParam.DataDes.outputType = args.srcDataType;
+        }
+    }
+    return HCCL_SUCCESS;
+}
+
+HcclResult Mc2AcquireCcResCtxImpl(HcclComm comm, uint8_t ccType, void* ccArgs, void** ccResCtx, uint32_t* ccResCtxSize)
+{
+    HCCL_RUN_INFO(
+        "[MC2_CLIENT_A5] enter asc-devkit common Mc2AcquireCcResCtx, "
+        "comm[%p], ccType[%u], ccArgs[%p].",
+        comm, static_cast<uint32_t>(ccType), ccArgs);
+    HcclUs startut = TIME_NOW();
+    CHK_PTR_NULL(ccResCtx);
+    CHK_PTR_NULL(ccResCtxSize);
+    *ccResCtx = nullptr;
+    *ccResCtxSize = 0;
+
+    CHK_PTR_NULL(comm);
+    CHK_PTR_NULL(ccArgs);
+    const auto& args = *static_cast<const Mc2CcArgs*>(ccArgs);
+    CHK_RET(ValidateCcType(ccType));
+
+    DevType deviceType = DevType::DEV_TYPE_COUNT;
+    CHK_RET(hrtGetDeviceType(deviceType));
+    if (deviceType != DevType::DEV_TYPE_950) {
+        HCCL_ERROR("[%s] unsupported deviceType[%u]", __func__, deviceType);
+        return HCCL_E_NOT_SUPPORT;
+    }
+    CHK_RET(InitEnvConfig());
+    uint32_t rankSize = 0;
+    uint32_t rankId = 0;
+    CHK_RET(HcclGetRankSize(comm, &rankSize));
+    CHK_RET(HcclGetRankId(comm, &rankId));
+    CHK_RET(HcomCheckUserRank(rankSize, rankId));
+
+    char commName[COMM_INDENTIFIER_MAX_LENGTH]{};
+    CHK_RET(HcclGetCommName(comm, commName));
+
+    std::string ctxTag;
+    OpParam opParam{};
+    void* result = nullptr;
+    switch (static_cast<OpExecuteConfig>(args.commEngine)) {
+        case OpExecuteConfig::AICPU_TS: {
+            const std::string topoTag =
+                std::to_string(ccType) + "_" + std::to_string(args.srcDataType) + "_" + commName;
+            CHK_RET(HcclCheckTag(topoTag.c_str()));
+            ctxTag = std::string(args.groupName) + "_" + std::to_string(ccType) + "_" + args.algConfig + "_" +
+                     std::to_string(args.commEngine);
+            CHK_RET(PrepareCcOpParam(ccType, args, topoTag, commName, rankSize, opParam));
+            CHK_RET(PrepareCcAlgResources(comm, args.algConfig, opParam, true));
+            // The resource storage engine is AICPU; the selected execution engine is stored in opParam.
+            CHK_RET(HcclAllocOpResCtx(comm, ctxTag, opParam, OpExecuteConfigToCommEngine(args.commEngine), &result));
+            break;
+        }
+        case OpExecuteConfig::CCU_MS:
+            HCCL_ERROR("[%s] CCU_MS resource acquisition is not supported", __func__);
+            return HCCL_E_NOT_SUPPORT;
+        case OpExecuteConfig::CCU_SCHED:
+            HCCL_ERROR("[%s] CCU_SCHED resource acquisition is not supported", __func__);
+            return HCCL_E_NOT_SUPPORT;
+        case OpExecuteConfig::AICPU:
+            HCCL_ERROR("[%s] AICPU resource acquisition is not supported", __func__);
+            return HCCL_E_NOT_SUPPORT;
+        default:
+            HCCL_ERROR("[%s] unsupported commEngine[%u]", __func__, args.commEngine);
+            return HCCL_E_NOT_SUPPORT;
+    }
+
+    const std::string srcDataTypeName = GetDataTypeEnumStr(args.srcDataType);
+    const std::string dstDataTypeName = GetDataTypeEnumStr(args.dstDataType);
+    HCCL_RUN_INFO(
+        "[MC2_ALG_INFO] rank[%u], group[%s], opType[%s](%u), algName[%s], "
+        "srcDataType[%s](%u), dstDataType[%s](%u), engine[%u].",
+        rankId, args.groupName, GetMc2OpTypeName(opParam.opType), static_cast<uint32_t>(opParam.opType),
+        opParam.algName, srcDataTypeName.c_str(), static_cast<uint32_t>(args.srcDataType), dstDataTypeName.c_str(),
+        static_cast<uint32_t>(args.dstDataType), static_cast<uint32_t>(opParam.engine));
+    CHK_RET(LogHcclExit("Mc2AcquireCcResCtx", ctxTag.c_str(), startut));
+    *ccResCtx = result;
+    *ccResCtxSize = sizeof(OpResCtx);
+    return HCCL_SUCCESS;
+}
+
+} // namespace
+
+HcclResult __attribute__((visibility("default"))) Mc2AcquireCcResCtx(
+    HcclComm comm, uint8_t ccType, void* ccArgs, void** ccResCtx, uint32_t* ccResCtxSize)
+{
+    return Mc2AcquireCcResCtxImpl(comm, ccType, ccArgs, ccResCtx, ccResCtxSize);
 }
 
 namespace {

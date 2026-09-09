@@ -14,73 +14,76 @@
 #include <hccl/hccl_res.h>
 #include <ccu/ccu_types.h>
 #include <acl/acl_base_rt.h>
+#include <cstdint>
 
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
 
 /**
- * @brief  Alloc Mc2OpArgs memory
- * @param opArgs A pointer to the allocated Mc2OpArgs memory.
+ * @brief  Alloc Mc2CcArgs memory
+ * @param ccArgs A pointer to the allocated Mc2CcArgs memory.
  */
-extern HcclResult Mc2KfcAllocOpArgs(void** opArgs);
+extern HcclResult __attribute__((visibility("default"))) Mc2GetCcArgs(void** ccArgs);
 
 /**
- * @brief  Free Mc2OpArgs memory
- * @param opArgs A pointer to the Mc2OpArgs memory.
+ * @brief  Free Mc2CcArgs memory
+ * @param ccArgs A pointer to the Mc2CcArgs memory.
  */
-extern HcclResult Mc2KfcFreeOpArgs(void* opArgs);
+extern HcclResult __attribute__((visibility("default"))) Mc2FreeCcArgs(void* ccArgs);
 
 /**
- * @brief  Set the source data type param of Mc2OpArgs
- * @param opArgs A pointer to the Mc2OpArgs.
+ * @brief  Set the source data type param of Mc2CcArgs
+ * @param ccArgs A pointer to the Mc2CcArgs.
  * @param srcDataType The source data type to set.
  */
-extern HcclResult Mc2KfcOpArgsSetSrcDataType(void* opArgs, uint8_t srcDataType);
+extern HcclResult __attribute__((visibility("default"))) Mc2SetCcSrcDataType(void* ccArgs, uint8_t srcDataType);
 
 /**
- * @brief  Set the destination data type param of Mc2OpArgs
- * @param opArgs A pointer to the Mc2OpArgs.
+ * @brief  Set the destination data type param of Mc2CcArgs
+ * @param ccArgs A pointer to the Mc2CcArgs.
  * @param dstDataType The destination data type to set.
  */
-extern HcclResult Mc2KfcOpArgsSetDstDataType(void* opArgs, uint8_t dstDataType);
+extern HcclResult __attribute__((visibility("default"))) Mc2SetCcDstDataType(void* ccArgs, uint8_t dstDataType);
 
 /**
- * @brief  Set the reduce type param of Mc2OpArgs
- * @param opArgs A pointer to the Mc2OpArgs.
+ * @brief  Set the reduce type param of Mc2CcArgs
+ * @param ccArgs A pointer to the Mc2CcArgs.
  * @param reduceType The reduce type to set.
  */
-extern HcclResult Mc2KfcOpArgsSetReduceType(void* opArgs, uint32_t reduceType);
+extern HcclResult __attribute__((visibility("default"))) Mc2SetCcReduceType(void* ccArgs, uint32_t reduceType);
 
 /**
- * @brief  Set the data count param of Mc2OpArgs
- * @param opArgs A pointer to the Mc2OpArgs.
- * @param count The data count to set.
- */
-extern HcclResult Mc2KfcOpArgsSetCount(void* opArgs, uint64_t count);
-
-/**
- * @brief  Set the algConfig param of Mc2OpArgs
- * @param opArgs A pointer to the Mc2OpArgs.
+ * @brief  Set the algConfig param of Mc2CcArgs
+ * @param ccArgs A pointer to the Mc2CcArgs.
  * @param algConfig The algConfig to set.
  */
-extern HcclResult Mc2KfcOpArgsSetAlgConfig(void* opArgs, char* algConfig);
+extern HcclResult __attribute__((visibility("default"))) Mc2SetCcAlgConfig(void* ccArgs, char* algConfig);
 
 /**
- * @brief  Set the comm engine param of Mc2OpArgs
- * @param opArgs A pointer to the Mc2OpArgs.
- * @param commEngine The comm engine type to set.
+ * @brief  Set the comm engine param of Mc2CcArgs
+ * @param ccArgs A pointer to the Mc2CcArgs.
+ * @param commEngine 2 (AICPU_TS), 5 (CCU_MS), 6 (CCU_SCHED) or 7 (AICPU).
  */
-extern HcclResult Mc2KfcOpArgsSetCommEngine(void* opArgs, uint8_t commEngine);
+extern HcclResult __attribute__((visibility("default"))) Mc2SetCcCommEngine(void* ccArgs, uint8_t commEngine);
 
 /**
- * @brief  Create the OpResCtx for communication
- * @param comm A pointer identifying the communication resource based on.
- * @param opType The opType param.
- * @param opArgs A pointer to the Mc2OpArgs.
- * @param opResCtx A pointer to the created OpResCtx.
+ * @brief Set the group name of Mc2CcArgs.
+ * @param ccArgs A pointer to the Mc2CcArgs.
+ * @param groupName The group name to set.
  */
-extern HcclResult Mc2CreateOpResCtx(HcclComm comm, uint8_t opType, void* opArgs, void** opResCtx);
+extern HcclResult __attribute__((visibility("default"))) Mc2SetCcGroupName(void* ccArgs, char* groupName);
+
+/**
+ * @brief Acquire AICPU_TS communication resources.
+ * @param comm The communication domain.
+ * @param ccType The HcclCMDType communication operation.
+ * @param ccArgs The communication arguments with algConfig set and commEngine set to 2 (AICPU_TS).
+ * @param ccResCtx The output device address of OpResCtx, owned by comm.
+ * @param ccResCtxSize The output size of OpResCtx in bytes.
+ */
+extern HcclResult __attribute__((visibility("default"))) Mc2AcquireCcResCtx(
+    HcclComm comm, uint8_t ccType, void* ccArgs, void** ccResCtx, uint32_t* ccResCtxSize);
 
 /**
  * @brief Allocate communication resource by MC2 Tiling data
