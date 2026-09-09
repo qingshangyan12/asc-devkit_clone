@@ -39,6 +39,8 @@ class MatmulService {
     using SrcT = typename A_TYPE::T;
     using DstT = typename C_TYPE::T;
     using BiasT = typename BIAS_TYPE::T;
+    using SrcScaleAT = typename A_TYPE::SCALE_T;
+    using SrcScaleBT = typename B_TYPE::SCALE_T;
     using TILING_TYPE = typename std::remove_cv<typename std::remove_reference<decltype(MM_CFG)>::type>::type;
 #if defined(USE_SSBUF)
     using IMPL = MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>;
