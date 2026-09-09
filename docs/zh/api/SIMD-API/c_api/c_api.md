@@ -319,6 +319,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_copy_ub2l1](vector_datamove/asc_copy_ub2l1.md)|将数据从UB搬运到L1 Buffer。|`c_api/vector_datamove/vector_datamove.h`|
 |[asc_copy_ub2ub](vector_datamove/asc_copy_ub2ub.md)|将数据从UB搬运到UB。|`c_api/vector_datamove/vector_datamove.h`|
 |[asc_ndim_copy_gm2ub](vector_datamove/asc_ndim_copy_gm2ub.md)|多维数据搬运接口，将数据从Global Memory (GM)搬运到UB。|`c_api/vector_datamove/vector_datamove.h`|
+|[asc_ndim_copy_dci](vector_datamove/asc_ndim_copy_dci.md)|执行N维搬运场景所需的数据缓存失效（Data Cache Invalidate，DCI）操作。|`c_api/vector_datamove/vector_datamove.h`|
 |[asc_set_copy_pad_val](vector_datamove/asc_set_copy_pad_val.md)|和asc_copy_gm2ub_align或asc_copy_ub2gm_align接口配合使用，设置连续搬运数据块左右两侧需要填补的数据值。|`c_api/vector_datamove/vector_datamove.h`|
 |[asc_set_gm2ub_loop1_stride](vector_datamove/asc_set_gm2ub_loop1_stride.md)|使用[asc_copy_gm2ub_align](vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)将数据从Global Memory (GM)搬运到UB时，设置内层循环中相邻迭代数据块间的间隔。|`c_api/vector_datamove/vector_datamove.h`|
 |[asc_set_gm2ub_loop2_stride](vector_datamove/asc_set_gm2ub_loop2_stride.md)|使用[asc_copy_gm2ub_align](vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)将数据从Global Memory (GM)搬运到UB时，设置外层循环中相邻迭代数据块间的间隔。|`c_api/vector_datamove/vector_datamove.h`|

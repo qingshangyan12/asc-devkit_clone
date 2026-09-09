@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="440" viewBox="0 0 840 440" role="img" aria-labelledby="title desc">
+  <title id="title">高维切分搬运示意图</title>
+  <desc id="desc">高维切分搬运示意图。</desc>
+  <style>
+    .title { font: 20px 'Huawei Sans', 'FZLanTingHeiS', 'Microsoft YaHei', 'Noto Sans SC', Arial, sans-serif; fill: #000000; }
+    .label { font: 16px 'Huawei Sans', 'FZLanTingHeiS', 'Microsoft YaHei', 'Noto Sans SC', Arial, sans-serif; fill: #000000; }
+    .small { font: 14px 'Huawei Sans', 'FZLanTingHeiS', 'Microsoft YaHei', 'Noto Sans SC', Arial, sans-serif; fill: #000000; }
+    .block-text { font: 13px 'Huawei Sans', 'FZLanTingHeiS', 'Microsoft YaHei', 'Noto Sans SC', Arial, sans-serif; fill: #000000; }
+    .middle { text-anchor: middle; dominant-baseline: middle; }
+    .src-block { fill: #9FE6D8; stroke: #686D75; stroke-width: 0.75; }
+    .dst-block { fill: #C2D5FE; stroke: #686D75; stroke-width: 0.75; }
+    .gap-block { fill: #FFFFFF; stroke: #686D75; stroke-width: 0.75; }
+    .measure { stroke: #191919; stroke-width: 1; fill: none; }
+    .brace { stroke: #191919; stroke-width: 1; fill: none; }
+  </style>
+  <rect width="840" height="440" fill="#FFFFFF"/>
+  <text x="40" y="35" class="title">高维切分搬运示意图</text>
+  <text x="40" y="63" class="small">n_burst = 2, len_burst = 3个DataBlock</text>
+
+  <rect x="610" y="8" width="82" height="38" rx="6" class="src-block"/>
+  <text x="651" y="27" class="block-text middle">DataBlock</text>
+  <text x="705" y="22" class="small">src (UB)单元</text>
+  <text x="705" y="40" class="small">1个DataBlock = 32B</text>
+  <rect x="610" y="55" width="82" height="38" rx="6" class="dst-block"/>
+  <text x="651" y="74" class="block-text middle">DataBlock</text>
+  <text x="705" y="69" class="small">dst (UB)单元</text>
+  <text x="705" y="87" class="small">1个DataBlock = 32B</text>
+
+  <text x="25" y="166" class="label">src (UB)</text>
+  <path d="M92 128 C92 116 104 116 116 116 L179 116 C186 116 188 106 196 106 C204 106 206 116 213 116 L321 116 C333 116 345 116 345 128" class="brace"/>
+  <text x="218" y="104" class="small middle">Burst 1</text>
+  <path d="M432 128 C432 116 444 116 456 116 L519 116 C526 116 528 106 536 106 C544 106 546 116 553 116 L661 116 C673 116 685 116 685 128" class="brace"/>
+  <text x="558" y="104" class="small middle">Burst 2</text>
+  <rect x="92" y="148" width="82" height="40" rx="6" class="src-block"/>
+  <text x="133" y="168" class="block-text middle">DataBlock0</text>
+  <rect x="177" y="148" width="82" height="40" rx="6" class="src-block"/>
+  <text x="218" y="168" class="block-text middle">DataBlock1</text>
+  <rect x="262" y="148" width="82" height="40" rx="6" class="src-block"/>
+  <text x="303" y="168" class="block-text middle">DataBlock2</text>
+  <rect x="347" y="148" width="82" height="40" rx="6" class="src-block"/>
+  <text x="388" y="168" class="block-text middle">DataBlock3</text>
+  <rect x="432" y="148" width="82" height="40" rx="6" class="src-block"/>
+  <text x="473" y="168" class="block-text middle">DataBlock4</text>
+  <rect x="517" y="148" width="82" height="40" rx="6" class="src-block"/>
+  <text x="558" y="168" class="block-text middle">DataBlock5</text>
+  <rect x="602" y="148" width="82" height="40" rx="6" class="src-block"/>
+  <text x="643" y="168" class="block-text middle">DataBlock6</text>
+  <line x1="344" y1="214" x2="432" y2="214" class="measure"/>
+  <line x1="344" y1="208" x2="344" y2="220" class="measure"/>
+  <line x1="432" y1="208" x2="432" y2="220" class="measure"/>
+  <text x="388" y="238" class="small middle">src_gap = 1个DataBlock</text>
+
+  <line x1="420" y1="255" x2="420" y2="278" stroke="#191919" stroke-width="8" fill="none"/>
+  <polygon points="420,300 408,278 432,278" fill="#191919"/>
+
+  <text x="25" y="341" class="label">dst (UB)</text>
+  <path d="M92 303 C92 291 104 291 116 291 L179 291 C186 291 188 281 196 281 C204 281 206 291 213 291 L321 291 C333 291 345 291 345 303" class="brace"/>
+  <text x="218" y="279" class="small middle">Burst 1</text>
+  <path d="M517 303 C517 291 529 291 541 291 L604 291 C611 291 613 281 621 281 C629 281 631 291 638 291 L746 291 C758 291 770 291 770 303" class="brace"/>
+  <text x="643" y="279" class="small middle">Burst 2</text>
+  <rect x="92" y="323" width="82" height="40" rx="6" class="dst-block"/>
+  <text x="133" y="343" class="block-text middle">DataBlock0</text>
+  <rect x="177" y="323" width="82" height="40" rx="6" class="dst-block"/>
+  <text x="218" y="343" class="block-text middle">DataBlock1</text>
+  <rect x="262" y="323" width="82" height="40" rx="6" class="dst-block"/>
+  <text x="303" y="343" class="block-text middle">DataBlock2</text>
+  <rect x="347" y="323" width="82" height="40" rx="6" class="gap-block"/>
+  <rect x="432" y="323" width="82" height="40" rx="6" class="gap-block"/>
+  <rect x="517" y="323" width="82" height="40" rx="6" class="dst-block"/>
+  <text x="558" y="343" class="block-text middle">DataBlock4</text>
+  <rect x="602" y="323" width="82" height="40" rx="6" class="dst-block"/>
+  <text x="643" y="343" class="block-text middle">DataBlock5</text>
+  <rect x="687" y="323" width="82" height="40" rx="6" class="dst-block"/>
+  <text x="728" y="343" class="block-text middle">DataBlock6</text>
+  <line x1="344" y1="389" x2="517" y2="389" class="measure"/>
+  <line x1="344" y1="383" x2="344" y2="395" class="measure"/>
+  <line x1="517" y1="383" x2="517" y2="395" class="measure"/>
+  <text x="430.5" y="413" class="small middle">dst_gap = 2个DataBlock</text>
+</svg>
