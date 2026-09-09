@@ -33,16 +33,17 @@ namespace Detail {
     We retain the freedom to make incompatible changes, but do not guarantee the stability.
     KLoop is only for internal usage, does not support extension or customized specialization!
 */
-template <typename IMPL, typename TRANS_T, class A_TYPE, const auto& MM_CFG>
+template <typename IMPL, typename TRANS_T, class A_TYPE, class B_TYPE, const auto& MM_CFG>
 class KLoop<
-    IMPL, TRANS_T, A_TYPE, MM_CFG,
+    IMPL, TRANS_T, A_TYPE, B_TYPE, MM_CFG,
     enable_if_t<
         !MatmulFeatureTrait<MM_CFG>::IsNeedUB() && DoMatmulMDL(MM_CFG) && IsKdimReorderLoad<MM_CFG> &&
-        !HasScalePosition<A_TYPE>::value>> : public KLoopMDLBase<IMPL, TRANS_T, A_TYPE, MM_CFG> {
+        !HasScalePosition<A_TYPE>::value && !HasScalePosition<B_TYPE>::value>>
+    : public KLoopMDLBase<IMPL, TRANS_T, A_TYPE, B_TYPE, MM_CFG> {
     MATMUL_USE_MODULE(MatmulShapeTiling);
 
 public:
-    using BASE_MODULE = AscendC::Impl::Detail::KLoopMDLBase<IMPL, TRANS_T, A_TYPE, MM_CFG>;
+    using BASE_MODULE = AscendC::Impl::Detail::KLoopMDLBase<IMPL, TRANS_T, A_TYPE, B_TYPE, MM_CFG>;
     __aicore__ inline KLoop() = default;
     __aicore__ inline ~KLoop() = default;
 

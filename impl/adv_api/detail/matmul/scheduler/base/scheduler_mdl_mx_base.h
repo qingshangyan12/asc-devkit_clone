@@ -58,7 +58,8 @@ class MxMatmulSchedulerBase
 
     using SrcAT = typename A_TYPE::T;
     using SrcBT = typename B_TYPE::T;
-    using ScaleT = fp8_e8m0_t;
+    using SrcScaleAT = typename A_TYPE::SCALE_T;
+    using SrcScaleBT = typename B_TYPE::SCALE_T;
     using BiasT = typename BIAS_TYPE::T;
     using SrcA2T = typename GetL0DataType<typename A_TYPE::T, true>::Type;
     using SrcB2T = typename GetL0DataType<typename B_TYPE::T, true>::Type;
@@ -261,7 +262,8 @@ protected:
 
         if constexpr (PhyPosIsL1OrUB<MM_CFG>(A_TYPE::scalePosition)) {
             aL0Params.auxMatrixL1Offset = MATMUL_MODULE(MLoop)->GetInnerIdx() * tilingBaseM;
-            aL0Params.kAuxMatrixL1Len = Ceil(MATMUL_MODULE(MatmulShapeInfo)->GetSingleCoreK(), MX_K_FACTOR);
+            aL0Params.kAuxMatrixL1Len =
+                Ceil(MATMUL_MODULE(MatmulShapeInfo)->GetSingleCoreK(), GetMxKfactor<SrcScaleAT>());
         } else {
             int32_t mInnerIdx = MATMUL_MODULE(MLoop)->GetInnerIdx();
             int32_t stepScaleM = tiling.GetStepM() * MATMUL_MODULE(MLoop)->GetScaleFactorM();
@@ -312,7 +314,8 @@ protected:
 
         if constexpr (PhyPosIsL1OrUB<MM_CFG>(B_TYPE::scalePosition)) {
             bL0Params.auxMatrixL1Offset = MATMUL_MODULE(NLoop)->GetInnerIdx() * tilingBaseN;
-            bL0Params.kAuxMatrixL1Len = Ceil(MATMUL_MODULE(MatmulShapeInfo)->GetSingleCoreK(), MX_K_FACTOR);
+            bL0Params.kAuxMatrixL1Len =
+                Ceil(MATMUL_MODULE(MatmulShapeInfo)->GetSingleCoreK(), GetMxKfactor<SrcScaleBT>());
         } else {
             int32_t nInnerIdx = MATMUL_MODULE(NLoop)->GetInnerIdx();
             int32_t stepScaleN =
@@ -382,7 +385,7 @@ protected:
     }
 
     __aicore__ inline LocalTensor<SrcA2T> SplitA(
-        const LocalTensor<SrcAT>& a1, LocalTensor<ScaleT>& scaleA1, const MxSplitParams& aL0Params,
+        const LocalTensor<SrcAT>& a1, LocalTensor<SrcScaleAT>& scaleA1, const MxSplitParams& aL0Params,
         const bool isATranspose)
     {
         auto posA = MATMUL_MODULE(MLoop)->GetInnerIdx() * MATMUL_MODULE(KLoop)->GetTotalIter() +
@@ -401,7 +404,7 @@ protected:
     }
 
     __aicore__ inline LocalTensor<SrcB2T> SplitB(
-        const LocalTensor<SrcBT>& b1, LocalTensor<ScaleT>& scaleB1, const MxSplitParams& bL0Params,
+        const LocalTensor<SrcBT>& b1, LocalTensor<SrcScaleBT>& scaleB1, const MxSplitParams& bL0Params,
         const bool isBTranspose)
     {
         auto posB = MATMUL_MODULE(NLoop)->GetInnerIdx() * MATMUL_MODULE(KLoop)->GetTotalIter() +
@@ -420,8 +423,8 @@ protected:
     }
 
     __aicore__ inline void ComputeKDB(
-        const LocalTensor<SrcAT>& a1, const LocalTensor<SrcBT>& b1, LocalTensor<ScaleT>& scaleA1,
-        LocalTensor<ScaleT>& scaleB1, const MxSplitParams& aL0Params, const MxSplitParams& bL0Params,
+        const LocalTensor<SrcAT>& a1, const LocalTensor<SrcBT>& b1, LocalTensor<SrcScaleAT>& scaleA1,
+        LocalTensor<SrcScaleBT>& scaleB1, const MxSplitParams& aL0Params, const MxSplitParams& bL0Params,
         const bool isATranspose, const bool isBTranspose, const bool sL0CInit, const bool sL0CLast)
     {
         MATMUL_MODULE(TBufPoolL0)->Allocate();

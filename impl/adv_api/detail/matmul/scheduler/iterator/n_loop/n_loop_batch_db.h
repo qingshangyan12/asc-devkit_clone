@@ -29,9 +29,9 @@ namespace AscendC {
 namespace Impl {
 namespace Detail {
 
-template <typename IMPL, class INPUT_TYPE, const auto& MM_CFG>
+template <typename IMPL, class INPUT_TYPE, class B_TYPE, const auto& MM_CFG>
 class NLoop<
-    IMPL, INPUT_TYPE, MM_CFG,
+    IMPL, INPUT_TYPE, B_TYPE, MM_CFG,
     enable_if_t<(
         IsBmmBatchScheduler<INPUT_TYPE, MM_CFG> &&
         (ToMatmulConfig(MM_CFG).scheduleType == ScheduleType::OUTER_PRODUCT))>> {
