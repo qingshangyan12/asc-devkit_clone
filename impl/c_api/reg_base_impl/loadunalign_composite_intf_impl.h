@@ -8,17 +8,16 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning \
+    "impl/c_api/reg_base_impl/loadunalign_composite_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
+
 #ifndef IMPL_C_API_REG_BASE_IMPL_LOADUNALIGN_COMPOSITE_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_LOADUNALIGN_COMPOSITE_INTF_IMPL_H
 
-#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#pragma message( \
-    "impl/c_api/reg_base_impl/loadunalign_composite_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
-#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_LOADUNALIGN_COMPOSITE_INTF_IMPL_H
-#endif
-
-#include "c_api/defs/defs.h"
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 #include "impl/c_api/reg_base_impl/loadunalign_intf_impl.h"
 
@@ -175,44 +174,161 @@ __simd_callee__ inline void asc_load_impl(vector_int4x2_t& dst, __ubuf__ int4b_t
     }
 }
 
-// ==========asc_load(u8/s8/half/u16/s16/float/u32/s32/s64/bf16/e4m3/e5m2/e8m0/e2m1/e1m2)=========
-__simd_callee__ inline void asc_load(vector_int8_t& dst, __ubuf__ int8_t* src) { asc_load_impl(dst, src); }
+__simd_callee__ inline void asc_load(vector_int8_t& dst, __ubuf__ int8_t* src)
+{
+    if ASC_IS_AIV {
+        vector_load_unalign ureg;
+        asc_loadunalign_pre_impl(ureg, src);
+        asc_loadunalign_impl(dst, ureg, src);
+    }
+}
 
-__simd_callee__ inline void asc_load(vector_uint8_t& dst, __ubuf__ uint8_t* src) { asc_load_impl(dst, src); }
+__simd_callee__ inline void asc_load(vector_uint8_t& dst, __ubuf__ uint8_t* src)
+{
+    if ASC_IS_AIV {
+        vector_load_unalign ureg;
+        asc_loadunalign_pre_impl(ureg, src);
+        asc_loadunalign_impl(dst, ureg, src);
+    }
+}
 
-__simd_callee__ inline void asc_load(vector_int16_t& dst, __ubuf__ int16_t* src) { asc_load_impl(dst, src); }
+__simd_callee__ inline void asc_load(vector_int16_t& dst, __ubuf__ int16_t* src)
+{
+    if ASC_IS_AIV {
+        vector_load_unalign ureg;
+        asc_loadunalign_pre_impl(ureg, src);
+        asc_loadunalign_impl(dst, ureg, src);
+    }
+}
 
-__simd_callee__ inline void asc_load(vector_uint16_t& dst, __ubuf__ uint16_t* src) { asc_load_impl(dst, src); }
+__simd_callee__ inline void asc_load(vector_uint16_t& dst, __ubuf__ uint16_t* src)
+{
+    if ASC_IS_AIV {
+        vector_load_unalign ureg;
+        asc_loadunalign_pre_impl(ureg, src);
+        asc_loadunalign_impl(dst, ureg, src);
+    }
+}
 
-__simd_callee__ inline void asc_load(vector_int32_t& dst, __ubuf__ int32_t* src) { asc_load_impl(dst, src); }
+__simd_callee__ inline void asc_load(vector_int32_t& dst, __ubuf__ int32_t* src)
+{
+    if ASC_IS_AIV {
+        vector_load_unalign ureg;
+        asc_loadunalign_pre_impl(ureg, src);
+        asc_loadunalign_impl(dst, ureg, src);
+    }
+}
 
-__simd_callee__ inline void asc_load(vector_uint32_t& dst, __ubuf__ uint32_t* src) { asc_load_impl(dst, src); }
+__simd_callee__ inline void asc_load(vector_uint32_t& dst, __ubuf__ uint32_t* src)
+{
+    if ASC_IS_AIV {
+        vector_load_unalign ureg;
+        asc_loadunalign_pre_impl(ureg, src);
+        asc_loadunalign_impl(dst, ureg, src);
+    }
+}
 
-__simd_callee__ inline void asc_load(vector_half& dst, __ubuf__ half* src) { asc_load_impl(dst, src); }
+__simd_callee__ inline void asc_load(vector_half& dst, __ubuf__ half* src)
+{
+    if ASC_IS_AIV {
+        vector_load_unalign ureg;
+        asc_loadunalign_pre_impl(ureg, src);
+        asc_loadunalign_impl(dst, ureg, src);
+    }
+}
 
-__simd_callee__ inline void asc_load(vector_float& dst, __ubuf__ float* src) { asc_load_impl(dst, src); }
+__simd_callee__ inline void asc_load(vector_float& dst, __ubuf__ float* src)
+{
+    if ASC_IS_AIV {
+        vector_load_unalign ureg;
+        asc_loadunalign_pre_impl(ureg, src);
+        asc_loadunalign_impl(dst, ureg, src);
+    }
+}
 
-__simd_callee__ inline void asc_load(vector_int64_t& dst, __ubuf__ int64_t* src) { asc_load_impl(dst, src); }
+__simd_callee__ inline void asc_load(vector_int64_t& dst, __ubuf__ int64_t* src)
+{
+    if ASC_IS_AIV {
+        vector_load_unalign ureg;
+        asc_loadunalign_pre_impl(ureg, src);
+        asc_loadunalign_impl(dst, ureg, src);
+    }
+}
 
-__simd_callee__ inline void asc_load(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src) { asc_load_impl(dst, src); }
+__simd_callee__ inline void asc_load(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src)
+{
+    if ASC_IS_AIV {
+        vector_load_unalign ureg;
+        asc_loadunalign_pre_impl(ureg, src);
+        asc_loadunalign_impl(dst, ureg, src);
+    }
+}
 
-__simd_callee__ inline void asc_load(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src) { asc_load_impl(dst, src); }
+__simd_callee__ inline void asc_load(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src)
+{
+    if ASC_IS_AIV {
+        vector_load_unalign ureg;
+        asc_loadunalign_pre_impl(ureg, src);
+        asc_loadunalign_impl(dst, ureg, src);
+    }
+}
 
-__simd_callee__ inline void asc_load(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src) { asc_load_impl(dst, src); }
+__simd_callee__ inline void asc_load(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src)
+{
+    if ASC_IS_AIV {
+        vector_load_unalign ureg;
+        asc_loadunalign_pre_impl(ureg, src);
+        asc_loadunalign_impl(dst, ureg, src);
+    }
+}
 
-__simd_callee__ inline void asc_load(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src) { asc_load_impl(dst, src); }
+__simd_callee__ inline void asc_load(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src)
+{
+    if ASC_IS_AIV {
+        vector_load_unalign ureg;
+        asc_loadunalign_pre_impl(ureg, src);
+        asc_loadunalign_impl(dst, ureg, src);
+    }
+}
 
-__simd_callee__ inline void asc_load(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src) { asc_load_impl(dst, src); }
+__simd_callee__ inline void asc_load(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src)
+{
+    if ASC_IS_AIV {
+        vector_load_unalign ureg;
+        asc_loadunalign_pre_impl(ureg, src);
+        asc_loadunalign_impl(dst, ureg, src);
+    }
+}
 
-__simd_callee__ inline void asc_load(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src) { asc_load_impl(dst, src); }
+__simd_callee__ inline void asc_load(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
+{
+    if ASC_IS_AIV {
+        vector_load_unalign ureg;
+        asc_loadunalign_pre_impl(ureg, src);
+        asc_loadunalign_impl(dst, ureg, src);
+    }
+}
 
-__simd_callee__ inline void asc_load(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src) { asc_load_impl(dst, src); }
+__simd_callee__ inline void asc_load(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src)
+{
+    if ASC_IS_AIV {
+        vector_load_unalign ureg;
+        asc_loadunalign_pre_impl(ureg, src);
+        asc_loadunalign_impl(dst, ureg, src);
+    }
+}
 
-__simd_callee__ inline void asc_load(vector_int4x2_t& dst, __ubuf__ int4b_t* src) { asc_load_impl(dst, src); }
+__simd_callee__ inline void asc_load(vector_int4x2_t& dst, __ubuf__ int4b_t* src)
+{
+    if ASC_IS_AIV {
+        vector_load_unalign ureg;
+        asc_loadunalign_pre_impl(ureg, src);
+        asc_loadunalign_impl(dst, ureg, src);
+    }
+}
 
 // ==========return-value load APIs==========
 // ========== return vector data register APIs ==========
-// ========== asc_load ==========
 __simd_callee__ inline vector_int4x2_t asc_load(__ubuf__ int4b_t* src)
 {
     vector_int4x2_t dst;
@@ -325,9 +441,9 @@ __simd_callee__ inline vector_float asc_load(__ubuf__ float* src)
     return dst;
 }
 
-#if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_LOADUNALIGN_COMPOSITE_INTF_IMPL_H)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_LOADUNALIGN_COMPOSITE_INTF_IMPL_H
 #endif
 
-#endif // IMPL_C_API_REG_BASE_IMPL_LOADUNALIGN_COMPOSITE_INTF_IMPL_H
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif

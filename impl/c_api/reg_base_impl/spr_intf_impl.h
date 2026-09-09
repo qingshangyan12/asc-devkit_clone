@@ -8,28 +8,24 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning \
+    "impl/c_api/reg_base_impl/spr_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
+
 #ifndef IMPL_C_API_REG_BASE_IMPL_SPR_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_SPR_INTF_IMPL_H
 
-#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#pragma message( \
-    "impl/c_api/reg_base_impl/spr_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
-#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_SPR_INTF_IMPL_H
-#endif
+__aicore__ inline int64_t asc_get_squeeze_status() { return get_ar(); }
 
-#include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/utils_impl.h"
+__aicore__ inline void asc_set_ctrl(uint64_t config) { set_ctrl(config); }
 
-__aicore__ inline int64_t asc_get_ar_spr_impl() { return get_ar(); }
+__aicore__ inline int64_t asc_get_ctrl() { return get_ctrl(); }
 
-__aicore__ inline int64_t asc_get_squeeze_status_impl() { return asc_get_ar_spr_impl(); }
-
-__aicore__ inline void asc_set_ctrl_impl(uint64_t config) { set_ctrl(config); }
-
-__aicore__ inline int64_t asc_get_ctrl_impl() { return get_ctrl(); }
-
-__aicore__ inline void asc_set_saturation_flag_impl(asc_saturation_mode saturation_mode, bool enable_sat)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+__aicore__ inline void asc_set_saturation_flag(asc_saturation_mode saturation_mode, bool enable_sat)
 {
     // Enum underlying values are CTRL bit indices. INT: 1=sat; FLOAT/FLOAT8/CAST: 0=sat.
     const int64_t bit = static_cast<int64_t>(saturation_mode);
@@ -37,7 +33,7 @@ __aicore__ inline void asc_set_saturation_flag_impl(asc_saturation_mode saturati
     set_ctrl(is_bit_set ? sbitset1(get_ctrl(), bit) : sbitset0(get_ctrl(), bit));
 }
 
-__aicore__ inline bool asc_get_saturation_flag_impl(asc_saturation_mode saturation_mode)
+__aicore__ inline bool asc_get_saturation_flag(asc_saturation_mode saturation_mode)
 {
     // Enum underlying values are CTRL bit indices. INT: 1=sat; FLOAT/FLOAT8/CAST: 0=sat.
     const uint8_t bit = static_cast<uint8_t>(saturation_mode);
@@ -45,7 +41,7 @@ __aicore__ inline bool asc_get_saturation_flag_impl(asc_saturation_mode saturati
     return (saturation_mode == asc_saturation_mode::INT) ? is_bit_set : !is_bit_set;
 }
 
-__aicore__ inline void asc_set_saturation_strategy_impl(asc_override_strategy strategy)
+__aicore__ inline void asc_set_saturation_strategy(asc_override_strategy strategy)
 {
     // CTRL[60]: 0 => USE_API, 1 => USE_GLOBAL. Aligns with AscendC::SetSaturationStrategy.
     constexpr int32_t SATURATION_STRATEGY_BIT = 60;
@@ -55,41 +51,21 @@ __aicore__ inline void asc_set_saturation_strategy_impl(asc_override_strategy st
                                                      sbitset1(ctrl_value, SATURATION_STRATEGY_BIT));
 }
 
-__aicore__ inline asc_override_strategy asc_get_saturation_strategy_impl()
+__aicore__ inline asc_override_strategy asc_get_saturation_strategy()
 {
     // CTRL[60]: 0 => USE_API, 1 => USE_GLOBAL. Aligns with AscendC::GetSaturationStrategy.
     int64_t value = (get_ctrl() >> 60) & 1;
     return value == 0 ? asc_override_strategy::USE_API : asc_override_strategy::USE_GLOBAL;
 }
-
-__aicore__ inline int64_t asc_get_squeeze_status() { return asc_get_squeeze_status_impl(); }
-
-__aicore__ inline void asc_set_ctrl(uint64_t config) { asc_set_ctrl_impl(config); }
-
-__aicore__ inline int64_t asc_get_ctrl() { return asc_get_ctrl_impl(); }
+#endif
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-__aicore__ inline void asc_set_saturation_flag(asc_saturation_mode saturation_mode, bool enable_sat)
-{
-    asc_set_saturation_flag_impl(saturation_mode, enable_sat);
-}
-
-__aicore__ inline bool asc_get_saturation_flag(asc_saturation_mode saturation_mode)
-{
-    return asc_get_saturation_flag_impl(saturation_mode);
-}
-
-__aicore__ inline void asc_set_saturation_strategy(asc_override_strategy strategy)
-{
-    asc_set_saturation_strategy_impl(strategy);
-}
-
-__aicore__ inline asc_override_strategy asc_get_saturation_strategy() { return asc_get_saturation_strategy_impl(); }
+#include "impl/c_api/reg_base_impl/npu_arch_3510/spr_intf_impl.h"
 #endif
 
-#if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_SPR_INTF_IMPL_H)
+#endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_SPR_INTF_IMPL_H
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
-
-#endif // IMPL_C_API_REG_BASE_IMPL_SPR_INTF_IMPL_H

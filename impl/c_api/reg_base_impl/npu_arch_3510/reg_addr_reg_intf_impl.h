@@ -8,19 +8,15 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#ifndef IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_REG_ADDR_REG_INTF_IMPL_H
-#define IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_REG_ADDR_REG_INTF_IMPL_H
-
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#pragma message( \
-    "impl/c_api/reg_base_impl/npu_arch_3510/reg_addr_reg_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
+#warning \
+    "impl/c_api/reg_base_impl/npu_arch_3510/reg_addr_reg_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_REG_ADDR_REG_INTF_IMPL_H
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
 
-#include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/utils_impl.h"
-#include "impl/c_api/reg_base_impl/reg_addr_reg_intf_impl.h"
+#ifndef IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_REG_ADDR_REG_INTF_IMPL_H
+#define IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_REG_ADDR_REG_INTF_IMPL_H
 
 // ==========asc_create_iter_reg (deprecated, please use asc_update_addr_reg instead)=========
 #define ASC_DEFINE_ITER_REG_DEPRECATED_API(bxx)                                                                      \
@@ -56,9 +52,9 @@ ASC_DEFINE_ITER_REG_DEPRECATED_API(b8)
 
 #undef ASC_DEFINE_ITER_REG_DEPRECATED_API
 
-#if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_REG_ADDR_REG_INTF_IMPL_H)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_REG_ADDR_REG_INTF_IMPL_H
 #endif
 
-#endif // IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_REG_ADDR_REG_INTF_IMPL_H
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif

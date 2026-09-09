@@ -8,17 +8,16 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning \
+    "impl/c_api/reg_base_impl/reg_copy_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
+
 #ifndef IMPL_C_API_REG_BASE_IMPL_REG_COPY_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_REG_COPY_INTF_IMPL_H
 
-#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#pragma message( \
-    "impl/c_api/reg_base_impl/reg_copy_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
-#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_REG_COPY_INTF_IMPL_H
-#endif
-
-#include "c_api/defs/defs.h"
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
 __simd_callee__ inline void asc_copy_impl(vector_int8_t& dst, vector_int8_t src, vector_bool mask)
@@ -112,67 +111,95 @@ __simd_callee__ inline void asc_copy_impl(vector_bool& dst, vector_uint32_t src,
     }
 }
 
-// ==========asc_copy(u8/s8/half/u16/s16/float/u32/s32/bf16)=========
 __simd_callee__ inline void asc_copy(vector_int8_t& dst, vector_int8_t src, vector_bool mask)
 {
-    asc_copy_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vmov(dst, src, mask, MODE_MERGING);
+    }
 }
 
 __simd_callee__ inline void asc_copy(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask)
 {
-    asc_copy_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vmov(dst, src, mask, MODE_MERGING);
+    }
 }
 
 __simd_callee__ inline void asc_copy(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
 {
-    asc_copy_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vmov(dst, src, mask, MODE_MERGING);
+    }
 }
 
 __simd_callee__ inline void asc_copy(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask)
 {
-    asc_copy_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vmov(dst, src, mask, MODE_MERGING);
+    }
 }
 
 __simd_callee__ inline void asc_copy(vector_half& dst, vector_half src, vector_bool mask)
 {
-    asc_copy_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vmov(dst, src, mask, MODE_MERGING);
+    }
 }
 
 __simd_callee__ inline void asc_copy(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
 {
-    asc_copy_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vmov(dst, src, mask, MODE_MERGING);
+    }
 }
 
 __simd_callee__ inline void asc_copy(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
 {
-    asc_copy_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vmov(dst, src, mask, MODE_MERGING);
+    }
 }
 
 __simd_callee__ inline void asc_copy(vector_float& dst, vector_float src, vector_bool mask)
 {
-    asc_copy_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vmov(dst, src, mask, MODE_MERGING);
+    }
 }
 
 __simd_callee__ inline void asc_copy(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
-    asc_copy_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vmov(dst, src, mask, MODE_MERGING);
+    }
 }
 
 __simd_callee__ inline void asc_copy(vector_bool& dst, vector_bool src, vector_bool mask)
 {
-    asc_copy_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        pmov(dst, src, mask);
+    }
 }
 
-__simd_callee__ inline void asc_copy(vector_bool& dst, vector_bool src) { asc_copy_impl(dst, src); }
+__simd_callee__ inline void asc_copy(vector_bool& dst, vector_bool src)
+{
+    if ASC_IS_AIV {
+        pmov(dst, src);
+    }
+}
 
 __simd_callee__ inline void asc_copy(vector_bool& dst, vector_uint16_t src, int16_t part)
 {
-    asc_copy_impl(dst, src, part);
+    if ASC_IS_AIV {
+        movvp(dst, src, part);
+    }
 }
 
 __simd_callee__ inline void asc_copy(vector_bool& dst, vector_uint32_t src, int16_t part)
 {
-    asc_copy_impl(dst, src, part);
+    if ASC_IS_AIV {
+        movvp(dst, src, part);
+    }
 }
 
 // ==========asc_mask return-value overloads(u8/s8/half/u16/s16/float/u32/s32/bf16/bool)==========
@@ -268,9 +295,9 @@ __simd_callee__ inline vector_bool asc_extract_mask(vector_uint32_t src, int16_t
     return dst;
 }
 
-#if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_REG_COPY_INTF_IMPL_H)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_REG_COPY_INTF_IMPL_H
 #endif
 
-#endif // IMPL_C_API_REG_BASE_IMPL_REG_COPY_INTF_IMPL_H
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif

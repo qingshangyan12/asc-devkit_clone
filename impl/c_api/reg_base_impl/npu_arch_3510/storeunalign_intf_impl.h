@@ -8,35 +8,37 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning \
+    "impl/c_api/reg_base_impl/npu_arch_3510/storeunalign_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
+
 #ifndef IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_STOREUNALIGN_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_STOREUNALIGN_INTF_IMPL_H
 
-#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#pragma message( \
-    "impl/c_api/reg_base_impl/npu_arch_3510/storeunalign_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
-#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_STOREUNALIGN_INTF_IMPL_H
-#endif
-
-#include "c_api/defs/defs.h"
 #include "impl/c_api/reg_base_impl/utils_impl.h"
-#include "impl/c_api/reg_base_impl/storeunalign_intf_impl.h"
 
 [[deprecated("NOTICE: asc_storeunalign_postupdate with a b8 destination and vector_bool source is deprecated. "
              "Please use the b16 or b32 overload instead.")]]
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ uint8_t*& dst, vector_store_unalign& src0, vector_bool src1)
 {
-    asc_storeunalign_postupdate_impl(dst, src0, src1);
+    if ASC_IS_AIV {
+        __ubuf__ uint32_t*& dst_tmp = reinterpret_cast<__ubuf__ uint32_t*&>(dst);
+        pstu(src0, src1, dst_tmp);
+    }
 }
 
-// ==========asc_storeunalign_postupdate(u8/s8/half/u16/s16/float/u32/s32/s64/bf16/e4m3/e5m2/e8m0/e1m2/e2m1)=========
 [[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
              "instead.")]]
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ int8_t* dst, vector_store_unalign& src0, vector_int8_t src1)
 {
-    asc_storeunalign_postupdate_impl(dst, src0, src1);
+    if ASC_IS_AIV {
+        vstur(src0, src1, dst, POST_UPDATE);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
@@ -44,7 +46,9 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ uint8_t* dst, vector_store_unalign& src0, vector_uint8_t src1)
 {
-    asc_storeunalign_postupdate_impl(dst, src0, src1);
+    if ASC_IS_AIV {
+        vstur(src0, src1, dst, POST_UPDATE);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
@@ -52,7 +56,9 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ int16_t* dst, vector_store_unalign& src0, vector_int16_t src1)
 {
-    asc_storeunalign_postupdate_impl(dst, src0, src1);
+    if ASC_IS_AIV {
+        vstur(src0, src1, dst, POST_UPDATE);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
@@ -60,7 +66,9 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ uint16_t* dst, vector_store_unalign& src0, vector_uint16_t src1)
 {
-    asc_storeunalign_postupdate_impl(dst, src0, src1);
+    if ASC_IS_AIV {
+        vstur(src0, src1, dst, POST_UPDATE);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
@@ -68,7 +76,9 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ int32_t* dst, vector_store_unalign& src0, vector_int32_t src1)
 {
-    asc_storeunalign_postupdate_impl(dst, src0, src1);
+    if ASC_IS_AIV {
+        vstur(src0, src1, dst, POST_UPDATE);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
@@ -76,7 +86,9 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ uint32_t* dst, vector_store_unalign& src0, vector_uint32_t src1)
 {
-    asc_storeunalign_postupdate_impl(dst, src0, src1);
+    if ASC_IS_AIV {
+        vstur(src0, src1, dst, POST_UPDATE);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
@@ -84,7 +96,9 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ int64_t* dst, vector_store_unalign& src0, vector_int64_t src1)
 {
-    asc_storeunalign_postupdate_impl(dst, src0, src1);
+    if ASC_IS_AIV {
+        vstur(src0, src1, dst, POST_UPDATE);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
@@ -92,7 +106,9 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ half* dst, vector_store_unalign& src0, vector_half src1)
 {
-    asc_storeunalign_postupdate_impl(dst, src0, src1);
+    if ASC_IS_AIV {
+        vstur(src0, src1, dst, POST_UPDATE);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
@@ -100,7 +116,9 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ float* dst, vector_store_unalign& src0, vector_float src1)
 {
-    asc_storeunalign_postupdate_impl(dst, src0, src1);
+    if ASC_IS_AIV {
+        vstur(src0, src1, dst, POST_UPDATE);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
@@ -108,7 +126,9 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ bfloat16_t* dst, vector_store_unalign& src0, vector_bfloat16_t src1)
 {
-    asc_storeunalign_postupdate_impl(dst, src0, src1);
+    if ASC_IS_AIV {
+        vstur(src0, src1, dst, POST_UPDATE);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
@@ -116,7 +136,9 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ fp8_e4m3fn_t* dst, vector_store_unalign& src0, vector_fp8_e4m3fn_t src1)
 {
-    asc_storeunalign_postupdate_impl(dst, src0, src1);
+    if ASC_IS_AIV {
+        vstur(src0, src1, dst, POST_UPDATE);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
@@ -124,7 +146,9 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ fp8_e5m2_t* dst, vector_store_unalign& src0, vector_fp8_e5m2_t src1)
 {
-    asc_storeunalign_postupdate_impl(dst, src0, src1);
+    if ASC_IS_AIV {
+        vstur(src0, src1, dst, POST_UPDATE);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
@@ -132,7 +156,9 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ fp8_e8m0_t* dst, vector_store_unalign& src0, vector_fp8_e8m0_t src1)
 {
-    asc_storeunalign_postupdate_impl(dst, src0, src1);
+    if ASC_IS_AIV {
+        vstur(src0, src1, dst, POST_UPDATE);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
@@ -140,7 +166,9 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ fp4x2_e2m1_t* dst, vector_store_unalign& src0, vector_fp4x2_e2m1_t src1)
 {
-    asc_storeunalign_postupdate_impl(dst, src0, src1);
+    if ASC_IS_AIV {
+        vstur(src0, src1, dst, POST_UPDATE);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
@@ -148,7 +176,9 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ fp4x2_e1m2_t* dst, vector_store_unalign& src0, vector_fp4x2_e1m2_t src1)
 {
-    asc_storeunalign_postupdate_impl(dst, src0, src1);
+    if ASC_IS_AIV {
+        vstur(src0, src1, dst, POST_UPDATE);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_postupdate is deprecated. Please use asc_squeeze_and_storeunalign "
@@ -156,109 +186,144 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ int4b_t* dst, vector_store_unalign& src0, vector_int4x2_t src1)
 {
-    asc_storeunalign_postupdate_impl(dst, src0, src1);
+    if ASC_IS_AIV {
+        __ubuf__ float4_e1m2x2_t*& dst_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2_t*&>(dst);
+        vstur(src0, *reinterpret_cast<vector_fp4x2_e1m2_t*>(&src1), dst_tmp, POST_UPDATE);
+    }
 }
 
-//===========asc_storeunalign_post(int8/uint8/e2m1/e1m2/e8m0/e5m2/e4m3fn/int16/uint16/half/bfloat16/int32/uint32/float/int64)===========
 [[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int8_t* dst, vector_store_unalign src)
 {
-    asc_storeunalign_post_impl(dst, src);
+    if ASC_IS_AIV {
+        vstar(src, dst);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ uint8_t* dst, vector_store_unalign src)
 {
-    asc_storeunalign_post_impl(dst, src);
+    if ASC_IS_AIV {
+        vstar(src, dst);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ fp4x2_e2m1_t* dst, vector_store_unalign src)
 {
-    asc_storeunalign_post_impl(dst, src);
+    if ASC_IS_AIV {
+        vstar(src, dst);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ fp4x2_e1m2_t* dst, vector_store_unalign src)
 {
-    asc_storeunalign_post_impl(dst, src);
+    if ASC_IS_AIV {
+        vstar(src, dst);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int4b_t* dst, vector_store_unalign src)
 {
-    asc_storeunalign_post_impl(dst, src);
+    if ASC_IS_AIV {
+        __ubuf__ float4_e1m2x2_t* dst_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2_t*>(dst);
+        vstar(src, dst_tmp);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ fp8_e8m0_t* dst, vector_store_unalign src)
 {
-    asc_storeunalign_post_impl(dst, src);
+    if ASC_IS_AIV {
+        vstar(src, dst);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ fp8_e5m2_t* dst, vector_store_unalign src)
 {
-    asc_storeunalign_post_impl(dst, src);
+    if ASC_IS_AIV {
+        vstar(src, dst);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ fp8_e4m3fn_t* dst, vector_store_unalign src)
 {
-    asc_storeunalign_post_impl(dst, src);
+    if ASC_IS_AIV {
+        vstar(src, dst);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int16_t* dst, vector_store_unalign src)
 {
-    asc_storeunalign_post_impl(dst, src);
+    if ASC_IS_AIV {
+        vstar(src, dst);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ uint16_t* dst, vector_store_unalign src)
 {
-    asc_storeunalign_post_impl(dst, src);
+    if ASC_IS_AIV {
+        vstar(src, dst);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ half* dst, vector_store_unalign src)
 {
-    asc_storeunalign_post_impl(dst, src);
+    if ASC_IS_AIV {
+        vstar(src, dst);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ bfloat16_t* dst, vector_store_unalign src)
 {
-    asc_storeunalign_post_impl(dst, src);
+    if ASC_IS_AIV {
+        vstar(src, dst);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int32_t* dst, vector_store_unalign src)
 {
-    asc_storeunalign_post_impl(dst, src);
+    if ASC_IS_AIV {
+        vstar(src, dst);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ uint32_t* dst, vector_store_unalign src)
 {
-    asc_storeunalign_post_impl(dst, src);
+    if ASC_IS_AIV {
+        vstar(src, dst);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ float* dst, vector_store_unalign src)
 {
-    asc_storeunalign_post_impl(dst, src);
+    if ASC_IS_AIV {
+        vstar(src, dst);
+    }
 }
 
 [[deprecated("NOTICE: asc_storeunalign_post is deprecated. Please use asc_squeeze_and_storeunalign_finalize instead.")]]
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int64_t* dst, vector_store_unalign src)
 {
-    asc_storeunalign_post_impl(dst, src);
+    if ASC_IS_AIV {
+        vstar(src, dst);
+    }
 }
 
-#if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_STOREUNALIGN_INTF_IMPL_H)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_STOREUNALIGN_INTF_IMPL_H
 #endif
 
-#endif // IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_STOREUNALIGN_INTF_IMPL_H
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif

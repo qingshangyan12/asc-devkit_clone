@@ -8,17 +8,16 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning \
+    "impl/c_api/reg_base_impl/reg_addr_reg_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
+
 #ifndef IMPL_C_API_REG_BASE_IMPL_REG_ADDR_REG_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_REG_ADDR_REG_INTF_IMPL_H
 
-#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#pragma message( \
-    "impl/c_api/reg_base_impl/reg_addr_reg_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
-#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_REG_ADDR_REG_INTF_IMPL_H
-#endif
-
-#include "c_api/defs/defs.h"
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
 #define ASC_DEFINE_UPDATE_ADDR_REG_IMPL(bxx)                                                             \
@@ -59,7 +58,6 @@ ASC_DEFINE_UPDATE_ADDR_REG_IMPL(b8)
 
 #undef ASC_DEFINE_UPDATE_ADDR_REG_IMPL
 
-// ==========asc_update_addr_reg(b8/b16/b32)=========
 #define ASC_DEFINE_UPDATE_ADDR_REG_API(bxx)                                                                         \
     __simd_callee__ inline addr_reg asc_update_addr_reg_##bxx(uint32_t offset)                                      \
     {                                                                                                               \
@@ -85,9 +83,13 @@ ASC_DEFINE_UPDATE_ADDR_REG_API(b8)
 
 #undef ASC_DEFINE_UPDATE_ADDR_REG_API
 
-#if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_REG_ADDR_REG_INTF_IMPL_H)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_REG_ADDR_REG_INTF_IMPL_H
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#include "impl/c_api/reg_base_impl/npu_arch_3510/reg_addr_reg_intf_impl.h"
 #endif
 
-#endif // IMPL_C_API_REG_BASE_IMPL_REG_ADDR_REG_INTF_IMPL_H
+#endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif

@@ -8,17 +8,16 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning \
+    "impl/c_api/memory_base_impl/vector_sort_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
+
 #ifndef IMPL_C_API_MEMORY_BASE_IMPL_VECTOR_SORT_INTF_IMPL_H
 #define IMPL_C_API_MEMORY_BASE_IMPL_VECTOR_SORT_INTF_IMPL_H
 
-#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#pragma message( \
-    "impl/c_api/memory_base_impl/vector_sort_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
-#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define ASCENDC_C_API_INTERNAL_IMPL_C_API_MEMORY_BASE_IMPL_VECTOR_SORT_INTF_IMPL_H
-#endif
-
-#include "c_api/defs/defs.h"
 #include "impl/c_api/memory_base_impl/utils_impl.h"
 
 __aicore__ inline void asc_bitsort_impl_half(
@@ -70,7 +69,6 @@ __aicore__ inline void asc_mrgsort4_impl(
     }
 }
 
-// ==========asc_bitsort(half/float)==========
 __aicore__ inline void asc_bitsort(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat)
 {
     asc_bitsort_impl_half(dst, src0, src1, repeat);
@@ -81,10 +79,8 @@ __aicore__ inline void asc_bitsort(__ubuf__ float* dst, __ubuf__ float* src0, __
     asc_bitsort_impl_float(dst, src0, src1, repeat);
 }
 
-// ==========asc_get_vms4_sr==========
 __aicore__ inline void asc_get_vms4_sr(uint16_t sorted_num[4]) { asc_get_vms4_sr_impl(sorted_num); }
 
-// ==========asc_mrgsort4(half/float)==========
 __aicore__ inline void asc_mrgsort4(
     __ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0,
     uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension,
@@ -105,9 +101,9 @@ __aicore__ inline void asc_mrgsort4(
         if_exhausted_suspension, valid_bit);
 }
 
-#if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_MEMORY_BASE_IMPL_VECTOR_SORT_INTF_IMPL_H)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef ASCENDC_C_API_INTERNAL_IMPL_C_API_MEMORY_BASE_IMPL_VECTOR_SORT_INTF_IMPL_H
 #endif
 
-#endif // IMPL_C_API_MEMORY_BASE_IMPL_VECTOR_SORT_INTF_IMPL_H
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif

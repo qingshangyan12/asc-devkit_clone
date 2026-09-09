@@ -8,17 +8,16 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning \
+    "impl/c_api/reg_base_impl/reg_reduce_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
+
 #ifndef IMPL_C_API_REG_BASE_IMPL_REG_REDUCE_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_REG_REDUCE_INTF_IMPL_H
 
-#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#pragma message( \
-    "impl/c_api/reg_base_impl/reg_reduce_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
-#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_REG_REDUCE_INTF_IMPL_H
-#endif
-
-#include "c_api/defs/defs.h"
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
 __simd_callee__ inline void asc_reduce_max_impl(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
@@ -293,15 +292,18 @@ __simd_callee__ inline void asc_reduce_sum_datablock_impl(vector_int32_t& dst, v
     }
 }
 
-// ==========asc_pair_reduce_sum(half/float)==========
 __simd_callee__ inline void asc_pair_reduce_sum(vector_half& dst, vector_half src, vector_bool mask)
 {
-    asc_pair_reduce_sum_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcpadd(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_pair_reduce_sum(vector_float& dst, vector_float src, vector_bool mask)
 {
-    asc_pair_reduce_sum_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcpadd(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline vector_half asc_pair_reduce_sum(vector_half src, vector_bool mask)
@@ -318,35 +320,46 @@ __simd_callee__ inline vector_float asc_pair_reduce_sum(vector_float src, vector
     return dst;
 }
 
-// ==========asc_reduce_max(uint16_t/int16_t/half/uint32_t/int32_t/float)==========
 __simd_callee__ inline void asc_reduce_max(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
 {
-    asc_reduce_max_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcmax(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_max(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
 {
-    asc_reduce_max_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcmax(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_max(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask)
 {
-    asc_reduce_max_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcmax(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_max(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
 {
-    asc_reduce_max_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcmax(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_max(vector_half& dst, vector_half src, vector_bool mask)
 {
-    asc_reduce_max_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcmax(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_max(vector_float& dst, vector_float src, vector_bool mask)
 {
-    asc_reduce_max_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcmax(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline vector_int16_t asc_reduce_max(vector_int16_t src, vector_bool mask)
@@ -391,35 +404,46 @@ __simd_callee__ inline vector_float asc_reduce_max(vector_float src, vector_bool
     return dst;
 }
 
-// ==========asc_reduce_min(uint16_t/int16_t/half/uint32_t/int32_t/float)==========
 __simd_callee__ inline void asc_reduce_min(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
 {
-    asc_reduce_min_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcmin(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_min(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
 {
-    asc_reduce_min_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcmin(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_min(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask)
 {
-    asc_reduce_min_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcmin(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_min(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
 {
-    asc_reduce_min_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcmin(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_min(vector_half& dst, vector_half src, vector_bool mask)
 {
-    asc_reduce_min_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcmin(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_min(vector_float& dst, vector_float src, vector_bool mask)
 {
-    asc_reduce_min_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcmin(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline vector_int16_t asc_reduce_min(vector_int16_t src, vector_bool mask)
@@ -464,35 +488,46 @@ __simd_callee__ inline vector_float asc_reduce_min(vector_float src, vector_bool
     return dst;
 }
 
-// ==========asc_reduce_min_datablock(uint16_t/int16_t/half/uint32_t/int32_t/float)==========
 __simd_callee__ inline void asc_reduce_min_datablock(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
 {
-    asc_reduce_min_datablock_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcgmin(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_min_datablock(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
 {
-    asc_reduce_min_datablock_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcgmin(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_min_datablock(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask)
 {
-    asc_reduce_min_datablock_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcgmin(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_min_datablock(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
 {
-    asc_reduce_min_datablock_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcgmin(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_min_datablock(vector_half& dst, vector_half src, vector_bool mask)
 {
-    asc_reduce_min_datablock_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcgmin(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_min_datablock(vector_float& dst, vector_float src, vector_bool mask)
 {
-    asc_reduce_min_datablock_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcgmin(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline vector_int16_t asc_reduce_min_datablock(vector_int16_t src, vector_bool mask)
@@ -537,35 +572,46 @@ __simd_callee__ inline vector_float asc_reduce_min_datablock(vector_float src, v
     return dst;
 }
 
-//==================asc_reduce_max_datablock====================
 __simd_callee__ inline void asc_reduce_max_datablock(vector_half& dst, vector_half src, vector_bool mask)
 {
-    asc_reduce_max_datablock_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcgmax(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_max_datablock(vector_float& dst, vector_float src, vector_bool mask)
 {
-    asc_reduce_max_datablock_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcgmax(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_max_datablock(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask)
 {
-    asc_reduce_max_datablock_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcgmax(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_max_datablock(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
 {
-    asc_reduce_max_datablock_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcgmax(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_max_datablock(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
 {
-    asc_reduce_max_datablock_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcgmax(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_max_datablock(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
 {
-    asc_reduce_max_datablock_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcgmax(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline vector_int16_t asc_reduce_max_datablock(vector_int16_t src, vector_bool mask)
@@ -610,35 +656,46 @@ __simd_callee__ inline vector_float asc_reduce_max_datablock(vector_float src, v
     return dst;
 }
 
-// ==========asc_reduce_sum(int16_t/int32_t/uint16_t/uint32_t/half/float)==========
 __simd_callee__ inline void asc_reduce_sum(vector_int32_t& dst, vector_int16_t src, vector_bool mask)
 {
-    asc_reduce_sum_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcadd(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_sum(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
 {
-    asc_reduce_sum_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcadd(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_sum(vector_uint32_t& dst, vector_uint16_t src, vector_bool mask)
 {
-    asc_reduce_sum_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcadd(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_sum(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
 {
-    asc_reduce_sum_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcadd(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_sum(vector_half& dst, vector_half src, vector_bool mask)
 {
-    asc_reduce_sum_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcadd(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_sum(vector_float& dst, vector_float src, vector_bool mask)
 {
-    asc_reduce_sum_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcadd(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline vector_int32_t asc_reduce_sum(vector_int16_t src, vector_bool mask)
@@ -683,35 +740,46 @@ __simd_callee__ inline vector_float asc_reduce_sum(vector_float src, vector_bool
     return dst;
 }
 
-// ==========asc_reduce_sum_datablock(half/float/uint16_t/int16_t/uint32_t/int32_t)==========
 __simd_callee__ inline void asc_reduce_sum_datablock(vector_half& dst, vector_half src, vector_bool mask)
 {
-    asc_reduce_sum_datablock_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcgadd(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_sum_datablock(vector_float& dst, vector_float src, vector_bool mask)
 {
-    asc_reduce_sum_datablock_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcgadd(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_sum_datablock(vector_uint32_t& dst, vector_uint16_t src, vector_bool mask)
 {
-    asc_reduce_sum_datablock_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcgadd(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_sum_datablock(vector_int32_t& dst, vector_int16_t src, vector_bool mask)
 {
-    asc_reduce_sum_datablock_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcgadd(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_sum_datablock(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
 {
-    asc_reduce_sum_datablock_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcgadd(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_reduce_sum_datablock(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
 {
-    asc_reduce_sum_datablock_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vcgadd(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline vector_half asc_reduce_sum_datablock(vector_half src, vector_bool mask)
@@ -756,9 +824,9 @@ __simd_callee__ inline vector_int32_t asc_reduce_sum_datablock(vector_int32_t sr
     return dst;
 }
 
-#if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_REG_REDUCE_INTF_IMPL_H)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_REG_REDUCE_INTF_IMPL_H
 #endif
 
-#endif // IMPL_C_API_REG_BASE_IMPL_REG_REDUCE_INTF_IMPL_H
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif

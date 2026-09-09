@@ -8,62 +8,70 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning \
+    "impl/c_api/reg_base_impl/npu_arch_3510/storealign_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
+
 #ifndef IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_STOREALIGN_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_STOREALIGN_INTF_IMPL_H
 
-#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#pragma message( \
-    "impl/c_api/reg_base_impl/npu_arch_3510/storealign_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
-#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_STOREALIGN_INTF_IMPL_H
-#endif
-
-#include "c_api/defs/defs.h"
 #include "impl/c_api/reg_base_impl/utils_impl.h"
-#include "impl/c_api/reg_base_impl/storealign_intf_impl.h"
 
-// ==========asc_storealign_pack_v2(float/u32/s32)=========
 [[deprecated("NOTICE: asc_storealign_pack_v2 is deprecated. "
              "Please use asc_storealign_pack_quarter instead.")]] __simd_callee__ inline void
 asc_storealign_pack_v2(__ubuf__ int32_t* dst_align32b, vector_int32_t src, vector_bool mask)
 {
-    asc_storealign_pack_v2_impl(dst_align32b, src, mask);
+    if ASC_IS_AIV {
+        vsts(src, dst_align32b, 0, PK4_B32, mask);
+    }
 }
 
 [[deprecated("NOTICE: asc_storealign_pack_v2 is deprecated. "
              "Please use asc_storealign_pack_quarter instead.")]] __simd_callee__ inline void
 asc_storealign_pack_v2(__ubuf__ uint32_t* dst_align32b, vector_uint32_t src, vector_bool mask)
 {
-    asc_storealign_pack_v2_impl(dst_align32b, src, mask);
+    if ASC_IS_AIV {
+        vsts(src, dst_align32b, 0, PK4_B32, mask);
+    }
 }
 
 [[deprecated("NOTICE: asc_storealign_pack_v2 is deprecated. "
              "Please use asc_storealign_pack_quarter instead.")]] __simd_callee__ inline void
 asc_storealign_pack_v2(__ubuf__ float* dst_align32b, vector_float src, vector_bool mask)
 {
-    asc_storealign_pack_v2_impl(dst_align32b, src, mask);
+    if ASC_IS_AIV {
+        vsts(src, dst_align32b, 0, PK4_B32, mask);
+    }
 }
 
-// ==========asc_storealign_pack_v2(float/u32/s32)=========
 [[deprecated("NOTICE: asc_storealign_pack_v2 is deprecated. "
              "Please use asc_storealign_pack_quarter instead.")]] __simd_callee__ inline void
 asc_storealign_pack_v2(__ubuf__ int32_t* dst_align32b, vector_int32_t src, addr_reg offset, vector_bool mask)
 {
-    asc_storealign_pack_v2_impl(dst_align32b, src, offset, mask);
+    if ASC_IS_AIV {
+        vst(src, dst_align32b, offset, PK4_B32, mask);
+    }
 }
 
 [[deprecated("NOTICE: asc_storealign_pack_v2 is deprecated. "
              "Please use asc_storealign_pack_quarter instead.")]] __simd_callee__ inline void
 asc_storealign_pack_v2(__ubuf__ uint32_t* dst_align32b, vector_uint32_t src, addr_reg offset, vector_bool mask)
 {
-    asc_storealign_pack_v2_impl(dst_align32b, src, offset, mask);
+    if ASC_IS_AIV {
+        vst(src, dst_align32b, offset, PK4_B32, mask);
+    }
 }
 
 [[deprecated("NOTICE: asc_storealign_pack_v2 is deprecated. "
              "Please use asc_storealign_pack_quarter instead.")]] __simd_callee__ inline void
 asc_storealign_pack_v2(__ubuf__ float* dst_align32b, vector_float src, addr_reg offset, vector_bool mask)
 {
-    asc_storealign_pack_v2_impl(dst_align32b, src, offset, mask);
+    if ASC_IS_AIV {
+        vst(src, dst_align32b, offset, PK4_B32, mask);
+    }
 }
 
 // storealign_pack_v2
@@ -71,21 +79,27 @@ asc_storealign_pack_v2(__ubuf__ float* dst_align32b, vector_float src, addr_reg 
              "Please use asc_storealign_pack_quarter instead.")]] __simd_callee__ inline void
 asc_storealign_pack_v2(__ubuf__ int32_t* dst_align32b, vector_int32_t src, int32_t offset, vector_bool mask)
 {
-    asc_storealign_pack_v2_impl(dst_align32b, src, offset, mask);
+    if ASC_IS_AIV {
+        vsts(src, dst_align32b, offset, PK4_B32, mask);
+    }
 }
 
 [[deprecated("NOTICE: asc_storealign_pack_v2 is deprecated. "
              "Please use asc_storealign_pack_quarter instead.")]] __simd_callee__ inline void
 asc_storealign_pack_v2(__ubuf__ uint32_t* dst_align32b, vector_uint32_t src, int32_t offset, vector_bool mask)
 {
-    asc_storealign_pack_v2_impl(dst_align32b, src, offset, mask);
+    if ASC_IS_AIV {
+        vsts(src, dst_align32b, offset, PK4_B32, mask);
+    }
 }
 
 [[deprecated("NOTICE: asc_storealign_pack_v2 is deprecated. "
              "Please use asc_storealign_pack_quarter instead.")]] __simd_callee__ inline void
 asc_storealign_pack_v2(__ubuf__ float* dst_align32b, vector_float src, int32_t offset, vector_bool mask)
 {
-    asc_storealign_pack_v2_impl(dst_align32b, src, offset, mask);
+    if ASC_IS_AIV {
+        vsts(src, dst_align32b, offset, PK4_B32, mask);
+    }
 }
 
 // storealign_pack_v2
@@ -93,7 +107,9 @@ asc_storealign_pack_v2(__ubuf__ float* dst_align32b, vector_float src, int32_t o
              "Please use asc_storealign_pack_quarter_postupdate instead.")]] __simd_callee__ inline void
 asc_storealign_pack_postupdate_v2(__ubuf__ int32_t*& dst_align32b, vector_int32_t src, int32_t offset, vector_bool mask)
 {
-    asc_storealign_pack_postupdate_v2_impl(dst_align32b, src, offset, mask);
+    if ASC_IS_AIV {
+        vsts(src, dst_align32b, offset, PK4_B32, mask, POST_UPDATE);
+    }
 }
 
 [[deprecated("NOTICE: asc_storealign_pack_postupdate_v2 is deprecated. "
@@ -101,19 +117,23 @@ asc_storealign_pack_postupdate_v2(__ubuf__ int32_t*& dst_align32b, vector_int32_
 asc_storealign_pack_postupdate_v2(
     __ubuf__ uint32_t*& dst_align32b, vector_uint32_t src, int32_t offset, vector_bool mask)
 {
-    asc_storealign_pack_postupdate_v2_impl(dst_align32b, src, offset, mask);
+    if ASC_IS_AIV {
+        vsts(src, dst_align32b, offset, PK4_B32, mask, POST_UPDATE);
+    }
 }
 
 [[deprecated("NOTICE: asc_storealign_pack_postupdate_v2 is deprecated. "
              "Please use asc_storealign_pack_quarter_postupdate instead.")]] __simd_callee__ inline void
 asc_storealign_pack_postupdate_v2(__ubuf__ float*& dst_align32b, vector_float src, int32_t offset, vector_bool mask)
 {
-    asc_storealign_pack_postupdate_v2_impl(dst_align32b, src, offset, mask);
+    if ASC_IS_AIV {
+        vsts(src, dst_align32b, offset, PK4_B32, mask, POST_UPDATE);
+    }
 }
 
-#if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_STOREALIGN_INTF_IMPL_H)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_STOREALIGN_INTF_IMPL_H
 #endif
 
-#endif // IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_STOREALIGN_INTF_IMPL_H
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif

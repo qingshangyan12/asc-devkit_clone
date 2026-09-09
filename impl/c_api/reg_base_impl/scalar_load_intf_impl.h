@@ -8,80 +8,55 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning \
+    "impl/c_api/reg_base_impl/scalar_load_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
+
 #ifndef IMPL_C_API_REG_BASE_IMPL_SCALAR_LOAD_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_SCALAR_LOAD_INTF_IMPL_H
 
-#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#pragma message( \
-    "impl/c_api/reg_base_impl/scalar_load_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
-#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_SCALAR_LOAD_INTF_IMPL_H
-#endif
-
-#include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/utils_impl.h"
-
 constexpr int16_t ASC_C_API_LOAD_DEV_DEFAULT_OFFSET = 0;
 
-__aicore__ inline int8_t asc_load_dev_impl(__gm__ int8_t* addr)
+__aicore__ inline int8_t asc_load_dev(__gm__ int8_t* addr)
 {
     return ld_dev(reinterpret_cast<__gm__ uint8_t*>(addr), ASC_C_API_LOAD_DEV_DEFAULT_OFFSET);
 }
 
-__aicore__ inline uint8_t asc_load_dev_impl(__gm__ uint8_t* addr)
-{
-    return ld_dev(addr, ASC_C_API_LOAD_DEV_DEFAULT_OFFSET);
-}
+__aicore__ inline uint8_t asc_load_dev(__gm__ uint8_t* addr) { return ld_dev(addr, ASC_C_API_LOAD_DEV_DEFAULT_OFFSET); }
 
-__aicore__ inline int16_t asc_load_dev_impl(__gm__ int16_t* addr)
+__aicore__ inline int16_t asc_load_dev(__gm__ int16_t* addr)
 {
     return ld_dev(reinterpret_cast<__gm__ uint16_t*>(addr), ASC_C_API_LOAD_DEV_DEFAULT_OFFSET);
 }
 
-__aicore__ inline uint16_t asc_load_dev_impl(__gm__ uint16_t* addr)
+__aicore__ inline uint16_t asc_load_dev(__gm__ uint16_t* addr)
 {
     return ld_dev(addr, ASC_C_API_LOAD_DEV_DEFAULT_OFFSET);
 }
 
-__aicore__ inline int32_t asc_load_dev_impl(__gm__ int32_t* addr)
+__aicore__ inline int32_t asc_load_dev(__gm__ int32_t* addr)
 {
     return ld_dev(reinterpret_cast<__gm__ uint32_t*>(addr), ASC_C_API_LOAD_DEV_DEFAULT_OFFSET);
 }
 
-__aicore__ inline uint32_t asc_load_dev_impl(__gm__ uint32_t* addr)
+__aicore__ inline uint32_t asc_load_dev(__gm__ uint32_t* addr)
 {
     return ld_dev(addr, ASC_C_API_LOAD_DEV_DEFAULT_OFFSET);
 }
 
-__aicore__ inline int64_t asc_load_dev_impl(__gm__ int64_t* addr)
+__aicore__ inline int64_t asc_load_dev(__gm__ int64_t* addr) { return ld_dev(addr, ASC_C_API_LOAD_DEV_DEFAULT_OFFSET); }
+
+__aicore__ inline uint64_t asc_load_dev(__gm__ uint64_t* addr)
 {
     return ld_dev(addr, ASC_C_API_LOAD_DEV_DEFAULT_OFFSET);
 }
 
-__aicore__ inline uint64_t asc_load_dev_impl(__gm__ uint64_t* addr)
-{
-    return ld_dev(addr, ASC_C_API_LOAD_DEV_DEFAULT_OFFSET);
-}
-
-__aicore__ inline int8_t asc_load_dev(__gm__ int8_t* addr) { return asc_load_dev_impl(addr); }
-
-__aicore__ inline uint8_t asc_load_dev(__gm__ uint8_t* addr) { return asc_load_dev_impl(addr); }
-
-__aicore__ inline int16_t asc_load_dev(__gm__ int16_t* addr) { return asc_load_dev_impl(addr); }
-
-__aicore__ inline uint16_t asc_load_dev(__gm__ uint16_t* addr) { return asc_load_dev_impl(addr); }
-
-__aicore__ inline int32_t asc_load_dev(__gm__ int32_t* addr) { return asc_load_dev_impl(addr); }
-
-__aicore__ inline uint32_t asc_load_dev(__gm__ uint32_t* addr) { return asc_load_dev_impl(addr); }
-
-__aicore__ inline int64_t asc_load_dev(__gm__ int64_t* addr) { return asc_load_dev_impl(addr); }
-
-__aicore__ inline uint64_t asc_load_dev(__gm__ uint64_t* addr) { return asc_load_dev_impl(addr); }
-
-#if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_SCALAR_LOAD_INTF_IMPL_H)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_SCALAR_LOAD_INTF_IMPL_H
 #endif
 
-#endif // IMPL_C_API_REG_BASE_IMPL_SCALAR_LOAD_INTF_IMPL_H
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif

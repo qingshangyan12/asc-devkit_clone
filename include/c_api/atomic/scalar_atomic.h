@@ -26,7 +26,6 @@
 #include "impl/c_api/memory_base_impl/scalar_atomic_intf_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/reg_base_impl/scalar_atomic_intf_impl.h"
-#include "impl/c_api/reg_base_impl/npu_arch_3510/scalar_atomic_intf_impl.h"
 #endif
 
 namespace __asc_aicore {

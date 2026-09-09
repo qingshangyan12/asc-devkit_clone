@@ -23,7 +23,6 @@
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/reg_base_impl/storealign_intf_impl.h"
-#include "impl/c_api/reg_base_impl/npu_arch_3510/storealign_intf_impl.h"
 #endif
 
 __simd_callee__ inline void asc_storealign(__ubuf__ int8_t* dst, vector_int8_t src, vector_bool mask);

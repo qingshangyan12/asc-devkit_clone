@@ -8,30 +8,26 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#ifndef IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_SPR_INTF_IMPL_H
-#define IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_SPR_INTF_IMPL_H
-
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#pragma message( \
-    "impl/c_api/reg_base_impl/npu_arch_3510/spr_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
+#warning \
+    "impl/c_api/reg_base_impl/npu_arch_3510/spr_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_SPR_INTF_IMPL_H
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
 
-#include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/utils_impl.h"
-#include "impl/c_api/reg_base_impl/spr_intf_impl.h"
+#ifndef IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_SPR_INTF_IMPL_H
+#define IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_SPR_INTF_IMPL_H
 
 [[deprecated("NOTICE: asc_get_ar_spr is deprecated. "
              "Please use asc_get_squeeze_status instead.")]] __aicore__ inline int64_t
 asc_get_ar_spr()
 {
-    return asc_get_ar_spr_impl();
+    return get_ar();
 }
 
-#if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_SPR_INTF_IMPL_H)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_SPR_INTF_IMPL_H
 #endif
 
-#endif // IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_SPR_INTF_IMPL_H
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif

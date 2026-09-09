@@ -8,59 +8,35 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning \
+    "impl/c_api/reg_base_impl/scalar_bit_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
+
 #ifndef IMPL_C_API_REG_BASE_IMPL_SCALAR_BIT_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_SCALAR_BIT_INTF_IMPL_H
 
-#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#pragma message( \
-    "impl/c_api/reg_base_impl/scalar_bit_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
-#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_SCALAR_BIT_INTF_IMPL_H
+__aicore__ inline int64_t asc_clz(uint64_t value_in) { return clz(value_in); }
+
+__aicore__ inline int64_t asc_zero_bits_cnt(uint64_t value) { return bcnt0(value); }
+
+__aicore__ inline int64_t asc_ffs(uint64_t value) { return sff1(value); }
+
+__aicore__ inline int64_t asc_popc(uint64_t value) { return bcnt1(value); }
+
+__aicore__ inline int64_t asc_sflbits(int64_t value) { return sflbits(value); }
+
+__aicore__ inline int64_t asc_ffz(uint64_t value) { return sff0(value); }
+
+__aicore__ inline uint64_t asc_clear_nthbit(uint64_t bits, int64_t idx) { return sbitset0(bits, idx); }
+
+__aicore__ inline uint64_t asc_set_nthbit(uint64_t bits, int64_t idx) { return sbitset1(bits, idx); }
+
 #endif
 
-#include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/utils_impl.h"
-
-__aicore__ inline int64_t asc_popc_impl(uint64_t value) { return bcnt1(value); }
-
-__aicore__ inline int64_t asc_clz_impl(uint64_t value_in) { return clz(value_in); }
-
-__aicore__ inline int64_t asc_zero_bits_cnt_impl(uint64_t value) { return bcnt0(value); }
-
-__aicore__ inline int64_t asc_ffs_impl(uint64_t value) { return sff1(value); }
-
-__aicore__ inline int64_t asc_sflbits_impl(int64_t value) { return sflbits(value); }
-
-__aicore__ inline int64_t asc_ffz_impl(uint64_t value) { return sff0(value); }
-
-__aicore__ inline uint64_t asc_clear_nthbit_impl(uint64_t bits, int64_t idx) { return sbitset0(bits, idx); }
-
-__aicore__ inline uint64_t asc_set_nthbit_impl(uint64_t bits, int64_t idx) { return sbitset1(bits, idx); }
-
-// ==========asc_clz==========
-__aicore__ inline int64_t asc_clz(uint64_t value_in) { return asc_clz_impl(value_in); }
-
-__aicore__ inline int64_t asc_zero_bits_cnt(uint64_t value) { return asc_zero_bits_cnt_impl(value); }
-
-__aicore__ inline int64_t asc_ffs(uint64_t value) { return asc_ffs_impl(value); }
-
-__aicore__ inline int64_t asc_popc(uint64_t value) { return asc_popc_impl(value); }
-
-//=============asc_sflbits============
-__aicore__ inline int64_t asc_sflbits(int64_t value) { return asc_sflbits_impl(value); }
-
-//=============asc_ffz================
-__aicore__ inline int64_t asc_ffz(uint64_t value) { return asc_ffz_impl(value); }
-
-//=============asc_clear_nthbit================
-__aicore__ inline uint64_t asc_clear_nthbit(uint64_t bits, int64_t idx) { return asc_clear_nthbit_impl(bits, idx); }
-
-//=============asc_set_nthbit================
-__aicore__ inline uint64_t asc_set_nthbit(uint64_t bits, int64_t idx) { return asc_set_nthbit_impl(bits, idx); }
-
-#if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_SCALAR_BIT_INTF_IMPL_H)
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_SCALAR_BIT_INTF_IMPL_H
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
-
-#endif // IMPL_C_API_REG_BASE_IMPL_SCALAR_BIT_INTF_IMPL_H
