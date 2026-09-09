@@ -118,7 +118,7 @@
                                                                                                                     \
         asc_mmad_mx(                                                                                                \
             c_matrix, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, bias, 4, 5, 6,                            \
-            asc_unit_flag_mode::ENABLE_KEEP, false, true, false);                                                   \
+            asc_unit_flag_mode::ENABLE_KEEP, false);                                                                \
         GlobalMockObject::verify();                                                                                 \
     }
 

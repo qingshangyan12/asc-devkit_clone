@@ -200,15 +200,14 @@ __aicore__ inline void asc_mmad_mx(
 __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
     __cb__ fp4x2_e1m2_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint64_t bias, uint16_t left_height,
-    uint16_t n_dim, uint16_t right_width, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source,
-    bool c_matrix_init_val)
+    uint16_t n_dim, uint16_t right_width, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
 {
     if ASC_IS_AIC {
         uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
         uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
             c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, left_height, n_dim,
-            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
+            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
@@ -230,15 +229,14 @@ __aicore__ inline void asc_mmad_mx(
 __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
     __cb__ fp4x2_e2m1_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint64_t bias, uint16_t left_height,
-    uint16_t n_dim, uint16_t right_width, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source,
-    bool c_matrix_init_val)
+    uint16_t n_dim, uint16_t right_width, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
 {
     if ASC_IS_AIC {
         uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
         uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
             c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, left_height, n_dim,
-            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
+            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
@@ -260,15 +258,14 @@ __aicore__ inline void asc_mmad_mx(
 __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
     __cb__ fp4x2_e1m2_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint64_t bias, uint16_t left_height,
-    uint16_t n_dim, uint16_t right_width, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source,
-    bool c_matrix_init_val)
+    uint16_t n_dim, uint16_t right_width, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
 {
     if ASC_IS_AIC {
         uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
         uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
             c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, left_height, n_dim,
-            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
+            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
@@ -290,15 +287,14 @@ __aicore__ inline void asc_mmad_mx(
 __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
     __cb__ fp4x2_e2m1_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint64_t bias, uint16_t left_height,
-    uint16_t n_dim, uint16_t right_width, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source,
-    bool c_matrix_init_val)
+    uint16_t n_dim, uint16_t right_width, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
 {
     if ASC_IS_AIC {
         uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
         uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
             c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, left_height, n_dim,
-            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
+            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
@@ -320,15 +316,14 @@ __aicore__ inline void asc_mmad_mx(
 __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
     __cb__ fp8_e4m3fn_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint64_t bias, uint16_t left_height,
-    uint16_t n_dim, uint16_t right_width, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source,
-    bool c_matrix_init_val)
+    uint16_t n_dim, uint16_t right_width, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
 {
     if ASC_IS_AIC {
         uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
         uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
             c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, left_height, n_dim,
-            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
+            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
@@ -350,15 +345,14 @@ __aicore__ inline void asc_mmad_mx(
 __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
     __cb__ fp8_e5m2_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint64_t bias, uint16_t left_height, uint16_t n_dim,
-    uint16_t right_width, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source,
-    bool c_matrix_init_val)
+    uint16_t right_width, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
 {
     if ASC_IS_AIC {
         uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
         uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
             c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, left_height, n_dim,
-            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
+            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
@@ -380,15 +374,14 @@ __aicore__ inline void asc_mmad_mx(
 __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
     __cb__ fp8_e4m3fn_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint64_t bias, uint16_t left_height,
-    uint16_t n_dim, uint16_t right_width, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source,
-    bool c_matrix_init_val)
+    uint16_t n_dim, uint16_t right_width, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
 {
     if ASC_IS_AIC {
         uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
         uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
             c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, left_height, n_dim,
-            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
+            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
@@ -421,14 +414,14 @@ __aicore__ inline void asc_mmad_mx(
 __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ hif4x2_t* a_matrix, __ca__ hif4_scale* scale_a_matrix, __cb__ hif4x2_t* b_matrix,
     __cb__ hif4_scale* scale_b_matrix, uint64_t bias, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+    asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
 {
     if ASC_IS_AIC {
         uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
         uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
             c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, left_height, n_dim,
-            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
+            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
@@ -461,14 +454,14 @@ __aicore__ inline void asc_mmad_mx(
 __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix, __cb__ hif4x2_t* b_matrix,
     __cb__ hif4_scale* scale_b_matrix, uint64_t bias, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+    asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
 {
     if ASC_IS_AIC {
         uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
         uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
             c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, left_height, n_dim,
-            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
+            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
@@ -502,15 +495,14 @@ __aicore__ inline void asc_mmad_mx(
 __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
     __cb__ fp4x2_e2m1_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint64_t bias, uint16_t left_height,
-    uint16_t n_dim, uint16_t right_width, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source,
-    bool c_matrix_init_val)
+    uint16_t n_dim, uint16_t right_width, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
 {
     if ASC_IS_AIC {
         uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
         uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
             c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, left_height, n_dim,
-            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
+            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
@@ -543,14 +535,14 @@ __aicore__ inline void asc_mmad_mx(
 __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ half* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix, __cb__ fp4x2_e2m1_t* b_matrix,
     __cb__ fp8_e8m0_t* scale_b_matrix, uint64_t bias, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+    asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
 {
     if ASC_IS_AIC {
         uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
         uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
             c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, left_height, n_dim,
-            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
+            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
@@ -583,14 +575,14 @@ __aicore__ inline void asc_mmad_mx(
 __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ half* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix, __cb__ hif4x2_t* b_matrix,
     __cb__ hif4_scale* scale_b_matrix, uint64_t bias, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+    asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
 {
     if ASC_IS_AIC {
         uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
         uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
             c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, left_height, n_dim,
-            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
+            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
@@ -624,15 +616,14 @@ __aicore__ inline void asc_mmad_mx(
 __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
     __cb__ fp4x2_e2m1_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint64_t bias, uint16_t left_height,
-    uint16_t n_dim, uint16_t right_width, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source,
-    bool c_matrix_init_val)
+    uint16_t n_dim, uint16_t right_width, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
 {
     if ASC_IS_AIC {
         uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
         uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
             c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, left_height, n_dim,
-            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
+            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
@@ -665,14 +656,14 @@ __aicore__ inline void asc_mmad_mx(
 __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix, __cb__ hif4x2_t* b_matrix,
     __cb__ hif4_scale* scale_b_matrix, uint64_t bias, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+    asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
 {
     if ASC_IS_AIC {
         uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
         uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
             c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, left_height, n_dim,
-            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
+            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
@@ -705,14 +696,14 @@ __aicore__ inline void asc_mmad_mx(
 __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix, __cb__ fp8_e5m2_t* b_matrix,
     __cb__ fp8_e8m0_t* scale_b_matrix, uint64_t bias, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+    asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
 {
     if ASC_IS_AIC {
         uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
         uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
             c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, left_height, n_dim,
-            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
+            right_width, static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
