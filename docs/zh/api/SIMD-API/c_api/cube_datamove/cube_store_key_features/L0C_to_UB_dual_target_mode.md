@@ -49,28 +49,3 @@ M方向切分：
 **图2** NZ2ND参数双搬入模式设置示意图<a name="fig715654093716"></a>  
 
 ![](../../../../figures/nz2nd_l0c2ub_dual_dst.png)
-
-
-## C API枚举与调用
-
-[asc_copy_l0c2ub](../asc_copy_l0c2ub.md)最新重载使用`asc_dual_dst_mode`：
-
-| 枚举 | 模式 | sub_blockid |
-| --- | --- | --- |
-| `DUAL_DST_DISABLE` | 完整矩阵写入单个UB | 0或1选择目标 |
-| `DUAL_DST_SPLIT_M` | 按M拆分，各接收M/2×N | 不用于选择单一UB |
-| `DUAL_DST_SPLIT_N` | 按N拆分，各接收M×N/2 | 不用于选择单一UB |
-
-仅在普通NZ搬运或NZ2ND场景启用双目标，关闭额外量化/激活、Channel Split和NZ2DN。片上行宽和步长的32B对齐要求同样适用于拆分后的每个目标，不能只检查拆分前矩阵。
-
-以下为float结果按M拆成两个24×32矩阵并以ND写入的3510片段；`dst`为两个目标UB中约定的相同偏移，数据已就绪。跨核消费者访问前仍需建立AIC/AIV同步。
-
-```cpp
-asc_set_l0c_copy_nz_para(1, 0, 0);
-asc_copy_l0c2ub(dst, src, 32, 48, 32, 64,
-    0 /* sub_blockid */, asc_dual_dst_mode::DUAL_DST_SPLIT_M,
-    asc_unit_flag_mode::DISABLE, asc_quant_mode::NoQuant,
-    asc_relu_pre_mode::NONE, false, true, false, false);
-```
-
-图2中的批次数`ndNum`对应`matrix_num`，源批次步长`srcNdStride`对应`src_nz_matrix_stride`，单位64B；目的批次步长`dstNdStride`对应`dst_matrix_stride`，单位元素。

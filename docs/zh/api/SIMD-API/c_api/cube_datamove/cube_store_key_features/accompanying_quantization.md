@@ -84,20 +84,3 @@ VQF322F32_PRE,         // Vector_Quant_Float32_2_Float32: float量化成float，
 
 <!-- end id4 -->
 <!-- end id2 -->
-
-## 使用示例
-
-以下为3510的float→int8_t Scalar量化片段，系数为2、偏移为3、有符号输出，输出ND；`src`为已就绪的16×16 L0C矩阵，`dst`为足够大的GM输出。
-
-```cpp
-asc_set_l0c_copy_prequant(2.0f, 3, true);
-asc_set_l0c_copy_nz_para(1, 0, 0);
-asc_copy_l0c2gm(dst, src, 16, 16, 16, 16,
-    asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, asc_unit_flag_mode::DISABLE,
-    asc_quant_mode::QF322B8_PRE, asc_relu_pre_mode::NONE,
-    false, true, false, false);
-```
-
-Vector量化将模式改为对应的V前缀枚举，并在搬出前完成系数搬入与地址配置。3510量化区4KB最多容纳512个8B系数；较大的N需要按实际容量分片，逐片更新数据和地址。2201量化区为2KB，可容纳256个8B系数。
-
-QUANT_PRE中的M1是(1,8,10)有限精度浮点位模式。3510的低13位无效，写入`scale`后不会保留完整float精度。系数不能为Inf/NaN，使用接口约束允许的有限规格化值；Sign位控制B8有符号/无符号输出，不改变源矩阵的类型。

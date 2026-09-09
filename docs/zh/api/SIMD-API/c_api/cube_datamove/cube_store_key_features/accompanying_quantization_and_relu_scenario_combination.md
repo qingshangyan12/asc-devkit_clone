@@ -44,13 +44,3 @@ SCALAR/VECTOR是负半轴的独立系数选择，不会自动将激活系数与�
 2201的搬出整数参数`relu_pre=2/3`也分别选择Scalar/Vector负半轴系数；其Scalar配置使用`asc_set_l0c2gm_lrelu_alpha`，Vector地址使用`asc_set_l0c2gm_config`。带MCB右移的量化先按2201位域说明转换输入，不套用3510省略右移的算法。
 
 Clip使用独立开关`enable_clip_relu_pre`，与Normal ReLU及量化模式组合；不应把Clip当作`asc_relu_pre_mode`的新枚举值。配置与限制见[随路ReLU](accompanying_relu.md)。
-
-## 算法参考与验证边界
-
-以下Python文件可用于理解共享硬件指令的既有量化算法，属于仓库Basic API样例的数据生成脚本，不是C API调用示例；它们未覆盖3510新增的所有低位宽及激活组合：
-
-- [(V)REQ8算法](../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2gm/scripts/gen_data_s322s8.py)：int32_t→int8_t/uint8_t。
-- [(V)DEQF16算法](../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2gm/scripts/gen_data_s322f16.py)：int32_t→half。
-- [(V)QF322B8_PRE算法](../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2gm/scripts/gen_data_f322s8.py)：float→int8_t/uint8_t。
-
-C API调用应使用本章的枚举与显式配置，并分别检查负数、零、舍入边界、饱和值和各通道系数。支持某个枚举不代表任意类型、格式、双目标及激活组合都合法，仍需满足对应搬出通路约束。

@@ -13,13 +13,3 @@
 
 ![](../../../../figures/Fixpipe_NC1HWC0_NCHW.png)
 <!-- end id1 -->
-
-## C API维度映射
-
-将卷积结果视作矩阵`[M, N]`，其中`M=H×W`（一个批次/分片的空间位置数）、`N=C`（输出通道数），L0C小分形固定为16×16。
-
-- NHWC输出：开启`enable_nz2nd`，不带额外行Padding时`dst_stride=C`，每个空间位置的C个通道连续。
-- 3510 NCHW输出：开启`enable_nz2dn`，不带额外行Padding时`dst_stride=H×W`，每个通道的空间位置连续，并调用`asc_set_l0c_copy_channel_para(1)`。
-- 多批次使用对应架构的批次配置接口。源批次步长由L0C的实际分形分配推导，目标批次步长通常为`H×W×C`个元素；含Padding或分片时按真实跨度计算。
-
-量化系数和Vector激活系数按源矩阵的N列（输出通道）索引；转为DN之后，不能改为按输出空间位置索引。对于L1/UB目标，维度与步长还须满足片上搬出对齐约束。

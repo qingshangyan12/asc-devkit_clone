@@ -40,16 +40,3 @@
 **图2** F32 Channel Split示意图（有无效数据）<a name="zh-cn_topic_0000002515660950_fig5809145844116"></a>  
 
 ![](../../../../figures/Fixpipe_Channel_Split_with_dirty.png)
-
-## C API调用片段
-
-以下为3510图1的float→float、NZ写GM配置，源数据已就绪，`src_stride=64`（64B单位），拆分后目的分形列跨度为64×8个float元素：
-
-```cpp
-asc_copy_l0c2gm(dst, src, 32, 64, 512, 64,
-    asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, asc_unit_flag_mode::DISABLE,
-    asc_quant_mode::NoQuant, asc_relu_pre_mode::NONE,
-    true, false, false, false);
-```
-
-Channel Split保持512B目的小分形的作用，与UB双目标将矩阵分给两个Vector核不同。L1/UB通路即使原型保留同名开关，也不能据此绕过本节的GM通路限制。

@@ -107,18 +107,3 @@ for (j = 0; j < m_size; j++) {
 - src_stride=64，表示源NZ矩阵中待搬运矩阵相邻Z排布的起始地址偏移，即下图中第一个Z排布的起始地址与第二个Z排布的起始地址之间的间隔为64 \* C0\_Size。
 - dst_stride = 40 * 16，表示目的NZ矩阵中相邻Z排布的起始地址偏移，即下图中第一个Z排布的起始地址与第二个Z排布的起始地址之间的间隔为40\*16个元素。
 <!-- end id5 -->
-
-## C API配置补充
-
-3510配置`enable_nz2nd=false, enable_nz2dn=false`，2201配置`nz2nd_en=false`。这里“不改变NZ排布”指布局类别；改变输出位宽、Channel Split或自动Channel Merge时，物理小分形的形状仍会变化。
-
-普通NZ输出需`n_size`为16的倍数；F32 Channel Split可使用8的倍数。3510的B8包括int8/uint8、FP8和HiFloat8，自动合并为16×32分形；B4输出为int4b_t，自动合并为16×64分形。具体支持通路和类型见[随路量化](accompanying_quantization.md)。
-
-图1若输出half，目的分形列间隔为40×32B；图2若输出half，间隔为640×2B，两者均为1280B，C API实参分别为40和640。以下为3510图2对应的half输出片段（假设L0C数据已就绪，空间足够）：
-
-```cpp
-asc_copy_l0c2gm(dst, src, 48, 24, 640, 64,
-    asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, asc_unit_flag_mode::DISABLE,
-    asc_quant_mode::F322F16, asc_relu_pre_mode::NONE,
-    false, false, false, false);
-```

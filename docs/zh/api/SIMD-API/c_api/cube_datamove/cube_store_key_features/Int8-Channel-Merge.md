@@ -15,9 +15,3 @@
 **图1** Int8 Channel Merge示意图<a name="zh-cn_topic_0000002547260781_fig1935632714360"></a>  
 
 ![](../../../../figures/Fixpipe_Int8_Channel_Merge.png)
-
-## C API位宽扩展
-
-此特性不需要单独的enable参数；选择NZ输出和相应的目标类型/量化模式即可。3510的FP8、HiFloat8也是B8输出，按16×32合并；4位int4b_t输出按16×64合并，详见[随路量化](accompanying_quantization.md)。2201的4位输出仅按L0C→L1对应重载使用，不能推及该架构的GM输出。
-
-尾部不足完整合并分形时应按实际写入布局预留空间，不能仅用M×N的紧凑张量大小推算NZ缓存。该特性只适用于NZ输出，不与NZ2ND/NZ2DN同时执行。开启UnitFlag且使用Channel Merge时，矩阵计算方向设置为N方向。
