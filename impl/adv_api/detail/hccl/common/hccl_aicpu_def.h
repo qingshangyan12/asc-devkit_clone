@@ -131,7 +131,7 @@ private:
     __gm__ HcclCombineOpParam* hcclContext_;
 #endif
     __gm__ HcclMsgArea* hcclMsgArea_;
-    uint64_t tilingBaseAddr_;
+    uint64_t tilingBaseAddr_ = 0UL;
     uint16_t queueNum_ = 0U;
     uint16_t handleId2CurrSliceId_[HCCL_MAX_HANDLE_ID] = {0U};
     uint16_t handleIdCommitTurnCnt_[HCCL_MAX_HANDLE_ID] = {0U};
