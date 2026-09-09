@@ -28,8 +28,8 @@ The following figure shows the data processing pipelines of the two cases.
 │   ├── CMakeLists.txt                // Compilation project file
 │   ├── figures                       // Image resources in the README
 │   ├── hash_table_mte_queue.asc      // Ascend C sample implementation
-│   ├── README.md                     // Chinese sample documentation.
-│   ├── README_en.md                  // English sample documentation.
+│   ├── README.md                     // Sample documentation
+│   ├── README_en.md                  // English sample documentation
 │   └── scripts
 │       └── run.sh                    // Compiles and uses msOpProf to collect performance data of the two cases
 ```

@@ -17,8 +17,8 @@ Based on the [matrix_transpose_practice sample](../../../03_simt_api/03_best_pra
 │   ├── figures                     // Image resources for README
 │   ├── CMakeLists.txt              // Build project file
 │   ├── matrix_transpose.asc        // SIMD and SIMT hybrid matrix transpose optimization path implementation
-│   ├── README.md                   // Chinese sample documentation.
-│   └── README_en.md                // English sample documentation.
+│   ├── README.md                   // Sample documentation
+│   └── README_en.md                // English sample documentation
 ```
 
 ## Sample Description

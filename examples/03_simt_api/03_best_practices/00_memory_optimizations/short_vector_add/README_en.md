@@ -25,8 +25,8 @@ This example uses vector addition to demonstrate performance tuning methods for 
 │   ├── CMakeLists.txt       // Build project file
 │   ├── data_utils.h         // Data read/write utility functions
 │   ├── short_vector_add.asc // Ascend C operator implementation & invocation example
-│   ├── README.md            // Chinese sample documentation.
-│   └── README_en.md         // English sample documentation.
+│   ├── README.md            // Sample documentation
+│   └── README_en.md         // English sample documentation
 ```
 
 ## Example Description

@@ -14,16 +14,16 @@ This sample uses the adaptive_max_pool3d_grad operator to compare the implementa
 
 ```text
 ├── simd_simt_adaptive_max_pool3d_grad
-│   ├── figures                              // Image resources for README.
-│   ├── adaptive_max_pool3d_grad_common.h    // Pipeline sync-wait helpers shared by the four cases.
-│   ├── adaptive_max_pool3d_grad_hybrid_ub.h // SIMD zeroing and SIMT static-UB scatter implementation.
-│   ├── adaptive_max_pool3d_grad_hybrid.h    // SIMD zeroing and SIMT GM scatter implementation.
-│   ├── adaptive_max_pool3d_grad_scalar.h    // SIMD zeroing and scalar GM scatter implementation.
-│   ├── adaptive_max_pool3d_grad_simd.h      // SIMD vector API implementation for zeroing and scatter.
-│   ├── adaptive_max_pool3d_grad_host.asc    // Unified main entry and host-side execution logic.
-│   ├── CMakeLists.txt                       // Build project file.
-│   ├── README.md                            // Chinese sample documentation.
-│   └── README_en.md                         // English sample documentation.
+│   ├── figures                              // Image resources for README
+│   ├── adaptive_max_pool3d_grad_common.h    // Pipeline sync-wait helpers shared by the four cases
+│   ├── adaptive_max_pool3d_grad_hybrid_ub.h // SIMD zeroing and SIMT static-UB scatter implementation
+│   ├── adaptive_max_pool3d_grad_hybrid.h    // SIMD zeroing and SIMT GM scatter implementation
+│   ├── adaptive_max_pool3d_grad_scalar.h    // SIMD zeroing and scalar GM scatter implementation
+│   ├── adaptive_max_pool3d_grad_simd.h      // SIMD vector API implementation for zeroing and scatter
+│   ├── adaptive_max_pool3d_grad_host.asc    // Unified main entry and host-side execution logic
+│   ├── CMakeLists.txt                       // Build project file
+│   ├── README.md                            // Sample documentation
+│   └── README_en.md                         // English sample documentation
 ```
 
 ## Sample Description

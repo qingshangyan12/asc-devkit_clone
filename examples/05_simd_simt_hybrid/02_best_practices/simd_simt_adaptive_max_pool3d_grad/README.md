@@ -14,15 +14,15 @@
 
 ```text
 ├── simd_simt_adaptive_max_pool3d_grad
-│   ├── figures                              // README中的图片资源。
-│   ├── adaptive_max_pool3d_grad_common.h    // 四个Case共用的流水同步等待工具函数。
-│   ├── adaptive_max_pool3d_grad_hybrid_ub.h // SIMD清零和SIMT静态UB回填实现。
-│   ├── adaptive_max_pool3d_grad_hybrid.h    // SIMD清零和SIMT GM回填实现。
-│   ├── adaptive_max_pool3d_grad_scalar.h    // SIMD清零和Scalar GM回填实现。
-│   ├── adaptive_max_pool3d_grad_simd.h      // SIMD向量API实现清零和回填。
-│   ├── adaptive_max_pool3d_grad_host.asc    // 统一main入口和Host侧运行逻辑。
-│   ├── CMakeLists.txt                       // 编译工程文件。
-│   ├── README.md                            // 中文样例说明。
+│   ├── figures                              // README中的图片资源
+│   ├── adaptive_max_pool3d_grad_common.h    // 四个Case共用的流水同步等待工具函数
+│   ├── adaptive_max_pool3d_grad_hybrid_ub.h // SIMD清零和SIMT静态UB回填实现
+│   ├── adaptive_max_pool3d_grad_hybrid.h    // SIMD清零和SIMT GM回填实现
+│   ├── adaptive_max_pool3d_grad_scalar.h    // SIMD清零和Scalar GM回填实现
+│   ├── adaptive_max_pool3d_grad_simd.h      // SIMD向量API实现清零和回填
+│   ├── adaptive_max_pool3d_grad_host.asc    // 统一main入口和Host侧运行逻辑
+│   ├── CMakeLists.txt                       // 编译工程文件
+│   ├── README.md                            // 样例说明文档
 │   └── README_en.md                         // 英文样例说明文档
 ```
 

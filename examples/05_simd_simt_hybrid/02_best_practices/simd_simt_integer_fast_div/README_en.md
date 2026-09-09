@@ -23,8 +23,8 @@ This example uses fixed-divisor integer division computation to demonstrate inte
 ├── simd_simt_integer_fast_div
 │   ├── CMakeLists.txt          // Build project file
 │   ├── integer_div.asc         // Integer division example implementation
-│   ├── README.md               // Chinese sample documentation.
-│   └── README_en.md            // English sample documentation.
+│   ├── README.md               // Sample documentation
+│   └── README_en.md            // English sample documentation
 ```
 
 ## Example Description

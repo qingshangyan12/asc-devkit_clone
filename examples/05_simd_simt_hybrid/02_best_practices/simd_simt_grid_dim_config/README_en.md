@@ -17,8 +17,8 @@ This example uses the Gather computation to demonstrate thread block count confi
 │   ├── figures                // Image resources for README
 │   ├── CMakeLists.txt         // Build project file
 │   ├── grid_config.asc        // Ascend C operator implementation & invocation example
-│   ├── README.md              // Chinese sample documentation.
-│   └── README_en.md           // English sample documentation.
+│   ├── README.md              // Sample documentation
+│   └── README_en.md           // English sample documentation
 ```
 
 ## Example Description

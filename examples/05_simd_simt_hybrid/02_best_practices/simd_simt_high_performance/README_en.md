@@ -27,8 +27,8 @@ This example uses the FloorMod computation to demonstrate performance tuning met
 │   ├── data_utils.h          // Data read/write functions
 │   ├── figures               // Illustrations
 │   ├── floor_mod.asc         // Ascend C example implementation
-│   ├── README.md             // Chinese sample documentation.
-│   ├── README_en.md          // English sample documentation.
+│   ├── README.md             // Sample documentation
+│   ├── README_en.md          // English sample documentation
 │   └── scripts
 │       ├── gen_data.py       // Input data and ground truth generation script
 │       └── verify_result.py  // Ground truth comparison script

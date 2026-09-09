@@ -19,8 +19,8 @@ This sample uses sparse matrix-vector multiplication (SpMV) to demonstrate the i
 ├── warp_divergence
 │   ├── CMakeLists.txt              // cmake compilation file
 │   ├── spmv.asc                    // SIMT SpMV sample implementation
-│   ├── README.md                   // Chinese sample documentation.
-│   └── README_en.md                // English sample documentation.
+│   ├── README.md                   // Sample documentation
+│   └── README_en.md                // English sample documentation
 ```
 
 ## Sample Description
