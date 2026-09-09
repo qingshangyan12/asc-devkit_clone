@@ -47,7 +47,8 @@ class MatmulImpl<
       MATMUL_IMPORT_MODULE_PRIVATE(DataCopyWrapperScaleA),
       MATMUL_IMPORT_MODULE_PRIVATE(DataCopyWrapperScaleB) {
 private:
-    using SrcScaleT = fp8_e8m0_t;
+    using SrcScaleAT = typename A_TYPE::SCALE_T;
+    using SrcScaleBT = typename B_TYPE::SCALE_T;
     using DstT = typename C_TYPE::T;
     using IMPL = MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>;
 
@@ -132,25 +133,25 @@ public:
         BASE_MODULE::Init(cubeTiling, tpipe);
     }
 
-    __aicore__ inline void SetTensorScaleA(const GlobalTensor<SrcScaleT>& gm, bool isTransposeScaleA = false)
+    __aicore__ inline void SetTensorScaleA(const GlobalTensor<SrcScaleAT>& gm, bool isTransposeScaleA = false)
     {
         MATMUL_MODULE(CopyCubeInScaleA)->SetInput(gm, isTransposeScaleA);
         MATMUL_MODULE(Scheduler)->Reset();
     }
 
-    __aicore__ inline void SetTensorScaleA(const LocalTensor<SrcScaleT>& leftMatrix, bool isTransposeScaleA = false)
+    __aicore__ inline void SetTensorScaleA(const LocalTensor<SrcScaleAT>& leftMatrix, bool isTransposeScaleA = false)
     {
         MATMUL_MODULE(CopyCubeInScaleA)->SetInput(leftMatrix, isTransposeScaleA);
         MATMUL_MODULE(Scheduler)->Reset();
     }
 
-    __aicore__ inline void SetTensorScaleB(const GlobalTensor<SrcScaleT>& gm, bool isTransposeScaleB = true)
+    __aicore__ inline void SetTensorScaleB(const GlobalTensor<SrcScaleBT>& gm, bool isTransposeScaleB = true)
     {
         MATMUL_MODULE(CopyCubeInScaleB)->SetInput(gm, isTransposeScaleB);
         MATMUL_MODULE(Scheduler)->Reset();
     }
 
-    __aicore__ inline void SetTensorScaleB(const LocalTensor<SrcScaleT>& rightMatrix, bool isTransposeScaleB = true)
+    __aicore__ inline void SetTensorScaleB(const LocalTensor<SrcScaleBT>& rightMatrix, bool isTransposeScaleB = true)
     {
         MATMUL_MODULE(CopyCubeInScaleB)->SetInput(rightMatrix, isTransposeScaleB);
         MATMUL_MODULE(Scheduler)->Reset();
