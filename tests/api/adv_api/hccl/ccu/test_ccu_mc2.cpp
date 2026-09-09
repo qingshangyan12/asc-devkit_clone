@@ -17,6 +17,7 @@
 #include "base.h"
 #include "include/adv_api/hccl/hccl_mc2.h"
 #include "hccl_alloc_ctx_res.h"
+#include "include/adv_api/hccl/internal/hccl_msg.h"
 #include "sim_communicator.h"
 #include "sim_world.h"
 #include "topo_model.h"
@@ -1020,7 +1021,7 @@ TEST_F(CcuMc2TestSuite, CheckOpResSufficient_ReduceScatterRejectsUnsupportedComb
     EXPECT_EQ(CheckOpResSufficient(comm_, stream_, &tiling), HCCL_E_NOT_SUPPORT);
 }
 
-class Mc2CcResCtxTest : public CcuMc2TestSuite {
+class Mc2OpResCtxTest : public CcuMc2TestSuite {
 protected:
     void SetUp() override
     {
@@ -1042,12 +1043,12 @@ protected:
     void* args_ = nullptr;
 };
 
-TEST_F(Mc2CcResCtxTest, AicpuResourceLayoutAndReuse)
+TEST_F(Mc2OpResCtxTest, AicpuResourceLayoutAndReuse)
 {
-    static_assert(sizeof(CcResCtx) == 64, "CcResCtx ABI");
-    static_assert(offsetof(CcResCtx, opParam) == 40, "opParam ABI");
-    static_assert(offsetof(CcResCtx, opType) == 56, "opType ABI");
-    static_assert(offsetof(CcResCtx, debugMode) == 60, "debugMode ABI");
+    static_assert(sizeof(OpResCtx) == sizeof(HcclApi::OpResCtx), "Host/device context size must match");
+    static_assert(offsetof(OpResCtx, debugMode) == offsetof(HcclApi::OpResCtx, debugMode), "debugMode ABI");
+    static_assert(offsetof(OpResCtx, opParamSize) == offsetof(HcclApi::OpResCtx, opParamSize), "opParamSize ABI");
+    static_assert(offsetof(OpResCtx, opType) == offsetof(HcclApi::OpResCtx, opType), "opType ABI");
     static_assert(sizeof(HcommCcuSchd) == 12, "HcommCcuSchd ABI");
     void* deviceCtx = nullptr;
     uint32_t size = 0;
@@ -1055,18 +1056,18 @@ TEST_F(Mc2CcResCtxTest, AicpuResourceLayoutAndReuse)
     ASSERT_EQ(
         Mc2AcquireCcResCtx(comm_, HcclCMDType::HCCL_CMD_ALLGATHER, args_, &deviceCtx, &size, &schd), HCCL_SUCCESS);
     ASSERT_NE(deviceCtx, nullptr);
-    ASSERT_EQ(size, sizeof(CcResCtx));
-    const auto& ctx = *static_cast<const CcResCtx*>(deviceCtx);
+    ASSERT_EQ(size, sizeof(OpResCtx));
+    const auto& ctx = *static_cast<const OpResCtx*>(deviceCtx);
     EXPECT_EQ(ctx.version, 0U);
     EXPECT_EQ(ctx.debugMode, 0U);
     EXPECT_EQ(ctx.rankId, g_stubRankId);
     EXPECT_EQ(ctx.rankSize, g_stubRankSize);
-    EXPECT_EQ(ctx.opType, HcclCMDType::HCCL_CMD_ALLGATHER);
+    EXPECT_EQ(ctx.opType[0], HcclCMDType::HCCL_CMD_ALLGATHER);
     EXPECT_EQ(ctx.workSpaceSize, 20U * 1024 * 1024);
     EXPECT_NE(ctx.workSpace, 0U);
-    ASSERT_NE(ctx.opParam, 0U);
-    EXPECT_EQ(ctx.opParamSize, sizeof(OpParam));
-    const auto& param = *reinterpret_cast<const OpParam*>(ctx.opParam);
+    ASSERT_NE(ctx.algInfo[0].opParam, 0U);
+    EXPECT_EQ(ctx.opParamSize[0], sizeof(OpParam));
+    const auto& param = *reinterpret_cast<const OpParam*>(ctx.algInfo[0].opParam);
     EXPECT_EQ(param.opType, HcclCMDType::HCCL_CMD_ALLGATHER);
     EXPECT_EQ(param.engine, COMM_ENGINE_AICPU_TS);
     EXPECT_EQ(param.stream, nullptr);
@@ -1082,7 +1083,45 @@ TEST_F(Mc2CcResCtxTest, AicpuResourceLayoutAndReuse)
     EXPECT_EQ(reused, deviceCtx);
 }
 
-TEST_F(Mc2CcResCtxTest, DebugModeIsUpdatedInReusedContext)
+TEST_F(Mc2OpResCtxTest, LegacyAndArgumentApisReuseTheSameResource)
+{
+    struct Tiling {
+        Mc2InitTilingInner init;
+        Mc2CcTilingInner cc;
+    } tiling{};
+    tiling.init.version = INIT_TILING_VERSION;
+    tiling.init.mc2HcommCnt = 1;
+    tiling.init.offset[0] = offsetof(Tiling, cc);
+    tiling.init.debugMode = 4;
+    tiling.cc.commEngine = static_cast<uint8_t>(OpExecuteConfig::AICPU_TS);
+    tiling.cc.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
+    tiling.cc.srcDataType = HCCL_DATA_TYPE_FP16;
+    tiling.cc.dstDataType = HCCL_DATA_TYPE_FP16;
+    tiling.cc.reduceType = HCCL_REDUCE_SUM;
+    void* legacy = nullptr;
+    EXPECT_NE(HcclAllocComResourceByTiling(comm_, nullptr, &tiling, &legacy), HCCL_SUCCESS);
+    ASSERT_EQ(HcclAllocComResourceByTiling(comm_, stream_, &tiling, &legacy), HCCL_SUCCESS);
+    const auto& ctx = *static_cast<const OpResCtx*>(legacy);
+    EXPECT_EQ(ctx.debugMode, 4U);
+    EXPECT_EQ(ctx.opType[0], tiling.cc.opType);
+    const OpParam legacyParam = *reinterpret_cast<const OpParam*>(ctx.algInfo[0].opParam);
+    EXPECT_EQ(legacyParam.stream, stream_);
+
+    ASSERT_EQ(Mc2SetCcDebugMode(args_, 4), HCCL_SUCCESS);
+    void* result = nullptr;
+    uint32_t size = 0;
+    ASSERT_EQ(Mc2AcquireCcResCtx(comm_, tiling.cc.opType, args_, &result, &size, nullptr), HCCL_SUCCESS);
+    EXPECT_EQ(result, legacy);
+    EXPECT_EQ(size, sizeof(OpResCtx));
+    const auto& param = *reinterpret_cast<const OpParam*>(ctx.algInfo[0].opParam);
+    EXPECT_EQ(param.stream, nullptr);
+    EXPECT_EQ(param.opType, legacyParam.opType);
+    EXPECT_EQ(param.DataDes.dataType, legacyParam.DataDes.dataType);
+    EXPECT_STREQ(param.algName, legacyParam.algName);
+    EXPECT_EQ(ctx.debugMode, 4U);
+}
+
+TEST_F(Mc2OpResCtxTest, DebugModeIsUpdatedInReusedContext)
 {
     void* diagnosticCtx = nullptr;
     void* faultCtx = nullptr;
@@ -1093,22 +1132,22 @@ TEST_F(Mc2CcResCtxTest, DebugModeIsUpdatedInReusedContext)
         Mc2AcquireCcResCtx(comm_, HcclCMDType::HCCL_CMD_ALLGATHER, args_, &diagnosticCtx, &size, nullptr),
         HCCL_SUCCESS);
     ASSERT_NE(diagnosticCtx, nullptr);
-    EXPECT_EQ(static_cast<const CcResCtx*>(diagnosticCtx)->debugMode, 1U);
+    EXPECT_EQ(static_cast<const OpResCtx*>(diagnosticCtx)->debugMode, 1U);
 
     ASSERT_EQ(Mc2SetCcDebugMode(args_, 250), HCCL_SUCCESS);
     ASSERT_EQ(
         Mc2AcquireCcResCtx(comm_, HcclCMDType::HCCL_CMD_ALLGATHER, args_, &faultCtx, &size, nullptr), HCCL_SUCCESS);
     ASSERT_NE(faultCtx, nullptr);
     EXPECT_EQ(faultCtx, diagnosticCtx);
-    EXPECT_EQ(static_cast<const CcResCtx*>(faultCtx)->debugMode, 250U);
+    EXPECT_EQ(static_cast<const OpResCtx*>(faultCtx)->debugMode, 250U);
     ASSERT_EQ(Mc2SetCcDebugMode(args_, 1), HCCL_SUCCESS);
     ASSERT_EQ(
         Mc2AcquireCcResCtx(comm_, HcclCMDType::HCCL_CMD_ALLGATHER, args_, &reusedCtx, &size, nullptr), HCCL_SUCCESS);
     EXPECT_EQ(reusedCtx, diagnosticCtx);
-    EXPECT_EQ(static_cast<const CcResCtx*>(reusedCtx)->debugMode, 1U);
+    EXPECT_EQ(static_cast<const OpResCtx*>(reusedCtx)->debugMode, 1U);
 }
 
-TEST_F(Mc2CcResCtxTest, OutputTypeMatchesLegacyFlow)
+TEST_F(Mc2OpResCtxTest, OutputTypeMatchesLegacyFlow)
 {
     ASSERT_EQ(Mc2SetCcSrcDataType(args_, HCCL_DATA_TYPE_FP32), HCCL_SUCCESS);
     ASSERT_EQ(Mc2SetCcDstDataType(args_, HCCL_DATA_TYPE_FP16), HCCL_SUCCESS);
@@ -1126,25 +1165,25 @@ TEST_F(Mc2CcResCtxTest, OutputTypeMatchesLegacyFlow)
         uint32_t size = 0;
         ASSERT_EQ(Mc2AcquireCcResCtx(comm_, testCase.op, args_, &deviceCtx, &size, nullptr), HCCL_SUCCESS);
         ASSERT_NE(deviceCtx, nullptr);
-        const auto& ctx = *static_cast<const CcResCtx*>(deviceCtx);
-        ASSERT_NE(ctx.opParam, 0U);
-        const auto& param = *reinterpret_cast<const OpParam*>(ctx.opParam);
+        const auto& ctx = *static_cast<const OpResCtx*>(deviceCtx);
+        ASSERT_NE(ctx.algInfo[0].opParam, 0U);
+        const auto& param = *reinterpret_cast<const OpParam*>(ctx.algInfo[0].opParam);
         EXPECT_EQ(param.DataDes.dataType, HCCL_DATA_TYPE_FP32);
         EXPECT_EQ(param.DataDes.outputType, testCase.outputType);
     }
 }
 
-TEST_F(Mc2CcResCtxTest, AlltoAllVariableStorageAndNoDanglingHostPointers)
+TEST_F(Mc2OpResCtxTest, AlltoAllVariableStorageAndNoDanglingHostPointers)
 {
     for (auto op : {HcclCMDType::HCCL_CMD_ALLTOALL, HcclCMDType::HCCL_CMD_ALLTOALLV}) {
         void* deviceCtx = nullptr;
         uint32_t size = 0;
         ASSERT_EQ(Mc2AcquireCcResCtx(comm_, op, args_, &deviceCtx, &size, nullptr), HCCL_SUCCESS);
-        const auto& ctx = *static_cast<const CcResCtx*>(deviceCtx);
+        const auto& ctx = *static_cast<const OpResCtx*>(deviceCtx);
         const uint64_t extraSize = ALL_TO_ALL_V_VECTOR_NUM * g_stubRankSize * sizeof(uint64_t);
-        EXPECT_EQ(ctx.opType, op);
-        EXPECT_EQ(ctx.opParamSize, sizeof(OpParam) + extraSize);
-        const auto& param = *reinterpret_cast<const OpParam*>(ctx.opParam);
+        EXPECT_EQ(ctx.opType[0], op);
+        EXPECT_EQ(ctx.opParamSize[0], sizeof(OpParam) + extraSize);
+        const auto& param = *reinterpret_cast<const OpParam*>(ctx.algInfo[0].opParam);
         EXPECT_EQ(param.varMemSize, extraSize);
         EXPECT_EQ(param.all2AllVDataDes.sendType, HCCL_DATA_TYPE_FP16);
         EXPECT_EQ(param.all2AllVDataDes.recvType, HCCL_DATA_TYPE_FP16);
@@ -1152,42 +1191,42 @@ TEST_F(Mc2CcResCtxTest, AlltoAllVariableStorageAndNoDanglingHostPointers)
         EXPECT_EQ(param.all2AllVDataDes.recvCounts, nullptr);
         EXPECT_EQ(param.all2AllVDataDes.sdispls, nullptr);
         EXPECT_EQ(param.all2AllVDataDes.rdispls, nullptr);
-        const auto* tail = reinterpret_cast<const uint8_t*>(ctx.opParam) + sizeof(OpParam);
+        const auto* tail = reinterpret_cast<const uint8_t*>(ctx.algInfo[0].opParam) + sizeof(OpParam);
         for (uint64_t i = 0; i < extraSize; ++i) {
             ASSERT_EQ(tail[i], 0U);
         }
     }
 }
 
-TEST_F(Mc2CcResCtxTest, ReductionReusesContextAndGroupSeparatesContexts)
+TEST_F(Mc2OpResCtxTest, ReductionReusesContextAndGroupSeparatesContexts)
 {
     void* sum = nullptr;
     void* max = nullptr;
     void* group = nullptr;
     uint32_t size = 0;
     ASSERT_EQ(Mc2AcquireCcResCtx(comm_, HcclCMDType::HCCL_CMD_ALLREDUCE, args_, &sum, &size, nullptr), HCCL_SUCCESS);
-    const auto& sumCtx = *static_cast<const CcResCtx*>(sum);
-    EXPECT_EQ(reinterpret_cast<const OpParam*>(sumCtx.opParam)->reduceType, HCCL_REDUCE_SUM);
+    const auto& sumCtx = *static_cast<const OpResCtx*>(sum);
+    EXPECT_EQ(reinterpret_cast<const OpParam*>(sumCtx.algInfo[0].opParam)->reduceType, HCCL_REDUCE_SUM);
     ASSERT_EQ(Mc2SetCcReduceType(args_, HCCL_REDUCE_MAX), HCCL_SUCCESS);
     ASSERT_EQ(Mc2AcquireCcResCtx(comm_, HcclCMDType::HCCL_CMD_ALLREDUCE, args_, &max, &size, nullptr), HCCL_SUCCESS);
     EXPECT_EQ(sum, max);
-    const auto& maxCtx = *static_cast<const CcResCtx*>(max);
-    EXPECT_EQ(reinterpret_cast<const OpParam*>(maxCtx.opParam)->reduceType, HCCL_REDUCE_MAX);
+    const auto& maxCtx = *static_cast<const OpResCtx*>(max);
+    EXPECT_EQ(reinterpret_cast<const OpParam*>(maxCtx.algInfo[0].opParam)->reduceType, HCCL_REDUCE_MAX);
     char name[] = "another_group";
     ASSERT_EQ(Mc2SetCcGroupName(args_, name), HCCL_SUCCESS);
     ASSERT_EQ(Mc2AcquireCcResCtx(comm_, HcclCMDType::HCCL_CMD_ALLREDUCE, args_, &group, &size, nullptr), HCCL_SUCCESS);
     EXPECT_NE(group, max);
 }
 
-TEST_F(Mc2CcResCtxTest, DataTypesReuseContextAndSourceTypeUpdatesTopoTag)
+TEST_F(Mc2OpResCtxTest, DataTypesReuseContextAndSourceTypeUpdatesTopoTag)
 {
     void* original = nullptr;
     void* reused = nullptr;
     uint32_t size = 0;
     const auto op = HcclCMDType::HCCL_CMD_ALLTOALL;
     ASSERT_EQ(Mc2AcquireCcResCtx(comm_, op, args_, &original, &size, nullptr), HCCL_SUCCESS);
-    const auto& ctx = *static_cast<const CcResCtx*>(original);
-    const auto& param = *reinterpret_cast<const OpParam*>(ctx.opParam);
+    const auto& ctx = *static_cast<const OpResCtx*>(original);
+    const auto& param = *reinterpret_cast<const OpParam*>(ctx.algInfo[0].opParam);
     const std::string originalTopoTag = param.tag;
 
     ASSERT_EQ(Mc2SetCcDstDataType(args_, HCCL_DATA_TYPE_FP32), HCCL_SUCCESS);
@@ -1201,12 +1240,12 @@ TEST_F(Mc2CcResCtxTest, DataTypesReuseContextAndSourceTypeUpdatesTopoTag)
     EXPECT_EQ(reused, original);
     EXPECT_EQ(param.all2AllVDataDes.sendType, HCCL_DATA_TYPE_FP32);
     const std::string expectedTopoTag =
-        "mc2_cc_" + std::to_string(op) + "_" + std::to_string(HCCL_DATA_TYPE_FP32) + "_" + param.commName;
+        std::to_string(op) + "_" + std::to_string(HCCL_DATA_TYPE_FP32) + "_" + param.commName;
     EXPECT_EQ(std::string(param.tag), expectedTopoTag);
     EXPECT_NE(std::string(param.tag), originalTopoTag);
 }
 
-TEST_F(Mc2CcResCtxTest, InvalidInputsAndUnsupportedEngine)
+TEST_F(Mc2OpResCtxTest, InvalidInputsAndUnsupportedEngine)
 {
     void* ctx = reinterpret_cast<void*>(1);
     uint32_t size = 123;
@@ -1224,7 +1263,7 @@ TEST_F(Mc2CcResCtxTest, InvalidInputsAndUnsupportedEngine)
     EXPECT_EQ(size, 0U);
 }
 
-TEST_F(Mc2CcResCtxTest, CcuDispatchIsNotSupported)
+TEST_F(Mc2OpResCtxTest, CcuDispatchIsNotSupported)
 {
     ASSERT_EQ(Mc2SetCcCommEngine(args_, COMM_ENGINE_CCU), HCCL_SUCCESS);
     void* ctx = reinterpret_cast<void*>(1);
@@ -1239,7 +1278,7 @@ TEST_F(Mc2CcResCtxTest, CcuDispatchIsNotSupported)
     EXPECT_EQ(schd.phyDieMask, 0U);
 }
 
-TEST_F(Mc2CcResCtxTest, ResourceFailureDoesNotPublishContext)
+TEST_F(Mc2OpResCtxTest, ResourceFailureDoesNotPublishContext)
 {
     mc2_ops_hccl::g_stubCcuAlgResUnavailable = true;
     void* ctx = reinterpret_cast<void*>(1);
@@ -1250,7 +1289,7 @@ TEST_F(Mc2CcResCtxTest, ResourceFailureDoesNotPublishContext)
     EXPECT_EQ(mc2_ops_hccl::g_stubAlgResAttempts.size(), 1U);
 }
 
-TEST_F(Mc2CcResCtxTest, UnavailableForcedAlgorithmUsesDefault)
+TEST_F(Mc2OpResCtxTest, UnavailableForcedAlgorithmUsesDefault)
 {
     char algConfig[] = "ForcedAllGather";
     ASSERT_EQ(Mc2SetCcAlgConfig(args_, algConfig), HCCL_SUCCESS);
@@ -1260,13 +1299,13 @@ TEST_F(Mc2CcResCtxTest, UnavailableForcedAlgorithmUsesDefault)
     uint32_t size = 0;
     ASSERT_EQ(
         Mc2AcquireCcResCtx(comm_, HcclCMDType::HCCL_CMD_ALLGATHER, args_, &deviceCtx, &size, nullptr), HCCL_SUCCESS);
-    const auto& ctx = *static_cast<const CcResCtx*>(deviceCtx);
-    const auto& param = *reinterpret_cast<const OpParam*>(ctx.opParam);
+    const auto& ctx = *static_cast<const OpResCtx*>(deviceCtx);
+    const auto& param = *reinterpret_cast<const OpParam*>(ctx.algInfo[0].opParam);
     EXPECT_STREQ(param.algName, "InsAllGatherMesh");
     EXPECT_EQ(mc2_ops_hccl::g_stubAlgResAttempts, std::vector<std::string>({"InsAllGatherMesh"}));
 }
 
-TEST_F(Mc2CcResCtxTest, AlltoAllResourceFailureRetriesWithLiveCounts)
+TEST_F(Mc2OpResCtxTest, AlltoAllResourceFailureRetriesWithLiveCounts)
 {
     char algConfig[] = "ForcedAlltoAll";
     ASSERT_EQ(Mc2SetCcAlgConfig(args_, algConfig), HCCL_SUCCESS);
@@ -1275,8 +1314,8 @@ TEST_F(Mc2CcResCtxTest, AlltoAllResourceFailureRetriesWithLiveCounts)
     uint32_t size = 0;
     ASSERT_EQ(
         Mc2AcquireCcResCtx(comm_, HcclCMDType::HCCL_CMD_ALLTOALL, args_, &deviceCtx, &size, nullptr), HCCL_SUCCESS);
-    const auto& ctx = *static_cast<const CcResCtx*>(deviceCtx);
-    const auto& param = *reinterpret_cast<const OpParam*>(ctx.opParam);
+    const auto& ctx = *static_cast<const OpResCtx*>(deviceCtx);
+    const auto& param = *reinterpret_cast<const OpParam*>(ctx.algInfo[0].opParam);
     EXPECT_STREQ(param.algName, "InsAlltoAllMesh");
     EXPECT_EQ(param.all2AllVDataDes.sendCounts, nullptr);
     EXPECT_EQ(mc2_ops_hccl::g_stubAlgResAttempts, std::vector<std::string>({"ForcedAlltoAll", "InsAlltoAllMesh"}));
@@ -1284,7 +1323,7 @@ TEST_F(Mc2CcResCtxTest, AlltoAllResourceFailureRetriesWithLiveCounts)
         mc2_ops_hccl::g_stubAlltoAllSendCounts, std::vector<uint64_t>({200ULL * 1024 * 1024, 200ULL * 1024 * 1024}));
 }
 
-TEST_F(Mc2CcResCtxTest, FailedFallbackStopsAfterTwoAttempts)
+TEST_F(Mc2OpResCtxTest, FailedFallbackStopsAfterTwoAttempts)
 {
     char algConfig[] = "ForcedAlltoAll";
     ASSERT_EQ(Mc2SetCcAlgConfig(args_, algConfig), HCCL_SUCCESS);
@@ -1298,11 +1337,11 @@ TEST_F(Mc2CcResCtxTest, FailedFallbackStopsAfterTwoAttempts)
     EXPECT_EQ(mc2_ops_hccl::g_stubAlgResAttempts, std::vector<std::string>({"ForcedAlltoAll", "InsAlltoAllMesh"}));
 }
 
-TEST_F(Mc2CcResCtxTest, RejectUndersizedCachedContext)
+TEST_F(Mc2OpResCtxTest, RejectUndersizedCachedContext)
 {
     void* cached = nullptr;
-    const std::string tag = "mc2_cc__" + std::to_string(HcclCMDType::HCCL_CMD_ALLGATHER) + "_" + "_" +
-                            std::to_string(COMM_ENGINE_AICPU) + "_param";
+    const std::string tag = "_" + std::to_string(HcclCMDType::HCCL_CMD_ALLGATHER) + "_" + "_" +
+                            std::to_string(static_cast<uint8_t>(OpExecuteConfig::AICPU_TS)) + "_0";
     ASSERT_EQ(HcclEngineCtxCreate(comm_, tag.c_str(), COMM_ENGINE_AICPU, 1, &cached), HCCL_SUCCESS);
     void* ctx = nullptr;
     uint32_t size = 0;

@@ -146,6 +146,7 @@ HcclResult AllocComResourceByTilingCcu(
 
     // 构建 OpResCtx 基础字段（workspace、XN、CKE等）
     OpResCtx resCtx{};
+    resCtx.debugMode = static_cast<const Mc2InitTilingInner*>(mc2Tiling)->debugMode;
     if (checkOnly) {
         resCtx.rankId = userRank;
         resCtx.rankSize = rankSize;

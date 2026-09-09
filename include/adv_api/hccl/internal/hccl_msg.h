@@ -233,6 +233,8 @@ struct OpResCtx {
     uint32_t opType[HCCL_API_MAX_OP_NUM];
     uint32_t algorithmType[HCCL_API_MAX_OP_NUM];
     uint64_t opParamSize[HCCL_API_MAX_OP_NUM];
+    bool isKfc[HCCL_API_MAX_OP_NUM];
+    uint8_t debugMode;
 };
 } // namespace HcclApi
 

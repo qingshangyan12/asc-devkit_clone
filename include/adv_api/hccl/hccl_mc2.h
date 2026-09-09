@@ -42,18 +42,6 @@ struct Mc2CcArgs {
 extern "C" {
 #endif // __cplusplus
 
-struct CcResCtx {
-    uint64_t version;
-    uint64_t workSpace;
-    uint64_t workSpaceSize;
-    uint64_t rankId;
-    uint64_t rankSize;
-    uint64_t opParam;
-    uint64_t opParamSize;
-    uint32_t opType;
-    uint8_t debugMode;
-};
-
 typedef struct {
     uint32_t numBlocks;
     uint32_t reserve;
@@ -126,8 +114,8 @@ extern HcclResult Mc2SetCcDebugMode(void* ccArgs, uint8_t debugMode);
  * @param comm The communication domain.
  * @param ccType The HcclCMDType communication operation.
  * @param ccArgs The communication arguments with algConfig and commEngine set.
- * @param ccResCtx The output device address of CcResCtx, owned by comm.
- * @param ccResCtxSize The output size of CcResCtx in bytes.
+ * @param ccResCtx The output device address of OpResCtx, owned by comm.
+ * @param ccResCtxSize The output size of OpResCtx in bytes.
  * @param schd Optional HcommCcuSchd output; zeroed for AICPU.
  */
 extern HcclResult Mc2AcquireCcResCtx(
