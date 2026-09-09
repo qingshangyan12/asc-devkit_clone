@@ -35,6 +35,7 @@ public:
     __aicore__ inline static void data_copy_impl(const DstTensor& dst, const SrcTensor& src,
                                                  const l0c_to_ub_params& params = default_l0c_to_ub_params)
     {
+        check_dual_dst_ctl<trait>();
         using dst_pos = get_mem_location<DstTensor>;
         using src_pos = get_mem_location<SrcTensor>;
         static_assert(Std::is_same_v<dst_pos, location::ub>,
@@ -59,6 +60,7 @@ public:
                                                  const SrcCoord& src_coord, const CopyShape& copy_shape,
                                                  const l0c_to_ub_params& params = default_l0c_to_ub_params)
     {
+        check_dual_dst_ctl<trait>();
         using dst_pos = get_mem_location<DstTensor>;
         using src_pos = get_mem_location<SrcTensor>;
         static_assert(Std::is_same_v<dst_pos, location::ub>,
@@ -80,6 +82,7 @@ public:
     data_copy_impl(const DstTensor& dst, const SrcTensor& src, const Quant& quant,
                    const l0c_to_ub_params& params = default_l0c_to_ub_params)
     {
+        check_dual_dst_ctl<trait>();
         using dst_pos = get_mem_location<DstTensor>;
         using src_pos = get_mem_location<SrcTensor>;
         static_assert(Std::is_same_v<dst_pos, location::ub>,
@@ -105,6 +108,7 @@ public:
                    const SrcCoord& src_coord, const CopyShape& copy_shape,
                    const l0c_to_ub_params& params = default_l0c_to_ub_params)
     {
+        check_dual_dst_ctl<trait>();
         using dst_pos = get_mem_location<DstTensor>;
         using src_pos = get_mem_location<SrcTensor>;
         static_assert(Std::is_same_v<dst_pos, location::ub>,
@@ -127,6 +131,7 @@ public:
     data_copy_impl(const DstTensor& dst, const SrcTensor& src, const Quant& quant,
                    const l0c_to_ub_params& params = default_l0c_to_ub_params)
     {
+        check_dual_dst_ctl<trait>();
         using dst_pos = get_mem_location<DstTensor>;
         using src_pos = get_mem_location<SrcTensor>;
         static_assert(Std::is_same_v<dst_pos, location::ub>,
@@ -153,6 +158,7 @@ public:
                    const SrcCoord& src_coord, const CopyShape& copy_shape,
                    const l0c_to_ub_params& params = default_l0c_to_ub_params)
     {
+        check_dual_dst_ctl<trait>();
         using dst_pos = get_mem_location<DstTensor>;
         using src_pos = get_mem_location<SrcTensor>;
         static_assert(Std::is_same_v<dst_pos, location::ub>,
@@ -168,6 +174,16 @@ public:
         auto resolved_src_coord = resolve_copy_coord(src.layout(), copy_shape, src_coord);
         copy_l0c_to_ub_impl::template run<trait>(dst, src, quant, resolved_dst_coord, resolved_src_coord, copy_shape,
                                                  params);
+    }
+
+private:
+    template <const l0c_to_ub_trait& trait>
+    __aicore__ inline static constexpr void check_dual_dst_ctl()
+    {
+        if constexpr (current_arch_version == arch_version::v9201) {
+            static_assert(trait.dual_dst_ctl == dual_dst_mode::disable,
+                          "For arch_version::v9201, dual_dst_ctl only supports disable.");
+        }
     }
 };
 
