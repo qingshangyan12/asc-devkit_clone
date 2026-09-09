@@ -46,6 +46,8 @@
 #include "dav_5162/kernel_operator_vec_reduce_impl.h"
 #elif (__NPU_ARCH__ == 3003)
 #include "dav_l300/kernel_operator_vec_reduce_impl.h"
+#elif (__NPU_ARCH__ == 3103)
+#include "dav_l310/kernel_operator_vec_reduce_impl.h"
 #elif (__NPU_ARCH__ == 3113)
 #include "dav_l311/kernel_operator_vec_reduce_impl.h"
 #endif
@@ -174,7 +176,7 @@ __aicore__ inline void CheckReduceRepeatMaxMinParams(
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
 #if defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 5102) || \
-     (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510) || \
+     (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510) || \
      (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     CheckValueRange<int>(static_cast<int>(order), 0, 3, "order", apiName);
 #elif (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002)
@@ -193,7 +195,7 @@ __aicore__ inline void CheckReduceRepeatMaxMinParams(
             (Std::is_same_v<MaskType, int32_t> ? KernelFuncType::MASK_COUNT_MODE : KernelFuncType::MASK_BIT_MODE));
     }
 #endif
-#if ASCENDC_CPU_DEBUG && (__NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if ASCENDC_CPU_DEBUG && (__NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3103 || __NPU_ARCH__ == 3113)
     MaskSetter::Instance().SetMask(isSetMask);
     if (!CheckFunVecReduceOther(
             dst, src, repeatTime, mask, dstRepStride, srcBlkStride, srcRepStride,
@@ -313,7 +315,7 @@ __aicore__ inline void ReduceRepeatCommon(
         "Invalid reduceType for ReduceRepeat, only ReduceType::SUM, ReduceType::MAX and ReduceType::MIN are "
         "supported.");
 #if defined(__NPU_ARCH__) &&                                                                                 \
-    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
      (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     static_assert(
         (reduceType == ReduceType::SUM || Std::is_same_v<SrcPrimType, DstPrimType>),
@@ -613,7 +615,7 @@ __aicore__ inline void PairReduceSum(
 }
 
 #if defined(__NPU_ARCH__) &&                                                                                 \
-    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
      (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 // RepeatReduceSum has been updated, please use ReduceRepeat instead.
 template <typename T, bool isSetMask = true, typename U = T>
@@ -683,7 +685,7 @@ __aicore__ inline void RepeatReduceSum(
  * @param [in] srcRepStride src repeat stride
  */
 #if defined(__NPU_ARCH__) &&                                                                                 \
-    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
      (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <typename T, bool isSetMask = true, typename U = T>
 __ASC_USE_RESERVED_UBUF__(
@@ -806,7 +808,7 @@ __aicore__ inline void WholeReduceMin(
 }
 
 #if defined(__NPU_ARCH__) &&                                                                               \
-    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || __NPU_ARCH__ == 3003 || \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3103 || \
      __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
 // WholeReduceSum has been updated, please use ReduceRepeat instead.
 template <typename T, bool isSetMask = true, typename U = T>
@@ -1052,7 +1054,7 @@ __aicore__ inline void ReduceMax(
     }
 #endif
 #if defined(__NPU_ARCH__) &&                                                                                 \
-    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
      (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     ReduceMaxImpl<PrimType>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
@@ -1099,7 +1101,7 @@ __aicore__ inline void ReduceMin(
         ASCENDC_REPORT_CHECK_ERROR("ReduceMin", KernelFuncType::MASK_COUNT_MODE);
     }
 #endif
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
     (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
     ReduceMinImpl<PrimType>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
@@ -1145,7 +1147,7 @@ __aicore__ inline void ReduceSum(
         ASCENDC_REPORT_CHECK_ERROR("ReduceSum", KernelFuncType::MASK_COUNT_MODE);
     }
 #endif
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
     (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
     ReduceSumImpl<PrimType>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
@@ -1183,7 +1185,7 @@ __aicore__ inline void ReduceMax(
     }
 #endif
 #if defined(__NPU_ARCH__) &&                                                                                 \
-    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
      (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     ReduceMaxImpl<PrimType>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
@@ -1220,7 +1222,7 @@ __aicore__ inline void ReduceMin(
         ASCENDC_REPORT_CHECK_ERROR("ReduceMin", KernelFuncType::MASK_BIT_MODE);
     }
 #endif
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
     (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
     ReduceMinImpl<PrimType>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
@@ -1257,7 +1259,7 @@ __aicore__ inline void ReduceSum(
         ASCENDC_REPORT_CHECK_ERROR("ReduceSum", KernelFuncType::MASK_BIT_MODE);
     }
 #endif
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
     (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
     ReduceSumImpl<PrimType>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
@@ -1298,7 +1300,7 @@ __aicore__ inline void ReduceMin(
 #endif
     using PrimType = PrimT<T>;
 #if defined(__NPU_ARCH__) &&                                                                                 \
-    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
      (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 #if ASCENDC_CPU_DEBUG
     int32_t oneRepSize = ONE_REPEAT_BYTE_SIZE / sizeof(PrimType);
@@ -1366,7 +1368,7 @@ __aicore__ inline void ReduceMax(
 #endif
     using PrimType = PrimT<T>;
 #if defined(__NPU_ARCH__) &&                                                                                 \
-    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
      (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 #if ASCENDC_CPU_DEBUG
     int32_t oneRepSize = ONE_REPEAT_BYTE_SIZE / sizeof(PrimType);
@@ -1449,7 +1451,7 @@ __aicore__ inline void ReduceSum(
     }
     ReduceSumImpl<PrimType, isSetMask>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
-#elif (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+#elif (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
     (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 #if ASCENDC_CPU_DEBUG
     int32_t oneRepSize = ONE_REPEAT_BYTE_SIZE / sizeof(PrimType);
@@ -1461,7 +1463,7 @@ __aicore__ inline void ReduceSum(
     ReduceSumImpl<PrimType>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ PrimType*)sharedTmpBuffer.GetPhyAddr(), count);
-#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
     ReduceSumImpl<PrimType>(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ PrimType*)sharedTmpBuffer.GetPhyAddr(), count);
@@ -1575,7 +1577,7 @@ __aicore__ inline int64_t GetReduceRepeatSumSpr()
         return 0;
     }
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3103 || __NPU_ARCH__ == 3113)
     return GetAccValImpl<int64_t>();
 #else
     return get_acc_val();
