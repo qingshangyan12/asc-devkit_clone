@@ -1,4 +1,4 @@
-# asc_get_ar_spr (废弃)
+# asc_sync_vec（废弃）
 
 ## 产品支持情况
 
@@ -6,10 +6,10 @@
 - Ascend 950PR/Ascend 950DT：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
@@ -26,16 +26,16 @@
 
 ## 功能说明
 
-头文件路径为：`"c_api/spr/spr.h"`。
+头文件路径为：`"c_api/sync/sync.h"`。
 
-**该接口已废弃，请使用[asc_get_squeeze_status](asc_get_squeeze_status.md)实现此功能。**
+**无入参原型`asc_sync_vec()`已废弃，请使用[asc_sync](../sync/asc_sync.md)执行针对所有流水的同步操作。**
 
-读取指定特殊寄存器的值。
+等待`PIPE_V`中的前序指令完成后，再执行其他流水的后续指令。
 
 ## 函数原型
 
-```cpp
-__aicore__ inline int64_t asc_get_ar_spr()
+```c
+__aicore__ inline void asc_sync_vec()
 ```
 
 ## 参数说明
@@ -44,7 +44,7 @@ __aicore__ inline int64_t asc_get_ar_spr()
 
 ## 返回值说明
 
-返回int64_t类型的特殊寄存器中的数值。
+无
 
 ## 流水类型
 
@@ -52,8 +52,10 @@ PIPE_S
 
 ## 约束说明
 
-无
+本接口只能在AIV中调用。
 
 ## 调用示例
 
-无
+```cpp
+asc_sync();
+```

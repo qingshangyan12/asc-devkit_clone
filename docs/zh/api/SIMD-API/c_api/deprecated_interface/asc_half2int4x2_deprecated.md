@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/reg_compute/reg_convert.h"`。
 
-**该接口已废弃，后续版本将不再支持。**
+**接口名带`_v2`、`_v3`或`_v4`位置后缀的原型在当前设备上不受支持，现已废弃。仅处理索引0位置时，请使用[asc_half2int4x2](../reg_compute/reg_convert/asc_half2int4x2.md)中不带位置后缀的原型替代；索引1、2、3位置当前无直接替代接口。**
 
 将half类型数据转为int4x2类型，并支持多种舍入模式，饱和/非饱和模式。
 
@@ -37,12 +37,8 @@
 ## 函数原型
 
 ```cpp
-// FLOOR舍入模式，非饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_half2int4x2_rd(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 // FLOOR舍入模式，非饱和模式，选取索引1的位置
 __simd_callee__ inline void asc_half2int4x2_rd_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// FLOOR舍入模式，饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_half2int4x2_rd_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 // FLOOR舍入模式，饱和模式，选取索引1的位置
 __simd_callee__ inline void asc_half2int4x2_rd_sat_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 // FLOOR舍入模式，非饱和模式，选取索引2的位置
@@ -53,12 +49,8 @@ __simd_callee__ inline void asc_half2int4x2_rd_sat_v3(vector_int4x2_t& dst, vect
 __simd_callee__ inline void asc_half2int4x2_rd_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 // FLOOR舍入模式，饱和模式，选取索引3的位置
 __simd_callee__ inline void asc_half2int4x2_rd_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// RINT舍入模式，非饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_half2int4x2_rn(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 // RINT舍入模式，非饱和模式，选取索引1的位置
 __simd_callee__ inline void asc_half2int4x2_rn_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// RINT舍入模式，饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_half2int4x2_rn_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 // RINT舍入模式，饱和模式，选取索引1的位置
 __simd_callee__ inline void asc_half2int4x2_rn_sat_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 // RINT舍入模式，非饱和模式，选取索引2的位置
@@ -69,12 +61,8 @@ __simd_callee__ inline void asc_half2int4x2_rn_sat_v3(vector_int4x2_t& dst, vect
 __simd_callee__ inline void asc_half2int4x2_rn_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 // RINT舍入模式，饱和模式，选取索引3的位置
 __simd_callee__ inline void asc_half2int4x2_rn_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// ROUND舍入模式，非饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_half2int4x2_rna(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 // ROUND舍入模式，非饱和模式，选取索引1的位置
 __simd_callee__ inline void asc_half2int4x2_rna_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// ROUND舍入模式，饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_half2int4x2_rna_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 // ROUND舍入模式，饱和模式，选取索引1的位置
 __simd_callee__ inline void asc_half2int4x2_rna_sat_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 // ROUND舍入模式，非饱和模式，选取索引2的位置
@@ -85,12 +73,8 @@ __simd_callee__ inline void asc_half2int4x2_rna_sat_v3(vector_int4x2_t& dst, vec
 __simd_callee__ inline void asc_half2int4x2_rna_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 // ROUND舍入模式，饱和模式，选取索引3的位置
 __simd_callee__ inline void asc_half2int4x2_rna_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// CEIL舍入模式，非饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_half2int4x2_ru(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 // CEIL舍入模式，非饱和模式，选取索引1的位置
 __simd_callee__ inline void asc_half2int4x2_ru_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// CEIL舍入模式，饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_half2int4x2_ru_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 // CEIL舍入模式，饱和模式，选取索引1的位置
 __simd_callee__ inline void asc_half2int4x2_ru_sat_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 // CEIL舍入模式，非饱和模式，选取索引2的位置
@@ -101,12 +85,8 @@ __simd_callee__ inline void asc_half2int4x2_ru_sat_v3(vector_int4x2_t& dst, vect
 __simd_callee__ inline void asc_half2int4x2_ru_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 // CEIL舍入模式，饱和模式，选取索引3的位置  
 __simd_callee__ inline void asc_half2int4x2_ru_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// TRUNC舍入模式，非饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_half2int4x2_rz(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 // TRUNC舍入模式，非饱和模式，选取索引1的位置
 __simd_callee__ inline void asc_half2int4x2_rz_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// TRUNC舍入模式，饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_half2int4x2_rz_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 // TRUNC舍入模式，饱和模式，选取索引1的位置
 __simd_callee__ inline void asc_half2int4x2_rz_sat_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 // TRUNC舍入模式，非饱和模式，选取索引2的位置

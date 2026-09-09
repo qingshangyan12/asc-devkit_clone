@@ -28,15 +28,13 @@
 
 头文件路径为：`"c_api/reg_compute/reg_convert.h"`。
 
-**该接口已废弃，后续版本将不再支持。**
+**接口名带`_v2`、`_v3`或`_v4`位置后缀的原型在当前设备上不受支持，现已废弃。仅处理索引0位置时，请使用[asc_int4x22bfloat16](../reg_compute/reg_convert/asc_int4x22bfloat16.md)替代；索引1、2、3位置当前无直接替代接口。**
 
 将int4x2_t类型转化为bfloat16_t类型，无舍入模式。
 
 ## 函数原型
 
 ```cpp
-// 数据读取索引为0的位置
-__simd_callee__ inline void asc_int4x22bfloat16(vector_bfloat16_t& dst, vector_int4x2_t src, vector_bool mask)
 // 数据读取索引为1的位置
 __simd_callee__ inline void asc_int4x22bfloat16_v2(vector_bfloat16_t& dst, vector_int4x2_t src, vector_bool mask)
 // 数据读取索引为2的位置

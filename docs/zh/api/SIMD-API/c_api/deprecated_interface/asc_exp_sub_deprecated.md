@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/reg_compute/compute/reg_fused.h"`。
 
-**输入数据类型为`half`且不带`src_pos`参数的`asc_exp_sub`原型以及`asc_exp_sub_v2`原型已废弃。新接口请参见[asc_exp_sub](../reg_compute/reg_fused/asc_exp_sub.md)。**
+**输入数据类型为`half`且不带`src_pos`参数的`asc_exp_sub`原型以及`asc_exp_sub_v2`原型已废弃。`half`类型请使用[asc_exp_sub](../reg_compute/reg_fused/asc_exp_sub.md)页面中的`asc_exp_sub_half2float`显式位置参数原型替代；`float`类型的`asc_exp_sub_v2`请使用同页面中的`asc_exp_sub`替代。**
 
 这些接口将`src0`与`src1`按元素相减，并计算以差值为指数的自然指数函数，将计算结果写入`dst`。
 

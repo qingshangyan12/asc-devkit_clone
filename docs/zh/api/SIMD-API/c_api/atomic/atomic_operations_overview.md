@@ -14,7 +14,7 @@
 | [asc_set_atomic_min](datamove_atomic/asc_set_atomic_min.md) | 设置后续搬运到GM的数据是否执行原子比较：将待拷贝的内容和GM已有内容进行比较，然后将最小值写入GM。 |
 | [asc_disable_dma_atomic](datamove_atomic/asc_disable_dma_atomic.md) | 关闭数据搬运随路原子操作功能。 |
 | [asc_set_store_atomic_config_v1](scalar_atomic/asc_set_store_atomic_config_v1.md) | 设置数据搬运的原子操作配置。 |
-| [asc_get_store_atomic_config](scalar_atomic/asc_get_store_atomic_config.md) | 获取数据搬运的原子操作配置。 |
+| [asc_get_store_atomic_config（废弃）](../deprecated_interface/asc_get_store_atomic_config_deprecated.md) | 获取数据搬运的原子操作配置。 |
 
 <!-- npu="950" id1 -->
 针对Ascend 950PR/Ascend 950DT，新增Scalar原子操作接口，能够在指定GM地址上进行单点原子计算操作，涉及的接口请参见[表2](#table2)。对比数据搬运随路原子操作接口，Scalar原子操作接口不会影响后续向GM搬运数据的指令。
