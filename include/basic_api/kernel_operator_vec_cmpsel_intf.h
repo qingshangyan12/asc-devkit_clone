@@ -288,7 +288,7 @@ __aicore__ inline void Select(
  * @param [in] count number Number of data involved in calculation
  */
 // One of src0/src1 should be Scalar
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
     (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 template <
     typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, bool isSetMask = true,
