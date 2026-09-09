@@ -18,11 +18,13 @@
 #ifndef IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_SYNC_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_SYNC_INTF_IMPL_H
 
+#include "impl/c_api/reg_base_impl/utils_impl.h"
+
 [[deprecated("NOTICE: asc_sync_vec() is deprecated. "
              "Please use asc_sync() instead")]]
 __aicore__ inline void asc_sync_vec()
 {
-    pipe_barrier(pipe_t::PIPE_ALL);
+    asc_sync_post_process();
 }
 
 #endif

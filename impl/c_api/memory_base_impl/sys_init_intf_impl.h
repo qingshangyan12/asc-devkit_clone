@@ -24,7 +24,7 @@ __aicore__ inline void asc_init()
 {
     if ASC_IS_AIV {
         set_atomic_none();
-        set_mask_norm();
+        asc_set_mask_count_end();
         set_vector_mask(static_cast<uint64_t>(-1), static_cast<uint64_t>(-1));
     }
 }

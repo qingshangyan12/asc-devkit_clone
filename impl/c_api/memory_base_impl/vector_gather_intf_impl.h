@@ -20,7 +20,7 @@
 
 #include "impl/c_api/memory_base_impl/utils_impl.h"
 
-__aicore__ inline void asc_gather_datablock_impl(
+__aicore__ inline void asc_gather_datablock(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
     uint8_t dst_block_stride, uint8_t repeat)
 {
@@ -29,7 +29,7 @@ __aicore__ inline void asc_gather_datablock_impl(
     }
 }
 
-__aicore__ inline void asc_gather_datablock_impl(
+__aicore__ inline void asc_gather_datablock(
     __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
     uint8_t dst_block_stride, uint8_t repeat)
 {
@@ -39,7 +39,7 @@ __aicore__ inline void asc_gather_datablock_impl(
 }
 
 // asc_gather int16_t
-__aicore__ inline void asc_gather_impl(
+__aicore__ inline void asc_gather(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
     uint8_t repeat)
 {
@@ -48,16 +48,16 @@ __aicore__ inline void asc_gather_impl(
     }
 }
 
-__aicore__ inline void asc_gather_impl(
+__aicore__ inline void asc_gather(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_gather_impl(dst, src, src_offset, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT.U8);
+    asc_gather(dst, src, src_offset, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT.U8);
     asc_set_mask_count_end();
 }
 
 // asc_gather uint16_t
-__aicore__ inline void asc_gather_impl(
+__aicore__ inline void asc_gather(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
     uint8_t repeat)
 {
@@ -66,154 +66,15 @@ __aicore__ inline void asc_gather_impl(
     }
 }
 
-__aicore__ inline void asc_gather_impl(
+__aicore__ inline void asc_gather(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_gather_impl(dst, src, src_offset, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT.U8);
+    asc_gather(dst, src, src_offset, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT.U8);
     asc_set_mask_count_end();
 }
 
 // asc_gather half
-__aicore__ inline void asc_gather_impl(
-    __ubuf__ half* dst, __ubuf__ half* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride, uint8_t repeat)
-{
-    if ASC_IS_AIV {
-        vgather((__ubuf__ uint16_t*)dst, src_offset, (uint64_t)src, dst_repeat_stride, repeat);
-    }
-}
-
-__aicore__ inline void asc_gather_impl(
-    __ubuf__ half* dst, __ubuf__ half* src, __ubuf__ uint32_t* src_offset, uint32_t count)
-{
-    asc_set_mask_count_begin(count);
-    asc_gather_impl(dst, src, src_offset, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT.U8);
-    asc_set_mask_count_end();
-}
-
-// asc_gather bfloat16_t
-__aicore__ inline void asc_gather_impl(
-    __ubuf__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
-    uint8_t repeat)
-{
-    if ASC_IS_AIV {
-        vgather((__ubuf__ uint16_t*)dst, src_offset, (uint64_t)src, dst_repeat_stride, repeat);
-    }
-}
-
-__aicore__ inline void asc_gather_impl(
-    __ubuf__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
-{
-    asc_set_mask_count_begin(count);
-    asc_gather_impl(dst, src, src_offset, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT.U8);
-    asc_set_mask_count_end();
-}
-
-// asc_gather int32_t
-__aicore__ inline void asc_gather_impl(
-    __ubuf__ int32_t* dst, __ubuf__ int32_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
-    uint8_t repeat)
-{
-    if ASC_IS_AIV {
-        vgather((__ubuf__ uint32_t*)dst, src_offset, (uint64_t)src, dst_repeat_stride, repeat);
-    }
-}
-
-__aicore__ inline void asc_gather_impl(
-    __ubuf__ int32_t* dst, __ubuf__ int32_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
-{
-    asc_set_mask_count_begin(count);
-    asc_gather_impl(dst, src, src_offset, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT.U8);
-    asc_set_mask_count_end();
-}
-
-// asc_gather uint32_t
-__aicore__ inline void asc_gather_impl(
-    __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
-    uint8_t repeat)
-{
-    if ASC_IS_AIV {
-        vgather(dst, src_offset, (uint64_t)src, dst_repeat_stride, repeat);
-    }
-}
-
-__aicore__ inline void asc_gather_impl(
-    __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
-{
-    asc_set_mask_count_begin(count);
-    asc_gather_impl(dst, src, src_offset, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT.U8);
-    asc_set_mask_count_end();
-}
-
-// asc_gather float
-__aicore__ inline void asc_gather_impl(
-    __ubuf__ float* dst, __ubuf__ float* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride, uint8_t repeat)
-{
-    if ASC_IS_AIV {
-        vgather((__ubuf__ uint32_t*)dst, src_offset, (uint64_t)src, dst_repeat_stride, repeat);
-    }
-}
-
-__aicore__ inline void asc_gather_impl(
-    __ubuf__ float* dst, __ubuf__ float* src, __ubuf__ uint32_t* src_offset, uint32_t count)
-{
-    asc_set_mask_count_begin(count);
-    asc_gather_impl(dst, src, src_offset, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT.U8);
-    asc_set_mask_count_end();
-}
-
-__aicore__ inline void asc_gather_datablock(
-    __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
-    uint8_t dst_block_stride, uint8_t repeat)
-{
-    if ASC_IS_AIV {
-        vgatherb(dst, src_offset, (uint64_t)src, dst_repeat_stride, dst_block_stride, repeat);
-    }
-}
-
-__aicore__ inline void asc_gather_datablock(
-    __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
-    uint8_t dst_block_stride, uint8_t repeat)
-{
-    if ASC_IS_AIV {
-        vgatherb(dst, src_offset, (uint64_t)src, dst_repeat_stride, dst_block_stride, repeat);
-    }
-}
-
-__aicore__ inline void asc_gather(
-    __ubuf__ int16_t* dst, __ubuf__ int16_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
-    uint8_t repeat)
-{
-    if ASC_IS_AIV {
-        vgather((__ubuf__ uint16_t*)dst, src_offset, (uint64_t)src, dst_repeat_stride, repeat);
-    }
-}
-
-__aicore__ inline void asc_gather(
-    __ubuf__ int16_t* dst, __ubuf__ int16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
-{
-    asc_set_mask_count_begin(count);
-    asc_gather_impl(dst, src, src_offset, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT.U8);
-    asc_set_mask_count_end();
-}
-
-__aicore__ inline void asc_gather(
-    __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
-    uint8_t repeat)
-{
-    if ASC_IS_AIV {
-        vgather(dst, src_offset, (uint64_t)src, dst_repeat_stride, repeat);
-    }
-}
-
-__aicore__ inline void asc_gather(
-    __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
-{
-    asc_set_mask_count_begin(count);
-    asc_gather_impl(dst, src, src_offset, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT.U8);
-    asc_set_mask_count_end();
-}
-
 __aicore__ inline void asc_gather(
     __ubuf__ half* dst, __ubuf__ half* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride, uint8_t repeat)
 {
@@ -225,10 +86,11 @@ __aicore__ inline void asc_gather(
 __aicore__ inline void asc_gather(__ubuf__ half* dst, __ubuf__ half* src, __ubuf__ uint32_t* src_offset, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_gather_impl(dst, src, src_offset, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT.U8);
+    asc_gather(dst, src, src_offset, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT.U8);
     asc_set_mask_count_end();
 }
 
+// asc_gather bfloat16_t
 __aicore__ inline void asc_gather(
     __ubuf__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
     uint8_t repeat)
@@ -242,10 +104,11 @@ __aicore__ inline void asc_gather(
     __ubuf__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_gather_impl(dst, src, src_offset, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT.U8);
+    asc_gather(dst, src, src_offset, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT.U8);
     asc_set_mask_count_end();
 }
 
+// asc_gather int32_t
 __aicore__ inline void asc_gather(
     __ubuf__ int32_t* dst, __ubuf__ int32_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
     uint8_t repeat)
@@ -259,10 +122,11 @@ __aicore__ inline void asc_gather(
     __ubuf__ int32_t* dst, __ubuf__ int32_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_gather_impl(dst, src, src_offset, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT.U8);
+    asc_gather(dst, src, src_offset, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT.U8);
     asc_set_mask_count_end();
 }
 
+// asc_gather uint32_t
 __aicore__ inline void asc_gather(
     __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
     uint8_t repeat)
@@ -276,10 +140,11 @@ __aicore__ inline void asc_gather(
     __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_gather_impl(dst, src, src_offset, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT.U8);
+    asc_gather(dst, src, src_offset, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT.U8);
     asc_set_mask_count_end();
 }
 
+// asc_gather float
 __aicore__ inline void asc_gather(
     __ubuf__ float* dst, __ubuf__ float* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride, uint8_t repeat)
 {
@@ -292,7 +157,7 @@ __aicore__ inline void asc_gather(
     __ubuf__ float* dst, __ubuf__ float* src, __ubuf__ uint32_t* src_offset, uint32_t count)
 {
     asc_set_mask_count_begin(count);
-    asc_gather_impl(dst, src, src_offset, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT.U8);
+    asc_gather(dst, src, src_offset, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT.U8);
     asc_set_mask_count_end();
 }
 

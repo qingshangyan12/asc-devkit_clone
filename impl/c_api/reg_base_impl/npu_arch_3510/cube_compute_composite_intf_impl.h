@@ -26,10 +26,13 @@ __aicore__ inline void asc_mmad_mx_sync(
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
 {
-    asc_mmad_mx(
-        c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
-        c_matrix_init_val);
-    asc_sync_post_process();
+    if ASC_IS_AIC {
+        mad_mx(
+            c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
+            c_matrix_init_val);
+
+        asc_sync_post_process();
+    }
 }
 
 ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad_mx and asc_sync)
@@ -38,10 +41,13 @@ __aicore__ inline void asc_mmad_mx_sync(
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
 {
-    asc_mmad_mx(
-        c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
-        c_matrix_init_val);
-    asc_sync_post_process();
+    if ASC_IS_AIC {
+        mad_mx(
+            c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
+            c_matrix_init_val);
+
+        asc_sync_post_process();
+    }
 }
 
 ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad_mx and asc_sync)
@@ -50,10 +56,13 @@ __aicore__ inline void asc_mmad_mx_sync(
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
 {
-    asc_mmad_mx(
-        c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
-        c_matrix_init_val);
-    asc_sync_post_process();
+    if ASC_IS_AIC {
+        mad_mx(
+            c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
+            c_matrix_init_val);
+
+        asc_sync_post_process();
+    }
 }
 
 ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad_mx and asc_sync)
@@ -62,10 +71,13 @@ __aicore__ inline void asc_mmad_mx_sync(
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
 {
-    asc_mmad_mx(
-        c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
-        c_matrix_init_val);
-    asc_sync_post_process();
+    if ASC_IS_AIC {
+        mad_mx(
+            c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
+            c_matrix_init_val);
+
+        asc_sync_post_process();
+    }
 }
 
 ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad_mx and asc_sync)
@@ -74,10 +86,13 @@ __aicore__ inline void asc_mmad_mx_sync(
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
 {
-    asc_mmad_mx(
-        c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
-        c_matrix_init_val);
-    asc_sync_post_process();
+    if ASC_IS_AIC {
+        mad_mx(
+            c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
+            c_matrix_init_val);
+
+        asc_sync_post_process();
+    }
 }
 
 ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad_mx and asc_sync)
@@ -86,10 +101,13 @@ __aicore__ inline void asc_mmad_mx_sync(
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
 {
-    asc_mmad_mx(
-        c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
-        c_matrix_init_val);
-    asc_sync_post_process();
+    if ASC_IS_AIC {
+        mad_mx(
+            c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
+            c_matrix_init_val);
+
+        asc_sync_post_process();
+    }
 }
 
 ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad_mx and asc_sync)
@@ -98,10 +116,13 @@ __aicore__ inline void asc_mmad_mx_sync(
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
 {
-    asc_mmad_mx(
-        c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
-        c_matrix_init_val);
-    asc_sync_post_process();
+    if ASC_IS_AIC {
+        mad_mx(
+            c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
+            c_matrix_init_val);
+
+        asc_sync_post_process();
+    }
 }
 
 ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad_mx and asc_sync)
@@ -110,10 +131,13 @@ __aicore__ inline void asc_mmad_mx_sync(
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
 {
-    asc_mmad_mx(
-        c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
-        c_matrix_init_val);
-    asc_sync_post_process();
+    if ASC_IS_AIC {
+        mad_mx(
+            c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
+            c_matrix_init_val);
+
+        asc_sync_post_process();
+    }
 }
 
 ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad and asc_sync)
@@ -122,10 +146,12 @@ __aicore__ inline void asc_mmad_sync(
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
 {
-    asc_mmad(
-        c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
-        c_matrix_init_val);
-    asc_sync_post_process();
+    if ASC_IS_AIC {
+        mad(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
+            c_matrix_init_val);
+
+        asc_sync_post_process();
+    }
 }
 
 ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad and asc_sync)
@@ -134,10 +160,12 @@ __aicore__ inline void asc_mmad_sync(
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
 {
-    asc_mmad(
-        c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
-        c_matrix_init_val);
-    asc_sync_post_process();
+    if ASC_IS_AIC {
+        mad(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
+            c_matrix_init_val);
+
+        asc_sync_post_process();
+    }
 }
 
 ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad and asc_sync)
@@ -146,10 +174,12 @@ __aicore__ inline void asc_mmad_sync(
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
 {
-    asc_mmad(
-        c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
-        c_matrix_init_val);
-    asc_sync_post_process();
+    if ASC_IS_AIC {
+        mad(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
+            c_matrix_init_val);
+
+        asc_sync_post_process();
+    }
 }
 
 ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad and asc_sync)
@@ -158,10 +188,12 @@ __aicore__ inline void asc_mmad_sync(
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
 {
-    asc_mmad(
-        c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
-        c_matrix_init_val);
-    asc_sync_post_process();
+    if ASC_IS_AIC {
+        mad(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
+            c_matrix_init_val);
+
+        asc_sync_post_process();
+    }
 }
 
 ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad and asc_sync)
@@ -170,10 +202,12 @@ __aicore__ inline void asc_mmad_sync(
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
 {
-    asc_mmad(
-        c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
-        c_matrix_init_val);
-    asc_sync_post_process();
+    if ASC_IS_AIC {
+        mad(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
+            c_matrix_init_val);
+
+        asc_sync_post_process();
+    }
 }
 
 ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad and asc_sync)
@@ -181,10 +215,12 @@ __aicore__ inline void asc_mmad_sync(
     __cc__ float* c_matrix, __ca__ half* a_matrix, __cb__ half* b_matrix, uint16_t left_height, uint16_t n_dim,
     uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
-    asc_mmad(
-        c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
-        c_matrix_init_val);
-    asc_sync_post_process();
+    if ASC_IS_AIC {
+        mad(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
+            c_matrix_init_val);
+
+        asc_sync_post_process();
+    }
 }
 
 ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad and asc_sync)
@@ -192,10 +228,12 @@ __aicore__ inline void asc_mmad_sync(
     __cc__ float* c_matrix, __ca__ float* a_matrix, __cb__ float* b_matrix, uint16_t left_height, uint16_t n_dim,
     uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
-    asc_mmad(
-        c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
-        c_matrix_init_val);
-    asc_sync_post_process();
+    if ASC_IS_AIC {
+        mad(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
+            c_matrix_init_val);
+
+        asc_sync_post_process();
+    }
 }
 
 ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad and asc_sync)
@@ -203,10 +241,12 @@ __aicore__ inline void asc_mmad_sync(
     __cc__ int32_t* c_matrix, __ca__ int8_t* a_matrix, __cb__ int8_t* b_matrix, uint16_t left_height, uint16_t n_dim,
     uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
-    asc_mmad(
-        c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
-        c_matrix_init_val);
-    asc_sync_post_process();
+    if ASC_IS_AIC {
+        mad(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
+            c_matrix_init_val);
+
+        asc_sync_post_process();
+    }
 }
 
 ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad and asc_sync)
@@ -215,10 +255,12 @@ __aicore__ inline void asc_mmad_sync(
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
 {
-    asc_mmad(
-        c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
-        c_matrix_init_val);
-    asc_sync_post_process();
+    if ASC_IS_AIC {
+        mad(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
+            c_matrix_init_val);
+
+        asc_sync_post_process();
+    }
 }
 
 #endif

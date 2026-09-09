@@ -1935,7 +1935,6 @@ asc_int162uint8_sat_v2(vector_uint8_t& dst, vector_int16_t src, vector_bool mask
     }
 }
 
-// ==========asc_float2int16_rd/ru/rz/rn/rna==========
 [[deprecated("NOTICE: asc_float2int16_rd(vector_int16_t& dst, vector_float src, vector_bool mask) is deprecated. "
              "Please use asc_float2int16_rd(vector_int16_t& dst, vector_float src, vector_bool mask, "
              "ASC_POSITION_EVEN) instead.")]] __simd_callee__ inline void
@@ -2131,7 +2130,6 @@ asc_float2int16_rz_sat_v2(vector_int16_t& dst, vector_float src, vector_bool mas
     }
 }
 
-// ==========asc_float2int64_rd/ru/rz/rn/rna==========
 [[deprecated("NOTICE: asc_float2int64_rd(vector_int64_t& dst, vector_float src, vector_bool mask) is deprecated. "
              "Please use asc_float2int64_rd(vector_int64_t& dst, vector_float src, vector_bool mask, "
              "ASC_POSITION_EVEN) instead.")]] __simd_callee__ inline void
@@ -2327,7 +2325,6 @@ asc_float2int64_rz_sat_v2(vector_int64_t& dst, vector_float src, vector_bool mas
     }
 }
 
-// ==========asc_bfloat162e2m1x2_rd/rn/rna/ru/rz==========
 [[deprecated(
     "NOTICE: asc_bfloat162e2m1x2_rd(vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask) is deprecated. "
     "Please use asc_bfloat162e2m1x2_rd(vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask, "
@@ -2533,7 +2530,6 @@ asc_bfloat162e2m1x2_rz_v4(vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vecto
     }
 }
 
-// ==========asc_float2hif8_rh/rna==========
 [[deprecated("NOTICE: asc_float2hif8_rh_sat(vector_hifloat8_t& dst, vector_float src, vector_bool mask) is deprecated. "
              "Please use asc_float2hif8_rh_sat(vector_hifloat8_t& dst, vector_float src, vector_bool mask, "
              "ASC_DISPERSE_FIRST_QUARTER) instead.")]] __simd_callee__ inline void
@@ -3430,7 +3426,6 @@ asc_float2e4m3_rn_v4(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mas
     }
 }
 
-// ==========asc_bfloat162e1m2x2_rd/rn/rna/ru/rz==========
 [[deprecated(
     "NOTICE: asc_bfloat162e1m2x2_rd(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask) is deprecated. "
     "Please use asc_bfloat162e1m2x2_rd(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask, "

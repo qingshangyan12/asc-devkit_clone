@@ -234,7 +234,8 @@ impl/adv_api/
 ### C API清单
 
 ```text
-□ include/c_api/<category>/[子目录/]<header>.h或添加函数声明到现有文件
+□ include/c_api/<category>/<header>.h
+    新增公开头，或在现有公开头中添加函数声明；如分类下还有嵌套目录，沿用现有目录层级
 
 □ impl/c_api/memory_base_impl/<header>_intf_impl.h
     2201实现，公开接口包装与专用辅助实现放在对应公开头的实现文件中

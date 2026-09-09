@@ -18,12 +18,8 @@
 #ifndef IMPL_C_API_REG_BASE_IMPL_SCALAR_CONVERT_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_SCALAR_CONVERT_INTF_IMPL_H
 
-__aicore__ inline half asc_float2half_ro_impl(float value) { return conv_f322f16o(value); }
-
-// ==========asc_float2half (ro)==========
 __aicore__ inline half asc_float2half_ro(float value) { return conv_f322f16o(value); }
 
-// ==========asc_float2int32 (rd/ru/rn/rna)==========
 __aicore__ inline int32_t asc_float2int32_rd(float value) { return conv_f322s32f(value); }
 
 __aicore__ inline int32_t asc_float2int32_ru(float value) { return conv_f322s32c(value); }

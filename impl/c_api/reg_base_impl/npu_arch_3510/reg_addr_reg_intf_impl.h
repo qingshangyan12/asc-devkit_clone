@@ -18,7 +18,6 @@
 #ifndef IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_REG_ADDR_REG_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_REG_ADDR_REG_INTF_IMPL_H
 
-// ==========asc_create_iter_reg (deprecated, please use asc_update_addr_reg instead)=========
 #define ASC_DEFINE_ITER_REG_DEPRECATED_API(bxx)                                                                      \
     [[deprecated("NOTICE: asc_create_iter_reg_" #bxx " is deprecated. "                                              \
                  "Please use asc_update_addr_reg_" #bxx                                                              \

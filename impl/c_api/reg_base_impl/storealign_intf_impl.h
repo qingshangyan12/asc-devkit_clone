@@ -76,20 +76,16 @@ union asc_store_align_config_post {
 
 // storealign_intlv
 
-// asc_storealign_pack_quarter_impl forwards to asc_storealign_pack_v2_impl
-
-// asc_storealign_pack_quarter_postupdate_impl forwards to asc_storealign_pack_postupdate_v2_impl
-
-__simd_callee__ inline void asc_storealign_squeeze_status_impl(__ubuf__ uint32_t* dst, int32_t offset)
+__simd_callee__ inline void asc_storealign_squeeze_status(__ubuf__ uint32_t* dst, int32_t offset)
 {
     if ASC_IS_AIV {
         sprsts(SPR_AR, dst, offset);
     }
 }
 
-__simd_callee__ inline void asc_storealign_squeeze_status_impl(__ubuf__ uint32_t* dst)
+__simd_callee__ inline void asc_storealign_squeeze_status(__ubuf__ uint32_t* dst)
 {
-    asc_storealign_squeeze_status_impl(dst, 0);
+    asc_storealign_squeeze_status(dst, 0);
 }
 
 // ==========偏移固定传入0，由用户自行更新目的操作数的地址=========
@@ -2237,18 +2233,6 @@ __simd_callee__ inline void asc_storealign_pack_quarter_postupdate(
 {
     if ASC_IS_AIV {
         vsts(src, dst, offset, PK4_B32, mask, POST_UPDATE);
-    }
-}
-
-__simd_callee__ inline void asc_storealign_squeeze_status(__ubuf__ uint32_t* dst)
-{
-    asc_storealign_squeeze_status_impl(dst, 0);
-}
-
-__simd_callee__ inline void asc_storealign_squeeze_status(__ubuf__ uint32_t* dst, int32_t offset)
-{
-    if ASC_IS_AIV {
-        sprsts(SPR_AR, dst, offset);
     }
 }
 

@@ -18,8 +18,6 @@
 #ifndef IMPL_C_API_REG_BASE_IMPL_SYS_MISC_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_SYS_MISC_INTF_IMPL_H
 
-namespace __asc_aicore {} // namespace __asc_aicore
-
 namespace __asc_aicore {
 __aicore__ inline void asc_nop() { asm volatile("nop"); }
 } // namespace __asc_aicore

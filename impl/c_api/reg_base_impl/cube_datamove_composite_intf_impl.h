@@ -18,8 +18,6 @@
 #ifndef IMPL_C_API_REG_BASE_IMPL_CUBE_DATAMOVE_COMPOSITE_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_CUBE_DATAMOVE_COMPOSITE_INTF_IMPL_H
 
-#include "impl/c_api/reg_base_impl/cube_datamove_intf_impl.h"
-
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/reg_base_impl/npu_arch_3510/cube_datamove_composite_intf_impl.h"
 #endif
