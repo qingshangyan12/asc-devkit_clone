@@ -105,7 +105,7 @@ enum class histogram_half {
     low,
     high,
 };
- 
+
 enum class histogram_mode {
     frequency,
     cumulative,

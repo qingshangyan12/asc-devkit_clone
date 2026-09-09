@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/utils/print_tensor_debug_bus_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/utils/print.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_PRINT_TENSOR_DEBUG_BUS_IMPL_H
@@ -50,22 +50,22 @@ struct debug_bus_chunk {
     __aicore__ inline uint32_t word(uint32_t index) const
     {
         switch (index) {
-        case 0:
-            return word0;
-        case 1:
-            return word1;
-        case 2:
-            return word2;
-        case 3:
-            return word3;
-        case 4:
-            return word4;
-        case 5:
-            return word5;
-        case 6:
-            return word6;
-        default:
-            return word7;
+            case 0:
+                return word0;
+            case 1:
+                return word1;
+            case 2:
+                return word2;
+            case 3:
+                return word3;
+            case 4:
+                return word4;
+            case 5:
+                return word5;
+            case 6:
+                return word6;
+            default:
+                return word7;
         }
     }
 
@@ -79,8 +79,8 @@ struct debug_bus_chunk {
             uint32_t byte_value = (word(byte_index >> 2) >> ((byte_index & 3U) << 3)) & 0xFFU;
             value |= static_cast<uint64_t>(byte_value) << (i << 3);
         }
-        return (value >> (bit_offset & 7U))
-               & (bit_count == 64U ? ~0ULL : ((static_cast<uint64_t>(1U) << bit_count) - 1U));
+        return (value >> (bit_offset & 7U)) &
+               (bit_count == 64U ? ~0ULL : ((static_cast<uint64_t>(1U) << bit_count) - 1U));
     }
 };
 
@@ -94,14 +94,16 @@ template <AscendC::Hardware Hardware>
 __aicore__ inline void configure_debug_bus_read(uint64_t debug_bus_address, uint64_t local_address)
 {
     __asc_aicore::sync_all();
-    __asc_aicore::debug_bus_write_reg(debug_bus_address, __asc_aicore::ASC_DEBUG_BUS_UNLOCK_OFFSET,
-                                      __asc_aicore::ASC_DEBUG_BUS_UNLOCK_VALUE);
-    __asc_aicore::debug_bus_write_reg(debug_bus_address, __asc_aicore::ASC_DEBUG_BUS_ADDR_LOW_OFFSET,
-                                      get_debug_bus_local_offset<Hardware>(local_address));
-    __asc_aicore::debug_bus_write_reg(debug_bus_address, __asc_aicore::ASC_DEBUG_BUS_MODEL_BASE_OFFSET,
-                                      __asc_aicore::get_debug_bus_model_base<Hardware>());
-    __asc_aicore::debug_bus_write_reg(debug_bus_address, __asc_aicore::ASC_DEBUG_BUS_CTRL_OFFSET,
-                                      __asc_aicore::ASC_DEBUG_BUS_READ_MASK);
+    __asc_aicore::debug_bus_write_reg(
+        debug_bus_address, __asc_aicore::ASC_DEBUG_BUS_UNLOCK_OFFSET, __asc_aicore::ASC_DEBUG_BUS_UNLOCK_VALUE);
+    __asc_aicore::debug_bus_write_reg(
+        debug_bus_address, __asc_aicore::ASC_DEBUG_BUS_ADDR_LOW_OFFSET,
+        get_debug_bus_local_offset<Hardware>(local_address));
+    __asc_aicore::debug_bus_write_reg(
+        debug_bus_address, __asc_aicore::ASC_DEBUG_BUS_MODEL_BASE_OFFSET,
+        __asc_aicore::get_debug_bus_model_base<Hardware>());
+    __asc_aicore::debug_bus_write_reg(
+        debug_bus_address, __asc_aicore::ASC_DEBUG_BUS_CTRL_OFFSET, __asc_aicore::ASC_DEBUG_BUS_READ_MASK);
 }
 
 template <AscendC::Hardware Hardware>

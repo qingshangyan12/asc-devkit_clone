@@ -9,8 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
-    "impl/tensor_api/experimental/arch/vector/histogram_compute_impl.h is internal and must not be used directly."
+#warning "impl/tensor_api/experimental/arch/vector/histogram_compute_impl.h is internal and must not be used directly."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_HISTOGRAM_COMPUTE_IMPL
 #endif
@@ -25,12 +24,12 @@ namespace te {
 namespace experimental {
 
 template <const histogram_options& options>
-__simd_callee__ inline reg_tensor<uint16_t> histograms(
-    const reg_tensor<uint16_t>& dst, const reg_tensor<uint8_t>& src)
+__simd_callee__ inline reg_tensor<uint16_t> histograms(const reg_tensor<uint16_t>& dst, const reg_tensor<uint8_t>& src)
 {
-    static_assert(options.half == histogram_half::low || options.half == histogram_half::high,
-        "unsupported histogram half");
-    static_assert(options.mode == histogram_mode::frequency || options.mode == histogram_mode::cumulative,
+    static_assert(
+        options.half == histogram_half::low || options.half == histogram_half::high, "unsupported histogram half");
+    static_assert(
+        options.mode == histogram_mode::frequency || options.mode == histogram_mode::cumulative,
         "unsupported histogram mode");
 
     reg_tensor<uint16_t> result = dst;

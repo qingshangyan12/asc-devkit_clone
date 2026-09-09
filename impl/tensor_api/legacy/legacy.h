@@ -89,8 +89,8 @@ __aicore__ inline constexpr Shape<FirstShape, Shapes...> MakeShape(const FirstSh
 }
 
 template <typename FirstStride, typename... Strides>
-__aicore__ inline constexpr Stride<FirstStride, Strides...> MakeStride(const FirstStride& value,
-                                                                       const Strides&... values)
+__aicore__ inline constexpr Stride<FirstStride, Strides...> MakeStride(
+    const FirstStride& value, const Strides&... values)
 {
     return make_stride(value, values...);
 }
@@ -161,8 +161,8 @@ __aicore__ inline constexpr auto Select(const LayoutType& layout)
     return select<Is...>(layout);
 }
 
-template <size_t I, size_t... Is, typename Tuple,
-          typename = Std::enable_if_t<Std::is_tuple_v<Std::remove_cvref_t<Tuple>>>>
+template <
+    size_t I, size_t... Is, typename Tuple, typename = Std::enable_if_t<Std::is_tuple_v<Std::remove_cvref_t<Tuple>>>>
 __aicore__ inline constexpr auto Get(Tuple&& tuple)
 {
     return get<I, Is...>(static_cast<Tuple&&>(tuple));
@@ -228,8 +228,8 @@ __aicore__ inline auto MakeLocationMemPtr(Iterator iterator)
     return make_location_mem_ptr<PtrPattern>(iterator);
 }
 
-template <typename PtrPattern, typename DataType, typename Addr,
-          asc::te::enable_make_ptr_by_trait<PtrPattern, Addr> = 0>
+template <
+    typename PtrPattern, typename DataType, typename Addr, asc::te::enable_make_ptr_by_trait<PtrPattern, Addr> = 0>
 __aicore__ inline auto MakeMemPtr(Addr address)
 {
     return make_mem_ptr<PtrPattern, DataType>(address);
@@ -253,17 +253,20 @@ __aicore__ inline constexpr auto MakeTensor(const Iterator& iterator, const Args
     return make_tensor(iterator, args...);
 }
 
-template <size_t... SqueezeDims, typename Input,
-          typename = Std::enable_if_t<(asc::te::is_layout_v<Input> || asc::te::is_attr_tensor_v<Input>)
-                                      && (sizeof...(SqueezeDims) > 0)>>
+template <
+    size_t... SqueezeDims, typename Input,
+    typename = Std::enable_if_t<
+        (asc::te::is_layout_v<Input> || asc::te::is_attr_tensor_v<Input>) && (sizeof...(SqueezeDims) > 0)>>
 __aicore__ inline constexpr auto Squeeze(const Input& value)
 {
     return squeeze<SqueezeDims...>(value);
 }
 
-template <typename Pattern, typename Input,
-          typename = Std::enable_if_t<(asc::te::is_layout_v<Input> || asc::te::is_attr_tensor_v<Input>)
-                                      && Std::is_tuple_v<Std::remove_cvref_t<Pattern>>>>
+template <
+    typename Pattern, typename Input,
+    typename = Std::enable_if_t<
+        (asc::te::is_layout_v<Input> || asc::te::is_attr_tensor_v<Input>) &&
+        Std::is_tuple_v<Std::remove_cvref_t<Pattern>>>>
 __aicore__ inline constexpr auto Squeeze(const Input& value, const Pattern& pattern)
 {
     return squeeze(value, pattern);
@@ -271,16 +274,18 @@ __aicore__ inline constexpr auto Squeeze(const Input& value, const Pattern& patt
 
 // Mmad / MakeMmad: PascalCase 接口
 template <typename... Args, typename DstTensor, typename FmTensor, typename FilterTensor>
-__aicore__ inline void Mmad(const MmadAtom<MmadTraits<Args...>>& atom, const DstTensor& dst, const FmTensor& fm,
-                            const FilterTensor& filter)
+__aicore__ inline void Mmad(
+    const MmadAtom<MmadTraits<Args...>>& atom, const DstTensor& dst, const FmTensor& fm, const FilterTensor& filter)
 {
     atom.Call(dst, fm, filter);
 }
 
-template <typename... Args, typename DstTensor, typename FmTensor, typename FilterTensor, typename BiasTensor,
-          Std::enable_if_t<asc::te::is_attr_tensor_v<BiasTensor>, int> = 0>
-__aicore__ inline void Mmad(const MmadAtom<MmadTraits<Args...>>& atom, const DstTensor& dst, const FmTensor& fm,
-                            const FilterTensor& filter, const BiasTensor& bias)
+template <
+    typename... Args, typename DstTensor, typename FmTensor, typename FilterTensor, typename BiasTensor,
+    Std::enable_if_t<asc::te::is_attr_tensor_v<BiasTensor>, int> = 0>
+__aicore__ inline void Mmad(
+    const MmadAtom<MmadTraits<Args...>>& atom, const DstTensor& dst, const FmTensor& fm, const FilterTensor& filter,
+    const BiasTensor& bias)
 {
     atom.Call(dst, fm, filter, bias);
 }

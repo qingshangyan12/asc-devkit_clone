@@ -27,8 +27,9 @@ template <typename T, typename scalar_type>
 __simd_callee__ inline reg_tensor<T> axpy(const reg_tensor<T>& dst, const reg_tensor<T>& src, const scalar_type& scalar)
 {
     static_assert(detail::supports_axpy_v<T>, "axpy supports half and float");
-    static_assert(Std::is_same_v<Std::remove_cvref_t<scalar_type>, T>,
-                  "axpy requires the scalar and reg_tensor element types to match");
+    static_assert(
+        Std::is_same_v<Std::remove_cvref_t<scalar_type>, T>,
+        "axpy requires the scalar and reg_tensor element types to match");
     reg_tensor<T> result = dst;
     asc_axpy(result.reg, src.reg, scalar, dst.mask);
     return result;
@@ -51,8 +52,9 @@ __simd_callee__ inline reg_tensor<float> exp_diff(const reg_tensor<T>& src0, con
     reg_tensor<float> dst;
     if constexpr (Std::is_same_v<T, half>) {
         // Preserve the legacy half overload's PART_EVEN behavior.
-        asc_exp_sub_half2float(dst.reg, src0.reg, src1.reg, src0.mask,
-                               std::integral_constant<asc_position_mode, asc_position_mode::EVEN>{});
+        asc_exp_sub_half2float(
+            dst.reg, src0.reg, src1.reg, src0.mask,
+            std::integral_constant<asc_position_mode, asc_position_mode::EVEN>{});
     } else {
         asc_exp_sub(dst.reg, src0.reg, src1.reg, src0.mask);
     }
@@ -61,8 +63,8 @@ __simd_callee__ inline reg_tensor<float> exp_diff(const reg_tensor<T>& src0, con
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> fma(const reg_tensor<T>& src0, const reg_tensor<T>& src1,
-                                         const reg_tensor<T>& src2)
+__simd_callee__ inline reg_tensor<T> fma(
+    const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<T>& src2)
 {
     static_assert(detail::supports_fma_v<T>, "fma supports half and float");
     reg_tensor<T> dst = src0;

@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/utils/print_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/utils/print.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -241,8 +241,8 @@ __aicore__ inline void emit_tensor_content(print_session& session, const T& tens
     using element_type = typename tensor_type::element_type;
     using data_type = get_attribute_element_type<element_type*>;
     using tensor_location = get_mem_location<tensor_type>;
-    static_assert(layout_type::rank_size >= 1 && layout_type::rank_size <= 4,
-                  "print_tensor only supports rank 1 to 4 tensors.");
+    static_assert(
+        layout_type::rank_size >= 1 && layout_type::rank_size <= 4, "print_tensor only supports rank 1 to 4 tensors.");
 
     if (print_type) {
         emit_value(session, tensor);
@@ -265,10 +265,7 @@ __aicore__ inline void emit_tensor_content(print_session& session, const T& tens
 
 } // namespace detail
 
-__aicore__ inline void print(__gm__ const char* fmt)
-{
-    detail::print_format(fmt);
-}
+__aicore__ inline void print(__gm__ const char* fmt) { detail::print_format(fmt); }
 
 template <typename Arg0, typename... Args>
 __aicore__ inline void print(__gm__ const char* fmt, Arg0&& arg0, Args&&... args)
