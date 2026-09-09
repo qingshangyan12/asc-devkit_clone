@@ -21,15 +21,6 @@ using Json = nlohmann::json;
 constexpr char SCHEMA_VERSION[] = "1.0";
 constexpr char OPTIONS_PREFIX[] = "${options:";
 
-bool ReadBoundedNonnegativeInteger(const Json& value, uint64_t maximum, uint64_t& result)
-{
-    if (!value.is_number_integer() || (!value.is_number_unsigned() && value.get<int64_t>() < 0)) {
-        return false;
-    }
-    result = value.get<uint64_t>();
-    return result <= maximum;
-}
-
 } // namespace
 
 aclError CompilationManifestParser::ParseConstants(const Json& kernel, std::vector<ManifestConstant>& constants) const
@@ -86,12 +77,15 @@ aclError CompilationManifestParser::ParseCommand(
     parsedCommand.objectKind = objectKind;
     parsedCommand.diagnosticLabel = objectName + "/" + type + "[" + std::to_string(index) + "]";
     if (command.contains("stage")) {
-        uint64_t stage = 0U;
-        if (!ReadBoundedNonnegativeInteger(command.at("stage"), std::numeric_limits<uint32_t>::max(), stage)) {
-            ASCENDLOGE("Manifest command %s has invalid stage", parsedCommand.diagnosticLabel.c_str());
+        const Json& stage = command.at("stage");
+        if (!stage.is_number_integer() || (!stage.is_number_unsigned() && stage.get<int64_t>() < 0) ||
+            stage.get<uint64_t>() > std::numeric_limits<uint32_t>::max()) {
+            ASCENDLOGE(
+                "Manifest command %s stage must be an integer in the uint32_t range",
+                parsedCommand.diagnosticLabel.c_str());
             return ACLRTC_ERROR_FAILURE;
         }
-        parsedCommand.parallelStage = static_cast<uint32_t>(stage);
+        parsedCommand.parallelStage = stage.get<uint32_t>();
     }
     const auto argv = command.at("cmd").get<std::vector<std::string>>();
     if (argv.empty()) {
