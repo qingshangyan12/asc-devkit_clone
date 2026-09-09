@@ -200,13 +200,7 @@ run_llt_test(
 # ================ common ================
 add_executable(ascendc_ut_build_common
     ${ASCENDC_DIR}/tests/main.cpp
-    common/test_file_utils.cpp
-    common/test_process_executor.cpp
-    common/test_directory_cleanup_guard.cpp
     common/test_ascendc_tool_log.cpp
-    ${ASCENDC_DIR}/tools/build/common/file_utils.cpp
-    ${ASCENDC_DIR}/tools/build/common/process_executor.cpp
-    ${ASCENDC_DIR}/tools/build/common/directory_cleanup_guard.cpp
 )
 
 function(configure_common_test target_name)
@@ -223,11 +217,9 @@ function(configure_common_test target_name)
     )
 
     target_link_libraries(${target_name} PRIVATE
-        Boost::filesystem
         $<BUILD_INTERFACE:intf_llt_pub_basic>
         mmpa_headers
         metadef_headers
-        dl
     )
 endfunction()
 
