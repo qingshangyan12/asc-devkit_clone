@@ -26,9 +26,11 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/compute/reg_logic.h"`。
+
 根据`mask`对源操作数`src0`、`src1`执行按位与（&）操作，将结果作为返回值返回或写入目的操作数`dst`。
 
-- 矢量数据寄存器按位与：对两个矢量数据寄存器执行按位与（&），结果为矢量数据寄存器。
+- 矢量数据寄存器按位与：对两个矢量数据寄存器按`dtype`位宽执行按位与（&），结果为矢量数据寄存器。
 
 - 掩码寄存器按位与：对两个掩码寄存器执行按位与（&），结果为掩码寄存器。
 
@@ -45,12 +47,12 @@ $$
 ### 矢量数据寄存器按位与
 
 ```c
-// 通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_and(vector_<dtype> src0,
                                               vector_<dtype> src1,
                                               vector_bool mask)
 
-// 通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_and(vector_<dtype>& dst,
                                     vector_<dtype> src0,
                                     vector_<dtype> src1,
@@ -59,9 +61,7 @@ __simd_callee__ inline void asc_and(vector_<dtype>& dst,
 
 #### dtype支持数据类型
 
-通过函数返回值返回结果的函数原型中，`dtype`取值为：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`。
-
-通过引用参数输出结果的函数原型中，`dtype`取值为：`int8_t`、`uint8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+`dtype`取值为：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`。
 
 #### 函数原型典型示例
 

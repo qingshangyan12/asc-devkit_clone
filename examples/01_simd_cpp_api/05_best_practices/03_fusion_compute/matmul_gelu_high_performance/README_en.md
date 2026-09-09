@@ -8,9 +8,9 @@ This example demonstrates Cube-Vector (CV) fusion implementation based on the st
 
 | Product | CANN Version |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.0.0 |
-| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.2.0 |
+| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -189,7 +189,7 @@ After the AIC side completes Fixpipe output of one (baseM × baseN) sub-block, i
 AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(0x8);  // Notify AIV data ready
 
 // AIV side GeluAndCopyOutAivSeparate() / GeluAndCopyOutAiv():
-AscendC::CrossCoreWaitFlag(0x8);  // Wait for AIC side Fixpipe completion
+AscendC::CrossCoreWaitFlag<0x2>(0x8);  // Wait for AIC side Fixpipe completion
 ```
 
 #### 3. Multi-Core Splitting in `__mix__(1,2)` Mode
@@ -346,7 +346,7 @@ Fixpipe L0C → UB (Enable dual destination mode through `dualDstCtl=0b01`, spli
 
 ```cpp
 AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams;
-fixpipeParams.mSize = DivCeil(curM, 2) * 2;
+fixpipeParams.mSize = AscendC::Std::ceil_div(curM, 2) * 2;
 fixpipeParams.nSize = curN;
 fixpipeParams.srcStride = curMAlign;
 fixpipeParams.dstStride = curN;

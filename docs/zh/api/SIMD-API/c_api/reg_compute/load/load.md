@@ -1,5 +1,7 @@
 # Reg数据搬入
 
+- **[Reg数据搬入概述](reg_load_overview.md)**
+
 ## Reg对齐搬入
 
 - **[asc_loadalign](asc_loadalign.md)**
@@ -31,10 +33,3 @@
 - **[asc_loadunalign](asc_loadunalign.md)**
 - **[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)**
 - **[asc_loadunalign_pre](asc_loadunalign_pre.md)**
-
-## 废弃接口
-
-- **[asc_loadalign (废弃)](../../deprecated_interface/asc_loadalign_v1_deprecated.md)**
-- **[asc_loadalign (废弃)](../../deprecated_interface/asc_loadalign_v2_deprecated.md)**
-- **[asc_loadalign (废弃)](../../deprecated_interface/asc_loadalign_v3_deprecated.md)**
-- **[asc_loadalign (废弃)](../../deprecated_interface/asc_loadalign_v4_deprecated.md)**

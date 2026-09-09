@@ -23,6 +23,7 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/DataCopy_L0CToL1_res.md#id1 -->
 
 ## 功能说明<a id="zh-cn_topic_0000002511188540_section106841136114319"></a>
 
@@ -116,6 +117,7 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 | ---------- | ---------- |
 | float | int8_t、uint8_t、half、bfloat16_t、float。 |
 | int32_t | int8_t、uint8_t、half、int32_t。 |
+
 <!-- end id17 -->
 
 <!-- npu="A3" id18 -->
@@ -125,6 +127,7 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 | ---------- | ---------- |
 | float | int8_t、uint8_t、half、bfloat16_t。 |
 | int32_t | int8_t、uint8_t、half。 |
+
 <!-- end id18 -->
 
 <!-- npu="910b" id19 -->
@@ -134,6 +137,7 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 | ---------- | ---------- |
 | float | int8_t、uint8_t、half、bfloat16_t。 |
 | int32_t | int8_t、uint8_t、half。 |
+
 <!-- end id19 -->
 
 <!-- npu="310b" id20 -->
@@ -143,6 +147,7 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 | ---------- | ---------- |
 | float | int8_t、uint8_t、half、bfloat16_t。 |
 | int32_t | int8_t、uint8_t、half。 |
+
 <!-- end id20 -->
 
 ## 返回值说明

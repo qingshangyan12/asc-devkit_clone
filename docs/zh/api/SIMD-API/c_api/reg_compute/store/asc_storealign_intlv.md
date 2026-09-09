@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/store/storealign.h"`。
+
 将两个矢量数据寄存器中的数据按元素顺序交织后连续对齐搬出到Unified Buffer（UB）。单次搬出量为`2 × VL`（共512字节），不支持配置掩码。搬运过程中数据格式与内容保持不变。本接口在Vector Function（`__simd_vf__`标记的函数）内使用。
 
 本接口提供三种参数列表不同的功能模式：
@@ -41,7 +43,8 @@
 ### 对齐搬出模式
 
 ```c
-__simd_callee__ inline void asc_storealign_intlv(__ubuf__ <dtype>* dst_align32b,
+// 占位符形式
+__simd_callee__ inline void asc_storealign_intlv(__ubuf__ <dtype>* dst,
                                                  vector_<dtype> src0,
                                                  vector_<dtype> src1)
 ```
@@ -53,7 +56,7 @@ __simd_callee__ inline void asc_storealign_intlv(__ubuf__ <dtype>* dst_align32b,
 #### 函数原型典型示例
 
 ```c
-__simd_callee__ inline void asc_storealign_intlv(__ubuf__ int8_t* dst_align32b,
+__simd_callee__ inline void asc_storealign_intlv(__ubuf__ int8_t* dst,
                                                  vector_int8_t src0,
                                                  vector_int8_t src1)
 ```
@@ -61,7 +64,8 @@ __simd_callee__ inline void asc_storealign_intlv(__ubuf__ int8_t* dst_align32b,
 ### 立即数偏移搬出模式
 
 ```c
-__simd_callee__ inline void asc_storealign_intlv(__ubuf__ <dtype>* dst_align32b,
+// 占位符形式
+__simd_callee__ inline void asc_storealign_intlv(__ubuf__ <dtype>* dst,
                                                  vector_<dtype> src0,
                                                  vector_<dtype> src1,
                                                  int32_t offset)
@@ -74,7 +78,7 @@ __simd_callee__ inline void asc_storealign_intlv(__ubuf__ <dtype>* dst_align32b,
 #### 函数原型典型示例
 
 ```c
-__simd_callee__ inline void asc_storealign_intlv(__ubuf__ int8_t* dst_align32b,
+__simd_callee__ inline void asc_storealign_intlv(__ubuf__ int8_t* dst,
                                                  vector_int8_t src0,
                                                  vector_int8_t src1,
                                                  int32_t offset)
@@ -83,7 +87,8 @@ __simd_callee__ inline void asc_storealign_intlv(__ubuf__ int8_t* dst_align32b,
 ### 地址寄存器偏移搬出模式
 
 ```c
-__simd_callee__ inline void asc_storealign_intlv(__ubuf__ <dtype>* dst_align32b,
+// 占位符形式
+__simd_callee__ inline void asc_storealign_intlv(__ubuf__ <dtype>* dst,
                                                  vector_<dtype> src0,
                                                  vector_<dtype> src1,
                                                  addr_reg offset)
@@ -96,7 +101,7 @@ __simd_callee__ inline void asc_storealign_intlv(__ubuf__ <dtype>* dst_align32b,
 #### 函数原型典型示例
 
 ```c
-__simd_callee__ inline void asc_storealign_intlv(__ubuf__ int8_t* dst_align32b,
+__simd_callee__ inline void asc_storealign_intlv(__ubuf__ int8_t* dst,
                                                  vector_int8_t src0,
                                                  vector_int8_t src1,
                                                  addr_reg offset)
@@ -111,9 +116,9 @@ __simd_callee__ inline void asc_storealign_intlv(__ubuf__ int8_t* dst_align32b,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst_align32b | 输出 | 目的操作数（矢量）的起始地址。类型为`__ubuf__ <dtype>*`，起始地址需32字节对齐。 |
-| src0 | 输入 | 源操作数0（矢量数据寄存器）。`dtype`须与`dst_align32b`一致。 |
-| src1 | 输入 | 源操作数1（矢量数据寄存器）。`dtype`须与`dst_align32b`一致。 |
+| dst | 输出 | 目的操作数（矢量）的起始地址。类型为`__ubuf__ <dtype>*`，起始地址需32字节对齐。 |
+| src0 | 输入 | 源操作数0（矢量数据寄存器）。`dtype`须与`dst`一致。 |
+| src1 | 输入 | 源操作数1（矢量数据寄存器）。`dtype`须与`dst`一致。 |
 
 ### 立即数偏移搬出模式
 
@@ -121,10 +126,10 @@ __simd_callee__ inline void asc_storealign_intlv(__ubuf__ int8_t* dst_align32b,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst_align32b | 输出 | 目的操作数（矢量）的起始地址。类型为`__ubuf__ <dtype>*`，起始地址需32字节对齐。 |
-| src0 | 输入 | 源操作数0（矢量数据寄存器）。`dtype`须与`dst_align32b`一致。 |
-| src1 | 输入 | 源操作数1（矢量数据寄存器）。`dtype`须与`dst_align32b`一致。 |
-| offset | 输入 | 相对`dst_align32b`起始地址的偏移量，类型为`int32_t`，单位为元素。 |
+| dst | 输出 | 目的操作数（矢量）的起始地址。类型为`__ubuf__ <dtype>*`，起始地址需32字节对齐。 |
+| src0 | 输入 | 源操作数0（矢量数据寄存器）。`dtype`须与`dst`一致。 |
+| src1 | 输入 | 源操作数1（矢量数据寄存器）。`dtype`须与`dst`一致。 |
+| offset | 输入 | 相对`dst`起始地址的偏移量，类型为`int32_t`，单位为元素。 |
 
 ### 地址寄存器偏移搬出模式
 
@@ -132,9 +137,9 @@ __simd_callee__ inline void asc_storealign_intlv(__ubuf__ int8_t* dst_align32b,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst_align32b | 输出 | 目的操作数（矢量）的起始地址。类型为`__ubuf__ <dtype>*`，起始地址需32字节对齐。 |
-| src0 | 输入 | 源操作数0（矢量数据寄存器）。`dtype`须与`dst_align32b`一致。 |
-| src1 | 输入 | 源操作数1（矢量数据寄存器）。`dtype`须与`dst_align32b`一致。 |
+| dst | 输出 | 目的操作数（矢量）的起始地址。类型为`__ubuf__ <dtype>*`，起始地址需32字节对齐。 |
+| src0 | 输入 | 源操作数0（矢量数据寄存器）。`dtype`须与`dst`一致。 |
+| src1 | 输入 | 源操作数1（矢量数据寄存器）。`dtype`须与`dst`一致。 |
 | offset | 输入 | 地址寄存器偏移，类型为`addr_reg`，由配套的地址寄存器构造接口预先构造。 |
 
 矢量数据寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
@@ -149,7 +154,7 @@ __simd_callee__ inline void asc_storealign_intlv(__ubuf__ int8_t* dst_align32b,
 
 - 本接口非AIV调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
-- `dst_align32b`起始地址需32字节对齐，否则会报错。
+- `dst`起始地址需32字节对齐，否则会报错。
 - UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈+2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。目的操作数地址偏移后不可超过实际可用容量，否则会报错。
 - 通过`offset`参数偏移后的实际访问地址需落在UB地址范围内，且实际访问地址仍需32字节对齐，否则会报错。
 - 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。

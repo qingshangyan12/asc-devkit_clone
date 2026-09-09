@@ -29,6 +29,7 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030：支持
 <!-- end id9 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceRepeat_res.md#id1 -->
 
 ## 功能说明
 
@@ -125,6 +126,7 @@
     | `uint32_t` | `uint16_t`，`uint32_t` |
     | `half` | `half` |
     | `float` | `float` |
+
 <!-- end id18 -->
 
 <!-- npu="A3,910b,910,310p,310b,x90,9030" id19 -->

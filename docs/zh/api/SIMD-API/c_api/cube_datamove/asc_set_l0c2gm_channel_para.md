@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/cube_datamove/cube_datamove.h"`。
+
 本接口用于在L0C Buffer搬出并执行Nz2DN格式转换时，配置源Nz矩阵中相邻行的地址偏移。配置写入后，由后续开启Nz2DN功能的[asc_copy_l0c2gm](asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](asc_copy_l0c2ub.md)接口使用；未开启Nz2DN功能时，本配置不生效。
 
 本接口为矩阵搬出相关配置接口，仅在AIC上生效。
@@ -120,7 +122,7 @@ __global__ __cube__ void asc_set_l0c2gm_channel_para_kernel(
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
 
-    asc_set_l0c_copy_channel_para(1);
+    asc_set_l0c2gm_channel_para(1ULL << 48);
     asc_set_l0c_copy_nz_para(1, 0, 0);
     asc_copy_l0c2gm(output, c_l0, N, M, M, M, 0, 0, 0,
         static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, false,

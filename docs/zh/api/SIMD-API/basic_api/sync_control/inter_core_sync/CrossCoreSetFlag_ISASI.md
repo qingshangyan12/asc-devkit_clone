@@ -23,6 +23,7 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreSetFlag_ISASI_res.md#id1 -->
 
 ## 功能说明<a id="section618mcpsimp"></a>
 
@@ -42,7 +43,7 @@
 
 > [!NOTE]说明
 > - 不同型号支持的模式不同，具体支持情况请参考[modeId支持的取值说明](#modeId支持的取值说明)。
-> - 每个模式的具体执行逻辑与细节可以参考[关键特性说明](key_features.md#ZH-CN_TOPIC_0000002586300741)。
+> - 每个模式的具体执行逻辑与细节可以参考[关键特性说明](key_features.md)。
 
 **图1**  同步控制模式示意图<a id="fig37581010773"></a>  
 ![](../../../../figures/block_subblock_relationship_3510.png "同步控制模式示意图")
@@ -58,12 +59,14 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
 
 ### 模板参数及输入参数说明
 
+CrossCoreSetFlag的模板参数`modeId`和`pipe`均**没有默认值**，其取值用于配置硬件指令，调用接口时必须**显式传入**。与本接口不同，CrossCoreWaitFlag的两个模板参数均具有默认值，且在不同产品和同步模式下的生效情况不同，因此**两个接口对模板参数的传入要求并不相同**。具体请参见[CrossCoreWaitFlag模板参数说明](CrossCoreWaitFlag_ISASI.md#template-parameter-defaults)。
+
 **表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
 | modeId | 核间同步的模式，不同产品对同步模式的支持情况请参见[modeId支持的取值说明](#modeId支持的取值说明)。<br>各个模式支持的对应核函数（Kernel）类型请参照[表3](#table3)。 |
-| pipe | 设置这条指令所在的流水类型。支持的流水类型为PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX，不支持PIPE_S和PIPE_ALL。不同产品对流水类型的支持情况请参见[pipe支持的流水类型说明](#pipe支持的流水类型说明)。 |
+| pipe | 标识在哪条流水的前序指令完成后，CrossCoreSetFlag才向调度模块发送通知。支持的流水类型为PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX，不支持PIPE_S和PIPE_ALL。不同产品对流水类型的支持情况请参见[pipe支持的流水类型说明](#pipe支持的流水类型说明)。 |
 
 **表2**  参数说明
 
@@ -148,7 +151,7 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
     <!-- npu="950" id15 -->
     - 针对Ascend 950PR/Ascend 950DT，核间同步的模式为模式4时，AIC有32个flagId，支持的取值范围为0-31，如果flagId的值超出该范围，则截取低5bit（例如，flagId=35时，截取后为3）；AIV有16个flagId，支持的取值范围为0-15，如果flagId的值超出该范围，则截取低4bit（例如，flagId=17时，截取后为1）。
     <!-- end id15 -->
-    - 每个flagId都对应一个计数器，当调用[CrossCoreWaitFlag](CrossCoreWaitFlag_ISASI.md)时，若计数器值为0则会阻塞后续指令下发，已下发指令可正常执行；当调度模块感知到所有参与同步的核（具体包含哪些核与设置的核间同步模式有关）完成（调用了CrossCoreSetFlag）同步后，会将与设置的flagId对应的计数器的值增加1。此时，计数器值为非0，阻塞解除，并且将对应计数器的值减去1进行还原。具体执行逻辑与细节可以参考[关键特性说明](key_features.md#ZH-CN_TOPIC_0000002586300741)。每一个计数器计数范围为0-15。如果调用CrossCoreSetFlag的次数超过15次，计数器的值超出该范围，则会异常报错，中断流程。
+    - 每个flagId都对应一个计数器，当调用[CrossCoreWaitFlag](CrossCoreWaitFlag_ISASI.md)时，若计数器值为0则会阻塞后续指令下发，已下发指令可正常执行；当调度模块感知到所有参与同步的核（具体包含哪些核与设置的核间同步模式有关）完成（调用了CrossCoreSetFlag）同步后，会将与设置的flagId对应的计数器的值增加1。此时，计数器值为非0，阻塞解除，并且将对应计数器的值减去1进行还原。具体执行逻辑与细节可以参考[关键特性说明](key_features.md)。每一个计数器计数范围为0-15。如果调用CrossCoreSetFlag的次数超过15次，计数器的值超出该范围，则会异常报错，中断流程。
 - 核间同步的模式为模式0、1、2时，同一个flagId用于不同核间同步模式的约束：
     - 同一核上，若同一个flagId需用于不同核间同步模式，须在模式切换前完成前一个模式的所有同步操作——即确保该flagId关联的所有CrossCoreSetFlag与配套CrossCoreWaitFlag调用均已执行完毕。
     - 对于不同的核，可以直接将同一flagId用于不同的核间同步模式，具体包括以下2种场景：
@@ -187,7 +190,7 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
     // 当本AIV完成前置PIPE_MTE3(DataCopy)流水操作后，通知其他AIV核，本AIV已经完成。
     AscendC::CrossCoreSetFlag<0, PIPE_MTE3>(0);
     // 阻塞本AIV继续往下执行指令，直到其他AIV全部都完成PIPE_MTE3流水操作，才解除阻塞往下执行。
-    AscendC::CrossCoreWaitFlag(0);
+    AscendC::CrossCoreWaitFlag<0>(0);
     // 关闭原子累加。
     AscendC::DisableDmaAtomic();
 

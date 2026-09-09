@@ -323,6 +323,7 @@ const static std::map<std::string, std::string> convertMapInAicpu = {
     {"Ascend910_9392", "Ascend910B"},
     {"Ascend910_9382", "Ascend910B"},
     {"Ascend910_9362", "Ascend910B"},
+    {"Ascend910_9363", "Ascend910B"},
     {"Ascend910A", "Ascend910"}, // ascend910_list
     {"Ascend910ProA", "Ascend910"},
     {"Ascend910B", "Ascend910"},
@@ -354,6 +355,7 @@ const static std::map<std::string, std::string> convertMapInAicpu = {
     {"Ascend950DT_9596", "Ascend950"},
     {"Ascend950DT_9581", "Ascend950"},
     {"Ascend950DT_9582", "Ascend950"},
+    {"Ascend950DT_9581x", "Ascend950"},
     {"Ascend950DT_9582x", "Ascend950"},
     {"Ascend950DT_9583", "Ascend950"},
     {"Ascend950DT_9584", "Ascend950"},

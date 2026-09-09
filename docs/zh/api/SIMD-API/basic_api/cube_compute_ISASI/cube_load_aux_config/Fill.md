@@ -29,6 +29,7 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030：支持
 <!-- end id9 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_load_aux_config/Fill_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -102,6 +103,7 @@ __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParam
 - 不同的型号在设置InitConstValueParams参数时，支持配置参数的不同。
     - 仅支持配置迭代次数和初始化值场景下，其他参数配置无效。每次迭代处理固定数据量（512字节），迭代间无间隔。
     - 支持配置所有参数场景下，支持配置迭代次数、初始化值、每个迭代处理的数据块个数和迭代间间隔。
+    <!-- npu="910,310p" id21 -->
     - 特别地，针对如下型号，仅支持配置迭代次数和初始化值。
         
         <!-- npu="910" id18 -->
@@ -110,6 +112,7 @@ __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParam
         <!-- npu="310p" id19 -->
         - Atlas 推理系列产品AI Core。
         <!-- end id19 -->
+    <!-- end id21 -->
 
 - 支持的物理存储位置为：L1 Buffer（TPosition: A1/B1）、L0A Buffer（TPosition: A2）、L0B Buffer（TPosition: B2）。
     <!-- npu="950" id20 -->

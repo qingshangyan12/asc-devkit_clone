@@ -23,9 +23,12 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/Kernel-Tiling/set_Kernel_type_res.md#id1 -->
 
 
 ## 功能说明<a name="zh-cn_topic_0000001610027821_section212607105720"></a>
+
+头文件路径为：`"utils/base/sys_macros.h"`。
 
 用于用户自定义设置kernel类型，控制算子执行时只启动该类型的核，避免启动不需要工作的核，缩短核启动开销。
 

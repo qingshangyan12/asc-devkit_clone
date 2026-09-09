@@ -8,9 +8,9 @@
 
 | 产品                                        | CANN软件版本  |
 | ------------------------------------------- | ------------- |
-| Ascend 950PR/Ascend 950DT                   | >= CANN 9.1.0 |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
+| Ascend 950PR/Ascend 950DT                   | >= CANN 9.2.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.2.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.2.0 |
 
 ## 目录结构介绍
 
@@ -189,7 +189,7 @@ AIC侧每完成一个 (baseM × baseN)大小子块的Fixpipe输出后，通过 `
 AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(0x8);  // 通知AIV数据就绪
 
 // AIV侧 GeluFromGM() / GeluFromUB():
-AscendC::CrossCoreWaitFlag(0x8);  // 等待AIC侧Fixpipe完成
+AscendC::CrossCoreWaitFlag<0x2>(0x8);  // 等待AIC侧Fixpipe完成
 ```
 
 #### 3. `__mix__(1,2)` 模式下的多核切分
@@ -350,7 +350,7 @@ Fixpipe L0C → UB（通过 `dualDstCtl=0b01` 开启双目标模式，按M维度
 
 ```cpp
 AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams;
-fixpipeParams.mSize = DivCeil(curM, 2) * 2;
+fixpipeParams.mSize = AscendC::Std::ceil_div(curM, 2) * 2;
 fixpipeParams.nSize = curN;
 fixpipeParams.srcStride = curMAlign;
 fixpipeParams.dstStride = curN;

@@ -29,6 +29,7 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030：不支持
 <!-- end id9 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToUB_res.md#id1 -->
 
 ## 功能说明<a name="zh-cn_topic_0000002549846732_section106841136114319"></a>
 
@@ -152,6 +153,7 @@ L0C Buffer到UB数据搬运提供矩阵搬出的组合接口Fixpipe，接口内�
 | ---------- | ---------- |
 | float | int8_t、uint8_t、hifloat8_t、fp8_e4m3fn_t、half、bfloat16_t、float。 |
 | int32_t | int8_t、uint8_t、half、bfloat16_t、int32_t。 |
+
 <!-- end id14 -->
 
 <!-- npu="310b" id17 -->
@@ -161,6 +163,7 @@ L0C Buffer到UB数据搬运提供矩阵搬出的组合接口Fixpipe，接口内�
 | ---------- | ---------- |
 | float | int8_t、uint8_t、half、bfloat16_t、float。 |
 | int32_t | int8_t、uint8_t、half、int32_t。 |
+
 <!-- end id17 -->
 
 ## 返回值说明

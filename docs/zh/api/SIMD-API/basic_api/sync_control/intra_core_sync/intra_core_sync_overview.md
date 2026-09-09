@@ -18,7 +18,7 @@ AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以
 针对[NPU架构3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)，硬件架构图如下，高亮部分展示了并行执行的计算单元和搬运单元。
 
 **图 2**  架构图<a name="zh-cn_topic_0000002542725361_fig31512113433"></a>  
-![](../../../../figures/ascend_950pr_950dt_architecture.png "Ascend_950PR_950DT_硬件架构图")
+![](../../../../figures/npu_3510_hw_arch_sync.png "Ascend_950PR_950DT_硬件架构图")
 
 <!-- end id2 -->
 
@@ -58,7 +58,7 @@ AI Core内部并行的指令流水类型和解释如下所示：
 对上述核内并行流水的同步控制分为两种：
 
 - 多流水同步：同一核内具有数据依赖的不同类型流水指令之间的同步。
-    [TQueSync](TQueSync_template_params.md)类接口和[SetFlag/WaitFlag\(ISASI\)](SetFlag_WaitFlag_ISASI.md)中提供的同步控制接口的区别在于，[SetFlag/WaitFlag\(ISASI\)](SetFlag_WaitFlag_ISASI.md)中的接口标注为ISASI类别，不能保证跨硬件版本兼容；TQueSync类接口可以保证跨硬件版本兼容。
+    [TQueSync](TQueSync.md)类接口和[SetFlag/WaitFlag\(ISASI\)](SetFlag_WaitFlag_ISASI.md)中提供的同步控制接口的区别在于，[SetFlag/WaitFlag\(ISASI\)](SetFlag_WaitFlag_ISASI.md)中的接口标注为ISASI类别，不能保证跨硬件版本兼容；TQueSync类接口可以保证跨硬件版本兼容。
     通过SetFlag/WaitFlag接口进行不同流水线间的同步控制。在SetFlag/WaitFlag的指令中，可以指定一对指令流水（源流水与目的流水）先后执行的关系，表示两个指令流水之间完成一组“锁”机制，其作用原理为：
     - SetFlag：当源流水的前序指令的所有读写操作都完成之后，当前指令开始执行，并将硬件中的对应标志位设置为1。
     - WaitFlag：当目的流水执行到该指令时，如果发现硬件中对应标志位为0，目的流水的后续指令将一直被阻塞；如果发现硬件中对应标志位为1，则将硬件中对应标志位设置为0，同时目的流水的后续指令开始执行。
