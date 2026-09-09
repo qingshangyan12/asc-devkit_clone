@@ -3553,15 +3553,13 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __asc_make_float_from_mantiss
             result = 0.0f;
         } else if (result_exponent >= -126) { // -126: smallest normal fp32 exponent
             // Normal result: normalize mantissa and pack signless fp32 bits.
-            const uint32_t normalized_mantissa =
-                mantissa << static_cast<uint32_t>(23 - mantissa_log2);                    // 23: fp32 mantissa width.
-            const uint32_t bits = (static_cast<uint32_t>(result_exponent + 127) << 23U) | // 127: fp32 exponent bias.
-                                  (normalized_mantissa & ASCRT_MAN_BIT_FLOAT_U);
+            const uint32_t normalized_mantissa = mantissa << static_cast<uint32_t>(23 - mantissa_log2);
+            const uint32_t bits =
+                (static_cast<uint32_t>(result_exponent + 127) << 23U) | (normalized_mantissa & ASCRT_MAN_BIT_FLOAT_U);
             result = __uint_as_float(bits);
         } else {
             // Subnormal result: shift mantissa directly into the denormal field.
-            const uint32_t subnormal_shift =
-                static_cast<uint32_t>(exponent + 149); // 149: smallest subnormal exponent offset.
+            const uint32_t subnormal_shift = static_cast<uint32_t>(exponent + 149);
             result = __uint_as_float(mantissa << subnormal_shift);
         }
     }
@@ -3867,7 +3865,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_sincospif_core(float x, fl
     if (((quadrant + 1) & 2) != 0) { // 2: bit mask, the +1 shifts cos parity so this selects where cos flips sign
         selected_cos = -selected_cos;
     }
-    if (is_integer) { // Exact integer x => sin(pi * x) should be signed zero.
+    if (is_integer) {
         selected_sin = 0.0f * safe_x;
     }
 
