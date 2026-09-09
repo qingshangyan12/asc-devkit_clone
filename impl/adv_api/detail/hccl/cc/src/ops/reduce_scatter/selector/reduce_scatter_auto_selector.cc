@@ -292,13 +292,13 @@ SelectorStatus ReduceScatterAutoSelector::SelectMeshAlgoAicpuForMesh1D(
             if (dataSize * topoInfo->userRankSize > RS_AICPU_1D_TWO_LEVER_DATA_SIZE_THRESHOLD) {
                 selectAlgName = "InsReduceScatterMesh1DZAxisDetour";
             } else if (dataSize * ratio > RS_AICPU_1D_MAX_DATA_SIZE) {
-                selectAlgName = "InsReduceScatterMesh1DMeshChunk";
+                selectAlgName = "AicpuReduceScatterSoleMeshChunk";
             } else {
                 selectAlgName = "InsReduceScatterMesh1D";
             }
         } else {
             if (dataSize * ratio > RS_AICPU_1D_MAX_DATA_SIZE) {
-                selectAlgName = "InsReduceScatterMesh1DMeshChunk";
+                selectAlgName = "AicpuReduceScatterSoleMeshChunk";
             } else {
                 selectAlgName = "InsReduceScatterMesh1D";
             }
@@ -337,7 +337,7 @@ SelectorStatus ReduceScatterAutoSelector::SelectMeshAlgoAicpuForMesh1DClos(
             selectAlgName = "AicpuReduceScatterConcurMeshNHR";
         } else {
             if (dataSize * ratio > RS_AICPU_1D_MAX_DATA_SIZE) {
-                selectAlgName = "InsReduceScatterMesh1DMeshChunk";
+                selectAlgName = "AicpuReduceScatterSoleMeshChunk";
             } else {
                 selectAlgName = "InsReduceScatterMesh1D";
             }
