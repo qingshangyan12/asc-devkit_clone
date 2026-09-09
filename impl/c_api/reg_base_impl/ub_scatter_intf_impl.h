@@ -20,6 +20,10 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#include "impl/c_api/reg_base_impl/npu_arch_3510/ub_scatter_intf_impl.h"
+#endif
+
 // asc_scatter int8_t
 
 // asc_scatter uint8_t
@@ -107,10 +111,6 @@ __simd_callee__ inline void asc_scatter(__ubuf__ float* dst, vector_float src, v
         vscatter(src, dst, index, mask);
     }
 }
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/reg_base_impl/npu_arch_3510/ub_scatter_intf_impl.h"
-#endif
 
 #endif
 

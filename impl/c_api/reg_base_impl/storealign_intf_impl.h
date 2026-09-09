@@ -20,6 +20,10 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#include "impl/c_api/reg_base_impl/npu_arch_3510/storealign_intf_impl.h"
+#endif
+
 union asc_store_align_config {
     int32_t config;
     struct {
@@ -2242,10 +2246,6 @@ __simd_callee__ inline void asc_storealign_squeeze_status_postupdate(__ubuf__ ui
         sprsts(SPR_AR, dst, offset, POST_UPDATE);
     }
 }
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/reg_base_impl/npu_arch_3510/storealign_intf_impl.h"
-#endif
 
 #endif
 

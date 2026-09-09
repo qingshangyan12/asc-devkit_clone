@@ -30,7 +30,6 @@ __aicore__ inline void asc_mrgsort4_sync(
         vmrgsort4(
             dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
             if_exhausted_suspension, valid_bit);
-
         asc_sync_post_process();
     }
 }
@@ -45,7 +44,6 @@ __aicore__ inline void asc_mrgsort4_sync(
         vmrgsort4(
             dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
             if_exhausted_suspension, valid_bit);
-
         asc_sync_post_process();
     }
 }
@@ -55,11 +53,8 @@ __aicore__ inline void asc_bitsort_sync(
     __ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat)
 {
     if ASC_IS_AIV {
-        {
-            uint64_t config = (static_cast<uint64_t>(repeat) & 0xff) << 56;
-            vbs(dst, src0, src1, config);
-        }
-
+        uint64_t config = (static_cast<uint64_t>(repeat) & 0xff) << 56;
+        vbs(dst, src0, src1, config);
         asc_sync_post_process();
     }
 }
@@ -69,11 +64,8 @@ __aicore__ inline void asc_bitsort_sync(
     __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, int32_t repeat)
 {
     if ASC_IS_AIV {
-        {
-            uint64_t config = (static_cast<uint64_t>(repeat) & 0xff) << 56;
-            vbs(dst, src0, src1, config);
-        }
-
+        uint64_t config = (static_cast<uint64_t>(repeat) & 0xff) << 56;
+        vbs(dst, src0, src1, config);
         asc_sync_post_process();
     }
 }
@@ -83,7 +75,6 @@ __aicore__ inline void asc_transpose_sync(__ubuf__ int16_t* dst, __ubuf__ int16_
 {
     if ASC_IS_AIV {
         vtranspose(dst, src);
-
         asc_sync_post_process();
     }
 }
@@ -93,7 +84,6 @@ __aicore__ inline void asc_transpose_sync(__ubuf__ uint16_t* dst, __ubuf__ uint1
 {
     if ASC_IS_AIV {
         vtranspose(dst, src);
-
         asc_sync_post_process();
     }
 }
@@ -383,7 +373,6 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ uint8_t* dst, __gm__ u
             dst, src, 0, static_cast<uint32_t>(1), size, static_cast<uint8_t>(0), static_cast<uint8_t>(0), false,
             static_cast<uint8_t>(static_cast<asc_load_l2_cache_mode>(0)), static_cast<uint64_t>(0),
             static_cast<uint32_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -396,7 +385,6 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ int8_t* dst, __gm__ in
             dst, src, 0, static_cast<uint32_t>(1), size, static_cast<uint8_t>(0), static_cast<uint8_t>(0), false,
             static_cast<uint8_t>(static_cast<asc_load_l2_cache_mode>(0)), static_cast<uint64_t>(0),
             static_cast<uint32_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -409,7 +397,6 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ uint16_t* dst, __gm__ 
             dst, src, 0, static_cast<uint32_t>(1), size, static_cast<uint8_t>(0), static_cast<uint8_t>(0), false,
             static_cast<uint8_t>(static_cast<asc_load_l2_cache_mode>(0)), static_cast<uint64_t>(0),
             static_cast<uint32_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -422,7 +409,6 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ int16_t* dst, __gm__ i
             dst, src, 0, static_cast<uint32_t>(1), size, static_cast<uint8_t>(0), static_cast<uint8_t>(0), false,
             static_cast<uint8_t>(static_cast<asc_load_l2_cache_mode>(0)), static_cast<uint64_t>(0),
             static_cast<uint32_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -435,7 +421,6 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ uint32_t* dst, __gm__ 
             dst, src, 0, static_cast<uint32_t>(1), size, static_cast<uint8_t>(0), static_cast<uint8_t>(0), false,
             static_cast<uint8_t>(static_cast<asc_load_l2_cache_mode>(0)), static_cast<uint64_t>(0),
             static_cast<uint32_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -448,7 +433,6 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ int32_t* dst, __gm__ i
             dst, src, 0, static_cast<uint32_t>(1), size, static_cast<uint8_t>(0), static_cast<uint8_t>(0), false,
             static_cast<uint8_t>(static_cast<asc_load_l2_cache_mode>(0)), static_cast<uint64_t>(0),
             static_cast<uint32_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -461,7 +445,6 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ half* dst, __gm__ half
             dst, src, 0, static_cast<uint32_t>(1), size, static_cast<uint8_t>(0), static_cast<uint8_t>(0), false,
             static_cast<uint8_t>(static_cast<asc_load_l2_cache_mode>(0)), static_cast<uint64_t>(0),
             static_cast<uint32_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -474,7 +457,6 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ float* dst, __gm__ flo
             dst, src, 0, static_cast<uint32_t>(1), size, static_cast<uint8_t>(0), static_cast<uint8_t>(0), false,
             static_cast<uint8_t>(static_cast<asc_load_l2_cache_mode>(0)), static_cast<uint64_t>(0),
             static_cast<uint32_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -487,7 +469,6 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ hifloat8_t* dst, __gm_
             dst, src, 0, static_cast<uint32_t>(1), size, static_cast<uint8_t>(0), static_cast<uint8_t>(0), false,
             static_cast<uint8_t>(static_cast<asc_load_l2_cache_mode>(0)), static_cast<uint64_t>(0),
             static_cast<uint32_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -500,7 +481,6 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ bfloat16_t* dst, __gm_
             dst, src, 0, static_cast<uint32_t>(1), size, static_cast<uint8_t>(0), static_cast<uint8_t>(0), false,
             static_cast<uint8_t>(static_cast<asc_load_l2_cache_mode>(0)), static_cast<uint64_t>(0),
             static_cast<uint32_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -513,7 +493,6 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ fp8_e5m2_t* dst, __gm_
             dst, src, 0, static_cast<uint32_t>(1), size, static_cast<uint8_t>(0), static_cast<uint8_t>(0), false,
             static_cast<uint8_t>(static_cast<asc_load_l2_cache_mode>(0)), static_cast<uint64_t>(0),
             static_cast<uint32_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -526,7 +505,6 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ fp8_e4m3fn_t* dst, __g
             dst, src, 0, static_cast<uint32_t>(1), size, static_cast<uint8_t>(0), static_cast<uint8_t>(0), false,
             static_cast<uint8_t>(static_cast<asc_load_l2_cache_mode>(0)), static_cast<uint64_t>(0),
             static_cast<uint32_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -539,7 +517,6 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ uint8_t* dst, __ubuf__ u
             (__gm__ void*)dst, (__ubuf__ void*)src, 0, static_cast<uint32_t>(1), size,
             static_cast<uint8_t>(static_cast<asc_store_l2_cache_mode>(0)), static_cast<uint64_t>(0),
             static_cast<uint32_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -552,7 +529,6 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ int8_t* dst, __ubuf__ in
             (__gm__ void*)dst, (__ubuf__ void*)src, 0, static_cast<uint32_t>(1), size,
             static_cast<uint8_t>(static_cast<asc_store_l2_cache_mode>(0)), static_cast<uint64_t>(0),
             static_cast<uint32_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -565,7 +541,6 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ uint16_t* dst, __ubuf__ 
             (__gm__ void*)dst, (__ubuf__ void*)src, 0, static_cast<uint32_t>(1), size,
             static_cast<uint8_t>(static_cast<asc_store_l2_cache_mode>(0)), static_cast<uint64_t>(0),
             static_cast<uint32_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -578,7 +553,6 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ int16_t* dst, __ubuf__ i
             (__gm__ void*)dst, (__ubuf__ void*)src, 0, static_cast<uint32_t>(1), size,
             static_cast<uint8_t>(static_cast<asc_store_l2_cache_mode>(0)), static_cast<uint64_t>(0),
             static_cast<uint32_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -591,7 +565,6 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ uint32_t* dst, __ubuf__ 
             (__gm__ void*)dst, (__ubuf__ void*)src, 0, static_cast<uint32_t>(1), size,
             static_cast<uint8_t>(static_cast<asc_store_l2_cache_mode>(0)), static_cast<uint64_t>(0),
             static_cast<uint32_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -604,7 +577,6 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ int32_t* dst, __ubuf__ i
             (__gm__ void*)dst, (__ubuf__ void*)src, 0, static_cast<uint32_t>(1), size,
             static_cast<uint8_t>(static_cast<asc_store_l2_cache_mode>(0)), static_cast<uint64_t>(0),
             static_cast<uint32_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -617,7 +589,6 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ half* dst, __ubuf__ half
             (__gm__ void*)dst, (__ubuf__ void*)src, 0, static_cast<uint32_t>(1), size,
             static_cast<uint8_t>(static_cast<asc_store_l2_cache_mode>(0)), static_cast<uint64_t>(0),
             static_cast<uint32_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -630,7 +601,6 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ float* dst, __ubuf__ flo
             (__gm__ void*)dst, (__ubuf__ void*)src, 0, static_cast<uint32_t>(1), size,
             static_cast<uint8_t>(static_cast<asc_store_l2_cache_mode>(0)), static_cast<uint64_t>(0),
             static_cast<uint32_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -643,7 +613,6 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ hifloat8_t* dst, __ubuf_
             (__gm__ void*)dst, (__ubuf__ void*)src, 0, static_cast<uint32_t>(1), size,
             static_cast<uint8_t>(static_cast<asc_store_l2_cache_mode>(0)), static_cast<uint64_t>(0),
             static_cast<uint32_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -656,7 +625,6 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ bfloat16_t* dst, __ubuf_
             (__gm__ void*)dst, (__ubuf__ void*)src, 0, static_cast<uint32_t>(1), size,
             static_cast<uint8_t>(static_cast<asc_store_l2_cache_mode>(0)), static_cast<uint64_t>(0),
             static_cast<uint32_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -669,7 +637,6 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ fp8_e5m2_t* dst, __ubuf_
             (__gm__ void*)dst, (__ubuf__ void*)src, 0, static_cast<uint32_t>(1), size,
             static_cast<uint8_t>(static_cast<asc_store_l2_cache_mode>(0)), static_cast<uint64_t>(0),
             static_cast<uint32_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -682,7 +649,6 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ fp8_e4m3fn_t* dst, __ubu
             (__gm__ void*)dst, (__ubuf__ void*)src, 0, static_cast<uint32_t>(1), size,
             static_cast<uint8_t>(static_cast<asc_store_l2_cache_mode>(0)), static_cast<uint64_t>(0),
             static_cast<uint32_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -694,7 +660,6 @@ __aicore__ inline void asc_copy_ub2l1_sync(__cbuf__ void* dst, __ubuf__ void* sr
         copy_ubuf_to_cbuf(
             dst, src, 0, static_cast<uint16_t>(1), size / ASC_C_API_ONE_DATABLOCK_SIZE, static_cast<uint16_t>(0),
             static_cast<uint16_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -706,7 +671,6 @@ __aicore__ inline void asc_copy_gm2ub_sync(__ubuf__ void* dst, __gm__ void* src,
         copy_gm_to_ubuf_align_v2(
             (__ubuf__ uint8_t*)dst, (__gm__ uint8_t*)src, 0, static_cast<uint16_t>(1), static_cast<uint16_t>(size), 0,
             0, false, 0, static_cast<uint16_t>(0), static_cast<uint16_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -718,7 +682,6 @@ __aicore__ inline void asc_copy_ub2gm_sync(__gm__ void* dst, __ubuf__ void* src,
         copy_ubuf_to_gm_align_v2(
             dst, src, 0, static_cast<uint16_t>(1), static_cast<uint16_t>(size), 0, static_cast<uint16_t>(0),
             static_cast<uint16_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -730,7 +693,6 @@ __aicore__ inline void asc_copy_ub2ub_sync(__ubuf__ void* dst, __ubuf__ void* sr
         copy_ubuf_to_ubuf(
             dst, src, 0, static_cast<uint16_t>(1), size / ASC_C_API_ONE_DATABLOCK_SIZE, static_cast<uint16_t>(0),
             static_cast<uint16_t>(0));
-
         asc_sync_post_process();
     }
 }

@@ -20,6 +20,10 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#include "impl/c_api/reg_base_impl/npu_arch_3510/vector_datamove_intf_impl.h"
+#endif
+
 __aicore__ inline void asc_copy_gm2ub(
     __ubuf__ void* dst, __gm__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_stride,
     uint16_t dst_stride)
@@ -902,10 +906,6 @@ __aicore__ inline void asc_set_copy_pad_val(float pad_value)
         set_mov_pad_val(*reinterpret_cast<uint32_t*>(&pad_value));
     }
 }
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/reg_base_impl/npu_arch_3510/vector_datamove_intf_impl.h"
-#endif
 
 #endif
 

@@ -18,13 +18,16 @@
 #ifndef IMPL_C_API_REG_BASE_IMPL_SPR_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_SPR_INTF_IMPL_H
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#include "impl/c_api/reg_base_impl/npu_arch_3510/spr_intf_impl.h"
+#endif
+
 __aicore__ inline int64_t asc_get_squeeze_status() { return get_ar(); }
 
 __aicore__ inline void asc_set_ctrl(uint64_t config) { set_ctrl(config); }
 
 __aicore__ inline int64_t asc_get_ctrl() { return get_ctrl(); }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __aicore__ inline void asc_set_saturation_flag(asc_saturation_mode saturation_mode, bool enable_sat)
 {
     // Enum underlying values are CTRL bit indices. INT: 1=sat; FLOAT/FLOAT8/CAST: 0=sat.
@@ -57,11 +60,6 @@ __aicore__ inline asc_override_strategy asc_get_saturation_strategy()
     int64_t value = (get_ctrl() >> 60) & 1;
     return value == 0 ? asc_override_strategy::USE_API : asc_override_strategy::USE_GLOBAL;
 }
-#endif
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/reg_base_impl/npu_arch_3510/spr_intf_impl.h"
-#endif
 
 #endif
 

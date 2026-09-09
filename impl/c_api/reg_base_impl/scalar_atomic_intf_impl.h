@@ -18,6 +18,10 @@
 #ifndef IMPL_C_API_REG_BASE_IMPL_SCALAR_ATOMIC_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_SCALAR_ATOMIC_INTF_IMPL_H
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#include "impl/c_api/reg_base_impl/npu_arch_3510/scalar_atomic_intf_impl.h"
+#endif
+
 namespace __asc_aicore {
 __aicore__ inline int32_t asc_atomic_add(__gm__ int32_t* address, int32_t val) { return atomicAdd(address, val); }
 } // namespace __asc_aicore
@@ -216,10 +220,6 @@ __aicore__ inline uint32_t asc_atomic_dec(__gm__ uint32_t* address, uint32_t val
 namespace __asc_aicore {
 __aicore__ inline uint64_t asc_atomic_dec(__gm__ uint64_t* address, uint64_t val) { return atomicDec(address, val); }
 } // namespace __asc_aicore
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/reg_base_impl/npu_arch_3510/scalar_atomic_intf_impl.h"
-#endif
 
 #endif
 

@@ -25,14 +25,11 @@ __aicore__ inline void asc_copy_l12l0b_sparse_sync(
     __cb__ int8_t* dst, __cbuf__ int8_t* src, __cbuf__ int8_t* index, uint16_t start_index, uint8_t repeat)
 {
     if ASC_IS_AIC {
-        {
-            asc_sparse_addr_config addr_config;
-            addr_config.src = (uint64_t)src & 0xffffffff;
-            addr_config.index = (uint64_t)index & 0xffffffff;
-            __cbuf__ int8_t* src_addr = reinterpret_cast<__cbuf__ int8_t*>(addr_config.config);
-            load_cbuf_to_cb_sp(dst, src_addr, start_index, repeat);
-        }
-
+        asc_sparse_addr_config addr_config;
+        addr_config.src = (uint64_t)src & 0xffffffff;
+        addr_config.index = (uint64_t)index & 0xffffffff;
+        __cbuf__ int8_t* src_addr = reinterpret_cast<__cbuf__ int8_t*>(addr_config.config);
+        load_cbuf_to_cb_sp(dst, src_addr, start_index, repeat);
         asc_sync_post_process();
     }
 }
@@ -44,7 +41,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_s4(dst, src, start_index, repeat, src_stride, dst_gap, 0, false, inc);
-
         asc_sync_post_process();
     }
 }
@@ -56,7 +52,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, start_index, repeat, src_stride, dst_gap, 0, false, inc);
-
         asc_sync_post_process();
     }
 }
@@ -68,7 +63,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, start_index, repeat, src_stride, dst_gap, 0, false, inc);
-
         asc_sync_post_process();
     }
 }
@@ -79,7 +73,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, start_index, repeat, src_stride, dst_gap, 0, false, inc);
-
         asc_sync_post_process();
     }
 }
@@ -91,7 +84,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, start_index, repeat, src_stride, dst_gap, 0, false, inc);
-
         asc_sync_post_process();
     }
 }
@@ -103,7 +95,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, start_index, repeat, src_stride, dst_gap, 0, false, inc);
-
         asc_sync_post_process();
     }
 }
@@ -115,7 +106,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, start_index, repeat, src_stride, dst_gap, 0, false, inc);
-
         asc_sync_post_process();
     }
 }
@@ -126,7 +116,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, start_index, repeat, src_stride, dst_gap, 0, false, inc);
-
         asc_sync_post_process();
     }
 }
@@ -142,7 +131,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         img2colv2_cbuf_to_cb(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -158,7 +146,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         img2colv2_cbuf_to_cb(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -174,7 +161,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         img2colv2_cbuf_to_cb(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -190,7 +176,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         img2colv2_cbuf_to_cb(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -206,7 +191,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         img2colv2_cbuf_to_cb(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -218,7 +202,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca_s4(dst, src, start_index, repeat, src_stride, dst_gap, 0, false, inc);
-
         asc_sync_post_process();
     }
 }
@@ -230,7 +213,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, start_index, repeat, src_stride, dst_gap, 0, false, inc);
-
         asc_sync_post_process();
     }
 }
@@ -242,7 +224,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, start_index, repeat, src_stride, dst_gap, 0, false, inc);
-
         asc_sync_post_process();
     }
 }
@@ -253,7 +234,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, start_index, repeat, src_stride, dst_gap, 0, false, inc);
-
         asc_sync_post_process();
     }
 }
@@ -265,7 +245,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, start_index, repeat, src_stride, dst_gap, 0, false, inc);
-
         asc_sync_post_process();
     }
 }
@@ -277,7 +256,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, start_index, repeat, src_stride, dst_gap, 0, false, inc);
-
         asc_sync_post_process();
     }
 }
@@ -289,7 +267,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, start_index, repeat, src_stride, dst_gap, 0, false, inc);
-
         asc_sync_post_process();
     }
 }
@@ -300,7 +277,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, start_index, repeat, src_stride, dst_gap, 0, false, inc);
-
         asc_sync_post_process();
     }
 }
@@ -316,7 +292,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         img2colv2_cbuf_to_ca_s4(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -332,7 +307,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -348,7 +322,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -364,7 +337,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -380,7 +352,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -396,7 +367,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -412,7 +382,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -428,7 +397,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -442,7 +410,6 @@ __aicore__ inline void asc_load_image_to_cbuf_sync(
         load_image_to_cbuf(
             dst, hor_size, ver_size, hor_start_pos, ver_start_pos, src_hor_size, top_pad_size, bot_pad_size,
             left_pad_size, right_pad_size, 0);
-
         asc_sync_post_process();
     }
 }
@@ -456,7 +423,6 @@ __aicore__ inline void asc_load_image_to_cbuf_sync(
         load_image_to_cbuf(
             dst, hor_size, ver_size, hor_start_pos, ver_start_pos, src_hor_size, top_pad_size, bot_pad_size,
             left_pad_size, right_pad_size, 0);
-
         asc_sync_post_process();
     }
 }
@@ -466,7 +432,6 @@ __aicore__ inline void asc_fill_l0a_sync(__ca__ half* dst, half value, const asc
 {
     if ASC_IS_AIC {
         create_ca_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -476,7 +441,6 @@ __aicore__ inline void asc_fill_l0a_sync(__ca__ half* dst, uint32_t value, const
 {
     if ASC_IS_AIC {
         create_ca_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -486,7 +450,6 @@ __aicore__ inline void asc_fill_l0a_sync(__ca__ float* dst, half value, const as
 {
     if ASC_IS_AIC {
         create_ca_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -496,7 +459,6 @@ __aicore__ inline void asc_fill_l0a_sync(__ca__ float* dst, uint32_t value, cons
 {
     if ASC_IS_AIC {
         create_ca_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -506,7 +468,6 @@ __aicore__ inline void asc_fill_l0a_sync(__ca__ int16_t* dst, half value, const 
 {
     if ASC_IS_AIC {
         create_ca_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -516,7 +477,6 @@ __aicore__ inline void asc_fill_l0a_sync(__ca__ int16_t* dst, uint32_t value, co
 {
     if ASC_IS_AIC {
         create_ca_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -526,7 +486,6 @@ __aicore__ inline void asc_fill_l0a_sync(__ca__ int32_t* dst, half value, const 
 {
     if ASC_IS_AIC {
         create_ca_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -536,7 +495,6 @@ __aicore__ inline void asc_fill_l0a_sync(__ca__ int32_t* dst, uint32_t value, co
 {
     if ASC_IS_AIC {
         create_ca_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -546,7 +504,6 @@ __aicore__ inline void asc_fill_l0a_sync(__ca__ uint16_t* dst, half value, const
 {
     if ASC_IS_AIC {
         create_ca_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -556,7 +513,6 @@ __aicore__ inline void asc_fill_l0a_sync(__ca__ uint16_t* dst, uint32_t value, c
 {
     if ASC_IS_AIC {
         create_ca_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -566,7 +522,6 @@ __aicore__ inline void asc_fill_l0a_sync(__ca__ uint32_t* dst, half value, const
 {
     if ASC_IS_AIC {
         create_ca_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -576,7 +531,6 @@ __aicore__ inline void asc_fill_l0a_sync(__ca__ uint32_t* dst, uint32_t value, c
 {
     if ASC_IS_AIC {
         create_ca_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -586,7 +540,6 @@ __aicore__ inline void asc_fill_l0a_sync(__ca__ bfloat16_t* dst, bfloat16_t valu
 {
     if ASC_IS_AIC {
         create_ca_matrix_bf16(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -596,7 +549,6 @@ __aicore__ inline void asc_fill_l0a_sync(__ca__ bfloat16_t* dst, half value, con
 {
     if ASC_IS_AIC {
         create_ca_matrix_h(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -606,7 +558,6 @@ __aicore__ inline void asc_fill_l0a_sync(__ca__ bfloat16_t* dst, uint32_t value,
 {
     if ASC_IS_AIC {
         create_ca_matrix_ui(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -616,7 +567,6 @@ __aicore__ inline void asc_fill_l0b_sync(__cb__ half* dst, half value, const asc
 {
     if ASC_IS_AIC {
         create_cb_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -626,7 +576,6 @@ __aicore__ inline void asc_fill_l0b_sync(__cb__ half* dst, uint32_t value, const
 {
     if ASC_IS_AIC {
         create_cb_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -636,7 +585,6 @@ __aicore__ inline void asc_fill_l0b_sync(__cb__ float* dst, half value, const as
 {
     if ASC_IS_AIC {
         create_cb_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -646,7 +594,6 @@ __aicore__ inline void asc_fill_l0b_sync(__cb__ float* dst, uint32_t value, cons
 {
     if ASC_IS_AIC {
         create_cb_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -656,7 +603,6 @@ __aicore__ inline void asc_fill_l0b_sync(__cb__ int16_t* dst, half value, const 
 {
     if ASC_IS_AIC {
         create_cb_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -666,7 +612,6 @@ __aicore__ inline void asc_fill_l0b_sync(__cb__ int16_t* dst, uint32_t value, co
 {
     if ASC_IS_AIC {
         create_cb_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -676,7 +621,6 @@ __aicore__ inline void asc_fill_l0b_sync(__cb__ int32_t* dst, half value, const 
 {
     if ASC_IS_AIC {
         create_cb_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -686,7 +630,6 @@ __aicore__ inline void asc_fill_l0b_sync(__cb__ int32_t* dst, uint32_t value, co
 {
     if ASC_IS_AIC {
         create_cb_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -696,7 +639,6 @@ __aicore__ inline void asc_fill_l0b_sync(__cb__ uint16_t* dst, half value, const
 {
     if ASC_IS_AIC {
         create_cb_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -706,7 +648,6 @@ __aicore__ inline void asc_fill_l0b_sync(__cb__ uint16_t* dst, uint32_t value, c
 {
     if ASC_IS_AIC {
         create_cb_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -716,7 +657,6 @@ __aicore__ inline void asc_fill_l0b_sync(__cb__ uint32_t* dst, half value, const
 {
     if ASC_IS_AIC {
         create_cb_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -726,7 +666,6 @@ __aicore__ inline void asc_fill_l0b_sync(__cb__ uint32_t* dst, uint32_t value, c
 {
     if ASC_IS_AIC {
         create_cb_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -736,7 +675,6 @@ __aicore__ inline void asc_fill_l0b_sync(__cb__ bfloat16_t* dst, bfloat16_t valu
 {
     if ASC_IS_AIC {
         create_cb_matrix_bf16(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -746,7 +684,6 @@ __aicore__ inline void asc_fill_l0b_sync(__cb__ bfloat16_t* dst, half value, con
 {
     if ASC_IS_AIC {
         create_cb_matrix_h(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -756,7 +693,6 @@ __aicore__ inline void asc_fill_l0b_sync(__cb__ bfloat16_t* dst, uint32_t value,
 {
     if ASC_IS_AIC {
         create_cb_matrix_ui(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -766,7 +702,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ half* dst, half value, const as
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -776,7 +711,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ half* dst, uint32_t value, cons
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -786,7 +720,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ float* dst, half value, const a
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -796,7 +729,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ float* dst, uint32_t value, con
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -806,7 +738,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ int16_t* dst, half value, const
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -816,7 +747,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ int16_t* dst, uint32_t value, c
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -826,7 +756,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ int32_t* dst, half value, const
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -836,7 +765,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ int32_t* dst, uint32_t value, c
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -846,7 +774,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ uint16_t* dst, half value, cons
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -856,7 +783,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ uint16_t* dst, uint32_t value, 
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -866,7 +792,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ uint32_t* dst, half value, cons
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -876,7 +801,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ uint32_t* dst, uint32_t value, 
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -886,7 +810,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ bfloat16_t* dst, bfloat16_t val
 {
     if ASC_IS_AIC {
         create_cbuf_matrix_bf16(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -896,7 +819,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ bfloat16_t* dst, half value, co
 {
     if ASC_IS_AIC {
         create_cbuf_matrix_h(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -906,7 +828,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ bfloat16_t* dst, uint32_t value
 {
     if ASC_IS_AIC {
         create_cbuf_matrix_ui(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -918,7 +839,6 @@ __aicore__ inline void asc_copy_l12l0a_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca_transpose(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -930,7 +850,6 @@ __aicore__ inline void asc_copy_l12l0a_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca_transpose(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -942,7 +861,6 @@ __aicore__ inline void asc_copy_l12l0a_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca_transpose(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -954,7 +872,6 @@ __aicore__ inline void asc_copy_l12l0a_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca_transpose(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -966,7 +883,6 @@ __aicore__ inline void asc_copy_l12l0a_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca_transpose(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -978,7 +894,6 @@ __aicore__ inline void asc_copy_l12l0a_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca_transpose(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -990,7 +905,6 @@ __aicore__ inline void asc_copy_l12l0a_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca_transpose(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -1002,7 +916,6 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -1014,7 +927,6 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -1026,7 +938,6 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -1038,7 +949,6 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -1050,7 +960,6 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -1062,7 +971,6 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -1074,7 +982,6 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -1086,7 +993,6 @@ __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ void* dst, __gm__ void* src,
         copy_gm_to_cbuf(
             dst, src, 0, static_cast<uint16_t>(1), size / ASC_C_API_ONE_DATABLOCK_SIZE, static_cast<uint16_t>(0),
             static_cast<uint16_t>(0), PAD_NONE);
-
         asc_sync_post_process();
     }
 }
@@ -1098,7 +1004,6 @@ __aicore__ inline void asc_copy_gm2l1_pad1_sync(__cbuf__ void* dst, __gm__ void*
         copy_gm_to_cbuf(
             dst, src, 0, static_cast<uint16_t>(1), size / ASC_C_API_ONE_DATABLOCK_SIZE, static_cast<uint16_t>(0),
             static_cast<uint16_t>(0), PAD_MODE1);
-
         asc_sync_post_process();
     }
 }
@@ -1110,7 +1015,6 @@ __aicore__ inline void asc_copy_gm2l1_pad2_sync(__cbuf__ void* dst, __gm__ void*
         copy_gm_to_cbuf(
             dst, src, 0, static_cast<uint16_t>(1), size / ASC_C_API_ONE_DATABLOCK_SIZE, static_cast<uint16_t>(0),
             static_cast<uint16_t>(0), PAD_MODE2);
-
         asc_sync_post_process();
     }
 }
@@ -1122,7 +1026,6 @@ __aicore__ inline void asc_copy_gm2l1_pad3_sync(__cbuf__ void* dst, __gm__ void*
         copy_gm_to_cbuf(
             dst, src, 0, static_cast<uint16_t>(1), size / ASC_C_API_ONE_DATABLOCK_SIZE, static_cast<uint16_t>(0),
             static_cast<uint16_t>(0), PAD_MODE3);
-
         asc_sync_post_process();
     }
 }
@@ -1134,7 +1037,6 @@ __aicore__ inline void asc_copy_gm2l1_pad4_sync(__cbuf__ void* dst, __gm__ void*
         copy_gm_to_cbuf(
             dst, src, 0, static_cast<uint16_t>(1), size / ASC_C_API_ONE_DATABLOCK_SIZE, static_cast<uint16_t>(0),
             static_cast<uint16_t>(0), PAD_MODE4);
-
         asc_sync_post_process();
     }
 }
@@ -1146,7 +1048,6 @@ __aicore__ inline void asc_copy_gm2l1_pad5_sync(__cbuf__ void* dst, __gm__ void*
         copy_gm_to_cbuf(
             dst, src, 0, static_cast<uint16_t>(1), size / ASC_C_API_ONE_DATABLOCK_SIZE, static_cast<uint16_t>(0),
             static_cast<uint16_t>(0), PAD_MODE5);
-
         asc_sync_post_process();
     }
 }
@@ -1158,7 +1059,6 @@ __aicore__ inline void asc_copy_gm2l1_pad6_sync(__cbuf__ void* dst, __gm__ void*
         copy_gm_to_cbuf(
             dst, src, 0, static_cast<uint16_t>(1), size / ASC_C_API_ONE_DATABLOCK_SIZE, static_cast<uint16_t>(0),
             static_cast<uint16_t>(0), PAD_MODE6);
-
         asc_sync_post_process();
     }
 }
@@ -1170,7 +1070,6 @@ __aicore__ inline void asc_copy_gm2l1_pad7_sync(__cbuf__ void* dst, __gm__ void*
         copy_gm_to_cbuf(
             dst, src, 0, static_cast<uint16_t>(1), size / ASC_C_API_ONE_DATABLOCK_SIZE, static_cast<uint16_t>(0),
             static_cast<uint16_t>(0), PAD_MODE7);
-
         asc_sync_post_process();
     }
 }
@@ -1182,7 +1081,6 @@ __aicore__ inline void asc_copy_gm2l1_pad8_sync(__cbuf__ void* dst, __gm__ void*
         copy_gm_to_cbuf(
             dst, src, 0, static_cast<uint16_t>(1), size / ASC_C_API_ONE_DATABLOCK_SIZE, static_cast<uint16_t>(0),
             static_cast<uint16_t>(0), PAD_MODE8);
-
         asc_sync_post_process();
     }
 }
@@ -1197,7 +1095,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
         copy_gm_to_cbuf_multi_nd2nz_b8(
             dst, src, 0, nd_num, n_value, d_value, src_nd_matrix_stride, src_d_value, dst_nz_c0_stride, dst_nz_n_stride,
             dst_nz_matrix_stride);
-
         asc_sync_post_process();
     }
 }
@@ -1212,7 +1109,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
         copy_gm_to_cbuf_multi_nd2nz_b8(
             dst, src, 0, nd_num, n_value, d_value, src_nd_matrix_stride, src_d_value, dst_nz_c0_stride, dst_nz_n_stride,
             dst_nz_matrix_stride);
-
         asc_sync_post_process();
     }
 }
@@ -1227,7 +1123,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
         copy_gm_to_cbuf_multi_nd2nz_b16(
             dst, src, 0, nd_num, n_value, d_value, src_nd_matrix_stride, src_d_value, dst_nz_c0_stride, dst_nz_n_stride,
             dst_nz_matrix_stride);
-
         asc_sync_post_process();
     }
 }
@@ -1242,7 +1137,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
         copy_gm_to_cbuf_multi_nd2nz_b16(
             dst, src, 0, nd_num, n_value, d_value, src_nd_matrix_stride, src_d_value, dst_nz_c0_stride, dst_nz_n_stride,
             dst_nz_matrix_stride);
-
         asc_sync_post_process();
     }
 }
@@ -1257,7 +1151,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
         copy_gm_to_cbuf_multi_nd2nz_b16(
             dst, src, 0, nd_num, n_value, d_value, src_nd_matrix_stride, src_d_value, dst_nz_c0_stride, dst_nz_n_stride,
             dst_nz_matrix_stride);
-
         asc_sync_post_process();
     }
 }
@@ -1272,7 +1165,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
         copy_gm_to_cbuf_multi_nd2nz_b32s(
             dst, src, 0, nd_num, n_value, d_value, src_nd_matrix_stride, src_d_value, dst_nz_c0_stride, dst_nz_n_stride,
             dst_nz_matrix_stride);
-
         asc_sync_post_process();
     }
 }
@@ -1287,7 +1179,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
         copy_gm_to_cbuf_multi_nd2nz_b32s(
             dst, src, 0, nd_num, n_value, d_value, src_nd_matrix_stride, src_d_value, dst_nz_c0_stride, dst_nz_n_stride,
             dst_nz_matrix_stride);
-
         asc_sync_post_process();
     }
 }
@@ -1302,7 +1193,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
         copy_gm_to_cbuf_multi_nd2nz_b32s(
             dst, src, 0, nd_num, n_value, d_value, src_nd_matrix_stride, src_d_value, dst_nz_c0_stride, dst_nz_n_stride,
             dst_nz_matrix_stride);
-
         asc_sync_post_process();
     }
 }
@@ -1314,7 +1204,6 @@ __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ void* src, uin
         copy_cbuf_to_bt(
             dst, src, static_cast<uint16_t>(0), static_cast<uint16_t>(1), size / ASC_C_API_ONE_DATABLOCK_SIZE,
             static_cast<uint16_t>(0), static_cast<uint16_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -1326,7 +1215,6 @@ __aicore__ inline void asc_copy_l12fb_sync(__fbuf__ void* dst, __cbuf__ void* sr
         copy_cbuf_to_fbuf(
             dst, src, static_cast<uint16_t>(1), size / ASC_C_API_ONE_DATABLOCK_SIZE, static_cast<uint16_t>(0),
             static_cast<uint16_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -1341,7 +1229,6 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
         copy_matrix_cc_to_gm(
             dst, src, 0, n_size, m_size, dst_stride_dst_d, src_stride, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
-
         asc_sync_post_process();
     }
 }
@@ -1356,7 +1243,6 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
         copy_matrix_cc_to_gm(
             dst, src, 0, n_size, m_size, dst_stride_dst_d, src_stride, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
-
         asc_sync_post_process();
     }
 }
@@ -1371,7 +1257,6 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
         copy_matrix_cc_to_gm(
             dst, src, 0, n_size, m_size, dst_stride_dst_d, src_stride, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
-
         asc_sync_post_process();
     }
 }
@@ -1386,7 +1271,6 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
         copy_matrix_cc_to_gm(
             dst, src, 0, n_size, m_size, dst_stride_dst_d, src_stride, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
-
         asc_sync_post_process();
     }
 }
@@ -1401,7 +1285,6 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
         copy_matrix_cc_to_gm(
             dst, src, 0, n_size, m_size, dst_stride_dst_d, src_stride, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
-
         asc_sync_post_process();
     }
 }
@@ -1416,7 +1299,6 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
         copy_matrix_cc_to_gm(
             dst, src, 0, n_size, m_size, dst_stride_dst_d, src_stride, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
-
         asc_sync_post_process();
     }
 }
@@ -1431,7 +1313,6 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
         copy_matrix_cc_to_gm(
             dst, src, 0, n_size, m_size, dst_stride_dst_d, src_stride, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
-
         asc_sync_post_process();
     }
 }
@@ -1446,7 +1327,6 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
         copy_matrix_cc_to_gm(
             dst, src, 0, n_size, m_size, dst_stride_dst_d, src_stride, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
-
         asc_sync_post_process();
     }
 }
@@ -1461,7 +1341,6 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
         copy_matrix_cc_to_gm(
             dst, src, 0, n_size, m_size, dst_stride_dst_d, src_stride, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
-
         asc_sync_post_process();
     }
 }
@@ -1475,7 +1354,6 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
         copy_matrix_cc_to_cbuf(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, unit_flag_mode, static_cast<QuantMode_t>(quant_pre),
             relu_pre, enable_channel_split, enable_nz2nd);
-
         asc_sync_post_process();
     }
 }
@@ -1490,7 +1368,6 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
         copy_matrix_cc_to_cbuf(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, unit_flag_mode, static_cast<QuantMode_t>(quant_pre),
             relu_pre, enable_channel_split, enable_nz2nd);
-
         asc_sync_post_process();
     }
 }
@@ -1504,7 +1381,6 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
         copy_matrix_cc_to_cbuf(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, unit_flag_mode, static_cast<QuantMode_t>(quant_pre),
             relu_pre, enable_channel_split, enable_nz2nd);
-
         asc_sync_post_process();
     }
 }
@@ -1518,7 +1394,6 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
         copy_matrix_cc_to_cbuf(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, unit_flag_mode, static_cast<QuantMode_t>(quant_pre),
             relu_pre, enable_channel_split, enable_nz2nd);
-
         asc_sync_post_process();
     }
 }
@@ -1533,7 +1408,6 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
         copy_matrix_cc_to_cbuf(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, unit_flag_mode, static_cast<QuantMode_t>(quant_pre),
             relu_pre, enable_channel_split, enable_nz2nd);
-
         asc_sync_post_process();
     }
 }
@@ -1548,7 +1422,6 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
         copy_matrix_cc_to_cbuf(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, unit_flag_mode, static_cast<QuantMode_t>(quant_pre),
             relu_pre, enable_channel_split, enable_nz2nd);
-
         asc_sync_post_process();
     }
 }
@@ -1563,7 +1436,6 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
         copy_matrix_cc_to_cbuf(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, unit_flag_mode, static_cast<QuantMode_t>(quant_pre),
             relu_pre, enable_channel_split, enable_nz2nd);
-
         asc_sync_post_process();
     }
 }
@@ -1577,7 +1449,6 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
         copy_matrix_cc_to_cbuf_b4(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, unit_flag_mode, static_cast<QuantMode_t>(quant_pre),
             relu_pre, enable_channel_split, enable_nz2nd);
-
         asc_sync_post_process();
     }
 }
@@ -1591,7 +1462,6 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
         copy_matrix_cc_to_cbuf_b4(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, unit_flag_mode, static_cast<QuantMode_t>(quant_pre),
             relu_pre, enable_channel_split, enable_nz2nd);
-
         asc_sync_post_process();
     }
 }
@@ -1603,7 +1473,6 @@ __aicore__ inline void asc_copy_gm2l0a_sync(
 {
     if ASC_IS_AIC {
         load_gm_to_ca(dst, src, base_idx, repeat, src_stride, dst_gap, 0, inc);
-
         asc_sync_post_process();
     }
 }
@@ -1614,7 +1483,6 @@ __aicore__ inline void asc_copy_gm2l0a_sync(
 {
     if ASC_IS_AIC {
         load_gm_to_ca(dst, src, base_idx, repeat, src_stride, dst_gap, 0, inc);
-
         asc_sync_post_process();
     }
 }
@@ -1625,7 +1493,6 @@ __aicore__ inline void asc_copy_gm2l0a_sync(
 {
     if ASC_IS_AIC {
         load_gm_to_ca(dst, src, base_idx, repeat, src_stride, dst_gap, 0, inc);
-
         asc_sync_post_process();
     }
 }
@@ -1636,7 +1503,6 @@ __aicore__ inline void asc_copy_gm2l0a_sync(
 {
     if ASC_IS_AIC {
         load_gm_to_ca(dst, src, base_idx, repeat, src_stride, dst_gap, 0, inc);
-
         asc_sync_post_process();
     }
 }
@@ -1647,7 +1513,6 @@ __aicore__ inline void asc_copy_gm2l0a_sync(
 {
     if ASC_IS_AIC {
         load_gm_to_ca(dst, src, base_idx, repeat, src_stride, dst_gap, 0, inc);
-
         asc_sync_post_process();
     }
 }
@@ -1658,7 +1523,6 @@ __aicore__ inline void asc_copy_gm2l0a_sync(
 {
     if ASC_IS_AIC {
         load_gm_to_ca(dst, src, base_idx, repeat, src_stride, dst_gap, 0, inc);
-
         asc_sync_post_process();
     }
 }
@@ -1670,7 +1534,6 @@ __aicore__ inline void asc_copy_gm2l0a_sync(
 {
     if ASC_IS_AIC {
         load_gm_to_ca(dst, src, base_idx, repeat, src_stride, dst_gap, 0, inc);
-
         asc_sync_post_process();
     }
 }
@@ -1681,7 +1544,6 @@ __aicore__ inline void asc_copy_gm2l0a_sync(
 {
     if ASC_IS_AIC {
         load_gm_to_ca_s4((__ca__ void*)dst, (__gm__ void*)src, base_idx, repeat, src_stride, dst_gap, 0, inc);
-
         asc_sync_post_process();
     }
 }
@@ -1692,7 +1554,6 @@ __aicore__ inline void asc_copy_l12gm_sync(
 {
     if ASC_IS_AIC {
         copy_cbuf_to_gm(dst, src, 0, n_burst, len_burst, src_gap, dst_gap);
-
         asc_sync_post_process();
     }
 }
@@ -1704,7 +1565,6 @@ __aicore__ inline void asc_copy_l12l0c_sync(
 {
     if ASC_IS_AIC {
         copy_matrix_cbuf_to_cc(dst, src, n_burst, len_burst, src_gap, dst_gap);
-
         asc_sync_post_process();
     }
 }
@@ -1715,7 +1575,6 @@ __aicore__ inline void asc_copy_l12l0c_sync(
 {
     if ASC_IS_AIC {
         copy_matrix_cbuf_to_cc(dst, src, n_burst, len_burst, src_gap, dst_gap);
-
         asc_sync_post_process();
     }
 }
@@ -1726,7 +1585,6 @@ __aicore__ inline void asc_copy_l12l0c_sync(
 {
     if ASC_IS_AIC {
         copy_matrix_cbuf_to_cc(dst, src, n_burst, len_burst, src_gap, dst_gap);
-
         asc_sync_post_process();
     }
 }
@@ -1738,7 +1596,6 @@ __aicore__ inline void asc_copy_l12l0c_sync(
 {
     if ASC_IS_AIC {
         copy_matrix_cbuf_to_cc(dst, src, n_burst, len_burst, src_gap, dst_gap);
-
         asc_sync_post_process();
     }
 }
@@ -1749,7 +1606,6 @@ __aicore__ inline void asc_copy_l12l0c_sync(
 {
     if ASC_IS_AIC {
         copy_matrix_cbuf_to_cc(dst, src, n_burst, len_burst, src_gap, dst_gap);
-
         asc_sync_post_process();
     }
 }
@@ -1761,7 +1617,6 @@ __aicore__ inline void asc_copy_l12l0c_sync(
 {
     if ASC_IS_AIC {
         copy_matrix_cbuf_to_cc(dst, src, n_burst, len_burst, src_gap, dst_gap);
-
         asc_sync_post_process();
     }
 }
@@ -1773,7 +1628,6 @@ __aicore__ inline void asc_copy_l12l0c_sync(
 {
     if ASC_IS_AIC {
         copy_matrix_cbuf_to_cc(dst, src, n_burst, len_burst, src_gap, dst_gap);
-
         asc_sync_post_process();
     }
 }
@@ -1785,7 +1639,6 @@ __aicore__ inline void asc_copy_gm2l0b_sync(
 {
     if ASC_IS_AIC {
         load_gm_to_cb(dst, src, base_idx, repeat, src_stride, dst_gap, 0, addr_cal_mode_t::inc);
-
         asc_sync_post_process();
     }
 }
@@ -1796,7 +1649,6 @@ __aicore__ inline void asc_copy_gm2l0b_sync(
 {
     if ASC_IS_AIC {
         load_gm_to_cb(dst, src, base_idx, repeat, src_stride, dst_gap, 0, addr_cal_mode_t::inc);
-
         asc_sync_post_process();
     }
 }
@@ -1807,7 +1659,6 @@ __aicore__ inline void asc_copy_gm2l0b_sync(
 {
     if ASC_IS_AIC {
         load_gm_to_cb(dst, src, base_idx, repeat, src_stride, dst_gap, 0, addr_cal_mode_t::inc);
-
         asc_sync_post_process();
     }
 }
@@ -1818,7 +1669,6 @@ __aicore__ inline void asc_copy_gm2l0b_sync(
 {
     if ASC_IS_AIC {
         load_gm_to_cb(dst, src, base_idx, repeat, src_stride, dst_gap, 0, addr_cal_mode_t::inc);
-
         asc_sync_post_process();
     }
 }
@@ -1829,7 +1679,6 @@ __aicore__ inline void asc_copy_gm2l0b_sync(
 {
     if ASC_IS_AIC {
         load_gm_to_cb(dst, src, base_idx, repeat, src_stride, dst_gap, 0, addr_cal_mode_t::inc);
-
         asc_sync_post_process();
     }
 }
@@ -1841,7 +1690,6 @@ __aicore__ inline void asc_copy_gm2l0b_sync(
 {
     if ASC_IS_AIC {
         load_gm_to_cb(dst, src, base_idx, repeat, src_stride, dst_gap, 0, addr_cal_mode_t::inc);
-
         asc_sync_post_process();
     }
 }
@@ -1852,7 +1700,6 @@ __aicore__ inline void asc_copy_gm2l0b_sync(
 {
     if ASC_IS_AIC {
         load_gm_to_cb(dst, src, base_idx, repeat, src_stride, dst_gap, 0, addr_cal_mode_t::inc);
-
         asc_sync_post_process();
     }
 }
@@ -1863,7 +1710,6 @@ __aicore__ inline void asc_copy_gm2l0b_sync(
 {
     if ASC_IS_AIC {
         load_gm_to_cb_s4(dst, src, base_idx, repeat, src_stride, dst_gap, 0, addr_cal_mode_t::inc);
-
         asc_sync_post_process();
     }
 }
@@ -1875,7 +1721,6 @@ __aicore__ inline void asc_copy_gm2l1_sync(
 {
     if ASC_IS_AIC {
         load_gm_to_cbuf(dst, src, base_idx, repeat, src_stride, dst_gap, static_cast<uint8_t>(0), addr_cal_mode_t::inc);
-
         asc_sync_post_process();
     }
 }
@@ -1886,7 +1731,6 @@ __aicore__ inline void asc_copy_gm2l1_sync(
 {
     if ASC_IS_AIC {
         load_gm_to_cbuf(dst, src, base_idx, repeat, src_stride, dst_gap, static_cast<uint8_t>(0), addr_cal_mode_t::inc);
-
         asc_sync_post_process();
     }
 }
@@ -1897,7 +1741,6 @@ __aicore__ inline void asc_copy_gm2l1_sync(
 {
     if ASC_IS_AIC {
         load_gm_to_cbuf(dst, src, base_idx, repeat, src_stride, dst_gap, static_cast<uint8_t>(0), addr_cal_mode_t::inc);
-
         asc_sync_post_process();
     }
 }
@@ -1909,7 +1752,6 @@ __aicore__ inline void asc_copy_gm2l1_sync(
 {
     if ASC_IS_AIC {
         load_gm_to_cbuf(dst, src, base_idx, repeat, src_stride, dst_gap, static_cast<uint8_t>(0), addr_cal_mode_t::inc);
-
         asc_sync_post_process();
     }
 }
@@ -1920,7 +1762,6 @@ __aicore__ inline void asc_copy_gm2l1_sync(
 {
     if ASC_IS_AIC {
         load_gm_to_cbuf(dst, src, base_idx, repeat, src_stride, dst_gap, static_cast<uint8_t>(0), addr_cal_mode_t::inc);
-
         asc_sync_post_process();
     }
 }
@@ -1932,7 +1773,6 @@ __aicore__ inline void asc_copy_gm2l1_sync(
 {
     if ASC_IS_AIC {
         load_gm_to_cbuf(dst, src, base_idx, repeat, src_stride, dst_gap, static_cast<uint8_t>(0), addr_cal_mode_t::inc);
-
         asc_sync_post_process();
     }
 }
@@ -1944,7 +1784,6 @@ __aicore__ inline void asc_copy_gm2l1_sync(
 {
     if ASC_IS_AIC {
         load_gm_to_cbuf(dst, src, base_idx, repeat, src_stride, dst_gap, static_cast<uint8_t>(0), addr_cal_mode_t::inc);
-
         asc_sync_post_process();
     }
 }

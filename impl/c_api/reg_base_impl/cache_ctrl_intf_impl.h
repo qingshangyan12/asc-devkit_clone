@@ -59,7 +59,6 @@ __aicore__ inline int64_t asc_get_icache_preload_status() { return get_icache_pr
 
 __aicore__ inline void asc_dci() { dci(); }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __aicore__ inline void asc_set_scalar_cache_mode(asc_load_l2_cache_mode l2_cache_mode)
 {
     ctrl_scalar_cache_bits ctrl;
@@ -89,7 +88,6 @@ __aicore__ inline asc_store_l2_cache_mode asc_get_scalar_store_cache_mode()
     uint8_t cache_bits = static_cast<uint8_t>((get_ctrl() >> start_bit) & 0xF);
     return static_cast<asc_store_l2_cache_mode>(cache_bits);
 }
-#endif
 
 #endif
 

@@ -20,6 +20,10 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#include "impl/c_api/reg_base_impl/npu_arch_3510/reg_fused_intf_impl.h"
+#endif
+
 __simd_callee__ inline void asc_relu(vector_half& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -353,10 +357,6 @@ __simd_callee__ inline vector_float asc_fma(vector_float src0, vector_float src1
     }
     return src2;
 }
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/reg_base_impl/npu_arch_3510/reg_fused_intf_impl.h"
-#endif
 
 #endif
 

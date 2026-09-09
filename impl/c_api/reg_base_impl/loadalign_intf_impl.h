@@ -20,6 +20,10 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#include "impl/c_api/reg_base_impl/npu_arch_3510/loadalign_intf_impl.h"
+#endif
+
 // offset = 0, norm
 __simd_callee__ inline void asc_loadalign(vector_int8_t& dst, __ubuf__ int8_t* src)
 {
@@ -5502,10 +5506,6 @@ __simd_callee__ inline vector_bool asc_loadalign_mask_upsample(__ubuf__ uint32_t
     asc_loadalign_upsample(dst, src);
     return dst;
 }
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/reg_base_impl/npu_arch_3510/loadalign_intf_impl.h"
-#endif
 
 #endif
 

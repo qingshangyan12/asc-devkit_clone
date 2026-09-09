@@ -18,6 +18,10 @@
 #ifndef IMPL_C_API_REG_BASE_IMPL_DATAMOVE_ATOMIC_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_DATAMOVE_ATOMIC_INTF_IMPL_H
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#include "impl/c_api/reg_base_impl/npu_arch_3510/datamove_atomic_intf_impl.h"
+#endif
+
 /// Enables atomic add for data transfer from Unified Buffer/L0C Buffer/L1 Buffer to
 /// Global Memory with half precision (half).
 __aicore__ inline void asc_set_atomic_add_float16()
@@ -164,10 +168,6 @@ __aicore__ inline void asc_set_atomic_min_int32()
     set_atomic_min();
     set_atomic_s32();
 }
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/reg_base_impl/npu_arch_3510/datamove_atomic_intf_impl.h"
-#endif
 
 #endif
 
