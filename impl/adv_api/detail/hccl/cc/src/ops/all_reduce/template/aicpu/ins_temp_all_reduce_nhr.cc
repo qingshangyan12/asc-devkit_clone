@@ -153,18 +153,7 @@ HcclResult InsTempAllReduceNHR::KernelRun(
         return HcclResult::HCCL_SUCCESS;
     }
 
-    if (templateRankSize_ == 1) {
-        CHK_PRT_RET(
-            templateResource.threads.empty(), HCCL_ERROR("[InsTempAllReduceNHR][KernelRun] threads is empty."),
-            HcclResult::HCCL_E_INTERNAL);
-        DataSlice copySrcSlice(
-            tempAlgParams.buffInfo.inputPtr, tempAlgParams.buffInfo.inBuffBaseOff, processSize_, count_);
-        DataSlice copyDstSlice(
-            tempAlgParams.buffInfo.outputPtr, tempAlgParams.buffInfo.outBuffBaseOff, processSize_, count_);
-        CHK_RET(LocalCopy(templateResource.threads.at(0), copySrcSlice, copyDstSlice));
-        return HcclResult::HCCL_SUCCESS;
-    }
-
+    // 数据切片：向下取整，前N-1个rank各拿sliceSize_，最后rank拿tailSize_
     sliceSize_ = (count_ / templateRankSize_) * dataTypeSize_;
     tailSize_ = count_ * dataTypeSize_ - sliceSize_ * (templateRankSize_ - 1);
 
@@ -177,6 +166,7 @@ HcclResult InsTempAllReduceNHR::KernelRun(
             templateResource.threads.size()),
         HcclResult::HCCL_E_INTERNAL);
 
+    // 将数据从input拷贝到hcclBuffer上（对称内存路径跳过）
     if (!supportSymmetricMemAccess_) {
         CHK_RET(PreCopy(tempAlgParams, templateResource.threads));
     }
@@ -187,8 +177,10 @@ HcclResult InsTempAllReduceNHR::KernelRun(
         CHK_RET(PreSyncInterThreads(templateResource.threads[0], subThreads, notifyIdxMainToSub_));
     }
     for (u32 channelIdx = 0; channelIdx < channelsPerRank_; channelIdx++) {
+        // TwoShot算法，第一步ReduceScatter
         CHK_RET(RunReduceScatter(tempAlgParams, templateResource.channels, templateResource.threads, channelIdx));
     }
+    // 对称内存路径：RS 完成后 input[mySlice] 已是归约结果，拷贝到 output[mySlice] 供 AG 阶段使用
     if (supportSymmetricMemAccess_) {
         u64 mySliceSize = (myRankIdx_ == templateRankSize_ - 1) ? tailSize_ : sliceSize_;
         u64 mySliceOffset = myRankIdx_ * sliceSize_;
@@ -201,6 +193,7 @@ HcclResult InsTempAllReduceNHR::KernelRun(
         CHK_RET(LocalCopy(templateResource.threads[0], copySrcSlice, copyDstSlice));
     }
     for (u32 channelIdx = 0; channelIdx < channelsPerRank_; channelIdx++) {
+        // TwoShot算法，第二步AllGather
         CHK_RET(RunAllGather(tempAlgParams, templateResource.channels, templateResource.threads, channelIdx));
     }
     if (threadNum_ > 1) {
@@ -210,6 +203,7 @@ HcclResult InsTempAllReduceNHR::KernelRun(
         CHK_RET(PostSyncInterThreads(templateResource.threads[0], subThreads, notifyIdxSubToMain_));
     }
     if (!supportSymmetricMemAccess_) {
+        // 将数据从hcclBuffer上拷贝到output上
         CHK_RET(PostCopy(tempAlgParams, templateResource.threads));
     }
 
@@ -220,6 +214,8 @@ HcclResult InsTempAllReduceNHR::KernelRun(
 HcclResult InsTempAllReduceNHR::PreCopy(
     const TemplateDataParams& tempAlgParams, const std::vector<ThreadHandle>& threads) const
 {
+    HCCL_INFO("[InsTempAllReduceNHR] PreCopy data from input to hccl buffer");
+
     void* localInBuffPtr = tempAlgParams.buffInfo.inputPtr;
     void* localHcclBuffPtr = tempAlgParams.buffInfo.hcclBuff.addr;
     u64 inBuffBaseOffset = tempAlgParams.buffInfo.inBuffBaseOff;
@@ -264,27 +260,12 @@ HcclResult InsTempAllReduceNHR::RunReduceScatter(
         std::vector<DataSlice> recvDstSlicesList;
         std::vector<DataSlice> sendDstSlicesList;
 
-        void* sendRemoteHcclBuffPtr = sendChannel.remoteCclMem.addr;
-        void* recvRemoteHcclBuffPtr = recvChannel.remoteCclMem.addr;
-        if (supportSymmetricMemAccess_) {
-            HcclResult ret = HcclSymWinGetPeerPointer(
-                inputSymWindow_, inputOffset_, sendChannel.remoteRank, &sendRemoteHcclBuffPtr);
-            CHK_PRT_RET(
-                ret != HCCL_SUCCESS || sendRemoteHcclBuffPtr == nullptr,
-                HCCL_ERROR(
-                    "[InsTempAllReduceNHR] HcclSymWinGetPeerPointer input failed, remoteRank[%u] ret[%d] addr[%p]",
-                    sendChannel.remoteRank, ret, sendRemoteHcclBuffPtr),
-                HcclResult::HCCL_E_INTERNAL);
-            ret = HcclSymWinGetPeerPointer(
-                inputSymWindow_, inputOffset_, recvChannel.remoteRank, &recvRemoteHcclBuffPtr);
-            CHK_PRT_RET(
-                ret != HCCL_SUCCESS || recvRemoteHcclBuffPtr == nullptr,
-                HCCL_ERROR(
-                    "[InsTempAllReduceNHR] HcclSymWinGetPeerPointer input failed, remoteRank[%u] ret[%d] addr[%p]",
-                    recvChannel.remoteRank, ret, recvRemoteHcclBuffPtr),
-                HcclResult::HCCL_E_INTERNAL);
-        }
+        void* sendRemoteHcclBuffPtr
+            = supportSymmetricMemAccess_ ? sendChannel.remoteInputGraphMode.addr : sendChannel.remoteCclMem.addr;
+        void* recvRemoteHcclBuffPtr
+            = supportSymmetricMemAccess_ ? recvChannel.remoteInputGraphMode.addr : recvChannel.remoteCclMem.addr;
 
+        // 在 nhrInBuffType_ 上进行 ReduceScatter 操作
         for (u32 idx = 0; idx < stepInfo.nSlices; ++idx) {
             u32 txIdx = stepInfo.txSliceIdxs.at(idx);
             u32 rxIdx = stepInfo.rxSliceIdxs.at(idx);
@@ -295,11 +276,9 @@ HcclResult InsTempAllReduceNHR::RunReduceScatter(
             sendSrcSlicesList.emplace_back(
                 localHcclBuffPtr, hcclBuffBaseOffset + txIdx * sliceSize_ + txOff, txSz, txSz / dataTypeSize_);
             sendDstSlicesList.emplace_back(
-                sendRemoteHcclBuffPtr, hcclBuffBaseOffset + txIdx * sliceSize_ + txOff, txSz,
-                txSz / dataTypeSize_);
+                sendRemoteHcclBuffPtr, hcclBuffBaseOffset + txIdx * sliceSize_ + txOff, txSz, txSz / dataTypeSize_);
             recvSrcSlicesList.emplace_back(
-                recvRemoteHcclBuffPtr, hcclBuffBaseOffset + rxIdx * sliceSize_ + rxOff, rxSz,
-                rxSz / dataTypeSize_);
+                recvRemoteHcclBuffPtr, hcclBuffBaseOffset + rxIdx * sliceSize_ + rxOff, rxSz, rxSz / dataTypeSize_);
             recvDstSlicesList.emplace_back(
                 localHcclBuffPtr, hcclBuffBaseOffset + rxIdx * sliceSize_ + rxOff, rxSz, rxSz / dataTypeSize_);
         }
@@ -361,26 +340,10 @@ HcclResult InsTempAllReduceNHR::RunAllGather(
         std::vector<DataSlice> recvSrcSlicesList;
         std::vector<DataSlice> recvDstSlicesList;
 
-        void* sendRemoteHcclBuffPtr = sendChannel.remoteCclMem.addr;
-        void* recvRemoteHcclBuffPtr = recvChannel.remoteCclMem.addr;
-        if (supportSymmetricMemAccess_) {
-            HcclResult ret = HcclSymWinGetPeerPointer(
-                outputSymWindow_, outputOffset_, sendChannel.remoteRank, &sendRemoteHcclBuffPtr);
-            CHK_PRT_RET(
-                ret != HCCL_SUCCESS || sendRemoteHcclBuffPtr == nullptr,
-                HCCL_ERROR(
-                    "[InsTempAllReduceNHR] HcclSymWinGetPeerPointer output failed, remoteRank[%u] ret[%d] addr[%p]",
-                    sendChannel.remoteRank, ret, sendRemoteHcclBuffPtr),
-                HcclResult::HCCL_E_INTERNAL);
-            ret = HcclSymWinGetPeerPointer(
-                outputSymWindow_, outputOffset_, recvChannel.remoteRank, &recvRemoteHcclBuffPtr);
-            CHK_PRT_RET(
-                ret != HCCL_SUCCESS || recvRemoteHcclBuffPtr == nullptr,
-                HCCL_ERROR(
-                    "[InsTempAllReduceNHR] HcclSymWinGetPeerPointer output failed, remoteRank[%u] ret[%d] addr[%p]",
-                    recvChannel.remoteRank, ret, recvRemoteHcclBuffPtr),
-                HcclResult::HCCL_E_INTERNAL);
-        }
+        void* sendRemoteHcclBuffPtr
+            = supportSymmetricMemAccess_ ? sendChannel.remoteOutputGraphMode.addr : sendChannel.remoteCclMem.addr;
+        void* recvRemoteHcclBuffPtr
+            = supportSymmetricMemAccess_ ? recvChannel.remoteOutputGraphMode.addr : recvChannel.remoteCclMem.addr;
 
         for (u32 idx = 0; idx < stepInfo.nSlices; ++idx) {
             u32 txIdx = stepInfo.txSliceIdxs.at(idx);
@@ -392,17 +355,15 @@ HcclResult InsTempAllReduceNHR::RunAllGather(
             sendSrcSlicesList.emplace_back(
                 localHcclBuffPtr, hcclBuffBaseOffset + txIdx * sliceSize_ + txOff, txSz, txSz / dataTypeSize_);
             sendDstSlicesList.emplace_back(
-                sendRemoteHcclBuffPtr, hcclBuffBaseOffset + txIdx * sliceSize_ + txOff, txSz,
-                txSz / dataTypeSize_);
+                sendRemoteHcclBuffPtr, hcclBuffBaseOffset + txIdx * sliceSize_ + txOff, txSz, txSz / dataTypeSize_);
             recvSrcSlicesList.emplace_back(
-                recvRemoteHcclBuffPtr, hcclBuffBaseOffset + rxIdx * sliceSize_ + rxOff, rxSz,
-                rxSz / dataTypeSize_);
+                recvRemoteHcclBuffPtr, hcclBuffBaseOffset + rxIdx * sliceSize_ + rxOff, rxSz, rxSz / dataTypeSize_);
             recvDstSlicesList.emplace_back(
                 localHcclBuffPtr, hcclBuffBaseOffset + rxIdx * sliceSize_ + rxOff, rxSz, rxSz / dataTypeSize_);
         }
         SendRecvInfo sendRecvInfo{
             {sendChannel, recvChannel},
-            {{sendSrcSlicesList, sendDstSlicesList}, {recvSrcSlicesList, recvDstSlicesList}}, dataType_};
+            {{sendSrcSlicesList, sendDstSlicesList}, {recvSrcSlicesList, recvDstSlicesList}}};
 
         if (supportSymmetricMemAccess_) {
             CHK_PRT_RET(
@@ -426,6 +387,8 @@ HcclResult InsTempAllReduceNHR::RunAllGather(
 HcclResult InsTempAllReduceNHR::PostCopy(
     const TemplateDataParams& tempAlgParams, const std::vector<ThreadHandle>& threads) const
 {
+    HCCL_INFO("[InsTempAllReduceNHR][PostCopy] Opbase copy from scratchBuffer to userOut");
+
     void* localHcclBuffPtr = tempAlgParams.buffInfo.hcclBuff.addr;
     void* localOutBuffPtr = tempAlgParams.buffInfo.outputPtr;
     u64 hcclBuffBaseOffset = tempAlgParams.buffInfo.hcclBuffBaseOff;
@@ -444,10 +407,12 @@ HcclResult InsTempAllReduceNHR::GetReduceScatterStepInfoList(std::vector<NHRStep
     stepInfoList.resize(nSteps);
 
     for (u32 step = 0; step < nSteps; step++) {
+        // 计算通信对象
         u32 deltaRank = 1 << step;
         u32 sendToIdx = (myRankIdx_ + templateRankSize_ - deltaRank) % templateRankSize_;
         u32 recvFromIdx = (myRankIdx_ + deltaRank) % templateRankSize_;
 
+        // 数据份数和数据编号增量
         u32 nSlices = (templateRankSize_ - 1 + (1 << step)) / (1 << (step + 1));
         u32 deltaSliceIndex = 1 << (step + 1);
         u32 txSliceIdx = sendToIdx;
@@ -460,6 +425,7 @@ HcclResult InsTempAllReduceNHR::GetReduceScatterStepInfoList(std::vector<NHRStep
         currStepInfo.toRank = sendToIdx;
         currStepInfo.fromRank = recvFromIdx;
 
+        // 计算本rank在每轮收/发中的slice编号
         currStepInfo.txSliceIdxs.reserve(nSlices);
         currStepInfo.rxSliceIdxs.reserve(nSlices);
         for (u32 i = 0; i < nSlices; i++) {
@@ -475,16 +441,20 @@ HcclResult InsTempAllReduceNHR::GetReduceScatterStepInfoList(std::vector<NHRStep
     return HcclResult::HCCL_SUCCESS;
 }
 
+// 计算AllGather每轮收发的对端以及slice编号
 HcclResult InsTempAllReduceNHR::GetAllGatherStepInfoList(std::vector<NHRStepInfo>& stepInfoList) const
 {
     stepInfoList.clear();
+
     u32 nSteps = GetNHRStepNum();
     stepInfoList.resize(nSteps);
     for (u32 step = 0; step < nSteps; step++) {
+        // 计算通信对象
         u32 deltaRank = 1 << (nSteps - 1 - step);
         u32 sendToIdx = (myRankIdx_ + deltaRank) % templateRankSize_;
         u32 recvFromIdx = (myRankIdx_ + templateRankSize_ - deltaRank) % templateRankSize_;
 
+        // 数据份数和数据编号增量
         u32 nSlices = (templateRankSize_ - 1 + (1 << (nSteps - 1 - step))) / (1 << (nSteps - step));
         u32 deltaSliceIndex = 1 << (nSteps - step);
         u32 txSliceIdx = myRankIdx_;
@@ -497,6 +467,7 @@ HcclResult InsTempAllReduceNHR::GetAllGatherStepInfoList(std::vector<NHRStepInfo
         currStepInfo.myRank = myRankIdx_;
         currStepInfo.nSlices = nSlices;
 
+        // 计算本rank在每轮收/发中的slice编号
         currStepInfo.txSliceIdxs.reserve(nSlices);
         currStepInfo.rxSliceIdxs.reserve(nSlices);
         for (u32 i = 0; i < nSlices; i++) {
