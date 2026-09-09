@@ -10,6 +10,7 @@
 #ifndef __TESTS_C_API_STUB__
 #define __TESTS_C_API_STUB__
 #include <cstdint>
+#include "impl/utils/common_types.h"
 #include "stub_fun.h"
 #include "c_api/defs/enum.h"
 
@@ -660,6 +661,12 @@ inline void load_gm_to_cbuf_2dv2_s4(
     __cbuf__ void* dst, __gm__ void* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
     uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode, bool enable_pre_load_ignore_sync,
     uint8_t l2_cache_ctl)
+{}
+
+inline void load_gm_to_cbuf_2dv2_s4(
+    __cbuf__ hif4_scale* dst, __gm__ hif4_scale* src, uint32_t m_start_position, uint32_t k_start_position,
+    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode,
+    bool enable_pre_load_ignore_sync, uint8_t l2_cache_ctl)
 {}
 
 // ==========copy_cbuf_to_ubuf===========
