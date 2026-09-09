@@ -329,16 +329,6 @@ __simd_callee__ inline void DataCopyUnAlignImpl(
             vstus(ureg, tmpStride2 * 2, tmp2, (__ubuf__ uint32_t*&)dstAddr, postValue);
         }
     } else {
-        // if constexpr (SupportType<ActualT, complex32>() && (CheckRegTrait<U, RegTraitNumTwo>())) {
-        //     RegTensor<uint16_t> tmp1;
-        //     RegTensor<uint16_t> tmp2;
-        //     Interleave(tmp1, tmp2, (RegTensor<uint16_t>&)srcReg.reg[0], (RegTensor<uint16_t>&)srcReg.reg[1]);
-        //     constexpr uint32_t one_repeat_num = VECTOR_REG_WIDTH / sizeof(ActualT);
-        //     uint32_t tmpStride1 = (postUpdateStride > one_repeat_num) ? one_repeat_num : postUpdateStride;
-        //     vstus(ureg, tmpStride1 * 2, tmp1, (__ubuf__ uint16_t*&)dstAddr, postValue);
-        //     uint32_t tmpStride2 = (postUpdateStride > one_repeat_num) ? (postUpdateStride - one_repeat_num) : 0;
-        //     vstus(ureg, tmpStride2 * 2, tmp2, (__ubuf__ uint16_t*&)dstAddr, postValue);
-        // } else {
         if constexpr (Std::is_same_v<T, bool>) {
             vstus(ureg, postUpdateStride, (RegTensor<int8_t>&)srcReg, (__ubuf__ int8_t*&)dstAddr, postValue);
         } else if constexpr (SupportBytes<T, 4>()) {
@@ -346,7 +336,6 @@ __simd_callee__ inline void DataCopyUnAlignImpl(
         } else {
             vstus(ureg, postUpdateStride, srcReg, dstAddr, postValue);
         }
-        // }
     }
 }
 

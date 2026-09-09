@@ -244,14 +244,6 @@ __aicore__ inline void SetVaReg(uint64_t dst[NCHW_CONV_ADDR_LIST_SIZE], uint64_t
     set_va_reg_sb(VA3, src + VA_REG_ARRAY_LEN);
 }
 
-// __aicore__ inline void VldVaReg(__ubuf__ uint64_t* dst, __ubuf__ uint64_t* src)
-// {
-//     ldva(VA0, (uint64_t)dst, false); // false refers to low 128 bit;
-//     ldva(VA1, (uint64_t)dst, true);  // true refers to high 128 bit;
-//     ldva(VA2, (uint64_t)src, false);
-//     ldva(VA3, (uint64_t)src, true);
-// }
-
 template <typename T>
 __aicore__ inline void TransDataTo5HDImpl(
     __ubuf__ T* dstList[16], __ubuf__ T* srcList[16], const TransDataTo5HDParams& transDataTo5HDParams)
