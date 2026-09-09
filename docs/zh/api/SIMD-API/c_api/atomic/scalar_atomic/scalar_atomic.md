@@ -11,5 +11,4 @@
 - **[asc_atomic_or](asc_atomic_or.md)**
 - **[asc_atomic_sub](asc_atomic_sub.md)**
 - **[asc_atomic_xor](asc_atomic_xor.md)**
-- **[asc_get_store_atomic_config](asc_get_store_atomic_config.md)**
 - **[asc_set_store_atomic_config_v1](asc_set_store_atomic_config_v1.md)**
