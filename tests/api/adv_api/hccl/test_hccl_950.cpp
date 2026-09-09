@@ -371,8 +371,7 @@ TEST_F(HcclSuiteAIC, ReduceScatter_CcuReduceScatterMeshMem2Mem1DPeerOnly)
     HcclMsgArea* hcclMsgArea = GetHcclMsgArea(workSpace.data());
     HcclCombineOpParam hcclCombineOpParam = GetHcclCombineOpParam(workSpace);
     hcclCombineOpParam.opType[0] = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER);
-    hcclCombineOpParam.algorithmType[0] =
-        static_cast<uint8_t>(AlgorithmType::CcuReduceScatterMeshMem2Mem1DPeerOnly);
+    hcclCombineOpParam.algorithmType[0] = static_cast<uint8_t>(AlgorithmType::CcuReduceScatterMeshMem2Mem1DPeerOnly);
 
     Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU> hccl;
     hccl.Init(reinterpret_cast<GM_ADDR>(&hcclCombineOpParam));

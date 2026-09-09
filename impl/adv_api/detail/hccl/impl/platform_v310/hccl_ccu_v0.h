@@ -291,8 +291,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         FlushDataCache(reinterpret_cast<__gm__ uint8_t*>(&handleParamGM_[handleId]) + MAX_DCCI_CNT);
         CcuPrepareForAllToAllVWrite(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
-        if (GetAlgorithmType(handleId) ==
-            static_cast<uint32_t>(AlgorithmType::CcuReduceScatterMeshMem2Mem1DPeerOnly)) {
+        if (GetAlgorithmType(handleId) == static_cast<uint32_t>(AlgorithmType::CcuReduceScatterMeshMem2Mem1DPeerOnly)) {
             ccuUsedXnNum_ = 9;
             CcuPrepareForReduceScatterPeerOnlyM2M(&handleParamGM_[handleId]);
         } else {

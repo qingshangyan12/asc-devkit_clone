@@ -251,8 +251,8 @@ TEST_F(TestHcclTilingCcuKfc, ReduceScatterCcuSchedUsesCcuNewVersion)
 TEST_F(TestHcclTilingCcuKfc, ReduceScatterPeerOnlyCcuSchedUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER),
-        "CcuSchedReduceScatterSoleMeshPeerOnly", 6U, INIT_TILING_CCU_NEW_VERSION);
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterSoleMeshPeerOnly", 6U,
+        INIT_TILING_CCU_NEW_VERSION);
 }
 
 // ============================================================================

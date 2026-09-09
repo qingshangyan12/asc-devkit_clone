@@ -24,8 +24,7 @@ using namespace HcclKfcProtocol;
 static_assert(KFC_CONCURRENT_AG_PARAM_NUM <= CCU_USED_XN_NUM, "Concurrent AllGather parameters exceed XN capacity");
 static_assert(CCU_USED_XN_NUM <= CCU_MSG_XN_NUM, "KFC loaded parameters exceed the message slot");
 
-__aicore__ inline void CalcPeerOnlyChunkParams(
-    uint64_t sliceSize, uint64_t* tailSize, uint64_t* chunkLoopNum)
+__aicore__ inline void CalcPeerOnlyChunkParams(uint64_t sliceSize, uint64_t* tailSize, uint64_t* chunkLoopNum)
 {
     const uint64_t fullChunkCount = sliceSize == 0 ? 0 : (sliceSize - 1) / CCU_MAX_COMM_DATA;
     *tailSize = sliceSize - fullChunkCount * CCU_MAX_COMM_DATA;
@@ -360,8 +359,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 }
 
 template <const auto& config>
-__aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::
-    CcuPrepareForReduceScatterPeerOnlyM2M(__gm__ CommonPrepareParamCcu* commParam)
+__aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForReduceScatterPeerOnlyM2M(
+    __gm__ CommonPrepareParamCcu* commParam)
 {
     xnData_[0] = GetOpId(commParam);
     const uint64_t dataSize = GetHcclDataTypeSize(commParam->dataType);
@@ -371,8 +370,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::
     xnData_[3] = 0;
 
     const uint64_t sliceSize = commParam->count * dataSize;
-    xnData_[4] = ccuParam_.rankId *
-                 ((commParam->strideCount == 0) ? sliceSize : (commParam->strideCount * dataSize));
+    xnData_[4] = ccuParam_.rankId * ((commParam->strideCount == 0) ? sliceSize : (commParam->strideCount * dataSize));
     xnData_[5] = 0;
     xnData_[6] = 0;
     CalcPeerOnlyChunkParams(sliceSize, &xnData_[7], &xnData_[8]);

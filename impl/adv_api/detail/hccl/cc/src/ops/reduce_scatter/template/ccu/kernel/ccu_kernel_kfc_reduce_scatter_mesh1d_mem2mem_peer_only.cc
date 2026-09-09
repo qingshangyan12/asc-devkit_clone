@@ -70,11 +70,9 @@ static CcuResult LoadPeerOnlyArgs(
 static CcuResult PeerOnlyPreSync(KfcReduceScatterMesh1DMem2MemPeerOnlyContext& ctx)
 {
     CCU_CHK_RET(ccu::WriteVariableWithNotify(
-        ctx.channels[0], ctx.input[ctx.rankId], PEER_ONLY_INPUT_XN_ID, PEER_ONLY_CKE_IDX,
-        1U << PEER_ONLY_INPUT_XN_ID));
+        ctx.channels[0], ctx.input[ctx.rankId], PEER_ONLY_INPUT_XN_ID, PEER_ONLY_CKE_IDX, 1U << PEER_ONLY_INPUT_XN_ID));
     CCU_CHK_RET(ccu::WriteVariableWithNotify(
-        ctx.channels[0], ctx.token[ctx.rankId], PEER_ONLY_TOKEN_XN_ID, PEER_ONLY_CKE_IDX,
-        1U << PEER_ONLY_TOKEN_XN_ID));
+        ctx.channels[0], ctx.token[ctx.rankId], PEER_ONLY_TOKEN_XN_ID, PEER_ONLY_CKE_IDX, 1U << PEER_ONLY_TOKEN_XN_ID));
     constexpr uint32_t allBit = (1U << PEER_ONLY_INPUT_XN_ID) | (1U << PEER_ONLY_TOKEN_XN_ID);
     ccu::NotifyWait(ctx.channels[0], PEER_ONLY_CKE_IDX, allBit);
     return CCU_SUCCESS;
@@ -105,16 +103,12 @@ static CcuResult DoPeerOnlyReduceScatter(KfcReduceScatterMesh1DMem2MemPeerOnlyCo
     chunkLoopNumAdd = 1;
     CCU_WHILE(ctx.chunkLoopNum != UINT64_MAX)
     {
-        CCU_IF(ctx.chunkLoopNum == UINT64_MAX - 1)
-        {
-            chunkSize = ctx.tailSize;
-        }
+        CCU_IF(ctx.chunkLoopNum == UINT64_MAX - 1) { chunkSize = ctx.tailSize; }
         ctx.chunkLoopNum += chunkLoopNumAdd;
         CCU_IF(chunkSize != 0)
         {
             ccu::ReadReduce(
-                ctx.channels[0], output, remoteInput, chunkSize, ctx.dataType, ctx.reduceOp, ctx.event,
-                1U << peerRank);
+                ctx.channels[0], output, remoteInput, chunkSize, ctx.dataType, ctx.reduceOp, ctx.event, 1U << peerRank);
             ccu::EventWait(ctx.event, 1U << peerRank);
         }
         remoteInput.addr += chunkSize;
@@ -147,8 +141,8 @@ CcuResult CcuReduceScatterMeshMem2Mem1DPeerOnlyKernel(
         "[CcuSchedReduceScatterSoleMeshPeerOnly] run, rankId[%u], rankSize[%u], dataType[%d], reduceOp[%d].",
         ctx.rankId, ctx.rankSize, ctx.dataType, ctx.reduceOp);
     CCU_CHK_RET(InitPeerOnlyResource(ctx));
-    CCU_CHK_RET(LoadPeerOnlyArgs(
-        ctx, inputAddr, outputAddr, tokenInfo, currentRankSliceInputOffset, tailSize, chunkLoopNum));
+    CCU_CHK_RET(
+        LoadPeerOnlyArgs(ctx, inputAddr, outputAddr, tokenInfo, currentRankSliceInputOffset, tailSize, chunkLoopNum));
     CCU_CHK_RET(PeerOnlyPreSync(ctx));
     CCU_CHK_RET(DoPeerOnlyReduceScatter(ctx));
     CCU_CHK_RET(PeerOnlyPostSync(ctx));

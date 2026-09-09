@@ -38,8 +38,8 @@ HcclResult InheritKfcServerKernelArg(
         srcName == "CcuKernelKfcAllToAllMesh1DMultiJetty" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALL;
     const bool isReduceScatter =
         srcName == "CcuKernelKfcReduceScatterMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
-    const bool isReduceScatterPeerOnly = srcName == KFC_REDUCE_SCATTER_PEER_ONLY_KERNEL_NAME &&
-                                         param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
+    const bool isReduceScatterPeerOnly =
+        srcName == KFC_REDUCE_SCATTER_PEER_ONLY_KERNEL_NAME && param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
     const bool isAllToAllV = srcName == "CcuKernelAlltoAllVMesh1D" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV;
     const bool isAlltoAll = srcName == "CcuKernelAlltoAllMesh1D" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALL;
     const bool isAllReduce =
@@ -69,8 +69,8 @@ HcclResult InheritKfcServerKernelArg(
         kfcArg->rankId = srcArg->rankId;
         kfcArg->opParam = srcArg->opParam;
         kfcArg->subCommRanks = srcArg->subCommRanks;
-    } else if (isAllGather || isAllGatherKfc || isReduceScatter || isReduceScatterPeerOnly || isAlltoAll ||
-               isAllReduce) {
+    } else if (
+        isAllGather || isAllGatherKfc || isReduceScatter || isReduceScatterPeerOnly || isAlltoAll || isAllReduce) {
         kfcArg->rankSize = subCommRanks[0].size();
         kfcArg->rankId = rankId;
         kfcArg->loadFromMem = false;

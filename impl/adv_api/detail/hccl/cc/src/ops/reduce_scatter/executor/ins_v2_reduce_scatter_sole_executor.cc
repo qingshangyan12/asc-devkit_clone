@@ -267,8 +267,8 @@ REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleMesh, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
     CcuTempKfcReduceScatterMesh1DMem2Mem);
 REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleMeshPeerOnly,
-    InsV2ReduceScatterSoleExecutor, TopoMatch1D, CcuTempKfcReduceScatterMesh1DMem2MemPeerOnly);
+    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleMeshPeerOnly, InsV2ReduceScatterSoleExecutor,
+    TopoMatch1D, CcuTempKfcReduceScatterMesh1DMem2MemPeerOnly);
 #endif
 
 } // namespace mc2_ops_hccl
