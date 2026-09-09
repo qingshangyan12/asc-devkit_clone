@@ -38,16 +38,16 @@ __aicore__ inline constexpr auto get(Tuple&& t);
 
 // layout construction
 template <typename FirstShape, typename... Shapes>
-__aicore__ inline constexpr shape<FirstShape, Shapes...> make_shape(const FirstShape& first_shape,
-                                                                    const Shapes&... shapes);
+__aicore__ inline constexpr shape<FirstShape, Shapes...> make_shape(
+    const FirstShape& first_shape, const Shapes&... shapes);
 
 template <typename FirstStride, typename... Strides>
-__aicore__ inline constexpr stride<FirstStride, Strides...> make_stride(const FirstStride& first_stride,
-                                                                        const Strides&... strides);
+__aicore__ inline constexpr stride<FirstStride, Strides...> make_stride(
+    const FirstStride& first_stride, const Strides&... strides);
 
 template <typename FirstCoord, typename... Coords>
-__aicore__ inline constexpr coord<FirstCoord, Coords...> make_coord(const FirstCoord& first_coord,
-                                                                    const Coords&... coords);
+__aicore__ inline constexpr coord<FirstCoord, Coords...> make_coord(
+    const FirstCoord& first_coord, const Coords&... coords);
 
 template <typename Shape, typename Stride>
 __aicore__ inline constexpr auto make_layout(const Shape& shape, const Stride& stride);

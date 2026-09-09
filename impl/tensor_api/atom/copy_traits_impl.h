@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/atom/copy_traits_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -31,16 +31,17 @@ template <typename AlwaysVoid, typename CopyOperation, typename Trait, const Tra
 struct has_pascal_copy_method : Std::false_type {};
 
 template <typename CopyOperation, typename Trait, const Trait& trait, typename... Args>
-struct has_pascal_copy_method<void_t<decltype(
-    CopyOperation::template Copy<Trait, trait, Args...>(std::declval<Args>()...))>, CopyOperation, Trait, trait,
-    Args...> : Std::true_type {};
+struct has_pascal_copy_method<
+    void_t<decltype(CopyOperation::template Copy<Trait, trait, Args...>(std::declval<Args>()...))>, CopyOperation,
+    Trait, trait, Args...> : Std::true_type {};
 
 template <typename AlwaysVoid, typename CopyTraitsType, typename Trait, const Trait& trait, typename... Args>
 struct has_pascal_copy_unpack_method : Std::false_type {};
 
 template <typename CopyTraitsType, typename Trait, const Trait& trait, typename... Args>
-struct has_pascal_copy_unpack_method<void_t<decltype(
-    std::declval<const CopyTraitsType&>().template CopyUnpack<trait, Args...>(std::declval<Args>()...))>,
+struct has_pascal_copy_unpack_method<
+    void_t<decltype(std::declval<const CopyTraitsType&>().template CopyUnpack<trait, Args...>(
+        std::declval<Args>()...))>,
     CopyTraitsType, Trait, trait, Args...> : Std::true_type {};
 
 template <typename CopyOperation, typename CopyTrait, typename CopyOperationWith, typename CopyTraitWith>
@@ -52,10 +53,11 @@ copy_traits<CopyOperation, CopyTrait, CopyOperationWith, CopyTraitWith>::with(co
 }
 
 template <typename CopyOperation, typename CopyTrait, typename CopyOperationWith, typename CopyTraitWith>
-template <const typename copy_traits<CopyOperation, CopyTrait, CopyOperationWith, CopyTraitWith>::trait_type& trait,
-          typename... Args>
-__aicore__ inline void
-copy_traits<CopyOperation, CopyTrait, CopyOperationWith, CopyTraitWith>::copy_unpack(const Args&... args) const
+template <
+    const typename copy_traits<CopyOperation, CopyTrait, CopyOperationWith, CopyTraitWith>::trait_type& trait,
+    typename... Args>
+__aicore__ inline void copy_traits<CopyOperation, CopyTrait, CopyOperationWith, CopyTraitWith>::copy_unpack(
+    const Args&... args) const
 {
     if constexpr (has_pascal_copy_method<void, CopyOperation, trait_type, trait, Args...>::value) {
         CopyOperation::template Copy<trait_type, trait, Args...>(args...);

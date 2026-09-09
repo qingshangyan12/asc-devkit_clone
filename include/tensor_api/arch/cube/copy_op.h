@@ -36,8 +36,8 @@ struct l0c_to_gm_params {
 struct l0c_to_ub_params {
     __aicore__ constexpr l0c_to_ub_params() = default;
 
-    __aicore__ constexpr l0c_to_ub_params(unit_flag_mode unit_flag, uint8_t sub_block_id = 0) :
-        unit_flag(unit_flag), sub_block_id(sub_block_id)
+    __aicore__ constexpr l0c_to_ub_params(unit_flag_mode unit_flag, uint8_t sub_block_id = 0)
+        : unit_flag(unit_flag), sub_block_id(sub_block_id)
     {}
 
     unit_flag_mode unit_flag = unit_flag_mode::disable;
@@ -80,10 +80,12 @@ private:
     template <const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor>
     __aicore__ inline static void data_copy_impl(const DstTensor& dst, const SrcTensor& src);
 
-    template <const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
-              typename CopyShape>
-    __aicore__ inline static void data_copy_impl(const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord,
-                                                 const SrcCoord& src_coord, const CopyShape& copy_shape);
+    template <
+        const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
+        typename CopyShape>
+    __aicore__ inline static void data_copy_impl(
+        const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord, const SrcCoord& src_coord,
+        const CopyShape& copy_shape);
 };
 
 struct copy_l1_to_ub {
@@ -94,10 +96,12 @@ private:
     template <const l1_to_ub_trait& trait, typename DstTensor, typename SrcTensor>
     __aicore__ inline static void data_copy_impl(const DstTensor& dst, const SrcTensor& src);
 
-    template <const l1_to_ub_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
-              typename CopyShape>
-    __aicore__ inline static void data_copy_impl(const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord,
-                                                 const SrcCoord& src_coord, const CopyShape& copy_shape);
+    template <
+        const l1_to_ub_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
+        typename CopyShape>
+    __aicore__ inline static void data_copy_impl(
+        const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord, const SrcCoord& src_coord,
+        const CopyShape& copy_shape);
 };
 
 struct copy_l1_to_l0a {
@@ -113,10 +117,12 @@ private:
     template <const l1_to_l0b_trait& trait, typename DstTensor, typename SrcTensor>
     __aicore__ inline static void load_data(const DstTensor& dst, const SrcTensor& src);
 
-    template <const l1_to_l0b_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord,
-              typename SrcCoord, typename CopyShape>
-    __aicore__ inline static void load_data(const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord,
-                                            const SrcCoord& src_coord, const CopyShape& copy_shape);
+    template <
+        const l1_to_l0b_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
+        typename CopyShape>
+    __aicore__ inline static void load_data(
+        const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord, const SrcCoord& src_coord,
+        const CopyShape& copy_shape);
 };
 
 struct copy_l1_to_l0scalea {
@@ -127,10 +133,12 @@ private:
     template <const l1_to_l0scalea_trait& trait, typename DstTensor, typename SrcTensor>
     __aicore__ inline static void load_data(const DstTensor& dst, const SrcTensor& src);
 
-    template <const l1_to_l0scalea_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord,
-              typename SrcCoord, typename CopyShape>
-    __aicore__ inline static void load_data(const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord,
-                                            const SrcCoord& src_coord, const CopyShape& copy_shape);
+    template <
+        const l1_to_l0scalea_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
+        typename CopyShape>
+    __aicore__ inline static void load_data(
+        const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord, const SrcCoord& src_coord,
+        const CopyShape& copy_shape);
 };
 
 struct copy_l1_to_l0scaleb {
@@ -141,10 +149,12 @@ private:
     template <const l1_to_l0scaleb_trait& trait, typename DstTensor, typename SrcTensor>
     __aicore__ inline static void load_data(const DstTensor& dst, const SrcTensor& src);
 
-    template <const l1_to_l0scaleb_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord,
-              typename SrcCoord, typename CopyShape>
-    __aicore__ inline static void load_data(const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord,
-                                            const SrcCoord& src_coord, const CopyShape& copy_shape);
+    template <
+        const l1_to_l0scaleb_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
+        typename CopyShape>
+    __aicore__ inline static void load_data(
+        const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord, const SrcCoord& src_coord,
+        const CopyShape& copy_shape);
 };
 
 struct copy_l1_to_fixbuf {
@@ -155,10 +165,12 @@ private:
     template <const l1_to_fixbuf_trait& trait, typename DstTensor, typename SrcTensor>
     __aicore__ inline static void data_copy_impl(const DstTensor& dst, const SrcTensor& src);
 
-    template <const l1_to_fixbuf_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord,
-              typename SrcCoord, typename CopyShape>
-    __aicore__ inline static void data_copy_impl(const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord,
-                                                 const SrcCoord& src_coord, const CopyShape& copy_shape);
+    template <
+        const l1_to_fixbuf_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
+        typename CopyShape>
+    __aicore__ inline static void data_copy_impl(
+        const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord, const SrcCoord& src_coord,
+        const CopyShape& copy_shape);
 };
 
 struct copy_l1_to_biastable {
@@ -169,10 +181,12 @@ private:
     template <const l1_to_biastable_trait& trait, typename DstTensor, typename SrcTensor>
     __aicore__ inline static void data_copy_impl(const DstTensor& dst, const SrcTensor& src);
 
-    template <const l1_to_biastable_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord,
-              typename SrcCoord, typename CopyShape>
-    __aicore__ inline static void data_copy_impl(const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord,
-                                                 const SrcCoord& src_coord, const CopyShape& copy_shape);
+    template <
+        const l1_to_biastable_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord,
+        typename SrcCoord, typename CopyShape>
+    __aicore__ inline static void data_copy_impl(
+        const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord, const SrcCoord& src_coord,
+        const CopyShape& copy_shape);
 };
 
 struct copy_l0c_to_gm {

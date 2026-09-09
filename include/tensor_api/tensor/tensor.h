@@ -70,8 +70,8 @@ struct base_tensor {
     __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs);
 
     template <typename Coord0, typename Coord1, typename... Coords>
-    __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1,
-                                                          const Coords&... cs) const;
+    __aicore__ inline constexpr decltype(auto) operator()(
+        const Coord0& c0, const Coord1& c1, const Coords&... cs) const;
 
     template <typename Coord, typename Info>
     __aicore__ inline constexpr decltype(auto) slice(const Coord& coord, const Info& info);
@@ -98,8 +98,8 @@ struct base_tensor {
 
 private:
     template <typename SliceEngine, typename SliceLayout>
-    __aicore__ inline static constexpr decltype(auto) make_sub_tensor(const SliceEngine& slice_engine,
-                                                                      const SliceLayout& slice_layout);
+    __aicore__ inline static constexpr decltype(auto) make_sub_tensor(
+        const SliceEngine& slice_engine, const SliceLayout& slice_layout);
 
     Std::tuple<layout_type, engine_type> rep;
 };

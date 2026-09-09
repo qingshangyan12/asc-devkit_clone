@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/l0c_to_gm/copy_impl/nz2nhwc.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -50,16 +50,17 @@ public:
         uint8_t unit_flag = static_cast<uint8_t>(params.unit_flag);
         bool is_channel_split = trait.enable_channel_split;
 
-        copy_l0c_to_gm_instr::data_copy<quant_pre>(dst.data().get(), src.data().get(), n_size, m_size, src_stride,
-                                                   dst_stride, cache_mode, relu_en, unit_flag, is_channel_split, true,
-                                                   false);
+        copy_l0c_to_gm_instr::data_copy<quant_pre>(
+            dst.data().get(), src.data().get(), n_size, m_size, src_stride, dst_stride, cache_mode, relu_en, unit_flag,
+            is_channel_split, true, false);
     }
 
-    template <const l0c_to_gm_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord,
-              typename SrcCoord, typename CopyShape>
-    __aicore__ inline static void run(const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord,
-                                      const SrcCoord& src_coord, const CopyShape& copy_shape,
-                                      const l0c_to_gm_params& params)
+    template <
+        const l0c_to_gm_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
+        typename CopyShape>
+    __aicore__ inline static void run(
+        const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord, const SrcCoord& src_coord,
+        const CopyShape& copy_shape, const l0c_to_gm_params& params)
     {
         constexpr QuantMode_t quant_pre = get_quant_mode<trait.round_mode, DstTensor, SrcTensor>();
         check_data_type::check_l0c_to_gm_data_type<quant_pre, DstTensor, SrcTensor>();

@@ -35,8 +35,7 @@ struct l1_to_biastable_trait {};
 
 struct l0c_to_gm_trait {
     __aicore__ constexpr l0c_to_gm_trait() = default;
-    __aicore__ constexpr l0c_to_gm_trait(asc::te::round_mode round_mode, bool enable_relu,
-                                         bool enable_channel_split);
+    __aicore__ constexpr l0c_to_gm_trait(asc::te::round_mode round_mode, bool enable_relu, bool enable_channel_split);
 
     asc::te::round_mode round_mode = asc::te::round_mode::default_round;
     bool enable_relu = false;
@@ -45,8 +44,8 @@ struct l0c_to_gm_trait {
 
 struct l0c_to_ub_trait {
     __aicore__ constexpr l0c_to_ub_trait() = default;
-    __aicore__ constexpr l0c_to_ub_trait(asc::te::round_mode round_mode, bool enable_relu,
-                                         bool enable_channel_split, dual_dst_mode dual_dst_ctl);
+    __aicore__ constexpr l0c_to_ub_trait(
+        asc::te::round_mode round_mode, bool enable_relu, bool enable_channel_split, dual_dst_mode dual_dst_ctl);
 
     asc::te::round_mode round_mode = asc::te::round_mode::default_round;
     bool enable_relu = false;
@@ -56,8 +55,7 @@ struct l0c_to_ub_trait {
 
 struct l0c_to_l1_trait {
     __aicore__ constexpr l0c_to_l1_trait() = default;
-    __aicore__ constexpr l0c_to_l1_trait(asc::te::round_mode round_mode, bool enable_relu,
-                                         bool enable_channel_split);
+    __aicore__ constexpr l0c_to_l1_trait(asc::te::round_mode round_mode, bool enable_relu, bool enable_channel_split);
 
     asc::te::round_mode round_mode = asc::te::round_mode::default_round;
     bool enable_relu = false;

@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/l1_to_l0scaleb/copy.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -38,10 +38,11 @@ __aicore__ inline void copy_l1_to_l0scaleb::load_data(const DstTensor& dst, cons
 {
     using dst_pos = get_mem_location<DstTensor>;
     using src_pos = get_mem_location<SrcTensor>;
-    static_assert(Std::is_same_v<dst_pos, location::l0scaleb>,
-                  "For copy_l1_to_l0scaleb, the destination tensor must be located in L0ScaleB.");
-    static_assert(Std::is_same_v<src_pos, location::l1>,
-                  "For copy_l1_to_l0scaleb, the source tensor must be located in L1.");
+    static_assert(
+        Std::is_same_v<dst_pos, location::l0scaleb>,
+        "For copy_l1_to_l0scaleb, the destination tensor must be located in L0ScaleB.");
+    static_assert(
+        Std::is_same_v<src_pos, location::l1>, "For copy_l1_to_l0scaleb, the source tensor must be located in L1.");
     using dst_layout = typename DstTensor::layout_type;
     using src_layout = typename SrcTensor::layout_type;
     using dst_pattern = get_layout_pattern<dst_layout>;
@@ -54,17 +55,20 @@ __aicore__ inline void copy_l1_to_l0scaleb::load_data(const DstTensor& dst, cons
     copy_l1_to_l0scaleb_impl::template run<trait, DstTensor, SrcTensor>(dst, src);
 }
 
-template <const l1_to_l0scaleb_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord,
-    typename SrcCoord, typename CopyShape>
-__aicore__ inline void copy_l1_to_l0scaleb::load_data(const DstTensor& dst, const SrcTensor& src,
-    const DstCoord& dst_coord, const SrcCoord& src_coord, const CopyShape& copy_shape)
+template <
+    const l1_to_l0scaleb_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
+    typename CopyShape>
+__aicore__ inline void copy_l1_to_l0scaleb::load_data(
+    const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord, const SrcCoord& src_coord,
+    const CopyShape& copy_shape)
 {
     using dst_pos = get_mem_location<DstTensor>;
     using src_pos = get_mem_location<SrcTensor>;
-    static_assert(Std::is_same_v<dst_pos, location::l0scaleb>,
-                  "For copy_l1_to_l0scaleb, the destination tensor must be located in L0ScaleB.");
-    static_assert(Std::is_same_v<src_pos, location::l1>,
-                  "For copy_l1_to_l0scaleb, the source tensor must be located in L1.");
+    static_assert(
+        Std::is_same_v<dst_pos, location::l0scaleb>,
+        "For copy_l1_to_l0scaleb, the destination tensor must be located in L0ScaleB.");
+    static_assert(
+        Std::is_same_v<src_pos, location::l1>, "For copy_l1_to_l0scaleb, the source tensor must be located in L1.");
     using dst_pattern = get_layout_pattern<typename DstTensor::layout_type>;
     using src_pattern = get_layout_pattern<typename SrcTensor::layout_type>;
     using copy_l1_to_l0scaleb_impl =

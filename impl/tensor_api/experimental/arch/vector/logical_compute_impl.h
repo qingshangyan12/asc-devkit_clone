@@ -61,12 +61,13 @@ __simd_callee__ inline reg_tensor<T> operator<<(const reg_tensor<T>& src, const 
     reg_tensor<T> dst;
     if constexpr (is_reg_tensor_v<U>) {
         using shift_type = detail::reg_elem_t<U>;
-        static_assert(detail::supports_shift_pair_v<T, shift_type>,
+        static_assert(
+            detail::supports_shift_pair_v<T, shift_type>,
             "register operator<< requires a signed shift register of the same width");
         asc_shiftleft(dst.reg, src.reg, shift.reg, src.mask);
     } else {
-        static_assert(Std::is_same_v<Std::remove_cvref_t<U>, int16_t>,
-            "scalar operator<< requires an int16_t shift value");
+        static_assert(
+            Std::is_same_v<Std::remove_cvref_t<U>, int16_t>, "scalar operator<< requires an int16_t shift value");
         asc_shiftleft_scalar(dst.reg, src.reg, shift, src.mask);
     }
     dst.mask = src.mask;
@@ -81,12 +82,13 @@ __simd_callee__ inline reg_tensor<T> operator>>(const reg_tensor<T>& src, const 
     reg_tensor<T> dst;
     if constexpr (is_reg_tensor_v<U>) {
         using shift_type = detail::reg_elem_t<U>;
-        static_assert(detail::supports_shift_pair_v<T, shift_type>,
+        static_assert(
+            detail::supports_shift_pair_v<T, shift_type>,
             "register operator>> requires a signed shift register of the same width");
         asc_shiftright(dst.reg, src.reg, shift.reg, src.mask);
     } else {
-        static_assert(Std::is_same_v<Std::remove_cvref_t<U>, int16_t>,
-            "scalar operator>> requires an int16_t shift value");
+        static_assert(
+            Std::is_same_v<Std::remove_cvref_t<U>, int16_t>, "scalar operator>> requires an int16_t shift value");
         asc_shiftright_scalar(dst.reg, src.reg, shift, src.mask);
     }
     dst.mask = src.mask;
