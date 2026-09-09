@@ -148,7 +148,7 @@ extern CcuResult CcuKernelLaunch(HcclComm comm, void* opResCtx);
  * @brief Launch the MC2 AICPU KFC server kernel (Mc2ServerKernel) with the device-side OpResCtx
  * @param blockDim AICPU block number for the kernel, 0 is treated as 1.
  * @param stream Stream used to launch the kernel.
- * @param opResCtx Device-side OpResCtx address created by HcclAllocComResourceByTiling, passed to the
+ * @param opResCtx Device-side OpResCtx address created by Mc2AcquireCcResCtx, passed to the
  *                 kernel as launch args; no extra H2D copy is performed since it already resides on device.
  * @param opResCtxSize Size of the OpResCtx in bytes, must not be smaller than sizeof(OpResCtx).
  * @return HcclResult - HCCL_SUCCESS on success, error code otherwise.
