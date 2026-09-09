@@ -190,7 +190,7 @@ asc-devkit/
 │           ├── loadalign_intf_impl.h
 │           ├── vector_datamove_intf_impl.h
 │           ├── ...
-│           └── npu_arch_3510/    # 仅3510废弃接口及专用辅助实现
+│           └── npu_arch_3510/    # 3510专用实现，由公共实现头按架构宏包含
 │               ├── reg_convert_intf_impl.h
 │               └── ...
 │
