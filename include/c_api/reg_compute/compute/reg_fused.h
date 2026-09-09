@@ -51,6 +51,7 @@ __simd_callee__ inline void asc_axpy(vector_float& dst, vector_float src, float 
 
 __simd_callee__ inline void asc_muls(vector_half& dst, vector_float src, float value, vector_bool mask);
 
+ASC_DEPRECATED(9.2.0, "2027/09/03", asc_mul_scalar_float2half_rn)
 __simd_callee__ inline void asc_muls_v2(vector_half& dst, vector_float src, float value, vector_bool mask);
 
 __simd_callee__ inline void asc_mul_scalar_float2half_rn(

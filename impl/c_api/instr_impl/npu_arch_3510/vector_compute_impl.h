@@ -7668,8 +7668,8 @@ __simd_callee__ inline void asc_muls(vector_half& dst, vector_float src, float v
     asc_muls_impl(dst, src, value, mask);
 }
 
-[[deprecated("NOTICE: asc_muls_v2 is deprecated. "
-             "Currently asc_muls_v2 is an unsupported API on current device.")]] __simd_callee__ inline void
+ASC_DEPRECATED(9.2.0, "2027/09/03", asc_mul_scalar_float2half_rn)
+__simd_callee__ inline void
 asc_muls_v2(vector_half& dst, vector_float src, float value, vector_bool mask)
 {
     asc_muls_v2_impl(dst, src, value, mask);
