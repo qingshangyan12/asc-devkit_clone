@@ -54,6 +54,9 @@ std::string g_stubSelectorAlgName;
 // HcclGetAlgRes资源不足打桩：置true时HcclGetAlgRes直接返回HCCL_E_UNAVAIL，
 // 用于验证checkOnly场景下UNAVAIL被翻译为HCCL_E_RES_NOT_SUFFICIENT（非checkOnly保持UNAVAIL原样）。
 bool g_stubCcuAlgResUnavailable = false;
+uint32_t g_stubAlgResFailuresRemaining = 0;
+std::vector<std::string> g_stubAlgResAttempts;
+std::vector<uint64_t> g_stubAlltoAllSendCounts;
 
 HcclResult GetOrCreateCcuCtx(HcclComm comm, const std::string& tag, uint64_t ctxSize, void** ctx)
 {
@@ -331,6 +334,14 @@ HcclResult HcclGetAlgRes(
     }
 
     // 资源不足打桩：模拟CCU通道/实例资源不足，供checkOnly的UNAVAIL→RES_NOT_SUFFICIENT用例使用
+    g_stubAlgResAttempts.emplace_back(param.algName);
+    if (param.opType == HcclCMDType::HCCL_CMD_ALLTOALL && param.all2AllVDataDes.sendCounts != nullptr) {
+        g_stubAlltoAllSendCounts.push_back(static_cast<const uint64_t*>(param.all2AllVDataDes.sendCounts)[0]);
+    }
+    if (g_stubAlgResFailuresRemaining > 0) {
+        --g_stubAlgResFailuresRemaining;
+        return HCCL_E_UNAVAIL;
+    }
     if (g_stubCcuAlgResUnavailable) {
         return HCCL_E_UNAVAIL;
     }
