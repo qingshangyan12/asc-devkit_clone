@@ -71,23 +71,23 @@ struct base_tensor {
     __aicore__ inline constexpr decltype(auto) operator[](const Coord& coord) const;
 
     template <typename Coord>
-    __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord);
+    __aicore__ inline decltype(auto) operator()(const Coord& coord);
 
     template <typename Coord>
-    __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) const;
+    __aicore__ inline decltype(auto) operator()(const Coord& coord) const;
 
     template <typename Coord0, typename Coord1, typename... Coords>
-    __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs);
+    __aicore__ inline decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs);
 
     template <typename Coord0, typename Coord1, typename... Coords>
-    __aicore__ inline constexpr decltype(auto) operator()(
+    __aicore__ inline decltype(auto) operator()(
         const Coord0& c0, const Coord1& c1, const Coords&... cs) const;
 
     template <typename Coord, typename Info>
-    __aicore__ inline constexpr decltype(auto) slice(const Coord& coord, const Info& info);
+    __aicore__ inline decltype(auto) slice(const Coord& coord, const Info& info);
 
     template <typename Coord, typename Info>
-    __aicore__ inline constexpr decltype(auto) slice(const Coord& coord, const Info& info) const;
+    __aicore__ inline decltype(auto) slice(const Coord& coord, const Info& info) const;
 
     __aicore__ inline constexpr decltype(auto) Tensor() const;
     __aicore__ inline constexpr decltype(auto) Engine() const;
@@ -101,14 +101,14 @@ struct base_tensor {
     __aicore__ inline constexpr auto Capacity() const;
 
     template <typename Coord, typename Info>
-    __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info);
+    __aicore__ inline decltype(auto) Slice(const Coord& coord, const Info& info);
 
     template <typename Coord, typename Info>
-    __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info) const;
+    __aicore__ inline decltype(auto) Slice(const Coord& coord, const Info& info) const;
 
 private:
     template <typename SliceEngine, typename SliceLayout>
-    __aicore__ inline static constexpr decltype(auto) make_sub_tensor(
+    __aicore__ inline static decltype(auto) make_sub_tensor(
         const SliceEngine& slice_engine, const SliceLayout& slice_layout);
 
     Std::tuple<layout_type, engine_type> rep;
@@ -137,13 +137,13 @@ namespace asc {
 namespace te {
 
 template <typename Iterator, typename... Args>
-__aicore__ inline constexpr auto make_tensor(const Iterator& iter, const Args&... args);
+__aicore__ inline auto make_tensor(const Iterator& iter, const Args&... args);
 
 template <size_t... SqueezeDims, typename Input, typename Enable>
-__aicore__ inline constexpr auto squeeze(const Input& x);
+__aicore__ inline auto squeeze(const Input& x);
 
 template <typename Pattern, typename Input, typename Enable>
-__aicore__ inline constexpr auto squeeze(const Input& x, const Pattern& pattern);
+__aicore__ inline auto squeeze(const Input& x, const Pattern& pattern);
 
 } // namespace te
 } // namespace asc

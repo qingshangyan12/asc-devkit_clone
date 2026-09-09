@@ -248,7 +248,7 @@ __aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
 }
 
 template <typename Iterator, typename... Args>
-__aicore__ inline constexpr auto MakeTensor(const Iterator& iterator, const Args&... args)
+__aicore__ inline auto MakeTensor(const Iterator& iterator, const Args&... args)
 {
     return make_tensor(iterator, args...);
 }
@@ -257,7 +257,7 @@ template <
     size_t... SqueezeDims, typename Input,
     typename = Std::enable_if_t<
         (asc::te::is_layout_v<Input> || asc::te::is_attr_tensor_v<Input>) && (sizeof...(SqueezeDims) > 0)>>
-__aicore__ inline constexpr auto Squeeze(const Input& value)
+__aicore__ inline auto Squeeze(const Input& value)
 {
     return squeeze<SqueezeDims...>(value);
 }
@@ -267,7 +267,7 @@ template <
     typename = Std::enable_if_t<
         (asc::te::is_layout_v<Input> || asc::te::is_attr_tensor_v<Input>) &&
         Std::is_tuple_v<Std::remove_cvref_t<Pattern>>>>
-__aicore__ inline constexpr auto Squeeze(const Input& value, const Pattern& pattern)
+__aicore__ inline auto Squeeze(const Input& value, const Pattern& pattern)
 {
     return squeeze(value, pattern);
 }

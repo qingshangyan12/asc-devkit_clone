@@ -86,7 +86,7 @@ template <size_t... Is, typename Layout, typename Enable = Std::enable_if_t<is_l
 __aicore__ inline constexpr auto capacity(const Layout& layout);
 
 template <typename Tensor, typename Coord, typename Info>
-__aicore__ inline constexpr decltype(auto) slice(Tensor&& tensor, const Coord& coord, const Info& info);
+__aicore__ inline decltype(auto) slice(Tensor&& tensor, const Coord& coord, const Info& info);
 
 template <typename LayoutPattern, typename Trait = Std::ignore_t, typename... Args>
 __aicore__ inline constexpr decltype(auto) make_frame_layout(const Args&... args);
