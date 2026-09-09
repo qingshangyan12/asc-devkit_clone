@@ -128,6 +128,11 @@ HcclResult ObtainCommEngine(const void* ccTilingList[], uint32_t tilingNum, uint
 
 HcclResult CheckCcuKfcFlow(const void* mc2Tiling, const void* ccTilingList[], uint32_t tilingNum);
 
+// A null stream selects AICPU resource acquisition without a caller stream.
+HcclResult AllocComResourceByTilingAicpu(
+    HcclComm comm, void* stream, void* mc2Tiling, const void* ccTilingList[], uint32_t tilingNum, const char* commName,
+    u32 rankSize, u32 userRank, void** opResCtx, std::string& ctxTag);
+
 // 构建 opResCtx 基础字段
 HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSize, u32 userRank, OpResCtx& opResCtx);
 

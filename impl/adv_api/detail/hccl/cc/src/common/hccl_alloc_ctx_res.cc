@@ -277,6 +277,7 @@ HcclResult AllocOpParamMemory(
         resCtx.algInfo[i].opParam = opParamAddr[i];
         resCtx.algInfo[i].offset = initTiling->offset[i];
         resCtx.opParamSize[i] = opParamSize;
+        resCtx.opType[i] = ccTiling->opType;
     }
     return HCCL_SUCCESS;
 }
@@ -831,7 +832,11 @@ HcclResult GetOpParamResCtx(
 
     ThreadHandle cpuTsThread{0};
     ThreadHandle exportedAicpuTsThread{0};
-    if ((opParam.engine == COMM_ENGINE_AICPU_TS) || (opParam.engine == COMM_ENGINE_CPU)) {
+    CHK_PRT_RET(
+        opParam.stream == nullptr && opParam.engine != COMM_ENGINE_AICPU_TS,
+        HCCL_ERROR("Resource acquisition without a stream requires AICPU_TS engine."), HCCL_E_NOT_SUPPORT);
+    if (opParam.stream != nullptr &&
+        ((opParam.engine == COMM_ENGINE_AICPU_TS) || (opParam.engine == COMM_ENGINE_CPU))) {
         CHK_RET(HcclThreadAcquireWithStream(comm, COMM_ENGINE_CPU_TS, opParam.stream, 1, &cpuTsThread));
         CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
     }
@@ -883,7 +888,6 @@ HcclResult GetOpParam(
     HcclComm comm, void* stream, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& opParam)
 {
     CHK_PTR_NULL(comm);
-    CHK_PTR_NULL(stream);
     CHK_PTR_NULL(ccTiling);
     CHK_RET(InitOpParamByTiling(comm, stream, tag, ccTiling, opParam));
 
@@ -902,6 +906,9 @@ HcclResult GetOpParam(
     if (!forcedAlgAccepted) {
         CHK_RET(SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo));
     }
+    CHK_PRT_RET(
+        stream == nullptr && opParam.engine != COMM_ENGINE_AICPU_TS,
+        HCCL_ERROR("Resource acquisition without a stream requires AICPU_TS engine."), HCCL_E_NOT_SUPPORT);
     CHK_RET(FillOpParamAlgName(opParam, algName));
 
     bool skipGetRes = false;
