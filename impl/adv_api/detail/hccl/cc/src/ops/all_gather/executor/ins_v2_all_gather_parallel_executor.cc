@@ -12,6 +12,10 @@
 #include "alg_data_trans_wrapper.h"
 #include "ins_temp_all_gather_mesh_1D.h"
 #include "ins_temp_all_gather_nhr.h"
+#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+#include "ccu_temp_kfc_all_gather_mesh_1D_mem2mem.h"
+#include "ccu_temp_kfc_all_gather_nhr_1D_multi_jetty_mem2mem.h"
+#endif
 #include "topo_match_pcie_mix.h"
 #include "alg_data_trans_wrapper.h"
 
@@ -289,7 +293,10 @@ template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTempla
 HcclResult InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::Orchestrate(
     const OpParam& param, const AlgResourceCtxSerializable& resCtx)
 {
-    if (resCtx.algHierarchyInfo.infos.empty() || resCtx.algHierarchyInfo.infos.size() < REQUIRED_HIERARCHY_INFO_NUM) {
+    const bool isMeshClos =
+        resCtx.topoInfo.level0Topo == Level0Shape::MESH_1D_CLOS && !resCtx.topoInfo.level0PcieMix;
+    if (resCtx.algHierarchyInfo.infos.empty() ||
+        (!isMeshClos && resCtx.algHierarchyInfo.infos.size() < REQUIRED_HIERARCHY_INFO_NUM)) {
         HCCL_ERROR("[%s] algHierarchyInfo.infos is invalid (empty or size < 2).", __func__);
         return HCCL_E_PARA;
     }
@@ -539,5 +546,11 @@ REGISTER_EXECUTOR_BY_TWO_TEMPS(
 REGISTER_EXECUTOR_BY_TWO_TEMPS(
     HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherParallelMesh1DNHRPcie, InsV2AllGatherParallelExecutor,
     TopoMatchPcieMix, InsTempAllGatherMesh1D, InsTempAllGatherNHR);
+#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+REGISTER_EXECUTOR_BY_TWO_TEMPS(
+    HcclCMDType::HCCL_CMD_ALLGATHER, CcuSchedAllGatherParallelMeshNHRMultiLink,
+    InsV2AllGatherParallelExecutor, TopoMatchUBX, CcuTempKfcAllGatherMesh1DMem2Mem,
+    CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem);
+#endif
 } // namespace mc2_ops_hccl
 // 算法注册

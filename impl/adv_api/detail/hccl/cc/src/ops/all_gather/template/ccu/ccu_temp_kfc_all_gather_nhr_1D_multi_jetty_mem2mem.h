@@ -50,6 +50,14 @@ public:
     HcclResult GetRes(AlgResourceRequest& resourceRequest) const override;
     u64 GetThreadNum() const override;
     u64 CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) override;
+    // The generic parallel executor contains an AICPU-only runtime branch.
+    // CCU never consumes that channel map; keeping this no-op interface lets
+    // the shared executor instantiate without changing its control flow.
+    HcclResult SetchannelsPerRank(const std::map<u32, std::vector<ChannelInfo>>& channels)
+    {
+        (void)channels;
+        return HCCL_SUCCESS;
+    }
 
 private:
     HcclResult CalcNhrInfo(std::vector<KfcNhrStepInfo>& stepInfoVector) const;
