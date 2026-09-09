@@ -91,7 +91,7 @@ extern HcclResult Mc2SetCcAlgConfig(void* ccArgs, char* algConfig);
 /**
  * @brief  Set the comm engine param of Mc2CcArgs
  * @param ccArgs A pointer to the Mc2CcArgs.
- * @param commEngine The comm engine type to set.
+ * @param commEngine COMM_ENGINE_AICPU_TS, COMM_ENGINE_AIV or COMM_ENGINE_CCU.
  */
 extern HcclResult Mc2SetCcCommEngine(void* ccArgs, uint8_t commEngine);
 

@@ -1029,7 +1029,7 @@ protected:
         ASSERT_EQ(Mc2GetCcArgs(&args_), HCCL_SUCCESS);
         char algConfig[] = "";
         ASSERT_EQ(Mc2SetCcAlgConfig(args_, algConfig), HCCL_SUCCESS);
-        ASSERT_EQ(Mc2SetCcCommEngine(args_, COMM_ENGINE_AICPU), HCCL_SUCCESS);
+        ASSERT_EQ(Mc2SetCcCommEngine(args_, COMM_ENGINE_AICPU_TS), HCCL_SUCCESS);
     }
 
     void TearDown() override
@@ -1042,6 +1042,13 @@ protected:
 
     void* args_ = nullptr;
 };
+
+TEST_F(Mc2OpResCtxTest, CommEngineUsesAicpuTs)
+{
+    EXPECT_EQ(static_cast<const Mc2CcArgs*>(args_)->commEngine, COMM_ENGINE_AICPU_TS);
+    EXPECT_EQ(Mc2SetCcCommEngine(args_, COMM_ENGINE_AICPU), HCCL_E_NOT_SUPPORT);
+    EXPECT_EQ(static_cast<const Mc2CcArgs*>(args_)->commEngine, COMM_ENGINE_AICPU_TS);
+}
 
 TEST_F(Mc2OpResCtxTest, AicpuResourceLayoutAndReuse)
 {

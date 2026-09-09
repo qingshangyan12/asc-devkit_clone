@@ -98,7 +98,7 @@ HcclResult Mc2SetCcAlgConfig(void* ccArgs, char* algConfig)
 HcclResult Mc2SetCcCommEngine(void* ccArgs, uint8_t commEngine)
 {
     CHK_PTR_NULL(ccArgs);
-    if (commEngine != COMM_ENGINE_AICPU && commEngine != COMM_ENGINE_AIV && commEngine != COMM_ENGINE_CCU) {
+    if (commEngine != COMM_ENGINE_AICPU_TS && commEngine != COMM_ENGINE_AIV && commEngine != COMM_ENGINE_CCU) {
         HCCL_ERROR("[%s] commEngine[%u] not supported", __func__, commEngine);
         return HCCL_E_NOT_SUPPORT;
     }
@@ -211,8 +211,8 @@ HcclResult Mc2AcquireCcResCtxImpl(
     char commName[COMM_INDENTIFIER_MAX_LENGTH]{};
     CHK_RET(HcclGetCommName(comm, commName));
 
-    if (args.commEngine != COMM_ENGINE_AICPU) {
-        HCCL_ERROR("[%s] unsupported commEngine[%u], only AICPU is supported", __func__, args.commEngine);
+    if (args.commEngine != COMM_ENGINE_AICPU_TS) {
+        HCCL_ERROR("[%s] unsupported commEngine[%u], only AICPU_TS is supported", __func__, args.commEngine);
         return HCCL_E_NOT_SUPPORT;
     }
 
