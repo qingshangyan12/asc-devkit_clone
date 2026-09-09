@@ -22,6 +22,7 @@
 namespace AscendC {
 using namespace HcclKfcProtocol;
 static_assert(KFC_CONCURRENT_AG_PARAM_NUM <= CCU_USED_XN_NUM, "Concurrent AllGather parameters exceed XN capacity");
+static_assert(KFC_CONCURRENT_RS_PARAM_NUM <= CCU_USED_XN_NUM, "Concurrent ReduceScatter parameters exceed XN capacity");
 static_assert(CCU_USED_XN_NUM <= CCU_MSG_XN_NUM, "KFC loaded parameters exceed the message slot");
 
 __aicore__ inline void CalcPeerOnlyChunkParams(uint64_t sliceSize, uint64_t* tailSize, uint64_t* chunkLoopNum)
@@ -379,6 +380,62 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         "PeerOnly RS prepare: input=0x%llx, output=0x%llx, rankOffset=0x%llx, slice=0x%llx, "
         "chunk=0x%llx, tail=0x%llx, loop=0x%llx\n",
         xnData_[1], xnData_[2], xnData_[4], sliceSize, CCU_MAX_COMM_DATA, xnData_[7], xnData_[8]);
+}
+
+template <const auto& config>
+__aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForConcurrentReduceScatterM2M(
+    __gm__ CommonPrepareParamCcu* commParam)
+{
+    // 将 hccl InsReduceScatterConcurrentExecutor::OrchestrateLoop 的 host 侧切分搬到 AIV：
+    // CCU_SCHED 带宽比 MESH_BW_SCHED:CLOS_BW_SCHED = 10:12，meshSize 按 128B 对齐下取整。
+    constexpr uint64_t meshBandwidth = 10U;
+    constexpr uint64_t totalBandwidth = 22U;
+    constexpr uint64_t splitAlignment = 128U;
+    constexpr uint64_t nhrJettyNum = 1U; // 与 hccl CcuTempReduceScatterNhrMultiJettyMem2Mem1D 的 portNum=1 一致
+    const uint64_t dataTypeSize = GetHcclDataTypeSize(commParam->dataType);
+    const uint64_t sliceSize = commParam->count * dataTypeSize; // 每 rank 输出份
+    const uint64_t repeatOffset = sliceSize * ccuParam_.repeatIndex;
+    const uint64_t meshSize = (sliceSize * meshBandwidth / totalBandwidth / splitAlignment) * splitAlignment;
+    const uint64_t nhrSize = sliceSize - meshSize;
+    const uint64_t sliceStride = commParam->strideCount == 0U ? sliceSize : commParam->strideCount * dataTypeSize;
+    const uint64_t inputBase = reinterpret_cast<uint64_t>(commParam->sendBuf) + repeatOffset;
+    const uint64_t outputBase = reinterpret_cast<uint64_t>(commParam->recvBuf) + repeatOffset;
+
+    // mission0：Mesh 流（紧凑布局 [1..15]，chunk 循环公式同 SoleMesh；NHR 流不占 scratch，全量给 Mesh 流）。
+    xnData_[KFC_CONCURRENT_RS_OP_ID] = GetOpId(commParam);
+    xnData_[KFC_CONCURRENT_RS_MESH_INPUT] = inputBase;
+    xnData_[KFC_CONCURRENT_RS_MESH_OUTPUT] = outputBase;
+    xnData_[KFC_CONCURRENT_RS_MESH_SCRATCH] = ccuParam_.scratchAddr;
+    xnData_[KFC_CONCURRENT_RS_MESH_RANK_SLICE_OFFSET] = ccuParam_.rankId * sliceStride;
+    constexpr uint64_t scratchSize = 64 * 1024 * 1024; // 与 host 侧 alloc_ctx_res.cc 对齐（双端契约）
+    const uint64_t chunkSize = scratchSize / ccuParam_.rankNum / splitAlignment * splitAlignment;
+    const uint64_t fullChunkCount = meshSize == 0 ? 0 : (meshSize - 1) / chunkSize;
+    const uint64_t chunkCount = meshSize == 0 ? 0 : fullChunkCount + 1;
+    const uint64_t meshTailSize = meshSize - fullChunkCount * chunkSize;
+    xnData_[KFC_CONCURRENT_RS_MESH_CHUNK_SIZE] = chunkSize;
+    xnData_[KFC_CONCURRENT_RS_MESH_CHUNK_LOOP_NUM] = UINT64_MAX - chunkCount;
+    xnData_[KFC_CONCURRENT_RS_MESH_TAIL_SIZE] = meshTailSize;
+    CalcGoSize(
+        chunkSize, CCU_LOOP_COUNT_M2M_RE, CCU_MEMSLICE_SIZE, &xnData_[KFC_CONCURRENT_RS_MESH_FULL_GO_ADDR_OFFSET]);
+    CalcGoSize(
+        meshTailSize, CCU_LOOP_COUNT_M2M_RE, CCU_MEMSLICE_SIZE, &xnData_[KFC_CONCURRENT_RS_MESH_TAIL_GO_ADDR_OFFSET]);
+
+    // mission1：NHR 流（[16..24]，处理 meshSize 之后的尾段；sliceStride 用于定位各 rank 的输入分片）。
+    xnData_[KFC_CONCURRENT_RS_NHR_INPUT] = inputBase + meshSize;
+    xnData_[KFC_CONCURRENT_RS_NHR_OUTPUT] = outputBase + meshSize;
+    xnData_[KFC_CONCURRENT_RS_NHR_SLICE_SIZE] = nhrSize;
+    xnData_[KFC_CONCURRENT_RS_NHR_INPUT_SLICE_STRIDE] = sliceStride;
+    xnData_[KFC_CONCURRENT_RS_NHR_SLICE_ONE_JETTY_SIZE] = nhrSize / nhrJettyNum / splitAlignment * splitAlignment;
+    xnData_[KFC_CONCURRENT_RS_NHR_SLICE_LAST_JETTY_SIZE] =
+        nhrSize - (nhrJettyNum - 1U) * xnData_[KFC_CONCURRENT_RS_NHR_SLICE_ONE_JETTY_SIZE];
+    xnData_[KFC_CONCURRENT_RS_NHR_REPEAT_NUM_INV] = UINT64_MAX - 1U;
+    xnData_[KFC_CONCURRENT_RS_NHR_INPUT_REPEAT_STRIDE] = 0U;
+    xnData_[KFC_CONCURRENT_RS_NHR_OUTPUT_REPEAT_STRIDE] = 0U;
+    KERNEL_LOG(
+        KERNEL_INFO,
+        "RS concur chunk debug: slice=0x%llx, mesh=0x%llx, nhr=0x%llx, chunk=0x%llx, meshLoop=0x%llx, "
+        "meshTail=0x%llx\n",
+        sliceSize, meshSize, nhrSize, chunkSize, xnData_[KFC_CONCURRENT_RS_MESH_CHUNK_LOOP_NUM], meshTailSize);
 }
 } // namespace AscendC
 
