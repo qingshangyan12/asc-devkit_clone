@@ -31,7 +31,6 @@
 
 namespace AscendC {
 namespace Internal {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 template <const Reg::RegTrait& Trait>
 __simd_callee__ inline void ReduceSumInt16(
     Reg::RegTensor<int16_t, Trait>& dst, Reg::RegTensor<int16_t, Trait> src, Reg::MaskReg mask)
@@ -43,7 +42,6 @@ __simd_callee__ inline void ReduceSumInt16(
     Reg::Pack<uint16_t, int32_t, Reg::HighLowPart::LOWEST>(
         (Reg::RegTensor<uint16_t, Trait>&)dst, sum);
 }
-#endif
 
 template <class T, bool isReuseSource = false>
 __aicore__ inline void ReduceSumARB64ReuseSourceCompute(
@@ -69,7 +67,6 @@ template <class T, bool isReuseSource = false>
 __aicore__ inline void ReduceSumARReuseSourceCompute(
     __ubuf__ T* dstAddr, __ubuf__ T* srcAddr, __ubuf__ T* tmpAddr, const uint32_t srcShape[])
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (std::is_same_v<T, int16_t>) {
         if ((srcShape[1] * sizeof(T)) % 32 == 0 || srcShape[1] == 1) {
             ReduceARImpl<
@@ -94,19 +91,6 @@ __aicore__ inline void ReduceSumARReuseSourceCompute(
                 dstAddr, srcAddr, srcShape[0], srcShape[1]);
         }
     }
-#else
-    if ((srcShape[1] * sizeof(T)) % 32 == 0 || srcShape[1] == 1) {
-        ReduceARImpl<
-            T, Reg::RegTraitNumOne, Reg::Add<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>,
-            Reg::ReduceSum<T, T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>, Reg::RegTensor<T>>,
-            isReuseSource, ReduceType::SUM>(dstAddr, srcAddr, tmpAddr, srcShape[0], srcShape[1]);
-    } else {
-        ReduceARReuseSourceUnAligned<
-            T, Reg::RegTraitNumOne, Reg::Add<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>,
-            Reg::ReduceSum<T, T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>, Reg::RegTensor<T>>>(
-            dstAddr, srcAddr, srcShape[0], srcShape[1]);
-    }
-#endif
 }
 
 template <class T, bool isReuseSource = false>
@@ -139,7 +123,6 @@ __aicore__ inline void ReduceSumRAReuseSourceCompute(
     }
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_vf__ inline void NarrowReduceSumOutput(
     __ubuf__ int8_t* dstAddr, __ubuf__ int16_t* srcAddr, uint32_t count)
 {
@@ -182,7 +165,6 @@ __aicore__ inline void ReduceSumInt8Compute(
     PipeBarrier<PIPE_V>();
     NarrowReduceSumOutput((__ubuf__ int8_t*)dst.GetPhyAddr(), widenedDst, outputCount);
 }
-#endif
 
 template <class T, class pattern, bool isReuseSource = false>
 __aicore__ inline void ReduceSumImpl(
@@ -195,26 +177,17 @@ __aicore__ inline void ReduceSumImpl(
     static_assert(
         std::is_same_v<pattern, Pattern::Reduce::AR> || std::is_same_v<pattern, Pattern::Reduce::RA>,
         "ReduceSum only support AR and RA pattern on current device!");
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     static_assert(
         SupportType<T, int8_t, int16_t, int32_t, uint32_t, float, int64_t, uint64_t>(),
         "ReduceSum only support int8_t/int16_t/int32_t/uint32_t/float/int64_t/uint64_t data type on current "
         "device!");
-#else
-    static_assert(
-        SupportType<T, int32_t, uint32_t, float, int64_t, uint64_t>(),
-        "ReduceSum only support int32_t/uint32_t/float/int64_t/uint64_t data type on current device!");
-#endif
     __ubuf__ T* dstAddr = (__ubuf__ T*)dst.GetPhyAddr();
     __ubuf__ T* srcAddr = (__ubuf__ T*)src.GetPhyAddr();
     LocalTensor<T> tmpBuf = sharedTmpBuffer.ReinterpretCast<T>();
     __ubuf__ T* tmpAddr = (__ubuf__ T*)tmpBuf.GetPhyAddr();
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (std::is_same_v<T, int8_t>) {
         ReduceSumInt8Compute<pattern>(dst, src, sharedTmpBuffer, srcShape);
-    } else
-#endif
-    {
+    } else {
         if constexpr (std::is_same_v<pattern, Pattern::Reduce::AR>) {
             if constexpr (SupportBytes<T, 8>()) {
                 ReduceSumARB64ReuseSourceCompute<T, isReuseSource>(dstAddr, srcAddr, tmpAddr, srcShape);
