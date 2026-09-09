@@ -24,6 +24,14 @@
 
 本样例选取14个结构体，按`sizeof`分为4B、8B、16B、32B四组，每组做类型对齐与非对齐的对照；其中4B组覆盖`alignof=1`与`alignof=2`两档窄对齐，并补充2组字段类型不一致的混合结构体对照。测试时依次将长度为`num_elements`的输入数组`d_idata`整体复制到`d_odata`，对比搬运效率。
 
+- 关键参数：
+
+  | 参数 | 值 | 说明 |
+  |------|-----|------|
+  | MEM_BYTES      | **512MiB** | 输入/输出buffer字节数 |
+  | THREAD_COUNT   | 2048   | 单核2048线程，grid固定`<<<1, 2048>>>` |
+  | num_elements   | MEM_BYTES / sizeof(TData) | 每个用例的元素数，随结构体大小自动伸缩 |
+
 - 样例规格：
 
   | 名称              | 字段                    | sizeof | alignof | num_elements  |
@@ -70,14 +78,6 @@
   struct alignas(4) Align3 { unsigned char r, g, b; }; // alignof=4 sizeof=4 (随alignas抬升)
   struct Misalign3 { unsigned char r, g, b; }; // alignof=1 sizeof=3 (默认)
   ```
-
-### 关键参数
-
-  | 参数 | 值 | 说明 |
-  |------|-----|------|
-  | MEM_BYTES      | **512MiB** | 输入/输出buffer字节数 |
-  | THREAD_COUNT   | 2048   | 单核2048线程，grid固定`<<<1, 2048>>>` |
-  | num_elements   | MEM_BYTES / sizeof(TData) | 每个用例的元素数，随结构体大小自动伸缩 |
 
 ### 性能指标说明
 

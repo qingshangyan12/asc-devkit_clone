@@ -24,6 +24,14 @@
 
 This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B groups. Each group has aligned and non-aligned comparisons; the 4B group covers `alignof=1` and `alignof=2` narrow alignment levels, plus 2 mixed-field struct comparisons with inconsistent field types. During testing, an input array `d_idata` of length `num_elements` is copied entirely to `d_odata`, and transfer efficiency is compared.
 
+- Key Parameters:
+
+  | Parameter | Value | Description |
+  |------|-----|------|
+  | MEM_BYTES      | **512MiB** | Input/output buffer size in bytes |
+  | THREAD_COUNT   | 2048   | 2048 threads per core, grid fixed at `<<<1, 2048>>>` |
+  | num_elements   | MEM_BYTES / sizeof(TData) | Number of elements per case, automatically scales with struct size |
+
 - Sample Specifications:
 
   | Name              | Fields                    | sizeof | alignof | num_elements  |
@@ -70,14 +78,6 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
   struct alignas(4) Align3 { unsigned char r, g, b; }; // alignof=4 sizeof=4 (increased with alignas)
   struct Misalign3 { unsigned char r, g, b; }; // alignof=1 sizeof=3 (default)
   ```
-
-### Key Parameters
-
-  | Parameter | Value | Description |
-  |------|-----|------|
-  | MEM_BYTES      | **512MiB** | Input/output buffer size in bytes |
-  | THREAD_COUNT   | 2048   | 2048 threads per core, grid fixed at `<<<1, 2048>>>` |
-  | num_elements   | MEM_BYTES / sizeof(TData) | Number of elements per case, automatically scales with struct size |
 
 ### Performance Metrics Description
 
