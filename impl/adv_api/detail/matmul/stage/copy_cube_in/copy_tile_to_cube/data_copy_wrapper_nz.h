@@ -50,8 +50,10 @@ public:
         const LocalTensor<TransT>& dst, const GlobalTensor<SrcT>& src, const int32_t row, const int32_t col,
         const int32_t height, const int32_t width, const int32_t gRow, const bool kAlignToC0Size = false)
     {
+        constexpr static bool preAllocation = NeedPreallocation<INPUT_TYPE, MM_CFG>();
         constexpr bool hasScalePos = HasScalePosition<INPUT_TYPE>::value;
-        CopyNZ2NZImpl<SrcT, TransT, hasScalePos>(dst, src, row, col, height, width, gRow, kAlignToC0Size);
+        CopyNZ2NZImpl<SrcT, TransT, hasScalePos, preAllocation>(
+            dst, src, row, col, height, width, gRow, kAlignToC0Size);
     }
 
     __aicore__ inline void CopyNZ2NZDecompMode(
