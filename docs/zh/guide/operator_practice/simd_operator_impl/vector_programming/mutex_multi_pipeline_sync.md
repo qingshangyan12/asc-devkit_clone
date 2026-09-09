@@ -96,6 +96,61 @@ AscendC::ReleaseMutexID(mutexId1);
 
 `SetFlag/WaitFlag`和Mutex都可以建立核内多流水依赖。对于双缓冲算子中按Buffer生命周期组织的依赖，Mutex能将同步状态聚合到对应的MutexID：开发者在当前阶段只需调用`Lock<当前pipe>(mutexId)`和`Unlock<当前pipe>(mutexId)`，无需关心或传入前序生产者流水。Lock阻塞当前流水，直至此前所有流水中相同MutexID的Mutex均已Unlock；它等待的是该资源此前所有阶段的完成状态，而不是某一条指定源流水。因此，不需要像SetFlag/WaitFlag一样传入或维护源流水、目的流水组合及其事件ID。
 
+### SetFlag/WaitFlag时序
+
+SetFlag/WaitFlag以一对源流水和目的流水为同步方向。源流水执行完前序指令后，`SetFlag`将对应事件置为1；目的流水执行到`WaitFlag`时等待该事件，等待成功后将事件清零。以下时序图以`buffer0`为例，正向依赖和Buffer复用时的反向依赖需要分别使用事件表达。
+
+```mermaid
+sequenceDiagram
+    participant MTE2 as PIPE_MTE2
+    participant V as PIPE_V
+    participant MTE3 as PIPE_MTE3
+    Note over MTE2,MTE3: Tile i使用buffer0
+    MTE2->>MTE2: 搬入buffer0
+    MTE2-->>V: SetFlag(MTE2_V, eventId0)，事件置1
+    V->>V: WaitFlag(MTE2_V, eventId0)，等待后清零
+    V->>V: 计算buffer0
+    V-->>MTE3: SetFlag(V_MTE3, eventId1)，事件置1
+    MTE3->>MTE3: WaitFlag(V_MTE3, eventId1)，等待后清零
+    MTE3->>MTE3: 搬出buffer0
+    MTE3-->>MTE2: SetFlag(MTE3_MTE2, eventId2)，事件置1
+    Note over MTE2,MTE3: Tile i+2复用buffer0
+    MTE2->>MTE2: WaitFlag(MTE3_MTE2, eventId2)，等待后清零
+    MTE2->>MTE2: 再次搬入buffer0
+```
+
+图中三组事件分别描述`PIPE_MTE2 -> PIPE_V`、`PIPE_V -> PIPE_MTE3`和`PIPE_MTE3 -> PIPE_MTE2`。前两组是当前tile的正向依赖，第三组是复用Buffer前的反向依赖。每增加一种流水依赖方向，都需要配置相应的流水组合并管理其事件ID。
+
+### Lock/Unlock时序
+
+Lock/Unlock不指定源流水和目的流水组合。每个阶段通过`Lock<当前pipe>(mutexId0)`锁定当前流水，操作完成后再通过相同pipe和MutexID的`Unlock`释放。后续阶段对同一MutexID执行Lock时，会等待此前所有流水中同一MutexID的Mutex均已释放。
+
+```mermaid
+sequenceDiagram
+    participant MTE2 as PIPE_MTE2
+    participant V as PIPE_V
+    participant MTE3 as PIPE_MTE3
+    Note over MTE2,MTE3: Tile i使用buffer0和mutexId0
+    MTE2->>MTE2: Lock(MTE2, mutexId0)
+    MTE2->>MTE2: 搬入buffer0
+    MTE2->>MTE2: Unlock(MTE2, mutexId0)
+    Note over MTE2,V: V上的Lock等待此前同ID的MTE2释放
+    V->>V: Lock(V, mutexId0)
+    V->>V: 计算buffer0
+    V->>V: Unlock(V, mutexId0)
+    Note over V,MTE3: MTE3上的Lock等待此前同ID的V释放
+    MTE3->>MTE3: Lock(MTE3, mutexId0)
+    MTE3->>MTE3: 搬出buffer0
+    MTE3->>MTE3: Unlock(MTE3, mutexId0)
+    Note over MTE2,MTE3: Tile i+2复用buffer0和mutexId0
+    Note over MTE2,MTE3: MTE2上的Lock统一等待此前同ID的各流水释放
+    MTE2->>MTE2: Lock(MTE2, mutexId0)
+    MTE2->>MTE2: 再次搬入buffer0
+    MTE2->>MTE2: Unlock(MTE2, mutexId0)
+```
+
+图中没有单独配置`PIPE_MTE2 -> PIPE_V`、`PIPE_V -> PIPE_MTE3`或`PIPE_MTE3 -> PIPE_MTE2`事件。三条流水复用同一个MutexID，既建立当前tile内的正向依赖，也使第`i + 2`轮的MTE2在复用`buffer0`前等待第`i`轮的MTE3释放。
+
 | 对比项 | Mutex Lock/Unlock | SetFlag/WaitFlag |
 | --- | --- | --- |
 | 依赖表达 | 调用`Lock<当前pipe>(mutexId)`即可等待此前所有流水对该MutexID的Unlock，以MutexID关联同一Buffer生命周期内的多个阶段。 | 以源流水、目标流水和事件ID明确配对。 |
