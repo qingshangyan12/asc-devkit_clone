@@ -356,8 +356,6 @@ HcclResult HcclAllocOpResCtx(
     const auto* initTiling = static_cast<const Mc2InitTilingInner*>(mc2Tiling);
     const auto* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[0]);
 
-    resCtx.debugMode = initTiling->debugMode;
-
     CHK_RET(AllocOpParamMemory(comm, ctxTag, opParamVec, initTiling, ccTilingList, resCtx));
     CHK_RET(AllocWorkspaceMemory(comm, ctxTag, ccTiling, resCtx));
     CHK_RET(FillRankInfo(comm, resCtx));

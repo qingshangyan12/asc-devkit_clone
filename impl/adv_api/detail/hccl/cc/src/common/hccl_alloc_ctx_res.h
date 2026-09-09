@@ -82,7 +82,6 @@ struct OpResCtx {
     uint32_t algorithmType[Hccl::MC2_MAX_OP_NUM];
     uint64_t opParamSize[Hccl::MC2_MAX_OP_NUM];
     bool isKfc[Hccl::MC2_MAX_OP_NUM]; // 用于标记是否走kfcServer
-    uint8_t debugMode;
 };
 
 enum class AlgorithmType {

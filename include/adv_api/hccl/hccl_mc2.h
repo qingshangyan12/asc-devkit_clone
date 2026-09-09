@@ -25,7 +25,6 @@ struct Mc2CcArgs {
     char groupName[GROUP_NAME_SIZE];
     char algConfig[ALG_CONFIG_SIZE];
     CommEngine commEngine;
-    uint8_t debugMode;
     uint64_t reverse;
 
     void Init()
@@ -34,7 +33,6 @@ struct Mc2CcArgs {
         dstDataType = HCCL_DATA_TYPE_FP16;
         reduceType = HCCL_REDUCE_SUM;
         groupName[0] = '\0';
-        debugMode = 0;
     }
 };
 
@@ -101,13 +99,6 @@ extern HcclResult Mc2SetCcCommEngine(void* ccArgs, uint8_t commEngine);
  * @param groupName The group name to set.
  */
 extern HcclResult Mc2SetCcGroupName(void* ccArgs, char* groupName);
-
-/**
- * @brief Set the debug mode of Mc2CcArgs.
- * @param ccArgs A pointer to the Mc2CcArgs.
- * @param debugMode The debug mode to set.
- */
-extern HcclResult Mc2SetCcDebugMode(void* ccArgs, uint8_t debugMode);
 
 /**
  * @brief Acquire AICPU communication resources.

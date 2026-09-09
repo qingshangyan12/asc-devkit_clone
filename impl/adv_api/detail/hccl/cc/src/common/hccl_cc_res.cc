@@ -123,19 +123,6 @@ HcclResult Mc2SetCcGroupName(void* ccArgs, char* groupName)
     return HCCL_SUCCESS;
 }
 
-HcclResult Mc2SetCcDebugMode(void* ccArgs, uint8_t debugMode)
-{
-    CHK_PTR_NULL(ccArgs);
-    if (!((debugMode >= 1 && debugMode <= 4) || debugMode >= 250)) {
-        HCCL_ERROR("[%s] debugMode[%u] only supports [1,4] or [250,255]", __func__, debugMode);
-        return HCCL_E_PARA;
-    }
-
-    Mc2CcArgs* ccArgsPtr = static_cast<Mc2CcArgs*>(ccArgs);
-    ccArgsPtr->debugMode = debugMode;
-    return HCCL_SUCCESS;
-}
-
 namespace {
 HcclResult ValidateCcType(uint8_t ccType)
 {
@@ -163,7 +150,6 @@ HcclResult BuildCcResourceTiling(uint8_t ccType, const Mc2CcArgs& args, Mc2CcRes
     tiling.init.version = INIT_TILING_VERSION;
     tiling.init.mc2HcommCnt = 1;
     tiling.init.offset[0] = offsetof(Mc2CcResourceTiling, cc);
-    tiling.init.debugMode = args.debugMode;
     tiling.cc.opType = ccType;
     tiling.cc.commEngine = static_cast<uint8_t>(OpExecuteConfig::AICPU_TS);
     tiling.cc.srcDataType = static_cast<uint8_t>(args.srcDataType);

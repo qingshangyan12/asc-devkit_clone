@@ -1053,7 +1053,6 @@ TEST_F(Mc2OpResCtxTest, CommEngineUsesAicpuTs)
 TEST_F(Mc2OpResCtxTest, AicpuResourceLayoutAndReuse)
 {
     static_assert(sizeof(OpResCtx) == sizeof(HcclApi::OpResCtx), "Host/device context size must match");
-    static_assert(offsetof(OpResCtx, debugMode) == offsetof(HcclApi::OpResCtx, debugMode), "debugMode ABI");
     static_assert(offsetof(OpResCtx, opParamSize) == offsetof(HcclApi::OpResCtx, opParamSize), "opParamSize ABI");
     static_assert(offsetof(OpResCtx, opType) == offsetof(HcclApi::OpResCtx, opType), "opType ABI");
     static_assert(sizeof(HcommCcuSchd) == 12, "HcommCcuSchd ABI");
@@ -1066,7 +1065,6 @@ TEST_F(Mc2OpResCtxTest, AicpuResourceLayoutAndReuse)
     ASSERT_EQ(size, sizeof(OpResCtx));
     const auto& ctx = *static_cast<const OpResCtx*>(deviceCtx);
     EXPECT_EQ(ctx.version, 0U);
-    EXPECT_EQ(ctx.debugMode, 0U);
     EXPECT_EQ(ctx.rankId, g_stubRankId);
     EXPECT_EQ(ctx.rankSize, g_stubRankSize);
     EXPECT_EQ(ctx.opType[0], HcclCMDType::HCCL_CMD_ALLGATHER);
@@ -1099,7 +1097,6 @@ TEST_F(Mc2OpResCtxTest, LegacyAndArgumentApisReuseTheSameResource)
     tiling.init.version = INIT_TILING_VERSION;
     tiling.init.mc2HcommCnt = 1;
     tiling.init.offset[0] = offsetof(Tiling, cc);
-    tiling.init.debugMode = 4;
     tiling.cc.commEngine = static_cast<uint8_t>(OpExecuteConfig::AICPU_TS);
     tiling.cc.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
     tiling.cc.srcDataType = HCCL_DATA_TYPE_FP16;
@@ -1109,12 +1106,10 @@ TEST_F(Mc2OpResCtxTest, LegacyAndArgumentApisReuseTheSameResource)
     EXPECT_NE(HcclAllocComResourceByTiling(comm_, nullptr, &tiling, &legacy), HCCL_SUCCESS);
     ASSERT_EQ(HcclAllocComResourceByTiling(comm_, stream_, &tiling, &legacy), HCCL_SUCCESS);
     const auto& ctx = *static_cast<const OpResCtx*>(legacy);
-    EXPECT_EQ(ctx.debugMode, 4U);
     EXPECT_EQ(ctx.opType[0], tiling.cc.opType);
     const OpParam legacyParam = *reinterpret_cast<const OpParam*>(ctx.algInfo[0].opParam);
     EXPECT_EQ(legacyParam.stream, stream_);
 
-    ASSERT_EQ(Mc2SetCcDebugMode(args_, 4), HCCL_SUCCESS);
     void* result = nullptr;
     uint32_t size = 0;
     ASSERT_EQ(Mc2AcquireCcResCtx(comm_, tiling.cc.opType, args_, &result, &size, nullptr), HCCL_SUCCESS);
@@ -1125,33 +1120,6 @@ TEST_F(Mc2OpResCtxTest, LegacyAndArgumentApisReuseTheSameResource)
     EXPECT_EQ(param.opType, legacyParam.opType);
     EXPECT_EQ(param.DataDes.dataType, legacyParam.DataDes.dataType);
     EXPECT_STREQ(param.algName, legacyParam.algName);
-    EXPECT_EQ(ctx.debugMode, 4U);
-}
-
-TEST_F(Mc2OpResCtxTest, DebugModeIsUpdatedInReusedContext)
-{
-    void* diagnosticCtx = nullptr;
-    void* faultCtx = nullptr;
-    void* reusedCtx = nullptr;
-    uint32_t size = 0;
-    ASSERT_EQ(Mc2SetCcDebugMode(args_, 1), HCCL_SUCCESS);
-    ASSERT_EQ(
-        Mc2AcquireCcResCtx(comm_, HcclCMDType::HCCL_CMD_ALLGATHER, args_, &diagnosticCtx, &size, nullptr),
-        HCCL_SUCCESS);
-    ASSERT_NE(diagnosticCtx, nullptr);
-    EXPECT_EQ(static_cast<const OpResCtx*>(diagnosticCtx)->debugMode, 1U);
-
-    ASSERT_EQ(Mc2SetCcDebugMode(args_, 250), HCCL_SUCCESS);
-    ASSERT_EQ(
-        Mc2AcquireCcResCtx(comm_, HcclCMDType::HCCL_CMD_ALLGATHER, args_, &faultCtx, &size, nullptr), HCCL_SUCCESS);
-    ASSERT_NE(faultCtx, nullptr);
-    EXPECT_EQ(faultCtx, diagnosticCtx);
-    EXPECT_EQ(static_cast<const OpResCtx*>(faultCtx)->debugMode, 250U);
-    ASSERT_EQ(Mc2SetCcDebugMode(args_, 1), HCCL_SUCCESS);
-    ASSERT_EQ(
-        Mc2AcquireCcResCtx(comm_, HcclCMDType::HCCL_CMD_ALLGATHER, args_, &reusedCtx, &size, nullptr), HCCL_SUCCESS);
-    EXPECT_EQ(reusedCtx, diagnosticCtx);
-    EXPECT_EQ(static_cast<const OpResCtx*>(reusedCtx)->debugMode, 1U);
 }
 
 TEST_F(Mc2OpResCtxTest, OutputTypeMatchesLegacyFlow)
