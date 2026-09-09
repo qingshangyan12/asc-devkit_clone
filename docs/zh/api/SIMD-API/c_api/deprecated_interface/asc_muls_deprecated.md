@@ -1,4 +1,4 @@
-# asc_muls (废弃)
+# asc_muls（废弃）
 
 ## 产品支持情况
 
@@ -28,24 +28,42 @@
 
 头文件路径为：`"c_api/reg_compute/compute/reg_fused.h"`。
 
+**`asc_muls`和`asc_muls_v2`原型已废弃，新接口请参见[asc_mul_scalar_float2half_rn](../reg_compute/reg_fused/asc_mul_scalar_float2half_rn.md)。**
+
 对源操作数src和value进行乘法运算再按照数据类型转换的ROUND舍入模式转成half类型，根据mask将结果写入目的操作数dst。计算公式如下：
 
 $$
 dst_i = round\_to\_half(src_i \times value)
 $$
 
+### 迁移说明
+
+由于源操作数（float，32位）与目的操作数（half，16位）的位宽比为2:1，一个`vector_float`的数据转换后会填满一个`vector_half`。新接口`asc_mul_scalar_float2half_rn`通过`dst_pos`参数显式指定结果写入`dst`中索引为偶数或奇数的位置，替代旧接口通过函数名后缀区分写入位置的方式。
+
+**表1** 新旧原型对应关系
+
+| 旧原型 | 新原型 |
+| ------ | ------ |
+| `asc_muls(dst, src, value, mask)` | `asc_mul_scalar_float2half_rn(dst, src, value, mask, ASC_POSITION_EVEN)` |
+| `asc_muls_v2(dst, src, value, mask)` | `asc_mul_scalar_float2half_rn(dst, src, value, mask, ASC_POSITION_ODD)` |
+
 ## 函数原型
 
 ```cpp
 // 数据写入索引为偶数的位置
-__simd_callee__ inline void asc_muls(vector_half& dst, vector_float src, float value, vector_bool mask)
+[[deprecated("NOTICE: asc_muls is deprecated. "
+             "Please use asc_mul_scalar_float2half_rn with dst_pos instead.")]] __simd_callee__ inline void
+asc_muls(vector_half& dst, vector_float src, float value, vector_bool mask);
+
 // 数据写入索引为奇数的位置
-__simd_callee__ inline void asc_muls_v2(vector_half& dst, vector_float src, float value, vector_bool mask)
+[[deprecated("NOTICE: asc_muls_v2 is deprecated. "
+             "Please use asc_mul_scalar_float2half_rn with dst_pos instead.")]] __simd_callee__ inline void
+asc_muls_v2(vector_half& dst, vector_float src, float value, vector_bool mask);
 ```
 
 ## 参数说明
 
-**表1** 参数说明
+**表2** 参数说明
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
@@ -54,7 +72,7 @@ __simd_callee__ inline void asc_muls_v2(vector_half& dst, vector_float src, floa
 | value | 输入 | 源操作数（标量）。 |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../defs/type/data_type_definition.md)。
 
 ## 返回值说明
 
@@ -76,5 +94,10 @@ vector_half dst;
 float value = 1.0f;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);
 asc_loadalign(src, src_addr);  // src_addr是外部输入的Unified Buffer（UB）内存空间地址
+
+// 旧接口：结果写入偶数索引位置。
 asc_muls(dst, src, value, mask);
+
+// 替代接口：显式指定结果写入偶数索引位置。
+asc_mul_scalar_float2half_rn(dst, src, value, mask, ASC_POSITION_EVEN);
 ```

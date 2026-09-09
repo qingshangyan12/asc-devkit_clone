@@ -32,6 +32,7 @@
 ### 复合计算
 
 - **[asc_exp_sub（废弃）](asc_exp_sub_deprecated.md)**
+- **[asc_muls（废弃）](asc_muls_deprecated.md)**
 
 ### 类型转换
 
