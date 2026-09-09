@@ -162,84 +162,108 @@ __simd_callee__ inline void asc_cast_impl(
     vector_bfloat16_t& dst, vector_int4x2_t src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> src_pos)
 {
-    asc_int4x22bfloat16_impl(dst, src, mask, src_pos);
+    if ASC_IS_AIV {
+        vcvt_s42bf16(dst, src, mask, PART_P0, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
     vector_bfloat16_t& dst, vector_int4x2_t src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER> src_pos)
 {
-    asc_int4x22bfloat16_impl(dst, src, mask, src_pos);
+    if ASC_IS_AIV {
+        vcvt_s42bf16(dst, src, mask, PART_P1, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
     vector_bfloat16_t& dst, vector_int4x2_t src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER> src_pos)
 {
-    asc_int4x22bfloat16_impl(dst, src, mask, src_pos);
+    if ASC_IS_AIV {
+        vcvt_s42bf16(dst, src, mask, PART_P2, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
     vector_bfloat16_t& dst, vector_int4x2_t src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER> src_pos)
 {
-    asc_int4x22bfloat16_impl(dst, src, mask, src_pos);
+    if ASC_IS_AIV {
+        vcvt_s42bf16(dst, src, mask, PART_P3, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
     vector_half& dst, vector_int4x2_t src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> src_pos)
 {
-    asc_int4x22half_impl(dst, src, mask, src_pos);
+    if ASC_IS_AIV {
+        vcvt_s42f16(dst, src, mask, PART_P0, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
     vector_half& dst, vector_int4x2_t src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER> src_pos)
 {
-    asc_int4x22half_impl(dst, src, mask, src_pos);
+    if ASC_IS_AIV {
+        vcvt_s42f16(dst, src, mask, PART_P1, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
     vector_half& dst, vector_int4x2_t src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER> src_pos)
 {
-    asc_int4x22half_impl(dst, src, mask, src_pos);
+    if ASC_IS_AIV {
+        vcvt_s42f16(dst, src, mask, PART_P2, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
     vector_half& dst, vector_int4x2_t src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER> src_pos)
 {
-    asc_int4x22half_impl(dst, src, mask, src_pos);
+    if ASC_IS_AIV {
+        vcvt_s42f16(dst, src, mask, PART_P3, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
     vector_int16_t& dst, vector_int4x2_t src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> src_pos)
 {
-    asc_int4x22int16_impl(dst, src, mask, src_pos);
+    if ASC_IS_AIV {
+        vcvt_s42s16(dst, src, mask, PART_P0, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
     vector_int16_t& dst, vector_int4x2_t src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER> src_pos)
 {
-    asc_int4x22int16_impl(dst, src, mask, src_pos);
+    if ASC_IS_AIV {
+        vcvt_s42s16(dst, src, mask, PART_P1, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
     vector_int16_t& dst, vector_int4x2_t src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER> src_pos)
 {
-    asc_int4x22int16_impl(dst, src, mask, src_pos);
+    if ASC_IS_AIV {
+        vcvt_s42s16(dst, src, mask, PART_P2, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
     vector_int16_t& dst, vector_int4x2_t src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER> src_pos)
 {
-    asc_int4x22int16_impl(dst, src, mask, src_pos);
+    if ASC_IS_AIV {
+        vcvt_s42s16(dst, src, mask, PART_P3, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -568,7 +592,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rn_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_R, RS_DISABLE, PART_P0, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -577,7 +603,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rn_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_R, RS_DISABLE, PART_P1, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -586,7 +614,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rn_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_R, RS_DISABLE, PART_P2, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -595,7 +625,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rn_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_R, RS_DISABLE, PART_P3, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -604,7 +636,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rn_sat_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_R, RS_ENABLE, PART_P0, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -613,7 +647,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rn_sat_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_R, RS_ENABLE, PART_P1, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -622,7 +658,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rn_sat_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_R, RS_ENABLE, PART_P2, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -631,7 +669,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rn_sat_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_R, RS_ENABLE, PART_P3, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -640,7 +680,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rna_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_A, RS_DISABLE, PART_P0, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -649,7 +691,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rna_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_A, RS_DISABLE, PART_P1, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -658,7 +702,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rna_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_A, RS_DISABLE, PART_P2, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -667,7 +713,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rna_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_A, RS_DISABLE, PART_P3, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -676,7 +724,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rna_sat_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_A, RS_ENABLE, PART_P0, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -685,7 +735,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rna_sat_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_A, RS_ENABLE, PART_P1, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -694,7 +746,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rna_sat_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_A, RS_ENABLE, PART_P2, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -703,7 +757,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rna_sat_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_A, RS_ENABLE, PART_P3, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -712,7 +768,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rd_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_F, RS_DISABLE, PART_P0, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -721,7 +779,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rd_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_F, RS_DISABLE, PART_P1, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -730,7 +790,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rd_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_F, RS_DISABLE, PART_P2, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -739,7 +801,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rd_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_F, RS_DISABLE, PART_P3, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -748,7 +812,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rd_sat_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_F, RS_ENABLE, PART_P0, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -757,7 +823,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rd_sat_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_F, RS_ENABLE, PART_P1, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -766,7 +834,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rd_sat_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_F, RS_ENABLE, PART_P2, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -775,7 +845,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rd_sat_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_F, RS_ENABLE, PART_P3, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -784,7 +856,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_pos)
 {
-    asc_half2int4x2_ru_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_C, RS_DISABLE, PART_P0, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -793,7 +867,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER> dst_pos)
 {
-    asc_half2int4x2_ru_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_C, RS_DISABLE, PART_P1, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -802,7 +878,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER> dst_pos)
 {
-    asc_half2int4x2_ru_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_C, RS_DISABLE, PART_P2, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -811,7 +889,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER> dst_pos)
 {
-    asc_half2int4x2_ru_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_C, RS_DISABLE, PART_P3, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -820,7 +900,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_pos)
 {
-    asc_half2int4x2_ru_sat_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_C, RS_ENABLE, PART_P0, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -829,7 +911,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER> dst_pos)
 {
-    asc_half2int4x2_ru_sat_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_C, RS_ENABLE, PART_P1, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -838,7 +922,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER> dst_pos)
 {
-    asc_half2int4x2_ru_sat_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_C, RS_ENABLE, PART_P2, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -847,7 +933,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER> dst_pos)
 {
-    asc_half2int4x2_ru_sat_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_C, RS_ENABLE, PART_P3, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -856,7 +944,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rz_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_Z, RS_DISABLE, PART_P0, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -865,7 +955,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rz_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_Z, RS_DISABLE, PART_P1, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -874,7 +966,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rz_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_Z, RS_DISABLE, PART_P2, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -883,7 +977,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rz_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_Z, RS_DISABLE, PART_P3, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -892,7 +988,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rz_sat_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_Z, RS_ENABLE, PART_P0, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -901,7 +999,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rz_sat_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_Z, RS_ENABLE, PART_P1, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -910,7 +1010,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rz_sat_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_Z, RS_ENABLE, PART_P2, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
@@ -919,7 +1021,9 @@ __simd_callee__ inline void asc_cast_impl(
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER> dst_pos)
 {
-    asc_half2int4x2_rz_sat_impl(dst, src, mask, dst_pos);
+    if ASC_IS_AIV {
+        vcvt_f162s4(dst, src, mask, ROUND_Z, RS_ENABLE, PART_P3, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_cast_impl(
