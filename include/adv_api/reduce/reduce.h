@@ -225,7 +225,8 @@ __aicore__ inline void ReduceMin(
 /* !
  * \brief This function calculates the sum of all elements in the input tensor based on the reduction pattern.
  *
- * \note support data type: float
+ * \note support data type: float; Ascend 950 additionally supports
+ * int8_t/int16_t/int32_t/uint32_t/int64_t/uint64_t
  *
  * \tparam [in] T, data type
  * \tparam [in] pattern, reduce pattern of input tensor, each character is a dimension
@@ -254,7 +255,8 @@ __aicore__ inline void ReduceSum(
 /* !
  * \brief This function calculates the sum of all elements in the input tensor based on the reduction pattern.
  *
- * \note support data type: float
+ * \note support data type: float; Ascend 950 additionally supports
+ * int8_t/int16_t/int32_t/uint32_t/int64_t/uint64_t
  *
  * \tparam [in] T, data type
  * \tparam [in] pattern, reduce pattern of input tensor, each character is a dimension

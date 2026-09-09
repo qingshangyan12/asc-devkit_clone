@@ -66,7 +66,7 @@
 | --- | --- |
 | T | 操作数的数据类型。不同型号支持的数据类型请参考[支持的数据类型](#li778844571310)。 |
 | pattern | 用于指定ReduceSum计算轴，包括Reduce轴和Normal轴。pattern由与向量维度数量相同的A、R字母组合形成，字母A表示Normal轴，R表示Reduce轴。例如，AR表示对二维向量进行ReduceSum计算：第一维是Normal轴，第二维是Reduce轴，即对第二维进行数据累加的计算。<br><br>pattern是定义在AscendC::Pattern::Reduce命名空间下的结构体，其成员变量用户无需关注。<br><br>pattern当前只支持取值为AR和RA。 |
-| isReuseSource | 是否允许修改源操作数，默认值为false。如果开发者允许源操作数被改写，可以设置该参数取值为true开启，开启后能够节省部分内存空间。<br><br>设置为true，则本接口内部计算时复用src的内存空间，节省内存空间；设置为false，则本接口内部计算时不复用src的内存空间。<br><br>isReuseSource的使用样例请参考[更多样例](../../math_compute/more_examples.md#section639165323915)。 |
+| isReuseSource | 是否允许修改源操作数，默认值为false。如果开发者允许源操作数被改写，可以设置该参数取值为true开启，开启后能够节省部分内存空间。<br><br>设置为true，则本接口内部计算时复用src的内存空间，节省内存空间；设置为false，则本接口内部计算时不复用src的内存空间。<!-- npu="950" id13 --><br><br>Ascend 950PR/Ascend 950DT上，T为int8\_t时，内部需要将输入转换为int16\_t后计算，因此该参数不影响临时空间大小，且接口不复用srcTensor的内存空间。<!-- end id13 --><br><br>isReuseSource的使用样例请参考[更多样例](../../math_compute/more_examples.md#section639165323915)。 |
 
 **表2**  接口参数说明
 
@@ -88,11 +88,14 @@
 
 -   **不支持源操作数与目的操作数地址重叠。**
 -   不支持sharedTmpBuffer与源操作数和目的操作数地址重叠。
--   内部算法不处理累加计算时的数据溢出，溢出场景不保证接口精度。
+<!-- npu="950" id14 -->
+-   int8\_t和int16\_t按输入数据类型进行累加；累加结果超出该数据类型的表示范围时，保留对应宽度的低位，行为与PyTorch显式指定`dtype`为输入数据类型时一致。
+<!-- end id14 -->
+-   其他数据类型发生溢出时不保证接口精度。
 -   支持的数据类型<a id="li778844571310"></a>
 
     <!-- npu="950" id10 -->
-    Ascend 950PR/Ascend 950DT，支持的数据类型为：int32\_t、uint32\_t、float、int64\_t、uint64\_t。
+    Ascend 950PR/Ascend 950DT，支持的数据类型为：int8\_t、int16\_t、int32\_t、uint32\_t、float、int64\_t、uint64\_t。
     <!-- end id10 -->
     <!-- npu="A3" id11 -->
     Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：float。

@@ -2369,6 +2369,38 @@ TEST_F(TestTiling, testReduceSumTiling)
     GetReduceSumMaxMinTmpSize(shape, ge::DataType::DT_INT32, ReducePattern::RA, true, true, maxSize, minSize);
     EXPECT_EQ(maxSize, 0);
     EXPECT_EQ(minSize, 0);
+
+    shape = ge::Shape({2, 256});
+    GetReduceSumMaxMinTmpSize(shape, ge::DataType::DT_INT8, ReducePattern::AR, false, false, maxSize, minSize);
+    EXPECT_EQ(maxSize, 1056);
+    EXPECT_EQ(minSize, 1056);
+
+    GetReduceSumMaxMinTmpSize(shape, ge::DataType::DT_INT8, ReducePattern::AR, false, true, maxSize, minSize);
+    EXPECT_EQ(maxSize, 1056);
+    EXPECT_EQ(minSize, 1056);
+
+    shape = ge::Shape({2, 512});
+    GetReduceSumMaxMinTmpSize(shape, ge::DataType::DT_INT8, ReducePattern::AR, true, false, maxSize, minSize);
+    EXPECT_EQ(maxSize, 2080);
+    EXPECT_EQ(minSize, 2080);
+
+    shape = ge::Shape({2, 256});
+    GetReduceSumMaxMinTmpSize(shape, ge::DataType::DT_INT16, ReducePattern::AR, true, false, maxSize, minSize);
+    EXPECT_EQ(maxSize, 2 * 128 * 2);
+    EXPECT_EQ(minSize, 2 * 128 * 2);
+
+    shape = ge::Shape({17, 31});
+    GetReduceSumMaxMinTmpSize(shape, ge::DataType::DT_INT8, ReducePattern::RA, false, false, maxSize, minSize);
+    EXPECT_EQ(maxSize, 1120);
+    EXPECT_EQ(minSize, 1120);
+
+    GetReduceSumMaxMinTmpSize(shape, ge::DataType::DT_INT16, ReducePattern::RA, false, false, maxSize, minSize);
+    EXPECT_EQ(maxSize, 16 * 32 * 2);
+    EXPECT_EQ(minSize, 16 * 32 * 2);
+
+    GetReduceSumMaxMinTmpSize(shape, ge::DataType::DT_INT16, ReducePattern::RA, false, true, maxSize, minSize);
+    EXPECT_EQ(maxSize, 0);
+    EXPECT_EQ(minSize, 0);
 }
 
 TEST_F(TestTiling, TestBesselI0Tiling)

@@ -171,6 +171,20 @@ INSTANTIATE_TEST_CASE_P(
         ReduceOpTestParams{MainReduceOpTest<uint32_t, 256, 2, 0, true, 2, 128, false>},
         ReduceOpTestParams{MainReduceOpTest<int64_t, 256, 2, 0, true, 2, 128, false>},
         ReduceOpTestParams{MainReduceOpTest<uint64_t, 256, 2, 0, true, 2, 128, false>},
+        // int8 AR: <VL/2, =VL/2, >VL/2, =VL, >VL, aligned/unaligned, and source reuse.
+        ReduceOpTestParams{MainReduceOpTest<int8_t, 64, 2, 0, false, 2, 32, false>},
+        ReduceOpTestParams{MainReduceOpTest<int8_t, 256, 2, 0, true, 2, 128, false>},
+        ReduceOpTestParams{MainReduceOpTest<int8_t, 258, 2, 0, false, 2, 129, false>},
+        ReduceOpTestParams{MainReduceOpTest<int8_t, 512, 2, 0, false, 2, 256, false>},
+        ReduceOpTestParams{MainReduceOpTest<int8_t, 514, 2, 0, true, 2, 257, false>},
+        ReduceOpTestParams{MainReduceOpTest<int8_t, 2418, 2, 0, false, 2, 1209, false>},
+        // int16 AR uses a 128-element VL and includes non-32B tails.
+        ReduceOpTestParams{MainReduceOpTest<int16_t, 32, 2, 0, false, 2, 16, false>},
+        ReduceOpTestParams{MainReduceOpTest<int16_t, 128, 2, 0, true, 2, 64, false>},
+        ReduceOpTestParams{MainReduceOpTest<int16_t, 130, 2, 0, false, 2, 65, false>},
+        ReduceOpTestParams{MainReduceOpTest<int16_t, 256, 2, 0, false, 2, 128, false>},
+        ReduceOpTestParams{MainReduceOpTest<int16_t, 258, 2, 0, true, 2, 129, false>},
+        ReduceOpTestParams{MainReduceOpTest<int16_t, 2418, 2, 0, false, 2, 1209, false>},
         ReduceOpTestParams{MainReduceOpTest<float, 4032, 64, 1, true, 64, 63, false>},
         ReduceOpTestParams{MainReduceOpTest<float, 1024, 64, 1, true, 64, 16, false>},
         ReduceOpTestParams{MainReduceOpTest<float, 8192, 64, 1, true, 64, 128, false>},
@@ -189,6 +203,15 @@ INSTANTIATE_TEST_CASE_P(
         ReduceOpTestParams{MainReduceOpTest<int64_t, 1040, 65, 1, true, 65, 16, false>},
         ReduceOpTestParams{MainReduceOpTest<int64_t, 8320, 65, 1, true, 65, 128, false>},
         ReduceOpTestParams{MainReduceOpTest<int64_t, 2048, 2, 1, true, 2, 1024, false>},
+        // Narrow integer RA: aligned/unaligned inner axes and small/large reduce axes.
+        ReduceOpTestParams{MainReduceOpTest<int8_t, 2016, 32, 1, false, 32, 63, false>},
+        ReduceOpTestParams{MainReduceOpTest<int8_t, 1953, 31, 1, true, 31, 63, false>},
+        ReduceOpTestParams{MainReduceOpTest<int8_t, 8192, 32, 1, true, 32, 256, false>},
+        ReduceOpTestParams{MainReduceOpTest<int8_t, 7967, 31, 1, false, 31, 257, false>},
+        ReduceOpTestParams{MainReduceOpTest<int16_t, 1008, 16, 1, false, 16, 63, false>},
+        ReduceOpTestParams{MainReduceOpTest<int16_t, 945, 15, 1, true, 15, 63, false>},
+        ReduceOpTestParams{MainReduceOpTest<int16_t, 2048, 16, 1, true, 16, 128, false>},
+        ReduceOpTestParams{MainReduceOpTest<int16_t, 1935, 15, 1, false, 15, 129, false>},
         ReduceOpTestParams{MainReduceOpTest<uint64_t, 4032, 64, 1, true, 64, 63, false>}));
 
 TEST_P(ReduceOpTestsuite, ReduceOpTestCase)

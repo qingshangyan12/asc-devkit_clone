@@ -25,13 +25,12 @@ constexpr uint32_t HALF_TYPE_SIZE = 2;
 constexpr uint32_t FLOAT_TYPE_SIZE = 4;
 constexpr uint32_t INT32_TYPE_SIZE = 4;
 constexpr uint32_t ALLOWED_SHAPE_DIM = 2;
-constexpr uint32_t B32_ELEM_NUM_PER_REPEAT = 64;
 
 uint32_t GetTypeSize(const AscendC::TensorDataType dataType)
 {
     if (dataType == ge::DT_FLOAT) {
         return FLOAT_TYPE_SIZE;
-    } else if (dataType == ge::DT_FLOAT16) {
+    } else if (dataType == ge::DT_FLOAT16 || dataType == ge::DT_INT16) {
         return HALF_TYPE_SIZE;
     } else if (dataType == ge::DT_INT32) {
         return INT32_TYPE_SIZE;
@@ -119,8 +118,9 @@ inline void GetReduceCommonMaxMinTmpSize(
 }
 
 inline void GetReduceSumMeanCommonTmpSize(
-    const AscendC::TensorShape& srcShape, ReducePattern pattern, bool isSrcInnerPad, bool isReuseSource,
-    uint32_t& maxValue, uint32_t& minValue, std::string apiName, std::string funcName)
+    const AscendC::TensorShape& srcShape, const AscendC::TensorDataType dataType, ReducePattern pattern,
+    bool isSrcInnerPad, bool isReuseSource, uint32_t& maxValue, uint32_t& minValue, std::string apiName,
+    std::string funcName)
 {
     std::vector<int64_t> shapeDims = srcShape.GetDims();
     const uint32_t first = static_cast<uint32_t>(shapeDims[0]);
@@ -130,16 +130,19 @@ inline void GetReduceSumMeanCommonTmpSize(
         maxValue = minValue = 0U;
         return;
     }
-    uint32_t elePerBlk = ONE_BLK_SIZE / FLOAT_TYPE_SIZE;
+    const bool isNarrowInteger = dataType == ge::DT_INT8 || dataType == ge::DT_INT16;
+    const uint32_t typeSize = isNarrowInteger ? GetTypeSize(dataType) : FLOAT_TYPE_SIZE;
+    const uint32_t elePerBlk = ONE_BLK_SIZE / typeSize;
+    const uint32_t elePerRep = ONE_REPEAT_BYTE_SIZE / typeSize;
     if (pattern == ReducePattern::AR) {
         uint32_t k = FindK(last);
         if (k == last && first > 1U) {
             k >>= 1U;
         }
-        if (last <= B32_ELEM_NUM_PER_REPEAT) {
+        if (last <= elePerRep) {
             maxValue = minValue = 0U;
         } else {
-            maxValue = minValue = (first * k) * FLOAT_TYPE_SIZE;
+            maxValue = minValue = (first * k) * typeSize;
         }
     } else {
         uint32_t k = FindK(first);
@@ -147,7 +150,7 @@ inline void GetReduceSumMeanCommonTmpSize(
         if (first == k && first > 1U) {
             k >>= 1U;
         }
-        maxValue = minValue = (k * padLast) * FLOAT_TYPE_SIZE;
+        maxValue = minValue = (k * padLast) * typeSize;
     }
     return;
 }
@@ -308,18 +311,34 @@ void GetReduceSumMaxMinTmpSize(
     const auto npuArch = platform->GetCurNpuArch();
     if (npuArch == NpuArch::DAV_3510) {
         ASCENDC_HOST_ASSERT(
-            dataType == ge::DT_INT32 || dataType == ge::DT_UINT32 || dataType == ge::DT_FLOAT ||
-                dataType == ge::DT_INT64 || dataType == ge::DT_UINT64,
+            dataType == ge::DT_INT8 || dataType == ge::DT_INT16 || dataType == ge::DT_INT32 ||
+                dataType == ge::DT_UINT32 || dataType == ge::DT_FLOAT || dataType == ge::DT_INT64 ||
+                dataType == ge::DT_UINT64,
             return,
-            "[ReduceSum][GetReduceSumMaxMinTmpSize] it only supports int32_t/uint32_t/float/int64_t/uint64_t type on "
-            "this platform.");
+            "[ReduceSum][GetReduceSumMaxMinTmpSize] it only supports "
+            "int8_t/int16_t/int32_t/uint32_t/float/int64_t/uint64_t type on this platform.");
     } else {
         ASCENDC_HOST_ASSERT(
             dataType == ge::DT_FLOAT, return,
             "[ReduceSum][GetReduceSumMaxMinTmpSize] it only supports float type on this platform.");
     }
+    if (npuArch == NpuArch::DAV_3510 && dataType == ge::DT_INT8) {
+        const std::vector<int64_t> shapeDims = srcShape.GetDims();
+        const uint32_t first = static_cast<uint32_t>(shapeDims[0]);
+        const uint32_t last = static_cast<uint32_t>(shapeDims[1]);
+        CheckParams(shapeDims, isSrcInnerPad, pattern, first, last, "ReduceSum", "GetReduceSumMaxMinTmpSize");
+        const uint32_t inputCount = first * last;
+        const uint32_t outputCount = pattern == ReducePattern::AR ? first : last;
+        const uint32_t widenedInputBytes =
+            (inputCount * HALF_TYPE_SIZE + ONE_BLK_SIZE - 1U) / ONE_BLK_SIZE * ONE_BLK_SIZE;
+        const uint32_t widenedOutputBytes =
+            (outputCount * HALF_TYPE_SIZE + ONE_BLK_SIZE - 1U) / ONE_BLK_SIZE * ONE_BLK_SIZE;
+        maxValue = minValue = widenedInputBytes + widenedOutputBytes;
+        return;
+    }
     GetReduceSumMeanCommonTmpSize(
-        srcShape, pattern, isSrcInnerPad, isReuseSource, maxValue, minValue, "ReduceSum", "GetReduceSumMaxMinTmpSize");
+        srcShape, dataType, pattern, isSrcInnerPad, isReuseSource, maxValue, minValue, "ReduceSum",
+        "GetReduceSumMaxMinTmpSize");
 }
 
 void GetReduceMeanMaxMinTmpSize(
@@ -330,7 +349,7 @@ void GetReduceMeanMaxMinTmpSize(
         dataType == ge::DT_FLOAT, return,
         "[ReduceMean][GetReduceMeanMaxMinTmpSize] it only supports float type on this platform.");
     GetReduceSumMeanCommonTmpSize(
-        srcShape, pattern, isSrcInnerPad, isReuseSource, maxValue, minValue, "ReduceMean",
+        srcShape, dataType, pattern, isSrcInnerPad, isReuseSource, maxValue, minValue, "ReduceMean",
         "GetReduceMeanMaxMinTmpSize");
 }
 } // namespace AscendC
