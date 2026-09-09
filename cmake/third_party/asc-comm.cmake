@@ -102,3 +102,27 @@ install(CODE "file(MAKE_DIRECTORY \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTA
 install(CODE "file(MAKE_DIRECTORY \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/impl/comm_api/aicore)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../../adv_api/hcomm \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/comm_api/aicore/hcomm SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../../adv_api/detail/hcomm \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/impl/comm_api/aicore/hcomm SYMBOLIC)" COMPONENT asc-devkit)
+
+# 构建 asc-comm CCU 数据面动态库，并将库与公开 DSL 头文件交付到 asc-devkit run 包。
+# 数据面源码归属 asc-comm，跨 SO 依赖通过已安装 CANN pkg_inc 和 POD ABI 解决。
+set(ASC_COMM_CCU_CMAKE_DIR ${ASC_COMM_SOURCE_PATH}/src/ccu)
+if(EXISTS "${ASC_COMM_CCU_CMAKE_DIR}/CMakeLists.txt")
+    if(NOT TARGET asccomm_ccu_dataplane)
+        add_subdirectory(${ASC_COMM_CCU_CMAKE_DIR} ${CMAKE_BINARY_DIR}/asccomm_ccu)
+    endif()
+
+    if(TARGET asccomm_ccu_dataplane)
+        if(NOT TARGET asccomm_ccu_build)
+            add_custom_target(asccomm_ccu_build ALL DEPENDS asccomm_ccu_dataplane)
+        endif()
+        install(TARGETS asccomm_ccu_dataplane
+            LIBRARY DESTINATION ${CMAKE_SYSTEM_PROCESSOR}-linux/lib64 ${INSTALL_OPTIONAL}
+            COMPONENT asc-devkit)
+        install(DIRECTORY ${ASC_COMM_SOURCE_PATH}/include/ccu/hcomm/
+            DESTINATION ${CMAKE_SYSTEM_PROCESSOR}-linux/include/ccu/hcomm
+            COMPONENT asc-devkit
+            FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
+    endif()
+else()
+    message(STATUS "[ThirdPartyLib][asc-comm] Missing CCU cmake dir: ${ASC_COMM_CCU_CMAKE_DIR}, skip CCU so build")
+endif()
