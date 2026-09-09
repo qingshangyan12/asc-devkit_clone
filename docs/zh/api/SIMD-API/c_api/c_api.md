@@ -483,6 +483,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_fma](reg_compute/reg_fused/asc_fma.md)|逐元素乘加运算。|`c_api/reg_compute/compute/reg_fused.h`|
 |[asc_leakyrelu](reg_compute/reg_fused/asc_leakyrelu.md)|按元素执行Leaky ReLU（Leaky Rectified Linear Unit）操作。|`c_api/reg_compute/compute/reg_fused.h`|
 |[asc_madd](reg_compute/reg_fused/asc_madd.md)|madd（multiply-add），对源操作数执行逐元素乘法和加法。|`c_api/reg_compute/compute/reg_fused.h`|
+|[asc_muls](reg_compute/reg_fused/asc_muls.md)|将float类型矢量数据与float类型标量相乘，并按照ROUND舍入模式转换为half类型。|`c_api/reg_compute/compute/reg_fused.h`|
 |[asc_mula](reg_compute/reg_fused/asc_mula.md)|根据掩码将两个源寄存器按元素相乘，并与目的寄存器累加。|`c_api/reg_compute/compute/reg_fused.h`|
 |[asc_prelu](reg_compute/reg_fused/asc_prelu.md)|源操作数src0大于0的情况下直接将src0写入目的操作数dst，否则将src0 * src1的结果写入dst。|`c_api/reg_compute/compute/reg_fused.h`|
 |[asc_relu](reg_compute/reg_fused/asc_relu.md)|逐元素执行ReLU运算。|`c_api/reg_compute/compute/reg_fused.h`|
@@ -567,6 +568,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_half2hif8](reg_compute/reg_convert/asc_half2hif8.md)|将half类型转换为hifloat8_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_half2int16](reg_compute/reg_convert/asc_half2int16.md)|将half类型数据转换为int16_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_half2int32](reg_compute/reg_convert/asc_half2int32.md)|将half类型数据转换为int32_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
+|[asc_half2int4x2](reg_compute/reg_convert/asc_half2int4x2.md)|将half类型数据转换为int4x2_t类型，并支持多种舍入模式和饱和/非饱和模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_half2int8](reg_compute/reg_convert/asc_half2int8.md)|将half类型转换为int8_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_half2uint8](reg_compute/reg_convert/asc_half2uint8.md)|将half类型转换为uint8_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_hif82half](reg_compute/reg_convert/asc_hif82half.md)|将hifloat8_t类型数据转换为half类型。|`c_api/reg_compute/reg_convert.h`|
@@ -583,6 +585,9 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_int642int32](reg_compute/reg_convert/asc_int642int32.md)|将int64_t类型转换为int32_t类型。|`c_api/reg_compute/reg_convert.h`|
 |[asc_int82half](reg_compute/reg_convert/asc_int82half.md)|将int8_t类型转换为half类型。|`c_api/reg_compute/reg_convert.h`|
 |[asc_int82int16](reg_compute/reg_convert/asc_int82int16.md)|将int8_t类型转换为int16_t类型。|`c_api/reg_compute/reg_convert.h`|
+|[asc_int4x22bfloat16](reg_compute/reg_convert/asc_int4x22bfloat16.md)|将int4x2_t类型数据转换为bfloat16_t类型。|`c_api/reg_compute/reg_convert.h`|
+|[asc_int4x22half](reg_compute/reg_convert/asc_int4x22half.md)|将int4x2_t类型数据转换为half类型。|`c_api/reg_compute/reg_convert.h`|
+|[asc_int4x22int16](reg_compute/reg_convert/asc_int4x22int16.md)|将int4x2_t类型数据转换为int16_t类型。|`c_api/reg_compute/reg_convert.h`|
 |[asc_rint](reg_compute/reg_convert/asc_rint.md)|将源操作数中的浮点数元素按照RINT（四舍六入五成双）模式舍入到整数值，结果保持原浮点数据类型。|`c_api/reg_compute/reg_convert.h`|
 |[asc_round](reg_compute/reg_convert/asc_round.md)|将源操作数中的浮点数元素按照ROUND（四舍五入）模式舍入到整数值，结果保持原浮点数据类型。|`c_api/reg_compute/reg_convert.h`|
 |[asc_trunc](reg_compute/reg_convert/asc_trunc.md)|将源操作数中的浮点数元素按照TRUNC（向零方向截断）模式截断到整数值，结果保持原浮点数据类型。|`c_api/reg_compute/reg_convert.h`|
@@ -659,7 +664,6 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_atomic_or](atomic/scalar_atomic/asc_atomic_or.md)|对Global Memory中的数据与指定数据执行原子或操作。|`c_api/atomic/scalar_atomic.h`|
 |[asc_atomic_sub](atomic/scalar_atomic/asc_atomic_sub.md)|对Global Memory中的数据与指定数据执行原子减操作。|`c_api/atomic/scalar_atomic.h`|
 |[asc_atomic_xor](atomic/scalar_atomic/asc_atomic_xor.md)|对Global Memory中的数据与指定数据执行原子异或操作。|`c_api/atomic/scalar_atomic.h`|
-|[asc_get_store_atomic_config](atomic/scalar_atomic/asc_get_store_atomic_config.md)|获取原子操作启用位与原子操作类型的值。|`c_api/atomic/scalar_atomic.h`|
 |[asc_set_store_atomic_config_v1](atomic/scalar_atomic/asc_set_store_atomic_config_v1.md)|设置原子操作启用位与原子操作类型的值，适用于Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品。|`c_api/atomic/scalar_atomic.h`|
 
 ## 缓存控制
