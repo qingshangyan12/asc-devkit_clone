@@ -102,8 +102,8 @@ __aicore__ inline void DumpTensor(
     ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "DumpTensor is not supported in cpu mode."); });
 #endif
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
-                              (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || \
+                              (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3102))
     DumpShapeImpl(shapeInfo);
     DumpTensorGM2GMImpl(input, desc, dumpSize);
 #else
@@ -121,8 +121,8 @@ __aicore__ inline void DumpTensor(
     ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "DumpTensor is not supported in cpu mode."); });
 #endif
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || \
-                              (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || \
+                              (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3102))
     DumpShapeImpl(shapeInfo);
     DumpTensorLocal2GMImpl(input, desc, dumpSize);
 #else
