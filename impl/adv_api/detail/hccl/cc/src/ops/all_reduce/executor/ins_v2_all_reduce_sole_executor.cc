@@ -18,7 +18,25 @@
 #include "ins_temp_all_reduce_aicpu_reduce_nhr.h"
 #include "ins_temp_all_reduce_mesh_1D_two_shot_mesh_chunk.h"
 
+#include <type_traits>
+
 namespace mc2_ops_hccl {
+
+namespace {
+template <typename InsAlgTemplate>
+typename std::enable_if<std::is_base_of<InsAlgTemplateBase, InsAlgTemplate>::value, HcclResult>::type
+SetChannelsPerRankIfSupported(InsAlgTemplate& algTemplate, const std::map<u32, std::vector<ChannelInfo>>& channels)
+{
+    return algTemplate.SetchannelsPerRank(channels);
+}
+
+template <typename InsAlgTemplate>
+typename std::enable_if<!std::is_base_of<InsAlgTemplateBase, InsAlgTemplate>::value, HcclResult>::type
+SetChannelsPerRankIfSupported(InsAlgTemplate&, const std::map<u32, std::vector<ChannelInfo>>&)
+{
+    return HCCL_SUCCESS;
+}
+} // namespace
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::InsV2AllReduceSoleExecutor()
@@ -115,7 +133,7 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     std::shared_ptr<InsAlgTemplate> algTemplate =
         std::make_shared<InsAlgTemplate>(param, resCtx.topoInfo.userRank, resCtx.algHierarchyInfo.infos[0]);
     if (param.engine == CommEngine::COMM_ENGINE_AICPU_TS && resCtx.topoInfo.isPod) {
-        CHK_RET(algTemplate->SetchannelsPerRank(templateAlgRes.channels));
+        CHK_RET(SetChannelsPerRankIfSupported(*algTemplate, templateAlgRes.channels));
     }
     u32 templateScratchMultiplier =
         algTemplate->CalcScratchMultiple(tempAlgParams.buffInfo.inBuffType, tempAlgParams.buffInfo.outBuffType);
