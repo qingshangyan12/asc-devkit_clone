@@ -1,4 +1,4 @@
-# asc_get_store_atomic_config
+# asc_get_store_atomic_config（废弃）
 
 ## 产品支持情况
 
@@ -28,10 +28,10 @@
 
 头文件路径为：`"c_api/atomic/scalar_atomic.h"`。
 
-获取原子操作启用位与原子操作类型的值，可用于校验[asc_set_store_atomic_config_v1](asc_set_store_atomic_config_v1.md)和[asc_set_store_atomic_config_v2（废弃）](../../deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md)设置的原子操作启用位和原子操作类型的值是否符合预期。
+获取原子操作启用位与原子操作类型的值，可用于校验[asc_set_store_atomic_config_v1](../atomic/scalar_atomic/asc_set_store_atomic_config_v1.md)和[asc_set_store_atomic_config_v2（废弃）](asc_set_store_atomic_config_v2_deprecated.md)设置的原子操作启用位和原子操作类型的值是否符合预期。
 
 <!-- npu="950" id8 -->
-**Ascend 950PR/Ascend 950DT产品上该接口已废弃。原子加操作可以直接使用[asc_atomic_add](asc_atomic_add.md)实现。无需再对原子操作启用位和原子操作类型的值进行配置和校验。**
+**Ascend 950PR/Ascend 950DT产品上该接口已废弃，请使用[asc_atomic_add](../atomic/scalar_atomic/asc_atomic_add.md)直接实现原子加操作，无需再对原子操作启用位和原子操作类型的值进行配置和校验。**
 <!-- end id8 -->
 
 ## 函数原型
@@ -46,7 +46,7 @@ __aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& conf
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| config | 输出 | 用于获取原子操作启用位和原子操作类型的值，详细说明请参考[asc_store_atomic_config](../../defs/union/asc_store_atomic_config.md)。 |
+| config | 输出 | 用于获取原子操作启用位和原子操作类型的值，详细说明请参考[asc_store_atomic_config](../defs/union/asc_store_atomic_config.md)。 |
 
 ## 返回值说明
 
@@ -65,7 +65,7 @@ PIPE_S
 将以下代码保存为`example.asc`后，执行如下编译运行命令：
 
 <!-- npu="A3,910b" id9 -->
-以[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)为例，编译运行命令如下：
+以[NPU架构版本2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-2201 && ./main
