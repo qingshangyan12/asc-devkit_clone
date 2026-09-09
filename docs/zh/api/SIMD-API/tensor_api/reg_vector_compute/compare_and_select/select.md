@@ -73,7 +73,7 @@ __simd_vf__ inline void select_vf(T x_tensor, U y_tensor, V z_tensor,
         const auto coord = asc::te::make_coord(offset);
         auto x_reg = x_tensor.load(coord).with_mask(mask);
         auto y_reg = y_tensor.load(coord).with_mask(mask);
-        auto z_reg = asc::te::experimental::select((x_reg > y_reg), x_reg, y_reg);
+        auto z_reg = asc::te::experimental::select(condition, x_reg, y_reg);
         z_tensor.store(coord, z_reg);
     }
 }
