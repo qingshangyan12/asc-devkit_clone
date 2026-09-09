@@ -49,9 +49,13 @@ __simd_callee__ inline void asc_axpy(vector_half& dst, vector_half src, half val
 
 __simd_callee__ inline void asc_axpy(vector_float& dst, vector_float src, float value, vector_bool mask);
 
-__simd_callee__ inline void asc_muls(vector_half& dst, vector_float src, float value, vector_bool mask);
+[[deprecated("NOTICE: asc_muls is deprecated. "
+             "Please use asc_mul_scalar_float2half_rn with dst_pos instead.")]] __simd_callee__ inline void
+asc_muls(vector_half& dst, vector_float src, float value, vector_bool mask);
 
-__simd_callee__ inline void asc_muls_v2(vector_half& dst, vector_float src, float value, vector_bool mask);
+[[deprecated("NOTICE: asc_muls_v2 is deprecated. "
+             "Please use asc_mul_scalar_float2half_rn with dst_pos instead.")]] __simd_callee__ inline void
+asc_muls_v2(vector_half& dst, vector_float src, float value, vector_bool mask);
 
 __simd_callee__ inline void asc_mul_scalar_float2half_rn(
     vector_half& dst, vector_float src, float value, vector_bool mask,
