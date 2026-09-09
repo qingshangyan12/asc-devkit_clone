@@ -18,6 +18,10 @@
 #ifndef IMPL_C_API_REG_BASE_IMPL_SYS_VAR_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_SYS_VAR_INTF_IMPL_H
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#include "impl/c_api/reg_base_impl/npu_arch_3510/sys_var_intf_impl.h"
+#endif
+
 constexpr int64_t SYSTEM_CLOCK_FREQ_MHZ = 1000;
 
 __aicore__ inline int64_t asc_get_program_counter() { return get_pc(); }
@@ -49,10 +53,6 @@ __aicore__ inline int64_t asc_get_phy_stack_base() { return get_stack_phy_base()
 __aicore__ inline int64_t asc_get_status() { return get_status(); }
 
 __aicore__ inline int64_t asc_get_sys_virtual_base() { return get_sys_va_base(); }
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/reg_base_impl/npu_arch_3510/sys_var_intf_impl.h"
-#endif
 
 #endif
 

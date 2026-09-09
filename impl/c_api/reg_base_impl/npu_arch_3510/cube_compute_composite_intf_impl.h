@@ -30,7 +30,6 @@ __aicore__ inline void asc_mmad_mx_sync(
         mad_mx(
             c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
             c_matrix_init_val);
-
         asc_sync_post_process();
     }
 }
@@ -45,7 +44,6 @@ __aicore__ inline void asc_mmad_mx_sync(
         mad_mx(
             c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
             c_matrix_init_val);
-
         asc_sync_post_process();
     }
 }
@@ -60,7 +58,6 @@ __aicore__ inline void asc_mmad_mx_sync(
         mad_mx(
             c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
             c_matrix_init_val);
-
         asc_sync_post_process();
     }
 }
@@ -75,7 +72,6 @@ __aicore__ inline void asc_mmad_mx_sync(
         mad_mx(
             c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
             c_matrix_init_val);
-
         asc_sync_post_process();
     }
 }
@@ -90,7 +86,6 @@ __aicore__ inline void asc_mmad_mx_sync(
         mad_mx(
             c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
             c_matrix_init_val);
-
         asc_sync_post_process();
     }
 }
@@ -105,7 +100,6 @@ __aicore__ inline void asc_mmad_mx_sync(
         mad_mx(
             c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
             c_matrix_init_val);
-
         asc_sync_post_process();
     }
 }
@@ -120,7 +114,6 @@ __aicore__ inline void asc_mmad_mx_sync(
         mad_mx(
             c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
             c_matrix_init_val);
-
         asc_sync_post_process();
     }
 }
@@ -135,7 +128,6 @@ __aicore__ inline void asc_mmad_mx_sync(
         mad_mx(
             c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
             c_matrix_init_val);
-
         asc_sync_post_process();
     }
 }
@@ -149,7 +141,6 @@ __aicore__ inline void asc_mmad_sync(
     if ASC_IS_AIC {
         mad(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
             c_matrix_init_val);
-
         asc_sync_post_process();
     }
 }
@@ -163,7 +154,6 @@ __aicore__ inline void asc_mmad_sync(
     if ASC_IS_AIC {
         mad(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
             c_matrix_init_val);
-
         asc_sync_post_process();
     }
 }
@@ -177,7 +167,6 @@ __aicore__ inline void asc_mmad_sync(
     if ASC_IS_AIC {
         mad(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
             c_matrix_init_val);
-
         asc_sync_post_process();
     }
 }
@@ -191,7 +180,6 @@ __aicore__ inline void asc_mmad_sync(
     if ASC_IS_AIC {
         mad(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
             c_matrix_init_val);
-
         asc_sync_post_process();
     }
 }
@@ -205,7 +193,6 @@ __aicore__ inline void asc_mmad_sync(
     if ASC_IS_AIC {
         mad(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
             c_matrix_init_val);
-
         asc_sync_post_process();
     }
 }
@@ -218,7 +205,6 @@ __aicore__ inline void asc_mmad_sync(
     if ASC_IS_AIC {
         mad(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
             c_matrix_init_val);
-
         asc_sync_post_process();
     }
 }
@@ -231,7 +217,6 @@ __aicore__ inline void asc_mmad_sync(
     if ASC_IS_AIC {
         mad(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
             c_matrix_init_val);
-
         asc_sync_post_process();
     }
 }
@@ -244,7 +229,6 @@ __aicore__ inline void asc_mmad_sync(
     if ASC_IS_AIC {
         mad(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
             c_matrix_init_val);
-
         asc_sync_post_process();
     }
 }
@@ -258,7 +242,6 @@ __aicore__ inline void asc_mmad_sync(
     if ASC_IS_AIC {
         mad(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
             c_matrix_init_val);
-
         asc_sync_post_process();
     }
 }

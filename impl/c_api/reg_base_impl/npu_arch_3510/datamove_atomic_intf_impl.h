@@ -21,7 +21,7 @@
 [[deprecated("NOTICE: asc_set_atomic_none is deprecated. Please use asc_disable_dma_atomic instead.")]]
 __aicore__ inline void asc_set_atomic_none()
 {
-    asc_disable_dma_atomic();
+    set_atomic_none();
 }
 
 /// \deprecated Use asc_set_atomic_add_int32 instead.

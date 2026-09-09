@@ -20,6 +20,10 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#include "impl/c_api/reg_base_impl/npu_arch_3510/sync_intf_impl.h"
+#endif
+
 __aicore__ inline void asc_sync_notify_impl_aic(pipe_t pipe, pipe_t tpipe, event_t id)
 {
     if (pipe == pipe_t::PIPE_S) {
@@ -604,10 +608,6 @@ __aicore__ inline void asc_sync_block_wait(pipe_t pipe, int64_t flag_id)
         }
     }
 }
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/reg_base_impl/npu_arch_3510/sync_intf_impl.h"
-#endif
 
 #endif
 

@@ -235,21 +235,16 @@ impl/adv_api/
 
 ```text
 □ include/c_api/<category>/<header>.h
-    新增公开头，或在现有公开头中添加函数声明；如分类下还有嵌套目录，沿用现有目录层级
+    放置接口声明
 
 □ impl/c_api/memory_base_impl/<header>_intf_impl.h
-    2201接口直接实现及必要的辅助函数放在对应公开头的实现文件中
+    放置2201架构的实现
 
 □ impl/c_api/reg_base_impl/<header>_intf_impl.h
-    regbase公共实现，公开头只直接包含同名接口实现头
+    放置regbase公共实现
 
 □ impl/c_api/reg_base_impl/npu_arch_3510/<header>_intf_impl.h
-    放置3510专用实现，由同名公共实现头通过 __NPU_ARCH__ == 3510 包含
-    不反向包含公共接口实现头；仅保留实际需要的工具依赖
-    新增category时还需在对应公开入口中注册公开头
-
-    聚合头、纯类型头和无独立实现的宏别名不创建空impl；架构专用接口仍通过同名公共入口分发
-    共享内部辅助代码放在各架构组的utils_impl.h中，避免无意义的接口转发层
+    仅放置3510独有的实现
 
 □ tests/api/c_api/npu_arch_<arch>/<category>/test_asc_<api>.cpp
     Mock测试

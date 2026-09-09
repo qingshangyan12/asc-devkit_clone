@@ -20,6 +20,10 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#include "impl/c_api/reg_base_impl/npu_arch_3510/reg_addr_reg_intf_impl.h"
+#endif
+
 #define ASC_DEFINE_UPDATE_ADDR_REG_IMPL(bxx)                                                             \
     __simd_callee__ inline addr_reg asc_update_addr_reg_##bxx##_impl(uint32_t offset)                    \
     {                                                                                                    \
@@ -82,10 +86,6 @@ ASC_DEFINE_UPDATE_ADDR_REG_API(b16)
 ASC_DEFINE_UPDATE_ADDR_REG_API(b8)
 
 #undef ASC_DEFINE_UPDATE_ADDR_REG_API
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/reg_base_impl/npu_arch_3510/reg_addr_reg_intf_impl.h"
-#endif
 
 #endif
 

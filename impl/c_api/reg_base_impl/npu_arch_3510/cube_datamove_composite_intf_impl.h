@@ -27,7 +27,6 @@ __aicore__ inline void asc_copy_l12l0a_mx_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca_mx(dst, (__cbuf__ void*)src, x_start_pos, y_start_pos, x_step, y_step, src_stride, dst_stride);
-
         asc_sync_post_process();
     }
 }
@@ -39,7 +38,6 @@ __aicore__ inline void asc_copy_l12l0b_mx_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_mx(dst, (__cbuf__ void*)src, x_start_pos, y_start_pos, x_step, y_step, src_stride, dst_stride);
-
         asc_sync_post_process();
     }
 }
@@ -51,7 +49,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -63,7 +60,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -75,7 +71,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -87,7 +82,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -99,7 +93,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -111,7 +104,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -123,7 +115,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -135,7 +126,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -147,7 +137,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -159,7 +148,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -171,7 +159,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -183,7 +170,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -195,7 +181,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca_s4(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -207,7 +192,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca_s4(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -219,7 +203,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca_s4(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -231,7 +214,6 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -243,7 +225,6 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -255,7 +236,6 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -267,7 +247,6 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -279,7 +258,6 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -291,7 +269,6 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -303,7 +280,6 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -315,7 +291,6 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -327,7 +302,6 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -339,7 +313,6 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -351,7 +324,6 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -363,7 +335,6 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -375,7 +346,6 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca_s4(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -387,7 +357,6 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca_s4(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -399,7 +368,6 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca_s4(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -411,7 +379,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -423,7 +390,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -435,7 +401,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -447,7 +412,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -459,7 +423,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -471,7 +434,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -483,7 +445,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -495,7 +456,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -507,7 +467,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -519,7 +478,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -531,7 +489,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -543,7 +500,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -555,7 +511,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_s4(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -567,7 +522,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_s4(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -579,7 +533,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_s4(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 0);
-
         asc_sync_post_process();
     }
 }
@@ -591,7 +544,6 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -603,7 +555,6 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -615,7 +566,6 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -627,7 +577,6 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -639,7 +588,6 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -651,7 +599,6 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -663,7 +610,6 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -675,7 +621,6 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -687,7 +632,6 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -699,7 +643,6 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -711,7 +654,6 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -723,7 +665,6 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -735,7 +676,6 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_s4(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -747,7 +687,6 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_s4(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -759,7 +698,6 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_s4(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride, 1);
-
         asc_sync_post_process();
     }
 }
@@ -771,7 +709,6 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, inc, dst_frac_gap, src_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -783,7 +720,6 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, inc, dst_frac_gap, src_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -795,7 +731,6 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, inc, dst_frac_gap, src_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -807,7 +742,6 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, inc, dst_frac_gap, src_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -819,7 +753,6 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, inc, dst_frac_gap, src_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -831,7 +764,6 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, inc, dst_frac_gap, src_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -843,7 +775,6 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, inc, dst_frac_gap, src_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -855,7 +786,6 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, inc, dst_frac_gap, src_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -867,7 +797,6 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, inc, dst_frac_gap, src_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -879,7 +808,6 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, inc, dst_frac_gap, src_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -891,7 +819,6 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_transpose_s4(dst, src, index_id, repeat, src_stride, dst_gap, inc, dst_frac_gap, src_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -903,7 +830,6 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb_transpose_s4(dst, src, index_id, repeat, src_stride, dst_gap, inc, dst_frac_gap, src_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -917,7 +843,6 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
         load_cbuf_to_cb_transpose_s4(
             (__cb__ void*)dst, (__cbuf__ void*)src, index_id, repeat, src_stride, dst_gap, inc, dst_frac_gap,
             src_frac_gap);
-
         asc_sync_post_process();
     }
 }
@@ -933,7 +858,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -949,7 +873,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -965,7 +888,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -981,7 +903,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -997,7 +918,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -1013,7 +933,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -1029,7 +948,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -1045,7 +963,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -1061,7 +978,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -1077,7 +993,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -1093,7 +1008,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -1109,7 +1023,6 @@ __aicore__ inline void asc_copy_l12l0a_sync(
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -1125,7 +1038,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         img2colv2_cbuf_to_cb(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -1141,7 +1053,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         img2colv2_cbuf_to_cb(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -1157,7 +1068,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         img2colv2_cbuf_to_cb(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -1173,7 +1083,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         img2colv2_cbuf_to_cb(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -1189,7 +1098,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         img2colv2_cbuf_to_cb(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -1205,7 +1113,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         img2colv2_cbuf_to_cb(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -1221,7 +1128,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         img2colv2_cbuf_to_cb(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -1237,7 +1143,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         img2colv2_cbuf_to_cb(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -1253,7 +1158,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         img2colv2_cbuf_to_cb(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -1269,7 +1173,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         img2colv2_cbuf_to_cb(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -1285,7 +1188,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         img2colv2_cbuf_to_cb(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -1301,7 +1203,6 @@ __aicore__ inline void asc_copy_l12l0b_sync(
         img2colv2_cbuf_to_cb(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
-
         asc_sync_post_process();
     }
 }
@@ -1316,7 +1217,6 @@ __aicore__ inline void asc_copy_gm2l1_align_sync(
         copy_gm_to_cbuf_align_v2(
             dst, src, 0, n_burst, len_burst, left_padding_count, right_padding_count, data_select_bit, l2_cache_ctl,
             burst_src_stride, burst_dst_stride);
-
         asc_sync_post_process();
     }
 }
@@ -1331,7 +1231,6 @@ __aicore__ inline void asc_copy_gm2l1_align_sync(
         copy_gm_to_cbuf_align_v2(
             dst, src, 0, n_burst, len_burst, left_padding_count, right_padding_count, data_select_bit, l2_cache_ctl,
             burst_src_stride, burst_dst_stride);
-
         asc_sync_post_process();
     }
 }
@@ -1346,7 +1245,6 @@ __aicore__ inline void asc_copy_gm2l1_align_sync(
         copy_gm_to_cbuf_align_v2(
             dst, src, 0, n_burst, len_burst, left_padding_count, right_padding_count, data_select_bit, l2_cache_ctl,
             burst_src_stride, burst_dst_stride);
-
         asc_sync_post_process();
     }
 }
@@ -1361,7 +1259,6 @@ __aicore__ inline void asc_copy_gm2l1_align_sync(
         copy_gm_to_cbuf_align_v2(
             dst, src, 0, n_burst, len_burst, left_padding_count, right_padding_count, data_select_bit, l2_cache_ctl,
             burst_src_stride, burst_dst_stride);
-
         asc_sync_post_process();
     }
 }
@@ -1376,7 +1273,6 @@ __aicore__ inline void asc_copy_gm2l1_align_sync(
         copy_gm_to_cbuf_align_v2(
             dst, src, 0, n_burst, len_burst, left_padding_count, right_padding_count, data_select_bit, l2_cache_ctl,
             burst_src_stride, burst_dst_stride);
-
         asc_sync_post_process();
     }
 }
@@ -1391,7 +1287,6 @@ __aicore__ inline void asc_copy_gm2l1_align_sync(
         copy_gm_to_cbuf_align_v2(
             dst, src, 0, n_burst, len_burst, left_padding_count, right_padding_count, data_select_bit, l2_cache_ctl,
             burst_src_stride, burst_dst_stride);
-
         asc_sync_post_process();
     }
 }
@@ -1406,7 +1301,6 @@ __aicore__ inline void asc_copy_gm2l1_align_sync(
         copy_gm_to_cbuf_align_v2(
             dst, src, 0, n_burst, len_burst, left_padding_count, right_padding_count, data_select_bit, l2_cache_ctl,
             burst_src_stride, burst_dst_stride);
-
         asc_sync_post_process();
     }
 }
@@ -1421,7 +1315,6 @@ __aicore__ inline void asc_copy_gm2l1_align_sync(
         copy_gm_to_cbuf_align_v2(
             dst, src, 0, n_burst, len_burst, left_padding_count, right_padding_count, data_select_bit, l2_cache_ctl,
             burst_src_stride, burst_dst_stride);
-
         asc_sync_post_process();
     }
 }
@@ -1436,7 +1329,6 @@ __aicore__ inline void asc_copy_gm2l1_align_sync(
         copy_gm_to_cbuf_align_v2(
             dst, src, 0, n_burst, len_burst, left_padding_count, right_padding_count, data_select_bit, l2_cache_ctl,
             burst_src_stride, burst_dst_stride);
-
         asc_sync_post_process();
     }
 }
@@ -1451,7 +1343,6 @@ __aicore__ inline void asc_copy_gm2l1_align_sync(
         copy_gm_to_cbuf_align_v2(
             dst, src, 0, n_burst, len_burst, left_padding_count, right_padding_count, data_select_bit, l2_cache_ctl,
             burst_src_stride, burst_dst_stride);
-
         asc_sync_post_process();
     }
 }
@@ -1464,7 +1355,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_dn2nz(
             dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
-
         asc_sync_post_process();
     }
 }
@@ -1477,7 +1367,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_dn2nz(
             dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
-
         asc_sync_post_process();
     }
 }
@@ -1490,7 +1379,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_dn2nz(
             dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
-
         asc_sync_post_process();
     }
 }
@@ -1503,7 +1391,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_dn2nz(
             dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
-
         asc_sync_post_process();
     }
 }
@@ -1516,7 +1403,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_dn2nz(
             dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
-
         asc_sync_post_process();
     }
 }
@@ -1529,7 +1415,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_dn2nz(
             dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
-
         asc_sync_post_process();
     }
 }
@@ -1542,7 +1427,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_dn2nz(
             dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
-
         asc_sync_post_process();
     }
 }
@@ -1555,7 +1439,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_dn2nz(
             dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
-
         asc_sync_post_process();
     }
 }
@@ -1568,7 +1451,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_dn2nz(
             dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
-
         asc_sync_post_process();
     }
 }
@@ -1581,7 +1463,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_dn2nz(
             dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
-
         asc_sync_post_process();
     }
 }
@@ -1594,7 +1475,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_dn2nz(
             dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
-
         asc_sync_post_process();
     }
 }
@@ -1607,7 +1487,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_dn2nz(
             dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
-
         asc_sync_post_process();
     }
 }
@@ -1620,7 +1499,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_nd2nz(
             dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
-
         asc_sync_post_process();
     }
 }
@@ -1633,7 +1511,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_nd2nz(
             dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
-
         asc_sync_post_process();
     }
 }
@@ -1646,7 +1523,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_nd2nz(
             dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
-
         asc_sync_post_process();
     }
 }
@@ -1659,7 +1535,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_nd2nz(
             dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
-
         asc_sync_post_process();
     }
 }
@@ -1672,7 +1547,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_nd2nz(
             dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
-
         asc_sync_post_process();
     }
 }
@@ -1685,7 +1559,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_nd2nz(
             dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
-
         asc_sync_post_process();
     }
 }
@@ -1698,7 +1571,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_nd2nz(
             dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
-
         asc_sync_post_process();
     }
 }
@@ -1711,7 +1583,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_nd2nz(
             dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
-
         asc_sync_post_process();
     }
 }
@@ -1724,7 +1595,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_nd2nz(
             dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
-
         asc_sync_post_process();
     }
 }
@@ -1737,7 +1607,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_nd2nz(
             dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
-
         asc_sync_post_process();
     }
 }
@@ -1750,7 +1619,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_nd2nz(
             dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
-
         asc_sync_post_process();
     }
 }
@@ -1763,7 +1631,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_nd2nz(
             dst, src, 0, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
-
         asc_sync_post_process();
     }
 }
@@ -1775,7 +1642,6 @@ __aicore__ inline void asc_copy_gm2l1_sync(
 {
     if ASC_IS_AIC {
         copy_gm_to_cbuf_v2(dst, src, 0, n_burst, len_burst, pad_func_mode, 0, src_stride, dst_stride);
-
         asc_sync_post_process();
     }
 }
@@ -1787,7 +1653,6 @@ __aicore__ inline void asc_copy_l12fb_sync(__fbuf__ void* dst, __cbuf__ void* sr
         copy_cbuf_to_fbuf(
             dst, src, static_cast<uint16_t>(1), size / ASC_C_API_ONE_DATABLOCK_SIZE, static_cast<uint16_t>(0),
             static_cast<uint16_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -1799,7 +1664,6 @@ __aicore__ inline void asc_copy_l12ub_sync(
 {
     if ASC_IS_AIC {
         copy_cbuf_to_ubuf(dst_addr, src_addr, static_cast<int8_t>(sub_blockid), n_burst, len_burst, src_gap, dst_gap);
-
         asc_sync_post_process();
     }
 }
@@ -1811,7 +1675,6 @@ __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ void* src, uin
         copy_cbuf_to_bt(
             dst, src, static_cast<uint16_t>(0), static_cast<uint16_t>(1), size / ASC_C_API_ONE_DATABLOCK_SIZE,
             static_cast<uint16_t>(0), static_cast<uint16_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -1823,7 +1686,6 @@ __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ bfloat16_t* sr
         copy_cbuf_to_bt(
             dst, src, static_cast<uint16_t>(0), static_cast<uint16_t>(1), size / ASC_C_API_ONE_DATABLOCK_SIZE,
             static_cast<uint16_t>(0), static_cast<uint16_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -1835,7 +1697,6 @@ __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ half* src, uin
         copy_cbuf_to_bt(
             dst, src, static_cast<uint16_t>(0), static_cast<uint16_t>(1), size / ASC_C_API_ONE_DATABLOCK_SIZE,
             static_cast<uint16_t>(0), static_cast<uint16_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -1847,7 +1708,6 @@ __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ float* src, ui
         copy_cbuf_to_bt(
             dst, src, static_cast<uint16_t>(0), static_cast<uint16_t>(1), size / ASC_C_API_ONE_DATABLOCK_SIZE,
             static_cast<uint16_t>(0), static_cast<uint16_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -1859,7 +1719,6 @@ __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ int32_t* src, 
         copy_cbuf_to_bt(
             dst, src, static_cast<uint16_t>(0), static_cast<uint16_t>(1), size / ASC_C_API_ONE_DATABLOCK_SIZE,
             static_cast<uint16_t>(0), static_cast<uint16_t>(0));
-
         asc_sync_post_process();
     }
 }
@@ -1878,7 +1737,6 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -1897,7 +1755,6 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -1916,7 +1773,6 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -1934,7 +1790,6 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -1953,7 +1808,6 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -1972,7 +1826,6 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -1990,7 +1843,6 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -2008,7 +1860,6 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -2026,7 +1877,6 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -2045,7 +1895,6 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -2063,7 +1912,6 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -2081,7 +1929,6 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -2100,7 +1947,6 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -2119,7 +1965,6 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -2137,7 +1982,6 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -2156,7 +2000,6 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -2175,7 +2018,6 @@ __aicore__ inline void asc_copy_l0c2ub_sync(
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -2194,7 +2036,6 @@ __aicore__ inline void asc_copy_l0c2ub_sync(
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -2213,7 +2054,6 @@ __aicore__ inline void asc_copy_l0c2ub_sync(
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -2232,7 +2072,6 @@ __aicore__ inline void asc_copy_l0c2ub_sync(
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -2251,7 +2090,6 @@ __aicore__ inline void asc_copy_l0c2ub_sync(
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -2270,7 +2108,6 @@ __aicore__ inline void asc_copy_l0c2ub_sync(
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -2289,7 +2126,6 @@ __aicore__ inline void asc_copy_l0c2ub_sync(
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -2308,7 +2144,6 @@ __aicore__ inline void asc_copy_l0c2ub_sync(
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -2327,7 +2162,6 @@ __aicore__ inline void asc_copy_l0c2ub_sync(
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -2346,7 +2180,6 @@ __aicore__ inline void asc_copy_l0c2ub_sync(
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -2365,7 +2198,6 @@ __aicore__ inline void asc_copy_l0c2ub_sync(
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -2384,7 +2216,6 @@ __aicore__ inline void asc_copy_l0c2ub_sync(
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -2403,7 +2234,6 @@ __aicore__ inline void asc_copy_l0c2ub_sync(
             enable_clip_relu_pre, unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode,
             enable_channel_split, enable_nz2nd, static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post,
             false, eltwise_op, eltwise_antq_en, false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -2422,7 +2252,6 @@ __aicore__ inline void asc_copy_l0c2ub_sync(
             enable_clip_relu_pre, unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode,
             enable_channel_split, enable_nz2nd, static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post,
             false, eltwise_op, eltwise_antq_en, false, c0_pad_en, false, broadcast_en, enable_nz2dn);
-
         asc_sync_post_process();
     }
 }
@@ -2435,7 +2264,6 @@ __aicore__ inline void asc_copy_gm2l1_sync(
     if ASC_IS_AIC {
         load_gm_to_cbuf_2dv2(
             dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, 0, decomp_mode, l2_cache_ctl);
-
         asc_sync_post_process();
     }
 }
@@ -2448,7 +2276,6 @@ __aicore__ inline void asc_copy_gm2l1_sync(
     if ASC_IS_AIC {
         load_gm_to_cbuf_2dv2(
             dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, 0, decomp_mode, l2_cache_ctl);
-
         asc_sync_post_process();
     }
 }
@@ -2461,7 +2288,6 @@ __aicore__ inline void asc_copy_gm2l1_sync(
     if ASC_IS_AIC {
         load_gm_to_cbuf_2dv2(
             dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, 0, decomp_mode, l2_cache_ctl);
-
         asc_sync_post_process();
     }
 }
@@ -2474,7 +2300,6 @@ __aicore__ inline void asc_copy_gm2l1_sync(
     if ASC_IS_AIC {
         load_gm_to_cbuf_2dv2(
             dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, 0, decomp_mode, l2_cache_ctl);
-
         asc_sync_post_process();
     }
 }
@@ -2487,7 +2312,6 @@ __aicore__ inline void asc_copy_gm2l1_sync(
     if ASC_IS_AIC {
         load_gm_to_cbuf_2dv2(
             dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, 0, decomp_mode, l2_cache_ctl);
-
         asc_sync_post_process();
     }
 }
@@ -2500,7 +2324,6 @@ __aicore__ inline void asc_copy_gm2l1_sync(
     if ASC_IS_AIC {
         load_gm_to_cbuf_2dv2(
             dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, 0, decomp_mode, l2_cache_ctl);
-
         asc_sync_post_process();
     }
 }
@@ -2513,7 +2336,6 @@ __aicore__ inline void asc_copy_gm2l1_sync(
     if ASC_IS_AIC {
         load_gm_to_cbuf_2dv2(
             dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, 0, decomp_mode, l2_cache_ctl);
-
         asc_sync_post_process();
     }
 }
@@ -2526,7 +2348,6 @@ __aicore__ inline void asc_copy_gm2l1_sync(
     if ASC_IS_AIC {
         load_gm_to_cbuf_2dv2(
             dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, 0, decomp_mode, l2_cache_ctl);
-
         asc_sync_post_process();
     }
 }
@@ -2539,7 +2360,6 @@ __aicore__ inline void asc_copy_gm2l1_sync(
     if ASC_IS_AIC {
         load_gm_to_cbuf_2dv2(
             dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, 0, decomp_mode, l2_cache_ctl);
-
         asc_sync_post_process();
     }
 }
@@ -2552,7 +2372,6 @@ __aicore__ inline void asc_copy_gm2l1_sync(
     if ASC_IS_AIC {
         load_gm_to_cbuf_2dv2(
             dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, 0, decomp_mode, l2_cache_ctl);
-
         asc_sync_post_process();
     }
 }
@@ -2565,7 +2384,6 @@ __aicore__ inline void asc_copy_gm2l1_sync(
     if ASC_IS_AIC {
         load_gm_to_cbuf_2dv2(
             dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, 0, decomp_mode, l2_cache_ctl);
-
         asc_sync_post_process();
     }
 }
@@ -2578,7 +2396,6 @@ __aicore__ inline void asc_copy_gm2l1_sync(
     if ASC_IS_AIC {
         load_gm_to_cbuf_2dv2(
             dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, 0, decomp_mode, l2_cache_ctl);
-
         asc_sync_post_process();
     }
 }
@@ -2591,7 +2408,6 @@ __aicore__ inline void asc_copy_gm2l1_sync(
     if ASC_IS_AIC {
         load_gm_to_cbuf_2dv2_s4(
             dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, 0, decomp_mode, l2_cache_ctl);
-
         asc_sync_post_process();
     }
 }
@@ -2604,7 +2420,6 @@ __aicore__ inline void asc_copy_gm2l1_sync(
     if ASC_IS_AIC {
         load_gm_to_cbuf_2dv2_s4(
             dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, 0, decomp_mode, l2_cache_ctl);
-
         asc_sync_post_process();
     }
 }
@@ -2617,7 +2432,6 @@ __aicore__ inline void asc_copy_gm2l1_sync(
     if ASC_IS_AIC {
         load_gm_to_cbuf_2dv2_s4(
             dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, 0, decomp_mode, l2_cache_ctl);
-
         asc_sync_post_process();
     }
 }
@@ -2627,7 +2441,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ half* dst, half value, const as
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -2637,7 +2450,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ half* dst, uint32_t value, cons
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -2647,7 +2459,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ float* dst, half value, const a
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -2657,7 +2468,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ float* dst, uint32_t value, con
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -2667,7 +2477,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ int16_t* dst, half value, const
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -2677,7 +2486,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ int16_t* dst, uint32_t value, c
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -2687,7 +2495,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ int32_t* dst, half value, const
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -2697,7 +2504,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ int32_t* dst, uint32_t value, c
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -2707,7 +2513,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ uint16_t* dst, half value, cons
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -2717,7 +2522,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ uint16_t* dst, uint32_t value, 
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -2727,7 +2531,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ uint32_t* dst, half value, cons
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -2737,7 +2540,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ uint32_t* dst, uint32_t value, 
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -2747,7 +2549,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ bfloat16_t* dst, bfloat16_t val
 {
     if ASC_IS_AIC {
         create_cbuf_matrix_bf16(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -2757,7 +2558,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ bfloat16_t* dst, half value, co
 {
     if ASC_IS_AIC {
         create_cbuf_matrix_h(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
@@ -2767,7 +2567,6 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ bfloat16_t* dst, uint32_t value
 {
     if ASC_IS_AIC {
         create_cbuf_matrix_ui(dst, config.config, value);
-
         asc_sync_post_process();
     }
 }
