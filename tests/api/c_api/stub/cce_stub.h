@@ -13,6 +13,42 @@
 #include "stub_fun.h"
 #include "c_api/defs/enum.h"
 
+inline void mad(
+    __cc__ float* c_matrix, __ca__ half* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t left_height, uint16_t n_dim,
+    uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{}
+
+inline void mad(
+    __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t left_height,
+    uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
+    bool c_matrix_init_val)
+{}
+
+inline void mad(
+    __cc__ float* c_matrix, __ca__ half* a_matrix, __cb__ int8_t* b_matrix, uint16_t left_height, uint16_t n_dim,
+    uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{}
+
+inline void mad(
+    __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ int8_t* b_matrix, uint16_t left_height, uint16_t n_dim,
+    uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{}
+
+inline void mad_s8s4(
+    __cc__ int32_t* c_matrix, __ca__ int8_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t left_height, uint16_t n_dim,
+    uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{}
+
+inline void mad_f16s4(
+    __cc__ float* c_matrix, __ca__ half* a_matrix, __cb__ int4b_t* b_matrix, uint16_t left_height, uint16_t n_dim,
+    uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{}
+
+inline void madbf16s4(
+    __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t left_height, uint16_t n_dim,
+    uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{}
+
 template <typename C, typename A, typename B>
 inline void mad(
     __cc__ C* c_matrix, __ca__ A* a_matrix, __cb__ B* b_matrix, uint16_t left_height, uint16_t n_dim,
@@ -21,6 +57,45 @@ inline void mad(
     mad(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, static_cast<uint8_t>(unit_flag), disable_gemv,
         c_matrix_source, c_matrix_init_val);
 }
+
+inline void mad_mx(
+    __cc__ float* c_matrix, __ca__ hif4x2_t* a_matrix, __cb__ hif4x2_t* b_matrix, uint16_t left_height, uint16_t n_dim,
+    uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{}
+
+inline void mad_mx(
+    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ hif4x2_t* b_matrix, uint16_t left_height,
+    uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
+    bool c_matrix_init_val)
+{}
+
+inline void mad_mx(
+    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp4x2_e2m1_t* b_matrix, uint16_t left_height,
+    uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
+    bool c_matrix_init_val)
+{}
+
+inline void mad_mx(
+    __cc__ float* c_matrix, __ca__ half* a_matrix, __cb__ fp4x2_e2m1_t* b_matrix, uint16_t left_height, uint16_t n_dim,
+    uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{}
+
+inline void mad_mx(
+    __cc__ float* c_matrix, __ca__ half* a_matrix, __cb__ hif4x2_t* b_matrix, uint16_t left_height, uint16_t n_dim,
+    uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{}
+
+inline void mad_mx(
+    __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ fp4x2_e2m1_t* b_matrix, uint16_t left_height,
+    uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
+    bool c_matrix_init_val)
+{}
+
+inline void mad_mx(
+    __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ hif4x2_t* b_matrix, uint16_t left_height,
+    uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
+    bool c_matrix_init_val)
+{}
 
 template <typename C, typename A, typename B>
 inline void mad_mx(
@@ -31,6 +106,96 @@ inline void mad_mx(
         c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, static_cast<uint8_t>(unit_flag), disable_gemv,
         c_matrix_source, c_matrix_init_val);
 }
+
+inline void mad_mx(
+    __cc__ float* c_matrix, uint64_t bias, __ca__ fp4x2_e1m2_t* a_matrix, uint64_t scale_a_addr,
+    __cb__ fp4x2_e1m2_t* b_matrix, uint64_t scale_b_addr, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{}
+
+inline void mad_mx(
+    __cc__ float* c_matrix, uint64_t bias, __ca__ fp4x2_e1m2_t* a_matrix, uint64_t scale_a_addr,
+    __cb__ fp4x2_e2m1_t* b_matrix, uint64_t scale_b_addr, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{}
+
+inline void mad_mx(
+    __cc__ float* c_matrix, uint64_t bias, __ca__ fp4x2_e2m1_t* a_matrix, uint64_t scale_a_addr,
+    __cb__ fp4x2_e1m2_t* b_matrix, uint64_t scale_b_addr, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{}
+
+inline void mad_mx(
+    __cc__ float* c_matrix, uint64_t bias, __ca__ fp4x2_e2m1_t* a_matrix, uint64_t scale_a_addr,
+    __cb__ fp4x2_e2m1_t* b_matrix, uint64_t scale_b_addr, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{}
+
+inline void mad_mx(
+    __cc__ float* c_matrix, uint64_t bias, __ca__ fp8_e4m3fn_t* a_matrix, uint64_t scale_a_addr,
+    __cb__ fp8_e4m3fn_t* b_matrix, uint64_t scale_b_addr, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{}
+
+inline void mad_mx(
+    __cc__ float* c_matrix, uint64_t bias, __ca__ fp8_e4m3fn_t* a_matrix, uint64_t scale_a_addr,
+    __cb__ fp8_e5m2_t* b_matrix, uint64_t scale_b_addr, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{}
+
+inline void mad_mx(
+    __cc__ float* c_matrix, uint64_t bias, __ca__ fp8_e5m2_t* a_matrix, uint64_t scale_a_addr,
+    __cb__ fp8_e4m3fn_t* b_matrix, uint64_t scale_b_addr, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{}
+
+inline void mad_mx(
+    __cc__ float* c_matrix, uint64_t bias, __ca__ hif4x2_t* a_matrix, uint64_t scale_a_addr, __cb__ hif4x2_t* b_matrix,
+    uint64_t scale_b_addr, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag,
+    bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{}
+
+inline void mad_mx(
+    __cc__ float* c_matrix, uint64_t bias, __ca__ fp8_e4m3fn_t* a_matrix, uint64_t scale_a_addr,
+    __cb__ hif4x2_t* b_matrix, uint64_t scale_b_addr, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{}
+
+inline void mad_mx(
+    __cc__ float* c_matrix, uint64_t bias, __ca__ fp8_e4m3fn_t* a_matrix, uint64_t scale_a_addr,
+    __cb__ fp4x2_e2m1_t* b_matrix, uint64_t scale_b_addr, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{}
+
+inline void mad_mx(
+    __cc__ float* c_matrix, uint64_t bias, __ca__ half* a_matrix, uint64_t scale_a_addr, __cb__ fp4x2_e2m1_t* b_matrix,
+    uint64_t scale_b_addr, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag,
+    bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{}
+
+inline void mad_mx(
+    __cc__ float* c_matrix, uint64_t bias, __ca__ half* a_matrix, uint64_t scale_a_addr, __cb__ hif4x2_t* b_matrix,
+    uint64_t scale_b_addr, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag,
+    bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{}
+
+inline void mad_mx(
+    __cc__ float* c_matrix, uint64_t bias, __ca__ bfloat16_t* a_matrix, uint64_t scale_a_addr,
+    __cb__ fp4x2_e2m1_t* b_matrix, uint64_t scale_b_addr, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{}
+
+inline void mad_mx(
+    __cc__ float* c_matrix, uint64_t bias, __ca__ bfloat16_t* a_matrix, uint64_t scale_a_addr,
+    __cb__ hif4x2_t* b_matrix, uint64_t scale_b_addr, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{}
+
+inline void mad_mx(
+    __cc__ float* c_matrix, uint64_t bias, __ca__ fp8_e5m2_t* a_matrix, uint64_t scale_a_addr,
+    __cb__ fp8_e5m2_t* b_matrix, uint64_t scale_b_addr, uint16_t left_height, uint16_t n_dim, uint16_t right_width,
+    uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{}
 
 // The compiler supports this overload, but it is missing from the CPU debug stub header.
 int64_t ld_dev(__gm__ int64_t* src, int16_t offset);
@@ -684,6 +849,84 @@ inline int64_t get_iqent(pipe_t pipe) { return 0; }
 inline void pstu(vector_store_unalign& ureg, vector_bool mask, __ubuf__ uint16_t*& dst) {}
 inline void pstu(vector_store_unalign& ureg, vector_bool mask, __ubuf__ uint32_t*& dst) {}
 #endif
+
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ uint8_t* dst_addr, __gm__ uint8_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool pre_read_ignore_sync,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool retry_mode)
+{}
+
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ int8_t* dst_addr, __gm__ int8_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool pre_read_ignore_sync,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool retry_mode)
+{}
+
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ uint16_t* dst_addr, __gm__ uint16_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool pre_read_ignore_sync,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool retry_mode)
+{}
+
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ int16_t* dst_addr, __gm__ int16_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool pre_read_ignore_sync,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool retry_mode)
+{}
+
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ uint32_t* dst_addr, __gm__ uint32_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool pre_read_ignore_sync,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool retry_mode)
+{}
+
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ int32_t* dst_addr, __gm__ int32_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool pre_read_ignore_sync,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool retry_mode)
+{}
+
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ half* dst_addr, __gm__ half* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool pre_read_ignore_sync,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool retry_mode)
+{}
+
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ float* dst_addr, __gm__ float* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool pre_read_ignore_sync,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool retry_mode)
+{}
+
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ hifloat8_t* dst_addr, __gm__ hifloat8_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool pre_read_ignore_sync,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool retry_mode)
+{}
+
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ bfloat16_t* dst_addr, __gm__ bfloat16_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool pre_read_ignore_sync,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool retry_mode)
+{}
+
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ fp8_e4m3fn_t* dst_addr, __gm__ fp8_e4m3fn_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool pre_read_ignore_sync,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool retry_mode)
+{}
+
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ fp8_e5m2_t* dst_addr, __gm__ fp8_e5m2_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool pre_read_ignore_sync,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool retry_mode)
+{}
+
+inline void copy_ubuf_to_gm_align_v2(
+    __gm__ void* dst_addr, __ubuf__ void* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len, bool reserved0,
+    bool reserved1, uint8_t reserved2, uint8_t l2_cache_mode, uint64_t burst_dst_stride, uint32_t burst_src_stride,
+    bool reserved3)
+{}
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 // asc_copy_gm2ub_impl uses void*; stub_fun.h void* overload lacks l2_cache_ctl param.
