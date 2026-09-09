@@ -24,7 +24,7 @@
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "impl/c_api/memory_base_impl/cube_compute_composite_intf_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/reg_base_impl/npu_arch_3510/cube_compute_composite_intf_impl.h"
+#include "impl/c_api/reg_base_impl/cube_compute_composite_intf_impl.h"
 #endif
 
 ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad and asc_sync)

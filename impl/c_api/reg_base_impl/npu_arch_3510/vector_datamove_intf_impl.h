@@ -8,26 +8,17 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning \
+    "impl/c_api/reg_base_impl/npu_arch_3510/vector_datamove_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
+
 #ifndef IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_VECTOR_DATAMOVE_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_VECTOR_DATAMOVE_INTF_IMPL_H
 
-#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#pragma message( \
-    "impl/c_api/reg_base_impl/npu_arch_3510/vector_datamove_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
-#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_VECTOR_DATAMOVE_INTF_IMPL_H
-#endif
-
-#include "c_api/defs/defs.h"
 #include "impl/c_api/reg_base_impl/utils_impl.h"
-#include "impl/c_api/reg_base_impl/vector_datamove_intf_impl.h"
-
-__aicore__ inline void asc_set_gm2ub_pad_impl(uint32_t pad_val)
-{
-    if ASC_IS_AIV {
-        set_pad_val_outtoub(pad_val);
-    }
-}
 
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
              "Please use enum class asc_load_l2_cache_mode instead")]]
@@ -36,9 +27,11 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode)
 {
-    asc_ndim_copy_gm2ub_impl(
-        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
-        padding_mode, cache_mode);
+    if ASC_IS_AIV {
+        nddma_out_to_ub_b8(
+            (__ubuf__ void*)dst, (__gm__ void*)src, 0, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size,
+            loop0_lp_count, loop0_rp_count, padding_mode, cache_mode);
+    }
 }
 
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
@@ -48,9 +41,11 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode)
 {
-    asc_ndim_copy_gm2ub_impl(
-        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
-        padding_mode, cache_mode);
+    if ASC_IS_AIV {
+        nddma_out_to_ub_b8(
+            (__ubuf__ void*)dst, (__gm__ void*)src, 0, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size,
+            loop0_lp_count, loop0_rp_count, padding_mode, cache_mode);
+    }
 }
 
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
@@ -60,9 +55,11 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode)
 {
-    asc_ndim_copy_gm2ub_impl(
-        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
-        padding_mode, cache_mode);
+    if ASC_IS_AIV {
+        nddma_out_to_ub_b8(
+            (__ubuf__ void*)dst, (__gm__ void*)src, 0, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size,
+            loop0_lp_count, loop0_rp_count, padding_mode, cache_mode);
+    }
 }
 
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
@@ -72,9 +69,11 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode)
 {
-    asc_ndim_copy_gm2ub_impl(
-        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
-        padding_mode, cache_mode);
+    if ASC_IS_AIV {
+        nddma_out_to_ub_b8(
+            (__ubuf__ void*)dst, (__gm__ void*)src, 0, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size,
+            loop0_lp_count, loop0_rp_count, padding_mode, cache_mode);
+    }
 }
 
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
@@ -84,9 +83,11 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode)
 {
-    asc_ndim_copy_gm2ub_impl(
-        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
-        padding_mode, cache_mode);
+    if ASC_IS_AIV {
+        nddma_out_to_ub_b8(
+            (__ubuf__ void*)dst, (__gm__ void*)src, 0, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size,
+            loop0_lp_count, loop0_rp_count, padding_mode, cache_mode);
+    }
 }
 
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
@@ -96,9 +97,11 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode)
 {
-    asc_ndim_copy_gm2ub_impl(
-        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
-        padding_mode, cache_mode);
+    if ASC_IS_AIV {
+        nddma_out_to_ub_b8(
+            (__ubuf__ void*)dst, (__gm__ void*)src, 0, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size,
+            loop0_lp_count, loop0_rp_count, padding_mode, cache_mode);
+    }
 }
 
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
@@ -108,9 +111,11 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode)
 {
-    asc_ndim_copy_gm2ub_impl(
-        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
-        padding_mode, cache_mode);
+    if ASC_IS_AIV {
+        nddma_out_to_ub_b8(
+            (__ubuf__ void*)dst, (__gm__ void*)src, 0, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size,
+            loop0_lp_count, loop0_rp_count, padding_mode, cache_mode);
+    }
 }
 
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
@@ -120,9 +125,11 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode)
 {
-    asc_ndim_copy_gm2ub_impl(
-        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
-        padding_mode, cache_mode);
+    if ASC_IS_AIV {
+        nddma_out_to_ub_b16(
+            (__ubuf__ void*)dst, (__gm__ void*)src, 0, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size,
+            loop0_lp_count, loop0_rp_count, padding_mode, cache_mode);
+    }
 }
 
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
@@ -132,9 +139,11 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode)
 {
-    asc_ndim_copy_gm2ub_impl(
-        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
-        padding_mode, cache_mode);
+    if ASC_IS_AIV {
+        nddma_out_to_ub_b16(
+            (__ubuf__ void*)dst, (__gm__ void*)src, 0, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size,
+            loop0_lp_count, loop0_rp_count, padding_mode, cache_mode);
+    }
 }
 
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
@@ -144,9 +153,11 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode)
 {
-    asc_ndim_copy_gm2ub_impl(
-        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
-        padding_mode, cache_mode);
+    if ASC_IS_AIV {
+        nddma_out_to_ub_b16(
+            (__ubuf__ void*)dst, (__gm__ void*)src, 0, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size,
+            loop0_lp_count, loop0_rp_count, padding_mode, cache_mode);
+    }
 }
 
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
@@ -156,9 +167,11 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode)
 {
-    asc_ndim_copy_gm2ub_impl(
-        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
-        padding_mode, cache_mode);
+    if ASC_IS_AIV {
+        nddma_out_to_ub_b16(
+            (__ubuf__ void*)dst, (__gm__ void*)src, 0, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size,
+            loop0_lp_count, loop0_rp_count, padding_mode, cache_mode);
+    }
 }
 
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
@@ -168,9 +181,11 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode)
 {
-    asc_ndim_copy_gm2ub_impl(
-        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
-        padding_mode, cache_mode);
+    if ASC_IS_AIV {
+        nddma_out_to_ub_b32(
+            (__ubuf__ void*)dst, (__gm__ void*)src, 0, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size,
+            loop0_lp_count, loop0_rp_count, padding_mode, cache_mode);
+    }
 }
 
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
@@ -180,9 +195,11 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode)
 {
-    asc_ndim_copy_gm2ub_impl(
-        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
-        padding_mode, cache_mode);
+    if ASC_IS_AIV {
+        nddma_out_to_ub_b32(
+            (__ubuf__ void*)dst, (__gm__ void*)src, 0, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size,
+            loop0_lp_count, loop0_rp_count, padding_mode, cache_mode);
+    }
 }
 
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
@@ -192,9 +209,11 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode)
 {
-    asc_ndim_copy_gm2ub_impl(
-        dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,
-        padding_mode, cache_mode);
+    if ASC_IS_AIV {
+        nddma_out_to_ub_b32(
+            (__ubuf__ void*)dst, (__gm__ void*)src, 0, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size,
+            loop0_lp_count, loop0_rp_count, padding_mode, cache_mode);
+    }
 }
 
 [[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
@@ -204,9 +223,11 @@ __aicore__ inline void asc_copy_gm2ub_align(
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
     uint32_t dst_stride)
 {
-    asc_copy_gm2ub_align_impl(
-        dst, src, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode,
-        src_stride, dst_stride);
+    if ASC_IS_AIV {
+        copy_gm_to_ubuf_align_v2(
+            dst, src, 0, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad,
+            l2_cache_mode, src_stride, dst_stride);
+    }
 }
 
 [[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
@@ -216,9 +237,11 @@ __aicore__ inline void asc_copy_gm2ub_align(
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
     uint32_t dst_stride)
 {
-    asc_copy_gm2ub_align_impl(
-        dst, src, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode,
-        src_stride, dst_stride);
+    if ASC_IS_AIV {
+        copy_gm_to_ubuf_align_v2(
+            dst, src, 0, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad,
+            l2_cache_mode, src_stride, dst_stride);
+    }
 }
 
 [[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
@@ -228,9 +251,11 @@ __aicore__ inline void asc_copy_gm2ub_align(
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
     uint32_t dst_stride)
 {
-    asc_copy_gm2ub_align_impl(
-        dst, src, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode,
-        src_stride, dst_stride);
+    if ASC_IS_AIV {
+        copy_gm_to_ubuf_align_v2(
+            dst, src, 0, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad,
+            l2_cache_mode, src_stride, dst_stride);
+    }
 }
 
 [[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
@@ -240,9 +265,11 @@ __aicore__ inline void asc_copy_gm2ub_align(
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
     uint32_t dst_stride)
 {
-    asc_copy_gm2ub_align_impl(
-        dst, src, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode,
-        src_stride, dst_stride);
+    if ASC_IS_AIV {
+        copy_gm_to_ubuf_align_v2(
+            dst, src, 0, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad,
+            l2_cache_mode, src_stride, dst_stride);
+    }
 }
 
 [[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
@@ -252,9 +279,11 @@ __aicore__ inline void asc_copy_gm2ub_align(
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
     uint32_t dst_stride)
 {
-    asc_copy_gm2ub_align_impl(
-        dst, src, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode,
-        src_stride, dst_stride);
+    if ASC_IS_AIV {
+        copy_gm_to_ubuf_align_v2(
+            dst, src, 0, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad,
+            l2_cache_mode, src_stride, dst_stride);
+    }
 }
 
 [[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
@@ -264,9 +293,11 @@ __aicore__ inline void asc_copy_gm2ub_align(
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
     uint32_t dst_stride)
 {
-    asc_copy_gm2ub_align_impl(
-        dst, src, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode,
-        src_stride, dst_stride);
+    if ASC_IS_AIV {
+        copy_gm_to_ubuf_align_v2(
+            dst, src, 0, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad,
+            l2_cache_mode, src_stride, dst_stride);
+    }
 }
 
 [[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
@@ -276,9 +307,11 @@ __aicore__ inline void asc_copy_gm2ub_align(
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
     uint32_t dst_stride)
 {
-    asc_copy_gm2ub_align_impl(
-        dst, src, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode,
-        src_stride, dst_stride);
+    if ASC_IS_AIV {
+        copy_gm_to_ubuf_align_v2(
+            dst, src, 0, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad,
+            l2_cache_mode, src_stride, dst_stride);
+    }
 }
 
 [[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
@@ -288,9 +321,11 @@ __aicore__ inline void asc_copy_gm2ub_align(
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
     uint32_t dst_stride)
 {
-    asc_copy_gm2ub_align_impl(
-        dst, src, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode,
-        src_stride, dst_stride);
+    if ASC_IS_AIV {
+        copy_gm_to_ubuf_align_v2(
+            dst, src, 0, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad,
+            l2_cache_mode, src_stride, dst_stride);
+    }
 }
 
 [[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
@@ -300,9 +335,11 @@ __aicore__ inline void asc_copy_gm2ub_align(
     uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode,
     uint64_t src_stride, uint32_t dst_stride)
 {
-    asc_copy_gm2ub_align_impl(
-        dst, src, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode,
-        src_stride, dst_stride);
+    if ASC_IS_AIV {
+        copy_gm_to_ubuf_align_v2(
+            dst, src, 0, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad,
+            l2_cache_mode, src_stride, dst_stride);
+    }
 }
 
 [[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
@@ -312,9 +349,11 @@ __aicore__ inline void asc_copy_gm2ub_align(
     uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode,
     uint64_t src_stride, uint32_t dst_stride)
 {
-    asc_copy_gm2ub_align_impl(
-        dst, src, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode,
-        src_stride, dst_stride);
+    if ASC_IS_AIV {
+        copy_gm_to_ubuf_align_v2(
+            dst, src, 0, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad,
+            l2_cache_mode, src_stride, dst_stride);
+    }
 }
 
 [[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
@@ -324,9 +363,11 @@ __aicore__ inline void asc_copy_gm2ub_align(
     uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode,
     uint64_t src_stride, uint32_t dst_stride)
 {
-    asc_copy_gm2ub_align_impl(
-        dst, src, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode,
-        src_stride, dst_stride);
+    if ASC_IS_AIV {
+        copy_gm_to_ubuf_align_v2(
+            dst, src, 0, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad,
+            l2_cache_mode, src_stride, dst_stride);
+    }
 }
 
 [[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
@@ -336,9 +377,11 @@ __aicore__ inline void asc_copy_gm2ub_align(
     uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode,
     uint64_t src_stride, uint32_t dst_stride)
 {
-    asc_copy_gm2ub_align_impl(
-        dst, src, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode,
-        src_stride, dst_stride);
+    if ASC_IS_AIV {
+        copy_gm_to_ubuf_align_v2(
+            dst, src, 0, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad,
+            l2_cache_mode, src_stride, dst_stride);
+    }
 }
 
 [[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
@@ -347,7 +390,10 @@ __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ uint8_t* dst, __ubuf__ uint8_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
 {
-    asc_copy_ub2gm_align_impl(dst, src, burst_count, burst_len, l2_cache_mode, dst_stride, src_stride);
+    if ASC_IS_AIV {
+        copy_ubuf_to_gm_align_v2(
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, l2_cache_mode, dst_stride, src_stride);
+    }
 }
 
 [[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
@@ -356,7 +402,10 @@ __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ int8_t* dst, __ubuf__ int8_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
 {
-    asc_copy_ub2gm_align_impl(dst, src, burst_count, burst_len, l2_cache_mode, dst_stride, src_stride);
+    if ASC_IS_AIV {
+        copy_ubuf_to_gm_align_v2(
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, l2_cache_mode, dst_stride, src_stride);
+    }
 }
 
 [[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
@@ -365,7 +414,10 @@ __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
 {
-    asc_copy_ub2gm_align_impl(dst, src, burst_count, burst_len, l2_cache_mode, dst_stride, src_stride);
+    if ASC_IS_AIV {
+        copy_ubuf_to_gm_align_v2(
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, l2_cache_mode, dst_stride, src_stride);
+    }
 }
 
 [[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
@@ -374,7 +426,10 @@ __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ int16_t* dst, __ubuf__ int16_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
 {
-    asc_copy_ub2gm_align_impl(dst, src, burst_count, burst_len, l2_cache_mode, dst_stride, src_stride);
+    if ASC_IS_AIV {
+        copy_ubuf_to_gm_align_v2(
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, l2_cache_mode, dst_stride, src_stride);
+    }
 }
 
 [[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
@@ -383,7 +438,10 @@ __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
 {
-    asc_copy_ub2gm_align_impl(dst, src, burst_count, burst_len, l2_cache_mode, dst_stride, src_stride);
+    if ASC_IS_AIV {
+        copy_ubuf_to_gm_align_v2(
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, l2_cache_mode, dst_stride, src_stride);
+    }
 }
 
 [[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
@@ -392,7 +450,10 @@ __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ int32_t* dst, __ubuf__ int32_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
 {
-    asc_copy_ub2gm_align_impl(dst, src, burst_count, burst_len, l2_cache_mode, dst_stride, src_stride);
+    if ASC_IS_AIV {
+        copy_ubuf_to_gm_align_v2(
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, l2_cache_mode, dst_stride, src_stride);
+    }
 }
 
 [[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
@@ -401,7 +462,10 @@ __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ half* dst, __ubuf__ half* src, uint32_t burst_count, uint32_t burst_len, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
 {
-    asc_copy_ub2gm_align_impl(dst, src, burst_count, burst_len, l2_cache_mode, dst_stride, src_stride);
+    if ASC_IS_AIV {
+        copy_ubuf_to_gm_align_v2(
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, l2_cache_mode, dst_stride, src_stride);
+    }
 }
 
 [[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
@@ -410,7 +474,10 @@ __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ float* dst, __ubuf__ float* src, uint32_t burst_count, uint32_t burst_len, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
 {
-    asc_copy_ub2gm_align_impl(dst, src, burst_count, burst_len, l2_cache_mode, dst_stride, src_stride);
+    if ASC_IS_AIV {
+        copy_ubuf_to_gm_align_v2(
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, l2_cache_mode, dst_stride, src_stride);
+    }
 }
 
 [[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
@@ -419,7 +486,10 @@ __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ hifloat8_t* dst, __ubuf__ hifloat8_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
 {
-    asc_copy_ub2gm_align_impl(dst, src, burst_count, burst_len, l2_cache_mode, dst_stride, src_stride);
+    if ASC_IS_AIV {
+        copy_ubuf_to_gm_align_v2(
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, l2_cache_mode, dst_stride, src_stride);
+    }
 }
 
 [[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
@@ -428,7 +498,10 @@ __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
 {
-    asc_copy_ub2gm_align_impl(dst, src, burst_count, burst_len, l2_cache_mode, dst_stride, src_stride);
+    if ASC_IS_AIV {
+        copy_ubuf_to_gm_align_v2(
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, l2_cache_mode, dst_stride, src_stride);
+    }
 }
 
 [[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
@@ -437,7 +510,10 @@ __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ fp8_e5m2_t* dst, __ubuf__ fp8_e5m2_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
 {
-    asc_copy_ub2gm_align_impl(dst, src, burst_count, burst_len, l2_cache_mode, dst_stride, src_stride);
+    if ASC_IS_AIV {
+        copy_ubuf_to_gm_align_v2(
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, l2_cache_mode, dst_stride, src_stride);
+    }
 }
 
 [[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
@@ -446,20 +522,24 @@ __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ fp8_e4m3fn_t* dst, __ubuf__ fp8_e4m3fn_t* src, uint32_t burst_count, uint32_t burst_len,
     uint8_t l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
 {
-    asc_copy_ub2gm_align_impl(dst, src, burst_count, burst_len, l2_cache_mode, dst_stride, src_stride);
+    if ASC_IS_AIV {
+        copy_ubuf_to_gm_align_v2(
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, l2_cache_mode, dst_stride, src_stride);
+    }
 }
 
-// ========== asc_set_gm2ub_pad ==========
 [[deprecated("NOTICE: asc_set_gm2ub_pad is deprecated. "
              "Please use asc_set_copy_pad_val instead for pad value setting")]] __aicore__ inline void
 asc_set_gm2ub_pad(uint32_t pad_val)
 {
-    asc_set_gm2ub_pad_impl(pad_val);
+    if ASC_IS_AIV {
+        set_pad_val_outtoub(pad_val);
+    }
 }
 
-#if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_VECTOR_DATAMOVE_INTF_IMPL_H)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_VECTOR_DATAMOVE_INTF_IMPL_H
 #endif
 
-#endif // IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_VECTOR_DATAMOVE_INTF_IMPL_H
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif

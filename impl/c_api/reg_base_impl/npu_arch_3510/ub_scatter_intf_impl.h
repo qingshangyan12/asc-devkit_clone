@@ -8,19 +8,17 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning \
+    "impl/c_api/reg_base_impl/npu_arch_3510/ub_scatter_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
+
 #ifndef IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_UB_SCATTER_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_UB_SCATTER_INTF_IMPL_H
 
-#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#pragma message( \
-    "impl/c_api/reg_base_impl/npu_arch_3510/ub_scatter_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
-#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_UB_SCATTER_INTF_IMPL_H
-#endif
-
-#include "c_api/defs/defs.h"
 #include "impl/c_api/reg_base_impl/utils_impl.h"
-#include "impl/c_api/reg_base_impl/ub_scatter_intf_impl.h"
 
 [[deprecated("NOTICE: asc_scatter(vector_int8_t& src, __ubuf__ int8_t* dst, vector_uint16_t index, vector_bool mask) "
              "is deprecated. "
@@ -28,7 +26,9 @@
              "instead.")]] __simd_callee__ inline void
 asc_scatter(vector_int8_t& src, __ubuf__ int8_t* dst, vector_uint16_t index, vector_bool mask)
 {
-    asc_scatter_impl(src, dst, index, mask);
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
 }
 
 [[deprecated("NOTICE: asc_scatter(vector_uint8_t& src, __ubuf__ uint8_t* dst, vector_uint16_t index, vector_bool mask) "
@@ -37,7 +37,9 @@ asc_scatter(vector_int8_t& src, __ubuf__ int8_t* dst, vector_uint16_t index, vec
              "mask) instead.")]] __simd_callee__ inline void
 asc_scatter(vector_uint8_t& src, __ubuf__ uint8_t* dst, vector_uint16_t index, vector_bool mask)
 {
-    asc_scatter_impl(src, dst, index, mask);
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
 }
 
 [[deprecated("NOTICE: asc_scatter(vector_int16_t& src, __ubuf__ int16_t* dst, vector_uint16_t index, vector_bool mask) "
@@ -46,7 +48,9 @@ asc_scatter(vector_uint8_t& src, __ubuf__ uint8_t* dst, vector_uint16_t index, v
              "mask) instead.")]] __simd_callee__ inline void
 asc_scatter(vector_int16_t& src, __ubuf__ int16_t* dst, vector_uint16_t index, vector_bool mask)
 {
-    asc_scatter_impl(src, dst, index, mask);
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
 }
 
 [[deprecated("NOTICE: asc_scatter(vector_uint16_t& src, __ubuf__ uint16_t* dst, vector_uint16_t index, vector_bool "
@@ -55,7 +59,9 @@ asc_scatter(vector_int16_t& src, __ubuf__ int16_t* dst, vector_uint16_t index, v
              "mask) instead.")]] __simd_callee__ inline void
 asc_scatter(vector_uint16_t& src, __ubuf__ uint16_t* dst, vector_uint16_t index, vector_bool mask)
 {
-    asc_scatter_impl(src, dst, index, mask);
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
 }
 
 [[deprecated("NOTICE: asc_scatter(vector_int32_t& src, __ubuf__ int32_t* dst, vector_uint32_t index, vector_bool mask) "
@@ -64,7 +70,9 @@ asc_scatter(vector_uint16_t& src, __ubuf__ uint16_t* dst, vector_uint16_t index,
              "mask) instead.")]] __simd_callee__ inline void
 asc_scatter(vector_int32_t& src, __ubuf__ int32_t* dst, vector_uint32_t index, vector_bool mask)
 {
-    asc_scatter_impl(src, dst, index, mask);
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
 }
 
 [[deprecated("NOTICE: asc_scatter(vector_uint32_t& src, __ubuf__ uint32_t* dst, vector_uint32_t index, vector_bool "
@@ -73,7 +81,9 @@ asc_scatter(vector_int32_t& src, __ubuf__ int32_t* dst, vector_uint32_t index, v
              "mask) instead.")]] __simd_callee__ inline void
 asc_scatter(vector_uint32_t& src, __ubuf__ uint32_t* dst, vector_uint32_t index, vector_bool mask)
 {
-    asc_scatter_impl(src, dst, index, mask);
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
 }
 
 [[deprecated("NOTICE: asc_scatter(vector_bfloat16_t& src, __ubuf__ bfloat16_t* dst, vector_uint16_t index, vector_bool "
@@ -82,7 +92,9 @@ asc_scatter(vector_uint32_t& src, __ubuf__ uint32_t* dst, vector_uint32_t index,
              "vector_bool mask) instead.")]] __simd_callee__ inline void
 asc_scatter(vector_bfloat16_t& src, __ubuf__ bfloat16_t* dst, vector_uint16_t index, vector_bool mask)
 {
-    asc_scatter_impl(src, dst, index, mask);
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
 }
 
 [[deprecated(
@@ -91,7 +103,9 @@ asc_scatter(vector_bfloat16_t& src, __ubuf__ bfloat16_t* dst, vector_uint16_t in
     "instead.")]] __simd_callee__ inline void
 asc_scatter(vector_half& src, __ubuf__ half* dst, vector_uint16_t index, vector_bool mask)
 {
-    asc_scatter_impl(src, dst, index, mask);
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
 }
 
 [[deprecated("NOTICE: asc_scatter(vector_float& src, __ubuf__ float* dst, vector_uint32_t index, vector_bool mask) is "
@@ -100,12 +114,14 @@ asc_scatter(vector_half& src, __ubuf__ half* dst, vector_uint16_t index, vector_
              "instead.")]] __simd_callee__ inline void
 asc_scatter(vector_float& src, __ubuf__ float* dst, vector_uint32_t index, vector_bool mask)
 {
-    asc_scatter_impl(src, dst, index, mask);
+    if ASC_IS_AIV {
+        vscatter(src, dst, index, mask);
+    }
 }
 
-#if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_UB_SCATTER_INTF_IMPL_H)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_UB_SCATTER_INTF_IMPL_H
 #endif
 
-#endif // IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_UB_SCATTER_INTF_IMPL_H
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif

@@ -8,75 +8,50 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning \
+    "impl/c_api/reg_base_impl/reg_histogram_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
+
 #ifndef IMPL_C_API_REG_BASE_IMPL_REG_HISTOGRAM_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_REG_HISTOGRAM_INTF_IMPL_H
 
-#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#pragma message( \
-    "impl/c_api/reg_base_impl/reg_histogram_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
-#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_REG_HISTOGRAM_INTF_IMPL_H
-#endif
-
-#include "c_api/defs/defs.h"
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
-__simd_callee__ inline void asc_cumulative_histogram_bin0_impl(
-    vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
+// ==========asc_cumulative_histogram/asc_frequency_histogram==========
+__simd_callee__ inline void asc_cumulative_histogram_bin0(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
         chistv2(dst, src, mask, Bin_N0);
     }
 }
 
-__simd_callee__ inline void asc_cumulative_histogram_bin1_impl(
-    vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
+__simd_callee__ inline void asc_cumulative_histogram_bin1(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
         chistv2(dst, src, mask, Bin_N1);
     }
 }
 
-__simd_callee__ inline void asc_frequency_histogram_bin0_impl(
-    vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
+__simd_callee__ inline void asc_frequency_histogram_bin0(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
         dhistv2(dst, src, mask, Bin_N0);
     }
 }
 
-__simd_callee__ inline void asc_frequency_histogram_bin1_impl(
-    vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
+__simd_callee__ inline void asc_frequency_histogram_bin1(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
         dhistv2(dst, src, mask, Bin_N1);
     }
 }
 
-// ==========asc_cumulative_histogram/asc_frequency_histogram==========
-__simd_callee__ inline void asc_cumulative_histogram_bin0(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
-{
-    asc_cumulative_histogram_bin0_impl(dst, src, mask);
-}
-
-__simd_callee__ inline void asc_cumulative_histogram_bin1(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
-{
-    asc_cumulative_histogram_bin1_impl(dst, src, mask);
-}
-
-__simd_callee__ inline void asc_frequency_histogram_bin0(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
-{
-    asc_frequency_histogram_bin0_impl(dst, src, mask);
-}
-
-__simd_callee__ inline void asc_frequency_histogram_bin1(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
-{
-    asc_frequency_histogram_bin1_impl(dst, src, mask);
-}
-
-#if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_REG_HISTOGRAM_INTF_IMPL_H)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_REG_HISTOGRAM_INTF_IMPL_H
 #endif
 
-#endif // IMPL_C_API_REG_BASE_IMPL_REG_HISTOGRAM_INTF_IMPL_H
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif

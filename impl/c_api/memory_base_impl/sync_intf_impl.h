@@ -8,17 +8,16 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning \
+    "impl/c_api/memory_base_impl/sync_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
+
 #ifndef IMPL_C_API_MEMORY_BASE_IMPL_SYNC_INTF_IMPL_H
 #define IMPL_C_API_MEMORY_BASE_IMPL_SYNC_INTF_IMPL_H
 
-#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#pragma message( \
-    "impl/c_api/memory_base_impl/sync_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
-#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define ASCENDC_C_API_INTERNAL_IMPL_C_API_MEMORY_BASE_IMPL_SYNC_INTF_IMPL_H
-#endif
-
-#include "c_api/defs/defs.h"
 #include "impl/c_api/memory_base_impl/utils_impl.h"
 
 __aicore__ inline void asc_sync_notify_impl_aic(pipe_t pipe, pipe_t tpipe, event_t id)
@@ -120,15 +119,6 @@ __aicore__ inline void asc_sync_notify_impl_aiv(pipe_t pipe, pipe_t tpipe, event
         } else if (tpipe == pipe_t::PIPE_MTE2) {
             set_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_MTE2, id);
         }
-    }
-}
-
-__aicore__ inline void asc_sync_notify_impl(pipe_t pipe, pipe_t tpipe, event_t id)
-{
-    if ASC_IS_AIC {
-        asc_sync_notify_impl_aic(pipe, tpipe, id);
-    } else if ASC_IS_AIV {
-        asc_sync_notify_impl_aiv(pipe, tpipe, id);
     }
 }
 
@@ -234,7 +224,34 @@ __aicore__ inline void asc_sync_wait_impl_aiv(pipe_t pipe, pipe_t tpipe, event_t
     }
 }
 
-__aicore__ inline void asc_sync_wait_impl(pipe_t pipe, pipe_t tpipe, event_t id)
+__aicore__ inline void asc_sync_vec(int id)
+{
+    set_flag(pipe_t::PIPE_V, pipe_t::PIPE_MTE2, static_cast<event_t>(id));
+    set_flag(pipe_t::PIPE_V, pipe_t::PIPE_MTE3, static_cast<event_t>(id));
+    set_flag(pipe_t::PIPE_V, pipe_t::PIPE_S, static_cast<event_t>(id));
+    wait_flag(pipe_t::PIPE_V, pipe_t::PIPE_MTE2, static_cast<event_t>(id));
+    wait_flag(pipe_t::PIPE_V, pipe_t::PIPE_MTE3, static_cast<event_t>(id));
+    wait_flag(pipe_t::PIPE_V, pipe_t::PIPE_S, static_cast<event_t>(id));
+    pipe_barrier(pipe_t::PIPE_V);
+}
+
+[[deprecated("NOTICE: asc_sync_vec() is deprecated. "
+             "Please use asc_sync() instead")]]
+__aicore__ inline void asc_sync_vec()
+{
+    pipe_barrier(pipe_t::PIPE_ALL);
+}
+
+__aicore__ inline void asc_sync_notify(pipe_t pipe, pipe_t tpipe, event_t id)
+{
+    if ASC_IS_AIC {
+        asc_sync_notify_impl_aic(pipe, tpipe, id);
+    } else if ASC_IS_AIV {
+        asc_sync_notify_impl_aiv(pipe, tpipe, id);
+    }
+}
+
+__aicore__ inline void asc_sync_wait(pipe_t pipe, pipe_t tpipe, event_t id)
 {
     if ASC_IS_AIC {
         asc_sync_wait_impl_aic(pipe, tpipe, id);
@@ -243,7 +260,7 @@ __aicore__ inline void asc_sync_wait_impl(pipe_t pipe, pipe_t tpipe, event_t id)
     }
 }
 
-__aicore__ inline void asc_sync_pipe_impl(pipe_t pipe)
+__aicore__ inline void asc_sync_pipe(pipe_t pipe)
 {
     if ASC_IS_AIC {
         if (pipe == pipe_t::PIPE_M) {
@@ -272,29 +289,7 @@ __aicore__ inline void asc_sync_pipe_impl(pipe_t pipe)
     }
 }
 
-__aicore__ inline void asc_sync_vec_impl() { pipe_barrier(pipe_t::PIPE_ALL); }
-
-__aicore__ inline void asc_sync_vec_impl(int id)
-{
-    set_flag(pipe_t::PIPE_V, pipe_t::PIPE_MTE2, static_cast<event_t>(id));
-    set_flag(pipe_t::PIPE_V, pipe_t::PIPE_MTE3, static_cast<event_t>(id));
-    set_flag(pipe_t::PIPE_V, pipe_t::PIPE_S, static_cast<event_t>(id));
-    wait_flag(pipe_t::PIPE_V, pipe_t::PIPE_MTE2, static_cast<event_t>(id));
-    wait_flag(pipe_t::PIPE_V, pipe_t::PIPE_MTE3, static_cast<event_t>(id));
-    wait_flag(pipe_t::PIPE_V, pipe_t::PIPE_S, static_cast<event_t>(id));
-    pipe_barrier(pipe_t::PIPE_V);
-}
-
-__aicore__ inline void asc_sync_mte2_impl(int id)
-{
-    set_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_MTE3, static_cast<event_t>(id));
-    set_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_V, static_cast<event_t>(id));
-    wait_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_MTE3, static_cast<event_t>(id));
-    wait_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_V, static_cast<event_t>(id));
-    pipe_barrier(pipe_t::PIPE_MTE2);
-}
-
-__aicore__ inline void asc_sync_mte3_impl(int id)
+__aicore__ inline void asc_sync_mte3(int id)
 {
     set_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_MTE2, static_cast<event_t>(id));
     set_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_V, static_cast<event_t>(id));
@@ -303,22 +298,18 @@ __aicore__ inline void asc_sync_mte3_impl(int id)
     pipe_barrier(pipe_t::PIPE_MTE3);
 }
 
-__aicore__ inline void asc_sync_impl() { pipe_barrier(pipe_t::PIPE_ALL); }
-
-__aicore__ inline void asc_sync_data_barrier_impl(mem_dsb_t arg)
+__aicore__ inline void asc_sync_mte2(int id)
 {
-    if (arg == mem_dsb_t::DSB_ALL) {
-        dsb(mem_dsb_t::DSB_ALL);
-    } else if (arg == mem_dsb_t::DSB_DDR) {
-        dsb(mem_dsb_t::DSB_DDR);
-    } else if (arg == mem_dsb_t::DSB_UB) {
-        dsb(mem_dsb_t::DSB_UB);
-    } else if (arg == mem_dsb_t::DSB_SEQ) {
-        dsb(mem_dsb_t::DSB_SEQ);
-    }
+    set_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_MTE3, static_cast<event_t>(id));
+    set_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_V, static_cast<event_t>(id));
+    wait_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_MTE3, static_cast<event_t>(id));
+    wait_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_V, static_cast<event_t>(id));
+    pipe_barrier(pipe_t::PIPE_MTE2);
 }
 
-__aicore__ inline void asc_sync_block_arrive_impl(pipe_t pipe, int64_t flag_id)
+__aicore__ inline void asc_sync() { pipe_barrier(pipe_t::PIPE_ALL); }
+
+__aicore__ inline void asc_sync_block_arrive(pipe_t pipe, int64_t flag_id)
 {
     constexpr uint16_t SYNC_MODE_SHIFT_VALUE = 4;
     constexpr uint16_t SYNC_FLAG_SHIFT_VALUE = 8;
@@ -344,33 +335,7 @@ __aicore__ inline void asc_sync_block_arrive_impl(pipe_t pipe, int64_t flag_id)
     }
 }
 
-__aicore__ inline void asc_sync_inter_arrive_impl(pipe_t pipe, int64_t flag_id)
-{
-    constexpr uint16_t SYNC_MODE_SHIFT_VALUE = 4;
-    constexpr uint16_t SYNC_FLAG_SHIFT_VALUE = 8;
-    uint16_t mode = 0x00;
-    uint64_t config = (0x1 + ((mode & 0x3) << SYNC_MODE_SHIFT_VALUE) + ((flag_id & 0xf) << SYNC_FLAG_SHIFT_VALUE));
-
-    if (pipe == pipe_t::PIPE_S) {
-        ffts_cross_core_sync(pipe_t::PIPE_S, config);
-    } else if (pipe == pipe_t::PIPE_V) {
-        ffts_cross_core_sync(pipe_t::PIPE_V, config);
-    } else if (pipe == pipe_t::PIPE_M) {
-        ffts_cross_core_sync(pipe_t::PIPE_M, config);
-    } else if (pipe == pipe_t::PIPE_MTE1) {
-        ffts_cross_core_sync(pipe_t::PIPE_MTE1, config);
-    } else if (pipe == pipe_t::PIPE_MTE2) {
-        ffts_cross_core_sync(pipe_t::PIPE_MTE2, config);
-    } else if (pipe == pipe_t::PIPE_MTE3) {
-        ffts_cross_core_sync(pipe_t::PIPE_MTE3, config);
-    } else if (pipe == pipe_t::PIPE_ALL) {
-        ffts_cross_core_sync(pipe_t::PIPE_ALL, config);
-    } else if (pipe == pipe_t::PIPE_FIX) {
-        ffts_cross_core_sync(pipe_t::PIPE_FIX, config);
-    }
-}
-
-__aicore__ inline void asc_sync_subblock_arrive_impl(pipe_t pipe, int64_t flag_id)
+__aicore__ inline void asc_sync_subblock_arrive(pipe_t pipe, int64_t flag_id)
 {
     constexpr uint16_t SYNC_MODE_SHIFT_VALUE = 4;
     constexpr uint16_t SYNC_FLAG_SHIFT_VALUE = 8;
@@ -396,62 +361,54 @@ __aicore__ inline void asc_sync_subblock_arrive_impl(pipe_t pipe, int64_t flag_i
     }
 }
 
-__aicore__ inline void asc_sync_inter_wait_impl(pipe_t pipe, int64_t flag_id) { wait_flag_dev(flag_id); }
-
-__aicore__ inline void asc_sync_block_wait_impl(pipe_t pipe, int64_t flag_id) { wait_flag_dev(flag_id); }
-
-__aicore__ inline void asc_sync_subblock_wait_impl(pipe_t pipe, int64_t flag_id) { wait_flag_dev(flag_id); }
-
-__aicore__ inline void asc_sync_vec(int id) { asc_sync_vec_impl(id); }
-
-[[deprecated("NOTICE: asc_sync_vec() is deprecated. "
-             "Please use asc_sync() instead")]]
-__aicore__ inline void asc_sync_vec()
-{
-    asc_sync_vec_impl();
-}
-
-__aicore__ inline void asc_sync_notify(pipe_t pipe, pipe_t tpipe, event_t id) { asc_sync_notify_impl(pipe, tpipe, id); }
-
-__aicore__ inline void asc_sync_wait(pipe_t pipe, pipe_t tpipe, event_t id) { asc_sync_wait_impl(pipe, tpipe, id); }
-
-__aicore__ inline void asc_sync_pipe(pipe_t pipe) { asc_sync_pipe_impl(pipe); }
-
-__aicore__ inline void asc_sync_mte3(int id) { asc_sync_mte3_impl(id); }
-
-__aicore__ inline void asc_sync_mte2(int id) { asc_sync_mte2_impl(id); }
-
-__aicore__ inline void asc_sync() { asc_sync_impl(); }
-
-__aicore__ inline void asc_sync_block_arrive(pipe_t pipe, int64_t flag_id)
-{
-    asc_sync_block_arrive_impl(pipe, flag_id);
-}
-
-__aicore__ inline void asc_sync_subblock_arrive(pipe_t pipe, int64_t flag_id)
-{
-    asc_sync_subblock_arrive_impl(pipe, flag_id);
-}
-
 __aicore__ inline void asc_sync_inter_arrive(pipe_t pipe, int64_t flag_id)
 {
-    asc_sync_inter_arrive_impl(pipe, flag_id);
+    constexpr uint16_t SYNC_MODE_SHIFT_VALUE = 4;
+    constexpr uint16_t SYNC_FLAG_SHIFT_VALUE = 8;
+    uint16_t mode = 0x00;
+    uint64_t config = (0x1 + ((mode & 0x3) << SYNC_MODE_SHIFT_VALUE) + ((flag_id & 0xf) << SYNC_FLAG_SHIFT_VALUE));
+
+    if (pipe == pipe_t::PIPE_S) {
+        ffts_cross_core_sync(pipe_t::PIPE_S, config);
+    } else if (pipe == pipe_t::PIPE_V) {
+        ffts_cross_core_sync(pipe_t::PIPE_V, config);
+    } else if (pipe == pipe_t::PIPE_M) {
+        ffts_cross_core_sync(pipe_t::PIPE_M, config);
+    } else if (pipe == pipe_t::PIPE_MTE1) {
+        ffts_cross_core_sync(pipe_t::PIPE_MTE1, config);
+    } else if (pipe == pipe_t::PIPE_MTE2) {
+        ffts_cross_core_sync(pipe_t::PIPE_MTE2, config);
+    } else if (pipe == pipe_t::PIPE_MTE3) {
+        ffts_cross_core_sync(pipe_t::PIPE_MTE3, config);
+    } else if (pipe == pipe_t::PIPE_ALL) {
+        ffts_cross_core_sync(pipe_t::PIPE_ALL, config);
+    } else if (pipe == pipe_t::PIPE_FIX) {
+        ffts_cross_core_sync(pipe_t::PIPE_FIX, config);
+    }
 }
 
-__aicore__ inline void asc_sync_data_barrier(mem_dsb_t arg) { asc_sync_data_barrier_impl(arg); }
-
-__aicore__ inline void asc_sync_subblock_wait(pipe_t pipe, int64_t flag_id)
+__aicore__ inline void asc_sync_data_barrier(mem_dsb_t arg)
 {
-    asc_sync_subblock_wait_impl(pipe, flag_id);
+    if (arg == mem_dsb_t::DSB_ALL) {
+        dsb(mem_dsb_t::DSB_ALL);
+    } else if (arg == mem_dsb_t::DSB_DDR) {
+        dsb(mem_dsb_t::DSB_DDR);
+    } else if (arg == mem_dsb_t::DSB_UB) {
+        dsb(mem_dsb_t::DSB_UB);
+    } else if (arg == mem_dsb_t::DSB_SEQ) {
+        dsb(mem_dsb_t::DSB_SEQ);
+    }
 }
 
-__aicore__ inline void asc_sync_block_wait(pipe_t pipe, int64_t flag_id) { asc_sync_block_wait_impl(pipe, flag_id); }
+__aicore__ inline void asc_sync_subblock_wait(pipe_t pipe, int64_t flag_id) { wait_flag_dev(flag_id); }
 
-__aicore__ inline void asc_sync_inter_wait(pipe_t pipe, int64_t flag_id) { asc_sync_inter_wait_impl(pipe, flag_id); }
+__aicore__ inline void asc_sync_block_wait(pipe_t pipe, int64_t flag_id) { wait_flag_dev(flag_id); }
 
-#if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_MEMORY_BASE_IMPL_SYNC_INTF_IMPL_H)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef ASCENDC_C_API_INTERNAL_IMPL_C_API_MEMORY_BASE_IMPL_SYNC_INTF_IMPL_H
+__aicore__ inline void asc_sync_inter_wait(pipe_t pipe, int64_t flag_id) { wait_flag_dev(flag_id); }
+
 #endif
 
-#endif // IMPL_C_API_MEMORY_BASE_IMPL_SYNC_INTF_IMPL_H
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif

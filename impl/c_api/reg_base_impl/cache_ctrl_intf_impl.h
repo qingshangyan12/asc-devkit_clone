@@ -8,18 +8,15 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#ifndef IMPL_C_API_REG_BASE_IMPL_CACHE_CTRL_INTF_IMPL_H
-#define IMPL_C_API_REG_BASE_IMPL_CACHE_CTRL_INTF_IMPL_H
-
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#pragma message( \
-    "impl/c_api/reg_base_impl/cache_ctrl_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
+#warning \
+    "impl/c_api/reg_base_impl/cache_ctrl_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_CACHE_CTRL_INTF_IMPL_H
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
 
-#include "c_api/defs/defs.h"
-#include "impl/c_api/reg_base_impl/utils_impl.h"
+#ifndef IMPL_C_API_REG_BASE_IMPL_CACHE_CTRL_INTF_IMPL_H
+#define IMPL_C_API_REG_BASE_IMPL_CACHE_CTRL_INTF_IMPL_H
 
 union ctrl_scalar_cache_bits {
     uint64_t value;
@@ -31,43 +28,41 @@ union ctrl_scalar_cache_bits {
     };
 };
 
-__aicore__ inline void asc_icache_preload_impl(const void* addr, int64_t prefetch_len) { preload(addr, prefetch_len); }
+namespace __asc_aicore {} // namespace __asc_aicore
 
-__aicore__ inline void asc_datacache_preload_impl(__gm__ uint64_t* address, int64_t offset)
-{
-    dc_preload(address, offset);
-}
+// Enum underlying values match HW encodings; cast is used as-is (illegal codes are not normalized).
+
+__aicore__ inline void asc_icache_preload(const void* addr, int64_t prefetch_len) { preload(addr, prefetch_len); }
+
+__aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t offset) { dc_preload(address, offset); }
 
 namespace __asc_aicore {
-__aicore__ inline void asc_dcci_single_impl(__gm__ void* dst) { dcci(dst, cache_line_t::SINGLE_CACHE_LINE); }
+__aicore__ inline void asc_dcci_single(__gm__ void* dst) { dcci(dst, cache_line_t::SINGLE_CACHE_LINE); }
 } // namespace __asc_aicore
 
-// namespace __asc_aicore
+__aicore__ inline void asc_ub_dcci_single(__ubuf__ void* dst) { dcci(dst, cache_line_t::SINGLE_CACHE_LINE); }
 
-// namespace __asc_aicore
-
-__aicore__ inline void asc_ub_dcci_single_impl(__ubuf__ void* dst) { dcci(dst, cache_line_t::SINGLE_CACHE_LINE); }
-
-__aicore__ inline void asc_dcci_entire_all_impl()
+__aicore__ inline void asc_dcci_entire_all()
 {
     dcci((__gm__ int64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_ALL);
 }
 
-__aicore__ inline void asc_dcci_entire_out_impl()
+__aicore__ inline void asc_dcci_entire_out()
 {
     dcci((__gm__ int64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
 }
 
-__aicore__ inline void asc_dcci_entire_atomic_impl()
+__aicore__ inline void asc_dcci_entire_atomic()
 {
     dcci((__gm__ int64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_ATOMIC);
 }
 
-__aicore__ inline int64_t asc_get_icache_preload_status_impl() { return get_icache_prl_st(); }
+__aicore__ inline int64_t asc_get_icache_preload_status() { return get_icache_prl_st(); }
 
-__aicore__ inline void asc_dci_impl() { dci(); }
+__aicore__ inline void asc_dci() { dci(); }
 
-__aicore__ inline void asc_set_scalar_cache_mode_impl(asc_load_l2_cache_mode l2_cache_mode)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+__aicore__ inline void asc_set_scalar_cache_mode(asc_load_l2_cache_mode l2_cache_mode)
 {
     ctrl_scalar_cache_bits ctrl;
     ctrl.value = static_cast<uint64_t>(get_ctrl());
@@ -75,7 +70,7 @@ __aicore__ inline void asc_set_scalar_cache_mode_impl(asc_load_l2_cache_mode l2_
     set_ctrl(static_cast<int64_t>(ctrl.value));
 }
 
-__aicore__ inline void asc_set_scalar_cache_mode_impl(asc_store_l2_cache_mode l2_cache_mode)
+__aicore__ inline void asc_set_scalar_cache_mode(asc_store_l2_cache_mode l2_cache_mode)
 {
     ctrl_scalar_cache_bits ctrl;
     ctrl.value = static_cast<uint64_t>(get_ctrl());
@@ -83,81 +78,25 @@ __aicore__ inline void asc_set_scalar_cache_mode_impl(asc_store_l2_cache_mode l2
     set_ctrl(static_cast<int64_t>(ctrl.value));
 }
 
-// Enum underlying values match HW encodings; cast is used as-is (illegal codes are not normalized).
-__aicore__ inline asc_load_l2_cache_mode asc_get_scalar_load_cache_mode_impl()
+//==============asc_get_scalar_load/store_cache_mode===============
+__aicore__ inline asc_load_l2_cache_mode asc_get_scalar_load_cache_mode()
 {
     constexpr uint8_t start_bit = 16; // READ mode: CTRL[19:16]
     uint8_t cache_bits = static_cast<uint8_t>((get_ctrl() >> start_bit) & 0xF);
     return static_cast<asc_load_l2_cache_mode>(cache_bits);
 }
 
-__aicore__ inline asc_store_l2_cache_mode asc_get_scalar_store_cache_mode_impl()
+__aicore__ inline asc_store_l2_cache_mode asc_get_scalar_store_cache_mode()
 {
     constexpr uint8_t start_bit = 20; // WRITE mode: CTRL[23:20]
     uint8_t cache_bits = static_cast<uint8_t>((get_ctrl() >> start_bit) & 0xF);
     return static_cast<asc_store_l2_cache_mode>(cache_bits);
 }
-
-// ==========asc_icache_preload==========
-__aicore__ inline void asc_icache_preload(const void* addr, int64_t prefetch_len)
-{
-    asc_icache_preload_impl(addr, prefetch_len);
-}
-
-__aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t offset)
-{
-    asc_datacache_preload_impl(address, offset);
-}
-
-namespace __asc_aicore {
-__aicore__ inline void asc_dcci_single(__gm__ void* dst) { asc_dcci_single_impl(dst); }
-} // namespace __asc_aicore
-
-// namespace __asc_aicore
-
-// namespace __asc_aicore
-
-__aicore__ inline void asc_ub_dcci_single(__ubuf__ void* dst) { asc_ub_dcci_single_impl(dst); }
-
-__aicore__ inline void asc_dcci_entire_all() { asc_dcci_entire_all_impl(); }
-
-__aicore__ inline void asc_dcci_entire_out() { asc_dcci_entire_out_impl(); }
-
-__aicore__ inline void asc_dcci_entire_atomic() { asc_dcci_entire_atomic_impl(); }
-
-//=========asc_get_icache_preload_status========
-__aicore__ inline int64_t asc_get_icache_preload_status() { return asc_get_icache_preload_status_impl(); }
-
-//==============asc_dci===============
-__aicore__ inline void asc_dci() { asc_dci_impl(); }
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-//==============asc_set_scalar_cache_mode===============
-__aicore__ inline void asc_set_scalar_cache_mode(asc_load_l2_cache_mode l2_cache_mode)
-{
-    asc_set_scalar_cache_mode_impl(l2_cache_mode);
-}
-
-__aicore__ inline void asc_set_scalar_cache_mode(asc_store_l2_cache_mode l2_cache_mode)
-{
-    asc_set_scalar_cache_mode_impl(l2_cache_mode);
-}
-
-//==============asc_get_scalar_load/store_cache_mode===============
-__aicore__ inline asc_load_l2_cache_mode asc_get_scalar_load_cache_mode()
-{
-    return asc_get_scalar_load_cache_mode_impl();
-}
-
-__aicore__ inline asc_store_l2_cache_mode asc_get_scalar_store_cache_mode()
-{
-    return asc_get_scalar_store_cache_mode_impl();
-}
 #endif
 
-#if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_CACHE_CTRL_INTF_IMPL_H)
+#endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_CACHE_CTRL_INTF_IMPL_H
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
-
-#endif // IMPL_C_API_REG_BASE_IMPL_CACHE_CTRL_INTF_IMPL_H

@@ -8,17 +8,16 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning \
+    "impl/c_api/reg_base_impl/reg_fused_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
+
 #ifndef IMPL_C_API_REG_BASE_IMPL_REG_FUSED_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_REG_FUSED_INTF_IMPL_H
 
-#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#pragma message( \
-    "impl/c_api/reg_base_impl/reg_fused_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
-#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_REG_FUSED_INTF_IMPL_H
-#endif
-
-#include "c_api/defs/defs.h"
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
 __simd_callee__ inline void asc_relu_impl(vector_half& dst, vector_half src, vector_bool mask)
@@ -56,42 +55,6 @@ __simd_callee__ inline void asc_abs_sub_impl(vector_float& dst, vector_float src
     }
 }
 
-__simd_callee__ inline void asc_axpy_impl(vector_half& dst, vector_half src, half value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vaxpy(dst, src, value, mask, MODE_ZEROING);
-    }
-}
-
-__simd_callee__ inline void asc_axpy_impl(vector_float& dst, vector_float src, float value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vaxpy(dst, src, value, mask, MODE_ZEROING);
-    }
-}
-
-__simd_callee__ inline void asc_madd_impl(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vmadd(dst, src0, src1, mask, MODE_ZEROING);
-    }
-}
-
-__simd_callee__ inline void asc_madd_impl(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vmadd(dst, src0, src1, mask, MODE_ZEROING);
-    }
-}
-
-__simd_callee__ inline void asc_madd_impl(
-    vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vmadd(dst, src0, src1, mask, MODE_ZEROING);
-    }
-}
-
 // asc_leakyrelu float
 __simd_callee__ inline void asc_leakyrelu_impl(vector_float& dst, vector_float src, float alpha, vector_bool mask)
 {
@@ -122,13 +85,6 @@ __simd_callee__ inline vector_half asc_leakyrelu_impl(vector_half src, half alph
     vector_half dst;
     asc_leakyrelu_impl(dst, src, alpha, mask);
     return dst;
-}
-
-__simd_callee__ inline void asc_muls_impl(vector_half& dst, vector_float src, float value, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vmulscvt(dst, src, value, mask, PART_EVEN);
-    }
 }
 
 __simd_callee__ inline void asc_mul_scalar_float2half_rn_impl(
@@ -234,60 +190,6 @@ __simd_callee__ inline vector_half asc_prelu_impl(vector_half src0, vector_half 
     return dst;
 }
 
-__simd_callee__ inline void asc_mula_impl(
-    vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vmula(dst, src0, src1, mask, MODE_ZEROING);
-    }
-}
-
-__simd_callee__ inline void asc_mula_impl(
-    vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vmula(dst, src0, src1, mask, MODE_ZEROING);
-    }
-}
-
-__simd_callee__ inline void asc_mula_impl(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vmula(dst, src0, src1, mask, MODE_ZEROING);
-    }
-}
-
-__simd_callee__ inline void asc_mula_impl(
-    vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vmula(dst, src0, src1, mask, MODE_ZEROING);
-    }
-}
-
-__simd_callee__ inline void asc_mula_impl(
-    vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vmula(dst, src0, src1, mask, MODE_ZEROING);
-    }
-}
-
-__simd_callee__ inline void asc_mula_impl(
-    vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vmula(dst, src0, src1, mask, MODE_ZEROING);
-    }
-}
-
-__simd_callee__ inline void asc_mula_impl(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vmula(dst, src0, src1, mask, MODE_ZEROING);
-    }
-}
-
 __simd_callee__ inline void asc_fma_impl(
     vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
@@ -310,38 +212,47 @@ __simd_callee__ inline void asc_fma_impl(vector_float& dst, vector_float src0, v
     }
 }
 
-// ==========asc_madd(half/float)==========
-// ==========asc_madd(half/float/bfloat16_t)==========
 __simd_callee__ inline void asc_madd(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
 {
-    asc_madd_impl(dst, src0, src1, mask);
+    if ASC_IS_AIV {
+        vmadd(dst, src0, src1, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_madd(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
 {
-    asc_madd_impl(dst, src0, src1, mask);
+    if ASC_IS_AIV {
+        vmadd(dst, src0, src1, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_madd(
     vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
-    asc_madd_impl(dst, src0, src1, mask);
+    if ASC_IS_AIV {
+        vmadd(dst, src0, src1, mask, MODE_ZEROING);
+    }
 }
 
-// ==========asc_relu(half/int32_t/float)==========
 __simd_callee__ inline void asc_relu(vector_half& dst, vector_half src, vector_bool mask)
 {
-    asc_relu_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vrelu(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_relu(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
 {
-    asc_relu_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vrelu(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_relu(vector_float& dst, vector_float src, vector_bool mask)
 {
-    asc_relu_impl(dst, src, mask);
+    if ASC_IS_AIV {
+        vrelu(dst, src, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline vector_half asc_relu(vector_half src, vector_bool mask)
@@ -365,15 +276,18 @@ __simd_callee__ inline vector_float asc_relu(vector_float src, vector_bool mask)
     return dst;
 }
 
-// ==========asc_abs_sub(half/float)==========
 __simd_callee__ inline void asc_abs_sub(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
 {
-    asc_abs_sub_impl(dst, src0, src1, mask);
+    if ASC_IS_AIV {
+        vabsdif(dst, src0, src1, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_abs_sub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
 {
-    asc_abs_sub_impl(dst, src0, src1, mask);
+    if ASC_IS_AIV {
+        vabsdif(dst, src0, src1, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline vector_half asc_abs_sub(vector_half src0, vector_half src1, vector_bool mask)
@@ -390,57 +304,71 @@ __simd_callee__ inline vector_float asc_abs_sub(vector_float src0, vector_float 
     return dst;
 }
 
-// ==========asc_axpy(half/float)==========
 __simd_callee__ inline void asc_axpy(vector_half& dst, vector_half src, half value, vector_bool mask)
 {
-    asc_axpy_impl(dst, src, value, mask);
+    if ASC_IS_AIV {
+        vaxpy(dst, src, value, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_axpy(vector_float& dst, vector_float src, float value, vector_bool mask)
 {
-    asc_axpy_impl(dst, src, value, mask);
+    if ASC_IS_AIV {
+        vaxpy(dst, src, value, mask, MODE_ZEROING);
+    }
 }
 
-//================asc_leakyrelu===================
 __simd_callee__ inline void asc_leakyrelu(vector_float& dst, vector_float src, float alpha, vector_bool mask)
 {
-    asc_leakyrelu_impl(dst, src, alpha, mask);
+    if ASC_IS_AIV {
+        vlrelu(dst, src, alpha, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_leakyrelu(vector_half& dst, vector_half src, half alpha, vector_bool mask)
 {
-    asc_leakyrelu_impl(dst, src, alpha, mask);
+    if ASC_IS_AIV {
+        vlrelu(dst, src, alpha, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline vector_float asc_leakyrelu(vector_float src, float alpha, vector_bool mask)
 {
-    return asc_leakyrelu_impl(src, alpha, mask);
+    vector_float dst;
+    asc_leakyrelu_impl(dst, src, alpha, mask);
+    return dst;
 }
 
 __simd_callee__ inline vector_half asc_leakyrelu(vector_half src, half alpha, vector_bool mask)
 {
-    return asc_leakyrelu_impl(src, alpha, mask);
+    vector_half dst;
+    asc_leakyrelu_impl(dst, src, alpha, mask);
+    return dst;
 }
 
-// ==========asc_muls==========
 __simd_callee__ inline void asc_muls(vector_half& dst, vector_float src, float value, vector_bool mask)
 {
-    asc_muls_impl(dst, src, value, mask);
+    if ASC_IS_AIV {
+        vmulscvt(dst, src, value, mask, PART_EVEN);
+    }
 }
 
-// ==========asc_mul_scalar_float2half_rn==========
 __simd_callee__ inline void asc_mul_scalar_float2half_rn(
     vector_half& dst, vector_float src, float value, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 {
-    asc_mul_scalar_float2half_rn_impl(dst, src, value, mask, dst_pos);
+    if ASC_IS_AIV {
+        vmulscvt(dst, src, value, mask, PART_EVEN);
+    }
 }
 
 __simd_callee__ inline void asc_mul_scalar_float2half_rn(
     vector_half& dst, vector_float src, float value, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 {
-    asc_mul_scalar_float2half_rn_impl(dst, src, value, mask, dst_pos);
+    if ASC_IS_AIV {
+        vmulscvt(dst, src, value, mask, PART_ODD);
+    }
 }
 
 __simd_callee__ inline vector_half asc_mul_scalar_float2half_rn(
@@ -463,102 +391,132 @@ __simd_callee__ inline vector_half asc_mul_scalar_float2half_rn(
 
 __simd_callee__ inline void asc_exp_sub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
 {
-    asc_exp_sub_impl(dst, src0, src1, mask);
+    if ASC_IS_AIV {
+        vexpdif(dst, src0, src1, mask, PART_EVEN);
+    }
 }
 
 __simd_callee__ inline vector_float asc_exp_sub(vector_float src0, vector_float src1, vector_bool mask)
 {
-    return asc_exp_sub_impl(src0, src1, mask);
+    vector_float dst;
+    asc_exp_sub_impl(dst, src0, src1, mask);
+    return dst;
 }
 
-// ==========asc_exp_sub_half2float==========
 __simd_callee__ inline void asc_exp_sub_half2float(
     vector_float& dst, vector_half src0, vector_half src1, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
 {
-    asc_exp_sub_half2float_impl(dst, src0, src1, mask, src_pos);
+    if ASC_IS_AIV {
+        vexpdif(dst, src0, src1, mask, PART_EVEN);
+    }
 }
 
 __simd_callee__ inline vector_float asc_exp_sub_half2float(
     vector_half src0, vector_half src1, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
 {
-    return asc_exp_sub_half2float_impl(src0, src1, mask, src_pos);
+    vector_float dst;
+    asc_exp_sub_half2float_impl(dst, src0, src1, mask, src_pos);
+    return dst;
 }
 
 __simd_callee__ inline void asc_exp_sub_half2float(
     vector_float& dst, vector_half src0, vector_half src1, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
 {
-    asc_exp_sub_half2float_impl(dst, src0, src1, mask, src_pos);
+    if ASC_IS_AIV {
+        vexpdif(dst, src0, src1, mask, PART_ODD);
+    }
 }
 
 __simd_callee__ inline vector_float asc_exp_sub_half2float(
     vector_half src0, vector_half src1, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
 {
-    return asc_exp_sub_half2float_impl(src0, src1, mask, src_pos);
+    vector_float dst;
+    asc_exp_sub_half2float_impl(dst, src0, src1, mask, src_pos);
+    return dst;
 }
 
-//===================asc_prelu=====================
 __simd_callee__ inline void asc_prelu(vector_float& dst, vector_float src0, vector_float alpha, vector_bool mask)
 {
-    asc_prelu_impl(dst, src0, alpha, mask);
+    if ASC_IS_AIV {
+        vprelu(dst, src0, alpha, mask, MODE_UNKNOWN);
+    }
 }
 
 __simd_callee__ inline void asc_prelu(vector_half& dst, vector_half src0, vector_half alpha, vector_bool mask)
 {
-    asc_prelu_impl(dst, src0, alpha, mask);
+    if ASC_IS_AIV {
+        vprelu(dst, src0, alpha, mask, MODE_UNKNOWN);
+    }
 }
 
 __simd_callee__ inline vector_float asc_prelu(vector_float src0, vector_float alpha, vector_bool mask)
 {
-    return asc_prelu_impl(src0, alpha, mask);
+    vector_float dst;
+    asc_prelu_impl(dst, src0, alpha, mask);
+    return dst;
 }
 
 __simd_callee__ inline vector_half asc_prelu(vector_half src0, vector_half alpha, vector_bool mask)
 {
-    return asc_prelu_impl(src0, alpha, mask);
+    vector_half dst;
+    asc_prelu_impl(dst, src0, alpha, mask);
+    return dst;
 }
 
-//=================asc_mula==================
 __simd_callee__ inline void asc_mula(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
 {
-    asc_mula_impl(dst, src0, src1, mask);
+    if ASC_IS_AIV {
+        vmula(dst, src0, src1, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_mula(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
 {
-    asc_mula_impl(dst, src0, src1, mask);
+    if ASC_IS_AIV {
+        vmula(dst, src0, src1, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_mula(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
 {
-    asc_mula_impl(dst, src0, src1, mask);
+    if ASC_IS_AIV {
+        vmula(dst, src0, src1, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_mula(
     vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
-    asc_mula_impl(dst, src0, src1, mask);
+    if ASC_IS_AIV {
+        vmula(dst, src0, src1, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_mula(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
 {
-    asc_mula_impl(dst, src0, src1, mask);
+    if ASC_IS_AIV {
+        vmula(dst, src0, src1, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_mula(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
 {
-    asc_mula_impl(dst, src0, src1, mask);
+    if ASC_IS_AIV {
+        vmula(dst, src0, src1, mask, MODE_ZEROING);
+    }
 }
 
 __simd_callee__ inline void asc_mula(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
 {
-    asc_mula_impl(dst, src0, src1, mask);
+    if ASC_IS_AIV {
+        vmula(dst, src0, src1, mask, MODE_ZEROING);
+    }
 }
 
-//=================asc_fma==================
 __simd_callee__ inline vector_half asc_fma(vector_half src0, vector_half src1, vector_half src2, vector_bool mask)
 {
     asc_fma_impl(src2, src0, src1, mask);
@@ -578,9 +536,13 @@ __simd_callee__ inline vector_float asc_fma(vector_float src0, vector_float src1
     return src2;
 }
 
-#if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_REG_FUSED_INTF_IMPL_H)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_REG_FUSED_INTF_IMPL_H
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#include "impl/c_api/reg_base_impl/npu_arch_3510/reg_fused_intf_impl.h"
 #endif
 
-#endif // IMPL_C_API_REG_BASE_IMPL_REG_FUSED_INTF_IMPL_H
+#endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif

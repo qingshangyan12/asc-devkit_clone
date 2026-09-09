@@ -26,7 +26,6 @@
 #include "impl/c_api/memory_base_impl/datamove_atomic_intf_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/reg_base_impl/datamove_atomic_intf_impl.h"
-#include "impl/c_api/reg_base_impl/npu_arch_3510/datamove_atomic_intf_impl.h"
 #endif
 
 __aicore__ inline void asc_set_atomic_add_float();

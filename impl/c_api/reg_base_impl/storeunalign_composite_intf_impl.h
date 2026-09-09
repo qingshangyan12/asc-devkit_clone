@@ -8,22 +8,21 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning \
+    "impl/c_api/reg_base_impl/storeunalign_composite_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
+
 #ifndef IMPL_C_API_REG_BASE_IMPL_STOREUNALIGN_COMPOSITE_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_STOREUNALIGN_COMPOSITE_INTF_IMPL_H
 
-#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#pragma message( \
-    "impl/c_api/reg_base_impl/storeunalign_composite_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
-#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_STOREUNALIGN_COMPOSITE_INTF_IMPL_H
-#endif
-
-#include "c_api/defs/defs.h"
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 #include "impl/c_api/reg_base_impl/storeunalign_intf_impl.h"
 #include "impl/c_api/reg_base_impl/sys_var_intf_impl.h"
 
-__simd_callee__ inline void asc_store_impl(__ubuf__ int8_t* dst, vector_int8_t src)
+__simd_callee__ inline void asc_store(__ubuf__ int8_t* dst, vector_int8_t src)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -33,7 +32,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__ int8_t* dst, vector_int8_t s
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__ uint8_t* dst, vector_uint8_t src)
+__simd_callee__ inline void asc_store(__ubuf__ uint8_t* dst, vector_uint8_t src)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -43,7 +42,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__ uint8_t* dst, vector_uint8_t
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__ int16_t* dst, vector_int16_t src)
+__simd_callee__ inline void asc_store(__ubuf__ int16_t* dst, vector_int16_t src)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -53,7 +52,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__ int16_t* dst, vector_int16_t
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__ uint16_t* dst, vector_uint16_t src)
+__simd_callee__ inline void asc_store(__ubuf__ uint16_t* dst, vector_uint16_t src)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -63,7 +62,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__ uint16_t* dst, vector_uint16
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__ int32_t* dst, vector_int32_t src)
+__simd_callee__ inline void asc_store(__ubuf__ int32_t* dst, vector_int32_t src)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -73,7 +72,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__ int32_t* dst, vector_int32_t
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__ uint32_t* dst, vector_uint32_t src)
+__simd_callee__ inline void asc_store(__ubuf__ uint32_t* dst, vector_uint32_t src)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -83,7 +82,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__ uint32_t* dst, vector_uint32
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__ half* dst, vector_half src)
+__simd_callee__ inline void asc_store(__ubuf__ half* dst, vector_half src)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -93,7 +92,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__ half* dst, vector_half src)
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__ float* dst, vector_float src)
+__simd_callee__ inline void asc_store(__ubuf__ float* dst, vector_float src)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -103,7 +102,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__ float* dst, vector_float src
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__ int64_t* dst, vector_int64_t src)
+__simd_callee__ inline void asc_store(__ubuf__ int64_t* dst, vector_int64_t src)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -113,7 +112,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__ int64_t* dst, vector_int64_t
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__ bfloat16_t* dst, vector_bfloat16_t src)
+__simd_callee__ inline void asc_store(__ubuf__ bfloat16_t* dst, vector_bfloat16_t src)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -123,7 +122,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__ bfloat16_t* dst, vector_bflo
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__ fp8_e4m3fn_t* dst, vector_fp8_e4m3fn_t src)
+__simd_callee__ inline void asc_store(__ubuf__ fp8_e4m3fn_t* dst, vector_fp8_e4m3fn_t src)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -133,7 +132,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__ fp8_e4m3fn_t* dst, vector_fp
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__ hifloat8_t* dst, vector_hifloat8_t src)
+__simd_callee__ inline void asc_store(__ubuf__ hifloat8_t* dst, vector_hifloat8_t src)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -143,7 +142,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__ hifloat8_t* dst, vector_hifl
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__ fp8_e5m2_t* dst, vector_fp8_e5m2_t src)
+__simd_callee__ inline void asc_store(__ubuf__ fp8_e5m2_t* dst, vector_fp8_e5m2_t src)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -153,7 +152,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__ fp8_e5m2_t* dst, vector_fp8_
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__ fp8_e8m0_t* dst, vector_fp8_e8m0_t src)
+__simd_callee__ inline void asc_store(__ubuf__ fp8_e8m0_t* dst, vector_fp8_e8m0_t src)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -163,7 +162,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__ fp8_e8m0_t* dst, vector_fp8_
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__ fp4x2_e2m1_t* dst, vector_fp4x2_e2m1_t src)
+__simd_callee__ inline void asc_store(__ubuf__ fp4x2_e2m1_t* dst, vector_fp4x2_e2m1_t src)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -173,7 +172,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__ fp4x2_e2m1_t* dst, vector_fp
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__ fp4x2_e1m2_t* dst, vector_fp4x2_e1m2_t src)
+__simd_callee__ inline void asc_store(__ubuf__ fp4x2_e1m2_t* dst, vector_fp4x2_e1m2_t src)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -183,7 +182,7 @@ __simd_callee__ inline void asc_store_impl(__ubuf__ fp4x2_e1m2_t* dst, vector_fp
     }
 }
 
-__simd_callee__ inline void asc_store_impl(__ubuf__ int4b_t* dst, vector_int4x2_t src)
+__simd_callee__ inline void asc_store(__ubuf__ int4b_t* dst, vector_int4x2_t src)
 {
     if ASC_IS_AIV {
         vector_store_unalign ureg;
@@ -193,284 +192,162 @@ __simd_callee__ inline void asc_store_impl(__ubuf__ int4b_t* dst, vector_int4x2_
     }
 }
 
-// asc_store(with count)
-__simd_callee__ inline void asc_store_impl(__ubuf__ int8_t* dst, vector_int8_t src, uint32_t count)
-{
-    if ASC_IS_AIV {
-        vector_store_unalign ureg;
-        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
-        asc_storeunalign_post_impl(dst, ureg, 0);
-    }
-}
-
-__simd_callee__ inline void asc_store_impl(__ubuf__ uint8_t* dst, vector_uint8_t src, uint32_t count)
-{
-    if ASC_IS_AIV {
-        vector_store_unalign ureg;
-        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
-        asc_storeunalign_post_impl(dst, ureg, 0);
-    }
-}
-
-__simd_callee__ inline void asc_store_impl(__ubuf__ int16_t* dst, vector_int16_t src, uint32_t count)
-{
-    if ASC_IS_AIV {
-        vector_store_unalign ureg;
-        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
-        asc_storeunalign_post_impl(dst, ureg, 0);
-    }
-}
-
-__simd_callee__ inline void asc_store_impl(__ubuf__ uint16_t* dst, vector_uint16_t src, uint32_t count)
-{
-    if ASC_IS_AIV {
-        vector_store_unalign ureg;
-        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
-        asc_storeunalign_post_impl(dst, ureg, 0);
-    }
-}
-
-__simd_callee__ inline void asc_store_impl(__ubuf__ int32_t* dst, vector_int32_t src, uint32_t count)
-{
-    if ASC_IS_AIV {
-        vector_store_unalign ureg;
-        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
-        asc_storeunalign_post_impl(dst, ureg, 0);
-    }
-}
-
-__simd_callee__ inline void asc_store_impl(__ubuf__ uint32_t* dst, vector_uint32_t src, uint32_t count)
-{
-    if ASC_IS_AIV {
-        vector_store_unalign ureg;
-        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
-        asc_storeunalign_post_impl(dst, ureg, 0);
-    }
-}
-
-__simd_callee__ inline void asc_store_impl(__ubuf__ half* dst, vector_half src, uint32_t count)
-{
-    if ASC_IS_AIV {
-        vector_store_unalign ureg;
-        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
-        asc_storeunalign_post_impl(dst, ureg, 0);
-    }
-}
-
-__simd_callee__ inline void asc_store_impl(__ubuf__ float* dst, vector_float src, uint32_t count)
-{
-    if ASC_IS_AIV {
-        vector_store_unalign ureg;
-        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
-        asc_storeunalign_post_impl(dst, ureg, 0);
-    }
-}
-
-__simd_callee__ inline void asc_store_impl(__ubuf__ int64_t* dst, vector_int64_t src, uint32_t count)
-{
-    if ASC_IS_AIV {
-        vector_store_unalign ureg;
-        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
-        asc_storeunalign_post_impl(dst, ureg, 0);
-    }
-}
-
-__simd_callee__ inline void asc_store_impl(__ubuf__ bfloat16_t* dst, vector_bfloat16_t src, uint32_t count)
-{
-    if ASC_IS_AIV {
-        vector_store_unalign ureg;
-        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
-        asc_storeunalign_post_impl(dst, ureg, 0);
-    }
-}
-
-__simd_callee__ inline void asc_store_impl(__ubuf__ fp8_e4m3fn_t* dst, vector_fp8_e4m3fn_t src, uint32_t count)
-{
-    if ASC_IS_AIV {
-        vector_store_unalign ureg;
-        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
-        asc_storeunalign_post_impl(dst, ureg, 0);
-    }
-}
-
-__simd_callee__ inline void asc_store_impl(__ubuf__ hifloat8_t* dst, vector_hifloat8_t src, uint32_t count)
-{
-    if ASC_IS_AIV {
-        vector_store_unalign ureg;
-        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
-        asc_storeunalign_post_impl(dst, ureg, 0);
-    }
-}
-
-__simd_callee__ inline void asc_store_impl(__ubuf__ fp8_e5m2_t* dst, vector_fp8_e5m2_t src, uint32_t count)
-{
-    if ASC_IS_AIV {
-        vector_store_unalign ureg;
-        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
-        asc_storeunalign_post_impl(dst, ureg, 0);
-    }
-}
-
-__simd_callee__ inline void asc_store_impl(__ubuf__ fp8_e8m0_t* dst, vector_fp8_e8m0_t src, uint32_t count)
-{
-    if ASC_IS_AIV {
-        vector_store_unalign ureg;
-        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
-        asc_storeunalign_post_impl(dst, ureg, 0);
-    }
-}
-
-__simd_callee__ inline void asc_store_impl(__ubuf__ fp4x2_e2m1_t* dst, vector_fp4x2_e2m1_t src, uint32_t count)
-{
-    if ASC_IS_AIV {
-        vector_store_unalign ureg;
-        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
-        asc_storeunalign_post_impl(dst, ureg, 0);
-    }
-}
-
-__simd_callee__ inline void asc_store_impl(__ubuf__ fp4x2_e1m2_t* dst, vector_fp4x2_e1m2_t src, uint32_t count)
-{
-    if ASC_IS_AIV {
-        vector_store_unalign ureg;
-        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
-        asc_storeunalign_post_impl(dst, ureg, 0);
-    }
-}
-
-__simd_callee__ inline void asc_store_impl(__ubuf__ int4b_t* dst, vector_int4x2_t src, uint32_t count)
-{
-    if ASC_IS_AIV {
-        vector_store_unalign ureg;
-        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
-        asc_storeunalign_post_impl(dst, ureg, 0);
-    }
-}
-
-//===========asc_store==================
-__simd_callee__ inline void asc_store(__ubuf__ int8_t* dst, vector_int8_t src) { asc_store_impl(dst, src); }
-
-__simd_callee__ inline void asc_store(__ubuf__ uint8_t* dst, vector_uint8_t src) { asc_store_impl(dst, src); }
-
-__simd_callee__ inline void asc_store(__ubuf__ int16_t* dst, vector_int16_t src) { asc_store_impl(dst, src); }
-
-__simd_callee__ inline void asc_store(__ubuf__ uint16_t* dst, vector_uint16_t src) { asc_store_impl(dst, src); }
-
-__simd_callee__ inline void asc_store(__ubuf__ int32_t* dst, vector_int32_t src) { asc_store_impl(dst, src); }
-
-__simd_callee__ inline void asc_store(__ubuf__ uint32_t* dst, vector_uint32_t src) { asc_store_impl(dst, src); }
-
-__simd_callee__ inline void asc_store(__ubuf__ half* dst, vector_half src) { asc_store_impl(dst, src); }
-
-__simd_callee__ inline void asc_store(__ubuf__ float* dst, vector_float src) { asc_store_impl(dst, src); }
-
-__simd_callee__ inline void asc_store(__ubuf__ int64_t* dst, vector_int64_t src) { asc_store_impl(dst, src); }
-
-__simd_callee__ inline void asc_store(__ubuf__ bfloat16_t* dst, vector_bfloat16_t src) { asc_store_impl(dst, src); }
-
-__simd_callee__ inline void asc_store(__ubuf__ fp8_e4m3fn_t* dst, vector_fp8_e4m3fn_t src) { asc_store_impl(dst, src); }
-
-__simd_callee__ inline void asc_store(__ubuf__ hifloat8_t* dst, vector_hifloat8_t src) { asc_store_impl(dst, src); }
-
-__simd_callee__ inline void asc_store(__ubuf__ fp8_e5m2_t* dst, vector_fp8_e5m2_t src) { asc_store_impl(dst, src); }
-
-__simd_callee__ inline void asc_store(__ubuf__ fp8_e8m0_t* dst, vector_fp8_e8m0_t src) { asc_store_impl(dst, src); }
-
-__simd_callee__ inline void asc_store(__ubuf__ fp4x2_e2m1_t* dst, vector_fp4x2_e2m1_t src) { asc_store_impl(dst, src); }
-
-__simd_callee__ inline void asc_store(__ubuf__ fp4x2_e1m2_t* dst, vector_fp4x2_e1m2_t src) { asc_store_impl(dst, src); }
-
-__simd_callee__ inline void asc_store(__ubuf__ int4b_t* dst, vector_int4x2_t src) { asc_store_impl(dst, src); }
-
-// ==========asc_store(with count)============
 __simd_callee__ inline void asc_store(__ubuf__ int8_t* dst, vector_int8_t src, uint32_t count)
 {
-    asc_store_impl(dst, src, count);
+    if ASC_IS_AIV {
+        vector_store_unalign ureg;
+        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
+        asc_storeunalign_post_impl(dst, ureg, 0);
+    }
 }
 
 __simd_callee__ inline void asc_store(__ubuf__ uint8_t* dst, vector_uint8_t src, uint32_t count)
 {
-    asc_store_impl(dst, src, count);
+    if ASC_IS_AIV {
+        vector_store_unalign ureg;
+        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
+        asc_storeunalign_post_impl(dst, ureg, 0);
+    }
 }
 
 __simd_callee__ inline void asc_store(__ubuf__ int16_t* dst, vector_int16_t src, uint32_t count)
 {
-    asc_store_impl(dst, src, count);
+    if ASC_IS_AIV {
+        vector_store_unalign ureg;
+        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
+        asc_storeunalign_post_impl(dst, ureg, 0);
+    }
 }
 
 __simd_callee__ inline void asc_store(__ubuf__ uint16_t* dst, vector_uint16_t src, uint32_t count)
 {
-    asc_store_impl(dst, src, count);
+    if ASC_IS_AIV {
+        vector_store_unalign ureg;
+        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
+        asc_storeunalign_post_impl(dst, ureg, 0);
+    }
 }
 
 __simd_callee__ inline void asc_store(__ubuf__ int32_t* dst, vector_int32_t src, uint32_t count)
 {
-    asc_store_impl(dst, src, count);
+    if ASC_IS_AIV {
+        vector_store_unalign ureg;
+        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
+        asc_storeunalign_post_impl(dst, ureg, 0);
+    }
 }
 
 __simd_callee__ inline void asc_store(__ubuf__ uint32_t* dst, vector_uint32_t src, uint32_t count)
 {
-    asc_store_impl(dst, src, count);
+    if ASC_IS_AIV {
+        vector_store_unalign ureg;
+        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
+        asc_storeunalign_post_impl(dst, ureg, 0);
+    }
 }
 
 __simd_callee__ inline void asc_store(__ubuf__ half* dst, vector_half src, uint32_t count)
 {
-    asc_store_impl(dst, src, count);
+    if ASC_IS_AIV {
+        vector_store_unalign ureg;
+        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
+        asc_storeunalign_post_impl(dst, ureg, 0);
+    }
 }
 
 __simd_callee__ inline void asc_store(__ubuf__ float* dst, vector_float src, uint32_t count)
 {
-    asc_store_impl(dst, src, count);
+    if ASC_IS_AIV {
+        vector_store_unalign ureg;
+        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
+        asc_storeunalign_post_impl(dst, ureg, 0);
+    }
 }
 
 __simd_callee__ inline void asc_store(__ubuf__ int64_t* dst, vector_int64_t src, uint32_t count)
 {
-    asc_store_impl(dst, src, count);
+    if ASC_IS_AIV {
+        vector_store_unalign ureg;
+        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
+        asc_storeunalign_post_impl(dst, ureg, 0);
+    }
 }
 
 __simd_callee__ inline void asc_store(__ubuf__ bfloat16_t* dst, vector_bfloat16_t src, uint32_t count)
 {
-    asc_store_impl(dst, src, count);
+    if ASC_IS_AIV {
+        vector_store_unalign ureg;
+        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
+        asc_storeunalign_post_impl(dst, ureg, 0);
+    }
 }
 
 __simd_callee__ inline void asc_store(__ubuf__ fp8_e8m0_t* dst, vector_fp8_e8m0_t src, uint32_t count)
 {
-    asc_store_impl(dst, src, count);
+    if ASC_IS_AIV {
+        vector_store_unalign ureg;
+        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
+        asc_storeunalign_post_impl(dst, ureg, 0);
+    }
 }
 
 __simd_callee__ inline void asc_store(__ubuf__ fp8_e4m3fn_t* dst, vector_fp8_e4m3fn_t src, uint32_t count)
 {
-    asc_store_impl(dst, src, count);
+    if ASC_IS_AIV {
+        vector_store_unalign ureg;
+        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
+        asc_storeunalign_post_impl(dst, ureg, 0);
+    }
 }
 
 __simd_callee__ inline void asc_store(__ubuf__ hifloat8_t* dst, vector_hifloat8_t src, uint32_t count)
 {
-    asc_store_impl(dst, src, count);
+    if ASC_IS_AIV {
+        vector_store_unalign ureg;
+        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
+        asc_storeunalign_post_impl(dst, ureg, 0);
+    }
 }
 
 __simd_callee__ inline void asc_store(__ubuf__ fp8_e5m2_t* dst, vector_fp8_e5m2_t src, uint32_t count)
 {
-    asc_store_impl(dst, src, count);
+    if ASC_IS_AIV {
+        vector_store_unalign ureg;
+        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
+        asc_storeunalign_post_impl(dst, ureg, 0);
+    }
 }
 
 __simd_callee__ inline void asc_store(__ubuf__ fp4x2_e2m1_t* dst, vector_fp4x2_e2m1_t src, uint32_t count)
 {
-    asc_store_impl(dst, src, count);
+    if ASC_IS_AIV {
+        vector_store_unalign ureg;
+        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
+        asc_storeunalign_post_impl(dst, ureg, 0);
+    }
 }
 
 __simd_callee__ inline void asc_store(__ubuf__ fp4x2_e1m2_t* dst, vector_fp4x2_e1m2_t src, uint32_t count)
 {
-    asc_store_impl(dst, src, count);
+    if ASC_IS_AIV {
+        vector_store_unalign ureg;
+        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
+        asc_storeunalign_post_impl(dst, ureg, 0);
+    }
 }
 
 __simd_callee__ inline void asc_store(__ubuf__ int4b_t* dst, vector_int4x2_t src, uint32_t count)
 {
-    asc_store_impl(dst, src, count);
+    if ASC_IS_AIV {
+        vector_store_unalign ureg;
+        asc_storeunalign_postupdate_impl(dst, ureg, src, count);
+        asc_storeunalign_post_impl(dst, ureg, 0);
+    }
 }
 
-#if defined(ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_STOREUNALIGN_COMPOSITE_INTF_IMPL_H)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_STOREUNALIGN_COMPOSITE_INTF_IMPL_H
 #endif
 
-#endif // IMPL_C_API_REG_BASE_IMPL_STOREUNALIGN_COMPOSITE_INTF_IMPL_H
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
