@@ -68,6 +68,19 @@ protected:
         GlobalMockObject::verify();                                                                             \
     }
 
+TEST_F(TEST_COPY_GM_TO_L1_ALIGN, TEST_COPY_GM_TO_L1_ALIGN_AIV_NOOP)
+{
+    g_coreType = C_API_AIV_TYPE;
+    MOCKER_CPP(copy_gm_to_cbuf_align_v2,
+        void(__cbuf__ half*, __gm__ half*, uint8_t, uint32_t, uint32_t, uint8_t, uint8_t, bool, bool, uint8_t,
+            uint64_t, uint32_t))
+        .times(0);
+
+    asc_copy_gm2l1_align(reinterpret_cast<__cbuf__ half*>(11), reinterpret_cast<__gm__ half*>(22), 33, 44, 0, 0,
+        true, false, asc_load_l2_cache_mode::NORMAL_LAST_VICTIM, 88, 99);
+    GlobalMockObject::verify();
+}
+
 // ==========asc_copy_gm2l1_align==========
 TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN(bfloat16_t);
 TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN(half);

@@ -62,6 +62,18 @@ protected:
         GlobalMockObject::verify();                                                                                 \
     }
 
+TEST_F(TEST_COPY_GM_TO_L1_DN2NZ, TEST_COPY_GM_TO_L1_DN2NZ_AIV_NOOP)
+{
+    g_coreType = C_API_AIV_TYPE;
+    MOCKER_CPP(copy_gm_to_cbuf_multi_dn2nz,
+        void(__cbuf__ half*, __gm__ half*, uint8_t, uint64_t, uint8_t, uint16_t, uint32_t, uint64_t, bool, bool))
+        .times(0);
+
+    asc_copy_gm2l1_dn2nz(reinterpret_cast<__cbuf__ half*>(11), reinterpret_cast<__gm__ half*>(22), 33,
+        asc_load_l2_cache_mode::NORMAL_LAST_VICTIM, 55, 66, 77, false, false);
+    GlobalMockObject::verify();
+}
+
 // ==========asc_copy_gm2l1_dn2nz==========
 TEST_CUBE_DATAMOVE_COPY_GM2L1_DN2NZ(bfloat16_t);
 TEST_CUBE_DATAMOVE_COPY_GM2L1_DN2NZ(half);

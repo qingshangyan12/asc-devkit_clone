@@ -85,6 +85,19 @@ TEST_F(TEST_COPY_GM_TO_L1, TEST_COPY_GM_TO_L1_ENABLE_PRE_LOAD_IGNORE_SYNC)
     GlobalMockObject::verify();
 }
 
+TEST_F(TEST_COPY_GM_TO_L1, TEST_COPY_GM_TO_L1_AIV_NOOP)
+{
+    g_coreType = C_API_AIV_TYPE;
+    MOCKER_CPP(load_gm_to_cbuf_2dv2,
+        void(__cbuf__ half*, __gm__ half*, uint32_t, uint32_t, uint16_t, uint16_t, uint16_t, uint8_t, uint8_t, bool,
+            uint8_t))
+        .times(0);
+
+    asc_copy_gm2l1(reinterpret_cast<__cbuf__ half*>(11), reinterpret_cast<__gm__ half*>(22), 33, 44, 55, 66, 77,
+        false, asc_load_l2_cache_mode::NORMAL_LAST_VICTIM);
+    GlobalMockObject::verify();
+}
+
 TEST_CUBE_DATAMOVE_COPY_GM2L1(load_gm_to_cbuf_2dv2, bfloat16_t);
 TEST_CUBE_DATAMOVE_COPY_GM2L1(load_gm_to_cbuf_2dv2, float);
 TEST_CUBE_DATAMOVE_COPY_GM2L1(load_gm_to_cbuf_2dv2, fp8_e4m3fn_t);
