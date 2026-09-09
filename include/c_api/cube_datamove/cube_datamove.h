@@ -31,7 +31,10 @@
 
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
 
-#include "impl/c_api/instr_impl/npu_arch_9201/cube_datamove_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_9201/cube_datamove_impl/asc_copy_gm2l1_align_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_9201/cube_datamove_impl/asc_copy_gm2l1_dn2nz_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_9201/cube_datamove_impl/asc_copy_gm2l1_nd2nz_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_9201/cube_datamove_impl/asc_copy_gm2l1_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl.h"
 
 #endif
