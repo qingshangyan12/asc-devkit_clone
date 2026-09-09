@@ -54,10 +54,34 @@ HcclHcommBatchTransferDesc MakeBatchReduceDesc(
     return desc;
 }
 
+bool FuseNotifyToLastWriteReduceDesc(std::vector<HcclHcommBatchTransferDesc>& transferDescs, u32 notifyIdx)
+{
+    if (transferDescs.empty()) {
+        return false;
+    }
+
+    const HcclHcommBatchTransferDesc& last = transferDescs.back();
+    if (last.transType != HCCL_HCOMM_TRANSFER_TYPE_WRITE_REDUCE) {
+        return false;
+    }
+
+    HcclHcommBatchTransferDesc fusedDesc = {};
+    fusedDesc.transType = HCCL_HCOMM_TRANSFER_TYPE_WRITE_REDUCE_WITH_NOTIFY;
+    fusedDesc.transferInfo.writeReduceWithNotify.count = last.transferInfo.reduce.count;
+    fusedDesc.transferInfo.writeReduceWithNotify.dst = last.transferInfo.reduce.dst;
+    fusedDesc.transferInfo.writeReduceWithNotify.src = last.transferInfo.reduce.src;
+    fusedDesc.transferInfo.writeReduceWithNotify.reduceOp = last.transferInfo.reduce.reduceOp;
+    fusedDesc.transferInfo.writeReduceWithNotify.dataType = last.transferInfo.reduce.dataType;
+    fusedDesc.transferInfo.writeReduceWithNotify.notifyIdx = notifyIdx;
+    transferDescs.back() = fusedDesc;
+    return true;
+}
+
 template <typename ProcessSliceFunc>
 HcclResult RunBatchTransfer(
     const ThreadHandle& thread, const ChannelInfo& channel, const std::vector<DataSlice>& srcSlices,
-    const std::vector<DataSlice>& dstSlices, const char* funcName, ProcessSliceFunc processSlice)
+    const std::vector<DataSlice>& dstSlices, const char* funcName, ProcessSliceFunc processSlice,
+    bool fusePostNotify = false, u32 notifyIdx = 0, bool* notifyFused = nullptr)
 {
     CHK_PRT_RET(
         srcSlices.size() != dstSlices.size(),
@@ -78,6 +102,10 @@ HcclResult RunBatchTransfer(
         CHK_RET(processSlice(srcSlice, dstSlice, transferDescs));
     }
 
+    if (fusePostNotify && notifyFused != nullptr) {
+        *notifyFused = FuseNotifyToLastWriteReduceDesc(transferDescs, notifyIdx);
+    }
+
     if (!transferDescs.empty()) {
         HCCL_DEBUG(
             "[MC2_BATCH_TRANSFER][Run] func[%s], descNum[%zu], channelHandle[%llu].", funcName, transferDescs.size(),
@@ -88,10 +116,26 @@ HcclResult RunBatchTransfer(
     return HCCL_SUCCESS;
 }
 
+template <typename ProcessSliceFunc>
+HcclResult RunBatchTransferAndNotify(
+    const ThreadHandle& thread, const ChannelInfo& channel, const std::vector<DataSlice>& srcSlices,
+    const std::vector<DataSlice>& dstSlices, const char* funcName, ProcessSliceFunc processSlice, bool fusePostNotify)
+{
+    bool notifyFused = false;
+    CHK_RET(RunBatchTransfer(
+        thread, channel, srcSlices, dstSlices, funcName, processSlice, fusePostNotify, NOTIFY_IDX_DATA_SIGNAL,
+        &notifyFused));
+    if (!notifyFused) {
+        CHK_RET(static_cast<HcclResult>(
+            HcommChannelNotifyRecordOnThread(thread, channel.handle, NOTIFY_IDX_DATA_SIGNAL)));
+    }
+    return HCCL_SUCCESS;
+}
+
 template <typename SendRecvInfoType, typename ProcessSliceFunc, typename FallbackFunc>
 HcclResult DoSendRecvBatchTx(
     const SendRecvInfoType& sendRecvInfo, const ThreadHandle& thread, const char* funcName,
-    ProcessSliceFunc processSlice, FallbackFunc fallback)
+    ProcessSliceFunc processSlice, FallbackFunc fallback, bool fusePostNotify = false)
 {
     if (!IsHcommBatchTransferOnThreadSupported()) {
         return fallback(sendRecvInfo, thread);
@@ -103,9 +147,8 @@ HcclResult DoSendRecvBatchTx(
     CHK_RET(static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, recvChannel.handle, NOTIFY_IDX_ACK)));
     CHK_RET(static_cast<HcclResult>(
         HcommChannelNotifyWaitOnThread(thread, sendChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
-    CHK_RET(RunBatchTransfer(thread, sendChannel, srcSlices, dstSlices, funcName, processSlice));
-    CHK_RET(
-        static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
+    CHK_RET(RunBatchTransferAndNotify(
+        thread, sendChannel, srcSlices, dstSlices, funcName, processSlice, fusePostNotify));
     CHK_RET(static_cast<HcclResult>(
         HcommChannelNotifyWaitOnThread(thread, recvChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
     return HCCL_SUCCESS;
@@ -114,7 +157,7 @@ HcclResult DoSendRecvBatchTx(
 template <typename DataInfoType, typename ProcessSliceFunc, typename FallbackFunc>
 HcclResult DoSendBatchTx(
     const DataInfoType& sendInfo, const ThreadHandle& thread, const char* funcName, ProcessSliceFunc processSlice,
-    FallbackFunc fallback)
+    FallbackFunc fallback, bool fusePostNotify = false)
 {
     if (!IsHcommBatchTransferOnThreadSupported()) {
         return fallback(sendInfo, thread);
@@ -124,9 +167,8 @@ HcclResult DoSendBatchTx(
     const ChannelInfo& sendChannel = sendInfo.channel_;
     CHK_RET(static_cast<HcclResult>(
         HcommChannelNotifyWaitOnThread(thread, sendChannel.handle, NOTIFY_IDX_ACK, CUSTOM_TIMEOUT)));
-    CHK_RET(RunBatchTransfer(thread, sendChannel, srcSlices, dstSlices, funcName, processSlice));
-    CHK_RET(
-        static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
+    CHK_RET(RunBatchTransferAndNotify(
+        thread, sendChannel, srcSlices, dstSlices, funcName, processSlice, fusePostNotify));
     return HCCL_SUCCESS;
 }
 
@@ -355,7 +397,7 @@ HcclResult SendBatchWriteReduce(const DataReduceInfo& sendInfo, const ThreadHand
             sendInfo.dataType_, sendInfo.reduceType_));
         return HCCL_SUCCESS;
     };
-    return DoSendBatchTx(sendInfo, thread, "SendBatchWriteReduce", processSlice, SendWriteReduce);
+    return DoSendBatchTx(sendInfo, thread, "SendBatchWriteReduce", processSlice, SendWriteReduce, true);
 }
 
 HcclResult RecvWriteReduce(const DataReduceInfo& recvInfo, const ThreadHandle& thread)
@@ -441,7 +483,8 @@ HcclResult SendRecvBatchWriteReduce(const SendRecvReduceInfo& sendRecvInfo, cons
             sendRecvInfo.dataType_, sendRecvInfo.reduceType_));
         return HCCL_SUCCESS;
     };
-    return DoSendRecvBatchTx(sendRecvInfo, thread, "SendRecvBatchWriteReduce", processSlice, SendRecvWriteReduce);
+    return DoSendRecvBatchTx(
+        sendRecvInfo, thread, "SendRecvBatchWriteReduce", processSlice, SendRecvWriteReduce, true);
 }
 
 HcclResult SendRead(const DataInfo& sendInfo, const ThreadHandle& thread)
