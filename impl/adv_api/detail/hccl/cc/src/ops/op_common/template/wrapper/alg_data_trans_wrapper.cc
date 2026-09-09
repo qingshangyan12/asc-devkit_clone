@@ -25,6 +25,23 @@ std::atomic<int> g_hcommBatchTransferSupportState{HCOMM_BATCH_TRANSFER_UNINIT};
 
 void* GetSliceAddr(const DataSlice& slice) { return static_cast<void*>(static_cast<s8*>(slice.addr_) + slice.offset_); }
 
+void TraceDataSlice(
+    const char* funcName, const char* transType, u32 sliceIdx, u32 sliceNum, const DataSlice& srcSlice,
+    const DataSlice& dstSlice, const void* src, const void* dst, u64 len, HcclDataType dataType,
+    HcclReduceOp reduceOp)
+{
+    HCCL_DEBUG(
+        "[AlgDataTransWrapper][%s][%s] sliceIdx[%u], sliceNum[%u], srcBase[%p], "
+        "srcOffset[%llu], srcAddr[%p], srcSize[%llu], srcCount[%llu], dstBase[%p], "
+        "dstOffset[%llu], dstAddr[%p], dstSize[%llu], dstCount[%llu], len[%llu], "
+        "dataType[%d], reduceOp[%d].",
+        funcName, transType, sliceIdx, sliceNum, srcSlice.addr_, static_cast<unsigned long long>(srcSlice.offset_),
+        src, static_cast<unsigned long long>(srcSlice.size_), static_cast<unsigned long long>(srcSlice.count_),
+        dstSlice.addr_, static_cast<unsigned long long>(dstSlice.offset_), dst,
+        static_cast<unsigned long long>(dstSlice.size_), static_cast<unsigned long long>(dstSlice.count_),
+        static_cast<unsigned long long>(len), static_cast<int>(dataType), static_cast<int>(reduceOp));
+}
+
 HcclHcommBatchTransferDesc MakeBatchTransDesc(HcclHcommTransferType transType, void* dst, void* src, u64 len)
 {
     HcclHcommBatchTransferDesc desc = {};
@@ -88,14 +105,15 @@ HcclResult RunBatchTransfer(
 
     std::vector<HcclHcommBatchTransferDesc> transferDescs;
     transferDescs.reserve(srcSlices.size());
-    for (size_t i = 0; i < srcSlices.size(); ++i) {
+    const u32 repeatNum = static_cast<u32>(srcSlices.size());
+    for (u32 i = 0; i < repeatNum; ++i) {
         const DataSlice& srcSlice = srcSlices[i];
         const DataSlice& dstSlice = dstSlices[i];
         if (srcSlice.size_ == 0) {
             HCCL_WARNING("[AlgDataTransWrapper] %s: size is 0.", funcName);
             continue;
         }
-        CHK_RET(processSlice(srcSlice, dstSlice, transferDescs));
+        CHK_RET(processSlice(i, srcSlice, dstSlice, transferDescs, repeatNum));
     }
 
     const bool fused = fusePostNotify && FuseNotifyToLastWriteReduceDesc(transferDescs);
@@ -297,8 +315,8 @@ HcclResult SendRecvWrite(const SendRecvInfo& sendRecvInfo, const ThreadHandle& t
 
 HcclResult SendBatchWrite(const DataInfo& sendInfo, const ThreadHandle& thread)
 {
-    auto processSlice = [](const DataSlice& srcSlice, const DataSlice& dstSlice,
-                           std::vector<HcclHcommBatchTransferDesc>& transferDescs) -> HcclResult {
+    auto processSlice = [](u32, const DataSlice& srcSlice, const DataSlice& dstSlice,
+                           std::vector<HcclHcommBatchTransferDesc>& transferDescs, u32) -> HcclResult {
         transferDescs.push_back(MakeBatchTransDesc(
             HCCL_HCOMM_TRANSFER_TYPE_WRITE, GetSliceAddr(dstSlice), GetSliceAddr(srcSlice), srcSlice.size_));
         return HCCL_SUCCESS;
@@ -308,8 +326,8 @@ HcclResult SendBatchWrite(const DataInfo& sendInfo, const ThreadHandle& thread)
 
 HcclResult SendRecvBatchWrite(const SendRecvInfo& sendRecvInfo, const ThreadHandle& thread)
 {
-    auto processSlice = [](const DataSlice& srcSlice, const DataSlice& dstSlice,
-                           std::vector<HcclHcommBatchTransferDesc>& transferDescs) -> HcclResult {
+    auto processSlice = [](u32, const DataSlice& srcSlice, const DataSlice& dstSlice,
+                           std::vector<HcclHcommBatchTransferDesc>& transferDescs, u32) -> HcclResult {
         transferDescs.push_back(MakeBatchTransDesc(
             HCCL_HCOMM_TRANSFER_TYPE_WRITE, GetSliceAddr(dstSlice), GetSliceAddr(srcSlice), srcSlice.size_));
         return HCCL_SUCCESS;
@@ -360,8 +378,8 @@ HcclResult SendWriteReduce(const DataReduceInfo& sendInfo, const ThreadHandle& t
 HcclResult SendBatchWriteReduce(const DataReduceInfo& sendInfo, const ThreadHandle& thread)
 {
     auto processSlice = [&sendInfo](
-                            const DataSlice& srcSlice, const DataSlice& dstSlice,
-                            std::vector<HcclHcommBatchTransferDesc>& transferDescs) -> HcclResult {
+                            u32, const DataSlice& srcSlice, const DataSlice& dstSlice,
+                            std::vector<HcclHcommBatchTransferDesc>& transferDescs, u32) -> HcclResult {
         CHK_PRT_RET(
             srcSlice.count_ * DATATYPE_SIZE_TABLE[sendInfo.dataType_] != srcSlice.size_,
             HCCL_ERROR(
@@ -447,8 +465,8 @@ HcclResult SendRecvBatchWriteReduce(
     const SendRecvReduceInfo& sendRecvInfo, const ThreadHandle& thread, bool fusePostNotify)
 {
     auto processSlice = [&sendRecvInfo](
-                            const DataSlice& srcSlice, const DataSlice& dstSlice,
-                            std::vector<HcclHcommBatchTransferDesc>& transferDescs) -> HcclResult {
+                            u32 sliceIdx, const DataSlice& srcSlice, const DataSlice& dstSlice,
+                            std::vector<HcclHcommBatchTransferDesc>& transferDescs, u32 repeatNum) -> HcclResult {
         CHK_PRT_RET(
             srcSlice.count_ * DATATYPE_SIZE_TABLE[sendRecvInfo.dataType_] != srcSlice.size_,
             HCCL_ERROR(
@@ -465,8 +483,14 @@ HcclResult SendRecvBatchWriteReduce(
                 static_cast<unsigned long long>(dstSlice.count_), static_cast<unsigned long long>(dstSlice.size_),
                 sendRecvInfo.dataType_),
             HCCL_E_INTERNAL);
+        void* dst = GetSliceAddr(dstSlice);
+        void* src = GetSliceAddr(srcSlice);
+        TraceDataSlice(
+            "SendRecvBatchWriteReduce", "BATCH_WRITE_REDUCE", sliceIdx, repeatNum, srcSlice, dstSlice, src, dst,
+            srcSlice.count_ * DATATYPE_SIZE_TABLE[sendRecvInfo.dataType_], sendRecvInfo.dataType_,
+            sendRecvInfo.reduceType_);
         transferDescs.push_back(MakeBatchReduceDesc(
-            HCCL_HCOMM_TRANSFER_TYPE_WRITE_REDUCE, GetSliceAddr(dstSlice), GetSliceAddr(srcSlice), srcSlice.count_,
+            HCCL_HCOMM_TRANSFER_TYPE_WRITE_REDUCE, dst, src, srcSlice.count_,
             sendRecvInfo.dataType_, sendRecvInfo.reduceType_));
         return HCCL_SUCCESS;
     };
@@ -509,8 +533,8 @@ HcclResult RecvRead(const DataInfo& recvInfo, const ThreadHandle& thread)
 
 HcclResult RecvBatchRead(const DataInfo& recvInfo, const ThreadHandle& thread)
 {
-    auto processSlice = [](const DataSlice& srcSlice, const DataSlice& dstSlice,
-                           std::vector<HcclHcommBatchTransferDesc>& transferDescs) -> HcclResult {
+    auto processSlice = [](u32, const DataSlice& srcSlice, const DataSlice& dstSlice,
+                           std::vector<HcclHcommBatchTransferDesc>& transferDescs, u32) -> HcclResult {
         transferDescs.push_back(MakeBatchTransDesc(
             HCCL_HCOMM_TRANSFER_TYPE_READ, GetSliceAddr(dstSlice), GetSliceAddr(srcSlice), srcSlice.size_));
         return HCCL_SUCCESS;
@@ -552,8 +576,8 @@ HcclResult SendRecvRead(const SendRecvInfo& sendRecvInfo, const ThreadHandle& th
 
 HcclResult SendRecvBatchRead(const SendRecvInfo& sendRecvInfo, const ThreadHandle& thread)
 {
-    auto processSlice = [](const DataSlice& srcSlice, const DataSlice& dstSlice,
-                           std::vector<HcclHcommBatchTransferDesc>& transferDescs) -> HcclResult {
+    auto processSlice = [](u32, const DataSlice& srcSlice, const DataSlice& dstSlice,
+                           std::vector<HcclHcommBatchTransferDesc>& transferDescs, u32) -> HcclResult {
         transferDescs.push_back(MakeBatchTransDesc(
             HCCL_HCOMM_TRANSFER_TYPE_READ, GetSliceAddr(dstSlice), GetSliceAddr(srcSlice), srcSlice.size_));
         return HCCL_SUCCESS;
@@ -613,8 +637,8 @@ HcclResult RecvReadReduce(const DataReduceInfo& recvInfo, const ThreadHandle& th
 HcclResult RecvBatchReadReduce(const DataReduceInfo& recvInfo, const ThreadHandle& thread)
 {
     auto processSlice = [&recvInfo](
-                            const DataSlice& srcSlice, const DataSlice& dstSlice,
-                            std::vector<HcclHcommBatchTransferDesc>& transferDescs) -> HcclResult {
+                            u32, const DataSlice& srcSlice, const DataSlice& dstSlice,
+                            std::vector<HcclHcommBatchTransferDesc>& transferDescs, u32) -> HcclResult {
         CHK_PRT_RET(
             srcSlice.count_ * DATATYPE_SIZE_TABLE[recvInfo.dataType_] != srcSlice.size_,
             HCCL_ERROR(
@@ -690,8 +714,8 @@ HcclResult SendRecvReadReduce(const SendRecvReduceInfo& sendRecvInfo, const Thre
 HcclResult SendRecvBatchReadReduce(const SendRecvReduceInfo& sendRecvInfo, const ThreadHandle& thread)
 {
     auto processSlice = [&sendRecvInfo](
-                            const DataSlice& srcSlice, const DataSlice& dstSlice,
-                            std::vector<HcclHcommBatchTransferDesc>& transferDescs) -> HcclResult {
+                            u32, const DataSlice& srcSlice, const DataSlice& dstSlice,
+                            std::vector<HcclHcommBatchTransferDesc>& transferDescs, u32) -> HcclResult {
         CHK_PRT_RET(
             srcSlice.count_ * DATATYPE_SIZE_TABLE[sendRecvInfo.dataType_] != srcSlice.size_,
             HCCL_ERROR(
