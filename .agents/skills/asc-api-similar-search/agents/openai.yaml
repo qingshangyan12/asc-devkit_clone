@@ -1,0 +1,4 @@
+interface:
+  display_name: "Asc API Similar Search"
+  short_description: "Find related AscendC APIs from evidence-backed tag indexes."
+  default_prompt: "Find APIs similar to the specified AscendC API."
