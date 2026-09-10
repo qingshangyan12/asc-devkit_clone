@@ -56,8 +56,10 @@ struct KfcReduceScatterNhrContext : CcuKernelCtxBase {
 
 CcuResult InitResource(KfcReduceScatterNhrContext& ctx)
 {
+    // rank2ChannelIdx 为"每 peer 首条通道"模型（同 peer 多条 CLOS 链路时 size < channelCount，
+    // 多余通道仅参与 PreSync/PostSync 变量交换，不参与 stepInfo 寻址），故只校验非空。
     if (ctx.rankSize == 0U || ctx.rankId >= ctx.rankSize || ctx.channelCount == 0U || ctx.rank2ChannelIdx == nullptr ||
-        ctx.rank2ChannelIdx->size() != ctx.channelCount || ctx.jettyNum == 0U) {
+        ctx.rank2ChannelIdx->empty() || ctx.jettyNum == 0U) {
         HCCL_ERROR(
             "[CcuKfcReduceScatterNHR] invalid resource, rankSize[%u], rankId[%u], channels[%u], jetty[%u]",
             ctx.rankSize, ctx.rankId, ctx.channelCount, ctx.jettyNum);
