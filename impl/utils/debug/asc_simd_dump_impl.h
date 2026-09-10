@@ -189,7 +189,6 @@ __simd_callee__ inline void asc_dump(__ubuf__ T* input, uint32_t desc, uint32_t 
 
 #else
 
-#include <cassert>
 
 namespace __asc_simd_vf {
 template <typename T, typename U>
