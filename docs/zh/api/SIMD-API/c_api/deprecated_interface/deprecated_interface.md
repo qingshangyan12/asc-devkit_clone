@@ -11,19 +11,14 @@
 - **[asc_abs_sync（废弃）](asc_abs_sync_deprecated.md)**
 - **[asc_transto5hd_sync（废弃）](asc_transto5hd_sync_deprecated.md)**
 
-## 矢量数据搬运
+## Memory数据搬运
 
 - **[asc_copy_gm2ub_align_arch_3510（废弃）](asc_copy_gm2ub_align_arch_3510_deprecated.md)**
-- **[asc_copy_gm2ub_align_sync_arch_2201（废弃）](asc_copy_gm2ub_align_sync_arch_2201_deprecated.md)**
-- **[asc_copy_gm2ub_sync_arch_2201（废弃）](asc_copy_gm2ub_sync_arch_2201_deprecated.md)**
-- **[asc_copy_gm2ub_sync_arch_3510（废弃）](asc_copy_gm2ub_sync_arch_3510_deprecated.md)**
 - **[asc_copy_ub2gm_align_arch_3510（废弃）](asc_copy_ub2gm_align_arch_3510_deprecated.md)**
-- **[asc_copy_ub2gm_align_sync_arch_2201（废弃）](asc_copy_ub2gm_align_sync_arch_2201_deprecated.md)**
-- **[asc_copy_ub2gm_sync_arch_2201（废弃）](asc_copy_ub2gm_sync_arch_2201_deprecated.md)**
-- **[asc_copy_ub2gm_sync_arch_3510（废弃）](asc_copy_ub2gm_sync_arch_3510_deprecated.md)**
-- **[asc_copy_ub2l1_sync（废弃）](asc_copy_ub2l1_deprecated.md)**
-- **[asc_copy_ub2ub_sync（废弃）](asc_copy_ub2ub_deprecated.md)**
+- **[asc_copy_ub2l1（废弃）](asc_copy_ub2l1_deprecated.md)**
+- **[asc_copy_ub2ub（废弃）](asc_copy_ub2ub_deprecated.md)**
 - **[asc_ndim_copy_gm2ub（废弃）](asc_ndim_copy_gm2ub_deprecated.md)**
+- **[asc_set_gm2ub_pad（废弃）](asc_set_gm2ub_pad_deprecated.md)**
 
 ## Reg矢量计算
 
@@ -114,10 +109,6 @@
 - **[asc_uint82half（废弃）](asc_uint82half_deprecated.md)**
 - **[asc_uint82uint16（废弃）](asc_uint82uint16_deprecated.md)**
 - **[asc_uint82uint32（废弃）](asc_uint82uint32_deprecated.md)**
-
-## 矢量数据搬运
-
-- **[asc_set_gm2ub_pad（废弃）](asc_set_gm2ub_pad_deprecated.md)**
 
 ## 原子操作
 
