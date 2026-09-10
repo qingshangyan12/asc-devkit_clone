@@ -40,7 +40,8 @@ class MatmulScheduler<
     IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, POLICY_TYPE,
     enable_if_t<
         DoMatmulMDL(MM_CFG) && POLICY_TYPE != PolicyType::MATMUL_NBUFFER_33 && !isMxMatmul<A_TYPE, B_TYPE> &&
-        !ToMatmulConfig(MM_CFG).isPartialOutput && !(IsAFullLoad(MM_CFG) || IsBFullLoad(MM_CFG))>>
+        !isOnlyScaleBMxMatmul<A_TYPE, B_TYPE> && !ToMatmulConfig(MM_CFG).isPartialOutput &&
+        !(IsAFullLoad(MM_CFG) || IsBFullLoad(MM_CFG))>>
     : public MatmulMDLSchedulerCommon<IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, POLICY_TYPE> {
     MATMUL_USE_MODULE(BiasScheduler);
     MATMUL_USE_MODULE(CubeOutBuffer);
