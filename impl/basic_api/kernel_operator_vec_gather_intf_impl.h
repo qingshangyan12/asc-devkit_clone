@@ -247,7 +247,7 @@ __aicore__ inline void Gather(
  * @param [in] gatherParam gather parameters, including offsetNum, burstLen and dstStride
  * @param [in] gatherPadParam gather pad parameters, including padSel and paddingValue
  */
-template <typename T, typename U = int32_t>
+template <typename T, typename U>
 __aicore__ inline void GatherFromGlobal(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LocalTensor<U>& offsetSrc,
     GatherParams& gatherParam, GatherPadParams<T>& gatherPadParam)
