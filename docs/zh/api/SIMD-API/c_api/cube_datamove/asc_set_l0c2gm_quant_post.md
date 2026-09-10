@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_l0c2gm_quant_post"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c2gm_quant_post.md"
+description: "对QUANT_POST寄存器中的值进行设置, QUANT_POST是一个64bit的寄存器，存储Fixpipe后处理阶段量化信息。"
+tag: [c_api, data_movement_configuration, post_update]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_l0c2gm_quant_post__u64"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_l0c2gm_quant_post
 
 ## 产品支持情况
@@ -44,6 +61,14 @@
 
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_set_l0c2gm_quant_post__u64"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
 
 ```cpp
 __aicore__ inline void asc_set_l0c2gm_quant_post(uint64_t config)

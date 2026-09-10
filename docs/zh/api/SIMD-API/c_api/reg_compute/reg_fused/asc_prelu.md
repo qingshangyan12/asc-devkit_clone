@@ -1,3 +1,24 @@
+---
+okftype: reference.api.cpp
+title: "asc_prelu"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_prelu.md"
+description: "根据掩码对源操作数矢量数据寄存器`src0`中的元素执行PReLU（Parametric ReLU）运算，负半轴斜率由矢量数据寄存器`alpha`中的对应元素指定，并将结果通过函数返回值返回或写入目的操作数矢量数据寄存器。`src0`大于0时直接写入输出结果，否则将`src0`与`alpha`相乘后写入输出结果。掩码对应位置为1的元素参与计算，为0的元素在输出结果中置零。"
+tag: [c_api, compute, arithmetic, prelu, mask, vector, register_vector, masked]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_prelu__v<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_fused.h"
+  - prototype_id: "asc_prelu__Rv<dtype>_v<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_fused.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_prelu
 
 ## 产品支持情况
@@ -41,11 +62,38 @@ $$
 
 ## 函数原型
 
+```yaml
+api_signature:
+  prototype_id: "asc_prelu__v<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_fused.h"
+  dtype:
+    values:
+      - "half"
+      - "float"
+```
+
 ```c
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_prelu(vector_<dtype> src0,
                                                 vector_<dtype> alpha,
                                                 vector_bool mask)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_prelu__Rv<dtype>_v<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_fused.h"
+  dtype:
+    values:
+      - "half"
+      - "float"
+```
+
+```c
 
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_prelu(vector_<dtype>& dst,

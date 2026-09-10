@@ -1,3 +1,29 @@
+---
+okftype: reference.api.cpp
+title: "asc_storeunalign_postupdate"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_postupdate.md"
+description: "将矢量数据寄存器或掩码寄存器中的数据连续搬出到非32字节对齐的Unified Buffer（UB）地址，启用Post Update模式在搬出后自动累加目的地址指针或地址寄存器，便于硬件循环内连续多次调用时无需手动维护目的地址。本接口在Vector Function（`__simd_vf__` 标记的函数）内使用。"
+tag: [c_api, data_movement, 'operations:store', vector, register_vector, 'src:vector_register',
+  'dst:unified_buffer', post_update]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_storeunalign_postupdate__RPU<dtype>_Rvstoreunalign_v<dtype>_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storeunalign.h"
+  - prototype_id: "asc_storeunalign_postupdate__PU<dtype>_Rvstoreunalign_v<dtype>_Rar"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storeunalign.h"
+  - prototype_id: "asc_storeunalign_postupdate__RPU<dtype>_Rvstoreunalign_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storeunalign.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_storeunalign_postupdate
 
 ## 产品支持情况
@@ -54,6 +80,33 @@
 
 ### 立即数偏移搬出模式
 
+```yaml
+api_signature:
+  prototype_id: "asc_storeunalign_postupdate__RPU<dtype>_Rvstoreunalign_v<dtype>_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storeunalign.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "hifloat8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+      - "int64_t"
+```
+
 ```c
 // 占位符形式
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ <dtype>*& dst,
@@ -77,6 +130,33 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t*& dst,
 
 ### 地址寄存器偏移搬出模式
 
+```yaml
+api_signature:
+  prototype_id: "asc_storeunalign_postupdate__PU<dtype>_Rvstoreunalign_v<dtype>_Rar"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storeunalign.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "hifloat8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+      - "int64_t"
+```
+
 ```c
 // 占位符形式
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ <dtype>* dst,
@@ -99,6 +179,18 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t* dst,
 ```
 
 ### 掩码寄存器搬出模式
+
+```yaml
+api_signature:
+  prototype_id: "asc_storeunalign_postupdate__RPU<dtype>_Rvstoreunalign_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storeunalign.h"
+  dtype:
+    values:
+      - "uint16_t"
+      - "uint32_t"
+```
 
 ```c
 // 占位符形式

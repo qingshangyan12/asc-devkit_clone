@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_store_atomic_config_v2（废弃）"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md"
+description: "**该接口已废弃。原子加操作请使用[asc_atomic_add](../atomic/scalar_atomic/asc_atomic_add.md)实现。"
+tag: [c_api, 'roles:configuration', atomic, deprecated]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_store_atomic_config_v2__u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/atomic/scalar_atomic.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_store_atomic_config_v2（废弃）
 
 ## 产品支持情况
@@ -33,6 +50,14 @@
 设置原子操作启用位与原子操作类型的值。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_set_store_atomic_config_v2__u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/atomic/scalar_atomic.h"
+```
 
 ```c
 [[deprecated("NOTICE: asc_set_store_atomic_config_v2 is deprecated."

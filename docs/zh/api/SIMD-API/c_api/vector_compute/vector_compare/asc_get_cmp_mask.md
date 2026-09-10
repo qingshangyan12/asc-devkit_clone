@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_get_cmp_mask"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md"
+description: "此接口用于获取Compare操作的比较结果。"
+tag: [c_api, compute, 'roles:query', 'operations:comparison', vector, memory_vector]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_get_cmp_mask__PUv"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_compare.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_get_cmp_mask
 
 ## 产品支持情况
@@ -31,6 +48,14 @@
 此接口用于获取Compare操作的比较结果。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_get_cmp_mask__PUv"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_compare.h"
+```
 
 ```cpp
 __aicore__ inline void asc_get_cmp_mask(__ubuf__ void* dst)

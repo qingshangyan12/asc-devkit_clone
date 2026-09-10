@@ -1,3 +1,24 @@
+---
+okftype: reference.api.cpp
+title: "asc_int162uint32（废弃）"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int162uint32_deprecated.md"
+description: "**该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_int162uint32](../reg_compute/reg_convert/asc_int162uint32.md)的显式位置参数重载替代。"
+tag: [c_api, compute, 'operations:conversion', mask, masked]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_int162uint32__Rvu32_vi16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_int162uint32_v2__Rvu32_vi16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_int162uint32（废弃）
 
 ## 产品支持情况
@@ -36,9 +57,28 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_int162uint32__Rvu32_vi16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```cpp
 //取src的偶数索引元素（索引0, 2, 4, ...）进行转换，mask每2bit为一组、仅组内LSB为1时选取对应位置的int16_t元素。
 __simd_callee__ inline void asc_int162uint32(vector_uint32_t& dst, vector_int16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int162uint32_v2__Rvu32_vi16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 //取src的奇数索引元素（索引1, 3, 5, ...）进行转换，mask每2bit为一组、仅组内LSB为1时选取对应位置的int16_t元素。
 __simd_callee__ inline void asc_int162uint32_v2(vector_uint32_t& dst, vector_int16_t src, vector_bool mask)
 ```

@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_l0c_copy_params"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_params.md"
+description: "DataCopy从L0C Buffer搬运到Global Memory或L1 Buffer过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。"
+tag: [c_api, data_movement_configuration]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_l0c_copy_params__u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_l0c_copy_params
 
 ## 产品支持情况
@@ -31,6 +48,14 @@
 DataCopy从L0C Buffer搬运到Global Memory或L1 Buffer过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_set_l0c_copy_params__u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
 
 ```cpp
 __aicore__ inline void asc_set_l0c_copy_params(uint16_t nd_num, uint16_t src_nd_stride, uint16_t dst_nd_stride)

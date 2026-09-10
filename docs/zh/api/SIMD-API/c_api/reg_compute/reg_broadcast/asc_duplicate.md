@@ -1,3 +1,24 @@
+---
+okftype: reference.api.cpp
+title: "asc_duplicate"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate.md"
+description: "将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。"
+tag: [c_api, compute, 'operations:broadcast', mask, vector, register_vector, masked]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_duplicate__v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - prototype_id: "asc_duplicate__Rv<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_duplicate
 
 ## 产品支持情况
@@ -34,10 +55,57 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  prototype_id: "asc_duplicate__v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
 ```c
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_duplicate(vector_<dtype> src,
                                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_duplicate__Rv<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
+```c
 
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_duplicate(vector_<dtype>& dst,

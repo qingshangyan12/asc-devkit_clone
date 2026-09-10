@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: "asc_int82int32 (废弃)"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int82int32_deprecated.md"
+description: "将int8_t类型转化为int32_t类型。"
+tag: [c_api, compute, 'operations:conversion', vector, register_vector]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_int82int32__Rvi32_vi8_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_int82int32_v2__Rvi32_vi8_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_int82int32_v3__Rvi32_vi8_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_int82int32_v4__Rvi32_vi8_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_int82int32 (废弃)
 
 ## 产品支持情况
@@ -34,13 +63,54 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_int82int32__Rvi32_vi8_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```cpp
 // 数据读取索引0的位置
 __simd_callee__ inline void asc_int82int32(vector_int32_t& dst, vector_int8_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int82int32_v2__Rvi32_vi8_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // 数据读取索引1的位置
 __simd_callee__ inline void asc_int82int32_v2(vector_int32_t& dst, vector_int8_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int82int32_v3__Rvi32_vi8_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // 数据读取索引2的位置
 __simd_callee__ inline void asc_int82int32_v3(vector_int32_t& dst, vector_int8_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int82int32_v4__Rvi32_vi8_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // 数据读取索引3的位置
 __simd_callee__ inline void asc_int82int32_v4(vector_int32_t& dst, vector_int8_t src, vector_bool mask)
 ```

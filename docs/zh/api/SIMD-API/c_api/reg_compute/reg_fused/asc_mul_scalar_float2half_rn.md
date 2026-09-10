@@ -1,3 +1,33 @@
+---
+okftype: reference.api.cpp
+title: "asc_mul_scalar_float2half_rn"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mul_scalar_float2half_rn.md"
+description: "根据`mask`将源操作数`src`（float类型）按元素与标量`value`相乘后，按照RINT舍入模式转换为half类型，得到计算结果。"
+tag: [c_api, compute, arithmetic, 'operations:conversion', multiply, mask, scalar,
+  vector, register_vector, elementwise, masked, 'traits:rounding_mode', scalar_operand]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_mul_scalar_float2half_rn__vf32_f32_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_fused.h"
+  - override_id: "asc_mul_scalar_float2half_rn__vf32_f32_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_fused.h"
+  - override_id: "asc_mul_scalar_float2half_rn__Rvf16_vf32_f32_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_fused.h"
+  - override_id: "asc_mul_scalar_float2half_rn__Rvf16_vf32_f32_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_fused.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_mul_scalar_float2half_rn
 
 ## 产品支持情况
@@ -38,21 +68,62 @@ $$
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_mul_scalar_float2half_rn__vf32_f32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_fused.h"
+```
+
 ```c
 // 通过函数返回值返回结果，数据写入索引为偶数的位置
 __simd_callee__ inline vector_half asc_mul_scalar_float2half_rn(
     vector_float src, float value, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_mul_scalar_float2half_rn__vf32_f32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_fused.h"
+```
+
+```c
 
 // 通过函数返回值返回结果，数据写入索引为奇数的位置
 __simd_callee__ inline vector_half asc_mul_scalar_float2half_rn(
     vector_float src, float value, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_mul_scalar_float2half_rn__Rvf16_vf32_f32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_fused.h"
+```
+
+```c
 
 // 通过引用参数输出结果，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_mul_scalar_float2half_rn(
     vector_half& dst, vector_float src, float value, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_mul_scalar_float2half_rn__Rvf16_vf32_f32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_fused.h"
+```
+
+```c
 
 // 通过引用参数输出结果，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_mul_scalar_float2half_rn(
@@ -61,6 +132,14 @@ __simd_callee__ inline void asc_mul_scalar_float2half_rn(
 ```
 
 ### 函数原型典型示例
+
+```yaml
+api_signature:
+  override_id: "asc_mul_scalar_float2half_rn__Rvf16_vf32_f32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_fused.h"
+```
 
 ```c
 // 示例：对float矢量数据寄存器与float标量执行乘法后转换为half类型，结果写入偶数位置

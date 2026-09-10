@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_l12fb"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12fb/asc_copy_l12fb_arch_3510.md"
+description: "将数据从L1 Buffer搬运到Fixpipe Buffer中，Fixpipe Buffer用于存放量化参数。"
+tag: [c_api, data_movement, copy]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_copy_l12fb__PFBv_PL1v_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12fb__PFBv_PL1v_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12fb_sync__PFBv_PL1v_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_copy_l12fb
 
 ## 产品支持情况
@@ -33,16 +58,40 @@
 ## 函数原型
 
 - 前n个数据搬运
+```yaml
+api_signature:
+  override_id: "asc_copy_l12fb__PFBv_PL1v_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
     ```cpp
     __aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size)
     ```
 
 - 高维切分搬运
+```yaml
+api_signature:
+  override_id: "asc_copy_l12fb__PFBv_PL1v_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
     ```cpp
     __aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap_size, uint16_t dst_gap_size)
     ```
 
 - 同步搬运
+```yaml
+api_signature:
+  override_id: "asc_copy_l12fb_sync__PFBv_PL1v_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
     ```cpp
     __aicore__ inline void asc_copy_l12fb_sync(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size)
     ```

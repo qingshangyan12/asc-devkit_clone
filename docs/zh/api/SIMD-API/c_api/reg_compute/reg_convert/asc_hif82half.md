@@ -1,3 +1,24 @@
+---
+okftype: reference.api.cpp
+title: "asc_hif82half"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82half.md"
+description: "`src`中hifloat8_t数据类型的元素转换为half数据类型，并将结果写入dst。"
+tag: [c_api, compute, 'operations:conversion', vector, register_vector]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_hif82half__Rvf16_vhf8_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_hif82half__Rvf16_vhf8_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_hif82half
 
 ## 产品支持情况
@@ -47,11 +68,30 @@ def asc_hif82half(dst, src, mask, src_pos):
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_hif82half__Rvf16_vhf8_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```c
 __simd_callee__ inline void asc_hif82half(vector_half& dst,
                                           vector_hifloat8_t src,
                                           vector_bool mask,
                                           std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_hif82half__Rvf16_vhf8_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
 
 __simd_callee__ inline void asc_hif82half(vector_half& dst,
                                           vector_hifloat8_t src,

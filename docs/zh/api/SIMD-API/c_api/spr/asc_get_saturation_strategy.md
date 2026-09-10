@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_get_saturation_strategy"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_strategy.md"
+description: "读取当前饱和控制策略。"
+tag: [c_api, 'roles:query', 'traits:saturation_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_get_saturation_strategy__z"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/spr/spr.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_get_saturation_strategy
 
 ## 产品支持情况
@@ -36,6 +53,14 @@
 常用于临时切换策略前保存原配置，或与[asc_set_saturation_strategy](asc_set_saturation_strategy.md)配合做回读校验。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_get_saturation_strategy__z"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/spr/spr.h"
+```
 
 ```c
 __aicore__ inline asc_override_strategy asc_get_saturation_strategy()

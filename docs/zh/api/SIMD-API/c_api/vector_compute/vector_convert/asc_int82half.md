@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: "asc_int82half"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int82half.md"
+description: "将int8_t类型数据转换为half类型。"
+tag: [c_api, compute, 'operations:conversion', vector, memory_vector]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_int82half__PUf16_PUi8_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_int82half__PUf16_PUi8_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_int82half_sync__PUf16_PUi8_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_int82half
 
 ## 产品支持情况
@@ -34,17 +59,41 @@
 
 - 前n个数据计算
 
+```yaml
+api_signature:
+  override_id: "asc_int82half__PUf16_PUi8_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
     ```cpp
     __aicore__ inline void asc_int82half(__ubuf__ half* dst, __ubuf__ int8_t* src, uint32_t count)
     ```
 
 - 高维切分计算
 
+```yaml
+api_signature:
+  override_id: "asc_int82half__PUf16_PUi8_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
     ```cpp
     __aicore__ inline void asc_int82half(__ubuf__ half* dst, __ubuf__ int8_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
 
 - 同步计算
+
+```yaml
+api_signature:
+  override_id: "asc_int82half_sync__PUf16_PUi8_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
 
     ```cpp
     __aicore__ inline void asc_int82half_sync(__ubuf__ half* dst, __ubuf__ int8_t* src, uint32_t count)

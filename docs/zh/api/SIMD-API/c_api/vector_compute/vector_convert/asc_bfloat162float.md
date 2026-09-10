@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: "asc_bfloat162float"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_bfloat162float.md"
+description: "将bfloat16_t类型数据转为float，无舍入模式。"
+tag: [c_api, compute, 'operations:conversion', vector, memory_vector, 'traits:rounding_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_bfloat162float__PUf32_PUbf16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_bfloat162float__PUf32_PUbf16_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_bfloat162float_sync__PUf32_PUbf16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_bfloat162float
 
 ## 产品支持情况
@@ -33,14 +58,38 @@
 ## 函数原型
 
 - 前n个数据计算
+```yaml
+api_signature:
+  override_id: "asc_bfloat162float__PUf32_PUbf16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
 ```cpp
 __aicore__ inline void asc_bfloat162float(__ubuf__ float* dst, __ubuf__ bfloat16_t* src, uint32_t count)
 ```
 - 高维切分计算
+```yaml
+api_signature:
+  override_id: "asc_bfloat162float__PUf32_PUbf16_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
 ```cpp
 __aicore__ inline void asc_bfloat162float(__ubuf__ float* dst, __ubuf__ bfloat16_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
 ```
 - 同步计算
+```yaml
+api_signature:
+  override_id: "asc_bfloat162float_sync__PUf32_PUbf16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
 ```cpp
 __aicore__ inline void asc_bfloat162float_sync(__ubuf__ float* dst, __ubuf__ bfloat16_t* src, uint32_t count)
 ```

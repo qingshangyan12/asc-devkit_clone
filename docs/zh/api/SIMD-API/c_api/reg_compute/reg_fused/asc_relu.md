@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_relu"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_relu.md"
+description: "根据`mask`对源操作数`src`按元素执行ReLU操作，得到计算结果。"
+tag: [c_api, compute, arithmetic, relu, mask, vector, register_vector, elementwise,
+  masked]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_relu__v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_fused.h"
+  - prototype_id: "asc_relu__Rv<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_fused.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_relu
 
 ## 产品支持情况
@@ -36,10 +58,39 @@ $$
 
 ## 函数原型
 
+```yaml
+api_signature:
+  prototype_id: "asc_relu__v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_fused.h"
+  dtype:
+    values:
+      - "half"
+      - "int32_t"
+      - "float"
+```
+
 ```c
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_relu(vector_<dtype> src,
                                                vector_bool mask)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_relu__Rv<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_fused.h"
+  dtype:
+    values:
+      - "half"
+      - "int32_t"
+      - "float"
+```
+
+```c
 
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_relu(vector_<dtype>& dst,

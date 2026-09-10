@@ -1,3 +1,44 @@
+---
+okftype: reference.api.cpp
+title: "asc_unsqueeze"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unsqueeze.md"
+description: "将dst中数据根据mask进行解压缩，或将解压缩结果通过函数返回值返回。解压缩方式：dst中第0个元素置为0，dst中的第i个元素等于mask中从第0个到第(i-1)个元素中1的数量。mask最高位被忽略，不参与统计。"
+tag: [c_api, layout_transform]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_unsqueeze_u8__vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - override_id: "asc_unsqueeze_s8__vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - override_id: "asc_unsqueeze_u16__vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - override_id: "asc_unsqueeze_s16__vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - override_id: "asc_unsqueeze_u32__vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - override_id: "asc_unsqueeze_s32__vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - prototype_id: "asc_unsqueeze__Rv<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_unsqueeze
 
 ## 产品支持情况
@@ -40,14 +81,96 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_unsqueeze_u8__vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
 ```c
 // 通过函数返回值返回结果。
 __simd_callee__ inline vector_uint8_t asc_unsqueeze_u8(vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_unsqueeze_s8__vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
+```c
 __simd_callee__ inline vector_int8_t asc_unsqueeze_s8(vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_unsqueeze_u16__vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
+```c
 __simd_callee__ inline vector_uint16_t asc_unsqueeze_u16(vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_unsqueeze_s16__vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
+```c
 __simd_callee__ inline vector_int16_t asc_unsqueeze_s16(vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_unsqueeze_u32__vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
+```c
 __simd_callee__ inline vector_uint32_t asc_unsqueeze_u32(vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_unsqueeze_s32__vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
+```c
 __simd_callee__ inline vector_int32_t asc_unsqueeze_s32(vector_bool mask)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_unsqueeze__Rv<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "int32_t"
+      - "uint32_t"
+```
+
+```c
 
 // 通过引用参数输出结果。
 __simd_callee__ inline void asc_unsqueeze(vector_<dtype>& dst,
@@ -68,9 +191,20 @@ dtype支持的数据类型：int8_t、uint8_t、int16_t、uint16_t、int32_t、u
 
 #### 函数原型典型示例
 
+```yaml
+api_signature:
+  override_id: "asc_unsqueeze_s8__vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
 ```c
 // 示例：对int8_t矢量数据寄存器执行解压缩，通过函数返回值返回结果。
 __simd_callee__ inline vector_int8_t asc_unsqueeze_s8(vector_bool mask)
+```
+
+```c
 
 // 示例：对int8_t矢量数据寄存器执行解压缩。
 __simd_callee__ inline void asc_unsqueeze(vector_int8_t& dst,

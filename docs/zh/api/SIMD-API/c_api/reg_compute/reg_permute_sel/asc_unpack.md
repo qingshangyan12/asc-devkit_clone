@@ -1,3 +1,48 @@
+---
+okftype: reference.api.cpp
+title: "asc_unpack"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unpack.md"
+description: "将src中低半部分或高半部分的元素以扩充位宽的方式写入dst或通过函数返回值返回。"
+tag: [c_api, layout_transform]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_unpack_lower__v<dtype_src>"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - prototype_id: "asc_unpack_upper__v<dtype_src>"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - prototype_id: "asc_unpack_lower__Rv<dtype_dst>_v<dtype_src>"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - prototype_id: "asc_unpack_upper__Rv<dtype_dst>_v<dtype_src>"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - override_id: "asc_unpack_lower__vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - override_id: "asc_unpack_upper__vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - override_id: "asc_unpack_lower__Rvb_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - override_id: "asc_unpack_upper__Rvb_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_unpack
 
 ## 产品支持情况
@@ -57,15 +102,104 @@
 
 ### 矢量数据寄存器解压缩
 
+```yaml
+api_signature:
+  prototype_id: "asc_unpack_lower__v<dtype_src>"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  dtype:
+    variants:
+      -
+        dtype_src: "uint8_t"
+      -
+        dtype_src: "int8_t"
+      -
+        dtype_src: "uint16_t"
+      -
+        dtype_src: "int16_t"
+```
+
 ```c
 // 解压缩低位，通过函数返回值返回结果（占位符形式）。
 __simd_callee__ inline vector_<dtype_dst> asc_unpack_lower(vector_<dtype_src> src)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_unpack_upper__v<dtype_src>"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  dtype:
+    variants:
+      -
+        dtype_src: "uint8_t"
+      -
+        dtype_src: "int8_t"
+      -
+        dtype_src: "uint16_t"
+      -
+        dtype_src: "int16_t"
+```
+
+```c
 // 解压缩高位，通过函数返回值返回结果（占位符形式）。
 __simd_callee__ inline vector_<dtype_dst> asc_unpack_upper(vector_<dtype_src> src)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_unpack_lower__Rv<dtype_dst>_v<dtype_src>"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  dtype:
+    variants:
+      -
+        dtype_dst: "uint16_t"
+        dtype_src: "uint8_t"
+      -
+        dtype_dst: "int16_t"
+        dtype_src: "int8_t"
+      -
+        dtype_dst: "uint32_t"
+        dtype_src: "uint16_t"
+      -
+        dtype_dst: "int32_t"
+        dtype_src: "int16_t"
+```
+
+```c
 
 // 解压缩低位，通过引用参数输出结果（占位符形式）。
 __simd_callee__ inline void asc_unpack_lower(vector_<dtype_dst>& dst,
                                              vector_<dtype_src> src)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_unpack_upper__Rv<dtype_dst>_v<dtype_src>"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  dtype:
+    variants:
+      -
+        dtype_dst: "uint16_t"
+        dtype_src: "uint8_t"
+      -
+        dtype_dst: "int16_t"
+        dtype_src: "int8_t"
+      -
+        dtype_dst: "uint32_t"
+        dtype_src: "uint16_t"
+      -
+        dtype_dst: "int32_t"
+        dtype_src: "int16_t"
+```
+
+```c
 // 解压缩高位，通过引用参数输出结果（占位符形式）。
 __simd_callee__ inline void asc_unpack_upper(vector_<dtype_dst>& dst,
                                              vector_<dtype_src> src)
@@ -94,15 +228,56 @@ __simd_callee__ inline void asc_unpack_lower(vector_uint32_t& dst,
 
 ### 掩码寄存器解压缩
 
+```yaml
+api_signature:
+  override_id: "asc_unpack_lower__vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
 ```c
 // 解压缩低位，通过函数返回值返回结果。
 __simd_callee__ inline vector_bool asc_unpack_lower(vector_bool src)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_unpack_upper__vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
+```c
 // 解压缩高位，通过函数返回值返回结果。
 __simd_callee__ inline vector_bool asc_unpack_upper(vector_bool src)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_unpack_lower__Rvb_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
+```c
 
 // 解压缩低位，通过引用参数输出结果。
 __simd_callee__ inline void asc_unpack_lower(vector_bool& dst,
                                              vector_bool src)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_unpack_upper__Rvb_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
+```c
 // 解压缩高位，通过引用参数输出结果。
 __simd_callee__ inline void asc_unpack_upper(vector_bool& dst,
                                              vector_bool src)

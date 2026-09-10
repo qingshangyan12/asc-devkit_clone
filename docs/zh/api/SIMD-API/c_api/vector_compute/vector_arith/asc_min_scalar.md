@@ -1,3 +1,65 @@
+---
+okftype: reference.api.cpp
+title: "asc_min_scalar"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_min_scalar.md"
+description: "源操作数矢量逐元素与标量相比，如果比标量值大，则取标量值，比标量值小，则取源操作数值。"
+tag: [c_api, compute, arithmetic, minimum, scalar, vector, memory_vector, 'src:unified_buffer',
+  'dst:unified_buffer', count_limited, elementwise, high_dimensional, scalar_operand]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_min_scalar__PUf16_PUf16_f16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_arith.h"
+  - override_id: "asc_min_scalar__PUf32_PUf32_f32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_arith.h"
+  - override_id: "asc_min_scalar__PUi16_PUi16_i16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_arith.h"
+  - override_id: "asc_min_scalar__PUi32_PUi32_i32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_arith.h"
+  - override_id: "asc_min_scalar__PUf16_PUf16_f16_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_arith.h"
+  - override_id: "asc_min_scalar__PUf32_PUf32_f32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_arith.h"
+  - override_id: "asc_min_scalar__PUi16_PUi16_i16_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_arith.h"
+  - override_id: "asc_min_scalar__PUi32_PUi32_i32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_arith.h"
+  - override_id: "asc_min_scalar_sync__PUf16_PUf16_f16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_min_scalar_sync__PUf32_PUf32_f32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_min_scalar_sync__PUi16_PUi16_i16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_min_scalar_sync__PUi32_PUi32_i32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_min_scalar
 
 ## 产品支持情况
@@ -38,28 +100,151 @@ $$
 
 - 前n个数据计算
 
+```yaml
+api_signature:
+  override_id: "asc_min_scalar__PUf16_PUf16_f16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_arith.h"
+```
+
     ```cpp
    __aicore__ inline void asc_min_scalar(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_min_scalar__PUf32_PUf32_f32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_arith.h"
+```
+
+    ```cpp
    __aicore__ inline void asc_min_scalar(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_min_scalar__PUi16_PUi16_i16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_arith.h"
+```
+
+    ```cpp
    __aicore__ inline void asc_min_scalar(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_min_scalar__PUi32_PUi32_i32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_arith.h"
+```
+
+    ```cpp
    __aicore__ inline void asc_min_scalar(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
     ```
 
 - 高维切分计算
 
+```yaml
+api_signature:
+  override_id: "asc_min_scalar__PUf16_PUf16_f16_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_arith.h"
+```
+
     ```cpp
     __aicore__ inline void asc_min_scalar(__ubuf__ half* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_min_scalar__PUf32_PUf32_f32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_arith.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_min_scalar(__ubuf__ float* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_min_scalar__PUi16_PUi16_i16_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_arith.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_min_scalar(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_min_scalar__PUi32_PUi32_i32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_arith.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_min_scalar(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
 
 - 同步计算
 
+```yaml
+api_signature:
+  override_id: "asc_min_scalar_sync__PUf16_PUf16_f16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
     ```cpp
     __aicore__ inline void asc_min_scalar_sync(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_min_scalar_sync__PUf32_PUf32_f32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_min_scalar_sync(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_min_scalar_sync__PUi16_PUi16_i16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_min_scalar_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_min_scalar_sync__PUi32_PUi32_i32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_min_scalar_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
     ```
 

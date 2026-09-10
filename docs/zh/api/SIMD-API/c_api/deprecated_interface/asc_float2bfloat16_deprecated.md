@@ -1,3 +1,97 @@
+---
+okftype: reference.api.cpp
+title: "asc_float2bfloat16（废弃）"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2bfloat16_deprecated.md"
+description: "**该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_float2bfloat16](../reg_compute/reg_convert/asc_float2bfloat16.md)的显式位置参数重载替代。"
+tag: [c_api, compute, 'operations:conversion', mask, masked, 'traits:rounding_mode',
+  'traits:saturation_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_float2bfloat16_rd__Rvbf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2bfloat16_rd_v2__Rvbf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2bfloat16_rd_sat__Rvbf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2bfloat16_rd_sat_v2__Rvbf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2bfloat16_rn__Rvbf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2bfloat16_rn_v2__Rvbf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2bfloat16_rn_sat__Rvbf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2bfloat16_rn_sat_v2__Rvbf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2bfloat16_rna__Rvbf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2bfloat16_rna_v2__Rvbf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2bfloat16_rna_sat__Rvbf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2bfloat16_rna_sat_v2__Rvbf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2bfloat16_ru__Rvbf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2bfloat16_ru_v2__Rvbf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2bfloat16_ru_sat__Rvbf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2bfloat16_ru_sat_v2__Rvbf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2bfloat16_rz__Rvbf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2bfloat16_rz_v2__Rvbf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2bfloat16_rz_sat__Rvbf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2bfloat16_rz_sat_v2__Rvbf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_float2bfloat16（废弃）
 
 ## 产品支持情况
@@ -69,8 +163,282 @@ def asc_float2bfloat16_rn_v2(dst, src, mask):
 
 ### 模板原型（占位符形式）
 
+```yaml
+api_signature:
+  override_id: "asc_float2bfloat16_rd__Rvbf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```c
-__simd_callee__ inline void asc_float2bfloat16_<round_mode><sat_mode><position_mode>(vector_bfloat16_t& dst,
+__simd_callee__ inline void asc_float2bfloat16_rd(vector_bfloat16_t& dst,
+                                                                                     vector_float src,
+                                                                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2bfloat16_rd_v2__Rvbf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_float2bfloat16_rd_v2(vector_bfloat16_t& dst,
+                                                                                     vector_float src,
+                                                                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2bfloat16_rd_sat__Rvbf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_float2bfloat16_rd_sat(vector_bfloat16_t& dst,
+                                                                                     vector_float src,
+                                                                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2bfloat16_rd_sat_v2__Rvbf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_float2bfloat16_rd_sat_v2(vector_bfloat16_t& dst,
+                                                                                     vector_float src,
+                                                                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2bfloat16_rn__Rvbf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_float2bfloat16_rn(vector_bfloat16_t& dst,
+                                                                                     vector_float src,
+                                                                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2bfloat16_rn_v2__Rvbf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_float2bfloat16_rn_v2(vector_bfloat16_t& dst,
+                                                                                     vector_float src,
+                                                                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2bfloat16_rn_sat__Rvbf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_float2bfloat16_rn_sat(vector_bfloat16_t& dst,
+                                                                                     vector_float src,
+                                                                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2bfloat16_rn_sat_v2__Rvbf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_float2bfloat16_rn_sat_v2(vector_bfloat16_t& dst,
+                                                                                     vector_float src,
+                                                                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2bfloat16_rna__Rvbf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_float2bfloat16_rna(vector_bfloat16_t& dst,
+                                                                                     vector_float src,
+                                                                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2bfloat16_rna_v2__Rvbf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_float2bfloat16_rna_v2(vector_bfloat16_t& dst,
+                                                                                     vector_float src,
+                                                                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2bfloat16_rna_sat__Rvbf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_float2bfloat16_rna_sat(vector_bfloat16_t& dst,
+                                                                                     vector_float src,
+                                                                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2bfloat16_rna_sat_v2__Rvbf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_float2bfloat16_rna_sat_v2(vector_bfloat16_t& dst,
+                                                                                     vector_float src,
+                                                                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2bfloat16_ru__Rvbf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_float2bfloat16_ru(vector_bfloat16_t& dst,
+                                                                                     vector_float src,
+                                                                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2bfloat16_ru_v2__Rvbf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_float2bfloat16_ru_v2(vector_bfloat16_t& dst,
+                                                                                     vector_float src,
+                                                                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2bfloat16_ru_sat__Rvbf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_float2bfloat16_ru_sat(vector_bfloat16_t& dst,
+                                                                                     vector_float src,
+                                                                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2bfloat16_ru_sat_v2__Rvbf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_float2bfloat16_ru_sat_v2(vector_bfloat16_t& dst,
+                                                                                     vector_float src,
+                                                                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2bfloat16_rz__Rvbf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_float2bfloat16_rz(vector_bfloat16_t& dst,
+                                                                                     vector_float src,
+                                                                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2bfloat16_rz_v2__Rvbf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_float2bfloat16_rz_v2(vector_bfloat16_t& dst,
+                                                                                     vector_float src,
+                                                                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2bfloat16_rz_sat__Rvbf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_float2bfloat16_rz_sat(vector_bfloat16_t& dst,
+                                                                                     vector_float src,
+                                                                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2bfloat16_rz_sat_v2__Rvbf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_float2bfloat16_rz_sat_v2(vector_bfloat16_t& dst,
                                                                                      vector_float src,
                                                                                      vector_bool mask)
 ```
@@ -82,6 +450,14 @@ __simd_callee__ inline void asc_float2bfloat16_<round_mode><sat_mode><position_m
 - `<position_mode>`表示`dst`写入的位置，为空时，结果写入`dst`的偶数索引位置；取值为`_v2`时，结果写入`dst`的奇数索引位置。
 
 ### 函数原型典型示例
+
+```yaml
+api_signature:
+  override_id: "asc_float2bfloat16_rn__Rvbf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
 
 ```c
 // RINT舍入模式，非饱和模式，数据写入索引为偶数的位置

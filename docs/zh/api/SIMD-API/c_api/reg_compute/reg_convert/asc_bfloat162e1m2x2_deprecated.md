@@ -1,3 +1,96 @@
+---
+okftype: reference.api.cpp
+title: "asc_bfloat162e1m2x2 (废弃)"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162e1m2x2_deprecated.md"
+description: "将bfloat16_t类型转化为fp4x2_e1m2_t类型，并支持多种舍入模式。"
+tag: [c_api, compute, 'operations:conversion', vector, register_vector, 'traits:rounding_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_bfloat162e1m2x2_rn__Rvf4e1m2x2_vbf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_bfloat162e1m2x2_rn_v2__Rvf4e1m2x2_vbf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_bfloat162e1m2x2_rn_v3__Rvf4e1m2x2_vbf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_bfloat162e1m2x2_rn_v4__Rvf4e1m2x2_vbf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_bfloat162e1m2x2_rna__Rvf4e1m2x2_vbf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_bfloat162e1m2x2_rna_v2__Rvf4e1m2x2_vbf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_bfloat162e1m2x2_rna_v3__Rvf4e1m2x2_vbf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_bfloat162e1m2x2_rna_v4__Rvf4e1m2x2_vbf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_bfloat162e1m2x2_rd__Rvf4e1m2x2_vbf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_bfloat162e1m2x2_rd_v2__Rvf4e1m2x2_vbf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_bfloat162e1m2x2_rd_v3__Rvf4e1m2x2_vbf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_bfloat162e1m2x2_rd_v4__Rvf4e1m2x2_vbf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_bfloat162e1m2x2_ru__Rvf4e1m2x2_vbf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_bfloat162e1m2x2_ru_v2__Rvf4e1m2x2_vbf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_bfloat162e1m2x2_ru_v3__Rvf4e1m2x2_vbf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_bfloat162e1m2x2_ru_v4__Rvf4e1m2x2_vbf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_bfloat162e1m2x2_rz__Rvf4e1m2x2_vbf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_bfloat162e1m2x2_rz_v2__Rvf4e1m2x2_vbf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_bfloat162e1m2x2_rz_v3__Rvf4e1m2x2_vbf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_bfloat162e1m2x2_rz_v4__Rvf4e1m2x2_vbf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_bfloat162e1m2x2 (废弃)
 
 ## 产品支持情况
@@ -36,45 +129,262 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_bfloat162e1m2x2_rn__Rvf4e1m2x2_vbf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```cpp
 // RINT舍入模式,数据写入索引0的位置
 __simd_callee__ inline void asc_bfloat162e1m2x2_rn(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_bfloat162e1m2x2_rn_v2__Rvf4e1m2x2_vbf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // RINT舍入模式,数据写入索引1的位置
 __simd_callee__ inline void asc_bfloat162e1m2x2_rn_v2(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_bfloat162e1m2x2_rn_v3__Rvf4e1m2x2_vbf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // RINT舍入模式,数据写入索引2的位置
 __simd_callee__ inline void asc_bfloat162e1m2x2_rn_v3(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_bfloat162e1m2x2_rn_v4__Rvf4e1m2x2_vbf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // RINT舍入模式,数据写入索引3的位置
 __simd_callee__ inline void asc_bfloat162e1m2x2_rn_v4(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_bfloat162e1m2x2_rna__Rvf4e1m2x2_vbf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // ROUND舍入模式,数据写入索引0的位置
 __simd_callee__ inline void asc_bfloat162e1m2x2_rna(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_bfloat162e1m2x2_rna_v2__Rvf4e1m2x2_vbf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // ROUND舍入模式,数据写入索引1的位置
 __simd_callee__ inline void asc_bfloat162e1m2x2_rna_v2(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_bfloat162e1m2x2_rna_v3__Rvf4e1m2x2_vbf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // ROUND舍入模式,数据写入索引2的位置
 __simd_callee__ inline void asc_bfloat162e1m2x2_rna_v3(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_bfloat162e1m2x2_rna_v4__Rvf4e1m2x2_vbf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // ROUND舍入模式,数据写入索引3的位置
 __simd_callee__ inline void asc_bfloat162e1m2x2_rna_v4(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_bfloat162e1m2x2_rd__Rvf4e1m2x2_vbf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // FLOOR舍入模式,数据写入索引0的位置
 __simd_callee__ inline void asc_bfloat162e1m2x2_rd(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_bfloat162e1m2x2_rd_v2__Rvf4e1m2x2_vbf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // FLOOR舍入模式,数据写入索引1的位置
 __simd_callee__ inline void asc_bfloat162e1m2x2_rd_v2(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_bfloat162e1m2x2_rd_v3__Rvf4e1m2x2_vbf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // FLOOR舍入模式,数据写入索引2的位置
 __simd_callee__ inline void asc_bfloat162e1m2x2_rd_v3(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_bfloat162e1m2x2_rd_v4__Rvf4e1m2x2_vbf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // FLOOR舍入模式,数据写入索引3的位置
 __simd_callee__ inline void asc_bfloat162e1m2x2_rd_v4(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_bfloat162e1m2x2_ru__Rvf4e1m2x2_vbf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // CEIL舍入模式,数据写入索引0的位置
 __simd_callee__ inline void asc_bfloat162e1m2x2_ru(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_bfloat162e1m2x2_ru_v2__Rvf4e1m2x2_vbf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // CEIL舍入模式,数据写入索引1的位置
 __simd_callee__ inline void asc_bfloat162e1m2x2_ru_v2(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_bfloat162e1m2x2_ru_v3__Rvf4e1m2x2_vbf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // CEIL舍入模式,数据写入索引2的位置
 __simd_callee__ inline void asc_bfloat162e1m2x2_ru_v3(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_bfloat162e1m2x2_ru_v4__Rvf4e1m2x2_vbf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // CEIL舍入模式,数据写入索引3的位置
 __simd_callee__ inline void asc_bfloat162e1m2x2_ru_v4(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_bfloat162e1m2x2_rz__Rvf4e1m2x2_vbf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // TRUNC舍入模式,数据写入索引0的位置
 __simd_callee__ inline void asc_bfloat162e1m2x2_rz(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_bfloat162e1m2x2_rz_v2__Rvf4e1m2x2_vbf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // TRUNC舍入模式,数据写入索引1的位置
 __simd_callee__ inline void asc_bfloat162e1m2x2_rz_v2(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_bfloat162e1m2x2_rz_v3__Rvf4e1m2x2_vbf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // TRUNC舍入模式,数据写入索引2的位置
 __simd_callee__ inline void asc_bfloat162e1m2x2_rz_v3(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_bfloat162e1m2x2_rz_v4__Rvf4e1m2x2_vbf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // TRUNC舍入模式,数据写入索引3的位置
 __simd_callee__ inline void asc_bfloat162e1m2x2_rz_v4(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 ```

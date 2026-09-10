@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_sync"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/asc_sync.md"
+description: "用于同一核内所有流水线之间的全流水同步，功能等价于[asc_sync_pipe(PIPE_ALL)](asc_sync_pipe.md)。阻塞调用点后所有硬件流水的后序指令，直到调用点之前所有硬件流水的前序指令全部完成。"
+tag: [c_api, 'operations:synchronization']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_sync__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/sync/sync.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_sync
 
 ## 产品支持情况
@@ -33,6 +50,14 @@
 本接口适用于需要等待核内所有并行执行单元同时到达一个一致状态后再继续执行的场景。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_sync__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/sync/sync.h"
+```
 
 ```c
 __aicore__ inline void asc_sync()

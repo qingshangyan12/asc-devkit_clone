@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_l0c2gm_nz2nd"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c2gm_nz2nd.md"
+description: "本接口用于在L0C Buffer搬出接口[asc_copy_l0c2gm](asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](asc_copy_l0c2ub.md)启用随路Nz转ND格式功能时，配置格式转换所需的相关参数。"
+tag: [c_api, data_movement_configuration, layout_transform]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_l0c2gm_nz2nd__u64_u64_u64"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad"
+    archs: ["3510"]
+    override_id: "asc_set_l0c2gm_nz2nd__u64_u64_u64"
+    file: "mmad_s1.h"
+  - path: "/examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad"
+    archs: ["3510"]
+    override_id: "asc_set_l0c2gm_nz2nd__u64_u64_u64"
+    file: "mmad_s2.h"
+timestamp: "2026-09-10"
+---
+
 # asc_set_l0c2gm_nz2nd
 
 ## 产品支持情况
@@ -33,6 +58,14 @@
 本接口为矩阵搬出相关配置接口，仅在AIC上生效。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_set_l0c2gm_nz2nd__u64_u64_u64"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
 
 ```c
 __aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num,

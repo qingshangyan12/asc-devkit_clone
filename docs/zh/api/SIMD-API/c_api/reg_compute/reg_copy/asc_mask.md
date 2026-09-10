@@ -1,3 +1,29 @@
+---
+okftype: reference.api.cpp
+title: "asc_mask"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_mask.md"
+description: "将src中被mask筛选的有效元素复制到返回值对应位置，未被mask筛选的位置置为0（ZEROING模式），并通过函数返回值返回结果。"
+tag: [c_api, data_movement, copy, vector, register_vector, 'src:vector_register',
+  'dst:vector_register']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_mask__v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_copy.h"
+  - override_id: "asc_mask__vb_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_copy.h"
+  - override_id: "asc_mask__vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_copy.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_mask
 
 ## 产品支持情况
@@ -43,6 +69,25 @@
 
 ### 矢量数据寄存器复制到矢量数据寄存器
 
+```yaml
+api_signature:
+  prototype_id: "asc_mask__v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_copy.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
 ```c
 __simd_callee__ inline vector_<dtype> asc_mask(vector_<dtype> src,
                                                 vector_bool mask)
@@ -61,9 +106,28 @@ __simd_callee__ inline vector_half asc_mask(vector_half src,
 
 ### 掩码寄存器复制到掩码寄存器
 
+```yaml
+api_signature:
+  override_id: "asc_mask__vb_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_copy.h"
+```
+
 ```c
 __simd_callee__ inline vector_bool asc_mask(vector_bool src,
                                             vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_mask__vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_copy.h"
+```
+
+```c
 __simd_callee__ inline vector_bool asc_mask(vector_bool src)
 ```
 

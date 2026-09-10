@@ -1,3 +1,29 @@
+---
+okftype: reference.api.cpp
+title: "asc_exp_sub"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_exp_sub.md"
+description: "根据`mask`将`src0`与`src1`按元素相减，并计算以差值为指数的自然指数函数。"
+tag: [c_api, compute, arithmetic, exponential, mask, vector, register_vector, elementwise,
+  masked]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_exp_sub__Rvf32_vf32_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_fused.h"
+  - override_id: "asc_exp_sub_half2float__Rvf32_vf16_vf16_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_fused.h"
+  - override_id: "asc_exp_sub_half2float__Rvf32_vf16_vf16_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_fused.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_exp_sub
 
 ## 产品支持情况
@@ -49,6 +75,14 @@
 
 - 用于处理`float`数据类型的源操作数。
 
+```yaml
+api_signature:
+  override_id: "asc_exp_sub__Rvf32_vf32_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_fused.h"
+```
+
   ```c
   __simd_callee__ inline void asc_exp_sub(vector_float& dst,
                                           vector_float src0,
@@ -58,6 +92,14 @@
 
 - 处理`half`数据类型的源操作数，支持读取偶数索引或奇数索引的源数据。
 
+```yaml
+api_signature:
+  override_id: "asc_exp_sub_half2float__Rvf32_vf16_vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_fused.h"
+```
+
   ```c
   __simd_callee__ inline void asc_exp_sub_half2float(
       vector_float& dst,
@@ -65,6 +107,17 @@
       vector_half src1,
       vector_bool mask,
       std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_exp_sub_half2float__Rvf32_vf16_vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_fused.h"
+```
+
+  ```c
 
   __simd_callee__ inline void asc_exp_sub_half2float(
       vector_float& dst,

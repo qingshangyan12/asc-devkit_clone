@@ -1,3 +1,76 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_l12bt"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md"
+description: "将MMAD指令的Bias数据从L1 Buffer搬运到BiasTable Buffer中。"
+tag: [c_api, data_movement, copy]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_copy_l12bt__u64_PL1v_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12bt__u64_PL1bf16_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12bt__u64_PL1f16_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12bt__u64_PL1f32_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12bt__u64_PL1i32_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12bt__u64_PL1v_u16_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12bt__u64_PL1bf16_u16_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12bt__u64_PL1f16_u16_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12bt__u64_PL1f32_u16_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12bt__u64_PL1i32_u16_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12bt_sync__u64_PL1v_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_l12bt_sync__u64_PL1bf16_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_l12bt_sync__u64_PL1f16_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_l12bt_sync__u64_PL1f32_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_l12bt_sync__u64_PL1i32_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_copy_l12bt
 
 ## 产品支持情况
@@ -33,29 +106,185 @@
 ## 函数原型
 
 - 前n个数据搬运
+```yaml
+api_signature:
+  override_id: "asc_copy_l12bt__u64_PL1v_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
     ```cpp
     __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12bt__u64_PL1bf16_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ bfloat16_t* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12bt__u64_PL1f16_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ half* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12bt__u64_PL1f32_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ float* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12bt__u64_PL1i32_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ int32_t* src, uint32_t size)
     ```
 
 - 高维切分搬运
+```yaml
+api_signature:
+  override_id: "asc_copy_l12bt__u64_PL1v_u16_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
     ```cpp
     __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12bt__u64_PL1bf16_u16_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ bfloat16_t* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12bt__u64_PL1f16_u16_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ half* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12bt__u64_PL1f32_u16_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ float* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12bt__u64_PL1i32_u16_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ int32_t* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap)
     ```
 
 - 同步搬运
+```yaml
+api_signature:
+  override_id: "asc_copy_l12bt_sync__u64_PL1v_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
     ```cpp
     __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ void* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12bt_sync__u64_PL1bf16_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ bfloat16_t* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12bt_sync__u64_PL1f16_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ half* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12bt_sync__u64_PL1f32_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ float* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12bt_sync__u64_PL1i32_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ int32_t* src, uint32_t size)
     ```
 

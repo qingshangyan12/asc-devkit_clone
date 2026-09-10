@@ -1,3 +1,41 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md"
+description: "完成数据在寄存器间的搬运。"
+tag: [c_api, data_movement, copy, vector, register_vector, 'src:vector_register',
+  'dst:vector_register']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_copy__Rv<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_copy.h"
+  - override_id: "asc_copy__Rvb_vb_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_copy.h"
+  - override_id: "asc_copy__Rvb_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_copy.h"
+  - override_id: "asc_copy__Rvb_vu16_i16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_copy.h"
+  - override_id: "asc_copy__Rvb_vu32_i16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_copy.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/mergemode"
+    archs: ["3510"]
+    override_id: "asc_copy__Rvf32_vf32_vb"
+    file: "mergemode.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_copy
 
 ## 产品支持情况
@@ -48,6 +86,25 @@
 
 ### 矢量数据寄存器复制到矢量数据寄存器
 
+```yaml
+api_signature:
+  prototype_id: "asc_copy__Rv<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_copy.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
 ```c
 // 占位符形式
 __simd_callee__ inline void asc_copy(vector_<dtype>& dst,
@@ -69,10 +126,29 @@ __simd_callee__ inline void asc_copy(vector_half& dst,
 
 ### 掩码寄存器复制到掩码寄存器
 
+```yaml
+api_signature:
+  override_id: "asc_copy__Rvb_vb_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_copy.h"
+```
+
 ```c
 __simd_callee__ inline void asc_copy(vector_bool& dst,
                                      vector_bool src,
                                      vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_copy__Rvb_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_copy.h"
+```
+
+```c
 __simd_callee__ inline void asc_copy(vector_bool& dst,
                                      vector_bool src)
 ```
@@ -81,10 +157,29 @@ __simd_callee__ inline void asc_copy(vector_bool& dst,
 
 **part的值必须在编译期确定，可传入整数字面量或constexpr整数常量，不支持传入运行时变量。**
 
+```yaml
+api_signature:
+  override_id: "asc_copy__Rvb_vu16_i16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_copy.h"
+```
+
 ```c
 __simd_callee__ inline void asc_copy(vector_bool& dst,
                                      vector_uint16_t src,
                                      int16_t part)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_copy__Rvb_vu32_i16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_copy.h"
+```
+
+```c
 __simd_callee__ inline void asc_copy(vector_bool& dst,
                                      vector_uint32_t src,
                                      int16_t part)

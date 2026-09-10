@@ -1,3 +1,56 @@
+---
+okftype: reference.api.cpp
+title: "asc_eq"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq.md"
+description: "比较src0与src1在对应索引位置的元素大小。若比较结果为真，则输出结果的对应比特位设为1，否则设为0。"
+tag: [c_api, compute, 'operations:comparison', vector, memory_vector]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_eq__PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_compare.h"
+  - override_id: "asc_eq__PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_compare.h"
+  - override_id: "asc_eq__PUu8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_compare.h"
+  - override_id: "asc_eq__PUu8_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_compare.h"
+  - override_id: "asc_eq__PUu8_PUi32_PUi32_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_compare.h"
+  - override_id: "asc_eq_sync__PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_eq_sync__PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_eq_sync__PUu8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_eq_sync__PUu8_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_eq_sync__PUu8_PUi32_PUi32_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_eq
 
 ## 产品支持情况
@@ -33,24 +86,128 @@
 ## 函数原型
 
 - 高维切分计算
+```yaml
+api_signature:
+  override_id: "asc_eq__PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_compare.h"
+```
+
   ```cpp
   // 比较结果存入寄存器
   __aicore__ inline void asc_eq(__ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_eq__PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_compare.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_eq(__ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_eq__PUu8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_compare.h"
+```
+
+  ```cpp
   // 比较结果存入dst中
   __aicore__ inline void asc_eq(__ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_eq__PUu8_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_compare.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_eq(__ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_eq__PUu8_PUi32_PUi32_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_compare.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_eq(__ubuf__ uint8_t* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
   ```
 
 - 同步计算
+```yaml
+api_signature:
+  override_id: "asc_eq_sync__PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
   ```cpp
   // 比较结果存入寄存器
   __aicore__ inline void asc_eq_sync(__ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_eq_sync__PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_eq_sync(__ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_eq_sync__PUu8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+  ```cpp
   // 比较结果存入dst中
   __aicore__ inline void asc_eq_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_eq_sync__PUu8_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_eq_sync(__ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_eq_sync__PUu8_PUi32_PUi32_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_eq_sync(__ubuf__ uint8_t* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
   ```
 

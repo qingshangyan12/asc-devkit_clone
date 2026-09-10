@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_transto5hd_sync（废弃）"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_transto5hd_sync_deprecated.md"
+description: "**`asc_transto5hd_b8_sync`、`asc_transto5hd_b16_sync`和`asc_transto5hd_b32_sync`接口已废弃。请使用[asc_transto5hd](../vector_compute/vector_permute_sel/asc_transto5hd.md)接口和[asc_sync](../sync/asc_sync.md)接口替代。"
+tag: [c_api, layout_transform, transpose]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_transto5hd_b32_sync__uba8_uba8_u8_u16_u16"
+    archs: ["3510", "2201"]
+    headers: []
+  - override_id: "asc_transto5hd_b16_sync__uba8_uba8_u8_u16_u16"
+    archs: ["3510", "2201"]
+    headers: []
+  - override_id: "asc_transto5hd_b8_sync__uba8_uba8_u8_u16_u16_b_b"
+    archs: ["3510", "2201"]
+    headers: []
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_transto5hd_sync（废弃）
 
 ## 产品支持情况
@@ -45,11 +67,38 @@ NCHW格式转换成NC1HWC0格式时，如果是数据类型的位宽为32位或�
 ## 函数原型
 
 - 同步计算
+```yaml
+api_signature:
+  override_id: "asc_transto5hd_b32_sync__uba8_uba8_u8_u16_u16"
+  archs: ["3510", "2201"]
+  headers: []
+```
+
 ```cpp
 __aicore__ inline void asc_transto5hd_b32_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
     uint16_t dst_stride, uint16_t src_stride)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_transto5hd_b16_sync__uba8_uba8_u8_u16_u16"
+  archs: ["3510", "2201"]
+  headers: []
+```
+
+```cpp
 __aicore__ inline void asc_transto5hd_b16_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
     uint16_t dst_stride, uint16_t src_stride)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_transto5hd_b8_sync__uba8_uba8_u8_u16_u16_b_b"
+  archs: ["3510", "2201"]
+  headers: []
+```
+
+```cpp
 __aicore__ inline void asc_transto5hd_b8_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
     uint16_t dst_stride, uint16_t src_stride, bool dst_high_half, bool src_high_half)
 ```

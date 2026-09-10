@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: "asc_exp_sub（废弃）"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_exp_sub_deprecated.md"
+description: "**输入数据类型为`half`且不带`src_pos`参数的`asc_exp_sub`原型以及`asc_exp_sub_v2`原型已废弃。新接口请参见[asc_exp_sub](../reg_compute/reg_fused/asc_exp_sub.md)。"
+tag: [c_api, compute, arithmetic, exponential]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_exp_sub__Rvf32_vf16_vf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_fused.h"
+  - override_id: "asc_exp_sub_v2__Rvf32_vf16_vf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_fused.h"
+  - override_id: "asc_exp_sub_v2__Rvf32_vf32_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_fused.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_exp_sub（废弃）
 
 ## 产品支持情况
@@ -44,16 +69,46 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_exp_sub__Rvf32_vf16_vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_fused.h"
+```
+
 ```c
 __simd_callee__ inline void asc_exp_sub(vector_float& dst,
                                         vector_half src0,
                                         vector_half src1,
                                         vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_exp_sub_v2__Rvf32_vf16_vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_fused.h"
+```
+
+```c
 
 __simd_callee__ inline void asc_exp_sub_v2(vector_float& dst,
                                            vector_half src0,
                                            vector_half src1,
                                            vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_exp_sub_v2__Rvf32_vf32_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_fused.h"
+```
+
+```c
 
 __simd_callee__ inline void asc_exp_sub_v2(vector_float& dst,
                                            vector_float src0,

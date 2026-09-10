@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_nop"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_misc/asc_nop.md"
+description: "生成一条空操作指令，不执行实际计算。每调用一次阻塞一拍流水。"
+tag: [c_api, 'roles:control', 'families:system']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_nop__z"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/utils/sys_misc.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_nop
 
 ## 产品支持情况
@@ -31,6 +48,14 @@
 生成一条空操作指令，不执行实际计算。每调用一次阻塞一拍流水。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_nop__z"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/utils/sys_misc.h"
+```
 
 ```c
 __aicore__ inline void asc_nop()

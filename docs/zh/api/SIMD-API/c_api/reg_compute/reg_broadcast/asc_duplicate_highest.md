@@ -1,3 +1,64 @@
+---
+okftype: reference.api.cpp
+title: "asc_duplicate_highest"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_highest.md"
+description: "将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的位置被置为0。"
+tag: [c_api, compute, 'operations:broadcast', mask, vector, register_vector, masked]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_duplicate_highest__Rvi8_vi8_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - override_id: "asc_duplicate_highest__Rvu8_vu8_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - override_id: "asc_duplicate_highest__Rvf8e8m0_vf8e8m0_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - override_id: "asc_duplicate_highest__Rvf8e5m2_vf8e5m2_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - override_id: "asc_duplicate_highest__Rvf8e4m3_vf8e4m3_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - override_id: "asc_duplicate_highest__Rvi16_vi16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - override_id: "asc_duplicate_highest__Rvu16_vu16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - override_id: "asc_duplicate_highest__Rvf16_vf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - override_id: "asc_duplicate_highest__Rvbf16_vbf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - override_id: "asc_duplicate_highest__Rvi32_vi32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - override_id: "asc_duplicate_highest__Rvu32_vu32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - override_id: "asc_duplicate_highest__Rvf32_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_duplicate_highest
 
 ## 产品支持情况
@@ -32,18 +93,147 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_duplicate_highest__Rvi8_vi8_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
 ```cpp
 __simd_callee__ inline void asc_duplicate_highest(vector_int8_t& dst, vector_int8_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_highest__Rvu8_vu8_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_duplicate_highest(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_highest__Rvf8e8m0_vf8e8m0_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_duplicate_highest(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_highest__Rvf8e5m2_vf8e5m2_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_duplicate_highest(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_highest__Rvf8e4m3_vf8e4m3_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_duplicate_highest(vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_highest__Rvi16_vi16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_duplicate_highest(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_highest__Rvu16_vu16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_duplicate_highest(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_highest__Rvf16_vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_duplicate_highest(vector_half& dst, vector_half src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_highest__Rvbf16_vbf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_duplicate_highest(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_highest__Rvi32_vi32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_duplicate_highest(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_highest__Rvu32_vu32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_duplicate_highest(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_highest__Rvf32_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_duplicate_highest(vector_float& dst, vector_float src, vector_bool mask)
 ```
 

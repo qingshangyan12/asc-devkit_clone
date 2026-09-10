@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: "asc_load_l2_cache_mode"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md"
+description: "asc_load_l2_cache_mode用于表示数据从GM搬运到Unified Buffer（UB）时的L2 cache管理策略。"
+tag: [c_api]
+usage_dependencies:
+  status: not_applicable
+signature:
+  []
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_load_l2_cache_mode
 
 asc_load_l2_cache_mode用于表示数据从GM搬运到Unified Buffer（UB）时的L2 cache管理策略，可用于：

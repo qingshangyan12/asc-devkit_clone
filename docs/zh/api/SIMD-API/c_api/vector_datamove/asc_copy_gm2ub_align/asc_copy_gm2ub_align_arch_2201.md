@@ -1,3 +1,124 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_gm2ub_align"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_2201.md"
+description: "提供数据非对齐搬运的功能，将数据从Global Memory (GM)搬运到Unified Buffer（UB），并支持8位/16位/32位数据类型搬运。"
+tag: [c_api, data_movement, copy, 'src:global_memory', 'dst:unified_buffer']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_copy_gm2ub_align__PUi8_PGi8_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy_gm2ub_align__PUu8_PGu8_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy_gm2ub_align__PUi16_PGi16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy_gm2ub_align__PUu16_PGu16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy_gm2ub_align__PUf16_PGf16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy_gm2ub_align__PUbf16_PGbf16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy_gm2ub_align__PUi32_PGi32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy_gm2ub_align__PUu32_PGu32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy_gm2ub_align__PUf32_PGf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy_gm2ub_align__PUi8_PGi8_u16_u32_u8_u8_u32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy_gm2ub_align__PUu8_PGu8_u16_u32_u8_u8_u32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy_gm2ub_align__PUi16_PGi16_u16_u32_u8_u8_u32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy_gm2ub_align__PUu16_PGu16_u16_u32_u8_u8_u32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy_gm2ub_align__PUf16_PGf16_u16_u32_u8_u8_u32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy_gm2ub_align__PUbf16_PGbf16_u16_u32_u8_u8_u32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy_gm2ub_align__PUi32_PGi32_u16_u32_u8_u8_u32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy_gm2ub_align__PUu32_PGu32_u16_u32_u8_u8_u32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy_gm2ub_align__PUf32_PGf32_u16_u32_u8_u8_u32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy_gm2ub_align_sync__PUi8_PGi8_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_copy_gm2ub_align_sync__PUu8_PGu8_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_copy_gm2ub_align_sync__PUi16_PGi16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_copy_gm2ub_align_sync__PUu16_PGu16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_copy_gm2ub_align_sync__PUf16_PGf16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_copy_gm2ub_align_sync__PUbf16_PGbf16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_copy_gm2ub_align_sync__PUi32_PGi32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_copy_gm2ub_align_sync__PUu32_PGu32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_copy_gm2ub_align_sync__PUf32_PGf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_copy_gm2ub_align
 
 ## 产品支持情况
@@ -50,43 +171,331 @@
 
 - 前n个数据搬运
 
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align__PUi8_PGi8_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
     ```cpp
     __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align__PUu8_PGu8_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align__PUi16_PGi16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ int16_t* dst, __gm__ int16_t* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align__PUu16_PGu16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align__PUf16_PGf16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ half* dst, __gm__ half* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align__PUbf16_PGbf16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align__PUi32_PGi32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ int32_t* dst, __gm__ int32_t* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align__PUu32_PGu32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align__PUf32_PGf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ float* dst, __gm__ float* src, uint32_t size)
     ```
 
 - 高维切分搬运
 
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align__PUi8_PGi8_u16_u32_u8_u8_u32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
     ```cpp
     __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align__PUu8_PGu8_u16_u32_u8_u8_u32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align__PUi16_PGi16_u16_u32_u8_u8_u32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ int16_t* dst, __gm__ int16_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align__PUu16_PGu16_u16_u32_u8_u8_u32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align__PUf16_PGf16_u16_u32_u8_u8_u32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ half* dst, __gm__ half* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align__PUbf16_PGbf16_u16_u32_u8_u8_u32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align__PUi32_PGi32_u16_u32_u8_u8_u32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ int32_t* dst, __gm__ int32_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align__PUu32_PGu32_u16_u32_u8_u8_u32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align__PUf32_PGf32_u16_u32_u8_u8_u32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ float* dst, __gm__ float* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
     ```
 
 - 同步计算
 
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align_sync__PUi8_PGi8_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
     ```cpp
     __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align_sync__PUu8_PGu8_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align_sync__PUi16_PGi16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ int16_t* dst, __gm__ int16_t* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align_sync__PUu16_PGu16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align_sync__PUf16_PGf16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ half* dst, __gm__ half* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align_sync__PUbf16_PGbf16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align_sync__PUi32_PGi32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ int32_t* dst, __gm__ int32_t* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align_sync__PUu32_PGu32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_align_sync__PUf32_PGf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ float* dst, __gm__ float* src, uint32_t size)
     ```
 

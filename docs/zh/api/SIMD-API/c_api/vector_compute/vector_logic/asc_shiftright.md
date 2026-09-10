@@ -1,3 +1,87 @@
+---
+okftype: reference.api.cpp
+title: "asc_shiftright"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md"
+description: "对src中的每个元素执行右移，右移大小为value。"
+tag: [c_api, compute, bitwise, 'operations:bitwise_shift', vector, memory_vector]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_shiftright__PUi16_PUi16_i32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_logic.h"
+  - override_id: "asc_shiftright__PUu16_PUu16_u32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_logic.h"
+  - override_id: "asc_shiftright__PUi32_PUi32_i32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_logic.h"
+  - override_id: "asc_shiftright__PUu32_PUu32_u32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_logic.h"
+  - override_id: "asc_shiftright_round__PUi16_PUi16_i32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_logic.h"
+  - override_id: "asc_shiftright_round__PUi32_PUi32_i32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_logic.h"
+  - override_id: "asc_shiftright__PUi16_PUi16_i32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_logic.h"
+  - override_id: "asc_shiftright__PUu16_PUu16_u32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_logic.h"
+  - override_id: "asc_shiftright__PUi32_PUi32_i32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_logic.h"
+  - override_id: "asc_shiftright__PUu32_PUu32_u32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_logic.h"
+  - override_id: "asc_shiftright_round__PUi16_PUi16_i32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_logic.h"
+  - override_id: "asc_shiftright_round__PUi32_PUi32_i32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_logic.h"
+  - override_id: "asc_shiftright_sync__PUi16_PUi16_i32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_shiftright_sync__PUu16_PUu16_u32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_shiftright_sync__PUi32_PUi32_i32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_shiftright_sync__PUu32_PUu32_u32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_shiftright_round_sync__PUi16_PUi16_i32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_shiftright_round_sync__PUi32_PUi32_i32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
 
 # asc_shiftright
 
@@ -38,34 +122,223 @@
 
 - 前n个数据计算
 
+```yaml
+api_signature:
+  override_id: "asc_shiftright__PUi16_PUi16_i32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_logic.h"
+```
+
     ```cpp
     __aicore__ inline void asc_shiftright(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_shiftright__PUu16_PUu16_u32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_logic.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_shiftright(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t value, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_shiftright__PUi32_PUi32_i32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_logic.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_shiftright(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_shiftright__PUu32_PUu32_u32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_logic.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_shiftright(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t value, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_shiftright_round__PUi16_PUi16_i32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_logic.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_shiftright_round(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_shiftright_round__PUi32_PUi32_i32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_logic.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_shiftright_round(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
     ```
 
 - 高维切分计算
 
+```yaml
+api_signature:
+  override_id: "asc_shiftright__PUi16_PUi16_i32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_logic.h"
+```
+
     ```cpp
     __aicore__ inline void asc_shiftright(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_shiftright__PUu16_PUu16_u32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_logic.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_shiftright(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_shiftright__PUi32_PUi32_i32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_logic.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_shiftright(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_shiftright__PUu32_PUu32_u32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_logic.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_shiftright(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_shiftright_round__PUi16_PUi16_i32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_logic.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_shiftright_round(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_shiftright_round__PUi32_PUi32_i32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_logic.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_shiftright_round(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
 
 - 同步计算
 
+```yaml
+api_signature:
+  override_id: "asc_shiftright_sync__PUi16_PUi16_i32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
     ```cpp
     __aicore__ inline void asc_shiftright_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_shiftright_sync__PUu16_PUu16_u32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_shiftright_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t value, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_shiftright_sync__PUi32_PUi32_i32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_shiftright_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_shiftright_sync__PUu32_PUu32_u32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_shiftright_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t value, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_shiftright_round_sync__PUi16_PUi16_i32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_shiftright_round_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_shiftright_round_sync__PUi32_PUi32_i32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_shiftright_round_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
     ```
 

@@ -31,16 +31,52 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_pipe_idle_slot_count_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.experimental
+ * @override_id asc_get_pipe_mte2_idle_slot_count__z
+ * @archs 3510
+ * @brief 本接口为试验接口，在后续版本中可能会调整或改进，不保证后续兼容性。请开发者在使用过程中关注后续版本更新。
+ */
 __aicore__ inline uint8_t asc_get_pipe_mte2_idle_slot_count();
 
+/**
+ * @ingroup simd_c_api.experimental
+ * @override_id asc_get_pipe_mte3_idle_slot_count__z
+ * @archs 3510
+ * @brief 本接口为试验接口，在后续版本中可能会调整或改进，不保证后续兼容性。请开发者在使用过程中关注后续版本更新。
+ */
 __aicore__ inline uint8_t asc_get_pipe_mte3_idle_slot_count();
 
+/**
+ * @ingroup simd_c_api.experimental
+ * @override_id asc_get_pipe_v_idle_slot_count__z
+ * @archs 3510
+ * @brief 本接口为试验接口，在后续版本中可能会调整或改进，不保证后续兼容性。请开发者在使用过程中关注后续版本更新。
+ */
 __aicore__ inline uint8_t asc_get_pipe_v_idle_slot_count();
 
+/**
+ * @ingroup simd_c_api.experimental
+ * @override_id asc_get_pipe_m_idle_slot_count__z
+ * @archs 3510
+ * @brief 本接口为试验接口，在后续版本中可能会调整或改进，不保证后续兼容性。请开发者在使用过程中关注后续版本更新。
+ */
 __aicore__ inline uint8_t asc_get_pipe_m_idle_slot_count();
 
+/**
+ * @ingroup simd_c_api.experimental
+ * @override_id asc_get_pipe_mte1_idle_slot_count__z
+ * @archs 3510
+ * @brief 本接口为试验接口，在后续版本中可能会调整或改进，不保证后续兼容性。请开发者在使用过程中关注后续版本更新。
+ */
 __aicore__ inline uint8_t asc_get_pipe_mte1_idle_slot_count();
 
+/**
+ * @ingroup simd_c_api.experimental
+ * @override_id asc_get_pipe_fix_idle_slot_count__z
+ * @archs 3510
+ * @brief 本接口为试验接口，在后续版本中可能会调整或改进，不保证后续兼容性。请开发者在使用过程中关注后续版本更新。
+ */
 __aicore__ inline uint8_t asc_get_pipe_fix_idle_slot_count();
 
 #endif

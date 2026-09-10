@@ -1,3 +1,100 @@
+---
+okftype: reference.api.cpp
+title: "asc_float2half"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2half.md"
+description: "将float类型数据转换为half类型。"
+tag: [c_api, compute, 'operations:conversion', vector, memory_vector, 'traits:rounding_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_float2half__PUf16_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_float2half_rn__PUf16_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_float2half_rna__PUf16_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_float2half_rd__PUf16_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_float2half_ru__PUf16_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_float2half_rz__PUf16_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_float2half_ro__PUf16_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_float2half__PUf16_PUf32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_float2half_rn__PUf16_PUf32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_float2half_rna__PUf16_PUf32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_float2half_rd__PUf16_PUf32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_float2half_ru__PUf16_PUf32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_float2half_rz__PUf16_PUf32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_float2half_ro__PUf16_PUf32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_float2half_sync__PUf16_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_float2half_rn_sync__PUf16_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_float2half_rna_sync__PUf16_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_float2half_rd_sync__PUf16_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_float2half_ru_sync__PUf16_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_float2half_rz_sync__PUf16_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_float2half_ro_sync__PUf16_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_float2half
 
 ## 产品支持情况
@@ -41,57 +138,279 @@
 
 - 前n个数据计算
 
+```yaml
+api_signature:
+  override_id: "asc_float2half__PUf16_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
   ```cpp
   // 在转换有精度损失时表示RINT舍入模式，不涉及精度损失时表示不舍入
   __aicore__ inline void asc_float2half(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rn__PUf16_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
+  ```cpp
   // RINT舍入模式
   __aicore__ inline void asc_float2half_rn(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rna__PUf16_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
+  ```cpp
   // ROUND舍入模式
   __aicore__ inline void asc_float2half_rna(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rd__PUf16_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
+  ```cpp
   // FLOOR舍入模式
   __aicore__ inline void asc_float2half_rd(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ru__PUf16_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
+  ```cpp
   // CEIL舍入模式
   __aicore__ inline void asc_float2half_ru(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rz__PUf16_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
+  ```cpp
   // TRUNC舍入模式
   __aicore__ inline void asc_float2half_rz(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ro__PUf16_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
+  ```cpp
   // ODD舍入模式
   __aicore__ inline void asc_float2half_ro(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
   ```
 
 - 高维切分计算
 
+```yaml
+api_signature:
+  override_id: "asc_float2half__PUf16_PUf32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
   ```cpp
   // 在转换有精度损失时表示RINT舍入模式，不涉及精度损失时表示不舍入
   __aicore__ inline void asc_float2half(__ubuf__ half* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rn__PUf16_PUf32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
+  ```cpp
   // RINT舍入模式
   __aicore__ inline void asc_float2half_rn(__ubuf__ half* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rna__PUf16_PUf32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
+  ```cpp
   // ROUND舍入模式
   __aicore__ inline void asc_float2half_rna(__ubuf__ half* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rd__PUf16_PUf32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
+  ```cpp
   // FLOOR舍入模式
   __aicore__ inline void asc_float2half_rd(__ubuf__ half* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ru__PUf16_PUf32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
+  ```cpp
   // CEIL舍入模式
   __aicore__ inline void asc_float2half_ru(__ubuf__ half* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rz__PUf16_PUf32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
+  ```cpp
   // TRUNC舍入模式
   __aicore__ inline void asc_float2half_rz(__ubuf__ half* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ro__PUf16_PUf32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
+  ```cpp
   // ODD舍入模式
   __aicore__ inline void asc_float2half_ro(__ubuf__ half* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
   ```
 
 - 同步计算
 
+```yaml
+api_signature:
+  override_id: "asc_float2half_sync__PUf16_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
     ```cpp
   // 在转换有精度损失时表示RINT舍入模式，不涉及精度损失时表示不舍入
   __aicore__ inline void asc_float2half_sync(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rn_sync__PUf16_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
   // RINT舍入模式
   __aicore__ inline void asc_float2half_rn_sync(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rna_sync__PUf16_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
   // ROUND舍入模式
   __aicore__ inline void asc_float2half_rna_sync(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rd_sync__PUf16_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
   // FLOOR舍入模式
   __aicore__ inline void asc_float2half_rd_sync(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ru_sync__PUf16_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
   // CEIL舍入模式
   __aicore__ inline void asc_float2half_ru_sync(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rz_sync__PUf16_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
   // TRUNC舍入模式
   __aicore__ inline void asc_float2half_rz_sync(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ro_sync__PUf16_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
   // ODD舍入模式
   __aicore__ inline void asc_float2half_ro_sync(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
   ```

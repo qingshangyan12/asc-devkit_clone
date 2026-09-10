@@ -1,3 +1,49 @@
+---
+okftype: reference.api.cpp
+title: "asc_int322uint8 (废弃)"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322uint8_deprecated.md"
+description: "将int32_t类型转化为uint8_t类型，支持饱和/非饱和模式。"
+tag: [c_api, compute, 'operations:conversion', vector, register_vector, 'traits:rounding_mode',
+  'traits:saturation_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_int322uint8__Rvu8_vi32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_int322uint8_sat__Rvu8_vi32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_int322uint8_v2__Rvu8_vi32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_int322uint8_sat_v2__Rvu8_vi32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_int322uint8_v3__Rvu8_vi32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_int322uint8_sat_v3__Rvu8_vi32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_int322uint8_v4__Rvu8_vi32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_int322uint8_sat_v4__Rvu8_vi32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_int322uint8 (废弃)
 ## 产品支持情况
 
@@ -35,21 +81,106 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_int322uint8__Rvu8_vi32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```cpp
 // 非饱和模式，数据写入索引0的位置
 __simd_callee__ inline void asc_int322uint8(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int322uint8_sat__Rvu8_vi32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // 饱和模式，数据写入索引0的位置
 __simd_callee__ inline void asc_int322uint8_sat(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int322uint8_v2__Rvu8_vi32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // 非饱和模式，数据写入索引1的位置
 __simd_callee__ inline void asc_int322uint8_v2(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int322uint8_sat_v2__Rvu8_vi32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // 饱和模式，数据写入索引1的位置
 __simd_callee__ inline void asc_int322uint8_sat_v2(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int322uint8_v3__Rvu8_vi32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // 非饱和模式，数据写入索引2的位置
 __simd_callee__ inline void asc_int322uint8_v3(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int322uint8_sat_v3__Rvu8_vi32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // 饱和模式，数据写入索引2的位置
 __simd_callee__ inline void asc_int322uint8_sat_v3(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int322uint8_v4__Rvu8_vi32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // 非饱和模式，数据写入索引3的位置
 __simd_callee__ inline void asc_int322uint8_v4(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int322uint8_sat_v4__Rvu8_vi32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // 饱和模式，数据写入索引3的位置
 __simd_callee__ inline void asc_int322uint8_sat_v4(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
 ```

@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_l0c_copy_channel_para"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_channel_para.md"
+description: "本接口用于在L0C Buffer搬出并执行Nz2DN格式转换时，配置源Nz矩阵中相邻行的地址偏移。配置写入后，由后续开启Nz2DN功能的[asc_copy_l0c2gm](./asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](./asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](./asc_copy_l0c2ub.md)接口使用；未开启Nz2DN功能时，本配置不生效。"
+tag: [c_api, data_movement_configuration]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_l0c_copy_channel_para__u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_l0c_copy_channel_para
 
 ## 产品支持情况
@@ -33,6 +50,14 @@
 本接口为矩阵搬出相关配置接口，仅在AIC上生效。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_set_l0c_copy_channel_para__u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
 
 ```c
 __aicore__ inline void asc_set_l0c_copy_channel_para(uint16_t src_nz_fractal_stride)

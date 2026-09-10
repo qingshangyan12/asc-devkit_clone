@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: "asc_ne_scalar"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne_scalar.md"
+description: "src中的每个元素逐个与标量value比较大小，如果某个位置上的元素不等于value，则输出结果dst对应比特位为1，否则为0。"
+tag: [c_api, compute, 'operations:comparison', scalar, vector, memory_vector, scalar_operand]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_ne_scalar__PUu8_PUf16_f16_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_compare.h"
+  - override_id: "asc_ne_scalar__PUu8_PUf32_f32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_compare.h"
+  - override_id: "asc_ne_scalar_sync__PUu8_PUf16_f16_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_ne_scalar_sync__PUu8_PUf32_f32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_ne_scalar
 
 ## 产品支持情况
@@ -34,15 +63,53 @@ src中的每个元素逐个与标量value比较大小，如果某个位置上的
 
 - 高维切分计算
 
+```yaml
+api_signature:
+  override_id: "asc_ne_scalar__PUu8_PUf16_f16_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_compare.h"
+```
+
     ```cpp
     __aicore__ inline void asc_ne_scalar(__ubuf__ uint8_t *dst, __ubuf__ half *src, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_ne_scalar__PUu8_PUf32_f32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_compare.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_ne_scalar(__ubuf__ uint8_t *dst, __ubuf__ float *src, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
 
 - 同步计算
 
+```yaml
+api_signature:
+  override_id: "asc_ne_scalar_sync__PUu8_PUf16_f16_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
     ```cpp
     __aicore__ inline void asc_ne_scalar_sync(__ubuf__ uint8_t *dst, __ubuf__ half *src, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_ne_scalar_sync__PUu8_PUf32_f32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_ne_scalar_sync(__ubuf__ uint8_t *dst, __ubuf__ float *src, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
 

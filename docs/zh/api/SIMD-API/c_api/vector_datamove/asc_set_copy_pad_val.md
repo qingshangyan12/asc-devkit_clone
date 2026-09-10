@@ -1,3 +1,52 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_copy_pad_val"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md"
+description: "和asc_copy_gm2ub_align接口配合使用，设置连续搬运数据块左右两侧需要填补的数据值。"
+tag: [c_api, data_movement_configuration]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_copy_pad_val__i8"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_set_copy_pad_val__u8"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_set_copy_pad_val__i16"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_set_copy_pad_val__u16"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_set_copy_pad_val__f16"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_set_copy_pad_val__bf16"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_set_copy_pad_val__i32"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_set_copy_pad_val__u32"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_set_copy_pad_val__f32"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_copy_pad_val
 
 ## 产品支持情况
@@ -39,15 +88,111 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_set_copy_pad_val__i8"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
 ```cpp
 __aicore__ inline void asc_set_copy_pad_val(int8_t pad_value)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_copy_pad_val__u8"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_set_copy_pad_val(uint8_t pad_value)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_copy_pad_val__i16"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_set_copy_pad_val(int16_t pad_value)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_copy_pad_val__u16"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_set_copy_pad_val(uint16_t pad_value)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_copy_pad_val__f16"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_set_copy_pad_val(half pad_value)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_copy_pad_val__bf16"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_set_copy_pad_val(bfloat16_t pad_value)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_copy_pad_val__i32"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_set_copy_pad_val(int32_t pad_value)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_copy_pad_val__u32"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_set_copy_pad_val(uint32_t pad_value)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_copy_pad_val__f32"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_set_copy_pad_val(float pad_value)
 ```
 

@@ -1,3 +1,49 @@
+---
+okftype: reference.api.cpp
+title: "asc_float2e4m3 (废弃)"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3_deprecated.md"
+description: "将float类型转化为fp8_e4m3fn_t类型，支持RINT舍入模式，饱和/非饱和模式。"
+tag: [c_api, compute, 'operations:conversion', vector, register_vector, 'traits:rounding_mode',
+  'traits:saturation_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_float2e4m3_rn__Rvf8e4m3_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2e4m3_rn_sat__Rvf8e4m3_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2e4m3_rn_v2__Rvf8e4m3_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2e4m3_rn_sat_v2__Rvf8e4m3_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2e4m3_rn_v3__Rvf8e4m3_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2e4m3_rn_sat_v3__Rvf8e4m3_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2e4m3_rn_v4__Rvf8e4m3_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2e4m3_rn_sat_v4__Rvf8e4m3_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_float2e4m3 (废弃)
 
 ## 产品支持情况
@@ -36,21 +82,106 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_float2e4m3_rn__Rvf8e4m3_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```cpp
 // RINT舍入模式，非饱和模式，数据写入索引为0的位置
 __simd_callee__ inline void asc_float2e4m3_rn(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2e4m3_rn_sat__Rvf8e4m3_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // RINT舍入模式，饱和模式，数据写入索引为0的位置
 __simd_callee__ inline void asc_float2e4m3_rn_sat(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2e4m3_rn_v2__Rvf8e4m3_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // RINT舍入模式，非饱和模式，数据写入索引为1的位置
 __simd_callee__ inline void asc_float2e4m3_rn_v2(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2e4m3_rn_sat_v2__Rvf8e4m3_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // RINT舍入模式，饱和模式，数据写入索引为1的位置
 __simd_callee__ inline void asc_float2e4m3_rn_sat_v2(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2e4m3_rn_v3__Rvf8e4m3_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // RINT舍入模式，非饱和模式，数据写入索引为2的位置
 __simd_callee__ inline void asc_float2e4m3_rn_v3(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2e4m3_rn_sat_v3__Rvf8e4m3_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // RINT舍入模式，饱和模式，数据写入索引为2的位置
 __simd_callee__ inline void asc_float2e4m3_rn_sat_v3(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2e4m3_rn_v4__Rvf8e4m3_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // RINT舍入模式，非饱和模式，数据写入索引为3的位置
 __simd_callee__ inline void asc_float2e4m3_rn_v4(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2e4m3_rn_sat_v4__Rvf8e4m3_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // RINT舍入模式，饱和模式，数据写入索引为3的位置
 __simd_callee__ inline void asc_float2e4m3_rn_sat_v4(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask)
 

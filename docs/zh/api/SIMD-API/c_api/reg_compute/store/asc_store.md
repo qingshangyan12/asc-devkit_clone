@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_store"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_store.md"
+description: "将矢量数据寄存器中的数据搬出到Unified Buffer（UB），目的地址需按照`dtype`对齐。底层经非对齐搬出指令完成单次连续写入，搬运过程中数据格式和内容保持不变。在追求极致性能时，对齐场景推荐使用[asc_storealign](asc_storealign.md)接口。本接口在Vector Function（`__simd_vf__`标记的函数）内使用。"
+tag: [c_api, data_movement, 'operations:store', vector, register_vector, 'src:vector_register',
+  'dst:unified_buffer']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_store__PU<dtype>_v<dtype>"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/storeunalign_composite.h"
+  - prototype_id: "asc_store__PU<dtype>_v<dtype>_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/storeunalign_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_store
 
 ## 产品支持情况
@@ -39,6 +61,33 @@
 
 ### 连续搬出模式
 
+```yaml
+api_signature:
+  prototype_id: "asc_store__PU<dtype>_v<dtype>"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/storeunalign_composite.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e1m2_t"
+      - "fp4x2_e2m1_t"
+      - "hifloat8_t"
+      - "fp8_e4m3fn_t"
+      - "fp8_e5m2_t"
+      - "fp8_e8m0_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+      - "int64_t"
+```
+
 ```c
 // 占位符形式
 __simd_callee__ inline void asc_store(__ubuf__ <dtype>* dst,
@@ -57,6 +106,32 @@ __simd_callee__ inline void asc_store(__ubuf__ int8_t* dst,
 ```
 
 ### 带搬出数量模式
+
+```yaml
+api_signature:
+  prototype_id: "asc_store__PU<dtype>_v<dtype>_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/storeunalign_composite.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e1m2_t"
+      - "fp4x2_e2m1_t"
+      - "hifloat8_t"
+      - "fp8_e4m3fn_t"
+      - "fp8_e5m2_t"
+      - "fp8_e8m0_t"
+      - "int16_t"
+      - "uint16_t"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+      - "int64_t"
+```
 
 ```c
 __simd_callee__ inline void asc_store(__ubuf__ <dtype>* dst,

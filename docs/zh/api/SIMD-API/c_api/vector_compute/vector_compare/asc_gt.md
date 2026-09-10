@@ -1,3 +1,48 @@
+---
+okftype: reference.api.cpp
+title: "asc_gt"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt.md"
+description: "按元素比较两个矢量的大小关系，若比较后的结果为真，则输出结果的对应比特位为1，否则为0。"
+tag: [c_api, compute, 'operations:comparison', vector, memory_vector, elementwise]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_gt__PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_compare.h"
+  - override_id: "asc_gt__PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_compare.h"
+  - override_id: "asc_gt__PUu8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_compare.h"
+  - override_id: "asc_gt__PUu8_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_compare.h"
+  - override_id: "asc_gt_sync__PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_gt_sync__PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_gt_sync__PUu8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_gt_sync__PUu8_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_gt
 
 ## 产品支持情况
@@ -54,23 +99,105 @@ $$
 
 - 高维切分计算
 
+```yaml
+api_signature:
+  override_id: "asc_gt__PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_compare.h"
+```
+
     ```cpp
     // 结果存入寄存器
     __aicore__ inline void asc_gt(__ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_gt__PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_compare.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_gt(__ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_gt__PUu8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_compare.h"
+```
+
+    ```cpp
     // 结果输出到目的操作数
     __aicore__ inline void asc_gt(__ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_gt__PUu8_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_compare.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_gt(__ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
     ```
 
 - 同步计算
 
+```yaml
+api_signature:
+  override_id: "asc_gt_sync__PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
     ```cpp
     // 结果存入寄存器
     __aicore__ inline void asc_gt_sync(__ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t      dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_gt_sync__PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_gt_sync(__ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_gt_sync__PUu8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     // 结果输出到目的操作数
     __aicore__ inline void asc_gt_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_gt_sync__PUu8_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_gt_sync(__ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
     ```
 

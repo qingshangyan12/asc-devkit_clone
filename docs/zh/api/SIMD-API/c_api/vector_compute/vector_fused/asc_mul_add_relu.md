@@ -1,3 +1,41 @@
+---
+okftype: reference.api.cpp
+title: "asc_mul_add_relu"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_add_relu.md"
+description: "按元素将src0和dst相乘并加上src1，再进行Relu计算（结果和0对比取较大值），最终结果存放进dst中。"
+tag: [c_api, compute, arithmetic, 'operations:fused_multiply_add', multiply, vector,
+  memory_vector, elementwise]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_mul_add_relu__PUf16_PUf16_PUf16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_fused.h"
+  - override_id: "asc_mul_add_relu__PUf32_PUf32_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_fused.h"
+  - override_id: "asc_mul_add_relu__PUf16_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_fused.h"
+  - override_id: "asc_mul_add_relu__PUf32_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_fused.h"
+  - override_id: "asc_mul_add_relu_sync__PUf16_PUf16_PUf16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_mul_add_relu_sync__PUf32_PUf32_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_mul_add_relu
 
 ## 产品支持情况
@@ -38,22 +76,79 @@ $$
 
 - 前n个数据计算
 
+```yaml
+api_signature:
+  override_id: "asc_mul_add_relu__PUf16_PUf16_PUf16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_fused.h"
+```
+
     ```cpp
     __aicore__ inline void asc_mul_add_relu(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_mul_add_relu__PUf32_PUf32_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_fused.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_mul_add_relu(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
     ```
 
 - 高维切分计算
 
+```yaml
+api_signature:
+  override_id: "asc_mul_add_relu__PUf16_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_fused.h"
+```
+
     ```cpp
     __aicore__ inline void asc_mul_add_relu(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_mul_add_relu__PUf32_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_fused.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_mul_add_relu(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
     ```
 
 - 同步计算
 
+```yaml
+api_signature:
+  override_id: "asc_mul_add_relu_sync__PUf16_PUf16_PUf16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
     ```cpp
     __aicore__ inline void asc_mul_add_relu_sync(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_mul_add_relu_sync__PUf32_PUf32_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_mul_add_relu_sync(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
     ```
 

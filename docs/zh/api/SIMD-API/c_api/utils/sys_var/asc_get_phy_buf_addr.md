@@ -1,3 +1,24 @@
+---
+okftype: reference.api.cpp
+title: "asc_get_phy_buf_addr"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_phy_buf_addr.md"
+description: "基于偏移量offset获取片上实际物理地址。"
+tag: [c_api, 'roles:query', 'families:system']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_get_phy_buf_addr__u64"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/utils/sys_var.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_ub2l1"
+    archs: ["3510"]
+    override_id: "asc_get_phy_buf_addr__u64"
+    file: "data_copy_ub2l1.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_get_phy_buf_addr
 
 ## 产品支持情况
@@ -31,6 +52,14 @@
 基于偏移量offset获取片上实际物理地址。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_get_phy_buf_addr__u64"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/utils/sys_var.h"
+```
 
 ```cpp
 __aicore__ inline uint64_t asc_get_phy_buf_addr(uint64_t offset)

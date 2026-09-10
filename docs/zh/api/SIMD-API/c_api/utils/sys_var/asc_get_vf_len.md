@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_get_vf_len"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_vf_len.md"
+description: "获取Tensor位宽VL（Vector Length）的大小。"
+tag: [c_api, 'roles:query', 'families:system']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_get_vf_len__z"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/utils/sys_var.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_get_vf_len
 
 ## 产品支持情况
@@ -31,6 +48,14 @@
 获取Tensor位宽VL（Vector Length）的大小。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_get_vf_len__z"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/utils/sys_var.h"
+```
 
 ```cpp
 __aicore__ inline constexpr int64_t asc_get_vf_len()

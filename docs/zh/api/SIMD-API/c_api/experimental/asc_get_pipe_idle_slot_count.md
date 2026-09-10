@@ -1,3 +1,40 @@
+---
+okftype: reference.api.cpp
+title: "指令发射队列空闲槽位查询"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/experimental/asc_get_pipe_idle_slot_count.md"
+description: "本接口为试验接口，在后续版本中可能会调整或改进，不保证后续兼容性。请开发者在使用过程中关注后续版本更新。"
+tag: [c_api, 'roles:query', 'families:system']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_get_pipe_mte2_idle_slot_count__z"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+  - override_id: "asc_get_pipe_mte3_idle_slot_count__z"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+  - override_id: "asc_get_pipe_v_idle_slot_count__z"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+  - override_id: "asc_get_pipe_m_idle_slot_count__z"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+  - override_id: "asc_get_pipe_mte1_idle_slot_count__z"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+  - override_id: "asc_get_pipe_fix_idle_slot_count__z"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # 指令发射队列空闲槽位查询
 
 ## 产品支持情况
@@ -46,17 +83,80 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_get_pipe_mte2_idle_slot_count__z"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+```
+
   ```cpp
   // 获取PIPE_MTE2发射队列的空闲槽位数量。
   __aicore__ inline uint8_t asc_get_pipe_mte2_idle_slot_count()
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_get_pipe_mte3_idle_slot_count__z"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+```
+
+  ```cpp
   // 获取PIPE_MTE3发射队列的空闲槽位数量。
   __aicore__ inline uint8_t asc_get_pipe_mte3_idle_slot_count()
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_get_pipe_v_idle_slot_count__z"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+```
+
+  ```cpp
   // 获取PIPE_V发射队列的空闲槽位数量。
   __aicore__ inline uint8_t asc_get_pipe_v_idle_slot_count()
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_get_pipe_m_idle_slot_count__z"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+```
+
+  ```cpp
   // 获取PIPE_M发射队列的空闲槽位数量。
   __aicore__ inline uint8_t asc_get_pipe_m_idle_slot_count()
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_get_pipe_mte1_idle_slot_count__z"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+```
+
+  ```cpp
   // 获取PIPE_MTE1发射队列的空闲槽位数量。
   __aicore__ inline uint8_t asc_get_pipe_mte1_idle_slot_count()
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_get_pipe_fix_idle_slot_count__z"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+```
+
+  ```cpp
   // 获取PIPE_FIX发射队列的空闲槽位数量。
   __aicore__ inline uint8_t asc_get_pipe_fix_idle_slot_count()
   ```

@@ -25,12 +25,44 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_histogram
+ * @override_id asc_cumulative_histogram_bin0__Rvu16_vu8_vb
+ * @archs 3510
+ * @brief 对输入矢量数据寄存器中的元素进行累计频率统计，生成累计直方图。统计结果在目的矢量数据寄存器原有数据基础上累加。支持配置掩码用于指示参与统计的元素，掩码位为1时，对应元素参与统计；为0时不统计。掩码不影响目的矢量数据寄存器的写入行为。本接口在Vector Function（`__simd_vf__`标记的函数）内使用。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline void asc_cumulative_histogram_bin0(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_histogram
+ * @override_id asc_cumulative_histogram_bin1__Rvu16_vu8_vb
+ * @archs 3510
+ * @brief 对输入矢量数据寄存器中的元素进行累计频率统计，生成累计直方图。统计结果在目的矢量数据寄存器原有数据基础上累加。支持配置掩码用于指示参与统计的元素，掩码位为1时，对应元素参与统计；为0时不统计。掩码不影响目的矢量数据寄存器的写入行为。本接口在Vector Function（`__simd_vf__`标记的函数）内使用。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline void asc_cumulative_histogram_bin1(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_histogram
+ * @override_id asc_frequency_histogram_bin0__Rvu16_vu8_vb
+ * @archs 3510
+ * @brief 对输入矢量数据寄存器中的元素进行频率统计，生成直方图。统计结果在目的矢量数据寄存器原有数据基础上累加。支持配置掩码用于指示参与统计的元素，掩码为1的元素参与统计，掩码为0的元素不统计，掩码不影响目的矢量寄存器的写入行为。本接口在Vector Function（`__simd_vf__`标记的函数）内使用。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_frequency_histogram_bin0(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_histogram
+ * @override_id asc_frequency_histogram_bin1__Rvu16_vu8_vb
+ * @archs 3510
+ * @brief 对输入矢量数据寄存器中的元素进行频率统计，生成直方图。统计结果在目的矢量数据寄存器原有数据基础上累加。支持配置掩码用于指示参与统计的元素，掩码为1的元素参与统计，掩码为0的元素不统计，掩码不影响目的矢量寄存器的写入行为。本接口在Vector Function（`__simd_vf__`标记的函数）内使用。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_frequency_histogram_bin1(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask);
 
 #endif

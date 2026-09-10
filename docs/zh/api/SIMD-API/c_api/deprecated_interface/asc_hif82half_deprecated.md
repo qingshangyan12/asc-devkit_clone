@@ -1,3 +1,24 @@
+---
+okftype: reference.api.cpp
+title: "asc_hif82half（废弃）"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_hif82half_deprecated.md"
+description: "**该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_hif82half](../reg_compute/reg_convert/asc_hif82half.md)的显式位置参数重载替代。"
+tag: [c_api, compute, 'operations:conversion', mask, masked]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_hif82half__Rvf16_vhf8_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_hif82half_v2__Rvf16_vhf8_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_hif82half（废弃）
 
 ## 产品支持情况
@@ -36,9 +57,28 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_hif82half__Rvf16_vhf8_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```cpp
 // 取src的偶数索引元素（索引0, 2, 4, ...）进行转换，mask每bit为1时选取对应位置的hifloat8_t元素。
 __simd_callee__ inline void asc_hif82half(vector_half& dst, vector_hifloat8_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_hif82half_v2__Rvf16_vhf8_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // 取src的奇数索引元素（索引1, 3, 5, ...）进行转换，mask每bit为1时选取对应位置的hifloat8_t元素。
 __simd_callee__ inline void asc_hif82half_v2(vector_half& dst, vector_hifloat8_t src, vector_bool mask)
 ```

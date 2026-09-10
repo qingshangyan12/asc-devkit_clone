@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_ub2gm_align"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md"
+description: "提供数据非对齐搬运的功能，将数据从Unified Buffer (UB)搬运到Global Memory (GM)，并支持8位/16位/32位数据类型搬运。"
+tag: [c_api, data_movement, copy, 'src:unified_buffer', 'dst:global_memory']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_copy_ub2gm_align__PG<dtype>_PU<dtype>_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - prototype_id: "asc_copy_ub2gm_align__PG<dtype>_PU<dtype>_u32_u32_storel2_u64_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+examples:
+  - path: "/examples/02_simd_c_api/02_features/01_reg_vector_compute/00_add_double_buffer"
+    archs: ["3510"]
+    override_id: "asc_copy_ub2gm_align__PGf16_PUf16_u32_u32_storel2_u64_u32"
+    file: "add_double_buffer.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_copy_ub2gm_align
 
 ## 产品支持情况
@@ -57,6 +82,28 @@
 
 ### 连续数据搬运（占位符形式）
 
+```yaml
+api_signature:
+  prototype_id: "asc_copy_ub2gm_align__PG<dtype>_PU<dtype>_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "hifloat8_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
 ```c
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ <dtype>* dst,
                                             __ubuf__ <dtype>* src,
@@ -77,6 +124,28 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__ bfloat16_t* dst,
 ```
 
 ### 高维切分数据搬运（占位符形式）
+
+```yaml
+api_signature:
+  prototype_id: "asc_copy_ub2gm_align__PG<dtype>_PU<dtype>_u32_u32_storel2_u64_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "hifloat8_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
 
 ```c
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ <dtype>* dst,

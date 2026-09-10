@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_l3d_rpt_b"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l3d_rpt_b.md"
+description: "用于设置接口[asc_copy_l12l0a](asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md)、[asc_copy_l12l0b](asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md)的2D格式搬运的repeat参数。"
+tag: [c_api, data_movement_configuration]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_l3d_rpt_b__u64"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_l3d_rpt_b
 
 ## 产品支持情况
@@ -31,6 +48,14 @@
 用于设置接口[asc_copy_l12l0a](asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md)、[asc_copy_l12l0b](asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md)的2D格式搬运的repeat参数。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_set_l3d_rpt_b__u64"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
 
 ```cpp
 __aicore__ inline void asc_set_l3d_rpt_b(uint64_t config)

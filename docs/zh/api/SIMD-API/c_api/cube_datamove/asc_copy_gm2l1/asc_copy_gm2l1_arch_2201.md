@@ -1,3 +1,180 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_gm2l1"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_arch_2201.md"
+description: "将矩阵数据从Global Memory搬运到L1 Buffer中，并支持不同类型的pad模式。"
+tag: [c_api, data_movement, copy, 'src:global_memory', 'dst:l1_buffer']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_copy_gm2l1__PL1v_PGv_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1_pad1__PL1v_PGv_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1_pad2__PL1v_PGv_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1_pad3__PL1v_PGv_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1_pad4__PL1v_PGv_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1_pad5__PL1v_PGv_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1_pad6__PL1v_PGv_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1_pad7__PL1v_PGv_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1_pad8__PL1v_PGv_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1__PL1v_PGv_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1_pad1__PL1v_PGv_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1_pad2__PL1v_PGv_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1_pad3__PL1v_PGv_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1_pad4__PL1v_PGv_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1_pad5__PL1v_PGv_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1_pad6__PL1v_PGv_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1_pad7__PL1v_PGv_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1_pad8__PL1v_PGv_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1_sync__PL1v_PGv_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_gm2l1_pad1_sync__PL1v_PGv_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_gm2l1_pad2_sync__PL1v_PGv_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_gm2l1_pad3_sync__PL1v_PGv_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_gm2l1_pad4_sync__PL1v_PGv_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_gm2l1_pad5_sync__PL1v_PGv_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_gm2l1_pad6_sync__PL1v_PGv_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_gm2l1_pad7_sync__PL1v_PGv_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_gm2l1_pad8_sync__PL1v_PGv_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_gm2l1__PL1bf16_PGbf16_u16_u8_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1__PL1f16_PGf16_u16_u8_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1__PL1f32_PGf32_u16_u8_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1__PL1i32_PGi32_u16_u8_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1__PL1i8_PGi8_u16_u8_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1__PL1u32_PGu32_u16_u8_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1__PL1u8_PGu8_u16_u8_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1_sync__PL1bf16_PGbf16_u16_u8_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_gm2l1_sync__PL1f16_PGf16_u16_u8_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_gm2l1_sync__PL1f32_PGf32_u16_u8_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_gm2l1_sync__PL1i32_PGi32_u16_u8_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_gm2l1_sync__PL1i8_PGi8_u16_u8_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_gm2l1_sync__PL1u32_PGu32_u16_u8_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_gm2l1_sync__PL1u8_PGu8_u16_u8_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_copy_gm2l1
 
 ## 产品支持情况
@@ -34,54 +211,246 @@
 
 - 普通搬运模式
 
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1__PL1v_PGv_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
     ```cpp
     // 不进行pad操作
     __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_pad1__PL1v_PGv_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     // 以32B为单位，每1B插入31B的pad
     __aicore__ inline void asc_copy_gm2l1_pad1(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_pad2__PL1v_PGv_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     // 以32B为单位，每1B插入15B的pad
     __aicore__ inline void asc_copy_gm2l1_pad2(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_pad3__PL1v_PGv_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     // 以32B为单位，每2B插入14B的pad
     __aicore__ inline void asc_copy_gm2l1_pad3(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_pad4__PL1v_PGv_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     // 以32B为单位，每4B插入12B的pad
     __aicore__ inline void asc_copy_gm2l1_pad4(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_pad5__PL1v_PGv_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     // 以32B为单位，每8B插入8B的pad
     __aicore__ inline void asc_copy_gm2l1_pad5(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_pad6__PL1v_PGv_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     // 每32B删除最高位的28B,最低位的4B连续存储
     __aicore__ inline void asc_copy_gm2l1_pad6(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_pad7__PL1v_PGv_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     // 每32B删除最高位的24B,最低位的8B连续存储
     __aicore__ inline void asc_copy_gm2l1_pad7(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_pad8__PL1v_PGv_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     // 每32B删除最高位的16B,最低位的16B连续存储
     __aicore__ inline void asc_copy_gm2l1_pad8(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
     ```
 
 - 普通搬运模式（高维切分）
 
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1__PL1v_PGv_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
     ```cpp
     // 不进行pad操作
     __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst, __gm__ void* src, uint16_t n_burst,
                                       uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_pad1__PL1v_PGv_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     // 以32B为单位，每1B插入31B的pad
     __aicore__ inline void asc_copy_gm2l1_pad1(__cbuf__ void* dst, __gm__ void* src, uint16_t n_burst,
                                       uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_pad2__PL1v_PGv_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     // 以32B为单位，每1B插入15B的pad
     __aicore__ inline void asc_copy_gm2l1_pad2(__cbuf__ void* dst, __gm__ void* src, uint16_t n_burst,
                                       uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_pad3__PL1v_PGv_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     // 以32B为单位，每2B插入14B的pad
     __aicore__ inline void asc_copy_gm2l1_pad3(__cbuf__ void* dst, __gm__ void* src, uint16_t n_burst,
                                       uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_pad4__PL1v_PGv_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     // 以32B为单位，每4B插入12B的pad
     __aicore__ inline void asc_copy_gm2l1_pad4(__cbuf__ void* dst, __gm__ void* src, uint16_t n_burst,
                                       uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_pad5__PL1v_PGv_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     // 以32B为单位，每8B插入8B的pad
     __aicore__ inline void asc_copy_gm2l1_pad5(__cbuf__ void* dst, __gm__ void* src, uint16_t n_burst,
                                       uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_pad6__PL1v_PGv_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     // 每32B删除最高位的28B,最低位的4B连续存储
     __aicore__ inline void asc_copy_gm2l1_pad6(__cbuf__ void* dst, __gm__ void* src, uint16_t n_burst,
                                       uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_pad7__PL1v_PGv_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     // 每32B删除最高位的24B,最低位的8B连续存储
     __aicore__ inline void asc_copy_gm2l1_pad7(__cbuf__ void* dst, __gm__ void* src, uint16_t n_burst,
                                       uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_pad8__PL1v_PGv_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     // 每32B删除最高位的16B,最低位的16B连续存储
     __aicore__ inline void asc_copy_gm2l1_pad8(__cbuf__ void* dst, __gm__ void* src, uint16_t n_burst,
                                       uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
@@ -89,61 +458,305 @@
 
 - 普通搬运模式（同步）
 
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_sync__PL1v_PGv_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
     ```cpp
     // 不进行pad操作
     __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_pad1_sync__PL1v_PGv_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     // 以32B为单位，每1B插入31B的pad
     __aicore__ inline void asc_copy_gm2l1_pad1_sync(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_pad2_sync__PL1v_PGv_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     // 以32B为单位，每1B插入15B的pad
     __aicore__ inline void asc_copy_gm2l1_pad2_sync(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_pad3_sync__PL1v_PGv_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     // 以32B为单位，每2B插入14B的pad
     __aicore__ inline void asc_copy_gm2l1_pad3_sync(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_pad4_sync__PL1v_PGv_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     // 以32B为单位，每4B插入12B的pad
     __aicore__ inline void asc_copy_gm2l1_pad4_sync(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_pad5_sync__PL1v_PGv_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     // 以32B为单位，每8B插入8B的pad
     __aicore__ inline void asc_copy_gm2l1_pad5_sync(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_pad6_sync__PL1v_PGv_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     // 每32B删除最高位的28B,最低位的4B连续存储
     __aicore__ inline void asc_copy_gm2l1_pad6_sync(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_pad7_sync__PL1v_PGv_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     // 每32B删除最高位的24B,最低位的8B连续存储
     __aicore__ inline void asc_copy_gm2l1_pad7_sync(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_pad8_sync__PL1v_PGv_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     // 每32B删除最高位的16B,最低位的16B连续存储
     __aicore__ inline void asc_copy_gm2l1_pad8_sync(__cbuf__ void* dst, __gm__ void* src, uint32_t size)
     ```
 
 - 2D搬运模式
 
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1__PL1bf16_PGbf16_u16_u8_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
     ```cpp
     // 2D搬运bfloat16_t类型矩阵数据
     __aicore__ inline void asc_copy_gm2l1(__cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1__PL1f16_PGf16_u16_u8_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     // 2D搬运half类型矩阵数据
     __aicore__ inline void asc_copy_gm2l1(__cbuf__ half* dst, __gm__ half* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1__PL1f32_PGf32_u16_u8_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     // 2D搬运float类型矩阵数据
     __aicore__ inline void asc_copy_gm2l1(__cbuf__ float* dst, __gm__ float* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1__PL1i32_PGi32_u16_u8_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     // 2D搬运int32_t类型矩阵数据
     __aicore__ inline void asc_copy_gm2l1(__cbuf__ int32_t* dst, __gm__ int32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1__PL1i8_PGi8_u16_u8_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     // 2D搬运int8_t类型矩阵数据
     __aicore__ inline void asc_copy_gm2l1(__cbuf__ int8_t* dst, __gm__ int8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1__PL1u32_PGu32_u16_u8_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     // 2D搬运uint32_t类型矩阵数据
     __aicore__ inline void asc_copy_gm2l1(__cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1__PL1u8_PGu8_u16_u8_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     // 2D搬运uint8_t类型矩阵数据
     __aicore__ inline void asc_copy_gm2l1(__cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
     ```
 
 - 2D搬运模式（同步）
 
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_sync__PL1bf16_PGbf16_u16_u8_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
     ```cpp
     // 2D搬运bfloat16_t类型矩阵数据（同步）
     __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_sync__PL1f16_PGf16_u16_u8_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     // 2D搬运half类型矩阵数据（同步）
     __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ half* dst, __gm__ half* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_sync__PL1f32_PGf32_u16_u8_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     // 2D搬运float类型矩阵数据（同步）
     __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ float* dst, __gm__ float* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_sync__PL1i32_PGi32_u16_u8_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     // 2D搬运int32_t类型矩阵数据（同步）
     __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ int32_t* dst, __gm__ int32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_sync__PL1i8_PGi8_u16_u8_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     // 2D搬运int8_t类型矩阵数据（同步）
     __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ int8_t* dst, __gm__ int8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_sync__PL1u32_PGu32_u16_u8_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     // 2D搬运uint32_t类型矩阵数据（同步）
     __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_sync__PL1u8_PGu8_u16_u8_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     // 2D搬运uint8_t类型矩阵数据（同步）
     __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
     ```

@@ -3,6 +3,10 @@ okftype: reference.api.cpp
 title: "asc_sub"
 resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_sub.md"
 description: "该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求差操作，将结果写入目的操作数`dst`。"
+tag: [c_api, compute, arithmetic, subtract, carry_flag, mask, vector, register_vector,
+  'src:vector_register', 'dst:vector_register', elementwise, masked, supports_carry_output]
+usage_dependencies:
+  status: unconfirmed
 signature:
   - prototype_id: "asc_sub__Rv<dtype>_v<dtype>_v<dtype>_vb"
     archs: ["3510"]

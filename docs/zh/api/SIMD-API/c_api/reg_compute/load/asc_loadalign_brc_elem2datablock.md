@@ -1,3 +1,33 @@
+---
+okftype: reference.api.cpp
+title: "asc_loadalign_brc_elem2datablock"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem2datablock.md"
+description: "从Unified Buffer（UB）中16字节对齐（b16类型）或32字节对齐（b32类型）的起始地址连续读取8个元素，并将每个元素广播到输出结果对应的一个`DataBlock`（32字节）中。结果通过函数返回值返回或写入目的矢量数据寄存器，搬运过程中数据格式和内容保持不变。"
+tag: [c_api, data_movement, 'operations:load', vector, register_vector, 'src:unified_buffer',
+  'dst:vector_register']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_loadalign_brc_elem2datablock__PU<dtype>"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - prototype_id: "asc_loadalign_brc_elem2datablock__Rv<dtype>_PU<dtype>"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - prototype_id: "asc_loadalign_brc_elem2datablock__Rv<dtype>_PU<dtype>_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - prototype_id: "asc_loadalign_brc_elem2datablock__Rv<dtype>_PU<dtype>_ar"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_loadalign_brc_elem2datablock
 
 ## 产品支持情况
@@ -40,9 +70,46 @@
 
 ### 对齐搬入模式
 
+```yaml
+api_signature:
+  prototype_id: "asc_loadalign_brc_elem2datablock__PU<dtype>"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+  dtype:
+    values:
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
 ```c
 // 通过函数返回值返回结果。
 __simd_callee__ inline vector_<dtype> asc_loadalign_brc_elem2datablock(__ubuf__ <dtype>* src)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_loadalign_brc_elem2datablock__Rv<dtype>_PU<dtype>"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+  dtype:
+    values:
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
+```c
 
 // 通过引用参数输出结果。
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_<dtype>& dst,
@@ -65,6 +132,23 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_half& dst,
 
 ### 立即数偏移搬入模式
 
+```yaml
+api_signature:
+  prototype_id: "asc_loadalign_brc_elem2datablock__Rv<dtype>_PU<dtype>_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+  dtype:
+    values:
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
 ```c
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_<dtype>& dst,
                                                             __ubuf__ <dtype>* src,
@@ -85,6 +169,23 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_half& dst,
 ```
 
 ### 地址寄存器偏移搬入模式
+
+```yaml
+api_signature:
+  prototype_id: "asc_loadalign_brc_elem2datablock__Rv<dtype>_PU<dtype>_ar"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+  dtype:
+    values:
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
 
 ```c
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_<dtype>& dst,

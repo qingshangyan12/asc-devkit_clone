@@ -1,3 +1,37 @@
+---
+okftype: reference.api.cpp
+title: "asc_int162half"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162half.md"
+description: "`src`中int16_t类型的元素转换为half类型（16位浮点数），并将结果写入dst。源操作数和目的操作数位宽相同，转换后元素数量不变。支持5种舍入模式，关于舍入模式的详细说明请参见[舍入模式与饱和模式](rounding_mode.md)。"
+tag: [c_api, compute, 'operations:conversion', vector, register_vector, 'traits:rounding_mode',
+  'traits:saturation_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_int162half_rd__Rvf16_vi16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_int162half_rn__Rvf16_vi16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_int162half_rna__Rvf16_vi16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_int162half_ru__Rvf16_vi16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_int162half_rz__Rvf16_vi16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_int162half
 
 ## 产品支持情况
@@ -43,26 +77,150 @@ def asc_int162half_rn(dst, src, mask):
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_int162half_rd__Rvf16_vi16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```cpp
 // 向负无穷方向舍入（rd）
 __simd_callee__ inline void asc_int162half_rd(vector_half& dst, vector_int16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int162half_rn__Rvf16_vi16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // 四舍六入五成双舍入（rn）
 __simd_callee__ inline void asc_int162half_rn(vector_half& dst, vector_int16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int162half_rna__Rvf16_vi16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // 四舍五入舍入（rna）
 __simd_callee__ inline void asc_int162half_rna(vector_half& dst, vector_int16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int162half_ru__Rvf16_vi16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // 向正无穷方向舍入（ru）
 __simd_callee__ inline void asc_int162half_ru(vector_half& dst, vector_int16_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int162half_rz__Rvf16_vi16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // 向零方向舍入（rz）
 __simd_callee__ inline void asc_int162half_rz(vector_half& dst, vector_int16_t src, vector_bool mask)
 ```
 
+```yaml
+api_signature:
+  override_id: "asc_int162half_rd__Rvf16_vi16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```c
-__simd_callee__ inline void asc_int162half_<round_mode>(vector_half& dst,
+__simd_callee__ inline void asc_int162half_rd(vector_half& dst,
+                                                         vector_int16_t src,
+                                                         vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int162half_rn__Rvf16_vi16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_int162half_rn(vector_half& dst,
+                                                         vector_int16_t src,
+                                                         vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int162half_rna__Rvf16_vi16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_int162half_rna(vector_half& dst,
+                                                         vector_int16_t src,
+                                                         vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int162half_ru__Rvf16_vi16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_int162half_ru(vector_half& dst,
+                                                         vector_int16_t src,
+                                                         vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int162half_rz__Rvf16_vi16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_int162half_rz(vector_half& dst,
                                                          vector_int16_t src,
                                                          vector_bool mask)
 ```
 
 ### 函数原型典型示例
+
+```yaml
+api_signature:
+  override_id: "asc_int162half_rn__Rvf16_vi16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
 
 ```c
 // 示例：四舍六入五成双舍入（rn）。

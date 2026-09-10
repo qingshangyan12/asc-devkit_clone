@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: "asc_load3d_v2_config"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/defs/union/asc_load3d_v2_config.md"
+description: "asc_load3d_v2_config用于设置Load3Dv2接口的repeat参数。"
+tag: [c_api]
+usage_dependencies:
+  status: not_applicable
+signature:
+  []
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_load3d_v2_config
 
 asc_load3d_v2_config用于设置Load3Dv2接口的repeat参数。

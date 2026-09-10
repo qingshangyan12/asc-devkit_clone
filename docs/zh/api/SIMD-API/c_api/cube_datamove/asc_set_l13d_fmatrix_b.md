@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_l13d_fmatrix_b"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_fmatrix_b.md"
+description: "设置Feature map属性描述，用于在调用[asc_copy_l12l0a](asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口时配置填充数值。 仅当asc_copy_l12l0a/asc_copy_l12l0b接口的f_matrix_ctrl参数指示从右矩阵获取FeatureMap的属性时使用本接口设置Feature map属性描述，否则使用asc_set_l13d_fmatrix接口。"
+tag: [c_api, data_movement_configuration]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_l13d_fmatrix_b__Rl13dcfg"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_l13d_fmatrix_b
 
 ## 产品支持情况
@@ -32,6 +49,14 @@
 仅当asc_copy_l12l0a/asc_copy_l12l0b接口的f_matrix_ctrl参数指示从右矩阵获取FeatureMap的属性时使用本接口设置Feature map属性描述，否则使用asc_set_l13d_fmatrix接口。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_set_l13d_fmatrix_b__Rl13dcfg"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
 
 ```cpp
 __aicore__ inline void asc_set_l13d_fmatrix_b(asc_l13d_fmatrix_config& config)

@@ -27,6 +27,12 @@
 #endif
 
 namespace __asc_aicore {
+/**
+ * @ingroup simd_c_api.utils.sys_misc
+ * @override_id asc_nop__z
+ * @archs 3510
+ * @brief 生成一条空操作指令，不执行实际计算。每调用一次阻塞一拍流水。
+ */
 __aicore__ inline void asc_nop();
 } // namespace __asc_aicore
 

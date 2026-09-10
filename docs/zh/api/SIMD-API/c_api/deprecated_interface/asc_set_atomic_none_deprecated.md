@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_atomic_none（废弃）"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_atomic_none_deprecated.md"
+description: "**该接口已废弃，请使用[asc_disable_dma_atomic](../atomic/datamove_atomic/asc_disable_dma_atomic.md)替代。"
+tag: [c_api, 'roles:configuration', atomic, deprecated]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_atomic_none__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/atomic/datamove_atomic.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_atomic_none（废弃）
 
 ## 产品支持情况
@@ -33,6 +50,14 @@
 与[asc_set_atomic_add](../atomic/datamove_atomic/asc_set_atomic_add.md)、[asc_set_atomic_max](../atomic/datamove_atomic/asc_set_atomic_max.md)、[asc_set_atomic_min](../atomic/datamove_atomic/asc_set_atomic_min.md)接口配合使用，用于在完成原子操作后关闭原子操作，避免影响后续搬运。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_set_atomic_none__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/atomic/datamove_atomic.h"
+```
 
 ```c
 [[deprecated("NOTICE: asc_set_atomic_none is deprecated. Please use asc_disable_dma_atomic instead.")]]

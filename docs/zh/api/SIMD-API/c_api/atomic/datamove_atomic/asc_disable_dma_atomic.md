@@ -1,3 +1,24 @@
+---
+okftype: reference.api.cpp
+title: "asc_disable_dma_atomic"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md"
+description: "与[asc_set_atomic_add](asc_set_atomic_add.md)、[asc_set_atomic_max](asc_set_atomic_max.md)、[asc_set_atomic_min](asc_set_atomic_min.md)接口配合使用，用于在完成原子操作后关闭原子操作，避免影响后续搬运。"
+tag: [c_api, data_movement_configuration, atomic]
+usage_dependencies:
+  status: confirmed
+  companion:
+  - asc_set_atomic_add.md
+  - asc_set_atomic_max.md
+  - asc_set_atomic_min.md
+signature:
+  - override_id: "asc_disable_dma_atomic__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/atomic/datamove_atomic.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_disable_dma_atomic
 
 ## 产品支持情况
@@ -31,6 +52,14 @@
 与[asc_set_atomic_add](asc_set_atomic_add.md)、[asc_set_atomic_max](asc_set_atomic_max.md)、[asc_set_atomic_min](asc_set_atomic_min.md)接口配合使用，用于在完成原子操作后关闭原子操作，避免影响后续搬运。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_disable_dma_atomic__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/atomic/datamove_atomic.h"
+```
 
 ```c
 __aicore__ inline void asc_disable_dma_atomic()

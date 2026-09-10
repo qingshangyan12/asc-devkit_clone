@@ -1,3 +1,24 @@
+---
+okftype: reference.api.cpp
+title: "asc_int162uint32"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162uint32.md"
+description: "`src`中int16_t类型的元素转换为uint32_t类型，并将结果写入dst。转换过程将16位有符号整数转换为32位无符号整数。"
+tag: [c_api, compute, 'operations:conversion', vector, register_vector]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_int162uint32__Rvu32_vi16_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_int162uint32__Rvu32_vi16_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_int162uint32
 
 ## 产品支持情况
@@ -47,11 +68,30 @@ def asc_int162uint32(dst, src, mask, src_pos):
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_int162uint32__Rvu32_vi16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```c
 __simd_callee__ inline void asc_int162uint32(vector_uint32_t& dst,
                                              vector_int16_t src,
                                              vector_bool mask,
                                              std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int162uint32__Rvu32_vi16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
 
 __simd_callee__ inline void asc_int162uint32(vector_uint32_t& dst,
                                              vector_int16_t src,

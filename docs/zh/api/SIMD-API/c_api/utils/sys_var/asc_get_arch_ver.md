@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_get_arch_ver"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_arch_ver.md"
+description: "获取当前AI处理器架构版本号。"
+tag: [c_api, 'roles:query', 'families:system']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_get_arch_ver__Ru32"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/utils/sys_var.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_get_arch_ver
 
 ## 产品支持情况
@@ -31,6 +48,14 @@
 获取当前AI处理器架构版本号。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_get_arch_ver__Ru32"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/utils/sys_var.h"
+```
 
 ```cpp
 __aicore__ inline void asc_get_arch_ver(uint32_t& core_version)

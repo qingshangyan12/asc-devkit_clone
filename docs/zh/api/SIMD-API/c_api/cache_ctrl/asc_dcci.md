@@ -1,3 +1,40 @@
+---
+okftype: reference.api.cpp
+title: "asc_dcci"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md"
+description: "在AI Core内部，Scalar单元和DMA单元都可能对Global Memory进行访问。"
+tag: [c_api, 'roles:control', 'families:cache_management']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_dcci_single__PGv"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/cache_ctrl/cache_ctrl.h"
+  - override_id: "asc_ub_dcci_single__PUv"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/cache_ctrl/cache_ctrl.h"
+  - override_id: "asc_dcci_entire_all__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/cache_ctrl/cache_ctrl.h"
+  - override_id: "asc_dcci_entire_ub__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/cache_ctrl/cache_ctrl.h"
+  - override_id: "asc_dcci_entire_out__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/cache_ctrl/cache_ctrl.h"
+  - override_id: "asc_dcci_entire_atomic__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/cache_ctrl/cache_ctrl.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_dcci
 
 ## 产品支持情况
@@ -49,17 +86,80 @@ Scalar单元访问UB数据时，该接口需配合[asc_set_ctrl()](../spr/asc_se
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_dcci_single__PGv"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/cache_ctrl/cache_ctrl.h"
+```
+
    ```cpp
    // 刷新传入地址所在的单个Cache Line
    __aicore__ inline void asc_dcci_single(__gm__ void* dst)
+   ```
+
+```yaml
+api_signature:
+  override_id: "asc_ub_dcci_single__PUv"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/cache_ctrl/cache_ctrl.h"
+```
+
+   ```cpp
 
    // 刷新传入的UB地址空间地址所在的单个Cache Line
    __aicore__ inline void asc_ub_dcci_single(__ubuf__ void* dst)
+   ```
+
+```yaml
+api_signature:
+  override_id: "asc_dcci_entire_all__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/cache_ctrl/cache_ctrl.h"
+```
+
+   ```cpp
 
    // 刷新所有Cache Line
    __aicore__ inline void asc_dcci_entire_all()
+   ```
+
+```yaml
+api_signature:
+  override_id: "asc_dcci_entire_ub__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/cache_ctrl/cache_ctrl.h"
+```
+
+   ```cpp
    __aicore__ inline void asc_dcci_entire_ub()
+   ```
+
+```yaml
+api_signature:
+  override_id: "asc_dcci_entire_out__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/cache_ctrl/cache_ctrl.h"
+```
+
+   ```cpp
    __aicore__ inline void asc_dcci_entire_out()
+   ```
+
+```yaml
+api_signature:
+  override_id: "asc_dcci_entire_atomic__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/cache_ctrl/cache_ctrl.h"
+```
+
+   ```cpp
    __aicore__ inline void asc_dcci_entire_atomic()
    ```
 

@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_scalar_cache_mode"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md"
+description: "配置标量单元访问Global Memory时的L2 Cache管理策略。"
+tag: [c_api, 'roles:configuration', 'roles:control', 'families:cache_management',
+  atomic]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_scalar_cache_mode__loadl2"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cache_ctrl/cache_ctrl.h"
+  - override_id: "asc_set_scalar_cache_mode__storel2"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cache_ctrl/cache_ctrl.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_scalar_cache_mode
 
 ## 产品支持情况
@@ -37,8 +59,27 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_set_scalar_cache_mode__loadl2"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cache_ctrl/cache_ctrl.h"
+```
+
 ```c
 __aicore__ inline void asc_set_scalar_cache_mode(asc_load_l2_cache_mode l2_cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_scalar_cache_mode__storel2"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cache_ctrl/cache_ctrl.h"
+```
+
+```c
 __aicore__ inline void asc_set_scalar_cache_mode(asc_store_l2_cache_mode l2_cache_mode)
 ```
 

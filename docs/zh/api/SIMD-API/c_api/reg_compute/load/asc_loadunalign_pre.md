@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_loadunalign_pre"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_pre.md"
+description: "本接口根据Unified Buffer（UB）中按dtype对齐的起始地址，初始化[非对齐寄存器](../../defs/type/data_type_definition.md#非对齐寄存器)，作为后续非对齐搬入的前置缓存。该阶段仅完成非对齐寄存器初始化，不会将数据搬入矢量数据寄存器。"
+tag: [c_api, data_movement, 'operations:load', vector, register_vector, 'src:unified_buffer',
+  'dst:vector_register']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_loadunalign_pre__Rvloadunalign_PU<dtype>"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadunalign.h"
+  - prototype_id: "asc_loadunalign_pre__Rvloadunalign_PU<dtype>_ar"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadunalign.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_loadunalign_pre
 
 ## 产品支持情况
@@ -43,6 +65,33 @@
 
 ### 源地址预处理模式
 
+```yaml
+api_signature:
+  prototype_id: "asc_loadunalign_pre__Rvloadunalign_PU<dtype>"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadunalign.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "hifloat8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+      - "int64_t"
+```
+
 ```c
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst,
                                                 __ubuf__ <dtype>* src)
@@ -61,6 +110,33 @@ __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst,
 ```
 
 ### 地址寄存器偏移预处理模式
+
+```yaml
+api_signature:
+  prototype_id: "asc_loadunalign_pre__Rvloadunalign_PU<dtype>_ar"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadunalign.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "hifloat8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+      - "int64_t"
+```
 
 ```c
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst,

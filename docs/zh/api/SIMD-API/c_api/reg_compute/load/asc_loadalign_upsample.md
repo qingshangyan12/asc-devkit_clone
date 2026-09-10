@@ -1,3 +1,49 @@
+---
+okftype: reference.api.cpp
+title: "asc_loadalign_upsample"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_upsample.md"
+description: "从Unified Buffer（UB）中满足对应对齐要求的起始地址读取连续数据并进行2倍上采样，结果通过函数返回值返回或写入目的寄存器。"
+tag: [c_api, data_movement, 'operations:load', vector, register_vector, 'src:unified_buffer',
+  'dst:vector_register']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_loadalign_upsample__PU<dtype>"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - prototype_id: "asc_loadalign_upsample__Rv<dtype>_PU<dtype>"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_upsample__Rvb_PUu32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - prototype_id: "asc_loadalign_upsample__Rv<dtype>_PU<dtype>_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_upsample__Rvb_PUu32_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - prototype_id: "asc_loadalign_upsample__Rv<dtype>_PU<dtype>_ar"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_upsample__Rvb_PUu32_ar"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_align"
+    archs: ["3510"]
+    override_id: "asc_loadalign_upsample__Rvf16_PUf16"
+    file: "reg_load_store_align.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_loadalign_upsample
 
 ## 产品支持情况
@@ -47,13 +93,73 @@
 
 ### 对齐搬入模式
 
+```yaml
+api_signature:
+  prototype_id: "asc_loadalign_upsample__PU<dtype>"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "hifloat8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+```
+
 ```c
 // 通过函数返回值返回矢量数据寄存器。
 __simd_callee__ inline vector_<dtype> asc_loadalign_upsample(__ubuf__ <dtype>* src)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_loadalign_upsample__Rv<dtype>_PU<dtype>"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "hifloat8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+```
+
+```c
 
 // 搬入矢量数据寄存器。
 __simd_callee__ inline void asc_loadalign_upsample(vector_<dtype>& dst,
                                                    __ubuf__ <dtype>* src)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_upsample__Rvb_PUu32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```c
 // 搬入掩码寄存器。
 __simd_callee__ inline void asc_loadalign_upsample(vector_bool& dst,
                                                    __ubuf__ uint32_t* src)
@@ -75,11 +181,45 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_half& dst,
 
 ### 立即数偏移搬入模式
 
+```yaml
+api_signature:
+  prototype_id: "asc_loadalign_upsample__Rv<dtype>_PU<dtype>_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "hifloat8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+```
+
 ```c
 // 搬入矢量数据寄存器。
 __simd_callee__ inline void asc_loadalign_upsample(vector_<dtype>& dst,
                                                    __ubuf__ <dtype>* src,
                                                    int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_upsample__Rvb_PUu32_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```c
 // 搬入掩码寄存器。
 __simd_callee__ inline void asc_loadalign_upsample(vector_bool& dst,
                                                    __ubuf__ uint32_t* src,
@@ -101,11 +241,45 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_half& dst,
 
 ### 地址寄存器偏移搬入模式
 
+```yaml
+api_signature:
+  prototype_id: "asc_loadalign_upsample__Rv<dtype>_PU<dtype>_ar"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "hifloat8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+```
+
 ```c
 // 搬入矢量数据寄存器。
 __simd_callee__ inline void asc_loadalign_upsample(vector_<dtype>& dst,
                                                    __ubuf__ <dtype>* src,
                                                    addr_reg offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_upsample__Rvb_PUu32_ar"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```c
 // 搬入掩码寄存器。
 __simd_callee__ inline void asc_loadalign_upsample(vector_bool& dst,
                                                    __ubuf__ uint32_t* src,

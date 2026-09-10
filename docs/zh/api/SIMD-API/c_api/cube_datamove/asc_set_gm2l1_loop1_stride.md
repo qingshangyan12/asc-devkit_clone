@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_gm2l1_loop1_stride"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop1_stride.md"
+description: "将数据从Global Memory (GM)搬运到L1 Buffer时，通过调用该接口设置内层循环中相邻迭代数据块间的间隔。"
+tag: [c_api, data_movement_configuration]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_gm2l1_loop1_stride__u64_u64"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_gm2l1_loop1_stride
 
 ## 产品支持情况
@@ -35,6 +52,14 @@
 ![源操作数搬运场景示例](../figures/source_operand_move_example.png)
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_set_gm2l1_loop1_stride__u64_u64"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
 
 ```cpp
 __aicore__ inline void asc_set_gm2l1_loop1_stride(uint64_t loop1_src_stride, uint64_t loop1_dst_stride)

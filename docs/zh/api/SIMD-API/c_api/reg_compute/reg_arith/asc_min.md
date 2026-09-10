@@ -3,6 +3,10 @@ okftype: reference.api.cpp
 title: "asc_min"
 resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_min.md"
 description: "该接口根据mask，对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。"
+tag: [c_api, compute, arithmetic, minimum, mask, vector, register_vector, 'src:vector_register',
+  'dst:vector_register', elementwise, masked]
+usage_dependencies:
+  status: unconfirmed
 signature:
   - prototype_id: "asc_min__Rv<dtype>_v<dtype>_v<dtype>_vb"
     archs: ["3510"]

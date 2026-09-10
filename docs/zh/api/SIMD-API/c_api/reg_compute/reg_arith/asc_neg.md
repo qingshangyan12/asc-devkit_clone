@@ -3,6 +3,10 @@ okftype: reference.api.cpp
 title: "asc_neg"
 resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_neg.md"
 description: "根据`mask`对源操作数`src`按元素取相反数，并将结果作为返回值返回或写入目的操作数`dst`。"
+tag: [c_api, compute, arithmetic, negate, mask, vector, register_vector, 'src:vector_register',
+  'dst:vector_register', elementwise, masked]
+usage_dependencies:
+  status: unconfirmed
 signature:
   - prototype_id: "asc_neg__v<dtype>_vb"
     archs: ["3510"]

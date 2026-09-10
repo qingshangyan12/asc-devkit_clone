@@ -1,3 +1,49 @@
+---
+okftype: reference.api.cpp
+title: "asc_ne"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne.md"
+description: "按元素判断src0 != src1是否成立，若成立则输出结果为1，否则为0。每个元素的比较结果占1个bit。 当结果输出到寄存器中时，可在计算完成后调用[asc_get_cmp_mask](asc_get_cmp_mask.md)获取比较结果。"
+tag: [c_api, compute, 'operations:comparison', mask, vector, memory_vector, elementwise,
+  masked]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_ne__PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_compare.h"
+  - override_id: "asc_ne__PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_compare.h"
+  - override_id: "asc_ne__PUu8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_compare.h"
+  - override_id: "asc_ne__PUu8_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_compare.h"
+  - override_id: "asc_ne_sync__PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_ne_sync__PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_ne_sync__PUu8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_ne_sync__PUu8_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_ne
 
 ## 产品支持情况
@@ -34,24 +80,106 @@
 ## 函数原型
 
 - 高维切分计算
+```yaml
+api_signature:
+  override_id: "asc_ne__PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_compare.h"
+```
+
     ```cpp
     // 结果输出到寄存器中
     __aicore__ inline void asc_ne(__ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_ne__PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_compare.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_ne(__ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_ne__PUu8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_compare.h"
+```
+
+    ```cpp
 
     // 结果输出到目标地址中
     __aicore__ inline void asc_ne(__ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_ne__PUu8_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_compare.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_ne(__ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
     ```
 
 - 同步计算
+```yaml
+api_signature:
+  override_id: "asc_ne_sync__PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
     ```cpp
     // 结果输出到寄存器中
     __aicore__ inline void asc_ne_sync(__ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_ne_sync__PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_ne_sync(__ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_ne_sync__PUu8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
 
     // 结果输出到目标地址中
     __aicore__ inline void asc_ne_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_ne_sync__PUu8_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_ne_sync(__ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
     ```
 

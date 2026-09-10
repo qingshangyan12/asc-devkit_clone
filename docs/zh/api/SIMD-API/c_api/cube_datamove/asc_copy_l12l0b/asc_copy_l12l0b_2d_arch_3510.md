@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_l12l0b_arch_3510（2D矩阵搬运）"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_2d_arch_3510.md"
+description: "负责完成矩阵计算所需的2D格式数据的搬运，搬运粒度为大小为512字节的数据分形，支持非转置与转置矩阵从L1 Buffer到L0B buffer的数据搬运。"
+tag: [c_api, data_movement, copy]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_copy_l12l0b__PCB<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - prototype_id: "asc_copy_l12l0b_sync__PCB<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - prototype_id: "asc_copy_l12l0b_transpose__PCB<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - prototype_id: "asc_copy_l12l0b_transpose_sync__PCB<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_copy_l12l0b_arch_3510（2D矩阵搬运）
 
 ## 产品支持情况
@@ -43,6 +72,31 @@
 
 ### 2D搬运模式
 
+```yaml
+api_signature:
+  prototype_id: "asc_copy_l12l0b__PCB<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "hifloat8_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
 ```cpp
 __aicore__ inline void asc_copy_l12l0b(__cb__ <dtype>* dst,
                                        __cbuf__ <dtype>* src,
@@ -52,6 +106,34 @@ __aicore__ inline void asc_copy_l12l0b(__cb__ <dtype>* dst,
                                        uint8_t k_step,
                                        int16_t src_stride,
                                        uint16_t dst_stride)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_copy_l12l0b_sync__PCB<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "hifloat8_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
+```cpp
 __aicore__ inline void asc_copy_l12l0b_sync(__cb__ <dtype>* dst,
                                             __cbuf__ <dtype>* src,
                                             uint16_t m_start_position,
@@ -82,6 +164,31 @@ __aicore__ inline void asc_copy_l12l0b(__cb__ half* dst,
 
 ### 2D转置搬运模式
 
+```yaml
+api_signature:
+  prototype_id: "asc_copy_l12l0b_transpose__PCB<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "hifloat8_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
 ```cpp
 __aicore__ inline void asc_copy_l12l0b_transpose(__cb__ <dtype>* dst,
                                                  __cbuf__ <dtype>* src,
@@ -91,6 +198,34 @@ __aicore__ inline void asc_copy_l12l0b_transpose(__cb__ <dtype>* dst,
                                                  uint8_t k_step,
                                                  int16_t src_stride,
                                                  uint16_t dst_stride)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_copy_l12l0b_transpose_sync__PCB<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "hifloat8_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
+```cpp
 __aicore__ inline void asc_copy_l12l0b_transpose_sync(__cb__ <dtype>* dst,
                                                       __cbuf__ <dtype>* src,
                                                       uint16_t m_start_position,

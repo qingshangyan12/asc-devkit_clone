@@ -3,6 +3,10 @@ okftype: reference.api.cpp
 title: "asc_log"
 resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_log.md"
 description: "根据`mask`将源操作数`src`按元素取自然对数，将结果写入目的操作数`dst`。"
+tag: [c_api, compute, arithmetic, natural_log, mask, vector, register_vector, 'src:vector_register',
+  'dst:vector_register', elementwise, masked]
+usage_dependencies:
+  status: unconfirmed
 signature:
   - prototype_id: "asc_log__Rv<dtype>_v<dtype>_vb"
     archs: ["3510"]

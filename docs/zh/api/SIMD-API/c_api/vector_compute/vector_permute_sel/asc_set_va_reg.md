@@ -1,3 +1,48 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_va_reg"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_set_va_reg.md"
+description: "用于设置transpose的16个DataBlock地址，将操作数地址序列与地址寄存器关联，接口要求前8个和后8个地址序列与地址寄存器分别关联。"
+tag: [c_api, 'roles:configuration']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_va_reg__uba8_PPUi8"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - override_id: "asc_set_va_reg__uba8_PPUu8"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - override_id: "asc_set_va_reg__uba8_PPUi16"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - override_id: "asc_set_va_reg__uba8_PPUu16"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - override_id: "asc_set_va_reg__uba8_PPUf16"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - override_id: "asc_set_va_reg__uba8_PPUi32"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - override_id: "asc_set_va_reg__uba8_PPUu32"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - override_id: "asc_set_va_reg__uba8_PPUf32"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_va_reg
 
 ## 产品支持情况
@@ -32,14 +77,99 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_set_va_reg__uba8_PPUi8"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+```
+
 ```cpp
 __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int8_t** src_array)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_va_reg__uba8_PPUu8"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+```
+
+```cpp
 __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint8_t** src_array)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_va_reg__uba8_PPUi16"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+```
+
+```cpp
 __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int16_t** src_array)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_va_reg__uba8_PPUu16"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+```
+
+```cpp
 __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint16_t** src_array)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_va_reg__uba8_PPUf16"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+```
+
+```cpp
 __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ half** src_array)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_va_reg__uba8_PPUi32"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+```
+
+```cpp
 __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int32_t** src_array)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_va_reg__uba8_PPUu32"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+```
+
+```cpp
 __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint32_t** src_array)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_va_reg__uba8_PPUf32"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+```
+
+```cpp
 __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ float** src_array)
 ```
 

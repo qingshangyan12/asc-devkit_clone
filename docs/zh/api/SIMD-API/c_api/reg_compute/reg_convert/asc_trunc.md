@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_trunc"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_trunc.md"
+description: "将`src`中的浮点数元素按照TRUNC（向零方向截断）截断到整数值，结果仍保持原浮点数据类型。接口支持通过函数返回值返回结果，也支持通过引用和参数输出结果：前者直接返回截断结果，后者将截断结果写入`dst`。截断规则等价于C标准库`trunc`语义：向零方向舍入，即丢弃小数部分取整，正数向0方向取整（如1.7 -> 1.0），负数向0方向取整（如-1.7 -> -1.0），整数值保持不变。未被`mask`筛选的元素置零。"
+tag: [c_api, compute, 'operations:conversion', mask, vector, register_vector, masked,
+  'traits:rounding_mode', 'traits:saturation_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_trunc__v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - prototype_id: "asc_trunc__Rv<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_trunc
 
 ## 产品支持情况
@@ -42,10 +64,39 @@ $$
 
 ## 函数原型
 
+```yaml
+api_signature:
+  prototype_id: "asc_trunc__v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+  dtype:
+    values:
+      - "half"
+      - "bfloat16_t"
+      - "float"
+```
+
 ```cpp
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_trunc(vector_<dtype> src,
                                                  vector_bool mask)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_trunc__Rv<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+  dtype:
+    values:
+      - "half"
+      - "bfloat16_t"
+      - "float"
+```
+
+```cpp
 
 // 通过引用和参数输出结果（占位符形式）
 __simd_callee__ inline void asc_trunc(vector_<dtype>& dst,

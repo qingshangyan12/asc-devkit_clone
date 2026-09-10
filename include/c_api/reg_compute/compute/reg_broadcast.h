@@ -25,248 +25,1232 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__Rvu8_u8_vb
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。仅带输出参数的接口包含该参数，dst的元素数据类型用于确定函数重载。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器），仅带mask的重载包含该参数。mask筛选的元素在dst中填充为value，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_uint8_t& dst, uint8_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__Rvi8_i8_vb
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。仅带输出参数的接口包含该参数，dst的元素数据类型用于确定函数重载。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器），仅带mask的重载包含该参数。mask筛选的元素在dst中填充为value，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_int8_t& dst, int8_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__Rvf8e4m3_f8e4m3_vb
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。仅带输出参数的接口包含该参数，dst的元素数据类型用于确定函数重载。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器），仅带mask的重载包含该参数。mask筛选的元素在dst中填充为value，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_fp8_e4m3fn_t& dst, fp8_e4m3fn_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__Rvf8e5m2_f8e5m2_vb
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。仅带输出参数的接口包含该参数，dst的元素数据类型用于确定函数重载。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器），仅带mask的重载包含该参数。mask筛选的元素在dst中填充为value，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_fp8_e5m2_t& dst, fp8_e5m2_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__Rvf8e8m0_f8e8m0_vb
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。仅带输出参数的接口包含该参数，dst的元素数据类型用于确定函数重载。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器），仅带mask的重载包含该参数。mask筛选的元素在dst中填充为value，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_fp8_e8m0_t& dst, fp8_e8m0_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__Rvu16_u16_vb
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。仅带输出参数的接口包含该参数，dst的元素数据类型用于确定函数重载。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器），仅带mask的重载包含该参数。mask筛选的元素在dst中填充为value，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_uint16_t& dst, uint16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__Rvi16_i16_vb
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。仅带输出参数的接口包含该参数，dst的元素数据类型用于确定函数重载。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器），仅带mask的重载包含该参数。mask筛选的元素在dst中填充为value，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_int16_t& dst, int16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__Rvf16_f16_vb
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。仅带输出参数的接口包含该参数，dst的元素数据类型用于确定函数重载。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器），仅带mask的重载包含该参数。mask筛选的元素在dst中填充为value，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_half& dst, half value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__Rvbf16_bf16_vb
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。仅带输出参数的接口包含该参数，dst的元素数据类型用于确定函数重载。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器），仅带mask的重载包含该参数。mask筛选的元素在dst中填充为value，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_bfloat16_t& dst, bfloat16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__Rvu32_u32_vb
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。仅带输出参数的接口包含该参数，dst的元素数据类型用于确定函数重载。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器），仅带mask的重载包含该参数。mask筛选的元素在dst中填充为value，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_uint32_t& dst, uint32_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__Rvi32_i32_vb
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。仅带输出参数的接口包含该参数，dst的元素数据类型用于确定函数重载。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器），仅带mask的重载包含该参数。mask筛选的元素在dst中填充为value，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_int32_t& dst, int32_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__Rvf32_f32_vb
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。仅带输出参数的接口包含该参数，dst的元素数据类型用于确定函数重载。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器），仅带mask的重载包含该参数。mask筛选的元素在dst中填充为value，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_float& dst, float value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__u8_vb
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器），仅带mask的重载包含该参数。mask筛选的元素在dst中填充为value，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline vector_uint8_t asc_duplicate_scalar(uint8_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__i8_vb
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器），仅带mask的重载包含该参数。mask筛选的元素在dst中填充为value，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline vector_int8_t asc_duplicate_scalar(int8_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__f8e4m3_vb
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器），仅带mask的重载包含该参数。mask筛选的元素在dst中填充为value，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_duplicate_scalar(fp8_e4m3fn_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__f8e5m2_vb
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器），仅带mask的重载包含该参数。mask筛选的元素在dst中填充为value，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline vector_fp8_e5m2_t asc_duplicate_scalar(fp8_e5m2_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__f8e8m0_vb
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器），仅带mask的重载包含该参数。mask筛选的元素在dst中填充为value，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline vector_fp8_e8m0_t asc_duplicate_scalar(fp8_e8m0_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__u16_vb
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器），仅带mask的重载包含该参数。mask筛选的元素在dst中填充为value，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline vector_uint16_t asc_duplicate_scalar(uint16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__i16_vb
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器），仅带mask的重载包含该参数。mask筛选的元素在dst中填充为value，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline vector_int16_t asc_duplicate_scalar(int16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__f16_vb
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器），仅带mask的重载包含该参数。mask筛选的元素在dst中填充为value，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline vector_half asc_duplicate_scalar(half value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__bf16_vb
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器），仅带mask的重载包含该参数。mask筛选的元素在dst中填充为value，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline vector_bfloat16_t asc_duplicate_scalar(bfloat16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__u32_vb
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器），仅带mask的重载包含该参数。mask筛选的元素在dst中填充为value，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline vector_uint32_t asc_duplicate_scalar(uint32_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__i32_vb
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器），仅带mask的重载包含该参数。mask筛选的元素在dst中填充为value，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline vector_int32_t asc_duplicate_scalar(int32_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__f32_vb
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器），仅带mask的重载包含该参数。mask筛选的元素在dst中填充为value，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline vector_float asc_duplicate_scalar(float value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar_merge__Rvu8_u8_vb
+ * @archs 3510
+ * @brief merge模式下，将标量值value广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_uint8_t& dst, uint8_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar_merge__Rvi8_i8_vb
+ * @archs 3510
+ * @brief merge模式下，将标量值value广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_int8_t& dst, int8_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar_merge__Rvf8e4m3_f8e4m3_vb
+ * @archs 3510
+ * @brief merge模式下，将标量值value广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_fp8_e4m3fn_t& dst, fp8_e4m3fn_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar_merge__Rvf8e5m2_f8e5m2_vb
+ * @archs 3510
+ * @brief merge模式下，将标量值value广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_fp8_e5m2_t& dst, fp8_e5m2_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar_merge__Rvf8e8m0_f8e8m0_vb
+ * @archs 3510
+ * @brief merge模式下，将标量值value广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_fp8_e8m0_t& dst, fp8_e8m0_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar_merge__Rvu16_u16_vb
+ * @archs 3510
+ * @brief merge模式下，将标量值value广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_uint16_t& dst, uint16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar_merge__Rvi16_i16_vb
+ * @archs 3510
+ * @brief merge模式下，将标量值value广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_int16_t& dst, int16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar_merge__Rvf16_f16_vb
+ * @archs 3510
+ * @brief merge模式下，将标量值value广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_half& dst, half value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar_merge__Rvbf16_bf16_vb
+ * @archs 3510
+ * @brief merge模式下，将标量值value广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_bfloat16_t& dst, bfloat16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar_merge__Rvu32_u32_vb
+ * @archs 3510
+ * @brief merge模式下，将标量值value广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_uint32_t& dst, uint32_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar_merge__Rvi32_i32_vb
+ * @archs 3510
+ * @brief merge模式下，将标量值value广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_int32_t& dst, int32_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar_merge__Rvf32_f32_vb
+ * @archs 3510
+ * @brief merge模式下，将标量值value广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_float& dst, float value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__Rvu8_u8
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。仅带输出参数的接口包含该参数，dst的元素数据类型用于确定函数重载。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_uint8_t& dst, uint8_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__Rvi8_i8
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。仅带输出参数的接口包含该参数，dst的元素数据类型用于确定函数重载。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_int8_t& dst, int8_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__Rvu16_u16
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。仅带输出参数的接口包含该参数，dst的元素数据类型用于确定函数重载。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_uint16_t& dst, uint16_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__Rvi16_i16
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。仅带输出参数的接口包含该参数，dst的元素数据类型用于确定函数重载。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_int16_t& dst, int16_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__Rvu32_u32
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。仅带输出参数的接口包含该参数，dst的元素数据类型用于确定函数重载。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_uint32_t& dst, uint32_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__Rvi32_i32
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。仅带输出参数的接口包含该参数，dst的元素数据类型用于确定函数重载。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_int32_t& dst, int32_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__Rvf16_f16
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。仅带输出参数的接口包含该参数，dst的元素数据类型用于确定函数重载。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_half& dst, half value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__Rvf32_f32
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。仅带输出参数的接口包含该参数，dst的元素数据类型用于确定函数重载。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_float& dst, float value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__Rvbf16_bf16
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。仅带输出参数的接口包含该参数，dst的元素数据类型用于确定函数重载。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_bfloat16_t& dst, bfloat16_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__Rvf8e4m3_f8e4m3
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。仅带输出参数的接口包含该参数，dst的元素数据类型用于确定函数重载。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_fp8_e4m3fn_t& dst, fp8_e4m3fn_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__Rvf8e5m2_f8e5m2
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。仅带输出参数的接口包含该参数，dst的元素数据类型用于确定函数重载。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_fp8_e5m2_t& dst, fp8_e5m2_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__Rvf8e8m0_f8e8m0
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。仅带输出参数的接口包含该参数，dst的元素数据类型用于确定函数重载。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_fp8_e8m0_t& dst, fp8_e8m0_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__u8
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ */
 __simd_callee__ inline vector_uint8_t asc_duplicate_scalar(uint8_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__i8
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ */
 __simd_callee__ inline vector_int8_t asc_duplicate_scalar(int8_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__u16
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ */
 __simd_callee__ inline vector_uint16_t asc_duplicate_scalar(uint16_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__i16
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ */
 __simd_callee__ inline vector_int16_t asc_duplicate_scalar(int16_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__u32
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ */
 __simd_callee__ inline vector_uint32_t asc_duplicate_scalar(uint32_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__i32
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ */
 __simd_callee__ inline vector_int32_t asc_duplicate_scalar(int32_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__f16
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ */
 __simd_callee__ inline vector_half asc_duplicate_scalar(half value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__f32
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ */
 __simd_callee__ inline vector_float asc_duplicate_scalar(float value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__bf16
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ */
 __simd_callee__ inline vector_bfloat16_t asc_duplicate_scalar(bfloat16_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__f8e4m3
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ */
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_duplicate_scalar(fp8_e4m3fn_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__f8e5m2
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ */
 __simd_callee__ inline vector_fp8_e5m2_t asc_duplicate_scalar(fp8_e5m2_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_scalar__f8e8m0
+ * @archs 3510
+ * @brief 将标量值广播到目的操作数中。
+ * @param [in] value 源操作数（标量），作为待广播的数据。对于带返回值接口，value的数据类型用于确定函数重载和返回类型，建议传入类型明确的变量或使用显式类型转换。
+ */
 __simd_callee__ inline vector_fp8_e8m0_t asc_duplicate_scalar(fp8_e8m0_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate__Rvu8_vu8_vb
+ * @archs 3510
+ * @brief 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。数据类型需要与src保持一致。仅无返回值类型接口包含该参数。
+ * @param [in] src 源操作数（矢量数据寄存器），其最低位元素作为待广播的数据。数据类型需要与dst保持一致。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline void asc_duplicate(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate__Rvi8_vi8_vb
+ * @archs 3510
+ * @brief 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。数据类型需要与src保持一致。仅无返回值类型接口包含该参数。
+ * @param [in] src 源操作数（矢量数据寄存器），其最低位元素作为待广播的数据。数据类型需要与dst保持一致。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline void asc_duplicate(vector_int8_t& dst, vector_int8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate__Rvf8e4m3_vf8e4m3_vb
+ * @archs 3510
+ * @brief 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。数据类型需要与src保持一致。仅无返回值类型接口包含该参数。
+ * @param [in] src 源操作数（矢量数据寄存器），其最低位元素作为待广播的数据。数据类型需要与dst保持一致。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline void asc_duplicate(vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate__Rvf8e5m2_vf8e5m2_vb
+ * @archs 3510
+ * @brief 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。数据类型需要与src保持一致。仅无返回值类型接口包含该参数。
+ * @param [in] src 源操作数（矢量数据寄存器），其最低位元素作为待广播的数据。数据类型需要与dst保持一致。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline void asc_duplicate(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate__Rvf8e8m0_vf8e8m0_vb
+ * @archs 3510
+ * @brief 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。数据类型需要与src保持一致。仅无返回值类型接口包含该参数。
+ * @param [in] src 源操作数（矢量数据寄存器），其最低位元素作为待广播的数据。数据类型需要与dst保持一致。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline void asc_duplicate(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate__Rvu16_vu16_vb
+ * @archs 3510
+ * @brief 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。数据类型需要与src保持一致。仅无返回值类型接口包含该参数。
+ * @param [in] src 源操作数（矢量数据寄存器），其最低位元素作为待广播的数据。数据类型需要与dst保持一致。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline void asc_duplicate(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate__Rvi16_vi16_vb
+ * @archs 3510
+ * @brief 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。数据类型需要与src保持一致。仅无返回值类型接口包含该参数。
+ * @param [in] src 源操作数（矢量数据寄存器），其最低位元素作为待广播的数据。数据类型需要与dst保持一致。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline void asc_duplicate(vector_int16_t& dst, vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate__Rvf16_vf16_vb
+ * @archs 3510
+ * @brief 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。数据类型需要与src保持一致。仅无返回值类型接口包含该参数。
+ * @param [in] src 源操作数（矢量数据寄存器），其最低位元素作为待广播的数据。数据类型需要与dst保持一致。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline void asc_duplicate(vector_half& dst, vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate__Rvbf16_vbf16_vb
+ * @archs 3510
+ * @brief 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。数据类型需要与src保持一致。仅无返回值类型接口包含该参数。
+ * @param [in] src 源操作数（矢量数据寄存器），其最低位元素作为待广播的数据。数据类型需要与dst保持一致。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline void asc_duplicate(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate__Rvu32_vu32_vb
+ * @archs 3510
+ * @brief 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。数据类型需要与src保持一致。仅无返回值类型接口包含该参数。
+ * @param [in] src 源操作数（矢量数据寄存器），其最低位元素作为待广播的数据。数据类型需要与dst保持一致。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline void asc_duplicate(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate__Rvi32_vi32_vb
+ * @archs 3510
+ * @brief 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。数据类型需要与src保持一致。仅无返回值类型接口包含该参数。
+ * @param [in] src 源操作数（矢量数据寄存器），其最低位元素作为待广播的数据。数据类型需要与dst保持一致。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline void asc_duplicate(vector_int32_t& dst, vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate__Rvf32_vf32_vb
+ * @archs 3510
+ * @brief 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
+ * @param [out] dst 目的操作数（矢量数据寄存器），保存广播结果。数据类型需要与src保持一致。仅无返回值类型接口包含该参数。
+ * @param [in] src 源操作数（矢量数据寄存器），其最低位元素作为待广播的数据。数据类型需要与dst保持一致。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline void asc_duplicate(vector_float& dst, vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate__vu8_vb
+ * @archs 3510
+ * @brief 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
+ * @param [in] src 源操作数（矢量数据寄存器），其最低位元素作为待广播的数据。数据类型需要与dst保持一致。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline vector_uint8_t asc_duplicate(vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate__vi8_vb
+ * @archs 3510
+ * @brief 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
+ * @param [in] src 源操作数（矢量数据寄存器），其最低位元素作为待广播的数据。数据类型需要与dst保持一致。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline vector_int8_t asc_duplicate(vector_int8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate__vf8e4m3_vb
+ * @archs 3510
+ * @brief 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
+ * @param [in] src 源操作数（矢量数据寄存器），其最低位元素作为待广播的数据。数据类型需要与dst保持一致。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_duplicate(vector_fp8_e4m3fn_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate__vf8e5m2_vb
+ * @archs 3510
+ * @brief 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
+ * @param [in] src 源操作数（矢量数据寄存器），其最低位元素作为待广播的数据。数据类型需要与dst保持一致。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline vector_fp8_e5m2_t asc_duplicate(vector_fp8_e5m2_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate__vf8e8m0_vb
+ * @archs 3510
+ * @brief 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
+ * @param [in] src 源操作数（矢量数据寄存器），其最低位元素作为待广播的数据。数据类型需要与dst保持一致。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline vector_fp8_e8m0_t asc_duplicate(vector_fp8_e8m0_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate__vu16_vb
+ * @archs 3510
+ * @brief 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
+ * @param [in] src 源操作数（矢量数据寄存器），其最低位元素作为待广播的数据。数据类型需要与dst保持一致。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline vector_uint16_t asc_duplicate(vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate__vi16_vb
+ * @archs 3510
+ * @brief 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
+ * @param [in] src 源操作数（矢量数据寄存器），其最低位元素作为待广播的数据。数据类型需要与dst保持一致。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline vector_int16_t asc_duplicate(vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate__vf16_vb
+ * @archs 3510
+ * @brief 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
+ * @param [in] src 源操作数（矢量数据寄存器），其最低位元素作为待广播的数据。数据类型需要与dst保持一致。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline vector_half asc_duplicate(vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate__vbf16_vb
+ * @archs 3510
+ * @brief 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
+ * @param [in] src 源操作数（矢量数据寄存器），其最低位元素作为待广播的数据。数据类型需要与dst保持一致。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline vector_bfloat16_t asc_duplicate(vector_bfloat16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate__vu32_vb
+ * @archs 3510
+ * @brief 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
+ * @param [in] src 源操作数（矢量数据寄存器），其最低位元素作为待广播的数据。数据类型需要与dst保持一致。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline vector_uint32_t asc_duplicate(vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate__vi32_vb
+ * @archs 3510
+ * @brief 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
+ * @param [in] src 源操作数（矢量数据寄存器），其最低位元素作为待广播的数据。数据类型需要与dst保持一致。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline vector_int32_t asc_duplicate(vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate__vf32_vb
+ * @archs 3510
+ * @brief 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
+ * @param [in] src 源操作数（矢量数据寄存器），其最低位元素作为待广播的数据。数据类型需要与dst保持一致。
+ * @param [in] mask 源操作数元素操作的有效指示（掩码寄存器）。mask筛选的元素在dst中填充为src的最低位元素，未筛选的元素在dst中置零。
+ */
 __simd_callee__ inline vector_float asc_duplicate(vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_highest__Rvu8_vu8_vb
+ * @archs 3510
+ * @brief 将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的位置被置为0。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_duplicate_highest(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_highest__Rvi8_vi8_vb
+ * @archs 3510
+ * @brief 将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的位置被置为0。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_duplicate_highest(vector_int8_t& dst, vector_int8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_highest__Rvf8e4m3_vf8e4m3_vb
+ * @archs 3510
+ * @brief 将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的位置被置为0。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_duplicate_highest(vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_highest__Rvf8e5m2_vf8e5m2_vb
+ * @archs 3510
+ * @brief 将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的位置被置为0。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_duplicate_highest(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_highest__Rvf8e8m0_vf8e8m0_vb
+ * @archs 3510
+ * @brief 将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的位置被置为0。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_duplicate_highest(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_highest__Rvu16_vu16_vb
+ * @archs 3510
+ * @brief 将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的位置被置为0。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_duplicate_highest(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_highest__Rvi16_vi16_vb
+ * @archs 3510
+ * @brief 将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的位置被置为0。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_duplicate_highest(vector_int16_t& dst, vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_highest__Rvf16_vf16_vb
+ * @archs 3510
+ * @brief 将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的位置被置为0。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_duplicate_highest(vector_half& dst, vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_highest__Rvbf16_vbf16_vb
+ * @archs 3510
+ * @brief 将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的位置被置为0。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_duplicate_highest(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_highest__Rvu32_vu32_vb
+ * @archs 3510
+ * @brief 将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的位置被置为0。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_duplicate_highest(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_highest__Rvi32_vi32_vb
+ * @archs 3510
+ * @brief 将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的位置被置为0。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_duplicate_highest(vector_int32_t& dst, vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_highest__Rvf32_vf32_vb
+ * @archs 3510
+ * @brief 将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的位置被置为0。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_duplicate_highest(vector_float& dst, vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_merge__Rvu8_vu8_vb
+ * @archs 3510
+ * @brief merge模式下，将src的最低位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_merge(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_merge__Rvi8_vi8_vb
+ * @archs 3510
+ * @brief merge模式下，将src的最低位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_merge(vector_int8_t& dst, vector_int8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_merge__Rvf8e4m3_vf8e4m3_vb
+ * @archs 3510
+ * @brief merge模式下，将src的最低位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_merge(vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_merge__Rvf8e5m2_vf8e5m2_vb
+ * @archs 3510
+ * @brief merge模式下，将src的最低位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_merge(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_merge__Rvf8e8m0_vf8e8m0_vb
+ * @archs 3510
+ * @brief merge模式下，将src的最低位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_merge(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_merge__Rvu16_vu16_vb
+ * @archs 3510
+ * @brief merge模式下，将src的最低位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_merge(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_merge__Rvi16_vi16_vb
+ * @archs 3510
+ * @brief merge模式下，将src的最低位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_merge(vector_int16_t& dst, vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_merge__Rvf16_vf16_vb
+ * @archs 3510
+ * @brief merge模式下，将src的最低位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_merge(vector_half& dst, vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_merge__Rvbf16_vbf16_vb
+ * @archs 3510
+ * @brief merge模式下，将src的最低位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_merge(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_merge__Rvu32_vu32_vb
+ * @archs 3510
+ * @brief merge模式下，将src的最低位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_merge(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_merge__Rvi32_vi32_vb
+ * @archs 3510
+ * @brief merge模式下，将src的最低位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_merge(vector_int32_t& dst, vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_merge__Rvf32_vf32_vb
+ * @archs 3510
+ * @brief merge模式下，将src的最低位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_merge(vector_float& dst, vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_highest_merge__Rvu8_vu8_vb
+ * @archs 3510
+ * @brief merge模式下，将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_highest_merge(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_highest_merge__Rvi8_vi8_vb
+ * @archs 3510
+ * @brief merge模式下，将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_highest_merge(vector_int8_t& dst, vector_int8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_highest_merge__Rvf8e4m3_vf8e4m3_vb
+ * @archs 3510
+ * @brief merge模式下，将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_highest_merge(
     vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_highest_merge__Rvf8e5m2_vf8e5m2_vb
+ * @archs 3510
+ * @brief merge模式下，将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_highest_merge(
     vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_highest_merge__Rvf8e8m0_vf8e8m0_vb
+ * @archs 3510
+ * @brief merge模式下，将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_highest_merge(
     vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_highest_merge__Rvu16_vu16_vb
+ * @archs 3510
+ * @brief merge模式下，将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_highest_merge(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_highest_merge__Rvi16_vi16_vb
+ * @archs 3510
+ * @brief merge模式下，将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_highest_merge(vector_int16_t& dst, vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_highest_merge__Rvf16_vf16_vb
+ * @archs 3510
+ * @brief merge模式下，将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_highest_merge(vector_half& dst, vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_highest_merge__Rvbf16_vbf16_vb
+ * @archs 3510
+ * @brief merge模式下，将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_highest_merge(
     vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_highest_merge__Rvu32_vu32_vb
+ * @archs 3510
+ * @brief merge模式下，将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_highest_merge(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_highest_merge__Rvi32_vi32_vb
+ * @archs 3510
+ * @brief merge模式下，将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_highest_merge(vector_int32_t& dst, vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @override_id asc_duplicate_highest_merge__Rvf32_vf32_vb
+ * @archs 3510
+ * @brief merge模式下，将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_duplicate_highest_merge(vector_float& dst, vector_float src, vector_bool mask);
 
 #endif

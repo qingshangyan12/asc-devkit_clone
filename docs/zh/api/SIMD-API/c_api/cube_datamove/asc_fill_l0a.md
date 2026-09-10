@@ -1,3 +1,132 @@
+---
+okftype: reference.api.cpp
+title: "asc_fill_l0a"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0a.md"
+description: "将value的二进制值赋值给dst，对L0A Buffer的Local Memory进行初始化。"
+tag: [c_api, data_initialization, fill]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_fill_l0a__PCAi16_f16_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_fill_l0a__PCAi16_u32_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_fill_l0a__PCAu16_f16_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_fill_l0a__PCAu16_u32_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_fill_l0a__PCAf16_f16_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_fill_l0a__PCAf16_u32_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_fill_l0a__PCAbf16_bf16_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_fill_l0a__PCAbf16_f16_RCfillcfg"
+    archs: ["2201"]
+    headers: []
+  - override_id: "asc_fill_l0a__PCAbf16_u32_RCfillcfg"
+    archs: ["2201"]
+    headers: []
+  - override_id: "asc_fill_l0a__PCAi32_f16_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_fill_l0a__PCAi32_u32_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_fill_l0a__PCAu32_f16_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_fill_l0a__PCAu32_u32_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_fill_l0a__PCAf32_f16_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_fill_l0a__PCAf32_u32_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_fill_l0a_sync__PCAi16_f16_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_fill_l0a_sync__PCAi16_u32_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_fill_l0a_sync__PCAu16_f16_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_fill_l0a_sync__PCAu16_u32_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_fill_l0a_sync__PCAf16_f16_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_fill_l0a_sync__PCAf16_u32_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_fill_l0a_sync__PCAbf16_bf16_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_fill_l0a_sync__PCAbf16_f16_RCfillcfg"
+    archs: ["2201"]
+    headers: []
+  - override_id: "asc_fill_l0a_sync__PCAbf16_u32_RCfillcfg"
+    archs: ["2201"]
+    headers: []
+  - override_id: "asc_fill_l0a_sync__PCAi32_f16_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_fill_l0a_sync__PCAi32_u32_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_fill_l0a_sync__PCAu32_f16_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_fill_l0a_sync__PCAu32_u32_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_fill_l0a_sync__PCAf32_f16_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_fill_l0a_sync__PCAf32_u32_RCfillcfg"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_fill_l0a
 
 ## 产品支持情况
@@ -34,41 +163,361 @@
 
 - 常规计算
 
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a__PCAi16_f16_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
     ```cpp
     __aicore__ inline void asc_fill_l0a(__ca__ int16_t* dst, half value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a__PCAi16_u32_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a(__ca__ int16_t* dst, uint32_t value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a__PCAu16_f16_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a(__ca__ uint16_t* dst, half value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a__PCAu16_u32_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a(__ca__ uint16_t* dst, uint32_t value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a__PCAf16_f16_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a(__ca__ half* dst, half value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a__PCAf16_u32_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a(__ca__ half* dst, uint32_t value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a__PCAbf16_bf16_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a(__ca__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a__PCAbf16_f16_RCfillcfg"
+  archs: ["2201"]
+  headers: []
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a(__ca__ bfloat16_t* dst, half value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a__PCAbf16_u32_RCfillcfg"
+  archs: ["2201"]
+  headers: []
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a(__ca__ bfloat16_t* dst, uint32_t value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a__PCAi32_f16_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a(__ca__ int32_t* dst, half value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a__PCAi32_u32_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a(__ca__ int32_t* dst, uint32_t value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a__PCAu32_f16_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a(__ca__ uint32_t* dst, half value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a__PCAu32_u32_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a(__ca__ uint32_t* dst, uint32_t value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a__PCAf32_f16_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a(__ca__ float* dst, half value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a__PCAf32_u32_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a(__ca__ float* dst, uint32_t value, const asc_fill_value_config& config)
     ```
 
 - 同步计算
 
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a_sync__PCAi16_f16_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
     ```cpp
     __aicore__ inline void asc_fill_l0a_sync(__ca__ int16_t* dst, half value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a_sync__PCAi16_u32_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a_sync(__ca__ int16_t* dst, uint32_t value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a_sync__PCAu16_f16_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a_sync(__ca__ uint16_t* dst, half value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a_sync__PCAu16_u32_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a_sync(__ca__ uint16_t* dst, uint32_t value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a_sync__PCAf16_f16_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a_sync(__ca__ half* dst, half value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a_sync__PCAf16_u32_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a_sync(__ca__ half* dst, uint32_t value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a_sync__PCAbf16_bf16_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a_sync(__ca__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a_sync__PCAbf16_f16_RCfillcfg"
+  archs: ["2201"]
+  headers: []
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a_sync(__ca__ bfloat16_t* dst, half value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a_sync__PCAbf16_u32_RCfillcfg"
+  archs: ["2201"]
+  headers: []
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a_sync(__ca__ bfloat16_t* dst, uint32_t value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a_sync__PCAi32_f16_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a_sync(__ca__ int32_t* dst, half value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a_sync__PCAi32_u32_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a_sync(__ca__ int32_t* dst, uint32_t value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a_sync__PCAu32_f16_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a_sync(__ca__ uint32_t* dst, half value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a_sync__PCAu32_u32_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a_sync(__ca__ uint32_t* dst, uint32_t value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a_sync__PCAf32_f16_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a_sync(__ca__ float* dst, half value, const asc_fill_value_config& config)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_fill_l0a_sync__PCAf32_u32_RCfillcfg"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_fill_l0a_sync(__ca__ float* dst, uint32_t value, const asc_fill_value_config& config)
     ```
 

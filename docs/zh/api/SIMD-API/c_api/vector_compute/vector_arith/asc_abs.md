@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: "asc_abs"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_abs.md"
+description: "按元素取绝对值。"
+tag: [c_api, compute, arithmetic, absolute, vector, memory_vector, 'src:unified_buffer',
+  'dst:unified_buffer', count_limited, elementwise, high_dimensional]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_abs__PUf16_PUf16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_arith.h"
+  - override_id: "asc_abs__PUf32_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_arith.h"
+  - override_id: "asc_abs__PUf16_PUf16_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_arith.h"
+  - override_id: "asc_abs__PUf32_PUf32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_arith.h"
+examples: []
+timestamp: "2026-09-10"
+---
 
 # asc_abs
 
@@ -38,15 +67,53 @@ $$
 
 - 前n个数据计算
 
+```yaml
+api_signature:
+  override_id: "asc_abs__PUf16_PUf16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_arith.h"
+```
+
     ```cpp
     __aicore__ inline void asc_abs(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_abs__PUf32_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_arith.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_abs(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
     ```
 
 - 高维切分计算
 
+```yaml
+api_signature:
+  override_id: "asc_abs__PUf16_PUf16_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_arith.h"
+```
+
     ```cpp
     __aicore__ inline void asc_abs(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_abs__PUf32_PUf32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_arith.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_abs(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
 

@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_abs_sub"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_abs_sub.md"
+description: "根据`mask`对源操作数`src0`、`src1`按元素相减后取绝对值，得到计算结果。"
+tag: [c_api, compute, arithmetic, absolute, mask, vector, register_vector, elementwise,
+  masked]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_abs_sub__v<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_fused.h"
+  - prototype_id: "asc_abs_sub__Rv<dtype>_v<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_fused.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_abs_sub
 
 ## 产品支持情况
@@ -36,11 +58,38 @@ $$
 
 ## 函数原型
 
+```yaml
+api_signature:
+  prototype_id: "asc_abs_sub__v<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_fused.h"
+  dtype:
+    values:
+      - "half"
+      - "float"
+```
+
 ```c
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_abs_sub(vector_<dtype> src0,
                                                   vector_<dtype> src1,
                                                   vector_bool mask)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_abs_sub__Rv<dtype>_v<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_fused.h"
+  dtype:
+    values:
+      - "half"
+      - "float"
+```
+
+```c
 
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_abs_sub(vector_<dtype>& dst,

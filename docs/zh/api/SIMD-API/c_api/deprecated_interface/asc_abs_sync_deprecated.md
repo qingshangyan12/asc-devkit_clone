@@ -1,3 +1,24 @@
+---
+okftype: reference.api.cpp
+title: "asc_abs_sync（废弃）"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_abs_sync_deprecated.md"
+description: "该接口废弃，请通过[asc_abs](../vector_compute/vector_arith/asc_abs.md)和同步接口[asc_sync](../sync/asc_sync.md)实现精细化调优，达成最优性能。"
+tag: [c_api, compute, arithmetic, absolute]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_abs_sync__PUf16_PUf16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_abs_sync__PUf32_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_abs_sync（废弃）
 
 ## 产品支持情况
@@ -39,8 +60,27 @@ $$
 
 - 同步计算
 
+```yaml
+api_signature:
+  override_id: "asc_abs_sync__PUf16_PUf16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
     ```cpp
     __aicore__ inline void asc_abs_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_abs_sync__PUf32_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_abs_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
     ```
 

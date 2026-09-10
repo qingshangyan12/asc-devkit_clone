@@ -1,3 +1,23 @@
+---
+okftype: reference.api.cpp
+title: "asc_sync_subblock_wait"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/asc_sync_subblock_wait.md"
+description: "本接口与[asc_sync_subblock_arrive](asc_sync_subblock_arrive.md)配对使用，实现同一AI Core内全部AIV（[subblock](inter_core_sync_overview.md#fig_block_subblock_relationship)）之间的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式1）。"
+tag: [c_api, 'operations:synchronization']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_sync_subblock_wait__pipe_u8"
+    archs: ["3510", "2201"]
+    headers: []
+  - override_id: "asc_sync_subblock_wait__pipe_i64"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/sync/sync.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_sync_subblock_wait
 
 ## 产品支持情况
@@ -35,9 +55,27 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_sync_subblock_wait__pipe_u8"
+  archs: ["3510", "2201"]
+  headers: []
+```
+
 ```c
 __aicore__ inline void asc_sync_subblock_wait(pipe_t pipe,
                                               uint8_t flag_id)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_sync_subblock_wait__pipe_i64"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/sync/sync.h"
+```
+
+```c
 
 __aicore__ inline void asc_sync_subblock_wait(pipe_t pipe,
                                               int64_t flag_id)

@@ -1,3 +1,76 @@
+---
+okftype: reference.api.cpp
+title: "asc_float2int64"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int64.md"
+description: "将float类型转化为int64_t类型。"
+tag: [c_api, compute, 'operations:conversion', vector, memory_vector, 'traits:rounding_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_float2int64_rn__PUi64_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_float2int64_rna__PUi64_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_float2int64_rd__PUi64_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_float2int64_ru__PUi64_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_float2int64_rz__PUi64_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_float2int64_rn__PUi64_PUf32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_float2int64_rna__PUi64_PUf32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_float2int64_rd__PUi64_PUf32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_float2int64_ru__PUi64_PUf32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_float2int64_rz__PUi64_PUf32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_float2int64_rn_sync__PUi64_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_float2int64_rna_sync__PUi64_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_float2int64_rd_sync__PUi64_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_float2int64_ru_sync__PUi64_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_float2int64_rz_sync__PUi64_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_float2int64
 
 ## 产品支持情况
@@ -42,45 +115,201 @@
 
 - 前n个数据计算
   
+```yaml
+api_signature:
+  override_id: "asc_float2int64_rn__PUi64_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
   ```cpp
   // RINT舍入模式
   __aicore__ inline void asc_float2int64_rn(__ubuf__ int64_t* dst, __ubuf__ float* src, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2int64_rna__PUi64_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
+  ```cpp
   // ROUND舍入模式
   __aicore__ inline void asc_float2int64_rna(__ubuf__ int64_t* dst, __ubuf__ float* src, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2int64_rd__PUi64_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
+  ```cpp
   // FLOOR舍入模式
   __aicore__ inline void asc_float2int64_rd(__ubuf__ int64_t* dst, __ubuf__ float* src, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2int64_ru__PUi64_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
+  ```cpp
   // CEIL舍入模式
   __aicore__ inline void asc_float2int64_ru(__ubuf__ int64_t* dst, __ubuf__ float* src, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2int64_rz__PUi64_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
+  ```cpp
   // TRUNC舍入模式
   __aicore__ inline void asc_float2int64_rz(__ubuf__ int64_t* dst, __ubuf__ float* src, uint32_t count)
   ```
 
 - 高维切分计算
   
+```yaml
+api_signature:
+  override_id: "asc_float2int64_rn__PUi64_PUf32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
   ```cpp
   // RINT舍入模式
   __aicore__ inline void asc_float2int64_rn(__ubuf__ int64_t* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2int64_rna__PUi64_PUf32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
+  ```cpp
   // ROUND舍入模式
   __aicore__ inline void asc_float2int64_rna(__ubuf__ int64_t* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2int64_rd__PUi64_PUf32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
+  ```cpp
   // FLOOR舍入模式
   __aicore__ inline void asc_float2int64_rd(__ubuf__ int64_t* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2int64_ru__PUi64_PUf32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
+  ```cpp
   // CEIL舍入模式
   __aicore__ inline void asc_float2int64_ru(__ubuf__ int64_t* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2int64_rz__PUi64_PUf32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
+  ```cpp
   // TRUNC舍入模式
   __aicore__ inline void asc_float2int64_rz(__ubuf__ int64_t* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
   ```
 
 - 同步计算
   
+```yaml
+api_signature:
+  override_id: "asc_float2int64_rn_sync__PUi64_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
   ```cpp
   // RINT舍入模式
   __aicore__ inline void asc_float2int64_rn_sync(__ubuf__ int64_t* dst, __ubuf__ float* src, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2int64_rna_sync__PUi64_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+  ```cpp
   // ROUND舍入模式
   __aicore__ inline void asc_float2int64_rna_sync(__ubuf__ int64_t* dst, __ubuf__ float* src, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2int64_rd_sync__PUi64_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+  ```cpp
   // FLOOR舍入模式
   __aicore__ inline void asc_float2int64_rd_sync(__ubuf__ int64_t* dst, __ubuf__ float* src, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2int64_ru_sync__PUi64_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+  ```cpp
   // CEIL舍入模式
   __aicore__ inline void asc_float2int64_ru_sync(__ubuf__ int64_t* dst, __ubuf__ float* src, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_float2int64_rz_sync__PUi64_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+  ```cpp
   // TRUNC舍入模式
   __aicore__ inline void asc_float2int64_rz_sync(__ubuf__ int64_t* dst, __ubuf__ float* src, uint32_t count)
   ```

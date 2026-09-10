@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: "asc_squeeze"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze.md"
+description: "将`src`中被`mask`选择的有效元素作为返回值返回或依次复制到`dst`中。有效元素在计算结果中从低到高连续排列，剩余位置元素置为0。"
+tag: [c_api, compute, 'operations:compact', mask, vector, register_vector, masked]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_squeeze__v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - prototype_id: "asc_squeeze__Rv<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/squeeze"
+    archs: ["3510"]
+    override_id: "asc_squeeze__Rvf32_vf32_vb"
+    file: "squeeze.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_squeeze
 
 ## 产品支持情况
@@ -36,10 +61,59 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  prototype_id: "asc_squeeze__v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "hifloat8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
 ```c
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_squeeze(vector_<dtype> src,
                                                   vector_bool mask)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_squeeze__Rv<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "hifloat8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
+```c
 
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_squeeze(vector_<dtype>& dst,

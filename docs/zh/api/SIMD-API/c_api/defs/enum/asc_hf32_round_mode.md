@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: "asc_hf32_round_mode"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_hf32_round_mode.md"
+description: "asc_hf32_round_mode用于Mmad计算开启HF32模式时由FP32舍入到HF32的舍入模式管理策略，在调用[asc_set_hf32_round_mode](../../cube_compute/asc_set_hf32_round_mode.md)时使用。"
+tag: [c_api, 'traits:rounding_mode']
+usage_dependencies:
+  status: not_applicable
+signature:
+  []
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_hf32_round_mode
 
 asc_hf32_round_mode用于Mmad计算开启HF32模式时由FP32舍入到HF32的舍入模式管理策略，在调用[asc_set_hf32_round_mode](../../cube_compute/asc_set_hf32_round_mode.md)时使用。

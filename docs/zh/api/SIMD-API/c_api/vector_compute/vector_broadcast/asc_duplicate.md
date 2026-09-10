@@ -1,3 +1,100 @@
+---
+okftype: reference.api.cpp
+title: "asc_duplicate"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_duplicate.md"
+description: "执行矢量复制（Duplicate）操作，将标量值复制填充到矢量中。"
+tag: [c_api, compute, 'operations:broadcast', scalar, vector, memory_vector, scalar_operand]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_duplicate__PUf16_f16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - override_id: "asc_duplicate__PUi16_i16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - override_id: "asc_duplicate__PUu16_u16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - override_id: "asc_duplicate__PUbf16_bf16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - override_id: "asc_duplicate__PUf32_f32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - override_id: "asc_duplicate__PUi32_i32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - override_id: "asc_duplicate__PUu32_u32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - override_id: "asc_duplicate__PUf16_f16_u8_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - override_id: "asc_duplicate__PUi16_i16_u8_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - override_id: "asc_duplicate__PUu16_u16_u8_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - override_id: "asc_duplicate__PUbf16_bf16_u8_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - override_id: "asc_duplicate__PUf32_f32_u8_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - override_id: "asc_duplicate__PUi32_i32_u8_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - override_id: "asc_duplicate__PUu32_u32_u8_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - override_id: "asc_duplicate_sync__PUf16_f16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_duplicate_sync__PUi16_i16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_duplicate_sync__PUu16_u16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_duplicate_sync__PUbf16_bf16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_duplicate_sync__PUf32_f32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_duplicate_sync__PUi32_i32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_duplicate_sync__PUu32_u32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_duplicate
 
 ## 产品支持情况
@@ -34,37 +131,259 @@
 
 - 前n个数据计算
 
+```yaml
+api_signature:
+  override_id: "asc_duplicate__PUf16_f16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+```
+
     ```cpp
     __aicore__ inline void asc_duplicate(__ubuf__ half* dst, half src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate__PUi16_i16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_duplicate(__ubuf__ int16_t* dst, int16_t src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate__PUu16_u16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_duplicate(__ubuf__ uint16_t* dst, uint16_t src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate__PUbf16_bf16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_duplicate(__ubuf__ bfloat16_t* dst, bfloat16_t src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate__PUf32_f32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_duplicate(__ubuf__ float* dst, float src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate__PUi32_i32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_duplicate(__ubuf__ int32_t* dst, int32_t src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate__PUu32_u32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_duplicate(__ubuf__ uint32_t* dst, uint32_t src, uint32_t count)
     ```
 
 - 高维切分计算
 
+```yaml
+api_signature:
+  override_id: "asc_duplicate__PUf16_f16_u8_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+```
+
     ```cpp
     __aicore__ inline void asc_duplicate(__ubuf__ half* dst, half src, uint8_t repeat, uint16_t dst_block_stride, uint16_t dst_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate__PUi16_i16_u8_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_duplicate(__ubuf__ int16_t* dst, int16_t src, uint8_t repeat, uint16_t dst_block_stride, uint16_t dst_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate__PUu16_u16_u8_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_duplicate(__ubuf__ uint16_t* dst, uint16_t src, uint8_t repeat, uint16_t dst_block_stride, uint16_t dst_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate__PUbf16_bf16_u8_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_duplicate(__ubuf__ bfloat16_t* dst, bfloat16_t src, uint8_t repeat, uint16_t dst_block_stride, uint16_t dst_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate__PUf32_f32_u8_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_duplicate(__ubuf__ float* dst, float src, uint8_t repeat, uint16_t dst_block_stride, uint16_t dst_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate__PUi32_i32_u8_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_duplicate(__ubuf__ int32_t* dst, int32_t src, uint8_t repeat, uint16_t dst_block_stride, uint16_t dst_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate__PUu32_u32_u8_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_duplicate(__ubuf__ uint32_t* dst, uint32_t src, uint8_t repeat, uint16_t dst_block_stride, uint16_t dst_repeat_stride)
     ```
 
 - 同步计算
 
+```yaml
+api_signature:
+  override_id: "asc_duplicate_sync__PUf16_f16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
     ```cpp
     __aicore__ inline void asc_duplicate_sync(__ubuf__ half* dst, half src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_sync__PUi16_i16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_duplicate_sync(__ubuf__ int16_t* dst, int16_t src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_sync__PUu16_u16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_duplicate_sync(__ubuf__ uint16_t* dst, uint16_t src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_sync__PUbf16_bf16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_duplicate_sync(__ubuf__ bfloat16_t* dst, bfloat16_t src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_sync__PUf32_f32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_duplicate_sync(__ubuf__ float* dst, float src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_sync__PUi32_i32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_duplicate_sync(__ubuf__ int32_t* dst, int32_t src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_sync__PUu32_u32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_duplicate_sync(__ubuf__ uint32_t* dst, uint32_t src, uint32_t count)
     ```
 

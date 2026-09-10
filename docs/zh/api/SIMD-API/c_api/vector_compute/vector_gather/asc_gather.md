@@ -1,3 +1,99 @@
+---
+okftype: reference.api.cpp
+title: "asc_gather"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather.md"
+description: "将src按照src_offset给定的偏移按元素收集到dst中。"
+tag: [c_api, compute, 'operations:gather', vector, memory_vector, elementwise]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_gather__PUi16_PUi16_PUu32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_gather.h"
+  - override_id: "asc_gather__PUu16_PUu16_PUu32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_gather.h"
+  - override_id: "asc_gather__PUf16_PUf16_PUu32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_gather.h"
+  - override_id: "asc_gather__PUbf16_PUbf16_PUu32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_gather.h"
+  - override_id: "asc_gather__PUi32_PUi32_PUu32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_gather.h"
+  - override_id: "asc_gather__PUu32_PUu32_PUu32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_gather.h"
+  - override_id: "asc_gather__PUf32_PUf32_PUu32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_gather.h"
+  - override_id: "asc_gather__PUi16_PUi16_PUu32_u16_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_gather.h"
+  - override_id: "asc_gather__PUu16_PUu16_PUu32_u16_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_gather.h"
+  - override_id: "asc_gather__PUf16_PUf16_PUu32_u16_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_gather.h"
+  - override_id: "asc_gather__PUbf16_PUbf16_PUu32_u16_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_gather.h"
+  - override_id: "asc_gather__PUi32_PUi32_PUu32_u16_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_gather.h"
+  - override_id: "asc_gather__PUu32_PUu32_PUu32_u16_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_gather.h"
+  - override_id: "asc_gather__PUf32_PUf32_PUu32_u16_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_gather.h"
+  - override_id: "asc_gather_sync__PUi16_PUi16_PUu32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_gather_sync__PUu16_PUu16_PUu32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_gather_sync__PUf16_PUf16_PUu32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_gather_sync__PUbf16_PUbf16_PUu32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_gather_sync__PUi32_PUi32_PUu32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_gather_sync__PUu32_PUu32_PUu32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_gather_sync__PUf32_PUf32_PUu32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
 
 # asc_gather
 
@@ -35,37 +131,259 @@
 
 - 前n个数据计算
 
+```yaml
+api_signature:
+  override_id: "asc_gather__PUi16_PUi16_PUu32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_gather.h"
+```
+
     ```cpp
     __aicore__ inline void asc_gather(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_gather__PUu16_PUu16_PUu32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_gather.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_gather(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_gather__PUf16_PUf16_PUu32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_gather.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_gather(__ubuf__ half* dst, __ubuf__ half* src, __ubuf__ uint32_t* src_offset, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_gather__PUbf16_PUbf16_PUu32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_gather.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_gather(__ubuf__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_gather__PUi32_PUi32_PUu32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_gather.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_gather(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_gather__PUu32_PUu32_PUu32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_gather.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_gather(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_gather__PUf32_PUf32_PUu32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_gather.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_gather(__ubuf__ float* dst, __ubuf__ float* src, __ubuf__ uint32_t* src_offset, uint32_t count)
     ```
 
 - 高维切分计算
 
+```yaml
+api_signature:
+  override_id: "asc_gather__PUi16_PUi16_PUu32_u16_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_gather.h"
+```
+
     ```cpp
     __aicore__ inline void asc_gather(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride, uint8_t repeat)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_gather__PUu16_PUu16_PUu32_u16_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_gather.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_gather(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride, uint8_t repeat)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_gather__PUf16_PUf16_PUu32_u16_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_gather.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_gather(__ubuf__ half* dst, __ubuf__ half* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride, uint8_t repeat)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_gather__PUbf16_PUbf16_PUu32_u16_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_gather.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_gather(__ubuf__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride, uint8_t repeat)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_gather__PUi32_PUi32_PUu32_u16_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_gather.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_gather(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride, uint8_t repeat)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_gather__PUu32_PUu32_PUu32_u16_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_gather.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_gather(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride, uint8_t repeat)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_gather__PUf32_PUf32_PUu32_u16_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_gather.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_gather(__ubuf__ float* dst, __ubuf__ float* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride, uint8_t repeat)
     ```
 
 - 同步计算
 
+```yaml
+api_signature:
+  override_id: "asc_gather_sync__PUi16_PUi16_PUu32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
     ```cpp
     __aicore__ inline void asc_gather_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_gather_sync__PUu16_PUu16_PUu32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_gather_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_gather_sync__PUf16_PUf16_PUu32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_gather_sync(__ubuf__ half* dst, __ubuf__ half* src, __ubuf__ uint32_t* src_offset, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_gather_sync__PUbf16_PUbf16_PUu32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_gather_sync(__ubuf__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_gather_sync__PUi32_PUi32_PUu32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_gather_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_gather_sync__PUu32_PUu32_PUu32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_gather_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_gather_sync__PUf32_PUf32_PUu32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_gather_sync(__ubuf__ float* dst, __ubuf__ float* src, __ubuf__ uint32_t* src_offset, uint32_t count)
     ```
 

@@ -1,3 +1,23 @@
+---
+okftype: reference.api.cpp
+title: "asc_squeeze_and_storeunalign"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md"
+description: "Reg计算数据搬运接口。将源矢量数据寄存器`src1`中被掩码`squeeze_mask`选中的元素压缩到目的矢量数据寄存器`dst`，并将这些元素连续搬出到Unified Buffer（UB）。压缩后的元素按其在`src1`中的顺序从`dst`的低位开始连续排列，`dst`中的剩余元素置0。"
+tag: [c_api, compute, 'operations:compact', mask, vector, register_vector, masked]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_squeeze_and_storeunalign__PU<dtype>_Rv<dtype>_Rvstoreunalign_v<dtype>_vb"
+    archs: ["3510"]
+    headers: []
+  - prototype_id: "asc_squeeze_and_storeunalign__PU<dtype>_Rv<dtype>_Rvstoreunalign_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_squeeze_and_storeunalign
 
 ## 产品支持情况
@@ -37,6 +57,40 @@ Reg计算数据搬运接口。将源矢量数据寄存器`src1`中被掩码`sque
 本接口仅在AIV上生效。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  prototype_id: "asc_squeeze_and_storeunalign__PU<dtype>_Rv<dtype>_Rvstoreunalign_v<dtype>_vb"
+  archs: ["3510"]
+  headers: []
+  dtype:
+    values:
+      - "int4b_t"
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_squeeze_and_storeunalign__PU<dtype>_Rv<dtype>_Rvstoreunalign_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
 
 ```c
 __simd_callee__ inline void asc_squeeze_and_storeunalign(

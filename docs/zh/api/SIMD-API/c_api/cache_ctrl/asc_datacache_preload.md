@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_datacache_preload"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_datacache_preload.md"
+description: "从源地址所在的特定GM地址预加载数据到Data Cache中，每次调用只能预加载一个Cache Line大小的数据。"
+tag: [c_api, 'roles:control', 'families:cache_management']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_datacache_preload__PGu64_i64"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/cache_ctrl/cache_ctrl.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_datacache_preload
 
 ## 产品支持情况
@@ -31,6 +48,14 @@
 从源地址所在的特定GM地址预加载数据到Data Cache中，每次调用只能预加载一个Cache Line大小的数据。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_datacache_preload__PGu64_i64"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/cache_ctrl/cache_ctrl.h"
+```
 
 ```cpp
 __aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t offset)

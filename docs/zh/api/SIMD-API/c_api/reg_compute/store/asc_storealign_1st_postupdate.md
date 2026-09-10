@@ -1,3 +1,21 @@
+---
+okftype: reference.api.cpp
+title: "asc_storealign_1st_postupdate"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_1st_postupdate.md"
+description: "将源矢量数据寄存器中的第一个元素写入Unified Buffer（UB）中目的地址。单次搬出单个元素的数据，不支持配置掩码，目的地址需按`sizeof(dtype)`对齐，搬运过程中数据格式和内容保持不变。接口采用Post Update模式，搬运完成后自动更新目的地址，便于硬件循环内连续多次调用时无需手动维护目的地址。本接口在Vector Function（`__simd_vf__`标记的函数）内使用。"
+tag: [c_api, data_movement, 'operations:store', vector, register_vector, 'src:vector_register',
+  'dst:unified_buffer', post_update]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_storealign_1st_postupdate__RPU<dtype>_v<dtype>_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storealign.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_storealign_1st_postupdate
 
 ## 产品支持情况
@@ -33,6 +51,25 @@
 本接口仅在AIV上执行有效。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  prototype_id: "asc_storealign_1st_postupdate__RPU<dtype>_v<dtype>_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storealign.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
 
 ```c
 // 占位符形式

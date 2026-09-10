@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_shiftright_scalar"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftright_scalar.md"
+description: "根据掩码对源操作数矢量数据寄存器中的元素执行右移，右移位数由标量立即数指定，并将结果通过函数返回值返回或写入目的操作数。掩码对应位置为1的元素参与计算，为0的元素在输出结果中置零。"
+tag: [c_api, compute, bitwise, 'operations:bitwise_shift', mask, scalar, vector, register_vector,
+  masked, scalar_operand]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_shiftright_scalar__v<dtype>_i16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_logic.h"
+  - prototype_id: "asc_shiftright_scalar__Rv<dtype>_v<dtype>_i16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_logic.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_shiftright_scalar
 
 ## 产品支持情况
@@ -43,11 +65,46 @@ $$
 
 ## 函数原型
 
+```yaml
+api_signature:
+  prototype_id: "asc_shiftright_scalar__v<dtype>_i16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_logic.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "int32_t"
+      - "uint32_t"
+```
+
 ```c
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_shiftright_scalar(vector_<dtype> src,
                                                             int16_t shift,
                                                             vector_bool mask)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_shiftright_scalar__Rv<dtype>_v<dtype>_i16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_logic.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "int32_t"
+      - "uint32_t"
+```
+
+```c
 
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_shiftright_scalar(vector_<dtype>& dst,

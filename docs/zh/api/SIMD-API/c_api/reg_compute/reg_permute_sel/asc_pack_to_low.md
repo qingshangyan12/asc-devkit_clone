@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: "asc_pack_to_low"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_low.md"
+description: "将源操作数中的元素选取偶数位bit(bool)、低8位（b16）、低16位（b32）、低32位（b64）写入目的操作数的低半部分。 当源操作数为vector_bool时，其按bit位进行压缩，每2bit将其中的低位bit存储至目的操作数的低半部分。"
+tag: [c_api, compute, 'operations:compression', vector, register_vector]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_pack_to_low__Rvu8_vu16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - override_id: "asc_pack_to_low__Rvu16_vu32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - override_id: "asc_pack_to_low__Rvb_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/data_relayout"
+    archs: ["3510"]
+    override_id: "asc_pack_to_low__Rvu16_vu32"
+    file: "data_relayout.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_pack_to_low
 
 ## 产品支持情况
@@ -35,9 +64,39 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_pack_to_low__Rvu8_vu16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
 ```cpp
 __simd_callee__ inline void asc_pack_to_low(vector_uint8_t& dst, vector_uint16_t src)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_pack_to_low__Rvu16_vu32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_pack_to_low(vector_uint16_t& dst, vector_uint32_t src)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_pack_to_low__Rvb_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_pack_to_low(vector_bool& dst, vector_bool src)
 ```
 

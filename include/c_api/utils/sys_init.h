@@ -27,6 +27,12 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/misc_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.utils.sys_init
+ * @override_id asc_init__z
+ * @archs 3510 2201
+ * @brief 本接口将当前AI Core上可能由前序算子遗留的全局状态恢复为接口约定的初始状态，避免这些状态影响当前算子的计算结果。本接口仅初始化控制状态，不会清零Global Memory、Local Memory或用户数据。
+ */
 __aicore__ inline void asc_init();
 
 #endif

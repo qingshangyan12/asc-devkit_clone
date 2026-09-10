@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: "asc_e5m22float (废弃)"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e5m22float_deprecated.md"
+description: "将vector_fp8_e5m2_t类型的源操作数以256B为单位分为四部分，读取其中一部分元素，将其转换成vector_float类型并写入目的操作数。"
+tag: [c_api, compute, 'operations:conversion', vector, register_vector]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_e5m22float__Rvf32_vf8e5m2_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_e5m22float_v2__Rvf32_vf8e5m2_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_e5m22float_v3__Rvf32_vf8e5m2_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_e5m22float_v4__Rvf32_vf8e5m2_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_e5m22float (废弃)
 
 ## 产品支持情况
@@ -40,10 +69,51 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_e5m22float__Rvf32_vf8e5m2_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```cpp
 __simd_callee__ inline void asc_e5m22float(vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_e5m22float_v2__Rvf32_vf8e5m2_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_e5m22float_v2(vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_e5m22float_v3__Rvf32_vf8e5m2_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_e5m22float_v3(vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_e5m22float_v4__Rvf32_vf8e5m2_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_e5m22float_v4(vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask)
 ```
 

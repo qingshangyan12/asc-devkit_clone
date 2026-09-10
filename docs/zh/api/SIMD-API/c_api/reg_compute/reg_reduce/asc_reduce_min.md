@@ -1,3 +1,24 @@
+---
+okftype: reference.api.cpp
+title: "asc_reduce_min"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_min.md"
+description: "根据`mask`对源操作数`src`进行归约最小值操作，得到归约结果。结果保存在`dst`的第0个元素，最小值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最小值，则保留最小的索引。"
+tag: [c_api, compute, reduction, mask, vector, register_vector, masked]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_reduce_min__v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_reduce.h"
+  - prototype_id: "asc_reduce_min__Rv<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_reduce.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_reduce_min
 
 ## 产品支持情况
@@ -39,10 +60,45 @@ $$
 
 ## 函数原型
 
+```yaml
+api_signature:
+  prototype_id: "asc_reduce_min__v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_reduce.h"
+  dtype:
+    values:
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
 ```c
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_reduce_min(vector_<dtype> src,
                                                       vector_bool mask)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_reduce_min__Rv<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_reduce.h"
+  dtype:
+    values:
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
+```c
 
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_reduce_min(vector_<dtype>& dst,

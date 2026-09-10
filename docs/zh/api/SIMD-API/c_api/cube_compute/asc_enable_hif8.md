@@ -1,3 +1,21 @@
+---
+okftype: reference.api.cpp
+title: "asc_enable_hif8"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hif8.md"
+description: "用于设置Mmad计算开启HiF8模式，开启该模式后L0A Buffer/L0B Buffer中的8bit数据将在参与矩阵乘法运算前被转化为hifloat8_t类型数据。"
+tag: [c_api, compute, 'roles:configuration', 'operations:matrix_multiply_accumulate',
+  matrix]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_enable_hif8__z"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_compute/cube_compute.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_enable_hif8
 
 ## 产品支持情况
@@ -31,6 +49,14 @@
 用于设置Mmad计算开启HiF8模式，开启该模式后L0A Buffer/L0B Buffer中的8bit数据将在参与矩阵乘法运算前被转化为hifloat8_t类型数据。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_enable_hif8__z"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_compute/cube_compute.h"
+```
 
  ```cpp
 __aicore__ inline void asc_enable_hif8()

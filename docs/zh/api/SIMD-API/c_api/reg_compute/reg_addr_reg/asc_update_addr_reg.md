@@ -1,3 +1,68 @@
+---
+okftype: reference.api.cpp
+title: "asc_update_addr_reg"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md"
+description: "更新地址寄存器（[addr_reg](../../defs/type/data_type_definition.md#地址寄存器)），用于迭代寻址。"
+tag: [c_api, 'roles:configuration']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_update_addr_reg_b8__u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - override_id: "asc_update_addr_reg_b16__u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - override_id: "asc_update_addr_reg_b32__u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - override_id: "asc_update_addr_reg_b8__u32_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - override_id: "asc_update_addr_reg_b16__u32_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - override_id: "asc_update_addr_reg_b32__u32_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - override_id: "asc_update_addr_reg_b8__u32_u32_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - override_id: "asc_update_addr_reg_b16__u32_u32_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - override_id: "asc_update_addr_reg_b32__u32_u32_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - override_id: "asc_update_addr_reg_b8__u32_u32_u32_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - override_id: "asc_update_addr_reg_b16__u32_u32_u32_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - override_id: "asc_update_addr_reg_b32__u32_u32_u32_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_align"
+    archs: ["3510"]
+    override_id: "asc_update_addr_reg_b16__u32"
+    file: "reg_load_store_align.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_update_addr_reg
 
 ## 产品支持情况
@@ -43,33 +108,153 @@
 
 - 1维偏移
 
+```yaml
+api_signature:
+  override_id: "asc_update_addr_reg_b8__u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+```
+
     ```cpp
     __simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_update_addr_reg_b16__u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+```
+
+    ```cpp
     __simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_update_addr_reg_b32__u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+```
+
+    ```cpp
     __simd_callee__ inline addr_reg asc_update_addr_reg_b32(uint32_t offset)
     ```
 
 - 2维偏移
 
+```yaml
+api_signature:
+  override_id: "asc_update_addr_reg_b8__u32_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+```
+
     ```cpp
     __simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset0, uint32_t offset1)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_update_addr_reg_b16__u32_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+```
+
+    ```cpp
     __simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset0, uint32_t offset1)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_update_addr_reg_b32__u32_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+```
+
+    ```cpp
     __simd_callee__ inline addr_reg asc_update_addr_reg_b32(uint32_t offset0, uint32_t offset1)
     ```
 
 - 3维偏移
 
+```yaml
+api_signature:
+  override_id: "asc_update_addr_reg_b8__u32_u32_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+```
+
     ```cpp
     __simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset0, uint32_t offset1, uint32_t offset2)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_update_addr_reg_b16__u32_u32_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+```
+
+    ```cpp
     __simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset0, uint32_t offset1, uint32_t offset2)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_update_addr_reg_b32__u32_u32_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+```
+
+    ```cpp
     __simd_callee__ inline addr_reg asc_update_addr_reg_b32(uint32_t offset0, uint32_t offset1, uint32_t offset2)
     ```
 
 - 4维偏移
 
+```yaml
+api_signature:
+  override_id: "asc_update_addr_reg_b8__u32_u32_u32_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+```
+
     ```cpp
     __simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_update_addr_reg_b16__u32_u32_u32_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+```
+
+    ```cpp
     __simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_update_addr_reg_b32__u32_u32_u32_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+```
+
+    ```cpp
     __simd_callee__ inline addr_reg asc_update_addr_reg_b32(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3)
     ```
 

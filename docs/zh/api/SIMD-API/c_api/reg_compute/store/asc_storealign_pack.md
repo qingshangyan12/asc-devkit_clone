@@ -1,3 +1,45 @@
+---
+okftype: reference.api.cpp
+title: "asc_storealign_pack"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack.md"
+description: "将矢量数据寄存器或掩码寄存器中的数据压缩搬出到Unified Buffer（UB）。当源操作数为矢量数据寄存器时，`mask`用于指示参与搬出的元素，`mask`对应位置为1时，将有效元素的低半部分bit数据写入压缩后对应的目的位置。`mask`对应位置为0时，压缩后对应的目的位置保持原值。当源操作数为掩码寄存器时，每间隔1 bit丢弃1 bit，将保留的bit连续压缩存储到目的地址，掩码寄存器搬出场景不支持配置掩码。本接口在Vector Function（`__simd_vf__`标记的函数）内使用。"
+tag: [c_api, data_movement, 'operations:compression', 'operations:store', mask, vector,
+  register_vector, 'src:vector_register', 'dst:unified_buffer', masked]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_storealign_pack__PU<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storealign.h"
+  - prototype_id: "asc_storealign_pack__PU<dtype>_v<dtype>_i32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storealign.h"
+  - prototype_id: "asc_storealign_pack__PU<dtype>_v<dtype>_ar_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storealign.h"
+  - prototype_id: "asc_storealign_pack__PU<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storealign.h"
+  - prototype_id: "asc_storealign_pack__PU<dtype>_vb_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storealign.h"
+  - prototype_id: "asc_storealign_pack__PU<dtype>_vb_ar"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storealign.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/cast"
+    archs: ["3510"]
+    override_id: "asc_storealign_pack__PUi32_vi32_vb"
+    file: "cast.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_storealign_pack
 
 ## 产品支持情况
@@ -52,6 +94,25 @@
 
 ### 矢量数据寄存器连续对齐搬出模式
 
+```yaml
+api_signature:
+  prototype_id: "asc_storealign_pack__PU<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storealign.h"
+  dtype:
+    values:
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+      - "int64_t"
+      - "uint64_t"
+```
+
 ```c
 // 占位符形式
 __simd_callee__ inline void asc_storealign_pack(__ubuf__ <dtype>* dst,
@@ -72,6 +133,25 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__ int16_t* dst,
 ```
 
 ### 矢量数据寄存器立即数偏移搬出模式
+
+```yaml
+api_signature:
+  prototype_id: "asc_storealign_pack__PU<dtype>_v<dtype>_i32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storealign.h"
+  dtype:
+    values:
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+      - "int64_t"
+      - "uint64_t"
+```
 
 ```c
 __simd_callee__ inline void asc_storealign_pack(__ubuf__ <dtype>* dst,
@@ -95,6 +175,25 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__ int16_t* dst,
 
 ### 矢量数据寄存器地址寄存器偏移压缩搬出
 
+```yaml
+api_signature:
+  prototype_id: "asc_storealign_pack__PU<dtype>_v<dtype>_ar_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storealign.h"
+  dtype:
+    values:
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+      - "int64_t"
+      - "uint64_t"
+```
+
 ```c
 __simd_callee__ inline void asc_storealign_pack(__ubuf__ <dtype>* dst,
                                                 vector_<dtype> src,
@@ -117,6 +216,19 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__ int16_t* dst,
 
 ### 掩码寄存器连续对齐搬出模式
 
+```yaml
+api_signature:
+  prototype_id: "asc_storealign_pack__PU<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storealign.h"
+  dtype:
+    values:
+      - "uint8_t"
+      - "uint16_t"
+      - "uint32_t"
+```
+
 ```c
 __simd_callee__ inline void asc_storealign_pack(__ubuf__ <dtype>* dst,
                                                 vector_bool src)
@@ -134,6 +246,19 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint8_t* dst,
 ```
 
 ### 掩码寄存器立即数偏移压缩搬出
+
+```yaml
+api_signature:
+  prototype_id: "asc_storealign_pack__PU<dtype>_vb_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storealign.h"
+  dtype:
+    values:
+      - "uint8_t"
+      - "uint16_t"
+      - "uint32_t"
+```
 
 ```c
 __simd_callee__ inline void asc_storealign_pack(__ubuf__ <dtype>* dst,
@@ -154,6 +279,19 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint8_t* dst,
 ```
 
 ### 掩码寄存器地址寄存器偏移压缩搬出
+
+```yaml
+api_signature:
+  prototype_id: "asc_storealign_pack__PU<dtype>_vb_ar"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storealign.h"
+  dtype:
+    values:
+      - "uint8_t"
+      - "uint16_t"
+      - "uint32_t"
+```
 
 ```c
 __simd_callee__ inline void asc_storealign_pack(__ubuf__ <dtype>* dst,

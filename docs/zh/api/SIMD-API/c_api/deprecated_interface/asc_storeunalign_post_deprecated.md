@@ -1,3 +1,80 @@
+---
+okftype: reference.api.cpp
+title: "asc_storeunalign_post（废弃）"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_post_deprecated.md"
+description: "**该接口已废弃。请使用[asc_squeeze_and_storeunalign_finalize](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md)实现此功能。"
+tag: [c_api, deprecated]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_storeunalign_post__PUi8_vstoreunalign"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storeunalign.h"
+  - override_id: "asc_storeunalign_post__PUu8_vstoreunalign"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storeunalign.h"
+  - override_id: "asc_storeunalign_post__PUf4e2m1x2_vstoreunalign"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storeunalign.h"
+  - override_id: "asc_storeunalign_post__PUf4e1m2x2_vstoreunalign"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storeunalign.h"
+  - override_id: "asc_storeunalign_post__PUi4x2_vstoreunalign"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storeunalign.h"
+  - override_id: "asc_storeunalign_post__PUf8e8m0_vstoreunalign"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storeunalign.h"
+  - override_id: "asc_storeunalign_post__PUf8e5m2_vstoreunalign"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storeunalign.h"
+  - override_id: "asc_storeunalign_post__PUf8e4m3_vstoreunalign"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storeunalign.h"
+  - override_id: "asc_storeunalign_post__PUi16_vstoreunalign"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storeunalign.h"
+  - override_id: "asc_storeunalign_post__PUu16_vstoreunalign"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storeunalign.h"
+  - override_id: "asc_storeunalign_post__PUf16_vstoreunalign"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storeunalign.h"
+  - override_id: "asc_storeunalign_post__PUbf16_vstoreunalign"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storeunalign.h"
+  - override_id: "asc_storeunalign_post__PUi32_vstoreunalign"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storeunalign.h"
+  - override_id: "asc_storeunalign_post__PUu32_vstoreunalign"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storeunalign.h"
+  - override_id: "asc_storeunalign_post__PUf32_vstoreunalign"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storeunalign.h"
+  - override_id: "asc_storeunalign_post__PUi64_vstoreunalign"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storeunalign.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_storeunalign_post（废弃）
 
 ## 产品支持情况
@@ -45,22 +122,195 @@ store_unalign或store_unalign_postupdate接口执行时，会将主块搬出至U
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_storeunalign_post__PUi8_vstoreunalign"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storeunalign.h"
+```
+
 ```cpp
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int8_t* dst, vector_store_unalign src)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_storeunalign_post__PUu8_vstoreunalign"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storeunalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ uint8_t* dst, vector_store_unalign src)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_storeunalign_post__PUf4e2m1x2_vstoreunalign"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storeunalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ fp4x2_e2m1_t* dst, vector_store_unalign src)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_storeunalign_post__PUf4e1m2x2_vstoreunalign"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storeunalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ fp4x2_e1m2_t* dst, vector_store_unalign src)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_storeunalign_post__PUi4x2_vstoreunalign"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storeunalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int4b_t* dst, vector_store_unalign src)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_storeunalign_post__PUf8e8m0_vstoreunalign"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storeunalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ fp8_e8m0_t* dst, vector_store_unalign src)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_storeunalign_post__PUf8e5m2_vstoreunalign"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storeunalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ fp8_e5m2_t* dst, vector_store_unalign src)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_storeunalign_post__PUf8e4m3_vstoreunalign"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storeunalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ fp8_e4m3fn_t* dst, vector_store_unalign src)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_storeunalign_post__PUi16_vstoreunalign"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storeunalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int16_t* dst, vector_store_unalign src)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_storeunalign_post__PUu16_vstoreunalign"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storeunalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ uint16_t* dst, vector_store_unalign src)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_storeunalign_post__PUf16_vstoreunalign"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storeunalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ half* dst, vector_store_unalign src)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_storeunalign_post__PUbf16_vstoreunalign"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storeunalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ bfloat16_t* dst, vector_store_unalign src)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_storeunalign_post__PUi32_vstoreunalign"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storeunalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int32_t* dst, vector_store_unalign src)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_storeunalign_post__PUu32_vstoreunalign"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storeunalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ uint32_t* dst, vector_store_unalign src)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_storeunalign_post__PUf32_vstoreunalign"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storeunalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ float* dst, vector_store_unalign src)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_storeunalign_post__PUi64_vstoreunalign"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storeunalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int64_t* dst, vector_store_unalign src)
 ```
 

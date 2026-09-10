@@ -1,3 +1,33 @@
+---
+okftype: reference.api.cpp
+title: "asc_or"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_or.md"
+description: "根据`mask`对源操作数`src0`、`src1`执行按位或（|）操作，将结果作为返回值返回或写入目的操作数`dst`。"
+tag: [c_api, compute, bitwise, 'operations:bitwise_or', mask, vector, register_vector,
+  masked]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_or__v<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_logic.h"
+  - prototype_id: "asc_or__Rv<dtype>_v<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_logic.h"
+  - override_id: "asc_or__vb_vb_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_logic.h"
+  - override_id: "asc_or__Rvb_vb_vb_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_logic.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_or
 
 ## 产品支持情况
@@ -46,11 +76,48 @@ $$
 
 ### 矢量数据寄存器按位或
 
+```yaml
+api_signature:
+  prototype_id: "asc_or__v<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_logic.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "int32_t"
+      - "uint32_t"
+```
+
 ```c
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_or(vector_<dtype> src0,
                                              vector_<dtype> src1,
                                              vector_bool mask)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_or__Rv<dtype>_v<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_logic.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
+```c
 
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_or(vector_<dtype>& dst,
@@ -81,11 +148,30 @@ __simd_callee__ inline void asc_or(vector_int32_t& dst,
 
 ### 掩码寄存器按位或
 
+```yaml
+api_signature:
+  override_id: "asc_or__vb_vb_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_logic.h"
+```
+
 ```c
 // 通过函数返回值返回结果
 __simd_callee__ inline vector_bool asc_or(vector_bool src0,
                                           vector_bool src1,
                                           vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_or__Rvb_vb_vb_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_logic.h"
+```
+
+```c
 
 // 通过引用参数输出结果
 __simd_callee__ inline void asc_or(vector_bool& dst,

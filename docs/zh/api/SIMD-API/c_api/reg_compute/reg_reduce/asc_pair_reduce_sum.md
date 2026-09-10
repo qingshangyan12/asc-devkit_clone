@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: "asc_pair_reduce_sum"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_pair_reduce_sum.md"
+description: "根据`mask`将源操作数`src`中每两个相邻元素相加，得到计算结果。结果连续保存在目的操作数`dst`的低半部分，`dst`的高半部分置0。"
+tag: [c_api, compute, reduction, mask, vector, register_vector, masked]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_pair_reduce_sum__v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_reduce.h"
+  - prototype_id: "asc_pair_reduce_sum__Rv<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_reduce.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce_pair"
+    archs: ["3510"]
+    override_id: "asc_pair_reduce_sum__Rvf32_vf32_vb"
+    file: "reduce_pair.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_pair_reduce_sum
 
 ## 产品支持情况
@@ -42,10 +67,37 @@ $$
 
 ## 函数原型
 
+```yaml
+api_signature:
+  prototype_id: "asc_pair_reduce_sum__v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_reduce.h"
+  dtype:
+    values:
+      - "half"
+      - "float"
+```
+
 ```c
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_pair_reduce_sum(vector_<dtype> src,
                                                            vector_bool mask)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_pair_reduce_sum__Rv<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_reduce.h"
+  dtype:
+    values:
+      - "half"
+      - "float"
+```
+
+```c
 
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_pair_reduce_sum(vector_<dtype>& dst,

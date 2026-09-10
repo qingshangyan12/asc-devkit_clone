@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_saturation_flag"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md"
+description: "按饱和模式类型设置对应饱和开关。`enable_sat`表示API语义上的“是否开启饱和”，接口内部会按模式处理不同语义。"
+tag: [c_api, 'roles:configuration', 'traits:saturation_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_saturation_flag__saturation_b"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/spr/spr.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_saturation_flag
 
 ## 产品支持情况
@@ -43,6 +60,14 @@
 
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_set_saturation_flag__saturation_b"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/spr/spr.h"
+```
 
 ```c
 __aicore__ inline void asc_set_saturation_flag(asc_saturation_mode saturation_mode, bool enable_sat)

@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_get_rsvd_count"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_rsvd_count.md"
+description: "此接口用于获取执行[asc_reduce](asc_reduce.md)操作后剩余的元素数量。"
+tag: [c_api, 'roles:query']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_get_rsvd_count__z"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_get_rsvd_count
 
 ## 产品支持情况
@@ -31,6 +48,14 @@
 此接口用于获取执行[asc_reduce](asc_reduce.md)操作后剩余的元素数量。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_get_rsvd_count__z"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+```
 
 ```cpp
   __aicore__ inline int64_t asc_get_rsvd_count()

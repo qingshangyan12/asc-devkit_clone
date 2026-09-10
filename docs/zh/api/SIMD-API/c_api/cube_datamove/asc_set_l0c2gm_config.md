@@ -1,3 +1,24 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_l0c2gm_config"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c2gm_config.md"
+description: "数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的矢量量化参数。"
+tag: [c_api, data_movement_configuration]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_l0c2gm_config__u64_u64_b"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_gm2l1"
+    archs: ["3510"]
+    override_id: "asc_set_l0c2gm_config__u64_u64_b"
+    file: "data_copy_gm2l1.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_set_l0c2gm_config
 ## 产品支持情况
 
@@ -30,6 +51,14 @@
 数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的矢量量化参数。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_set_l0c2gm_config__u64_u64_b"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
 
 ```cpp
 __aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag)

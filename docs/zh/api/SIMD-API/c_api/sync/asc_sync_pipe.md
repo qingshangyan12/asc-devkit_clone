@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_sync_pipe"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/asc_sync_pipe.md"
+description: "完成同一流水线内的同步控制。"
+tag: [c_api, 'operations:synchronization']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_sync_pipe__pipe"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/sync/sync.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_sync_pipe
 
 ## 产品支持情况
@@ -39,6 +56,14 @@
 ![](../figures/asc_sync_pipe.png)
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_sync_pipe__pipe"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/sync/sync.h"
+```
 
 ```c
 __aicore__ inline void asc_sync_pipe(pipe_t pipe)

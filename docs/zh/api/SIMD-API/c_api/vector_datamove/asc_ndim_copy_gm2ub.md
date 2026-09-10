@@ -1,3 +1,132 @@
+---
+okftype: reference.api.cpp
+title: "asc_ndim_copy_gm2ub"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md"
+description: "多维数据搬运接口，将数据从Global Memory (GM)搬运到Unified Buffer（UB）。相比于基础数据搬移接口，可以更加自由配置搬入的维度信息。 本功能最多能处理5个维度，每个维度都可以单独配置Stride，且支持随路Padding功能。相关配置参数有很多，需要通过不同的接口传入。"
+tag: [c_api, data_movement, copy, 'src:global_memory', 'dst:unified_buffer']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_ndim_copy_gm2ub__PUi8_PGi8_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUu8_PGu8_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUf4e2m1x2_PGf4e2m1x2_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUf4e1m2x2_PGf4e1m2x2_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUf8e8m0_PGf8e8m0_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUf8e5m2_PGf8e5m2_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUf8e4m3_PGf8e4m3_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUi16_PGi16_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUu16_PGu16_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUf16_PGf16_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUbf16_PGbf16_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUi32_PGi32_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUu32_PGu32_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUf32_PGf32_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUi8_PGi8_u32_u32_u32_u32_u32_u8_u8_b_u8"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUu8_PGu8_u32_u32_u32_u32_u32_u8_u8_b_u8"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUf4e2m1x2_PGf4e2m1x2_u32_u32_u32_u32_u32_u8_u8_b_u8"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUf4e1m2x2_PGf4e1m2x2_u32_u32_u32_u32_u32_u8_u8_b_u8"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUf8e8m0_PGf8e8m0_u32_u32_u32_u32_u32_u8_u8_b_u8"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUf8e5m2_PGf8e5m2_u32_u32_u32_u32_u32_u8_u8_b_u8"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUf8e4m3_PGf8e4m3_u32_u32_u32_u32_u32_u8_u8_b_u8"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUi16_PGi16_u32_u32_u32_u32_u32_u8_u8_b_u8"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUu16_PGu16_u32_u32_u32_u32_u32_u8_u8_b_u8"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUf16_PGf16_u32_u32_u32_u32_u32_u8_u8_b_u8"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUbf16_PGbf16_u32_u32_u32_u32_u32_u8_u8_b_u8"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUi32_PGi32_u32_u32_u32_u32_u32_u8_u8_b_u8"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUu32_PGu32_u32_u32_u32_u32_u32_u8_u8_b_u8"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_ndim_copy_gm2ub__PUf32_PGf32_u32_u32_u32_u32_u32_u8_u8_b_u8"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_ub2l1"
+    archs: ["3510"]
+    override_id: "asc_ndim_copy_gm2ub__PUf16_PGf16_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+    file: "data_copy_ub2l1.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_ndim_copy_gm2ub
 
 ## 产品支持情况
@@ -65,39 +194,341 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUi8_PGi8_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
 ```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUu8_PGu8_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUf4e2m1x2_PGf4e2m1x2_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e2m1_t* dst, __gm__ fp4x2_e2m1_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUf4e1m2x2_PGf4e1m2x2_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e1m2_t* dst, __gm__ fp4x2_e1m2_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUf8e8m0_PGf8e8m0_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp8_e8m0_t* dst, __gm__ fp8_e8m0_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUf8e5m2_PGf8e5m2_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUf8e4m3_PGf8e4m3_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUi16_PGi16_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int16_t* dst, __gm__ int16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUu16_PGu16_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUf16_PGf16_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ half* dst, __gm__ half* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUbf16_PGbf16_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUi32_PGi32_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int32_t* dst, __gm__ int32_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUu32_PGu32_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUf32_PGf32_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ float* dst, __gm__ float* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
 ```
 
 **以下函数原型已废弃，请使用asc_load_l2_cache_mode类型枚举值进行L2 Cache管理策略配置。**
 
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUi8_PGi8_u32_u32_u32_u32_u32_u8_u8_b_u8"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
 ```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUu8_PGu8_u32_u32_u32_u32_u32_u8_u8_b_u8"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUf4e2m1x2_PGf4e2m1x2_u32_u32_u32_u32_u32_u8_u8_b_u8"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e2m1_t* dst, __gm__ fp4x2_e2m1_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUf4e1m2x2_PGf4e1m2x2_u32_u32_u32_u32_u32_u8_u8_b_u8"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e1m2_t* dst, __gm__ fp4x2_e1m2_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUf8e8m0_PGf8e8m0_u32_u32_u32_u32_u32_u8_u8_b_u8"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp8_e8m0_t* dst, __gm__ fp8_e8m0_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUf8e5m2_PGf8e5m2_u32_u32_u32_u32_u32_u8_u8_b_u8"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUf8e4m3_PGf8e4m3_u32_u32_u32_u32_u32_u8_u8_b_u8"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUi16_PGi16_u32_u32_u32_u32_u32_u8_u8_b_u8"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int16_t* dst, __gm__ int16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUu16_PGu16_u32_u32_u32_u32_u32_u8_u8_b_u8"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUf16_PGf16_u32_u32_u32_u32_u32_u8_u8_b_u8"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ half* dst, __gm__ half* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUbf16_PGbf16_u32_u32_u32_u32_u32_u8_u8_b_u8"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUi32_PGi32_u32_u32_u32_u32_u32_u8_u8_b_u8"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int32_t* dst, __gm__ int32_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUu32_PGu32_u32_u32_u32_u32_u32_u8_u8_b_u8"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_ndim_copy_gm2ub__PUf32_PGf32_u32_u32_u32_u32_u32_u8_u8_b_u8"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ float* dst, __gm__ float* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
 ```
 

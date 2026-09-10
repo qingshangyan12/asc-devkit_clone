@@ -101,9 +101,11 @@ private:
             for (uint32_t nBlockIdx = 0; nBlockIdx < nLoopCount; nBlockIdx++) {
                 uint32_t nIdx = nBlockIdx * tileN;
                 uint32_t curCols = (nIdx + tileN > n) ? (n - nIdx) : tileN;
+                //! [asc_copy_gm2ub_align__PUf16_PGf16_u32_u32_u8_u8_b_loadl2_u64_u32]
                 asc_copy_gm2ub_align(
                     ubLocal, srcGlobal + mIdx * n + nIdx, (uint16_t)tileM, (uint32_t)(curCols * sizeof(half)), 0, 0, 0,
                     asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, (uint64_t)((n - curCols) * sizeof(half)), 0);
+                //! [asc_copy_gm2ub_align__PUf16_PGf16_u32_u32_u8_u8_b_loadl2_u64_u32]
             }
         }
     }
@@ -122,10 +124,12 @@ private:
                 uint32_t mIdx = mStart + mBlockIdx * tileM;
                 for (uint32_t nBlockIdx = 0; nBlockIdx < nLoopCount; nBlockIdx++) {
                     uint32_t nIdx = nBlockIdx * tileN;
+                    //! [asc_copy_gm2ub_align__PUf16_PGf16_u32_u32_u8_u8_b_loadl2_u64_u32]
                     asc_copy_gm2ub_align(
                         ubLocal, srcGlobal + mIdx * n + nStart + nIdx, (uint16_t)tileM,
                         (uint32_t)(tileN * sizeof(half)), 0, 0, 0, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM,
                         (uint64_t)((n - tileN) * sizeof(half)), 0);
+                    //! [asc_copy_gm2ub_align__PUf16_PGf16_u32_u32_u8_u8_b_loadl2_u64_u32]
                 }
             }
         }
@@ -235,8 +239,12 @@ private:
 
             asc_sync_wait(PIPE_V, PIPE_MTE2, eventID);
 
+            //! [asc_copy_gm2ub_align__PUf16_PGf16_u32_u32_u8_u8_b_loadl2_u64_u32]
             asc_copy_gm2ub_align(xLocal, xGm + startElement, 1, curLen * sizeof(half), 0, 0, 0, l2CacheMode, 0, 0);
+            //! [asc_copy_gm2ub_align__PUf16_PGf16_u32_u32_u8_u8_b_loadl2_u64_u32]
+            //! [asc_copy_gm2ub_align__PUf16_PGf16_u32_u32_u8_u8_b_loadl2_u64_u32]
             asc_copy_gm2ub_align(yLocal, yGm + startElement, 1, curLen * sizeof(half), 0, 0, 0, l2CacheMode, 0, 0);
+            //! [asc_copy_gm2ub_align__PUf16_PGf16_u32_u32_u8_u8_b_loadl2_u64_u32]
 
             asc_sync_notify(PIPE_MTE2, PIPE_V, eventID);
             asc_sync_wait(PIPE_MTE2, PIPE_V, eventID);

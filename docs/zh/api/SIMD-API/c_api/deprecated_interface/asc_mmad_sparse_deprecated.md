@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_mmad_sparse（废弃）"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_mmad_sparse_deprecated.md"
+description: "**入参`unit_flag`类型为`uint8_t`的`asc_mmad_sparse`接口和`asc_mmad_sparse_sync`接口已废弃。请使用入参`unit_flag_mode`类型为`asc_unit_flag_mode`的[asc_mmad_sparse](../cube_compute/asc_mmad_sparse.md)接口替代；原`asc_mmad_sparse_sync`接口的同步功能请通过新`asc_mmad_sparse`接口和`asc_sync()`实现，具体请参见[asc_sync](../sync/asc_sync.md)。"
+tag: [c_api, compute, 'operations:matrix_multiply_accumulate', matrix, post_update,
+  'traits:sparse_input']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_mmad_sparse__PCCi32_PCAi8_PCBi8_u16_u16_u16_u8_b_b"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_compute/cube_compute.h"
+  - override_id: "asc_mmad_sparse_sync__PCCi32_PCAi8_PCBi8_u16_u16_u16_u8_b_b"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_mmad_sparse（废弃）
 
 ## 产品支持情况
@@ -36,6 +58,14 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_mmad_sparse__PCCi32_PCAi8_PCBi8_u16_u16_u16_u8_b_b"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_compute/cube_compute.h"
+```
+
 ```c
 __aicore__ inline void asc_mmad_sparse(__cc__ int32_t* c,
                                        __ca__ int8_t* a,
@@ -46,6 +76,17 @@ __aicore__ inline void asc_mmad_sparse(__cc__ int32_t* c,
                                        uint8_t unit_flag,
                                        bool c_matrix_source,
                                        bool c_matrix_init_val)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_mmad_sparse_sync__PCCi32_PCAi8_PCBi8_u16_u16_u16_u8_b_b"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_compute_composite.h"
+```
+
+```c
 
 __aicore__ inline void asc_mmad_sparse_sync(__cc__ int32_t* c,
                                             __ca__ int8_t* a,

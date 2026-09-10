@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_mask_norm"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_norm.md"
+description: "设置Mask模式为Normal模式，该模式为系统默认模式。该模式下，Mask参数可控制高维切分计算过程中单次迭代内参与计算的元素。"
+tag: [c_api, 'roles:configuration']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_mask_norm__z"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_mask_config.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_mask_norm
 
 ## 产品支持情况
@@ -31,6 +48,14 @@
 设置Mask模式为Normal模式，该模式为系统默认模式。该模式下，Mask参数可控制高维切分计算过程中单次迭代内参与计算的元素。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_set_mask_norm__z"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_mask_config.h"
+```
 
 ```cpp
 __aicore__ inline void asc_set_mask_norm()

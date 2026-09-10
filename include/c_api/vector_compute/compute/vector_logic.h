@@ -26,106 +26,486 @@
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
 #endif
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_shiftleft__PUi16_PUi16_u32_u8_u16_u16_u16_u16
+ * @archs 2201
+ * @brief 将所有元素左移distance位。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] distance 源操作数（标量），表示左移的位数。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_shiftleft(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint32_t distance, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_shiftleft__PUi16_PUi16_u32_u32
+ * @archs 2201
+ * @brief 将所有元素左移distance位。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] distance 源操作数（标量），表示左移的位数。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_shiftleft(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint32_t distance, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_shiftleft__PUu16_PUu16_u32_u8_u16_u16_u16_u16
+ * @archs 2201
+ * @brief 将所有元素左移distance位。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] distance 源操作数（标量），表示左移的位数。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_shiftleft(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t distance, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_shiftleft__PUu16_PUu16_u32_u32
+ * @archs 2201
+ * @brief 将所有元素左移distance位。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] distance 源操作数（标量），表示左移的位数。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_shiftleft(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t distance, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_shiftleft__PUi32_PUi32_u32_u8_u16_u16_u16_u16
+ * @archs 2201
+ * @brief 将所有元素左移distance位。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] distance 源操作数（标量），表示左移的位数。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_shiftleft(
     __ubuf__ int32_t* dst, __ubuf__ int32_t* src, uint32_t distance, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_shiftleft__PUi32_PUi32_u32_u32
+ * @archs 2201
+ * @brief 将所有元素左移distance位。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] distance 源操作数（标量），表示左移的位数。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_shiftleft(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, uint32_t distance, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_shiftleft__PUu32_PUu32_u32_u8_u16_u16_u16_u16
+ * @archs 2201
+ * @brief 将所有元素左移distance位。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] distance 源操作数（标量），表示左移的位数。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_shiftleft(
     __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t distance, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_shiftleft__PUu32_PUu32_u32_u32
+ * @archs 2201
+ * @brief 将所有元素左移distance位。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] distance 源操作数（标量），表示左移的位数。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_shiftleft(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t distance, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_or__PUi16_PUi16_PUi16_u32
+ * @archs 2201
+ * @brief 每对元素按位或运算。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_or(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_or__PUi16_PUi16_PUi16_u8_u8_u8_u8_u8_u8_u8
+ * @archs 2201
+ * @brief 每对元素按位或运算。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src0_block_stride 源操作数0单次迭代内不同DataBlock间地址步长。
+ * @param [in] src1_block_stride 源操作数1单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_or(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_or__PUu16_PUu16_PUu16_u32
+ * @archs 2201
+ * @brief 每对元素按位或运算。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_or(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_or__PUu16_PUu16_PUu16_u8_u8_u8_u8_u8_u8_u8
+ * @archs 2201
+ * @brief 每对元素按位或运算。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src0_block_stride 源操作数0单次迭代内不同DataBlock间地址步长。
+ * @param [in] src1_block_stride 源操作数1单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_or(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_not__PUi16_PUi16_u32
+ * @archs 2201
+ * @brief 按元素做按位取反。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_not(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_not__PUi16_PUi16_u8_u16_u16_u16_u16
+ * @archs 2201
+ * @brief 按元素做按位取反。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_not(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
     uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_not__PUu16_PUu16_u32
+ * @archs 2201
+ * @brief 按元素做按位取反。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_not(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_not__PUu16_PUu16_u8_u16_u16_u16_u16
+ * @archs 2201
+ * @brief 按元素做按位取反。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_not(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_shiftright__PUi16_PUi16_i32_u32
+ * @archs 2201
+ * @brief 对src中的每个元素执行右移，右移大小为value。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] value 源操作数（标量），表示右移的位数。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_shiftright(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_shiftright__PUi16_PUi16_i32_u8_u16_u16_u16_u16
+ * @archs 2201
+ * @brief 对src中的每个元素执行右移，右移大小为value。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] value 源操作数（标量），表示右移的位数。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_shiftright(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_shiftright__PUi32_PUi32_i32_u32
+ * @archs 2201
+ * @brief 对src中的每个元素执行右移，右移大小为value。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] value 源操作数（标量），表示右移的位数。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_shiftright(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_shiftright__PUi32_PUi32_i32_u8_u16_u16_u16_u16
+ * @archs 2201
+ * @brief 对src中的每个元素执行右移，右移大小为value。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] value 源操作数（标量），表示右移的位数。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_shiftright(
     __ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_shiftright__PUu16_PUu16_u32_u32
+ * @archs 2201
+ * @brief 对src中的每个元素执行右移，右移大小为value。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] value 源操作数（标量），表示右移的位数。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_shiftright(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t value, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_shiftright__PUu16_PUu16_u32_u8_u16_u16_u16_u16
+ * @archs 2201
+ * @brief 对src中的每个元素执行右移，右移大小为value。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] value 源操作数（标量），表示右移的位数。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_shiftright(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_shiftright__PUu32_PUu32_u32_u32
+ * @archs 2201
+ * @brief 对src中的每个元素执行右移，右移大小为value。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] value 源操作数（标量），表示右移的位数。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_shiftright(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t value, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_shiftright__PUu32_PUu32_u32_u8_u16_u16_u16_u16
+ * @archs 2201
+ * @brief 对src中的每个元素执行右移，右移大小为value。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] value 源操作数（标量），表示右移的位数。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_shiftright(
     __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_shiftright_round__PUi16_PUi16_i32_u32
+ * @archs 2201
+ * @brief 对src中的每个元素执行右移，右移大小为value。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] value 源操作数（标量），表示右移的位数。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_shiftright_round(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_shiftright_round__PUi16_PUi16_i32_u8_u16_u16_u16_u16
+ * @archs 2201
+ * @brief 对src中的每个元素执行右移，右移大小为value。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] value 源操作数（标量），表示右移的位数。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_shiftright_round(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_shiftright_round__PUi32_PUi32_i32_u32
+ * @archs 2201
+ * @brief 对src中的每个元素执行右移，右移大小为value。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] value 源操作数（标量），表示右移的位数。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_shiftright_round(
     __ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_shiftright_round__PUi32_PUi32_i32_u8_u16_u16_u16_u16
+ * @archs 2201
+ * @brief 对src中的每个元素执行右移，右移大小为value。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] value 源操作数（标量），表示右移的位数。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_shiftright_round(
     __ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_and__PUi16_PUi16_PUi16_u8_u8_u8_u8_u8_u8_u8
+ * @archs 2201
+ * @brief 执行矢量与运算。
+ * @param [out] dst 目的操作数。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src0_block_stride 源操作数0单次迭代内不同DataBlock间地址步长。
+ * @param [in] src1_block_stride 源操作数1单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_and(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_and__PUi16_PUi16_PUi16_u32
+ * @archs 2201
+ * @brief 执行矢量与运算。
+ * @param [out] dst 目的操作数。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_and(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_and__PUu16_PUu16_PUu16_u8_u8_u8_u8_u8_u8_u8
+ * @archs 2201
+ * @brief 执行矢量与运算。
+ * @param [out] dst 目的操作数。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src0_block_stride 源操作数0单次迭代内不同DataBlock间地址步长。
+ * @param [in] src1_block_stride 源操作数1单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_and(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_logic
+ * @override_id asc_and__PUu16_PUu16_PUu16_u32
+ * @archs 2201
+ * @brief 执行矢量与运算。
+ * @param [out] dst 目的操作数。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_and(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint32_t count);
 

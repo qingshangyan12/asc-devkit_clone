@@ -1,3 +1,177 @@
+---
+okftype: reference.api.cpp
+title: "asc_half2uint8"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2uint8.md"
+description: "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`uint8_t`类型，结果写入`dst`。由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个`VL`大小的数据分为两部分，根据参数`dst_pos`选择写入`dst`索引为偶数的位置或奇数的位置。"
+tag: [c_api, compute, 'operations:conversion', mask, vector, register_vector, masked,
+  'traits:rounding_mode', 'traits:saturation_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_half2uint8_rd__Rvu8_vf16_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rd_sat__Rvu8_vf16_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rn__Rvu8_vf16_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rn_sat__Rvu8_vf16_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rna__Rvu8_vf16_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rna_sat__Rvu8_vf16_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_ru__Rvu8_vf16_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_ru_sat__Rvu8_vf16_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rz__Rvu8_vf16_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rz_sat__Rvu8_vf16_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rd__Rvu8_vf16_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rd_sat__Rvu8_vf16_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rn__Rvu8_vf16_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rn_sat__Rvu8_vf16_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rna__Rvu8_vf16_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rna_sat__Rvu8_vf16_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_ru__Rvu8_vf16_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_ru_sat__Rvu8_vf16_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rz__Rvu8_vf16_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rz_sat__Rvu8_vf16_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rd__vf16_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rd_sat__vf16_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rn__vf16_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rn_sat__vf16_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rna__vf16_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rna_sat__vf16_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_ru__vf16_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_ru_sat__vf16_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rz__vf16_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rz_sat__vf16_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rd__vf16_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rd_sat__vf16_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rn__vf16_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rn_sat__vf16_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rna__vf16_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rna_sat__vf16_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_ru__vf16_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_ru_sat__vf16_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rz__vf16_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2uint8_rz_sat__vf16_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_half2uint8
 
 ## 产品支持情况
@@ -34,24 +208,1262 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rd__Rvu8_vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```c
 // 通过引用参数输出结果（占位符形式）
-__simd_callee__ inline void asc_half2uint8<round_mode><sat_mode>(vector_uint8_t& dst,
+__simd_callee__ inline void asc_half2uint8_rd(vector_uint8_t& dst,
                                                                  vector_half src,
                                                                  vector_bool mask,
                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
 
-__simd_callee__ inline void asc_half2uint8<round_mode><sat_mode>(vector_uint8_t& dst,
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rd_sat__Rvu8_vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 通过引用参数输出结果（占位符形式）
+__simd_callee__ inline void asc_half2uint8_rd_sat(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rn__Rvu8_vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 通过引用参数输出结果（占位符形式）
+__simd_callee__ inline void asc_half2uint8_rn(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rn_sat__Rvu8_vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 通过引用参数输出结果（占位符形式）
+__simd_callee__ inline void asc_half2uint8_rn_sat(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rna__Rvu8_vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 通过引用参数输出结果（占位符形式）
+__simd_callee__ inline void asc_half2uint8_rna(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rna_sat__Rvu8_vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 通过引用参数输出结果（占位符形式）
+__simd_callee__ inline void asc_half2uint8_rna_sat(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_ru__Rvu8_vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 通过引用参数输出结果（占位符形式）
+__simd_callee__ inline void asc_half2uint8_ru(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_ru_sat__Rvu8_vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 通过引用参数输出结果（占位符形式）
+__simd_callee__ inline void asc_half2uint8_ru_sat(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rz__Rvu8_vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 通过引用参数输出结果（占位符形式）
+__simd_callee__ inline void asc_half2uint8_rz(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rz_sat__Rvu8_vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 通过引用参数输出结果（占位符形式）
+__simd_callee__ inline void asc_half2uint8_rz_sat(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rd__Rvu8_vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 通过引用参数输出结果（占位符形式）
+__simd_callee__ inline void asc_half2uint8_rd(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rd_sat__Rvu8_vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 通过引用参数输出结果（占位符形式）
+__simd_callee__ inline void asc_half2uint8_rd_sat(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rn__Rvu8_vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 通过引用参数输出结果（占位符形式）
+__simd_callee__ inline void asc_half2uint8_rn(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rn_sat__Rvu8_vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 通过引用参数输出结果（占位符形式）
+__simd_callee__ inline void asc_half2uint8_rn_sat(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rna__Rvu8_vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 通过引用参数输出结果（占位符形式）
+__simd_callee__ inline void asc_half2uint8_rna(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rna_sat__Rvu8_vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 通过引用参数输出结果（占位符形式）
+__simd_callee__ inline void asc_half2uint8_rna_sat(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_ru__Rvu8_vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 通过引用参数输出结果（占位符形式）
+__simd_callee__ inline void asc_half2uint8_ru(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_ru_sat__Rvu8_vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 通过引用参数输出结果（占位符形式）
+__simd_callee__ inline void asc_half2uint8_ru_sat(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rz__Rvu8_vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 通过引用参数输出结果（占位符形式）
+__simd_callee__ inline void asc_half2uint8_rz(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rz_sat__Rvu8_vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 通过引用参数输出结果（占位符形式）
+__simd_callee__ inline void asc_half2uint8_rz_sat(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rd__Rvu8_vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline void asc_half2uint8_rd(vector_uint8_t& dst,
                                                                  vector_half src,
                                                                  vector_bool mask,
                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rd_sat__Rvu8_vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline void asc_half2uint8_rd_sat(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rn__Rvu8_vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline void asc_half2uint8_rn(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rn_sat__Rvu8_vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline void asc_half2uint8_rn_sat(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rna__Rvu8_vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline void asc_half2uint8_rna(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rna_sat__Rvu8_vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline void asc_half2uint8_rna_sat(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_ru__Rvu8_vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline void asc_half2uint8_ru(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_ru_sat__Rvu8_vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline void asc_half2uint8_ru_sat(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rz__Rvu8_vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline void asc_half2uint8_rz(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rz_sat__Rvu8_vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline void asc_half2uint8_rz_sat(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rd__Rvu8_vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline void asc_half2uint8_rd(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rd_sat__Rvu8_vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline void asc_half2uint8_rd_sat(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rn__Rvu8_vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline void asc_half2uint8_rn(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rn_sat__Rvu8_vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline void asc_half2uint8_rn_sat(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rna__Rvu8_vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline void asc_half2uint8_rna(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rna_sat__Rvu8_vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline void asc_half2uint8_rna_sat(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_ru__Rvu8_vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline void asc_half2uint8_ru(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_ru_sat__Rvu8_vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline void asc_half2uint8_ru_sat(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rz__Rvu8_vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline void asc_half2uint8_rz(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rz_sat__Rvu8_vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline void asc_half2uint8_rz_sat(vector_uint8_t& dst,
+                                                                 vector_half src,
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rd__vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
 
 // 通过函数返回值返回结果（占位符形式）
-__simd_callee__ inline vector_uint8_t asc_half2uint8<round_mode><sat_mode>(vector_half src,
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rd(vector_half src,
                                                                            vector_bool mask,
                                                                            std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
 
-__simd_callee__ inline vector_uint8_t asc_half2uint8<round_mode><sat_mode>(vector_half src,
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rd_sat__vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rd_sat(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rn__vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rn(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rn_sat__vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rn_sat(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rna__vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rna(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rna_sat__vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rna_sat(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_ru__vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_uint8_t asc_half2uint8_ru(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_ru_sat__vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_uint8_t asc_half2uint8_ru_sat(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rz__vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rz(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rz_sat__vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rz_sat(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rd__vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rd(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rd_sat__vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rd_sat(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rn__vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rn(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rn_sat__vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rn_sat(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rna__vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rna(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rna_sat__vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rna_sat(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_ru__vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_uint8_t asc_half2uint8_ru(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_ru_sat__vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_uint8_t asc_half2uint8_ru_sat(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rz__vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rz(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rz_sat__vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rz_sat(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rd__vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rd(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rd_sat__vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rd_sat(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rn__vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rn(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rn_sat__vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rn_sat(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rna__vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rna(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rna_sat__vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rna_sat(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_ru__vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline vector_uint8_t asc_half2uint8_ru(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_ru_sat__vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline vector_uint8_t asc_half2uint8_ru_sat(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rz__vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rz(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rz_sat__vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rz_sat(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rd__vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rd(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rd_sat__vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rd_sat(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rn__vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rn(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rn_sat__vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rn_sat(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rna__vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rna(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rna_sat__vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rna_sat(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_ru__vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline vector_uint8_t asc_half2uint8_ru(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_ru_sat__vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline vector_uint8_t asc_half2uint8_ru_sat(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rz__vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rz(vector_half src,
+                                                                           vector_bool mask,
+                                                                           std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rz_sat__vf16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+__simd_callee__ inline vector_uint8_t asc_half2uint8_rz_sat(vector_half src,
                                                                            vector_bool mask,
                                                                            std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 ```
@@ -62,12 +1474,31 @@ __simd_callee__ inline vector_uint8_t asc_half2uint8<round_mode><sat_mode>(vecto
 
 ### 函数原型典型示例
 
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rd__Rvu8_vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```c
 // 通过引用参数输出结果
 __simd_callee__ inline void asc_half2uint8_rd(vector_uint8_t& dst,
                                               vector_half src,
                                               vector_bool mask,
                                               std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2uint8_rd__vf16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
 
 // 通过函数返回值返回结果
 __simd_callee__ inline vector_uint8_t asc_half2uint8_rd(vector_half src,

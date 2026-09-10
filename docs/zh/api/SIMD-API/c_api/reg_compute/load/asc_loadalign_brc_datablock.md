@@ -1,3 +1,33 @@
+---
+okftype: reference.api.cpp
+title: "asc_loadalign_brc_datablock"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock.md"
+description: "从Unified Buffer（UB）中32字节对齐的起始地址读取一个`DataBlock`（32字节），并将该`DataBlock`广播到整个矢量数据寄存器。结果通过函数返回值返回或写入目的矢量数据寄存器，搬运过程中数据格式和内容保持不变。"
+tag: [c_api, data_movement, 'operations:load', vector, register_vector, 'src:unified_buffer',
+  'dst:vector_register']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_loadalign_brc_datablock__PU<dtype>"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - prototype_id: "asc_loadalign_brc_datablock__Rv<dtype>_PU<dtype>"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - prototype_id: "asc_loadalign_brc_datablock__Rv<dtype>_PU<dtype>_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - prototype_id: "asc_loadalign_brc_datablock__Rv<dtype>_PU<dtype>_ar"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_loadalign_brc_datablock
 
 ## 产品支持情况
@@ -40,9 +70,64 @@
 
 ### 对齐搬入模式
 
+```yaml
+api_signature:
+  prototype_id: "asc_loadalign_brc_datablock__PU<dtype>"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "hifloat8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
 ```c
 // 通过函数返回值返回结果。
 __simd_callee__ inline vector_<dtype> asc_loadalign_brc_datablock(__ubuf__ <dtype>* src)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_loadalign_brc_datablock__Rv<dtype>_PU<dtype>"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "hifloat8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
+```c
 
 // 通过引用参数输出结果。
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_<dtype>& dst,
@@ -65,6 +150,32 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_half& dst,
 
 ### 立即数偏移搬入模式
 
+```yaml
+api_signature:
+  prototype_id: "asc_loadalign_brc_datablock__Rv<dtype>_PU<dtype>_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "hifloat8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
 ```c
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_<dtype>& dst,
                                                         __ubuf__ <dtype>* src,
@@ -85,6 +196,32 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_half& dst,
 ```
 
 ### 地址寄存器偏移搬入模式
+
+```yaml
+api_signature:
+  prototype_id: "asc_loadalign_brc_datablock__Rv<dtype>_PU<dtype>_ar"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "hifloat8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
 
 ```c
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_<dtype>& dst,

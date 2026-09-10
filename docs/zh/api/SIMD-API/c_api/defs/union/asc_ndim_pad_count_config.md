@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: "asc_ndim_pad_count_config"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md"
+description: "asc_ndim_pad_count_config用于[asc_set_ndim_pad_count](../../vector_datamove/asc_set_ndim_pad_count.md)接口中，设置[asc_ndim_copy_gm2ub](../../vector_datamove/asc_ndim_copy_gm2ub.md)接口的各个维度左右侧的padding元素个数。"
+tag: [c_api]
+usage_dependencies:
+  status: not_applicable
+signature:
+  []
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_ndim_pad_count_config
 
 asc_ndim_pad_count_config用于[asc_set_ndim_pad_count](../../vector_datamove/asc_set_ndim_pad_count.md)接口中，设置[asc_ndim_copy_gm2ub](../../vector_datamove/asc_ndim_copy_gm2ub.md)接口的各个维度左右侧的padding元素个数。

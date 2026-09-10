@@ -1,3 +1,24 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_gm2l1_arch_3510（高维切分数据搬运）"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md"
+description: "将数据从Global Memory搬运到L1 Buffer，数据搬运时格式和内容保持不变。高维切分是指能够通过配置数据块个数、单个数据块长度、地址偏移等搬运参数实现非连续搬运。并且此接口支持在搬运过程中按通道padding模式对32字节粒度的数据插入或移除padding。其中padding值需要通过[asc_set_gm2l1_pad](../asc_set_gm2l1_pad.md)设置。"
+tag: [c_api, data_movement, copy, 'src:global_memory', 'dst:l1_buffer']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_copy_gm2l1__PL1v_PGv_u32_u32_u8_u64_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_gm2l1_sync__PL1v_PGv_u32_u32_u8_u64_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_copy_gm2l1_arch_3510（高维切分数据搬运）
 
 ## 产品支持情况
@@ -36,10 +57,29 @@
 
 ### 高维切分数据搬运
 
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1__PL1v_PGv_u32_u32_u8_u64_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
 ```cpp
 __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst, __gm__ void* src, uint32_t n_burst,
                                       uint32_t len_burst, uint8_t pad_func_mode, uint64_t src_stride,
                                       uint32_t dst_stride)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2l1_sync__PL1v_PGv_u32_u32_u8_u64_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+```cpp
 __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ void* dst, __gm__ void* src, uint32_t n_burst,
                                            uint32_t len_burst, uint8_t pad_func_mode, uint64_t src_stride,
                                            uint32_t dst_stride)

@@ -1,3 +1,41 @@
+---
+okftype: reference.api.cpp
+title: "asc_reduce"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_reduce.md"
+description: "以内置固定模式对应的二进制或者用户自定义输入的数值对应的gather mask（数据收集的掩码），从源操作数中选取元素写入目的操作数中。"
+tag: [c_api, compute, 'operations:gather', reduction, mask, vector, memory_vector,
+  masked]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_reduce__PUu16_PUu16_PUu16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - override_id: "asc_reduce__PUu32_PUu32_PUu32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - override_id: "asc_reduce__PUu16_PUu16_PUu16_u16_u8_u8_u16_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - override_id: "asc_reduce__PUu32_PUu32_PUu32_u16_u8_u8_u16_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - override_id: "asc_reduce_sync__PUu16_PUu16_PUu16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_reduce_sync__PUu32_PUu32_PUu32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_reduce
 
 ## 产品支持情况
@@ -34,24 +72,81 @@
 
 - 前n个数据计算
 
+```yaml
+api_signature:
+  override_id: "asc_reduce__PUu16_PUu16_PUu16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+```
+
     ```cpp
     __aicore__ inline void asc_reduce(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_reduce__PUu32_PUu32_PUu32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src0, __ubuf__ uint32_t* src1, uint32_t count)
     ```
 
 - 高维切分计算
 
+```yaml
+api_signature:
+  override_id: "asc_reduce__PUu16_PUu16_PUu16_u16_u8_u8_u16_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+```
+
   ```cpp
   __aicore__ inline void asc_reduce(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1,
     uint16_t repeat, uint8_t src0_block_stride, uint8_t pattern_mode, uint16_t src0_repeat_stride, uint8_t src1_repeat_stride)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_reduce__PUu32_PUu32_PUu32_u16_u8_u8_u16_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src0, __ubuf__ uint32_t* src1,
     uint16_t repeat, uint8_t src0_block_stride, uint8_t pattern_mode, uint16_t src0_repeat_stride, uint8_t src1_repeat_stride)
   ```
 
 - 同步计算
 
+```yaml
+api_signature:
+  override_id: "asc_reduce_sync__PUu16_PUu16_PUu16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
   ```cpp
   __aicore__ inline void asc_reduce_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_reduce_sync__PUu32_PUu32_PUu32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_reduce_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src0, __ubuf__ uint32_t* src1, uint32_t count)
   ```
 

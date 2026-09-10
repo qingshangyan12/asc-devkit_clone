@@ -1,3 +1,57 @@
+---
+okftype: reference.api.cpp
+title: "asc_mmad（废弃）"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_mmad_deprecated.md"
+description: "**入参`unit_flag`类型为`uint8_t`的`asc_mmad`接口以及`asc_mmad_sync`接口已废弃。请使用入参`unit_flag_mode`类型为`asc_unit_flag_mode`的[asc_mmad](../cube_compute/asc_mmad.md)接口替代；原同步功能请通过新接口和`asc_sync()`实现，具体请参见[asc_sync](../sync/asc_sync.md)。"
+tag: [c_api, compute, 'operations:matrix_multiply_accumulate', matrix, post_update,
+  'traits:saturation_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_mmad__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_compute/cube_compute.h"
+  - prototype_id: "asc_mmad_sync__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_compute_composite.h"
+  - prototype_id: "asc_mmad__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_compute/cube_compute.h"
+  - prototype_id: "asc_mmad__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_u8_u8_b_b_b_b"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_compute/cube_compute.h"
+  - prototype_id: "asc_mmad_sync__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_compute_composite.h"
+  - prototype_id: "asc_mmad_sync__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_u8_u8_b_b_b_b"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_compute_composite.h"
+  - override_id: "asc_mmad_s4__PCCi32_PCAi4x2_PCBi4x2_u16_u16_u16_u8_b_b_b"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_compute/cube_compute.h"
+  - override_id: "asc_mmad_s4__PCCi32_PCAi4x2_PCBi4x2_u16_u16_u16_u8_u8_u8_b_b_b_b"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_compute/cube_compute.h"
+  - override_id: "asc_mmad_s4_sync__PCCi32_PCAi4x2_PCBi4x2_u16_u16_u16_u8_b_b_b"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_compute_composite.h"
+  - override_id: "asc_mmad_s4_sync__PCCi32_PCAi4x2_PCBi4x2_u16_u16_u16_u8_u8_u8_b_b_b_b"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_mmad（废弃）
 
 ## 产品支持情况
@@ -86,6 +140,52 @@ K0的取值为`32B / sizeof(dtype)`，`dtype`为矩阵的数据类型。当数�
 
 **占位符形式：**
 
+```yaml
+api_signature:
+  prototype_id: "asc_mmad__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_compute/cube_compute.h"
+  dtype:
+    variants:
+      -
+        c_dtype: "int32_t"
+        a_dtype: "int8_t"
+        b_dtype: "int8_t"
+      -
+        c_dtype: "float"
+        a_dtype: "hifloat8_t"
+        b_dtype: "hifloat8_t"
+      -
+        c_dtype: "float"
+        a_dtype: "fp8_e5m2_t"
+        b_dtype: "fp8_e5m2_t"
+      -
+        c_dtype: "float"
+        a_dtype: "fp8_e5m2_t"
+        b_dtype: "fp8_e4m3fn_t"
+      -
+        c_dtype: "float"
+        a_dtype: "fp8_e4m3fn_t"
+        b_dtype: "fp8_e5m2_t"
+      -
+        c_dtype: "float"
+        a_dtype: "fp8_e4m3fn_t"
+        b_dtype: "fp8_e4m3fn_t"
+      -
+        c_dtype: "float"
+        a_dtype: "half"
+        b_dtype: "half"
+      -
+        c_dtype: "float"
+        a_dtype: "bfloat16_t"
+        b_dtype: "bfloat16_t"
+      -
+        c_dtype: "float"
+        a_dtype: "float"
+        b_dtype: "float"
+```
+
 ```c
 __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
                                 __ca__ <a_dtype>* a_matrix,
@@ -97,6 +197,55 @@ __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
                                 bool disable_gemv,
                                 bool c_matrix_source,
                                 bool c_matrix_init_val)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_mmad_sync__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_compute_composite.h"
+  dtype:
+    variants:
+      -
+        c_dtype: "int32_t"
+        a_dtype: "int8_t"
+        b_dtype: "int8_t"
+      -
+        c_dtype: "float"
+        a_dtype: "hifloat8_t"
+        b_dtype: "hifloat8_t"
+      -
+        c_dtype: "float"
+        a_dtype: "fp8_e5m2_t"
+        b_dtype: "fp8_e5m2_t"
+      -
+        c_dtype: "float"
+        a_dtype: "fp8_e5m2_t"
+        b_dtype: "fp8_e4m3fn_t"
+      -
+        c_dtype: "float"
+        a_dtype: "fp8_e4m3fn_t"
+        b_dtype: "fp8_e5m2_t"
+      -
+        c_dtype: "float"
+        a_dtype: "fp8_e4m3fn_t"
+        b_dtype: "fp8_e4m3fn_t"
+      -
+        c_dtype: "float"
+        a_dtype: "half"
+        b_dtype: "half"
+      -
+        c_dtype: "float"
+        a_dtype: "bfloat16_t"
+        b_dtype: "bfloat16_t"
+      -
+        c_dtype: "float"
+        a_dtype: "float"
+        b_dtype: "float"
+```
+
+```c
 
 __aicore__ inline void asc_mmad_sync(__cc__ <c_dtype>* c_matrix,
                                      __ca__ <a_dtype>* a_matrix,
@@ -149,10 +298,123 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 
 - `asc_mmad`及`asc_mmad_sync`：
 
+```yaml
+api_signature:
+  prototype_id: "asc_mmad__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_compute/cube_compute.h"
+  dtype:
+    variants:
+      -
+        c_dtype: "float"
+        a_dtype: "bfloat16_t"
+        b_dtype: "bfloat16_t"
+      -
+        c_dtype: "float"
+        a_dtype: "half"
+        b_dtype: "half"
+      -
+        c_dtype: "float"
+        a_dtype: "float"
+        b_dtype: "float"
+      -
+        c_dtype: "int32_t"
+        a_dtype: "int8_t"
+        b_dtype: "int8_t"
+```
+
   ```c
   __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix, __ca__ <a_dtype>* a_matrix, __cb__ <b_dtype>* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
+  ```
+
+```yaml
+api_signature:
+  prototype_id: "asc_mmad__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_u8_u8_b_b_b_b"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_compute/cube_compute.h"
+  dtype:
+    variants:
+      -
+        c_dtype: "float"
+        a_dtype: "bfloat16_t"
+        b_dtype: "bfloat16_t"
+      -
+        c_dtype: "float"
+        a_dtype: "half"
+        b_dtype: "half"
+      -
+        c_dtype: "float"
+        a_dtype: "float"
+        b_dtype: "float"
+      -
+        c_dtype: "int32_t"
+        a_dtype: "int8_t"
+        b_dtype: "int8_t"
+```
+
+  ```c
   __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix, __ca__ <a_dtype>* a_matrix, __cb__ <b_dtype>* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
+  ```
+
+```yaml
+api_signature:
+  prototype_id: "asc_mmad_sync__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_compute_composite.h"
+  dtype:
+    variants:
+      -
+        c_dtype: "float"
+        a_dtype: "bfloat16_t"
+        b_dtype: "bfloat16_t"
+      -
+        c_dtype: "float"
+        a_dtype: "half"
+        b_dtype: "half"
+      -
+        c_dtype: "float"
+        a_dtype: "float"
+        b_dtype: "float"
+      -
+        c_dtype: "int32_t"
+        a_dtype: "int8_t"
+        b_dtype: "int8_t"
+```
+
+  ```c
   __aicore__ inline void asc_mmad_sync(__cc__ <c_dtype>* c_matrix, __ca__ <a_dtype>* a_matrix, __cb__ <b_dtype>* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
+  ```
+
+```yaml
+api_signature:
+  prototype_id: "asc_mmad_sync__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_u8_u8_b_b_b_b"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_compute_composite.h"
+  dtype:
+    variants:
+      -
+        c_dtype: "float"
+        a_dtype: "bfloat16_t"
+        b_dtype: "bfloat16_t"
+      -
+        c_dtype: "float"
+        a_dtype: "half"
+        b_dtype: "half"
+      -
+        c_dtype: "float"
+        a_dtype: "float"
+        b_dtype: "float"
+      -
+        c_dtype: "int32_t"
+        a_dtype: "int8_t"
+        b_dtype: "int8_t"
+```
+
+  ```c
   __aicore__ inline void asc_mmad_sync(__cc__ <c_dtype>* c_matrix, __ca__ <a_dtype>* a_matrix, __cb__ <b_dtype>* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
   ```
 
@@ -160,10 +422,51 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 
 - `asc_mmad_s4`及`asc_mmad_s4_sync`：
 
+```yaml
+api_signature:
+  override_id: "asc_mmad_s4__PCCi32_PCAi4x2_PCBi4x2_u16_u16_u16_u8_b_b_b"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_compute/cube_compute.h"
+```
+
   ```c
   __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c_matrix, __ca__ int4b_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_mmad_s4__PCCi32_PCAi4x2_PCBi4x2_u16_u16_u16_u8_u8_u8_b_b_b_b"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_compute/cube_compute.h"
+```
+
+  ```c
   __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c_matrix, __ca__ int4b_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_mmad_s4_sync__PCCi32_PCAi4x2_PCBi4x2_u16_u16_u16_u8_b_b_b"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_compute_composite.h"
+```
+
+  ```c
   __aicore__ inline void asc_mmad_s4_sync(__cc__ int32_t* c_matrix, __ca__ int4b_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_mmad_s4_sync__PCCi32_PCAi4x2_PCBi4x2_u16_u16_u16_u8_u8_u8_b_b_b_b"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_compute_composite.h"
+```
+
+  ```c
   __aicore__ inline void asc_mmad_s4_sync(__cc__ int32_t* c_matrix, __ca__ int4b_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
   ```
 <!-- end id20 -->

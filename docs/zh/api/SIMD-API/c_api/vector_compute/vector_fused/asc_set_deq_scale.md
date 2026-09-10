@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_deq_scale"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md"
+description: "设置DEQSCALE（量化参数）寄存器的值。"
+tag: [c_api, 'roles:configuration']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_deq_scale__PUu64_Avdeqf32_Avdeqi16_Avdeqb"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_fused.h"
+  - override_id: "asc_set_deq_scale__f32_i16_b"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_fused.h"
+  - override_id: "asc_set_deq_scale__f16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_fused.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_deq_scale
 
 ## 产品支持情况
@@ -32,9 +57,39 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_set_deq_scale__PUu64_Avdeqf32_Avdeqi16_Avdeqb"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_fused.h"
+```
+
 ```cpp
 __aicore__ inline void asc_set_deq_scale(__ubuf__ uint64_t* tmp, float scale_arr[ASC_VDEQ_SIZE], int16_t offset_arr[ASC_VDEQ_SIZE], bool sign_mode_arr[ASC_VDEQ_SIZE])
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_deq_scale__f32_i16_b"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_fused.h"
+```
+
+```cpp
 __aicore__ inline void asc_set_deq_scale(float scale, int16_t offset, bool sign_mode)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_deq_scale__f16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_fused.h"
+```
+
+```cpp
 __aicore__ inline void asc_set_deq_scale(half scale)
 ```
 

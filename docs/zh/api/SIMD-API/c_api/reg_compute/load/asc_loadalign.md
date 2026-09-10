@@ -1,3 +1,49 @@
+---
+okftype: reference.api.cpp
+title: "asc_loadalign"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md"
+description: "从Unified Buffer（UB）中32字节对齐的起始地址读取数据，并通过函数返回值返回或写入目的矢量数据寄存器或掩码寄存器，搬运过程中数据格式和内容保持不变。"
+tag: [c_api, data_movement, 'operations:load', vector, register_vector, 'src:unified_buffer',
+  'dst:vector_register']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_loadalign__PU<dtype>"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - prototype_id: "asc_loadalign__Rv<dtype>_PU<dtype>"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign__Rvb_PUu32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - prototype_id: "asc_loadalign__Rv<dtype>_PU<dtype>_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign__Rvb_PUu32_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - prototype_id: "asc_loadalign__Rv<dtype>_PU<dtype>_ar"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign__Rvb_PUu32_ar"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - prototype_id: "asc_loadalign__Rv<dtype>_PU<dtype>_u16_u16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_loadalign
 
 ## 产品支持情况
@@ -43,13 +89,81 @@
 
 ### 连续对齐搬入模式
 
+```yaml
+api_signature:
+  prototype_id: "asc_loadalign__PU<dtype>"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "hifloat8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
 ```c
 // 通过函数返回值返回矢量数据寄存器。
 __simd_callee__ inline vector_<dtype> asc_loadalign(__ubuf__ <dtype>* src)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_loadalign__Rv<dtype>_PU<dtype>"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "hifloat8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+      - "int64_t"
+      - "uint64_t"
+```
+
+```c
 
 // 搬入矢量数据寄存器。
 __simd_callee__ inline void asc_loadalign(vector_<dtype>& dst,
                                           __ubuf__ <dtype>* src)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign__Rvb_PUu32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```c
 // 搬入掩码寄存器。
 __simd_callee__ inline void asc_loadalign(vector_bool& dst,
                                           __ubuf__ uint32_t* src)
@@ -74,11 +188,50 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
 
 ### 立即数偏移搬入模式
 
+```yaml
+api_signature:
+  prototype_id: "asc_loadalign__Rv<dtype>_PU<dtype>_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "hifloat8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+      - "int64_t"
+      - "uint64_t"
+```
+
 ```c
 // 搬入矢量数据寄存器。
 __simd_callee__ inline void asc_loadalign(vector_<dtype>& dst,
                                           __ubuf__ <dtype>* src,
                                           int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign__Rvb_PUu32_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```c
 // 搬入掩码寄存器。
 __simd_callee__ inline void asc_loadalign(vector_bool& dst,
                                           __ubuf__ uint32_t* src,
@@ -100,11 +253,50 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
 
 ### 地址寄存器偏移搬入模式
 
+```yaml
+api_signature:
+  prototype_id: "asc_loadalign__Rv<dtype>_PU<dtype>_ar"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "hifloat8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+      - "int64_t"
+      - "uint64_t"
+```
+
 ```c
 // 搬入矢量数据寄存器。
 __simd_callee__ inline void asc_loadalign(vector_<dtype>& dst,
                                           __ubuf__ <dtype>* src,
                                           addr_reg offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign__Rvb_PUu32_ar"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```c
 // 搬入掩码寄存器。
 __simd_callee__ inline void asc_loadalign(vector_bool& dst,
                                           __ubuf__ uint32_t* src,
@@ -125,6 +317,33 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
 ```
 
 ### 非连续对齐搬入模式
+
+```yaml
+api_signature:
+  prototype_id: "asc_loadalign__Rv<dtype>_PU<dtype>_u16_u16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "hifloat8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+      - "int64_t"
+```
 
 ```c
 __simd_callee__ inline void asc_loadalign(vector_<dtype>& dst,

@@ -1,3 +1,33 @@
+---
+okftype: reference.api.cpp
+title: "asc_int642int32"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int642int32.md"
+description: "将`int64_t`类型的源操作数转换成`int32_t`类型，并支持不同的饱和模式。"
+tag: [c_api, compute, 'operations:conversion', vector, register_vector, 'traits:rounding_mode',
+  'traits:saturation_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_int642int32__Rvi32_vi64_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_int642int32_sat__Rvi32_vi64_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_int642int32__Rvi32_vi64_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_int642int32_sat__Rvi32_vi64_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_int642int32
 
 ## 产品支持情况
@@ -50,15 +80,133 @@ def asc_int642int32(dst, src, mask, dst_pos):
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_int642int32__Rvi32_vi64_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```c
 // 占位符形式
-__simd_callee__ inline void asc_int642int32<sat_mode>(vector_int32_t& dst,
+__simd_callee__ inline void asc_int642int32(vector_int32_t& dst,
                                                       vector_int64_t src,
                                                       vector_bool mask,
                                                       std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int642int32_sat__Rvi32_vi64_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_int642int32_sat(vector_int32_t& dst,
+                                                      vector_int64_t src,
+                                                      vector_bool mask,
+                                                      std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int642int32__Rvi32_vi64_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_int642int32(vector_int32_t& dst,
+                                                      vector_int64_t src,
+                                                      vector_bool mask,
+                                                      std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int642int32_sat__Rvi32_vi64_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_int642int32_sat(vector_int32_t& dst,
+                                                      vector_int64_t src,
+                                                      vector_bool mask,
+                                                      std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int642int32__Rvi32_vi64_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
 
 // 占位符形式
-__simd_callee__ inline void asc_int642int32<sat_mode>(vector_int32_t& dst,
+__simd_callee__ inline void asc_int642int32(vector_int32_t& dst,
+                                                      vector_int64_t src,
+                                                      vector_bool mask,
+                                                      std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int642int32_sat__Rvi32_vi64_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_int642int32_sat(vector_int32_t& dst,
+                                                      vector_int64_t src,
+                                                      vector_bool mask,
+                                                      std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int642int32__Rvi32_vi64_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_int642int32(vector_int32_t& dst,
+                                                      vector_int64_t src,
+                                                      vector_bool mask,
+                                                      std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int642int32_sat__Rvi32_vi64_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_int642int32_sat(vector_int32_t& dst,
                                                       vector_int64_t src,
                                                       vector_bool mask,
                                                       std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
@@ -67,6 +215,14 @@ __simd_callee__ inline void asc_int642int32<sat_mode>(vector_int32_t& dst,
 - `<sat_mode>`表示饱和/非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
 
 ### 函数原型典型示例
+
+```yaml
+api_signature:
+  override_id: "asc_int642int32__Rvi32_vi64_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
 
 ```c
 // 非饱和模式，数据写入索引为偶数的位置

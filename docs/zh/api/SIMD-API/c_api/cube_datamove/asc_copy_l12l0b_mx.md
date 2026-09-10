@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_l12l0b_mx"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_mx.md"
+description: "负责完成MX矩阵计算过程中所需的右矩阵对应的量化系数的搬运，数据通路为L1 Buffer->L0B_MX Buffer。其中右量化系数矩阵以32字节（固定数据类型为`fp8_e8m0_t`、分形大小为2×16的）的数据分形为单位进行搬运。"
+tag: [c_api, data_movement, copy]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_copy_l12l0b_mx__u64_PL1f8e8m0_u16_u16_u8_u8_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12l0b_mx_sync__u64_PL1f8e8m0_u16_u16_u8_u8_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad_mx"
+    archs: ["3510"]
+    override_id: "asc_copy_l12l0b_mx__u64_PL1f8e8m0_u16_u16_u8_u8_u16_u16"
+    file: "mmad_mx.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_copy_l12l0b_mx
 
 ## 产品支持情况
@@ -42,6 +67,14 @@ $$
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_mx__u64_PL1f8e8m0_u16_u16_u8_u8_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
 ```cpp
 __aicore__ inline void asc_copy_l12l0b_mx(uint64_t dst,
                                           __cbuf__ fp8_e8m0_t* src,
@@ -51,6 +84,17 @@ __aicore__ inline void asc_copy_l12l0b_mx(uint64_t dst,
                                           uint8_t y_step,
                                           uint16_t src_stride,
                                           uint16_t dst_stride)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_mx_sync__u64_PL1f8e8m0_u16_u16_u8_u8_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+```cpp
 
 __aicore__ inline void asc_copy_l12l0b_mx_sync(uint64_t dst,
                                                __cbuf__ fp8_e8m0_t* src,

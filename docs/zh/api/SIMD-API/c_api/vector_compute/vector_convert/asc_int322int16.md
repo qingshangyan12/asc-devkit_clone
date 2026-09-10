@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: "asc_int322int16"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322int16.md"
+description: "将int32_t类型数据转换为int16_t类型。"
+tag: [c_api, compute, 'operations:conversion', vector, memory_vector]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_int322int16__PUi16_PUi32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_int322int16__PUi16_PUi32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_convert.h"
+  - override_id: "asc_int322int16_sync__PUi16_PUi32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_int322int16
 
 ## 产品支持情况
@@ -34,17 +59,41 @@
 
 - 前n个数据计算
 
+```yaml
+api_signature:
+  override_id: "asc_int322int16__PUi16_PUi32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
     ```cpp
     __aicore__ inline void asc_int322int16(__ubuf__ int16_t* dst, __ubuf__ int32_t* src, uint32_t count)
     ```
 
 - 高维切分计算
 
+```yaml
+api_signature:
+  override_id: "asc_int322int16__PUi16_PUi32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
     ```cpp
     __aicore__ inline void asc_int322int16(__ubuf__ int16_t* dst, __ubuf__ int32_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
 
 - 同步计算
+
+```yaml
+api_signature:
+  override_id: "asc_int322int16_sync__PUi16_PUi32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
 
     ```cpp
     __aicore__ inline void asc_int322int16_sync(__ubuf__ int16_t* dst, __ubuf__ int32_t* src, uint32_t count)

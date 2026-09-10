@@ -1,3 +1,29 @@
+---
+okftype: reference.api.cpp
+title: "asc_storealign_intlv"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_intlv.md"
+description: "将两个矢量数据寄存器中的数据按元素顺序交织后连续对齐搬出到Unified Buffer（UB）。单次搬出量为`2 × VL`（共512字节），不支持配置掩码。搬运过程中数据格式与内容保持不变。本接口在Vector Function（`__simd_vf__`标记的函数）内使用。"
+tag: [c_api, data_movement, 'operations:store', vector, register_vector, 'src:vector_register',
+  'dst:unified_buffer']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_storealign_intlv__PU<dtype>_v<dtype>_v<dtype>"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storealign.h"
+  - prototype_id: "asc_storealign_intlv__PU<dtype>_v<dtype>_v<dtype>_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storealign.h"
+  - prototype_id: "asc_storealign_intlv__PU<dtype>_v<dtype>_v<dtype>_ar"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storealign.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_storealign_intlv
 
 ## 产品支持情况
@@ -42,6 +68,31 @@
 
 ### 对齐搬出模式
 
+```yaml
+api_signature:
+  prototype_id: "asc_storealign_intlv__PU<dtype>_v<dtype>_v<dtype>"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storealign.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e1m2_t"
+      - "fp4x2_e2m1_t"
+      - "hifloat8_t"
+      - "fp8_e4m3fn_t"
+      - "fp8_e5m2_t"
+      - "fp8_e8m0_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+```
+
 ```c
 // 占位符形式
 __simd_callee__ inline void asc_storealign_intlv(__ubuf__ <dtype>* dst,
@@ -62,6 +113,31 @@ __simd_callee__ inline void asc_storealign_intlv(__ubuf__ int8_t* dst,
 ```
 
 ### 立即数偏移搬出模式
+
+```yaml
+api_signature:
+  prototype_id: "asc_storealign_intlv__PU<dtype>_v<dtype>_v<dtype>_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storealign.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e1m2_t"
+      - "fp4x2_e2m1_t"
+      - "hifloat8_t"
+      - "fp8_e4m3fn_t"
+      - "fp8_e5m2_t"
+      - "fp8_e8m0_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+```
 
 ```c
 // 占位符形式
@@ -85,6 +161,31 @@ __simd_callee__ inline void asc_storealign_intlv(__ubuf__ int8_t* dst,
 ```
 
 ### 地址寄存器偏移搬出模式
+
+```yaml
+api_signature:
+  prototype_id: "asc_storealign_intlv__PU<dtype>_v<dtype>_v<dtype>_ar"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storealign.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e1m2_t"
+      - "fp4x2_e2m1_t"
+      - "hifloat8_t"
+      - "fp8_e4m3fn_t"
+      - "fp8_e5m2_t"
+      - "fp8_e8m0_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+```
 
 ```c
 // 占位符形式

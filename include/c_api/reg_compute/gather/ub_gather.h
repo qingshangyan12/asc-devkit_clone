@@ -25,267 +25,1224 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__PUi8_vu16_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline vector_int8_t asc_gather(__ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__PUu8_vu16_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline vector_uint8_t asc_gather(__ubuf__ uint8_t* src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__PUi16_vu16_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline vector_int16_t asc_gather(__ubuf__ int16_t* src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__PUu16_vu16_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline vector_uint16_t asc_gather(__ubuf__ uint16_t* src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__PUi32_vu32_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline vector_int32_t asc_gather(__ubuf__ int32_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__PUu32_vu32_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline vector_uint32_t asc_gather(__ubuf__ uint32_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__PUf16_vu16_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline vector_half asc_gather(__ubuf__ half* src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__PUf32_vu32_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline vector_float asc_gather(__ubuf__ float* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__PUbf16_vu16_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline vector_bfloat16_t asc_gather(__ubuf__ bfloat16_t* src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__PUf8e4m3_vu16_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_gather(
     __ubuf__ fp8_e4m3fn_t* src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__PUhf8_vu16_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline vector_hifloat8_t asc_gather(__ubuf__ hifloat8_t* src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__PUf8e5m2_vu16_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline vector_fp8_e5m2_t asc_gather(__ubuf__ fp8_e5m2_t* src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__PUf8e8m0_vu16_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline vector_fp8_e8m0_t asc_gather(__ubuf__ fp8_e8m0_t* src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__PUi16_vu32_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline vector_int16_t asc_gather(__ubuf__ int16_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__PUu16_vu32_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline vector_uint16_t asc_gather(__ubuf__ uint16_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__PUf16_vu32_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline vector_half asc_gather(__ubuf__ half* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__PUbf16_vu32_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline vector_bfloat16_t asc_gather(__ubuf__ bfloat16_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__Rvi16_PUi8_vu16_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_gather(
     vector_int16_t& dst, __ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__Rvu16_PUu8_vu16_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_gather(
     vector_uint16_t& dst, __ubuf__ uint8_t* src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__Rvi8_PUi8_vu16_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_gather(
     vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__Rvu8_PUu8_vu16_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_gather(
     vector_uint8_t& dst, __ubuf__ uint8_t* src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__Rvi16_PUi16_vu16_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_gather(
     vector_int16_t& dst, __ubuf__ int16_t* src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__Rvu16_PUu16_vu16_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_gather(
     vector_uint16_t& dst, __ubuf__ uint16_t* src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__Rvi32_PUi32_vu32_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_gather(
     vector_int32_t& dst, __ubuf__ int32_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__Rvu32_PUu32_vu32_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_gather(
     vector_uint32_t& dst, __ubuf__ uint32_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__Rvf16_PUf16_vu16_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_gather(vector_half& dst, __ubuf__ half* src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__Rvf32_PUf32_vu32_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_gather(vector_float& dst, __ubuf__ float* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__Rvbf16_PUbf16_vu16_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_gather(
     vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__Rvf8e4m3_PUf8e4m3_vu16_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_gather(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__Rvhf8_PUhf8_vu16_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_gather(
     vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__Rvf8e5m2_PUf8e5m2_vu16_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_gather(
     vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__Rvf8e8m0_PUf8e8m0_vu16_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_gather(
     vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint16_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__Rvi16_PUi16_vu32_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_gather(
     vector_int16_t& dst, __ubuf__ int16_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__Rvu16_PUu16_vu32_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_gather(
     vector_uint16_t& dst, __ubuf__ uint16_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__Rvf16_PUf16_vu32_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_gather(vector_half& dst, __ubuf__ half* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather__Rvbf16_PUbf16_vu32_vb
+ * @archs 3510
+ * @brief 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量）的起始地址。在UB中的起始地址需要32B对齐，须落在UB地址空间内。
+ * @param [in] index 数据索引（矢量数据寄存器）。dst中每个元素在UB中相对于src的索引位置，单位是元素个数。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_gather(
     vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUi8_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline vector_int8_t asc_gather_datablock(
     __ubuf__ int8_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUu8_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline vector_uint8_t asc_gather_datablock(
     __ubuf__ uint8_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUi16_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline vector_int16_t asc_gather_datablock(
     __ubuf__ int16_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUu16_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline vector_uint16_t asc_gather_datablock(
     __ubuf__ uint16_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUi32_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline vector_int32_t asc_gather_datablock(
     __ubuf__ int32_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUu32_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline vector_uint32_t asc_gather_datablock(
     __ubuf__ uint32_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUf16_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline vector_half asc_gather_datablock(__ubuf__ half* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUf32_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline vector_float asc_gather_datablock(__ubuf__ float* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUbf16_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline vector_bfloat16_t asc_gather_datablock(
     __ubuf__ bfloat16_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUf8e4m3_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_gather_datablock(
     __ubuf__ fp8_e4m3fn_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUhf8_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline vector_hifloat8_t asc_gather_datablock(
     __ubuf__ hifloat8_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUf8e5m2_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline vector_fp8_e5m2_t asc_gather_datablock(
     __ubuf__ fp8_e5m2_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUf4e2m1x2_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline vector_fp4x2_e2m1_t asc_gather_datablock(
     __ubuf__ fp4x2_e2m1_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUf4e1m2x2_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline vector_fp4x2_e1m2_t asc_gather_datablock(
     __ubuf__ fp4x2_e1m2_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUi4x2_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline vector_int4x2_t asc_gather_datablock(
     __ubuf__ int4b_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUf8e8m0_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline vector_fp8_e8m0_t asc_gather_datablock(
     __ubuf__ fp8_e8m0_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUi8_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline vector_int8_t asc_gather_datablock(__ubuf__ int8_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUu8_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline vector_uint8_t asc_gather_datablock(__ubuf__ uint8_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUi16_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline vector_int16_t asc_gather_datablock(__ubuf__ int16_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUu16_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline vector_uint16_t asc_gather_datablock(__ubuf__ uint16_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUi32_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline vector_int32_t asc_gather_datablock(__ubuf__ int32_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUu32_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline vector_uint32_t asc_gather_datablock(__ubuf__ uint32_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUf16_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline vector_half asc_gather_datablock(__ubuf__ half* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUf32_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline vector_float asc_gather_datablock(__ubuf__ float* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUbf16_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline vector_bfloat16_t asc_gather_datablock(__ubuf__ bfloat16_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUf8e4m3_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_gather_datablock(__ubuf__ fp8_e4m3fn_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUhf8_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline vector_hifloat8_t asc_gather_datablock(__ubuf__ hifloat8_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUf8e5m2_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline vector_fp8_e5m2_t asc_gather_datablock(__ubuf__ fp8_e5m2_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUf4e2m1x2_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline vector_fp4x2_e2m1_t asc_gather_datablock(__ubuf__ fp4x2_e2m1_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUf4e1m2x2_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline vector_fp4x2_e1m2_t asc_gather_datablock(__ubuf__ fp4x2_e1m2_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUi4x2_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline vector_int4x2_t asc_gather_datablock(__ubuf__ int4b_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__PUf8e8m0_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline vector_fp8_e8m0_t asc_gather_datablock(__ubuf__ fp8_e8m0_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvi8_PUi8_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline void asc_gather_datablock(
     vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvu8_PUu8_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline void asc_gather_datablock(
     vector_uint8_t& dst, __ubuf__ uint8_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvi16_PUi16_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline void asc_gather_datablock(
     vector_int16_t& dst, __ubuf__ int16_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvu16_PUu16_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline void asc_gather_datablock(
     vector_uint16_t& dst, __ubuf__ uint16_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvi32_PUi32_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline void asc_gather_datablock(
     vector_int32_t& dst, __ubuf__ int32_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvu32_PUu32_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline void asc_gather_datablock(
     vector_uint32_t& dst, __ubuf__ uint32_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvi64_PUi64_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline void asc_gather_datablock(
     vector_int64_t& dst, __ubuf__ int64_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvu64_PUu64_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline void asc_gather_datablock(
     vector_uint64_t& dst, __ubuf__ uint64_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvf16_PUf16_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline void asc_gather_datablock(
     vector_half& dst, __ubuf__ half* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvf32_PUf32_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline void asc_gather_datablock(
     vector_float& dst, __ubuf__ float* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvbf16_PUbf16_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline void asc_gather_datablock(
     vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvf8e4m3_PUf8e4m3_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline void asc_gather_datablock(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvhf8_PUhf8_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline void asc_gather_datablock(
     vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvf8e5m2_PUf8e5m2_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline void asc_gather_datablock(
     vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvf4e2m1x2_PUf4e2m1x2_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline void asc_gather_datablock(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvf4e1m2x2_PUf4e1m2x2_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline void asc_gather_datablock(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvi4x2_PUi4x2_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline void asc_gather_datablock(
     vector_int4x2_t& dst, __ubuf__ int4b_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvf8e8m0_PUf8e8m0_vu32_vb
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ * @param [in] mask 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dst中DataBlock0至DataBlock7是否更新，其余bit无效。**
+ */
 __simd_callee__ inline void asc_gather_datablock(
     vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint32_t index, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvi8_PUi8_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline void asc_gather_datablock(vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvu8_PUu8_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline void asc_gather_datablock(vector_uint8_t& dst, __ubuf__ uint8_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvi16_PUi16_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline void asc_gather_datablock(vector_int16_t& dst, __ubuf__ int16_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvu16_PUu16_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline void asc_gather_datablock(vector_uint16_t& dst, __ubuf__ uint16_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvi32_PUi32_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline void asc_gather_datablock(vector_int32_t& dst, __ubuf__ int32_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvu32_PUu32_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline void asc_gather_datablock(vector_uint32_t& dst, __ubuf__ uint32_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvi64_PUi64_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline void asc_gather_datablock(vector_int64_t& dst, __ubuf__ int64_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvu64_PUu64_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline void asc_gather_datablock(vector_uint64_t& dst, __ubuf__ uint64_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvf16_PUf16_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline void asc_gather_datablock(vector_half& dst, __ubuf__ half* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvf32_PUf32_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline void asc_gather_datablock(vector_float& dst, __ubuf__ float* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvbf16_PUbf16_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline void asc_gather_datablock(
     vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvf8e4m3_PUf8e4m3_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline void asc_gather_datablock(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvhf8_PUhf8_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline void asc_gather_datablock(
     vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvf8e5m2_PUf8e5m2_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline void asc_gather_datablock(
     vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvf4e2m1x2_PUf4e2m1x2_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline void asc_gather_datablock(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvf4e1m2x2_PUf4e1m2x2_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline void asc_gather_datablock(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvi4x2_PUi4x2_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline void asc_gather_datablock(vector_int4x2_t& dst, __ubuf__ int4b_t* src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.ub_gather
+ * @override_id asc_gather_datablock__Rvf8e8m0_PUf8e8m0_vu32
+ * @archs 3510
+ * @brief 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] index 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。**
+ */
 __simd_callee__ inline void asc_gather_datablock(
     vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint32_t index);
 

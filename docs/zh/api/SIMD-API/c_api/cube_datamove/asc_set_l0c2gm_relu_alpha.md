@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_l0c2gm_relu_alpha"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c2gm_relu_alpha.md"
+description: "对RELU_ALPHA寄存器中的值进行设置。这是一个64bit的寄存器，存储在fixpipe或cube指令中进行Scalar ReLU时使用的alpha值。"
+tag: [c_api, data_movement_configuration]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_l0c2gm_relu_alpha__u64"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_l0c2gm_relu_alpha
 
 ## 产品支持情况
@@ -40,6 +57,14 @@
 | 63:45 | 表示ReLU_POST中Scalar ReLU的M2值，只有Scalar ReLU时生效。硬件将以1位符号位，8位指数位和10位尾数位的格式用于计算，不能是INF/NAN。 |
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_set_l0c2gm_relu_alpha__u64"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
 
 ```cpp
 __aicore__ inline void asc_set_l0c2gm_relu_alpha(uint64_t config)

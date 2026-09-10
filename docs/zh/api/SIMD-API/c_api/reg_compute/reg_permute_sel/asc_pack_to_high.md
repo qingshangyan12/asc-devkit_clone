@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: "asc_pack_to_high"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_high.md"
+description: "将源操作数中的元素选取低8位（b16）、低16位（b32）、低32位（b64）写入目的操作数的高半部分。 当源操作数为vector_bool时，其按bit位进行压缩，每2bit将其中的低位bit存储至目的操作数的高半部分。"
+tag: [c_api, compute, 'operations:compression', vector, register_vector]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_pack_to_high__Rvu8_vu16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - override_id: "asc_pack_to_high__Rvu16_vu32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - override_id: "asc_pack_to_high__Rvb_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_pack_to_high
 
 ## 产品支持情况
@@ -35,9 +60,39 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_pack_to_high__Rvu8_vu16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
 ```cpp
 __simd_callee__ inline void asc_pack_to_high(vector_uint8_t& dst, vector_uint16_t src)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_pack_to_high__Rvu16_vu32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_pack_to_high(vector_uint16_t& dst, vector_uint32_t src)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_pack_to_high__Rvb_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_pack_to_high(vector_bool& dst, vector_bool src)
 ```
 

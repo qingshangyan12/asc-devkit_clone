@@ -1,3 +1,40 @@
+---
+okftype: reference.api.cpp
+title: "asc_datablock_reduce_sum"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_sum.md"
+description: "对每个DataBlock内所有元素求和。"
+tag: [c_api, compute, reduction, vector, memory_vector]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_datablock_reduce_sum__PUf16_PUf16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - override_id: "asc_datablock_reduce_sum__PUf32_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - override_id: "asc_datablock_reduce_sum__PUf16_PUf16_u8_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - override_id: "asc_datablock_reduce_sum__PUf32_PUf32_u8_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - override_id: "asc_datablock_reduce_sum_sync__PUf16_PUf16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_datablock_reduce_sum_sync__PUf32_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_datablock_reduce_sum
 
 ## 产品支持情况
@@ -38,22 +75,79 @@
 
 - 前n个数据计算
 
+```yaml
+api_signature:
+  override_id: "asc_datablock_reduce_sum__PUf16_PUf16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+```
+
     ```cpp
     __aicore__ inline void asc_datablock_reduce_sum(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_datablock_reduce_sum__PUf32_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_datablock_reduce_sum(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
     ```
 
 - 高维切分计算
 
+```yaml
+api_signature:
+  override_id: "asc_datablock_reduce_sum__PUf16_PUf16_u8_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+```
+
     ```cpp
     __aicore__ inline void asc_datablock_reduce_sum(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride, uint16_t src_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_datablock_reduce_sum__PUf32_PUf32_u8_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_datablock_reduce_sum(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride, uint16_t src_repeat_stride)
     ```
 
 - 同步计算
 
+```yaml
+api_signature:
+  override_id: "asc_datablock_reduce_sum_sync__PUf16_PUf16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
     ```cpp
     __aicore__ inline void asc_datablock_reduce_sum_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_datablock_reduce_sum_sync__PUf32_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_datablock_reduce_sum_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
     ```
 

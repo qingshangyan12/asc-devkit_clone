@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: "asc_mrgsort4"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md"
+description: "将已经排好序的最多4条队列，合并排列成1条队列，结果按照score域由大到小排序。"
+tag: [c_api, compute, 'operations:sort', vector, memory_vector]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_mrgsort4__PUf16_AmrgPUf16_u8_u16_u16_u16_u16_b_u8"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_sort.h"
+  - override_id: "asc_mrgsort4__PUf32_AmrgPUf32_u8_u16_u16_u16_u16_b_u8"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_sort.h"
+  - override_id: "asc_mrgsort4_sync__PUf16_AmrgPUf16_u8_u16_u16_u16_u16_b_u8"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_mrgsort4_sync__PUf32_AmrgPUf32_u8_u16_u16_u16_u16_b_u8"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_mrgsort4
 
 ## 产品支持情况
@@ -43,15 +72,53 @@ asc_mrgsort4处理的数据一般是经过asc_bitsort指令处理后的数据，
 
 - 计算
 
+```yaml
+api_signature:
+  override_id: "asc_mrgsort4__PUf16_AmrgPUf16_u8_u16_u16_u16_u16_b_u8"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_sort.h"
+```
+
     ```cpp
     __aicore__ inline void asc_mrgsort4(__ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_mrgsort4__PUf32_AmrgPUf32_u8_u16_u16_u16_u16_b_u8"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_sort.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_mrgsort4(__ubuf__ float* dst, __ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
     ```
 
 - 同步计算
 
+```yaml
+api_signature:
+  override_id: "asc_mrgsort4_sync__PUf16_AmrgPUf16_u8_u16_u16_u16_u16_b_u8"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
     ```cpp
     __aicore__ inline void asc_mrgsort4_sync(__ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_mrgsort4_sync__PUf32_AmrgPUf32_u8_u16_u16_u16_u16_b_u8"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_mrgsort4_sync(__ubuf__ float* dst, __ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
     ```
 

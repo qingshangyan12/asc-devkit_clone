@@ -1,3 +1,40 @@
+---
+okftype: reference.api.cpp
+title: "asc_rcp"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_rcp.md"
+description: "执行矢量的取倒数运算。"
+tag: [c_api, compute, arithmetic, reciprocal, vector, memory_vector, 'src:unified_buffer',
+  'dst:unified_buffer', count_limited, elementwise, high_dimensional]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_rcp__PUf16_PUf16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_arith.h"
+  - override_id: "asc_rcp__PUf32_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_arith.h"
+  - override_id: "asc_rcp__PUf16_PUf16_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_arith.h"
+  - override_id: "asc_rcp__PUf32_PUf32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_arith.h"
+  - override_id: "asc_rcp_sync__PUf16_PUf16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_rcp_sync__PUf32_PUf32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
 
 # asc_rcp
 
@@ -39,22 +76,79 @@ $$
 
 - 前n个数据计算
 
+```yaml
+api_signature:
+  override_id: "asc_rcp__PUf16_PUf16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_arith.h"
+```
+
     ```cpp
     __aicore__ inline void asc_rcp(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_rcp__PUf32_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_arith.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_rcp(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
     ```
 
 - 高维切分计算
 
+```yaml
+api_signature:
+  override_id: "asc_rcp__PUf16_PUf16_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_arith.h"
+```
+
     ```cpp
     __aicore__ inline void asc_rcp(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_rcp__PUf32_PUf32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_arith.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_rcp(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
 
 - 同步计算
 
+```yaml
+api_signature:
+  override_id: "asc_rcp_sync__PUf16_PUf16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
     ```cpp
     __aicore__ inline void asc_rcp_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_rcp_sync__PUf32_PUf32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_rcp_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
     ```
 

@@ -1,3 +1,24 @@
+---
+okftype: reference.api.cpp
+title: "asc_get_mask_spr"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_get_mask_spr.md"
+description: "从SPR（Special Purpose Register）中读取mask值，并按数据类型格式化后返回。"
+tag: [c_api, 'roles:configuration', 'roles:query']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_get_mask_spr_b16__z"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_mask.h"
+  - override_id: "asc_get_mask_spr_b32__z"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_mask.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_get_mask_spr
 
 ## 产品支持情况
@@ -35,8 +56,27 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_get_mask_spr_b16__z"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_mask.h"
+```
+
 ```c
 __simd_callee__ inline vector_bool asc_get_mask_spr_b16()
+```
+
+```yaml
+api_signature:
+  override_id: "asc_get_mask_spr_b32__z"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_mask.h"
+```
+
+```c
 __simd_callee__ inline vector_bool asc_get_mask_spr_b32()
 ```
 

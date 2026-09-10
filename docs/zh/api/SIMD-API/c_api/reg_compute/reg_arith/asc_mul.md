@@ -3,6 +3,10 @@ okftype: reference.api.cpp
 title: "asc_mul"
 resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_mul.md"
 description: "该接口根据`mask`，对源操作数`src0`、`src1`按元素进行乘法运算，将结果写入目的操作数`dst`。"
+tag: [c_api, compute, arithmetic, multiply, mask, vector, register_vector, 'src:vector_register',
+  'dst:vector_register', elementwise, masked]
+usage_dependencies:
+  status: unconfirmed
 signature:
   - prototype_id: "asc_mul__Rv<dtype>_v<dtype>_v<dtype>_vb"
     archs: ["3510"]

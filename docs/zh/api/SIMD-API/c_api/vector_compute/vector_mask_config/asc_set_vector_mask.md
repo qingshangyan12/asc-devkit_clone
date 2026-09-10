@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_vector_mask"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md"
+description: "本API用于设置Mask值。某些矢量计算接口需要提前设置Mask，用于指示哪些数据参与计算。 单独使用该API时可引入`c_api/vector_compute/compute/vector_mask_config.h`，整体使用C API时可引入`c_api/asc_simd.h`。"
+tag: [c_api, 'roles:configuration']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_vector_mask__u64_u64"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_mask_config.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_vector_mask
 
 ## 产品支持情况
@@ -45,6 +62,14 @@
 <!-- end id9 -->
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_set_vector_mask__u64_u64"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_mask_config.h"
+```
 
 ```cpp
 __aicore__ inline void asc_set_vector_mask(uint64_t mask_high, uint64_t mask_low)

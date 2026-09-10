@@ -3,6 +3,10 @@ okftype: reference.api.cpp
 title: "asc_add_scalar"
 resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_add_scalar.md"
 description: "根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。"
+tag: [c_api, compute, arithmetic, add, mask, scalar, vector, register_vector, 'src:vector_register',
+  'dst:vector_register', elementwise, masked, scalar_operand]
+usage_dependencies:
+  status: unconfirmed
 signature:
   - prototype_id: "asc_add_scalar__v<dtype>_<dtype>_vb"
     archs: ["3510"]

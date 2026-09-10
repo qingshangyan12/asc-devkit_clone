@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: "asc_reduce_sum"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_sum.md"
+description: "根据`mask`对源操作数`src`进行归约求和操作，用于将`src`中的所有参与计算的元素求和，得到归约结果。结果保存在`dst`中的0位置。"
+tag: [c_api, compute, reduction, mask, vector, register_vector, masked]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_reduce_sum__v<src_dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_reduce.h"
+  - prototype_id: "asc_reduce_sum__Rv<dst_dtype>_v<src_dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_reduce.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce"
+    archs: ["3510"]
+    override_id: "asc_reduce_sum__Rvf32_vf32_vb"
+    file: "reduce.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_reduce_sum
 
 ## 产品支持情况
@@ -43,10 +68,63 @@ def asc_reduce_sum(dst, src, mask):
 
 ## 函数原型
 
+```yaml
+api_signature:
+  prototype_id: "asc_reduce_sum__v<src_dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_reduce.h"
+  dtype:
+    variants:
+      -
+        src_dtype: "int16_t"
+      -
+        src_dtype: "uint16_t"
+      -
+        src_dtype: "half"
+      -
+        src_dtype: "int32_t"
+      -
+        src_dtype: "uint32_t"
+      -
+        src_dtype: "float"
+```
+
 ```c
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dst_dtype> asc_reduce_sum(vector_<src_dtype> src,
                                                           vector_bool mask)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_reduce_sum__Rv<dst_dtype>_v<src_dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_reduce.h"
+  dtype:
+    variants:
+      -
+        dst_dtype: "int32_t"
+        src_dtype: "int16_t"
+      -
+        dst_dtype: "uint32_t"
+        src_dtype: "uint16_t"
+      -
+        dst_dtype: "half"
+        src_dtype: "half"
+      -
+        dst_dtype: "int32_t"
+        src_dtype: "int32_t"
+      -
+        dst_dtype: "uint32_t"
+        src_dtype: "uint32_t"
+      -
+        dst_dtype: "float"
+        src_dtype: "float"
+```
+
+```c
 
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_reduce_sum(vector_<dst_dtype>& dst,

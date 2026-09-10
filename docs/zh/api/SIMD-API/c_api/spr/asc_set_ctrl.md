@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_ctrl"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md"
+description: "对CTRL寄存器（控制寄存器）的特定比特位进行设置。"
+tag: [c_api, 'roles:configuration', 'traits:saturation_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_ctrl__u64"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/spr/spr.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_ctrl
 
 ## 产品支持情况
@@ -31,6 +48,14 @@
 对CTRL寄存器（控制寄存器）的特定比特位进行设置。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_set_ctrl__u64"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/spr/spr.h"
+```
 
 ```cpp
 __aicore__ inline void asc_set_ctrl(uint64_t config)

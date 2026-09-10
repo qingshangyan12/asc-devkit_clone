@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_ceil"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_ceil.md"
+description: "将`src`中的浮点数元素按照CEIL（向正无穷方向舍入）舍入模式舍入到整数值，结果仍保持原浮点数据类型。接口支持通过函数返回值返回结果，也支持通过引用和参数输出结果：前者直接返回舍入结果，后者将舍入结果写入`dst`。舍入规则等价于C标准库`ceil`语义：向正无穷方向舍入，即取大于或等于输入值的最小整数，正数向数值增大的方向取整（如1.3 -> 2.0），负数向0方向取整（如-1.7 -> -1.0），整数值保持不变。未被`mask`筛选的元素置零。"
+tag: [c_api, compute, 'operations:conversion', mask, vector, register_vector, masked,
+  'traits:rounding_mode', 'traits:saturation_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_ceil__v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - prototype_id: "asc_ceil__Rv<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_ceil
 
 ## 产品支持情况
@@ -34,10 +56,39 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  prototype_id: "asc_ceil__v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+  dtype:
+    values:
+      - "half"
+      - "bfloat16_t"
+      - "float"
+```
+
 ```cpp
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_ceil(vector_<dtype> src,
                                                 vector_bool mask)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_ceil__Rv<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+  dtype:
+    values:
+      - "half"
+      - "bfloat16_t"
+      - "float"
+```
+
+```cpp
 
 // 通过引用和参数输出结果（占位符形式）
 __simd_callee__ inline void asc_ceil(vector_<dtype>& dst,

@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: "asc_update_mask"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_update_mask.md"
+description: "根据元素个数value生成mask，并自动将value减去当前向量处理单元的元素个数。"
+tag: [c_api, 'roles:configuration']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_update_mask_b8__Ru32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_mask.h"
+  - override_id: "asc_update_mask_b16__Ru32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_mask.h"
+  - override_id: "asc_update_mask_b32__Ru32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_mask.h"
+examples:
+  - path: "/examples/02_simd_c_api/00_introduction/04_reg_base_add_compute/c_api_simd_add"
+    archs: ["3510"]
+    override_id: "asc_update_mask_b32__Ru32"
+    file: "c_api_add.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_update_mask
 
 ## 产品支持情况
@@ -42,9 +71,39 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_update_mask_b8__Ru32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_mask.h"
+```
+
 ```c
 __simd_callee__ inline vector_bool asc_update_mask_b8(uint32_t& value)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_update_mask_b16__Ru32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_mask.h"
+```
+
+```c
 __simd_callee__ inline vector_bool asc_update_mask_b16(uint32_t& value)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_update_mask_b32__Ru32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_mask.h"
+```
+
+```c
 __simd_callee__ inline vector_bool asc_update_mask_b32(uint32_t& value)
 ```
 

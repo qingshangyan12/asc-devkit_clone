@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_l13d_rpt"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt.md"
+description: "用于设置Load3Dv2接口的repeat参数。"
+tag: [c_api, data_movement_configuration]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_l13d_rpt__Rload3dcfg"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_l13d_rpt
 
 ## 产品支持情况
@@ -31,6 +48,14 @@
 用于设置Load3Dv2接口的repeat参数。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_set_l13d_rpt__Rload3dcfg"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
 
 ```cpp
 __aicore__ inline void asc_set_l13d_rpt(asc_load3d_v2_config& config)

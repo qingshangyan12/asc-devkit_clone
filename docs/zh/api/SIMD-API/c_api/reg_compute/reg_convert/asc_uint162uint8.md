@@ -1,3 +1,33 @@
+---
+okftype: reference.api.cpp
+title: "asc_uint162uint8"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint162uint8.md"
+description: "将`uint16_t`类型数据转换为`uint8_t`类型，无舍入模式，支持饱和/非饱和模式。"
+tag: [c_api, compute, 'operations:conversion', vector, register_vector, 'traits:rounding_mode',
+  'traits:saturation_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_uint162uint8__Rvu8_vu16_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_uint162uint8_sat__Rvu8_vu16_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_uint162uint8__Rvu8_vu16_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_uint162uint8_sat__Rvu8_vu16_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_uint162uint8
 
 ## 产品支持情况
@@ -48,15 +78,133 @@ def asc_uint162uint8(dst, src, mask, dst_pos):
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_uint162uint8__Rvu8_vu16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```c
 // 占位符形式
-__simd_callee__ inline void asc_uint162uint8<sat_mode>(vector_uint8_t& dst,
+__simd_callee__ inline void asc_uint162uint8(vector_uint8_t& dst,
                                                        vector_uint16_t src,
                                                        vector_bool mask,
                                                        std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_uint162uint8_sat__Rvu8_vu16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_uint162uint8_sat(vector_uint8_t& dst,
+                                                       vector_uint16_t src,
+                                                       vector_bool mask,
+                                                       std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_uint162uint8__Rvu8_vu16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_uint162uint8(vector_uint8_t& dst,
+                                                       vector_uint16_t src,
+                                                       vector_bool mask,
+                                                       std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_uint162uint8_sat__Rvu8_vu16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_uint162uint8_sat(vector_uint8_t& dst,
+                                                       vector_uint16_t src,
+                                                       vector_bool mask,
+                                                       std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_uint162uint8__Rvu8_vu16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
 
 // 占位符形式
-__simd_callee__ inline void asc_uint162uint8<sat_mode>(vector_uint8_t& dst,
+__simd_callee__ inline void asc_uint162uint8(vector_uint8_t& dst,
+                                                       vector_uint16_t src,
+                                                       vector_bool mask,
+                                                       std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_uint162uint8_sat__Rvu8_vu16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_uint162uint8_sat(vector_uint8_t& dst,
+                                                       vector_uint16_t src,
+                                                       vector_bool mask,
+                                                       std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_uint162uint8__Rvu8_vu16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_uint162uint8(vector_uint8_t& dst,
+                                                       vector_uint16_t src,
+                                                       vector_bool mask,
+                                                       std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_uint162uint8_sat__Rvu8_vu16_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_uint162uint8_sat(vector_uint8_t& dst,
                                                        vector_uint16_t src,
                                                        vector_bool mask,
                                                        std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
@@ -67,6 +215,14 @@ __simd_callee__ inline void asc_uint162uint8<sat_mode>(vector_uint8_t& dst,
 - `<sat_mode>`表示饱和/非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
 
 ### 函数原型典型示例
+
+```yaml
+api_signature:
+  override_id: "asc_uint162uint8__Rvu8_vu16_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
 
 ```c
 // 示例：偶数分块位置、非饱和模式。

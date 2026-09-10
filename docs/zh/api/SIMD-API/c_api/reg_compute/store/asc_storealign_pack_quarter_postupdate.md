@@ -1,3 +1,21 @@
+---
+okftype: reference.api.cpp
+title: "asc_storealign_pack_quarter_postupdate"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter_postupdate.md"
+description: "将矢量数据寄存器中的数据压缩搬出到Unified Buffer（UB），写入完成后启用Post Update模式自动累加目的地址指针，便于硬件循环内连续多次调用时无需手动维护目的地址。`mask`用于指示参与搬出的元素，`mask`对应位置为1时，将`src`中有效的32位元素中的低8bit数据写入压缩后对应的目的位置；`mask`对应位置为0时，对应元素不参与搬出，压缩后对应的目的位置保持原值。`offset`单位为元素。搬出完成后，目的地址累加`offset × sizeof(dtype)`字节。本接口在Vector Function（`__simd_vf__`标记的函数）内使用。"
+tag: [c_api, data_movement, 'operations:compression', 'operations:store', mask, vector,
+  register_vector, 'src:vector_register', 'dst:unified_buffer', masked, post_update]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_storealign_pack_quarter_postupdate__RPU<dtype>_v<dtype>_i32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storealign.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_storealign_pack_quarter_postupdate
 
 ## 产品支持情况
@@ -33,6 +51,19 @@
 本接口仅在AIV上执行有效。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  prototype_id: "asc_storealign_pack_quarter_postupdate__RPU<dtype>_v<dtype>_i32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storealign.h"
+  dtype:
+    values:
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
 
 ```c
 // 占位符形式

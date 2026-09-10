@@ -1,3 +1,40 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_atomic_add"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md"
+description: "原子累加过程：将待搬运到GM的数据和GM上已有数据进行求和，然后将求和结果写入GM。本接口对后续目的地址为GM的数据搬运指令开启原子累加，不同产品支持的数据搬运通路请参考[约束说明](#约束说明)。"
+tag: [c_api, data_movement_configuration, arithmetic, add, atomic]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_atomic_add_int8__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/atomic/datamove_atomic.h"
+  - override_id: "asc_set_atomic_add_int16__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/atomic/datamove_atomic.h"
+  - override_id: "asc_set_atomic_add_int32__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/atomic/datamove_atomic.h"
+  - override_id: "asc_set_atomic_add_float16__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/atomic/datamove_atomic.h"
+  - override_id: "asc_set_atomic_add_bfloat__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/atomic/datamove_atomic.h"
+  - override_id: "asc_set_atomic_add_float__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/atomic/datamove_atomic.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_atomic_add
 
 ## 产品支持情况
@@ -34,12 +71,75 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_set_atomic_add_int8__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/atomic/datamove_atomic.h"
+```
+
 ```c
 __aicore__ inline void asc_set_atomic_add_int8()
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_atomic_add_int16__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/atomic/datamove_atomic.h"
+```
+
+```c
 __aicore__ inline void asc_set_atomic_add_int16()
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_atomic_add_int32__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/atomic/datamove_atomic.h"
+```
+
+```c
 __aicore__ inline void asc_set_atomic_add_int32()
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_atomic_add_float16__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/atomic/datamove_atomic.h"
+```
+
+```c
 __aicore__ inline void asc_set_atomic_add_float16()
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_atomic_add_bfloat__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/atomic/datamove_atomic.h"
+```
+
+```c
 __aicore__ inline void asc_set_atomic_add_bfloat()
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_atomic_add_float__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/atomic/datamove_atomic.h"
+```
+
+```c
 __aicore__ inline void asc_set_atomic_add_float()
 ```
 

@@ -1,3 +1,37 @@
+---
+okftype: reference.api.cpp
+title: "asc_mmad_mx"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md"
+description: "本接口用于完成带有量化系数的矩阵乘加计算（MmadMx），即左矩阵A和右矩阵B均有对应的量化系数矩阵，左量化系数矩阵ScaleA和右量化系数矩阵ScaleB。"
+tag: [c_api, compute, 'roles:configuration', 'operations:matrix_multiply_accumulate',
+  matrix, 'traits:saturation_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_mmad_mx__PCCf32_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_unitflag_b_b_b"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_compute/cube_compute.h"
+  - prototype_id: "asc_mmad_mx__PCCf32_PCA<a_dtype>_PCB<b_dtype>_u64_u16_u16_u16_unitflag_b"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_compute/cube_compute.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad_mx"
+    archs: ["3510"]
+    override_id: "asc_mmad_mx__PCCf32_PCAf4e1m2x2_PCBf4e2m1x2_u16_u16_u16_unitflag_b_b_b"
+    file: "mmad_mx.asc"
+  - path: "/examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad_mx"
+    archs: ["3510"]
+    override_id: "asc_mmad_mx__PCCf32_PCAf4e2m1x2_PCBf4e1m2x2_u16_u16_u16_unitflag_b_b_b"
+    file: "mmad_mx.asc"
+  - path: "/examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad_mx"
+    archs: ["3510"]
+    override_id: "asc_mmad_mx__PCCf32_PCAf8e4m3_PCBf8e5m2_u16_u16_u16_unitflag_b_b_b"
+    file: "mmad_mx.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_mmad_mx
 
 ## 产品支持情况
@@ -57,6 +91,40 @@ $$
 
 **占位符形式：**
 
+```yaml
+api_signature:
+  prototype_id: "asc_mmad_mx__PCCf32_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_unitflag_b_b_b"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_compute/cube_compute.h"
+  dtype:
+    variants:
+      -
+        a_dtype: "fp4x2_e1m2_t"
+        b_dtype: "fp4x2_e1m2_t"
+      -
+        a_dtype: "fp4x2_e1m2_t"
+        b_dtype: "fp4x2_e2m1_t"
+      -
+        a_dtype: "fp4x2_e2m1_t"
+        b_dtype: "fp4x2_e1m2_t"
+      -
+        a_dtype: "fp4x2_e2m1_t"
+        b_dtype: "fp4x2_e2m1_t"
+      -
+        a_dtype: "fp8_e4m3fn_t"
+        b_dtype: "fp8_e4m3fn_t"
+      -
+        a_dtype: "fp8_e4m3fn_t"
+        b_dtype: "fp8_e5m2_t"
+      -
+        a_dtype: "fp8_e5m2_t"
+        b_dtype: "fp8_e4m3fn_t"
+      -
+        a_dtype: "fp8_e5m2_t"
+        b_dtype: "fp8_e5m2_t"
+```
+
 ```c
 // 不显式传入Bias起始地址，通过参数控制C矩阵初始化方式
 __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
@@ -69,6 +137,43 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
                                     bool disable_gemv,
                                     bool c_matrix_source,
                                     bool c_matrix_init_val)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_mmad_mx__PCCf32_PCA<a_dtype>_PCB<b_dtype>_u64_u16_u16_u16_unitflag_b"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_compute/cube_compute.h"
+  dtype:
+    variants:
+      -
+        a_dtype: "fp4x2_e1m2_t"
+        b_dtype: "fp4x2_e1m2_t"
+      -
+        a_dtype: "fp4x2_e1m2_t"
+        b_dtype: "fp4x2_e2m1_t"
+      -
+        a_dtype: "fp4x2_e2m1_t"
+        b_dtype: "fp4x2_e1m2_t"
+      -
+        a_dtype: "fp4x2_e2m1_t"
+        b_dtype: "fp4x2_e2m1_t"
+      -
+        a_dtype: "fp8_e4m3fn_t"
+        b_dtype: "fp8_e4m3fn_t"
+      -
+        a_dtype: "fp8_e4m3fn_t"
+        b_dtype: "fp8_e5m2_t"
+      -
+        a_dtype: "fp8_e5m2_t"
+        b_dtype: "fp8_e4m3fn_t"
+      -
+        a_dtype: "fp8_e5m2_t"
+        b_dtype: "fp8_e5m2_t"
+```
+
+```c
 
 // 显式传入Bias起始地址，C矩阵使用Bias矩阵初始化
 __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,

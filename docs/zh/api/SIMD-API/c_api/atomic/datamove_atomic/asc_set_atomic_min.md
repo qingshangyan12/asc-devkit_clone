@@ -1,3 +1,40 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_atomic_min"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md"
+description: "设置对后续的从Unified Buffer（UB）/L0C Buffer/L1 Buffer到GM的数据传输开启原子比较取小操作。数据类型支持int8_t、int16_t、half、bfloat16_t、int32_t、float。 开启原子比较取小后，后续执行搬运操作从UB/L0C Buffer/L1 Buffer到GM时，将待拷贝的内容和GM已有内容进行比较，将最小值写入GM。"
+tag: [c_api, data_movement_configuration, arithmetic, minimum, atomic]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_atomic_min_int8__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/atomic/datamove_atomic.h"
+  - override_id: "asc_set_atomic_min_int16__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/atomic/datamove_atomic.h"
+  - override_id: "asc_set_atomic_min_float16__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/atomic/datamove_atomic.h"
+  - override_id: "asc_set_atomic_min_bfloat__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/atomic/datamove_atomic.h"
+  - override_id: "asc_set_atomic_min_int32__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/atomic/datamove_atomic.h"
+  - override_id: "asc_set_atomic_min_float__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/atomic/datamove_atomic.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_atomic_min
 
 ## 产品支持情况
@@ -36,12 +73,75 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_set_atomic_min_int8__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/atomic/datamove_atomic.h"
+```
+
 ```c
 __aicore__ inline void asc_set_atomic_min_int8()
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_atomic_min_int16__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/atomic/datamove_atomic.h"
+```
+
+```c
 __aicore__ inline void asc_set_atomic_min_int16()
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_atomic_min_float16__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/atomic/datamove_atomic.h"
+```
+
+```c
 __aicore__ inline void asc_set_atomic_min_float16()
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_atomic_min_bfloat__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/atomic/datamove_atomic.h"
+```
+
+```c
 __aicore__ inline void asc_set_atomic_min_bfloat()
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_atomic_min_int32__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/atomic/datamove_atomic.h"
+```
+
+```c
 __aicore__ inline void asc_set_atomic_min_int32()
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_atomic_min_float__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/atomic/datamove_atomic.h"
+```
+
+```c
 __aicore__ inline void asc_set_atomic_min_float()
 ```
 

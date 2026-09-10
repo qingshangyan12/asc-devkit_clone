@@ -1,3 +1,33 @@
+---
+okftype: reference.api.cpp
+title: "asc_not"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_not.md"
+description: "根据`mask`对源操作数`src`执行按位取反操作，将结果作为返回值返回或写入目的操作数`dst`。"
+tag: [c_api, compute, bitwise, 'operations:bitwise_not', mask, vector, register_vector,
+  masked]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_not__v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_logic.h"
+  - prototype_id: "asc_not__Rv<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_logic.h"
+  - override_id: "asc_not__vb_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_logic.h"
+  - override_id: "asc_not__Rvb_vb_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_logic.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_not
 
 ## 产品支持情况
@@ -46,10 +76,49 @@ $$
 
 ### 矢量数据寄存器按位取反
 
+```yaml
+api_signature:
+  prototype_id: "asc_not__v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_logic.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
 ```c
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_not(vector_<dtype> src,
                                               vector_bool mask)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_not__Rv<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_logic.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
+```c
 
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_not(vector_<dtype>& dst,
@@ -75,10 +144,29 @@ __simd_callee__ inline void asc_not(vector_half& dst,
 
 ### 掩码寄存器按位取反
 
+```yaml
+api_signature:
+  override_id: "asc_not__vb_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_logic.h"
+```
+
 ```c
 // 通过函数返回值返回结果
 __simd_callee__ inline vector_bool asc_not(vector_bool src,
                                            vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_not__Rvb_vb_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_logic.h"
+```
+
+```c
 
 // 通过引用参数输出结果
 __simd_callee__ inline void asc_not(vector_bool& dst,

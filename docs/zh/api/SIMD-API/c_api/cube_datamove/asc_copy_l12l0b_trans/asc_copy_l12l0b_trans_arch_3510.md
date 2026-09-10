@@ -1,3 +1,124 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_l12l0b_trans"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_3510.md"
+description: "该接口实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载。"
+tag: [c_api, data_movement, copy, transpose]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_copy_l12l0b_trans__PCBbf16_PL1bf16_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12l0b_trans__PCBf8e4m3_PL1f8e4m3_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12l0b_trans__PCBf8e5m2_PL1f8e5m2_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12l0b_trans__PCBf16_PL1f16_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12l0b_trans__PCBf32_PL1f32_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12l0b_trans__PCBhf8_PL1hf8_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12l0b_trans__PCBi32_PL1i32_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12l0b_trans__PCBi8_PL1i8_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12l0b_trans__PCBu32_PL1u32_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12l0b_trans__PCBu8_PL1u8_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12l0b_trans__PCBi4x2_PL1i4x2_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12l0b_trans__PCBf4e2m1x2_PL1f4e2m1x2_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12l0b_trans__PCBf4e1m2x2_PL1f4e1m2x2_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12l0b_trans_sync__PCBbf16_PL1bf16_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_l12l0b_trans_sync__PCBf8e4m3_PL1f8e4m3_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_l12l0b_trans_sync__PCBf8e5m2_PL1f8e5m2_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_l12l0b_trans_sync__PCBf16_PL1f16_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_l12l0b_trans_sync__PCBf32_PL1f32_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_l12l0b_trans_sync__PCBhf8_PL1hf8_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_l12l0b_trans_sync__PCBi32_PL1i32_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_l12l0b_trans_sync__PCBi8_PL1i8_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_l12l0b_trans_sync__PCBu32_PL1u32_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_l12l0b_trans_sync__PCBu8_PL1u8_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_l12l0b_trans_sync__PCBi4x2_PL1i4x2_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_l12l0b_trans_sync__PCBf4e2m1x2_PL1f4e2m1x2_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_l12l0b_trans_sync__PCBf4e1m2x2_PL1f4e1m2x2_u16_u8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad"
+    archs: ["3510"]
+    override_id: "asc_copy_l12l0b_trans__PCBi8_PL1i8_u16_u8_u16_u16_u16_u16"
+    file: "mmad_s1.h"
+timestamp: "2026-09-10"
+---
+
 # asc_copy_l12l0b_trans
 
 ## 产品支持情况
@@ -96,37 +217,317 @@
 
 - 常规转置搬运
 
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans__PCBbf16_PL1bf16_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
   ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans__PCBf8e4m3_PL1f8e4m3_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans(__cb__ fp8_e4m3fn_t* dst, __cbuf__ fp8_e4m3fn_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans__PCBf8e5m2_PL1f8e5m2_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans(__cb__ fp8_e5m2_t* dst, __cbuf__ fp8_e5m2_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans__PCBf16_PL1f16_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans(__cb__ half* dst, __cbuf__ half* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans__PCBf32_PL1f32_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans(__cb__ float* dst, __cbuf__ float* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans__PCBhf8_PL1hf8_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans(__cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans__PCBi32_PL1i32_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans(__cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans__PCBi8_PL1i8_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans(__cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans__PCBu32_PL1u32_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans(__cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans__PCBu8_PL1u8_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans(__cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans__PCBi4x2_PL1i4x2_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans(__cb__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans__PCBf4e2m1x2_PL1f4e2m1x2_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans(__cb__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans__PCBf4e1m2x2_PL1f4e1m2x2_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans(__cb__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
   ```
 
 - 同步转置搬运
 
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans_sync__PCBbf16_PL1bf16_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
   ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans_sync__PCBf8e4m3_PL1f8e4m3_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ fp8_e4m3fn_t* dst, __cbuf__ fp8_e4m3fn_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans_sync__PCBf8e5m2_PL1f8e5m2_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ fp8_e5m2_t* dst, __cbuf__ fp8_e5m2_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans_sync__PCBf16_PL1f16_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ half* dst, __cbuf__ half* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans_sync__PCBf32_PL1f32_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ float* dst, __cbuf__ float* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans_sync__PCBhf8_PL1hf8_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans_sync__PCBi32_PL1i32_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans_sync__PCBi8_PL1i8_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans_sync__PCBu32_PL1u32_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans_sync__PCBu8_PL1u8_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans_sync__PCBi4x2_PL1i4x2_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans_sync__PCBf4e2m1x2_PL1f4e2m1x2_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_trans_sync__PCBf4e1m2x2_PL1f4e1m2x2_u16_u8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap)
 
   ```

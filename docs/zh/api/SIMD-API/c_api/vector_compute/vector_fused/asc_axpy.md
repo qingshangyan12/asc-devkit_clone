@@ -1,3 +1,53 @@
+---
+okftype: reference.api.cpp
+title: "asc_axpy"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_axpy.md"
+description: "源操作数src中每个元素与标量value求积后和目的操作数dst中的对应元素相加。"
+tag: [c_api, compute, 'operations:fused_multiply_add', scalar, vector, memory_vector,
+  scalar_operand]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_axpy__PUf16_PUf16_f16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_fused.h"
+  - override_id: "asc_axpy__PUf32_PUf16_f16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_fused.h"
+  - override_id: "asc_axpy__PUf32_PUf32_f32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_fused.h"
+  - override_id: "asc_axpy__PUf16_PUf16_f16_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_fused.h"
+  - override_id: "asc_axpy__PUf32_PUf16_f16_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_fused.h"
+  - override_id: "asc_axpy__PUf32_PUf32_f32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_fused.h"
+  - override_id: "asc_axpy_sync__PUf16_PUf16_f16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_axpy_sync__PUf32_PUf16_f16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_axpy_sync__PUf32_PUf32_f32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_axpy
 
 ## 产品支持情况
@@ -38,25 +88,115 @@ $$
 
 - 连续数据计算
 
+```yaml
+api_signature:
+  override_id: "asc_axpy__PUf16_PUf16_f16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_fused.h"
+```
+
   ```cpp
   __aicore__ inline void asc_axpy(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_axpy__PUf32_PUf16_f16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_fused.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_axpy(__ubuf__ float* dst, __ubuf__ half* src, half value, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_axpy__PUf32_PUf32_f32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_fused.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_axpy(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
   ```
 
 - 高维切分计算
 
+```yaml
+api_signature:
+  override_id: "asc_axpy__PUf16_PUf16_f16_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_fused.h"
+```
+
   ```cpp
   __aicore__ inline void asc_axpy(__ubuf__ half* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_axpy__PUf32_PUf16_f16_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_fused.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_axpy(__ubuf__ float* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_axpy__PUf32_PUf32_f32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_fused.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_axpy(__ubuf__ float* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
   ```
 
 - 同步计算
 
+```yaml
+api_signature:
+  override_id: "asc_axpy_sync__PUf16_PUf16_f16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
   ```cpp
   __aicore__ inline void asc_axpy_sync(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_axpy_sync__PUf32_PUf16_f16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_axpy_sync(__ubuf__ float* dst, __ubuf__ half* src, half value, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_axpy_sync__PUf32_PUf32_f32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_axpy_sync(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
   ```
 

@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: "asc_bitsort"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_bitsort.md"
+description: "位图排序函数，一次迭代可以完成32个元素的排序。"
+tag: [c_api, compute, 'operations:sort', vector, memory_vector]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_bitsort__PUf16_PUf16_PUu32_i32"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_sort.h"
+  - override_id: "asc_bitsort__PUf32_PUf32_PUu32_i32"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_sort.h"
+  - override_id: "asc_bitsort_sync__PUf16_PUf16_PUu32_i32"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_bitsort_sync__PUf32_PUf32_PUu32_i32"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_bitsort
 
 ## 产品支持情况
@@ -35,14 +64,52 @@ Score和Index分别存储在src0和src1中，按Score进行排序（Score大的�
 ## 函数原型
 
 - 连续计算
+```yaml
+api_signature:
+  override_id: "asc_bitsort__PUf16_PUf16_PUu32_i32"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_sort.h"
+```
+
   ```cpp
   __aicore__ inline void asc_bitsort(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_bitsort__PUf32_PUf32_PUu32_i32"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_sort.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_bitsort(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, int32_t repeat)
   ```
 
 - 同步计算
+```yaml
+api_signature:
+  override_id: "asc_bitsort_sync__PUf16_PUf16_PUu32_i32"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
   ```cpp
   __aicore__ inline void asc_bitsort_sync(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_bitsort_sync__PUf32_PUf32_PUu32_i32"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_bitsort_sync(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, int32_t repeat)
   ```
 

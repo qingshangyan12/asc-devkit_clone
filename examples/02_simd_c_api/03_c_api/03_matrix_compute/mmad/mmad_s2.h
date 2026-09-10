@@ -84,7 +84,9 @@ __aicore__ inline void s2_split_matrix_a_to_l0a(__ca__ bfloat16_t* dst, __cbuf__
     int16_t src_stride = ceil_div(M, BLOCK_CUBE);
     uint16_t dst_stride = ceil_div(M, BLOCK_CUBE);
 
+    //! [asc_copy_l12l0a__PCAbf16_PL1bf16_u16_u16_u8_u8_i16_u16]
     asc_copy_l12l0a(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
+    //! [asc_copy_l12l0a__PCAbf16_PL1bf16_u16_u16_u8_u8_i16_u16]
 
     asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
 }
@@ -120,16 +122,20 @@ __aicore__ inline void s2_compute_mmad(__cc__ float* c_matrix, __ca__ bfloat16_t
     bool c_matrix_source = false;
     bool c_matrix_init_val = true;
 
+    //! [asc_mmad__PCCf32_PCAbf16_PCBbf16_u16_u16_u16_unitflag_b_b_b]
     asc_mmad(
         c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
         c_matrix_init_val);
+    //! [asc_mmad__PCCf32_PCAbf16_PCBbf16_u16_u16_u16_unitflag_b_b_b]
 
     c_matrix_source = false;
     c_matrix_init_val = false;
 
+    //! [asc_mmad__PCCf32_PCAbf16_PCBbf16_u16_u16_u16_unitflag_b_b_b]
     asc_mmad(
         c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
         c_matrix_init_val);
+    //! [asc_mmad__PCCf32_PCAbf16_PCBbf16_u16_u16_u16_unitflag_b_b_b]
 
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
 }
@@ -144,7 +150,9 @@ __aicore__ inline void s2_copy_result_to_gm(__gm__ float* dst, __cc__ float* src
     uint64_t src_nd_stride = 0;
     uint64_t dst_nd_stride = 0;
 
+    //! [asc_set_l0c2gm_nz2nd__u64_u64_u64]
     asc_set_l0c2gm_nz2nd(nd_num, src_nd_stride, dst_nd_stride);
+    //! [asc_set_l0c2gm_nz2nd__u64_u64_u64]
 
     uint16_t n_size = N;
     uint16_t m_size = M;

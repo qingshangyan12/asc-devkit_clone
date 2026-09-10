@@ -1,3 +1,64 @@
+---
+okftype: reference.api.cpp
+title: "asc_create_iter_reg (废弃)"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_create_iter_reg_deprecated.md"
+description: "**该接口已废弃，请使用[asc_update_addr_reg](asc_update_addr_reg.md)实现此功能。"
+tag: [c_api, 'roles:configuration', deprecated]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_create_iter_reg_b32__u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - override_id: "asc_create_iter_reg_b16__u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - override_id: "asc_create_iter_reg_b8__u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - override_id: "asc_create_iter_reg_b32__u32_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - override_id: "asc_create_iter_reg_b16__u32_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - override_id: "asc_create_iter_reg_b8__u32_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - override_id: "asc_create_iter_reg_b32__u32_u32_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - override_id: "asc_create_iter_reg_b16__u32_u32_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - override_id: "asc_create_iter_reg_b8__u32_u32_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - override_id: "asc_create_iter_reg_b32__u32_u32_u32_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - override_id: "asc_create_iter_reg_b16__u32_u32_u32_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - override_id: "asc_create_iter_reg_b8__u32_u32_u32_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_create_iter_reg (废弃)
 
 ## 产品支持情况
@@ -34,18 +95,147 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_create_iter_reg_b32__u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+```
+
   ```cpp
   __simd_callee__ inline iter_reg asc_create_iter_reg_b32(uint32_t offset)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_create_iter_reg_b16__u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+```
+
+  ```cpp
   __simd_callee__ inline iter_reg asc_create_iter_reg_b16(uint32_t offset)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_create_iter_reg_b8__u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+```
+
+  ```cpp
   __simd_callee__ inline iter_reg asc_create_iter_reg_b8(uint32_t offset)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_create_iter_reg_b32__u32_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+```
+
+  ```cpp
   __simd_callee__ inline iter_reg asc_create_iter_reg_b32(uint32_t offset0, uint32_t offset1)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_create_iter_reg_b16__u32_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+```
+
+  ```cpp
   __simd_callee__ inline iter_reg asc_create_iter_reg_b16(uint32_t offset0, uint32_t offset1)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_create_iter_reg_b8__u32_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+```
+
+  ```cpp
   __simd_callee__ inline iter_reg asc_create_iter_reg_b8(uint32_t offset0, uint32_t offset1)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_create_iter_reg_b32__u32_u32_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+```
+
+  ```cpp
   __simd_callee__ inline iter_reg asc_create_iter_reg_b32(uint32_t offset0, uint32_t offset1, uint32_t offset2)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_create_iter_reg_b16__u32_u32_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+```
+
+  ```cpp
   __simd_callee__ inline iter_reg asc_create_iter_reg_b16(uint32_t offset0, uint32_t offset1, uint32_t offset2)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_create_iter_reg_b8__u32_u32_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+```
+
+  ```cpp
   __simd_callee__ inline iter_reg asc_create_iter_reg_b8(uint32_t offset0, uint32_t offset1, uint32_t offset2)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_create_iter_reg_b32__u32_u32_u32_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+```
+
+  ```cpp
   __simd_callee__ inline iter_reg asc_create_iter_reg_b32(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_create_iter_reg_b16__u32_u32_u32_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+```
+
+  ```cpp
   __simd_callee__ inline iter_reg asc_create_iter_reg_b16(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_create_iter_reg_b8__u32_u32_u32_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+```
+
+  ```cpp
   __simd_callee__ inline iter_reg asc_create_iter_reg_b8(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3)
   ```
 

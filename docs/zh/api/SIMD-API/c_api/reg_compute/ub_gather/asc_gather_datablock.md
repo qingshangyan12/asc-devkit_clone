@@ -1,3 +1,36 @@
+---
+okftype: reference.api.cpp
+title: "asc_gather_datablock"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/ub_gather/asc_gather_datablock.md"
+description: "给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。"
+tag: [c_api, compute, 'operations:gather', vector, register_vector]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_gather_datablock__Rv<dst_dtype>_PU<src_dtype>_vu32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/gather/ub_gather.h"
+  - prototype_id: "asc_gather_datablock__PU<src_dtype>_vu32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/gather/ub_gather.h"
+  - prototype_id: "asc_gather_datablock__Rv<dst_dtype>_PU<src_dtype>_vu32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/gather/ub_gather.h"
+  - prototype_id: "asc_gather_datablock__PU<src_dtype>_vu32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/gather/ub_gather.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_gather"
+    archs: ["3510"]
+    override_id: "asc_gather_datablock__Rvf16_PUf16_vu32_vb"
+    file: "reg_load_gather.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_gather_datablock
 
 ## 产品支持情况
@@ -38,12 +71,121 @@
 
 ### 支持掩码控制
 
+```yaml
+api_signature:
+  prototype_id: "asc_gather_datablock__Rv<dst_dtype>_PU<src_dtype>_vu32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/gather/ub_gather.h"
+  dtype:
+    variants:
+      -
+        dst_dtype: "vector_int4x2_t"
+        src_dtype: "int4b_t"
+      -
+        dst_dtype: "vector_int8_t"
+        src_dtype: "int8_t"
+      -
+        dst_dtype: "vector_uint8_t"
+        src_dtype: "uint8_t"
+      -
+        dst_dtype: "vector_fp4x2_e2m1_t"
+        src_dtype: "fp4x2_e2m1_t"
+      -
+        dst_dtype: "vector_fp4x2_e1m2_t"
+        src_dtype: "fp4x2_e1m2_t"
+      -
+        dst_dtype: "vector_hifloat8_t"
+        src_dtype: "hifloat8_t"
+      -
+        dst_dtype: "vector_fp8_e8m0_t"
+        src_dtype: "fp8_e8m0_t"
+      -
+        dst_dtype: "vector_fp8_e5m2_t"
+        src_dtype: "fp8_e5m2_t"
+      -
+        dst_dtype: "vector_fp8_e4m3fn_t"
+        src_dtype: "fp8_e4m3fn_t"
+      -
+        dst_dtype: "vector_int16_t"
+        src_dtype: "int16_t"
+      -
+        dst_dtype: "vector_uint16_t"
+        src_dtype: "uint16_t"
+      -
+        dst_dtype: "vector_half"
+        src_dtype: "half"
+      -
+        dst_dtype: "vector_bfloat16_t"
+        src_dtype: "bfloat16_t"
+      -
+        dst_dtype: "vector_int32_t"
+        src_dtype: "int32_t"
+      -
+        dst_dtype: "vector_uint32_t"
+        src_dtype: "uint32_t"
+      -
+        dst_dtype: "vector_float"
+        src_dtype: "float"
+      -
+        dst_dtype: "vector_int64_t"
+        src_dtype: "int64_t"
+      -
+        dst_dtype: "vector_uint64_t"
+        src_dtype: "uint64_t"
+```
+
 ```c
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_gather_datablock(vector_<dst_dtype>& dst,
                                                  __ubuf__ <src_dtype>* src,
                                                  vector_uint32_t index,
                                                  vector_bool mask)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_gather_datablock__PU<src_dtype>_vu32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/gather/ub_gather.h"
+  dtype:
+    variants:
+      -
+        src_dtype: "int4b_t"
+      -
+        src_dtype: "int8_t"
+      -
+        src_dtype: "uint8_t"
+      -
+        src_dtype: "fp4x2_e2m1_t"
+      -
+        src_dtype: "fp4x2_e1m2_t"
+      -
+        src_dtype: "hifloat8_t"
+      -
+        src_dtype: "fp8_e8m0_t"
+      -
+        src_dtype: "fp8_e5m2_t"
+      -
+        src_dtype: "fp8_e4m3fn_t"
+      -
+        src_dtype: "int16_t"
+      -
+        src_dtype: "uint16_t"
+      -
+        src_dtype: "half"
+      -
+        src_dtype: "bfloat16_t"
+      -
+        src_dtype: "int32_t"
+      -
+        src_dtype: "uint32_t"
+      -
+        src_dtype: "float"
+```
+
+```c
 
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dst_dtype> asc_gather_datablock(__ubuf__ <src_dtype>* src,
@@ -91,11 +233,120 @@ __simd_callee__ inline vector_int8_t asc_gather_datablock(__ubuf__ int8_t* src,
 
 ### 无掩码控制（占位符形式）
 
+```yaml
+api_signature:
+  prototype_id: "asc_gather_datablock__Rv<dst_dtype>_PU<src_dtype>_vu32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/gather/ub_gather.h"
+  dtype:
+    variants:
+      -
+        dst_dtype: "vector_int4x2_t"
+        src_dtype: "int4b_t"
+      -
+        dst_dtype: "vector_int8_t"
+        src_dtype: "int8_t"
+      -
+        dst_dtype: "vector_uint8_t"
+        src_dtype: "uint8_t"
+      -
+        dst_dtype: "vector_fp4x2_e2m1_t"
+        src_dtype: "fp4x2_e2m1_t"
+      -
+        dst_dtype: "vector_fp4x2_e1m2_t"
+        src_dtype: "fp4x2_e1m2_t"
+      -
+        dst_dtype: "vector_hifloat8_t"
+        src_dtype: "hifloat8_t"
+      -
+        dst_dtype: "vector_fp8_e8m0_t"
+        src_dtype: "fp8_e8m0_t"
+      -
+        dst_dtype: "vector_fp8_e5m2_t"
+        src_dtype: "fp8_e5m2_t"
+      -
+        dst_dtype: "vector_fp8_e4m3fn_t"
+        src_dtype: "fp8_e4m3fn_t"
+      -
+        dst_dtype: "vector_int16_t"
+        src_dtype: "int16_t"
+      -
+        dst_dtype: "vector_uint16_t"
+        src_dtype: "uint16_t"
+      -
+        dst_dtype: "vector_half"
+        src_dtype: "half"
+      -
+        dst_dtype: "vector_bfloat16_t"
+        src_dtype: "bfloat16_t"
+      -
+        dst_dtype: "vector_int32_t"
+        src_dtype: "int32_t"
+      -
+        dst_dtype: "vector_uint32_t"
+        src_dtype: "uint32_t"
+      -
+        dst_dtype: "vector_float"
+        src_dtype: "float"
+      -
+        dst_dtype: "vector_int64_t"
+        src_dtype: "int64_t"
+      -
+        dst_dtype: "vector_uint64_t"
+        src_dtype: "uint64_t"
+```
+
 ```c
 // 通过引用参数输出结果
 __simd_callee__ inline void asc_gather_datablock(vector_<dst_dtype>& dst,
                                                  __ubuf__ <src_dtype>* src,
                                                  vector_uint32_t index)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_gather_datablock__PU<src_dtype>_vu32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/gather/ub_gather.h"
+  dtype:
+    variants:
+      -
+        src_dtype: "int4b_t"
+      -
+        src_dtype: "int8_t"
+      -
+        src_dtype: "uint8_t"
+      -
+        src_dtype: "fp4x2_e2m1_t"
+      -
+        src_dtype: "fp4x2_e1m2_t"
+      -
+        src_dtype: "hifloat8_t"
+      -
+        src_dtype: "fp8_e8m0_t"
+      -
+        src_dtype: "fp8_e5m2_t"
+      -
+        src_dtype: "fp8_e4m3fn_t"
+      -
+        src_dtype: "int16_t"
+      -
+        src_dtype: "uint16_t"
+      -
+        src_dtype: "half"
+      -
+        src_dtype: "bfloat16_t"
+      -
+        src_dtype: "int32_t"
+      -
+        src_dtype: "uint32_t"
+      -
+        src_dtype: "float"
+```
+
+```c
 
 // 通过函数返回值返回结果
 __simd_callee__ inline vector_<dst_dtype> asc_gather_datablock(__ubuf__ <src_dtype>* src,

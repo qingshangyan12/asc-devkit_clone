@@ -1,3 +1,21 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_mmad_direction_m"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_m.md"
+description: "本接口用于设置矩阵乘加计算（Mmad）时逐列生成矩阵计算结果分形。该配置只改变L0C Buffer上结果分形的生成顺序，不改变计算结果、乘加次数或输出格式。"
+tag: [c_api, compute, 'roles:configuration', 'operations:matrix_multiply_accumulate',
+  matrix]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_mmad_direction_m__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/cube_compute/cube_compute.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_mmad_direction_m
 
 ## 产品支持情况
@@ -37,6 +55,14 @@
 - UnitFlag开启且搬出时开启Nz2DN随路格式转换。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_set_mmad_direction_m__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/cube_compute/cube_compute.h"
+```
 
 ```c
 __aicore__ inline void asc_set_mmad_direction_m()

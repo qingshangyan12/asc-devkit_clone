@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_get_smmu_tag_version"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_smmu_tag_version.md"
+description: "获取SMMU（System Memory Management Unit）版本信息。"
+tag: [c_api, 'roles:query', 'families:system']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_get_smmu_tag_version__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/utils/sys_var.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_get_smmu_tag_version
 
 ## 产品支持情况
@@ -31,6 +48,14 @@
 获取SMMU（System Memory Management Unit）版本信息。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_get_smmu_tag_version__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/utils/sys_var.h"
+```
 
 ```cpp
 __aicore__ inline int64_t asc_get_smmu_tag_version()

@@ -1,3 +1,52 @@
+---
+okftype: reference.api.cpp
+title: "asc_scatter（废弃）"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_scatter_deprecated.md"
+description: "**该接口已废弃。请使用[asc_scatter](../reg_compute/scatter/asc_scatter.md)实现此功能。"
+tag: [c_api, compute, 'operations:scatter', deprecated]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_scatter__Rvi8_PUi8_vu16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  - override_id: "asc_scatter__Rvu8_PUu8_vu16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  - override_id: "asc_scatter__Rvi16_PUi16_vu16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  - override_id: "asc_scatter__Rvu16_PUu16_vu16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  - override_id: "asc_scatter__Rvi32_PUi32_vu32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  - override_id: "asc_scatter__Rvu32_PUu32_vu32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  - override_id: "asc_scatter__Rvbf16_PUbf16_vu16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  - override_id: "asc_scatter__Rvf16_PUf16_vu16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  - override_id: "asc_scatter__Rvf32_PUf32_vu32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_scatter（废弃）
 
 ## 产品支持情况
@@ -36,15 +85,111 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_scatter__Rvi8_PUi8_vu16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+```
+
 ```cpp
 __simd_callee__ inline void asc_scatter(vector_int8_t& src, __ubuf__ int8_t* dst, vector_uint16_t index, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_scatter__Rvu8_PUu8_vu16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_scatter(vector_uint8_t& src, __ubuf__ uint8_t* dst, vector_uint16_t index, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_scatter__Rvi16_PUi16_vu16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_scatter(vector_int16_t& src, __ubuf__ int16_t* dst, vector_uint16_t index, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_scatter__Rvu16_PUu16_vu16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_scatter(vector_uint16_t& src, __ubuf__ uint16_t* dst, vector_uint16_t index, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_scatter__Rvi32_PUi32_vu32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_scatter(vector_int32_t& src, __ubuf__ int32_t* dst, vector_uint32_t index, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_scatter__Rvu32_PUu32_vu32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_scatter(vector_uint32_t& src, __ubuf__ uint32_t* dst, vector_uint32_t index, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_scatter__Rvbf16_PUbf16_vu16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_scatter(vector_bfloat16_t& src, __ubuf__ bfloat16_t* dst, vector_uint16_t index, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_scatter__Rvf16_PUf16_vu16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_scatter(vector_half& src, __ubuf__ half* dst, vector_uint16_t index, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_scatter__Rvf32_PUf32_vu32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_scatter(vector_float& src, __ubuf__ float* dst, vector_uint32_t index, vector_bool mask)
 ```
 

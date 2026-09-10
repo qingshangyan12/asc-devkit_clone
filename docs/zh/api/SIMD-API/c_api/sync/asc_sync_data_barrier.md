@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_sync_data_barrier"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/asc_sync_data_barrier.md"
+description: "阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可通过参数控制）执行结束，用于解决Scalar的内存依赖。"
+tag: [c_api, 'operations:synchronization']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_sync_data_barrier__memdsb"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/sync/sync.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_sync_data_barrier
 
 ## 产品支持情况
@@ -31,6 +48,14 @@
 阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可通过参数控制）执行结束，用于解决Scalar的内存依赖。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_sync_data_barrier__memdsb"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/sync/sync.h"
+```
 
 ```cpp
 __aicore__ inline void asc_sync_data_barrier(mem_dsb_t arg)

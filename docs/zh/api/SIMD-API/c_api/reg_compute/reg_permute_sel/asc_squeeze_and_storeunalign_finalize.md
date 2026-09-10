@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_squeeze_and_storeunalign_finalize"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md"
+description: "Reg计算数据搬运接口，用于结束一组[asc_squeeze_and_storeunalign](asc_squeeze_and_storeunalign.md)连续搬出操作，将暂存在非对齐寄存器中的尾块写入Unified Buffer（UB）。"
+tag: [c_api, 'roles:control']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_squeeze_and_storeunalign_finalize__PU<dtype>_vstoreunalign"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_squeeze_and_storeunalign_finalize
 
 ## 产品支持情况
@@ -33,6 +50,31 @@ Reg计算数据搬运接口，用于结束一组[asc_squeeze_and_storeunalign](a
 本接口仅在AIV上生效。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  prototype_id: "asc_squeeze_and_storeunalign_finalize__PU<dtype>_vstoreunalign"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
 
 ```c
 // 占位符形式

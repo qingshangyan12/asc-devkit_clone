@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_storealign_pack_postupdate"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack_postupdate.md"
+description: "将矢量数据寄存器或掩码寄存器中的数据压缩搬出到Unified Buffer（UB），写入完成后启用Post Update模式自动累加目的地址指针，便于硬件循环内连续多次调用时无需手动维护目的地址。当源操作数为矢量数据寄存器时，`mask`用于指示参与搬出的元素，`mask`对应位置为1时，将有效元素的低半部分bit数据写入压缩后对应的目的位置。`mask`对应位置为0时，压缩后对应的目的位置保持原值。当源操作数为掩码寄存器时，每间隔1 bit丢弃1 bit，将保留的bit连续压缩存储到目的地址，掩码寄存器搬出场景不支持配置掩码。本接口在Vector Function（`__simd_vf__`标记的函数）内使用，目的操作数为UB地址。"
+tag: [c_api, data_movement, 'operations:compression', 'operations:store', mask, vector,
+  register_vector, 'src:vector_register', 'dst:unified_buffer', masked, post_update]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_storealign_pack_postupdate__RPU<dtype>_v<dtype>_i32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storealign.h"
+  - prototype_id: "asc_storealign_pack_postupdate__RPU<dtype>_vb_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storealign.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_storealign_pack_postupdate
 
 ## 产品支持情况
@@ -41,6 +63,25 @@
 
 ### 矢量数据寄存器搬出模式
 
+```yaml
+api_signature:
+  prototype_id: "asc_storealign_pack_postupdate__RPU<dtype>_v<dtype>_i32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storealign.h"
+  dtype:
+    values:
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+      - "int64_t"
+      - "uint64_t"
+```
+
 ```c
 // 占位符形式
 __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ <dtype>*& dst,
@@ -63,6 +104,19 @@ __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint32_t*& d
 ```
 
 ### 掩码寄存器搬出模式
+
+```yaml
+api_signature:
+  prototype_id: "asc_storealign_pack_postupdate__RPU<dtype>_vb_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storealign.h"
+  dtype:
+    values:
+      - "uint8_t"
+      - "uint16_t"
+      - "uint32_t"
+```
 
 ```c
 // 占位符形式

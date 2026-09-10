@@ -28,35 +28,173 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/atomic_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_add_float__z
+ * @archs 3510 2201
+ * @brief 原子累加过程：将待搬运到GM的数据和GM上已有数据进行求和，然后将求和结果写入GM。本接口对后续目的地址为GM的数据搬运指令开启原子累加，不同产品支持的数据搬运通路请参考[约束说明](#约束说明)。
+ */
 __aicore__ inline void asc_set_atomic_add_float();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_add_int8__z
+ * @archs 3510 2201
+ * @brief 原子累加过程：将待搬运到GM的数据和GM上已有数据进行求和，然后将求和结果写入GM。本接口对后续目的地址为GM的数据搬运指令开启原子累加，不同产品支持的数据搬运通路请参考[约束说明](#约束说明)。
+ */
 __aicore__ inline void asc_set_atomic_add_int8();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_add_int16__z
+ * @archs 3510 2201
+ * @brief 原子累加过程：将待搬运到GM的数据和GM上已有数据进行求和，然后将求和结果写入GM。本接口对后续目的地址为GM的数据搬运指令开启原子累加，不同产品支持的数据搬运通路请参考[约束说明](#约束说明)。
+ */
 __aicore__ inline void asc_set_atomic_add_int16();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_add_int32__z
+ * @archs 3510 2201
+ * @brief 原子累加过程：将待搬运到GM的数据和GM上已有数据进行求和，然后将求和结果写入GM。本接口对后续目的地址为GM的数据搬运指令开启原子累加，不同产品支持的数据搬运通路请参考[约束说明](#约束说明)。
+ */
 __aicore__ inline void asc_set_atomic_add_int32();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_disable_dma_atomic__z
+ * @archs 3510 2201
+ * @brief 与[asc_set_atomic_add](asc_set_atomic_add.md)、[asc_set_atomic_max](asc_set_atomic_max.md)、[asc_set_atomic_min](asc_set_atomic_min.md)接口配合使用，用于在完成原子操作后关闭原子操作，避免影响后续搬运。
+ */
 __aicore__ inline void asc_disable_dma_atomic();
 [[deprecated("NOTICE: asc_set_atomic_none is deprecated. Please use asc_disable_dma_atomic instead.")]]
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @override_id asc_set_atomic_none__z
+ * @archs 3510 2201
+ * @brief **该接口已废弃，请使用[asc_disable_dma_atomic](../atomic/datamove_atomic/asc_disable_dma_atomic.md)替代。
+ */
 __aicore__ inline void asc_set_atomic_none();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_add_bfloat__z
+ * @archs 3510 2201
+ * @brief 原子累加过程：将待搬运到GM的数据和GM上已有数据进行求和，然后将求和结果写入GM。本接口对后续目的地址为GM的数据搬运指令开启原子累加，不同产品支持的数据搬运通路请参考[约束说明](#约束说明)。
+ */
 __aicore__ inline void asc_set_atomic_add_bfloat();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_add_float16__z
+ * @archs 3510 2201
+ * @brief 原子累加过程：将待搬运到GM的数据和GM上已有数据进行求和，然后将求和结果写入GM。本接口对后续目的地址为GM的数据搬运指令开启原子累加，不同产品支持的数据搬运通路请参考[约束说明](#约束说明)。
+ */
 __aicore__ inline void asc_set_atomic_add_float16();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_max_bfloat__z
+ * @archs 3510 2201
+ * @brief 设置对后续的从Unified Buffer（UB）/L0C Buffer/L1 Buffer到GM的数据传输开启原子比较取大操作。数据类型支持int8_t、int16_t、half、bfloat16_t、int32_t、float。 开启原子比较取大后，后续执行搬运操作从UB/L0C Buffer/L1 Buffer到GM时，将待拷贝的内容和GM已有内容进行比较，将最大值写入GM。
+ */
 __aicore__ inline void asc_set_atomic_max_bfloat();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_max_float__z
+ * @archs 3510 2201
+ * @brief 设置对后续的从Unified Buffer（UB）/L0C Buffer/L1 Buffer到GM的数据传输开启原子比较取大操作。数据类型支持int8_t、int16_t、half、bfloat16_t、int32_t、float。 开启原子比较取大后，后续执行搬运操作从UB/L0C Buffer/L1 Buffer到GM时，将待拷贝的内容和GM已有内容进行比较，将最大值写入GM。
+ */
 __aicore__ inline void asc_set_atomic_max_float();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_max_float16__z
+ * @archs 3510 2201
+ * @brief 设置对后续的从Unified Buffer（UB）/L0C Buffer/L1 Buffer到GM的数据传输开启原子比较取大操作。数据类型支持int8_t、int16_t、half、bfloat16_t、int32_t、float。 开启原子比较取大后，后续执行搬运操作从UB/L0C Buffer/L1 Buffer到GM时，将待拷贝的内容和GM已有内容进行比较，将最大值写入GM。
+ */
 __aicore__ inline void asc_set_atomic_max_float16();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_max_int8__z
+ * @archs 3510 2201
+ * @brief 设置对后续的从Unified Buffer（UB）/L0C Buffer/L1 Buffer到GM的数据传输开启原子比较取大操作。数据类型支持int8_t、int16_t、half、bfloat16_t、int32_t、float。 开启原子比较取大后，后续执行搬运操作从UB/L0C Buffer/L1 Buffer到GM时，将待拷贝的内容和GM已有内容进行比较，将最大值写入GM。
+ */
 __aicore__ inline void asc_set_atomic_max_int8();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_max_int16__z
+ * @archs 3510 2201
+ * @brief 设置对后续的从Unified Buffer（UB）/L0C Buffer/L1 Buffer到GM的数据传输开启原子比较取大操作。数据类型支持int8_t、int16_t、half、bfloat16_t、int32_t、float。 开启原子比较取大后，后续执行搬运操作从UB/L0C Buffer/L1 Buffer到GM时，将待拷贝的内容和GM已有内容进行比较，将最大值写入GM。
+ */
 __aicore__ inline void asc_set_atomic_max_int16();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_max_int32__z
+ * @archs 3510 2201
+ * @brief 设置对后续的从Unified Buffer（UB）/L0C Buffer/L1 Buffer到GM的数据传输开启原子比较取大操作。数据类型支持int8_t、int16_t、half、bfloat16_t、int32_t、float。 开启原子比较取大后，后续执行搬运操作从UB/L0C Buffer/L1 Buffer到GM时，将待拷贝的内容和GM已有内容进行比较，将最大值写入GM。
+ */
 __aicore__ inline void asc_set_atomic_max_int32();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_min_bfloat__z
+ * @archs 3510 2201
+ * @brief 设置对后续的从Unified Buffer（UB）/L0C Buffer/L1 Buffer到GM的数据传输开启原子比较取小操作。数据类型支持int8_t、int16_t、half、bfloat16_t、int32_t、float。 开启原子比较取小后，后续执行搬运操作从UB/L0C Buffer/L1 Buffer到GM时，将待拷贝的内容和GM已有内容进行比较，将最小值写入GM。
+ */
 __aicore__ inline void asc_set_atomic_min_bfloat();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_min_float__z
+ * @archs 3510 2201
+ * @brief 设置对后续的从Unified Buffer（UB）/L0C Buffer/L1 Buffer到GM的数据传输开启原子比较取小操作。数据类型支持int8_t、int16_t、half、bfloat16_t、int32_t、float。 开启原子比较取小后，后续执行搬运操作从UB/L0C Buffer/L1 Buffer到GM时，将待拷贝的内容和GM已有内容进行比较，将最小值写入GM。
+ */
 __aicore__ inline void asc_set_atomic_min_float();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_min_float16__z
+ * @archs 3510 2201
+ * @brief 设置对后续的从Unified Buffer（UB）/L0C Buffer/L1 Buffer到GM的数据传输开启原子比较取小操作。数据类型支持int8_t、int16_t、half、bfloat16_t、int32_t、float。 开启原子比较取小后，后续执行搬运操作从UB/L0C Buffer/L1 Buffer到GM时，将待拷贝的内容和GM已有内容进行比较，将最小值写入GM。
+ */
 __aicore__ inline void asc_set_atomic_min_float16();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_min_int8__z
+ * @archs 3510 2201
+ * @brief 设置对后续的从Unified Buffer（UB）/L0C Buffer/L1 Buffer到GM的数据传输开启原子比较取小操作。数据类型支持int8_t、int16_t、half、bfloat16_t、int32_t、float。 开启原子比较取小后，后续执行搬运操作从UB/L0C Buffer/L1 Buffer到GM时，将待拷贝的内容和GM已有内容进行比较，将最小值写入GM。
+ */
 __aicore__ inline void asc_set_atomic_min_int8();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_min_int16__z
+ * @archs 3510 2201
+ * @brief 设置对后续的从Unified Buffer（UB）/L0C Buffer/L1 Buffer到GM的数据传输开启原子比较取小操作。数据类型支持int8_t、int16_t、half、bfloat16_t、int32_t、float。 开启原子比较取小后，后续执行搬运操作从UB/L0C Buffer/L1 Buffer到GM时，将待拷贝的内容和GM已有内容进行比较，将最小值写入GM。
+ */
 __aicore__ inline void asc_set_atomic_min_int16();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_min_int32__z
+ * @archs 3510 2201
+ * @brief 设置对后续的从Unified Buffer（UB）/L0C Buffer/L1 Buffer到GM的数据传输开启原子比较取小操作。数据类型支持int8_t、int16_t、half、bfloat16_t、int32_t、float。 开启原子比较取小后，后续执行搬运操作从UB/L0C Buffer/L1 Buffer到GM时，将待拷贝的内容和GM已有内容进行比较，将最小值写入GM。
+ */
 __aicore__ inline void asc_set_atomic_min_int32();
 
 [[deprecated("NOTICE: asc_set_atomic_add_int is deprecated. Please use asc_set_atomic_add_int32 instead.")]]
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @override_id asc_set_atomic_add_int__z
+ * @archs 3510 2201
+ * @brief **该接口已废弃，请使用[asc_set_atomic_add_int32](../atomic/datamove_atomic/asc_set_atomic_add.md)替代。
+ */
 __aicore__ inline void asc_set_atomic_add_int();
 
 [[deprecated("NOTICE: asc_set_atomic_max_int is deprecated. Please use asc_set_atomic_max_int32 instead.")]]
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @override_id asc_set_atomic_max_int__z
+ * @archs 3510 2201
+ * @brief **该接口已废弃，请使用[asc_set_atomic_max_int32](../atomic/datamove_atomic/asc_set_atomic_max.md)替代。
+ */
 __aicore__ inline void asc_set_atomic_max_int();
 
 [[deprecated("NOTICE: asc_set_atomic_min_int is deprecated. Please use asc_set_atomic_min_int32 instead.")]]
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @override_id asc_set_atomic_min_int__z
+ * @archs 3510 2201
+ * @brief **该接口已废弃，请使用[asc_set_atomic_min_int32](../atomic/datamove_atomic/asc_set_atomic_min.md)替代。
+ */
 __aicore__ inline void asc_set_atomic_min_int();
 
 #endif

@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: "asc_fill_l1"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l1.md"
+description: "将一个标量填充值写入L1 Buffer的目的地址，并将填充值广播到多个32字节分形块中，可用于L1 Buffer的内存初始化。需要通过[asc_fill_value_config](../defs/union/asc_fill_value_config.md)配置的重复次数、单次分形块数、相邻重复之间的间隔。"
+tag: [c_api, data_initialization, fill]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_fill_l1__PL1<dst_dtype>_<value_dtype>_RCfillcfg"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - prototype_id: "asc_fill_l1_sync__PL1<dst_dtype>_<value_dtype>_RCfillcfg"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad_mx"
+    archs: ["3510"]
+    override_id: "asc_fill_l1__PL1bf16_u32_RCfillcfg"
+    file: "mmad_mx.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_fill_l1
 
 ## 产品支持情况
@@ -34,10 +59,51 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  prototype_id: "asc_fill_l1__PL1<dst_dtype>_<value_dtype>_RCfillcfg"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+  dtype:
+    variants:
+      -
+        dst_dtype: "bfloat16_t"
+        value_dtype: "half"
+      -
+        dst_dtype: "bfloat16_t"
+        value_dtype: "bfloat16_t"
+      -
+        dst_dtype: "bfloat16_t"
+        value_dtype: "uint32_t"
+```
+
 ```cpp
 __aicore__ inline void asc_fill_l1(__cbuf__ <dst_dtype>* dst,
                                    <value_dtype> value,
                                    const asc_fill_value_config& config)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_fill_l1_sync__PL1<dst_dtype>_<value_dtype>_RCfillcfg"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+  dtype:
+    variants:
+      -
+        dst_dtype: "bfloat16_t"
+        value_dtype: "half"
+      -
+        dst_dtype: "bfloat16_t"
+        value_dtype: "bfloat16_t"
+      -
+        dst_dtype: "bfloat16_t"
+        value_dtype: "uint32_t"
+```
+
+```cpp
 __aicore__ inline void asc_fill_l1_sync(__cbuf__ <dst_dtype>* dst,
                                         <value_dtype> value,
                                         const asc_fill_value_config& config)
@@ -51,6 +117,25 @@ dst dtype与value dtype支持以下组合：
 - `dst_dtype`为`bfloat16_t`时，`value_dtype`支持`half`、`bfloat16_t`、`uint32_t`。
 
 ### 函数原型典型示例
+
+```yaml
+api_signature:
+  prototype_id: "asc_fill_l1__PL1<dst_dtype>_<value_dtype>_RCfillcfg"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+  dtype:
+    variants:
+      -
+        dst_dtype: "bfloat16_t"
+        value_dtype: "half"
+      -
+        dst_dtype: "bfloat16_t"
+        value_dtype: "bfloat16_t"
+      -
+        dst_dtype: "bfloat16_t"
+        value_dtype: "uint32_t"
+```
 
 ```cpp
 // 示例：使用half类型的值填充half类型的L1 Buffer。

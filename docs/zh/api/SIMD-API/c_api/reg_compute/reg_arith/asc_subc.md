@@ -3,6 +3,11 @@ okftype: reference.api.cpp
 title: "asc_subc"
 resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_subc.md"
 description: "该接口根据mask，对源操作数src0、src1及输入进位carry_src进行按元素求差操作，减法运算在硬件底层通过补码加法实现，将结果写入目的操作数dst，同时将每个元素的进位结果写入carry（存放进位标志的掩码寄存器）。"
+tag: [c_api, compute, arithmetic, subtract, carry_flag, mask, vector, register_vector,
+  'src:vector_register', 'dst:vector_register', carry_input, elementwise, masked,
+  supports_carry_output]
+usage_dependencies:
+  status: unconfirmed
 signature:
   - prototype_id: "asc_subc__Rvb_Rv<dtype>_v<dtype>_v<dtype>_vb_vb"
     archs: ["3510"]

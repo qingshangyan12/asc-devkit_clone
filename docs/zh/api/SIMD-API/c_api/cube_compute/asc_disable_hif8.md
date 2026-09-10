@@ -1,3 +1,21 @@
+---
+okftype: reference.api.cpp
+title: "asc_disable_hif8"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/asc_disable_hif8.md"
+description: "本接口用于设置Mmad计算关闭HiF8模式（与[asc_enable_hif8](./asc_enable_hif8.md)相反），调用此接口后L0A Buffer/L0B Buffer中的FP8数据在参与Mmad计算之前不会被转化为hifloat8_t类型数据。"
+tag: [c_api, compute, 'roles:configuration', 'operations:matrix_multiply_accumulate',
+  matrix]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_disable_hif8__z"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_compute/cube_compute.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_disable_hif8
 
 ## 产品支持情况
@@ -33,6 +51,14 @@
 本接口为矩阵计算相关配置接口，仅在AIC上生效。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_disable_hif8__z"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_compute/cube_compute.h"
+```
 
 ```cpp
 __aicore__ inline void asc_disable_hif8()

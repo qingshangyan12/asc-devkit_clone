@@ -1,3 +1,27 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_l12ub"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12ub.md"
+description: "将数据从L1 Buffer搬运到Unified Buffer（UB）中。"
+tag: [c_api, data_movement, copy, 'src:l1_buffer', 'dst:unified_buffer']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_copy_l12ub__PUv_PL1v_i8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12ub_sync__PUv_PL1v_i8_u16_u16_u16_u16"
+    archs: ["3510"]
+    headers: []
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_ub2l1"
+    archs: ["3510"]
+    override_id: "asc_copy_l12ub_sync__PUv_PL1v_i8_u16_u16_u16_u16"
+    file: "data_copy_ub2l1.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_copy_l12ub
 
 ## 产品支持情况
@@ -33,11 +57,26 @@
 ## 函数原型
 
 - 高维切分搬运
+```yaml
+api_signature:
+  override_id: "asc_copy_l12ub__PUv_PL1v_i8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
     ```cpp
     __aicore__ inline void asc_copy_l12ub(__ubuf__ void* dst_addr, __cbuf__ void* src_addr, int8_t sub_blockid, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
     ```
 
 - 同步搬运
+```yaml
+api_signature:
+  override_id: "asc_copy_l12ub_sync__PUv_PL1v_i8_u16_u16_u16_u16"
+  archs: ["3510"]
+  headers: []
+```
+
     ```cpp
     __aicore__ inline void asc_copy_l12ub_sync(__ubuf__ void* dst_addr, __cbuf__ void* src_addr, int8_t sub_blockid, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
     ```

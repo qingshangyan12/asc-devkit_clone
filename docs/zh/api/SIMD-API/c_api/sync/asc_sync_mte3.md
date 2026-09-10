@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_sync_mte3"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/asc_sync_mte3.md"
+description: "针对PIPE_MTE3流水线执行同步操作。其作用是保证PIPE_MTE3流水线中前序指令（如Unified Buffer（UB）到GM的数据搬运）全部完成后，PIPE_MTE2与PIPE_V流水线的后续指令才能开始执行。"
+tag: [c_api, 'operations:synchronization']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_sync_mte3__i"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/sync/sync.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_sync_mte3
 
 ## 产品支持情况
@@ -31,6 +48,14 @@
 针对PIPE_MTE3流水线执行同步操作。其作用是保证PIPE_MTE3流水线中前序指令（如Unified Buffer（UB）到GM的数据搬运）全部完成后，PIPE_MTE2与PIPE_V流水线的后续指令才能开始执行。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_sync_mte3__i"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/sync/sync.h"
+```
 
 ```cpp
 __aicore__ inline void asc_sync_mte3(int id)

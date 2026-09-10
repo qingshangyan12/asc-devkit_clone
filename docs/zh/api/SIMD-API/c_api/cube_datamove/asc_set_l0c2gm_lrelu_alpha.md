@@ -1,3 +1,24 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_l0c2gm_lrelu_alpha"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c2gm_lrelu_alpha.md"
+description: "用于设置asc_copy_l0c2l1或asc_copy_l0c2gm接口计算过程中使用的Leaky ReLU alpha值。该值只支持half和float两种数据类型。"
+tag: [c_api, data_movement_configuration]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_l0c2gm_lrelu_alpha__Rf16"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_set_l0c2gm_lrelu_alpha__Rf32"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_l0c2gm_lrelu_alpha
 
 ## 产品支持情况
@@ -32,8 +53,27 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_set_l0c2gm_lrelu_alpha__Rf16"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
 ```cpp
 __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_l0c2gm_lrelu_alpha__Rf32"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(float& config)
 ```
 

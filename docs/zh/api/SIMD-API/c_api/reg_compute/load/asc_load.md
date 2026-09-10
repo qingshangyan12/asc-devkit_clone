@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_load"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_load.md"
+description: "从Unified Buffer（UB）中按dtype对齐的起始地址读取VL长度数据，并通过函数返回值返回或写入目的矢量数据寄存器，搬运过程中数据格式和内容保持不变。连续搬入时，需要在每次调用前手动更新源地址。该接口为易用性接口，对性能有要求时可使用[asc_loadunalign](asc_loadunalign.md)或[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)。"
+tag: [c_api, data_movement, 'operations:load', vector, register_vector, 'src:unified_buffer',
+  'dst:vector_register']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_load__PU<dtype>"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/loadunalign_composite.h"
+  - prototype_id: "asc_load__Rv<dtype>_PU<dtype>"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/loadunalign_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_load
 
 ## 产品支持情况
@@ -34,9 +56,65 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  prototype_id: "asc_load__PU<dtype>"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/loadunalign_composite.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "hifloat8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
 ```c
 // 通过函数返回值返回结果。
 __simd_callee__ inline vector_<dtype> asc_load(__ubuf__ <dtype>* src)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_load__Rv<dtype>_PU<dtype>"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/loadunalign_composite.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "hifloat8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+      - "int64_t"
+```
+
+```c
 
 // 通过引用参数输出结果。
 __simd_callee__ inline void asc_load(vector_<dtype>& dst,

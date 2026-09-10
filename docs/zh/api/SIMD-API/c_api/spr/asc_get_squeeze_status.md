@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_get_squeeze_status"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md"
+description: "读取squeeze操作后保存至AR特殊寄存器的有效数据长度值，用于配合[asc_squeeze_and_storeunalign](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)接口获取已连续搬出的有效数据量。"
+tag: [c_api, 'roles:query']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_get_squeeze_status__z"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/spr/spr.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_get_squeeze_status
 
 ## 产品支持情况
@@ -31,6 +48,14 @@
 读取squeeze操作后保存至AR特殊寄存器的有效数据长度值，用于配合[asc_squeeze_and_storeunalign](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)接口获取已连续搬出的有效数据量。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_get_squeeze_status__z"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/spr/spr.h"
+```
 
 ```cpp
 __aicore__ inline int64_t asc_get_squeeze_status()

@@ -1,3 +1,24 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_l12l0b_arch_3510（3D矩阵搬运）"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md"
+description: "3D卷积数据搬运是用于将NC1HWC0格式的Feature Map完成Image to Column展开，按卷积步长、卷积核大小、膨胀系数配置生成img2col二维矩阵，再从展开后的矩阵中选取指定数据块搬运到L0B Buffer，用于3D卷积场景的矩阵计算数据加载。"
+tag: [c_api, data_movement, copy]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_copy_l12l0b__PCB<dtype>_PL1<dtype>_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - prototype_id: "asc_copy_l12l0b_sync__PCB<dtype>_PL1<dtype>_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_copy_l12l0b_arch_3510（3D矩阵搬运）
 
 ## 产品支持情况
@@ -38,6 +59,28 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  prototype_id: "asc_copy_l12l0b__PCB<dtype>_PL1<dtype>_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "hifloat8_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
 ```cpp
 __aicore__ inline void asc_copy_l12l0b(__cb__ <dtype>* dst,
                                        __cbuf__ <dtype>* src,
@@ -56,6 +99,31 @@ __aicore__ inline void asc_copy_l12l0b(__cb__ <dtype>* dst,
                                        bool transpose,
                                        bool f_matrix_ctrl,
                                        uint16_t channel_size)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_copy_l12l0b_sync__PCB<dtype>_PL1<dtype>_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "hifloat8_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
+```cpp
 __aicore__ inline void asc_copy_l12l0b_sync(__cb__ <dtype>* dst,
                                             __cbuf__ <dtype>* src,
                                             uint16_t k_extension,

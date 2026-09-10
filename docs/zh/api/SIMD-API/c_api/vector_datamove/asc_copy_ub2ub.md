@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_ub2ub"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2ub.md"
+description: "将数据从Unified Buffer（UB）搬运到UB。"
+tag: [c_api, data_movement, copy]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_copy_ub2ub__PUv_PUv_u32"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy_ub2ub__PUv_PUv_u16_u16_u16_u16"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy_ub2ub_sync__PUv_PUv_u32"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_ub2l1"
+    archs: ["3510"]
+    override_id: "asc_copy_ub2ub__PUv_PUv_u16_u16_u16_u16"
+    file: "data_copy_ub2l1.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_copy_ub2ub
 
 ## 产品支持情况
@@ -34,17 +63,41 @@
 
 - 前n个数据搬运
 
+```yaml
+api_signature:
+  override_id: "asc_copy_ub2ub__PUv_PUv_u32"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
 ```cpp
 __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src, uint32_t size)
 ```
 
 - 高维切分搬运
 
+```yaml
+api_signature:
+  override_id: "asc_copy_ub2ub__PUv_PUv_u16_u16_u16_u16"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
 ```cpp
 __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
 ```
 
 - 同步计算
+
+```yaml
+api_signature:
+  override_id: "asc_copy_ub2ub_sync__PUv_PUv_u32"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
 
 ```cpp
 __aicore__ inline void asc_copy_ub2ub_sync(__ubuf__ void* dst, __ubuf__ void* src, uint32_t size)

@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: "asc_deintlv"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_deintlv.md"
+description: "将src0和src1中的元素解交织存入dst0和dst1中。"
+tag: [c_api, layout_transform]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_deintlv__Rv<dtype>_Rv<dtype>_v<dtype>_v<dtype>"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - override_id: "asc_deintlv_b8__Rvb_Rvb_vb_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - override_id: "asc_deintlv_b16__Rvb_Rvb_vb_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - override_id: "asc_deintlv_b32__Rvb_Rvb_vb_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_deintlv
 
 ## 产品支持情况
@@ -45,6 +74,29 @@
 
 ### 矢量数据解交织
 
+```yaml
+api_signature:
+  prototype_id: "asc_deintlv__Rv<dtype>_Rv<dtype>_v<dtype>_v<dtype>"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "hifloat8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
 ```c
 // 占位符形式
 __simd_callee__ inline void asc_deintlv(vector_<dtype>& dst0,
@@ -69,15 +121,45 @@ __simd_callee__ inline void asc_deintlv(vector_half& dst0,
 
 ### 掩码解交织
 
+```yaml
+api_signature:
+  override_id: "asc_deintlv_b8__Rvb_Rvb_vb_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
 ```c
 __simd_callee__ inline void asc_deintlv_b8(vector_bool& dst0,
                                             vector_bool& dst1,
                                             vector_bool src0,
                                             vector_bool src1)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_deintlv_b16__Rvb_Rvb_vb_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
+```c
 __simd_callee__ inline void asc_deintlv_b16(vector_bool& dst0,
                                             vector_bool& dst1,
                                             vector_bool src0,
                                             vector_bool src1)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_deintlv_b32__Rvb_Rvb_vb_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
+```c
 __simd_callee__ inline void asc_deintlv_b32(vector_bool& dst0,
                                             vector_bool& dst1,
                                             vector_bool src0,

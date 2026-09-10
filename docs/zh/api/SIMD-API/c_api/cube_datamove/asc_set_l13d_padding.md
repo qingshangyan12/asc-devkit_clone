@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_l13d_padding"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_padding.md"
+description: "设置Pad属性描述，用于在调用[asc_copy_l12l0a](asc_copy_l12l0a/asc_copy_l12l0a.md)接口时配置填充数值。"
+tag: [c_api, data_movement_configuration]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_l13d_padding__u64"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_set_l13d_padding__f16"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_set_l13d_padding__i16"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_set_l13d_padding__u16"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_l13d_padding
 
 ## 产品支持情况
@@ -32,10 +61,51 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_set_l13d_padding__u64"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
 ```cpp
 __aicore__ inline void asc_set_l13d_padding(uint64_t config)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_l13d_padding__f16"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_set_l13d_padding(half config)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_l13d_padding__i16"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_set_l13d_padding(int16_t config)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_l13d_padding__u16"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_set_l13d_padding(uint16_t config)
 ```
 

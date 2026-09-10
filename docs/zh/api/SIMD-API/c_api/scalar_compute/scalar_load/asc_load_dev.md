@@ -1,3 +1,48 @@
+---
+okftype: reference.api.cpp
+title: "asc_load_dev"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_load/asc_load_dev.md"
+description: "不经过DCache直接从GM地址读取整型数据。 当多核操作GM地址且数据无法对齐到Cache Line时，经过DCache读写可能引入Cache Line粒度的数据覆盖。此时，可使用本接口绕过DCache读取GM数据。"
+tag: [c_api, data_movement, 'operations:load', scalar, 'src:global_memory']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_load_dev__PGi8"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/scalar_compute/scalar_load.h"
+  - override_id: "asc_load_dev__PGu8"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/scalar_compute/scalar_load.h"
+  - override_id: "asc_load_dev__PGi16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/scalar_compute/scalar_load.h"
+  - override_id: "asc_load_dev__PGu16"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/scalar_compute/scalar_load.h"
+  - override_id: "asc_load_dev__PGi32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/scalar_compute/scalar_load.h"
+  - override_id: "asc_load_dev__PGu32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/scalar_compute/scalar_load.h"
+  - override_id: "asc_load_dev__PGi64"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/scalar_compute/scalar_load.h"
+  - override_id: "asc_load_dev__PGu64"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/scalar_compute/scalar_load.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_load_dev
 
 ## 产品支持情况
@@ -33,20 +78,105 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_load_dev__PGi8"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/scalar_compute/scalar_load.h"
+```
+
 ```cpp
 __aicore__ inline int8_t asc_load_dev(__gm__ int8_t* addr)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_load_dev__PGu8"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/scalar_compute/scalar_load.h"
+```
+
+```cpp
 
 __aicore__ inline uint8_t asc_load_dev(__gm__ uint8_t* addr)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_load_dev__PGi16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/scalar_compute/scalar_load.h"
+```
+
+```cpp
 
 __aicore__ inline int16_t asc_load_dev(__gm__ int16_t* addr)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_load_dev__PGu16"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/scalar_compute/scalar_load.h"
+```
+
+```cpp
 
 __aicore__ inline uint16_t asc_load_dev(__gm__ uint16_t* addr)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_load_dev__PGi32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/scalar_compute/scalar_load.h"
+```
+
+```cpp
 
 __aicore__ inline int32_t asc_load_dev(__gm__ int32_t* addr)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_load_dev__PGu32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/scalar_compute/scalar_load.h"
+```
+
+```cpp
 
 __aicore__ inline uint32_t asc_load_dev(__gm__ uint32_t* addr)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_load_dev__PGi64"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/scalar_compute/scalar_load.h"
+```
+
+```cpp
 
 __aicore__ inline int64_t asc_load_dev(__gm__ int64_t* addr)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_load_dev__PGu64"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/scalar_compute/scalar_load.h"
+```
+
+```cpp
 
 __aicore__ inline uint64_t asc_load_dev(__gm__ uint64_t* addr)
 ```

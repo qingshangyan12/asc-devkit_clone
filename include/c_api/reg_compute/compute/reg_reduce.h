@@ -25,156 +25,802 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_max__Rvi16_vi16_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约最大值操作，得到归约结果。结果保存在`dst`的第0个元素，最大值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最大值，则保留最小的索引。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_max(vector_int16_t& dst, vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_max__Rvi32_vi32_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约最大值操作，得到归约结果。结果保存在`dst`的第0个元素，最大值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最大值，则保留最小的索引。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_max(vector_int32_t& dst, vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_max__Rvu16_vu16_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约最大值操作，得到归约结果。结果保存在`dst`的第0个元素，最大值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最大值，则保留最小的索引。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_max(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_max__Rvu32_vu32_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约最大值操作，得到归约结果。结果保存在`dst`的第0个元素，最大值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最大值，则保留最小的索引。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_max(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_max__Rvf16_vf16_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约最大值操作，得到归约结果。结果保存在`dst`的第0个元素，最大值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最大值，则保留最小的索引。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_max(vector_half& dst, vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_max__Rvf32_vf32_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约最大值操作，得到归约结果。结果保存在`dst`的第0个元素，最大值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最大值，则保留最小的索引。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_max(vector_float& dst, vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_max__vi16_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约最大值操作，得到归约结果。结果保存在`dst`的第0个元素，最大值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最大值，则保留最小的索引。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_int16_t asc_reduce_max(vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_max__vi32_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约最大值操作，得到归约结果。结果保存在`dst`的第0个元素，最大值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最大值，则保留最小的索引。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_int32_t asc_reduce_max(vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_max__vu16_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约最大值操作，得到归约结果。结果保存在`dst`的第0个元素，最大值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最大值，则保留最小的索引。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_uint16_t asc_reduce_max(vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_max__vu32_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约最大值操作，得到归约结果。结果保存在`dst`的第0个元素，最大值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最大值，则保留最小的索引。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_uint32_t asc_reduce_max(vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_max__vf16_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约最大值操作，得到归约结果。结果保存在`dst`的第0个元素，最大值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最大值，则保留最小的索引。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_half asc_reduce_max(vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_max__vf32_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约最大值操作，得到归约结果。结果保存在`dst`的第0个元素，最大值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最大值，则保留最小的索引。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_float asc_reduce_max(vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_min__Rvi16_vi16_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约最小值操作，得到归约结果。结果保存在`dst`的第0个元素，最小值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最小值，则保留最小的索引。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_min(vector_int16_t& dst, vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_min__Rvi32_vi32_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约最小值操作，得到归约结果。结果保存在`dst`的第0个元素，最小值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最小值，则保留最小的索引。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_min(vector_int32_t& dst, vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_min__Rvu16_vu16_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约最小值操作，得到归约结果。结果保存在`dst`的第0个元素，最小值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最小值，则保留最小的索引。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_min(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_min__Rvu32_vu32_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约最小值操作，得到归约结果。结果保存在`dst`的第0个元素，最小值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最小值，则保留最小的索引。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_min(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_min__Rvf16_vf16_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约最小值操作，得到归约结果。结果保存在`dst`的第0个元素，最小值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最小值，则保留最小的索引。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_min(vector_half& dst, vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_min__Rvf32_vf32_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约最小值操作，得到归约结果。结果保存在`dst`的第0个元素，最小值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最小值，则保留最小的索引。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_min(vector_float& dst, vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_min__vi16_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约最小值操作，得到归约结果。结果保存在`dst`的第0个元素，最小值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最小值，则保留最小的索引。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_int16_t asc_reduce_min(vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_min__vi32_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约最小值操作，得到归约结果。结果保存在`dst`的第0个元素，最小值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最小值，则保留最小的索引。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_int32_t asc_reduce_min(vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_min__vu16_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约最小值操作，得到归约结果。结果保存在`dst`的第0个元素，最小值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最小值，则保留最小的索引。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_uint16_t asc_reduce_min(vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_min__vu32_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约最小值操作，得到归约结果。结果保存在`dst`的第0个元素，最小值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最小值，则保留最小的索引。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_uint32_t asc_reduce_min(vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_min__vf16_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约最小值操作，得到归约结果。结果保存在`dst`的第0个元素，最小值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最小值，则保留最小的索引。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_half asc_reduce_min(vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_min__vf32_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约最小值操作，得到归约结果。结果保存在`dst`的第0个元素，最小值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最小值，则保留最小的索引。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_float asc_reduce_min(vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_min_datablock__Rvi16_vi16_vb
+ * @archs 3510
+ * @brief 根据`mask`对每个`DataBlock`（32B）内的元素求最小值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_min_datablock(vector_int16_t& dst, vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_min_datablock__Rvi32_vi32_vb
+ * @archs 3510
+ * @brief 根据`mask`对每个`DataBlock`（32B）内的元素求最小值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_min_datablock(vector_int32_t& dst, vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_min_datablock__Rvu16_vu16_vb
+ * @archs 3510
+ * @brief 根据`mask`对每个`DataBlock`（32B）内的元素求最小值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_min_datablock(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_min_datablock__Rvu32_vu32_vb
+ * @archs 3510
+ * @brief 根据`mask`对每个`DataBlock`（32B）内的元素求最小值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_min_datablock(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_min_datablock__Rvf16_vf16_vb
+ * @archs 3510
+ * @brief 根据`mask`对每个`DataBlock`（32B）内的元素求最小值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_min_datablock(vector_half& dst, vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_min_datablock__Rvf32_vf32_vb
+ * @archs 3510
+ * @brief 根据`mask`对每个`DataBlock`（32B）内的元素求最小值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_min_datablock(vector_float& dst, vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_min_datablock__vi16_vb
+ * @archs 3510
+ * @brief 根据`mask`对每个`DataBlock`（32B）内的元素求最小值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_int16_t asc_reduce_min_datablock(vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_min_datablock__vi32_vb
+ * @archs 3510
+ * @brief 根据`mask`对每个`DataBlock`（32B）内的元素求最小值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_int32_t asc_reduce_min_datablock(vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_min_datablock__vu16_vb
+ * @archs 3510
+ * @brief 根据`mask`对每个`DataBlock`（32B）内的元素求最小值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_uint16_t asc_reduce_min_datablock(vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_min_datablock__vu32_vb
+ * @archs 3510
+ * @brief 根据`mask`对每个`DataBlock`（32B）内的元素求最小值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_uint32_t asc_reduce_min_datablock(vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_min_datablock__vf16_vb
+ * @archs 3510
+ * @brief 根据`mask`对每个`DataBlock`（32B）内的元素求最小值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_half asc_reduce_min_datablock(vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_min_datablock__vf32_vb
+ * @archs 3510
+ * @brief 根据`mask`对每个`DataBlock`（32B）内的元素求最小值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_float asc_reduce_min_datablock(vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_pair_reduce_sum__Rvf16_vf16_vb
+ * @archs 3510
+ * @brief 根据`mask`将源操作数`src`中每两个相邻元素相加，得到计算结果。结果连续保存在目的操作数`dst`的低半部分，`dst`的高半部分置0。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline void asc_pair_reduce_sum(vector_half& dst, vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_pair_reduce_sum__Rvf32_vf32_vb
+ * @archs 3510
+ * @brief 根据`mask`将源操作数`src`中每两个相邻元素相加，得到计算结果。结果连续保存在目的操作数`dst`的低半部分，`dst`的高半部分置0。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline void asc_pair_reduce_sum(vector_float& dst, vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_pair_reduce_sum__vf16_vb
+ * @archs 3510
+ * @brief 根据`mask`将源操作数`src`中每两个相邻元素相加，得到计算结果。结果连续保存在目的操作数`dst`的低半部分，`dst`的高半部分置0。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline vector_half asc_pair_reduce_sum(vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_pair_reduce_sum__vf32_vb
+ * @archs 3510
+ * @brief 根据`mask`将源操作数`src`中每两个相邻元素相加，得到计算结果。结果连续保存在目的操作数`dst`的低半部分，`dst`的高半部分置0。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline vector_float asc_pair_reduce_sum(vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_max_datablock__Rvf16_vf16_vb
+ * @archs 3510
+ * @brief 根据`mask`对每个`DataBlock`（32B）内的元素求最大值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_max_datablock(vector_half& dst, vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_max_datablock__Rvf32_vf32_vb
+ * @archs 3510
+ * @brief 根据`mask`对每个`DataBlock`（32B）内的元素求最大值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_max_datablock(vector_float& dst, vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_max_datablock__Rvu16_vu16_vb
+ * @archs 3510
+ * @brief 根据`mask`对每个`DataBlock`（32B）内的元素求最大值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_max_datablock(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_max_datablock__Rvi16_vi16_vb
+ * @archs 3510
+ * @brief 根据`mask`对每个`DataBlock`（32B）内的元素求最大值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_max_datablock(vector_int16_t& dst, vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_max_datablock__Rvu32_vu32_vb
+ * @archs 3510
+ * @brief 根据`mask`对每个`DataBlock`（32B）内的元素求最大值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_max_datablock(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_max_datablock__Rvi32_vi32_vb
+ * @archs 3510
+ * @brief 根据`mask`对每个`DataBlock`（32B）内的元素求最大值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_max_datablock(vector_int32_t& dst, vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_max_datablock__vi16_vb
+ * @archs 3510
+ * @brief 根据`mask`对每个`DataBlock`（32B）内的元素求最大值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_int16_t asc_reduce_max_datablock(vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_max_datablock__vi32_vb
+ * @archs 3510
+ * @brief 根据`mask`对每个`DataBlock`（32B）内的元素求最大值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_int32_t asc_reduce_max_datablock(vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_max_datablock__vu16_vb
+ * @archs 3510
+ * @brief 根据`mask`对每个`DataBlock`（32B）内的元素求最大值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_uint16_t asc_reduce_max_datablock(vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_max_datablock__vu32_vb
+ * @archs 3510
+ * @brief 根据`mask`对每个`DataBlock`（32B）内的元素求最大值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_uint32_t asc_reduce_max_datablock(vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_max_datablock__vf16_vb
+ * @archs 3510
+ * @brief 根据`mask`对每个`DataBlock`（32B）内的元素求最大值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_half asc_reduce_max_datablock(vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_max_datablock__vf32_vb
+ * @archs 3510
+ * @brief 根据`mask`对每个`DataBlock`（32B）内的元素求最大值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_float asc_reduce_max_datablock(vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_sum__Rvi32_vi16_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约求和操作，用于将`src`中的所有参与计算的元素求和，得到归约结果。结果保存在`dst`中的0位置。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_sum(vector_int32_t& dst, vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_sum__Rvi32_vi32_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约求和操作，用于将`src`中的所有参与计算的元素求和，得到归约结果。结果保存在`dst`中的0位置。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_sum(vector_int32_t& dst, vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_sum__Rvu32_vu16_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约求和操作，用于将`src`中的所有参与计算的元素求和，得到归约结果。结果保存在`dst`中的0位置。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_sum(vector_uint32_t& dst, vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_sum__Rvu32_vu32_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约求和操作，用于将`src`中的所有参与计算的元素求和，得到归约结果。结果保存在`dst`中的0位置。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_sum(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_sum__Rvf16_vf16_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约求和操作，用于将`src`中的所有参与计算的元素求和，得到归约结果。结果保存在`dst`中的0位置。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_sum(vector_half& dst, vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_sum__Rvf32_vf32_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约求和操作，用于将`src`中的所有参与计算的元素求和，得到归约结果。结果保存在`dst`中的0位置。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_sum(vector_float& dst, vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_sum__vi16_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约求和操作，用于将`src`中的所有参与计算的元素求和，得到归约结果。结果保存在`dst`中的0位置。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_int32_t asc_reduce_sum(vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_sum__vi32_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约求和操作，用于将`src`中的所有参与计算的元素求和，得到归约结果。结果保存在`dst`中的0位置。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_int32_t asc_reduce_sum(vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_sum__vu16_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约求和操作，用于将`src`中的所有参与计算的元素求和，得到归约结果。结果保存在`dst`中的0位置。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_uint32_t asc_reduce_sum(vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_sum__vu32_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约求和操作，用于将`src`中的所有参与计算的元素求和，得到归约结果。结果保存在`dst`中的0位置。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_uint32_t asc_reduce_sum(vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_sum__vf16_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约求和操作，用于将`src`中的所有参与计算的元素求和，得到归约结果。结果保存在`dst`中的0位置。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_half asc_reduce_sum(vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_sum__vf32_vb
+ * @archs 3510
+ * @brief 根据`mask`对源操作数`src`进行归约求和操作，用于将`src`中的所有参与计算的元素求和，得到归约结果。结果保存在`dst`中的0位置。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_float asc_reduce_sum(vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_sum_datablock__Rvf16_vf16_vb
+ * @archs 3510
+ * @brief 根据`mask`将每个`DataBlock`（32B）中参与计算的元素相加，得到各`DataBlock`的归约结果。结果依次保存在`dst`的最低位。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_sum_datablock(vector_half& dst, vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_sum_datablock__Rvf32_vf32_vb
+ * @archs 3510
+ * @brief 根据`mask`将每个`DataBlock`（32B）中参与计算的元素相加，得到各`DataBlock`的归约结果。结果依次保存在`dst`的最低位。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_sum_datablock(vector_float& dst, vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_sum_datablock__Rvu32_vu16_vb
+ * @archs 3510
+ * @brief 根据`mask`将每个`DataBlock`（32B）中参与计算的元素相加，得到各`DataBlock`的归约结果。结果依次保存在`dst`的最低位。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_sum_datablock(vector_uint32_t& dst, vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_sum_datablock__Rvi32_vi16_vb
+ * @archs 3510
+ * @brief 根据`mask`将每个`DataBlock`（32B）中参与计算的元素相加，得到各`DataBlock`的归约结果。结果依次保存在`dst`的最低位。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_sum_datablock(vector_int32_t& dst, vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_sum_datablock__Rvu32_vu32_vb
+ * @archs 3510
+ * @brief 根据`mask`将每个`DataBlock`（32B）中参与计算的元素相加，得到各`DataBlock`的归约结果。结果依次保存在`dst`的最低位。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_sum_datablock(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_sum_datablock__Rvi32_vi32_vb
+ * @archs 3510
+ * @brief 根据`mask`将每个`DataBlock`（32B）中参与计算的元素相加，得到各`DataBlock`的归约结果。结果依次保存在`dst`的最低位。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline void asc_reduce_sum_datablock(vector_int32_t& dst, vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_sum_datablock__vf16_vb
+ * @archs 3510
+ * @brief 根据`mask`将每个`DataBlock`（32B）中参与计算的元素相加，得到各`DataBlock`的归约结果。结果依次保存在`dst`的最低位。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_half asc_reduce_sum_datablock(vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_sum_datablock__vf32_vb
+ * @archs 3510
+ * @brief 根据`mask`将每个`DataBlock`（32B）中参与计算的元素相加，得到各`DataBlock`的归约结果。结果依次保存在`dst`的最低位。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_float asc_reduce_sum_datablock(vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_sum_datablock__vu16_vb
+ * @archs 3510
+ * @brief 根据`mask`将每个`DataBlock`（32B）中参与计算的元素相加，得到各`DataBlock`的归约结果。结果依次保存在`dst`的最低位。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_uint32_t asc_reduce_sum_datablock(vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_sum_datablock__vi16_vb
+ * @archs 3510
+ * @brief 根据`mask`将每个`DataBlock`（32B）中参与计算的元素相加，得到各`DataBlock`的归约结果。结果依次保存在`dst`的最低位。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_int32_t asc_reduce_sum_datablock(vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_sum_datablock__vu32_vb
+ * @archs 3510
+ * @brief 根据`mask`将每个`DataBlock`（32B）中参与计算的元素相加，得到各`DataBlock`的归约结果。结果依次保存在`dst`的最低位。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_uint32_t asc_reduce_sum_datablock(vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_reduce
+ * @override_id asc_reduce_sum_datablock__vi32_vb
+ * @archs 3510
+ * @brief 根据`mask`将每个`DataBlock`（32B）中参与计算的元素相加，得到各`DataBlock`的归约结果。结果依次保存在`dst`的最低位。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与归约。
+ */
 __simd_callee__ inline vector_int32_t asc_reduce_sum_datablock(vector_int32_t src, vector_bool mask);
 
 #endif

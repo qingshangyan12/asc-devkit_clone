@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: "asc_float2int32"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_convert/asc_float2int32.md"
+description: "将`float`类型的标量转换为`int32_t`类型并返回。"
+tag: [c_api, compute, 'operations:conversion', scalar, 'traits:rounding_mode', 'traits:saturation_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_float2int32_rd__f32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/scalar_compute/compute/scalar_convert.h"
+  - override_id: "asc_float2int32_rn__f32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/scalar_compute/compute/scalar_convert.h"
+  - override_id: "asc_float2int32_rna__f32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/scalar_compute/compute/scalar_convert.h"
+  - override_id: "asc_float2int32_ru__f32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/scalar_compute/compute/scalar_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_float2int32
 
 ## 产品支持情况
@@ -34,14 +63,69 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_float2int32_rd__f32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/scalar_compute/compute/scalar_convert.h"
+```
+
 ```c
 // 占位符形式
-__aicore__ inline int32_t asc_float2int32_<round_mode>(float value)
+__aicore__ inline int32_t asc_float2int32_rd(float value)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2int32_rn__f32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/scalar_compute/compute/scalar_convert.h"
+```
+
+```c
+// 占位符形式
+__aicore__ inline int32_t asc_float2int32_rn(float value)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2int32_rna__f32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/scalar_compute/compute/scalar_convert.h"
+```
+
+```c
+// 占位符形式
+__aicore__ inline int32_t asc_float2int32_rna(float value)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2int32_ru__f32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/scalar_compute/compute/scalar_convert.h"
+```
+
+```c
+// 占位符形式
+__aicore__ inline int32_t asc_float2int32_ru(float value)
 ```
 
 `<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）和`ru`（CEIL）。
 
 ### 函数原型典型示例
+
+```yaml
+api_signature:
+  override_id: "asc_float2int32_rn__f32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/scalar_compute/compute/scalar_convert.h"
+```
 
 ```c
 __aicore__ inline int32_t asc_float2int32_rn(

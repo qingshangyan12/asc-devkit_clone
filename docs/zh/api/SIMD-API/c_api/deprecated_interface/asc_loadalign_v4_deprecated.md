@@ -1,3 +1,144 @@
+---
+okftype: reference.api.cpp
+title: "asc_loadalign (废弃)"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_loadalign_v4_deprecated.md"
+description: "**该接口已废弃。其中asc_loadalign_brc_postupdate_v2请使用[asc_loadalign_brc_datablock_postupdate](../reg_compute/load/asc_loadalign_brc_datablock_postupdate.md)，asc_loadalign_brc_postupdate_v3请使用[asc_loadalign_brc_elem2datablock_postupdate](../reg_compute/load/asc_loadalign_brc_elem2datablock_postupdate.md)，asc_loadalign_unpack_postupdate_v2请使用[asc_loadalign_unpack4_postupdate](../reg_compute/load/asc_loadalign_unpack4_postupdate.md)实现此功能。"
+tag: [c_api, deprecated]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_loadalign_unpack_postupdate_v2__Rvi8_RPUi8_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_unpack_postupdate_v2__Rvu8_RPUu8_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_unpack_postupdate_v2__Rvf4e2m1x2_RPUf4e2m1x2_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_unpack_postupdate_v2__Rvf4e1m2x2_RPUf4e1m2x2_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_unpack_postupdate_v2__Rvf8e8m0_RPUf8e8m0_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_unpack_postupdate_v2__Rvf8e5m2_RPUf8e5m2_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_unpack_postupdate_v2__Rvf8e4m3_RPUf8e4m3_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_unpack_postupdate_v2__Rvhf8_RPUhf8_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_unpack_postupdate_v2__Rvi4x2_RPUi4x2_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_brc_postupdate_v2__Rvi8_RPUi8_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_brc_postupdate_v2__Rvu8_RPUu8_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_brc_postupdate_v2__Rvf4e2m1x2_RPUf4e2m1x2_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_brc_postupdate_v2__Rvf4e1m2x2_RPUf4e1m2x2_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_brc_postupdate_v2__Rvf8e8m0_RPUf8e8m0_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_brc_postupdate_v2__Rvf8e5m2_RPUf8e5m2_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_brc_postupdate_v2__Rvf8e4m3_RPUf8e4m3_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_brc_postupdate_v2__Rvhf8_RPUhf8_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_brc_postupdate_v2__Rvi16_RPUi16_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_brc_postupdate_v2__Rvu16_RPUu16_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_brc_postupdate_v2__Rvf16_RPUf16_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_brc_postupdate_v2__Rvbf16_RPUbf16_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_brc_postupdate_v2__Rvi32_RPUi32_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_brc_postupdate_v2__Rvu32_RPUu32_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_brc_postupdate_v2__Rvf32_RPUf32_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_brc_postupdate_v2__Rvi4x2_RPUi4x2_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_brc_postupdate_v3__Rvi16_RPUi16_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_brc_postupdate_v3__Rvu16_RPUu16_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_brc_postupdate_v3__Rvf16_RPUf16_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_brc_postupdate_v3__Rvbf16_RPUbf16_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_brc_postupdate_v3__Rvi32_RPUi32_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_brc_postupdate_v3__Rvu32_RPUu32_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_brc_postupdate_v3__Rvf32_RPUf32_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_loadalign (废弃)
 
 ## 产品支持情况
@@ -38,41 +179,390 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_loadalign_unpack_postupdate_v2__Rvi8_RPUi8_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
 ```cpp
 // UNPACKV2搬入模式
 __simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(vector_int8_t& dst, __ubuf__ int8_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_unpack_postupdate_v2__Rvu8_RPUu8_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(vector_uint8_t& dst, __ubuf__ uint8_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_unpack_postupdate_v2__Rvf4e2m1x2_RPUf4e2m1x2_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_unpack_postupdate_v2__Rvf4e1m2x2_RPUf4e1m2x2_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_unpack_postupdate_v2__Rvf8e8m0_RPUf8e8m0_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_unpack_postupdate_v2__Rvf8e5m2_RPUf8e5m2_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_unpack_postupdate_v2__Rvf8e4m3_RPUf8e4m3_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_unpack_postupdate_v2__Rvhf8_RPUhf8_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(vector_hifloat8_t& dst, __ubuf__ hifloat8_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_unpack_postupdate_v2__Rvi4x2_RPUi4x2_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(vector_int4x2_t& dst, __ubuf__ int4b_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_brc_postupdate_v2__Rvi8_RPUi8_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 // BRCV2搬入模式
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_int8_t& dst, __ubuf__ int8_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_brc_postupdate_v2__Rvu8_RPUu8_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_uint8_t& dst, __ubuf__ uint8_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_brc_postupdate_v2__Rvf4e2m1x2_RPUf4e2m1x2_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_brc_postupdate_v2__Rvf4e1m2x2_RPUf4e1m2x2_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_brc_postupdate_v2__Rvf8e8m0_RPUf8e8m0_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_brc_postupdate_v2__Rvf8e5m2_RPUf8e5m2_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_brc_postupdate_v2__Rvf8e4m3_RPUf8e4m3_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_brc_postupdate_v2__Rvhf8_RPUhf8_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_hifloat8_t& dst, __ubuf__ hifloat8_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_brc_postupdate_v2__Rvi16_RPUi16_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_int16_t& dst, __ubuf__ int16_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_brc_postupdate_v2__Rvu16_RPUu16_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_uint16_t& dst, __ubuf__ uint16_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_brc_postupdate_v2__Rvf16_RPUf16_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_half& dst, __ubuf__ half*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_brc_postupdate_v2__Rvbf16_RPUbf16_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_bfloat16_t& dst, __ubuf__ bfloat16_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_brc_postupdate_v2__Rvi32_RPUi32_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_int32_t& dst, __ubuf__ int32_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_brc_postupdate_v2__Rvu32_RPUu32_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_uint32_t& dst, __ubuf__ uint32_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_brc_postupdate_v2__Rvf32_RPUf32_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_float& dst, __ubuf__ float*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_brc_postupdate_v2__Rvi4x2_RPUi4x2_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_int4x2_t& dst, __ubuf__ int4b_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_brc_postupdate_v3__Rvi16_RPUi16_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 // BRCV3搬入模式
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v3(vector_int16_t& dst, __ubuf__ int16_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_brc_postupdate_v3__Rvu16_RPUu16_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v3(vector_uint16_t& dst, __ubuf__ uint16_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_brc_postupdate_v3__Rvf16_RPUf16_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v3(vector_half& dst, __ubuf__ half*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_brc_postupdate_v3__Rvbf16_RPUbf16_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v3(vector_bfloat16_t& dst, __ubuf__ bfloat16_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_brc_postupdate_v3__Rvi32_RPUi32_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v3(vector_int32_t& dst, __ubuf__ int32_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_brc_postupdate_v3__Rvu32_RPUu32_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v3(vector_uint32_t& dst, __ubuf__ uint32_t*& src, int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_brc_postupdate_v3__Rvf32_RPUf32_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v3(vector_float& dst, __ubuf__ float*& src, int32_t offset)
 ```
 

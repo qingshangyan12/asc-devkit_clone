@@ -1,3 +1,113 @@
+---
+okftype: reference.api.cpp
+title: "asc_float2half"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2half.md"
+description: "将`float`类型数据转换成`half`类型，并支持多种舍入模式与饱和模式。"
+tag: [c_api, compute, 'operations:conversion', vector, register_vector, 'traits:rounding_mode',
+  'traits:saturation_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_float2half_rd__Rvf16_vf32_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rd_sat__Rvf16_vf32_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rn__Rvf16_vf32_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rn_sat__Rvf16_vf32_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rna__Rvf16_vf32_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rna_sat__Rvf16_vf32_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_ro__Rvf16_vf32_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_ro_sat__Rvf16_vf32_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_ru__Rvf16_vf32_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_ru_sat__Rvf16_vf32_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rz__Rvf16_vf32_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rz_sat__Rvf16_vf32_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rd__Rvf16_vf32_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rd_sat__Rvf16_vf32_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rn__Rvf16_vf32_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rn_sat__Rvf16_vf32_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rna__Rvf16_vf32_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rna_sat__Rvf16_vf32_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_ro__Rvf16_vf32_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_ro_sat__Rvf16_vf32_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_ru__Rvf16_vf32_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_ru_sat__Rvf16_vf32_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rz__Rvf16_vf32_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rz_sat__Rvf16_vf32_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_float2half
 
 ## 产品支持情况
@@ -48,15 +158,793 @@ def asc_float2half_rn(dst, src, mask, dst_pos):
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_float2half_rd__Rvf16_vf32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```c
 // 占位符形式
-__simd_callee__ inline void asc_float2half_<round_mode><sat_mode>(vector_half& dst,
+__simd_callee__ inline void asc_float2half_rd(vector_half& dst,
                                                                   vector_float src,
                                                                   vector_bool mask,
                                                                   std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rd_sat__Rvf16_vf32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rd_sat(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rn__Rvf16_vf32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rn(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rn_sat__Rvf16_vf32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rn_sat(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rna__Rvf16_vf32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rna(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rna_sat__Rvf16_vf32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rna_sat(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ro__Rvf16_vf32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2half_ro(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ro_sat__Rvf16_vf32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2half_ro_sat(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ru__Rvf16_vf32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2half_ru(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ru_sat__Rvf16_vf32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2half_ru_sat(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rz__Rvf16_vf32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rz(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rz_sat__Rvf16_vf32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rz_sat(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rd__Rvf16_vf32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rd(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rd_sat__Rvf16_vf32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rd_sat(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rn__Rvf16_vf32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rn(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rn_sat__Rvf16_vf32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rn_sat(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rna__Rvf16_vf32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rna(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rna_sat__Rvf16_vf32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rna_sat(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ro__Rvf16_vf32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2half_ro(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ro_sat__Rvf16_vf32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2half_ro_sat(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ru__Rvf16_vf32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2half_ru(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ru_sat__Rvf16_vf32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2half_ru_sat(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rz__Rvf16_vf32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rz(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rz_sat__Rvf16_vf32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rz_sat(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rd__Rvf16_vf32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
 
 // 占位符形式
-__simd_callee__ inline void asc_float2half_<round_mode><sat_mode>(vector_half& dst,
+__simd_callee__ inline void asc_float2half_rd(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rd_sat__Rvf16_vf32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rd_sat(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rn__Rvf16_vf32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rn(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rn_sat__Rvf16_vf32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rn_sat(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rna__Rvf16_vf32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rna(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rna_sat__Rvf16_vf32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rna_sat(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ro__Rvf16_vf32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_float2half_ro(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ro_sat__Rvf16_vf32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_float2half_ro_sat(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ru__Rvf16_vf32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_float2half_ru(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ru_sat__Rvf16_vf32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_float2half_ru_sat(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rz__Rvf16_vf32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rz(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rz_sat__Rvf16_vf32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rz_sat(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rd__Rvf16_vf32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rd(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rd_sat__Rvf16_vf32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rd_sat(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rn__Rvf16_vf32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rn(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rn_sat__Rvf16_vf32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rn_sat(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rna__Rvf16_vf32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rna(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rna_sat__Rvf16_vf32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rna_sat(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ro__Rvf16_vf32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_float2half_ro(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ro_sat__Rvf16_vf32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_float2half_ro_sat(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ru__Rvf16_vf32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_float2half_ru(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ru_sat__Rvf16_vf32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_float2half_ru_sat(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rz__Rvf16_vf32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rz(vector_half& dst,
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rz_sat__Rvf16_vf32_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 占位符形式
+__simd_callee__ inline void asc_float2half_rz_sat(vector_half& dst,
                                                                   vector_float src,
                                                                   vector_bool mask,
                                                                   std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
@@ -66,6 +954,14 @@ __simd_callee__ inline void asc_float2half_<round_mode><sat_mode>(vector_half& d
 - `<sat_mode>`表示饱和/非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
 
 ### 函数原型典型示例
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rn__Rvf16_vf32_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
 
 ```c
 // RINT舍入模式，非饱和模式，数据写入索引为偶数的位置

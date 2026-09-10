@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_l12l0_padding_val"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0_padding_val.md"
+description: "对PADDING_B寄存器中的值进行设置，这是一个64bit的寄存器，用于存储搬运过程中padding的值。"
+tag: [c_api, data_movement_configuration]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_l12l0_padding_val__u64"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_l12l0_padding_val
 
 ## 产品支持情况
@@ -39,6 +56,14 @@
 | 33:32 | 表示所使用的padding模式，当前支持三种模式。<br>2'b00：固定padding；<br>2'b01：按通道padding；<br>2'b10/2'b11：当前保留。 |
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_set_l12l0_padding_val__u64"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
 
 ```cpp
 __aicore__ inline void asc_set_l12l0_padding_val(uint64_t config)

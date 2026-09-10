@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: "asc_unlock"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/asc_unlock.md"
+description: "用于同步AI Core内部异步流水的指令，直到当前流水的前序指令执行完成后，根据mutex_id释放对应Mutex。"
+tag: [c_api, 'operations:synchronization']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_unlock__pipe_u8"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/sync/sync.h"
+  - override_id: "asc_unlock__pipe_u8_mutexmode"
+    archs: ["3510"]
+    headers: []
+examples:
+  - path: "/examples/02_simd_c_api/02_features/01_reg_vector_compute/00_add_double_buffer"
+    archs: ["3510"]
+    override_id: "asc_unlock__pipe_u8"
+    file: "add_double_buffer.asc"
+  - path: "/examples/02_simd_c_api/02_features/02_matrix_compute/00_mmad_double_buffer"
+    archs: ["3510"]
+    override_id: "asc_unlock__pipe_u8"
+    file: "mmad_double_buffer.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_unlock
 
 ## 产品支持情况
@@ -64,6 +92,14 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_unlock__pipe_u8"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/sync/sync.h"
+```
+
 ```cpp
 enum ascMutexExecuteMode {
     ASC_LOCK_BLOCK = 0,
@@ -71,6 +107,16 @@ enum ascMutexExecuteMode {
 };
 
 __aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_unlock__pipe_u8_mutexmode"
+  archs: ["3510"]
+  headers: []
+```
+
+```cpp
 __aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id, const ascMutexExecuteMode mode)
 ```
 

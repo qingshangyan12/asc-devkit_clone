@@ -1,3 +1,29 @@
+---
+okftype: reference.api.cpp
+title: "asc_floor"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_floor.md"
+description: "将`src`中的浮点数元素按照FLOOR（向负无穷方向舍入）舍入模式舍入到整数值，结果仍保持原浮点数据类型。接口支持通过函数返回值返回结果，也支持通过引用和参数输出结果：前者直接返回舍入结果，后者将舍入结果写入`dst`。舍入规则等价于C标准库`floor`语义：向负无穷方向舍入，即取小于或等于输入值的最大整数，正数向0方向取整（如1.7 -> 1.0），负数向数值减小的方向取整（如-1.3 -> -2.0），整数值保持不变。未被`mask`筛选的元素置零。"
+tag: [c_api, compute, 'operations:conversion', mask, vector, register_vector, masked,
+  'traits:rounding_mode', 'traits:saturation_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_floor__v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - prototype_id: "asc_floor__Rv<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/truncate"
+    archs: ["3510"]
+    override_id: "asc_floor__Rvf32_vf32_vb"
+    file: "truncate.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_floor
 
 ## 产品支持情况
@@ -34,10 +60,39 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  prototype_id: "asc_floor__v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+  dtype:
+    values:
+      - "half"
+      - "bfloat16_t"
+      - "float"
+```
+
 ```cpp
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_floor(vector_<dtype> src,
                                                  vector_bool mask)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_floor__Rv<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+  dtype:
+    values:
+      - "half"
+      - "bfloat16_t"
+      - "float"
+```
+
+```cpp
 
 // 通过引用和参数输出结果（占位符形式）
 __simd_callee__ inline void asc_floor(vector_<dtype>& dst,

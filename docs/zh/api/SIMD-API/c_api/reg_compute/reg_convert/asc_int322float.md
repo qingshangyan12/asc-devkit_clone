@@ -1,3 +1,37 @@
+---
+okftype: reference.api.cpp
+title: "asc_int322float"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322float.md"
+description: "根据`mask`将`src`中的每个`int32_t`类型数据转换成`float`类型，并支持多种舍入模式，结果写入`dst`。"
+tag: [c_api, compute, 'operations:conversion', mask, vector, register_vector, masked,
+  'traits:rounding_mode', 'traits:saturation_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_int322float_rd__Rvf32_vi32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_int322float_rn__Rvf32_vi32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_int322float_rna__Rvf32_vi32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_int322float_ru__Rvf32_vi32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_int322float_rz__Rvf32_vi32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_int322float
 
 ## 产品支持情况
@@ -43,9 +77,77 @@ def asc_int322float_rn(dst, src, mask):
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_int322float_rd__Rvf32_vi32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```c
 // 占位符形式
-__simd_callee__ inline void asc_int322float_<round_mode>(vector_float& dst,
+__simd_callee__ inline void asc_int322float_rd(vector_float& dst,
+                                                         vector_int32_t src,
+                                                         vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int322float_rn__Rvf32_vi32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_int322float_rn(vector_float& dst,
+                                                         vector_int32_t src,
+                                                         vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int322float_rna__Rvf32_vi32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_int322float_rna(vector_float& dst,
+                                                         vector_int32_t src,
+                                                         vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int322float_ru__Rvf32_vi32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_int322float_ru(vector_float& dst,
+                                                         vector_int32_t src,
+                                                         vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_int322float_rz__Rvf32_vi32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_int322float_rz(vector_float& dst,
                                                          vector_int32_t src,
                                                          vector_bool mask)
 ```
@@ -53,6 +155,14 @@ __simd_callee__ inline void asc_int322float_<round_mode>(vector_float& dst,
 `<round_mode>`表示支持的舍入模式，支持`rd`（`FLOOR`）、`rn`（`RINT`）、`rna`（`ROUND`）、`ru`（`CEIL`）和`rz`（`TRUNC`）。
 
 ### 函数原型典型示例
+
+```yaml
+api_signature:
+  override_id: "asc_int322float_rn__Rvf32_vi32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
 
 ```c
 // RINT舍入模式

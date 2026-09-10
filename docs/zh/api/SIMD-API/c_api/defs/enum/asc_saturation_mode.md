@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: "asc_saturation_mode"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md"
+description: "asc_saturation_mode用于表示饱和控制所作用的模式类型，在调用[asc_set_saturation_flag](../../spr/asc_set_saturation_flag.md)和[asc_get_saturation_flag](../../spr/asc_get_saturation_flag.md)时使用。"
+tag: [c_api, 'traits:saturation_mode']
+usage_dependencies:
+  status: not_applicable
+signature:
+  []
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_saturation_mode
 
 asc_saturation_mode用于表示饱和控制所作用的模式类型，在调用[asc_set_saturation_flag](../../spr/asc_set_saturation_flag.md)和[asc_get_saturation_flag](../../spr/asc_get_saturation_flag.md)时使用。

@@ -1,3 +1,33 @@
+---
+okftype: reference.api.cpp
+title: "asc_uint322int16（废弃）"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322int16_deprecated.md"
+description: "**该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_uint322int16](../reg_compute/reg_convert/asc_uint322int16.md)的显式位置参数重载替代。"
+tag: [c_api, compute, 'operations:conversion', mask, masked, 'traits:rounding_mode',
+  'traits:saturation_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_uint322int16__Rvi16_vu32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_uint322int16_sat__Rvi16_vu32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_uint322int16_v2__Rvi16_vu32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_uint322int16_sat_v2__Rvi16_vu32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_uint322int16（废弃）
 
 ## 产品支持情况
@@ -38,13 +68,54 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_uint322int16__Rvi16_vu32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```cpp
 // 数据写入索引为偶数的位置，非饱和模式
 __simd_callee__ inline void asc_uint322int16(vector_int16_t& dst, vector_uint32_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_uint322int16_sat__Rvi16_vu32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // 数据写入索引为偶数的位置，饱和模式
 __simd_callee__ inline void asc_uint322int16_sat(vector_int16_t& dst, vector_uint32_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_uint322int16_v2__Rvi16_vu32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // 数据写入索引为奇数的位置，非饱和模式
 __simd_callee__ inline void asc_uint322int16_v2(vector_int16_t& dst, vector_uint32_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_uint322int16_sat_v2__Rvi16_vu32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // 数据写入索引为奇数的位置，饱和模式
 __simd_callee__ inline void asc_uint322int16_sat_v2(vector_int16_t& dst, vector_uint32_t src, vector_bool mask)
 ```

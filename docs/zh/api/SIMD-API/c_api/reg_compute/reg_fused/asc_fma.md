@@ -1,3 +1,21 @@
+---
+okftype: reference.api.cpp
+title: "asc_fma"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_fma.md"
+description: "根据`mask`对源操作数`src0`、`src1`按元素相乘后，与源操作数`src2`中的对应元素相加，将计算结果作为返回值返回。"
+tag: [c_api, compute, 'operations:fused_multiply_add', mask, vector, register_vector,
+  elementwise, masked]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_fma__v<dtype>_v<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_fused.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_fma
 
 ## 产品支持情况
@@ -35,6 +53,19 @@ result_i = src0_i \times src1_i + src2_i
 $$
 
 ## 函数原型
+
+```yaml
+api_signature:
+  prototype_id: "asc_fma__v<dtype>_v<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_fused.h"
+  dtype:
+    values:
+      - "half"
+      - "bfloat16_t"
+      - "float"
+```
 
 ```c
 // 占位符形式

@@ -1,3 +1,21 @@
+---
+okftype: reference.api.cpp
+title: "asc_axpy"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_axpy.md"
+description: "根据`mask`将源操作数`src`中的每个元素与标量`value`求积后，与目的操作数`dst`中的对应元素相加，将结果写入`dst`。其中，`dst`既作为输入累加器参与计算，又用于存储最终结果。"
+tag: [c_api, compute, 'operations:fused_multiply_add', mask, scalar, vector, register_vector,
+  masked, scalar_operand]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_axpy__Rv<dtype>_v<dtype>_<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_fused.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_axpy
 
 ## 产品支持情况
@@ -35,6 +53,18 @@ dst_i = src_i \times value + dst_i
 $$
 
 ## 函数原型
+
+```yaml
+api_signature:
+  prototype_id: "asc_axpy__Rv<dtype>_v<dtype>_<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_fused.h"
+  dtype:
+    values:
+      - "half"
+      - "float"
+```
 
 ```c
 // 占位符形式

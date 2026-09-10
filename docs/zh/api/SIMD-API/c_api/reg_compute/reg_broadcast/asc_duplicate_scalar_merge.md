@@ -1,3 +1,65 @@
+---
+okftype: reference.api.cpp
+title: "asc_duplicate_scalar_merge"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_scalar_merge.md"
+description: "merge模式下，将标量值value广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。"
+tag: [c_api, compute, 'operations:broadcast', mask, scalar, vector, register_vector,
+  masked, scalar_operand]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_duplicate_scalar_merge__Rvi8_i8_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - override_id: "asc_duplicate_scalar_merge__Rvu8_u8_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - override_id: "asc_duplicate_scalar_merge__Rvf8e8m0_f8e8m0_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - override_id: "asc_duplicate_scalar_merge__Rvf8e5m2_f8e5m2_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - override_id: "asc_duplicate_scalar_merge__Rvf8e4m3_f8e4m3_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - override_id: "asc_duplicate_scalar_merge__Rvi16_i16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - override_id: "asc_duplicate_scalar_merge__Rvu16_u16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - override_id: "asc_duplicate_scalar_merge__Rvf16_f16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - override_id: "asc_duplicate_scalar_merge__Rvbf16_bf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - override_id: "asc_duplicate_scalar_merge__Rvi32_i32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - override_id: "asc_duplicate_scalar_merge__Rvu32_u32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - override_id: "asc_duplicate_scalar_merge__Rvf32_f32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_duplicate_scalar_merge
 
 ## 产品支持情况
@@ -32,18 +94,147 @@ merge模式下，将标量值value广播到dst中被mask筛选的位置，dst中
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_duplicate_scalar_merge__Rvi8_i8_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
 ```cpp
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_int8_t& dst, int8_t value, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_scalar_merge__Rvu8_u8_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_uint8_t& dst, uint8_t value, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_scalar_merge__Rvf8e8m0_f8e8m0_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_fp8_e8m0_t& dst, fp8_e8m0_t value, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_scalar_merge__Rvf8e5m2_f8e5m2_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_fp8_e5m2_t& dst, fp8_e5m2_t value, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_scalar_merge__Rvf8e4m3_f8e4m3_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_fp8_e4m3fn_t& dst, fp8_e4m3fn_t value, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_scalar_merge__Rvi16_i16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_int16_t& dst, int16_t value, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_scalar_merge__Rvu16_u16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_uint16_t& dst, uint16_t value, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_scalar_merge__Rvf16_f16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_half& dst, half value, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_scalar_merge__Rvbf16_bf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_bfloat16_t& dst, bfloat16_t value, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_scalar_merge__Rvi32_i32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_int32_t& dst, int32_t value, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_scalar_merge__Rvu32_u32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_uint32_t& dst, uint32_t value, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_duplicate_scalar_merge__Rvf32_f32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_float& dst, float value, vector_bool mask)
 ```
 

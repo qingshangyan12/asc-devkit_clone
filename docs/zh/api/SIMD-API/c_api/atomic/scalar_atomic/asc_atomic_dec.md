@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_atomic_dec"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_dec.md"
+description: "对Global Memory中`address`指向的一个`uint32_t`或`uint64_t`元素执行原子递减操作。"
+tag: [c_api, atomic]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_atomic_dec__PG<dtype>_<dtype>"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/atomic/scalar_atomic.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_atomic_dec
 
 ## 产品支持情况
@@ -37,6 +54,18 @@ $$
 接口返回`old_value`。整个读取、判断和写回过程为原子操作。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  prototype_id: "asc_atomic_dec__PG<dtype>_<dtype>"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/atomic/scalar_atomic.h"
+  dtype:
+    values:
+      - "uint32_t"
+      - "uint64_t"
+```
 
 ```c
 __aicore__ inline <dtype> asc_atomic_dec(__gm__ <dtype>* address,

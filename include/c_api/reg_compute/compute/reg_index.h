@@ -24,44 +24,174 @@
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
 #endif
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @override_id asc_arange__i8
+ * @archs 3510
+ * @brief 以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中，[Vector Length (VL)](../../defs/type/data_type_definition.md)表示矢量数据寄存器的位宽，`VL_T`表示该寄存器可存储的元素数量。
+ */
 __simd_callee__ inline vector_int8_t asc_arange(int8_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @override_id asc_arange__i16
+ * @archs 3510
+ * @brief 以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中，[Vector Length (VL)](../../defs/type/data_type_definition.md)表示矢量数据寄存器的位宽，`VL_T`表示该寄存器可存储的元素数量。
+ */
 __simd_callee__ inline vector_int16_t asc_arange(int16_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @override_id asc_arange__i32
+ * @archs 3510
+ * @brief 以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中，[Vector Length (VL)](../../defs/type/data_type_definition.md)表示矢量数据寄存器的位宽，`VL_T`表示该寄存器可存储的元素数量。
+ */
 __simd_callee__ inline vector_int32_t asc_arange(int32_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @override_id asc_arange__f16
+ * @archs 3510
+ * @brief 以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中，[Vector Length (VL)](../../defs/type/data_type_definition.md)表示矢量数据寄存器的位宽，`VL_T`表示该寄存器可存储的元素数量。
+ */
 __simd_callee__ inline vector_half asc_arange(half value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @override_id asc_arange__f32
+ * @archs 3510
+ * @brief 以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中，[Vector Length (VL)](../../defs/type/data_type_definition.md)表示矢量数据寄存器的位宽，`VL_T`表示该寄存器可存储的元素数量。
+ */
 __simd_callee__ inline vector_float asc_arange(float value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @override_id asc_arange_descend__i8
+ * @archs 3510
+ * @brief 以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中，[Vector Length (VL)](../../defs/type/data_type_definition.md)表示矢量数据寄存器的位宽，`VL_T`表示该寄存器可存储的元素数量。
+ */
 __simd_callee__ inline vector_int8_t asc_arange_descend(int8_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @override_id asc_arange_descend__i16
+ * @archs 3510
+ * @brief 以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中，[Vector Length (VL)](../../defs/type/data_type_definition.md)表示矢量数据寄存器的位宽，`VL_T`表示该寄存器可存储的元素数量。
+ */
 __simd_callee__ inline vector_int16_t asc_arange_descend(int16_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @override_id asc_arange_descend__i32
+ * @archs 3510
+ * @brief 以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中，[Vector Length (VL)](../../defs/type/data_type_definition.md)表示矢量数据寄存器的位宽，`VL_T`表示该寄存器可存储的元素数量。
+ */
 __simd_callee__ inline vector_int32_t asc_arange_descend(int32_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @override_id asc_arange_descend__f16
+ * @archs 3510
+ * @brief 以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中，[Vector Length (VL)](../../defs/type/data_type_definition.md)表示矢量数据寄存器的位宽，`VL_T`表示该寄存器可存储的元素数量。
+ */
 __simd_callee__ inline vector_half asc_arange_descend(half value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @override_id asc_arange_descend__f32
+ * @archs 3510
+ * @brief 以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中，[Vector Length (VL)](../../defs/type/data_type_definition.md)表示矢量数据寄存器的位宽，`VL_T`表示该寄存器可存储的元素数量。
+ */
 __simd_callee__ inline vector_float asc_arange_descend(float value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @override_id asc_arange__Rvi8_i8
+ * @archs 3510
+ * @brief 以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中，[Vector Length (VL)](../../defs/type/data_type_definition.md)表示矢量数据寄存器的位宽，`VL_T`表示该寄存器可存储的元素数量。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ */
 __simd_callee__ inline void asc_arange(vector_int8_t& dst, int8_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @override_id asc_arange__Rvi16_i16
+ * @archs 3510
+ * @brief 以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中，[Vector Length (VL)](../../defs/type/data_type_definition.md)表示矢量数据寄存器的位宽，`VL_T`表示该寄存器可存储的元素数量。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ */
 __simd_callee__ inline void asc_arange(vector_int16_t& dst, int16_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @override_id asc_arange__Rvi32_i32
+ * @archs 3510
+ * @brief 以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中，[Vector Length (VL)](../../defs/type/data_type_definition.md)表示矢量数据寄存器的位宽，`VL_T`表示该寄存器可存储的元素数量。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ */
 __simd_callee__ inline void asc_arange(vector_int32_t& dst, int32_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @override_id asc_arange__Rvf16_f16
+ * @archs 3510
+ * @brief 以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中，[Vector Length (VL)](../../defs/type/data_type_definition.md)表示矢量数据寄存器的位宽，`VL_T`表示该寄存器可存储的元素数量。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ */
 __simd_callee__ inline void asc_arange(vector_half& dst, half value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @override_id asc_arange__Rvf32_f32
+ * @archs 3510
+ * @brief 以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中，[Vector Length (VL)](../../defs/type/data_type_definition.md)表示矢量数据寄存器的位宽，`VL_T`表示该寄存器可存储的元素数量。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ */
 __simd_callee__ inline void asc_arange(vector_float& dst, float value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @override_id asc_arange_descend__Rvi8_i8
+ * @archs 3510
+ * @brief 以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中，[Vector Length (VL)](../../defs/type/data_type_definition.md)表示矢量数据寄存器的位宽，`VL_T`表示该寄存器可存储的元素数量。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ */
 __simd_callee__ inline void asc_arange_descend(vector_int8_t& dst, int8_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @override_id asc_arange_descend__Rvi16_i16
+ * @archs 3510
+ * @brief 以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中，[Vector Length (VL)](../../defs/type/data_type_definition.md)表示矢量数据寄存器的位宽，`VL_T`表示该寄存器可存储的元素数量。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ */
 __simd_callee__ inline void asc_arange_descend(vector_int16_t& dst, int16_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @override_id asc_arange_descend__Rvi32_i32
+ * @archs 3510
+ * @brief 以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中，[Vector Length (VL)](../../defs/type/data_type_definition.md)表示矢量数据寄存器的位宽，`VL_T`表示该寄存器可存储的元素数量。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ */
 __simd_callee__ inline void asc_arange_descend(vector_int32_t& dst, int32_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @override_id asc_arange_descend__Rvf16_f16
+ * @archs 3510
+ * @brief 以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中，[Vector Length (VL)](../../defs/type/data_type_definition.md)表示矢量数据寄存器的位宽，`VL_T`表示该寄存器可存储的元素数量。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ */
 __simd_callee__ inline void asc_arange_descend(vector_half& dst, half value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @override_id asc_arange_descend__Rvf32_f32
+ * @archs 3510
+ * @brief 以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中，[Vector Length (VL)](../../defs/type/data_type_definition.md)表示矢量数据寄存器的位宽，`VL_T`表示该寄存器可存储的元素数量。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ */
 __simd_callee__ inline void asc_arange_descend(vector_float& dst, float value);
 
 #endif

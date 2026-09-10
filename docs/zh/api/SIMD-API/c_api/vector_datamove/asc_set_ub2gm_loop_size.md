@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_ub2gm_loop_size"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop_size.md"
+description: "本接口用于设置[asc_copy_ub2gm_align](./asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)使用循环搬运模式时的两层循环迭代次数。`loop1_size`用于设置内层循环`loop1`的迭代次数，`loop2_size`用于设置外层循环`loop2`的迭代次数。"
+tag: [c_api, data_movement_configuration]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_ub2gm_loop_size__u32_u32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_ub2gm_loop_size
 
 ## 产品支持情况
@@ -39,6 +56,14 @@
 本接口仅在AIV上执行有效，在AIC上调用为空操作。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_set_ub2gm_loop_size__u32_u32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
 
 ```c
 __aicore__ inline void asc_set_ub2gm_loop_size(uint32_t loop1_size,

@@ -1,3 +1,12 @@
 schema_version: 1
-generated_at: "2026-09-04"
-reverse: {}
+generated_at: "2026-09-10"
+reverse:
+  "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md":
+    - executor_path: "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md":
+    - executor_path: "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md":
+    - executor_path: "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md"
+      relationship: "companion"

@@ -28,11 +28,46 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_convert
+ * @override_id asc_float2half_ro__f32
+ * @archs 3510
+ * @brief 将`float`类型的标量转换为`half`类型并返回，舍入模式固定为ODD（最近邻奇数舍入）。
+ * @param [in] value 源操作数（标量），数据类型为`float`。
+ */
 __aicore__ inline half asc_float2half_ro(float value);
 
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_convert
+ * @override_id asc_float2int32_rd__f32
+ * @archs 3510
+ * @brief 将`float`类型的标量转换为`int32_t`类型并返回。
+ * @param [in] value 源操作数（标量），数据类型为`float`。
+ */
 __aicore__ inline int32_t asc_float2int32_rd(float value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_convert
+ * @override_id asc_float2int32_ru__f32
+ * @archs 3510
+ * @brief 将`float`类型的标量转换为`int32_t`类型并返回。
+ * @param [in] value 源操作数（标量），数据类型为`float`。
+ */
 __aicore__ inline int32_t asc_float2int32_ru(float value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_convert
+ * @override_id asc_float2int32_rn__f32
+ * @archs 3510
+ * @brief 将`float`类型的标量转换为`int32_t`类型并返回。
+ * @param [in] value 源操作数（标量），数据类型为`float`。
+ */
 __aicore__ inline int32_t asc_float2int32_rn(float value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_convert
+ * @override_id asc_float2int32_rna__f32
+ * @archs 3510
+ * @brief 将`float`类型的标量转换为`int32_t`类型并返回。
+ * @param [in] value 源操作数（标量），数据类型为`float`。
+ */
 __aicore__ inline int32_t asc_float2int32_rna(float value);
 
 #endif

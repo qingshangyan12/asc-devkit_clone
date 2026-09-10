@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_round"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_round.md"
+description: "将`src`中的浮点数元素按照ROUND（四舍五入）舍入模式舍入到整数值，结果仍保持原浮点数据类型。接口支持通过函数返回值返回结果，也支持通过引用和参数输出结果：前者直接返回舍入结果，后者将舍入结果写入`dst`。舍入规则等价于C标准库`round`语义：舍入到最接近的整数；当输入值恰好位于两个整数中间时，向远离0的方向舍入（如1.4 -> 1.0、1.5 -> 2.0、-1.5 -> -2.0），整数值保持不变。未被`mask`筛选的元素置零。"
+tag: [c_api, compute, 'operations:conversion', mask, vector, register_vector, masked,
+  'traits:rounding_mode', 'traits:saturation_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_round__v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - prototype_id: "asc_round__Rv<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_round
 
 ## 产品支持情况
@@ -34,10 +56,39 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  prototype_id: "asc_round__v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+  dtype:
+    values:
+      - "half"
+      - "bfloat16_t"
+      - "float"
+```
+
 ```cpp
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_round(vector_<dtype> src,
                                                  vector_bool mask)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_round__Rv<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+  dtype:
+    values:
+      - "half"
+      - "bfloat16_t"
+      - "float"
+```
+
+```cpp
 
 // 通过引用和参数输出结果（占位符形式）
 __simd_callee__ inline void asc_round(vector_<dtype>& dst,

@@ -1,3 +1,56 @@
+---
+okftype: reference.api.cpp
+title: "asc_half2bfloat16"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2bfloat16.md"
+description: "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`bfloat16_t`类型，结果写入`dst`。"
+tag: [c_api, compute, 'operations:conversion', mask, vector, register_vector, masked]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_half2bfloat16_rd__Rvbf16_vf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2bfloat16_rn__Rvbf16_vf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2bfloat16_rna__Rvbf16_vf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2bfloat16_ru__Rvbf16_vf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2bfloat16_rz__Rvbf16_vf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2bfloat16_rd__vf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2bfloat16_rn__vf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2bfloat16_rna__vf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2bfloat16_ru__vf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2bfloat16_rz__vf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_half2bfloat16
 
 ## 产品支持情况
@@ -32,14 +85,153 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_half2bfloat16_rd__Rvbf16_vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```c
 // 通过引用参数输出结果（占位符形式）
-__simd_callee__ inline void asc_half2bfloat16<round_mode>(vector_bfloat16_t& dst,
+__simd_callee__ inline void asc_half2bfloat16_rd(vector_bfloat16_t& dst,
                                                           vector_half src,
                                                           vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2bfloat16_rn__Rvbf16_vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 通过引用参数输出结果（占位符形式）
+__simd_callee__ inline void asc_half2bfloat16_rn(vector_bfloat16_t& dst,
+                                                          vector_half src,
+                                                          vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2bfloat16_rna__Rvbf16_vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 通过引用参数输出结果（占位符形式）
+__simd_callee__ inline void asc_half2bfloat16_rna(vector_bfloat16_t& dst,
+                                                          vector_half src,
+                                                          vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2bfloat16_ru__Rvbf16_vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 通过引用参数输出结果（占位符形式）
+__simd_callee__ inline void asc_half2bfloat16_ru(vector_bfloat16_t& dst,
+                                                          vector_half src,
+                                                          vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2bfloat16_rz__Rvbf16_vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 通过引用参数输出结果（占位符形式）
+__simd_callee__ inline void asc_half2bfloat16_rz(vector_bfloat16_t& dst,
+                                                          vector_half src,
+                                                          vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2bfloat16_rd__vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
 
 // 通过函数返回值返回结果（占位符形式）
-__simd_callee__ inline vector_bfloat16_t asc_half2bfloat16<round_mode>(vector_half src,
+__simd_callee__ inline vector_bfloat16_t asc_half2bfloat16_rd(vector_half src,
+                                                                       vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2bfloat16_rn__vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_bfloat16_t asc_half2bfloat16_rn(vector_half src,
+                                                                       vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2bfloat16_rna__vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_bfloat16_t asc_half2bfloat16_rna(vector_half src,
+                                                                       vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2bfloat16_ru__vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_bfloat16_t asc_half2bfloat16_ru(vector_half src,
+                                                                       vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2bfloat16_rz__vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_bfloat16_t asc_half2bfloat16_rz(vector_half src,
                                                                        vector_bool mask)
 ```
 
@@ -47,11 +239,30 @@ __simd_callee__ inline vector_bfloat16_t asc_half2bfloat16<round_mode>(vector_ha
 
 ### 函数原型典型示例
 
+```yaml
+api_signature:
+  override_id: "asc_half2bfloat16_rna__Rvbf16_vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```c
 // 通过引用参数输出结果
 __simd_callee__ inline void asc_half2bfloat16_rna(vector_bfloat16_t& dst,
                                                   vector_half src,
                                                   vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2bfloat16_rna__vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
 
 // 通过函数返回值返回结果
 __simd_callee__ inline vector_bfloat16_t asc_half2bfloat16_rna(vector_half src,

@@ -1,3 +1,63 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy.md"
+description: "将数据从Unified Buffer（UB）搬运到UB。支持高维切分。"
+tag: [c_api, data_movement, copy]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_copy__PUi16_PUi16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy__PUu16_PUu16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy__PUi32_PUi32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy__PUu32_PUu32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy__PUi16_PUi16_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy__PUu16_PUu16_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy__PUi32_PUi32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy__PUu32_PUu32_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy_sync__PUi16_PUi16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_copy_sync__PUu16_PUu16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_copy_sync__PUi32_PUi32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_copy_sync__PUu32_PUu32_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
 
 # asc_copy
 
@@ -35,12 +95,53 @@
 
 - 前n个数据计算
 
+```yaml
+api_signature:
+  override_id: "asc_copy__PUi16_PUi16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
 ```cpp
 __aicore__ inline void asc_copy(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint32_t count)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_copy__PUu16_PUu16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 
 __aicore__ inline void asc_copy(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t count)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_copy__PUi32_PUi32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 
 __aicore__ inline void asc_copy(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, uint32_t count)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_copy__PUu32_PUu32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 
 __aicore__ inline void asc_copy(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t count)
 
@@ -48,15 +149,56 @@ __aicore__ inline void asc_copy(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, 
 
 - 高维切分计算
 
+```yaml
+api_signature:
+  override_id: "asc_copy__PUi16_PUi16_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
 ```cpp
 __aicore__ inline void asc_copy(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint8_t repeat,
     uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_copy__PUu16_PUu16_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 
 __aicore__ inline void asc_copy(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint8_t repeat,
     uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_copy__PUi32_PUi32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 
 __aicore__ inline void asc_copy(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, uint8_t repeat,
     uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_copy__PUu32_PUu32_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+```cpp
 
 __aicore__ inline void asc_copy(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint8_t repeat,
     uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
@@ -64,12 +206,53 @@ __aicore__ inline void asc_copy(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, 
 
 - 同步计算
 
+```yaml
+api_signature:
+  override_id: "asc_copy_sync__PUi16_PUi16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
 ```cpp
 __aicore__ inline void asc_copy_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint32_t count)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_sync__PUu16_PUu16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+```cpp
 
 __aicore__ inline void asc_copy_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t count)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_sync__PUi32_PUi32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+```cpp
 
 __aicore__ inline void asc_copy_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, uint32_t count)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_sync__PUu32_PUu32_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+```cpp
 
 __aicore__ inline void asc_copy_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t count)
 ```

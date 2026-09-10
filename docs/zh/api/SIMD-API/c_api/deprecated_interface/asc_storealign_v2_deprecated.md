@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: "asc_storealign_pack_v2（废弃）"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v2_deprecated.md"
+description: "**该接口已废弃。请使用[asc_storealign_pack_quarter](../reg_compute/store/asc_storealign_pack_quarter.md)实现此功能。"
+tag: [c_api, deprecated]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_storealign_pack_v2__PUi32_vi32_ar_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storealign.h"
+  - override_id: "asc_storealign_pack_v2__PUu32_vu32_ar_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storealign.h"
+  - override_id: "asc_storealign_pack_v2__PUf32_vf32_ar_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/store/storealign.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_storealign_pack_v2（废弃）
 
 ## 产品支持情况
@@ -34,9 +59,39 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_storealign_pack_v2__PUi32_vi32_ar_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storealign.h"
+```
+
 ```cpp
 __simd_callee__ inline void asc_storealign_pack_v2(__ubuf__ int32_t* dst_align32b, vector_int32_t src, addr_reg offset, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_storealign_pack_v2__PUu32_vu32_ar_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storealign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_storealign_pack_v2(__ubuf__ uint32_t* dst_align32b, vector_uint32_t src, addr_reg offset, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_storealign_pack_v2__PUf32_vf32_ar_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/store/storealign.h"
+```
+
+```cpp
 __simd_callee__ inline void asc_storealign_pack_v2(__ubuf__ float* dst_align32b, vector_float src, addr_reg offset, vector_bool mask)
 ```
 

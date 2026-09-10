@@ -1,3 +1,40 @@
+---
+okftype: reference.api.cpp
+title: "asc_not"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_not.md"
+description: "按元素做按位取反。"
+tag: [c_api, compute, bitwise, 'operations:bitwise_not', vector, memory_vector, elementwise]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_not__PUi16_PUi16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_logic.h"
+  - override_id: "asc_not__PUu16_PUu16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_logic.h"
+  - override_id: "asc_not__PUi16_PUi16_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_logic.h"
+  - override_id: "asc_not__PUu16_PUu16_u8_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_logic.h"
+  - override_id: "asc_not_sync__PUi16_PUi16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_not_sync__PUu16_PUu16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_not
 
 ## 产品支持情况
@@ -36,20 +73,77 @@ $$
 ## 函数原型
 
 - 前n个数据计算
+```yaml
+api_signature:
+  override_id: "asc_not__PUi16_PUi16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_logic.h"
+```
+
     ```cpp
     __aicore__ inline void asc_not(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_not__PUu16_PUu16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_logic.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_not(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t count)
     ```
 
 - 高维切分计算
+```yaml
+api_signature:
+  override_id: "asc_not__PUi16_PUi16_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_logic.h"
+```
+
     ```cpp
     __aicore__ inline void asc_not(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_not__PUu16_PUu16_u8_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_logic.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_not(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
 
 - 同步计算
+```yaml
+api_signature:
+  override_id: "asc_not_sync__PUi16_PUi16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
     ```cpp
     __aicore__ inline void asc_not_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_not_sync__PUu16_PUu16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_not_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t count)
     ```
 

@@ -1,3 +1,57 @@
+---
+okftype: reference.api.cpp
+title: "asc_float2int32"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int32.md"
+description: "将`float`类型数据转换为`int32_t`类型，并支持多种舍入模式与饱和/非饱和模式。"
+tag: [c_api, compute, 'operations:conversion', vector, register_vector, 'traits:rounding_mode',
+  'traits:saturation_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_float2int32_rn__Rvi32_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2int32_rn_sat__Rvi32_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2int32_rna__Rvi32_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2int32_rna_sat__Rvi32_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2int32_rd__Rvi32_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2int32_rd_sat__Rvi32_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2int32_ru__Rvi32_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2int32_ru_sat__Rvi32_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2int32_rz__Rvi32_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2int32_rz_sat__Rvi32_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_float2int32
 
 ## 产品支持情况
@@ -47,9 +101,152 @@ def asc_float2int32_rn(dst, src, mask):
 
 ### 模板原型
 
+```yaml
+api_signature:
+  override_id: "asc_float2int32_rn__Rvi32_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```c
 // 占位符形式
-__simd_callee__ inline void asc_float2int32_<round_mode><sat_mode>(vector_int32_t& dst,
+__simd_callee__ inline void asc_float2int32_rn(vector_int32_t& dst,
+                                                                   vector_float src,
+                                                                   vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2int32_rn_sat__Rvi32_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2int32_rn_sat(vector_int32_t& dst,
+                                                                   vector_float src,
+                                                                   vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2int32_rna__Rvi32_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2int32_rna(vector_int32_t& dst,
+                                                                   vector_float src,
+                                                                   vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2int32_rna_sat__Rvi32_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2int32_rna_sat(vector_int32_t& dst,
+                                                                   vector_float src,
+                                                                   vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2int32_rd__Rvi32_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2int32_rd(vector_int32_t& dst,
+                                                                   vector_float src,
+                                                                   vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2int32_rd_sat__Rvi32_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2int32_rd_sat(vector_int32_t& dst,
+                                                                   vector_float src,
+                                                                   vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2int32_ru__Rvi32_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2int32_ru(vector_int32_t& dst,
+                                                                   vector_float src,
+                                                                   vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2int32_ru_sat__Rvi32_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2int32_ru_sat(vector_int32_t& dst,
+                                                                   vector_float src,
+                                                                   vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2int32_rz__Rvi32_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2int32_rz(vector_int32_t& dst,
+                                                                   vector_float src,
+                                                                   vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2int32_rz_sat__Rvi32_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_float2int32_rz_sat(vector_int32_t& dst,
                                                                    vector_float src,
                                                                    vector_bool mask)
 ```
@@ -60,6 +257,14 @@ __simd_callee__ inline void asc_float2int32_<round_mode><sat_mode>(vector_int32_
 - `<sat_mode>`表示饱和/非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
 
 ### 函数原型典型示例
+
+```yaml
+api_signature:
+  override_id: "asc_float2int32_rn__Rvi32_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
 
 ```c
 // 示例：向最近且偶数舍入（rn）非饱和模式。

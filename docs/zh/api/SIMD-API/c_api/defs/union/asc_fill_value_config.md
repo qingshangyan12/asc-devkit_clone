@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: "asc_fill_value_config"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md"
+description: "asc_fill_value_config为fill_value的初始化参数结构体，包含[asc_fill_l0a](../../cube_datamove/asc_fill_l0a.md)/[asc_fill_l0b](../../cube_datamove/asc_fill_l0b.md)/[asc_fill_l1](../../cube_datamove/asc_fill_l1.md)接口需要配置的各种初始化参数。"
+tag: [c_api]
+usage_dependencies:
+  status: not_applicable
+signature:
+  []
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_fill_value_config
 
 asc_fill_value_config为fill_value的初始化参数结构体，包含[asc_fill_l0a](../../cube_datamove/asc_fill_l0a.md)/[asc_fill_l0b](../../cube_datamove/asc_fill_l0b.md)/[asc_fill_l1](../../cube_datamove/asc_fill_l1.md)接口需要配置的各种初始化参数。

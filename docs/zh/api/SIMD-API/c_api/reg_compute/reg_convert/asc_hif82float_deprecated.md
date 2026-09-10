@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: "asc_hif82float (废弃)"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82float_deprecated.md"
+description: "将hifloat8_t类型数据转换为float类型。"
+tag: [c_api, compute, 'operations:conversion', vector, register_vector]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_hif82float__Rvf32_vhf8_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_hif82float_v2__Rvf32_vhf8_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_hif82float_v3__Rvf32_vhf8_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_hif82float_v4__Rvf32_vhf8_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_hif82float (废弃)
 
 ## 产品支持情况
@@ -34,13 +63,54 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_hif82float__Rvf32_vhf8_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```cpp
 // 选取索引0的位置
 __simd_callee__ inline void asc_hif82float(vector_float& dst, vector_hifloat8_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_hif82float_v2__Rvf32_vhf8_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // 选取索引1的位置
 __simd_callee__ inline void asc_hif82float_v2(vector_float& dst, vector_hifloat8_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_hif82float_v3__Rvf32_vhf8_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // 选取索引2的位置
 __simd_callee__ inline void asc_hif82float_v3(vector_float& dst, vector_hifloat8_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_hif82float_v4__Rvf32_vhf8_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // 选取索引3的位置
 __simd_callee__ inline void asc_hif82float_v4(vector_float& dst, vector_hifloat8_t src, vector_bool mask)
 ```

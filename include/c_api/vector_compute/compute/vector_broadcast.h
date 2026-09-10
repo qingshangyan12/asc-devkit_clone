@@ -26,47 +26,209 @@
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
 #endif
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @override_id asc_brcb__PUu16_PUu16_u16_u16_u8
+ * @archs 2201
+ * @brief 给定一个输入矢量，每一次取输入矢量中的8个数填充到结果矢量的8个datablock（32Bytes）中去，每个数对应一个datablock。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] repeat 迭代次数。
+ */
 __aicore__ inline void asc_brcb(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint16_t dst_block_stride, uint16_t dst_repeat_stride,
     uint8_t repeat);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @override_id asc_brcb__PUu32_PUu32_u16_u16_u8
+ * @archs 2201
+ * @brief 给定一个输入矢量，每一次取输入矢量中的8个数填充到结果矢量的8个datablock（32Bytes）中去，每个数对应一个datablock。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] repeat 迭代次数。
+ */
 __aicore__ inline void asc_brcb(
     __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint16_t dst_block_stride, uint16_t dst_repeat_stride,
     uint8_t repeat);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @override_id asc_duplicate__PUf16_f16_u8_u16_u16
+ * @archs 2201
+ * @brief 执行矢量复制（Duplicate）操作，将标量值复制填充到矢量中。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（标量）。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_duplicate(
     __ubuf__ half* dst, half src, uint8_t repeat, uint16_t dst_block_stride, uint16_t dst_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @override_id asc_duplicate__PUf16_f16_u32
+ * @archs 2201
+ * @brief 执行矢量复制（Duplicate）操作，将标量值复制填充到矢量中。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（标量）。
+ * @param [in] count 参与连续复制的元素个数。
+ */
 __aicore__ inline void asc_duplicate(__ubuf__ half* dst, half src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @override_id asc_duplicate__PUi16_i16_u8_u16_u16
+ * @archs 2201
+ * @brief 执行矢量复制（Duplicate）操作，将标量值复制填充到矢量中。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（标量）。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_duplicate(
     __ubuf__ int16_t* dst, int16_t src, uint8_t repeat, uint16_t dst_block_stride, uint16_t dst_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @override_id asc_duplicate__PUi16_i16_u32
+ * @archs 2201
+ * @brief 执行矢量复制（Duplicate）操作，将标量值复制填充到矢量中。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（标量）。
+ * @param [in] count 参与连续复制的元素个数。
+ */
 __aicore__ inline void asc_duplicate(__ubuf__ int16_t* dst, int16_t src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @override_id asc_duplicate__PUu16_u16_u8_u16_u16
+ * @archs 2201
+ * @brief 执行矢量复制（Duplicate）操作，将标量值复制填充到矢量中。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（标量）。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_duplicate(
     __ubuf__ uint16_t* dst, uint16_t src, uint8_t repeat, uint16_t dst_block_stride, uint16_t dst_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @override_id asc_duplicate__PUu16_u16_u32
+ * @archs 2201
+ * @brief 执行矢量复制（Duplicate）操作，将标量值复制填充到矢量中。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（标量）。
+ * @param [in] count 参与连续复制的元素个数。
+ */
 __aicore__ inline void asc_duplicate(__ubuf__ uint16_t* dst, uint16_t src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @override_id asc_duplicate__PUbf16_bf16_u8_u16_u16
+ * @archs 2201
+ * @brief 执行矢量复制（Duplicate）操作，将标量值复制填充到矢量中。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（标量）。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_duplicate(
     __ubuf__ bfloat16_t* dst, bfloat16_t src, uint8_t repeat, uint16_t dst_block_stride, uint16_t dst_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @override_id asc_duplicate__PUbf16_bf16_u32
+ * @archs 2201
+ * @brief 执行矢量复制（Duplicate）操作，将标量值复制填充到矢量中。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（标量）。
+ * @param [in] count 参与连续复制的元素个数。
+ */
 __aicore__ inline void asc_duplicate(__ubuf__ bfloat16_t* dst, bfloat16_t src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @override_id asc_duplicate__PUf32_f32_u8_u16_u16
+ * @archs 2201
+ * @brief 执行矢量复制（Duplicate）操作，将标量值复制填充到矢量中。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（标量）。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_duplicate(
     __ubuf__ float* dst, float src, uint8_t repeat, uint16_t dst_block_stride, uint16_t dst_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @override_id asc_duplicate__PUf32_f32_u32
+ * @archs 2201
+ * @brief 执行矢量复制（Duplicate）操作，将标量值复制填充到矢量中。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（标量）。
+ * @param [in] count 参与连续复制的元素个数。
+ */
 __aicore__ inline void asc_duplicate(__ubuf__ float* dst, float src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @override_id asc_duplicate__PUi32_i32_u8_u16_u16
+ * @archs 2201
+ * @brief 执行矢量复制（Duplicate）操作，将标量值复制填充到矢量中。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（标量）。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_duplicate(
     __ubuf__ int32_t* dst, int32_t src, uint8_t repeat, uint16_t dst_block_stride, uint16_t dst_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @override_id asc_duplicate__PUi32_i32_u32
+ * @archs 2201
+ * @brief 执行矢量复制（Duplicate）操作，将标量值复制填充到矢量中。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（标量）。
+ * @param [in] count 参与连续复制的元素个数。
+ */
 __aicore__ inline void asc_duplicate(__ubuf__ int32_t* dst, int32_t src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @override_id asc_duplicate__PUu32_u32_u8_u16_u16
+ * @archs 2201
+ * @brief 执行矢量复制（Duplicate）操作，将标量值复制填充到矢量中。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（标量）。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_duplicate(
     __ubuf__ uint32_t* dst, uint32_t src, uint8_t repeat, uint16_t dst_block_stride, uint16_t dst_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @override_id asc_duplicate__PUu32_u32_u32
+ * @archs 2201
+ * @brief 执行矢量复制（Duplicate）操作，将标量值复制填充到矢量中。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（标量）。
+ * @param [in] count 参与连续复制的元素个数。
+ */
 __aicore__ inline void asc_duplicate(__ubuf__ uint32_t* dst, uint32_t src, uint32_t count);
 
 #endif

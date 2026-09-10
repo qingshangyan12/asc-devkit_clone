@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: "Reg数据类型定义"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md"
+description: "矢量数据寄存器用于存储矢量数据，其长度为`VL`（Vector Length）。在Ascend 950PR/Ascend 950DT产品中，`VL`为256字节，可存储`VL / sizeof(dtype)`个`dtype`类型的元素。例如，`vector_float`可存储`256 / sizeof(float) = 64`个`float`类型的元素。"
+tag: [c_api]
+usage_dependencies:
+  status: not_applicable
+signature:
+  []
+examples: []
+timestamp: "2026-09-10"
+---
+
 # Reg数据类型定义
 
 ## 产品支持情况

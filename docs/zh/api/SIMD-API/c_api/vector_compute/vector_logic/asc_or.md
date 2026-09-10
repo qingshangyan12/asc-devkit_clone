@@ -1,3 +1,40 @@
+---
+okftype: reference.api.cpp
+title: "asc_or"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_or.md"
+description: "每对元素按位或运算。"
+tag: [c_api, compute, bitwise, 'operations:bitwise_or', vector, memory_vector]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_or__PUi16_PUi16_PUi16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_logic.h"
+  - override_id: "asc_or__PUu16_PUu16_PUu16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_logic.h"
+  - override_id: "asc_or__PUi16_PUi16_PUi16_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_logic.h"
+  - override_id: "asc_or__PUu16_PUu16_PUu16_u8_u8_u8_u8_u8_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_logic.h"
+  - override_id: "asc_or_sync__PUi16_PUi16_PUi16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_or_sync__PUu16_PUu16_PUu16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_or
 
 ## 产品支持情况
@@ -36,20 +73,77 @@ $$
 ## 函数原型
 
 - 前n个数据计算
+```yaml
+api_signature:
+  override_id: "asc_or__PUi16_PUi16_PUi16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_logic.h"
+```
+
   ```cpp
   __aicore__ inline void asc_or(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_or__PUu16_PUu16_PUu16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_logic.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_or(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint32_t count)
   ```
 
 - 高维切分计算
+```yaml
+api_signature:
+  override_id: "asc_or__PUi16_PUi16_PUi16_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_logic.h"
+```
+
   ```cpp
   __aicore__ inline void asc_or(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_or__PUu16_PUu16_PUu16_u8_u8_u8_u8_u8_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_logic.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_or(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
   ```
 
 - 同步计算
+```yaml
+api_signature:
+  override_id: "asc_or_sync__PUi16_PUi16_PUi16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
   ```cpp
   __aicore__ inline void asc_or_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
+  ```
+
+```yaml
+api_signature:
+  override_id: "asc_or_sync__PUu16_PUu16_PUu16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+  ```cpp
   __aicore__ inline void asc_or_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint32_t count)
   ```
 

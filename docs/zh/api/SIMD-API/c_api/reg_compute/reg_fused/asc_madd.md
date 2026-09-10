@@ -1,3 +1,21 @@
+---
+okftype: reference.api.cpp
+title: "asc_madd"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_madd.md"
+description: "根据`mask`对目的操作数`dst`与源操作数`src0`按元素相乘后，与源操作数`src1`中的对应元素相加，将结果写入`dst`。其中，`dst`既作为输入参与计算，又用于存储最终结果。"
+tag: [c_api, compute, 'operations:fused_multiply_add', mask, vector, register_vector,
+  elementwise, masked]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_madd__Rv<dtype>_v<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_fused.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_madd
 
 ## 产品支持情况
@@ -35,6 +53,19 @@ dst_i = dst_i \times src0_i + src1_i
 $$
 
 ## 函数原型
+
+```yaml
+api_signature:
+  prototype_id: "asc_madd__Rv<dtype>_v<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_fused.h"
+  dtype:
+    values:
+      - "half"
+      - "bfloat16_t"
+      - "float"
+```
 
 ```c
 __simd_callee__ inline void asc_madd(vector_<dtype>& dst,

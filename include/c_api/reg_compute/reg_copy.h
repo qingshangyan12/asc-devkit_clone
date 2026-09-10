@@ -25,58 +25,220 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_copy__Rvi8_vi8_vb
+ * @archs 3510
+ * @brief 完成数据在寄存器间的搬运。
+ */
 __simd_callee__ inline void asc_copy(vector_int8_t& dst, vector_int8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_copy__Rvu8_vu8_vb
+ * @archs 3510
+ * @brief 完成数据在寄存器间的搬运。
+ */
 __simd_callee__ inline void asc_copy(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_copy__Rvi16_vi16_vb
+ * @archs 3510
+ * @brief 完成数据在寄存器间的搬运。
+ */
 __simd_callee__ inline void asc_copy(vector_int16_t& dst, vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_copy__Rvu16_vu16_vb
+ * @archs 3510
+ * @brief 完成数据在寄存器间的搬运。
+ */
 __simd_callee__ inline void asc_copy(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_copy__Rvf16_vf16_vb
+ * @archs 3510
+ * @brief 完成数据在寄存器间的搬运。
+ */
 __simd_callee__ inline void asc_copy(vector_half& dst, vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_copy__Rvi32_vi32_vb
+ * @archs 3510
+ * @brief 完成数据在寄存器间的搬运。
+ */
 __simd_callee__ inline void asc_copy(vector_int32_t& dst, vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_copy__Rvu32_vu32_vb
+ * @archs 3510
+ * @brief 完成数据在寄存器间的搬运。
+ */
 __simd_callee__ inline void asc_copy(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_copy__Rvf32_vf32_vb
+ * @archs 3510
+ * @brief 完成数据在寄存器间的搬运。
+ */
 __simd_callee__ inline void asc_copy(vector_float& dst, vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_copy__Rvbf16_vbf16_vb
+ * @archs 3510
+ * @brief 完成数据在寄存器间的搬运。
+ */
 __simd_callee__ inline void asc_copy(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_copy__Rvb_vb_vb
+ * @archs 3510
+ * @brief 完成数据在寄存器间的搬运。
+ */
 __simd_callee__ inline void asc_copy(vector_bool& dst, vector_bool src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_copy__Rvb_vb
+ * @archs 3510
+ * @brief 完成数据在寄存器间的搬运。
+ */
 __simd_callee__ inline void asc_copy(vector_bool& dst, vector_bool src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_copy__Rvb_vu16_i16
+ * @archs 3510
+ * @brief 完成数据在寄存器间的搬运。
+ * @param [in] part part决定了src中需要搬运的数据块，具体描述请参考[关键特性说明](#关键特性说明)。&bull; 当数据类型为uint16_t，part∈[0, 15]。&bull; 当数据类型为uint32_t，part∈[0, 31]。
+ */
 __simd_callee__ inline void asc_copy(vector_bool& dst, vector_uint16_t src, int16_t part);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_copy__Rvb_vu32_i16
+ * @archs 3510
+ * @brief 完成数据在寄存器间的搬运。
+ * @param [in] part part决定了src中需要搬运的数据块，具体描述请参考[关键特性说明](#关键特性说明)。&bull; 当数据类型为uint16_t，part∈[0, 15]。&bull; 当数据类型为uint32_t，part∈[0, 31]。
+ */
 __simd_callee__ inline void asc_copy(vector_bool& dst, vector_uint32_t src, int16_t part);
 
 // ==========asc_mask return-value overloads(u8/s8/half/u16/s16/float/u32/s32/bf16/bool)==========
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_mask__vi8_vb
+ * @archs 3510
+ * @brief 将src中被mask筛选的有效元素复制到返回值对应位置，未被mask筛选的位置置为0（ZEROING模式），并通过函数返回值返回结果。
+ */
 __simd_callee__ inline vector_int8_t asc_mask(vector_int8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_mask__vu8_vb
+ * @archs 3510
+ * @brief 将src中被mask筛选的有效元素复制到返回值对应位置，未被mask筛选的位置置为0（ZEROING模式），并通过函数返回值返回结果。
+ */
 __simd_callee__ inline vector_uint8_t asc_mask(vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_mask__vi16_vb
+ * @archs 3510
+ * @brief 将src中被mask筛选的有效元素复制到返回值对应位置，未被mask筛选的位置置为0（ZEROING模式），并通过函数返回值返回结果。
+ */
 __simd_callee__ inline vector_int16_t asc_mask(vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_mask__vu16_vb
+ * @archs 3510
+ * @brief 将src中被mask筛选的有效元素复制到返回值对应位置，未被mask筛选的位置置为0（ZEROING模式），并通过函数返回值返回结果。
+ */
 __simd_callee__ inline vector_uint16_t asc_mask(vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_mask__vf16_vb
+ * @archs 3510
+ * @brief 将src中被mask筛选的有效元素复制到返回值对应位置，未被mask筛选的位置置为0（ZEROING模式），并通过函数返回值返回结果。
+ */
 __simd_callee__ inline vector_half asc_mask(vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_mask__vi32_vb
+ * @archs 3510
+ * @brief 将src中被mask筛选的有效元素复制到返回值对应位置，未被mask筛选的位置置为0（ZEROING模式），并通过函数返回值返回结果。
+ */
 __simd_callee__ inline vector_int32_t asc_mask(vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_mask__vu32_vb
+ * @archs 3510
+ * @brief 将src中被mask筛选的有效元素复制到返回值对应位置，未被mask筛选的位置置为0（ZEROING模式），并通过函数返回值返回结果。
+ */
 __simd_callee__ inline vector_uint32_t asc_mask(vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_mask__vf32_vb
+ * @archs 3510
+ * @brief 将src中被mask筛选的有效元素复制到返回值对应位置，未被mask筛选的位置置为0（ZEROING模式），并通过函数返回值返回结果。
+ */
 __simd_callee__ inline vector_float asc_mask(vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_mask__vbf16_vb
+ * @archs 3510
+ * @brief 将src中被mask筛选的有效元素复制到返回值对应位置，未被mask筛选的位置置为0（ZEROING模式），并通过函数返回值返回结果。
+ */
 __simd_callee__ inline vector_bfloat16_t asc_mask(vector_bfloat16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_mask__vb_vb
+ * @archs 3510
+ * @brief 将src中被mask筛选的有效元素复制到返回值对应位置，未被mask筛选的位置置为0（ZEROING模式），并通过函数返回值返回结果。
+ */
 __simd_callee__ inline vector_bool asc_mask(vector_bool src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_mask__vb
+ * @archs 3510
+ * @brief 将src中被mask筛选的有效元素复制到返回值对应位置，未被mask筛选的位置置为0（ZEROING模式），并通过函数返回值返回结果。
+ */
 __simd_callee__ inline vector_bool asc_mask(vector_bool src);
 
 // ==========asc_extract_mask return-value overloads(u16/u32)==========
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_extract_mask__vu16_i16
+ * @archs 3510
+ * @brief 从矢量数据寄存器中提取掩码寄存器，并通过函数返回值返回结果。
+ * @param [in] src 源矢量数据寄存器。
+ * @param [in] part part决定了src中需要搬运的数据块，具体描述请参考[asc_copy关键特性说明](asc_copy.md#关键特性说明)。&bull; 当数据类型为uint16_t，part∈[0, 15]。&bull; 当数据类型为uint32_t，part∈[0, 31]。
+ */
 __simd_callee__ inline vector_bool asc_extract_mask(vector_uint16_t src, int16_t part);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @override_id asc_extract_mask__vu32_i16
+ * @archs 3510
+ * @brief 从矢量数据寄存器中提取掩码寄存器，并通过函数返回值返回结果。
+ * @param [in] src 源矢量数据寄存器。
+ * @param [in] part part决定了src中需要搬运的数据块，具体描述请参考[asc_copy关键特性说明](asc_copy.md#关键特性说明)。&bull; 当数据类型为uint16_t，part∈[0, 15]。&bull; 当数据类型为uint32_t，part∈[0, 31]。
+ */
 __simd_callee__ inline vector_bool asc_extract_mask(vector_uint32_t src, int16_t part);
 
 #endif

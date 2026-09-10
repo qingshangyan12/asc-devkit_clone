@@ -27,19 +27,72 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.spr
+ * @override_id asc_get_ctrl__z
+ * @archs 3510 2201
+ * @brief 读取CTRL寄存器（控制寄存器）特定比特位上的值。
+ */
 __aicore__ inline int64_t asc_get_ctrl();
 
+/**
+ * @ingroup simd_c_api.spr
+ * @override_id asc_set_ctrl__u64
+ * @archs 3510 2201
+ * @brief 对CTRL寄存器（控制寄存器）的特定比特位进行设置。
+ * @param [in] config 待设置的寄存器值。常用CTRL寄存器比特位说明参考表2。
+ */
 __aicore__ inline void asc_set_ctrl(uint64_t config);
 
+/**
+ * @ingroup simd_c_api.spr
+ * @override_id asc_get_squeeze_status__z
+ * @archs 3510
+ * @brief 读取squeeze操作后保存至AR特殊寄存器的有效数据长度值，用于配合[asc_squeeze_and_storeunalign](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)接口获取已连续搬出的有效数据量。
+ */
 __aicore__ inline int64_t asc_get_squeeze_status();
 
 [[deprecated("NOTICE: asc_get_ar_spr is deprecated. "
              "Please use asc_get_squeeze_status instead.")]]
+/**
+ * @ingroup simd_c_api.spr
+ * @override_id asc_get_ar_spr__z
+ * @archs 3510
+ * @brief **该接口已废弃，请使用[asc_get_squeeze_status](asc_get_squeeze_status.md)实现此功能。
+ */
 __aicore__ inline int64_t asc_get_ar_spr();
 
+/**
+ * @ingroup simd_c_api.spr
+ * @override_id asc_set_saturation_flag__saturation_b
+ * @archs 3510
+ * @brief 按饱和模式类型设置对应饱和开关。`enable_sat`表示API语义上的“是否开启饱和”，接口内部会按模式处理不同语义。
+ * @param [in] saturation_mode 饱和模式类型，取值见[asc_saturation_mode](../defs/enum/asc_saturation_mode.md)。
+ * @param [in] enable_sat 是否开启饱和。`true`表示开启饱和，`false`表示关闭饱和（对INT为截断；对FLOAT/FLOAT8/CAST为非饱和或截断，见上表）。
+ */
 __aicore__ inline void asc_set_saturation_flag(asc_saturation_mode saturation_mode, bool enable_sat);
+/**
+ * @ingroup simd_c_api.spr
+ * @override_id asc_get_saturation_flag__saturation
+ * @archs 3510
+ * @brief 按饱和模式类型读取当前是否开启饱和，并返回布尔类型的结果。
+ * @param [in] saturation_mode 饱和模式类型，取值见[asc_saturation_mode](../defs/enum/asc_saturation_mode.md)。
+ */
 __aicore__ inline bool asc_get_saturation_flag(asc_saturation_mode saturation_mode);
+/**
+ * @ingroup simd_c_api.spr
+ * @override_id asc_set_saturation_strategy__strategy
+ * @archs 3510
+ * @brief 设置饱和控制策略。
+ * @param [in] strategy 饱和控制策略，取值见[asc_override_strategy](../defs/enum/asc_override_strategy.md)。
+ */
 __aicore__ inline void asc_set_saturation_strategy(asc_override_strategy strategy);
+/**
+ * @ingroup simd_c_api.spr
+ * @override_id asc_get_saturation_strategy__z
+ * @archs 3510
+ * @brief 读取当前饱和控制策略。
+ */
 __aicore__ inline asc_override_strategy asc_get_saturation_strategy();
 
 #endif

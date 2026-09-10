@@ -1,3 +1,45 @@
+---
+okftype: reference.api.cpp
+title: "asc_loadalign_postupdate"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_postupdate.md"
+description: "从Unified Buffer（UB）中32字节对齐的起始地址读取数据，并搬入矢量数据寄存器或掩码寄存器，搬运过程中数据格式和内容保持不变。接口采用Post Update模式，搬运完成后自动更新源地址指针。"
+tag: [c_api, data_movement, 'operations:load', vector, register_vector, 'src:unified_buffer',
+  'dst:vector_register', post_update]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_loadalign_postupdate__Rv<dtype>_RPU<dtype>_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - override_id: "asc_loadalign_postupdate__Rvb_RPUu32_i32"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+  - prototype_id: "asc_loadalign_postupdate__Rv<dtype>_RPU<dtype>_u16_u16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/load/loadalign.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_align"
+    archs: ["3510"]
+    override_id: "asc_loadalign_postupdate__Rvf16_RPUf16_i32"
+    file: "reg_load_store_align.asc"
+  - path: "/examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_align"
+    archs: ["3510"]
+    override_id: "asc_loadalign_postupdate__Rvf16_RPUf16_u16_u16_vb"
+    file: "reg_load_store_align.asc"
+  - path: "/examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_mask"
+    archs: ["3510"]
+    override_id: "asc_loadalign_postupdate__Rvf32_RPUf32_i32"
+    file: "reg_load_store_mask.asc"
+  - path: "/examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_mask"
+    archs: ["3510"]
+    override_id: "asc_loadalign_postupdate__Rvb_RPUu32_i32"
+    file: "reg_load_store_mask.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_loadalign_postupdate
 
 ## 产品支持情况
@@ -39,11 +81,50 @@
 
 ### 立即数偏移搬入模式
 
+```yaml
+api_signature:
+  prototype_id: "asc_loadalign_postupdate__Rv<dtype>_RPU<dtype>_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "hifloat8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+      - "int64_t"
+      - "uint64_t"
+```
+
 ```c
 // 搬入矢量数据寄存器。
 __simd_callee__ inline void asc_loadalign_postupdate(vector_<dtype>& dst,
                                                      __ubuf__ <dtype>*& src,
                                                      int32_t offset)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_loadalign_postupdate__Rvb_RPUu32_i32"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+```
+
+```c
 // 搬入掩码寄存器。
 __simd_callee__ inline void asc_loadalign_postupdate(vector_bool& dst,
                                                      __ubuf__ uint32_t*& src,
@@ -64,6 +145,33 @@ __simd_callee__ inline void asc_loadalign_postupdate(vector_float& dst,
 ```
 
 ### 非连续对齐搬入模式
+
+```yaml
+api_signature:
+  prototype_id: "asc_loadalign_postupdate__Rv<dtype>_RPU<dtype>_u16_u16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/load/loadalign.h"
+  dtype:
+    values:
+      - "int4b_t"
+      - "int8_t"
+      - "uint8_t"
+      - "fp4x2_e2m1_t"
+      - "fp4x2_e1m2_t"
+      - "hifloat8_t"
+      - "fp8_e8m0_t"
+      - "fp8_e5m2_t"
+      - "fp8_e4m3fn_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+      - "int64_t"
+```
 
 ```c
 __simd_callee__ inline void asc_loadalign_postupdate(vector_<dtype>& dst,

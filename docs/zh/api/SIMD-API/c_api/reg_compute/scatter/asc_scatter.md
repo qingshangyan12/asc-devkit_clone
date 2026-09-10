@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_scatter"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/scatter/asc_scatter.md"
+description: "根据索引寄存器中的索引值，将源矢量数据寄存器中的元素分散搬出到Unified Buffer（UB）。`mask`用于指示参与搬出的元素，掩码为1的源元素写入`dst`中对应索引位置，掩码为0的源元素不写入目的地址，保留目的地址原数据。搬运过程中数据格式与内容保持不变。本接口在Vector Function（`__simd_vf__`标记的函数）内使用。"
+tag: [c_api, compute, 'operations:scatter', mask, vector, register_vector, masked]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_scatter__PU<dtype>_v<dtype>_v<index_dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_scatter
 
 ## 产品支持情况
@@ -39,6 +56,43 @@
 本接口仅在AIV上执行有效。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  prototype_id: "asc_scatter__PU<dtype>_v<dtype>_v<index_dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  dtype:
+    variants:
+      -
+        dtype: "int8_t"
+        index_dtype: "uint16_t"
+      -
+        dtype: "uint8_t"
+        index_dtype: "uint16_t"
+      -
+        dtype: "int16_t"
+        index_dtype: "uint16_t"
+      -
+        dtype: "uint16_t"
+        index_dtype: "uint16_t"
+      -
+        dtype: "half"
+        index_dtype: "uint16_t"
+      -
+        dtype: "bfloat16_t"
+        index_dtype: "uint16_t"
+      -
+        dtype: "int32_t"
+        index_dtype: "uint32_t"
+      -
+        dtype: "uint32_t"
+        index_dtype: "uint32_t"
+      -
+        dtype: "float"
+        index_dtype: "uint32_t"
+```
 
 ```c
 // 占位符形式

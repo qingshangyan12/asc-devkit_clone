@@ -1,3 +1,24 @@
+---
+okftype: reference.api.cpp
+title: "asc_uint82uint16（废弃）"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82uint16_deprecated.md"
+description: "**该接口通过接口后缀来控制源操作数读取位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_uint82uint16](../reg_compute/reg_convert/asc_uint82uint16.md)的显式位置参数重载替代。"
+tag: [c_api, compute, 'operations:conversion', mask, masked]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_uint82uint16__Rvu16_vu8_vb_icposeven"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_uint82uint16__Rvu16_vu8_vb_icposodd"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_uint82uint16（废弃）
 
 ## 产品支持情况
@@ -55,11 +76,30 @@ def asc_uint82uint16(dst, src, mask, src_pos):
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_uint82uint16__Rvu16_vu8_vb_icposeven"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```c
 __simd_callee__ inline void asc_uint82uint16(vector_uint16_t& dst,
                                              vector_uint8_t src,
                                              vector_bool mask,
                                              std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_uint82uint16__Rvu16_vu8_vb_icposodd"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
 
 __simd_callee__ inline void asc_uint82uint16(vector_uint16_t& dst,
                                              vector_uint8_t src,

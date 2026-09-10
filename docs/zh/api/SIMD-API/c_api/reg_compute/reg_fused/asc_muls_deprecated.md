@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_muls (废弃)"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_muls_deprecated.md"
+description: "对源操作数src和value进行乘法运算再按照数据类型转换的ROUND舍入模式转成half类型，根据mask将结果写入目的操作数dst。"
+tag: [c_api, compute, 'operations:conversion', mask, vector, register_vector, masked,
+  'traits:rounding_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_muls__Rvf16_vf32_f32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_fused.h"
+  - override_id: "asc_muls_v2__Rvf16_vf32_f32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_fused.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_muls (废弃)
 
 ## 产品支持情况
@@ -36,9 +58,28 @@ $$
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_muls__Rvf16_vf32_f32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_fused.h"
+```
+
 ```cpp
 // 数据写入索引为偶数的位置
 __simd_callee__ inline void asc_muls(vector_half& dst, vector_float src, float value, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_muls_v2__Rvf16_vf32_f32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_fused.h"
+```
+
+```cpp
 // 数据写入索引为奇数的位置
 __simd_callee__ inline void asc_muls_v2(vector_half& dst, vector_float src, float value, vector_bool mask)
 ```

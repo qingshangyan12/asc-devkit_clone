@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_get_ctrl"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_get_ctrl.md"
+description: "读取CTRL寄存器（控制寄存器）特定比特位上的值。"
+tag: [c_api, 'roles:query']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_get_ctrl__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/spr/spr.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_get_ctrl
 
 ## 产品支持情况
@@ -31,6 +48,14 @@
 读取CTRL寄存器（控制寄存器）特定比特位上的值。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_get_ctrl__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/spr/spr.h"
+```
 
 ```cpp
 __aicore__ inline int64_t asc_get_ctrl()

@@ -28,13 +28,77 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_store
+ * @override_id asc_store_dev__PGi8_i8
+ * @archs 3510
+ * @brief 不经过DCache向GM地址上写数据。 当多核操作GM地址时，如果数据无法对齐到Cache Line，经过DCache的方式下，由于按照Cache Line大小进行读写，会导致多核数据随机覆盖的问题。此时，可以采用不经过DCache直接读写GM地址的方式，从而避免上述随机覆盖的问题。
+ * @param [out] addr 目标GM地址。
+ * @param [in] value 待写入目标的数据。
+ */
 __aicore__ inline void asc_store_dev(__gm__ int8_t* addr, int8_t value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_store
+ * @override_id asc_store_dev__PGu8_u8
+ * @archs 3510
+ * @brief 不经过DCache向GM地址上写数据。 当多核操作GM地址时，如果数据无法对齐到Cache Line，经过DCache的方式下，由于按照Cache Line大小进行读写，会导致多核数据随机覆盖的问题。此时，可以采用不经过DCache直接读写GM地址的方式，从而避免上述随机覆盖的问题。
+ * @param [out] addr 目标GM地址。
+ * @param [in] value 待写入目标的数据。
+ */
 __aicore__ inline void asc_store_dev(__gm__ uint8_t* addr, uint8_t value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_store
+ * @override_id asc_store_dev__PGi16_i16
+ * @archs 3510
+ * @brief 不经过DCache向GM地址上写数据。 当多核操作GM地址时，如果数据无法对齐到Cache Line，经过DCache的方式下，由于按照Cache Line大小进行读写，会导致多核数据随机覆盖的问题。此时，可以采用不经过DCache直接读写GM地址的方式，从而避免上述随机覆盖的问题。
+ * @param [out] addr 目标GM地址。
+ * @param [in] value 待写入目标的数据。
+ */
 __aicore__ inline void asc_store_dev(__gm__ int16_t* addr, int16_t value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_store
+ * @override_id asc_store_dev__PGu16_u16
+ * @archs 3510
+ * @brief 不经过DCache向GM地址上写数据。 当多核操作GM地址时，如果数据无法对齐到Cache Line，经过DCache的方式下，由于按照Cache Line大小进行读写，会导致多核数据随机覆盖的问题。此时，可以采用不经过DCache直接读写GM地址的方式，从而避免上述随机覆盖的问题。
+ * @param [out] addr 目标GM地址。
+ * @param [in] value 待写入目标的数据。
+ */
 __aicore__ inline void asc_store_dev(__gm__ uint16_t* addr, uint16_t value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_store
+ * @override_id asc_store_dev__PGi32_i32
+ * @archs 3510
+ * @brief 不经过DCache向GM地址上写数据。 当多核操作GM地址时，如果数据无法对齐到Cache Line，经过DCache的方式下，由于按照Cache Line大小进行读写，会导致多核数据随机覆盖的问题。此时，可以采用不经过DCache直接读写GM地址的方式，从而避免上述随机覆盖的问题。
+ * @param [out] addr 目标GM地址。
+ * @param [in] value 待写入目标的数据。
+ */
 __aicore__ inline void asc_store_dev(__gm__ int32_t* addr, int32_t value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_store
+ * @override_id asc_store_dev__PGu32_u32
+ * @archs 3510
+ * @brief 不经过DCache向GM地址上写数据。 当多核操作GM地址时，如果数据无法对齐到Cache Line，经过DCache的方式下，由于按照Cache Line大小进行读写，会导致多核数据随机覆盖的问题。此时，可以采用不经过DCache直接读写GM地址的方式，从而避免上述随机覆盖的问题。
+ * @param [out] addr 目标GM地址。
+ * @param [in] value 待写入目标的数据。
+ */
 __aicore__ inline void asc_store_dev(__gm__ uint32_t* addr, uint32_t value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_store
+ * @override_id asc_store_dev__PGi64_i64
+ * @archs 3510
+ * @brief 不经过DCache向GM地址上写数据。 当多核操作GM地址时，如果数据无法对齐到Cache Line，经过DCache的方式下，由于按照Cache Line大小进行读写，会导致多核数据随机覆盖的问题。此时，可以采用不经过DCache直接读写GM地址的方式，从而避免上述随机覆盖的问题。
+ * @param [out] addr 目标GM地址。
+ * @param [in] value 待写入目标的数据。
+ */
 __aicore__ inline void asc_store_dev(__gm__ int64_t* addr, int64_t value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_store
+ * @override_id asc_store_dev__PGu64_u64
+ * @archs 3510
+ * @brief 不经过DCache向GM地址上写数据。 当多核操作GM地址时，如果数据无法对齐到Cache Line，经过DCache的方式下，由于按照Cache Line大小进行读写，会导致多核数据随机覆盖的问题。此时，可以采用不经过DCache直接读写GM地址的方式，从而避免上述随机覆盖的问题。
+ * @param [out] addr 目标GM地址。
+ * @param [in] value 待写入目标的数据。
+ */
 __aicore__ inline void asc_store_dev(__gm__ uint64_t* addr, uint64_t value);
 
 #endif

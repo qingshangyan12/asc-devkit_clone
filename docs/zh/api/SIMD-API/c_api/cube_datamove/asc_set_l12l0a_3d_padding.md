@@ -1,3 +1,24 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_l12l0a_3d_padding"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0a_3d_padding.md"
+description: "用于调用[asc_copy_l12l0a_arch_3510（3D矩阵搬运）](asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md)时设置3D格式分形矩阵搬运（im2col展开）搬运指令使用的填充值。`asc_copy_l12l0a`接口中的`f_matrix_ctrl`参数设置为`false`时，3D格式分形矩阵搬运（im2col展开）场景会使用本接口设置的值做为填充值。"
+tag: [c_api, data_movement_configuration]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_set_l12l0a_3d_padding__<dtype>"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_set_l12l0a_3d_padding__u64"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_l12l0a_3d_padding
 
 ## 产品支持情况
@@ -34,8 +55,38 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  prototype_id: "asc_set_l12l0a_3d_padding__<dtype>"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
 ```cpp
 __aicore__ inline void asc_set_l12l0a_3d_padding(<dtype> padding_value)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_set_l12l0a_3d_padding__u64"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_set_l12l0a_3d_padding(uint64_t config)
 ```
 

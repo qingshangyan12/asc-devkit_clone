@@ -1,3 +1,24 @@
+---
+okftype: reference.api.cpp
+title: "asc_lt"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_lt.md"
+description: "lt表示小于（less than），该接口用于逐元素比较两个源操作数大小，将比较结果（$src0_i < src1_i$）作为返回值返回或写入目的操作数`dst`对应比特位。如果比较结果为真，则对应比特位为1，否则为0。"
+tag: [c_api, compute, 'operations:comparison', vector, register_vector]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_lt__v<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_compare.h"
+  - prototype_id: "asc_lt__Rvb_v<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_compare.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_lt
 
 ## 产品支持情况
@@ -40,11 +61,52 @@ $$
 
 ## 函数原型
 
+```yaml
+api_signature:
+  prototype_id: "asc_lt__v<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_compare.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
 ```c
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_bool asc_lt(vector_<dtype> src0,
                                           vector_<dtype> src1,
                                           vector_bool mask)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_lt__Rvb_v<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_compare.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
+```c
 
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_lt(vector_bool& dst,

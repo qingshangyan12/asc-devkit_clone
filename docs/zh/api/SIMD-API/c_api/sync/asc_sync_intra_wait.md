@@ -1,3 +1,27 @@
+---
+okftype: reference.api.cpp
+title: "asc_sync_intra_wait"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/asc_sync_intra_wait.md"
+description: "本接口与[asc_sync_intra_arrive](asc_sync_intra_arrive.md)配对使用，实现单AI Core内AIC与单个AIV之间的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式4）。"
+tag: [c_api, 'operations:synchronization']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_sync_intra_wait__pipe_u8"
+    archs: ["3510"]
+    headers: []
+  - override_id: "asc_sync_intra_wait__pipe_u64"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/sync/sync.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_ub2l1"
+    archs: ["3510"]
+    override_id: "asc_sync_intra_wait__pipe_u64"
+    file: "data_copy_ub2l1.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_sync_intra_wait
 
 ## 产品支持情况
@@ -39,9 +63,27 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_sync_intra_wait__pipe_u8"
+  archs: ["3510"]
+  headers: []
+```
+
 ```c
 __aicore__ inline void asc_sync_intra_wait(pipe_t pipe,
                                            uint8_t sync_id)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_sync_intra_wait__pipe_u64"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/sync/sync.h"
+```
+
+```c
 __aicore__ inline void asc_sync_intra_wait(pipe_t pipe,
                                            uint64_t sync_id)
 ```

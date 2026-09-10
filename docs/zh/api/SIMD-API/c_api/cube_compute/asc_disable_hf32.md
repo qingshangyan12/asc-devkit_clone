@@ -1,3 +1,21 @@
+---
+okftype: reference.api.cpp
+title: "asc_disable_hf32"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/asc_disable_hf32.md"
+description: "本接口用于设置Mmad计算关闭HF32模式，其作用与[asc_enable_hf32](./asc_enable_hf32.md)相反，两个接口不同时生效。关闭HF32模式后，L0A Buffer与L0B Buffer中的`float`数据在参与Mmad计算之前不做舍入处理。"
+tag: [c_api, compute, 'roles:configuration', 'operations:matrix_multiply_accumulate',
+  matrix]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_disable_hf32__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/cube_compute/cube_compute.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_disable_hf32
 
 ## 产品支持情况
@@ -33,6 +51,14 @@
 本接口为矩阵计算相关配置接口，仅在AIC上生效。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_disable_hf32__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/cube_compute/cube_compute.h"
+```
 
 ```c
 __aicore__ inline void asc_disable_hf32()

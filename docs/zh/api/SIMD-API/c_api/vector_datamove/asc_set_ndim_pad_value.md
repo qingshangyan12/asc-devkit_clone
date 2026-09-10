@@ -1,3 +1,24 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_ndim_pad_value"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md"
+description: "本接口用于设置[asc_ndim_copy_gm2ub](asc_ndim_copy_gm2ub.md)在常数填充模式下使用的填充值。当`padding_mode`设置为`true`时，后续调用`asc_ndim_copy_gm2ub`将使用该值填充搬运数据的边界区域。"
+tag: [c_api, data_movement_configuration]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_set_ndim_pad_value__<dtype>"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_ub2l1"
+    archs: ["3510"]
+    override_id: "asc_set_ndim_pad_value__f16"
+    file: "data_copy_ub2l1.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_set_ndim_pad_value
 
 ## 产品支持情况
@@ -35,6 +56,25 @@
 本接口仅在AIV上执行有效，在AIC上调用为空操作。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  prototype_id: "asc_set_ndim_pad_value__<dtype>"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
 
 ```c
 __aicore__ inline void asc_set_ndim_pad_value(<dtype> pad_value)

@@ -1,3 +1,21 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_nthbit"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_set_nthbit.md"
+description: "将`uint64_t`数据的指定二进制位置为1，其余位保持不变。返回修改后的`uint64_t`整数。"
+tag: [c_api, compute, 'roles:configuration', bitwise, 'operations:bit_manipulation',
+  scalar]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_set_nthbit__u64_i64"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/scalar_compute/compute/scalar_bit.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_set_nthbit
 
 ## 产品支持情况
@@ -31,6 +49,14 @@
 将`uint64_t`数据的指定二进制位置为1，其余位保持不变。返回修改后的`uint64_t`整数。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_set_nthbit__u64_i64"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/scalar_compute/compute/scalar_bit.h"
+```
 
 ```c
 __aicore__ inline uint64_t asc_set_nthbit(uint64_t bits,

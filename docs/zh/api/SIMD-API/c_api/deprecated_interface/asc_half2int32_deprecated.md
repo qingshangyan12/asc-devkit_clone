@@ -1,3 +1,56 @@
+---
+okftype: reference.api.cpp
+title: "asc_half2int32（废弃）"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_half2int32_deprecated.md"
+description: "**该接口通过接口后缀来控制源操作数读取位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_half2int32](../reg_compute/reg_convert/asc_half2int32.md)的显式位置参数重载替代。"
+tag: [c_api, compute, 'operations:conversion', mask, masked, 'traits:rounding_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_half2int32_rd__Rvi32_vf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2int32_rd_v2__Rvi32_vf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2int32_rn__Rvi32_vf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2int32_rn_v2__Rvi32_vf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2int32_rna__Rvi32_vf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2int32_rna_v2__Rvi32_vf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2int32_ru__Rvi32_vf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2int32_ru_v2__Rvi32_vf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2int32_rz__Rvi32_vf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_half2int32_rz_v2__Rvi32_vf16_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_half2int32（废弃）
 
 ## 产品支持情况
@@ -65,8 +118,142 @@ def asc_half2int32_rd_v2(dst, src, mask):
 
 ### 模板原型（占位符形式）
 
+```yaml
+api_signature:
+  override_id: "asc_half2int32_rd__Rvi32_vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```c
-__simd_callee__ inline void asc_half2int32_<round_mode><position_mode>(vector_int32_t& dst,
+__simd_callee__ inline void asc_half2int32_rd(vector_int32_t& dst,
+                                                                       vector_half src,
+                                                                       vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2int32_rd_v2__Rvi32_vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_half2int32_rd_v2(vector_int32_t& dst,
+                                                                       vector_half src,
+                                                                       vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2int32_rn__Rvi32_vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_half2int32_rn(vector_int32_t& dst,
+                                                                       vector_half src,
+                                                                       vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2int32_rn_v2__Rvi32_vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_half2int32_rn_v2(vector_int32_t& dst,
+                                                                       vector_half src,
+                                                                       vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2int32_rna__Rvi32_vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_half2int32_rna(vector_int32_t& dst,
+                                                                       vector_half src,
+                                                                       vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2int32_rna_v2__Rvi32_vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_half2int32_rna_v2(vector_int32_t& dst,
+                                                                       vector_half src,
+                                                                       vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2int32_ru__Rvi32_vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_half2int32_ru(vector_int32_t& dst,
+                                                                       vector_half src,
+                                                                       vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2int32_ru_v2__Rvi32_vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_half2int32_ru_v2(vector_int32_t& dst,
+                                                                       vector_half src,
+                                                                       vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2int32_rz__Rvi32_vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_half2int32_rz(vector_int32_t& dst,
+                                                                       vector_half src,
+                                                                       vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_half2int32_rz_v2__Rvi32_vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```c
+__simd_callee__ inline void asc_half2int32_rz_v2(vector_int32_t& dst,
                                                                        vector_half src,
                                                                        vector_bool mask)
 ```
@@ -77,6 +264,14 @@ __simd_callee__ inline void asc_half2int32_<round_mode><position_mode>(vector_in
 - `<position_mode>`表示`src`读取的位置，为空时，结果读取`src`的偶数索引位置；取值为`_v2`时，结果读取`src`的奇数索引位置。
 
 ### 函数原型典型示例
+
+```yaml
+api_signature:
+  override_id: "asc_half2int32_rd__Rvi32_vf16_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
 
 ```c
 // FLOOR舍入模式，读取src索引为偶数的位置

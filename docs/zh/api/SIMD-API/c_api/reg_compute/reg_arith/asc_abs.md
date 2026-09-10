@@ -3,6 +3,10 @@ okftype: reference.api.cpp
 title: "asc_abs"
 resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md"
 description: "根据`mask`对源操作数`src`按元素取绝对值，得到计算结果。"
+tag: [c_api, compute, arithmetic, absolute, mask, vector, register_vector, 'src:vector_register',
+  'dst:vector_register', elementwise, masked]
+usage_dependencies:
+  status: unconfirmed
 signature:
   - prototype_id: "asc_abs__v<dtype>_vb"
     archs: ["3510"]

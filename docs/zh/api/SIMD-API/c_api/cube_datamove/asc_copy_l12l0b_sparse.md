@@ -1,3 +1,24 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_l12l0b_sparse"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_sparse.md"
+description: "用于搬运存放在L1 Buffer里的512B大小的稠密权重矩阵到L0B Buffer里，同时读取128B大小的索引矩阵用于稠密矩阵的稀疏化。"
+tag: [c_api, data_movement, copy, 'traits:sparse_input']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_copy_l12l0b_sparse__PCBi8_PL1i8_PL1i8_u16_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l12l0b_sparse_sync__PCBi8_PL1i8_PL1i8_u16_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_copy_l12l0b_sparse
 
 ## 产品支持情况
@@ -35,11 +56,27 @@
 ## 函数原型
 
 - 高维切分搬运
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_sparse__PCBi8_PL1i8_PL1i8_u16_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
   ```cpp
   __aicore__ inline void asc_copy_l12l0b_sparse(__cb__ int8_t* dst, __cbuf__ int8_t* src, __cbuf__ int8_t* index, uint16_t start_index, uint8_t repeat)
   ```
 
 - 同步搬运
+```yaml
+api_signature:
+  override_id: "asc_copy_l12l0b_sparse_sync__PCBi8_PL1i8_PL1i8_u16_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
   ```cpp
   __aicore__ inline void asc_copy_l12l0b_sparse_sync(__cb__ int8_t* dst, __cbuf__ int8_t* src, __cbuf__ int8_t* index, uint16_t start_index, uint8_t repeat)
   ```

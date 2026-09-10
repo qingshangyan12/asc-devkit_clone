@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_le_scalar"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_le_scalar.md"
+description: "根据`mask`将源操作数`src`按元素与标量`value`进行二进制比较，若$src_i \\leq value$则计算结果对应位为1，否则为0。计算结果作为返回值返回或写入目的操作数`dst`，每个元素的比较结果占一个bit。"
+tag: [c_api, compute, 'operations:comparison', mask, scalar, vector, register_vector,
+  elementwise, masked, scalar_operand]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_le_scalar__v<dtype>_<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_compare.h"
+  - prototype_id: "asc_le_scalar__Rvb_v<dtype>_<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_compare.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_le_scalar
 
 ## 产品支持情况
@@ -42,11 +64,52 @@ $$
 
 ## 函数原型
 
+```yaml
+api_signature:
+  prototype_id: "asc_le_scalar__v<dtype>_<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_compare.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
 ```c
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_bool asc_le_scalar(vector_<dtype> src,
                                                  <dtype> value,
                                                  vector_bool mask)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_le_scalar__Rvb_v<dtype>_<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_compare.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
+```c
 
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_le_scalar(vector_bool& dst,

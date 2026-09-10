@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_shiftright"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftright.md"
+description: "根据掩码对源操作数矢量数据寄存器中的元素执行右移，右移位数由矢量数据寄存器`shift`中对应元素指定，并将结果通过函数返回值返回或写入目的操作数。掩码对应位置为1的元素参与计算，为0的元素在输出结果中置零。"
+tag: [c_api, compute, bitwise, 'operations:bitwise_shift', mask, vector, register_vector,
+  masked]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - prototype_id: "asc_shiftright__v<dtype0>_v<dtype1>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_logic.h"
+  - prototype_id: "asc_shiftright__Rv<dtype0>_v<dtype0>_v<dtype1>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_logic.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_shiftright
 
 ## 产品支持情况
@@ -43,11 +65,70 @@ $$
 
 ## 函数原型
 
+```yaml
+api_signature:
+  prototype_id: "asc_shiftright__v<dtype0>_v<dtype1>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_logic.h"
+  dtype:
+    variants:
+      -
+        dtype0: "int8_t"
+        dtype1: "int8_t"
+      -
+        dtype0: "uint8_t"
+        dtype1: "int8_t"
+      -
+        dtype0: "int16_t"
+        dtype1: "int16_t"
+      -
+        dtype0: "uint16_t"
+        dtype1: "int16_t"
+      -
+        dtype0: "int32_t"
+        dtype1: "int32_t"
+      -
+        dtype0: "uint32_t"
+        dtype1: "int32_t"
+```
+
 ```c
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype0> asc_shiftright(vector_<dtype0> src,
                                                       vector_<dtype1> shift,
                                                       vector_bool mask)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_shiftright__Rv<dtype0>_v<dtype0>_v<dtype1>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_logic.h"
+  dtype:
+    variants:
+      -
+        dtype0: "int8_t"
+        dtype1: "int8_t"
+      -
+        dtype0: "uint8_t"
+        dtype1: "int8_t"
+      -
+        dtype0: "int16_t"
+        dtype1: "int16_t"
+      -
+        dtype0: "uint16_t"
+        dtype1: "int16_t"
+      -
+        dtype0: "int32_t"
+        dtype1: "int32_t"
+      -
+        dtype0: "uint32_t"
+        dtype1: "int32_t"
+```
+
+```c
 
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_shiftright(vector_<dtype0>& dst,

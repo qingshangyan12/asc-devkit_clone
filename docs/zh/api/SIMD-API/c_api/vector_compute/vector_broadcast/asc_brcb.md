@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: "asc_brcb"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_brcb.md"
+description: "给定一个输入矢量，每一次取输入矢量中的8个数填充到结果矢量的8个datablock（32Bytes）中去，每个数对应一个datablock。"
+tag: [c_api, compute, 'operations:broadcast', vector, memory_vector]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_brcb__PUu16_PUu16_u16_u16_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - override_id: "asc_brcb__PUu32_PUu32_u16_u16_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - override_id: "asc_brcb_sync__PUu16_PUu16_u16_u16_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_brcb_sync__PUu32_PUu32_u16_u16_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_brcb
 
 ## 产品支持情况
@@ -34,15 +63,53 @@
 
 - 高维切分计算
 
+```yaml
+api_signature:
+  override_id: "asc_brcb__PUu16_PUu16_u16_u16_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+```
+
     ```cpp
     __aicore__ inline void asc_brcb(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint16_t dst_block_stride, uint16_t dst_repeat_stride, uint8_t repeat)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_brcb__PUu32_PUu32_u16_u16_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_brcb(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint16_t dst_block_stride, uint16_t dst_repeat_stride, uint8_t repeat)
     ```
 
 - 同步高维切分计算
 
+```yaml
+api_signature:
+  override_id: "asc_brcb_sync__PUu16_PUu16_u16_u16_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
     ```cpp
     __aicore__ inline void asc_brcb_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint16_t dst_block_stride, uint16_t dst_repeat_stride, uint8_t repeat)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_brcb_sync__PUu32_PUu32_u16_u16_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_brcb_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint16_t dst_block_stride, uint16_t dst_repeat_stride, uint8_t repeat)
     ```
 

@@ -1,3 +1,63 @@
+---
+okftype: reference.api.cpp
+title: "asc_deq_int162b8"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int162b8.md"
+description: "将int16_t类型转换为int8_t或uint8_t类型，并将数据存放在每个DataBlock的高半块或低半块。使用该接口前需要调用[asc_set_deq_scale](asc_set_deq_scale.md)接口设置量化参数。"
+tag: [c_api, compute, 'operations:conversion', vector, memory_vector]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_deq_int162b8_h__PUi8_PUi16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_fused.h"
+  - override_id: "asc_deq_int162b8_h__PUu8_PUi16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_fused.h"
+  - override_id: "asc_deq_int162b8_l__PUi8_PUi16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_fused.h"
+  - override_id: "asc_deq_int162b8_l__PUu8_PUi16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_fused.h"
+  - override_id: "asc_deq_int162b8_h__PUi8_PUi16_u8_u16_u16_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_fused.h"
+  - override_id: "asc_deq_int162b8_h__PUu8_PUi16_u8_u16_u16_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_fused.h"
+  - override_id: "asc_deq_int162b8_l__PUi8_PUi16_u8_u16_u16_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_fused.h"
+  - override_id: "asc_deq_int162b8_l__PUu8_PUi16_u8_u16_u16_u8_u8"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_fused.h"
+  - override_id: "asc_deq_int162b8_h_sync__PUi8_PUi16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_deq_int162b8_h_sync__PUu8_PUi16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_deq_int162b8_l_sync__PUi8_PUi16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+  - override_id: "asc_deq_int162b8_l_sync__PUu8_PUi16_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
 
 # asc_deq_int162b8
 
@@ -47,28 +107,151 @@ $$
 
 - 前n个数据计算
 
+```yaml
+api_signature:
+  override_id: "asc_deq_int162b8_h__PUi8_PUi16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_fused.h"
+```
+
     ```cpp
     __aicore__ inline void asc_deq_int162b8_h(__ubuf__ int8_t* dst, __ubuf__ int16_t* src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_deq_int162b8_h__PUu8_PUi16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_fused.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_deq_int162b8_h(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_deq_int162b8_l__PUi8_PUi16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_fused.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_deq_int162b8_l(__ubuf__ int8_t* dst, __ubuf__ int16_t* src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_deq_int162b8_l__PUu8_PUi16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_fused.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_deq_int162b8_l(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint32_t count)
     ```
 
 - 高维切分计算
 
+```yaml
+api_signature:
+  override_id: "asc_deq_int162b8_h__PUi8_PUi16_u8_u16_u16_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_fused.h"
+```
+
     ```cpp
     __aicore__ inline void asc_deq_int162b8_h(__ubuf__ int8_t* dst, __ubuf__ int16_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint8_t dst_repeat_stride, uint8_t src_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_deq_int162b8_h__PUu8_PUi16_u8_u16_u16_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_fused.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_deq_int162b8_h(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint8_t dst_repeat_stride, uint8_t src_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_deq_int162b8_l__PUi8_PUi16_u8_u16_u16_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_fused.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_deq_int162b8_l(__ubuf__ int8_t* dst, __ubuf__ int16_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint8_t dst_repeat_stride, uint8_t src_repeat_stride)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_deq_int162b8_l__PUu8_PUi16_u8_u16_u16_u8_u8"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_fused.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_deq_int162b8_l(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint8_t dst_repeat_stride, uint8_t src_repeat_stride)
     ```
 
 - 同步计算
 
+```yaml
+api_signature:
+  override_id: "asc_deq_int162b8_h_sync__PUi8_PUi16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
     ```cpp
     __aicore__ inline void asc_deq_int162b8_h_sync(__ubuf__ int8_t* dst, __ubuf__ int16_t* src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_deq_int162b8_h_sync__PUu8_PUi16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_deq_int162b8_h_sync(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_deq_int162b8_l_sync__PUi8_PUi16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_deq_int162b8_l_sync(__ubuf__ int8_t* dst, __ubuf__ int16_t* src, uint32_t count)
+    ```
+
+```yaml
+api_signature:
+  override_id: "asc_deq_int162b8_l_sync__PUu8_PUi16_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
+
+    ```cpp
     __aicore__ inline void asc_deq_int162b8_l_sync(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint32_t count)
     ```
 

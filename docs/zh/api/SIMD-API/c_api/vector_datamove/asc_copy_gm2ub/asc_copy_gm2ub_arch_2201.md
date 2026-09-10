@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_gm2ub"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md"
+description: "将数据从Global Memory (GM)搬运到Unified Buffer（UB）。"
+tag: [c_api, data_movement, copy, 'src:global_memory', 'dst:unified_buffer']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_copy_gm2ub__PUv_PGv_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy_gm2ub__PUv_PGv_u16_u16_u16_u16"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_datamove/vector_datamove.h"
+  - override_id: "asc_copy_gm2ub_sync__PUv_PGv_u32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_copy_gm2ub
 
 ## 产品支持情况
@@ -34,17 +59,41 @@
 
 - 前n个数据搬运
 
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub__PUv_PGv_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
 ```cpp
 __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
 ```
 
 - 高维切分搬运
 
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub__PUv_PGv_u16_u16_u16_u16"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
 ```cpp
 __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
 ```
 
 - 同步计算
+
+```yaml
+api_signature:
+  override_id: "asc_copy_gm2ub_sync__PUv_PGv_u32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/composite/vector_compute_composite.h"
+```
 
 ```cpp
 __aicore__ inline void asc_copy_gm2ub_sync(__ubuf__ void* dst, __gm__ void* src, uint32_t size)

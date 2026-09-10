@@ -1,3 +1,24 @@
+---
+okftype: reference.api.cpp
+title: "asc_sync_vec"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/asc_sync_vec.md"
+description: "**无入参函数原型`asc_sync_vec()`接口已废弃，请使用[asc_sync](asc_sync.md)执行针对所有流水线的同步操作。"
+tag: [c_api, 'operations:synchronization']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_sync_vec__i"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/sync/sync.h"
+  - override_id: "asc_sync_vec__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/sync/sync.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_sync_vec
 
 ## 产品支持情况
@@ -34,8 +55,27 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_sync_vec__i"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/sync/sync.h"
+```
+
 ```cpp
 __aicore__ inline void asc_sync_vec(int id)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_sync_vec__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/sync/sync.h"
+```
+
+```cpp
 __aicore__ inline void asc_sync_vec()
 ```
 

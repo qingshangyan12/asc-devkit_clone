@@ -26,265 +26,1195 @@
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
 #endif
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_set_deq_scale__f32_i16_b
+ * @archs 2201
+ * @brief 设置DEQSCALE（量化参数）寄存器的值。
+ * @param [in] offset 量化参数，int16_t类型，只有前9位有效。
+ * @param [in] sign_mode bool类型，表示量化结果是否带符号。
+ */
 __aicore__ inline void asc_set_deq_scale(float scale, int16_t offset, bool sign_mode);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_set_deq_scale__PUu64_Avdeqf32_Avdeqi16_Avdeqb
+ * @archs 2201
+ * @brief 设置DEQSCALE（量化参数）寄存器的值。
+ * @param [in] tmp 一块临时内存区域，用于存储一组大小为16的量化参数。
+ * @param [in] scale_arr float数组类型，大小为16，用于存储一组量化参数。
+ * @param [in] offset_arr int16_t数组类型，大小为16，用于存储一组量化参数。
+ * @param [in] sign_mode_arr bool数组类型，大小为16，用于存储一组量化参数。
+ */
 __aicore__ inline void asc_set_deq_scale(
     __ubuf__ uint64_t* tmp, float scale_arr[ASC_VDEQ_SIZE], int16_t offset_arr[ASC_VDEQ_SIZE],
     bool sign_mode_arr[ASC_VDEQ_SIZE]);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_set_deq_scale__f16
+ * @archs 2201
+ * @brief 设置DEQSCALE（量化参数）寄存器的值。
+ */
 __aicore__ inline void asc_set_deq_scale(half scale);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_mul_cast_half2int8__PUi8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
+ * @archs 2201
+ * @brief 按元素求积，并将结果转换为int8_t类型。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src0_block_stride 源操作数0单次迭代内不同DataBlock间地址步长。
+ * @param [in] src1_block_stride 源操作数1单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_mul_cast_half2int8(
     __ubuf__ int8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_mul_cast_half2int8__PUi8_PUf16_PUf16_u32
+ * @archs 2201
+ * @brief 按元素求积，并将结果转换为int8_t类型。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_mul_cast_half2int8(
     __ubuf__ int8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_mul_cast_half2uint8__PUu8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
+ * @archs 2201
+ * @brief 按元素求积，并将结果转换为uint8_t类型。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数0（矢量）的起始地址。
+ * @param [in] src1 源操作数1（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src0_block_stride 源操作数0单次迭代内不同DataBlock间地址步长。
+ * @param [in] src1_block_stride 源操作数1单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_mul_cast_half2uint8(
     __ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_mul_cast_half2uint8__PUu8_PUf16_PUf16_u32
+ * @archs 2201
+ * @brief 按元素求积，并将结果转换为uint8_t类型。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数0（矢量）的起始地址。
+ * @param [in] src1 源操作数1（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_mul_cast_half2uint8(
     __ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_deq_int322half__PUf16_PUi32_u8_u16_u16_u8_u8
+ * @archs 2201
+ * @brief 对输入的int32_t类型的数据按元素做量化并转换为half类型。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_deq_int322half(
     __ubuf__ half* dst, __ubuf__ int32_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
     uint8_t dst_repeat_stride, uint8_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_deq_int322half__PUf16_PUi32_u32
+ * @archs 2201
+ * @brief 对输入的int32_t类型的数据按元素做量化并转换为half类型。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_deq_int322half(__ubuf__ half* dst, __ubuf__ int32_t* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_relu__PUf16_PUf16_u8_u16_u16_u16_u16
+ * @archs 2201
+ * @brief 按元素做线性整流Relu。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_relu(
     __ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
     uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_relu__PUf16_PUf16_u32
+ * @archs 2201
+ * @brief 按元素做线性整流Relu。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_relu(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_relu__PUf32_PUf32_u8_u16_u16_u16_u16
+ * @archs 2201
+ * @brief 按元素做线性整流Relu。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_relu(
     __ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
     uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_relu__PUf32_PUf32_u32
+ * @archs 2201
+ * @brief 按元素做线性整流Relu。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_relu(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_relu__PUi32_PUi32_u8_u16_u16_u16_u16
+ * @archs 2201
+ * @brief 按元素做线性整流Relu。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_relu(
     __ubuf__ int32_t* dst, __ubuf__ int32_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
     uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_relu__PUi32_PUi32_u32
+ * @archs 2201
+ * @brief 按元素做线性整流Relu。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_relu(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_fma__PUf16_PUf16_PUf16_u32
+ * @archs 2201
+ * @brief 按元素将src0和src1相乘并和dst相加。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_fma(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_fma__PUf16_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
+ * @archs 2201
+ * @brief 按元素将src0和src1相乘并和dst相加。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src0_block_stride 源操作数0单次迭代内不同DataBlock间地址步长。
+ * @param [in] src1_block_stride 源操作数1单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_fma(
     __ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_fma__PUf32_PUf32_PUf32_u32
+ * @archs 2201
+ * @brief 按元素将src0和src1相乘并和dst相加。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_fma(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_fma__PUf32_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
+ * @archs 2201
+ * @brief 按元素将src0和src1相乘并和dst相加。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src0_block_stride 源操作数0单次迭代内不同DataBlock间地址步长。
+ * @param [in] src1_block_stride 源操作数1单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_fma(
     __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_fma__PUf32_PUf16_PUf16_u32
+ * @archs 2201
+ * @brief 按元素将src0和src1相乘并和dst相加。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_fma(__ubuf__ float* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_fma__PUf32_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
+ * @archs 2201
+ * @brief 按元素将src0和src1相乘并和dst相加。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src0_block_stride 源操作数0单次迭代内不同DataBlock间地址步长。
+ * @param [in] src1_block_stride 源操作数1单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_fma(
     __ubuf__ float* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_mul_add__PUf16_PUf16_PUf16_u32
+ * @archs 2201
+ * @brief 执行矢量的乘加运算。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_mul_add(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_mul_add__PUf16_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
+ * @archs 2201
+ * @brief 执行矢量的乘加运算。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src0_block_stride 源操作数0单次迭代内不同DataBlock间地址步长。
+ * @param [in] src1_block_stride 源操作数1单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_mul_add(
     __ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_mul_add__PUf32_PUf32_PUf32_u32
+ * @archs 2201
+ * @brief 执行矢量的乘加运算。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_mul_add(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_mul_add__PUf32_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
+ * @archs 2201
+ * @brief 执行矢量的乘加运算。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src0_block_stride 源操作数0单次迭代内不同DataBlock间地址步长。
+ * @param [in] src1_block_stride 源操作数1单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_mul_add(
     __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_mul_add_relu__PUf16_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
+ * @archs 2201
+ * @brief 按元素将src0和dst相乘并加上src1，再进行Relu计算（结果和0对比取较大值），最终结果存放进dst中。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src0_block_stride 源操作数0单次迭代内不同DataBlock间地址步长。
+ * @param [in] src1_block_stride 源操作数1单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_mul_add_relu(
     __ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_mul_add_relu__PUf16_PUf16_PUf16_u32
+ * @archs 2201
+ * @brief 按元素将src0和dst相乘并加上src1，再进行Relu计算（结果和0对比取较大值），最终结果存放进dst中。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_mul_add_relu(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_mul_add_relu__PUf32_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
+ * @archs 2201
+ * @brief 按元素将src0和dst相乘并加上src1，再进行Relu计算（结果和0对比取较大值），最终结果存放进dst中。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src0_block_stride 源操作数0单次迭代内不同DataBlock间地址步长。
+ * @param [in] src1_block_stride 源操作数1单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_mul_add_relu(
     __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_mul_add_relu__PUf32_PUf32_PUf32_u32
+ * @archs 2201
+ * @brief 按元素将src0和dst相乘并加上src1，再进行Relu计算（结果和0对比取较大值），最终结果存放进dst中。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_mul_add_relu(
     __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_deq_int162b8_h__PUi8_PUi16_u32
+ * @archs 2201
+ * @brief 将int16_t类型转换为int8_t或uint8_t类型，并将数据存放在每个DataBlock的高半块或低半块。使用该接口前需要调用[asc_set_deq_scale](asc_set_deq_scale.md)接口设置量化参数。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_deq_int162b8_h(__ubuf__ int8_t* dst, __ubuf__ int16_t* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_deq_int162b8_h__PUi8_PUi16_u8_u16_u16_u8_u8
+ * @archs 2201
+ * @brief 将int16_t类型转换为int8_t或uint8_t类型，并将数据存放在每个DataBlock的高半块或低半块。使用该接口前需要调用[asc_set_deq_scale](asc_set_deq_scale.md)接口设置量化参数。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_deq_int162b8_h(
     __ubuf__ int8_t* dst, __ubuf__ int16_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
     uint8_t dst_repeat_stride, uint8_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_deq_int162b8_h__PUu8_PUi16_u32
+ * @archs 2201
+ * @brief 将int16_t类型转换为int8_t或uint8_t类型，并将数据存放在每个DataBlock的高半块或低半块。使用该接口前需要调用[asc_set_deq_scale](asc_set_deq_scale.md)接口设置量化参数。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_deq_int162b8_h(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_deq_int162b8_h__PUu8_PUi16_u8_u16_u16_u8_u8
+ * @archs 2201
+ * @brief 将int16_t类型转换为int8_t或uint8_t类型，并将数据存放在每个DataBlock的高半块或低半块。使用该接口前需要调用[asc_set_deq_scale](asc_set_deq_scale.md)接口设置量化参数。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_deq_int162b8_h(
     __ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
     uint8_t dst_repeat_stride, uint8_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_deq_int162b8_l__PUi8_PUi16_u32
+ * @archs 2201
+ * @brief 将int16_t类型转换为int8_t或uint8_t类型，并将数据存放在每个DataBlock的高半块或低半块。使用该接口前需要调用[asc_set_deq_scale](asc_set_deq_scale.md)接口设置量化参数。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_deq_int162b8_l(__ubuf__ int8_t* dst, __ubuf__ int16_t* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_deq_int162b8_l__PUi8_PUi16_u8_u16_u16_u8_u8
+ * @archs 2201
+ * @brief 将int16_t类型转换为int8_t或uint8_t类型，并将数据存放在每个DataBlock的高半块或低半块。使用该接口前需要调用[asc_set_deq_scale](asc_set_deq_scale.md)接口设置量化参数。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_deq_int162b8_l(
     __ubuf__ int8_t* dst, __ubuf__ int16_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
     uint8_t dst_repeat_stride, uint8_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_deq_int162b8_l__PUu8_PUi16_u32
+ * @archs 2201
+ * @brief 将int16_t类型转换为int8_t或uint8_t类型，并将数据存放在每个DataBlock的高半块或低半块。使用该接口前需要调用[asc_set_deq_scale](asc_set_deq_scale.md)接口设置量化参数。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_deq_int162b8_l(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_deq_int162b8_l__PUu8_PUi16_u8_u16_u16_u8_u8
+ * @archs 2201
+ * @brief 将int16_t类型转换为int8_t或uint8_t类型，并将数据存放在每个DataBlock的高半块或低半块。使用该接口前需要调用[asc_set_deq_scale](asc_set_deq_scale.md)接口设置量化参数。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_deq_int162b8_l(
     __ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
     uint8_t dst_repeat_stride, uint8_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_leakyrelu__PUf16_PUf16_f16_u8_u16_u16_u16_u16
+ * @archs 2201
+ * @brief 执行矢量Leaky Relu运算。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址，为待处理数据。
+ * @param [in] value 源操作数（标量），leaky_relu中alpha的值。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_leakyrelu(
     __ubuf__ half* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_leakyrelu__PUf16_PUf16_f16_u32
+ * @archs 2201
+ * @brief 执行矢量Leaky Relu运算。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址，为待处理数据。
+ * @param [in] value 源操作数（标量），leaky_relu中alpha的值。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_leakyrelu(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_leakyrelu__PUf32_PUf32_f32_u8_u16_u16_u16_u16
+ * @archs 2201
+ * @brief 执行矢量Leaky Relu运算。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址，为待处理数据。
+ * @param [in] value 源操作数（标量），leaky_relu中alpha的值。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_leakyrelu(
     __ubuf__ float* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_leakyrelu__PUf32_PUf32_f32_u32
+ * @archs 2201
+ * @brief 执行矢量Leaky Relu运算。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址，为待处理数据。
+ * @param [in] value 源操作数（标量），leaky_relu中alpha的值。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_leakyrelu(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_sub_relu__PUf16_PUf16_PUf16_u32
+ * @archs 2201
+ * @brief 按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_sub_relu(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_sub_relu__PUf16_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
+ * @archs 2201
+ * @brief 按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src0_block_stride 源操作数0单次迭代内不同DataBlock间地址步长。
+ * @param [in] src1_block_stride 源操作数1单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_sub_relu(
     __ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_sub_relu__PUf32_PUf32_PUf32_u32
+ * @archs 2201
+ * @brief 按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_sub_relu(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_sub_relu__PUf32_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
+ * @archs 2201
+ * @brief 按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src0_block_stride 源操作数0单次迭代内不同DataBlock间地址步长。
+ * @param [in] src1_block_stride 源操作数1单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_sub_relu(
     __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_sub_relu__PUi16_PUi16_PUi16_u32
+ * @archs 2201
+ * @brief 按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_sub_relu(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_sub_relu__PUi16_PUi16_PUi16_u8_u8_u8_u8_u8_u8_u8
+ * @archs 2201
+ * @brief 按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src0_block_stride 源操作数0单次迭代内不同DataBlock间地址步长。
+ * @param [in] src1_block_stride 源操作数1单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_sub_relu(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_sub_relu__PUi8_PUf16_PUf16_u32
+ * @archs 2201
+ * @brief 按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_sub_relu(__ubuf__ int8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_sub_relu__PUi8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
+ * @archs 2201
+ * @brief 按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src0_block_stride 源操作数0单次迭代内不同DataBlock间地址步长。
+ * @param [in] src1_block_stride 源操作数1单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_sub_relu(
     __ubuf__ int8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_sub_relu__PUf16_PUf32_PUf32_u32
+ * @archs 2201
+ * @brief 按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_sub_relu(__ubuf__ half* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_sub_relu__PUf16_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
+ * @archs 2201
+ * @brief 按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src0_block_stride 源操作数0单次迭代内不同DataBlock间地址步长。
+ * @param [in] src1_block_stride 源操作数1单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_sub_relu(
     __ubuf__ half* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_sub_relu__PUi8_PUi16_PUi16_u32
+ * @archs 2201
+ * @brief 按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_sub_relu(
     __ubuf__ int8_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_sub_relu__PUi8_PUi16_PUi16_u8_u8_u8_u8_u8_u8_u8
+ * @archs 2201
+ * @brief 按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src0_block_stride 源操作数0单次迭代内不同DataBlock间地址步长。
+ * @param [in] src1_block_stride 源操作数1单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_sub_relu(
     __ubuf__ int8_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_add_relu__PUf16_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
+ * @archs 2201
+ * @brief 按元素求和，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src0_block_stride 源操作数0单次迭代内不同DataBlock间地址步长。
+ * @param [in] src1_block_stride 源操作数1单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_add_relu(
     __ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_add_relu__PUf16_PUf16_PUf16_u32
+ * @archs 2201
+ * @brief 按元素求和，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_add_relu(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_add_relu__PUf32_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
+ * @archs 2201
+ * @brief 按元素求和，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src0_block_stride 源操作数0单次迭代内不同DataBlock间地址步长。
+ * @param [in] src1_block_stride 源操作数1单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_add_relu(
     __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_add_relu__PUf32_PUf32_PUf32_u32
+ * @archs 2201
+ * @brief 按元素求和，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_add_relu(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_add_relu__PUi16_PUi16_PUi16_u8_u8_u8_u8_u8_u8_u8
+ * @archs 2201
+ * @brief 按元素求和，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src0_block_stride 源操作数0单次迭代内不同DataBlock间地址步长。
+ * @param [in] src1_block_stride 源操作数1单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_add_relu(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_add_relu__PUi16_PUi16_PUi16_u32
+ * @archs 2201
+ * @brief 按元素求和，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_add_relu(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_vdeq_int162b8_h__PUi8_PUi16_u32
+ * @archs 2201
+ * @brief 将int16_t类型转化为int8_t或uint8_t类型，并将数据存放在每个DataBlock的上半块或下半块。使用该接口前需要调用asc_set_deq_scale设置量化参数。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_vdeq_int162b8_h(__ubuf__ int8_t* dst, __ubuf__ int16_t* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_vdeq_int162b8_h__PUi8_PUi16_u8_u16_u16_u8_u8
+ * @archs 2201
+ * @brief 将int16_t类型转化为int8_t或uint8_t类型，并将数据存放在每个DataBlock的上半块或下半块。使用该接口前需要调用asc_set_deq_scale设置量化参数。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_vdeq_int162b8_h(
     __ubuf__ int8_t* dst, __ubuf__ int16_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
     uint8_t dst_repeat_stride, uint8_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_vdeq_int162b8_h__PUu8_PUi16_u32
+ * @archs 2201
+ * @brief 将int16_t类型转化为int8_t或uint8_t类型，并将数据存放在每个DataBlock的上半块或下半块。使用该接口前需要调用asc_set_deq_scale设置量化参数。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_vdeq_int162b8_h(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_vdeq_int162b8_h__PUu8_PUi16_u8_u16_u16_u8_u8
+ * @archs 2201
+ * @brief 将int16_t类型转化为int8_t或uint8_t类型，并将数据存放在每个DataBlock的上半块或下半块。使用该接口前需要调用asc_set_deq_scale设置量化参数。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_vdeq_int162b8_h(
     __ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
     uint8_t dst_repeat_stride, uint8_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_vdeq_int162b8_l__PUi8_PUi16_u8_u16_u16_u8_u8
+ * @archs 2201
+ * @brief 将int16_t类型转化为int8_t或uint8_t类型，并将数据存放在每个DataBlock的上半块或下半块。使用该接口前需要调用asc_set_deq_scale设置量化参数。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_vdeq_int162b8_l(
     __ubuf__ int8_t* dst, __ubuf__ int16_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
     uint8_t dst_repeat_stride, uint8_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_vdeq_int162b8_l__PUi8_PUi16_u32
+ * @archs 2201
+ * @brief 将int16_t类型转化为int8_t或uint8_t类型，并将数据存放在每个DataBlock的上半块或下半块。使用该接口前需要调用asc_set_deq_scale设置量化参数。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_vdeq_int162b8_l(__ubuf__ int8_t* dst, __ubuf__ int16_t* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_vdeq_int162b8_l__PUu8_PUi16_u8_u16_u16_u8_u8
+ * @archs 2201
+ * @brief 将int16_t类型转化为int8_t或uint8_t类型，并将数据存放在每个DataBlock的上半块或下半块。使用该接口前需要调用asc_set_deq_scale设置量化参数。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_vdeq_int162b8_l(
     __ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
     uint8_t dst_repeat_stride, uint8_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_vdeq_int162b8_l__PUu8_PUi16_u32
+ * @archs 2201
+ * @brief 将int16_t类型转化为int8_t或uint8_t类型，并将数据存放在每个DataBlock的上半块或下半块。使用该接口前需要调用asc_set_deq_scale设置量化参数。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_vdeq_int162b8_l(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_axpy__PUf16_PUf16_f16_u32
+ * @archs 2201
+ * @brief 源操作数src中每个元素与标量value求积后和目的操作数dst中的对应元素相加。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] count 参与连续计算的元素个数。
+ */
 __aicore__ inline void asc_axpy(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_axpy__PUf16_PUf16_f16_u8_u16_u16_u16_u16
+ * @archs 2201
+ * @brief 源操作数src中每个元素与标量value求积后和目的操作数dst中的对应元素相加。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_axpy(
     __ubuf__ half* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_axpy__PUf32_PUf32_f32_u32
+ * @archs 2201
+ * @brief 源操作数src中每个元素与标量value求积后和目的操作数dst中的对应元素相加。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] count 参与连续计算的元素个数。
+ */
 __aicore__ inline void asc_axpy(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_axpy__PUf32_PUf32_f32_u8_u16_u16_u16_u16
+ * @archs 2201
+ * @brief 源操作数src中每个元素与标量value求积后和目的操作数dst中的对应元素相加。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_axpy(
     __ubuf__ float* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_axpy__PUf32_PUf16_f16_u32
+ * @archs 2201
+ * @brief 源操作数src中每个元素与标量value求积后和目的操作数dst中的对应元素相加。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] count 参与连续计算的元素个数。
+ */
 __aicore__ inline void asc_axpy(__ubuf__ float* dst, __ubuf__ half* src, half value, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_axpy__PUf32_PUf16_f16_u8_u16_u16_u16_u16
+ * @archs 2201
+ * @brief 源操作数src中每个元素与标量value求积后和目的操作数dst中的对应元素相加。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_axpy(
     __ubuf__ float* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_add_relu__PUi8_PUf16_PUf16_u32
+ * @archs 2201
+ * @brief 按元素求和，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_add_relu(__ubuf__ int8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_add_relu__PUi8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
+ * @archs 2201
+ * @brief 按元素求和，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src0_block_stride 源操作数0单次迭代内不同DataBlock间地址步长。
+ * @param [in] src1_block_stride 源操作数1单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_add_relu(
     __ubuf__ int8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_add_relu__PUf16_PUf32_PUf32_u32
+ * @archs 2201
+ * @brief 按元素求和，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_add_relu(__ubuf__ half* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_add_relu__PUf16_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
+ * @archs 2201
+ * @brief 按元素求和，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src0_block_stride 源操作数0单次迭代内不同DataBlock间地址步长。
+ * @param [in] src1_block_stride 源操作数1单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_add_relu(
     __ubuf__ half* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_add_relu__PUi8_PUi16_PUi16_u32
+ * @archs 2201
+ * @brief 按元素求和，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void asc_add_relu(
     __ubuf__ int8_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_fused
+ * @override_id asc_add_relu__PUi8_PUi16_PUi16_u8_u8_u8_u8_u8_u8_u8
+ * @archs 2201
+ * @brief 按元素求和，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src0_block_stride 源操作数0单次迭代内不同DataBlock间地址步长。
+ * @param [in] src1_block_stride 源操作数1单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_add_relu(
     __ubuf__ int8_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,

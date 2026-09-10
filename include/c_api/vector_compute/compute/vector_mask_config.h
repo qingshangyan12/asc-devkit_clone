@@ -26,10 +26,28 @@
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
 #endif
+/**
+ * @ingroup simd_c_api.vector_compute.vector_mask_config
+ * @override_id asc_set_mask_count__z
+ * @archs 2201
+ * @brief 设置Mask模式为Counter模式。该模式下，不需要开发者去感知迭代次数、处理非对齐的尾块等操作，可直接传入数据计算数量，实际迭代次数由Vector计算单元自动推断。在前n个数据计算类的接口内部会自动设置该模式，不需要自行设置。
+ */
 __aicore__ inline void asc_set_mask_count();
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_mask_config
+ * @override_id asc_set_mask_norm__z
+ * @archs 2201
+ * @brief 设置Mask模式为Normal模式，该模式为系统默认模式。该模式下，Mask参数可控制高维切分计算过程中单次迭代内参与计算的元素。
+ */
 __aicore__ inline void asc_set_mask_norm();
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_mask_config
+ * @override_id asc_set_vector_mask__u64_u64
+ * @archs 3510 2201
+ * @brief 本API用于设置Mask值。某些矢量计算接口需要提前设置Mask，用于指示哪些数据参与计算。 单独使用该API时可引入`c_api/vector_compute/compute/vector_mask_config.h`，整体使用C API时可引入`c_api/asc_simd.h`。
+ */
 __aicore__ inline void asc_set_vector_mask(uint64_t mask_high, uint64_t mask_low);
 
 #endif

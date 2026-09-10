@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_sync_wait"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/asc_sync_wait.md"
+description: "等待特定的同步标志，阻塞当前流水线直到条件满足。"
+tag: [c_api, 'operations:synchronization']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_sync_wait__pipe_pipe_event"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/sync/sync.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_sync_wait
 
 ## 产品支持情况
@@ -31,6 +48,14 @@
 等待特定的同步标志，阻塞当前流水线直到条件满足。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_sync_wait__pipe_pipe_event"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/sync/sync.h"
+```
 
 ```cpp
 __aicore__ inline void asc_sync_wait(pipe_t pipe, pipe_t tpipe, event_t id)

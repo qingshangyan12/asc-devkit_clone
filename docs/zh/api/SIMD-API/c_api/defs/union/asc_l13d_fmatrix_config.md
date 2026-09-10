@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: "asc_l13d_fmatrix_config"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md"
+description: "asc_l13d_fmatrix_config用于设置[asc_copy_l12l0a](../../cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](../../cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口的Feature map属性参数。"
+tag: [c_api]
+usage_dependencies:
+  status: not_applicable
+signature:
+  []
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_l13d_fmatrix_config
 
 asc_l13d_fmatrix_config用于设置[asc_copy_l12l0a](../../cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](../../cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口的Feature map属性参数。

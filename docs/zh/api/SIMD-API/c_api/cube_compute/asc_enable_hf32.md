@@ -1,3 +1,21 @@
+---
+okftype: reference.api.cpp
+title: "asc_enable_hf32"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hf32.md"
+description: "本接口用于设置Mmad计算开启HF32模式，开启该模式后，Mmad计算FP32数据的性能将得到提升，但会带来一定的精度损失。"
+tag: [c_api, compute, 'roles:configuration', 'operations:matrix_multiply_accumulate',
+  matrix, 'traits:rounding_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_enable_hf32__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/cube_compute/cube_compute.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_enable_hf32
 
 ## 产品支持情况
@@ -88,6 +106,14 @@ FP32与HF32格式的精度对比如下图所示：
 <!-- end id11 -->
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_enable_hf32__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/cube_compute/cube_compute.h"
+```
 
 ```c
 __aicore__ inline void asc_enable_hf32()

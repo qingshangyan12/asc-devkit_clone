@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_get_sys_virtual_base"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sys_virtual_base.md"
+description: "获取系统虚拟基地址。"
+tag: [c_api, 'roles:query', 'families:system']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_get_sys_virtual_base__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/utils/sys_var.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_get_sys_virtual_base
 
 ## 产品支持情况
@@ -31,6 +48,14 @@
 获取系统虚拟基地址。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_get_sys_virtual_base__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/utils/sys_var.h"
+```
 
 ```cpp
  __aicore__ inline int64_t asc_get_sys_virtual_base()

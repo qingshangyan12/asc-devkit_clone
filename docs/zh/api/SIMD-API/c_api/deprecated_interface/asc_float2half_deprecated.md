@@ -1,3 +1,113 @@
+---
+okftype: reference.api.cpp
+title: "asc_float2half（废弃）"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2half_deprecated.md"
+description: "**该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_float2half](../reg_compute/reg_convert/asc_float2half.md)的显式位置参数重载替代。"
+tag: [c_api, compute, 'operations:conversion', mask, masked, 'traits:rounding_mode',
+  'traits:saturation_mode']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_float2half_rn__Rvf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rn_sat__Rvf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rn_v2__Rvf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rn_sat_v2__Rvf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rna__Rvf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rna_sat__Rvf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rna_v2__Rvf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rna_sat_v2__Rvf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rd__Rvf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rd_sat__Rvf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rd_v2__Rvf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rd_sat_v2__Rvf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_ru__Rvf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_ru_sat__Rvf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_ru_v2__Rvf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_ru_sat_v2__Rvf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rz__Rvf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rz_sat__Rvf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rz_v2__Rvf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_rz_sat_v2__Rvf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_ro__Rvf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_ro_sat__Rvf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_ro_v2__Rvf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_float2half_ro_sat_v2__Rvf16_vf32_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_float2half（废弃）
 
 ## 产品支持情况
@@ -38,53 +148,314 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_float2half_rn__Rvf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```cpp
 // RINT舍入模式，非饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2half_rn(vector_half& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rn_sat__Rvf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // RINT舍入模式，饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2half_rn_sat(vector_half& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rn_v2__Rvf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // RINT舍入模式，非饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2half_rn_v2(vector_half& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rn_sat_v2__Rvf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // RINT舍入模式，饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2half_rn_sat_v2(vector_half& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rna__Rvf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // ROUND舍入模式，非饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2half_rna(vector_half& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rna_sat__Rvf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // ROUND舍入模式，饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2half_rna_sat(vector_half& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rna_v2__Rvf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // ROUND舍入模式，非饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2half_rna_v2(vector_half& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rna_sat_v2__Rvf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // ROUND舍入模式，饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2half_rna_sat_v2(vector_half& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rd__Rvf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // FLOOR舍入模式，非饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2half_rd(vector_half& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rd_sat__Rvf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // FLOOR舍入模式，饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2half_rd_sat(vector_half& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rd_v2__Rvf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // FLOOR舍入模式，非饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2half_rd_v2(vector_half& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rd_sat_v2__Rvf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // FLOOR舍入模式，饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2half_rd_sat_v2(vector_half& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ru__Rvf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // CEIL舍入模式，非饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2half_ru(vector_half& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ru_sat__Rvf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // CEIL舍入模式，饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2half_ru_sat(vector_half& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ru_v2__Rvf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // CEIL舍入模式，非饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2half_ru_v2(vector_half& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ru_sat_v2__Rvf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // CEIL舍入模式，饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2half_ru_sat_v2(vector_half& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rz__Rvf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // TRUNC舍入模式，非饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2half_rz(vector_half& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rz_sat__Rvf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // TRUNC舍入模式，饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2half_rz_sat(vector_half& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rz_v2__Rvf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // TRUNC舍入模式，非饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2half_rz_v2(vector_half& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_rz_sat_v2__Rvf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // TRUNC舍入模式，饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2half_rz_sat_v2(vector_half& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ro__Rvf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // ODD舍入模式，非饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2half_ro(vector_half& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ro_sat__Rvf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // ODD舍入模式，饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2half_ro_sat(vector_half& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ro_v2__Rvf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // ODD舍入模式，非饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2half_ro_v2(vector_half& dst, vector_float src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_float2half_ro_sat_v2__Rvf16_vf32_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // ODD舍入模式，饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2half_ro_sat_v2(vector_half& dst, vector_float src, vector_bool mask)
 ```

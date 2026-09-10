@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_get_icache_preload_status"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_icache_preload_status.md"
+description: "获取ICache的Preload的状态。"
+tag: [c_api, 'roles:query', 'families:cache_management']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_get_icache_preload_status__z"
+    archs: ["3510", "2201"]
+    headers:
+      - "/include/c_api/cache_ctrl/cache_ctrl.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_get_icache_preload_status
 
 ## 产品支持情况
@@ -33,6 +50,14 @@
 该接口为调试接口，在[asc_icache_preload](asc_icache_preload.md)后调用，用于获取ICache的PreLoad的状态。当返回值为0时，说明ICache的PreLoad已完成；当返回值为1时，说明ICache的PreLoad未完成。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "asc_get_icache_preload_status__z"
+  archs: ["3510", "2201"]
+  headers:
+    - "/include/c_api/cache_ctrl/cache_ctrl.h"
+```
 
 ```cpp
 __aicore__ inline int64_t asc_get_icache_preload_status()

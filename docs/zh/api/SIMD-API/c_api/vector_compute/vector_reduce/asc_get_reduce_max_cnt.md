@@ -1,3 +1,24 @@
+---
+okftype: reference.api.cpp
+title: "asc_get_reduce_max_cnt"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_max_cnt.md"
+description: "此接口用于获取执行[asc_repeat_reduce_max](asc_repeat_reduce_max.md)操作后的最大值，以及第一个最大值时的索引。"
+tag: [c_api, 'roles:query']
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_get_reduce_max_cnt__Rf16_Ru32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - override_id: "asc_get_reduce_max_cnt__Rf32_Ru32"
+    archs: ["2201"]
+    headers:
+      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_get_reduce_max_cnt
 
 ## 产品支持情况
@@ -32,8 +53,27 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_get_reduce_max_cnt__Rf16_Ru32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+```
+
 ```cpp
 __aicore__ inline void asc_get_reduce_max_cnt(half& val, uint32_t& index)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_get_reduce_max_cnt__Rf32_Ru32"
+  archs: ["2201"]
+  headers:
+    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+```
+
+```cpp
 __aicore__ inline void asc_get_reduce_max_cnt(float& val, uint32_t& index)
 ```
 

@@ -1,3 +1,68 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_l0c2l1"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md"
+description: "该接口用于将矩阵计算的结果从L0C Buffer搬运至L1 Buffer中，并且在搬运过程中支持与其它接口组合使用，配置多种随路能力。"
+tag: [c_api, data_movement, copy]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_copy_l0c2l1__PL1f16_PCCf32_u16_u16_u32_u16_u8_u8_u64_u8_b_b_u64_u8_b_u8_u8_b"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l0c2l1__PL1bf16_PCCf32_u16_u16_u32_u16_u8_u8_u64_u8_b_b_u64_u8_b_u8_u8_b"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l0c2l1__PL1i8_PCCf32_u16_u16_u32_u16_u8_u8_u64_u8_b_b_u64_u8_b_u8_u8_b"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l0c2l1__PL1u8_PCCf32_u16_u16_u32_u16_u8_u8_u64_u8_b_b_u64_u8_b_u8_u8_b"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l0c2l1__PL1f32_PCCf32_u16_u16_u32_u16_u8_u8_u64_u8_b_b_u64_u8_b_u8_u8_b"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l0c2l1__PL1f16_PCCi32_u16_u16_u32_u16_u8_u8_u64_u8_b_b_u64_u8_b_u8_u8_b"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l0c2l1__PL1i8_PCCi32_u16_u16_u32_u16_u8_u8_u64_u8_b_b_u64_u8_b_u8_u8_b"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l0c2l1__PL1u8_PCCi32_u16_u16_u32_u16_u8_u8_u64_u8_b_b_u64_u8_b_u8_u8_b"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l0c2l1__PL1i32_PCCi32_u16_u16_u32_u16_u8_u8_u64_u8_b_b_u64_u8_b_u8_u8_b"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l0c2l1__PL1i4x2_PCCf32_u16_u16_u32_u16_u8_u8_u8_u64_u8_b_b_u64_u8_b_u8_b_b_b_b"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l0c2l1_sync__PL1i4x2_PCCf32_u16_u16_u32_u16_u8_u8_u8_u64_u8_b_b_u64_u8_b_u8_b_b_b_b"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+  - override_id: "asc_copy_l0c2l1__PL1i4x2_PCCi32_u16_u16_u32_u16_u8_u8_u8_u64_u8_b_b_u64_u8_b_u8_b_b_b_b"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/cube_datamove/cube_datamove.h"
+  - override_id: "asc_copy_l0c2l1_sync__PL1i4x2_PCCi32_u16_u16_u32_u16_u8_u8_u8_u64_u8_b_b_u64_u8_b_u8_b_b_b_b"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/composite/cube_datamove_composite.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_copy_l0c2l1
 
 ## 产品支持情况
@@ -68,70 +133,210 @@ quant_pre_mode量化模式参数支持的枚举值如下：
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_copy_l0c2l1__PL1f16_PCCf32_u16_u16_u32_u16_u8_u8_u64_u8_b_b_u64_u8_b_u8_u8_b"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
 ```cpp
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
     uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post,
     uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l0c2l1__PL1bf16_PCCf32_u16_u16_u32_u16_u8_u8_u64_u8_b_b_u64_u8_b_u8_u8_b"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
     uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post,
     uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l0c2l1__PL1i8_PCCf32_u16_u16_u32_u16_u8_u8_u64_u8_b_b_u64_u8_b_u8_u8_b"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
     uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post,
     uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l0c2l1__PL1u8_PCCf32_u16_u16_u32_u16_u8_u8_u64_u8_b_b_u64_u8_b_u8_u8_b"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
     uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post,
     uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l0c2l1__PL1f32_PCCf32_u16_u16_u32_u16_u8_u8_u64_u8_b_b_u64_u8_b_u8_u8_b"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
     uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post,
     uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l0c2l1__PL1f16_PCCi32_u16_u16_u32_u16_u8_u8_u64_u8_b_b_u64_u8_b_u8_u8_b"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
     uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post,
     uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l0c2l1__PL1i8_PCCi32_u16_u16_u32_u16_u8_u8_u64_u8_b_b_u64_u8_b_u8_u8_b"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
     uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post,
     uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l0c2l1__PL1u8_PCCi32_u16_u16_u32_u16_u8_u8_u64_u8_b_b_u64_u8_b_u8_u8_b"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
     uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post,
     uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l0c2l1__PL1i32_PCCi32_u16_u16_u32_u16_u8_u8_u64_u8_b_b_u64_u8_b_u8_u8_b"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
     uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post,
     uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l0c2l1__PL1i4x2_PCCf32_u16_u16_u32_u16_u8_u8_u8_u64_u8_b_b_u64_u8_b_u8_b_b_b_b"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int4b_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
     uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
     uint64_t quant_post, uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op,
     bool eltwise_antq_en, bool c0_pad_en, bool broadcast_en, bool enable_nz2dn)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l0c2l1_sync__PL1i4x2_PCCf32_u16_u16_u32_u16_u8_u8_u8_u64_u8_b_b_u64_u8_b_u8_b_b_b_b"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+```cpp
 __aicore__ inline void asc_copy_l0c2l1_sync(
     __cbuf__ int4b_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
     uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
     uint64_t quant_post, uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op,
     bool eltwise_antq_en, bool c0_pad_en, bool broadcast_en, bool enable_nz2dn)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l0c2l1__PL1i4x2_PCCi32_u16_u16_u32_u16_u8_u8_u8_u64_u8_b_b_u64_u8_b_u8_b_b_b_b"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
+```cpp
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int4b_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
     uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
     uint64_t quant_post, uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op,
     bool eltwise_antq_en, bool c0_pad_en, bool broadcast_en, bool enable_nz2dn)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_copy_l0c2l1_sync__PL1i4x2_PCCi32_u16_u16_u32_u16_u8_u8_u8_u64_u8_b_b_u64_u8_b_u8_b_b_b_b"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/composite/cube_datamove_composite.h"
+```
+
+```cpp
 __aicore__ inline void asc_copy_l0c2l1_sync(
     __cbuf__ int4b_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,

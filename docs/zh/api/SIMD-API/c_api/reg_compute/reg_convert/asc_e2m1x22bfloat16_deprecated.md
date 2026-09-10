@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: "asc_e2m1x22bfloat16 (废弃)"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e2m1x22bfloat16_deprecated.md"
+description: "将fp4x2_e2m1_t类型转化为bfloat16_t类型。"
+tag: [c_api, compute, 'operations:conversion', vector, register_vector]
+usage_dependencies:
+  status: unconfirmed
+signature:
+  - override_id: "asc_e2m1x22bfloat16__Rvbf16_vf4e2m1x2_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_e2m1x22bfloat16_v2__Rvbf16_vf4e2m1x2_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_e2m1x22bfloat16_v3__Rvbf16_vf4e2m1x2_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+  - override_id: "asc_e2m1x22bfloat16_v4__Rvbf16_vf4e2m1x2_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_e2m1x22bfloat16 (废弃)
 
 ## 产品支持情况
@@ -34,13 +63,54 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "asc_e2m1x22bfloat16__Rvbf16_vf4e2m1x2_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
 ```cpp
 // 读取索引0的位置
 __simd_callee__ inline void asc_e2m1x22bfloat16(vector_bfloat16_t& dst, vector_fp4x2_e2m1_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_e2m1x22bfloat16_v2__Rvbf16_vf4e2m1x2_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // 读取索引1的位置
 __simd_callee__ inline void asc_e2m1x22bfloat16_v2(vector_bfloat16_t& dst, vector_fp4x2_e2m1_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_e2m1x22bfloat16_v3__Rvbf16_vf4e2m1x2_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // 读取索引2的位置
 __simd_callee__ inline void asc_e2m1x22bfloat16_v3(vector_bfloat16_t& dst, vector_fp4x2_e2m1_t src, vector_bool mask)
+```
+
+```yaml
+api_signature:
+  override_id: "asc_e2m1x22bfloat16_v4__Rvbf16_vf4e2m1x2_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/reg_convert.h"
+```
+
+```cpp
 // 读取索引3的位置
 __simd_callee__ inline void asc_e2m1x22bfloat16_v4(vector_bfloat16_t& dst, vector_fp4x2_e2m1_t src, vector_bool mask)
 ```
