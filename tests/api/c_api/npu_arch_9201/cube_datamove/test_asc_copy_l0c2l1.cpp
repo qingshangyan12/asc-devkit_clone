@@ -9,51 +9,47 @@
  */
 
 #include "tests/api/c_api/npu_arch_9201/utils/test_copy_l0c2l1_instr_utils.h"
-#include "impl/c_api/instr_impl/npu_arch_9201/cube_datamove_impl/asc_copy_l0c2l1_impl.h"
+#include "impl/c_api/reg_base_impl/npu_arch_9201/cube_datamove_intf_impl.h"
 
-//================asc_copy_l0c2l1_impl basic================
-TEST_CUBE_DATAMOVE_L0C2L1_BASIC(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, half, float, 1);
-TEST_CUBE_DATAMOVE_L0C2L1_BASIC(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, bfloat16_t, float, 2);
-TEST_CUBE_DATAMOVE_L0C2L1_BASIC(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, int8_t, float, 3);
-TEST_CUBE_DATAMOVE_L0C2L1_BASIC(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, uint8_t, float, 4);
-TEST_CUBE_DATAMOVE_L0C2L1_BASIC(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, float, float, 5);
-TEST_CUBE_DATAMOVE_L0C2L1_BASIC(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, half, int32_t, 6);
-TEST_CUBE_DATAMOVE_L0C2L1_BASIC(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, int8_t, int32_t, 7);
-TEST_CUBE_DATAMOVE_L0C2L1_BASIC(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, uint8_t, int32_t, 8);
-TEST_CUBE_DATAMOVE_L0C2L1_BASIC(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, int32_t, int32_t, 9);
+//================asc_copy_l0c2l1 basic================
+TEST_CUBE_DATAMOVE_L0C2L1_BASIC(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, half, float, 1);
+TEST_CUBE_DATAMOVE_L0C2L1_BASIC(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, bfloat16_t, float, 2);
+TEST_CUBE_DATAMOVE_L0C2L1_BASIC(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, int8_t, float, 3);
+TEST_CUBE_DATAMOVE_L0C2L1_BASIC(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, uint8_t, float, 4);
+TEST_CUBE_DATAMOVE_L0C2L1_BASIC(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, float, float, 5);
+TEST_CUBE_DATAMOVE_L0C2L1_BASIC(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, half, int32_t, 6);
+TEST_CUBE_DATAMOVE_L0C2L1_BASIC(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, int8_t, int32_t, 7);
+TEST_CUBE_DATAMOVE_L0C2L1_BASIC(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, uint8_t, int32_t, 8);
+TEST_CUBE_DATAMOVE_L0C2L1_BASIC(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, int32_t, int32_t, 9);
 
-//================asc_copy_l0c2l1_impl quant_pre_rnd================
-TEST_CUBE_DATAMOVE_L0C2L1_RND(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, half, float, 51);
-TEST_CUBE_DATAMOVE_L0C2L1_RND(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, bfloat16_t, float, 52);
-TEST_CUBE_DATAMOVE_L0C2L1_RND(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, int8_t, float, 53);
-TEST_CUBE_DATAMOVE_L0C2L1_RND(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, uint8_t, float, 54);
-TEST_CUBE_DATAMOVE_L0C2L1_RND(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, float, float, 55);
-TEST_CUBE_DATAMOVE_L0C2L1_RND(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, half, int32_t, 56);
-TEST_CUBE_DATAMOVE_L0C2L1_RND(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, int8_t, int32_t, 57);
-TEST_CUBE_DATAMOVE_L0C2L1_RND(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, uint8_t, int32_t, 58);
-TEST_CUBE_DATAMOVE_L0C2L1_RND(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, int32_t, int32_t, 59);
+//================asc_copy_l0c2l1 quant_pre_rnd================
+TEST_CUBE_DATAMOVE_L0C2L1_RND(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, half, float, 51);
+TEST_CUBE_DATAMOVE_L0C2L1_RND(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, bfloat16_t, float, 52);
+TEST_CUBE_DATAMOVE_L0C2L1_RND(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, int8_t, float, 53);
+TEST_CUBE_DATAMOVE_L0C2L1_RND(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, uint8_t, float, 54);
+TEST_CUBE_DATAMOVE_L0C2L1_RND(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, float, float, 55);
+TEST_CUBE_DATAMOVE_L0C2L1_RND(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, half, int32_t, 56);
+TEST_CUBE_DATAMOVE_L0C2L1_RND(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, int8_t, int32_t, 57);
+TEST_CUBE_DATAMOVE_L0C2L1_RND(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, uint8_t, int32_t, 58);
+TEST_CUBE_DATAMOVE_L0C2L1_RND(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, int32_t, int32_t, 59);
 
-//================asc_copy_l0c2l1_impl enable_nz2dn================
+//================asc_copy_l0c2l1 enable_nz2dn================
 // half+float only has quant_pre_rnd + enable_nz2dn overload
-TEST_CUBE_DATAMOVE_L0C2L1_RND_NZ2DN(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, half, float, 101);
-TEST_CUBE_DATAMOVE_L0C2L1_NZ2DN(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, bfloat16_t, float, 102);
-TEST_CUBE_DATAMOVE_L0C2L1_NZ2DN(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, int8_t, float, 103);
-TEST_CUBE_DATAMOVE_L0C2L1_NZ2DN(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, uint8_t, float, 104);
-TEST_CUBE_DATAMOVE_L0C2L1_NZ2DN(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, float, float, 105);
-TEST_CUBE_DATAMOVE_L0C2L1_NZ2DN(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, hifloat8_t, float, 106);
-TEST_CUBE_DATAMOVE_L0C2L1_NZ2DN(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, fp8_e4m3fn_t, float, 107);
-TEST_CUBE_DATAMOVE_L0C2L1_NZ2DN(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, half, int32_t, 108);
-TEST_CUBE_DATAMOVE_L0C2L1_NZ2DN(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, bfloat16_t, int32_t, 109);
-TEST_CUBE_DATAMOVE_L0C2L1_NZ2DN(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, int8_t, int32_t, 110);
-TEST_CUBE_DATAMOVE_L0C2L1_NZ2DN(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, uint8_t, int32_t, 111);
-TEST_CUBE_DATAMOVE_L0C2L1_NZ2DN(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf, int32_t, int32_t, 112);
+TEST_CUBE_DATAMOVE_L0C2L1_RND_NZ2DN(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, half, float, 101);
+TEST_CUBE_DATAMOVE_L0C2L1_NZ2DN(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, bfloat16_t, float, 102);
+TEST_CUBE_DATAMOVE_L0C2L1_NZ2DN(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, int8_t, float, 103);
+TEST_CUBE_DATAMOVE_L0C2L1_NZ2DN(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, uint8_t, float, 104);
+TEST_CUBE_DATAMOVE_L0C2L1_NZ2DN(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, float, float, 105);
+TEST_CUBE_DATAMOVE_L0C2L1_NZ2DN(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, hifloat8_t, float, 106);
+TEST_CUBE_DATAMOVE_L0C2L1_NZ2DN(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, fp8_e4m3fn_t, float, 107);
+TEST_CUBE_DATAMOVE_L0C2L1_NZ2DN(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, half, int32_t, 108);
+TEST_CUBE_DATAMOVE_L0C2L1_NZ2DN(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, bfloat16_t, int32_t, 109);
+TEST_CUBE_DATAMOVE_L0C2L1_NZ2DN(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, int8_t, int32_t, 110);
+TEST_CUBE_DATAMOVE_L0C2L1_NZ2DN(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, uint8_t, int32_t, 111);
+TEST_CUBE_DATAMOVE_L0C2L1_NZ2DN(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf, int32_t, int32_t, 112);
 
-//================asc_copy_l0c2l1_impl / sync void* s4================
-TEST_CUBE_DATAMOVE_L0C2L1_S4(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf_s4, float, 301);
-TEST_CUBE_DATAMOVE_L0C2L1_S4(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf_s4, int32_t, 302);
-TEST_CUBE_DATAMOVE_L0C2L1_S4(L0C2L1, asc_copy_l0c2l1_sync_impl, copy_matrix_cc_to_cbuf_s4, float, 303);
-TEST_CUBE_DATAMOVE_L0C2L1_S4(L0C2L1, asc_copy_l0c2l1_sync_impl, copy_matrix_cc_to_cbuf_s4, int32_t, 304);
-TEST_CUBE_DATAMOVE_L0C2L1_S4_RND(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf_s4, float, 305);
-TEST_CUBE_DATAMOVE_L0C2L1_S4_RND(L0C2L1, asc_copy_l0c2l1_impl, copy_matrix_cc_to_cbuf_s4, int32_t, 306);
-TEST_CUBE_DATAMOVE_L0C2L1_S4_RND(L0C2L1, asc_copy_l0c2l1_sync_impl, copy_matrix_cc_to_cbuf_s4, float, 307);
-TEST_CUBE_DATAMOVE_L0C2L1_S4_RND(L0C2L1, asc_copy_l0c2l1_sync_impl, copy_matrix_cc_to_cbuf_s4, int32_t, 308);
+//================asc_copy_l0c2l1 void* s4================
+TEST_CUBE_DATAMOVE_L0C2L1_S4(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf_s4, float, 301);
+TEST_CUBE_DATAMOVE_L0C2L1_S4(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf_s4, int32_t, 302);
+TEST_CUBE_DATAMOVE_L0C2L1_S4_RND(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf_s4, float, 303);
+TEST_CUBE_DATAMOVE_L0C2L1_S4_RND(L0C2L1, asc_copy_l0c2l1, copy_matrix_cc_to_cbuf_s4, int32_t, 304);

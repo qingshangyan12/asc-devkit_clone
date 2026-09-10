@@ -18,272 +18,953 @@
 #ifndef IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_9201_CUBE_DATAMOVE_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_9201_CUBE_DATAMOVE_INTF_IMPL_H
 
-#include "impl/c_api/instr_impl/npu_arch_9201/cube_datamove_impl/asc_prefetch_l2cache_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_9201/utils_impl.h"
 
-// =============asc_prefetch_gm2l2cache===============
-
-__aicore__ inline void asc_prefetch_gm2l2cache(__gm__ int8_t* src, uint32_t burst_num, uint32_t burst_len, uint64_t burst_src_stride)
+// ==========asc_copy_l0c2l1==========
+// half  float
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
+    uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
+    bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post,
+    uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
 {
-    asc_prefetch_gm2l2cache_impl(src, burst_num, burst_len, burst_src_stride);
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, false, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, false);
+    }
 }
 
-__aicore__ inline void asc_prefetch_gm2l2cache(__gm__ uint8_t* src, uint32_t burst_num, uint32_t burst_len, uint64_t burst_src_stride)
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
+    bool quant_pre_rnd, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
+    bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post,
+    uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
 {
-    asc_prefetch_gm2l2cache_impl(src, burst_num, burst_len, burst_src_stride);
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, quant_pre_rnd, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, false);
+    }
 }
 
-__aicore__ inline void asc_prefetch_gm2l2cache(__gm__ hifloat8_t* src, uint32_t burst_num, uint32_t burst_len, uint64_t burst_src_stride)
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
+    bool quant_pre_rnd, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
+    bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post,
+    uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en, bool enable_nz2dn)
 {
-    asc_prefetch_gm2l2cache_impl(src, burst_num, burst_len, burst_src_stride);
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, quant_pre_rnd, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, enable_nz2dn);
+    }
 }
 
-__aicore__ inline void asc_prefetch_gm2l2cache(__gm__ fp8_e5m2_t* src, uint32_t burst_num, uint32_t burst_len, uint64_t burst_src_stride)
+// bfloat16_t  float
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
+    uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
+    uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post,
+    bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
 {
-    asc_prefetch_gm2l2cache_impl(src, burst_num, burst_len, burst_src_stride);
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, 0, n_size, m_size, dst_stride, src_stride, 0, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, false);
+    }
 }
 
-__aicore__ inline void asc_prefetch_gm2l2cache(__gm__ fp8_e4m3fn_t* src, uint32_t burst_num, uint32_t burst_len, uint64_t burst_src_stride)
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
+    bool quant_pre_rnd, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
+    bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post,
+    uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
 {
-    asc_prefetch_gm2l2cache_impl(src, burst_num, burst_len, burst_src_stride);
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, quant_pre_rnd, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, false);
+    }
 }
 
-__aicore__ inline void asc_prefetch_gm2l2cache(__gm__ int16_t* src, uint32_t burst_num, uint32_t burst_len, uint64_t burst_src_stride)
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
+    uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
+    uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post,
+    bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en, bool enable_nz2dn)
 {
-    asc_prefetch_gm2l2cache_impl(src, burst_num, burst_len, burst_src_stride);
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, false, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, enable_nz2dn);
+    }
 }
 
-__aicore__ inline void asc_prefetch_gm2l2cache(__gm__ uint16_t* src, uint32_t burst_num, uint32_t burst_len, uint64_t burst_src_stride)
+// int8_t  float
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
+    uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
+    bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post,
+    uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
 {
-    asc_prefetch_gm2l2cache_impl(src, burst_num, burst_len, burst_src_stride);
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, 0, n_size, m_size, dst_stride, src_stride, 0, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, false);
+    }
 }
 
-__aicore__ inline void asc_prefetch_gm2l2cache(__gm__ half* src, uint32_t burst_num, uint32_t burst_len, uint64_t burst_src_stride)
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
+    bool quant_pre_rnd, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
+    bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post,
+    uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
 {
-    asc_prefetch_gm2l2cache_impl(src, burst_num, burst_len, burst_src_stride);
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, quant_pre_rnd, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, false);
+    }
 }
 
-__aicore__ inline void asc_prefetch_gm2l2cache(__gm__ bfloat16_t* src, uint32_t burst_num, uint32_t burst_len, uint64_t burst_src_stride)
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
+    uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
+    bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post,
+    uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en, bool enable_nz2dn)
 {
-    asc_prefetch_gm2l2cache_impl(src, burst_num, burst_len, burst_src_stride);
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, false, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, enable_nz2dn);
+    }
 }
 
-__aicore__ inline void asc_prefetch_gm2l2cache(__gm__ int32_t* src, uint32_t burst_num, uint32_t burst_len, uint64_t burst_src_stride)
+// uint8_t  float
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
+    uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
+    uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post,
+    bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
 {
-    asc_prefetch_gm2l2cache_impl(src, burst_num, burst_len, burst_src_stride);
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, false, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, false);
+    }
 }
 
-__aicore__ inline void asc_prefetch_gm2l2cache(__gm__ uint32_t* src, uint32_t burst_num, uint32_t burst_len, uint64_t burst_src_stride)
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
+    bool quant_pre_rnd, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
+    bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post,
+    uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
 {
-    asc_prefetch_gm2l2cache_impl(src, burst_num, burst_len, burst_src_stride);
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, quant_pre_rnd, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, false);
+    }
 }
 
-__aicore__ inline void asc_prefetch_gm2l2cache(__gm__ float* src, uint32_t burst_num, uint32_t burst_len, uint64_t burst_src_stride)
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
+    uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
+    uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post,
+    bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en, bool enable_nz2dn)
 {
-    asc_prefetch_gm2l2cache_impl(src, burst_num, burst_len, burst_src_stride);
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, false, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, enable_nz2dn);
+    }
 }
 
-// =============asc_prefetch_gm2l2cache_dn2nz===============
+// float  float
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
+    uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
+    bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post,
+    uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, false, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, false);
+    }
+}
 
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
+    bool quant_pre_rnd, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
+    bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post,
+    uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, quant_pre_rnd, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, false);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
+    uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
+    bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post,
+    uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en, bool enable_nz2dn)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, false, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, enable_nz2dn);
+    }
+}
+
+// half int32_t
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
+    uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
+    bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post,
+    uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, false, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, false);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
+    bool quant_pre_rnd, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
+    bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post,
+    uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, quant_pre_rnd, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, false);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
+    uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
+    bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post,
+    uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en, bool enable_nz2dn)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, false, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, enable_nz2dn);
+    }
+}
+
+// int8_t int32_t
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
+    uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
+    uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post,
+    bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, false, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, false);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
+    bool quant_pre_rnd, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
+    bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post,
+    uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, quant_pre_rnd, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, false);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
+    uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
+    uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post,
+    bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en, bool enable_nz2dn)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, false, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, enable_nz2dn);
+    }
+}
+
+// uint8_t int32_t
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
+    uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
+    uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post,
+    bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, false, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, false);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
+    bool quant_pre_rnd, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
+    bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post,
+    uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, quant_pre_rnd, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, false);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
+    uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
+    uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post,
+    bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en, bool enable_nz2dn)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, false, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, enable_nz2dn);
+    }
+}
+
+// int32_t int32_t
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
+    uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
+    uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post,
+    bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, false, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, false);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
+    bool quant_pre_rnd, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
+    bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post,
+    uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, quant_pre_rnd, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, false);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
+    uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
+    uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post,
+    bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en, bool enable_nz2dn)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, false, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, enable_nz2dn);
+    }
+}
+
+
+// hifloat8_t  float
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ hifloat8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
+    uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
+    uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post,
+    bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en, bool enable_nz2dn)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, false, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, enable_nz2dn);
+    }
+}
+
+// fp8_e4m3fn_t  float
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ fp8_e4m3fn_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
+    uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
+    uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post,
+    bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en, bool enable_nz2dn)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, false, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, enable_nz2dn);
+    }
+}
+
+
+// bfloat16_t int32_t
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ bfloat16_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
+    uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
+    uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post,
+    bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en, bool enable_nz2dn)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf(
+            dst, src, n_size, m_size, dst_stride, src_stride, false, enable_clip_relu_pre, unit_flag_mode,
+            static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, false, enable_nz2dn);
+    }
+}
+
+// void float
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ void* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
+    uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
+    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post,
+    uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, bool eltwise_antq_en, bool c0_pad_en, bool broadcast_en,
+    bool enable_nz2dn)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf_s4(
+            dst, src, n_size, m_size, dst_stride, src_stride, false, enable_clip_relu_pre,
+            unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, broadcast_en, enable_nz2dn);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ void* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
+    uint16_t src_stride, bool quant_pre_rnd, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
+    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post,
+    uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, bool eltwise_antq_en, bool c0_pad_en, bool broadcast_en,
+    bool enable_nz2dn)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf_s4(
+            dst, src, n_size, m_size, dst_stride, src_stride, quant_pre_rnd, enable_clip_relu_pre,
+            unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, broadcast_en, enable_nz2dn);
+    }
+}
+
+// void int32_t
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ void* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
+    uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
+    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post,
+    uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, bool eltwise_antq_en, bool c0_pad_en, bool broadcast_en,
+    bool enable_nz2dn)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf_s4(
+            dst, src, n_size, m_size, dst_stride, src_stride, false, enable_clip_relu_pre,
+            unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, broadcast_en, enable_nz2dn);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2l1(
+    __cbuf__ void* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
+    uint16_t src_stride, bool quant_pre_rnd, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
+    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post,
+    uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, bool eltwise_antq_en, bool c0_pad_en, bool broadcast_en,
+    bool enable_nz2dn)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_cbuf_s4(
+            dst, src, n_size, m_size, dst_stride, src_stride, quant_pre_rnd, enable_clip_relu_pre,
+            unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            false, c0_pad_en, false, broadcast_en, enable_nz2dn);
+    }
+}
+
+// ==========asc_prefetch_l2cache==========
+// =======asc_prefetch_gm2l2cache=======
+// int8_t
+__aicore__ inline void asc_prefetch_gm2l2cache(
+    __gm__ int8_t* src, uint32_t burst_num, uint32_t burst_len, uint64_t burst_src_stride)
+{
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_align_v2(
+            (__cbuf__ int8_t*)0, src, 0, burst_num, burst_len, 0, 0, true, false, 3, burst_src_stride, 0);
+    }
+    if ASC_IS_AIV {
+        copy_gm_to_ubuf_align_v2(
+            (__ubuf__ int8_t*)0, src, 0, burst_num, burst_len, 0, 0, false, false, 3, burst_src_stride, 0, false);
+    }
+}
+
+// uint8_t
+__aicore__ inline void asc_prefetch_gm2l2cache(
+    __gm__ uint8_t* src, uint32_t burst_num, uint32_t burst_len, uint64_t burst_src_stride)
+{
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_align_v2(
+            (__cbuf__ uint8_t*)0, src, 0, burst_num, burst_len, 0, 0, true, false, 3, burst_src_stride, 0);
+    }
+    if ASC_IS_AIV {
+        copy_gm_to_ubuf_align_v2(
+            (__ubuf__ uint8_t*)0, src, 0, burst_num, burst_len, 0, 0, false, false, 3, burst_src_stride, 0, false);
+    }
+}
+
+// hifloat8_t
+__aicore__ inline void asc_prefetch_gm2l2cache(
+    __gm__ hifloat8_t* src, uint32_t burst_num, uint32_t burst_len, uint64_t burst_src_stride)
+{
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_align_v2(
+            (__cbuf__ hifloat8_t*)0, src, 0, burst_num, burst_len, 0, 0, true, false, 3, burst_src_stride, 0);
+    }
+    if ASC_IS_AIV {
+        copy_gm_to_ubuf_align_v2(
+            (__ubuf__ hifloat8_t*)0, src, 0, burst_num, burst_len, 0, 0, false, false, 3, burst_src_stride, 0, false);
+    }
+}
+
+// fp8_e5m2_t
+__aicore__ inline void asc_prefetch_gm2l2cache(
+    __gm__ fp8_e5m2_t* src, uint32_t burst_num, uint32_t burst_len, uint64_t burst_src_stride)
+{
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_align_v2(
+            (__cbuf__ fp8_e5m2_t*)0, src, 0, burst_num, burst_len, 0, 0, true, false, 3, burst_src_stride, 0);
+    }
+    if ASC_IS_AIV {
+        copy_gm_to_ubuf_align_v2(
+            (__ubuf__ fp8_e5m2_t*)0, src, 0, burst_num, burst_len, 0, 0, false, false, 3, burst_src_stride, 0, false);
+    }
+}
+
+// fp8_e4m3fn_t
+__aicore__ inline void asc_prefetch_gm2l2cache(
+    __gm__ fp8_e4m3fn_t* src, uint32_t burst_num, uint32_t burst_len, uint64_t burst_src_stride)
+{
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_align_v2(
+            (__cbuf__ fp8_e4m3fn_t*)0, src, 0, burst_num, burst_len, 0, 0, true, false, 3, burst_src_stride, 0);
+    }
+    if ASC_IS_AIV {
+        copy_gm_to_ubuf_align_v2(
+            (__ubuf__ fp8_e4m3fn_t*)0, src, 0, burst_num, burst_len, 0, 0, false, false, 3, burst_src_stride, 0, false);
+    }
+}
+
+// int16_t
+__aicore__ inline void asc_prefetch_gm2l2cache(
+    __gm__ int16_t* src, uint32_t burst_num, uint32_t burst_len, uint64_t burst_src_stride)
+{
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_align_v2(
+            (__cbuf__ int16_t*)0, src, 0, burst_num, burst_len, 0, 0, true, false, 3, burst_src_stride, 0);
+    }
+    if ASC_IS_AIV {
+        copy_gm_to_ubuf_align_v2(
+            (__ubuf__ int16_t*)0, src, 0, burst_num, burst_len, 0, 0, false, false, 3, burst_src_stride, 0, false);
+    }
+}
+
+// uint16_t
+__aicore__ inline void asc_prefetch_gm2l2cache(
+    __gm__ uint16_t* src, uint32_t burst_num, uint32_t burst_len, uint64_t burst_src_stride)
+{
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_align_v2(
+            (__cbuf__ uint16_t*)0, src, 0, burst_num, burst_len, 0, 0, true, false, 3, burst_src_stride, 0);
+    }
+    if ASC_IS_AIV {
+        copy_gm_to_ubuf_align_v2(
+            (__ubuf__ uint16_t*)0, src, 0, burst_num, burst_len, 0, 0, false, false, 3, burst_src_stride, 0, false);
+    }
+}
+
+// half
+__aicore__ inline void asc_prefetch_gm2l2cache(
+    __gm__ half* src, uint32_t burst_num, uint32_t burst_len, uint64_t burst_src_stride)
+{
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_align_v2(
+            (__cbuf__ half*)0, src, 0, burst_num, burst_len, 0, 0, true, false, 3, burst_src_stride, 0);
+    }
+    if ASC_IS_AIV {
+        copy_gm_to_ubuf_align_v2(
+            (__ubuf__ half*)0, src, 0, burst_num, burst_len, 0, 0, false, false, 3, burst_src_stride, 0, false);
+    }
+}
+
+// bfloat16_t
+__aicore__ inline void asc_prefetch_gm2l2cache(
+    __gm__ bfloat16_t* src, uint32_t burst_num, uint32_t burst_len, uint64_t burst_src_stride)
+{
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_align_v2(
+            (__cbuf__ bfloat16_t*)0, src, 0, burst_num, burst_len, 0, 0, true, false, 3, burst_src_stride, 0);
+    }
+    if ASC_IS_AIV {
+        copy_gm_to_ubuf_align_v2(
+            (__ubuf__ bfloat16_t*)0, src, 0, burst_num, burst_len, 0, 0, false, false, 3, burst_src_stride, 0, false);
+    }
+}
+
+// int32_t
+__aicore__ inline void asc_prefetch_gm2l2cache(
+    __gm__ int32_t* src, uint32_t burst_num, uint32_t burst_len, uint64_t burst_src_stride)
+{
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_align_v2(
+            (__cbuf__ int32_t*)0, src, 0, burst_num, burst_len, 0, 0, true, false, 3, burst_src_stride, 0);
+    }
+    if ASC_IS_AIV {
+        copy_gm_to_ubuf_align_v2(
+            (__ubuf__ int32_t*)0, src, 0, burst_num, burst_len, 0, 0, false, false, 3, burst_src_stride, 0, false);
+    }
+}
+
+// uint32_t
+__aicore__ inline void asc_prefetch_gm2l2cache(
+    __gm__ uint32_t* src, uint32_t burst_num, uint32_t burst_len, uint64_t burst_src_stride)
+{
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_align_v2(
+            (__cbuf__ uint32_t*)0, src, 0, burst_num, burst_len, 0, 0, true, false, 3, burst_src_stride, 0);
+    }
+    if ASC_IS_AIV {
+        copy_gm_to_ubuf_align_v2(
+            (__ubuf__ uint32_t*)0, src, 0, burst_num, burst_len, 0, 0, false, false, 3, burst_src_stride, 0, false);
+    }
+}
+
+// float
+__aicore__ inline void asc_prefetch_gm2l2cache(
+    __gm__ float* src, uint32_t burst_num, uint32_t burst_len, uint64_t burst_src_stride)
+{
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_align_v2(
+            (__cbuf__ float*)0, src, 0, burst_num, burst_len, 0, 0, true, false, 3, burst_src_stride, 0);
+    }
+    if ASC_IS_AIV {
+        copy_gm_to_ubuf_align_v2(
+            (__ubuf__ float*)0, src, 0, burst_num, burst_len, 0, 0, false, false, 3, burst_src_stride, 0, false);
+    }
+}
+
+// =======asc_prefetch_gm2l2cache_dn2nz=======
+// int8_t
 __aicore__ inline void asc_prefetch_gm2l2cache_dn2nz(
-    __gm__ int8_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value,
-    uint64_t loop4_src_stride
-)
+    __gm__ int8_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride)
 {
-    asc_prefetch_gm2l2cache_dn2nz_impl(src, loop1_src_stride, n_value, d_value, loop4_src_stride);
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_dn2nz(
+            (__cbuf__ int8_t*)0, src, 0, loop1_src_stride, 3, n_value, d_value, loop4_src_stride, false, false);
+    }
 }
 
+// uint8_t
 __aicore__ inline void asc_prefetch_gm2l2cache_dn2nz(
-    __gm__ uint8_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value,
-    uint64_t loop4_src_stride
-)
+    __gm__ uint8_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride)
 {
-    asc_prefetch_gm2l2cache_dn2nz_impl(src, loop1_src_stride, n_value, d_value, loop4_src_stride);
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_dn2nz(
+            (__cbuf__ uint8_t*)0, src, 0, loop1_src_stride, 3, n_value, d_value, loop4_src_stride, false, false);
+    }
 }
 
+// hifloat8_t
 __aicore__ inline void asc_prefetch_gm2l2cache_dn2nz(
-    __gm__ hifloat8_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value,
-    uint64_t loop4_src_stride
-)
+    __gm__ hifloat8_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride)
 {
-    asc_prefetch_gm2l2cache_dn2nz_impl(src, loop1_src_stride, n_value, d_value, loop4_src_stride);
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_dn2nz(
+            (__cbuf__ hifloat8_t*)0, src, 0, loop1_src_stride, 3, n_value, d_value, loop4_src_stride, false, false);
+    }
 }
 
+// fp8_e5m2_t
 __aicore__ inline void asc_prefetch_gm2l2cache_dn2nz(
-    __gm__ fp8_e5m2_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value,
-    uint64_t loop4_src_stride
-)
+    __gm__ fp8_e5m2_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride)
 {
-    asc_prefetch_gm2l2cache_dn2nz_impl(src, loop1_src_stride, n_value, d_value, loop4_src_stride);
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_dn2nz(
+            (__cbuf__ fp8_e5m2_t*)0, src, 0, loop1_src_stride, 3, n_value, d_value, loop4_src_stride, false, false);
+    }
 }
 
+// fp8_e4m3fn_t
 __aicore__ inline void asc_prefetch_gm2l2cache_dn2nz(
-    __gm__ fp8_e4m3fn_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value,
-    uint64_t loop4_src_stride
-)
+    __gm__ fp8_e4m3fn_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride)
 {
-    asc_prefetch_gm2l2cache_dn2nz_impl(src, loop1_src_stride, n_value, d_value, loop4_src_stride);
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_dn2nz(
+            (__cbuf__ fp8_e4m3fn_t*)0, src, 0, loop1_src_stride, 3, n_value, d_value, loop4_src_stride, false, false);
+    }
 }
 
+// int16_t
 __aicore__ inline void asc_prefetch_gm2l2cache_dn2nz(
-    __gm__ int16_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value,
-    uint64_t loop4_src_stride
-)
+    __gm__ int16_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride)
 {
-    asc_prefetch_gm2l2cache_dn2nz_impl(src, loop1_src_stride, n_value, d_value, loop4_src_stride);
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_dn2nz(
+            (__cbuf__ int16_t*)0, src, 0, loop1_src_stride, 3, n_value, d_value, loop4_src_stride, false, false);
+    }
 }
 
+// uint16_t
 __aicore__ inline void asc_prefetch_gm2l2cache_dn2nz(
-    __gm__ uint16_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value,
-    uint64_t loop4_src_stride
-)
+    __gm__ uint16_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride)
 {
-    asc_prefetch_gm2l2cache_dn2nz_impl(src, loop1_src_stride, n_value, d_value, loop4_src_stride);
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_dn2nz(
+            (__cbuf__ uint16_t*)0, src, 0, loop1_src_stride, 3, n_value, d_value, loop4_src_stride, false, false);
+    }
 }
 
+// half
 __aicore__ inline void asc_prefetch_gm2l2cache_dn2nz(
-    __gm__ half* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value,
-    uint64_t loop4_src_stride
-)
+    __gm__ half* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride)
 {
-    asc_prefetch_gm2l2cache_dn2nz_impl(src, loop1_src_stride, n_value, d_value, loop4_src_stride);
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_dn2nz(
+            (__cbuf__ half*)0, src, 0, loop1_src_stride, 3, n_value, d_value, loop4_src_stride, false, false);
+    }
 }
 
+// bfloat16_t
 __aicore__ inline void asc_prefetch_gm2l2cache_dn2nz(
-    __gm__ bfloat16_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value,
-    uint64_t loop4_src_stride
-)
+    __gm__ bfloat16_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride)
 {
-    asc_prefetch_gm2l2cache_dn2nz_impl(src, loop1_src_stride, n_value, d_value, loop4_src_stride);
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_dn2nz(
+            (__cbuf__ bfloat16_t*)0, src, 0, loop1_src_stride, 3, n_value, d_value, loop4_src_stride, false, false);
+    }
 }
 
+// int32_t
 __aicore__ inline void asc_prefetch_gm2l2cache_dn2nz(
-    __gm__ int32_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value,
-    uint64_t loop4_src_stride
-)
+    __gm__ int32_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride)
 {
-    asc_prefetch_gm2l2cache_dn2nz_impl(src, loop1_src_stride, n_value, d_value, loop4_src_stride);
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_dn2nz(
+            (__cbuf__ int32_t*)0, src, 0, loop1_src_stride, 3, n_value, d_value, loop4_src_stride, false, false);
+    }
 }
 
+// uint32_t
 __aicore__ inline void asc_prefetch_gm2l2cache_dn2nz(
-    __gm__ uint32_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value,
-    uint64_t loop4_src_stride
-)
+    __gm__ uint32_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride)
 {
-    asc_prefetch_gm2l2cache_dn2nz_impl(src, loop1_src_stride, n_value, d_value, loop4_src_stride);
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_dn2nz(
+            (__cbuf__ uint32_t*)0, src, 0, loop1_src_stride, 3, n_value, d_value, loop4_src_stride, false, false);
+    }
 }
 
+// float
 __aicore__ inline void asc_prefetch_gm2l2cache_dn2nz(
-    __gm__ float* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value,
-    uint64_t loop4_src_stride
-)
+    __gm__ float* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride)
 {
-    asc_prefetch_gm2l2cache_dn2nz_impl(src, loop1_src_stride, n_value, d_value, loop4_src_stride);
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_dn2nz(
+            (__cbuf__ float*)0, src, 0, loop1_src_stride, 3, n_value, d_value, loop4_src_stride, false, false);
+    }
 }
 
-// =============asc_prefetch_gm2l2cache_nd2nz===============
-
+// =======asc_prefetch_gm2l2cache_nd2nz=======
+// int8_t
 __aicore__ inline void asc_prefetch_gm2l2cache_nd2nz(
-    __gm__ int8_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value,
-    uint64_t loop4_src_stride
-)
+    __gm__ int8_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride)
 {
-    asc_prefetch_gm2l2cache_nd2nz_impl(src, loop1_src_stride, n_value, d_value, loop4_src_stride);
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_nd2nz(
+            (__cbuf__ int8_t*)0, src, 0, loop1_src_stride, 3, n_value, d_value, loop4_src_stride, false, false);
+    }
 }
 
+// uint8_t
 __aicore__ inline void asc_prefetch_gm2l2cache_nd2nz(
-    __gm__ uint8_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value,
-    uint64_t loop4_src_stride
-)
+    __gm__ uint8_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride)
 {
-    asc_prefetch_gm2l2cache_nd2nz_impl(src, loop1_src_stride, n_value, d_value, loop4_src_stride);
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_nd2nz(
+            (__cbuf__ uint8_t*)0, src, 0, loop1_src_stride, 3, n_value, d_value, loop4_src_stride, false, false);
+    }
 }
 
+// hifloat8_t
 __aicore__ inline void asc_prefetch_gm2l2cache_nd2nz(
-    __gm__ hifloat8_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value,
-    uint64_t loop4_src_stride
-)
+    __gm__ hifloat8_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride)
 {
-    asc_prefetch_gm2l2cache_nd2nz_impl(src, loop1_src_stride, n_value, d_value, loop4_src_stride);
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_nd2nz(
+            (__cbuf__ hifloat8_t*)0, src, 0, loop1_src_stride, 3, n_value, d_value, loop4_src_stride, false, false);
+    }
 }
 
+// fp8_e5m2_t
 __aicore__ inline void asc_prefetch_gm2l2cache_nd2nz(
-    __gm__ fp8_e5m2_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value,
-    uint64_t loop4_src_stride
-)
+    __gm__ fp8_e5m2_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride)
 {
-    asc_prefetch_gm2l2cache_nd2nz_impl(src, loop1_src_stride, n_value, d_value, loop4_src_stride);
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_nd2nz(
+            (__cbuf__ fp8_e5m2_t*)0, src, 0, loop1_src_stride, 3, n_value, d_value, loop4_src_stride, false, false);
+    }
 }
 
+// fp8_e4m3fn_t
 __aicore__ inline void asc_prefetch_gm2l2cache_nd2nz(
-    __gm__ fp8_e4m3fn_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value,
-    uint64_t loop4_src_stride
-)
+    __gm__ fp8_e4m3fn_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride)
 {
-    asc_prefetch_gm2l2cache_nd2nz_impl(src, loop1_src_stride, n_value, d_value, loop4_src_stride);
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_nd2nz(
+            (__cbuf__ fp8_e4m3fn_t*)0, src, 0, loop1_src_stride, 3, n_value, d_value, loop4_src_stride, false, false);
+    }
 }
 
+// int16_t
 __aicore__ inline void asc_prefetch_gm2l2cache_nd2nz(
-    __gm__ int16_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value,
-    uint64_t loop4_src_stride
-)
+    __gm__ int16_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride)
 {
-    asc_prefetch_gm2l2cache_nd2nz_impl(src, loop1_src_stride, n_value, d_value, loop4_src_stride);
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_nd2nz(
+            (__cbuf__ int16_t*)0, src, 0, loop1_src_stride, 3, n_value, d_value, loop4_src_stride, false, false);
+    }
 }
 
+// uint16_t
 __aicore__ inline void asc_prefetch_gm2l2cache_nd2nz(
-    __gm__ uint16_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value,
-    uint64_t loop4_src_stride
-)
+    __gm__ uint16_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride)
 {
-    asc_prefetch_gm2l2cache_nd2nz_impl(src, loop1_src_stride, n_value, d_value, loop4_src_stride);
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_nd2nz(
+            (__cbuf__ uint16_t*)0, src, 0, loop1_src_stride, 3, n_value, d_value, loop4_src_stride, false, false);
+    }
 }
 
+// half
 __aicore__ inline void asc_prefetch_gm2l2cache_nd2nz(
-    __gm__ half* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value,
-    uint64_t loop4_src_stride
-)
+    __gm__ half* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride)
 {
-    asc_prefetch_gm2l2cache_nd2nz_impl(src, loop1_src_stride, n_value, d_value, loop4_src_stride);
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_nd2nz(
+            (__cbuf__ half*)0, src, 0, loop1_src_stride, 3, n_value, d_value, loop4_src_stride, false, false);
+    }
 }
 
+// bfloat16_t
 __aicore__ inline void asc_prefetch_gm2l2cache_nd2nz(
-    __gm__ bfloat16_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value,
-    uint64_t loop4_src_stride
-)
+    __gm__ bfloat16_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride)
 {
-    asc_prefetch_gm2l2cache_nd2nz_impl(src, loop1_src_stride, n_value, d_value, loop4_src_stride);
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_nd2nz(
+            (__cbuf__ bfloat16_t*)0, src, 0, loop1_src_stride, 3, n_value, d_value, loop4_src_stride, false, false);
+    }
 }
 
+// int32_t
 __aicore__ inline void asc_prefetch_gm2l2cache_nd2nz(
-    __gm__ int32_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value,
-    uint64_t loop4_src_stride
-)
+    __gm__ int32_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride)
 {
-    asc_prefetch_gm2l2cache_nd2nz_impl(src, loop1_src_stride, n_value, d_value, loop4_src_stride);
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_nd2nz(
+            (__cbuf__ int32_t*)0, src, 0, loop1_src_stride, 3, n_value, d_value, loop4_src_stride, false, false);
+    }
 }
 
+// uint32_t
 __aicore__ inline void asc_prefetch_gm2l2cache_nd2nz(
-    __gm__ uint32_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value,
-    uint64_t loop4_src_stride
-)
+    __gm__ uint32_t* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride)
 {
-    asc_prefetch_gm2l2cache_nd2nz_impl(src, loop1_src_stride, n_value, d_value, loop4_src_stride);
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_nd2nz(
+            (__cbuf__ uint32_t*)0, src, 0, loop1_src_stride, 3, n_value, d_value, loop4_src_stride, false, false);
+    }
 }
 
+// float
 __aicore__ inline void asc_prefetch_gm2l2cache_nd2nz(
-    __gm__ float* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value,
-    uint64_t loop4_src_stride
-)
+    __gm__ float* src, uint64_t loop1_src_stride, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride)
 {
-    asc_prefetch_gm2l2cache_nd2nz_impl(src, loop1_src_stride, n_value, d_value, loop4_src_stride);
+    if ASC_IS_AIC {
+        copy_gm_to_cbuf_multi_nd2nz(
+            (__cbuf__ float*)0, src, 0, loop1_src_stride, 3, n_value, d_value, loop4_src_stride, false, false);
+    }
 }
 
-// =============asc_prefetch_stop===============
-
-__aicore__ inline void asc_prefetch_stop()
-{
-    asc_prefetch_stop_impl();
-}
+// =======asc_prefetch_gm2l2cache_nd2nz=======
+__aicore__ inline void asc_prefetch_stop(){__prefetch_stop();}
 
 #endif
 
