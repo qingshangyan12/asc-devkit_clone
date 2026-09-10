@@ -105,7 +105,7 @@ AI Core内部存在Scalar流水、MTE流水、Fixpipe流水<!-- npu="950" id1 --
 Scalar负责标量控制、地址计算、标量计算、Scalar访存以及发射其他流水指令等操作。Scalar流水内的GM访问需要按GM地址、访问路径以及DCache的Cache Line粒度区分：
 
 - **访问不同GM地址**：不同地址之间没有天然的数据依赖，无论访问是否经过DCache，硬件不保证这些访问的完成顺序或对其他观察者的可见顺序与代码顺序一致。例如先写`data`、后写`flag`时，不能仅依赖代码顺序推断其他流水、其他AI Core或Host侧一定先看到`data`、再看到`flag`。
-- **访问同一GM地址**：普通Scalar通过DCache访问同一GM地址时，同地址访问结果与程序序保持一致。虽然流水内同地址访问结果与程序序保持一致，但是其他流水或其他AI Core想要观察到该写入结果时，还需要按CacheLine处理DCache中的Dirty副本或旧副本，参考[DCache与GM的缓存一致性](./cache_coherence.md#dcache与gm的缓存一致性)。
+- **访问同一GM地址**：普通Scalar通过DCache访问同一GM地址时，同地址访问结果与程序序保持一致。虽然流水内同地址访问结果与程序序保持一致，但是其他流水或其他AI Core想要观察到该写入结果时，还需要按Cache Line处理DCache中的Dirty副本或旧副本，参考[DCache与GM的缓存一致性](./cache_coherence.md#dcache与gm的缓存一致性)。
 - **同一GM地址混用不同访问路径**：同一地址访问中如果混用经过DCache和不经过DCache的路径，硬件不保证最终结果一定符合代码顺序，需要由软件额外处理访问完成和Cache副本问题。例如Scalar经过DCache读写和Scalar原子操作混用，需要用户显式插入同步保证内存一致性。
 
 ##### MTE/Fixpipe流水
@@ -201,14 +201,14 @@ T4                                                                MTE3.LOAD_UB
 
 反向依赖出现在多次循环复用Buffer的场景中。正向依赖约束的是“本轮后序流水等待本轮前序流水”，例如本轮Vector等待本轮MTE2搬入完成；反向依赖约束的是“后续循环重新写入某块Buffer前，必须等待前序循环中最后一个使用该Buffer的流水完成访问”。
 
-无论使用单Buffer还是[Double Buffer](../../../technical_appendix/concepts_and_terms/performance_optimization/double_buffer.md)，只要后续循环会重新写入某块Buffer，就需要同步保证一致性。单Buffer和Double Buffer区别在于同一块Buffer被复用的间隔不同：
+无论使用单Buffer还是[DoubleBuffer](../../../technical_appendix/concepts_and_terms/performance_optimization/double_buffer.md)，只要后续循环会重新写入某块Buffer，就需要同步保证一致性。单Buffer和DoubleBuffer区别在于同一块Buffer被复用的间隔不同：
 
 | 场景 | Buffer复用关系 | 需要等待的位置 | 说明 |
 | --- | --- | --- | --- |
 | 单Buffer | Loop 1复用Loop 0的`buf`。 | Loop 1写`buf`前，等待Loop 0最后一个使用`buf`的流水完成。 | 相邻循环之间存在反向依赖。 |
-| Double Buffer | Loop 0使用`buffer1`，Loop 1使用`buffer2`，Loop 2重新使用`buffer1`。 | Loop 2写`buffer1`前，等待Loop 0最后一个使用`buffer1`的流水完成。 | 反向依赖仍存在，只是同一Buffer的复用间隔变长。 |
+| DoubleBuffer | Loop 0使用`buffer1`，Loop 1使用`buffer2`，Loop 2重新使用`buffer1`。 | Loop 2写`buffer1`前，等待Loop 0最后一个使用`buffer1`的流水完成。 | 反向依赖仍存在，只是同一Buffer的复用间隔变长。 |
 
-如果不处理反向依赖，后续循环的写入可能覆盖前序循环仍在读取或搬出的数据，导致内存一致性问题。下面分别用单Buffer和Double Buffer说明。
+如果不处理反向依赖，后续循环的写入可能覆盖前序循环仍在读取或搬出的数据，导致内存一致性问题。下面分别用单Buffer和DoubleBuffer说明。
 
 ##### 单Buffer示例
 
@@ -235,7 +235,7 @@ T3                                                WAIT MTE3
 
 上例中的`WAIT MTE3`就是反向同步点。它不是本轮`MTE2 -> V -> MTE3`的正向依赖，而是用于保证Loop 1复用`buf`前，Loop 0对`buf`的使用已经结束。
 
-##### Double Buffer示例
+##### DoubleBuffer示例
 
 ```text
 时间点    Loop 0                                  Loop 1                                  Loop 2
@@ -264,11 +264,11 @@ T4                                                                              
                                                                                           // 重新复用buffer1搬入Loop 2输入
 ```
 
-上例中的`WAIT MTE3`是Double Buffer场景下的反向同步点。它不是为了建立Loop 2内部`MTE2 -> V -> MTE3`的正向依赖，而是为了保证`buffer1`在被Loop 2重新写入前，Loop 0对`buffer1`的使用已经结束。
+上例中的`WAIT MTE3`是DoubleBuffer场景下的反向同步点。它不是为了建立Loop 2内部`MTE2 -> V -> MTE3`的正向依赖，而是为了保证`buffer1`在被Loop 2重新写入前，Loop 0对`buffer1`的使用已经结束。
 
-反向依赖时，无论是单Buffer还是Double Buffer，维护内存一致性的原则不变：谁先使用Buffer，谁在使用完成后通知；谁后复用Buffer，谁在复用前等待。
+反向依赖时，无论是单Buffer还是DoubleBuffer，维护内存一致性的原则不变：谁先使用Buffer，谁在使用完成后通知；谁后复用Buffer，谁在复用前等待。
 
-如果使用`mutex_id`处理同步，单Buffer场景下所有循环复用同一个`mutex_id`；Double Buffer场景下`buffer1`和`buffer2`分别使用不同`mutex_id`。这样后续循环重新复用某个`Buffer`时，会等待该`Buffer`上一轮最后一个使用者释放对应`mutex_id`。具体示例请参考[asc_lock](../../../../api/SIMD-API/c_api/sync/asc_lock.md)/[asc_unlock](../../../../api/SIMD-API/c_api/sync/asc_unlock.md)。
+如果使用`mutex_id`处理同步，单Buffer场景下所有循环复用同一个`mutex_id`；DoubleBuffer场景下`buffer1`和`buffer2`分别使用不同`mutex_id`。这样后续循环重新复用某个`Buffer`时，会等待该`Buffer`上一轮最后一个使用者释放对应`mutex_id`。具体示例请参考[asc_lock](../../../../api/SIMD-API/c_api/sync/asc_lock.md)/[asc_unlock](../../../../api/SIMD-API/c_api/sync/asc_unlock.md)。
 
 ### 同流水内存一致性
 
@@ -338,7 +338,7 @@ Scalar流水不通过`asc_sync_pipe(PIPE_S)`处理，Scalar确保上一个指令
 | 接口 | 使用场景 | 简要说明 |
 | --- | --- | --- |
 | [asc_sync_notify](../../../../api/SIMD-API/c_api/sync/asc_sync_notify.md)/[asc_sync_wait](../../../../api/SIMD-API/c_api/sync/asc_sync_wait.md) | 两条流水之间存在明确依赖。 | `notify`在源流水设置同步标志，`wait`在目标流水等待该标志；通过源流水、目标流水和`event_id`配对。 |
-| [asc_lock](../../../../api/SIMD-API/c_api/sync/asc_lock.md)/[asc_unlock](../../../../api/SIMD-API/c_api/sync/asc_unlock.md) | 多流水之间需要按Buffer生命周期或mutex_id管理依赖。 | 使用mutex机制阻塞或释放指定流水，适合复杂流水编排、反向依赖和Double Buffer场景；必须成对使用，避免嵌套相同`mutex_id`。该机制为[NPU架构版本3510](../../language_extension/simd_builtin_keywords.md)新增。 |
+| [asc_lock](../../../../api/SIMD-API/c_api/sync/asc_lock.md)/[asc_unlock](../../../../api/SIMD-API/c_api/sync/asc_unlock.md) | 多流水之间需要按Buffer生命周期或mutex_id管理依赖。 | 使用mutex机制阻塞或释放指定流水，适合复杂流水编排、反向依赖和DoubleBuffer场景；必须成对使用，避免嵌套相同`mutex_id`。该机制为[NPU架构版本3510](../../language_extension/simd_builtin_keywords.md)新增。 |
 | [asc_sync](../../../../api/SIMD-API/c_api/sync/asc_sync.md) | 需要等待所有流水前序操作完成。 | 等待所有流水线操作完成，范围较大，会影响性能；若只依赖单条或少数流水，优先使用更精确的同步接口。|
 | [asc_sync_mte2](../../../../api/SIMD-API/c_api/sync/asc_sync_mte2.md)/[asc_sync_mte3](../../../../api/SIMD-API/c_api/sync/asc_sync_mte3.md)/[asc_sync_vec](../../../../api/SIMD-API/c_api/sync/asc_sync_vec.md) | 需要等待MTE2、MTE3或Vector流水前序操作完成。 | 面向特定流水的便捷等待接口，用于等待指定流水前序操作完成后再启动后续相关操作；这类接口不表达一对源流水和目标流水的精确配对关系。 |
 
