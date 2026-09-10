@@ -3,6 +3,7 @@
 .clangd.local
 /build/
 /build_ut/
+/.worktrees/
 build_out
 output
 __pycache__/
