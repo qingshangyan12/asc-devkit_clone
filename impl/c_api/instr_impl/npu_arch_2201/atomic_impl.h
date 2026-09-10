@@ -91,7 +91,6 @@ __aicore__ inline void asc_set_atomic_min_int32() { asc_set_atomic_min_int32_imp
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_disable_dma_atomic)
 __aicore__ inline void asc_set_atomic_none() { asc_disable_dma_atomic(); }
 
-ASC_DEPRECATED(9.1.0, "2027/09/07", asc_atomic_add)
 __aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& config)
 {
     asc_get_store_atomic_config_impl(config);
