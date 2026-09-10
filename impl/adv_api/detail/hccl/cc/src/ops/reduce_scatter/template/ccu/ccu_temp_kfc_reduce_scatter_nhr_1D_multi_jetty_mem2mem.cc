@@ -12,6 +12,8 @@
 #include "channel.h"
 #include "ccu_temp_kfc_reduce_scatter_nhr_1D_multi_jetty_mem2mem.h"
 
+#include <set>
+
 namespace mc2_ops_hccl {
 namespace {
 // 与 hccl CcuTempReduceScatterNhrMultiJettyMem2Mem1D 保持一致：当前 portNum 为 1。
@@ -46,21 +48,36 @@ HcclResult CcuTempKfcReduceScatterNHR1DMultiJettyMem2Mem::CalcRes(
             HCCL_E_INTERNAL);
     }
 
+    // 同一 peer 存在多条 CLOS 链路（multijetty 逐链路建通道）：每 peer 只取首条，
+    // 对齐 hccl GetNhrStepInfo 的 channelResort 语义（通道数 = peer 数），
+    // 否则通道数 = peer 数 × 每对链路数，会超过 CCU_MAX_RANK_SIZE(16) 上限。
+    std::vector<HcclChannelDesc> dedupedChannels;
+    std::set<u32> seenPeers;
+    for (const auto& channel : channelDescs) {
+        if (seenPeers.insert(RemoteRankIdToSubRank(channel.remoteRank)).second) {
+            dedupedChannels.push_back(channel);
+        }
+    }
+    CHK_PRT_RET(
+        dedupedChannels.empty(),
+        HCCL_ERROR("[CcuTempKfcReduceScatterNHR1DMultiJettyMem2Mem] no CLOS channel for any NHR peer."),
+        HCCL_E_INTERNAL);
+
     auto kernelArg = std::make_shared<CcuKernelArgKfcReduceScatterNHR1DMultiJettyMem2Mem>();
     kernelArg->rankSize = tempRankSize_;
     kernelArg->rankId = mySubCommRank_;
     kernelArg->portNum = KFC_RS_NHR_PORT_NUM;
     kernelArg->opParam = param;
     kernelArg->subCommRanks = subCommRanks_;
-    for (u32 i = 0; i < channelDescs.size(); ++i) {
-        kernelArg->rank2ChannelIdx[RemoteRankIdToSubRank(channelDescs[i].remoteRank)] = i;
+    for (u32 i = 0; i < dedupedChannels.size(); ++i) {
+        kernelArg->rank2ChannelIdx.emplace(RemoteRankIdToSubRank(dedupedChannels[i].remoteRank), i);
     }
     CHK_RET(CalcNhrInfo(kernelArg->stepInfoVector));
 
     CcuKernelInfo kernelInfo{};
     CHK_SAFETY_FUNC_RET(strcpy_s(
         kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelReduceScatterNHR1DMultiJettyMem2Mem"));
-    kernelInfo.channels = channelDescs;
+    kernelInfo.channels = dedupedChannels;
     kernelInfo.setKernelArg(kernelArg);
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);
     return HCCL_SUCCESS;
