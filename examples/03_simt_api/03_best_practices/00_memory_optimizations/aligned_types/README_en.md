@@ -24,6 +24,32 @@
 
 This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B groups. Each group has aligned and non-aligned comparisons; the 4B group covers `alignof=1` and `alignof=2` narrow alignment levels, plus 2 mixed-field struct comparisons with inconsistent field types. During testing, an input array `d_idata` of length `num_elements` is copied entirely to `d_odata`, and transfer efficiency is compared.
 
+- Basic Concepts:
+
+  **1. alignof**
+
+  A compile-time operator that returns the alignment requirement of an object, that is, the number of bytes that the starting address of the object must be a multiple of. The default `alignof` of a struct equals the maximum `alignof` of all its fields, and can be forcibly increased using the `alignas` keyword. For example, for `struct T` and `struct T2` below, `T` has `alignof` of 4B, and `T2` has `alignof` of 8B.
+
+  ```cpp
+  struct T { uint8_t a; uint32_t b; };  // alignof = max(1, 4) = 4
+  struct alignas(8) T2 { uint8_t a; uint32_t b; };  // alignof = 8 (alignas increases alignment)
+  ```
+
+  **2. alignas**
+
+  An alignment specifier introduced in C++11 that forces increased alignment when declaring objects.
+
+  Restrictions of `alignas`:
+
+  - **Can only increase, not decrease**: The `N` in `alignas(N)` must be greater than or equal to the default `alignof` of the type, that is, the maximum `alignof` of all fields; otherwise the compiler will ignore it or report an error.
+  - **Must be a power of 2**: The `N` in `alignas(N)` must be a power of 2.
+  - **Also increases sizeof**: `sizeof` must be a multiple of `alignof`, so when increasing `alignof`, `sizeof` rounds up.
+
+  ```cpp
+  struct alignas(4) Align3 { unsigned char r, g, b; }; // alignof=4 sizeof=4 (increased with alignas)
+  struct Misalign3 { unsigned char r, g, b; }; // alignof=1 sizeof=3 (default)
+  ```
+
 - Key Parameters:
 
   | Parameter | Value | Description |
@@ -52,32 +78,6 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
   | Misalign32       | 8 x u32                  |  32B  | **4B** | 16777216  |
 
 ## Example Implementation
-
-### Basic Concepts
-
-  **1. alignof**
-
-  A compile-time operator that returns the alignment requirement of an object, that is, the number of bytes that the starting address of the object must be a multiple of. The default `alignof` of a struct equals the maximum `alignof` of all its fields, and can be forcibly increased using the `alignas` keyword. For example, for `struct T` and `struct T2` below, `T` has `alignof` of 4B, and `T2` has `alignof` of 8B.
-
-  ```cpp
-  struct T { uint8_t a; uint32_t b; };  // alignof = max(1, 4) = 4
-  struct alignas(8) T2 { uint8_t a; uint32_t b; };  // alignof = 8 (alignas increases alignment)
-  ```
-
-  **2. alignas**
-
-  An alignment specifier introduced in C++11 that forces increased alignment when declaring objects.
-
-  Restrictions of `alignas`:
-
-  - **Can only increase, not decrease**: The `N` in `alignas(N)` must be greater than or equal to the default `alignof` of the type, that is, the maximum `alignof` of all fields; otherwise the compiler will ignore it or report an error.
-  - **Must be a power of 2**: The `N` in `alignas(N)` must be a power of 2.
-  - **Also increases sizeof**: `sizeof` must be a multiple of `alignof`, so when increasing `alignof`, `sizeof` rounds up.
-
-  ```cpp
-  struct alignas(4) Align3 { unsigned char r, g, b; }; // alignof=4 sizeof=4 (increased with alignas)
-  struct Misalign3 { unsigned char r, g, b; }; // alignof=1 sizeof=3 (default)
-  ```
 
 ### Performance Metrics Description
 

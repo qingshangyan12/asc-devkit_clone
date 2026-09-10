@@ -24,6 +24,32 @@
 
 本样例选取14个结构体，按`sizeof`分为4B、8B、16B、32B四组，每组做类型对齐与非对齐的对照；其中4B组覆盖`alignof=1`与`alignof=2`两档窄对齐，并补充2组字段类型不一致的混合结构体对照。测试时依次将长度为`num_elements`的输入数组`d_idata`整体复制到`d_odata`，对比搬运效率。
 
+- 基础概念：
+
+  **1、alignof**
+
+  编译期运算符，返回对象的对齐要求，即该对象的起始地址必须是多少字节的倍数。结构体的默认`alignof`等于其所有字段`alignof`的最大值，可通过关键字`alignas`强制加大。例如下面的`struct T`和`struct T2`，`T`的`alignof`是4B，`T2`的`alignof`是8B。
+
+  ```cpp
+  struct T { uint8_t a; uint32_t b; };  // alignof = max(1, 4) = 4
+  struct alignas(8) T2 { uint8_t a; uint32_t b; };  // alignof = 8 (alignas 放大)
+  ```
+
+  **2、alignas**
+
+  C++11引入的对齐说明符，在声明对象时强制加大对齐。
+
+  `alignas`的几条限制：
+
+  - **只能放大，不能缩小**：`alignas(N)`中的`N`必须大于等于类型的默认`alignof`，即所有字段`alignof`的最大值，否则编译器会忽略或报错。
+  - **取值必须是2的幂**：`alignas(N)`中的`N`必须是2的幂。
+  - **会同步抬升sizeof**：`sizeof`必须是`alignof`的整数倍，所以放大`alignof`时，`sizeof`会向上进位。
+
+  ```cpp
+  struct alignas(4) Align3 { unsigned char r, g, b; }; // alignof=4 sizeof=4 (随alignas抬升)
+  struct Misalign3 { unsigned char r, g, b; }; // alignof=1 sizeof=3 (默认)
+  ```
+
 - 关键参数：
 
   | 参数 | 值 | 说明 |
@@ -52,32 +78,6 @@
   | Misalign32       | 8 × u32                  |  32B  | **4B** | 16777216  |
 
 ## 样例实现
-
-### 基础概念
-
-  **1、alignof**
-
-  编译期运算符，返回对象的对齐要求，即该对象的起始地址必须是多少字节的倍数。结构体的默认`alignof`等于其所有字段`alignof`的最大值，可通过关键字`alignas`强制加大。例如下面的`struct T`和`struct T2`，`T`的`alignof`是4B，`T2`的`alignof`是8B。
-
-  ```cpp
-  struct T { uint8_t a; uint32_t b; };  // alignof = max(1, 4) = 4
-  struct alignas(8) T2 { uint8_t a; uint32_t b; };  // alignof = 8 (alignas 放大)
-  ```
-
-  **2、alignas**
-
-  C++11引入的对齐说明符，在声明对象时强制加大对齐。
-
-  `alignas`的几条限制：
-
-  - **只能放大，不能缩小**：`alignas(N)`中的`N`必须大于等于类型的默认`alignof`，即所有字段`alignof`的最大值，否则编译器会忽略或报错。
-  - **取值必须是2的幂**：`alignas(N)`中的`N`必须是2的幂。
-  - **会同步抬升sizeof**：`sizeof`必须是`alignof`的整数倍，所以放大`alignof`时，`sizeof`会向上进位。
-
-  ```cpp
-  struct alignas(4) Align3 { unsigned char r, g, b; }; // alignof=4 sizeof=4 (随alignas抬升)
-  struct Misalign3 { unsigned char r, g, b; }; // alignof=1 sizeof=3 (默认)
-  ```
 
 ### 性能指标说明
 
