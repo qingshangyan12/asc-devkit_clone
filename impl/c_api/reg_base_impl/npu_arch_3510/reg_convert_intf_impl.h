@@ -20,8 +20,6 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
-// part_odd
-
 [[deprecated("NOTICE: asc_float2half_rd(vector_half& dst, vector_float src, vector_bool mask) is deprecated. "
              "Please use asc_float2half_rd(vector_half& dst, vector_float src, vector_bool mask, ASC_POSITION_EVEN) "
              "instead.")]] __simd_callee__ inline void

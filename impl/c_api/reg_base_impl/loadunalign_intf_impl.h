@@ -260,8 +260,6 @@ __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf
     }
 }
 
-// vldu
-
 __simd_callee__ inline void asc_loadunalign(vector_int8_t& dst, vector_load_unalign& src0, __ubuf__ int8_t* src1)
 {
     if ASC_IS_AIV {

@@ -40,46 +40,6 @@ union asc_store_align_config_post {
     };
 };
 
-// ==========偏移固定传入0，由用户自行更新目的操作数的地址=========
-// storealign
-
-// storealign_1st
-
-// storealign_pack
-
-// storealign_pack_v2
-
-// storealign_intlv
-
-//===========使用vsts通过int32_t传入偏移，用户可以选择更新偏移或者更新src地址
-
-// storealign_1st
-
-// storealign_pack
-
-// storealign_pack_v2
-
-// storealign_intlv
-
-//===========使用vsts通过int32_t传入偏移，增加PostMode可以设置成硬件自动Post Update
-
-// storealign_1st
-
-// storealign_pack
-
-// storealign_pack_v2
-
-// ==========通过地址寄存器传入偏移，用户可以选择更新偏移或者更新目的操作数的地址=========
-// storealign
-
-// storealign_1st
-
-// storealign_pack
-
-// storealign_pack_v2
-
-// storealign_intlv
-
 __simd_callee__ inline void asc_storealign_squeeze_status(__ubuf__ uint32_t* dst, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1122,7 +1082,6 @@ __simd_callee__ inline void asc_storealign(__ubuf__ int4b_t* dst, vector_int4x2_
     }
 }
 
-// storealign_1st
 __simd_callee__ inline void asc_storealign_1st(__ubuf__ int8_t* dst, vector_int8_t src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1253,7 +1212,6 @@ __simd_callee__ inline void asc_storealign_1st(__ubuf__ int4b_t* dst, vector_int
     }
 }
 
-// storealign_pack
 __simd_callee__ inline void asc_storealign_pack(
     __ubuf__ int16_t* dst, vector_int16_t src, int32_t offset, vector_bool mask)
 {
@@ -1324,7 +1282,6 @@ __simd_callee__ inline void asc_storealign_pack(
     }
 }
 
-// storealign_intlv
 __simd_callee__ inline void asc_storealign_intlv(
     __ubuf__ int8_t* dst, vector_int8_t src0, vector_int8_t src1, int32_t offset)
 {
@@ -1538,7 +1495,6 @@ __simd_callee__ inline void asc_storealign_postupdate(
     }
 }
 
-// storealign_1st
 __simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__ int8_t*& dst, vector_int8_t src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1612,7 +1568,6 @@ __simd_callee__ inline void asc_storealign_1st_postupdate(
     }
 }
 
-// storealign_pack
 __simd_callee__ inline void asc_storealign_pack_postupdate(
     __ubuf__ int16_t*& dst, vector_int16_t src, int32_t offset, vector_bool mask)
 {

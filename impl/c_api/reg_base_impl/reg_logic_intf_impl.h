@@ -542,7 +542,6 @@ __simd_callee__ inline void asc_or(vector_bool& dst, vector_bool src0, vector_bo
     }
 }
 
-// asc_xor(vxor) int32_t
 __simd_callee__ inline void asc_xor(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -550,7 +549,6 @@ __simd_callee__ inline void asc_xor(vector_int32_t& dst, vector_int32_t src0, ve
     }
 }
 
-// asc_xor(vxor) uint32_t
 __simd_callee__ inline void asc_xor(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -558,7 +556,6 @@ __simd_callee__ inline void asc_xor(vector_uint32_t& dst, vector_uint32_t src0, 
     }
 }
 
-// asc_xor(vxor) uint16_t
 __simd_callee__ inline void asc_xor(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -566,7 +563,6 @@ __simd_callee__ inline void asc_xor(vector_uint16_t& dst, vector_uint16_t src0, 
     }
 }
 
-// asc_xor(vxor) int16_t
 __simd_callee__ inline void asc_xor(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -574,7 +570,6 @@ __simd_callee__ inline void asc_xor(vector_int16_t& dst, vector_int16_t src0, ve
     }
 }
 
-// asc_xor(vxor) uint8_t
 __simd_callee__ inline void asc_xor(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -582,7 +577,6 @@ __simd_callee__ inline void asc_xor(vector_uint8_t& dst, vector_uint8_t src0, ve
     }
 }
 
-// asc_xor(vxor) int8_t
 __simd_callee__ inline void asc_xor(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -590,7 +584,6 @@ __simd_callee__ inline void asc_xor(vector_int8_t& dst, vector_int8_t src0, vect
     }
 }
 
-// asc_xor(pxor) bool
 __simd_callee__ inline void asc_xor(vector_bool& dst, vector_bool src0, vector_bool src1, vector_bool mask)
 {
     if ASC_IS_AIV {

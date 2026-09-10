@@ -795,7 +795,6 @@ __simd_callee__ inline vector_bfloat16_t asc_add(vector_bfloat16_t src0, vector_
     return dst;
 }
 
-// // ==========asc_addc(uint32_t/int32_t)==========
 __simd_callee__ inline void asc_addc(
     vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool carry_src,
     vector_bool mask)

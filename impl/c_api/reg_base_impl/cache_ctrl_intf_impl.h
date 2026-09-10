@@ -28,8 +28,6 @@ union ctrl_scalar_cache_bits {
     };
 };
 
-// Enum underlying values match HW encodings; cast is used as-is (illegal codes are not normalized).
-
 __aicore__ inline void asc_icache_preload(const void* addr, int64_t prefetch_len) { preload(addr, prefetch_len); }
 
 __aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t offset) { dc_preload(address, offset); }

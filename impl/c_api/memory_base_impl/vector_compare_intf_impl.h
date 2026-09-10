@@ -112,7 +112,6 @@ __aicore__ inline void asc_gt(
     }
 }
 
-// asc_ge(vcmp) half
 __aicore__ inline void asc_ge(
     __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
     uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
@@ -124,7 +123,6 @@ __aicore__ inline void asc_ge(
     }
 }
 
-// asc_ge(vcmp) float
 __aicore__ inline void asc_ge(
     __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
     uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
@@ -136,7 +134,6 @@ __aicore__ inline void asc_ge(
     }
 }
 
-// asc_ge(vcmpv) half
 __aicore__ inline void asc_ge(
     __ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
@@ -149,7 +146,6 @@ __aicore__ inline void asc_ge(
     }
 }
 
-// asc_ge(vcmpv) float
 __aicore__ inline void asc_ge(
     __ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
@@ -220,7 +216,6 @@ __aicore__ inline void asc_eq(
     }
 }
 
-// vcmp_ne(half, half)
 __aicore__ inline void asc_ne(
     __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
     uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
@@ -232,7 +227,6 @@ __aicore__ inline void asc_ne(
     }
 }
 
-// vcmp_ne(float, float)
 __aicore__ inline void asc_ne(
     __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
     uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
@@ -244,7 +238,6 @@ __aicore__ inline void asc_ne(
     }
 }
 
-// vcmpv_ne(uint8, half, half)
 __aicore__ inline void asc_ne(
     __ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
@@ -257,7 +250,6 @@ __aicore__ inline void asc_ne(
     }
 }
 
-// vcmpv_ne(uint8, float, float)
 __aicore__ inline void asc_ne(
     __ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,

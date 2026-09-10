@@ -174,8 +174,6 @@ __simd_callee__ inline void asc_load(vector_int4x2_t& dst, __ubuf__ int4b_t* src
     }
 }
 
-// ==========return-value load APIs==========
-// ========== return vector data register APIs ==========
 __simd_callee__ inline vector_int4x2_t asc_load(__ubuf__ int4b_t* src)
 {
     vector_int4x2_t dst;

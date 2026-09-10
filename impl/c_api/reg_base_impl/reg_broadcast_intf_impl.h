@@ -20,7 +20,6 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
-// vdup
 __simd_callee__ inline void asc_duplicate_scalar(vector_uint8_t& dst, uint8_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -105,9 +104,6 @@ __simd_callee__ inline void asc_duplicate_scalar(vector_float& dst, float value,
     }
 }
 
-// vdup with merging mode
-
-// vbr
 __simd_callee__ inline void asc_duplicate_scalar(vector_uint8_t& dst, uint8_t value)
 {
     if ASC_IS_AIV {
@@ -275,8 +271,6 @@ __simd_callee__ inline void asc_duplicate(vector_float& dst, vector_float src, v
         vdup(dst, src, mask, POS_LOWEST, MODE_ZEROING);
     }
 }
-
-// vdup with merging mode
 
 __simd_callee__ inline vector_uint8_t asc_duplicate_scalar(uint8_t value, vector_bool mask)
 {

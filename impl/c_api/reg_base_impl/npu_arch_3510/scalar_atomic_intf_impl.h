@@ -18,8 +18,6 @@
 #ifndef IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_SCALAR_ATOMIC_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_SCALAR_ATOMIC_INTF_IMPL_H
 
-// ==================== Deprecated interfaces ====================
-
 /// \deprecated Use asc_atomic_add for atomic add operation instead.
 [[deprecated("NOTICE: asc_set_store_atomic_config_v2 is deprecated."
              "Please use asc_atomic_add instead for atomic add operation.")]] __aicore__ inline void

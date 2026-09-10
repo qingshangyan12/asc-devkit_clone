@@ -390,7 +390,6 @@ __aicore__ inline void asc_mmad(
     }
 }
 
-// ==========mmad with bias==========
 __aicore__ inline void asc_mmad(
     __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ bfloat16_t* b_matrix, uint64_t bias, uint16_t m,
     uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
@@ -490,7 +489,6 @@ __aicore__ inline void asc_mmad(
     }
 }
 
-// ==========mmad_mx with bias==========
 __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __cb__ fp4x2_e1m2_t* b_matrix, uint64_t bias, uint16_t m,
     uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)

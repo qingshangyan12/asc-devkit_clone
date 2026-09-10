@@ -124,15 +124,6 @@ __aicore__ inline void asc_copy_ub2gm(__gm__ void* dst, __ubuf__ void* src, uint
     asc_copy_ub2gm(dst, src, 1, size / ASC_C_API_ONE_DATABLOCK_SIZE, 0, 0);
 }
 
-#ifndef ASC_C_API_DEFAULT_ZERO_VALUE
-#define ASC_C_API_DEFAULT_ZERO_VALUE 0
-#endif
-
-#ifndef ASC_C_API_DEFAULT_NBURST
-#define ASC_C_API_DEFAULT_NBURST 1
-#endif
-
-// uint8_t
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
@@ -149,7 +140,6 @@ __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint8_t* dst, __gm__ uint8_
     asc_copy_gm2ub_align(dst, src, 1, size, 0, 0, 0, 0);
 }
 
-// int8_t
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ int8_t* dst, __gm__ int8_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
@@ -166,7 +156,6 @@ __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ int8_t* dst, __gm__ int8_t*
     asc_copy_gm2ub_align(dst, src, 1, size, 0, 0, 0, 0);
 }
 
-// half
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ half* dst, __gm__ half* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
@@ -183,7 +172,6 @@ __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ half* dst, __gm__ half* src
     asc_copy_gm2ub_align(dst, src, 1, size, 0, 0, 0, 0);
 }
 
-// bfloat16_t
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t burst_count, uint32_t burst_len,
     uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
@@ -200,7 +188,6 @@ __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ bfloat16_t* dst, __gm__ bfl
     asc_copy_gm2ub_align(dst, src, 1, size, 0, 0, 0, 0);
 }
 
-// int16_t
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ int16_t* dst, __gm__ int16_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
@@ -217,7 +204,6 @@ __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ int16_t* dst, __gm__ int16_
     asc_copy_gm2ub_align(dst, src, 1, size, 0, 0, 0, 0);
 }
 
-// uint16_t
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
@@ -234,7 +220,6 @@ __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint16_t* dst, __gm__ uint1
     asc_copy_gm2ub_align(dst, src, 1, size, 0, 0, 0, 0);
 }
 
-// uint32_t
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
@@ -251,7 +236,6 @@ __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint32_t* dst, __gm__ uint3
     asc_copy_gm2ub_align(dst, src, 1, size, 0, 0, 0, 0);
 }
 
-// int32_t
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ int32_t* dst, __gm__ int32_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
@@ -268,7 +252,6 @@ __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ int32_t* dst, __gm__ int32_
     asc_copy_gm2ub_align(dst, src, 1, size, 0, 0, 0, 0);
 }
 
-// float
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ float* dst, __gm__ float* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
@@ -284,18 +267,6 @@ __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ float* dst, __gm__ float* s
 {
     asc_copy_gm2ub_align(dst, src, 1, size, 0, 0, 0, 0);
 }
-
-#undef ASC_C_API_DEFAULT_ZERO_VALUE
-
-#undef ASC_C_API_DEFAULT_NBURST
-
-#ifndef ASC_C_API_DEFAULT_ZERO_VALUE
-#define ASC_C_API_DEFAULT_ZERO_VALUE 0
-#endif
-
-#ifndef ASC_C_API_DEFAULT_NBURST
-#define ASC_C_API_DEFAULT_NBURST 1
-#endif
 
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ uint8_t* dst, __ubuf__ uint8_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
@@ -488,10 +459,6 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__ uint64_t* dst, __ubuf__ uint6
 {
     asc_copy_ub2gm_align(dst, src, 1, size, 0, 0, 0, 0);
 }
-
-#undef ASC_C_API_DEFAULT_ZERO_VALUE
-
-#undef ASC_C_API_DEFAULT_NBURST
 
 __aicore__ inline void asc_set_copy_pad_val(int8_t pad_value)
 {
