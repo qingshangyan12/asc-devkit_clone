@@ -2,10 +2,15 @@
 
 如图1所示，本章节将配合时序图介绍四对核间同步接口支持的四种同步控制模式各自实现的原理。
 
-- 模式0：AI Core核间的同步控制。对于AIC全核场景，同步所有的AIC核，直到所有的AIC核都执行到`asc_sync_inter_arrive`时，`asc_sync_inter_wait`后续由`pipe`参数指定的流水中的指令才会执行；对于AIV全核场景，同步所有的AIV核，直到所有的AIV核都执行到`asc_sync_inter_arrive`时，`asc_sync_inter_wait`后续由`pipe`参数指定的流水中的指令才会执行。
-- 模式1：AI Core内部，AIV核之间的同步控制。如果两个AIV核都运行了`asc_sync_subblock_arrive`，`asc_sync_subblock_wait`后续的所有流水中的指令才会执行。
-- 模式2：AI Core内部，AIC与AIV之间的同步控制。在AIC核执行`asc_sync_block_arrive`之后，两个AIV上`asc_sync_block_wait`后续由`pipe`参数指定的流水中的指令才会继续执行；两个AIV都执行`asc_sync_block_arrive`后，AIC上`asc_sync_block_wait`后续由`pipe`参数指定的流水中的指令才能执行。
-- 模式4：AI Core内部，AIC与单个AIV之间的同步控制。通过`asc_sync_intra_arrive`和`asc_sync_intra_wait`配合使用，AIV0与AIV1可单独触发AIC等待。
+- 模式0：AI Core核间的同步控制。对于AIC全核场景，同步所有的AIC核，直到所有的AIC核都执行到`asc_sync_inter_arrive`时，`asc_sync_inter_wait`后续的全部流水或者由`pipe`参数指定的流水（与NPU架构有关）中的指令才会执行；对于AIV全核场景，同步所有的AIV核，直到所有的AIV核都执行到`asc_sync_inter_arrive`时，`asc_sync_inter_wait`后续的全部流水或者由`pipe`参数指定的流水（与NPU架构有关）中的指令才会执行。
+- 模式1：AI Core内部，AIV核之间的同步控制。如果两个AIV核都运行了`asc_sync_subblock_arrive`，`asc_sync_subblock_wait`后续的全部流水或者由`pipe`参数指定的流水（与NPU架构有关）中的指令才会执行。
+- 模式2：AI Core内部，AIC与AIV之间的同步控制。在AIC核执行`asc_sync_block_arrive`之后，两个AIV上`asc_sync_block_wait`后续的全部流水或者由`pipe`参数指定的流水（与NPU架构有关）中的指令才会继续执行；两个AIV都执行`asc_sync_block_arrive`后，AIC上`asc_sync_block_wait`后续的全部流水或者由`pipe`参数指定的流水（与NPU架构有关）中的指令才能执行。
+- 模式4：AI Core内部，AIC与单个AIV之间的同步控制。在AIC核执行`asc_sync_intra_arrive`之后，单个AIV上`asc_sync_intra_wait`后续的由`pipe`参数指定的流水中的指令才会继续执行；单个AIV执行`asc_sync_intra_arrive`后，AIC上`asc_sync_intra_wait`后续的由`pipe`参数指定的流水中的指令才能执行。该模式仅在[NPU架构版本3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)上支持。
+
+> [!NOTE]说明
+> `asc_sync_inter_wait`、`asc_sync_subblock_wait`、`asc_sync_block_wait`接口阻塞的流水类型因NPU架构而异：
+> - 在[NPU架构版本2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)上，上述接口传入的`pipe`参数无效，无论取何值都阻塞全部流水的后续指令。
+> - 在[NPU架构版本3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)上，上述接口传入的`pipe`参数生效，阻塞由`pipe`参数指定的流水的后续指令。
 
 **图1**  同步控制模式示意图<a id="sync_control_mode_diagram"></a>    
 ![](../../../figures/3510_sync_control_mode_diagram.png "同步控制模式示意图")
