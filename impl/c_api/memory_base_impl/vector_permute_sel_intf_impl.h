@@ -78,23 +78,6 @@ __aicore__ inline void asc_transpose(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* 
     }
 }
 
-#define ASC_TRANSTO5HD_B8_CALL(dst_va, src_va, repeat, dst_stride, src_stride, dst_high_half, src_high_half) \
-    do {                                                                                                     \
-        if (!(dst_high_half)) {                                                                              \
-            if (!(src_high_half)) {                                                                          \
-                scatter_vnchwconv_b8(dst_va, src_va, repeat, dst_stride, src_stride, false, false);          \
-            } else {                                                                                         \
-                scatter_vnchwconv_b8(dst_va, src_va, repeat, dst_stride, src_stride, false, true);           \
-            }                                                                                                \
-        } else if (!(src_high_half)) {                                                                       \
-            scatter_vnchwconv_b8(dst_va, src_va, repeat, dst_stride, src_stride, true, false);               \
-        } else {                                                                                             \
-            scatter_vnchwconv_b8(dst_va, src_va, repeat, dst_stride, src_stride, true, true);                \
-        }                                                                                                    \
-    } while (0)
-
-#undef ASC_TRANSTO5HD_B8_CALL
-
 __aicore__ inline void asc_transto5hd_b16(
     ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride)
 {

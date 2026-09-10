@@ -988,7 +988,6 @@ __aicore__ inline void asc_leakyrelu_sync(__ubuf__ half* dst, __ubuf__ half* src
             ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16,
             ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
         asc_set_mask_count_end();
-        asc_set_mask_count_end();
         asc_sync_post_process();
     }
 }
@@ -1002,7 +1001,6 @@ __aicore__ inline void asc_leakyrelu_sync(__ubuf__ float* dst, __ubuf__ float* s
             dst, src, value, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
             ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16,
             ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
-        asc_set_mask_count_end();
         asc_set_mask_count_end();
         asc_sync_post_process();
     }

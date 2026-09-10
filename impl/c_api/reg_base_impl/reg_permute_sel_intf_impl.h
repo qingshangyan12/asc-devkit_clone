@@ -19,7 +19,6 @@
 #define IMPL_C_API_REG_BASE_IMPL_REG_PERMUTE_SEL_INTF_IMPL_H
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
-#include "impl/c_api/reg_base_impl/storeunalign_intf_impl.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/reg_base_impl/npu_arch_3510/reg_permute_sel_intf_impl.h"
