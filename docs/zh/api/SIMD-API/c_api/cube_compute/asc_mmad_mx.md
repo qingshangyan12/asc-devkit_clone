@@ -57,7 +57,7 @@ $$
 <!-- end id9 -->
 
 <!-- npu="950" id10 -->
-在Ascend 960PR/Ascend 950DT上不支持单独传入Scale矩阵地址，而是根据A、B矩阵的起始地址，按照固定的地址映射关系从L0A_MX Buffer和L0B_MX Buffer读取对应的Scale矩阵。各矩阵的信息说明见下表：
+在Ascend 960PR/Ascend 950DT上不支持传入Scale矩阵地址，而是根据A、B矩阵的起始地址，按照固定的地址映射关系从L0A_MX Buffer和L0B_MX Buffer读取对应的Scale矩阵。各矩阵的信息说明见下表：
 
 **表2** 矩阵信息说明
 
@@ -138,7 +138,7 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
 
 `a_dtype`、`scale_a_dtype`、`b_dtype`、`scale_b_dtype`的取值组合见下表：
 
-**表3** 支持的数据类型组合<a id="asc_mmad_mx_data_type"></a>
+**表3** 支持的数据类型组合<a id="asc_mmad_mx_data_type_960"></a>
 
 | a_dtype | scale_a_dtype | b_dtype | scale_b_dtype | 结果矩阵C数据类型 | Bias数据类型 |
 | --- | --- | --- | --- | --- | --- |
@@ -248,7 +248,7 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
 
 `a_dtype`、`b_dtype`的取值组合见下表：
 
-**表4** 支持的数据类型组合<a id="asc_mmad_mx_data_type"></a>
+**表4** 支持的数据类型组合<a id="asc_mmad_mx_data_type_950"></a>
 
 | a_dtype | b_dtype | ScaleA/ScaleB数据类型 | 结果矩阵C数据类型 | Bias数据类型 |
 | --- | --- | --- | --- | --- |
@@ -292,15 +292,15 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
 ## 参数说明
 
 <!-- npu="960" id13 -->
-**表5** 参数说明（[NPU架构版本9201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="asc_mmad_mx_param_table"></a>
+**表5** 参数说明（[NPU架构版本9201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="asc_mmad_mx_param_table_960"></a>
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | c_matrix | 输出 | 目的操作数，结果矩阵C在L0C Buffer中的起始地址，数据类型为`float`，需按照1024字节对齐。 |
-| a_matrix | 输入 | 源操作数，左矩阵A在L0A Buffer中的起始地址。数据类型由接口重载决定，具体请参见[表2](#asc_mmad_mx_data_type)。<br>矩阵数据类型为`fp8_e5m2_t`、`fp8_e4m3fn_t`时需按照1024字节对齐，其余矩阵数据类型需按照512字节对齐。<br>不显式传入ScaleA矩阵地址时ScaleA矩阵在L0A_MX Buffer中的起始地址为`a_matrix`起始地址除以16。 |
-| scale_a_matrix | 输入 | ScaleA矩阵在L0A_MX Buffer中的起始地址，仅显式传入Scale矩阵起始地址的接口包含该参数。 |
-| b_matrix | 输入 | 源操作数，右矩阵B在L0B Buffer中的起始地址。数据类型由接口重载决定，具体请参见[表2](#asc_mmad_mx_data_type)。<br>矩阵数据类型为`fp8_e5m2_t`、`fp8_e4m3fn_t`时需按照1024字节对齐，其余矩阵数据类型需按照512字节对齐。<br>不显式传入ScaleB矩阵地址时ScaleB矩阵在L0B_MX Buffer中的起始地址为`b_matrix`起始地址除以16。 |
-| scale_b_matrix | 输入 | ScaleB矩阵在L0B_MX Buffer中的起始地址，仅显式传入Scale矩阵起始地址的接口包含该参数。 |
+| a_matrix | 输入 | 源操作数，左矩阵A在L0A Buffer中的起始地址。数据类型由接口重载决定，具体请参见[表3](#asc_mmad_mx_data_type_960)。<br>矩阵数据类型为`fp8_e5m2_t`、`fp8_e4m3fn_t`时需按照1024字节对齐，其余矩阵数据类型需按照512字节对齐。<br>不显式传入ScaleA矩阵地址时ScaleA矩阵在L0A_MX Buffer中的起始地址为`a_matrix`起始地址除以16。 |
+| scale_a_matrix | 输入 | ScaleA矩阵在L0A_MX Buffer中的起始地址，仅显式传入Scale矩阵起始地址的接口包含该参数。数据类型由接口重载决定，具体请参见[表3](#asc_mmad_mx_data_type_960)。 |
+| b_matrix | 输入 | 源操作数，右矩阵B在L0B Buffer中的起始地址。数据类型由接口重载决定，具体请参见[表3](#asc_mmad_mx_data_type_960)。<br>矩阵数据类型为`fp8_e5m2_t`、`fp8_e4m3fn_t`时需按照1024字节对齐，其余矩阵数据类型需按照512字节对齐。<br>不显式传入ScaleB矩阵地址时ScaleB矩阵在L0B_MX Buffer中的起始地址为`b_matrix`起始地址除以16。 |
+| scale_b_matrix | 输入 | ScaleB矩阵在L0B_MX Buffer中的起始地址，仅显式传入Scale矩阵起始地址的接口包含该参数。数据类型由接口重载决定，具体请参见[表3](#asc_mmad_mx_data_type_960)。 |
 | bias | 输入 | Bias矩阵在BiasTable Buffer中的起始地址，需按照64字节对齐，可以为非零地址，仅显式传入Bias起始地址的接口包含该参数。<br>Bias支持的数据类型为`float`，调用本接口前，需将Bias数据通过[asc_copy_l12bt](../cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md)接口搬运到该地址，Bias占用长度为`n * sizeof(float)`向上补齐到64字节。 |
 | m | 输入 | 左矩阵A和结果矩阵C的M维大小，单位为元素，取值范围为[0, 4095]。 |
 | k | 输入 | 左矩阵A和右矩阵B的K维大小，单位为元素，取值范围为[0, 4095]，并且需为64的倍数。 |
@@ -312,13 +312,13 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
 <!-- end id13 -->
 
 <!-- npu="950" id14 -->
-**表6** 参数说明（[NPU架构版本3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="asc_mmad_mx_param_table"></a>
+**表6** 参数说明（[NPU架构版本3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="asc_mmad_mx_param_table_950"></a>
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | c_matrix | 输出 | 目的操作数，结果矩阵C在L0C Buffer中的起始地址，数据类型为`float`，需按照1024字节对齐。 |
-| a_matrix | 输入 | 源操作数，左矩阵A在L0A Buffer中的起始地址。数据类型由接口重载决定，具体请参见[表2](#asc_mmad_mx_data_type)。<br>矩阵数据类型为`fp4x2_e2m1_t`、`fp4x2_e1m2_t`时需按照512字节对齐，矩阵数据类型为`fp8_e5m2_t`、`fp8_e4m3fn_t`时需按照1024字节对齐。<br>ScaleA矩阵在L0A_MX Buffer中的起始地址为`a_matrix`起始地址除以16。 |
-| b_matrix | 输入 | 源操作数，右矩阵B在L0B Buffer中的起始地址。数据类型由接口重载决定，具体请参见[表2](#asc_mmad_mx_data_type)。<br>矩阵数据类型为`fp4x2_e2m1_t`、`fp4x2_e1m2_t`时需按照512字节对齐，矩阵数据类型为`fp8_e5m2_t`、`fp8_e4m3fn_t`时需按照1024字节对齐。<br>ScaleB矩阵在L0B_MX Buffer中的起始地址为`b_matrix`起始地址除以16。 |
+| a_matrix | 输入 | 源操作数，左矩阵A在L0A Buffer中的起始地址。数据类型由接口重载决定，具体请参见[表4](#asc_mmad_mx_data_type_950)。<br>矩阵数据类型为`fp4x2_e2m1_t`、`fp4x2_e1m2_t`时需按照512字节对齐，矩阵数据类型为`fp8_e5m2_t`、`fp8_e4m3fn_t`时需按照1024字节对齐。<br>ScaleA矩阵在L0A_MX Buffer中的起始地址为`a_matrix`起始地址除以16。 |
+| b_matrix | 输入 | 源操作数，右矩阵B在L0B Buffer中的起始地址。数据类型由接口重载决定，具体请参见[表4](#asc_mmad_mx_data_type_950)。<br>矩阵数据类型为`fp4x2_e2m1_t`、`fp4x2_e1m2_t`时需按照512字节对齐，矩阵数据类型为`fp8_e5m2_t`、`fp8_e4m3fn_t`时需按照1024字节对齐。<br>ScaleB矩阵在L0B_MX Buffer中的起始地址为`b_matrix`起始地址除以16。 |
 | bias | 输入 | Bias矩阵在BiasTable Buffer中的起始地址，需按照64字节对齐，可以为非零地址，仅显式传入Bias起始地址的接口包含该参数。<br>Bias支持的数据类型为`float`，调用本接口前，需将Bias数据通过[asc_copy_l12bt](../cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md)接口搬运到该地址，Bias占用长度为`n * sizeof(float)`向上补齐到64字节。 |
 | m | 输入 | 左矩阵A和结果矩阵C的M维大小，单位为元素，取值范围为[0, 4095]。 |
 | k | 输入 | 左矩阵A和右矩阵B的K维大小，单位为元素，取值范围为[0, 4095]，并且需为64的倍数。 |
@@ -350,12 +350,12 @@ PIPE_M
   <!-- npu="960" id16 -->
   - 针对Ascend 950PR/Ascend 950DT，L0C Buffer大小为256KB，L0A Buffer和L0B Buffer大小均为64KB，L0A_MX Buffer和L0B_MX Buffer大小均为4KB，BiasTable Buffer大小为4KB。矩阵的起始地址和占用空间不能超出对应Buffer的范围。
   <!-- end id16 -->
-  - 各矩阵的起始地址需满足[表3](#asc_mmad_mx_param_table)中的对齐要求。操作数的其他地址约束请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
+  - 各矩阵的起始地址需根据产品型号满足[表5](#asc_mmad_mx_param_table_960)[表6](#asc_mmad_mx_param_table_960)中的对齐要求。操作数的其他地址约束请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
   - 不显式配置Scale矩阵起始地址时，ScaleA矩阵在L0A_MX Buffer中的起始地址为`a_matrix`起始地址除以16，ScaleB矩阵在L0B_MX Buffer中的起始地址为`b_matrix`起始地址除以16。搬入Scale矩阵时需使用与矩阵A和矩阵B匹配的目的地址。
   - `k`需为64的倍数。原始K不是64的倍数时，需将K向上补齐到64的倍数，并将补齐区域的矩阵A和矩阵B数据设置为0；传入接口的`k`、矩阵存储空间以及Scale矩阵的K维大小均需按照补齐后的K计算。
   - 矩阵存储空间的M、N维需分别向上补齐到16的倍数，`m`和`n`仍传入矩阵的有效M、N值。补齐部分为无效数据，不参与结果矩阵有效区域的计算。
   - Scale矩阵需覆盖本次矩阵乘加所需的全部数据。ScaleA的M维需向上补齐到16的倍数，K维大小为K / 32；ScaleB的K维大小为K / 32，N维需向上补齐到16的倍数。对应的起始地址与占用空间不能超出MX Buffer的范围。
-  - 当M为1且`disable_gemv`为false时，默认开启GEMV模式。此时从L0A Buffer读取矩阵A时按照ND格式读取，矩阵A需按照ND格式排布，起始地址仍需满足[表3](#asc_mmad_mx_param_table)中的对齐要求。
+  - 当M为1且`disable_gemv`为false时，默认开启GEMV模式。此时从L0A Buffer读取矩阵A时按照ND格式读取，矩阵A需按照ND格式排布，起始地址仍需满足[表5](#asc_mmad_mx_param_table_960)[表6](#asc_mmad_mx_param_table_960)中的对齐要求。
 
 - 同步约束说明：
 
