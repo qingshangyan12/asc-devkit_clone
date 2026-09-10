@@ -71,10 +71,6 @@ __simd_callee__ inline void asc_duplicate_highest_merge(vector_float& dst,
 
 无
 
-## 流水类型
-
-PIPE_V
-
 ## 约束说明
 
 - 本接口只能在使用`__simd_vf__`标记的Vector Function内调用，不支持在`__aicore__`函数中直接调用，仅在AIV上生效，在AIC上调用将直接返回。
