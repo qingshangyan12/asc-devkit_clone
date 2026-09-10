@@ -47,43 +47,35 @@
 
 ## 函数原型
 
-- 用于处理`float`数据类型的源操作数。
+```c
+// 通过函数返回值返回结果，用于处理float数据类型的源操作数
+__simd_callee__ inline vector_float asc_exp_sub(vector_float src0,
+                                                 vector_float src1,
+                                                 vector_bool mask)
 
-  ```c
-  // 通过函数返回值返回结果
-  __simd_callee__ inline vector_float asc_exp_sub(vector_float src0,
-                                                  vector_float src1,
-                                                  vector_bool mask)
+// 通过引用参数输出结果，用于处理float数据类型的源操作数
+__simd_callee__ inline void asc_exp_sub(vector_float& dst,
+                                         vector_float src0,
+                                         vector_float src1,
+                                         vector_bool mask)
 
-  // 通过引用参数输出结果
-  __simd_callee__ inline void asc_exp_sub(vector_float& dst,
-                                          vector_float src0,
-                                          vector_float src1,
-                                          vector_bool mask)
-  ```
+// 通过函数返回值返回结果（占位符形式），处理half数据类型的源操作数，支持读取偶数索引或奇数索引的源数据
+__simd_callee__ inline vector_float asc_exp_sub_half2float(vector_half src0,
+                                                            vector_half src1,
+                                                            vector_bool mask,
+                                                            std::integral_constant<asc_position_mode, <src_pos>> src_pos)
 
-- 处理`half`数据类型的源操作数，支持读取偶数索引或奇数索引的源数据。
+// 通过引用参数输出结果（占位符形式），处理half数据类型的源操作数，支持读取偶数索引或奇数索引的源数据
+__simd_callee__ inline void asc_exp_sub_half2float(vector_float& dst,
+                                                    vector_half src0,
+                                                    vector_half src1,
+                                                    vector_bool mask,
+                                                    std::integral_constant<asc_position_mode, <src_pos>> src_pos)
+```
 
-  ```c
-  // 通过函数返回值返回结果（占位符形式）
-  __simd_callee__ inline vector_float asc_exp_sub_half2float(
-      vector_half src0,
-      vector_half src1,
-      vector_bool mask,
-      std::integral_constant<asc_position_mode, <src_pos>> src_pos)
+**占位符说明如下：**
 
-  // 通过引用参数输出结果（占位符形式）
-  __simd_callee__ inline void asc_exp_sub_half2float(
-      vector_float& dst,
-      vector_half src0,
-      vector_half src1,
-      vector_bool mask,
-      std::integral_constant<asc_position_mode, <src_pos>> src_pos)
-  ```
-
-  **占位符说明如下：**
-
-  - `<src_pos>`支持`ASC_POSITION_EVEN`和`ASC_POSITION_ODD`。
+- `<src_pos>`支持`ASC_POSITION_EVEN`和`ASC_POSITION_ODD`。
 
 ## 参数说明
 
