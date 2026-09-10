@@ -416,8 +416,7 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__ fp8_e5m2_t* dst, __ubuf__ fp8
     asc_copy_ub2gm_align(dst, src, 1, size, static_cast<asc_store_l2_cache_mode>(0), 0, 0);
 }
 
-[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -430,8 +429,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     }
 }
 
-[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -444,8 +442,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     }
 }
 
-[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ fp4x2_e2m1_t* dst, __gm__ fp4x2_e2m1_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -458,8 +455,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     }
 }
 
-[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ fp4x2_e1m2_t* dst, __gm__ fp4x2_e1m2_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -472,8 +468,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     }
 }
 
-[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ fp8_e8m0_t* dst, __gm__ fp8_e8m0_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -486,8 +481,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     }
 }
 
-[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -500,8 +494,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     }
 }
 
-[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -514,8 +507,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     }
 }
 
-[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ int16_t* dst, __gm__ int16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -528,8 +520,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     }
 }
 
-[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -542,8 +533,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     }
 }
 
-[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ half* dst, __gm__ half* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -556,8 +546,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     }
 }
 
-[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -570,8 +559,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     }
 }
 
-[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ int32_t* dst, __gm__ int32_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -584,8 +572,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     }
 }
 
-[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -598,8 +585,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     }
 }
 
-[[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ float* dst, __gm__ float* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -612,8 +598,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     }
 }
 
-[[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
@@ -626,8 +611,7 @@ __aicore__ inline void asc_copy_gm2ub_align(
     }
 }
 
-[[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
@@ -640,8 +624,7 @@ __aicore__ inline void asc_copy_gm2ub_align(
     }
 }
 
-[[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
@@ -654,8 +637,7 @@ __aicore__ inline void asc_copy_gm2ub_align(
     }
 }
 
-[[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ int16_t* dst, __gm__ int16_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
@@ -668,8 +650,7 @@ __aicore__ inline void asc_copy_gm2ub_align(
     }
 }
 
-[[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
@@ -682,8 +663,7 @@ __aicore__ inline void asc_copy_gm2ub_align(
     }
 }
 
-[[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ int32_t* dst, __gm__ int32_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
@@ -696,8 +676,7 @@ __aicore__ inline void asc_copy_gm2ub_align(
     }
 }
 
-[[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ half* dst, __gm__ half* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
@@ -710,8 +689,7 @@ __aicore__ inline void asc_copy_gm2ub_align(
     }
 }
 
-[[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ float* dst, __gm__ float* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode, uint64_t src_stride,
@@ -724,8 +702,7 @@ __aicore__ inline void asc_copy_gm2ub_align(
     }
 }
 
-[[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint32_t burst_count, uint32_t burst_len,
     uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode,
@@ -738,8 +715,7 @@ __aicore__ inline void asc_copy_gm2ub_align(
     }
 }
 
-[[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t burst_count, uint32_t burst_len,
     uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode,
@@ -752,8 +728,7 @@ __aicore__ inline void asc_copy_gm2ub_align(
     }
 }
 
-[[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint32_t burst_count, uint32_t burst_len,
     uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode,
@@ -766,8 +741,7 @@ __aicore__ inline void asc_copy_gm2ub_align(
     }
 }
 
-[[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint32_t burst_count, uint32_t burst_len,
     uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode,
@@ -780,8 +754,7 @@ __aicore__ inline void asc_copy_gm2ub_align(
     }
 }
 
-[[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
-             "Please use enum class asc_store_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_store_l2_cache_mode)
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ uint8_t* dst, __ubuf__ uint8_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
@@ -792,8 +765,7 @@ __aicore__ inline void asc_copy_ub2gm_align(
     }
 }
 
-[[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
-             "Please use enum class asc_store_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_store_l2_cache_mode)
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ int8_t* dst, __ubuf__ int8_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
@@ -804,8 +776,7 @@ __aicore__ inline void asc_copy_ub2gm_align(
     }
 }
 
-[[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
-             "Please use enum class asc_store_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_store_l2_cache_mode)
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
@@ -816,8 +787,7 @@ __aicore__ inline void asc_copy_ub2gm_align(
     }
 }
 
-[[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
-             "Please use enum class asc_store_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_store_l2_cache_mode)
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ int16_t* dst, __ubuf__ int16_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
@@ -828,8 +798,7 @@ __aicore__ inline void asc_copy_ub2gm_align(
     }
 }
 
-[[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
-             "Please use enum class asc_store_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_store_l2_cache_mode)
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
@@ -840,8 +809,7 @@ __aicore__ inline void asc_copy_ub2gm_align(
     }
 }
 
-[[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
-             "Please use enum class asc_store_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_store_l2_cache_mode)
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ int32_t* dst, __ubuf__ int32_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
@@ -852,8 +820,7 @@ __aicore__ inline void asc_copy_ub2gm_align(
     }
 }
 
-[[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
-             "Please use enum class asc_store_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_store_l2_cache_mode)
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ half* dst, __ubuf__ half* src, uint32_t burst_count, uint32_t burst_len, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
@@ -864,8 +831,7 @@ __aicore__ inline void asc_copy_ub2gm_align(
     }
 }
 
-[[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
-             "Please use enum class asc_store_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_store_l2_cache_mode)
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ float* dst, __ubuf__ float* src, uint32_t burst_count, uint32_t burst_len, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
@@ -876,8 +842,7 @@ __aicore__ inline void asc_copy_ub2gm_align(
     }
 }
 
-[[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
-             "Please use enum class asc_store_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_store_l2_cache_mode)
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ hifloat8_t* dst, __ubuf__ hifloat8_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
@@ -888,8 +853,7 @@ __aicore__ inline void asc_copy_ub2gm_align(
     }
 }
 
-[[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
-             "Please use enum class asc_store_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_store_l2_cache_mode)
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
@@ -900,8 +864,7 @@ __aicore__ inline void asc_copy_ub2gm_align(
     }
 }
 
-[[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
-             "Please use enum class asc_store_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_store_l2_cache_mode)
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ fp8_e5m2_t* dst, __ubuf__ fp8_e5m2_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t l2_cache_mode,
     uint64_t dst_stride, uint32_t src_stride)
@@ -912,8 +875,7 @@ __aicore__ inline void asc_copy_ub2gm_align(
     }
 }
 
-[[deprecated("NOTICE: asc_copy_ub2gm_align the uint8_t l2_cache_mode parameter is deprecated. "
-             "Please use enum class asc_store_l2_cache_mode instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_store_l2_cache_mode)
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ fp8_e4m3fn_t* dst, __ubuf__ fp8_e4m3fn_t* src, uint32_t burst_count, uint32_t burst_len,
     uint8_t l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
@@ -924,9 +886,8 @@ __aicore__ inline void asc_copy_ub2gm_align(
     }
 }
 
-[[deprecated("NOTICE: asc_set_gm2ub_pad is deprecated. "
-             "Please use asc_set_copy_pad_val instead for pad value setting")]] __aicore__ inline void
-asc_set_gm2ub_pad(uint32_t pad_val)
+ASC_DEPRECATED(9.1.0, "2027/09/07", asc_set_copy_pad_val)
+__aicore__ inline void asc_set_gm2ub_pad(uint32_t pad_val)
 {
     if ASC_IS_AIV {
         set_pad_val_outtoub(pad_val);

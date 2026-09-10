@@ -18,22 +18,11 @@
 #ifndef IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_SYS_VAR_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_SYS_VAR_INTF_IMPL_H
 
-[[deprecated("NOTICE: asc_get_block_idx is deprecated. "
-             "Please use block_idx for pure Vector, pure Cube, and Mix(1, 1). "
-             "For Mix(1, 2), please use block_idx on the Cube core and "
-             "block_idx * asc_get_sub_block_num() + asc_get_sub_block_id() "
-             "on Vector cores instead.")]] __aicore__ inline int64_t
-asc_get_block_idx()
-{
-    return get_block_idx();
-}
+ASC_DEPRECATED(9.2.0, "2027/09/07", block_idx and asc_get_sub_block_num and asc_get_sub_block_id)
+__aicore__ inline int64_t asc_get_block_idx() { return get_block_idx(); }
 
-[[deprecated("NOTICE: asc_get_block_num is deprecated. "
-             "Please use block_num instead.")]] __aicore__ inline int64_t
-asc_get_block_num()
-{
-    return get_block_num();
-}
+ASC_DEPRECATED(9.2.0, "2027/09/07", block_num)
+__aicore__ inline int64_t asc_get_block_num() { return get_block_num(); }
 
 #endif
 

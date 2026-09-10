@@ -22,22 +22,11 @@ constexpr int64_t SYSTEM_CLOCK_FREQ_MHZ = 50;
 
 __aicore__ inline int64_t asc_get_core_id() { return get_coreid(); }
 
-[[deprecated("NOTICE: asc_get_block_idx is deprecated. "
-             "Please use block_idx for pure Vector, pure Cube, and Mix(1, 1). "
-             "For Mix(1, 2), please use block_idx on the Cube core and "
-             "block_idx * asc_get_sub_block_num() + asc_get_sub_block_id() "
-             "on Vector cores instead.")]]
-__aicore__ inline int64_t asc_get_block_idx()
-{
-    return get_block_idx();
-}
+ASC_DEPRECATED(9.2.0, "2027/09/07", block_idx and asc_get_sub_block_num and asc_get_sub_block_id)
+__aicore__ inline int64_t asc_get_block_idx() { return get_block_idx(); }
 
-[[deprecated("NOTICE: asc_get_block_num is deprecated. "
-             "Please use block_num instead.")]]
-__aicore__ inline int64_t asc_get_block_num()
-{
-    return get_block_num();
-}
+ASC_DEPRECATED(9.2.0, "2027/09/07", block_num)
+__aicore__ inline int64_t asc_get_block_num() { return get_block_num(); }
 
 __aicore__ inline uint64_t asc_get_phy_buf_addr(uint64_t offset) { return get_imm(offset); }
 

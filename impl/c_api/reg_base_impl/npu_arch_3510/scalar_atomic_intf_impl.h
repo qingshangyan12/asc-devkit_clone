@@ -19,9 +19,8 @@
 #define IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_SCALAR_ATOMIC_INTF_IMPL_H
 
 /// \deprecated Use asc_atomic_add for atomic add operation instead.
-[[deprecated("NOTICE: asc_set_store_atomic_config_v2 is deprecated."
-             "Please use asc_atomic_add instead for atomic add operation.")]] __aicore__ inline void
-asc_set_store_atomic_config_v2(uint16_t type, uint16_t op)
+ASC_DEPRECATED(9.1.0, "2027/09/07", asc_atomic_add)
+__aicore__ inline void asc_set_store_atomic_config_v2(uint16_t type, uint16_t op)
 {
     constexpr uint64_t type_mask = 0x15;
     constexpr uint64_t op_mask = 0x3;
@@ -31,9 +30,8 @@ asc_set_store_atomic_config_v2(uint16_t type, uint16_t op)
 }
 
 /// \deprecated Use asc_atomic_add for atomic add operation instead.
-[[deprecated("NOTICE: asc_get_store_atomic_config is deprecated on Ascend 950PR/Ascend 950DT."
-             "Please use asc_atomic_add instead for atomic add operation.")]] __aicore__ inline void
-asc_get_store_atomic_config(asc_store_atomic_config& config)
+ASC_DEPRECATED(9.1.0, "2027/09/07", asc_atomic_add)
+__aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& config)
 {
     config.config = get_st_atomic_cfg();
 }

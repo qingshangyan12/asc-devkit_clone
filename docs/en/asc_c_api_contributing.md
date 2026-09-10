@@ -190,7 +190,7 @@ asc-devkit/
 │           ├── loadalign_intf_impl.h
 │           ├── vector_datamove_intf_impl.h
 │           ├── ...
-│           └── npu_arch_3510/    # Deprecated 3510 interfaces and exclusive helpers only
+│           └── npu_arch_3510/    # 3510-specific implementations, included by common headers under an architecture guard
 │               ├── reg_convert_intf_impl.h
 │               └── ...
 │
