@@ -87,6 +87,10 @@ bool FuseNotifyToLastWriteReduceDesc(std::vector<HcclHcommBatchTransferDesc>& de
     fused.transferInfo.writeReduceWithNotify.reduceOp = reduce.reduceOp;
     fused.transferInfo.writeReduceWithNotify.notifyIdx = NOTIFY_IDX_DATA_SIGNAL;
     descs.back() = fused;
+    HCCL_DEBUG(
+            "[AlgDataTransWrapper] FuseNotifyToLastWriteReduceDesc: fused last descriptor to "
+            "WRITE_REDUCE_WITH_NOTIFY, notifyIdx[%u].",
+            NOTIFY_IDX_DATA_SIGNAL);
     return true;
 }
 
