@@ -21,23 +21,22 @@
 <!-- end id1 -->
 
 <!-- npu="950" id2 -->
-- [asc_copy_gm2ub_align](../SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md)接口（仅Ascend 950PR/Ascend 950DT上原高维切分搬运形式函数原型）
+- [asc_copy_gm2ub_align](../SIMD-API/c_api/deprecated_interface/asc_copy_gm2ub_align_arch_3510_deprecated.md)接口（仅Ascend 950PR/Ascend 950DT上原高维切分搬运形式函数原型）
 
     Ascend 950PR/Ascend 950DT上此接口的原高维切分搬运形式函数原型已废弃，请使用[asc_load_l2_cache_mode](../SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md)类型枚举值进行L2 Cache管理策略配置。
 <!-- end id2 -->
 
 <!-- npu="950" id3 -->
-- [asc_copy_ub2gm_align](../SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md)接口（仅Ascend 950PR/Ascend 950DT上原高维切分搬运形式函数原型）
+- [asc_copy_ub2gm_align](../SIMD-API/c_api/deprecated_interface/asc_copy_ub2gm_align_arch_3510_deprecated.md)接口（仅Ascend 950PR/Ascend 950DT上原高维切分搬运形式函数原型）
 
     Ascend 950PR/Ascend 950DT上此接口的原高维切分搬运形式函数原型已废弃，请使用[asc_store_l2_cache_mode](../SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md)类型枚举值进行L2 Cache管理策略配置。
 <!-- end id3 -->
 
 <!-- npu="950" id4 -->
-- [asc_ndim_copy_gm2ub](../SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md)
+- [asc_ndim_copy_gm2ub](../SIMD-API/c_api/deprecated_interface/asc_ndim_copy_gm2ub_deprecated.md)接口
 
     此接口的原函数原型已废弃，请使用[asc_load_l2_cache_mode](../SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md)类型枚举值进行L2 Cache管理策略配置。
 <!-- end id4 -->
-
 
 ### 原子操作
 
@@ -654,6 +653,10 @@
 
     `asc_copy_gm2ub_align_sync()`已废弃，请使用[对应的非同步接口](../SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_2201.md)和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口替代。
 
+- [asc_copy_gm2ub_align_sync_arch_3510（废弃）](../SIMD-API/c_api/deprecated_interface/asc_copy_gm2ub_align_sync_arch_3510_deprecated.md)接口
+
+    `asc_copy_gm2ub_align_sync()`已废弃，请使用[对应的非同步接口](../SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md)和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口替代。
+
 - [asc_copy_gm2ub_sync_arch_2201（废弃）](../SIMD-API/c_api/deprecated_interface/asc_copy_gm2ub_sync_arch_2201_deprecated.md)接口
 
     `asc_copy_gm2ub_sync()`已废弃，请使用[对应的非同步接口](../SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md)和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口替代。
@@ -669,6 +672,10 @@
 - [asc_copy_ub2gm_align_sync_arch_2201（废弃）](../SIMD-API/c_api/deprecated_interface/asc_copy_ub2gm_align_sync_arch_2201_deprecated.md)接口
 
     `asc_copy_ub2gm_align_sync()`已废弃，请使用[对应的非同步接口](../SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_2201.md)和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口替代。
+
+- [asc_copy_ub2gm_align_sync_arch_3510（废弃）](../SIMD-API/c_api/deprecated_interface/asc_copy_ub2gm_align_sync_arch_3510_deprecated.md)接口
+
+    `asc_copy_ub2gm_align_sync()`已废弃，请使用[对应的非同步接口](../SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md)和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口替代。
 
 - [asc_copy_ub2gm_sync_arch_2201（废弃）](../SIMD-API/c_api/deprecated_interface/asc_copy_ub2gm_sync_arch_2201_deprecated.md)接口
 
