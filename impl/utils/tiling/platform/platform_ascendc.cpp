@@ -26,6 +26,7 @@
 namespace platform_ascendc {
 const static uint64_t LOCAL_RESERV_SIZE = 256;
 const static uint64_t KIRIN_UB_RESERVED_SIZE = 8 * 1024;
+const static uint32_t WORK_SPACE_SIZE_MC62 = 0;
 const static uint32_t WORK_SPACE_SIZE_910B = 16 * 1024 * 1024;
 const static uint32_t WORK_SPACE_SIZE_950 = 16 * 1024 * 1024;
 const static uint32_t WORK_SPACE_SIZE = 2 * 1024 * 1024;
@@ -275,7 +276,7 @@ uint32_t PlatformAscendC::GetLibApiWorkSpaceSize(void) const
         PF_LOGE("get platform failed, CurNpuArch is NpuArch::DAV_RESV");
         return -1;
     } else if (npuArch == NpuArch::DAV_5102) {
-        return 0;
+        return WORK_SPACE_SIZE_MC62;
     } else if (npuArch == NpuArch::DAV_2201) {
         return WORK_SPACE_SIZE_910B;
     } else if (npuArch == NpuArch::DAV_3510) {

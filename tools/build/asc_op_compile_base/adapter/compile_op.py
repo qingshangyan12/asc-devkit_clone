@@ -675,6 +675,8 @@ def _gen_usr_workspace_codes():
             f"    GM_ADDR usrWorkspace = {workspace_ptr} + AscendC::RESERVED_WORKSPACE;\n"
             "#endif\n"
         )
+    if CommonUtility.is_m510():
+        return f"    GM_ADDR usrWorkspace = {workspace_ptr} + AscendC::RESERVED_WORKSPACE;\n"
     return f"    GM_ADDR usrWorkspace = {workspace_ptr};\n"
 
 

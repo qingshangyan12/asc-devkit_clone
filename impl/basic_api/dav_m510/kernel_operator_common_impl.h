@@ -50,7 +50,7 @@ __aicore__ inline GM_ADDR GetUserWorkspace(GM_ADDR workspace)
     return workspace;
 #else
     (void)(workspace);
-    return GetSysWorkSpacePtr();
+    return GetSysWorkSpacePtr() + RESERVED_WORKSPACE;
 #endif
 }
 

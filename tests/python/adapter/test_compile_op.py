@@ -5971,6 +5971,7 @@ Contents of section
 
         with (
             mock.patch.object(CommonUtility, "is_c310", return_value=True),
+            mock.patch.object(CommonUtility, "is_m510", return_value=False),
             mock.patch.object(
                 CommonUtility,
                 "is_support_workspace_offset",
@@ -5984,6 +5985,20 @@ Contents of section
                 "#else\n"
                 "    GM_ADDR usrWorkspace = workspace + AscendC::RESERVED_WORKSPACE;\n"
                 "#endif\n",
+            )
+
+        with (
+            mock.patch.object(CommonUtility, "is_c310", return_value=False),
+            mock.patch.object(CommonUtility, "is_m510", return_value=True),
+            mock.patch.object(
+                CommonUtility,
+                "is_support_workspace_offset",
+                return_value=True,
+            ),
+        ):
+            self.assertEqual(
+                _gen_usr_workspace_codes(),
+                "    GM_ADDR usrWorkspace = workspace + AscendC::RESERVED_WORKSPACE;\n",
             )
 
     def test_dump_compile_log(self):

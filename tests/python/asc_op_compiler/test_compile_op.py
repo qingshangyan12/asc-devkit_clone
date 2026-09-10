@@ -7210,9 +7210,13 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
             compile_options,
             compile_info,
         )
-        self.assertTrue(result.startswith("    GM_ADDR usrWorkspace = workspace;\n"))
+        self.assertTrue(
+            result.startswith(
+                "    GM_ADDR usrWorkspace = workspace + AscendC::RESERVED_WORKSPACE;\n"
+            )
+        )
         self.assertNotIn("AscendC::GetUserWorkspace", result)
-        self.assertNotIn("AscendC::RESERVED_WORKSPACE", result)
+        self.assertIn("AscendC::RESERVED_WORKSPACE", result)
         with buildcfg.build_config() as cfg:
             cfg.current()["tir.op_debug_config"] = ["oom"]
             result = _gen_set_workspace_codes(
