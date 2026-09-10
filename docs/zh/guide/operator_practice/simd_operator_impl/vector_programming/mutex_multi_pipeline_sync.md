@@ -98,67 +98,60 @@ AscendC::ReleaseMutexID(mutexId1);
 
 ### SetFlag/WaitFlag时序
 
-SetFlag/WaitFlag以一对源流水和目的流水为同步方向。源流水执行完前序指令后，`SetFlag`将对应事件置为1；目的流水执行到`WaitFlag`时等待该事件，等待成功后将事件清零。以下时序图以`buffer0`为例，正向依赖和Buffer复用时的反向依赖需要分别使用事件表达。
+SetFlag/WaitFlag以一对源流水和目的流水为同步方向。以MTE2流水搬入数据、V流水读取数据进行计算为例，需要通过`HardEvent::MTE2_V`明确指定源流水和目的流水，并为这组同步分配事件ID。MTE2流水的前序指令执行完成后，`SetFlag`将对应事件置为1；V流水执行到`WaitFlag`时，如果事件为0，则阻塞V流水的后续指令，如果事件为1，则将事件清零并继续执行。
 
 ```mermaid
 sequenceDiagram
     participant MTE2 as PIPE_MTE2
+    participant Event as MTE2_V事件
     participant V as PIPE_V
-    participant MTE3 as PIPE_MTE3
-    Note over MTE2,MTE3: Tile i使用buffer0
-    MTE2->>MTE2: 搬入buffer0
-    MTE2-->>V: SetFlag(MTE2_V, eventId0)，事件置1
-    V->>V: WaitFlag(MTE2_V, eventId0)，等待后清零
-    V->>V: 计算buffer0
-    V-->>MTE3: SetFlag(V_MTE3, eventId1)，事件置1
-    MTE3->>MTE3: WaitFlag(V_MTE3, eventId1)，等待后清零
-    MTE3->>MTE3: 搬出buffer0
-    MTE3-->>MTE2: SetFlag(MTE3_MTE2, eventId2)，事件置1
-    Note over MTE2,MTE3: Tile i+2复用buffer0
-    MTE2->>MTE2: WaitFlag(MTE3_MTE2, eventId2)，等待后清零
-    MTE2->>MTE2: 再次搬入buffer0
+    Note over MTE2,V: 指令已下发到两条异步流水
+    V->>Event: WaitFlag(MTE2_V, eventId)，事件为0
+    Event-->>V: 阻塞V流水后续指令
+    MTE2->>MTE2: DataCopy搬入数据
+    MTE2->>Event: SetFlag(MTE2_V, eventId)，事件置1
+    Note over MTE2,Event: SetFlag等待MTE2前序读写完成
+    Event-->>V: WaitFlag将事件清零，解除阻塞
+    V->>V: Vector计算
 ```
 
-图中三组事件分别描述`PIPE_MTE2 -> PIPE_V`、`PIPE_V -> PIPE_MTE3`和`PIPE_MTE3 -> PIPE_MTE2`。前两组是当前tile的正向依赖，第三组是复用Buffer前的反向依赖。每增加一种流水依赖方向，都需要配置相应的流水组合并管理其事件ID。
+`SetFlag`和`WaitFlag`必须使用完全相同的HardEvent和事件ID。图中的`MTE2_V`同时编码了源流水MTE2和目的流水V；如果同步方向或参与流水发生变化，开发者需要选择对应的HardEvent并管理其事件ID。
 
 ### Lock/Unlock时序
 
-Lock/Unlock不指定源流水和目的流水组合。每个阶段通过`Lock<当前pipe>(mutexId0)`锁定当前流水，操作完成后再通过相同pipe和MutexID的`Unlock`释放。后续阶段对同一MutexID执行Lock时，会等待此前所有流水中同一MutexID的Mutex均已释放。
+Lock/Unlock不指定源流水和目的流水组合。在相同场景中，MTE2和V流水分别通过`Lock<当前pipe>(mutexId)`指定当前流水，并在操作完成后通过相同pipe和MutexID的`Unlock`释放。V流水执行Lock时，会等待此前所有流水中具有相同MutexID的Mutex均已释放，其中包括MTE2流水的Unlock。
 
 ```mermaid
 sequenceDiagram
     participant MTE2 as PIPE_MTE2
+    participant Mutex as MutexID
     participant V as PIPE_V
-    participant MTE3 as PIPE_MTE3
-    Note over MTE2,MTE3: Tile i使用buffer0和mutexId0
-    MTE2->>MTE2: Lock(MTE2, mutexId0)
-    MTE2->>MTE2: 搬入buffer0
-    MTE2->>MTE2: Unlock(MTE2, mutexId0)
-    Note over MTE2,V: V上的Lock等待此前同ID的MTE2释放
-    V->>V: Lock(V, mutexId0)
-    V->>V: 计算buffer0
-    V->>V: Unlock(V, mutexId0)
-    Note over V,MTE3: MTE3上的Lock等待此前同ID的V释放
-    MTE3->>MTE3: Lock(MTE3, mutexId0)
-    MTE3->>MTE3: 搬出buffer0
-    MTE3->>MTE3: Unlock(MTE3, mutexId0)
-    Note over MTE2,MTE3: Tile i+2复用buffer0和mutexId0
-    Note over MTE2,MTE3: MTE2上的Lock统一等待此前同ID的各流水释放
-    MTE2->>MTE2: Lock(MTE2, mutexId0)
-    MTE2->>MTE2: 再次搬入buffer0
-    MTE2->>MTE2: Unlock(MTE2, mutexId0)
+    MTE2->>Mutex: Lock(MTE2, mutexId)
+    Mutex-->>MTE2: 获取Mutex
+    V->>Mutex: Lock(V, mutexId)
+    Mutex-->>V: 阻塞V流水后续指令
+    MTE2->>MTE2: DataCopy搬入数据
+    MTE2->>Mutex: Unlock(MTE2, mutexId)
+    Note over MTE2,Mutex: MTE2前序指令完成后释放Mutex
+    Mutex-->>V: 获取Mutex，解除阻塞
+    V->>V: Vector计算
+    V->>Mutex: Unlock(V, mutexId)
 ```
 
-图中没有单独配置`PIPE_MTE2 -> PIPE_V`、`PIPE_V -> PIPE_MTE3`或`PIPE_MTE3 -> PIPE_MTE2`事件。三条流水复用同一个MutexID，既建立当前tile内的正向依赖，也使第`i + 2`轮的MTE2在复用`buffer0`前等待第`i`轮的MTE3释放。
+图中MTE2流水只指定`PIPE_MTE2`，V流水只指定`PIPE_V`，两条流水通过相同的MutexID建立依赖。与SetFlag/WaitFlag相比，Lock/Unlock不需要通过HardEvent同时编码源流水和目的流水；V流水只需关注自身和待访问资源对应的MutexID。
 
 | 对比项 | Mutex Lock/Unlock | SetFlag/WaitFlag |
 | --- | --- | --- |
 | 依赖表达 | 调用`Lock<当前pipe>(mutexId)`即可等待此前所有流水对该MutexID的Unlock，以MutexID关联同一Buffer生命周期内的多个阶段。 | 以源流水、目标流水和事件ID明确配对。 |
 | 解除阻塞条件 | 此前所有流水中相同MutexID的Mutex均已Unlock，不需要识别前序流水类型。 | 指定源流水已通过对应事件通知指定目标流水。 |
 | 反向同步 | 后续复用Buffer时再次Lock同一MutexID即可等待前序使用者释放，无需在当前调用中指定MTE3到下一轮MTE2的流水组合。 | 需要为反向依赖额外设置与等待相应的事件。 |
-| 同步信号量 | MutexID可用数量更多，适合管理多个并发Buffer。 | 事件ID数量受限，需要规划复用时机。 |
+| 同步信号量 | 建议使用MutexID 0-27，共28个ID，适合区分较多并发Buffer或资源。 | Ascend 950PR/Ascend 950DT支持事件ID 0-7；静态Tensor编程范式建议使用0-5，事件ID 6和7为系统或框架规划保留。 |
 | 架构相关配置 | 不依赖HardEvent，不需要根据源、目的流水组合选择事件类型。 | HardEvent的取值随硬件架构变化，需要根据目标架构支持的事件选择源、目的流水组合。 |
 | 跨硬件版本 | 仅适用于支持Mutex的Ascend 950PR/Ascend 950DT。 | TQueSync的SetFlag/WaitFlag可保证跨硬件版本兼容。 |
+
+“同步信号量更多”是指开发者可用于区分同步对象的MutexID数量更多，不表示一次Lock/Unlock能够同步更多流水，也不代表使用Mutex一定能提升性能。例如，多个Buffer并发复用时，可以为每个Buffer分配不同的MutexID，并由MTE2、V、MTE3流水复用该MutexID管理Buffer的完整生命周期。使用SetFlag/WaitFlag时，每种HardEvent表示一种源流水到目的流水的依赖方向，同一依赖方向可使用的事件ID数量有限；并发Buffer较多时，需要规划事件ID的复用时机，并确保上一组SetFlag/WaitFlag已经严格配对和消费。
+
+MutexID数量和事件ID数量不能直接理解为全部硬件同步资源的总量对比。SetFlag/WaitFlag的事件资源按HardEvent方向组织，不能将不同HardEvent下的事件槽位简单相加后与MutexID数量比较。此外，采用TPipe-TQue框架编程范式时，MutexID由框架分配，实际可申请数量还取决于框架内部的资源占用。因此，Mutex的主要优势仍是通过MutexID聚合同一资源的多流水依赖，降低HardEvent选择和事件配对的编程复杂度；可使用更多同步信号量是其附加优势。
 
 Mutex并不用于同一条流水内的指令排序。例如，同一`PIPE_MTE2`上两次UB地址重叠的数据搬运，需要使用[PipeBarrier](../../../../api/SIMD-API/basic_api/sync_control/intra_core_sync/PipeBarrier_ISASI.md)等待前一次搬运完成。
 
