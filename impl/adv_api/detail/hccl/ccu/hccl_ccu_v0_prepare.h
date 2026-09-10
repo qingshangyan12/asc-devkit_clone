@@ -38,8 +38,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 {
     const uint64_t dataSize = GetHcclDataTypeSize(commParam->dataType);
     xnData_[0] = GetOpId(commParam); // ccu xn0
-    KERNEL_LOG(
-        KERNEL_INFO, "ApiClient CcuPrepareForAllToAllV count:%llu, sendBuf:0x%llx, recvBuf:0x%llx, dataType:%d",
+    AscendC::printf(
+        "ApiClient CcuPrepareForAllToAllV count:%llu, sendBuf:0x%llx, recvBuf:0x%llx, dataType:%d\n",
         (unsigned long long)commParam->count, (unsigned long long)(uint64_t)commParam->sendBuf,
         (unsigned long long)(uint64_t)commParam->recvBuf, static_cast<int>(commParam->dataType));
     uint64_t offset = commParam->count * ccuParam_.repeatIndex * dataSize;
@@ -55,12 +55,14 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     auto dataSlice = ((allToAllVParam->sendCounts[ccuParam_.rankId]) * dataSize) % CCU_MAX_COMM_DATA;
     CalcGoSize(dataSlice, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[5]);
     xnData_[9] = reinterpret_cast<uint64_t>(ccuParam_.ccuMsgExt) + CCU_MSG_EXT_RANK_OFFSET * ccuParam_.alltoallvCnt;
-    KERNEL_LOG(
-        KERNEL_INFO,
-        "ApiClient CcuPrepareForAllToAllV xn0(opId):0x%llx, xn1(sendBuf+off):0x%llx, xn2(recvBuf+off):0x%llx, "
-        "xn5(goSize):0x%llx, xn9(msgExt):0x%llx",
-        (unsigned long long)xnData_[0], (unsigned long long)xnData_[1], (unsigned long long)xnData_[2],
-        (unsigned long long)xnData_[5], (unsigned long long)xnData_[9]);
+    AscendC::printf(
+        "ApiClient CcuPrepareForAllToAllV rank:%u, repeatIndex:%u, xn0(opId):0x%llx, "
+        "xn1(sendBuf+off):0x%llx, xn2(recvBuf+off):0x%llx, "
+        "xn5(addrOffset):%llu, xn6(loopParam):%llu, xn7(parallelParam):%llu, xn8(residual):%llu, xn9(msgExt):0x%llx\n",
+        ccuParam_.rankId, static_cast<unsigned int>(ccuParam_.repeatIndex), (unsigned long long)xnData_[0],
+        (unsigned long long)xnData_[1], (unsigned long long)xnData_[2], (unsigned long long)xnData_[5],
+        (unsigned long long)xnData_[6], (unsigned long long)xnData_[7], (unsigned long long)xnData_[8],
+        (unsigned long long)xnData_[9]);
     return;
 }
 
