@@ -328,12 +328,12 @@ struct Complex {
 
     __simd_callee__ inline Complex(const Complex& other) : real(other.real), imag(other.imag) {}
 
-    __simd_callee__ inline bool operator==(const Complex& val) const
+    __simd_callee__ constexpr inline bool operator==(const Complex& val) const
     {
         return (real == val.real) && (imag == val.imag);
     }
 
-    __simd_callee__ inline Complex& operator=(const Complex& other)
+    __simd_callee__ constexpr inline Complex& operator=(const Complex& other)
     {
         if (this == &other) {
             return *this;

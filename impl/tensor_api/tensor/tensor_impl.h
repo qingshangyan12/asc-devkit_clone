@@ -36,11 +36,11 @@ template <typename LocationType, typename EngineT, typename LayoutT>
 struct make_tensor_result;
 
 template <typename EngineT, typename LayoutT>
-__aicore__ inline base_tensor<EngineT, LayoutT>::base_tensor()
+__aicore__ inline constexpr base_tensor<EngineT, LayoutT>::base_tensor()
 {}
 
 template <typename EngineT, typename LayoutT>
-__aicore__ inline base_tensor<EngineT, LayoutT>::base_tensor(const EngineT& engine, const LayoutT& layout)
+__aicore__ inline constexpr base_tensor<EngineT, LayoutT>::base_tensor(const EngineT& engine, const LayoutT& layout)
     : rep(layout, engine)
 {}
 
@@ -263,7 +263,7 @@ __aicore__ inline constexpr decltype(auto) base_tensor<EngineT, LayoutT>::make_s
 }
 
 template <typename EngineT, typename LayoutT>
-__aicore__ inline global_tensor<EngineT, LayoutT>::global_tensor() = default;
+__aicore__ inline constexpr global_tensor<EngineT, LayoutT>::global_tensor() = default;
 
 template <typename EngineT, typename LayoutT>
 __aicore__ inline constexpr cache_mode global_tensor<EngineT, LayoutT>::get_cache_mode() const
