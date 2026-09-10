@@ -59,6 +59,7 @@ private:
         CHIP_TYPE_220,
         CHIP_TYPE_300,
         CHIP_TYPE_310,
+        CHIP_TYPE_920R1,
         CHIP_TYPE_510R2,
         CHIP_TYPE_L300,
         CHIP_TYPE_L311,
@@ -78,8 +79,10 @@ private:
         return CHIP_TYPE_L300;
 #elif __NPU_ARCH__ == 3113
         return CHIP_TYPE_L311;
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
+#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         return CHIP_TYPE_310;
+#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 9201
+        return CHIP_TYPE_920R1;
 #elif __NPU_ARCH__ == 5102
         return CHIP_TYPE_510R2;
 #else
@@ -109,6 +112,9 @@ private:
         /*310*/
         {true, false, false, true, FixpipeParamsType::V310, true, false, true, false, true, true, true, false, true,
          true, true},
+        /*920R1*/
+        {true, false, false, true, FixpipeParamsType::V310, true, false, true, false, true, true, true, true, true,
+         false, true},
         /*510R2*/
         {true, false, true, false, FixpipeParamsType::V510, true, true, true, false, true, false, false, true, true,
          false, true},

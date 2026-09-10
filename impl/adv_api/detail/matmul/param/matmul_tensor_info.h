@@ -202,8 +202,8 @@ private:
 };
 
 template <const auto& MM_CFG, typename INPUT_TYPE>
-constexpr bool IsSparseMatmul = (INPUT_TYPE::TAG == InputTypeTag::B) && HasSparseIndex<INPUT_TYPE>() &&
-                                DoMatmulMDL(MM_CFG);
+constexpr bool IsSparseMatmul =
+    (INPUT_TYPE::TAG == InputTypeTag::B) && HasSparseIndex<INPUT_TYPE>() && DoMatmulMDL(MM_CFG);
 
 template <typename IMPL, const auto& MM_CFG, class INPUT_TYPE>
 class MatmulTensorInfo<
@@ -277,7 +277,7 @@ class MatmulTensorInfo<
     enable_if_t<
         HasScalePosition<INPUT_TYPE>::value &&
         (INPUT_TYPE::TAG == InputTypeTag::scaleA || INPUT_TYPE::TAG == InputTypeTag::scaleB)>> {
-    using SrcT = fp8_e8m0_t;
+    using SrcT = typename INPUT_TYPE::TRANS_T;
     MATMUL_USE_MODULE(MatmulShapeInfo);
 
 public:

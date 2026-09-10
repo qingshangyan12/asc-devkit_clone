@@ -1,18 +1,19 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 /*!
-* \file matmul_policy.h
-* \brief
-*/
+ * \file matmul_policy.h
+ * \brief
+ */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#pragma message("impl/adv_api/detail/matmul/policy/matmul_policy.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
+#pragma message( \
+    "impl/adv_api/detail/matmul/policy/matmul_policy.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_POLICY_MATMUL_POLICY_H__
 #endif
@@ -38,8 +39,7 @@ namespace Detail {
     MatmulPolicy is only for internal usage, does not support extension or customized specialization!
 */
 template <const auto& MM_CFG, typename IMPL, typename A_TYPE, typename B_TYPE, typename C_TYPE, typename BIAS_TYPE>
-struct MatmulPolicy
-{
+struct MatmulPolicy {
 public:
     constexpr static PolicyType POLICY_TYPE = PolicyType::MATMUL_DEFAULT;
     using L0cT = typename GetMmDstType<typename A_TYPE::T>::Type;
@@ -50,8 +50,10 @@ public:
     using TransT_B = decltype(GetTransBDataType<A_TYPE, B_TYPE, MM_CFG>());
     using CopyCubeInA = AscendC::Impl::Detail::CopyCubeIn<IMPL, MatmulInputAType<A_TYPE, typename A_TYPE::T>, MM_CFG>;
     using CopyCubeInB = AscendC::Impl::Detail::CopyCubeIn<IMPL, MatmulInputBType<B_TYPE, typename TransT_B::T>, MM_CFG>;
-    using CubeInBufferA = AscendC::Impl::Detail::CubeInBuffer<IMPL, MatmulInputAType<A_TYPE, typename A_TYPE::T>, MM_CFG>;
-    using CubeInBufferB = AscendC::Impl::Detail::CubeInBuffer<IMPL, MatmulInputBType<B_TYPE, typename TransT_B::T>, MM_CFG>;
+    using CubeInBufferA =
+        AscendC::Impl::Detail::CubeInBuffer<IMPL, MatmulInputAType<A_TYPE, typename A_TYPE::T>, MM_CFG>;
+    using CubeInBufferB =
+        AscendC::Impl::Detail::CubeInBuffer<IMPL, MatmulInputBType<B_TYPE, typename TransT_B::T>, MM_CFG>;
 
     using Scheduler = AscendC::Impl::Detail::MatmulScheduler<IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG>;
     using BatchScheduler = AscendC::Impl::Detail::BatchScheduler<IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG>;
@@ -61,14 +63,28 @@ public:
 };
 
 template <const auto& MM_CFG, typename IMPL, typename A_TYPE, typename B_TYPE, typename C_TYPE, typename BIAS_TYPE>
-struct MatmulWithScalePolicy : public MatmulPolicy<MM_CFG, IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE>
-{
+struct MatmulWithScalePolicy : public MatmulPolicy<MM_CFG, IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE> {
 public:
     // for scale
-    using CubeInBufferScaleA = AscendC::Impl::Detail::CubeInBuffer<IMPL, MatmulInputScaleAType<A_TYPE, fp8_e8m0_t>, MM_CFG>;
-    using CopyCubeInScaleA = AscendC::Impl::Detail::CopyCubeIn<IMPL, MatmulInputScaleAType<A_TYPE, fp8_e8m0_t>, MM_CFG>;
-    using CubeInBufferScaleB = AscendC::Impl::Detail::CubeInBuffer<IMPL, MatmulInputScaleBType<B_TYPE, fp8_e8m0_t>, MM_CFG>;
-    using CopyCubeInScaleB = AscendC::Impl::Detail::CopyCubeIn<IMPL, MatmulInputScaleBType<B_TYPE, fp8_e8m0_t>, MM_CFG>;
+    using CubeInBufferScaleA =
+        AscendC::Impl::Detail::CubeInBuffer<IMPL, MatmulInputScaleAType<A_TYPE, typename A_TYPE::SCALE_T>, MM_CFG>;
+    using CopyCubeInScaleA =
+        AscendC::Impl::Detail::CopyCubeIn<IMPL, MatmulInputScaleAType<A_TYPE, typename A_TYPE::SCALE_T>, MM_CFG>;
+    using CubeInBufferScaleB =
+        AscendC::Impl::Detail::CubeInBuffer<IMPL, MatmulInputScaleBType<B_TYPE, typename B_TYPE::SCALE_T>, MM_CFG>;
+    using CopyCubeInScaleB =
+        AscendC::Impl::Detail::CopyCubeIn<IMPL, MatmulInputScaleBType<B_TYPE, typename B_TYPE::SCALE_T>, MM_CFG>;
+};
+
+// only B has scale matrix
+template <const auto& MM_CFG, typename IMPL, typename A_TYPE, typename B_TYPE, typename C_TYPE, typename BIAS_TYPE>
+struct MatmulWithOnlyScaleBPolicy : public MatmulPolicy<MM_CFG, IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE> {
+public:
+    // for scaleB, here has no scaleA
+    using CubeInBufferScaleB =
+        AscendC::Impl::Detail::CubeInBuffer<IMPL, MatmulInputScaleBType<B_TYPE, typename B_TYPE::SCALE_T>, MM_CFG>;
+    using CopyCubeInScaleB =
+        AscendC::Impl::Detail::CopyCubeIn<IMPL, MatmulInputScaleBType<B_TYPE, typename B_TYPE::SCALE_T>, MM_CFG>;
 };
 
 /*
@@ -77,8 +93,7 @@ public:
     NBuffer33MatmulPolicy is only for internal usage, does not support extension or customized specialization!
 */
 template <const auto& MM_CFG, typename IMPL, typename A_TYPE, typename B_TYPE, typename C_TYPE, typename BIAS_TYPE>
-struct NBuffer33MatmulPolicy : public MatmulPolicy<MM_CFG, IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE>
-{
+struct NBuffer33MatmulPolicy : public MatmulPolicy<MM_CFG, IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE> {
 public:
     constexpr static PolicyType POLICY_TYPE = PolicyType::MATMUL_NBUFFER_33;
     using Scheduler = MatmulScheduler<IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, POLICY_TYPE>;
@@ -91,8 +106,7 @@ public:
     TrianUpperMatmulPolicy is only for internal usage, does not support extension or customized specialization!
 */
 template <const auto& MM_CFG, typename IMPL, typename A_TYPE, typename B_TYPE, typename C_TYPE, typename BIAS_TYPE>
-struct TrianUpperMatmulPolicy : public MatmulPolicy<MM_CFG, IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE>
-{
+struct TrianUpperMatmulPolicy : public MatmulPolicy<MM_CFG, IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE> {
 public:
     constexpr static PolicyType POLICY_TYPE = PolicyType::MATMUL_UPPER_TRIANGULAR;
     using Scheduler = MatmulScheduler<IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, POLICY_TYPE>;
@@ -104,8 +118,7 @@ public:
     TrianLowerMatmulPolicy is only for internal usage, does not support extension or customized specialization!
 */
 template <const auto& MM_CFG, typename IMPL, typename A_TYPE, typename B_TYPE, typename C_TYPE, typename BIAS_TYPE>
-struct TrianLowerMatmulPolicy : public MatmulPolicy<MM_CFG, IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE>
-{
+struct TrianLowerMatmulPolicy : public MatmulPolicy<MM_CFG, IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE> {
 public:
     constexpr static PolicyType POLICY_TYPE = PolicyType::MATMUL_LOWER_TRIANGULAR;
     using Scheduler = MatmulScheduler<IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, POLICY_TYPE>;
@@ -117,10 +130,10 @@ public:
     SplitMMatmulPolicy is only for internal usage, does not support extension or customized specialization!
 */
 template <const auto& MM_CFG, typename IMPL, typename A_TYPE, typename B_TYPE, typename C_TYPE, typename BIAS_TYPE>
-struct SplitMMatmulPolicy : public MatmulPolicy<MM_CFG, IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE>
-{
+struct SplitMMatmulPolicy : public MatmulPolicy<MM_CFG, IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE> {
 public:
-    using CopyCubeOut = AscendC::Impl::Detail::CopyCubeOut<IMPL, A_TYPE, B_TYPE, C_TYPE, MM_CFG, McgShfMode::DUAL_DST_SPLIT_M>;
+    using CopyCubeOut =
+        AscendC::Impl::Detail::CopyCubeOut<IMPL, A_TYPE, B_TYPE, C_TYPE, MM_CFG, McgShfMode::DUAL_DST_SPLIT_M>;
 };
 
 /*
@@ -129,14 +142,14 @@ public:
     SplitNMatmulPolicy is only for internal usage, does not support extension or customized specialization!
 */
 template <const auto& MM_CFG, typename IMPL, typename A_TYPE, typename B_TYPE, typename C_TYPE, typename BIAS_TYPE>
-struct SplitNMatmulPolicy : public MatmulPolicy<MM_CFG, IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE>
-{
+struct SplitNMatmulPolicy : public MatmulPolicy<MM_CFG, IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE> {
 public:
-    using CopyCubeOut = AscendC::Impl::Detail::CopyCubeOut<IMPL, A_TYPE, B_TYPE, C_TYPE, MM_CFG, McgShfMode::DUAL_DST_SPLIT_N>;
+    using CopyCubeOut =
+        AscendC::Impl::Detail::CopyCubeOut<IMPL, A_TYPE, B_TYPE, C_TYPE, MM_CFG, McgShfMode::DUAL_DST_SPLIT_N>;
 };
-}  // namespace Detail
-}  // namespace Impl
-}  // namespace AscendC
+} // namespace Detail
+} // namespace Impl
+} // namespace AscendC
 #endif // _MATMUL_POLICY_H_
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_POLICY_MATMUL_POLICY_H__)

@@ -1,20 +1,21 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /*!
-* \file n_loop_intf.h
-* \brief
-*/
+ * \file n_loop_intf.h
+ * \brief
+ */
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#pragma message("impl/adv_api/detail/matmul/scheduler/iterator/n_loop/n_loop_intf.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
+#pragma message( \
+    "impl/adv_api/detail/matmul/scheduler/iterator/n_loop/n_loop_intf.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_SCHEDULER_ITERATOR_N_LOOP_N_LOOP_INTF_H__
 #endif
@@ -30,9 +31,8 @@ namespace Detail {
     We retain the freedom to make incompatible changes, but do not guarantee the stability.
     NLoop is only for internal usage, does not support extension or customized specialization!
 */
-template <typename IMPL, class A_TYPE, const auto &MM_CFG, typename = void>
-class NLoop
-{
+template <typename IMPL, class A_TYPE, class B_TYPE, const auto& MM_CFG, typename = void>
+class NLoop {
 public:
     __aicore__ inline NLoop() = default;
     __aicore__ inline ~NLoop() = default;
@@ -55,10 +55,7 @@ public:
      * @param: void
      * @return: total number of iteration on N-dimension
      */
-    __aicore__ inline uint32_t GetTotalIter() const
-    {
-        return 0;
-    }
+    __aicore__ inline uint32_t GetTotalIter() const { return 0; }
 
     /**
      * @description: N-dimension outer loop start.
@@ -72,70 +69,49 @@ public:
      * @param: void
      * @return: return false when outer loop is end.
      */
-    __aicore__ inline bool OuterNext()
-    {
-        return false;
-    }
+    __aicore__ inline bool OuterNext() { return false; }
 
     /**
      * @description: Judge whether N-dimension outer loop is end.
      * @param: void
      * @return: return true if outer loop is end.
      */
-    __aicore__ inline bool OuterEnd()
-    {
-        return true;
-    }
+    __aicore__ inline bool OuterEnd() { return true; }
 
     /**
      * @description: Get current outer loop index.
      * @param: void
      * @return: current outer loop index.
      */
-    __aicore__ inline uint32_t GetOuterIdx() const
-    {
-        return 0;
-    }
+    __aicore__ inline uint32_t GetOuterIdx() const { return 0; }
 
     /**
      * @description: Get the iteration number of outer loop.
      * @param: void
      * @return: the iteration number of outer loop.
      */
-    __aicore__ inline uint32_t GetOuterIter() const
-    {
-        return 0;
-    }
+    __aicore__ inline uint32_t GetOuterIter() const { return 0; }
 
     /**
      * @description: Get matrixB shape of current outer loop.
      * @param: void
      * @return: matrixB shape of current outer loop.
      */
-    __aicore__ inline int32_t GetTileShape() const
-    {
-        return 0;
-    }
+    __aicore__ inline int32_t GetTileShape() const { return 0; }
 
     /**
      * @description: Get matrixB block shape of current outer loop.
      * @param: void
      * @return: matrixB block shape of current outer loop.
      */
-    __aicore__ inline int32_t GetTileBlockShape() const
-    {
-        return 0;
-    }
+    __aicore__ inline int32_t GetTileBlockShape() const { return 0; }
 
     /**
      * @description: Get matrixB tail shape of current outer loop.
      * @param: void
      * @return: matrixB tail shape of current outer loop.
      */
-    __aicore__ inline int32_t GetTailShape() const
-    {
-        return 0;
-    }
+    __aicore__ inline int32_t GetTailShape() const { return 0; }
 
     /**
      * @description: N-dimension inner loop start.
@@ -149,65 +125,47 @@ public:
      * @param: void
      * @return: return false when inner loop is end.
      */
-    __aicore__ inline bool InnerNext()
-    {
-        return false;
-    }
+    __aicore__ inline bool InnerNext() { return false; }
 
     /**
      * @description: Judge whether N-dimension inner loop is end.
      * @param: void
      * @return: return true if inner loop is end.
      */
-    __aicore__ inline bool InnerEnd()
-    {
-        return true;
-    }
+    __aicore__ inline bool InnerEnd() { return true; }
 
     /**
      * @description: Get current inner loop index.
      * @param: void
      * @return: current inner loop index.
      */
-    __aicore__ inline uint32_t GetInnerIdx() const
-    {
-        return 0;
-    }
+    __aicore__ inline uint32_t GetInnerIdx() const { return 0; }
 
     /**
      * @description: Get the iteration number of inner loop.
      * @param: void
      * @return: the iteration number of inner loop.
      */
-    __aicore__ inline uint32_t GetInnerIter() const
-    {
-        return 0;
-    }
+    __aicore__ inline uint32_t GetInnerIter() const { return 0; }
 
     /**
      * @description: Get matrixB shape of current inner loop.
      * @param: void
      * @return: matrixB shape of current inner loop.
      */
-    __aicore__ inline int32_t GetBaseShape() const
-    {
-        return 0;
-    }
+    __aicore__ inline int32_t GetBaseShape() const { return 0; }
 
     /**
      * @description: Get matrixB block shape of current inner loop.
      * @param: void
      * @return: matrixB block shape of current inner loop.
      */
-    __aicore__ inline int32_t GetBaseBlockShape() const
-    {
-        return 0;
-    }
+    __aicore__ inline int32_t GetBaseBlockShape() const { return 0; }
 };
 
-}  // namespace Detail
-}  // namespace Impl
-}  // namespace AscendC
+} // namespace Detail
+} // namespace Impl
+} // namespace AscendC
 #endif // _N_LOOP_INTF_H_
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_SCHEDULER_ITERATOR_N_LOOP_N_LOOP_INTF_H__)
