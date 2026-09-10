@@ -43,3 +43,7 @@ auto quant = make_tensor(make_mem_ptr(quant_addr), make_frame_layout<nd_ext_layo
 auto atom = make_copy(copy_l0c_to_gm{}).with(l0c_to_gm_params{});
 copy(atom, dst, l0c, quant);
 ```
+
+## 约束说明
+
+quant为标量时，quant中的量化参数部分的值不支持设置为INF或NAN。quant为张量时，quant中每个元素的量化参数部分的值不支持设置为INF或NAN。

@@ -235,6 +235,7 @@ struct l0c_to_l1_params {
 
 ## 约束说明
 
+- quant为标量时，quant中的量化参数部分的值不支持设置为INF或NAN。quant为张量时，quant中每个元素的量化参数部分的值不支持设置为INF或NAN。
 - `dst`必须位于L1 Buffer，`src`必须位于L0C Buffer。
 - Trait和Params的配置需要与数据类型、Layout和量化模式匹配。
 - 使用坐标搬运时，coord和copy_shape需要与对应张量的形状结构匹配，且搬运范围不能越界。

@@ -40,6 +40,8 @@ enum class DequantType {
 
 ## 约束说明
 
+核函数（Kernel）侧SetQuantScalar接口的quantScalar中的量化参数部分，以及SetQuantVector接口的quantTensor中每个元素的量化参数部分的值不支持设置为INF或NAN。
+
 本接口支持的同一系数的量化/反量化模式、向量的量化/反量化模式分别与核函数（Kernel）侧接口[SetQuantScalar](../Matmul_Kernel/SetQuantScalar.md)和[SetQuantVector](../Matmul_Kernel/SetQuantVector.md)对应，本接口设置的量化/反量化模式必须与核函数（Kernel）侧使用的接口保持一致。
 
 ## 调用示例

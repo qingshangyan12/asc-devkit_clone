@@ -73,6 +73,8 @@ __aicore__ inline void SetFixPipeConfig(const LocalTensor<T>& preData, bool isUn
 
 ## 约束说明<a name="zh-cn_topic_0000002547729135_section633mcpsimp"></a>
 
+配置Tensor量化参数时，quantPre或preData中每个元素的量化参数部分的值不支持设置为INF或NAN。
+
 quantPre和reluPre必须是Fixpipe Buffer上的tensor。
 
 ## 调用示例<a name="section642mcpsimp"></a>

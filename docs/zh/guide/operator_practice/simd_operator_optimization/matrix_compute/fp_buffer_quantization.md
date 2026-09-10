@@ -4,6 +4,8 @@
 
 【描述】算子实现中对矩阵乘结果进行量化计算时，可将量化参数搬运到Fixpipe Buffer（C2PIPE2GM）上，调用一次Fixpipe接口实现矩阵乘结果的量化计算。相比于将矩阵乘的结果从L0C Buffer（CO1）搬运到GM，再从GM搬运到Unified Buffer（UB），在UB进行量化计算的过程，数据搬运的次数更少，内存使用效率更高。
 
+【约束】正例中deqTensor指向的量化参数向量中，每个元素的量化参数部分的值不支持设置为INF或NAN。
+
 >[!NOTE]说明 
 >本性能优化手段仅针对Atlas A2 训练系列产品/Atlas A2 推理系列产品生效。
 

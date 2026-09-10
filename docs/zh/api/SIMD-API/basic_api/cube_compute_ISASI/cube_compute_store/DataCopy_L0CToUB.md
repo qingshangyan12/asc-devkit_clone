@@ -139,6 +139,7 @@
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
+- Scalar量化模式下，enhancedParams.deqValue中的量化参数部分的值不支持设置为INF或NAN。Tensor/Vector量化模式下，enhancedParams.deqTensorAddr指向的参数向量中，每个元素的量化参数部分的值不支持设置为INF或NAN。
 - 开发者需要保证DataCopyEnhancedParams中的isRelu参数配置和量化系数deqValue/量化参数向量deqTensorAddr的ReLU标志位配置一致：都开启或都不开启。
 - 如果有随路精度转换，操作数的blockLen单位需要减半。
 

@@ -208,7 +208,7 @@
     - 如果用户提供的是标准的IEEE 754 float32输入，API内部会处理成处理器支持的float32格式进行计算，此时如果golden数据生成过程中使用的是标准的IEEE 754 float32数据，则可能引入精度不匹配问题，需要修正golden数据的生成，将量化参数的23bits尾数位的低13bits数据位清零再参与量化计算。
 - 源矩阵NZ格式地址要求64字节对齐，目的矩阵NZ格式地址需要满足32字节对齐。
 - 当搬出的mSize、nSize或者ndNum中的任意一个值为0时，该指令不会被执行。ndNum=0时会报warning。
-- 量化和ReLU参数不能为inf/nan和非规格化数。
+- Scalar量化模式下，intriParams.deqScalar中的量化参数部分的值不支持设置为INF或NAN。Tensor量化模式下，cbufWorkspace中每个元素的量化参数部分的值不支持设置为INF或NAN。量化参数还不支持设置为非规格化数，ReLU参数不支持设置为INF、NAN或非规格化数。
 - 目标数据不能有重叠。如果对目的地址有重叠写入，硬件不会报告任何警告和错误，也不保证重叠数据的写入顺序。
 - unitFlag特性开启需要配合Mmad同时开启。
 <!-- npu="950" id27 -->

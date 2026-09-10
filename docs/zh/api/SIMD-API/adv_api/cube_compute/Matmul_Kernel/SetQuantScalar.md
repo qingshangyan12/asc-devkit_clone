@@ -70,6 +70,8 @@ __aicore__ inline void SetQuantScalar(const uint64_t quantScalar)
 
 ## 约束说明
 
+quantScalar中的量化参数部分的值不支持设置为INF或NAN。
+
 需与[SetDequantType](../Matmul_Tiling/SetDequantType.md)保持一致。
 
 本接口必须在[Iterate](Iterate.md)或者[IterateAll](IterateAll.md)前调用。
