@@ -355,4 +355,4 @@ int main()
 }
 ```
 
-更多场景使用样例请参考[asc_mmad_mx样例](../../../../../../examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad_mx)。
+更多场景使用样例请参考[asc_mmad_mx样例](../../../../../../examples/02_simd_c_api/05_matrix_compute/mmad_mx)。
