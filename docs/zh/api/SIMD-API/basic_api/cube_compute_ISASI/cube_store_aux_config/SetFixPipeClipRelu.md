@@ -61,6 +61,8 @@ __aicore__ inline void SetFixPipeClipRelu(uint64_t config)
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
+随路量化场景下，量化参数的值不支持设置为INF或NAN。
+
 开启ReLU的情况下，先进行ReLU操作，之后再进行ClipReLU。
 
 ## 调用示例<a name="section6461234123118"></a>
