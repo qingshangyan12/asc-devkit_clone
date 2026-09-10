@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1240" height="500" viewBox="0 0 1240 500" role="img" aria-labelledby="title desc">
-  <title id="title">Ping Pong DoubleBuffer的三个时间点</title>
+  <title id="title">Ping Pong Double Buffer的三个时间点</title>
   <desc id="desc">t0搬入块0到Ping；t1搬入块1到Pong并计算块0；t2搬入块2到Ping、计算块1并搬出块0。</desc>
   <rect width="1240" height="500" fill="#ffffff"/>
-  <text x="620" y="38" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2937">Ping/Pong DoubleBuffer的三个时间点</text>
+  <text x="620" y="38" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2937">Ping/Pong Double Buffer的三个时间点</text>
   <text x="320" y="82" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#1f2937">t0：预热</text>
   <text x="680" y="82" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#1f2937">t1：开始重叠</text>
   <text x="1040" y="82" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#1f2937">t2：三阶段重叠</text>

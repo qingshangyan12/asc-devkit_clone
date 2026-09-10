@@ -1,6 +1,6 @@
-# DoubleBuffer（CAPI）
+# Double Buffer
 
-DoubleBuffer是一种通过增加UB缓冲区组数，使数据搬入、Vector计算和结果搬出能够跨数据块重叠执行的优化方法。本文以CAPI为例说明其工作方式和实现要点。
+Double Buffer是一种通过增加UB缓冲区组数，使数据搬入、Vector计算和结果搬出能够跨数据块重叠执行的优化方法。本文以基于指针的C语言编程方式说明其工作方式和实现要点。
 
 在矢量算子中，一个数据块通常需要经历以下三个阶段：
 
@@ -8,7 +8,7 @@ DoubleBuffer是一种通过增加UB缓冲区组数，使数据搬入、Vector计
 - Vector计算：读取UB中的输入并将结果写入UB，由`PIPE_V`执行。
 - 数据搬出：将UB中的结果写回GM，由`PIPE_MTE3`执行。
 
-`PIPE_MTE2`、`PIPE_V`和`PIPE_MTE3`表示CAPI操作所属的执行阶段。它们可以并行执行；但当多个阶段访问同一片UB时，必须通过同步保证访问顺序。
+`PIPE_MTE2`、`PIPE_V`和`PIPE_MTE3`表示算子的执行阶段。它们可以并行执行；但当多个阶段访问同一片UB时，必须通过同步保证访问顺序。
 
 ## 单缓冲区的数据依赖与流水等待
 
@@ -21,12 +21,12 @@ DoubleBuffer是一种通过增加UB缓冲区组数，使数据搬入、Vector计
 
 ## 双缓冲区的流水并行机制
 
-DoubleBuffer为每个数据块准备两组独立的UB缓冲区：Ping和Pong。每组包含输入`x`、输入`y`和输出`z`三个互不重叠的子缓冲区。偶数数据块使用Ping，奇数数据块使用Pong。
+Double Buffer为每个数据块准备两组独立的UB缓冲区：Ping和Pong。每组包含输入`x`、输入`y`和输出`z`三个互不重叠的子缓冲区。偶数数据块使用Ping，奇数数据块使用Pong。
 
-图2展示了前三个时间点的操作。块0在Ping中处理，块1在Pong中处理；到t2时，MTE2向Ping的`x/y`搬入块2输入，Vector计算Pong中的块1，同时MTE3从Ping的`z`搬出块0结果。三个操作访问的都是不同的UB区域，因此可以重叠执行。
+图2展示了前三个时间点的操作。t0时，MTE2将块0的输入搬入Ping；t1时，MTE2将块1的输入搬入Pong，Vector同时读取Ping中存储的块0输入并将计算结果写入Ping；t2时，MTE2将块2的输入搬入Ping，Vector读取Pong中存储的块1输入并将计算结果写入Pong，MTE3同时从Ping搬出块0的结果。每个时间点内并行执行的操作访问不同的UB区域，因此不会发生读写冲突。
 
-**图2** Ping/Pong DoubleBuffer的三个时间点<a name="fig-double-buffer-capi"></a>  
-![](./figures/double_buffer_capi.svg "Ping/Pong DoubleBuffer的三个时间点")
+**图2** Ping/Pong Double Buffer的三个时间点<a name="fig-double-buffer-capi"></a>
+![](./figures/double_buffer_capi.svg "Ping/Pong Double Buffer的三个时间点")
 
 图2中的时序可按如下方式理解：
 
@@ -38,15 +38,15 @@ DoubleBuffer为每个数据块准备两组独立的UB缓冲区：Ping和Pong。�
 
 循环结束后还需要等待已提交的操作完成，这一阶段称为流水排空。首块只有搬入、末块只有搬出是正常现象，因此实际收益应以完整算子的端到端耗时衡量。
 
-## CAPI双缓冲区实现方法
+## 基于指针的C语言编程实现方法
 
-在CAPI中，DoubleBuffer不是单一开关，而是以下三项配合完成：
+采用基于指针的C语言编程方式时，Double Buffer不是单一开关，而是通过以下三项配合实现：
 
 1. 在UB中分配Ping和Pong两组独立缓冲区。
 2. 在循环中按数据块序号交替选择缓冲区组。
 3. 使用同步原语约束同一组缓冲区的读、写和再次复用。
 
-下面的代码省略了核间切分、对齐和尾块计算，只保留DoubleBuffer所在的内核位置及其关键逻辑。`BLOCK_LENGTH`表示单个数据块的最大元素个数，`current_length`表示当前块的实际元素个数。
+下面的代码省略了核间切分、对齐和尾块计算，只保留Double Buffer所在的内核位置及其关键逻辑。`BLOCK_LENGTH`表示单个数据块的最大元素个数，`current_length`表示当前块的实际元素个数。
 
 ```cpp
 __global__ __vector__ void add_double_buffer(__gm__ half* x_gm, __gm__ half* y_gm, __gm__ half* z_gm,
@@ -108,7 +108,7 @@ __global__ __vector__ void add_double_buffer(__gm__ half* x_gm, __gm__ half* y_g
 
 仅将UB空间扩展为两组并不能保证正确性。同步的作用是描述每个缓冲区在其生命周期中的可访问状态。以图2为例，需要满足以下关系：
 
-| UB区域 | 生产者和消费者 | 需要保证的顺序 | 对应CAPI同步 |
+| UB区域 | 生产者和消费者 | 需要保证的顺序 | 同步方式 |
 | --- | --- | --- | --- |
 | Ping/Pong `x/y` | MTE2写入 -> Vector读取 | 同组输入搬入完成后才能计算；下一次写同组输入前，前一次读取必须结束。 | 使用该组的输入`mutex_id`。 |
 | Ping/Pong `z` | Vector写入 -> MTE3读取 | 计算完成后才能搬出结果。 | 使用该组的输出`mutex_id`。 |
@@ -116,26 +116,26 @@ __global__ __vector__ void add_double_buffer(__gm__ half* x_gm, __gm__ half* y_g
 
 t2中MTE2向Ping的`x/y`搬入块2，同时MTE3从Ping的`z`搬出块0，并不冲突：`x/y/z`是同一组内彼此独立的子缓冲区。真正不能省略的是两类复用等待：再次写入同组`x/y`前等待前一次Vector读取结束；再次写入同组`z`前等待前一次MTE3搬出结束。
 
-本文代码使用[asc_lock](../../../../api/SIMD-API/c_api/sync/asc_lock.md)和[asc_unlock](../../../../api/SIMD-API/c_api/sync/asc_unlock.md)按Buffer生命周期管理跨阶段依赖。二者必须成对使用，且不能嵌套使用相同的`mutex_id`。`asc_lock/asc_unlock`当前仅支持Ascend 950PR/Ascend 950DT；其他产品应根据其CAPI同步接口支持情况，使用`asc_sync_notify/asc_sync_wait`等同步原语建立等价的数据依赖，不能直接照搬本节代码。
+本文代码使用[asc_lock](../../../../api/SIMD-API/c_api/sync/asc_lock.md)和[asc_unlock](../../../../api/SIMD-API/c_api/sync/asc_unlock.md)按Buffer生命周期管理跨阶段依赖。二者必须成对使用，且不能嵌套使用相同的`mutex_id`。`asc_lock/asc_unlock`当前仅支持Ascend 950PR/Ascend 950DT；其他产品应根据对应产品的同步接口支持情况，使用`asc_sync_notify/asc_sync_wait`等同步原语建立等价的数据依赖，不能直接照搬本节代码。
 
 ## 适用场景和限制
 
-是否适合使用DoubleBuffer，取决于是否存在可重叠的跨块阶段和足够的本地存储空间，而不是取决于算子是否为静态编程。不同开发方式的处理如下。
+是否适合使用Double Buffer，取决于是否存在可重叠的跨块阶段和足够的本地存储空间，不取决于算子编程方式。不同编程方式的处理如下。
 
-| 开发方式或场景 | 是否可使用 | 实现或判断方式 |
+| 编程方式或场景 | 是否可使用 | 实现或判断方式 |
 | --- | --- | --- |
-| 基础API，使用`TPipe/TQue`管理资源 | 可以 | 基础API通过队列Buffer数量配置DoubleBuffer。该方式不使用本文的手动UB切分代码，可参考[DoubleBuffer场景](../../../operator_practice/simd_operator_impl/vector_programming/double_buffer_scenario.md)。 |
-| CAPI，手动申请`__ubuf__` | 可以 | 为每个待复用数据块准备Ping/Pong两组UB区域，并显式建立跨阶段同步。本文和配套样例采用此方式。 |
+| 基础API，使用`TPipe/TQue`管理资源 | 可以 | 基础API通过队列Buffer数量配置Double Buffer。该方式不使用本文的手动UB切分代码，可参考[Double Buffer场景](../../../operator_practice/simd_operator_impl/vector_programming/double_buffer_scenario.md)。 |
+| 基于指针的C语言编程，手动申请`__ubuf__` | 可以 | 为每个待复用数据块准备Ping/Pong两组UB区域，并显式建立跨阶段同步。本文和配套样例采用此方式。 |
 | 静态或动态形状编程 | 取决于资源和流水 | 编程形态不是限制条件；只要UB可容纳两组缓冲区、数据可分块，且存在可重叠的异步阶段，就可以采用。 |
 | 单个数据块、数据量很小 | 通常无收益 | 没有足够的相邻块填充和排空流水，额外UB占用及同步开销可能超过收益。 |
 | 无GM-UB搬运与Vector计算重叠机会 | 不适用 | 没有可隐藏的等待时间，复制Buffer不会带来流水收益。 |
-| 高阶模板或封装API | 取决于接口 | 仅在对应接口明确提供DoubleBuffer配置时启用；不要将本文的CAPI同步代码直接嵌入其他编程模型。 |
+| 高阶模板或封装API | 取决于接口 | 仅在对应接口明确提供Double Buffer配置时启用；不要将本文的同步代码直接嵌入其他编程模型。 |
 
-开启DoubleBuffer前还应确认以下条件：
+开启Double Buffer前还应确认以下条件：
 
 - UB容量能够容纳两组输入和输出缓冲区，以及其他运行时占用。
 - 每个缓冲区的地址和每次数据搬运长度满足目标产品及搬运接口的对齐要求。
 - 尾块按实际长度计算，不能按照满块长度访问GM或UB。
 - 使用性能工具对比相同计算量、相同搬运量下的端到端耗时。多个阶段已经重叠后，各阶段耗时或占比不能直接相加。
 
-DoubleBuffer能够减少等待时间，但不会减少计算量或GM搬运量。若搬运本身不是瓶颈、数据块数量不足，或额外UB空间导致分块变小，其性能收益可能有限，甚至不如单Buffer实现。
+Double Buffer能够减少等待时间，但不会减少计算量或GM搬运量。若搬运本身不是瓶颈、数据块数量不足，或额外UB空间导致分块变小，其性能收益可能有限，甚至不如单Buffer实现。
