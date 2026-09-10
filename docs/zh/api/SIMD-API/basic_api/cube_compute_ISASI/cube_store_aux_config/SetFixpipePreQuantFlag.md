@@ -59,7 +59,7 @@ __aicore__ inline void SetFixpipePreQuantFlag(uint64_t config)
 
 ## 约束说明<a name="zh-cn_topic_0000002516049318_section633mcpsimp"></a>
 
-无
+config中的量化参数部分的值不支持设置为INF或NAN。
 
 ## 调用示例<a name="section6461234123118"></a>
 

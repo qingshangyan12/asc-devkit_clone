@@ -89,6 +89,7 @@ PIPE_S
 
 ## 约束说明
 
+- scale的值，以及config中的量化参数部分（scale字段）的值，均不支持设置为INF或NAN。
 - 本接口非AIC调用直接返回。
 - 本接口需在对应的L0C Buffer搬出接口执行前调用，并在搬出接口中配置对应的Scalar量化模式。
 

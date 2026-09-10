@@ -74,6 +74,10 @@ VQF322F32_PRE,         // Vector_Quant_Float32_2_Float32: float量化成float，
 <!-- end id4 -->
 <!-- end id2 -->
 
+## 约束说明
+
+Scalar量化模式下，QUANT_PRE中的量化参数部分的值不支持设置为INF或NAN。Tensor/Vector量化模式下，Quant_PRE_ADDR[i]中的量化参数部分的值不支持设置为INF或NAN。
+
 ## 使用示例
 
 完整样例请参考[fixpipe\_l0c2gm样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2gm)。

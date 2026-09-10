@@ -195,7 +195,7 @@ PIPE_FIX
 - src与dst dtype组合需与`quant_pre_mode`量化模式匹配，否则会导致搬运结果不符合预期。
 - `dual_dst_ctrl`仅支持在普通搬运模式（Nz2Nz）或Nz2ND搬运场景下使用，不支持其他随路功能场景。
 - `enable_channel_split`仅在输出dtype为`float`且输出为Nz格式时可设为true。
-- 量化与激活模式中使用的量化系数不可为INF/NAN和非规格化数，否则会导致量化激活结果错误。
+- quant_pre_mode选择Scalar或Tensor量化模式时，所使用的量化参数中的浮点系数不支持设置为INF或NAN。量化参数还不支持设置为非规格化数，否则会导致量化激活结果错误。
 - 开启Nz2DN转换时，需通过[asc_set_l0c_copy_channel_para](asc_set_l0c_copy_channel_para.md)预先配置源矩阵步长，且源矩阵步长不可为0，否则会导致搬运异常。
 - 开启Nz2DN转换时，仅当通过[asc_set_l0c_copy_channel_para](asc_set_l0c_copy_channel_para.md)配置源矩阵步长为1时，可同时开启UnitFlag功能。
 - `enable_clip_relu_pre`设为Clip ReLU（标量模式）时需搭配`relu_pre_mode`与量化功能一起使用。
