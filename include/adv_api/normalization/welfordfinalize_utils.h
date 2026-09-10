@@ -37,12 +37,12 @@ struct WelfordFinalizeConfig {
 constexpr WelfordFinalizeConfig WFFINALIZE_DEFAULT_CFG = {false};
 
 struct WelfordFinalizePara {
-    uint32_t rnLength;
-    uint32_t abLength;
-    uint32_t headCount;
-    uint32_t headCountLength;
-    uint32_t tailCount;
-    uint32_t tailCountLength;
+    int32_t rnLength;
+    int32_t abLength;
+    int32_t headCount;
+    int32_t headCountLength;
+    int32_t tailCount;
+    int32_t tailCountLength;
     float abRec;
     float rRec;
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 5102 || \
