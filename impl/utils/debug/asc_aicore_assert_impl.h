@@ -16,16 +16,22 @@
 #ifndef IMPL_UTILS_DEBUG_ASC_AICORE_ASSERT_IMPL_H
 #define IMPL_UTILS_DEBUG_ASC_AICORE_ASSERT_IMPL_H
 
-#ifndef ASCENDC_CPU_DEBUG
+#ifdef ASCENDC_CPU_DEBUG
+#include <cstdlib>
+#include "impl/utils/debug/asc_cpu_assert_utils.h"
+#else
 #include "impl/utils/debug/asc_aicore_printf_impl.h"
+#endif
 
 namespace __asc_aicore {
+#ifndef ASCENDC_CPU_DEBUG
 inline __aicore__ void __assert_fail(
     const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line, const __gm__ char* __function)
 {
     printf_impl_assert("[ASSERT] %s:%u: %s: Assertion '%s' failed.\n", __file, __line, __function, __assertion);
     trap();
 }
+#endif
 
 template <typename... Args>
 inline __aicore__ void __assert_fail_msg(
@@ -33,10 +39,14 @@ inline __aicore__ void __assert_fail_msg(
     const __gm__ char* fmt, Args&&... args)
 {
     printf_impl_assert_msg(__assertion, __file, __line, __function, fmt, args...);
+#ifdef ASCENDC_CPU_DEBUG
+    std::fflush(stdout);
+    std::abort();
+#else
     trap();
+#endif
 }
 } // namespace __asc_aicore
-#endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_AICORE_ASSERT_IMPL__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
