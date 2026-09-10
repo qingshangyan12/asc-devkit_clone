@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/vector_datamove/vector_datamove.h"`。
 
-该接口与`asc_copy_gm2ub_align`配合使用，用于设置连续搬运数据块左右两侧的填充值。
+该接口与[asc_copy_gm2ub_align](./asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)配合使用，用于设置连续搬运数据块左右两侧的填充值。
 
 <!-- npu="950" id8 -->
 对于Ascend 950PR/Ascend 950DT产品：
