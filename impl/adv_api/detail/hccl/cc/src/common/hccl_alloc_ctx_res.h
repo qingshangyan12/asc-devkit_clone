@@ -99,6 +99,7 @@ enum class AlgorithmType {
     CcuSchedAllToAllSoleMesh = 150,
     CcuSchedAllToAllVSoleMesh = 151,
     CcuSchedAllGatherSoleMesh = 152,
+    CcuSchedReduceScatterConcurMeshNHRMultiLink = 153,
     CcuSchedReduceScatterSoleNHRMultiLink = 154,
 };
 
@@ -113,6 +114,7 @@ static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
     {"CcuSchedAllReduceSoleMesh", AlgorithmType::CcuAllReduceMeshMem2Mem1D},
     {"CcuSchedAllGatherMesh1DMem2Mem", AlgorithmType::CcuAllGatherMeshMem2Mem1D},
     {"CcuSchedAllGatherSoleMesh", AlgorithmType::CcuSchedAllGatherSoleMesh},
+    {"CcuSchedReduceScatterConcurMeshNHRMultiLink", AlgorithmType::CcuSchedReduceScatterConcurMeshNHRMultiLink},
     {"CcuSchedReduceScatterSoleNHRMultiLink", AlgorithmType::CcuSchedReduceScatterSoleNHRMultiLink}};
 
 typedef HcclResult (*OpParamPrepareFunc)(
