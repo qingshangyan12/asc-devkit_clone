@@ -398,7 +398,6 @@ __simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_float src, fl
     }
 }
 
-// asc_gt(vcmp) uint8_t
 __simd_callee__ inline void asc_gt(vector_bool& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -406,7 +405,6 @@ __simd_callee__ inline void asc_gt(vector_bool& dst, vector_uint8_t src0, vector
     }
 }
 
-// asc_gt(vcmp) int8_t
 __simd_callee__ inline void asc_gt(vector_bool& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -414,7 +412,6 @@ __simd_callee__ inline void asc_gt(vector_bool& dst, vector_int8_t src0, vector_
     }
 }
 
-// asc_gt(vcmp) half
 __simd_callee__ inline void asc_gt(vector_bool& dst, vector_half src0, vector_half src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -422,7 +419,6 @@ __simd_callee__ inline void asc_gt(vector_bool& dst, vector_half src0, vector_ha
     }
 }
 
-// asc_gt(vcmp) float
 __simd_callee__ inline void asc_gt(vector_bool& dst, vector_float src0, vector_float src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -430,7 +426,6 @@ __simd_callee__ inline void asc_gt(vector_bool& dst, vector_float src0, vector_f
     }
 }
 
-// asc_gt(vcmp) uint16_t
 __simd_callee__ inline void asc_gt(vector_bool& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -438,7 +433,6 @@ __simd_callee__ inline void asc_gt(vector_bool& dst, vector_uint16_t src0, vecto
     }
 }
 
-// asc_gt(vcmp) int16_t
 __simd_callee__ inline void asc_gt(vector_bool& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -446,7 +440,6 @@ __simd_callee__ inline void asc_gt(vector_bool& dst, vector_int16_t src0, vector
     }
 }
 
-// asc_gt(vcmp) uint32_t
 __simd_callee__ inline void asc_gt(vector_bool& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -454,7 +447,6 @@ __simd_callee__ inline void asc_gt(vector_bool& dst, vector_uint32_t src0, vecto
     }
 }
 
-// asc_gt(vcmp) int32_t
 __simd_callee__ inline void asc_gt(vector_bool& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -462,7 +454,6 @@ __simd_callee__ inline void asc_gt(vector_bool& dst, vector_int32_t src0, vector
     }
 }
 
-// asc_gt(vcmp) bfloat16
 __simd_callee__ inline void asc_gt(vector_bool& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -470,7 +461,6 @@ __simd_callee__ inline void asc_gt(vector_bool& dst, vector_bfloat16_t src0, vec
     }
 }
 
-// uint8_t
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_uint8_t src, uint8_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -478,7 +468,6 @@ __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_uint8_t src, 
     }
 }
 
-// int8_t
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_int8_t src, int8_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -486,7 +475,6 @@ __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_int8_t src, i
     }
 }
 
-// bfloat16
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -494,7 +482,6 @@ __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_bfloat16_t sr
     }
 }
 
-// uint16_t
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_uint16_t src, uint16_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -502,7 +489,6 @@ __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_uint16_t src,
     }
 }
 
-// int16_t
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_int16_t src, int16_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -510,7 +496,6 @@ __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_int16_t src, 
     }
 }
 
-// uint32_t
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_uint32_t src, uint32_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -518,7 +503,6 @@ __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_uint32_t src,
     }
 }
 
-// int32_t
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_int32_t src, int32_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -526,7 +510,6 @@ __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_int32_t src, 
     }
 }
 
-// half
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_half src, half value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -534,7 +517,6 @@ __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_half src, hal
     }
 }
 
-// float32
 __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_float src, float value, vector_bool mask)
 {
     if ASC_IS_AIV {

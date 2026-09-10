@@ -20,7 +20,6 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
-// ==========源操作数为起初地址，目的数为寄存器=========
 __simd_callee__ inline void asc_gather(
     vector_int16_t& dst, __ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask)
 {
@@ -173,7 +172,6 @@ __simd_callee__ inline void asc_gather(
     }
 }
 
-// ==========有mask参数=========
 __simd_callee__ inline void asc_gather_datablock(
     vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint32_t index, vector_bool mask)
 {
@@ -320,7 +318,6 @@ __simd_callee__ inline void asc_gather_datablock(
     }
 }
 
-// ==========无mask参数=========
 __simd_callee__ inline void asc_gather_datablock(vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint32_t index)
 {
     if ASC_IS_AIV {
@@ -455,8 +452,6 @@ __simd_callee__ inline void asc_gather_datablock(
     }
 }
 
-// ==========源操作数为起初地址，目的数为寄存器=========
-
 __simd_callee__ inline vector_int8_t asc_gather(__ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask)
 {
     vector_int8_t dst;
@@ -576,8 +571,6 @@ __simd_callee__ inline vector_bfloat16_t asc_gather(__ubuf__ bfloat16_t* src, ve
     asc_gather(dst, src, index, mask);
     return dst;
 }
-
-// ==========有mask参数=========
 
 __simd_callee__ inline vector_int8_t asc_gather_datablock(__ubuf__ int8_t* src, vector_uint32_t index, vector_bool mask)
 {
@@ -703,8 +696,6 @@ __simd_callee__ inline vector_fp8_e8m0_t asc_gather_datablock(
     asc_gather_datablock(dst, src, index, mask);
     return dst;
 }
-
-// ==========无mask参数=========
 
 __simd_callee__ inline vector_int8_t asc_gather_datablock(__ubuf__ int8_t* src, vector_uint32_t index)
 {

@@ -697,10 +697,6 @@ __simd_callee__ inline void asc_storeunalign(
     }
 }
 
-// ==========偏移固定传入0，由用户自行更新目的操作数的地址=========
-
-// ==========通过地址寄存器传入偏移，用户可以选择更新偏移或者更新目的操作数的地址=========
-
 __simd_callee__ inline void asc_storeunalign_post_postupdate(
     __ubuf__ int8_t*& dst, vector_store_unalign src, int32_t offset)
 {

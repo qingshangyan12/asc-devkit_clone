@@ -24,7 +24,6 @@
 #include "impl/c_api/reg_base_impl/npu_arch_3510/loadalign_intf_impl.h"
 #endif
 
-// offset = 0, norm
 __simd_callee__ inline void asc_loadalign(vector_int8_t& dst, __ubuf__ int8_t* src)
 {
     if ASC_IS_AIV {
@@ -159,7 +158,6 @@ __simd_callee__ inline void asc_loadalign(vector_bool& dst, __ubuf__ uint32_t* s
     }
 }
 
-// offset = 0, brc
 __simd_callee__ inline void asc_loadalign_brc(vector_int8_t& dst, __ubuf__ int8_t* src)
 {
     if ASC_IS_AIV {
@@ -273,7 +271,6 @@ __simd_callee__ inline void asc_loadalign_brc(vector_float& dst, __ubuf__ float*
     }
 }
 
-// offset = 0, upsample
 __simd_callee__ inline void asc_loadalign_upsample(vector_int8_t& dst, __ubuf__ int8_t* src)
 {
     if ASC_IS_AIV {
@@ -373,7 +370,6 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_bool& dst, __ubuf__ ui
     }
 }
 
-// offset = 0, downsample
 __simd_callee__ inline void asc_loadalign_downsample(vector_int8_t& dst, __ubuf__ int8_t* src)
 {
     if ASC_IS_AIV {
@@ -473,7 +469,6 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst, __ubuf__ 
     }
 }
 
-// offset = 0, unpack
 __simd_callee__ inline void asc_loadalign_unpack(vector_int8_t& dst, __ubuf__ int8_t* src)
 {
     if ASC_IS_AIV {
@@ -587,7 +582,6 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_float& dst, __ubuf__ flo
     }
 }
 
-// offset = 0, unpack_v2
 __simd_callee__ inline void asc_loadalign_unpack4(vector_int8_t& dst, __ubuf__ int8_t* src)
 {
     if ASC_IS_AIV {
@@ -652,7 +646,6 @@ __simd_callee__ inline void asc_loadalign_unpack4(vector_hifloat8_t& dst, __ubuf
     }
 }
 
-// offset = 0, brc_v2
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_int8_t& dst, __ubuf__ int8_t* src)
 {
     if ASC_IS_AIV {
@@ -766,7 +759,6 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_float& dst, __ubu
     }
 }
 
-// offset = 0, brc_v3
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_int16_t& dst, __ubuf__ int16_t* src)
 {
     if ASC_IS_AIV {
@@ -816,9 +808,6 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_float& dst, 
     }
 }
 
-// offset = 0, deintlv
-
-// int32_t offset, norm
 __simd_callee__ inline void asc_loadalign(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -953,7 +942,6 @@ __simd_callee__ inline void asc_loadalign(vector_bool& dst, __ubuf__ uint32_t* s
     }
 }
 
-// int32_t offset, brc
 __simd_callee__ inline void asc_loadalign_brc(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1067,7 +1055,6 @@ __simd_callee__ inline void asc_loadalign_brc(vector_float& dst, __ubuf__ float*
     }
 }
 
-// int32_t offset, upsample
 __simd_callee__ inline void asc_loadalign_upsample(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1167,7 +1154,6 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_bool& dst, __ubuf__ ui
     }
 }
 
-// int32_t offset, downsample
 __simd_callee__ inline void asc_loadalign_downsample(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1270,7 +1256,6 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst, __ubuf__ 
     }
 }
 
-// int32_t offset, unpack
 __simd_callee__ inline void asc_loadalign_unpack(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1384,7 +1369,6 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_float& dst, __ubuf__ flo
     }
 }
 
-// int32_t offset, unpack_v2
 __simd_callee__ inline void asc_loadalign_unpack4(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1449,7 +1433,6 @@ __simd_callee__ inline void asc_loadalign_unpack4(vector_hifloat8_t& dst, __ubuf
     }
 }
 
-// int32_t offset, brc_v2
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1570,7 +1553,6 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_float& dst, __ubu
     }
 }
 
-// int32_t offset, brc_v3
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1622,8 +1604,6 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_float& dst, 
         vlds(dst, src, offset, E2B_B32);
     }
 }
-
-// int32_t offset, deintlv
 
 __simd_callee__ inline void asc_loadalign(
     vector_int8_t& dst, __ubuf__ int8_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
@@ -1903,7 +1883,6 @@ __simd_callee__ inline void asc_loadalign(vector_bool& dst, __ubuf__ uint32_t* s
     }
 }
 
-// =========BRC_B8(fp4x2_e2m1/fp4x2_e1m2/u8/s8/f8_e4m3/fp8_e5m2/fp8_e8m0)=========
 __simd_callee__ inline void asc_loadalign_brc(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
@@ -1968,7 +1947,6 @@ __simd_callee__ inline void asc_loadalign_brc(vector_fp8_e8m0_t& dst, __ubuf__ f
     }
 }
 
-// =========BRC_B16(u16/s16/bf16/half)=========
 __simd_callee__ inline void asc_loadalign_brc(vector_uint16_t& dst, __ubuf__ uint16_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
@@ -1997,7 +1975,6 @@ __simd_callee__ inline void asc_loadalign_brc(vector_half& dst, __ubuf__ half* s
     }
 }
 
-// =========BRC_B32(u32/s32/float)=========
 __simd_callee__ inline void asc_loadalign_brc(vector_uint32_t& dst, __ubuf__ uint32_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
@@ -2019,7 +1996,6 @@ __simd_callee__ inline void asc_loadalign_brc(vector_float& dst, __ubuf__ float*
     }
 }
 
-// =========US(B8/B16)=========
 __simd_callee__ inline void asc_loadalign_upsample(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
@@ -2122,7 +2098,6 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_bool& dst, __ubuf__ ui
     }
 }
 
-// =========DS(B8/B16)=========
 __simd_callee__ inline void asc_loadalign_downsample(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
@@ -2225,9 +2200,6 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst, __ubuf__ 
     }
 }
 
-// DINTLV(B8/B16/B32)
-
-// unpack(B8/B16/B32)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
@@ -2341,7 +2313,6 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_float& dst, __ubuf__ flo
     }
 }
 
-// unpack v2
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
@@ -2406,7 +2377,6 @@ __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e8m0_t& dst, __ubuf
     }
 }
 
-// brc_v2
 __simd_callee__ inline void asc_loadalign_brc_datablock(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
@@ -2527,7 +2497,6 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_float& dst, __ubu
     }
 }
 
-/// brc_v3(B16/B32)
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock(
     vector_uint16_t& dst, __ubuf__ uint16_t* src, addr_reg offset)
 {
@@ -2581,24 +2550,6 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_float& dst, 
         vld(dst, src, offset, E2B_B32);
     }
 }
-
-// postupdate, norm
-
-// postupdate, brc
-
-// postupdate, upsample
-
-// postupdate, downsample
-
-// postupdate, unpack
-
-// postupdate, unpack_v2
-
-// postupdate, brc_v2
-
-// postupdate, brc_v3
-
-// postupdate, deintlv
 
 __simd_callee__ inline void asc_loadalign_deintlv(vector_int8_t& dst0, vector_int8_t& dst1, __ubuf__ int8_t* src)
 {
@@ -2724,15 +2675,6 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0, vector_flo
     }
 }
 
-// =========BRC_B16(u16/s16/bf16/half)=========
-
-// =========BRC_B32(u32/s32/float)=========
-
-// =========US(B8/B16)=========
-
-// =========DS(B8/B16)=========
-
-// DINTLV(B8/B16/B32)
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_fp4x2_e1m2_t& dst0, vector_fp4x2_e1m2_t& dst1, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
@@ -2863,8 +2805,6 @@ __simd_callee__ inline void asc_loadalign_deintlv(
         vld(dst0, dst1, src, offset, DINTLV_B32);
     }
 }
-
-// unpack(B8/B16/B32)
 
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_int8_t& dst0, vector_int8_t& dst1, __ubuf__ int8_t* src, int32_t offset)
@@ -5485,7 +5425,6 @@ __simd_callee__ inline vector_float asc_loadalign_datablock_strided(
     return dst;
 }
 
-// ========== return mask register APIs ==========
 __simd_callee__ inline vector_bool asc_loadalign_mask(__ubuf__ uint32_t* src)
 {
     vector_bool dst;

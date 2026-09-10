@@ -74,7 +74,6 @@ asc_storealign_pack_v2(__ubuf__ float* dst_align32b, vector_float src, addr_reg 
     }
 }
 
-// storealign_pack_v2
 [[deprecated("NOTICE: asc_storealign_pack_v2 is deprecated. "
              "Please use asc_storealign_pack_quarter instead.")]] __simd_callee__ inline void
 asc_storealign_pack_v2(__ubuf__ int32_t* dst_align32b, vector_int32_t src, int32_t offset, vector_bool mask)
@@ -102,7 +101,6 @@ asc_storealign_pack_v2(__ubuf__ float* dst_align32b, vector_float src, int32_t o
     }
 }
 
-// storealign_pack_v2
 [[deprecated("NOTICE: asc_storealign_pack_postupdate_v2 is deprecated. "
              "Please use asc_storealign_pack_quarter_postupdate instead.")]] __simd_callee__ inline void
 asc_storealign_pack_postupdate_v2(__ubuf__ int32_t*& dst_align32b, vector_int32_t src, int32_t offset, vector_bool mask)

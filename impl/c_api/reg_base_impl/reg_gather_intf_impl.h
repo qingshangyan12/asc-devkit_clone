@@ -20,7 +20,6 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
-// ==========源操作数和目的数都为寄存器=========
 __simd_callee__ inline void asc_gather(vector_int8_t& dst, vector_int8_t src, vector_uint8_t index)
 {
     if ASC_IS_AIV {
@@ -111,8 +110,6 @@ __simd_callee__ inline void asc_gather(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t
         vselr(dst, src, index);
     }
 }
-
-// ==========源操作数和目的数都为寄存器=========
 
 __simd_callee__ inline vector_int8_t asc_gather(vector_int8_t src, vector_uint8_t index)
 {
