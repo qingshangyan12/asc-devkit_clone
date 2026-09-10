@@ -138,30 +138,24 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <cstdint>
 #include <iostream>
 #include <vector>
+
 #include "c_api/asc_simd.h"
 #include "acl/acl.h"
 
 namespace {
-template <typename T>
-void print_data(const char* label, const std::vector<T>& values, uint32_t offset = 0)
-{
-    std::cout << label << ":";
-    const size_t remaining = values.size() - offset;
-    const size_t count = remaining < 8 ? remaining : 8;
-    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[offset + i];
-    if (remaining > count) std::cout << " ...";
-    std::cout << std::endl;
-}
-
 constexpr uint32_t ELEMENT_COUNT = 64;
+constexpr uint32_t ACTIVE_COUNT = 4;
 constexpr float FILL_VALUE = 3.5f;
 
 __simd_vf__ inline void duplicate_scalar(__ubuf__ float* dst)
 {
-    uint32_t count = ELEMENT_COUNT;
-    vector_bool mask = asc_update_mask_b32(count);
-    vector_float dst_reg = asc_duplicate_scalar(FILL_VALUE, mask);
-    asc_storealign(dst, dst_reg, mask);
+    uint32_t active_count = ACTIVE_COUNT;
+    uint32_t full_count = ELEMENT_COUNT;
+    vector_bool active_mask = asc_update_mask_b32(active_count);
+    vector_bool full_mask = asc_update_mask_b32(full_count);
+    vector_float dst_reg;
+    asc_duplicate_scalar(dst_reg, FILL_VALUE, active_mask);
+    asc_storealign(dst, dst_reg, full_mask);
 }
 
 __global__ __vector__ void asc_duplicate_scalar_kernel(__gm__ float* dst)
@@ -178,22 +172,19 @@ __global__ __vector__ void asc_duplicate_scalar_kernel(__gm__ float* dst)
 
 int main()
 {
-    std::vector<float> output(ELEMENT_COUNT, -1.0f);
-    std::vector<float> golden(ELEMENT_COUNT, FILL_VALUE);
+    std::vector<float> output(ELEMENT_COUNT);
+    std::vector<float> golden(ELEMENT_COUNT, 0.0f);
+    for (uint32_t i = 0; i < ACTIVE_COUNT; ++i) golden[i] = FILL_VALUE;
 
     aclInit(nullptr);
     aclrtSetDevice(0);
-    float *dst_device = nullptr;
+    float* dst_device = nullptr;
     aclrtMalloc(reinterpret_cast<void**>(&dst_device), output.size() * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMemcpy(dst_device, output.size() * sizeof(float), output.data(), output.size() * sizeof(float),
-        ACL_MEMCPY_HOST_TO_DEVICE);
     asc_duplicate_scalar_kernel<<<1, 0>>>(dst_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(float), dst_device, output.size() * sizeof(float),
         ACL_MEMCPY_DEVICE_TO_HOST);
 
-    print_data("Output", output);
-    print_data("Golden", golden);
     const bool passed = output == golden;
     std::cout << (passed ? "[Success] asc_duplicate_scalar passed."
                         : "[Failed] asc_duplicate_scalar failed.") << std::endl;
