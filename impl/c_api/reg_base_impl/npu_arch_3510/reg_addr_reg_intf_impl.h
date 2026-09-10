@@ -23,26 +23,38 @@
                  "Please use asc_update_addr_reg_" #bxx                                                              \
                  " instead.")]] __simd_callee__ inline addr_reg asc_create_iter_reg_##bxx(uint32_t offset)           \
     {                                                                                                                \
-        return asc_update_addr_reg_##bxx(offset);                                                                    \
+        if ASC_IS_AIV {                                                                                              \
+            return vag_##bxx(offset);                                                                                \
+        }                                                                                                            \
+        return addr_reg{};                                                                                           \
     }                                                                                                                \
     [[deprecated(                                                                                                    \
         "NOTICE: asc_create_iter_reg_" #bxx " is deprecated. "                                                       \
         "Please use asc_update_addr_reg_" #bxx                                                                       \
         " instead.")]] __simd_callee__ inline addr_reg asc_create_iter_reg_##bxx(uint32_t offset0, uint32_t offset1) \
     {                                                                                                                \
-        return asc_update_addr_reg_##bxx(offset0, offset1);                                                          \
+        if ASC_IS_AIV {                                                                                              \
+            return vag_##bxx(offset0, offset1);                                                                      \
+        }                                                                                                            \
+        return addr_reg{};                                                                                           \
     }                                                                                                                \
     [[deprecated("NOTICE: asc_create_iter_reg_" #bxx " is deprecated. "                                              \
                  "Please use asc_update_addr_reg_" #bxx " instead.")]] __simd_callee__ inline addr_reg               \
         asc_create_iter_reg_##bxx(uint32_t offset0, uint32_t offset1, uint32_t offset2)                              \
     {                                                                                                                \
-        return asc_update_addr_reg_##bxx(offset0, offset1, offset2);                                                 \
+        if ASC_IS_AIV {                                                                                              \
+            return vag_##bxx(offset0, offset1, offset2);                                                             \
+        }                                                                                                            \
+        return addr_reg{};                                                                                           \
     }                                                                                                                \
     [[deprecated("NOTICE: asc_create_iter_reg_" #bxx " is deprecated. "                                              \
                  "Please use asc_update_addr_reg_" #bxx " instead.")]] __simd_callee__ inline addr_reg               \
         asc_create_iter_reg_##bxx(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3)            \
     {                                                                                                                \
-        return asc_update_addr_reg_##bxx(offset0, offset1, offset2, offset3);                                        \
+        if ASC_IS_AIV {                                                                                              \
+            return vag_##bxx(offset0, offset1, offset2, offset3);                                                    \
+        }                                                                                                            \
+        return addr_reg{};                                                                                           \
     }
 
 ASC_DEFINE_ITER_REG_DEPRECATED_API(b32)

@@ -314,7 +314,6 @@ __simd_callee__ inline void asc_add(
     }
 }
 
-// asc_max uint8_t
 __simd_callee__ inline void asc_max(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -322,7 +321,6 @@ __simd_callee__ inline void asc_max(vector_uint8_t& dst, vector_uint8_t src0, ve
     }
 }
 
-// asc_max int8_t
 __simd_callee__ inline void asc_max(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -330,7 +328,6 @@ __simd_callee__ inline void asc_max(vector_int8_t& dst, vector_int8_t src0, vect
     }
 }
 
-// asc_max uint16_t
 __simd_callee__ inline void asc_max(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -338,7 +335,6 @@ __simd_callee__ inline void asc_max(vector_uint16_t& dst, vector_uint16_t src0, 
     }
 }
 
-// asc_max int16_t
 __simd_callee__ inline void asc_max(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -346,7 +342,6 @@ __simd_callee__ inline void asc_max(vector_int16_t& dst, vector_int16_t src0, ve
     }
 }
 
-// asc_max int32_t
 __simd_callee__ inline void asc_max(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -354,7 +349,6 @@ __simd_callee__ inline void asc_max(vector_int32_t& dst, vector_int32_t src0, ve
     }
 }
 
-// asc_max uint32_t
 __simd_callee__ inline void asc_max(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -362,7 +356,6 @@ __simd_callee__ inline void asc_max(vector_uint32_t& dst, vector_uint32_t src0, 
     }
 }
 
-// asc_max float
 __simd_callee__ inline void asc_max(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -370,7 +363,6 @@ __simd_callee__ inline void asc_max(vector_float& dst, vector_float src0, vector
     }
 }
 
-// asc_max half
 __simd_callee__ inline void asc_max(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -378,7 +370,6 @@ __simd_callee__ inline void asc_max(vector_half& dst, vector_half src0, vector_h
     }
 }
 
-// asc_max bfloat16
 __simd_callee__ inline void asc_max(
     vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
@@ -387,7 +378,6 @@ __simd_callee__ inline void asc_max(
     }
 }
 
-// asc_min_scalar int32_t
 __simd_callee__ inline void asc_min_scalar(vector_int32_t& dst, vector_int32_t src, int32_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -395,7 +385,6 @@ __simd_callee__ inline void asc_min_scalar(vector_int32_t& dst, vector_int32_t s
     }
 }
 
-// asc_min_scalar uint32_t
 __simd_callee__ inline void asc_min_scalar(vector_uint32_t& dst, vector_uint32_t src, uint32_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -403,7 +392,6 @@ __simd_callee__ inline void asc_min_scalar(vector_uint32_t& dst, vector_uint32_t
     }
 }
 
-// asc_min_scalar int16_t
 __simd_callee__ inline void asc_min_scalar(vector_int16_t& dst, vector_int16_t src, int16_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -411,7 +399,6 @@ __simd_callee__ inline void asc_min_scalar(vector_int16_t& dst, vector_int16_t s
     }
 }
 
-// asc_min_scalar uint16_t
 __simd_callee__ inline void asc_min_scalar(vector_uint16_t& dst, vector_uint16_t src, uint16_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -419,7 +406,6 @@ __simd_callee__ inline void asc_min_scalar(vector_uint16_t& dst, vector_uint16_t
     }
 }
 
-// asc_min_scalar int8_t
 __simd_callee__ inline void asc_min_scalar(vector_int8_t& dst, vector_int8_t src, int8_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -427,7 +413,6 @@ __simd_callee__ inline void asc_min_scalar(vector_int8_t& dst, vector_int8_t src
     }
 }
 
-// asc_min_scalar uint8_t
 __simd_callee__ inline void asc_min_scalar(vector_uint8_t& dst, vector_uint8_t src, uint8_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -435,7 +420,6 @@ __simd_callee__ inline void asc_min_scalar(vector_uint8_t& dst, vector_uint8_t s
     }
 }
 
-// asc_min_scalar float
 __simd_callee__ inline void asc_min_scalar(vector_float& dst, vector_float src, float value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -443,7 +427,6 @@ __simd_callee__ inline void asc_min_scalar(vector_float& dst, vector_float src, 
     }
 }
 
-// asc_min_scalar half
 __simd_callee__ inline void asc_min_scalar(vector_half& dst, vector_half src, half value, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -451,7 +434,6 @@ __simd_callee__ inline void asc_min_scalar(vector_half& dst, vector_half src, ha
     }
 }
 
-// asc_min_scalar bfloat16_t
 __simd_callee__ inline void asc_min_scalar(
     vector_bfloat16_t& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
 {

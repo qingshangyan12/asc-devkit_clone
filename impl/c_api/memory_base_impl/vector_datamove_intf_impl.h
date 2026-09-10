@@ -493,8 +493,6 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__ uint64_t* dst, __ubuf__ uint6
 
 #undef ASC_C_API_DEFAULT_NBURST
 
-// asc_copy_gm2ub_align  int8_t / uint8_t / half / bfloat16_t / int16_t / uint16_t / float / int32_t / uint32_t
-
 __aicore__ inline void asc_set_copy_pad_val(int8_t pad_value)
 {
     if ASC_IS_AIV {

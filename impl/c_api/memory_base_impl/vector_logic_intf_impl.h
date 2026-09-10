@@ -214,7 +214,6 @@ __aicore__ inline void asc_shiftleft(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* 
     asc_set_mask_count_end();
 }
 
-// asc_shiftright int16_t
 __aicore__ inline void asc_shiftright(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
@@ -233,7 +232,6 @@ __aicore__ inline void asc_shiftright(__ubuf__ int16_t* dst, __ubuf__ int16_t* s
     asc_set_mask_count_end();
 }
 
-// asc_shiftright int32_t
 __aicore__ inline void asc_shiftright(
     __ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
@@ -252,7 +250,6 @@ __aicore__ inline void asc_shiftright(__ubuf__ int32_t* dst, __ubuf__ int32_t* s
     asc_set_mask_count_end();
 }
 
-// asc_shiftright uint16_t
 __aicore__ inline void asc_shiftright(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
@@ -271,7 +268,6 @@ __aicore__ inline void asc_shiftright(__ubuf__ uint16_t* dst, __ubuf__ uint16_t*
     asc_set_mask_count_end();
 }
 
-// asc_shiftright uint32_t
 __aicore__ inline void asc_shiftright(
     __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
@@ -290,7 +286,6 @@ __aicore__ inline void asc_shiftright(__ubuf__ uint32_t* dst, __ubuf__ uint32_t*
     asc_set_mask_count_end();
 }
 
-// asc_shiftright_round int16_t
 __aicore__ inline void asc_shiftright_round(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
@@ -309,7 +304,6 @@ __aicore__ inline void asc_shiftright_round(__ubuf__ int16_t* dst, __ubuf__ int1
     asc_set_mask_count_end();
 }
 
-// asc_shiftright_round int32_t
 __aicore__ inline void asc_shiftright_round(
     __ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)

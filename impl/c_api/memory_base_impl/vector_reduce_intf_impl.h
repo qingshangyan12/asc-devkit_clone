@@ -452,7 +452,6 @@ __aicore__ inline void asc_repeat_reduce_min_only_index(__ubuf__ float* dst, __u
     asc_set_mask_count_end();
 }
 
-// asc_reduce uint16_t
 __aicore__ inline void asc_reduce(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint16_t repeat,
     uint8_t src0_block_stride, uint8_t pattern_mode, uint16_t src0_repeat_stride, uint8_t src1_repeat_stride)
@@ -472,7 +471,6 @@ __aicore__ inline void asc_reduce(
     asc_set_mask_count_end();
 }
 
-// asc_reduce uint32_t
 __aicore__ inline void asc_reduce(
     __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src0, __ubuf__ uint32_t* src1, uint16_t repeat,
     uint8_t src0_block_stride, uint8_t pattern_mode, uint16_t src0_repeat_stride, uint8_t src1_repeat_stride)
