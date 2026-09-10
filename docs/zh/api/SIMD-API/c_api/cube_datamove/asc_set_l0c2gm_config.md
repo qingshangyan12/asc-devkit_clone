@@ -55,6 +55,8 @@ PIPE_S
 
 ## 约束说明
 
+Tensor量化参数的值不支持设置为INF或NAN。
+
 支持以下三种传参形式：
 - 同时设置relu_pre和quant_pre。
 - 仅传入relu_pre，quant_pre传入0。

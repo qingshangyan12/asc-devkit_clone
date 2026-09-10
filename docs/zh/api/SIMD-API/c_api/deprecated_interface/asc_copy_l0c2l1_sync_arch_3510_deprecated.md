@@ -137,6 +137,7 @@ PIPE_FIX
 
 ## 约束说明
 
+- 量化参数的值不支持设置为INF或NAN，该约束同时适用于Scalar量化模式和Tensor/Vector量化模式。
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
 
 ## 调用示例

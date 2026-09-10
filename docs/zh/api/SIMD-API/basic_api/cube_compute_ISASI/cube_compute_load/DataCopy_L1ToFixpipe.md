@@ -89,6 +89,7 @@ src数据类型支持uint64_t，dst数据类型支持uint64_t。
 
 ## 约束说明<a id="section_constraint"></a>
 
+- 搬运至Fixpipe Buffer的量化参数的值不支持设置为INF或NAN。
 <!-- npu="950" id11 -->
 - 针对Ascend 950PR/Ascend 950DT，blockLen参数单位为64B。
 <!-- end id11 -->

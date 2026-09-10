@@ -55,7 +55,7 @@ LocalTensor支持的数据类型为：half。
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-无
+随路量化场景下，量化参数的值不支持设置为INF或NAN。
 
 ## 调用示例<a name="section6461234123118"></a>
 

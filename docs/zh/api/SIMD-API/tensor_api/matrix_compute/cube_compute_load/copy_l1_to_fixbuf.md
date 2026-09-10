@@ -157,6 +157,7 @@ struct l1_to_fixbuf_trait_default {
 
 ## 约束说明
 
+- 搬运至Fixpipe Buffer的量化参数的值不支持设置为INF或NAN。
 - 源Tensor内存地址和大小需要满足32Byte对齐要求。
 - 目的Tensor内存地址和大小需要满足128Byte对齐要求。
 - 由于Fixpipe Buffer大小为4KB，因此每次搬运最多4KB数据。
