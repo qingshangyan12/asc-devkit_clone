@@ -105,7 +105,7 @@ __global__ __vector__ void asc_set_gm2ub_loop_size_kernel(__gm__ uint8_t* output
         asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, 0, 0);
     asc_set_gm2ub_loop_size(1, 1);
     asc_sync_mte2(0);
-    asc_copy_gm2ub_align(output, local, OUTPUT_BYTES);
+    asc_copy_ub2gm_align(output, local, OUTPUT_BYTES);
     asc_sync_mte3(0);
 }
 
