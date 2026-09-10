@@ -124,6 +124,7 @@ ascendc_assert(expr, fmt, args...)
 ### 通用约束
 
 - 在CMake工程的Release模式下，默认使能`NDEBUG`宏定义，本接口不生效。
+- CPU调试时，SIMD和SIMD VF场景下的多参数调用与单参数调用行为一致，仅检查`expr`；`fmt`和`args`不生效，不求值，也不输出自定义错误信息。
 - 使用`assert`时，如需包含标准库头文件`<cassert>`，请先包含`<cassert>`，再包含`"kernel_operator.h"`或`"utils/debug/asc_assert.h"`，避免标准库覆盖Ascend C的`assert`定义。
 
 ### SIMD编程场景
@@ -132,7 +133,8 @@ ascendc_assert(expr, fmt, args...)
 
 ### SIMT VF编程场景
 
-不输出`fmt`和`args`指定的自定义错误信息。
+- 本接口不支持CPU调试。
+- 不输出`fmt`和`args`指定的自定义错误信息。
 
 ### SIMD VF编程场景
 
