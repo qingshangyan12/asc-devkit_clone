@@ -1,5 +1,7 @@
 # NZ2DN<a name="ZH-CN_TOPIC_0000002550560514"></a>
 
+<!-- npu="950" id1 -->
+
 ## 特性说明
 
 矩阵计算的搬出过程中NZ2DN的核心功能体现为，将NZ格式矩阵转化为DN格式矩阵。
@@ -39,7 +41,7 @@ for (int h = 0; h < matrix_num; h++) {
 - 在上述源自DN矩阵的每一组数据中，再以每行元素为一组数据，每一组数据的起始地址为dst\_block\_addr。
 - src\_ele\_addr为NZ矩阵一列的每个元素的地址，dst\_ele\_addr为DN矩阵一行的每个元素的地址，二者为一一对应关系，对应完成NZ2DN格式转换。
 
-以下参数为NZ2DN用户可配置参数，含义取值范围参见[C API搬出参数（3510）](../asc_copy_l0c2gm/asc_copy_l0c2gm.md)：
+以下参数为NZ2DN用户可配置参数，含义取值范围参见[C API搬出参数（3510）](../asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)：
 
 - matrix_num表示需要做NZ2DN转化的矩阵个数。
 - m_size与n_size分别表示矩阵m方向和n方向上的维度。
@@ -47,7 +49,7 @@ for (int h = 0; h < matrix_num; h++) {
 - dst_stride表示目的DN矩阵每一行中的元素个数，单位为element。
 - src_nz_matrix_stride表示不同源NZ矩阵的起始地址的间隔，单位为C0\_Size。
 - dst_matrix_stride表示相邻目的DN矩阵起始地址间的间隔，单位为element。
-- src_nz_fractal_stride表示源矩阵NZ分形相邻行的地址偏移为，单位为C0\_Size。
+- src_nz_fractal_stride表示源矩阵NZ分形相邻行的地址偏移，单位为C0\_Size。
 
 ## 特性约束
 
@@ -59,7 +61,7 @@ for (int h = 0; h < matrix_num; h++) {
 
 如下图所示，在L0C Buffer中有两个NZ格式的矩阵，每个矩阵N方向上维度为32，M方向上维度为48，经过NZ2DN转换，将数据格式变为右部分所示排布。
 
-**图1** NZ2DN示意图<a name="fig3981319172211"></a>  
+**图1** NZ2DN示意图<a name="fig3981319172211"></a>
 
 ![](../../../../figures/fixpipe_nz2dn.png)
 
@@ -73,3 +75,7 @@ for (int h = 0; h < matrix_num; h++) {
 - src_nz_matrix_stride = 240，表示不同源NZ矩阵的起始地址的间隔为240 \* C0\_Size。
 - dst_matrix_stride = 48 \* 80，表示相邻目的DN矩阵起始地址间的间隔为48 \* 80 =3840个元素，其中48为目的矩阵起始地址间的间隔行数，80为dst_stride（每行的元素个数）。
 - src_nz_fractal_stride = 1：表示源矩阵NZ分形相邻行的地址偏移为1 \* C0\_Size。
+
+图中批量参数通过[asc_set_l0c_copy_nz_para](../asc_set_l0c_copy_nz_para.md)配置：`matrix_num=2`、`src_nz_matrix_stride=240`、`dst_matrix_stride=3840`。源行间隔通过[asc_set_l0c_copy_channel_para](../asc_set_l0c_copy_channel_para.md)设置为1。搬出时设置`enable_nz2dn=true`、`enable_nz2nd=false`；开启UnitFlag时，源行间隔必须为1。
+
+<!-- end id1 -->

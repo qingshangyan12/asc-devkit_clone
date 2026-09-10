@@ -6,10 +6,22 @@
 
 带参数量化包括两种粒度：
 
-- Scalar：整个C矩阵共享一个量化参数。3510优先用[asc_set_l0c_copy_prequant(scale, offset, is_signed)](../asc_set_l0c_copy_prequant.md)配置；2201的同名接口使用打包后的`uint64_t config`，低32位必须是float的位模式，不能把浮点值数值转换成uint64_t。
-- Vector：C矩阵每一列（N方向）对应一个8B量化参数，参数shape为[N]。先用[asc_copy_l12fb](../asc_copy_l12fb/asc_copy_l12fb.md)从L1搬入量化区，再设置起始地址索引。3510使用[asc_set_l0c_copy_config](../asc_set_l0c_copy_config.md)，2201使用[asc_set_l0c2gm_config](../asc_set_l0c2gm_config.md)。量化地址索引为量化区字节地址除以128，不是元素下标；激活地址索引为激活区字节地址除以64。两个参数区分别寻址，起始地址与长度都不能超过对应区域。
+- Scalar：整个C矩阵共享一个量化参数。
+- Vector：C矩阵每一列（N方向）对应一个8B量化参数，参数shape为[N]。先用[asc_copy_l12fb](../asc_copy_l12fb/asc_copy_l12fb.md)从L1 Buffer搬入量化区，再设置起始地址索引。量化地址索引为量化区字节地址除以128，不是元素下标；激活地址索引为激活区字节地址除以64。两个参数区分别寻址，起始地址与长度都不能超过对应区域。
 
-配置系数只写寄存器，不会自动选择搬出模式；还需设置搬出调用的`quant_pre_mode`（2201参数名为`quant_pre`）。本文模式名称均为`asc_quant_mode`的成员。
+<!-- npu="950" id1 -->
+
+3510的Scalar系数使用[asc_set_l0c_copy_prequant(scale, offset, is_signed)](../asc_set_l0c_copy_prequant.md)配置，Vector地址使用[asc_set_l0c_copy_config](../asc_set_l0c_copy_config.md)配置。搬出调用的`quant_pre_mode`使用`asc_quant_mode`枚举。
+
+<!-- end id1 -->
+
+<!-- npu="910b,A3" id2 -->
+
+2201的Scalar系数通过[asc_set_l0c_copy_prequant](../asc_set_l0c_copy_prequant.md)传入打包后的`uint64_t config`，低32位必须是float的位模式，不能将浮点数数值转换成uint64_t；Vector地址使用[asc_set_l0c2gm_config](../asc_set_l0c2gm_config.md)配置。搬出调用的`quant_pre`使用整数，可显式转换`asc_quant_mode`枚举得到模式编码。
+
+<!-- end id2 -->
+
+配置系数只写寄存器，不会自动选择搬出模式。下文模式名称均为`asc_quant_mode`的成员，调用时须按所选重载的参数类型传入。
 
 当前支持的量化模式及其功能描述如下：
 
@@ -21,7 +33,7 @@ VQF322B8_PRE,          // Vector_Quant_Float32_2_B8：float量化成int8_t/uint8
 REQ8,                  // ReQuant_int8：int32_t重量化成int8_t/uint8_t，scalar量化
 VREQ8,                 // Vector_ReQuant_int8：int32_t重量化成int8_t/uint8_t，tensor量化
 ```
-<!-- npu="950" id1 -->
+<!-- npu="950" id3 -->
 除上述量化模式外，Ascend 950PR/Ascend 950DT产品还额外支持以下量化模式：
 
 ```text
@@ -40,23 +52,40 @@ VQF322BF16_PRE,        // Vector_Quant_Float32_2_BFloat16: float量化成bfloat1
 QF322F32_PRE,          // Quant_Float32_2_Float32: float量化成float，scalar量化，使用有限精度的量化系数，需按输入范围验证误差
 VQF322F32_PRE,         // Vector_Quant_Float32_2_Float32: float量化成float，tensor量化，使用有限精度的量化系数，需按输入范围验证误差
 ```
-<!-- end id1 -->
+<!-- end id3 -->
 
 **C API补充模式与通路：**
 
-| 模式 | 输入→输出 | 2201 | 3510 |
-| --- | --- | --- | --- |
-| `REQ4` / `VREQ4` | int32_t→int4b_t，Scalar/Vector | L0C→L1对应4位重载 | L0C→GM/L1/UB |
-| `QF322S4_PRE` / `VQF322S4_PRE` | float→int4b_t，Scalar/Vector | L0C→L1对应4位重载 | L0C→GM/L1/UB |
+<!-- npu="910b,A3" id4 -->
+
+| 模式 | 输入→输出 | 2201 |
+| --- | --- | --- |
+| `REQ4` / `VREQ4` | int32_t→int4b_t，Scalar/Vector | L0C Buffer→L1 Buffer对应4位重载 |
+| `QF322S4_PRE` / `VQF322S4_PRE` | float→int4b_t，Scalar/Vector | L0C Buffer→L1 Buffer对应4位重载 |
+
+<!-- end id4 -->
+
+<!-- npu="950" id5 -->
+
+| 模式 | 输入→输出 | 3510 |
+| --- | --- | --- |
+| `REQ4` / `VREQ4` | int32_t→int4b_t，Scalar/Vector | L0C Buffer→GM/L1 Buffer/UB |
+| `QF322S4_PRE` / `VQF322S4_PRE` | float→int4b_t，Scalar/Vector | L0C Buffer→GM/L1 Buffer/UB |
+
+<!-- end id5 -->
+
+<!-- npu="950" id6 -->
 
 3510 FP8量化输出类型为`fp8_e4m3fn_t`，不能因为矩阵输入支持`fp8_e5m2_t`就推定搬出也有同类型量化重载。HiFloat8的普通和HYBRID模式舍入不同，应与下游数值格式约定一致。4位输出的物理小分形和通道合并见[Int8 Channel Merge及位宽扩展](Int8-Channel-Merge.md)。
 
+<!-- end id6 -->
+
 不同量化模式的量化算法详细介绍参见[随路量化与随路ReLU场景组合](accompanying_quantization_and_relu_scenario_combination.md)。
 
-<!-- npu="950,A3,910b" id2 -->
+<!-- npu="950,A3,910b" id7 -->
 量化参数比特位含义见下表：
 
-<!-- npu="A3,910b" id3 -->
+<!-- npu="A3,910b" id8 -->
 **表1** 量化参数QUANT\_PRE比特位含义映射表（[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="zh-cn_topic_0000002547300781_table1273124313613"></a>
 
 | 模式 | 比特位数 | 变量名 | 作用介绍 |
@@ -68,9 +97,9 @@ VQF322F32_PRE,         // Vector_Quant_Float32_2_Float32: float量化成float，
 | &bull;(V)REQ8<br>&bull;(V)QF322B8_PRE<br>&bull;(V)DEQF16 | 46 | Sign标志位 | 如果置为1，表明量化结果是signed(int8)；如果置为0，表明量化结果是unsigned(uint8)。仅在(V)REQ8、(V)QF322B8_PRE中会用到。 |
 | &bull;(V)REQ8<br>&bull;(V)QF322B8_PRE<br>&bull;(V)DEQF16 | 47~63 | - | 无效比特位，用户无需关注。 |
 
-<!-- end id3 -->
+<!-- end id8 -->
 
-<!-- npu="950" id4 -->
+<!-- npu="950" id9 -->
 **表2** 量化参数QUANT\_PRE比特位含义映射表（[NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="zh-cn_topic_0000002547300781_table1273124313714"></a>
 
 | 模式 | 比特位数 | 变量名 | 作用介绍 |
@@ -82,5 +111,5 @@ VQF322F32_PRE,         // Vector_Quant_Float32_2_Float32: float量化成float，
 | 同第一行 | 46 | Sign标志位 | 如果置为1，表明量化结果是signed(int8)；如果为置为0，表明量化结果是unsigned(uint8)。仅在(V)REQ8、(V)QF322B8_PRE中会用到。 |
 | 同第一行 | 47~63 | - | 无效比特位，用户无需关注。 |
 
-<!-- end id4 -->
-<!-- end id2 -->
+<!-- end id9 -->
+<!-- end id7 -->

@@ -4,7 +4,7 @@
 
 矩阵搬出时，NZ2ND功能即为实现NZ格式到ND格式的矩阵转换。
 
-NZ2ND转化过程可以参考以下伪代码（所有地址按字节计数，src_matrix_stride_64b为统一的64B步长记号，不是2201接口参数）：
+NZ2ND转化过程可以参考以下伪代码（所有地址按字节计数，src_matrix_stride_64b为统一的64B步长记号，用于统一说明源矩阵间隔）：
 
 ```cpp
 for (i = 0; i < matrix_num; i++) {
@@ -32,7 +32,7 @@ for (i = 0; i < matrix_num; i++) {
 - 目的操作数每个ND矩阵中每一行的起始地址为dst\_temp\_n\_addr。
 - 在每一行中，以16个数据为一个数据块，源操作数每块数据块的起始地址为src\_block\_addr，目的操作数中每一块数据块的起始地址为dst\_block\_addr。
 
-以下参数为NZ2ND用户可配置参数，含义及取值范围参见[C API搬出参数](../asc_copy_l0c2gm/asc_copy_l0c2gm.md)与[参数说明](../asc_copy_l0c2gm/asc_copy_l0c2gm.md)：
+以下参数为NZ2ND用户可配置参数，含义及取值范围参见[C API搬出参数](../asc_copy_l0c2gm/asc_copy_l0c2gm.md)：
 
 - m_size与n_size分别表示矩阵m方向和n方向上的维度。
 - src_stride表示NZ矩阵中不同Z分形列的间隔，单位为C0\_Size。
@@ -50,7 +50,7 @@ for (i = 0; i < matrix_num; i++) {
 
 如下图所示，在L0C Buffer中有两个NZ格式的矩阵，每个矩阵N方向上维度为32，M方向上维度为48，经过NZ2ND转换，将数据格式变为右部分所示排布。
 
-**图1** NZ2ND示意图<a name="zh-cn_topic_0000002547300777_fig862819576334"></a>  
+**图1** NZ2ND示意图<a name="zh-cn_topic_0000002547300777_fig862819576334"></a>
 
 ![](../../../../figures/Fixpipe_NZ2ND.png)
 
@@ -63,3 +63,15 @@ for (i = 0; i < matrix_num; i++) {
 - dst_stride = 64，表示目的ND矩阵每一行中的元素个数为64。
 - src_matrix_stride_64b = 256，表示不同NZ矩阵起始地址之间的间隔为256 \* C0\_Size字节。
 - dst_matrix_stride = 4096，表示目的相邻ND矩阵起始地址之间的偏移为4096个元素。
+
+<!-- npu="910b,A3" id1 -->
+
+2201使用[asc_set_l0c_copy_params](../asc_set_l0c_copy_params.md)设置批量参数，`src_nd_stride`单位为1024B。本图源矩阵间隔为256×64B，所以参数应为16；`nd_num=2`、`dst_nd_stride=4096`。搬出时设置`nz2nd_en=true`。
+
+<!-- end id1 -->
+
+<!-- npu="950" id2 -->
+
+3510使用[asc_set_l0c_copy_nz_para](../asc_set_l0c_copy_nz_para.md)设置`matrix_num=2`、`src_nz_matrix_stride=256`、`dst_matrix_stride=4096`，源间隔单位为64B。搬出时设置`enable_nz2nd=true`、`enable_nz2dn=false`。
+
+<!-- end id2 -->

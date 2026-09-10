@@ -2,19 +2,31 @@
 
 **特性说明：**
 
-unitFlag的核心功能体现为：asc_mmad和L0C搬出接口引入了单元标志（unit-flag）机制，通过以内存块为粒度实现精细化的数据同步，从而有效降低同步延迟，提升系统整体性能。当UnitFlag开关打开后，对于L0C Buffer中的每个内存块（512B），提供一个单元标志位，用于指示该块是否可读或可写。
+unitFlag的核心功能体现为：asc_mmad和L0C Buffer搬出接口引入了单元标志（unit-flag）机制，通过以内存块为粒度实现精细化的数据同步，从而有效降低同步延迟，提升系统整体性能。当UnitFlag开关打开后，对于L0C Buffer中的每个内存块（512B），提供一个单元标志位，用于指示该块是否可读或可写。
 
-asc_mmad和L0C搬出接口设置unit_flag_mode为ENABLE_KEEP/ENABLE_UPDATE后，系统会启动单元标志位。
+asc_mmad通过`asc_unit_flag_mode::ENABLE_KEEP`（2）或`ENABLE_UPDATE`（3）启用单元标志。
+
+<!-- npu="950" id1 -->
+
+3510的L0C Buffer搬出接口同样使用`asc_unit_flag_mode`枚举。
+
+<!-- end id1 -->
+
+<!-- npu="910b,A3" id2 -->
+
+2201的L0C Buffer搬出接口使用整数`unit_flag_mode`，传入2或3；不能直接传入枚举类成员。
+
+<!-- end id2 -->
 
 当unit_flag_mode == asc_unit_flag_mode::ENABLE_KEEP（0b10），开启unitFlag功能，在硬件执行完指令后，不改变单元标志位；
 
 - 对于写操作（asc_mmad接口），如果单元标志位0，则硬件直接写入L0C Buffer；否则，如果单元标志位为1，则写操作会等待直到单元标志变为0；执行完成后将单元标志位保持为0；
-- 对于读操作（L0C搬出接口），如果单元标志位1，则硬件直接读取L0C Buffer；否则，如果单元标志位为0，则读操作为等待直到单元标志变为1；执行完成后将单元标志位保持为1；
+- 对于读操作（L0C Buffer搬出接口），如果单元标志位1，则硬件直接读取L0C Buffer；否则，如果单元标志位为0，则读操作会等待直到单元标志变为1；执行完成后将单元标志位保持为1；
 
 当unit_flag_mode == asc_unit_flag_mode::ENABLE_UPDATE（0b11），开启unitFlag功能，在硬件执行完指令后，改变单元标志位；
 
 - 对于写操作（asc_mmad接口），如果单元标志位0，则硬件直接写入L0C Buffer；否则，如果单元标志位为1，则写操作会等待直到单元标志变为0；执行完成后将单元标志位设置成1；
-- 对于读操作（L0C搬出接口），如果单元标志位1，则硬件直接读取L0C Buffer；否则，如果单元标志位为0，则读操作为等待直到单元标志变为1；执行完成后将单元标志位设置成0；
+- 对于读操作（L0C Buffer搬出接口），如果单元标志位1，则硬件直接读取L0C Buffer；否则，如果单元标志位为0，则读操作会等待直到单元标志变为1；执行完成后将单元标志位设置成0；
 
 根据上述特性，如果用户在进行A矩阵\[128, 1024\]、B矩阵为\[1024, 128\]的矩阵乘计算时，需要沿着K轴进行迭代循环，假设每次迭代K长度为128，则需要迭代8次，此时8次asc_mmad对应1次Fixpipe操作；
 
@@ -37,9 +49,23 @@ asc_mmad和L0C搬出接口设置unit_flag_mode为ENABLE_KEEP/ENABLE_UPDATE后，
 
 **特性约束：**
 
-- asc_mmad和L0C搬出接口均提供了UnitFlag控制参数来控制该功能的启用，需确保两者同步开启，才能正常生效。
+- asc_mmad和L0C Buffer搬出接口均提供了UnitFlag控制参数来控制该功能的启用，需确保两者同步开启，才能正常生效。
 - 当希望控制同一块L0C Buffer内存空间能持续只被多条asc_mmad或多条Fixpipe指令操作时，需将对应的前n-1条指令的unitFlag值设置为2，维持被操作内存空间的持续占用状态，最后一条指令设置为3，解除被占用状态。
-- 当启用unitFlag功能后，建议asc_mmad的计算数据量与Fixpipe搬出的数据量保持一致。若asc_mmad计算了大块数据（M × N = 128 × 128），但Fixpipe只搬出了其中一部分数据（M × N = 64 × 64），则可能会导致执行异常，必须先等待相关计算和搬出结束，再重置未被释放的状态。3510使用`asc_set_l0c_copy_config(relu_index, quant_index, true)`；2201使用`asc_set_l0c2gm_config(relu_index, quant_index, true)`。两个索引须保留当前所需系数地址，清标志不代替等待。
+- 当启用unitFlag功能后，建议asc_mmad的计算数据量与Fixpipe搬出的数据量保持一致。若asc_mmad计算了大块数据（M × N = 128 × 128），但Fixpipe只搬出了其中一部分数据（M × N = 64 × 64），则可能会导致执行异常，必须先等待相关计算和搬出结束，再重置未被释放的状态。两个索引须保留当前所需系数地址，清标志不代替等待。
+
+<!-- npu="950" id3 -->
+
+3510使用`asc_set_l0c_copy_config(relu_index, quant_index, true)`清理标志。
+
+<!-- end id3 -->
+
+<!-- npu="910b,A3" id4 -->
+
+2201使用`asc_set_l0c2gm_config(relu_index, quant_index, true)`清理标志。
+
+<!-- end id4 -->
+
+<!-- npu="950" id5 -->
 
 **沿K轴迭代循环使用示例片段：**
 
@@ -64,3 +90,5 @@ asc_copy_l0c2gm(c_gm, c, n, m, n, m,
 // 后续消费者读取GM或复用缓冲区前，仍需相应同步。
 #endif
 ```
+
+<!-- end id5 -->

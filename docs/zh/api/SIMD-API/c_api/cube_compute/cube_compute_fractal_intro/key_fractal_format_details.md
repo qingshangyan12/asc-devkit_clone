@@ -5,7 +5,7 @@
 为了适配矩阵计算单元的物理读取路径，不同的产品形态有不同的格式要求：
 
 <!-- npu="910b,A3" id1 -->
-- Zz × Zn = Nz（A × B = C）组合  
+- Zz × Zn = Nz（A × B = C）组合
   矩阵乘法A × B = C要求：左矩阵A使用Zz格式，右矩阵B使用Zn格式，结果矩阵C使用Nz格式，如图1所示。这种分形格式组合适用于：
   <!-- npu="910b" id2 -->
   - Atlas A2训练系列产品/Atlas A2推理系列产品
@@ -14,17 +14,17 @@
   - Atlas A3训练系列产品/Atlas A3推理系列产品
   <!-- end id3 -->
 
-  **图1** 矩阵乘法场景涉及的数据格式<a name="zh-cn_topic_0000002545089965_fig18172115901518"></a>  
+  **图1** 矩阵乘法场景涉及的数据格式<a name="zh-cn_topic_0000002545089965_fig18172115901518"></a>
   ![](../../../../figures/fractals_involved_in_matrix_calculation_a2a3.png "矩阵乘法场景涉及的数据格式")
 <!-- end id1 -->
 
-<!-- npu="950" id9 -->
-- Nz × Zn = Nz（A × B = C）组合  
+<!-- npu="950" id4 -->
+- Nz × Zn = Nz（A × B = C）组合
   针对Ascend 950PR/Ascend 950DT，矩阵乘法C = A×B要求：左矩阵A使用Nz格式，右矩阵B使用Zn格式，结果矩阵C使用Nz格式，如图2所示：
 
-  **图2** 矩阵乘法场景涉及的数据格式<a name="zh-cn_topic_0000002545089965_fig11172355102017"></a>  
+  **图2** 矩阵乘法场景涉及的数据格式<a name="zh-cn_topic_0000002545089965_fig11172355102017"></a>
   ![](../../../../figures/fractals_involved_in_matrix_calculation_950.png "矩阵乘法场景涉及的数据格式-27")
-<!-- end id9 -->
+<!-- end id4 -->
 
 在具体的矩阵乘法场景中，各格式的详细定义与物理成因如下：
 
@@ -47,8 +47,8 @@
         - 右侧L1 Buffer中，数据被重组为3 x 4个分形块。
         - 分形内按行主序（小z）存放，分形间按列主序（大N）存放（如图中折线箭头所示），完成了从“线性”到“分形”的物理映射，做好了进入Cube计算的准备。
 
-**图3** ND（GM）到Nz（L1 Buffer）的数据转换<a name="zh-cn_topic_0000002545089965_fig1541710246162"></a>  
-![](../../../../figures/nd2nz_gm2l1_fractals_transform.png "ND-(GM)-到-Nz-(L1-Buffer)-的数据转换")
+**图3** ND（GM）到Nz（L1 Buffer）的数据转换<a name="zh-cn_topic_0000002545089965_fig1541710246162"></a>
+![](../../../../figures/nd2nz_gm2l1_fractals_transform.png "ND-(GM)-到-Nz-(L1 Buffer)-的数据转换")
 
 ## DN格式（Dimension-N）
 
@@ -56,16 +56,16 @@
 
 ![列优先排布](../../../../figures/column_major_layout.png)
 - 场景：通常存在于Global Memory（GM）中。若此输入要作为矩阵计算的输入，需要转换成Nz格式。
-<!-- npu="950" id20 -->
+<!-- npu="950" id5 -->
 - 转换示例：针对Ascend 950PR/Ascend 950DT，可以使用[矩阵搬入数据搬运 DN2NZ接口](../../cube_datamove/asc_copy_gm2l1_dn2nz.md)将其转换为Nz格式以适配Cube单元。
-<!-- end id20 -->
+<!-- end id5 -->
 
-<!-- npu="910b,A3" id10 -->
+<!-- npu="910b,A3" id6 -->
 ## Zz格式（FRACTAL_Zz）<a name="zh-cn_topic_0000002545089965_section1798516571585"></a>
 
 - **定义：** 大Z外部row major（行主序）+ 小z内部row major（行主序），见[图4](#zh-cn_topic_0000002545089965_fig18376432205510)。
 
-    **图4** Zz格式（以half类型为例）<a name="zh-cn_topic_0000002545089965_fig18376432205510"></a>  
+    **图4** Zz格式（以half类型为例）<a name="zh-cn_topic_0000002545089965_fig18376432205510"></a>
 
 ![Zz格式示意图](../../../../figures/zz_fractals_of_half.png)
 
@@ -89,13 +89,13 @@
     - 16-bit（half）：K0=16（分形16x16）
     - 8-bit（int8）：K0=32（分形16x32）
     - 4-bit：K0=64（分形16x64）
-<!-- end id10 -->
+<!-- end id6 -->
 
 ## Zn格式（FRACTAL_Zn）<a name="zh-cn_topic_0000002545089965_section1934175314107"></a>
 
 - **定义：** 大Z外部row major（行主序）+ 小n内部column major（列主序），见[图5](#zh-cn_topic_0000002545089965_fig9884894817)。
 
-    **图5** Zn格式（以half类型为例）<a name="zh-cn_topic_0000002545089965_fig9884894817"></a>  
+    **图5** Zn格式（以half类型为例）<a name="zh-cn_topic_0000002545089965_fig9884894817"></a>
     ![](../../../../figures/zn_fractals_of_half.png "Zn-格式(以half类型为例)")
 
 - **物理位置：**
@@ -120,28 +120,28 @@
 
 - **定义：** 大N外部column major（列主序）+ 小z内部row major（行主序），见[图6](#zh-cn_topic_0000002545089965_fig583717713334)。
 
-    **图6** Nz格式<a name="zh-cn_topic_0000002545089965_fig583717713334"></a>  
+    **图6** Nz格式<a name="zh-cn_topic_0000002545089965_fig583717713334"></a>
     ![](../../../../figures/nz_fractals_of_half_for_cmatrix.png "Nz-格式")
 
 - **物理位置：**
     - **L0C Buffer：** 存储矩阵乘法的结果（分形固定为16x16）。
     - **L1 Buffer / GM：** 数据流转的通用中间格式（分形为16xK0，K0的大小取决于数据类型位宽）。
-    <!-- npu="950" id11 -->
+    <!-- npu="950" id7 -->
     - **L0A Buffer：** 仅Ascend 950PR/Ascend 950DT下使用，用于存储左矩阵（分形为16xK0，K0的大小取决于数据类型位宽）。
-    <!-- end id11 -->
+    <!-- end id7 -->
 - **设计原理：**
     - Nz是昇腾芯片架构内部的“中间标准格式”。它是对“线性数据（ND）”和“计算专用数据（Zz/Zn）”的一种折中。
     - **大N排布**（column major（列主序）Block）的设计通常是为了配合多核并行或后续算子（如Vector向量计算）在处理通道（Channel）维度数据时的便利性。
 
->**说明：** 
+>**说明：**
 >通常情况下，Nz格式在L0C Buffer和L1 Buffer中分别用于不同的场景：
 >
 >- 在L0C Buffer中，Nz格式用于存储矩阵乘法的结果。其分形形状为16x16，包含256个元素，这种结构非常适合Cube计算单元进行高效的矩阵乘法运算。
 >- 在L1 Buffer中，Nz格式被采用以便于将数据搬运到L0A Buffer和L0B Buffer时，能够方便地转换为对应的Zz和Zn格式。此时，分形形状为16 x \(32B / sizeof\(Datatype\)\)，大小为512字节。
 >因此，当数据从L0C Buffer搬运到L1 Buffer时，其分形大小可能会发生变化。
-<!-- npu="950" id12 -->
+<!-- npu="950" id8 -->
 >- 针对Ascend 950PR/Ascend 950DT，Nz格式在L0A Buffer中用于存储左矩阵。
-<!-- end id12 -->
+<!-- end id8 -->
 
 ## Nz格式转换详解与示例<a name="zh-cn_topic_0000002545089965_section18217312102718"></a>
 
@@ -219,9 +219,9 @@
 
 **定义：** NC1HWC0是一种用于卷积加速的数据格式。通过将NHWC数据在C维度进行split，变成C1份NHWC0，然后将C1份NHWC0在内存中连续排列，变成NC1HWC0。
 
-C0表示元素个数。对于这里的输入FeatureMap，`C0 = 32B / sizeof(Datatype)`，`C1 = ceil(C / C0)`；尾块补齐到C0个元素。L0C输出分形的通道粒度固定为16个累加元素，不能沿用输入的32B规则。
+C0表示元素个数。对于这里的输入FeatureMap，`C0 = 32B / sizeof(Datatype)`，`C1 = ceil(C / C0)`；尾块补齐到C0个元素。L0C Buffer输出分形的通道粒度固定为16个累加元素，不能沿用输入的32B规则。
 
-**图7** NHWC->NC1HWC0<a name="zh-cn_topic_0000002545089965_fig4805172135014"></a>  
+**图7** NHWC->NC1HWC0<a name="zh-cn_topic_0000002545089965_fig4805172135014"></a>
 ![](../../../../figures/nhwc2nc1hwc0.png "NHWC--NC1HWC0")
 
 - **物理位置：** 通常位于Global Memory（GM）或者L1 Buffer中，作为卷积的Feature Map输入。

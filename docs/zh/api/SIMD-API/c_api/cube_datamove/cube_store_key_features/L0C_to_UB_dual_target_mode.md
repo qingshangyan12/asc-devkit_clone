@@ -1,5 +1,7 @@
 # L0C Buffer到UB双目标模式
 
+<!-- npu="950" id1 -->
+
 ## 特性说明
 
 本特性仅适用于3510。同一AI Core内有一个Cube Core和两个Vector Core，当启用双目标模式控制时，L0C Buffer中的M×N矩阵将被分成两半，并同时分别写入两个Vector Core各自的Unified Buffer（UB）中，其中前半部分写入SUB BLOCK0，后半部分写入SUB BLOCK1。
@@ -31,7 +33,7 @@ M方向切分：
 - src_stride = 64，表示源NZ矩阵中待搬运矩阵相邻Z排布的起始地址偏移，即下图中第一个块Z排布矩阵的起始地址与第二个Z排布矩阵的起始地址之间的间隔为64 \* C0\_Size。
 - dst_stride = 40 \* C0，表示目的NZ矩阵中相邻Z排布的起始地址偏移，即下图中UB0（或UB1）中第一个Z排布的起始地址与第二个Z排布的起始地址之间的间隔为40 \* 16个元素。
 
-**图1** NZ2NZ双目标搬运模式设置示意图<a name="fig1386816164556"></a>  
+**图1** NZ2NZ双目标搬运模式设置示意图<a name="fig1386816164556"></a>
 
 ![](../../../../figures/nz2nz_l0c2ub_dual_dst.png)
 
@@ -42,10 +44,13 @@ M方向切分：
 - m_size = 48，表示源NZ矩阵在M方向上的大小为48个元素。
 - src_stride = 64，表示源NZ矩阵中相邻Z排布的起始地址偏移，即下图红框区域中左侧浅色Z排布矩阵的起始地址与右侧深色Z排布矩阵的起始地址之间的间隔为64 \* C0\_Size。
 - dst_stride = 64，表示目的ND矩阵每一行中的元素个数为64。
-- nd_num = 2, 表示源NZ矩阵的数目。
 - src_nd_stride = 240 ,  表示不同NZ矩阵起始地址之间的间隔为240 \* C0\_Size。
 - dst_nd_stride  = 4096，表示目的相邻ND矩阵起始地址之间的偏移为4096个元素。
 
-**图2** NZ2ND参数双搬入模式设置示意图<a name="fig715654093716"></a>  
+**图2** NZ2ND双目标搬出模式设置示意图<a name="fig715654093716"></a>
 
 ![](../../../../figures/nz2nd_l0c2ub_dual_dst.png)
+
+图中`nd_num`、`src_nd_stride`、`dst_nd_stride`分别对应[asc_set_l0c_copy_nz_para](../asc_set_l0c_copy_nz_para.md)的`matrix_num`、`src_nz_matrix_stride`、`dst_matrix_stride`，本例取2、240、4096。`asc_copy_l0c2ub`通过`asc_dual_dst_mode::DUAL_DST_SPLIT_M`或`DUAL_DST_SPLIT_N`选择切分方向。NZ输出示例中的C0为16，`dst_stride`按目标元素计数。
+
+<!-- end id1 -->
