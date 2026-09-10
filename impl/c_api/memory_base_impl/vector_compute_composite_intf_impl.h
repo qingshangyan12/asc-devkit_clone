@@ -954,9 +954,9 @@ __aicore__ inline void asc_sub_scalar_sync(__ubuf__ int16_t* dst, __ubuf__ int16
         float tmpValue = static_cast<float>(value);
         tmpValue = 0 - tmpValue;
         vadds(
-            dst, src, static_cast<int16_t>(tmpValue), ASC_C_API_DEFAULT_REPEAT.U8,
-            ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
-            ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
+            dst, src, static_cast<int16_t>(tmpValue), ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
+            ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16,
+            ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
         asc_set_mask_count_end();
         asc_sync_post_process();
     }
@@ -970,9 +970,9 @@ __aicore__ inline void asc_sub_scalar_sync(__ubuf__ int32_t* dst, __ubuf__ int32
         float tmpValue = static_cast<float>(value);
         tmpValue = 0 - tmpValue;
         vadds(
-            dst, src, static_cast<int32_t>(tmpValue), ASC_C_API_DEFAULT_REPEAT.U8,
-            ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
-            ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
+            dst, src, static_cast<int32_t>(tmpValue), ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
+            ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16,
+            ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
         asc_set_mask_count_end();
         asc_sync_post_process();
     }
