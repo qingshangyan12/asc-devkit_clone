@@ -211,7 +211,7 @@ __aicore__ inline void Scatter(
  * @param [in] offsetSrc input LocalTensor, offset type is int32_t or int64_t
  * @param [in] scatterParam scatter parameters, including offsetNum, burstLen and dstStride
  */
-template <typename T, typename U = int32_t>
+template <typename T, typename U>
 __aicore__ inline void ScatterToGlobal(
     const GlobalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<U>& offsetSrc,
     ScatterParams& scatterParam)
