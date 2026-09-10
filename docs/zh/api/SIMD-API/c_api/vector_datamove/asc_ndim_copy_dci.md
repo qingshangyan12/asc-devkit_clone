@@ -81,21 +81,25 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 namespace {
 
 constexpr uint32_t INPUT_BYTES = 12;
-constexpr uint32_t OUTPUT_BYTES = 12;
+constexpr uint32_t OUTPUT_COLUMNS = 6;
+constexpr uint32_t OUTPUT_BYTES = OUTPUT_COLUMNS * 9;
+constexpr uint8_t PAD_VALUE = 88;
 
 __global__ __vector__ void asc_ndim_copy_dci_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
 {
     asc_init();
-    __ubuf__ uint8_t local[32];
-    asc_set_ndim_loop0_stride(4, 1);
-    asc_set_ndim_loop1_stride(1, 3);
+    __ubuf__ uint8_t local[64];
+    asc_set_ndim_loop0_stride(1, 1);
+    asc_set_ndim_loop1_stride(6, 3);
     asc_set_ndim_loop2_stride(0, 0);
     asc_set_ndim_loop3_stride(0, 0);
     asc_set_ndim_loop4_stride(0, 0);
+    asc_set_ndim_pad_value(PAD_VALUE);
     asc_ndim_pad_count_config config;
+    config.loop1_lp_count = 2;
+    config.loop1_rp_count = 3;
     asc_set_ndim_pad_count(config);
-    asc_ndim_copy_dci();
-    asc_ndim_copy_gm2ub(local, input, 3, 4, 1, 1, 1, 0, 0, false,
+    asc_ndim_copy_gm2ub(local, input, 3, 4, 1, 1, 1, 2, 1, true,
         asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM);
     asc_sync_mte2(0);
     asc_copy_ub2gm_align(output, local, OUTPUT_BYTES);
@@ -114,10 +118,12 @@ void print_data(const char* name, const std::vector<uint8_t>& data)
 
 int main()
 {
-    std::vector<uint8_t> input(INPUT_BYTES), output(OUTPUT_BYTES, 0), golden(OUTPUT_BYTES, 0);
-    for (uint32_t i = 0; i < INPUT_BYTES; ++i) input[i] = static_cast<uint8_t>(i + 1);
-    for (uint32_t column = 0; column < 3; ++column) {
-        for (uint32_t row = 0; row < 4; ++row) golden[column * 4 + row] = input[row * 3 + column];
+    std::vector<uint8_t> input(INPUT_BYTES), output(OUTPUT_BYTES, 0), golden(OUTPUT_BYTES, PAD_VALUE);
+    for (uint32_t i = 0; i < INPUT_BYTES; ++i) input[i] = static_cast<uint8_t>(i);
+    for (uint32_t row = 0; row < 4; ++row) {
+        for (uint32_t column = 0; column < 3; ++column) {
+            golden[(row + 2) * OUTPUT_COLUMNS + column + 2] = input[row * 3 + column];
+        }
     }
     aclInit(nullptr);
     aclrtSetDevice(0);
