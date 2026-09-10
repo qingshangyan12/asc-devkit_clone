@@ -24,7 +24,6 @@
 #include "impl/c_api/reg_base_impl/npu_arch_3510/storeunalign_intf_impl.h"
 #endif
 
-// ==========偏移固定传入0，由用户自行更新目的操作数的地址=========
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ int8_t*& dst, vector_store_unalign& src0, vector_int8_t src1, uint32_t count)
 {
@@ -180,7 +179,6 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
     }
 }
 
-// ==========通过地址寄存器传入偏移，用户可以选择更新偏移或者更新目的操作数的地址=========
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ int8_t* dst, vector_store_unalign& src0, vector_int8_t src1, addr_reg& count)
 {
