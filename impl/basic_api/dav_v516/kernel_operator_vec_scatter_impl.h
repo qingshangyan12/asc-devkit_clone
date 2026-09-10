@@ -444,25 +444,25 @@ __aicore__ inline void ScatterToGlobalImpl(__gm__ T *dst, __ubuf__ T *src, __ubu
 {
     constexpr uint8_t offsetType = ScatterOffsetDtypeEncoding<U>::value;
     if constexpr (sizeof(T) == B8_BYTE_SIZE) {
-        scatter_ubuf_go_gm((__ubuf__ uint8_t *)dst, (__gm__ uint8_t *)src, 0, offsetType, \
+        scatter_ubuf_to_gm((__gm__ uint8_t *)dst, (__ubuf__ uint8_t *)src, 0, offsetType, \
             offsetSrc, cacheMode, \
             scatterParam.burstLen, scatterParam.dstStride, scatterParam.offsetNum);
     } else if constexpr (sizeof(T) == B16_BYTE_SIZE) {
-        scatter_ubuf_go_gm((__ubuf__ uint16_t *)dst, (__gm__ uint16_t *)src, 0, offsetType, \
+        scatter_ubuf_to_gm((__gm__ uint16_t *)dst, (__ubuf__ uint16_t *)src, 0, offsetType, \
             offsetSrc, cacheMode, \
             scatterParam.burstLen, scatterParam.dstStride, scatterParam.offsetNum);
     } else if constexpr (sizeof(T) == B32_BYTE_SIZE) {
-        scatter_ubuf_go_gm((__ubuf__ uint32_t *)dst, (__gm__ uint32_t *)src, 0, offsetType, \
+        scatter_ubuf_to_gm((__gm__ uint32_t *)dst, (__ubuf__ uint32_t *)src, 0, offsetType, \
             offsetSrc, cacheMode, \
             scatterParam.burstLen, scatterParam.dstStride, scatterParam.offsetNum);
     } else if constexpr (sizeof(T) == B64_BYTE_SIZE) {
-        scatter_ubuf_go_gm((__ubuf__ uint64_t *)dst, (__gm__ uint64_t *)src, 0, offsetType, \
+        scatter_ubuf_to_gm((__gm__ uint64_t *)dst, (__ubuf__ uint64_t *)src, 0, offsetType, \
             offsetSrc, cacheMode, \
             scatterParam.burstLen, scatterParam.dstStride, scatterParam.offsetNum);
     } else {
-        ASSERT(false && "Current Scatter API is not supported on current device!")
+        ASSERT(false && "Current Scatter API is not supported on current device!");
     }
-}
+};
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_SCATTER_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_SCATTER_IMPL_H__)
