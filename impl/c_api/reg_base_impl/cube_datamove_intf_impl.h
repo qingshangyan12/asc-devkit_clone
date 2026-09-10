@@ -2779,7 +2779,6 @@ __aicore__ inline void asc_copy_l12ub(
     }
 }
 
-// asc_fill_l1_value half
 __aicore__ inline void asc_fill_l1(__cbuf__ half* dst, half value, const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
@@ -2794,7 +2793,6 @@ __aicore__ inline void asc_fill_l1(__cbuf__ half* dst, uint32_t value, const asc
     }
 }
 
-// asc_fill_l1_value float
 __aicore__ inline void asc_fill_l1(__cbuf__ float* dst, half value, const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
@@ -2809,7 +2807,6 @@ __aicore__ inline void asc_fill_l1(__cbuf__ float* dst, uint32_t value, const as
     }
 }
 
-// asc_fill_l1_value int16_t
 __aicore__ inline void asc_fill_l1(__cbuf__ int16_t* dst, half value, const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
@@ -2824,7 +2821,6 @@ __aicore__ inline void asc_fill_l1(__cbuf__ int16_t* dst, uint32_t value, const 
     }
 }
 
-// asc_fill_l1_value int32_t
 __aicore__ inline void asc_fill_l1(__cbuf__ int32_t* dst, half value, const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
@@ -2839,7 +2835,6 @@ __aicore__ inline void asc_fill_l1(__cbuf__ int32_t* dst, uint32_t value, const 
     }
 }
 
-// asc_fill_l1_value uint16_t
 __aicore__ inline void asc_fill_l1(__cbuf__ uint16_t* dst, half value, const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
@@ -2854,7 +2849,6 @@ __aicore__ inline void asc_fill_l1(__cbuf__ uint16_t* dst, uint32_t value, const
     }
 }
 
-// asc_fill_l1_value uint32_t
 __aicore__ inline void asc_fill_l1(__cbuf__ uint32_t* dst, half value, const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
@@ -2869,7 +2863,6 @@ __aicore__ inline void asc_fill_l1(__cbuf__ uint32_t* dst, uint32_t value, const
     }
 }
 
-// asc_fill_l1_value bfloat16_t
 __aicore__ inline void asc_fill_l1(__cbuf__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {

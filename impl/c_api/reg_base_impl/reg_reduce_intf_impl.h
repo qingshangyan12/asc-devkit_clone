@@ -160,7 +160,6 @@ __simd_callee__ inline void asc_pair_reduce_sum(vector_float& dst, vector_float 
     }
 }
 
-// asc_reduce_max_datablock half
 __simd_callee__ inline void asc_reduce_max_datablock(vector_half& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -168,7 +167,6 @@ __simd_callee__ inline void asc_reduce_max_datablock(vector_half& dst, vector_ha
     }
 }
 
-// asc_reduce_max_datablock float
 __simd_callee__ inline void asc_reduce_max_datablock(vector_float& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -176,7 +174,6 @@ __simd_callee__ inline void asc_reduce_max_datablock(vector_float& dst, vector_f
     }
 }
 
-// asc_reduce_max_datablock uint16_t
 __simd_callee__ inline void asc_reduce_max_datablock(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -184,7 +181,6 @@ __simd_callee__ inline void asc_reduce_max_datablock(vector_uint16_t& dst, vecto
     }
 }
 
-// asc_reduce_max_datablock int16_t
 __simd_callee__ inline void asc_reduce_max_datablock(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -192,7 +188,6 @@ __simd_callee__ inline void asc_reduce_max_datablock(vector_int16_t& dst, vector
     }
 }
 
-// asc_reduce_max_datablock uint32_t
 __simd_callee__ inline void asc_reduce_max_datablock(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -200,7 +195,6 @@ __simd_callee__ inline void asc_reduce_max_datablock(vector_uint32_t& dst, vecto
     }
 }
 
-// asc_reduce_max_datablock int32_t
 __simd_callee__ inline void asc_reduce_max_datablock(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
 {
     if ASC_IS_AIV {

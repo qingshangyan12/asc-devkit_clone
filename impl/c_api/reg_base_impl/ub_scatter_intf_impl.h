@@ -24,24 +24,6 @@
 #include "impl/c_api/reg_base_impl/npu_arch_3510/ub_scatter_intf_impl.h"
 #endif
 
-// asc_scatter int8_t
-
-// asc_scatter uint8_t
-
-// asc_scatter int16_t
-
-// asc_scatter uint16_t
-
-// asc_scatter int32_t
-
-// asc_scatter uint32_t
-
-// asc_scatter bfloat16_t
-
-// asc_scatter float16_t
-
-// asc_scatter float32_t
-
 __simd_callee__ inline void asc_scatter(
     __ubuf__ int8_t* dst, vector_int8_t src, vector_uint16_t index, vector_bool mask)
 {

@@ -59,7 +59,6 @@ __simd_callee__ inline void asc_abs_sub(vector_float& dst, vector_float src0, ve
     }
 }
 
-// asc_leakyrelu float
 __simd_callee__ inline void asc_leakyrelu(vector_float& dst, vector_float src, float alpha, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -67,7 +66,6 @@ __simd_callee__ inline void asc_leakyrelu(vector_float& dst, vector_float src, f
     }
 }
 
-// asc_leakyrelu half
 __simd_callee__ inline void asc_leakyrelu(vector_half& dst, vector_half src, half alpha, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -75,7 +73,6 @@ __simd_callee__ inline void asc_leakyrelu(vector_half& dst, vector_half src, hal
     }
 }
 
-// asc_leakyrelu float
 __simd_callee__ inline vector_float asc_leakyrelu(vector_float src, float alpha, vector_bool mask)
 {
     vector_float dst;
@@ -83,7 +80,6 @@ __simd_callee__ inline vector_float asc_leakyrelu(vector_float src, float alpha,
     return dst;
 }
 
-// asc_leakyrelu half
 __simd_callee__ inline vector_half asc_leakyrelu(vector_half src, half alpha, vector_bool mask)
 {
     vector_half dst;

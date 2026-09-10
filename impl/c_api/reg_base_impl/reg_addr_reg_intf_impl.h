@@ -24,61 +24,35 @@
 #include "impl/c_api/reg_base_impl/npu_arch_3510/reg_addr_reg_intf_impl.h"
 #endif
 
-#define ASC_DEFINE_UPDATE_ADDR_REG_IMPL(bxx)                                                             \
-    __simd_callee__ inline addr_reg asc_update_addr_reg_##bxx##_impl(uint32_t offset)                    \
-    {                                                                                                    \
-        if ASC_IS_AIV {                                                                                  \
-            return vag_##bxx(offset);                                                                    \
-        }                                                                                                \
-        return addr_reg{};                                                                               \
-    }                                                                                                    \
-    __simd_callee__ inline addr_reg asc_update_addr_reg_##bxx##_impl(uint32_t offset0, uint32_t offset1) \
-    {                                                                                                    \
-        if ASC_IS_AIV {                                                                                  \
-            return vag_##bxx(offset0, offset1);                                                          \
-        }                                                                                                \
-        return addr_reg{};                                                                               \
-    }                                                                                                    \
-    __simd_callee__ inline addr_reg asc_update_addr_reg_##bxx##_impl(                                    \
-        uint32_t offset0, uint32_t offset1, uint32_t offset2)                                            \
-    {                                                                                                    \
-        if ASC_IS_AIV {                                                                                  \
-            return vag_##bxx(offset0, offset1, offset2);                                                 \
-        }                                                                                                \
-        return addr_reg{};                                                                               \
-    }                                                                                                    \
-    __simd_callee__ inline addr_reg asc_update_addr_reg_##bxx##_impl(                                    \
-        uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3)                          \
-    {                                                                                                    \
-        if ASC_IS_AIV {                                                                                  \
-            return vag_##bxx(offset0, offset1, offset2, offset3);                                        \
-        }                                                                                                \
-        return addr_reg{};                                                                               \
-    }
-
-ASC_DEFINE_UPDATE_ADDR_REG_IMPL(b32)
-ASC_DEFINE_UPDATE_ADDR_REG_IMPL(b16)
-ASC_DEFINE_UPDATE_ADDR_REG_IMPL(b8)
-
-#undef ASC_DEFINE_UPDATE_ADDR_REG_IMPL
-
 #define ASC_DEFINE_UPDATE_ADDR_REG_API(bxx)                                                                         \
     __simd_callee__ inline addr_reg asc_update_addr_reg_##bxx(uint32_t offset)                                      \
     {                                                                                                               \
-        return asc_update_addr_reg_##bxx##_impl(offset);                                                            \
+        if ASC_IS_AIV {                                                                                             \
+            return vag_##bxx(offset);                                                                               \
+        }                                                                                                           \
+        return addr_reg{};                                                                                          \
     }                                                                                                               \
     __simd_callee__ inline addr_reg asc_update_addr_reg_##bxx(uint32_t offset0, uint32_t offset1)                   \
     {                                                                                                               \
-        return asc_update_addr_reg_##bxx##_impl(offset0, offset1);                                                  \
+        if ASC_IS_AIV {                                                                                             \
+            return vag_##bxx(offset0, offset1);                                                                     \
+        }                                                                                                           \
+        return addr_reg{};                                                                                          \
     }                                                                                                               \
     __simd_callee__ inline addr_reg asc_update_addr_reg_##bxx(uint32_t offset0, uint32_t offset1, uint32_t offset2) \
     {                                                                                                               \
-        return asc_update_addr_reg_##bxx##_impl(offset0, offset1, offset2);                                         \
+        if ASC_IS_AIV {                                                                                             \
+            return vag_##bxx(offset0, offset1, offset2);                                                            \
+        }                                                                                                           \
+        return addr_reg{};                                                                                          \
     }                                                                                                               \
     __simd_callee__ inline addr_reg asc_update_addr_reg_##bxx(                                                      \
         uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3)                                     \
     {                                                                                                               \
-        return asc_update_addr_reg_##bxx##_impl(offset0, offset1, offset2, offset3);                                \
+        if ASC_IS_AIV {                                                                                             \
+            return vag_##bxx(offset0, offset1, offset2, offset3);                                                   \
+        }                                                                                                           \
+        return addr_reg{};                                                                                          \
     }
 
 ASC_DEFINE_UPDATE_ADDR_REG_API(b32)
