@@ -294,7 +294,7 @@ __aicore__ inline void WelfordFinalizeWithCounts(
         WelfordFinalizeWithCountsOutMeanVF<isReuseSource, config>(
             outMean, counts, inMean, inVar, tmpbuffer, K, sregLower, repeat, m);
         uint32_t k = CalculateMainBlock(K);
-        uint32_t kOverflow = k < K ? (k << 1) : k;
+        int32_t kOverflow = k < K ? (k << 1) : k;
         BinaryReduceSum(
             outMean + m, tmpbuffer, sumTmpbuffer, K, k, 1.0f / kOverflow, para.rRec * kOverflow,
             para.rRecWithCorrection * kOverflow);
@@ -416,7 +416,7 @@ __aicore__ inline void WelfordFinalizeForB32(
     if (para.tailCount == 0 || para.tailCountLength == 0) {
         uint32_t K = para.abLength;
         uint32_t k = CalculateMainBlock(para.headCountLength);
-        uint32_t kOverflow = k < K ? (k << 1) : k;
+        int32_t kOverflow = k < K ? (k << 1) : k;
         for (uint16_t m = 0; m < 1; m++) {
             BinaryReduceSum(
                 outMean + m, inMean + m * para.headCountLength, sumTmpbuffer, para.headCountLength, k, 1.0f / kOverflow,
@@ -433,7 +433,7 @@ __aicore__ inline void WelfordFinalizeForB32(
         uint16_t abRepeat = static_cast<uint16_t>(CeilDivision(K, sregLower));
         uint16_t hRepeat = static_cast<uint16_t>(CeilDivision(para.headCountLength, sregLower));
         uint32_t k = CalculateMainBlock(K);
-        uint32_t kOverflow = k < K ? (k << 1) : k;
+        int32_t kOverflow = k < K ? (k << 1) : k;
         for (uint16_t m = 0; m < 1; m++) {
             WelfordFinalizeForB32OutMeanVF<isReuseSource, config>(
                 inMean, tmpbuffer, para, sregLower, K, m, hRepeat, abRepeat);
