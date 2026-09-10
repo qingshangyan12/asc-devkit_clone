@@ -1,56 +1,19 @@
 ---
 okftype: reference.api.cpp
-title: asc_exp
-path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_exp.md
-description: 该接口根据mask，对源操作数src进行按元素求自然指数操作，将结果写入目的操作数dst。
-tag:
-  api_surfaces:
-  - c_api
-  roles: []
-  families:
-  - arithmetic
-  operations:
-  - exponential
-  objects:
-  - mask
-  - vector
-  execution_models:
-  - register_vector
-  source_locations:
-  - vector_register
-  destination_locations:
-  - vector_register
-  traits:
-  - masked
-usage_dependencies:
-  status: unconfirmed
+title: "asc_exp"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_exp.md"
+description: "该接口根据mask，对源操作数src进行按元素求自然指数操作，将结果写入目的操作数dst。"
 signature:
-- function: asc_exp(vector_<dtype>&,vector_<dtype>,vector_bool)
-  archs:
-  - '3510'
-  headers:
-  - scope: /include/c_api/reg_compute/compute/reg_arith.h
-    header: /include/c_api/reg_compute/compute/reg_arith.h
-  - scope: /include/c_api/asc_simd.h
-    header: /include/c_api/reg_compute/compute/reg_arith.h
-  dtype:
-    values:
-    - half
-    - float
-- function: asc_exp(vector_<dtype>,vector_bool)
-  archs:
-  - '3510'
-  headers:
-  - scope: /include/c_api/reg_compute/compute/reg_arith.h
-    header: /include/c_api/reg_compute/compute/reg_arith.h
-  - scope: /include/c_api/asc_simd.h
-    header: /include/c_api/reg_compute/compute/reg_arith.h
-  dtype:
-    values:
-    - half
-    - float
+  - prototype_id: "asc_exp__Rv<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_arith.h"
+  - prototype_id: "asc_exp__v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_arith.h"
 examples: []
-timestamp: '2026-09-04'
+timestamp: "2026-09-10"
 ---
 
 # asc_exp
@@ -93,16 +56,15 @@ $$
 ## 函数原型
 ```yaml
 api_signature:
-  function: "asc_exp(vector_<dtype>&,vector_<dtype>,vector_bool)"
-  archs:
-    - "3510"
+  prototype_id: "asc_exp__Rv<dtype>_v<dtype>_vb"
+  archs: ["3510"]
   headers:
-    - scope: "/include/c_api/reg_compute/compute/reg_arith.h"
-      header: "/include/c_api/reg_compute/compute/reg_arith.h"
-    - scope: "/include/c_api/asc_simd.h"
-      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  dtype:
+    values:
+      - "half"
+      - "float"
 ```
-
 
 ```c
 // 通过引用参数输出结果（占位符形式）
@@ -113,16 +75,15 @@ __simd_callee__ inline void asc_exp(vector_<dtype>& dst,
 
 ```yaml
 api_signature:
-  function: "asc_exp(vector_<dtype>,vector_bool)"
-  archs:
-    - "3510"
+  prototype_id: "asc_exp__v<dtype>_vb"
+  archs: ["3510"]
   headers:
-    - scope: "/include/c_api/reg_compute/compute/reg_arith.h"
-      header: "/include/c_api/reg_compute/compute/reg_arith.h"
-    - scope: "/include/c_api/asc_simd.h"
-      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  dtype:
+    values:
+      - "half"
+      - "float"
 ```
-
 
 ```c
 

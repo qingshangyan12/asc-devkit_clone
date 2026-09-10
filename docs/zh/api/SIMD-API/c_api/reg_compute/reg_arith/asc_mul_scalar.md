@@ -1,74 +1,23 @@
 ---
 okftype: reference.api.cpp
-title: asc_mul_scalar
-path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_mul_scalar.md
-description: 根据`mask`对源操作数`src`按元素与标量`value`相乘，得到计算结果。
-tag:
-  api_surfaces:
-  - c_api
-  roles: []
-  families:
-  - arithmetic
-  operations:
-  - multiply
-  objects:
-  - mask
-  - scalar
-  - vector
-  execution_models:
-  - register_vector
-  source_locations:
-  - vector_register
-  destination_locations:
-  - vector_register
-  traits:
-  - masked
-  - scalar_operand
-usage_dependencies:
-  status: unconfirmed
+title: "asc_mul_scalar"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_mul_scalar.md"
+description: "根据`mask`对源操作数`src`按元素与标量`value`相乘，得到计算结果。"
 signature:
-- function: asc_mul_scalar(vector_<dtype>,<dtype>,vector_bool)
-  archs:
-  - '3510'
-  headers:
-  - scope: /include/c_api/reg_compute/compute/reg_arith.h
-    header: /include/c_api/reg_compute/compute/reg_arith.h
-  - scope: /include/c_api/asc_simd.h
-    header: /include/c_api/reg_compute/compute/reg_arith.h
-  dtype:
-    values:
-    - int16_t
-    - uint16_t
-    - half
-    - int32_t
-    - uint32_t
-    - float
-- function: asc_mul_scalar(vector_<dtype>&,vector_<dtype>,<dtype>,vector_bool)
-  archs:
-  - '3510'
-  headers:
-  - scope: /include/c_api/reg_compute/compute/reg_arith.h
-    header: /include/c_api/reg_compute/compute/reg_arith.h
-  - scope: /include/c_api/asc_simd.h
-    header: /include/c_api/reg_compute/compute/reg_arith.h
-  dtype:
-    values:
-    - int16_t
-    - uint16_t
-    - half
-    - int32_t
-    - uint32_t
-    - float
+  - prototype_id: "asc_mul_scalar__v<dtype>_<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_arith.h"
+  - prototype_id: "asc_mul_scalar__Rv<dtype>_v<dtype>_<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_arith.h"
 examples:
-- path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/muls
-  archs:
-  - '3510'
-  signature:
-  - function: asc_mul_scalar(vector_float&,vector_float,float,vector_bool)
-    snippets:
-    - id: asc_mul_scalar
-      file: muls.asc
-timestamp: '2026-09-04'
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/muls"
+    archs: ["3510"]
+    override_id: "asc_mul_scalar__Rvf32_vf32_f32_vb"
+    file: "muls.asc"
+timestamp: "2026-09-10"
 ---
 
 # asc_mul_scalar
@@ -110,16 +59,19 @@ $$
 ## 函数原型
 ```yaml
 api_signature:
-  function: "asc_mul_scalar(vector_<dtype>,<dtype>,vector_bool)"
-  archs:
-    - "3510"
+  prototype_id: "asc_mul_scalar__v<dtype>_<dtype>_vb"
+  archs: ["3510"]
   headers:
-    - scope: "/include/c_api/reg_compute/compute/reg_arith.h"
-      header: "/include/c_api/reg_compute/compute/reg_arith.h"
-    - scope: "/include/c_api/asc_simd.h"
-      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  dtype:
+    values:
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
 ```
-
 
 ```c
 // 通过函数返回值返回结果（占位符形式）
@@ -130,16 +82,19 @@ __simd_callee__ inline vector_<dtype> asc_mul_scalar(vector_<dtype> src,
 
 ```yaml
 api_signature:
-  function: "asc_mul_scalar(vector_<dtype>&,vector_<dtype>,<dtype>,vector_bool)"
-  archs:
-    - "3510"
+  prototype_id: "asc_mul_scalar__Rv<dtype>_v<dtype>_<dtype>_vb"
+  archs: ["3510"]
   headers:
-    - scope: "/include/c_api/reg_compute/compute/reg_arith.h"
-      header: "/include/c_api/reg_compute/compute/reg_arith.h"
-    - scope: "/include/c_api/asc_simd.h"
-      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  dtype:
+    values:
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
 ```
-
 
 ```c
 

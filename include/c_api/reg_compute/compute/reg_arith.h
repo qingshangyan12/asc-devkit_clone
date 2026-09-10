@@ -27,7 +27,7 @@
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_sub(vector_uint8_t,vector_uint8_t,vector_bool)
+ * @override_id asc_sub__vu8_vu8_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求差操作，将结果写入目的操作数`dst`。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -38,7 +38,7 @@ __simd_callee__ inline vector_uint8_t asc_sub(vector_uint8_t src0, vector_uint8_
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_sub(vector_int8_t,vector_int8_t,vector_bool)
+ * @override_id asc_sub__vi8_vi8_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求差操作，将结果写入目的操作数`dst`。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -49,7 +49,7 @@ __simd_callee__ inline vector_int8_t asc_sub(vector_int8_t src0, vector_int8_t s
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_sub(vector_uint16_t,vector_uint16_t,vector_bool)
+ * @override_id asc_sub__vu16_vu16_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求差操作，将结果写入目的操作数`dst`。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -60,7 +60,7 @@ __simd_callee__ inline vector_uint16_t asc_sub(vector_uint16_t src0, vector_uint
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_sub(vector_int16_t,vector_int16_t,vector_bool)
+ * @override_id asc_sub__vi16_vi16_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求差操作，将结果写入目的操作数`dst`。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -71,7 +71,7 @@ __simd_callee__ inline vector_int16_t asc_sub(vector_int16_t src0, vector_int16_
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_sub(vector_half,vector_half,vector_bool)
+ * @override_id asc_sub__vf16_vf16_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求差操作，将结果写入目的操作数`dst`。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -82,7 +82,7 @@ __simd_callee__ inline vector_half asc_sub(vector_half src0, vector_half src1, v
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_sub(vector_bfloat16_t,vector_bfloat16_t,vector_bool)
+ * @override_id asc_sub__vbf16_vbf16_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求差操作，将结果写入目的操作数`dst`。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -93,7 +93,7 @@ __simd_callee__ inline vector_bfloat16_t asc_sub(vector_bfloat16_t src0, vector_
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_sub(vector_uint32_t,vector_uint32_t,vector_bool)
+ * @override_id asc_sub__vu32_vu32_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求差操作，将结果写入目的操作数`dst`。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -104,7 +104,7 @@ __simd_callee__ inline vector_uint32_t asc_sub(vector_uint32_t src0, vector_uint
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_sub(vector_int32_t,vector_int32_t,vector_bool)
+ * @override_id asc_sub__vi32_vi32_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求差操作，将结果写入目的操作数`dst`。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -115,7 +115,7 @@ __simd_callee__ inline vector_int32_t asc_sub(vector_int32_t src0, vector_int32_
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_sub(vector_float,vector_float,vector_bool)
+ * @override_id asc_sub__vf32_vf32_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求差操作，将结果写入目的操作数`dst`。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -126,7 +126,7 @@ __simd_callee__ inline vector_float asc_sub(vector_float src0, vector_float src1
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_sub(vector_uint8_t&,vector_uint8_t,vector_uint8_t,vector_bool)
+ * @override_id asc_sub__Rvu8_vu8_vu8_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求差操作，将结果写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），用于存储减法结果，仅适用于通过引用参数输出结果的函数原型。
@@ -138,7 +138,7 @@ __simd_callee__ inline void asc_sub(vector_uint8_t& dst, vector_uint8_t src0, ve
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_sub(vector_int8_t&,vector_int8_t,vector_int8_t,vector_bool)
+ * @override_id asc_sub__Rvi8_vi8_vi8_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求差操作，将结果写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），用于存储减法结果，仅适用于通过引用参数输出结果的函数原型。
@@ -150,7 +150,7 @@ __simd_callee__ inline void asc_sub(vector_int8_t& dst, vector_int8_t src0, vect
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_sub(vector_uint16_t&,vector_uint16_t,vector_uint16_t,vector_bool)
+ * @override_id asc_sub__Rvu16_vu16_vu16_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求差操作，将结果写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），用于存储减法结果，仅适用于通过引用参数输出结果的函数原型。
@@ -162,7 +162,7 @@ __simd_callee__ inline void asc_sub(vector_uint16_t& dst, vector_uint16_t src0, 
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_sub(vector_int16_t&,vector_int16_t,vector_int16_t,vector_bool)
+ * @override_id asc_sub__Rvi16_vi16_vi16_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求差操作，将结果写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），用于存储减法结果，仅适用于通过引用参数输出结果的函数原型。
@@ -174,7 +174,7 @@ __simd_callee__ inline void asc_sub(vector_int16_t& dst, vector_int16_t src0, ve
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_sub(vector_half&,vector_half,vector_half,vector_bool)
+ * @override_id asc_sub__Rvf16_vf16_vf16_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求差操作，将结果写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），用于存储减法结果，仅适用于通过引用参数输出结果的函数原型。
@@ -186,7 +186,7 @@ __simd_callee__ inline void asc_sub(vector_half& dst, vector_half src0, vector_h
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_sub(vector_bfloat16_t&,vector_bfloat16_t,vector_bfloat16_t,vector_bool)
+ * @override_id asc_sub__Rvbf16_vbf16_vbf16_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求差操作，将结果写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），用于存储减法结果，仅适用于通过引用参数输出结果的函数原型。
@@ -199,7 +199,7 @@ __simd_callee__ inline void asc_sub(
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_sub(vector_uint32_t&,vector_uint32_t,vector_uint32_t,vector_bool)
+ * @override_id asc_sub__Rvu32_vu32_vu32_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求差操作，将结果写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），用于存储减法结果，仅适用于通过引用参数输出结果的函数原型。
@@ -211,7 +211,7 @@ __simd_callee__ inline void asc_sub(vector_uint32_t& dst, vector_uint32_t src0, 
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_sub(vector_int32_t&,vector_int32_t,vector_int32_t,vector_bool)
+ * @override_id asc_sub__Rvi32_vi32_vi32_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求差操作，将结果写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），用于存储减法结果，仅适用于通过引用参数输出结果的函数原型。
@@ -223,7 +223,7 @@ __simd_callee__ inline void asc_sub(vector_int32_t& dst, vector_int32_t src0, ve
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_sub(vector_float&,vector_float,vector_float,vector_bool)
+ * @override_id asc_sub__Rvf32_vf32_vf32_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求差操作，将结果写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），用于存储减法结果，仅适用于通过引用参数输出结果的函数原型。
@@ -235,7 +235,7 @@ __simd_callee__ inline void asc_sub(vector_float& dst, vector_float src0, vector
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_sub(vector_bool&,vector_uint32_t&,vector_uint32_t,vector_uint32_t,vector_bool)
+ * @override_id asc_sub__Rvb_Rvu32_vu32_vu32_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求差操作，将结果写入目的操作数`dst`。
  * @param [out] carry 目的操作数（掩码寄存器），用于存储减法借位输出。减法不借位等价于补码加法进位。
@@ -249,7 +249,7 @@ __simd_callee__ inline void asc_sub(
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_sub(vector_bool&,vector_int32_t&,vector_int32_t,vector_int32_t,vector_bool)
+ * @override_id asc_sub__Rvb_Rvi32_vi32_vi32_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求差操作，将结果写入目的操作数`dst`。
  * @param [out] carry 目的操作数（掩码寄存器），用于存储减法借位输出。减法不借位等价于补码加法进位。
@@ -263,7 +263,7 @@ __simd_callee__ inline void asc_sub(
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_subc(vector_bool&,vector_uint32_t&,vector_uint32_t,vector_uint32_t,vector_bool,vector_bool)
+ * @override_id asc_subc__Rvb_Rvu32_vu32_vu32_vb_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1及输入进位carry_src进行按元素求差操作，减法运算在硬件底层通过补码加法实现，将结果写入目的操作数dst，同时将每个元素的进位结果写入carry（存放进位标志的掩码寄存器）。
  * @param [out] carry 目的操作数（掩码寄存器）。用于存储减法借位输出。减法不借位等价于补码加法进位。
@@ -279,7 +279,7 @@ __simd_callee__ inline void asc_subc(
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_subc(vector_bool&,vector_int32_t&,vector_int32_t,vector_int32_t,vector_bool,vector_bool)
+ * @override_id asc_subc__Rvb_Rvi32_vi32_vi32_vb_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1及输入进位carry_src进行按元素求差操作，减法运算在硬件底层通过补码加法实现，将结果写入目的操作数dst，同时将每个元素的进位结果写入carry（存放进位标志的掩码寄存器）。
  * @param [out] carry 目的操作数（掩码寄存器）。用于存储减法借位输出。减法不借位等价于补码加法进位。
@@ -295,7 +295,7 @@ __simd_callee__ inline void asc_subc(
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min(vector_int8_t,vector_int8_t,vector_bool)
+ * @override_id asc_min__vi8_vi8_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。 计算公式如下：
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -306,7 +306,7 @@ __simd_callee__ inline vector_int8_t asc_min(vector_int8_t src0, vector_int8_t s
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min(vector_int16_t,vector_int16_t,vector_bool)
+ * @override_id asc_min__vi16_vi16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。 计算公式如下：
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -317,7 +317,7 @@ __simd_callee__ inline vector_int16_t asc_min(vector_int16_t src0, vector_int16_
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min(vector_int32_t,vector_int32_t,vector_bool)
+ * @override_id asc_min__vi32_vi32_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。 计算公式如下：
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -328,7 +328,7 @@ __simd_callee__ inline vector_int32_t asc_min(vector_int32_t src0, vector_int32_
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min(vector_uint8_t,vector_uint8_t,vector_bool)
+ * @override_id asc_min__vu8_vu8_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。 计算公式如下：
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -339,7 +339,7 @@ __simd_callee__ inline vector_uint8_t asc_min(vector_uint8_t src0, vector_uint8_
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min(vector_uint16_t,vector_uint16_t,vector_bool)
+ * @override_id asc_min__vu16_vu16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。 计算公式如下：
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -350,7 +350,7 @@ __simd_callee__ inline vector_uint16_t asc_min(vector_uint16_t src0, vector_uint
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min(vector_uint32_t,vector_uint32_t,vector_bool)
+ * @override_id asc_min__vu32_vu32_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。 计算公式如下：
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -361,7 +361,7 @@ __simd_callee__ inline vector_uint32_t asc_min(vector_uint32_t src0, vector_uint
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min(vector_half,vector_half,vector_bool)
+ * @override_id asc_min__vf16_vf16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。 计算公式如下：
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -372,7 +372,7 @@ __simd_callee__ inline vector_half asc_min(vector_half src0, vector_half src1, v
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min(vector_bfloat16_t,vector_bfloat16_t,vector_bool)
+ * @override_id asc_min__vbf16_vbf16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。 计算公式如下：
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -383,7 +383,7 @@ __simd_callee__ inline vector_bfloat16_t asc_min(vector_bfloat16_t src0, vector_
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min(vector_float,vector_float,vector_bool)
+ * @override_id asc_min__vf32_vf32_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。 计算公式如下：
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -394,7 +394,7 @@ __simd_callee__ inline vector_float asc_min(vector_float src0, vector_float src1
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min(vector_int8_t&,vector_int8_t,vector_int8_t,vector_bool)
+ * @override_id asc_min__Rvi8_vi8_vi8_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。 计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -406,7 +406,7 @@ __simd_callee__ inline void asc_min(vector_int8_t& dst, vector_int8_t src0, vect
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min(vector_int16_t&,vector_int16_t,vector_int16_t,vector_bool)
+ * @override_id asc_min__Rvi16_vi16_vi16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。 计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -418,7 +418,7 @@ __simd_callee__ inline void asc_min(vector_int16_t& dst, vector_int16_t src0, ve
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min(vector_int32_t&,vector_int32_t,vector_int32_t,vector_bool)
+ * @override_id asc_min__Rvi32_vi32_vi32_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。 计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -430,7 +430,7 @@ __simd_callee__ inline void asc_min(vector_int32_t& dst, vector_int32_t src0, ve
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min(vector_uint8_t&,vector_uint8_t,vector_uint8_t,vector_bool)
+ * @override_id asc_min__Rvu8_vu8_vu8_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。 计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -442,7 +442,7 @@ __simd_callee__ inline void asc_min(vector_uint8_t& dst, vector_uint8_t src0, ve
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min(vector_uint16_t&,vector_uint16_t,vector_uint16_t,vector_bool)
+ * @override_id asc_min__Rvu16_vu16_vu16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。 计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -454,7 +454,7 @@ __simd_callee__ inline void asc_min(vector_uint16_t& dst, vector_uint16_t src0, 
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min(vector_uint32_t&,vector_uint32_t,vector_uint32_t,vector_bool)
+ * @override_id asc_min__Rvu32_vu32_vu32_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。 计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -466,7 +466,7 @@ __simd_callee__ inline void asc_min(vector_uint32_t& dst, vector_uint32_t src0, 
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min(vector_half&,vector_half,vector_half,vector_bool)
+ * @override_id asc_min__Rvf16_vf16_vf16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。 计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -478,7 +478,7 @@ __simd_callee__ inline void asc_min(vector_half& dst, vector_half src0, vector_h
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min(vector_bfloat16_t&,vector_bfloat16_t,vector_bfloat16_t,vector_bool)
+ * @override_id asc_min__Rvbf16_vbf16_vbf16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。 计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -491,7 +491,7 @@ __simd_callee__ inline void asc_min(
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min(vector_float&,vector_float,vector_float,vector_bool)
+ * @override_id asc_min__Rvf32_vf32_vf32_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。 计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -503,7 +503,7 @@ __simd_callee__ inline void asc_min(vector_float& dst, vector_float src0, vector
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_neg(vector_int8_t&,vector_int8_t,vector_bool)
+ * @override_id asc_neg__Rvi8_vi8_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素取相反数，并将结果作为返回值返回或写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），用于存储取反结果，仅用于无返回值原型。
@@ -514,7 +514,7 @@ __simd_callee__ inline void asc_neg(vector_int8_t& dst, vector_int8_t src, vecto
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_neg(vector_int8_t,vector_bool)
+ * @override_id asc_neg__vi8_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素取相反数，并将结果作为返回值返回或写入目的操作数`dst`。
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -524,7 +524,7 @@ __simd_callee__ inline vector_int8_t asc_neg(vector_int8_t src, vector_bool mask
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_neg(vector_int16_t&,vector_int16_t,vector_bool)
+ * @override_id asc_neg__Rvi16_vi16_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素取相反数，并将结果作为返回值返回或写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），用于存储取反结果，仅用于无返回值原型。
@@ -535,7 +535,7 @@ __simd_callee__ inline void asc_neg(vector_int16_t& dst, vector_int16_t src, vec
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_neg(vector_int16_t,vector_bool)
+ * @override_id asc_neg__vi16_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素取相反数，并将结果作为返回值返回或写入目的操作数`dst`。
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -545,7 +545,7 @@ __simd_callee__ inline vector_int16_t asc_neg(vector_int16_t src, vector_bool ma
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_neg(vector_int32_t&,vector_int32_t,vector_bool)
+ * @override_id asc_neg__Rvi32_vi32_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素取相反数，并将结果作为返回值返回或写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），用于存储取反结果，仅用于无返回值原型。
@@ -556,7 +556,7 @@ __simd_callee__ inline void asc_neg(vector_int32_t& dst, vector_int32_t src, vec
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_neg(vector_int32_t,vector_bool)
+ * @override_id asc_neg__vi32_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素取相反数，并将结果作为返回值返回或写入目的操作数`dst`。
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -566,7 +566,7 @@ __simd_callee__ inline vector_int32_t asc_neg(vector_int32_t src, vector_bool ma
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_neg(vector_half&,vector_half,vector_bool)
+ * @override_id asc_neg__Rvf16_vf16_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素取相反数，并将结果作为返回值返回或写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），用于存储取反结果，仅用于无返回值原型。
@@ -577,7 +577,7 @@ __simd_callee__ inline void asc_neg(vector_half& dst, vector_half src, vector_bo
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_neg(vector_half,vector_bool)
+ * @override_id asc_neg__vf16_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素取相反数，并将结果作为返回值返回或写入目的操作数`dst`。
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -587,7 +587,7 @@ __simd_callee__ inline vector_half asc_neg(vector_half src, vector_bool mask);
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_neg(vector_float&,vector_float,vector_bool)
+ * @override_id asc_neg__Rvf32_vf32_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素取相反数，并将结果作为返回值返回或写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），用于存储取反结果，仅用于无返回值原型。
@@ -598,7 +598,7 @@ __simd_callee__ inline void asc_neg(vector_float& dst, vector_float src, vector_
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_neg(vector_float,vector_bool)
+ * @override_id asc_neg__vf32_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素取相反数，并将结果作为返回值返回或写入目的操作数`dst`。
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -608,7 +608,7 @@ __simd_callee__ inline vector_float asc_neg(vector_float src, vector_bool mask);
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_abs(vector_int8_t&,vector_int8_t,vector_bool)
+ * @override_id asc_abs__Rvi8_vi8_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素取绝对值，得到计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -619,7 +619,7 @@ __simd_callee__ inline void asc_abs(vector_int8_t& dst, vector_int8_t src, vecto
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_abs(vector_int16_t&,vector_int16_t,vector_bool)
+ * @override_id asc_abs__Rvi16_vi16_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素取绝对值，得到计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -630,7 +630,7 @@ __simd_callee__ inline void asc_abs(vector_int16_t& dst, vector_int16_t src, vec
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_abs(vector_int32_t&,vector_int32_t,vector_bool)
+ * @override_id asc_abs__Rvi32_vi32_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素取绝对值，得到计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -641,7 +641,7 @@ __simd_callee__ inline void asc_abs(vector_int32_t& dst, vector_int32_t src, vec
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_abs(vector_half&,vector_half,vector_bool)
+ * @override_id asc_abs__Rvf16_vf16_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素取绝对值，得到计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -652,7 +652,7 @@ __simd_callee__ inline void asc_abs(vector_half& dst, vector_half src, vector_bo
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_abs(vector_float&,vector_float,vector_bool)
+ * @override_id asc_abs__Rvf32_vf32_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素取绝对值，得到计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -663,7 +663,7 @@ __simd_callee__ inline void asc_abs(vector_float& dst, vector_float src, vector_
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_abs(vector_int8_t,vector_bool)
+ * @override_id asc_abs__vi8_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素取绝对值，得到计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -673,7 +673,7 @@ __simd_callee__ inline vector_int8_t asc_abs(vector_int8_t src, vector_bool mask
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_abs(vector_int16_t,vector_bool)
+ * @override_id asc_abs__vi16_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素取绝对值，得到计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -683,7 +683,7 @@ __simd_callee__ inline vector_int16_t asc_abs(vector_int16_t src, vector_bool ma
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_abs(vector_int32_t,vector_bool)
+ * @override_id asc_abs__vi32_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素取绝对值，得到计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -693,7 +693,7 @@ __simd_callee__ inline vector_int32_t asc_abs(vector_int32_t src, vector_bool ma
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_abs(vector_half,vector_bool)
+ * @override_id asc_abs__vf16_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素取绝对值，得到计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -703,7 +703,7 @@ __simd_callee__ inline vector_half asc_abs(vector_half src, vector_bool mask);
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_abs(vector_float,vector_bool)
+ * @override_id asc_abs__vf32_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素取绝对值，得到计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -713,7 +713,7 @@ __simd_callee__ inline vector_float asc_abs(vector_float src, vector_bool mask);
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mull(vector_uint32_t&,vector_uint32_t&,vector_uint32_t,vector_uint32_t,vector_bool)
+ * @override_id asc_mull__Rvu32_Rvu32_vu32_vu32_vb
  * @archs 3510
  * @brief 根据掩码将两个源矢量数据寄存器中的有效元素相乘，数据类型位宽为32位的元素相乘得到64位乘积，拆分为低32位与高32位分别写入两个目的矢量数据寄存器。掩码对应位置为1的元素参与计算，为0的元素在目的矢量数据寄存器中置零。计算公式如下：
  * @param [out] dst0 目的操作数（矢量数据寄存器）。数据类型须与src0一致。
@@ -727,7 +727,7 @@ __simd_callee__ inline void asc_mull(
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mull(vector_int32_t&,vector_int32_t&,vector_int32_t,vector_int32_t,vector_bool)
+ * @override_id asc_mull__Rvi32_Rvi32_vi32_vi32_vb
  * @archs 3510
  * @brief 根据掩码将两个源矢量数据寄存器中的有效元素相乘，数据类型位宽为32位的元素相乘得到64位乘积，拆分为低32位与高32位分别写入两个目的矢量数据寄存器。掩码对应位置为1的元素参与计算，为0的元素在目的矢量数据寄存器中置零。计算公式如下：
  * @param [out] dst0 目的操作数（矢量数据寄存器）。数据类型须与src0一致。
@@ -741,7 +741,7 @@ __simd_callee__ inline void asc_mull(
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_sqrt(vector_half,vector_bool)
+ * @override_id asc_sqrt__vf16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src进行按元素求开方操作，将结果写入目的操作数dst。
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -751,7 +751,7 @@ __simd_callee__ inline vector_half asc_sqrt(vector_half src, vector_bool mask);
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_sqrt(vector_float,vector_bool)
+ * @override_id asc_sqrt__vf32_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src进行按元素求开方操作，将结果写入目的操作数dst。
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -761,7 +761,7 @@ __simd_callee__ inline vector_float asc_sqrt(vector_float src, vector_bool mask)
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_sqrt(vector_half&,vector_half,vector_bool)
+ * @override_id asc_sqrt__Rvf16_vf16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src进行按元素求开方操作，将结果写入目的操作数dst。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -772,7 +772,7 @@ __simd_callee__ inline void asc_sqrt(vector_half& dst, vector_half src, vector_b
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_sqrt(vector_float&,vector_float,vector_bool)
+ * @override_id asc_sqrt__Rvf32_vf32_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src进行按元素求开方操作，将结果写入目的操作数dst。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -783,7 +783,7 @@ __simd_callee__ inline void asc_sqrt(vector_float& dst, vector_float src, vector
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul(vector_int16_t,vector_int16_t,vector_bool)
+ * @override_id asc_mul__vi16_vi16_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`按元素进行乘法运算，将结果写入目的操作数`dst`。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -794,7 +794,7 @@ __simd_callee__ inline vector_int16_t asc_mul(vector_int16_t src0, vector_int16_
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul(vector_uint16_t,vector_uint16_t,vector_bool)
+ * @override_id asc_mul__vu16_vu16_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`按元素进行乘法运算，将结果写入目的操作数`dst`。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -805,7 +805,7 @@ __simd_callee__ inline vector_uint16_t asc_mul(vector_uint16_t src0, vector_uint
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul(vector_half,vector_half,vector_bool)
+ * @override_id asc_mul__vf16_vf16_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`按元素进行乘法运算，将结果写入目的操作数`dst`。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -816,7 +816,7 @@ __simd_callee__ inline vector_half asc_mul(vector_half src0, vector_half src1, v
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul(vector_bfloat16_t,vector_bfloat16_t,vector_bool)
+ * @override_id asc_mul__vbf16_vbf16_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`按元素进行乘法运算，将结果写入目的操作数`dst`。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -827,7 +827,7 @@ __simd_callee__ inline vector_bfloat16_t asc_mul(vector_bfloat16_t src0, vector_
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul(vector_int32_t,vector_int32_t,vector_bool)
+ * @override_id asc_mul__vi32_vi32_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`按元素进行乘法运算，将结果写入目的操作数`dst`。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -838,7 +838,7 @@ __simd_callee__ inline vector_int32_t asc_mul(vector_int32_t src0, vector_int32_
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul(vector_uint32_t,vector_uint32_t,vector_bool)
+ * @override_id asc_mul__vu32_vu32_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`按元素进行乘法运算，将结果写入目的操作数`dst`。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -849,7 +849,7 @@ __simd_callee__ inline vector_uint32_t asc_mul(vector_uint32_t src0, vector_uint
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul(vector_float,vector_float,vector_bool)
+ * @override_id asc_mul__vf32_vf32_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`按元素进行乘法运算，将结果写入目的操作数`dst`。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -860,7 +860,7 @@ __simd_callee__ inline vector_float asc_mul(vector_float src0, vector_float src1
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul(vector_int16_t&,vector_int16_t,vector_int16_t,vector_bool)
+ * @override_id asc_mul__Rvi16_vi16_vi16_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`按元素进行乘法运算，将结果写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -872,7 +872,7 @@ __simd_callee__ inline void asc_mul(vector_int16_t& dst, vector_int16_t src0, ve
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul(vector_uint16_t&,vector_uint16_t,vector_uint16_t,vector_bool)
+ * @override_id asc_mul__Rvu16_vu16_vu16_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`按元素进行乘法运算，将结果写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -884,7 +884,7 @@ __simd_callee__ inline void asc_mul(vector_uint16_t& dst, vector_uint16_t src0, 
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul(vector_half&,vector_half,vector_half,vector_bool)
+ * @override_id asc_mul__Rvf16_vf16_vf16_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`按元素进行乘法运算，将结果写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -896,7 +896,7 @@ __simd_callee__ inline void asc_mul(vector_half& dst, vector_half src0, vector_h
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul(vector_bfloat16_t&,vector_bfloat16_t,vector_bfloat16_t,vector_bool)
+ * @override_id asc_mul__Rvbf16_vbf16_vbf16_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`按元素进行乘法运算，将结果写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -909,7 +909,7 @@ __simd_callee__ inline void asc_mul(
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul(vector_int32_t&,vector_int32_t,vector_int32_t,vector_bool)
+ * @override_id asc_mul__Rvi32_vi32_vi32_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`按元素进行乘法运算，将结果写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -921,7 +921,7 @@ __simd_callee__ inline void asc_mul(vector_int32_t& dst, vector_int32_t src0, ve
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul(vector_uint32_t&,vector_uint32_t,vector_uint32_t,vector_bool)
+ * @override_id asc_mul__Rvu32_vu32_vu32_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`按元素进行乘法运算，将结果写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -933,7 +933,7 @@ __simd_callee__ inline void asc_mul(vector_uint32_t& dst, vector_uint32_t src0, 
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul(vector_float&,vector_float,vector_float,vector_bool)
+ * @override_id asc_mul__Rvf32_vf32_vf32_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`按元素进行乘法运算，将结果写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -945,7 +945,7 @@ __simd_callee__ inline void asc_mul(vector_float& dst, vector_float src0, vector
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul_scalar(vector_int16_t&,vector_int16_t,int16_t,vector_bool)
+ * @override_id asc_mul_scalar__Rvi16_vi16_i16_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素与标量`value`相乘，得到计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -957,7 +957,7 @@ __simd_callee__ inline void asc_mul_scalar(vector_int16_t& dst, vector_int16_t s
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul_scalar(vector_uint16_t&,vector_uint16_t,uint16_t,vector_bool)
+ * @override_id asc_mul_scalar__Rvu16_vu16_u16_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素与标量`value`相乘，得到计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -969,7 +969,7 @@ __simd_callee__ inline void asc_mul_scalar(vector_uint16_t& dst, vector_uint16_t
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul_scalar(vector_half&,vector_half,half,vector_bool)
+ * @override_id asc_mul_scalar__Rvf16_vf16_f16_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素与标量`value`相乘，得到计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -981,7 +981,7 @@ __simd_callee__ inline void asc_mul_scalar(vector_half& dst, vector_half src, ha
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul_scalar(vector_int32_t&,vector_int32_t,int32_t,vector_bool)
+ * @override_id asc_mul_scalar__Rvi32_vi32_i32_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素与标量`value`相乘，得到计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -993,7 +993,7 @@ __simd_callee__ inline void asc_mul_scalar(vector_int32_t& dst, vector_int32_t s
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul_scalar(vector_uint32_t&,vector_uint32_t,uint32_t,vector_bool)
+ * @override_id asc_mul_scalar__Rvu32_vu32_u32_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素与标量`value`相乘，得到计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -1005,7 +1005,7 @@ __simd_callee__ inline void asc_mul_scalar(vector_uint32_t& dst, vector_uint32_t
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul_scalar(vector_float&,vector_float,float,vector_bool)
+ * @override_id asc_mul_scalar__Rvf32_vf32_f32_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素与标量`value`相乘，得到计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -1017,7 +1017,7 @@ __simd_callee__ inline void asc_mul_scalar(vector_float& dst, vector_float src, 
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add(vector_uint8_t,vector_uint8_t,vector_bool)
+ * @override_id asc_add__vu8_vu8_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求和操作，将结果写入目的操作数`dst`。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -1028,7 +1028,7 @@ __simd_callee__ inline vector_uint8_t asc_add(vector_uint8_t src0, vector_uint8_
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add(vector_int8_t,vector_int8_t,vector_bool)
+ * @override_id asc_add__vi8_vi8_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求和操作，将结果写入目的操作数`dst`。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -1039,7 +1039,7 @@ __simd_callee__ inline vector_int8_t asc_add(vector_int8_t src0, vector_int8_t s
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add(vector_uint16_t,vector_uint16_t,vector_bool)
+ * @override_id asc_add__vu16_vu16_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求和操作，将结果写入目的操作数`dst`。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -1050,7 +1050,7 @@ __simd_callee__ inline vector_uint16_t asc_add(vector_uint16_t src0, vector_uint
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add(vector_int16_t,vector_int16_t,vector_bool)
+ * @override_id asc_add__vi16_vi16_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求和操作，将结果写入目的操作数`dst`。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -1061,7 +1061,7 @@ __simd_callee__ inline vector_int16_t asc_add(vector_int16_t src0, vector_int16_
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add(vector_half,vector_half,vector_bool)
+ * @override_id asc_add__vf16_vf16_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求和操作，将结果写入目的操作数`dst`。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -1072,7 +1072,7 @@ __simd_callee__ inline vector_half asc_add(vector_half src0, vector_half src1, v
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add(vector_float,vector_float,vector_bool)
+ * @override_id asc_add__vf32_vf32_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求和操作，将结果写入目的操作数`dst`。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -1083,7 +1083,7 @@ __simd_callee__ inline vector_float asc_add(vector_float src0, vector_float src1
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add(vector_int32_t,vector_int32_t,vector_bool)
+ * @override_id asc_add__vi32_vi32_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求和操作，将结果写入目的操作数`dst`。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -1094,7 +1094,7 @@ __simd_callee__ inline vector_int32_t asc_add(vector_int32_t src0, vector_int32_
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add(vector_uint32_t,vector_uint32_t,vector_bool)
+ * @override_id asc_add__vu32_vu32_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求和操作，将结果写入目的操作数`dst`。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -1105,7 +1105,7 @@ __simd_callee__ inline vector_uint32_t asc_add(vector_uint32_t src0, vector_uint
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add(vector_bfloat16_t,vector_bfloat16_t,vector_bool)
+ * @override_id asc_add__vbf16_vbf16_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求和操作，将结果写入目的操作数`dst`。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -1116,7 +1116,7 @@ __simd_callee__ inline vector_bfloat16_t asc_add(vector_bfloat16_t src0, vector_
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul_scalar(vector_int16_t,int16_t,vector_bool)
+ * @override_id asc_mul_scalar__vi16_i16_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素与标量`value`相乘，得到计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -1127,7 +1127,7 @@ __simd_callee__ inline vector_int16_t asc_mul_scalar(vector_int16_t src, int16_t
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul_scalar(vector_uint16_t,uint16_t,vector_bool)
+ * @override_id asc_mul_scalar__vu16_u16_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素与标量`value`相乘，得到计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -1138,7 +1138,7 @@ __simd_callee__ inline vector_uint16_t asc_mul_scalar(vector_uint16_t src, uint1
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul_scalar(vector_half,half,vector_bool)
+ * @override_id asc_mul_scalar__vf16_f16_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素与标量`value`相乘，得到计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -1149,7 +1149,7 @@ __simd_callee__ inline vector_half asc_mul_scalar(vector_half src, half value, v
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul_scalar(vector_int32_t,int32_t,vector_bool)
+ * @override_id asc_mul_scalar__vi32_i32_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素与标量`value`相乘，得到计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -1160,7 +1160,7 @@ __simd_callee__ inline vector_int32_t asc_mul_scalar(vector_int32_t src, int32_t
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul_scalar(vector_uint32_t,uint32_t,vector_bool)
+ * @override_id asc_mul_scalar__vu32_u32_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素与标量`value`相乘，得到计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -1171,7 +1171,7 @@ __simd_callee__ inline vector_uint32_t asc_mul_scalar(vector_uint32_t src, uint3
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_mul_scalar(vector_float,float,vector_bool)
+ * @override_id asc_mul_scalar__vf32_f32_vb
  * @archs 3510
  * @brief 根据`mask`对源操作数`src`按元素与标量`value`相乘，得到计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -1182,7 +1182,7 @@ __simd_callee__ inline vector_float asc_mul_scalar(vector_float src, float value
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add(vector_uint8_t&,vector_uint8_t,vector_uint8_t,vector_bool)
+ * @override_id asc_add__Rvu8_vu8_vu8_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求和操作，将结果写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），用于存储加法和。
@@ -1194,7 +1194,7 @@ __simd_callee__ inline void asc_add(vector_uint8_t& dst, vector_uint8_t src0, ve
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add(vector_int8_t&,vector_int8_t,vector_int8_t,vector_bool)
+ * @override_id asc_add__Rvi8_vi8_vi8_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求和操作，将结果写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），用于存储加法和。
@@ -1206,7 +1206,7 @@ __simd_callee__ inline void asc_add(vector_int8_t& dst, vector_int8_t src0, vect
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add(vector_uint16_t&,vector_uint16_t,vector_uint16_t,vector_bool)
+ * @override_id asc_add__Rvu16_vu16_vu16_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求和操作，将结果写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），用于存储加法和。
@@ -1218,7 +1218,7 @@ __simd_callee__ inline void asc_add(vector_uint16_t& dst, vector_uint16_t src0, 
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add(vector_int16_t&,vector_int16_t,vector_int16_t,vector_bool)
+ * @override_id asc_add__Rvi16_vi16_vi16_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求和操作，将结果写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），用于存储加法和。
@@ -1230,7 +1230,7 @@ __simd_callee__ inline void asc_add(vector_int16_t& dst, vector_int16_t src0, ve
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add(vector_half&,vector_half,vector_half,vector_bool)
+ * @override_id asc_add__Rvf16_vf16_vf16_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求和操作，将结果写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），用于存储加法和。
@@ -1242,7 +1242,7 @@ __simd_callee__ inline void asc_add(vector_half& dst, vector_half src0, vector_h
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add(vector_float&,vector_float,vector_float,vector_bool)
+ * @override_id asc_add__Rvf32_vf32_vf32_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求和操作，将结果写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），用于存储加法和。
@@ -1254,7 +1254,7 @@ __simd_callee__ inline void asc_add(vector_float& dst, vector_float src0, vector
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add(vector_int32_t&,vector_int32_t,vector_int32_t,vector_bool)
+ * @override_id asc_add__Rvi32_vi32_vi32_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求和操作，将结果写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），用于存储加法和。
@@ -1266,7 +1266,7 @@ __simd_callee__ inline void asc_add(vector_int32_t& dst, vector_int32_t src0, ve
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add(vector_uint32_t&,vector_uint32_t,vector_uint32_t,vector_bool)
+ * @override_id asc_add__Rvu32_vu32_vu32_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求和操作，将结果写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），用于存储加法和。
@@ -1278,7 +1278,7 @@ __simd_callee__ inline void asc_add(vector_uint32_t& dst, vector_uint32_t src0, 
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add(vector_bfloat16_t&,vector_bfloat16_t,vector_bfloat16_t,vector_bool)
+ * @override_id asc_add__Rvbf16_vbf16_vbf16_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求和操作，将结果写入目的操作数`dst`。
  * @param [out] dst 目的操作数（矢量数据寄存器），用于存储加法和。
@@ -1291,7 +1291,7 @@ __simd_callee__ inline void asc_add(
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add(vector_bool&,vector_uint32_t&,vector_uint32_t,vector_uint32_t,vector_bool)
+ * @override_id asc_add__Rvb_Rvu32_vu32_vu32_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求和操作，将结果写入目的操作数`dst`。
  * @param [out] carry 目的操作数（掩码寄存器），用于存储加法计算后的进位数据。
@@ -1305,7 +1305,7 @@ __simd_callee__ inline void asc_add(
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add(vector_bool&,vector_int32_t&,vector_int32_t,vector_int32_t,vector_bool)
+ * @override_id asc_add__Rvb_Rvi32_vi32_vi32_vb
  * @archs 3510
  * @brief 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求和操作，将结果写入目的操作数`dst`。
  * @param [out] carry 目的操作数（掩码寄存器），用于存储加法计算后的进位数据。
@@ -1319,7 +1319,7 @@ __simd_callee__ inline void asc_add(
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_addc(vector_bool&,vector_uint32_t&,vector_uint32_t,vector_uint32_t,vector_bool,vector_bool)
+ * @override_id asc_addc__Rvb_Rvu32_vu32_vu32_vb_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1及输入进位carry_src进行按元素求和操作，将结果写入目的操作数dst，同时将每个元素的进位结果写入carry（存放进位标志的掩码寄存器）。
  * @param [out] carry 目的操作数（掩码寄存器）。存储加法计算后的进位数据。
@@ -1335,7 +1335,7 @@ __simd_callee__ inline void asc_addc(
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_addc(vector_bool&,vector_int32_t&,vector_int32_t,vector_int32_t,vector_bool,vector_bool)
+ * @override_id asc_addc__Rvb_Rvi32_vi32_vi32_vb_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1及输入进位carry_src进行按元素求和操作，将结果写入目的操作数dst，同时将每个元素的进位结果写入carry（存放进位标志的掩码寄存器）。
  * @param [out] carry 目的操作数（掩码寄存器）。存储加法计算后的进位数据。
@@ -1351,7 +1351,7 @@ __simd_callee__ inline void asc_addc(
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max(vector_uint8_t,vector_uint8_t,vector_bool)
+ * @override_id asc_max__vu8_vu8_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最大值操作，将结果写入目的操作数dst。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -1362,7 +1362,7 @@ __simd_callee__ inline vector_uint8_t asc_max(vector_uint8_t src0, vector_uint8_
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max(vector_int8_t,vector_int8_t,vector_bool)
+ * @override_id asc_max__vi8_vi8_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最大值操作，将结果写入目的操作数dst。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -1373,7 +1373,7 @@ __simd_callee__ inline vector_int8_t asc_max(vector_int8_t src0, vector_int8_t s
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max(vector_uint16_t,vector_uint16_t,vector_bool)
+ * @override_id asc_max__vu16_vu16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最大值操作，将结果写入目的操作数dst。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -1384,7 +1384,7 @@ __simd_callee__ inline vector_uint16_t asc_max(vector_uint16_t src0, vector_uint
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max(vector_int16_t,vector_int16_t,vector_bool)
+ * @override_id asc_max__vi16_vi16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最大值操作，将结果写入目的操作数dst。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -1395,7 +1395,7 @@ __simd_callee__ inline vector_int16_t asc_max(vector_int16_t src0, vector_int16_
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max(vector_int32_t,vector_int32_t,vector_bool)
+ * @override_id asc_max__vi32_vi32_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最大值操作，将结果写入目的操作数dst。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -1406,7 +1406,7 @@ __simd_callee__ inline vector_int32_t asc_max(vector_int32_t src0, vector_int32_
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max(vector_uint32_t,vector_uint32_t,vector_bool)
+ * @override_id asc_max__vu32_vu32_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最大值操作，将结果写入目的操作数dst。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -1417,7 +1417,7 @@ __simd_callee__ inline vector_uint32_t asc_max(vector_uint32_t src0, vector_uint
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max(vector_float,vector_float,vector_bool)
+ * @override_id asc_max__vf32_vf32_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最大值操作，将结果写入目的操作数dst。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -1428,7 +1428,7 @@ __simd_callee__ inline vector_float asc_max(vector_float src0, vector_float src1
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max(vector_half,vector_half,vector_bool)
+ * @override_id asc_max__vf16_vf16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最大值操作，将结果写入目的操作数dst。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -1439,7 +1439,7 @@ __simd_callee__ inline vector_half asc_max(vector_half src0, vector_half src1, v
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max(vector_bfloat16_t,vector_bfloat16_t,vector_bool)
+ * @override_id asc_max__vbf16_vbf16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最大值操作，将结果写入目的操作数dst。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -1450,7 +1450,7 @@ __simd_callee__ inline vector_bfloat16_t asc_max(vector_bfloat16_t src0, vector_
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max(vector_uint8_t&,vector_uint8_t,vector_uint8_t,vector_bool)
+ * @override_id asc_max__Rvu8_vu8_vu8_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最大值操作，将结果写入目的操作数dst。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -1462,7 +1462,7 @@ __simd_callee__ inline void asc_max(vector_uint8_t& dst, vector_uint8_t src0, ve
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max(vector_int8_t&,vector_int8_t,vector_int8_t,vector_bool)
+ * @override_id asc_max__Rvi8_vi8_vi8_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最大值操作，将结果写入目的操作数dst。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -1474,7 +1474,7 @@ __simd_callee__ inline void asc_max(vector_int8_t& dst, vector_int8_t src0, vect
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max(vector_uint16_t&,vector_uint16_t,vector_uint16_t,vector_bool)
+ * @override_id asc_max__Rvu16_vu16_vu16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最大值操作，将结果写入目的操作数dst。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -1486,7 +1486,7 @@ __simd_callee__ inline void asc_max(vector_uint16_t& dst, vector_uint16_t src0, 
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max(vector_int16_t&,vector_int16_t,vector_int16_t,vector_bool)
+ * @override_id asc_max__Rvi16_vi16_vi16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最大值操作，将结果写入目的操作数dst。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -1498,7 +1498,7 @@ __simd_callee__ inline void asc_max(vector_int16_t& dst, vector_int16_t src0, ve
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max(vector_int32_t&,vector_int32_t,vector_int32_t,vector_bool)
+ * @override_id asc_max__Rvi32_vi32_vi32_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最大值操作，将结果写入目的操作数dst。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -1510,7 +1510,7 @@ __simd_callee__ inline void asc_max(vector_int32_t& dst, vector_int32_t src0, ve
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max(vector_uint32_t&,vector_uint32_t,vector_uint32_t,vector_bool)
+ * @override_id asc_max__Rvu32_vu32_vu32_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最大值操作，将结果写入目的操作数dst。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -1522,7 +1522,7 @@ __simd_callee__ inline void asc_max(vector_uint32_t& dst, vector_uint32_t src0, 
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max(vector_float&,vector_float,vector_float,vector_bool)
+ * @override_id asc_max__Rvf32_vf32_vf32_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最大值操作，将结果写入目的操作数dst。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -1534,7 +1534,7 @@ __simd_callee__ inline void asc_max(vector_float& dst, vector_float src0, vector
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max(vector_half&,vector_half,vector_half,vector_bool)
+ * @override_id asc_max__Rvf16_vf16_vf16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最大值操作，将结果写入目的操作数dst。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -1546,7 +1546,7 @@ __simd_callee__ inline void asc_max(vector_half& dst, vector_half src0, vector_h
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max(vector_bfloat16_t&,vector_bfloat16_t,vector_bfloat16_t,vector_bool)
+ * @override_id asc_max__Rvbf16_vbf16_vbf16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求最大值操作，将结果写入目的操作数dst。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -1559,7 +1559,7 @@ __simd_callee__ inline void asc_max(
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min_scalar(vector_int32_t&,vector_int32_t,int32_t,vector_bool)
+ * @override_id asc_min_scalar__Rvi32_vi32_i32_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最小值作为计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -1571,7 +1571,7 @@ __simd_callee__ inline void asc_min_scalar(vector_int32_t& dst, vector_int32_t s
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min_scalar(vector_uint32_t&,vector_uint32_t,uint32_t,vector_bool)
+ * @override_id asc_min_scalar__Rvu32_vu32_u32_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最小值作为计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -1583,7 +1583,7 @@ __simd_callee__ inline void asc_min_scalar(vector_uint32_t& dst, vector_uint32_t
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min_scalar(vector_int16_t&,vector_int16_t,int16_t,vector_bool)
+ * @override_id asc_min_scalar__Rvi16_vi16_i16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最小值作为计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -1595,7 +1595,7 @@ __simd_callee__ inline void asc_min_scalar(vector_int16_t& dst, vector_int16_t s
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min_scalar(vector_uint16_t&,vector_uint16_t,uint16_t,vector_bool)
+ * @override_id asc_min_scalar__Rvu16_vu16_u16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最小值作为计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -1607,7 +1607,7 @@ __simd_callee__ inline void asc_min_scalar(vector_uint16_t& dst, vector_uint16_t
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min_scalar(vector_int8_t&,vector_int8_t,int8_t,vector_bool)
+ * @override_id asc_min_scalar__Rvi8_vi8_i8_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最小值作为计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -1619,7 +1619,7 @@ __simd_callee__ inline void asc_min_scalar(vector_int8_t& dst, vector_int8_t src
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min_scalar(vector_uint8_t&,vector_uint8_t,uint8_t,vector_bool)
+ * @override_id asc_min_scalar__Rvu8_vu8_u8_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最小值作为计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -1631,7 +1631,7 @@ __simd_callee__ inline void asc_min_scalar(vector_uint8_t& dst, vector_uint8_t s
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min_scalar(vector_float&,vector_float,float,vector_bool)
+ * @override_id asc_min_scalar__Rvf32_vf32_f32_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最小值作为计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -1643,7 +1643,7 @@ __simd_callee__ inline void asc_min_scalar(vector_float& dst, vector_float src, 
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min_scalar(vector_half&,vector_half,half,vector_bool)
+ * @override_id asc_min_scalar__Rvf16_vf16_f16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最小值作为计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -1655,7 +1655,7 @@ __simd_callee__ inline void asc_min_scalar(vector_half& dst, vector_half src, ha
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min_scalar(vector_bfloat16_t&,vector_bfloat16_t,bfloat16_t,vector_bool)
+ * @override_id asc_min_scalar__Rvbf16_vbf16_bf16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最小值作为计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -1668,7 +1668,7 @@ __simd_callee__ inline void asc_min_scalar(
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_exp(vector_half,vector_bool)
+ * @override_id asc_exp__vf16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src进行按元素求自然指数操作，将结果写入目的操作数dst。
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -1678,7 +1678,7 @@ __simd_callee__ inline vector_half asc_exp(vector_half src, vector_bool mask);
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_exp(vector_float,vector_bool)
+ * @override_id asc_exp__vf32_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src进行按元素求自然指数操作，将结果写入目的操作数dst。
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -1688,7 +1688,7 @@ __simd_callee__ inline vector_float asc_exp(vector_float src, vector_bool mask);
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min_scalar(vector_int32_t,int32_t,vector_bool)
+ * @override_id asc_min_scalar__vi32_i32_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最小值作为计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -1699,7 +1699,7 @@ __simd_callee__ inline vector_int32_t asc_min_scalar(vector_int32_t src, int32_t
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min_scalar(vector_uint32_t,uint32_t,vector_bool)
+ * @override_id asc_min_scalar__vu32_u32_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最小值作为计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -1710,7 +1710,7 @@ __simd_callee__ inline vector_uint32_t asc_min_scalar(vector_uint32_t src, uint3
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min_scalar(vector_int16_t,int16_t,vector_bool)
+ * @override_id asc_min_scalar__vi16_i16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最小值作为计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -1721,7 +1721,7 @@ __simd_callee__ inline vector_int16_t asc_min_scalar(vector_int16_t src, int16_t
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min_scalar(vector_uint16_t,uint16_t,vector_bool)
+ * @override_id asc_min_scalar__vu16_u16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最小值作为计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -1732,7 +1732,7 @@ __simd_callee__ inline vector_uint16_t asc_min_scalar(vector_uint16_t src, uint1
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min_scalar(vector_int8_t,int8_t,vector_bool)
+ * @override_id asc_min_scalar__vi8_i8_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最小值作为计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -1743,7 +1743,7 @@ __simd_callee__ inline vector_int8_t asc_min_scalar(vector_int8_t src, int8_t va
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min_scalar(vector_uint8_t,uint8_t,vector_bool)
+ * @override_id asc_min_scalar__vu8_u8_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最小值作为计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -1754,7 +1754,7 @@ __simd_callee__ inline vector_uint8_t asc_min_scalar(vector_uint8_t src, uint8_t
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min_scalar(vector_float,float,vector_bool)
+ * @override_id asc_min_scalar__vf32_f32_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最小值作为计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -1765,7 +1765,7 @@ __simd_callee__ inline vector_float asc_min_scalar(vector_float src, float value
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min_scalar(vector_half,half,vector_bool)
+ * @override_id asc_min_scalar__vf16_f16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最小值作为计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -1776,7 +1776,7 @@ __simd_callee__ inline vector_half asc_min_scalar(vector_half src, half value, v
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_min_scalar(vector_bfloat16_t,bfloat16_t,vector_bool)
+ * @override_id asc_min_scalar__vbf16_bf16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最小值作为计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -1787,7 +1787,7 @@ __simd_callee__ inline vector_bfloat16_t asc_min_scalar(vector_bfloat16_t src, b
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_exp(vector_half&,vector_half,vector_bool)
+ * @override_id asc_exp__Rvf16_vf16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src进行按元素求自然指数操作，将结果写入目的操作数dst。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -1798,7 +1798,7 @@ __simd_callee__ inline void asc_exp(vector_half& dst, vector_half src, vector_bo
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_exp(vector_float&,vector_float,vector_bool)
+ * @override_id asc_exp__Rvf32_vf32_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src进行按元素求自然指数操作，将结果写入目的操作数dst。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -1809,7 +1809,7 @@ __simd_callee__ inline void asc_exp(vector_float& dst, vector_float src, vector_
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add_scalar(vector_int8_t&,vector_int8_t,int8_t,vector_bool)
+ * @override_id asc_add_scalar__Rvi8_vi8_i8_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -1821,7 +1821,7 @@ __simd_callee__ inline void asc_add_scalar(vector_int8_t& dst, vector_int8_t src
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add_scalar(vector_uint8_t&,vector_uint8_t,uint8_t,vector_bool)
+ * @override_id asc_add_scalar__Rvu8_vu8_u8_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -1833,7 +1833,7 @@ __simd_callee__ inline void asc_add_scalar(vector_uint8_t& dst, vector_uint8_t s
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add_scalar(vector_int16_t&,vector_int16_t,int16_t,vector_bool)
+ * @override_id asc_add_scalar__Rvi16_vi16_i16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -1845,7 +1845,7 @@ __simd_callee__ inline void asc_add_scalar(vector_int16_t& dst, vector_int16_t s
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add_scalar(vector_uint16_t&,vector_uint16_t,uint16_t,vector_bool)
+ * @override_id asc_add_scalar__Rvu16_vu16_u16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -1857,7 +1857,7 @@ __simd_callee__ inline void asc_add_scalar(vector_uint16_t& dst, vector_uint16_t
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add_scalar(vector_half&,vector_half,half,vector_bool)
+ * @override_id asc_add_scalar__Rvf16_vf16_f16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -1869,7 +1869,7 @@ __simd_callee__ inline void asc_add_scalar(vector_half& dst, vector_half src, ha
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add_scalar(vector_bfloat16_t&,vector_bfloat16_t,bfloat16_t,vector_bool)
+ * @override_id asc_add_scalar__Rvbf16_vbf16_bf16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -1882,7 +1882,7 @@ __simd_callee__ inline void asc_add_scalar(
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add_scalar(vector_int32_t&,vector_int32_t,int32_t,vector_bool)
+ * @override_id asc_add_scalar__Rvi32_vi32_i32_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -1894,7 +1894,7 @@ __simd_callee__ inline void asc_add_scalar(vector_int32_t& dst, vector_int32_t s
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add_scalar(vector_uint32_t&,vector_uint32_t,uint32_t,vector_bool)
+ * @override_id asc_add_scalar__Rvu32_vu32_u32_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -1906,7 +1906,7 @@ __simd_callee__ inline void asc_add_scalar(vector_uint32_t& dst, vector_uint32_t
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add_scalar(vector_float&,vector_float,float,vector_bool)
+ * @override_id asc_add_scalar__Rvf32_vf32_f32_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -1918,7 +1918,7 @@ __simd_callee__ inline void asc_add_scalar(vector_float& dst, vector_float src, 
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add_scalar(vector_int8_t,int8_t,vector_bool)
+ * @override_id asc_add_scalar__vi8_i8_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -1929,7 +1929,7 @@ __simd_callee__ inline vector_int8_t asc_add_scalar(vector_int8_t src, int8_t va
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add_scalar(vector_uint8_t,uint8_t,vector_bool)
+ * @override_id asc_add_scalar__vu8_u8_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -1940,7 +1940,7 @@ __simd_callee__ inline vector_uint8_t asc_add_scalar(vector_uint8_t src, uint8_t
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add_scalar(vector_int16_t,int16_t,vector_bool)
+ * @override_id asc_add_scalar__vi16_i16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -1951,7 +1951,7 @@ __simd_callee__ inline vector_int16_t asc_add_scalar(vector_int16_t src, int16_t
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add_scalar(vector_uint16_t,uint16_t,vector_bool)
+ * @override_id asc_add_scalar__vu16_u16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -1962,7 +1962,7 @@ __simd_callee__ inline vector_uint16_t asc_add_scalar(vector_uint16_t src, uint1
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add_scalar(vector_half,half,vector_bool)
+ * @override_id asc_add_scalar__vf16_f16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -1973,7 +1973,7 @@ __simd_callee__ inline vector_half asc_add_scalar(vector_half src, half value, v
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add_scalar(vector_bfloat16_t,bfloat16_t,vector_bool)
+ * @override_id asc_add_scalar__vbf16_bf16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -1984,7 +1984,7 @@ __simd_callee__ inline vector_bfloat16_t asc_add_scalar(vector_bfloat16_t src, b
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add_scalar(vector_int32_t,int32_t,vector_bool)
+ * @override_id asc_add_scalar__vi32_i32_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -1995,7 +1995,7 @@ __simd_callee__ inline vector_int32_t asc_add_scalar(vector_int32_t src, int32_t
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add_scalar(vector_uint32_t,uint32_t,vector_bool)
+ * @override_id asc_add_scalar__vu32_u32_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -2006,7 +2006,7 @@ __simd_callee__ inline vector_uint32_t asc_add_scalar(vector_uint32_t src, uint3
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_add_scalar(vector_float,float,vector_bool)
+ * @override_id asc_add_scalar__vf32_f32_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -2017,7 +2017,7 @@ __simd_callee__ inline vector_float asc_add_scalar(vector_float src, float value
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_ln(vector_half&,vector_half,vector_bool)
+ * @override_id asc_ln__Rvf16_vf16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素取自然对数，将结果写入目的操作数`dst`。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -2028,7 +2028,7 @@ __simd_callee__ inline void asc_ln(vector_half& dst, vector_half src, vector_boo
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_ln(vector_float&,vector_float,vector_bool)
+ * @override_id asc_ln__Rvf32_vf32_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素取自然对数，将结果写入目的操作数`dst`。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -2039,7 +2039,7 @@ __simd_callee__ inline void asc_ln(vector_float& dst, vector_float src, vector_b
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_div(vector_half,vector_half,vector_bool)
+ * @override_id asc_div__vf16_vf16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -2050,7 +2050,7 @@ __simd_callee__ inline vector_half asc_div(vector_half src0, vector_half src1, v
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_div(vector_float,vector_float,vector_bool)
+ * @override_id asc_div__vf32_vf32_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -2061,7 +2061,7 @@ __simd_callee__ inline vector_float asc_div(vector_float src0, vector_float src1
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_div(vector_int16_t,vector_int16_t,vector_bool)
+ * @override_id asc_div__vi16_vi16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -2072,7 +2072,7 @@ __simd_callee__ inline vector_int16_t asc_div(vector_int16_t src0, vector_int16_
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_div(vector_uint16_t,vector_uint16_t,vector_bool)
+ * @override_id asc_div__vu16_vu16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -2083,7 +2083,7 @@ __simd_callee__ inline vector_uint16_t asc_div(vector_uint16_t src0, vector_uint
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_div(vector_int32_t,vector_int32_t,vector_bool)
+ * @override_id asc_div__vi32_vi32_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -2094,7 +2094,7 @@ __simd_callee__ inline vector_int32_t asc_div(vector_int32_t src0, vector_int32_
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_div(vector_uint32_t,vector_uint32_t,vector_bool)
+ * @override_id asc_div__vu32_vu32_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。
  * @param [in] src0 源操作数（矢量数据寄存器）。
@@ -2105,7 +2105,7 @@ __simd_callee__ inline vector_uint32_t asc_div(vector_uint32_t src0, vector_uint
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_log(vector_half&,vector_half,vector_bool)
+ * @override_id asc_log__Rvf16_vf16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素取自然对数，将结果写入目的操作数`dst`。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -2116,7 +2116,7 @@ __simd_callee__ inline void asc_log(vector_half& dst, vector_half src, vector_bo
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_log(vector_float&,vector_float,vector_bool)
+ * @override_id asc_log__Rvf32_vf32_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素取自然对数，将结果写入目的操作数`dst`。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -2127,7 +2127,7 @@ __simd_callee__ inline void asc_log(vector_float& dst, vector_float src, vector_
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_div(vector_half&,vector_half,vector_half,vector_bool)
+ * @override_id asc_div__Rvf16_vf16_vf16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -2139,7 +2139,7 @@ __simd_callee__ inline void asc_div(vector_half& dst, vector_half src0, vector_h
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_div(vector_float&,vector_float,vector_float,vector_bool)
+ * @override_id asc_div__Rvf32_vf32_vf32_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -2151,7 +2151,7 @@ __simd_callee__ inline void asc_div(vector_float& dst, vector_float src0, vector
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_div(vector_int16_t&,vector_int16_t,vector_int16_t,vector_bool)
+ * @override_id asc_div__Rvi16_vi16_vi16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -2163,7 +2163,7 @@ __simd_callee__ inline void asc_div(vector_int16_t& dst, vector_int16_t src0, ve
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_div(vector_uint16_t&,vector_uint16_t,vector_uint16_t,vector_bool)
+ * @override_id asc_div__Rvu16_vu16_vu16_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -2175,7 +2175,7 @@ __simd_callee__ inline void asc_div(vector_uint16_t& dst, vector_uint16_t src0, 
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_div(vector_int32_t&,vector_int32_t,vector_int32_t,vector_bool)
+ * @override_id asc_div__Rvi32_vi32_vi32_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -2187,7 +2187,7 @@ __simd_callee__ inline void asc_div(vector_int32_t& dst, vector_int32_t src0, ve
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_div(vector_uint32_t&,vector_uint32_t,vector_uint32_t,vector_bool)
+ * @override_id asc_div__Rvu32_vu32_vu32_vb
  * @archs 3510
  * @brief 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。
  * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
@@ -2199,7 +2199,7 @@ __simd_callee__ inline void asc_div(vector_uint32_t& dst, vector_uint32_t src0, 
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max_scalar(vector_int8_t&,vector_int8_t,int8_t,vector_bool)
+ * @override_id asc_max_scalar__Rvi8_vi8_i8_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最大值作为计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -2211,7 +2211,7 @@ __simd_callee__ inline void asc_max_scalar(vector_int8_t& dst, vector_int8_t src
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max_scalar(vector_int16_t&,vector_int16_t,int16_t,vector_bool)
+ * @override_id asc_max_scalar__Rvi16_vi16_i16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最大值作为计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -2223,7 +2223,7 @@ __simd_callee__ inline void asc_max_scalar(vector_int16_t& dst, vector_int16_t s
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max_scalar(vector_int32_t&,vector_int32_t,int32_t,vector_bool)
+ * @override_id asc_max_scalar__Rvi32_vi32_i32_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最大值作为计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -2235,7 +2235,7 @@ __simd_callee__ inline void asc_max_scalar(vector_int32_t& dst, vector_int32_t s
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max_scalar(vector_uint8_t&,vector_uint8_t,uint8_t,vector_bool)
+ * @override_id asc_max_scalar__Rvu8_vu8_u8_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最大值作为计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -2247,7 +2247,7 @@ __simd_callee__ inline void asc_max_scalar(vector_uint8_t& dst, vector_uint8_t s
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max_scalar(vector_uint16_t&,vector_uint16_t,uint16_t,vector_bool)
+ * @override_id asc_max_scalar__Rvu16_vu16_u16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最大值作为计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -2259,7 +2259,7 @@ __simd_callee__ inline void asc_max_scalar(vector_uint16_t& dst, vector_uint16_t
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max_scalar(vector_uint32_t&,vector_uint32_t,uint32_t,vector_bool)
+ * @override_id asc_max_scalar__Rvu32_vu32_u32_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最大值作为计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -2271,7 +2271,7 @@ __simd_callee__ inline void asc_max_scalar(vector_uint32_t& dst, vector_uint32_t
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max_scalar(vector_half&,vector_half,half,vector_bool)
+ * @override_id asc_max_scalar__Rvf16_vf16_f16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最大值作为计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -2283,7 +2283,7 @@ __simd_callee__ inline void asc_max_scalar(vector_half& dst, vector_half src, ha
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max_scalar(vector_float&,vector_float,float,vector_bool)
+ * @override_id asc_max_scalar__Rvf32_vf32_f32_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最大值作为计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -2295,7 +2295,7 @@ __simd_callee__ inline void asc_max_scalar(vector_float& dst, vector_float src, 
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max_scalar(vector_bfloat16_t&,vector_bfloat16_t,bfloat16_t,vector_bool)
+ * @override_id asc_max_scalar__Rvbf16_vbf16_bf16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最大值作为计算结果。计算公式如下：
  * @param [out] dst 目的操作数（矢量数据寄存器）。
@@ -2308,7 +2308,7 @@ __simd_callee__ inline void asc_max_scalar(
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max_scalar(vector_int8_t,int8_t,vector_bool)
+ * @override_id asc_max_scalar__vi8_i8_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最大值作为计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -2319,7 +2319,7 @@ __simd_callee__ inline vector_int8_t asc_max_scalar(vector_int8_t src, int8_t va
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max_scalar(vector_int16_t,int16_t,vector_bool)
+ * @override_id asc_max_scalar__vi16_i16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最大值作为计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -2330,7 +2330,7 @@ __simd_callee__ inline vector_int16_t asc_max_scalar(vector_int16_t src, int16_t
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max_scalar(vector_int32_t,int32_t,vector_bool)
+ * @override_id asc_max_scalar__vi32_i32_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最大值作为计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -2341,7 +2341,7 @@ __simd_callee__ inline vector_int32_t asc_max_scalar(vector_int32_t src, int32_t
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max_scalar(vector_uint8_t,uint8_t,vector_bool)
+ * @override_id asc_max_scalar__vu8_u8_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最大值作为计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -2352,7 +2352,7 @@ __simd_callee__ inline vector_uint8_t asc_max_scalar(vector_uint8_t src, uint8_t
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max_scalar(vector_uint16_t,uint16_t,vector_bool)
+ * @override_id asc_max_scalar__vu16_u16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最大值作为计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -2363,7 +2363,7 @@ __simd_callee__ inline vector_uint16_t asc_max_scalar(vector_uint16_t src, uint1
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max_scalar(vector_uint32_t,uint32_t,vector_bool)
+ * @override_id asc_max_scalar__vu32_u32_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最大值作为计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -2374,7 +2374,7 @@ __simd_callee__ inline vector_uint32_t asc_max_scalar(vector_uint32_t src, uint3
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max_scalar(vector_half,half,vector_bool)
+ * @override_id asc_max_scalar__vf16_f16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最大值作为计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -2385,7 +2385,7 @@ __simd_callee__ inline vector_half asc_max_scalar(vector_half src, half value, v
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max_scalar(vector_float,float,vector_bool)
+ * @override_id asc_max_scalar__vf32_f32_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最大值作为计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。
@@ -2396,7 +2396,7 @@ __simd_callee__ inline vector_float asc_max_scalar(vector_float src, float value
 
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @function asc_max_scalar(vector_bfloat16_t,bfloat16_t,vector_bool)
+ * @override_id asc_max_scalar__vbf16_bf16_vb
  * @archs 3510
  * @brief 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最大值作为计算结果。计算公式如下：
  * @param [in] src 源操作数（矢量数据寄存器）。

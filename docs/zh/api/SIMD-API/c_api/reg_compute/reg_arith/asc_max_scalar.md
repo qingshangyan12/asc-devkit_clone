@@ -1,72 +1,19 @@
 ---
 okftype: reference.api.cpp
-title: asc_max_scalar
-path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_max_scalar.md
-description: 根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最大值作为计算结果。
-tag:
-  api_surfaces:
-  - c_api
-  roles: []
-  families:
-  - arithmetic
-  operations:
-  - maximum
-  objects:
-  - mask
-  - scalar
-  - vector
-  execution_models:
-  - register_vector
-  source_locations:
-  - vector_register
-  destination_locations:
-  - vector_register
-  traits:
-  - masked
-  - scalar_operand
-usage_dependencies:
-  status: unconfirmed
+title: "asc_max_scalar"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_max_scalar.md"
+description: "根据`mask`将源操作数`src`按元素与标量`value`进行比较，得到最大值作为计算结果。"
 signature:
-- function: asc_max_scalar(vector_<dtype>,<dtype>,vector_bool)
-  archs:
-  - '3510'
-  headers:
-  - scope: /include/c_api/reg_compute/compute/reg_arith.h
-    header: /include/c_api/reg_compute/compute/reg_arith.h
-  - scope: /include/c_api/asc_simd.h
-    header: /include/c_api/reg_compute/compute/reg_arith.h
-  dtype:
-    values:
-    - int8_t
-    - uint8_t
-    - int16_t
-    - uint16_t
-    - half
-    - bfloat16_t
-    - int32_t
-    - uint32_t
-    - float
-- function: asc_max_scalar(vector_<dtype>&,vector_<dtype>,<dtype>,vector_bool)
-  archs:
-  - '3510'
-  headers:
-  - scope: /include/c_api/reg_compute/compute/reg_arith.h
-    header: /include/c_api/reg_compute/compute/reg_arith.h
-  - scope: /include/c_api/asc_simd.h
-    header: /include/c_api/reg_compute/compute/reg_arith.h
-  dtype:
-    values:
-    - int8_t
-    - uint8_t
-    - int16_t
-    - uint16_t
-    - half
-    - bfloat16_t
-    - int32_t
-    - uint32_t
-    - float
+  - prototype_id: "asc_max_scalar__v<dtype>_<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_arith.h"
+  - prototype_id: "asc_max_scalar__Rv<dtype>_v<dtype>_<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_arith.h"
 examples: []
-timestamp: '2026-09-04'
+timestamp: "2026-09-10"
 ---
 
 # asc_max_scalar
@@ -108,16 +55,22 @@ $$
 ## 函数原型
 ```yaml
 api_signature:
-  function: "asc_max_scalar(vector_<dtype>,<dtype>,vector_bool)"
-  archs:
-    - "3510"
+  prototype_id: "asc_max_scalar__v<dtype>_<dtype>_vb"
+  archs: ["3510"]
   headers:
-    - scope: "/include/c_api/reg_compute/compute/reg_arith.h"
-      header: "/include/c_api/reg_compute/compute/reg_arith.h"
-    - scope: "/include/c_api/asc_simd.h"
-      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
 ```
-
 
 ```c
 // 通过函数返回值返回结果（占位符形式）
@@ -128,16 +81,22 @@ __simd_callee__ inline vector_<dtype> asc_max_scalar(vector_<dtype> src,
 
 ```yaml
 api_signature:
-  function: "asc_max_scalar(vector_<dtype>&,vector_<dtype>,<dtype>,vector_bool)"
-  archs:
-    - "3510"
+  prototype_id: "asc_max_scalar__Rv<dtype>_v<dtype>_<dtype>_vb"
+  archs: ["3510"]
   headers:
-    - scope: "/include/c_api/reg_compute/compute/reg_arith.h"
-      header: "/include/c_api/reg_compute/compute/reg_arith.h"
-    - scope: "/include/c_api/asc_simd.h"
-      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
 ```
-
 
 ```c
 

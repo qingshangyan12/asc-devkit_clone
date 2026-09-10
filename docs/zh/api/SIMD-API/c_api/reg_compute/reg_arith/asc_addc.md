@@ -1,47 +1,15 @@
 ---
 okftype: reference.api.cpp
-title: asc_addc
-path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_addc.md
-description: 该接口根据mask，对源操作数src0、src1及输入进位carry_src进行按元素求和操作，将结果写入目的操作数dst，同时将每个元素的进位结果写入carry（存放进位标志的掩码寄存器）。
-tag:
-  api_surfaces:
-  - c_api
-  roles: []
-  families:
-  - arithmetic
-  operations:
-  - add
-  objects:
-  - carry_flag
-  - mask
-  - vector
-  execution_models:
-  - register_vector
-  source_locations:
-  - vector_register
-  destination_locations:
-  - vector_register
-  traits:
-  - carry_input
-  - masked
-  - supports_carry_output
-usage_dependencies:
-  status: unconfirmed
+title: "asc_addc"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_addc.md"
+description: "该接口根据mask，对源操作数src0、src1及输入进位carry_src进行按元素求和操作，将结果写入目的操作数dst，同时将每个元素的进位结果写入carry（存放进位标志的掩码寄存器）。"
 signature:
-- function: asc_addc(vector_bool&,vector_<dtype>&,vector_<dtype>,vector_<dtype>,vector_bool,vector_bool)
-  archs:
-  - '3510'
-  headers:
-  - scope: /include/c_api/reg_compute/compute/reg_arith.h
-    header: /include/c_api/reg_compute/compute/reg_arith.h
-  - scope: /include/c_api/asc_simd.h
-    header: /include/c_api/reg_compute/compute/reg_arith.h
-  dtype:
-    values:
-    - int32_t
-    - uint32_t
+  - prototype_id: "asc_addc__Rvb_Rv<dtype>_v<dtype>_v<dtype>_vb_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_arith.h"
 examples: []
-timestamp: '2026-09-04'
+timestamp: "2026-09-10"
 ---
 
 # asc_addc
@@ -91,16 +59,15 @@ $$
 ## 函数原型
 ```yaml
 api_signature:
-  function: "asc_addc(vector_bool&,vector_<dtype>&,vector_<dtype>,vector_<dtype>,vector_bool,vector_bool)"
-  archs:
-    - "3510"
+  prototype_id: "asc_addc__Rvb_Rv<dtype>_v<dtype>_v<dtype>_vb_vb"
+  archs: ["3510"]
   headers:
-    - scope: "/include/c_api/reg_compute/compute/reg_arith.h"
-      header: "/include/c_api/reg_compute/compute/reg_arith.h"
-    - scope: "/include/c_api/asc_simd.h"
-      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  dtype:
+    values:
+      - "int32_t"
+      - "uint32_t"
 ```
-
 
 ```cpp
 // 占位符形式

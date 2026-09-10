@@ -1,70 +1,19 @@
 ---
 okftype: reference.api.cpp
-title: asc_min
-path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_min.md
-description: 该接口根据mask，对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。
-tag:
-  api_surfaces:
-  - c_api
-  roles: []
-  families:
-  - arithmetic
-  operations:
-  - minimum
-  objects:
-  - mask
-  - vector
-  execution_models:
-  - register_vector
-  source_locations:
-  - vector_register
-  destination_locations:
-  - vector_register
-  traits:
-  - masked
-usage_dependencies:
-  status: unconfirmed
+title: "asc_min"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_min.md"
+description: "该接口根据mask，对源操作数src0、src1进行按元素求最小值操作，将结果写入目的操作数dst。"
 signature:
-- function: asc_min(vector_<dtype>&,vector_<dtype>,vector_<dtype>,vector_bool)
-  archs:
-  - '3510'
-  headers:
-  - scope: /include/c_api/reg_compute/compute/reg_arith.h
-    header: /include/c_api/reg_compute/compute/reg_arith.h
-  - scope: /include/c_api/asc_simd.h
-    header: /include/c_api/reg_compute/compute/reg_arith.h
-  dtype:
-    values:
-    - int8_t
-    - uint8_t
-    - int16_t
-    - uint16_t
-    - half
-    - bfloat16_t
-    - int32_t
-    - uint32_t
-    - float
-- function: asc_min(vector_<dtype>,vector_<dtype>,vector_bool)
-  archs:
-  - '3510'
-  headers:
-  - scope: /include/c_api/reg_compute/compute/reg_arith.h
-    header: /include/c_api/reg_compute/compute/reg_arith.h
-  - scope: /include/c_api/asc_simd.h
-    header: /include/c_api/reg_compute/compute/reg_arith.h
-  dtype:
-    values:
-    - int8_t
-    - uint8_t
-    - int16_t
-    - uint16_t
-    - half
-    - bfloat16_t
-    - int32_t
-    - uint32_t
-    - float
+  - prototype_id: "asc_min__Rv<dtype>_v<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_arith.h"
+  - prototype_id: "asc_min__v<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_arith.h"
 examples: []
-timestamp: '2026-09-04'
+timestamp: "2026-09-10"
 ---
 
 # asc_min
@@ -107,16 +56,22 @@ $$
 ## 函数原型
 ```yaml
 api_signature:
-  function: "asc_min(vector_<dtype>&,vector_<dtype>,vector_<dtype>,vector_bool)"
-  archs:
-    - "3510"
+  prototype_id: "asc_min__Rv<dtype>_v<dtype>_v<dtype>_vb"
+  archs: ["3510"]
   headers:
-    - scope: "/include/c_api/reg_compute/compute/reg_arith.h"
-      header: "/include/c_api/reg_compute/compute/reg_arith.h"
-    - scope: "/include/c_api/asc_simd.h"
-      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
 ```
-
 
 ```c
 // 通过引用参数输出结果（占位符形式）
@@ -128,16 +83,22 @@ __simd_callee__ inline void asc_min(vector_<dtype>& dst,
 
 ```yaml
 api_signature:
-  function: "asc_min(vector_<dtype>,vector_<dtype>,vector_bool)"
-  archs:
-    - "3510"
+  prototype_id: "asc_min__v<dtype>_v<dtype>_vb"
+  archs: ["3510"]
   headers:
-    - scope: "/include/c_api/reg_compute/compute/reg_arith.h"
-      header: "/include/c_api/reg_compute/compute/reg_arith.h"
-    - scope: "/include/c_api/asc_simd.h"
-      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
 ```
-
 
 ```c
 
