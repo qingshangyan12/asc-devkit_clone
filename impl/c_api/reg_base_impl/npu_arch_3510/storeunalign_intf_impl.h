@@ -20,6 +20,10 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
+ASC_DEPRECATED(
+    9.2.0, "2027/09/07",
+    asc_storeunalign_postupdate(__ubuf__ uint16_t*& dst, vector_store_unalign& src0, vector_bool src1) or
+        asc_storeunalign_postupdate(__ubuf__ uint32_t * &dst, vector_store_unalign& src0, vector_bool src1))
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ uint8_t*& dst, vector_store_unalign& src0, vector_bool src1)
 {

@@ -20,6 +20,8 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
+ASC_DEPRECATED(
+    9.1.0, "2027/09/07", asc_scatter(__ubuf__ int8_t* dst, vector_int8_t src, vector_uint16_t index, vector_bool mask))
 __simd_callee__ inline void asc_scatter(
     vector_int8_t& src, __ubuf__ int8_t* dst, vector_uint16_t index, vector_bool mask)
 {
@@ -28,6 +30,9 @@ __simd_callee__ inline void asc_scatter(
     }
 }
 
+ASC_DEPRECATED(
+    9.1.0, "2027/09/07",
+    asc_scatter(__ubuf__ uint8_t* dst, vector_uint8_t src, vector_uint16_t index, vector_bool mask))
 __simd_callee__ inline void asc_scatter(
     vector_uint8_t& src, __ubuf__ uint8_t* dst, vector_uint16_t index, vector_bool mask)
 {
@@ -36,6 +41,9 @@ __simd_callee__ inline void asc_scatter(
     }
 }
 
+ASC_DEPRECATED(
+    9.1.0, "2027/09/07",
+    asc_scatter(__ubuf__ int16_t* dst, vector_int16_t src, vector_uint16_t index, vector_bool mask))
 __simd_callee__ inline void asc_scatter(
     vector_int16_t& src, __ubuf__ int16_t* dst, vector_uint16_t index, vector_bool mask)
 {
@@ -44,6 +52,9 @@ __simd_callee__ inline void asc_scatter(
     }
 }
 
+ASC_DEPRECATED(
+    9.1.0, "2027/09/07",
+    asc_scatter(__ubuf__ uint16_t* dst, vector_uint16_t src, vector_uint16_t index, vector_bool mask))
 __simd_callee__ inline void asc_scatter(
     vector_uint16_t& src, __ubuf__ uint16_t* dst, vector_uint16_t index, vector_bool mask)
 {
@@ -52,6 +63,9 @@ __simd_callee__ inline void asc_scatter(
     }
 }
 
+ASC_DEPRECATED(
+    9.1.0, "2027/09/07",
+    asc_scatter(__ubuf__ int32_t* dst, vector_int32_t src, vector_uint32_t index, vector_bool mask))
 __simd_callee__ inline void asc_scatter(
     vector_int32_t& src, __ubuf__ int32_t* dst, vector_uint32_t index, vector_bool mask)
 {
@@ -60,6 +74,9 @@ __simd_callee__ inline void asc_scatter(
     }
 }
 
+ASC_DEPRECATED(
+    9.1.0, "2027/09/07",
+    asc_scatter(__ubuf__ uint32_t* dst, vector_uint32_t src, vector_uint32_t index, vector_bool mask))
 __simd_callee__ inline void asc_scatter(
     vector_uint32_t& src, __ubuf__ uint32_t* dst, vector_uint32_t index, vector_bool mask)
 {
@@ -68,6 +85,9 @@ __simd_callee__ inline void asc_scatter(
     }
 }
 
+ASC_DEPRECATED(
+    9.1.0, "2027/09/07",
+    asc_scatter(__ubuf__ bfloat16_t* dst, vector_bfloat16_t src, vector_uint16_t index, vector_bool mask))
 __simd_callee__ inline void asc_scatter(
     vector_bfloat16_t& src, __ubuf__ bfloat16_t* dst, vector_uint16_t index, vector_bool mask)
 {
@@ -76,6 +96,8 @@ __simd_callee__ inline void asc_scatter(
     }
 }
 
+ASC_DEPRECATED(
+    9.1.0, "2027/09/07", asc_scatter(__ubuf__ half* dst, vector_half src, vector_uint16_t index, vector_bool mask))
 __simd_callee__ inline void asc_scatter(vector_half& src, __ubuf__ half* dst, vector_uint16_t index, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -83,6 +105,8 @@ __simd_callee__ inline void asc_scatter(vector_half& src, __ubuf__ half* dst, ve
     }
 }
 
+ASC_DEPRECATED(
+    9.1.0, "2027/09/07", asc_scatter(__ubuf__ float* dst, vector_float src, vector_uint32_t index, vector_bool mask))
 __simd_callee__ inline void asc_scatter(vector_float& src, __ubuf__ float* dst, vector_uint32_t index, vector_bool mask)
 {
     if ASC_IS_AIV {
