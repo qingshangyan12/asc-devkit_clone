@@ -39,7 +39,7 @@ $$
 
 其中，A、B、C分别为左、右、结果矩阵，C矩阵可以通过配置本接口的参数，初始化为全0矩阵、L0C Buffer中的矩阵或Bias矩阵，各矩阵的信息说明见下表：
 
-<!-- npu="950" id9 -->
+<!-- npu="960" id9 -->
 **表1** 矩阵信息说明（[NPU架构版本9201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
 
 | 矩阵 | 存储位置 | 形状（行数×列数） | 数据格式 | 分形大小（行数×列数） |
@@ -130,7 +130,7 @@ __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
 | `bfloat16_t` | `bfloat16_t` | `float` | `float` |
 | `float` | `float` | `float` | `float` |
 
-<!-- npu="950" id13 -->
+<!-- npu="960" id13 -->
 **表5** Ascend 960PR/Ascend 960DT新增支持的数据类型组合（[NPU架构版本9201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="asc_mmad_data_type_960"></a>
 | a_dtype | b_dtype | c_dtype | Bias数据类型 |
 | --- | --- | --- | --- |
@@ -207,9 +207,9 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| c_matrix | 输出 | 目的操作数，结果矩阵C在L0C Buffer中的起始地址，需按照1024字节对齐。数据类型由接口重载决定，具体请参见[支持的数据类型组合](#asc_mmad_data_type)。 |
-| a_matrix | 输入 | 源操作数，左矩阵A在L0A Buffer中的起始地址，需按照512字节对齐。数据类型由接口重载决定，具体请参见[支持的数据类型组合](#asc_mmad_data_type)。 |
-| b_matrix | 输入 | 源操作数，右矩阵B在L0B Buffer中的起始地址，需按照512字节对齐。数据类型由接口重载决定，具体请参见[支持的数据类型组合](#asc_mmad_data_type)。 |
+| c_matrix | 输出 | 目的操作数，结果矩阵C在L0C Buffer中的起始地址，需按照1024字节对齐。数据类型由接口重载决定，具体请参见[表4](#asc_mmad_data_type_950)、[表5](#asc_mmad_data_type_960)。 |
+| a_matrix | 输入 | 源操作数，左矩阵A在L0A Buffer中的起始地址，需按照512字节对齐。数据类型由接口重载决定，具体请参见[表4](#asc_mmad_data_type_950)、[表5](#asc_mmad_data_type_960)。 |
+| b_matrix | 输入 | 源操作数，右矩阵B在L0B Buffer中的起始地址，需按照512字节对齐。数据类型由接口重载决定，具体请参见[表4](#asc_mmad_data_type_950)、[表5](#asc_mmad_data_type_960)。 |
 | bias | 输入 | Bias矩阵在BiasTable Buffer中的起始地址，需按照64字节对齐，可以为非零地址，仅显式传入Bias起始地址的接口包含该参数。<br>Bias的数据类型需与C矩阵的数据类型保持一致，调用本接口前，需将Bias数据通过[asc_copy_l12bt](../cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md)接口搬运到该地址，Bias占用长度为`n * sizeof(c_dtype)`向上补齐到64字节。 |
 | m | 输入 | 左矩阵A和结果矩阵C的M维大小，单位为元素，取值范围为[0, 4095]。 |
 | k | 输入 | 左矩阵A和右矩阵B的K维大小，单位为元素，取值范围为[0, 4095]。 |
@@ -256,10 +256,10 @@ PIPE_M
   <!-- npu="950,960" id17 -->
   - 针对如下产品型号：
     <!-- npu="950" id18 -->
-    Ascend 950PR/Ascend 950DT:
+    Ascend 950PR/Ascend 950DT：
     <!-- end id18 -->
     <!-- npu="960" id19 -->
-    Ascend 960PR/Ascend 960DT:
+    Ascend 960PR/Ascend 960DT：
     <!-- end id19 -->
 
       - L0C Buffer大小为256KB，L0A Buffer和L0B Buffer大小均为64KB。BiasTable Buffer大小为4KB。矩阵的起始地址和占用空间不能超出对应Buffer的范围。

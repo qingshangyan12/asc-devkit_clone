@@ -56,7 +56,7 @@ $$
 表格中K0_A、K0_B的取值分别为`32B / sizeof(dtype_A)`、`32B / sizeof(dtype_B)`，`dtype_A`、`dtype_B`分别为A矩阵和B矩阵的数据类型。
 <!-- end id9 -->
 
-<!-- npu="950" id10 -->
+<!-- npu="960" id10 -->
 在Ascend 960PR/Ascend 950DT上不支持传入Scale矩阵地址，而是根据A、B矩阵的起始地址，按照固定的地址映射关系从L0A_MX Buffer和L0B_MX Buffer读取对应的Scale矩阵。各矩阵的信息说明见下表：
 
 **表2** 矩阵信息说明
@@ -341,16 +341,16 @@ PIPE_M
 
 - 本接口仅在AIC上生效，在AIV上调用将直接返回。
 - `m`、`k`、`n`中的任意一个值为0时，接口将被视为NOP（空操作）。
-- 调用本接口前，需通过[asc_copy_l12l0a_mx](../cube_datamove/asc_copy_l12l0a_mx.md)和[asc_copy_l12l0b_mx](../cube_datamove/asc_copy_l12l0b_mx.md)等接口，将ScaleA和ScaleB矩阵分别搬入L0A_MX Buffer和L0B_MX Buffer。ScaleA和ScaleB矩阵的数据类型根据对应矩阵数据类型为`fp8_e8m0_t`或`hifloat4_t`，K方向上每个Scale元素对应32个输入矩阵元素。
+- 调用本接口前，需通过[asc_copy_l12l0a_mx](../cube_datamove/asc_copy_l12l0a_mx.md)和[asc_copy_l12l0b_mx](../cube_datamove/asc_copy_l12l0b_mx.md)等接口，将ScaleA和ScaleB矩阵分别搬入L0A_MX Buffer和L0B_MX Buffer。ScaleA和ScaleB矩阵的数据类型根据对应矩阵数据类型为`fp8_e8m0_t`或`hif4_scale`，K方向上每个Scale元素对应32个输入矩阵元素。
 
 - 内存使用约束说明：
   <!-- npu="960" id15 -->
   - 针对Ascend 960PR/Ascend 960DT，L0C Buffer大小为256KB，L0A Buffer和L0B Buffer大小均为64KB，L0A_MX Buffer和L0B_MX Buffer大小均为8KB，BiasTable Buffer大小为4KB。矩阵的起始地址和占用空间不能超出对应Buffer的范围。
   <!-- end id15 -->
-  <!-- npu="960" id16 -->
+  <!-- npu="950" id16 -->
   - 针对Ascend 950PR/Ascend 950DT，L0C Buffer大小为256KB，L0A Buffer和L0B Buffer大小均为64KB，L0A_MX Buffer和L0B_MX Buffer大小均为4KB，BiasTable Buffer大小为4KB。矩阵的起始地址和占用空间不能超出对应Buffer的范围。
   <!-- end id16 -->
-  - 各矩阵的起始地址需根据产品型号满足[表5](#asc_mmad_mx_param_table_960)[表6](#asc_mmad_mx_param_table_960)中的对齐要求。操作数的其他地址约束请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
+  - 各矩阵的起始地址需根据产品型号满足[表5](#asc_mmad_mx_param_table_960)、[表6](#asc_mmad_mx_param_table_950)中的对齐要求。操作数的其他地址约束请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
   - 不显式配置Scale矩阵起始地址时，ScaleA矩阵在L0A_MX Buffer中的起始地址为`a_matrix`起始地址除以16，ScaleB矩阵在L0B_MX Buffer中的起始地址为`b_matrix`起始地址除以16。搬入Scale矩阵时需使用与矩阵A和矩阵B匹配的目的地址。
   - `k`需为64的倍数。原始K不是64的倍数时，需将K向上补齐到64的倍数，并将补齐区域的矩阵A和矩阵B数据设置为0；传入接口的`k`、矩阵存储空间以及Scale矩阵的K维大小均需按照补齐后的K计算。
   - 矩阵存储空间的M、N维需分别向上补齐到16的倍数，`m`和`n`仍传入矩阵的有效M、N值。补齐部分为无效数据，不参与结果矩阵有效区域的计算。
