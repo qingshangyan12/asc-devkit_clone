@@ -18,6 +18,9 @@
 #ifndef IMPL_C_API_REG_BASE_IMPL_CUBE_COMPUTE_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_CUBE_COMPUTE_INTF_IMPL_H
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#include "impl/c_api/reg_base_impl/npu_arch_9201/cube_compute_intf_impl.h"
+#endif
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
 __aicore__ inline void asc_mmad_mx(

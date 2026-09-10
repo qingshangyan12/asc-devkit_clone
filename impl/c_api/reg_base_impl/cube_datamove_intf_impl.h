@@ -24,6 +24,10 @@
 #include "impl/c_api/reg_base_impl/npu_arch_3510/cube_datamove_intf_impl.h"
 #endif
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#include "impl/c_api/reg_base_impl/npu_arch_9201/cube_datamove_intf_impl.h"
+#endif
+
 constexpr uint8_t ASC_L13D_RPT_REPEAT_TIMES_SHIFT = 16;
 
 constexpr uint8_t ASC_L13D_RPT_DIRECTION_SHIFT = 24;
