@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_sub"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_sub.md"
+description: "该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求差操作，将结果写入目的操作数`dst`。"
+signature:
+  - prototype_id: "asc_sub__Rv<dtype>_v<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_arith.h"
+  - prototype_id: "asc_sub__v<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_arith.h"
+  - prototype_id: "asc_sub__Rvb_Rv<dtype>_v<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_arith.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_sub
 
 ## 产品支持情况
@@ -53,6 +75,24 @@ $$
 ## 函数原型
 
 ### 无借位输出减法
+```yaml
+api_signature:
+  prototype_id: "asc_sub__Rv<dtype>_v<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
 
 ```c
 // 通过引用参数输出结果（占位符形式）
@@ -60,6 +100,28 @@ __simd_callee__ inline void asc_sub(vector_<dtype>& dst,
                                     vector_<dtype> src0,
                                     vector_<dtype> src1,
                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_sub__v<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
+```c
 
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_sub(vector_<dtype> src0,
@@ -87,6 +149,17 @@ __simd_callee__ inline vector_float asc_sub(vector_float src0,
 ```
 
 ### 带借位输出减法（占位符形式）
+```yaml
+api_signature:
+  prototype_id: "asc_sub__Rvb_Rv<dtype>_v<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  dtype:
+    values:
+      - "int32_t"
+      - "uint32_t"
+```
 
 ```c
 __simd_callee__ inline void asc_sub(vector_bool& carry,

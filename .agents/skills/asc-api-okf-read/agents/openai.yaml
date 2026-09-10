@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ascend API OKF Reader"
+  short_description: "Read a known Ascend API from OKF first"
+  default_prompt: "Use $asc-api-okf-read to inspect the requested Ascend API."

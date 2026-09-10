@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: "asc_subc"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_subc.md"
+description: "该接口根据mask，对源操作数src0、src1及输入进位carry_src进行按元素求差操作，减法运算在硬件底层通过补码加法实现，将结果写入目的操作数dst，同时将每个元素的进位结果写入carry（存放进位标志的掩码寄存器）。"
+signature:
+  - prototype_id: "asc_subc__Rvb_Rv<dtype>_v<dtype>_v<dtype>_vb_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_arith.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_subc
 
 ## 产品支持情况
@@ -43,6 +57,17 @@ $$
 本接口仅在AIV上生效。
 
 ## 函数原型
+```yaml
+api_signature:
+  prototype_id: "asc_subc__Rvb_Rv<dtype>_v<dtype>_v<dtype>_vb_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  dtype:
+    values:
+      - "int32_t"
+      - "uint32_t"
+```
 
 ```cpp
 // 占位符形式

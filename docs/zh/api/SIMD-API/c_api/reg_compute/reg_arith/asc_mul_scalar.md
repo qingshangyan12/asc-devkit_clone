@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_mul_scalar"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_mul_scalar.md"
+description: "根据`mask`对源操作数`src`按元素与标量`value`相乘，得到计算结果。"
+signature:
+  - prototype_id: "asc_mul_scalar__v<dtype>_<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_arith.h"
+  - prototype_id: "asc_mul_scalar__Rv<dtype>_v<dtype>_<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_arith.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/muls"
+    archs: ["3510"]
+    override_id: "asc_mul_scalar__Rvf32_vf32_f32_vb"
+    file: "muls.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_mul_scalar
 
 ## 产品支持情况
@@ -35,12 +57,46 @@ dst_i = src_i \times value
 $$
 
 ## 函数原型
+```yaml
+api_signature:
+  prototype_id: "asc_mul_scalar__v<dtype>_<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  dtype:
+    values:
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
 
 ```c
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_mul_scalar(vector_<dtype> src,
                                                      <dtype> value,
                                                      vector_bool mask)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_mul_scalar__Rv<dtype>_v<dtype>_<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  dtype:
+    values:
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
+```c
 
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_mul_scalar(vector_<dtype>& dst,

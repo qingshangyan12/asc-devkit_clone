@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_add"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_add.md"
+description: "该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求和操作，将结果写入目的操作数`dst`。"
+signature:
+  - prototype_id: "asc_add__Rv<dtype>_v<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_arith.h"
+  - prototype_id: "asc_add__v<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_arith.h"
+  - prototype_id: "asc_add__Rvb_Rv<dtype>_v<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_arith.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_add
 
 ## 产品支持情况
@@ -53,6 +75,24 @@ $$
 ## 函数原型
 
 ### 无进位输出加法
+```yaml
+api_signature:
+  prototype_id: "asc_add__Rv<dtype>_v<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
 
 ```c
 // 通过引用参数输出结果（占位符形式）
@@ -60,6 +100,28 @@ __simd_callee__ inline void asc_add(vector_<dtype>& dst,
                                     vector_<dtype> src0,
                                     vector_<dtype> src1,
                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_add__v<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
+```c
 
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_add(vector_<dtype> src0,
@@ -87,6 +149,17 @@ __simd_callee__ inline vector_float asc_add(vector_float src0,
 ```
 
 ### 带进位输出加法
+```yaml
+api_signature:
+  prototype_id: "asc_add__Rvb_Rv<dtype>_v<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  dtype:
+    values:
+      - "int32_t"
+      - "uint32_t"
+```
 
 ```c
 __simd_callee__ inline void asc_add(vector_bool& carry,

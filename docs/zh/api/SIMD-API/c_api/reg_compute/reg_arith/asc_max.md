@@ -1,3 +1,21 @@
+---
+okftype: reference.api.cpp
+title: "asc_max"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_max.md"
+description: "该接口根据mask，对源操作数src0、src1进行按元素求最大值操作，将结果写入目的操作数dst。"
+signature:
+  - prototype_id: "asc_max__Rv<dtype>_v<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_arith.h"
+  - prototype_id: "asc_max__v<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_arith.h"
+examples: []
+timestamp: "2026-09-10"
+---
+
 # asc_max
 
 ## 产品支持情况
@@ -37,6 +55,24 @@ dst_i = max(src0_i, src1_i)
 $$
 
 ## 函数原型
+```yaml
+api_signature:
+  prototype_id: "asc_max__Rv<dtype>_v<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
 
 ```c
 // 通过引用参数输出结果（占位符形式）
@@ -44,6 +80,28 @@ __simd_callee__ inline void asc_max(vector_<dtype>& dst,
                                     vector_<dtype> src0,
                                     vector_<dtype> src1,
                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_max__v<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  dtype:
+    values:
+      - "int8_t"
+      - "uint8_t"
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "bfloat16_t"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
+```c
 
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_max(vector_<dtype> src0,

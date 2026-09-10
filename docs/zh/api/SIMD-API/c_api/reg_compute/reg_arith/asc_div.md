@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_div"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_div.md"
+description: "该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。"
+signature:
+  - prototype_id: "asc_div__Rv<dtype>_v<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_arith.h"
+  - prototype_id: "asc_div__v<dtype>_v<dtype>_vb"
+    archs: ["3510"]
+    headers:
+      - "/include/c_api/reg_compute/compute/reg_arith.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/div"
+    archs: ["3510"]
+    override_id: "asc_div__Rvf32_vf32_vf32_vb"
+    file: "div.asc"
+timestamp: "2026-09-10"
+---
+
 # asc_div
 
 ## 产品支持情况
@@ -37,6 +59,21 @@ dst_i = src0_i \div src1_i
 $$
 
 ## 函数原型
+```yaml
+api_signature:
+  prototype_id: "asc_div__Rv<dtype>_v<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  dtype:
+    values:
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
 
 ```c
 // 通过引用参数输出结果（占位符形式）
@@ -44,6 +81,25 @@ __simd_callee__ inline void asc_div(vector_<dtype>& dst,
                                     vector_<dtype> src0,
                                     vector_<dtype> src1,
                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  prototype_id: "asc_div__v<dtype>_v<dtype>_vb"
+  archs: ["3510"]
+  headers:
+    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  dtype:
+    values:
+      - "int16_t"
+      - "uint16_t"
+      - "half"
+      - "int32_t"
+      - "uint32_t"
+      - "float"
+```
+
+```c
 
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_div(vector_<dtype> src0,
