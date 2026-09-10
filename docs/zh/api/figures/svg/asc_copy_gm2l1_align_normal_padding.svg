@@ -2,9 +2,9 @@
   <title id="title">Normal padding layout</title>
   <desc id="desc">Three 48-byte data bursts each followed by 16 bytes of padding. The destination stride is 64 bytes.</desc>
   <style>
-    .title { font: 20px 'FZLanTingHeiS', 'Huawei Sans', sans-serif; fill: #000000; }
-    .label { font: 16px 'FZLanTingHeiS', 'Huawei Sans', sans-serif; fill: #000000; }
-    .small { font: 14px 'FZLanTingHeiS', 'Huawei Sans', sans-serif; fill: #000000; }
+    .title { font: 20px 'FZLanTingHeiS'; fill: #000000; }
+    .label { font: 16px 'FZLanTingHeiS'; fill: #000000; }
+    .small { font: 14px 'FZLanTingHeiS'; fill: #000000; }
     .data { fill: #C2D5FE; stroke: #686D75; stroke-width: 0.75; }
     .pad { fill: #FEE2BA; stroke: #686D75; stroke-width: 0.75; }
     .line { stroke: #686D75; stroke-width: 0.75; }
@@ -19,11 +19,11 @@
   <rect x="540" y="105" width="180" height="60" class="data"/>
   <rect x="720" y="105" width="60" height="60" class="pad"/>
   <text x="100" y="143" class="label">Data 48B</text>
-  <text x="249" y="143" class="small">Pad 16B</text>
+  <text x="270" y="143" class="small" text-anchor="middle">Pad 16B</text>
   <text x="340" y="143" class="label">Data 48B</text>
-  <text x="489" y="143" class="small">Pad 16B</text>
+  <text x="510" y="143" class="small" text-anchor="middle">Pad 16B</text>
   <text x="580" y="143" class="label">Data 48B</text>
-  <text x="729" y="143" class="small">Pad 16B</text>
+  <text x="750" y="143" class="small" text-anchor="middle">Pad 16B</text>
   <text x="60" y="192" class="small">0B</text>
   <text x="300" y="192" class="small">64B</text>
   <text x="540" y="192" class="small">128B</text>
