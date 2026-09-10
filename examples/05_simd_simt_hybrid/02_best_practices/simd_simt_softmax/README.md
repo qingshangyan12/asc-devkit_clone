@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例以按行计算的softmax为例，采用SIMD与SIMT混合编程对softmax算子进行优化，覆盖最后一维不超过512的场景：核函数内的MTE流水负责GM与UB之间的数据搬运，SIMT VF负责行内计算，一个Warp处理一行，搬运与计算流水并行。为了展示逐步优化过程，本样例从SIMT直接读GM的基线出发，引入UB中转与MTE双缓冲，最后收敛为编译期bucket方案：按cols上界（64/128/256/384/512）生成模板kernel，使整行中间值以定长数组的形式驻留寄存器，Host侧按shape动态选择线程数，呈现SIMD与SIMT混合softmax的调优路径。
+本样例以softmax为例，介绍SIMD与SIMT混合编程场景下行内归约算子的调优方法，依次使用三种优化手段：SIMT VF直接读GM建立基线、MTE搬入UB中转并配合双缓冲使搬运与计算流水重叠、编译期bucket模板使整行中间值驻留寄存器。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -16,6 +16,8 @@
 ├── simd_simt_softmax
 │   ├── CMakeLists.txt                  // 编译工程文件
 │   ├── data_utils.h                    // Host侧bin文件读写工具
+│   ├── figures
+│   │   └── bucket_ub_layout.svg        // Case 2 bucket分桶与UB布局示意图
 │   ├── scripts
 │   │   ├── gen_data.py                 // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py            // 真值对比脚本
@@ -35,6 +37,12 @@
   y_{i,j} = \frac{\exp(x_{i,j} - \max_{k}{x_{i,k}})}{\sum_{k}\exp(x_{i,k} - \max_{k}{x_{i,k}})}
   $$
 
+  其中，$x_{i,j}$ 为输入第 $i$ 行第 $j$ 列的元素，$y_{i,j}$ 为对应的输出；$\max_{k}{x_{i,k}}$ 表示取第 $i$ 行所有列元素的最大值（$k$ 遍历该行全部列），$\sum_{k}$ 表示对第 $i$ 行所有列求和。
+
+- 计算规则：
+
+  softmax按行独立计算，行与行之间互不依赖。对每一行：先求行内最大值，再将行内每个元素减去该最大值后做指数运算（避免溢出），并对指数结果按行求和，最后用每个指数值除以该行和，得到归一化输出。实现中一个Warp负责一行，Warp内32个线程分摊行内不同列的数据，行内最大值与求和通过Warp归约原语完成。
+
 - 样例规格：
 
   <table>
@@ -42,7 +50,7 @@
   <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">input</td><td align="center">[8192, 197]</td><td align="center">float16</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">output</td><td align="center">[8192, 197]</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center"><code>softmax_gm_kernel</code> / <code>softmax_ub_kernel</code> / <code>softmax_bucket_kernel</code></td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">softmax_gm_kernel / softmax_ub_kernel / softmax_bucket_kernel</td></tr>
   </table>
 
   > **输入约束：** 样例默认shape为[8192, 197]；支持通过运行参数指定自定义shape，cols取值范围为1~512。
@@ -55,11 +63,11 @@
 
 | Case | 核函数                              | 线程块数量         | 每个线程块的线程数                        | 本步引入的变化                                                       |
 | ---- | ----------------------------------- | ------------------ | ----------------------------------------- | -------------------------------------------------------------------- |
-| 0    | `softmax_gm_kernel`   | 根据数据量动态计算 | `32 × warps_per_block`，随rows自适应，最多2048 | SIMT VF直接读GM，一个Warp处理一行，Warp规约完成行内max和sum          |
-| 1    | `softmax_ub_kernel` | 根据数据量动态计算 | `32 × rows_per_tile`，随rows和UB容量自适应，最多2048 | 输入经MTE搬入UB中转，双份tile缓冲区轮换，搬运与计算重叠              |
-| 2    | `softmax_bucket_kernel` | 根据数据量动态计算 | 512/1024/2048（按shape动态选择） | 编译期bucket使中间值以定长数组驻留寄存器；UB按bucket宽度padding |
+| 0    | softmax_gm_kernel   | 根据数据量动态计算 | 32 × warps_per_block，随rows自适应，最多2048 | SIMT VF直接读GM，一个Warp处理一行，Warp归约完成行内max和sum          |
+| 1    | softmax_ub_kernel | 根据数据量动态计算 | 32 × rows_per_tile，随rows和UB容量自适应，最多2048 | 输入经MTE搬入UB中转，双份tile缓冲区轮换，搬运与计算重叠              |
+| 2    | softmax_bucket_kernel | 根据数据量动态计算 | 512/1024/2048（按shape动态选择） | 编译期bucket使中间值以定长数组驻留寄存器；UB按bucket宽度padding |
 
-其中线程块数量在Host侧根据数据量动态计算：先通过 `aclrtGetDeviceInfo(ACL_DEV_ATTR_VECTOR_CORE_NUM)` 查询硬件AIV核数，再取AIV核数与rows的较小值作为线程块数量——一个Warp处理一行，rows不足AIV核数时多余的Thread Block无行可处理。三个Case通过编译选项 `SCENARIO_NUM` 选择，0、1、2分别对应Case 0、Case 1和Case 2，默认为2。
+其中线程块数量在Host侧根据数据量动态计算：先通过 `aclrtGetDeviceInfo(ACL_DEV_ATTR_VECTOR_CORE_NUM)` 查询硬件AIV核数，再取AIV核数与rows的较小值作为线程块数量。一个Warp处理一行：Case 0和Case 1中每个Thread Block实际启动的Warp数随rows自适应，rows不足AIV核数时每个Thread Block只处理一行，不存在空跑的Thread Block；Case 2中每个Thread Block按固定行数处理数据，rows较小时部分Thread Block无行可处理、直接退出。三个Case通过编译选项 `SCENARIO_NUM` 选择，0、1、2分别对应Case 0、Case 1和Case 2，默认为2。
 
 ### 性能指标说明
 
@@ -81,7 +89,7 @@
 
 **优化目标**：以最直接的实现建立功能正确性和性能基线：Warp直接从GM读取输入，完成行内max、exp/sum和归一化，不引入任何中间缓冲。
 
-**核心实现**：softmax的每一行内部是规约计算，行与行之间彼此独立。样例因此采用“一个Warp处理一行”的线程组织：Warp内32个线程分别负责同一行中不同列的数据，行内max/sum直接通过Warp规约原语 `asc_reduce_max`/`asc_reduce_add` 完成，不需要共享内存，也不需要跨Warp同步；一个Thread Block内的多个Warp各自处理不同的行。本样例覆盖的cols不超过512，Warp内每个线程按32列步进分轮处理，少量迭代即可覆盖整行，线程组织与数据形状天然对齐。核函数按动态计算的线程块数量启动Thread Block，`asc_vf_call` 以 `dim3(32, warps_per_block)` 启动SIMT VF，`warps_per_block` 随rows自适应，行方向按grid-stride循环覆盖全部行。行内softmax分三轮完成：第一轮从GM读取整行求最大值并用 `asc_reduce_max` 做Warp规约；第二轮重新读取GM计算 `__expf(x - max)` 并用 `asc_reduce_add` 求和；第三轮再次读取GM完成归一化写回。
+**核心实现**：softmax的每一行内部是归约计算，行与行之间彼此独立。样例因此采用“一个Warp处理一行”的线程组织：Warp内32个线程分别负责同一行中不同列的数据，行内max/sum直接通过Warp归约原语 `asc_reduce_max`/`asc_reduce_add` 完成，不需要共享内存，也不需要跨Warp同步；一个Thread Block内的多个Warp各自处理不同的行。本样例覆盖的cols不超过512，Warp内每个线程按32列步进分轮处理，少量迭代即可覆盖整行，线程组织与数据形状天然对齐。核函数按动态计算的线程块数量启动Thread Block，`asc_vf_call` 以 `dim3(32, warps_per_block)` 启动SIMT VF，`warps_per_block` 随rows自适应，行方向按grid-stride循环覆盖全部行。行内softmax分三轮完成：第一轮从GM读取整行求最大值并用 `asc_reduce_max` 做Warp归约；第二轮重新读取GM计算 `__expf(x - max)` 并用 `asc_reduce_add` 求和；第三轮再次读取GM完成归一化写回。
 
 ```cpp
 for (uint32_t row = blockIdx.x * warps_per_block + warp_in_block;
@@ -118,7 +126,7 @@ for (uint32_t row = blockIdx.x * warps_per_block + warp_in_block;
 
 **分析**：
 
-Case 0的 `aiv_mte2_time` 和 `aiv_mte3_time` 接近0，说明数据读写由SIMT线程直接访问GM完成，未经过MTE搬运路径；`aiv_vec_ratio` 达到0.829，耗时集中在SIMT线程的GM读写和行内计算上。从实现看，同一行输入在三轮循环中被重复读取三次，`exp` 被计算两次，且GM访问与计算串行在同一段SIMT线程内，无法与搬运流水重叠。下一步将数据搬运与计算拆开，由MTE把输入搬入UB中转。
+Case 0的 `aiv_vec_ratio` 达到0.829，耗时集中在SIMT线程的GM读写和行内计算上。从实现看，同一行输入在三轮循环中被重复读取三次，`exp` 被计算两次，且GM访问与计算串行在同一段SIMT线程内，无法与搬运流水重叠。下一步将数据搬运与计算拆开，由MTE把输入搬入UB中转。
 
 ---
 
@@ -155,17 +163,9 @@ for (uint32_t tile_idx = 0; tile_idx < tile_count; ++tile_idx) {
         __ubuf__ half* next_input_tile_ub = next_slot == 0 ? input_tile_ub0 : input_tile_ub1;
 
         asc_sync_wait(PIPE_V, PIPE_MTE2, next_event_id);
-        asc_copy_gm2ub_align(
-            next_input_tile_ub,
-            mutable_gm_ptr(input + next_row_base * cols),
-            static_cast<uint16_t>(next_rows_in_tile),
-            row_bytes,
-            0,
-            0,
-            false,
-            asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM,
-            row_bytes,
-            padded_row_bytes);
+        asc_copy_gm2ub_align(next_input_tile_ub, mutable_gm_ptr(input + next_row_base * cols),
+            static_cast<uint16_t>(next_rows_in_tile), row_bytes, 0, 0, false,
+            asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, row_bytes, padded_row_bytes);
         asc_sync_notify(PIPE_MTE2, PIPE_V, next_event_id);
     }
 
@@ -176,14 +176,8 @@ for (uint32_t tile_idx = 0; tile_idx < tile_count; ++tile_idx) {
 
     asc_sync_notify(PIPE_V, PIPE_MTE3, event_id);
     asc_sync_wait(PIPE_V, PIPE_MTE3, event_id);
-    asc_copy_ub2gm_align(
-        output + row_base * cols,
-        output_tile_ub,
-        static_cast<uint16_t>(rows_in_tile),
-        row_bytes,
-        asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM,
-        row_bytes,
-        padded_row_bytes);
+    asc_copy_ub2gm_align(output + row_base * cols, output_tile_ub, static_cast<uint16_t>(rows_in_tile),
+        row_bytes, asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, row_bytes, padded_row_bytes);
     asc_sync_notify(PIPE_MTE3, PIPE_V, event_id);
 }
 ```
@@ -204,13 +198,17 @@ Case 1把GM访问交给MTE流水并引入双缓冲，SIMT VF不再直接读GM：
 
 ### Case 2：编译期bucket与动态线程选择
 
-**优化目标**：针对Case 1中cols为运行时参数带来的“局部数组只能分配在栈空间、整行中间值无法驻留寄存器，输入行和 `exp` 被重复计算”的问题，将实现收敛为编译期bucket模板：按cols上界64/128/256/384/512生成特化kernel，使定长数组 `elements[kWarpIterations]` 驻留寄存器；Host侧按shape动态选择线程数。
+**优化目标**：消除Case 1行内计算对输入行的重复读取和对 `exp` 的重复计算。第一步先引入静态数组，把整行元素从UB缓存下来，一次读入完成max、exp/sum和归一化；第二步再设法让数组驻留寄存器，进一步降低访存开销。为此将实现收敛为编译期bucket模板：按cols上界64/128/256/384/512生成特化kernel，使定长数组 `elements[kWarpIterations]` 驻留寄存器；Host侧按shape动态选择线程数。
 
 **核心实现**：
 
-- bucket分类：`cols <= 64/128/256/384/512` 分别实例化 `softmax_bucket_kernel<kThreadCount, kBucketCols>`。`kBucketCols` 为编译期常量，`kWarpIterations = kBucketCols / 32` 可完全展开；尾部无效列用 `-ASCRT_INF_F` 屏蔽，不参与规约与归一化。
-- SIMT VF把整行元素读入定长数组 `elements[kWarpIterations]`，编译器将其暂存在寄存器中：一次读入后完成max规约、exp、sum规约和归一化写回，输入行只读一次，`exp` 只计算一次。
-- UB布局：tile缓冲区按bucket容量 `kBucketCols` 申请，MTE按运行时的真实cols搬运每行数据，真实元素之后的余量空置；SIMT VF在padded UB上计算，MTE3按真实cols将结果搬回GM。
+- 静态数组缓存整行：本样例一个线程单轮最多访问 kBucketCols/32（不超过16）个元素，行内数据量不大，适合直接在寄存器中完成计算。为此先引入静态数组 `elements[kWarpIterations]` 缓存整行元素，引导编译器将其分配到寄存器，而不是每轮循环重新读取UB输入行。
+- 编译期定长：cols是运行时参数，访问数组的循环边界和下标在编译期均无法确定，编译器不能把动态下标的数组映射到寄存器。将cols按上界划分为64/128/256/384/512五档bucket，按档位实例化 `softmax_bucket_kernel<kThreadCount, kBucketCols>` 模板：`kBucketCols` 为编译期常量，`kWarpIterations = kBucketCols / 32` 为定值，访问数组的循环可完全展开，`elements` 得以驻留寄存器；尾部无效列用 `-ASCRT_INF_F` 屏蔽，不参与归约与归一化。
+- 一轮读入完成全部计算：整行元素一次读入 `elements` 后，max归约、exp、sum归约和归一化写回全部在寄存器上完成，输入行只读一次，`exp` 只计算一次。
+- UB布局：tile缓冲区按bucket容量 `kBucketCols` 申请，MTE按运行时的真实cols搬运每行数据，真实元素之后的余量空置；SIMT VF在padded UB上计算，MTE3按真实cols将结果搬回GM。bucket分桶与UB布局如下图所示。
+
+  <img src="./figures/bucket_ub_layout.svg">
+
 - 输入/输出各两份UB缓冲区按tile轮换，配合事件机制管理缓冲区生命周期，使相邻tile的MTE2搬入、SIMT VF计算与MTE3搬出重叠。
 - 动态线程选择：Host按 `rows_per_core = ceil(rows / block_count)` 估算每核行数，`needed_threads = rows_per_core * 32`：不超过512选512线程，不超过1024选1024线程；超过1024且 `cols <= 256` 时选2048线程；`cols > 256` 时考虑寄存器压力，SIMT VF的 `__launch_bounds__` 配置为1024，最多启动1024个线程。一个Warp处理一行，512/1024/2048线程对应每个tile最多处理16/32/64行。
 
@@ -283,9 +281,9 @@ Case 2相对Case 1的主要变化是“运行时cols”变为“编译期bucket�
 
 ## 调优建议
 
-1. 行内规约类计算适合“一个Warp处理一行”的SIMT写法，行内max/sum用Warp规约完成，不需要跨Warp同步。
+1. 行内归约类计算适合“一个Warp处理一行”的SIMT写法，行内max/sum用Warp归约完成，不需要跨Warp同步。
 2. 先用最直接的实现建立基线，再把数据搬运与计算拆开：MTE负责GM与UB之间的搬运，SIMT VF只在UB上计算，配合双缓冲使搬运与计算流水并行。
-3. 规约维度较小时，把维度上界固化到编译期，定长数组的中间值可以驻留寄存器，避免重复读输入和重复计算。
+3. 归约维度较小时，把维度上界固化到编译期，定长数组的中间值可以驻留寄存器，避免重复读输入和重复计算。
 
 ## 编译运行
 
@@ -320,8 +318,8 @@ Case 2相对Case 1的主要变化是“运行时cols”变为“编译期bucket�
 
   | 选项                        | 可选值       | 说明                                                       |
   | --------------------------- | ------------ | ---------------------------------------------------------- |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构：本样例仅支持dav-3510（Ascend 950PR/Ascend 950DT） |
-  | `SCENARIO_NUM`            | `0`-`2`    | 样例类型，默认为2：0=SIMT直接读GM，1=UB中转与MTE双缓冲，2=编译期bucket |
+  | CMAKE_ASC_ARCHITECTURES | dav-3510 | NPU架构：本样例仅支持dav-3510（Ascend 950PR/Ascend 950DT） |
+  | SCENARIO_NUM            | 0-2    | 样例类型，默认为2：0=SIMT直接读GM，1=UB中转与MTE双缓冲，2=编译期bucket |
 
   执行结果如下，说明精度对比成功。
 
@@ -364,5 +362,3 @@ msopprof ./softmax
 # 查看Task Duration 以及各项数据
 cat ./OPPROF_*/PipeUtilization.csv
 ```
-
-更多 `msOpProf` 工具使用方法，请参见[MindStudio工具调优（msOpProf）快速入门](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/quick_start/msopprof_quick_start.md)。
