@@ -113,8 +113,10 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_BASIC_CASE_SRC_FILES
 set(ASCENDC_TEST_ascend950pr_9599_AIV_BASIC_PRINTF_CASE_FILE
     ascendc_case_ascend950pr_9599/ascendc_case_ascend950pr_9599_aiv_basic/test_operator_printf.cpp
 )
-# Keep target-level ASCENDC_DUMP=0; enable it only for this source file.
-set_source_files_properties(${ASCENDC_TEST_ascend950pr_9599_AIV_BASIC_PRINTF_CASE_FILE} PROPERTIES
+# Keep target-level ASCENDC_DUMP=0; enable it only for these debug test sources.
+set_source_files_properties(${ASCENDC_TEST_ascend950pr_9599_AIV_BASIC_PRINTF_CASE_FILE}
+    ascendc_case_ascend950pr_9599/ascendc_case_ascend950pr_9599_aiv_basic/test_operator_assert.cpp
+    PROPERTIES
     COMPILE_OPTIONS "-UASCENDC_DUMP;-DASCENDC_DUMP=1"
 )
 

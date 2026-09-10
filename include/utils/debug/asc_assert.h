@@ -31,10 +31,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __trap();
 } // namespace __asc_simt_vf
 #endif
 
-#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
-#if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if defined(ASCENDC_CPU_DEBUG) || \
+    (!defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__) && \
+     ((__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)))
 #include "impl/utils/debug/asc_aicore_assert_impl.h"
-#endif
 #endif
 
 #define ASC_INTERNAL_COUNT_ARGS_IMPL(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, N, ...) N
@@ -46,7 +46,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __trap();
 #ifndef ASCENDC_CPU_DEBUG
 #define ASC_INTERNAL_ASSERT_2(expr, fmt, ...) (static_cast<bool>(expr) ? void(0) : __assert_fail_msg(#expr, __FILE__, __LINE__, (__PRETTY_FUNCTION__), fmt, ##__VA_ARGS__))
 #else
-#define ASC_INTERNAL_ASSERT_2(expr, ...) ASC_INTERNAL_ASSERT_1(expr)
+#define ASC_INTERNAL_ASSERT_2(expr, fmt, ...) \
+    (static_cast<bool>(expr) ? void(0) : \
+        ::__asc_aicore::__assert_fail_msg(#expr, __FILE__, __LINE__, (__PRETTY_FUNCTION__), fmt, ##__VA_ARGS__))
 #endif
 
 #undef assert
