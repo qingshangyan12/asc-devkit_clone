@@ -26,7 +26,7 @@
 namespace ops {
 const std::set<std::string> VALID_SOC_SET = {
     "ascend310b", "ascend310p", "ascend610",    "ascend610lite", "ascend950",    "ascend350",   "ascend910_93",
-    "ascend910",  "ascend910b", "bs9sx1a",      "bs9sx2a",       "mc61am21a",    "mc62",        "ascend910_96",
+    "ascend910",  "ascend910b", "bs9sx1a",      "bs9sx2a",       "mc61am21a",    "mc62",        "ascend960dt",
     "kirinx90",   "kirin9030",  "kirindev0000", "kirindev0001",  "kirindev0002", "kirindev0003"};
 class CfgGenerator : public Generator {
 public:
