@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License).
+ * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
@@ -158,17 +158,9 @@ __global__ __vector__ void softmax_ub_kernel(
     const uint32_t first_rows_remaining = rows - first_row_base;
     const uint32_t first_rows_in_tile = first_rows_remaining < rows_per_tile ? first_rows_remaining : rows_per_tile;
     asc_sync_wait(PIPE_V, PIPE_MTE2, EVENT_ID0);
-    asc_copy_gm2ub_align(
-        input_tile_ub0,
-        mutable_gm_ptr(input + first_row_base * cols),
-        static_cast<uint16_t>(first_rows_in_tile),
-        row_bytes,
-        0,
-        0,
-        false,
-        asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM,
-        row_bytes,
-        padded_row_bytes);
+    asc_copy_gm2ub_align(input_tile_ub0, mutable_gm_ptr(input + first_row_base * cols),
+        static_cast<uint16_t>(first_rows_in_tile), row_bytes, 0, 0, false,
+        asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, row_bytes, padded_row_bytes);
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
 
     for (uint32_t tile_idx = 0; tile_idx < tile_count; ++tile_idx) {
@@ -191,17 +183,9 @@ __global__ __vector__ void softmax_ub_kernel(
             __ubuf__ half* next_input_tile_ub = next_slot == 0 ? input_tile_ub0 : input_tile_ub1;
 
             asc_sync_wait(PIPE_V, PIPE_MTE2, next_event_id);
-            asc_copy_gm2ub_align(
-                next_input_tile_ub,
-                mutable_gm_ptr(input + next_row_base * cols),
-                static_cast<uint16_t>(next_rows_in_tile),
-                row_bytes,
-                0,
-                0,
-                false,
-                asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM,
-                row_bytes,
-                padded_row_bytes);
+            asc_copy_gm2ub_align(next_input_tile_ub, mutable_gm_ptr(input + next_row_base * cols),
+                static_cast<uint16_t>(next_rows_in_tile), row_bytes, 0, 0, false,
+                asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, row_bytes, padded_row_bytes);
             asc_sync_notify(PIPE_MTE2, PIPE_V, next_event_id);
         }
 
@@ -212,14 +196,8 @@ __global__ __vector__ void softmax_ub_kernel(
 
         asc_sync_notify(PIPE_V, PIPE_MTE3, event_id);
         asc_sync_wait(PIPE_V, PIPE_MTE3, event_id);
-        asc_copy_ub2gm_align(
-            output + row_base * cols,
-            output_tile_ub,
-            static_cast<uint16_t>(rows_in_tile),
-            row_bytes,
-            asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM,
-            row_bytes,
-            padded_row_bytes);
+        asc_copy_ub2gm_align(output + row_base * cols, output_tile_ub, static_cast<uint16_t>(rows_in_tile),
+            row_bytes, asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, row_bytes, padded_row_bytes);
         asc_sync_notify(PIPE_MTE3, PIPE_V, event_id);
     }
 
