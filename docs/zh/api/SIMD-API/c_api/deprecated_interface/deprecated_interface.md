@@ -11,6 +11,20 @@
 - **[asc_abs_sync（废弃）](asc_abs_sync_deprecated.md)**
 - **[asc_transto5hd_sync（废弃）](asc_transto5hd_sync_deprecated.md)**
 
+## 矢量数据搬运
+
+- **[asc_copy_gm2ub_align_arch_3510（废弃）](asc_copy_gm2ub_align_arch_3510_deprecated.md)**
+- **[asc_copy_gm2ub_align_sync_arch_2201（废弃）](asc_copy_gm2ub_align_sync_arch_2201_deprecated.md)**
+- **[asc_copy_gm2ub_sync_arch_2201（废弃）](asc_copy_gm2ub_sync_arch_2201_deprecated.md)**
+- **[asc_copy_gm2ub_sync_arch_3510（废弃）](asc_copy_gm2ub_sync_arch_3510_deprecated.md)**
+- **[asc_copy_ub2gm_align_arch_3510（废弃）](asc_copy_ub2gm_align_arch_3510_deprecated.md)**
+- **[asc_copy_ub2gm_align_sync_arch_2201（废弃）](asc_copy_ub2gm_align_sync_arch_2201_deprecated.md)**
+- **[asc_copy_ub2gm_sync_arch_2201（废弃）](asc_copy_ub2gm_sync_arch_2201_deprecated.md)**
+- **[asc_copy_ub2gm_sync_arch_3510（废弃）](asc_copy_ub2gm_sync_arch_3510_deprecated.md)**
+- **[asc_copy_ub2l1_sync（废弃）](asc_copy_ub2l1_deprecated.md)**
+- **[asc_copy_ub2ub_sync（废弃）](asc_copy_ub2ub_deprecated.md)**
+- **[asc_ndim_copy_gm2ub（废弃）](asc_ndim_copy_gm2ub_deprecated.md)**
+
 ## Reg矢量计算
 
 ### 地址寄存器操作
