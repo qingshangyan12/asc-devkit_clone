@@ -108,17 +108,9 @@ __global__ __vector__ void softmax_bucket_kernel(
                                  sizeof(half));
 
         asc_sync_wait(PIPE_V, PIPE_MTE2, event_id);
-        asc_copy_gm2ub_align(
-            input_tile_ub[slot],
-            mutable_gm_ptr(input + row_base * cols),
-            static_cast<uint16_t>(rows_in_tile),
-            row_bytes,
-            0,
-            right_padding_elems,
-            true,
-            asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM,
-            row_bytes,
-            padded_row_bytes);
+        asc_copy_gm2ub_align(input_tile_ub[slot], mutable_gm_ptr(input + row_base * cols),
+            static_cast<uint16_t>(rows_in_tile), row_bytes, 0, right_padding_elems, true,
+            asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, row_bytes, padded_row_bytes);
         asc_sync_notify(PIPE_MTE2, PIPE_V, event_id);
 
         asc_sync_wait(PIPE_MTE2, PIPE_V, event_id);
@@ -129,14 +121,8 @@ __global__ __vector__ void softmax_bucket_kernel(
 
         asc_sync_notify(PIPE_V, PIPE_MTE3, event_id);
         asc_sync_wait(PIPE_V, PIPE_MTE3, event_id);
-        asc_copy_ub2gm_align(
-            output + row_base * cols,
-            output_tile_ub[slot],
-            static_cast<uint16_t>(rows_in_tile),
-            row_bytes,
-            asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM,
-            row_bytes,
-            padded_row_bytes);
+        asc_copy_ub2gm_align(output + row_base * cols, output_tile_ub[slot], static_cast<uint16_t>(rows_in_tile),
+            row_bytes, asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, row_bytes, padded_row_bytes);
         asc_sync_notify(PIPE_MTE3, PIPE_V, event_id);
     }
 
