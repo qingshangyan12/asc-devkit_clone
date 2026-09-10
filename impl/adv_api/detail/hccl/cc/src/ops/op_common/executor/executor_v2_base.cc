@@ -9,6 +9,7 @@
  */
 #include "executor_v2_base.h"
 #include "adapter_error_manager_pub.h"
+#include "selector/alg_parse.h"
 
 namespace mc2_ops_hccl {
 
@@ -31,12 +32,64 @@ HcclResult InsCollAlgBase::CalcAlgHierarchyInfoV2(
     return HCCL_SUCCESS;
 }
 
-AlgAttrs InsCollAlgBase::GetAlgoMeta(const std::string& algName) const
+AlgAttrs InsCollAlgBase::ParseAlgAttrsFromName(const std::string& algName)
 {
     AlgAttrs attrs;
     attrs.name = algName;
+
+    // 按算法名分段解析（对齐 hccl AlgAttrsRegistry::ParseAlgName）：引擎 → opType → executor ×2 → algoTypes 贪婪匹配。
+    // Bridge 场景下 CANN 侧 TopoMatchTwoLevel 依赖 algoTypes.size()==2 做两级分组，空 attrs 会导致 forced 校验失败。
+    std::string remaining = algName;
+    for (const auto& prefix : GetEnginePrefixes()) {
+        if (remaining.size() > prefix.size() && remaining.compare(0, prefix.size(), prefix) == 0) {
+            remaining = remaining.substr(prefix.size());
+            break;
+        }
+    }
+    for (const auto& pattern : GetOpTypePatterns()) {
+        const std::string& pascal = pattern.first;
+        if (remaining.size() >= pascal.size() && remaining.compare(0, pascal.size(), pascal) == 0) {
+            attrs.opType = pattern.second;
+            remaining = remaining.substr(pascal.size());
+            break;
+        }
+    }
+    for (int pass = 0; pass < 2; ++pass) {
+        bool found = false;
+        for (const auto& name : GetExecutorNames()) {
+            if (remaining.size() >= name.size() && remaining.compare(0, name.size(), name) == 0) {
+                remaining = remaining.substr(name.size());
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            break;
+        }
+    }
+    size_t pos = 0;
+    while (pos < remaining.size()) {
+        bool matched = false;
+        for (const auto& kv : GetAlgoNameToTypeMap()) {
+            if (remaining.compare(pos, kv.first.size(), kv.first) == 0) {
+                attrs.algoTypes.push_back(kv.second);
+                pos += kv.first.size();
+                matched = true;
+                break;
+            }
+        }
+        if (!matched) {
+            HCCL_WARNING(
+                "[InsCollAlgBase][ParseAlgAttrsFromName] skipped unmatched algoName=%s at pos=%zu, remaining='%s'.",
+                algName.c_str(), pos, remaining.c_str() + pos);
+            attrs.algoTypes.clear();
+            break;
+        }
+    }
     return attrs;
 }
+
+AlgAttrs InsCollAlgBase::GetAlgoMeta(const std::string& algName) const { return ParseAlgAttrsFromName(algName); }
 
 HcclResult InsCollAlgBase::RestoreChannelMap(
     const AlgResourceCtxSerializable& resCtx,

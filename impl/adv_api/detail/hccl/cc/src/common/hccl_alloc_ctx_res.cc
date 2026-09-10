@@ -653,6 +653,11 @@ HcclResult CheckForcedAlgResource(
         // Match HcclGetAlgRes: bridge executors need the selected algorithm's topology metadata.
         // opParam.algName is filled later, so use the explicit forced algorithm name here.
         AlgAttrs algAttrs = executor->GetAlgoMeta(algName);
+        if (algAttrs.algoTypes.empty()) {
+            // CANN 侧注册表可能无该算法条目（旧版本 libhccl.so），本地按算法名解析兜底，
+            // 保证 TopoMatchTwoLevel 拿到两级 algoTypes，避免 "invalid input" 拒绝。
+            algAttrs = InsCollAlgBase::ParseAlgAttrsFromName(algName);
+        }
         ret = executor->CalcAlgHierarchyInfoV2(topoInfo, algHierarchyInfo, algAttrs);
     } else {
         ret = executor->CalcAlgHierarchyInfo(comm, topoInfo, algHierarchyInfo);
