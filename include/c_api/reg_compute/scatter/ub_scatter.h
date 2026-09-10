@@ -50,6 +50,8 @@ __simd_callee__ inline void asc_scatter(__ubuf__ half* dst, vector_half src, vec
 
 __simd_callee__ inline void asc_scatter(__ubuf__ float* dst, vector_float src, vector_uint32_t index, vector_bool mask);
 
+// The 3510 inline definitions already carry these attributes and precede the interface declarations.
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 3510)
 ASC_DEPRECATED(
     9.1.0, "2027/09/07", asc_scatter(__ubuf__ int8_t* dst, vector_int8_t src, vector_uint16_t index, vector_bool mask))
 __simd_callee__ inline void asc_scatter(
@@ -99,6 +101,7 @@ ASC_DEPRECATED(
     9.1.0, "2027/09/07", asc_scatter(__ubuf__ float* dst, vector_float src, vector_uint32_t index, vector_bool mask))
 __simd_callee__ inline void asc_scatter(
     vector_float& src, __ubuf__ float* dst, vector_uint32_t index, vector_bool mask);
+#endif
 
 #endif
 
