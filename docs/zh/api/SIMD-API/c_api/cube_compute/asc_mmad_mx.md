@@ -2,27 +2,30 @@
 
 ## 产品支持情况
 
-<!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+<!-- npu="960" id1 -->
+- Ascend 960PR/Ascend 960DT：支持
 <!-- end id1 -->
-<!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- npu="950" id2 -->
+- Ascend 950PR/Ascend 950DT：支持
 <!-- end id2 -->
-<!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- npu="A3" id3 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
 <!-- end id3 -->
-<!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+<!-- npu="910b" id4 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
 <!-- end id4 -->
-<!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+<!-- npu="310b" id5 -->
+- Atlas 200I/500 A2 推理产品：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas 推理系列产品AI Core：不支持
 <!-- end id6 -->
-<!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+<!-- npu="310p" id7 -->
+- Atlas 推理系列产品Vector Core：不支持
 <!-- end id7 -->
+<!-- npu="910" id8 -->
+- Atlas 训练系列产品：不支持
+<!-- end id8 -->
 
 ## 功能说明
 
@@ -36,9 +39,27 @@ $$
 
 其中，$\otimes$表示广播乘法，矩阵A、B沿K维度每连续32个元素共享对应量化系数矩阵ScaleA、ScaleB中的一个量化系数。C矩阵可以通过配置本接口的参数，初始化为全0矩阵、L0C Buffer中的矩阵或Bias矩阵。
 
-本接口不单独传入Scale矩阵地址，而是根据A、B矩阵的起始地址，按照固定的地址映射关系从L0A_MX Buffer和L0B_MX Buffer读取对应的Scale矩阵。各矩阵的信息说明见下表：
+<!-- npu="960" id9 -->
+在Ascend 960PR/Ascend 960DT上，支持独立传入Scale矩阵地址。各矩阵的信息说明见下表：
 
 **表1** 矩阵信息说明
+
+| 矩阵 | 存储位置 | 形状（行数×列数） | 数据格式 | 分形大小（行数×列数） |
+| --- | --- | --- | --- | --- |
+| A | L0A Buffer | M×K | Nz | 16×K0_A |
+| ScaleA | L0A_MX Buffer | M×(K / 32) | Zz | 16×2 |
+| B | L0B Buffer | K×N | Zn | K0_B×16 |
+| ScaleB | L0B_MX Buffer | (K / 32)×N | Nn | 2×16 |
+| C | L0C Buffer | M×N | Nz | 16×16 |
+| Bias（用于C矩阵初始化） | BiasTable Buffer | 1×N，使用时通过广播复制M行来初始化C矩阵 | ND | - |
+
+表格中K0_A、K0_B的取值分别为`32B / sizeof(dtype_A)`、`32B / sizeof(dtype_B)`，`dtype_A`、`dtype_B`分别为A矩阵和B矩阵的数据类型。
+<!-- end id9 -->
+
+<!-- npu="950" id10 -->
+在Ascend 960PR/Ascend 950DT上不支持单独传入Scale矩阵地址，而是根据A、B矩阵的起始地址，按照固定的地址映射关系从L0A_MX Buffer和L0B_MX Buffer读取对应的Scale矩阵。各矩阵的信息说明见下表：
+
+**表2** 矩阵信息说明
 
 | 矩阵 | 存储位置 | 形状（行数×列数） | 数据格式 | 分形大小（行数×列数） |
 | --- | --- | --- | --- | --- |
@@ -50,10 +71,151 @@ $$
 | Bias（用于C矩阵初始化） | BiasTable Buffer | 1×N，使用时通过广播复制M行来初始化C矩阵 | ND | - |
 
 当矩阵数据类型为`fp8_e5m2_t`、`fp8_e4m3fn_t`时，`K0 = 32`；当矩阵数据类型为`fp4x2_e2m1_t`、`fp4x2_e1m2_t`时，`K0 = 64`。
+<!-- end id10 -->
 
 本接口为矩阵计算接口，仅在AIC上生效。
 
 ## 函数原型
+
+<!-- npu="960" id11 -->
+### 函数原型（[NPU架构版本9201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
+
+**占位符形式：**
+
+```c
+// 不显式传入Scale矩阵和Bias起始地址，根据A、B矩阵的起始地址，按照固定的地址映射关系从L0A_MX Buffer和L0B_MX Buffer读取对应的Scale矩阵，通过参数控制C矩阵初始化方式
+__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
+                                    __ca__ <a_dtype>* a_matrix,
+                                    __cb__ <b_dtype>* b_matrix,
+                                    uint16_t m,
+                                    uint16_t k,
+                                    uint16_t n,
+                                    asc_unit_flag_mode unit_flag_mode,
+                                    bool disable_gemv,
+                                    bool c_matrix_source,
+                                    bool c_matrix_init_val)
+
+// 显式传入Bias起始地址，根据A、B矩阵的起始地址，按照固定的地址映射关系从L0A_MX Buffer和L0B_MX Buffer读取对应的Scale矩阵
+__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
+                                    __ca__ <a_dtype>* a_matrix,
+                                    __cb__ <b_dtype>* b_matrix,
+                                    uint64_t bias,
+                                    uint16_t m,
+                                    uint16_t k,
+                                    uint16_t n,
+                                    asc_unit_flag_mode unit_flag_mode,
+                                    bool disable_gemv)
+
+// 显式传入Scale矩阵起始地址，通过参数控制C矩阵初始化方式
+__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
+                                    __ca__ <a_dtype>* a_matrix,
+                                    __ca__ <scale_a_dtype>* scale_a_matrix,
+                                    __cb__ <b_dtype>* b_matrix,
+                                    __cb__ <scale_b_dtype>* scale_b_matrix,
+                                    uint16_t m,
+                                    uint16_t k,
+                                    uint16_t n,
+                                    asc_unit_flag_mode unit_flag_mode,
+                                    bool disable_gemv,
+                                    bool c_matrix_source,
+                                    bool c_matrix_init_val)
+
+// 显式传入Scale矩阵起始地址和Bias起始地址，C矩阵使用Bias矩阵初始化
+__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
+                                    __ca__ <a_dtype>* a_matrix,
+                                    __ca__ <scale_a_dtype>* scale_a_matrix,
+                                    __cb__ <b_dtype>* b_matrix,
+                                    __cb__ <scale_b_dtype>* scale_b_matrix,
+                                    uint64_t bias,
+                                    uint16_t m,
+                                    uint16_t k,
+                                    uint16_t n,
+                                    asc_unit_flag_mode unit_flag_mode,
+                                    bool disable_gemv)
+```
+
+**dtype支持的数据类型：**
+
+`a_dtype`、`scale_a_dtype`、`b_dtype`、`scale_b_dtype`的取值组合见下表：
+
+**表3** 支持的数据类型组合<a id="asc_mmad_mx_data_type"></a>
+
+| a_dtype | scale_a_dtype | b_dtype | scale_b_dtype | 结果矩阵C数据类型 | Bias数据类型 |
+| --- | --- | --- | --- | --- | --- |
+| `fp4x2_e1m2_t` | `fp8_e8m0_t` | `fp4x2_e1m2_t` | `fp8_e8m0_t` | `float` | `float` |
+| `fp4x2_e1m2_t` | `fp8_e8m0_t` | `fp4x2_e2m1_t` | `fp8_e8m0_t` | `float` | `float` |
+| `fp4x2_e2m1_t` | `fp8_e8m0_t` | `fp4x2_e1m2_t` | `fp8_e8m0_t` | `float` | `float` |
+| `fp4x2_e2m1_t` | `fp8_e8m0_t` | `fp4x2_e2m1_t` | `fp8_e8m0_t` | `float` | `float` |
+| `fp8_e4m3fn_t` | `fp8_e8m0_t` | `fp8_e4m3fn_t` | `fp8_e8m0_t` | `float` | `float` |
+| `fp8_e4m3fn_t` | `fp8_e8m0_t` | `fp8_e5m2_t`   | `fp8_e8m0_t` | `float` | `float` |
+| `fp8_e5m2_t`   | `fp8_e8m0_t` | `fp8_e4m3fn_t` | `fp8_e8m0_t` | `float` | `float` |
+| `fp8_e5m2_t`   | `fp8_e8m0_t` | `fp8_e5m2_t`   | `fp8_e8m0_t` | `float` | `float` |
+| `hif4x2_t`     | `hif4_scale` | `hif4x2_t`     | `hif4_scale` | `float` | `float` |
+| `fp8_e4m3fn_t` | `fp8_e8m0_t` | `hif4x2_t`     | `hif4_scale` | `float` | `float` |
+| `fp8_e4m3fn_t` | `fp8_e8m0_t` | `fp4x2_e2m1_t` | `fp8_e8m0_t` | `float` | `float` |
+| `half`         | `fp8_e8m0_t` | `fp4x2_e2m1_t` | `fp8_e8m0_t` | `float` | `float` |
+| `half`         | `fp8_e8m0_t` | `hifloat4_t`   | `hif4_scale` | `float` | `float` |
+| `bfloat16_t`   | `fp8_e8m0_t` | `fp4x2_e2m1_t` | `fp8_e8m0_t` | `float` | `float` |
+| `bfloat16_t`   | `fp8_e8m0_t` | `hifloat4_t`   | `hif4_scale` | `float` | `float` |
+
+
+**典型示例：**
+
+```c
+// 不显式传入Scale矩阵和Bias起始地址，根据A、B矩阵的起始地址，按照固定的地址映射关系从L0A_MX Buffer和L0B_MX Buffer读取对应的Scale矩阵，通过参数控制C矩阵初始化方式
+__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
+                                    __ca__ fp4x2_e1m2_t* a_matrix,
+                                    __cb__ fp4x2_e1m2_t* b_matrix,
+                                    uint16_t m,
+                                    uint16_t k,
+                                    uint16_t n,
+                                    asc_unit_flag_mode unit_flag_mode,
+                                    bool disable_gemv,
+                                    bool c_matrix_source,
+                                    bool c_matrix_init_val)
+
+// 显式传入Bias起始地址，根据A、B矩阵的起始地址，按照固定的地址映射关系从L0A_MX Buffer和L0B_MX Buffer读取对应的Scale矩阵
+__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
+                                    __ca__ fp4x2_e1m2_t* a_matrix,
+                                    __cb__ fp4x2_e2m1_t* b_matrix,
+                                    uint64_t bias,
+                                    uint16_t m,
+                                    uint16_t k,
+                                    uint16_t n,
+                                    asc_unit_flag_mode unit_flag_mode,
+                                    bool disable_gemv)
+
+// 显式传入Scale矩阵起始地址，通过参数控制C矩阵初始化方式
+__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
+                                    __ca__ fp4x2_e1m2_t* a_matrix,
+                                    __ca__ fp8_e8m0_t* scale_a_matrix,
+                                    __cb__ fp4x2_e1m2_t* b_matrix,
+                                    __cb__ fp8_e8m0_t* scale_b_matrix,
+                                    uint16_t m,
+                                    uint16_t k,
+                                    uint16_t n,
+                                    asc_unit_flag_mode unit_flag_mode,
+                                    bool disable_gemv,
+                                    bool c_matrix_source,
+                                    bool c_matrix_init_val)
+
+// 显式传入Scale矩阵起始地址和Bias起始地址，C矩阵使用Bias矩阵初始化
+__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
+                                    __ca__ fp4x2_e1m2_t* a_matrix,
+                                    __ca__ fp8_e8m0_t* scale_a_matrix,
+                                    __cb__ fp4x2_e1m2_t* b_matrix,
+                                    __cb__ fp8_e8m0_t* scale_b_matrix,
+                                    uint64_t bias,
+                                    uint16_t m,
+                                    uint16_t k,
+                                    uint16_t n,
+                                    asc_unit_flag_mode unit_flag_mode,
+                                    bool disable_gemv)
+```
+<!-- end id11 -->
+
+<!-- npu="950" id12 -->
+### 函数原型（[NPU架构版本3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
 
 **占位符形式：**
 
@@ -86,7 +248,7 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
 
 `a_dtype`、`b_dtype`的取值组合见下表：
 
-**表2** 支持的数据类型组合<a id="asc_mmad_mx_data_type"></a>
+**表4** 支持的数据类型组合<a id="asc_mmad_mx_data_type"></a>
 
 | a_dtype | b_dtype | ScaleA/ScaleB数据类型 | 结果矩阵C数据类型 | Bias数据类型 |
 | --- | --- | --- | --- | --- |
@@ -125,10 +287,32 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
                                     asc_unit_flag_mode unit_flag_mode,
                                     bool disable_gemv)
 ```
+<!-- end id12 -->
 
 ## 参数说明
 
-**表3** 参数说明<a id="asc_mmad_mx_param_table"></a>
+<!-- npu="960" id13 -->
+**表5** 参数说明（[NPU架构版本9201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="asc_mmad_mx_param_table"></a>
+
+| 参数名 | 输入/输出 | 描述 |
+| --- | --- | --- |
+| c_matrix | 输出 | 目的操作数，结果矩阵C在L0C Buffer中的起始地址，数据类型为`float`，需按照1024字节对齐。 |
+| a_matrix | 输入 | 源操作数，左矩阵A在L0A Buffer中的起始地址。数据类型由接口重载决定，具体请参见[表2](#asc_mmad_mx_data_type)。<br>矩阵数据类型为`fp8_e5m2_t`、`fp8_e4m3fn_t`时需按照1024字节对齐，其余矩阵数据类型需按照512字节对齐。<br>不显式传入ScaleA矩阵地址时ScaleA矩阵在L0A_MX Buffer中的起始地址为`a_matrix`起始地址除以16。 |
+| scale_a_matrix | 输入 | ScaleA矩阵在L0A_MX Buffer中的起始地址，仅显式传入Scale矩阵起始地址的接口包含该参数。 |
+| b_matrix | 输入 | 源操作数，右矩阵B在L0B Buffer中的起始地址。数据类型由接口重载决定，具体请参见[表2](#asc_mmad_mx_data_type)。<br>矩阵数据类型为`fp8_e5m2_t`、`fp8_e4m3fn_t`时需按照1024字节对齐，其余矩阵数据类型需按照512字节对齐。<br>不显式传入ScaleB矩阵地址时ScaleB矩阵在L0B_MX Buffer中的起始地址为`b_matrix`起始地址除以16。 |
+| scale_b_matrix | 输入 | ScaleB矩阵在L0B_MX Buffer中的起始地址，仅显式传入Scale矩阵起始地址的接口包含该参数。 |
+| bias | 输入 | Bias矩阵在BiasTable Buffer中的起始地址，需按照64字节对齐，可以为非零地址，仅显式传入Bias起始地址的接口包含该参数。<br>Bias支持的数据类型为`float`，调用本接口前，需将Bias数据通过[asc_copy_l12bt](../cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md)接口搬运到该地址，Bias占用长度为`n * sizeof(float)`向上补齐到64字节。 |
+| m | 输入 | 左矩阵A和结果矩阵C的M维大小，单位为元素，取值范围为[0, 4095]。 |
+| k | 输入 | 左矩阵A和右矩阵B的K维大小，单位为元素，取值范围为[0, 4095]，并且需为64的倍数。 |
+| n | 输入 | 右矩阵B和结果矩阵C的N维大小，单位为元素，取值范围为[0, 4095]。 |
+| unit_flag_mode | 输入 | 用于控制矩阵乘加指令与矩阵搬出指令的细粒度并行，开启UnitFlag后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：<br>&nbsp;&nbsp;&bull; `asc_unit_flag_mode::DISABLE`：不开启UnitFlag。<br>&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_KEEP`：开启UnitFlag，硬件执行完指令后不改变单元标志位。<br>&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_UPDATE`：开启UnitFlag，硬件执行完指令后改变单元标志位。<br>矩阵乘加指令与对应的矩阵搬出指令必须都开启或都不开启UnitFlag，开启后指令之间无需再插入同步指令。 |
+| disable_gemv | 输入 | M为1时，配置是否关闭GEMV模式。<br>&nbsp;&nbsp;&bull; false：开启GEMV模式。<br>&nbsp;&nbsp;&bull; true：关闭GEMV模式。<br>M不为1时，该参数不生效。 |
+| c_matrix_source | 输入 | 仅不显式传入Bias起始地址的重载包含该参数。当参数`c_matrix_init_val`为false时，配置矩阵C的初始值来源。<br>&nbsp;&nbsp;&bull; false：矩阵C的初始值来源于L0C Buffer。<br>&nbsp;&nbsp;&bull; true：矩阵C的初始值来源于BiasTable Buffer，并固定从0地址开始读取。 |
+| c_matrix_init_val | 输入 | 仅不显式传入Bias起始地址的重载包含该参数。配置是否将矩阵C的初始值设置为0。<br>&nbsp;&nbsp;&bull; true：将矩阵C的初始值设置为0，参数`c_matrix_source`不生效。<br>&nbsp;&nbsp;&bull; false：不执行清零操作，矩阵C的初始值由参数`c_matrix_source`配置。 |
+<!-- end id13 -->
+
+<!-- npu="950" id14 -->
+**表6** 参数说明（[NPU架构版本3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="asc_mmad_mx_param_table"></a>
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -143,6 +327,7 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
 | disable_gemv | 输入 | M为1时，配置是否关闭GEMV模式。<br>&nbsp;&nbsp;&bull; false：开启GEMV模式。<br>&nbsp;&nbsp;&bull; true：关闭GEMV模式。<br>M不为1时，该参数不生效。 |
 | c_matrix_source | 输入 | 仅不显式传入Bias起始地址的重载包含该参数。当参数`c_matrix_init_val`为false时，配置矩阵C的初始值来源。<br>&nbsp;&nbsp;&bull; false：矩阵C的初始值来源于L0C Buffer。<br>&nbsp;&nbsp;&bull; true：矩阵C的初始值来源于BiasTable Buffer，并固定从0地址开始读取。 |
 | c_matrix_init_val | 输入 | 仅不显式传入Bias起始地址的重载包含该参数。配置是否将矩阵C的初始值设置为0。<br>&nbsp;&nbsp;&bull; true：将矩阵C的初始值设置为0，参数`c_matrix_source`不生效。<br>&nbsp;&nbsp;&bull; false：不执行清零操作，矩阵C的初始值由参数`c_matrix_source`配置。 |
+<!-- end id14 -->
 
 ## 返回值说明
 
@@ -156,13 +341,17 @@ PIPE_M
 
 - 本接口仅在AIC上生效，在AIV上调用将直接返回。
 - `m`、`k`、`n`中的任意一个值为0时，接口将被视为NOP（空操作）。
-- 调用本接口前，需通过[asc_copy_l12l0a_mx](../cube_datamove/asc_copy_l12l0a_mx.md)和[asc_copy_l12l0b_mx](../cube_datamove/asc_copy_l12l0b_mx.md)等接口，将ScaleA和ScaleB矩阵分别搬入L0A_MX Buffer和L0B_MX Buffer。ScaleA和ScaleB矩阵的数据类型必须为`fp8_e8m0_t`，K方向上每个Scale元素对应32个输入矩阵元素。
+- 调用本接口前，需通过[asc_copy_l12l0a_mx](../cube_datamove/asc_copy_l12l0a_mx.md)和[asc_copy_l12l0b_mx](../cube_datamove/asc_copy_l12l0b_mx.md)等接口，将ScaleA和ScaleB矩阵分别搬入L0A_MX Buffer和L0B_MX Buffer。ScaleA和ScaleB矩阵的数据类型根据对应矩阵数据类型为`fp8_e8m0_t`或`hifloat4_t`，K方向上每个Scale元素对应32个输入矩阵元素。
 
 - 内存使用约束说明：
-
-  - L0C Buffer大小为256KB，L0A Buffer和L0B Buffer大小均为64KB，L0A_MX Buffer和L0B_MX Buffer大小均为4KB，BiasTable Buffer大小为4KB。矩阵的起始地址和占用空间不能超出对应Buffer的范围。
+  <!-- npu="960" id15 -->
+  - 针对Ascend 960PR/Ascend 960DT，L0C Buffer大小为256KB，L0A Buffer和L0B Buffer大小均为64KB，L0A_MX Buffer和L0B_MX Buffer大小均为8KB，BiasTable Buffer大小为4KB。矩阵的起始地址和占用空间不能超出对应Buffer的范围。
+  <!-- end id15 -->
+  <!-- npu="960" id16 -->
+  - 针对Ascend 950PR/Ascend 950DT，L0C Buffer大小为256KB，L0A Buffer和L0B Buffer大小均为64KB，L0A_MX Buffer和L0B_MX Buffer大小均为4KB，BiasTable Buffer大小为4KB。矩阵的起始地址和占用空间不能超出对应Buffer的范围。
+  <!-- end id16 -->
   - 各矩阵的起始地址需满足[表3](#asc_mmad_mx_param_table)中的对齐要求。操作数的其他地址约束请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
-  - ScaleA矩阵在L0A_MX Buffer中的起始地址为`a_matrix`起始地址除以16，ScaleB矩阵在L0B_MX Buffer中的起始地址为`b_matrix`起始地址除以16。搬入Scale矩阵时需使用与矩阵A和矩阵B匹配的目的地址。
+  - 不显式配置Scale矩阵起始地址时，ScaleA矩阵在L0A_MX Buffer中的起始地址为`a_matrix`起始地址除以16，ScaleB矩阵在L0B_MX Buffer中的起始地址为`b_matrix`起始地址除以16。搬入Scale矩阵时需使用与矩阵A和矩阵B匹配的目的地址。
   - `k`需为64的倍数。原始K不是64的倍数时，需将K向上补齐到64的倍数，并将补齐区域的矩阵A和矩阵B数据设置为0；传入接口的`k`、矩阵存储空间以及Scale矩阵的K维大小均需按照补齐后的K计算。
   - 矩阵存储空间的M、N维需分别向上补齐到16的倍数，`m`和`n`仍传入矩阵的有效M、N值。补齐部分为无效数据，不参与结果矩阵有效区域的计算。
   - Scale矩阵需覆盖本次矩阵乘加所需的全部数据。ScaleA的M维需向上补齐到16的倍数，K维大小为K / 32；ScaleB的K维大小为K / 32，N维需向上补齐到16的倍数。对应的起始地址与占用空间不能超出MX Buffer的范围。
@@ -189,6 +378,7 @@ PIPE_M
 
   边界值计算结果请见[MmadMx接口边界值汇总](../../../appendix/mmad_mx_interface_boundary_value_summary.md)。
 
+<!-- npu="950" id17 -->
 ## 调用示例
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
@@ -356,3 +546,4 @@ int main()
 ```
 
 更多场景使用样例请参考[asc_mmad_mx样例](../../../../../../examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad_mx)。
+<!-- end id17 -->
