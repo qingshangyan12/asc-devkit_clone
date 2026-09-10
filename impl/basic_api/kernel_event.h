@@ -668,7 +668,7 @@ __aicore__ constexpr HardEvent GetQueEvt(
     }
 #elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103))
     } else if (src == Hardware::L0C) {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103))
         ASSERT(dst == Hardware::GM || dst == Hardware::UB || dst == Hardware::L1);
         return fwdDirect ? HardEvent::M_FIX : HardEvent::FIX_M;
 #else
