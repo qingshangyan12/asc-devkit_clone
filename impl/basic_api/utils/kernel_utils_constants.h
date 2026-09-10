@@ -737,8 +737,23 @@ struct GetDstType<mx_fp8_e8m0_t> {
 };
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
-template <typename T>
-struct GetDstType<T> {
+template <>
+struct GetDstType<half> {
+    using Type = int32_t;
+};
+
+template <>
+struct GetDstType<int4b_t> {
+    using Type = int32_t;
+};
+
+template <>
+struct GetDstType<int8_t> {
+    using Type = int32_t;
+};
+
+template <>
+struct GetDstType<int16_t> {
     using Type = int32_t;
 };
 #endif
