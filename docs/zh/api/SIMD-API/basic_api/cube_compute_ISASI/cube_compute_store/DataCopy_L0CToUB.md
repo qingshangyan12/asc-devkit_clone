@@ -139,6 +139,8 @@
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
+- deqScale为DEQ、DEQ8或DEQ16时，deqValue中的量化参数部分的值不支持设置为INF或NAN。
+- deqScale为VDEQ、VDEQ8或VDEQ16时，deqTensorAddr指向的反量化参数向量中，每个元素的量化参数部分的值不支持设置为INF或NAN。
 - 开发者需要保证DataCopyEnhancedParams中的isRelu参数配置和量化系数deqValue/量化参数向量deqTensorAddr的ReLU标志位配置一致：都开启或都不开启。
 - 如果有随路精度转换，操作数的blockLen单位需要减半。
 
