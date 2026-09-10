@@ -14,10 +14,10 @@
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
 
-#ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_9201_CUBE_DATAMOVE_IMPL_ASC_COPY_GM2L1_ALIGN_IMPL_H
-#define IMPL_C_API_INSTR_IMPL_NPU_ARCH_9201_CUBE_DATAMOVE_IMPL_ASC_COPY_GM2L1_ALIGN_IMPL_H
+#ifndef IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_9201_ASC_COPY_GM2L1_ALIGN_IMPL_H
+#define IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_9201_ASC_COPY_GM2L1_ALIGN_IMPL_H
 
-#include "impl/c_api/instr_impl/npu_arch_9201/utils_impl/utils_impl.h"
+#include "impl/c_api/reg_base_impl/npu_arch_9201/utils_impl.h"
 
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count,
