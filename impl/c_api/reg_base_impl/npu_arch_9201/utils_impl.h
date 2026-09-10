@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -14,12 +14,15 @@
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
 
-#ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_9201_UTILS_IMPL_H
-#define IMPL_C_API_INSTR_IMPL_NPU_ARCH_9201_UTILS_IMPL_H
+#ifndef IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_9201_UTILS_IMPL_H
+#define IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_9201_UTILS_IMPL_H
 
 #include "c_api/defs/enum.h"
 #include "c_api/defs/type.h"
-#include "impl/c_api/instr_impl/npu_arch_9201/utils_impl/utils_impl.h"
+#include "utils/base/sys_constants.h"
+
+#define ASC_IS_AIV ASCEND_IS_AIV
+#define ASC_IS_AIC ASCEND_IS_AIC
 
 #endif
 
