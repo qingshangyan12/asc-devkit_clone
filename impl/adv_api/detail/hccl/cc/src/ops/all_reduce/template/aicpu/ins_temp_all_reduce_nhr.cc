@@ -298,7 +298,7 @@ HcclResult InsTempAllReduceNHR::RunReduceScatter(
                 HcclResult::HCCL_E_INTERNAL);
         } else {
             CHK_PRT_RET(
-                SendRecvBatchWriteReduce(sendRecvReduceInfo, threads.at(channelIdx)),
+                SendRecvBatchWriteReduce(sendRecvReduceInfo, threads.at(channelIdx), true),
                 HCCL_ERROR("[InsTempAllReduceNHR] RunReduceScatter SendRecvReduce failed"),
                 HcclResult::HCCL_E_INTERNAL);
         }
