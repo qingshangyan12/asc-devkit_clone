@@ -86,6 +86,7 @@ PIPE_FIX
 
 ## 约束说明
 
+- quant_pre选择Scalar或Tensor量化模式时，所使用的量化参数中的浮点系数不支持设置为INF或NAN。
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
 - 如果需要执行多条asc_copy_l0c2l1指令，且asc_copy_l0c2l1指令的目的地址存在重叠，需要插入同步指令，保证多个asc_copy_l0c2l1指令的串行化，防止出现异常数据。
 

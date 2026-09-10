@@ -18,6 +18,8 @@
 
 ## 概述
 
+量化参数的值不支持设置为INF或NAN，该约束同时适用于Scalar量化模式和Tensor/Vector量化模式。下文的边界值说明针对L0C Buffer中的待搬出数据及其输出结果。
+
 三个搬运指令分别将L0C Buffer中的矩阵计算结果搬运到GM、L1 Buffer和UB，在搬运过程中支持随路量化，将L0C Buffer中的float或int32_t数据转换为目标数据类型输出。随路量化的inf/nan处理行为在三个搬运指令间完全一致，通过基础API [SetCtrlSpr](../SIMD-API/basic_api/special_register_access/SetCtrlSpr_ISASI.md) 或 C API [asc_set_ctrl](../SIMD-API/c_api/spr/asc_set_ctrl.md) 设置CTRL[48]比特位控制饱和模式：
 
 - **饱和模式（CTRL[48]=1'b0）**：inf输出会被饱和为±MAX，nan输出会被饱和为0。
