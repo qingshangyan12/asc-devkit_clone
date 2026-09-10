@@ -124,14 +124,49 @@ SelectorStatus ReduceScatterAutoSelector::SelectCcuScheduleAlgo(
         HCCL_WARNING("[ReduceScatterAutoSelector] KFC ReduceScatter does not support INT64, UINT64 or FP64.");
         return SelectorStatus::NOT_MATCH;
     }
-    if (topoInfo->topoLevelNums != 1 || topoInfo->level0Topo != Level0Shape::MESH_1D ||
-        topoInfo->level0MeshType != Level0MeshType::SINGLE_DIE) {
+    if (topoInfo->topoLevelNums != 1) {
+        HCCL_WARNING("[ReduceScatterAutoSelector] unsupported KFC topology, levelNum[%u].", topoInfo->topoLevelNums);
+        return SelectorStatus::NOT_MATCH;
+    }
+    if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS) {
+        return SelectCcuScheduleUBXAlgo(topoInfo, opParam, selectAlgName);
+    }
+    if (topoInfo->level0Topo != Level0Shape::MESH_1D || topoInfo->level0MeshType != Level0MeshType::SINGLE_DIE) {
         HCCL_WARNING(
             "[ReduceScatterAutoSelector] unsupported KFC topology, levelNum[%u], level0Topo[%d], meshType[%d].",
             topoInfo->topoLevelNums, topoInfo->level0Topo, topoInfo->level0MeshType);
         return SelectorStatus::NOT_MATCH;
     }
     return SelectMeshAlgoCcuSchedule(topoInfo, opParam, selectAlgName);
+}
+
+// UBX（MESH_1D_CLOS）机型：与 hccl SelectMeshAlgoCcuSchedule 的 UBX 分支对齐——
+// 同一组 4P（meshNum==closNum 且 rankSize<=4）+ 非小数据走 Mesh+NHR 并发算法；
+// 其余 UBX 场景（矩形 Parallel/PipeLine、SoleNHRMultiLink）未迁移，返回 NOT_MATCH。
+SelectorStatus ReduceScatterAutoSelector::SelectCcuScheduleUBXAlgo(
+    const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam, std::string& selectAlgName) const
+{
+    if (topoInfo->level0PcieMix) {
+        HCCL_WARNING("[ReduceScatterAutoSelector] pcie mixed topo is not supported yet for ccu sched mode.");
+        return SelectorStatus::NOT_MATCH;
+    }
+    u64 perDataSize = DATATYPE_SIZE_TABLE[opParam.DataDes.dataType];
+    u64 dataSize = opParam.DataDes.count * perDataSize;
+    bool isMeshNumEqualToClosNum = false;
+    CHK_PRT_RET(
+        CheckMeshNumEqualToClosNum(topoInfo, isMeshNumEqualToClosNum) != HCCL_SUCCESS,
+        HCCL_DEBUG("[ReduceScatterAutoSelector] CheckMeshNumEqualToClosNum failed."), SelectorStatus::NOT_MATCH);
+    if (isMeshNumEqualToClosNum && topoInfo->userRankSize <= MAX_RANK_NUM_FOR_CONCURRENT_ALGO &&
+        !IsSmallData(dataSize)) {
+        selectAlgName = "CcuSchedReduceScatterConcurMeshNHRMultiLink";
+        HCCL_INFO("[ReduceScatterAutoSelector][%s] UBX concurrent Algo match [%s]", __func__, selectAlgName.c_str());
+        return SelectorStatus::MATCH;
+    }
+    HCCL_INFO(
+        "[ReduceScatterAutoSelector][%s] UBX topo fallthrough, meshEqualsClos[%d], rankSize[%u], dataSize[%llu]",
+        __func__, static_cast<int>(isMeshNumEqualToClosNum), topoInfo->userRankSize,
+        static_cast<unsigned long long>(dataSize));
+    return SelectorStatus::NOT_MATCH;
 }
 
 SelectorStatus ReduceScatterAutoSelector::SelectMeshAlgoCcuSchedule(
