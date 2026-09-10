@@ -147,7 +147,7 @@ template <typename T>
 class LocalTensor : public BaseLocalTensor<T>, public BaseTensorTraitTensor<T> {
 public:
     using PrimType = PrimT<T>;
-    __aicore__ inline LocalTensor<T>(){};
+    __aicore__ inline constexpr LocalTensor<T>(){};
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     ~LocalTensor();
     explicit LocalTensor<T>(TBuffAddr& address);
@@ -186,10 +186,10 @@ public:
                  "Please do not use it!")]] __aicore__ inline void
     SetAddrWithOffset(LocalTensor<S>& src, uint32_t offset);
 #endif
-    __aicore__ inline LocalTensor<T>(TPosition pos, uint32_t addr, uint32_t tileSize);
+    __aicore__ inline constexpr LocalTensor<T>(TPosition pos, uint32_t addr, uint32_t tileSize);
     template <typename U>
-    __aicore__ inline LocalTensor<T>(uint32_t addr, const U& layout);
-    __aicore__ inline LocalTensor<T>(uint32_t addr);
+    __aicore__ inline constexpr LocalTensor<T>(uint32_t addr, const U& layout);
+    __aicore__ inline constexpr LocalTensor<T>(uint32_t addr);
     __aicore__ inline int32_t GetPosition() const;
     __aicore__ inline void SetSize(const uint32_t size);
     __aicore__ inline uint32_t GetSize() const;
@@ -240,7 +240,7 @@ public:
 
 private:
     template <typename S>
-    __aicore__ inline void CreateTensor(TPosition pos, uint32_t addr, uint32_t tileSize);
+    __aicore__ inline constexpr void CreateTensor(TPosition pos, uint32_t addr, uint32_t tileSize);
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     inline void PrintTypicalFloat(uint32_t len, uint32_t dataSize);
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
