@@ -436,6 +436,7 @@ def get_normalized_dtype(dtype):
         OpDataType.DT_UINT32,
         OpDataType.DT_FLOAT,
         OpDataType.DT_COMPLEX32,
+        OpDataType.DT_HIFLOAT4_SCALE,
     ]:
         normalized_dtype = OpDataType.DT_INT32
     elif dtype in [
@@ -449,7 +450,11 @@ def get_normalized_dtype(dtype):
         normalized_dtype = OpDataType.DT_INT8
     elif dtype in [OpDataType.DT_FLOAT6_E3M2, OpDataType.DT_FLOAT6_E2M3]:
         normalized_dtype = OpDataType.DT_FLOAT6_E3M2
-    elif dtype in [OpDataType.DT_FLOAT4_E2M1, OpDataType.DT_FLOAT4_E1M2]:
+    elif dtype in [
+        OpDataType.DT_FLOAT4_E2M1,
+        OpDataType.DT_FLOAT4_E1M2,
+        OpDataType.DT_HIFLOAT4,
+    ]:
         normalized_dtype = OpDataType.DT_FLOAT4_E2M1
     else:
         normalized_dtype = dtype
