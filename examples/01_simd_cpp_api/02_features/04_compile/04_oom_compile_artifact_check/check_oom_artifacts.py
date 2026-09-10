@@ -12,10 +12,15 @@
 """Check compatibility contracts in generated OOM compile artifacts."""
 
 import argparse
+import ast
+import importlib
 import importlib.util
+import json
 import os
 import sys
 from pathlib import Path
+from tempfile import TemporaryDirectory
+from unittest import mock
 
 
 EXIT_OK = 0
@@ -83,6 +88,27 @@ def load_repo_module(module_name, module_path):
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def load_repo_function(module_path, function_name, base_namespace):
+    tree = ast.parse(module_path.read_text(encoding="utf-8"), filename=str(module_path))
+    function = next(
+        (
+            node
+            for node in tree.body
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+            and node.name == function_name
+        ),
+        None,
+    )
+    if function is None:
+        raise ImportError(f"{function_name} is missing from {module_path}")
+    namespace = base_namespace.copy()
+    exec(
+        compile(ast.Module(body=[function], type_ignores=[]), str(module_path), "exec"),
+        namespace,
+    )
+    return namespace[function_name]
 
 
 def tensor(name, shape):
@@ -207,6 +233,95 @@ def check_source_artifacts(generator, buildcfg):
     return checks
 
 
+def write_base_artifacts(directory, kernel_name):
+    json_path = directory / f"{kernel_name}.json"
+    json_path.write_text(
+        json.dumps(
+            {
+                "kernelName": kernel_name,
+                "workspace": {"num": 1, "size": [0], "type": [0]},
+                "compileInfo": {},
+            }
+        ),
+        encoding="utf-8",
+    )
+    (directory / f"{kernel_name}.o").write_bytes(b"")
+    return json_path
+
+
+def generate_json_artifact(
+    compile_op, json_post_process, buildcfg, op_context, oom_enabled
+):
+    op_info, tiling_info, compile_info = make_fixtures(compile_op, False)
+    compile_info.kernel_name = op_info.kernel_name
+    compile_op.DFXSectionGenerator().dfx_info_reset(op_info)
+    compile_op.global_var_storage.set_variable("ascendc_tiling_no_register", False)
+    compile_op.global_var_storage.set_variable("ascendc_enable_super_kernel", False)
+
+    with TemporaryDirectory() as temp_dir:
+        directory = Path(temp_dir)
+        json_path = write_base_artifacts(directory, compile_info.kernel_name)
+        with op_context.OpContext():
+            with buildcfg.build_config() as config:
+                config.current()["tir.op_debug_config"] = (
+                    ["oom"] if oom_enabled else []
+                )
+                with (
+                    mock.patch.object(
+                        compile_op.CommonUtility,
+                        "get_kernel_meta_dir",
+                        return_value=temp_dir,
+                    ),
+                    mock.patch.object(
+                        compile_op.CommonUtility, "is_v220", return_value=False
+                    ),
+                    mock.patch.object(
+                        compile_op.CommonUtility, "is_c310", return_value=False
+                    ),
+                ):
+                    json_post_process(
+                        compile_info,
+                        op_info,
+                        tiling_info,
+                        False,
+                        False,
+                        None,
+                    )
+        return json.loads(json_path.read_text(encoding="utf-8"))
+
+
+def check_json_artifacts(devkit_path, compile_op, buildcfg, op_context):
+    compile_op_path = (
+        devkit_path
+        / "tools/build/asc_op_compile_base/asc_op_compiler/compile_op.py"
+    )
+    json_post_process = load_repo_function(
+        compile_op_path, "_json_post_process", compile_op.__dict__
+    )
+    oom_json = generate_json_artifact(
+        compile_op, json_post_process, buildcfg, op_context, True
+    )
+    non_oom_json = generate_json_artifact(
+        compile_op, json_post_process, buildcfg, op_context, False
+    )
+    placeholder_count = compile_op.DFXSectionGenerator().param_placeholder_num
+    expected_oom_size = 64 + 8 + 8 * placeholder_count + 2
+    expected_non_oom_size = 64 + 8
+    condition = (
+        oom_json.get("oom") == {"version": 1, "tensor_version": 1}
+        and oom_json.get("opParaSize") == expected_oom_size
+        and "oom" not in non_oom_json
+        and non_oom_json.get("opParaSize") == expected_non_oom_size
+    )
+    detail = (
+        f"oom={oom_json.get('oom')}, "
+        f"OOM opParaSize={oom_json.get('opParaSize')} (expected {expected_oom_size}), "
+        f"non-OOM opParaSize={non_oom_json.get('opParaSize')} "
+        f"(expected {expected_non_oom_size})"
+    )
+    return report_check("OOM JSON capability and opParaSize", condition, detail)
+
+
 def main():
     args = parse_args()
     try:
@@ -220,6 +335,7 @@ def main():
         bootstrap_environment(cann_path)
 
         from asc_op_compile_base.common import buildcfg
+        from asc_op_compile_base.common.context import op_context
 
         generator = load_repo_module(
             "asc_op_compile_base.asc_op_compiler.oom_sample_gen_code",
@@ -227,15 +343,22 @@ def main():
             / "tools/build/asc_op_compile_base/asc_op_compiler/ascendc_compile_gen_code.py",
         )
         checks = check_source_artifacts(generator, buildcfg)
-    except (ImportError, OSError, ValueError) as error:
+        compile_op = importlib.import_module(
+            "asc_op_compile_base.asc_op_compiler.compile_op"
+        )
+        checks.append(
+            check_json_artifacts(devkit_path, compile_op, buildcfg, op_context)
+        )
+    except (ImportError, OSError, StopIteration, ValueError) as error:
         print(f"ERROR {error}")
         return EXIT_ENVIRONMENT_ERROR
 
-    print("FAIL OOM JSON capability and opParaSize: check is not implemented")
-    checks.append(False)
     failed = checks.count(False)
-    print(f"{failed} OOM compile artifact check(s) failed.")
-    return EXIT_CHECK_FAILED
+    if failed:
+        print(f"{failed} OOM compile artifact check(s) failed.")
+        return EXIT_CHECK_FAILED
+    print("All OOM compile artifact checks passed.")
+    return EXIT_OK
 
 
 if __name__ == "__main__":
