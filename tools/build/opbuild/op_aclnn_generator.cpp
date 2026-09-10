@@ -60,7 +60,7 @@ constexpr const char* OP_ACLNN_SOC_INFO = "enum SocType {\n"
                                           "    SOC_VERSION_MC61AM21A = 10, // 9 is deprecated\n"
                                           "    SOC_VERSION_MC62CM12A = 11,\n"
                                           "    SOC_VERSION_BS9SX2A = 12,\n"
-                                          "    SOC_VERSION_ASCEND910_96 = 13,\n"
+                                          "    SOC_VERSION_ASCEND960DT = 13,\n"
                                           "    SOC_VERSION_KIRINX90 = 14,\n"
                                           "    SOC_VERSION_KIRIN9030 = 15,\n"
                                           "    SOC_VERSION_ASCEND350 = 16,\n"
@@ -161,7 +161,7 @@ const std::map<std::string, std::string> SOC_SUPPORT_MAP = {
     {"ascend910_55", "SOC_VERSION_ASCEND910_55"},
     {"mc61am21a", "SOC_VERSION_MC61AM21A"},
     {"mc62cm12a", "SOC_VERSION_MC62CM12A"},
-    {"ascend910_96", "SOC_VERSION_ASCEND910_96"},
+    {"ascend960dt", "SOC_VERSION_ASCEND960DT"},
     {"kirinx90", "SOC_VERSION_KIRINX90"},
     {"kirin9030", "SOC_VERSION_KIRIN9030"},
     {"kirindev0000", "SOC_VERSION_KIRINDEV0000"},
