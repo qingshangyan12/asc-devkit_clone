@@ -53,6 +53,8 @@ public:
 
     virtual AlgAttrs GetAlgoMeta(const std::string& algName) const;
 
+    static AlgAttrs ParseAlgAttrsFromName(const std::string& algName);
+
     HcclResult SetTempFastLaunchAddr(
         TemplateFastLaunchCtx& tempFastLaunchCtx, void* inputPtr, void* outputPtr, const HcclMem& hcclBuff) const;
 

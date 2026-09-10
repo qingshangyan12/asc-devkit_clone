@@ -32,7 +32,7 @@ HcclResult InsCollAlgBase::CalcAlgHierarchyInfoV2(
     return HCCL_SUCCESS;
 }
 
-AlgAttrs InsCollAlgBase::GetAlgoMeta(const std::string& algName) const
+AlgAttrs InsCollAlgBase::ParseAlgAttrsFromName(const std::string& algName)
 {
     AlgAttrs attrs;
     attrs.name = algName;
@@ -80,7 +80,7 @@ AlgAttrs InsCollAlgBase::GetAlgoMeta(const std::string& algName) const
         }
         if (!matched) {
             HCCL_WARNING(
-                "[InsCollAlgBase][GetAlgoMeta] skipped unmatched algoName=%s at pos=%zu, remaining='%s'.",
+                "[InsCollAlgBase][ParseAlgAttrsFromName] skipped unmatched algoName=%s at pos=%zu, remaining='%s'.",
                 algName.c_str(), pos, remaining.c_str() + pos);
             attrs.algoTypes.clear();
             break;
@@ -88,6 +88,8 @@ AlgAttrs InsCollAlgBase::GetAlgoMeta(const std::string& algName) const
     }
     return attrs;
 }
+
+AlgAttrs InsCollAlgBase::GetAlgoMeta(const std::string& algName) const { return ParseAlgAttrsFromName(algName); }
 
 HcclResult InsCollAlgBase::RestoreChannelMap(
     const AlgResourceCtxSerializable& resCtx,

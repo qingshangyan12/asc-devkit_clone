@@ -847,6 +847,9 @@ HcclResult HcclGetAlgRes(
          param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE);
     if (useCannBridge) {
         AlgAttrs algAttrs = executor->GetAlgoMeta(std::string(param.algName));
+        if (algAttrs.algoTypes.empty()) {
+            algAttrs = InsCollAlgBase::ParseAlgAttrsFromName(std::string(param.algName));
+        }
         HcclResult calcHierarchyRet = executor->CalcAlgHierarchyInfoV2(topoInfo, algHierarchyInfo, algAttrs);
         HCCL_INFO(
             "[asc][AlgoResource][HcclGetAlgRes] after CalcAlgHierarchyInfoV2, ret[%d], levelNum[%zu].",
