@@ -305,12 +305,17 @@ __simd_callee__ inline void ComplexMulKernel(U& dstReg, U& srcReg0, U& srcReg1, 
     RegTensor<typename ActualT::EleType> f;
     RegTensor<typename ActualT::EleType> g;
     RegTensor<typename ActualT::EleType> h;
-    Mul(e, src0Real, src1Real, mask);
-    Mul(f, src0Imag, src1Imag, mask);
-    Mul(g, src0Imag, src1Real, mask);
-    Mul(h, src0Real, src1Imag, mask);
-    Sub(dstReal, e, f, mask);
-    Add(dstImag, g, h, mask);
+    // Mul(e, src0Real, src1Real, mask);
+    // Mul(f, src0Imag, src1Imag, mask);
+    // Mul(g, src0Imag, src1Real, mask);
+    // Mul(h, src0Real, src1Imag, mask);
+    // Sub(dstReal, e, f, mask);
+    // Add(dstImag, g, h, mask);
+    Not(src0Imag, src0Imag, mask);
+    Mul(dstReal, src0Imag, src1Imag, mask);
+    MulAddDst(dstReal, src0Real, src1Real, mask);
+    Mul(dstImag, src0Imag, src1Real, mask);
+    MulAddDst(dstImag, src0Real, src1Imag, mask);
 }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
