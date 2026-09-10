@@ -1135,7 +1135,7 @@
                 -   [asc_prelu](SIMD-API/c_api/reg_compute/reg_fused/asc_prelu.md)
                 -   [asc_relu](SIMD-API/c_api/reg_compute/reg_fused/asc_relu.md)
                 -   [asc_exp_sub](SIMD-API/c_api/reg_compute/reg_fused/asc_exp_sub.md)
-                -   [asc_muls (废弃)](SIMD-API/c_api/reg_compute/reg_fused/asc_muls_deprecated.md)
+                -   [asc_muls (废弃)](SIMD-API/c_api/deprecated_interface/asc_muls_deprecated.md)
             -   [比较计算](SIMD-API/c_api/reg_compute/reg_compare/reg_compare.md)
                 -   [asc_eq](SIMD-API/c_api/reg_compute/reg_compare/asc_eq.md)
                 -   [asc_eq_scalar](SIMD-API/c_api/reg_compute/reg_compare/asc_eq_scalar.md)

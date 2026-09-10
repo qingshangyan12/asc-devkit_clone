@@ -447,9 +447,9 @@
 
     旧原型已废弃，请使用[asc_uint322uint8](../SIMD-API/c_api/reg_compute/reg_convert/asc_uint322uint8.md)的显式位置参数重载。
 
-- [asc_muls](../SIMD-API/c_api/reg_compute/reg_fused/asc_muls_deprecated.md)接口
+- [asc_muls](../SIMD-API/c_api/deprecated_interface/asc_muls_deprecated.md)接口
 
-    此接口后续版本会废弃。
+    该接口已废弃，请使用[asc_mul_scalar_float2half_rn](../SIMD-API/c_api/reg_compute/reg_fused/asc_mul_scalar_float2half_rn.md)的显式位置参数重载替代。
 
 - [asc_exp_sub](../SIMD-API/c_api/deprecated_interface/asc_exp_sub_deprecated.md)接口
 
