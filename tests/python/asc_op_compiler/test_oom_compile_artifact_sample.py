@@ -9,6 +9,7 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
+import os
 import subprocess
 import sys
 import unittest
@@ -21,7 +22,7 @@ SAMPLE = (
     / "examples/01_simd_cpp_api/02_features/04_compile"
     / "04_oom_compile_artifact_check/check_oom_artifacts.py"
 )
-CANN_PATH = Path("/data/chu/Ascend/cann")
+CANN_PATH = Path(os.environ.get("ASCEND_HOME_PATH", "/data/chu/Ascend/cann"))
 
 
 class TestOomCompileArtifactSample(unittest.TestCase):
@@ -57,6 +58,23 @@ class TestOomCompileArtifactSample(unittest.TestCase):
         )
         for line in expected_lines:
             self.assertIn(line, result.stdout)
+
+    def test_devkit_path_defaults_to_repository_root(self):
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(SAMPLE),
+                "--cann-path",
+                str(CANN_PATH),
+            ],
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            check=False,
+        )
+
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertIn("All OOM compile artifact checks passed.", result.stdout)
 
     def test_invalid_devkit_path_is_an_environment_error(self):
         result = self.run_sample("/tmp/not-a-devkit")

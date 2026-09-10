@@ -29,7 +29,7 @@ EXIT_ENVIRONMENT_ERROR = 2
 
 
 def parse_args():
-    default_devkit = Path(__file__).resolve().parents[6]
+    default_devkit = Path(__file__).resolve().parents[5]
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--devkit-path", type=Path, default=default_devkit)
     parser.add_argument(
