@@ -18,12 +18,8 @@
 #ifndef IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_SPR_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_3510_SPR_INTF_IMPL_H
 
-[[deprecated("NOTICE: asc_get_ar_spr is deprecated. "
-             "Please use asc_get_squeeze_status instead.")]] __aicore__ inline int64_t
-asc_get_ar_spr()
-{
-    return get_ar();
-}
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_get_squeeze_status)
+__aicore__ inline int64_t asc_get_ar_spr() { return get_ar(); }
 
 #endif
 

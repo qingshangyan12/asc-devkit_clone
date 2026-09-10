@@ -235,12 +235,8 @@ __aicore__ inline void asc_sync_vec(int id)
     pipe_barrier(pipe_t::PIPE_V);
 }
 
-[[deprecated("NOTICE: asc_sync_vec() is deprecated. "
-             "Please use asc_sync() instead")]]
-__aicore__ inline void asc_sync_vec()
-{
-    asc_sync_post_process();
-}
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_sync)
+__aicore__ inline void asc_sync_vec() { asc_sync_post_process(); }
 
 __aicore__ inline void asc_sync_notify(pipe_t pipe, pipe_t tpipe, event_t id)
 {

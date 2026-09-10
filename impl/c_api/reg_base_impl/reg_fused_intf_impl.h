@@ -254,6 +254,7 @@ __simd_callee__ inline void asc_axpy(vector_float& dst, vector_float src, float 
     }
 }
 
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mul_scalar_float2half_rn)
 __simd_callee__ inline void asc_muls(vector_half& dst, vector_float src, float value, vector_bool mask)
 {
     if ASC_IS_AIV {

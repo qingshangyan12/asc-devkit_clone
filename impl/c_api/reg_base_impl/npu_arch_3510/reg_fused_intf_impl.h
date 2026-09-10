@@ -20,36 +20,32 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
-[[deprecated("NOTICE: asc_muls_v2 is deprecated. "
-             "Currently asc_muls_v2 is an unsupported API on current device.")]] __simd_callee__ inline void
-asc_muls_v2(vector_half& dst, vector_float src, float value, vector_bool mask)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mul_scalar_float2half_rn)
+__simd_callee__ inline void asc_muls_v2(vector_half& dst, vector_float src, float value, vector_bool mask)
 {
     if ASC_IS_AIV {
         vmulscvt(dst, src, value, mask, PART_ODD);
     }
 }
 
-[[deprecated("NOTICE: asc_exp_sub with half inputs and without src_pos is deprecated. "
-             "Please use asc_exp_sub_half2float with src_pos instead.")]] __simd_callee__ inline void
-asc_exp_sub(vector_float& dst, vector_half src0, vector_half src1, vector_bool mask)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_exp_sub_half2float)
+__simd_callee__ inline void asc_exp_sub(vector_float& dst, vector_half src0, vector_half src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vexpdif(dst, src0, src1, mask, PART_EVEN);
     }
 }
 
-[[deprecated("NOTICE: asc_exp_sub_v2 with half inputs is deprecated. "
-             "Please use asc_exp_sub_half2float with src_pos instead.")]] __simd_callee__ inline void
-asc_exp_sub_v2(vector_float& dst, vector_half src0, vector_half src1, vector_bool mask)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_exp_sub_half2float)
+__simd_callee__ inline void asc_exp_sub_v2(vector_float& dst, vector_half src0, vector_half src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vexpdif(dst, src0, src1, mask, PART_ODD);
     }
 }
 
-[[deprecated("NOTICE: asc_exp_sub_v2 with float inputs is deprecated. "
-             "Please use asc_exp_sub instead.")]] __simd_callee__ inline void
-asc_exp_sub_v2(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
+ASC_DEPRECATED(9.1.0, "2027/09/07", asc_exp_sub)
+__simd_callee__ inline void asc_exp_sub_v2(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
 {
     if ASC_IS_AIV {
         vexpdif(dst, src0, src1, mask, PART_ODD);

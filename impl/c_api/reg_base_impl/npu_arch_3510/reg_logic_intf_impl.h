@@ -20,8 +20,7 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
-[[deprecated("NOTICE: asc_and floating-point overloads are deprecated since 9.2.0. Floating-point data types are not "
-             "supported; use the same-width integer overload only when bitwise interpretation is intended.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_and integer overload)
 __simd_callee__ inline void asc_and(
     vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1, vector_bool mask)
 {
@@ -30,8 +29,7 @@ __simd_callee__ inline void asc_and(
     }
 }
 
-[[deprecated("NOTICE: asc_and floating-point overloads are deprecated since 9.2.0. Floating-point data types are not "
-             "supported; use the same-width integer overload only when bitwise interpretation is intended.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_and integer overload)
 __simd_callee__ inline void asc_and(
     vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1, vector_bool mask)
 {
@@ -40,8 +38,7 @@ __simd_callee__ inline void asc_and(
     }
 }
 
-[[deprecated("NOTICE: asc_and floating-point overloads are deprecated since 9.2.0. Floating-point data types are not "
-             "supported; use the same-width integer overload only when bitwise interpretation is intended.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_and integer overload)
 __simd_callee__ inline void asc_and(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -49,8 +46,7 @@ __simd_callee__ inline void asc_and(vector_half& dst, vector_half src0, vector_h
     }
 }
 
-[[deprecated("NOTICE: asc_and floating-point overloads are deprecated since 9.2.0. Floating-point data types are not "
-             "supported; use the same-width integer overload only when bitwise interpretation is intended.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_and integer overload)
 __simd_callee__ inline void asc_and(
     vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
@@ -59,8 +55,7 @@ __simd_callee__ inline void asc_and(
     }
 }
 
-[[deprecated("NOTICE: asc_and floating-point overloads are deprecated since 9.2.0. Floating-point data types are not "
-             "supported; use the same-width integer overload only when bitwise interpretation is intended.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_and integer overload)
 __simd_callee__ inline void asc_and(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -68,8 +63,7 @@ __simd_callee__ inline void asc_and(vector_float& dst, vector_float src0, vector
     }
 }
 
-[[deprecated("NOTICE: asc_or floating-point overloads are deprecated since 9.2.0. Floating-point data types are not "
-             "supported; use the same-width integer overload only when bitwise interpretation is intended.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_or integer overload)
 __simd_callee__ inline void asc_or(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -77,8 +71,7 @@ __simd_callee__ inline void asc_or(vector_half& dst, vector_half src0, vector_ha
     }
 }
 
-[[deprecated("NOTICE: asc_or floating-point overloads are deprecated since 9.2.0. Floating-point data types are not "
-             "supported; use the same-width integer overload only when bitwise interpretation is intended.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_or integer overload)
 __simd_callee__ inline void asc_or(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
 {
     if ASC_IS_AIV {

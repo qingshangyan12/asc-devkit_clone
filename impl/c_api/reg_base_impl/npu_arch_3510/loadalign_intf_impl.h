@@ -20,45 +20,40 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_int8_t& dst, __ubuf__ int8_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_int8_t& dst, __ubuf__ int8_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, UNPK4_B8);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_uint8_t& dst, __ubuf__ uint8_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_uint8_t& dst, __ubuf__ uint8_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, UNPK4_B8);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, UNPK4_B8);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, UNPK4_B8);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_int4x2_t& dst, __ubuf__ int4b_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_int4x2_t& dst, __ubuf__ int4b_t* src)
 {
     if ASC_IS_AIV {
         __ubuf__ float4_e1m2x2_t* src_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2_t*>(src);
@@ -66,81 +61,72 @@ asc_loadalign_unpack_v2(vector_int4x2_t& dst, __ubuf__ int4b_t* src)
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, UNPK4_B8);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, UNPK4_B8);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, UNPK4_B8);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src)
 {
     if ASC_IS_AIV {
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), 0, UNPK4_B8);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_int8_t& dst, __ubuf__ int8_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_int8_t& dst, __ubuf__ int8_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_uint8_t& dst, __ubuf__ uint8_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_uint8_t& dst, __ubuf__ uint8_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_int4x2_t& dst, __ubuf__ int4b_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_int4x2_t& dst, __ubuf__ int4b_t* src)
 {
     if ASC_IS_AIV {
         __ubuf__ float4_e1m2x2_t* src_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2_t*>(src);
@@ -148,189 +134,170 @@ asc_loadalign_brc_v2(vector_int4x2_t& dst, __ubuf__ int4b_t* src)
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src)
 {
     if ASC_IS_AIV {
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), 0, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_int16_t& dst, __ubuf__ int16_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_int16_t& dst, __ubuf__ int16_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_uint16_t& dst, __ubuf__ uint16_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_uint16_t& dst, __ubuf__ uint16_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_half& dst, __ubuf__ half* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_half& dst, __ubuf__ half* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_int32_t& dst, __ubuf__ int32_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_int32_t& dst, __ubuf__ int32_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_uint32_t& dst, __ubuf__ uint32_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_uint32_t& dst, __ubuf__ uint32_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_float& dst, __ubuf__ float* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_float& dst, __ubuf__ float* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v3(vector_int16_t& dst, __ubuf__ int16_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
+__simd_callee__ inline void asc_loadalign_brc_v3(vector_int16_t& dst, __ubuf__ int16_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, E2B_B16);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v3(vector_uint16_t& dst, __ubuf__ uint16_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
+__simd_callee__ inline void asc_loadalign_brc_v3(vector_uint16_t& dst, __ubuf__ uint16_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, E2B_B16);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v3(vector_half& dst, __ubuf__ half* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
+__simd_callee__ inline void asc_loadalign_brc_v3(vector_half& dst, __ubuf__ half* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, E2B_B16);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v3(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
+__simd_callee__ inline void asc_loadalign_brc_v3(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, E2B_B16);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v3(vector_int32_t& dst, __ubuf__ int32_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
+__simd_callee__ inline void asc_loadalign_brc_v3(vector_int32_t& dst, __ubuf__ int32_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, E2B_B32);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v3(vector_uint32_t& dst, __ubuf__ uint32_t* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
+__simd_callee__ inline void asc_loadalign_brc_v3(vector_uint32_t& dst, __ubuf__ uint32_t* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, E2B_B32);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v3(vector_float& dst, __ubuf__ float* src)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
+__simd_callee__ inline void asc_loadalign_brc_v3(vector_float& dst, __ubuf__ float* src)
 {
     if ASC_IS_AIV {
         vlds(dst, src, 0, E2B_B32);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(
+    vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, UNPK4_B8);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(
+    vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, UNPK4_B8);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_int4x2_t& dst, __ubuf__ int4b_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_int4x2_t& dst, __ubuf__ int4b_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         __ubuf__ float4_e1m2x2_t* src_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2_t*>(src);
@@ -338,81 +305,73 @@ asc_loadalign_unpack_v2(vector_int4x2_t& dst, __ubuf__ int4b_t* src, addr_reg of
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_uint8_t& dst, __ubuf__ uint8_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_uint8_t& dst, __ubuf__ uint8_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, UNPK4_B8);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_int8_t& dst, __ubuf__ int8_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_int8_t& dst, __ubuf__ int8_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, UNPK4_B8);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(
+    vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, UNPK4_B8);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, UNPK4_B8);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, UNPK4_B8);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, UNPK4_B8);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_int4x2_t& dst, __ubuf__ int4b_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_int4x2_t& dst, __ubuf__ int4b_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         __ubuf__ float4_e1m2x2_t* src_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2_t*>(src);
@@ -420,225 +379,202 @@ asc_loadalign_brc_v2(vector_int4x2_t& dst, __ubuf__ int4b_t* src, addr_reg offse
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_uint8_t& dst, __ubuf__ uint8_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_uint8_t& dst, __ubuf__ uint8_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_int8_t& dst, __ubuf__ int8_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_int8_t& dst, __ubuf__ int8_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_uint16_t& dst, __ubuf__ uint16_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_uint16_t& dst, __ubuf__ uint16_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_int16_t& dst, __ubuf__ int16_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_int16_t& dst, __ubuf__ int16_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_half& dst, __ubuf__ half* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_half& dst, __ubuf__ half* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_uint32_t& dst, __ubuf__ uint32_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_uint32_t& dst, __ubuf__ uint32_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_int32_t& dst, __ubuf__ int32_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_int32_t& dst, __ubuf__ int32_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_float& dst, __ubuf__ float* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_float& dst, __ubuf__ float* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v3(vector_uint16_t& dst, __ubuf__ uint16_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
+__simd_callee__ inline void asc_loadalign_brc_v3(vector_uint16_t& dst, __ubuf__ uint16_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, E2B_B16);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v3(vector_int16_t& dst, __ubuf__ int16_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
+__simd_callee__ inline void asc_loadalign_brc_v3(vector_int16_t& dst, __ubuf__ int16_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, E2B_B16);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v3(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
+__simd_callee__ inline void asc_loadalign_brc_v3(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, E2B_B16);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v3(vector_half& dst, __ubuf__ half* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
+__simd_callee__ inline void asc_loadalign_brc_v3(vector_half& dst, __ubuf__ half* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, E2B_B16);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v3(vector_uint32_t& dst, __ubuf__ uint32_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
+__simd_callee__ inline void asc_loadalign_brc_v3(vector_uint32_t& dst, __ubuf__ uint32_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, E2B_B32);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v3(vector_int32_t& dst, __ubuf__ int32_t* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
+__simd_callee__ inline void asc_loadalign_brc_v3(vector_int32_t& dst, __ubuf__ int32_t* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, E2B_B32);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v3(vector_float& dst, __ubuf__ float* src, addr_reg offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
+__simd_callee__ inline void asc_loadalign_brc_v3(vector_float& dst, __ubuf__ float* src, addr_reg offset)
 {
     if ASC_IS_AIV {
         vld(dst, src, offset, E2B_B32);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK4_B8);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_uint8_t& dst, __ubuf__ uint8_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_uint8_t& dst, __ubuf__ uint8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK4_B8);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(
+    vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK4_B8);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(
+    vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK4_B8);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         __ubuf__ float4_e1m2x2_t* src_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2_t*>(src);
@@ -646,81 +582,73 @@ asc_loadalign_unpack_v2(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t off
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK4_B8);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK4_B8);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(
+    vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK4_B8);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4 instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_v2(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4)
+__simd_callee__ inline void asc_loadalign_unpack_v2(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, UNPK4_B8);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_uint8_t& dst, __ubuf__ uint8_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_uint8_t& dst, __ubuf__ uint8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         __ubuf__ float4_e1m2x2_t* src_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2_t*>(src);
@@ -728,207 +656,189 @@ asc_loadalign_brc_v2(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(reinterpret_cast<vector_uint8_t&>(dst), reinterpret_cast<__ubuf__ uint8_t*>(src), offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_uint16_t& dst, __ubuf__ uint16_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_uint16_t& dst, __ubuf__ uint16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_half& dst, __ubuf__ half* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_half& dst, __ubuf__ half* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_int32_t& dst, __ubuf__ int32_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_int32_t& dst, __ubuf__ int32_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_uint32_t& dst, __ubuf__ uint32_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_uint32_t& dst, __ubuf__ uint32_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v2(vector_float& dst, __ubuf__ float* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock)
+__simd_callee__ inline void asc_loadalign_brc_v2(vector_float& dst, __ubuf__ float* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v3(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
+__simd_callee__ inline void asc_loadalign_brc_v3(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, E2B_B16);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v3(vector_uint16_t& dst, __ubuf__ uint16_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
+__simd_callee__ inline void asc_loadalign_brc_v3(vector_uint16_t& dst, __ubuf__ uint16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, E2B_B16);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v3(vector_half& dst, __ubuf__ half* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
+__simd_callee__ inline void asc_loadalign_brc_v3(vector_half& dst, __ubuf__ half* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, E2B_B16);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v3(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
+__simd_callee__ inline void asc_loadalign_brc_v3(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, E2B_B16);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v3(vector_int32_t& dst, __ubuf__ int32_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
+__simd_callee__ inline void asc_loadalign_brc_v3(vector_int32_t& dst, __ubuf__ int32_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, E2B_B32);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v3(vector_uint32_t& dst, __ubuf__ uint32_t* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
+__simd_callee__ inline void asc_loadalign_brc_v3(vector_uint32_t& dst, __ubuf__ uint32_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, E2B_B32);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_v3(vector_float& dst, __ubuf__ float* src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock)
+__simd_callee__ inline void asc_loadalign_brc_v3(vector_float& dst, __ubuf__ float* src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, E2B_B32);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_postupdate_v2(vector_int8_t& dst, __ubuf__ int8_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4_postupdate)
+__simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(
+    vector_int8_t& dst, __ubuf__ int8_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK4_B8, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_postupdate_v2(vector_uint8_t& dst, __ubuf__ uint8_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4_postupdate)
+__simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(
+    vector_uint8_t& dst, __ubuf__ uint8_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK4_B8, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_postupdate_v2(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4_postupdate)
+__simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(
+    vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK4_B8, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_postupdate_v2(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4_postupdate)
+__simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(
+    vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK4_B8, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_postupdate_v2(vector_int4x2_t& dst, __ubuf__ int4b_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4_postupdate)
+__simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(
+    vector_int4x2_t& dst, __ubuf__ int4b_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         __ubuf__ float4_e1m2x2_t*& src_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2_t*&>(src);
@@ -936,36 +846,36 @@ asc_loadalign_unpack_postupdate_v2(vector_int4x2_t& dst, __ubuf__ int4b_t*& src,
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_postupdate_v2(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4_postupdate)
+__simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(
+    vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK4_B8, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_postupdate_v2(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4_postupdate)
+__simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(
+    vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK4_B8, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_postupdate_v2(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4_postupdate)
+__simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(
+    vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, UNPK4_B8, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_postupdate_v2 is deprecated. "
-             "Please use asc_loadalign_unpack4_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_unpack_postupdate_v2(vector_hifloat8_t& dst, __ubuf__ hifloat8_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_unpack4_postupdate)
+__simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(
+    vector_hifloat8_t& dst, __ubuf__ hifloat8_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         __ubuf__ uint8_t*& src_tmp = reinterpret_cast<__ubuf__ uint8_t*&>(src);
@@ -973,45 +883,43 @@ asc_loadalign_unpack_postupdate_v2(vector_hifloat8_t& dst, __ubuf__ hifloat8_t*&
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_postupdate_v2(vector_int8_t& dst, __ubuf__ int8_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock_postupdate)
+__simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_int8_t& dst, __ubuf__ int8_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_postupdate_v2(vector_uint8_t& dst, __ubuf__ uint8_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock_postupdate)
+__simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_uint8_t& dst, __ubuf__ uint8_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_postupdate_v2(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock_postupdate)
+__simd_callee__ inline void asc_loadalign_brc_postupdate_v2(
+    vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_postupdate_v2(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock_postupdate)
+__simd_callee__ inline void asc_loadalign_brc_postupdate_v2(
+    vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_postupdate_v2(vector_int4x2_t& dst, __ubuf__ int4b_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock_postupdate)
+__simd_callee__ inline void asc_loadalign_brc_postupdate_v2(
+    vector_int4x2_t& dst, __ubuf__ int4b_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         __ubuf__ float4_e1m2x2_t*& src_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2_t*&>(src);
@@ -1019,36 +927,36 @@ asc_loadalign_brc_postupdate_v2(vector_int4x2_t& dst, __ubuf__ int4b_t*& src, in
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_postupdate_v2(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock_postupdate)
+__simd_callee__ inline void asc_loadalign_brc_postupdate_v2(
+    vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_postupdate_v2(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock_postupdate)
+__simd_callee__ inline void asc_loadalign_brc_postupdate_v2(
+    vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_postupdate_v2(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock_postupdate)
+__simd_callee__ inline void asc_loadalign_brc_postupdate_v2(
+    vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_postupdate_v2(vector_hifloat8_t& dst, __ubuf__ hifloat8_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock_postupdate)
+__simd_callee__ inline void asc_loadalign_brc_postupdate_v2(
+    vector_hifloat8_t& dst, __ubuf__ hifloat8_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         __ubuf__ uint8_t*& src_tmp = reinterpret_cast<__ubuf__ uint8_t*&>(src);
@@ -1056,126 +964,118 @@ asc_loadalign_brc_postupdate_v2(vector_hifloat8_t& dst, __ubuf__ hifloat8_t*& sr
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_postupdate_v2(vector_int16_t& dst, __ubuf__ int16_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock_postupdate)
+__simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_int16_t& dst, __ubuf__ int16_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_postupdate_v2(vector_uint16_t& dst, __ubuf__ uint16_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock_postupdate)
+__simd_callee__ inline void asc_loadalign_brc_postupdate_v2(
+    vector_uint16_t& dst, __ubuf__ uint16_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_postupdate_v2(vector_half& dst, __ubuf__ half*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock_postupdate)
+__simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_half& dst, __ubuf__ half*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_postupdate_v2(vector_bfloat16_t& dst, __ubuf__ bfloat16_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock_postupdate)
+__simd_callee__ inline void asc_loadalign_brc_postupdate_v2(
+    vector_bfloat16_t& dst, __ubuf__ bfloat16_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_postupdate_v2(vector_int32_t& dst, __ubuf__ int32_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock_postupdate)
+__simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_int32_t& dst, __ubuf__ int32_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_postupdate_v2(vector_uint32_t& dst, __ubuf__ uint32_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock_postupdate)
+__simd_callee__ inline void asc_loadalign_brc_postupdate_v2(
+    vector_uint32_t& dst, __ubuf__ uint32_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v2 is deprecated. "
-             "Please use asc_loadalign_brc_datablock_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_postupdate_v2(vector_float& dst, __ubuf__ float*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_datablock_postupdate)
+__simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_float& dst, __ubuf__ float*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, BLK, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_postupdate_v3(vector_int16_t& dst, __ubuf__ int16_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock_postupdate)
+__simd_callee__ inline void asc_loadalign_brc_postupdate_v3(vector_int16_t& dst, __ubuf__ int16_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, E2B_B16, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_postupdate_v3(vector_uint16_t& dst, __ubuf__ uint16_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock_postupdate)
+__simd_callee__ inline void asc_loadalign_brc_postupdate_v3(
+    vector_uint16_t& dst, __ubuf__ uint16_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, E2B_B16, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_postupdate_v3(vector_half& dst, __ubuf__ half*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock_postupdate)
+__simd_callee__ inline void asc_loadalign_brc_postupdate_v3(vector_half& dst, __ubuf__ half*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, E2B_B16, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_postupdate_v3(vector_bfloat16_t& dst, __ubuf__ bfloat16_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock_postupdate)
+__simd_callee__ inline void asc_loadalign_brc_postupdate_v3(
+    vector_bfloat16_t& dst, __ubuf__ bfloat16_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, E2B_B16, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_postupdate_v3(vector_int32_t& dst, __ubuf__ int32_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock_postupdate)
+__simd_callee__ inline void asc_loadalign_brc_postupdate_v3(vector_int32_t& dst, __ubuf__ int32_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, E2B_B32, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_postupdate_v3(vector_uint32_t& dst, __ubuf__ uint32_t*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock_postupdate)
+__simd_callee__ inline void asc_loadalign_brc_postupdate_v3(
+    vector_uint32_t& dst, __ubuf__ uint32_t*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, E2B_B32, POST_UPDATE);
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_postupdate_v3 is deprecated. "
-             "Please use asc_loadalign_brc_elem2datablock_postupdate instead.")]] __simd_callee__ inline void
-asc_loadalign_brc_postupdate_v3(vector_float& dst, __ubuf__ float*& src, int32_t offset)
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_loadalign_brc_elem2datablock_postupdate)
+__simd_callee__ inline void asc_loadalign_brc_postupdate_v3(vector_float& dst, __ubuf__ float*& src, int32_t offset)
 {
     if ASC_IS_AIV {
         vlds(dst, src, offset, E2B_B32, POST_UPDATE);
