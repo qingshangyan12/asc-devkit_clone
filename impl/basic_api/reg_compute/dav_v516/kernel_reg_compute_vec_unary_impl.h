@@ -369,7 +369,7 @@ __simd_callee__ inline void SqrtImpl(U& dstReg, U& srcReg, MaskReg& mask)
                 "Reg Sqrt for high precision mode by using fast_inverse approach only supports float.");
             SqrtFastInverseImpl<T, mode, U>(dstReg, srcReg, mask);
         } else if constexpr (sprMode.algo == SqrtAlgo::PRECISION_1ULP_FTZ_FALSE) {
-            static_assert(SupportType<T, half>()), "Sqrt for PRECISION_1ULP_FALSE only supports half on current device"
+            static_assert(SupportType<T, half>(), "Sqrt for PRECISION_1ULP_FALSE only supports half on current device");
             RegTensor<T> tmpReg;
             RegTensor<T> dstRegCopy;
             RegTensor<T> srcRegCopy = srcReg;

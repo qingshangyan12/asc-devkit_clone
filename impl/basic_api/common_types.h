@@ -44,7 +44,7 @@ enum class TPosition : uint8_t {
     C2PIPE2GM,
     C2PIPE2LOCAL,
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5162)
     C2PT,
 #endif
     MAX,

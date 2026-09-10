@@ -966,7 +966,7 @@ __simd_callee__ inline void DivImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
     constexpr DivSpecificMode sprMode = Internal::GetDivSpecificMode(mode);
     static_assert(
         SupportType<
-            ActualT, half, float, complex32>(), "current data type is not supported on current device!");
+            ActualT, uint16_t, int16_t, uint32_t, int32_t, half, float, complex32>(), "current data type is not supported on current device!");
     static_assert(
         SupportEnum<sprMode.mrgMode, MaskMergeMode::ZEROING>(),
         "current Div api only supported Mode ZEROING on current device!");
@@ -1442,7 +1442,7 @@ __simd_callee__ inline void PreluImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg
 template <typename T = DefaultType, typename U>
 __simd_callee__ inline void MullImpl(U& dstReg0, U& dstReg1, U& srcReg0, U& srcReg1, MaskReg& mask)
 {
-    SCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, " Mull is not supported on current device"); });
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, " Mull is not supported on current device"); });
 }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
@@ -1464,20 +1464,20 @@ template <typename T = DefaultType, typename U>
 __simd_callee__ inline void AddCarryOutsImpl(
     MaskReg& carry, U& dstReg, U& srcReg0, U& srcReg1, MaskReg& carrySrc, MaskReg& mask)
 {
-    SCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, " AddCarryOuts is not supported on current device"); });
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, " AddCarryOuts is not supported on current device"); });
 }
 
 template <typename T = DefaultType, typename U>
 __simd_callee__ inline void SubCarryOutsImpl(
     MaskReg& carry, U& dstReg, U& srcReg0, U& srcReg1, MaskReg& carrySrc, MaskReg& mask)
 {
-    SCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, " SubCarryOuts is not supported on current device"); });
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, " SubCarryOuts is not supported on current device"); });
 }
 
 template <typename T = DefaultType, typename U>
 __simd_callee__ inline void AddCarryOutImpl(MaskReg& carry, U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
 {
-    SCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, " AddCarryOut is not supported on current device"); });
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, " AddCarryOut is not supported on current device"); });
 }
 
 template <typename T = DefaultType, typename U>

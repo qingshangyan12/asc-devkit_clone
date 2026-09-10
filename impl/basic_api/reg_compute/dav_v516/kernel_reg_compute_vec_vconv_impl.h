@@ -191,6 +191,7 @@ __simd_callee__ inline void CastOperator(RegTensor<T>& dstReg, RegTensor<U>& src
             vcvt(
                 (RegTensor<uint8_t>&)dstReg, (RegTensor<uint16_t>&)srcReg, mask, satModeOnly, partModeValue, modeValue);
         } else if constexpr (SupportType<Tuple<fp4x2_e2m1_t, bfloat16_t>, Tuple<fp4x2_e1m2_t, bfloat16_t>>()) {
+            constexpr auto partModeValue = std::integral_constant<::Part, static_cast<::Part>(layoutMode)>();
             vcvt(dstReg, srcReg, mask, roundModeValue, satModeValue, partModeValue);
         } else {
             constexpr auto partModeValue = std::integral_constant<::Part, static_cast<::Part>(layoutMode)>();
