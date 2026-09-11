@@ -28,8 +28,8 @@ inline uint32_t GetHypotMaxTmpSize(const uint32_t inputSize, const uint32_t type
     platform_ascendc::PlatformAscendC* platform = platform_ascendc::PlatformAscendCManager::GetInstance();
     ASCENDC_HOST_ASSERT((platform != nullptr), return 0, "Failed to get PlatformAscendC");
     const auto npuArch = platform->GetCurNpuArch();
-    if (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_5102 ||
-        npuArch == NpuArch::DAV_5162) {
+    if (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 || npuArch == aclplatformNpuArch::DAV_5102 ||
+        npuArch == aclplatformNpuArch::DAV_5162) {
         return 0;
     }
     return 0;
@@ -41,8 +41,8 @@ inline uint32_t GetHypotMinTmpSize(const uint32_t typeSize)
     platform_ascendc::PlatformAscendC* platform = platform_ascendc::PlatformAscendCManager::GetInstance();
     ASCENDC_HOST_ASSERT((platform != nullptr), return 0, "Failed to get PlatformAscendC");
     const auto npuArch = platform->GetCurNpuArch();
-    if (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_5102 ||
-        npuArch == NpuArch::DAV_5162) {
+    if (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 || npuArch == aclplatformNpuArch::DAV_5102 ||
+        npuArch == aclplatformNpuArch::DAV_5162) {
         return 0;
     }
     return 0;
@@ -68,8 +68,8 @@ void GetHypotTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeC
     platform_ascendc::PlatformAscendC* platform = platform_ascendc::PlatformAscendCManager::GetInstance();
     ASCENDC_HOST_ASSERT((platform != nullptr), return, "Failed to get PlatformAscendC");
     const auto npuArch = platform->GetCurNpuArch();
-    if (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_5102 ||
-        npuArch == NpuArch::DAV_5162) {
+    if (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 || npuArch == aclplatformNpuArch::DAV_5102 ||
+        npuArch == aclplatformNpuArch::DAV_5162) {
         maxLiveNodeCount = 0;
     }
 }

@@ -24,7 +24,7 @@ static const std::set<uint32_t> SUPPORT_TYPESIZE = {1, 2, 4, 8};
 static constexpr const char BITWISE_OR_GET_MAX_MIN[] = "GetBitwiseOrMaxMinTmpSize";
 static constexpr const char BITWISE_OR_GET_TMP_BUFFER[] = "GetBitwiseOrTmpBufferFactorSize";
 
-uint32_t GetBitwiseOrMaxTmpSize(const NpuArch npuArch, const uint32_t inputSize, const uint32_t typeSize)
+uint32_t GetBitwiseOrMaxTmpSize(aclplatformNpuArch npuArch, const uint32_t inputSize, const uint32_t typeSize)
 {
     (void)npuArch;
     (void)typeSize;
@@ -32,7 +32,7 @@ uint32_t GetBitwiseOrMaxTmpSize(const NpuArch npuArch, const uint32_t inputSize,
     return 0;
 }
 
-uint32_t GetBitwiseOrMinTmpSize(const NpuArch npuArch, const uint32_t typeSize)
+uint32_t GetBitwiseOrMinTmpSize(aclplatformNpuArch npuArch, const uint32_t typeSize)
 {
     (void)npuArch;
     (void)typeSize;
@@ -48,7 +48,7 @@ void GetBitwiseOrMaxMinTmpSize(
     const uint32_t inputSize = srcShape.GetShapeSize();
     auto npuArch = ascendcPlatform.GetCurNpuArch();
     ASCENDC_HOST_ASSERT(
-        (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201), return,
+        (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201), return,
         "Unsupported NpuArch of BitwiseOr API.");
 
     HighLevelApiCheck::SrcShapeSizeVerifyingParameters<BITWISE_OR_GET_MAX_MIN>(inputSize, typeSize);
@@ -65,7 +65,7 @@ void GetBitwiseOrTmpBufferFactorSize(
 {
     auto npuArch = ascendcPlatform.GetCurNpuArch();
     ASCENDC_HOST_ASSERT(
-        (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201), return,
+        (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201), return,
         "Unsupported NpuArch of BitwiseOr API.");
     HighLevelApiCheck::TypeSizeVerifyingParameters<BITWISE_OR_GET_TMP_BUFFER>(typeSize, SUPPORT_TYPESIZE);
 

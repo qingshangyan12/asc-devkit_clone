@@ -418,20 +418,20 @@ void SetTopkNSmallVal200(
 
 bool TopKTilingFunc(
     const int32_t inner, const int32_t outter, const int32_t k, const uint32_t dataTypeSize, const bool isInitIndex,
-    enum TopKMode mode, optiling::TopkTiling& topKTiling, const bool isLargest, const NpuArch npuArch)
+    enum TopKMode mode, optiling::TopkTiling& topKTiling, const bool isLargest, aclplatformNpuArch npuArch)
 {
     if (dataTypeSize == 0) {
         return false;
     }
-    if (npuArch == NpuArch::DAV_2002) {
+    if (npuArch == aclplatformNpuArch::DAV_2002) {
         if (mode == TopKMode::TOPK_NORMAL) {
             SetTopkNormalVal200(inner, outter, k, dataTypeSize, topKTiling);
         } else {
             SetTopkNSmallVal200(inner, outter, k, dataTypeSize, topKTiling);
         }
     } else if (
-        npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_5102 ||
-        npuArch == NpuArch::DAV_5162 || npuArch == NpuArch::DAV_3003) {
+        npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 || npuArch == aclplatformNpuArch::DAV_5102 ||
+        npuArch == aclplatformNpuArch::DAV_5162 || npuArch == aclplatformNpuArch::DAV_3003) {
         topKTiling.set_allDataSize(inner * outter);
         if (mode == TopKMode::TOPK_NORMAL) {
             SetTopkNormalVal310(inner, outter, k, dataTypeSize, isInitIndex, topKTiling);
@@ -467,7 +467,7 @@ void CheckTopKHostCommon(
             inner == 32, return, "[%s][%s] In Small mode, the length of the inner axis must be 32!", apiName,
             hostFuncName);
     }
-    if (npuArch == NpuArch::DAV_2002 && isInitIndex == false) {
+    if (npuArch == aclplatformNpuArch::DAV_2002 && isInitIndex == false) {
         ASCENDC_HOST_ASSERT(
             inner <= 2048, return,
             "[%s][%s] In Atlas inference products, when the data type is half and the parameter isInitIndex "
@@ -498,11 +498,11 @@ bool GetTopKMaxMinTmpSize(
     CheckTopKHostCommon(
         "TopK", "GetTopKMaxMinTmpSize", ascendcPlatform, inner, outter, isInitIndex, mode, dataTypeSize);
     const auto npuArch = ascendcPlatform.GetCurNpuArch();
-    if (npuArch == NpuArch::DAV_2002) {
+    if (npuArch == aclplatformNpuArch::DAV_2002) {
         GetTopKMaxMinTmpSize200(inner, outter, mode, maxValue, minValue, dataTypeSize);
     } else if (
-        npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_5102 ||
-        npuArch == NpuArch::DAV_5162 || npuArch == NpuArch::DAV_3003) {
+        npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 || npuArch == aclplatformNpuArch::DAV_5102 ||
+        npuArch == aclplatformNpuArch::DAV_5162 || npuArch == aclplatformNpuArch::DAV_3003) {
         GetTopKMaxMinTmpSize310(inner, outter, isInitIndex, mode, maxValue, minValue);
     } else {
         GetTopKMaxMinTmpSize220(inner, outter, isInitIndex, mode, maxValue, minValue, isLargest);
@@ -520,8 +520,8 @@ bool GetTopKMaxMinTmpSize(
 
     auto npuArch = platform->GetCurNpuArch();
     ASCENDC_HOST_ASSERT(
-        (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_5102 ||
-         npuArch == NpuArch::DAV_5162),
+        (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 || npuArch == aclplatformNpuArch::DAV_5102 ||
+         npuArch == aclplatformNpuArch::DAV_5162),
         return false, "Unsupported NpuArch of Topk radix select API.");
 
     ASCENDC_HOST_ASSERT((inner % 32 == 0), return false, "The value of inner must be an integer multiple of 32.");

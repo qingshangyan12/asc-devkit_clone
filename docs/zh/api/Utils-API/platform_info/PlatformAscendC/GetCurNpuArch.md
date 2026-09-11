@@ -54,7 +54,7 @@ ge::graphStatus TilingXXX(gert::TilingContext* context) {
     auto npuArch = ascendcPlatform.GetCurNpuArch();
     // 根据所获得的版本型号自行设计Tiling策略
     // DAV_XXX请替换为实际的架构号
-    if (socVersion == NpuArch::DAV_XXXX) {
+    if (socVersion == aclplatformNpuArch::DAV_XXXX) {
         // ...
     }
     return ret;

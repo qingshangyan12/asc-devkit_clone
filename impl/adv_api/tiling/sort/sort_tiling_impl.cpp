@@ -48,8 +48,8 @@ void GetSortMaxMinTmpSize(
     ASCENDC_HOST_ASSERT(platform != nullptr, return, "Failed to get PlatformAscendC");
     auto npuArch = platform->GetCurNpuArch();
     ASCENDC_HOST_ASSERT(
-        npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_5102 ||
-            npuArch == NpuArch::DAV_5162,
+        npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 || npuArch == aclplatformNpuArch::DAV_5102 ||
+            npuArch == aclplatformNpuArch::DAV_5162,
         return, "Unsupported NpuArch for Sort API.");
     std::set<AscendC::TensorDataType> supportValueType = {ge::DT_INT8,   ge::DT_UINT8,  ge::DT_FLOAT, ge::DT_FLOAT16,
                                                           ge::DT_BF16,   ge::DT_INT16,  ge::DT_INT32, ge::DT_UINT16,
@@ -124,8 +124,8 @@ uint32_t GetConcatTmpSize(
 {
     CheckSortHostCommon("Sort", "GetConcatTmpSize", ascendcPlatform, elemCount, dataTypeSize);
     auto npuArch = ascendcPlatform.GetCurNpuArch();
-    if (npuArch == NpuArch::DAV_2201 || npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 ||
-        npuArch == NpuArch::DAV_3003) {
+    if (npuArch == aclplatformNpuArch::DAV_2201 || npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 ||
+        npuArch == aclplatformNpuArch::DAV_3003) {
         return 0;
     } else {
         return elemCount * REGION_PROPOSAL_DATA_SIZE_V200 * dataTypeSize;
@@ -137,8 +137,8 @@ uint32_t GetSortTmpSize(
 {
     CheckSortHostCommon("Sort", "GetSortTmpSize", ascendcPlatform, elemCount, dataTypeSize);
     auto npuArch = ascendcPlatform.GetCurNpuArch();
-    if (npuArch == NpuArch::DAV_2201 || npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 ||
-        npuArch == NpuArch::DAV_3003) {
+    if (npuArch == aclplatformNpuArch::DAV_2201 || npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 ||
+        npuArch == aclplatformNpuArch::DAV_3003) {
         if (dataTypeSize == sizeof(float)) {
             return elemCount * REGION_PROPOSAL_DATA_SIZE_FLOAT_V220 * dataTypeSize;
         } else {

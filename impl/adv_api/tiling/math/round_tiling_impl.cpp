@@ -28,7 +28,7 @@ void GetRoundMaxMinTmpSize(
     ASCENDC_HOST_ASSERT(inputSize > 0, return, "Input Shape size must be greater than 0.");
 
     const auto npuArch = ascendcPlatform.GetCurNpuArch();
-    if (npuArch == NpuArch::DAV_2201) {
+    if (npuArch == aclplatformNpuArch::DAV_2201) {
         if (typeSize == sizeof(float)) {
             minValue = 0;
             maxValue = 0;
@@ -36,7 +36,7 @@ void GetRoundMaxMinTmpSize(
             minValue = ROUND_ONE_REPEAT_BYTE_SIZE * ROUND_HALF_CALC_FAC_220;
             maxValue = ROUND_HALF_CALC_FAC_220 * std::max(inputSize * typeSize, ROUND_ONE_REPEAT_BYTE_SIZE);
         }
-    } else if (npuArch == NpuArch::DAV_2002) {
+    } else if (npuArch == aclplatformNpuArch::DAV_2002) {
         if (typeSize == sizeof(float)) {
             minValue = ROUND_ONE_REPEAT_BYTE_SIZE * ROUND_FLOAT_CALC_FAC;
             maxValue = ROUND_FLOAT_CALC_FAC * std::max(inputSize * typeSize, ROUND_ONE_REPEAT_BYTE_SIZE);
@@ -54,13 +54,13 @@ void GetRoundTmpBufferFactorSize(
     extraBuf = 0;
     auto npuArch = ascendcPlatform.GetCurNpuArch();
     constexpr uint32_t liveNodeTwo = 2;
-    if (npuArch == NpuArch::DAV_2201) {
+    if (npuArch == aclplatformNpuArch::DAV_2201) {
         if (typeSize == sizeof(float)) {
             maxLiveNodeCount = 0;
         } else {
             maxLiveNodeCount = 1;
         }
-    } else if (npuArch == NpuArch::DAV_2002) {
+    } else if (npuArch == aclplatformNpuArch::DAV_2002) {
         if (typeSize == sizeof(float)) {
             maxLiveNodeCount = 1;
         } else {

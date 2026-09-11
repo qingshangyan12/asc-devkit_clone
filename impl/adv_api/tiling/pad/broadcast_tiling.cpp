@@ -79,7 +79,7 @@ void CheckBroadCastParams(
     const AscendC::TensorShape& dstShape, uint32_t typeSize, const bool isReuseSource, const char* funcName)
 {
     auto npuArch = ascendcPlatform.GetCurNpuArch();
-    if (npuArch == NpuArch::DAV_2201 || npuArch == NpuArch::DAV_2002) {
+    if (npuArch == aclplatformNpuArch::DAV_2201 || npuArch == aclplatformNpuArch::DAV_2002) {
         ASCENDC_HOST_ASSERT(
             typeSize == 1 || typeSize == CAST_TYPE_TWO || typeSize == CAST_TYPE_FOUR, continue,
             "[Broadcast][%s] The value of typeSize is %u, should be 1 or 2 or 4.", funcName, typeSize);
@@ -110,7 +110,7 @@ void GetBroadCastMaxMinTmpSize(
     size_t dstShapeDimNum = dstShape.GetDimNum();
     constexpr uint32_t needDstShapeDimNum = 2;
     auto npuArch = ascendcPlatform.GetCurNpuArch();
-    if (npuArch == NpuArch::DAV_2201 || npuArch == NpuArch::DAV_2002) {
+    if (npuArch == aclplatformNpuArch::DAV_2201 || npuArch == aclplatformNpuArch::DAV_2002) {
         ASCENDC_HOST_ASSERT(
             (dstShapeDimNum == needDstShapeDimNum || dstShapeDimNum == 1), return, "Now only support dim = 1 or 2.");
     }
@@ -143,7 +143,7 @@ void GetBroadCastMaxMinTmpSize(
         axis = 1;
     }
 
-    if (npuArch == NpuArch::DAV_2201 || npuArch == NpuArch::DAV_2002) {
+    if (npuArch == aclplatformNpuArch::DAV_2201 || npuArch == aclplatformNpuArch::DAV_2002) {
         if (axis == 0) {
             const uint32_t castTempBuffer = GetCastTempBuffer(srcShape, dstShape, typeSize);
             ASCENDC_HOST_ASSERT(
@@ -154,9 +154,9 @@ void GetBroadCastMaxMinTmpSize(
         }
     }
 
-    if (npuArch == NpuArch::DAV_2201) {
+    if (npuArch == aclplatformNpuArch::DAV_2201) {
         GetBroadCastMaxMinTmpSize220(srcShape, dstShape, typeSize, maxValue, minValue);
-    } else if (npuArch == NpuArch::DAV_2002) {
+    } else if (npuArch == aclplatformNpuArch::DAV_2002) {
         const uint32_t castTempBuffer = GetCastTempBuffer(srcShape, dstShape, typeSize);
         const uint32_t oneBlockElementNum = ONE_BLK_SIZE / typeSize;
         ASCENDC_HOST_ASSERT(dstShape.GetDim(0) % oneBlockElementNum == 0, return, "dim[0] is not 32-byte aligned.");

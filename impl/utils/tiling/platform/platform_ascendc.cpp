@@ -216,21 +216,21 @@ SocVersion PlatformAscendC::GetSocVersion(void) const
     return SocVersionStrMap(socVerStr.c_str());
 }
 
-NpuArch PlatformAscendC::GetCurNpuArch(void) const
+aclplatformNpuArch PlatformAscendC::GetCurNpuArch(void) const
 {
     std::string npuArchStr;
     bool ret = GetPlatFormInfo()->GetPlatformResWithLock(LABEL_VERSION, NPU_ARCH, npuArchStr);
     if (!ret) {
         PF_LOGE("platform do not support get npu arch!");
-        return NpuArch::DAV_RESV;
+        return aclplatformNpuArch::DAV_RESV;
     }
     // atoi不会抛异常，非法输入返回0
     int32_t npuArchInt = std::atoi(npuArchStr.c_str());
     if (npuArchInt <= 0) {
         PF_LOGE("npu str to int failed, NpuArch str is %s", npuArchStr.c_str());
-        return NpuArch::DAV_RESV;
+        return aclplatformNpuArch::DAV_RESV;
     }
-    return static_cast<NpuArch>(npuArchInt);
+    return static_cast<aclplatformNpuArch>(npuArchInt);
 }
 
 void PlatformAscendC::GetCoreMemBw(const CoreMemType& memType, uint64_t& bwSize) const
@@ -272,12 +272,12 @@ uint32_t PlatformAscendC::CalcTschBlockDim(uint32_t sliceNum, uint32_t aicCoreNu
 uint32_t PlatformAscendC::GetLibApiWorkSpaceSize(void) const
 {
     auto npuArch = GetCurNpuArch();
-    if (npuArch == NpuArch::DAV_RESV) {
-        PF_LOGE("get platform failed, CurNpuArch is NpuArch::DAV_RESV");
+    if (npuArch == aclplatformNpuArch::DAV_RESV) {
+        PF_LOGE("get platform failed, CurNpuArch is aclplatformNpuArch::DAV_RESV");
         return -1;
-    } else if (npuArch == NpuArch::DAV_2201) {
+    } else if (npuArch == aclplatformNpuArch::DAV_2201) {
         return WORK_SPACE_SIZE_910B;
-    } else if (npuArch == NpuArch::DAV_3510) {
+    } else if (npuArch == aclplatformNpuArch::DAV_3510) {
         return WORK_SPACE_SIZE_950;
     }
     return WORK_SPACE_SIZE;

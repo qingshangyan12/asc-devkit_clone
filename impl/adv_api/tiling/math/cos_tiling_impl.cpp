@@ -84,8 +84,8 @@ void GetCosMaxMinTmpSize(
 
     auto npuArch = platform->GetCurNpuArch();
     ASCENDC_HOST_ASSERT(
-        (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_5102 ||
-         npuArch == NpuArch::DAV_5162),
+        (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 || npuArch == aclplatformNpuArch::DAV_5102 ||
+         npuArch == aclplatformNpuArch::DAV_5162),
         return, "Unsupported NpuArch of Cos API.");
 
     if (config.algo == CosAlgo::POLYNOMIAL_APPROXIMATION) {
@@ -111,8 +111,8 @@ void GetCosTmpBufferFactorSize(
 
     auto npuArch = platform->GetCurNpuArch();
     ASCENDC_HOST_ASSERT(
-        (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_5102 ||
-         npuArch == NpuArch::DAV_5162),
+        (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 || npuArch == aclplatformNpuArch::DAV_5102 ||
+         npuArch == aclplatformNpuArch::DAV_5162),
         return, "Unsupported NpuArch of Cos API.");
     if (config.algo == CosAlgo::POLYNOMIAL_APPROXIMATION) {
         extraBuf = 0;

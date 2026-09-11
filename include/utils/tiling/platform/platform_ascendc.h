@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <mutex>
 #include "platform/soc_spec.h"
+#include "acl/acl_platform.h"
 
 #if !defined(__NPU_DEVICE__) && !defined(__ASCC_DEVICE__)
 
@@ -155,7 +156,7 @@ public:
      * @return Enum SocVersion
      */
     SocVersion GetSocVersion(void) const;
-    NpuArch GetCurNpuArch(void) const;
+    aclplatformNpuArch GetCurNpuArch(void) const;
 
     uint32_t GetVecRegLen(void) const;
 private:

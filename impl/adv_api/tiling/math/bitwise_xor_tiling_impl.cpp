@@ -25,7 +25,7 @@ static const std::set<uint32_t> SUPPORT_TYPESIZE = {1, 2, 4, 8};
 static constexpr const char BITWISE_XOR_GET_MAX_MIN[] = "GetBitwiseXorMaxMinTmpSize";
 static constexpr const char BITWISE_XOR_GET_TMP_BUFFER[] = "GetBitwiseXorTmpBufferFactorSize";
 
-uint32_t GetBitwiseXorMaxTmpSize(const NpuArch npuArch, const uint32_t inputSize, const uint32_t typeSize)
+uint32_t GetBitwiseXorMaxTmpSize(aclplatformNpuArch npuArch, const uint32_t inputSize, const uint32_t typeSize)
 {
     (void)npuArch;
     (void)typeSize;
@@ -33,7 +33,7 @@ uint32_t GetBitwiseXorMaxTmpSize(const NpuArch npuArch, const uint32_t inputSize
     return 0;
 }
 
-uint32_t GetBitwiseXorMinTmpSize(const NpuArch npuArch, const uint32_t typeSize)
+uint32_t GetBitwiseXorMinTmpSize(aclplatformNpuArch npuArch, const uint32_t typeSize)
 {
     (void)npuArch;
     (void)typeSize;
@@ -49,7 +49,7 @@ void GetBitwiseXorMaxMinTmpSize(
     const uint32_t inputSize = srcShape.GetShapeSize();
     auto npuArch = ascendcPlatform.GetCurNpuArch();
     ASCENDC_HOST_ASSERT(
-        (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201), return,
+        (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201), return,
         "Unsupported NpuArch of BitwiseXor API.");
 
     HighLevelApiCheck::SrcShapeSizeVerifyingParameters<BITWISE_XOR_GET_MAX_MIN>(inputSize, typeSize);
@@ -66,7 +66,7 @@ void GetBitwiseXorTmpBufferFactorSize(
 {
     auto npuArch = ascendcPlatform.GetCurNpuArch();
     ASCENDC_HOST_ASSERT(
-        (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201), return,
+        (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201), return,
         "Unsupported NpuArch of BitwiseXor API.");
     HighLevelApiCheck::TypeSizeVerifyingParameters<BITWISE_XOR_GET_TMP_BUFFER>(typeSize, SUPPORT_TYPESIZE);
 

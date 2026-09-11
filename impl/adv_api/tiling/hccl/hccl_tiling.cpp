@@ -269,7 +269,7 @@ uint32_t Mc2CcTilingConfig::SetStepSize(uint8_t stepSize)
 {
     auto ascendcPlatform = platform_ascendc::PlatformAscendCManager::GetInstance();
     auto npuArch = ascendcPlatform->GetCurNpuArch();
-    if (npuArch == NpuArch::DAV_2201) {
+    if (npuArch == aclplatformNpuArch::DAV_2201) {
         // This API is only supported on Atlas A3
         impl_.stepSize_ = stepSize;
         return EXIT_SUCCESS;
