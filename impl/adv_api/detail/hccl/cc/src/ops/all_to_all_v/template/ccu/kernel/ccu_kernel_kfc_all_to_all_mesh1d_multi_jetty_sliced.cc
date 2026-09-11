@@ -41,10 +41,10 @@ struct KfcAllToAllSlicedContext : CcuKernelCtxBase {
 
 CcuResult InitResource(KfcAllToAllSlicedContext& ctx)
 {
-    if (ctx.channelCount == 0U || ctx.rankSize == 0U || ctx.rankId >= ctx.rankSize) {
+    if (ctx.channelCount == 0U || ctx.rankSize == 0U || ctx.rankId >= ctx.rankSize || ctx.jettyNum == 0U) {
         HCCL_ERROR(
-            "[CcuKfcAllToAllSliced] invalid resource, channelCount[%u], rankSize[%u], rankId[%u]", ctx.channelCount,
-            ctx.rankSize, ctx.rankId);
+            "[CcuKfcAllToAllSliced] invalid resource, channelCount[%u], rankSize[%u], rankId[%u], jetty[%u]",
+            ctx.channelCount, ctx.rankSize, ctx.rankId, ctx.jettyNum);
         return CCU_E_INTERNAL;
     }
     ctx.peerOutput.resize(ctx.rankSize);
