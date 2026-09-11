@@ -9,7 +9,7 @@
 
 ## npu-arch编译选项说明
 
-开发者需根据实际的执行环境，修改具体样例目录下CMakeLists.txt文件中的`--npu-arch`编译选项，参考下表中的对应关系，修改为环境对应的npu-arch参数值。
+开发者需根据实际的执行环境，修改具体样例目录下CMakeLists.txt文件中的`CMAKE_ASC_ARCHITECTURES`编译选项，参考下表中的对应关系，修改为环境对应的npu-arch参数值。
 | 产品型号 |  npu-arch参数 |
 | ---- | ---- |
-| Ascend 950PR/Ascend 950DT | --npu-arch=dav-3510 |
+| Ascend 950PR/Ascend 950DT | dav-3510 |

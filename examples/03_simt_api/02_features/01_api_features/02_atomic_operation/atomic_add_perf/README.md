@@ -73,13 +73,13 @@
 
 ```cpp
 // 场景1：GM单地址，所有线程竞争同一个GM计数器
-__global__ void atomic_add_gm_single_no_return(int32_t* counter)
+__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void atomic_add_gm_single_no_return(int32_t* counter)
 {
     asc_atomic_add(counter, 1);  // 1024个线程访问同一GM地址
 }
 
 // 场景2：UB单地址，所有线程调用同一个UB地址上的原子加接口
-__global__ void atomic_add_ub_local_no_return()
+__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void atomic_add_ub_local_no_return()
 {
     __ubuf__ int32_t local[1];
     asc_atomic_add(&local[0], 1);  // 1024个线程访问同一UB地址
@@ -129,13 +129,13 @@ GM是位于AI Core外部的设备全局内存，访问路径较长；UB是位于
 
 ```cpp
 // 场景3：GM单地址，8192个线程都直接竞争同一个GM计数器
-__global__ void atomic_add_gm_single_no_return(int32_t* counter)
+__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void atomic_add_gm_single_no_return(int32_t* counter)
 {
     asc_atomic_add(counter, 1);
 }
 
 // 场景4：每个线程块先在自己的UB中累加，再由线程0写回GM
-__global__ void atomic_add_ub_block_accum_no_return(int32_t* gm_result)
+__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void atomic_add_ub_block_accum_no_return(int32_t* gm_result)
 {
     __ubuf__ int32_t local[1];
     if (threadIdx.x == 0) {
@@ -189,20 +189,20 @@ __global__ void atomic_add_ub_block_accum_no_return(int32_t* gm_result)
 
 ```cpp
 // 场景5：GM单地址，使用返回值
-__global__ void atomic_add_gm_single_return(int32_t* counter)
+__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void atomic_add_gm_single_return(int32_t* counter)
 {
     volatile int32_t old_value_sink = asc_atomic_add(counter, 1);
     (void)old_value_sink;
 }
 
 // 场景6：GM单地址，不使用返回值
-__global__ void atomic_add_gm_single_no_return(int32_t* counter)
+__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void atomic_add_gm_single_no_return(int32_t* counter)
 {
     asc_atomic_add(counter, 1);
 }
 
 // 场景7：UB单地址，使用返回值
-__global__ void atomic_add_ub_local_return()
+__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void atomic_add_ub_local_return()
 {
     __ubuf__ int32_t local[1];
     volatile int32_t old_value_sink = asc_atomic_add(&local[0], 1);
@@ -210,7 +210,7 @@ __global__ void atomic_add_ub_local_return()
 }
 
 // 场景8：UB单地址，不使用返回值
-__global__ void atomic_add_ub_local_no_return()
+__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void atomic_add_ub_local_no_return()
 {
     __ubuf__ int32_t local[1];
     asc_atomic_add(&local[0], 1);
@@ -282,7 +282,7 @@ __global__ void atomic_add_ub_local_no_return()
 > 本组场景统一使用返回值：由Case 3可知，不使用返回值时`int32_t`会触发指令优化，其耗时主要由该优化决定，会掩盖同一地址上的线程数和Sector分布对性能的影响。
 
 ```cpp
-__global__ void atomic_add_gm_case4_i32_return(
+__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void atomic_add_gm_case4_i32_return(
     int32_t* counters, uint64_t target_count, uint64_t threads_per_target,
     uint64_t target_stride)
 {
@@ -340,13 +340,13 @@ __global__ void atomic_add_gm_case4_i32_return(
 
 ```cpp
 // 不使用返回值
-__global__ void atomic_add_gm_dense_i32_no_return(int32_t* counters, uint64_t target_count)
+__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void atomic_add_gm_dense_i32_no_return(int32_t* counters, uint64_t target_count)
 {
     asc_atomic_add(counters + ((blockIdx.x * blockDim.x + threadIdx.x) % target_count), 1);
 }
 
 // 使用返回值
-__global__ void atomic_add_gm_dense_i32_return(int32_t* counters, uint64_t target_count)
+__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void atomic_add_gm_dense_i32_return(int32_t* counters, uint64_t target_count)
 {
     volatile int32_t old_value_sink =
         asc_atomic_add(counters + ((blockIdx.x * blockDim.x + threadIdx.x) % target_count), 1);

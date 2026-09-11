@@ -41,9 +41,9 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void transpose_ub_kernel(float* 
 }
 ```
 
-上述实现通过UB中转保证了GM读写连续，这里的UB中的`tile`数组表示用于暂存32×32矩阵块的二维UB数组。`tile`数组的数据在UB中的排布为32×32。每行32个`float`，共128B，恰好跨越4个bank。转置写回时，同一个Warp的线程会读取UB中的一列元素，即访问`tile[tx][ty]`。由于行跨度固定为32个`float`，32个线程读取同一列时，访问地址会集中落到两个bank group的subbank 0，属于读读冲突场景。
+上述实现通过UB中转保证了GM读写连续，这里的UB中的`tile`数组表示用于暂存32×32矩阵块的二维UB数组。`tile`数组的数据在UB中的排布为32×32。每行32个`float`，共128B，恰好跨越4个bank。转置写回时，同一个Warp的线程会读取UB中的一列元素，即访问`tile[tx][ty]`。由于行跨度固定为32个`float`，32个线程读取同一列时，访问地址会集中落到两个bank group的相同编号subbank，属于读读冲突场景。
 
-下图展示了UB中的`tile`数组前12行元素按照行优先存储的排布，其中蓝色标记表示每行的第一个元素。按照地址低位交织规则，tile数组的第1行覆盖bank0到bank3，第2行覆盖bank4到bank7，第3行覆盖bank8到bank11，其余行依次类推。在32×32的UB tile中，同一个Warp的32个线程读取同一列时，会集中访问两个bank group的subbank 0。
+下图展示了UB中的`tile`数组前12行元素按照行优先存储的排布，其中蓝色标记表示每行的第一个元素。按照地址低位交织规则，tile数组的第1行覆盖bank0到bank3，第2行覆盖bank4到bank7，第3行覆盖bank8到bank11，其余行依次类推。在32×32的UB tile中，同一个Warp的32个线程读取同一列时，会集中访问两个bank group的相同编号subbank。
 
 <img src="../../../figures/bank_bad.png">
 

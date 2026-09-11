@@ -141,7 +141,6 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void histogram_ub_block_local(
     }
     asc_syncthreads();
 
-    // grid-stride遍历，对本Block私有的UB直方图做原子累加
     uint32_t index = blockIdx.x * blockDim.x + threadIdx.x;
     const uint32_t stride = gridDim.x * blockDim.x;
     for (; index < byte_count; index += stride) {
@@ -149,7 +148,7 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void histogram_ub_block_local(
     }
     asc_syncthreads();
 
-    // 前256个线程各负责一个桶，把Block局部结果原子累加到最终GM直方图
+    // 前256个线程各负责一个bin，把Block局部结果原子累加到最终GM直方图
     for (uint32_t bin_index = threadIdx.x; bin_index < HISTOGRAM_BIN_COUNT; bin_index += blockDim.x) {
         asc_atomic_add(histogram + bin_index, block_histogram[bin_index]);
     }

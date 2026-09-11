@@ -293,7 +293,7 @@ __global__ __launch_bounds__(MAX_THREAD_COUNT) void gather_custom(
     if (out_row >= index_total_length) {
         return;
     }
-    // Single thread processes entire row (all columns) - enables coalesced memory access
+    // Single thread processes an entire row (all columns).
     uint32_t in_row = index[out_row];
     int input_idx = in_row * in_width;
     int output_idx = out_row * in_width;

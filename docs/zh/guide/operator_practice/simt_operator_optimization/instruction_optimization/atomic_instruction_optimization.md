@@ -112,7 +112,7 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void histogram_ub_block_local(
 
 ```cpp
 // GM单地址，使用返回值。
-__global__ void atomic_add_gm_single_return(int32_t* counter)
+__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void atomic_add_gm_single_return(int32_t* counter)
 {
     volatile int32_t old_value_sink = asc_atomic_add(counter, 1);
     (void)old_value_sink;
@@ -123,7 +123,7 @@ __global__ void atomic_add_gm_single_return(int32_t* counter)
 
 ```cpp
 // GM单地址，不使用返回值。
-__global__ void atomic_add_gm_single_no_return(int32_t* counter)
+__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void atomic_add_gm_single_no_return(int32_t* counter)
 {
     asc_atomic_add(counter, 1);
 }

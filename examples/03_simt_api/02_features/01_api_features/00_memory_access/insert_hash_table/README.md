@@ -50,7 +50,7 @@ struct Bucket {
     int64_t key;            // 键
     uint32_t state;         // key值写入状态标记
     uint32_t flag;          // 原子操作标志位
-    float value[32];        // 值
+    float value[VALUE_DIM];        // 值
 };
 ```
 

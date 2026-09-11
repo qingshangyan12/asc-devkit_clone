@@ -191,16 +191,21 @@ uint32_t tx = threadIdx.x;
 uint32_t tiles_x = width / TILE_DIM;
 
 uint32_t tile_id = blockIdx.x * TILES_PER_BLOCK + local_tile;
+bool active = tile_id < total_tiles;
 uint32_t tile_y = tile_id / tiles_x;
 uint32_t tile_x = tile_id - tile_y * tiles_x;
 uint32_t x_index = tile_x * TILE_DIM + tx;
 uint32_t y_index = tile_y * TILE_DIM + ty;
-tile[local_tile][ty][tx] = input[x_index + y_index * width];
+if (active) {
+    tile[local_tile][ty][tx] = input[x_index + y_index * width];
+}
 asc_syncthreads();
 
 x_index = tile_y * TILE_DIM + tx;
 y_index = tile_x * TILE_DIM + ty;
-output[x_index + y_index * height] = tile[local_tile][tx][ty];
+if (active) {
+    output[x_index + y_index * height] = tile[local_tile][tx][ty];
+}
 ```
 
 **性能数据**：

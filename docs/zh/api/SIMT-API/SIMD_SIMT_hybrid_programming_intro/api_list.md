@@ -812,7 +812,7 @@
 | [asc_stwt](../memory_access_functions/asc_stwt.md) | 将指定数据存储到Global Memory的地址address中，并缓存至Data Cache和L2 Cache。 |
 | [asc_dcci_single](../memory_access_functions/asc_dcci_single.md) | 刷新指定地址所在的Cache Line，保证数据读取时Cache的一致性。 |
 | [asc_dcci_entire](../memory_access_functions/asc_dcci_entire.md) | 刷新核内的整个Data Cache，保证数据读取时Cache的一致性。 |
-| [asc_nop](../memory_access_functions/asc_nop.md) | 生成一条空操作指令，占用当前线程15个时钟周期，不执行任何实际计算与访存操作。 |
+| [asc_nop](../memory_access_functions/asc_nop.md) | 生成一条空操作指令，不执行任何实际计算与访存操作。 |
 
 ## 协作组<a name="section_cooperative_groups"></a>
 

@@ -95,7 +95,6 @@
 ```
 constexpr uint32_t THREAD_COUNT = 2048;                  // threads per block
 constexpr size_t MEM_BYTES = 512ULL * 1024ULL * 1024ULL; // 总数据量 512 MiB
-uint32_t num_elements = static_cast<uint32_t>(MEM_BYTES / sizeof(TData));
 
 template <class TData>
 __global__ __launch_bounds__(THREAD_COUNT) void aligned_type_kernel(

@@ -52,9 +52,9 @@ UB内存空间总大小为256KB。UB按功能划分为四个主要区域，从�
 
 > [!NOTE]说明
 >
-> 用户可选择禁用预留空间，禁用方法为：编译时增加[--cce-disable-vf-stack-reserved-ubuf](../../../compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#ZH-CN_TOPIC_0000002462746461)选项。开启该选项后，编译器不再预留该部分UB空间，该空间可作为普通UB空间使用，Data Cache空间可按如下公式估算：
+> 用户可选择禁用预留空间，禁用方法为：编译时增加[--cce-disable-vf-stack-reserved-ubuf](../../../compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#ZH-CN_TOPIC_0000002462746461)选项。开启该选项后（该选项仅在3510架构下生效），编译器不再预留该部分UB空间，该空间可作为普通UB空间使用，Data Cache空间可按如下公式估算：
 > ```
-> Data Cache空间大小 = min(UB总大小（256KB） - 静态内存 - 动态内存 - 预留空间（8KB）, 128KB)
+> Data Cache空间大小 = min(UB总大小（256KB） - 静态内存 - 动态内存, 128KB)
 > ```
 > 使用该选项时，仍需保证Data Cache空间不小于32KB，且Data Cache空间上限仍为128KB。开启该选项后，编译器将无法使用预留UB空间作为寄存器溢出的缓存空间，开发者需保证不会发生寄存器溢出。
 

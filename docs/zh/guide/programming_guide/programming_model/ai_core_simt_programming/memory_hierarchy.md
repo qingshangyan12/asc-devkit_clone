@@ -6,7 +6,7 @@ SIMT线程可访问多种内存空间。下表汇总了SIMT编程中常见内存
 |---------|----------|---------|---------|
 | 全局内存 | Grid | 应用程序 | Device |
 | 共享内存 | Block | 核函数（Kernel） | Vector Core |
-| 栈空间 | Thread | 核函数（Kernel） | Global Memory |
+| 栈空间 | Thread | 核函数（Kernel） | Global Memory / UB |
 | 寄存器 | Thread | 核函数（Kernel） | Vector Core |
 
 -   全局内存是所有线程均可直接访问的内存资源，即Global Memory；
