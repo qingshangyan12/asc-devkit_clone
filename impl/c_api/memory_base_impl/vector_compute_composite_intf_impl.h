@@ -1100,6 +1100,7 @@ __aicore__ inline void asc_rsqrt_sync(__ubuf__ half* dst, __ubuf__ half* src, ui
             ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16,
             ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
         asc_set_mask_count_end();
+        asc_sync_post_process();
     }
 }
 
@@ -1113,6 +1114,7 @@ __aicore__ inline void asc_rsqrt_sync(__ubuf__ float* dst, __ubuf__ float* src, 
             ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16,
             ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
         asc_set_mask_count_end();
+        asc_sync_post_process();
     }
 }
 
