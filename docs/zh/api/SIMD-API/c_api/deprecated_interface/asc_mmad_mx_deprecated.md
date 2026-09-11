@@ -5,7 +5,11 @@ resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_mmad_m
 description: "**入参`unit_flag`类型为`uint8_t`的`asc_mmad_mx`接口和`asc_mmad_mx_sync`接口已废弃。请使用入参`unit_flag_mode`类型为`asc_unit_flag_mode`的[asc_mmad_mx](../cube_compute/asc_mmad_mx.md)接口替代；原`asc_mmad_mx_sync`接口的同步功能请通过新`asc_mmad_mx`接口和`asc_sync()`实现，具体请参见[asc_sync](../sync/asc_sync.md)。"
 tag: [c_api, compute, 'operations:matrix_multiply_accumulate', matrix, 'traits:saturation_mode']
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  required_before:
+    all_of:
+    - ../cube_datamove/asc_copy_l12l0a_mx.md
+    - ../cube_datamove/asc_copy_l12l0b_mx.md
 signature:
   - prototype_id: "asc_mmad_mx__PCCf32_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b"
     archs: ["3510"]

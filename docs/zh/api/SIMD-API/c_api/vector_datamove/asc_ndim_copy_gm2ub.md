@@ -5,7 +5,11 @@ resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_g
 description: "多维数据搬运接口，将数据从Global Memory (GM)搬运到Unified Buffer（UB）。相比于基础数据搬移接口，可以更加自由配置搬入的维度信息。 本功能最多能处理5个维度，每个维度都可以单独配置Stride，且支持随路Padding功能。相关配置参数有很多，需要通过不同的接口传入。"
 tag: [c_api, data_movement, copy, 'src:global_memory', 'dst:unified_buffer']
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  required_before:
+    all_of:
+    - asc_set_ndim_loop_stride.md
+    - asc_set_ndim_pad_count.md
 signature:
   - override_id: "asc_ndim_copy_gm2ub__PUi8_PGi8_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
     archs: ["3510"]

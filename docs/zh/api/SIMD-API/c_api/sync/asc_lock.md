@@ -5,7 +5,9 @@ resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/asc_lock.md"
 description: "该接口用于AI Core内部异步流水线之间的同步，可按需阻塞指定流水线的执行。"
 tag: [c_api, 'operations:synchronization']
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  companion:
+  - asc_unlock.md
 signature:
   - override_id: "asc_lock__pipe_u8"
     archs: ["3510"]

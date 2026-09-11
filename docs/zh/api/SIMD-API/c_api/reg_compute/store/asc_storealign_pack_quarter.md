@@ -6,7 +6,9 @@ description: "将矢量数据寄存器中的数据压缩搬出到Unified Buffer�
 tag: [c_api, data_movement, 'operations:compression', 'operations:store', mask, vector,
   register_vector, 'src:vector_register', 'dst:unified_buffer', masked]
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  companion:
+  - ../reg_addr_reg/asc_update_addr_reg.md
 signature:
   - prototype_id: "asc_storealign_pack_quarter__PU<dtype>_v<dtype>_vb"
     archs: ["3510"]

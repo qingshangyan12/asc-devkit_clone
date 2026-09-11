@@ -5,7 +5,9 @@ resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/as
 description: "此接口用于获取执行[asc_repeat_reduce_max](asc_repeat_reduce_max.md)操作后的最大值，以及第一个最大值时的索引。"
 tag: [c_api, 'roles:query']
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  companion:
+  - asc_repeat_reduce_max.md
 signature:
   - override_id: "asc_get_reduce_max_cnt__Rf16_Ru32"
     archs: ["2201"]

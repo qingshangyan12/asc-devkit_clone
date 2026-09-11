@@ -5,7 +5,10 @@ resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc
 description: "Reg计算数据搬运接口，用于结束一组[asc_squeeze_and_storeunalign](asc_squeeze_and_storeunalign.md)连续搬出操作，将暂存在非对齐寄存器中的尾块写入Unified Buffer（UB）。"
 tag: [c_api, 'roles:control']
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  required_before:
+    all_of:
+    - asc_squeeze_and_storeunalign.md
 signature:
   - prototype_id: "asc_squeeze_and_storeunalign_finalize__PU<dtype>_vstoreunalign"
     archs: ["3510"]

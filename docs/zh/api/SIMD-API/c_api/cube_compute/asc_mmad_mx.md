@@ -6,7 +6,12 @@ description: "本接口用于完成带有量化系数的矩阵乘加计算（Mma
 tag: [c_api, compute, 'roles:configuration', 'operations:matrix_multiply_accumulate',
   matrix, 'traits:saturation_mode']
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  required_before:
+    all_of:
+    - ../cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md
+    - ../cube_datamove/asc_copy_l12l0a_mx.md
+    - ../cube_datamove/asc_copy_l12l0b_mx.md
 signature:
   - prototype_id: "asc_mmad_mx__PCCf32_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_unitflag_b_b_b"
     archs: ["3510"]

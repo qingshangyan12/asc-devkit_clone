@@ -5,7 +5,10 @@ resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_al
 description: "对矩阵数据进行实时padding，完成padding后将数据从Global Memory搬运到L1 Buffer。需要与[asc_set_gm2l1_loop_size](asc_set_gm2l1_loop_size.md)、[asc_set_gm2l1_loop1_stride](asc_set_gm2l1_loop1_stride.md)、[asc_set_gm2l1_loop2_stride](asc_set_gm2l1_loop2_stride.md)和[asc_set_gm2l1_pad](asc_set_gm2l1_pad.md)配合使用。"
 tag: [c_api, data_movement, copy, 'src:global_memory', 'dst:l1_buffer']
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  companion:
+  - asc_set_gm2l1_loop2_stride.md
+  - asc_set_gm2l1_pad.md
 signature:
   - override_id: "asc_copy_gm2l1_align__PL1i8_PGi8_u32_u32_u8_u8_b_u8_u64_u32"
     archs: ["3510"]

@@ -5,7 +5,10 @@ resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc
 description: "Reg计算数据搬运接口。将源矢量数据寄存器`src1`中被掩码`squeeze_mask`选中的元素压缩到目的矢量数据寄存器`dst`，并将这些元素连续搬出到Unified Buffer（UB）。压缩后的元素按其在`src1`中的顺序从`dst`的低位开始连续排列，`dst`中的剩余元素置0。"
 tag: [c_api, compute, 'operations:compact', mask, vector, register_vector, masked]
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  required_before:
+    all_of:
+    - asc_squeeze_and_storeunalign_init.md
 signature:
   - prototype_id: "asc_squeeze_and_storeunalign__PU<dtype>_Rv<dtype>_Rvstoreunalign_v<dtype>_vb"
     archs: ["3510"]

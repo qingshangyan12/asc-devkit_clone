@@ -5,7 +5,24 @@ resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.m
 description: "将矩阵计算结果从L0C Buffer搬运至Unified Buffer，搬运过程中可同步支持随路量化、随路激活、随路格式转换（Nz2ND/Nz2DN）等能力组合。"
 tag: [c_api, data_movement, copy]
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  conditional_before:
+  - when: '- Nz2DN格式转换场景下'
+    all_of:
+    - asc_set_l0c_copy_channel_para.md
+  - when: '- Nz2ND格式转换场景下'
+    all_of:
+    - asc_set_l0c_copy_nz_para.md
+  - when: '- 随路激活模式下'
+    all_of:
+    - asc_set_l0c2gm_lrelu_alpha.md
+    - asc_set_l0c2gm_relu_alpha.md
+  - when: 需要进行随路Nz转ND/DN格式之前
+    all_of:
+    - asc_set_l0c_copy_nz_para.md
+  - when: 需要进行随路Nz转ND格式之前
+    all_of:
+    - asc_set_l0c2gm_nz2nd.md
 signature:
   - prototype_id: "asc_copy_l0c2ub__PU<dst_dtype>_PCC<src_dtype>_u16_u16_u32_u16_u8_b_u8_u8_u64_u8_b_b_u64_u8_b_u8_b_b_b_b"
     archs: ["3510"]

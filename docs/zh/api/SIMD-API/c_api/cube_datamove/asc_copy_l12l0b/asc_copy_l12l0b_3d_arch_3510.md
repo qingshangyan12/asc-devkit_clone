@@ -5,7 +5,11 @@ resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/a
 description: "3D卷积数据搬运是用于将NC1HWC0格式的Feature Map完成Image to Column展开，按卷积步长、卷积核大小、膨胀系数配置生成img2col二维矩阵，再从展开后的矩阵中选取指定数据块搬运到L0B Buffer，用于3D卷积场景的矩阵计算数据加载。"
 tag: [c_api, data_movement, copy]
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  required_before:
+    all_of:
+    - ../asc_set_l12l0_padding_val.md
+    - ../asc_set_l13d_fmatrix_b.md
 signature:
   - prototype_id: "asc_copy_l12l0b__PCB<dtype>_PL1<dtype>_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16"
     archs: ["3510"]

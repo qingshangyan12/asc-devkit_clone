@@ -6,7 +6,10 @@ description: "本接口是Ascend C面向昇腾AI芯片的矩阵乘加（Mmad）�
 tag: [c_api, compute, 'roles:configuration', 'operations:matrix_multiply_accumulate',
   matrix, 'traits:saturation_mode']
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  required_before:
+    all_of:
+    - ../cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md
 signature:
   - prototype_id: "asc_mmad__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_unitflag_b_b_b"
     archs: ["3510"]

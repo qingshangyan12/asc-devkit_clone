@@ -5,7 +5,9 @@ resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/asc_sync_inter_arrive.md"
 description: "本接口与[asc_sync_inter_wait](asc_sync_inter_wait.md)配对使用，实现不同AI Core之间全部AIC或全部AIV的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式0）。"
 tag: [c_api, 'operations:synchronization']
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  companion:
+  - asc_sync_inter_wait.md
 signature:
   - override_id: "asc_sync_inter_arrive__pipe_i64"
     archs: ["3510", "2201"]

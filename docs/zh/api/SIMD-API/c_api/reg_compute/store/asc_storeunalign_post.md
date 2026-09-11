@@ -6,7 +6,9 @@ description: "将非对齐寄存器中暂存的尾块写入Unified Buffer（UB�
 tag: [c_api, data_movement, 'operations:store', vector, register_vector, 'src:vector_register',
   'dst:unified_buffer', post_update]
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  companion:
+  - ../reg_addr_reg/asc_update_addr_reg.md
 signature:
   - prototype_id: "asc_storeunalign_post__PU<dtype>_vstoreunalign_i32"
     archs: ["3510"]

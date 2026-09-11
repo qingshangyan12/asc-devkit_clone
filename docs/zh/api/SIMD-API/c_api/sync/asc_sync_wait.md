@@ -5,7 +5,9 @@ resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/asc_sync_wait.md"
 description: "等待特定的同步标志，阻塞当前流水线直到条件满足。"
 tag: [c_api, 'operations:synchronization']
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  companion:
+  - asc_sync_notify.md
 signature:
   - override_id: "asc_sync_wait__pipe_pipe_event"
     archs: ["3510", "2201"]

@@ -6,7 +6,9 @@ description: "将矢量数据寄存器中的首个元素搬出到Unified Buffer�
 tag: [c_api, data_movement, 'operations:store', vector, register_vector, 'src:vector_register',
   'dst:unified_buffer']
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  companion:
+  - ../reg_addr_reg/asc_update_addr_reg.md
 signature:
   - prototype_id: "asc_storealign_1st__PU<dtype>_v<dtype>"
     archs: ["3510"]

@@ -5,7 +5,9 @@ resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/as
 description: "此接口用于获取执行[asc_reduce](asc_reduce.md)操作后剩余的元素数量。"
 tag: [c_api, 'roles:query']
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  companion:
+  - asc_reduce.md
 signature:
   - override_id: "asc_get_rsvd_count__z"
     archs: ["2201"]

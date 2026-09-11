@@ -6,7 +6,9 @@ description: "将矢量数据寄存器或掩码寄存器中的数据以对齐的
 tag: [c_api, data_movement, 'operations:store', vector, register_vector, 'src:vector_register',
   'dst:unified_buffer']
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  companion:
+  - ../reg_addr_reg/asc_update_addr_reg.md
 signature:
   - prototype_id: "asc_storealign__PU<dtype>_v<dtype>_vb"
     archs: ["3510"]

@@ -6,7 +6,14 @@ description: "本接口根据Unified Buffer（UB）中按dtype对齐的起始地
 tag: [c_api, data_movement, 'operations:load', vector, register_vector, 'src:unified_buffer',
   'dst:vector_register']
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  required_before:
+    all_of:
+    - ../reg_addr_reg/asc_update_addr_reg.md
+  companion:
+  - ../reg_addr_reg/asc_update_addr_reg.md
+  - asc_loadunalign.md
+  - asc_loadunalign_postupdate.md
 signature:
   - prototype_id: "asc_loadunalign_pre__Rvloadunalign_PU<dtype>"
     archs: ["3510"]

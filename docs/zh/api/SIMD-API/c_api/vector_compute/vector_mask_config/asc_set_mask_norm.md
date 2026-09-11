@@ -5,7 +5,9 @@ resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_conf
 description: "设置Mask模式为Normal模式，该模式为系统默认模式。该模式下，Mask参数可控制高维切分计算过程中单次迭代内参与计算的元素。"
 tag: [c_api, 'roles:configuration']
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  companion:
+  - asc_set_vector_mask.md
 signature:
   - override_id: "asc_set_mask_norm__z"
     archs: ["2201"]

@@ -6,7 +6,12 @@ description: "从Unified Buffer（UB）中32字节对齐的起始地址读取一
 tag: [c_api, data_movement, 'operations:load', vector, register_vector, 'src:unified_buffer',
   'dst:vector_register']
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  required_before:
+    all_of:
+    - ../reg_addr_reg/asc_update_addr_reg.md
+  companion:
+  - ../reg_addr_reg/asc_update_addr_reg.md
 signature:
   - prototype_id: "asc_loadalign_brc_datablock__PU<dtype>"
     archs: ["3510"]

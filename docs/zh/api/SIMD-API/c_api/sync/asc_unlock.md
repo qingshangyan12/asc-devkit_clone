@@ -5,7 +5,9 @@ resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/asc_unlock.md"
 description: "用于同步AI Core内部异步流水的指令，直到当前流水的前序指令执行完成后，根据mutex_id释放对应Mutex。"
 tag: [c_api, 'operations:synchronization']
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  companion:
+  - asc_lock.md
 signature:
   - override_id: "asc_unlock__pipe_u8"
     archs: ["3510"]

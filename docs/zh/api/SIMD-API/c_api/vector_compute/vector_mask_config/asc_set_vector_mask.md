@@ -5,7 +5,11 @@ resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_conf
 description: "本API用于设置Mask值。某些矢量计算接口需要提前设置Mask，用于指示哪些数据参与计算。 单独使用该API时可引入`c_api/vector_compute/compute/vector_mask_config.h`，整体使用C API时可引入`c_api/asc_simd.h`。"
 tag: [c_api, 'roles:configuration']
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  required_before:
+    any_of:
+    - asc_set_mask_count.md
+    - asc_set_mask_norm.md
 signature:
   - override_id: "asc_set_vector_mask__u64_u64"
     archs: ["3510", "2201"]

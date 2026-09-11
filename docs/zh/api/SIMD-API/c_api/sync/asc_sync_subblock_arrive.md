@@ -5,7 +5,9 @@ resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/asc_sync_subblock_arrive.m
 description: "本接口与[asc_sync_subblock_wait](asc_sync_subblock_wait.md)配对使用，实现同一AI Core内全部AIV（[subblock](inter_core_sync_overview.md#fig_block_subblock_relationship)）之间的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式1）。"
 tag: [c_api, 'operations:synchronization']
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  companion:
+  - asc_sync_subblock_wait.md
 signature:
   - override_id: "asc_sync_subblock_arrive__pipe_i64"
     archs: ["3510", "2201"]

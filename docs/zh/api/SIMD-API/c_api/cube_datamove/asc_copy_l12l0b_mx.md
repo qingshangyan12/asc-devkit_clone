@@ -5,7 +5,9 @@ resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_m
 description: "负责完成MX矩阵计算过程中所需的右矩阵对应的量化系数的搬运，数据通路为L1 Buffer->L0B_MX Buffer。其中右量化系数矩阵以32字节（固定数据类型为`fp8_e8m0_t`、分形大小为2×16的）的数据分形为单位进行搬运。"
 tag: [c_api, data_movement, copy]
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  companion:
+  - asc_copy_l12l0b/asc_copy_l12l0b_2d_arch_3510.md
 signature:
   - override_id: "asc_copy_l12l0b_mx__u64_PL1f8e8m0_u16_u16_u8_u8_u16_u16"
     archs: ["3510"]

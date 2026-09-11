@@ -6,7 +6,11 @@ description: "从Unified Buffer（UB）中按dtype对齐的起始地址读取VL�
 tag: [c_api, data_movement, 'operations:load', vector, register_vector, 'src:unified_buffer',
   'dst:vector_register', post_update]
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  required_before:
+    all_of:
+    - ../reg_addr_reg/asc_update_addr_reg.md
+    - asc_loadunalign_pre.md
 signature:
   - prototype_id: "asc_loadunalign_postupdate__Rv<dtype>_Rvloadunalign_RPU<dtype>_u32"
     archs: ["3510"]

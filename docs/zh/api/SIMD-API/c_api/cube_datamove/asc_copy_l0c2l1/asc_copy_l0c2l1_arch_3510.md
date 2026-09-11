@@ -5,7 +5,14 @@ resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/a
 description: "该接口用于将矩阵计算的结果从L0C Buffer搬运至L1 Buffer中，并且在搬运过程中支持与其它接口组合使用，配置多种随路能力。"
 tag: [c_api, data_movement, copy]
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  conditional_before:
+  - when: 需要进行随路Nz转ND/DN格式之前
+    all_of:
+    - ../asc_set_l0c_copy_nz_para.md
+  - when: 需要进行随路Nz转ND格式之前
+    all_of:
+    - ../asc_set_l0c2gm_nz2nd.md
 signature:
   - override_id: "asc_copy_l0c2l1__PL1f16_PCCf32_u16_u16_u32_u16_u8_u8_u64_u8_b_b_u64_u8_b_u8_u8_b"
     archs: ["3510"]

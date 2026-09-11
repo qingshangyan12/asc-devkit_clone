@@ -6,7 +6,9 @@ description: "为[asc_select](../vector_permute_sel/asc_select.md)操作设置�
 tag: [c_api, compute, 'roles:configuration', 'operations:comparison', mask, vector,
   memory_vector, masked]
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  companion:
+  - ../vector_permute_sel/asc_select.md
 signature:
   - override_id: "asc_set_cmp_mask__PUv"
     archs: ["2201"]

@@ -5,7 +5,10 @@ resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_nd
 description: "将数据从Global Memory搬运到L1 Buffer，并在搬运过程中将源端按N维连续排布的ND格式数据转换为L1 Buffer侧的Nz分形排布，使其满足后续矩阵计算对分形列连续性的要求。该接口也适用于卷积格式NHWC（ND）转换为NC1HWC0格式等转换场景。"
 tag: [c_api, data_movement, copy, layout_transform, 'src:global_memory', 'dst:l1_buffer']
 usage_dependencies:
-  status: unconfirmed
+  status: confirmed
+  required_before:
+    all_of:
+    - ../asc_set_gm2l1_nz_para.md
 signature:
   - prototype_id: "asc_copy_gm2l1_nd2nz__PL1<dtype>_PG<dtype>_u64_u8_u16_u32_u64_b"
     archs: ["3510"]
