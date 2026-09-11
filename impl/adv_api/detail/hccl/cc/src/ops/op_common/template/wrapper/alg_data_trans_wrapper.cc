@@ -15,6 +15,12 @@
 namespace mc2_ops_hccl {
 
 namespace {
+HcclResult HcommChannelNotifyWaitOnThread(
+    ThreadHandle thread, ChannelHandle channel, u32 localNotifyIdx, u32 timeout)
+{
+    return HcclChannelNotifyWaitOnThreadDefault(thread, channel, localNotifyIdx, timeout);
+}
+
 enum HcommBatchTransferSupportState {
     HCOMM_BATCH_TRANSFER_UNINIT = -1,
     HCOMM_BATCH_TRANSFER_UNSUPPORTED = 0,
