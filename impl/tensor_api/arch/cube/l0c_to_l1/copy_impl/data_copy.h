@@ -23,7 +23,7 @@
 #define IMPL_TENSOR_API_ARCH_CUBE_L0C_TO_L1_COPY_IMPL_DATA_COPY_H
 
 #include "impl/tensor_api/utils/utils_impl.h"
-#include "impl/tensor_api/arch/cube/l1_to_fb/l1_to_fb_copy.h"
+#include "impl/tensor_api/arch/cube/l1_to_fb/copy.h"
 #include "impl/tensor_api/arch/cube/utils/l0c2out_utils.h"
 #include "impl/tensor_api/arch/cube/l0c_to_l1/copy_impl/instruction.h"
 
@@ -61,8 +61,8 @@ public:
         auto copy_params = make_l0c_out_copy_params<DstTensor, SrcTensor>(dst.layout(), src.layout(), dst_shape);
         copy_l0c_to_l1_instr::data_copy_with_offset<quant_pre, DstTensor, SrcTensor>(
             dst, src, dst_offset, src_offset, copy_params.n_size, copy_params.m_size, copy_params.src_stride,
-            copy_params.dst_stride, trait.enable_relu, static_cast<uint8_t>(params.unit_flag),
-            trait.enable_channel_split);
+            copy_params.dst_stride, trait.enable_relu ? asc_relu_pre_mode::NORMAL : asc_relu_pre_mode::NONE,
+            static_cast<asc_unit_flag_mode>(params.unit_flag), trait.enable_channel_split);
     }
 
 private:
@@ -75,14 +75,14 @@ private:
     {
         auto copy_params = make_l0c_out_copy_params<DstTensor, SrcTensor>(dst_layout, src_layout);
 
-        bool relu_en = trait.enable_relu;
-        uint8_t unit_flag = static_cast<uint8_t>(params.unit_flag);
+        auto relu_pre = trait.enable_relu ? asc_relu_pre_mode::NORMAL : asc_relu_pre_mode::NONE;
+        auto unit_flag = static_cast<asc_unit_flag_mode>(params.unit_flag);
 
         bool is_channel_split = trait.enable_channel_split;
 
         copy_l0c_to_l1_instr::data_copy<quant_pre>(
             dst.data().get(), src.data().get(), copy_params.n_size, copy_params.m_size, copy_params.src_stride,
-            copy_params.dst_stride, relu_en, unit_flag, is_channel_split);
+            copy_params.dst_stride, relu_pre, unit_flag, is_channel_split);
     }
 };
 
@@ -124,8 +124,8 @@ public:
             auto dst_offset = base_dst_offset + dst.layout()(dst_coord);
             copy_l0c_to_l1_instr::data_copy_with_offset<quant_pre>(
                 dst, src(src_coord), dst_offset, src_offset, cal_n_size, copy_params.m_size, copy_params.src_stride,
-                copy_params.dst_stride, trait.enable_relu, static_cast<uint8_t>(params.unit_flag),
-                trait.enable_channel_split);
+                copy_params.dst_stride, trait.enable_relu ? asc_relu_pre_mode::NORMAL : asc_relu_pre_mode::NONE,
+                static_cast<asc_unit_flag_mode>(params.unit_flag), trait.enable_channel_split);
         }
     }
 
@@ -182,11 +182,11 @@ private:
         const uint32_t src_stride = get_element<attr_info::stride, attr_info::column, 1>(src_layout) / fractal_fixed;
         const uint32_t dst_stride = get_element<attr_info::stride, attr_info::column, 1>(dst_layout);
 
-        const bool relu_enable = trait.enable_relu;
-        const uint8_t unit_flag = static_cast<uint8_t>(params.unit_flag);
+        const auto relu_pre = trait.enable_relu ? asc_relu_pre_mode::NORMAL : asc_relu_pre_mode::NONE;
+        const auto unit_flag = static_cast<asc_unit_flag_mode>(params.unit_flag);
 
         const bool channel_split = trait.enable_channel_split;
-        return Std::make_tuple(n_size, m_size, src_stride, dst_stride, relu_enable, unit_flag, channel_split);
+        return Std::make_tuple(n_size, m_size, src_stride, dst_stride, relu_pre, unit_flag, channel_split);
     }
 
     template <typename SrcTensor>
