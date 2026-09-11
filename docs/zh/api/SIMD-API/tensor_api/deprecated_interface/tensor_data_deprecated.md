@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: base_tensor::Data（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/deprecated_interface/tensor_data_deprecated.md
+description: '**该接口已废弃，请使用[base_tensor::data](../tensor/tensor.md#data)替代。'
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Data__z
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/tensor.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # base_tensor::Data（废弃）
 
 ## 产品支持情况
@@ -34,8 +50,25 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "Data__z"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/tensor.h"]
+```
+
 ```cpp
 __aicore__ inline constexpr decltype(auto) Data() const;
+```
+
+```yaml
+api_signature:
+  override_id: "Data__z"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/tensor.h"]
+```
+
+```cpp
 __aicore__ inline constexpr decltype(auto) Data();
 ```
 

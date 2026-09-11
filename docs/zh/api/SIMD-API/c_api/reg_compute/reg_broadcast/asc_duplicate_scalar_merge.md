@@ -10,52 +10,40 @@ usage_dependencies:
 signature:
   - override_id: "asc_duplicate_scalar_merge__Rvi8_i8_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
   - override_id: "asc_duplicate_scalar_merge__Rvu8_u8_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
   - override_id: "asc_duplicate_scalar_merge__Rvf8e8m0_f8e8m0_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
   - override_id: "asc_duplicate_scalar_merge__Rvf8e5m2_f8e5m2_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
   - override_id: "asc_duplicate_scalar_merge__Rvf8e4m3_f8e4m3_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
   - override_id: "asc_duplicate_scalar_merge__Rvi16_i16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
   - override_id: "asc_duplicate_scalar_merge__Rvu16_u16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
   - override_id: "asc_duplicate_scalar_merge__Rvf16_f16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
   - override_id: "asc_duplicate_scalar_merge__Rvbf16_bf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
   - override_id: "asc_duplicate_scalar_merge__Rvi32_i32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
   - override_id: "asc_duplicate_scalar_merge__Rvu32_u32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
   - override_id: "asc_duplicate_scalar_merge__Rvf32_f32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -98,8 +86,7 @@ merge模式下，将标量值value广播到dst中被mask筛选的位置，dst中
 api_signature:
   override_id: "asc_duplicate_scalar_merge__Rvi8_i8_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
 ```
 
 ```cpp
@@ -110,8 +97,7 @@ __simd_callee__ inline void asc_duplicate_scalar_merge(vector_int8_t& dst, int8_
 api_signature:
   override_id: "asc_duplicate_scalar_merge__Rvu8_u8_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
 ```
 
 ```cpp
@@ -122,8 +108,7 @@ __simd_callee__ inline void asc_duplicate_scalar_merge(vector_uint8_t& dst, uint
 api_signature:
   override_id: "asc_duplicate_scalar_merge__Rvf8e8m0_f8e8m0_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
 ```
 
 ```cpp
@@ -134,8 +119,7 @@ __simd_callee__ inline void asc_duplicate_scalar_merge(vector_fp8_e8m0_t& dst, f
 api_signature:
   override_id: "asc_duplicate_scalar_merge__Rvf8e5m2_f8e5m2_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
 ```
 
 ```cpp
@@ -146,8 +130,7 @@ __simd_callee__ inline void asc_duplicate_scalar_merge(vector_fp8_e5m2_t& dst, f
 api_signature:
   override_id: "asc_duplicate_scalar_merge__Rvf8e4m3_f8e4m3_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
 ```
 
 ```cpp
@@ -158,8 +141,7 @@ __simd_callee__ inline void asc_duplicate_scalar_merge(vector_fp8_e4m3fn_t& dst,
 api_signature:
   override_id: "asc_duplicate_scalar_merge__Rvi16_i16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
 ```
 
 ```cpp
@@ -170,8 +152,7 @@ __simd_callee__ inline void asc_duplicate_scalar_merge(vector_int16_t& dst, int1
 api_signature:
   override_id: "asc_duplicate_scalar_merge__Rvu16_u16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
 ```
 
 ```cpp
@@ -182,8 +163,7 @@ __simd_callee__ inline void asc_duplicate_scalar_merge(vector_uint16_t& dst, uin
 api_signature:
   override_id: "asc_duplicate_scalar_merge__Rvf16_f16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
 ```
 
 ```cpp
@@ -194,8 +174,7 @@ __simd_callee__ inline void asc_duplicate_scalar_merge(vector_half& dst, half va
 api_signature:
   override_id: "asc_duplicate_scalar_merge__Rvbf16_bf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
 ```
 
 ```cpp
@@ -206,8 +185,7 @@ __simd_callee__ inline void asc_duplicate_scalar_merge(vector_bfloat16_t& dst, b
 api_signature:
   override_id: "asc_duplicate_scalar_merge__Rvi32_i32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
 ```
 
 ```cpp
@@ -218,8 +196,7 @@ __simd_callee__ inline void asc_duplicate_scalar_merge(vector_int32_t& dst, int3
 api_signature:
   override_id: "asc_duplicate_scalar_merge__Rvu32_u32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
 ```
 
 ```cpp
@@ -230,8 +207,7 @@ __simd_callee__ inline void asc_duplicate_scalar_merge(vector_uint32_t& dst, uin
 api_signature:
   override_id: "asc_duplicate_scalar_merge__Rvf32_f32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
 ```
 
 ```cpp

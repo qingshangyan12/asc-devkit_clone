@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetUserTag
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/GetUserTag.md
+description: 获取指定Tensor块的Tag信息，用户可以根据Tag信息对Tensor进行不同操作。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetUserTag__z
+  archs: ['3510', '2201', '3002', '2002', '1001']
+  headers: [/include/basic_api/kernel_tensor.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetUserTag<a name="ZH-CN_TOPIC_0000002364845757"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -31,6 +47,13 @@
 获取指定Tensor块的Tag信息，用户可以根据Tag信息对Tensor进行不同操作。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "GetUserTag__z"
+  archs: ["3510", "2201", "3002", "2002", "1001"]
+  headers: ["/include/basic_api/kernel_tensor.h"]
+```
 
 ```cpp
 __aicore__ inline TTagType GetUserTag() const

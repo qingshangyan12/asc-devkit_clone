@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: MakeLayout
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/aux_data_structures/Layout/MakeLayout.md
+description: 将传入的Shape和Stride数据打包成Layout数据结构。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: MakeLayout__RCpShapeType_RCpStrideType
+  archs: ['2201']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # MakeLayout<a name="ZH-CN_TOPIC_0000002332317301"></a>
 
 ## 产品支持情况<a name="section73648168211"></a>
@@ -31,6 +47,13 @@
 将传入的Shape和Stride数据打包成Layout数据结构。
 
 ## 函数原型<a name="zh-cn_topic_0000002078447573_zh-cn_topic_0000001576806829_zh-cn_topic_0000001339187720_section13230182415108"></a>
+
+```yaml
+api_signature:
+  override_id: "MakeLayout__RCpShapeType_RCpStrideType"
+  archs: ["2201"]
+  headers: []
+```
 
 ```cpp
 template <typename ShapeType, typename StrideType>

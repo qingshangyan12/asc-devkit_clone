@@ -1,3 +1,21 @@
+---
+okftype: reference.api.cpp
+title: WaitPreBlock
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/WaitPreBlock.md
+description: WaitPreBlock和NotifyNextBlock是核间同步控制接口。NotifyNextBlock通过写全局内存来通知其他核当前核已执行完成，其他核可以继续往下执行；WaitPreBlock通过读取全局内存，判断当前核是否可以继续往下执行。
+tag: [basic_api]
+usage_dependencies:
+  status: confirmed
+  companion:
+  - InitDetermineComputeWorkspace.md
+signature:
+- override_id: WaitPreBlock__Rgtg1x3_i32_Rltg1x3_i32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/basic_api/kernel_operator_determine_compute_sync_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # WaitPreBlock<a name="ZH-CN_TOPIC_0000001771590261"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -34,6 +52,13 @@ WaitPreBlock和NotifyNextBlock是核间同步控制接口。NotifyNextBlock通�
 WaitPreBlock和NotifyNextBlock必须与[InitDetermineComputeWorkspace](InitDetermineComputeWorkspace.md#)接口配合使用，这三个接口组合使用能够确保多个AIV核严格按照blockIdx的升序执行，适用于要求确定性计算的场景，确定性计算的具体含义请参考[原子操作-确定性计算](../../atomic_operations/key_features.md)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "WaitPreBlock__Rgtg1x3_i32_Rltg1x3_i32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/basic_api/kernel_operator_determine_compute_sync_intf.h"]
+```
 
 ```cpp
 __aicore__ inline void WaitPreBlock(GlobalTensor<int32_t>& gmWorkspace, LocalTensor<int32_t>& ubWorkspace)

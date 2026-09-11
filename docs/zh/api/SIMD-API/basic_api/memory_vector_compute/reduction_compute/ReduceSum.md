@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: ReduceSum
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceSum.md
+description: '`ReduceSum`接口对所有输入数据进行求和，计算过程如下。'
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ReduceSum
 
 ## 产品支持情况

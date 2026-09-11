@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Sub
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Sub.md
+description: Sub属于双目矢量类计算接口，负责将输入的两个tensor按元素求差。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Sub<a name="ZH-CN_TOPIC_0000001429950413"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: InterHcclGroupSync
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/InterHcclGroupSync.md
+description: 用于等待一个跨通信域的通信任务完成。调用该接口后，本通信域后续下发的通信任务，均等待指定的srcGroupID通信域中的srcHandleID通信任务执行完成，才开始执行。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # InterHcclGroupSync
 
 ## 产品支持情况

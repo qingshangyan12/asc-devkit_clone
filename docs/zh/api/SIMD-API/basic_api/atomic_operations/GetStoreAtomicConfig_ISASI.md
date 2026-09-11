@@ -1,3 +1,21 @@
+---
+okftype: reference.api.cpp
+title: GetStoreAtomicConfig\(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/atomic_operations/GetStoreAtomicConfig_ISASI.md
+description: 获取原子操作开启位与原子操作类型的值，详细说明见[表1](SetStoreAtomicConfig_ISASI.md#table622mcpsimp)。
+tag: [basic_api]
+usage_dependencies:
+  status: confirmed
+  companion:
+  - SetStoreAtomicConfig_ISASI.md
+signature:
+- override_id: GetStoreAtomicConfig__Ru16_Ru16
+  archs: ['3510', '2201', '3002']
+  headers: [/include/basic_api/kernel_operator_common_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetStoreAtomicConfig\(ISASI\)<a name="ZH-CN_TOPIC_0000001836926165"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -32,6 +50,13 @@
 获取原子操作开启位与原子操作类型的值，详细说明见[表1](SetStoreAtomicConfig_ISASI.md#table622mcpsimp)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "GetStoreAtomicConfig__Ru16_Ru16"
+  archs: ["3510", "2201", "3002"]
+  headers: ["/include/basic_api/kernel_operator_common_intf.h"]
+```
 
 ```cpp
 __aicore__ inline void GetStoreAtomicConfig(uint16_t& atomicType, uint16_t& atomicOp)

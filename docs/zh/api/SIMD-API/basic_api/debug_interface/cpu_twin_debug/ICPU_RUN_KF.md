@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: ICPU_RUN_KF
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/debug_interface/cpu_twin_debug/ICPU_RUN_KF.md
+description: 进行核函数（Kernel）的CPU侧运行验证时，CPU调测总入口，完成CPU侧的算子程序调用。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ICPU_RUN_KF<a name="ZH-CN_TOPIC_0000002080882157"></a>
 
 ## 产品支持情况

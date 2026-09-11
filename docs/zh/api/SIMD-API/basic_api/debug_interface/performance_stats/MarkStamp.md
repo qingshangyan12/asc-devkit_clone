@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: MarkStamp
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/debug_interface/performance_stats/MarkStamp.md
+description: 推荐使用[asc\_mark\_stamp](../../../../Utils-API/tuning_interface/asc_mark_stamp.md)接口进行特定位置的标记，该接口同时适用于C语言和C++语言编程。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: MarkStamp__z
+  archs: ['3510']
+  headers: []
+- override_id: MarkStamp__u16
+  archs: ['3510']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # MarkStamp<a name="ZH-CN_TOPIC_0000002491669476"></a>
 
 ## 产品支持情况
@@ -33,9 +52,26 @@
 
 ## 函数原型<a name="section054795512320"></a>
 
+```yaml
+api_signature:
+  override_id: "MarkStamp__z"
+  archs: ["3510"]
+  headers: []
+```
+
 ```
 template<pipe_t pipe, uint16_t index>
 __aicore__ inline void MarkStamp()
+```
+
+```yaml
+api_signature:
+  override_id: "MarkStamp__u16"
+  archs: ["3510"]
+  headers: []
+```
+
+```
 
 template<pipe_t pipe>
 __aicore__ inline void MarkStamp(uint16_t index)

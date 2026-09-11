@@ -12,8 +12,7 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_squeeze_and_storeunalign_finalize__PU<dtype>_vstoreunalign"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -58,8 +57,7 @@ Reg计算数据搬运接口，用于结束一组[asc_squeeze_and_storeunalign](a
 api_signature:
   prototype_id: "asc_squeeze_and_storeunalign_finalize__PU<dtype>_vstoreunalign"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   dtype:
     values:
       - "int4b_t"

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Gather
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/scatter_operations/Gather.md
+description: 该指令会根据索引值indexReg将源操作数srcReg按元素收集到目的操作数dstReg中。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Gather__RpS_RpS_RpV
+  archs: ['3510']
+  headers: [/include/basic_api/reg_compute/kernel_reg_compute_gather_mask_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Gather<a name="ZH-CN_TOPIC_0000002095379710"></a>
 
 ## 产品支持情况
@@ -35,6 +51,13 @@
 ![](../../../../figures/reg_gather_1.png "Gather功能说明")
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "Gather__RpS_RpS_RpV"
+  archs: ["3510"]
+  headers: ["/include/basic_api/reg_compute/kernel_reg_compute_gather_mask_intf.h"]
+```
 
 ```cpp
 template <typename T = DefaultType, typename U = DefaultType, typename S, typename V>

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: rank
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/layout/rank.md
+description: 用于返回layout的秩。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: rank__RCpLayout
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/layout_interface.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # rank
 
 ## 产品支持情况
@@ -29,6 +45,13 @@
 用于返回layout的秩。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "rank__RCpLayout"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/layout_interface.h"]
+```
 
 ```cpp
 template <size_t... Is, typename Layout>

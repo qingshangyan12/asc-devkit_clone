@@ -57,6 +57,16 @@ namespace AscendC {
  * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  */
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.math_compute.sinh_interface
+ * @override_id Sinh__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 按元素做双曲正弦函数计算。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcTensor 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] sharedTmpBuffer 临时缓存。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。临时空间大小BufferSize的获取方式请参考[GetSinhMaxMinTmpSize](GetSinhMaxMinTmpSize.md)。
+ * @param [in] calCount 参与计算的元素个数。
+ */
 __aicore__ inline void Sinh(
     const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
     const uint32_t calCount)
@@ -83,6 +93,15 @@ __aicore__ inline void Sinh(
  * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  */
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.math_compute.sinh_interface
+ * @override_id Sinh__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 按元素做双曲正弦函数计算。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcTensor 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] sharedTmpBuffer 临时缓存。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。临时空间大小BufferSize的获取方式请参考[GetSinhMaxMinTmpSize](GetSinhMaxMinTmpSize.md)。
+ */
 __aicore__ inline void Sinh(
     const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
 {
@@ -101,6 +120,15 @@ __aicore__ inline void Sinh(
  * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  */
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.math_compute.sinh_interface
+ * @override_id Sinh__RCltg1x2_pT_RCltg1x2_pT_u32
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 按元素做双曲正弦函数计算。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcTensor 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] calCount 参与计算的元素个数。
+ */
 __aicore__ inline void Sinh(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
 {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
@@ -120,6 +148,14 @@ __aicore__ inline void Sinh(const LocalTensor<T>& dstTensor, const LocalTensor<T
  * \note src/dst Tensor must be 32B aligned, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  */
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.math_compute.sinh_interface
+ * @override_id Sinh__RCltg1x2_pT_RCltg1x2_pT
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 按元素做双曲正弦函数计算。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcTensor 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ */
 __aicore__ inline void Sinh(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
 {
     Sinh<T, isReuseSource>(dstTensor, srcTensor, srcTensor.GetSize());

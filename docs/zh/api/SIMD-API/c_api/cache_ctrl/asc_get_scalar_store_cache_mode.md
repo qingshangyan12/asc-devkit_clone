@@ -9,10 +9,9 @@ usage_dependencies:
 signature:
   - override_id: "asc_get_scalar_store_cache_mode__z"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cache_ctrl/cache_ctrl.h"
+    headers: ["/include/c_api/cache_ctrl/cache_ctrl.h"]
 examples: []
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_get_scalar_store_cache_mode
@@ -55,8 +54,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_get_scalar_store_cache_mode__z"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cache_ctrl/cache_ctrl.h"
+  headers: ["/include/c_api/cache_ctrl/cache_ctrl.h"]
 ```
 
 ```c

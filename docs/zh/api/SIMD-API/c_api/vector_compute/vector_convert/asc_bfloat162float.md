@@ -9,16 +9,13 @@ usage_dependencies:
 signature:
   - override_id: "asc_bfloat162float__PUf32_PUbf16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_convert.h"
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: "asc_bfloat162float__PUf32_PUbf16_u8_u16_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_convert.h"
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: "asc_bfloat162float_sync__PUf32_PUbf16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -62,8 +59,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_bfloat162float__PUf32_PUbf16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_convert.h"
+  headers: [/include/c_api/vector_compute/compute/vector_convert.h]
 ```
 
 ```cpp
@@ -74,8 +70,7 @@ __aicore__ inline void asc_bfloat162float(__ubuf__ float* dst, __ubuf__ bfloat16
 api_signature:
   override_id: "asc_bfloat162float__PUf32_PUbf16_u8_u16_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_convert.h"
+  headers: [/include/c_api/vector_compute/compute/vector_convert.h]
 ```
 
 ```cpp
@@ -86,8 +81,7 @@ __aicore__ inline void asc_bfloat162float(__ubuf__ float* dst, __ubuf__ bfloat16
 api_signature:
   override_id: "asc_bfloat162float_sync__PUf32_PUbf16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
 ```cpp

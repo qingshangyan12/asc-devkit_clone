@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Normalize
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/normalization/Normalize.md
+description: '[LayerNorm](LayerNorm.md)中，已知均值和方差，计算shape为\[A。'
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Normalize
 
 ## 产品支持情况

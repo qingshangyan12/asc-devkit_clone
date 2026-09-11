@@ -1,3 +1,18 @@
+---
+okftype: reference.api.cpp
+title: GetTensorC
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3DBackpropInput_Kernel/GetTensorC.md
+description: 在完成Iterate操作后调用本接口，获取结果矩阵块，完成数据从L0C到GM的搬运。此接口与[Iterate](Iterate.md)接口配合使用，用于在Iterate执行迭代计算后，获取结果矩阵。
+tag: [adv_api]
+usage_dependencies:
+  status: confirmed
+  companion:
+  - Iterate.md
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetTensorC
 
 ## 产品支持情况

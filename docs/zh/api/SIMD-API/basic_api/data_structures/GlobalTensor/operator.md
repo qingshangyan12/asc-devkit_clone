@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: operator\[\]
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/data_structures/GlobalTensor/operator.md
+description: 根据输入的offset偏移返回新的GlobalTensor。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # operator\[\]<a name="ZH-CN_TOPIC_0000002132249364"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

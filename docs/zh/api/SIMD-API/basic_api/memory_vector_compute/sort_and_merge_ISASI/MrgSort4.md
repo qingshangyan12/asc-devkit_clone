@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: MrgSort4
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/sort_and_merge_ISASI/MrgSort4.md
+description: 将已经排好序的最多4条Region Proposals队列，排列并合并成1条队列，结果按照score域由大到小排序。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # MrgSort4<a name="ZH-CN_TOPIC_0000001493137873"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

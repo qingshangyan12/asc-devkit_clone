@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: PostFakeMsg
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_group_mgmt_ISASI/CubeResGroupHandle/PostFakeMsg.md
+description: 通过AllocMessage接口获取到消息空间地址后，AIV发送假消息，刷新消息状态msgState为FAKE。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # PostFakeMsg<a name="ZH-CN_TOPIC_0000001960384800"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: SoftmaxGradFront
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/activation_functions/SoftMax_interface/SoftmaxGradFront.md
+description: 将输入tensor\[m<sub>0</sub>, m<sub>1</sub>, ...m<sub>t</sub>, n\]（t大于等于0）的非尾轴长度相乘的结果看作m，则输入tensor的shape看作\[m,
+  n\]。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SoftmaxGradFront
 
 ## 产品支持情况

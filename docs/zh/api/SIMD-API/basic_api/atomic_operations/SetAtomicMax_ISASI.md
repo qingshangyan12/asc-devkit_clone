@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetAtomicMax\(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/atomic_operations/SetAtomicMax_ISASI.md
+description: 设置后续搬运到GM的数据是否执行原子比较：将待拷贝的内容和GM已有内容进行比较，然后将最大值写入GM。SetAtomicMax接口可通过设置模板参数来设定不同的数据类型。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetAtomicMax__z
+  archs: ['3510', '2201']
+  headers: [/include/basic_api/kernel_operator_set_atomic_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetAtomicMax\(ISASI\)<a name="ZH-CN_TOPIC_0000001685721321"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -32,6 +48,13 @@
 设置后续搬运到GM的数据是否执行原子比较：将待拷贝的内容和GM已有内容进行比较，然后将最大值写入GM。SetAtomicMax接口可通过设置模板参数来设定不同的数据类型。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "SetAtomicMax__z"
+  archs: ["3510", "2201"]
+  headers: ["/include/basic_api/kernel_operator_set_atomic_intf.h"]
+```
 
 ```cpp
 template <typename T>

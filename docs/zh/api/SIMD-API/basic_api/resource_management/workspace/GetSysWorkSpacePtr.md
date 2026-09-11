@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetSysWorkSpacePtr
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/workspace/GetSysWorkSpacePtr.md
+description: 获取系统workspace指针。部分高阶API如Matmul需要使用系统workspace，相关接口需要传入系统workspace指针，此时可以通过该接口获取。使用系统workspace时，host侧开发者需要自行申请系统workspace的空间，其预留空间大小可以通过[GetLibApiWorkSpaceSize](../../../../Utils-API/platform_info/PlatformAscendC/GetLibApiWorkSpaceSize.md)接口获取。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetSysWorkSpacePtr__z
+  archs: ['3510', '2201', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_swap_mem_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetSysWorkSpacePtr<a name="ZH-CN_TOPIC_0000001666431622"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -37,6 +53,13 @@
 获取系统workspace指针。部分高阶API如Matmul需要使用系统workspace，相关接口需要传入系统workspace指针，此时可以通过该接口获取。使用系统workspace时，host侧开发者需要自行申请系统workspace的空间，其预留空间大小可以通过[GetLibApiWorkSpaceSize](../../../../Utils-API/platform_info/PlatformAscendC/GetLibApiWorkSpaceSize.md)接口获取。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "GetSysWorkSpacePtr__z"
+  archs: ["3510", "2201", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_swap_mem_intf.h"]
+```
 
 ```
 __aicore__ inline __gm__ uint8_t* __gm__ GetSysWorkSpacePtr()

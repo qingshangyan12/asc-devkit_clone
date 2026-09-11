@@ -9,16 +9,13 @@ usage_dependencies:
 signature:
   - override_id: "asc_copy_gm2ub__PUv_PGv_u32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy_gm2ub__PUv_PGv_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy_gm2ub_sync__PUv_PGv_u32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_ub2l1"
     archs: ["3510"]
@@ -67,8 +64,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_copy_gm2ub__PUv_PGv_u32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -81,8 +77,7 @@ __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint
 api_signature:
   override_id: "asc_copy_gm2ub__PUv_PGv_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -95,8 +90,7 @@ __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint
 api_signature:
   override_id: "asc_copy_gm2ub_sync__PUv_PGv_u32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
 ```cpp

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: update_mask
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/reg_vector_compute/mask_reg_compute/update_mask.md
+description: 根据当前剩余待处理元素数的值生成对应长度的有效位掩码，并自动将前剩余待处理元素数减去当前向量长度以更新剩余待处理元素数量。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: update_mask__Ru32
+  archs: ['3510']
+  headers: [/include/tensor_api/experimental/arch/vector/mask_reg_compute.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # update_mask
 
 ## 产品支持情况
@@ -31,6 +47,13 @@
 根据当前剩余待处理元素数的值生成对应长度的有效位掩码，并自动将前剩余待处理元素数减去当前向量长度以更新剩余待处理元素数量。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "update_mask__Ru32"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/experimental/arch/vector/mask_reg_compute.h"]
+```
 
 ```cpp
 template <typename DataType>

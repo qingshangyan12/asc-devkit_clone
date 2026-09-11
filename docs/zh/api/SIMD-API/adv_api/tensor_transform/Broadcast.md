@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Broadcast
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/tensor_transform/Broadcast.md
+description: 将输入按照输出shape进行广播。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Broadcast
 
 ## 产品支持情况

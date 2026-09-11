@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GetDigammaMaxMinTmpSize
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/Digamma_interface/GetDigammaMaxMinTmpSize.md
+description: kernel侧Digamma接口的计算需要开发者预留/申请临时空间，本接口用于在host侧获取预留/申请的最大和最小临时空间大小，开发者基于此范围选择合适的空间大小作为Tiling参数传递到kernel侧使用。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetDigammaMaxMinTmpSize
 
 ## 功能说明

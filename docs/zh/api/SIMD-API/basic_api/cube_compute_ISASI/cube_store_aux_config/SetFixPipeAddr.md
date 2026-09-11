@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetFixPipeAddr
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_store_aux_config/SetFixPipeAddr.md
+description: DataCopy数据搬运（[L0C Buffer->GM](../cube_compute_store/Fixpipe_L0CToGM.md)）过程中进行随路量化后，通过调用该接口设置Elementwise操作时LocalTensor的地址。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetFixPipeAddr__RCltg1x2_pT_u16
+  archs: ['3002']
+  headers: [/include/basic_api/kernel_operator_fixpipe_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetFixPipeAddr<a name="ZH-CN_TOPIC_0000002090402209"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -30,6 +46,13 @@
 DataCopy数据搬运（[L0C Buffer->GM](../cube_compute_store/Fixpipe_L0CToGM.md)）过程中进行随路量化后，通过调用该接口设置Elementwise操作时LocalTensor的地址。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "SetFixPipeAddr__RCltg1x2_pT_u16"
+  archs: ["3002"]
+  headers: ["/include/basic_api/kernel_operator_fixpipe_intf.h"]
+```
 
 ```cpp
 template <typename T>

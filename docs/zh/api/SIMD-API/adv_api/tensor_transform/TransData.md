@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: TransData
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/tensor_transform/TransData.md
+description: 将输入数据的排布格式转换为目标排布格式。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # TransData
 
 ## 产品支持情况

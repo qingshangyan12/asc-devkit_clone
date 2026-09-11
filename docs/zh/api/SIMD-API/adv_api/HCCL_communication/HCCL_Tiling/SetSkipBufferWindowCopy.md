@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetSkipBufferWindowCopy
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Tiling/SetSkipBufferWindowCopy.md
+description: 设置通信算法获取输入数据的位置。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetSkipBufferWindowCopy
 
 ## 功能说明

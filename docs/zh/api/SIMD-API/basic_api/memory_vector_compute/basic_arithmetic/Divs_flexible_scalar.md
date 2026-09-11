@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Divs
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Divs_flexible_scalar.md
+description: Divs属于双目标量类计算接口，用于将矢量中的每个元素与标量相除，支持标量作为被除数或除数两种场景。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Divs<a name="ZH-CN_TOPIC_0000002132391848"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

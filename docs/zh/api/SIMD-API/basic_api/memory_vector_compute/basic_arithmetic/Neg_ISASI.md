@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Neg\(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Neg_ISASI.md
+description: Neg属于单目矢量类计算接口，负责将输入的tensor按元素取相反数。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Neg__RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Neg\(ISASI\)<a name="ZH-CN_TOPIC_0000002193851733"></a>
 
 ## 产品支持情况
@@ -34,6 +50,13 @@ Neg属于单目矢量类计算接口，负责将输入的tensor按元素取相�
 $dst_i = -src_i$
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "Neg__RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510"]
+  headers: []
+```
 
 ```cpp
 template <typename T>

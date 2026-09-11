@@ -9,8 +9,7 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_set_ndim_pad_value__<dtype>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_ub2l1"
     archs: ["3510"]
@@ -61,8 +60,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_set_ndim_pad_value__<dtype>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
   dtype:
     values:
       - "int8_t"

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetBlockNum
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetBlockNum.md
+description: 获取当前任务配置的逻辑AI Core的数量，用于代码内部的多核逻辑控制等。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetBlockNum__z
+  archs: ['3510', '2201', '3002', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_sys_var_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetBlockNum
 
 ## 产品支持情况
@@ -38,6 +54,13 @@
 获取当前任务配置的逻辑AI Core的数量，用于代码内部的多核逻辑控制等。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "GetBlockNum__z"
+  archs: ["3510", "2201", "3002", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_sys_var_intf.h"]
+```
 
 ```cpp
 __aicore__ inline int64_t GetBlockNum()

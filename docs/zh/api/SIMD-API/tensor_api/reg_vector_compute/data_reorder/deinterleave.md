@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: deinterleave
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/reg_vector_compute/data_reorder/deinterleave.md
+description: 给定源操作数寄存器src0和src1，将src0和src1中的元素解交织存入结果操作数dst0和dst1中。
+tag: [tensor_api, 'operations:deinterleave']
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: deinterleave__regtensorg1x2_pT_regtensorg1x2_pT
+  archs: ['3510']
+  headers: [/include/tensor_api/experimental/arch/vector/data_reorder.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # deinterleave
 
 ## 产品支持情况
@@ -33,6 +49,13 @@
 ![DeInterleave示意图](../../../../figures/reg_regdeinterleave.png)
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "deinterleave__regtensorg1x2_pT_regtensorg1x2_pT"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/experimental/arch/vector/data_reorder.h"]
+```
 
 ```cpp
 template <typename T>

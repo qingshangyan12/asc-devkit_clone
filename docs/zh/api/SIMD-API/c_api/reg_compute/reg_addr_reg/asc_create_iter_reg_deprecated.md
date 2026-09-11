@@ -9,52 +9,40 @@ usage_dependencies:
 signature:
   - override_id: "asc_create_iter_reg_b32__u32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+    headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
   - override_id: "asc_create_iter_reg_b16__u32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+    headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
   - override_id: "asc_create_iter_reg_b8__u32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+    headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
   - override_id: "asc_create_iter_reg_b32__u32_u32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+    headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
   - override_id: "asc_create_iter_reg_b16__u32_u32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+    headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
   - override_id: "asc_create_iter_reg_b8__u32_u32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+    headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
   - override_id: "asc_create_iter_reg_b32__u32_u32_u32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+    headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
   - override_id: "asc_create_iter_reg_b16__u32_u32_u32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+    headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
   - override_id: "asc_create_iter_reg_b8__u32_u32_u32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+    headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
   - override_id: "asc_create_iter_reg_b32__u32_u32_u32_u32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+    headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
   - override_id: "asc_create_iter_reg_b16__u32_u32_u32_u32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+    headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
   - override_id: "asc_create_iter_reg_b8__u32_u32_u32_u32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+    headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -99,8 +87,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_create_iter_reg_b32__u32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
 ```
 
   ```cpp
@@ -111,8 +98,7 @@ api_signature:
 api_signature:
   override_id: "asc_create_iter_reg_b16__u32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
 ```
 
   ```cpp
@@ -123,8 +109,7 @@ api_signature:
 api_signature:
   override_id: "asc_create_iter_reg_b8__u32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
 ```
 
   ```cpp
@@ -135,8 +120,7 @@ api_signature:
 api_signature:
   override_id: "asc_create_iter_reg_b32__u32_u32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
 ```
 
   ```cpp
@@ -147,8 +131,7 @@ api_signature:
 api_signature:
   override_id: "asc_create_iter_reg_b16__u32_u32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
 ```
 
   ```cpp
@@ -159,8 +142,7 @@ api_signature:
 api_signature:
   override_id: "asc_create_iter_reg_b8__u32_u32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
 ```
 
   ```cpp
@@ -171,8 +153,7 @@ api_signature:
 api_signature:
   override_id: "asc_create_iter_reg_b32__u32_u32_u32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
 ```
 
   ```cpp
@@ -183,8 +164,7 @@ api_signature:
 api_signature:
   override_id: "asc_create_iter_reg_b16__u32_u32_u32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
 ```
 
   ```cpp
@@ -195,8 +175,7 @@ api_signature:
 api_signature:
   override_id: "asc_create_iter_reg_b8__u32_u32_u32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
 ```
 
   ```cpp
@@ -207,8 +186,7 @@ api_signature:
 api_signature:
   override_id: "asc_create_iter_reg_b32__u32_u32_u32_u32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
 ```
 
   ```cpp
@@ -219,8 +197,7 @@ api_signature:
 api_signature:
   override_id: "asc_create_iter_reg_b16__u32_u32_u32_u32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
 ```
 
   ```cpp
@@ -231,8 +208,7 @@ api_signature:
 api_signature:
   override_id: "asc_create_iter_reg_b8__u32_u32_u32_u32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
 ```
 
   ```cpp

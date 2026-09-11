@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Reset
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/custom_TBufPool/Reset.md
+description: 完成自定义TbufPool资源的释放与eventId等变量的复位对消。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Reset__z
+  archs: ['3510', '2201', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_tpipe.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Reset<a name="ZH-CN_TOPIC_0000002087883721"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -38,6 +54,13 @@
 完成自定义TbufPool资源的释放与eventId等变量的复位对消。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "Reset__z"
+  archs: ["3510", "2201", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_tpipe.h"]
+```
 
 ```cpp
 __aicore__ inline void Reset()

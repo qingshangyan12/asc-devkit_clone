@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Reciprocal
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Reciprocal.md
+description: Reciprocal属于单目矢量类计算接口，负责将输入的tensor按元素取倒数。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Reciprocal<a name="ZH-CN_TOPIC_0000001429443329"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

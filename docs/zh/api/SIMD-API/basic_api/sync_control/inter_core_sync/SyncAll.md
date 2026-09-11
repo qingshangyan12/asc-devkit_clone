@@ -1,3 +1,26 @@
+---
+okftype: reference.api.cpp
+title: SyncAll
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/SyncAll.md
+description: SyncAll是核间同步控制接口。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SyncAll__RCgtg1x3_i32_RCltg1x3_i32_i32
+  archs: ['3510', '2201', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_block_sync_intf.h]
+- override_id: SyncAll__z
+  archs: ['3510', '2201', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_block_sync_intf.h]
+examples:
+- path: /examples/01_simd_cpp_api/03_basic_api/05_sync_control/sync_all
+  archs: ['2201', '3510']
+  override_id: SyncAll__z
+  file: sync_all.asc
+timestamp: '2026-09-11'
+---
+
 # SyncAll<a id="ZH-CN_TOPIC_0000001538296817"></a>
 
 ## 产品支持情况<a id="section1550532418810"></a>
@@ -115,6 +138,13 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 
 - 软同步
 
+```yaml
+api_signature:
+  override_id: "SyncAll__RCgtg1x3_i32_RCltg1x3_i32_i32"
+  archs: ["3510", "2201", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_block_sync_intf.h"]
+```
+
     ```cpp
     template <bool isAIVOnly = true>
     __aicore__ inline void SyncAll(const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace, const int32_t usedCores = 0)
@@ -123,12 +153,26 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 - 硬同步
     - 不支持config指定流水
 
+```yaml
+api_signature:
+  override_id: "SyncAll__z"
+  archs: ["3510", "2201", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_block_sync_intf.h"]
+```
+
         ```cpp
         template <bool isAIVOnly = true>
         __aicore__ inline void SyncAll()
         ```
 
     - 支持config指定流水
+
+```yaml
+api_signature:
+  override_id: "SyncAll__z"
+  archs: ["3510", "2201", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_block_sync_intf.h"]
+```
 
         ```cpp
         template <bool isAIVOnly = true, const SyncAllConfig& config = DEFAULT_SYNC_ALL_CONFIG>

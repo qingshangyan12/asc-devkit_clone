@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: GetPhyAddr
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/data_structures/GlobalTensor/GetPhyAddr.md
+description: 获取全局数据的地址。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetPhyAddr__z
+  archs: ['3510', '2201', '3002', '2002', '1001']
+  headers: []
+- override_id: GetPhyAddr__u64
+  archs: ['3510', '2201', '3002', '2002', '1001']
+  headers: [/include/basic_api/kernel_tensor.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetPhyAddr<a name="ZH-CN_TOPIC_0000002167524401"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -34,11 +53,25 @@
 
 -   获取全局数据的地址
 
+```yaml
+api_signature:
+  override_id: "GetPhyAddr__z"
+  archs: ["3510", "2201", "3002", "2002", "1001"]
+  headers: []
+```
+
     ```cpp
     __aicore__ inline const __gm__ PrimType* GetPhyAddr() const
     ```
 
 -   获取全局数据（指定偏移offset个元素）的地址
+
+```yaml
+api_signature:
+  override_id: "GetPhyAddr__u64"
+  archs: ["3510", "2201", "3002", "2002", "1001"]
+  headers: ["/include/basic_api/kernel_tensor.h"]
+```
 
     ```cpp
     __aicore__ inline __gm__ PrimType* GetPhyAddr(const uint64_t offset) const

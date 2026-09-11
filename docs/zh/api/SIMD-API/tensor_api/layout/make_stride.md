@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: make_stride
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/layout/make_stride.md
+description: 构造stride对象，用于描述各维度在内存中的步长。支持传入多个步长值，也支持传入嵌套的stride子结构以构造层次化stride。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: make_stride__RCpFirstStride_QRCpStrides
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/layout_interface.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # make_stride
 
 ## 产品支持情况
@@ -29,6 +45,13 @@
 构造stride对象，用于描述各维度在内存中的步长。支持传入多个步长值，也支持传入嵌套的stride子结构以构造层次化stride。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "make_stride__RCpFirstStride_QRCpStrides"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/layout_interface.h"]
+```
 
 ```cpp
 template <typename FirstStride, typename... Strides>

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: DeepNorm Tiling
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/normalization/DeepNorm-Tiling.md
+description: Ascend C提供DeepNorm Tiling API，方便用户获取DeepNorm kernel计算时所需的Tiling参数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DeepNorm Tiling
 
 ## 功能说明

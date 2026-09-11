@@ -1,3 +1,21 @@
+---
+okftype: reference.api.cpp
+title: SetCcTiling（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/SetCcTiling_deprecated.md
+description: 用于设置HCCL客户端通信算法的Tiling地址。
+tag: [adv_api]
+usage_dependencies:
+  status: confirmed
+  companion:
+  - Init_deprecated.md
+signature:
+- override_id: SetCcTiling__PGv
+  archs: ['2201']
+  headers: [/include/adv_api/hccl/hccl.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetCcTiling（废弃）
 
 > [!NOTE]说明
@@ -31,6 +49,13 @@
 用于设置HCCL客户端通信算法的Tiling地址。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "SetCcTiling__PGv"
+  archs: ["2201"]
+  headers: ["/include/adv_api/hccl/hccl.h"]
+```
 
 ```
 __aicore__ inline int32_t SetCcTiling(__gm__ void* ccOpTilingData)

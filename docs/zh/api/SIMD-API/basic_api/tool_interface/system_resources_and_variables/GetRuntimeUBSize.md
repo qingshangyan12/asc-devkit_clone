@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetRuntimeUBSize
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetRuntimeUBSize.md
+description: 获取运行时Unified Buffer（UB）空间的大小，单位为Byte。开发者根据UB的大小来计算循环次数等参数值。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetRuntimeUBSize__z
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_sys_var_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetRuntimeUBSize
 
 ## 产品支持情况
@@ -32,6 +48,13 @@
 获取运行时Unified Buffer（UB）空间的大小，单位为Byte。开发者根据UB的大小来计算循环次数等参数值。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "GetRuntimeUBSize__z"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_sys_var_intf.h"]
+```
 
 ```cpp
 __aicore__ inline uint32_t GetRuntimeUBSize()

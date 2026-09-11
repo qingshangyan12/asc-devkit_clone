@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: LogicalAnds
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/LogicalAnds_interface/LogicalAnds.md
+description: 输入矢量内的每个元素与标量进行与操作。当输入矢量、标量的数据类型不是bool时，零被视为False，非零数据被视为True。接口中矢量与标量的顺序支持标量在前和标量在后两种场景，其中，标量支持配置为LocalTensor的单点元素。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: LogicalAnds__RCltg1x2_pT_RCpU_RCpS_u32
+  archs: ['3510']
+  headers: [/include/adv_api/math/logical_ands.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LogicalAnds
 
 ## 产品支持情况
@@ -32,6 +48,13 @@
 ![](../../../../figures/zh-cn_formulaimage_0000002462754813.png)
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "LogicalAnds__RCltg1x2_pT_RCpU_RCpS_u32"
+  archs: ["3510"]
+  headers: ["/include/adv_api/math/logical_ands.h"]
+```
 
 ```
 template <const LogicalAndsConfig& config = DEFAULT_LOGICAL_ANDS_CONFIG, typename T, typename U, typename S>

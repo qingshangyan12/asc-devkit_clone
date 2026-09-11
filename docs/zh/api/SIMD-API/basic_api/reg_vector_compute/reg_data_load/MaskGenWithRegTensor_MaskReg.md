@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: MaskReg搬入（MaskGenWithRegTensor）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/MaskGenWithRegTensor_MaskReg.md
+description: MaskGenWithRegTensor能够实现数据从[RegTensor](../register_data_types/RegTensor.md)搬运至[MaskReg](../register_data_types/MaskReg.md)。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # MaskReg搬入（MaskGenWithRegTensor）
 
 ## 产品支持情况

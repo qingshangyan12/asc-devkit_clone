@@ -45,6 +45,15 @@ namespace AscendC {
  */
 // GeGLU(x1,x2) = x1*GeLU(x2), x1 is src0, x2 is src1
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.activation_functions.geglu_interface
+ * @override_id GeGLU__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+ * @archs 3510 2201 2002 x90 9030
+ * @brief GeGLU是采用GELU作为激活函数的GLU变体。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] sharedTmpBuffer 临时缓存。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。用于GeGLU内部复杂计算时存储中间变量，由开发者提供。临时空间大小BufferSize的获取方式请参考[GetGeGLUMaxMinTmpSize](GetGeGLUMaxMinTmpSize.md)。
+ * @param [in] calCount 实际计算数据元素个数。
+ */
 __aicore__ inline void GeGLU(
     const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1,
     const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
@@ -61,6 +70,14 @@ __aicore__ inline void GeGLU(
  * \param [in] calCount, amount of data to be calculated
  */
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.activation_functions.geglu_interface
+ * @override_id GeGLU__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32
+ * @archs 3510 2201 2002 x90 9030
+ * @brief GeGLU是采用GELU作为激活函数的GLU变体。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] calCount 实际计算数据元素个数。
+ */
 __aicore__ inline void GeGLU(
     const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1,
     uint32_t calCount)
@@ -82,6 +99,14 @@ __aicore__ inline void GeGLU(
  * \param [in] sharedTmpBuffer, input local temporary Tensor
  */
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.activation_functions.geglu_interface
+ * @override_id GeGLU__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8
+ * @archs 3510 2201 2002 x90 9030
+ * @brief GeGLU是采用GELU作为激活函数的GLU变体。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] sharedTmpBuffer 临时缓存。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。用于GeGLU内部复杂计算时存储中间变量，由开发者提供。临时空间大小BufferSize的获取方式请参考[GetGeGLUMaxMinTmpSize](GetGeGLUMaxMinTmpSize.md)。
+ */
 __aicore__ inline void GeGLU(
     const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1,
     const LocalTensor<uint8_t>& sharedTmpBuffer)
@@ -96,6 +121,13 @@ __aicore__ inline void GeGLU(
  * \param [in] srcTensor1, input1 LocalTensor
  */
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.activation_functions.geglu_interface
+ * @override_id GeGLU__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT
+ * @archs 3510 2201 2002 x90 9030
+ * @brief GeGLU是采用GELU作为激活函数的GLU变体。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ */
 __aicore__ inline void GeGLU(
     const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1)
 {

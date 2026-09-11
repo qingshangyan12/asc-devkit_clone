@@ -9,16 +9,13 @@ usage_dependencies:
 signature:
   - override_id: "asc_pack_to_high__Rvu8_vu16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_pack_to_high__Rvu16_vu32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_pack_to_high__Rvb_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -64,8 +61,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_pack_to_high__Rvu8_vu16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp
@@ -76,8 +72,7 @@ __simd_callee__ inline void asc_pack_to_high(vector_uint8_t& dst, vector_uint16_
 api_signature:
   override_id: "asc_pack_to_high__Rvu16_vu32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp
@@ -88,8 +83,7 @@ __simd_callee__ inline void asc_pack_to_high(vector_uint16_t& dst, vector_uint32
 api_signature:
   override_id: "asc_pack_to_high__Rvb_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp

@@ -10,164 +10,124 @@ usage_dependencies:
 signature:
   - override_id: "asc_half2int4x2_rd__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rd_v2__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rd_sat__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rd_sat_v2__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rd_v3__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rd_sat_v3__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rd_v4__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rd_sat_v4__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rn__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rn_v2__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rn_sat__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rn_sat_v2__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rn_v3__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rn_sat_v3__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rn_v4__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rn_sat_v4__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rna__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rna_v2__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rna_sat__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rna_sat_v2__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rna_v3__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rna_sat_v3__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rna_v4__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rna_sat_v4__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_ru__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_ru_v2__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_ru_sat__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_ru_sat_v2__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_ru_v3__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_ru_sat_v3__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_ru_v4__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_ru_sat_v4__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rz__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rz_v2__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rz_sat__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rz_sat_v2__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rz_v3__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rz_sat_v3__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rz_v4__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int4x2_rz_sat_v4__Rvi4x2_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -212,8 +172,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_half2int4x2_rd__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -225,8 +184,7 @@ __simd_callee__ inline void asc_half2int4x2_rd(vector_int4x2_t& dst, vector_half
 api_signature:
   override_id: "asc_half2int4x2_rd_v2__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -238,8 +196,7 @@ __simd_callee__ inline void asc_half2int4x2_rd_v2(vector_int4x2_t& dst, vector_h
 api_signature:
   override_id: "asc_half2int4x2_rd_sat__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -251,8 +208,7 @@ __simd_callee__ inline void asc_half2int4x2_rd_sat(vector_int4x2_t& dst, vector_
 api_signature:
   override_id: "asc_half2int4x2_rd_sat_v2__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -264,8 +220,7 @@ __simd_callee__ inline void asc_half2int4x2_rd_sat_v2(vector_int4x2_t& dst, vect
 api_signature:
   override_id: "asc_half2int4x2_rd_v3__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -277,8 +232,7 @@ __simd_callee__ inline void asc_half2int4x2_rd_v3(vector_int4x2_t& dst, vector_h
 api_signature:
   override_id: "asc_half2int4x2_rd_sat_v3__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -290,8 +244,7 @@ __simd_callee__ inline void asc_half2int4x2_rd_sat_v3(vector_int4x2_t& dst, vect
 api_signature:
   override_id: "asc_half2int4x2_rd_v4__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -303,8 +256,7 @@ __simd_callee__ inline void asc_half2int4x2_rd_v4(vector_int4x2_t& dst, vector_h
 api_signature:
   override_id: "asc_half2int4x2_rd_sat_v4__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -316,8 +268,7 @@ __simd_callee__ inline void asc_half2int4x2_rd_sat_v4(vector_int4x2_t& dst, vect
 api_signature:
   override_id: "asc_half2int4x2_rn__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -329,8 +280,7 @@ __simd_callee__ inline void asc_half2int4x2_rn(vector_int4x2_t& dst, vector_half
 api_signature:
   override_id: "asc_half2int4x2_rn_v2__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -342,8 +292,7 @@ __simd_callee__ inline void asc_half2int4x2_rn_v2(vector_int4x2_t& dst, vector_h
 api_signature:
   override_id: "asc_half2int4x2_rn_sat__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -355,8 +304,7 @@ __simd_callee__ inline void asc_half2int4x2_rn_sat(vector_int4x2_t& dst, vector_
 api_signature:
   override_id: "asc_half2int4x2_rn_sat_v2__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -368,8 +316,7 @@ __simd_callee__ inline void asc_half2int4x2_rn_sat_v2(vector_int4x2_t& dst, vect
 api_signature:
   override_id: "asc_half2int4x2_rn_v3__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -381,8 +328,7 @@ __simd_callee__ inline void asc_half2int4x2_rn_v3(vector_int4x2_t& dst, vector_h
 api_signature:
   override_id: "asc_half2int4x2_rn_sat_v3__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -394,8 +340,7 @@ __simd_callee__ inline void asc_half2int4x2_rn_sat_v3(vector_int4x2_t& dst, vect
 api_signature:
   override_id: "asc_half2int4x2_rn_v4__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -407,8 +352,7 @@ __simd_callee__ inline void asc_half2int4x2_rn_v4(vector_int4x2_t& dst, vector_h
 api_signature:
   override_id: "asc_half2int4x2_rn_sat_v4__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -420,8 +364,7 @@ __simd_callee__ inline void asc_half2int4x2_rn_sat_v4(vector_int4x2_t& dst, vect
 api_signature:
   override_id: "asc_half2int4x2_rna__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -433,8 +376,7 @@ __simd_callee__ inline void asc_half2int4x2_rna(vector_int4x2_t& dst, vector_hal
 api_signature:
   override_id: "asc_half2int4x2_rna_v2__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -446,8 +388,7 @@ __simd_callee__ inline void asc_half2int4x2_rna_v2(vector_int4x2_t& dst, vector_
 api_signature:
   override_id: "asc_half2int4x2_rna_sat__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -459,8 +400,7 @@ __simd_callee__ inline void asc_half2int4x2_rna_sat(vector_int4x2_t& dst, vector
 api_signature:
   override_id: "asc_half2int4x2_rna_sat_v2__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -472,8 +412,7 @@ __simd_callee__ inline void asc_half2int4x2_rna_sat_v2(vector_int4x2_t& dst, vec
 api_signature:
   override_id: "asc_half2int4x2_rna_v3__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -485,8 +424,7 @@ __simd_callee__ inline void asc_half2int4x2_rna_v3(vector_int4x2_t& dst, vector_
 api_signature:
   override_id: "asc_half2int4x2_rna_sat_v3__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -498,8 +436,7 @@ __simd_callee__ inline void asc_half2int4x2_rna_sat_v3(vector_int4x2_t& dst, vec
 api_signature:
   override_id: "asc_half2int4x2_rna_v4__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -511,8 +448,7 @@ __simd_callee__ inline void asc_half2int4x2_rna_v4(vector_int4x2_t& dst, vector_
 api_signature:
   override_id: "asc_half2int4x2_rna_sat_v4__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -524,8 +460,7 @@ __simd_callee__ inline void asc_half2int4x2_rna_sat_v4(vector_int4x2_t& dst, vec
 api_signature:
   override_id: "asc_half2int4x2_ru__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -537,8 +472,7 @@ __simd_callee__ inline void asc_half2int4x2_ru(vector_int4x2_t& dst, vector_half
 api_signature:
   override_id: "asc_half2int4x2_ru_v2__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -550,8 +484,7 @@ __simd_callee__ inline void asc_half2int4x2_ru_v2(vector_int4x2_t& dst, vector_h
 api_signature:
   override_id: "asc_half2int4x2_ru_sat__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -563,8 +496,7 @@ __simd_callee__ inline void asc_half2int4x2_ru_sat(vector_int4x2_t& dst, vector_
 api_signature:
   override_id: "asc_half2int4x2_ru_sat_v2__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -576,8 +508,7 @@ __simd_callee__ inline void asc_half2int4x2_ru_sat_v2(vector_int4x2_t& dst, vect
 api_signature:
   override_id: "asc_half2int4x2_ru_v3__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -589,8 +520,7 @@ __simd_callee__ inline void asc_half2int4x2_ru_v3(vector_int4x2_t& dst, vector_h
 api_signature:
   override_id: "asc_half2int4x2_ru_sat_v3__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -602,8 +532,7 @@ __simd_callee__ inline void asc_half2int4x2_ru_sat_v3(vector_int4x2_t& dst, vect
 api_signature:
   override_id: "asc_half2int4x2_ru_v4__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -615,8 +544,7 @@ __simd_callee__ inline void asc_half2int4x2_ru_v4(vector_int4x2_t& dst, vector_h
 api_signature:
   override_id: "asc_half2int4x2_ru_sat_v4__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -628,8 +556,7 @@ __simd_callee__ inline void asc_half2int4x2_ru_sat_v4(vector_int4x2_t& dst, vect
 api_signature:
   override_id: "asc_half2int4x2_rz__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -641,8 +568,7 @@ __simd_callee__ inline void asc_half2int4x2_rz(vector_int4x2_t& dst, vector_half
 api_signature:
   override_id: "asc_half2int4x2_rz_v2__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -654,8 +580,7 @@ __simd_callee__ inline void asc_half2int4x2_rz_v2(vector_int4x2_t& dst, vector_h
 api_signature:
   override_id: "asc_half2int4x2_rz_sat__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -667,8 +592,7 @@ __simd_callee__ inline void asc_half2int4x2_rz_sat(vector_int4x2_t& dst, vector_
 api_signature:
   override_id: "asc_half2int4x2_rz_sat_v2__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -680,8 +604,7 @@ __simd_callee__ inline void asc_half2int4x2_rz_sat_v2(vector_int4x2_t& dst, vect
 api_signature:
   override_id: "asc_half2int4x2_rz_v3__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -693,8 +616,7 @@ __simd_callee__ inline void asc_half2int4x2_rz_v3(vector_int4x2_t& dst, vector_h
 api_signature:
   override_id: "asc_half2int4x2_rz_sat_v3__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -706,8 +628,7 @@ __simd_callee__ inline void asc_half2int4x2_rz_sat_v3(vector_int4x2_t& dst, vect
 api_signature:
   override_id: "asc_half2int4x2_rz_v4__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -719,8 +640,7 @@ __simd_callee__ inline void asc_half2int4x2_rz_v4(vector_int4x2_t& dst, vector_h
 api_signature:
   override_id: "asc_half2int4x2_rz_sat_v4__Rvi4x2_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp

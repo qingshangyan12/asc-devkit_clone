@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetKfcWorkspace
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_group_mgmt_ISASI/KfcWorkspace/GetKfcWorkspace.md
+description: 获取用于CubeResGroupHandle消息通信区的内存地址。用户使用[CubeResGroupHandle](../CubeResGroupHandle/CubeResGroupHandle_constructor.md)接口时，需要用此接口自主管理空间地址。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetKfcWorkspace__z
+  archs: ['3510', '2201']
+  headers: [/include/basic_api/core_mng/roc/kernel_operator_cube_group_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetKfcWorkspace<a name="ZH-CN_TOPIC_0000002005165737"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -31,6 +47,13 @@
 获取用于CubeResGroupHandle消息通信区的内存地址。用户使用[CubeResGroupHandle](../CubeResGroupHandle/CubeResGroupHandle_constructor.md)接口时，需要用此接口自主管理空间地址。
 
 ## 函数原型<a name="section765814724715"></a>
+
+```yaml
+api_signature:
+  override_id: "GetKfcWorkspace__z"
+  archs: ["3510", "2201"]
+  headers: ["/include/basic_api/core_mng/roc/kernel_operator_cube_group_intf.h"]
+```
 
 ```
 __aicore__ inline GM_ADDR GetKfcWorkspace()

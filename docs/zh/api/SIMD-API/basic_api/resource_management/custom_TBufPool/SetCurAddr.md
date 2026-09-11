@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetCurAddr
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/custom_TBufPool/SetCurAddr.md
+description: 设置自定义TBufPool已经被分配完的地址，比如初始化时一共申请了32k的内存大小，给某一个TQue分配了8K，则需要调用该接口以保证后续的内存块从8K开始分配。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetCurAddr__u32
+  archs: ['3510', '2201', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_tpipe.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetCurAddr<a name="ZH-CN_TOPIC_0000002087922325"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -38,6 +54,13 @@
 设置自定义TBufPool已经被分配完的地址，比如初始化时一共申请了32k的内存大小，给某一个TQue分配了8K，则需要调用该接口以保证后续的内存块从8K开始分配。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "SetCurAddr__u32"
+  archs: ["3510", "2201", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_tpipe.h"]
+```
 
 ```cpp
 __aicore__ inline void SetCurAddr(uint32_t curAddr)

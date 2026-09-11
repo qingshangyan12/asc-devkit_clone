@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetWeight
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3D_Kernel/SetWeight.md
+description: 设置权重矩阵Weight。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetWeight
 
 ## 产品支持情况

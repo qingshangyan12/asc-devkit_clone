@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: LayerNorm
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/normalization/LayerNorm.md
+description: 根据接口输出的不同，本节介绍如下两种LayerNorm接口。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LayerNorm
 
 ## 产品支持情况

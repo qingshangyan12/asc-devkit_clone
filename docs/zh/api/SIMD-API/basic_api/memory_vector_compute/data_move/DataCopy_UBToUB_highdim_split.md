@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: DataCopy（UBToUB高维切分数据搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_UBToUB_highdim_split.md
+description: 支持Unified Buffer（UB）内部的高维切分数据搬运，数据在传输过程中保持原始格式和内容不变。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DataCopy（UBToUB高维切分数据搬运）<a name="ZH-CN_TOPIC_0000002382908021"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

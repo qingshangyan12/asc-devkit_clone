@@ -9,8 +9,7 @@ usage_dependencies:
 signature:
   - override_id: "asc_sync__z"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/sync/sync.h"
+    headers: [/include/c_api/sync/sync.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -55,8 +54,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_sync__z"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/sync/sync.h"
+  headers: [/include/c_api/sync/sync.h]
 ```
 
 ```c

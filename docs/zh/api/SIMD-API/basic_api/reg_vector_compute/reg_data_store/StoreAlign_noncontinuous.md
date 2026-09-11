@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: 非连续对齐搬出（StoreAlign）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_store/StoreAlign_noncontinuous.md
+description: StoreAlign能够实现数据从[RegTensor](../register_data_types/RegTensor.md)非连续搬运至Unified
+  Buffer（UB）。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # 非连续对齐搬出（StoreAlign）<a name="ZH-CN_TOPIC_0000001956110781"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

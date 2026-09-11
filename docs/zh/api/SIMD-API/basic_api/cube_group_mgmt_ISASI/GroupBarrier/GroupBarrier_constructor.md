@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GroupBarrier构造函数
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_group_mgmt_ISASI/GroupBarrier/GroupBarrier_constructor.md
+description: 创建GroupBarrier对象，通过设置构造函数参数，确定Arrive组的Block个数和Wait组的Block个数。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GroupBarrier构造函数<a name="ZH-CN_TOPIC_0000002005085181"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

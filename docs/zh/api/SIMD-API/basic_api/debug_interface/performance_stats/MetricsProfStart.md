@@ -1,3 +1,21 @@
+---
+okftype: reference.api.cpp
+title: MetricsProfStart
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/debug_interface/performance_stats/MetricsProfStart.md
+description: 推荐使用[asc_prof_start](../../../../Utils-API/tuning_interface/asc_prof_start.md)接口进行性能数据采集信号启动的设置，该接口同时适用于C语言和C++语言编程。
+tag: [basic_api]
+usage_dependencies:
+  status: confirmed
+  companion:
+  - MetricsProfStop.md
+signature:
+- override_id: MetricsProfStart__z
+  archs: ['3510', '2201']
+  headers: [/include/basic_api/kernel_prof_trace_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # MetricsProfStart<a name="ZH-CN_TOPIC_0000002080803573"></a>
 
 ## 产品支持情况
@@ -34,6 +52,13 @@
 用于设置性能数据采集信号启动，和[MetricsProfStop](MetricsProfStop.md)配合使用。使用msOpProf工具进行算子上板调优时，可在kernel侧代码段前后分别调用MetricsProfStart和MetricsProfStop来指定需要调优的代码段范围。
 
 ## 函数原型<a name="zh-cn_topic_0000001963799138_zh-cn_topic_0000001997078721_section2067518173415"></a>
+
+```yaml
+api_signature:
+  override_id: "MetricsProfStart__z"
+  archs: ["3510", "2201"]
+  headers: ["/include/basic_api/kernel_prof_trace_intf.h"]
+```
 
 ```cpp
 __aicore__ inline void MetricsProfStart()

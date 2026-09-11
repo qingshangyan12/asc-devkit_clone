@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: CountLeadingZero
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/scalar_compute/CountLeadingZero.md
+description: 统计uint64\_t类型数值的二进制表示中前导0的个数（二进制表示中最高有效位到第一个'1'的'0'的数量，输入为0时返回64）。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: CountLeadingZero__u64
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_scalar_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # CountLeadingZero<a name="ZH-CN_TOPIC_0000001834229569"></a>
 
 ## 产品支持情况
@@ -50,6 +66,13 @@ int64_t leadingZeros = AscendC::CountLeadingZero(0x0100000000000020ULL); // 返�
 ![CountLeadingZero计算示意图](../../../figures/CountLeadingZero.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "CountLeadingZero__u64"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_scalar_intf.h"]
+```
 
 ```cpp
 __aicore__ inline int64_t CountLeadingZero(uint64_t valueIn)

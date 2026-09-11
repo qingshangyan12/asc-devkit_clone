@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: LogicalNot
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/LogicalNot_interface/LogicalNot.md
+description: 按元素进行取反操作。当输入的数据类型不是bool时，零被视为False，非零数据被视为True。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: LogicalNot__RCltg1x2_pT_RCltg1x2_pU_u32
+  archs: ['3510']
+  headers: [/include/adv_api/math/logical_not.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LogicalNot
 
 ## 产品支持情况
@@ -32,6 +48,13 @@
 ![](../../../../figures/zh-cn_formulaimage_0000002419746457.png)
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "LogicalNot__RCltg1x2_pT_RCltg1x2_pU_u32"
+  archs: ["3510"]
+  headers: ["/include/adv_api/math/logical_not.h"]
+```
 
 ```
 template <const LogicalNotConfig& config = DEFAULT_LOGICAL_NOT_CONFIG, typename T, typename U>

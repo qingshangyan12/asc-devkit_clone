@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: SetSelfDefineData
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetSelfDefineData.md
+description: 启用模板参数[MatmulCallBackFunc](Matmul_template_params.md#matmul-callback-func)（自定义回调函数）时，设置需要的计算数据或在GM上存储的数据地址等信息，用于回调函数使用。复用同一个Matmul对象时，可以多次调用本接口重新设置对应数据信息。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetSelfDefineData__u64
+  archs: ['3510', '2201', x90]
+  headers: []
+- override_id: SetSelfDefineData__pT
+  archs: ['3510', '2201', x90]
+  headers: [/include/adv_api/matmul/matmul.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetSelfDefineData
 
 ## 产品支持情况
@@ -32,8 +51,22 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "SetSelfDefineData__u64"
+  archs: ["3510", "2201", "x90"]
+  headers: []
+```
+
 ```
 __aicore__ inline void SetSelfDefineData(const uint64_t dataPtr)
+```
+
+```yaml
+api_signature:
+  override_id: "SetSelfDefineData__pT"
+  archs: ["3510", "2201", "x90"]
+  headers: ["/include/adv_api/matmul/matmul.h"]
 ```
 
 ```

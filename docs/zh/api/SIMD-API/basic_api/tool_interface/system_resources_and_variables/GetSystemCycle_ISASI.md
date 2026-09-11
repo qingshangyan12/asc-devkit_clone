@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetSystemCycle(ISASI)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetSystemCycle_ISASI.md
+description: 获取系统计数器当前的cycle值。通过计算代码段前后cycle值的差值，可得到代码段消耗的系统cycle数，再通过换算即可获得代码段的执行时间。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetSystemCycle__z
+  archs: ['3510', '2201']
+  headers: [/include/basic_api/kernel_operator_sys_var_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetSystemCycle(ISASI)
 
 ## 产品支持情况
@@ -44,6 +60,13 @@
 <!-- end id10 --> 
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "GetSystemCycle__z"
+  archs: ["3510", "2201"]
+  headers: ["/include/basic_api/kernel_operator_sys_var_intf.h"]
+```
 
 ```cpp
 __aicore__ inline int64_t GetSystemCycle()

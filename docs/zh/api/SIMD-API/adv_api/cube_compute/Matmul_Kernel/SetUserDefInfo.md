@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetUserDefInfo
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetUserDefInfo.md
+description: 启用模板参数[MatmulCallBackFunc](MatmulCallBackFunc.md)（自定义回调函数）时，设置算子tiling地址，用于回调函数使用，该接口仅需调用一次。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetUserDefInfo__u64
+  archs: ['3510', '2201', x90]
+  headers: [/include/adv_api/matmul/matmul.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetUserDefInfo
 
 ## 产品支持情况
@@ -31,6 +47,13 @@
 启用模板参数[MatmulCallBackFunc](MatmulCallBackFunc.md)（自定义回调函数）时，设置算子tiling地址，用于回调函数使用，该接口仅需调用一次。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "SetUserDefInfo__u64"
+  archs: ["3510", "2201", "x90"]
+  headers: ["/include/adv_api/matmul/matmul.h"]
+```
 
 ```
 __aicore__ inline void SetUserDefInfo(const uint64_t tilingPtr)

@@ -9,12 +9,10 @@ usage_dependencies:
 signature:
   - override_id: "asc_int82int16__Rvi16_vi8_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_int82int16__Rvi16_vi8_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -72,8 +70,7 @@ def asc_int82int16(dst, src, mask, src_pos):
 api_signature:
   override_id: "asc_int82int16__Rvi16_vi8_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -87,8 +84,7 @@ __simd_callee__ inline void asc_int82int16(vector_int16_t& dst,
 api_signature:
   override_id: "asc_int82int16__Rvi16_vi8_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c

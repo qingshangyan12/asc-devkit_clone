@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: select
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/reg_vector_compute/compare_and_select/select.md
+description: 给定两个源操作数src0和src1，根据condition的比特位值选取元素，得到目的操作数。当condition的比特位是1时，从src0中选取对应位置的数，比特位是0时从src1选取对应位置的数。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: select__regtensorg1x1_b_regtensorg1x2_pT_regtensorg1x2_pT
+  archs: ['3510']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # select
 
 ## 产品支持情况
@@ -31,6 +47,13 @@
 给定两个源操作数src0和src1，根据condition的比特位值选取元素，得到目的操作数。当condition的比特位是1时，从src0中选取对应位置的数，比特位是0时从src1选取对应位置的数。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "select__regtensorg1x1_b_regtensorg1x2_pT_regtensorg1x2_pT"
+  archs: ["3510"]
+  headers: []
+```
 
 ```cpp
 template <typename T>

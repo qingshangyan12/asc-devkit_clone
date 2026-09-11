@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetStride
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/aux_data_structures/Layout/GetStride.md
+description: 返回描述内存访问步长的Stride对象，与Shape的维度信息一一对应。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetStride__z
+  archs: ['2201']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetStride<a name="ZH-CN_TOPIC_0000002331573721"></a>
 
 ## 产品支持情况<a name="section73648168211"></a>
@@ -32,8 +48,25 @@
 
 ## 函数原型<a name="zh-cn_topic_0000002042526794_zh-cn_topic_0000001602767550_zh-cn_topic_0000001600123102_section13230182415108"></a>
 
+```yaml
+api_signature:
+  override_id: "GetStride__z"
+  archs: ["2201"]
+  headers: []
+```
+
 ```cpp
 __aicore__ inline constexpr decltype(auto) GetStride() {}    
+```
+
+```yaml
+api_signature:
+  override_id: "GetStride__z"
+  archs: ["2201"]
+  headers: []
+```
+
+```cpp
 __aicore__ inline constexpr decltype(auto) GetStride() const {}
 ```
 

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: ICPU\_SET\_TILING\_KEY
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/debug_interface/cpu_twin_debug/ICPU_SET_TILING_KEY.md
+description: 用于指定本次CPU调测使用的tilingKey。调测执行时，将只执行算子核函数（Kernel）中该tilingKey对应的分支。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ICPU\_SET\_TILING\_KEY<a name="ZH-CN_TOPIC_0000002044842850"></a>
 
 ## 功能说明<a name="zh-cn_topic_0000002000279997_zh-cn_topic_0000001610028277_section259105813316"></a>

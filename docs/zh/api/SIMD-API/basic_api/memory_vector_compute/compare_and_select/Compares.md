@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Compares
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Compares.md
+description: 逐元素比较一个tensor中的元素和另一个Scalar的大小，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Compares<a name="ZH-CN_TOPIC_0000001787851728"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

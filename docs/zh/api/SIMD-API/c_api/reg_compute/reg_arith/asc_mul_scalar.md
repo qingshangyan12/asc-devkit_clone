@@ -10,12 +10,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_mul_scalar__v<dtype>_<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_arith.h"
+    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
   - prototype_id: "asc_mul_scalar__Rv<dtype>_v<dtype>_<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_arith.h"
+    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/muls"
     archs: ["3510"]
@@ -65,8 +63,7 @@ $$
 api_signature:
   prototype_id: "asc_mul_scalar__v<dtype>_<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  headers: [/include/c_api/reg_compute/compute/reg_arith.h]
   dtype:
     values:
       - "int16_t"
@@ -88,8 +85,7 @@ __simd_callee__ inline vector_<dtype> asc_mul_scalar(vector_<dtype> src,
 api_signature:
   prototype_id: "asc_mul_scalar__Rv<dtype>_v<dtype>_<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  headers: [/include/c_api/reg_compute/compute/reg_arith.h]
   dtype:
     values:
       - "int16_t"

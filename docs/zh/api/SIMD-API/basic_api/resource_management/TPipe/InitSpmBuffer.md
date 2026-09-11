@@ -1,3 +1,23 @@
+---
+okftype: reference.api.cpp
+title: InitSpmBuffer
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/TPipe/InitSpmBuffer.md
+description: 初始化SPM Buffer。SPM Buffer是一块在GM上的空间，当Unified Buffer（UB）空间不足时可以将溢出数据存放在SPM
+  Buffer上。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: InitSpmBuffer__RCgtg1x2_pT_i32
+  archs: ['3510', '2201', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_tpipe.h]
+- override_id: InitSpmBuffer__i32
+  archs: ['3510', '2201', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_tpipe.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # InitSpmBuffer<a name="ZH-CN_TOPIC_0000001560400104"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -41,12 +61,26 @@
 
 -   暂存到workspace初始化，需要指定GM地址为SPM Buffer：
 
+```yaml
+api_signature:
+  override_id: "InitSpmBuffer__RCgtg1x2_pT_i32"
+  archs: ["3510", "2201", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_tpipe.h"]
+```
+
     ```cpp
     template <typename T>
     __aicore__ inline void InitSpmBuffer(const GlobalTensor<T>& workspace, const int32_t bufferSize)
     ```
 
 -   暂存到L1 Buffer初始化，不需要指定地址，会默认暂存到L1 Buffer，只需要传入需要的SPM Buffer大小：
+
+```yaml
+api_signature:
+  override_id: "InitSpmBuffer__i32"
+  archs: ["3510", "2201", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_tpipe.h"]
+```
 
     ```cpp
     __aicore__ inline void InitSpmBuffer(const int32_t bufferSize)

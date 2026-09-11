@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: AntiQuantize
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/quantization/AntiQuantize.md
+description: 按元素做伪量化计算，比如将int8\_t数据类型伪量化为half数据类型。**本接口最多支持输入为二维数据，不支持更高维度的输入。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # AntiQuantize
 
 ## 产品支持情况

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Duplicate
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/data_padding/Duplicate.md
+description: 支持Scalar和Tensor两种模式：。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Duplicate<a name="ZH-CN_TOPIC_0000001937477638"></a>
 
 ## 产品支持情况

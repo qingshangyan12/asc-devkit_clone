@@ -39,6 +39,12 @@ namespace AscendC {
  * @brief wait previous compute finish
  * @param [in] global memory workspace
  */
+/**
+ * @ingroup simd_api.basic_api.sync_control.inter_core_sync
+ * @override_id InitDetermineComputeWorkspace__Rgtg1x3_i32_Rltg1x3_i32
+ * @archs 3510 2201 2002
+ * @brief InitDetermineComputeWorkspace是基于核间顺序执行的确定性计算的初始化配置接口，能够初始化GM共享内存的值，完成初始化后才可以调用[WaitPreBlock](WaitPreBlock.md)和[NotifyNextBlock](NotifyNextBlock.md)。以上三个接口共同完成基于核间顺序执行的确定性计算，确定性计算的具体含义请参考[确定性计算](../../atomic_operations/key_features.md)。
+ */
 __aicore__ inline void InitDetermineComputeWorkspace(
     GlobalTensor<int32_t>& gmWorkspace, LocalTensor<int32_t>& ubWorkspace);
 /*
@@ -46,12 +52,24 @@ __aicore__ inline void InitDetermineComputeWorkspace(
  * @brief wait previous compute finish
  * @param [in] global memory workspace
  */
+/**
+ * @ingroup simd_api.basic_api.sync_control.inter_core_sync
+ * @override_id WaitPreBlock__Rgtg1x3_i32_Rltg1x3_i32
+ * @archs 3510 2201 2002
+ * @brief WaitPreBlock和NotifyNextBlock是核间同步控制接口。NotifyNextBlock通过写全局内存来通知其他核当前核已执行完成，其他核可以继续往下执行；WaitPreBlock通过读取全局内存，判断当前核是否可以继续往下执行。
+ */
 __aicore__ inline void WaitPreBlock(GlobalTensor<int32_t>& gmWorkspace, LocalTensor<int32_t>& ubWorkspace);
 
 /*
  * @ingroup NotifyNextBlock
  * @brief wait previous compute finish
  * @param [in] global memory workspace
+ */
+/**
+ * @ingroup simd_api.basic_api.sync_control.inter_core_sync
+ * @override_id NotifyNextBlock__Rgtg1x3_i32_Rltg1x3_i32
+ * @archs 3510 2201 2002
+ * @brief WaitPreBlock和NotifyNextBlock是核间同步控制接口。NotifyNextBlock通过写全局内存来通知其他核当前核已执行完成，其他核可以继续往下执行；WaitPreBlock通过读取全局内存，判断当前核是否可以继续往下执行。
  */
 __aicore__ inline void NotifyNextBlock(GlobalTensor<int32_t>& gmWorkspace, LocalTensor<int32_t>& ubWorkspace);
 } // namespace AscendC

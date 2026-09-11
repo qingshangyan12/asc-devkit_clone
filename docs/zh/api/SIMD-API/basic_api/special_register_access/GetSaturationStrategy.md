@@ -1,3 +1,21 @@
+---
+okftype: reference.api.cpp
+title: GetSaturationStrategy
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/special_register_access/GetSaturationStrategy.md
+description: 获取精度转换接口当前使用的饱和模式配置策略。饱和模式用于处理精度转换过程中结果溢出或出现INF/NAN的场景，详细说明请参考[SetSaturationFlag功能说明](SetSaturationFlag_ISASI.md#功能说明)。
+tag: [basic_api]
+usage_dependencies:
+  status: confirmed
+  companion:
+  - ../reg_vector_compute/type_conversion/Cast.md
+signature:
+- override_id: GetSaturationStrategy__z
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_common_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetSaturationStrategy
 
 ## 产品支持情况
@@ -40,6 +58,13 @@
 - 使用全局饱和配置时，两类Cast均使用[SetSaturationFlag](SetSaturationFlag_ISASI.md)设置的全局饱和模式。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "GetSaturationStrategy__z"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_common_intf.h"]
+```
 
 ```cpp
 __aicore__ inline OverrideStrategy GetSaturationStrategy()

@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: Rint
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/Rint_interface/Rint.md
+description: 获取与输入数据最接近的整数，若存在两个同样接近的整数，则获取其中的偶数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Rint__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+  archs: ['3510']
+  headers: [/include/adv_api/math/rint.h]
+- override_id: Rint__RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510']
+  headers: [/include/adv_api/math/rint.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Rint
 
 ## 产品支持情况
@@ -41,12 +60,26 @@ Rint\(3.5\) = 4
 
 -   通过sharedTmpBuffer入参传入临时空间
 
+```yaml
+api_signature:
+  override_id: "Rint__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32"
+  archs: ["3510"]
+  headers: ["/include/adv_api/math/rint.h"]
+```
+
     ```
     template <const RintConfig& config = DEFAULT_RINT_CONFIG, typename T>
     __aicore__ inline void Rint(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t count)
     ```
 
 -   接口框架申请临时空间
+
+```yaml
+api_signature:
+  override_id: "Rint__RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510"]
+  headers: ["/include/adv_api/math/rint.h"]
+```
 
     ```
     template <const RintConfig& config = DEFAULT_RINT_CONFIG, typename T>

@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: DumpAccChkPoint
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/debug_interface/onboard_print/DumpAccChkPoint.md
+description: 该接口Dump指定Tensor的内容。同时支持打印自定义的标签（仅支持uint32_t数据类型的信息），比如打印当前行号等。区别于[DumpTensor](DumpTensor.md)，使用该接口可以支持指定偏移位置的Tensor打印。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: DumpAccChkPoint__RCltg1x2_pT_u32_u32_u32
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_dump_tensor_intf.h]
+- override_id: DumpAccChkPoint__RCgtg1x2_pT_u32_u32_u32
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_dump_tensor_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DumpAccChkPoint<a name="ZH-CN_TOPIC_0000001877958569"></a>
 
 ## 产品支持情况
@@ -48,9 +67,26 @@ AscendC::DumpAccChkPoint(srcLocal, 5, 32, dataLen);
 
 ## 函数原型<a name="section2067518173415"></a>
 
+```yaml
+api_signature:
+  override_id: "DumpAccChkPoint__RCltg1x2_pT_u32_u32_u32"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_dump_tensor_intf.h"]
+```
+
 ```cpp
 template <typename T>
 __aicore__ inline void DumpAccChkPoint(const LocalTensor<T> &tensor, uint32_t index, uint32_t countOff, uint32_t dumpSize)
+```
+
+```yaml
+api_signature:
+  override_id: "DumpAccChkPoint__RCgtg1x2_pT_u32_u32_u32"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_dump_tensor_intf.h"]
+```
+
+```cpp
 template <typename T>
 __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &tensor, uint32_t index, uint32_t countOff, uint32_t dumpSize)
 ```

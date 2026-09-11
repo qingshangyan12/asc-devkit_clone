@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: GeGLU
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/activation_functions/GeGLU_interface/GeGLU.md
+description: GeGLU是采用GELU作为激活函数的GLU变体。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GeGLU__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/activation/geglu.h]
+- override_id: GeGLU__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/activation/geglu.h]
+- override_id: GeGLU__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/activation/geglu.h]
+- override_id: GeGLU__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/activation/geglu.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GeGLU
 
 ## 产品支持情况
@@ -54,12 +79,26 @@ GeGLU是采用GELU作为激活函数的GLU变体。具体计算公式如下：
 -   通过sharedTmpBuffer入参传入临时空间
     -   源操作数Tensor全部/部分参与计算
 
+```yaml
+api_signature:
+  override_id: "GeGLU__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/activation/geglu.h"]
+```
+
         ```
         template <typename T, bool isReuseSource = false>
         __aicore__ inline void GeGLU(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1, const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
+
+```yaml
+api_signature:
+  override_id: "GeGLU__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/activation/geglu.h"]
+```
 
         ```
         template <typename T, bool isReuseSource = false>
@@ -69,12 +108,26 @@ GeGLU是采用GELU作为激活函数的GLU变体。具体计算公式如下：
 -   接口框架申请临时空间
     -   源操作数Tensor全部/部分参与计算
 
+```yaml
+api_signature:
+  override_id: "GeGLU__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/activation/geglu.h"]
+```
+
         ```
         template <typename T, bool isReuseSource = false>
         __aicore__ inline void GeGLU(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1, uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
+
+```yaml
+api_signature:
+  override_id: "GeGLU__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/activation/geglu.h"]
+```
 
         ```
         template <typename T, bool isReuseSource = false>

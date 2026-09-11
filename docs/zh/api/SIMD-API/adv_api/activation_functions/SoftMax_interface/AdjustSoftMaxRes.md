@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: AdjustSoftMaxRes
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/activation_functions/SoftMax_interface/AdjustSoftMaxRes.md
+description: 本接口用于调整SoftMax的计算结果为指定的值。主要用于对SoftMax相关计算结果做后处理。当输入的max中存在指定的值的时候，会调整对应的softmaxres中的结果为输入的自定义的值。以上调整方式为按行进行，即当max某一行的值为某个值时，调整当前softmaxres对应一行的值都为输入的值。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # AdjustSoftMaxRes
 
 ## 产品支持情况

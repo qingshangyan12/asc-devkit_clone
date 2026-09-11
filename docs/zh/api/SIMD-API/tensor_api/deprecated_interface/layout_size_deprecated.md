@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: layout::Size（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/deprecated_interface/layout_size_deprecated.md
+description: '**该接口已废弃，请使用[layout::size](../layout/layout.md#size)替代。'
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Size__z
+  archs: ['3510']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # layout::Size（废弃）
 
 ## 产品支持情况
@@ -33,6 +49,13 @@
 返回当前Layout或指定子维度覆盖的有效元素数量。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "Size__z"
+  archs: ["3510"]
+  headers: []
+```
 
 ```cpp
 template <size_t... I>

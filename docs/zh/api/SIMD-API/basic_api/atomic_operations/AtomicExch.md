@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: AtomicExch
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/atomic_operations/AtomicExch.md
+description: 该接口用于在GM内存中执行原子交换操作，读取**address**指向的GM地址上的旧值（**old_value**），并将输入的标量值（**value**）替换旧值存储回同一地址，返回该地址修改前的值（**old_value**）。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: AtomicExch__PGpT_pT
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_atomic_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # AtomicExch<a name="ZH-CN_TOPIC_0000002598784433"></a>
 
 ## 产品支持情况
@@ -38,6 +54,13 @@ new\_value = value
 $$
 
 ## 函数原型<a name="section1171112415119"></a>
+
+```yaml
+api_signature:
+  override_id: "AtomicExch__PGpT_pT"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_atomic_intf.h"]
+```
 
 ```cpp
 template <typename T>

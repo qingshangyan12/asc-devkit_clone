@@ -9,100 +9,76 @@ usage_dependencies:
 signature:
   - override_id: "asc_repeat_reduce_max_index_value__PUf16_PUf16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: "asc_repeat_reduce_max_index_value__PUf32_PUf32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: "asc_repeat_reduce_max_value_index__PUf16_PUf16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: "asc_repeat_reduce_max_value_index__PUf32_PUf32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: "asc_repeat_reduce_max_only_value__PUf16_PUf16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: "asc_repeat_reduce_max_only_value__PUf32_PUf32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: "asc_repeat_reduce_max_only_index__PUf16_PUf16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: "asc_repeat_reduce_max_only_index__PUf32_PUf32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: "asc_repeat_reduce_max_index_value__PUf16_PUf16_u8_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: "asc_repeat_reduce_max_index_value__PUf32_PUf32_u8_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: "asc_repeat_reduce_max_value_index__PUf16_PUf16_u8_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: "asc_repeat_reduce_max_value_index__PUf32_PUf32_u8_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: "asc_repeat_reduce_max_only_value__PUf16_PUf16_u8_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: "asc_repeat_reduce_max_only_value__PUf32_PUf32_u8_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: "asc_repeat_reduce_max_only_index__PUf16_PUf16_u8_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: "asc_repeat_reduce_max_only_index__PUf32_PUf32_u8_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: "asc_repeat_reduce_max_index_value_sync__PUf16_PUf16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_repeat_reduce_max_index_value_sync__PUf32_PUf32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_repeat_reduce_max_value_index_sync__PUf16_PUf16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_repeat_reduce_max_value_index_sync__PUf32_PUf32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_repeat_reduce_max_only_value_sync__PUf16_PUf16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_repeat_reduce_max_only_value_sync__PUf32_PUf32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_repeat_reduce_max_only_index_sync__PUf16_PUf16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_repeat_reduce_max_only_index_sync__PUf32_PUf32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -154,8 +130,7 @@ only_index接口：表示只返回最值索引，返回结果存储顺序为[ind
 api_signature:
   override_id: "asc_repeat_reduce_max_index_value__PUf16_PUf16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
 ```
 
     ```cpp
@@ -166,8 +141,7 @@ api_signature:
 api_signature:
   override_id: "asc_repeat_reduce_max_index_value__PUf32_PUf32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
 ```
 
     ```cpp
@@ -178,8 +152,7 @@ api_signature:
 api_signature:
   override_id: "asc_repeat_reduce_max_value_index__PUf16_PUf16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
 ```
 
     ```cpp
@@ -190,8 +163,7 @@ api_signature:
 api_signature:
   override_id: "asc_repeat_reduce_max_value_index__PUf32_PUf32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
 ```
 
     ```cpp
@@ -202,8 +174,7 @@ api_signature:
 api_signature:
   override_id: "asc_repeat_reduce_max_only_value__PUf16_PUf16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
 ```
 
     ```cpp
@@ -214,8 +185,7 @@ api_signature:
 api_signature:
   override_id: "asc_repeat_reduce_max_only_value__PUf32_PUf32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
 ```
 
     ```cpp
@@ -226,8 +196,7 @@ api_signature:
 api_signature:
   override_id: "asc_repeat_reduce_max_only_index__PUf16_PUf16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
 ```
 
     ```cpp
@@ -238,8 +207,7 @@ api_signature:
 api_signature:
   override_id: "asc_repeat_reduce_max_only_index__PUf32_PUf32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
 ```
 
     ```cpp
@@ -252,8 +220,7 @@ api_signature:
 api_signature:
   override_id: "asc_repeat_reduce_max_index_value__PUf16_PUf16_u8_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
 ```
 
     ```cpp
@@ -264,8 +231,7 @@ api_signature:
 api_signature:
   override_id: "asc_repeat_reduce_max_index_value__PUf32_PUf32_u8_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
 ```
 
     ```cpp
@@ -276,8 +242,7 @@ api_signature:
 api_signature:
   override_id: "asc_repeat_reduce_max_value_index__PUf16_PUf16_u8_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
 ```
 
     ```cpp
@@ -288,8 +253,7 @@ api_signature:
 api_signature:
   override_id: "asc_repeat_reduce_max_value_index__PUf32_PUf32_u8_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
 ```
 
     ```cpp
@@ -300,8 +264,7 @@ api_signature:
 api_signature:
   override_id: "asc_repeat_reduce_max_only_value__PUf16_PUf16_u8_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
 ```
 
     ```cpp
@@ -312,8 +275,7 @@ api_signature:
 api_signature:
   override_id: "asc_repeat_reduce_max_only_value__PUf32_PUf32_u8_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
 ```
 
     ```cpp
@@ -324,8 +286,7 @@ api_signature:
 api_signature:
   override_id: "asc_repeat_reduce_max_only_index__PUf16_PUf16_u8_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
 ```
 
     ```cpp
@@ -336,8 +297,7 @@ api_signature:
 api_signature:
   override_id: "asc_repeat_reduce_max_only_index__PUf32_PUf32_u8_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
 ```
 
     ```cpp
@@ -350,8 +310,7 @@ api_signature:
 api_signature:
   override_id: "asc_repeat_reduce_max_index_value_sync__PUf16_PUf16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -362,8 +321,7 @@ api_signature:
 api_signature:
   override_id: "asc_repeat_reduce_max_index_value_sync__PUf32_PUf32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -374,8 +332,7 @@ api_signature:
 api_signature:
   override_id: "asc_repeat_reduce_max_value_index_sync__PUf16_PUf16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -386,8 +343,7 @@ api_signature:
 api_signature:
   override_id: "asc_repeat_reduce_max_value_index_sync__PUf32_PUf32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -398,8 +354,7 @@ api_signature:
 api_signature:
   override_id: "asc_repeat_reduce_max_only_value_sync__PUf16_PUf16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -410,8 +365,7 @@ api_signature:
 api_signature:
   override_id: "asc_repeat_reduce_max_only_value_sync__PUf32_PUf32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -422,8 +376,7 @@ api_signature:
 api_signature:
   override_id: "asc_repeat_reduce_max_only_index_sync__PUf16_PUf16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -434,8 +387,7 @@ api_signature:
 api_signature:
   override_id: "asc_repeat_reduce_max_only_index_sync__PUf32_PUf32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp

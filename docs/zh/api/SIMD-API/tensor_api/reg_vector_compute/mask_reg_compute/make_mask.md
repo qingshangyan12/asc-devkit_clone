@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: make_mask
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/reg_vector_compute/mask_reg_compute/make_mask.md
+description: 根据模式和数据元素宽度创建掩码寄存器，用于指示在计算过程中哪些元素参与计算。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: make_mask__z
+  archs: ['3510']
+  headers: [/include/tensor_api/experimental/arch/vector/mask_reg_compute.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # make_mask
 
 ## 产品支持情况
@@ -31,6 +47,13 @@
 根据模式和数据元素宽度创建掩码寄存器，用于指示在计算过程中哪些元素参与计算。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "make_mask__z"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/experimental/arch/vector/mask_reg_compute.h"]
+```
 
 ```cpp
 template <mask_pattern Pattern = mask_pattern::all, typename DataType>

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: ReducePairElem
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReducePairElem.md
+description: '`ReducePairElem`接口根据模板参数`reduceType`，对相邻两个（奇偶）元素进行归约操作，结果按顺序写入目标地址。**当前仅支持求和操作。'
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ReducePairElem
 
 ## 产品支持情况

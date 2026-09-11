@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Adds（灵活标量位置）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Adds_flexible_scalar.md
+description: Adds属于双目标量类计算接口，矢量内每个元素和标量间做加法，支持标量在前和标量在后两种场景。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Adds（灵活标量位置）<a name="ZH-CN_TOPIC_0000002170278873"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: GetSubBlockIdx(ISASI)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetSubBlockIdx_ISASI.md
+description: 在[分离模式架构](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md)下，获取逻辑AI
+  Core上Cube Core（AIC）或者Vector Core（AIV）的逻辑索引。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetSubBlockIdx__z
+  archs: ['3510', '2201', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_sys_var_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetSubBlockIdx(ISASI)
 
 ## 产品支持情况
@@ -40,6 +57,13 @@
 GetSubBlockIdx在使用`__mix__(1, 2)`作为[函数执行空间限定符](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#section1074418132518)的场景下，可以用于区分同一个核上的两个不同Vector Core，取值分别为0和1。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "GetSubBlockIdx__z"
+  archs: ["3510", "2201", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_sys_var_intf.h"]
+```
 
 ```cpp
 __aicore__ inline int64_t GetSubBlockIdx()

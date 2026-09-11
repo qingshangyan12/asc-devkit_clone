@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GetDataPtr
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/aux_data_structures/TensorDesc/GetDataPtr.md
+description: 获取储存Tensor数据地址。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetDataPtr<a name="ZH-CN_TOPIC_0000002306338962"></a>
 
 ## 产品支持情况<a name="section73648168211"></a>

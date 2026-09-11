@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Trap
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/debug_interface/exception_detection/Trap.md
+description: 在核函数（Kernel）侧调用，NPU模式下会中断AI Core的运行，CPU模式下等同于assert。可用于核函数（Kernel）侧异常场景的调试。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Trap__z
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_sys_var_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Trap<a name="ZH-CN_TOPIC_0000001834672609"></a>
 
 ## 产品支持情况
@@ -38,6 +54,13 @@
 在核函数（Kernel）侧调用，NPU模式下会中断AI Core的运行，CPU模式下等同于assert。可用于核函数（Kernel）侧异常场景的调试。
 
 ## 函数原型<a name="section2067518173415"></a>
+
+```yaml
+api_signature:
+  override_id: "Trap__z"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_sys_var_intf.h"]
+```
 
 ```cpp
 __aicore__ inline void Trap()

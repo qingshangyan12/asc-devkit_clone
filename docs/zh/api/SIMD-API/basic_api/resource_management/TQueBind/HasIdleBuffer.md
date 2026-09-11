@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: HasIdleBuffer
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/TQueBind/HasIdleBuffer.md
+description: 查询Que中是否有空闲的内存块。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: HasIdleBuffer__z
+  archs: ['3510', '2201', '3002', '2002', '1001']
+  headers: [/include/basic_api/kernel_tpipe.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # HasIdleBuffer<a name="ZH-CN_TOPIC_0000001857592869"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -32,6 +48,13 @@
 查询Que中是否有空闲的内存块。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "HasIdleBuffer__z"
+  archs: ["3510", "2201", "3002", "2002", "1001"]
+  headers: ["/include/basic_api/kernel_tpipe.h"]
+```
 
 ```cpp
 __aicore__ inline bool HasIdleBuffer()

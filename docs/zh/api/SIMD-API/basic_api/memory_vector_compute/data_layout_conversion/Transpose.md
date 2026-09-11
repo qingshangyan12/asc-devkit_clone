@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Transpose
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_layout_conversion/Transpose.md
+description: Transpose接口用于实现16\*16的二维矩阵数据块转置或者\[N,C,H,W\]与\[N,H,W,C\]数据格式互相转换。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Transpose<a name="ZH-CN_TOPIC_0000001498796777"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

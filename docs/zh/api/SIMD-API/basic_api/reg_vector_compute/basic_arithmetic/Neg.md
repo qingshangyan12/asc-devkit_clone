@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Neg
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/basic_arithmetic/Neg.md
+description: 该接口用于根据mask对输入数据srcReg进行取相反数操作，将结果写入dstReg。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Neg<a name="ZH-CN_TOPIC_0000001956986913"></a>
 
 ## 产品支持情况

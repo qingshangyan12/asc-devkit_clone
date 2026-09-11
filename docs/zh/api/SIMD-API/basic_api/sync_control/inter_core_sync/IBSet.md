@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: IBSet
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/IBSet.md
+description: 当不同核之间操作同一块全局内存且可能存在读后写、写后读以及写后写等数据依赖问题时，通过调用该函数来插入同步语句来避免上述数据依赖时可能出现的数据读写错误问题。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: IBSet__RCgtg1x3_i32_RCltg1x3_i32_i32_i32
+  archs: ['3510', '2201', '2002', '1001']
+  headers: [/include/basic_api/kernel_operator_block_sync_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # IBSet<a name="ZH-CN_TOPIC_0000001538096733"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -34,6 +50,13 @@
 调用IBSet设置某一个核的标志位，与IBWait成对使用，表示核之间的同步等待指令：被等待核中调用IBSet，通过将值1写入全局内存中某块地址来通知等待核；而等待核中调用IBWait，持续读取全局内存中相应地址块的值，直到其值变为1，从而实现核间同步。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "IBSet__RCgtg1x3_i32_RCltg1x3_i32_i32_i32"
+  archs: ["3510", "2201", "2002", "1001"]
+  headers: ["/include/basic_api/kernel_operator_block_sync_intf.h"]
+```
 
 ```cpp
 template <bool isAIVOnly = true>

@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: Init
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3DBackpropFilter_Kernel/Init.md
+description: Init主要用于对Conv3DBackpropFilter对象中的Tiling数据进行初始化，根据Tiling参数进行资源划分，Tiling参数的具体介绍请参考[Conv3DBackpropFilter
+  Tiling侧接口](../Conv3DBackpropFilter_Tiling/Conv3DBackpropFilter_Tiling.md)。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Init
 
 ## 产品支持情况

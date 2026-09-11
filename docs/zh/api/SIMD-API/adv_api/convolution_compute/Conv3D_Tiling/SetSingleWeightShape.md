@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetSingleWeightShape
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3D_Tiling/SetSingleWeightShape.md
+description: 设置单核上权重矩阵Weight的形状。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetSingleWeightShape
 
 ## 功能说明

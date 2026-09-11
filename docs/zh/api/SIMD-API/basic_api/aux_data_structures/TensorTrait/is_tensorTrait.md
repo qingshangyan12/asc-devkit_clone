@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: is\_tensorTrait
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/aux_data_structures/TensorTrait/is_tensorTrait.md
+description: 判断输入的数据结构是否为TensorTrait数据结构，可通过检查其成员常量value的值来判断。当value为true时，表示输入的数据结构是TensorTrait类型；反之则为非TensorTrait类型。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # is\_tensorTrait<a name="ZH-CN_TOPIC_0000002371314345"></a>
 
 ## 产品支持情况<a name="section73648168211"></a>

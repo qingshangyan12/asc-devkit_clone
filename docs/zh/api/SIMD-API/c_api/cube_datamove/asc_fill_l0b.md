@@ -9,126 +9,96 @@ usage_dependencies:
 signature:
   - override_id: "asc_fill_l0b__PCBi16_f16_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_fill_l0b__PCBi16_u32_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_fill_l0b__PCBu16_f16_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_fill_l0b__PCBu16_u32_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_fill_l0b__PCBf16_f16_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_fill_l0b__PCBf16_u32_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_fill_l0b__PCBbf16_bf16_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_fill_l0b__PCBbf16_f16_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_fill_l0b__PCBbf16_u32_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_fill_l0b__PCBi32_f16_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_fill_l0b__PCBi32_u32_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_fill_l0b__PCBu32_f16_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_fill_l0b__PCBu32_u32_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_fill_l0b__PCBf32_f16_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_fill_l0b__PCBf32_u32_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_fill_l0b_sync__PCBi16_f16_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_fill_l0b_sync__PCBi16_u32_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_fill_l0b_sync__PCBu16_f16_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_fill_l0b_sync__PCBu16_u32_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_fill_l0b_sync__PCBf16_f16_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_fill_l0b_sync__PCBf16_u32_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_fill_l0b_sync__PCBbf16_bf16_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_fill_l0b_sync__PCBbf16_f16_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_fill_l0b_sync__PCBbf16_u32_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_fill_l0b_sync__PCBi32_f16_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_fill_l0b_sync__PCBi32_u32_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_fill_l0b_sync__PCBu32_f16_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_fill_l0b_sync__PCBu32_u32_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_fill_l0b_sync__PCBf32_f16_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_fill_l0b_sync__PCBf32_u32_RCfillcfg"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 examples: []
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_fill_l0b
@@ -171,8 +141,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_fill_l0b__PCBi16_f16_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
     ```cpp
@@ -183,8 +152,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b__PCBi16_u32_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
     ```cpp
@@ -195,8 +163,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b__PCBu16_f16_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
     ```cpp
@@ -207,8 +174,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b__PCBu16_u32_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
     ```cpp
@@ -219,8 +185,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b__PCBf16_f16_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
     ```cpp
@@ -231,8 +196,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b__PCBf16_u32_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
     ```cpp
@@ -243,8 +207,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b__PCBbf16_bf16_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
     ```cpp
@@ -255,8 +218,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b__PCBbf16_f16_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
     ```cpp
@@ -267,8 +229,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b__PCBbf16_u32_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
     ```cpp
@@ -279,8 +240,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b__PCBi32_f16_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
     ```cpp
@@ -291,8 +251,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b__PCBi32_u32_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
     ```cpp
@@ -303,8 +262,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b__PCBu32_f16_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
     ```cpp
@@ -315,8 +273,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b__PCBu32_u32_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
     ```cpp
@@ -327,8 +284,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b__PCBf32_f16_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
     ```cpp
@@ -339,8 +295,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b__PCBf32_u32_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
     ```cpp
@@ -353,8 +308,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b_sync__PCBi16_f16_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
     ```cpp
@@ -365,8 +319,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b_sync__PCBi16_u32_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
     ```cpp
@@ -377,8 +330,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b_sync__PCBu16_f16_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
     ```cpp
@@ -389,8 +341,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b_sync__PCBu16_u32_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
     ```cpp
@@ -401,8 +352,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b_sync__PCBf16_f16_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
     ```cpp
@@ -413,8 +363,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b_sync__PCBf16_u32_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
     ```cpp
@@ -425,8 +374,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b_sync__PCBbf16_bf16_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
     ```cpp
@@ -437,8 +385,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b_sync__PCBbf16_f16_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
     ```cpp
@@ -449,8 +396,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b_sync__PCBbf16_u32_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
     ```cpp
@@ -461,8 +407,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b_sync__PCBi32_f16_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
     ```cpp
@@ -473,8 +418,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b_sync__PCBi32_u32_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
     ```cpp
@@ -485,8 +429,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b_sync__PCBu32_f16_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
     ```cpp
@@ -497,8 +440,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b_sync__PCBu32_u32_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
     ```cpp
@@ -509,8 +451,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b_sync__PCBf32_f16_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
     ```cpp
@@ -521,8 +462,7 @@ api_signature:
 api_signature:
   override_id: "asc_fill_l0b_sync__PCBf32_u32_RCfillcfg"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
     ```cpp

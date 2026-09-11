@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: MakeTensorTrait
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/aux_data_structures/TensorTrait/MakeTensorTrait.md
+description: 生成TensorTrait实例化对象。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: MakeTensorTrait__RCpLayoutType
+  archs: ['3510', '2201']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # MakeTensorTrait<a name="ZH-CN_TOPIC_0000002337196228"></a>
 
 ## 产品支持情况<a name="section73648168211"></a>
@@ -31,6 +47,13 @@
 生成TensorTrait实例化对象。
 
 ## 函数原型<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section13230182415108"></a>
+
+```yaml
+api_signature:
+  override_id: "MakeTensorTrait__RCpLayoutType"
+  archs: ["3510", "2201"]
+  headers: []
+```
 
 ```cpp
 template <typename T, TPosition pos, typename LayoutType>

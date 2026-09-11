@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: MmadBitMode
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/MmadBitMode.md
+description: MmadBitMode对于MmadParams结构体构造进行了优化，本接口适用于scalar流水成为性能优化瓶颈的场景，支持基础Mmad/MmadMx计算功能。本接口与Mmad/MmadMx接口的差异在于参数传入的方式不同，本接口传入的是联合结构体MmadBitModeParams。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # MmadBitMode<a name="ZH-CN_TOPIC_000000253823118101"></a>
 
 ## 产品支持情况

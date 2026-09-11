@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: AssignQueue
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_group_mgmt_ISASI/CubeResGroupHandle/AssignQueue.md
+description: 用于AIV绑定CubeResGroupHandle中某一个消息队列的序号。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: AssignQueue__u8
+  archs: ['3510', '2201']
+  headers: [/include/basic_api/core_mng/roc/kernel_operator_cube_group_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # AssignQueue<a name="ZH-CN_TOPIC_0000001996865753"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -31,6 +47,13 @@
 用于AIV绑定CubeResGroupHandle中某一个消息队列的序号。
 
 ## 函数原型<a name="section765814724715"></a>
+
+```yaml
+api_signature:
+  override_id: "AssignQueue__u8"
+  archs: ["3510", "2201"]
+  headers: ["/include/basic_api/core_mng/roc/kernel_operator_cube_group_intf.h"]
+```
 
 ```
 __aicore__ inline void AssignQueue(uint8_t queueIdIn)

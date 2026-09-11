@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: MoveMask
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/MaskReg_compute/MoveMask.md
+description: 从[SetVectorMask](../../memory_vector_compute/mask_operations/SetVectorMask.md)设置的掩码寄存器{MASK1,
+  MASK0}中读取Mask值，并按模板参数T对应的数据格式转换后写入返回值MaskReg。
+tag: [basic_api]
+usage_dependencies:
+  status: confirmed
+  required_before:
+    all_of:
+    - ../../memory_vector_compute/mask_operations/SetMaskCount.md
+    - ../../memory_vector_compute/mask_operations/SetMaskNorm.md
+    - ../../memory_vector_compute/mask_operations/SetVectorMask.md
+signature:
+- override_id: MoveMask__z
+  archs: ['3510']
+  headers: [/include/basic_api/reg_compute/kernel_reg_compute_maskreg_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # MoveMask<a name="ZH-CN_TOPIC_0000001985457933"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -38,6 +60,13 @@ b16类型读取完整128bit的{MASK1, MASK0}，将每个bit复制为2bit；b32�
 Mask与MaskReg的机制对比，具体请参考[A2/A3与950 Mask机制对比](../register_data_types/MaskReg.md)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "MoveMask__z"
+  archs: ["3510"]
+  headers: ["/include/basic_api/reg_compute/kernel_reg_compute_maskreg_intf.h"]
+```
 
 ```cpp
 template <typename T> 

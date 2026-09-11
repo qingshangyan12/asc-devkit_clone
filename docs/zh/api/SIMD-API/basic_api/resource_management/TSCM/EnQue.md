@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: EnQue
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/TSCM/EnQue.md
+description: 将tensor push到队列。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: EnQue__RCltg1x2_pT
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_tpipe.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # EnQue<a name="ZH-CN_TOPIC_0000002126034674"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -32,6 +48,13 @@
 将tensor push到队列。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "EnQue__RCltg1x2_pT"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_tpipe.h"]
+```
 
 ```cpp
 template <typename T>

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: LoadUnzipIndex
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_load_aux_config/LoadUnzipIndex.md
+description: 加载GM上的压缩索引表到内部寄存器。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: LoadUnzipIndex__RCgtg1x2_pT_u32
+  archs: ['2002']
+  headers: [/include/basic_api/kernel_operator_mm_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LoadUnzipIndex<a name="ZH-CN_TOPIC_0000001913174992"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -34,6 +50,13 @@
 索引表由压缩工具根据对应的权重数据离线生成。一个LoadUnzipIndex指令可以加载多个索引表，而每个LoadDataUnzip指令只能消耗一个索引表。因此，索引表之间的顺序应该由用户来确定，以确保其与压缩数据的对应性。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "LoadUnzipIndex__RCgtg1x2_pT_u32"
+  archs: ["2002"]
+  headers: ["/include/basic_api/kernel_operator_mm_intf.h"]
+```
 
 ```cpp
 template <typename T = int8_t, typename Std::enable_if<Std::is_same<PrimT<T>, int8_t>::value, bool>::type = true> 

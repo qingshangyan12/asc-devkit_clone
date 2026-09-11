@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: ShiftLeft
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/logical_compute/ShiftLeft.md
+description: 对源操作数中的每个元素进行左移操作，左移的位数由标量scalarValue决定。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ShiftLeft<a name="ZH-CN_TOPIC_0000001474880641"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

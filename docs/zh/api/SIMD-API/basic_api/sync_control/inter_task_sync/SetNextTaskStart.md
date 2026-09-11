@@ -1,3 +1,23 @@
+---
+okftype: reference.api.cpp
+title: SetNextTaskStart
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/sync_control/inter_task_sync/SetNextTaskStart.md
+description: 算子层面支持SuperKernel特性Early-Start能力的接口，调用后在TorchAir层面：1.GE图模式下进行默认启用; 2.npugraph_ex后端通过early_start选项进行控制启用。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetNextTaskStart__z
+  archs: ['3510', '2201', '3002', x90, '9030', '2002', '1001']
+  headers: [/include/basic_api/kernel_operator_common_intf.h]
+examples:
+- path: /examples/01_simd_cpp_api/03_basic_api/05_sync_control/task_sync
+  archs: ['2201', '3510']
+  override_id: SetNextTaskStart__z
+  file: task_sync.asc
+timestamp: '2026-09-11'
+---
+
 # SetNextTaskStart<a name="ZH-CN_TOPIC_0000002337763421"></a>
 
 > [!NOTE]说明 
@@ -78,6 +98,13 @@ SuperKernel是一种算子的二进制融合技术，与源码融合不同，它
     Kirin 9030 
     <!-- end id6 -->
 
+```yaml
+api_signature:
+  override_id: "SetNextTaskStart__z"
+  archs: ["3510", "2201", "3002", "x90", "9030", "2002", "1001"]
+  headers: ["/include/basic_api/kernel_operator_common_intf.h"]
+```
+
     ```cpp
     template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_FIX, bool FORCE = false>
     __aicore__ inline void SetNextTaskStart()
@@ -98,6 +125,13 @@ SuperKernel是一种算子的二进制融合技术，与源码融合不同，它
     <!-- npu="910" id9 -->
     Atlas 训练系列产品 
     <!-- end id9 -->
+
+```yaml
+api_signature:
+  override_id: "SetNextTaskStart__z"
+  archs: ["3510", "2201", "3002", "x90", "9030", "2002", "1001"]
+  headers: ["/include/basic_api/kernel_operator_common_intf.h"]
+```
 
     ```cpp
     template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_MTE3, bool FORCE = false>

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetLocalWorkspace
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetLocalWorkspace.md
+description: 对于某些场景Matmul内部需要额外占用Unified Buffer（UB，VECCALC）空间，如果用户希望在算子中复用这个额外占用的UB（VECCALC）空间，则该空间需要用户预留，并申请好LocalTensor，将其起始物理地址传入给Matmul。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetLocalWorkspace__RCltg1x2_u8
+  archs: ['3510', '2002']
+  headers: [/include/adv_api/matmul/matmul.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetLocalWorkspace
 
 ## 产品支持情况
@@ -43,6 +59,13 @@
 获取到的UB临时空间大小以字节为单位。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "SetLocalWorkspace__RCltg1x2_u8"
+  archs: ["3510", "2002"]
+  headers: ["/include/adv_api/matmul/matmul.h"]
+```
 
 ```
 __aicore__ inline void SetLocalWorkspace(const LocalTensor<uint8_t>& tmpBuffer)

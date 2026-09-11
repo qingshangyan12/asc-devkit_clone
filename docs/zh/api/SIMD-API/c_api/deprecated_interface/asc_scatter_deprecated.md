@@ -9,40 +9,31 @@ usage_dependencies:
 signature:
   - override_id: "asc_scatter__Rvi8_PUi8_vu16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+    headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
   - override_id: "asc_scatter__Rvu8_PUu8_vu16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+    headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
   - override_id: "asc_scatter__Rvi16_PUi16_vu16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+    headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
   - override_id: "asc_scatter__Rvu16_PUu16_vu16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+    headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
   - override_id: "asc_scatter__Rvi32_PUi32_vu32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+    headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
   - override_id: "asc_scatter__Rvu32_PUu32_vu32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+    headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
   - override_id: "asc_scatter__Rvbf16_PUbf16_vu16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+    headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
   - override_id: "asc_scatter__Rvf16_PUf16_vu16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+    headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
   - override_id: "asc_scatter__Rvf32_PUf32_vu32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+    headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -89,8 +80,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_scatter__Rvi8_PUi8_vu16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
 ```
 
 ```cpp
@@ -101,8 +91,7 @@ __simd_callee__ inline void asc_scatter(vector_int8_t& src, __ubuf__ int8_t* dst
 api_signature:
   override_id: "asc_scatter__Rvu8_PUu8_vu16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
 ```
 
 ```cpp
@@ -113,8 +102,7 @@ __simd_callee__ inline void asc_scatter(vector_uint8_t& src, __ubuf__ uint8_t* d
 api_signature:
   override_id: "asc_scatter__Rvi16_PUi16_vu16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
 ```
 
 ```cpp
@@ -125,8 +113,7 @@ __simd_callee__ inline void asc_scatter(vector_int16_t& src, __ubuf__ int16_t* d
 api_signature:
   override_id: "asc_scatter__Rvu16_PUu16_vu16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
 ```
 
 ```cpp
@@ -137,8 +124,7 @@ __simd_callee__ inline void asc_scatter(vector_uint16_t& src, __ubuf__ uint16_t*
 api_signature:
   override_id: "asc_scatter__Rvi32_PUi32_vu32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
 ```
 
 ```cpp
@@ -149,8 +135,7 @@ __simd_callee__ inline void asc_scatter(vector_int32_t& src, __ubuf__ int32_t* d
 api_signature:
   override_id: "asc_scatter__Rvu32_PUu32_vu32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
 ```
 
 ```cpp
@@ -161,8 +146,7 @@ __simd_callee__ inline void asc_scatter(vector_uint32_t& src, __ubuf__ uint32_t*
 api_signature:
   override_id: "asc_scatter__Rvbf16_PUbf16_vu16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
 ```
 
 ```cpp
@@ -173,8 +157,7 @@ __simd_callee__ inline void asc_scatter(vector_bfloat16_t& src, __ubuf__ bfloat1
 api_signature:
   override_id: "asc_scatter__Rvf16_PUf16_vu16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
 ```
 
 ```cpp
@@ -185,8 +168,7 @@ __simd_callee__ inline void asc_scatter(vector_half& src, __ubuf__ half* dst, ve
 api_signature:
   override_id: "asc_scatter__Rvf32_PUf32_vu32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
 ```
 
 ```cpp

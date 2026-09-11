@@ -9,20 +9,16 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_copy_l12l0a__PCA<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - prototype_id: "asc_copy_l12l0a_sync__PCA<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - prototype_id: "asc_copy_l12l0a_transpose__PCA<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - prototype_id: "asc_copy_l12l0a_transpose_sync__PCA<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad"
     archs: ["3510"]
@@ -32,7 +28,7 @@ examples:
     archs: ["3510"]
     override_id: "asc_copy_l12l0a__PCAbf16_PL1bf16_u16_u16_u8_u8_i16_u16"
     file: "mmad_s2.h"
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_copy_l12l0a_arch_3510（2D矩阵搬运）
@@ -84,8 +80,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_copy_l12l0a__PCA<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   dtype:
     values:
       - "int4b_t"
@@ -120,8 +115,7 @@ __aicore__ inline void asc_copy_l12l0a(__ca__ <dtype>* dst,
 api_signature:
   prototype_id: "asc_copy_l12l0a_sync__PCA<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   dtype:
     values:
       - "int4b_t"
@@ -176,8 +170,7 @@ __aicore__ inline void asc_copy_l12l0a(__ca__ half* dst,
 api_signature:
   prototype_id: "asc_copy_l12l0a_transpose__PCA<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   dtype:
     values:
       - "int4b_t"
@@ -212,8 +205,7 @@ __aicore__ inline void asc_copy_l12l0a_transpose(__ca__ <dtype>* dst,
 api_signature:
   prototype_id: "asc_copy_l12l0a_transpose_sync__PCA<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   dtype:
     values:
       - "int4b_t"

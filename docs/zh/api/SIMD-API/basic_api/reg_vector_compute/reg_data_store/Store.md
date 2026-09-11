@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: Store
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_store/Store.md
+description: Reg矢量计算数据搬运接口，支持从RegTensor搬出至非32字节对齐的Unified Buffer（UB）地址dstAddr。连续搬运时，用户需手动更新dstAddr地址。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Store__PUpT_RpU
+  archs: ['3510']
+  headers: [/include/basic_api/reg_compute/kernel_reg_compute_datacopy_intf.h]
+- override_id: Store__PUpT_RpU_u32
+  archs: ['3510']
+  headers: [/include/basic_api/reg_compute/kernel_reg_compute_datacopy_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Store
 
 ## 产品支持情况
@@ -37,12 +56,26 @@ Reg矢量计算数据搬运接口，支持从RegTensor搬出至非32字节对齐
 
 -   搬运量为VL
 
+```yaml
+api_signature:
+  override_id: "Store__PUpT_RpU"
+  archs: ["3510"]
+  headers: ["/include/basic_api/reg_compute/kernel_reg_compute_datacopy_intf.h"]
+```
+
     ```cpp
     template <typename T = DefaultType, typename U>
     __simd_callee__ inline void Store(__ubuf__ T* dstAddr, U& srcReg)
     ```
 
 -   搬运count个数据
+
+```yaml
+api_signature:
+  override_id: "Store__PUpT_RpU_u32"
+  archs: ["3510"]
+  headers: ["/include/basic_api/reg_compute/kernel_reg_compute_datacopy_intf.h"]
+```
 
     ```cpp
     template <typename T = DefaultType, typename U>

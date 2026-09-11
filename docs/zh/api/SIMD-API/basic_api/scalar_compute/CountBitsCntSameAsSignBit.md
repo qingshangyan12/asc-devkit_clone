@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: CountBitsCntSameAsSignBit
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/scalar_compute/CountBitsCntSameAsSignBit.md
+description: 统计int64\_t类型数值的二进制表示中，从最高数值位开始与符号位相同的连续比特位的个数。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: CountBitsCntSameAsSignBit__i64
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_scalar_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # CountBitsCntSameAsSignBit<a name="ZH-CN_TOPIC_0000001834069645"></a>
 
 ## 产品支持情况
@@ -50,6 +66,13 @@ int64_t valueOut = AscendC::CountBitsCntSameAsSignBit(0x0100000000000020ULL); //
 ![CountBitsCntSameAsSignBit计算示意图](../../../figures/CountBitsCntSameAsSignBit.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "CountBitsCntSameAsSignBit__i64"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_scalar_intf.h"]
+```
 
 ```cpp
 __aicore__ inline int64_t CountBitsCntSameAsSignBit(int64_t valueIn)

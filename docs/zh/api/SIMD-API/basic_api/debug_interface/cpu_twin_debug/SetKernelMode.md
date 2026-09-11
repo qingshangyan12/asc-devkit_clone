@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetKernelMode
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/debug_interface/cpu_twin_debug/SetKernelMode.md
+description: 针对分离模式，CPU调测时，设置内核模式为单AIV模式，单AIC模式或者MIX模式，以分别支持单AIV矢量算子，单AIC矩阵算子，MIX混合算子的CPU调试。不调用该接口的情况下，默认为MIX模式。为保证算子代码在多个硬件平台兼容，耦合模式下也可以调用，该场景下接口不会生效，不影响正常调试。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetKernelMode<a name="ZH-CN_TOPIC_0000002044684570"></a>
 
 ## 产品支持情况

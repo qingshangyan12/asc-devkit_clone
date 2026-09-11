@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: 离散搬出（Scatter）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_store/Scatter_discrete.md
+description: 该指令会根据索引值index将源操作数srcReg中的元素分散到目的操作数Unified Buffer（UB）中。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # 离散搬出（Scatter）<a name="ZH-CN_TOPIC_0000001929080422"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

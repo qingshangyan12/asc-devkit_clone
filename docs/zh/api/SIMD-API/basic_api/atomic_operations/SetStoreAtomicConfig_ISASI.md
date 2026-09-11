@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetStoreAtomicConfig\(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/atomic_operations/SetStoreAtomicConfig_ISASI.md
+description: 设置原子操作开启位与原子操作类型。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetStoreAtomicConfig__z
+  archs: ['3510', '2201', '3002']
+  headers: [/include/basic_api/kernel_operator_common_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetStoreAtomicConfig\(ISASI\)<a name="ZH-CN_TOPIC_0000001790206710"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -32,6 +48,13 @@
 设置原子操作开启位与原子操作类型。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "SetStoreAtomicConfig__z"
+  archs: ["3510", "2201", "3002"]
+  headers: ["/include/basic_api/kernel_operator_common_intf.h"]
+```
 
 ```cpp
 template <AtomicDtype type, AtomicOp op>

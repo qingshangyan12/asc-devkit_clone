@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Fixpipe（L0C到GM数据搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM.md
+description: 矩阵计算的结果存放在L0C Buffer，Fixpipe接口用于将结果搬运至Global Memory（GM）中，并且在搬运过程中支持随路格式转换等操作。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Fixpipe（L0C到GM数据搬运）<a id="ZH-CN_TOPIC_0000002569070977"></a>
 
 ## 产品支持情况<a id="zh-cn_topic_0000002542828493_section796754519912"></a>

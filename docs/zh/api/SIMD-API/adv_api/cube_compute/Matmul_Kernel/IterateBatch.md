@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: IterateBatch
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/IterateBatch.md
+description: 单次Matmul计算处理的shape比较小时，由于每次计算均涉及到内部的通信，可能会影响性能，该接口提供批量处理Matmul的功能，调用一次IterateBatch，可以计算出多个singleCoreM
+  \* singleCoreN大小的C矩阵。
+tag: [adv_api]
+usage_dependencies:
+  status: confirmed
+  required_before:
+    all_of:
+    - SetBatchNum.md
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # IterateBatch
 
 ## 产品支持情况

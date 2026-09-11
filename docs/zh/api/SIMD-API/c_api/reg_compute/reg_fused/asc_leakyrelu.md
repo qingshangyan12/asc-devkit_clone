@@ -10,12 +10,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_leakyrelu__v<dtype>_<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_fused.h"
+    headers: [/include/c_api/reg_compute/compute/reg_fused.h]
   - prototype_id: "asc_leakyrelu__Rv<dtype>_v<dtype>_<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_fused.h"
+    headers: [/include/c_api/reg_compute/compute/reg_fused.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -64,8 +62,7 @@ $$
 api_signature:
   prototype_id: "asc_leakyrelu__v<dtype>_<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_fused.h"
+  headers: [/include/c_api/reg_compute/compute/reg_fused.h]
   dtype:
     values:
       - "half"
@@ -83,8 +80,7 @@ __simd_callee__ inline vector_<dtype> asc_leakyrelu(vector_<dtype> src,
 api_signature:
   prototype_id: "asc_leakyrelu__Rv<dtype>_v<dtype>_<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_fused.h"
+  headers: [/include/c_api/reg_compute/compute/reg_fused.h]
   dtype:
     values:
       - "half"

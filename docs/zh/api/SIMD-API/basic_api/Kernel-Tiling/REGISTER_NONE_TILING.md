@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: REGISTER\_NONE\_TILING
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/Kernel-Tiling/REGISTER_NONE_TILING.md
+description: 在核函数（Kernel）侧使用标准C++语法自定义的TilingData结构体时，若用户不确定需要注册哪些结构体，可使用该接口告知框架侧需使用未注册的标准C++语法来定义TilingData，并配套[GET\_TILING\_DATA\_WITH\_STRUCT](GET_TILING_DATA_WITH_STRUCT.md)，[GET\_TILING\_DATA\_MEMBER](GET_TILING_DATA_MEMBER.md)，[GET\_TILING\_DATA\_PTR\_WITH\_STRUCT](GET_TILING_DATA_PTR_WITH_STRUCT.md)来获取对应的TilingData。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # REGISTER\_NONE\_TILING<a name="ZH-CN_TOPIC_0000002473236240"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

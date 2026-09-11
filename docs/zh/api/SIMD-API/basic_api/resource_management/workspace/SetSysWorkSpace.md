@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetSysWorkSpace
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/workspace/SetSysWorkSpace.md
+description: 框架需要使用的workspace称之为系统workspace。[Matmul核函数（Kernel）侧接口](../../../adv_api/cube_compute/Matmul_Kernel/Matmul_Kernel.md)等高阶API需要系统workspace，所以在使用该类API时，需要调用该接口，设置系统workspace的指针。采用工程化算子开发方式或者kernel直调方式（开启HAVE\_WORKSPACE编译选项）时，不需要开发者手动设置，框架会自动设置。其他场景下，需要开发者调用SetSysWorkSpace进行设置。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetSysWorkSpace<a name="ZH-CN_TOPIC_0000001714391393"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

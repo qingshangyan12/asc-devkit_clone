@@ -10,12 +10,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_load__PU<dtype>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/loadunalign_composite.h"
+    headers: [/include/c_api/composite/loadunalign_composite.h]
   - prototype_id: "asc_load__Rv<dtype>_PU<dtype>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/loadunalign_composite.h"
+    headers: [/include/c_api/composite/loadunalign_composite.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -60,8 +58,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_load__PU<dtype>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/loadunalign_composite.h"
+  headers: [/include/c_api/composite/loadunalign_composite.h]
   dtype:
     values:
       - "int4b_t"
@@ -91,8 +88,7 @@ __simd_callee__ inline vector_<dtype> asc_load(__ubuf__ <dtype>* src)
 api_signature:
   prototype_id: "asc_load__Rv<dtype>_PU<dtype>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/loadunalign_composite.h"
+  headers: [/include/c_api/composite/loadunalign_composite.h]
   dtype:
     values:
       - "int4b_t"

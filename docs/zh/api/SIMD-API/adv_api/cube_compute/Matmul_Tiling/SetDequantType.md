@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetDequantType
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetDequantType.md
+description: 该接口用于设置量化或反量化的模式。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetDequantType
 
 ## 功能说明

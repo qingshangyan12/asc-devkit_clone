@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: operator*
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/reg_vector_compute/basic_arithmetic/operator_mul.md
+description: 该接口根据输入reg_tensor携带的mask，对两个源操作数进行按元素相乘操作，并返回计算结果。支持reg_tensor与reg_tensor、reg_tensor与标量、标量与reg_tensor三种操作数组合。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # operator*
 
 ## 产品支持情况

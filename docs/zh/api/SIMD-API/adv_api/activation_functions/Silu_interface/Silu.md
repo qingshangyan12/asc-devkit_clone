@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Silu
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/activation_functions/Silu_interface/Silu.md
+description: 按元素做Silu运算。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Silu__RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/activation/silu.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Silu
 
 ## 产品支持情况
@@ -38,6 +54,13 @@
 ![](../../../../figures/zh-cn_formulaimage_0000001729001889.png)
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "Silu__RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/activation/silu.h"]
+```
 
 ```
 template <typename T, bool isReuseSource = false>

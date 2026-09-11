@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: LeakyRelu
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/basic_arithmetic/LeakyRelu.md
+description: 该接口用于按元素执行Leaky ReLU（Leaky Rectified Linear Unit）操作：当源操作数中某元素大于0时，直接将该元素写入目的操作数；否则将该元素乘以标量值scalarValue后写入目的操作数。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LeakyRelu<a name="ZH-CN_TOPIC_0000002043279360"></a>
 
 ## 产品支持情况

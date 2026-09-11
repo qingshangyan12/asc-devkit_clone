@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: DataCopy（GMToL1随路转换-DN2NZ搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_GMToL1_DN2NZ.md
+description: 随路格式转换数据搬运，适用于在搬运时进行DN到NZ格式的转换。数据从Global Memory搬运至L1 Buffer（TPosition为A1/B1），搬运过程中完成DN->NZ格式转换。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DataCopy（GMToL1随路转换-DN2NZ搬运）<a id="ZH-CN_TOPIC_0000002563847574"></a>
 
 ## 产品支持情况<a id="section1550532418810"></a>

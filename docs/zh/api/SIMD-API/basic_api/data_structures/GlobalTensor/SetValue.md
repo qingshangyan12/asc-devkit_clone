@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetValue
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/data_structures/GlobalTensor/SetValue.md
+description: 设置GlobalTensor相应偏移位置的值。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetValue<a name="ZH-CN_TOPIC_0000002167530617"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: SetLoadDataBoundary
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_load_aux_config/SetLoadDataBoundary.md
+description: '设置[LoadData（卷积数据搬运）](../cube_compute_load/LoadData_3D.md)接口所需的L1 Buffer（TPosition:
+  A1/B1）边界值。'
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetLoadDataBoundary__u32
+  archs: ['2201', '2002']
+  headers: [/include/basic_api/kernel_operator_mm_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetLoadDataBoundary<a name="ZH-CN_TOPIC_0000001787861430"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -34,6 +51,13 @@
 如果[LoadData（卷积数据搬运）](../cube_compute_load/LoadData_3D.md)指令在处理源操作数时，源操作数在L1 Buffer（A1/B1）上的地址超出设置的边界，则会从L1 Buffer（A1/B1）起始地址开始读取数据。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "SetLoadDataBoundary__u32"
+  archs: ["2201", "2002"]
+  headers: ["/include/basic_api/kernel_operator_mm_intf.h"]
+```
 
 ```cpp
 __aicore__ inline void SetLoadDataBoundary(uint32_t boundaryValue)

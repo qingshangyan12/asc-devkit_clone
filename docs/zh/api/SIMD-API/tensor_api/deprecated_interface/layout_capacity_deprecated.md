@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: layout::Capacity（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/deprecated_interface/layout_capacity_deprecated.md
+description: '**该接口已废弃，请使用[layout::capacity](../layout/layout.md#capacity)替代。'
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Capacity__z
+  archs: ['3510']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # layout::Capacity（废弃）
 
 ## 产品支持情况
@@ -33,6 +49,13 @@
 返回当前Layout或指定子维度对应布局的实际内存容量，包含由非连续Stride产生的无效数据区域。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "Capacity__z"
+  archs: ["3510"]
+  headers: []
+```
 
 ```cpp
 template <size_t... I>

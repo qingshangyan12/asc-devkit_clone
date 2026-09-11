@@ -449,6 +449,12 @@ __aicore__ inline void Or(
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T, typename U>
+/**
+ * @ingroup simd_api.basic_api.memory_vector_compute.logical_compute
+ * @override_id ShiftLeft__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pU_RCi32
+ * @archs 3510
+ * @brief 对源操作数中的每个元素进行左移操作。
+ */
 __aicore__ inline void ShiftLeft(
     const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<U>& src1, const int32_t& count);
 
@@ -464,6 +470,12 @@ __aicore__ inline void ShiftLeft(
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T, typename U>
+/**
+ * @ingroup simd_api.basic_api.memory_vector_compute.logical_compute
+ * @override_id ShiftRight__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pU_RCi32
+ * @archs 3510
+ * @brief 源操作数内每个元素做右移。
+ */
 __aicore__ inline void ShiftRight(
     const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<U>& src1, const int32_t& count);
 
@@ -783,6 +795,14 @@ __aicore__ inline void FusedAbsSub(
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T, typename U>
+/**
+ * @ingroup simd_api.basic_api.memory_vector_compute.composite_compute
+ * @override_id ExpSub__RCltg1x2_pT_RCltg1x2_pU_RCltg1x2_pU_u32
+ * @archs 3510
+ * @brief src0与src1相减，将差值作为指数计算自然常数e的幂次，并将计算结果写入dst。
+ * @param [out] dst 目的操作数。类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。LocalTensor的起始地址需要32字节对齐。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void ExpSub(
     const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, const uint32_t count);
 

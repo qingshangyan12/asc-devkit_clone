@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Mull\(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Mull_ISASI.md
+description: Mull属于双目矢量类计算接口，对前count个输入数据src0、src1按元素相乘操作，将结果写入dst0，溢出部分写入dst1。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Mull__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Mull\(ISASI\)<a name="ZH-CN_TOPIC_0000002193851737"></a>
 
 ## 产品支持情况
@@ -34,6 +50,13 @@ Mull属于双目矢量类计算接口，对前count个输入数据src0、src1按
 ![](../../../../figures/mull.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "Mull__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510"]
+  headers: []
+```
 
 ```cpp
 template <typename T>

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GET\_TILING\_DATA\_WITH\_STRUCT
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/Kernel-Tiling/GET_TILING_DATA_WITH_STRUCT.md
+description: 使用该接口指定结构体名称，可获取指定的tiling信息，并填入对应的Tiling结构体中，此函数会以宏展开的方式进行编译。与[GET\_TILING\_DATA](GET_TILING_DATA.md)的区别是：[GET\_TILING\_DATA](GET_TILING_DATA.md)只能获取默认注册的结构体，该接口可以根据指定的结构体名称获取对应的结构体，常用于针对不同的TilingKey注册了不同结构体的情况下。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GET\_TILING\_DATA\_WITH\_STRUCT<a name="ZH-CN_TOPIC_0000001867523629"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

@@ -9,12 +9,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_duplicate__v<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
   - prototype_id: "asc_duplicate__Rv<dtype>_v<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -59,8 +57,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_duplicate__v<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
   dtype:
     values:
       - "int8_t"
@@ -87,8 +84,7 @@ __simd_callee__ inline vector_<dtype> asc_duplicate(vector_<dtype> src,
 api_signature:
   prototype_id: "asc_duplicate__Rv<dtype>_v<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
   dtype:
     values:
       - "int8_t"

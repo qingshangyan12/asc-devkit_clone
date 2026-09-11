@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: UnPad
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/tensor_transform/UnPad.md
+description: 对height \* width的二维Tensor在width方向上进行unpad，如果Tensor的width非32B对齐，则不支持调用本接口unpad。本接口具体功能场景如下：Tensor的width已32B对齐，以half为例，如16\*16，进行UnPad，变成16\*15。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # UnPad
 
 ## 产品支持情况

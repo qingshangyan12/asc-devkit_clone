@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: MakeStride
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/aux_data_structures/Layout/MakeStride.md
+description: 将传入的数据打包成Stride数据结构。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: MakeStride__QRCpTs
+  archs: ['2201']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # MakeStride<a name="ZH-CN_TOPIC_0000002298317784"></a>
 
 ## 产品支持情况<a name="section73648168211"></a>
@@ -31,6 +47,13 @@
 将传入的数据打包成Stride数据结构。
 
 ## 函数原型<a name="zh-cn_topic_0000002078447573_zh-cn_topic_0000001576806829_zh-cn_topic_0000001339187720_section13230182415108"></a>
+
+```yaml
+api_signature:
+  override_id: "MakeStride__QRCpTs"
+  archs: ["2201"]
+  headers: []
+```
 
 ```cpp
 template <typename... Ts>

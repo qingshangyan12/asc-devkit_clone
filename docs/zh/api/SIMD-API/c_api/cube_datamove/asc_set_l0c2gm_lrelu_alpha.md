@@ -9,14 +9,12 @@ usage_dependencies:
 signature:
   - override_id: "asc_set_l0c2gm_lrelu_alpha__Rf16"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_set_l0c2gm_lrelu_alpha__Rf32"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 examples: []
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_set_l0c2gm_lrelu_alpha
@@ -57,8 +55,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_set_l0c2gm_lrelu_alpha__Rf16"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
 ```cpp
@@ -69,8 +66,7 @@ __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config)
 api_signature:
   override_id: "asc_set_l0c2gm_lrelu_alpha__Rf32"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
 ```cpp

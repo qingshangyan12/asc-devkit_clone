@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: DataCopy（L1ToGM高维切分数据搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/DataCopy_L1ToGM_highdim_split.md
+description: 该接口主要实现将矩阵从L1 Buffer搬运至Global Memory，数据搬运时格式和内容保持不变。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DataCopy（L1ToGM高维切分数据搬运）<a name="ZH-CN_TOPIC_0000002594407261"></a>
 
 ## 产品支持情况<a name="zh-cn_topic_0000002540558032_section796754519912"></a>

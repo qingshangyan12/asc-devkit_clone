@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetDim
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetDim.md
+description: 设置多核Matmul时，参与运算的核数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetDim
 
 ## 功能说明

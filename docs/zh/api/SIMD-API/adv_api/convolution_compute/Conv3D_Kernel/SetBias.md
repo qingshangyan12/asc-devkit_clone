@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetBias
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3D_Kernel/SetBias.md
+description: 设置偏置矩阵Bias。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetBias
 
 ## 产品支持情况

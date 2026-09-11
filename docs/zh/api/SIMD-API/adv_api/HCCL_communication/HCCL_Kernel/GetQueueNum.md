@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetQueueNum
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/GetQueueNum.md
+description: 获取BatchWrite通信任务的通信队列数量。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetQueueNum__z
+  archs: ['2201']
+  headers: [/include/adv_api/hccl/hccl.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetQueueNum
 
 ## 产品支持情况
@@ -28,6 +44,13 @@
 获取BatchWrite通信任务的通信队列数量。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "GetQueueNum__z"
+  archs: ["2201"]
+  headers: ["/include/adv_api/hccl/hccl.h"]
+```
 
 ```
 __aicore__ inline uint16_t GetQueueNum()

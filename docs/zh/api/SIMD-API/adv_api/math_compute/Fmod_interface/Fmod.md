@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: Fmod
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/Fmod_interface/Fmod.md
+description: 按元素计算两个浮点数a, b相除后的余数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Fmod__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/fmod.h]
+- override_id: Fmod__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/fmod.h]
+- override_id: Fmod__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/fmod.h]
+- override_id: Fmod__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/fmod.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Fmod
 
 ## 产品支持情况
@@ -42,12 +67,26 @@ Fmod\(-3.0, 1.1\) = -0.8
 -   通过sharedTmpBuffer入参传入临时空间
     -   源操作数Tensor全部/部分参与计算
 
+```yaml
+api_signature:
+  override_id: "Fmod__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/fmod.h"]
+```
+
         ```
         template <typename T, bool isReuseSource = false, const FmodConfig& config = DEFAULT_FMOD_CONFIG>
         __aicore__ inline void Fmod(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
+
+```yaml
+api_signature:
+  override_id: "Fmod__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/fmod.h"]
+```
 
         ```
         template <typename T, bool isReuseSource = false, const FmodConfig& config = DEFAULT_FMOD_CONFIG>
@@ -57,12 +96,26 @@ Fmod\(-3.0, 1.1\) = -0.8
 -   接口框架申请临时空间
     -   源操作数Tensor全部/部分参与计算
 
+```yaml
+api_signature:
+  override_id: "Fmod__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/fmod.h"]
+```
+
         ```
         template <typename T, bool isReuseSource = false, const FmodConfig& config = DEFAULT_FMOD_CONFIG>
         __aicore__ inline void Fmod(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
+
+```yaml
+api_signature:
+  override_id: "Fmod__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/fmod.h"]
+```
 
         ```
         template <typename T, bool isReuseSource = false, const FmodConfig& config = DEFAULT_FMOD_CONFIG>

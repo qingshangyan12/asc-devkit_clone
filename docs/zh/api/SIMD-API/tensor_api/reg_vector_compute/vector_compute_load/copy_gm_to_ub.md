@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: copy（Global Memory到Unified Buffer的数据搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/reg_vector_compute/vector_compute_load/copy_gm_to_ub.md
+description: Tensor API通过`copy`接口统一执行不同通路的数据搬运。该接口用于将Global Memory中的数据搬运到Unified Buffer（UB）。接口根据源Tensor和目的Tensor的存储位置自动选择`copy_gm_to_ub`通路，并根据Layout推导搬运块数、单块长度、源步长和目的步长，实现连续或非连续的高维切分数据搬运。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: copy__RCpDstTensor_RCpSrcTensor
+  archs: ['3510']
+  headers: [/include/tensor_api/algorithm/copy.h]
+- override_id: copy__RCcopyatomg1x5_pAtom_RCpDstTensor_RCpSrcTensor
+  archs: ['3510']
+  headers: [/include/tensor_api/algorithm/copy.h]
+- override_id: copy__RCpDstTensor_RCpSrcTensor_RCpDstCoord_RCpSrcCoord_RCpCopyShape
+  archs: ['3510']
+  headers: [/include/tensor_api/algorithm/copy.h]
+- override_id: make_copy__RCpCopyOperation
+  archs: ['3510']
+  headers: [/include/tensor_api/algorithm/copy.h]
+- override_id: make_copy__RCpCopyOperation_RCpCopyTrait
+  archs: ['3510']
+  headers: [/include/tensor_api/algorithm/copy.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # copy（Global Memory到Unified Buffer的数据搬运）
 
 > [!NOTE]说明
@@ -41,12 +69,26 @@ Tensor API通过`copy`接口统一执行不同通路的数据搬运。该接口�
 
 - 根据源、目的Tensor的存储位置自动推导通路。
 
+```yaml
+api_signature:
+  override_id: "copy__RCpDstTensor_RCpSrcTensor"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/algorithm/copy.h"]
+```
+
     ```cpp
     template <typename DstTensor, typename SrcTensor>
     __aicore__ inline void copy(const DstTensor& dst, const SrcTensor& src)
     ```
 
 - 使用搬运原子对象执行搬运。
+
+```yaml
+api_signature:
+  override_id: "copy__RCcopyatomg1x5_pAtom_RCpDstTensor_RCpSrcTensor"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/algorithm/copy.h"]
+```
 
     ```cpp
     template <typename Atom, typename DstTensor, typename SrcTensor>
@@ -55,6 +97,13 @@ Tensor API通过`copy`接口统一执行不同通路的数据搬运。该接口�
     ```
 
 - 搬运指定区域。
+
+```yaml
+api_signature:
+  override_id: "copy__RCpDstTensor_RCpSrcTensor_RCpDstCoord_RCpSrcCoord_RCpCopyShape"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/algorithm/copy.h"]
+```
 
     ```cpp
     template <typename DstTensor, typename SrcTensor, typename DstCoord,
@@ -66,9 +115,26 @@ Tensor API通过`copy`接口统一执行不同通路的数据搬运。该接口�
 
 - 构造搬运原子对象。
 
+```yaml
+api_signature:
+  override_id: "make_copy__RCpCopyOperation"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/algorithm/copy.h"]
+```
+
     ```cpp
     template <typename CopyOperation>
     __aicore__ inline constexpr auto make_copy(const CopyOperation& operation)
+    ```
+
+```yaml
+api_signature:
+  override_id: "make_copy__RCpCopyOperation_RCpCopyTrait"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/algorithm/copy.h"]
+```
+
+    ```cpp
 
     template <typename CopyOperation, typename CopyTrait>
     __aicore__ inline constexpr auto make_copy(

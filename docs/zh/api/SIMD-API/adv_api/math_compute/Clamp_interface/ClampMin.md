@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: ClampMin
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/Clamp_interface/ClampMin.md
+description: 将srcTensor中小于scalar的数替换为scalar，大于等于scalar的数保持不变，作为dstTensor输出。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: ClampMin__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_pT_u32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/clamp.h]
+- override_id: ClampMin__RCltg1x2_pT_RCltg1x2_pT_pT_u32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/clamp.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ClampMin
 
 ## 产品支持情况
@@ -35,12 +54,26 @@
 
 -   通过sharedTmpBuffer入参传入临时空间
 
+```yaml
+api_signature:
+  override_id: "ClampMin__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_pT_u32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/clamp.h"]
+```
+
     ```
     template <typename T, bool isReuseSource = false>
     __aicore__ inline void ClampMin(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const T scalar, const uint32_t calCount)
     ```
 
 -   接口框架申请临时空间
+
+```yaml
+api_signature:
+  override_id: "ClampMin__RCltg1x2_pT_RCltg1x2_pT_pT_u32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/clamp.h"]
+```
 
     ```
     template <typename T, bool isReuseSource = false>

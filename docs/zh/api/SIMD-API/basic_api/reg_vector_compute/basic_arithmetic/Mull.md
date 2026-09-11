@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Mull
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/basic_arithmetic/Mull.md
+description: 该接口根据mask对输入数据srcReg0、srcReg1按元素相乘操作，将乘法结果的低位部分写入dstReg0，溢出（高位）部分写入dstReg1。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Mull<a name="ZH-CN_TOPIC_0000001929827664"></a>
 
 ## 产品支持情况

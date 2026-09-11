@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Interleave
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/MaskReg_compute/Interleave.md
+description: 将源操作数src0和src1中的元素交织存入目的操作数dst0和dst1中。
+tag: [basic_api, 'operations:interleave']
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Interleave<a name="ZH-CN_TOPIC_0000001952378500"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

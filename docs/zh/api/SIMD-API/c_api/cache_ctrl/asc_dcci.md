@@ -9,30 +9,24 @@ usage_dependencies:
 signature:
   - override_id: "asc_dcci_single__PGv"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/cache_ctrl/cache_ctrl.h"
+    headers: ["/include/c_api/cache_ctrl/cache_ctrl.h"]
   - override_id: "asc_ub_dcci_single__PUv"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/cache_ctrl/cache_ctrl.h"
+    headers: ["/include/c_api/cache_ctrl/cache_ctrl.h"]
   - override_id: "asc_dcci_entire_all__z"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/cache_ctrl/cache_ctrl.h"
+    headers: ["/include/c_api/cache_ctrl/cache_ctrl.h"]
   - override_id: "asc_dcci_entire_ub__z"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/cache_ctrl/cache_ctrl.h"
+    headers: ["/include/c_api/cache_ctrl/cache_ctrl.h"]
   - override_id: "asc_dcci_entire_out__z"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/cache_ctrl/cache_ctrl.h"
+    headers: ["/include/c_api/cache_ctrl/cache_ctrl.h"]
   - override_id: "asc_dcci_entire_atomic__z"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/cache_ctrl/cache_ctrl.h"
+    headers: ["/include/c_api/cache_ctrl/cache_ctrl.h"]
 examples: []
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_dcci
@@ -90,8 +84,7 @@ Scalar单元访问UB数据时，该接口需配合[asc_set_ctrl()](../spr/asc_se
 api_signature:
   override_id: "asc_dcci_single__PGv"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/cache_ctrl/cache_ctrl.h"
+  headers: ["/include/c_api/cache_ctrl/cache_ctrl.h"]
 ```
 
    ```cpp
@@ -103,8 +96,7 @@ api_signature:
 api_signature:
   override_id: "asc_ub_dcci_single__PUv"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/cache_ctrl/cache_ctrl.h"
+  headers: ["/include/c_api/cache_ctrl/cache_ctrl.h"]
 ```
 
    ```cpp
@@ -117,8 +109,7 @@ api_signature:
 api_signature:
   override_id: "asc_dcci_entire_all__z"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/cache_ctrl/cache_ctrl.h"
+  headers: ["/include/c_api/cache_ctrl/cache_ctrl.h"]
 ```
 
    ```cpp
@@ -131,8 +122,7 @@ api_signature:
 api_signature:
   override_id: "asc_dcci_entire_ub__z"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/cache_ctrl/cache_ctrl.h"
+  headers: ["/include/c_api/cache_ctrl/cache_ctrl.h"]
 ```
 
    ```cpp
@@ -143,8 +133,7 @@ api_signature:
 api_signature:
   override_id: "asc_dcci_entire_out__z"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/cache_ctrl/cache_ctrl.h"
+  headers: ["/include/c_api/cache_ctrl/cache_ctrl.h"]
 ```
 
    ```cpp
@@ -155,8 +144,7 @@ api_signature:
 api_signature:
   override_id: "asc_dcci_entire_atomic__z"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/cache_ctrl/cache_ctrl.h"
+  headers: ["/include/c_api/cache_ctrl/cache_ctrl.h"]
 ```
 
    ```cpp

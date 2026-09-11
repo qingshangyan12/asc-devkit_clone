@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: InitDetermineComputeWorkspace
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/InitDetermineComputeWorkspace.md
+description: InitDetermineComputeWorkspace是基于核间顺序执行的确定性计算的初始化配置接口，能够初始化GM共享内存的值，完成初始化后才可以调用[WaitPreBlock](WaitPreBlock.md)和[NotifyNextBlock](NotifyNextBlock.md)。以上三个接口共同完成基于核间顺序执行的确定性计算，确定性计算的具体含义请参考[确定性计算](../../atomic_operations/key_features.md)。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: InitDetermineComputeWorkspace__Rgtg1x3_i32_Rltg1x3_i32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/basic_api/kernel_operator_determine_compute_sync_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # InitDetermineComputeWorkspace<a name="ZH-CN_TOPIC_0000001723825540"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -32,6 +48,13 @@
 InitDetermineComputeWorkspace是基于核间顺序执行的确定性计算的初始化配置接口，能够初始化GM共享内存的值，完成初始化后才可以调用[WaitPreBlock](WaitPreBlock.md)和[NotifyNextBlock](NotifyNextBlock.md)。以上三个接口共同完成基于核间顺序执行的确定性计算，确定性计算的具体含义请参考[确定性计算](../../atomic_operations/key_features.md)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "InitDetermineComputeWorkspace__Rgtg1x3_i32_Rltg1x3_i32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/basic_api/kernel_operator_determine_compute_sync_intf.h"]
+```
 
 ```cpp
 __aicore__ inline void InitDetermineComputeWorkspace(GlobalTensor<int32_t>& gmWorkspace, LocalTensor<int32_t>& ubWorkspace)

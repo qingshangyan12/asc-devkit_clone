@@ -43,6 +43,12 @@ namespace AscendC {
  * \param [in] count, amount of data to be calculated
  */
 template <const BitwiseOrConfig& config = DEFAULT_BITWISE_OR_CONFIG, typename T>
+/**
+ * @ingroup simd_api.adv_api.math_compute.bitwiseor_interface
+ * @override_id BitwiseOr__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32
+ * @archs 3510
+ * @brief 逐比特对两个输入进行或操作。
+ */
 __aicore__ inline void BitwiseOr(
     const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const uint32_t count)
 {

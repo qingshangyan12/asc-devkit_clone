@@ -10,12 +10,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_shiftright__v<dtype0>_v<dtype1>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_logic.h"
+    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
   - prototype_id: "asc_shiftright__Rv<dtype0>_v<dtype0>_v<dtype1>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_logic.h"
+    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -69,8 +67,7 @@ $$
 api_signature:
   prototype_id: "asc_shiftright__v<dtype0>_v<dtype1>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_logic.h"
+  headers: [/include/c_api/reg_compute/compute/reg_logic.h]
   dtype:
     variants:
       -
@@ -104,8 +101,7 @@ __simd_callee__ inline vector_<dtype0> asc_shiftright(vector_<dtype0> src,
 api_signature:
   prototype_id: "asc_shiftright__Rv<dtype0>_v<dtype0>_v<dtype1>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_logic.h"
+  headers: [/include/c_api/reg_compute/compute/reg_logic.h]
   dtype:
     variants:
       -

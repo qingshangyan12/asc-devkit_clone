@@ -13,20 +13,16 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_mmad__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_unitflag_b_b_b"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_compute/cube_compute.h"
+    headers: ["/include/c_api/cube_compute/cube_compute.h"]
   - prototype_id: "asc_mmad__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u64_u16_u16_u16_unitflag_b"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_compute/cube_compute.h"
+    headers: ["/include/c_api/cube_compute/cube_compute.h"]
   - prototype_id: "asc_mmad__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_unitflag_b_b_b"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_compute/cube_compute.h"
+    headers: ["/include/c_api/cube_compute/cube_compute.h"]
   - override_id: "asc_mmad_s4__PCCi32_PCAi4x2_PCBi4x2_u16_u16_u16_unitflag_b_b_b"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_compute/cube_compute.h"
+    headers: ["/include/c_api/cube_compute/cube_compute.h"]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad"
     archs: ["3510"]
@@ -36,7 +32,7 @@ examples:
     archs: ["3510"]
     override_id: "asc_mmad__PCCf32_PCAbf16_PCBbf16_u16_u16_u16_unitflag_b_b_b"
     file: "mmad_s2.h"
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_mmad
@@ -116,8 +112,7 @@ $$
 api_signature:
   prototype_id: "asc_mmad__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_unitflag_b_b_b"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_compute/cube_compute.h"
+  headers: ["/include/c_api/cube_compute/cube_compute.h"]
   dtype:
     variants:
       -
@@ -176,8 +171,7 @@ __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
 api_signature:
   prototype_id: "asc_mmad__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u64_u16_u16_u16_unitflag_b"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_compute/cube_compute.h"
+  headers: ["/include/c_api/cube_compute/cube_compute.h"]
   dtype:
     variants:
       -
@@ -289,8 +283,7 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 api_signature:
   prototype_id: "asc_mmad__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_unitflag_b_b_b"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_compute/cube_compute.h"
+  headers: ["/include/c_api/cube_compute/cube_compute.h"]
   dtype:
     variants:
       -
@@ -332,8 +325,7 @@ api_signature:
 api_signature:
   override_id: "asc_mmad_s4__PCCi32_PCAi4x2_PCBi4x2_u16_u16_u16_unitflag_b_b_b"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_compute/cube_compute.h"
+  headers: ["/include/c_api/cube_compute/cube_compute.h"]
 ```
 
   ```c

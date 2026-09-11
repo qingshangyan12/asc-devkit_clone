@@ -1,3 +1,18 @@
+---
+okftype: reference.api.cpp
+title: InitV2
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/InitV2.md
+description: HCCL客户端初始化接口。该接口默认在所有核上工作，用户也可以在调用前通过[GetBlockIdx](../../../basic_api/tool_interface/system_resources_and_variables/GetBlockIdx.md)指定其在某一个核上运行。
+tag: [adv_api]
+usage_dependencies:
+  status: confirmed
+  companion:
+  - SetCcTilingV2.md
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # InitV2
 
 ## 产品支持情况

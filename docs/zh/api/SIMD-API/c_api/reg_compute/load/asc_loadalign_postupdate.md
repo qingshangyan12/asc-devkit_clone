@@ -10,16 +10,13 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_loadalign_postupdate__Rv<dtype>_RPU<dtype>_i32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_postupdate__Rvb_RPUu32_i32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - prototype_id: "asc_loadalign_postupdate__Rv<dtype>_RPU<dtype>_u16_u16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_align"
     archs: ["3510"]
@@ -85,8 +82,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_loadalign_postupdate__Rv<dtype>_RPU<dtype>_i32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
   dtype:
     values:
       - "int4b_t"
@@ -120,8 +116,7 @@ __simd_callee__ inline void asc_loadalign_postupdate(vector_<dtype>& dst,
 api_signature:
   override_id: "asc_loadalign_postupdate__Rvb_RPUu32_i32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```c
@@ -150,8 +145,7 @@ __simd_callee__ inline void asc_loadalign_postupdate(vector_float& dst,
 api_signature:
   prototype_id: "asc_loadalign_postupdate__Rv<dtype>_RPU<dtype>_u16_u16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
   dtype:
     values:
       - "int4b_t"

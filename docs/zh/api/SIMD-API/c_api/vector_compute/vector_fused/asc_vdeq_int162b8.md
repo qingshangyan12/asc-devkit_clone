@@ -9,52 +9,40 @@ usage_dependencies:
 signature:
   - override_id: "asc_vdeq_int162b8_h__PUi8_PUi16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_fused.h"
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: "asc_vdeq_int162b8_h__PUu8_PUi16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_fused.h"
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: "asc_vdeq_int162b8_l__PUi8_PUi16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_fused.h"
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: "asc_vdeq_int162b8_l__PUu8_PUi16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_fused.h"
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: "asc_vdeq_int162b8_h__PUi8_PUi16_u8_u16_u16_u8_u8"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_fused.h"
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: "asc_vdeq_int162b8_h__PUu8_PUi16_u8_u16_u16_u8_u8"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_fused.h"
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: "asc_vdeq_int162b8_l__PUi8_PUi16_u8_u16_u16_u8_u8"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_fused.h"
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: "asc_vdeq_int162b8_l__PUu8_PUi16_u8_u16_u16_u8_u8"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_fused.h"
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: "asc_vdeq_int162b8_h_sync__PUi8_PUi16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_vdeq_int162b8_h_sync__PUu8_PUi16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_vdeq_int162b8_l_sync__PUi8_PUi16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_vdeq_int162b8_l_sync__PUu8_PUi16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -107,8 +95,7 @@ $$
 api_signature:
   override_id: "asc_vdeq_int162b8_h__PUi8_PUi16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_fused.h"
+  headers: [/include/c_api/vector_compute/compute/vector_fused.h]
 ```
 
     ```cpp
@@ -119,8 +106,7 @@ api_signature:
 api_signature:
   override_id: "asc_vdeq_int162b8_h__PUu8_PUi16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_fused.h"
+  headers: [/include/c_api/vector_compute/compute/vector_fused.h]
 ```
 
     ```cpp
@@ -131,8 +117,7 @@ api_signature:
 api_signature:
   override_id: "asc_vdeq_int162b8_l__PUi8_PUi16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_fused.h"
+  headers: [/include/c_api/vector_compute/compute/vector_fused.h]
 ```
 
     ```cpp
@@ -143,8 +128,7 @@ api_signature:
 api_signature:
   override_id: "asc_vdeq_int162b8_l__PUu8_PUi16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_fused.h"
+  headers: [/include/c_api/vector_compute/compute/vector_fused.h]
 ```
 
     ```cpp
@@ -157,8 +141,7 @@ api_signature:
 api_signature:
   override_id: "asc_vdeq_int162b8_h__PUi8_PUi16_u8_u16_u16_u8_u8"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_fused.h"
+  headers: [/include/c_api/vector_compute/compute/vector_fused.h]
 ```
 
     ```cpp
@@ -169,8 +152,7 @@ api_signature:
 api_signature:
   override_id: "asc_vdeq_int162b8_h__PUu8_PUi16_u8_u16_u16_u8_u8"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_fused.h"
+  headers: [/include/c_api/vector_compute/compute/vector_fused.h]
 ```
 
     ```cpp
@@ -181,8 +163,7 @@ api_signature:
 api_signature:
   override_id: "asc_vdeq_int162b8_l__PUi8_PUi16_u8_u16_u16_u8_u8"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_fused.h"
+  headers: [/include/c_api/vector_compute/compute/vector_fused.h]
 ```
 
     ```cpp
@@ -193,8 +174,7 @@ api_signature:
 api_signature:
   override_id: "asc_vdeq_int162b8_l__PUu8_PUi16_u8_u16_u16_u8_u8"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_fused.h"
+  headers: [/include/c_api/vector_compute/compute/vector_fused.h]
 ```
 
     ```cpp
@@ -207,8 +187,7 @@ api_signature:
 api_signature:
   override_id: "asc_vdeq_int162b8_h_sync__PUi8_PUi16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -219,8 +198,7 @@ api_signature:
 api_signature:
   override_id: "asc_vdeq_int162b8_h_sync__PUu8_PUi16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -231,8 +209,7 @@ api_signature:
 api_signature:
   override_id: "asc_vdeq_int162b8_l_sync__PUi8_PUi16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -243,8 +220,7 @@ api_signature:
 api_signature:
   override_id: "asc_vdeq_int162b8_l_sync__PUu8_PUi16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp

@@ -44,6 +44,16 @@ namespace AscendC {
  * \param [in] highPerformance, whether to enable the high-performance interface to improve the computing efficiency
  */
 template <typename T, bool highPrecision = false, bool highPerformance = false>
+/**
+ * @ingroup simd_api.adv_api.activation_functions.gelu_interface
+ * @override_id Gelu__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 在神经网络中，GELU是一个重要的激活函数，其灵感来源于Relu和Dropout，在激活中引入了随机正则的思想。
+ * @param [out] dstLocal 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcLocal 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] sharedTmpBuffer 临时缓存。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。用于接口内部复杂计算时存储中间变量，由开发者提供。临时空间大小BufferSize的获取方式请参考[GetGeluMaxMinTmpSize](GetGeluMaxMinTmpSize.md)。
+ * @param [in] dataSize 实际计算数据元素个数。
+ */
 __aicore__ inline void Gelu(
     const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& sharedTmpBuffer,
     const uint32_t dataSize)
@@ -63,6 +73,15 @@ __aicore__ inline void Gelu(
  * \param [in] highPerformance, whether to enable the high-performance interface to improve the computing efficiency
  */
 template <typename T, bool highPrecision = false, bool highPerformance = false>
+/**
+ * @ingroup simd_api.adv_api.activation_functions.gelu_interface
+ * @override_id Gelu__RCltg1x2_pT_RCltg1x2_pT_u32
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 在神经网络中，GELU是一个重要的激活函数，其灵感来源于Relu和Dropout，在激活中引入了随机正则的思想。
+ * @param [out] dstLocal 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcLocal 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] dataSize 实际计算数据元素个数。
+ */
 __aicore__ inline void Gelu(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t dataSize)
 {
     if ASCEND_IS_AIC {
@@ -81,6 +100,16 @@ __aicore__ inline void Gelu(const LocalTensor<T>& dstLocal, const LocalTensor<T>
  * \param [in] highPerformance, whether to enable the high-performance interface to improve the computing efficiency
  */
 template <typename T, bool highPrecision = false, bool highPerformance = false>
+/**
+ * @ingroup simd_api.adv_api.activation_functions.gelu_interface
+ * @override_id FasterGelu__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 在神经网络中，GELU是一个重要的激活函数，其灵感来源于relu和dropout，在激活中引入了随机正则的思想。为了降低GELU的算力需求，业界提出了FastGelu等版本。本接口FasterGelu是针对FastGelu的化简版本，公式化简可以大幅度提升计算性能。
+ * @param [out] dstLocal 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcLocal 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] sharedTmpBuffer 临时缓存。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。用于接口内部复杂计算时存储中间变量，由开发者提供。临时空间大小BufferSize的获取方式请参考[GetGeluMaxMinTmpSize](GetGeluMaxMinTmpSize.md)。
+ * @param [in] dataSize 实际计算数据元素个数。
+ */
 __aicore__ inline void FasterGelu(
     const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& sharedTmpBuffer,
     const uint32_t dataSize)
@@ -107,6 +136,15 @@ __aicore__ inline void FasterGelu(
  * \param [in] highPerformance, whether to enable the high-performance interface to improve the computing efficiency
  */
 template <typename T, bool highPrecision = false, bool highPerformance = false>
+/**
+ * @ingroup simd_api.adv_api.activation_functions.gelu_interface
+ * @override_id FasterGelu__RCltg1x2_pT_RCltg1x2_pT_u32
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 在神经网络中，GELU是一个重要的激活函数，其灵感来源于relu和dropout，在激活中引入了随机正则的思想。为了降低GELU的算力需求，业界提出了FastGelu等版本。本接口FasterGelu是针对FastGelu的化简版本，公式化简可以大幅度提升计算性能。
+ * @param [out] dstLocal 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcLocal 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] dataSize 实际计算数据元素个数。
+ */
 __aicore__ inline void FasterGelu(
     const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t dataSize)
 {
@@ -133,6 +171,16 @@ __aicore__ inline void FasterGelu(
  * \param [in] highPerformance, whether to enable the high-performance interface to improve the computing efficiency
  */
 template <typename T, bool highPrecision = false, bool highPerformance = false>
+/**
+ * @ingroup simd_api.adv_api.activation_functions.gelu_interface
+ * @override_id FasterGeluV2__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+ * @archs 3510 2201 2002
+ * @brief 在神经网络中，GELU是一个重要的激活函数，其灵感来源于relu和dropout，在激活中引入了随机正则的思想。为了降低GELU的算力需求，业界提出了FastGeluV2版本。
+ * @param [out] dstLocal 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcLocal 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] sharedTmpBuffer 临时缓存。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。用于接口内部复杂计算时存储中间变量，由开发者提供。临时空间大小BufferSize的获取方式请参考[GetGeluMaxMinTmpSize](GetGeluMaxMinTmpSize.md)。
+ * @param [in] dataSize 实际计算数据元素个数。
+ */
 __aicore__ inline void FasterGeluV2(
     const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& sharedTmpBuffer,
     const uint32_t dataSize)
@@ -156,6 +204,15 @@ __aicore__ inline void FasterGeluV2(
  * \param [in] highPerformance, whether to enable the high-performance interface to improve the computing efficiency
  */
 template <typename T, bool highPrecision = false, bool highPerformance = false>
+/**
+ * @ingroup simd_api.adv_api.activation_functions.gelu_interface
+ * @override_id FasterGeluV2__RCltg1x2_pT_RCltg1x2_pT_u32
+ * @archs 3510 2201 2002
+ * @brief 在神经网络中，GELU是一个重要的激活函数，其灵感来源于relu和dropout，在激活中引入了随机正则的思想。为了降低GELU的算力需求，业界提出了FastGeluV2版本。
+ * @param [out] dstLocal 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcLocal 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] dataSize 实际计算数据元素个数。
+ */
 __aicore__ inline void FasterGeluV2(
     const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t dataSize)
 {

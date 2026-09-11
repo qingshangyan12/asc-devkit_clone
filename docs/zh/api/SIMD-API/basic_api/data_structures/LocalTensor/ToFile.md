@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: ToFile
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/ToFile.md
+description: 只限于CPU调试，将LocalTensor数据Dump到文件中，用于精度调试，文件保存在执行目录。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ToFile<a name="ZH-CN_TOPIC_0000002330767574"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

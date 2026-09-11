@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: none_mask
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/reg_vector_compute/mask_reg_compute/none_mask.md
+description: 创建`reg_tensor<bool>`，其成员变量reg是与`DataType`元素位宽匹配的全无效掩码寄存器，等价于`make_mask<mask_pattern::none,
+  DataType>()`。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: none_mask__z
+  archs: ['3510']
+  headers: [/include/tensor_api/experimental/arch/vector/mask_reg_compute.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # none_mask
 
 ## 产品支持情况
@@ -31,6 +48,13 @@
 创建`reg_tensor<bool>`，其成员变量reg是与`DataType`元素位宽匹配的全无效掩码寄存器，等价于`make_mask<mask_pattern::none, DataType>()`。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "none_mask__z"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/experimental/arch/vector/mask_reg_compute.h"]
+```
 
 ```cpp
 template <typename DataType>

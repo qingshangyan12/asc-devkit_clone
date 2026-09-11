@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: operator\[\]
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/operator.md
+description: 获取距原LocalTensor起始地址偏移量为offset的新LocalTensor，注意offset不能超过原有LocalTensor的size大小。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # operator\[\]<a name="ZH-CN_TOPIC_0000002364805833"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

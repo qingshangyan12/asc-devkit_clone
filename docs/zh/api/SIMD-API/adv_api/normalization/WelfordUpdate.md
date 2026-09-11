@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: WelfordUpdate
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/normalization/WelfordUpdate.md
+description: Welford是一种在线计算均值和方差的方法。一方面，它可以在不存储所有样本的情况下，逐步计算所有样本的均值和方差，更适合处理海量数据；另一方面，它只需要对数据进行一次遍历，能减少访存次数，提高计算性能。本接口为Welford算法的前处理。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # WelfordUpdate
 
 ## 产品支持情况

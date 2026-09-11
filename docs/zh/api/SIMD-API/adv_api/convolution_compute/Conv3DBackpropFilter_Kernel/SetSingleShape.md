@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetSingleShape
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3DBackpropFilter_Kernel/SetSingleShape.md
+description: 设置Conv3DBackpropFilter在单核上计算的形状。用于运行时修改shape。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetSingleShape__u64_u64_u64
+  archs: ['2201']
+  headers: [/include/adv_api/conv_backprop/conv3d_bp_filter_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetSingleShape
 
 ## 产品支持情况
@@ -28,6 +44,13 @@
 设置Conv3DBackpropFilter在单核上计算的形状。用于运行时修改shape。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "SetSingleShape__u64_u64_u64"
+  archs: ["2201"]
+  headers: ["/include/adv_api/conv_backprop/conv3d_bp_filter_intf.h"]
+```
 
 ```
 __aicore__ inline void SetSingleShape(uint64_t singleCoreM, uint64_t singleCoreN, uint64_t singleCoreK)

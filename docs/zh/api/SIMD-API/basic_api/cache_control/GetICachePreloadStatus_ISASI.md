@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetICachePreloadStatus\(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cache_control/GetICachePreloadStatus_ISASI.md
+description: GetICachePreloadStatus为调试接口，在ICachePreLoad后调用，用于获取ICache的PreLoad的状态：当返回值为0时，说明ICache的PreLoad已完成；当返回值为1时，说明ICache的PreLoad未完成。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetICachePreloadStatus__z
+  archs: ['3510', '2201']
+  headers: [/include/basic_api/kernel_operator_cache_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetICachePreloadStatus\(ISASI\)<a name="ZH-CN_TOPIC_0000001788032978"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -32,6 +48,13 @@
 GetICachePreloadStatus为调试接口，在ICachePreLoad后调用，用于获取ICache的PreLoad的状态：当返回值为0时，说明ICache的PreLoad已完成；当返回值为1时，说明ICache的PreLoad未完成。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "GetICachePreloadStatus__z"
+  archs: ["3510", "2201"]
+  headers: ["/include/basic_api/kernel_operator_cache_intf.h"]
+```
 
 ```cpp
 __aicore__ inline int64_t GetICachePreloadStatus()

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetShapeInfo
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/SetShapeInfo.md
+description: 设置LocalTensor的Shape信息。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetShapeInfo<a name="ZH-CN_TOPIC_0000002330767566"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GetBaseK
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/GetBaseK.md
+description: 获取Tiling计算得到的baseK值。baseK参数的说明请参考[表1](TCubeTiling_struct.md#tcubetiling-struct)。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetBaseK
 
 ## 功能说明

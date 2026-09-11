@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: load
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/reg_vector_compute/reg_data_load/load.md
+description: '`load`用于将Unified Buffer（UB）中的数据搬入[reg_tensor](../reg_tensor/reg_tensor.md)。接口通过`load_sideband_mode`配置正常搬入、上采样、下采样、解压缩或解交织等数据排列方式。`deintlv`模式返回`reg_pair`，其他模式返回`reg_tensor`。'
+tag: [tensor_api, 'operations:deinterleave']
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: load__RCpTensor_RCpCoord
+  archs: ['3510']
+  headers: [/include/tensor_api/experimental/arch/vector/reg_data_load.h]
+- override_id: load__RCpTensor
+  archs: ['3510']
+  headers: [/include/tensor_api/experimental/arch/vector/reg_data_load.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # load
 
 ## 产品支持情况
@@ -39,6 +58,13 @@
 
 - 指定坐标：
 
+```yaml
+api_signature:
+  override_id: "load__RCpTensor_RCpCoord"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/experimental/arch/vector/reg_data_load.h"]
+```
+
     ```cpp
     template <load_sideband_mode sideband_mode = load_sideband_mode::direct,
               typename Tensor,
@@ -47,6 +73,13 @@
     ```
 
 - 从Tensor起始位置搬入：
+
+```yaml
+api_signature:
+  override_id: "load__RCpTensor"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/experimental/arch/vector/reg_data_load.h"]
+```
 
     ```cpp
     template <load_sideband_mode sideband_mode = load_sideband_mode::direct,

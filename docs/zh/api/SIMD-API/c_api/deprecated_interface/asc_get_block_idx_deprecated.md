@@ -9,8 +9,7 @@ usage_dependencies:
 signature:
   - override_id: "asc_get_block_idx__z"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/utils/sys_var.h"
+    headers: [/include/c_api/utils/sys_var.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -66,8 +65,7 @@ __gm__ float* xGm = x + blockIdx * blockLength;
 api_signature:
   override_id: "asc_get_block_idx__z"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/utils/sys_var.h"
+  headers: [/include/c_api/utils/sys_var.h]
 ```
 
 ```cpp

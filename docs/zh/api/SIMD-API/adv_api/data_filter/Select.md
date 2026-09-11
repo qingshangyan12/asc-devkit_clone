@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Select
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/data_filter/Select.md
+description: 给定两个源操作数src0和src1，根据maskTensor相应位置的值（非bit位）选取元素，得到目的操作数dst。选择的规则为：当Mask的值为0时，从src0中选取，否则从src1选取。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Select
 
 ## 产品支持情况

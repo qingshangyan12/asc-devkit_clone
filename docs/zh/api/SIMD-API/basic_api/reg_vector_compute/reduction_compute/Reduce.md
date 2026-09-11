@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Reduce
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reduction_compute/Reduce.md
+description: 归约指令根据ReduceType，将数据集合简化为单一值或者更小的集合。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Reduce<a name="ZH-CN_TOPIC_0000001938595870"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

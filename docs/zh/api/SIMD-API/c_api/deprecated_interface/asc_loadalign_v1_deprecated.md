@@ -9,132 +9,100 @@ usage_dependencies:
 signature:
   - override_id: "asc_loadalign_unpack_v2__Rvi8_PUi8"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_unpack_v2__Rvu8_PUu8"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_unpack_v2__Rvf4e2m1x2_PUf4e2m1x2"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_unpack_v2__Rvf4e1m2x2_PUf4e1m2x2"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_unpack_v2__Rvf8e8m0_PUf8e8m0"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_unpack_v2__Rvf8e5m2_PUf8e5m2"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_unpack_v2__Rvf8e4m3_PUf8e4m3"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_unpack_v2__Rvhf8_PUhf8"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_unpack_v2__Rvi4x2_PUi4x2"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_brc_v2__Rvi8_PUi8"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_brc_v2__Rvu8_PUu8"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_brc_v2__Rvf4e2m1x2_PUf4e2m1x2"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_brc_v2__Rvf4e1m2x2_PUf4e1m2x2"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_brc_v2__Rvf8e8m0_PUf8e8m0"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_brc_v2__Rvf8e5m2_PUf8e5m2"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_brc_v2__Rvf8e4m3_PUf8e4m3"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_brc_v2__Rvhf8_PUhf8"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_brc_v2__Rvi16_PUi16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_brc_v2__Rvu16_PUu16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_brc_v2__Rvf16_PUf16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_brc_v2__Rvbf16_PUbf16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_brc_v2__Rvi32_PUi32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_brc_v2__Rvu32_PUu32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_brc_v2__Rvf32_PUf32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_brc_v2__Rvi4x2_PUi4x2"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_brc_v3__Rvi16_PUi16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_brc_v3__Rvu16_PUu16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_brc_v3__Rvf16_PUf16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_brc_v3__Rvbf16_PUbf16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_brc_v3__Rvi32_PUi32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_brc_v3__Rvu32_PUu32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_brc_v3__Rvf32_PUf32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -183,8 +151,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_loadalign_unpack_v2__Rvi8_PUi8"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -196,8 +163,7 @@ __simd_callee__ inline void asc_loadalign_unpack_v2(vector_int8_t& dst, __ubuf__
 api_signature:
   override_id: "asc_loadalign_unpack_v2__Rvu8_PUu8"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -208,8 +174,7 @@ __simd_callee__ inline void asc_loadalign_unpack_v2(vector_uint8_t& dst, __ubuf_
 api_signature:
   override_id: "asc_loadalign_unpack_v2__Rvf4e2m1x2_PUf4e2m1x2"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -220,8 +185,7 @@ __simd_callee__ inline void asc_loadalign_unpack_v2(vector_fp4x2_e2m1_t& dst, __
 api_signature:
   override_id: "asc_loadalign_unpack_v2__Rvf4e1m2x2_PUf4e1m2x2"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -232,8 +196,7 @@ __simd_callee__ inline void asc_loadalign_unpack_v2(vector_fp4x2_e1m2_t& dst, __
 api_signature:
   override_id: "asc_loadalign_unpack_v2__Rvf8e8m0_PUf8e8m0"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -244,8 +207,7 @@ __simd_callee__ inline void asc_loadalign_unpack_v2(vector_fp8_e8m0_t& dst, __ub
 api_signature:
   override_id: "asc_loadalign_unpack_v2__Rvf8e5m2_PUf8e5m2"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -256,8 +218,7 @@ __simd_callee__ inline void asc_loadalign_unpack_v2(vector_fp8_e5m2_t& dst, __ub
 api_signature:
   override_id: "asc_loadalign_unpack_v2__Rvf8e4m3_PUf8e4m3"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -268,8 +229,7 @@ __simd_callee__ inline void asc_loadalign_unpack_v2(vector_fp8_e4m3fn_t& dst, __
 api_signature:
   override_id: "asc_loadalign_unpack_v2__Rvhf8_PUhf8"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -280,8 +240,7 @@ __simd_callee__ inline void asc_loadalign_unpack_v2(vector_hifloat8_t& dst, __ub
 api_signature:
   override_id: "asc_loadalign_unpack_v2__Rvi4x2_PUi4x2"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -292,8 +251,7 @@ __simd_callee__ inline void asc_loadalign_unpack_v2(vector_int4x2_t& dst, __ubuf
 api_signature:
   override_id: "asc_loadalign_brc_v2__Rvi8_PUi8"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -305,8 +263,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_int8_t& dst, __ubuf__ in
 api_signature:
   override_id: "asc_loadalign_brc_v2__Rvu8_PUu8"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -317,8 +274,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_uint8_t& dst, __ubuf__ u
 api_signature:
   override_id: "asc_loadalign_brc_v2__Rvf4e2m1x2_PUf4e2m1x2"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -329,8 +285,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_fp4x2_e2m1_t& dst, __ubu
 api_signature:
   override_id: "asc_loadalign_brc_v2__Rvf4e1m2x2_PUf4e1m2x2"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -341,8 +296,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_fp4x2_e1m2_t& dst, __ubu
 api_signature:
   override_id: "asc_loadalign_brc_v2__Rvf8e8m0_PUf8e8m0"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -353,8 +307,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_fp8_e8m0_t& dst, __ubuf_
 api_signature:
   override_id: "asc_loadalign_brc_v2__Rvf8e5m2_PUf8e5m2"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -365,8 +318,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_fp8_e5m2_t& dst, __ubuf_
 api_signature:
   override_id: "asc_loadalign_brc_v2__Rvf8e4m3_PUf8e4m3"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -377,8 +329,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_fp8_e4m3fn_t& dst, __ubu
 api_signature:
   override_id: "asc_loadalign_brc_v2__Rvhf8_PUhf8"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -389,8 +340,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_hifloat8_t& dst, __ubuf_
 api_signature:
   override_id: "asc_loadalign_brc_v2__Rvi16_PUi16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -401,8 +351,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_int16_t& dst, __ubuf__ i
 api_signature:
   override_id: "asc_loadalign_brc_v2__Rvu16_PUu16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -413,8 +362,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_uint16_t& dst, __ubuf__ 
 api_signature:
   override_id: "asc_loadalign_brc_v2__Rvf16_PUf16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -425,8 +373,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_half& dst, __ubuf__ half
 api_signature:
   override_id: "asc_loadalign_brc_v2__Rvbf16_PUbf16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -437,8 +384,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_bfloat16_t& dst, __ubuf_
 api_signature:
   override_id: "asc_loadalign_brc_v2__Rvi32_PUi32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -449,8 +395,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_int32_t& dst, __ubuf__ i
 api_signature:
   override_id: "asc_loadalign_brc_v2__Rvu32_PUu32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -461,8 +406,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_uint32_t& dst, __ubuf__ 
 api_signature:
   override_id: "asc_loadalign_brc_v2__Rvf32_PUf32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -473,8 +417,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_float& dst, __ubuf__ flo
 api_signature:
   override_id: "asc_loadalign_brc_v2__Rvi4x2_PUi4x2"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -485,8 +428,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_int4x2_t& dst, __ubuf__ 
 api_signature:
   override_id: "asc_loadalign_brc_v3__Rvi16_PUi16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -498,8 +440,7 @@ __simd_callee__ inline void asc_loadalign_brc_v3(vector_int16_t& dst, __ubuf__ i
 api_signature:
   override_id: "asc_loadalign_brc_v3__Rvu16_PUu16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -510,8 +451,7 @@ __simd_callee__ inline void asc_loadalign_brc_v3(vector_uint16_t& dst, __ubuf__ 
 api_signature:
   override_id: "asc_loadalign_brc_v3__Rvf16_PUf16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -522,8 +462,7 @@ __simd_callee__ inline void asc_loadalign_brc_v3(vector_half& dst, __ubuf__ half
 api_signature:
   override_id: "asc_loadalign_brc_v3__Rvbf16_PUbf16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -534,8 +473,7 @@ __simd_callee__ inline void asc_loadalign_brc_v3(vector_bfloat16_t& dst, __ubuf_
 api_signature:
   override_id: "asc_loadalign_brc_v3__Rvi32_PUi32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -546,8 +484,7 @@ __simd_callee__ inline void asc_loadalign_brc_v3(vector_int32_t& dst, __ubuf__ i
 api_signature:
   override_id: "asc_loadalign_brc_v3__Rvu32_PUu32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp
@@ -558,8 +495,7 @@ __simd_callee__ inline void asc_loadalign_brc_v3(vector_uint32_t& dst, __ubuf__ 
 api_signature:
   override_id: "asc_loadalign_brc_v3__Rvf32_PUf32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```cpp

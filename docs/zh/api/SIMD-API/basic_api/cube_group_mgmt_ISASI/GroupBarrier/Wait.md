@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Wait
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_group_mgmt_ISASI/GroupBarrier/Wait.md
+description: 阻塞该AIV需要等待Arrive组全部完成任务，再开始执行任务。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Wait__u32
+  archs: ['3510', '2201']
+  headers: [/include/basic_api/core_mng/roc/kernel_operator_group_barrier_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Wait<a name="ZH-CN_TOPIC_0000001960384820"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -31,6 +47,13 @@
 阻塞该AIV需要等待Arrive组全部完成任务，再开始执行任务。
 
 ## 函数原型<a name="section765814724715"></a>
+
+```yaml
+api_signature:
+  override_id: "Wait__u32"
+  archs: ["3510", "2201"]
+  headers: ["/include/basic_api/core_mng/roc/kernel_operator_group_barrier_intf.h"]
+```
 
 ```
 __aicore__ inline void Wait(uint32_t waitIndex)

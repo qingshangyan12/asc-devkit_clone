@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: SetCLayout
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetCLayout.md
+description: 设置C矩阵的Layout轴信息，包括[B、S、N、G、D轴](../Matmul_Kernel/IterateBatch.md)。对于BSNGD、SBNGD、BNGS1S2
+  Layout格式，调用[IterateBatch](../Matmul_Kernel/IterateBatch.md)接口之前，需要在Host侧Tiling实现中通过本接口设置C矩阵的Layout轴信息。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetCLayout
 
 ## 功能说明

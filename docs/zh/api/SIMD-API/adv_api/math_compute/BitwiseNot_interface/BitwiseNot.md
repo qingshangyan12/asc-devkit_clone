@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: BitwiseNot
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/BitwiseNot_interface/BitwiseNot.md
+description: 逐比特对输入进行取反。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: BitwiseNot__RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510']
+  headers: [/include/adv_api/math/bitwise_not.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # BitwiseNot
 
 ## 产品支持情况
@@ -30,6 +46,13 @@
 ![](../../../../figures/zh-cn_formulaimage_0000002477048097.png)
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "BitwiseNot__RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510"]
+  headers: ["/include/adv_api/math/bitwise_not.h"]
+```
 
 ```
 template <const BitwiseNotConfig& config = DEFAULT_BITWISE_NOT_CONFIG, typename T>

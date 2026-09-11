@@ -10,14 +10,12 @@ usage_dependencies:
 signature:
   - override_id: "asc_set_scalar_cache_mode__loadl2"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cache_ctrl/cache_ctrl.h"
+    headers: ["/include/c_api/cache_ctrl/cache_ctrl.h"]
   - override_id: "asc_set_scalar_cache_mode__storel2"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cache_ctrl/cache_ctrl.h"
+    headers: ["/include/c_api/cache_ctrl/cache_ctrl.h"]
 examples: []
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_set_scalar_cache_mode
@@ -63,8 +61,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_set_scalar_cache_mode__loadl2"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cache_ctrl/cache_ctrl.h"
+  headers: ["/include/c_api/cache_ctrl/cache_ctrl.h"]
 ```
 
 ```c
@@ -75,8 +72,7 @@ __aicore__ inline void asc_set_scalar_cache_mode(asc_load_l2_cache_mode l2_cache
 api_signature:
   override_id: "asc_set_scalar_cache_mode__storel2"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cache_ctrl/cache_ctrl.h"
+  headers: ["/include/c_api/cache_ctrl/cache_ctrl.h"]
 ```
 
 ```c

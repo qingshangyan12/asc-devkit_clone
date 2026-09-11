@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Mul
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/basic_arithmetic/Mul.md
+description: 该接口根据mask对输入数据srcReg0、srcReg1按元素相乘操作，将结果写入dstReg。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Mul<a name="ZH-CN_TOPIC_0000001956986917"></a>
 
 ## 产品支持情况

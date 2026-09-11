@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Where
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/Where_interface/Where.md
+description: 根据指定的条件，从两个源操作数中选择元素，生成目标操作数。两个源操作数均可以是LocalTensor或标量。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Where__RCltg1x2_pT_RCpU_RCpS_RCltg1x2_pV_u32
+  archs: ['3510']
+  headers: [/include/adv_api/math/where.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Where
 
 ## 产品支持情况
@@ -30,6 +46,13 @@
 ![](../../../../figures/zh-cn_formulaimage_0000002425808613.png)
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "Where__RCltg1x2_pT_RCpU_RCpS_RCltg1x2_pV_u32"
+  archs: ["3510"]
+  headers: ["/include/adv_api/math/where.h"]
+```
 
 ```
 template <typename T, typename U, typename S, typename V>

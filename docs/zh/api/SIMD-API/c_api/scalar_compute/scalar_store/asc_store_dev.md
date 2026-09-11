@@ -9,8 +9,7 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_store_dev__PG<dtype>_<dtype>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/scalar_compute/scalar_store.h"
+    headers: [/include/c_api/scalar_compute/scalar_store.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -54,8 +53,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_store_dev__PG<dtype>_<dtype>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/scalar_compute/scalar_store.h"
+  headers: [/include/c_api/scalar_compute/scalar_store.h]
   dtype:
     values:
       - "int8_t"

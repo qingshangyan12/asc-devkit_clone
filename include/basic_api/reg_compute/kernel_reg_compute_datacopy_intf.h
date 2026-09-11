@@ -95,6 +95,14 @@ template <typename T = DefaultType, typename U>
 __simd_callee__ inline void LoadUnAlign(U& dstReg, UnalignRegForLoad& ureg, __ubuf__ T* srcAddr);
 
 template <typename T = DefaultType, typename U>
+/**
+ * @ingroup simd_api.basic_api.reg_vector_compute.reg_data_load
+ * @override_id Load__RpU_PUpT
+ * @archs 3510
+ * @brief Reg矢量计算数据搬运接口，支持从Unified Buffer（UB）非32字节对齐的源地址srcAddr搬运至RegTensor，搬运量为VL（256B）。连续搬运时，用户需手动更新srcAddr地址。
+ * @param [out] dstReg 目的操作数，类型为[RegTensor](../register_data_types/RegTensor.md)。
+ * @param [in] srcAddr 源操作数，UB起始地址，不需要32字节对齐。
+ */
 __simd_callee__ inline void Load(U& dstReg, __ubuf__ T* srcAddr);
 
 // vlda/vldu
@@ -114,9 +122,26 @@ template <typename T, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE>
 __simd_callee__ inline void StoreUnAlignPost(__ubuf__ T*& dstAddr, UnalignRegForStore& ureg, int32_t postUpdateStride);
 
 template <typename T = DefaultType, typename U>
+/**
+ * @ingroup simd_api.basic_api.reg_vector_compute.reg_data_store
+ * @override_id Store__PUpT_RpU
+ * @archs 3510
+ * @brief Reg矢量计算数据搬运接口，支持从RegTensor搬出至非32字节对齐的Unified Buffer（UB）地址dstAddr。连续搬运时，用户需手动更新dstAddr地址。
+ * @param [out] dstAddr 目的操作数，UB起始地址，不需要32字节对齐。
+ * @param [in] srcReg 源操作数，类型为[RegTensor](../register_data_types/RegTensor.md)。
+ */
 __simd_callee__ inline void Store(__ubuf__ T* dstAddr, U& srcReg);
 
 template <typename T = DefaultType, typename U>
+/**
+ * @ingroup simd_api.basic_api.reg_vector_compute.reg_data_store
+ * @override_id Store__PUpT_RpU_u32
+ * @archs 3510
+ * @brief Reg矢量计算数据搬运接口，支持从RegTensor搬出至非32字节对齐的Unified Buffer（UB）地址dstAddr。连续搬运时，用户需手动更新dstAddr地址。
+ * @param [out] dstAddr 目的操作数，UB起始地址，不需要32字节对齐。
+ * @param [in] srcReg 源操作数，类型为[RegTensor](../register_data_types/RegTensor.md)。
+ * @param [in] count 搬运数据量。连续搬运时需手动更新地址：dstAddr = dstAddr + count。
+ */
 __simd_callee__ inline void Store(__ubuf__ T* dstAddr, U& srcReg, uint32_t count);
 
 // vstu/vsta

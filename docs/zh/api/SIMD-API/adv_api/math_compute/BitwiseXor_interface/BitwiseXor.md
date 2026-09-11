@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: BitwiseXor
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/BitwiseXor_interface/BitwiseXor.md
+description: 逐比特对两个输入进行异或操作。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: BitwiseXor__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510']
+  headers: [/include/adv_api/math/bitwise_xor.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # BitwiseXor
 
 ## 产品支持情况
@@ -30,6 +46,13 @@
 ![](../../../../figures/zh-cn_formulaimage_0000002442051698.png)
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "BitwiseXor__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510"]
+  headers: ["/include/adv_api/math/bitwise_xor.h"]
+```
 
 ```
 template <const BitwiseXorConfig& config = DEFAULT_BITWISE_XOR_CONFIG, typename T>

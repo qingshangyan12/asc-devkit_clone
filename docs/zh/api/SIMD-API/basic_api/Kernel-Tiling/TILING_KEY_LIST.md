@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: TILING\_KEY\_LIST
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/Kernel-Tiling/TILING_KEY_LIST.md
+description: TILING\_KEY\_LIST函数用于在核函数（Kernel）中判断当前执行的TilingKey是否与Host侧配置的指定TilingKey匹配，从而标识满足TilingKey
+  == key1或TilingKey == key2条件的分支逻辑。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # TILING\_KEY\_LIST<a name="ZH-CN_TOPIC_0000002516636745"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

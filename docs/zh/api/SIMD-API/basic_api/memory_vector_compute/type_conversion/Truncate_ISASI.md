@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Truncate\(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/type_conversion/Truncate_ISASI.md
+description: 头文件路径为 `"basic_api/kernel_operator_vec_vconv_intf.h"`。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Truncate__RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_vec_vconv_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Truncate\(ISASI\)<a name="ZH-CN_TOPIC_0000002158484952"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -32,6 +48,13 @@
 将源操作数的浮点数元素截断到整数位，同时源操作数的数据类型保持不变。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "Truncate__RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_vec_vconv_intf.h"]
+```
 
 ```
 template <typename T, RoundMode roundMode>

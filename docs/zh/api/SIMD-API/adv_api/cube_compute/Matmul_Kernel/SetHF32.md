@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetHF32
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetHF32.md
+description: 在纯Cube模式（只有矩阵计算）下，设置是否开启HF32（矩阵乘计算时可采用的数据类型）模式。开启后，在矩阵乘计算时，float32数据类型会转换为hf32数据类型，可提升计算性能，但同时也会带来精度损失。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetHF32__b_i32
+  archs: ['3510', '2201']
+  headers: [/include/adv_api/matmul/matmul.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetHF32
 
 ## 产品支持情况
@@ -34,6 +50,13 @@
 在纯Cube模式（只有矩阵计算）下，设置是否开启HF32（矩阵乘计算时可采用的数据类型）模式。开启后，在矩阵乘计算时，float32数据类型会转换为hf32数据类型，可提升计算性能，但同时也会带来精度损失。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "SetHF32__b_i32"
+  archs: ["3510", "2201"]
+  headers: ["/include/adv_api/matmul/matmul.h"]
+```
 
 ```
 __aicore__ inline void SetHF32(bool enableHF32 = false, int32_t transMode = 0)

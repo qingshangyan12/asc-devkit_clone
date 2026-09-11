@@ -9,36 +9,28 @@ usage_dependencies:
 signature:
   - override_id: "asc_set_va_reg__uba8_PPUi8"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+    headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
   - override_id: "asc_set_va_reg__uba8_PPUu8"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+    headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
   - override_id: "asc_set_va_reg__uba8_PPUi16"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+    headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
   - override_id: "asc_set_va_reg__uba8_PPUu16"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+    headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
   - override_id: "asc_set_va_reg__uba8_PPUf16"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+    headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
   - override_id: "asc_set_va_reg__uba8_PPUi32"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+    headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
   - override_id: "asc_set_va_reg__uba8_PPUu32"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+    headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
   - override_id: "asc_set_va_reg__uba8_PPUf32"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+    headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -81,8 +73,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_set_va_reg__uba8_PPUi8"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
 ```
 
 ```cpp
@@ -93,8 +84,7 @@ __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int8_t** src_arr
 api_signature:
   override_id: "asc_set_va_reg__uba8_PPUu8"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
 ```
 
 ```cpp
@@ -105,8 +95,7 @@ __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint8_t** src_ar
 api_signature:
   override_id: "asc_set_va_reg__uba8_PPUi16"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
 ```
 
 ```cpp
@@ -117,8 +106,7 @@ __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int16_t** src_ar
 api_signature:
   override_id: "asc_set_va_reg__uba8_PPUu16"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
 ```
 
 ```cpp
@@ -129,8 +117,7 @@ __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint16_t** src_a
 api_signature:
   override_id: "asc_set_va_reg__uba8_PPUf16"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
 ```
 
 ```cpp
@@ -141,8 +128,7 @@ __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ half** src_array
 api_signature:
   override_id: "asc_set_va_reg__uba8_PPUi32"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
 ```
 
 ```cpp
@@ -153,8 +139,7 @@ __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int32_t** src_ar
 api_signature:
   override_id: "asc_set_va_reg__uba8_PPUu32"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
 ```
 
 ```cpp
@@ -165,8 +150,7 @@ __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint32_t** src_a
 api_signature:
   override_id: "asc_set_va_reg__uba8_PPUf32"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
 ```
 
 ```cpp

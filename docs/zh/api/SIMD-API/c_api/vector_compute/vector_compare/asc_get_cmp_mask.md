@@ -9,8 +9,7 @@ usage_dependencies:
 signature:
   - override_id: "asc_get_cmp_mask__PUv"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_compare.h"
+    headers: [/include/c_api/vector_compute/compute/vector_compare.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -53,8 +52,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_get_cmp_mask__PUv"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_compare.h"
+  headers: [/include/c_api/vector_compute/compute/vector_compare.h]
 ```
 
 ```cpp

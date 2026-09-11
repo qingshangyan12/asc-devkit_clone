@@ -9,8 +9,7 @@ usage_dependencies:
 signature:
   - override_id: "asc_set_l0c2gm_nz2nd__u64_u64_u64"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad"
     archs: ["3510"]
@@ -20,7 +19,7 @@ examples:
     archs: ["3510"]
     override_id: "asc_set_l0c2gm_nz2nd__u64_u64_u64"
     file: "mmad_s2.h"
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_set_l0c2gm_nz2nd
@@ -63,8 +62,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_set_l0c2gm_nz2nd__u64_u64_u64"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
 ```c

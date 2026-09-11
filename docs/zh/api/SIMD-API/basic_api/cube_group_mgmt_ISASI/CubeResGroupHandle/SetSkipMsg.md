@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetSkipMsg
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_group_mgmt_ISASI/CubeResGroupHandle/SetSkipMsg.md
+description: AIC跳过指定个数假消息的处理，仅在回调函数中调用。下图中Block0通过调用SetSkipMsg跳过三个假消息。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetSkipMsg__u8
+  archs: ['3510', '2201']
+  headers: [/include/basic_api/core_mng/roc/kernel_operator_cube_group_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetSkipMsg<a name="ZH-CN_TOPIC_0000001960384808"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -34,6 +50,13 @@ AIC跳过指定个数假消息的处理，仅在回调函数中调用。下图�
 ![](../../../../figures/setskipmsg_diagram.png "SetSkipMsg示意图")
 
 ## 函数原型<a name="section765814724715"></a>
+
+```yaml
+api_signature:
+  override_id: "SetSkipMsg__u8"
+  archs: ["3510", "2201"]
+  headers: ["/include/basic_api/core_mng/roc/kernel_operator_cube_group_intf.h"]
+```
 
 ```
  __aicore__ inline void SetSkipMsg(uint8_t skipCnt)

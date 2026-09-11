@@ -9,14 +9,13 @@ usage_dependencies:
 signature:
   - override_id: "asc_set_l0c_copy_nz_para__u16_u16_u32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_compute/cube_compute.h"
+    headers: ["/include/c_api/cube_compute/cube_compute.h"]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/03_matrix_compute/load_data_l12l0_950"
     archs: ["3510"]
     override_id: "asc_set_l0c_copy_nz_para__u16_u16_u32"
     file: "load_data_l12l0_950.asc"
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_set_l0c_copy_nz_para
@@ -59,8 +58,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_set_l0c_copy_nz_para__u16_u16_u32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_compute/cube_compute.h"
+  headers: ["/include/c_api/cube_compute/cube_compute.h"]
 ```
 
 ```c

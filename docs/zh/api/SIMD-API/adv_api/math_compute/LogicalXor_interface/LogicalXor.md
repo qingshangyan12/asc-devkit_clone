@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: LogicalXor
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/LogicalXor_interface/LogicalXor.md
+description: 按元素进行逻辑异或操作。当输入的数据类型不是bool时，零被视为False，非零数据被视为True。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: LogicalXor__RCltg1x2_pT_RCltg1x2_pU_RCltg1x2_pU_u32
+  archs: ['3510']
+  headers: [/include/adv_api/math/logical_xor.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LogicalXor
 
 ## 产品支持情况
@@ -30,6 +46,13 @@
 ![](../../../../figures/zh-cn_formulaimage_0000002475452485.png)
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "LogicalXor__RCltg1x2_pT_RCltg1x2_pU_RCltg1x2_pU_u32"
+  archs: ["3510"]
+  headers: ["/include/adv_api/math/logical_xor.h"]
+```
 
 ```
 template <const LogicalXorConfig& config = DEFAULT_LOGICAL_XOR_CONFIG, typename T, typename U>

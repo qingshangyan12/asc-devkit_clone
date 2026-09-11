@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetQuantScalar
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetQuantScalar.md
+description: 本接口提供对输出矩阵的所有值采用同一系数进行量化或反量化的功能，即整个C矩阵对应一个量化参数，量化参数的shape为\[1\]。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetQuantScalar__u64
+  archs: ['3510', '2201', '3002', '2002', x90]
+  headers: [/include/adv_api/matmul/matmul.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetQuantScalar
 
 ## 产品支持情况
@@ -35,6 +51,13 @@ Matmul反量化场景：在Matmul计算时，左、右矩阵的输入为int8\_t�
 Matmul量化场景：在Matmul计算时，左、右矩阵的输入为half或bfloat16\_t类型，输出为int8\_t类型。该场景下，输出C矩阵的数据从L0C Buffer（CO1）搬出到Global Memory时，会执行量化操作，将最终结果量化为int8\_t类型。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "SetQuantScalar__u64"
+  archs: ["3510", "2201", "3002", "2002", "x90"]
+  headers: ["/include/adv_api/matmul/matmul.h"]
+```
 
 ```
 __aicore__ inline void SetQuantScalar(const uint64_t quantScalar)

@@ -9,10 +9,9 @@ usage_dependencies:
 signature:
   - override_id: "asc_set_l0c_copy_params__u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 examples: []
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_set_l0c_copy_params
@@ -53,8 +52,7 @@ DataCopy从L0C Buffer搬运到Global Memory或L1 Buffer过程中进行随路格�
 api_signature:
   override_id: "asc_set_l0c_copy_params__u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
 ```cpp

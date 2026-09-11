@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetSplitK
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetSplitK.md
+description: '[EnableMultiCoreSplitK](EnableMultiCoreSplitK.md)接口功能与该接口相同，建议使用[EnableMultiCoreSplitK](EnableMultiCoreSplitK.md)。'
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetSplitK
 
 ## 功能说明

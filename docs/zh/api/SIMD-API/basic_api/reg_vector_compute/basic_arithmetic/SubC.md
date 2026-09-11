@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SubC
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/basic_arithmetic/SubC.md
+description: 该接口根据mask，对源操作数srcReg0、srcReg1及输入进位carrySrc进行按元素求差操作，减法运算在硬件底层通过补码加法实现，将结果写入目的操作数dstReg，同时将每个元素的进位结果写入carry（存放进位的MaskReg寄存器）。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SubC<a name="ZH-CN_TOPIC_0000002080143865"></a>
 
 ## 产品支持情况

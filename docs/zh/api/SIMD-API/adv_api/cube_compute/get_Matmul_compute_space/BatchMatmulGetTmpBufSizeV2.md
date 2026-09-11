@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: BatchMatmulGetTmpBufSizeV2
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/get_Matmul_compute_space/BatchMatmulGetTmpBufSizeV2.md
+description: BatchMatmul Tiling调用[GetTiling](../Matmul_Tiling/GetTiling.md)接口获取Tiling参数后，根据Tiling结构体信息获取L1
+  Buffer/Unified Buffer（UB）/L0C Buffer的使用大小。
+tag: [adv_api]
+usage_dependencies:
+  status: confirmed
+  companion:
+  - ../Matmul_Tiling/GetTiling.md
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # BatchMatmulGetTmpBufSizeV2
 
 ## 功能说明

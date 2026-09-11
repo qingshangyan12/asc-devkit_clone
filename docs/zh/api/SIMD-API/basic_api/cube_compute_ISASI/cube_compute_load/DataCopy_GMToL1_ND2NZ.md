@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: DataCopy（GMToL1随路转换-ND2NZ搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_GMToL1_ND2NZ.md
+description: 该接口主要实现将矩阵从Global Memory搬运至L1 Buffer（TPosition为A1/B1），并支持在数据搬运时进行ND到NZ格式的转换。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DataCopy（GMToL1随路转换-ND2NZ搬运）<a id="ZH-CN_TOPIC_0000002569070913"></a>
 
 ## 产品支持情况<a id="zh-cn_topic_0000002566538879_section796754519912"></a>

@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: Iterate
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3DBackpropFilter_Kernel/Iterate.md
+description: 每次调用Iterate时，会计算出一个baseM \* baseN的结果矩阵，并将该结果写入L0C Buffer。接口内部会维护迭代进度，每次调用后，矩阵的起始地址将进行偏移。如果传入的数据未对齐存在尾块，则在最后一次迭代中输出尾块的计算结果。本接口需与[GetTensorC](GetTensorC.md)接口配合使用；在调用本接口后，再调用GetTensorC接口，L0C
+  Buffer中的数据将被写入目标地址。
+tag: [adv_api]
+usage_dependencies:
+  status: confirmed
+  companion:
+  - GetTensorC.md
+signature:
+- override_id: Iterate__b
+  archs: ['2201']
+  headers: [/include/adv_api/conv_backprop/conv3d_bp_filter_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Iterate
 
 ## 产品支持情况
@@ -28,6 +47,13 @@
 每次调用Iterate时，会计算出一个baseM \* baseN的结果矩阵，并将该结果写入L0C Buffer。接口内部会维护迭代进度，每次调用后，矩阵的起始地址将进行偏移。如果传入的数据未对齐存在尾块，则在最后一次迭代中输出尾块的计算结果。本接口需与[GetTensorC](GetTensorC.md)接口配合使用；在调用本接口后，再调用GetTensorC接口，L0C Buffer中的数据将被写入目标地址。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "Iterate__b"
+  archs: ["2201"]
+  headers: ["/include/adv_api/conv_backprop/conv3d_bp_filter_intf.h"]
+```
 
 ```
 template <bool sync = true>

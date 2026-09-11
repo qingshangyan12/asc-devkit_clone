@@ -9,20 +9,16 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_deintlv__Rv<dtype>_Rv<dtype>_v<dtype>_v<dtype>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_deintlv_b8__Rvb_Rvb_vb_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_deintlv_b16__Rvb_Rvb_vb_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_deintlv_b32__Rvb_Rvb_vb_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -78,8 +74,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_deintlv__Rv<dtype>_Rv<dtype>_v<dtype>_v<dtype>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   dtype:
     values:
       - "int8_t"
@@ -125,8 +120,7 @@ __simd_callee__ inline void asc_deintlv(vector_half& dst0,
 api_signature:
   override_id: "asc_deintlv_b8__Rvb_Rvb_vb_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```c
@@ -140,8 +134,7 @@ __simd_callee__ inline void asc_deintlv_b8(vector_bool& dst0,
 api_signature:
   override_id: "asc_deintlv_b16__Rvb_Rvb_vb_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```c
@@ -155,8 +148,7 @@ __simd_callee__ inline void asc_deintlv_b16(vector_bool& dst0,
 api_signature:
   override_id: "asc_deintlv_b32__Rvb_Rvb_vb_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```c

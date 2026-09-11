@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: LayerNorm Tiling
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/normalization/LayerNorm-Tiling.md
+description: Ascend C提供一组LayerNorm Tiling API，方便用户获取LayerNorm kernel计算时所需的Tiling参数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LayerNorm Tiling
 
 ## 功能说明

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: slice
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/tensor/slice.md
+description: slice用于从张量指定坐标处切出一个子张量。根据输入的起始坐标coord和切片描述信息info，计算新的起始存储位置，并构造对应的子张量，子张量保持与原张量相同的存储位置类型。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: slice__OpTensor_RCpCoord_RCpInfo
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/layout_interface.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # slice
 
 ## 产品支持情况
@@ -31,6 +47,13 @@
 slice用于从张量指定坐标处切出一个子张量。根据输入的起始坐标coord和切片描述信息info，计算新的起始存储位置，并构造对应的子张量，子张量保持与原张量相同的存储位置类型。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "slice__OpTensor_RCpCoord_RCpInfo"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/layout_interface.h"]
+```
 
 ```cpp
 template <typename Tensor, typename Coord, typename Info>

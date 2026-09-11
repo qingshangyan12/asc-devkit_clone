@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: ICachePreLoad\(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cache_control/ICachePreLoad_ISASI.md
+description: 开发者手动调用ICachePreLoad接口，能够从指令所在GM地址预加载指令到ICache中。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: ICachePreLoad__i64
+  archs: ['3510', '2201', '2002']
+  headers: [/include/basic_api/kernel_operator_cache_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ICachePreLoad\(ISASI\)<a name="ZH-CN_TOPIC_0000001834752537"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -32,6 +48,13 @@
 开发者手动调用ICachePreLoad接口，能够从指令所在GM地址预加载指令到ICache中。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "ICachePreLoad__i64"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/basic_api/kernel_operator_cache_intf.h"]
+```
 
 ```cpp
 __aicore__ inline void ICachePreLoad(const int64_t preFetchLen)

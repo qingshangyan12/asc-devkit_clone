@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: MulAddDst
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/composite_compute/MulAddDst.md
+description: 该接口按元素将srcReg0与srcReg1相乘再加上dstReg，根据mask将计算结果写入dstReg。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # MulAddDst<a name="ZH-CN_TOPIC_0000002009338652"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

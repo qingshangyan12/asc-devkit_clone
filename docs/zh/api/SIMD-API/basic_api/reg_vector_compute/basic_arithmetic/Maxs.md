@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Maxs
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/basic_arithmetic/Maxs.md
+description: 该接口根据mask，对源操作数srcReg按元素与标量相比，如果比标量大，则取源操作数值；如果比标量小，则取标量值，将结果写入目的操作数dstReg。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Maxs<a name="ZH-CN_TOPIC_0000001929827668"></a>
 
 ## 产品支持情况

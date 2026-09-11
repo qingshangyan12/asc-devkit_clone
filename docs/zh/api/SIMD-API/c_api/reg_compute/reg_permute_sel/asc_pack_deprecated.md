@@ -9,44 +9,34 @@ usage_dependencies:
 signature:
   - override_id: "asc_pack__Rvu8_vu16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_pack__Rvu8_vi16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_pack__Rvu16_vu32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_pack__Rvu16_vi32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_pack__Rvb_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_pack_v2__Rvu8_vu16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_pack_v2__Rvu8_vi16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_pack_v2__Rvu16_vu32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_pack_v2__Rvu16_vi32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_pack_v2__Rvb_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -95,8 +85,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_pack__Rvu8_vu16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp
@@ -107,8 +96,7 @@ __simd_callee__ inline void asc_pack(vector_uint8_t& dst, vector_uint16_t src)
 api_signature:
   override_id: "asc_pack__Rvu8_vi16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp
@@ -119,8 +107,7 @@ __simd_callee__ inline void asc_pack(vector_uint8_t& dst, vector_int16_t src)
 api_signature:
   override_id: "asc_pack__Rvu16_vu32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp
@@ -131,8 +118,7 @@ __simd_callee__ inline void asc_pack(vector_uint16_t& dst, vector_uint32_t src)
 api_signature:
   override_id: "asc_pack__Rvu16_vi32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp
@@ -143,8 +129,7 @@ __simd_callee__ inline void asc_pack(vector_uint16_t& dst, vector_int32_t src)
 api_signature:
   override_id: "asc_pack__Rvb_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp
@@ -155,8 +140,7 @@ __simd_callee__ inline void asc_pack(vector_bool& dst, vector_bool src)
 api_signature:
   override_id: "asc_pack_v2__Rvu8_vu16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp
@@ -167,8 +151,7 @@ __simd_callee__ inline void asc_pack_v2(vector_uint8_t& dst, vector_uint16_t src
 api_signature:
   override_id: "asc_pack_v2__Rvu8_vi16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp
@@ -179,8 +162,7 @@ __simd_callee__ inline void asc_pack_v2(vector_uint8_t& dst, vector_int16_t src)
 api_signature:
   override_id: "asc_pack_v2__Rvu16_vu32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp
@@ -191,8 +173,7 @@ __simd_callee__ inline void asc_pack_v2(vector_uint16_t& dst, vector_uint32_t sr
 api_signature:
   override_id: "asc_pack_v2__Rvu16_vi32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp
@@ -203,8 +184,7 @@ __simd_callee__ inline void asc_pack_v2(vector_uint16_t& dst, vector_int32_t src
 api_signature:
   override_id: "asc_pack_v2__Rvb_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp

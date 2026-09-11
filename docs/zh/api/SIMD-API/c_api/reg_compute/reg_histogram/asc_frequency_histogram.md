@@ -9,12 +9,10 @@ usage_dependencies:
 signature:
   - override_id: "asc_frequency_histogram_bin0__Rvu16_vu8_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_histogram.h"
+    headers: [/include/c_api/reg_compute/compute/reg_histogram.h]
   - override_id: "asc_frequency_histogram_bin1__Rvu16_vu8_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_histogram.h"
+    headers: [/include/c_api/reg_compute/compute/reg_histogram.h]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/histogram"
     archs: ["3510"]
@@ -78,8 +76,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_frequency_histogram_bin0__Rvu16_vu8_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_histogram.h"
+  headers: [/include/c_api/reg_compute/compute/reg_histogram.h]
 ```
 
 ```cpp
@@ -92,8 +89,7 @@ __simd_callee__ inline void asc_frequency_histogram_bin0(vector_uint16_t& dst, v
 api_signature:
   override_id: "asc_frequency_histogram_bin1__Rvu16_vu8_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_histogram.h"
+  headers: [/include/c_api/reg_compute/compute/reg_histogram.h]
 ```
 
 ```cpp

@@ -9,10 +9,9 @@ usage_dependencies:
 signature:
   - override_id: "asc_set_l12l0_padding_val__u64"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 examples: []
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_set_l12l0_padding_val
@@ -61,8 +60,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_set_l12l0_padding_val__u64"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
 ```cpp

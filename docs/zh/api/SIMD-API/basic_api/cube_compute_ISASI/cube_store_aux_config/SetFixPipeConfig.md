@@ -1,3 +1,23 @@
+---
+okftype: reference.api.cpp
+title: SetFixPipeConfig
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_store_aux_config/SetFixPipeConfig.md
+description: DataCopy数据搬运（[L0C Buffer->GM](../cube_compute_store/Fixpipe_L0CToGM.md)、[L0C
+  Buffer->L1 Buffer](../cube_compute_store/Fixpipe_L0CToL1.md)）过程中进行随路量化时，通过调用该接口设置量化的参数。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetFixPipeConfig__RCltg1x2_pT_RCltg1x2_pT_b
+  archs: ['3510', '2201', '3002', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_fixpipe_intf.h]
+- override_id: SetFixPipeConfig__RCltg1x2_pT_b
+  archs: ['3510', '2201', '3002', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_fixpipe_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetFixPipeConfig<a name="ZH-CN_TOPIC_0000002538231208"></a>
 
 ## 产品支持情况<a name="zh-cn_topic_0000002547729135_section18204144912492"></a>
@@ -37,9 +57,26 @@ DataCopy数据搬运（[L0C Buffer->GM](../cube_compute_store/Fixpipe_L0CToGM.md
 
 ## 函数原型<a name="zh-cn_topic_0000002547729135_section620mcpsimp"></a>
 
+```yaml
+api_signature:
+  override_id: "SetFixPipeConfig__RCltg1x2_pT_RCltg1x2_pT_b"
+  archs: ["3510", "2201", "3002", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_fixpipe_intf.h"]
+```
+
 ```cpp
 template <typename T>
 __aicore__ inline void SetFixPipeConfig(const LocalTensor<T>& reluPre, const LocalTensor<T>& quantPre, bool isUnitFlag = false)
+```
+
+```yaml
+api_signature:
+  override_id: "SetFixPipeConfig__RCltg1x2_pT_b"
+  archs: ["3510", "2201", "3002", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_fixpipe_intf.h"]
+```
+
+```cpp
 
 template <typename T, bool setRelu = false>
 __aicore__ inline void SetFixPipeConfig(const LocalTensor<T>& preData, bool isUnitFlag = false)

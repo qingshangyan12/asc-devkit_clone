@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GetSwishTmpSize
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/activation_functions/Swish_interface/GetSwishTmpSize.md
+description: 用于获取Swish Tiling参数：Swish接口能完成计算所需最大临时空间大小和最小临时空间大小。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetSwishTmpSize
 
 ## 功能说明

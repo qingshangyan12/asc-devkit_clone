@@ -37,9 +37,24 @@ template <typename T = DefaultType, typename U>
 __simd_callee__ inline void Unsqueeze(U& dstReg, MaskReg& mask);
 
 template <SpecialPurposeReg spr>
+/**
+ * @ingroup simd_api.basic_api.reg_vector_compute.system_variable_access
+ * @override_id ClearSpr__z
+ * @archs 3510
+ * @brief 该接口用于对指定的特殊目的寄存器（SpecialPurposeReg）进行清零操作。通过模板参数spr指定目标特殊寄存器，调用后该寄存器的值被置为0，当前支持的特殊寄存器见[表 SpecialPurposeReg模板参数说明](#table2)。
+ */
 __simd_callee__ inline void ClearSpr();
 
 template <typename T = DefaultType, typename U = DefaultType, typename S, typename V>
+/**
+ * @ingroup simd_api.basic_api.reg_vector_compute.scatter_operations
+ * @override_id Gather__RpS_RpS_RpV
+ * @archs 3510
+ * @brief 该指令会根据索引值indexReg将源操作数srcReg按元素收集到目的操作数dstReg中。
+ * @param [out] dstReg 目的操作数。类型为[RegTensor](../register_data_types/RegTensor.md)。
+ * @param [in] srcReg 源操作数。类型为[RegTensor](../register_data_types/RegTensor.md)。
+ * @param [in] indexReg 索引值，单位：元素。类型为[RegTensor](../register_data_types/RegTensor.md)。数据类型的位宽需要与目的操作数的位宽保持一致。indexReg中的值可以重复。如果indexReg中索引值超出当前RegTensor中能存储的最大数据元素个数时，按照如下方式处理：RegTensor所能存储的最大数据元素个数为[VL](../register_data_types/RegTensor.md)/sizeof(T)，indexReg中索引值为i，索引值更新为i % (VL/sizeof(T))。例：元素为half数据类型的srcReg，有128个元素，当indexReg中索引值为168时，索引值更新为168 % 128 = 40。
+ */
 __simd_callee__ inline void Gather(S& dstReg, S& srcReg, V& indexReg);
 } // namespace Reg
 } // namespace AscendC

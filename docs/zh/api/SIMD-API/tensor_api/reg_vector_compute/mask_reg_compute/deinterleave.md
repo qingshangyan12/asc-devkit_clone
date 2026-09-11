@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: deinterleave(掩码解交织)
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/reg_vector_compute/mask_reg_compute/deinterleave.md
+description: 将两个源`reg_tensor<bool>`寄存器的reg按`DataType`对应的元素宽度解交织。`src0`和`src1`中偶数索引的分组依次写入返回值的`first.reg`，奇数索引的分组依次写入`second.reg`。
+tag: [tensor_api, 'operations:deinterleave']
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: deinterleave__regtensorg1x1_b_regtensorg1x1_b
+  archs: ['3510']
+  headers: [/include/tensor_api/experimental/arch/vector/mask_reg_compute.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # deinterleave(掩码解交织)
 
 ## 产品支持情况
@@ -35,6 +51,13 @@
 本接口只处理`reg_tensor<bool>`寄存器。数据寄存器的解交织接口参见[deinterleave（数据寄存器解交织）](../data_reorder/deinterleave.md)。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "deinterleave__regtensorg1x1_b_regtensorg1x1_b"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/experimental/arch/vector/mask_reg_compute.h"]
+```
 
 ```cpp
 template <typename DataType>

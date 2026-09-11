@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetTensorScaleB
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetTensorScaleB.md
+description: MxMatmul场景，设置矩阵乘中右矩阵的量化系数矩阵scaleB。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetTensorScaleB
 
 ## 产品支持情况

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: LoadData（MX矩阵搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_2D_MX.md
+description: 负责完成矩阵计算所需的左右矩阵数据和对应的左右量化系数矩阵数据的搬运。其中左右矩阵数据以大小为512字节的数据分形为单位进行搬运，左右量化系数矩阵以32字节的数据分形为单位进行搬运。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LoadData（MX矩阵搬运）<a id="ZH-CN_TOPIC_0000002517258774"></a>
 
 ## 产品支持情况<a id="section1550532418810"></a>

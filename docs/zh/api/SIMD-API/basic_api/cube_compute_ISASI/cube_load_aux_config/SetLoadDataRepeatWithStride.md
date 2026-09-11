@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetLoadDataRepeatWithStride
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_load_aux_config/SetLoadDataRepeatWithStride.md
+description: 用于设置[LoadDataWithStride](../cube_compute_load/LoadDataWithStride.md)接口的repeat参数。设置repeat参数后，可以通过调用一次LoadDataWithStride接口完成多个迭代的数据搬运，还用于配置输出矩阵K轴方向偏移。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetLoadDataRepeatWithStride<a id="ZH-CN_TOPIC_0000002583382412"></a>
 
 ## 产品支持情况<a id="section1550532418810"></a>

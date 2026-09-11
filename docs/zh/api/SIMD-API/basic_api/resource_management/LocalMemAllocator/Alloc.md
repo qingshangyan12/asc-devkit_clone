@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Alloc
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/LocalMemAllocator/Alloc.md
+description: 根据用户指定的逻辑位置、数据类型、数据长度返回对应的LocalTensor对象。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Alloc__z
+  archs: ['3510', '2201', '2002']
+  headers: [/include/basic_api/kernel_tensor.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Alloc<a name="ZH-CN_TOPIC_0000002303937138"></a>
 
 ## 产品支持情况<a name="section73648168211"></a>
@@ -35,9 +51,26 @@
 
 -   原型1：tileSize为模板参数
 
+```yaml
+api_signature:
+  override_id: "Alloc__z"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/basic_api/kernel_tensor.h"]
+```
+
     ```cpp
     // 当tileSize为常量时，建议使用此接口，以获得更优的性能
     template <class DataType, uint32_t tileSize> LocalTensor<DataType> __aicore__ inline Alloc()
+    ```
+
+```yaml
+api_signature:
+  override_id: "Alloc__z"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/basic_api/kernel_tensor.h"]
+```
+
+    ```cpp
     template <TPosition pos, class DataType, uint32_t tileSize> __aicore__ inline LocalTensor<DataType> Alloc()
     ```
 
@@ -50,6 +83,13 @@
     ```
 
 -   原型3：使用TensorTrait时使用此接口
+
+```yaml
+api_signature:
+  override_id: "Alloc__z"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/basic_api/kernel_tensor.h"]
+```
 
     ```cpp
     template <class DataType> LocalTensor<DataType> __aicore__ inline Alloc()

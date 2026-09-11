@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GetDropOutMaxMinTmpSize
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/data_filter/GetDropOutMaxMinTmpSize.md
+description: 用于获取DropOut Tiling参数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetDropOutMaxMinTmpSize
 
 ## 功能说明

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: select
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/layout/select.md
+description: 选择layout的shape和stride指定维度组成新的layout对象并返回。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: select__RCpLayout
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/layout_interface.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # select
 
 ## 产品支持情况
@@ -29,6 +45,13 @@
 选择layout的shape和stride指定维度组成新的layout对象并返回。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "select__RCpLayout"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/layout_interface.h"]
+```
 
 ```cpp
 template <size_t... Is, typename Layout>

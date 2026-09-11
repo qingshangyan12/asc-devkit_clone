@@ -10,164 +10,124 @@ usage_dependencies:
 signature:
   - override_id: "asc_bfloat162int32_rd__Rvi32_vbf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rd_sat__Rvi32_vbf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rn__Rvi32_vbf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rn_sat__Rvi32_vbf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rna__Rvi32_vbf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rna_sat__Rvi32_vbf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_ru__Rvi32_vbf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_ru_sat__Rvi32_vbf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rz__Rvi32_vbf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rz_sat__Rvi32_vbf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rd__Rvi32_vbf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rd_sat__Rvi32_vbf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rn__Rvi32_vbf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rn_sat__Rvi32_vbf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rna__Rvi32_vbf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rna_sat__Rvi32_vbf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_ru__Rvi32_vbf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_ru_sat__Rvi32_vbf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rz__Rvi32_vbf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rz_sat__Rvi32_vbf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rd__vbf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rd_sat__vbf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rn__vbf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rn_sat__vbf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rna__vbf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rna_sat__vbf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_ru__vbf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_ru_sat__vbf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rz__vbf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rz_sat__vbf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rd__vbf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rd_sat__vbf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rn__vbf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rn_sat__vbf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rna__vbf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rna_sat__vbf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_ru__vbf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_ru_sat__vbf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rz__vbf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162int32_rz_sat__vbf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -212,8 +172,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_bfloat162int32_rd__Rvi32_vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -228,8 +187,7 @@ __simd_callee__ inline void asc_bfloat162int32_rd(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rd_sat__Rvi32_vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -244,8 +202,7 @@ __simd_callee__ inline void asc_bfloat162int32_rd_sat(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rn__Rvi32_vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -260,8 +217,7 @@ __simd_callee__ inline void asc_bfloat162int32_rn(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rn_sat__Rvi32_vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -276,8 +232,7 @@ __simd_callee__ inline void asc_bfloat162int32_rn_sat(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rna__Rvi32_vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -292,8 +247,7 @@ __simd_callee__ inline void asc_bfloat162int32_rna(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rna_sat__Rvi32_vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -308,8 +262,7 @@ __simd_callee__ inline void asc_bfloat162int32_rna_sat(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_ru__Rvi32_vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -324,8 +277,7 @@ __simd_callee__ inline void asc_bfloat162int32_ru(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_ru_sat__Rvi32_vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -340,8 +292,7 @@ __simd_callee__ inline void asc_bfloat162int32_ru_sat(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rz__Rvi32_vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -356,8 +307,7 @@ __simd_callee__ inline void asc_bfloat162int32_rz(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rz_sat__Rvi32_vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -372,8 +322,7 @@ __simd_callee__ inline void asc_bfloat162int32_rz_sat(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rd__Rvi32_vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -388,8 +337,7 @@ __simd_callee__ inline void asc_bfloat162int32_rd(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rd_sat__Rvi32_vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -404,8 +352,7 @@ __simd_callee__ inline void asc_bfloat162int32_rd_sat(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rn__Rvi32_vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -420,8 +367,7 @@ __simd_callee__ inline void asc_bfloat162int32_rn(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rn_sat__Rvi32_vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -436,8 +382,7 @@ __simd_callee__ inline void asc_bfloat162int32_rn_sat(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rna__Rvi32_vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -452,8 +397,7 @@ __simd_callee__ inline void asc_bfloat162int32_rna(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rna_sat__Rvi32_vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -468,8 +412,7 @@ __simd_callee__ inline void asc_bfloat162int32_rna_sat(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_ru__Rvi32_vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -484,8 +427,7 @@ __simd_callee__ inline void asc_bfloat162int32_ru(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_ru_sat__Rvi32_vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -500,8 +442,7 @@ __simd_callee__ inline void asc_bfloat162int32_ru_sat(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rz__Rvi32_vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -516,8 +457,7 @@ __simd_callee__ inline void asc_bfloat162int32_rz(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rz_sat__Rvi32_vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -532,8 +472,7 @@ __simd_callee__ inline void asc_bfloat162int32_rz_sat(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rd__Rvi32_vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -548,8 +487,7 @@ __simd_callee__ inline void asc_bfloat162int32_rd(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rd_sat__Rvi32_vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -564,8 +502,7 @@ __simd_callee__ inline void asc_bfloat162int32_rd_sat(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rn__Rvi32_vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -580,8 +517,7 @@ __simd_callee__ inline void asc_bfloat162int32_rn(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rn_sat__Rvi32_vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -596,8 +532,7 @@ __simd_callee__ inline void asc_bfloat162int32_rn_sat(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rna__Rvi32_vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -612,8 +547,7 @@ __simd_callee__ inline void asc_bfloat162int32_rna(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rna_sat__Rvi32_vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -628,8 +562,7 @@ __simd_callee__ inline void asc_bfloat162int32_rna_sat(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_ru__Rvi32_vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -644,8 +577,7 @@ __simd_callee__ inline void asc_bfloat162int32_ru(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_ru_sat__Rvi32_vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -660,8 +592,7 @@ __simd_callee__ inline void asc_bfloat162int32_ru_sat(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rz__Rvi32_vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -676,8 +607,7 @@ __simd_callee__ inline void asc_bfloat162int32_rz(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rz_sat__Rvi32_vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -692,8 +622,7 @@ __simd_callee__ inline void asc_bfloat162int32_rz_sat(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rd__Rvi32_vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -708,8 +637,7 @@ __simd_callee__ inline void asc_bfloat162int32_rd(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rd_sat__Rvi32_vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -724,8 +652,7 @@ __simd_callee__ inline void asc_bfloat162int32_rd_sat(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rn__Rvi32_vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -740,8 +667,7 @@ __simd_callee__ inline void asc_bfloat162int32_rn(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rn_sat__Rvi32_vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -756,8 +682,7 @@ __simd_callee__ inline void asc_bfloat162int32_rn_sat(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rna__Rvi32_vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -772,8 +697,7 @@ __simd_callee__ inline void asc_bfloat162int32_rna(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rna_sat__Rvi32_vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -788,8 +712,7 @@ __simd_callee__ inline void asc_bfloat162int32_rna_sat(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_ru__Rvi32_vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -804,8 +727,7 @@ __simd_callee__ inline void asc_bfloat162int32_ru(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_ru_sat__Rvi32_vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -820,8 +742,7 @@ __simd_callee__ inline void asc_bfloat162int32_ru_sat(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rz__Rvi32_vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -836,8 +757,7 @@ __simd_callee__ inline void asc_bfloat162int32_rz(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rz_sat__Rvi32_vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -852,8 +772,7 @@ __simd_callee__ inline void asc_bfloat162int32_rz_sat(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rd__vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -868,8 +787,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rd(vector_bfloat16_t sr
 api_signature:
   override_id: "asc_bfloat162int32_rd_sat__vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -884,8 +802,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rd_sat(vector_bfloat16_
 api_signature:
   override_id: "asc_bfloat162int32_rn__vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -900,8 +817,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rn(vector_bfloat16_t sr
 api_signature:
   override_id: "asc_bfloat162int32_rn_sat__vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -916,8 +832,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rn_sat(vector_bfloat16_
 api_signature:
   override_id: "asc_bfloat162int32_rna__vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -932,8 +847,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rna(vector_bfloat16_t s
 api_signature:
   override_id: "asc_bfloat162int32_rna_sat__vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -948,8 +862,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rna_sat(vector_bfloat16
 api_signature:
   override_id: "asc_bfloat162int32_ru__vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -964,8 +877,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_ru(vector_bfloat16_t sr
 api_signature:
   override_id: "asc_bfloat162int32_ru_sat__vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -980,8 +892,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_ru_sat(vector_bfloat16_
 api_signature:
   override_id: "asc_bfloat162int32_rz__vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -996,8 +907,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rz(vector_bfloat16_t sr
 api_signature:
   override_id: "asc_bfloat162int32_rz_sat__vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1012,8 +922,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rz_sat(vector_bfloat16_
 api_signature:
   override_id: "asc_bfloat162int32_rd__vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1028,8 +937,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rd(vector_bfloat16_t sr
 api_signature:
   override_id: "asc_bfloat162int32_rd_sat__vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1044,8 +952,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rd_sat(vector_bfloat16_
 api_signature:
   override_id: "asc_bfloat162int32_rn__vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1060,8 +967,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rn(vector_bfloat16_t sr
 api_signature:
   override_id: "asc_bfloat162int32_rn_sat__vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1076,8 +982,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rn_sat(vector_bfloat16_
 api_signature:
   override_id: "asc_bfloat162int32_rna__vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1092,8 +997,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rna(vector_bfloat16_t s
 api_signature:
   override_id: "asc_bfloat162int32_rna_sat__vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1108,8 +1012,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rna_sat(vector_bfloat16
 api_signature:
   override_id: "asc_bfloat162int32_ru__vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1124,8 +1027,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_ru(vector_bfloat16_t sr
 api_signature:
   override_id: "asc_bfloat162int32_ru_sat__vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1140,8 +1042,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_ru_sat(vector_bfloat16_
 api_signature:
   override_id: "asc_bfloat162int32_rz__vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1156,8 +1057,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rz(vector_bfloat16_t sr
 api_signature:
   override_id: "asc_bfloat162int32_rz_sat__vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1172,8 +1072,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rz_sat(vector_bfloat16_
 api_signature:
   override_id: "asc_bfloat162int32_rd__vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1187,8 +1086,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rd(vector_bfloat16_t sr
 api_signature:
   override_id: "asc_bfloat162int32_rd_sat__vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1202,8 +1100,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rd_sat(vector_bfloat16_
 api_signature:
   override_id: "asc_bfloat162int32_rn__vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1217,8 +1114,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rn(vector_bfloat16_t sr
 api_signature:
   override_id: "asc_bfloat162int32_rn_sat__vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1232,8 +1128,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rn_sat(vector_bfloat16_
 api_signature:
   override_id: "asc_bfloat162int32_rna__vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1247,8 +1142,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rna(vector_bfloat16_t s
 api_signature:
   override_id: "asc_bfloat162int32_rna_sat__vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1262,8 +1156,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rna_sat(vector_bfloat16
 api_signature:
   override_id: "asc_bfloat162int32_ru__vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1277,8 +1170,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_ru(vector_bfloat16_t sr
 api_signature:
   override_id: "asc_bfloat162int32_ru_sat__vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1292,8 +1184,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_ru_sat(vector_bfloat16_
 api_signature:
   override_id: "asc_bfloat162int32_rz__vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1307,8 +1198,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rz(vector_bfloat16_t sr
 api_signature:
   override_id: "asc_bfloat162int32_rz_sat__vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1322,8 +1212,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rz_sat(vector_bfloat16_
 api_signature:
   override_id: "asc_bfloat162int32_rd__vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1337,8 +1226,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rd(vector_bfloat16_t sr
 api_signature:
   override_id: "asc_bfloat162int32_rd_sat__vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1352,8 +1240,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rd_sat(vector_bfloat16_
 api_signature:
   override_id: "asc_bfloat162int32_rn__vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1367,8 +1254,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rn(vector_bfloat16_t sr
 api_signature:
   override_id: "asc_bfloat162int32_rn_sat__vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1382,8 +1268,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rn_sat(vector_bfloat16_
 api_signature:
   override_id: "asc_bfloat162int32_rna__vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1397,8 +1282,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rna(vector_bfloat16_t s
 api_signature:
   override_id: "asc_bfloat162int32_rna_sat__vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1412,8 +1296,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rna_sat(vector_bfloat16
 api_signature:
   override_id: "asc_bfloat162int32_ru__vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1427,8 +1310,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_ru(vector_bfloat16_t sr
 api_signature:
   override_id: "asc_bfloat162int32_ru_sat__vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1442,8 +1324,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_ru_sat(vector_bfloat16_
 api_signature:
   override_id: "asc_bfloat162int32_rz__vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1457,8 +1338,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rz(vector_bfloat16_t sr
 api_signature:
   override_id: "asc_bfloat162int32_rz_sat__vbf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1478,8 +1358,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rz_sat(vector_bfloat16_
 api_signature:
   override_id: "asc_bfloat162int32_rn__Rvi32_vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -1494,8 +1373,7 @@ __simd_callee__ inline void asc_bfloat162int32_rn(vector_int32_t& dst,
 api_signature:
   override_id: "asc_bfloat162int32_rn__vbf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c

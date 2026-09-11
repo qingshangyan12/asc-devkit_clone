@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SoftMax/SimpleSoftMax Tiling
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/activation_functions/SoftMax_interface/SoftMax-SimpleSoftMax-Tiling.md
+description: 用于获取SoftMax/SimpleSoftMax Tiling参数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SoftMax/SimpleSoftMax Tiling
 
 ## 功能说明

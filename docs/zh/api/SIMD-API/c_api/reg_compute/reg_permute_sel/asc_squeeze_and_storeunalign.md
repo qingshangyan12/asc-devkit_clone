@@ -15,8 +15,7 @@ signature:
     headers: []
   - prototype_id: "asc_squeeze_and_storeunalign__PU<dtype>_Rv<dtype>_Rvstoreunalign_v<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -75,8 +74,7 @@ api_signature:
 api_signature:
   prototype_id: "asc_squeeze_and_storeunalign__PU<dtype>_Rv<dtype>_Rvstoreunalign_v<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   dtype:
     values:
       - "int8_t"

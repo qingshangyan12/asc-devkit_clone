@@ -43,6 +43,16 @@ namespace AscendC {
  * \param [in] count, amount of data to be calculated
  */
 template <const RintConfig& config = DEFAULT_RINT_CONFIG, typename T>
+/**
+ * @ingroup simd_api.adv_api.math_compute.rint_interface
+ * @override_id Rint__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+ * @archs 3510
+ * @brief 获取与输入数据最接近的整数，若存在两个同样接近的整数，则获取其中的偶数。
+ * @param [out] dst 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] src 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型与目的操作数保持一致。
+ * @param [in] sharedTmpBuffer 临时缓存。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。用于Rint内部复杂计算时存储中间变量，由开发者提供。临时空间大小BufferSize的获取方式请参考[GetRintMaxMinTmpSize](GetRintMaxMinTmpSize.md)。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void Rint(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer,
     const uint32_t count)
@@ -61,6 +71,15 @@ __aicore__ inline void Rint(
  * \param [in] count, amount of data to be calculated
  */
 template <const RintConfig& config = DEFAULT_RINT_CONFIG, typename T>
+/**
+ * @ingroup simd_api.adv_api.math_compute.rint_interface
+ * @override_id Rint__RCltg1x2_pT_RCltg1x2_pT_u32
+ * @archs 3510
+ * @brief 获取与输入数据最接近的整数，若存在两个同样接近的整数，则获取其中的偶数。
+ * @param [out] dst 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] src 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型与目的操作数保持一致。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void Rint(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
 {
 #if defined(__NPU_ARCH__) && \

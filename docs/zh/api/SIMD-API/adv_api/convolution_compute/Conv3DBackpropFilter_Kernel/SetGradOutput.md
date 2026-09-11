@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetGradOutput
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3DBackpropFilter_Kernel/SetGradOutput.md
+description: 设置卷积反向计算的输入矩阵GradOutput。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetGradOutput
 
 ## 产品支持情况

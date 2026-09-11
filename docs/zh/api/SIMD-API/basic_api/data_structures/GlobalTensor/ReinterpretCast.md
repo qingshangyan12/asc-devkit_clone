@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: ReinterpretCast
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/data_structures/GlobalTensor/ReinterpretCast.md
+description: 将当前GlobalTensor重解释为用户指定的新类型。转换后的Tensor与原Tensor地址及内容完全相同，Tensor的内存大小（比特数）保持不变。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: ReinterpretCast__z
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_tensor.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ReinterpretCast<a name="ZH-CN_TOPIC_0000002132450370"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -31,6 +47,13 @@
 将当前GlobalTensor重解释为用户指定的新类型。转换后的Tensor与原Tensor地址及内容完全相同，Tensor的内存大小（比特数）保持不变。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "ReinterpretCast__z"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_tensor.h"]
+```
 
 ```cpp
 template <typename CAST_T>

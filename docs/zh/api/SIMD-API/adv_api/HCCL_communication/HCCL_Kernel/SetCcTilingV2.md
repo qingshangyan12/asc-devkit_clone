@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetCcTilingV2
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/SetCcTilingV2.md
+description: 用于设置HCCL客户端中某个通信算法配置的TilingData地址。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetCcTilingV2__u64
+  archs: ['3510', '2201']
+  headers: [/include/adv_api/hccl/hccl.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetCcTilingV2
 
 ## 产品支持情况
@@ -28,6 +44,13 @@
 用于设置HCCL客户端中某个通信算法配置的TilingData地址。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "SetCcTilingV2__u64"
+  archs: ["3510", "2201"]
+  headers: ["/include/adv_api/hccl/hccl.h"]
+```
 
 ```
 __aicore__ inline int32_t SetCcTilingV2(uint64_t offset)

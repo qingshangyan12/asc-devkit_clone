@@ -10,52 +10,40 @@ usage_dependencies:
 signature:
   - override_id: "asc_mul__PUi16_PUi16_PUi16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_arith.h"
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: "asc_mul__PUf16_PUf16_PUf16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_arith.h"
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: "asc_mul__PUi32_PUi32_PUi32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_arith.h"
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: "asc_mul__PUf32_PUf32_PUf32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_arith.h"
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: "asc_mul__PUi16_PUi16_PUi16_u8_u8_u8_u8_u8_u8_u8"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_arith.h"
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: "asc_mul__PUf16_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_arith.h"
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: "asc_mul__PUi32_PUi32_PUi32_u8_u8_u8_u8_u8_u8_u8"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_arith.h"
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: "asc_mul__PUf32_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_arith.h"
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: "asc_mul_sync__PUi16_PUi16_PUi16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_mul_sync__PUf16_PUf16_PUf16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_mul_sync__PUi32_PUi32_PUi32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_mul_sync__PUf32_PUf32_PUf32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -104,8 +92,7 @@ $$
 api_signature:
   override_id: "asc_mul__PUi16_PUi16_PUi16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_arith.h"
+  headers: [/include/c_api/vector_compute/compute/vector_arith.h]
 ```
 
 ```cpp
@@ -116,8 +103,7 @@ __aicore__ inline void asc_mul(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __
 api_signature:
   override_id: "asc_mul__PUf16_PUf16_PUf16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_arith.h"
+  headers: [/include/c_api/vector_compute/compute/vector_arith.h]
 ```
 
 ```cpp
@@ -128,8 +114,7 @@ __aicore__ inline void asc_mul(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__
 api_signature:
   override_id: "asc_mul__PUi32_PUi32_PUi32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_arith.h"
+  headers: [/include/c_api/vector_compute/compute/vector_arith.h]
 ```
 
 ```cpp
@@ -140,8 +125,7 @@ __aicore__ inline void asc_mul(__ubuf__ int32_t* dst, __ubuf__ int32_t* src0, __
 api_signature:
   override_id: "asc_mul__PUf32_PUf32_PUf32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_arith.h"
+  headers: [/include/c_api/vector_compute/compute/vector_arith.h]
 ```
 
 ```cpp
@@ -154,8 +138,7 @@ __aicore__ inline void asc_mul(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf
 api_signature:
   override_id: "asc_mul__PUi16_PUi16_PUi16_u8_u8_u8_u8_u8_u8_u8"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_arith.h"
+  headers: [/include/c_api/vector_compute/compute/vector_arith.h]
 ```
 
 ```cpp
@@ -168,8 +151,7 @@ __aicore__ inline void asc_mul(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __
 api_signature:
   override_id: "asc_mul__PUf16_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_arith.h"
+  headers: [/include/c_api/vector_compute/compute/vector_arith.h]
 ```
 
 ```cpp
@@ -182,8 +164,7 @@ __aicore__ inline void asc_mul(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__
 api_signature:
   override_id: "asc_mul__PUi32_PUi32_PUi32_u8_u8_u8_u8_u8_u8_u8"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_arith.h"
+  headers: [/include/c_api/vector_compute/compute/vector_arith.h]
 ```
 
 ```cpp
@@ -196,8 +177,7 @@ __aicore__ inline void asc_mul(__ubuf__ int32_t* dst, __ubuf__ int32_t* src0, __
 api_signature:
   override_id: "asc_mul__PUf32_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_arith.h"
+  headers: [/include/c_api/vector_compute/compute/vector_arith.h]
 ```
 
 ```cpp
@@ -212,8 +192,7 @@ __aicore__ inline void asc_mul(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf
 api_signature:
   override_id: "asc_mul_sync__PUi16_PUi16_PUi16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
 ```cpp
@@ -224,8 +203,7 @@ __aicore__ inline void asc_mul_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src
 api_signature:
   override_id: "asc_mul_sync__PUf16_PUf16_PUf16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
 ```cpp
@@ -236,8 +214,7 @@ __aicore__ inline void asc_mul_sync(__ubuf__ half* dst, __ubuf__ half* src0, __u
 api_signature:
   override_id: "asc_mul_sync__PUi32_PUi32_PUi32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
 ```cpp
@@ -248,8 +225,7 @@ __aicore__ inline void asc_mul_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src
 api_signature:
   override_id: "asc_mul_sync__PUf32_PUf32_PUf32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
 ```cpp

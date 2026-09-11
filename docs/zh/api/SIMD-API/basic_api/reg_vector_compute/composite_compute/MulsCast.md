@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: MulsCast
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/composite_compute/MulsCast.md
+description: 该接口用于将源操作数src与标量scalar相乘，再按照CAST\_ROUND模式将结果转换为half类型，根据mask将计算结果写入目的操作数dst。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # MulsCast<a name="ZH-CN_TOPIC_0000002008487800"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

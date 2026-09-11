@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: AddDeqRelu
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/AddDeqRelu.md
+description: 依次计算按元素求和、结果进行deq量化后再进行relu计算（结果和0对比取较大值）。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # AddDeqRelu<a name="ZH-CN_TOPIC_0000001815255356"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Truncate
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/type_conversion/Truncate.md
+description: 将源操作数中的浮点数元素截断为整数值（保留原数据类型），并存入目的操作数。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Truncate<a name="ZH-CN_TOPIC_0000001929827676"></a>
 
 ## 产品支持情况

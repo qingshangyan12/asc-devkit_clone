@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Arange
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/index_compute/Arange.md
+description: 给定起始值，等差值和长度，返回一个等差数列。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Arange__RCltg1x2_pT_pT_pT_i32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/index/arithprogression.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Arange
 
 ## 产品支持情况
@@ -41,6 +57,13 @@
 3.  等差数列长度64以上的步骤：对第二步中的等差数列结果使用Adds进行扩充，不断循环直至达到等差数列长度为止。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "Arange__RCltg1x2_pT_pT_pT_i32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/index/arithprogression.h"]
+```
 
 ```
 template <typename T>

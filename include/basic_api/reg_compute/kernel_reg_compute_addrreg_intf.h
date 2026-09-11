@@ -35,16 +35,40 @@
 namespace AscendC {
 namespace Reg {
 template <typename T>
+/**
+ * @ingroup simd_api.basic_api.reg_vector_compute.register_data_types
+ * @override_id CreateAddrReg__u16_u32
+ * @archs 3510
+ * @brief 头文件引用路径为 "basic_api/reg_compute/kernel_reg_compute_addrreg_intf.h"。
+ */
 __simd_callee__ inline AddrReg CreateAddrReg(uint16_t index0, uint32_t stride0);
 
 template <typename T>
+/**
+ * @ingroup simd_api.basic_api.reg_vector_compute.register_data_types
+ * @override_id CreateAddrReg__u16_u32_u16_u32
+ * @archs 3510
+ * @brief 头文件引用路径为 "basic_api/reg_compute/kernel_reg_compute_addrreg_intf.h"。
+ */
 __simd_callee__ inline AddrReg CreateAddrReg(uint16_t index0, uint32_t stride0, uint16_t index1, uint32_t stride1);
 
 template <typename T>
+/**
+ * @ingroup simd_api.basic_api.reg_vector_compute.register_data_types
+ * @override_id CreateAddrReg__u16_u32_u16_u32_u16_u32
+ * @archs 3510
+ * @brief 头文件引用路径为 "basic_api/reg_compute/kernel_reg_compute_addrreg_intf.h"。
+ */
 __simd_callee__ inline AddrReg CreateAddrReg(
     uint16_t index0, uint32_t stride0, uint16_t index1, uint32_t stride1, uint16_t index2, uint32_t stride2);
 
 template <typename T>
+/**
+ * @ingroup simd_api.basic_api.reg_vector_compute.register_data_types
+ * @override_id CreateAddrReg__u16_u32_u16_u32_u16_u32_u16_u32
+ * @archs 3510
+ * @brief 头文件引用路径为 "basic_api/reg_compute/kernel_reg_compute_addrreg_intf.h"。
+ */
 __simd_callee__ inline AddrReg CreateAddrReg(
     uint16_t index0, uint32_t stride0, uint16_t index1, uint32_t stride1, uint16_t index2, uint32_t stride2,
     uint16_t index3, uint32_t stride3);

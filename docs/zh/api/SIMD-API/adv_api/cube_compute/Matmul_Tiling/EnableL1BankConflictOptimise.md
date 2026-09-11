@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: EnableL1BankConflictOptimise
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/EnableL1BankConflictOptimise.md
+description: 根据[GetTiling](GetTiling.md)接口计算出的Tiling参数，获取是否可以开启L1 Bank冲突优化功能。若可以开启该功能，则与TilingKey机制配合使用，通过增加TilingKey，关联Host侧与核函数（Kernel）侧实现，并在核函数（Kernel）侧增加代码实现分支，将MatmulConfig中的[enableL1BankConflictOptimise](../Matmul_Kernel/MatmulConfig.md#p84588523128)设置为true，即可优化L1上的Bank冲突。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # EnableL1BankConflictOptimise
 
 ## 功能说明

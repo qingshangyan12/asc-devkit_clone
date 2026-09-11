@@ -11,12 +11,10 @@ usage_dependencies:
 signature:
   - override_id: "asc_get_reduce_max_cnt__Rf16_Ru32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: "asc_get_reduce_max_cnt__Rf32_Ru32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_reduce.h"
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -59,8 +57,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_get_reduce_max_cnt__Rf16_Ru32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
 ```
 
 ```cpp
@@ -71,8 +68,7 @@ __aicore__ inline void asc_get_reduce_max_cnt(half& val, uint32_t& index)
 api_signature:
   override_id: "asc_get_reduce_max_cnt__Rf32_Ru32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_reduce.h"
+  headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
 ```
 
 ```cpp

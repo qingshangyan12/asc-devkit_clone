@@ -10,10 +10,9 @@ usage_dependencies:
 signature:
   - override_id: "asc_set_mmad_direction_n__z"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/cube_compute/cube_compute.h"
+    headers: ["/include/c_api/cube_compute/cube_compute.h"]
 examples: []
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_set_mmad_direction_n
@@ -59,8 +58,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_set_mmad_direction_n__z"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/cube_compute/cube_compute.h"
+  headers: ["/include/c_api/cube_compute/cube_compute.h"]
 ```
 
 ```c

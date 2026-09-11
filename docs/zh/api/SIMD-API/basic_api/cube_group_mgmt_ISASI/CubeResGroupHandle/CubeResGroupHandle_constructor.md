@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: CubeResGroupHandle构造函数
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_group_mgmt_ISASI/CubeResGroupHandle/CubeResGroupHandle_constructor.md
+description: 构造CubeResGroupHandle对象，完成组内的AIC和消息队列分配。构造CubeResGroupHandle对象时需要传入模板参数CubeMsgType，CubeMsgType是由用户定义的消息结构体，请参考[表1](CubeResGroupHandle_usage.md#table189051237164018)。使用此接口需要用户自主管理地址、同步事件等，因此更推荐使用[CreateCubeResGroup](CubeResGroupHandle_constructor.md)接口快速创建CubeResGroupHandle对象。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # CubeResGroupHandle构造函数<a name="ZH-CN_TOPIC_0000001965821852"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

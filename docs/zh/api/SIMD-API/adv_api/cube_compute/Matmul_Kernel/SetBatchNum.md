@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetBatchNum
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetBatchNum.md
+description: 在不改变Tiling的情况下，重新设置多Batch计算的Batch数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetBatchNum__i32_i32
+  archs: ['3510', '2201', '2002', x90]
+  headers: [/include/adv_api/matmul/matmul.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetBatchNum
 
 ## 产品支持情况
@@ -31,6 +47,13 @@
 在不改变Tiling的情况下，重新设置多Batch计算的Batch数。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "SetBatchNum__i32_i32"
+  archs: ["3510", "2201", "2002", "x90"]
+  headers: ["/include/adv_api/matmul/matmul.h"]
+```
 
 ```
 __aicore__ inline void SetBatchNum(int32_t batchA, int32_t batchB)

@@ -42,6 +42,12 @@ namespace AscendC {
  * \param [in] count, amount of data to be calculated
  */
 template <const BitwiseNotConfig& config = DEFAULT_BITWISE_NOT_CONFIG, typename T>
+/**
+ * @ingroup simd_api.adv_api.math_compute.bitwisenot_interface
+ * @override_id BitwiseNot__RCltg1x2_pT_RCltg1x2_pT_u32
+ * @archs 3510
+ * @brief 逐比特对输入进行取反。
+ */
 __aicore__ inline void BitwiseNot(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
 {
 #if defined(__NPU_ARCH__) && \

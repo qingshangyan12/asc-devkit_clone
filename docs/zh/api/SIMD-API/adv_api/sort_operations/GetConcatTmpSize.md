@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GetConcatTmpSize
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/sort_operations/GetConcatTmpSize.md
+description: 获取Concat接口所需的临时空间大小，单位为字节。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetConcatTmpSize
 
 ## 功能说明

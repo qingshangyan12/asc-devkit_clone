@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetL2CacheHint
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/data_structures/GlobalTensor/SetL2CacheHint.md
+description: 设置GlobalTensor是否启用L2 Cache，默认启用L2 Cache。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetL2CacheHint<a name="ZH-CN_TOPIC_0000002130744234"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

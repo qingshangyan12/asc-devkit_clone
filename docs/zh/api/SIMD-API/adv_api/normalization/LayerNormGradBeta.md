@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: LayerNormGradBeta
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/normalization/LayerNormGradBeta.md
+description: LayerNormGradBeta接口用于获取反向beta/gamma的数值，和LayerNormGrad共同输出pdx。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LayerNormGradBeta
 
 ## 产品支持情况

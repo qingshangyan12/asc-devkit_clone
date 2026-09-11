@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: WaitIterateAll
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/WaitIterateAll.md
+description: 等待IterateAll异步接口返回，支持连续输出到Global Memory。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: WaitIterateAll__z
+  archs: ['3510', '2201', x90]
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # WaitIterateAll
 
 ## 产品支持情况
@@ -31,6 +47,13 @@
 等待IterateAll异步接口返回，支持连续输出到Global Memory。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "WaitIterateAll__z"
+  archs: ["3510", "2201", "x90"]
+  headers: []
+```
 
 ```
 __aicore__ inline void WaitIterateAll()

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetReduceRepeatSumSpr(ISASI)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute_aux_config/GetReduceRepeatSumSpr_ISASI.md
+description: 获取[ReduceSum](../reduction_compute/ReduceSum.md)接口的计算结果，仅支持tensor前n个数据连续计算接口使用。计算结果以全局变量形式存储，可以随时调用获取。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetReduceRepeatSumSpr__z
+  archs: ['3510', '2201']
+  headers: [/include/basic_api/kernel_operator_vec_reduce_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetReduceRepeatSumSpr(ISASI)
 
 ## 产品支持情况
@@ -32,6 +48,13 @@
 获取[ReduceSum](../reduction_compute/ReduceSum.md)接口的计算结果，仅支持tensor前n个数据连续计算接口使用。计算结果以全局变量形式存储，可以随时调用获取。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "GetReduceRepeatSumSpr__z"
+  archs: ["3510", "2201"]
+  headers: ["/include/basic_api/kernel_operator_vec_reduce_intf.h"]
+```
 
 ```cpp
 template <typename T>

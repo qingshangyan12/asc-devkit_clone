@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: Lowest
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/tool_interface/NumericLimits_utils/Lowest.md
+description: 返回指定数据类型的最低有限值，即满足无其他有限值y符合y < x的有限值x。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Lowest__z
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_limits_intf.h]
+- override_id: Lowest__RCltg1x2_pT_u32
+  archs: ['3510']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Lowest
 
 ## 产品支持情况
@@ -35,11 +54,25 @@
 
 - 标量接口，返回值为标量：
 
+```yaml
+api_signature:
+  override_id: "Lowest__z"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_limits_intf.h"]
+```
+
     ```cpp
     constexpr __aicore__ static inline T Lowest()
     ```
 
 - 矢量接口，为dstLocal前count个元素赋最低有限值：
+
+```yaml
+api_signature:
+  override_id: "Lowest__RCltg1x2_pT_u32"
+  archs: ["3510"]
+  headers: []
+```
 
     ```cpp
     __aicore__ static inline void Lowest(const LocalTensor<T>& dstLocal, uint32_t count)

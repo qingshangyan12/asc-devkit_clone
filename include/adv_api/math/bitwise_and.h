@@ -43,6 +43,14 @@ namespace AscendC {
  * \param [in] count, amount of data to be calculated
  */
 template <const BitwiseAndConfig& config = DEFAULT_BITWISE_AND_CONFIG, typename T>
+/**
+ * @ingroup simd_api.adv_api.math_compute.bitwiseand_interface
+ * @override_id BitwiseAnd__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32
+ * @archs 3510
+ * @brief 逐比特对两个输入进行与操作。
+ * @param [out] dst 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void BitwiseAnd(
     const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const uint32_t count)
 {

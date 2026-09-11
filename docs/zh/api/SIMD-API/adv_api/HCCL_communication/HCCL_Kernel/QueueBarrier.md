@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: QueueBarrier
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/QueueBarrier.md
+description: 阻塞服务端上指定队列的BatchWrite通信任务，直到指定范围内所有队列上的任务完成执行，从而实现指定范围内队列的同步。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: QueueBarrier__u16
+  archs: ['2201']
+  headers: [/include/adv_api/hccl/hccl.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # QueueBarrier
 
 ## 产品支持情况
@@ -28,6 +44,13 @@
 阻塞服务端上指定队列的BatchWrite通信任务，直到指定范围内所有队列上的任务完成执行，从而实现指定范围内队列的同步。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "QueueBarrier__u16"
+  archs: ["2201"]
+  headers: ["/include/adv_api/hccl/hccl.h"]
+```
 
 ```
 template <ScopeType type = ScopeType::ALL>

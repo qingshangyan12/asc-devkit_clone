@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GET\_TILING\_DATA\_PTR\_WITH\_STRUCT
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/Kernel-Tiling/GET_TILING_DATA_PTR_WITH_STRUCT.md
+description: 在使用该宏时，开发者可以通过指定结构体名称来获取相应的Tiling信息，并将其填入对应的Tiling结构体中。完成填充后，该宏将返回一个指向该Tiling结构体的指针，并使用\_\_tiling\_data\_ptr\_\_修饰符对该指针进行修饰。这种修饰方式能够确保在动静态Shape场景下代码的统一性和兼容性。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GET\_TILING\_DATA\_PTR\_WITH\_STRUCT<a name="ZH-CN_TOPIC_0000002448078405"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

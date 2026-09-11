@@ -11,8 +11,7 @@ usage_dependencies:
 signature:
   - override_id: "asc_unlock__pipe_u8"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/sync/sync.h"
+    headers: [/include/c_api/sync/sync.h]
   - override_id: "asc_unlock__pipe_u8_mutexmode"
     archs: ["3510"]
     headers: []
@@ -98,8 +97,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_unlock__pipe_u8"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/sync/sync.h"
+  headers: [/include/c_api/sync/sync.h]
 ```
 
 ```cpp

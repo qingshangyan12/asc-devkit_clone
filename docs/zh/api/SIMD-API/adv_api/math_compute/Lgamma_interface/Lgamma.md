@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: Lgamma
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/Lgamma_interface/Lgamma.md
+description: 按元素计算x的gamma函数的绝对值并求自然对数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Lgamma__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/lgamma.h]
+- override_id: Lgamma__RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/lgamma.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Lgamma
 
 ## 产品支持情况
@@ -37,12 +56,26 @@
 
 -   通过sharedTmpBuffer入参传入临时空间
 
+```yaml
+api_signature:
+  override_id: "Lgamma__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/lgamma.h"]
+```
+
     ```
     template <typename T, bool isReuseSource = false>
     __aicore__ inline void Lgamma(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
     ```
 
 -   接口框架申请临时空间
+
+```yaml
+api_signature:
+  override_id: "Lgamma__RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/lgamma.h"]
+```
 
     ```
     template <typename T, bool isReuseSource = false>

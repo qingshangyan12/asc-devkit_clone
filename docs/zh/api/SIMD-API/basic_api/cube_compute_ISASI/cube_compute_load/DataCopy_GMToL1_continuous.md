@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: DataCopy（GMToL1连续数据搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_GMToL1_continuous.md
+description: 该接口能够将矩阵从Global Memory连续搬运至L1 Buffer（TPosition为A1/B1），数据搬运时格式和内容保持不变。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: DataCopy__RCltg1x2_pT_RCgtg1x2_pT_u32
+  archs: ['3510', '2201', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_data_copy_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DataCopy（GMToL1连续数据搬运）<a id="ZH-CN_TOPIC_0000002569070903"></a>
 
 ## 产品支持情况<a id="zh-cn_topic_0000002535739034_section796754519912"></a>
@@ -38,6 +54,13 @@
 该接口能够将矩阵从Global Memory连续搬运至L1 Buffer（TPosition为A1/B1），数据搬运时格式和内容保持不变。
 
 ## 函数原型<a id="zh-cn_topic_0000002535739034_section82039854412"></a>
+
+```yaml
+api_signature:
+  override_id: "DataCopy__RCltg1x2_pT_RCgtg1x2_pT_u32"
+  archs: ["3510", "2201", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_data_copy_intf.h"]
+```
 
 ```cpp
 template <typename T>

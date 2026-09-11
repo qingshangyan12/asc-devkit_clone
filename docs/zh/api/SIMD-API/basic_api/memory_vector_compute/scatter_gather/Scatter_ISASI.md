@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Scatter\(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/scatter_gather/Scatter_ISASI.md
+description: 给定一个连续的输入张量和一个目的地址偏移张量，Scatter指令根据偏移地址生成新的结果张量后将输入张量分散到结果张量中。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Scatter\(ISASI\)<a name="ZH-CN_TOPIC_0000001862055393"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

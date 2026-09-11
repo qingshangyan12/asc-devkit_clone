@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: Init
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/Init.md
+description: Init主要用于对Matmul对象中的Tiling数据进行初始化，根据Tiling参数进行资源划分，Tiling参数的具体介绍请参考[Matmul
+  Tiling侧接口](../Matmul_Tiling/Matmul_Tiling.md)。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Init
 
 ## 产品支持情况

@@ -95,6 +95,13 @@ __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const LocalTensor<T>
  * @param [count] count number of data calculation, must be even number
  */
 template <typename T>
+/**
+ * @ingroup simd_api.basic_api.memory_vector_compute.data_rearrange_isasi
+ * @override_id Interleave__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_i32
+ * @archs 3510
+ * @brief 给定源操作数src0和src1，将src0和src1中的元素交织存入结果操作数dst0和dst1中。交织排列方式如下图所示，其中每个方格代表一个元素。
+ * @param [in] count 输入/输出数据元素个数，dst0/dst1/src0/src1长度大小均为count。count必须为偶数。
+ */
 __aicore__ inline void Interleave(
     const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
     const int32_t count);
@@ -112,6 +119,13 @@ __aicore__ inline void Interleave(
  * @param [count] count number of data calculation, must be even number
  */
 template <typename T>
+/**
+ * @ingroup simd_api.basic_api.memory_vector_compute.data_rearrange_isasi
+ * @override_id DeInterleave__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_i32
+ * @archs 3510
+ * @brief 给定源操作数src0和src1，将src0和src1中的元素解交织存入结果操作数dst0和dst1中。解交织排列方式如下图所示，其中每个方格代表一个元素。
+ * @param [in] count 输入/输出数据元素个数，dst0/dst1/src0/src1长度大小为count。count必须为偶数。
+ */
 __aicore__ inline void DeInterleave(
     const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
     const int32_t count);
@@ -125,6 +139,13 @@ __aicore__ inline void DeInterleave(
  * @param [srcCount] srcCount number of data calculation, must be even number
  */
 template <typename T>
+/**
+ * @ingroup simd_api.basic_api.memory_vector_compute.data_rearrange_isasi
+ * @override_id DeInterleave__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_i32
+ * @archs 3510
+ * @brief 给定源操作数src0和src1，将src0和src1中的元素解交织存入结果操作数dst0和dst1中。解交织排列方式如下图所示，其中每个方格代表一个元素。
+ * @param [in] srcCount 输入数据元素个数，两个输出的大小都为输入的一半。srcCount必须为偶数。
+ */
 __aicore__ inline void DeInterleave(
     const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src, const int32_t srcCount);
 } // namespace AscendC

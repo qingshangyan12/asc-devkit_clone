@@ -9,8 +9,7 @@ usage_dependencies:
 signature:
   - override_id: "asc_set_ffts_base_addr__u64"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/utils/sys_var.h"
+    headers: [/include/c_api/utils/sys_var.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -57,8 +56,7 @@ aclError aclrtGetHardwareSyncAddr(void **addr);
 api_signature:
   override_id: "asc_set_ffts_base_addr__u64"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/utils/sys_var.h"
+  headers: [/include/c_api/utils/sys_var.h]
 ```
 
 ```cpp

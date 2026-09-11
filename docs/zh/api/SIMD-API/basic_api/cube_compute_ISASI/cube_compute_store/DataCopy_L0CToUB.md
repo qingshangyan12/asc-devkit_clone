@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: DataCopy（L0C Buffer到UB数据搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/DataCopy_L0CToUB.md
+description: 对数据搬运能力进行增强，相比于基础数据搬运接口，增加了L0C Buffer-\>UB通路的随路计算。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DataCopy（L0C Buffer到UB数据搬运）<a name="ZH-CN_TOPIC_0000002382867725"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Relu
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/basic_arithmetic/Relu.md
+description: 该接口根据mask对输入数据srcReg进行Relu（线性整流）操作。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Relu<a name="ZH-CN_TOPIC_0000001929651446"></a>
 
 ## 产品支持情况

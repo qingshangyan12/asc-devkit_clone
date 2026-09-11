@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Extract
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/sort_operations/Extract.md
+description: 处理Sort的结果数据，输出排序后的value和index。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Extract__RCltg1x2_pT_RCltg1x3_u32_RCltg1x2_pT_i32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/basic_api/kernel_operator_proposal_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Extract
 
 ## 产品支持情况
@@ -28,6 +44,13 @@
 处理Sort的结果数据，输出排序后的value和index。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "Extract__RCltg1x2_pT_RCltg1x3_u32_RCltg1x2_pT_i32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/basic_api/kernel_operator_proposal_intf.h"]
+```
 
 ```
 template <typename T>

@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: LocalMemBar
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/sync_control/LocalMemBar.md
+description: Reg矢量计算宏函数内不同流水线之间的同步指令。该同步指令指定src源流水线和dst目的流水线，如下图所示，目的流水线将等待源流水线上所有指令完成才进行执行。读写场景下，当读指令使用的寄存器和写指令使用的寄存器相同时，可以触发寄存器保序，指令将会按照代码顺序执行，不需要插入同步指令，而当使用的寄存器不同时，如果要确保读写指令顺序执行，则需要插入同步指令，写写场景同理。MemType用于标识不同的流水线类型，其具体取值与含义详见[表
+  MemType取值说明](#table2_memtype)。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: LocalMemBar__z
+  archs: ['3510']
+  headers: [/include/basic_api/reg_compute/kernel_reg_compute_membar_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LocalMemBar<a name="ZH-CN_TOPIC_0000002222134221"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -36,6 +53,13 @@ Reg矢量计算宏函数内不同流水线之间的同步指令。该同步指�
 ![](../../../../figures/pipeline_wait.png "流水线等待示意图")
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "LocalMemBar__z"
+  archs: ["3510"]
+  headers: ["/include/basic_api/reg_compute/kernel_reg_compute_membar_intf.h"]
+```
 
 ```cpp
 template <MemType src, MemType dst> 

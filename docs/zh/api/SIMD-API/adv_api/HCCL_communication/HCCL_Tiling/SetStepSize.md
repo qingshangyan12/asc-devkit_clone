@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetStepSize
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Tiling/SetStepSize.md
+description: 设置[细粒度通信](../HCCL_Kernel/Iterate.md)时，通信算法的步长，即设置细粒度通信时，一次子通信任务执行或准备执行的通信算法的步骤数。例如，[图1使用pairwise算法的AlltoAllV通信步骤示意图](../HCCL_Kernel/Iterate.md)中，该细粒度通信场景下，AlltoAllV通信任务的通信步长为1。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetStepSize
 
 ## 功能说明

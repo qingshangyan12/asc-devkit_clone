@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Compares（灵活标量位置）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Compares_flexible_scalar.md
+description: 提供灵活标量位置的接口，支持标量在前和标量在后两种场景。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Compares（灵活标量位置）<a name="ZH-CN_TOPIC_0000002136591178"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

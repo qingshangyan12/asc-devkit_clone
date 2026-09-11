@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: DataCopy（GM与UB切片数据搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_GMAndUB_slice.md
+description: 该接口为软仿接口，从易用性角度出发进行设计，支持数据的切片搬运，提取多维Tensor数据的子集进行搬运。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DataCopy（GM与UB切片数据搬运）<a name="ZH-CN_TOPIC_0000002568770166"></a>
 
 ## 产品支持情况<a name="zh-cn_topic_0000002565968945_section796754519912"></a>

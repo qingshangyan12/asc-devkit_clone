@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: End
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/End.md
+description: 多个Matmul对象之间切换计算时，必须调用一次End函数，用于释放Matmul计算资源，防止多个Matmul对象的计算资源冲突。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: End__z
+  archs: ['3510', '2201', '3002', '2002', x90, '9030']
+  headers: [/include/adv_api/matmul/matmul.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # End
 
 ## 产品支持情况
@@ -34,6 +50,13 @@
 多个Matmul对象之间切换计算时，必须调用一次End函数，用于释放Matmul计算资源，防止多个Matmul对象的计算资源冲突。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "End__z"
+  archs: ["3510", "2201", "3002", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/matmul/matmul.h"]
+```
 
 ```
 __aicore__ inline void End()

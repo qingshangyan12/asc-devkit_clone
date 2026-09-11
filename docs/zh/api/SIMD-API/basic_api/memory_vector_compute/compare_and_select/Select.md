@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Select
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Select.md
+description: 给定两个源操作数src0和src1，根据selMask（用于选择的Mask掩码）的比特位值选取元素，得到目的操作数dst。选择规则为：当selMask的比特位是1时，从src0中选取；比特位是0时从src1选取。
+tag: [basic_api]
+usage_dependencies:
+  status: confirmed
+  companion:
+  - ../mask_operations/SetVectorMask.md
+  - SetCmpMask_ISASI.md
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Select<a name="ZH-CN_TOPIC_0000001550716925"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

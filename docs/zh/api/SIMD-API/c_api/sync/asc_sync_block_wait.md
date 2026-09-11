@@ -14,8 +14,7 @@ signature:
     headers: []
   - override_id: "asc_sync_block_wait__pipe_i64"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/sync/sync.h"
+    headers: [/include/c_api/sync/sync.h]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_ub2l1"
     archs: ["3510"]
@@ -81,8 +80,7 @@ __aicore__ inline void asc_sync_block_wait(pipe_t pipe,
 api_signature:
   override_id: "asc_sync_block_wait__pipe_i64"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/sync/sync.h"
+  headers: [/include/c_api/sync/sync.h]
 ```
 
 ```c

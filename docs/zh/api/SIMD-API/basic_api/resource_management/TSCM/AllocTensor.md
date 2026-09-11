@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: AllocTensor
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/TSCM/AllocTensor.md
+description: 从TSCM中分配tensor，tensor所占大小为InitBuffer时设置的每块内存长度。注意，分配的tensor内容并非全0，可能会是随机值。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: AllocTensor__z
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_tpipe.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # AllocTensor<a name="ZH-CN_TOPIC_0000002161196177"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -32,6 +48,13 @@
 从TSCM中分配tensor，tensor所占大小为InitBuffer时设置的每块内存长度。注意，分配的tensor内容并非全0，可能会是随机值。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "AllocTensor__z"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_tpipe.h"]
+```
 
 ```cpp
 template <typename T>

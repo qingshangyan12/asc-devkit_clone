@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: ReleaseEventID
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/TPipe/ReleaseEventID.md
+description: 用于释放HardEvent（硬件类型同步事件）的TEventID，通常与[AllocEventID](AllocEventID.md)搭配使用。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ReleaseEventID<a name="ZH-CN_TOPIC_0000001744571864"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

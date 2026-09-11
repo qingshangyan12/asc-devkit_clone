@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: REGISTER\_TILING\_DEFAULT
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/Kernel-Tiling/REGISTER_TILING_DEFAULT.md
+description: 用于在kernel侧注册用户使用标准C++语法自定义的默认TilingData结构体。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # REGISTER\_TILING\_DEFAULT<a name="ZH-CN_TOPIC_0000002123262037"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

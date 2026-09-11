@@ -33,20 +33,50 @@
 
 namespace AscendC {
 template <typename T>
+/**
+ * @ingroup simd_api.basic_api.atomic_operations
+ * @override_id SetAtomicType__z
+ * @archs 3510 2201 3002 2002
+ * @brief 通过设置模板参数来设定原子操作不同的数据类型。
+ */
 __aicore__ inline void SetAtomicType();
 
 template <typename T>
+/**
+ * @ingroup simd_api.basic_api.atomic_operations
+ * @override_id SetAtomicAdd__z
+ * @archs 3510 2201 3002 2002 1001
+ * @brief 对后续目的地址为GM的数据搬运开启原子累加。原子累加过程：将待拷贝的内容和GM已有内容进行求和，然后将求和结果写入GM。SetAtomicAdd接口可通过模板参数设定不同的累加数据类型。
+ */
 __aicore__ inline void SetAtomicAdd();
 
+/**
+ * @ingroup simd_api.basic_api.atomic_operations
+ * @override_id DisableDmaAtomic__z
+ * @archs 3510 2201 3002 2002 1001
+ * @brief 关闭数据搬运随路原子操作功能，后续执行数据搬运时，GM中原始数据将被新搬运数据完全覆盖。
+ */
 __aicore__ inline void DisableDmaAtomic();
 
 // SetAtomicNone has been updated, please use DisableDmaAtomic instead.
 __aicore__ inline void SetAtomicNone();
 
 template <typename T>
+/**
+ * @ingroup simd_api.basic_api.atomic_operations
+ * @override_id SetAtomicMax__z
+ * @archs 3510 2201
+ * @brief 设置后续搬运到GM的数据是否执行原子比较：将待拷贝的内容和GM已有内容进行比较，然后将最大值写入GM。SetAtomicMax接口可通过设置模板参数来设定不同的数据类型。
+ */
 __aicore__ inline void SetAtomicMax();
 
 template <typename T>
+/**
+ * @ingroup simd_api.basic_api.atomic_operations
+ * @override_id SetAtomicMin__z
+ * @archs 3510 2201
+ * @brief 设置后续搬运到GM的数据是否执行原子比较：将待拷贝的内容和GM已有内容进行比较，然后将最小值写入GM。SetAtomicMin接口可通过设置模板参数来设定不同的数据类型。
+ */
 __aicore__ inline void SetAtomicMin();
 } // namespace AscendC
 

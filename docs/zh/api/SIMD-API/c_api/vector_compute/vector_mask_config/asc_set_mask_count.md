@@ -11,8 +11,7 @@ usage_dependencies:
 signature:
   - override_id: "asc_set_mask_count__z"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_mask_config.h"
+    headers: [/include/c_api/vector_compute/compute/vector_mask_config.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -55,8 +54,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_set_mask_count__z"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_mask_config.h"
+  headers: [/include/c_api/vector_compute/compute/vector_mask_config.h]
 ```
 
 ```cpp

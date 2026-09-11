@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetInputStartPosition
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3D_Kernel/SetInputStartPosition.md
+description: 设置单核上特征矩阵Input载入数据的起始位置。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetInputStartPosition__i64_i64
+  archs: ['2201']
+  headers: [/include/adv_api/conv/conv3d/conv3d_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetInputStartPosition
 
 ## 产品支持情况
@@ -28,6 +44,13 @@
 设置单核上特征矩阵Input载入数据的起始位置。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "SetInputStartPosition__i64_i64"
+  archs: ["2201"]
+  headers: ["/include/adv_api/conv/conv3d/conv3d_intf.h"]
+```
 
 ```
 __aicore__ inline void SetInputStartPosition(int64_t diStartPos, int64_t mStartPos)

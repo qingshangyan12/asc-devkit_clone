@@ -10,8 +10,7 @@ usage_dependencies:
 signature:
   - override_id: "asc_loadalign_mask_downsample__PUu32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -58,8 +57,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_loadalign_mask_downsample__PUu32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```c

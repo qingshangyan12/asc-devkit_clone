@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: MakeCoord
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/aux_data_structures/Coordinate/MakeCoord.md
+description: 将传入的数据打包成Coord数据结构。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # MakeCoord<a name="ZH-CN_TOPIC_0000002366586926"></a>
 
 ## 产品支持情况<a name="section73648168211"></a>

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Brcb
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_padding/Brcb.md
+description: Brcb接口对输入数据，每一次取输入张量中的8个数进行填充操作，将每个数填充到结果张量的一个DataBlock（32字节）中。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Brcb<a name="ZH-CN_TOPIC_0000002543424524"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

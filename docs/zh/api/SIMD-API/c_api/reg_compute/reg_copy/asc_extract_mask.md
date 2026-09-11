@@ -10,12 +10,10 @@ usage_dependencies:
 signature:
   - override_id: "asc_extract_mask__vu16_i16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_copy.h"
+    headers: [/include/c_api/reg_compute/reg_copy.h]
   - override_id: "asc_extract_mask__vu32_i16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_copy.h"
+    headers: [/include/c_api/reg_compute/reg_copy.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -69,8 +67,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_extract_mask__vu16_i16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_copy.h"
+  headers: [/include/c_api/reg_compute/reg_copy.h]
 ```
 
 ```c
@@ -82,8 +79,7 @@ __simd_callee__ inline vector_bool asc_extract_mask(vector_uint16_t src,
 api_signature:
   override_id: "asc_extract_mask__vu32_i16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_copy.h"
+  headers: [/include/c_api/reg_compute/reg_copy.h]
 ```
 
 ```c

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: End
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3DBackpropInput_Kernel/End.md
+description: 在Conv3DBackpropInput卷积反向计算完成后，必须调用一次End，以清除EventID并释放内部申请的临时内存。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: End__z
+  archs: ['2201']
+  headers: [/include/adv_api/conv_backprop/conv3d_bp_input_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # End
 
 ## 产品支持情况
@@ -28,6 +44,13 @@
 在Conv3DBackpropInput卷积反向计算完成后，必须调用一次End，以清除EventID并释放内部申请的临时内存。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "End__z"
+  archs: ["2201"]
+  headers: ["/include/adv_api/conv_backprop/conv3d_bp_input_intf.h"]
+```
 
 ```
 __aicore__ inline void End()

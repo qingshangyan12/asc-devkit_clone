@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: Round
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/Round_interface/Round.md
+description: 将输入的元素四舍五入到最接近的整数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Round__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/round.h]
+- override_id: Round__RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/round.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Round
 
 ## 产品支持情况
@@ -39,12 +58,26 @@ Round\(-3.4\) = -3.0
 
 -   通过sharedTmpBuffer入参传入临时空间
 
+```yaml
+api_signature:
+  override_id: "Round__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/round.h"]
+```
+
     ```
     template <typename T, bool isReuseSource = false>
     __aicore__ inline void Round(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
     ```
 
 -   接口框架申请临时空间
+
+```yaml
+api_signature:
+  override_id: "Round__RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/round.h"]
+```
 
     ```
     template <typename T, bool isReuseSource = false>

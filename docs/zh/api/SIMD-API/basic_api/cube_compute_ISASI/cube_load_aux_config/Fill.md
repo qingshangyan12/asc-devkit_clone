@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Fill
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_load_aux_config/Fill.md
+description: 将特定物理存储位置的LocalTensor初始化为某一具体数值。仅支持L1 Buffer/L0A Buffer/L0B Buffer上的LocalTensor初始化。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Fill<a name="ZH-CN_TOPIC_0000001834660669"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: TBufPool构造函数
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/TBufPool/TBufPool_constructor.md
+description: 创建TBufPool对象时，初始化数据成员。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: TBufPool__z
+  archs: ['3510', '2201', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_tpipe.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # TBufPool构造函数<a name="ZH-CN_TOPIC_0000002019602020"></a>
 
 ## 产品支持情况
@@ -38,6 +54,13 @@
 创建TBufPool对象时，初始化数据成员。
 
 ## 函数原型<a name="zh-cn_topic_0000001935531088_zh-cn_topic_0000001339105488_section13230182415108"></a>
+
+```yaml
+api_signature:
+  override_id: "TBufPool__z"
+  archs: ["3510", "2201", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_tpipe.h"]
+```
 
 ```cpp
 template <TPosition pos, uint32_t bufIDSize = defaultBufIDSize>

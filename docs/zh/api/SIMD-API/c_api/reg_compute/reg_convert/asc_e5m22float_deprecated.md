@@ -9,20 +9,16 @@ usage_dependencies:
 signature:
   - override_id: "asc_e5m22float__Rvf32_vf8e5m2_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_e5m22float_v2__Rvf32_vf8e5m2_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_e5m22float_v3__Rvf32_vf8e5m2_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_e5m22float_v4__Rvf32_vf8e5m2_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -73,8 +69,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_e5m22float__Rvf32_vf8e5m2_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -85,8 +80,7 @@ __simd_callee__ inline void asc_e5m22float(vector_float& dst, vector_fp8_e5m2_t 
 api_signature:
   override_id: "asc_e5m22float_v2__Rvf32_vf8e5m2_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -97,8 +91,7 @@ __simd_callee__ inline void asc_e5m22float_v2(vector_float& dst, vector_fp8_e5m2
 api_signature:
   override_id: "asc_e5m22float_v3__Rvf32_vf8e5m2_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -109,8 +102,7 @@ __simd_callee__ inline void asc_e5m22float_v3(vector_float& dst, vector_fp8_e5m2
 api_signature:
   override_id: "asc_e5m22float_v4__Rvf32_vf8e5m2_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp

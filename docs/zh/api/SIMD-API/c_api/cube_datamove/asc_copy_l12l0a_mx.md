@@ -11,18 +11,16 @@ usage_dependencies:
 signature:
   - override_id: "asc_copy_l12l0a_mx__u64_PL1f8e8m0_u16_u16_u8_u8_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_copy_l12l0a_mx_sync__u64_PL1f8e8m0_u16_u16_u8_u8_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad_mx"
     archs: ["3510"]
     override_id: "asc_copy_l12l0a_mx__u64_PL1f8e8m0_u16_u16_u8_u8_u16_u16"
     file: "mmad_mx.asc"
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_copy_l12l0a_mx
@@ -73,8 +71,7 @@ $$
 api_signature:
   override_id: "asc_copy_l12l0a_mx__u64_PL1f8e8m0_u16_u16_u8_u8_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
 ```cpp
@@ -92,8 +89,7 @@ __aicore__ inline void asc_copy_l12l0a_mx(uint64_t dst,
 api_signature:
   override_id: "asc_copy_l12l0a_mx_sync__u64_PL1f8e8m0_u16_u16_u8_u8_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
 ```cpp

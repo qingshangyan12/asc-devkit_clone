@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Log2
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/basic_arithmetic/Log2.md
+description: 该接口用于根据mask对输入数据srcReg进行求以2为底的对数操作，将结果写入dstReg。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Log2<a name="ZH-CN_TOPIC_0000002008231220"></a>
 
 ## 产品支持情况

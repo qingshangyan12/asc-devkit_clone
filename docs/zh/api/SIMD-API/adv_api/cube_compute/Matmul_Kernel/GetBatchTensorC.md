@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetBatchTensorC
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/GetBatchTensorC.md
+description: 调用一次GetBatchTensorC，会获取C矩阵片，该接口可以与[IterateNBatch](IterateNBatch.md)异步接口配合使用。用于在调用IterateNBatch迭代计算后，获取一片std::max\(batchA,
+  batchB\) \* singleCoreM \* singleCoreN大小的矩阵分片。
+tag: [adv_api]
+usage_dependencies:
+  status: confirmed
+  companion:
+  - IterateNBatch.md
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetBatchTensorC
 
 ## 产品支持情况

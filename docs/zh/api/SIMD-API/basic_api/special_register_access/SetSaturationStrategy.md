@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: SetSaturationStrategy
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/special_register_access/SetSaturationStrategy.md
+description: 设置精度转换接口使用的饱和模式配置策略。
+tag: [basic_api]
+usage_dependencies:
+  status: confirmed
+  companion:
+  - ../memory_vector_compute/type_conversion/Cast.md
+  - ../reg_vector_compute/type_conversion/Cast.md
+signature:
+- override_id: SetSaturationStrategy__z
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_common_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetSaturationStrategy
 
 ## 产品支持情况
@@ -42,6 +61,13 @@
 具体支持的数据类型和转换组合以各Cast接口资料为准，可通过[GetSaturationStrategy](GetSaturationStrategy.md)查询当前使用的配置策略。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "SetSaturationStrategy__z"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_common_intf.h"]
+```
 
 ```cpp
 template <OverrideStrategy strategy>

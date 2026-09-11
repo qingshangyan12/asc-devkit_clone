@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Pad Tiling
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/tensor_transform/Pad-Tiling.md
+description: 用于获取Pad Tiling参数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Pad Tiling
 
 ## 功能说明

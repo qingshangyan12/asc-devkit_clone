@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetLoadDataPaddingValue
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_load_aux_config/SetLoadDataPaddingValue.md
+description: 用于调用[LoadData（卷积数据搬运）](../cube_compute_load/LoadData_3D.md)接口时设置Pad填充的数值。LoadData（卷积数据搬运）的模板参数isSetPadding设置为false时，用户需要通过本接口设置Pad填充的数值，设置为true时，本接口设置的填充值不生效。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetLoadDataPaddingValue__pT
+  archs: ['3510', '2201', '3002', '2002', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_mm_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetLoadDataPaddingValue<a name="ZH-CN_TOPIC_0000001834740625"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -38,6 +54,13 @@
 用于调用[LoadData（卷积数据搬运）](../cube_compute_load/LoadData_3D.md)接口时设置Pad填充的数值。LoadData（卷积数据搬运）的模板参数isSetPadding设置为false时，用户需要通过本接口设置Pad填充的数值，设置为true时，本接口设置的填充值不生效。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "SetLoadDataPaddingValue__pT"
+  archs: ["3510", "2201", "3002", "2002", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_mm_intf.h"]
+```
 
 ```cpp
 template <typename T>

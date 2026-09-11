@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Pack
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/MaskReg_compute/Pack.md
+description: 根据所选的低位模式或高位模式，将源操作数src的偶数位bit，提取到目的操作数dst的低半部分或高半部分。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Pack<a name="ZH-CN_TOPIC_0000001952378504"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

@@ -1,3 +1,24 @@
+---
+okftype: reference.api.cpp
+title: SetFixpipePreQuantFlag
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_store_aux_config/SetFixpipePreQuantFlag.md
+description: DataCopy数据搬运（[L0C Buffer->GM](../cube_compute_store/Fixpipe_L0CToGM.md)、[L0C
+  Buffer->L1 Buffer](../cube_compute_store/Fixpipe_L0CToL1.md)）过程中进行随路量化时，通过调用该接口设置scalar量化参数。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetFixpipePreQuantFlag__u64
+  archs: ['3510', '2201', '3002', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_fixpipe_intf.h]
+examples:
+- path: /examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_l0c2gm
+  archs: ['2201', '3510']
+  override_id: SetFixpipePreQuantFlag__u64
+  file: data_copy_l0c2gm.asc
+timestamp: '2026-09-11'
+---
+
 # SetFixpipePreQuantFlag<a name="ZH-CN_TOPIC_0000002538071284"></a>
 
 ## 产品支持情况<a name="zh-cn_topic_0000002516049318_section18204144912492"></a>
@@ -36,6 +57,13 @@
 DataCopy数据搬运（[L0C Buffer->GM](../cube_compute_store/Fixpipe_L0CToGM.md)、[L0C Buffer->L1 Buffer](../cube_compute_store/Fixpipe_L0CToL1.md)）过程中进行随路量化时，通过调用该接口设置scalar量化参数。
 
 ## 函数原型<a name="zh-cn_topic_0000002516049318_section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "SetFixpipePreQuantFlag__u64"
+  archs: ["3510", "2201", "3002", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_fixpipe_intf.h"]
+```
 
 ```cpp
 __aicore__ inline void SetFixpipePreQuantFlag(uint64_t config)

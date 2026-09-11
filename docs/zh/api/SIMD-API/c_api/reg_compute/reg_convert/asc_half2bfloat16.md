@@ -9,44 +9,34 @@ usage_dependencies:
 signature:
   - override_id: "asc_half2bfloat16_rd__Rvbf16_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2bfloat16_rn__Rvbf16_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2bfloat16_rna__Rvbf16_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2bfloat16_ru__Rvbf16_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2bfloat16_rz__Rvbf16_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2bfloat16_rd__vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2bfloat16_rn__vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2bfloat16_rna__vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2bfloat16_ru__vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2bfloat16_rz__vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -89,8 +79,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_half2bfloat16_rd__Rvbf16_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -104,8 +93,7 @@ __simd_callee__ inline void asc_half2bfloat16_rd(vector_bfloat16_t& dst,
 api_signature:
   override_id: "asc_half2bfloat16_rn__Rvbf16_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -119,8 +107,7 @@ __simd_callee__ inline void asc_half2bfloat16_rn(vector_bfloat16_t& dst,
 api_signature:
   override_id: "asc_half2bfloat16_rna__Rvbf16_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -134,8 +121,7 @@ __simd_callee__ inline void asc_half2bfloat16_rna(vector_bfloat16_t& dst,
 api_signature:
   override_id: "asc_half2bfloat16_ru__Rvbf16_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -149,8 +135,7 @@ __simd_callee__ inline void asc_half2bfloat16_ru(vector_bfloat16_t& dst,
 api_signature:
   override_id: "asc_half2bfloat16_rz__Rvbf16_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -164,8 +149,7 @@ __simd_callee__ inline void asc_half2bfloat16_rz(vector_bfloat16_t& dst,
 api_signature:
   override_id: "asc_half2bfloat16_rd__vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -179,8 +163,7 @@ __simd_callee__ inline vector_bfloat16_t asc_half2bfloat16_rd(vector_half src,
 api_signature:
   override_id: "asc_half2bfloat16_rn__vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -194,8 +177,7 @@ __simd_callee__ inline vector_bfloat16_t asc_half2bfloat16_rn(vector_half src,
 api_signature:
   override_id: "asc_half2bfloat16_rna__vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -209,8 +191,7 @@ __simd_callee__ inline vector_bfloat16_t asc_half2bfloat16_rna(vector_half src,
 api_signature:
   override_id: "asc_half2bfloat16_ru__vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -224,8 +205,7 @@ __simd_callee__ inline vector_bfloat16_t asc_half2bfloat16_ru(vector_half src,
 api_signature:
   override_id: "asc_half2bfloat16_rz__vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -243,8 +223,7 @@ __simd_callee__ inline vector_bfloat16_t asc_half2bfloat16_rz(vector_half src,
 api_signature:
   override_id: "asc_half2bfloat16_rna__Rvbf16_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -258,8 +237,7 @@ __simd_callee__ inline void asc_half2bfloat16_rna(vector_bfloat16_t& dst,
 api_signature:
   override_id: "asc_half2bfloat16_rna__vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c

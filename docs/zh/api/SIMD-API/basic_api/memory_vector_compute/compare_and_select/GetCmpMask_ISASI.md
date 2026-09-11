@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetCmpMask\(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/GetCmpMask_ISASI.md
+description: 此接口用于获取[Compare（结果存入寄存器）](Compare_store_to_register.md)指令的比较结果。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetCmpMask__RCltg1x2_pT
+  archs: ['3510', '2201', '2002']
+  headers: [/include/basic_api/kernel_operator_vec_cmpsel_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetCmpMask\(ISASI\)<a name="ZH-CN_TOPIC_0000001836766209"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -34,6 +50,13 @@
 [Compare（结果存入寄存器）](Compare_store_to_register.md)指令会将比较后的结果写入CmpMask寄存器中，使用GetCmpMask接口可以获取到CmpMask寄存器的值从而得到Compare的结果。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "GetCmpMask__RCltg1x2_pT"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/basic_api/kernel_operator_vec_cmpsel_intf.h"]
+```
 
 ```cpp
 template<typename T>

@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: SetMMColumnMajor/SetMMRowMajor
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute_aux_config/SetMMColumnMajor-SetMMRowMajor.md
+description: 控制Mmad/MmadWithSparse优先通过M/N的哪个方向。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetMMColumnMajor__z
+  archs: ['3510', '2201', '3002']
+  headers: [/include/basic_api/kernel_operator_mm_intf.h]
+- override_id: SetMMRowMajor__z
+  archs: ['3510', '2201', '3002']
+  headers: [/include/basic_api/kernel_operator_mm_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetMMColumnMajor/SetMMRowMajor
 
 ## 产品支持情况
@@ -31,8 +50,25 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "SetMMColumnMajor__z"
+  archs: ["3510", "2201", "3002"]
+  headers: ["/include/basic_api/kernel_operator_mm_intf.h"]
+```
+
 ```cpp
 __aicore__ inline void SetMMColumnMajor() // 代表CUBE将首先通过M方向，然后通过N方向生成结果
+```
+
+```yaml
+api_signature:
+  override_id: "SetMMRowMajor__z"
+  archs: ["3510", "2201", "3002"]
+  headers: ["/include/basic_api/kernel_operator_mm_intf.h"]
+```
+
+```cpp
 __aicore__ inline void SetMMRowMajor()   // 代表CUBE将首先通过N方向，然后通过M方向产生结果
 ```
 

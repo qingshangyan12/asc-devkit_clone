@@ -9,12 +9,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_copy_gm2ub_align__PU<dtype>_PG<dtype>_u32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - prototype_id: "asc_copy_gm2ub_align__PU<dtype>_PG<dtype>_u32_u32_u8_u8_b_loadl2_u64_u32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
 examples:
   - path: "/examples/02_simd_c_api/02_features/00_data_movement/00_set_l2_cache_mode"
     archs: ["3510", "2201"]
@@ -94,8 +92,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_copy_gm2ub_align__PU<dtype>_PG<dtype>_u32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
   dtype:
     values:
       - "int8_t"
@@ -137,8 +134,7 @@ __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ bfloat16_t* dst,
 api_signature:
   prototype_id: "asc_copy_gm2ub_align__PU<dtype>_PG<dtype>_u32_u32_u8_u8_b_loadl2_u64_u32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
   dtype:
     values:
       - "int8_t"

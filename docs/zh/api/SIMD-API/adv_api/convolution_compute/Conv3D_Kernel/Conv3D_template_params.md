@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Conv3D模板参数
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3D_Kernel/Conv3D_template_params.md
+description: 创建Conv3D对象时需要传入：。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Conv3D模板参数
 
 ## 产品支持情况

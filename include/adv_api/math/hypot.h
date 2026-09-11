@@ -51,6 +51,14 @@ namespace AscendC {
  * \note src/dst Tensor must be 32B align, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  */
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.math_compute.hypot_interface
+ * @override_id Hypot__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8
+ * @archs 3510
+ * @brief 按元素计算两个浮点数平方和的平方根。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] sharedTmpBuffer 临时缓存。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。用于Hypot内部复杂计算时存储中间变量，由开发者提供。临时空间大小BufferSize的获取方式请参考[GetHypotMaxMinTmpSize](GetHypotMaxMinTmpSize.md)。
+ */
 __aicore__ inline void Hypot(
     const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
     const LocalTensor<uint8_t>& sharedTmpBuffer)
@@ -80,6 +88,15 @@ __aicore__ inline void Hypot(
  * \note src/dst Tensor must be 32B align, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  */
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.math_compute.hypot_interface
+ * @override_id Hypot__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+ * @archs 3510
+ * @brief 按元素计算两个浮点数平方和的平方根。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] sharedTmpBuffer 临时缓存。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。用于Hypot内部复杂计算时存储中间变量，由开发者提供。临时空间大小BufferSize的获取方式请参考[GetHypotMaxMinTmpSize](GetHypotMaxMinTmpSize.md)。
+ * @param [in] calCount 参与计算的元素个数。
+ */
 __aicore__ inline void Hypot(
     const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
@@ -102,6 +119,13 @@ __aicore__ inline void Hypot(
  * \note src/dst Tensor must be 32B align, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  */
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.math_compute.hypot_interface
+ * @override_id Hypot__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT
+ * @archs 3510
+ * @brief 按元素计算两个浮点数平方和的平方根。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ */
 __aicore__ inline void Hypot(
     const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor)
 {
@@ -125,6 +149,14 @@ __aicore__ inline void Hypot(
  * \note src/dst Tensor must be 32B align, and it doesn't allow src/dst/sharedTmpBuffer tensor address overlap.
  */
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.math_compute.hypot_interface
+ * @override_id Hypot__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32
+ * @archs 3510
+ * @brief 按元素计算两个浮点数平方和的平方根。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] calCount 参与计算的元素个数。
+ */
 __aicore__ inline void Hypot(
     const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
     const uint32_t calCount)

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Sqrt
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/basic_arithmetic/Sqrt.md
+description: 该接口根据mask，对源操作数srcReg逐元素做平方根运算，将结果写入目的操作数dstReg。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Sqrt<a name="ZH-CN_TOPIC_0000001929668256"></a>
 
 ## 产品支持情况

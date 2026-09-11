@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetMMConfig
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/GetMMConfig.md
+description: 灵活的自定义Matmul模板参数配置。通过设置[MatmulConfigMode](#table17837129144319)、[MatmulShapeParams](#table16317184295116)、[MatmulQuantParams](#table8313111211573)、[MatmulBatchParams](#table15129204644)、[MatmulFuncParams](#table66217141862)，获取自定义的[MatmulConfig](MatmulConfig.md#matmulconfig-params)。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetMMConfig__QOpArgTypes
+  archs: ['3510', '2201', '2002', x90]
+  headers: [/include/adv_api/matmul/tiling.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetMMConfig
 
 ## 产品支持情况
@@ -36,6 +52,13 @@
 MatmulConfigMode指定了获取并要修改的MatmulConfig模板，各模板介绍请参考[模板特性](MatmulConfig.md#template-features)；用户根据使用需求通过设置可变参数，即一个或多个任意顺序的MatmulShapeParams、MatmulQuantParams、MatmulBatchParams、MatmulFuncParams，修改该MatmulConfig模板的相应参数配置。相比[GetNormalConfig](GetNormalConfig.md)、[GetMDLConfig](GetMDLConfig.md)等获取模板的接口，该接口提供了更灵活的自定义Matmul模板参数的配置方式。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "GetMMConfig__QOpArgTypes"
+  archs: ["3510", "2201", "2002", "x90"]
+  headers: ["/include/adv_api/matmul/tiling.h"]
+```
 
 ```
 template <MatmulConfigMode configMode, typename... ArgTypes>

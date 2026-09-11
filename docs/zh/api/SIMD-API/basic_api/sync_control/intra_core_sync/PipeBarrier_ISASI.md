@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: PipeBarrier\(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/PipeBarrier_ISASI.md
+description: 如下图1所示，完成同一流水线内的同步控制，用于在同一流水线内部约束执行顺序。其作用是，保证前序指令中所有数据的读写工作全部完成，后序指令才能执行。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: PipeBarrier__z
+  archs: ['3510', '2201', '3002', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_block_sync_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # PipeBarrier\(ISASI\)<a name="ZH-CN_TOPIC_0000001835308877"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -41,6 +57,13 @@
 ![](../../../../figures/pipebarrier_function_diagram.png "PipeBarrier_接口功能示意图")
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "PipeBarrier__z"
+  archs: ["3510", "2201", "3002", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_block_sync_intf.h"]
+```
 
 ```cpp
 template <pipe_t pipe>

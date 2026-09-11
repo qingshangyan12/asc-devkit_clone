@@ -9,88 +9,67 @@ usage_dependencies:
 signature:
   - override_id: "asc_duplicate__PUf16_f16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
   - override_id: "asc_duplicate__PUi16_i16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
   - override_id: "asc_duplicate__PUu16_u16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
   - override_id: "asc_duplicate__PUbf16_bf16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
   - override_id: "asc_duplicate__PUf32_f32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
   - override_id: "asc_duplicate__PUi32_i32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
   - override_id: "asc_duplicate__PUu32_u32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
   - override_id: "asc_duplicate__PUf16_f16_u8_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
   - override_id: "asc_duplicate__PUi16_i16_u8_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
   - override_id: "asc_duplicate__PUu16_u16_u8_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
   - override_id: "asc_duplicate__PUbf16_bf16_u8_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
   - override_id: "asc_duplicate__PUf32_f32_u8_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
   - override_id: "asc_duplicate__PUi32_i32_u8_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
   - override_id: "asc_duplicate__PUu32_u32_u8_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
   - override_id: "asc_duplicate_sync__PUf16_f16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_duplicate_sync__PUi16_i16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_duplicate_sync__PUu16_u16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_duplicate_sync__PUbf16_bf16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_duplicate_sync__PUf32_f32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_duplicate_sync__PUi32_i32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_duplicate_sync__PUu32_u32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -135,8 +114,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_duplicate__PUf16_f16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
 ```
 
     ```cpp
@@ -147,8 +125,7 @@ api_signature:
 api_signature:
   override_id: "asc_duplicate__PUi16_i16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
 ```
 
     ```cpp
@@ -159,8 +136,7 @@ api_signature:
 api_signature:
   override_id: "asc_duplicate__PUu16_u16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
 ```
 
     ```cpp
@@ -171,8 +147,7 @@ api_signature:
 api_signature:
   override_id: "asc_duplicate__PUbf16_bf16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
 ```
 
     ```cpp
@@ -183,8 +158,7 @@ api_signature:
 api_signature:
   override_id: "asc_duplicate__PUf32_f32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
 ```
 
     ```cpp
@@ -195,8 +169,7 @@ api_signature:
 api_signature:
   override_id: "asc_duplicate__PUi32_i32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
 ```
 
     ```cpp
@@ -207,8 +180,7 @@ api_signature:
 api_signature:
   override_id: "asc_duplicate__PUu32_u32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
 ```
 
     ```cpp
@@ -221,8 +193,7 @@ api_signature:
 api_signature:
   override_id: "asc_duplicate__PUf16_f16_u8_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
 ```
 
     ```cpp
@@ -233,8 +204,7 @@ api_signature:
 api_signature:
   override_id: "asc_duplicate__PUi16_i16_u8_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
 ```
 
     ```cpp
@@ -245,8 +215,7 @@ api_signature:
 api_signature:
   override_id: "asc_duplicate__PUu16_u16_u8_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
 ```
 
     ```cpp
@@ -257,8 +226,7 @@ api_signature:
 api_signature:
   override_id: "asc_duplicate__PUbf16_bf16_u8_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
 ```
 
     ```cpp
@@ -269,8 +237,7 @@ api_signature:
 api_signature:
   override_id: "asc_duplicate__PUf32_f32_u8_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
 ```
 
     ```cpp
@@ -281,8 +248,7 @@ api_signature:
 api_signature:
   override_id: "asc_duplicate__PUi32_i32_u8_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
 ```
 
     ```cpp
@@ -293,8 +259,7 @@ api_signature:
 api_signature:
   override_id: "asc_duplicate__PUu32_u32_u8_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
 ```
 
     ```cpp
@@ -307,8 +272,7 @@ api_signature:
 api_signature:
   override_id: "asc_duplicate_sync__PUf16_f16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -319,8 +283,7 @@ api_signature:
 api_signature:
   override_id: "asc_duplicate_sync__PUi16_i16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -331,8 +294,7 @@ api_signature:
 api_signature:
   override_id: "asc_duplicate_sync__PUu16_u16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -343,8 +305,7 @@ api_signature:
 api_signature:
   override_id: "asc_duplicate_sync__PUbf16_bf16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -355,8 +316,7 @@ api_signature:
 api_signature:
   override_id: "asc_duplicate_sync__PUf32_f32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -367,8 +327,7 @@ api_signature:
 api_signature:
   override_id: "asc_duplicate_sync__PUi32_i32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -379,8 +338,7 @@ api_signature:
 api_signature:
   override_id: "asc_duplicate_sync__PUu32_u32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp

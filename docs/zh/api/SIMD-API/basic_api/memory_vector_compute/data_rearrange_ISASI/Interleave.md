@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Interleave
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_rearrange_ISASI/Interleave.md
+description: 给定源操作数src0和src1，将src0和src1中的元素交织存入结果操作数dst0和dst1中。交织排列方式如下图所示，其中每个方格代表一个元素。
+tag: [basic_api, 'operations:interleave']
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Interleave__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_i32
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_vec_duplicate_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Interleave<a name="ZH-CN_TOPIC_0000002166544241"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -34,6 +50,13 @@
 ![](../../../../figures/interleave_memory.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "Interleave__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_i32"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_vec_duplicate_intf.h"]
+```
 
 ```
 template <typename T>

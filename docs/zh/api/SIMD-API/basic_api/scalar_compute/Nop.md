@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Nop
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/scalar_compute/Nop.md
+description: 用户输入延迟的个数，实现延迟若干个cycle。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Nop__z
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_utils_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Nop
 
 ## 产品支持情况
@@ -31,6 +47,13 @@
 用户输入延迟的个数，实现延迟若干个cycle。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "Nop__z"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_utils_intf.h"]
+```
 
 ```cpp
 template <int count = 1>

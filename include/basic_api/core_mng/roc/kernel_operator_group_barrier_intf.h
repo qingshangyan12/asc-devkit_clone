@@ -35,9 +35,27 @@ template <PipeMode pipeMode>
 class GroupBarrier {
 public:
     __aicore__ inline GroupBarrier(GM_ADDR groupWorkspace, uint32_t arriveSizeIn, uint32_t waitSizeIn);
+/**
+ * @ingroup simd_api.basic_api.cube_group_mgmt_isasi.groupbarrier
+ * @override_id Arrive__u32
+ * @archs 3510 2201
+ * @brief 通知其他等待的AIV，本AIV已经完成其依赖的任务。
+ */
     __aicore__ inline void Arrive(uint32_t arriveIndex);
     // stuck in while loop until all aiv has arrived, then update wait counter
+/**
+ * @ingroup simd_api.basic_api.cube_group_mgmt_isasi.groupbarrier
+ * @override_id Wait__u32
+ * @archs 3510 2201
+ * @brief 阻塞该AIV需要等待Arrive组全部完成任务，再开始执行任务。
+ */
     __aicore__ inline void Wait(uint32_t waitIndex);
+/**
+ * @ingroup simd_api.basic_api.cube_group_mgmt_isasi.groupbarrier
+ * @override_id GetWorkspaceLen__z
+ * @archs 3510 2201
+ * @brief 返回当前GroupBarrier所占用的Global Memory消息空间大小。
+ */
     __aicore__ inline uint64_t GetWorkspaceLen();
 
 private:

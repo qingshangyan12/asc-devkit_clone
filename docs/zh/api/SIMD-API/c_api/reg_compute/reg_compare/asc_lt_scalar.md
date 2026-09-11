@@ -10,12 +10,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_lt_scalar__v<dtype>_<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_compare.h"
+    headers: [/include/c_api/reg_compute/compute/reg_compare.h]
   - prototype_id: "asc_lt_scalar__Rvb_v<dtype>_<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_compare.h"
+    headers: [/include/c_api/reg_compute/compute/reg_compare.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -68,8 +66,7 @@ $$
 api_signature:
   prototype_id: "asc_lt_scalar__v<dtype>_<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_compare.h"
+  headers: [/include/c_api/reg_compute/compute/reg_compare.h]
   dtype:
     values:
       - "int8_t"
@@ -94,8 +91,7 @@ __simd_callee__ inline vector_bool asc_lt_scalar(vector_<dtype> src,
 api_signature:
   prototype_id: "asc_lt_scalar__Rvb_v<dtype>_<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_compare.h"
+  headers: [/include/c_api/reg_compute/compute/reg_compare.h]
   dtype:
     values:
       - "int8_t"

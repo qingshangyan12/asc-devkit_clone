@@ -9,20 +9,16 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_gather_datablock__Rv<dst_dtype>_PU<src_dtype>_vu32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/gather/ub_gather.h"
+    headers: [/include/c_api/reg_compute/gather/ub_gather.h]
   - prototype_id: "asc_gather_datablock__PU<src_dtype>_vu32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/gather/ub_gather.h"
+    headers: [/include/c_api/reg_compute/gather/ub_gather.h]
   - prototype_id: "asc_gather_datablock__Rv<dst_dtype>_PU<src_dtype>_vu32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/gather/ub_gather.h"
+    headers: [/include/c_api/reg_compute/gather/ub_gather.h]
   - prototype_id: "asc_gather_datablock__PU<src_dtype>_vu32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/gather/ub_gather.h"
+    headers: [/include/c_api/reg_compute/gather/ub_gather.h]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_gather"
     archs: ["3510"]
@@ -75,8 +71,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_gather_datablock__Rv<dst_dtype>_PU<src_dtype>_vu32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/gather/ub_gather.h"
+  headers: [/include/c_api/reg_compute/gather/ub_gather.h]
   dtype:
     variants:
       -
@@ -147,8 +142,7 @@ __simd_callee__ inline void asc_gather_datablock(vector_<dst_dtype>& dst,
 api_signature:
   prototype_id: "asc_gather_datablock__PU<src_dtype>_vu32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/gather/ub_gather.h"
+  headers: [/include/c_api/reg_compute/gather/ub_gather.h]
   dtype:
     variants:
       -
@@ -237,8 +231,7 @@ __simd_callee__ inline vector_int8_t asc_gather_datablock(__ubuf__ int8_t* src,
 api_signature:
   prototype_id: "asc_gather_datablock__Rv<dst_dtype>_PU<src_dtype>_vu32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/gather/ub_gather.h"
+  headers: [/include/c_api/reg_compute/gather/ub_gather.h]
   dtype:
     variants:
       -
@@ -308,8 +301,7 @@ __simd_callee__ inline void asc_gather_datablock(vector_<dst_dtype>& dst,
 api_signature:
   prototype_id: "asc_gather_datablock__PU<src_dtype>_vu32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/gather/ub_gather.h"
+  headers: [/include/c_api/reg_compute/gather/ub_gather.h]
   dtype:
     variants:
       -

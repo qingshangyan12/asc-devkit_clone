@@ -9,114 +9,88 @@ usage_dependencies:
 signature:
   - override_id: "asc_copy_l12l0b_trans__PCBbf16_PL1bf16_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_copy_l12l0b_trans__PCBf8e4m3_PL1f8e4m3_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_copy_l12l0b_trans__PCBf8e5m2_PL1f8e5m2_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_copy_l12l0b_trans__PCBf16_PL1f16_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_copy_l12l0b_trans__PCBf32_PL1f32_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_copy_l12l0b_trans__PCBhf8_PL1hf8_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_copy_l12l0b_trans__PCBi32_PL1i32_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_copy_l12l0b_trans__PCBi8_PL1i8_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_copy_l12l0b_trans__PCBu32_PL1u32_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_copy_l12l0b_trans__PCBu8_PL1u8_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_copy_l12l0b_trans__PCBi4x2_PL1i4x2_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_copy_l12l0b_trans__PCBf4e2m1x2_PL1f4e2m1x2_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_copy_l12l0b_trans__PCBf4e1m2x2_PL1f4e1m2x2_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_copy_l12l0b_trans_sync__PCBbf16_PL1bf16_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_copy_l12l0b_trans_sync__PCBf8e4m3_PL1f8e4m3_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_copy_l12l0b_trans_sync__PCBf8e5m2_PL1f8e5m2_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_copy_l12l0b_trans_sync__PCBf16_PL1f16_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_copy_l12l0b_trans_sync__PCBf32_PL1f32_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_copy_l12l0b_trans_sync__PCBhf8_PL1hf8_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_copy_l12l0b_trans_sync__PCBi32_PL1i32_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_copy_l12l0b_trans_sync__PCBi8_PL1i8_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_copy_l12l0b_trans_sync__PCBu32_PL1u32_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_copy_l12l0b_trans_sync__PCBu8_PL1u8_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_copy_l12l0b_trans_sync__PCBi4x2_PL1i4x2_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_copy_l12l0b_trans_sync__PCBf4e2m1x2_PL1f4e2m1x2_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_copy_l12l0b_trans_sync__PCBf4e1m2x2_PL1f4e1m2x2_u16_u8_u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad"
     archs: ["3510"]
     override_id: "asc_copy_l12l0b_trans__PCBi8_PL1i8_u16_u8_u16_u16_u16_u16"
     file: "mmad_s1.h"
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_copy_l12l0b_trans
@@ -221,8 +195,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_copy_l12l0b_trans__PCBbf16_PL1bf16_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
   ```cpp
@@ -233,8 +206,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_trans__PCBf8e4m3_PL1f8e4m3_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
   ```cpp
@@ -245,8 +217,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_trans__PCBf8e5m2_PL1f8e5m2_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
   ```cpp
@@ -257,8 +228,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_trans__PCBf16_PL1f16_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
   ```cpp
@@ -269,8 +239,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_trans__PCBf32_PL1f32_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
   ```cpp
@@ -281,8 +250,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_trans__PCBhf8_PL1hf8_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
   ```cpp
@@ -293,8 +261,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_trans__PCBi32_PL1i32_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
   ```cpp
@@ -305,8 +272,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_trans__PCBi8_PL1i8_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
   ```cpp
@@ -317,8 +283,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_trans__PCBu32_PL1u32_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
   ```cpp
@@ -329,8 +294,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_trans__PCBu8_PL1u8_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
   ```cpp
@@ -341,8 +305,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_trans__PCBi4x2_PL1i4x2_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
   ```cpp
@@ -353,8 +316,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_trans__PCBf4e2m1x2_PL1f4e2m1x2_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
   ```cpp
@@ -365,8 +327,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_trans__PCBf4e1m2x2_PL1f4e1m2x2_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
   ```cpp
@@ -379,8 +340,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_trans_sync__PCBbf16_PL1bf16_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
   ```cpp
@@ -391,8 +351,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_trans_sync__PCBf8e4m3_PL1f8e4m3_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
   ```cpp
@@ -403,8 +362,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_trans_sync__PCBf8e5m2_PL1f8e5m2_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
   ```cpp
@@ -415,8 +373,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_trans_sync__PCBf16_PL1f16_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
   ```cpp
@@ -427,8 +384,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_trans_sync__PCBf32_PL1f32_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
   ```cpp
@@ -439,8 +395,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_trans_sync__PCBhf8_PL1hf8_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
   ```cpp
@@ -451,8 +406,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_trans_sync__PCBi32_PL1i32_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
   ```cpp
@@ -463,8 +417,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_trans_sync__PCBi8_PL1i8_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
   ```cpp
@@ -475,8 +428,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_trans_sync__PCBu32_PL1u32_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
   ```cpp
@@ -487,8 +439,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_trans_sync__PCBu8_PL1u8_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
   ```cpp
@@ -499,8 +450,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_trans_sync__PCBi4x2_PL1i4x2_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
   ```cpp
@@ -511,8 +461,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_trans_sync__PCBf4e2m1x2_PL1f4e2m1x2_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
   ```cpp
@@ -523,8 +472,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_trans_sync__PCBf4e1m2x2_PL1f4e1m2x2_u16_u8_u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
   ```cpp

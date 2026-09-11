@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: SimpleSoftMax
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/activation_functions/SoftMax_interface/SimpleSoftMax.md
+description: 将输入tensor\[m<sub>0</sub>, m<sub>1</sub>, ...m<sub>t</sub>, n\]（t大于等于0）的非尾轴长度相乘的结果看作m，则输入tensor的shape看作\[m,
+  n\]。对输入tensor\[m,n\]按行做如下计算，与[SoftMax](SoftMax.md)接口不同，该接口内部没有reduce过程计算sum和max数据，而是使用计算好的sum和max数据对输入tensor做Softmax计算。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SimpleSoftMax
 
 ## 产品支持情况

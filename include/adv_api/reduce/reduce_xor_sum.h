@@ -55,6 +55,17 @@ namespace AscendC {
  * @param [in] calCount: amount of data to be calculated
  */
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.reduction_operations.reducexorsum_interface
+ * @override_id ReduceXorSum__Rltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_Rltg1x2_u8_u32
+ * @archs 3510 2201 2002
+ * @brief 按照元素执行Xor（按位异或）运算，并将计算结果ReduceSum求和。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。输出值需要sizeof(T)大小的空间进行保存。开发者要根据该大小和框架的对齐要求来为dstTensor分配实际内存空间。**注意**：遵循框架对内存开辟的要求（开辟内存的大小满足32Byte对齐），即sizeof(T)不是32Byte对齐时，需要向上进行32Byte对齐。为了对齐而多开辟的内存空间不填值，为一些随机值。
+ * @param [in] src0Tensor 源操作数0。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] src1Tensor 源操作数1。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] sharedTmpBuffer 临时缓存。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。用于ReduceXorSum计算时存储中间变量，由开发者提供。临时空间大小BufferSize的获取方式请参考[GetReduceXorSumMaxMinTmpSize](GetReduceXorSumMaxMinTmpSize.md)。
+ * @param [in] calCount 参与计算的元素个数。
+ */
 __aicore__ inline void ReduceXorSum(
     LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
     LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
@@ -83,6 +94,16 @@ __aicore__ inline void ReduceXorSum(
  * @param [in] calCount: amount of data to be calculated
  */
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.reduction_operations.reducexorsum_interface
+ * @override_id ReduceXorSum__Rltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32
+ * @archs 3510 2201 2002
+ * @brief 按照元素执行Xor（按位异或）运算，并将计算结果ReduceSum求和。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。输出值需要sizeof(T)大小的空间进行保存。开发者要根据该大小和框架的对齐要求来为dstTensor分配实际内存空间。**注意**：遵循框架对内存开辟的要求（开辟内存的大小满足32Byte对齐），即sizeof(T)不是32Byte对齐时，需要向上进行32Byte对齐。为了对齐而多开辟的内存空间不填值，为一些随机值。
+ * @param [in] src0Tensor 源操作数0。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] src1Tensor 源操作数1。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] calCount 参与计算的元素个数。
+ */
 __aicore__ inline void ReduceXorSum(
     LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
     const uint32_t calCount)

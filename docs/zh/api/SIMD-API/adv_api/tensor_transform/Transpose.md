@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Transpose
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/tensor_transform/Transpose.md
+description: 对输入数据进行数据排布及Reshape操作。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Transpose
 
 ## 产品支持情况

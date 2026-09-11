@@ -9,20 +9,16 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_intlv__Rv<dtype>_Rv<dtype>_v<dtype>_v<dtype>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_intlv_b8__Rvb_Rvb_vb_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_intlv_b16__Rvb_Rvb_vb_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_intlv_b32__Rvb_Rvb_vb_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/data_relayout"
     archs: ["3510"]
@@ -80,8 +76,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_intlv__Rv<dtype>_Rv<dtype>_v<dtype>_v<dtype>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   dtype:
     values:
       - "int8_t"
@@ -126,8 +121,7 @@ __simd_callee__ inline void asc_intlv(vector_int8_t& dst0,
 api_signature:
   override_id: "asc_intlv_b8__Rvb_Rvb_vb_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```c
@@ -141,8 +135,7 @@ __simd_callee__ inline void asc_intlv_b8(vector_bool& dst0,
 api_signature:
   override_id: "asc_intlv_b16__Rvb_Rvb_vb_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```c
@@ -156,8 +149,7 @@ __simd_callee__ inline void asc_intlv_b16(vector_bool& dst0,
 api_signature:
   override_id: "asc_intlv_b32__Rvb_Rvb_vb_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```c

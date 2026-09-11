@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: global_tensor::SetL2CacheHint（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/deprecated_interface/set_l2_cache_hint_deprecated.md
+description: '**该接口已废弃，请使用[global_tensor::set_l2_cache_hint](../tensor/tensor.md#set_l2_cache_hint)替代。'
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetL2CacheHint__cachemode
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/tensor.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # global_tensor::SetL2CacheHint（废弃）
 
 ## 产品支持情况
@@ -33,6 +49,13 @@
 设置Global Tensor访问Global Memory时使用的L2 Cache Hint。迁移时需要将PascalCase的`AscendC::Te::CacheMode`枚举值替换为snake_case的`cache_mode`枚举值。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "SetL2CacheHint__cachemode"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/tensor.h"]
+```
 
 ```cpp
 __aicore__ inline constexpr void SetL2CacheHint(AscendC::Te::CacheMode mode);

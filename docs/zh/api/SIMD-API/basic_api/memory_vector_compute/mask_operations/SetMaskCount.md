@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetMaskCount
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/mask_operations/SetMaskCount.md
+description: 设置Mask模式为Counter模式。该模式下，不需要开发者去感知迭代次数、处理非对齐的尾块等操作，可直接传入计算数据量，实际迭代次数由Vector计算单元自动推断。本接口推荐配合API中isSetMask模板参数使用，当isSetMask为false时，支持用户调用本接口手动管理Counter模式，并通过[SetVectorMask](SetVectorMask.md)设置Counter模式下参与计算的元素个数。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetMaskCount__z
+  archs: ['3510', '2201', '3002', '2002', x90, '9030']
+  headers: [/include/basic_api/kernel_common.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetMaskCount<a name="ZH-CN_TOPIC_0000001790047006"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -38,6 +54,13 @@
 设置Mask模式为Counter模式。该模式下，不需要开发者去感知迭代次数、处理非对齐的尾块等操作，可直接传入计算数据量，实际迭代次数由Vector计算单元自动推断。本接口推荐配合API中isSetMask模板参数使用，当isSetMask为false时，支持用户调用本接口手动管理Counter模式，并通过[SetVectorMask](SetVectorMask.md)设置Counter模式下参与计算的元素个数。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "SetMaskCount__z"
+  archs: ["3510", "2201", "3002", "2002", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_common.h"]
+```
 
 ```cpp
 __aicore__ inline void SetMaskCount()

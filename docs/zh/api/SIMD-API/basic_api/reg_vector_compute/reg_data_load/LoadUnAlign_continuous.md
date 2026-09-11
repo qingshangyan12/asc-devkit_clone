@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: 连续非对齐搬入（LoadUnAlign）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/LoadUnAlign_continuous.md
+description: 为提升对不规则内存地址的处理能力，Reg矢量计算支持在数据搬运过程中对非32字节对齐的地址进行访问，降低非对齐访问带来的性能开销。LoadUnAlign能够实现数据从非对齐的Unified
+  Buffer（UB）连续搬运至[RegTensor](../register_data_types/RegTensor.md)，利用非对齐寄存器[UnalignRegForLoad](../register_data_types/UnalignRegForLoad-UnalignRegForStore.md)作为临时缓存区，暂存跨对齐边界的数据，从而实现高效的连续非对齐数据传输。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # 连续非对齐搬入（LoadUnAlign）<a name="ZH-CN_TOPIC_0000001955990981"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

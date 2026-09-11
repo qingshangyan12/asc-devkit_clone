@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetShapeAddr
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/aux_data_structures/TensorDesc/SetShapeAddr.md
+description: 配置用于储存shape信息的地址。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetShapeAddr<a name="ZH-CN_TOPIC_0000002306338958"></a>
 
 ## 产品支持情况<a name="section73648168211"></a>

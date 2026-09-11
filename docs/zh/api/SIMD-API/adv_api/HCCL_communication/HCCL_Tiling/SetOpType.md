@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetOpType
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Tiling/SetOpType.md
+description: 设置通信任务类型。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetOpType
 
 ## 功能说明

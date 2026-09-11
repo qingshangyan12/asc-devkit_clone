@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: ReGlu
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/activation_functions/ReGlu_interface/ReGlu.md
+description: ReGlu是一种GLU变体。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: ReGlu__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/activation/reglu.h]
+- override_id: ReGlu__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/activation/reglu.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ReGlu
 
 ## 产品支持情况
@@ -43,12 +62,26 @@ ReGlu是一种GLU变体，使用Relu作为激活函数，计算公式如下：
 
 -   通过sharedTmpBuffer入参传入临时空间
 
+```yaml
+api_signature:
+  override_id: "ReGlu__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/activation/reglu.h"]
+```
+
     ```
     template <typename T, bool isReuseSource = false>
     __aicore__ inline void ReGlu(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
     ```
 
 -   接口框架申请临时空间
+
+```yaml
+api_signature:
+  override_id: "ReGlu__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/activation/reglu.h"]
+```
 
     ```
     template <typename T, bool isReuseSource = false>

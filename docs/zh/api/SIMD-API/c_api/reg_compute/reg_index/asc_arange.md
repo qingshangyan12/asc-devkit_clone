@@ -9,20 +9,16 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_arange__Rv<dtype>_<dtype>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_index.h"
+    headers: [/include/c_api/reg_compute/compute/reg_index.h]
   - prototype_id: "asc_arange__<dtype>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_index.h"
+    headers: [/include/c_api/reg_compute/compute/reg_index.h]
   - prototype_id: "asc_arange_descend__Rv<dtype>_<dtype>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_index.h"
+    headers: [/include/c_api/reg_compute/compute/reg_index.h]
   - prototype_id: "asc_arange_descend__<dtype>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_index.h"
+    headers: [/include/c_api/reg_compute/compute/reg_index.h]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/arange"
     archs: ["3510"]
@@ -83,8 +79,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_arange__Rv<dtype>_<dtype>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_index.h"
+  headers: [/include/c_api/reg_compute/compute/reg_index.h]
   dtype:
     values:
       - "int8_t"
@@ -104,8 +99,7 @@ __simd_callee__ inline void asc_arange(vector_<dtype>& dst,
 api_signature:
   prototype_id: "asc_arange__<dtype>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_index.h"
+  headers: [/include/c_api/reg_compute/compute/reg_index.h]
   dtype:
     values:
       - "int8_t"
@@ -143,8 +137,7 @@ __simd_callee__ inline vector_half asc_arange(half value)
 api_signature:
   prototype_id: "asc_arange_descend__Rv<dtype>_<dtype>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_index.h"
+  headers: [/include/c_api/reg_compute/compute/reg_index.h]
   dtype:
     values:
       - "int8_t"
@@ -164,8 +157,7 @@ __simd_callee__ inline void asc_arange_descend(vector_<dtype>& dst,
 api_signature:
   prototype_id: "asc_arange_descend__<dtype>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_index.h"
+  headers: [/include/c_api/reg_compute/compute/reg_index.h]
   dtype:
     values:
       - "int8_t"

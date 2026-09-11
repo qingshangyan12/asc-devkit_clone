@@ -1,3 +1,27 @@
+---
+okftype: reference.api.cpp
+title: SetVectorMask
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/mask_operations/SetVectorMask.md
+description: 本接口用于在矢量计算时设置mask。
+tag: [basic_api]
+usage_dependencies:
+  status: confirmed
+  conditional_before:
+  - when: 并通过调用本接口设置Counter/Normal模式下
+    all_of:
+    - SetMaskCount.md
+    - SetMaskNorm.md
+signature:
+- override_id: SetVectorMask__u64_u64
+  archs: ['3510', '2201', '3002', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_common.h]
+- override_id: SetVectorMask__i32
+  archs: ['3510', '2201', '3002', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_common.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetVectorMask<a name="ZH-CN_TOPIC_0000001839731333"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -52,12 +76,26 @@
 
 - 适用于Normal模式下mask逐比特模式和Counter模式
 
+```yaml
+api_signature:
+  override_id: "SetVectorMask__u64_u64"
+  archs: ["3510", "2201", "3002", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_common.h"]
+```
+
     ```cpp
     template <typename T, MaskMode mode = MaskMode::NORMAL>
     __aicore__ static inline void SetVectorMask(const uint64_t maskHigh, const uint64_t maskLow)
     ```
 
 - 适用于Normal模式下Mask连续模式和Counter模式
+
+```yaml
+api_signature:
+  override_id: "SetVectorMask__i32"
+  archs: ["3510", "2201", "3002", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_common.h"]
+```
 
     ```cpp
     template <typename T, MaskMode mode = MaskMode::NORMAL>

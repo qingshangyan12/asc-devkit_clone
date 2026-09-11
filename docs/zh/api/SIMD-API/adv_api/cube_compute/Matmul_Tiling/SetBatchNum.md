@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetBatchNum
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetBatchNum.md
+description: 设置多Batch计算的最大Batch数，最大Batch数为A矩阵[batchA](../Matmul_Kernel/SetBatchNum.md#table9646134355611)和B矩阵[batchB](../Matmul_Kernel/SetBatchNum.md#table9646134355611)中的最大值。调用[IterateBatch](../Matmul_Kernel/IterateBatch.md)接口之前，需要在Host侧Tiling实现中通过本接口设置多Batch计算的Batch数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetBatchNum
 
 ## 功能说明

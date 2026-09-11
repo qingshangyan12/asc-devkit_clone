@@ -9,20 +9,16 @@ usage_dependencies:
 signature:
   - override_id: "asc_float2int32_rd__f32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/scalar_compute/compute/scalar_convert.h"
+    headers: [/include/c_api/scalar_compute/compute/scalar_convert.h]
   - override_id: "asc_float2int32_rn__f32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/scalar_compute/compute/scalar_convert.h"
+    headers: [/include/c_api/scalar_compute/compute/scalar_convert.h]
   - override_id: "asc_float2int32_rna__f32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/scalar_compute/compute/scalar_convert.h"
+    headers: [/include/c_api/scalar_compute/compute/scalar_convert.h]
   - override_id: "asc_float2int32_ru__f32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/scalar_compute/compute/scalar_convert.h"
+    headers: [/include/c_api/scalar_compute/compute/scalar_convert.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -67,8 +63,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_float2int32_rd__f32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/scalar_compute/compute/scalar_convert.h"
+  headers: [/include/c_api/scalar_compute/compute/scalar_convert.h]
 ```
 
 ```c
@@ -80,8 +75,7 @@ __aicore__ inline int32_t asc_float2int32_rd(float value)
 api_signature:
   override_id: "asc_float2int32_rn__f32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/scalar_compute/compute/scalar_convert.h"
+  headers: [/include/c_api/scalar_compute/compute/scalar_convert.h]
 ```
 
 ```c
@@ -93,8 +87,7 @@ __aicore__ inline int32_t asc_float2int32_rn(float value)
 api_signature:
   override_id: "asc_float2int32_rna__f32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/scalar_compute/compute/scalar_convert.h"
+  headers: [/include/c_api/scalar_compute/compute/scalar_convert.h]
 ```
 
 ```c
@@ -106,8 +99,7 @@ __aicore__ inline int32_t asc_float2int32_rna(float value)
 api_signature:
   override_id: "asc_float2int32_ru__f32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/scalar_compute/compute/scalar_convert.h"
+  headers: [/include/c_api/scalar_compute/compute/scalar_convert.h]
 ```
 
 ```c
@@ -123,8 +115,7 @@ __aicore__ inline int32_t asc_float2int32_ru(float value)
 api_signature:
   override_id: "asc_float2int32_rn__f32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/scalar_compute/compute/scalar_convert.h"
+  headers: [/include/c_api/scalar_compute/compute/scalar_convert.h]
 ```
 
 ```c

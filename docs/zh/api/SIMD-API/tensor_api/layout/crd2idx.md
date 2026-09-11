@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: crd2idx
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/layout/crd2idx.md
+description: crd2idx根据coord、shape和stride计算坐标对应的一维线性索引。输入为嵌套Tuple时，接口会按照相同的层次结构递归计算各维度的偏移并求和。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: crd2idx__RCpCoord_RCpShape_RCpStride
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/layout_interface.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # crd2idx
 
 ## 产品支持情况
@@ -31,6 +47,13 @@
 crd2idx根据coord、shape和stride计算坐标对应的一维线性索引。输入为嵌套Tuple时，接口会按照相同的层次结构递归计算各维度的偏移并求和。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "crd2idx__RCpCoord_RCpShape_RCpStride"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/layout_interface.h"]
+```
 
 ```cpp
 template <typename Coord, typename Shape, typename Stride>

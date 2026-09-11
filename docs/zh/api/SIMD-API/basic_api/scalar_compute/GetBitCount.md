@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetBitCount
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/scalar_compute/GetBitCount.md
+description: 统计uint64\_t类型数值的二进制表示中指定比特值（0或1）的出现次数。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetBitCount__u64
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_scalar_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetBitCount<a name="ZH-CN_TOPIC_0000001787630010"></a>
 
 ## 产品支持情况
@@ -38,6 +54,13 @@
 统计uint64\_t类型数值的二进制表示中指定比特值（0或1）的出现次数。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "GetBitCount__u64"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_scalar_intf.h"]
+```
 
 ```cpp
 template <int countValue>

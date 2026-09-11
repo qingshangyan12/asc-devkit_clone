@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: TopK
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/sort_operations/TopK.md
+description: 获取最后一个维度的前k个最大值或最小值及其对应的索引。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # TopK
 
 ## 产品支持情况

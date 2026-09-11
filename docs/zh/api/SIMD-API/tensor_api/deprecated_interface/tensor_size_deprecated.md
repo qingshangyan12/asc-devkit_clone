@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: base_tensor::Size（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/deprecated_interface/tensor_size_deprecated.md
+description: '**该接口已废弃，请使用[base_tensor::size](../tensor/tensor.md#size)替代。'
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Size__z
+  archs: ['3510']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # base_tensor::Size（废弃）
 
 ## 产品支持情况
@@ -33,6 +49,13 @@
 获取Tensor覆盖的逻辑元素总数。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "Size__z"
+  archs: ["3510"]
+  headers: []
+```
 
 ```cpp
 __aicore__ inline constexpr auto Size() const;

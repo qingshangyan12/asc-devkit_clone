@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Cast（float转bfloat16\_t）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/scalar_compute/Cast_float_to_bfloat16.md
+description: float类型标量数据转换成bfloat16\_t类型标量数据。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Cast__RCf32
+  archs: ['3510', '2201']
+  headers: [/include/basic_api/kernel_operator_scalar_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Cast（float转bfloat16\_t）<a name="ZH-CN_TOPIC_0000001623365980"></a>
 
 ## 产品支持情况
@@ -34,6 +50,13 @@ float类型标量数据转换成bfloat16\_t类型标量数据。
 在使用该接口之前，用户需要先了解[内置数据类型](../data_structures/builtin_data_types.md)和[精度转换](../data_structures/precision_conversion.md)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "Cast__RCf32"
+  archs: ["3510", "2201"]
+  headers: ["/include/basic_api/kernel_operator_scalar_intf.h"]
+```
 
 ```cpp
 __aicore__ inline bfloat16_t Cast(const float& fVal)

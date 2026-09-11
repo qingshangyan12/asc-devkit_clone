@@ -9,20 +9,16 @@ usage_dependencies:
 signature:
   - override_id: "asc_e2m1x22bfloat16__Rvbf16_vf4e2m1x2_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_e2m1x22bfloat16_v2__Rvbf16_vf4e2m1x2_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_e2m1x22bfloat16_v3__Rvbf16_vf4e2m1x2_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_e2m1x22bfloat16_v4__Rvbf16_vf4e2m1x2_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -67,8 +63,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_e2m1x22bfloat16__Rvbf16_vf4e2m1x2_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -80,8 +75,7 @@ __simd_callee__ inline void asc_e2m1x22bfloat16(vector_bfloat16_t& dst, vector_f
 api_signature:
   override_id: "asc_e2m1x22bfloat16_v2__Rvbf16_vf4e2m1x2_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -93,8 +87,7 @@ __simd_callee__ inline void asc_e2m1x22bfloat16_v2(vector_bfloat16_t& dst, vecto
 api_signature:
   override_id: "asc_e2m1x22bfloat16_v3__Rvbf16_vf4e2m1x2_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -106,8 +99,7 @@ __simd_callee__ inline void asc_e2m1x22bfloat16_v3(vector_bfloat16_t& dst, vecto
 api_signature:
   override_id: "asc_e2m1x22bfloat16_v4__Rvbf16_vf4e2m1x2_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp

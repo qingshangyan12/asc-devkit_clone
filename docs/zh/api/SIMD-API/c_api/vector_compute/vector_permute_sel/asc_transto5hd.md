@@ -9,16 +9,13 @@ usage_dependencies:
 signature:
   - override_id: "asc_transto5hd_b32__uba8_uba8_u8_u16_u16"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_convert.h"
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: "asc_transto5hd_b16__uba8_uba8_u8_u16_u16"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_convert.h"
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: "asc_transto5hd_b8__uba8_uba8_u8_u16_u16_b_b"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_convert.h"
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -74,8 +71,7 @@ NCHW格式转换成NC1HWC0格式时，如果是数据类型的位宽为32位或�
 api_signature:
   override_id: "asc_transto5hd_b32__uba8_uba8_u8_u16_u16"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_convert.h"
+  headers: [/include/c_api/vector_compute/compute/vector_convert.h]
 ```
 
 ```cpp
@@ -87,8 +83,7 @@ __aicore__ inline void asc_transto5hd_b32(ub_addr8_t dst, ub_addr8_t src, uint8_
 api_signature:
   override_id: "asc_transto5hd_b16__uba8_uba8_u8_u16_u16"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_convert.h"
+  headers: [/include/c_api/vector_compute/compute/vector_convert.h]
 ```
 
 ```cpp
@@ -100,8 +95,7 @@ __aicore__ inline void asc_transto5hd_b16(ub_addr8_t dst, ub_addr8_t src, uint8_
 api_signature:
   override_id: "asc_transto5hd_b8__uba8_uba8_u8_u16_u16_b_b"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_convert.h"
+  headers: [/include/c_api/vector_compute/compute/vector_convert.h]
 ```
 
 ```cpp

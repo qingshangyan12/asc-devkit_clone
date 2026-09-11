@@ -9,14 +9,12 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_set_l12l0a_3d_padding__<dtype>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_set_l12l0a_3d_padding__u64"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 examples: []
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_set_l12l0a_3d_padding
@@ -59,8 +57,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_set_l12l0a_3d_padding__<dtype>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   dtype:
     values:
       - "int8_t"
@@ -82,8 +79,7 @@ __aicore__ inline void asc_set_l12l0a_3d_padding(<dtype> padding_value)
 api_signature:
   override_id: "asc_set_l12l0a_3d_padding__u64"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
 ```cpp

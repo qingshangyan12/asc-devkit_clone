@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GroupNorm
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/normalization/GroupNorm.md
+description: 对一个特征进行标准化的一般。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GroupNorm
 
 ## 产品支持情况

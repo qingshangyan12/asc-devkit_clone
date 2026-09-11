@@ -10,8 +10,7 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_storealign_pack_quarter_postupdate__RPU<dtype>_v<dtype>_i32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/store/storealign.h"
+    headers: [/include/c_api/reg_compute/store/storealign.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -56,8 +55,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_storealign_pack_quarter_postupdate__RPU<dtype>_v<dtype>_i32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/store/storealign.h"
+  headers: [/include/c_api/reg_compute/store/storealign.h]
   dtype:
     values:
       - "int32_t"

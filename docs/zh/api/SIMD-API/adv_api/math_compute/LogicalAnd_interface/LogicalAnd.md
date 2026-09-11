@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: LogicalAnd
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/LogicalAnd_interface/LogicalAnd.md
+description: 按元素进行与操作。当输入的数据类型不是bool时，零被视为False，非零数据被视为True。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: LogicalAnd__RCltg1x2_pT_RCltg1x2_pU_RCltg1x2_pU_u32
+  archs: ['3510']
+  headers: [/include/adv_api/math/logical_and.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LogicalAnd
 
 ## 产品支持情况
@@ -30,6 +46,13 @@
 ![](../../../../figures/zh-cn_formulaimage_0000002386250116.png)
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "LogicalAnd__RCltg1x2_pT_RCltg1x2_pU_RCltg1x2_pU_u32"
+  archs: ["3510"]
+  headers: ["/include/adv_api/math/logical_and.h"]
+```
 
 ```
 template <const LogicalAndConfig& config = DEFAULT_LOGICAL_AND_CONFIG, typename T, typename U>

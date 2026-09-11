@@ -15,12 +15,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_mmad_mx__PCCf32_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_unitflag_b_b_b"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_compute/cube_compute.h"
+    headers: ["/include/c_api/cube_compute/cube_compute.h"]
   - prototype_id: "asc_mmad_mx__PCCf32_PCA<a_dtype>_PCB<b_dtype>_u64_u16_u16_u16_unitflag_b"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_compute/cube_compute.h"
+    headers: ["/include/c_api/cube_compute/cube_compute.h"]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad_mx"
     archs: ["3510"]
@@ -34,7 +32,7 @@ examples:
     archs: ["3510"]
     override_id: "asc_mmad_mx__PCCf32_PCAf8e4m3_PCBf8e5m2_u16_u16_u16_unitflag_b_b_b"
     file: "mmad_mx.asc"
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_mmad_mx
@@ -100,8 +98,7 @@ $$
 api_signature:
   prototype_id: "asc_mmad_mx__PCCf32_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_unitflag_b_b_b"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_compute/cube_compute.h"
+  headers: ["/include/c_api/cube_compute/cube_compute.h"]
   dtype:
     variants:
       -
@@ -148,8 +145,7 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
 api_signature:
   prototype_id: "asc_mmad_mx__PCCf32_PCA<a_dtype>_PCB<b_dtype>_u64_u16_u16_u16_unitflag_b"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_compute/cube_compute.h"
+  headers: ["/include/c_api/cube_compute/cube_compute.h"]
   dtype:
     variants:
       -

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetMDLConfig
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/GetMDLConfig.md
+description: 用于配置MDL模板的参数，获取自定义MDL模板。MDL模板的介绍请参考[表模板特性](MatmulConfig.md#template-features)。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetMDLConfig__b_b_u32_b_b_b_b_b_b_b_b_b
+  archs: ['3510', '2201', '2002', x90]
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetMDLConfig
 
 ## 产品支持情况
@@ -34,6 +50,13 @@
 用于配置MDL模板的参数，获取自定义MDL模板。MDL模板的介绍请参考[表模板特性](MatmulConfig.md#template-features)。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "GetMDLConfig__b_b_u32_b_b_b_b_b_b_b_b_b"
+  archs: ["3510", "2201", "2002", "x90"]
+  headers: []
+```
 
 ```
 __aicore__ constexpr MatmulConfig GetMDLConfig(const bool intrinsicsLimit = false, const bool batchLoop = false, const uint32_t doMTE2Preload = 0, const bool isVecND2NZ = false, bool isPerTensor = false, bool hasAntiQuantOffset = false, const bool enUnitFlag = false, const bool isMsgReuse = true, const bool enableUBReuse = true, const bool enableL1CacheUB = false, const bool enableMixDualMaster = false, const bool enableKdimReorderLoad = false)

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SoftmaxFlash
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/activation_functions/SoftMax_interface/SoftmaxFlash.md
+description: '**注意：该接口后续即将废弃，请使用精度和性能更好的SoftmaxFlashV2接口**。'
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SoftmaxFlash
 
 ## 产品支持情况

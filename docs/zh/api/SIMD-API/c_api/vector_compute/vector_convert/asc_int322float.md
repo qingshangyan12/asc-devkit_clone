@@ -9,76 +9,58 @@ usage_dependencies:
 signature:
   - override_id: "asc_int322float__PUf32_PUi32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_convert.h"
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: "asc_int322float_rn__PUf32_PUi32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_convert.h"
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: "asc_int322float_rna__PUf32_PUi32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_convert.h"
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: "asc_int322float_rd__PUf32_PUi32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_convert.h"
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: "asc_int322float_ru__PUf32_PUi32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_convert.h"
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: "asc_int322float_rz__PUf32_PUi32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_convert.h"
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: "asc_int322float__PUf32_PUi32_u8_u16_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_convert.h"
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: "asc_int322float_rn__PUf32_PUi32_u8_u16_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_convert.h"
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: "asc_int322float_rna__PUf32_PUi32_u8_u16_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_convert.h"
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: "asc_int322float_rd__PUf32_PUi32_u8_u16_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_convert.h"
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: "asc_int322float_ru__PUf32_PUi32_u8_u16_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_convert.h"
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: "asc_int322float_rz__PUf32_PUi32_u8_u16_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_convert.h"
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: "asc_int322float_sync__PUf32_PUi32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_int322float_rn_sync__PUf32_PUi32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_int322float_rna_sync__PUf32_PUi32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_int322float_rd_sync__PUf32_PUi32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_int322float_ru_sync__PUf32_PUi32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_int322float_rz_sync__PUf32_PUi32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -129,8 +111,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_int322float__PUf32_PUi32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_convert.h"
+  headers: [/include/c_api/vector_compute/compute/vector_convert.h]
 ```
 
   ```cpp
@@ -142,8 +123,7 @@ api_signature:
 api_signature:
   override_id: "asc_int322float_rn__PUf32_PUi32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_convert.h"
+  headers: [/include/c_api/vector_compute/compute/vector_convert.h]
 ```
 
   ```cpp
@@ -155,8 +135,7 @@ api_signature:
 api_signature:
   override_id: "asc_int322float_rna__PUf32_PUi32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_convert.h"
+  headers: [/include/c_api/vector_compute/compute/vector_convert.h]
 ```
 
   ```cpp
@@ -168,8 +147,7 @@ api_signature:
 api_signature:
   override_id: "asc_int322float_rd__PUf32_PUi32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_convert.h"
+  headers: [/include/c_api/vector_compute/compute/vector_convert.h]
 ```
 
   ```cpp
@@ -181,8 +159,7 @@ api_signature:
 api_signature:
   override_id: "asc_int322float_ru__PUf32_PUi32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_convert.h"
+  headers: [/include/c_api/vector_compute/compute/vector_convert.h]
 ```
 
   ```cpp
@@ -194,8 +171,7 @@ api_signature:
 api_signature:
   override_id: "asc_int322float_rz__PUf32_PUi32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_convert.h"
+  headers: [/include/c_api/vector_compute/compute/vector_convert.h]
 ```
 
   ```cpp
@@ -209,8 +185,7 @@ api_signature:
 api_signature:
   override_id: "asc_int322float__PUf32_PUi32_u8_u16_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_convert.h"
+  headers: [/include/c_api/vector_compute/compute/vector_convert.h]
 ```
 
   ```cpp
@@ -222,8 +197,7 @@ api_signature:
 api_signature:
   override_id: "asc_int322float_rn__PUf32_PUi32_u8_u16_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_convert.h"
+  headers: [/include/c_api/vector_compute/compute/vector_convert.h]
 ```
 
   ```cpp
@@ -235,8 +209,7 @@ api_signature:
 api_signature:
   override_id: "asc_int322float_rna__PUf32_PUi32_u8_u16_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_convert.h"
+  headers: [/include/c_api/vector_compute/compute/vector_convert.h]
 ```
 
   ```cpp
@@ -248,8 +221,7 @@ api_signature:
 api_signature:
   override_id: "asc_int322float_rd__PUf32_PUi32_u8_u16_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_convert.h"
+  headers: [/include/c_api/vector_compute/compute/vector_convert.h]
 ```
 
   ```cpp
@@ -261,8 +233,7 @@ api_signature:
 api_signature:
   override_id: "asc_int322float_ru__PUf32_PUi32_u8_u16_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_convert.h"
+  headers: [/include/c_api/vector_compute/compute/vector_convert.h]
 ```
 
   ```cpp
@@ -274,8 +245,7 @@ api_signature:
 api_signature:
   override_id: "asc_int322float_rz__PUf32_PUi32_u8_u16_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_convert.h"
+  headers: [/include/c_api/vector_compute/compute/vector_convert.h]
 ```
 
   ```cpp
@@ -289,8 +259,7 @@ api_signature:
 api_signature:
   override_id: "asc_int322float_sync__PUf32_PUi32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -302,8 +271,7 @@ api_signature:
 api_signature:
   override_id: "asc_int322float_rn_sync__PUf32_PUi32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -315,8 +283,7 @@ api_signature:
 api_signature:
   override_id: "asc_int322float_rna_sync__PUf32_PUi32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -328,8 +295,7 @@ api_signature:
 api_signature:
   override_id: "asc_int322float_rd_sync__PUf32_PUi32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -341,8 +307,7 @@ api_signature:
 api_signature:
   override_id: "asc_int322float_ru_sync__PUf32_PUi32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -354,8 +319,7 @@ api_signature:
 api_signature:
   override_id: "asc_int322float_rz_sync__PUf32_PUi32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp

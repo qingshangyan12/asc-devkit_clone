@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: make_coord
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/layout/make_coord.md
+description: 构造coord对象，用于定义张量的坐标。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: make_coord__RCpFirstCoord_QRCpCoords
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/layout_interface.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # make_coord
 
 ## 产品支持情况
@@ -31,6 +47,13 @@
 构造coord对象，用于定义张量的坐标。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "make_coord__RCpFirstCoord_QRCpCoords"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/layout_interface.h"]
+```
 
 ```cpp
 template <typename FirstCoord, typename... Coords>

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetBlockIdx
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetBlockIdx.md
+description: 获取当前逻辑AI Core的索引，用于代码内部的多核逻辑控制及多核偏移量计算等。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetBlockIdx__z
+  archs: ['3510', '2201', '3002', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_sys_var_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetBlockIdx
 
 ## 产品支持情况
@@ -38,6 +54,13 @@
 获取当前逻辑AI Core的索引，用于代码内部的多核逻辑控制及多核偏移量计算等。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "GetBlockIdx__z"
+  archs: ["3510", "2201", "3002", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_sys_var_intf.h"]
+```
 
 ```cpp
 __aicore__ inline int64_t GetBlockIdx()

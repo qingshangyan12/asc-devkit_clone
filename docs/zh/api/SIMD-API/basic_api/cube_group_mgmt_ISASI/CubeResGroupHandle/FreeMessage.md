@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: FreeMessage
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_group_mgmt_ISASI/CubeResGroupHandle/FreeMessage.md
+description: 在自定义的回调函数逻辑中，完成消息处理后，调用该接口，刷新消息状态为FREE；或者待消息状态为指定状态waitState时，刷新消息状态为FREE。消息状态的介绍可以参考[表2](CubeResGroupHandle_usage.md#table77221554135216)中的参数msgState。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # FreeMessage<a name="ZH-CN_TOPIC_0000001996945149"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

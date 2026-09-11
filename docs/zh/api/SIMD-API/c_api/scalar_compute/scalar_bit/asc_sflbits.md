@@ -9,8 +9,7 @@ usage_dependencies:
 signature:
   - override_id: "asc_sflbits__i64"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/scalar_compute/compute/scalar_bit.h"
+    headers: [/include/c_api/scalar_compute/compute/scalar_bit.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -59,8 +58,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_sflbits__i64"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/scalar_compute/compute/scalar_bit.h"
+  headers: [/include/c_api/scalar_compute/compute/scalar_bit.h]
 ```
 
 ```c

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: AbsSub
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/composite_compute/AbsSub.md
+description: 该接口根据mask将srcReg0与srcReg1逐元素相减再求绝对值，计算结果写入dstReg。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # AbsSub<a name="ZH-CN_TOPIC_0000002044605805"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

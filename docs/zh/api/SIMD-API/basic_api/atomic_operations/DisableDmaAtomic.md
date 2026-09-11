@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: DisableDmaAtomic
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/atomic_operations/DisableDmaAtomic.md
+description: 关闭数据搬运随路原子操作功能，后续执行数据搬运时，GM中原始数据将被新搬运数据完全覆盖。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: DisableDmaAtomic__z
+  archs: ['3510', '2201', '3002', '2002', '1001']
+  headers: [/include/basic_api/kernel_operator_set_atomic_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DisableDmaAtomic<a name="ZH-CN_TOPIC_0000001839732381"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -32,6 +48,13 @@
 关闭数据搬运随路原子操作功能，后续执行数据搬运时，GM中原始数据将被新搬运数据完全覆盖。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "DisableDmaAtomic__z"
+  archs: ["3510", "2201", "3002", "2002", "1001"]
+  headers: ["/include/basic_api/kernel_operator_set_atomic_intf.h"]
+```
 
 ```cpp
 __aicore__ inline void DisableDmaAtomic()

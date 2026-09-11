@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: MaskReg搬出（StoreAlign）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_store/StoreAlign_MaskReg.md
+description: StoreAlign能够实现数据从[MaskReg](../register_data_types/MaskReg.md)搬运至Unified
+  Buffer（UB）。
+tag: [basic_api]
+usage_dependencies:
+  status: confirmed
+  required_before:
+    all_of:
+    - ../register_data_types/AddrReg.md
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # MaskReg搬出（StoreAlign）<a name="ZH-CN_TOPIC_0000001958347433"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

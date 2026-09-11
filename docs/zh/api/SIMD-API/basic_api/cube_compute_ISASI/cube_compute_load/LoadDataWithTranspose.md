@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: LoadDataWithTranspose
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadDataWithTranspose.md
+description: LoadDataWithTranspose负责完成普通矩阵计算所需的2D格式的数据的搬运，搬运过程中会伴随转置操作，参考特性[分形转置](#zh-cn_topic_0000002543851571_section10110103802915)。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LoadDataWithTranspose<a id="ZH-CN_TOPIC_0000002538231154"></a>
 
 ## 产品支持情况<a id="zh-cn_topic_0000002543851571_section796754519912"></a>

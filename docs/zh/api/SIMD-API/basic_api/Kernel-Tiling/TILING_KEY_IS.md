@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: TILING\_KEY\_IS
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/Kernel-Tiling/TILING_KEY_IS.md
+description: 在核函数（Kernel）中判断本次执行时的tiling\_key是否等于host侧运行时设置的某个key，从而标识tiling\_key==key的一条kernel分支。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # TILING\_KEY\_IS<a name="ZH-CN_TOPIC_0000001586995454"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

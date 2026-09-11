@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Prelu\(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Prelu_ISASI.md
+description: Prelu属于双目矢量类计算接口，源操作数src0大于0的情况下直接将src0写入目的操作数dst，否则将源操作数src0 * src1的结果写入dst。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Prelu__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Prelu\(ISASI\)<a name="ZH-CN_TOPIC_0000002193806085"></a>
 
 ## 产品支持情况
@@ -34,6 +50,13 @@ Prelu属于双目矢量类计算接口，源操作数src0大于0的情况下直�
 $dst_i = (src0_i \ge 0) ? src0_i : src0_i * src1_i$
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "Prelu__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510"]
+  headers: []
+```
 
 ```cpp
 template <typename T>

@@ -9,8 +9,7 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_scatter__PU<dtype>_v<dtype>_v<index_dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+    headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -61,8 +60,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_scatter__PU<dtype>_v<dtype>_v<index_dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
   dtype:
     variants:
       -

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetReduceType
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Tiling/SetReduceType.md
+description: 设置Reduce操作类型，仅对有归约操作的通信任务生效。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetReduceType
 
 ## 功能说明

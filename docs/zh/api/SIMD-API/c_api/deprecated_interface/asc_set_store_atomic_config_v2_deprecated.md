@@ -9,8 +9,7 @@ usage_dependencies:
 signature:
   - override_id: "asc_set_store_atomic_config_v2__u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/atomic/scalar_atomic.h"
+    headers: [/include/c_api/atomic/scalar_atomic.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -55,8 +54,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_set_store_atomic_config_v2__u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/atomic/scalar_atomic.h"
+  headers: [/include/c_api/atomic/scalar_atomic.h]
 ```
 
 ```c

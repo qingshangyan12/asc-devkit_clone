@@ -70,6 +70,12 @@ namespace AscendC {
  * \note Tensors must be 32B align, and it doesn't allow address overlap among tensors.
  */
 template <typename T, typename U, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
+/**
+ * @ingroup simd_api.adv_api.sort_operations
+ * @override_id Sort__Rltg1x2_pT_Rltg1x2_pU_RCltg1x2_pT_RCltg1x2_pU_RCltg1x2_u8_u32
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 排序函数，按照数值大小进行降序排序。
+ */
 __aicore__ inline void Sort(
     LocalTensor<T>& dstTensor, LocalTensor<U>& dstIndexTensor, const LocalTensor<T>& srcTensor,
     const LocalTensor<U>& srcIndexTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
@@ -97,6 +103,12 @@ __aicore__ inline void Sort(
  * \note Tensors must be 32B align, and it doesn't allow address overlap among tensors.
  */
 template <typename T, typename U, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
+/**
+ * @ingroup simd_api.adv_api.sort_operations
+ * @override_id Sort__RCltg1x2_pT_RCltg1x2_pU_RCltg1x2_pT_RCltg1x2_pU_u32
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 排序函数，按照数值大小进行降序排序。
+ */
 __aicore__ inline void Sort(
     const LocalTensor<T>& dstTensor, const LocalTensor<U>& dstIndexTensor, const LocalTensor<T>& srcTensor,
     const LocalTensor<U>& srcIndexTensor, const uint32_t calCount)
@@ -126,6 +138,12 @@ __aicore__ inline void Sort(
  * \note Tensors must be 32B align, and it doesn't allow address overlap among tensors.
  */
 template <typename T, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
+/**
+ * @ingroup simd_api.adv_api.sort_operations
+ * @override_id Sort__Rltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 排序函数，按照数值大小进行降序排序。
+ */
 __aicore__ inline void Sort(
     LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
     const uint32_t calCount)
@@ -149,6 +167,12 @@ __aicore__ inline void Sort(
  * \note Tensors must be 32B align, and it doesn't allow address overlap among tensors.
  */
 template <typename T, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
+/**
+ * @ingroup simd_api.adv_api.sort_operations
+ * @override_id Sort__Rltg1x2_pT_RCltg1x2_pT_u32
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 排序函数，按照数值大小进行降序排序。
+ */
 __aicore__ inline void Sort(LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
 {
 #if defined(__NPU_ARCH__) && \
@@ -176,6 +200,12 @@ __aicore__ inline void Sort(LocalTensor<T>& dstTensor, const LocalTensor<T>& src
  * \note Tensors must be 32B align, and it doesn't allow address overlap among tensors.
  */
 template <typename T, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
+/**
+ * @ingroup simd_api.adv_api.sort_operations
+ * @override_id Sort__Rltg1x2_pT_Rltg1x3_u32_RCltg1x2_pT_RCltg1x2_u8_u32
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 排序函数，按照数值大小进行降序排序。
+ */
 __aicore__ inline void Sort(
     LocalTensor<T>& dstTensor, LocalTensor<uint32_t>& dstIndexTensor, const LocalTensor<T>& srcTensor,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
@@ -200,6 +230,12 @@ __aicore__ inline void Sort(
  * \note Tensors must be 32B align, and it doesn't allow address overlap among tensors.
  */
 template <typename T, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
+/**
+ * @ingroup simd_api.adv_api.sort_operations
+ * @override_id Sort__Rltg1x2_pT_Rltg1x3_u32_RCltg1x2_pT_u32
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 排序函数，按照数值大小进行降序排序。
+ */
 __aicore__ inline void Sort(
     LocalTensor<T>& dstTensor, LocalTensor<uint32_t>& dstIndexTensor, const LocalTensor<T>& srcTensor,
     const uint32_t calCount)

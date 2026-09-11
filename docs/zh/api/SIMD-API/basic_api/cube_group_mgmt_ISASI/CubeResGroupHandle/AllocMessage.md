@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: AllocMessage
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_group_mgmt_ISASI/CubeResGroupHandle/AllocMessage.md
+description: AIV从消息队列里申请消息空间，用于存放消息结构体，返回当前申请的消息空间的地址。消息队列的深度固定为4，申请消息空间的顺序为自上而下，然后循环。当消息队列指针指向的消息空间为FREE状态时，AllocMessage返回空间的地址，否则循环等待，直到当前空间的状态为FREE。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: AllocMessage__z
+  archs: ['3510', '2201']
+  headers: [/include/basic_api/core_mng/roc/kernel_operator_cube_group_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # AllocMessage<a name="ZH-CN_TOPIC_0000001960224984"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -34,6 +50,13 @@ AIV从消息队列里申请消息空间，用于存放消息结构体，返回�
 ![](../../../../figures/allocmessage_diagram.png "AllocMessage示意图")
 
 ## 函数原型<a name="section765814724715"></a>
+
+```yaml
+api_signature:
+  override_id: "AllocMessage__z"
+  archs: ["3510", "2201"]
+  headers: ["/include/basic_api/core_mng/roc/kernel_operator_cube_group_intf.h"]
+```
 
 ```
 template <PipeMode pipeMode = PipeMode::SCALAR_MODE>             

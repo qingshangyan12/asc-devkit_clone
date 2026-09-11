@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Gemm（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Gemm_deprecated.md
+description: '**该接口废弃，并将在后续版本移除，请不要使用该接口。'
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Gemm（废弃）
 
 ## 产品支持情况

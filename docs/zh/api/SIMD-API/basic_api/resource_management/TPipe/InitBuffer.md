@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: InitBuffer
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/TPipe/InitBuffer.md
+description: 用于为TQue等队列和TBuf分配内存。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # InitBuffer<a name="ZH-CN_TOPIC_0000001375937722"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

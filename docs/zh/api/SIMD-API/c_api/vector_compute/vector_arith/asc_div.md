@@ -10,28 +10,22 @@ usage_dependencies:
 signature:
   - override_id: "asc_div__PUf16_PUf16_PUf16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_arith.h"
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: "asc_div__PUf32_PUf32_PUf32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_arith.h"
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: "asc_div__PUf16_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_arith.h"
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: "asc_div__PUf32_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_arith.h"
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: "asc_div_sync__PUf16_PUf16_PUf16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_div_sync__PUf32_PUf32_PUf32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -80,8 +74,7 @@ $$
 api_signature:
   override_id: "asc_div__PUf16_PUf16_PUf16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_arith.h"
+  headers: [/include/c_api/vector_compute/compute/vector_arith.h]
 ```
 
 ```cpp
@@ -92,8 +85,7 @@ __aicore__ inline void asc_div(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__
 api_signature:
   override_id: "asc_div__PUf32_PUf32_PUf32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_arith.h"
+  headers: [/include/c_api/vector_compute/compute/vector_arith.h]
 ```
 
 ```cpp
@@ -106,8 +98,7 @@ __aicore__ inline void asc_div(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf
 api_signature:
   override_id: "asc_div__PUf16_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_arith.h"
+  headers: [/include/c_api/vector_compute/compute/vector_arith.h]
 ```
 
 ```cpp
@@ -120,8 +111,7 @@ __aicore__ inline void asc_div(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__
 api_signature:
   override_id: "asc_div__PUf32_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_arith.h"
+  headers: [/include/c_api/vector_compute/compute/vector_arith.h]
 ```
 
 ```cpp
@@ -136,8 +126,7 @@ __aicore__ inline void asc_div(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf
 api_signature:
   override_id: "asc_div_sync__PUf16_PUf16_PUf16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
 ```cpp
@@ -148,8 +137,7 @@ __aicore__ inline void asc_div_sync(__ubuf__ half* dst, __ubuf__ half* src0, __u
 api_signature:
   override_id: "asc_div_sync__PUf32_PUf32_PUf32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
 ```cpp

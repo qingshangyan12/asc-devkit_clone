@@ -9,84 +9,64 @@ usage_dependencies:
 signature:
   - override_id: "asc_half2int32_rd__Rvi32_vf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int32_rn__Rvi32_vf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int32_rna__Rvi32_vf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int32_ru__Rvi32_vf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int32_rz__Rvi32_vf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int32_rd__Rvi32_vf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int32_rn__Rvi32_vf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int32_rna__Rvi32_vf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int32_ru__Rvi32_vf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int32_rz__Rvi32_vf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int32_rd__vf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int32_rn__vf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int32_rna__vf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int32_ru__vf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int32_rz__vf16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int32_rd__vf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int32_rn__vf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int32_rna__vf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int32_ru__vf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_half2int32_rz__vf16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/cast"
     archs: ["3510"]
@@ -133,8 +113,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_half2int32_rd__Rvi32_vf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -149,8 +128,7 @@ __simd_callee__ inline void asc_half2int32_rd(vector_int32_t& dst,
 api_signature:
   override_id: "asc_half2int32_rn__Rvi32_vf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -165,8 +143,7 @@ __simd_callee__ inline void asc_half2int32_rn(vector_int32_t& dst,
 api_signature:
   override_id: "asc_half2int32_rna__Rvi32_vf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -181,8 +158,7 @@ __simd_callee__ inline void asc_half2int32_rna(vector_int32_t& dst,
 api_signature:
   override_id: "asc_half2int32_ru__Rvi32_vf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -197,8 +173,7 @@ __simd_callee__ inline void asc_half2int32_ru(vector_int32_t& dst,
 api_signature:
   override_id: "asc_half2int32_rz__Rvi32_vf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -213,8 +188,7 @@ __simd_callee__ inline void asc_half2int32_rz(vector_int32_t& dst,
 api_signature:
   override_id: "asc_half2int32_rd__Rvi32_vf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -229,8 +203,7 @@ __simd_callee__ inline void asc_half2int32_rd(vector_int32_t& dst,
 api_signature:
   override_id: "asc_half2int32_rn__Rvi32_vf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -245,8 +218,7 @@ __simd_callee__ inline void asc_half2int32_rn(vector_int32_t& dst,
 api_signature:
   override_id: "asc_half2int32_rna__Rvi32_vf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -261,8 +233,7 @@ __simd_callee__ inline void asc_half2int32_rna(vector_int32_t& dst,
 api_signature:
   override_id: "asc_half2int32_ru__Rvi32_vf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -277,8 +248,7 @@ __simd_callee__ inline void asc_half2int32_ru(vector_int32_t& dst,
 api_signature:
   override_id: "asc_half2int32_rz__Rvi32_vf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -293,8 +263,7 @@ __simd_callee__ inline void asc_half2int32_rz(vector_int32_t& dst,
 api_signature:
   override_id: "asc_half2int32_rd__Rvi32_vf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -309,8 +278,7 @@ __simd_callee__ inline void asc_half2int32_rd(vector_int32_t& dst,
 api_signature:
   override_id: "asc_half2int32_rn__Rvi32_vf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -325,8 +293,7 @@ __simd_callee__ inline void asc_half2int32_rn(vector_int32_t& dst,
 api_signature:
   override_id: "asc_half2int32_rna__Rvi32_vf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -341,8 +308,7 @@ __simd_callee__ inline void asc_half2int32_rna(vector_int32_t& dst,
 api_signature:
   override_id: "asc_half2int32_ru__Rvi32_vf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -357,8 +323,7 @@ __simd_callee__ inline void asc_half2int32_ru(vector_int32_t& dst,
 api_signature:
   override_id: "asc_half2int32_rz__Rvi32_vf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -373,8 +338,7 @@ __simd_callee__ inline void asc_half2int32_rz(vector_int32_t& dst,
 api_signature:
   override_id: "asc_half2int32_rd__Rvi32_vf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -389,8 +353,7 @@ __simd_callee__ inline void asc_half2int32_rd(vector_int32_t& dst,
 api_signature:
   override_id: "asc_half2int32_rn__Rvi32_vf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -405,8 +368,7 @@ __simd_callee__ inline void asc_half2int32_rn(vector_int32_t& dst,
 api_signature:
   override_id: "asc_half2int32_rna__Rvi32_vf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -421,8 +383,7 @@ __simd_callee__ inline void asc_half2int32_rna(vector_int32_t& dst,
 api_signature:
   override_id: "asc_half2int32_ru__Rvi32_vf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -437,8 +398,7 @@ __simd_callee__ inline void asc_half2int32_ru(vector_int32_t& dst,
 api_signature:
   override_id: "asc_half2int32_rz__Rvi32_vf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -453,8 +413,7 @@ __simd_callee__ inline void asc_half2int32_rz(vector_int32_t& dst,
 api_signature:
   override_id: "asc_half2int32_rd__vf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -469,8 +428,7 @@ __simd_callee__ inline vector_int32_t asc_half2int32_rd(vector_half src,
 api_signature:
   override_id: "asc_half2int32_rn__vf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -485,8 +443,7 @@ __simd_callee__ inline vector_int32_t asc_half2int32_rn(vector_half src,
 api_signature:
   override_id: "asc_half2int32_rna__vf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -501,8 +458,7 @@ __simd_callee__ inline vector_int32_t asc_half2int32_rna(vector_half src,
 api_signature:
   override_id: "asc_half2int32_ru__vf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -517,8 +473,7 @@ __simd_callee__ inline vector_int32_t asc_half2int32_ru(vector_half src,
 api_signature:
   override_id: "asc_half2int32_rz__vf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -533,8 +488,7 @@ __simd_callee__ inline vector_int32_t asc_half2int32_rz(vector_half src,
 api_signature:
   override_id: "asc_half2int32_rd__vf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -549,8 +503,7 @@ __simd_callee__ inline vector_int32_t asc_half2int32_rd(vector_half src,
 api_signature:
   override_id: "asc_half2int32_rn__vf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -565,8 +518,7 @@ __simd_callee__ inline vector_int32_t asc_half2int32_rn(vector_half src,
 api_signature:
   override_id: "asc_half2int32_rna__vf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -581,8 +533,7 @@ __simd_callee__ inline vector_int32_t asc_half2int32_rna(vector_half src,
 api_signature:
   override_id: "asc_half2int32_ru__vf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -597,8 +548,7 @@ __simd_callee__ inline vector_int32_t asc_half2int32_ru(vector_half src,
 api_signature:
   override_id: "asc_half2int32_rz__vf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -613,8 +563,7 @@ __simd_callee__ inline vector_int32_t asc_half2int32_rz(vector_half src,
 api_signature:
   override_id: "asc_half2int32_rd__vf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -628,8 +577,7 @@ __simd_callee__ inline vector_int32_t asc_half2int32_rd(vector_half src,
 api_signature:
   override_id: "asc_half2int32_rn__vf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -643,8 +591,7 @@ __simd_callee__ inline vector_int32_t asc_half2int32_rn(vector_half src,
 api_signature:
   override_id: "asc_half2int32_rna__vf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -658,8 +605,7 @@ __simd_callee__ inline vector_int32_t asc_half2int32_rna(vector_half src,
 api_signature:
   override_id: "asc_half2int32_ru__vf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -673,8 +619,7 @@ __simd_callee__ inline vector_int32_t asc_half2int32_ru(vector_half src,
 api_signature:
   override_id: "asc_half2int32_rz__vf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -688,8 +633,7 @@ __simd_callee__ inline vector_int32_t asc_half2int32_rz(vector_half src,
 api_signature:
   override_id: "asc_half2int32_rd__vf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -703,8 +647,7 @@ __simd_callee__ inline vector_int32_t asc_half2int32_rd(vector_half src,
 api_signature:
   override_id: "asc_half2int32_rn__vf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -718,8 +661,7 @@ __simd_callee__ inline vector_int32_t asc_half2int32_rn(vector_half src,
 api_signature:
   override_id: "asc_half2int32_rna__vf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -733,8 +675,7 @@ __simd_callee__ inline vector_int32_t asc_half2int32_rna(vector_half src,
 api_signature:
   override_id: "asc_half2int32_ru__vf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -748,8 +689,7 @@ __simd_callee__ inline vector_int32_t asc_half2int32_ru(vector_half src,
 api_signature:
   override_id: "asc_half2int32_rz__vf16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -767,8 +707,7 @@ __simd_callee__ inline vector_int32_t asc_half2int32_rz(vector_half src,
 api_signature:
   override_id: "asc_half2int32_rd__Rvi32_vf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -783,8 +722,7 @@ __simd_callee__ inline void asc_half2int32_rd(vector_int32_t& dst,
 api_signature:
   override_id: "asc_half2int32_rd__vf16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c

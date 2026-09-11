@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: DataSyncBarrier\(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/DataSyncBarrier_ISASI.md
+description: 阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可通过参数控制）执行结束，用于解决Scalar的内存依赖。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: DataSyncBarrier__z
+  archs: ['3510', '2201', '3002']
+  headers: [/include/basic_api/kernel_operator_block_sync_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DataSyncBarrier\(ISASI\)<a name="ZH-CN_TOPIC_0000001787873298"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -32,6 +48,13 @@
 阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可通过参数控制）执行结束，用于解决Scalar的内存依赖。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "DataSyncBarrier__z"
+  archs: ["3510", "2201", "3002"]
+  headers: ["/include/basic_api/kernel_operator_block_sync_intf.h"]
+```
 
 ```cpp
 template <MemDsbT arg0>

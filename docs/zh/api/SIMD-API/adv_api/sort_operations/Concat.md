@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Concat
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/sort_operations/Concat.md
+description: 对数据进行预处理，将要排序的源操作数src一一对应的合入目标数据concat中，数据预处理完成后，可以进行[Sort](Sort.md)。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Concat__Rltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_i32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/basic_api/kernel_operator_proposal_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Concat
 
 ## 产品支持情况
@@ -28,6 +44,13 @@
 对数据进行预处理，将要排序的源操作数src一一对应的合入目标数据concat中，数据预处理完成后，可以进行[Sort](Sort.md)。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "Concat__Rltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_i32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/basic_api/kernel_operator_proposal_intf.h"]
+```
 
 ```
 template <typename T>

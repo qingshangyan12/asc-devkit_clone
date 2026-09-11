@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: SetQuantVector
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetQuantVector.md
+description: 本接口提供对输出矩阵采用向量进行量化或反量化的功能，即对于输入shape为\[1, N\]的参数向量，N值为Matmul矩阵计算时M/N/K中的N值，对输出矩阵的每一列都采用该向量中对应列的系数进行量化或反量化。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetQuantVector__RCgtg1x3_u64
+  archs: ['3510', '2201', '3002', '2002', x90]
+  headers: [/include/adv_api/matmul/matmul.h]
+- override_id: SetQuantVector__RCltg1x3_u64
+  archs: ['3510', '2201', '3002', '2002', x90]
+  headers: [/include/adv_api/matmul/matmul.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetQuantVector
 
 ## 产品支持情况
@@ -38,11 +57,25 @@ Matmul量化场景：在Matmul计算时，左、右矩阵的输入为half或bflo
 
 -   量化参数的存储位置为GM
 
+```yaml
+api_signature:
+  override_id: "SetQuantVector__RCgtg1x3_u64"
+  archs: ["3510", "2201", "3002", "2002", "x90"]
+  headers: ["/include/adv_api/matmul/matmul.h"]
+```
+
     ```
     __aicore__ inline void SetQuantVector(const GlobalTensor<uint64_t>& quantTensor)
     ```
 
 -   量化参数的存储位置为L1 Buffer
+
+```yaml
+api_signature:
+  override_id: "SetQuantVector__RCltg1x3_u64"
+  archs: ["3510", "2201", "3002", "2002", "x90"]
+  headers: ["/include/adv_api/matmul/matmul.h"]
+```
 
     ```
     __aicore__ inline void SetQuantVector(const LocalTensor<uint64_t>& quantTensor)

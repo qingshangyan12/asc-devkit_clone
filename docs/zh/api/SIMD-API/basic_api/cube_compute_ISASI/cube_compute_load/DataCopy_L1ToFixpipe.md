@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: DataCopy（L1ToFixpipe-Buffer数据搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_L1ToFixpipe.md
+description: DataCopy数据搬运支持将随路量化参数从L1 Buffer移动到Fixpipe Buffer。Fixpipe Buffer包含两种参数：pre_stage的量化参数，这些参数各自独立存储，并拥有独立的地址空间。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DataCopy（L1ToFixpipe-Buffer数据搬运）<a id="ZH-CN_TOPIC_0000002569070951"></a>
 
 ## 产品支持情况<a id="zh-cn_topic_0000002538001510_section18204144912492"></a>

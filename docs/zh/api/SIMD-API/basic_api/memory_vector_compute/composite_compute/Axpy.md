@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Axpy
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/Axpy.md
+description: 向量和标量的乘积，并将乘积结果逐元素加到的输出向量上。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Axpy<a name="ZH-CN_TOPIC_0000001424952592"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

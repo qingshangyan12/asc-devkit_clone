@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetArchVersion
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetArchVersion.md
+description: 获取当前AI处理器架构版本号。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetArchVersion__Ru32
+  archs: ['3510', '2201', '3002', '2002', '1001']
+  headers: [/include/basic_api/kernel_operator_sys_var_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetArchVersion
 
 ## 产品支持情况
@@ -33,6 +49,13 @@
 获取当前AI处理器架构版本号。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "GetArchVersion__Ru32"
+  archs: ["3510", "2201", "3002", "2002", "1001"]
+  headers: ["/include/basic_api/kernel_operator_sys_var_intf.h"]
+```
 
 ```cpp
 __aicore__ inline void GetArchVersion(uint32_t& coreVersion)

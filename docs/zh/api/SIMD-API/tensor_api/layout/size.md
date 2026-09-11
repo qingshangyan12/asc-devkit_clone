@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: size
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/layout/size.md
+description: 用于返回layout的有效元素个数。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: size__RCpLayout
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/layout_interface.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # size
 
 ## 产品支持情况
@@ -29,6 +45,13 @@
 用于返回layout的有效元素个数。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "size__RCpLayout"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/layout_interface.h"]
+```
 
 ```cpp
 template <size_t... Is, typename Layout>

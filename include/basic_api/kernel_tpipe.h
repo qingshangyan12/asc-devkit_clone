@@ -52,6 +52,12 @@ struct DataCopyParams;
 template <TPosition src, TPosition dst, int32_t depth, auto mask = 0>
 class TQueBind {
 public:
+/**
+ * @ingroup simd_api.basic_api.resource_management.tquebind
+ * @override_id TQueBind__z
+ * @archs 3510 2201 3002 2002 1001
+ * @brief 创建TQueBind对象。
+ */
     __aicore__ inline TQueBind();
     __aicore__ inline void FreeBuffer(TBufHandle buf);
     __aicore__ inline TBuffAddr GetBufferAddr(TBufHandle buf);
@@ -74,16 +80,52 @@ public:
     template <TPosition srcUserPos, TPosition dstUserPos, typename T>
     __aicore__ inline bool EnQue(const LocalTensor<T>& tensor);
     template <typename T>
+/**
+ * @ingroup simd_api.basic_api.resource_management.tquebind
+ * @override_id DeQue__Rltg1x2_pT
+ * @archs 3510 2201 3002 2002 1001
+ * @brief 将Tensor从队列中取出，用于后续处理。
+ */
     __aicore__ inline void DeQue(LocalTensor<T>& tensor);
     template <typename T>
     __aicore__ inline LocalTensor<T> DeQue();
     __aicore__ inline TBufHandle DeQue();
     template <TPosition srcUserPos, TPosition dstUserPos, typename T>
     __aicore__ inline LocalTensor<T> DeQue();
+/**
+ * @ingroup simd_api.basic_api.resource_management.tquebind
+ * @override_id VacantInQue__z
+ * @archs 3510 2201 3002 2002 1001
+ * @brief 查询队列是否已满。
+ */
     __aicore__ inline bool VacantInQue();
+/**
+ * @ingroup simd_api.basic_api.resource_management.tquebind
+ * @override_id HasTensorInQue__z
+ * @archs 3510 2201 3002 2002 1001
+ * @brief 查询Que中目前是否已有入队的Tensor。
+ */
     __aicore__ inline bool HasTensorInQue();
+/**
+ * @ingroup simd_api.basic_api.resource_management.tquebind
+ * @override_id GetTensorCountInQue__z
+ * @archs 3510 2201 3002 2002 1001
+ * @brief 查询Que中已入队的Tensor数量。
+ */
     __aicore__ inline int32_t GetTensorCountInQue();
+/**
+ * @ingroup simd_api.basic_api.resource_management.tquebind
+ * @override_id HasIdleBuffer__z
+ * @archs 3510 2201 3002 2002 1001
+ * @brief 查询Que中是否有空闲的内存块。
+ */
     __aicore__ inline bool HasIdleBuffer();
+/**
+ * @ingroup simd_api.basic_api.resource_management.tquebind
+ * @override_id FreeAllEvent__z
+ * @archs 3510 2201 3002 2002 1001
+ * @brief 释放队列中申请的所有同步事件。队列分配的Buffer关联着同步事件的eventID，因为同步事件的数量有限制，如果同时使用的队列Buffer数量超过限制，将无法继续申请队列，使用本接口释放队列中的事件后，可以再次申请队列。详细介绍请参考[TQue Buffer限制](../TQue/TQue_intro.md#section466543213575)。
+ */
     __aicore__ inline void FreeAllEvent();
     template <typename T>
     __aicore__ inline TBufState GetState(const LocalTensor<T>& tensor) const;
@@ -211,12 +253,24 @@ private:
 template <TPosition pos = TPosition::LCM>
 class TBuf : public TQueBind<pos, pos, 0, 0> {
 public:
+/**
+ * @ingroup simd_api.basic_api.resource_management.tbuf
+ * @override_id TBuf__z
+ * @archs 3510 2201 3002 2002 1001 x90 9030
+ * @brief 创建TBuf对象时，初始化数据成员。
+ */
     __aicore__ inline TBuf() = default;
     template <typename T>
     __aicore__ inline LocalTensor<T> Get();
     template <typename T>
     __aicore__ inline LocalTensor<T> Get(uint32_t len);
     template <typename T>
+/**
+ * @ingroup simd_api.basic_api.resource_management.tbuf
+ * @override_id GetWithOffset__u32_u32
+ * @archs 3510 2201 3002 2002 1001 x90 9030
+ * @brief 以TBuf为基地址，向后偏移指定长度，将偏移后的地址作为起始地址，提取长度为指定值的Tensor。
+ */
     __aicore__ inline LocalTensor<T> GetWithOffset(uint32_t size, uint32_t bufOffset);
     // inheritance function from Class TQueBind
     template <typename T>
@@ -472,6 +526,12 @@ public:
     template <class T, class U>
     __aicore__ inline bool InitBufPool(T& bufPool, uint32_t len, U& shareBuf);
     template <HardEvent evt>
+/**
+ * @ingroup simd_api.basic_api.resource_management.tpipe
+ * @override_id AllocEventID__z
+ * @archs 3510 2201 2002 1001 x90 9030
+ * @brief 用于申请HardEvent（硬件类型同步事件）的TEventID，必须与[ReleaseEventID](ReleaseEventID.md)搭配使用，调用该接口后，会占用申请的TEventID，直至调用ReleaseEventID释放。
+ */
     __aicore__ inline TEventID AllocEventID();
     template <HardEvent evt>
     __aicore__ inline void ReleaseEventID(TEventID id);
@@ -501,7 +561,19 @@ public:
      * tpipe.ReadSpmBuffer(calcTensor, size);
      */
     template <typename T>
+/**
+ * @ingroup simd_api.basic_api.resource_management.tpipe
+ * @override_id InitSpmBuffer__RCgtg1x2_pT_i32
+ * @archs 3510 2201 2002 1001 x90 9030
+ * @brief 初始化SPM Buffer。SPM Buffer是一块在GM上的空间，当Unified Buffer（UB）空间不足时可以将溢出数据存放在SPM Buffer上。
+ */
     __aicore__ inline void InitSpmBuffer(const GlobalTensor<T>& workspace, const int32_t bufferSize);
+/**
+ * @ingroup simd_api.basic_api.resource_management.tpipe
+ * @override_id InitSpmBuffer__i32
+ * @archs 3510 2201 2002 1001 x90 9030
+ * @brief 初始化SPM Buffer。SPM Buffer是一块在GM上的空间，当Unified Buffer（UB）空间不足时可以将溢出数据存放在SPM Buffer上。
+ */
     __aicore__ inline void InitSpmBuffer(const int32_t bufferSize);
     template <typename T>
     __aicore__ inline void WriteSpmBuffer(
@@ -515,7 +587,19 @@ public:
     template <typename T>
     __aicore__ inline void ReadSpmBuffer(
         const LocalTensor<T>& readBuffer, const int32_t readSize, int32_t readOffset = 0);
+/**
+ * @ingroup simd_api.basic_api.resource_management.tpipe
+ * @override_id DestroyWithoutPipeAll__z
+ * @archs 3510 2201 3002 2002 1001
+ * @brief 释放资源。
+ */
     __aicore__ inline void DestroyWithoutPipeAll();
+/**
+ * @ingroup simd_api.basic_api.resource_management.tpipe
+ * @override_id Destroy__z
+ * @archs 3510 2201 3002 2002 1001 x90 9030
+ * @brief 释放资源。
+ */
     __aicore__ inline void Destroy();
     __aicore__ inline void Reset();
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1

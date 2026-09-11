@@ -41,6 +41,12 @@ namespace AscendC {
 template <typename T>
 struct NumericLimits {
 public:
+/**
+ * @ingroup simd_api.basic_api.tool_interface.numericlimits_utils
+ * @override_id Max__z
+ * @archs 3510
+ * @brief 返回指定数据类型的最大有限值。
+ */
     constexpr __aicore__ static inline T Max()
     {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
@@ -76,6 +82,12 @@ public:
         return T();
     }
 
+/**
+ * @ingroup simd_api.basic_api.tool_interface.numericlimits_utils
+ * @override_id Lowest__z
+ * @archs 3510
+ * @brief 返回指定数据类型的最低有限值，即满足无其他有限值y符合y < x的有限值x。
+ */
     constexpr __aicore__ static inline T Lowest()
     {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
@@ -111,6 +123,12 @@ public:
         return T();
     }
 
+/**
+ * @ingroup simd_api.basic_api.tool_interface.numericlimits_utils
+ * @override_id Min__z
+ * @archs 3510
+ * @brief 返回指定数据类型的最小有限值，对于浮点数类型来说，返回其最小规约正数。
+ */
     constexpr __aicore__ static inline T Min()
     {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
@@ -146,6 +164,12 @@ public:
         return T();
     }
 
+/**
+ * @ingroup simd_api.basic_api.tool_interface.numericlimits_utils
+ * @override_id Infinity__z
+ * @archs 3510
+ * @brief 返回指定数据类型的正无穷大值。
+ */
     constexpr __aicore__ static inline T Infinity()
     {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
@@ -166,6 +190,12 @@ public:
         return T();
     }
 
+/**
+ * @ingroup simd_api.basic_api.tool_interface.numericlimits_utils
+ * @override_id NegativeInfinity__z
+ * @archs 3510
+ * @brief 返回指定数据类型的负无穷大值。
+ */
     constexpr __aicore__ static inline T NegativeInfinity()
     {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
@@ -186,6 +216,12 @@ public:
         return T();
     }
 
+/**
+ * @ingroup simd_api.basic_api.tool_interface.numericlimits_utils
+ * @override_id QuietNaN__z
+ * @archs 3510
+ * @brief 返回指定数据类型的[安静NaN值](../../data_structures/builtin_data_types.md)（浮点尾数最高位为1）。
+ */
     constexpr __aicore__ static inline T QuietNaN()
     {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
@@ -206,6 +242,12 @@ public:
         return T();
     }
 
+/**
+ * @ingroup simd_api.basic_api.tool_interface.numericlimits_utils
+ * @override_id SignalingNaN__z
+ * @archs 3510
+ * @brief 返回指定数据类型的[发信NaN值](../../data_structures/builtin_data_types.md)（浮点尾数最高位为0）。
+ */
     constexpr __aicore__ static inline T SignalingNaN()
     {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
@@ -226,6 +268,12 @@ public:
         return T();
     }
 
+/**
+ * @ingroup simd_api.basic_api.tool_interface.numericlimits_utils
+ * @override_id DeNormMin__z
+ * @archs 3510
+ * @brief 返回指定数据类型的最小正的非正规值。
+ */
     constexpr __aicore__ static inline T DeNormMin()
     {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
@@ -246,10 +294,26 @@ public:
         return T();
     }
 
+/**
+ * @ingroup simd_api.basic_api.tool_interface.numericlimits_utils
+ * @override_id Max__RCltg1x2_pT_u32
+ * @archs 3510
+ * @brief 返回指定数据类型的最大有限值。
+ * @param [out] dst 目的操作数。类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。LocalTensor的起始地址需要32字节对齐。
+ * @param [in] count 输入数据元素个数。
+ */
     __aicore__ static inline void Max(const LocalTensor<T>& dst, uint32_t count) { Duplicate(dst, Max(), count); }
 
     __aicore__ static inline void Lowest(const LocalTensor<T>& dst, uint32_t count) { Duplicate(dst, Lowest(), count); }
 
+/**
+ * @ingroup simd_api.basic_api.tool_interface.numericlimits_utils
+ * @override_id Min__RCltg1x2_pT_u32
+ * @archs 3510
+ * @brief 返回指定数据类型的最小有限值，对于浮点数类型来说，返回其最小规约正数。
+ * @param [out] dst 目的操作数。类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。LocalTensor的起始地址需要32字节对齐。
+ * @param [in] count 输入数据元素个数。
+ */
     __aicore__ static inline void Min(const LocalTensor<T>& dst, uint32_t count) { Duplicate(dst, Min(), count); }
 
     __aicore__ static inline void Infinity(const LocalTensor<T>& dst, uint32_t count)

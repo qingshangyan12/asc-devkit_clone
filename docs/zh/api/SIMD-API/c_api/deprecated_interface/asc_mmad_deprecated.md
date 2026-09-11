@@ -10,44 +10,34 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_mmad__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_compute/cube_compute.h"
+    headers: [/include/c_api/cube_compute/cube_compute.h]
   - prototype_id: "asc_mmad_sync__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/cube_compute_composite.h"
+    headers: [/include/c_api/composite/cube_compute_composite.h]
   - prototype_id: "asc_mmad__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_compute/cube_compute.h"
+    headers: [/include/c_api/cube_compute/cube_compute.h]
   - prototype_id: "asc_mmad__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_u8_u8_b_b_b_b"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_compute/cube_compute.h"
+    headers: [/include/c_api/cube_compute/cube_compute.h]
   - prototype_id: "asc_mmad_sync__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/cube_compute_composite.h"
+    headers: [/include/c_api/composite/cube_compute_composite.h]
   - prototype_id: "asc_mmad_sync__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_u8_u8_b_b_b_b"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/cube_compute_composite.h"
+    headers: [/include/c_api/composite/cube_compute_composite.h]
   - override_id: "asc_mmad_s4__PCCi32_PCAi4x2_PCBi4x2_u16_u16_u16_u8_b_b_b"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_compute/cube_compute.h"
+    headers: [/include/c_api/cube_compute/cube_compute.h]
   - override_id: "asc_mmad_s4__PCCi32_PCAi4x2_PCBi4x2_u16_u16_u16_u8_u8_u8_b_b_b_b"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_compute/cube_compute.h"
+    headers: [/include/c_api/cube_compute/cube_compute.h]
   - override_id: "asc_mmad_s4_sync__PCCi32_PCAi4x2_PCBi4x2_u16_u16_u16_u8_b_b_b"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/cube_compute_composite.h"
+    headers: [/include/c_api/composite/cube_compute_composite.h]
   - override_id: "asc_mmad_s4_sync__PCCi32_PCAi4x2_PCBi4x2_u16_u16_u16_u8_u8_u8_b_b_b_b"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/cube_compute_composite.h"
+    headers: [/include/c_api/composite/cube_compute_composite.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -144,8 +134,7 @@ K0的取值为`32B / sizeof(dtype)`，`dtype`为矩阵的数据类型。当数�
 api_signature:
   prototype_id: "asc_mmad__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_compute/cube_compute.h"
+  headers: [/include/c_api/cube_compute/cube_compute.h]
   dtype:
     variants:
       -
@@ -203,8 +192,7 @@ __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
 api_signature:
   prototype_id: "asc_mmad_sync__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/cube_compute_composite.h"
+  headers: [/include/c_api/composite/cube_compute_composite.h]
   dtype:
     variants:
       -
@@ -302,8 +290,7 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 api_signature:
   prototype_id: "asc_mmad__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_compute/cube_compute.h"
+  headers: [/include/c_api/cube_compute/cube_compute.h]
   dtype:
     variants:
       -
@@ -332,8 +319,7 @@ api_signature:
 api_signature:
   prototype_id: "asc_mmad__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_u8_u8_b_b_b_b"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_compute/cube_compute.h"
+  headers: [/include/c_api/cube_compute/cube_compute.h]
   dtype:
     variants:
       -
@@ -362,8 +348,7 @@ api_signature:
 api_signature:
   prototype_id: "asc_mmad_sync__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/cube_compute_composite.h"
+  headers: [/include/c_api/composite/cube_compute_composite.h]
   dtype:
     variants:
       -
@@ -392,8 +377,7 @@ api_signature:
 api_signature:
   prototype_id: "asc_mmad_sync__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_u8_u8_b_b_b_b"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/cube_compute_composite.h"
+  headers: [/include/c_api/composite/cube_compute_composite.h]
   dtype:
     variants:
       -
@@ -426,8 +410,7 @@ api_signature:
 api_signature:
   override_id: "asc_mmad_s4__PCCi32_PCAi4x2_PCBi4x2_u16_u16_u16_u8_b_b_b"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_compute/cube_compute.h"
+  headers: [/include/c_api/cube_compute/cube_compute.h]
 ```
 
   ```c
@@ -438,8 +421,7 @@ api_signature:
 api_signature:
   override_id: "asc_mmad_s4__PCCi32_PCAi4x2_PCBi4x2_u16_u16_u16_u8_u8_u8_b_b_b_b"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_compute/cube_compute.h"
+  headers: [/include/c_api/cube_compute/cube_compute.h]
 ```
 
   ```c
@@ -450,8 +432,7 @@ api_signature:
 api_signature:
   override_id: "asc_mmad_s4_sync__PCCi32_PCAi4x2_PCBi4x2_u16_u16_u16_u8_b_b_b"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/cube_compute_composite.h"
+  headers: [/include/c_api/composite/cube_compute_composite.h]
 ```
 
   ```c
@@ -462,8 +443,7 @@ api_signature:
 api_signature:
   override_id: "asc_mmad_s4_sync__PCCi32_PCAi4x2_PCBi4x2_u16_u16_u16_u8_u8_u8_b_b_b_b"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/cube_compute_composite.h"
+  headers: [/include/c_api/composite/cube_compute_composite.h]
 ```
 
   ```c

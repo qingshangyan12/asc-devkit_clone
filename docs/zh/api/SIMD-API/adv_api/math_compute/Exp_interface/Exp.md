@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: Exp
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/Exp_interface/Exp.md
+description: 按元素取自然指数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Exp__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+  archs: ['3510', '2201']
+  headers: [/include/adv_api/math/exp.h]
+- override_id: Exp__RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510', '2201']
+  headers: [/include/adv_api/math/exp.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Exp
 
 ## 产品支持情况
@@ -47,12 +66,26 @@
 
 -   通过sharedTmpBuffer入参传入临时空间
 
+```yaml
+api_signature:
+  override_id: "Exp__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32"
+  archs: ["3510", "2201"]
+  headers: ["/include/adv_api/math/exp.h"]
+```
+
     ```
     template <typename T, uint8_t taylorExpandLevel, bool isReuseSource = false>
     __aicore__ inline void Exp(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
     ```
 
 -   接口框架申请临时空间
+
+```yaml
+api_signature:
+  override_id: "Exp__RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510", "2201"]
+  headers: ["/include/adv_api/math/exp.h"]
+```
 
     ```
     template <typename T, uint8_t taylorExpandLevel, bool isReuseSource = false>

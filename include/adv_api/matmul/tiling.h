@@ -189,6 +189,10 @@ __aicore__ constexpr MatmulConfig GetMDLConfig(
  * @param [in] hasAntiQuantOffset: whether to enable B matrix quantization by using offset coefficient
  *                                 when the input is A16W8
  * @return MatmulConfig with special MDL setting
+ * @ingroup simd_api.adv_api.cube_compute.matmul_kernel
+ * @override_id GetSpecialMDLConfig__b_b_u32_b_b_b
+ * @archs 3510 2201 x90
+ * @param [in] intrinsicsLimit 用于设置参数intrinsicsCheck。当左矩阵或右矩阵在单核上内轴（即尾轴）大于等于65535（元素个数）时，是否开启循环执行数据从Global Memory到L1 Buffer的搬入。例如，左矩阵A[M, K]，单核上的内轴数据singleCoreK大于65535，配置该参数为true后，API内部通过循环执行数据的搬入。参数取值如下：false：当左矩阵或右矩阵在单核上内轴大于等于65535时，不开启循环执行数据的搬入（默认值）。true：当左矩阵或右矩阵在单核上内轴大于等于65535时，开启循环执行数据的搬入。
  */
 __aicore__ constexpr MatmulConfig GetSpecialMDLConfig(
     const bool intrinsicsLimit = false, const bool batchLoop = false, const uint32_t doMTE2Preload = 0,
@@ -409,6 +413,13 @@ constexpr MatmulConfig CFG_IBSHARE_NORM = GetIBShareNormConfig();
  * @return MatmulConfig with custom setting
  */
 template <MatmulConfigMode configMode, typename... ArgTypes>
+/**
+ * @ingroup simd_api.adv_api.cube_compute.matmul_kernel
+ * @override_id GetMMConfig__QOpArgTypes
+ * @archs 3510 2201 2002 x90
+ * @brief 灵活的自定义Matmul模板参数配置。通过设置[MatmulConfigMode](#table17837129144319)、[MatmulShapeParams](#table16317184295116)、[MatmulQuantParams](#table8313111211573)、[MatmulBatchParams](#table15129204644)、[MatmulFuncParams](#table66217141862)，获取自定义的[MatmulConfig](MatmulConfig.md#matmulconfig-params)。
+ * @param [in] args 可变参数，任意顺序传入需要设置的MatmulShapeParams、MatmulQuantParams、MatmulBatchParams、MatmulFuncParams中的一个或多个。
+ */
 __aicore__ inline constexpr MatmulConfig GetMMConfig(ArgTypes&&... args)
 {
     MatmulConfig mmConfig = CFG_NORM;

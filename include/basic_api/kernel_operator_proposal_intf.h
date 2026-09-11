@@ -60,6 +60,12 @@ __aicore__ inline void MrgSort4(const LocalTensor<T>& dst, const MrgSortSrcList<
  * @param [in] repeatTime repeat times
  */
 template <typename T>
+/**
+ * @ingroup simd_api.basic_api.memory_vector_compute.sort_and_merge_isasi
+ * @override_id RpSort16__RCltg1x2_pT_RCltg1x2_pT_i32
+ * @archs 2002 1001
+ * @brief 根据Region Proposals中的score域对其进行排序（score大的排前面），每次排16个Region Proposals。
+ */
 __aicore__ inline void RpSort16(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t repeatTime);
 
 /* **************************************** MrgSort ****************************************** */
@@ -87,6 +93,12 @@ __aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T
  * @param [in] repeatTime repeat times
  */
 template <typename T>
+/**
+ * @ingroup simd_api.basic_api.memory_vector_compute.sort_and_merge_isasi
+ * @override_id Sort32__RCltg1x2_pT_RCltg1x2_pT_RCltg1x3_u32_i32
+ * @archs 3510 2201 3002
+ * @brief Sort32接口实现一次迭代内对32个数的降序排列操作。
+ */
 __aicore__ inline void Sort32(
     const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<uint32_t>& src1, const int32_t repeatTime);
 
@@ -100,6 +112,12 @@ __aicore__ inline void Sort32(
  * @param [in] modeNumbe Position parameter
  */
 template <typename T>
+/**
+ * @ingroup simd_api.basic_api.memory_vector_compute.sort_and_merge_isasi
+ * @override_id ProposalConcat__RCltg1x2_pT_RCltg1x2_pT_i32_i32
+ * @archs 2002 1001
+ * @brief 将连续元素合入Region Proposal内对应位置，每次迭代会将16个连续元素合入到16个Region Proposals的对应位置里。
+ */
 __aicore__ inline void ProposalConcat(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t repeatTime, const int32_t modeNumber);
 
@@ -113,6 +131,12 @@ __aicore__ inline void ProposalConcat(
  * @param [in] modeNumbe Position parameter
  */
 template <typename T>
+/**
+ * @ingroup simd_api.basic_api.memory_vector_compute.sort_and_merge_isasi
+ * @override_id ProposalExtract__RCltg1x2_pT_RCltg1x2_pT_i32_i32
+ * @archs 2002 1001
+ * @brief 与ProposalConcat功能相反，从Region Proposals内将相应位置的单个元素抽取后重排，每次迭代处理16个Region Proposals，抽取16个元素后连续排列。
+ */
 __aicore__ inline void ProposalExtract(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t repeatTime, const int32_t modeNumber);
 
@@ -126,6 +150,16 @@ __aicore__ inline void ProposalExtract(
  * @param [in] repeatTime repeat times
  */
 template <typename T>
+/**
+ * @ingroup simd_api.adv_api.sort_operations
+ * @override_id Concat__Rltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_i32
+ * @archs 3510 2201 2002
+ * @brief 对数据进行预处理，将要排序的源操作数src一一对应的合入目标数据concat中，数据预处理完成后，可以进行[Sort](Sort.md)。
+ * @param [out] concat 目的操作数。类型为[LocalTensor](../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。LocalTensor的起始地址需要32字节对齐。
+ * @param [in] src 源操作数。类型为[LocalTensor](../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。LocalTensor的起始地址需要32字节对齐。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] tmp 临时空间。接口内部复杂计算时用于存储中间变量，由开发者提供，临时空间大小的获取方式请参考[GetConcatTmpSize](GetConcatTmpSize.md)。数据类型与源操作数保持一致。类型为[LocalTensor](../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。LocalTensor的起始地址需要32字节对齐。
+ * @param [in] repeatTime 重复迭代次数，int32_t类型，每次迭代处理16个元素，下次迭代跳至相邻的下一组16个元素。取值范围：repeatTime∈[0,255]。
+ */
 __aicore__ inline void Concat(
     LocalTensor<T>& concat, const LocalTensor<T>& src, const LocalTensor<T>& tmp, const int32_t repeatTime);
 
@@ -139,6 +173,16 @@ __aicore__ inline void Concat(
  * @param [in] repeatTime repeat times
  */
 template <typename T>
+/**
+ * @ingroup simd_api.adv_api.sort_operations
+ * @override_id Extract__RCltg1x2_pT_RCltg1x3_u32_RCltg1x2_pT_i32
+ * @archs 3510 2201 2002
+ * @brief 处理Sort的结果数据，输出排序后的value和index。
+ * @param [out] dstValue 目的操作数。类型为[LocalTensor](../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。LocalTensor的起始地址需要32字节对齐。
+ * @param [out] dstIndex 目的操作数。类型为[LocalTensor](../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。LocalTensor的起始地址需要32字节对齐。此源操作数固定为uint32_t数据类型。
+ * @param [in] sorted 源操作数。类型为[LocalTensor](../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。LocalTensor的起始地址需要32字节对齐。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] repeatTime 重复迭代次数，int32_t类型。
+ */
 __aicore__ inline void Extract(
     const LocalTensor<T>& dstValue, const LocalTensor<uint32_t>& dstIndex, const LocalTensor<T>& sorted,
     const int32_t repeatTime);
@@ -170,6 +214,12 @@ __aicore__ inline void MrgSort(
  * @param [in] repeatTime repeat times
  */
 template <typename T, bool isFullSort>
+/**
+ * @ingroup simd_api.adv_api.sort_operations
+ * @override_id Sort__RCltg1x2_pT_RCltg1x2_pT_RCltg1x3_u32_Rltg1x2_pT_i32
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 排序函数，按照数值大小进行降序排序。
+ */
 __aicore__ inline void Sort(
     const LocalTensor<T>& dst, const LocalTensor<T>& concat, const LocalTensor<uint32_t>& index, LocalTensor<T>& tmp,
     const int32_t repeatTime);
@@ -181,6 +231,12 @@ __aicore__ inline void Sort(
  * @param [in] elemOffset element number offer
  */
 template <typename T>
+/**
+ * @ingroup simd_api.adv_api.sort_operations
+ * @override_id GetSortOffset__u32
+ * @brief 根据元素位置，获取Sort数据中的对应偏移量（单位为字节）。
+ * @param [in] elemOffset 元素的位置。
+ */
 __aicore__ inline uint32_t GetSortOffset(const uint32_t elemOffset);
 
 /* **************************************** GetSortLen ****************************************** */
@@ -190,6 +246,12 @@ __aicore__ inline uint32_t GetSortOffset(const uint32_t elemOffset);
  * @param [in] elemOffset element number ocountffer
  */
 template <typename T>
+/**
+ * @ingroup simd_api.adv_api.sort_operations
+ * @override_id GetSortLen__u32
+ * @brief 根据元素数量，获取Sort数据的大小（单位为字节）。
+ * @param [in] elemCount 输入元素个数。
+ */
 __aicore__ inline uint32_t GetSortLen(const uint32_t elemCount);
 #pragma end_pipe
 __aicore__ inline __inout_pipe__(S) void GetMrgSortResult(

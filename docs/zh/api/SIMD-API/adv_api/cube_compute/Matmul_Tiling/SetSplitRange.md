@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetSplitRange
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetSplitRange.md
+description: 设置baseM/baseN/baseK的最大值和最小值。目前Tiling暂时不支持该功能。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetSplitRange
 
 ## 功能说明

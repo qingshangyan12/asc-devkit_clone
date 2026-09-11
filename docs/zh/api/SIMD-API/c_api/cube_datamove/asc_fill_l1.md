@@ -9,18 +9,16 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_fill_l1__PL1<dst_dtype>_<value_dtype>_RCfillcfg"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - prototype_id: "asc_fill_l1_sync__PL1<dst_dtype>_<value_dtype>_RCfillcfg"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad_mx"
     archs: ["3510"]
     override_id: "asc_fill_l1__PL1bf16_u32_RCfillcfg"
     file: "mmad_mx.asc"
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_fill_l1
@@ -63,8 +61,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_fill_l1__PL1<dst_dtype>_<value_dtype>_RCfillcfg"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   dtype:
     variants:
       -
@@ -88,8 +85,7 @@ __aicore__ inline void asc_fill_l1(__cbuf__ <dst_dtype>* dst,
 api_signature:
   prototype_id: "asc_fill_l1_sync__PL1<dst_dtype>_<value_dtype>_RCfillcfg"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   dtype:
     variants:
       -
@@ -122,8 +118,7 @@ dst dtype与value dtype支持以下组合：
 api_signature:
   prototype_id: "asc_fill_l1__PL1<dst_dtype>_<value_dtype>_RCfillcfg"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   dtype:
     variants:
       -

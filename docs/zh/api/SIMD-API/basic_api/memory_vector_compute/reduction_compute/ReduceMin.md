@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: ReduceMin
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceMin.md
+description: '`ReduceMin`接口用于从所有输入数据中找出最小值和最小值索引。'
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ReduceMin
 
 ## 产品支持情况

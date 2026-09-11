@@ -38,6 +38,15 @@ namespace AscendC {
  * @param [in] calCount, amount of data to be calculated
  */
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.math_compute.log_interface
+ * @override_id Log__RCltg1x2_pT_RCltg1x2_pT_u32
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 按元素以e、2、10为底做对数运算。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcTensor 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] calCount 参与计算的元素个数。
+ */
 __aicore__ inline void Log(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, uint32_t calCount)
 {
     // Only for AI Vector Core.
@@ -59,6 +68,14 @@ __aicore__ inline void Log(const LocalTensor<T>& dstTensor, const LocalTensor<T>
  * @param [in] srcTensor, input LocalTensor
  */
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.math_compute.log_interface
+ * @override_id Log__RCltg1x2_pT_RCltg1x2_pT
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 按元素以e、2、10为底做对数运算。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcTensor 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ */
 __aicore__ inline void Log(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
 {
     Log<T, isReuseSource>(dstTensor, srcTensor, srcTensor.GetSize());
@@ -73,6 +90,16 @@ __aicore__ inline void Log(const LocalTensor<T>& dstTensor, const LocalTensor<T>
  * @param [in] calCount, amount of data to be calculated
  */
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.math_compute.log_interface
+ * @override_id Log2__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 按元素以e、2、10为底做对数运算。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcTensor 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] sharedTmpBuffer 临时缓存。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。临时空间大小BufferSize的获取方式请参考[GetLogMaxMinTmpSize](GetLogMaxMinTmpSize.md)。
+ * @param [in] calCount 参与计算的元素个数。
+ */
 __aicore__ inline void Log2(
     const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
     uint32_t calCount)
@@ -97,6 +124,15 @@ __aicore__ inline void Log2(
  * @param [in] sharedTmpBuffer, input local temporary Tensor
  */
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.math_compute.log_interface
+ * @override_id Log2__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 按元素以e、2、10为底做对数运算。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcTensor 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] sharedTmpBuffer 临时缓存。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。临时空间大小BufferSize的获取方式请参考[GetLogMaxMinTmpSize](GetLogMaxMinTmpSize.md)。
+ */
 __aicore__ inline void Log2(
     const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
 {
@@ -111,6 +147,15 @@ __aicore__ inline void Log2(
  * @param [in] calCount, amount of data to be calculated
  */
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.math_compute.log_interface
+ * @override_id Log2__RCltg1x2_pT_RCltg1x2_pT_u32
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 按元素以e、2、10为底做对数运算。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcTensor 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] calCount 参与计算的元素个数。
+ */
 __aicore__ inline void Log2(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, uint32_t calCount)
 {
     LocalTensor<uint8_t> stackTensor;
@@ -130,6 +175,14 @@ __aicore__ inline void Log2(const LocalTensor<T>& dstTensor, const LocalTensor<T
  * @param [in] srcTensor, input LocalTensor
  */
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.math_compute.log_interface
+ * @override_id Log2__RCltg1x2_pT_RCltg1x2_pT
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 按元素以e、2、10为底做对数运算。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcTensor 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ */
 __aicore__ inline void Log2(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
 {
     Log2<T, isReuseSource>(dstTensor, srcTensor, srcTensor.GetSize());
@@ -143,6 +196,15 @@ __aicore__ inline void Log2(const LocalTensor<T>& dstTensor, const LocalTensor<T
  * @param [in] calCount, amount of data to be calculated
  */
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.math_compute.log_interface
+ * @override_id Log10__RCltg1x2_pT_RCltg1x2_pT_u32
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 按元素以e、2、10为底做对数运算。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcTensor 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] calCount 参与计算的元素个数。
+ */
 __aicore__ inline void Log10(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, uint32_t calCount)
 {
     // Only for AI Vector Core.
@@ -164,6 +226,14 @@ __aicore__ inline void Log10(const LocalTensor<T>& dstTensor, const LocalTensor<
  * @param [in] srcTensor, input LocalTensor
  */
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.math_compute.log_interface
+ * @override_id Log10__RCltg1x2_pT_RCltg1x2_pT
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 按元素以e、2、10为底做对数运算。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcTensor 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ */
 __aicore__ inline void Log10(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
 {
     Log10<T, isReuseSource>(dstTensor, srcTensor, srcTensor.GetSize());

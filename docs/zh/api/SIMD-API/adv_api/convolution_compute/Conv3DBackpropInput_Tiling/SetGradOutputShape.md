@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetGradOutputShape
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3DBackpropInput_Tiling/SetGradOutputShape.md
+description: 设置GradOutput的形状：Batch、Channel、Depth、Height、Width。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetGradOutputShape
 
 ## 功能说明

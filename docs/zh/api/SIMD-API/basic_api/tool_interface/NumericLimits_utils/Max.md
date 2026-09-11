@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: Max
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/tool_interface/NumericLimits_utils/Max.md
+description: 返回指定数据类型的最大有限值。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Max__z
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_limits_intf.h]
+- override_id: Max__RCltg1x2_pT_u32
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_limits_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Max
 
 ## 产品支持情况
@@ -35,11 +54,25 @@
 
 - 标量接口，返回值为标量：
 
+```yaml
+api_signature:
+  override_id: "Max__z"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_limits_intf.h"]
+```
+
     ```cpp
     constexpr __aicore__ static inline T Max()
     ```
 
 - 矢量接口，为dst前count个元素赋最大有限值：
+
+```yaml
+api_signature:
+  override_id: "Max__RCltg1x2_pT_u32"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_limits_intf.h"]
+```
 
     ```cpp
     __aicore__ static inline void Max(const LocalTensor<T>& dst, uint32_t count)

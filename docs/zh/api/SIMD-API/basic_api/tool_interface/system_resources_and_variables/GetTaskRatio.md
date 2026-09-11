@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: GetTaskRatio
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetTaskRatio.md
+description: '[分离模式](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md)下，获取任务启动的Cube
+  Core（AIC）或者Vector Core（AIV）的数量与逻辑AI Core数量的比例。'
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetTaskRatio__z
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_sys_var_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetTaskRatio
 
 ## 产品支持情况
@@ -43,6 +60,13 @@
 [耦合模式](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md)下，固定返回1。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "GetTaskRatio__z"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_sys_var_intf.h"]
+```
 
 ```cpp
 __aicore__ inline int64_t GetTaskRatio()

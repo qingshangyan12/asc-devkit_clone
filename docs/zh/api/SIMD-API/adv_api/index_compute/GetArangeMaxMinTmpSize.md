@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GetArangeMaxMinTmpSize
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/index_compute/GetArangeMaxMinTmpSize.md
+description: 用于获取Arange Tiling参数：Arange接口能完成计算所需最大临时空间大小max和最小临时空间大小min。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetArangeMaxMinTmpSize
 
 ## 功能说明

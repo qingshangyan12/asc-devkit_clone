@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: Hypot
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/Hypot_interface/Hypot.md
+description: 按元素计算两个浮点数平方和的平方根。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Hypot__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+  archs: ['3510']
+  headers: [/include/adv_api/math/hypot.h]
+- override_id: Hypot__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8
+  archs: ['3510']
+  headers: [/include/adv_api/math/hypot.h]
+- override_id: Hypot__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510']
+  headers: [/include/adv_api/math/hypot.h]
+- override_id: Hypot__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT
+  archs: ['3510']
+  headers: [/include/adv_api/math/hypot.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Hypot
 
 ## 产品支持情况
@@ -40,12 +65,26 @@ Hypot\(3.0, 4.0\) = 5.0
 -   通过sharedTmpBuffer入参传入临时空间
     -   源操作数Tensor全部/部分参与计算
 
+```yaml
+api_signature:
+  override_id: "Hypot__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32"
+  archs: ["3510"]
+  headers: ["/include/adv_api/math/hypot.h"]
+```
+
         ```
         template <typename T, bool isReuseSource = false>
         __aicore__ inline void Hypot(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
+
+```yaml
+api_signature:
+  override_id: "Hypot__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8"
+  archs: ["3510"]
+  headers: ["/include/adv_api/math/hypot.h"]
+```
 
         ```
         template <typename T, bool isReuseSource = false>
@@ -55,12 +94,26 @@ Hypot\(3.0, 4.0\) = 5.0
 -   接口框架申请临时空间
     -   源操作数Tensor全部/部分参与计算
 
+```yaml
+api_signature:
+  override_id: "Hypot__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510"]
+  headers: ["/include/adv_api/math/hypot.h"]
+```
+
         ```
         template <typename T, bool isReuseSource = false>
         __aicore__ inline void Hypot(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
+
+```yaml
+api_signature:
+  override_id: "Hypot__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT"
+  archs: ["3510"]
+  headers: ["/include/adv_api/math/hypot.h"]
+```
 
         ```
         template <typename T, bool isReuseSource = false>

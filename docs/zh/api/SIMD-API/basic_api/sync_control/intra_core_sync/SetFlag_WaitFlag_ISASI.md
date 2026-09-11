@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: SetFlag/WaitFlag\(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md
+description: 如图1所示。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetFlag__i32
+  archs: ['3510', '2201', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_block_sync_intf.h]
+- override_id: WaitFlag__i32
+  archs: ['3510', '2201', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_block_sync_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetFlag/WaitFlag\(ISASI\)<a name="ZH-CN_TOPIC_0000001837467889"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -48,9 +67,26 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
+```yaml
+api_signature:
+  override_id: "SetFlag__i32"
+  archs: ["3510", "2201", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_block_sync_intf.h"]
+```
+
 ```cpp
 template <HardEvent event>
 __aicore__ inline void SetFlag(int32_t eventID)
+```
+
+```yaml
+api_signature:
+  override_id: "WaitFlag__i32"
+  archs: ["3510", "2201", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_block_sync_intf.h"]
+```
+
+```cpp
 template <HardEvent event>
 __aicore__ inline void WaitFlag(int32_t eventID)
 ```

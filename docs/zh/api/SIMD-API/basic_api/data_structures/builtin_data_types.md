@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: 内置数据类型
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/data_structures/builtin_data_types.md
+description: Ascend C提供b8\~b64（8bit\~64bit）四种不同位宽的数据类型，不同位宽对应的数据类型如下表所示。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # 内置数据类型<a name="ZH-CN_TOPIC_0000002313437229"></a>
 
 ## 数据类型列表<a name="section16395539499"></a>

@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: EXTERN\_IMPL\_BUFPOOL宏
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/custom_TBufPool/EXTERN_IMPL_BUFPOOL.md
+description: 开发者可以通过[TBufPool类](../TBufPool/TBufPool.md)手动管理Unified Buffer（UB）、L1
+  Buffer物理内存。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # EXTERN\_IMPL\_BUFPOOL宏<a name="ZH-CN_TOPIC_0000002087922321"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

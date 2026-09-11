@@ -9,20 +9,16 @@ usage_dependencies:
 signature:
   - override_id: "asc_bitsort__PUf16_PUf16_PUu32_i32"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_sort.h"
+    headers: [/include/c_api/vector_compute/compute/vector_sort.h]
   - override_id: "asc_bitsort__PUf32_PUf32_PUu32_i32"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_sort.h"
+    headers: [/include/c_api/vector_compute/compute/vector_sort.h]
   - override_id: "asc_bitsort_sync__PUf16_PUf16_PUu32_i32"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_bitsort_sync__PUf32_PUf32_PUu32_i32"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -68,8 +64,7 @@ Score和Index分别存储在src0和src1中，按Score进行排序（Score大的�
 api_signature:
   override_id: "asc_bitsort__PUf16_PUf16_PUu32_i32"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_sort.h"
+  headers: [/include/c_api/vector_compute/compute/vector_sort.h]
 ```
 
   ```cpp
@@ -80,8 +75,7 @@ api_signature:
 api_signature:
   override_id: "asc_bitsort__PUf32_PUf32_PUu32_i32"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_sort.h"
+  headers: [/include/c_api/vector_compute/compute/vector_sort.h]
 ```
 
   ```cpp
@@ -93,8 +87,7 @@ api_signature:
 api_signature:
   override_id: "asc_bitsort_sync__PUf16_PUf16_PUu32_i32"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
   ```cpp
@@ -105,8 +98,7 @@ api_signature:
 api_signature:
   override_id: "asc_bitsort_sync__PUf32_PUf32_PUu32_i32"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
   ```cpp

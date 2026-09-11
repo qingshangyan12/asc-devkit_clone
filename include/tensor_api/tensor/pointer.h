@@ -26,6 +26,12 @@ namespace asc {
 namespace te {
 
 template <typename PtrPattern, typename DataType, typename Addr, enable_make_ptr_by_trait<PtrPattern, Addr> Enable>
+/**
+ * @ingroup simd_api.tensor_api.tensor
+ * @override_id make_mem_ptr__pAddr
+ * @archs 3510
+ * @brief make_mem_ptr用于构造带物理存储位置标记和数据类型信息的内存指针适配器`hardware_mem_ptr`，支持的物理位置如下表所示。
+ */
 __aicore__ inline auto make_mem_ptr(Addr address);
 
 template <typename PtrPattern, typename Iterator, enable_make_hardware_ptr<PtrPattern, Iterator> Enable>

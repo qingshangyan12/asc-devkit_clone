@@ -12,28 +12,22 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_storealign_pack__PU<dtype>_v<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/store/storealign.h"
+    headers: [/include/c_api/reg_compute/store/storealign.h]
   - prototype_id: "asc_storealign_pack__PU<dtype>_v<dtype>_i32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/store/storealign.h"
+    headers: [/include/c_api/reg_compute/store/storealign.h]
   - prototype_id: "asc_storealign_pack__PU<dtype>_v<dtype>_ar_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/store/storealign.h"
+    headers: [/include/c_api/reg_compute/store/storealign.h]
   - prototype_id: "asc_storealign_pack__PU<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/store/storealign.h"
+    headers: [/include/c_api/reg_compute/store/storealign.h]
   - prototype_id: "asc_storealign_pack__PU<dtype>_vb_i32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/store/storealign.h"
+    headers: [/include/c_api/reg_compute/store/storealign.h]
   - prototype_id: "asc_storealign_pack__PU<dtype>_vb_ar"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/store/storealign.h"
+    headers: [/include/c_api/reg_compute/store/storealign.h]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/cast"
     archs: ["3510"]
@@ -100,8 +94,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_storealign_pack__PU<dtype>_v<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/store/storealign.h"
+  headers: [/include/c_api/reg_compute/store/storealign.h]
   dtype:
     values:
       - "int16_t"
@@ -140,8 +133,7 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__ int16_t* dst,
 api_signature:
   prototype_id: "asc_storealign_pack__PU<dtype>_v<dtype>_i32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/store/storealign.h"
+  headers: [/include/c_api/reg_compute/store/storealign.h]
   dtype:
     values:
       - "int16_t"
@@ -181,8 +173,7 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__ int16_t* dst,
 api_signature:
   prototype_id: "asc_storealign_pack__PU<dtype>_v<dtype>_ar_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/store/storealign.h"
+  headers: [/include/c_api/reg_compute/store/storealign.h]
   dtype:
     values:
       - "int16_t"
@@ -222,8 +213,7 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__ int16_t* dst,
 api_signature:
   prototype_id: "asc_storealign_pack__PU<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/store/storealign.h"
+  headers: [/include/c_api/reg_compute/store/storealign.h]
   dtype:
     values:
       - "uint8_t"
@@ -253,8 +243,7 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint8_t* dst,
 api_signature:
   prototype_id: "asc_storealign_pack__PU<dtype>_vb_i32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/store/storealign.h"
+  headers: [/include/c_api/reg_compute/store/storealign.h]
   dtype:
     values:
       - "uint8_t"
@@ -286,8 +275,7 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint8_t* dst,
 api_signature:
   prototype_id: "asc_storealign_pack__PU<dtype>_vb_ar"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/store/storealign.h"
+  headers: [/include/c_api/reg_compute/store/storealign.h]
   dtype:
     values:
       - "uint8_t"

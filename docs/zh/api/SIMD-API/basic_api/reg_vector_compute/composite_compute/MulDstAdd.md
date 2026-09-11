@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: MulDstAdd
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/composite_compute/MulDstAdd.md
+description: 该接口用于完成dstReg与srcReg0逐元素相乘再加srcReg1的融合乘加运算，根据mask将计算结果写回dstReg。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # MulDstAdd<a name="ZH-CN_TOPIC_0000002093730614"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

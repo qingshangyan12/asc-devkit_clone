@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: ReduceProd
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/reduction_operations/ReduceProd_interface/ReduceProd.md
+description: 对一个多维向量在指定的维度求积。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ReduceProd
 
 ## 产品支持情况

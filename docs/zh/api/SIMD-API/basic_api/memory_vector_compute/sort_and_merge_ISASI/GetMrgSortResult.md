@@ -1,3 +1,21 @@
+---
+okftype: reference.api.cpp
+title: GetMrgSortResult
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/sort_and_merge_ISASI/GetMrgSortResult.md
+description: null
+tag: [basic_api]
+usage_dependencies:
+  status: confirmed
+  companion:
+  - MrgSort.md
+signature:
+- override_id: GetMrgSortResult__Ru16_Ru16_Ru16_Ru16
+  archs: ['3510', '2201', '3002', '2002']
+  headers: [/include/basic_api/kernel_operator_proposal_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetMrgSortResult<a name="ZH-CN_TOPIC_0000001790047014"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -66,6 +84,13 @@
 <!-- end id13 -->
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "GetMrgSortResult__Ru16_Ru16_Ru16_Ru16"
+  archs: ["3510", "2201", "3002", "2002"]
+  headers: ["/include/basic_api/kernel_operator_proposal_intf.h"]
+```
 
 ```cpp
 __aicore__ inline void GetMrgSortResult(uint16_t &mrgSortList1, uint16_t &mrgSortList2, uint16_t &mrgSortList3, uint16_t &mrgSortList4)

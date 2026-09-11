@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: LoadDataUnzip
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_load_aux_config/LoadDataUnzip.md
+description: 将GM上的数据解压并搬运到L1 Buffer（A1/B1）或L0B Buffer（B2）上。执行该API前需要执行[LoadUnzipIndex](LoadUnzipIndex.md)加载压缩索引表。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: LoadDataUnzip__RCltg1x2_pT_RCgtg1x2_pT
+  archs: ['2002']
+  headers: [/include/basic_api/kernel_operator_mm_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LoadDataUnzip<a name="ZH-CN_TOPIC_0000001913015096"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -30,6 +46,13 @@
 将GM上的数据解压并搬运到L1 Buffer（A1/B1）或L0B Buffer（B2）上。执行该API前需要执行[LoadUnzipIndex](LoadUnzipIndex.md)加载压缩索引表。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "LoadDataUnzip__RCltg1x2_pT_RCgtg1x2_pT"
+  archs: ["2002"]
+  headers: ["/include/basic_api/kernel_operator_mm_intf.h"]
+```
 
 ```cpp
 template <typename T>

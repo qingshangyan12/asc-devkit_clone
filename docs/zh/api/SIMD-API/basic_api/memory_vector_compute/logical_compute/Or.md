@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Or
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/logical_compute/Or.md
+description: 每对元素做按位或运算。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Or<a name="ZH-CN_TOPIC_0000001379430576"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

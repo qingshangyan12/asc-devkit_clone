@@ -9,12 +9,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_gather__Rv<dtype>_v<dtype>_v<index_dtype>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_gather.h"
+    headers: [/include/c_api/reg_compute/compute/reg_gather.h]
   - prototype_id: "asc_gather__v<dtype>_v<index_dtype>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_gather.h"
+    headers: [/include/c_api/reg_compute/compute/reg_gather.h]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/gather"
     archs: ["3510"]
@@ -67,8 +65,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_gather__Rv<dtype>_v<dtype>_v<index_dtype>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_gather.h"
+  headers: [/include/c_api/reg_compute/compute/reg_gather.h]
   dtype:
     variants:
       -
@@ -123,8 +120,7 @@ __simd_callee__ inline void asc_gather(vector_<dtype>& dst,
 api_signature:
   prototype_id: "asc_gather__v<dtype>_v<index_dtype>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_gather.h"
+  headers: [/include/c_api/reg_compute/compute/reg_gather.h]
   dtype:
     variants:
       -

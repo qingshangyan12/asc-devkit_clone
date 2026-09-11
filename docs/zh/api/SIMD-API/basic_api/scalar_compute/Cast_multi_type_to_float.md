@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: Cast（多类型转float）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/scalar_compute/Cast_multi_type_to_float.md
+description: 该接口将输入数据转换为float类型。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Cast__RCbf16
+  archs: ['2201']
+  headers: [/include/basic_api/kernel_operator_scalar_intf.h]
+- override_id: Cast__pT
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_scalar_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Cast（多类型转float）<a name="ZH-CN_TOPIC_0000001623525812"></a>
 
 ## 产品支持情况
@@ -48,6 +67,13 @@
 
 bfloat16\_t类型转换为float类型：
 
+```yaml
+api_signature:
+  override_id: "Cast__RCbf16"
+  archs: ["2201"]
+  headers: ["/include/basic_api/kernel_operator_scalar_intf.h"]
+```
+
 ```cpp
 __aicore__ inline float Cast(const bfloat16_t& bVal)
 ```
@@ -57,6 +83,13 @@ __aicore__ inline float Cast(const bfloat16_t& bVal)
 以下函数原型仅支持Ascend 950PR/Ascend 950DT：
 
 支持多种数据类型转换为float类型：
+
+```yaml
+api_signature:
+  override_id: "Cast__pT"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_scalar_intf.h"]
+```
 
 ```cpp
 template <typename T, typename U = float,

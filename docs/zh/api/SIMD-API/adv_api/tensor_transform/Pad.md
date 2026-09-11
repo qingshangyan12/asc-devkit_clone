@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Pad
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/tensor_transform/Pad.md
+description: 对height \* width的二维Tensor在width方向上pad到32B对齐，如果Tensor的width已32B对齐，且全部为有效数据，则不支持调用本接口对齐。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Pad
 
 ## 产品支持情况

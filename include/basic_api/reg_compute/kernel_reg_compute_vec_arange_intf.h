@@ -31,6 +31,12 @@
 namespace AscendC {
 namespace Reg {
 template <typename T = DefaultType, IndexOrder order = IndexOrder::INCREASE_ORDER, typename U, typename S>
+/**
+ * @ingroup simd_api.basic_api.reg_vector_compute.index_operations
+ * @override_id Arange__RpS_pU
+ * @archs 3510
+ * @brief 递增模式时，该函数以传入的scalarValue的值为起始值，生成递增的索引；递减模式时，该函数以传入的scalarValue的值为终止值，生成递减的索引，并将索引保存在dstReg中。
+ */
 __simd_callee__ inline void Arange(S& dstReg, U scalarValue);
 } // namespace Reg
 } // namespace AscendC

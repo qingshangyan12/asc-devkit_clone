@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: make_shape
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/layout/make_shape.md
+description: 构造shape对象，用于描述数据的逻辑形状。支持传入多个维度值，也支持传入嵌套的shape子结构以构造层次化shape。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: make_shape__RCpFirstShape_QRCpShapes
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/layout_interface.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # make_shape
 
 ## 产品支持情况
@@ -29,6 +45,13 @@
 构造shape对象，用于描述数据的逻辑形状。支持传入多个维度值，也支持传入嵌套的shape子结构以构造层次化shape。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "make_shape__RCpFirstShape_QRCpShapes"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/layout_interface.h"]
+```
 
 ```cpp
 template <typename FirstShape, typename... Shapes>

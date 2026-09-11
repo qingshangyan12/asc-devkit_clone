@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: UnPack
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/data_compression/UnPack.md
+description: 对于无符号整型，将源操作数srcReg中低半部分或高半部分的元素以高位填0扩充位宽的方式写入dstReg。对于有符号整型，将源操作数srcReg中低半部分或高半部分的元素以保持符号位扩充位宽的方式写入dstReg。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: UnPack__RpS_RpV
+  archs: ['3510']
+  headers: [/include/basic_api/reg_compute/kernel_reg_compute_pack_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # UnPack<a name="ZH-CN_TOPIC_0000002047032737"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -37,6 +53,13 @@
 ![UnPack](../../../../figures/reg_unpack_1.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "UnPack__RpS_RpV"
+  archs: ["3510"]
+  headers: ["/include/basic_api/reg_compute/kernel_reg_compute_pack_intf.h"]
+```
 
 ```cpp
 template <typename T = DefaultType, typename U = DefaultType, HighLowPart part = HighLowPart::LOWEST, typename S, typename V>

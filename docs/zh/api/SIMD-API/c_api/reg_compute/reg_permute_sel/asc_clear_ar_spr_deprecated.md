@@ -9,8 +9,7 @@ usage_dependencies:
 signature:
   - override_id: "asc_clear_ar_spr__z"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -56,8 +55,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_clear_ar_spr__z"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```c

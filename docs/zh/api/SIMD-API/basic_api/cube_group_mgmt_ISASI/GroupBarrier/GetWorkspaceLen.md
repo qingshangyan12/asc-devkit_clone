@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetWorkspaceLen
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_group_mgmt_ISASI/GroupBarrier/GetWorkspaceLen.md
+description: 返回当前GroupBarrier所占用的Global Memory消息空间大小。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetWorkspaceLen__z
+  archs: ['3510', '2201']
+  headers: [/include/basic_api/core_mng/roc/kernel_operator_group_barrier_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetWorkspaceLen<a name="ZH-CN_TOPIC_0000001968485296"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -31,6 +47,13 @@
 返回当前GroupBarrier所占用的Global Memory消息空间大小。
 
 ## 函数原型<a name="section765814724715"></a>
+
+```yaml
+api_signature:
+  override_id: "GetWorkspaceLen__z"
+  archs: ["3510", "2201"]
+  headers: ["/include/basic_api/core_mng/roc/kernel_operator_group_barrier_intf.h"]
+```
 
 ```
 __aicore__ inline uint64_t GetWorkspaceLen()

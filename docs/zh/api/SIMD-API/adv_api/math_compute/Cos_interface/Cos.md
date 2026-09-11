@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: Cos
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/Cos_interface/Cos.md
+description: 按元素做三角函数余弦运算。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Cos__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/math/cos.h]
+- override_id: Cos__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/math/cos.h]
+- override_id: Cos__RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/math/cos.h]
+- override_id: Cos__RCltg1x2_pT_RCltg1x2_pT
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/math/cos.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Cos
 
 ## 产品支持情况
@@ -44,12 +69,26 @@ Cos\(x\)的泰勒展开式为：
 -   通过sharedTmpBuffer入参传入临时空间
     -   源操作数Tensor全部/部分参与计算
 
+```yaml
+api_signature:
+  override_id: "Cos__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/math/cos.h"]
+```
+
         ```
         template <typename T, bool isReuseSource = false, const CosConfig& config = defaultCosConfig>
         __aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
+
+```yaml
+api_signature:
+  override_id: "Cos__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/math/cos.h"]
+```
 
         ```
         template <typename T, bool isReuseSource = false, const CosConfig& config = defaultCosConfig>
@@ -59,12 +98,26 @@ Cos\(x\)的泰勒展开式为：
 -   接口框架申请临时空间
     -   源操作数Tensor全部/部分参与计算
 
+```yaml
+api_signature:
+  override_id: "Cos__RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/math/cos.h"]
+```
+
         ```
         template <typename T, bool isReuseSource = false, const CosConfig& config = defaultCosConfig>
         __aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
+
+```yaml
+api_signature:
+  override_id: "Cos__RCltg1x2_pT_RCltg1x2_pT"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/math/cos.h"]
+```
 
         ```
         template <typename T, bool isReuseSource = false, const CosConfig& config = defaultCosConfig>

@@ -9,76 +9,58 @@ usage_dependencies:
 signature:
   - override_id: "asc_shiftright__PUi16_PUi16_i32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_logic.h"
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
   - override_id: "asc_shiftright__PUu16_PUu16_u32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_logic.h"
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
   - override_id: "asc_shiftright__PUi32_PUi32_i32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_logic.h"
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
   - override_id: "asc_shiftright__PUu32_PUu32_u32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_logic.h"
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
   - override_id: "asc_shiftright_round__PUi16_PUi16_i32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_logic.h"
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
   - override_id: "asc_shiftright_round__PUi32_PUi32_i32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_logic.h"
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
   - override_id: "asc_shiftright__PUi16_PUi16_i32_u8_u16_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_logic.h"
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
   - override_id: "asc_shiftright__PUu16_PUu16_u32_u8_u16_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_logic.h"
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
   - override_id: "asc_shiftright__PUi32_PUi32_i32_u8_u16_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_logic.h"
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
   - override_id: "asc_shiftright__PUu32_PUu32_u32_u8_u16_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_logic.h"
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
   - override_id: "asc_shiftright_round__PUi16_PUi16_i32_u8_u16_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_logic.h"
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
   - override_id: "asc_shiftright_round__PUi32_PUi32_i32_u8_u16_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_logic.h"
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
   - override_id: "asc_shiftright_sync__PUi16_PUi16_i32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_shiftright_sync__PUu16_PUu16_u32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_shiftright_sync__PUi32_PUi32_i32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_shiftright_sync__PUu32_PUu32_u32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_shiftright_round_sync__PUi16_PUi16_i32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_shiftright_round_sync__PUi32_PUi32_i32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -126,8 +108,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_shiftright__PUi16_PUi16_i32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_logic.h"
+  headers: [/include/c_api/vector_compute/compute/vector_logic.h]
 ```
 
     ```cpp
@@ -138,8 +119,7 @@ api_signature:
 api_signature:
   override_id: "asc_shiftright__PUu16_PUu16_u32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_logic.h"
+  headers: [/include/c_api/vector_compute/compute/vector_logic.h]
 ```
 
     ```cpp
@@ -150,8 +130,7 @@ api_signature:
 api_signature:
   override_id: "asc_shiftright__PUi32_PUi32_i32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_logic.h"
+  headers: [/include/c_api/vector_compute/compute/vector_logic.h]
 ```
 
     ```cpp
@@ -162,8 +141,7 @@ api_signature:
 api_signature:
   override_id: "asc_shiftright__PUu32_PUu32_u32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_logic.h"
+  headers: [/include/c_api/vector_compute/compute/vector_logic.h]
 ```
 
     ```cpp
@@ -174,8 +152,7 @@ api_signature:
 api_signature:
   override_id: "asc_shiftright_round__PUi16_PUi16_i32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_logic.h"
+  headers: [/include/c_api/vector_compute/compute/vector_logic.h]
 ```
 
     ```cpp
@@ -186,8 +163,7 @@ api_signature:
 api_signature:
   override_id: "asc_shiftright_round__PUi32_PUi32_i32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_logic.h"
+  headers: [/include/c_api/vector_compute/compute/vector_logic.h]
 ```
 
     ```cpp
@@ -200,8 +176,7 @@ api_signature:
 api_signature:
   override_id: "asc_shiftright__PUi16_PUi16_i32_u8_u16_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_logic.h"
+  headers: [/include/c_api/vector_compute/compute/vector_logic.h]
 ```
 
     ```cpp
@@ -212,8 +187,7 @@ api_signature:
 api_signature:
   override_id: "asc_shiftright__PUu16_PUu16_u32_u8_u16_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_logic.h"
+  headers: [/include/c_api/vector_compute/compute/vector_logic.h]
 ```
 
     ```cpp
@@ -224,8 +198,7 @@ api_signature:
 api_signature:
   override_id: "asc_shiftright__PUi32_PUi32_i32_u8_u16_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_logic.h"
+  headers: [/include/c_api/vector_compute/compute/vector_logic.h]
 ```
 
     ```cpp
@@ -236,8 +209,7 @@ api_signature:
 api_signature:
   override_id: "asc_shiftright__PUu32_PUu32_u32_u8_u16_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_logic.h"
+  headers: [/include/c_api/vector_compute/compute/vector_logic.h]
 ```
 
     ```cpp
@@ -248,8 +220,7 @@ api_signature:
 api_signature:
   override_id: "asc_shiftright_round__PUi16_PUi16_i32_u8_u16_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_logic.h"
+  headers: [/include/c_api/vector_compute/compute/vector_logic.h]
 ```
 
     ```cpp
@@ -260,8 +231,7 @@ api_signature:
 api_signature:
   override_id: "asc_shiftright_round__PUi32_PUi32_i32_u8_u16_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_logic.h"
+  headers: [/include/c_api/vector_compute/compute/vector_logic.h]
 ```
 
     ```cpp
@@ -274,8 +244,7 @@ api_signature:
 api_signature:
   override_id: "asc_shiftright_sync__PUi16_PUi16_i32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -286,8 +255,7 @@ api_signature:
 api_signature:
   override_id: "asc_shiftright_sync__PUu16_PUu16_u32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -298,8 +266,7 @@ api_signature:
 api_signature:
   override_id: "asc_shiftright_sync__PUi32_PUi32_i32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -310,8 +277,7 @@ api_signature:
 api_signature:
   override_id: "asc_shiftright_sync__PUu32_PUu32_u32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -322,8 +288,7 @@ api_signature:
 api_signature:
   override_id: "asc_shiftright_round_sync__PUi16_PUi16_i32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -334,8 +299,7 @@ api_signature:
 api_signature:
   override_id: "asc_shiftright_round_sync__PUi32_PUi32_i32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp

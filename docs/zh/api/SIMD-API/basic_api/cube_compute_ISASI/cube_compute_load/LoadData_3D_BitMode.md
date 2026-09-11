@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: LoadData（BitMode卷积数据搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_3D_BitMode.md
+description: LoadData（BitMode卷积数据搬运）用于完成image to column操作，将多维feature map转为二维矩阵。支持的数据通路为：L1
+  Buffer->L0A Buffer、L1 Buffer->L0B Buffer。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LoadData（BitMode卷积数据搬运）<a id="ZH-CN_TOPIC_0000002517284408"></a>
 
 ## 产品支持情况<a id="section1550532418810"></a>

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: DataCopy（UBToUB连续数据搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_UBToUB_continuous.md
+description: 支持Unified Buffer（UB）内部的连续数据搬运，数据在传输过程中保持原始格式和内容不变。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: DataCopy__RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510', '2201', '2002', '1001']
+  headers: [/include/basic_api/kernel_operator_data_copy_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DataCopy（UBToUB连续数据搬运）<a name="ZH-CN_TOPIC_0000002382908021"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -44,6 +60,13 @@
     - VECCALC -> VECOUT
 
 ## 函数原型<a name="section1954364615315"></a>
+
+```yaml
+api_signature:
+  override_id: "DataCopy__RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510", "2201", "2002", "1001"]
+  headers: ["/include/basic_api/kernel_operator_data_copy_intf.h"]
+```
 
 ```cpp
 template <typename T>

@@ -14,8 +14,7 @@ signature:
     headers: []
   - override_id: "asc_sync_subblock_wait__pipe_i64"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/sync/sync.h"
+    headers: [/include/c_api/sync/sync.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -73,8 +72,7 @@ __aicore__ inline void asc_sync_subblock_wait(pipe_t pipe,
 api_signature:
   override_id: "asc_sync_subblock_wait__pipe_i64"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/sync/sync.h"
+  headers: [/include/c_api/sync/sync.h]
 ```
 
 ```c

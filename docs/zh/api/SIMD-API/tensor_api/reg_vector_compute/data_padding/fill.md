@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: fill
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/reg_vector_compute/data_padding/fill.md
+description: 支持scalar和tensor两种模式：。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: fill__RCpT_RCregtensorg1x1_b
+  archs: ['3510']
+  headers: []
+- override_id: fill__RCregtensorg1x2_pT_RCregtensorg1x1_b
+  archs: ['3510']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # fill
 
 ## 产品支持情况
@@ -37,16 +56,30 @@
 
 - 将value广播到目的寄存器
 
+```yaml
+api_signature:
+  override_id: "fill__RCpT_RCregtensorg1x1_b"
+  archs: ["3510"]
+  headers: []
+```
+
     ```cpp
     template <size_t N = 1, typename T>
-    __simd_callee__ inline reg_tensor<T> fill(const T& value, const reg_tensor<bool>& mask = all_mask<T>());
+    __simd_callee__ inline reg_tensor<T> fill(const T& value, const reg_tensor<bool>& mask = fill());
     ```
 
 - 将寄存器src的最低位元素广播到目的寄存器
 
+```yaml
+api_signature:
+  override_id: "fill__RCregtensorg1x2_pT_RCregtensorg1x1_b"
+  archs: ["3510"]
+  headers: []
+```
+
     ```cpp
     template <size_t N = 1, typename T>
-    __simd_callee__ inline reg_tensor<T> fill(const reg_tensor<T>& src, const reg_tensor<bool>& mask = all_mask<T>());
+    __simd_callee__ inline reg_tensor<T> fill(const reg_tensor<T>& src, const reg_tensor<bool>& mask = fill());
     ```
 
 ## 参数说明

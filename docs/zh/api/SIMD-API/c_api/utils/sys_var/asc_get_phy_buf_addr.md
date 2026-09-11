@@ -9,8 +9,7 @@ usage_dependencies:
 signature:
   - override_id: "asc_get_phy_buf_addr__u64"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/utils/sys_var.h"
+    headers: [/include/c_api/utils/sys_var.h]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_ub2l1"
     archs: ["3510"]
@@ -57,8 +56,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_get_phy_buf_addr__u64"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/utils/sys_var.h"
+  headers: [/include/c_api/utils/sys_var.h]
 ```
 
 ```cpp

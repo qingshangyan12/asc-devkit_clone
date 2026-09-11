@@ -35,9 +35,21 @@ namespace Reg {
                                                          (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) || \
                                defined(__ASC_NPU_HOST__))
 template <typename T, const RegTrait& regTrait = RegTraitNumOne>
+/**
+ * @ingroup simd_api.basic_api.reg_vector_compute.register_data_types
+ * @override_id UpdateMask__Ru32
+ * @archs 3510
+ * @brief 头文件引用路径为"basic_api/reg_compute/kernel_reg_compute_maskreg_intf.h"。
+ */
 __simd_callee__ inline MaskReg UpdateMask(uint32_t& scalarValue);
 
 template <typename T, MaskPattern mode = MaskPattern::ALL, const RegTrait& regTrait = RegTraitNumOne>
+/**
+ * @ingroup simd_api.basic_api.reg_vector_compute.register_data_types
+ * @override_id CreateMask__z
+ * @archs 3510
+ * @brief 头文件引用路径为"basic_api/reg_compute/kernel_reg_compute_maskreg_intf.h"。
+ */
 __simd_callee__ inline MaskReg CreateMask();
 
 __simd_callee__ inline void Not(MaskReg& dst, MaskReg& src, MaskReg& mask);
@@ -70,6 +82,12 @@ template <HighLowPart part = HighLowPart::LOWEST>
 __simd_callee__ inline void UnPack(MaskReg& dst, MaskReg& src);
 
 template <typename T>
+/**
+ * @ingroup simd_api.basic_api.reg_vector_compute.maskreg_compute
+ * @override_id MoveMask__z
+ * @archs 3510
+ * @brief 从[SetVectorMask](../../memory_vector_compute/mask_operations/SetVectorMask.md)设置的掩码寄存器{MASK1, MASK0}中读取Mask值，并按模板参数T对应的数据格式转换后写入返回值MaskReg。
+ */
 __simd_callee__ inline MaskReg MoveMask();
 #endif
 } // namespace Reg

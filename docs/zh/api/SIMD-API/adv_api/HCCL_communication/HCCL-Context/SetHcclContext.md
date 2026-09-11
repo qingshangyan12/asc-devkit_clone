@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetHcclContext
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL-Context/SetHcclContext.md
+description: 设置通算融合算子每个通信域对应的context（消息区）地址。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetHcclContext__PGu8
+  archs: ['2201', '2002']
+  headers: [/include/basic_api/kernel_common.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetHcclContext
 
 ## 产品支持情况
@@ -28,6 +44,13 @@
 设置通算融合算子每个通信域对应的context（消息区）地址。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "SetHcclContext__PGu8"
+  archs: ["2201", "2002"]
+  headers: ["/include/basic_api/kernel_common.h"]
+```
 
 ```
 template <uint32_t index>

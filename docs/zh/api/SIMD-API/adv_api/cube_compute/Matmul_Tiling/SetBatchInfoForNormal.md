@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetBatchInfoForNormal
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetBatchInfoForNormal.md
+description: 设置A/B矩阵的M/N/K轴信息，以及A/B矩阵的Batch数。Layout类型为NORMAL的场景，调用[IterateBatch](../Matmul_Kernel/IterateBatch.md)或者[IterateNBatch](../Matmul_Kernel/IterateNBatch.md)接口之前，需要在Host侧Tiling实现中通过本接口设置A/B矩阵的M/N/K轴等信息。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetBatchInfoForNormal
 
 ## 功能说明

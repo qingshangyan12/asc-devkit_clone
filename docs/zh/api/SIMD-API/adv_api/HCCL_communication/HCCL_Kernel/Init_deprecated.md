@@ -1,3 +1,18 @@
+---
+okftype: reference.api.cpp
+title: Init（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/Init_deprecated.md
+description: HCCL客户端初始化接口。该接口默认在所有核上工作，用户也可以在调用前通过[GetBlockIdx](../../../basic_api/tool_interface/system_resources_and_variables/GetBlockIdx.md)指定其在某一个核上运行。
+tag: [adv_api]
+usage_dependencies:
+  status: confirmed
+  companion:
+  - SetCcTiling_deprecated.md
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Init（废弃）
 
 > [!NOTE]说明

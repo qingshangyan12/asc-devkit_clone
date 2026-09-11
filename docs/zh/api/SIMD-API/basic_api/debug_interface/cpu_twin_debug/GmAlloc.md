@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GmAlloc
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/debug_interface/cpu_twin_debug/GmAlloc.md
+description: 进行核函数（Kernel）的CPU侧运行验证时，用于创建共享内存：在/tmp目录下创建一个共享文件，并返回该文件的映射指针。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GmAlloc<a name="ZH-CN_TOPIC_0000002044684566"></a>
 
 ## 产品支持情况

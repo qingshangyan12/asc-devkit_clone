@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Muls
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/basic_arithmetic/Muls.md
+description: 矢量内每个元素与标量求积。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Muls<a name="ZH-CN_TOPIC_0000001956827105"></a>
 
 ## 产品支持情况

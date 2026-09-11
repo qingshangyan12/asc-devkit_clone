@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Wait
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_group_mgmt_ISASI/CubeResGroupHandle/Wait.md
+description: 在调用PostMessage或PostFakeMessage后，查询该消息是否已被AIC处理完。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Wait__u16
+  archs: ['3510', '2201']
+  headers: [/include/basic_api/core_mng/roc/kernel_operator_cube_group_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Wait<a name="ZH-CN_TOPIC_0000001960224988"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -31,6 +47,13 @@
 在调用PostMessage或PostFakeMessage后，查询该消息是否已被AIC处理完。
 
 ## 函数原型<a name="section765814724715"></a>
+
+```yaml
+api_signature:
+  override_id: "Wait__u16"
+  archs: ["3510", "2201"]
+  headers: ["/include/basic_api/core_mng/roc/kernel_operator_cube_group_intf.h"]
+```
 
 ```
 template <bool sync = true>

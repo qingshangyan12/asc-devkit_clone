@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Arange
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/index_operations/Arange.md
+description: 递增模式时，该函数以传入的scalarValue的值为起始值，生成递增的索引；递减模式时，该函数以传入的scalarValue的值为终止值，生成递减的索引，并将索引保存在dstReg中。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Arange__RpS_pU
+  archs: ['3510']
+  headers: [/include/basic_api/reg_compute/kernel_reg_compute_vec_arange_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Arange<a name="ZH-CN_TOPIC_0000001960926493"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -41,6 +57,13 @@
 ![Arange示意图](../../../../figures/reg_arange_de.png)
 
 ## 函数原型<a name="section520771712327"></a>
+
+```yaml
+api_signature:
+  override_id: "Arange__RpS_pU"
+  archs: ["3510"]
+  headers: ["/include/basic_api/reg_compute/kernel_reg_compute_vec_arange_intf.h"]
+```
 
 ```cpp
 template <typename T = DefaultType, IndexOrder order = IndexOrder::INCREASE_ORDER, typename U, typename S>

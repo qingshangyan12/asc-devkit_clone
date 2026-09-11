@@ -53,6 +53,15 @@ namespace AscendC {
  *       tensor address overlap.
  */
 template <const FmaConfig& config = DEFAULT_FMA_CONFIG, typename T>
+/**
+ * @ingroup simd_api.adv_api.math_compute.fma_interface
+ * @override_id Fma__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+ * @archs 3510
+ * @brief 按元素计算两个输入相乘后与第三个输入相加的结果。
+ * @param [out] dst 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] sharedTmpBuffer 临时缓存。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。用于Fma内部复杂计算时存储中间变量，由开发者提供。临时空间大小BufferSize的获取方式请参考[GetFmaMaxMinTmpSize](GetFmaMaxMinTmpSize.md)。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void Fma(
     const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const LocalTensor<T>& src2,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t count)
@@ -75,6 +84,14 @@ __aicore__ inline void Fma(
  * \note dst/src0/src1/src2 Tensor must be 32B aligned, and it doesn't allow dst/src0/src1/src2 tensor address overlap.
  */
 template <const FmaConfig& config = DEFAULT_FMA_CONFIG, typename T>
+/**
+ * @ingroup simd_api.adv_api.math_compute.fma_interface
+ * @override_id Fma__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32
+ * @archs 3510
+ * @brief 按元素计算两个输入相乘后与第三个输入相加的结果。
+ * @param [out] dst 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void Fma(
     const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const LocalTensor<T>& src2,
     const uint32_t count)

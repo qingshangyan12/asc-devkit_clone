@@ -1,3 +1,24 @@
+---
+okftype: reference.api.cpp
+title: SetPadValue\(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move_aux_config/SetPadValue_ISASI.md
+description: '[DataCopyPad（GMToUB非对齐数据搬运）](../data_move/DataCopyPad_GMToUB.md)从Global
+  Memory将数据非对齐搬运至Unified Buffer（UB）时，可根据开发者的需要自行填充数据。SetPadValue用于设置DataCopyPad需要填充的数值。'
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetPadValue__pT
+  archs: ['3510', '2201']
+  headers: [/include/basic_api/kernel_operator_data_copy_intf.h]
+examples:
+- path: /examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_pad_gm2ub_ub2gm
+  archs: ['2201', '3510']
+  override_id: SetPadValue__pT
+  file: data_copy_pad.asc
+timestamp: '2026-09-11'
+---
+
 # SetPadValue\(ISASI\)<a name="ZH-CN_TOPIC_0000001786582454"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -38,6 +59,13 @@
     - GM -> VECOUT
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "SetPadValue__pT"
+  archs: ["3510", "2201"]
+  headers: ["/include/basic_api/kernel_operator_data_copy_intf.h"]
+```
 
 ```cpp
 template <typename T, TPosition pos = TPosition::MAX>

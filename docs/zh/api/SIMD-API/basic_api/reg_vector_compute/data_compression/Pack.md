@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Pack
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/data_compression/Pack.md
+description: 将源操作数srcReg中的元素选取低8位（对于b16类型）、低16位（对于b32类型）、低32位（对于b64类型）写入dstReg的低半部分或高半部分。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Pack__RpS_RpV
+  archs: ['3510']
+  headers: [/include/basic_api/reg_compute/kernel_reg_compute_pack_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Pack<a name="ZH-CN_TOPIC_0000002010754854"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -37,6 +53,13 @@
 ![Pack](../../../../figures/reg_pack_1.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "Pack__RpS_RpV"
+  archs: ["3510"]
+  headers: ["/include/basic_api/reg_compute/kernel_reg_compute_pack_intf.h"]
+```
 
 ```cpp
 template <typename T = DefaultType, typename U = DefaultType, HighLowPart part = HighLowPart::LOWEST, typename S, typename V>

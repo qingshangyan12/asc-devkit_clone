@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: RpSort16
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/sort_and_merge_ISASI/RpSort16.md
+description: 根据Region Proposals中的score域对其进行排序（score大的排前面），每次排16个Region Proposals。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: RpSort16__RCltg1x2_pT_RCltg1x2_pT_i32
+  archs: ['2002', '1001']
+  headers: [/include/basic_api/kernel_operator_proposal_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # RpSort16<a name="ZH-CN_TOPIC_0000001443137898"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -31,6 +47,13 @@
 根据Region Proposals中的score域对其进行排序（score大的排前面），每次排16个Region Proposals。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "RpSort16__RCltg1x2_pT_RCltg1x2_pT_i32"
+  archs: ["2002", "1001"]
+  headers: ["/include/basic_api/kernel_operator_proposal_intf.h"]
+```
 
 ```
 template <typename T>

@@ -55,6 +55,15 @@ namespace AscendC {
  * \param [in] calCount: The number of elements to be processed.
  */
 template <typename T, uint8_t taylorExpandLevel, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.math_compute.exp_interface
+ * @override_id Exp__RCltg1x2_pT_RCltg1x2_pT_u32
+ * @archs 3510 2201
+ * @brief 按元素取自然指数。
+ * @param [out] dstLocal 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcLocal 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] calCount 参与计算的元素个数。
+ */
 __aicore__ inline void Exp(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t calCount)
 {
     if ASCEND_IS_AIC {
@@ -89,6 +98,16 @@ __aicore__ inline void Exp(const LocalTensor<T>& dstLocal, const LocalTensor<T>&
  * \param [in] calCount: The number of elements to be processed.
  */
 template <typename T, uint8_t taylorExpandLevel, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.math_compute.exp_interface
+ * @override_id Exp__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+ * @archs 3510 2201
+ * @brief 按元素取自然指数。
+ * @param [out] dstLocal 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcLocal 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] sharedTmpBuffer 临时缓存。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。用于Exp内部复杂计算时存储中间变量，由开发者提供。临时空间大小BufferSize的获取方式请参考[GetExpMaxMinTmpSize](GetExpMaxMinTmpSize.md)。
+ * @param [in] calCount 参与计算的元素个数。
+ */
 __aicore__ inline void Exp(
     const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& sharedTmpBuffer,
     const uint32_t calCount)

@@ -262,6 +262,13 @@ public:
      * @note Must be called after Init
      */
     [[deprecated("It is obsolete and use SetCcTilingV2 instead.")]]
+/**
+ * @ingroup simd_api.adv_api.hccl_communication.hccl_kernel
+ * @override_id SetCcTiling__PGv
+ * @archs 2201
+ * @brief 用于设置HCCL客户端通信算法的Tiling地址。
+ * @param [in] ccOpTilingData 通信算法的[Mc2CcTiling](../HCCL_Tiling/TilingData_struct.md#table678914014562)参数的地址。Mc2CcTiling在Host侧计算得出，具体请参考[表2 Mc2CcTiling参数说明](../HCCL_Tiling/TilingData_struct.md#table678914014562)，由框架传递到核函数（Kernel）中使用。
+ */
     __aicore__ inline int32_t SetCcTiling(__gm__ void* ccOpTilingData);
 
     /*!
@@ -271,6 +278,13 @@ public:
      * @return Returns 0 if the legitimate call succeeds, -1 otherwise
      * @note Must be called after Init
      */
+/**
+ * @ingroup simd_api.adv_api.hccl_communication.hccl_kernel
+ * @override_id SetCcTilingV2__u64
+ * @archs 3510 2201
+ * @brief 用于设置HCCL客户端中某个通信算法配置的TilingData地址。
+ * @param [in] offset 通信算法配置[Mc2CcTiling](../HCCL_Tiling/TilingData_struct.md#table678914014562)参数地址相对于[Mc2InitTiling](../HCCL_Tiling/TilingData_struct.md#table4835205712588)起始地址的偏移。[Mc2CcTiling](../HCCL_Tiling/TilingData_struct.md#table678914014562)在Host侧计算得出，具体请参考[表2 Mc2CcTiling参数说明](../HCCL_Tiling/TilingData_struct.md#table678914014562)，由框架传递到核函数（Kernel）中使用。
+ */
     __aicore__ inline int32_t SetCcTilingV2(uint64_t offset);
 
     /*!
@@ -342,6 +356,13 @@ public:
      * @param [in] queueID: The queue ID for barrier.
      */
     template <ScopeType type = ScopeType::ALL>
+/**
+ * @ingroup simd_api.adv_api.hccl_communication.hccl_kernel
+ * @override_id QueueBarrier__u16
+ * @archs 2201
+ * @brief 阻塞服务端上指定队列的BatchWrite通信任务，直到指定范围内所有队列上的任务完成执行，从而实现指定范围内队列的同步。
+ * @param [in] queueID 表示队列ID。
+ */
     __aicore__ inline void QueueBarrier(uint16_t queueID);
 
     /*!
@@ -365,6 +386,12 @@ public:
      *       2) Only the core 0 can write fields for hcclMsgArea.
      */
     template <bool sync = true>
+/**
+ * @ingroup simd_api.adv_api.hccl_communication.hccl_kernel
+ * @override_id Finalize__z
+ * @archs 3510 2201
+ * @brief 通知服务端后续无通信任务，执行结束后退出。
+ */
     __aicore__ inline void Finalize();
 
 public:
@@ -377,6 +404,13 @@ public:
      * @note 1) Specify AICube core or AIVector core before calling this interface;
      *       2) All cores will invoke GetWindowsInAddr if you do not specify workBlockIdx;
      */
+/**
+ * @ingroup simd_api.adv_api.hccl_communication.hccl_kernel
+ * @override_id GetWindowsInAddr__u32
+ * @archs 2201
+ * @brief 获取卡间通信数据WindowsIn起始地址，可用来直接作为计算的输入输出地址，减少拷贝。该接口默认在所有核上工作，用户也可以在调用前通过[GetBlockIdx](../../../basic_api/tool_interface/system_resources_and_variables/GetBlockIdx.md)指定其在某一个核上运行。
+ * @param [in] rankId 待查询的卡的Id。
+ */
     __aicore__ inline GM_ADDR GetWindowsInAddr(uint32_t rankId);
 
     /*!
@@ -388,6 +422,13 @@ public:
      * @note 1) Specify AICube core or AIVector core before calling this interface;
      *       2) All cores will invoke GetWindowsOutAddr if you do not specify workBlockIdx;
      */
+/**
+ * @ingroup simd_api.adv_api.hccl_communication.hccl_kernel
+ * @override_id GetWindowsOutAddr__u32
+ * @archs 2201
+ * @brief 获取卡间通信数据WindowsOut起始地址，可用来直接作为计算的输入输出地址，减少拷贝。该接口默认在所有核上工作，用户也可以在调用前通过[GetBlockIdx](../../../basic_api/tool_interface/system_resources_and_variables/GetBlockIdx.md)指定其在某一个核上运行。
+ * @param [in] rankId 待查询的卡的Id。
+ */
     __aicore__ inline GM_ADDR GetWindowsOutAddr(uint32_t rankId);
 
     /*!
@@ -397,6 +438,12 @@ public:
      * @note 1) Specify AICube core or AIVector core before calling this interface;
      *       2) All cores will invoke GetRankId if you do not specify workBlockIdx;
      */
+/**
+ * @ingroup simd_api.adv_api.hccl_communication.hccl_kernel
+ * @override_id GetRankId__z
+ * @archs 3510 2201
+ * @brief 获取本卡RankId。该接口默认在所有核上工作，用户也可以在调用前通过[GetBlockIdx](../../../basic_api/tool_interface/system_resources_and_variables/GetBlockIdx.md)指定其在某一个核上运行。
+ */
     __aicore__ inline uint32_t GetRankId();
 
     /*!
@@ -406,8 +453,20 @@ public:
      * @note 1) Specify AICube core or AIVector core before calling this interface;
      *       2) All cores will invoke GetRankDim if you do not specify workBlockIdx;
      */
+/**
+ * @ingroup simd_api.adv_api.hccl_communication.hccl_kernel
+ * @override_id GetRankDim__z
+ * @archs 3510 2201
+ * @brief 获取通信域内卡的数量。该接口默认在所有核上工作，用户也可以在调用前通过[GetBlockIdx](../../../basic_api/tool_interface/system_resources_and_variables/GetBlockIdx.md)指定其在某一个核上运行。
+ */
     __aicore__ inline uint32_t GetRankDim();
 
+/**
+ * @ingroup simd_api.adv_api.hccl_communication.hccl_kernel
+ * @override_id GetQueueNum__z
+ * @archs 2201
+ * @brief 获取BatchWrite通信任务的通信队列数量。
+ */
     __aicore__ inline uint16_t GetQueueNum();
 
 private:

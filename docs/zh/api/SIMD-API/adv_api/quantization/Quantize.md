@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Quantize
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/quantization/Quantize.md
+description: 按元素做量化计算，将高精度数据转换为低精度数据。本接口的量化策略包括PER\_TENSOR，PER\_CHANNEL，PER\_TOKEN和PER\_GROUP四种，每种量化策略均支持配置舍入模式。**本接口最多支持输入为二维数据，不支持更高维度的输入。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Quantize
 
 ## 产品支持情况

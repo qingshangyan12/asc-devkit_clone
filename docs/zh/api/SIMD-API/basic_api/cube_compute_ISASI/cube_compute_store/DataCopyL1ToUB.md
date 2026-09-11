@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: DataCopyL1ToUB（L1到UB数据搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/DataCopyL1ToUB.md
+description: 提供从L1 Buffer搬运数据到Unified Buffer（UB）的基础能力，数据在传输过程中保持原始格式和内容不变，支持连续和非连续的数据搬运。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DataCopyL1ToUB（L1到UB数据搬运）
 
 ## 产品支持情况

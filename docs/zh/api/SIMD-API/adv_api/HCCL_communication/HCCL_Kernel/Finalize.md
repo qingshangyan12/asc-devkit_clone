@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Finalize
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/Finalize.md
+description: 通知服务端后续无通信任务，执行结束后退出。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Finalize__z
+  archs: ['3510', '2201']
+  headers: [/include/adv_api/hccl/hccl.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Finalize
 
 ## 产品支持情况
@@ -28,6 +44,13 @@
 通知服务端后续无通信任务，执行结束后退出。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "Finalize__z"
+  archs: ["3510", "2201"]
+  headers: ["/include/adv_api/hccl/hccl.h"]
+```
 
 ```
 template <bool sync = true>

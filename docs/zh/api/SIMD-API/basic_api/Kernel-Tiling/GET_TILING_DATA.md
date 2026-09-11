@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GET\_TILING\_DATA
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/Kernel-Tiling/GET_TILING_DATA.md
+description: 用于获取算子kernel入口函数传入的Tiling信息，并填入注册的TilingData结构体中，此函数会以宏展开的方式进行编译。对应的算子host实现中需要定义TilingData结构体，实现并注册计算TilingData的Tiling函数。如果用户通过[TilingData结构注册](../../../Utils-API/Tiling_data_structure_register/TilingData_struct_register.md)注册了多个TilingData结构体，使用该接口返回默认注册的结构体。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GET\_TILING\_DATA<a name="ZH-CN_TOPIC_0000001637034733"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

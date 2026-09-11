@@ -10,24 +10,19 @@ usage_dependencies:
 signature:
   - override_id: "asc_int162half_rd__Rvf16_vi16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_int162half_rn__Rvf16_vi16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_int162half_rna__Rvf16_vi16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_int162half_ru__Rvf16_vi16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_int162half_rz__Rvf16_vi16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -81,8 +76,7 @@ def asc_int162half_rn(dst, src, mask):
 api_signature:
   override_id: "asc_int162half_rd__Rvf16_vi16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -94,8 +88,7 @@ __simd_callee__ inline void asc_int162half_rd(vector_half& dst, vector_int16_t s
 api_signature:
   override_id: "asc_int162half_rn__Rvf16_vi16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -107,8 +100,7 @@ __simd_callee__ inline void asc_int162half_rn(vector_half& dst, vector_int16_t s
 api_signature:
   override_id: "asc_int162half_rna__Rvf16_vi16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -120,8 +112,7 @@ __simd_callee__ inline void asc_int162half_rna(vector_half& dst, vector_int16_t 
 api_signature:
   override_id: "asc_int162half_ru__Rvf16_vi16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -133,8 +124,7 @@ __simd_callee__ inline void asc_int162half_ru(vector_half& dst, vector_int16_t s
 api_signature:
   override_id: "asc_int162half_rz__Rvf16_vi16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -146,8 +136,7 @@ __simd_callee__ inline void asc_int162half_rz(vector_half& dst, vector_int16_t s
 api_signature:
   override_id: "asc_int162half_rd__Rvf16_vi16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -160,8 +149,7 @@ __simd_callee__ inline void asc_int162half_rd(vector_half& dst,
 api_signature:
   override_id: "asc_int162half_rn__Rvf16_vi16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -174,8 +162,7 @@ __simd_callee__ inline void asc_int162half_rn(vector_half& dst,
 api_signature:
   override_id: "asc_int162half_rna__Rvf16_vi16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -188,8 +175,7 @@ __simd_callee__ inline void asc_int162half_rna(vector_half& dst,
 api_signature:
   override_id: "asc_int162half_ru__Rvf16_vi16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -202,8 +188,7 @@ __simd_callee__ inline void asc_int162half_ru(vector_half& dst,
 api_signature:
   override_id: "asc_int162half_rz__Rvf16_vi16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -218,8 +203,7 @@ __simd_callee__ inline void asc_int162half_rz(vector_half& dst,
 api_signature:
   override_id: "asc_int162half_rn__Rvf16_vi16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c

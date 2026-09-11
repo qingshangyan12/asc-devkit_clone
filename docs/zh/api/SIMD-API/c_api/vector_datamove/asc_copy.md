@@ -9,52 +9,40 @@ usage_dependencies:
 signature:
   - override_id: "asc_copy__PUi16_PUi16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy__PUu16_PUu16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy__PUi32_PUi32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy__PUu32_PUu32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy__PUi16_PUi16_u8_u16_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy__PUu16_PUu16_u8_u16_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy__PUi32_PUi32_u8_u16_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy__PUu32_PUu32_u8_u16_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy_sync__PUi16_PUi16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_copy_sync__PUu16_PUu16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_copy_sync__PUi32_PUi32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_copy_sync__PUu32_PUu32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -99,8 +87,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_copy__PUi16_PUi16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -111,8 +98,7 @@ __aicore__ inline void asc_copy(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, ui
 api_signature:
   override_id: "asc_copy__PUu16_PUu16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -124,8 +110,7 @@ __aicore__ inline void asc_copy(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, 
 api_signature:
   override_id: "asc_copy__PUi32_PUi32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -137,8 +122,7 @@ __aicore__ inline void asc_copy(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, ui
 api_signature:
   override_id: "asc_copy__PUu32_PUu32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -153,8 +137,7 @@ __aicore__ inline void asc_copy(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, 
 api_signature:
   override_id: "asc_copy__PUi16_PUi16_u8_u16_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -166,8 +149,7 @@ __aicore__ inline void asc_copy(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, ui
 api_signature:
   override_id: "asc_copy__PUu16_PUu16_u8_u16_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -180,8 +162,7 @@ __aicore__ inline void asc_copy(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, 
 api_signature:
   override_id: "asc_copy__PUi32_PUi32_u8_u16_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -194,8 +175,7 @@ __aicore__ inline void asc_copy(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, ui
 api_signature:
   override_id: "asc_copy__PUu32_PUu32_u8_u16_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -210,8 +190,7 @@ __aicore__ inline void asc_copy(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, 
 api_signature:
   override_id: "asc_copy_sync__PUi16_PUi16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
 ```cpp
@@ -222,8 +201,7 @@ __aicore__ inline void asc_copy_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* sr
 api_signature:
   override_id: "asc_copy_sync__PUu16_PUu16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
 ```cpp
@@ -235,8 +213,7 @@ __aicore__ inline void asc_copy_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* 
 api_signature:
   override_id: "asc_copy_sync__PUi32_PUi32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
 ```cpp
@@ -248,8 +225,7 @@ __aicore__ inline void asc_copy_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* sr
 api_signature:
   override_id: "asc_copy_sync__PUu32_PUu32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
 ```cpp

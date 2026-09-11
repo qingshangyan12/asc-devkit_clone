@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: make_tensor
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/tensor/make_tensor.md
+description: make_tensor负责将内存指针（由[make_mem_ptr](make_mem_ptr.md)生成）与布局对象（由[make_frame_layout](../layout/make_frame_layout.md)/[make_layout](../layout/make_layout.md)生成）绑定，生成带有完整类型信息的Tensor对象。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: make_tensor__RCpIterator_QRCpArgs
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/tensor.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # make_tensor
 
 ## 产品支持情况
@@ -35,6 +51,13 @@ make_tensor会根据内存指针的物理位置标记，自动推导返回global
 生成的Tensor对象可直接传入copy（数据搬运）和mmad（矩阵计算）等接口，编译器会根据其Engine中的物理位置标记和layout中的布局模式，自动选择底层硬件指令。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "make_tensor__RCpIterator_QRCpArgs"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/tensor.h"]
+```
 
 ```cpp
 template <typename Iterator, typename... Args>

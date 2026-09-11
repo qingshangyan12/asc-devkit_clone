@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GetErfcTmpBufferFactorSize
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/Erfc_interface/GetErfcTmpBufferFactorSize.md
+description: 该接口用于获取maxLiveNodeCount和extraBuf，在固定空间大小的情况下，通过maxLiveNodeCount和extraBuf可以推算算子单次最大计算元素数量。maxLiveNodeCount表示临时空间是单次计算数据量所占空间的多少倍；extraBuf表示使用的额外临时空间大小。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetErfcTmpBufferFactorSize
 
 ## 功能说明

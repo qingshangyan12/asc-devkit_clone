@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Sqrt
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Sqrt.md
+description: Sqrt属于单目矢量类计算接口，负责将输入的tensor按元素做开方。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Sqrt<a name="ZH-CN_TOPIC_0000001379163546"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

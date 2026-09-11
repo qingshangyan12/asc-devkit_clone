@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: ReduceMax
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/reduction_operations/ReduceMax_interface/ReduceMax.md
+description: 对一个多维向量在指定的维度求最大值。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ReduceMax
 
 ## 产品支持情况

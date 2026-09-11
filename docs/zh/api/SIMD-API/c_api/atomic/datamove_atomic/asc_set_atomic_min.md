@@ -9,30 +9,24 @@ usage_dependencies:
 signature:
   - override_id: "asc_set_atomic_min_int8__z"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/atomic/datamove_atomic.h"
+    headers: ["/include/c_api/atomic/datamove_atomic.h"]
   - override_id: "asc_set_atomic_min_int16__z"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/atomic/datamove_atomic.h"
+    headers: ["/include/c_api/atomic/datamove_atomic.h"]
   - override_id: "asc_set_atomic_min_float16__z"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/atomic/datamove_atomic.h"
+    headers: ["/include/c_api/atomic/datamove_atomic.h"]
   - override_id: "asc_set_atomic_min_bfloat__z"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/atomic/datamove_atomic.h"
+    headers: ["/include/c_api/atomic/datamove_atomic.h"]
   - override_id: "asc_set_atomic_min_int32__z"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/atomic/datamove_atomic.h"
+    headers: ["/include/c_api/atomic/datamove_atomic.h"]
   - override_id: "asc_set_atomic_min_float__z"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/atomic/datamove_atomic.h"
+    headers: ["/include/c_api/atomic/datamove_atomic.h"]
 examples: []
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_set_atomic_min
@@ -77,8 +71,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_set_atomic_min_int8__z"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/atomic/datamove_atomic.h"
+  headers: ["/include/c_api/atomic/datamove_atomic.h"]
 ```
 
 ```c
@@ -89,8 +82,7 @@ __aicore__ inline void asc_set_atomic_min_int8()
 api_signature:
   override_id: "asc_set_atomic_min_int16__z"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/atomic/datamove_atomic.h"
+  headers: ["/include/c_api/atomic/datamove_atomic.h"]
 ```
 
 ```c
@@ -101,8 +93,7 @@ __aicore__ inline void asc_set_atomic_min_int16()
 api_signature:
   override_id: "asc_set_atomic_min_float16__z"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/atomic/datamove_atomic.h"
+  headers: ["/include/c_api/atomic/datamove_atomic.h"]
 ```
 
 ```c
@@ -113,8 +104,7 @@ __aicore__ inline void asc_set_atomic_min_float16()
 api_signature:
   override_id: "asc_set_atomic_min_bfloat__z"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/atomic/datamove_atomic.h"
+  headers: ["/include/c_api/atomic/datamove_atomic.h"]
 ```
 
 ```c
@@ -125,8 +115,7 @@ __aicore__ inline void asc_set_atomic_min_bfloat()
 api_signature:
   override_id: "asc_set_atomic_min_int32__z"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/atomic/datamove_atomic.h"
+  headers: ["/include/c_api/atomic/datamove_atomic.h"]
 ```
 
 ```c
@@ -137,8 +126,7 @@ __aicore__ inline void asc_set_atomic_min_int32()
 api_signature:
   override_id: "asc_set_atomic_min_float__z"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/atomic/datamove_atomic.h"
+  headers: ["/include/c_api/atomic/datamove_atomic.h"]
 ```
 
 ```c

@@ -252,6 +252,15 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
  * @param [in] count Number of operands
  */
 template <typename T>
+/**
+ * @ingroup simd_api.basic_api.memory_vector_compute.data_move
+ * @override_id DataCopy__RCltg1x2_pT_RCltg1x2_pT_u32
+ * @archs 3510 2201 2002 1001
+ * @brief 该接口实现将矩阵从Unified Buffer（UB，TPosition为VECIN/VECCALC/VECOUT）搬运至L1 Buffer，搬运方式为连续搬运，数据搬运时格式和内容保持不变。
+ * @param [out] dst 目的操作数。类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor_intro.md)，存储位置为UB，目的地址需要32字节对齐。
+ * @param [in] src 源操作数。类型为LocalTensor，存储位置为UB，源地址需要32字节对齐。
+ * @param [in] count 参与搬运的元素个数。**注：count * sizeof(T)需要32字节对齐，若未对齐，搬运量会向下取整到32字节对齐。**
+ */
 __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count);
 
 /*
@@ -448,6 +457,13 @@ __aicore__ inline void DataCopyPad(
     const Nd2NzParams& nd2nzParams);
 
 template <typename T, TPosition pos = TPosition::MAX>
+/**
+ * @ingroup simd_api.basic_api.memory_vector_compute.data_move_aux_config
+ * @override_id SetPadValue__pT
+ * @archs 3510 2201
+ * @brief [DataCopyPad（GMToUB非对齐数据搬运）](../data_move/DataCopyPad_GMToUB.md)从Global Memory将数据非对齐搬运至Unified Buffer（UB）时，可根据开发者的需要自行填充数据。SetPadValue用于设置DataCopyPad需要填充的数值。
+ * @param [in] paddingValue DataCopyPad接口填充的数值，数据类型与DataCopyPad接口搬运的数据类型一致。
+ */
 __aicore__ inline void SetPadValue(T paddingValue);
 
 template <typename T, uint8_t subBlockId = 0>
@@ -463,6 +479,12 @@ __aicore__ inline void DataCopy(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const MultiCopyParams<T, dim>& params);
 #endif
 
+/**
+ * @ingroup simd_api.basic_api.memory_vector_compute.data_move_aux_config
+ * @override_id NdDmaDci__z
+ * @archs 3510
+ * @brief 刷新NDDMA DataCache。在多核场景下，当多个AI Core读取同一块GM（Global Memory）地址时，NDDMA DataCache中可能缓存了旧数据，导致部分核读取到错误的数据。因此，在使用[DataCopy（GMToUB多维数据搬运NDDMA）](../data_move/DataCopy_GMToUB_NDDMA.md)前，需要调用NdDmaDci接口刷新NDDMA DataCache，确保缓存中的数据为最新状态。
+ */
 __aicore__ inline void NdDmaDci();
 
 __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCopyMVType type);

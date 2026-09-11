@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: coshape
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/layout/coshape.md
+description: coshape表示layout陪域（codomain）区间的标量大小，即逻辑坐标映射到一维索引后，所有可能的索引值构成的区间大小。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: coshape__RCpLayout
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/layout_interface.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # coshape
 
 ## 产品支持情况
@@ -35,6 +51,13 @@ coshape = Σ( (shape[i] - 1) × stride[i] ) + 1
 ```
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "coshape__RCpLayout"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/layout_interface.h"]
+```
 
 ```cpp
 template <size_t... Is, typename Layout>

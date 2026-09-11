@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: ReduceMean
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/reduction_operations/ReduceMean_interface/ReduceMean.md
+description: 对一个多维向量按照指定的维度求平均值。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ReduceMean
 
 ## 产品支持情况

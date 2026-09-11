@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Swish
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/activation_functions/Swish_interface/Swish.md
+description: 在神经网络中，Swish是一个重要的激活函数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Swish__RCltg1x2_pT_RCltg1x2_pT_u32_pT
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/activation/swish.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Swish
 
 ## 产品支持情况
@@ -32,6 +48,13 @@
 ![](../../../../figures/zh-cn_formulaimage_0000001680848998.png)
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "Swish__RCltg1x2_pT_RCltg1x2_pT_u32_pT"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/activation/swish.h"]
+```
 
 ```
 template <typename T, bool isReuseSource = false>

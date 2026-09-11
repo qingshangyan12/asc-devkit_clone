@@ -1,3 +1,18 @@
+---
+okftype: reference.api.cpp
+title: SoftmaxFlashV3
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/activation_functions/SoftMax_interface/SoftmaxFlashV3.md
+description: SoftmaxFlash增强版本，对应Softmax PASA算法。将输入tensor\[m<sub>0</sub>, m<sub>1</sub>,
+  ..., m<sub>t</sub>, n\]（t大于或等于0）的非尾轴长度m<sub>0</sub>, m<sub>1</sub>, ..., m<sub>t</sub>相乘的结果看作m，则输入tensor的shape看作\[m,
+  n\]。对输入tensor x的尾轴进行切分，分块个数为splitMeanCnt，切分后的tensor为x\_cnt<sub>i</sub>。按如下公式进行计算，其中x、inmax、insum、inmean为输入，M、S、E、A均为输出。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SoftmaxFlashV3
 
 ## 产品支持情况

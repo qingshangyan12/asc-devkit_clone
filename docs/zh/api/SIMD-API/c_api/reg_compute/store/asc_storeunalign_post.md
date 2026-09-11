@@ -12,12 +12,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_storeunalign_post__PU<dtype>_vstoreunalign_i32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/store/storeunalign.h"
+    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - prototype_id: "asc_storeunalign_post__PU<dtype>_vstoreunalign_ar"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/store/storeunalign.h"
+    headers: [/include/c_api/reg_compute/store/storeunalign.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -67,8 +65,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_storeunalign_post__PU<dtype>_vstoreunalign_i32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/store/storeunalign.h"
+  headers: [/include/c_api/reg_compute/store/storeunalign.h]
   dtype:
     values:
       - "int4b_t"
@@ -115,8 +112,7 @@ __simd_callee__ inline void asc_storeunalign_post(__ubuf__ uint8_t* dst,
 api_signature:
   prototype_id: "asc_storeunalign_post__PU<dtype>_vstoreunalign_ar"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/store/storeunalign.h"
+  headers: [/include/c_api/reg_compute/store/storeunalign.h]
   dtype:
     values:
       - "int4b_t"

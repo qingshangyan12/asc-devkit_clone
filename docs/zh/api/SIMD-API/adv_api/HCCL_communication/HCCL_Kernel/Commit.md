@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Commit
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/Commit.md
+description: 非[细粒度通信](Iterate.md)时，每调用一次本接口，则通知服务端可以执行handleId对应的任务一次。[细粒度通信](Iterate.md)时，每调用一次本接口，则通知服务端可以执行handleId对应的[步长](../HCCL_Tiling/SetStepSize.md)长度的子通信任务。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Commit
 
 ## 产品支持情况

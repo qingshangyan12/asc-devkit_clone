@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: CreateCubeResGroup
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_group_mgmt_ISASI/CubeResGroupHandle/CreateCubeResGroup.md
+description: 快速创建CubeResGroupHandle对象，内部完成消息队列空间和同步事件分配。推荐使用该接口，避免使用CubeResGroupHandle的构造函数创建对象，出现不同对象的消息队列空间冲突、同步事件错误等情况。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # CreateCubeResGroup<a name="ZH-CN_TOPIC_0000001996865761"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

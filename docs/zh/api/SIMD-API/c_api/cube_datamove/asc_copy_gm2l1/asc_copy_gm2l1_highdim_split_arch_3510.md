@@ -9,14 +9,12 @@ usage_dependencies:
 signature:
   - override_id: "asc_copy_gm2l1__PL1v_PGv_u32_u32_u8_u64_u32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_copy_gm2l1_sync__PL1v_PGv_u32_u32_u8_u64_u32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 examples: []
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_copy_gm2l1_arch_3510（高维切分数据搬运）
@@ -61,8 +59,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_copy_gm2l1__PL1v_PGv_u32_u32_u8_u64_u32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
 ```cpp
@@ -75,8 +72,7 @@ __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst, __gm__ void* src, uint
 api_signature:
   override_id: "asc_copy_gm2l1_sync__PL1v_PGv_u32_u32_u8_u64_u32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
 ```cpp

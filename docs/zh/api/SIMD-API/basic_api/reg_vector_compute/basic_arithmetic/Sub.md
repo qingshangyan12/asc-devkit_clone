@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Sub
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/basic_arithmetic/Sub.md
+description: 该接口根据mask，对源操作数srcReg0、srcReg1进行按元素求差操作，将结果写入目的操作数dstReg。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Sub<a name="ZH-CN_TOPIC_0000001929827652"></a>
 
 ## 产品支持情况

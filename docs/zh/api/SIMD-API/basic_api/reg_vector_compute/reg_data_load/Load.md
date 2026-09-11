@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Load
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/Load.md
+description: Reg矢量计算数据搬运接口，支持从Unified Buffer（UB）非32字节对齐的源地址srcAddr搬运至RegTensor，搬运量为VL（256B）。连续搬运时，用户需手动更新srcAddr地址。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Load__RpU_PUpT
+  archs: ['3510']
+  headers: [/include/basic_api/reg_compute/kernel_reg_compute_datacopy_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Load<a name="ZH-CN_TOPIC_0000002581346834"></a>
 
 ## 产品支持情况<a name="section129404119114"></a>
@@ -34,6 +50,13 @@ Reg矢量计算数据搬运接口，支持从Unified Buffer（UB）非32字节�
 该接口封装了[LoadUnAlignPre和LoadUnAlign](LoadUnAlign_continuous.md)。
 
 ## 函数原型<a name="section429122319217"></a>
+
+```yaml
+api_signature:
+  override_id: "Load__RpU_PUpT"
+  archs: ["3510"]
+  headers: ["/include/basic_api/reg_compute/kernel_reg_compute_datacopy_intf.h"]
+```
 
 ```cpp
 template <typename T = DefaultType, typename U>

@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: copy（Unified Buffer到Unified Buffer的数据搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/reg_vector_compute/vector_compute_load/copy_ub_to_ub.md
+description: 该接口用于在Unified Buffer（UB）内部进行高维切分数据搬运。接口根据源、目的Tensor的存储位置自动选择`copy_ub_to_ub`通路，并根据Layout推导数据块个数、单块长度以及源、目的块间间隔，支持连续和非连续搬运。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: copy__RCpDstTensor_RCpSrcTensor
+  archs: ['3510']
+  headers: [/include/tensor_api/algorithm/copy.h]
+- override_id: copy__RCcopyatomg1x5_pAtom_RCpDstTensor_RCpSrcTensor
+  archs: ['3510']
+  headers: [/include/tensor_api/algorithm/copy.h]
+- override_id: copy__RCpDstTensor_RCpSrcTensor_RCpDstCoord_RCpSrcCoord_RCpCopyShape
+  archs: ['3510']
+  headers: [/include/tensor_api/algorithm/copy.h]
+- override_id: make_copy__RCpCopyOperation
+  archs: ['3510']
+  headers: [/include/tensor_api/algorithm/copy.h]
+- override_id: make_copy__RCpCopyOperation_RCpCopyTrait
+  archs: ['3510']
+  headers: [/include/tensor_api/algorithm/copy.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # copy（Unified Buffer到Unified Buffer的数据搬运）
 
 > [!NOTE]说明
@@ -37,22 +65,69 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "copy__RCpDstTensor_RCpSrcTensor"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/algorithm/copy.h"]
+```
+
 ```cpp
 template <typename DstTensor, typename SrcTensor>
 __aicore__ inline void copy(const DstTensor& dst, const SrcTensor& src)
+```
+
+```yaml
+api_signature:
+  override_id: "copy__RCcopyatomg1x5_pAtom_RCpDstTensor_RCpSrcTensor"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/algorithm/copy.h"]
+```
+
+```cpp
 
 template <typename Atom, typename DstTensor, typename SrcTensor>
 __aicore__ inline void copy(const copy_atom<Atom>& atom,
     const DstTensor& dst, const SrcTensor& src)
+```
+
+```yaml
+api_signature:
+  override_id: "copy__RCpDstTensor_RCpSrcTensor_RCpDstCoord_RCpSrcCoord_RCpCopyShape"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/algorithm/copy.h"]
+```
+
+```cpp
 
 template <typename DstTensor, typename SrcTensor, typename DstCoord,
     typename SrcCoord, typename CopyShape>
 __aicore__ inline void copy(const DstTensor& dst, const SrcTensor& src,
     const DstCoord& dst_coord, const SrcCoord& src_coord,
     const CopyShape& copy_shape)
+```
+
+```yaml
+api_signature:
+  override_id: "make_copy__RCpCopyOperation"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/algorithm/copy.h"]
+```
+
+```cpp
 
 template <typename CopyOperation>
 __aicore__ inline constexpr auto make_copy(const CopyOperation& operation)
+```
+
+```yaml
+api_signature:
+  override_id: "make_copy__RCpCopyOperation_RCpCopyTrait"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/algorithm/copy.h"]
+```
+
+```cpp
 
 template <typename CopyOperation, typename CopyTrait>
 __aicore__ inline constexpr auto make_copy(

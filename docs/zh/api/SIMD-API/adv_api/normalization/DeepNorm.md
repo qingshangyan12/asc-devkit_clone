@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: DeepNorm
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/normalization/DeepNorm.md
+description: 在深层神经网络训练过程中，执行层LayerNorm归一化时，可以使用DeepNorm进行替代，通过扩大残差连接来提高Transformer的稳定性。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DeepNorm
 
 ## 产品支持情况

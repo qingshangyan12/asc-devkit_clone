@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: LoadData（BitMode 2D矩阵搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_2D_BitMode.md
+description: 负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512字节的数据分形为单位进行搬运，支持的数据通路为：L1 Buffer->L0A
+  Buffer、L1 Buffer->L0B Buffer。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LoadData（BitMode 2D矩阵搬运）<a id="ZH-CN_TOPIC_0000002517418694"></a>
 
 ## 产品支持情况<a id="section1550532418810"></a>

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetPosition
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/GetPosition.md
+description: 获取LocalTensor所在的TPosition逻辑位置，支持TPosition为VECIN、VECOUT、VECCALC、A1、A2、B1、B2、CO1、CO2。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetPosition__z
+  archs: ['3510', '2201', '3002', '2002', '1001']
+  headers: [/include/basic_api/kernel_tensor.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetPosition<a name="ZH-CN_TOPIC_0000002364845741"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -31,6 +47,13 @@
 获取LocalTensor所在的TPosition逻辑位置，支持TPosition为VECIN、VECOUT、VECCALC、A1、A2、B1、B2、CO1、CO2。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "GetPosition__z"
+  archs: ["3510", "2201", "3002", "2002", "1001"]
+  headers: ["/include/basic_api/kernel_tensor.h"]
+```
 
 ```cpp
 __aicore__ inline int32_t GetPosition() const

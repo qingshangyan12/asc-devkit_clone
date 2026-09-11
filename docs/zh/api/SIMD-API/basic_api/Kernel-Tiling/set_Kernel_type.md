@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: 设置核函数（Kernel）类型
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/Kernel-Tiling/set_Kernel_type.md
+description: 用于用户自定义设置kernel类型，控制算子执行时只启动该类型的核，避免启动不需要工作的核，缩短核启动开销。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # 设置核函数（Kernel）类型<a name="ZH-CN_TOPIC_0000001777592824"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

@@ -43,6 +43,12 @@ namespace AscendC {
  * \param [in] count, amount of data to be calculated
  */
 template <typename T, typename U, typename S, typename V>
+/**
+ * @ingroup simd_api.adv_api.math_compute.where_interface
+ * @override_id Where__RCltg1x2_pT_RCpU_RCpS_RCltg1x2_pV_u32
+ * @archs 3510
+ * @brief 根据指定的条件，从两个源操作数中选择元素，生成目标操作数。两个源操作数均可以是LocalTensor或标量。
+ */
 __aicore__ inline void Where(
     const LocalTensor<T>& dst, const U& src0, const S& src1, const LocalTensor<V>& condition, const uint32_t count)
 {

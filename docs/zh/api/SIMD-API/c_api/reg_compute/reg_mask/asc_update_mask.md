@@ -9,16 +9,13 @@ usage_dependencies:
 signature:
   - override_id: "asc_update_mask_b8__Ru32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_mask.h"
+    headers: [/include/c_api/reg_compute/compute/reg_mask.h]
   - override_id: "asc_update_mask_b16__Ru32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_mask.h"
+    headers: [/include/c_api/reg_compute/compute/reg_mask.h]
   - override_id: "asc_update_mask_b32__Ru32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_mask.h"
+    headers: [/include/c_api/reg_compute/compute/reg_mask.h]
 examples:
   - path: "/examples/02_simd_c_api/00_introduction/04_reg_base_add_compute/c_api_simd_add"
     archs: ["3510"]
@@ -75,8 +72,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_update_mask_b8__Ru32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_mask.h"
+  headers: [/include/c_api/reg_compute/compute/reg_mask.h]
 ```
 
 ```c
@@ -87,8 +83,7 @@ __simd_callee__ inline vector_bool asc_update_mask_b8(uint32_t& value)
 api_signature:
   override_id: "asc_update_mask_b16__Ru32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_mask.h"
+  headers: [/include/c_api/reg_compute/compute/reg_mask.h]
 ```
 
 ```c
@@ -99,8 +94,7 @@ __simd_callee__ inline vector_bool asc_update_mask_b16(uint32_t& value)
 api_signature:
   override_id: "asc_update_mask_b32__Ru32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_mask.h"
+  headers: [/include/c_api/reg_compute/compute/reg_mask.h]
 ```
 
 ```c

@@ -54,23 +54,65 @@ namespace AscendC {
  */
 
 template <typename T>
+/**
+ * @ingroup simd_api.basic_api.cube_compute_isasi.cube_store_aux_config
+ * @override_id SetFixPipeConfig__RCltg1x2_pT_RCltg1x2_pT_b
+ * @archs 3510 2201 3002 x90 9030
+ * @brief DataCopy数据搬运（[L0C Buffer->GM](../cube_compute_store/Fixpipe_L0CToGM.md)、[L0C Buffer->L1 Buffer](../cube_compute_store/Fixpipe_L0CToL1.md)）过程中进行随路量化时，通过调用该接口设置量化的参数。
+ */
 __aicore__ inline void SetFixPipeConfig(
     const LocalTensor<T>& reluPre, const LocalTensor<T>& quantPre, bool isUnitFlag = false);
 
 template <typename T, bool setRelu = false>
+/**
+ * @ingroup simd_api.basic_api.cube_compute_isasi.cube_store_aux_config
+ * @override_id SetFixPipeConfig__RCltg1x2_pT_b
+ * @archs 3510 2201 3002 x90 9030
+ * @brief DataCopy数据搬运（[L0C Buffer->GM](../cube_compute_store/Fixpipe_L0CToGM.md)、[L0C Buffer->L1 Buffer](../cube_compute_store/Fixpipe_L0CToL1.md)）过程中进行随路量化时，通过调用该接口设置量化的参数。
+ */
 __aicore__ inline void SetFixPipeConfig(const LocalTensor<T>& preData, bool isUnitFlag = false);
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+/**
+ * @ingroup simd_api.basic_api.cube_compute_isasi.cube_store_aux_config
+ * @override_id SetFixpipeNz2ndFlag__u16_u16_u32
+ * @archs 3510
+ * @brief DataCopy数据搬运（[L0C Buffer->GM](../cube_compute_store/Fixpipe_L0CToGM.md)）过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。
+ */
 __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint32_t dstNdStride);
 #else
+/**
+ * @ingroup simd_api.basic_api.cube_compute_isasi.cube_store_aux_config
+ * @override_id SetFixpipeNz2ndFlag__u16_u16_u16
+ * @archs 3510 2201 3002 x90 9030
+ * @brief DataCopy数据搬运（[L0C Buffer->GM](../cube_compute_store/Fixpipe_L0CToGM.md)）过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。
+ */
 __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint16_t dstNdStride);
 #endif
 
+/**
+ * @ingroup simd_api.basic_api.cube_compute_isasi.cube_store_aux_config
+ * @override_id SetFixpipePreQuantFlag__u64
+ * @archs 3510 2201 3002 x90 9030
+ * @brief DataCopy数据搬运（[L0C Buffer->GM](../cube_compute_store/Fixpipe_L0CToGM.md)、[L0C Buffer->L1 Buffer](../cube_compute_store/Fixpipe_L0CToL1.md)）过程中进行随路量化时，通过调用该接口设置scalar量化参数。
+ */
 __aicore__ inline void SetFixpipePreQuantFlag(uint64_t config);
 
+/**
+ * @ingroup simd_api.basic_api.cube_compute_isasi.cube_store_aux_config
+ * @override_id SetFixPipeClipRelu__u64
+ * @archs 3002 x90 9030
+ * @brief DataCopy数据搬运（[L0C Buffer->GM](../cube_compute_store/Fixpipe_L0CToGM.md)）过程中进行随路量化后，通过调用该接口设置ClipReLU操作的最大值。
+ */
 __aicore__ inline void SetFixPipeClipRelu(uint64_t config);
 
 template <typename T>
+/**
+ * @ingroup simd_api.basic_api.cube_compute_isasi.cube_store_aux_config
+ * @override_id SetFixPipeAddr__RCltg1x2_pT_u16
+ * @archs 3002
+ * @brief DataCopy数据搬运（[L0C Buffer->GM](../cube_compute_store/Fixpipe_L0CToGM.md)）过程中进行随路量化后，通过调用该接口设置Elementwise操作时LocalTensor的地址。
+ */
 __aicore__ inline void SetFixPipeAddr(const LocalTensor<T>& eleWiseData, uint16_t c0ChStride);
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Subs
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Subs_flexible_scalar.md
+description: Subs属于双目标量类计算接口，矢量内每个元素和标量间做减法，支持标量在前和标量在后两种场景。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Subs<a name="ZH-CN_TOPIC_0000002167791269"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

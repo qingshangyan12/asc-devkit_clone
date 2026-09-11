@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SoftmaxFlash Tiling接口
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/activation_functions/SoftMax_interface/SoftmaxFlash_Tiling_interface.md
+description: '**注意：该接口后续即将废弃，新开发内容不要使用该接口**。'
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SoftmaxFlash Tiling接口
 
 ## 功能说明

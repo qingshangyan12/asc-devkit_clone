@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetQuit
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_group_mgmt_ISASI/CubeResGroupHandle/SetQuit.md
+description: 通过AllocMessage接口获取到消息空间地址后，发送退出消息，告知该消息队列对应的AIC无需处理该队列的消息。如下图，Queue5对应的AIV发了退出消息后，Block1将不再处理Queue5的任何消息。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetQuit<a name="ZH-CN_TOPIC_0000001996865757"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

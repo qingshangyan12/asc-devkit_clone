@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Ln
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Ln.md
+description: Ln属于单目矢量类计算接口，负责将输入的tensor按元素取自然对数。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Ln<a name="ZH-CN_TOPIC_0000001429283377"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

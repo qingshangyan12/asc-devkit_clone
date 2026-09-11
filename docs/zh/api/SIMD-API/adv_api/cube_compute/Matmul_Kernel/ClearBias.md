@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: ClearBias
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/ClearBias.md
+description: '[DisableBias](DisableBias.md)接口与该接口的功能相同，建议使用[DisableBias](DisableBias.md)。'
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: ClearBias__z
+  archs: ['3510', '2201', '3002', '2002', x90]
+  headers: [/include/adv_api/matmul/matmul.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ClearBias
 
 ## 产品支持情况
@@ -33,6 +49,13 @@
 清除Bias标志位，表示Matmul计算时没有Bias参与。如果在调用[Init](Init.md)时配置了TCubeTiling结构中的isBias参数来启用Bias，调用该接口后，会清除Bias标志位，不再启用Bias。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "ClearBias__z"
+  archs: ["3510", "2201", "3002", "2002", "x90"]
+  headers: ["/include/adv_api/matmul/matmul.h"]
+```
 
 ```
 __aicore__ inline void ClearBias()

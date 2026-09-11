@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: ClearSpr
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/special_register_access/ClearSpr.md
+description: 对指定的特殊寄存器进行清零。当前支持[表SpecialPurposeReg模板参数说明](GetSpr.md#table37531617424)。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: ClearSpr__z
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_sys_var_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ClearSpr<a name="ZH-CN_TOPIC_0000002537397560"></a>
 
 ## 产品支持情况<a name="section364964311912"></a>
@@ -32,6 +48,13 @@
 对指定的特殊寄存器进行清零。当前支持[表SpecialPurposeReg模板参数说明](GetSpr.md#table37531617424)。
 
 ## 函数原型<a name="section113251712205"></a>
+
+```yaml
+api_signature:
+  override_id: "ClearSpr__z"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_sys_var_intf.h"]
+```
 
 ```cpp
 template <SpecialPurposeReg spr>

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetStartPosition
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3DBackpropInput_Kernel/SetStartPosition.md
+description: 设置单核上GradOutput载入数据的起始位置。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetStartPosition__u32_i32
+  archs: ['2201']
+  headers: [/include/adv_api/conv_backprop/conv3d_bp_input_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetStartPosition
 
 ## 产品支持情况
@@ -28,6 +44,13 @@
 设置单核上GradOutput载入数据的起始位置。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "SetStartPosition__u32_i32"
+  archs: ["2201"]
+  headers: ["/include/adv_api/conv_backprop/conv3d_bp_input_intf.h"]
+```
 
 ```
 __aicore__ inline void SetStartPosition(uint32_t curDinStartIdx, int32_t curHoStartIdx)

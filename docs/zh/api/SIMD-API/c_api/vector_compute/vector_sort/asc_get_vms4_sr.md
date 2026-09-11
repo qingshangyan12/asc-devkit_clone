@@ -11,8 +11,7 @@ usage_dependencies:
 signature:
   - override_id: "asc_get_vms4_sr__Amrgu16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_sort.h"
+    headers: [/include/c_api/vector_compute/compute/vector_sort.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -55,8 +54,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_get_vms4_sr__Amrgu16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_sort.h"
+  headers: [/include/c_api/vector_compute/compute/vector_sort.h]
 ```
 
 ```cpp

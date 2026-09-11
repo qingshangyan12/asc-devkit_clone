@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetSpr
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/special_register_access/GetSpr.md
+description: 获取指定特殊寄存器的值。当前支持[表SpecialPurposeReg模板参数说明](#table37531617424)。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetSpr__z
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_sys_var_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetSpr<a name="ZH-CN_TOPIC_0000002537557502"></a>
 
 ## 产品支持情况<a name="section364964311912"></a>
@@ -32,6 +48,13 @@
 获取指定特殊寄存器的值。当前支持[表SpecialPurposeReg模板参数说明](#table37531617424)。
 
 ## 函数原型<a name="section113251712205"></a>
+
+```yaml
+api_signature:
+  override_id: "GetSpr__z"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_sys_var_intf.h"]
+```
 
 ```cpp
 template <SpecialPurposeReg spr>

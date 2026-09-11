@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GetDataObj
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/aux_data_structures/TensorDesc/GetDataObj.md
+description: 将数据指针置于GlobalTensor中并返回该GlobalTensor。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetDataObj<a name="ZH-CN_TOPIC_0000002340348465"></a>
 
 ## 产品支持情况<a name="section73648168211"></a>

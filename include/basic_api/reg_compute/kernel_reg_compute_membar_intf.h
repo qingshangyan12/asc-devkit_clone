@@ -31,6 +31,12 @@ namespace AscendC {
 namespace Reg {
 
 template <MemType src, MemType dst>
+/**
+ * @ingroup simd_api.basic_api.reg_vector_compute.sync_control
+ * @override_id LocalMemBar__z
+ * @archs 3510
+ * @brief Reg矢量计算宏函数内不同流水线之间的同步指令。该同步指令指定src源流水线和dst目的流水线，如下图所示，目的流水线将等待源流水线上所有指令完成才进行执行。读写场景下，当读指令使用的寄存器和写指令使用的寄存器相同时，可以触发寄存器保序，指令将会按照代码顺序执行，不需要插入同步指令，而当使用的寄存器不同时，如果要确保读写指令顺序执行，则需要插入同步指令，写写场景同理。MemType用于标识不同的流水线类型，其具体取值与含义详见[表 MemType取值说明](#table2_memtype)。
+ */
 __simd_callee__ inline void LocalMemBar();
 
 } // namespace Reg

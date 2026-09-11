@@ -10,12 +10,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_gt_scalar__v<dtype>_<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_compare.h"
+    headers: [/include/c_api/reg_compute/compute/reg_compare.h]
   - prototype_id: "asc_gt_scalar__Rvb_v<dtype>_<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_compare.h"
+    headers: [/include/c_api/reg_compute/compute/reg_compare.h]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/compare"
     archs: ["3510"]
@@ -70,8 +68,7 @@ $$
 api_signature:
   prototype_id: "asc_gt_scalar__v<dtype>_<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_compare.h"
+  headers: [/include/c_api/reg_compute/compute/reg_compare.h]
   dtype:
     values:
       - "int8_t"
@@ -96,8 +93,7 @@ __simd_callee__ inline vector_bool asc_gt_scalar(vector_<dtype> src,
 api_signature:
   prototype_id: "asc_gt_scalar__Rvb_v<dtype>_<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_compare.h"
+  headers: [/include/c_api/reg_compute/compute/reg_compare.h]
   dtype:
     values:
       - "int8_t"

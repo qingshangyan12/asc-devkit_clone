@@ -10,8 +10,7 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_axpy__Rv<dtype>_v<dtype>_<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_fused.h"
+    headers: [/include/c_api/reg_compute/compute/reg_fused.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -58,8 +57,7 @@ $$
 api_signature:
   prototype_id: "asc_axpy__Rv<dtype>_v<dtype>_<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_fused.h"
+  headers: [/include/c_api/reg_compute/compute/reg_fused.h]
   dtype:
     values:
       - "half"

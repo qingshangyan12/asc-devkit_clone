@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: AsyncGetTensorC
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/AsyncGetTensorC.md
+description: 获取Iterate接口异步计算的结果矩阵。该接口功能已被[GetTensorC](GetTensorC.md)覆盖，建议直接使用GetTensorC异步接口。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # AsyncGetTensorC
 
 ## 产品支持情况

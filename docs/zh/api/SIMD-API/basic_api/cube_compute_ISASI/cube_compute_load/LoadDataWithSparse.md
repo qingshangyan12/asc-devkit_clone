@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: LoadDataWithSparse
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadDataWithSparse.md
+description: 用于从L1 Buffer中搬运以512字节为单位存放的稠密权重矩阵到L0B Buffer里，同时搬运以128字节为单位的索引矩阵到内置的专用buffer空间（用于后续MmadWithSparse接口进行读取）。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LoadDataWithSparse<a name="ZH-CN_TOPIC_0000002568950935"></a>
 
 ## 产品支持情况<a name="zh-cn_topic_0000002512171654_section796754519912"></a>

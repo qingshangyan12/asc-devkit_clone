@@ -9,14 +9,12 @@ usage_dependencies:
 signature:
   - override_id: "asc_set_l0c_copy_prequant__f32_u16_b"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_set_l0c_copy_prequant__u64"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 examples: []
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_set_l0c_copy_prequant
@@ -74,8 +72,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_set_l0c_copy_prequant__f32_u16_b"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
 ```cpp
@@ -86,8 +83,7 @@ __aicore__ inline void asc_set_l0c_copy_prequant(float scale, uint16_t offset, b
 api_signature:
   override_id: "asc_set_l0c_copy_prequant__u64"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
 ```cpp

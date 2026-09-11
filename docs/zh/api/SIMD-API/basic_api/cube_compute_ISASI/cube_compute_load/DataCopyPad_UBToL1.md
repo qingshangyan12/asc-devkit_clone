@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: DataCopyPad（UBToL1非对齐数据搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopyPad_UBToL1.md
+description: 该接口提供从Unified Buffer（UB）到L1 Buffer的数据非对齐搬运功能。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DataCopyPad（UBToL1非对齐数据搬运）
 
 ## 产品支持情况<a name="section1550532418810"></a>

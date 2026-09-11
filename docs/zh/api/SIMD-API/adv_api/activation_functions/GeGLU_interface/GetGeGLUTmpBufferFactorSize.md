@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GetGeGLUTmpBufferFactorSize
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/activation_functions/GeGLU_interface/GetGeGLUTmpBufferFactorSize.md
+description: kernel侧GeGLU接口的计算需要开发者预留/申请临时空间。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetGeGLUTmpBufferFactorSize
 
 ## 功能说明

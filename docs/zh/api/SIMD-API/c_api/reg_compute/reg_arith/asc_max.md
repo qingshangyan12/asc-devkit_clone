@@ -10,12 +10,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_max__Rv<dtype>_v<dtype>_v<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_arith.h"
+    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
   - prototype_id: "asc_max__v<dtype>_v<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_arith.h"
+    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -63,8 +61,7 @@ $$
 api_signature:
   prototype_id: "asc_max__Rv<dtype>_v<dtype>_v<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  headers: [/include/c_api/reg_compute/compute/reg_arith.h]
   dtype:
     values:
       - "int8_t"
@@ -90,8 +87,7 @@ __simd_callee__ inline void asc_max(vector_<dtype>& dst,
 api_signature:
   prototype_id: "asc_max__v<dtype>_v<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  headers: [/include/c_api/reg_compute/compute/reg_arith.h]
   dtype:
     values:
       - "int8_t"

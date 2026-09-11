@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetProgramCounter(ISASI)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetProgramCounter_ISASI.md
+description: 获取程序计数器的值，以追踪当前程序执行的位置。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetProgramCounter__z
+  archs: ['3510', '2201', '2002']
+  headers: [/include/basic_api/kernel_operator_sys_var_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetProgramCounter(ISASI)
 
 ## 产品支持情况
@@ -32,6 +48,13 @@
 获取程序计数器的值，以追踪当前程序执行的位置。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "GetProgramCounter__z"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/basic_api/kernel_operator_sys_var_intf.h"]
+```
 
 ```cpp
 __aicore__ inline int64_t GetProgramCounter()

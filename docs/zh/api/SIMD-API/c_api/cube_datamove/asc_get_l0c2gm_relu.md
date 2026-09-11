@@ -9,10 +9,9 @@ usage_dependencies:
 signature:
   - override_id: "asc_get_l0c2gm_relu__z"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 examples: []
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_get_l0c2gm_relu
@@ -53,8 +52,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_get_l0c2gm_relu__z"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
 ```cpp

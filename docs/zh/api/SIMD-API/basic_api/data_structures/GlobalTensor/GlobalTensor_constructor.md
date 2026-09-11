@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GlobalTensor构造函数
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/data_structures/GlobalTensor/GlobalTensor_constructor.md
+description: GlobalTensor构造函数。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GlobalTensor__z
+  archs: ['3510', '2201', '3002', '2002', '1001']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GlobalTensor构造函数<a name="ZH-CN_TOPIC_0000002167642833"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -32,8 +48,15 @@ GlobalTensor构造函数。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
+```yaml
+api_signature:
+  override_id: "GlobalTensor__z"
+  archs: ["3510", "2201", "3002", "2002", "1001"]
+  headers: []
+```
+
 ```cpp
-__aicore__ inline GlobalTensor<T>() {}
+__aicore__ inline GlobalTensor() {}
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

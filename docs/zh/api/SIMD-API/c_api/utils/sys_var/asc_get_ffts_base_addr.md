@@ -9,8 +9,7 @@ usage_dependencies:
 signature:
   - override_id: "asc_get_ffts_base_addr__z"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/utils/sys_var.h"
+    headers: [/include/c_api/utils/sys_var.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -53,8 +52,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_get_ffts_base_addr__z"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/utils/sys_var.h"
+  headers: [/include/c_api/utils/sys_var.h]
 ```
 
 ```cpp

@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: make_layout
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/layout/make_layout.md
+description: make_layout用于根据shape和stride构造layout对象，描述数据张量在逻辑维度上的形状以及各维对应的步长信息。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: make_layout__RCpShape_RCpStride
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/layout_interface.h]
+- override_id: make_layout__RCpShape
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/layout_interface.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # make_layout
 
 ## 产品支持情况
@@ -37,9 +56,26 @@ make_layout支持以下两种构造方式：
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "make_layout__RCpShape_RCpStride"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/layout_interface.h"]
+```
+
 ```cpp
 template <typename Shape, typename Stride>
 __aicore__ inline constexpr auto make_layout(const Shape& shape, const Stride& stride)
+```
+
+```yaml
+api_signature:
+  override_id: "make_layout__RCpShape"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/layout_interface.h"]
+```
+
+```cpp
 
 template <typename Shape>
 __aicore__ inline constexpr auto make_layout(const Shape& shape)

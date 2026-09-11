@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: Init
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3D_Kernel/Init.md
+description: Init主要用于对Conv3D对象中的Tiling数据进行初始化，根据Tiling参数进行资源划分，同时获取用户声明的Pipe对象，完成内存分配。Tiling参数的具体介绍请参考[Conv3D
+  Tiling](../Conv3D_Tiling/Conv3d_Tiling.md)。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Init__PCv
+  archs: ['2201']
+  headers: [/include/adv_api/conv/conv3d/conv3d_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Init
 
 ## 产品支持情况
@@ -28,6 +45,13 @@
 Init主要用于对Conv3D对象中的Tiling数据进行初始化，根据Tiling参数进行资源划分，同时获取用户声明的Pipe对象，完成内存分配。Tiling参数的具体介绍请参考[Conv3D Tiling](../Conv3D_Tiling/Conv3d_Tiling.md)。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "Init__PCv"
+  archs: ["2201"]
+  headers: ["/include/adv_api/conv/conv3d/conv3d_intf.h"]
+```
 
 ```
 __aicore__ inline void Init(const void* __restrict cubeTiling)

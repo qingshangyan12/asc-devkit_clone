@@ -9,32 +9,25 @@ usage_dependencies:
 signature:
   - override_id: "asc_unsqueeze_u8__vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_unsqueeze_s8__vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_unsqueeze_u16__vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_unsqueeze_s16__vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_unsqueeze_u32__vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_unsqueeze_s32__vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - prototype_id: "asc_unsqueeze__Rv<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -85,8 +78,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_unsqueeze_u8__vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```c
@@ -98,8 +90,7 @@ __simd_callee__ inline vector_uint8_t asc_unsqueeze_u8(vector_bool mask)
 api_signature:
   override_id: "asc_unsqueeze_s8__vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```c
@@ -110,8 +101,7 @@ __simd_callee__ inline vector_int8_t asc_unsqueeze_s8(vector_bool mask)
 api_signature:
   override_id: "asc_unsqueeze_u16__vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```c
@@ -122,8 +112,7 @@ __simd_callee__ inline vector_uint16_t asc_unsqueeze_u16(vector_bool mask)
 api_signature:
   override_id: "asc_unsqueeze_s16__vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```c
@@ -134,8 +123,7 @@ __simd_callee__ inline vector_int16_t asc_unsqueeze_s16(vector_bool mask)
 api_signature:
   override_id: "asc_unsqueeze_u32__vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```c
@@ -146,8 +134,7 @@ __simd_callee__ inline vector_uint32_t asc_unsqueeze_u32(vector_bool mask)
 api_signature:
   override_id: "asc_unsqueeze_s32__vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```c
@@ -158,8 +145,7 @@ __simd_callee__ inline vector_int32_t asc_unsqueeze_s32(vector_bool mask)
 api_signature:
   prototype_id: "asc_unsqueeze__Rv<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   dtype:
     values:
       - "int8_t"
@@ -195,8 +181,7 @@ dtype支持的数据类型：int8_t、uint8_t、int16_t、uint16_t、int32_t、u
 api_signature:
   override_id: "asc_unsqueeze_s8__vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```c

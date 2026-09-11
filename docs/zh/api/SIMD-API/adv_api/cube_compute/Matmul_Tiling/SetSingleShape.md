@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetSingleShape
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetSingleShape.md
+description: 设置Matmul单核计算的形状singleMIn，singleNIn，singleKIn，单位为元素。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetSingleShape
 
 ## 功能说明

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: log
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/reg_vector_compute/basic_arithmetic/log.md
+description: 该接口根据src_reg.mask，对源操作数src_reg中的有效元素逐个求自然对数（以e为底），并返回计算结果。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: log__RCregtensorg1x2_pT
+  archs: ['3510']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # log
 
 ## 产品支持情况
@@ -35,6 +51,13 @@ dst_i = \ln(src\_reg_i)
 $$
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "log__RCregtensorg1x2_pT"
+  archs: ["3510"]
+  headers: []
+```
 
 ```cpp
 template <typename T>

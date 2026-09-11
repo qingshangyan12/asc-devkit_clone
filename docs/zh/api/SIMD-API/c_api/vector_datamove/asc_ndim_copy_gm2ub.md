@@ -13,116 +13,88 @@ usage_dependencies:
 signature:
   - override_id: "asc_ndim_copy_gm2ub__PUi8_PGi8_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUu8_PGu8_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUf4e2m1x2_PGf4e2m1x2_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUf4e1m2x2_PGf4e1m2x2_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUf8e8m0_PGf8e8m0_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUf8e5m2_PGf8e5m2_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUf8e4m3_PGf8e4m3_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUi16_PGi16_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUu16_PGu16_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUf16_PGf16_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUbf16_PGbf16_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUi32_PGi32_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUu32_PGu32_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUf32_PGf32_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUi8_PGi8_u32_u32_u32_u32_u32_u8_u8_b_u8"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUu8_PGu8_u32_u32_u32_u32_u32_u8_u8_b_u8"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUf4e2m1x2_PGf4e2m1x2_u32_u32_u32_u32_u32_u8_u8_b_u8"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUf4e1m2x2_PGf4e1m2x2_u32_u32_u32_u32_u32_u8_u8_b_u8"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUf8e8m0_PGf8e8m0_u32_u32_u32_u32_u32_u8_u8_b_u8"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUf8e5m2_PGf8e5m2_u32_u32_u32_u32_u32_u8_u8_b_u8"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUf8e4m3_PGf8e4m3_u32_u32_u32_u32_u32_u8_u8_b_u8"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUi16_PGi16_u32_u32_u32_u32_u32_u8_u8_b_u8"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUu16_PGu16_u32_u32_u32_u32_u32_u8_u8_b_u8"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUf16_PGf16_u32_u32_u32_u32_u32_u8_u8_b_u8"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUbf16_PGbf16_u32_u32_u32_u32_u32_u8_u8_b_u8"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUi32_PGi32_u32_u32_u32_u32_u32_u8_u8_b_u8"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUu32_PGu32_u32_u32_u32_u32_u32_u8_u8_b_u8"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_ndim_copy_gm2ub__PUf32_PGf32_u32_u32_u32_u32_u32_u8_u8_b_u8"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_ub2l1"
     archs: ["3510"]
@@ -202,8 +174,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUi8_PGi8_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -214,8 +185,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int8_t* dst, __gm__ int8_t* 
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUu8_PGu8_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -226,8 +196,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ uint8_t* dst, __gm__ uint8_t
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUf4e2m1x2_PGf4e2m1x2_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -238,8 +207,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e2m1_t* dst, __gm__ fp
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUf4e1m2x2_PGf4e1m2x2_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -250,8 +218,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e1m2_t* dst, __gm__ fp
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUf8e8m0_PGf8e8m0_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -262,8 +229,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp8_e8m0_t* dst, __gm__ fp8_
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUf8e5m2_PGf8e5m2_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -274,8 +240,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp8_e5m2_t* dst, __gm__ fp8_
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUf8e4m3_PGf8e4m3_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -286,8 +251,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp8_e4m3fn_t* dst, __gm__ fp
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUi16_PGi16_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -298,8 +262,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int16_t* dst, __gm__ int16_t
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUu16_PGu16_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -310,8 +273,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ uint16_t* dst, __gm__ uint16
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUf16_PGf16_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -322,8 +284,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ half* dst, __gm__ half* src,
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUbf16_PGbf16_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -334,8 +295,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ bfloat16_t* dst, __gm__ bflo
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUi32_PGi32_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -346,8 +306,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int32_t* dst, __gm__ int32_t
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUu32_PGu32_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -358,8 +317,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ uint32_t* dst, __gm__ uint32
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUf32_PGf32_u32_u32_u32_u32_u32_u8_u8_b_loadl2"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -372,8 +330,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ float* dst, __gm__ float* sr
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUi8_PGi8_u32_u32_u32_u32_u32_u8_u8_b_u8"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -384,8 +341,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int8_t* dst, __gm__ int8_t* 
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUu8_PGu8_u32_u32_u32_u32_u32_u8_u8_b_u8"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -396,8 +352,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ uint8_t* dst, __gm__ uint8_t
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUf4e2m1x2_PGf4e2m1x2_u32_u32_u32_u32_u32_u8_u8_b_u8"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -408,8 +363,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e2m1_t* dst, __gm__ fp
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUf4e1m2x2_PGf4e1m2x2_u32_u32_u32_u32_u32_u8_u8_b_u8"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -420,8 +374,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e1m2_t* dst, __gm__ fp
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUf8e8m0_PGf8e8m0_u32_u32_u32_u32_u32_u8_u8_b_u8"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -432,8 +385,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp8_e8m0_t* dst, __gm__ fp8_
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUf8e5m2_PGf8e5m2_u32_u32_u32_u32_u32_u8_u8_b_u8"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -444,8 +396,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp8_e5m2_t* dst, __gm__ fp8_
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUf8e4m3_PGf8e4m3_u32_u32_u32_u32_u32_u8_u8_b_u8"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -456,8 +407,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp8_e4m3fn_t* dst, __gm__ fp
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUi16_PGi16_u32_u32_u32_u32_u32_u8_u8_b_u8"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -468,8 +418,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int16_t* dst, __gm__ int16_t
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUu16_PGu16_u32_u32_u32_u32_u32_u8_u8_b_u8"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -480,8 +429,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ uint16_t* dst, __gm__ uint16
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUf16_PGf16_u32_u32_u32_u32_u32_u8_u8_b_u8"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -492,8 +440,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ half* dst, __gm__ half* src,
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUbf16_PGbf16_u32_u32_u32_u32_u32_u8_u8_b_u8"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -504,8 +451,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ bfloat16_t* dst, __gm__ bflo
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUi32_PGi32_u32_u32_u32_u32_u32_u8_u8_b_u8"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -516,8 +462,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int32_t* dst, __gm__ int32_t
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUu32_PGu32_u32_u32_u32_u32_u32_u8_u8_b_u8"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp
@@ -528,8 +473,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ uint32_t* dst, __gm__ uint32
 api_signature:
   override_id: "asc_ndim_copy_gm2ub__PUf32_PGf32_u32_u32_u32_u32_u32_u8_u8_b_u8"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```cpp

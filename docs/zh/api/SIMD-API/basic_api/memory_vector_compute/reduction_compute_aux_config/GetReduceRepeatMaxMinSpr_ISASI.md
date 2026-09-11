@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: GetReduceRepeatMaxMinSpr(ISASI)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute_aux_config/GetReduceRepeatMaxMinSpr_ISASI.md
+description: 本接口用于获取调用[ReduceRepeat<MAX/MIN>](../reduction_compute/ReduceRepeat.md)时所有repeat内的最值及其索引，或获取调用[ReduceMax](../reduction_compute/ReduceMax.md)/[ReduceMin](../reduction_compute/ReduceMin.md)得到的最值。计算结果以全局变量形式存储，可以随时调用获取。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetReduceRepeatMaxMinSpr__RpT_RpT
+  archs: ['2201']
+  headers: [/include/basic_api/kernel_operator_vec_reduce_intf.h]
+- override_id: GetReduceRepeatMaxMinSpr__RpT
+  archs: ['2002']
+  headers: [/include/basic_api/kernel_operator_vec_reduce_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetReduceRepeatMaxMinSpr(ISASI)
 
 ## 产品支持情况
@@ -45,6 +64,13 @@
     - Atlas A2 训练系列产品/Atlas A2 推理系列产品
     <!-- end id10 -->
 
+```yaml
+api_signature:
+  override_id: "GetReduceRepeatMaxMinSpr__RpT_RpT"
+  archs: ["2201"]
+  headers: ["/include/basic_api/kernel_operator_vec_reduce_intf.h"]
+```
+
     ```cpp
     template <typename T>
     __aicore__ inline void GetReduceRepeatMaxMinSpr(T &maxMinValue, T &maxMinIndex)
@@ -55,6 +81,13 @@
 <!-- npu="310p" id11 -->
 
 - 获取调用[ReduceRepeat<MAX/MIN>](../reduction_compute/ReduceRepeat.md)时所有repeat内的最值，或获取调用[ReduceMax](../reduction_compute/ReduceMax.md)/[ReduceMin](../reduction_compute/ReduceMin.md)得到的最值。该函数原型仅支持Atlas 推理系列产品AI Core。
+
+```yaml
+api_signature:
+  override_id: "GetReduceRepeatMaxMinSpr__RpT"
+  archs: ["2002"]
+  headers: ["/include/basic_api/kernel_operator_vec_reduce_intf.h"]
+```
 
     ```cpp
     template <typename T>

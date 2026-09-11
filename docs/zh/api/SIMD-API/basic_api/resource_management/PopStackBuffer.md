@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: PopStackBuffer
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/PopStackBuffer.md
+description: 在指定position（逻辑位置）申请临时空间，空间大小为指定position的全部剩余空间。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: PopStackBuffer__Rltg1x2_pT
+  archs: ['3510', '2201', '3002', '2002', '1001', x90, '9030']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # PopStackBuffer<a name="ZH-CN_TOPIC_0000001870331257"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -37,6 +53,13 @@
 在指定position（逻辑位置）申请临时空间，空间大小为指定position的全部剩余空间。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "PopStackBuffer__Rltg1x2_pT"
+  archs: ["3510", "2201", "3002", "2002", "1001", "x90", "9030"]
+  headers: []
+```
 
 ```
 template <typename T, TPosition pos>

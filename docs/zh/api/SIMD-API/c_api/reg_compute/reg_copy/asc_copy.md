@@ -10,24 +10,19 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_copy__Rv<dtype>_v<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_copy.h"
+    headers: [/include/c_api/reg_compute/reg_copy.h]
   - override_id: "asc_copy__Rvb_vb_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_copy.h"
+    headers: [/include/c_api/reg_compute/reg_copy.h]
   - override_id: "asc_copy__Rvb_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_copy.h"
+    headers: [/include/c_api/reg_compute/reg_copy.h]
   - override_id: "asc_copy__Rvb_vu16_i16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_copy.h"
+    headers: [/include/c_api/reg_compute/reg_copy.h]
   - override_id: "asc_copy__Rvb_vu32_i16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_copy.h"
+    headers: [/include/c_api/reg_compute/reg_copy.h]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/mergemode"
     archs: ["3510"]
@@ -90,8 +85,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_copy__Rv<dtype>_v<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_copy.h"
+  headers: [/include/c_api/reg_compute/reg_copy.h]
   dtype:
     values:
       - "int8_t"
@@ -130,8 +124,7 @@ __simd_callee__ inline void asc_copy(vector_half& dst,
 api_signature:
   override_id: "asc_copy__Rvb_vb_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_copy.h"
+  headers: [/include/c_api/reg_compute/reg_copy.h]
 ```
 
 ```c
@@ -144,8 +137,7 @@ __simd_callee__ inline void asc_copy(vector_bool& dst,
 api_signature:
   override_id: "asc_copy__Rvb_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_copy.h"
+  headers: [/include/c_api/reg_compute/reg_copy.h]
 ```
 
 ```c
@@ -161,8 +153,7 @@ __simd_callee__ inline void asc_copy(vector_bool& dst,
 api_signature:
   override_id: "asc_copy__Rvb_vu16_i16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_copy.h"
+  headers: [/include/c_api/reg_compute/reg_copy.h]
 ```
 
 ```c
@@ -175,8 +166,7 @@ __simd_callee__ inline void asc_copy(vector_bool& dst,
 api_signature:
   override_id: "asc_copy__Rvb_vu32_i16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_copy.h"
+  headers: [/include/c_api/reg_compute/reg_copy.h]
 ```
 
 ```c

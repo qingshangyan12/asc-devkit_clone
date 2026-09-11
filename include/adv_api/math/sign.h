@@ -50,6 +50,16 @@ namespace AscendC {
  */
 template <typename T, bool isReuseSource = false>
 __ASC_USE_RESERVED_UBUF__(2201, "Sign is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+/**
+ * @ingroup simd_api.adv_api.math_compute.sign_interface
+ * @override_id Sign__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 按元素执行Sign操作，Sign是指返回输入数据的符号，如果为0则返回0，如果为正数则返回1，如果为负数则返回-1。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcTensor 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] sharedTmpBuffer 临时缓存。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。用于Sign内部复杂计算时存储中间变量，由开发者提供。临时空间大小BufferSize的获取方式请参考[GetSignMaxMinTmpSize](GetSignMaxMinTmpSize.md)。
+ * @param [in] calCount 参与计算的元素个数。
+ */
 __aicore__ inline void Sign(
     const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
     const uint32_t calCount)
@@ -71,6 +81,15 @@ __aicore__ inline void Sign(
  */
 template <typename T, bool isReuseSource = false>
 __ASC_USE_RESERVED_UBUF__(2201, "Sign is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+/**
+ * @ingroup simd_api.adv_api.math_compute.sign_interface
+ * @override_id Sign__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 按元素执行Sign操作，Sign是指返回输入数据的符号，如果为0则返回0，如果为正数则返回1，如果为负数则返回-1。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcTensor 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] sharedTmpBuffer 临时缓存。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。用于Sign内部复杂计算时存储中间变量，由开发者提供。临时空间大小BufferSize的获取方式请参考[GetSignMaxMinTmpSize](GetSignMaxMinTmpSize.md)。
+ */
 __aicore__ inline void Sign(
     const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
 {
@@ -88,6 +107,15 @@ __aicore__ inline void Sign(
  */
 template <typename T, bool isReuseSource = false>
 __ASC_USE_RESERVED_UBUF__(2201, "Sign is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+/**
+ * @ingroup simd_api.adv_api.math_compute.sign_interface
+ * @override_id Sign__RCltg1x2_pT_RCltg1x2_pT_u32
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 按元素执行Sign操作，Sign是指返回输入数据的符号，如果为0则返回0，如果为正数则返回1，如果为负数则返回-1。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcTensor 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] calCount 参与计算的元素个数。
+ */
 __aicore__ inline void Sign(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
 {
     // Only for AI Vector Core.
@@ -119,6 +147,14 @@ __aicore__ inline void Sign(const LocalTensor<T>& dstTensor, const LocalTensor<T
  */
 template <typename T, bool isReuseSource = false>
 __ASC_USE_RESERVED_UBUF__(2201, "Sign is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+/**
+ * @ingroup simd_api.adv_api.math_compute.sign_interface
+ * @override_id Sign__RCltg1x2_pT_RCltg1x2_pT
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 按元素执行Sign操作，Sign是指返回输入数据的符号，如果为0则返回0，如果为正数则返回1，如果为负数则返回-1。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcTensor 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ */
 __aicore__ inline void Sign(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
 {
     Sign<T, isReuseSource>(dstTensor, srcTensor, srcTensor.GetSize());

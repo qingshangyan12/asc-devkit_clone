@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetTail
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetTail.md
+description: 在不改变Tiling的情况下，重新设置本次计算的singleCoreM/singleCoreN/singleCoreK，以元素为单位。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetTail__i_i_i
+  archs: ['3510', '2201', '3002', '2002', x90]
+  headers: [/include/adv_api/matmul/matmul.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetTail
 
 ## 产品支持情况
@@ -31,6 +47,13 @@
 在不改变Tiling的情况下，重新设置本次计算的singleCoreM/singleCoreN/singleCoreK，以元素为单位。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "SetTail__i_i_i"
+  archs: ["3510", "2201", "3002", "2002", "x90"]
+  headers: ["/include/adv_api/matmul/matmul.h"]
+```
 
 ```
 __aicore__ inline void SetTail(int tailM = -1, int tailN = -1, int tailK = -1)

@@ -109,6 +109,9 @@ public:
      * @param singleCo Single output channel dimension
      * @param singleDo Single output depth dimension
      * @param singleM Single M dimension (height*width)
+ * @ingroup simd_api.adv_api.convolution_compute.conv3d_kernel
+ * @override_id SetSingleOutputShape__u64_u64_u64
+ * @archs 2201
      */
     __aicore__ inline void SetSingleOutputShape(uint64_t singleCo, uint64_t singleDo, uint64_t singleM)
     {
@@ -122,6 +125,9 @@ public:
      * @brief Set input start position for 2D-like convolution
      * @param diStartPos Starting position in depth dimension
      * @param mStartPos Starting position in M dimension (height*width)
+ * @ingroup simd_api.adv_api.convolution_compute.conv3d_kernel
+ * @override_id SetInputStartPosition__i64_i64
+ * @archs 2201
      */
     __aicore__ inline void SetInputStartPosition(int64_t diStartPos, int64_t mStartPos)
     {

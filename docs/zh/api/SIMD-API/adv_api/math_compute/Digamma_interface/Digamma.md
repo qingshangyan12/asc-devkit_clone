@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: Digamma
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/Digamma_interface/Digamma.md
+description: 按元素计算x的gamma函数的对数导数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Digamma__RCltg1x2_pT_RCltg1x2_pT_Rltg1x2_u8_u32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/digamma.h]
+- override_id: Digamma__RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/digamma.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Digamma
 
 ## 产品支持情况
@@ -35,12 +54,26 @@
 
 -   通过sharedTmpBuffer入参传入临时空间
 
+```yaml
+api_signature:
+  override_id: "Digamma__RCltg1x2_pT_RCltg1x2_pT_Rltg1x2_u8_u32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/digamma.h"]
+```
+
     ```
     template <typename T, bool isReuseSource = false>
     __aicore__ inline void Digamma(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
     ```
 
 -   接口框架申请临时空间
+
+```yaml
+api_signature:
+  override_id: "Digamma__RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/digamma.h"]
+```
 
     ```
     template<typename T, bool isReuseSource = false>

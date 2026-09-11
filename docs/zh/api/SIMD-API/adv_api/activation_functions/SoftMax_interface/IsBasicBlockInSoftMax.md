@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: IsBasicBlockInSoftMax
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/activation_functions/SoftMax_interface/IsBasicBlockInSoftMax.md
+description: 用于判断SoftMaxTiling结构是否符合基本块特征。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # IsBasicBlockInSoftMax
 
 ## 功能说明

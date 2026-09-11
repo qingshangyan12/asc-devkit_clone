@@ -34,8 +34,20 @@
 #include "include/utils/debug/asc_time.h"
 
 namespace AscendC {
+/**
+ * @ingroup simd_api.basic_api.debug_interface.performance_stats
+ * @override_id MetricsProfStart__z
+ * @archs 3510 2201
+ * @brief 推荐使用[asc_prof_start](../../../../Utils-API/tuning_interface/asc_prof_start.md)接口进行性能数据采集信号启动的设置，该接口同时适用于C语言和C++语言编程。
+ */
 __aicore__ inline void MetricsProfStart();
 
+/**
+ * @ingroup simd_api.basic_api.debug_interface.performance_stats
+ * @override_id MetricsProfStop__z
+ * @archs 3510 2201
+ * @brief 推荐使用[asc_prof_stop](../../../../Utils-API/tuning_interface/asc_prof_stop.md)接口进行性能数据采集信号启动的设置，该接口同时适用于C语言和C++语言编程。
+ */
 __aicore__ inline void MetricsProfStop();
 } // namespace AscendC
 

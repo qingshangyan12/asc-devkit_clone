@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: WaitGetTensorC
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/WaitGetTensorC.md
+description: 当使用GetTensorC异步接口将结果矩阵从GM拷贝到Unified Buffer（UB），且UB后续需要进行Vector计算时，需要调用WaitGetTensorC进行同步。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: WaitGetTensorC__z
+  archs: ['3510', '2201']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # WaitGetTensorC
 
 ## 产品支持情况
@@ -28,6 +44,13 @@
 当使用GetTensorC异步接口将结果矩阵从GM拷贝到Unified Buffer（UB），且UB后续需要进行Vector计算时，需要调用WaitGetTensorC进行同步。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "WaitGetTensorC__z"
+  archs: ["3510", "2201"]
+  headers: []
+```
 
 ```
 __aicore__ inline void WaitGetTensorC()

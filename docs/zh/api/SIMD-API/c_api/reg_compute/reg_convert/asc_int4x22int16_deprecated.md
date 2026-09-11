@@ -9,20 +9,16 @@ usage_dependencies:
 signature:
   - override_id: "asc_int4x22int16__Rvi16_vi4x2_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_int4x22int16_v2__Rvi16_vi4x2_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_int4x22int16_v3__Rvi16_vi4x2_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_int4x22int16_v4__Rvi16_vi4x2_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -67,8 +63,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_int4x22int16__Rvi16_vi4x2_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -80,8 +75,7 @@ __simd_callee__ inline void asc_int4x22int16(vector_int16_t& dst, vector_int4x2_
 api_signature:
   override_id: "asc_int4x22int16_v2__Rvi16_vi4x2_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -93,8 +87,7 @@ __simd_callee__ inline void asc_int4x22int16_v2(vector_int16_t& dst, vector_int4
 api_signature:
   override_id: "asc_int4x22int16_v3__Rvi16_vi4x2_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -106,8 +99,7 @@ __simd_callee__ inline void asc_int4x22int16_v3(vector_int16_t& dst, vector_int4
 api_signature:
   override_id: "asc_int4x22int16_v4__Rvi16_vi4x2_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp

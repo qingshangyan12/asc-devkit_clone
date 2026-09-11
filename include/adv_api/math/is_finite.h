@@ -45,6 +45,12 @@ namespace AscendC {
  */
 
 template <typename T, typename U>
+/**
+ * @ingroup simd_api.adv_api.math_compute.isfinite_interface
+ * @override_id IsFinite__RCltg1x2_pU_RCltg1x2_pT_u32
+ * @archs 3510
+ * @brief 按元素判断输入的浮点数是否非NAN、非±INF，输出结果为浮点数或者布尔值。对于非NAN或者非±INF的输入数据，当输出为浮点类型时，对应位置的结果为该浮点类型的1，反之为0；当输出为bool类型时，对应位置的结果为true，反之为false。
+ */
 __aicore__ inline void IsFinite(const LocalTensor<U>& dst, const LocalTensor<T>& src, uint32_t calCount)
 {
 #if defined(__NPU_ARCH__) && \

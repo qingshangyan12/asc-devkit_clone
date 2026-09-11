@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: TQueBind构造函数
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/TQueBind/TQueBind_constructor.md
+description: 创建TQueBind对象。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: TQueBind__z
+  archs: ['3510', '2201', '3002', '2002', '1001']
+  headers: [/include/basic_api/kernel_tpipe.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # TQueBind构造函数<a name="ZH-CN_TOPIC_0000002019600172"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -32,6 +48,13 @@
 创建TQueBind对象。
 
 ## 函数原型<a name="zh-cn_topic_0000001935531088_zh-cn_topic_0000001339105488_section13230182415108"></a>
+
+```yaml
+api_signature:
+  override_id: "TQueBind__z"
+  archs: ["3510", "2201", "3002", "2002", "1001"]
+  headers: ["/include/basic_api/kernel_tpipe.h"]
+```
 
 ```cpp
 __aicore__ inline TQueBind()

@@ -9,36 +9,28 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_unpack_lower__v<dtype_src>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - prototype_id: "asc_unpack_upper__v<dtype_src>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - prototype_id: "asc_unpack_lower__Rv<dtype_dst>_v<dtype_src>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - prototype_id: "asc_unpack_upper__Rv<dtype_dst>_v<dtype_src>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_unpack_lower__vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_unpack_upper__vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_unpack_lower__Rvb_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_unpack_upper__Rvb_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -106,8 +98,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_unpack_lower__v<dtype_src>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   dtype:
     variants:
       -
@@ -129,8 +120,7 @@ __simd_callee__ inline vector_<dtype_dst> asc_unpack_lower(vector_<dtype_src> sr
 api_signature:
   prototype_id: "asc_unpack_upper__v<dtype_src>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   dtype:
     variants:
       -
@@ -152,8 +142,7 @@ __simd_callee__ inline vector_<dtype_dst> asc_unpack_upper(vector_<dtype_src> sr
 api_signature:
   prototype_id: "asc_unpack_lower__Rv<dtype_dst>_v<dtype_src>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   dtype:
     variants:
       -
@@ -181,8 +170,7 @@ __simd_callee__ inline void asc_unpack_lower(vector_<dtype_dst>& dst,
 api_signature:
   prototype_id: "asc_unpack_upper__Rv<dtype_dst>_v<dtype_src>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   dtype:
     variants:
       -
@@ -232,8 +220,7 @@ __simd_callee__ inline void asc_unpack_lower(vector_uint32_t& dst,
 api_signature:
   override_id: "asc_unpack_lower__vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```c
@@ -245,8 +232,7 @@ __simd_callee__ inline vector_bool asc_unpack_lower(vector_bool src)
 api_signature:
   override_id: "asc_unpack_upper__vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```c
@@ -258,8 +244,7 @@ __simd_callee__ inline vector_bool asc_unpack_upper(vector_bool src)
 api_signature:
   override_id: "asc_unpack_lower__Rvb_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```c
@@ -273,8 +258,7 @@ __simd_callee__ inline void asc_unpack_lower(vector_bool& dst,
 api_signature:
   override_id: "asc_unpack_upper__Rvb_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```c

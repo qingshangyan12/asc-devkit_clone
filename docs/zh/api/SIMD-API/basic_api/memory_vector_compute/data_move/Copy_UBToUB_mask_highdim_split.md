@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Copy（UBToUB掩码式高维数据搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/Copy_UBToUB_mask_highdim_split.md
+description: 支持Unified Buffer（UB）内部的数据搬运，数据搬运时格式和内容保持不变，支持mask操作和DataBlock间隔操作。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Copy（UBToUB掩码式高维数据搬运）<a name="ZH-CN_TOPIC_0000002575088175"></a>
 
 ## 产品支持情况<a name="zh-cn_topic_0000002567699435_section796754519912"></a>

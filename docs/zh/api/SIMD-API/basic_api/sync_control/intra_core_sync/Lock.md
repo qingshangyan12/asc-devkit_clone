@@ -1,3 +1,18 @@
+---
+okftype: reference.api.cpp
+title: Lock
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/Lock.md
+description: 根据MutexID获取Mutex，若Mutex已被锁定，将阻塞指定流水上后续指令的执行，直到所有流水中具有相同MutexID的Mutex都已经被[Unlock](Unlock.md)释放。
+tag: [basic_api]
+usage_dependencies:
+  status: confirmed
+  companion:
+  - Unlock.md
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Lock<a name="ZH-CN_TOPIC_0000002372961532"></a>
 
 ## 产品支持情况<a name="section73648168211"></a>

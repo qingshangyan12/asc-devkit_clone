@@ -9,12 +9,10 @@ usage_dependencies:
 signature:
   - override_id: "asc_bfloat162float__Rvf32_vbf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_bfloat162float_v2__Rvf32_vbf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -88,8 +86,7 @@ def asc_bfloat162float_v2(dst, src, mask):
 api_signature:
   override_id: "asc_bfloat162float__Rvf32_vbf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -102,8 +99,7 @@ __simd_callee__ inline void asc_bfloat162float(vector_float& dst,
 api_signature:
   override_id: "asc_bfloat162float_v2__Rvf32_vbf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -122,8 +118,7 @@ __simd_callee__ inline void asc_bfloat162float_v2(vector_float& dst,
 api_signature:
   override_id: "asc_bfloat162float__Rvf32_vbf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c

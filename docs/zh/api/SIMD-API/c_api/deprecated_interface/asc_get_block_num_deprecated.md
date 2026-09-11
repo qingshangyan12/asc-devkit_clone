@@ -9,8 +9,7 @@ usage_dependencies:
 signature:
   - override_id: "asc_get_block_num__z"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/utils/sys_var.h"
+    headers: [/include/c_api/utils/sys_var.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -63,8 +62,7 @@ uint32_t blockLength = C_API_TOTAL_LENGTH / block_num;  // 替代 asc_get_block_
 api_signature:
   override_id: "asc_get_block_num__z"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/utils/sys_var.h"
+  headers: [/include/c_api/utils/sys_var.h]
 ```
 
 ```cpp

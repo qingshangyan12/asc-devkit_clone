@@ -32,10 +32,22 @@ namespace AscendC {
 namespace Reg {
 template <
     typename T = DefaultType, typename U = DefaultType, HighLowPart part = HighLowPart::LOWEST, typename S, typename V>
+/**
+ * @ingroup simd_api.basic_api.reg_vector_compute.data_compression
+ * @override_id Pack__RpS_RpV
+ * @archs 3510
+ * @brief 将源操作数srcReg中的元素选取低8位（对于b16类型）、低16位（对于b32类型）、低32位（对于b64类型）写入dstReg的低半部分或高半部分。
+ */
 __simd_callee__ inline void Pack(S& dstReg, V& srcReg);
 
 template <
     typename T = DefaultType, typename U = DefaultType, HighLowPart part = HighLowPart::LOWEST, typename S, typename V>
+/**
+ * @ingroup simd_api.basic_api.reg_vector_compute.data_compression
+ * @override_id UnPack__RpS_RpV
+ * @archs 3510
+ * @brief 对于无符号整型，将源操作数srcReg中低半部分或高半部分的元素以高位填0扩充位宽的方式写入dstReg。对于有符号整型，将源操作数srcReg中低半部分或高半部分的元素以保持符号位扩充位宽的方式写入dstReg。
+ */
 __simd_callee__ inline void UnPack(S& dstReg, V& srcReg);
 } // namespace Reg
 } // namespace AscendC

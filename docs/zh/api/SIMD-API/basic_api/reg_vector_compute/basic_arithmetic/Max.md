@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Max
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/basic_arithmetic/Max.md
+description: 该接口根据mask，对源操作数srcReg0、srcReg1进行按元素求最大值操作，将结果写入目的操作数dstReg。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Max<a name="ZH-CN_TOPIC_0000001956827097"></a>
 
 ## 产品支持情况

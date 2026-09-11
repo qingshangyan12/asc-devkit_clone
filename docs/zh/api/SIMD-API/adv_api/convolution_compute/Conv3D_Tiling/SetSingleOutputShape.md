@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetSingleOutputShape
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3D_Tiling/SetSingleOutputShape.md
+description: 设置单核上结果矩阵Output的形状。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetSingleOutputShape
 
 ## 功能说明

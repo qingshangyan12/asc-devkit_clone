@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: reg_tensor
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/reg_vector_compute/reg_tensor/reg_tensor.md
+description: '`reg_tensor<DataType>`是矢量寄存器值的轻量级封装。同时保存矢量数据寄存器`reg`和掩码寄存器`mask`，当`DataType`为`bool`时，`reg_tensor<bool>`的reg和mask均为掩码寄存器。'
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # reg_tensor
 
 ## 产品支持情况

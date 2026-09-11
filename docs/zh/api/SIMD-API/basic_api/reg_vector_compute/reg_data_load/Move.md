@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Move
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/Move.md
+description: 对srcReg中的有效元素逐个复制写入dstReg中对应位置处，无效位置保留dstReg原值。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Move
 
 ## 产品支持情况<a name="section1550532418810"></a>

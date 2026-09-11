@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetCurAddr
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/LocalMemAllocator/GetCurAddr.md
+description: 返回当前物理位置空闲的起始地址。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetCurAddr__z
+  archs: ['3510', '2201', '2002']
+  headers: [/include/basic_api/kernel_tensor.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetCurAddr<a name="ZH-CN_TOPIC_0000002303777434"></a>
 
 ## 产品支持情况<a name="section73648168211"></a>
@@ -32,6 +48,13 @@
 返回当前物理位置空闲的起始地址。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "GetCurAddr__z"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/basic_api/kernel_tensor.h"]
+```
 
 ```cpp
 template <Hardware hard>

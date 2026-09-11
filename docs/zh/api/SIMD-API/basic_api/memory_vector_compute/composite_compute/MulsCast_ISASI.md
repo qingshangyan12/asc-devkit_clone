@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: MulsCast\(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/MulsCast_ISASI.md
+description: 将矢量源操作数前count个数据与标量相乘再按照CAST\_ROUND模式转换成half类型，并将计算结果写入dst，此接口支持标量在前和标量在后两种场景。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: MulsCast__RCpT2_RCpT3_RCpT4_u32
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_vec_binary_scalar_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # MulsCast\(ISASI\)<a name="ZH-CN_TOPIC_0000002158325172"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -50,6 +66,13 @@ dst_i = Cast(src0_{idx} \times src1_i)
 $$
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "MulsCast__RCpT2_RCpT3_RCpT4_u32"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_vec_binary_scalar_intf.h"]
+```
 
 ```cpp
 template <typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, const BinaryConfig &config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>

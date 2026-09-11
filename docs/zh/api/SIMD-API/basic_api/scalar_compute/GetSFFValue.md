@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetSFFValue
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/scalar_compute/GetSFFValue.md
+description: 查找uint64\_t类型数值的二进制表示中从最低有效位开始的首个指定比特值（0或1）的位置，如果没找到则返回-1。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetSFFValue__u64
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_scalar_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetSFFValue<a name="ZH-CN_TOPIC_0000001787630014"></a>
 
 ## 产品支持情况
@@ -50,6 +66,13 @@ int64_t sffValue = AscendC::GetSFFValue<1>(0x1000000000000100ULL); // 返回8
 ![使用GetSFFValue查找从最低有效位开始首个1的位置](../../../figures/GetSFFValue.png "使用GetSFFValue查找从最低有效位开始首个1的位置")
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "GetSFFValue__u64"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_scalar_intf.h"]
+```
 
 ```cpp
 template <int countValue>

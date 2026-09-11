@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: make_mem_ptr
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/tensor/make_mem_ptr.md
+description: make_mem_ptr用于构造带物理存储位置标记和数据类型信息的内存指针适配器`hardware_mem_ptr`，支持的物理位置如下表所示。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: make_mem_ptr__pAddr
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/pointer.h]
+- override_id: make_mem_ptr__pIterator
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/pointer.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # make_mem_ptr
 
 ## 产品支持情况
@@ -40,6 +59,13 @@ make_mem_ptr提供三种调用形式：
 
 - 指定物理位置和数据类型，根据原始地址构造：
 
+```yaml
+api_signature:
+  override_id: "make_mem_ptr__pAddr"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/pointer.h"]
+```
+
   ```cpp
   template <typename PtrPattern, typename DataType, typename Addr>
   __aicore__ inline auto make_mem_ptr(Addr address)
@@ -47,12 +73,26 @@ make_mem_ptr提供三种调用形式：
 
 - 指定物理位置，从已有迭代器构造：
 
+```yaml
+api_signature:
+  override_id: "make_mem_ptr__pIterator"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/pointer.h"]
+```
+
   ```cpp
   template <typename PtrPattern, typename Iterator>
   __aicore__ inline constexpr auto make_mem_ptr(Iterator iterator)
   ```
 
 - 从已有迭代器中自动推导物理位置：
+
+```yaml
+api_signature:
+  override_id: "make_mem_ptr__pIterator"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/pointer.h"]
+```
 
   ```cpp
   template <typename Iterator>

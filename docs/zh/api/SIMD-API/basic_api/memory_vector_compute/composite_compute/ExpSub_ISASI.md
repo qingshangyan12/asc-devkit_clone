@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: ExpSub\(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/ExpSub_ISASI.md
+description: src0与src1相减，将差值作为指数计算自然常数e的幂次，并将计算结果写入dst。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: ExpSub__RCltg1x2_pT_RCltg1x2_pU_RCltg1x2_pU_u32
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_vec_binary_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ExpSub\(ISASI\)<a name="ZH-CN_TOPIC_0000002158484948"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -40,6 +56,13 @@ $dst_i = e^{(src0_i - src1_i)}$
 $dst_i = e^{(cast\_f16\_to\_f32(src0_i) - cast\_f16\_to\_f32(src1_i))}$
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "ExpSub__RCltg1x2_pT_RCltg1x2_pU_RCltg1x2_pU_u32"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_vec_binary_intf.h"]
+```
 
 ```cpp
 template <typename T, typename U>

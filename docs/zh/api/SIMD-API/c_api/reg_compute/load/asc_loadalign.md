@@ -15,36 +15,28 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_loadalign__PU<dtype>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - prototype_id: "asc_loadalign__Rv<dtype>_PU<dtype>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign__Rvb_PUu32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - prototype_id: "asc_loadalign__Rv<dtype>_PU<dtype>_i32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign__Rvb_PUu32_i32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - prototype_id: "asc_loadalign__Rv<dtype>_PU<dtype>_ar"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign__Rvb_PUu32_ar"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - prototype_id: "asc_loadalign__Rv<dtype>_PU<dtype>_u16_u16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -98,8 +90,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_loadalign__PU<dtype>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
   dtype:
     values:
       - "int4b_t"
@@ -129,8 +120,7 @@ __simd_callee__ inline vector_<dtype> asc_loadalign(__ubuf__ <dtype>* src)
 api_signature:
   prototype_id: "asc_loadalign__Rv<dtype>_PU<dtype>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
   dtype:
     values:
       - "int4b_t"
@@ -164,8 +154,7 @@ __simd_callee__ inline void asc_loadalign(vector_<dtype>& dst,
 api_signature:
   override_id: "asc_loadalign__Rvb_PUu32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```c
@@ -197,8 +186,7 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
 api_signature:
   prototype_id: "asc_loadalign__Rv<dtype>_PU<dtype>_i32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
   dtype:
     values:
       - "int4b_t"
@@ -232,8 +220,7 @@ __simd_callee__ inline void asc_loadalign(vector_<dtype>& dst,
 api_signature:
   override_id: "asc_loadalign__Rvb_PUu32_i32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```c
@@ -262,8 +249,7 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
 api_signature:
   prototype_id: "asc_loadalign__Rv<dtype>_PU<dtype>_ar"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
   dtype:
     values:
       - "int4b_t"
@@ -297,8 +283,7 @@ __simd_callee__ inline void asc_loadalign(vector_<dtype>& dst,
 api_signature:
   override_id: "asc_loadalign__Rvb_PUu32_ar"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```c
@@ -327,8 +312,7 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
 api_signature:
   prototype_id: "asc_loadalign__Rv<dtype>_PU<dtype>_u16_u16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
   dtype:
     values:
       - "int4b_t"

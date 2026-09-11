@@ -1,3 +1,21 @@
+---
+okftype: reference.api.cpp
+title: SetCtrlSpr(ISASI)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/special_register_access/SetCtrlSpr_ISASI.md
+description: 对CTRL寄存器（控制寄存器）的特定比特位进行设置。通过模板参数startBit和endBit指定目标比特位范围，将运行参数value（超出比特位范围会出现编译报错）写入CTRL寄存器对应位置。
+tag: [basic_api]
+usage_dependencies:
+  status: confirmed
+  companion:
+  - ../reg_vector_compute/type_conversion/Cast.md
+signature:
+- override_id: SetCtrlSpr__i64
+  archs: ['3510', '2201']
+  headers: [/include/basic_api/kernel_operator_common_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetCtrlSpr(ISASI)
 
 ## 产品支持情况
@@ -32,6 +50,13 @@
 对CTRL寄存器（控制寄存器）的特定比特位进行设置。通过模板参数startBit和endBit指定目标比特位范围，将运行参数value（超出比特位范围会出现编译报错）写入CTRL寄存器对应位置。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "SetCtrlSpr__i64"
+  archs: ["3510", "2201"]
+  headers: ["/include/basic_api/kernel_operator_common_intf.h"]
+```
 
 ```cpp
 template <int8_t startBit, int8_t endBit>

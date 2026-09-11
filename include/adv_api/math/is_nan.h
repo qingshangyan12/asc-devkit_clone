@@ -46,6 +46,12 @@ namespace AscendC {
  */
 
 template <const IsNanConfig& config = DEFAULT_IS_NAN_CONFIG, typename T, typename U>
+/**
+ * @ingroup simd_api.adv_api.math_compute.isnan_interface
+ * @override_id IsNan__RCltg1x2_pT_RCltg1x2_pU_u32
+ * @archs 3510
+ * @brief 按元素判断输入的浮点数是否为nan，输出结果为浮点数或布尔值。当输出为浮点类型时，对于nan的输入数据，对应位置的结果为浮点类型的1，反之为0；当输出为bool类型时，对于nan的输入数据，对应位置的结果为true，反之为false。
+ */
 __aicore__ inline void IsNan(const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint32_t count)
 {
 #if defined(__NPU_ARCH__) && \
@@ -65,6 +71,12 @@ __aicore__ inline void IsNan(const LocalTensor<T>& dst, const LocalTensor<U>& sr
  * \param [in] count, amount of data to be calculated
  */
 template <const IsNanConfig& config = DEFAULT_IS_NAN_CONFIG, typename T, typename U>
+/**
+ * @ingroup simd_api.adv_api.math_compute.isnan_interface
+ * @override_id IsNan__RCltg1x2_pT_RCltg1x2_pU_RCltg1x2_u8_u32
+ * @archs 3510
+ * @brief 按元素判断输入的浮点数是否为nan，输出结果为浮点数或布尔值。当输出为浮点类型时，对于nan的输入数据，对应位置的结果为浮点类型的1，反之为0；当输出为bool类型时，对于nan的输入数据，对应位置的结果为true，反之为false。
+ */
 __aicore__ inline void IsNan(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<uint8_t>& sharedTmpBuffer,
     const uint32_t count)

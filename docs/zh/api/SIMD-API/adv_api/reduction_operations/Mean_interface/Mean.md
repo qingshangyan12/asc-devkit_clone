@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Mean
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/reduction_operations/Mean_interface/Mean.md
+description: 根据最后一轴的方向对各元素求平均值。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Mean
 
 ## 产品支持情况

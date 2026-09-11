@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: SetSubBlockIdx
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetSubBlockIdx.md
+description: 设置当前AIV核的ID。分离架构下，一个AI Core由Cube Core（AIC）和Vector Core（AIV）按照一定比例1：N进行组合，其中N个AIV核的ID分别为0,
+  1, ..., N-1。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetSubBlockIdx__u8
+  archs: ['3510', '2201']
+  headers: [/include/adv_api/matmul/matmul.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetSubBlockIdx
 
 ## 产品支持情况
@@ -34,6 +51,13 @@
 设置当前AIV核的ID。分离架构下，一个AI Core由Cube Core（AIC）和Vector Core（AIV）按照一定比例1：N进行组合，其中N个AIV核的ID分别为0, 1, ..., N-1。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "SetSubBlockIdx__u8"
+  archs: ["3510", "2201"]
+  headers: ["/include/adv_api/matmul/matmul.h"]
+```
 
 ```
 __aicore__ inline void SetSubBlockIdx(uint8_t subBlockIdx)

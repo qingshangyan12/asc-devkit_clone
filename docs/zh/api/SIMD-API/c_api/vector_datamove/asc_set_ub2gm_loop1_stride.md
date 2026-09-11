@@ -9,8 +9,7 @@ usage_dependencies:
 signature:
   - override_id: "asc_set_ub2gm_loop1_stride__u64_u64"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -61,8 +60,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_set_ub2gm_loop1_stride__u64_u64"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```c

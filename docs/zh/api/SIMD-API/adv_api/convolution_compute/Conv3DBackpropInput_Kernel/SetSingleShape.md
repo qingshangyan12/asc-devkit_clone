@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetSingleShape
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3DBackpropInput_Kernel/SetSingleShape.md
+description: 设置Conv3DBackpropInput在单核上计算的形状，单位为元素个数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetSingleShape__u64_u64_u32
+  archs: ['2201']
+  headers: [/include/adv_api/conv_backprop/conv3d_bp_input_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetSingleShape
 
 ## 产品支持情况
@@ -28,6 +44,13 @@
 设置Conv3DBackpropInput在单核上计算的形状，单位为元素个数。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "SetSingleShape__u64_u64_u32"
+  archs: ["2201"]
+  headers: ["/include/adv_api/conv_backprop/conv3d_bp_input_intf.h"]
+```
 
 ```
 __aicore__ inline void SetSingleShape(uint64_t singleShapeM, uint64_t singleShapeK, uint32_t singleShapeN)

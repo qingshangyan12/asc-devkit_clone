@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Crd2Idx
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/aux_data_structures/Coordinate/Crd2Idx.md
+description: Crd2Idx函数用于将多维坐标（Coordinate）通过布局（Layout）转换为内存位置索引（Index），这里的Layout包含了Shape和Stride信息。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Crd2Idx
 
 ## 产品支持情况

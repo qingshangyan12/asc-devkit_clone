@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: trunc
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/reg_vector_compute/type_conversion/trunc.md
+description: 命名空间：`asc::te::experimental`。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: trunc__regtensorg1x2_pT
+  archs: ['3510']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # trunc
 
 ## 产品支持情况
@@ -48,6 +64,13 @@ src[i] <  0：dst[i] = ceil(src[i])
 接口使用`src.mask`筛选参与计算的元素，底层固定采用向0舍入和zeroing模式：mask未选中的返回值数据元素置0。返回值的mask与`src.mask`保持一致，可继续用于后续寄存器计算或`local_tensor::store`写回。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "trunc__regtensorg1x2_pT"
+  archs: ["3510"]
+  headers: []
+```
 
 ```cpp
 template <typename T>

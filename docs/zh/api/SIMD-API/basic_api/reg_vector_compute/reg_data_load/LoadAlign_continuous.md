@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: 连续对齐搬入（LoadAlign）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/LoadAlign_continuous.md
+description: LoadAlign能够实现数据从Unified Buffer（UB）连续搬运至[RegTensor](../register_data_types/RegTensor.md)。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # 连续对齐搬入（LoadAlign）<a name="ZH-CN_TOPIC_0000001955990973"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

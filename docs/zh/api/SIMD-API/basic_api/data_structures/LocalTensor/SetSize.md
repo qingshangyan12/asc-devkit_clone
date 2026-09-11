@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetSize
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/SetSize.md
+description: 设置当前LocalTensor Size大小。单位为元素。当用户重用local tensor变量且使用长度发生变化的时候，需要使用此接口重新设置Size。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetSize__u32
+  archs: ['3510', '2201', '3002', '2002', '1001']
+  headers: [/include/basic_api/kernel_tensor.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetSize<a name="ZH-CN_TOPIC_0000002364845729"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -31,6 +47,13 @@
 设置当前LocalTensor Size大小。单位为元素。当用户重用local tensor变量且使用长度发生变化的时候，需要使用此接口重新设置Size。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "SetSize__u32"
+  archs: ["3510", "2201", "3002", "2002", "1001"]
+  headers: ["/include/basic_api/kernel_tensor.h"]
+```
 
 ```cpp
 __aicore__ inline void SetSize(const uint32_t size)

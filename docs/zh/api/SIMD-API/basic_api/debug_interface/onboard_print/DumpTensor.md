@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: DumpTensor
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/debug_interface/onboard_print/DumpTensor.md
+description: 该接口可以打印Tensor的内容，同时支持打印自定义的标签（仅支持uint32_t数据类型的信息），比如打印当前行号等。 在算子kernel侧实现代码中需要打印Tensor数据的地方，调用DumpTensor接口打印相关内容。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DumpTensor<a name="ZH-CN_TOPIC_0000001584608650"></a>
 
 ## 产品支持情况

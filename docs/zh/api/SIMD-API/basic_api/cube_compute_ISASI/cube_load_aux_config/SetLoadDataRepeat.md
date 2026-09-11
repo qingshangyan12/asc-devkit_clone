@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetLoadDataRepeat
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_load_aux_config/SetLoadDataRepeat.md
+description: 用于设置[LoadData（卷积数据搬运）](../cube_compute_load/LoadData_3D.md)接口的repeat参数。设置repeat参数后，可以通过调用一次LoadData（卷积数据搬运）接口完成多个迭代的数据搬运。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetLoadDataRepeat<a name="ZH-CN_TOPIC_0000001788021082"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

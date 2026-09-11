@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: Get
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/TBuf/Get.md
+description: 从TBuf上获取指定长度的Tensor，或者获取全部长度的Tensor。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Get__z
+  archs: ['3510', '2201', '3002', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_tpipe.h]
+- override_id: Get__u32
+  archs: ['3510', '2201', '3002', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_tpipe.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Get<a name="ZH-CN_TOPIC_0000001470540244"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -41,12 +60,26 @@
 
 -   获取全部长度的Tensor
 
+```yaml
+api_signature:
+  override_id: "Get__z"
+  archs: ["3510", "2201", "3002", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_tpipe.h"]
+```
+
     ```cpp
     template <typename T>
     __aicore__ inline LocalTensor<T> Get()
     ```
 
 -   获取指定长度的Tensor
+
+```yaml
+api_signature:
+  override_id: "Get__u32"
+  archs: ["3510", "2201", "3002", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_tpipe.h"]
+```
 
     ```cpp
     template <typename T>

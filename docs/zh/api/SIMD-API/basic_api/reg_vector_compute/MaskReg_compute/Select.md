@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Select
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/MaskReg_compute/Select.md
+description: 给定两个源操作数src0和src1，根据mask的比特位值选取元素，得到目的操作数dst。选择的规则为：当mask的比特位是1时，从src0中选取对应位置的数，比特位是0时从src1选取对应位置的数。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Select<a name="ZH-CN_TOPIC_0000001985457929"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetCommBlockNum
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Tiling/SetCommBlockNum.md
+description: 设置参与BatchWrite通信的核数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetCommBlockNum
 
 ## 功能说明

@@ -9,12 +9,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_squeeze__v<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - prototype_id: "asc_squeeze__Rv<dtype>_v<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/squeeze"
     archs: ["3510"]
@@ -65,8 +63,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_squeeze__v<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   dtype:
     values:
       - "int8_t"
@@ -94,8 +91,7 @@ __simd_callee__ inline vector_<dtype> asc_squeeze(vector_<dtype> src,
 api_signature:
   prototype_id: "asc_squeeze__Rv<dtype>_v<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   dtype:
     values:
       - "int8_t"

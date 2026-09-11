@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: AscendDequant
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/quantization/AscendDequant.md
+description: 按元素做反量化计算，比如将int32\_t数据类型反量化为half/float等数据类型。**本接口最多支持输入为二维数据，不支持更高维度的输入。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # AscendDequant
 
 ## 产品支持情况

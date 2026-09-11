@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: DataCopyPad（GMToL1非对齐数据搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopyPad_GMToL1.md
+description: 该接口提供从Global Memory到L1 Buffer的数据非对齐搬运功能，可以根据开发者的需要自行填充数据。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DataCopyPad（GMToL1非对齐数据搬运）
 
 ## 产品支持情况<a name="section1550532418810"></a>

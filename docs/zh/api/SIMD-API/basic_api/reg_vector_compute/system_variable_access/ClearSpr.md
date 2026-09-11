@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: ClearSpr
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/system_variable_access/ClearSpr.md
+description: 该接口用于对指定的特殊目的寄存器（SpecialPurposeReg）进行清零操作。通过模板参数spr指定目标特殊寄存器，调用后该寄存器的值被置为0，当前支持的特殊寄存器见[表
+  SpecialPurposeReg模板参数说明](#table2)。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: ClearSpr__z
+  archs: ['3510']
+  headers: [/include/basic_api/reg_compute/kernel_reg_compute_gather_mask_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ClearSpr<a name="ZH-CN_TOPIC_0000002186694092"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -32,6 +49,13 @@
 
 该接口用于对指定的特殊目的寄存器（SpecialPurposeReg）进行清零操作。通过模板参数spr指定目标特殊寄存器，调用后该寄存器的值被置为0，当前支持的特殊寄存器见[表 SpecialPurposeReg模板参数说明](#table2)。
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "ClearSpr__z"
+  archs: ["3510"]
+  headers: ["/include/basic_api/reg_compute/kernel_reg_compute_gather_mask_intf.h"]
+```
 
 ```cpp
 template <SpecialPurposeReg spr>

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: TensorTrait构造函数
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/aux_data_structures/TensorTrait/TensorTrait_constructor.md
+description: 根据输入的Layout对象，实例化TensorTrait对象。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # TensorTrait构造函数<a name="ZH-CN_TOPIC_0000002371314333"></a>
 
 ## 产品支持情况<a name="section73648168211"></a>

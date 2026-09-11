@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: DropOut
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/data_filter/DropOut.md
+description: 提供根据MaskTensor对SrcTensor（源操作数，输入Tensor）进行过滤的功能，得到DstTensor（目的操作数、输出Tensor）。仅支持输入shape为ND格式。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DropOut
 
 ## 产品支持情况

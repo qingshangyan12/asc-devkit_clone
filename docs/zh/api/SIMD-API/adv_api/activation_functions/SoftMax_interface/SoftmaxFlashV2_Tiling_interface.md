@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SoftmaxFlashV2 Tiling接口
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/activation_functions/SoftMax_interface/SoftmaxFlashV2_Tiling_interface.md
+description: 用于获取SoftmaxFlashV2接口所需的Tiling参数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SoftmaxFlashV2 Tiling接口
 
 ## 功能说明

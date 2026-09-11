@@ -1,3 +1,37 @@
+---
+okftype: reference.api.cpp
+title: Sort
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/sort_operations/Sort.md
+description: 排序函数，按照数值大小进行降序排序。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Sort__RCltg1x2_pT_RCltg1x2_pT_RCltg1x3_u32_Rltg1x2_pT_i32
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_proposal_intf.h]
+- override_id: Sort__Rltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/sort/sort.h]
+- override_id: Sort__Rltg1x2_pT_Rltg1x3_u32_RCltg1x2_pT_u32
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/sort/sort.h]
+- override_id: Sort__RCltg1x2_pT_RCltg1x2_pU_RCltg1x2_pT_RCltg1x2_pU_u32
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/sort/sort.h]
+- override_id: Sort__Rltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/sort/sort.h]
+- override_id: Sort__Rltg1x2_pT_Rltg1x3_u32_RCltg1x2_pT_RCltg1x2_u8_u32
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/sort/sort.h]
+- override_id: Sort__Rltg1x2_pT_Rltg1x2_pU_RCltg1x2_pT_RCltg1x2_pU_RCltg1x2_u8_u32
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/sort/sort.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Sort
 
 ## 产品支持情况
@@ -111,6 +145,13 @@
 
 -   不带SortConfig
 
+```yaml
+api_signature:
+  override_id: "Sort__RCltg1x2_pT_RCltg1x2_pT_RCltg1x3_u32_Rltg1x2_pT_i32"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_proposal_intf.h"]
+```
+
     ```
     template <typename T, bool isFullSort>
     __aicore__ inline void Sort(const LocalTensor<T>& dst, const LocalTensor<T>& concat, const LocalTensor<uint32_t>& index, LocalTensor<T>& tmp, const int32_t repeatTime)
@@ -125,6 +166,13 @@
     -   接口框架申请临时空间
         -   不带srcIndexTensor和dstIndexTensor参数
 
+```yaml
+api_signature:
+  override_id: "Sort__Rltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/sort/sort.h"]
+```
+
             ```
             template <typename T, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
             __aicore__ inline void Sort(LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
@@ -132,12 +180,26 @@
 
         -   不带srcIndexTensor参数，带有dstIndexTensor参数
 
+```yaml
+api_signature:
+  override_id: "Sort__Rltg1x2_pT_Rltg1x3_u32_RCltg1x2_pT_u32"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/sort/sort.h"]
+```
+
             ```
             template <typename T, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
             __aicore__ inline void Sort(LocalTensor<T>& dstTensor, LocalTensor<uint32_t>& dstIndexTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
             ```
 
         -   带有srcIndexTensor和dstIndexTensor参数
+
+```yaml
+api_signature:
+  override_id: "Sort__RCltg1x2_pT_RCltg1x2_pU_RCltg1x2_pT_RCltg1x2_pU_u32"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/sort/sort.h"]
+```
 
             ```
             template <typename T, typename U, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
@@ -147,6 +209,13 @@
     -   通过sharedTmpBuffer入参传入临时空间
         -   不带srcIndexTensor和dstIndexTensor参数
 
+```yaml
+api_signature:
+  override_id: "Sort__Rltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/sort/sort.h"]
+```
+
             ```
             template <typename T, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
             __aicore__ inline void Sort(LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
@@ -154,12 +223,26 @@
 
         -   不带srcIndexTensor参数，带有dstIndexTensor参数
 
+```yaml
+api_signature:
+  override_id: "Sort__Rltg1x2_pT_Rltg1x3_u32_RCltg1x2_pT_RCltg1x2_u8_u32"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/sort/sort.h"]
+```
+
             ```
             template <typename T, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
             __aicore__ inline void Sort(LocalTensor<T>& dstTensor, LocalTensor<uint32_t>& dstIndexTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
             ```
 
         -   带有srcIndexTensor和dstIndexTensor参数
+
+```yaml
+api_signature:
+  override_id: "Sort__Rltg1x2_pT_Rltg1x2_pU_RCltg1x2_pT_RCltg1x2_pU_RCltg1x2_u8_u32"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/sort/sort.h"]
+```
 
             ```
             template <typename T, typename U, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>

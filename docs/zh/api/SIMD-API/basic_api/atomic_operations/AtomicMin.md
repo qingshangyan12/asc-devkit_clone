@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: AtomicMin
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/atomic_operations/AtomicMin.md
+description: 该接口用于在指定GM地址上进行原子取最小值操作，将**address**指向的GM地址上的旧值（**old_value**）与输入标量值（**value**）做比较，将较小值（**new_value**）写回GM地址，返回该地址修改前的值（**old_value**）。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: AtomicMin__PGpT_pT
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_atomic_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # AtomicMin<a name="ZH-CN_TOPIC_0000002568105162"></a>
 
 ## 产品支持情况
@@ -38,6 +54,13 @@ new\_value = Min(old\_value, value)
 $$
 
 ## 函数原型<a name="section1171112415119"></a>
+
+```yaml
+api_signature:
+  override_id: "AtomicMin__PGpT_pT"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_atomic_intf.h"]
+```
 
 ```cpp
 template <typename T>

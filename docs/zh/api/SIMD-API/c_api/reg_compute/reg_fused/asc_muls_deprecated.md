@@ -10,12 +10,10 @@ usage_dependencies:
 signature:
   - override_id: "asc_muls__Rvf16_vf32_f32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_fused.h"
+    headers: [/include/c_api/reg_compute/compute/reg_fused.h]
   - override_id: "asc_muls_v2__Rvf16_vf32_f32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_fused.h"
+    headers: [/include/c_api/reg_compute/compute/reg_fused.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -62,8 +60,7 @@ $$
 api_signature:
   override_id: "asc_muls__Rvf16_vf32_f32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_fused.h"
+  headers: [/include/c_api/reg_compute/compute/reg_fused.h]
 ```
 
 ```cpp
@@ -75,8 +72,7 @@ __simd_callee__ inline void asc_muls(vector_half& dst, vector_float src, float v
 api_signature:
   override_id: "asc_muls_v2__Rvf16_vf32_f32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_fused.h"
+  headers: [/include/c_api/reg_compute/compute/reg_fused.h]
 ```
 
 ```cpp

@@ -1,3 +1,18 @@
+---
+okftype: reference.api.cpp
+title: GetBatchC
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/GetBatchC.md
+description: '[GetBatchTensorC](GetBatchTensorC.md)接口与该接口的功能相同，建议使用[GetBatchTensorC](GetBatchTensorC.md)。'
+tag: [adv_api]
+usage_dependencies:
+  status: confirmed
+  companion:
+  - IterateNBatch.md
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetBatchC
 
 ## 产品支持情况

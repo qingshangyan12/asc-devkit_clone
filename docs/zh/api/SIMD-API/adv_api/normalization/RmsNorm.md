@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: RmsNorm
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/normalization/RmsNorm.md
+description: 实现对shape大小为\[B，S。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # RmsNorm
 
 ## 产品支持情况

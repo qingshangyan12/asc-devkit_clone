@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: LeakyRelu
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/LeakyRelu.md
+description: LeakyRelu属于双目标量类计算接口，输入为一个矢量tensor和一个标量scalar，LeakyRelu负责将矢量tensor内的每个元素执行Leaky
+  ReLu（Leaky Rectified Linear Unit）操作。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LeakyRelu<a name="ZH-CN_TOPIC_0000001475000405"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

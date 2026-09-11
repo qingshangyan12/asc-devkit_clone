@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetSaturationFlag(ISASI)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/special_register_access/SetSaturationFlag_ISASI.md
+description: 设置不同数据类型的计算或精度转换时饱和模式的开启状态。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetSaturationFlag__b
+  archs: ['3510', '2201']
+  headers: [/include/basic_api/kernel_operator_common_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetSaturationFlag(ISASI)
 
 ## 产品支持情况
@@ -50,6 +66,13 @@ Reg矢量计算Cast可通过`CastTrait::satMode`设置单接口饱和模式，Me
 <!-- end id10 -->
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "SetSaturationFlag__b"
+  archs: ["3510", "2201"]
+  headers: ["/include/basic_api/kernel_operator_common_intf.h"]
+```
 
 ```cpp
 template <SaturationMode mode>

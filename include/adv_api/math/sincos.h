@@ -43,6 +43,15 @@ namespace AscendC {
  * \param [in] count, amount of data to be calculated
  */
 template <const SinCosConfig& config = DEFAULT_SINCOS_CONFIG, typename T>
+/**
+ * @ingroup simd_api.adv_api.math_compute.sincos_interface
+ * @override_id SinCos__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+ * @archs 3510
+ * @brief 按元素进行正弦计算和余弦计算，分别获得正弦和余弦的结果。
+ * @param [in] src 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型与目的操作数保持一致。
+ * @param [in] sharedTmpBuffer 临时缓存。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。临时空间大小BufferSize的获取方式请参考[GetSinCosMaxMinTmpSize](GetSinCosMaxMinTmpSize.md)。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void SinCos(
     const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t count)
@@ -61,6 +70,14 @@ __aicore__ inline void SinCos(
  * \param [in] count, amount of data to be calculated
  */
 template <const SinCosConfig& config = DEFAULT_SINCOS_CONFIG, typename T>
+/**
+ * @ingroup simd_api.adv_api.math_compute.sincos_interface
+ * @override_id SinCos__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32
+ * @archs 3510
+ * @brief 按元素进行正弦计算和余弦计算，分别获得正弦和余弦的结果。
+ * @param [in] src 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型与目的操作数保持一致。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void SinCos(
     const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src, const uint32_t count)
 {

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetFixSplit
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetFixSplit.md
+description: 设置固定的baseM、baseN、baseK，单位为元素个数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetFixSplit
 
 ## 功能说明

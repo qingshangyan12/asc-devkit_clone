@@ -1,6 +1,143 @@
 schema_version: 1
 generated_at: "2026-09-11"
 reverse:
+  "docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/Init_deprecated.md":
+    - executor_path: "docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/SetCcTiling_deprecated.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/SetCcTilingV2.md":
+    - executor_path: "docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/InitV2.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/SetCcTiling_deprecated.md":
+    - executor_path: "docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/Init_deprecated.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3DBackpropFilter_Kernel/GetTensorC.md":
+    - executor_path: "docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3DBackpropFilter_Kernel/Iterate.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3DBackpropInput_Kernel/GetTensorC.md":
+    - executor_path: "docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3DBackpropInput_Kernel/Iterate.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3DBackpropInput_Kernel/Iterate.md":
+    - executor_path: "docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3DBackpropFilter_Kernel/GetTensorC.md"
+      relationship: "companion"
+    - executor_path: "docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3DBackpropInput_Kernel/GetTensorC.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/Iterate.md":
+    - executor_path: "docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/GetTensorC.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/IterateNBatch.md":
+    - executor_path: "docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/GetBatchC.md"
+      relationship: "companion"
+    - executor_path: "docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/GetBatchTensorC.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetBatchNum.md":
+    - executor_path: "docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/IterateBatch.md"
+      relationship: "required_before"
+      combination: "all_of"
+  "docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/GetTiling.md":
+    - executor_path: "docs/zh/api/SIMD-API/adv_api/cube_compute/get_Matmul_compute_space/BatchMatmulGetTmpBufSizeV2.md"
+      relationship: "companion"
+    - executor_path: "docs/zh/api/SIMD-API/adv_api/cube_compute/get_Matmul_compute_space/MatmulGetTmpBufSizeV2.md"
+      relationship: "companion"
+    - executor_path: "docs/zh/api/SIMD-API/adv_api/cube_compute/get_Matmul_compute_space/MultiCoreMatmulGetTmpBufSizeV2.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/basic_api/Kernel-Tiling/GET_TILING_DATA_PTR_WITH_STRUCT.md":
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/Kernel-Tiling/COPY_TILING_WITH_ARRAY.md"
+      relationship: "companion"
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/Kernel-Tiling/COPY_TILING_WITH_STRUCT.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/basic_api/atomic_operations/SetStoreAtomicConfig_ISASI.md":
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/atomic_operations/GetStoreAtomicConfig_ISASI.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/basic_api/cache_control/DataCacheCleanAndInvalid.md":
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/data_structures/GlobalTensor/GetValue.md"
+      relationship: "required_before"
+      combination: "all_of"
+  "docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_load_aux_config/LoadImageToLocal.md":
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_load_aux_config/SetAippFunctions.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/basic_api/debug_interface/performance_stats/MetricsProfStart.md":
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/debug_interface/performance_stats/MetricsProfStop.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/basic_api/debug_interface/performance_stats/MetricsProfStop.md":
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/debug_interface/performance_stats/MetricsProfStart.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/SetCmpMask_ISASI.md":
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Select.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_GMToUB_NDDMA.md":
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move_aux_config/NdDmaDci.md"
+      relationship: "required_before"
+      combination: "all_of"
+  "docs/zh/api/SIMD-API/basic_api/memory_vector_compute/mask_operations/SetMaskCount.md":
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/memory_vector_compute/mask_operations/SetVectorMask.md"
+      relationship: "conditional_before"
+      when: "并通过调用本接口设置Counter/Normal模式下"
+      combination: "all_of"
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/reg_vector_compute/MaskReg_compute/MoveMask.md"
+      relationship: "required_before"
+      combination: "all_of"
+  "docs/zh/api/SIMD-API/basic_api/memory_vector_compute/mask_operations/SetMaskNorm.md":
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/memory_vector_compute/mask_operations/SetVectorMask.md"
+      relationship: "conditional_before"
+      when: "并通过调用本接口设置Counter/Normal模式下"
+      combination: "all_of"
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/reg_vector_compute/MaskReg_compute/MoveMask.md"
+      relationship: "required_before"
+      combination: "all_of"
+  "docs/zh/api/SIMD-API/basic_api/memory_vector_compute/mask_operations/SetVectorMask.md":
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Select.md"
+      relationship: "companion"
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/reg_vector_compute/MaskReg_compute/MoveMask.md"
+      relationship: "required_before"
+      combination: "all_of"
+  "docs/zh/api/SIMD-API/basic_api/memory_vector_compute/sort_and_merge_ISASI/MrgSort.md":
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/memory_vector_compute/sort_and_merge_ISASI/GetMrgSortResult.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/basic_api/memory_vector_compute/type_conversion/Cast.md":
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/special_register_access/SetSaturationStrategy.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/basic_api/memory_vector_compute/type_conversion_aux_config/SetDeqScale.md":
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/CastDequant.md"
+      relationship: "companion"
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/memory_vector_compute/type_conversion/Cast.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/basic_api/reg_vector_compute/register_data_types/AddrReg.md":
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/LoadAlign_MaskReg.md"
+      relationship: "required_before"
+      combination: "all_of"
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_store/StoreAlign_MaskReg.md"
+      relationship: "required_before"
+      combination: "all_of"
+  "docs/zh/api/SIMD-API/basic_api/reg_vector_compute/type_conversion/Cast.md":
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/special_register_access/GetSaturationStrategy.md"
+      relationship: "companion"
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/special_register_access/SetCtrlSpr_ISASI.md"
+      relationship: "companion"
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/special_register_access/SetSaturationStrategy.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/basic_api/resource_management/TPipe/Destroy.md":
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/resource_management/TPipe/Init.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreSetFlag_ISASI.md":
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreWaitFlag_ISASI.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/InitDetermineComputeWorkspace.md":
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/NotifyNextBlock.md"
+      relationship: "companion"
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/WaitPreBlock.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/AllocMutexID_ISASI.md":
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/ReleaseMutexID_ISASI.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/Lock.md":
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/Unlock.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/ReleaseMutexID_ISASI.md":
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/AllocMutexID_ISASI.md"
+      relationship: "companion"
+  "docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/Unlock.md":
+    - executor_path: "docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/Lock.md"
+      relationship: "companion"
   "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md":
     - executor_path: "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md"
       relationship: "companion"

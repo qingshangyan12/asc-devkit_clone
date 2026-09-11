@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Move
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/MaskReg_compute/Move.md
+description: 将src中的元素复制到dst中的对应位置。如果有输入mask，则仅复制被mask选定的有效元素，无效元素填0。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Move<a name="ZH-CN_TOPIC_0000001985577785"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

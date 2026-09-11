@@ -65,6 +65,12 @@ enum class HF32TransMode {
  * @param [in] loadDataParams.ifTranspose enable parameters of transpose function
  */
 template <typename T>
+/**
+ * @ingroup simd_api.basic_api.cube_compute_isasi.cube_compute_load
+ * @override_id LoadData__RCltg1x2_pT_RCltg1x2_pT_RCload2d
+ * @archs 3510
+ * @brief 负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512字节的数据分形为单位进行搬运。
+ */
 __aicore__ inline void LoadData(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2DParams& loadDataParams);
 
@@ -357,6 +363,12 @@ __aicore__ inline void LoadDataWithSparse(
     const LoadData2dParams& loadDataParam);
 
 template <typename T = int8_t, typename Std::enable_if<Std::is_same<PrimT<T>, int8_t>::value, bool>::type = true>
+/**
+ * @ingroup simd_api.basic_api.cube_compute_isasi.cube_load_aux_config
+ * @override_id LoadUnzipIndex__RCgtg1x2_pT_u32
+ * @archs 2002
+ * @brief 加载GM上的压缩索引表到内部寄存器。
+ */
 __aicore__ inline void LoadUnzipIndex(const GlobalTensor<T>& src, uint32_t numOfIndexTabEntry);
 
 /* **************************************************************************************************
@@ -397,6 +409,12 @@ __aicore__ inline void InitConstValue(const LocalTensor<T>& dst, const InitConst
  * @param [in]padValue padding value
  */
 template <typename T>
+/**
+ * @ingroup simd_api.basic_api.cube_compute_isasi.cube_load_aux_config
+ * @override_id SetLoadDataPaddingValue__pT
+ * @archs 3510 2201 3002 2002 x90 9030
+ * @brief 用于调用[LoadData（卷积数据搬运）](../cube_compute_load/LoadData_3D.md)接口时设置Pad填充的数值。LoadData（卷积数据搬运）的模板参数isSetPadding设置为false时，用户需要通过本接口设置Pad填充的数值，设置为true时，本接口设置的填充值不生效。
+ */
 __aicore__ inline void SetLoadDataPaddingValue(const T padValue);
 
 /* **************************************************************************************************
@@ -421,6 +439,12 @@ __aicore__ inline void SetFmatrix(const SetFMatrixBitModeParams& param, const Fm
  * @ingroup SetFmatrix
  * @brief setting loaddata boundary
  * @param [in]boundaryValue
+ */
+/**
+ * @ingroup simd_api.basic_api.cube_compute_isasi.cube_load_aux_config
+ * @override_id SetLoadDataBoundary__u32
+ * @archs 2201 2002
+ * @brief 设置[LoadData（卷积数据搬运）](../cube_compute_load/LoadData_3D.md)接口所需的L1 Buffer（TPosition: A1/B1）边界值。
  */
 __aicore__ inline void SetLoadDataBoundary(uint32_t boundaryValue);
 
@@ -458,6 +482,12 @@ __aicore__ inline void LoadImageToLocal(const LocalTensor<T>& dst, const LoadIma
  * @param [in] src input GlobalTensor
  */
 template <typename T>
+/**
+ * @ingroup simd_api.basic_api.cube_compute_isasi.cube_load_aux_config
+ * @override_id LoadDataUnzip__RCltg1x2_pT_RCgtg1x2_pT
+ * @archs 2002
+ * @brief 将GM上的数据解压并搬运到L1 Buffer（A1/B1）或L0B Buffer（B2）上。执行该API前需要执行[LoadUnzipIndex](LoadUnzipIndex.md)加载压缩索引表。
+ */
 __aicore__ inline void LoadDataUnzip(const LocalTensor<T>& dst, const GlobalTensor<T>& src);
 
 /*
@@ -498,12 +528,24 @@ __aicore__ inline void SetHF32TransMode(bool hf32TransMode);
  * @brief Sets matrix multiplication result layout to row major
  * @note This function sets the CUBE output to row major format (M direction first, then N direction)
  */
+/**
+ * @ingroup simd_api.basic_api.cube_compute_isasi.mmad_compute_aux_config
+ * @override_id SetMMRowMajor__z
+ * @archs 3510 2201 3002
+ * @brief 控制Mmad/MmadWithSparse优先通过M/N的哪个方向。
+ */
 __aicore__ inline void SetMMRowMajor();
 
 /*
  * @ingroup MMLayout
  * @brief Sets matrix multiplication result layout to column major
  * @note This function sets the CUBE output to column major format (N direction first, then M direction)
+ */
+/**
+ * @ingroup simd_api.basic_api.cube_compute_isasi.mmad_compute_aux_config
+ * @override_id SetMMColumnMajor__z
+ * @archs 3510 2201 3002
+ * @brief 控制Mmad/MmadWithSparse优先通过M/N的哪个方向。
  */
 __aicore__ inline void SetMMColumnMajor();
 

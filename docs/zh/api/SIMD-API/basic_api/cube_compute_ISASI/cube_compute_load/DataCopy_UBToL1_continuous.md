@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: DataCopy（UBToL1连续数据搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_UBToL1_continuous.md
+description: 该接口实现将矩阵从Unified Buffer（UB，TPosition为VECIN/VECCALC/VECOUT）搬运至L1 Buffer，搬运方式为连续搬运，数据搬运时格式和内容保持不变。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: DataCopy__RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/basic_api/kernel_operator_data_copy_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DataCopy（UBToL1连续数据搬运）
 
 ## 产品支持情况
@@ -41,6 +57,13 @@
 该接口实现将矩阵从Unified Buffer（UB，TPosition为VECIN/VECCALC/VECOUT）搬运至L1 Buffer，搬运方式为连续搬运，数据搬运时格式和内容保持不变。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "DataCopy__RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/basic_api/kernel_operator_data_copy_intf.h"]
+```
 
 ```cpp
 // 连续搬运

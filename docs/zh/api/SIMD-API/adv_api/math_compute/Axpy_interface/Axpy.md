@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Axpy
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/Axpy_interface/Axpy.md
+description: 源操作数\(srcTensor\)中每个元素与标量求积后和目的操作数\(dstTensor\)中的对应元素相加。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Axpy__RCltg1x2_pT_RCltg1x2_pU_pU_RCltg1x2_u8_u32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/axpy.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Axpy
 
 ## 产品支持情况
@@ -34,6 +50,13 @@
 该接口功能同基础API Axpy，区别在于此接口指令是通过Muls和Add组合计算，从而提供更优的精度。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "Axpy__RCltg1x2_pT_RCltg1x2_pU_pU_RCltg1x2_u8_u32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/axpy.h"]
+```
 
 ```
 template <typename T, typename U, bool isReuseSource = false>

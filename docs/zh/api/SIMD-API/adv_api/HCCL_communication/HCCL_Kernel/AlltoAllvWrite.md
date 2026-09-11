@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: AlltoAllvWrite
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/AlltoAllvWrite.md
+description: 集合通信AlltoAllvWrite的任务下发接口，返回该任务的标识handleId给用户。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # AlltoAllvWrite
 
 ## 产品支持情况

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetBufferSpace
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetBufferSpace.md
+description: 设置Matmul计算时可用的L1 Buffer/L0C Buffer/Unified Buffer（UB）/BiasTable Buffer空间大小，单位为字节。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetBufferSpace
 
 ## 功能说明

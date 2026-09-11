@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GetNormalConfig
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/GetNormalConfig.md
+description: 用于配置Norm模板的参数，获取自定义Norm模板。Norm模板的介绍请参考[表模板特性](MatmulConfig.md#template-features)。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetNormalConfig
 
 ## 产品支持情况

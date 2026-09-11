@@ -43,7 +43,19 @@ namespace AscendC {
 class KfcWorkspace {
 public:
     __aicore__ inline KfcWorkspace(GM_ADDR workspace);
+/**
+ * @ingroup simd_api.basic_api.cube_group_mgmt_isasi.kfcworkspace
+ * @override_id UpdateKfcWorkspace__u32
+ * @archs 3510 2201
+ * @brief 更新用于CubeResGroupHandle消息通信区的内存地址。用户使用[CubeResGroupHandle](../CubeResGroupHandle/CubeResGroupHandle_constructor.md)接口时，需要用此接口自主管理空间地址。
+ */
     __aicore__ inline void UpdateKfcWorkspace(uint32_t offset);
+/**
+ * @ingroup simd_api.basic_api.cube_group_mgmt_isasi.kfcworkspace
+ * @override_id GetKfcWorkspace__z
+ * @archs 3510 2201
+ * @brief 获取用于CubeResGroupHandle消息通信区的内存地址。用户使用[CubeResGroupHandle](../CubeResGroupHandle/CubeResGroupHandle_constructor.md)接口时，需要用此接口自主管理空间地址。
+ */
     __aicore__ inline GM_ADDR GetKfcWorkspace();
     __aicore__ inline ~KfcWorkspace();
 
@@ -65,11 +77,23 @@ public:
     // aiv call: update aivNumForCurAic + msgHead + msgCurrent by aic, aiv index
     // queueIdIn : index of msgque in in this cubegrouphandle aicSubgroupID: index of aic in this cubegrouphandle
     // aivSubGroupID: index of aiv among aivs for that aic
+/**
+ * @ingroup simd_api.basic_api.cube_group_mgmt_isasi.cuberesgrouphandle
+ * @override_id AssignQueue__u8
+ * @archs 3510 2201
+ * @brief 用于AIV绑定CubeResGroupHandle中某一个消息队列的序号。
+ */
     __aicore__ inline void AssignQueue(uint8_t queueIdIn);
 
     // aiv call: check msgState of msgCurrent is FREE, can allocate only when state is FREE
     // to guarantee the order, not allowed to skip, must wait until msgState is updated to FREE
     template <PipeMode pipeMode = PipeMode::SCALAR_MODE>
+/**
+ * @ingroup simd_api.basic_api.cube_group_mgmt_isasi.cuberesgrouphandle
+ * @override_id AllocMessage__z
+ * @archs 3510 2201
+ * @brief AIV从消息队列里申请消息空间，用于存放消息结构体，返回当前申请的消息空间的地址。消息队列的深度固定为4，申请消息空间的顺序为自上而下，然后循环。当消息队列指针指向的消息空间为FREE状态时，AllocMessage返回空间的地址，否则循环等待，直到当前空间的状态为FREE。
+ */
     __aicore__ inline __gm__ CubeMsgType* AllocMessage();
 
     // aiv call: use dcci to send msg. return offset, the msg position is msgHead + offset
@@ -90,11 +114,23 @@ public:
 
     // aic move msgPos + msgCurrent due to skipCnt. do not allow skip to next row.
     // Ex: 1 row has aiv 0~4, current in aiv1. allow skipCnt=3, next pos is aiv0 of next row. Not allow skipCnt=4
+/**
+ * @ingroup simd_api.basic_api.cube_group_mgmt_isasi.cuberesgrouphandle
+ * @override_id SetSkipMsg__u8
+ * @archs 3510 2201
+ * @brief AIC跳过指定个数假消息的处理，仅在回调函数中调用。下图中Block0通过调用SetSkipMsg跳过三个假消息。
+ */
     __aicore__ inline void SetSkipMsg(uint8_t skipCnt);
 
     // aiv call: sync = true: wait until aic finish task and set state to FREE  sync = false: check if aic finish task
     // return true: aic has finished the task      false: aic has not finished yet
     template <bool sync = true>
+/**
+ * @ingroup simd_api.basic_api.cube_group_mgmt_isasi.cuberesgrouphandle
+ * @override_id Wait__u16
+ * @archs 3510 2201
+ * @brief 在调用PostMessage或PostFakeMessage后，查询该消息是否已被AIC处理完。
+ */
     __aicore__ inline bool Wait(uint16_t offset);
 
 private:

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: TopK Tiling
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/sort_operations/TopK-Tiling.md
+description: 用于获取TopK Tiling参数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # TopK Tiling
 
 ## 功能说明

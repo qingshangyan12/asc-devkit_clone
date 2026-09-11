@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: LayerNormGradBeta Tiling
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/normalization/LayerNormGradBeta-Tiling.md
+description: LayerNormGradBeta Tiling的功能如下：。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LayerNormGradBeta Tiling
 
 ## 功能说明

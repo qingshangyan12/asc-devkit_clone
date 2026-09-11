@@ -1,3 +1,30 @@
+---
+okftype: reference.api.cpp
+title: InitBufPool
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/TBufPool/InitBufPool.md
+description: 通过Tpipe::InitBufPool接口可划分出整块资源，整块TbufPool资源可以继续通过TBufPool::InitBufPool接口划分成小块资源。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: InitBufPool__RpT_u32
+  archs: ['3510', '2201', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_tpipe.h]
+- override_id: InitBufPool__RpT_u32_RpU
+  archs: ['3510', '2201', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_tpipe.h]
+examples:
+- path: /examples/01_simd_cpp_api/03_basic_api/04_memory_management/tbufpool_management
+  archs: ['2201', '3510']
+  override_id: InitBufPool__RpT_u32
+  file: tbufpool_management.asc
+- path: /examples/01_simd_cpp_api/03_basic_api/04_memory_management/tbufpool_management
+  archs: ['2201', '3510']
+  override_id: InitBufPool__RpT_u32_RpU
+  file: tbufpool_management.asc
+timestamp: '2026-09-11'
+---
+
 # InitBufPool<a name="ZH-CN_TOPIC_0000001912802253"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -45,12 +72,26 @@
 
 -   非共享模式
 
+```yaml
+api_signature:
+  override_id: "InitBufPool__RpT_u32"
+  archs: ["3510", "2201", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_tpipe.h"]
+```
+
     ```cpp
     template <class T>
     __aicore__ inline bool InitBufPool(T& bufPool, uint32_t len)
     ```
 
 -   共享模式
+
+```yaml
+api_signature:
+  override_id: "InitBufPool__RpT_u32_RpU"
+  archs: ["3510", "2201", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_tpipe.h"]
+```
 
     ```cpp
     template <class T, class U>

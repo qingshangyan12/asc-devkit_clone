@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetDebugMode
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Tiling/SetDebugMode.md
+description: 设置调测模式。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetDebugMode
 
 ## 功能说明

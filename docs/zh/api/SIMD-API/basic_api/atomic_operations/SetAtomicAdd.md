@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetAtomicAdd
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/atomic_operations/SetAtomicAdd.md
+description: 对后续目的地址为GM的数据搬运开启原子累加。原子累加过程：将待拷贝的内容和GM已有内容进行求和，然后将求和结果写入GM。SetAtomicAdd接口可通过模板参数设定不同的累加数据类型。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetAtomicAdd__z
+  archs: ['3510', '2201', '3002', '2002', '1001']
+  headers: [/include/basic_api/kernel_operator_set_atomic_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetAtomicAdd<a name="ZH-CN_TOPIC_0000001487536650"></a>
 
 ## 产品支持情况
@@ -32,6 +48,13 @@
 对后续目的地址为GM的数据搬运开启原子累加。原子累加过程：将待拷贝的内容和GM已有内容进行求和，然后将求和结果写入GM。SetAtomicAdd接口可通过模板参数设定不同的累加数据类型。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "SetAtomicAdd__z"
+  archs: ["3510", "2201", "3002", "2002", "1001"]
+  headers: ["/include/basic_api/kernel_operator_set_atomic_intf.h"]
+```
 
 ```cpp
 template <typename T>

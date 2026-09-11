@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: AllocTensor
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/TQueBind/AllocTensor.md
+description: 从Que中分配Tensor，Tensor所占大小为InitBuffer时设置的每块内存长度。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: AllocTensor__z
+  archs: ['3510', '2201', '3002', '2002', '1001']
+  headers: [/include/basic_api/kernel_tpipe.h]
+- override_id: AllocTensor__Rltg1x2_pT
+  archs: ['3510', '2201', '3002', '2002', '1001']
+  headers: [/include/basic_api/kernel_tpipe.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # AllocTensor<a name="ZH-CN_TOPIC_0000001811034064"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -35,12 +54,26 @@
 
 -   non-inplace接口：构造新的Tensor作为内存管理的对象
 
+```yaml
+api_signature:
+  override_id: "AllocTensor__z"
+  archs: ["3510", "2201", "3002", "2002", "1001"]
+  headers: ["/include/basic_api/kernel_tpipe.h"]
+```
+
     ```cpp
     template <typename T>
     __aicore__ inline LocalTensor<T> AllocTensor()
     ```
 
 -   inplace接口：直接使用传入的Tensor作为内存管理的对象，可以减少Tensor反复创建的开销，具体使用指导可参考[Tensor原地操作](../../../../../guide/programming_guide/appendix/common_operations/tensor_inplace_performance.md)。
+
+```yaml
+api_signature:
+  override_id: "AllocTensor__Rltg1x2_pT"
+  archs: ["3510", "2201", "3002", "2002", "1001"]
+  headers: ["/include/basic_api/kernel_tpipe.h"]
+```
 
     ```cpp
     template <typename T>

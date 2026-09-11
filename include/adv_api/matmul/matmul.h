@@ -99,6 +99,10 @@ public:
      * @param [in] orgKa: size of original A matrix K-axis shape
      * @param [in] orgKb: size of original B matrix K-axis shape
      * @param [in] orgKc: size of C matrix N-axis shape, only when B matrix's N and C matrix's N are different
+ * @ingroup simd_api.adv_api.cube_compute.matmul_kernel
+ * @override_id SetOrgShape__i_i_i_i_i
+ * @archs 3510 2201 3002 2002 x90
+ * @param [in] orgM 设置原始完整的形状M大小，单位为元素。
      */
     __aicore__ inline void SetOrgShape(int orgM, int orgN, int orgKa, int orgKb, int orgKc = 0) {}
     /**
@@ -181,6 +185,10 @@ public:
     /**
      * @brief Set the quantization vector
      * @param [in] quantTensor: quantization vector in local memery
+ * @ingroup simd_api.adv_api.cube_compute.matmul_kernel
+ * @override_id SetQuantVector__RCltg1x3_u64
+ * @archs 3510 2201 3002 2002 x90
+ * @param [in] quantTensor 量化或反量化运算时的参数向量。参数向量的存储位置为GM或L1 Buffer。
      */
     __aicore__ inline void SetQuantVector(const LocalTensor<uint64_t>& quantTensor) {}
     /**
@@ -354,6 +362,9 @@ public:
     /**
      * @brief Release Matmul computation resources to prevent confilicts among multiple Matmul objects
      * @note call End once when switching computations between multiple Matmul objects
+ * @ingroup simd_api.adv_api.cube_compute.matmul_kernel
+ * @override_id End__z
+ * @archs 3510 2201 3002 2002 x90 9030
      */
     __aicore__ inline void End() {}
     /**
@@ -386,6 +397,12 @@ public:
      * @note recommend to use this function
      */
     template <class T>
+/**
+ * @ingroup simd_api.adv_api.cube_compute.matmul_kernel
+ * @override_id SetWorkspace__Rgtg1x2_pT
+ * @archs 3510 2201 x90
+ * @brief [Iterate](Iterate.md)计算的[异步场景](GetTensorC.md#li17508136205415)，调用本接口申请一块临时空间来缓存计算结果，然后调用[GetTensorC](GetTensorC.md)时会在该临时空间中获取C的矩阵分片。
+ */
     __aicore__ inline void SetWorkspace(GlobalTensor<T>& addr)
     {}
 

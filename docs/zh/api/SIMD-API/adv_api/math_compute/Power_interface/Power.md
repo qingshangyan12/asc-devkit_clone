@@ -1,3 +1,52 @@
+---
+okftype: reference.api.cpp
+title: Power
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/Power_interface/Power.md
+description: 实现按元素做幂运算功能，提供3类接口。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Power__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/power.h]
+- override_id: Power__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/power.h]
+- override_id: Power__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/power.h]
+- override_id: Power__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/power.h]
+- override_id: Power__RCltg1x2_pT_RCltg1x2_pT_RCpT_RCltg1x2_u8_u32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/power.h]
+- override_id: Power__RCltg1x2_pT_RCltg1x2_pT_RCpT_RCltg1x2_u8
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/power.h]
+- override_id: Power__RCltg1x2_pT_RCltg1x2_pT_RCpT_u32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/power.h]
+- override_id: Power__RCltg1x2_pT_RCltg1x2_pT_RCpT
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/power.h]
+- override_id: Power__RCltg1x2_pT_RCpT_RCltg1x2_pT_RCltg1x2_u8_u32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/power.h]
+- override_id: Power__RCltg1x2_pT_RCpT_RCltg1x2_pT_RCltg1x2_u8
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/power.h]
+- override_id: Power__RCltg1x2_pT_RCpT_RCltg1x2_pT_u32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/power.h]
+- override_id: Power__RCltg1x2_pT_RCpT_RCltg1x2_pT
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/power.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Power
 
 ## 产品支持情况
@@ -37,12 +86,26 @@
     -   通过sharedTmpBuffer入参传入临时空间
         -   源操作数Tensor全部/部分参与计算
 
+```yaml
+api_signature:
+  override_id: "Power__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/power.h"]
+```
+
             ```
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
             __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
             ```
 
         -   源操作数Tensor全部参与计算
+
+```yaml
+api_signature:
+  override_id: "Power__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/power.h"]
+```
 
             ```
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
@@ -52,12 +115,26 @@
     -   接口框架申请临时空间
         -   源操作数Tensor全部/部分参与计算
 
+```yaml
+api_signature:
+  override_id: "Power__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/power.h"]
+```
+
             ```
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
             __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor, uint32_t calCount)
             ```
 
         -   源操作数Tensor全部参与计算
+
+```yaml
+api_signature:
+  override_id: "Power__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/power.h"]
+```
 
             ```
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
@@ -68,12 +145,26 @@
     -   通过sharedTmpBuffer入参传入临时空间
         -   源操作数Tensor全部/部分参与计算
 
+```yaml
+api_signature:
+  override_id: "Power__RCltg1x2_pT_RCltg1x2_pT_RCpT_RCltg1x2_u8_u32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/power.h"]
+```
+
             ```
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
             __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const T& src1Scalar, const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
             ```
 
         -   源操作数Tensor全部参与计算
+
+```yaml
+api_signature:
+  override_id: "Power__RCltg1x2_pT_RCltg1x2_pT_RCpT_RCltg1x2_u8"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/power.h"]
+```
 
             ```
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
@@ -83,12 +174,26 @@
     -   接口框架申请临时空间
         -   源操作数Tensor全部/部分参与计算
 
+```yaml
+api_signature:
+  override_id: "Power__RCltg1x2_pT_RCltg1x2_pT_RCpT_u32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/power.h"]
+```
+
             ```
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
             __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const T& src1Scalar, uint32_t calCount)
             ```
 
         -   源操作数Tensor全部参与计算
+
+```yaml
+api_signature:
+  override_id: "Power__RCltg1x2_pT_RCltg1x2_pT_RCpT"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/power.h"]
+```
 
             ```
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
@@ -99,12 +204,26 @@
     -   通过sharedTmpBuffer入参传入临时空间
         -   源操作数Tensor全部/部分参与计算
 
+```yaml
+api_signature:
+  override_id: "Power__RCltg1x2_pT_RCpT_RCltg1x2_pT_RCltg1x2_u8_u32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/power.h"]
+```
+
             ```
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
             __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const T& src0Scalar, const LocalTensor<T>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
             ```
 
         -   源操作数Tensor全部参与计算
+
+```yaml
+api_signature:
+  override_id: "Power__RCltg1x2_pT_RCpT_RCltg1x2_pT_RCltg1x2_u8"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/power.h"]
+```
 
             ```
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
@@ -114,12 +233,26 @@
     -   接口框架申请临时空间
         -   源操作数Tensor全部/部分参与计算
 
+```yaml
+api_signature:
+  override_id: "Power__RCltg1x2_pT_RCpT_RCltg1x2_pT_u32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/power.h"]
+```
+
             ```
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
             __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const T& src0Scalar, const LocalTensor<T>& src1Tensor, uint32_t calCount)
             ```
 
         -   源操作数Tensor全部参与计算
+
+```yaml
+api_signature:
+  override_id: "Power__RCltg1x2_pT_RCpT_RCltg1x2_pT"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/power.h"]
+```
 
             ```
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>

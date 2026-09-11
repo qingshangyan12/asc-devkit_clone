@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: ReduceDataBlock
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceDataBlock.md
+description: 如图1所示，`ReduceDataBlock`接口对输入数据以DataBlock为单位进行归约操作，根据模板参数`reduceType`，对每个DataBlock内的数据求和/求最大值/求最小值。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ReduceDataBlock
 
 ## 产品支持情况

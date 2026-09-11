@@ -1,3 +1,46 @@
+---
+okftype: reference.api.cpp
+title: copy（L0C Buffer到L1 Buffer数据搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/matrix_compute/cube_compute_store/copy_l0c_to_l1.md
+description: 本接口将矩阵计算结果从L0C Buffer搬运到L1 Buffer，支持非量化搬运和带量化参数的搬运。运行时参数通过`atom.with(params)`绑定。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: copy__RCcopyatomg1x5_pAtom_RCpDstTensor_RCpSrcTensor
+  archs: ['3510']
+  headers: [/include/tensor_api/algorithm/copy.h]
+- override_id: copy__RCpDstTensor_RCpSrcTensor
+  archs: ['3510']
+  headers: [/include/tensor_api/algorithm/copy.h]
+- override_id: copy__RCcopyatomg1x5_pAtom_RCpDstTensor_RCpSrcTensor_RCpQuant
+  archs: ['3510']
+  headers: [/include/tensor_api/algorithm/copy.h]
+- override_id: copy__RCpDstTensor_RCpSrcTensor_RCpQuant
+  archs: ['3510']
+  headers: []
+- override_id: copy__RCcopyatomg1x5_pAtom_RCpDstTensor_RCpSrcTensor_RCpDstCoord_RCpSrcCoord_RCpCopyShape
+  archs: ['3510']
+  headers: [/include/tensor_api/algorithm/copy.h]
+- override_id: copy__RCpDstTensor_RCpSrcTensor_RCpDstCoord_RCpSrcCoord_RCpCopyShape
+  archs: ['3510']
+  headers: [/include/tensor_api/algorithm/copy.h]
+- override_id: copy__RCcopyatomg1x5_pAtom_RCpDstTensor_RCpSrcTensor_RCpQuant_RCpDstCoord_RCpSrcCoord_RCpCopyShape
+  archs: ['3510']
+  headers: [/include/tensor_api/algorithm/copy.h]
+- override_id: copy__RCpDstTensor_RCpSrcTensor_RCpQuant_RCpDstCoord_RCpSrcCoord_RCpCopyShape
+  archs: ['3510']
+  headers: []
+- override_id: make_copy__RCpCopyOperation
+  archs: ['3510']
+  headers: [/include/tensor_api/algorithm/copy.h]
+- override_id: make_copy__RCpCopyOperation_RCpCopyTrait
+  archs: ['3510']
+  headers: [/include/tensor_api/algorithm/copy.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # copy（L0C Buffer到L1 Buffer数据搬运）
 
 ## 产品支持情况
@@ -36,6 +79,13 @@
 
 - 执行L0C Buffer到L1 Buffer的非量化搬运。
 
+```yaml
+api_signature:
+  override_id: "copy__RCcopyatomg1x5_pAtom_RCpDstTensor_RCpSrcTensor"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/algorithm/copy.h"]
+```
+
     ```cpp
     template <typename Atom, typename DstTensor, typename SrcTensor>
     __aicore__ inline void copy(const copy_atom<Atom>& atom,
@@ -44,12 +94,26 @@
 
 - 根据源张量和目的张量的存储位置自动推导搬运通路，使用默认trait执行L0C Buffer到L1 Buffer的非量化搬运。
 
+```yaml
+api_signature:
+  override_id: "copy__RCpDstTensor_RCpSrcTensor"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/algorithm/copy.h"]
+```
+
     ```cpp
     template <typename DstTensor, typename SrcTensor>
     __aicore__ inline void copy(const DstTensor& dst, const SrcTensor& src)
     ```
 
 - 执行L0C Buffer到L1 Buffer的量化搬运。
+
+```yaml
+api_signature:
+  override_id: "copy__RCcopyatomg1x5_pAtom_RCpDstTensor_RCpSrcTensor_RCpQuant"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/algorithm/copy.h"]
+```
 
     ```cpp
     template <typename Atom, typename DstTensor, typename SrcTensor, typename Quant>
@@ -59,12 +123,26 @@
 
 - 根据源张量和目的张量的存储位置自动推导搬运通路，使用默认trait执行L0C Buffer到L1 Buffer的量化搬运。
 
+```yaml
+api_signature:
+  override_id: "copy__RCpDstTensor_RCpSrcTensor_RCpQuant"
+  archs: ["3510"]
+  headers: []
+```
+
     ```cpp
     template <typename DstTensor, typename SrcTensor, typename Quant>
     __aicore__ inline void copy(const DstTensor& dst, const SrcTensor& src, const Quant& quant)
     ```
 
 - 按指定源坐标、目的坐标和搬运形状执行非量化搬运。
+
+```yaml
+api_signature:
+  override_id: "copy__RCcopyatomg1x5_pAtom_RCpDstTensor_RCpSrcTensor_RCpDstCoord_RCpSrcCoord_RCpCopyShape"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/algorithm/copy.h"]
+```
 
     ```cpp
     template <typename Atom, typename DstTensor, typename SrcTensor, typename DstCoord,
@@ -76,6 +154,13 @@
 
 - 根据源张量和目的张量的存储位置自动推导搬运通路，使用默认trait按指定源坐标、目的坐标和搬运形状执行非量化搬运。
 
+```yaml
+api_signature:
+  override_id: "copy__RCpDstTensor_RCpSrcTensor_RCpDstCoord_RCpSrcCoord_RCpCopyShape"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/algorithm/copy.h"]
+```
+
     ```cpp
     template <typename DstTensor, typename SrcTensor, typename DstCoord,
         typename SrcCoord, typename CopyShape>
@@ -85,6 +170,13 @@
     ```
 
 - 按指定源坐标、目的坐标和搬运形状执行量化搬运。
+
+```yaml
+api_signature:
+  override_id: "copy__RCcopyatomg1x5_pAtom_RCpDstTensor_RCpSrcTensor_RCpQuant_RCpDstCoord_RCpSrcCoord_RCpCopyShape"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/algorithm/copy.h"]
+```
 
     ```cpp
     template <typename Atom, typename DstTensor, typename SrcTensor, typename Quant,
@@ -96,6 +188,13 @@
 
 - 根据源张量和目的张量的存储位置自动推导搬运通路，使用默认trait按指定源坐标、目的坐标和搬运形状执行量化搬运。
 
+```yaml
+api_signature:
+  override_id: "copy__RCpDstTensor_RCpSrcTensor_RCpQuant_RCpDstCoord_RCpSrcCoord_RCpCopyShape"
+  archs: ["3510"]
+  headers: []
+```
+
     ```cpp
     template <typename DstTensor, typename SrcTensor, typename Quant,
         typename DstCoord, typename SrcCoord, typename CopyShape>
@@ -106,12 +205,26 @@
 
 - 使用默认trait构造搬运原子对象。
 
+```yaml
+api_signature:
+  override_id: "make_copy__RCpCopyOperation"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/algorithm/copy.h"]
+```
+
     ```cpp
     template <typename CopyOperation>
     __aicore__ inline constexpr auto make_copy(const CopyOperation& operation)
     ```
 
 - 使用指定trait构造搬运原子对象。
+
+```yaml
+api_signature:
+  override_id: "make_copy__RCpCopyOperation_RCpCopyTrait"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/algorithm/copy.h"]
+```
 
     ```cpp
     template <typename CopyOperation, typename CopyTrait>

@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: ProposalExtract
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/sort_and_merge_ISASI/ProposalExtract.md
+description: 与ProposalConcat功能相反，从Region Proposals内将相应位置的单个元素抽取后重排，每次迭代处理16个Region
+  Proposals，抽取16个元素后连续排列。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: ProposalExtract__RCltg1x2_pT_RCltg1x2_pT_i32_i32
+  archs: ['2002', '1001']
+  headers: [/include/basic_api/kernel_operator_proposal_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ProposalExtract<a name="ZH-CN_TOPIC_0000001492897985"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -31,6 +48,13 @@
 与ProposalConcat功能相反，从Region Proposals内将相应位置的单个元素抽取后重排，每次迭代处理16个Region Proposals，抽取16个元素后连续排列。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "ProposalExtract__RCltg1x2_pT_RCltg1x2_pT_i32_i32"
+  archs: ["2002", "1001"]
+  headers: ["/include/basic_api/kernel_operator_proposal_intf.h"]
+```
 
 ```
 template <typename T>

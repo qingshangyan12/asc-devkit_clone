@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: or
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/reg_vector_compute/logical_compute/or.md
+description: 该接口根据src0.mask，对源操作数src0、src1进行按位或（|）操作，并返回计算结果。T不为bool时，对两个矢量数据寄存器按元素计算；T为bool时，对两个掩码寄存器的有效bit计算。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # or
 
 ## 产品支持情况

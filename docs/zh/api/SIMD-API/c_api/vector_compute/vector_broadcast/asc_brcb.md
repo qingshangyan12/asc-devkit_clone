@@ -9,20 +9,16 @@ usage_dependencies:
 signature:
   - override_id: "asc_brcb__PUu16_PUu16_u16_u16_u8"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
   - override_id: "asc_brcb__PUu32_PUu32_u16_u16_u8"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
   - override_id: "asc_brcb_sync__PUu16_PUu16_u16_u16_u8"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_brcb_sync__PUu32_PUu32_u16_u16_u8"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -67,8 +63,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_brcb__PUu16_PUu16_u16_u16_u8"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
 ```
 
     ```cpp
@@ -79,8 +74,7 @@ api_signature:
 api_signature:
   override_id: "asc_brcb__PUu32_PUu32_u16_u16_u8"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
 ```
 
     ```cpp
@@ -93,8 +87,7 @@ api_signature:
 api_signature:
   override_id: "asc_brcb_sync__PUu16_PUu16_u16_u16_u8"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -105,8 +98,7 @@ api_signature:
 api_signature:
   override_id: "asc_brcb_sync__PUu32_PUu32_u16_u16_u8"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp

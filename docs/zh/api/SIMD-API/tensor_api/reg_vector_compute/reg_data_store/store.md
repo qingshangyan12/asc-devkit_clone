@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: store
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/reg_vector_compute/reg_data_store/store.md
+description: '`store`用于将[reg_tensor](../reg_tensor/reg_tensor.md)中的数据搬出到Unified Buffer（UB）Tensor。接口通过`store_sideband_mode`配置正常搬出、首元素搬出、交织搬出或压缩搬出等数据排列方式。'
+tag: [tensor_api, 'operations:interleave']
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: store__RpTensor_RCpCoord_RCregtensorg1x12_pRegDataType
+  archs: ['3510']
+  headers: [/include/tensor_api/experimental/arch/vector/reg_data_store.h]
+- override_id: store__RpTensor_RCregtensorg1x12_pRegDataType
+  archs: ['3510']
+  headers: [/include/tensor_api/experimental/arch/vector/reg_data_store.h]
+- override_id: store__RpTensor_RCpCoord_RCregtensorg1x12_pRegDataType_RCregtensorg1x12_pRegDataType
+  archs: ['3510']
+  headers: [/include/tensor_api/experimental/arch/vector/reg_data_store.h]
+- override_id: store__RpTensor_RCregtensorg1x12_pRegDataType_RCregtensorg1x12_pRegDataType
+  archs: ['3510']
+  headers: [/include/tensor_api/experimental/arch/vector/reg_data_store.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # store
 
 ## 产品支持情况
@@ -41,6 +66,13 @@
 
 - 单源操作数，指定坐标：
 
+```yaml
+api_signature:
+  override_id: "store__RpTensor_RCpCoord_RCregtensorg1x12_pRegDataType"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/experimental/arch/vector/reg_data_store.h"]
+```
+
     ```cpp
     template <store_sideband_mode sideband_mode = store_sideband_mode::direct,
               typename Tensor,
@@ -54,6 +86,13 @@
 
 - 单源操作数，从Tensor起始位置搬出：
 
+```yaml
+api_signature:
+  override_id: "store__RpTensor_RCregtensorg1x12_pRegDataType"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/experimental/arch/vector/reg_data_store.h"]
+```
+
     ```cpp
     template <store_sideband_mode sideband_mode = store_sideband_mode::direct,
               typename Tensor,
@@ -63,6 +102,13 @@
     ```
 
 - 双源操作数，指定坐标：
+
+```yaml
+api_signature:
+  override_id: "store__RpTensor_RCpCoord_RCregtensorg1x12_pRegDataType_RCregtensorg1x12_pRegDataType"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/experimental/arch/vector/reg_data_store.h"]
+```
 
     ```cpp
     template <store_sideband_mode sideband_mode = store_sideband_mode::intlv,
@@ -77,6 +123,13 @@
     ```
 
 - 双源操作数，从Tensor起始位置搬出：
+
+```yaml
+api_signature:
+  override_id: "store__RpTensor_RCregtensorg1x12_pRegDataType_RCregtensorg1x12_pRegDataType"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/experimental/arch/vector/reg_data_store.h"]
+```
 
     ```cpp
     template <store_sideband_mode sideband_mode = store_sideband_mode::intlv,

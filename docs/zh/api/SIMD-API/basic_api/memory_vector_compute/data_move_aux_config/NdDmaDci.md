@@ -1,3 +1,27 @@
+---
+okftype: reference.api.cpp
+title: NdDmaDci
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move_aux_config/NdDmaDci.md
+description: 刷新NDDMA DataCache。在多核场景下，当多个AI Core读取同一块GM（Global Memory）地址时，NDDMA DataCache中可能缓存了旧数据，导致部分核读取到错误的数据。因此，在使用[DataCopy（GMToUB多维数据搬运NDDMA）](../data_move/DataCopy_GMToUB_NDDMA.md)前，需要调用NdDmaDci接口刷新NDDMA
+  DataCache，确保缓存中的数据为最新状态。
+tag: [basic_api]
+usage_dependencies:
+  status: confirmed
+  required_before:
+    all_of:
+    - ../data_move/DataCopy_GMToUB_NDDMA.md
+signature:
+- override_id: NdDmaDci__z
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_data_copy_intf.h]
+examples:
+- path: /examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_gm2ub_nddma
+  archs: ['3510']
+  override_id: NdDmaDci__z
+  file: multidimensional_data_movement.asc
+timestamp: '2026-09-11'
+---
+
 # NdDmaDci<a name="ZH-CN_TOPIC_0000002414107834"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -32,6 +56,13 @@
 刷新NDDMA DataCache。在多核场景下，当多个AI Core读取同一块GM（Global Memory）地址时，NDDMA DataCache中可能缓存了旧数据，导致部分核读取到错误的数据。因此，在使用[DataCopy（GMToUB多维数据搬运NDDMA）](../data_move/DataCopy_GMToUB_NDDMA.md)前，需要调用NdDmaDci接口刷新NDDMA DataCache，确保缓存中的数据为最新状态。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "NdDmaDci__z"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_data_copy_intf.h"]
+```
 
 ```cpp
 __aicore__ inline void NdDmaDci()

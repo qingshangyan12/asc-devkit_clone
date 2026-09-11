@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: asc\_vf\_call
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/vf_call/asc_vf_call.md
+description: 在SIMD编程场景下使用。用于启动SIMD VF（Vector Function）子任务。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: asc_vf_call__QOpArgs
+  archs: ['3510']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # asc\_vf\_call<a name="ZH-CN_TOPIC_0000002563057755"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -30,6 +46,13 @@
 在SIMD编程场景下使用。用于启动SIMD VF（Vector Function）子任务。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "asc_vf_call__QOpArgs"
+  archs: ["3510"]
+  headers: []
+```
 
 ```cpp
 template <auto funcPtr, typename... Args>

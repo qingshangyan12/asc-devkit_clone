@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GetSortTmpSize
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/sort_operations/GetSortTmpSize.md
+description: 获取Sort接口所需的临时空间大小。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetSortTmpSize
 
 ## 功能说明

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: ReadGmByPassDCache\(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/scalar_compute/ReadGmByPassDCache_ISASI.md
+description: 不经过DCache从GM地址上读数据。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: ReadGmByPassDCache__PGpT
+  archs: ['3510', '2201']
+  headers: [/include/basic_api/kernel_operator_scalar_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ReadGmByPassDCache\(ISASI\)<a name="ZH-CN_TOPIC_0000002327311338"></a>
 
 ## 产品支持情况
@@ -32,6 +48,13 @@
 不经过DCache从GM地址上读数据。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "ReadGmByPassDCache__PGpT"
+  archs: ["3510", "2201"]
+  headers: ["/include/basic_api/kernel_operator_scalar_intf.h"]
+```
 
 ```cpp
 template <typename T>

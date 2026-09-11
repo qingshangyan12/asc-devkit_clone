@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetTraverse
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetTraverse.md
+description: 设置固定的Matmul计算方向，M轴优先还是N轴优先。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetTraverse
 
 ## 功能说明

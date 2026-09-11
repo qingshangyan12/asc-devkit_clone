@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: max
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/reg_vector_compute/basic_arithmetic/max.md
+description: 该接口根据输入reg_tensor携带的mask，对两个源操作数按元素求最大值，并返回计算结果。支持reg_tensor与reg_tensor、reg_tensor与标量、标量与reg_tensor三种操作数组合。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: max__RCregtensorg1x2_pT_RCregtensorg1x2_pT
+  archs: ['3510']
+  headers: [/include/tensor_api/experimental/arch/vector/basic_arithmetic.h]
+- override_id: max__RCregtensorg1x2_pT_RCpT
+  archs: ['3510']
+  headers: [/include/tensor_api/experimental/arch/vector/basic_arithmetic.h]
+- override_id: max__RCpT_RCregtensorg1x2_pT
+  archs: ['3510']
+  headers: [/include/tensor_api/experimental/arch/vector/basic_arithmetic.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # max
 
 ## 产品支持情况
@@ -38,6 +60,13 @@ $$
 
 - reg_tensor与reg_tensor
 
+```yaml
+api_signature:
+  override_id: "max__RCregtensorg1x2_pT_RCregtensorg1x2_pT"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/experimental/arch/vector/basic_arithmetic.h"]
+```
+
     ```cpp
     template <typename T>
     __simd_callee__ inline reg_tensor<T> max(
@@ -46,10 +75,27 @@ $$
 
 - reg_tensor与标量
 
+```yaml
+api_signature:
+  override_id: "max__RCregtensorg1x2_pT_RCpT"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/experimental/arch/vector/basic_arithmetic.h"]
+```
+
     ```cpp
     template <typename T>
     __simd_callee__ inline reg_tensor<T> max(
         const reg_tensor<T>& src, const T& scalar)
+    ```
+
+```yaml
+api_signature:
+  override_id: "max__RCpT_RCregtensorg1x2_pT"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/experimental/arch/vector/basic_arithmetic.h"]
+```
+
+    ```cpp
 
     template <typename T>
     __simd_callee__ inline reg_tensor<T> max(

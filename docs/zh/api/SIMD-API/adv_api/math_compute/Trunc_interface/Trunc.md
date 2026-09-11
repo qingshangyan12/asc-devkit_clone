@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: Trunc
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/Trunc_interface/Trunc.md
+description: 按元素做浮点数截断，即向零取整操作。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Trunc__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/trunc.h]
+- override_id: Trunc__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/trunc.h]
+- override_id: Trunc__RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/trunc.h]
+- override_id: Trunc__RCltg1x2_pT_RCltg1x2_pT
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/math/trunc.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Trunc
 
 ## 产品支持情况
@@ -40,12 +65,26 @@ Trunc\(-3.9\) = -3
 -   通过sharedTmpBuffer入参传入临时空间
     -   源操作数Tensor全部/部分参与计算
 
+```yaml
+api_signature:
+  override_id: "Trunc__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/trunc.h"]
+```
+
         ```
         template <typename T, bool isReuseSource = false>
         __aicore__ inline void Trunc(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
+
+```yaml
+api_signature:
+  override_id: "Trunc__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/trunc.h"]
+```
 
         ```
         template <typename T, bool isReuseSource = false>
@@ -55,12 +94,26 @@ Trunc\(-3.9\) = -3
 -   接口框架申请临时空间
     -   源操作数Tensor全部/部分参与计算
 
+```yaml
+api_signature:
+  override_id: "Trunc__RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/trunc.h"]
+```
+
         ```
         template <typename T, bool isReuseSource = false>
         __aicore__ inline void Trunc(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
+
+```yaml
+api_signature:
+  override_id: "Trunc__RCltg1x2_pT_RCltg1x2_pT"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/math/trunc.h"]
+```
 
         ```
         template <typename T, bool isReuseSource = false>

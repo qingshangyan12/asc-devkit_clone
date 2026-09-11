@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Squeeze
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/compare_and_select/Squeeze.md
+description: 将传入的srcReg中被mask选择的有效元素依次复制到dstReg中，有效元素在dstReg中从低到高连续排列，剩余位置元素置为0，如[图1](#figure1)所示。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Squeeze<a name="ZH-CN_TOPIC_0000002009320090"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

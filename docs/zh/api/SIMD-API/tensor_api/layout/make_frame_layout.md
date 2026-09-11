@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: make_frame_layout
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/layout/make_frame_layout.md
+description: make_frame_layout用于根据标准分形排布模式构造带类型信息的layout对象。该接口根据构造参数，结合指定的LayoutPattern（排布模式）和layout
+  trait（布局特征参数）计算shape和stride，构造layout对象。除矩阵layout外，该接口还支持构造卷积场景中的NCHW、NHWC、NC1HWC0、NCDHW和NDC1HWC0格式layout。该接口也支持在矩阵维度前传入Batch维度，用于构造多Batch矩阵的layout。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: make_frame_layout__QRCpArgs
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/layout_interface.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # make_frame_layout
 
 ## 产品支持情况
@@ -34,9 +51,26 @@ LayoutPattern决定数据在内存中的分形排列方式，不同存储位置�
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "make_frame_layout__QRCpArgs"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/layout_interface.h"]
+```
+
 ```cpp
 template <typename LayoutPattern, typename Trait = Std::ignore_t, typename... Args>
 __aicore__ inline constexpr decltype(auto) make_frame_layout(const Args&... args)
+```
+
+```yaml
+api_signature:
+  override_id: "make_frame_layout__QRCpArgs"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/layout_interface.h"]
+```
+
+```cpp
 
 template <typename LayoutPattern, size_t C0Element, typename... Args>
 __aicore__ inline constexpr decltype(auto) make_frame_layout(const Args&... args)

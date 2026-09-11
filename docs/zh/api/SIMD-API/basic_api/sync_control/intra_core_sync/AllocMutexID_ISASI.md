@@ -1,3 +1,21 @@
+---
+okftype: reference.api.cpp
+title: AllocMutexID \(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/AllocMutexID_ISASI.md
+description: 从框架获取并占用一个MutexID，与[ReleaseMutexID](ReleaseMutexID_ISASI.md)配合使用，管理MutexID的获取和释放。获取的MutexID可以传入[Mutex::Lock](Lock.md)/[Mutex::Unlock](Unlock.md)接口使用，此时Mutex::Lock/Unlock可以与TQue等其他接口配合使用。
+tag: [basic_api]
+usage_dependencies:
+  status: confirmed
+  companion:
+  - ReleaseMutexID_ISASI.md
+signature:
+- override_id: AllocMutexID__z
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_common.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # AllocMutexID \(ISASI\)<a name="ZH-CN_TOPIC_0000002352639064"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -32,6 +50,13 @@
 从框架获取并占用一个MutexID，与[ReleaseMutexID](ReleaseMutexID_ISASI.md)配合使用，管理MutexID的获取和释放。获取的MutexID可以传入[Mutex::Lock](Lock.md)/[Mutex::Unlock](Unlock.md)接口使用，此时Mutex::Lock/Unlock可以与TQue等其他接口配合使用。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "AllocMutexID__z"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_common.h"]
+```
 
 ```cpp
 __aicore__ inline MutexID AllocMutexID()

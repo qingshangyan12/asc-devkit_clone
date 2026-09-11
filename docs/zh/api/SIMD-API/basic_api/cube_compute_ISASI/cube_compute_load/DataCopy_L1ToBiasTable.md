@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: DataCopy（L1ToBiasTable Buffer数据搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_L1ToBiasTable.md
+description: DataCopy数据搬运支持将矩阵计算用到的Bias参数从L1 Buffer移动到BiasTable Buffer。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DataCopy（L1ToBiasTable Buffer数据搬运）<a id="ZH-CN_TOPIC_0000002538071240"></a>
 
 ## 产品支持情况<a id="zh-cn_topic_0000002566886667_section796754519912"></a>

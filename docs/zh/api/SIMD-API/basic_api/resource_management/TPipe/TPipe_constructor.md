@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: TPipe构造函数
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/TPipe/TPipe_constructor.md
+description: 构造用来管理内存和同步的TPipe对象。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: TPipe__z
+  archs: ['3510', '2201', '3002', '2002', '1001']
+  headers: [/include/basic_api/kernel_tpipe.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # TPipe构造函数<a name="ZH-CN_TOPIC_0000002027238497"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -32,6 +48,13 @@
 构造用来管理内存和同步的TPipe对象。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "TPipe__z"
+  archs: ["3510", "2201", "3002", "2002", "1001"]
+  headers: ["/include/basic_api/kernel_tpipe.h"]
+```
 
 ```cpp
 __aicore__ inline TPipe()

@@ -9,20 +9,16 @@ usage_dependencies:
 signature:
   - override_id: "asc_transpose__PUi16_PUi16"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+    headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
   - override_id: "asc_transpose__PUu16_PUu16"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+    headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
   - override_id: "asc_transpose_sync__PUi16_PUi16"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_transpose_sync__PUu16_PUu16"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -65,8 +61,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_transpose__PUi16_PUi16"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
 ```
 
   ```cpp
@@ -77,8 +72,7 @@ api_signature:
 api_signature:
   override_id: "asc_transpose__PUu16_PUu16"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
 ```
 
   ```cpp
@@ -90,8 +84,7 @@ api_signature:
 api_signature:
   override_id: "asc_transpose_sync__PUi16_PUi16"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
   ```cpp
@@ -102,8 +95,7 @@ api_signature:
 api_signature:
   override_id: "asc_transpose_sync__PUu16_PUu16"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
   ```cpp

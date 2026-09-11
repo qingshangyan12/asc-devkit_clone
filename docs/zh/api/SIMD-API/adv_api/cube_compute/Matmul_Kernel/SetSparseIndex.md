@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetSparseIndex
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetSparseIndex.md
+description: 设置稀疏矩阵[稠密化过程](../../../basic_api/cube_compute_ISASI/mmad_compute/MmadWithSparse.md#功能说明)生成的索引矩阵。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetSparseIndex__RCgtg1x2_u8
+  archs: ['2201']
+  headers: [/include/adv_api/matmul/matmul.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetSparseIndex
 
 ## 产品支持情况
@@ -30,6 +46,13 @@
 索引矩阵在稠密化中的作用请参考[MmadWithSparse](../../../basic_api/cube_compute_ISASI/mmad_compute/MmadWithSparse.md#section618mcpsimp)。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "SetSparseIndex__RCgtg1x2_u8"
+  archs: ["2201"]
+  headers: ["/include/adv_api/matmul/matmul.h"]
+```
 
 ```
 __aicore__ inline void SetSparseIndex(const GlobalTensor<uint8_t>& indexGlobal)

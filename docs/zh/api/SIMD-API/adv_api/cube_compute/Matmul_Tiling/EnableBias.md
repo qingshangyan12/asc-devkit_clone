@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: EnableBias
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/EnableBias.md
+description: 设置Bias是否参与运算，设置的信息必须与核函数（Kernel）侧保持一致。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # EnableBias
 
 ## 功能说明

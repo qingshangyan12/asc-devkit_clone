@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: squeeze
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/layout/squeeze.md
+description: squeeze用于删除layout的shape中大小为1的指定维度，并同步删除stride中的对应维度。输入为Tensor时，接口更新Tensor的layout，Tensor的Engine、存储位置和数据起始地址保持不变。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: squeeze__RCpInput
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/tensor.h]
+- override_id: squeeze__RCpInput_RCpPattern
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/tensor.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # squeeze
 
 ## 产品支持情况
@@ -41,12 +60,26 @@ squeeze用于删除layout的shape中大小为1的指定维度，并同步删除s
 
 - 通过维度索引删除大小为1的维度。
 
+```yaml
+api_signature:
+  override_id: "squeeze__RCpInput"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/tensor.h"]
+```
+
     ```cpp
     template <size_t... SqueezeDims, typename Input>
     __aicore__ inline constexpr auto squeeze(const Input& x)
     ```
 
 - 通过Pattern删除大小为1的维度。
+
+```yaml
+api_signature:
+  override_id: "squeeze__RCpInput_RCpPattern"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/tensor.h"]
+```
 
     ```cpp
     template <typename Pattern, typename Input>

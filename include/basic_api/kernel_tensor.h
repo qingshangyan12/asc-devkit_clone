@@ -172,6 +172,12 @@ public:
     int32_t ToFile(const std::string& fileName) const;
 #else
     __aicore__ inline uint64_t GetPhyAddr() const;
+/**
+ * @ingroup simd_api.basic_api.data_structures.localtensor
+ * @override_id GetPhyAddr__u32
+ * @archs 3510 2201 3002 2002 1001
+ * @brief 返回LocalTensor的地址或指定偏移量后的地址。
+ */
     __aicore__ inline uint64_t GetPhyAddr(const uint32_t offset) const;
     __aicore__ inline __inout_pipe__(S) PrimType GetValue(const uint32_t index) const;
     __aicore__ inline __inout_pipe__(S) __ubuf__ PrimType& operator()(const uint32_t offset) const;
@@ -190,16 +196,46 @@ public:
     template <typename U>
     __aicore__ inline LocalTensor<T>(uint32_t addr, const U& layout);
     __aicore__ inline LocalTensor<T>(uint32_t addr);
+/**
+ * @ingroup simd_api.basic_api.data_structures.localtensor
+ * @override_id GetPosition__z
+ * @archs 3510 2201 3002 2002 1001
+ * @brief 获取LocalTensor所在的TPosition逻辑位置，支持TPosition为VECIN、VECOUT、VECCALC、A1、A2、B1、B2、CO1、CO2。
+ */
     __aicore__ inline int32_t GetPosition() const;
+/**
+ * @ingroup simd_api.basic_api.data_structures.localtensor
+ * @override_id SetSize__u32
+ * @archs 3510 2201 3002 2002 1001
+ * @brief 设置当前LocalTensor Size大小。单位为元素。当用户重用local tensor变量且使用长度发生变化的时候，需要使用此接口重新设置Size。
+ */
     __aicore__ inline void SetSize(const uint32_t size);
     __aicore__ inline uint32_t GetSize() const;
 
     [[deprecated("NOTICE: GetLength has been deprecated and will be removed in the next version. Please do not use "
+/**
+ * @ingroup simd_api.basic_api.data_structures.localtensor
+ * @override_id GetLength__z
+ * @archs 3510 2201 3002 2002 1001
+ * @brief 获取LocalTensor数据长度。
+ */
                  "it!")]] __aicore__ inline uint32_t
     GetLength() const;
 
+/**
+ * @ingroup simd_api.basic_api.data_structures.localtensor
+ * @override_id SetBufferLen__u32
+ * @archs 3510 2201 3002 2002 1001
+ * @brief 设置Buffer长度。当用户调用operator\[\]函数创建新LocalTensor时，建议调用该接口设置新LocalTensor长度，便于编译器对内存及同步进行自动优化。
+ */
     __aicore__ inline void SetBufferLen(uint32_t dataLen);
     __aicore__ inline void SetUserTag(const TTagType tag);
+/**
+ * @ingroup simd_api.basic_api.data_structures.localtensor
+ * @override_id GetUserTag__z
+ * @archs 3510 2201 3002 2002 1001
+ * @brief 获取指定Tensor块的Tag信息，用户可以根据Tag信息对Tensor进行不同操作。
+ */
     __aicore__ inline TTagType GetUserTag() const;
     // symbol override
     __aicore__ inline void operator=(const SymbolOverrideAdd<T>& symbolOverride);
@@ -265,6 +301,12 @@ public:
     __aicore__ inline void SetGlobalBuffer(__gm__ PrimType* buffer, uint64_t bufferSize);
     __aicore__ inline void SetGlobalBuffer(__gm__ PrimType* buffer);
     __aicore__ inline const __gm__ PrimType* GetPhyAddr() const;
+/**
+ * @ingroup simd_api.basic_api.data_structures.globaltensor
+ * @override_id GetPhyAddr__u64
+ * @archs 3510 2201 3002 2002 1001
+ * @brief 获取全局数据的地址。
+ */
     __aicore__ inline __gm__ PrimType* GetPhyAddr(const uint64_t offset) const;
 
     __aicore__ inline __inout_pipe__(S) PrimType GetValue(const uint64_t offset) const;
@@ -312,7 +354,19 @@ private:
 template <Hardware hard = Hardware::UB>
 class LocalMemAllocator {
 public:
+/**
+ * @ingroup simd_api.basic_api.resource_management.localmemallocator
+ * @override_id LocalMemAllocator__z
+ * @archs 3510 2201 2002
+ * @brief LocalMemAllocator构造函数。
+ */
     __aicore__ inline LocalMemAllocator();
+/**
+ * @ingroup simd_api.basic_api.resource_management.localmemallocator
+ * @override_id GetCurAddr__z
+ * @archs 3510 2201 2002
+ * @brief 返回当前物理位置空闲的起始地址。
+ */
     __aicore__ inline uint32_t GetCurAddr() const;
     template <TPosition pos, class DataType, uint32_t tileSize>
     __aicore__ inline LocalTensor<DataType> Alloc();

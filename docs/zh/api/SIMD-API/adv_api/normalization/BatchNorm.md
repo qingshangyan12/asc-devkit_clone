@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: BatchNorm
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/normalization/BatchNorm.md
+description: BatchNorm是对于每一层的输入做规范化处理，使得每一层的分布尽可能的相同，从而加速训练过程和提高模型的泛化能力（有效减少梯度消失和梯度爆炸问题）。基本思想是对于每个batch中的样本，对其输入的每个特征在batch的维度上进行归一化。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # BatchNorm
 
 ## 产品支持情况

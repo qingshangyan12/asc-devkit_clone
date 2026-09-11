@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: FreeAllEvent
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/TQueBind/FreeAllEvent.md
+description: 释放队列中申请的所有同步事件。队列分配的Buffer关联着同步事件的eventID，因为同步事件的数量有限制，如果同时使用的队列Buffer数量超过限制，将无法继续申请队列，使用本接口释放队列中的事件后，可以再次申请队列。详细介绍请参考[TQue
+  Buffer限制](../TQue/TQue_intro.md#section466543213575)。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: FreeAllEvent__z
+  archs: ['3510', '2201', '3002', '2002', '1001']
+  headers: [/include/basic_api/kernel_tpipe.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # FreeAllEvent<a name="ZH-CN_TOPIC_0000001857594165"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -32,6 +49,13 @@
 释放队列中申请的所有同步事件。队列分配的Buffer关联着同步事件的eventID，因为同步事件的数量有限制，如果同时使用的队列Buffer数量超过限制，将无法继续申请队列，使用本接口释放队列中的事件后，可以再次申请队列。详细介绍请参考[TQue Buffer限制](../TQue/TQue_intro.md#section466543213575)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "FreeAllEvent__z"
+  archs: ["3510", "2201", "3002", "2002", "1001"]
+  headers: ["/include/basic_api/kernel_tpipe.h"]
+```
 
 ```cpp
 __aicore__ inline void FreeAllEvent()

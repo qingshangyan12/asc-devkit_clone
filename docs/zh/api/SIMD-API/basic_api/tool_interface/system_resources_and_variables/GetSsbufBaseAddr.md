@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetSsbufBaseAddr
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetSsbufBaseAddr.md
+description: 该接口用于获取SSBuffer的基地址。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetSsbufBaseAddr__z
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_sys_var_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetSsbufBaseAddr
 
 ## 产品支持情况
@@ -32,6 +48,13 @@
 该接口用于获取SSBuffer的基地址。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "GetSsbufBaseAddr__z"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_sys_var_intf.h"]
+```
 
 ```cpp
 __aicore__ inline __ssbuf__ void*  GetSsbufBaseAddr()

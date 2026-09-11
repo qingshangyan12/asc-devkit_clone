@@ -9,16 +9,13 @@ usage_dependencies:
 signature:
   - override_id: "asc_set_deq_scale__PUu64_Avdeqf32_Avdeqi16_Avdeqb"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_fused.h"
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: "asc_set_deq_scale__f32_i16_b"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_fused.h"
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: "asc_set_deq_scale__f16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_fused.h"
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -61,8 +58,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_set_deq_scale__PUu64_Avdeqf32_Avdeqi16_Avdeqb"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_fused.h"
+  headers: [/include/c_api/vector_compute/compute/vector_fused.h]
 ```
 
 ```cpp
@@ -73,8 +69,7 @@ __aicore__ inline void asc_set_deq_scale(__ubuf__ uint64_t* tmp, float scale_arr
 api_signature:
   override_id: "asc_set_deq_scale__f32_i16_b"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_fused.h"
+  headers: [/include/c_api/vector_compute/compute/vector_fused.h]
 ```
 
 ```cpp
@@ -85,8 +80,7 @@ __aicore__ inline void asc_set_deq_scale(float scale, int16_t offset, bool sign_
 api_signature:
   override_id: "asc_set_deq_scale__f16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_fused.h"
+  headers: [/include/c_api/vector_compute/compute/vector_fused.h]
 ```
 
 ```cpp

@@ -107,6 +107,14 @@ __aicore__ inline AscendC::TPipe* GetTPipePtr()
 
 namespace AscendC {
 template <typename T, MaskMode mode = MaskMode::NORMAL>
+/**
+ * @ingroup simd_api.basic_api.memory_vector_compute.mask_operations
+ * @override_id SetVectorMask__u64_u64
+ * @archs 3510 2201 3002 2002 1001 x90 9030
+ * @brief 本接口用于在矢量计算时设置mask。
+ * @param [in] maskHigh Normal模式：对应Normal模式下的逐比特模式，可以按位控制哪些元素参与计算。传入高位mask值。Counter模式：需要置0，本入参不生效。
+ * @param [in] maskLow Normal模式：对应Normal模式下的逐比特模式，可以按位控制哪些元素参与计算。传入低位mask值。Counter模式：整个矢量计算过程中，参与计算的元素个数。
+ */
 __aicore__ static inline void SetVectorMask(const uint64_t maskHigh, const uint64_t maskLow)
 {
 #if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102
@@ -118,6 +126,13 @@ __aicore__ static inline void SetVectorMask(const uint64_t maskHigh, const uint6
 }
 
 template <typename T, MaskMode mode = MaskMode::NORMAL>
+/**
+ * @ingroup simd_api.basic_api.memory_vector_compute.mask_operations
+ * @override_id SetVectorMask__i32
+ * @archs 3510 2201 3002 2002 1001 x90 9030
+ * @brief 本接口用于在矢量计算时设置mask。
+ * @param [in] len Normal模式：对应Normal模式下的Mask连续模式，表示单次迭代内前面连续的多少个元素参与计算。Counter模式：整个矢量计算过程中，参与计算的元素个数。
+ */
 __aicore__ static inline void SetVectorMask(int32_t len)
 {
 #if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102
@@ -126,6 +141,12 @@ __aicore__ static inline void SetVectorMask(int32_t len)
     SetVectorMaskImpl<T, mode>(len);
 }
 
+/**
+ * @ingroup simd_api.basic_api.memory_vector_compute.mask_operations
+ * @override_id ResetMask__z
+ * @archs 3510 2201 3002 2002
+ * @brief 恢复mask的值为默认值（全1），表示矢量计算中每次迭代内的所有元素都将参与运算。
+ */
 __aicore__ inline void ResetMask()
 {
 #if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102
@@ -163,6 +184,12 @@ public:
     }
 };
 
+/**
+ * @ingroup simd_api.basic_api.sync_control.intra_core_sync
+ * @override_id AllocMutexID__z
+ * @archs 3510
+ * @brief 从框架获取并占用一个MutexID，与[ReleaseMutexID](ReleaseMutexID_ISASI.md)配合使用，管理MutexID的获取和释放。获取的MutexID可以传入[Mutex::Lock](Lock.md)/[Mutex::Unlock](Unlock.md)接口使用，此时Mutex::Lock/Unlock可以与TQue等其他接口配合使用。
+ */
 __aicore__ inline MutexID AllocMutexID()
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
@@ -191,11 +218,29 @@ __aicore__ inline void ReleaseMutexID(MutexID id)
 #endif
 }
 
+/**
+ * @ingroup simd_api.basic_api.memory_vector_compute.mask_operations
+ * @override_id SetMaskCount__z
+ * @archs 3510 2201 3002 2002 x90 9030
+ * @brief 设置Mask模式为Counter模式。该模式下，不需要开发者去感知迭代次数、处理非对齐的尾块等操作，可直接传入计算数据量，实际迭代次数由Vector计算单元自动推断。本接口推荐配合API中isSetMask模板参数使用，当isSetMask为false时，支持用户调用本接口手动管理Counter模式，并通过[SetVectorMask](SetVectorMask.md)设置Counter模式下参与计算的元素个数。
+ */
 __aicore__ inline void SetMaskCount() { SetMaskCountImpl(); }
 
+/**
+ * @ingroup simd_api.basic_api.memory_vector_compute.mask_operations
+ * @override_id SetMaskNorm__z
+ * @archs 3510 2201 3002 2002 x90 9030
+ * @brief 设置Mask模式为Normal模式。该模式为系统默认模式，支持开发者配置迭代次数。本接口推荐配合API中isSetMask模板参数使用，当isSetMask为false时，支持用户调用本接口手动管理Normal模式，并通过[SetVectorMask](SetVectorMask.md)设置Normal模式下的掩码。
+ */
 __aicore__ inline void SetMaskNorm() { SetMaskNormImpl(); }
 
 template <uint32_t index>
+/**
+ * @ingroup simd_api.adv_api.hccl_communication.hccl_context
+ * @override_id SetHcclContext__PGu8
+ * @archs 2201 2002
+ * @brief 设置通算融合算子每个通信域对应的context（消息区）地址。
+ */
 __aicore__ inline void SetHcclContext(__gm__ uint8_t* context)
 {
     if constexpr (index > 1) {
@@ -205,6 +250,12 @@ __aicore__ inline void SetHcclContext(__gm__ uint8_t* context)
 }
 
 template <uint32_t index>
+/**
+ * @ingroup simd_api.adv_api.hccl_communication.hccl_context
+ * @override_id GetHcclContext__z
+ * @archs 2201 2002
+ * @brief 获取指定Index通信域的context（消息区）地址。
+ */
 __aicore__ inline __gm__ uint8_t* __gm__ GetHcclContext(void)
 {
     if constexpr (index > 1) {

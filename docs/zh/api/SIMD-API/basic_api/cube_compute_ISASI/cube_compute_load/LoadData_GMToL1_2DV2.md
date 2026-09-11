@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: LoadData（GMToL1-2D矩阵搬运V2）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_GMToL1_2DV2.md
+description: 负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512字节的数据分形为单位从Global Memory搬运至L1 Buffer（TPosition为A1/B1）。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LoadData（GMToL1-2D矩阵搬运V2）<a id="ZH-CN_TOPIC_0000002594327301"></a>
 
 ## 产品支持情况<a id="section1550532418810"></a>

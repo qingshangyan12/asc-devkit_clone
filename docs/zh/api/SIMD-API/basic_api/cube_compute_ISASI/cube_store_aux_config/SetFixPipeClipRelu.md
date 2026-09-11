@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetFixPipeClipRelu
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_store_aux_config/SetFixPipeClipRelu.md
+description: DataCopy数据搬运（[L0C Buffer->GM](../cube_compute_store/Fixpipe_L0CToGM.md)）过程中进行随路量化后，通过调用该接口设置ClipReLU操作的最大值。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetFixPipeClipRelu__u64
+  archs: ['3002', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_fixpipe_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetFixPipeClipRelu<a name="ZH-CN_TOPIC_0000002054401800"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -38,6 +54,13 @@ DataCopy数据搬运（[L0C Buffer->GM](../cube_compute_store/Fixpipe_L0CToGM.md
 ClipReLU计算公式为`min(clipReluMaxVal, srcData)`，clipReluMaxVal为通过该接口设置的最大值，srcData为源数据。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "SetFixPipeClipRelu__u64"
+  archs: ["3002", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_fixpipe_intf.h"]
+```
 
 ```cpp
 __aicore__ inline void SetFixPipeClipRelu(uint64_t config)

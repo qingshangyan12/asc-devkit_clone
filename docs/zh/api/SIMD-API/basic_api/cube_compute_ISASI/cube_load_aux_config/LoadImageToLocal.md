@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: LoadImageToLocal
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_load_aux_config/LoadImageToLocal.md
+description: 将图像数据从Global Memory搬运到Local Memory。搬运过程中可以完成图像预处理操作：包括图像翻转，改变图像尺寸（抠图，裁边，缩放，伸展），以及色域转换，类型转换等。图像预处理的相关参数通过[SetAippFunctions](SetAippFunctions.md)进行配置。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LoadImageToLocal<a name="ZH-CN_TOPIC_0000001945534165"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: LayerNormGrad Tiling
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/normalization/LayerNormGrad-Tiling.md
+description: LayerNormGrad Tiling的功能如下：。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LayerNormGrad Tiling
 
 ## 功能说明

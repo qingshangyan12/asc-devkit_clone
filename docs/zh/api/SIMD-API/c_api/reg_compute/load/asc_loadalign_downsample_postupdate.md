@@ -10,12 +10,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_loadalign_downsample_postupdate__Rv<dtype>_RPU<dtype>_i32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: "asc_loadalign_downsample_postupdate__Rvb_RPUu32_i32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -63,8 +61,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_loadalign_downsample_postupdate__Rv<dtype>_RPU<dtype>_i32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
   dtype:
     values:
       - "int4b_t"
@@ -93,8 +90,7 @@ __simd_callee__ inline void asc_loadalign_downsample_postupdate(vector_<dtype>& 
 api_signature:
   override_id: "asc_loadalign_downsample_postupdate__Rvb_RPUu32_i32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
 ```
 
 ```c

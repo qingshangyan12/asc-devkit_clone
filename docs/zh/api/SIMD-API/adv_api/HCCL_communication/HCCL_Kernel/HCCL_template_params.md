@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: HCCL模板参数
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/HCCL_template_params.md
+description: 创建HCCL对象时需要传入模板参数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # HCCL模板参数
 
 ## 产品支持情况

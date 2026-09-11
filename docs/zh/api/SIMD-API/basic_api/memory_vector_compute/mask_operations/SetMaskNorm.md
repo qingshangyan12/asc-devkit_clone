@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetMaskNorm
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/mask_operations/SetMaskNorm.md
+description: 设置Mask模式为Normal模式。该模式为系统默认模式，支持开发者配置迭代次数。本接口推荐配合API中isSetMask模板参数使用，当isSetMask为false时，支持用户调用本接口手动管理Normal模式，并通过[SetVectorMask](SetVectorMask.md)设置Normal模式下的掩码。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetMaskNorm__z
+  archs: ['3510', '2201', '3002', '2002', x90, '9030']
+  headers: [/include/basic_api/kernel_common.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetMaskNorm<a name="ZH-CN_TOPIC_0000001836766205"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -38,6 +54,13 @@
 设置Mask模式为Normal模式。该模式为系统默认模式，支持开发者配置迭代次数。本接口推荐配合API中isSetMask模板参数使用，当isSetMask为false时，支持用户调用本接口手动管理Normal模式，并通过[SetVectorMask](SetVectorMask.md)设置Normal模式下的掩码。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "SetMaskNorm__z"
+  archs: ["3510", "2201", "3002", "2002", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_common.h"]
+```
 
 ```cpp
 __aicore__ inline void SetMaskNorm()

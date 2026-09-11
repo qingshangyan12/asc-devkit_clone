@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetCommEngine
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Tiling/SetCommEngine.md
+description: 设置通信任务使用的通信引擎。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetCommEngine
 
 ## 功能说明

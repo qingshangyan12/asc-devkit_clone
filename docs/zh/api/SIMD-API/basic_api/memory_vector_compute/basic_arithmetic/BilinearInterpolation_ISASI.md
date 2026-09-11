@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: BilinearInterpolation\(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/BilinearInterpolation_ISASI.md
+description: BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭代+垂直迭代的双层循环完成乘累加运算，适用于非规则数据访问+权重乘加的向量运算场景（数据Gather+Multiply+Reduce）。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # BilinearInterpolation\(ISASI\)<a name="ZH-CN_TOPIC_0000001786742102"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

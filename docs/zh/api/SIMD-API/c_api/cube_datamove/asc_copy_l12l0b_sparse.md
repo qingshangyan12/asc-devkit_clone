@@ -9,14 +9,12 @@ usage_dependencies:
 signature:
   - override_id: "asc_copy_l12l0b_sparse__PCBi8_PL1i8_PL1i8_u16_u8"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_copy_l12l0b_sparse_sync__PCBi8_PL1i8_PL1i8_u16_u8"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 examples: []
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_copy_l12l0b_sparse
@@ -60,8 +58,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_copy_l12l0b_sparse__PCBi8_PL1i8_PL1i8_u16_u8"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
   ```cpp
@@ -73,8 +70,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_l12l0b_sparse_sync__PCBi8_PL1i8_PL1i8_u16_u8"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
   ```cpp

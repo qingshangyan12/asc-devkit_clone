@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetLayout
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/aux_data_structures/TensorTrait/SetLayout.md
+description: 设置Layout对象至TensorTrait结构中。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetLayout<a name="ZH-CN_TOPIC_0000002371274189"></a>
 
 ## 产品支持情况<a name="section73648168211"></a>

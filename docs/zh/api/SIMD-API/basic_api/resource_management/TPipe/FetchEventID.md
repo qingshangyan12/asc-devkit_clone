@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: FetchEventID
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/TPipe/FetchEventID.md
+description: 根据HardEvent（硬件类型的同步事件）获取相应可用的TEventID，此接口不会申请TEventID，仅提供可用的TEventID。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # FetchEventID<a name="ZH-CN_TOPIC_0000001791531573"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

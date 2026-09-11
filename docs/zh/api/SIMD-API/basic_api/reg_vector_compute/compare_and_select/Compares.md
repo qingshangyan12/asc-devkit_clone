@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Compares
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/compare_and_select/Compares.md
+description: 该接口用于逐元素比较源操作数中每个元素与一个标量的大小关系，根据模板参数指定的比较模式（LT/GT/GE/EQ/NE/LE）判断结果是否为真，若为真则输出`MaskReg`对应比特位置1，否则置0。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Compares<a name="ZH-CN_TOPIC_0000001956986933"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

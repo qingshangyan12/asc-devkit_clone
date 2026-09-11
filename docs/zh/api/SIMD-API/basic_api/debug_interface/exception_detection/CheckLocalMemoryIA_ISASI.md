@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: CheckLocalMemoryIA\(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/debug_interface/exception_detection/CheckLocalMemoryIA_ISASI.md
+description: check设定范围内的Unified Buffer（UB）读写行为，如果有设定范围的读写行为则会出现EXCEPTION报错，无设定范围的读写行为则不会报错。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # CheckLocalMemoryIA\(ISASI\)<a name="ZH-CN_TOPIC_0000001834740621"></a>
 
 ## 产品支持情况

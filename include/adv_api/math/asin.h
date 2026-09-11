@@ -58,6 +58,16 @@ namespace AscendC {
  * Input data valid range should be [-1, 1]
  */
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.math_compute.asin_interface
+ * @override_id Asin__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 按元素做反正弦函数计算。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcTensor 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] sharedTmpBuffer 临时缓存。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。用于Asin内部复杂计算时存储中间变量，由开发者提供。临时空间大小BufferSize的获取方式请参考[GetAsinMaxMinTmpSize](GetAsinMaxMinTmpSize.md)。
+ * @param [in] calCount 参与计算的元素个数。
+ */
 __aicore__ inline void Asin(
     const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
     const uint32_t calCount)
@@ -79,6 +89,14 @@ __aicore__ inline void Asin(
  * Input data valid range should be [-1, 1]
  */
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.math_compute.asin_interface
+ * @override_id Asin__RCltg1x2_pT_RCltg1x2_pT
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 按元素做反正弦函数计算。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcTensor 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ */
 __aicore__ inline void Asin(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
 {
     Asin<T, isReuseSource>(dstTensor, srcTensor, srcTensor.GetSize());
@@ -96,6 +114,15 @@ __aicore__ inline void Asin(const LocalTensor<T>& dstTensor, const LocalTensor<T
  * Input data valid range should be [-1, 1]
  */
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.math_compute.asin_interface
+ * @override_id Asin__RCltg1x2_pT_RCltg1x2_pT_u32
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 按元素做反正弦函数计算。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcTensor 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] calCount 参与计算的元素个数。
+ */
 __aicore__ inline void Asin(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
 {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
@@ -120,6 +147,15 @@ __aicore__ inline void Asin(const LocalTensor<T>& dstTensor, const LocalTensor<T
  * Input data valid range should be [-1, 1]
  */
 template <typename T, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.math_compute.asin_interface
+ * @override_id Asin__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8
+ * @archs 3510 2201 2002 x90 9030
+ * @brief 按元素做反正弦函数计算。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcTensor 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。
+ * @param [in] sharedTmpBuffer 临时缓存。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。用于Asin内部复杂计算时存储中间变量，由开发者提供。临时空间大小BufferSize的获取方式请参考[GetAsinMaxMinTmpSize](GetAsinMaxMinTmpSize.md)。
+ */
 __aicore__ inline void Asin(
     const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
 {

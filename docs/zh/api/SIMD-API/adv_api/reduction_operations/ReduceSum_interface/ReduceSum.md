@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: ReduceSum
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/reduction_operations/ReduceSum_interface/ReduceSum.md
+description: 对一个多维向量按照指定的维度进行数据累加。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ReduceSum
 
 ## 产品支持情况

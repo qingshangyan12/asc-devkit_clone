@@ -9,12 +9,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_copy_ub2gm_align__PG<dtype>_PU<dtype>_u32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - prototype_id: "asc_copy_ub2gm_align__PG<dtype>_PU<dtype>_u32_u32_storel2_u64_u32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
 examples:
   - path: "/examples/02_simd_c_api/02_features/01_reg_vector_compute/00_add_double_buffer"
     archs: ["3510"]
@@ -86,8 +84,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_copy_ub2gm_align__PG<dtype>_PU<dtype>_u32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
   dtype:
     values:
       - "int8_t"
@@ -129,8 +126,7 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__ bfloat16_t* dst,
 api_signature:
   prototype_id: "asc_copy_ub2gm_align__PG<dtype>_PU<dtype>_u32_u32_storel2_u64_u32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
   dtype:
     values:
       - "int8_t"

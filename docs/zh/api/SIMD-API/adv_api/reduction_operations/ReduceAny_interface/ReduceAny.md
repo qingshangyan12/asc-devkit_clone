@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: ReduceAny
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/reduction_operations/ReduceAny_interface/ReduceAny.md
+description: 对一个多维向量在指定的维度求逻辑或。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ReduceAny
 
 ## 产品支持情况

@@ -9,10 +9,9 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_atomic_cas__PG<dtype>_<dtype>_<dtype>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/atomic/scalar_atomic.h"
+    headers: ["/include/c_api/atomic/scalar_atomic.h"]
 examples: []
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_atomic_cas
@@ -59,8 +58,7 @@ $$
 api_signature:
   prototype_id: "asc_atomic_cas__PG<dtype>_<dtype>_<dtype>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/atomic/scalar_atomic.h"
+  headers: ["/include/c_api/atomic/scalar_atomic.h"]
   dtype:
     values:
       - "int32_t"

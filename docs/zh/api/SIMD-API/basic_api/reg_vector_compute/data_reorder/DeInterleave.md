@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: DeInterleave
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/data_reorder/DeInterleave.md
+description: 给定源操作数寄存器srcReg0和srcReg1，将srcReg0和srcReg1中的元素解交织存入结果操作数dstReg0和dstReg1中。
+tag: [basic_api, 'operations:deinterleave']
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: DeInterleave__RpU_RpU_RpU_RpU
+  archs: ['3510']
+  headers: [/include/basic_api/reg_compute/kernel_reg_compute_vec_data_reorder_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DeInterleave<a name="ZH-CN_TOPIC_0000001929091478"></a>
 
 ## 产品支持情况
@@ -34,6 +50,13 @@
 ![](../../../../figures/reg_regdeinterleave.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "DeInterleave__RpU_RpU_RpU_RpU"
+  archs: ["3510"]
+  headers: ["/include/basic_api/reg_compute/kernel_reg_compute_vec_data_reorder_intf.h"]
+```
 
 ```cpp
 template <typename T = DefaultType, typename U>

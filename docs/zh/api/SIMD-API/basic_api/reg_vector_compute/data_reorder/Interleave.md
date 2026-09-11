@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Interleave
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/data_reorder/Interleave.md
+description: 给定源操作数寄存器srcReg0和srcReg1，将srcReg0和srcReg1中的元素交织存入结果操作数dstReg0和dstReg1中。
+tag: [basic_api, 'operations:interleave']
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Interleave__RpU_RpU_RpU_RpU
+  archs: ['3510']
+  headers: [/include/basic_api/reg_compute/kernel_reg_compute_vec_data_reorder_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Interleave<a name="ZH-CN_TOPIC_0000001956130785"></a>
 
 ## 产品支持情况
@@ -34,6 +50,13 @@
 ![](../../../../figures/reg_reginterleave.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "Interleave__RpU_RpU_RpU_RpU"
+  archs: ["3510"]
+  headers: ["/include/basic_api/reg_compute/kernel_reg_compute_vec_data_reorder_intf.h"]
+```
 
 ```cpp
 template <typename T = DefaultType, typename U>

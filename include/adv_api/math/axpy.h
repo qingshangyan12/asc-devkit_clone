@@ -52,6 +52,17 @@ namespace AscendC {
  * \param [in] calCount: input total calCount
  */
 template <typename T, typename U, bool isReuseSource = false>
+/**
+ * @ingroup simd_api.adv_api.math_compute.axpy_interface
+ * @override_id Axpy__RCltg1x2_pT_RCltg1x2_pU_pU_RCltg1x2_u8_u32
+ * @archs 3510 2201 2002
+ * @brief 源操作数\(srcTensor\)中每个元素与标量求积后和目的操作数\(dstTensor\)中的对应元素相加。
+ * @param [out] dstTensor 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] srcTensor 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] scalarValue scalar标量。支持的数据类型为：half、float。scalar操作数的类型需要和srcTensor保持一致。
+ * @param [in] sharedTmpBuffer 临时缓存。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间需要开发者通过sharedTmpBuffer入参传入。临时空间大小BufferSize的获取方式请参考[GetAxpyMaxMinTmpSize](GetAxpyMaxMinTmpSize.md)。
+ * @param [in] calCount 参与计算的元素个数。
+ */
 __aicore__ inline void Axpy(
     const LocalTensor<T>& dstTensor, const LocalTensor<U>& srcTensor, const U scalarValue,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)

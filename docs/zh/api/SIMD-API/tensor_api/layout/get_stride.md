@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: get_stride
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/layout/get_stride.md
+description: get_stride用于从layout中提取stride部分：。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: get_stride__RCpLayout
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/layout_interface.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # get_stride
 
 ## 产品支持情况
@@ -34,6 +50,13 @@ get_stride用于从layout中提取stride部分：
 - **指定模板参数Is...**：从stride顶层tuple中选择对应索引的元素。指定单个索引时返回该元素；指定多个索引时返回由这些顶层元素组成的新tuple。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "get_stride__RCpLayout"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/layout_interface.h"]
+```
 
 ```cpp
 template <size_t... Is, typename Layout>

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: 运算符重载
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/aux_data_structures/Layout/operator_overloading.md
+description: 重载运算符\(\)，内部实现为调用[Crd2Idx](../Coordinate/Crd2Idx.md)接口，将多维坐标（Coordinate）通过布局（Layout）转换为内存位置索引（Index）。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # 运算符重载<a name="ZH-CN_TOPIC_0000002405828945"></a>
 
 ## 产品支持情况<a name="section73648168211"></a>

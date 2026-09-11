@@ -9,20 +9,16 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_duplicate_scalar__<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
   - prototype_id: "asc_duplicate_scalar__Rv<dtype>_<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
   - prototype_id: "asc_duplicate_scalar__<dtype>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
   - prototype_id: "asc_duplicate_scalar__Rv<dtype>_<dtype>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/duplicate"
     archs: ["3510"]
@@ -76,8 +72,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_duplicate_scalar__<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
   dtype:
     values:
       - "int8_t"
@@ -104,8 +99,7 @@ __simd_callee__ inline vector_<dtype> asc_duplicate_scalar(<dtype> value,
 api_signature:
   prototype_id: "asc_duplicate_scalar__Rv<dtype>_<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
   dtype:
     values:
       - "int8_t"
@@ -151,8 +145,7 @@ __simd_callee__ inline void asc_duplicate_scalar(vector_int8_t& dst,
 api_signature:
   prototype_id: "asc_duplicate_scalar__<dtype>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
   dtype:
     values:
       - "int8_t"
@@ -178,8 +171,7 @@ __simd_callee__ inline vector_<dtype> asc_duplicate_scalar(<dtype> value)
 api_signature:
   prototype_id: "asc_duplicate_scalar__Rv<dtype>_<dtype>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
   dtype:
     values:
       - "int8_t"

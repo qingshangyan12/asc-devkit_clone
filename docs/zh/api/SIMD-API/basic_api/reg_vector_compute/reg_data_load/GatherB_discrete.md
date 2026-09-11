@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: 离散搬入（GatherB）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/GatherB_discrete.md
+description: 该指令会根据索引值index将源操作数按DataBlock（32B）收集到目的操作数dstReg中。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # 离散搬入（GatherB）<a name="ZH-CN_TOPIC_0000001955999929"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Async
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/tool_interface/execution_mode/Async.md
+description: 基于[分离模式](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md)（AIC和AIV分离）开发融合算子时，算子逻辑中通常同时包含AIV和AIC的处理逻辑。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Async__QpArgs
+  archs: ['3510', '2201']
+  headers: [/include/basic_api/kernel_operator_utils_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Async
 
 ## 产品支持情况
@@ -43,6 +59,13 @@ if ASCEND_IS_AIC {
 Async通过模板函数的方式对这种隔离模式进行了封装，提供了一个统一的接口，用于在不同执行单元（AIC或AIV）下执行特定函数，从而避免在代码中使用硬件条件分支。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "Async__QpArgs"
+  archs: ["3510", "2201"]
+  headers: ["/include/basic_api/kernel_operator_utils_intf.h"]
+```
 
 ```cpp
 template <EngineType engine, auto funPtr, class... Args>

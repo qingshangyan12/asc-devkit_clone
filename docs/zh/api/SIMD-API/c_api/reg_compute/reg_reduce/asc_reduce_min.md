@@ -9,12 +9,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_reduce_min__v<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_reduce.h"
+    headers: [/include/c_api/reg_compute/compute/reg_reduce.h]
   - prototype_id: "asc_reduce_min__Rv<dtype>_v<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_reduce.h"
+    headers: [/include/c_api/reg_compute/compute/reg_reduce.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -64,8 +62,7 @@ $$
 api_signature:
   prototype_id: "asc_reduce_min__v<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_reduce.h"
+  headers: [/include/c_api/reg_compute/compute/reg_reduce.h]
   dtype:
     values:
       - "int16_t"
@@ -86,8 +83,7 @@ __simd_callee__ inline vector_<dtype> asc_reduce_min(vector_<dtype> src,
 api_signature:
   prototype_id: "asc_reduce_min__Rv<dtype>_v<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_reduce.h"
+  headers: [/include/c_api/reg_compute/compute/reg_reduce.h]
   dtype:
     values:
       - "int16_t"

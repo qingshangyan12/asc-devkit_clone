@@ -1,3 +1,21 @@
+---
+okftype: reference.api.cpp
+title: CrossCoreWaitFlag\(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreWaitFlag_ISASI.md
+description: 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，具体功能请参考[CrossCoreSetFlag功能说明](CrossCoreSetFlag_ISASI.md#section618mcpsimp)。
+tag: [basic_api]
+usage_dependencies:
+  status: confirmed
+  companion:
+  - CrossCoreSetFlag_ISASI.md
+signature:
+- override_id: CrossCoreWaitFlag__u16
+  archs: ['3510', '2201']
+  headers: [/include/basic_api/kernel_operator_block_sync_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # CrossCoreWaitFlag\(ISASI\)<a id="ZH-CN_TOPIC_0000001787470374"></a>
 
 ## 产品支持情况<a id="section1550532418810"></a>
@@ -32,6 +50,13 @@
 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，具体功能请参考[CrossCoreSetFlag功能说明](CrossCoreSetFlag_ISASI.md#section618mcpsimp)。
 
 ## 函数原型<a id="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "CrossCoreWaitFlag__u16"
+  archs: ["3510", "2201"]
+  headers: ["/include/basic_api/kernel_operator_block_sync_intf.h"]
+```
 
 ```cpp
 template <uint8_t modeId = 0, pipe_t pipe = PIPE_S>

@@ -10,12 +10,10 @@ usage_dependencies:
 signature:
   - override_id: "asc_mmad_sparse__PCCi32_PCAi8_PCBi8_u16_u16_u16_u8_b_b"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_compute/cube_compute.h"
+    headers: [/include/c_api/cube_compute/cube_compute.h]
   - override_id: "asc_mmad_sparse_sync__PCCi32_PCAi8_PCBi8_u16_u16_u16_u8_b_b"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/cube_compute_composite.h"
+    headers: [/include/c_api/composite/cube_compute_composite.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -62,8 +60,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_mmad_sparse__PCCi32_PCAi8_PCBi8_u16_u16_u16_u8_b_b"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_compute/cube_compute.h"
+  headers: [/include/c_api/cube_compute/cube_compute.h]
 ```
 
 ```c
@@ -82,8 +79,7 @@ __aicore__ inline void asc_mmad_sparse(__cc__ int32_t* c,
 api_signature:
   override_id: "asc_mmad_sparse_sync__PCCi32_PCAi8_PCBi8_u16_u16_u16_u8_b_b"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/cube_compute_composite.h"
+  headers: [/include/c_api/composite/cube_compute_composite.h]
 ```
 
 ```c

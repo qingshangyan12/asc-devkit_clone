@@ -35,6 +35,12 @@
 namespace AscendC {
 
 template <int count = 1>
+/**
+ * @ingroup simd_api.basic_api.scalar_compute
+ * @override_id Nop__z
+ * @archs 3510
+ * @brief 用户输入延迟的个数，实现延迟若干个cycle。
+ */
 __aicore__ inline void Nop()
 {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
@@ -53,6 +59,12 @@ __aicore__ inline void Nop()
 enum class EngineType : int32_t { AIC = 1, AIV = 2 };
 
 template <EngineType engine, auto funPtr, class... Args>
+/**
+ * @ingroup simd_api.basic_api.tool_interface.execution_mode
+ * @override_id Async__QpArgs
+ * @archs 3510 2201
+ * @brief 基于[分离模式](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md)（AIC和AIV分离）开发融合算子时，算子逻辑中通常同时包含AIV和AIC的处理逻辑。
+ */
 __aicore__ void Async(Args... args)
 {
     if constexpr (engine == EngineType::AIV) {

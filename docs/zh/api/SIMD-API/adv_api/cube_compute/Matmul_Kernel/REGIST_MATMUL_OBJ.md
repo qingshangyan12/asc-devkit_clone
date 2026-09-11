@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: REGIST\_MATMUL\_OBJ
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/REGIST_MATMUL_OBJ.md
+description: 初始化Matmul对象。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # REGIST\_MATMUL\_OBJ
 
 ## 功能说明

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GetDigammaTmpBufferFactorSize
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/Digamma_interface/GetDigammaTmpBufferFactorSize.md
+description: kernel侧Digamma接口的计算需要开发者预留/申请临时空间。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetDigammaTmpBufferFactorSize
 
 ## 功能说明

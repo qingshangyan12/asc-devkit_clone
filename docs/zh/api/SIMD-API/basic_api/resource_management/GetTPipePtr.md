@@ -1,3 +1,23 @@
+---
+okftype: reference.api.cpp
+title: GetTPipePtr
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/GetTPipePtr.md
+description: 创建[TPipe](TPipe/TPipe.md)对象时，对象初始化会设置全局唯一的TPipe指针。本接口用于获取该指针，获取该指针后，可进行[TPipe](TPipe/TPipe.md)相关的操作。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetTPipePtr__z
+  archs: ['3510', '2201', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_common.h]
+examples:
+- path: /examples/01_simd_cpp_api/03_basic_api/07_tpipe_tque/get_tpipe_ptr
+  archs: ['2201', '3510']
+  override_id: GetTPipePtr__z
+  file: get_tpipe_ptr.asc
+timestamp: '2026-09-11'
+---
+
 # GetTPipePtr<a name="ZH-CN_TOPIC_0000001808018758"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -38,6 +58,13 @@
 创建[TPipe](TPipe/TPipe.md)对象时，对象初始化会设置全局唯一的TPipe指针。本接口用于获取该指针，获取该指针后，可进行[TPipe](TPipe/TPipe.md)相关的操作。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "GetTPipePtr__z"
+  archs: ["3510", "2201", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_common.h"]
+```
 
 ```cpp
 __aicore__ inline AscendC::TPipe* GetTPipePtr()

@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: get
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/layout/get.md
+description: get提供两类能力：。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: get__OpTuple
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/layout_interface.h]
+- override_id: get__RCpLayout
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/layout_interface.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # get
 
 ## 产品支持情况
@@ -35,9 +54,26 @@ get提供两类能力：
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "get__OpTuple"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/layout_interface.h"]
+```
+
 ```cpp
 template <size_t I, size_t... Is, typename Tuple>
 __aicore__ inline constexpr auto get(Tuple&& t)
+```
+
+```yaml
+api_signature:
+  override_id: "get__RCpLayout"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/layout_interface.h"]
+```
+
+```cpp
 
 template <size_t... Is, typename Layout>
 __aicore__ inline constexpr auto get(const Layout& layout)

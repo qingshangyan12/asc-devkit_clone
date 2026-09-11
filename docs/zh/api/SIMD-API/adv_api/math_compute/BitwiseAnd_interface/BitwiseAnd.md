@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: BitwiseAnd
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/BitwiseAnd_interface/BitwiseAnd.md
+description: 逐比特对两个输入进行与操作。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: BitwiseAnd__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510']
+  headers: [/include/adv_api/math/bitwise_and.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # BitwiseAnd
 
 ## 产品支持情况
@@ -30,6 +46,13 @@
 ![](../../../../figures/zh-cn_formulaimage_0000002386108598.png)
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "BitwiseAnd__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510"]
+  headers: ["/include/adv_api/math/bitwise_and.h"]
+```
 
 ```
 template <const BitwiseAndConfig& config = DEFAULT_BITWISE_AND_CONFIG, typename T>

@@ -9,28 +9,22 @@ usage_dependencies:
 signature:
   - override_id: "asc_get_pipe_mte2_idle_slot_count__z"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+    headers: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
   - override_id: "asc_get_pipe_mte3_idle_slot_count__z"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+    headers: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
   - override_id: "asc_get_pipe_v_idle_slot_count__z"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+    headers: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
   - override_id: "asc_get_pipe_m_idle_slot_count__z"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+    headers: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
   - override_id: "asc_get_pipe_mte1_idle_slot_count__z"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+    headers: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
   - override_id: "asc_get_pipe_fix_idle_slot_count__z"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+    headers: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -87,8 +81,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_get_pipe_mte2_idle_slot_count__z"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+  headers: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
 ```
 
   ```cpp
@@ -100,8 +93,7 @@ api_signature:
 api_signature:
   override_id: "asc_get_pipe_mte3_idle_slot_count__z"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+  headers: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
 ```
 
   ```cpp
@@ -113,8 +105,7 @@ api_signature:
 api_signature:
   override_id: "asc_get_pipe_v_idle_slot_count__z"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+  headers: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
 ```
 
   ```cpp
@@ -126,8 +117,7 @@ api_signature:
 api_signature:
   override_id: "asc_get_pipe_m_idle_slot_count__z"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+  headers: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
 ```
 
   ```cpp
@@ -139,8 +129,7 @@ api_signature:
 api_signature:
   override_id: "asc_get_pipe_mte1_idle_slot_count__z"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+  headers: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
 ```
 
   ```cpp
@@ -152,8 +141,7 @@ api_signature:
 api_signature:
   override_id: "asc_get_pipe_fix_idle_slot_count__z"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+  headers: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
 ```
 
   ```cpp

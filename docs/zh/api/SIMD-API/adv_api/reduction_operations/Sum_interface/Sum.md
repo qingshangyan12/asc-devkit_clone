@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Sum
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/reduction_operations/Sum_interface/Sum.md
+description: 获取最后一个维度的元素总和。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Sum
 
 ## 产品支持情况

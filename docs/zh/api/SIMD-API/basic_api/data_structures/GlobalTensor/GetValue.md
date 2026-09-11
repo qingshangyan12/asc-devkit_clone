@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetValue
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/data_structures/GlobalTensor/GetValue.md
+description: 获取GlobalTensor的相应偏移位置的值。
+tag: [basic_api]
+usage_dependencies:
+  status: confirmed
+  required_before:
+    all_of:
+    - ../../cache_control/DataCacheCleanAndInvalid.md
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetValue<a name="ZH-CN_TOPIC_0000002132084956"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

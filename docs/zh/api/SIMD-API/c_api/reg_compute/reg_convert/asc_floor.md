@@ -10,12 +10,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_floor__v<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - prototype_id: "asc_floor__Rv<dtype>_v<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/truncate"
     archs: ["3510"]
@@ -64,8 +62,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_floor__v<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
   dtype:
     values:
       - "half"
@@ -83,8 +80,7 @@ __simd_callee__ inline vector_<dtype> asc_floor(vector_<dtype> src,
 api_signature:
   prototype_id: "asc_floor__Rv<dtype>_v<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
   dtype:
     values:
       - "half"

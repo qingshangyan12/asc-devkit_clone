@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: layout::Get（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/deprecated_interface/layout_get_deprecated.md
+description: '**该接口已废弃，请使用[layout::get](../layout/layout.md#get)替代。'
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Get__z
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/layout_type.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # layout::Get（废弃）
 
 ## 产品支持情况
@@ -34,9 +50,26 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "Get__z"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/layout_type.h"]
+```
+
 ```cpp
 template <size_t... I>
 __aicore__ inline constexpr decltype(auto) Get();
+```
+
+```yaml
+api_signature:
+  override_id: "Get__z"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/layout_type.h"]
+```
+
+```cpp
 
 template <size_t... I>
 __aicore__ inline constexpr decltype(auto) Get() const;

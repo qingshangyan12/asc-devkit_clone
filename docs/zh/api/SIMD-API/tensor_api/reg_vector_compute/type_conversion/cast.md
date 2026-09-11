@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: cast
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/reg_vector_compute/type_conversion/cast.md
+description: 命名空间：`asc::te::experimental`。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: cast__regtensorg1x8_pSrcType
+  archs: ['3510']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # cast
 
 ## 产品支持情况
@@ -39,6 +55,13 @@
 接口使用`src.mask`筛选源操作数中的有效元素，底层转换采用zeroing模式，mask未选中的目的元素置0。返回值保存转换结果，并原样传递`src.mask`，便于后续计算或`local_tensor::store`写回。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "cast__regtensorg1x8_pSrcType"
+  archs: ["3510"]
+  headers: []
+```
 
 ```cpp
 template <typename DstType,

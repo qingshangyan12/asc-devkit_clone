@@ -1,3 +1,23 @@
+---
+okftype: reference.api.cpp
+title: AtomicAdd
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/atomic_operations/AtomicAdd.md
+description: 该接口用于在指定GM地址上进行原子加操作，将**address**指向的GM地址上的旧值（**old_value**）与输入标量值（**value**）求和，将和结果（**new_value**）写回GM地址，返回该地址修改前的值（**old_value**）。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: AtomicAdd__PGpT_pT
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_atomic_intf.h]
+examples:
+- path: /examples/01_simd_cpp_api/03_basic_api/06_atomic/scalar_atomic_operations
+  archs: ['3510', '2201']
+  override_id: AtomicAdd__PGpT_pT
+  file: scalar_atomic_operations.asc
+timestamp: '2026-09-11'
+---
+
 # AtomicAdd<a name="ZH-CN_TOPIC_0000002598784427"></a>
 
 ## 产品支持情况
@@ -38,6 +58,13 @@ new\_value = Add(old\_value, value)
 $$
 
 ## 函数原型<a name="section1171112415119"></a>
+
+```yaml
+api_signature:
+  override_id: "AtomicAdd__PGpT_pT"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_atomic_intf.h"]
+```
 
 ```cpp
 template <typename T>

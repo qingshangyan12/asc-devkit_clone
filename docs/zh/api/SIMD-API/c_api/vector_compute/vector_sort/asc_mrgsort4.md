@@ -9,20 +9,16 @@ usage_dependencies:
 signature:
   - override_id: "asc_mrgsort4__PUf16_AmrgPUf16_u8_u16_u16_u16_u16_b_u8"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_sort.h"
+    headers: [/include/c_api/vector_compute/compute/vector_sort.h]
   - override_id: "asc_mrgsort4__PUf32_AmrgPUf32_u8_u16_u16_u16_u16_b_u8"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_sort.h"
+    headers: [/include/c_api/vector_compute/compute/vector_sort.h]
   - override_id: "asc_mrgsort4_sync__PUf16_AmrgPUf16_u8_u16_u16_u16_u16_b_u8"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_mrgsort4_sync__PUf32_AmrgPUf32_u8_u16_u16_u16_u16_b_u8"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -76,8 +72,7 @@ asc_mrgsort4处理的数据一般是经过asc_bitsort指令处理后的数据，
 api_signature:
   override_id: "asc_mrgsort4__PUf16_AmrgPUf16_u8_u16_u16_u16_u16_b_u8"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_sort.h"
+  headers: [/include/c_api/vector_compute/compute/vector_sort.h]
 ```
 
     ```cpp
@@ -88,8 +83,7 @@ api_signature:
 api_signature:
   override_id: "asc_mrgsort4__PUf32_AmrgPUf32_u8_u16_u16_u16_u16_b_u8"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_sort.h"
+  headers: [/include/c_api/vector_compute/compute/vector_sort.h]
 ```
 
     ```cpp
@@ -102,8 +96,7 @@ api_signature:
 api_signature:
   override_id: "asc_mrgsort4_sync__PUf16_AmrgPUf16_u8_u16_u16_u16_u16_b_u8"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -114,8 +107,7 @@ api_signature:
 api_signature:
   override_id: "asc_mrgsort4_sync__PUf32_AmrgPUf32_u8_u16_u16_u16_u16_b_u8"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp

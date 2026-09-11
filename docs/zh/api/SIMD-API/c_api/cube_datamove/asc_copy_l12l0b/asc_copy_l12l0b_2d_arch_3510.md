@@ -9,22 +9,18 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_copy_l12l0b__PCB<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - prototype_id: "asc_copy_l12l0b_sync__PCB<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - prototype_id: "asc_copy_l12l0b_transpose__PCB<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - prototype_id: "asc_copy_l12l0b_transpose_sync__PCB<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 examples: []
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_copy_l12l0b_arch_3510（2D矩阵搬运）
@@ -76,8 +72,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_copy_l12l0b__PCB<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   dtype:
     values:
       - "int4b_t"
@@ -112,8 +107,7 @@ __aicore__ inline void asc_copy_l12l0b(__cb__ <dtype>* dst,
 api_signature:
   prototype_id: "asc_copy_l12l0b_sync__PCB<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   dtype:
     values:
       - "int4b_t"
@@ -168,8 +162,7 @@ __aicore__ inline void asc_copy_l12l0b(__cb__ half* dst,
 api_signature:
   prototype_id: "asc_copy_l12l0b_transpose__PCB<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   dtype:
     values:
       - "int4b_t"
@@ -204,8 +197,7 @@ __aicore__ inline void asc_copy_l12l0b_transpose(__cb__ <dtype>* dst,
 api_signature:
   prototype_id: "asc_copy_l12l0b_transpose_sync__PCB<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   dtype:
     values:
       - "int4b_t"

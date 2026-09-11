@@ -9,24 +9,19 @@ usage_dependencies:
 signature:
   - override_id: "asc_set_ndim_loop0_stride__u64_u64"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_set_ndim_loop1_stride__u64_u64"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_set_ndim_loop2_stride__u64_u64"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_set_ndim_loop3_stride__u64_u64"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_set_ndim_loop4_stride__u64_u64"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -77,8 +72,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_set_ndim_loop0_stride__u64_u64"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```c
@@ -90,8 +84,7 @@ __aicore__ inline void asc_set_ndim_loop0_stride(uint64_t dst_stride,
 api_signature:
   override_id: "asc_set_ndim_loop1_stride__u64_u64"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```c
@@ -103,8 +96,7 @@ __aicore__ inline void asc_set_ndim_loop1_stride(uint64_t dst_stride,
 api_signature:
   override_id: "asc_set_ndim_loop2_stride__u64_u64"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```c
@@ -116,8 +108,7 @@ __aicore__ inline void asc_set_ndim_loop2_stride(uint64_t dst_stride,
 api_signature:
   override_id: "asc_set_ndim_loop3_stride__u64_u64"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```c
@@ -129,8 +120,7 @@ __aicore__ inline void asc_set_ndim_loop3_stride(uint64_t dst_stride,
 api_signature:
   override_id: "asc_set_ndim_loop4_stride__u64_u64"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
 ```c

@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: DataCopy（UBToL1随路转换-ND2NZ搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_UBToL1_ND2NZ.md
+description: 支持在数据搬运时进行ND到NZ格式的转换。数据从Unified Buffer（UB，TPosition为VECIN/VECCALC/VECOUT）搬运至L1
+  Buffer，搬运过程中完成ND->NZ格式转换。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DataCopy（UBToL1随路转换-ND2NZ搬运）<a id="ZH-CN_TOPIC_0000002349187356"></a>
 
 ## 产品支持情况<a id="section1550532418810"></a>

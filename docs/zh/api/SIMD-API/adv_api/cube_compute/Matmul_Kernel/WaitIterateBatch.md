@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: WaitIterateBatch
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/WaitIterateBatch.md
+description: 等待[IterateBatch](IterateBatch.md)异步接口或[IterateNBatch](IterateNBatch.md)异步接口返回，支持连续输出到Global
+  Memory。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: WaitIterateBatch__z
+  archs: ['3510', '2201']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # WaitIterateBatch
 
 ## 产品支持情况
@@ -28,6 +45,13 @@
 等待[IterateBatch](IterateBatch.md)异步接口或[IterateNBatch](IterateNBatch.md)异步接口返回，支持连续输出到Global Memory。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "WaitIterateBatch__z"
+  archs: ["3510", "2201"]
+  headers: []
+```
 
 ```
 __aicore__ inline void WaitIterateBatch()

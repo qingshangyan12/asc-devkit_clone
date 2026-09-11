@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: ReduceMin
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/reduction_operations/ReduceMin_interface/ReduceMin.md
+description: 对一个多维向量在指定的维度求最小值。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ReduceMin
 
 ## 产品支持情况

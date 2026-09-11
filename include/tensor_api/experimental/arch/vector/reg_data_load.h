@@ -34,6 +34,14 @@ namespace experimental {
  * @return A register pair for deintlv mode; otherwise, a register tensor.
  */
 template <load_sideband_mode sideband_mode = load_sideband_mode::direct, typename Tensor, typename Coord>
+/**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_data_load
+ * @override_id load__RCpTensor_RCpCoord
+ * @archs 3510
+ * @brief `load`用于将Unified Buffer（UB）中的数据搬入[reg_tensor](../reg_tensor/reg_tensor.md)。接口通过`load_sideband_mode`配置正常搬入、上采样、下采样、解压缩或解交织等数据排列方式。`deintlv`模式返回`reg_pair`，其他模式返回`reg_tensor`。
+ * @param [in] tensor 源Tensor，必须位于UB。
+ * @param [in] coord 搬入起始元素在`tensor`逻辑布局中的坐标。
+ */
 __simd_callee__ inline decltype(auto) load(const Tensor& tensor, const Coord& coord);
 
 /**
@@ -42,6 +50,13 @@ __simd_callee__ inline decltype(auto) load(const Tensor& tensor, const Coord& co
  * @return A register pair for deintlv mode; otherwise, a register tensor.
  */
 template <load_sideband_mode sideband_mode = load_sideband_mode::direct, typename Tensor>
+/**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_data_load
+ * @override_id load__RCpTensor
+ * @archs 3510
+ * @brief `load`用于将Unified Buffer（UB）中的数据搬入[reg_tensor](../reg_tensor/reg_tensor.md)。接口通过`load_sideband_mode`配置正常搬入、上采样、下采样、解压缩或解交织等数据排列方式。`deintlv`模式返回`reg_pair`，其他模式返回`reg_tensor`。
+ * @param [in] tensor 源Tensor，必须位于UB。
+ */
 __simd_callee__ inline decltype(auto) load(const Tensor& tensor);
 
 /**
@@ -51,6 +66,14 @@ __simd_callee__ inline decltype(auto) load(const Tensor& tensor);
  * @return A register tensor populated according to the selected broadcast mode.
  */
 template <broadcast_mode brc_mode = broadcast_mode::elem, typename Tensor, typename Coord>
+/**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_data_load
+ * @override_id load_broadcast__RCpTensor_RCpCoord
+ * @archs 3510
+ * @brief `load_broadcast`用于从Unified Buffer（UB）Tensor中搬入数据，并按照`broadcast_mode`指定的方式广播到一个[reg_tensor](../reg_tensor/reg_tensor.md)。
+ * @param [in] tensor 源Tensor，必须位于UB。
+ * @param [in] coord 搬入起始元素在`tensor`逻辑布局中的坐标。
+ */
 __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor, const Coord& coord);
 
 /**
@@ -59,6 +82,13 @@ __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor, const
  * @return A register tensor populated according to the selected broadcast mode.
  */
 template <broadcast_mode brc_mode = broadcast_mode::elem, typename Tensor>
+/**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_data_load
+ * @override_id load_broadcast__RCpTensor
+ * @archs 3510
+ * @brief `load_broadcast`用于从Unified Buffer（UB）Tensor中搬入数据，并按照`broadcast_mode`指定的方式广播到一个[reg_tensor](../reg_tensor/reg_tensor.md)。
+ * @param [in] tensor 源Tensor，必须位于UB。
+ */
 __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor);
 
 } // namespace experimental

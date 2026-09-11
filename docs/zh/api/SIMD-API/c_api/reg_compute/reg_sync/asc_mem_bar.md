@@ -9,8 +9,7 @@ usage_dependencies:
 signature:
   - override_id: "asc_mem_bar__mem"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_sync.h"
+    headers: [/include/c_api/reg_compute/reg_sync.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -58,8 +57,7 @@ Reg矢量计算内不同流水线之间的同步指令。该同步指令指定�
 api_signature:
   override_id: "asc_mem_bar__mem"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_sync.h"
+  headers: [/include/c_api/reg_compute/reg_sync.h]
 ```
 
 ```cpp

@@ -10,24 +10,19 @@ usage_dependencies:
 signature:
   - override_id: "asc_int322float_rd__Rvf32_vi32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_int322float_rn__Rvf32_vi32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_int322float_rna__Rvf32_vi32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_int322float_ru__Rvf32_vi32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_int322float_rz__Rvf32_vi32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -81,8 +76,7 @@ def asc_int322float_rn(dst, src, mask):
 api_signature:
   override_id: "asc_int322float_rd__Rvf32_vi32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -96,8 +90,7 @@ __simd_callee__ inline void asc_int322float_rd(vector_float& dst,
 api_signature:
   override_id: "asc_int322float_rn__Rvf32_vi32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -111,8 +104,7 @@ __simd_callee__ inline void asc_int322float_rn(vector_float& dst,
 api_signature:
   override_id: "asc_int322float_rna__Rvf32_vi32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -126,8 +118,7 @@ __simd_callee__ inline void asc_int322float_rna(vector_float& dst,
 api_signature:
   override_id: "asc_int322float_ru__Rvf32_vi32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -141,8 +132,7 @@ __simd_callee__ inline void asc_int322float_ru(vector_float& dst,
 api_signature:
   override_id: "asc_int322float_rz__Rvf32_vi32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -160,8 +150,7 @@ __simd_callee__ inline void asc_int322float_rz(vector_float& dst,
 api_signature:
   override_id: "asc_int322float_rn__Rvf32_vi32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c

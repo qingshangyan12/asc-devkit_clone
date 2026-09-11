@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: InitBufPool
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/TPipe/InitBufPool.md
+description: 初始化TBufPool内存资源池。本接口适用于内存资源有限时，希望手动指定Unified Buffer（UB）/L1内存资源复用的场景。本接口初始化后在整体内存资源中划分出一块子资源池。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: InitBufPool__RpT_u32
+  archs: ['3510', '2201', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_tpipe.h]
+- override_id: InitBufPool__RpT_u32_RpU
+  archs: ['3510', '2201', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_tpipe.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # InitBufPool<a name="ZH-CN_TOPIC_0000001912722601"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -45,9 +64,26 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
+```yaml
+api_signature:
+  override_id: "InitBufPool__RpT_u32"
+  archs: ["3510", "2201", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_tpipe.h"]
+```
+
 ```cpp
 template <class T>
 __aicore__ inline bool InitBufPool(T& bufPool, uint32_t len)
+```
+
+```yaml
+api_signature:
+  override_id: "InitBufPool__RpT_u32_RpU"
+  archs: ["3510", "2201", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_tpipe.h"]
+```
+
+```cpp
 template <class T, class U>
 __aicore__ inline bool InitBufPool(T& bufPool, uint32_t len, U& shareBuf)
 ```

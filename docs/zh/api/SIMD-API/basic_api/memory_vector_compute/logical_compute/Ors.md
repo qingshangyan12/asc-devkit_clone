@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Ors
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/logical_compute/Ors.md
+description: 矢量内每个元素和标量间做或操作，支持标量在前和标量在后两种场景，其中标量输入支持配置LocalTensor单点元素。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Ors<a name="ZH-CN_TOPIC_0000002132550008"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

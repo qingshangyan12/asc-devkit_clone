@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetShapeInfo
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/GetShapeInfo.md
+description: 获取LocalTensor的Shape信息。注意：Shape信息没有默认值，只有通过[SetShapeInfo](SetShapeInfo.md)设置过Shape信息后，才可以调用该接口获取正确的Shape信息。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetShapeInfo__z
+  archs: ['3510', '2201', '3002', '2002', '1001']
+  headers: [/include/basic_api/kernel_tensor.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetShapeInfo<a name="ZH-CN_TOPIC_0000002330927394"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -31,6 +47,13 @@
 获取LocalTensor的Shape信息。注意：Shape信息没有默认值，只有通过[SetShapeInfo](SetShapeInfo.md)设置过Shape信息后，才可以调用该接口获取正确的Shape信息。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "GetShapeInfo__z"
+  archs: ["3510", "2201", "3002", "2002", "1001"]
+  headers: ["/include/basic_api/kernel_tensor.h"]
+```
 
 ```cpp
 __aicore__ inline ShapeInfo GetShapeInfo() const

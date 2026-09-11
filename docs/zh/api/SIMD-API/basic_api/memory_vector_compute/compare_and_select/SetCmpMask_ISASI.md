@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetCmpMask\(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/SetCmpMask_ISASI.md
+description: 设置比较寄存器的值，配合不传入mask参数的[Select](Select.md)接口使用，根据不同的selMode传入不同的数据。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetCmpMask__RCltg1x2_pT
+  archs: ['3510', '2201', '2002']
+  headers: [/include/basic_api/kernel_operator_vec_cmpsel_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetCmpMask\(ISASI\)<a name="ZH-CN_TOPIC_0000001836926169"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -44,6 +60,13 @@
     SetCmpMask中传入LocalTensor，LocalTensor中存放的是selMask的地址。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "SetCmpMask__RCltg1x2_pT"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/basic_api/kernel_operator_vec_cmpsel_intf.h"]
+```
 
 ```cpp
 template <typename T>

@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: ResetCtrlSpr(ISASI)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/special_register_access/ResetCtrlSpr_ISASI.md
+description: 对CTRL寄存器（控制寄存器）的特定比特位做重置。由模板参数\[startBit, endBit\]指定的比特位重置为默认值，默认值参考[表
+  常用CTRL寄存器比特位说明](SetCtrlSpr_ISASI.md#tab-950)。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: ResetCtrlSpr__z
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_common_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ResetCtrlSpr(ISASI)
 
 ## 产品支持情况
@@ -34,6 +51,13 @@
 $\text{CTRL}[\,\text{startBit} : \text{endBit}\,] \leftarrow \text{defaultCtrl}[\,\text{startBit} : \text{endBit}\,]$
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "ResetCtrlSpr__z"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_common_intf.h"]
+```
 
 ```cpp
 template <int8_t startBit, int8_t endBit>

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: operator\(\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/operator_call.md
+description: 获取本LocalTensor的第offset个变量的引用。用于左值，相当于[SetValue](SetValue.md)接口，用于右值，相当于[GetValue](GetValue.md)接口。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # operator\(\)<a name="ZH-CN_TOPIC_0000002330767546"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

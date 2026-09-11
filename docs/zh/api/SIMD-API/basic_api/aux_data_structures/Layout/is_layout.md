@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: is\_layout
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/aux_data_structures/Layout/is_layout.md
+description: 判断输入的数据结构是否为Layout数据结构，可通过检查其成员常量value的值来判断。当value为true时，表示输入的数据结构是Layout类型；反之则为非Layout类型。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # is\_layout<a name="ZH-CN_TOPIC_0000002332197501"></a>
 
 ## 产品支持情况<a name="section73648168211"></a>

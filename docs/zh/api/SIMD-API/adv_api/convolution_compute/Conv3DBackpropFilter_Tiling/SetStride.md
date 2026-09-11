@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetStride
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3DBackpropFilter_Tiling/SetStride.md
+description: 设置Stride信息。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetStride
 
 ## 功能说明

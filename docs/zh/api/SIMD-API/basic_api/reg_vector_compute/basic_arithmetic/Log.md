@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Log
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/basic_arithmetic/Log.md
+description: 该接口根据mask逐元素对源操作数求自然对数（以e为底），将结果写入目的操作数。该接口与[Ln](Ln.md)接口功能等价，接口命名遵循C/C++标准库中`log()`表示自然对数的约定。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Log<a name="ZH-CN_TOPIC_0000001929827648"></a>
 
 ## 产品支持情况

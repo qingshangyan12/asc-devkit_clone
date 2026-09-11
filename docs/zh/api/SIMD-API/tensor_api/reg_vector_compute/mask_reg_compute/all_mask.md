@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: all_mask
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/reg_vector_compute/mask_reg_compute/all_mask.md
+description: 创建`reg_tensor<bool>`，其成员变量reg是与`DataType`元素类型宽度匹配的全有效的掩码寄存器，等价于`make_mask<mask_pattern::all,
+  DataType>()`。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: all_mask__z
+  archs: ['3510']
+  headers: [/include/tensor_api/experimental/arch/vector/mask_reg_compute.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # all_mask
 
 ## 产品支持情况
@@ -31,6 +48,13 @@
 创建`reg_tensor<bool>`，其成员变量reg是与`DataType`元素类型宽度匹配的全有效的掩码寄存器，等价于`make_mask<mask_pattern::all, DataType>()`。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "all_mask__z"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/experimental/arch/vector/mask_reg_compute.h"]
+```
 
 ```cpp
 template <typename DataType>

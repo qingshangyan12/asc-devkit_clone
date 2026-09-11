@@ -10,20 +10,16 @@ usage_dependencies:
 signature:
   - override_id: "asc_int322uint16__Rvu16_vi32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_int322uint16_v2__Rvu16_vi32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_int322uint16_sat__Rvu16_vi32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_int322uint16_sat_v2__Rvu16_vi32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -102,8 +98,7 @@ def asc_int322uint16_v2(dst, src, mask):
 api_signature:
   override_id: "asc_int322uint16__Rvu16_vi32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -116,8 +111,7 @@ __simd_callee__ inline void asc_int322uint16(vector_uint16_t& dst,
 api_signature:
   override_id: "asc_int322uint16_v2__Rvu16_vi32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -130,8 +124,7 @@ __simd_callee__ inline void asc_int322uint16_v2(vector_uint16_t& dst,
 api_signature:
   override_id: "asc_int322uint16_sat__Rvu16_vi32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -144,8 +137,7 @@ __simd_callee__ inline void asc_int322uint16_sat(vector_uint16_t& dst,
 api_signature:
   override_id: "asc_int322uint16_sat_v2__Rvu16_vi32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -165,8 +157,7 @@ __simd_callee__ inline void asc_int322uint16_sat_v2(vector_uint16_t& dst,
 api_signature:
   override_id: "asc_int322uint16__Rvu16_vi32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c

@@ -9,88 +9,67 @@ usage_dependencies:
 signature:
   - override_id: "asc_gather__PUi16_PUi16_PUu32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_gather.h"
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
   - override_id: "asc_gather__PUu16_PUu16_PUu32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_gather.h"
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
   - override_id: "asc_gather__PUf16_PUf16_PUu32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_gather.h"
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
   - override_id: "asc_gather__PUbf16_PUbf16_PUu32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_gather.h"
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
   - override_id: "asc_gather__PUi32_PUi32_PUu32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_gather.h"
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
   - override_id: "asc_gather__PUu32_PUu32_PUu32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_gather.h"
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
   - override_id: "asc_gather__PUf32_PUf32_PUu32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_gather.h"
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
   - override_id: "asc_gather__PUi16_PUi16_PUu32_u16_u8"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_gather.h"
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
   - override_id: "asc_gather__PUu16_PUu16_PUu32_u16_u8"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_gather.h"
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
   - override_id: "asc_gather__PUf16_PUf16_PUu32_u16_u8"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_gather.h"
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
   - override_id: "asc_gather__PUbf16_PUbf16_PUu32_u16_u8"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_gather.h"
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
   - override_id: "asc_gather__PUi32_PUi32_PUu32_u16_u8"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_gather.h"
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
   - override_id: "asc_gather__PUu32_PUu32_PUu32_u16_u8"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_gather.h"
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
   - override_id: "asc_gather__PUf32_PUf32_PUu32_u16_u8"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_gather.h"
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
   - override_id: "asc_gather_sync__PUi16_PUi16_PUu32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_gather_sync__PUu16_PUu16_PUu32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_gather_sync__PUf16_PUf16_PUu32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_gather_sync__PUbf16_PUbf16_PUu32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_gather_sync__PUi32_PUi32_PUu32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_gather_sync__PUu32_PUu32_PUu32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_gather_sync__PUf32_PUf32_PUu32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -135,8 +114,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_gather__PUi16_PUi16_PUu32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_gather.h"
+  headers: [/include/c_api/vector_compute/compute/vector_gather.h]
 ```
 
     ```cpp
@@ -147,8 +125,7 @@ api_signature:
 api_signature:
   override_id: "asc_gather__PUu16_PUu16_PUu32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_gather.h"
+  headers: [/include/c_api/vector_compute/compute/vector_gather.h]
 ```
 
     ```cpp
@@ -159,8 +136,7 @@ api_signature:
 api_signature:
   override_id: "asc_gather__PUf16_PUf16_PUu32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_gather.h"
+  headers: [/include/c_api/vector_compute/compute/vector_gather.h]
 ```
 
     ```cpp
@@ -171,8 +147,7 @@ api_signature:
 api_signature:
   override_id: "asc_gather__PUbf16_PUbf16_PUu32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_gather.h"
+  headers: [/include/c_api/vector_compute/compute/vector_gather.h]
 ```
 
     ```cpp
@@ -183,8 +158,7 @@ api_signature:
 api_signature:
   override_id: "asc_gather__PUi32_PUi32_PUu32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_gather.h"
+  headers: [/include/c_api/vector_compute/compute/vector_gather.h]
 ```
 
     ```cpp
@@ -195,8 +169,7 @@ api_signature:
 api_signature:
   override_id: "asc_gather__PUu32_PUu32_PUu32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_gather.h"
+  headers: [/include/c_api/vector_compute/compute/vector_gather.h]
 ```
 
     ```cpp
@@ -207,8 +180,7 @@ api_signature:
 api_signature:
   override_id: "asc_gather__PUf32_PUf32_PUu32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_gather.h"
+  headers: [/include/c_api/vector_compute/compute/vector_gather.h]
 ```
 
     ```cpp
@@ -221,8 +193,7 @@ api_signature:
 api_signature:
   override_id: "asc_gather__PUi16_PUi16_PUu32_u16_u8"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_gather.h"
+  headers: [/include/c_api/vector_compute/compute/vector_gather.h]
 ```
 
     ```cpp
@@ -233,8 +204,7 @@ api_signature:
 api_signature:
   override_id: "asc_gather__PUu16_PUu16_PUu32_u16_u8"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_gather.h"
+  headers: [/include/c_api/vector_compute/compute/vector_gather.h]
 ```
 
     ```cpp
@@ -245,8 +215,7 @@ api_signature:
 api_signature:
   override_id: "asc_gather__PUf16_PUf16_PUu32_u16_u8"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_gather.h"
+  headers: [/include/c_api/vector_compute/compute/vector_gather.h]
 ```
 
     ```cpp
@@ -257,8 +226,7 @@ api_signature:
 api_signature:
   override_id: "asc_gather__PUbf16_PUbf16_PUu32_u16_u8"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_gather.h"
+  headers: [/include/c_api/vector_compute/compute/vector_gather.h]
 ```
 
     ```cpp
@@ -269,8 +237,7 @@ api_signature:
 api_signature:
   override_id: "asc_gather__PUi32_PUi32_PUu32_u16_u8"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_gather.h"
+  headers: [/include/c_api/vector_compute/compute/vector_gather.h]
 ```
 
     ```cpp
@@ -281,8 +248,7 @@ api_signature:
 api_signature:
   override_id: "asc_gather__PUu32_PUu32_PUu32_u16_u8"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_gather.h"
+  headers: [/include/c_api/vector_compute/compute/vector_gather.h]
 ```
 
     ```cpp
@@ -293,8 +259,7 @@ api_signature:
 api_signature:
   override_id: "asc_gather__PUf32_PUf32_PUu32_u16_u8"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_gather.h"
+  headers: [/include/c_api/vector_compute/compute/vector_gather.h]
 ```
 
     ```cpp
@@ -307,8 +272,7 @@ api_signature:
 api_signature:
   override_id: "asc_gather_sync__PUi16_PUi16_PUu32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -319,8 +283,7 @@ api_signature:
 api_signature:
   override_id: "asc_gather_sync__PUu16_PUu16_PUu32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -331,8 +294,7 @@ api_signature:
 api_signature:
   override_id: "asc_gather_sync__PUf16_PUf16_PUu32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -343,8 +305,7 @@ api_signature:
 api_signature:
   override_id: "asc_gather_sync__PUbf16_PUbf16_PUu32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -355,8 +316,7 @@ api_signature:
 api_signature:
   override_id: "asc_gather_sync__PUi32_PUi32_PUu32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -367,8 +327,7 @@ api_signature:
 api_signature:
   override_id: "asc_gather_sync__PUu32_PUu32_PUu32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -379,8 +338,7 @@ api_signature:
 api_signature:
   override_id: "asc_gather_sync__PUf32_PUf32_PUu32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp

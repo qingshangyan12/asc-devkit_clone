@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: ShiftRight（右移位数为Tensor）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/logical_compute/ShiftRight_shift_amount_tensor.md
+description: 源操作数内每个元素做右移。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: ShiftRight__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pU_RCi32
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_vec_binary_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ShiftRight（右移位数为Tensor）<a name="ZH-CN_TOPIC_0000002193989473"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -42,6 +58,13 @@
 数据类型int16\_t，二进制数1010101010101010，算术右移三位结果为1111010101010101。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "ShiftRight__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pU_RCi32"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_vec_binary_intf.h"]
+```
 
 ```cpp
 template <typename T, typename U>

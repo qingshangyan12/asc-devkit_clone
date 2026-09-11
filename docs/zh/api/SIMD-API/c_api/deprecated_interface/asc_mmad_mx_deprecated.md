@@ -13,12 +13,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_mmad_mx__PCCf32_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_compute/cube_compute.h"
+    headers: [/include/c_api/cube_compute/cube_compute.h]
   - prototype_id: "asc_mmad_mx_sync__PCCf32_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/cube_compute_composite.h"
+    headers: [/include/c_api/composite/cube_compute_composite.h]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad_mx"
     archs: ["3510"]
@@ -100,8 +98,7 @@ $$
 api_signature:
   prototype_id: "asc_mmad_mx__PCCf32_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_compute/cube_compute.h"
+  headers: [/include/c_api/cube_compute/cube_compute.h]
   dtype:
     variants:
       -
@@ -147,8 +144,7 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
 api_signature:
   prototype_id: "asc_mmad_mx_sync__PCCf32_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/cube_compute_composite.h"
+  headers: [/include/c_api/composite/cube_compute_composite.h]
   dtype:
     variants:
       -

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: DataCopy（GMToUB多维数据搬运NDDMA）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_GMToUB_NDDMA.md
+description: 多维数据搬运接口，相比于基础数据搬运接口，可更加自由配置搬入的维度信息以及对应的Stride。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DataCopy（GMToUB多维数据搬运NDDMA）<a name="ZH-CN_TOPIC_0000002544407954"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

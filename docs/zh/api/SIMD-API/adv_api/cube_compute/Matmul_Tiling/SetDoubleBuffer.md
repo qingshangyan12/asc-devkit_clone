@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetDoubleBuffer
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetDoubleBuffer.md
+description: 设置A/B/C/Bias是否开启double buffer功能，以及是否需要做ND2NZ或者NZ2ND的转换，主要用于Tiling函数内部调优。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetDoubleBuffer
 
 ## 功能说明

@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: HCCL Tiling构造函数
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Tiling/HCCL_Tiling_constructor.md
+description: 用于创建一个Mc2CcTilingConfig对象。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # HCCL Tiling构造函数
 
 ## 功能说明

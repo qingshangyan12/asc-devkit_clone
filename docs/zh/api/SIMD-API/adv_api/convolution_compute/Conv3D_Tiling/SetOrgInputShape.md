@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetOrgInputShape
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3D_Tiling/SetOrgInputShape.md
+description: 设置特征矩阵Input的原始形状。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetOrgInputShape
 
 ## 功能说明

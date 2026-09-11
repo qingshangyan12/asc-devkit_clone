@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: EnableMultiCoreSplitK
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/EnableMultiCoreSplitK.md
+description: 多核场景，通过该接口开启切K轴。不调用该接口的情况下，默认不切K轴。在GetTiling接口调用前使用。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # EnableMultiCoreSplitK
 
 ## 功能说明

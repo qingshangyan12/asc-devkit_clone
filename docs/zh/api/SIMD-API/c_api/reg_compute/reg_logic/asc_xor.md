@@ -9,20 +9,16 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_xor__v<dtype>_v<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_logic.h"
+    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
   - prototype_id: "asc_xor__Rv<dtype>_v<dtype>_v<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_logic.h"
+    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
   - override_id: "asc_xor__vb_vb_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_logic.h"
+    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
   - override_id: "asc_xor__Rvb_vb_vb_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_logic.h"
+    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -82,8 +78,7 @@ def asc_xor(dst, src0, src1, mask):
 api_signature:
   prototype_id: "asc_xor__v<dtype>_v<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_logic.h"
+  headers: [/include/c_api/reg_compute/compute/reg_logic.h]
   dtype:
     values:
       - "int8_t"
@@ -105,8 +100,7 @@ __simd_callee__ inline vector_<dtype> asc_xor(vector_<dtype> src0,
 api_signature:
   prototype_id: "asc_xor__Rv<dtype>_v<dtype>_v<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_logic.h"
+  headers: [/include/c_api/reg_compute/compute/reg_logic.h]
   dtype:
     values:
       - "int8_t"
@@ -150,8 +144,7 @@ __simd_callee__ inline void asc_xor(vector_int8_t& dst,
 api_signature:
   override_id: "asc_xor__vb_vb_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_logic.h"
+  headers: [/include/c_api/reg_compute/compute/reg_logic.h]
 ```
 
 ```c
@@ -165,8 +158,7 @@ __simd_callee__ inline vector_bool asc_xor(vector_bool src0,
 api_signature:
   override_id: "asc_xor__Rvb_vb_vb_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_logic.h"
+  headers: [/include/c_api/reg_compute/compute/reg_logic.h]
 ```
 
 ```c

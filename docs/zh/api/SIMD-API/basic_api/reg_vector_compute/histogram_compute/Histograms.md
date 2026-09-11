@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Histograms
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/histogram_compute/Histograms.md
+description: 对直方图数据进行统计，在目的操作数dstReg的基础数据上加上源操作数srcReg数据的统计结果，包括数据的频率统计和累计统计。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Histograms<a name="ZH-CN_TOPIC_0000002079418145"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: Min
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/tool_interface/NumericLimits_utils/Min.md
+description: 返回指定数据类型的最小有限值，对于浮点数类型来说，返回其最小规约正数。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Min__z
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_limits_intf.h]
+- override_id: Min__RCltg1x2_pT_u32
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_limits_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Min
 
 ## 产品支持情况
@@ -35,11 +54,25 @@
 
 - 标量接口，返回值为标量：
 
+```yaml
+api_signature:
+  override_id: "Min__z"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_limits_intf.h"]
+```
+
     ```cpp
     constexpr __aicore__ static inline T Min()
     ```
 
 - 矢量接口，为dst前count个元素赋最小有限值：
+
+```yaml
+api_signature:
+  override_id: "Min__RCltg1x2_pT_u32"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_limits_intf.h"]
+```
 
     ```cpp
     __aicore__ static inline void Min(const LocalTensor<T>& dst, uint32_t count)

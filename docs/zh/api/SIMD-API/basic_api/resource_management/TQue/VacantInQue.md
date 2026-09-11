@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: VacantInQue
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/TQue/VacantInQue.md
+description: 查询队列是否已满。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: VacantInQue__z
+  archs: ['3510', '2201', '3002', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_tpipe.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # VacantInQue<a name="ZH-CN_TOPIC_0000001426049506"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -38,6 +54,13 @@
 查询队列是否已满。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "VacantInQue__z"
+  archs: ["3510", "2201", "3002", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_tpipe.h"]
+```
 
 ```cpp
 __aicore__ inline bool VacantInQue()

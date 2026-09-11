@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetTensorA
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetTensorA.md
+description: 设置矩阵乘的左矩阵A。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetTensorA
 
 ## 产品支持情况

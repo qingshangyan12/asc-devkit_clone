@@ -1,3 +1,18 @@
+---
+okftype: reference.api.cpp
+title: COPY\_TILING\_WITH\_STRUCT
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/Kernel-Tiling/COPY_TILING_WITH_STRUCT.md
+description: 拷贝Tiling结构体，并返回指向拷贝后的Tiling结构体的指针。该宏适用于嵌套结构体场景，可拷贝结构体的子结构体成员变量。该宏将指定结构体拷贝至栈上，适用于频繁访问Tiling数据的场景，能够加快数据访问速度。
+tag: [basic_api]
+usage_dependencies:
+  status: confirmed
+  companion:
+  - GET_TILING_DATA_PTR_WITH_STRUCT.md
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # COPY\_TILING\_WITH\_STRUCT<a name="ZH-CN_TOPIC_0000002447918481"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

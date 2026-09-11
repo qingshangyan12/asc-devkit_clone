@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: AddRelu
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/AddRelu.md
+description: 按元素求和，再进行Relu计算（结果和0对比取较大值）。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # AddRelu<a name="ZH-CN_TOPIC_0000001723846124"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

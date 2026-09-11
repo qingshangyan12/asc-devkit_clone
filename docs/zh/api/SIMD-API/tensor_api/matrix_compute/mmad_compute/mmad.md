@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: mmad
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/matrix_compute/mmad_compute/mmad.md
+description: '`mmad`接口用于完成L0A Buffer上左矩阵A和L0B Buffer上右矩阵B的矩阵乘加，结果写入L0C Buffer上结果矩阵C。默认模式为普通矩阵计算。'
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: mmad__RCmmadatomg1x5_pAtom_RCpCTensor_RCpATensor_RCpBTensor
+  archs: ['3510']
+  headers: [/include/tensor_api/algorithm/mmad.h]
+- override_id: mmad__RCmmadatomg1x5_pAtom_RCpCTensor_RCpATensor_RCpBTensor_RCpBiasTensor
+  archs: ['3510']
+  headers: [/include/tensor_api/algorithm/mmad.h]
+- override_id: make_mmad__RCpMmadOperation
+  archs: ['3510']
+  headers: [/include/tensor_api/algorithm/mmad.h]
+- override_id: make_mmad__RCpMmadOperation_RCpMmadTrait
+  archs: ['3510']
+  headers: [/include/tensor_api/algorithm/mmad.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # mmad
 
 ## 产品支持情况
@@ -68,6 +93,13 @@ mmad的矩阵乘加关系可参考下图：
 
 - 执行不传bias的矩阵计算。
 
+```yaml
+api_signature:
+  override_id: "mmad__RCmmadatomg1x5_pAtom_RCpCTensor_RCpATensor_RCpBTensor"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/algorithm/mmad.h"]
+```
+
     ```cpp
     template <typename Atom, typename CTensor, typename ATensor, typename BTensor>
     __aicore__ inline void mmad(
@@ -75,6 +107,13 @@ mmad的矩阵乘加关系可参考下图：
     ```
 
 - 执行传入bias的矩阵计算。
+
+```yaml
+api_signature:
+  override_id: "mmad__RCmmadatomg1x5_pAtom_RCpCTensor_RCpATensor_RCpBTensor_RCpBiasTensor"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/algorithm/mmad.h"]
+```
 
     ```cpp
     template <typename Atom, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor>
@@ -85,12 +124,26 @@ mmad的矩阵乘加关系可参考下图：
 
 - 构造默认矩阵计算原子对象。
 
+```yaml
+api_signature:
+  override_id: "make_mmad__RCpMmadOperation"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/algorithm/mmad.h"]
+```
+
     ```cpp
     template <typename MmadOperation>
     __aicore__ inline constexpr auto make_mmad(const MmadOperation& operation)
     ```
 
 - 构造指定Trait的矩阵计算原子对象。
+
+```yaml
+api_signature:
+  override_id: "make_mmad__RCpMmadOperation_RCpMmadTrait"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/algorithm/mmad.h"]
+```
 
     ```cpp
     template <typename MmadOperation, typename MmadTrait>

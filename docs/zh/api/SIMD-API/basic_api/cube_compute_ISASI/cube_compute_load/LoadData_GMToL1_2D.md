@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: LoadData（GMToL1-2D矩阵搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_GMToL1_2D.md
+description: 负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512字节的数据分形为单位从Global Memory搬运至L1 Buffer（TPosition为A1/B1）。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: LoadData__RCltg1x2_pT_RCgtg1x2_pT_RCload2d
+  archs: ['3510', '2201', '3002', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_mm_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LoadData（GMToL1-2D矩阵搬运）<a id="ZH-CN_TOPIC_0000002538231138"></a>
 
 ## 产品支持情况<a id="zh-cn_topic_0000002567745223_section796754519912"></a>
@@ -38,6 +54,13 @@
 负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512字节的数据分形为单位从Global Memory搬运至L1 Buffer（TPosition为A1/B1）。
 
 ## 函数原型<a id="zh-cn_topic_0000002567745223_section82039854412"></a>
+
+```yaml
+api_signature:
+  override_id: "LoadData__RCltg1x2_pT_RCgtg1x2_pT_RCload2d"
+  archs: ["3510", "2201", "3002", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_mm_intf.h"]
+```
 
 ```cpp
 template <typename T>

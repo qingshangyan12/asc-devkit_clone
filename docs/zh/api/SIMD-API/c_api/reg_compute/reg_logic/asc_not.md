@@ -10,20 +10,16 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_not__v<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_logic.h"
+    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
   - prototype_id: "asc_not__Rv<dtype>_v<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_logic.h"
+    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
   - override_id: "asc_not__vb_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_logic.h"
+    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
   - override_id: "asc_not__Rvb_vb_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_logic.h"
+    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -80,8 +76,7 @@ $$
 api_signature:
   prototype_id: "asc_not__v<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_logic.h"
+  headers: [/include/c_api/reg_compute/compute/reg_logic.h]
   dtype:
     values:
       - "int8_t"
@@ -104,8 +99,7 @@ __simd_callee__ inline vector_<dtype> asc_not(vector_<dtype> src,
 api_signature:
   prototype_id: "asc_not__Rv<dtype>_v<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_logic.h"
+  headers: [/include/c_api/reg_compute/compute/reg_logic.h]
   dtype:
     values:
       - "int8_t"
@@ -148,8 +142,7 @@ __simd_callee__ inline void asc_not(vector_half& dst,
 api_signature:
   override_id: "asc_not__vb_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_logic.h"
+  headers: [/include/c_api/reg_compute/compute/reg_logic.h]
 ```
 
 ```c
@@ -162,8 +155,7 @@ __simd_callee__ inline vector_bool asc_not(vector_bool src,
 api_signature:
   override_id: "asc_not__Rvb_vb_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_logic.h"
+  headers: [/include/c_api/reg_compute/compute/reg_logic.h]
 ```
 
 ```c

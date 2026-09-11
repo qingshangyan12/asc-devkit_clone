@@ -10,20 +10,16 @@ usage_dependencies:
 signature:
   - override_id: "asc_abs__PUf16_PUf16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_arith.h"
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: "asc_abs__PUf32_PUf32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_arith.h"
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: "asc_abs__PUf16_PUf16_u8_u16_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_arith.h"
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: "asc_abs__PUf32_PUf32_u8_u16_u16_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_compute/compute/vector_arith.h"
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -71,8 +67,7 @@ $$
 api_signature:
   override_id: "asc_abs__PUf16_PUf16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_arith.h"
+  headers: [/include/c_api/vector_compute/compute/vector_arith.h]
 ```
 
     ```cpp
@@ -83,8 +78,7 @@ api_signature:
 api_signature:
   override_id: "asc_abs__PUf32_PUf32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_arith.h"
+  headers: [/include/c_api/vector_compute/compute/vector_arith.h]
 ```
 
     ```cpp
@@ -97,8 +91,7 @@ api_signature:
 api_signature:
   override_id: "asc_abs__PUf16_PUf16_u8_u16_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_arith.h"
+  headers: [/include/c_api/vector_compute/compute/vector_arith.h]
 ```
 
     ```cpp
@@ -109,8 +102,7 @@ api_signature:
 api_signature:
   override_id: "asc_abs__PUf32_PUf32_u8_u16_u16_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_compute/compute/vector_arith.h"
+  headers: [/include/c_api/vector_compute/compute/vector_arith.h]
 ```
 
     ```cpp

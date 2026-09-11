@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetWorkspace
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetWorkspace.md
+description: '[Iterate](Iterate.md)计算的[异步场景](GetTensorC.md#li17508136205415)，调用本接口申请一块临时空间来缓存计算结果，然后调用[GetTensorC](GetTensorC.md)时会在该临时空间中获取C的矩阵分片。'
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetWorkspace__Rgtg1x2_pT
+  archs: ['3510', '2201', x90]
+  headers: [/include/adv_api/matmul/matmul.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetWorkspace
 
 ## 产品支持情况
@@ -35,6 +51,13 @@
 ## 函数原型
 
 建议用户使用GlobalTensor类型传入：
+
+```yaml
+api_signature:
+  override_id: "SetWorkspace__Rgtg1x2_pT"
+  archs: ["3510", "2201", "x90"]
+  headers: ["/include/adv_api/matmul/matmul.h"]
+```
 
 ```
 template <class T> __aicore__ inline void SetWorkspace(GlobalTensor<T>& addr)

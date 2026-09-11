@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetSingleOutputShape
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3D_Kernel/SetSingleOutputShape.md
+description: 设置单核上结果矩阵Output的形状。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetSingleOutputShape__u64_u64_u64
+  archs: ['2201']
+  headers: [/include/adv_api/conv/conv3d/conv3d_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetSingleOutputShape
 
 ## 产品支持情况
@@ -33,6 +49,13 @@ Conv3D高阶API目前支持M合轴模式的输出方式。在M合轴模式下，
 ![](../../../../figures/m_axis_merge_mode.png "M合轴模式示意图")
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "SetSingleOutputShape__u64_u64_u64"
+  archs: ["2201"]
+  headers: ["/include/adv_api/conv/conv3d/conv3d_intf.h"]
+```
 
 ```
 __aicore__ inline void SetSingleOutputShape(uint64_t singleCo, uint64_t singleDo, uint64_t singleM)

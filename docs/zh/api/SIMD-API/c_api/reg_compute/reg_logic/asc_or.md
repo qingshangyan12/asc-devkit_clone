@@ -10,20 +10,16 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_or__v<dtype>_v<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_logic.h"
+    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
   - prototype_id: "asc_or__Rv<dtype>_v<dtype>_v<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_logic.h"
+    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
   - override_id: "asc_or__vb_vb_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_logic.h"
+    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
   - override_id: "asc_or__Rvb_vb_vb_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_logic.h"
+    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -80,8 +76,7 @@ $$
 api_signature:
   prototype_id: "asc_or__v<dtype>_v<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_logic.h"
+  headers: [/include/c_api/reg_compute/compute/reg_logic.h]
   dtype:
     values:
       - "int8_t"
@@ -103,8 +98,7 @@ __simd_callee__ inline vector_<dtype> asc_or(vector_<dtype> src0,
 api_signature:
   prototype_id: "asc_or__Rv<dtype>_v<dtype>_v<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_logic.h"
+  headers: [/include/c_api/reg_compute/compute/reg_logic.h]
   dtype:
     values:
       - "int8_t"
@@ -152,8 +146,7 @@ __simd_callee__ inline void asc_or(vector_int32_t& dst,
 api_signature:
   override_id: "asc_or__vb_vb_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_logic.h"
+  headers: [/include/c_api/reg_compute/compute/reg_logic.h]
 ```
 
 ```c
@@ -167,8 +160,7 @@ __simd_callee__ inline vector_bool asc_or(vector_bool src0,
 api_signature:
   override_id: "asc_or__Rvb_vb_vb_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_logic.h"
+  headers: [/include/c_api/reg_compute/compute/reg_logic.h]
 ```
 
 ```c

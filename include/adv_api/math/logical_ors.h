@@ -43,6 +43,14 @@ namespace AscendC {
  * \param [in] count, amount of data to be calculated
  */
 template <const LogicalOrsConfig& config = DEFAULT_LOGICAL_ORS_CONFIG, typename T, typename U, typename S>
+/**
+ * @ingroup simd_api.adv_api.math_compute.logicalors_interface
+ * @override_id LogicalOrs__RCltg1x2_pT_RCpU_RCpS_u32
+ * @archs 3510
+ * @brief 输入矢量内的每个元素与标量进行或操作。当输入矢量、标量的数据类型不是bool时，零被视为False，非零数据被视为True。接口中矢量与标量的顺序支持标量在前和标量在后两种场景，其中，标量支持配置为LocalTensor的单点元素。
+ * @param [out] dst 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void LogicalOrs(const LocalTensor<T>& dst, const U& src0, const S& src1, const uint32_t count)
 {
 #if defined(__NPU_ARCH__) && \

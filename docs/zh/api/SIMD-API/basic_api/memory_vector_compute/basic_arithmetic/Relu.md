@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Relu
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Relu.md
+description: Relu属于单目矢量类计算接口，负责将输入的tensor按元素做ReLU（Rectified Linear Unit）计算。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Relu<a name="ZH-CN_TOPIC_0000001429563265"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

@@ -9,16 +9,13 @@ usage_dependencies:
 signature:
   - override_id: "asc_storealign_pack_v2__PUi32_vi32_i32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/store/storealign.h"
+    headers: [/include/c_api/reg_compute/store/storealign.h]
   - override_id: "asc_storealign_pack_v2__PUu32_vu32_i32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/store/storealign.h"
+    headers: [/include/c_api/reg_compute/store/storealign.h]
   - override_id: "asc_storealign_pack_v2__PUf32_vf32_i32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/store/storealign.h"
+    headers: [/include/c_api/reg_compute/store/storealign.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -63,8 +60,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_storealign_pack_v2__PUi32_vi32_i32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/store/storealign.h"
+  headers: [/include/c_api/reg_compute/store/storealign.h]
 ```
 
 ```cpp
@@ -75,8 +71,7 @@ __simd_callee__ inline void asc_storealign_pack_v2(__ubuf__ int32_t* dst_align32
 api_signature:
   override_id: "asc_storealign_pack_v2__PUu32_vu32_i32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/store/storealign.h"
+  headers: [/include/c_api/reg_compute/store/storealign.h]
 ```
 
 ```cpp
@@ -87,8 +82,7 @@ __simd_callee__ inline void asc_storealign_pack_v2(__ubuf__ uint32_t* dst_align3
 api_signature:
   override_id: "asc_storealign_pack_v2__PUf32_vf32_i32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/store/storealign.h"
+  headers: [/include/c_api/reg_compute/store/storealign.h]
 ```
 
 ```cpp

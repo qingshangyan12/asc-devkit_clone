@@ -10,10 +10,9 @@ usage_dependencies:
 signature:
   - override_id: "asc_mmad_sparse__PCCi32_PCAi8_PCBi8_u16_u16_u16_unitflag_b_b"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_compute/cube_compute.h"
+    headers: ["/include/c_api/cube_compute/cube_compute.h"]
 examples: []
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_mmad_sparse
@@ -54,8 +53,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_mmad_sparse__PCCi32_PCAi8_PCBi8_u16_u16_u16_unitflag_b_b"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_compute/cube_compute.h"
+  headers: ["/include/c_api/cube_compute/cube_compute.h"]
 ```
 
 ```cpp

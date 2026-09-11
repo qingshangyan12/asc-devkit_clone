@@ -33,6 +33,12 @@ namespace experimental {
  * @note Supported element widths are b8, b16 and b32.
  */
 template <mask_pattern Pattern = mask_pattern::all, typename DataType>
+/**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.mask_reg_compute
+ * @override_id make_mask__z
+ * @archs 3510
+ * @brief 根据模式和数据元素宽度创建掩码寄存器，用于指示在计算过程中哪些元素参与计算。
+ */
 __simd_callee__ inline reg_tensor<bool> make_mask();
 
 /**
@@ -41,6 +47,12 @@ __simd_callee__ inline reg_tensor<bool> make_mask();
  * @note Supported element widths are b8, b16 and b32.
  */
 template <typename DataType>
+/**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.mask_reg_compute
+ * @override_id all_mask__z
+ * @archs 3510
+ * @brief 创建`reg_tensor<bool>`，其成员变量reg是与`DataType`元素类型宽度匹配的全有效的掩码寄存器，等价于`make_mask<mask_pattern::all, DataType>()`。
+ */
 __simd_callee__ inline reg_tensor<bool> all_mask();
 
 /**
@@ -49,6 +61,12 @@ __simd_callee__ inline reg_tensor<bool> all_mask();
  * @note Supported element widths are b8, b16 and b32.
  */
 template <typename DataType>
+/**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.mask_reg_compute
+ * @override_id none_mask__z
+ * @archs 3510
+ * @brief 创建`reg_tensor<bool>`，其成员变量reg是与`DataType`元素位宽匹配的全无效掩码寄存器，等价于`make_mask<mask_pattern::none, DataType>()`。
+ */
 __simd_callee__ inline reg_tensor<bool> none_mask();
 
 /**
@@ -58,6 +76,12 @@ __simd_callee__ inline reg_tensor<bool> none_mask();
  * @note Supported element widths are b8, b16 and b32.
  */
 template <typename DataType>
+/**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.mask_reg_compute
+ * @override_id update_mask__Ru32
+ * @archs 3510
+ * @brief 根据当前剩余待处理元素数的值生成对应长度的有效位掩码，并自动将前剩余待处理元素数减去当前向量长度以更新剩余待处理元素数量。
+ */
 __simd_callee__ inline reg_tensor<bool> update_mask(uint32_t& remain);
 
 /**
@@ -82,6 +106,14 @@ __simd_callee__ inline reg_pair<bool> interleave(reg_tensor<bool> src0, reg_tens
  * @note Supported element widths are b8, b16 and b32.
  */
 template <typename DataType>
+/**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.mask_reg_compute
+ * @override_id deinterleave__regtensorg1x1_b_regtensorg1x1_b
+ * @archs 3510
+ * @brief 将两个源`reg_tensor<bool>`寄存器的reg按`DataType`对应的元素宽度解交织。`src0`和`src1`中偶数索引的分组依次写入返回值的`first.reg`，奇数索引的分组依次写入`second.reg`。
+ * @param [in] src0 第一个源Mask寄存器，类型为`reg_tensor`，必须保证其`reg`成员已初始化。其偶数索引分组写入`first.reg`前半部分，奇数索引分组写入`second.reg`前半部分。
+ * @param [in] src1 第二个源Mask寄存器，类型为`reg_tensor`，必须保证其`reg`成员已初始化。其偶数索引分组写入`first.reg`后半部分，奇数索引分组写入`second.reg`后半部分。
+ */
 __simd_callee__ inline reg_pair<bool> deinterleave(reg_tensor<bool> src0, reg_tensor<bool> src1);
 
 } // namespace experimental

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetShape
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/aux_data_structures/Layout/GetShape.md
+description: 返回描述张量形状的Shape对象。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetShape__z
+  archs: ['2201']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetShape<a name="ZH-CN_TOPIC_0000002297494516"></a>
 
 ## 产品支持情况<a name="section73648168211"></a>
@@ -32,8 +48,25 @@
 
 ## 函数原型<a name="zh-cn_topic_0000002078447573_zh-cn_topic_0000001576806829_zh-cn_topic_0000001339187720_section13230182415108"></a>
 
+```yaml
+api_signature:
+  override_id: "GetShape__z"
+  archs: ["2201"]
+  headers: []
+```
+
 ```cpp
 __aicore__ inline constexpr decltype(auto) GetShape() {}   
+```
+
+```yaml
+api_signature:
+  override_id: "GetShape__z"
+  archs: ["2201"]
+  headers: []
+```
+
+```cpp
 __aicore__ inline constexpr decltype(auto) GetShape() const {}
 ```
 

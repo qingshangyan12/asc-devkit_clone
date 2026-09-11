@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Matmul模板参数
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/Matmul_template_params.md
+description: 创建Matmul对象时需要传入：。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Matmul模板参数
 
 ## 产品支持情况

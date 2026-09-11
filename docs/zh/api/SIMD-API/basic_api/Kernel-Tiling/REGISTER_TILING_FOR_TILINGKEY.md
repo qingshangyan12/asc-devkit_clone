@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: REGISTER\_TILING\_FOR\_TILINGKEY
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/Kernel-Tiling/REGISTER_TILING_FOR_TILINGKEY.md
+description: 用于在kernel侧注册与TilingKey相匹配的TilingData自定义结构体；该接口需提供一个逻辑表达式，逻辑表达式以字符串“TILING\_KEY\_VAR”代指实际TilingKey，表达TilingKey所满足的范围。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # REGISTER\_TILING\_FOR\_TILINGKEY<a name="ZH-CN_TOPIC_0000002087702626"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

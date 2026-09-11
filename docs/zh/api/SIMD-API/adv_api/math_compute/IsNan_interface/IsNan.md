@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: IsNan
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/IsNan_interface/IsNan.md
+description: 按元素判断输入的浮点数是否为nan，输出结果为浮点数或布尔值。当输出为浮点类型时，对于nan的输入数据，对应位置的结果为浮点类型的1，反之为0；当输出为bool类型时，对于nan的输入数据，对应位置的结果为true，反之为false。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: IsNan__RCltg1x2_pT_RCltg1x2_pU_RCltg1x2_u8_u32
+  archs: ['3510']
+  headers: [/include/adv_api/math/is_nan.h]
+- override_id: IsNan__RCltg1x2_pT_RCltg1x2_pU_u32
+  archs: ['3510']
+  headers: [/include/adv_api/math/is_nan.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # IsNan
 
 ## 产品支持情况
@@ -43,12 +62,26 @@
 
 -   通过sharedTmpBuffer入参传入临时空间
 
+```yaml
+api_signature:
+  override_id: "IsNan__RCltg1x2_pT_RCltg1x2_pU_RCltg1x2_u8_u32"
+  archs: ["3510"]
+  headers: ["/include/adv_api/math/is_nan.h"]
+```
+
     ```
     template <const IsNanConfig& config = DEFAULT_IS_NAN_CONFIG, typename T, typename U>
     __aicore__ inline void IsNan(const LocalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t count)
     ```
 
 -   接口框架申请临时空间
+
+```yaml
+api_signature:
+  override_id: "IsNan__RCltg1x2_pT_RCltg1x2_pU_u32"
+  archs: ["3510"]
+  headers: ["/include/adv_api/math/is_nan.h"]
+```
 
     ```
     template <const IsNanConfig& config = DEFAULT_IS_NAN_CONFIG, typename T, typename U>

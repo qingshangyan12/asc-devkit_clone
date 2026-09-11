@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetWindowsInAddr
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/GetWindowsInAddr.md
+description: 获取卡间通信数据WindowsIn起始地址，可用来直接作为计算的输入输出地址，减少拷贝。该接口默认在所有核上工作，用户也可以在调用前通过[GetBlockIdx](../../../basic_api/tool_interface/system_resources_and_variables/GetBlockIdx.md)指定其在某一个核上运行。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetWindowsInAddr__u32
+  archs: ['2201']
+  headers: [/include/adv_api/hccl/hccl.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetWindowsInAddr
 
 ## 产品支持情况
@@ -28,6 +44,13 @@
 获取卡间通信数据WindowsIn起始地址，可用来直接作为计算的输入输出地址，减少拷贝。该接口默认在所有核上工作，用户也可以在调用前通过[GetBlockIdx](../../../basic_api/tool_interface/system_resources_and_variables/GetBlockIdx.md)指定其在某一个核上运行。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "GetWindowsInAddr__u32"
+  archs: ["2201"]
+  headers: ["/include/adv_api/hccl/hccl.h"]
+```
 
 ```
 __aicore__ inline GM_ADDR GetWindowsInAddr(uint32_t rankId)

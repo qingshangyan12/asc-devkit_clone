@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: Fma
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/Fma_interface/Fma.md
+description: 按元素计算两个输入相乘后与第三个输入相加的结果。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Fma__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+  archs: ['3510']
+  headers: [/include/adv_api/math/fma.h]
+- override_id: Fma__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510']
+  headers: [/include/adv_api/math/fma.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Fma
 
 ## 产品支持情况
@@ -35,12 +54,26 @@
 
 -   通过sharedTmpBuffer入参传入临时空间
 
+```yaml
+api_signature:
+  override_id: "Fma__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32"
+  archs: ["3510"]
+  headers: ["/include/adv_api/math/fma.h"]
+```
+
     ```
     template <const FmaConfig& config = DEFAULT_FMA_CONFIG, typename T>
     __aicore__ inline void Fma(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,const LocalTensor<T>& src2, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t count)
     ```
 
 -   接口框架申请临时空间
+
+```yaml
+api_signature:
+  override_id: "Fma__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510"]
+  headers: ["/include/adv_api/math/fma.h"]
+```
 
     ```
     template <const FmaConfig& config = DEFAULT_FMA_CONFIG, typename T>

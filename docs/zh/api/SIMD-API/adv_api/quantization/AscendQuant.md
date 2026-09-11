@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: AscendQuant
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/quantization/AscendQuant.md
+description: 按元素做量化计算，比如将half/float数据类型量化为int8\_t数据类型。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # AscendQuant
 
 ## 产品支持情况

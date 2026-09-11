@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: MatmulGetTmpBufSize
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/get_Matmul_compute_space/MatmulGetTmpBufSize.md
+description: 本接口用于在调用[GetTiling](../Matmul_Tiling/GetTiling.md)接口获取Tiling参数后，根据Tiling结构体信息获取L1
+  Buffer/Unified Buffer（UB）/L0C Buffer的使用大小。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # MatmulGetTmpBufSize
 
 ## 功能说明

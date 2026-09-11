@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: DisableBias
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/DisableBias.md
+description: 清除Bias标志位，表示Matmul计算时没有Bias参与。如果在初始化时配置了TCubeTiling结构中的isBias参数来启用Bias，调用该接口后，会清除Bias标志位，不再启用Bias。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: DisableBias__z
+  archs: ['3510', '2201', '3002', '2002', x90]
+  headers: [/include/adv_api/matmul/matmul.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DisableBias
 
 ## 产品支持情况
@@ -31,6 +47,13 @@
 清除Bias标志位，表示Matmul计算时没有Bias参与。如果在初始化时配置了TCubeTiling结构中的isBias参数来启用Bias，调用该接口后，会清除Bias标志位，不再启用Bias。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "DisableBias__z"
+  archs: ["3510", "2201", "3002", "2002", "x90"]
+  headers: ["/include/adv_api/matmul/matmul.h"]
+```
 
 ```
 __aicore__ inline void DisableBias()

@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: view_engine
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/tensor/view_engine.md
+description: view_engine是Tensor API中的视图引擎，负责持有一个指针对象Iterator，通过`begin()`返回这段视图的起始位置。在`local_tensor`中，view_engine和layout一起组成一个Tensor的视图。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: begin__z
+  archs: ['3510']
+  headers: []
+- override_id: view_engine__iter
+  archs: ['3510']
+  headers: []
+- override_id: view_engine__iter_cachemode
+  archs: ['3510']
+  headers: []
+- override_id: get_cache_mode__z
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/tensor.h]
+- override_id: set_cache_mode__cachemode
+  archs: ['3510']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # view_engine
 
 ## 产品支持情况
@@ -36,6 +64,13 @@ local_tensor<view_engine<Iterator>, LayoutT>
 
   `view_engine`定义如下：
 
+```yaml
+api_signature:
+  override_id: "begin__z"
+  archs: ["3510"]
+  headers: []
+```
+
   ```cpp
   template <typename Iterator>
   struct view_engine
@@ -46,11 +81,61 @@ local_tensor<view_engine<Iterator>, LayoutT>
       using value_type = typename iter_val<iterator>::type;
 
       __aicore__ inline constexpr iterator const& begin() const;
+  ```
+
+```yaml
+api_signature:
+  override_id: "begin__z"
+  archs: ["3510"]
+  headers: []
+```
+
+  ```cpp
       __aicore__ inline constexpr iterator& begin();
+  ```
+
+```yaml
+api_signature:
+  override_id: "view_engine__iter"
+  archs: ["3510"]
+  headers: []
+```
+
+  ```cpp
       __aicore__ inline constexpr view_engine(iterator storage = {});
+  ```
+
+```yaml
+api_signature:
+  override_id: "view_engine__iter_cachemode"
+  archs: ["3510"]
+  headers: []
+```
+
+  ```cpp
       __aicore__ inline constexpr view_engine(iterator storage, cache_mode mode);
+  ```
+
+```yaml
+api_signature:
+  override_id: "get_cache_mode__z"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/tensor.h"]
+```
+
+  ```cpp
 
       __aicore__ inline constexpr uint8_t get_cache_mode() const;
+  ```
+
+```yaml
+api_signature:
+  override_id: "set_cache_mode__cachemode"
+  archs: ["3510"]
+  headers: []
+```
+
+  ```cpp
       __aicore__ inline constexpr void set_cache_mode(cache_mode mode);
 
       template <typename Index>

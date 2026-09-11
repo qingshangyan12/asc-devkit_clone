@@ -10,12 +10,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_store__PU<dtype>_v<dtype>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/storeunalign_composite.h"
+    headers: [/include/c_api/composite/storeunalign_composite.h]
   - prototype_id: "asc_store__PU<dtype>_v<dtype>_u32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/composite/storeunalign_composite.h"
+    headers: [/include/c_api/composite/storeunalign_composite.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -65,8 +63,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_store__PU<dtype>_v<dtype>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/storeunalign_composite.h"
+  headers: [/include/c_api/composite/storeunalign_composite.h]
   dtype:
     values:
       - "int4b_t"
@@ -111,8 +108,7 @@ __simd_callee__ inline void asc_store(__ubuf__ int8_t* dst,
 api_signature:
   prototype_id: "asc_store__PU<dtype>_v<dtype>_u32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/composite/storeunalign_composite.h"
+  headers: [/include/c_api/composite/storeunalign_composite.h]
   dtype:
     values:
       - "int4b_t"

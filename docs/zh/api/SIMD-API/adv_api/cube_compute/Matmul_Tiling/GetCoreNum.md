@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GetCoreNum
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/GetCoreNum.md
+description: 获得多核切分所使用的NumBlocks参数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetCoreNum
 
 ## 功能说明

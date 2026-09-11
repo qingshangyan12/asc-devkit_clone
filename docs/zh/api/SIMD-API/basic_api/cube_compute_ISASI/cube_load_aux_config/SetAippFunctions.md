@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetAippFunctions
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_load_aux_config/SetAippFunctions.md
+description: 设置图片预处理（AIPP，AI Core pre-process）相关参数。和[LoadImageToLocal](LoadImageToLocal.md)接口配合使用。设置后，调用[LoadImageToLocal](LoadImageToLocal.md)接口可在搬运过程中完成图像预处理操作：包括数据填充、通道交换、单行读取、数据类型转换、通道填充、色域转换。调用SetAippFunctions接口时需传入源图片在Global
+  Memory上的矩阵、源图片的图片格式。
+tag: [basic_api]
+usage_dependencies:
+  status: confirmed
+  companion:
+  - LoadImageToLocal.md
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetAippFunctions<a name="ZH-CN_TOPIC_0000001913015092"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

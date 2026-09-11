@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: UnPack
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/MaskReg_compute/UnPack.md
+description: 根据所选的低位模式或高位模式，将源操作数src的低半部分或高半部分，展开到目的操作数dst。展开方式为：将每bit展开为2bit，高位置零。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # UnPack<a name="ZH-CN_TOPIC_0000001985577793"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

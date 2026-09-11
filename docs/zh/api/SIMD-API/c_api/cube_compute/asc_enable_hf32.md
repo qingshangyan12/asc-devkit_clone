@@ -10,10 +10,9 @@ usage_dependencies:
 signature:
   - override_id: "asc_enable_hf32__z"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/cube_compute/cube_compute.h"
+    headers: ["/include/c_api/cube_compute/cube_compute.h"]
 examples: []
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_enable_hf32
@@ -111,8 +110,7 @@ FP32与HF32格式的精度对比如下图所示：
 api_signature:
   override_id: "asc_enable_hf32__z"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/cube_compute/cube_compute.h"
+  headers: ["/include/c_api/cube_compute/cube_compute.h"]
 ```
 
 ```c

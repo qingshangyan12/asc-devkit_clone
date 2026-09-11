@@ -9,12 +9,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_select__v<dtype>_v<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - prototype_id: "asc_select__Rv<dtype>_v<dtype>_v<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/select"
     archs: ["3510"]
@@ -68,8 +66,7 @@ $$
 api_signature:
   prototype_id: "asc_select__v<dtype>_v<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   dtype:
     values:
       - "bool"
@@ -98,8 +95,7 @@ __simd_callee__ inline vector_<dtype> asc_select(vector_<dtype> src0,
 api_signature:
   prototype_id: "asc_select__Rv<dtype>_v<dtype>_v<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   dtype:
     values:
       - "bool"

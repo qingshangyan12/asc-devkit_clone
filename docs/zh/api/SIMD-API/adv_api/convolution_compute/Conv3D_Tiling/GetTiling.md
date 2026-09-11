@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GetTiling
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3D_Tiling/GetTiling.md
+description: 获取Tiling参数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetTiling
 
 ## 功能说明

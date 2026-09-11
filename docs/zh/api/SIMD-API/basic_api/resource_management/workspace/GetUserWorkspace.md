@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GetUserWorkspace
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/workspace/GetUserWorkspace.md
+description: 获取用户使用的workspace指针。核函数（Kernel）直调开发方式下，如果未开启HAVE\_WORKSPACE编译选项，框架不会自动设置系统workspace。如果使用了[Matmul核函数（Kernel）侧接口](../../../adv_api/cube_compute/Matmul_Kernel/Matmul_Kernel.md)等需要系统workspace的高阶API，kernel侧需要通过[SetSysWorkSpace](SetSysWorkSpace.md)设置系统workspace，此时用户workspace需要通过该接口获取。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetUserWorkspace<a name="ZH-CN_TOPIC_0000001666932721"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

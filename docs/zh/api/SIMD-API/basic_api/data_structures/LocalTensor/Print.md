@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Print
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/Print.md
+description: 只限于CPU调试，在调试窗口中打印LocalTensor数据用于精度调试，每一行打印一个DataBlock（32字节）的数据。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Print<a name="ZH-CN_TOPIC_0000002330927402"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

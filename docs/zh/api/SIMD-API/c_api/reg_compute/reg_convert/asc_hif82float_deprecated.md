@@ -9,20 +9,16 @@ usage_dependencies:
 signature:
   - override_id: "asc_hif82float__Rvf32_vhf8_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_hif82float_v2__Rvf32_vhf8_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_hif82float_v3__Rvf32_vhf8_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_hif82float_v4__Rvf32_vhf8_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -67,8 +63,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_hif82float__Rvf32_vhf8_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -80,8 +75,7 @@ __simd_callee__ inline void asc_hif82float(vector_float& dst, vector_hifloat8_t 
 api_signature:
   override_id: "asc_hif82float_v2__Rvf32_vhf8_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -93,8 +87,7 @@ __simd_callee__ inline void asc_hif82float_v2(vector_float& dst, vector_hifloat8
 api_signature:
   override_id: "asc_hif82float_v3__Rvf32_vhf8_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -106,8 +99,7 @@ __simd_callee__ inline void asc_hif82float_v3(vector_float& dst, vector_hifloat8
 api_signature:
   override_id: "asc_hif82float_v4__Rvf32_vhf8_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp

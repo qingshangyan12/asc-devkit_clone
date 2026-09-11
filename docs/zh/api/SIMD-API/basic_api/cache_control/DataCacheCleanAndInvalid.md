@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: DataCacheCleanAndInvalid
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cache_control/DataCacheCleanAndInvalid.md
+description: 如图1所示，在AI Core内部。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: DataCacheCleanAndInvalid__RCgtg1x2_pT
+  archs: ['3510', '2201', '3002', '2002', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_cache_intf.h]
+- override_id: DataCacheCleanAndInvalid__RCltg1x2_pT
+  archs: ['3510', '2201', '3002', '2002', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_cache_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DataCacheCleanAndInvalid<a name="ZH-CN_TOPIC_0000001787873306"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -64,10 +83,27 @@ DataCacheCleanAndInvalid接口用于解决上述一致性问题，其功能可�
 
 - 配置dcciDst的原型
 
+```yaml
+api_signature:
+  override_id: "DataCacheCleanAndInvalid__RCgtg1x2_pT"
+  archs: ["3510", "2201", "3002", "2002", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_cache_intf.h"]
+```
+
   ```cpp
   // 支持通过配置dcciDst确保DCache与GM存储的一致性。
   template <typename T, CacheLine entireType, DcciDst dcciDst>
   __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst)
+  ```
+
+```yaml
+api_signature:
+  override_id: "DataCacheCleanAndInvalid__RCltg1x2_pT"
+  archs: ["3510", "2201", "3002", "2002", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_cache_intf.h"]
+```
+
+  ```cpp
   // 支持通过配置dcciDst确保DCache与Local Memory存储的一致性。
   template <typename T, CacheLine entireType, DcciDst dcciDst>
   __aicore__ inline void DataCacheCleanAndInvalid(const LocalTensor<T>& dst)

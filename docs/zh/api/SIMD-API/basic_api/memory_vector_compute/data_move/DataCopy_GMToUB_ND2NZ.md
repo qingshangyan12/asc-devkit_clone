@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: DataCopy（GMToUB随路转换ND2NZ搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_GMToUB_ND2NZ.md
+description: 该接口为软仿接口，从易用性角度出发进行设计，支持在从Global Memory到Unified Buffer（UB）的数据搬运过程中进行ND到NZ格式的转换。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DataCopy（GMToUB随路转换ND2NZ搬运）<a name="ZH-CN_TOPIC_0000002349187356"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

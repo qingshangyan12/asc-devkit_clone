@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: InitSocState
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/tool_interface/system_init/InitSocState.md
+description: 本接口对AI Core的全局状态进行初始化，包括AIC（Cube Core）与AIV（Vector Core）的公共状态及各自特有状态。由于不同产品的实现存在差异，实际执行的初始化项也有所不同。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: InitSocState__z
+  archs: ['3510', '2201', '2002']
+  headers: [/include/basic_api/kernel_operator_common_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # InitSocState
 
 ## 产品支持情况
@@ -95,6 +111,13 @@
 <!-- end id11 -->
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "InitSocState__z"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/basic_api/kernel_operator_common_intf.h"]
+```
 
 ```cpp
 __aicore__ inline void InitSocState()

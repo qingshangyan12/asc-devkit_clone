@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: SinCos
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/SinCos_interface/SinCos.md
+description: 按元素进行正弦计算和余弦计算，分别获得正弦和余弦的结果。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SinCos__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+  archs: ['3510']
+  headers: [/include/adv_api/math/sincos.h]
+- override_id: SinCos__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510']
+  headers: [/include/adv_api/math/sincos.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SinCos
 
 ## 产品支持情况
@@ -35,12 +54,26 @@
 
 -   通过sharedTmpBuffer入参传入临时空间
 
+```yaml
+api_signature:
+  override_id: "SinCos__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32"
+  archs: ["3510"]
+  headers: ["/include/adv_api/math/sincos.h"]
+```
+
     ```
     template <const SinCosConfig& config = DEFAULT_SINCOS_CONFIG, typename T>
     __aicore__ inline void SinCos(const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t count)
     ```
 
 -   接口框架申请临时空间
+
+```yaml
+api_signature:
+  override_id: "SinCos__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510"]
+  headers: ["/include/adv_api/math/sincos.h"]
+```
 
     ```
     template <const SinCosConfig& config = DEFAULT_SINCOS_CONFIG, typename T>

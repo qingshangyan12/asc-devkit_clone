@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetGroups
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3D_Tiling/SetGroups.md
+description: 设置分组卷积的分组大小。分组大小为1表示普通卷积。**当前Conv3D高阶API不支持分组卷积**。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetGroups
 
 ## 功能说明

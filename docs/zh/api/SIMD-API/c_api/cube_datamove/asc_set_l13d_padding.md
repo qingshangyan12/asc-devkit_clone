@@ -9,22 +9,18 @@ usage_dependencies:
 signature:
   - override_id: "asc_set_l13d_padding__u64"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_set_l13d_padding__f16"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_set_l13d_padding__i16"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_set_l13d_padding__u16"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 examples: []
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_set_l13d_padding
@@ -65,8 +61,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_set_l13d_padding__u64"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
 ```cpp
@@ -77,8 +72,7 @@ __aicore__ inline void asc_set_l13d_padding(uint64_t config)
 api_signature:
   override_id: "asc_set_l13d_padding__f16"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
 ```cpp
@@ -89,8 +83,7 @@ __aicore__ inline void asc_set_l13d_padding(half config)
 api_signature:
   override_id: "asc_set_l13d_padding__i16"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
 ```cpp
@@ -101,8 +94,7 @@ __aicore__ inline void asc_set_l13d_padding(int16_t config)
 api_signature:
   override_id: "asc_set_l13d_padding__u16"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
 ```cpp

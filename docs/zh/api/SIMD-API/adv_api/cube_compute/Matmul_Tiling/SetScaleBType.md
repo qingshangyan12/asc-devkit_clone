@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetScaleBType
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetScaleBType.md
+description: MxMatmul场景，设置scaleB矩阵的位置、数据格式、是否转置等信息，这些信息需要和核函数（Kernel）侧的设置保持一致。如果不调用本接口，scaleB矩阵的信息将与[SetBType](SetBType.md)中设置的B矩阵的信息保持一致。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetScaleBType
 
 ## 功能说明

@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: MaskReg非对齐搬出（StoreUnAlign）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_store/StoreUnAlign_MaskReg.md
+description: StoreUnAlign能够实现数据从[MaskReg](../register_data_types/MaskReg.md)连续搬运至非对齐Unified
+  Buffer（UB），利用非对齐寄存器UnalignRegForStore作为临时缓存区，暂存跨对齐边界的数据，从而实现高效的连续非对齐数据传输。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # MaskReg非对齐搬出（StoreUnAlign）<a name="ZH-CN_TOPIC_0000002554449396"></a>
 
 ## 产品支持情况

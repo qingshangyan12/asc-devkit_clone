@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: load_broadcast
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/reg_vector_compute/reg_data_load/load_broadcast.md
+description: '`load_broadcast`用于从Unified Buffer（UB）Tensor中搬入数据，并按照`broadcast_mode`指定的方式广播到一个[reg_tensor](../reg_tensor/reg_tensor.md)。'
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: load_broadcast__RCpTensor_RCpCoord
+  archs: ['3510']
+  headers: [/include/tensor_api/experimental/arch/vector/reg_data_load.h]
+- override_id: load_broadcast__RCpTensor
+  archs: ['3510']
+  headers: [/include/tensor_api/experimental/arch/vector/reg_data_load.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # load_broadcast
 
 ## 产品支持情况
@@ -36,6 +55,13 @@
 
 - 指定坐标：
 
+```yaml
+api_signature:
+  override_id: "load_broadcast__RCpTensor_RCpCoord"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/experimental/arch/vector/reg_data_load.h"]
+```
+
     ```cpp
     template <broadcast_mode brc_mode = broadcast_mode::elem,
               typename Tensor,
@@ -45,6 +71,13 @@
     ```
 
 - 从Tensor起始位置搬入：
+
+```yaml
+api_signature:
+  override_id: "load_broadcast__RCpTensor"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/experimental/arch/vector/reg_data_load.h"]
+```
 
     ```cpp
     template <broadcast_mode brc_mode = broadcast_mode::elem,

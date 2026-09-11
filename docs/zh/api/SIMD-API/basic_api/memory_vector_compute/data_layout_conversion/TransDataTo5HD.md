@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: TransDataTo5HD
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_layout_conversion/TransDataTo5HD.md
+description: TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1HWC0格式](../../cube_compute_ISASI/cube_compute_fractal_intro/key_fractal_format_details.md#nc1hwc0格式)。特别的，也可以用于二维矩阵数据块的转置。完成转置功能时，相比于Transpose接口，Transpose仅支持16\*16大小的矩阵转置；本接口单次repeat内可处理512Byte的数据（16个DataBlock），根据数据类型不同，支持不同shape的矩阵转置，同时还可以支持多次repeat操作。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # TransDataTo5HD<a name="ZH-CN_TOPIC_0000001473462212"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

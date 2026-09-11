@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetSpecialMDLConfig
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/GetSpecialMDLConfig.md
+description: 用于配置SpecialMDL模板的参数，获取自定义SpecialMDL模板。SpecialMDL模板的介绍请参考[表模板特性](MatmulConfig.md#template-features)。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetSpecialMDLConfig__b_b_u32_b_b_b
+  archs: ['3510', '2201', x90]
+  headers: [/include/adv_api/matmul/tiling.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetSpecialMDLConfig
 
 ## 产品支持情况
@@ -34,6 +50,13 @@
 用于配置SpecialMDL模板的参数，获取自定义SpecialMDL模板。SpecialMDL模板的介绍请参考[表模板特性](MatmulConfig.md#template-features)。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "GetSpecialMDLConfig__b_b_u32_b_b_b"
+  archs: ["3510", "2201", "x90"]
+  headers: ["/include/adv_api/matmul/tiling.h"]
+```
 
 ```
 __aicore__ constexpr MatmulConfig GetSpecialMDLConfig(const bool intrinsicsLimit = false, const bool batchLoop = false, const uint32_t doMTE2Preload = 0, const bool isVecND2NZ = false, bool isPerTensor = false, bool hasAntiQuantOffset = false)

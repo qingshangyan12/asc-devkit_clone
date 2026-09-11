@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Cast（float转half/int32\_t）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/scalar_compute/Cast_float_to_half_int32.md
+description: 对标量的数据类型进行转换。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Cast__pT
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_scalar_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Cast（float转half/int32\_t）<a name="ZH-CN_TOPIC_0000001787470378"></a>
 
 ## 产品支持情况
@@ -40,6 +56,13 @@
 在使用该接口之前，用户需要先了解[内置数据类型](../data_structures/builtin_data_types.md)和[精度转换](../data_structures/precision_conversion.md)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "Cast__pT"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_scalar_intf.h"]
+```
 
 ```cpp
 template <typename T, typename U, RoundMode roundMode>

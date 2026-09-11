@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: 构造函数与析构函数
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_group_mgmt_ISASI/KfcWorkspace/constructor_and_destructor.md
+description: 用于创建KfcWorkspace对象，Kfc全称为kernel function call，表示核间通信调用。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # 构造函数与析构函数<a name="ZH-CN_TOPIC_0000001968645092"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

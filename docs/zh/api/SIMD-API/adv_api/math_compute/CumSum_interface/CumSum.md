@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: CumSum
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/CumSum_interface/CumSum.md
+description: 用于对输入张量按行或列进行累加和操作，输出结果中每个元素都是输入张量中对应位置及之前所有行或列的元素累加和。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # CumSum
 
 ## 产品支持情况

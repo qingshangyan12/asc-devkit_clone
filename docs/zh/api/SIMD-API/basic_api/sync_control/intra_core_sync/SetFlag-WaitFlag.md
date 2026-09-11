@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetFlag/WaitFlag
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag-WaitFlag.md
+description: 同一核内不同流水线之间的同步指令，具有数据依赖的不同流水指令之间需要插入此同步。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetFlag/WaitFlag<a name="ZH-CN_TOPIC_0000001944599897"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

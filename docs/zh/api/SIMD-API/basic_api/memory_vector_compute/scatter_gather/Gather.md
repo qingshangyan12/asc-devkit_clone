@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Gather
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/scatter_gather/Gather.md
+description: Gather接口接受输入张量（src）、地址偏移张量（srcOffset）和基地址（srcBaseAddr），根据基地址和地址偏移量确定输入张量的索引，将输入张量中对应元素收集到结果张量（dst）中。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Gather<a name="ZH-CN_TOPIC_0000002541491859"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

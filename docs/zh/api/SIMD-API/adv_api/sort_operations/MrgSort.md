@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: MrgSort
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/sort_operations/MrgSort.md
+description: 将已经排好序的最多4条队列，合并排列成1条队列，结果按照score域由大到小排序。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # MrgSort
 
 ## 产品支持情况

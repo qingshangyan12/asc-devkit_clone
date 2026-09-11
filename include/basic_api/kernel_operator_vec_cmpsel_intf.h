@@ -93,9 +93,23 @@ __aicore__ inline void Compare(
     const LocalTensor<U>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, CMPMODE cmpMode, uint32_t count);
 
 template <typename T>
+/**
+ * @ingroup simd_api.basic_api.memory_vector_compute.compare_and_select
+ * @override_id GetCmpMask__RCltg1x2_pT
+ * @archs 3510 2201 2002
+ * @brief 此接口用于获取[Compare（结果存入寄存器）](Compare_store_to_register.md)指令的比较结果。
+ * @param [out] dst [Compare（结果存入寄存器）](Compare_store_to_register.md)指令的比较结果。类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。LocalTensor的起始地址需要16字节对齐。
+ */
 __aicore__ inline void GetCmpMask(const LocalTensor<T>& dst);
 
 template <typename T>
+/**
+ * @ingroup simd_api.basic_api.memory_vector_compute.compare_and_select
+ * @override_id SetCmpMask__RCltg1x2_pT
+ * @archs 3510 2201 2002
+ * @brief 设置比较寄存器的值，配合不传入mask参数的[Select](Select.md)接口使用，根据不同的selMode传入不同的数据。
+ * @param [in] src 类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。LocalTensor的起始地址需要16字节对齐。
+ */
 __aicore__ inline void SetCmpMask(const LocalTensor<T>& src);
 
 /* **************************************************************************************************

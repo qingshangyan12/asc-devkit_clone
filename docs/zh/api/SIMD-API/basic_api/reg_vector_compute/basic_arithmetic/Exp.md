@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Exp
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/basic_arithmetic/Exp.md
+description: 该接口根据mask，对源操作数srcReg进行按元素指数操作，将结果写入目的操作数dstReg。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Exp<a name="ZH-CN_TOPIC_0000001929810838"></a>
 
 ## 产品支持情况

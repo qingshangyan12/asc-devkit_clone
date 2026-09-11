@@ -5,11 +5,12 @@ resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalig
 description: "从Unified Buffer（UB）中按dtype对齐的起始地址读取VL长度连续数据，并搬入矢量数据寄存器。本接口将[asc_loadunalign_pre](asc_loadunalign_pre.md)中的非对齐寄存器（32字节）中缓存的前置数据与从UB读取的后续数据拼接，得到VL长度数据并搬入矢量数据寄存器。连续搬入时，需要在每次调用前手动更新源地址。"
 tag: [c_api, data_movement, 'operations:load', vector, register_vector, 'src:unified_buffer',
   'dst:vector_register']
+usage_dependencies:
+  status: unconfirmed
 signature:
   - prototype_id: "asc_loadunalign__Rv<dtype>_Rvloadunalign_PU<dtype>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadunalign.h"
+    headers: [/include/c_api/reg_compute/load/loadunalign.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -54,8 +55,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_loadunalign__Rv<dtype>_Rvloadunalign_PU<dtype>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadunalign.h"
+  headers: [/include/c_api/reg_compute/load/loadunalign.h]
   dtype:
     values:
       - "int4b_t"

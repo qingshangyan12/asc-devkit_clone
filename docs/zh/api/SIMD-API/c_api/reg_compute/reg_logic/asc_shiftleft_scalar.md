@@ -10,12 +10,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_shiftleft_scalar__v<dtype>_i16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_logic.h"
+    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
   - prototype_id: "asc_shiftleft_scalar__Rv<dtype>_v<dtype>_i16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_logic.h"
+    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -69,8 +67,7 @@ $$
 api_signature:
   prototype_id: "asc_shiftleft_scalar__v<dtype>_i16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_logic.h"
+  headers: [/include/c_api/reg_compute/compute/reg_logic.h]
   dtype:
     values:
       - "int8_t"
@@ -92,8 +89,7 @@ __simd_callee__ inline vector_<dtype> asc_shiftleft_scalar(vector_<dtype> src,
 api_signature:
   prototype_id: "asc_shiftleft_scalar__Rv<dtype>_v<dtype>_i16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_logic.h"
+  headers: [/include/c_api/reg_compute/compute/reg_logic.h]
   dtype:
     values:
       - "int8_t"

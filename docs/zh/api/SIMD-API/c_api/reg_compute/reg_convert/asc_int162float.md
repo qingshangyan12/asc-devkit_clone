@@ -9,12 +9,10 @@ usage_dependencies:
 signature:
   - override_id: "asc_int162float__Rvf32_vi16_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_int162float__Rvf32_vi16_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -72,8 +70,7 @@ def asc_int162float(dst, src, mask, src_pos):
 api_signature:
   override_id: "asc_int162float__Rvf32_vi16_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -87,8 +84,7 @@ __simd_callee__ inline void asc_int162float(vector_float& dst,
 api_signature:
   override_id: "asc_int162float__Rvf32_vi16_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c

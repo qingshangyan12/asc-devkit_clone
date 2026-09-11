@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Adds
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Adds.md
+description: Adds属于双目标量类计算接口，输入为一个矢量tensor和一个标量scalar，Adds负责将矢量tensor内的每个元素与标量进行求和。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Adds<a name="ZH-CN_TOPIC_0000001379841780"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

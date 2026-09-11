@@ -9,12 +9,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_pair_reduce_sum__v<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_reduce.h"
+    headers: [/include/c_api/reg_compute/compute/reg_reduce.h]
   - prototype_id: "asc_pair_reduce_sum__Rv<dtype>_v<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_reduce.h"
+    headers: [/include/c_api/reg_compute/compute/reg_reduce.h]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce_pair"
     archs: ["3510"]
@@ -71,8 +69,7 @@ $$
 api_signature:
   prototype_id: "asc_pair_reduce_sum__v<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_reduce.h"
+  headers: [/include/c_api/reg_compute/compute/reg_reduce.h]
   dtype:
     values:
       - "half"
@@ -89,8 +86,7 @@ __simd_callee__ inline vector_<dtype> asc_pair_reduce_sum(vector_<dtype> src,
 api_signature:
   prototype_id: "asc_pair_reduce_sum__Rv<dtype>_v<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_reduce.h"
+  headers: [/include/c_api/reg_compute/compute/reg_reduce.h]
   dtype:
     values:
       - "half"

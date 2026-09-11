@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: WriteGmByPassDCache\(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/scalar_compute/WriteGmByPassDCache_ISASI.md
+description: 不经过DCache向GM地址上写数据。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: WriteGmByPassDCache__PGpT_pT
+  archs: ['3510', '2201']
+  headers: [/include/basic_api/kernel_operator_scalar_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # WriteGmByPassDCache\(ISASI\)<a name="ZH-CN_TOPIC_0000002327151478"></a>
 
 ## 产品支持情况
@@ -55,6 +71,13 @@ AscendC::WriteGmByPassDCache<T>(addr, value);
 ```
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "WriteGmByPassDCache__PGpT_pT"
+  archs: ["3510", "2201"]
+  headers: ["/include/basic_api/kernel_operator_scalar_intf.h"]
+```
 
 ```cpp
 template <typename T>

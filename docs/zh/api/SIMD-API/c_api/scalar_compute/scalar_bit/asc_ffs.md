@@ -9,8 +9,7 @@ usage_dependencies:
 signature:
   - override_id: "asc_ffs__u64"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/scalar_compute/compute/scalar_bit.h"
+    headers: [/include/c_api/scalar_compute/compute/scalar_bit.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -53,8 +52,7 @@ FindFirstSet接口，用于在输入`uint64_t`数据的二进制表示中，从�
 api_signature:
   override_id: "asc_ffs__u64"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/scalar_compute/compute/scalar_bit.h"
+  headers: [/include/c_api/scalar_compute/compute/scalar_bit.h]
 ```
 
 ```c

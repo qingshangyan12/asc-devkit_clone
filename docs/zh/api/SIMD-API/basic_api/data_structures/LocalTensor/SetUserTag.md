@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetUserTag
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/SetUserTag.md
+description: 为Tensor添加用户自定义信息，用户可以根据需要设置对应的Tag。后续可通过[GetUserTag](GetUserTag.md)获取指定Tensor的Tag信息，并根据Tag信息对Tensor进行相应操作。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetUserTag<a name="ZH-CN_TOPIC_0000002364805841"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

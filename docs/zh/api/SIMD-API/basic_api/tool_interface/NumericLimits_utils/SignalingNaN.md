@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: SignalingNaN
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/tool_interface/NumericLimits_utils/SignalingNaN.md
+description: 返回指定数据类型的[发信NaN值](../../data_structures/builtin_data_types.md)（浮点尾数最高位为0）。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SignalingNaN__z
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_limits_intf.h]
+- override_id: SignalingNaN__RCltg1x2_pT_u32
+  archs: ['3510']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SignalingNaN
 
 ## 产品支持情况
@@ -35,11 +54,25 @@
 
 - 标量接口，返回值为标量：
 
+```yaml
+api_signature:
+  override_id: "SignalingNaN__z"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_limits_intf.h"]
+```
+
     ```cpp
     constexpr __aicore__ static inline T SignalingNaN()
     ```
 
 - 矢量接口，为dstLocal前count个元素赋发信NaN值：
+
+```yaml
+api_signature:
+  override_id: "SignalingNaN__RCltg1x2_pT_u32"
+  archs: ["3510"]
+  headers: []
+```
 
     ```cpp
     __aicore__ static inline void SignalingNaN(const LocalTensor<T>& dstLocal, uint32_t count)

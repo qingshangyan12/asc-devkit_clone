@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: MaskReg
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/register_data_types/MaskReg.md
+description: 头文件引用路径为"basic_api/reg_compute/kernel_reg_compute_maskreg_intf.h"。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: CreateMask__z
+  archs: ['3510']
+  headers: [/include/basic_api/reg_compute/kernel_reg_compute_maskreg_intf.h]
+- override_id: UpdateMask__Ru32
+  archs: ['3510']
+  headers: [/include/basic_api/reg_compute/kernel_reg_compute_maskreg_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # MaskReg<a name="ZH-CN_TOPIC_0000001955873477"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -37,11 +56,25 @@ MaskReg寄存器用于指示在计算过程中哪些元素参与计算，宽度�
 
 ## 函数原型<a name="section620mcpsimp"></a>
 - CreateMask接口
+```yaml
+api_signature:
+  override_id: "CreateMask__z"
+  archs: ["3510"]
+  headers: ["/include/basic_api/reg_compute/kernel_reg_compute_maskreg_intf.h"]
+```
+
   ```cpp
   template <typename T, MaskPattern mode = MaskPattern::ALL, const RegTrait& regTrait = RegTraitNumOne>
   __simd_callee__ inline MaskReg CreateMask()
   ```
 - UpdateMask接口
+```yaml
+api_signature:
+  override_id: "UpdateMask__Ru32"
+  archs: ["3510"]
+  headers: ["/include/basic_api/reg_compute/kernel_reg_compute_maskreg_intf.h"]
+```
+
   ```cpp
   template <typename T, const RegTrait& regTrait = RegTraitNumOne>
   __simd_callee__ inline MaskReg UpdateMask(uint32_t& scalarValue)

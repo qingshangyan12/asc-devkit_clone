@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Clamp
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/Clamp_interface/Clamp.md
+description: 将输入中除nan值以外大于max的数替换为max，小于min的数替换为min，小于等于max和大于等于min的数保持不变，作为输出。当min大于max时，将除nan值外所有值替换为max。min和max可以为标量或LocalTensor。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Clamp__RCltg1x2_pT_RCltg1x2_pT_RCpU_RCpS_u32
+  archs: ['3510']
+  headers: [/include/adv_api/math/clamp.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Clamp
 
 ## 产品支持情况
@@ -32,6 +48,13 @@
 ![](../../../../figures/zh-cn_formulaimage_0000002419939453.png)
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "Clamp__RCltg1x2_pT_RCltg1x2_pT_RCpU_RCpS_u32"
+  archs: ["3510"]
+  headers: ["/include/adv_api/math/clamp.h"]
+```
 
 ```
 template <const ClampConfig& config = DEFAULT_CLAMP_CONFIG, typename T, typename U, typename S>

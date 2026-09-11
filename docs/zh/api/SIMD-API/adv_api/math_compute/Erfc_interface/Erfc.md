@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: Erfc
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/Erfc_interface/Erfc.md
+description: 返回输入x的互补误差函数结果，积分区间为x到无穷大。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Erfc__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/math/erfc.h]
+- override_id: Erfc__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/math/erfc.h]
+- override_id: Erfc__RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/math/erfc.h]
+- override_id: Erfc__RCltg1x2_pT_RCltg1x2_pT
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/math/erfc.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Erfc
 
 ## 产品支持情况
@@ -52,12 +77,26 @@ S\(z\) = \(\(\(\(z + S1\) \* z + S2\) \* z + S3\) \* z + S4\) \* z + S5是关于
 -   通过sharedTmpBuffer入参传入临时空间
     -   源操作数Tensor全部/部分参与计算
 
+```yaml
+api_signature:
+  override_id: "Erfc__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/math/erfc.h"]
+```
+
         ```
         template <typename T, bool isReuseSource = false>
         __aicore__ inline void Erfc(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
+
+```yaml
+api_signature:
+  override_id: "Erfc__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/math/erfc.h"]
+```
 
         ```
         template <typename T, bool isReuseSource = false>
@@ -67,12 +106,26 @@ S\(z\) = \(\(\(\(z + S1\) \* z + S2\) \* z + S3\) \* z + S4\) \* z + S5是关于
 -   接口框架申请临时空间
     -   源操作数Tensor全部/部分参与计算
 
+```yaml
+api_signature:
+  override_id: "Erfc__RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/math/erfc.h"]
+```
+
         ```
         template <typename T, bool isReuseSource = false>
         __aicore__ inline void Erfc(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
+
+```yaml
+api_signature:
+  override_id: "Erfc__RCltg1x2_pT_RCltg1x2_pT"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/math/erfc.h"]
+```
 
         ```
         template <typename T, bool isReuseSource = false>

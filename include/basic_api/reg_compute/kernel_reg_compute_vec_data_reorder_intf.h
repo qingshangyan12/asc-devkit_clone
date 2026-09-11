@@ -31,9 +31,21 @@
 namespace AscendC {
 namespace Reg {
 template <typename T = DefaultType, typename U>
+/**
+ * @ingroup simd_api.basic_api.reg_vector_compute.data_reorder
+ * @override_id Interleave__RpU_RpU_RpU_RpU
+ * @archs 3510
+ * @brief 给定源操作数寄存器srcReg0和srcReg1，将srcReg0和srcReg1中的元素交织存入结果操作数dstReg0和dstReg1中。
+ */
 __simd_callee__ inline void Interleave(U& dstReg0, U& dstReg1, U& srcReg0, U& srcReg1);
 
 template <typename T = DefaultType, typename U>
+/**
+ * @ingroup simd_api.basic_api.reg_vector_compute.data_reorder
+ * @override_id DeInterleave__RpU_RpU_RpU_RpU
+ * @archs 3510
+ * @brief 给定源操作数寄存器srcReg0和srcReg1，将srcReg0和srcReg1中的元素解交织存入结果操作数dstReg0和dstReg1中。
+ */
 __simd_callee__ inline void DeInterleave(U& dstReg0, U& dstReg1, U& srcReg0, U& srcReg1);
 } // namespace Reg
 } // namespace AscendC

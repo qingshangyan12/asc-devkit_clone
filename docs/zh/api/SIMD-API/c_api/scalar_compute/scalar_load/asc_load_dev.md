@@ -9,36 +9,28 @@ usage_dependencies:
 signature:
   - override_id: "asc_load_dev__PGi8"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/scalar_compute/scalar_load.h"
+    headers: [/include/c_api/scalar_compute/scalar_load.h]
   - override_id: "asc_load_dev__PGu8"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/scalar_compute/scalar_load.h"
+    headers: [/include/c_api/scalar_compute/scalar_load.h]
   - override_id: "asc_load_dev__PGi16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/scalar_compute/scalar_load.h"
+    headers: [/include/c_api/scalar_compute/scalar_load.h]
   - override_id: "asc_load_dev__PGu16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/scalar_compute/scalar_load.h"
+    headers: [/include/c_api/scalar_compute/scalar_load.h]
   - override_id: "asc_load_dev__PGi32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/scalar_compute/scalar_load.h"
+    headers: [/include/c_api/scalar_compute/scalar_load.h]
   - override_id: "asc_load_dev__PGu32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/scalar_compute/scalar_load.h"
+    headers: [/include/c_api/scalar_compute/scalar_load.h]
   - override_id: "asc_load_dev__PGi64"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/scalar_compute/scalar_load.h"
+    headers: [/include/c_api/scalar_compute/scalar_load.h]
   - override_id: "asc_load_dev__PGu64"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/scalar_compute/scalar_load.h"
+    headers: [/include/c_api/scalar_compute/scalar_load.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -82,8 +74,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_load_dev__PGi8"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/scalar_compute/scalar_load.h"
+  headers: [/include/c_api/scalar_compute/scalar_load.h]
 ```
 
 ```cpp
@@ -94,8 +85,7 @@ __aicore__ inline int8_t asc_load_dev(__gm__ int8_t* addr)
 api_signature:
   override_id: "asc_load_dev__PGu8"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/scalar_compute/scalar_load.h"
+  headers: [/include/c_api/scalar_compute/scalar_load.h]
 ```
 
 ```cpp
@@ -107,8 +97,7 @@ __aicore__ inline uint8_t asc_load_dev(__gm__ uint8_t* addr)
 api_signature:
   override_id: "asc_load_dev__PGi16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/scalar_compute/scalar_load.h"
+  headers: [/include/c_api/scalar_compute/scalar_load.h]
 ```
 
 ```cpp
@@ -120,8 +109,7 @@ __aicore__ inline int16_t asc_load_dev(__gm__ int16_t* addr)
 api_signature:
   override_id: "asc_load_dev__PGu16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/scalar_compute/scalar_load.h"
+  headers: [/include/c_api/scalar_compute/scalar_load.h]
 ```
 
 ```cpp
@@ -133,8 +121,7 @@ __aicore__ inline uint16_t asc_load_dev(__gm__ uint16_t* addr)
 api_signature:
   override_id: "asc_load_dev__PGi32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/scalar_compute/scalar_load.h"
+  headers: [/include/c_api/scalar_compute/scalar_load.h]
 ```
 
 ```cpp
@@ -146,8 +133,7 @@ __aicore__ inline int32_t asc_load_dev(__gm__ int32_t* addr)
 api_signature:
   override_id: "asc_load_dev__PGu32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/scalar_compute/scalar_load.h"
+  headers: [/include/c_api/scalar_compute/scalar_load.h]
 ```
 
 ```cpp
@@ -159,8 +145,7 @@ __aicore__ inline uint32_t asc_load_dev(__gm__ uint32_t* addr)
 api_signature:
   override_id: "asc_load_dev__PGi64"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/scalar_compute/scalar_load.h"
+  headers: [/include/c_api/scalar_compute/scalar_load.h]
 ```
 
 ```cpp
@@ -172,8 +157,7 @@ __aicore__ inline int64_t asc_load_dev(__gm__ int64_t* addr)
 api_signature:
   override_id: "asc_load_dev__PGu64"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/scalar_compute/scalar_load.h"
+  headers: [/include/c_api/scalar_compute/scalar_load.h]
 ```
 
 ```cpp

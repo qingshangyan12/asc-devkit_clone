@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GetLogMaxMinTmpSize
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/Log_interface/GetLogMaxMinTmpSize.md
+description: Host侧接口，用于获取Log接口能完成计算所需最小的临时空间大小，此空间为预留空间，即需要保证预留有足够的物理空间，用于执行计算。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetLogMaxMinTmpSize
 
 ## 功能说明

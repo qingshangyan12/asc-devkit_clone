@@ -1,3 +1,23 @@
+---
+okftype: reference.api.cpp
+title: AtomicCas
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/atomic_operations/AtomicCas.md
+description: 调用该接口后，可在指定GM地址上进行原子比较操作。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: AtomicCas__PGpT_pT_pT
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_atomic_intf.h]
+examples:
+- path: /examples/01_simd_cpp_api/03_basic_api/06_atomic/scalar_atomic_operations
+  archs: ['3510', '2201']
+  override_id: AtomicCas__PGpT_pT_pT
+  file: scalar_atomic_operations.asc
+timestamp: '2026-09-11'
+---
+
 # AtomicCas<a name="ZH-CN_TOPIC_0000002568264812"></a>
 
 ## 产品支持情况
@@ -42,6 +62,13 @@ new\_value = (old\_value == value1\ ?\ value2\ :\ old\_value)
 $$
 
 ## 函数原型<a name="section1171112415119"></a>
+
+```yaml
+api_signature:
+  override_id: "AtomicCas__PGpT_pT_pT"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_atomic_intf.h"]
+```
 
 ```cpp
 template <typename T>

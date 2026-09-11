@@ -15,20 +15,16 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_loadalign_unpack4__PU<dtype>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - prototype_id: "asc_loadalign_unpack4__Rv<dtype>_PU<dtype>"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - prototype_id: "asc_loadalign_unpack4__Rv<dtype>_PU<dtype>_i32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - prototype_id: "asc_loadalign_unpack4__Rv<dtype>_PU<dtype>_ar"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -79,8 +75,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_loadalign_unpack4__PU<dtype>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
   dtype:
     values:
       - "int4b_t"
@@ -103,8 +98,7 @@ __simd_callee__ inline vector_<dtype> asc_loadalign_unpack4(__ubuf__ <dtype>* sr
 api_signature:
   prototype_id: "asc_loadalign_unpack4__Rv<dtype>_PU<dtype>"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
   dtype:
     values:
       - "int4b_t"
@@ -145,8 +139,7 @@ __simd_callee__ inline void asc_loadalign_unpack4(vector_int8_t& dst,
 api_signature:
   prototype_id: "asc_loadalign_unpack4__Rv<dtype>_PU<dtype>_i32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
   dtype:
     values:
       - "int4b_t"
@@ -185,8 +178,7 @@ __simd_callee__ inline void asc_loadalign_unpack4(vector_int8_t& dst,
 api_signature:
   prototype_id: "asc_loadalign_unpack4__Rv<dtype>_PU<dtype>_ar"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
   dtype:
     values:
       - "int4b_t"

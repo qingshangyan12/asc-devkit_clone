@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Mins（灵活标量位置）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Mins_flexible_scalar.md
+description: Mins属于双目标量类计算接口，矢量内每个元素和标量间取较小值，支持标量在前和标量在后两种场景。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Mins（灵活标量位置）<a name="ZH-CN_TOPIC_0000002135039244"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

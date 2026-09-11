@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: make_pattern_layout
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/layout/make_pattern_layout.md
+description: make_pattern_layout用于根据shape、stride、LayoutPattern和Trait构造带布局模式信息的layout对象。
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: make_pattern_layout__RCpShape_RCpStride
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/layout_interface.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # make_pattern_layout
 
 ## 产品支持情况
@@ -35,6 +51,13 @@ make_pattern_layout用于根据shape、stride、LayoutPattern和Trait构造带�
 Trait用于描述C0粒度等布局特征。若使用`layout_trait<T, C0>`或`layout_trait_default<T>`写法，T仅作为兼容占位或C0推导依据，不作为Tensor的数据类型信息保存。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "make_pattern_layout__RCpShape_RCpStride"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/layout_interface.h"]
+```
 
 ```cpp
 template <typename LayoutPattern, typename Trait, typename Shape, typename Stride>

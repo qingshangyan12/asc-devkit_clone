@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GroupNorm Tiling
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/normalization/GroupNorm-Tiling.md
+description: GroupNorm Tiling API用于获取GroupNorm kernel计算时所需的Tiling参数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GroupNorm Tiling
 
 ## 功能说明

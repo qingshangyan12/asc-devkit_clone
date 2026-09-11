@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: BroadCastVecToMM\(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/BroadCastVecToMM_ISASI.md
+description: 将矢量数据广播到矩阵中，每个数据块中的每16个元素会被连续复制16次；当前支持的数据传输通路：UB-\>L0C Buffer（VECIN/VECCALC/VECOUT-\>CO1）。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: BroadCastVecToMM__RCltg1x2_pT_RCltg1x2_pU_i32_u8_u8_u8
+  archs: ['2002']
+  headers: [/include/basic_api/kernel_operator_mm_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # BroadCastVecToMM\(ISASI\)<a name="ZH-CN_TOPIC_0000001860143713"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -34,6 +50,13 @@
 ![](../../../../figures/function_example.png "功能示例")
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "BroadCastVecToMM__RCltg1x2_pT_RCltg1x2_pU_i32_u8_u8_u8"
+  archs: ["2002"]
+  headers: ["/include/basic_api/kernel_operator_mm_intf.h"]
+```
 
 ```cpp
 template <typename T, typename U>

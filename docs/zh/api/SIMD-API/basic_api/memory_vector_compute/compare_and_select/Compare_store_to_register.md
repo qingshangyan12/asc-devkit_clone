@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Compare（结果存入寄存器）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Compare_store_to_register.md
+description: 逐元素比较两个tensor大小，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。计算结果存入CmpMask 128bit寄存器中，可用于后续Select计算，也可使用[GetCmpMask](GetCmpMask_ISASI.md)接口获取寄存器保存的数据。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Compare（结果存入寄存器）<a name="ZH-CN_TOPIC_0000001835561717"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

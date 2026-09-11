@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: AddrReg
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/register_data_types/AddrReg.md
+description: 头文件引用路径为 "basic_api/reg_compute/kernel_reg_compute_addrreg_intf.h"。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: CreateAddrReg__u16_u32
+  archs: ['3510']
+  headers: [/include/basic_api/reg_compute/kernel_reg_compute_addrreg_intf.h]
+- override_id: CreateAddrReg__u16_u32_u16_u32
+  archs: ['3510']
+  headers: [/include/basic_api/reg_compute/kernel_reg_compute_addrreg_intf.h]
+- override_id: CreateAddrReg__u16_u32_u16_u32_u16_u32
+  archs: ['3510']
+  headers: [/include/basic_api/reg_compute/kernel_reg_compute_addrreg_intf.h]
+- override_id: CreateAddrReg__u16_u32_u16_u32_u16_u32_u16_u32
+  archs: ['3510']
+  headers: [/include/basic_api/reg_compute/kernel_reg_compute_addrreg_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # AddrReg<a name="ZH-CN_TOPIC_0000002081579973"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -73,18 +98,55 @@ AddrReg应该通过CreateAddrReg API初始化，然后在循环中使用AddrReg�
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
+```yaml
+api_signature:
+  override_id: "CreateAddrReg__u16_u32"
+  archs: ["3510"]
+  headers: ["/include/basic_api/reg_compute/kernel_reg_compute_addrreg_intf.h"]
+```
+
 ```cpp
 // offset = index0 * stride0 
 template <typename T> 
 __simd_callee__ inline AddrReg CreateAddrReg(uint16_t index0, uint32_t stride0) 
+```
+
+```yaml
+api_signature:
+  override_id: "CreateAddrReg__u16_u32_u16_u32"
+  archs: ["3510"]
+  headers: ["/include/basic_api/reg_compute/kernel_reg_compute_addrreg_intf.h"]
+```
+
+```cpp
   
 // offset = index0 * stride0 + index1 * stride1 
 template <typename T> 
 __simd_callee__ inline AddrReg CreateAddrReg(uint16_t index0, uint32_t stride0, uint16_t index1, uint32_t stride1) 
+```
+
+```yaml
+api_signature:
+  override_id: "CreateAddrReg__u16_u32_u16_u32_u16_u32"
+  archs: ["3510"]
+  headers: ["/include/basic_api/reg_compute/kernel_reg_compute_addrreg_intf.h"]
+```
+
+```cpp
   
 // offset = index0 * stride0 + index1 * stride1 + index2 * stride2 
 template <typename T> 
 __simd_callee__ inline AddrReg CreateAddrReg(uint16_t index0, uint32_t stride0, uint16_t index1, uint32_t stride1, uint16_t index2, uint32_t stride2)
+```
+
+```yaml
+api_signature:
+  override_id: "CreateAddrReg__u16_u32_u16_u32_u16_u32_u16_u32"
+  archs: ["3510"]
+  headers: ["/include/basic_api/reg_compute/kernel_reg_compute_addrreg_intf.h"]
+```
+
+```cpp
  
 // offset = index0 * stride0 + index1 * stride1 + index2 * stride2 + index3 * stride3 
 template <typename T> 

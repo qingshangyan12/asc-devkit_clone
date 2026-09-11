@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetDeqScale
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/type_conversion_aux_config/SetDeqScale.md
+description: 本接口用于设置DEQSCALE寄存器的值，DEQSCALE寄存器位宽为64bit，用于Vector计算单元上的量化计算。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetDeqScale<a name="ZH-CN_TOPIC_0000002573904763"></a>
 
 ## 产品支持情况<a name="zh-cn_topic_0000002563051145_section815614567413"></a>

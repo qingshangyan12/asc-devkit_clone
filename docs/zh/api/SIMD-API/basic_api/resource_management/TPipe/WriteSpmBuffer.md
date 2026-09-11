@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: WriteSpmBuffer
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/TPipe/WriteSpmBuffer.md
+description: 将因为Unified Buffer（UB）空间不足而需要溢出暂存的数据拷贝到SPM Buffer中。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # WriteSpmBuffer<a name="ZH-CN_TOPIC_0000001560560012"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

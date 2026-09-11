@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: FasterGeluV2
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/activation_functions/Gelu_interface/FasterGeluV2.md
+description: 在神经网络中，GELU是一个重要的激活函数，其灵感来源于relu和dropout，在激活中引入了随机正则的思想。为了降低GELU的算力需求，业界提出了FastGeluV2版本。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: FasterGeluV2__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/activation/gelu.h]
+- override_id: FasterGeluV2__RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/activation/gelu.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # FasterGeluV2
 
 ## 产品支持情况
@@ -37,12 +56,26 @@
 
 -   通过sharedTmpBuffer入参传入临时空间
 
+```yaml
+api_signature:
+  override_id: "FasterGeluV2__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/activation/gelu.h"]
+```
+
     ```
     template <typename T, bool highPrecision = false, bool highPerformance = false>
     __aicore__ inline void FasterGeluV2(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t dataSize)
     ```
 
 -   接口框架申请临时空间
+
+```yaml
+api_signature:
+  override_id: "FasterGeluV2__RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/activation/gelu.h"]
+```
 
     ```
     template <typename T, bool highPrecision = false, bool highPerformance = false>

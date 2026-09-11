@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Conv3D Tiling构造函数
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3D_Tiling/Conv3d_Tiling_constructor.md
+description: 用于创建一个Conv3D单核Tiling对象。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Conv3D Tiling构造函数
 
 ## 功能说明

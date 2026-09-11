@@ -9,12 +9,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_reduce_sum_datablock__v<src_dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_reduce.h"
+    headers: [/include/c_api/reg_compute/compute/reg_reduce.h]
   - prototype_id: "asc_reduce_sum_datablock__Rv<dst_dtype>_v<src_dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_reduce.h"
+    headers: [/include/c_api/reg_compute/compute/reg_reduce.h]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce_block"
     archs: ["3510"]
@@ -78,8 +76,7 @@ def asc_reduce_sum_datablock(dst, src, mask):
 api_signature:
   prototype_id: "asc_reduce_sum_datablock__v<src_dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_reduce.h"
+  headers: [/include/c_api/reg_compute/compute/reg_reduce.h]
   dtype:
     variants:
       -
@@ -106,8 +103,7 @@ __simd_callee__ inline vector_<dst_dtype> asc_reduce_sum_datablock(vector_<src_d
 api_signature:
   prototype_id: "asc_reduce_sum_datablock__Rv<dst_dtype>_v<src_dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_reduce.h"
+  headers: [/include/c_api/reg_compute/compute/reg_reduce.h]
   dtype:
     variants:
       -

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Fill
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/tensor_transform/Fill.md
+description: 将Global Memory上的数据初始化为指定值。该接口可用于对workspace地址或输出数据进行清零。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Fill__Rgtg1x2_pT_u64_pT
+  archs: ['3510', '2201', '2002']
+  headers: [/include/adv_api/utils/init_global_memory.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Fill
 
 ## 产品支持情况
@@ -28,6 +44,13 @@
 将Global Memory上的数据初始化为指定值。该接口可用于对workspace地址或输出数据进行清零。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "Fill__Rgtg1x2_pT_u64_pT"
+  archs: ["3510", "2201", "2002"]
+  headers: ["/include/adv_api/utils/init_global_memory.h"]
+```
 
 ```
 template <typename T>

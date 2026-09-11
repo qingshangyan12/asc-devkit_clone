@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Wait
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/Wait.md
+description: 阻塞AI Core，非[细粒度通信](Iterate.md)时，等待handleId对应的通信任务完成，[细粒度通信](Iterate.md)时，等待handleId对应的[步长](../HCCL_Tiling/SetStepSize.md)长度的子通信任务完成。handleId调用Wait接口的顺序，须和Prepare接口一致。该接口默认在所有核上工作，用户也可以在调用前通过[GetBlockIdx](../../../basic_api/tool_interface/system_resources_and_variables/GetBlockIdx.md)指定其在某一个核上运行。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Wait
 
 ## 产品支持情况

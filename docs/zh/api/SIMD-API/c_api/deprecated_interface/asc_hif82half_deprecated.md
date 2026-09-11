@@ -9,12 +9,10 @@ usage_dependencies:
 signature:
   - override_id: "asc_hif82half__Rvf16_vhf8_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_hif82half_v2__Rvf16_vhf8_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -61,8 +59,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_hif82half__Rvf16_vhf8_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp
@@ -74,8 +71,7 @@ __simd_callee__ inline void asc_hif82half(vector_half& dst, vector_hifloat8_t sr
 api_signature:
   override_id: "asc_hif82half_v2__Rvf16_vhf8_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```cpp

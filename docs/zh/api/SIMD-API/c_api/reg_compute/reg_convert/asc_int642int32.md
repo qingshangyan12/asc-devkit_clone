@@ -10,20 +10,16 @@ usage_dependencies:
 signature:
   - override_id: "asc_int642int32__Rvi32_vi64_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_int642int32_sat__Rvi32_vi64_vb_icposeven"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_int642int32__Rvi32_vi64_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: "asc_int642int32_sat__Rvi32_vi64_vb_icposodd"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/reg_convert.h"
+    headers: [/include/c_api/reg_compute/reg_convert.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -84,8 +80,7 @@ def asc_int642int32(dst, src, mask, dst_pos):
 api_signature:
   override_id: "asc_int642int32__Rvi32_vi64_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -100,8 +95,7 @@ __simd_callee__ inline void asc_int642int32(vector_int32_t& dst,
 api_signature:
   override_id: "asc_int642int32_sat__Rvi32_vi64_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -116,8 +110,7 @@ __simd_callee__ inline void asc_int642int32_sat(vector_int32_t& dst,
 api_signature:
   override_id: "asc_int642int32__Rvi32_vi64_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -132,8 +125,7 @@ __simd_callee__ inline void asc_int642int32(vector_int32_t& dst,
 api_signature:
   override_id: "asc_int642int32_sat__Rvi32_vi64_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -148,8 +140,7 @@ __simd_callee__ inline void asc_int642int32_sat(vector_int32_t& dst,
 api_signature:
   override_id: "asc_int642int32__Rvi32_vi64_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -165,8 +156,7 @@ __simd_callee__ inline void asc_int642int32(vector_int32_t& dst,
 api_signature:
   override_id: "asc_int642int32_sat__Rvi32_vi64_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -182,8 +172,7 @@ __simd_callee__ inline void asc_int642int32_sat(vector_int32_t& dst,
 api_signature:
   override_id: "asc_int642int32__Rvi32_vi64_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -199,8 +188,7 @@ __simd_callee__ inline void asc_int642int32(vector_int32_t& dst,
 api_signature:
   override_id: "asc_int642int32_sat__Rvi32_vi64_vb_icposodd"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c
@@ -220,8 +208,7 @@ __simd_callee__ inline void asc_int642int32_sat(vector_int32_t& dst,
 api_signature:
   override_id: "asc_int642int32__Rvi32_vi64_vb_icposeven"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/reg_convert.h"
+  headers: [/include/c_api/reg_compute/reg_convert.h]
 ```
 
 ```c

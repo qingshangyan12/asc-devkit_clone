@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: SetAtomicType
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/atomic_operations/SetAtomicType.md
+description: 通过设置模板参数来设定原子操作不同的数据类型。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetAtomicType__z
+  archs: ['3510', '2201', '3002', '2002']
+  headers: [/include/basic_api/kernel_operator_set_atomic_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetAtomicType<a name="ZH-CN_TOPIC_0000001835083633"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -32,6 +48,13 @@
 通过设置模板参数来设定原子操作不同的数据类型。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "SetAtomicType__z"
+  archs: ["3510", "2201", "3002", "2002"]
+  headers: ["/include/basic_api/kernel_operator_set_atomic_intf.h"]
+```
 
 ```cpp
 template <typename T>

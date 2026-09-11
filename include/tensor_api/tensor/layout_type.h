@@ -116,6 +116,12 @@ public:
     __aicore__ inline constexpr decltype(auto) Stride() const;
 
     template <size_t... I>
+/**
+ * @ingroup simd_api.tensor_api.deprecated_interface
+ * @override_id Rank__z
+ * @archs 3510
+ * @brief **该接口已废弃，请使用[layout::rank](../layout/layout.md#rank)替代。
+ */
     __aicore__ inline constexpr decltype(auto) Rank() const;
 
     template <size_t... I>

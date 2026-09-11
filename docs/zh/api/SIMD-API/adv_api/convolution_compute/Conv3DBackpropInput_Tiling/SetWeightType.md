@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetWeightType
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3DBackpropInput_Tiling/SetWeightType.md
+description: 设置权重矩阵Weight的位置、数据格式、数据类型信息，这些信息必须与核函数（Kernel）侧的设置保持一致。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetWeightType
 
 ## 功能说明

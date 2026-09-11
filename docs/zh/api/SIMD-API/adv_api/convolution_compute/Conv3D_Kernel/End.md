@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: End
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/convolution_compute/Conv3D_Kernel/End.md
+description: 在Conv3D计算完成后，必须调用一次End函数，以清除EventID并释放内部申请的临时内存。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # End
 
 ## 产品支持情况

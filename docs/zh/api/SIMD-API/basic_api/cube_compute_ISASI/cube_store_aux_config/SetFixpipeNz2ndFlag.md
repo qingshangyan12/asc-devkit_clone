@@ -1,3 +1,26 @@
+---
+okftype: reference.api.cpp
+title: SetFixpipeNz2ndFlag
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_store_aux_config/SetFixpipeNz2ndFlag.md
+description: DataCopy数据搬运（[L0C Buffer->GM](../cube_compute_store/Fixpipe_L0CToGM.md)）过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetFixpipeNz2ndFlag__u16_u16_u16
+  archs: ['3510', '2201', '3002', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_fixpipe_intf.h]
+- override_id: SetFixpipeNz2ndFlag__u16_u16_u32
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_fixpipe_intf.h]
+examples:
+- path: /examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_l0c2gm
+  archs: ['2201', '3510']
+  override_id: SetFixpipeNz2ndFlag__u16_u16_u16
+  file: data_copy_l0c2gm.asc
+timestamp: '2026-09-11'
+---
+
 # SetFixpipeNz2ndFlag<a id="ZH-CN_TOPIC_0000002569070993"></a>
 
 ## 产品支持情况<a id="zh-cn_topic_0000002516209232_section18204144912492"></a>
@@ -37,11 +60,25 @@ DataCopy数据搬运（[L0C Buffer->GM](../cube_compute_store/Fixpipe_L0CToGM.md
 
 ## 函数原型<a id="zh-cn_topic_0000002516209232_section620mcpsimp"></a>
 
+```yaml
+api_signature:
+  override_id: "SetFixpipeNz2ndFlag__u16_u16_u16"
+  archs: ["3510", "2201", "3002", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_fixpipe_intf.h"]
+```
+
 ```cpp
 __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint16_t dstNdStride)
 ```
 
 <!-- npu="950" id10 -->
+```yaml
+api_signature:
+  override_id: "SetFixpipeNz2ndFlag__u16_u16_u32"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_fixpipe_intf.h"]
+```
+
 ```cpp
 // 如下原型仅Ascend 950PR/Ascend 950DT支持
 __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint32_t dstNdStride)

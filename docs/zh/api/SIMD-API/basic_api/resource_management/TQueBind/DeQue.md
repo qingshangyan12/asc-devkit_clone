@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: DeQue
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/TQueBind/DeQue.md
+description: 将Tensor从队列中取出，用于后续处理。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: DeQue__z
+  archs: ['3510', '2201', '3002', '2002', '1001']
+  headers: [/include/basic_api/kernel_tpipe.h]
+- override_id: DeQue__Rltg1x2_pT
+  archs: ['3510', '2201', '3002', '2002', '1001']
+  headers: [/include/basic_api/kernel_tpipe.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DeQue<a name="ZH-CN_TOPIC_0000001857592865"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -35,12 +54,26 @@
 
 -   non-inplace接口：将入队的LocalTensor地址从队列中取出赋值给新创建的Tensor并返回
 
+```yaml
+api_signature:
+  override_id: "DeQue__z"
+  archs: ["3510", "2201", "3002", "2002", "1001"]
+  headers: ["/include/basic_api/kernel_tpipe.h"]
+```
+
     ```cpp
     template <typename T>
     __aicore__ inline LocalTensor<T> DeQue()
     ```
 
 -   inplace接口：通过出参的方式返回，可以减少Tensor反复创建的开销，具体使用指导可参考[Tensor原地操作](../../../../../guide/programming_guide/appendix/common_operations/tensor_inplace_performance.md)。
+
+```yaml
+api_signature:
+  override_id: "DeQue__Rltg1x2_pT"
+  archs: ["3510", "2201", "3002", "2002", "1001"]
+  headers: ["/include/basic_api/kernel_tpipe.h"]
+```
 
     ```cpp
     template <typename T>

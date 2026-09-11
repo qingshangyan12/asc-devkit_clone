@@ -10,12 +10,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_storealign_pack_postupdate__RPU<dtype>_v<dtype>_i32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/store/storealign.h"
+    headers: [/include/c_api/reg_compute/store/storealign.h]
   - prototype_id: "asc_storealign_pack_postupdate__RPU<dtype>_vb_i32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/store/storealign.h"
+    headers: [/include/c_api/reg_compute/store/storealign.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -67,8 +65,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_storealign_pack_postupdate__RPU<dtype>_v<dtype>_i32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/store/storealign.h"
+  headers: [/include/c_api/reg_compute/store/storealign.h]
   dtype:
     values:
       - "int16_t"
@@ -109,8 +106,7 @@ __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint32_t*& d
 api_signature:
   prototype_id: "asc_storealign_pack_postupdate__RPU<dtype>_vb_i32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/store/storealign.h"
+  headers: [/include/c_api/reg_compute/store/storealign.h]
   dtype:
     values:
       - "uint8_t"

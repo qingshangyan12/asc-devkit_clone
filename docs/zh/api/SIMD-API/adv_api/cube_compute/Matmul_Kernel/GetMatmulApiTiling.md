@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GetMatmulApiTiling
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/GetMatmulApiTiling.md
+description: 本接口用于在编译期间获取常量化的Matmul Tiling参数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetMatmulApiTiling
 
 ## 产品支持情况

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetDataBlockSizeInBytes
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetDataBlockSizeInBytes.md
+description: 获取当前芯片版本一个DataBlock的大小，单位为Byte。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetDataBlockSizeInBytes__z
+  archs: ['3510', '2201', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_sys_var_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetDataBlockSizeInBytes
 
 ## 产品支持情况
@@ -40,6 +56,13 @@
 开发者根据DataBlock的大小来计算API指令中待传入的[repeatTime、dstBlkStride、srcblkStride、dstRepStride、srcRepStride等参数值](../../memory_vector_compute/SIMD_compute/high_dim_split.md)。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "GetDataBlockSizeInBytes__z"
+  archs: ["3510", "2201", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_sys_var_intf.h"]
+```
 
 ```cpp
 __aicore__ inline constexpr int16_t GetDataBlockSizeInBytes()

@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: DeInterleave
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_rearrange_ISASI/DeInterleave.md
+description: 给定源操作数src0和src1，将src0和src1中的元素解交织存入结果操作数dst0和dst1中。解交织排列方式如下图所示，其中每个方格代表一个元素。
+tag: [basic_api, 'operations:deinterleave']
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: DeInterleave__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_i32
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_vec_duplicate_intf.h]
+- override_id: DeInterleave__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_i32
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_vec_duplicate_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DeInterleave<a name="ZH-CN_TOPIC_0000002131264492"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -37,12 +56,26 @@
 
 -   两个输入
 
+```yaml
+api_signature:
+  override_id: "DeInterleave__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_i32"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_vec_duplicate_intf.h"]
+```
+
     ```
     template <typename T>
     __aicore__ inline void DeInterleave(const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const int32_t count)
     ```
 
 -   一个输入
+
+```yaml
+api_signature:
+  override_id: "DeInterleave__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_i32"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_vec_duplicate_intf.h"]
+```
 
     ```
     template <typename T>

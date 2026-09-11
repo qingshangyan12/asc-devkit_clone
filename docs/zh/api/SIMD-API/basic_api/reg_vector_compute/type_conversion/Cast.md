@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Cast
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/type_conversion/Cast.md
+description: Cast用于数据类型精度转换，将源操作数数据类型转换成目的操作数数据类型，能够实现[浮点转整数](#表6-浮点转整数)、[浮点转浮点](#表7-浮点转浮点)、[整数转浮点](#表8-整数转浮点)、[整数转整数](#表9-整数转整数)的数据类型转换。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Cast<a name="ZH-CN_TOPIC_0000001956827113"></a>
 
 ## 产品支持情况

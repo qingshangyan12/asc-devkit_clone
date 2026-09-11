@@ -1,3 +1,18 @@
+---
+okftype: reference.api.cpp
+title: GetTensorC
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/GetTensorC.md
+description: Iterate后，获取一块或者两块C矩阵片，可以直接输出到GM tensor中，也可以输出到Unified Buffer（UB，VECIN）tensor中。当[MatmulConfig](MatmulConfig.md#matmulconfig-params)参数中的ScheduleType取值为ScheduleType::INNER\_PRODUCT时，获取一块C矩阵片；当[MatmulConfig](MatmulConfig.md#matmulconfig-params)参数中的ScheduleType取值为ScheduleType::OUTER\_PRODUCT时，获取两块C矩阵片。
+tag: [adv_api]
+usage_dependencies:
+  status: confirmed
+  companion:
+  - Iterate.md
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetTensorC
 
 ## 产品支持情况

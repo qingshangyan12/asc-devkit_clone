@@ -14,12 +14,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_loadunalign_postupdate__Rv<dtype>_Rvloadunalign_RPU<dtype>_u32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadunalign.h"
+    headers: [/include/c_api/reg_compute/load/loadunalign.h]
   - prototype_id: "asc_loadunalign_postupdate__Rv<dtype>_Rvloadunalign_PU<dtype>_Rar_u32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadunalign.h"
+    headers: [/include/c_api/reg_compute/load/loadunalign.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -72,8 +70,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_loadunalign_postupdate__Rv<dtype>_Rvloadunalign_RPU<dtype>_u32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadunalign.h"
+  headers: [/include/c_api/reg_compute/load/loadunalign.h]
   dtype:
     values:
       - "int4b_t"
@@ -122,8 +119,7 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_int8_t& dst,
 api_signature:
   prototype_id: "asc_loadunalign_postupdate__Rv<dtype>_Rvloadunalign_PU<dtype>_Rar_u32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadunalign.h"
+  headers: [/include/c_api/reg_compute/load/loadunalign.h]
   dtype:
     values:
       - "int4b_t"

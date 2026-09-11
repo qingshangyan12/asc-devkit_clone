@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: LayerNormGrad
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/normalization/LayerNormGrad.md
+description: LayerNormGrad是一个函数，用于计算LayerNorm的反向传播梯度。该接口单独使用会输出x、resForGamma；也可以和LayerNormGradBeta配合使用，输出的resForGamma传递给LayerNormGradBeta，
+  LayerNormGradBeta接口会输出gamma和beta，配合使用时就可以同时得到x、Gamma、beta。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LayerNormGrad
 
 ## 产品支持情况

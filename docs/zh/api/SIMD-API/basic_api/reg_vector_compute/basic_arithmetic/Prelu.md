@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Prelu
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/basic_arithmetic/Prelu.md
+description: 该接口用于实现PReLU（Parametric ReLU）激活函数：当源操作数srcReg0中对应元素大于0时。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Prelu<a name="ZH-CN_TOPIC_0000002043043760"></a>
 
 ## 产品支持情况

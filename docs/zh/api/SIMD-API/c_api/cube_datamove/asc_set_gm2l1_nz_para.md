@@ -9,14 +9,12 @@ usage_dependencies:
 signature:
   - override_id: "asc_set_gm2l1_nz_para__u16_u16_u16_u16"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_set_gm2l1_nz_para__u64"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 examples: []
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_set_gm2l1_nz_para
@@ -61,8 +59,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_set_gm2l1_nz_para__u16_u16_u16_u16"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
 ```c
@@ -73,8 +70,7 @@ __aicore__ inline void asc_set_gm2l1_nz_para(uint16_t matrix_num, uint16_t dst_n
 api_signature:
   override_id: "asc_set_gm2l1_nz_para__u64"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
 ```c

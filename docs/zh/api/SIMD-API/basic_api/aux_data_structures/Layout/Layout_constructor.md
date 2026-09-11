@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Layout构造函数
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/aux_data_structures/Layout/Layout_constructor.md
+description: 根据输入的Shape和Stride对象，实例化Layout对象。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Layout构造函数<a name="ZH-CN_TOPIC_0000002297654132"></a>
 
 ## 产品支持情况<a name="section73648168211"></a>

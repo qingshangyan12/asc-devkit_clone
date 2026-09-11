@@ -10,8 +10,7 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_storeunalign__PU<dtype>_Rvstoreunalign_v<dtype>_u32"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/store/storeunalign.h"
+    headers: [/include/c_api/reg_compute/store/storeunalign.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -64,8 +63,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_storeunalign__PU<dtype>_Rvstoreunalign_v<dtype>_u32"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/store/storeunalign.h"
+  headers: [/include/c_api/reg_compute/store/storeunalign.h]
   dtype:
     values:
       - "int4b_t"

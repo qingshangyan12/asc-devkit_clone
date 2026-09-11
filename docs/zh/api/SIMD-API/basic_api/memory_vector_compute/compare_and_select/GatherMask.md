@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GatherMask
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/GatherMask.md
+description: 以**内置固定模式**或者**用户自定义输入的Tensor**数值对应的二进制为gather mask（数据收集的掩码），从源操作数中选取元素写入目的操作数中。1为选取，0为不选取。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GatherMask<a name="ZH-CN_TOPIC_0000001500267978"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

@@ -68,6 +68,15 @@ public:
         }
     }
 
+/**
+ * @ingroup simd_api.adv_api.convolution_compute.conv3dbackpropfilter_kernel
+ * @override_id SetSingleShape__u64_u64_u64
+ * @archs 2201
+ * @brief 设置Conv3DBackpropFilter在单核上计算的形状。用于运行时修改shape。
+ * @param [in] singleCoreM 单核上M的大小，单位为元素个数。
+ * @param [in] singleCoreN 单核上N的大小，单位为元素个数。
+ * @param [in] singleCoreK 单核上K的大小，单位为元素个数。
+ */
     __aicore__ inline void SetSingleShape(uint64_t singleCoreM, uint64_t singleCoreN, uint64_t singleCoreK)
     {
         using Local = typename Ext::SetSingleShape;
@@ -76,6 +85,13 @@ public:
         }
     }
 
+/**
+ * @ingroup simd_api.adv_api.convolution_compute.conv3dbackpropfilter_kernel
+ * @override_id SetStartPosition__u32
+ * @archs 2201
+ * @brief 设置单核上GradOutput载入数据的起始位置。
+ * @param [in] hoStartIdx 当前核GradOutput Height方向起始位置。
+ */
     __aicore__ inline void SetStartPosition(uint32_t hoStartIdx)
     {
         using Local = typename Ext::SetStartPosition;
@@ -85,6 +101,13 @@ public:
     }
 
     template <bool sync = true>
+/**
+ * @ingroup simd_api.adv_api.convolution_compute.conv3dbackpropfilter_kernel
+ * @override_id Iterate__b
+ * @archs 2201
+ * @brief 每次调用Iterate时，会计算出一个baseM \* baseN的结果矩阵，并将该结果写入L0C Buffer。接口内部会维护迭代进度，每次调用后，矩阵的起始地址将进行偏移。如果传入的数据未对齐存在尾块，则在最后一次迭代中输出尾块的计算结果。本接口需与[GetTensorC](GetTensorC.md)接口配合使用；在调用本接口后，再调用GetTensorC接口，L0C Buffer中的数据将被写入目标地址。
+ * @param [in] enPartialSum 预留参数，用户无需感知。
+ */
     __aicore__ inline bool Iterate(bool enPartialSum = false)
     {
         using Local = typename Ext::template Iterate<sync>;
@@ -103,6 +126,12 @@ public:
         }
     }
 
+/**
+ * @ingroup simd_api.adv_api.convolution_compute.conv3dbackpropfilter_kernel
+ * @override_id End__z
+ * @archs 2201
+ * @brief 在Conv3DBackpropFilter卷积反向计算完成后，必须调用一次End，以清除EventID并释放内部申请的临时内存。
+ */
     __aicore__ inline void End()
     {
         using Local = typename Ext::End;

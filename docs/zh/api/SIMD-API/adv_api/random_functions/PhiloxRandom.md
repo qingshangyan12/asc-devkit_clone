@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: PhiloxRandom
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/random_functions/PhiloxRandom.md
+description: 基于Philox随机数生成算法，给定随机数种子，生成若干的随机数。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # PhiloxRandom
 
 ## 产品支持情况

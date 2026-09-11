@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: PrintTimeStamp
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/debug_interface/onboard_print/PrintTimeStamp.md
+description: 提供时间戳打点功能，用于在算子核函数（Kernel）代码中标记关键执行点。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: PrintTimeStamp__u32
+  archs: ['3510', '2201', '3002']
+  headers: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # PrintTimeStamp<a name="ZH-CN_TOPIC_0000002122196581"></a>
 
 ## 产品支持情况
@@ -53,6 +69,13 @@ descId is 11, rsv is 0, timeStamp is 815603975350485, pcPtr is 19792358553124, e
 > ```
 
 ## 函数原型<a name="section2067518173415"></a>
+
+```yaml
+api_signature:
+  override_id: "PrintTimeStamp__u32"
+  archs: ["3510", "2201", "3002"]
+  headers: []
+```
 
 ```cpp
 __aicore__ inline void PrintTimeStamp(uint32_t descId)

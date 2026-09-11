@@ -1,3 +1,18 @@
+---
+okftype: reference.api.cpp
+title: Unlock
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/Unlock.md
+description: 指定流水的前序指令执行完成后，根据MutexID释放对应Mutex。
+tag: [basic_api]
+usage_dependencies:
+  status: confirmed
+  companion:
+  - Lock.md
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Unlock<a name="ZH-CN_TOPIC_0000002406681009"></a>
 
 ## 产品支持情况<a name="section73648168211"></a>

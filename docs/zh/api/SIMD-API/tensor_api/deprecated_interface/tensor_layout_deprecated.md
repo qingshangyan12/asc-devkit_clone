@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: base_tensor::Layout（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/deprecated_interface/tensor_layout_deprecated.md
+description: '**该接口已废弃，请使用[base_tensor::layout](../tensor/tensor.md#layout)替代。'
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Layout__z
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/tensor.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # base_tensor::Layout（废弃）
 
 ## 产品支持情况
@@ -33,6 +49,13 @@
 获取Tensor绑定的Layout对象。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "Layout__z"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/tensor.h"]
+```
 
 ```cpp
 __aicore__ inline constexpr decltype(auto) Layout() const;

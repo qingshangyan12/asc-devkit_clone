@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: MaskReg搬入（LoadAlign）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/LoadAlign_MaskReg.md
+description: LoadAlign能够实现数据从Unified Buffer（UB）搬运至[MaskReg](../register_data_types/MaskReg.md)。
+tag: [basic_api]
+usage_dependencies:
+  status: confirmed
+  required_before:
+    all_of:
+    - ../register_data_types/AddrReg.md
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # MaskReg搬入（LoadAlign）<a name="ZH-CN_TOPIC_0000001958227253"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

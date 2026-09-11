@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: DataCopyPad（UBToGM非对齐数据搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopyPad_UBToGM.md
+description: 该接口提供将数据从Unified Buffer（UB）非对齐搬运至Global Memory的功能。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # DataCopyPad（UBToGM非对齐数据搬运）<a name="ZH-CN_TOPIC_0000001894460401"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

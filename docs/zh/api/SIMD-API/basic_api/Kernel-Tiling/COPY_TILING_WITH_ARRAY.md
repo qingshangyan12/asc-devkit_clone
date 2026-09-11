@@ -1,3 +1,18 @@
+---
+okftype: reference.api.cpp
+title: COPY\_TILING\_WITH\_ARRAY
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/Kernel-Tiling/COPY_TILING_WITH_ARRAY.md
+description: 拷贝指定大小的数组内容到目标数组中，并返回指向拷贝后数组的指针。适用于拷贝一个结构体的数组成员变量的场景。该宏将指定数组拷贝至栈上，适用于频繁访问Tiling数据的场景，能够加快数据访问速度。
+tag: [basic_api]
+usage_dependencies:
+  status: confirmed
+  companion:
+  - GET_TILING_DATA_PTR_WITH_STRUCT.md
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # COPY\_TILING\_WITH\_ARRAY<a name="ZH-CN_TOPIC_0000002414439318"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

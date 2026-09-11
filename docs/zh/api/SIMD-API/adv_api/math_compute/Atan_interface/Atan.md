@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: Atan
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/math_compute/Atan_interface/Atan.md
+description: 按元素做三角函数反正切运算。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Atan__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/math/atan.h]
+- override_id: Atan__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/math/atan.h]
+- override_id: Atan__RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/math/atan.h]
+- override_id: Atan__RCltg1x2_pT_RCltg1x2_pT
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/math/atan.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Atan
 
 ## 产品支持情况
@@ -42,12 +67,26 @@
 -   通过sharedTmpBuffer入参传入临时空间
     -   源操作数Tensor全部/部分参与计算
 
+```yaml
+api_signature:
+  override_id: "Atan__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/math/atan.h"]
+```
+
         ```
         template <typename T, bool isReuseSource = false, const AtanConfig& config = defaultAtanConfig>
         __aicore__ inline void Atan(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
+
+```yaml
+api_signature:
+  override_id: "Atan__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/math/atan.h"]
+```
 
         ```
         template <typename T, bool isReuseSource = false, const AtanConfig& config = defaultAtanConfig>
@@ -57,12 +96,26 @@
 -   接口框架申请临时空间
     -   源操作数Tensor全部/部分参与计算
 
+```yaml
+api_signature:
+  override_id: "Atan__RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/math/atan.h"]
+```
+
         ```
         template <typename T, bool isReuseSource = false, const AtanConfig& config = defaultAtanConfig>
         __aicore__ inline void Atan(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
+
+```yaml
+api_signature:
+  override_id: "Atan__RCltg1x2_pT_RCltg1x2_pT"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/math/atan.h"]
+```
 
         ```
         template <typename T, bool isReuseSource = false, const AtanConfig& config = defaultAtanConfig>

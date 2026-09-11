@@ -10,8 +10,7 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_loadalign_datablock_strided__PU<dtype>_u16_u16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/load/loadalign.h"
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -58,8 +57,7 @@ timestamp: "2026-09-10"
 api_signature:
   prototype_id: "asc_loadalign_datablock_strided__PU<dtype>_u16_u16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/load/loadalign.h"
+  headers: [/include/c_api/reg_compute/load/loadalign.h]
   dtype:
     values:
       - "int4b_t"

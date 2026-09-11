@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: ReduceMax
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceMax.md
+description: '`ReduceMax`接口用于从所有输入数据中找出最大值和最大值索引。'
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ReduceMax
 
 ## 产品支持情况

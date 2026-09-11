@@ -39,6 +39,12 @@ __simd_callee__ inline reg_pair<T> interleave(reg_tensor<T> src0, reg_tensor<T> 
  * @return A pair of register tensors containing the deinterleaved elements. Both result tensors use a full mask.
  */
 template <typename T>
+/**
+ * @ingroup simd_api.tensor_api.reg_vector_compute.data_reorder
+ * @override_id deinterleave__regtensorg1x2_pT_regtensorg1x2_pT
+ * @archs 3510
+ * @brief 给定源操作数寄存器src0和src1，将src0和src1中的元素解交织存入结果操作数dst0和dst1中。
+ */
 __simd_callee__ inline reg_pair<T> deinterleave(reg_tensor<T> src0, reg_tensor<T> src1);
 } // namespace experimental
 } // namespace te

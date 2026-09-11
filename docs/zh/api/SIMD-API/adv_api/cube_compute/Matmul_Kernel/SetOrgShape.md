@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: SetOrgShape
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetOrgShape.md
+description: 设置Matmul计算原始完整的形状M、N、K，单位为元素个数。用于运行时修改shape，比如复用同一个Matmul对象，从不同的矩阵块取数据计算。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SetOrgShape__i_i_i
+  archs: ['3510', '2201', '3002', '2002', x90]
+  headers: [/include/adv_api/matmul/matmul.h]
+- override_id: SetOrgShape__i_i_i_i_i
+  archs: ['3510', '2201', '3002', '2002', x90]
+  headers: [/include/adv_api/matmul/matmul.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetOrgShape
 
 ## 产品支持情况
@@ -32,8 +51,22 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "SetOrgShape__i_i_i"
+  archs: ["3510", "2201", "3002", "2002", "x90"]
+  headers: ["/include/adv_api/matmul/matmul.h"]
+```
+
 ```
 __aicore__ inline void SetOrgShape(int orgM, int orgN, int orgK)
+```
+
+```yaml
+api_signature:
+  override_id: "SetOrgShape__i_i_i_i_i"
+  archs: ["3510", "2201", "3002", "2002", "x90"]
+  headers: ["/include/adv_api/matmul/matmul.h"]
 ```
 
 ```

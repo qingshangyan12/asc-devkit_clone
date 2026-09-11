@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: SwiGLU
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/activation_functions/SwiGLU_interface/SwiGLU.md
+description: SwiGLU是采用Swish作为激活函数的GLU变体。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: SwiGLU__Rltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCf32_RCltg1x2_u8_u32
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/activation/swiglu.h]
+- override_id: SwiGLU__Rltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCf32_RCltg1x2_u8
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/activation/swiglu.h]
+- override_id: SwiGLU__Rltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCf32_u32
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/activation/swiglu.h]
+- override_id: SwiGLU__Rltg1x2_pT_Rltg1x2_pT_Rltg1x2_pT_RCf32
+  archs: ['3510', '2201', '2002', x90, '9030']
+  headers: [/include/adv_api/activation/swiglu.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SwiGLU
 
 ## 产品支持情况
@@ -44,12 +69,26 @@ SwiGLU是采用Swish作为激活函数的GLU变体。具体计算公式如下：
 -   通过sharedTmpBuffer入参传入临时空间
     -   源操作数Tensor全部/部分参与计算
 
+```yaml
+api_signature:
+  override_id: "SwiGLU__Rltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCf32_RCltg1x2_u8_u32"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/activation/swiglu.h"]
+```
+
         ```
         template <typename T, bool isReuseSource = false>
         __aicore__ inline void SwiGLU(LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1, const float& scalarValue, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
+
+```yaml
+api_signature:
+  override_id: "SwiGLU__Rltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCf32_RCltg1x2_u8"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/activation/swiglu.h"]
+```
 
         ```
         template <typename T, bool isReuseSource = false>
@@ -59,12 +98,26 @@ SwiGLU是采用Swish作为激活函数的GLU变体。具体计算公式如下：
 -   接口框架申请临时空间
     -   源操作数Tensor全部/部分参与计算
 
+```yaml
+api_signature:
+  override_id: "SwiGLU__Rltg1x2_pT_RCltg1x2_pT_RCltg1x2_pT_RCf32_u32"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/activation/swiglu.h"]
+```
+
         ```
         template <typename T, bool isReuseSource = false>
         __aicore__ inline void SwiGLU(LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1, const float& scalarValue, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
+
+```yaml
+api_signature:
+  override_id: "SwiGLU__Rltg1x2_pT_Rltg1x2_pT_Rltg1x2_pT_RCf32"
+  archs: ["3510", "2201", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/activation/swiglu.h"]
+```
 
         ```
         template <typename T, bool isReuseSource = false>

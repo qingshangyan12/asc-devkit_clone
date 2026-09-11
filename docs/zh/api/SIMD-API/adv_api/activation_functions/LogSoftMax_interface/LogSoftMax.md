@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: LogSoftMax
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/activation_functions/LogSoftMax_interface/LogSoftMax.md
+description: 对输入tensor做LogSoftmax计算。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LogSoftMax
 
 ## 产品支持情况

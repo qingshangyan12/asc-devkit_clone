@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetScaleAType
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetScaleAType.md
+description: MxMatmul场景，设置scaleA矩阵的位置、数据格式、是否转置等信息，这些信息需要和核函数（Kernel）侧的设置保持一致。如果不调用本接口，scaleA矩阵的信息将与[SetAType](SetAType.md)中设置的A矩阵的信息保持一致。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetScaleAType
 
 ## 功能说明

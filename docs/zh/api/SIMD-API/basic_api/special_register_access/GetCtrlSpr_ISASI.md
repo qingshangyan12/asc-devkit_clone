@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetCtrlSpr(ISASI)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/special_register_access/GetCtrlSpr_ISASI.md
+description: 读取CTRL寄存器（控制寄存器）特定比特位上的值。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetCtrlSpr__z
+  archs: ['3510', '2201']
+  headers: [/include/basic_api/kernel_operator_common_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetCtrlSpr(ISASI)
 
 ## 产品支持情况
@@ -32,6 +48,13 @@
 读取CTRL寄存器（控制寄存器）特定比特位上的值。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "GetCtrlSpr__z"
+  archs: ["3510", "2201"]
+  headers: ["/include/basic_api/kernel_operator_common_intf.h"]
+```
 
 ```cpp
 template <int8_t startBit, int8_t endBit>

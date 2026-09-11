@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetCurAddr
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/custom_TBufPool/GetCurAddr.md
+description: 获取当前已经被自定义TBufPool分配的地址，用户可以从该地址值开始向后分配内存块。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetCurAddr__z
+  archs: ['3510', '2201', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_tpipe.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetCurAddr<a name="ZH-CN_TOPIC_0000002087883725"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -38,6 +54,13 @@
 获取当前已经被自定义TBufPool分配的地址，用户可以从该地址值开始向后分配内存块。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "GetCurAddr__z"
+  archs: ["3510", "2201", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_tpipe.h"]
+```
 
 ```cpp
 __aicore__ inline uint32_t GetCurAddr()

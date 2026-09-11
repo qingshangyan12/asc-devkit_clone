@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: LoadData（2D矩阵搬运V2）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_2D_V2.md
+description: 负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512字节的数据分形为单位进行。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LoadData（2D矩阵搬运V2）
 
 ## 产品支持情况

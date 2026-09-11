@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetGroupName
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Tiling/SetGroupName.md
+description: 设置通信任务所在的通信域。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetGroupName
 
 ## 功能说明

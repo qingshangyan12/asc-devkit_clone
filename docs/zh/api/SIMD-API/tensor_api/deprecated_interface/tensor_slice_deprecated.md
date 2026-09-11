@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: base_tensor::Slice（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/tensor_api/deprecated_interface/tensor_slice_deprecated.md
+description: '**该接口已废弃，请使用[base_tensor::slice](../tensor/tensor.md#slice)替代。'
+tag: [tensor_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Slice__RCpCoord_RCpInfo
+  archs: ['3510']
+  headers: [/include/tensor_api/tensor/tensor.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # base_tensor::Slice（废弃）
 
 ## 产品支持情况
@@ -34,9 +50,26 @@
 
 ## 函数原型
 
+```yaml
+api_signature:
+  override_id: "Slice__RCpCoord_RCpInfo"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/tensor.h"]
+```
+
 ```cpp
 template <typename Coord, typename Info>
 __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info);
+```
+
+```yaml
+api_signature:
+  override_id: "Slice__RCpCoord_RCpInfo"
+  archs: ["3510"]
+  headers: ["/include/tensor_api/tensor/tensor.h"]
+```
+
+```cpp
 
 template <typename Coord, typename Info>
 __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info) const;

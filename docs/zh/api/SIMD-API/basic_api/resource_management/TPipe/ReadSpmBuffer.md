@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: ReadSpmBuffer
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/resource_management/TPipe/ReadSpmBuffer.md
+description: 从SPM Buffer读回到local数据中。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ReadSpmBuffer<a name="ZH-CN_TOPIC_0000001610919917"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

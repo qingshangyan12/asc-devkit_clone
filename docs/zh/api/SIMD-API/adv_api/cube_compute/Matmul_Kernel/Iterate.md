@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: Iterate
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/Iterate.md
+description: 每调用一次Iterate，会计算出一块baseM \* baseN的C矩阵。接口内部会维护迭代进度，调用一次后会对A、B矩阵首地址进行偏移。默认以先M轴再N轴的迭代顺序，也可以通过调整tiling参数iterateOrder，转换为先N轴再M轴的迭代顺序。当传入数据未对齐，存在尾块时，会在最后一次迭代输出尾块的计算结果。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Iterate__b
+  archs: ['3510', '2201', '3002', '2002', x90, '9030']
+  headers: [/include/adv_api/matmul/matmul.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Iterate
 
 ## 产品支持情况
@@ -41,6 +57,13 @@
 ## 函数原型
 
 -   <a name="li135771283591"></a>接口内部管理L0C Buffer（CO1）
+
+```yaml
+api_signature:
+  override_id: "Iterate__b"
+  archs: ["3510", "2201", "3002", "2002", "x90", "9030"]
+  headers: ["/include/adv_api/matmul/matmul.h"]
+```
 
     ```
     template <bool sync = true> __aicore__ inline bool Iterate(bool enPartialSum = false)

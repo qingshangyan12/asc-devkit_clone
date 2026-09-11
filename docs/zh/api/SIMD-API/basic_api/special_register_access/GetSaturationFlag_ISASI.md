@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: GetSaturationFlag(ISASI)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/special_register_access/GetSaturationFlag_ISASI.md
+description: 获取`mode`指定的全局饱和模式的开启状态，该状态通过[SetSaturationFlag](SetSaturationFlag_ISASI.md)设置。饱和模式用于处理计算或精度转换过程中结果溢出或出现INF/NAN的场景，详细说明请参考[SetSaturationFlag功能说明](SetSaturationFlag_ISASI.md#功能说明)。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: GetSaturationFlag__z
+  archs: ['3510', '2201']
+  headers: [/include/basic_api/kernel_operator_common_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetSaturationFlag(ISASI)
 
 ## 产品支持情况
@@ -38,6 +54,13 @@
 获取`mode`指定的全局饱和模式的开启状态，该状态通过[SetSaturationFlag](SetSaturationFlag_ISASI.md)设置。饱和模式用于处理计算或精度转换过程中结果溢出或出现INF/NAN的场景，详细说明请参考[SetSaturationFlag功能说明](SetSaturationFlag_ISASI.md#功能说明)。
 
 ## 函数原型
+
+```yaml
+api_signature:
+  override_id: "GetSaturationFlag__z"
+  archs: ["3510", "2201"]
+  headers: ["/include/basic_api/kernel_operator_common_intf.h"]
+```
 
 ```cpp
 template <SaturationMode mode>

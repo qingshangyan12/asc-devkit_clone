@@ -9,112 +9,85 @@ usage_dependencies:
 signature:
   - override_id: "asc_copy_gm2ub_align__PUi8_PGi8_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy_gm2ub_align__PUu8_PGu8_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy_gm2ub_align__PUi16_PGi16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy_gm2ub_align__PUu16_PGu16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy_gm2ub_align__PUf16_PGf16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy_gm2ub_align__PUbf16_PGbf16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy_gm2ub_align__PUi32_PGi32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy_gm2ub_align__PUu32_PGu32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy_gm2ub_align__PUf32_PGf32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy_gm2ub_align__PUi8_PGi8_u16_u32_u8_u8_u32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy_gm2ub_align__PUu8_PGu8_u16_u32_u8_u8_u32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy_gm2ub_align__PUi16_PGi16_u16_u32_u8_u8_u32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy_gm2ub_align__PUu16_PGu16_u16_u32_u8_u8_u32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy_gm2ub_align__PUf16_PGf16_u16_u32_u8_u8_u32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy_gm2ub_align__PUbf16_PGbf16_u16_u32_u8_u8_u32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy_gm2ub_align__PUi32_PGi32_u16_u32_u8_u8_u32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy_gm2ub_align__PUu32_PGu32_u16_u32_u8_u8_u32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy_gm2ub_align__PUf32_PGf32_u16_u32_u8_u8_u32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/vector_datamove/vector_datamove.h"
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: "asc_copy_gm2ub_align_sync__PUi8_PGi8_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_copy_gm2ub_align_sync__PUu8_PGu8_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_copy_gm2ub_align_sync__PUi16_PGi16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_copy_gm2ub_align_sync__PUu16_PGu16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_copy_gm2ub_align_sync__PUf16_PGf16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_copy_gm2ub_align_sync__PUbf16_PGbf16_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_copy_gm2ub_align_sync__PUi32_PGi32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_copy_gm2ub_align_sync__PUu32_PGu32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: "asc_copy_gm2ub_align_sync__PUf32_PGf32_u32"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/vector_compute_composite.h"
+    headers: [/include/c_api/composite/vector_compute_composite.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -175,8 +148,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_copy_gm2ub_align__PUi8_PGi8_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
     ```cpp
@@ -187,8 +159,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align__PUu8_PGu8_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
     ```cpp
@@ -199,8 +170,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align__PUi16_PGi16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
     ```cpp
@@ -211,8 +181,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align__PUu16_PGu16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
     ```cpp
@@ -223,8 +192,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align__PUf16_PGf16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
     ```cpp
@@ -235,8 +203,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align__PUbf16_PGbf16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
     ```cpp
@@ -247,8 +214,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align__PUi32_PGi32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
     ```cpp
@@ -259,8 +225,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align__PUu32_PGu32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
     ```cpp
@@ -271,8 +236,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align__PUf32_PGf32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
     ```cpp
@@ -285,8 +249,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align__PUi8_PGi8_u16_u32_u8_u8_u32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
     ```cpp
@@ -297,8 +260,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align__PUu8_PGu8_u16_u32_u8_u8_u32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
     ```cpp
@@ -309,8 +271,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align__PUi16_PGi16_u16_u32_u8_u8_u32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
     ```cpp
@@ -321,8 +282,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align__PUu16_PGu16_u16_u32_u8_u8_u32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
     ```cpp
@@ -333,8 +293,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align__PUf16_PGf16_u16_u32_u8_u8_u32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
     ```cpp
@@ -345,8 +304,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align__PUbf16_PGbf16_u16_u32_u8_u8_u32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
     ```cpp
@@ -357,8 +315,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align__PUi32_PGi32_u16_u32_u8_u8_u32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
     ```cpp
@@ -369,8 +326,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align__PUu32_PGu32_u16_u32_u8_u8_u32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
     ```cpp
@@ -381,8 +337,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align__PUf32_PGf32_u16_u32_u8_u8_u32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/vector_datamove/vector_datamove.h"
+  headers: [/include/c_api/vector_datamove/vector_datamove.h]
 ```
 
     ```cpp
@@ -395,8 +350,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align_sync__PUi8_PGi8_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -407,8 +361,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align_sync__PUu8_PGu8_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -419,8 +372,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align_sync__PUi16_PGi16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -431,8 +383,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align_sync__PUu16_PGu16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -443,8 +394,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align_sync__PUf16_PGf16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -455,8 +405,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align_sync__PUbf16_PGbf16_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -467,8 +416,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align_sync__PUi32_PGi32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -479,8 +427,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align_sync__PUu32_PGu32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp
@@ -491,8 +438,7 @@ api_signature:
 api_signature:
   override_id: "asc_copy_gm2ub_align_sync__PUf32_PGf32_u32"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/vector_compute_composite.h"
+  headers: [/include/c_api/composite/vector_compute_composite.h]
 ```
 
     ```cpp

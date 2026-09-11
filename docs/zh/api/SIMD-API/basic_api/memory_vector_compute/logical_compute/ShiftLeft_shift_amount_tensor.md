@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: ShiftLeft（左移位数为Tensor）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/logical_compute/ShiftLeft_shift_amount_tensor.md
+description: 对源操作数中的每个元素进行左移操作。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: ShiftLeft__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pU_RCi32
+  archs: ['3510']
+  headers: [/include/basic_api/kernel_operator_vec_binary_intf.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ShiftLeft（左移位数为Tensor）<a name="ZH-CN_TOPIC_0000002158548560"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
@@ -33,6 +49,13 @@
 -   数据类型为有符号类型：执行算术左移。算术左移会将二进制数整体向左移动指定的位数，最高位被丢弃（符号位会被丢弃），最低位用0填充。例如，二进制数1010101010101010（int16\_t类型）算术左移1位后，结果为0101010101010100；算术左移3位后，结果为0101010101010000。
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "ShiftLeft__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_pU_RCi32"
+  archs: ["3510"]
+  headers: ["/include/basic_api/kernel_operator_vec_binary_intf.h"]
+```
 
 ```cpp
 template <typename T, typename U>

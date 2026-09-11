@@ -43,6 +43,12 @@ namespace AscendC {
  * \param [in] count, amount of data to be calculated
  */
 template <const LogicalXorConfig& config = DEFAULT_LOGICAL_XOR_CONFIG, typename T, typename U>
+/**
+ * @ingroup simd_api.adv_api.math_compute.logicalxor_interface
+ * @override_id LogicalXor__RCltg1x2_pT_RCltg1x2_pU_RCltg1x2_pU_u32
+ * @archs 3510
+ * @brief 按元素进行逻辑异或操作。当输入的数据类型不是bool时，零被视为False，非零数据被视为True。
+ */
 __aicore__ inline void LogicalXor(
     const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, const uint32_t count)
 {

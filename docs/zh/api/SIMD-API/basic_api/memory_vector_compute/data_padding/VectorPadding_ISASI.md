@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: VectorPadding\(ISASI\)
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_padding/VectorPadding_ISASI.md
+description: 根据padMode（pad模式）与padSide（pad方向）对源操作数按照datablock进行填充操作。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # VectorPadding\(ISASI\)<a name="ZH-CN_TOPIC_0000001870220489"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

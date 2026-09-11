@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Axpy
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/composite_compute/Axpy.md
+description: 该接口根据mask对dstReg、srcReg和标量scalarValue按元素执行乘加操作，将结果写入dstReg。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Axpy<a name="ZH-CN_TOPIC_0000002159438184"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

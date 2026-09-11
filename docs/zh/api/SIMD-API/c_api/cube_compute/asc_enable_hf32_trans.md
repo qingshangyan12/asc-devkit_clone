@@ -10,10 +10,9 @@ usage_dependencies:
 signature:
   - override_id: "asc_enable_hf32_trans__u32"
     archs: ["3510", "2201"]
-    headers:
-      - "/include/c_api/cube_compute/cube_compute.h"
+    headers: ["/include/c_api/cube_compute/cube_compute.h"]
 examples: []
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_enable_hf32_trans
@@ -54,8 +53,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_enable_hf32_trans__u32"
   archs: ["3510", "2201"]
-  headers:
-    - "/include/c_api/cube_compute/cube_compute.h"
+  headers: ["/include/c_api/cube_compute/cube_compute.h"]
 ```
 
 ```c

@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: Sigmoid
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/activation_functions/Sigmoid_interface/Sigmoid.md
+description: 按元素做逻辑回归Sigmoid。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: Sigmoid__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32
+  archs: ['3510', '2201', '2002', '1001', x90, '9030']
+  headers: [/include/adv_api/activation/sigmoid.h]
+- override_id: Sigmoid__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8
+  archs: ['3510', '2201', '2002', '1001', x90, '9030']
+  headers: [/include/adv_api/activation/sigmoid.h]
+- override_id: Sigmoid__RCltg1x2_pT_RCltg1x2_pT_u32
+  archs: ['3510', '2201', '2002', '1001', x90, '9030']
+  headers: [/include/adv_api/activation/sigmoid.h]
+- override_id: Sigmoid__RCltg1x2_pT_RCltg1x2_pT
+  archs: ['3510', '2201', '2002', '1001', x90, '9030']
+  headers: [/include/adv_api/activation/sigmoid.h]
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Sigmoid
 
 ## 产品支持情况
@@ -42,12 +67,26 @@
 -   通过sharedTmpBuffer入参传入临时空间
     -   源操作数Tensor全部/部分参与计算
 
+```yaml
+api_signature:
+  override_id: "Sigmoid__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8_u32"
+  archs: ["3510", "2201", "2002", "1001", "x90", "9030"]
+  headers: ["/include/adv_api/activation/sigmoid.h"]
+```
+
         ```
         template <typename T, bool isReuseSource = false>
         __aicore__ inline void Sigmoid(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
+
+```yaml
+api_signature:
+  override_id: "Sigmoid__RCltg1x2_pT_RCltg1x2_pT_RCltg1x2_u8"
+  archs: ["3510", "2201", "2002", "1001", "x90", "9030"]
+  headers: ["/include/adv_api/activation/sigmoid.h"]
+```
 
         ```
         template <typename T, bool isReuseSource = false>
@@ -57,12 +96,26 @@
 -   接口框架申请临时空间
     -   源操作数Tensor全部/部分参与计算
 
+```yaml
+api_signature:
+  override_id: "Sigmoid__RCltg1x2_pT_RCltg1x2_pT_u32"
+  archs: ["3510", "2201", "2002", "1001", "x90", "9030"]
+  headers: ["/include/adv_api/activation/sigmoid.h"]
+```
+
         ```
         template <typename T, bool isReuseSource = false>
         __aicore__ inline void Sigmoid(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
+
+```yaml
+api_signature:
+  override_id: "Sigmoid__RCltg1x2_pT_RCltg1x2_pT"
+  archs: ["3510", "2201", "2002", "1001", "x90", "9030"]
+  headers: ["/include/adv_api/activation/sigmoid.h"]
+```
 
         ```
         template <typename T, bool isReuseSource = false>

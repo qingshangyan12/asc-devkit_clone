@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: LoadData（卷积数据搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_3D.md
+description: LoadData（卷积数据搬运）本质上是用于将NC1HWC0格式的Feature Map完成Image to Column展开，然后再从展开后的二维矩阵中选取指定数据块搬入对应内存位置。见图1。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # LoadData（卷积数据搬运）<a id="ZH-CN_TOPIC_0000002538071224"></a>
 
 ## 产品支持情况<a id="zh-cn_topic_0000002512171652_section796754519912"></a>

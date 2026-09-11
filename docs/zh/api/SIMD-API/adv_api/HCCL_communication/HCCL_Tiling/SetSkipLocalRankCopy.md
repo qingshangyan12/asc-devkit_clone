@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: SetSkipLocalRankCopy
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Tiling/SetSkipLocalRankCopy.md
+description: 设置本卡的通信算法的计算结果是否输出到目的数据buffer地址。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # SetSkipLocalRankCopy
 
 ## 功能说明

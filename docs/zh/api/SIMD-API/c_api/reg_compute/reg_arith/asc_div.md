@@ -10,12 +10,10 @@ usage_dependencies:
 signature:
   - prototype_id: "asc_div__Rv<dtype>_v<dtype>_v<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_arith.h"
+    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
   - prototype_id: "asc_div__v<dtype>_v<dtype>_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_arith.h"
+    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
 examples:
   - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/div"
     archs: ["3510"]
@@ -67,8 +65,7 @@ $$
 api_signature:
   prototype_id: "asc_div__Rv<dtype>_v<dtype>_v<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  headers: [/include/c_api/reg_compute/compute/reg_arith.h]
   dtype:
     values:
       - "int16_t"
@@ -91,8 +88,7 @@ __simd_callee__ inline void asc_div(vector_<dtype>& dst,
 api_signature:
   prototype_id: "asc_div__v<dtype>_v<dtype>_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_arith.h"
+  headers: [/include/c_api/reg_compute/compute/reg_arith.h]
   dtype:
     values:
       - "int16_t"

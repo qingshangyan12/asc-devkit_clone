@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: 模板参数
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/TQueSync_template_params.md
+description: TQueSync类的模板参数用于指定源流水和目标流水，目的流水等待源流水。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # 模板参数<a name="ZH-CN_TOPIC_0000001973155037"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

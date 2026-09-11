@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: GetSingleShape
+resource: asc-devkit/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/GetSingleShape.md
+description: 获取计算后的singleCoreM/singleCoreN/singleCoreK。
+tag: [adv_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # GetSingleShape
 
 ## 功能说明

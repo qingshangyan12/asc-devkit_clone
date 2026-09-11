@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: 连续非对齐搬出（StoreUnAlign）
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_store/StoreUnAlign_continuous.md
+description: 为提升对不规则内存地址的处理能力，Reg矢量计算支持在数据搬运过程中对非32字节对齐的地址进行访问，降低非对齐访问带来的性能开销。StoreUnAlign能够实现数据从[RegTensor](../register_data_types/RegTensor.md)连续搬运至非对齐Unified
+  Buffer（UB），利用非对齐寄存器UnalignRegForStore作为临时缓存区，暂存跨对齐边界的数据，从而实现高效的连续非对齐数据传输。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # 连续非对齐搬出（StoreUnAlign）<a name="ZH-CN_TOPIC_0000001929071470"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

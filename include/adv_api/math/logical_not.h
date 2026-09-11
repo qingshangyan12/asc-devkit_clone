@@ -42,6 +42,15 @@ namespace AscendC {
  * \param [in] count, amount of data to be calculated
  */
 template <const LogicalNotConfig& config = DEFAULT_LOGICAL_NOT_CONFIG, typename T, typename U>
+/**
+ * @ingroup simd_api.adv_api.math_compute.logicalnot_interface
+ * @override_id LogicalNot__RCltg1x2_pT_RCltg1x2_pU_u32
+ * @archs 3510
+ * @brief 按元素进行取反操作。当输入的数据类型不是bool时，零被视为False，非零数据被视为True。
+ * @param [out] dst 目的操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] src 源操作数。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。
+ * @param [in] count 参与计算的元素个数。
+ */
 __aicore__ inline void LogicalNot(const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint32_t count)
 {
 #if defined(__NPU_ARCH__) && \

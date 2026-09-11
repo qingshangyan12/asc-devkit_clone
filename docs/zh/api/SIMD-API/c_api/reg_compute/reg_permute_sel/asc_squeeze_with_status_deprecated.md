@@ -9,56 +9,43 @@ usage_dependencies:
 signature:
   - override_id: "asc_squeeze_with_status__Rvi8_vi8_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_squeeze_with_status__Rvu8_vu8_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_squeeze_with_status__Rvhf8_vhf8_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_squeeze_with_status__Rvf8e5m2_vf8e5m2_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_squeeze_with_status__Rvf8e4m3_vf8e4m3_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_squeeze_with_status__Rvf8e8m0_vf8e8m0_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_squeeze_with_status__Rvi16_vi16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_squeeze_with_status__Rvu16_vu16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_squeeze_with_status__Rvf16_vf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_squeeze_with_status__Rvbf16_vbf16_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_squeeze_with_status__Rvi32_vi32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_squeeze_with_status__Rvu32_vu32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: "asc_squeeze_with_status__Rvf32_vf32_vb"
     archs: ["3510"]
-    headers:
-      - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 examples: []
 timestamp: "2026-09-10"
 ---
@@ -105,8 +92,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_squeeze_with_status__Rvi8_vi8_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp
@@ -117,8 +103,7 @@ __simd_callee__ inline void asc_squeeze_with_status(vector_int8_t& dst, vector_i
 api_signature:
   override_id: "asc_squeeze_with_status__Rvu8_vu8_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp
@@ -129,8 +114,7 @@ __simd_callee__ inline void asc_squeeze_with_status(vector_uint8_t& dst, vector_
 api_signature:
   override_id: "asc_squeeze_with_status__Rvhf8_vhf8_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp
@@ -141,8 +125,7 @@ __simd_callee__ inline void asc_squeeze_with_status(vector_hifloat8_t& dst, vect
 api_signature:
   override_id: "asc_squeeze_with_status__Rvf8e5m2_vf8e5m2_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp
@@ -153,8 +136,7 @@ __simd_callee__ inline void asc_squeeze_with_status(vector_fp8_e5m2_t& dst, vect
 api_signature:
   override_id: "asc_squeeze_with_status__Rvf8e4m3_vf8e4m3_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp
@@ -165,8 +147,7 @@ __simd_callee__ inline void asc_squeeze_with_status(vector_fp8_e4m3fn_t& dst, ve
 api_signature:
   override_id: "asc_squeeze_with_status__Rvf8e8m0_vf8e8m0_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp
@@ -177,8 +158,7 @@ __simd_callee__ inline void asc_squeeze_with_status(vector_fp8_e8m0_t& dst, vect
 api_signature:
   override_id: "asc_squeeze_with_status__Rvi16_vi16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp
@@ -189,8 +169,7 @@ __simd_callee__ inline void asc_squeeze_with_status(vector_int16_t& dst, vector_
 api_signature:
   override_id: "asc_squeeze_with_status__Rvu16_vu16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp
@@ -201,8 +180,7 @@ __simd_callee__ inline void asc_squeeze_with_status(vector_uint16_t& dst, vector
 api_signature:
   override_id: "asc_squeeze_with_status__Rvf16_vf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp
@@ -213,8 +191,7 @@ __simd_callee__ inline void asc_squeeze_with_status(vector_half& dst, vector_hal
 api_signature:
   override_id: "asc_squeeze_with_status__Rvbf16_vbf16_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp
@@ -225,8 +202,7 @@ __simd_callee__ inline void asc_squeeze_with_status(vector_bfloat16_t& dst, vect
 api_signature:
   override_id: "asc_squeeze_with_status__Rvi32_vi32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp
@@ -237,8 +213,7 @@ __simd_callee__ inline void asc_squeeze_with_status(vector_int32_t& dst, vector_
 api_signature:
   override_id: "asc_squeeze_with_status__Rvu32_vu32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp
@@ -249,8 +224,7 @@ __simd_callee__ inline void asc_squeeze_with_status(vector_uint32_t& dst, vector
 api_signature:
   override_id: "asc_squeeze_with_status__Rvf32_vf32_vb"
   archs: ["3510"]
-  headers:
-    - "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 ```
 
 ```cpp

@@ -9,22 +9,18 @@ usage_dependencies:
 signature:
   - override_id: "asc_load_image_to_cbuf__PL1i8_u16_u16_u16_u16_u16_u8_u8_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_load_image_to_cbuf__PL1f16_u16_u16_u16_u16_u16_u8_u8_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/cube_datamove/cube_datamove.h"
+    headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
   - override_id: "asc_load_image_to_cbuf_sync__PL1i8_u16_u16_u16_u16_u16_u8_u8_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
   - override_id: "asc_load_image_to_cbuf_sync__PL1f16_u16_u16_u16_u16_u16_u8_u8_u16_u16"
     archs: ["2201"]
-    headers:
-      - "/include/c_api/composite/cube_datamove_composite.h"
+    headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 examples: []
-timestamp: "2026-09-10"
+timestamp: "2026-09-11"
 ---
 
 # asc_load_image_to_cbuf
@@ -67,8 +63,7 @@ timestamp: "2026-09-10"
 api_signature:
   override_id: "asc_load_image_to_cbuf__PL1i8_u16_u16_u16_u16_u16_u8_u8_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
     ```cpp
@@ -79,8 +74,7 @@ api_signature:
 api_signature:
   override_id: "asc_load_image_to_cbuf__PL1f16_u16_u16_u16_u16_u16_u8_u8_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/cube_datamove/cube_datamove.h"
+  headers: ["/include/c_api/cube_datamove/cube_datamove.h"]
 ```
 
     ```cpp
@@ -93,8 +87,7 @@ api_signature:
 api_signature:
   override_id: "asc_load_image_to_cbuf_sync__PL1i8_u16_u16_u16_u16_u16_u8_u8_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
     ```cpp
@@ -105,8 +98,7 @@ api_signature:
 api_signature:
   override_id: "asc_load_image_to_cbuf_sync__PL1f16_u16_u16_u16_u16_u16_u8_u8_u16_u16"
   archs: ["2201"]
-  headers:
-    - "/include/c_api/composite/cube_datamove_composite.h"
+  headers: ["/include/c_api/composite/cube_datamove_composite.h"]
 ```
 
     ```cpp

@@ -1,3 +1,23 @@
+---
+okftype: reference.api.cpp
+title: WaitPreTaskEnd
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/sync_control/inter_task_sync/WaitPreTaskEnd.md
+description: 算子层面支持SuperKernel特性Early-Start能力的接口，调用后在TorchAir层面：1.GE图模式下进行默认启用; 2.npugraph_ex后端通过early_start选项进行控制启用。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature:
+- override_id: WaitPreTaskEnd__z
+  archs: ['3510', '2201', '3002', '2002', '1001', x90, '9030']
+  headers: [/include/basic_api/kernel_operator_common_intf.h]
+examples:
+- path: /examples/01_simd_cpp_api/03_basic_api/05_sync_control/task_sync
+  archs: ['2201', '3510']
+  override_id: WaitPreTaskEnd__z
+  file: task_sync.asc
+timestamp: '2026-09-11'
+---
+
 # WaitPreTaskEnd<a name="ZH-CN_TOPIC_0000002337883177"></a>
 
 > [!NOTE]说明 
@@ -50,6 +70,13 @@ SuperKernel是一种算子的二进制融合技术，与源码融合不同，它
 ![](../../../../figures/wait_pre_task_end_parallel_diagram.png "通过WaitPreTaskEnd实现并行示意图")
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
+```yaml
+api_signature:
+  override_id: "WaitPreTaskEnd__z"
+  archs: ["3510", "2201", "3002", "2002", "1001", "x90", "9030"]
+  headers: ["/include/basic_api/kernel_operator_common_intf.h"]
+```
 
 ```cpp
 template<bool FORCE = false>

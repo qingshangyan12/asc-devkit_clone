@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: ExpSub
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/composite_compute/ExpSub.md
+description: srcReg0与srcReg1相减，差值作为e的指数计算，根据mask将计算结果写入dstReg。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # ExpSub<a name="ZH-CN_TOPIC_0000002008646072"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>

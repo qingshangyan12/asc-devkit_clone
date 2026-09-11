@@ -1,3 +1,16 @@
+---
+okftype: reference.api.cpp
+title: Ln
+resource: asc-devkit/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/basic_arithmetic/Ln.md
+description: 该接口根据mask逐元素对源操作数求自然对数，将结果写入目的操作数。
+tag: [basic_api]
+usage_dependencies:
+  status: unconfirmed
+signature: []
+examples: []
+timestamp: '2026-09-11'
+---
+
 # Ln<a name="ZH-CN_TOPIC_0000002052905730"></a>
 
 ## 产品支持情况
