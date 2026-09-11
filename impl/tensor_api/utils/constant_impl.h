@@ -141,8 +141,18 @@ inline constexpr bool is_data_type =
                      fp8_e4m3fn_t, fp8_e8m0_t>
     || Std::is_integral_v<Std::remove_cvref_t<DataType>> || Std::is_floating_point_v<Std::remove_cvref_t<DataType>>;
 
+#if (ASC_DEVKIT_VERSION_NUM >= 902000000)
+#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510))
 template <typename DataType>
 inline constexpr bool is_b4_type = is_one_of_attr_v<DataType, fp4x2_e1m2_t, fp4x2_e2m1_t, int4x2_t>;
+#endif
+#else
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+template <typename DataType>
+inline constexpr bool is_b4_type = is_one_of_attr_v<DataType, fp4x2_e1m2_t, fp4x2_e2m1_t, int4x2_t>;
+#endif
+#endif
+
 
 template <typename DataType = Std::ignore_t>
 __aicore__ inline constexpr size_t get_c0_size()
