@@ -90,8 +90,8 @@ template <typename T, int constRank = -1, uint32_t* constDstShape = nullptr, uin
 __aicore__ inline void GetBroadcastTilingInfo(
     uint32_t rank, const uint32_t* dstShape, const uint32_t* srcShape, bool srcInnerPad, BroadcastTiling& tiling)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || \
-                              __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 5102 || \
+                              __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     GetBroadcastTilingInfoImpl<T, constRank, constDstShape, constSrcShape>(
         rank, dstShape, srcShape, srcInnerPad, tiling);
 #endif
@@ -113,8 +113,8 @@ __aicore__ inline void Broadcast(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t* dstShape, const uint32_t* srcShape,
     BroadcastTiling* tiling)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || \
-                              __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 5102 || \
+                              __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     BroadcastImpl<T, constRank, constDstShape, constSrcShape, constSrcInnerPad>(dst, src, dstShape, srcShape, tiling);
 #endif
 }
