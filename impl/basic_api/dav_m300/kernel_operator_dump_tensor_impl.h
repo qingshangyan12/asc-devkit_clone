@@ -409,53 +409,8 @@ __aicore__ inline void WriteRingBufTlvData(
 }
 
 template <template <typename> class Tensor, typename T>
-__aicore__ inline void DumpTensorRingBufImpl(
-    const Tensor<T>& src, uint32_t desc, uint32_t dumpSize, const uint32_t* shape, const uint32_t shapeDim)
-{
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-    EnablePrintf();
-    if constexpr (GetTensorDataType<T>() == Internal::DumpTensorDataType::ACL_MAX) {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "dump tensor not support this data type"); });
-        return;
-    }
-    if (dumpSize == 0) {
-        return;
-    }
-    if constexpr (IsSameType<Tensor<T>, LocalTensor<T>>::value) {
-        if (CheckDumpTensorPosition(src) == Hardware::MAX) {
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "dump tensor only support dump tensor from local to gm"); });
-            return;
-        }
-    }
-    __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
-    if (blockRingBufInfo == nullptr) {
-        return;
-    }
-    constexpr uint32_t blockSize = 16 * 16 * sizeof(uint32_t);
-    uint32_t alignDumpDataLen = AlignUp(dumpSize * sizeof(T), ONE_BLK_SIZE);
-    uint32_t tlvLen = sizeof(DumpTensorTlvInfoHead) + alignDumpDataLen;
-    uint32_t maxResvLen = sizeof(DumpTensorTlvInfoHead) + AlignUp(alignDumpDataLen, blockSize) * 2; // resv tmp space
-    if (!CheckAndWaitRingBufSpace(blockRingBufInfo, maxResvLen)) { // Reserved Backup Capacity
-        return;
-    }
-
-    __gm__ DumpTensorTlvInfoHead* dumpTensorTlv =
-        reinterpret_cast<__gm__ DumpTensorTlvInfoHead*>(GetRingBufTlv(blockRingBufInfo));
-
-    WriteRingBufTlvHead(src, dumpTensorTlv, alignDumpDataLen, desc, dumpSize);
-    WriteRingBufTlvShape(dumpTensorTlv, shapeDim, shape);
-    if constexpr (IsSameType<Tensor<T>, LocalTensor<T>>::value) {
-        WriteRingBufTlvData(src, dumpTensorTlv, alignDumpDataLen, dumpSize);
-    } else if (IsSameType<Tensor<T>, GlobalTensor<T>>::value) {
-        WriteRingBufTlvData(src, dumpTensorTlv, dumpSize);
-    }
-
-    __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);
-
-    UpdateWriteInfo(writeInfo, tlvLen);
-#endif // ASCENDC_DUMP
-}
+__aicore__ __attribute__((noinline)) void DumpTensorRingBufImpl(
+    const Tensor<T>& src, uint32_t desc, uint32_t dumpSize, const uint32_t* shape, const uint32_t shapeDim);
 
 template <typename T>
 __aicore__ inline void DumpTensorLocal2GMImpl(
@@ -493,6 +448,55 @@ template <typename T>
 __aicore__ inline void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t desc, uint32_t dumpSize)
 {
     DumpTensorGM2GMImpl(src, desc, dumpSize, nullptr, 0);
+}
+
+template <template <typename> class Tensor, typename T>
+__aicore__ __attribute__((noinline)) void DumpTensorRingBufImpl(
+    const Tensor<T>& src, uint32_t desc, uint32_t dumpSize, const uint32_t* shape, const uint32_t shapeDim)
+{
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+    EnablePrintf();
+    if constexpr (GetTensorDataType<T>() == Internal::DumpTensorDataType::ACL_MAX) {
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "dump tensor not support this data type"); });
+        return;
+    }
+    if (dumpSize == 0) {
+        return;
+    }
+    if constexpr (IsSameType<Tensor<T>, LocalTensor<T>>::value) {
+        if (CheckDumpTensorPosition(src) == Hardware::MAX) {
+            ASCENDC_ASSERT(
+                (false), { KERNEL_LOG(KERNEL_ERROR, "dump tensor only support dump tensor from local to gm"); });
+            return;
+        }
+    }
+    __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
+    if (blockRingBufInfo == nullptr) {
+        return;
+    }
+    constexpr uint32_t blockSize = 16 * 16 * sizeof(uint32_t);
+    uint32_t alignDumpDataLen = AlignUp(dumpSize * sizeof(T), ONE_BLK_SIZE);
+    uint32_t tlvLen = sizeof(DumpTensorTlvInfoHead) + alignDumpDataLen;
+    uint32_t maxResvLen = sizeof(DumpTensorTlvInfoHead) + AlignUp(alignDumpDataLen, blockSize) * 2; // resv tmp space
+    if (!CheckAndWaitRingBufSpace(blockRingBufInfo, maxResvLen)) { // Reserved Backup Capacity
+        return;
+    }
+
+    __gm__ DumpTensorTlvInfoHead* dumpTensorTlv =
+        reinterpret_cast<__gm__ DumpTensorTlvInfoHead*>(GetRingBufTlv(blockRingBufInfo));
+
+    WriteRingBufTlvHead(src, dumpTensorTlv, alignDumpDataLen, desc, dumpSize);
+    WriteRingBufTlvShape(dumpTensorTlv, shapeDim, shape);
+    if constexpr (IsSameType<Tensor<T>, LocalTensor<T>>::value) {
+        WriteRingBufTlvData(src, dumpTensorTlv, alignDumpDataLen, dumpSize);
+    } else if constexpr (IsSameType<Tensor<T>, GlobalTensor<T>>::value) {
+        WriteRingBufTlvData(src, dumpTensorTlv, dumpSize);
+    }
+
+    __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);
+
+    UpdateWriteInfo(writeInfo, tlvLen);
+#endif // ASCENDC_DUMP
 }
 
 __aicore__ inline uint32_t GetArgsNum() { return 0; }
