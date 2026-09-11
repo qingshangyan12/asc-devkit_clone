@@ -17,7 +17,7 @@
 
 namespace AscendC {
 
-// 本枚举为 AIC 侧 hccl_alloc_ctx_res.h AlgorithmType 的镜像，显式值处（3/153）必须与宿主侧一致
+// 本枚举为 AIC 侧 hccl_alloc_ctx_res.h AlgorithmType 的镜像，显式值处（3/53/153）必须与宿主侧一致
 enum class AlgorithmType : uint8_t {
     CcuAllGatherMesh1D = 0,
     CcuAllGatherMeshMem2Mem1D,
@@ -26,6 +26,7 @@ enum class AlgorithmType : uint8_t {
     CcuReduceScatterMesh1D = 50,
     CcuReduceScatterMeshMem2Mem1D,
     CcuReduceScatterMesh2D,
+    CcuReduceScatterMeshMem2Mem1DPeerOnly = 53,
     CcuAllReduceMesh1D = 100,
     CcuAllReduceMeshMem2Mem1D,
     CcuAllReduceMesh2DOneShot,
@@ -107,7 +108,7 @@ private:
 
     __aicore__ inline uint8_t GetKfcMissionNum(HcclHandle handleId) const;
 
-    __aicore__ inline uint32_t GetHandleAlgorithmType(HcclHandle handleId) const;
+    __aicore__ inline uint32_t GetAlgorithmType(HcclHandle handleId) const;
 
     __aicore__ inline bool IsFinish(uint8_t reqId);
 
@@ -132,6 +133,7 @@ private:
     __aicore__ inline void CcuPrepareForAllGatherM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForConcurrentAllGatherM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForReduceScatterM2M(__gm__ CommonPrepareParamCcu* commParam);
+    __aicore__ inline void CcuPrepareForReduceScatterPeerOnlyM2M(__gm__ CommonPrepareParamCcu* commParam);
 
 private:
     __gm__ HcclCombineOpParam* hcclContext_;

@@ -41,6 +41,8 @@ HcclResult InheritKfcServerKernelArg(
         srcName == "CcuKernelKfcAllToAllMesh1DMultiJettySliced" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALL;
     const bool isReduceScatter =
         srcName == "CcuKernelKfcReduceScatterMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
+    const bool isReduceScatterPeerOnly =
+        srcName == KFC_REDUCE_SCATTER_PEER_ONLY_KERNEL_NAME && param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
     const bool isAllToAllV = srcName == "CcuKernelAlltoAllVMesh1D" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV;
     const bool isAlltoAll = srcName == "CcuKernelAlltoAllMesh1D" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALL;
     const bool isAllReduce =
@@ -78,7 +80,8 @@ HcclResult InheritKfcServerKernelArg(
         kfcArg->jettyNum = srcArg->jettyNum;
         kfcArg->opParam = srcArg->opParam;
         kfcArg->subCommRanks = srcArg->subCommRanks;
-    } else if (isAllGather || isAllGatherKfc || isReduceScatter || isAlltoAll || isAllReduce) {
+    } else if (
+        isAllGather || isAllGatherKfc || isReduceScatter || isReduceScatterPeerOnly || isAlltoAll || isAllReduce) {
         kfcArg->rankSize = subCommRanks[0].size();
         kfcArg->rankId = rankId;
         kfcArg->loadFromMem = false;
@@ -155,6 +158,8 @@ HcclResult CcuTempKfcServer::CalcRes(
             sourceName == "CcuKernelAllGatherNHR1DMultiJettyMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
         const bool isReduceScatter = sourceName == "CcuKernelKfcReduceScatterMesh1DMem2Mem" &&
                                      param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
+        const bool isReduceScatterPeerOnly = sourceName == KFC_REDUCE_SCATTER_PEER_ONLY_KERNEL_NAME &&
+                                             param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
         const bool isAlltoAll =
             sourceName == "CcuKernelAlltoAllMesh1D" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALL;
         const bool isAllToAllV =
@@ -168,8 +173,8 @@ HcclResult CcuTempKfcServer::CalcRes(
         const bool roleMatches = missionNum == 1U || (missionIndex == 0U && (isAllGather || isAllGatherKfc)) ||
                                  (missionIndex == 1U && isAllGatherNhr) || isAlltoAllKfcMultiJetty ||
                                  isAlltoAllKfcMultiJettySliced;
-        if ((!isAllGather && !isAllGatherNhr && !isReduceScatter && !isAlltoAll && !isAlltoAllKfcMultiJetty &&
-             !isAlltoAllKfcMultiJettySliced && !isAllReduce && !isAllToAllV) ||
+        if ((!isAllGather && !isAllGatherNhr && !isReduceScatter && !isReduceScatterPeerOnly && !isAlltoAll &&
+             !isAlltoAllKfcMultiJetty && !isAlltoAllKfcMultiJettySliced && !isAllReduce && !isAllToAllV) ||
             !roleMatches) {
             HCCL_ERROR(
                 "[CcuTempKfcServer::CalcRes] unsupported or misordered source kernel[%s] at mission[%u]",
