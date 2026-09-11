@@ -19,6 +19,10 @@
 - **[asc_get_l0c2gm_relu](asc_get_l0c2gm_relu.md)**
 - **[asc_get_l0c2gm_unitflag](asc_get_l0c2gm_unitflag.md)**
 - **[asc_load_image_to_cbuf](asc_load_image_to_cbuf.md)**
+- **[asc_prefetch_gm2l2cache](asc_prefetch_gm2l2cache.md)**
+- **[asc_prefetch_gm2l2cache_dn2nz](asc_prefetch_gm2l2cache_dn2nz.md)**
+- **[asc_prefetch_gm2l2cache_nd2nz](asc_prefetch_gm2l2cache_nd2nz.md)**
+- **[asc_prefetch_stop](asc_prefetch_stop.md)**
 - **[asc_set_gm2l1_loop1_stride](asc_set_gm2l1_loop1_stride.md)**
 - **[asc_set_gm2l1_loop2_stride](asc_set_gm2l1_loop2_stride.md)**
 - **[asc_set_gm2l1_loop_size](asc_set_gm2l1_loop_size.md)**
@@ -61,6 +65,7 @@
 - **[asc_copy_l0c2l1](asc_copy_l0c2l1/asc_copy_l0c2l1.md)**
 - **[asc_copy_l0c2l1_arch_2201](asc_copy_l0c2l1/asc_copy_l0c2l1_arch_2201.md)**
 - **[asc_copy_l0c2l1_arch_3510](asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)**
+- **[asc_copy_l0c2l1_arch_9201](asc_copy_l0c2l1/asc_copy_l0c2l1_arch_9201.md)**
 - **[asc_copy_l12bt](asc_copy_l12bt/asc_copy_l12bt.md)**
 - **[asc_copy_l12bt_arch_2201](asc_copy_l12bt/asc_copy_l12bt_arch_2201.md)**
 - **[asc_copy_l12bt_arch_3510](asc_copy_l12bt/asc_copy_l12bt_arch_3510.md)**

@@ -114,6 +114,10 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_get_l0c2gm_relu](cube_datamove/asc_get_l0c2gm_relu.md)|数据搬运过程中进行随路量化时，通过调用该接口获取ReLU操作前矢量的起始地址。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_get_l0c2gm_unitflag](cube_datamove/asc_get_l0c2gm_unitflag.md)|数据搬运过程中进行随路量化时，通过调用该接口获取unit_flag设置。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_load_image_to_cbuf](cube_datamove/asc_load_image_to_cbuf.md)|将图像数据从Global Memory搬运到L1 Buffer。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_prefetch_gm2l2cache](cube_datamove/asc_prefetch_gm2l2cache.md)|将GM中的数据预加载到L2 Cache中，不实际搬进内核。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_prefetch_gm2l2cache_dn2nz](cube_datamove/asc_prefetch_gm2l2cache_dn2nz.md)|将GM中的矩阵数据预加载到L2 Cache中，在此过程中执行DN->NZ/NCHW->NC1HWC0/NCHW->C1HWNC0操作。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_prefetch_gm2l2cache_nd2nz](cube_datamove/asc_prefetch_gm2l2cache_nd2nz.md)|将GM中的矩阵数据预加载到L2 Cache中，在此过程中执行ND->NZ/NCHW->NC1HWC0/NCHW->C1HWNC0操作。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_prefetch_stop](cube_datamove/asc_prefetch_stop.md)|删除尚未执行的Prefetch指令，用于预加载流程变化时清理未生效的预加载。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_gm2l1_loop1_stride](cube_datamove/asc_set_gm2l1_loop1_stride.md)|将数据从GM搬运到L1 Buffer时，设置内层循环中相邻迭代数据块间的间隔。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_gm2l1_loop2_stride](cube_datamove/asc_set_gm2l1_loop2_stride.md)|将数据从GM搬运到L1 Buffer时，设置外层循环中相邻迭代数据块间的间隔。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_gm2l1_loop_size](cube_datamove/asc_set_gm2l1_loop_size.md)|将数据从GM搬运到L1 Buffer时，设置数据搬运流程中的循环次数。|`c_api/cube_datamove/cube_datamove.h`|
