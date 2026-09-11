@@ -50,12 +50,12 @@ SocVersion PlatformAscendC::GetSocVersion(void) const
     return SocVersion::RESERVED_VERSION;
 }
 
-NpuArch PlatformAscendC::GetCurNpuArch(void) const
+aclplatformNpuArch PlatformAscendC::GetCurNpuArch(void) const
 {
     std::string npuArchStr;
     bool ret = this->platformInfo_->GetPlatformResWithLock("version", "NpuArch", npuArchStr);
     int32_t npuArchInt = std::atoi(npuArchStr.c_str());
-    return static_cast<NpuArch>(npuArchInt);
+    return static_cast<aclplatformNpuArch>(npuArchInt);
 }
 
 void PlatformAscendC::GetCoreMemSize(const CoreMemType& memType, uint64_t& size) const

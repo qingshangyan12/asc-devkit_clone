@@ -203,7 +203,7 @@ TEST_F(TestTiling, TestPlatformAscendC)
     // invalid case, return 0
     EXPECT_EQ(plat.CalcTschBlockDim(41, 20, 40), 0);
     EXPECT_EQ(plat.CalcTschNumBlocks(41, 20, 40), 0);
-    EXPECT_EQ(plat.GetCurNpuArch(), NpuArch::DAV_2201);
+    EXPECT_EQ(plat.GetCurNpuArch(), aclplatformNpuArch::DAV_2201);
     EXPECT_EQ(plat.GetLibApiWorkSpaceSize(), 16 * 1024 * 1024);
     EXPECT_EQ(plat.GetResCubeGroupWorkSpaceSize(), 1 * 1024 * 1024);
     EXPECT_EQ(plat.GetResGroupBarrierWorkSpaceSize(), 1 * 1024 * 1024);
@@ -690,7 +690,7 @@ TEST_F(TestTiling, TestGetNpuArchFailed)
         .will(returnValue(false));
 
     auto ret = plat.GetCurNpuArch();
-    EXPECT_EQ(ret, NpuArch::DAV_RESV);
+    EXPECT_EQ(ret, aclplatformNpuArch::DAV_RESV);
 }
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
@@ -700,7 +700,7 @@ TEST_F(TestTiling, TestGetNpuArchInvalidValue)
     auto plat = platform_ascendc::PlatformAscendC(&platform_info);
 
     platfrom_stub_set_npuarch("ABC");
-    EXPECT_EQ(plat.GetCurNpuArch(), NpuArch::DAV_RESV);
+    EXPECT_EQ(plat.GetCurNpuArch(), aclplatformNpuArch::DAV_RESV);
     platfrom_stub_set_npuarch("2201");
 }
 
@@ -709,7 +709,7 @@ TEST_F(TestTiling, TestGetNpuArchNeg)
     fe::PlatFormInfos platform_info;
     auto plat = platform_ascendc::PlatformAscendC(&platform_info);
     platfrom_stub_set_npuarch("-2");
-    EXPECT_EQ(plat.GetCurNpuArch(), NpuArch::DAV_RESV);
+    EXPECT_EQ(plat.GetCurNpuArch(), aclplatformNpuArch::DAV_RESV);
     platfrom_stub_set_npuarch("2201");
 }
 #endif

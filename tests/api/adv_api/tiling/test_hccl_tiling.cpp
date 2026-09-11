@@ -57,7 +57,7 @@ TEST_F(TestHcclTiling, Mc2CcTilingConfig_normal)
     reduceType = 0;
     EXPECT_EQ(ccTilingConfig.SetReduceType(reduceType), EXIT_SUCCESS);
     uint8_t stepSize = 1;
-    if (platform_ascendc::PlatformAscendCManager::GetInstance()->GetCurNpuArch() == NpuArch::DAV_2201) {
+    if (platform_ascendc::PlatformAscendCManager::GetInstance()->GetCurNpuArch() == aclplatformNpuArch::DAV_2201) {
         EXPECT_EQ(ccTilingConfig.SetStepSize(stepSize), EXIT_SUCCESS);
     } else {
         EXPECT_EQ(ccTilingConfig.SetStepSize(stepSize), EXIT_FAILURE);
