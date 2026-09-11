@@ -34,8 +34,7 @@ static_assert(
     KFC_CONCURRENT_A2A_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE,
     "Concurrent AllToAll parameters exceed the KFC server load width");
 static_assert(
-    KFC_A2A_MJ_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE,
-    "KFC AllToAll MultiJetty sliced parameters exceed CCU param window capacity");
+    KFC_A2A_MJ_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE, "AllToAll MultiJetty parameters exceed the KFC server load width");
 static_assert(KFC_MAX_MISSION_NUM == 2U, "KFC server CKE partitioning expects two missions");
 static_assert(KFC_SIGNAL_REGIONS_PER_MISSION == 2U, "Each KFC mission requires commit and done regions");
 
