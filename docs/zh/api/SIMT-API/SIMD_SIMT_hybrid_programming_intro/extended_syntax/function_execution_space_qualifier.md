@@ -12,7 +12,7 @@ SIMD与SIMT混合编程中涉及的函数类型如下表所示：
 | \_\_simd_vf\_\_ | 向量级并行计算任务 | 通过SIMD提供的asc_vf_call接口调用 |
 | \_\_simt_callee\_\_ | SIMT VF的子函数 | SIMT VF内部调用 |
 | \_\_simd_callee\_\_ | SIMD VF的子函数 | SIMD VF内部调用 |
-| \_\_callee\_\_ | 编译期执行的Device侧辅助函数 | Device侧函数内部均可调用 |
+| \_\_callee\_\_ | SIMD VF和SIMT VF的公共子函数 | VF内部调用 |
 
 函数调用关系如下图所示：
 

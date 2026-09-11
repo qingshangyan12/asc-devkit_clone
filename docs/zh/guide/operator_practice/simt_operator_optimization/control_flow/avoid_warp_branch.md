@@ -45,7 +45,7 @@ __global__ void kernel_spmv_thread(float* values, uint32_t* col_idx,
 
 上述实现中，每个线程根据全局ID确定处理的行号，独立遍历该行的所有非零元素并累加乘积。同一Warp内32个线程处理32行，各行非零元素个数不同，循环次数从1到64不等。由于不同行的非零元素数量不同，同一Warp内的线程退出循环的时间不一致，产生严重的Warp Divergence。假设一个Warp中线程0处理的行非零元素个数为3，线程1处理的行非零元素个数为64，线程0在3次循环后进入空闲等待，而线程1需要执行64次循环。这种等待在每个Warp中都会发生，造成大量计算资源浪费。
 
-反例算子的性能数据如下：
+反例算子在Ascend 950PR/Ascend 950DT产品上的性能数据如下：
 
 | Task Duration(μs) | aiv_total_cycles | Read Main Memory |
 | :---------------: | :--------------: | :--------------: |
@@ -79,7 +79,7 @@ __global__ void kernel_spmv_warp(float* values, uint32_t* col_idx,
 
 上述实现中，一个Warp的32个线程协作处理同一行数据，各线程以`warpSize`为步长访问该行的非零元素，循环次数基本相同。仅在最后一轮循环中部分线程可能不参与计算，Warp Divergence较小。使用[asc_reduce_add()](../../../../api/SIMT-API/Warp_functions/Warp_reduce_functions/asc_reduce_add.md)对Warp内各线程的部分和进行归约计算，由线程0写出最终结果。
 
-正例算子的性能数据如下：
+正例算子在Ascend 950PR/Ascend 950DT产品上的性能数据如下：
 
 | Task Duration(μs) | aiv_total_cycles | Read Main Memory |
 | :---------------: | :--------------: | :--------------: |

@@ -109,6 +109,17 @@
 
 ```cpp
 float x = input[idx];
+float sign = 1.0f;
+if (x < 0.0f) {
+    sign = -1.0f;
+    x = -x;
+}
+float two_pi = 2.0f * PI;
+x = fmodf(x, two_pi);
+if (x >= PI) {
+    x = two_pi - x;
+    sign = -sign;
+}
 float index_float = x * static_cast<float>(table_length) / PI;
 uint32_t n = static_cast<uint32_t>(floorf(index_float));
 float frac = index_float - static_cast<float>(n);
@@ -153,6 +164,17 @@ Case 0的场景中，加载input，output时会把数据缓存在DCache上，替
 
 ```cpp
 float x = asc_ldcg(&input[idx]);
+float sign = 1.0f;
+if (x < 0.0f) {
+    sign = -1.0f;
+    x = -x;
+}
+float two_pi = 2.0f * PI;
+x = fmodf(x, two_pi);
+if (x >= PI) {
+    x = two_pi - x;
+    sign = -sign;
+}
 float index_float = x * static_cast<float>(table_length) / PI;
 uint32_t n = static_cast<uint32_t>(floorf(index_float));
 float frac = index_float - static_cast<float>(n);
@@ -175,7 +197,7 @@ asc_stcg(&output[idx], y);
 
 **分析**：
 - 相比Case 0基线版本，Task Duration从56.82μs降低到50.895μs，耗时下降约10.4%
-- DCache Read GM从5064次降至3531次，减少约30.2%（减少1533次Global Memory访问），这是性能提升的关键因素
+- DCache Read GM从5064次降至3531次，减少约30.3%（减少1533次Global Memory访问），这是性能提升的关键因素
 - DCache Read Vector和DCache Write Vector保持不变，说明优化没有增加额外开销
 - sin表数据常驻DCache后，避免被输入/输出数据挤出，减少了从Global Memory重新加载sin表的次数
 ---
@@ -184,7 +206,7 @@ asc_stcg(&output[idx], y);
 
 **综合优化效果**：
 - 从Case 0基线版本到Case 1优化版本，Task Duration从56.82μs降低到50.895μs，耗时下降约10.4%
-- DCache Read GM从5064次降至3531次，减少约30.2%，减少1533次Global Memory访问
+- DCache Read GM从5064次降至3531次，减少约30.3%，减少1533次Global Memory访问
 
 | Case version | Task Duration(μs) | Task Duration相对Case 0 | 优化点                   |
 |--------------|-------------------|-----------------------|-----------------------|

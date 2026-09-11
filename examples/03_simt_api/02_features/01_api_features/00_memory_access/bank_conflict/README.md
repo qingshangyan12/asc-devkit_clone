@@ -121,7 +121,7 @@ for (uint32_t i = 0; i < REPEAT_TIMES; ++i) {
 uint64_t start = clock();
 // 重复UB读循环。
 uint64_t end = clock();
-cycle_output[threadIdx.x] = end - start;
+cycle_output[tid] = end - start;
 ```
 
 ### 性能指标说明
@@ -270,7 +270,7 @@ __aicore__ inline uint32_t get_ub_index_device(uint32_t thread_id)
 ...
 #elif SCENARIO_NUM == 4
     // 256B访问间隔切换bank group内的bank编号，但保持subbank编号不变。
-    return thread_id * 64;
+    return thread_id * SAME_BANK_GROUP_SUBBANK_STRIDE;
 ...
 }
 ```

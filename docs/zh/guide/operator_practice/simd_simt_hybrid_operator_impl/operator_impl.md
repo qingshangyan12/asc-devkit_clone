@@ -143,7 +143,7 @@ __simt_vf__ __launch_bounds__(THREAD_COUNT) inline void simt_gather(
 ```
 
 >[!NOTE]说明 
->在SIMT编程中，\_\_launch\_bounds\_\_\(thread\_num\)是可选配置，用于在编译期指定核函数（Kernel）启动的最大线程数（如果不配置，thread\_num默认为1024），使用时请注意：thread\_num \>= x \* y \* z （即：asc\_vf\_call的第一个参数：dim3\{x, y, z\}）, 线程数thread\_num的取值范围为1到2048。最大线程数决定了每个线程可分配的寄存器数量，具体对应关系请见[表5](../../programming_guide/language_extension/simt_builtin_keywords.md#table1715318510594)，寄存器用于存储线程中的局部变量，若局部变量的个数超出寄存器个数，容易出现栈溢出等问题。
+>在SIMT编程中，\_\_launch\_bounds\_\_\(thread\_num\)是可选配置，用于在编译期指定核函数（Kernel）启动的最大线程数（如果不配置，thread\_num默认为1024），使用时请注意：thread\_num \>= x \* y \* z （即：asc\_vf\_call的第一个参数：dim3\{x, y, z\}）, 线程数thread\_num的取值范围为1到2048。最大线程数决定了每个线程可分配的寄存器数量，具体对应关系请见[表5](../../programming_guide/language_extension/simt_builtin_keywords.md#table1715318510594)，寄存器用于存储线程中的局部变量，若局部变量的个数超出寄存器个数，容易出现寄存器溢出等问题。
 
 使用[\_\_simt\_vf\_\_](../../programming_guide/language_extension/simd_simt_hybrid_builtin_keywords.md#__simt_vf__)函数类型限定符标识SIMT VF函数入口，使其可以被[asc\_vf\_call](../../../api/SIMT-API/SIMD_SIMT_hybrid_programming_intro/extended_syntax/kernel_function_config.md#asc_vf_call调用)调用。
 

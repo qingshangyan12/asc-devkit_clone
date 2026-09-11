@@ -83,31 +83,35 @@ int y = warp_id / tiles_x;                          // 像素行号：第几行W
 
 
 ```cpp
-// 每个线程先读取当前像素所在列的上、中、下三个像素。
-// in_image标识当前线程坐标是否在图像有效范围内，为false时像素值置0。
-int top = in_image ? input[(y - 1) * width + x] : 0;
-int mid = in_image ? input[y * width + x] : 0;
-int bot = in_image ? input[(y + 1) * width + x] : 0;
+if (y > 0 && y < height - 1) {
+    // 每个线程先读取当前像素所在列的上、中、下三个像素。
+    // in_image标识当前线程坐标是否在图像有效范围内，为false时像素值置0。
+    int top = in_image ? input[(y - 1) * width + x] : 0;
+    int mid = in_image ? input[y * width + x] : 0;
+    int bot = in_image ? input[(y + 1) * width + x] : 0;
 
-// 从相邻线程获取左右两列数据。
-int shfl_top_left = asc_shfl_up(top, 1, warpSize);
-int shfl_top_right = asc_shfl_down(top, 1, warpSize);
-int shfl_mid_left = asc_shfl_up(mid, 1, warpSize);
-int shfl_mid_right = asc_shfl_down(mid, 1, warpSize);
-int shfl_bot_left = asc_shfl_up(bot, 1, warpSize);
-int shfl_bot_right = asc_shfl_down(bot, 1, warpSize);
+    // 从相邻线程获取左右两列数据。
+    int shfl_top_left = asc_shfl_up(top, 1, warpSize);
+    int shfl_top_right = asc_shfl_down(top, 1, warpSize);
+    int shfl_mid_left = asc_shfl_up(mid, 1, warpSize);
+    int shfl_mid_right = asc_shfl_down(mid, 1, warpSize);
+    int shfl_bot_left = asc_shfl_up(bot, 1, warpSize);
+    int shfl_bot_right = asc_shfl_down(bot, 1, warpSize);
+}
 ```
 
 对于需要参与Sobel计算的非边界像素，Warp边界处的线程需要特殊处理：第0号线程的左邻居和第31号线程的右邻居不在当前Warp内，因此需要从Global Memory读取数据：
 
 ```cpp
 // Warp边界处无法通过shuffle获取相邻像素，需要从Global Memory读取。
-int top_left = (lane_id == 0) ? input[(y - 1) * width + (x - 1)] : shfl_top_left;
-int top_right = (lane_id == 31) ? input[(y - 1) * width + (x + 1)] : shfl_top_right;
-int mid_left = (lane_id == 0) ? input[y * width + (x - 1)] : shfl_mid_left;
-int mid_right = (lane_id == 31) ? input[y * width + (x + 1)] : shfl_mid_right;
-int bot_left = (lane_id == 0) ? input[(y + 1) * width + (x - 1)] : shfl_bot_left;
-int bot_right = (lane_id == 31) ? input[(y + 1) * width + (x + 1)] : shfl_bot_right;
+if (in_image && x > 0 && x < width - 1) {
+    int top_left = (lane_id == 0) ? input[(y - 1) * width + (x - 1)] : shfl_top_left;
+    int top_right = (lane_id == 31) ? input[(y - 1) * width + (x + 1)] : shfl_top_right;
+    int mid_left = (lane_id == 0) ? input[y * width + (x - 1)] : shfl_mid_left;
+    int mid_right = (lane_id == 31) ? input[y * width + (x + 1)] : shfl_mid_right;
+    int bot_left = (lane_id == 0) ? input[(y + 1) * width + (x - 1)] : shfl_bot_left;
+    int bot_right = (lane_id == 31) ? input[(y + 1) * width + (x + 1)] : shfl_bot_right;
+}
 ```
 
 获取3×3邻域的全部9个像素后，按照Sobel公式计算水平梯度`Gx`和垂直梯度`Gy`，即可得到边缘幅值。

@@ -14,7 +14,7 @@ SIMD与SIMT混合编程中涉及的函数类型如下表所示：
 | `__simd_vf__` | 向量级并行计算任务 | 通过SIMD提供的`asc_vf_call`接口调用 |
 | `__simt_callee__` | SIMT VF的子函数 | SIMT VF内部调用 |
 | `__simd_callee__` | SIMD VF的子函数 | SIMD VF内部调用 |
-| `__callee__` | SIMD VF和SIMT VF的公共子函数 | VF内部调用 |
+| `__callee__` | SIMD VF和SIMT VF的公共子函数 | Device侧函数内部均可调用 |
 
 各层函数间的调用关系如下：
 - 核函数（Kernel）：是Device侧的入口函数，可以调用`__aicore__`函数和VF函数。
@@ -22,7 +22,7 @@ SIMD与SIMT混合编程中涉及的函数类型如下表所示：
 - simt vf函数：使用__simt_vf__标记，能被核函数（Kernel）或者`__aicore__`函数通过`asc_vf_call`接口调用。simt vf函数内只能调用`__simt_callee__`函数和`__callee__`函数。
 - `__simd_callee__`子函数：simd vf函数内部的子函数，子函数可能有返回值或者通过引用传参。__simd_callee__函数内只能调用`__simd_callee__`函数和`__callee__`函数。
 - `__simt_callee__`子函数：simt vf函数内部的子函数，子函数可能有返回值或者通过引用传参。`__simt_callee__`函数内只能调用`__simt_callee__`函数和`__callee__`函数。
-- `__callee__`公共函数：可供VF内部调用的公共子函数。`__callee__`函数内只能调用`__callee__`函数。
+- `__callee__`公共函数：可供Device侧函数调用的公共子函数。`__callee__`函数内只能调用`__callee__`函数。
 
 **图1** SIMD与SIMT混合编程函数调用层级  
 <img src="../../../../figures/simt_call.png" title="SIMD与SIMT混合编程函数调用层级">
@@ -101,7 +101,7 @@ asc_vf_call<function_name>(dim3(thread_num), arg1, arg2, ...);
 
 SIMT VF函数有以下约束：
 
--   入参仅支持Ascend C的[内置数据类型](../../../language_extension/simd_simt_hybrid_builtin_keywords.md#zh-cn_topic_0000002571575581_section1880403364916)（int32\_t、uint32\_t、float、half等）及其组成的指针、数组、结构体类型，且指针类型必须指向GM或者Unified Buffer（UB）内存。
+-   入参仅支持Ascend C的[内置数据类型](../../../language_extension/simd_simt_hybrid_builtin_keywords.md#zh-cn_topic_0000002571575581_section1880403364916)（int32\_t、uint32\_t、float、half等）及其组成的指针类型，且指针类型必须指向GM或者Unified Buffer（UB）内存。
 -   不支持将核函数（Kernel）中局部变量的地址或引用传递给VF函数。
 -   函数返回类型必须是void。
 -   SIMT VF内只能调用\_\_simt\_callee\_\_函数或\_\_callee\_\_函数。
