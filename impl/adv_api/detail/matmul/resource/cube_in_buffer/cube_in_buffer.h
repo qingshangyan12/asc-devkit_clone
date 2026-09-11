@@ -26,7 +26,7 @@
 #include "cube_in_buffer_single_global_buffer.h"
 #include "cube_in_buffer_double_buffer.h"
 #include "cube_in_buffer_double_global_buffer.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 #include "cube_in_buffer_double_buffer_sparse.h"
 #include "cube_in_buffer_n_buffer.h"
 #include "cube_in_buffer_bmm_db.h"
@@ -36,9 +36,6 @@
 #include "cube_in_buffer_bmm_db.h"
 #endif
 
-#if (__NPU_ARCH__ == 5102)
-#include "cube_in_buffer_bmm_db.h"
-#endif
 
 #endif // _CUBE_IN_BUFFER_H_
 

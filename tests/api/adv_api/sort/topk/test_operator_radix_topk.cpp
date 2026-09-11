@@ -559,9 +559,6 @@ INSTANTIATE_TEST_CASE_P(
             sizeof(float),
             true,
             testRadixTopK<float, true, true, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::LARGEST, false>}
-#if !(                       \
-    defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)) // 用例超出kirinx90 9030 ub size，bf16 kirinx90 9030不支持
         ,
         TopKTestParams{
             512,
@@ -766,7 +763,6 @@ INSTANTIATE_TEST_CASE_P(
             true,
             testRadixTopK<
                 bfloat16_t, true, false, false, AscendC::TopKMode::TOPK_NORMAL, AscendC::TopKOrder::SMALLEST, false>}
-#endif
         ));
 
 TEST_P(AdvanceTopKTestSuite, testRadixTopK)

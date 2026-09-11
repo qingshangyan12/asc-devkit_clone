@@ -62,7 +62,6 @@
 | ascend950pr_9599 AIV framework | `__NPU_ARCH__=3510`, `__DAV_C310__`, `__DAV_C310_VEC__` | `impl/basic_api/dav_3510/` | `tests/api/basic_api/ascendc_case_ascend950pr_9599/ascendc_case_ascend950pr_9599_aiv_framework/` |
 | common/header check | 多架构 | `impl/basic_api/`, `include/basic_api/` | `tests/api/basic_api/ascendc_case_common/`, `tests/api/basic_api/common/`, `tests/api/basic_api/ascendc_header_checker/` |
 
-`impl/basic_api/dav_l300/` 和 `impl/basic_api/dav_l311/` 当前也被接口实现聚合头引用，但本次扫描未发现同名 `tests/api/basic_api/ascendc_case_*` 顶层 UT 目录；新增相关 UT 前必须先确认产品目标和 CMake 配置。
 
 ## C API 子目录映射
 

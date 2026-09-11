@@ -28,13 +28,7 @@
 #include "../../../../../include/adv_api/sort/sort_utils.h"
 
 namespace AscendC {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003)
-constexpr auto singleSortElementCount = singleSortElementCountL300;
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3113)
-constexpr auto singleSortElementCount = singleSortElementCountL311;
-#else
 constexpr auto singleSortElementCount = singleSortElementCountArch3510;
-#endif
 
 namespace Reg {
 namespace internal {
