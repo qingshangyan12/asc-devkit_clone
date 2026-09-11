@@ -3438,5 +3438,6 @@
     -   [废弃接口](appendix/deprecated_interface.md)
     -   [接口变更说明](appendix/interface_change_description.md)
     -   [Release Notes](appendix/Release_Notes/release_notes.md)
+        -   [CANN 9.2.0](appendix/Release_Notes/CANN_9_2_0.md)
         -   [CANN 9.1.0](appendix/Release_Notes/CANN_9_1_0.md)
         -   [CANN 9.0.0](appendix/Release_Notes/CANN_9_0_0.md)
