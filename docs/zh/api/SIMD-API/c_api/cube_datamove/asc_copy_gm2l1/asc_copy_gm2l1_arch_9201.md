@@ -5,8 +5,31 @@
 <!-- npu="960" id1 -->
 - Ascend 960PR/Ascend 960DT：支持
 <!-- end id1 -->
+<!-- npu="950" id2 -->
+- Ascend 950PR/Ascend 950DT：不支持
+<!-- end id2 -->
+<!-- npu="A3" id3 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="910b" id4 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id4 -->
+<!-- npu="310b" id5 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id6 -->
+<!-- npu="310p" id7 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id7 -->
+<!-- npu="910" id8 -->
+- Atlas 训练系列产品：不支持
+<!-- end id8 -->
 
 ## 功能说明
+
+头文件路径为：`"c_api/cube_datamove/cube_datamove.h"`。
 
 将数据从Global Memory搬运到L1 Buffer。接口支持按连续数据块搬运，也支持以512字节分形为单位的2D矩阵搬运。2D矩阵搬运根据源矩阵行列方向的起始位置和步长切分分形矩阵，搬运过程中不进行分形格式转换。
 
@@ -41,7 +64,7 @@ __aicore__ inline void asc_copy_gm2l1(__cbuf__ <dtype>* dst,
                                       asc_load_l2_cache_mode l2_cache_mode)
 ```
 
-`dtype`支持的数据类型为`int8_t`、`uint8_t`、`fp4x2_e1m2_t`、`fp4x2_e2m1_t`、`hif4_scale`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`void`。
+`dtype`支持的数据类型为`int8_t`、`uint8_t`、`fp4x2_e1m2_t`、`fp4x2_e2m1_t`、`hif4_scale`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。此外，接口提供`void*`重载，用于按原始数据地址执行4-bit分形搬运。
 
 ## 参数说明
 
@@ -117,6 +140,7 @@ __global__ __cube__ void CopyGm2l1Kernel(__gm__ half* src)
     asc_init();
     __cbuf__ half dst[256];
 
+    // 从GM起始位置搬运一个512字节分形到L1 Buffer。
     asc_copy_gm2l1(dst, src, 0, 0, 1, 1, 1, false,
         asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM);
     asc_sync_pipe(PIPE_MTE2);

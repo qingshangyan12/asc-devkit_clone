@@ -5,6 +5,27 @@
 <!-- npu="960" id1 -->
 - Ascend 960PR/Ascend 960DT：支持
 <!-- end id1 -->
+<!-- npu="950" id2 -->
+- Ascend 950PR/Ascend 950DT：不支持
+<!-- end id2 -->
+<!-- npu="A3" id3 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="910b" id4 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id4 -->
+<!-- npu="310b" id5 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id6 -->
+<!-- npu="310p" id7 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id7 -->
+<!-- npu="910" id8 -->
+- Atlas 训练系列产品：不支持
+<!-- end id8 -->
 
 ## 功能说明
 
@@ -60,6 +81,7 @@ PIPE_MTE2
 - `n_value`超出16 bit取值范围或`d_value`超出21 bit取值范围时，高位会被截断。
 - `enable_small_c0`设置为`true`时，需满足`d_value <= 4`。
 - 开启`enable_pre_load_ignore_sync`前，需确保本次搬运与前序访问相同地址的指令不存在数据依赖，否则可能产生异常数据。
+- 如果本指令与其他指令存在数据依赖，需使用[asc_sync_notify](../sync/asc_sync_notify.md)和[asc_sync_wait](../sync/asc_sync_wait.md)进行同步。
 - `dst`偏移量与搬运大小之和不可超出L1 Buffer容量。
 
 ## 调用示例
@@ -71,6 +93,7 @@ __global__ __cube__ void CopyGm2l1Dn2nzKernel(__gm__ half* src)
 {
     asc_init();
     __cbuf__ half dst[256];
+    // 配置目的Nz矩阵布局，并将一个16 x 16的DN矩阵搬入L1 Buffer。
     asc_set_gm2l1_nz_para(1, 1, 16, 0);
     asc_copy_gm2l1_dn2nz(dst, src, 16 * sizeof(half),
         asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, 16, 16, 0, false, false);

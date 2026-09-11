@@ -5,8 +5,31 @@
 <!-- npu="960" id1 -->
 - Ascend 960PR/Ascend 960DT：支持
 <!-- end id1 -->
+<!-- npu="950" id2 -->
+- Ascend 950PR/Ascend 950DT：不支持
+<!-- end id2 -->
+<!-- npu="A3" id3 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="910b" id4 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id4 -->
+<!-- npu="310b" id5 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id6 -->
+<!-- npu="310p" id7 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id7 -->
+<!-- npu="910" id8 -->
+- Atlas 训练系列产品：不支持
+<!-- end id8 -->
 
 ## 功能说明
+
+头文件路径为：`"c_api/cube_datamove/cube_datamove.h"`。
 
 将数据从Global Memory搬运到L1 Buffer，并在搬运过程中将源端按N维连续排布的ND格式数据转换为L1 Buffer侧的Nz分形排布。该接口也适用于将卷积场景的NHWC（ND）格式转换为NC1HWC0格式。
 
@@ -89,6 +112,7 @@ __global__ __cube__ void CopyGm2l1Nd2nzKernel(__gm__ half* src)
     asc_init();
     __cbuf__ half dst[256];
 
+    // 配置目的Nz矩阵布局，并将一个16 x 16的ND矩阵搬入L1 Buffer。
     asc_set_gm2l1_nz_para(1, 1, 16, 0);
     asc_copy_gm2l1_nd2nz(dst, src, 16 * sizeof(half),
         asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM,
