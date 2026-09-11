@@ -102,13 +102,7 @@ extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z
 
 需要为特定TilingKey设置不同类型时，可以使用`KERNEL_TASK_TYPE(key, value)`接口。接口的产品支持情况、类型取值及使用约束请参考[设置核函数（Kernel）类型](../../../../../api/SIMD-API/basic_api/Kernel-Tiling/set_Kernel_type.md)。
 
-在Tiling模板编程场景中，在模板参数定义头文件的`ASCENDC_TPL_ARGS_SEL`内使用`ASCENDC_TPL_KERNEL_TYPE_SEL`设置该组模板参数组合的核函数（Kernel）类型。例如，以下配置将类型设置为纯AIV：
-
-```cpp
-ASCENDC_TPL_KERNEL_TYPE_SEL(ASCENDC_TPL_AIV_ONLY),
-```
-
-同一个`ASCENDC_TPL_SEL`下，选择显式设置类型时，每个`ASCENDC_TPL_ARGS_SEL`都需要配置此接口。接口详情及支持的类型请参考[模板参数定义](../../../../../api/Utils-API/Tiling_template_programming/template_params_definition.md)。
+在Tiling模板编程场景中，在模板参数定义头文件的`ASCENDC_TPL_ARGS_SEL`内使用`ASCENDC_TPL_KERNEL_TYPE_SEL`设置该组模板参数组合的核函数（Kernel）类型。同一个`ASCENDC_TPL_SEL`下，选择显式设置类型时，每个`ASCENDC_TPL_ARGS_SEL`都需要配置此接口。接口详情及支持的类型请参考[模板参数定义](../../../../../api/Utils-API/Tiling_template_programming/template_params_definition.md)。
 
 ## TilingData处理
 
