@@ -9,9 +9,8 @@
         - Atlas 推理系列产品
         <!-- end id2 -->
 
-- 核函数（Kernel）类型的设置方式取决于开发方式：
-    - 核函数（Kernel）直调场景推荐使用`__cube__`、`__vector__`或`__mix__(cube, vec)`函数执行空间限定符进行标记。
-    - aclnn工程化算子开发场景使用[KERNEL_TASK_TYPE_DEFAULT](../../../../api/SIMD-API/basic_api/Kernel-Tiling/set_Kernel_type.md)接口设置默认的核函数（Kernel）类型，不支持通过上述函数执行空间限定符设置类型。
+- 核函数（Kernel）推荐使用 \_\_cube\_\_ / \_\_vector\_\_ / \_\_mix\_\_(cube, vec)进行标记，KERNEL\_TASK\_TYPE\_DEFAULT接口即将废弃。
+
 - 纯Scalar算子无法实现自动推导
     需手动标记核函数（Kernel）类型，推荐设置为纯Vector类型。核函数（Kernel）直调场景添加`__vector__`函数执行空间限定符进行标记：
 
