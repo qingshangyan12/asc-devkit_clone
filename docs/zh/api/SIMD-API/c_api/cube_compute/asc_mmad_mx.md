@@ -56,8 +56,8 @@ $$
 表格中K0_A、K0_B的取值分别为`32B / sizeof(dtype_A)`、`32B / sizeof(dtype_B)`，`dtype_A`、`dtype_B`分别为A矩阵和B矩阵的数据类型。
 <!-- end id9 -->
 
-<!-- npu="960" id10 -->
-在Ascend 960PR/Ascend 950DT上不支持传入Scale矩阵地址，而是根据A、B矩阵的起始地址，按照固定的地址映射关系从L0A_MX Buffer和L0B_MX Buffer读取对应的Scale矩阵。各矩阵的信息说明见下表：
+<!-- npu="950" id10 -->
+在Ascend 950PR/Ascend 950DT上不支持传入Scale矩阵地址，而是根据A、B矩阵的起始地址，按照固定的地址映射关系从L0A_MX Buffer和L0B_MX Buffer读取对应的Scale矩阵。各矩阵的信息说明见下表：
 
 **表2** 矩阵信息说明
 
@@ -154,9 +154,9 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
 | `fp8_e4m3fn_t` | `fp8_e8m0_t` | `hif4x2_t`     | `hif4_scale` | `float` | `float` |
 | `fp8_e4m3fn_t` | `fp8_e8m0_t` | `fp4x2_e2m1_t` | `fp8_e8m0_t` | `float` | `float` |
 | `half`         | `fp8_e8m0_t` | `fp4x2_e2m1_t` | `fp8_e8m0_t` | `float` | `float` |
-| `half`         | `fp8_e8m0_t` | `hifloat4_t`   | `hif4_scale` | `float` | `float` |
+| `half`         | `fp8_e8m0_t` | `hif4x2_t`     | `hif4_scale` | `float` | `float` |
 | `bfloat16_t`   | `fp8_e8m0_t` | `fp4x2_e2m1_t` | `fp8_e8m0_t` | `float` | `float` |
-| `bfloat16_t`   | `fp8_e8m0_t` | `hifloat4_t`   | `hif4_scale` | `float` | `float` |
+| `bfloat16_t`   | `fp8_e8m0_t` | `hif4x2_t`     | `hif4_scale` | `float` | `float` |
 
 
 **典型示例：**
@@ -355,7 +355,7 @@ PIPE_M
   - `k`需为64的倍数。原始K不是64的倍数时，需将K向上补齐到64的倍数，并将补齐区域的矩阵A和矩阵B数据设置为0；传入接口的`k`、矩阵存储空间以及Scale矩阵的K维大小均需按照补齐后的K计算。
   - 矩阵存储空间的M、N维需分别向上补齐到16的倍数，`m`和`n`仍传入矩阵的有效M、N值。补齐部分为无效数据，不参与结果矩阵有效区域的计算。
   - Scale矩阵需覆盖本次矩阵乘加所需的全部数据。ScaleA的M维需向上补齐到16的倍数，K维大小为K / 32；ScaleB的K维大小为K / 32，N维需向上补齐到16的倍数。对应的起始地址与占用空间不能超出MX Buffer的范围。
-  - 当M为1且`disable_gemv`为false时，默认开启GEMV模式。此时从L0A Buffer读取矩阵A时按照ND格式读取，矩阵A需按照ND格式排布，起始地址仍需满足[表5](#asc_mmad_mx_param_table_960)[表6](#asc_mmad_mx_param_table_960)中的对齐要求。
+  - 当M为1且`disable_gemv`为false时，默认开启GEMV模式。此时从L0A Buffer读取矩阵A时按照ND格式读取，矩阵A需按照ND格式排布，起始地址仍需满足[表5](#asc_mmad_mx_param_table_960)、[表6](#asc_mmad_mx_param_table_950)中的对齐要求。
 
 - 同步约束说明：
 
