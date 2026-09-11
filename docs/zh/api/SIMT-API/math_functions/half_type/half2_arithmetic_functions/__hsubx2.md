@@ -56,7 +56,7 @@ half2 __hsubx2(const half2 x, const half2 y)
     <th>饱和模式返回值</th>
   </tr>
   <tr>
-    <td>inf</td>
+    <td>±inf</td>
     <td>有限值</td>
     <td>±inf</td>
     <td>±ASCRT_MAX_NORMAL_FP16</td>

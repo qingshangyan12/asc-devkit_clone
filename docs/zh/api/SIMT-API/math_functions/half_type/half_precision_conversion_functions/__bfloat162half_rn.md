@@ -27,6 +27,8 @@
 
 头文件路径为：`"simt_api/asc_bf16.h"`。
 
+将bfloat16类型数据转换为half类型数据，并遵循CAST_RINT模式，返回转换后的值。
+
 ## 函数原型
 
 ```cpp
