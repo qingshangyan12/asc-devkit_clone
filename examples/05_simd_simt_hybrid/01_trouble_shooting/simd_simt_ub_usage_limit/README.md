@@ -452,7 +452,7 @@ MainScalar、SIMD VF和SIMT VF中声明的静态UB共同占用当前Kernel的静
 
 对于越界访问目标UB区域，本Case构造MainScalar写和SIMT VF写两个场景。MainScalar写场景中，MainScalar将`bias`额外写入目标UB区域，随后SIMT VF仍从`static_ub`中读取`bias`计算输出；SIMT VF写场景中，SIMT VF将`bias`额外写入目标UB区域，再从`static_ub`中读取`bias`并计算输出。
 
-Case 3未添加关闭预留空间的编译选项，不配置动态UB。在该配置下，Data Cache达到128KB上限。根据[3510架构规格](../../../../docs/zh/guide/programming_guide/advanced_programming/hardware_implementation/architecture_spec/npu_arch_3510.md#compile-options-description)和[SIMT内存层级](../../../../docs/zh/guide/programming_guide/programming_model/ai_core_simt_programming/memory_hierarchy.md)，Data Cache之前还包含8KB预留空间。Case 3的UB布局计算如下：
+Case 3未添加关闭预留空间的编译选项，不配置动态UB。在该配置下，Data Cache达到128KB上限。根据[SIMT内存层级](../../../../docs/zh/guide/programming_guide/programming_model/ai_core_simt_programming/memory_hierarchy.md)，Data Cache之前还包含8KB预留空间。Case 3的UB布局计算如下：
 
 ```text
 Data Cache大小 = min(256KB - 4KB - 0KB - 8KB, 128KB) = 128KB

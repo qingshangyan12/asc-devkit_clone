@@ -26,7 +26,7 @@
 
 ## 指南概览
 
-混合编程作为高级编程方式，在阅读本章节内容前需对[SIMD编程模型](../../../programming_model/ai_core_simd_programming/ai_core_simd_programming.md)和[SIMT编程模型](../../../programming_model/ai_core_simt_programming/ai_core_simt_programming.md)有一定的了解。本章节将从以下几个方面展开介绍混合编程：
+混合编程作为高级编程方式，在阅读本章节内容前需对[SIMD编程模型](../../../programming_model/ai_core_simd_programming/overview.md)和[SIMT编程模型](../../../programming_model/ai_core_simt_programming/overview.md)有一定的了解。本章节将从以下几个方面展开介绍混合编程：
 
 -   **[抽象硬件架构](abstract_hardware_architecture.md)**：介绍了SIMD与SIMT混合编程场景的硬件架构，介绍VF（Vector Function）运行机制及SIMT VF、SIMD VF等概念。
 
