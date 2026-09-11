@@ -12,6 +12,7 @@ msSanitizer是基于昇腾AI处理器的异常检测工具，用于检测Ascend 
 
 | 产品 | CANN软件版本 |
 |------|-------------|
+| Ascend 960PR/Ascend 960DT | >= CANN 9.2.0 |
 | Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
