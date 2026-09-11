@@ -23,12 +23,19 @@ namespace mc2_ops_hccl {
 // 从源 CcuKernelInfo 继承属性到 KfcServer 的 CcuKernelInfo
 HcclResult InheritKfcServerKernelArg(
     const CcuKernelInfo& srcKernel, CcuKernelInfo& dstKernel, const OpParam& param, uint32_t rankId,
-    const std::vector<std::vector<u32>>& subCommRanks, uint32_t missionIndex)
+    const std::vector<std::vector<u32>>& subCommRanks, uint32_t missionIndex, uint32_t rankSizeLevel0,
+    uint32_t rankIdxLevel0, uint32_t rankSizeLevel1, uint32_t rankIdxLevel1)
 {
     std::string srcName(srcKernel.kernelFuncName);
     auto kfcArg = std::make_shared<CcuKernelArgKfcServer>();
 
     kfcArg->role = GetKfcServerRole(param.algName, missionIndex);
+    kfcArg->parallelAllGather =
+        param.algName != nullptr && std::strcmp(param.algName, KFC_PARALLEL_ALL_GATHER_ALG_NAME) == 0;
+    kfcArg->rankSizeLevel0 = rankSizeLevel0;
+    kfcArg->rankIdxLevel0 = rankIdxLevel0;
+    kfcArg->rankSizeLevel1 = rankSizeLevel1;
+    kfcArg->rankIdxLevel1 = rankIdxLevel1;
     const bool isAllGather =
         srcName == "CcuKernelAllGatherMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
     const bool isAllGatherKfc =
@@ -146,6 +153,24 @@ HcclResult CcuTempKfcServer::CalcRes(
     resourceRequest.slaveThreadNum = missionNum - 1U;
     const size_t firstKernelIndex = resourceRequest.ccuKernelInfos.size() - missionNum;
 
+    uint32_t rankSizeLevel0 = tempRankSize_;
+    uint32_t rankIdxLevel0 = mySubCommRank_;
+    uint32_t rankSizeLevel1 = 1U;
+    uint32_t rankIdxLevel1 = 0U;
+    if (param.algName != nullptr && std::strcmp(param.algName, KFC_PARALLEL_ALL_GATHER_ALG_NAME) == 0) {
+        CHK_PRT_RET(
+            missionNum != KFC_MAX_MISSION_NUM,
+            HCCL_ERROR("[CcuTempKfcServer::CalcRes] parallel AllGather requires two missions"), HCCL_E_INTERNAL);
+        const CcuKernelInfo& nhrKernel = resourceRequest.ccuKernelInfos[firstKernelIndex + 1U];
+        CHK_PRT_RET(
+            std::strcmp(nhrKernel.kernelFuncName, "CcuKernelAllGatherNHR1DMultiJettyMem2Mem") != 0,
+            HCCL_ERROR("[CcuTempKfcServer::CalcRes] parallel AllGather NHR kernel is missing"), HCCL_E_NOT_SUPPORT);
+        const auto* nhrArg = static_cast<const CcuKernelArgKfcAllGatherNHR1DMultiJettyMem2Mem*>(nhrKernel.kernelArg);
+        CHK_PTR_NULL(nhrArg);
+        rankSizeLevel1 = static_cast<uint32_t>(nhrArg->rankSize);
+        rankIdxLevel1 = nhrArg->rankId;
+    }
+
     for (uint32_t missionIndex = 0; missionIndex < missionNum; ++missionIndex) {
         const size_t kernelIndex = firstKernelIndex + missionIndex;
         CcuKernelInfo kernelInfo{};
@@ -188,7 +213,7 @@ HcclResult CcuTempKfcServer::CalcRes(
             resourceRequest.ccuKernelInfos[kernelIndex].kernelFuncName);
         CHK_RET(InheritKfcServerKernelArg(
             resourceRequest.ccuKernelInfos[kernelIndex], kernelInfo, param, mySubCommRank_, subCommRanks_,
-            missionIndex));
+            missionIndex, rankSizeLevel0, rankIdxLevel0, rankSizeLevel1, rankIdxLevel1));
         resourceRequest.ccuKernelInfos[kernelIndex] = kernelInfo;
     }
 
