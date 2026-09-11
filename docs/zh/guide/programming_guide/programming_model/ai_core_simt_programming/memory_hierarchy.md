@@ -99,11 +99,21 @@ __global__ void add_custom(float* x, float* y, float* z, uint64_t total_length)
 
 > [!NOTE]说明
 >
-> 用户可选择禁用预留空间，禁用方法为：编译时增加[--cce-disable-vf-stack-reserved-ubuf](../../compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#ZH-CN_TOPIC_0000002462746461)选项。开启该选项后，编译器不再预留该部分UB空间，该空间可作为普通UB空间使用，Data Cache空间可按如下公式估算：
+> 用户可选择禁用预留空间，禁用方法为编译时增加如下编译选项：
+>
+>- [--cce-disable-vf-stack-reserved-ubuf](../../compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#ZH-CN_TOPIC_0000002462746461)：关闭传参寄存器溢出栈空间（6KB）
+>- [--cce-disable-asc-reserved-ubuf](../../compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#ZH-CN_TOPIC_0000002462746461)：关闭Ascend C接口使用预留空间（2KB）
+>
+> 以上编译选项可独立使用，也可同时使用。开启后，编译器不再预留对应部分UB空间，该空间可作为普通UB空间使用。
+>
+> 例如，若同时增加以上两个编译选项，Data Cache空间计算公式为：
 > ```
 > Data Cache空间大小 = min(UB总大小（256KB） - 静态内存 - 动态内存, 128KB)
 > ```
-> 使用该选项时，仍需保证Data Cache空间不小于32KB，且Data Cache空间上限仍为128KB。开启该选项后，编译器将无法使用预留UB空间作为寄存器溢出的缓存空间，开发者需保证不会发生寄存器溢出。
+> 另外，开发者需要自行确认禁用预留空间的影响：
+>
+>- 开启`--cce-disable-vf-stack-reserved-ubuf`后，编译器将无法使用预留UB空间作为传参寄存器溢出的栈空间，用户需自行保证函数参数不过大。
+>- 开启`--cce-disable-asc-reserved-ubuf`暂无影响，当前SIMT编程场景内部暂未使用该空间。
 
 用户在UB上申请的动静态内存，按如下首地址对齐规则在UB中排布：
 
@@ -115,7 +125,7 @@ __global__ void add_custom(float* x, float* y, float* z, uint64_t total_length)
 SIMT编程中的栈空间由编译器管理，生命周期与核函数（Kernel）一致，包括以下两部分：
 
 -   位于Global Memory（GM）上的SIMT栈空间。
--   位于UB上用于SIMT函数调用参数传递的中转栈空间(UB上8KB预留空间的一部分)。
+-   位于UB上用于SIMT函数调用参数传递的中转栈空间（UB上8KB预留空间的一部分）。
 
 下文分别说明这两类栈空间。
 
