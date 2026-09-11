@@ -49,7 +49,7 @@ inline float sinpif(float x)
 
 输入数据与π相乘的正弦值。
 
-- 当x\*π超出float最大范围，返回值为nan。
+- 当|x|大于2^24时，返回值为带符号的0。
 - 当x\*π超出float最小范围，返回值为0或极小的subnormal值。
 - 当x为inf时，返回值为nan。
 - 当x为-inf时，返回值为nan。

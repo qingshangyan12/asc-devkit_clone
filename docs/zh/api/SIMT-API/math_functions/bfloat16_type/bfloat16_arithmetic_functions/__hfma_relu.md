@@ -68,9 +68,12 @@ x \* y + z的值。本接口不受全局饱和模式影响，特殊值如下：
     ```cpp
     #include "simt_api/asc_bf16.h"
 
-    __global__ __launch_bounds__(1024) void KernelHfma_relu(bfloat16_t* dst, bfloat16_t* x, bfloat16_t* y, bfloat16_t* z)
+    __global__ __launch_bounds__(1024) void KernelHfma_relu(bfloat16_t* dst, bfloat16_t* x, bfloat16_t* y, bfloat16_t* z, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __hfma_relu(x[idx], y[idx], z[idx]);
     }
     ```
@@ -80,9 +83,12 @@ x \* y + z的值。本接口不受全局饱和模式影响，特殊值如下：
     ```cpp
     #include "simt_api/asc_bf16.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void KernelHfma_relu(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x, __gm__ bfloat16_t* y, __gm__ bfloat16_t* z)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelHfma_relu(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x, __gm__ bfloat16_t* y, __gm__ bfloat16_t* z, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __hfma_relu(x[idx], y[idx], z[idx]);
     }
     ```

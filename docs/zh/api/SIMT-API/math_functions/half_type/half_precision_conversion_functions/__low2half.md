@@ -74,7 +74,7 @@ inline half __low2half(const half2 x)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= input_total_length / 2的线程不处理数据
-        if (idx > input_total_length / 2) {
+        if (idx >= input_total_length / 2) {
             return;
         }
         output[idx] = __low2half(input[idx]);
@@ -95,7 +95,7 @@ inline half __low2half(const half2 x)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= input_total_length / 2的线程不处理数据
-        if (idx > input_total_length / 2) {
+        if (idx >= input_total_length / 2) {
             return;
         }
         output[idx] = __low2half(input[idx]);

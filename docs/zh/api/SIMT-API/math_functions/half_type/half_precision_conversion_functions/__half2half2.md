@@ -88,4 +88,8 @@ inline half2 __half2half2(const half x)
         }
         dst[idx] = __half2half2(x[idx]);
     }
+    __global__ __vector__ void cast_kernel(__gm__ half2* dst, __gm__ half* x, uint32_t input_total_length)
+    {
+        asc_vf_call<kernel___half2half2>(dim3(1024), dst, x, input_total_length);
+    }
     ```

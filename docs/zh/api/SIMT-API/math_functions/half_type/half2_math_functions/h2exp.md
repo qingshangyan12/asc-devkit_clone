@@ -69,9 +69,12 @@ inline half2 h2exp(half2 x)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __global__ __launch_bounds__(1024) void KernelExp(half2* dst, half2* x)
+    __global__ __launch_bounds__(1024) void KernelExp(half2* dst, half2* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = h2exp(x[idx]);
     }
     ```
@@ -81,9 +84,12 @@ inline half2 h2exp(half2 x)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void KernelExp(__gm__ half2* dst, __gm__ half2* x)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelExp(__gm__ half2* dst, __gm__ half2* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = h2exp(x[idx]);
     }
     ```

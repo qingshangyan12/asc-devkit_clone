@@ -112,7 +112,7 @@ coalesced_group tiled_partition(const coalesced_group& parent, unsigned int tile
         auto tile4 = tiled_partition<4>(block);
 
         // 需要使用跨warp的thread_block_tile
-        __ubuf__ block_tile_memory<1024> scratch;
+        __ubuf__ block_tile_memory<1024> scratch = {};
         thread_block block_with_memory = this_thread_block(scratch);
         auto tile64 = tiled_partition<64>(block_with_memory);
         ...

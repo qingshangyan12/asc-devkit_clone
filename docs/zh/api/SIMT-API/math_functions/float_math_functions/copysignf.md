@@ -50,7 +50,8 @@ inline float copysignf(float x, float y)
 
 -   y\>=0时，返回x的绝对值Abs\(x\)。
 -   y<0时，返回x绝对值的相反数，-Abs\(x\)。
--   y=nan时，返回-Abs\(x\)。
+-   y=+nan时，返回Abs\(x\)。
+-   y=-nan时，返回-Abs\(x\)。
 -   y=-inf时，返回-Abs\(x\)。
 -   y=inf时，返回Abs\(x\)。
 

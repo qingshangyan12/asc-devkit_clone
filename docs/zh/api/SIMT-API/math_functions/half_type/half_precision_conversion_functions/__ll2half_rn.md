@@ -51,8 +51,6 @@ inline half __ll2half_rn(const long long int x)
 | --- | --- | --- |
 | 9223372036854775807（long long最大值） | inf | ASCRT\_MAX\_NORMAL\_FP16 |
 | -9223372036854775808（long long最小值） | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
-| x>9223372036854775807（long long最大值） | inf | ASCRT\_MAX\_NORMAL\_FP16 |
-| x<-9223372036854775808（long long最小值） | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
 | ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 |
 | -ASCRT\_MAX\_NORMAL\_FP16 | -ASCRT\_MAX\_NORMAL\_FP16 | -ASCRT\_MAX\_NORMAL\_FP16 |
 | 2049 | 2048 | 2048 |
@@ -69,9 +67,12 @@ inline half __ll2half_rn(const long long int x)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __global__ __launch_bounds__(1024) void kernel__ll2half_rn(half* dst, int64_t* x)
+    __global__ __launch_bounds__(1024) void kernel__ll2half_rn(half* dst, int64_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __ll2half_rn(x[idx]);
     }
     ```
@@ -81,9 +82,12 @@ inline half __ll2half_rn(const long long int x)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__ll2half_rn(__gm__ half* dst, __gm__ int64_t* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__ll2half_rn(__gm__ half* dst, __gm__ int64_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __ll2half_rn(x[idx]);
     }
     ```

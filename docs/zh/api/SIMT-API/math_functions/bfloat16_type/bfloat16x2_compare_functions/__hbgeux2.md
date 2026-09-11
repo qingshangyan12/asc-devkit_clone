@@ -63,7 +63,18 @@ bool __hbgeux2(bfloat16x2_t x, bfloat16x2_t y)
   </thead>
   <tbody>
     <tr>
-      <td colspan="2">任一分量为 nan</td>
+      <td>nan</td>
+      <td>正常值</td>
+      <td>true</td>
+    </tr>
+    <tr>
+      <td>正常值</td>
+      <td>nan</td>
+      <td>true</td>
+    </tr>
+    <tr>
+      <td>nan</td>
+      <td>nan</td>
       <td>true</td>
     </tr>
     <tr>

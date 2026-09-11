@@ -67,9 +67,12 @@ inline long long int __float2ll_rn(const float x)
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __global__ __launch_bounds__(1024) void kernel__float2ll_rn(int64_t* dst, float* x)
+    __global__ __launch_bounds__(1024) void kernel__float2ll_rn(int64_t* dst, float* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __float2ll_rn(x[idx]);
     }
     ```
@@ -79,9 +82,12 @@ inline long long int __float2ll_rn(const float x)
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__float2ll_rn(__gm__ int64_t* dst, __gm__ float* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__float2ll_rn(__gm__ int64_t* dst, __gm__ float* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __float2ll_rn(x[idx]);
     }
     ```

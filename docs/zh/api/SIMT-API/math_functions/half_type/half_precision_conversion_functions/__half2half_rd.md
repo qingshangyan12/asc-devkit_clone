@@ -45,16 +45,7 @@ inline half __half2half_rd(const half x)
 
 ## 返回值说明
 
-输入遵循CAST\_FLOOR模式取整后的half类型数据。本接口受全局饱和寄存器的影响，特殊值如下：
-
-| x值 | 非饱和模式返回值 | 饱和模式返回值 |
-| --- | --- | --- |
-| ±0 | 0 | 0 |
-| nan | nan | 0 |
-| inf | inf | ASCRT\_MAX\_NORMAL\_FP16 |
-| -inf | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
-| x>ASCRT\_MAX\_NORMAL\_FP16 | inf | ASCRT\_MAX\_NORMAL\_FP16 |
-| x<-ASCRT\_MAX\_NORMAL\_FP16 | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
+输入遵循CAST\_FLOOR模式取整后的half类型数据。
 
 ## 约束说明
 
@@ -67,9 +58,12 @@ inline half __half2half_rd(const half x)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __global__ __launch_bounds__(1024) void kernel__half2half_rd(half* dst, half* x)
+    __global__ __launch_bounds__(1024) void kernel__half2half_rd(half* dst, half* x, uint32_t input_total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = __half2half_rd(x[idx]);
     }
     ```
@@ -79,9 +73,12 @@ inline half __half2half_rd(const half x)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__half2half_rd(__gm__ half* dst, __gm__ half* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__half2half_rd(__gm__ half* dst, __gm__ half* x, uint32_t input_total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = __half2half_rd(x[idx]);
     }
     ```

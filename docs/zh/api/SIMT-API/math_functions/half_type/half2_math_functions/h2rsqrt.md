@@ -56,7 +56,7 @@ inline half2 h2rsqrt(half2 x)
 | nan | nan | ASCRT\_MAX\_NORMAL\_FP16 |
 | x<0 | nan | ASCRT\_MAX\_NORMAL\_FP16 |
 | -inf | nan | ASCRT\_MAX\_NORMAL\_FP16 |
-| inf | 0 | 1.52588e-05 |
+| inf | 0 | 0 |
 
 ## 约束说明
 

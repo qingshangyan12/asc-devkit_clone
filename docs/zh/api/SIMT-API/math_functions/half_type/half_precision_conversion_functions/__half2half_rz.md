@@ -67,9 +67,12 @@ inline half __half2half_rz(const half x)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __global__ __launch_bounds__(1024) void kernel__half2half_rz(half* dst, half* x)
+    __global__ __launch_bounds__(1024) void kernel__half2half_rz(half* dst, half* x, uint32_t input_total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = __half2half_rz(x[idx]);
     }
     ```
@@ -79,9 +82,12 @@ inline half __half2half_rz(const half x)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__half2half_rz(__gm__ half* dst, __gm__ half* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__half2half_rz(__gm__ half* dst, __gm__ half* x, uint32_t input_total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = __half2half_rz(x[idx]);
     }
     ```

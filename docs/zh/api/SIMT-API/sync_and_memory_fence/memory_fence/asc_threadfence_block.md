@@ -75,8 +75,12 @@ inline void asc_threadfence_block()
 
     __simt_vf__ __launch_bounds__(1024) inline void kernel_thread_fence_block(__gm__ float* dst, __gm__ float* src)
     {
-        src[0] = src[0] + 1;
-        asc_threadfence_block();
-        dst[0] = src[0];
+        if (threadIdx.x == 0) {
+            src[0] = src[0] + 1;
+            asc_threadfence_block();
+        }
+        if (threadIdx.x == 1) {
+            dst[0] = src[0];
+        }
     }
     ```

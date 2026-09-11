@@ -95,4 +95,9 @@ inline bfloat16_t hsqrt(bfloat16_t x)
         }
         dst[idx] = hsqrt(x[idx]);
     }
+
+    __global__ __vector__ void run_sqrt(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x, uint32_t total_length)
+    {
+        asc_vf_call<kernel_sqrt>(dim3(1024), dst, x, total_length);
+    }
     ```

@@ -67,9 +67,12 @@ inline half __bfloat162half_rn(const bfloat16_t x)
     #include "simt_api/asc_bf16.h"
 
     __global__ __launch_bounds__(1024) void kernel__bfloat162half_rn(half* dst,
-    bfloat16_t* x)
+    bfloat16_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __bfloat162half_rn(x[idx]);
     }
     ```
@@ -80,9 +83,12 @@ inline half __bfloat162half_rn(const bfloat16_t x)
     #include "simt_api/asc_bf16.h"
 
     __simt_vf__ __launch_bounds__(1024) inline void kernel__bfloat162half_rn(__gm__ half* dst, __gm__
-    bfloat16_t* x)
+    bfloat16_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __bfloat162half_rn(x[idx]);
     }
     ```

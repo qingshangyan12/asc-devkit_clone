@@ -66,9 +66,12 @@ inline bfloat16_t __float2bfloat16_rn(const float x)
     ```cpp
     #include "simt_api/asc_bf16.h"
 
-    __global__ __launch_bounds__(1024) void kernel__float2bfloat16_rn(bfloat16_t* dst, float* x)
+    __global__ __launch_bounds__(1024) void kernel__float2bfloat16_rn(bfloat16_t* dst, float* x, uint32_t input_total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = __float2bfloat16_rn(x[idx]);
     }
     ```
@@ -78,9 +81,12 @@ inline bfloat16_t __float2bfloat16_rn(const float x)
     ```cpp
     #include "simt_api/asc_bf16.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__float2bfloat16_rn(__gm__ bfloat16_t* dst, __gm__ float* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__float2bfloat16_rn(__gm__ bfloat16_t* dst, __gm__ float* x, uint32_t input_total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = __float2bfloat16_rn(x[idx]);
     }
     ```

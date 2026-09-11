@@ -32,7 +32,7 @@
 ## 函数原型
 
 ```cpp
-unsigned int num_threads() const
+static unsigned int num_threads()
 ```
 
 ## 参数说明

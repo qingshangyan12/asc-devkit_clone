@@ -65,9 +65,12 @@ inline half __int2half_rna(const int x)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __global__ __launch_bounds__(1024) void kernel__int2half_rna(half* dst, int32_t* x)
+    __global__ __launch_bounds__(1024) void kernel__int2half_rna(half* dst, int32_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __int2half_rna(x[idx]);
     }
     ```
@@ -77,9 +80,12 @@ inline half __int2half_rna(const int x)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__int2half_rna(__gm__ half* dst, __gm__ int32_t* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__int2half_rna(__gm__ half* dst, __gm__ int32_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __int2half_rna(x[idx]);
     }
     ```

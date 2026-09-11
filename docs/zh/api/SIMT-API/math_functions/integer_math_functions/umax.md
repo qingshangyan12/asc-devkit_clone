@@ -61,9 +61,12 @@ inline unsigned int umax(const unsigned int x, const unsigned int y)
     ```cpp
     #include "simt_api/math_functions.h"
 
-    __global__ __launch_bounds__(1024) void KernelUmax(unsigned int* dst, unsigned int* x, unsigned int* y)
+    __global__ __launch_bounds__(1024) void KernelUmax(unsigned int* dst, unsigned int* x, unsigned int* y, uint32_t input_total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = umax(x[idx], y[idx]);
     }
     ```
@@ -73,9 +76,12 @@ inline unsigned int umax(const unsigned int x, const unsigned int y)
     ```cpp
     #include "simt_api/math_functions.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void KernelUmax(__gm__ unsigned int* dst, __gm__ unsigned int* x, __gm__ unsigned int* y)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelUmax(__gm__ unsigned int* dst, __gm__ unsigned int* x, __gm__ unsigned int* y, uint32_t input_total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = umax(x[idx], y[idx]);
     }
     ```

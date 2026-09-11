@@ -81,6 +81,11 @@ inline float nanf(const char* tagp)
         dst[2] = nanf("abc");
         dst[3] = nanf("0");
     }
+
+    __global__ __vector__ void run_nanf(__gm__ float* dst)
+    {
+        asc_vf_call<kernel_nanf>(dim3(256), dst);
+    }
     ```
 
 输入输出示例如下：

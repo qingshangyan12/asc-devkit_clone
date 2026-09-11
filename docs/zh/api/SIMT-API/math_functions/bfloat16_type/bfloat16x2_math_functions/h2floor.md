@@ -66,9 +66,12 @@ inline bfloat16x2_t h2floor(bfloat16x2_t x)
     ```cpp
     #include "simt_api/asc_bf16.h"
 
-    __global__ __launch_bounds__(1024) void kernel_h2floor(bfloat16x2_t* dst, bfloat16x2_t* x)
+    __global__ __launch_bounds__(1024) void kernel_h2floor(bfloat16x2_t* dst, bfloat16x2_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = h2floor(x[idx]);
     }
     ```
@@ -78,9 +81,12 @@ inline bfloat16x2_t h2floor(bfloat16x2_t x)
     ```cpp
     #include "simt_api/asc_bf16.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void kernel_h2floor(__gm__ bfloat16x2_t* dst, __gm__ bfloat16x2_t* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_h2floor(__gm__ bfloat16x2_t* dst, __gm__ bfloat16x2_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = h2floor(x[idx]);
     }
     ```

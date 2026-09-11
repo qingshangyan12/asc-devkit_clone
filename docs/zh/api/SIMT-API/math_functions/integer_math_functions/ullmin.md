@@ -61,9 +61,12 @@ inline unsigned long long int ullmin(const unsigned long long int x, const unsig
     ```cpp
     #include "simt_api/math_functions.h"
 
-    __global__ __launch_bounds__(1024) void KernelUllmin(unsigned long long int* dst, unsigned long long int* x, unsigned long long int* y)
+    __global__ __launch_bounds__(1024) void KernelUllmin(unsigned long long int* dst, unsigned long long int* x, unsigned long long int* y, uint32_t input_total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = ullmin(x[idx], y[idx]);
     }
     ```
@@ -73,9 +76,12 @@ inline unsigned long long int ullmin(const unsigned long long int x, const unsig
     ```cpp
     #include "simt_api/math_functions.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void KernelUllmin(__gm__ unsigned long long int* dst, __gm__ unsigned long long int* x, __gm__ unsigned long long int* y)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelUllmin(__gm__ unsigned long long int* dst, __gm__ unsigned long long int* x, __gm__ unsigned long long int* y, uint32_t input_total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = ullmin(x[idx], y[idx]);
     }
     ```

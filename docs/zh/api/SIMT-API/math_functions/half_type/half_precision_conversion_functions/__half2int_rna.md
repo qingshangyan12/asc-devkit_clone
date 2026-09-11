@@ -55,7 +55,7 @@ inline int __half2int_rna(const half x)
 | -inf | -2147483648（int32_t最小值） |
 | ASCRT\_MAX\_NORMAL\_FP16 | 65504 |
 | -ASCRT\_MAX\_NORMAL\_FP16 | -65504 |
-| 0.5 | 1 |
+| ±0.5 | ±1 |
 
 ## 约束说明
 
