@@ -9,8 +9,11 @@ This sample demonstrates the basic usage of Ascend C vector addition.
 | Product | CANN Software Version |
 |------|-------------|
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 960DT | >= CANN 9.2.0 |
 | Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.0.0 |
 | Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
+
+> **Note:** For Ascend 960DT (dav-9201), only SIM mode has been validated; CPU debugging and on-device execution have not been validated. Use a CANN 9.2.0 or later development kit and simulator with dav-9201 support.
 
 ## Directory Structure
 
@@ -145,6 +148,8 @@ AscendC::DumpTensor(zLocal, 1, 32);
 
 ## Performance Debugging
 
+> A6: msopprof / msopprof simulator support has not been verified for this sample. The following profiling procedures do not establish A6 support.
+
 ### Introduction to the msOpProf Tool
 
 msOpProf is a single-operator performance analysis tool with two usage modes: `msopprof` and `msopprof simulator`. It helps users identify anomalies in operator memory, code, and instructions for comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and file types (executables or operator binary `.o` files).
@@ -210,6 +215,7 @@ Execute the following steps in the root directory of this sample to compile and 
   ```bash
   cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # CPU Debug mode
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU Simulation mode
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-9201 ..;make -j; # dav-9201 simulation mode
   ```
 
   > **Attention:** You need to clear the cmake cache before switching compilation modes. Execute `rm CMakeCache.txt` in the build directory and then run cmake again.
@@ -219,7 +225,7 @@ Execute the following steps in the root directory of this sample to compile and 
   | Option | Available Values | Description |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debug, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products, dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510`, `dav-9201` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products, dav-3510 corresponds to Ascend 950PR/Ascend 950DT; dav-9201 corresponds to Ascend 960DT (validated in SIM mode only) |
 
 - Execution Results
   The execution result is as follows, indicating that the accuracy comparison succeeds.

@@ -11,8 +11,11 @@ The sample uses 8 Cores. The main tile data volume in each core is 3200 `half` e
 | Product | CANN software version |
 |------|--------------|
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 960DT | >= CANN 9.2.0 |
 | Atlas A3 training series products/Atlas A3 inference series products | >= CANN 9.0.0 |
 | Atlas A2 training series products/Atlas A2 inference series products | >= CANN 9.0.0 |
+
+> **Note:** For Ascend 960DT (dav-9201), only SIM mode has been validated; CPU debugging and on-device execution have not been validated. Use a CANN 9.2.0 or later development kit and simulator with dav-9201 support.
 
 ## Directory Structure
 
@@ -199,6 +202,7 @@ In the sample root directory, perform the following steps to build and run the s
   ```bash
   cmake .. -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # CPU debugging mode
   cmake .. -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # NPU simulation mode
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-9201 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j; # dav-9201 simulation mode
   ```
 
   > **Note:** Before you switch the build mode, clear the cmake cache. In the build directory, run `rm CMakeCache.txt`, and then run `cmake` again.
@@ -208,7 +212,7 @@ In the sample root directory, perform the following steps to build and run the s
   | Option | Optional value | Description |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debugging, and NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: `dav-2201` maps to Atlas A2 training series products, Atlas A2 inference series products, Atlas A3 training series products, and Atlas A3 inference series products. `dav-3510` maps to Ascend 950PR and Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510`, `dav-9201` | NPU architecture: `dav-2201` maps to Atlas A2 training series products, Atlas A2 inference series products, Atlas A3 training series products, and Atlas A3 inference series products. `dav-3510` maps to Ascend 950PR and Ascend 950DT; dav-9201 corresponds to Ascend 960DT (validated in SIM mode only) |
   | `SCENARIO_NUM` | `0` (default), `1`, `2`, `3` | Scenario number: 0 (main tile equal split), 1 (tail block equal split), 2 (tail core split), and 3 (tail core split with tail blocks) |
 
 - Execution result.

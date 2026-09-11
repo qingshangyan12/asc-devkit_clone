@@ -9,6 +9,9 @@ This example implements multi-core matrix multiplication computation based on th
 | Product | CANN Software Version |
 |---------|----------------------|
 | Ascend 950PR/Ascend 950DT | > CANN 9.1.0 |
+| Ascend 960DT | >= CANN 9.2.0 |
+
+> **Note:** For Ascend 960DT (dav-9201), only SIM mode has been validated; CPU debugging and on-device execution have not been validated. Use a CANN 9.2.0 or later development kit and simulator with dav-9201 support.
 
 > **Note:** This example depends on CANN features that are not yet officially released. Please use the latest CANN master package.
 
@@ -117,6 +120,7 @@ Execute the following steps in the root directory of this example to build and r
 
   ```bash
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU simulation mode
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-9201 ..;make -j; # dav-9201 simulation mode
   ```
 
   > **Note:** Before switching build modes, you need to clean the cmake cache. You can execute `rm CMakeCache.txt` in the build directory and then run cmake again.
@@ -126,9 +130,9 @@ Execute the following steps in the root directory of this example to build and r
   | Option | Available Values | Description |
   |--------|------------------|-------------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`, `dav-9201` | NPU architecture: dav-3510 corresponds to Ascend 950PR/Ascend 950DT; dav-9201 corresponds to Ascend 960DT (validated in SIM mode only) |
 
-  > **Note:** This example only supports dav-3510 architecture (corresponding to Ascend 950PR/Ascend 950DT).
+  > **Note:** This example supports dav-3510 and adds dav-9201 simulation support.
 
 - Execution Result
   The execution result is as follows, indicating that the precision comparison succeeded.

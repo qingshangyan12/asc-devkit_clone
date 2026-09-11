@@ -41,6 +41,9 @@ $$
 | 产品 | CANN软件版本 |
 |------|-------------|
 | Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+| Ascend 960DT | >= CANN 9.2.0 |
+
+> **说明：** Ascend 960DT（dav-9201）本次仅验证 SIM 模式，未验证 CPU 调试和上板运行。请使用支持 dav-9201 的 CANN 9.2.0 及以上开发套件和仿真器。
 
 ## 算子实现
 
@@ -189,6 +192,8 @@ AscendC::DumpTensor(yLocal, 0, 16);
 
 ## 性能调试
 
+> A6：本样例尚未验证 msopprof / msopprof simulator 支持，以下性能调试流程不作为 A6 支持声明。
+
 ### msOpProf工具介绍
 msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
 
@@ -265,6 +270,7 @@ cat ./OPPROF_*/PipeUtilization.csv
   示例如下：
   ```bash
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-9201 -DCMAKE_VF_MODE=true ..;make -j; # dav-9201 仿真模式
   ```
 
 - 编译选项说明
@@ -272,7 +278,7 @@ cat ./OPPROF_*/PipeUtilization.csv
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`（默认） | NPU架构：Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`（默认）、`dav-9201` | NPU架构：Ascend 950PR/Ascend 950DT，dav-9201 对应 Ascend 960DT（仅验证 SIM 模式） |
   | `CMAKE_VF_MODE` | `true`（默认）、`false` | VF融合模式：启用或禁用 `--cce-simd-vf-fusion` |
 
 

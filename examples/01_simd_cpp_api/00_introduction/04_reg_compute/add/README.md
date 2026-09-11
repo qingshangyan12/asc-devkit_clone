@@ -8,6 +8,9 @@
 | 产品 | CANN软件版本 |
 |------|-------------|
 | Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+| Ascend 960DT | >= CANN 9.2.0 |
+
+> **说明：** Ascend 960DT（dav-9201）本次仅验证 SIM 模式，未验证 CPU 调试和上板运行。请使用支持 dav-9201 的 CANN 9.2.0 及以上开发套件和仿真器。
 
 ## 目录结构介绍
 ```
@@ -75,6 +78,7 @@
   ```bash
   cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # cpu调试模式
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-9201 ..;make -j; # dav-9201 仿真模式
   ```
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
@@ -84,7 +88,7 @@
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`、`dav-9201` | NPU 架构：Ascend 950PR/Ascend 950DT，dav-9201 对应 Ascend 960DT（仅验证 SIM 模式） |
 
 - 执行结果  
   执行结果如下，说明精度对比成功。

@@ -9,8 +9,11 @@
 | 产品 | CANN软件版本 |
 |------|-------------|
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 960DT | >= CANN 9.2.0 |
 | Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
+
+> **说明：** Ascend 960DT（dav-9201）本次仅验证 SIM 模式，未验证 CPU 调试和上板运行。请使用支持 dav-9201 的 CANN 9.2.0 及以上开发套件和仿真器。
 
 ## 目录结构介绍
 
@@ -207,7 +210,7 @@
 
                   // ==================== L1 → L0A/L0B: LoadData ====================
                   // ⚠️ 架构约束：不同产品的L0A排布格式不同，LoadData参数需对应调整
-                  // A2/A3(2201)为Zz排布需逐块搬运，950PR(3510)为Nz排布可一次完成
+                  // A2/A3(2201)为Zz排布需逐块搬运，dav-3510/dav-9201为Nz排布可一次完成
                   // A2/A3架构 (dav-2201): L0A排布为Zz格式，需逐块搬运
           #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
                   for (int i = 0; i < baseM / CUBE_BLOCK; ++i) {
@@ -219,8 +222,8 @@
                       AscendC::LoadData(b2Local[i * baseN * CUBE_BLOCK], b1Local[i * 512 / sizeof(half)],
                           AscendC::LoadData2DParams{0, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, 0, 0, true, 0});
                   }
-                  // Ascend 950PR架构 (dav-3510): L0A排布为Nz格式，一次搬运完成
-          #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+                  // dav-3510/dav-9201架构: L0A排布为Nz格式，一次搬运完成
+          #elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201))
                   AscendC::LoadData(a2Local, a1Local,
                       AscendC::LoadData2DParamsV2{0, 0, baseM / CUBE_BLOCK, baseK / CUBE_BLOCK,
                           baseM / CUBE_BLOCK, baseM / CUBE_BLOCK, false, 0});
@@ -456,6 +459,7 @@
   ```bash
   cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # cpu调试模式
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU仿真模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-9201 ..;make -j; # dav-9201 仿真模式
   ```
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
@@ -465,7 +469,7 @@
   | 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |
   | ----------------| -----------------------------| --------------------------------------------------------------------------------------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　　　　　　　　　　　　　　　　　　 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510`、`dav-9201` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT，dav-9201 对应 Ascend 960DT（仅验证 SIM 模式） |
 
 - 执行结果
 
@@ -542,6 +546,8 @@ AscendC::DumpTensor(zLocal, 1, 16);
 > **注意：** [DumpTensor](../../../../../docs/zh/api/SIMD-API/basic_api/debug_interface/onboard_print/DumpTensor.md)接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置ASCENDC_DUMP=0来关闭打印功能。
 
 ## 性能调试
+
+> A6：本样例尚未验证 msopprof / msopprof simulator 支持，以下性能调试流程不作为 A6 支持声明。
 
 ### msOpProf工具介绍
 msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
