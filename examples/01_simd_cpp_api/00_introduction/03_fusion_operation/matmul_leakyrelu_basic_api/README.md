@@ -208,7 +208,7 @@
 
                   // ==================== L1 → L0A/L0B: LoadData ====================
                   // ⚠️ 架构约束：不同产品的L0A排布格式不同，LoadData参数需对应调整
-                  // A2/A3(2201)为Zz排布需逐块搬运，950PR(3510)为Nz排布可一次完成
+                  // A2/A3(2201)为Zz排布需逐块搬运，dav-3510/dav-9201为Nz排布可一次完成
                   // A2/A3架构 (dav-2201): L0A排布为Zz格式，需逐块搬运
           #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
                   for (int i = 0; i < baseM / CUBE_BLOCK; ++i) {
@@ -220,7 +220,7 @@
                       AscendC::LoadData(b2Local[i * baseN * CUBE_BLOCK], b1Local[i * 512 / sizeof(half)],
                           AscendC::LoadData2DParams{0, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, 0, 0, true, 0});
                   }
-                  // Ascend 950PR架构 (dav-3510): L0A排布为Nz格式，一次搬运完成
+                  // dav-3510/dav-9201架构: L0A排布为Nz格式，一次搬运完成
           #elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201))
                   AscendC::LoadData(a2Local, a1Local,
                       AscendC::LoadData2DParamsV2{0, 0, baseM / CUBE_BLOCK, baseK / CUBE_BLOCK,
