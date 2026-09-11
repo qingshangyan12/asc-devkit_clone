@@ -344,11 +344,14 @@ struct CcuKernelInfo {
     void* kernelFunc;
     // KernelArg实例指针
     void* kernelArg;
+    // subKernelArg实例指针
+    void* subKernelArg;
     // kernel所需channel
     std::vector<HcclChannelDesc> channels;
 
 private:
     std::shared_ptr<CcuKernelArgBase> kernelArgSmartPtr;
+    std::shared_ptr<CcuKernelArgBase> subKernelArgSmartPtr;
 
 public:
     template <typename T>
@@ -356,6 +359,12 @@ public:
     {
         kernelArgSmartPtr = std::static_pointer_cast<CcuKernelArgBase>(arg);
         kernelArg = static_cast<void*>(arg.get());
+    }
+
+    void setSubKernelArgFromKernelArg()
+    {
+        subKernelArgSmartPtr = kernelArgSmartPtr;
+        subKernelArg = kernelArg;
     }
 };
 

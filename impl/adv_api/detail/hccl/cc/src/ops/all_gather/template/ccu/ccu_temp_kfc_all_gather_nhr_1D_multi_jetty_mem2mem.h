@@ -16,16 +16,6 @@
 
 namespace mc2_ops_hccl {
 
-struct CcuKernelArgKfcAllGatherNHR1DMultiJettyMem2Mem : CcuKernelArgBase {
-    uint64_t rankSize = 0;
-    uint32_t rankId = 0;
-    uint32_t jettyNum = 4;
-    OpParam opParam;
-    std::vector<KfcNhrStepInfo> stepInfoVector;
-    std::map<uint32_t, uint32_t> rank2ChannelIdx;
-    std::vector<std::vector<uint32_t>> subCommRanks;
-};
-
 class CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem : public CcuAlgTemplateBase {
 public:
     CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem() = default;
