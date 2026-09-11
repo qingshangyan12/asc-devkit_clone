@@ -14,8 +14,9 @@
 
 namespace mc2_ops_hccl {
 namespace {
+// 升 N>1 时须与 prepare 侧 a2aJettyNum 同步修改（hccl_ccu_v0_prepare.h）
 constexpr uint32_t KFC_A2A_JETTY_NUM = 1U;
-}
+} // namespace
 
 CcuTempKfcAllToAllMesh1DMultiJettySliced::CcuTempKfcAllToAllMesh1DMultiJettySliced(
     const OpParam& param, u32 rankId, const std::vector<std::vector<u32>>& subCommRanks)
