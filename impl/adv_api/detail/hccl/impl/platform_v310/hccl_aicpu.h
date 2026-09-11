@@ -30,18 +30,37 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::InitV2(
     GM_ADDR context, const void* initTiling)
 {
-    ASCENDC_HCCL_API_ASSERT(
-        initTiling != nullptr, { return; }, "Call InitV2 failed, ensure initTiling is not nullptr!");
-
-    const Mc2InitTilingInner* initTilingPtr = static_cast<const Mc2InitTilingInner*>(initTiling);
-    debugMode_ = initTilingPtr->debugMode;
-    devType_ = initTilingPtr->devType;
-    tilingBaseAddr_ = reinterpret_cast<uint64_t>(initTiling);
-
+    // ASCENDC_HCCL_API_ASSERT(
+    //     initTiling != nullptr, { return; }, "Call InitV2 failed, ensure initTiling is not nullptr!");
+    if (initTiling != nullptr) {
+        const Mc2InitTilingInner* initTilingPtr = static_cast<const Mc2InitTilingInner*>(initTiling);
+        debugMode_ = initTilingPtr->debugMode;
+        devType_ = initTilingPtr->devType;
+        tilingBaseAddr_ = reinterpret_cast<uint64_t>(initTiling);
+        hcclContext_ = (__gm__ OpResCtx*)context;
+        ASCENDC_HCCL_API_ASSERT(
+            hcclContext_ != nullptr, { return; }, "Init Hccl failed, context addr is nullptr.");
+        InitInner(hcclContext_->workspace, HcclTilingVersion::CONTEXT_DECOUPLE_VERSION);
+        return;
+    }
+    // initTiling is nullptr, get opType from context
+    // debugMode_ = context->debugMode;
+    // devType_ = context->devType;
     hcclContext_ = (__gm__ OpResCtx*)context;
     ASCENDC_HCCL_API_ASSERT(
         hcclContext_ != nullptr, { return; }, "Init Hccl failed, context addr is nullptr.");
     InitInner(hcclContext_->workspace, HcclTilingVersion::CONTEXT_DECOUPLE_VERSION);
+
+    
+    for (uint8_t i = 0; i < HCCL_ALG_SUPPORT_NUM; i++) {
+        const uint32_t opType = hcclContext_->opType;
+        ASCENDC_HCCL_API_ASSERT(
+            opType < static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL), { return ; },
+            "Call InitV2 failed, ensure cmdType is valid");
+        ccOpTilingDataTable_[opType] = 0;
+        ccOpParamTable_[opType] = hcclContext_->algInfo[i].opParam;
+    }
+    
 }
 
 template <const auto& config>
