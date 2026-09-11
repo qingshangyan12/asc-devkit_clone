@@ -85,7 +85,7 @@
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`、`dav-9201` | NPU 架构：Ascend 950PR/Ascend 950DT，dav-9201 对应 Ascend 960DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`、`dav-9201` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT，dav-9201 对应 Ascend 960DT |
 
 - 执行结果  
   执行结果如下，说明精度对比成功。

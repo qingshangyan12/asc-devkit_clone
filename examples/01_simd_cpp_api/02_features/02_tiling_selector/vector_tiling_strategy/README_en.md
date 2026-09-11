@@ -209,7 +209,7 @@ In the sample root directory, perform the following steps to build and run the s
   | Option | Optional value | Description |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debugging, and NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510`, `dav-9201` | NPU architecture: `dav-2201` maps to Atlas A2 training series products, Atlas A2 inference series products, Atlas A3 training series products, and Atlas A3 inference series products. `dav-3510` maps to Ascend 950PR and Ascend 950DT, dav-9201 corresponds to Ascend 960DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510`, `dav-9201` | NPU architecture: `dav-2201` maps to Atlas A2 training series products, Atlas A2 inference series products, Atlas A3 training series products, and Atlas A3 inference series products. `dav-3510` maps to Ascend 950PR and Ascend 950DT. `dav-9201` maps to Ascend 960DT |
   | `SCENARIO_NUM` | `0` (default), `1`, `2`, `3` | Scenario number: 0 (main tile equal split), 1 (tail block equal split), 2 (tail core split), and 3 (tail core split with tail blocks) |
 
 - Execution result.

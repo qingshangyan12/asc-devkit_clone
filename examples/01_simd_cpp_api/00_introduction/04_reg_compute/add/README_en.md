@@ -85,7 +85,7 @@ Execute the following steps in the root directory of this example to build and r
   | Option | Available Values | Description |
   |--------|------------------|-------------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debugging, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`, `dav-9201` | NPU architecture: Ascend 950PR/Ascend 950DT, dav-9201 corresponds to Ascend 960DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`, `dav-9201` | NPU architecture: dav-3510 corresponds to Ascend 950PR/Ascend 950DT, dav-9201 corresponds to Ascend 960DT |
 
 - Execution Results  
   The execution results are as follows, indicating the precision comparison succeeded.

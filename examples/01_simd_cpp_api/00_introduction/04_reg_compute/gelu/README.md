@@ -273,7 +273,7 @@ cat ./OPPROF_*/PipeUtilization.csv
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`（默认）、`dav-9201` | NPU架构：Ascend 950PR/Ascend 950DT，dav-9201 对应 Ascend 960DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`（默认）、`dav-9201` | NPU架构：dav-3510 对应 Ascend 950PR/Ascend 950DT，dav-9201 对应 Ascend 960DT |
   | `CMAKE_VF_MODE` | `true`（默认）、`false` | VF融合模式：启用或禁用 `--cce-simd-vf-fusion` |
 
 
