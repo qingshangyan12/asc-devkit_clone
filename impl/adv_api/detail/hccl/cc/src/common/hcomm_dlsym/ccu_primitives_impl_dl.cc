@@ -126,6 +126,7 @@ DEFINE_WEAK_FUNC(CcuResult, CcuFuncBlockBegin, const void* funcPtr, uint64_t* ou
 DEFINE_WEAK_FUNC(CcuResult, CcuFuncBlockEnd, uint64_t handle);
 DEFINE_WEAK_FUNC(CcuResult, CcuFuncDefineInArg, uint64_t handle, CcuVariableHandle formal);
 DEFINE_WEAK_FUNC(CcuResult, CcuFuncCall, uint64_t handle, const CcuVariableHandle* inArgs, uint32_t numIn);
+DEFINE_WEAK_FUNC(CcuResult, CcuCallTask, CcuVariableHandle taskPc, const CcuVariableHandle* inArgs, uint32_t numIn);
 
 /*
  * 控制流宏内部使用的标签栈接口（以 _ 前缀标识为内部 API，
@@ -212,6 +213,7 @@ void CcuPrimitivesImplDlInit(void* libHcommHandle)
     INIT_SUPPORT_FLAG(libHcommHandle, CcuFuncBlockEnd);
     INIT_SUPPORT_FLAG(libHcommHandle, CcuFuncDefineInArg);
     INIT_SUPPORT_FLAG(libHcommHandle, CcuFuncCall);
+    INIT_SUPPORT_FLAG(libHcommHandle, CcuCallTask);
     INIT_SUPPORT_FLAG(libHcommHandle, _CcuIfStackPush);
     INIT_SUPPORT_FLAG(libHcommHandle, _CcuIfStackMarkBodyDone);
     INIT_SUPPORT_FLAG(libHcommHandle, _CcuIfStackPopForElse);

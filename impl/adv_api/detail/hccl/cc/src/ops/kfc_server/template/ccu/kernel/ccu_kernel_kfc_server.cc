@@ -8,7 +8,10 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#include <utility>
+
 #include "ccu_kernel_alg_base.h"
+<<<<<<< HEAD
 #include "../../../../all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_mesh1d_mem2mem.h"
 #include "../../../../all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem.h"
 #include "../../../../all_reduce/template/ccu/kernel/ccu_kernel_kfc_all_reduce_mesh1d_mem2mem.h"
@@ -17,353 +20,273 @@
 #include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_mesh1d.h"
 #include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_v_mesh1d.h"
 #include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_kfc_all_to_all_mesh1d_multi_jetty.h"
+    == == ==
+    =
+>>>>>>> 8ad3b9b69 (add pc pointer)
 #include "ccu_kernel_kfc_server.h"
 #include "ccu_variable_dl.hpp"
 #include "ccu_func_dl.hpp"
 #include "mc2_type.h"
 #include "hccl_alloc_ctx_res.h"
 
-namespace mc2_ops_hccl {
-
-using namespace hcomm;
-using namespace std;
-
-static_assert(
-    KFC_CONCURRENT_AG_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE,
-    "Concurrent AllGather parameters exceed the KFC server load width");
-static_assert(
-    KFC_CONCURRENT_A2A_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE,
-    "Concurrent AllToAll parameters exceed the KFC server load width");
-static_assert(KFC_MAX_MISSION_NUM == 2U, "KFC server CKE partitioning expects two missions");
-static_assert(KFC_SIGNAL_REGIONS_PER_MISSION == 2U, "Each KFC mission requires commit and done regions");
-
-const uint32_t HBM_PARAM_IDX_0 = 0;
-const uint32_t HBM_PARAM_IDX_1 = 1;
-const uint32_t HBM_PARAM_IDX_2 = 2;
-const uint32_t HBM_PARAM_IDX_3 = 3;
-const uint32_t HBM_PARAM_IDX_4 = 4;
-const uint32_t HBM_PARAM_IDX_5 = 5;
-const uint32_t HBM_PARAM_IDX_6 = 6;
-const uint32_t HBM_PARAM_IDX_7 = 7;
-const uint32_t HBM_PARAM_IDX_8 = 8;
-const uint32_t HBM_PARAM_IDX_9 = 9;
-const uint32_t HBM_PARAM_IDX_10 = 10;
-const uint32_t HBM_PARAM_IDX_11 = 11;
-const uint32_t HBM_PARAM_IDX_12 = 12;
-const uint32_t HBM_PARAM_IDX_13 = 13;
-const uint32_t HBM_PARAM_IDX_14 = 14;
-const uint32_t HBM_PARAM_IDX_15 = 15;
-const uint32_t HBM_PARAM_IDX_16 = 16;
-const uint32_t HBM_PARAM_IDX_17 = 17;
-const uint32_t HBM_PARAM_IDX_18 = 18;
-const uint32_t HBM_PARAM_IDX_19 = 19;
-const uint32_t HBM_PARAM_IDX_20 = 20;
-const uint32_t HBM_PARAM_IDX_21 = 21;
-const uint32_t HBM_PARAM_IDX_22 = 22;
-const uint32_t HBM_PARAM_IDX_23 = 23;
-const uint32_t HBM_PARAM_IDX_24 = 24;
-const uint32_t HBM_PARAM_IDX_25 = 25;
-// KFC reduce_scatter specific parameters (at positions [13..23], not used by homm CCU server template)
-const uint32_t HBM_PARAM_IDX_KFC_CHUNK_SIZE = 13;
-const uint32_t HBM_PARAM_IDX_KFC_CHUNK_LOOP_NUM = 14;
-const uint32_t HBM_PARAM_IDX_KFC_TAIL_SIZE = 15;
-const uint32_t HBM_PARAM_IDX_KFC_FULL_GO_ADDR_OFFSET = 16;
-const uint32_t HBM_PARAM_IDX_KFC_FULL_GO_LOOP_PARAM = 17;
-const uint32_t HBM_PARAM_IDX_KFC_FULL_GO_PARALLEL_PARAM = 18;
-const uint32_t HBM_PARAM_IDX_KFC_FULL_GO_RESIDUAL = 19;
-const uint32_t HBM_PARAM_IDX_KFC_TAIL_GO_ADDR_OFFSET = 20;
-const uint32_t HBM_PARAM_IDX_KFC_TAIL_GO_LOOP_PARAM = 21;
-const uint32_t HBM_PARAM_IDX_KFC_TAIL_GO_PARALLEL_PARAM = 22;
-const uint32_t HBM_PARAM_IDX_KFC_TAIL_GO_RESIDUAL = 23;
-
-const uint32_t SINGLE_DIE = 1;
-const uint32_t DOUBLE_DIE = 2;
-const uint32_t DIE0_ID = 0;
-const uint32_t DIE1_ID = 1;
-constexpr const char* DIE1_START_SIG = "Die1StartSig";
-constexpr const char* DIE1_END_SIG = "Die1EndSig";
-
-static CcuResult ParseKernelArg(KfcServerContext& ctx, const CcuKernelArgKfcServer* kernelArg)
+        namespace mc2_ops_hccl
 {
-    ctx.arg = kernelArg;
-    return CCU_SUCCESS;
-}
+    using namespace hcomm;
+    using namespace std;
 
-static CcuResult InitResource(const KfcServerContext& ctx)
-{
-    (void)ctx;
-    return CCU_SUCCESS;
-}
+    static_assert(
+        KFC_CONCURRENT_AG_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE,
+        "Concurrent AllGather parameters exceed the KFC server load width");
+    static_assert(
+        KFC_CONCURRENT_A2A_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE,
+        "Concurrent AllToAll parameters exceed the KFC server load width");
+    static_assert(KFC_MAX_MISSION_NUM == 2U, "KFC server CKE partitioning expects two missions");
+    static_assert(KFC_SIGNAL_REGIONS_PER_MISSION == 2U, "Each KFC mission requires commit and done regions");
 
-static CcuResult LoadArgs(KfcServerContext& ctx)
-{
-    uint32_t argId = 0;
+    const uint32_t HBM_PARAM_IDX_0 = 0;
+    const uint32_t HBM_PARAM_IDX_1 = 1;
+    const uint32_t HBM_PARAM_IDX_2 = 2;
+    const uint32_t HBM_PARAM_IDX_3 = 3;
+    const uint32_t HBM_PARAM_IDX_4 = 4;
+    const uint32_t HBM_PARAM_IDX_5 = 5;
+    const uint32_t HBM_PARAM_IDX_6 = 6;
+    const uint32_t HBM_PARAM_IDX_7 = 7;
+    const uint32_t HBM_PARAM_IDX_8 = 8;
+    const uint32_t HBM_PARAM_IDX_9 = 9;
+    const uint32_t HBM_PARAM_IDX_10 = 10;
+    const uint32_t HBM_PARAM_IDX_11 = 11;
+    const uint32_t HBM_PARAM_IDX_12 = 12;
+    const uint32_t HBM_PARAM_IDX_13 = 13;
+    const uint32_t HBM_PARAM_IDX_14 = 14;
+    const uint32_t HBM_PARAM_IDX_15 = 15;
+    const uint32_t HBM_PARAM_IDX_16 = 16;
+    const uint32_t HBM_PARAM_IDX_17 = 17;
+    const uint32_t HBM_PARAM_IDX_18 = 18;
+    const uint32_t HBM_PARAM_IDX_19 = 19;
+    const uint32_t HBM_PARAM_IDX_20 = 20;
+    const uint32_t HBM_PARAM_IDX_21 = 21;
+    const uint32_t HBM_PARAM_IDX_22 = 22;
+    const uint32_t HBM_PARAM_IDX_23 = 23;
+    const uint32_t HBM_PARAM_IDX_24 = 24;
+    const uint32_t HBM_PARAM_IDX_25 = 25;
+    // KFC reduce_scatter specific parameters (at positions [13..23], not used by homm CCU server template)
+    const uint32_t HBM_PARAM_IDX_KFC_CHUNK_SIZE = 13;
+    const uint32_t HBM_PARAM_IDX_KFC_CHUNK_LOOP_NUM = 14;
+    const uint32_t HBM_PARAM_IDX_KFC_TAIL_SIZE = 15;
+    const uint32_t HBM_PARAM_IDX_KFC_FULL_GO_ADDR_OFFSET = 16;
+    const uint32_t HBM_PARAM_IDX_KFC_FULL_GO_LOOP_PARAM = 17;
+    const uint32_t HBM_PARAM_IDX_KFC_FULL_GO_PARALLEL_PARAM = 18;
+    const uint32_t HBM_PARAM_IDX_KFC_FULL_GO_RESIDUAL = 19;
+    const uint32_t HBM_PARAM_IDX_KFC_TAIL_GO_ADDR_OFFSET = 20;
+    const uint32_t HBM_PARAM_IDX_KFC_TAIL_GO_LOOP_PARAM = 21;
+    const uint32_t HBM_PARAM_IDX_KFC_TAIL_GO_PARALLEL_PARAM = 22;
+    const uint32_t HBM_PARAM_IDX_KFC_TAIL_GO_RESIDUAL = 23;
 
-    // 顺序需与 kfcServerArgs 中的字段顺序一致：xnAddr, ckeAddr, dieNum, missionNum, missionIndex, token
-    CCU_CHK_RET(ccu::LoadArg(ctx.xnAddr, argId++));
-    CCU_CHK_RET(ccu::LoadArg(ctx.ckeAddr, argId++));
-    CCU_CHK_RET(ccu::LoadArg(ctx.dieNum, argId++));
-    CCU_CHK_RET(ccu::LoadArg(ctx.missionNum, argId++));
-    CCU_CHK_RET(ccu::LoadArg(ctx.missionIndex, argId++));
-    CCU_CHK_RET(ccu::LoadArg(ctx.token, argId++));
+    const uint32_t SINGLE_DIE = 1;
+    const uint32_t DOUBLE_DIE = 2;
+    const uint32_t DIE0_ID = 0;
+    const uint32_t DIE1_ID = 1;
+    constexpr const char* DIE1_START_SIG = "Die1StartSig";
+    constexpr const char* DIE1_END_SIG = "Die1EndSig";
 
-    return CCU_SUCCESS;
-}
-
-static CcuResult CompArgs(KfcServerContext& ctx)
-{
-    ccu::Variable regionSize;
-    ctx.waitAddr = ctx.ckeAddr;
-    regionSize = CCU_TASK_NUM_MAX * CCU_ONE_PARAM_SIZE;
-    ctx.recordAddr = ctx.ckeAddr + regionSize;
-    CCU_IF(ctx.missionIndex == 1)
+    static CcuResult ParseKernelArg(KfcServerContext & ctx, const CcuKernelArgKfcServer* kernelArg)
     {
-        ctx.waitAddr = ctx.recordAddr + regionSize;
-        ctx.recordAddr = ctx.waitAddr + regionSize;
+        ctx.arg = kernelArg;
+        return CCU_SUCCESS;
     }
-    return CCU_SUCCESS;
-}
 
-void MissionPreSync(const ccu::Variable& func, const KfcServerContext& ctx)
-{
-    (void)func;
-    (void)ctx;
-}
-
-void MissionPostSync(const KfcServerContext& ctx) { (void)ctx; }
-
-CcuResult WaitTurnStartSig(const ccu::Variable& hbmSigAddr, ccu::Variable& turnStartSig, const KfcServerContext& ctx)
-{
-    (void)ctx;
-    const uint32_t getDieId = 1;
-    // 单Die场景：等待HBM中的信号
-    CCU_WHILE(turnStartSig != 1)
+    static CcuResult InitResource(const KfcServerContext& ctx)
     {
-        CCU_CHK_RET(ccu::Load(hbmSigAddr, turnStartSig)); // 循环读HBM对应地址的信号到Xn，直到Xn中的信号值为1
+        (void)ctx;
+        return CCU_SUCCESS;
     }
-    turnStartSig = 0;                                  // reset Xn
-    CCU_CHK_RET(ccu::Store(hbmSigAddr, turnStartSig)); // reset HBM
-    return CCU_SUCCESS;
-}
 
-CcuResult SetTurnEndSig(const ccu::Variable& hbmSigAddr, const ccu::Variable& turnEndSig, const KfcServerContext& ctx)
-{
-    (void)ctx;
-    const uint32_t getDieId = 1;
-    CCU_CHK_RET(ccu::Store(hbmSigAddr, turnEndSig));
-    return CCU_SUCCESS;
-}
-
-CcuResult LoadFuncParamFromMemory(
-    const ccu::Variable& paramAddr, ccu::Array<ccu::Variable>& param, const KfcServerContext& ctx)
-{
-    (void)ctx;
-    // 双Die场景Die1需要读后32个参数，其他场景都是读取前32个参数
-    ccu::Variable doubleDie;
-    doubleDie = CCU_PARAM_NUM_PER_DIE * CCU_ONE_PARAM_SIZE;
-    ccu::Variable addr;
-    addr = paramAddr;
-
-    // 一次性读取本轮32个参数
-    CCU_CHK_RET(ccu::Load(addr, param, CCU_PARAM_NUM_PER_DIE));
-    return CCU_SUCCESS;
-}
-
-static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerContext& ctx)
-{
-    if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLGATHER) {
-        if (ctx.arg->role == KfcServerRole::ALL_GATHER_NHR) {
-            CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
-                param[KFC_CONCURRENT_AG_NHR_INPUT], param[KFC_CONCURRENT_AG_NHR_OUTPUT], ctx.token,
-                param[KFC_CONCURRENT_AG_NHR_SLICE_SIZE], param[KFC_CONCURRENT_AG_NHR_SLICE_SIZE_PER_JETTY],
-                param[KFC_CONCURRENT_AG_NHR_LAST_SLICE_SIZE_PER_JETTY], param[KFC_CONCURRENT_AG_NHR_REPEAT_NUM_INV],
-                param[KFC_CONCURRENT_AG_NHR_INPUT_SLICE_STRIDE], param[KFC_CONCURRENT_AG_NHR_OUTPUT_SLICE_STRIDE],
-                param[KFC_CONCURRENT_AG_NHR_INPUT_REPEAT_STRIDE], param[KFC_CONCURRENT_AG_NHR_OUTPUT_REPEAT_STRIDE],
-                param[KFC_CONCURRENT_AG_NHR_INPUT_OUTPUT_EQUAL], param[KFC_CONCURRENT_AG_NHR_GO_SIZE_0],
-                param[KFC_CONCURRENT_AG_NHR_GO_SIZE_1], param[KFC_CONCURRENT_AG_NHR_GO_SIZE_2],
-                param[KFC_CONCURRENT_AG_NHR_GO_SIZE_3], ctx.arg->channels, ctx.arg->channelCount,
-                static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->jettyNum,
-                ctx.arg->nhrStepInfoVector, ctx.arg->nhrRank2ChannelIdx);
-        } else {
-            // The queue payload layout is
-            // [0]=op, [1]=input, [2]=output, [3]=outputOffset, [4]=sliceSize,
-            // [5..8]=goSize, [9]=inputOffset, [10]=repeat, [11..12]=strides,
-            // [13]=lastSliceSize, [14]=inplace.  The memory token is immutable
-            // for the KFC server lifetime and comes from ctx.token.
-            HCCL_INFO("[KFC][AllGather][Dispatch] route queue payload to CcuKfcAllGatherMesh1DMem2MemKernel, "
-                      "token=serverContext");
-
-            CcuKfcAllGatherMesh1DMem2MemKernel(
-                param[KFC_CONCURRENT_AG_MESH_INPUT], param[KFC_CONCURRENT_AG_MESH_OUTPUT], ctx.token,
-                param[KFC_CONCURRENT_AG_MESH_OUTPUT_OFFSET], param[KFC_CONCURRENT_AG_MESH_SLICE_SIZE],
-                param[KFC_CONCURRENT_AG_MESH_GO_SIZE_0], param[KFC_CONCURRENT_AG_MESH_GO_SIZE_1],
-                param[KFC_CONCURRENT_AG_MESH_GO_SIZE_2], param[KFC_CONCURRENT_AG_MESH_GO_SIZE_3],
-                param[KFC_CONCURRENT_AG_MESH_CURRENT_RANK_SLICE_INPUT_OFFSET],
-                param[KFC_CONCURRENT_AG_MESH_REPEAT_NUM_INV], param[KFC_CONCURRENT_AG_MESH_INPUT_REPEAT_STRIDE],
-                param[KFC_CONCURRENT_AG_MESH_OUTPUT_REPEAT_STRIDE], param[KFC_CONCURRENT_AG_MESH_LAST_SLICE_SIZE],
-                param[KFC_CONCURRENT_AG_MESH_INPUT_OUTPUT_EQUAL], ctx.arg->channels, ctx.arg->channelCount,
-                static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
-        }
-    } else if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
-        if (ctx.arg->opParam.algName != nullptr &&
-            std::strcmp(ctx.arg->opParam.algName, KFC_REDUCE_SCATTER_PEER_ONLY_ALG_NAME) == 0) {
-            CcuReduceScatterMeshMem2Mem1DPeerOnlyKernel(
-                param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_4],
-                param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], ctx.arg->channels, ctx.arg->channelCount,
-                static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType,
-                ctx.arg->opParam.reduceType);
-        } else {
-            CcuReduceScatterMesh1DMem2MemKernel(
-                param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3],
-                param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_KFC_CHUNK_SIZE], param[HBM_PARAM_IDX_KFC_CHUNK_LOOP_NUM],
-                param[HBM_PARAM_IDX_KFC_TAIL_SIZE], param[HBM_PARAM_IDX_KFC_FULL_GO_ADDR_OFFSET],
-                param[HBM_PARAM_IDX_KFC_FULL_GO_LOOP_PARAM], param[HBM_PARAM_IDX_KFC_FULL_GO_PARALLEL_PARAM],
-                param[HBM_PARAM_IDX_KFC_FULL_GO_RESIDUAL], param[HBM_PARAM_IDX_KFC_TAIL_GO_ADDR_OFFSET],
-                param[HBM_PARAM_IDX_KFC_TAIL_GO_LOOP_PARAM], param[HBM_PARAM_IDX_KFC_TAIL_GO_PARALLEL_PARAM],
-                param[HBM_PARAM_IDX_KFC_TAIL_GO_RESIDUAL], ctx.arg->channels, ctx.arg->channelCount,
-                static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType,
-                ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
-        }
-    } else if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLREDUCE) {
-        CcuKfcAllReduceMesh1DMem2MemKernel(
-            param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
-            param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
-            param[HBM_PARAM_IDX_9], param[HBM_PARAM_IDX_10], param[HBM_PARAM_IDX_11], param[HBM_PARAM_IDX_12],
-            param[HBM_PARAM_IDX_13], param[HBM_PARAM_IDX_14], param[HBM_PARAM_IDX_15], param[HBM_PARAM_IDX_16],
-            param[HBM_PARAM_IDX_17], param[HBM_PARAM_IDX_18], param[HBM_PARAM_IDX_19], param[HBM_PARAM_IDX_20],
-            param[HBM_PARAM_IDX_21], param[HBM_PARAM_IDX_22], param[HBM_PARAM_IDX_23], param[HBM_PARAM_IDX_24],
-            param[HBM_PARAM_IDX_25], ctx.arg->channels, ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize),
-            ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType, ctx.arg->opParam.DataDes.outputType,
-            ctx.arg->opParam.reduceType);
-    } else if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
-        CcuAlltoAllVMesh1DKernel(
-            param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
-            param[HBM_PARAM_IDX_9], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7],
-            param[HBM_PARAM_IDX_8], ctx.arg->channels, ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize),
-            ctx.arg->rankId);
-    } else if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALL) {
-        if (ctx.arg->role == KfcServerRole::ALL_TO_ALL_MULTI_JETTY) {
-            CcuKfcAllToAllMesh1DMultiJettyKernel(
-                param[KFC_CONCURRENT_A2A_INPUT], param[KFC_CONCURRENT_A2A_OUTPUT], ctx.token,
-                param[KFC_CONCURRENT_A2A_SLICE_SIZE], param[KFC_CONCURRENT_A2A_SRC_STRIDE],
-                param[KFC_CONCURRENT_A2A_SRC_OFFSET], param[KFC_CONCURRENT_A2A_DST_OFFSET],
-                param[KFC_CONCURRENT_A2A_GO_SIZE_0], param[KFC_CONCURRENT_A2A_GO_SIZE_1],
-                param[KFC_CONCURRENT_A2A_GO_SIZE_2], param[KFC_CONCURRENT_A2A_GO_SIZE_3], ctx.arg->channels,
-                ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
-        } else {
-            CcuAlltoAllMesh1DKernel(
-                param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3],
-                param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7],
-                param[HBM_PARAM_IDX_8], param[HBM_PARAM_IDX_9], param[HBM_PARAM_IDX_10], ctx.arg->channels,
-                ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->loadFromMem);
-        }
-    }
-}
-
-CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
-{
-    HCCL_INFO("[KfcServerGenCircularQueue] KfcServerGenCircularQueue start");
-
-    ccu::Variable repeatCond; // 存放《控制repeat循环执行的条件》的寄存器
-    repeatCond = 0;
-    ccu::Variable turnStartSig; // 存放《轮次执行开始信号》的寄存器
-    turnStartSig = 0;
-    ccu::Variable turnEndSig; // 存放《轮次执行完成信号》的寄存器，在循环中固定为1
-    turnEndSig = 1;
-
-    // 使用独立XN保存队列游标，避免Variable拷贝构造与context基址共享handle。
-    ccu::Variable waitAddr;
-    ccu::Variable recordAddr;
-    ccu::Variable paramAddr;
-    waitAddr = ctx.waitAddr;
-    recordAddr = ctx.recordAddr;
-    paramAddr = ctx.xnAddr;
-
-    ccu::Variable ckeSize; // 其他寄存器
-    ckeSize = CCU_ONE_PARAM_SIZE;
-    ccu::Variable paramSize;
-    paramSize = CCU_PARAM_NUM_MAX * CCU_ONE_PARAM_SIZE;
-
-    ccu::Variable queueIdx;
-    ccu::Variable queueEnd;
-    ccu::Variable one;
-    queueIdx = 0;
-    one = 1;
-    queueEnd = CCU_TASK_NUM_MAX;
-
-    // 存放<每轮算子参数>的寄存器
-    ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE);
-
-    CCU_WHILE(repeatCond == 0)
+    static CcuResult LoadArgs(KfcServerContext & ctx)
     {
-        CCU_CHK_RET(WaitTurnStartSig(waitAddr, turnStartSig, ctx));  // 等待本轮开始信号
-        CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx)); // 读取本轮参数
-        CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) { repeatCond = 1; }
-        CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
+        uint32_t argId = 0;
+
+        // 顺序需与 kfcServerArgs 中的字段顺序一致：xnAddr, ckeAddr, dieNum, missionNum, missionIndex, token
+        CCU_CHK_RET(ccu::LoadArg(ctx.xnAddr, argId++));
+        CCU_CHK_RET(ccu::LoadArg(ctx.ckeAddr, argId++));
+        CCU_CHK_RET(ccu::LoadArg(ctx.dieNum, argId++));
+        CCU_CHK_RET(ccu::LoadArg(ctx.missionNum, argId++));
+        CCU_CHK_RET(ccu::LoadArg(ctx.missionIndex, argId++));
+        CCU_CHK_RET(ccu::LoadArg(ctx.token, argId++));
+        CCU_CHK_RET(ccu::LoadArg(ctx.subKernelPc, argId++));
+
+        return CCU_SUCCESS;
+    }
+
+    static CcuResult CompArgs(KfcServerContext & ctx)
+    {
+        ccu::Variable regionSize;
+        ctx.waitAddr = ctx.ckeAddr;
+        regionSize = CCU_TASK_NUM_MAX * CCU_ONE_PARAM_SIZE;
+        ctx.recordAddr = ctx.ckeAddr + regionSize;
+        CCU_IF(ctx.missionIndex == 1)
         {
-            MissionPreSync(param[HBM_PARAM_IDX_0], ctx);
-            DispatchKfcSubKernel(param, ctx);
+            ctx.waitAddr = ctx.recordAddr + regionSize;
+            ctx.recordAddr = ctx.waitAddr + regionSize;
+        }
+        return CCU_SUCCESS;
+    }
+
+    void MissionPreSync(const ccu::Variable& func, const KfcServerContext& ctx)
+    {
+        (void)func;
+        (void)ctx;
+    }
+
+    void MissionPostSync(const KfcServerContext& ctx) { (void)ctx; }
+
+    CcuResult WaitTurnStartSig(
+        const ccu::Variable& hbmSigAddr, ccu::Variable& turnStartSig, const KfcServerContext& ctx)
+    {
+        (void)ctx;
+        const uint32_t getDieId = 1;
+        // 单Die场景：等待HBM中的信号
+        CCU_WHILE(turnStartSig != 1)
+        {
+            CCU_CHK_RET(ccu::Load(hbmSigAddr, turnStartSig)); // 循环读HBM对应地址的信号到Xn，直到Xn中的信号值为1
+        }
+        turnStartSig = 0;                                  // reset Xn
+        CCU_CHK_RET(ccu::Store(hbmSigAddr, turnStartSig)); // reset HBM
+        return CCU_SUCCESS;
+    }
+
+    CcuResult SetTurnEndSig(
+        const ccu::Variable& hbmSigAddr, const ccu::Variable& turnEndSig, const KfcServerContext& ctx)
+    {
+        (void)ctx;
+        const uint32_t getDieId = 1;
+        CCU_CHK_RET(ccu::Store(hbmSigAddr, turnEndSig));
+        return CCU_SUCCESS;
+    }
+
+    CcuResult LoadFuncParamFromMemory(
+        const ccu::Variable& paramAddr, ccu::Array<ccu::Variable>& param, const KfcServerContext& ctx)
+    {
+        (void)ctx;
+        // 双Die场景Die1需要读后32个参数，其他场景都是读取前32个参数
+        ccu::Variable doubleDie;
+        doubleDie = CCU_PARAM_NUM_PER_DIE * CCU_ONE_PARAM_SIZE;
+        ccu::Variable addr;
+        addr = paramAddr;
+
+        // 一次性读取本轮32个参数
+        CCU_CHK_RET(ccu::Load(addr, param, CCU_PARAM_NUM_PER_DIE));
+        return CCU_SUCCESS;
+    }
+
+    template <std::size_t... Is>
+    static CcuResult CallKfcSubKernel(
+        ccu::Array<ccu::Variable> & param, KfcServerContext & ctx, std::index_sequence<Is...>)
+    {
+        return ccu::CallTask(
+            ctx.subKernelPc, param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3 + Is]...);
+    }
+
+    static CcuResult CallKfcSubKernel(ccu::Array<ccu::Variable> & param, KfcServerContext & ctx)
+    {
+        return CallKfcSubKernel(param, ctx, std::make_index_sequence<CCU_PARAM_NUM_PER_DIE - HBM_PARAM_IDX_3>{});
+    }
+
+    static CcuResult KfcServerGenCircularQueue(KfcServerContext & ctx)
+    {
+        HCCL_INFO("[KfcServerGenCircularQueue] KfcServerGenCircularQueue start");
+
+        ccu::Variable repeatCond; // 存放《控制repeat循环执行的条件》的寄存器
+        repeatCond = 0;
+        ccu::Variable turnStartSig; // 存放《轮次执行开始信号》的寄存器
+        turnStartSig = 0;
+        ccu::Variable turnEndSig; // 存放《轮次执行完成信号》的寄存器，在循环中固定为1
+        turnEndSig = 1;
+
+        // 使用独立XN保存队列游标，避免Variable拷贝构造与context基址共享handle。
+        ccu::Variable waitAddr;
+        ccu::Variable recordAddr;
+        ccu::Variable paramAddr;
+        waitAddr = ctx.waitAddr;
+        recordAddr = ctx.recordAddr;
+        paramAddr = ctx.xnAddr;
+
+        ccu::Variable ckeSize; // 其他寄存器
+        ckeSize = CCU_ONE_PARAM_SIZE;
+        ccu::Variable paramSize;
+        paramSize = CCU_PARAM_NUM_MAX * CCU_ONE_PARAM_SIZE;
+
+        ccu::Variable queueIdx;
+        ccu::Variable queueEnd;
+        ccu::Variable one;
+        queueIdx = 0;
+        one = 1;
+        queueEnd = CCU_TASK_NUM_MAX;
+
+        // 存放<每轮算子参数>的寄存器
+        ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE);
+
+        CCU_WHILE(repeatCond == 0)
+        {
+            CCU_CHK_RET(WaitTurnStartSig(waitAddr, turnStartSig, ctx));  // 等待本轮开始信号
+            CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx)); // 读取本轮参数
+            CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) { repeatCond = 1; }
+            CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
+            {
+                MissionPreSync(param[HBM_PARAM_IDX_0], ctx);
+                CCU_CHK_RET(CallKfcSubKernel(param, ctx));
+                MissionPostSync(ctx);
+                CCU_CHK_RET(SetTurnEndSig(recordAddr, turnEndSig, ctx));
+            }
+            waitAddr += ckeSize;
+            recordAddr += ckeSize;
+            paramAddr += paramSize;
+            queueIdx += one;
+            CCU_IF(queueIdx == static_cast<u64>(CCU_TASK_NUM_MAX))
+            {
+                waitAddr = ctx.waitAddr;
+                recordAddr = ctx.recordAddr;
+                paramAddr = ctx.xnAddr;
+                queueIdx = 0;
+            }
+        }
+        return CCU_SUCCESS;
+    }
+
+    static CcuResult SlaveKfcServerGenCircularQueue(KfcServerContext & ctx)
+    {
+        ccu::Variable signature; // 算子签名
+
+        ccu::Variable repeatCond; // 存放《控制repeat循环执行的条件》的寄存器
+        repeatCond = 0;
+
+        ccu::Variable paramAddr;
+        paramAddr = ctx.xnAddr;
+
+        ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE); // 存放<每轮算子参数>的寄存器
+
+        CCU_WHILE(repeatCond == 0)
+        {
+            MissionPreSync(signature, ctx);                              // 在context中依次加入8轮指令
+            CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx)); // 读取本轮参数
+
+            CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) { repeatCond = 1; }
+            CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64) { CCU_CHK_RET(CallKfcSubKernel(param, ctx)); }
             MissionPostSync(ctx);
-            CCU_CHK_RET(SetTurnEndSig(recordAddr, turnEndSig, ctx));
         }
-        waitAddr += ckeSize;
-        recordAddr += ckeSize;
-        paramAddr += paramSize;
-        queueIdx += one;
-        CCU_IF(queueIdx == static_cast<u64>(CCU_TASK_NUM_MAX))
-        {
-            waitAddr = ctx.waitAddr;
-            recordAddr = ctx.recordAddr;
-            paramAddr = ctx.xnAddr;
-            queueIdx = 0;
-        }
+        return CCU_SUCCESS;
     }
-    return CCU_SUCCESS;
-}
 
-CcuResult SlaveKfcServerGenCircularQueue(KfcServerContext& ctx)
-{
-    ccu::Variable signature; // 算子签名
-
-    ccu::Variable repeatCond; // 存放《控制repeat循环执行的条件》的寄存器
-    repeatCond = 0;
-
-    ccu::Variable paramAddr;
-    paramAddr = ctx.xnAddr;
-
-    ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE); // 存放<每轮算子参数>的寄存器
-
-    CCU_WHILE(repeatCond == 0)
+    CcuResult CcuKfcServerKernel(CcuKernelArg arg)
     {
-        MissionPreSync(signature, ctx);                              // 在context中依次加入8轮指令
-        CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx)); // 读取本轮参数
-
-        CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) { repeatCond = 1; }
-        CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64) { DispatchKfcSubKernel(param, ctx); }
-        MissionPostSync(ctx);
+        auto* kernelArg = static_cast<CcuKernelArgKfcServer*>(arg);
+        KfcServerContext ctx;
+        CCU_CHK_RET(ParseKernelArg(ctx, kernelArg));
+        CCU_CHK_RET(InitResource(ctx));
+        CCU_CHK_RET(LoadArgs(ctx));
+        CCU_CHK_RET(CompArgs(ctx));
+        CCU_IF(ctx.missionIndex == 0) { CCU_CHK_RET(KfcServerGenCircularQueue(ctx)); }
+        CCU_ELSE { CCU_CHK_RET(SlaveKfcServerGenCircularQueue(ctx)); }
+        return CCU_SUCCESS;
     }
-    return CCU_SUCCESS;
-}
 
-// ============================================================================
-// 主入口 Kernel 函数
-// ============================================================================
-CcuResult CcuKfcServerKernel(CcuKernelArg arg)
-{
-    auto* kernelArg = static_cast<CcuKernelArgKfcServer*>(arg);
-    KfcServerContext ctx;
-    HCCL_INFO("[CcuKernelKfcServer] KfcServer run");
-    CCU_CHK_RET(ParseKernelArg(ctx, kernelArg));
-    HCCL_INFO("[CcuKernelKfcServer] ParseKernelArg finish");
-    CCU_CHK_RET(InitResource(ctx));
-    HCCL_INFO("[CcuKernelKfcServer] InitResource finish");
-    CCU_CHK_RET(LoadArgs(ctx));
-    HCCL_INFO("[CcuKernelKfcServer] LoadArgs finish");
-    CCU_CHK_RET(CompArgs(ctx));
-    HCCL_INFO("[CcuKernelKfcServer] CompArgs finish");
-    HCCL_INFO("[GenCircularQueue] KfcServer start");
-    CCU_CHK_RET(KfcServerGenCircularQueue(ctx));
-    HCCL_INFO("[CcuKernelKfcServer] KfcServer end");
-    return CCU_SUCCESS;
-}
 } // namespace mc2_ops_hccl

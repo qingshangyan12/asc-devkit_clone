@@ -19,6 +19,7 @@
 #include "alg_env_config.h"
 #include "param_check.h"
 #include "sal.h"
+#include "kfc_server_protocol.h"
 #include "hcomm/hccl/hccl_res.h"
 #include "hcomm/pkg_inc/hcomm/ccu/ccu_assist_pub.h"
 #include "acl/acl_rt.h"
@@ -54,6 +55,8 @@ std::string g_stubSelectorAlgName;
 // HcclGetAlgRes资源不足打桩：置true时HcclGetAlgRes直接返回HCCL_E_UNAVAIL，
 // 用于验证checkOnly场景下UNAVAIL被翻译为HCCL_E_RES_NOT_SUFFICIENT（非checkOnly保持UNAVAIL原样）。
 bool g_stubCcuAlgResUnavailable = false;
+
+constexpr uint64_t STUB_SUB_KERNEL_PC = 0x1000U;
 
 HcclResult GetOrCreateCcuCtx(HcclComm comm, const std::string& tag, uint64_t ctxSize, void** ctx)
 {
@@ -357,8 +360,10 @@ HcclResult HcclGetAlgRes(
             uint64_t cclBufferAddr = reinterpret_cast<uint64_t>(cclBufferPtr);
             uint64_t token = hcomm::CcuRep::GetTokenInfo(cclBufferAddr, cclBufferSize);
 
-            if (resCtxHost->kfcServerArgs.size() >= 6U) {
-                resCtxHost->kfcServerArgs[5] = token;
+            for (size_t offset = 0; offset + KFC_SERVER_SUB_KERNEL_PC_ARG_INDEX < resCtxHost->kfcServerArgs.size();
+                 offset += KFC_SERVER_ARG_NUM) {
+                resCtxHost->kfcServerArgs[offset + KFC_SERVER_TOKEN_ARG_INDEX] = token;
+                resCtxHost->kfcServerArgs[offset + KFC_SERVER_SUB_KERNEL_PC_ARG_INDEX] = STUB_SUB_KERNEL_PC;
             }
         }
     }
