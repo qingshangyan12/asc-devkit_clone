@@ -1531,7 +1531,7 @@ len_burst, 0, 0);\n"
     )
     class_body += "#else\n"
     class_body += (
-        "#if __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
+        "#if __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3103 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
 __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163\n"
     )
     class_body += (
