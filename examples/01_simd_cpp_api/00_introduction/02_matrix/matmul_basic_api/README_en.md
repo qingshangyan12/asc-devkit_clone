@@ -8,12 +8,10 @@ This sample implements multi-core matrix multiplication computation based on the
 
 | Product | CANN Software Version |
 |---------|-----------------------|
+| Ascend 960PR/Ascend 960DT | >= CANN 9.2.0 |
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Ascend 960DT | >= CANN 9.2.0 |
 | Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.0.0 |
 | Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
-
-> **Note:** For Ascend 960DT (dav-9201), only SIM mode has been validated; CPU debugging and on-device execution have not been validated. Use a CANN 9.2.0 or later development kit and simulator with dav-9201 support.
 
 ## Directory Structure
 
@@ -192,7 +190,6 @@ Execute the following steps in the root directory of this sample to compile and 
   ```bash
   cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # CPU debug mode
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU simulation mode
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-9201 ..;make -j; # dav-9201 simulation mode
   ```
 
   > **Note:** Before switching compilation modes, clear the cmake cache. Execute `rm CMakeCache.txt` in the build directory and run cmake again.
@@ -202,7 +199,7 @@ Execute the following steps in the root directory of this sample to compile and 
   | Option | Available Values | Description |
   |--------|------------------|-------------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debug, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510`, `dav-9201` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products, dav-3510 corresponds to Ascend 950PR/Ascend 950DT; dav-9201 corresponds to Ascend 960DT (validated in SIM mode only) |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510`, `dav-9201` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products, dav-3510 corresponds to Ascend 950PR/Ascend 950DT, dav-9201 corresponds to Ascend 960DT |
 
 - Execution Result  
   The execution result is as follows, indicating successful precision comparison.
@@ -241,8 +238,6 @@ AscendC::DumpTensor(cLocal, baseM * baseN);
 > The DumpTensor interface printing functionality has a certain impact on the actual running performance of the operator and is typically used during the debugging phase. Developers can disable the printing functionality by setting ASCENDC_DUMP=0 as needed.
 
 ## Performance Debugging
-
-> A6: msopprof / msopprof simulator support has not been verified for this sample. The following profiling procedures do not establish A6 support.
 
 ### Introduction to the msOpProf Tool
 

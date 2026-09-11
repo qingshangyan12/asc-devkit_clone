@@ -40,10 +40,8 @@ The complete data path is: GM → UB → Register (step-by-step computation) →
 
 | Product | CANN Software Version |
 |------|-------------|
+| Ascend 960PR/Ascend 960DT | >= CANN 9.2.0 |
 | Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
-| Ascend 960DT | >= CANN 9.2.0 |
-
-> **Note:** For Ascend 960DT (dav-9201), only SIM mode has been validated; CPU debugging and on-device execution have not been validated. Use a CANN 9.2.0 or later development kit and simulator with dav-9201 support.
 
 ## Operator Implementation
 
@@ -192,8 +190,6 @@ AscendC::DumpTensor(yLocal, 0, 16);
 
 ## Performance Debugging
 
-> A6: msopprof / msopprof simulator support has not been verified for this sample. The following profiling procedures do not establish A6 support.
-
 ### Introduction to the msOpProf Tool
 
 msOpProf is a single-operator performance analysis tool with two usage modes: `msopprof` and `msopprof simulator`. It helps users identify anomalies in operator memory, code, and instructions for comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and file types (executables or operator binary `.o` files).
@@ -271,7 +267,6 @@ Execute the following steps in the root directory of this example to build and r
   Example:
   ```bash
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-9201 -DCMAKE_VF_MODE=true ..;make -j; # dav-9201 simulation mode
   ```
 
 - Build option description
@@ -279,7 +274,7 @@ Execute the following steps in the root directory of this example to build and r
   | Option | Available Values | Description |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` (default), `dav-9201` | NPU architecture: Ascend 950PR/Ascend 950DT; dav-9201 corresponds to Ascend 960DT (validated in SIM mode only) |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` (default), `dav-9201` | NPU architecture: Ascend 950PR/Ascend 950DT, dav-9201 corresponds to Ascend 960DT |
   | `CMAKE_VF_MODE` | `true` (default), `false` | VF fusion mode: enable or disable `--cce-simd-vf-fusion` |
 
 
