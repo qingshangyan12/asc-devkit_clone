@@ -141,7 +141,6 @@ inline constexpr bool is_data_type =
                      fp8_e4m3fn_t, fp8_e8m0_t>
     || Std::is_integral_v<Std::remove_cvref_t<DataType>> || Std::is_floating_point_v<Std::remove_cvref_t<DataType>>;
 
-
 template <typename DataType>
 inline constexpr bool is_b4_type = is_one_of_attr_v<DataType, fp4x2_e1m2_t, fp4x2_e2m1_t>;
 
