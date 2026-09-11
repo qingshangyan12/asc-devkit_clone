@@ -172,6 +172,7 @@ constexpr const char* Ascend950DT_9575 = "Ascend950DT_9575";
 constexpr const char* Ascend950DT_9576 = "Ascend950DT_9576";
 constexpr const char* Ascend950DT_9577 = "Ascend950DT_9577";
 constexpr const char* Ascend950DT_9578 = "Ascend950DT_9578";
+constexpr const char* Ascend960DT_968B7 = "Ascend960DT_968B7";
 constexpr const char* Ascend350_354f = "Ascend350_354f";
 constexpr const char* Ascend350_355e = "Ascend350_355e";
 constexpr const char* Ascend_910ProA = "Ascend910ProA";
@@ -657,7 +658,7 @@ private:
         Ascend950DT_9586,  Ascend950DT_9587, Ascend950DT_9588,  Ascend950DT_9571, Ascend950DT_9572,   Ascend950DT_9573,
         Ascend950DT_9574,  Ascend950DT_9575, Ascend950DT_9576,  Ascend950DT_9577, Ascend950DT_9578,   MC32DM11AA,
         MC32DM11AB,        MC32DM11AC,       Ascend350_354f,    Ascend350_355e,   KirinDev0000,       KirinDev0001,
-        KirinDev0002,      KirinDev0003};
+        Ascend960DT_968B7, KirinDev0002,     KirinDev0003};
     enum platformconf::TIK_VERSION current_tik_version_ = platformconf::TIK_VERSION::TIK_1_0;
     const std::map<const std::string, platformconf::TIK_VERSION> kStringToTikVersion = {
         {"TIK1.0", platformconf::TIK_VERSION::TIK_1_0}, {"TIK1.5", platformconf::TIK_VERSION::TIK_1_5}};
