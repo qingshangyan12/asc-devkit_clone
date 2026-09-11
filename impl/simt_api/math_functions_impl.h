@@ -43,6 +43,7 @@ constexpr float __internal_fp32_subnormal_exponent_fix =
 constexpr float __internal_fp32_log_exponent_scale =
     1.1920928955078125e-07f;                             // 2^-23, converts exponent bits into log2 units.
 constexpr uint32_t __internal_fp32_exponent_shift = 23U; // Bit offset of the fp32 exponent field.
+constexpr int32_t __internal_fp32_exponent_bias = 127;   // IEEE-754 fp32 exponent bias (biased_exp - 127 = true exp).
 constexpr float __internal_fp32_max_exp = 126.0f;        // Largest finite fp32 exponent used by the clamped paths.
 constexpr int32_t __internal_fp32_subnormal_bias = 149;  // Subnormal exponent/reference bias for fp32 reconstruction.
 // Bit-pattern constants used to scale norm inputs into a stable fp32 range.
@@ -1011,9 +1012,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float ldexpf(float x, int exp)
         temp_x *= scale_q;
         result = temp_x;
     } else {
-        // 127: IEEE-754 float32 exponent bias (biased_exp = true_exp + 127).
-        // 23: float32 exponent field bit offset (bits [30:23]);
-        result = x * __uint_as_float(static_cast<uint32_t>(exp + 127) << 23);
+        result = x * __uint_as_float(
+                         static_cast<uint32_t>(exp + __internal_fp32_exponent_bias) << __internal_fp32_exponent_shift);
     }
 
     if (exp > 278) { // 278: beyond this positive shift, x * 2^exp overflows to +inf/-inf.
@@ -1115,6 +1115,83 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_norm_sqrt(float x)
             const float residual = fmaf(product, -product, scaled_x);
             result = fmaf(residual, inverse_sqrt, product) * scale_down;
         }
+    }
+    return result;
+}
+
+/*
+ * hypotf - sqrt(x^2 + y^2), avoiding intermediate overflow/underflow.
+ *
+ * Direct squaring of large finite floats (|x| > 2^64) overflows; very small
+ * values underflow to zero.  Both are avoided by scaling all operands by a
+ * power of two derived from the larger magnitude so that max*scale lands in
+ * [0.5, 4.0), keeping every squared term in the safe range [0, 16):
+ *     hypot = sqrt((max*s)^2 + (min*s)^2) / s
+ *
+ * Scale construction via IEEE-754 exponent bit arithmetic (no FP division):
+ *   - 0xFE000000  (__internal_norm_exponent_bucket_mask):
+ *       Retains upper 6 of 8 exponent bits; buckets exponents into groups of
+ *       4 adjacent powers of two so scaled_max always falls in [0.5, 4.0).
+ *   - 0x7E800000  (__internal_norm_scale_anchor_bits):
+ *       Bit pattern of 2^126 (biased exponent 253).  The scale is built by
+ *       unsigned subtraction:  scale_bits = anchor_bits - exponent_bucket,
+ *       yielding 2^(126 - bucket_exp).  Anchor 126 covers the full finite
+ *       range [2^-126, ~2^128].
+ *   - 0x00800000  (__internal_norm_restore_mantissa_bit):
+ *       Exponent LSB (bit 23).  OR-ing it into the bucket adds 1 to the biased
+ *       exponent, compensating for the IEEE-754 bias so restore_scale is the
+ *       exact reciprocal of scale:  scale * restore_scale = 1.0.
+ *
+ * Special cases: both zero -> signed zero preserved; NaN propagates via
+ * max/min bit selection; +Inf in either operand -> +Inf.
+ */
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float hypotf(float x, float y)
+{
+    // Take absolute values and reinterpret as uint32 for integer comparison.
+    const float abs_x = fabsf(x);
+    const float abs_y = fabsf(y);
+    const uint32_t abs_x_bits = __float_as_uint(abs_x);
+    const uint32_t abs_y_bits = __float_as_uint(abs_y);
+
+    // Identify max/min via unsigned integer comparison.  For non-negative
+    // IEEE-754 floats, larger bit pattern <=> larger value, so this avoids a
+    // float compare and preserves NaN bit patterns for later propagation.
+    const uint32_t max_bits = abs_x_bits > abs_y_bits ? abs_x_bits : abs_y_bits;
+    const uint32_t min_bits = abs_x_bits < abs_y_bits ? abs_x_bits : abs_y_bits;
+    const float max_abs = __uint_as_float(max_bits);
+    const float min_abs = __uint_as_float(min_bits);
+
+    // Extract the exponent of max_abs and bucket it (clear lowest 2 exponent
+    // bits) so the scale targets a group of 4 adjacent powers of two.
+    const uint32_t exponent_bucket = max_bits & __internal_norm_exponent_bucket_mask; // 0xFE000000: upper 6 exp bits.
+    // scale = 2^(126 - bucket_exp); brings max_abs into [0.5, 4.0).
+    const float scale = __uint_as_float(__internal_norm_scale_anchor_bits - exponent_bucket); // 0x7E800000 = 2^126.
+    // Scale both operands into the safe range where squaring cannot overflow
+    // (max scaled value < 4.0, so max square < 16.0) or underflow to zero.
+    const float scaled_min = min_abs * scale;
+    const float scaled_max = max_abs * scale;
+
+    // Accumulate scaled squares:  sum = (min*s)^2 + (max*s)^2.
+    // Start with the smaller term (plain mul), then add the larger via fmaf
+    // so each addition incurs only a single rounding error.
+    float square_sum = scaled_min * scaled_min;
+    square_sum = fmaf(scaled_max, scaled_max, square_sum);
+    // Compute sqrt of the scaled sum via the refined rsqrt-based path.
+    const float sqrt_scaled = __internal_norm_sqrt(square_sum);
+
+    // Restore original magnitude: restore_scale = 1/scale, constructed via
+    // an exact bit-pattern trick (OR the exponent LSB to add 1 to the biased
+    // exponent, compensating the bias subtracted in the scale).
+    const uint32_t restore_bits = exponent_bucket | __internal_norm_restore_mantissa_bit;
+    const float restore_scale = __uint_as_float(restore_bits);
+    // If max_abs is nonzero, unscale the sqrt result; otherwise return the
+    // (signed) zero directly — sqrt(0^2 + 0^2) = 0.
+    float result = max_abs != 0.0f ? restore_scale * sqrt_scaled : max_abs;
+
+    // If the smaller magnitude is +Inf, the result is +Inf regardless of the
+    // larger operand (covers hypot(Inf, Inf) and hypot(Inf, finite)).
+    if (min_abs == ASCRT_INF_F) {
+        result = ASCRT_INF_F;
     }
     return result;
 }
@@ -3363,28 +3440,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float tgammaf(float x)
     } else {
         return __internal_stirling_and_euler_reflection(x);
     }
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float hypotf(float x, float y)
-{
-    float abs_x = fabsf(x);
-    float abs_y = fabsf(y);
-    if (isinf(x) || isinf(y)) {
-        return ASCRT_INF_F;
-    }
-    if (isnan(abs_x)) {
-        return abs_x;
-    }
-    if (isnan(abs_y)) {
-        return abs_y;
-    }
-    float a = fmaxf(abs_x, abs_y);
-    float b = fminf(abs_x, abs_y);
-    if (b == 0.0f) {
-        return a;
-    }
-    float r = b / a;
-    return a * sqrtf(fmaf(r, r, 1.0f));
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float norm3df(float a, float b, float c)
@@ -5693,23 +5748,21 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float expm1f(float x)
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t __internal_ilogbf_finite_abs(float ax)
 {
     if (ax >= 1.17549435082228750797e-38f) {
-        // Normal or larger: exponent = (biased exponent field) - 127.
+        // Normal or larger: exponent = (biased exponent field) - bias.
         uint32_t bits = reinterpret_cast<uint32_t&>(ax);
-        // 23: fp32 exponent field bit offset (bits [30:23]);
-        // 0xFF: 8-bit exponent field mask;
-        // 127: IEEE-754 fp32 exponent bias (biased_exp - 127 = true exp).
-        return static_cast<int32_t>((bits >> 23) & 0xFFU) - 127;
+        // 0xFF: 8-bit exponent field mask.
+        return static_cast<int32_t>((bits >> __internal_fp32_exponent_shift) & 0xFFU) - __internal_fp32_exponent_bias;
     }
 
     // Subnormal: ax has no implicit leading 1, so its true exponent is below -126. Scale by 2^23
     // (8388608) to renormalize into the normal range, then subtract the 23 extra bits we added.
-    float scaled = ax * 8388608.0f;
+    constexpr float subnormal_scale = 8388608.0f; // 2^23, renormalizes subnormals into the normal range.
+    float scaled = ax * subnormal_scale;
     uint32_t bits = reinterpret_cast<uint32_t&>(scaled);
-    // 23 (shift): fp32 exponent field bit offset (bits [30:23]);
     // 0xFF: 8-bit exponent field mask;
-    // 127: IEEE-754 fp32 exponent bias (biased_exp - 127 = true exp);
-    // 23 (subtract): undo the 2^23 renormalization scaling applied above.
-    return static_cast<int32_t>((bits >> 23) & 0xFFU) - 127 - 23;
+    // __internal_fp32_exponent_shift (subtract): undo the 2^23 renormalization scaling above.
+    return static_cast<int32_t>((bits >> __internal_fp32_exponent_shift) & 0xFFU) - __internal_fp32_exponent_bias -
+           23; // undo the 2^23 renormalization scaling applied above.
 }
 
 // logbf(x) = (float) floor(log2(|x|)) = the unbiased exponent of |x| as a float.
@@ -5744,83 +5797,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t ilogbf(float x)
     }
 
     return __internal_ilogbf_finite_abs(ax);
-}
-
-/*
- * hypotf - sqrt(x^2 + y^2), avoiding intermediate overflow/underflow.
- *
- * Direct squaring of large finite floats (|x| > 2^64) overflows; very small
- * values underflow to zero.  Both are avoided by scaling all operands by a
- * power of two derived from the larger magnitude so that max*scale lands in
- * [0.5, 4.0), keeping every squared term in the safe range [0, 16):
- *     hypot = sqrt((max*s)^2 + (min*s)^2) / s
- *
- * Scale construction via IEEE-754 exponent bit arithmetic (no FP division):
- *   - 0xFE000000  (__internal_norm_exponent_bucket_mask):
- *       Retains upper 6 of 8 exponent bits; buckets exponents into groups of
- *       4 adjacent powers of two so scaled_max always falls in [0.5, 4.0).
- *   - 0x7E800000  (__internal_norm_scale_anchor_bits):
- *       Bit pattern of 2^126 (biased exponent 253).  The scale is built by
- *       unsigned subtraction:  scale_bits = anchor_bits - exponent_bucket,
- *       yielding 2^(126 - bucket_exp).  Anchor 126 covers the full finite
- *       range [2^-126, ~2^128].
- *   - 0x00800000  (__internal_norm_restore_mantissa_bit):
- *       Exponent LSB (bit 23).  OR-ing it into the bucket adds 1 to the biased
- *       exponent, compensating for the IEEE-754 bias so restore_scale is the
- *       exact reciprocal of scale:  scale * restore_scale = 1.0.
- *
- * Special cases: both zero -> signed zero preserved; NaN propagates via
- * max/min bit selection; +Inf in either operand -> +Inf.
- */
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float hypotf(float x, float y)
-{
-    // Take absolute values and reinterpret as uint32 for integer comparison.
-    const float abs_x = fabsf(x);
-    const float abs_y = fabsf(y);
-    const uint32_t abs_x_bits = __float_as_uint(abs_x);
-    const uint32_t abs_y_bits = __float_as_uint(abs_y);
-
-    // Identify max/min via unsigned integer comparison.  For non-negative
-    // IEEE-754 floats, larger bit pattern <=> larger value, so this avoids a
-    // float compare and preserves NaN bit patterns for later propagation.
-    const uint32_t max_bits = abs_x_bits > abs_y_bits ? abs_x_bits : abs_y_bits;
-    const uint32_t min_bits = abs_x_bits < abs_y_bits ? abs_x_bits : abs_y_bits;
-    const float max_abs = __uint_as_float(max_bits);
-    const float min_abs = __uint_as_float(min_bits);
-
-    // Extract the exponent of max_abs and bucket it (clear lowest 2 exponent
-    // bits) so the scale targets a group of 4 adjacent powers of two.
-    const uint32_t exponent_bucket = max_bits & __internal_norm_exponent_bucket_mask; // 0xFE000000: upper 6 exp bits.
-    // scale = 2^(126 - bucket_exp); brings max_abs into [0.5, 4.0).
-    const float scale = __uint_as_float(__internal_norm_scale_anchor_bits - exponent_bucket); // 0x7E800000 = 2^126.
-    // Scale both operands into the safe range where squaring cannot overflow
-    // (max scaled value < 4.0, so max square < 16.0) or underflow to zero.
-    const float scaled_min = min_abs * scale;
-    const float scaled_max = max_abs * scale;
-
-    // Accumulate scaled squares:  sum = (min*s)^2 + (max*s)^2.
-    // Start with the smaller term (plain mul), then add the larger via fmaf
-    // so each addition incurs only a single rounding error.
-    float square_sum = scaled_min * scaled_min;
-    square_sum = fmaf(scaled_max, scaled_max, square_sum);
-    // Compute sqrt of the scaled sum via the refined rsqrt-based path.
-    const float sqrt_scaled = __internal_norm_sqrt(square_sum);
-
-    // Restore original magnitude: restore_scale = 1/scale, constructed via
-    // an exact bit-pattern trick (OR the exponent LSB to add 1 to the biased
-    // exponent, compensating the bias subtracted in the scale).
-    const uint32_t restore_bits = exponent_bucket | __internal_norm_restore_mantissa_bit;
-    const float restore_scale = __uint_as_float(restore_bits);
-    // If max_abs is nonzero, unscale the sqrt result; otherwise return the
-    // (signed) zero directly — sqrt(0^2 + 0^2) = 0.
-    float result = max_abs != 0.0f ? restore_scale * sqrt_scaled : max_abs;
-
-    // If the smaller magnitude is +Inf, the result is +Inf regardless of the
-    // larger operand (covers hypot(Inf, Inf) and hypot(Inf, finite)).
-    if (min_abs == ASCRT_INF_F) {
-        result = ASCRT_INF_F;
-    }
-    return result;
 }
 
 /*
