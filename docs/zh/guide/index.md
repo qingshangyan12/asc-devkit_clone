@@ -149,6 +149,7 @@
                 -   [运行时加载机制](./programming_guide/advanced_programming/aclnn_operator_development/invocation/runtime_loading_mechanism.md)
                 -   [基于simplified key的运行时选择流程](./programming_guide/advanced_programming/aclnn_operator_development/invocation/simplified_key_runtime_flow.md)
             -   [附录](./programming_guide/advanced_programming/aclnn_operator_development/appendix/appendix.md)
+                -   [aclnn工程化算子开发约束](./programming_guide/advanced_programming/aclnn_operator_development/appendix/aclnn_development_constraints.md)
                 -   [命名转换规则对照表](./programming_guide/advanced_programming/aclnn_operator_development/appendix/naming_conversion_table.md)
                 -   [CMake函数参考](./programming_guide/advanced_programming/aclnn_operator_development/appendix/cmake_function_reference.md)
                 -   [外部样例链接汇总](./programming_guide/advanced_programming/aclnn_operator_development/appendix/external_sample_links.md)
