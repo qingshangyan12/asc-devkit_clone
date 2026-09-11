@@ -522,7 +522,7 @@ __aicore__ inline bool MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, 
 
     if constexpr (GetPhyType(C_TYPE::pos) == Hardware::UB) {
         LocalTensor<DstT> cLocal = GetLocalTensor<typename C_TYPE::T, C_TYPE::pos>(body->cAddr, size);
-        CrossCoreWaitFlag<INTRA_MODE, PIPE_FIX>(
+        WaitCVSync<INTRA_MODE, PIPE_FIX, CV_SYNC_AIV_ID0>(
             GetIntraFlagId(instID, static_cast<uint8_t>(CUBE_WAIT_INTRA_Enum::WAIT_FIXP), mul.GetSubBlockIdx()));
         if constexpr (A_TYPE::ibShare && B_TYPE::ibShare) {
             WaitCVSync<INTRA_MODE, PIPE_MTE2, CV_SYNC_AIV_ID1>(
