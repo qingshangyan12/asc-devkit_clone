@@ -265,7 +265,20 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     ccuUsedXnNum_ = 8; // 算法默认使用的xn num
     FlushDataCache(&handleParamGM_[handleId]);
     if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLGATHER) {
-        if (GetKfcMissionNum(handleId) == KFC_MAX_MISSION_NUM) {
+        uint32_t algorithmType = UINT32_MAX;
+        if (newCcuFlag_) {
+            const uint32_t prepareType = static_cast<uint32_t>(handleParamGM_[handleId].commType.prepareType);
+            for (uint32_t index = 0U; index < HCCL_API_MAX_OP_NUM; ++index) {
+                if (hcclNewContext_->opType[index] == prepareType) {
+                    algorithmType = hcclNewContext_->algorithmType[index];
+                    break;
+                }
+            }
+        }
+        if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherParallelMeshNHRMultiLink)) {
+            ccuUsedXnNum_ = KFC_PARALLEL_AG_STORAGE_NUM;
+            CcuPrepareForParallelAllGatherM2M(&handleParamGM_[handleId]);
+        } else if (GetKfcMissionNum(handleId) == KFC_MAX_MISSION_NUM) {
             ccuUsedXnNum_ = KFC_CONCURRENT_AG_PARAM_NUM;
             CcuPrepareForConcurrentAllGatherM2M(&handleParamGM_[handleId]);
         } else {
@@ -539,7 +552,8 @@ __aicore__ inline uint8_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
 {
     const uint32_t algorithmType = GetAlgorithmType(handleId);
     uint8_t missionNum = 1U;
-    if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherConcurMeshNHRMultiLink)) {
+    if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherConcurMeshNHRMultiLink) ||
+        algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherParallelMeshNHRMultiLink)) {
         missionNum = KFC_MAX_MISSION_NUM;
     }
     return missionNum;
