@@ -44,12 +44,6 @@ __aicore__ inline void asc_copy_ub2gm(__gm__ void* dst, __ubuf__ void* src, uint
 __aicore__ inline void asc_copy_ub2gm(__gm__ void* dst, __ubuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
 ```
 
-- 同步计算
-
-```cpp
-__aicore__ inline void asc_copy_ub2gm_sync(__gm__ void* dst, __ubuf__ void* src, uint32_t size)
-```
-
 ## 参数说明
 
 **表1** 参数说明
@@ -76,7 +70,6 @@ PIPE_MTE3
 
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
 - 如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_sync_notify](../../sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/asc_sync_wait.md)，保证多个指令串行化，防止出现异常数据。
-- 同步计算包含同步等待。
 - 当采用前n个数据搬运接口时，搬运数据大小要求32字节对齐。
 
 ## 调用示例
