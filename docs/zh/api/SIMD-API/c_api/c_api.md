@@ -533,7 +533,10 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_bfloat162int32](reg_compute/reg_convert/asc_bfloat162int32.md)|将bfloat16_t类型数据转换为int32_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_ceil](reg_compute/reg_convert/asc_ceil.md)|将源操作数中的浮点数元素按照CEIL（向正无穷方向舍入）模式舍入到整数值，结果保持原浮点数据类型。|`c_api/reg_compute/reg_convert.h`|
 |[asc_float2bfloat16](reg_compute/reg_convert/asc_float2bfloat16.md)|将float类型转换为bfloat16_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
+|[asc_float2e4m3](reg_compute/reg_convert/asc_float2e4m3.md)|将float类型转换为fp8_e4m3fn_t类型，支持RINT舍入模式与饱和/非饱和模式。|`c_api/reg_compute/reg_convert.h`|
+|[asc_float2e5m2](reg_compute/reg_convert/asc_float2e5m2.md)|将float类型转换为fp8_e5m2_t类型，支持RINT舍入模式与饱和/非饱和模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_float2half](reg_compute/reg_convert/asc_float2half.md)|将float类型转换为half类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
+|[asc_float2hif8](reg_compute/reg_convert/asc_float2hif8.md)|将float类型转换为hifloat8_t类型，支持ROUND/HYBRID舍入模式与饱和/非饱和模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_float2int16](reg_compute/reg_convert/asc_float2int16.md)|将float类型转换为int16_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_float2int32](reg_compute/reg_convert/asc_float2int32.md)|将float类型转换为int32_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_float2int64](reg_compute/reg_convert/asc_float2int64.md)|将float类型转换为int64_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|

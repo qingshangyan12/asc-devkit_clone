@@ -5,7 +5,10 @@
 - **[asc_bfloat162int32](asc_bfloat162int32.md)**
 - **[asc_ceil](asc_ceil.md)**
 - **[asc_float2bfloat16](asc_float2bfloat16.md)**
+- **[asc_float2e4m3](asc_float2e4m3.md)**
+- **[asc_float2e5m2](asc_float2e5m2.md)**
 - **[asc_float2half](asc_float2half.md)**
+- **[asc_float2hif8](asc_float2hif8.md)**
 - **[asc_float2int16](asc_float2int16.md)**
 - **[asc_float2int32](asc_float2int32.md)**
 - **[asc_float2int64](asc_float2int64.md)**
