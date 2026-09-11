@@ -16,6 +16,7 @@ set(ascend950_list   ascend950pr_9599 ascend950pr_958a ascend950pr_9589 ascend95
     ascend950dt_9581 ascend950dt_9582 ascend950dt_9583 ascend950dt_9584 ascend950dt_9585 ascend950dt_9586 ascend950dt_9587 ascend950dt_9588 ascend950dt_9571
     ascend950dt_9572 ascend950dt_9573 ascend950dt_9574 ascend950dt_9575 ascend950dt_9576 ascend950dt_9577 ascend950dt_9578 ascend350_354f   ascend350_355e)
 set(kirinx90_list kirinx90)
+set(kirin9020_list kirin9020)
 set(kirin9030_list kirin9030)
 set(kirindev0000_list kirindev0000)
 set(kirindev0001_list kirindev0001)
