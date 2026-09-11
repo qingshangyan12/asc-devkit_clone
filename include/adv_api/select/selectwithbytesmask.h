@@ -26,8 +26,8 @@
 #define LIB_SELECT_SELECT_WITH_BYTES_MASK_H
 #include "kernel_tensor.h"
 #include "../../../impl/basic_api/kernel_utils.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || \
-                              __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 5102 || \
+                              __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "../../../impl/adv_api/detail/select/selectwithbytesmask/selectwithbytesmask_3510_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002)
 #include "../../../impl/adv_api/detail/select/selectwithbytesmask/selectwithbytesmask_impl.h"
