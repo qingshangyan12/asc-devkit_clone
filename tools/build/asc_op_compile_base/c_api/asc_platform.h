@@ -66,6 +66,7 @@ enum class DPLATFORM {
     ASCEND_350, // C310
     ASCEND5162A,
     KIRINX90,
+    KIRIN9020,
     KIRIN9030,
     KIRIN_DEV_0000,
     KIRIN_DEV_0001,
@@ -229,6 +230,7 @@ constexpr const char* Ascend_035A = "Ascend035A";
 constexpr const char* Ascend_035B = "Ascend035B";
 constexpr const char* Ascend5162A = "Ascend5162A";
 constexpr const char* KirinX90 = "KirinX90";
+constexpr const char* Kirin9020 = "Kirin9020";
 constexpr const char* Kirin9030 = "Kirin9030";
 constexpr const char* KirinDev0000 = "KirinDev0000";
 constexpr const char* KirinDev0001 = "KirinDev0001";
@@ -672,7 +674,7 @@ private:
                                            MC62DM23AB,         MC62CM12AA,         MC62DM22AA,        MC62CM12AC,
                                            MC62DM22AC,         MC62CM12AD,         MC62DM22AD,        MC62CM12AE,
                                            MC62DM22AE,         MC62CM12AF,         MC62DM22AF,        MC62CM12AB,
-                                           MC62DM22AB,         KirinX90,           Kirin9030,         Ascend950PR_9599,
+                                           MC62DM22AB,         KirinX90,           Kirin9020,         Kirin9030,         Ascend950PR_9599,
                                            Ascend950PR_958a,   Ascend950PR_9589,   Ascend950PR_958b,  Ascend950PR_9579,
                                            Ascend950PR_957b,   Ascend950PR_957bx,  Ascend950PR_957c,  Ascend950PR_957d,
                                            Ascend950PR_950z,   Ascend950DT_950x,   Ascend950DT_950y,  Ascend950DT_95A1,
