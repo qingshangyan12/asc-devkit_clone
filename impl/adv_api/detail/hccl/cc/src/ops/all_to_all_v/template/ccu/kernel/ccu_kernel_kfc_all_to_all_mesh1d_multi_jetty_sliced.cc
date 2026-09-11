@@ -103,7 +103,7 @@ CcuResult DoAllToAllSliced(KfcAllToAllSlicedContext& ctx)
         for (uint32_t i = 0; i < rankIdx; ++i) {
             src.addr += ctx.srcStride;
         }
-        src.token = ctx.token;
+        src.token = ctx.peerToken[rankIdx];
         ccu::RemoteAddr dst;
         dst.addr = ctx.peerOutput[rankIdx];
         dst.addr += ctx.dstOffset;
