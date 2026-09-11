@@ -544,6 +544,8 @@ AscendC::DumpTensor(zLocal, 1, 16);
 
 ## 性能调试
 
+> **说明：** 当前版本的msOpProf工具暂不支持Ascend 960PR/Ascend 960DT的性能调试。
+
 ### msOpProf工具介绍
 msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
 
