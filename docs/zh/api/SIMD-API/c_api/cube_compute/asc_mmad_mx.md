@@ -156,7 +156,7 @@ PIPE_M
 
 - 本接口仅在AIC上生效，在AIV上调用将直接返回。
 - `m`、`k`、`n`中的任意一个值为0时，接口将被视为NOP（空操作）。
-- 调用本接口前，需通过[asc_copy_l12l0a_mx](../cube_datamove/asc_copy_l12l0a_mx.md)和[asc_copy_l12l0b_mx](../cube_datamove/asc_copy_l12l0b_mx.md)等接口，将ScaleA和ScaleB矩阵分别搬入L0A_MX Buffer和L0B_MX Buffer。ScaleA和ScaleB矩阵的数据类型必须为`fp8_e8m0_t`，K方向上每个Scale元素对应32个输入矩阵元素。
+- 调用本接口前，需通过[asc_copy_l12l0a_mx](../cube_datamove/asc_copy_l12l0a_mx/asc_copy_l12l0a_mx_arch_3510.md)和[asc_copy_l12l0b_mx](../cube_datamove/asc_copy_l12l0b_mx/asc_copy_l12l0b_mx_arch_3510.md)等接口，将ScaleA和ScaleB矩阵分别搬入L0A_MX Buffer和L0B_MX Buffer。ScaleA和ScaleB矩阵的数据类型必须为`fp8_e8m0_t`，K方向上每个Scale元素对应32个输入矩阵元素。
 
 - 内存使用约束说明：
 

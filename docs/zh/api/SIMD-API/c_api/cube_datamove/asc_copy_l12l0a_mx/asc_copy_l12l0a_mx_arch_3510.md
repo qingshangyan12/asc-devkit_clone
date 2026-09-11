@@ -1,4 +1,4 @@
-# asc_copy_l12l0a_mx
+# asc_copy_l12l0a_mx_arch_3510
 
 ## 产品支持情况
 
@@ -36,7 +36,7 @@ $$
 L0A\_MX\ Buffer\ Address = L0A\ Buffer\ Address / 16
 $$
 
-本接口为MX矩阵计算量化系数搬运接口，需要与对应数据搬运接口[asc_copy_l12l0a](asc_copy_l12l0a/asc_copy_l12l0a_2d_arch_3510.md)配合使用。
+本接口为MX矩阵计算量化系数搬运接口，需要与对应数据搬运接口[asc_copy_l12l0a](../asc_copy_l12l0a/asc_copy_l12l0a_2d_arch_3510.md)配合使用。
 
 本接口仅在AIC上执行有效。
 
@@ -72,13 +72,13 @@ __aicore__ inline void asc_copy_l12l0a_mx(uint64_t dst,
 
 **图 1**  ScaleA在L0A_MX Buffer中的分形排布<a id="l12l0a_mx_layout"></a>
 
-![ScaleA在L0A_MX Buffer中的分形排布](../../../figures/scalea_l0a_fractal.png "ScaleA在L0A_MX Buffer中的分形排布")
+![ScaleA在L0A_MX Buffer中的分形排布](../../../../figures/scalea_l0a_fractal.png "ScaleA在L0A_MX Buffer中的分形排布")
 
 [图2](#fig_l12l0a_mx_params)为ScaleA从L1 Buffer搬运至L0A_MX Buffer过程中的配置参数示意。每一行为32字节，对应[图1](#l12l0a_mx_layout)中的一个分形。`x_step`为M维度分形个数，示例中$x\_step=M/16=3$；`y_step`为K维度32字节数据块的个数，示例中$y\_step=K/32/2=21$；`src_stride`和`dst_stride`表示K维度上相邻数据块起始地址的间隔，单位为32字节。
 
 **图 2**  ScaleA从L1 Buffer搬运至L0A_MX Buffer的配置参数示意<a id="fig_l12l0a_mx_params"></a>
 
-![ScaleA从L1 Buffer搬运至L0A_MX Buffer的配置参数示意](../../../figures/LoadData_2D_MX_nd2nz.png "ScaleA从L1 Buffer搬运至L0A_MX Buffer的配置参数示意")
+![ScaleA从L1 Buffer搬运至L0A_MX Buffer的配置参数示意](../../../../figures/LoadData_2D_MX_nd2nz.png "ScaleA从L1 Buffer搬运至L0A_MX Buffer的配置参数示意")
 
 ## 返回值说明
 
@@ -96,21 +96,21 @@ PIPE_MTE1
 - `dst`起始地址需要按照32字节对齐，否则触发地址对齐异常。
 - `src`起始地址需要按照32字节对齐（L1 Buffer对齐要求），否则触发地址对齐异常。
 - `src`位于L1 Buffer，`dst`指向L0A_MX Buffer，两者分属不同的物理存储单元，不存在源操作数与目的操作数地址重叠的场景。
-- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../sync/asc_sync_notify.md)和[asc_sync_wait](../sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../../sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
 - L0A_MX Buffer容量上限：L0A_MX Buffer总容量4KB，`dst`偏移量与搬运大小之和不可越界，否则触发地址溢出异常。
 - L1 Buffer容量上限：L1 Buffer总容量512KB，`src`偏移量与源矩阵占用大小之和不可越界，否则触发地址溢出异常。
 
 ### 搬运约束
 
-- 本接口需要与对应数据搬运接口[asc_copy_l12l0a](asc_copy_l12l0a/asc_copy_l12l0a_2d_arch_3510.md)配合使用，使量化系数与左矩阵数据写入相互映射的L0A_MX Buffer和L0A Buffer地址。
+- 本接口需要与对应数据搬运接口[asc_copy_l12l0a](../asc_copy_l12l0a/asc_copy_l12l0a_2d_arch_3510.md)配合使用，使量化系数与左矩阵数据写入相互映射的L0A_MX Buffer和L0A Buffer地址。
 - `x_step`或`y_step`设置为0时，该接口将被视为NOP（空操作）。应避免无意传入0，否则不会产生有效数据且会增加指令调度开销。
 - 量化系数矩阵的分形固定为$(16, 2)$，对应L0A Buffer的分形为$(16, 32)$，占L0A Buffer地址空间的$1/16$。接口以32字节的完整分形为最小搬运粒度，不支持仅搬运分形内的部分元素；分形中的无效元素需要在调用前按照后续矩阵计算要求完成填充。`dst`与`dst_stride`需按地址约束设置，否则触发搬运异常。
 
 ## 调用示例
 
-仓库中的完整工程样例请参考[mmad_mx样例](../../../../../../examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad_mx)。
+仓库中的完整工程样例请参考[mmad_mx样例](../../../../../../../examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad_mx)。
 
-将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
+将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
 Ascend 950PR/Ascend 950DT产品对应的NPU架构为`dav-3510`，编译运行命令如下：

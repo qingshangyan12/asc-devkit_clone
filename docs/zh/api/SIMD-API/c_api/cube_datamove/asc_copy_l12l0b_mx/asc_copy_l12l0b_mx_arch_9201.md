@@ -1,34 +1,37 @@
-# asc_copy_l12l0b_mx
+# asc_copy_l12l0b_mx_arch_9201
 
 ## 产品支持情况
 
-<!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+<!-- npu="960" id1 -->
+- Ascend 960PR/Ascend 960DT：支持。
 <!-- end id1 -->
-<!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- npu="950" id2 -->
+- Ascend 950PR/Ascend 950DT：不支持。
 <!-- end id2 -->
-<!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- npu="A3" id3 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持。
 <!-- end id3 -->
-<!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+<!-- npu="910b" id4 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持。
 <!-- end id4 -->
-<!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+<!-- npu="310b" id5 -->
+- Atlas 200I/500 A2 推理产品：不支持。
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas 推理系列产品AI Core：不支持。
 <!-- end id6 -->
-<!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+<!-- npu="310p" id7 -->
+- Atlas 推理系列产品Vector Core：不支持。
 <!-- end id7 -->
+<!-- npu="910" id8 -->
+- Atlas 训练系列产品：不支持。
+<!-- end id8 -->
 
 ## 功能说明
 
 头文件路径为：`"c_api/cube_datamove/cube_datamove.h"`。
 
-负责完成MX矩阵计算过程中所需的右矩阵对应的量化系数的搬运，数据通路为L1 Buffer->L0B_MX Buffer。其中右量化系数矩阵以32字节（固定数据类型为`fp8_e8m0_t`、分形大小为2×16的）的数据分形为单位进行搬运。
+负责完成MX矩阵计算过程中所需的右矩阵对应的量化系数的搬运，数据通路为L1 Buffer->L0B_MX Buffer。其中右量化系数矩阵以32字节（分形大小为2×16的）的数据分形为单位进行搬运。
 
 其中，L0B_MX Buffer的大小为4KB，和L0B Buffer地址的映射关系如下：
 
@@ -36,13 +39,31 @@ $$
 L0B\_MX\ Buffer\ Address = L0B\ Buffer\ Address / 16
 $$
 
-本接口为MX矩阵计算量化系数搬运接口，需要与对应数据搬运接口[asc_copy_l12l0b](asc_copy_l12l0b/asc_copy_l12l0b_2d_arch_3510.md)配合使用。
+本接口为MX矩阵计算量化系数搬运接口，需要与对应数据搬运接口[asc_copy_l12l0b](../asc_copy_l12l0b/asc_copy_l12l0b_2d_arch_9201.md)配合使用。
 
 本接口仅在AIC上执行有效。
 
 ## 函数原型
 
 ```cpp
+__aicore__ inline void asc_copy_l12l0b_mx(uint64_t dst,
+                                          __cbuf__ <dtype>* src,
+                                          uint16_t x_start_pos,
+                                          uint16_t y_start_pos,
+                                          uint8_t x_step,
+                                          uint8_t y_step,
+                                          uint16_t src_stride,
+                                          uint16_t dst_stride)
+```
+
+### dtype支持的数据类型
+
+dtype支持的数据类型为`fp8_e8m0_t`、`hif4_scale`。
+
+### 函数原型典型示例
+
+```cpp
+// 示例：half类型的2D搬运。
 __aicore__ inline void asc_copy_l12l0b_mx(uint64_t dst,
                                           __cbuf__ fp8_e8m0_t* src,
                                           uint16_t x_start_pos,
@@ -82,28 +103,28 @@ PIPE_MTE1
 
 - 本接口非AIC调用直接返回。
 - `src`位于L1 Buffer，dst位于L0B_MX Buffer，二者位于不同的物理存储单元，不存在地址重叠。
-- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../sync/asc_sync_notify.md)和[asc_sync_wait](../sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../../sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
 - L0B_MX Buffer容量上限：L0B_MX Buffer总容量4KB，`dst`偏移量与搬运大小之和不可越界，否则触发地址溢出异常。
 - L1 Buffer容量上限：L1 Buffer总容量512KB，`src`偏移量与源矩阵占用大小之和不可越界，否则触发地址溢出异常。
 
 ### 搬运约束
 
-- 本接口需要与对应数据搬运接口[asc_copy_l12l0b](asc_copy_l12l0b/asc_copy_l12l0b_2d_arch_3510.md)配合使用，使量化系数与右矩阵数据写入相互映射的L0B_MX Buffer和L0B Buffer地址。
+- 本接口需要与对应数据搬运接口[asc_copy_l12l0b](../asc_copy_l12l0b/asc_copy_l12l0b_2d_arch_9201.md)配合使用，使量化系数与右矩阵数据写入相互映射的L0B_MX Buffer和L0B Buffer地址。
 - `x_step`或`y_step`配置为0时，本接口被视为NOP（空操作）。0不在有效取值范围内，不应在有效任务中配置为0，以免产生无效指令并影响性能。
 - 量化系数矩阵的最小搬运粒度为1个2×16分形。矩阵边缘不足一个分形时，源矩阵需要补齐到完整分形。
 - 量化系数矩阵的分形固定为2×16，对应L0B Buffer的分形为32×16，占L0B Buffer地址的1/16。dst与dst_stride需按地址映射关系设置，否则触发搬运异常。
 
 ## 调用示例
 
-将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
+将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
-<!-- npu="950" id8 -->
-Ascend 950PR/Ascend 950DT产品对应的NPU架构为`dav-3510`，编译运行命令如下：
+<!-- npu="960" id9 -->
+以Ascend 960PR/Ascend 960DT产品（对应NPU架构为`dav-9201`）为例，编译运行命令如下：
 
 ```bash
-bisheng examples.asc -o main --npu-arch=dav-3510 && ./main
+bisheng examples.asc -o main --npu-arch=dav-9201 && ./main
 ```
-<!-- end id8 -->
+<!-- end id9 -->
 
 样例单核占用33KB L1 Buffer、16KB L0A Buffer、16KB L0B Buffer和64KB L0C Buffer，并分别占用512字节L0A_MX Buffer和L0B_MX Buffer。样例依次复用`EVENT_ID0`完成MTE2到MTE1、MTE1到M、M到FIX的同步。
 

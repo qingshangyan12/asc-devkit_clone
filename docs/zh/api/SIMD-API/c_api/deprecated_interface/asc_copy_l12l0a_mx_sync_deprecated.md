@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/composite/cube_datamove_composite.h"`。
 
-**`asc_copy_l12l0a_mx_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/asc_copy_l12l0a_mx.md)和同步接口[asc_sync](../sync/asc_sync.md)替代。**
+**`asc_copy_l12l0a_mx_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/asc_copy_l12l0a_mx/asc_copy_l12l0a_mx_arch_3510.md)和同步接口[asc_sync](../sync/asc_sync.md)替代。**
 
 负责完成MX矩阵计算过程中所需的左矩阵对应的量化系数的搬运，数据通路为L1 Buffer->L0A_MX Buffer。其中左量化系数矩阵以32字节（固定数据类型为`fp8_e8m0_t`、分形大小为16×2的）的数据分形为单位进行搬运。
 
