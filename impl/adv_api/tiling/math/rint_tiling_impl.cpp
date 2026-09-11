@@ -38,8 +38,8 @@ void GetRintMaxMinTmpSize(
     auto npuArch = ascendcPlatform.GetCurNpuArch();
 
     ASCENDC_HOST_ASSERT(
-        (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 || npuArch == aclplatformNpuArch::DAV_5102 ||
-         npuArch == aclplatformNpuArch::DAV_5162),
+        (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 ||
+         npuArch == aclplatformNpuArch::DAV_5102 || npuArch == aclplatformNpuArch::DAV_5162),
         return, "Unsupported NpuArch of Rint API.");
     maxValue = 0u;
     minValue = 0u;
@@ -52,8 +52,8 @@ void GetRintTmpBufferFactorSize(
     HighLevelApiCheck::TypeSizeVerifyingParameters<RINT_GET_TMP_BUFFER>(typeSize, SUPPORT_TYPESIZE);
     auto npuArch = ascendcPlatform.GetCurNpuArch();
     ASCENDC_HOST_ASSERT(
-        (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 || npuArch == aclplatformNpuArch::DAV_5102 ||
-         npuArch == aclplatformNpuArch::DAV_5162),
+        (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 ||
+         npuArch == aclplatformNpuArch::DAV_5102 || npuArch == aclplatformNpuArch::DAV_5162),
         return, "Unsupported NpuArch of Rint API.");
     extraBuf = 0u;
     maxLivedNodeCount = 0u;

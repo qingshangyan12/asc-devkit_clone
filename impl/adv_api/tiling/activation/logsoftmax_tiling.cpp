@@ -91,8 +91,8 @@ uint32_t GetLogSoftMaxMaxTmpSize(
     const auto npuArch = platform->GetCurNpuArch();
 
     uint32_t needSize;
-    if (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 || npuArch == aclplatformNpuArch::DAV_5102 ||
-        npuArch == aclplatformNpuArch::DAV_5162) {
+    if (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 ||
+        npuArch == aclplatformNpuArch::DAV_5102 || npuArch == aclplatformNpuArch::DAV_5162) {
         uint32_t needSize1 = srcM * (BASIC_TILE_NUM + srcK) + SOFTMAX_BASICBLOCK_UNIT * SOFTMAX_FLOAT_SIZE +
                              (srcM + BASIC_TILE_NUM - 1) / BASIC_TILE_NUM * BASIC_TILE_NUM;
         uint32_t needSize2 = srcM * (elementNumPerBlk + srcK + SOFTMAX_BASICBLOCK_UNIT);
@@ -125,8 +125,8 @@ uint32_t GetLogSoftMaxMinTmpSize(
     const auto npuArch = platform->GetCurNpuArch();
 
     uint32_t needSize;
-    if (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 || npuArch == aclplatformNpuArch::DAV_5102 ||
-        npuArch == aclplatformNpuArch::DAV_5162) {
+    if (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 ||
+        npuArch == aclplatformNpuArch::DAV_5102 || npuArch == aclplatformNpuArch::DAV_5162) {
         uint32_t needSize1 = srcM * (BASIC_TILE_NUM + srcK) + SOFTMAX_BASICBLOCK_UNIT * SOFTMAX_FLOAT_SIZE +
                              (srcM + BASIC_TILE_NUM - 1) / BASIC_TILE_NUM * BASIC_TILE_NUM;
         uint32_t needSize2 = srcM * (elementNumPerBlk + srcK);

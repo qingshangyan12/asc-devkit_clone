@@ -88,8 +88,9 @@ void GetSinTmpBufferFactorSize(
 
     auto npuArch = platform->GetCurNpuArch();
     ASCENDC_HOST_ASSERT(
-        (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 || npuArch == aclplatformNpuArch::DAV_3003 ||
-         npuArch == aclplatformNpuArch::DAV_5102 || npuArch == aclplatformNpuArch::DAV_5162),
+        (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 ||
+         npuArch == aclplatformNpuArch::DAV_3003 || npuArch == aclplatformNpuArch::DAV_5102 ||
+         npuArch == aclplatformNpuArch::DAV_5162),
         return, "Unsupported NpuArch of Cos API.");
     if (config.algo == SinAlgo::POLYNOMIAL_APPROXIMATION) {
         extraBuf = 0;
@@ -117,8 +118,9 @@ void GetSinMaxMinTmpSize(
 
     auto npuArch = platform->GetCurNpuArch();
     ASCENDC_HOST_ASSERT(
-        (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 || npuArch == aclplatformNpuArch::DAV_3003 ||
-         npuArch == aclplatformNpuArch::DAV_5102 || npuArch == aclplatformNpuArch::DAV_5162),
+        (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 ||
+         npuArch == aclplatformNpuArch::DAV_3003 || npuArch == aclplatformNpuArch::DAV_5102 ||
+         npuArch == aclplatformNpuArch::DAV_5162),
         return, "Unsupported NpuArch of Cos API.");
 
     if (config.algo == SinAlgo::POLYNOMIAL_APPROXIMATION) {

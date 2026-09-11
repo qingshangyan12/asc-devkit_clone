@@ -41,8 +41,8 @@ void GetSinCosMaxMinTmpSize(
     HighLevelApiCheck::IsReuseSourceVerifyingParameters<SINCOS_GET_MAX_MIN>(isReuseSource);
     auto npuArch = ascendcPlatform.GetCurNpuArch();
     ASCENDC_HOST_ASSERT(
-        (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 || npuArch == aclplatformNpuArch::DAV_5102 ||
-         npuArch == aclplatformNpuArch::DAV_5162),
+        (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 ||
+         npuArch == aclplatformNpuArch::DAV_5102 || npuArch == aclplatformNpuArch::DAV_5162),
         return, "Unsupported NpuArch of CosSin API.");
 
     std::vector<int64_t> shapeDims = srcShape.GetDims();
@@ -62,8 +62,8 @@ void GetSinCosTmpBufferFactorSize(
     HighLevelApiCheck::TypeSizeVerifyingParameters<SINCOS_GET_TMP_BUFFER>(typeSize, SUPPORT_TYPESIZE);
     auto npuArch = ascendcPlatform.GetCurNpuArch();
     ASCENDC_HOST_ASSERT(
-        (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 || npuArch == aclplatformNpuArch::DAV_5102 ||
-         npuArch == aclplatformNpuArch::DAV_5162),
+        (npuArch == aclplatformNpuArch::DAV_3510 || npuArch == aclplatformNpuArch::DAV_9201 ||
+         npuArch == aclplatformNpuArch::DAV_5102 || npuArch == aclplatformNpuArch::DAV_5162),
         return, "Unsupported NpuArch of SinCos API.");
     if (typeSize == sizeof(float)) {
         extraBuf = SINCOS_EXTRA_BUF;
