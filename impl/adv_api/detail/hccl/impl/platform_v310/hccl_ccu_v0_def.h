@@ -33,7 +33,8 @@ enum class AlgorithmType : uint8_t {
     CcuSchedAllToAllSoleMesh,
     CcuSchedAllToAllVSoleMesh,
     CcuHalfAll2AllVMesh1D,
-    CcuSchedAllGatherSoleMesh
+    CcuSchedAllGatherSoleMesh,
+    CcuSchedAllToAllMesh1DMultiJetty = 153
 };
 
 template <const auto& config>
@@ -105,6 +106,8 @@ private:
 
     __aicore__ inline uint8_t GetKfcMissionNum(HcclHandle handleId) const;
 
+    __aicore__ inline uint32_t GetHandleAlgorithmType(HcclHandle handleId) const;
+
     __aicore__ inline bool IsFinish(uint8_t reqId);
 
     __aicore__ inline void InitHandleInfo(uint8_t handleId);
@@ -119,6 +122,7 @@ private:
     __aicore__ inline void CcuPrepareForAllGather(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForAllReduce(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForAllToAll(__gm__ CommonPrepareParamCcu* commParam);
+    __aicore__ inline void CcuPrepareForAllToAllMultiJetty(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForAllToAllV(
         __gm__ CommonPrepareParamCcu* commParam, __gm__ AlltoAllVParamCcu* allToAllVParam);
     __aicore__ inline void CcuPrepareForAllToAllVWrite(__gm__ CommonPrepareParamCcu* commParam);
