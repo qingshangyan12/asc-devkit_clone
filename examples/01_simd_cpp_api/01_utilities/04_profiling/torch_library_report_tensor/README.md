@@ -127,7 +127,7 @@
 
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510`、`dav-9201` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT，dav-9201 对应 Ascend 960PR/Ascend 960DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR |
 
 - 执行结果
   执行结果如下，说明Profiling数据采集和解析成功，其中DIR_NAME和PATH分别为落盘文件名和数据存放目录。

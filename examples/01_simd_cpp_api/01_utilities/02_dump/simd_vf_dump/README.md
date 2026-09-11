@@ -9,7 +9,6 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 960PR/Ascend 960DT | >= CANN 9.2.0 |
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## 目录结构介绍
@@ -80,7 +79,7 @@
 
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`（默认）、`dav-9201` | NPU架构：dav-3510对应Ascend 950PR/Ascend 950DT，dav-9201对应Ascend 960PR/Ascend 960DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`（默认） | NPU架构：dav-3510对应Ascend 950PR/Ascend 950DT |
 
 - 执行结果
   最终执行结果如下，说明精度对比成功。
