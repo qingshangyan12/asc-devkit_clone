@@ -496,25 +496,19 @@ $$
 
 -   使用**C API**时，对于纯Cube/纯Vector/Mix（1,1）场景，应使用内置变量block_idx获取当前核的逻辑位置；对于Mix（1,2）场景，应使用内置变量block_idx、asc_get_sub_block_num和asc_get_sub_block_id按公式计算logic_idx。
 
-## API内置数据类型
+## 内置数据类型
 
-使用以下数据类型时需要导入[SIMD API的头文件](../../../api/api_list.md#调用接口依赖的头文件和库文件说明)。
+以下数据类型是编译器默认支持的数据类型，使用时无需引入头文件。
 
-**表5**  API内置数据类型
+**表5**  编译器内置数据类型
 
 | 类型 | 数据类型 | 描述 | Size（bit） | 取值范围 |
 | --- | --- | --- | --- | --- |
-| 整型 | int4b_t | 有符号4位整数。 | 4 | [-8, 7] |
 | 布尔型 | bool | 全0代表false，否则代表true。 | 8 | true、false |
 | 整型 | int4x2_t | 两个有符号4位整数打包为一个8比特存储单元。 | 8 | 每个元素的取值范围为[-8, 7]。 |
 | 整型 | int8_t | signed char | 8 | [-128, 127] |
 | 整型 | uint8_t | unsigned char | 8 | [0, 255] |
-| 浮点型 | fp4x2_e2m1_t | 两个由1位符号位、2位指数位和1位尾数位组成的浮点数打包为一个8比特存储单元。 | 8 | [-6, 6] |
-| 浮点型 | fp4x2_e1m2_t | 两个由1位符号位、1位指数位和2位尾数位组成的浮点数打包为一个8比特存储单元。 | 8 | [-7×2<sup>-2</sup>, 7×2<sup>-2</sup>] |
 | 浮点型 | hifloat8_t | 符号位宽为1，指数位宽和尾数位宽由点域编码决定。 | 8 | 点域编码决定数据精度与取值范围。 |
-| 浮点型 | fp8_e8m0_t | 符号位宽为0，指数位宽为8，尾数位宽为0。 | 8 | [2<sup>-127</sup>, 2<sup>127</sup>] |
-| 浮点型 | fp8_e5m2_t | 符号位宽为1，指数位宽为5，尾数位宽为2。 | 8 | [2<sup>13</sup> - 2<sup>16</sup>, 2<sup>16</sup> - 2<sup>13</sup>] |
-| 浮点型 | fp8_e4m3fn_t | 符号位宽为1，指数位宽为4，尾数位宽为3。 | 8 | [2<sup>6</sup> - 2<sup>9</sup>, 2<sup>9</sup> - 2<sup>6</sup>] |
 | 整型 | int16_t | signed short | 16 | [-32768, 32767] |
 | 整型 | uint16_t | unsigned short | 16 | [0, 65535] |
 | 浮点型 | half | 符号位宽为1，指数位宽为5，尾数位宽为10。 | 16 | [2<sup>5</sup> - 2<sup>16</sup>, 2<sup>16</sup> - 2<sup>5</sup>] |
@@ -522,11 +516,24 @@ $$
 | 整型 | int32_t | signed int | 32 | [-2147483648, 2147483647] |
 | 整型 | uint32_t | unsigned int | 32 | [0, 4294967295] |
 | 浮点型 | float | 符号位宽为1，指数位宽为8，尾数位宽为23。 | 32 | [2<sup>104</sup> - 2<sup>128</sup>, 2<sup>128</sup> - 2<sup>104</sup>] |
-| 复数型 | complex32 | 实部和虚部都是half类型的复数。 | 32 | 实部：[2<sup>5</sup> - 2<sup>16</sup>, 2<sup>16</sup> - 2<sup>5</sup>]，虚部：[2<sup>5</sup> - 2<sup>16</sup>, 2<sup>16</sup> - 2<sup>5</sup>] |
 | 整型 | int64_t | signed long | 64 | [-9223372036854775808, 9223372036854775807] |
 | 整型 | uint64_t | unsigned long | 64 | [0, 18446744073709551615] |
 | 浮点型 | double | 符号位宽为1，指数位宽为11，尾数位宽为52。 | 64 | [2<sup>971</sup> - 2<sup>1024</sup>, 2<sup>1024</sup> - 2<sup>971</sup>] |
-| 复数型 | complex64 | 实部和虚部都是float类型的复数。 | 64 | 实部：[2<sup>104</sup> - 2<sup>128</sup>, 2<sup>128</sup> - 2<sup>104</sup>]，虚部：[2<sup>104</sup> - 2<sup>128</sup>, 2<sup>128</sup> - 2<sup>104</sup>] |
+
+使用以下数据类型时需要导入对应的头文件。
+
+**表6** API内置数据类型
+
+| 类型 | 数据类型 | 描述 | Size（bit） | 取值范围 | 头文件 |
+| --- | --- | --- | --- | --- | --- |
+| 整型 | int4b_t | 有符号4位整数。 | 4 | [-8, 7] | utils/common_types.h |
+| 浮点型 | fp4x2_e2m1_t | 两个由1位符号位、2位指数位和1位尾数位组成的浮点数打包为一个8比特存储单元。 | 8 | [-6, 6] | utils/common_types.h |
+| 浮点型 | fp4x2_e1m2_t | 两个由1位符号位、1位指数位和2位尾数位组成的浮点数打包为一个8比特存储单元。 | 8 | [-7×2<sup>-2</sup>, 7×2<sup>-2</sup>] | utils/common_types.h |
+| 浮点型 | fp8_e8m0_t | 符号位宽为0，指数位宽为8，尾数位宽为0。 | 8 | [2<sup>-127</sup>, 2<sup>127</sup>] | utils/common_types.h |
+| 浮点型 | fp8_e5m2_t | 符号位宽为1，指数位宽为5，尾数位宽为2。 | 8 | [2<sup>13</sup> - 2<sup>16</sup>, 2<sup>16</sup> - 2<sup>13</sup>] | utils/common_types.h |
+| 浮点型 | fp8_e4m3fn_t | 符号位宽为1，指数位宽为4，尾数位宽为3。 | 8 | [2<sup>6</sup> - 2<sup>9</sup>, 2<sup>9</sup> - 2<sup>6</sup>] | utils/common_types.h |
+| 复数型 | complex32 | 实部和虚部都是half类型的复数。 | 32 | 实部：[2<sup>5</sup> - 2<sup>16</sup>, 2<sup>16</sup> - 2<sup>5</sup>]，虚部：[2<sup>5</sup> - 2<sup>16</sup>, 2<sup>16</sup> - 2<sup>5</sup>] | basic_api/kernel_tpipe.h |
+| 复数型 | complex64 | 实部和虚部都是float类型的复数。 | 64 | 实部：[2<sup>104</sup> - 2<sup>128</sup>, 2<sup>128</sup> - 2<sup>104</sup>]，虚部：[2<sup>104</sup> - 2<sup>128</sup>, 2<sup>128</sup> - 2<sup>104</sup>] | basic_api/kernel_tpipe.h |
 
 更多详细信息请参考[内置数据类型](../../../api/SIMD-API/basic_api/data_structures/builtin_data_types.md)。
 
