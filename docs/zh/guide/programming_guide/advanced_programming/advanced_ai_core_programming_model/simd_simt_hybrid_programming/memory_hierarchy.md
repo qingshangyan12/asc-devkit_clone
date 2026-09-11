@@ -54,8 +54,8 @@ UB内存空间总大小为256KB。UB按功能划分为四个主要区域，从�
 >
 > 用户可选择禁用预留空间，禁用方法为编译时增加如下编译选项：
 >
->- [--cce-disable-vf-stack-reserved-ubuf](../../../compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#ZH-CN_TOPIC_0000002462746461): 关闭VF栈参数中转空间(6KB)
->- [--cce-disable-asc-reserved-ubuf](../../../compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#ZH-CN_TOPIC_0000002462746461): 关闭Ascend C SIMD接口使用预留空间(2KB)
+>- [--cce-disable-vf-stack-reserved-ubuf](../../../compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#ZH-CN_TOPIC_0000002462746461)：关闭VF栈参数中转空间（6KB）
+>- [--cce-disable-asc-reserved-ubuf](../../../compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#ZH-CN_TOPIC_0000002462746461)：关闭Ascend C SIMD接口使用预留空间（2KB）
 >
 > 以上编译选项可独立使用，也可同时使用。开启后，编译器不再预留对应部分UB空间，该空间可作为普通UB空间使用。
 >
@@ -66,7 +66,7 @@ UB内存空间总大小为256KB。UB按功能划分为四个主要区域，从�
 > 另外，开发者需要自行确认禁用预留空间的影响：
 >
 >- 开启`--cce-disable-vf-stack-reserved-ubuf`后，编译器将无法使用预留UB空间作为寄存器溢出的缓存空间，开发者需保证不会发生寄存器溢出。
->- 开启`--cce-disable-vf-stack-reserved-ubuf`后，[使用预留UB空间的API](../../../programming_model/ai_core_simd_programming/cpp_tensor_programming/static_tensor_programming.md#使用预留ub空间的api范围)无法正常使用，需要手动调整API调用方式或替换为不依赖预留UB空间的实现。
+>- 开启`--cce-disable-asc-reserved-ubuf`后，[使用预留UB空间的API](../../../programming_model/ai_core_simd_programming/cpp_tensor_programming/static_tensor_programming.md#section_reserved_ubuf_api)无法正常使用，需要手动调整API调用方式或替换为不依赖预留UB空间的实现。
 
 混合编程模式下，可在SIMT VF、SIMD VF和MainScalar执行空间中使用动静态内存。MainScalar是指Device侧在VF函数外部的执行空间。下图为不同执行空间申请内存时对应的UB内存排布示意图。
 
@@ -102,7 +102,7 @@ UB内存的排布遵循以下规则：
     -   写数据时，底层会确保数据立即写出到GM，从而确保其他通路读取到最新数据；
     -   读数据时，默认访存的底层实现与[asc\_ldca](../../../../../api/SIMT-API/memory_access_functions/asc_ldca.md)的实现一致。若访问的内存数据在SIMT Data Cache中命中，默认会读取Cache数据，可能导致读取到的数据与GM中的最新数据不一致。
 -   在MainScalar执行空间通过Cache读写GM上的数据时，读写均可能存在一致性问题：
-    -   写数据时，数据会先写入Cache，底层无法保证数据立即刷新到GM上，此时其他通路读取到的可能是旧数据。可使用缓存控制使数据立即刷新到GM上，保证其它通路读到的是最新数据，具体详见[asc\_dcci](../../../../../api/SIMD-API/c_api/cache_ctrl/asc_dcci.md)中的内容；
+    -   写数据时，数据会先写入Cache，底层无法保证数据立即刷新到GM上，此时其他通路读取到的可能是旧数据。可使用缓存控制使数据立即刷新到GM上，保证其他通路读到的是最新数据，具体详见[asc\_dcci](../../../../../api/SIMD-API/c_api/cache_ctrl/asc_dcci.md)中的内容；
     -   读数据时，若访问的内存在Cache中命中，将不会读取GM中的最新数据，可能导致读取到的数据失效。
 
 在SIMT VF执行空间读GM上的数据时，对于上述缓存数据与GM数据不一致的问题，可以通过以下的方式解决：
