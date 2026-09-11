@@ -203,6 +203,9 @@ __aicore__ inline bool MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, 
     if (msg->body.sync == 1) { // Synchronize
         uint16_t eventID = static_cast<uint16_t>(this->devEvtID * 2 + mul.GetSubBlockIdx());
         NotifyEvent<PIPE_FIX>(eventID);
+#if defined(__ASCENDC_ENABLE_SUPER_KERNEL__)
+        SuperKernelEventCount(eventID);
+#endif
     }
     return false;
 }
@@ -247,6 +250,9 @@ __aicore__ inline bool MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, 
     if (body->sync || body->waitIterateBatch) {
         uint16_t eventID = static_cast<uint16_t>(this->devEvtID * 2 + mul.GetSubBlockIdx());
         NotifyEvent<PIPE_FIX>(eventID);
+#if defined(__ASCENDC_ENABLE_SUPER_KERNEL__)
+        SuperKernelEventCount(eventID);
+#endif
     }
     return true;
 }
@@ -295,6 +301,9 @@ MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::
         if (cntIterator < INC_PROCESS_CHECK && (!body->sync && !body->waitIterateBatch)) {
             uint16_t eventID = static_cast<uint16_t>(this->devEvtID * 2 + mul.GetSubBlockIdx());
             NotifyEvent<PIPE_FIX>(eventID);
+#if defined(__ASCENDC_ENABLE_SUPER_KERNEL__)
+            SuperKernelEventCount(eventID);
+#endif
         }
     }
 }
@@ -330,8 +339,14 @@ __aicore__ inline bool MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, 
     uint16_t eventID = static_cast<uint16_t>(this->devEvtID * 2 + mul.GetSubBlockIdx());
     if (msg->body.sync || msg->body.waitIterateBatch) {
         NotifyEvent<PIPE_FIX>(eventID);
+#if defined(__ASCENDC_ENABLE_SUPER_KERNEL__)
+        SuperKernelEventCount(eventID);
+#endif
     } else if (cntIterator >= INC_PROCESS_CHECK) {
         NotifyEvent<PIPE_FIX>(eventID);
+#if defined(__ASCENDC_ENABLE_SUPER_KERNEL__)
+        SuperKernelEventCount(eventID);
+#endif
     }
     return true;
 }
