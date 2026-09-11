@@ -733,6 +733,20 @@ upgrade_run() {
     return $?
 }
 
+# Older asc-devkit packages incorrectly listed the public HCCL headers as
+# asc-devkit-owned files. New packages no longer deliver those headers, but
+# the old uninstaller still removes them before the new package is installed.
+# Drop the stale ownership records so that the HCCL package keeps its files.
+remove_legacy_hccl_header_records() {
+    local old_filelist="$1/script/filelist.csv"
+    if [ ! -f "$old_filelist" ]; then
+        return 0
+    fi
+
+    chmod u+w "$old_filelist"
+    sed -i '\|,copy,[^,]*include/hccl/hccl\(_mc2\)\?\.h,[^,]*include/hccl/hccl\(_mc2\)\?\.h,|d' "$old_filelist"
+}
+
 # 卸载调用子脚本
 uninstall_run() {
     local is_recreate_softlink="$2"
@@ -763,6 +777,10 @@ uninstall_run() {
     fi
     if [ "$1" = "uninstall" ]; then
         chmod_start "$upgrade_default_dir"
+        if ! remove_legacy_hccl_header_records "$upgrade_default_dir"; then
+            log "ERROR" "Failed to remove legacy HCCL header records from asc-devkit filelist."
+            exit_uninstall_log 1
+        fi
         new_echo "INFO" "uninstall ${asc_devkit_install_path_param} ${asc_devkit_install_type}"
         log "INFO" "uninstall ${asc_devkit_install_path_param} ${asc_devkit_install_type}"
         sh "$upgrade_default_dir/script/run_asc-devkit_uninstall.sh" "uninstall" "${asc_devkit_input_install_path}" "${asc_devkit_install_type}" "${is_quiet}" \
