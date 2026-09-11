@@ -390,7 +390,7 @@ __aicore__ inline bool asc_vf_debug_ub2gm()
         if (vInfo->assertFlag != BlockVFBufInfo::AssertState::IDLE) {
             trap();
         }
-        return vInfo->flag != 0;
+        break;
     }
     return vInfo->flag != 0;
 }
