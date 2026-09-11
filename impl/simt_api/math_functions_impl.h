@@ -1018,23 +1018,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float ldexpf(float x, int exp)
 
     if (x == 0.0f || isinf(x) || isnan(x) || exp == 0) {
         result = x;
-        result = x * __uint_as_float(
-                         static_cast<uint32_t>(exp + 127)
-                         << 23); // 23: float32 exponent starts at bit 23; 127: exponent bias.
     }
-
-    if (exp > 278) { // 278: beyond this positive shift, x * 2^exp overflows to +inf/-inf.
-        result = copysignf(ASCRT_INF_F, x);
-    }
-    if (exp < -278) { // -278: beyond this negative shift, x * 2^exp underflows to signed zero.
-        result = copysignf(0.0f, x);
-    }
-
-    if (x == 0.0f || isinf(x) || isnan(x) || exp == 0) {
-        result = x;
-    }
-
-    return result;
 
     return result;
 }
