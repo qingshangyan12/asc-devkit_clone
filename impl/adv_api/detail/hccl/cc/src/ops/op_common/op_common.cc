@@ -2696,12 +2696,14 @@ HcclResult CheckHostDPUOnly(const HcclComm comm, const TopoInfoWithNetLayerDetai
 
 static HcclResult GetCommMultipleDimensionSplitRatio(HcclComm comm, double& ratio, bool& isConfigured)
 {
+    // 值对齐 CANN >= 9.1 头文件中 HcclConfigType::HCCL_CONFIG_TYPE_MULTIPLE_DIMENSION_SPLIT_RATIO；
+    // 本地 hccl_comm.h 尚未收敛该成员，为避免对 include/adv_api 对外头的变更，此处使用局部常量直传。
+    constexpr HcclConfigType kCfgTypeSplitRatio = static_cast<HcclConfigType>(1);
     ratio = 0.0;
     isConfigured = false;
     double commRatio = 0.0;
     const uint32_t infoLen = sizeof(commRatio);
-    HcclResult ret =
-        HcclConfigGetInfo(comm, HcclConfigType::HCCL_CONFIG_TYPE_MULTIPLE_DIMENSION_SPLIT_RATIO, infoLen, &commRatio);
+    HcclResult ret = HcclConfigGetInfo(comm, kCfgTypeSplitRatio, infoLen, &commRatio);
     if (ret == HCCL_E_NOT_SUPPORT) {
         HCCL_INFO("[GetCommMultipleDimensionSplitRatio] comm config not set or not supported, ret[%d].", ret);
         return HCCL_SUCCESS;
