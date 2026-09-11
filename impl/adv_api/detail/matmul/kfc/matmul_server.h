@@ -209,6 +209,28 @@ public:
     __aicore__ inline void SetBias(MsgTmpPos MatmulConfigParams* body, const uint64_t offset);
     __aicore__ inline bool GetTensorC(MSG_POS KfcMsg* msg);
     __aicore__ inline uint16_t GetInstID() { return instID; }
+    // Notify the requesting AIV that the matmul result is ready. On dav-3510/9201 GM compatible mode,
+    // the broadcast NotifyEvent (ffts mode 2) increments the flagId counter on BOTH AIVs of the block.
+    // The sibling AIV never consumes its copy and the counter is not reset between launches, so the
+    // residual accumulates and exceeds the 0-15 hardware range, which deadlocks the sync. Use the
+    // point-to-point intra-block flag (same scheme as the SSBUF mode) so only the requesting AIV is
+    // notified. The sameAB mode still relies on the broadcast event (cross-AIV visibility), keep it.
+    __aicore__ inline void NotifyAivEvent(uint8_t subBlockIdx)
+    {
+#if defined(USE_WORKSPACE) && defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
+        if constexpr (!(A_TYPE::ibShare && B_TYPE::ibShare)) {
+            CrossCoreSetFlag<INTRA_MODE, PIPE_FIX>(
+                GetIntraFlagId(this->instID, static_cast<uint8_t>(GM_WAIT_FIXP_ID), subBlockIdx));
+            return;
+        }
+#endif
+        uint16_t eventID = static_cast<uint16_t>(this->devEvtID * 2 + subBlockIdx);
+        NotifyEvent<PIPE_FIX>(eventID);
+#if defined(__ASCENDC_ENABLE_SUPER_KERNEL__)
+        SuperKernelEventCount(eventID);
+#endif
+    }
+    __aicore__ inline void NotifyAivEvent() { NotifyAivEvent(mul.GetSubBlockIdx()); }
     __aicore__ inline void IterateSetMessage(MSG_POS KfcMsg* msg, MsgTmpPos MatmulConfigParams* body)
     {
 #if defined(USE_WORKSPACE)
@@ -328,12 +350,10 @@ public:
             cGlobal, msg->body.enAtomic, msg->body.enSequentialWrite, msg->body.waitIterateAll,
             msg->body.iterateFakeMsg);
 
-        uint16_t eventID0 = static_cast<uint16_t>(this->devEvtID * 2 + 0);
-        uint16_t eventID1 = static_cast<uint16_t>(this->devEvtID * 2 + 1);
         if (msg->body.sync || msg->body.waitIterateAll) {
             ASSERT(funID == KFC_Enum::MMFUN_ITERATE_ALL);
-            NotifyEvent<PIPE_FIX>(eventID0);
-            NotifyEvent<PIPE_FIX>(eventID1);
+            NotifyAivEvent(0);
+            NotifyAivEvent(1);
         }
         if (!msg->body.iterateFakeMsg) {
             mul.End();
