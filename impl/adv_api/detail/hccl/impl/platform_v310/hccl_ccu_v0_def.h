@@ -17,6 +17,7 @@
 
 namespace AscendC {
 
+// 本枚举为 AIC 侧 hccl_alloc_ctx_res.h AlgorithmType 的镜像，显式值处（3/153）必须与宿主侧一致
 enum class AlgorithmType : uint8_t {
     CcuAllGatherMesh1D = 0,
     CcuAllGatherMeshMem2Mem1D,
