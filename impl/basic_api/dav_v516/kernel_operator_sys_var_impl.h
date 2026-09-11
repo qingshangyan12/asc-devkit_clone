@@ -60,7 +60,7 @@ __aicore__ inline int64_t GetBlockIdxImpl()
 #endif
 }
 
-__aicore__ inline void GetArchVersionImpl(uint32_t& coreVersion) {coreVersion = 5162U;}
+__aicore__ inline void GetArchVersionImpl(uint32_t& coreVersion) { coreVersion = 5162U; }
 
 __aicore__ inline int64_t GetSubBlockNumImpl()
 {

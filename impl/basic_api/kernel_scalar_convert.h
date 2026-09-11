@@ -25,8 +25,8 @@
 #include "../utils/std/type_traits/enable_if.h"
 
 namespace AscendC {
-#if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || \
+                              (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
 __aicore__ inline bfloat16_t Cast(const float& fVal)
 {
     constexpr uint32_t fp32SignIdx = 31;

@@ -41,8 +41,8 @@ template <typename T, bool isReuseSource = false>
 __aicore__ inline void Log(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, uint32_t calCount)
 {
     // Only for AI Vector Core.
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || \
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
     if ASCEND_IS_AIC {
         return;
     }
@@ -80,8 +80,8 @@ __aicore__ inline void Log2(
     uint32_t calCount)
 {
     // Only for AI Vector Core.
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || \
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
     if ASCEND_IS_AIC {
         return;
     }
@@ -150,8 +150,8 @@ template <typename T, bool isReuseSource = false>
 __aicore__ inline void Log10(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, uint32_t calCount)
 {
     // Only for AI Vector Core.
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || \
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
     if ASCEND_IS_AIC {
         return;
     }
