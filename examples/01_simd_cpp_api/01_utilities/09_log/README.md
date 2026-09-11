@@ -10,6 +10,7 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
+| Ascend 950PR/Ascend 960DT | >= CANN 9.1.0 |
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 | Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
@@ -122,7 +123,7 @@
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：<br>dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510`、`dav-9201` | NPU 架构：<br>dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>dav-3510 对应 Ascend 950PR/Ascend 950DT<br>dav-9201 对应 Ascend 950PR/Ascend 960DT |
 
 - 执行结果（NPU模式，以非打屏模式下为例，落盘文件详情可参考[Ascend 日志功能参考](https://hiascend.com/document/redirect/CannCommunitylogref)）
   执行后会打印类似以下信息：

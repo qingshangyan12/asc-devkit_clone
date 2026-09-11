@@ -87,7 +87,7 @@
   | 选项 | 说明 |
   |------|------|
   | `CMAKE_ASC_RUN_MODE` | 指定为`sim`，开启NPU仿真模式 |
-  | `CMAKE_ASC_ARCHITECTURES` | 指定NPU架构版本号。`dav-2201`对应Atlas A2训练系列产品/Atlas A2推理系列产品和Atlas A3训练系列产品/Atlas A3推理系列产品，`dav-3510`对应Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | 指定NPU架构版本号。`dav-2201`对应Atlas A2训练系列产品/Atlas A2推理系列产品和Atlas A3训练系列产品/Atlas A3推理系列产品，`dav-3510`对应Ascend 950PR/Ascend 950DT，`dav-9201`对应Ascend 950PR/Ascend 960DT |
 
   精度对比成功时，输出如下：
 

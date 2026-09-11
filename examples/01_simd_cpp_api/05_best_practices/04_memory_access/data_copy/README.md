@@ -9,6 +9,7 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
+| Ascend 950PR/Ascend 960DT | >= CANN 9.1.0 |
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 | Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
@@ -438,7 +439,7 @@ for (uint32_t mBlockIdx = 0; mBlockIdx < fullMBlockCount; mBlockIdx++) {
   | `SCENARIO_NUM` | 场景编号 | `COPY_DST=UB`: 1-8; `COPY_DST=L1`: 1-7 | 1 |
   | `COPY_DST` | 搬运目标 | `UB`、`L1` | `UB` |
   | `CMAKE_ASC_RUN_MODE` | 运行模式 | `npu`、`sim` | `npu` |
-  | `CMAKE_ASC_ARCHITECTURES` | NPU 硬件架构 | `dav-2201`、`dav-3510` | `dav-2201` |
+  | `CMAKE_ASC_ARCHITECTURES` | NPU 硬件架构 | `dav-2201`、`dav-3510`、`dav-9201` | `dav-2201` |
 
 - 性能采集
 
