@@ -150,4 +150,8 @@ CcuResult CcuReduceScatterMeshMem2Mem1DPeerOnlyKernel(
     return CCU_SUCCESS;
 }
 
+REGISTER_KFC_CALLABLE_TASK(
+    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, KfcServerRole::DEFAULT, CcuSchedReduceScatterSoleMeshPeerOnly,
+    CcuReduceScatterMeshMem2Mem1DPeerOnlyKernel);
+
 } // namespace mc2_ops_hccl

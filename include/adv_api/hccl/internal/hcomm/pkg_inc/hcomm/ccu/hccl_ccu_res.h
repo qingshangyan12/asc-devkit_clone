@@ -26,7 +26,13 @@ extern CcuResult HcommCcuKernelRegister(
     CcuInsHandle insHandle, uint32_t dieId, const char* kernelFuncName, const void* kernelFunc, const void** kernelArgs,
     uint32_t argNum, CcuKernelHandle* kernelHandle);
 
+extern CcuResult HcommCcuKernelRegisterV2(
+    CcuInsHandle insHandle, uint32_t dieId, const char* kernelFuncName, const void* kernelFunc, const void** kernelArgs,
+    uint32_t argNum, const CcuKernelRegisterCfg* cfg, CcuKernelHandle* kernelHandle);
+
 extern CcuResult HcommCcuKernelRegisterEnd(CcuInsHandle insHandle);
+
+extern CcuResult HcommCcuFunctionGet(CcuInsHandle insHandle, const char* kernelFuncName, uint64_t* pc);
 
 extern CcuResult HcommCcuKernelLaunch(
     ThreadHandle threadHandle, CcuKernelHandle kernelHandle, const void* taskArgs, uint32_t argSize);

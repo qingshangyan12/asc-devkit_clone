@@ -77,21 +77,19 @@ Result CaptureAllReduceMeshMem2Mem1DKernel(void* kernelArg)
         return Result::PARAM_ERROR;
     }
 
-    std::array<AscendC::ccu::Variable, ALL_REDUCE_TASK_ARG_COUNT> arguments;
-    for (uint32_t index = 0; index < arguments.size(); ++index) {
-        if (AscendC::ccu::LoadArg(arguments[index], index) != Result::SUCCESS) {
-            return Result::CONTRACT_ERROR;
-        }
-    }
     CompilerContext::Current().ConfigureProgram(config.rankId, config.rankSize, config.channels);
 
-    const CcuResult result = mc2_ops_hccl::CcuKfcAllReduceMesh1DMem2MemKernel(
-        arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7],
-        arguments[8], arguments[9], arguments[10], arguments[11], arguments[12], arguments[13], arguments[14],
-        arguments[15], arguments[16], arguments[17], arguments[18], arguments[19], arguments[20], arguments[21],
-        arguments[22], arguments[23], arguments[24], arguments[25], config.channels.data(),
-        static_cast<uint32_t>(config.channels.size()), config.rankSize, config.rankId, config.dataType,
-        config.outputType, config.reduceOp);
+    mc2_ops_hccl::CcuKernelArgAllReduceKfc algorithmArg{};
+    algorithmArg.channelCount = static_cast<uint32_t>(config.channels.size());
+    for (uint32_t i = 0; i < algorithmArg.channelCount; ++i) {
+        algorithmArg.channels[i] = config.channels[i];
+    }
+    algorithmArg.rankSize = config.rankSize;
+    algorithmArg.rankId = config.rankId;
+    algorithmArg.opParam.DataDes.dataType = config.dataType;
+    algorithmArg.opParam.DataDes.outputType = config.outputType;
+    algorithmArg.opParam.reduceType = config.reduceOp;
+    const CcuResult result = mc2_ops_hccl::CcuKfcAllReduceMesh1DMem2MemKernel(&algorithmArg);
     return result == CCU_SUCCESS ? Result::SUCCESS : Result::CONTRACT_ERROR;
 }
 

@@ -14,6 +14,19 @@
 
 namespace mc2_ops_hccl {
 
+struct KfcAllGatherMesh1DContext : CcuKernelCtxBase {
+    const ChannelHandle* channels{nullptr};
+    uint32_t channelCount{0};
+    uint32_t rankSize{0};
+    uint32_t rankId{0};
+
+    ccu::Variable input;
+    std::vector<ccu::Variable> output;
+    std::vector<ccu::Variable> token;
+    ccu::Variable offset;
+    ccu::Variable sliceSize;
+};
+
 CcuResult CcuKfcAllGatherMesh1DKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable offset,
     ccu::Variable sliceSize, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId);

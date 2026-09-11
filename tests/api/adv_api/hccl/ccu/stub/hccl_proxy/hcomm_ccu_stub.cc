@@ -359,7 +359,20 @@ CcuResult HcommCcuKernelRegister(
     return CCU_SUCCESS;
 }
 
+CcuResult HcommCcuKernelRegisterV2(
+    CcuInsHandle insHandle, uint32_t dieId, const char* kernelFuncName, const void* kernelFunc, const void** kernelArgs,
+    uint32_t argNum, const CcuKernelRegisterCfg* cfg, CcuKernelHandle* kernelHandle)
+{
+    return HcommCcuKernelRegister(insHandle, dieId, kernelFuncName, kernelFunc, kernelArgs, argNum, kernelHandle);
+}
+
 CcuResult HcommCcuKernelRegisterEnd(CcuInsHandle insHandle) { return CCU_SUCCESS; }
+
+CcuResult HcommCcuFunctionGet(CcuInsHandle insHandle, const char* kernelFuncName, uint64_t* pc)
+{
+    *pc = 0x1000U;
+    return CCU_SUCCESS;
+}
 
 CcuResult HcommCcuKernelLaunch(
     ThreadHandle threadHandle, CcuKernelHandle kernelHandle, const void* taskArgs, uint32_t argSize)
