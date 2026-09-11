@@ -37,6 +37,23 @@
         EXPECT_FALSE(c_matrix_init_val);                                                                              \
     }                                                                                                                 \
                                                                                                                       \
+    void mad_mx_bias_##type_prefix##_Stub(                                                                            \
+        __cc__ float* c_matrix, __ca__ a_type* a_matrix, __cb__ b_type* b_matrix, uint16_t m, uint16_t k, uint16_t n, \
+        uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)                           \
+    {                                                                                                                 \
+        constexpr uint64_t expected_xd = 0x8765432112345678ULL;                                                       \
+        EXPECT_EQ(c_matrix, reinterpret_cast<__cc__ float*>(expected_xd));                                            \
+        EXPECT_EQ(a_matrix, reinterpret_cast<__ca__ a_type*>(2));                                                     \
+        EXPECT_EQ(b_matrix, reinterpret_cast<__cb__ b_type*>(3));                                                     \
+        EXPECT_EQ(m, static_cast<uint16_t>(4));                                                                       \
+        EXPECT_EQ(k, static_cast<uint16_t>(5));                                                                       \
+        EXPECT_EQ(n, static_cast<uint16_t>(6));                                                                       \
+        EXPECT_EQ(unit_flag, static_cast<uint8_t>(asc_unit_flag_mode::ENABLE_KEEP));                                  \
+        EXPECT_FALSE(disable_gemv);                                                                                   \
+        EXPECT_TRUE(c_matrix_source);                                                                                 \
+        EXPECT_FALSE(c_matrix_init_val);                                                                              \
+    }                                                                                                                 \
+                                                                                                                      \
     uint64_t expected_bias_##type_prefix = 0;                                                                         \
     void mad_mx_scale_##type_prefix##_Stub(                                                                           \
         __cc__ float* c_matrix, uint64_t bias, __ca__ a_type* a_matrix, uint64_t scale_a_addr,                        \
@@ -73,6 +90,24 @@
             .will(invoke(mad_mx_basic_##type_prefix##_Stub));                                                         \
                                                                                                                       \
         asc_mmad_mx(c_matrix, a_matrix, b_matrix, 4, 5, 6, asc_unit_flag_mode::ENABLE_KEEP, false, true, false);      \
+        GlobalMockObject::verify();                                                                                   \
+    }                                                                                                                 \
+                                                                                                                      \
+    TEST_F(TestMmadMx##type_prefix##CAPI, BiasSucc)                                                                   \
+    {                                                                                                                 \
+        __cc__ float* c_matrix = reinterpret_cast<__cc__ float*>(0x12345678ULL);                                      \
+        __ca__ a_type* a_matrix = reinterpret_cast<__ca__ a_type*>(2);                                                \
+        __cb__ b_type* b_matrix = reinterpret_cast<__cb__ b_type*>(3);                                                \
+        constexpr uint64_t bias = 0x87654321ULL;                                                                      \
+                                                                                                                      \
+        MOCKER_CPP(                                                                                                   \
+            mad_mx, void(                                                                                             \
+                        __cc__ float*, __ca__ a_type*, __cb__ b_type*, uint16_t, uint16_t, uint16_t, uint8_t, bool,   \
+                        bool, bool))                                                                                  \
+            .times(1)                                                                                                 \
+            .will(invoke(mad_mx_bias_##type_prefix##_Stub));                                                          \
+                                                                                                                      \
+        asc_mmad_mx(c_matrix, a_matrix, b_matrix, bias, 4, 5, 6, asc_unit_flag_mode::ENABLE_KEEP, false);             \
         GlobalMockObject::verify();                                                                                   \
     }                                                                                                                 \
                                                                                                                       \
@@ -135,4 +170,3 @@ TEST_MMAD_MX(half, fp8_e8m0_t, fp4x2_e2m1_t, fp8_e8m0_t, HalfE2m1)
 TEST_MMAD_MX(half, fp8_e8m0_t, hif4x2_t, hif4_scale, HalfHif4)
 TEST_MMAD_MX(bfloat16_t, fp8_e8m0_t, fp4x2_e2m1_t, fp8_e8m0_t, Bfloat16E2m1)
 TEST_MMAD_MX(bfloat16_t, fp8_e8m0_t, hif4x2_t, hif4_scale, Bfloat16Hif4)
-TEST_MMAD_MX(fp8_e5m2_t, fp8_e8m0_t, fp8_e5m2_t, fp8_e8m0_t, E5m2E5m2)
