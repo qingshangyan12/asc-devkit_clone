@@ -1,0 +1,120 @@
+# C API
+
+CANN 9.2.0在CANN 9.1.0的基础上继续增强C API。本版本新增矩阵与数据搬运配置、Reg计算与搬运、缓存和特殊寄存器控制等能力，为大量Reg接口补充函数返回值形式的重载，并统一公共头文件、接口命名和参数类型。同时，部分旧命名、隐式位置重载和同步复合接口进入废弃期。
+
+## 新增特性
+
+### 系统、缓存与控制
+
+- [asc_disable_dma_atomic](../../SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md)：在完成数据搬运原子操作后关闭原子操作，避免已开启的原子操作影响后续搬运。
+- [asc_get_pipe_mte2_idle_slot_count](../../SIMD-API/c_api/experimental/asc_get_pipe_idle_slot_count.md)、[asc_get_pipe_mte3_idle_slot_count](../../SIMD-API/c_api/experimental/asc_get_pipe_idle_slot_count.md)、[asc_get_pipe_v_idle_slot_count](../../SIMD-API/c_api/experimental/asc_get_pipe_idle_slot_count.md)、[asc_get_pipe_m_idle_slot_count](../../SIMD-API/c_api/experimental/asc_get_pipe_idle_slot_count.md)、[asc_get_pipe_mte1_idle_slot_count](../../SIMD-API/c_api/experimental/asc_get_pipe_idle_slot_count.md)和[asc_get_pipe_fix_idle_slot_count](../../SIMD-API/c_api/experimental/asc_get_pipe_idle_slot_count.md)：分别查询PIPE_MTE2、PIPE_MTE3、PIPE_V、PIPE_M、PIPE_MTE1和PIPE_FIX发射队列当前的空闲槽位数量，用于观察队列还能接收的待发射指令数量。该组接口仅支持Ascend 950PR/Ascend 950DT，属于试验特性，使用时需包含`c_api/experimental/asc_get_pipe_idle_slot_count.h`并定义`CANN_ASC_USE_EXPERIMENTAL`。
+- [asc_set_scalar_cache_mode](../../SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md)、[asc_get_scalar_load_cache_mode](../../SIMD-API/c_api/cache_ctrl/asc_get_scalar_load_cache_mode.md)、[asc_get_scalar_store_cache_mode](../../SIMD-API/c_api/cache_ctrl/asc_get_scalar_store_cache_mode.md)：支持分别设置标量读、写Global Memory时的L2 Cache管理策略，以及回读当前的标量读、写策略。设置后的策略持续生效，直至再次调用设置接口修改。
+- [asc_set_saturation_flag](../../SIMD-API/c_api/spr/asc_set_saturation_flag.md)和[asc_get_saturation_flag](../../SIMD-API/c_api/spr/asc_get_saturation_flag.md)：支持通过[asc_saturation_mode](../../SIMD-API/c_api/defs/enum/asc_saturation_mode.md)设置或查询浮点、FP8、整数和类型转换场景的饱和开关；[asc_set_saturation_strategy](../../SIMD-API/c_api/spr/asc_set_saturation_strategy.md)和[asc_get_saturation_strategy](../../SIMD-API/c_api/spr/asc_get_saturation_strategy.md)支持通过[asc_override_strategy](../../SIMD-API/c_api/defs/enum/asc_override_strategy.md)在单指令/API路径配置与全局饱和配置之间切换和查询。其中，类型转换场景的全局饱和开关仅在使用全局饱和配置时生效。
+- [asc_get_system_clock](../../SIMD-API/c_api/utils/sys_var/asc_get_system_clock.md)：读取当前系统cycle计数器，按芯片时钟频率换算后直接返回`int64_t`类型的微秒级时间值，在AIC和AIV上的返回值含义一致。CANN 9.1.0中已有的[asc_get_system_cycle](../../SIMD-API/c_api/utils/sys_var/asc_get_system_cycle.md)仍用于读取原始cycle计数值。
+- [asc_nop](../../SIMD-API/c_api/utils/sys_misc/asc_nop.md)：生成一条空操作指令，不执行实际计算。每调用一次阻塞一拍流水。
+
+### 矩阵计算与数据搬运
+
+- [asc_disable_hf32](../../SIMD-API/c_api/cube_compute/asc_disable_hf32.md)：关闭Mmad计算的HF32模式，使L0A Buffer和L0B Buffer中的`float`数据在参与计算前不做舍入处理；[asc_disable_hif8](../../SIMD-API/c_api/cube_compute/asc_disable_hif8.md)：关闭HiF8模式，使左右矩阵均为`fp8_e4m3fn_t`时不再转换为`hifloat8_t`，而是直接参与矩阵乘法。两个接口均为仅在AIC上生效的矩阵计算配置接口。
+- [asc_set_hf32_round_mode](../../SIMD-API/c_api/cube_compute/asc_set_hf32_round_mode.md)：使用[asc_hf32_round_mode](../../SIMD-API/c_api/defs/enum/asc_hf32_round_mode.md)枚举配置HF32舍入方式，调用前需先开启HF32模式。
+- [asc_set_gm2l1_padding](../../SIMD-API/c_api/cube_datamove/asc_set_gm2l1_padding.md)：配置GM到L1 Buffer高维切分搬运的Padding值；[asc_set_l12l0a_3d_padding](../../SIMD-API/c_api/cube_datamove/asc_set_l12l0a_3d_padding.md)和[asc_set_l12l0b_3d_padding](../../SIMD-API/c_api/cube_datamove/asc_set_l12l0b_3d_padding.md)：分别配置左、右矩阵3D im2col搬运的填充值；[asc_set_l13d_rpt_b](../../SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt_b.md)：配置3D im2col模式下右矩阵使用repeat搬运所需的参数。该组接口均仅在AIC上生效。
+- [asc_set_l0c_copy_config](../../SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_config.md)：配置L0C Buffer搬出时随路Tensor量化、Tensor激活参数在Fixpipe Buffer中的起始索引，并支持初始化UnitFlag全局状态；[asc_set_l0c_copy_channel_para](../../SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_channel_para.md)：配置Nz2DN格式转换时源Nz矩阵相邻行的地址偏移；[asc_set_l0c_copy_nz_para](../../SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_nz_para.md)：配置随路Nz转ND/DN所需参数；[asc_set_l0c_copy_relu_alpha](../../SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_relu_alpha.md)和[asc_set_l0c_copy_lrelu_alpha](../../SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_lrelu_alpha.md)：配置随路Scalar激活的缩放系数。该组配置由后续L0C Buffer搬出接口使用，且仅在AIC上生效。
+- [asc_load_dev](../../SIMD-API/c_api/scalar_compute/scalar_load/asc_load_dev.md)：不经过Data Cache直接从Global Memory读取整型标量数据，适用于多核访问无法按Cache Line对齐的GM地址、需要避免Cache Line粒度数据覆盖的场景。
+
+### Memory矢量计算
+
+- [asc_transto5hd](../../SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md)：将[asc_transto5hd_b8](../../SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md)、[asc_transto5hd_b16](../../SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md)和[asc_transto5hd_b32](../../SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md)正式加入公共头文件，用于NCHW到NC1HWC0格式转换或二维矩阵数据块转置。单次Repeat处理512 Byte（16个DataBlock），并支持多次Repeat操作。
+
+### Reg计算与Reg数据搬运
+
+- [asc_duplicate_highest](../../SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_highest.md)和[asc_duplicate_highest_merge](../../SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_highest_merge.md)：将源操作数中下标最大的元素广播到被掩码选中的目的位置，未选中位置分别置0或保留原值；[asc_duplicate_merge](../../SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_merge.md)和[asc_duplicate_scalar_merge](../../SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_scalar_merge.md)：分别将源操作数中下标最小的元素或给定标量广播到被掩码选中的目的位置，并保留未选中位置的原值。
+- [asc_mask](../../SIMD-API/c_api/reg_compute/reg_copy/asc_mask.md)：支持通过函数返回值完成矢量数据寄存器或掩码寄存器的掩码复制；[asc_extract_mask](../../SIMD-API/c_api/reg_compute/reg_copy/asc_extract_mask.md)：从`uint16_t`或`uint32_t`矢量数据寄存器的指定数据块中提取并扩展bit，生成掩码寄存器返回值。
+- [asc_pack_to_low](../../SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_low.md)和[asc_pack_to_high](../../SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_high.md)：选取源操作数的偶数bit（`vector_bool`）、低8位（b16）或低16位（b32），并分别写入目的操作数的低半部分或高半部分。
+- [asc_unsqueeze](../../SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unsqueeze.md)新增[asc_unsqueeze_s8](../../SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unsqueeze.md)、[asc_unsqueeze_u8](../../SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unsqueeze.md)、[asc_unsqueeze_s16](../../SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unsqueeze.md)、[asc_unsqueeze_u16](../../SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unsqueeze.md)、[asc_unsqueeze_s32](../../SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unsqueeze.md)和[asc_unsqueeze_u32](../../SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unsqueeze.md)，支持通过函数返回值获取掩码前缀计数结果：首元素为0，第`i`个元素为掩码第0至第`i-1`个元素中1的数量，掩码最高位不参与统计。
+- [asc_fma](../../SIMD-API/c_api/reg_compute/reg_fused/asc_fma.md)、[asc_mula](../../SIMD-API/c_api/reg_compute/reg_fused/asc_mula.md)和[asc_mul_scalar_float2half_rn](../../SIMD-API/c_api/reg_compute/reg_fused/asc_mul_scalar_float2half_rn.md)：分别支持三源融合乘加、目的操作数作为累加器参与乘加，以及`float`矢量与标量相乘后按RINT模式转换为`half`并写入指定奇偶位置。其中，`asc_fma`在CANN 9.1.0中仅有Memory矢量计算接口，本版本新增的是Reg接口。
+- [asc_exp_sub](../../SIMD-API/c_api/reg_compute/reg_fused/asc_exp_sub.md)新增[asc_exp_sub_half2float](../../SIMD-API/c_api/reg_compute/reg_fused/asc_exp_sub.md)接口，支持显式选择`half`源操作数的奇数或偶数索引元素，转换为`float`后逐元素计算以两源差值为指数的自然指数函数；[asc_log](../../SIMD-API/c_api/reg_compute/reg_arith/asc_log.md)新增Reg逐元素自然对数计算接口。
+- [asc_squeeze_and_storeunalign_init](../../SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md)清零AR特殊寄存器；[asc_squeeze_and_storeunalign](../../SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)按掩码筛选矢量寄存器元素，将结果连续搬出到非32字节对齐的UB地址，并在AR寄存器中累计有效数据总字节数；[asc_squeeze_and_storeunalign_finalize](../../SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md)将不足32 Byte、暂存在非对齐寄存器中的尾块写入UB。
+- [asc_get_squeeze_status](../../SIMD-API/c_api/spr/asc_get_squeeze_status.md)：读取squeeze操作保存在AR特殊寄存器中的有效数据长度；[asc_storealign_squeeze_status](../../SIMD-API/c_api/reg_compute/store/asc_storealign_squeeze_status.md)和[asc_storealign_squeeze_status_postupdate](../../SIMD-API/c_api/reg_compute/store/asc_storealign_squeeze_status_postupdate.md)：将该长度搬出到UB，后者还会在写入后按字节偏移自动更新目的地址。
+- Reg对齐搬入新增语义明确的模式接口：[asc_loadalign_brc_datablock](../../SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock.md)广播一个32 Byte DataBlock，[asc_loadalign_brc_elem](../../SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem.md)广播一个元素，[asc_loadalign_brc_elem2datablock](../../SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem2datablock.md)连续读取8个元素并将每个元素广播为一个DataBlock，[asc_loadalign_unpack4](../../SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack4.md)读取VL/4长度数据并在每个元素后补3个0；对应的[asc_loadalign_brc_datablock_postupdate](../../SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md)、[asc_loadalign_brc_elem_postupdate](../../SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem_postupdate.md)、[asc_loadalign_brc_elem2datablock_postupdate](../../SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem2datablock_postupdate.md)和[asc_loadalign_unpack4_postupdate](../../SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack4_postupdate.md)在搬入后自动更新源地址。新增[asc_loadalign_datablock_strided](../../SIMD-API/c_api/reg_compute/load/asc_loadalign_datablock_strided.md)、[asc_loadalign_mask](../../SIMD-API/c_api/reg_compute/load/asc_loadalign_mask.md)、[asc_loadalign_mask_downsample](../../SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_downsample.md)和[asc_loadalign_mask_upsample](../../SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_upsample.md)返回值接口，分别支持跨步搬入8个DataBlock，以及直接返回原始、偶数bit下采样和bit二倍重复上采样的掩码寄存器。
+- [asc_storealign_pack_quarter](../../SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter.md)和[asc_storealign_pack_quarter_postupdate](../../SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter_postupdate.md)：按掩码将32位Reg有效元素的低8位压缩搬出到UB，后者在搬出后按偏移自动更新目的地址。
+- [asc_update_addr_reg](../../SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md)接口族新增[asc_update_addr_reg_b8](../../SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md)、[asc_update_addr_reg_b16](../../SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md)和[asc_update_addr_reg_b32](../../SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md)，分别按1 Byte、2 Byte和4 Byte为单位计算1至4维循环的地址偏移，使用[addr_reg](../../SIMD-API/c_api/defs/type/data_type_definition.md#地址寄存器)保存偏移并配合Reg搬入、搬出接口完成迭代寻址，替代原[iter_reg](../../SIMD-API/c_api/deprecated_interface/asc_create_iter_reg_deprecated.md)接口族。
+
+## 增强
+
+### Reg计算
+
+- 为Reg算术、比较、逻辑、融合、规约、广播、索引生成、类型转换、数据搬入和排布变换接口补充函数返回值形式的重载。涉及[asc_add](../../SIMD-API/c_api/reg_compute/reg_arith/asc_add.md)、[asc_sub](../../SIMD-API/c_api/reg_compute/reg_arith/asc_sub.md)、[asc_mul](../../SIMD-API/c_api/reg_compute/reg_arith/asc_mul.md)、[asc_div](../../SIMD-API/c_api/reg_compute/reg_arith/asc_div.md)、[asc_max](../../SIMD-API/c_api/reg_compute/reg_arith/asc_max.md)、[asc_min](../../SIMD-API/c_api/reg_compute/reg_arith/asc_min.md)、[asc_abs](../../SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md)、[asc_neg](../../SIMD-API/c_api/reg_compute/reg_arith/asc_neg.md)、[asc_sqrt](../../SIMD-API/c_api/reg_compute/reg_arith/asc_sqrt.md)、[asc_exp](../../SIMD-API/c_api/reg_compute/reg_arith/asc_exp.md)、比较与标量比较接口、[asc_and](../../SIMD-API/c_api/reg_compute/reg_logic/asc_and.md)、[asc_or](../../SIMD-API/c_api/reg_compute/reg_logic/asc_or.md)、[asc_not](../../SIMD-API/c_api/reg_compute/reg_logic/asc_not.md)、[asc_xor](../../SIMD-API/c_api/reg_compute/reg_logic/asc_xor.md)、移位接口、[asc_abs_sub](../../SIMD-API/c_api/reg_compute/reg_fused/asc_abs_sub.md)、[asc_relu](../../SIMD-API/c_api/reg_compute/reg_fused/asc_relu.md)、规约接口、[asc_duplicate](../../SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate.md)、[asc_duplicate_scalar](../../SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_scalar.md)、[asc_arange](../../SIMD-API/c_api/reg_compute/reg_index/asc_arange.md)、[asc_arange_descend](../../SIMD-API/c_api/reg_compute/reg_index/asc_arange.md)、[asc_load](../../SIMD-API/c_api/reg_compute/load/asc_load.md)、[asc_loadalign](../../SIMD-API/c_api/reg_compute/load/asc_loadalign.md)、[asc_gather_datablock](../../SIMD-API/c_api/reg_compute/ub_gather/asc_gather_datablock.md)、[asc_half2int16](../../SIMD-API/c_api/reg_compute/reg_convert/asc_half2int16.md)及其他Reg类型转换接口。
+- `asc_div`新增`int16_t`、`uint16_t`、`int32_t`和`uint32_t`重载；UB源[asc_gather](../../SIMD-API/c_api/reg_compute/ub_gather/asc_gather.md)新增`vector_float`相关重载，并与寄存器源[asc_gather](../../SIMD-API/c_api/reg_compute/reg_gather/asc_gather.md)拆分资料及头文件归属。UB源收集接口使用`c_api/reg_compute/gather/ub_gather.h`，寄存器源收集接口使用`c_api/reg_compute/compute/reg_gather.h`。
+- [asc_min_scalar](../../SIMD-API/c_api/reg_compute/reg_arith/asc_min_scalar.md)和[asc_ne](../../SIMD-API/c_api/reg_compute/reg_compare/asc_ne.md)新增`bfloat16_t`重载。
+- `asc_duplicate`、`asc_duplicate_scalar`补充函数返回值形式。
+- 类型转换接口补充显式源/目的位置参数和函数返回值形式，统一由[asc_position_mode](../../SIMD-API/c_api/defs/enum/asc_position_mode.md)或[asc_position_quarter_mode](../../SIMD-API/c_api/defs/enum/asc_position_quarter_mode.md)表达位置，不再依赖`_v2`、`_v3`、`_v4`后缀推断位置。
+
+### 矩阵计算与数据搬运
+
+- [asc_mmad](../../SIMD-API/c_api/cube_compute/asc_mmad.md)和[asc_mmad_mx](../../SIMD-API/c_api/cube_compute/asc_mmad_mx.md)新增显式传入Bias起始地址的重载，支持使用BiasTable Buffer中的Bias矩阵初始化结果矩阵。
+- [asc_copy_gm2l1](../../SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1.md)、[asc_copy_gm2l1_align](../../SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_align.md)、[asc_copy_gm2l1_nd2nz](../../SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz.md)、[asc_copy_gm2l1_dn2nz](../../SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_dn2nz.md)以及L0C Buffer搬出接口补充参数化重载，支持使用枚举配置L2 Cache、量化、激活、格式转换和UnitFlag等搬运行为。
+- [asc_copy_l0c2l1](../../SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1.md)补充Ascend 950PR/Ascend 950DT的矩阵搬出重载及随路配置能力。该接口名在CANN 9.1.0中已经存在，本版本增强的是3510架构的原型和实现。
+- 矩阵与矢量搬运配置新增[asc_load_l2_cache_mode](../../SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md)、[asc_store_l2_cache_mode](../../SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md)、[asc_channel_pad_mode](../../SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md)、[asc_l13d_repeat_direction](../../SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md)、[asc_unit_flag_mode](../../SIMD-API/c_api/defs/enum/asc_unit_flag_mode.md)、[asc_quant_mode](../../SIMD-API/c_api/defs/enum/asc_quant_mode.md)、[asc_relu_pre_mode](../../SIMD-API/c_api/defs/enum/asc_relu_pre_mode.md)和[asc_dual_dst_mode](../../SIMD-API/c_api/defs/enum/asc_dual_dst_mode.md)等强类型枚举或别名，减少使用无类型整数配置硬件行为的歧义。
+- `asc_hf32_round_mode`统一为`NEAREST_AWAY`和`NEAREST_EVEN`。旧枚举值`NEAREST_ZERO`作为兼容别名保留，其实际行为等同于`NEAREST_AWAY`。
+
+### 系统与同步
+
+- [asc_get_arch_ver](../../SIMD-API/c_api/utils/sys_var/asc_get_arch_ver.md)改为返回Ascend C对外使用的架构版本号，2201架构返回`2201`，3510架构返回`3510`，不再直接暴露芯片寄存器中的内部版本字段。
+- [asc_sync_pipe](../../SIMD-API/c_api/sync/asc_sync_pipe.md)补齐2201架构Vector Core的`PIPE_V`单流水同步，并修正3510架构[asc_sync_vec](../../SIMD-API/c_api/sync/asc_sync_vec.md)带`id`重载中的冗余Vector流水屏障。
+- [asc_lock](../../SIMD-API/c_api/sync/asc_lock.md)和[asc_unlock](../../SIMD-API/c_api/sync/asc_unlock.md)新增使用[asc_mutex_execute_mode](../../SIMD-API/c_api/defs/enum/asc_mutex_execute_mode.md)的重载，以强类型参数选择阻塞或非阻塞模式；原`ascMutexExecuteMode`类型名作为兼容别名保留。
+
+### 公共头文件
+
+- 公共头文件按`defs`、`utils`、`cube_compute`、`cube_datamove`、`vector_compute`、`vector_datamove`、`reg_compute`、`scalar_compute`、`atomic`、`cache_ctrl`、`sync`和`spr`等模块拆分，API资料同步使用最细粒度公共头文件路径。
+- `c_api/asc_simd.h`仍作为全局聚合入口；新增`c_api/asc_cube.h`、`c_api/asc_memory_vector.h`和`c_api/asc_reg_vector.h`作为分域聚合入口。已有代码可以继续包含全局聚合头，新代码可按使用范围选择更细粒度的头文件。
+- 旧兼容头`c_api/misc/misc.h`、`c_api/utils_intf.h`、`c_api/utils/union.h`、`c_api/sys_var/sys_var.h`、`c_api/reg_compute/reg_vector.h`、`c_api/reg_compute/reg_load.h`和`c_api/reg_compute/reg_store.h`仍保留，但会给出废弃提示；建议迁移到对应的`c_api/utils/*`、`c_api/defs/*`、`c_api/reg_compute/reg_compute.h`或Reg搬入、搬出、聚合、离散操作的最细粒度公共头文件。
+
+## Bug修复
+
+- 修复3510架构下[asc_copy_gm2ub_align](../../SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)、[asc_copy_ub2gm_align](../../SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)等对齐搬运接口的`n_burst`参数位宽不足问题，将相关重载的`n_burst`扩展为`uint32_t`。
+- 修复3510架构下[asc_store](../../SIMD-API/c_api/reg_compute/store/asc_store.md)非对齐搬出时未执行地址Post Update后处理而导致搬运结果错误的问题。
+- 修复Post Update搬运接口的地址或地址寄存器按值传递问题：[asc_loadunalign_postupdate](../../SIMD-API/c_api/reg_compute/load/asc_loadunalign_postupdate.md)的UB源地址、`addr_reg`偏移，以及[asc_storealign_postupdate](../../SIMD-API/c_api/reg_compute/store/asc_storealign_postupdate.md)、[asc_storealign_1st_postupdate](../../SIMD-API/c_api/reg_compute/store/asc_storealign_1st_postupdate.md)、[asc_storealign_pack_postupdate](../../SIMD-API/c_api/reg_compute/store/asc_storealign_pack_postupdate.md)的UB目的地址改为引用传递，确保接口执行后的更新结果可回写调用方。
+- 修复[asc_loadalign_postupdate](../../SIMD-API/c_api/reg_compute/load/asc_loadalign_postupdate.md)的`vector_bool`重载缺少`offset`参数的问题，使公开声明与实现保持一致。
+- 修复`asc_squeeze_and_storeunalign`的目的矢量数据寄存器`dst`按值传递问题，改为引用传递，确保压缩结果可回写调用方。
+- 修复2201架构下[asc_sync_subblock_wait](../../SIMD-API/c_api/sync/asc_sync_subblock_wait.md)宏向底层接口多传`pipe`参数的问题。
+- 修复2201架构下部分[asc_sub_relu_sync](../../SIMD-API/c_api/deprecated_interface/asc_sub_relu_sync_deprecated.md)重载错误调用非同步实现的问题。
+- 修复2201架构下[asc_rsqrt](../../SIMD-API/c_api/vector_compute/vector_arith/asc_rsqrt.md)同步重载误调用非同步实现的问题。
+- 修复[asc_init](../../SIMD-API/c_api/utils/sys_init/asc_init.md)在3510架构下未完整复位`CTRL`、Mask、搬运循环、Padding及数据搬运原子操作类型等状态的问题，避免前序算子遗留状态影响当前算子。
+- 修复[asc_l13d_fmatrix_config](../../SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md)中`l1_width`和`l1_height`字段顺序错误导致配置值与预期不一致的问题。
+- 修复[asc_copy_gm2l1](../../SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1.md)和[asc_copy_l0c2l1](../../SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1.md)部分3510实现调用底层CCE指令时缺少参数的问题。
+- 修复[asc_mrgsort4](../../SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md)的源操作数声明与四路归并语义不一致的问题，`src`调整为包含4个UB地址的指针数组。
+- 将标量搬出实现中的`ASC_C_API_DEFAULIT_OFFSET`拼写修正为`ASC_C_API_DEFAULT_OFFSET`。
+
+## 接口废弃
+
+本版本新增以下废弃标记。完整函数原型、产品支持情况和替代链接请参见[废弃接口](../deprecated_interface.md)。
+
+| 废弃接口或重载 | 替代接口或迁移方式 | 迁移说明 |
+| --- | --- | --- |
+| [asc_set_atomic_none](../../SIMD-API/c_api/deprecated_interface/asc_set_atomic_none_deprecated.md) | `asc_disable_dma_atomic` | 使用语义明确的原子操作关闭接口。 |
+| [asc_set_atomic_add_int](../../SIMD-API/c_api/deprecated_interface/asc_set_atomic_add_int_deprecated.md)、[asc_set_atomic_max_int](../../SIMD-API/c_api/deprecated_interface/asc_set_atomic_max_int_deprecated.md)、[asc_set_atomic_min_int](../../SIMD-API/c_api/deprecated_interface/asc_set_atomic_min_int_deprecated.md) | [asc_set_atomic_add_int32](../../SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md)、[asc_set_atomic_max_int32](../../SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md)、[asc_set_atomic_min_int32](../../SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md) | 使用带明确数据类型后缀的接口。 |
+| [asc_get_block_num](../../SIMD-API/c_api/deprecated_interface/asc_get_block_num_deprecated.md)、[asc_get_block_idx](../../SIMD-API/c_api/deprecated_interface/asc_get_block_idx_deprecated.md) | 内置变量`block_num`、`block_idx`；混合核Vector Core索引配合[asc_get_sub_block_num](../../SIMD-API/c_api/utils/sys_var/asc_get_sub_block_num.md)和[asc_get_sub_block_id](../../SIMD-API/c_api/utils/sys_var/asc_get_sub_block_id.md)计算 | 系统内置变量替代函数式查询。 |
+| [asc_get_ar_spr](../../SIMD-API/c_api/deprecated_interface/asc_get_ar_spr_deprecated.md)、[asc_clear_ar_spr](../../SIMD-API/c_api/deprecated_interface/asc_clear_ar_spr_deprecated.md) | `asc_get_squeeze_status`、`asc_squeeze_and_storeunalign_init` | 使用语义明确的squeeze状态读写接口。 |
+| `iter_reg`、[asc_create_iter_reg_b8](../../SIMD-API/c_api/deprecated_interface/asc_create_iter_reg_deprecated.md)、[asc_create_iter_reg_b16](../../SIMD-API/c_api/deprecated_interface/asc_create_iter_reg_deprecated.md)、[asc_create_iter_reg_b32](../../SIMD-API/c_api/deprecated_interface/asc_create_iter_reg_deprecated.md) | `addr_reg`、`asc_update_addr_reg_b8`、`asc_update_addr_reg_b16`、`asc_update_addr_reg_b32` | 地址寄存器类型和初始化接口统一更名。 |
+| [asc_loadalign_brc_v2](../../SIMD-API/c_api/deprecated_interface/asc_loadalign_v1_deprecated.md)、[asc_loadalign_brc_v3](../../SIMD-API/c_api/deprecated_interface/asc_loadalign_v1_deprecated.md)、[asc_loadalign_unpack_v2](../../SIMD-API/c_api/deprecated_interface/asc_loadalign_v1_deprecated.md)及其Post Update重载 | `asc_loadalign_brc_datablock`、`asc_loadalign_brc_elem2datablock`、`asc_loadalign_unpack4`及对应Post Update接口 | 接口名直接表达搬入模式，避免通过版本后缀区分语义。 |
+| [asc_storealign_pack_v2](../../SIMD-API/c_api/deprecated_interface/asc_storealign_v1_deprecated.md)、[asc_storealign_pack_postupdate_v2](../../SIMD-API/c_api/deprecated_interface/asc_storealign_v4_deprecated.md) | `asc_storealign_pack_quarter`、`asc_storealign_pack_quarter_postupdate` | 使用接口名明确表达四分之一宽度的pack模式。 |
+| [asc_storeunalign_post](../../SIMD-API/c_api/deprecated_interface/asc_storeunalign_post_deprecated.md)及部分[asc_storeunalign_postupdate](../../SIMD-API/c_api/deprecated_interface/asc_storeunalign_postupdate_deprecated.md)旧重载 | `asc_squeeze_and_storeunalign`、`asc_squeeze_and_storeunalign_finalize`，或当前同名B16/B32重载 | 统一有效元素筛选与非对齐连续搬出流程；B8目的地址且源为`vector_bool`的重载不再推荐。 |
+| [asc_pack](../../SIMD-API/c_api/deprecated_interface/asc_pack_deprecated.md)、[asc_pack_v2](../../SIMD-API/c_api/deprecated_interface/asc_pack_deprecated.md) | `asc_pack_to_low`、`asc_pack_to_high` | 使用接口名显式表达写入目的操作数的低半部分或高半部分。 |
+| [asc_squeeze_with_status](../../SIMD-API/c_api/deprecated_interface/asc_squeeze_with_status_deprecated.md)、[asc_squeeze_v2](../../SIMD-API/c_api/deprecated_interface/asc_squeeze_deprecated.md) | `asc_squeeze_and_storeunalign`接口族，或当前[asc_squeeze](../../SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze.md)重载 | `asc_squeeze_with_status`为本版本新增的兼容接口并同时标记废弃；`asc_squeeze_v2`为从CANN 9.1.0延续的旧接口。按是否需要连续搬出选择替代接口。 |
+| [asc_muls](../../SIMD-API/c_api/deprecated_interface/asc_muls_deprecated.md)、[asc_muls_v2](../../SIMD-API/c_api/deprecated_interface/asc_muls_deprecated.md) | `asc_mul_scalar_float2half_rn` | 使用语义明确并支持显式位置参数的融合接口。 |
+| `asc_exp_sub`、[asc_exp_sub_v2](../../SIMD-API/c_api/deprecated_interface/asc_exp_sub_deprecated.md)的`half`转`float`重载 | `asc_exp_sub_half2float` | 使用函数名明确表达输入、输出数据类型。 |
+| `asc_and`、`asc_or`的浮点类型重载 | 按相同位宽选择整数类型重载 | 位逻辑运算不再接受浮点矢量类型。 |
+| Reg类型转换中通过接口后缀或隐式规则控制源/目的位置的重载 | 显式传入`asc_position_mode`或`asc_position_quarter_mode`的当前同名重载 | 涉及`float`、`half`、`bfloat16_t`、整数、FP8、HiF8和FP4等类型转换接口；`_v2`、`_v3`、`_v4`位置后缀进入废弃期。 |
+| `asc_mmad`、[asc_mmad_s4](../../SIMD-API/c_api/deprecated_interface/asc_mmad_deprecated.md)、[asc_mmad_sparse](../../SIMD-API/c_api/deprecated_interface/asc_mmad_sparse_deprecated.md)、`asc_mmad_mx`中`unit_flag`为`uint8_t`、带`feat_offset`参数的旧原型 | `unit_flag_mode`为`asc_unit_flag_mode`的当前同名接口 | 使用强类型枚举配置UnitFlag；不再传入无效的兼容参数。 |
+| [asc_transto5hd_b8_sync](../../SIMD-API/c_api/deprecated_interface/asc_transto5hd_sync_deprecated.md)、[asc_transto5hd_b16_sync](../../SIMD-API/c_api/deprecated_interface/asc_transto5hd_sync_deprecated.md)、[asc_transto5hd_b32_sync](../../SIMD-API/c_api/deprecated_interface/asc_transto5hd_sync_deprecated.md) | 对应的`asc_transto5hd_b8`、`asc_transto5hd_b16`、`asc_transto5hd_b32`接口分别配合[asc_sync](../../SIMD-API/c_api/sync/asc_sync.md) | 将格式转换与同步操作拆分调用。 |
+| 矩阵计算、矩阵搬运、矢量数据搬运和Memory矢量计算的`*_sync`复合接口 | 对应非同步接口配合`asc_sync()` | 包括[asc_mmad*_sync](../../SIMD-API/c_api/deprecated_interface/asc_mmad_deprecated.md)、[asc_copy_*_sync](../deprecated_interface.md)、[asc_fill_*_sync](../deprecated_interface.md)和Memory矢量计算`*_sync`接口族。 |
+| `asc_sync_vec`旧原型 | `asc_sync` | 使用统一的同步接口。 |
+| `asc_copy_gm2ub_align`、`asc_copy_ub2gm_align`、[asc_ndim_copy_gm2ub](../../SIMD-API/c_api/deprecated_interface/asc_ndim_copy_gm2ub_deprecated.md)中以整数参数表达L2 Cache策略的旧重载 | 使用`asc_load_l2_cache_mode`或`asc_store_l2_cache_mode`枚举的当前同名重载 | 使用强类型枚举配置L2 Cache管理策略。 |
+
+## 文件废弃
+
+本版本废弃以下兼容头文件。
+
+| 废弃文件 | 替代文件或迁移方式 | 迁移说明 |
+| --- | --- | --- |
+| `c_api/misc/misc.h`、`c_api/utils_intf.h`、`c_api/utils/union.h`、`c_api/sys_var/sys_var.h`、`c_api/reg_compute/reg_vector.h`、`c_api/reg_compute/reg_load.h`、`c_api/reg_compute/reg_store.h` | 对应的`c_api/utils/*`、`c_api/defs/*`、`c_api/reg_compute/reg_compute.h`或Reg搬入、搬出、聚合、离散操作的最细粒度公共头文件 | 旧头文件仅作为兼容入口保留，新代码应使用新的模块化公共头文件。 |
