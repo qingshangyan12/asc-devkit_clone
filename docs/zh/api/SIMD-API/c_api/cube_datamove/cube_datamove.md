@@ -6,9 +6,9 @@
 - **[asc_copy_gm2l1_dn2nz](asc_copy_gm2l1_dn2nz.md)**
 - **[asc_copy_l0c2ub](asc_copy_l0c2ub.md)**
 - **[asc_copy_l12gm](asc_copy_l12gm.md)**
-- **[asc_copy_l12l0a_mx](asc_copy_l12l0a_mx.md)**
+- **[asc_copy_l12l0a_mx](asc_copy_l12l0a_mx/asc_copy_l12l0a_mx.md)**
 - **[asc_copy_l12l0a_trans](asc_copy_l12l0a_trans.md)**
-- **[asc_copy_l12l0b_mx](asc_copy_l12l0b_mx.md)**
+- **[asc_copy_l12l0b_mx](asc_copy_l12l0b_mx/asc_copy_l12l0b_mx.md)**
 - **[asc_copy_l12l0b_sparse](asc_copy_l12l0b_sparse.md)**
 - **[asc_copy_l12l0c](asc_copy_l12l0c.md)**
 - **[asc_copy_l12ub](asc_copy_l12ub.md)**
