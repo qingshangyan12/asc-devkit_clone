@@ -65,9 +65,12 @@ SIMT编程场景由于无法设置CTRL寄存器，本接口的饱和模式不生
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__int2half_rna_sat(__gm__ half* dst, __gm__ int32_t* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__int2half_rna_sat(__gm__ half* dst, __gm__ int32_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __int2half_rna_sat(x[idx]);
     }
     ```

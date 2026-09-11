@@ -65,9 +65,12 @@ int32_t lanemask_lt()
     #include "simt_api/device_functions.h"
     #include "simt_api/device_warp_functions.h"
 
-    __global__ __launch_bounds__(1024) void kernel_lanemask_lt(int32_t* src, int32_t* dst, int32_t srcLane)
+    __global__ __launch_bounds__(1024) void kernel_lanemask_lt(int32_t* src, int32_t* dst, int32_t srcLane, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         int32_t lanes_before = __popc(static_cast<uint32_t>(lanemask_lt()));
         int32_t group_leader_lane = (lanes_before < 16) ? srcLane : (srcLane + 16);
         int32_t value = src[idx];
@@ -82,9 +85,12 @@ int32_t lanemask_lt()
     #include "simt_api/device_functions.h"
     #include "simt_api/device_warp_functions.h"
 
-    __simt_vf__ __launch_bounds__(1024) void kernel_lanemask_lt(__gm__ int32_t* src, __gm__ int32_t* dst, int32_t srcLane)
+    __simt_vf__ __launch_bounds__(1024) void kernel_lanemask_lt(__gm__ int32_t* src, __gm__ int32_t* dst, int32_t srcLane, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         int32_t lanes_before = __popc(static_cast<uint32_t>(lanemask_lt()));
         int32_t group_leader_lane = (lanes_before < 16) ? srcLane : (srcLane + 16);
         int32_t value = src[idx];

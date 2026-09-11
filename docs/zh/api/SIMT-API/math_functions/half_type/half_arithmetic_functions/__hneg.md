@@ -64,9 +64,12 @@ half __hneg(const half x)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __global__ __launch_bounds__(1024) void KernelHneg(half* dst, half* x)
+    __global__ __launch_bounds__(1024) void KernelHneg(half* dst, half* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __hneg(x[idx]);
     }
     ```
@@ -76,9 +79,12 @@ half __hneg(const half x)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void KernelHneg(__gm__ half* dst, __gm__ half* x)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelHneg(__gm__ half* dst, __gm__ half* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __hneg(x[idx]);
     }
     ```

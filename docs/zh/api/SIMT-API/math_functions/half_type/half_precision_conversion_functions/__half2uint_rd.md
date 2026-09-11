@@ -93,4 +93,9 @@ inline unsigned int __half2uint_rd(const half x)
         }
         dst[idx] = __half2uint_rd(x[idx]);
     }
+
+    __global__ __vector__ void wrapper__half2uint_rd(__gm__ uint32_t* dst, __gm__ half* x, uint32_t total_length)
+    {
+        asc_vf_call<kernel__half2uint_rd>(dim3(1024), dst, x, total_length);
+    }
     ```

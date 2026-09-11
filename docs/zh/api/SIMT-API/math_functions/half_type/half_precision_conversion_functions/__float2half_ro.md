@@ -69,9 +69,12 @@ inline half __float2half_ro(const float x)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __global__ __launch_bounds__(1024) void kernel__float2half_ro(half* dst, float* x)
+    __global__ __launch_bounds__(1024) void kernel__float2half_ro(half* dst, float* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __float2half_ro(x[idx]);
     }
     ```
@@ -81,9 +84,12 @@ inline half __float2half_ro(const float x)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__float2half_ro(__gm__ half* dst, __gm__ float* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__float2half_ro(__gm__ half* dst, __gm__ float* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __float2half_ro(x[idx]);
     }
     ```

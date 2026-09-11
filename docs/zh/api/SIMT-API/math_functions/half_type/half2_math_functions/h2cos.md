@@ -66,9 +66,12 @@ inline half2 h2cos(half2 x)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __global__ __launch_bounds__(1024) void KernelCos(half2* dst, half2* x)
+    __global__ __launch_bounds__(1024) void KernelCos(half2* dst, half2* x, uint32_t input_total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = h2cos(x[idx]); // 对src源地址的第idx个元素取三角函数余弦值
     }
     ```
@@ -78,9 +81,12 @@ inline half2 h2cos(half2 x)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void KernelCos(__gm__ half2* dst, __gm__ half2* x)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelCos(__gm__ half2* dst, __gm__ half2* x, uint32_t input_total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = h2cos(x[idx]); // 对src源地址的第idx个元素取三角函数余弦值
     }
     ```

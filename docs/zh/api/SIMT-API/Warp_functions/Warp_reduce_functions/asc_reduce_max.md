@@ -70,9 +70,12 @@ Warp内所有活跃线程输入val的最大值。
     ```cpp
     #include "simt_api/device_warp_functions.h"
 
-    __global__ __launch_bounds__(1024) void KernelReduceMax(int32_t* dst)
+    __global__ __launch_bounds__(1024) void KernelReduceMax(int32_t* dst, int32_t total_num)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_num) {
+            return;
+        }
         int32_t laneId = idx % 32;
         int32_t result = asc_reduce_max(laneId); // 返回值为31
         dst[idx] = result;
@@ -84,10 +87,13 @@ Warp内所有活跃线程输入val的最大值。
     ```cpp
     #include "simt_api/device_warp_functions.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void KernelReduceMax(__gm__ int32_t* dst)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelReduceMax(__gm__ int32_t* dst, int32_t total_num)
     {
         // asc_vf_call参数：dim3{1024, 1, 1}
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_num) {
+            return;
+        }
         int32_t laneId = idx % 32;
         int32_t result = asc_reduce_max(laneId); // 返回值为31
         dst[idx] = result;

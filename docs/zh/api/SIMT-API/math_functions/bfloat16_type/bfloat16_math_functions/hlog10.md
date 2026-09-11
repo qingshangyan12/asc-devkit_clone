@@ -67,9 +67,12 @@ inline bfloat16_t hlog10(bfloat16_t x)
     ```cpp
     #include "simt_api/asc_bf16.h"
 
-    __global__ __launch_bounds__(1024) void KernelLog10(bfloat16_t* dst, bfloat16_t* x)
+    __global__ __launch_bounds__(1024) void KernelLog10(bfloat16_t* dst, bfloat16_t* x, uint32_t input_total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = hlog10(x[idx]);
     }
     ```
@@ -79,9 +82,12 @@ inline bfloat16_t hlog10(bfloat16_t x)
     ```cpp
     #include "simt_api/asc_bf16.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void KernelLog10(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelLog10(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x, uint32_t input_total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = hlog10(x[idx]);
     }
     ```

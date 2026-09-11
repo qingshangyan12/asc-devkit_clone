@@ -57,6 +57,8 @@ inline bfloat16_t __hmin(bfloat16_t x, bfloat16_t y)
 | nan | 非特殊数值（非nan，inf，-inf） | y值 |
 | 非特殊数值（非nan，inf，-inf） | nan | x值 |
 | nan | nan | nan |
+| nan | inf | inf |
+| inf | nan | inf |
 | x，y任意一个为-inf | — | -inf |
 | inf | 非特殊数值（非nan，inf，-inf） | y |
 | 非特殊数值（非nan，inf，-inf） | inf | x |

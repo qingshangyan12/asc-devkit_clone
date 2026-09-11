@@ -80,7 +80,7 @@ inline half2 __float22half2_ru(const float2 x)
 
     __global__ __launch_bounds__(1024) void cast_kernel(float* input, half* output, uint32_t input_total_length)
     {
-        asc_vf_call<simt_float22half2_ru>(dim3(1024), (float2*)input, (half2*)output, input_total_length);
+        simt_float22half2_ru((float2*)input, (half2*)output, input_total_length);
     }
     ```
 

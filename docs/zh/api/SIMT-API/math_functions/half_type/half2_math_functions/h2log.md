@@ -68,9 +68,12 @@ inline half2 h2log(half2 x)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __global__ __launch_bounds__(1024) void KernelLog(half2* dst, half2* x)
+    __global__ __launch_bounds__(1024) void KernelLog(half2* dst, half2* x, uint32_t input_total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = h2log(x[idx]);
     }
     ```
@@ -80,9 +83,12 @@ inline half2 h2log(half2 x)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void KernelLog(__gm__ half2* dst, __gm__ half2* x)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelLog(__gm__ half2* dst, __gm__ half2* x, uint32_t input_total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = h2log(x[idx]);
     }
     ```

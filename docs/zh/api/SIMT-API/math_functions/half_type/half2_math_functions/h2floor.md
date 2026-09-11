@@ -89,4 +89,9 @@ inline half2 h2floor(half2 x)
         }
         dst[idx] = h2floor(x[idx]);
     }
+
+    __global__ __vector__ void run_floor(__gm__ half2* dst, __gm__ half2* x, uint32_t total_length)
+    {
+        asc_vf_call<kernel_floor>(dim3(1024), dst, x, total_length);
+    }
     ```

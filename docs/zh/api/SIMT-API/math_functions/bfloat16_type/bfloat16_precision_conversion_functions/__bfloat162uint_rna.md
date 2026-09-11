@@ -70,9 +70,12 @@ inline unsigned int __bfloat162uint_rna(const bfloat16_t x)
     ```cpp
     #include "simt_api/asc_bf16.h"
 
-    __global__ __launch_bounds__(1024) void kernel__bfloat162uint_rna(uint32_t* dst, bfloat16_t* x)
+    __global__ __launch_bounds__(1024) void kernel__bfloat162uint_rna(uint32_t* dst, bfloat16_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __bfloat162uint_rna(x[idx]);
     }
     ```
@@ -82,9 +85,12 @@ inline unsigned int __bfloat162uint_rna(const bfloat16_t x)
     ```cpp
     #include "simt_api/asc_bf16.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__bfloat162uint_rna(__gm__ uint32_t* dst, __gm__ bfloat16_t* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__bfloat162uint_rna(__gm__ uint32_t* dst, __gm__ bfloat16_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __bfloat162uint_rna(x[idx]);
     }
     ```

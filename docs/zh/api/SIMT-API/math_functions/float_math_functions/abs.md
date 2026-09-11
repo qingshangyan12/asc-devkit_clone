@@ -88,6 +88,11 @@ float abs(float x)
         }
         dst[idx] = abs(x[idx]);
     }
+
+    __global__ __vector__ void run_abs(__gm__ float* dst, __gm__ float* x, uint32_t input_total_length)
+    {
+        asc_vf_call<kernel_abs>(dim3(1024), dst, x, input_total_length);
+    }
     ```
 
 输入输出示例如下：

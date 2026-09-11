@@ -69,7 +69,7 @@ inline bfloat16x2_t __float22bfloat162_rna(const float2 x)
     #include "simt_api/asc_bf16.h"
 
     // 使用短向量可提升数据搬运效率
-    __aicore__ __launch_bounds__(1024) void simt_float22bfloat162_rna(float2* input, bfloat16x2_t* output, uint32_t input_total_length)
+    __aicore__ void simt_float22bfloat162_rna(float2* input, bfloat16x2_t* output, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         // 每个线程处理1个float2类型的数据，即2个float类型的数据，因此idx >= input_total_length / 2的线程不处理数据

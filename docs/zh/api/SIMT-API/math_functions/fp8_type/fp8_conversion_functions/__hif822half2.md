@@ -47,12 +47,12 @@ inline half2 __hif822half2(const hifloat8x2_t x)
 
 将hifloat8x2\_t类型输入转换成的half2类型数据。特殊值如下：
 
-| x分量值 | 非饱和模式返回值 | 饱和模式返回值 |
-|---|---|---|
-| ±0 | 0 | 0 |
-| nan | nan | 0 |
-| inf | inf | ASCRT_MAX_NORMAL_FP16 |
-| -inf | -inf | -ASCRT_MAX_NORMAL_FP16 |
+| x分量值 | 返回值 |
+|---|---|
+| ±0 | 0 |
+| nan | nan |
+| inf | inf |
+| -inf | -inf |
 
 ## 约束说明
 
@@ -70,7 +70,7 @@ SIMT编程场景当前不支持使用该接口。
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         // 每个线程处理1个hifloat8x2_t类型的数据，即2个hifloat8_t类型的数据，因此idx >= input_total_length / 2的线程不处理数据
-        if (idx > input_total_length /2) {
+        if (idx >= input_total_length /2) {
             return;
         }
         output[idx] = __hif822half2(input[idx]);

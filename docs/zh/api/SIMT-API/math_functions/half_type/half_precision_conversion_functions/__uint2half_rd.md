@@ -53,7 +53,7 @@ inline half __uint2half_rd(const unsigned int x)
 | 2049 | 2048 |
 | ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 |
 | 65505 | ASCRT\_MAX\_NORMAL\_FP16 |
-| x≥65535 | inf |
+| x≥65536 | inf |
 
 ## 约束说明
 
@@ -66,9 +66,12 @@ inline half __uint2half_rd(const unsigned int x)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __global__ __launch_bounds__(1024) void kernel__uint2half_rd(half* dst, uint32_t* x)
+    __global__ __launch_bounds__(1024) void kernel__uint2half_rd(half* dst, uint32_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __uint2half_rd(x[idx]);
     }
     ```
@@ -78,9 +81,12 @@ inline half __uint2half_rd(const unsigned int x)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__uint2half_rd(__gm__ half* dst, __gm__ uint32_t* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__uint2half_rd(__gm__ half* dst, __gm__ uint32_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __uint2half_rd(x[idx]);
     }
     ```

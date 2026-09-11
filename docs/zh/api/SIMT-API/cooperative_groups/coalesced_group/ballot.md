@@ -62,10 +62,8 @@ unsigned int ballot(int predicate) const
     __global__ void simt_kernel(...)
     {
         ...
-        if (threadIdx.x % 2 == 0) {
-            coalesced_group active = coalesced_threads();
-            uint32_t result = active.ballot(1); // 返回0xFFFF
-        }
+        coalesced_group active = coalesced_threads();
+        uint32_t result = active.ballot(1); // 返回0xFFFFFFFF
         ...
     }
     ```
@@ -79,10 +77,8 @@ unsigned int ballot(int predicate) const
     __simt_vf__ inline void simt_kernel(...)
     {
         ...
-        if (threadIdx.x % 2 == 0) {
-            coalesced_group active = coalesced_threads();
-            uint32_t result = active.ballot(1); // 返回0xFFFF
-        }
+        coalesced_group active = coalesced_threads();
+        uint32_t result = active.ballot(1); // 返回0xFFFFFFFF
         ...
     }
     ```

@@ -63,9 +63,12 @@ SIMT编程场景：
 ```cpp
 #include "simt_api/device_functions.h"
 
-__global__ __launch_bounds__(1024) void kernel__cvta_ubuf_to_generic(uint32_t* dst, uint64_t addr_val)
+__global__ __launch_bounds__(1024) void kernel__cvta_ubuf_to_generic(uint32_t* dst, uint64_t addr_val, uint32_t total_len)
 {
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
+    if (idx >= total_len) {
+        return;
+    }
     uint32_t* ptr = static_cast<uint32_t*>(__cvta_ubuf_to_generic(addr_val));
     dst[idx] = ptr[0];
 }

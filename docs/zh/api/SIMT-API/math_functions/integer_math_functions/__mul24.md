@@ -59,9 +59,12 @@ int __mul24(int x, int y)
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __global__ __launch_bounds__(1024) void KernelMul32(int* dst, int* x, int* y)
+    __global__ __launch_bounds__(1024) void KernelMul32(int* dst, int* x, int* y, uint32_t input_total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = __mul24(x[idx], y[idx]);
     }
     ```
@@ -71,9 +74,12 @@ int __mul24(int x, int y)
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void KernelMul32(__gm__ int* dst, __gm__ int* x, __gm__ int* y)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelMul32(__gm__ int* dst, __gm__ int* x, __gm__ int* y, uint32_t input_total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = __mul24(x[idx], y[idx]);
     }
     ```

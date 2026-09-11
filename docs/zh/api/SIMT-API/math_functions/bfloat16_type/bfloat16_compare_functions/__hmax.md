@@ -56,8 +56,9 @@ inline bfloat16_t __hmax(bfloat16_t x, bfloat16_t y)
 | -0 | +0 | +0 |
 | nan | 非特殊数值（非nan，inf，-inf） | y值 |
 | 非特殊数值（非nan，inf，-inf） | nan | x值 |
-| x，y同时为nan | nan |  |
-| x，y任意一个为+inf | +inf |  |
+| nan | nan | nan |
+| +inf | 任意 | +inf |
+| 任意 | +inf | +inf |
 | -inf | 非特殊数值（非nan，inf，-inf） | y |
 | 非特殊数值（非nan，inf，-inf） | -inf | x |
 

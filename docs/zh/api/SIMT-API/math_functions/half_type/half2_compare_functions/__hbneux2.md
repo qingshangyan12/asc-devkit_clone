@@ -52,7 +52,10 @@ bool __hbneux2(half2 x, half2 y)
 | --- | --- | --- |
 | nan | 任意值 | true |
 | ±0 | ±0 | false |
-| ±inf | ±inf | false |
+| inf | inf | false |
+| -inf | -inf | false |
+| inf | -inf | true |
+| -inf | inf | true |
 
 ## 约束说明
 

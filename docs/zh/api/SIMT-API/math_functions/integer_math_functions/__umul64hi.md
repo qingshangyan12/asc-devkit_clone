@@ -61,9 +61,12 @@ unsigned long long __umul64hi(unsigned long long x, unsigned long long y)
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __global__ __launch_bounds__(1024) void KernelUmul64hi(unsigned long long* dst, unsigned long long* x, unsigned long long* y)
+    __global__ __launch_bounds__(1024) void KernelUmul64hi(unsigned long long* dst, unsigned long long* x, unsigned long long* y, uint32_t input_total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = __umul64hi(x[idx], y[idx]);
     }
     ```
@@ -73,9 +76,12 @@ unsigned long long __umul64hi(unsigned long long x, unsigned long long y)
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void KernelUmul64hi(__gm__ unsigned long long* dst, __gm__ unsigned long long* x, __gm__ unsigned long long* y)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelUmul64hi(__gm__ unsigned long long* dst, __gm__ unsigned long long* x, __gm__ unsigned long long* y, uint32_t input_total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = __umul64hi(x[idx], y[idx]);
     }
     ```

@@ -58,9 +58,12 @@ inline long long int llabs(long long int x)
     ```cpp
     #include "simt_api/math_functions.h"
 
-    __global__ __launch_bounds__(1024) void KernelLlabs(long long int* dst, long long int* x)
+    __global__ __launch_bounds__(1024) void KernelLlabs(long long int* dst, long long int* x, uint32_t input_total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = llabs(x[idx]);
     }
     ```
@@ -70,9 +73,12 @@ inline long long int llabs(long long int x)
     ```cpp
     #include "simt_api/math_functions.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void KernelLlabs(__gm__ long long int* dst, __gm__ long long int* x)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelLlabs(__gm__ long long int* dst, __gm__ long long int* x, uint32_t input_total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = llabs(x[idx]);
     }
     ```

@@ -62,9 +62,12 @@ bool __hgtu(bfloat16_t x, bfloat16_t y)
     ```cpp
     #include "simt_api/asc_bf16.h"
 
-    __global__ __launch_bounds__(1024) void KernelHgtu(bool* dst, bfloat16_t* x, bfloat16_t* y)
+    __global__ __launch_bounds__(1024) void KernelHgtu(bool* dst, bfloat16_t* x, bfloat16_t* y, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __hgtu(x[idx], y[idx]);
     }
     ```
@@ -74,9 +77,12 @@ bool __hgtu(bfloat16_t x, bfloat16_t y)
     ```cpp
     #include "simt_api/asc_bf16.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void KernelHgtu(__gm__ bool* dst, __gm__ bfloat16_t* x, __gm__ bfloat16_t* y)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelHgtu(__gm__ bool* dst, __gm__ bfloat16_t* x, __gm__ bfloat16_t* y, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __hgtu(x[idx], y[idx]);
     }
     ```

@@ -65,9 +65,12 @@ SIMT编程场景：
 ```cpp
 #include "simt_api/device_functions.h"
 
-__global__ __launch_bounds__(1024) void kernel__cvta_generic_to_local(uint32_t* src)
+__global__ __launch_bounds__(1024) void kernel__cvta_generic_to_local(uint32_t* src, uint32_t input_total_length)
 {
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
+    if (idx >= input_total_length) {
+        return;
+    }
     uint32_t local_data[2] = {src[idx], src[idx]};
     size_t addr_val = __cvta_generic_to_local(local_data);
     if (addr_val > 1152) {  // 1152:SIMT栈空间大小

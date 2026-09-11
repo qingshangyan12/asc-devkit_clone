@@ -202,9 +202,12 @@ L2 Cache中的缓存数据或输入的Global Memory地址上的数据。
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __global__ __launch_bounds__(1024) void kernel_asc_ldcg(float* dst, float* src)
+    __global__ __launch_bounds__(1024) void kernel_asc_ldcg(float* dst, float* src, uint32_t input_total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = asc_ldcg(src + idx);
     }
     ```
@@ -216,9 +219,12 @@ L2 Cache中的缓存数据或输入的Global Memory地址上的数据。
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void kernel_asc_ldcg(__gm__ float* dst, __gm__ float* src)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_asc_ldcg(__gm__ float* dst, __gm__ float* src, uint32_t input_total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = asc_ldcg(src + idx);
     }
     ```

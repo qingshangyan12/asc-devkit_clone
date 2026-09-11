@@ -50,7 +50,7 @@ inline half __float2half(const float x)
 | x值 | 非饱和模式返回值 | 饱和模式返回值 |
 | --- | --- | --- |
 | ±0 | ±0 | ±0 |
-| nan | nan | ±0 |
+| nan | nan | 0 |
 | inf | inf | ASCRT\_MAX\_NORMAL\_FP16 |
 | -inf | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
 | x>ASCRT\_MAX\_NORMAL\_FP16 | inf | ASCRT\_MAX\_NORMAL\_FP16 |

@@ -69,9 +69,12 @@ inline float __int_as_float(const int x)
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __global__ __launch_bounds__(1024) void kernel__int_as_float(float* dst, int32_t* x)
+    __global__ __launch_bounds__(1024) void kernel__int_as_float(float* dst, int32_t* x, uint32_t input_total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = __int_as_float(x[idx]);
     }
     ```
@@ -81,9 +84,12 @@ inline float __int_as_float(const int x)
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__int_as_float(__gm__ float* dst, __gm__ int32_t* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__int_as_float(__gm__ float* dst, __gm__ int32_t* x, uint32_t input_total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = __int_as_float(x[idx]);
     }
     ```

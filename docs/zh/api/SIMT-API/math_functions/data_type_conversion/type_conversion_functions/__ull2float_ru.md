@@ -64,9 +64,12 @@ inline float __ull2float_ru(const unsigned long long int x)
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __global__ __launch_bounds__(1024) void kernel__ull2float_ru(float* dst, uint64_t* x)
+    __global__ __launch_bounds__(1024) void kernel__ull2float_ru(float* dst, uint64_t* x, uint32_t input_total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = __ull2float_ru(x[idx]);
     }
     ```
@@ -76,9 +79,12 @@ inline float __ull2float_ru(const unsigned long long int x)
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__ull2float_ru(__gm__ float* dst, __gm__ uint64_t* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__ull2float_ru(__gm__ float* dst, __gm__ uint64_t* x, uint32_t input_total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = __ull2float_ru(x[idx]);
     }
     ```

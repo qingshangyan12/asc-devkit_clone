@@ -71,9 +71,12 @@ inline unsigned long long int __bfloat162ull_rna(const bfloat16_t x)
     ```cpp
     #include "simt_api/asc_bf16.h"
 
-    __global__ __launch_bounds__(1024) void kernel__bfloat162ull_rna(uint64_t* dst, bfloat16_t* x)
+    __global__ __launch_bounds__(1024) void kernel__bfloat162ull_rna(uint64_t* dst, bfloat16_t* x, uint32_t input_total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = __bfloat162ull_rna(x[idx]);
     }
     ```
@@ -83,9 +86,12 @@ inline unsigned long long int __bfloat162ull_rna(const bfloat16_t x)
     ```cpp
     #include "simt_api/asc_bf16.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__bfloat162ull_rna(__gm__ uint64_t* dst, __gm__ bfloat16_t* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__bfloat162ull_rna(__gm__ uint64_t* dst, __gm__ bfloat16_t* x, uint32_t input_total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = __bfloat162ull_rna(x[idx]);
     }
     ```

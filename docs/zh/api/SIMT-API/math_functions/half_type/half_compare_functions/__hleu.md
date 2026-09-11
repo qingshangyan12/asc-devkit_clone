@@ -59,9 +59,12 @@ bool __hleu(half x, half y)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __global__ __launch_bounds__(1024) void KernelHleu(bool* dst, half* x, half* y)
+    __global__ __launch_bounds__(1024) void KernelHleu(bool* dst, half* x, half* y, uint32_t input_total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = __hleu(x[idx], y[idx]);
     }
     ```
@@ -71,9 +74,12 @@ bool __hleu(half x, half y)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void KernelHleu(__gm__ bool* dst, __gm__ half* x, __gm__ half* y)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelHleu(__gm__ bool* dst, __gm__ half* x, __gm__ half* y, uint32_t input_total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         dst[idx] = __hleu(x[idx], y[idx]);
     }
     ```

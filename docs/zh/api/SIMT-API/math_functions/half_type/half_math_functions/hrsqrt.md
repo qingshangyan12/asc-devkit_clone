@@ -60,7 +60,7 @@ inline half hrsqrt(half x)
 
 ## 约束说明
 
-本接口支持的输入数据范围为x大于等于0，否则返回值为nan。
+本接口支持的输入数据范围为x大于等于0，否则非饱和模式下返回值为nan，饱和模式下返回值为`ASCRT_MAX_NORMAL_FP16`。
 
 ## 调用示例
 
@@ -69,9 +69,12 @@ inline half hrsqrt(half x)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __global__ __launch_bounds__(1024) void KernelRsqrt(half* dst, half* x)
+    __global__ __launch_bounds__(1024) void KernelRsqrt(half* dst, half* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = hrsqrt(x[idx]);
     }
     ```
@@ -81,9 +84,12 @@ inline half hrsqrt(half x)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void KernelRsqrt(__gm__ half* dst, __gm__ half* x)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelRsqrt(__gm__ half* dst, __gm__ half* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = hrsqrt(x[idx]);
     }
     ```

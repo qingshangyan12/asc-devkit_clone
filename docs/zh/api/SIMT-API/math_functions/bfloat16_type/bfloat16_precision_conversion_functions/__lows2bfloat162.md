@@ -80,14 +80,14 @@ inline bfloat16x2_t __lows2bfloat162(const bfloat16x2_t x, const bfloat16x2_t y)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         // 每个线程处理1个bfloat16x2_t类型的数据，即2个bfloat16_t类型的数据，因此idx >= input_total_length / 2的线程不处理数据
-        if (idx > input_total_length / 2) {
+        if (idx >= input_total_length / 2) {
             return;
         }
         output[idx] = __lows2bfloat162(input1[idx], input2[idx]);
     }
     __global__ __launch_bounds__(1024) void cast_kernel(bfloat16_t* input1,  bfloat16_t* input2, bfloat16_t* output, uint32_t input_total_length)
     {
-        simt_lows2bfloat162((bfloat16x2_t*)input1, (__gm__ bfloat16x2_t*)input2, (bfloat16x2_t*)output, input_total_length);
+        simt_lows2bfloat162((bfloat16x2_t*)input1, (bfloat16x2_t*)input2, (bfloat16x2_t*)output, input_total_length);
     }
     ```
 
@@ -101,7 +101,7 @@ inline bfloat16x2_t __lows2bfloat162(const bfloat16x2_t x, const bfloat16x2_t y)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         // 每个线程处理1个bfloat16x2_t类型的数据，即2个bfloat16_t类型的数据，因此idx >= input_total_length / 2的线程不处理数据
-        if (idx > input_total_length / 2) {
+        if (idx >= input_total_length / 2) {
             return;
         }
         output[idx] = __lows2bfloat162(input1[idx], input2[idx]);

@@ -67,9 +67,12 @@ inline half2 h2sin(half2 x)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __global__ __launch_bounds__(1024) void KernelSin(half2* dst, half2* x)
+    __global__ __launch_bounds__(1024) void KernelSin(half2* dst, half2* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = h2sin(x[idx]); // 对src源地址的第idx个元素取三角函数正弦值
     }
     ```
@@ -79,9 +82,12 @@ inline half2 h2sin(half2 x)
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void KernelSin(__gm__ half2* dst, __gm__ half2* x)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelSin(__gm__ half2* dst, __gm__ half2* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = h2sin(x[idx]); // 对src源地址的第idx个元素取三角函数正弦值
     }
     ```

@@ -66,9 +66,12 @@ int __popc(unsigned long x)
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __global__ __launch_bounds__(1024) void KernelPopc(int* dst, unsigned int* x)
+    __global__ __launch_bounds__(1024) void KernelPopc(int* dst, unsigned int* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __popc(x[idx]);
     }
     ```
@@ -76,9 +79,12 @@ int __popc(unsigned long x)
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __global__ __launch_bounds__(1024) void KernelPopc(int* dst, unsigned long long* x)
+    __global__ __launch_bounds__(1024) void KernelPopc(int* dst, unsigned long long* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __popc(x[idx]);
     }
     ```
@@ -88,9 +94,12 @@ int __popc(unsigned long x)
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void KernelPopc(__gm__ int* dst, __gm__ unsigned int* x)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelPopc(__gm__ int* dst, __gm__ unsigned int* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __popc(x[idx]);
     }
     ```
@@ -98,9 +107,12 @@ int __popc(unsigned long x)
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void KernelPopc(__gm__ int* dst, __gm__ unsigned long long* x)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelPopc(__gm__ int* dst, __gm__ unsigned long long* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __popc(x[idx]);
     }
     ```
