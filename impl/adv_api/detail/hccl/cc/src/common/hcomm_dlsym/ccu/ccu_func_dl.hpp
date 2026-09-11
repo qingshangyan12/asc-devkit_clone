@@ -135,6 +135,21 @@ inline CcuResult CallFunc(Args... args)
     return ::CcuFuncCall(handle, actuals.empty() ? nullptr : actuals.data(), static_cast<uint32_t>(kArgN));
 }
 
+template <typename... Args>
+inline CcuResult CallTask(Variable pc, Args... args)
+{
+    constexpr std::size_t kArgN = sizeof...(Args);
+    if (kArgN > CCU_TASK_CALL_ARG_MAX) {
+        return CcuResult::CCU_E_PARA;
+    }
+    std::vector< ::CcuVariableHandle> actuals(kArgN);
+    std::size_t i = 0;
+    using expand_t = int[];
+    (void)expand_t{0, ((void)(actuals[i++] = args.handle), 0)...};
+    (void)i;
+    return ::CcuCallTask(pc.handle, actuals.empty() ? nullptr : actuals.data(), static_cast<uint32_t>(kArgN));
+}
+
 } // namespace ccu
 } // namespace AscendC
 

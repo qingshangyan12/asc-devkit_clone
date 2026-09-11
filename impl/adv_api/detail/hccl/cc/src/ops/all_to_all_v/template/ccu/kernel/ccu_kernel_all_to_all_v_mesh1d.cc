@@ -9,6 +9,7 @@
  */
 
 #include "ccu_kernel_all_to_all_v_mesh1d.h"
+#include "kfc_callable_task_registry.h"
 
 namespace mc2_ops_hccl {
 
@@ -30,19 +31,49 @@ constexpr uint64_t A2AV_MAX_TRANSPORT_SIZE = 256ULL * 1024ULL * 1024ULL;
 constexpr uint64_t A2AV_GROUP_MEMSLICE_SIZE = 32ULL * 1024ULL;
 constexpr uint64_t A2AV_GROUP_LOOP_COUNT = 8ULL;
 
-CcuResult CcuAlltoAllVMesh1DKernel(
-    ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable srcOffset,
-    ccu::Variable dstOffset, ccu::Variable extAddr, ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3,
-    ccu::Variable goSize4, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId)
+static CcuResult LoadArgs(AlltoAllVMesh1DContext& ctx)
 {
+    uint32_t argId = 0;
+    CCU_CHK_RET(ccu::LoadArg(ctx.inputAddr, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.outputAddr, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.tokenInfo, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.srcOffset, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.dstOffset, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.goSize.addrOffset, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.goSize.loopParam, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.goSize.parallelParam, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.goSize.residual, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.extAddr, argId++));
+    return CCU_SUCCESS;
+}
+
+CcuResult CcuAlltoAllVMesh1DKernel(CcuKernelArg arg)
+{
+    const auto* kernelArg = static_cast<CcuKernelArgAlltoAllVMesh1D*>(arg);
+    AlltoAllVMesh1DContext ctx;
+    InitCcuKernelCtxBase(ctx);
+    CCU_CHK_RET(LoadArgs(ctx));
+    ccu::Variable& inputAddr = ctx.inputAddr;
+    ccu::Variable& outputAddr = ctx.outputAddr;
+    ccu::Variable& tokenInfo = ctx.tokenInfo;
+    ccu::Variable& srcOffset = ctx.srcOffset;
+    ccu::Variable& dstOffset = ctx.dstOffset;
+    ccu::Variable& goSize1 = ctx.goSize.addrOffset;
+    ccu::Variable& goSize2 = ctx.goSize.loopParam;
+    ccu::Variable& goSize3 = ctx.goSize.parallelParam;
+    ccu::Variable& goSize4 = ctx.goSize.residual;
+    ccu::Variable& extAddr = ctx.extAddr;
+    const uint32_t rankSize = static_cast<uint32_t>(kernelArg->rankSize);
+    const uint32_t rankId = kernelArg->rankId;
+    const uint32_t channelCount = kernelArg->channelCount;
+    const ChannelHandle* channels = kernelArg->channels;
+
     std::vector<ccu::Variable> output(rankSize);
     std::vector<ccu::Variable> token(rankSize);
     std::vector<ccu::LocalAddr> src(rankSize);
     std::vector<ccu::RemoteAddr> dst(rankSize);
     ccu::LocalAddr localDst;
     std::vector<ccu::Event> events((rankSize + A2AV_BITS_PER_EVENT - 1) / A2AV_BITS_PER_EVENT);
-    CcuKernelCtxBase ctx;
-    InitCcuKernelCtxBase(ctx);
     GroupOpSizeVars tailGoSize{goSize1, goSize2, goSize3, goSize4};
     GroupOpSizeVars fullBlockGoSize;
     fullBlockGoSize.addrOffset = A2AV_MAX_TRANSPORT_SIZE;
@@ -180,5 +211,8 @@ CcuResult CcuAlltoAllVMesh1DKernel(
     }
     return CCU_SUCCESS;
 }
+
+REGISTER_KFC_CALLABLE_TASK(
+    HcclCMDType::HCCL_CMD_ALLTOALLV, KfcServerRole::DEFAULT, CcuKernelAlltoAllVMesh1D, CcuAlltoAllVMesh1DKernel);
 
 } // namespace mc2_ops_hccl

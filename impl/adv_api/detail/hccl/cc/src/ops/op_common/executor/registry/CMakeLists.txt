@@ -10,6 +10,7 @@
 set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/coll_alg_exec_registry.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/coll_alg_v2_exec_registry.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/kfc_callable_task_registry.cc
 )
 
 target_sources(mc2_client PRIVATE
