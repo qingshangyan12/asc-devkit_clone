@@ -594,7 +594,7 @@ class CommonUtility:
             res: True means c310
         """
         short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
-        if short_soc_version in ["Ascend950", "Ascend350"]:
+        if short_soc_version in ["Ascend950", "Ascend350", "Ascend960DT"]:
             return True
         return False
 
