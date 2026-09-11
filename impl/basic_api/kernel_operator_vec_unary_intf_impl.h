@@ -1031,7 +1031,8 @@ __aicore__ inline void Not(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     NotImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
 }
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+    (__NPU_ARCH__ == 3113)
 /* **************************************** Neg ****************************************** */
 /*
  * @ingroup Neg Level 2
