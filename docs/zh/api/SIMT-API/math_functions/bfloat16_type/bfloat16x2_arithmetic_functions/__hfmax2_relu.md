@@ -47,7 +47,7 @@ bfloat16x2_t __hfmax2_relu(const bfloat16x2_t x, const bfloat16x2_t y, const bfl
 
 ## 返回值说明
 
-输入数据各分量乘加的结果。计算的分量a、b、c满足：
+输入数据各分量乘加的结果。计算的分量x、y、z满足：
 
 <table>
   <thead>

@@ -53,7 +53,7 @@ inline unsigned short int __bfloat162ushort_rd(const bfloat16_t x)
 | nan | 0 |
 | inf | 65535（USHRT_MAX） |
 | -inf | 0 |
-| 超出short上界 | 65535（USHRT_MAX） |
+| 超出unsigned short上界 | 65535（USHRT_MAX） |
 | 负数 | 0 |
 
 ## 约束说明

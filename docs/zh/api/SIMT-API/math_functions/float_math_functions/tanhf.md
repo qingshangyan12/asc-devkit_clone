@@ -27,7 +27,7 @@
 
 头文件路径为：`"simt_api/math_functions.h"`。
 
-获取输入数据的三角函数双曲正切值。
+获取输入数据的双曲正切值。
 
 ![](../../../figures/zh-cn_formulaimage_0000002484776370.png)
 

@@ -47,10 +47,10 @@ bfloat16x2_t __hcmadd(const bfloat16x2_t x, const bfloat16x2_t y, const bfloat16
 
 ## 返回值说明
 
-输入数据视为复数，执行复数乘加运算的结果。对于输入a、b、c：
+输入数据视为复数，执行复数乘加运算的结果。对于输入x、y、z：
 
--   实部的结果为：\_\_hfma\(-a.y, b.y, \_\_hfma\(a.x, b.x, c.x\)\)。
--   虚部的结果为：\_\_hfma\( a.y, b.x, \_\_hfma\(a.x, b.y, c.y\)\)。
+-   实部的结果为：\_\_hfma\(-x.y, y.y, \_\_hfma\(x.x, y.x, z.x\)\)。
+-   虚部的结果为：\_\_hfma\( x.y, y.x, \_\_hfma\(x.x, y.y, z.y\)\)。
 
 ## 约束说明
 

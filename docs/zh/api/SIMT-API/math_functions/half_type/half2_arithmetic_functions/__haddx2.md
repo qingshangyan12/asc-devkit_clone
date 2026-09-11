@@ -59,7 +59,7 @@ half2 __haddx2(const half2 x, const half2 y)
 | 有限值 | inf | inf | ASCRT\_MAX\_NORMAL\_FP16 |
 | inf | 有限值 | inf | ASCRT\_MAX\_NORMAL\_FP16 |
 | 有限值 | -inf | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
-| -inf | ASCRT\_MAX\_NORMAL\_FP16 | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
+| -inf | 有限值 | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
 | inf | inf | inf | ASCRT\_MAX\_NORMAL\_FP16 |
 | -inf | -inf | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
 | inf | -inf | nan | 0 |

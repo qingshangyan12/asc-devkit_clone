@@ -52,7 +52,7 @@
 | ASCRT_TWO_TO_24_F | 定义$2^{24}$的浮点数值。 | math_constants.h |
 | ASCRT_TWO_TO_31_F | 定义$2^{31}$的浮点数值。 | math_constants.h |
 | ASCRT_TWO_TO_32_F | 定义$2^{32}$的浮点数值。 | math_constants.h |
-| ASCRT_REMQUO_BITS_F | 在remquof函数中提取商的最低3位有效位，即数值为3。 | math_constants.h |
+| ASCRT_REMQUO_BITS_F | remquof函数返回的商的有效低位比特数，即数值为3。 | math_constants.h |
 | ASCRT_REMQUO_MASK_F | 用于提取remquof结果中低3位比特的位掩码。 | math_constants.h |
 | ASCRT_TRIG_PLOSS_F | 105615.0F，表示三角函数计算中精度损失的临界阈值。 | math_constants.h |
 | ASCRT_MIN_VAL_S | 定义int32类型的最小值。 | math_constants.h |

@@ -56,7 +56,7 @@ SIMT编程接口核心特点：
 - **同步接口支持**：支持与业界一致的同步方式，提供`asc_syncthreads`、`asc_threadfence`等同步接口，确保线程间数据访问正确性。
 - **Warp类接口支持**：支持与业界一致的Warp类接口，提供`asc_shfl`、`asc_reduce_max`、`asc_all`等Warp类操作接口，用于直接操作线程束。
 - **原子操作支持**：支持与业界一致的使用方式，提供`asc_atomic_add`、`asc_atomic_sub`、`asc_atomic_exch`等原子操作接口。
-- **数学函数支持**：遵循业界统一方式，提供`sin`、`cos`、`exp`、`__brev`、`__clz`等计算接口，支持`half`、`half2`、`bfloat16_t`、`bfloat16x2_t`、`float`、`float2`等多种数据类型。
+- **数学函数支持**：遵循业界统一方式，提供`sinf`、`cosf`、`expf`、`__brev`、`__clz`等计算接口，支持`half`、`half2`、`bfloat16_t`、`bfloat16x2_t`、`float`、`float2`等多种数据类型。
 - **高阶特性支持**：当前提供协作组特性，用于需要灵活控制分组的业务场景。
 
 ## 小结
