@@ -4,7 +4,7 @@
 This sample implements gather and adds computation based on SIMD and SIMT hybrid programming mode. It uses SIMT programming to implement discrete memory access operation gather, and SIMD programming to implement continuous memory access operation adds.
 
 
-## Supported Products and CANN Versions
+## Supported Products and CANN Software Versions
 
 | Product | CANN Software Version |
 |------|-------------|
@@ -107,7 +107,7 @@ Execute the following steps in the root directory of this sample to compile and 
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU simulation mode
   ```
 
-  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+  > **Note:** Before switching compilation modes, you need to clear the cmake cache. You can execute `rm CMakeCache.txt` in the build directory and then run cmake again.
 
 - Compilation Options Description
 
