@@ -286,37 +286,47 @@ TEST_F(ResourceRegistryTest, AutomaticSearchRootsParsesCustomVendorAndBuiltInPat
 
     const AutomaticRoots roots = ResourceRegistry::AutomaticSearchRoots();
     const fs::path canonicalOpp = fs::canonical(opp);
-    ASSERT_EQ(roots.custom.size(), 4U);
-    EXPECT_EQ(roots.custom[0], "/custom/one/op_impl/ai_core/tbe/kernel/jit");
-    EXPECT_EQ(roots.custom[1], "/custom/two/op_impl/ai_core/tbe/kernel/jit");
-    EXPECT_EQ(roots.custom[2], (canonicalOpp / "vendors/vendor_a/op_impl/ai_core/tbe/kernel/jit").string());
-    EXPECT_EQ(roots.custom[3], (canonicalOpp / "vendors/vendor_b/op_impl/ai_core/tbe/kernel/jit").string());
-    ASSERT_EQ(roots.builtIn.size(), 1U);
-    EXPECT_EQ(roots.builtIn[0], (canonicalOpp / "built-in/op_impl/ai_core/tbe/kernel/jit").string());
+    EXPECT_EQ(roots.custom[0], "/custom/one/op_spec");
+    EXPECT_EQ(roots.builtIn[0], (canonicalOpp / "built-in/op_spec").string());
+    ASSERT_EQ(roots.custom.size(), 12U);
+    EXPECT_EQ(roots.custom[1], "/custom/one/op_impl/ai_core/tbe/kernel");
+    EXPECT_EQ(roots.custom[4], "/custom/two/op_impl/ai_core/tbe/kernel");
+    EXPECT_EQ(roots.custom[7], (canonicalOpp / "vendors/vendor_a/op_impl/ai_core/tbe/kernel").string());
+    EXPECT_EQ(roots.custom[10], (canonicalOpp / "vendors/vendor_b/op_impl/ai_core/tbe/kernel").string());
+#if defined(__aarch64__)
+    const std::string hostArch = "aarch64";
+#else
+    const std::string hostArch = "x86_64";
+#endif
+    EXPECT_EQ(roots.custom[2], "/custom/one/op_impl/ai_core/tbe/op_tiling/lib/linux/" + hostArch);
+    ASSERT_EQ(roots.builtIn.size(), 3U);
+    EXPECT_EQ(roots.builtIn[2], (canonicalOpp / "built-in/op_impl/ai_core/tbe/op_host/lib/linux" / hostArch).string());
+    EXPECT_EQ(roots.builtIn[1], (canonicalOpp / "built-in/op_impl/ai_core/tbe/kernel").string());
 
     SetEnvironment("ASCEND_OPP_PATH", Path("missing-opp").string());
     const AutomaticRoots missingOpp = ResourceRegistry::AutomaticSearchRoots();
-    EXPECT_EQ(missingOpp.custom.size(), 2U);
+    EXPECT_EQ(missingOpp.custom.size(), 6U);
     EXPECT_TRUE(missingOpp.builtIn.empty());
 
     const fs::path oppWithoutVendorConfig = Path("opp-without-vendor-config");
     MakeDirectory(oppWithoutVendorConfig);
     SetEnvironment("ASCEND_OPP_PATH", oppWithoutVendorConfig.string());
     const AutomaticRoots missingVendorConfig = ResourceRegistry::AutomaticSearchRoots();
-    EXPECT_EQ(missingVendorConfig.custom.size(), 2U);
-    ASSERT_EQ(missingVendorConfig.builtIn.size(), 1U);
+    EXPECT_EQ(missingVendorConfig.custom.size(), 6U);
+    ASSERT_EQ(missingVendorConfig.builtIn.size(), 3U);
     EXPECT_EQ(
-        missingVendorConfig.builtIn[0],
-        (fs::canonical(oppWithoutVendorConfig) / "built-in/op_impl/ai_core/tbe/kernel/jit").string());
+        missingVendorConfig.builtIn[1],
+        (fs::canonical(oppWithoutVendorConfig) / "built-in/op_impl/ai_core/tbe/kernel").string());
 
     UnsetEnvironment("ASCEND_OPP_PATH");
     const AutomaticRoots noOpp = ResourceRegistry::AutomaticSearchRoots();
-    EXPECT_EQ(noOpp.custom.size(), 2U);
+    EXPECT_EQ(noOpp.custom.size(), 6U);
     EXPECT_TRUE(noOpp.builtIn.empty());
 }
 
 TEST_F(ResourceRegistryTest, LibraryHelpersFilterFilesDirectoriesAndSymlinks)
 {
+    EXPECT_TRUE(ResourceRegistry::IsLibraryName("libcust_compile_db.so"));
     EXPECT_TRUE(ResourceRegistry::IsLibraryName("libx_compile_database.so"));
     EXPECT_FALSE(ResourceRegistry::IsLibraryName("lib_compile_database.so"));
     EXPECT_FALSE(ResourceRegistry::IsLibraryName("x_compile_database.so"));
@@ -505,6 +515,46 @@ TEST_F(ResourceRegistryTest, LocateSourceFileRequiresValidLayoutAndUniqueMatch)
     spec.path = linked.soPath;
     EXPECT_EQ(
         ResourceRegistry::LocateSourceFile(spec, "resource", "source.cpp", located), ResourceStatus::InvalidResource);
+}
+
+TEST_F(ResourceRegistryTest, LocateSourceFileInHostPackageLayouts)
+{
+#if defined(__aarch64__)
+    const std::string hostArch = "aarch64";
+#else
+    const std::string hostArch = "x86_64";
+#endif
+    for (bool builtIn : {false, true}) {
+        const fs::path tbe =
+            builtIn ? Path("built-in/op_impl/ai_core/tbe") : Path("vendors/example/op_impl/ai_core/tbe");
+        const fs::path so = builtIn ? tbe / "op_host/lib/linux" / hostArch / "libops_math_compile_database.so" :
+                                      tbe / "op_tiling/lib/linux" / hostArch / "libexample_compile_database.so";
+        const fs::path source =
+            builtIn ? tbe / "impl/ops_math/ascendc/add/source.cpp" : tbe / "example_impl/dynamic/source.cpp";
+        WriteFile(so);
+        WriteFile(source);
+        const LibrarySpec spec{so.string(), builtIn ? ResourceSourceType::BuiltIn : ResourceSourceType::Custom};
+        std::string located;
+        EXPECT_EQ(ResourceRegistry::LocateSourceFile(spec, "resource", "source.cpp", located), ResourceStatus::Success);
+        EXPECT_EQ(located, fs::canonical(source).parent_path().string());
+        const fs::path packageRoot = tbe.parent_path().parent_path().parent_path();
+        const std::string relativeSource = fs::relative(source, packageRoot).generic_string();
+        WriteFile(source.parent_path() / "duplicate/source.cpp");
+        EXPECT_EQ(
+            ResourceRegistry::LocateSourceFile(spec, "resource", "source.cpp", located),
+            ResourceStatus::InvalidResource);
+        EXPECT_EQ(
+            ResourceRegistry::LocateSourceFile(spec, "resource", relativeSource, located), ResourceStatus::Success);
+        EXPECT_EQ(located, fs::canonical(source).parent_path().string());
+        EXPECT_EQ(
+            ResourceRegistry::LocateSourceFile(spec, "resource", "missing/source.cpp", located),
+            ResourceStatus::InvalidResource);
+        const fs::path invalid = so.parent_path().parent_path() / "wrong_arch" / so.filename();
+        WriteFile(invalid);
+        EXPECT_EQ(
+            ResourceRegistry::LocateSourceFile({invalid.string(), spec.sourceType}, "resource", "source.cpp", located),
+            ResourceStatus::InvalidResource);
+    }
 }
 
 TEST_F(ResourceRegistryTest, GetBundleRejectsMissingSymbolAndInvalidAbi)
@@ -765,7 +815,7 @@ TEST_F(ResourceRegistryTest, LoadManifestValidatesJsonOwnershipSourceAndDuplicat
 
     const std::string valid = R"({"resource_id":"resource","source_file":"source.cpp","value":3})";
     EXPECT_EQ(loadText(valid), ResourceStatus::Success);
-    EXPECT_EQ(loadText(valid), ResourceStatus::Conflict);
+    EXPECT_EQ(loadText(valid), ResourceStatus::Success);
 
     AcCompileResourceManifest invalidString{{nullptr, 1U}, nullptr, 0U};
     EXPECT_EQ(ResourceRegistry::LoadManifest(invalidString, spec, 1U, stage), ResourceStatus::InvalidResource);
@@ -1052,7 +1102,7 @@ TEST_F(ResourceRegistryTest, CommitMergesCategoriesAndFindResourceUsesExpectedPr
     EXPECT_EQ(registry_->FindResource("ignored"), nullptr);
 }
 
-TEST_F(ResourceRegistryTest, CommitRejectsConflictsAndLimitsWithoutPartialMerge)
+TEST_F(ResourceRegistryTest, CommitDeduplicatesResourcesAndRejectsLimits)
 {
     StageState initial;
     initial.external.discovered = true;
@@ -1063,9 +1113,9 @@ TEST_F(ResourceRegistryTest, CommitRejectsConflictsAndLimitsWithoutPartialMerge)
     conflict.external.discovered = true;
     conflict.external.resources.emplace("existing", MakeEntry(ResourceSourceType::External));
     conflict.external.resources.emplace("must-not-merge", MakeEntry(ResourceSourceType::External));
-    EXPECT_EQ(registry_->Commit(conflict), ResourceStatus::Conflict);
-    EXPECT_TRUE(conflict.external.conflict);
-    EXPECT_EQ(registry_->FindResource("must-not-merge"), nullptr);
+    EXPECT_EQ(registry_->Commit(conflict), ResourceStatus::Success);
+    EXPECT_FALSE(conflict.external.conflict);
+    EXPECT_NE(registry_->FindResource("must-not-merge"), nullptr);
 
     StageState preconflicted;
     preconflicted.custom.discovered = true;

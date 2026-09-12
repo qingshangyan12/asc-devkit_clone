@@ -11,6 +11,7 @@
 # ----------------------------------------------------------------------------------------------------------
 
 import sys
+from kernel_spec_options import split_and_write_options
 import stat
 import os
 
@@ -172,6 +173,9 @@ def gen_compile_options(
 ):
     base_dir = os.path.dirname(compile_options_file)
     opc_config_file = os.path.join(base_dir, "custom_opc_options.ini")
+    compile_options = split_and_write_options(
+        compile_options, opc_config_file, op_type, compute_unit
+    )
 
     (
         compile_opt,

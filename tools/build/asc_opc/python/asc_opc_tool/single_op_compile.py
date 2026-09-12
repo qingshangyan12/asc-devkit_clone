@@ -100,7 +100,7 @@ class SingleOpCompile:
         kernel_spec_dir = self.__opc_compile_args.get(OpcOptions.KERNEL_SPEC_DIR)
         context.add_addition("kernel_spec_mode", kernel_spec_mode)
         context.add_addition("kernel_spec_dir", kernel_spec_dir)
-        if kernel_spec_mode == "SK":
+        if kernel_spec_mode in {"SK", "All"}:
             context.add_addition("super_kernel_sub_combine", True)
             if context.get_addition("super_kernel_sub_info") is None:
                 context.add_addition(
@@ -372,7 +372,7 @@ class SingleOpCompile:
         )
         kernel_spec_mode = self.__opc_compile_args.get(OpcOptions.KERNEL_SPEC, "None")
         # Explicit SK enables the existing dynamic SK preparation path.
-        enable_super_kernel = op_relocatable_bin or (kernel_spec_mode == "SK")
+        enable_super_kernel = op_relocatable_bin or (kernel_spec_mode in {"SK", "All"})
         logger.debug(
             "debug_config {}, enable_super_kernel {}.".format(
                 debug_config, enable_super_kernel

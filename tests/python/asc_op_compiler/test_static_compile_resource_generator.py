@@ -12,7 +12,7 @@
 
 import json
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import Enum
 from pathlib import Path
 import sys
@@ -1070,6 +1070,40 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         )
         self.assertNotIn("uint64_t args_offset", static_sk_wrapper)
 
+    def test_export_mode_selects_only_requested_objects(self):
+        basic = self.make_compile_context(symbols=["add_custom_100000"])
+        sk = self.make_compile_context(
+            kernel_name="add_custom_abcd1234",
+            wrapper_path=self.sk_wrapper_path,
+            symbols=["add_custom_abcd1234_100000_tilingkey"],
+        )
+        options = self.make_options()
+        records = self.make_records(
+            basic_context=basic,
+            basic_options=options,
+            sk_context=sk,
+            sk_options=options,
+        )
+        request = self.make_request(
+            records,
+            sk_cap_bitmap=3,
+            sk_kernel_attribute="__global__ [aicore]",
+            basic_kernel_attribute="__global__ [aicore]",
+            sk_bind_compile_options=options.compile_options,
+        )
+        for mode, expected in [
+            ("Normal", ["basic"]),
+            ("SK", ["sk"]),
+            ("All", ["basic", "sk"]),
+        ]:
+            with self.subTest(mode=mode):
+                result = self.generate(replace(request, kernel_spec_mode=mode))
+                manifest = json.loads(Path(result).read_text())
+                self.assertEqual(
+                    [obj["object_type"] for obj in manifest["kernels"][0]["objects"]],
+                    expected,
+                )
+
     def test_sk_object_uses_static_symbol_bind_and_output_namespace(self):
         dynamic_sk_symbol = "add_custom_abcd1234_100000_tilingkey"
         basic_context = self.make_compile_context(symbols=["add_custom_100000"])
@@ -1192,6 +1226,115 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 self.generate(request)
 
         self.assertEqual(Path(marker).read_text(encoding="utf-8"), "previous\n")
+
+
+class TestManifestPublicationFailure(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name)
+        self.state = mock.Mock()
+        self.state.global_var_storage.get_variable.return_value = "Ascend910B"
+
+        def fail(code, message):
+            raise RuntimeError(message)
+
+        utility = SimpleNamespace(
+            CommonUtility=SimpleNamespace(ascendc_raise_python_err=fail)
+        )
+        self.runtime = mock.patch.object(
+            generator,
+            "_kernel_spec_runtime",
+            return_value=(
+                None,
+                SimpleNamespace(TBE_DEFAULT_PYTHON_ERROR_CODE=1),
+                utility,
+                self.state,
+            ),
+        )
+        self.runtime.start()
+        self.addCleanup(self.runtime.stop)
+
+    def compilation(self, mode="Normal"):
+        result = generator.KernelSpecCompilation.__new__(
+            generator.KernelSpecCompilation
+        )
+        result.enabled = mode != "None"
+        result._kernel_spec_mode = mode
+        result.compile_info = SimpleNamespace(kernel_name="AddTest")
+        result.basic_compile_info = result.compile_info
+        result.sk_compile_info = None
+        result.sk_cap_bitmap = None
+        result.resource_id = "a" * 64
+        result.kernel_spec_dir = str(self.root)
+        result._manifest_path = None
+        result.record_sk_commands = False
+        return result
+
+    def test_success_without_publication_is_a_compile_error(self):
+        for mode in ("Normal", "SK", "All"):
+            with self.subTest(mode=mode):
+                with self.assertRaisesRegex(
+                    RuntimeError, "kernel=AddTest.*mode=" + mode + ".*not generated"
+                ):
+                    with self.compilation(mode):
+                        pass
+
+    def test_writer_returning_missing_or_empty_file_is_a_compile_error(self):
+        path = self.root / "manifest.json"
+        for empty in (False, True):
+            if empty:
+                path.touch()
+            with mock.patch.object(generator, "ManifestPackageWriter") as writer:
+                writer.return_value.write.return_value = str(path)
+                with self.assertRaisesRegex(
+                    RuntimeError, "manifest (was not generated|is empty)"
+                ):
+                    with self.compilation() as compilation:
+                        compilation.publish_manifest(None, 4)
+
+    def test_writer_io_error_reports_kernel_and_output_directory(self):
+        with mock.patch.object(generator, "ManifestPackageWriter") as writer:
+            writer.return_value.write.side_effect = OSError("disk full")
+            with self.assertRaisesRegex(
+                RuntimeError, "kernel=AddTest.*output_dir=.*disk full"
+            ):
+                with self.compilation() as compilation:
+                    compilation.publish_manifest(None, 4)
+
+    def test_valid_publication_and_disabled_export_succeed(self):
+        path = self.root / "manifest.json"
+        path.write_text('{"resource_id":"' + "a" * 64 + '"}')
+        with mock.patch.object(generator, "ManifestPackageWriter") as writer:
+            writer.return_value.write.return_value = str(path)
+            with self.compilation() as compilation:
+                compilation.publish_manifest(None, 4)
+        with self.compilation("None"):
+            pass
+        static = self.compilation()
+        static.enabled = False
+        with static:
+            pass
+
+    def test_kernel_error_is_not_replaced_by_missing_manifest(self):
+        original = ValueError("device compilation failed")
+        with self.assertRaises(ValueError) as raised:
+            with self.compilation():
+                raise original
+        self.assertIs(raised.exception, original)
+
+    def test_sk_cleanup_runs_when_publication_is_missing(self):
+        compilation = self.compilation("SK")
+        compilation.record_sk_commands = True
+        compilation._global_state = {"ascendc_enable_super_kernel": False}
+        compilation.cleanup = mock.Mock()
+        with self.assertRaisesRegex(RuntimeError, "not generated"):
+            with compilation:
+                pass
+        compilation.cleanup.assert_called_once()
+        self.state.global_var_storage.set_variable.assert_called_once_with(
+            "ascendc_enable_super_kernel", False
+        )
 
 
 if __name__ == "__main__":

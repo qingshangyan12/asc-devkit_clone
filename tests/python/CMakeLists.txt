@@ -106,3 +106,12 @@ add_custom_target(run_all_tests_and_clean ALL
     COMMENT "clean generated test files"
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
+
+# Package-level JIT configuration and manifest aggregation regressions.
+run_python_llt_test(
+    TARGET ascendc_pyut_kernel_spec_package
+    SRC_FILES_DIR ${ASCENDC_DIR}/cmake/asc/fwk_modules/util/
+    TEST_FILES_DIR ${ASCENDC_DIR}/tests/tools/utils/asc_kernel_spec/
+    PRE_TEST_COMMAND
+    COVERAGERC_DIR
+)
