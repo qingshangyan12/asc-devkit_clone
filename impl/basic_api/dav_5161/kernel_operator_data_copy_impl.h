@@ -970,13 +970,6 @@ __aicore__ inline void DataCopyPadUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, co
     ASSERT(false && "unsupported data copy UB to L1 on current device");
 }
 
-__aicore__ inline void NdDmaDciImpl()
-{
-#if ((!defined(ASCENDC_CPU_DEBUG)) || ASCENDC_CPU_DEBUG == 0)
-    nd_dma_dci();
-#endif
-}
-
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, const DataCopyParams& intriParams)
 {

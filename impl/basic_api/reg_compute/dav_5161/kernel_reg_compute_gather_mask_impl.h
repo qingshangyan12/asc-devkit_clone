@@ -27,50 +27,6 @@
 
 namespace AscendC {
 namespace Reg {
-template <typename T = DefaultType, GatherMaskMode store = GatherMaskMode::NO_STORE_REG, typename U>
-__simd_callee__ inline void GatherMaskImpl(U& dstReg, U srcReg, MaskReg& mask)
-{
-    using ActualT = typename U::ActualT;
-    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(
-        SupportType<ActualT, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, half, float>(),
-        "current data type is not supported on current device!");
-    constexpr auto modeValue = std::integral_constant<::StoreMode, static_cast<::StoreMode>(store)>();
-    vsqz(dstReg, srcReg, mask, modeValue);
-}
-
-template <typename T = DefaultType, typename U>
-__simd_callee__ inline void PrefixSumImpl(U& dstReg, MaskReg& mask)
-{
-    using ActualT = typename U::ActualT;
-    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(
-        SupportType<ActualT, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t>(),
-        "current data type is not supported on current device!");
-    vusqz(dstReg, mask);
-}
-
-template <SpecialPurposeReg spr = SpecialPurposeReg::AR>
-__aicore__ inline int64_t GetSprImpl()
-{
-    static_assert(
-        SupportEnum<spr, SpecialPurposeReg::AR>(),
-        "current GetSpr api only support SpecialPurposeReg AR on current device!");
-    return get_ar();
-}
-
-template <SpecialPurposeReg spr = SpecialPurposeReg::AR>
-__simd_callee__ inline void ClearSprImpl()
-{
-    constexpr uint8_t SPR_AR_VALUE = 74;
-
-    static_assert(
-        SupportEnum<spr, SpecialPurposeReg::AR>(),
-        "current ClearSpr api only support SpecialPurposeReg AR on current device!");
-    constexpr auto sprValue = std::integral_constant<::Spr, static_cast<::Spr>(SPR_AR_VALUE)>();
-    sprclr(sprValue);
-}
-
 template <typename T = DefaultType, typename U = DefaultType, typename S, typename V>
 __simd_callee__ inline void GatherImpl(S& dstReg, S& srcReg, V& indexReg)
 {

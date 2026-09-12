@@ -1881,12 +1881,12 @@ __aicore__ inline void DataCopy(
         (__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr(), params.loopInfo, params.constantValue,
         cacheMode);
 }
+
+__aicore__ inline void NdDmaDci() { NdDmaDciImpl(); }
 #endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
                               (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
-__aicore__ inline void NdDmaDci() { NdDmaDciImpl(); }
-
 __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCopyMVType type)
 {
     if (type == DataCopyMVType::UB_TO_OUT) {

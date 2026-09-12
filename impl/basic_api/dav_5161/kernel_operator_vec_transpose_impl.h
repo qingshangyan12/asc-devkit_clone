@@ -24,64 +24,6 @@
 #include "../../../include/basic_api/kernel_operator_block_sync_intf.h"
 
 namespace AscendC {
-// constexpr int8_t TWO_NUM = 2;
-__aicore__ inline void TransDataTo5HDIntrinsicsImpl(
-    __ubuf__ float* dstList[16], __ubuf__ float* srcList[16], const TransDataTo5HDParams& transDataTo5HDParams)
-{
-    scatter_vnchwconv_b32(
-        VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
-        transDataTo5HDParams.srcRepStride);
-}
-
-__aicore__ inline void TransDataTo5HDIntrinsicsImpl(
-    __ubuf__ int32_t* dstList[16], __ubuf__ int32_t* srcList[16], const TransDataTo5HDParams& transDataTo5HDParams)
-{
-    scatter_vnchwconv_b32(
-        VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
-        transDataTo5HDParams.srcRepStride);
-}
-
-__aicore__ inline void TransDataTo5HDIntrinsicsImpl(
-    __ubuf__ uint32_t* dstList[16], __ubuf__ uint32_t* srcList[16], const TransDataTo5HDParams& transDataTo5HDParams)
-{
-    scatter_vnchwconv_b32(
-        VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
-        transDataTo5HDParams.srcRepStride);
-}
-
-__aicore__ inline void TransDataTo5HDIntrinsicsImpl(
-    __ubuf__ int16_t* dstList[16], __ubuf__ int16_t* srcList[16], const TransDataTo5HDParams& transDataTo5HDParams)
-{
-    scatter_vnchwconv_b16(
-        VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
-        transDataTo5HDParams.srcRepStride);
-}
-
-__aicore__ inline void TransDataTo5HDIntrinsicsImpl(
-    __ubuf__ uint16_t* dstList[16], __ubuf__ uint16_t* srcList[16], const TransDataTo5HDParams& transDataTo5HDParams)
-{
-    scatter_vnchwconv_b16(
-        VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
-        transDataTo5HDParams.srcRepStride);
-}
-
-__aicore__ inline void TransDataTo5HDIntrinsicsImpl(
-    __ubuf__ half* dstList[16], __ubuf__ half* srcList[16], const TransDataTo5HDParams& transDataTo5HDParams)
-{
-    scatter_vnchwconv_b16(
-        VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
-        transDataTo5HDParams.srcRepStride);
-}
-
-__aicore__ inline void TransDataTo5HDIntrinsicsImpl(
-    __ubuf__ bfloat16_t* dstList[16], __ubuf__ bfloat16_t* srcList[16],
-    const TransDataTo5HDParams& transDataTo5HDParams)
-{
-    scatter_vnchwconv_b16(
-        VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
-        transDataTo5HDParams.srcRepStride);
-}
-
 __aicore__ inline void TransDataTo5HDB8IntrinsicsCommonImpl(const TransDataTo5HDParams& transDataTo5HDParams)
 {
     if ((transDataTo5HDParams.dstHighHalf == false) && (transDataTo5HDParams.srcHighHalf == false)) {
@@ -102,26 +44,6 @@ __aicore__ inline void TransDataTo5HDB8IntrinsicsCommonImpl(const TransDataTo5HD
             transDataTo5HDParams.srcRepStride, true, false);
     }
 }
-
-template <typename T>
-__aicore__ inline void TransDataTo5HDB8IntrinsicsImpl(
-    __ubuf__ T* dstList[16], __ubuf__ T* srcList[16], const TransDataTo5HDParams& transDataTo5HDParams)
-{
-    TransDataTo5HDB8IntrinsicsCommonImpl(transDataTo5HDParams);
-}
-
-__aicore__ inline void TransDataTo5HDIntrinsicsImpl(
-    __ubuf__ int8_t* dstList[16], __ubuf__ int8_t* srcList[16], const TransDataTo5HDParams& transDataTo5HDParams)
-{
-    TransDataTo5HDB8IntrinsicsImpl(dstList, srcList, transDataTo5HDParams);
-}
-
-__aicore__ inline void TransDataTo5HDIntrinsicsImpl(
-    __ubuf__ uint8_t* dstList[16], __ubuf__ uint8_t* srcList[16], const TransDataTo5HDParams& transDataTo5HDParams)
-{
-    TransDataTo5HDB8IntrinsicsImpl(dstList, srcList, transDataTo5HDParams);
-}
-
 template <typename T>
 __aicore__ inline void TransDataTo5HDIntrinsicsImpl(
     uint64_t dstList[16], uint64_t srcList[16], const TransDataTo5HDParams& transDataTo5HDParams)
@@ -215,44 +137,12 @@ __aicore__ inline void TransDataTo5HDIntrinsicsImpl<uint8_t>(
     TransDataTo5HDB8IntrinsicsImpl<uint8_t>(dstList, srcList, transDataTo5HDParams);
 }
 
-template <typename T>
-__aicore__ inline void SetVaReg(__ubuf__ T* dstList[16], __ubuf__ T* srcList[16])
-{
-    uint64_t vaRegArray1[VA_REG_ARRAY_LEN];
-    uint64_t vaRegArray2[VA_REG_ARRAY_LEN];
-    uint64_t vaRegArray3[VA_REG_ARRAY_LEN];
-    uint64_t vaRegArray4[VA_REG_ARRAY_LEN];
-
-    for (int32_t i = 0; i < VA_REG_ARRAY_LEN; i++) {
-        vaRegArray1[i] = (uint64_t)dstList[i];
-        vaRegArray2[i] = (uint64_t)dstList[VA_REG_ARRAY_LEN + i];
-        vaRegArray3[i] = (uint64_t)srcList[i];
-        vaRegArray4[i] = (uint64_t)srcList[VA_REG_ARRAY_LEN + i];
-    }
-
-    set_va_reg_sb(VA0, vaRegArray1);
-    set_va_reg_sb(VA1, vaRegArray2);
-    set_va_reg_sb(VA2, vaRegArray3);
-    set_va_reg_sb(VA3, vaRegArray4);
-}
-
 __aicore__ inline void SetVaReg(uint64_t dst[NCHW_CONV_ADDR_LIST_SIZE], uint64_t src[NCHW_CONV_ADDR_LIST_SIZE])
 {
     set_va_reg_sb(VA0, dst);
     set_va_reg_sb(VA1, dst + VA_REG_ARRAY_LEN);
     set_va_reg_sb(VA2, src);
     set_va_reg_sb(VA3, src + VA_REG_ARRAY_LEN);
-}
-
-template <typename T>
-__aicore__ inline void TransDataTo5HDImpl(
-    __ubuf__ T* dstList[16], __ubuf__ T* srcList[16], const TransDataTo5HDParams& transDataTo5HDParams)
-{
-    static_assert(
-        (SupportType<T, half, bfloat16_t, float, int16_t, uint16_t, int32_t, uint32_t, int8_t, uint8_t>()),
-        "TransDataTo5HD does not support current datatype!");
-    SetVaReg(dstList, srcList);
-    TransDataTo5HDIntrinsicsImpl(dstList, srcList, transDataTo5HDParams);
 }
 
 template <typename T>

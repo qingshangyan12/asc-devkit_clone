@@ -40,11 +40,15 @@
 #include "kernel_reg_compute_vec_cmpsel_intf_impl.h"
 #include "kernel_reg_compute_vec_arange_intf_impl.h"
 #include "kernel_reg_compute_vec_reduce_intf_impl.h"
-#include "kernel_reg_compute_vec_ternary_scalar_intf_impl.h"
 #include "kernel_reg_compute_vec_unary_intf_impl.h"
 #include "kernel_reg_compute_vec_vconv_intf_impl.h"
 #include "kernel_reg_compute_vec_fused_intf_impl.h"
+#if !(                       \
+    defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163))
+#include "kernel_reg_compute_vec_ternary_scalar_intf_impl.h"
 #include "kernel_reg_compute_histograms_intf_impl.h"
+#endif
 #endif
 
 #endif // ASCENDC_KERNEL_REG_COMPUTE_INTF_IMPL_H

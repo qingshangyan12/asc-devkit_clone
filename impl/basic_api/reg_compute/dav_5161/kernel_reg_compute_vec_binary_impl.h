@@ -1143,45 +1143,6 @@ __simd_callee__ inline void ShiftLeftB64Impl(T& dstReg, T& srcReg0, U& srcReg1, 
     }
 }
 
-template <
-    typename T = DefaultType, typename U = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S,
-    typename V>
-__simd_callee__ inline void ShiftLeftImpl(S& dstReg, S& srcReg0, V& srcReg1, MaskReg& mask)
-{
-    using ActualT = typename S::ActualT;
-    using ActualU = typename V::ActualT;
-    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(Std::is_same_v<U, DefaultType> || Std::is_same_v<U, ActualU>, "T type is not correct!");
-    static_assert(
-        SupportType<ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, uint64_t, int64_t>(),
-        "current data type is not supported on current device!");
-    static_assert(
-        SupportType<ActualU, int8_t, int16_t, int32_t, int64_t>(),
-        "current src1 data type is not supported on current device!");
-    static_assert(
-        SupportEnum<mode, MaskMergeMode::ZEROING>(),
-        "current ShiftLeft api only supported Mode ZEROING on current device!");
-    constexpr auto modeValue = GetMaskMergeMode<mode>();
-    if constexpr (sizeof(ActualT) != 8) {
-        vshl(dstReg, srcReg0, srcReg1, mask, modeValue);
-    } else {
-        if constexpr (CheckRegTrait<S, RegTraitNumOne>()) {
-            MaskReg maskTrait2;
-            Pack(maskTrait2, mask);
-            RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg0, traitTwoSrcReg1;
-            RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
-            B64TraitOneToTraitTwo(traitTwoSrcReg0, srcReg0);
-            B64TraitOneToTraitTwo(traitTwoSrcReg1, srcReg1);
-            ShiftLeftB64Impl<mode>(traitTwoDstReg, traitTwoSrcReg0, (RegTensor<int32_t>&)traitTwoSrcReg1, maskTrait2);
-            B64TraitTwoToTraitOne(dstReg, traitTwoDstReg);
-        } else if constexpr (CheckRegTrait<S, RegTraitNumTwo>()) {
-            S dstTemp;
-            ShiftLeftB64Impl<mode>(dstTemp, srcReg0, (RegTensor<int32_t>&)srcReg1, mask);
-            dstReg = dstTemp;
-        }
-    }
-}
-
 template <typename T = int32_t, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U, typename S>
 __simd_callee__ inline void ShiftR(U& dstReg, U& srcReg0, S& srcReg1, MaskReg& mask)
 {
@@ -1213,45 +1174,6 @@ __simd_callee__ inline void ShiftRightB64Impl(T& dstReg, T& srcReg0, U& srcReg1,
         ShiftR<uint32_t, mode>(dstReg, srcReg0, srcReg1, mask);
     } else if (Std::is_same_v<ActualT, int64_t>) {
         ShiftR<int32_t, mode>(dstReg, srcReg0, srcReg1, mask);
-    }
-}
-
-template <
-    typename T = DefaultType, typename U = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S,
-    typename V>
-__simd_callee__ inline void ShiftRightImpl(S& dstReg, S& srcReg0, V& srcReg1, MaskReg& mask)
-{
-    using ActualT = typename S::ActualT;
-    using ActualU = typename V::ActualT;
-    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(Std::is_same_v<U, DefaultType> || Std::is_same_v<U, ActualU>, "T type is not correct!");
-    static_assert(
-        SupportType<ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, uint64_t, int64_t>(),
-        "current data type is not supported on current device!");
-    static_assert(
-        SupportType<ActualU, int8_t, int16_t, int32_t, int64_t>(),
-        "current src1 data type is not supported on current device!");
-    static_assert(
-        SupportEnum<mode, MaskMergeMode::ZEROING>(),
-        "current ShiftRight api only supported Mode ZEROING on current device!");
-    constexpr auto modeValue = GetMaskMergeMode<mode>();
-    if constexpr (sizeof(ActualT) != 8) {
-        vshr(dstReg, srcReg0, srcReg1, mask, modeValue);
-    } else {
-        if constexpr (CheckRegTrait<S, RegTraitNumOne>()) {
-            MaskReg maskTrait2;
-            Pack(maskTrait2, mask);
-            RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg0, traitTwoSrcReg1;
-            RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
-            B64TraitOneToTraitTwo(traitTwoSrcReg0, srcReg0);
-            B64TraitOneToTraitTwo(traitTwoSrcReg1, srcReg1);
-            ShiftRightB64Impl<mode>(traitTwoDstReg, traitTwoSrcReg0, (RegTensor<int32_t>&)traitTwoSrcReg1, maskTrait2);
-            B64TraitTwoToTraitOne(dstReg, traitTwoDstReg);
-        } else if constexpr (CheckRegTrait<S, RegTraitNumTwo>()) {
-            S dstTemp;
-            ShiftRightB64Impl<mode>(dstTemp, srcReg0, (RegTensor<int32_t>&)srcReg1, mask);
-            dstReg = dstTemp;
-        }
     }
 }
 
@@ -1438,15 +1360,6 @@ __simd_callee__ inline void PreluImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg
     vprelu(dstReg, srcReg0, srcReg1, mask, modeValue);
 }
 
-template <typename T = DefaultType, typename U>
-__simd_callee__ inline void MullImpl(U& dstReg0, U& dstReg1, U& srcReg0, U& srcReg1, MaskReg& mask)
-{
-    using ActualT = typename U::ActualT;
-    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(SupportType<ActualT, uint32_t, int32_t>(), "current data type is not supported on current device!");
-    vmull(dstReg0, dstReg1, srcReg0, srcReg1, mask);
-}
-
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void MulAddDstImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
 {
@@ -1481,26 +1394,6 @@ __simd_callee__ inline void MulAddDstImpl(U& dstReg, U& srcReg0, U& srcReg1, Mas
         constexpr auto modeValue = GetMaskMergeMode<mode>();
         vmula(dstReg, srcReg0, srcReg1, mask, modeValue);
     }
-}
-
-template <typename T = DefaultType, typename U>
-__simd_callee__ inline void AddCarryOutsImpl(
-    MaskReg& carry, U& dstReg, U& srcReg0, U& srcReg1, MaskReg& carrySrc, MaskReg& mask)
-{
-    using ActualT = typename U::ActualT;
-    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(SupportType<ActualT, uint32_t, int32_t>(), "current data type is not supported on current device!");
-    vaddcs(carry, dstReg, srcReg0, srcReg1, carrySrc, mask);
-}
-
-template <typename T = DefaultType, typename U>
-__simd_callee__ inline void SubCarryOutsImpl(
-    MaskReg& carry, U& dstReg, U& srcReg0, U& srcReg1, MaskReg& carrySrc, MaskReg& mask)
-{
-    using ActualT = typename U::ActualT;
-    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(SupportType<ActualT, uint32_t, int32_t>(), "current data type is not supported on current device!");
-    vsubcs(carry, dstReg, srcReg0, srcReg1, carrySrc, mask);
 }
 
 template <typename T = DefaultType, typename U>

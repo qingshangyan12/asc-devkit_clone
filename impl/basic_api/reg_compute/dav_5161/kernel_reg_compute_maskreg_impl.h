@@ -84,21 +84,6 @@ __simd_callee__ inline MaskReg CreateMaskImpl()
     return reg;
 }
 
-template <typename T = DefaultType, int16_t offset, typename U>
-__simd_callee__ inline void MaskGenWithRegTensorImpl(MaskReg& dst, U& srcReg)
-{
-    using ActualT = typename U::ActualT;
-    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(SupportBytes<ActualT, 2, 4>(), "MaskGenWithRegTensor only support type b16/b32 on current device");
-    if constexpr (sizeof(ActualT) == 2) {
-        static_assert((offset >= 0) && (offset <= 15), "MaskGenWithRegTensor offset must be in 0~15 when T is b16");
-        movvp(dst, (RegTensor<uint16_t>&)srcReg, offset);
-    } else if constexpr (sizeof(ActualT) == 4) {
-        static_assert((offset >= 0) && (offset <= 31), "MaskGenWithRegTensor offset must be in 0~31 when T is b32");
-        movvp(dst, (RegTensor<uint32_t>&)srcReg, offset);
-    }
-}
-
 __simd_callee__ inline void MaskNotImpl(MaskReg& dst, MaskReg& src, MaskReg& mask) { pnot(dst, src, mask); }
 
 __simd_callee__ inline void MaskAndImpl(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
@@ -163,18 +148,6 @@ __simd_callee__ inline void MaskUnPackImpl(MaskReg& dst, MaskReg& src)
 {
     constexpr auto partValue = std::integral_constant<::HiloPart, static_cast<::HiloPart>(part)>();
     punpack(dst, src, partValue);
-}
-
-template <typename T>
-__simd_callee__ inline MaskReg MoveMaskImpl()
-{
-    static_assert(SupportBytes<T, 2, 4>(), "MoveMask only support type b16/b32 on current device");
-
-    if constexpr (sizeof(T) == 2) {
-        return movp_b16();
-    } else if constexpr (sizeof(T) == 4) {
-        return movp_b32();
-    }
 }
 } // namespace Reg
 } // namespace AscendC

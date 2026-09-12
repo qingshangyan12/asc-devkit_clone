@@ -46,38 +46,6 @@ __simd_callee__ inline void FusedMulsCastImpl(T3& dstReg, T4& srcReg, T2 scalarV
     vmulscvt(dstReg, srcReg, scalarValue, mask, partModeValue);
 }
 
-template <typename T, MaskMergeMode mode, typename U>
-__simd_callee__ inline void FusedAbsSubImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
-{
-    using ActualT = typename U::ActualT;
-    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(
-        SupportType<ActualT, half, float, int64_t>(), "current data type is not supported on current device!");
-    static_assert(
-        SupportEnum<mode, MaskMergeMode::ZEROING>(),
-        "current AbsSub api only supported Mode ZEROING on current device!");
-    if constexpr (sizeof(ActualT) == 8) {
-        if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
-            MaskReg maskTrait2;
-            Pack(maskTrait2, mask);
-            RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg0;
-            RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg1;
-            RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
-            B64TraitOneToTraitTwo(traitTwoSrcReg0, srcReg0);
-            B64TraitOneToTraitTwo(traitTwoSrcReg1, srcReg1);
-            Sub(traitTwoDstReg, traitTwoSrcReg0, traitTwoSrcReg1, maskTrait2);
-            Abs(traitTwoDstReg, traitTwoDstReg, maskTrait2);
-            B64TraitTwoToTraitOne(dstReg, traitTwoDstReg);
-        } else if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
-            Sub(dstReg, srcReg0, srcReg1, mask);
-            Abs(dstReg, dstReg, mask);
-        }
-    } else {
-        constexpr auto modeValue = GetMaskMergeMode<mode>();
-        vabsdif(dstReg, srcReg0, srcReg1, mask, modeValue);
-    }
-}
-
 template <typename T, typename U, RegLayout layout, MaskMergeMode mode, typename S, typename V>
 __simd_callee__ inline void FusedExpSubImpl(S& dstReg, V& srcReg0, V& srcReg1, MaskReg& mask)
 {
@@ -94,18 +62,6 @@ __simd_callee__ inline void FusedExpSubImpl(S& dstReg, V& srcReg0, V& srcReg1, M
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     constexpr auto partModeValue = std::integral_constant<::Part, static_cast<::Part>(layout)>();
     vexpdif(dstReg, srcReg0, srcReg1, mask, partModeValue);
-}
-
-template <typename T, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
-__simd_callee__ inline void FusedMulDstAddImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
-{
-    using ActualT = typename U::ActualT;
-    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(
-        SupportType<ActualT, half, float, bfloat16_t>(), "current data type is not supported on current device!");
-    static_assert(SupportEnum<mode, MaskMergeMode::ZEROING>(), "MulDstAdd only support Mode ZEROING");
-    constexpr auto modeValue = GetMaskMergeMode<mode>();
-    vmadd(dstReg, srcReg0, srcReg1, mask, modeValue);
 }
 } // namespace Reg
 } // namespace AscendC
