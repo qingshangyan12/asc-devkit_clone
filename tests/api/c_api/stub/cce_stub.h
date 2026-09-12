@@ -12,7 +12,6 @@
 #include <cstdint>
 #include "stub_fun.h"
 #include "c_api/utils/enum.h"
-#include "impl/utils/common_types.h"
 
 struct hifloat4x2_t {
     uint8_t val = 0;
@@ -41,17 +40,17 @@ inline void mad(
 {}
 
 inline void mad_s8s4(
-    __cc__ int32_t* c_matrix, __ca__ int8_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t left_height, uint16_t n_dim,
+    __cc__ int32_t* c_matrix, __ca__ int8_t* a_matrix, __cb__ void* b_matrix, uint16_t left_height, uint16_t n_dim,
     uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {}
 
 inline void mad_f16s4(
-    __cc__ float* c_matrix, __ca__ half* a_matrix, __cb__ int4b_t* b_matrix, uint16_t left_height, uint16_t n_dim,
+    __cc__ float* c_matrix, __ca__ half* a_matrix, __cb__ void* b_matrix, uint16_t left_height, uint16_t n_dim,
     uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {}
 
-inline void madbf16s4(
-    __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t left_height, uint16_t n_dim,
+inline void mad_bf16s4(
+    __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ void* b_matrix, uint16_t left_height, uint16_t n_dim,
     uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {}
 

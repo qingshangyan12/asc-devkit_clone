@@ -46,8 +46,8 @@ __aicore__ inline void asc_mmad(
 {
     if ASC_IS_AIC {
         mad_s8s4(
-            c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
-            c_matrix_init_val);
+            c_matrix, a_matrix, (__cb__ void*)b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv,
+            c_matrix_source, c_matrix_init_val);
     }
 }
 
@@ -77,8 +77,8 @@ __aicore__ inline void asc_mmad(
 {
     if ASC_IS_AIC {
         mad_f16s4(
-            c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
-            c_matrix_init_val);
+            c_matrix, a_matrix, (__cb__ void*)b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv,
+            c_matrix_source, c_matrix_init_val);
     }
 }
 
@@ -87,9 +87,9 @@ __aicore__ inline void asc_mmad(
     asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     if ASC_IS_AIC {
-        madbf16s4(
-            c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
-            c_matrix_init_val);
+        mad_bf16s4(
+            c_matrix, a_matrix, (__cb__ void*)b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv,
+            c_matrix_source, c_matrix_init_val);
     }
 }
 
@@ -122,8 +122,8 @@ __aicore__ inline void asc_mmad(
     if ASC_IS_AIC {
         uint64_t xd = ((uint64_t)c_matrix) & 0xffffffffULL | ((bias & 0xffffffffULL) << 32);
         mad_s8s4(
-            (__cc__ int32_t*)xd, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, true,
-            false);
+            (__cc__ int32_t*)xd, a_matrix, (__cb__ void*)b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode),
+            disable_gemv, true, false);
     }
 }
 
@@ -156,8 +156,8 @@ __aicore__ inline void asc_mmad(
     if ASC_IS_AIC {
         uint64_t xd = ((uint64_t)c_matrix) & 0xffffffffULL | ((bias & 0xffffffffULL) << 32);
         mad_f16s4(
-            (__cc__ float*)xd, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, true,
-            false);
+            (__cc__ float*)xd, a_matrix, (__cb__ void*)b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode),
+            disable_gemv, true, false);
     }
 }
 
@@ -167,9 +167,9 @@ __aicore__ inline void asc_mmad(
 {
     if ASC_IS_AIC {
         uint64_t xd = ((uint64_t)c_matrix) & 0xffffffffULL | ((bias & 0xffffffffULL) << 32);
-        madbf16s4(
-            (__cc__ float*)xd, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, true,
-            false);
+        mad_bf16s4(
+            (__cc__ float*)xd, a_matrix, (__cb__ void*)b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode),
+            disable_gemv, true, false);
     }
 }
 
