@@ -158,7 +158,8 @@ HcclResult CcuTempKfcServer::CalcRes(
         const bool isAllReduce =
             sourceName == "CcuKernelAllReduceMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE;
         const bool roleMatches = missionNum == 1U || (missionIndex == 0U && (isAllGather || isAllGatherKfc)) ||
-                                 (missionIndex == 1U && isAllGatherNhr) || isAlltoAllKfcMultiJetty;
+                                 (missionIndex == 1U && isAllGatherNhr) ||
+                                 (missionNum == KFC_MAX_MISSION_NUM && isAlltoAllKfcMultiJetty);
         if ((!isAllGather && !isAllGatherNhr && !isReduceScatter && !isReduceScatterPeerOnly && !isAlltoAll &&
              !isAlltoAllKfcMultiJetty && !isAllReduce && !isAllToAllV) ||
             !roleMatches) {
