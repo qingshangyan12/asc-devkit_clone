@@ -1,0 +1,2 @@
+# [gate-test] 场景3: requirements.txt 新增 py 组件（版本在 opensource_py 范围内）
+numpy==2.0.0
