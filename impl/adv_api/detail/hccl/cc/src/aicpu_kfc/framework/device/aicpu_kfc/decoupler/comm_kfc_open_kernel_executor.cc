@@ -179,7 +179,8 @@ HcclResult LaunchOpenOpParamDataImpl(
     CHK_RET(RestoreVarDataIfNeeded(*param, resCtx));
 
     const bool useCannBridge =
-        (param->opType == HCCL_CMD_ALLTOALL || param->opType == HCCL_CMD_ALLTOALLV);
+        (param->opType == HCCL_CMD_ALLTOALL || param->opType == HCCL_CMD_ALLTOALLV ||
+         param->opType == HCCL_CMD_ALLREDUCE);
     if (useCannBridge) {
         HcclResult cannRet = mc2_ops_hccl::RunWithMc2TaskCache(
             *param, resCtx, [&]() -> HcclResult { return mc2_ops_hccl::LaunchViaCann(*param, resCtx); });
