@@ -210,7 +210,8 @@ HcclResult CommKfcAicpuServer::AddOpContext(const HcclApi::OpResCtx* ctx)
 
         std::vector<uint8_t> baseOpParam{};
         std::string commName{};
-        CHK_RET(LoadOpenOpParamData(opParamKey, ctx->opParamSize[i], commName, baseOpParam));
+        bool loopSyncEnabled = false;
+        CHK_RET(LoadOpenOpParamData(opParamKey, ctx->opParamSize[i], commName, baseOpParam, &loopSyncEnabled));
         CHK_PRT_RET(
             commName.empty(), HCCL_ERROR("Group %u: empty comm name for opParamKey %#llx.", groupIdx_, opParamKey),
             HCCL_E_PARA);
@@ -235,6 +236,7 @@ HcclResult CommKfcAicpuServer::AddOpContext(const HcclApi::OpResCtx* ctx)
         execCtx.opParamKey = opParamKey;
         execCtx.commName = commName;
         execCtx.baseOpParam = std::move(baseOpParam);
+        execCtx.loopSyncEnabled = loopSyncEnabled;
         execCtx.resCtxHolder = std::move(resCtxHolder);
 
         bool isDevice950 = false;
@@ -492,10 +494,10 @@ HcclResult CommKfcAicpuServer::FormatOpParamFromMsg(
 }
 
 HcclResult CommKfcAicpuServer::LaunchOpenAicpuKernelServer(
-    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx)
+    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx, bool loopSyncEnabled)
 {
     LogOpenOpParamBrief("KernelServerBegin", opParam);
-    HcclResult ret = LaunchOpenOpParamData(opParam, resCtx);
+    HcclResult ret = LaunchOpenOpParamData(opParam, resCtx, loopSyncEnabled);
     HCCL_INFO("[MC2_OPEN_DIAG][KernelServerEnd] ret %u, opParamSize %zu.", ret, opParam.size());
     return ret;
 }
@@ -587,7 +589,7 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         HCCL_INFO(
             "[MC2_OPEN_DIAG][LoopBeforeKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u.", groupIdx_, msgPos, i,
             turnIdx);
-        ret = LaunchOpenAicpuKernelServer(runParam, *execCtx->resCtxHolder);
+        ret = LaunchOpenAicpuKernelServer(runParam, *execCtx->resCtxHolder, execCtx->loopSyncEnabled);
         UpdateProgress("AfterKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
             "AfterKernel", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,

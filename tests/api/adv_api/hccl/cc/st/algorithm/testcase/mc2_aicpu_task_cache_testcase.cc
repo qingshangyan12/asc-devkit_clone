@@ -196,6 +196,25 @@ TEST_F(Mc2AicpuTaskCacheTest, ShapeAndAllToAllVArraysChangeTheTag)
     EXPECT_NE(first.tag, second.tag);
 }
 
+TEST_F(Mc2AicpuTaskCacheTest, LoopBoundaryPolicySeparatesGraphsButAllowsAddressRelocation)
+{
+    auto inputs = MakeTaskCacheInputs(HCCL_CMD_REDUCE_SCATTER);
+    Mc2AicpuTaskCachePlan original, coalesced, tail, moved;
+    ASSERT_EQ(BuildMc2AicpuTaskCachePlan(inputs.param, inputs.resCtx, original), HCCL_SUCCESS);
+    ASSERT_EQ(
+        BuildMc2AicpuTaskCachePlan(inputs.param, inputs.resCtx, coalesced, "rs-nhr-loop-sync-v1:17:10:17:01"),
+        HCCL_SUCCESS);
+    ASSERT_EQ(
+        BuildMc2AicpuTaskCachePlan(inputs.param, inputs.resCtx, tail, "rs-nhr-loop-sync-v1:17:11:2:11"), HCCL_SUCCESS);
+    EXPECT_NE(original.tag, coalesced.tag);
+    EXPECT_NE(tail.tag, coalesced.tag);
+    inputs.param.inputPtr = reinterpret_cast<void*>(0x800000U);
+    ASSERT_EQ(
+        BuildMc2AicpuTaskCachePlan(inputs.param, inputs.resCtx, moved, "rs-nhr-loop-sync-v1:17:10:17:01"),
+        HCCL_SUCCESS);
+    EXPECT_EQ(moved.tag, coalesced.tag);
+}
+
 TEST_F(Mc2AicpuTaskCacheTest, MissingDynamicSymbolsBypassPlan)
 {
     Mc2HcommAicpuTsTaskCacheResetTestFunctions();

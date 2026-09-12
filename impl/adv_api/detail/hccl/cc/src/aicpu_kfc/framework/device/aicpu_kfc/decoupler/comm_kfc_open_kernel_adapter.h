@@ -22,11 +22,14 @@ struct AlgResourceCtxSerializable;
 }
 
 HcclResult LoadOpenOpParamData(
-    uint64_t opParamKey, uint64_t opParamSize, std::string& commName, std::vector<uint8_t>& opParam);
+    uint64_t opParamKey, uint64_t opParamSize, std::string& commName, std::vector<uint8_t>& opParam,
+    bool* loopSyncEnabled = nullptr);
 HcclResult FormatOpenOpParamDataFromMsg(
     const std::vector<uint8_t>& baseOpParam, const HcclApi::HcclMsg& msg, HcclApi::HcclMsgExt& extMsg, uint32_t rankNum,
     uint32_t repeatIdx, void* stream, std::vector<uint8_t>& runOpParam);
-HcclResult LaunchOpenOpParamData(std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx);
+HcclResult LaunchOpenOpParamData(
+    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx,
+    bool loopSyncEnabled = false);
 HcclResult LoadFromKey(uint64_t opParamKey);
 
 #endif

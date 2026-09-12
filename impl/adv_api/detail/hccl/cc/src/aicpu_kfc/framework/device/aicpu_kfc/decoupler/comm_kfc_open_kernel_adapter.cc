@@ -17,9 +17,10 @@
 
 #include "log.h"
 #include "alg_param.h"
+#include "hccl_loop_sync_policy.h"
 
 extern HcclResult LaunchOpenOpParamDataImpl(
-    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx);
+    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx, bool loopSyncEnabled);
 
 namespace {
 u64 GetDataTypeSize(HcclDataType dataType)
@@ -54,8 +55,12 @@ u64 GetDataTypeSize(HcclDataType dataType)
 } // namespace
 
 HcclResult LoadOpenOpParamData(
-    uint64_t opParamKey, uint64_t opParamSize, std::string& commName, std::vector<uint8_t>& opParam)
+    uint64_t opParamKey, uint64_t opParamSize, std::string& commName, std::vector<uint8_t>& opParam,
+    bool* loopSyncEnabled)
 {
+    if (loopSyncEnabled != nullptr) {
+        *loopSyncEnabled = false;
+    }
     if (opParamKey == 0U) {
         HCCL_ERROR("Invalid opParamKey %#llx.", opParamKey);
         return HCCL_E_PARA;
@@ -67,14 +72,25 @@ HcclResult LoadOpenOpParamData(
 
     const auto* param = reinterpret_cast<const mc2_ops_hccl::OpParam*>(opParamKey);
     const size_t serializedSize = static_cast<size_t>(opParamSize);
-    if (param->varMemSize != serializedSize - sizeof(mc2_ops_hccl::OpParam)) {
+    if (param->varMemSize > serializedSize - sizeof(mc2_ops_hccl::OpParam)) {
         HCCL_ERROR(
             "OpParam variable memory size %llu does not match serialized size %zu.",
             static_cast<unsigned long long>(param->varMemSize), serializedSize);
         return HCCL_E_PARA;
     }
     const auto* begin = reinterpret_cast<const uint8_t*>(param);
-    opParam.assign(begin, begin + serializedSize);
+    const size_t baseSize = sizeof(mc2_ops_hccl::OpParam) + param->varMemSize;
+    if (baseSize != serializedSize) {
+        bool enabled = false;
+        if (serializedSize - baseSize != HcclApi::LOOP_SYNC_EXTENSION_SIZE ||
+            !HcclApi::DecodeLoopSyncPolicy(begin + baseSize, serializedSize - baseSize, enabled) || !enabled ||
+            loopSyncEnabled == nullptr) {
+            HCCL_ERROR("Invalid or unsupported OpParam loop sync extension");
+            return HCCL_E_PARA;
+        }
+        *loopSyncEnabled = enabled;
+    }
+    opParam.assign(begin, begin + baseSize);
     commName.assign(param->commName);
     HCCL_INFO(
         "[MC2_OPEN_DIAG][LoadOpenOpParamData] file[%s:%d], key %#llx, sizeof(OpParam) %zu, "
@@ -286,11 +302,12 @@ HcclResult FormatOpenOpParamDataFromMsg(
     return HCCL_SUCCESS;
 }
 
-HcclResult LaunchOpenOpParamData(std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx)
+HcclResult LaunchOpenOpParamData(
+    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx, bool loopSyncEnabled)
 {
     if (opParam.empty()) {
         HCCL_ERROR("Op param is empty.");
         return HCCL_E_PARA;
     }
-    return LaunchOpenOpParamDataImpl(opParam, resCtx);
+    return LaunchOpenOpParamDataImpl(opParam, resCtx, loopSyncEnabled);
 }

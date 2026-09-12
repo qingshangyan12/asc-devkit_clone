@@ -71,6 +71,8 @@ target_compile_options(ccl_kernel_decoupler_open_exec PRIVATE
 )
 
 target_include_directories(ccl_kernel_decoupler_open_exec BEFORE PRIVATE
+    ${OPEN_HCCL_SRC_ROOT}/ops/reduce_scatter/executor
+    ${OPEN_HCCL_SRC_ROOT}/ops/reduce_scatter/template/aicpu
     ${HCCL_LOCAL_HEADER_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${HCCL_HCOMM_HEADER_DIR}/../

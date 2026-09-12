@@ -39,7 +39,7 @@ inline void ClearMc2TaskCacheBestEffort(
 template <typename Func>
 HcclResult RunWithMc2TaskCache(
     const OpParam& param, const AlgResourceCtxSerializable& resCtx, Func func,
-    Mc2AicpuTaskCacheManager& manager = Mc2AicpuTaskCacheManager::Instance())
+    Mc2AicpuTaskCacheManager& manager = Mc2AicpuTaskCacheManager::Instance(), const std::string& executionPolicy = "")
 {
     if (!IsMc2TaskCacheOp(param.opType)) {
         return func();
@@ -58,7 +58,7 @@ HcclResult RunWithMc2TaskCache(
 
     bool batchActive = true;
     Mc2AicpuTaskCachePlan plan;
-    HcclResult policyRet = BuildMc2AicpuTaskCachePlan(param, resCtx, plan);
+    HcclResult policyRet = BuildMc2AicpuTaskCachePlan(param, resCtx, plan, executionPolicy);
     if (policyRet != HCCL_SUCCESS || !plan.enabled) {
         if (policyRet != HCCL_SUCCESS) {
             HCCL_WARNING("[MC2_TASK_CACHE][Policy] failed and fallback to executor, ret[%d].", policyRet);

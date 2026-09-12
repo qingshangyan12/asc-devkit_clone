@@ -21,6 +21,72 @@
 #endif
 
 namespace mc2_ops_hccl {
+namespace {
+template <typename Template>
+HcclResult ConfigureSoleNhrChannels(
+    Template&, const OpParam&, const AlgResourceCtxSerializable&, const TemplateResource&)
+{
+    return HCCL_SUCCESS;
+}
+
+HcclResult ConfigureSoleNhrChannels(
+    InsTempReduceScatterNHR& algorithm, const OpParam& param, const AlgResourceCtxSerializable& resCtx,
+    const TemplateResource& resources)
+{
+    if (param.engine != COMM_ENGINE_AICPU_TS || !resCtx.topoInfo.isPod ||
+        std::string(param.algName) != "AicpuReduceScatterSoleNHR") {
+        return HCCL_SUCCESS;
+    }
+    CHK_RET(algorithm.SetchannelsPerRank(resources.channels));
+    CHK_PRT_RET(
+        algorithm.GetThreadNum() == 0 || algorithm.GetThreadNum() > resources.threads.size(),
+        HCCL_ERROR("SoleNHR channel count exceeds available threads"), HCCL_E_PARA);
+    return HCCL_SUCCESS;
+}
+} // namespace
+
+template <typename AlgTopoMatch, typename InsAlgTemplate>
+HcclResult InsV2ReduceScatterSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CollectLoops(
+    const OpParam& param, const AlgResourceCtxSerializable& resCtx, ReduceScatterNhrLoopPlan& plan)
+{
+    plan = ReduceScatterNhrLoopPlan{};
+    collectingPlan_ = &plan;
+    const HcclResult ret = Orchestrate(param, resCtx);
+    collectingPlan_ = nullptr;
+    return ret;
+}
+
+HcclResult PrepareReduceScatterNhrLoopPlan(
+    const OpParam& param, const AlgResourceCtxSerializable& resCtx, ReduceScatterNhrLoopPlan& plan)
+{
+    InsV2ReduceScatterSoleExecutor<TopoMatch1D, InsTempReduceScatterNHR> executor;
+    CHK_RET(executor.CollectLoops(param, resCtx, plan));
+    InsTempReduceScatterNHR algorithm(param, resCtx.topoInfo.userRank, resCtx.algHierarchyInfo.infos[0]);
+    CHK_RET(algorithm.PlanLoopBoundaries(param, plan.loops, plan.resource, plan.boundaries, plan.reason));
+    // The resource and normal shape digest already include channels, threads and stride.
+    // Salt only this graph domain; eligibility is recomputed for every set of addresses.
+    plan.cachePolicy = "rs-nhr-loop-sync-v1";
+    for (size_t i = 0; i < plan.loops.size(); ++i) {
+        plan.cachePolicy += ":" + std::to_string(plan.loops[i].count) + ":" +
+                            std::to_string(plan.boundaries[i].entrySync) + std::to_string(plan.boundaries[i].exitSync);
+    }
+    return HCCL_SUCCESS;
+}
+
+HcclResult ExecuteReduceScatterNhrLoopPlan(
+    const OpParam& param, const AlgResourceCtxSerializable& resCtx, const ReduceScatterNhrLoopPlan& plan)
+{
+    if (plan.loops.empty()) {
+        return HCCL_SUCCESS;
+    }
+    InsTempReduceScatterNHR algorithm(param, resCtx.topoInfo.userRank, resCtx.algHierarchyInfo.infos[0]);
+    CHK_RET(algorithm.SetchannelsPerRank(plan.resource.channels));
+    HCCL_DEBUG("[MC2_LOOP_SYNC] reason[%s] loops[%zu]", plan.reason.c_str(), plan.loops.size());
+    for (size_t i = 0; i < plan.loops.size(); ++i) {
+        CHK_RET(algorithm.KernelRunWithBoundary(param, plan.loops[i], plan.resource, plan.boundaries[i]));
+    }
+    return HCCL_SUCCESS;
+}
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 InsV2ReduceScatterSoleExecutor<AlgTopoMatch, InsAlgTemplate>::InsV2ReduceScatterSoleExecutor()
@@ -98,6 +164,9 @@ HcclResult InsV2ReduceScatterSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchest
     }
     templateAlgRes.threads = resCtx.threads;
     templateAlgRes.aivCommInfoPtr = resCtx.aivCommInfoPtr;
+    if (collectingPlan_ != nullptr) {
+        collectingPlan_->resource = templateAlgRes;
+    }
     // 准备数据
     TemplateDataParams tempAlgParams;
     tempAlgParams.buffInfo.inputPtr = param.inputPtr;
@@ -114,6 +183,9 @@ HcclResult InsV2ReduceScatterSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchest
         std::make_shared<InsAlgTemplate>(param, resCtx.topoInfo.userRank, resCtx.algHierarchyInfo.infos[0]);
     u32 templateScratchMultiplier =
         algTemplate->CalcScratchMultiple(tempAlgParams.buffInfo.inBuffType, tempAlgParams.buffInfo.outBuffType);
+    // Match HCCL's SoleNHR policy: only POD uses all provisioned channels.
+    // Do not change the channel selection of other MC2 algorithms here.
+    CHK_RET(ConfigureSoleNhrChannels(*algTemplate, param, resCtx, templateAlgRes));
     // 计算最小传输大小
     u64 maxDataSizePerLoop = 0;
     maxTmpMemSize_ = tempAlgParams.buffInfo.hcclBuff.size;
@@ -166,7 +238,11 @@ HcclResult InsV2ReduceScatterSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchest
         tempAlgParams.inputRepeatStride = 0;
         tempAlgParams.outputRepeatStride = 0;
         // 因为只考虑执行0级算法，所以传进template里面的channels就是channels_的第一个vector
-        CHK_RET(algTemplate->KernelRun(param, tempAlgParams, templateAlgRes));
+        if (collectingPlan_ != nullptr) {
+            collectingPlan_->loops.push_back(tempAlgParams);
+        } else {
+            CHK_RET(algTemplate->KernelRun(param, tempAlgParams, templateAlgRes));
+        }
         processedDataCount += currDataCount;
     }
 
