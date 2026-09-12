@@ -11,6 +11,7 @@
 
 #include <dlfcn.h>
 
+#include <cstring>
 #include <memory>
 #include <string>
 
@@ -141,9 +142,13 @@ const CannSyms& LoadCannSyms()
 
 bool UseCannBridge(const OpParam& param)
 {
+    const bool isLocalAllReduce =
+        param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE &&
+        (std::strcmp(param.algName, "AicpuAllReduceParallelMeshNHR") == 0 ||
+         std::strcmp(param.algName, "AicpuAllreduceParallelMeshNHRPcie") == 0);
     return (param.engine == COMM_ENGINE_AICPU_TS || param.engine == COMM_ENGINE_AICPU) &&
            (param.opType == HcclCMDType::HCCL_CMD_ALLTOALL || param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV ||
-            param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE);
+            (param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE && !isLocalAllReduce));
 }
 
 HcclResult SelectViaCann(OpParam& ascParam, TopoInfoWithNetLayerDetails* ascTopo, std::string& algName)

@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include <cstddef>
+#include <cstring>
 #include <memory>
 #include <string>
 #include <vector>
@@ -178,9 +179,13 @@ HcclResult LaunchOpenOpParamDataImpl(
 
     CHK_RET(RestoreVarDataIfNeeded(*param, resCtx));
 
+    const bool isLocalAllReduce =
+        param->opType == HCCL_CMD_ALLREDUCE &&
+        (std::strcmp(param->algName, "AicpuAllReduceParallelMeshNHR") == 0 ||
+         std::strcmp(param->algName, "AicpuAllreduceParallelMeshNHRPcie") == 0);
     const bool useCannBridge =
         (param->opType == HCCL_CMD_ALLTOALL || param->opType == HCCL_CMD_ALLTOALLV ||
-         param->opType == HCCL_CMD_ALLREDUCE);
+         (param->opType == HCCL_CMD_ALLREDUCE && !isLocalAllReduce));
     if (useCannBridge) {
         HcclResult cannRet = mc2_ops_hccl::RunWithMc2TaskCache(
             *param, resCtx, [&]() -> HcclResult { return mc2_ops_hccl::LaunchViaCann(*param, resCtx); });
