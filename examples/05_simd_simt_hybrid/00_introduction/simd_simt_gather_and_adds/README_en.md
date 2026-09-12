@@ -4,7 +4,7 @@
 This sample implements gather and adds computation based on SIMD and SIMT hybrid programming mode. It uses SIMT programming to implement discrete memory access operation gather, and SIMD programming to implement continuous memory access operation adds.
 
 
-## Supported Products and CANN Software Versions
+## Supported Products and CANN Versions
 
 | Product | CANN Software Version |
 |------|-------------|
