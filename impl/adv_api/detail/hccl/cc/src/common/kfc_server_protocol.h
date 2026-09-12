@@ -34,6 +34,7 @@ constexpr char KFC_CONCURRENT_ALL_GATHER_ALG_NAME[] = "CcuSchedAllGatherConcurMe
 constexpr char KFC_CONCURRENT_ALL_TO_ALL_ALG_NAME[] = "CcuSchedAllToAllSoleMeshConcurrent";
 constexpr char KFC_REDUCE_SCATTER_PEER_ONLY_ALG_NAME[] = "CcuSchedReduceScatterSoleMeshPeerOnly";
 constexpr char KFC_REDUCE_SCATTER_PEER_ONLY_KERNEL_NAME[] = "CcuKernelKfcReduceScatterMesh1DMem2MemPeerOnly";
+constexpr char KFC_RS_SOLE_NHR_ALG_NAME[] = "CcuSchedReduceScatterSoleNHRMultiLink";
 
 struct KfcNhrStepInfo {
     uint32_t step = 0;
@@ -62,13 +63,17 @@ enum class KfcServerRole : uint32_t {
     ALL_GATHER_MESH = 1,
     ALL_GATHER_NHR = 2,
     ALL_TO_ALL_MULTI_JETTY = 3,
+    // 4/5 预留给在途并发 RS 分支的 REDUCE_SCATTER_MESH/REDUCE_SCATTER_NHR（mission0/mission1）。
+    REDUCE_SCATTER_SOLE_NHR = 6,
+    ALL_TO_ALL_MESH = 7,
+    ALL_TO_ALL_CLOS = 8,
 };
 
 inline KfcServerRole GetKfcServerRole(const char* algName, uint32_t missionIndex)
 {
     if (GetKfcServerMissionNum(algName) == KFC_MAX_MISSION_NUM) {
         if (std::strcmp(algName, KFC_CONCURRENT_ALL_TO_ALL_ALG_NAME) == 0) {
-            return KfcServerRole::ALL_TO_ALL_MULTI_JETTY;
+            return missionIndex == 0U ? KfcServerRole::ALL_TO_ALL_MESH : KfcServerRole::ALL_TO_ALL_CLOS;
         }
         if (missionIndex == 0U) {
             return KfcServerRole::ALL_GATHER_MESH;
@@ -76,6 +81,9 @@ inline KfcServerRole GetKfcServerRole(const char* algName, uint32_t missionIndex
         if (missionIndex == 1U) {
             return KfcServerRole::ALL_GATHER_NHR;
         }
+    }
+    if (std::strcmp(algName, KFC_RS_SOLE_NHR_ALG_NAME) == 0) {
+        return KfcServerRole::REDUCE_SCATTER_SOLE_NHR;
     }
     return KfcServerRole::DEFAULT;
 }

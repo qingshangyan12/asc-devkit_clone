@@ -276,8 +276,13 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         ccuUsedXnNum_ = 26;
         CcuPrepareForAllReduceM2M(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALL) {
-        ccuUsedXnNum_ = 11;
-        CcuPrepareForAllToAll(&handleParamGM_[handleId]);
+        if (GetKfcMissionNum(handleId) == KFC_MAX_MISSION_NUM) {
+            ccuUsedXnNum_ = KFC_CONCURRENT_A2A_PARAM_NUM;
+            CcuPrepareForConcurrentAllToAll(&handleParamGM_[handleId]);
+        } else {
+            ccuUsedXnNum_ = 11;
+            CcuPrepareForAllToAll(&handleParamGM_[handleId]);
+        }
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
         ccuUsedXnNum_ = 10;
         FlushDataCache(&allToAllVParam_[handleId]);
@@ -294,6 +299,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         if (GetAlgorithmType(handleId) == static_cast<uint32_t>(AlgorithmType::CcuReduceScatterMeshMem2Mem1DPeerOnly)) {
             ccuUsedXnNum_ = 9;
             CcuPrepareForReduceScatterPeerOnlyM2M(&handleParamGM_[handleId]);
+        } else if (
+            GetAlgorithmType(handleId) == static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterSoleNHRMultiLink)) {
+            ccuUsedXnNum_ = KFC_RS_SOLE_NHR_PARAM_NUM;
+            CcuPrepareForReduceScatterSoleNhrM2M(&handleParamGM_[handleId]);
         } else {
             ccuUsedXnNum_ = 24;
             CcuPrepareForReduceScatterM2M(&handleParamGM_[handleId]);
@@ -535,7 +544,8 @@ __aicore__ inline uint8_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
 {
     const uint32_t algorithmType = GetAlgorithmType(handleId);
     uint8_t missionNum = 1U;
-    if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherConcurMeshNHRMultiLink)) {
+    if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherConcurMeshNHRMultiLink) ||
+        algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllToAllSoleMeshConcurrent)) {
         missionNum = KFC_MAX_MISSION_NUM;
     }
     return missionNum;
