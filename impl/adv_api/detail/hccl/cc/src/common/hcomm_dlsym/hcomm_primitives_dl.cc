@@ -218,8 +218,7 @@ void HcommPrimitivesDlInit(void* libHcommHandle)
 HcclResult HcclChannelNotifyWaitOnThreadDefault(
     ThreadHandle thread, ChannelHandle channel, uint32_t localNotifyIdx, uint32_t fallbackTimeout)
 {
-    if (HcommIsSupportHcommSetNotifyWaitTimeOut() &&
-        HcommIsSupportHcommChannelNotifyWaitOnThreadWithDefaultTimeout()) {
+    if (HcommIsSupportHcommSetNotifyWaitTimeOut() && HcommIsSupportHcommChannelNotifyWaitOnThreadWithDefaultTimeout()) {
         return static_cast<HcclResult>(
             HcommChannelNotifyWaitOnThreadWithDefaultTimeout(thread, channel, localNotifyIdx));
     }

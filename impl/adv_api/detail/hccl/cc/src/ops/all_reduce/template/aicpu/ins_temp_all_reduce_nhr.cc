@@ -71,10 +71,7 @@ HcclResult InsTempAllReduceNHR::GetRes(AlgResourceRequest& resourceRequest) cons
     return HCCL_SUCCESS;
 }
 
-u64 InsTempAllReduceNHR::GetThreadNum() const
-{
-    return channelsPerRank_;
-}
+u64 InsTempAllReduceNHR::GetThreadNum() const { return channelsPerRank_; }
 
 void InsTempAllReduceNHR::GetNotifyIdxMainToSub(std::vector<u32>& notifyIdxMainToSub)
 {
@@ -231,10 +228,10 @@ HcclResult InsTempAllReduceNHR::RunReduceScatter(
     const TemplateDataParams& tempAlgParams, const std::map<u32, std::vector<ChannelInfo>>& channels,
     const std::vector<ThreadHandle>& threads, u32 channelIdx)
 {
-    void* localHcclBuffPtr
-        = supportSymmetricMemAccess_ ? tempAlgParams.buffInfo.inputPtr : tempAlgParams.buffInfo.hcclBuff.addr;
-    u64 hcclBuffBaseOffset
-        = supportSymmetricMemAccess_ ? tempAlgParams.buffInfo.inBuffBaseOff : tempAlgParams.buffInfo.hcclBuffBaseOff;
+    void* localHcclBuffPtr =
+        supportSymmetricMemAccess_ ? tempAlgParams.buffInfo.inputPtr : tempAlgParams.buffInfo.hcclBuff.addr;
+    u64 hcclBuffBaseOffset =
+        supportSymmetricMemAccess_ ? tempAlgParams.buffInfo.inBuffBaseOff : tempAlgParams.buffInfo.hcclBuffBaseOff;
 
     std::vector<NHRStepInfo> stepInfoList;
     CHK_RET(GetReduceScatterStepInfoList(stepInfoList));
@@ -260,10 +257,10 @@ HcclResult InsTempAllReduceNHR::RunReduceScatter(
         std::vector<DataSlice> recvDstSlicesList;
         std::vector<DataSlice> sendDstSlicesList;
 
-        void* sendRemoteHcclBuffPtr
-            = supportSymmetricMemAccess_ ? sendChannel.remoteInputGraphMode.addr : sendChannel.remoteCclMem.addr;
-        void* recvRemoteHcclBuffPtr
-            = supportSymmetricMemAccess_ ? recvChannel.remoteInputGraphMode.addr : recvChannel.remoteCclMem.addr;
+        void* sendRemoteHcclBuffPtr =
+            supportSymmetricMemAccess_ ? sendChannel.remoteInputGraphMode.addr : sendChannel.remoteCclMem.addr;
+        void* recvRemoteHcclBuffPtr =
+            supportSymmetricMemAccess_ ? recvChannel.remoteInputGraphMode.addr : recvChannel.remoteCclMem.addr;
 
         // 在 nhrInBuffType_ 上进行 ReduceScatter 操作
         for (u32 idx = 0; idx < stepInfo.nSlices; ++idx) {
@@ -284,7 +281,9 @@ HcclResult InsTempAllReduceNHR::RunReduceScatter(
         }
         SendRecvReduceInfo sendRecvReduceInfo{
             {sendChannel, recvChannel},
-            {{sendSrcSlicesList, sendDstSlicesList}, {recvSrcSlicesList, recvDstSlicesList}}, dataType_, reduceOp_};
+            {{sendSrcSlicesList, sendDstSlicesList}, {recvSrcSlicesList, recvDstSlicesList}},
+            dataType_,
+            reduceOp_};
 
         if (supportSymmetricMemAccess_) {
             CHK_PRT_RET(
@@ -311,10 +310,10 @@ HcclResult InsTempAllReduceNHR::RunAllGather(
     const TemplateDataParams& tempAlgParams, const std::map<u32, std::vector<ChannelInfo>>& channels,
     const std::vector<ThreadHandle>& threads, u32 channelIdx)
 {
-    void* localHcclBuffPtr
-        = supportSymmetricMemAccess_ ? tempAlgParams.buffInfo.outputPtr : tempAlgParams.buffInfo.hcclBuff.addr;
-    u64 hcclBuffBaseOffset
-        = supportSymmetricMemAccess_ ? tempAlgParams.buffInfo.outBuffBaseOff : tempAlgParams.buffInfo.hcclBuffBaseOff;
+    void* localHcclBuffPtr =
+        supportSymmetricMemAccess_ ? tempAlgParams.buffInfo.outputPtr : tempAlgParams.buffInfo.hcclBuff.addr;
+    u64 hcclBuffBaseOffset =
+        supportSymmetricMemAccess_ ? tempAlgParams.buffInfo.outBuffBaseOff : tempAlgParams.buffInfo.hcclBuffBaseOff;
 
     std::vector<NHRStepInfo> stepInfoList;
     CHK_RET(GetAllGatherStepInfoList(stepInfoList));
@@ -340,10 +339,10 @@ HcclResult InsTempAllReduceNHR::RunAllGather(
         std::vector<DataSlice> recvSrcSlicesList;
         std::vector<DataSlice> recvDstSlicesList;
 
-        void* sendRemoteHcclBuffPtr
-            = supportSymmetricMemAccess_ ? sendChannel.remoteOutputGraphMode.addr : sendChannel.remoteCclMem.addr;
-        void* recvRemoteHcclBuffPtr
-            = supportSymmetricMemAccess_ ? recvChannel.remoteOutputGraphMode.addr : recvChannel.remoteCclMem.addr;
+        void* sendRemoteHcclBuffPtr =
+            supportSymmetricMemAccess_ ? sendChannel.remoteOutputGraphMode.addr : sendChannel.remoteCclMem.addr;
+        void* recvRemoteHcclBuffPtr =
+            supportSymmetricMemAccess_ ? recvChannel.remoteOutputGraphMode.addr : recvChannel.remoteCclMem.addr;
 
         for (u32 idx = 0; idx < stepInfo.nSlices; ++idx) {
             u32 txIdx = stepInfo.txSliceIdxs.at(idx);
@@ -368,8 +367,7 @@ HcclResult InsTempAllReduceNHR::RunAllGather(
         if (supportSymmetricMemAccess_) {
             CHK_PRT_RET(
                 SendRecvBatchRead(sendRecvInfo, threads.at(channelIdx)),
-                HCCL_ERROR("[InsTempAllReduceNHR] RunAllGather SendRecvBatchRead failed"),
-                HcclResult::HCCL_E_INTERNAL);
+                HCCL_ERROR("[InsTempAllReduceNHR] RunAllGather SendRecvBatchRead failed"), HcclResult::HCCL_E_INTERNAL);
         } else if (isDmaRead_) {
             CHK_PRT_RET(
                 SendRecvRead(sendRecvInfo, threads.at(channelIdx)),
