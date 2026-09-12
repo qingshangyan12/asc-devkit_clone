@@ -19,6 +19,7 @@
 #include "hcomm_primitives_dl.h"
 #include "ins_temp_reduce_scatter_mesh_1D_meshchunk.h"
 #include "ins_temp_reduce_scatter_nhr.h"
+#include "ins_v2_reduce_scatter_sole_executor.h"
 #include "coll_alg_v2_exec_registry.h"
 #include "executor_v2_base.h"
 
@@ -384,7 +385,7 @@ struct Scenario {
             ASSERT_EQ(exec->Orchestrate(param, ctx), HCCL_SUCCESS);
         }
     }
-    void ExecuteAndCheck()
+    void ExecuteAndCheck(bool skew = false)
     {
         std::map<ThreadHandle, std::vector<Task>> queues;
         for (const auto& t : tasks) {
@@ -394,9 +395,14 @@ struct Scenario {
         // Separate namespaces for local-thread and directed-channel notifications.
         std::map<std::pair<uint64_t, uint32_t>, bool> channelSignals, threadSignals;
         size_t remaining = tasks.size();
+        size_t tick = 0;
         while (remaining != 0) {
+            ++tick;
             bool progress = false;
             for (auto& entry : queues) {
+                if (skew && entry.first % 16 == 2 && tick % 7 != 0) {
+                    continue;
+                }
                 auto& pos = positions[entry.first];
                 if (pos == entry.second.size()) {
                     continue;
@@ -412,9 +418,10 @@ struct Scenario {
                     signals[key] = false;
                 } else if (t.kind == Kind::THREAD_RECORD || t.kind == Kind::CHANNEL_RECORD) {
                     if (t.kind == Kind::CHANNEL_RECORD) {
-                        const auto from = (t.target - 1) / 64;
+                        const auto bank = (t.target - 1) / 4096;
+                        const auto from = ((t.target - 1) % 4096) / 64;
                         const auto to = (t.target - 1) % 64;
-                        key.first = 1 + to * 64 + from;
+                        key.first = 1 + bank * 4096 + to * 64 + from;
                     }
                     ASSERT_FALSE(signals[key]) << "Notify overwritten before wait";
                     signals[key] = true;
@@ -431,7 +438,9 @@ struct Scenario {
                 --remaining;
                 progress = true;
             }
-            ASSERT_TRUE(progress) << "Task dependency deadlock; remaining=" << remaining;
+            if (!skew || tick % 7 == 0) {
+                ASSERT_TRUE(progress) << "Task dependency deadlock; remaining=" << remaining;
+            }
         }
         for (u32 dst = 0; dst < ranks; ++dst) {
             for (u64 i = 0; i < count; ++i) {
@@ -730,6 +739,160 @@ TEST_F(MeshChunkTest, NhrFusesRealTemplateForSoleAndInterServerRanksWithStridedL
                 }
             }
         }
+    }
+}
+
+TEST_F(MeshChunkTest, NhrLoopCoalescingPreservesPaddedResultsAndIsolatesTail)
+{
+    for (u32 ranks : {2U, 4U, 8U}) {
+        for (auto dtype : {HCCL_DATA_TYPE_INT8, HCCL_DATA_TYPE_FP16, HCCL_DATA_TYPE_BFP16, HCCL_DATA_TYPE_FP32}) {
+            for (bool enabled : {false, true}) {
+                NhrScenario scenario(ranks, 53, 61, dtype);
+                tasks.clear();
+                for (u32 rank = 0; rank < ranks; ++rank) {
+                    auto param = scenario.Param();
+                    param.opMode = OpMode::OPBASE;
+                    param.inputPtr = scenario.In(rank);
+                    param.outputPtr = scenario.Out(rank);
+                    param.inputSize = ranks * scenario.stride * scenario.elementSize;
+                    param.outputSize = scenario.count * scenario.elementSize;
+                    auto resources = scenario.NhrResources(rank);
+                    resources.threads = {1 + rank * 16, 2 + rank * 16};
+                    for (auto& peer : resources.channels) {
+                        auto second = peer.second[0];
+                        second.handle += 4096;
+                        peer.second.push_back(second);
+                    }
+                    std::vector<TemplateDataParams> loops;
+                    for (u64 offset = 0; offset < scenario.count; offset += 17) {
+                        loops.push_back(scenario.NhrData(rank, offset, std::min<u64>(17, scenario.count - offset)));
+                    }
+                    InsTempReduceScatterNHR algorithm(param, rank, {scenario.rankList});
+                    ASSERT_EQ(algorithm.SetchannelsPerRank(resources.channels), HCCL_SUCCESS);
+                    std::vector<NhrLoopBoundary> boundaries;
+                    std::string reason;
+                    ASSERT_EQ(algorithm.PlanLoopBoundaries(param, loops, resources, boundaries, reason), HCCL_SUCCESS);
+                    ASSERT_EQ(reason, "enabled");
+                    ASSERT_EQ(boundaries.size(), 4U);
+                    EXPECT_TRUE(boundaries.front().entrySync);
+                    EXPECT_FALSE(boundaries[0].exitSync);
+                    EXPECT_FALSE(boundaries[1].entrySync);
+                    EXPECT_FALSE(boundaries[1].exitSync);
+                    EXPECT_TRUE(boundaries[2].exitSync);
+                    EXPECT_TRUE(boundaries[3].entrySync);
+                    EXPECT_TRUE(boundaries.back().exitSync);
+                    for (size_t loop = 0; loop < loops.size(); ++loop) {
+                        ASSERT_EQ(
+                            algorithm.KernelRunWithBoundary(
+                                param, loops[loop], resources, enabled ? boundaries[loop] : NhrLoopBoundary{}),
+                            HCCL_SUCCESS);
+                    }
+                }
+                // Ordinary Notify is a bit cleared by Wait, not a counting semaphore.
+                scenario.ExecuteAndCheck(true);
+                const auto localTasks = std::count_if(tasks.begin(), tasks.end(), [](const Task& task) {
+                    return task.kind == Kind::THREAD_RECORD || task.kind == Kind::THREAD_WAIT;
+                });
+                EXPECT_EQ(localTasks, ranks * (enabled ? 8U : 16U));
+            }
+        }
+    }
+}
+
+TEST_F(MeshChunkTest, NhrLoopPlannerFailsClosedWithoutSubmittingTasks)
+{
+    NhrScenario scenario(4, 53, 61, HCCL_DATA_TYPE_FP32);
+    auto param = scenario.Param();
+    param.opMode = OpMode::OPBASE;
+    param.inputPtr = scenario.In(0);
+    param.outputPtr = scenario.Out(0);
+    param.inputSize = scenario.ranks * scenario.stride * scenario.elementSize;
+    param.outputSize = scenario.count * scenario.elementSize;
+    auto resource = scenario.NhrResources(0);
+    resource.threads = {1, 2};
+    for (auto& peer : resource.channels) {
+        auto second = peer.second[0];
+        second.handle += 4096;
+        peer.second.push_back(second);
+    }
+    std::vector<TemplateDataParams> loops{scenario.NhrData(0, 0, 17), scenario.NhrData(0, 17, 17)};
+    for (unsigned fault = 0; fault < 6; ++fault) {
+        auto currentParam = param;
+        auto currentResource = resource;
+        auto currentLoops = loops;
+        if (fault == 0) {
+            currentLoops.resize(1);
+        }
+        if (fault == 1) {
+            currentParam.inputPtr = scenario.Tmp(0);
+        }
+        if (fault == 2) {
+            currentResource.threads[1] = currentResource.threads[0];
+        }
+        if (fault == 3) {
+            currentResource.channels.begin()->second[0].protocol = COMM_PROTOCOL_PCIE;
+        }
+        if (fault == 4) {
+            currentParam.supportSymmetricMemory = true;
+        }
+        if (fault == 5) {
+            currentLoops[1].inputSliceStride = UINT64_MAX;
+        }
+        InsTempReduceScatterNHR algorithm(currentParam, 0, {scenario.rankList});
+        std::vector<NhrLoopBoundary> boundaries;
+        std::string reason;
+        ASSERT_EQ(
+            algorithm.PlanLoopBoundaries(currentParam, currentLoops, currentResource, boundaries, reason),
+            HCCL_SUCCESS);
+        for (const auto& boundary : boundaries) {
+            EXPECT_TRUE(boundary.entrySync);
+            EXPECT_TRUE(boundary.exitSync);
+        }
+        EXPECT_TRUE(tasks.empty());
+    }
+}
+
+TEST_F(MeshChunkTest, NhrExecutorPlanReusesRealLoopFormulaAndSupportsMultipleTurns)
+{
+    NhrScenario scenario(4, 770, 773, HCCL_DATA_TYPE_FP32);
+    for (unsigned turn = 0; turn < 2; ++turn) {
+        tasks.clear();
+        for (u32 rank = 0; rank < scenario.ranks; ++rank) {
+            auto param = scenario.Param();
+            param.opMode = OpMode::OPBASE;
+            ASSERT_EQ(strcpy_s(param.algName, sizeof(param.algName), "AicpuReduceScatterSoleNHR"), EOK);
+            param.inputPtr = scenario.In(rank);
+            param.outputPtr = scenario.Out(rank);
+            param.inputSize = scenario.ranks * scenario.stride * scenario.elementSize;
+            param.outputSize = scenario.count * scenario.elementSize;
+            AlgResourceCtxSerializable ctx{};
+            ctx.topoInfo.userRank = rank;
+            ctx.topoInfo.userRankSize = scenario.ranks;
+            ctx.topoInfo.isPod = true;
+            ctx.algHierarchyInfo.infos = {{scenario.rankList}};
+            ctx.threads = {1 + rank * 16, 2 + rank * 16};
+            ctx.cclMem.addr = scenario.Tmp(rank);
+            ctx.cclMem.size = 256 * scenario.elementSize * scenario.ranks;
+            ctx.channels.resize(1);
+            const auto resources = scenario.NhrResources(rank);
+            for (const auto& peer : resources.channels) {
+                auto channel = peer.second[0];
+                ctx.channels[0].push_back(channel);
+                channel.handle += 4096;
+                ctx.channels[0].push_back(channel);
+            }
+            ReduceScatterNhrLoopPlan plan;
+            ASSERT_EQ(PrepareReduceScatterNhrLoopPlan(param, ctx, plan), HCCL_SUCCESS);
+            ASSERT_EQ(plan.loops.size(), 4U);
+            EXPECT_EQ(plan.reason, "enabled");
+            EXPECT_EQ(plan.loops[0].count, 256U);
+            EXPECT_EQ(plan.loops[3].count, 2U);
+            EXPECT_EQ(plan.loops[1].inputSliceStride, 773U * sizeof(float));
+            EXPECT_TRUE(plan.boundaries[2].exitSync);
+            EXPECT_TRUE(plan.boundaries[3].entrySync);
+            ASSERT_EQ(ExecuteReduceScatterNhrLoopPlan(param, ctx, plan), HCCL_SUCCESS);
+        }
+        scenario.ExecuteAndCheck(true);
     }
 }
 

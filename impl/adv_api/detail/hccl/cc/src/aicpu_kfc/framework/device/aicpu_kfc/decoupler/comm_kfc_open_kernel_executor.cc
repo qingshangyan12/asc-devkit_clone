@@ -19,6 +19,7 @@
 #include "cann_dispatch_bridge.h"
 #include "cann_host_bridge.h"
 #include "hcomm_primitives.h"
+#include "ins_v2_reduce_scatter_sole_executor.h"
 #include "task_cache/mc2_aicpu_task_cache.h"
 #include "task_cache/mc2_aicpu_task_cache_runner.h"
 
@@ -124,7 +125,7 @@ HcclResult RestoreVarDataIfNeeded(mc2_ops_hccl::OpParam& param, const mc2_ops_hc
 } // namespace
 
 HcclResult LaunchOpenOpParamDataImpl(
-    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx)
+    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx, bool loopSyncEnabled)
 {
     auto* param = AsOpenOpParam(opParam);
     CHK_PTR_NULL(param);
@@ -177,6 +178,16 @@ HcclResult LaunchOpenOpParamDataImpl(
         static_cast<unsigned long long>(outputBegin + outputBytes), isAllGather, static_cast<u32>(param->engine));
 
     CHK_RET(RestoreVarDataIfNeeded(*param, resCtx));
+
+    if (loopSyncEnabled && param->opType == HCCL_CMD_REDUCE_SCATTER && param->engine == COMM_ENGINE_AICPU_TS &&
+        resCtx.topoInfo.isPod && std::string(param->algName) == "AicpuReduceScatterSoleNHR") {
+        mc2_ops_hccl::ReduceScatterNhrLoopPlan plan;
+        CHK_RET(mc2_ops_hccl::PrepareReduceScatterNhrLoopPlan(*param, resCtx, plan));
+        CHK_RET(mc2_ops_hccl::InitHcommBatchTransferOnThreadSupported(resCtx.isHcommBatchTransferOnThreadSupported));
+        return mc2_ops_hccl::RunWithMc2TaskCache(
+            *param, resCtx, [&]() { return mc2_ops_hccl::ExecuteReduceScatterNhrLoopPlan(*param, resCtx, plan); },
+            mc2_ops_hccl::Mc2AicpuTaskCacheManager::Instance(), plan.cachePolicy);
+    }
 
     const bool useCannBridge =
         (param->opType == HCCL_CMD_ALLTOALL || param->opType == HCCL_CMD_ALLTOALLV ||
