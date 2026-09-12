@@ -61,3 +61,8 @@ if(PACKAGE_OPEN_PROJECT)
   include(cmake/package.cmake)
   include(cmake/version_info.cmake)
 endif()
+
+# [gate-test] 场景1: URL 形式引入 C++ 三方库（URL 在 url 白名单内）
+set(GATE_TEST_MOCKCPP_URL "https://gitcode.com/cann-src-third-party/mockcpp/releases/download/v2.7-h3/mockcpp-2.7.tar.gz")
+# [gate-test] 场景2: add_cann_third_party 形式引入在册三方库
+add_cann_third_party(json)
