@@ -15,8 +15,7 @@
 namespace mc2_ops_hccl {
 
 namespace {
-HcclResult HcommChannelNotifyWaitOnThread(
-    ThreadHandle thread, ChannelHandle channel, u32 localNotifyIdx, u32 timeout)
+HcclResult HcommChannelNotifyWaitOnThread(ThreadHandle thread, ChannelHandle channel, u32 localNotifyIdx, u32 timeout)
 {
     return HcclChannelNotifyWaitOnThreadDefault(thread, channel, localNotifyIdx, timeout);
 }
@@ -77,9 +76,9 @@ bool FuseNotifyToLastWriteReduceDesc(std::vector<HcclHcommBatchTransferDesc>& de
     fused.transferInfo.writeReduceWithNotify.notifyIdx = NOTIFY_IDX_DATA_SIGNAL;
     descs.back() = fused;
     HCCL_DEBUG(
-            "[AlgDataTransWrapper] FuseNotifyToLastWriteReduceDesc: fused last descriptor to "
-            "WRITE_REDUCE_WITH_NOTIFY, notifyIdx[%u].",
-            NOTIFY_IDX_DATA_SIGNAL);
+        "[AlgDataTransWrapper] FuseNotifyToLastWriteReduceDesc: fused last descriptor to "
+        "WRITE_REDUCE_WITH_NOTIFY, notifyIdx[%u].",
+        NOTIFY_IDX_DATA_SIGNAL);
     return true;
 }
 
@@ -128,8 +127,7 @@ HcclResult DoSendRecvBatchTx(
     ProcessSliceFunc processSlice, FallbackFunc fallback, bool fusePostNotify = false)
 {
     if (!IsHcommBatchTransferOnThreadSupported()) {
-        HCCL_WARNING("[AlgDataTransWrapper][%s] hcomm batch transfer on thread not supported, use fallback.",
-            funcName);
+        HCCL_WARNING("[AlgDataTransWrapper][%s] hcomm batch transfer on thread not supported, use fallback.", funcName);
         return fallback(sendRecvInfo, thread);
     }
     const std::vector<DataSlice>& srcSlices = sendRecvInfo.sendRecvSlices_.txSlicesList_.srcSlices_;
