@@ -237,7 +237,7 @@ inline void copy_matrix_cc_to_cbuf(
 
 // npu_arch_9201: no sid, bool quant_pre_rnd as 7th arg
 #define stub_copy_matrix_cc_to_cbuf_no_sid(DstT, SrcT)                                                              \
-    inline void copy_matrix_cc_to_cbuf(                                                                              \
+    inline void copy_matrix_cc_to_cbuf(                                                                             \
         __cbuf__ DstT* dst_addr, __cc__ SrcT* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride, \
         uint16_t loop_src_stride, bool quant_pre_rnd, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,                 \
         uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post, uint8_t relu_post, \
@@ -811,12 +811,12 @@ inline void copy_gm_to_ubuf_align_v2(
     uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
 {}
 inline void copy_gm_to_cbuf_multi_dn2nz(
-    __cbuf__ hifloat8_t* dst_addr, __gm__ hifloat8_t* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
-    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+    __cbuf__ hifloat8_t* dst_addr, __gm__ hifloat8_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
+    uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
 {}
 inline void copy_gm_to_cbuf_multi_nd2nz(
-    __cbuf__ hifloat8_t* dst_addr, __gm__ hifloat8_t* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
-    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+    __cbuf__ hifloat8_t* dst_addr, __gm__ hifloat8_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
+    uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
 {}
 inline void copy_gm_to_cbuf_align_v2(
     __cbuf__ fp8_e5m2_t* dst_addr, __gm__ fp8_e5m2_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
@@ -829,12 +829,12 @@ inline void copy_gm_to_ubuf_align_v2(
     uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
 {}
 inline void copy_gm_to_cbuf_multi_dn2nz(
-    __cbuf__ fp8_e5m2_t* dst_addr, __gm__ fp8_e5m2_t* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
-    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+    __cbuf__ fp8_e5m2_t* dst_addr, __gm__ fp8_e5m2_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
+    uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
 {}
 inline void copy_gm_to_cbuf_multi_nd2nz(
-    __cbuf__ fp8_e5m2_t* dst_addr, __gm__ fp8_e5m2_t* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
-    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+    __cbuf__ fp8_e5m2_t* dst_addr, __gm__ fp8_e5m2_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
+    uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
 {}
 inline void copy_gm_to_cbuf_align_v2(
     __cbuf__ fp8_e4m3fn_t* dst_addr, __gm__ fp8_e4m3fn_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
@@ -847,12 +847,12 @@ inline void copy_gm_to_ubuf_align_v2(
     uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
 {}
 inline void copy_gm_to_cbuf_multi_dn2nz(
-    __cbuf__ fp8_e4m3fn_t* dst_addr, __gm__ fp8_e4m3fn_t* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
-    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+    __cbuf__ fp8_e4m3fn_t* dst_addr, __gm__ fp8_e4m3fn_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
+    uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
 {}
 inline void copy_gm_to_cbuf_multi_nd2nz(
-    __cbuf__ fp8_e4m3fn_t* dst_addr, __gm__ fp8_e4m3fn_t* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
-    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+    __cbuf__ fp8_e4m3fn_t* dst_addr, __gm__ fp8_e4m3fn_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
+    uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
 {}
 inline void copy_gm_to_cbuf_align_v2(
     __cbuf__ int16_t* dst_addr, __gm__ int16_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
@@ -883,12 +883,12 @@ inline void copy_gm_to_ubuf_align_v2(
     uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
 {}
 inline void copy_gm_to_cbuf_multi_dn2nz(
-    __cbuf__ uint16_t* dst_addr, __gm__ uint16_t* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
-    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+    __cbuf__ uint16_t* dst_addr, __gm__ uint16_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
+    uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
 {}
 inline void copy_gm_to_cbuf_multi_nd2nz(
-    __cbuf__ uint16_t* dst_addr, __gm__ uint16_t* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
-    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+    __cbuf__ uint16_t* dst_addr, __gm__ uint16_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
+    uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
 {}
 inline void copy_gm_to_cbuf_align_v2(
     __cbuf__ half* dst_addr, __gm__ half* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
@@ -919,12 +919,12 @@ inline void copy_gm_to_ubuf_align_v2(
     uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
 {}
 inline void copy_gm_to_cbuf_multi_dn2nz(
-    __cbuf__ bfloat16_t* dst_addr, __gm__ bfloat16_t* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
-    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+    __cbuf__ bfloat16_t* dst_addr, __gm__ bfloat16_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
+    uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
 {}
 inline void copy_gm_to_cbuf_multi_nd2nz(
-    __cbuf__ bfloat16_t* dst_addr, __gm__ bfloat16_t* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
-    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+    __cbuf__ bfloat16_t* dst_addr, __gm__ bfloat16_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
+    uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
 {}
 inline void copy_gm_to_cbuf_align_v2(
     __cbuf__ int32_t* dst_addr, __gm__ int32_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
@@ -955,12 +955,12 @@ inline void copy_gm_to_ubuf_align_v2(
     uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
 {}
 inline void copy_gm_to_cbuf_multi_dn2nz(
-    __cbuf__ uint32_t* dst_addr, __gm__ uint32_t* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
-    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+    __cbuf__ uint32_t* dst_addr, __gm__ uint32_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
+    uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
 {}
 inline void copy_gm_to_cbuf_multi_nd2nz(
-    __cbuf__ uint32_t* dst_addr, __gm__ uint32_t* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
-    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+    __cbuf__ uint32_t* dst_addr, __gm__ uint32_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
+    uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
 {}
 inline void copy_gm_to_cbuf_align_v2(
     __cbuf__ float* dst_addr, __gm__ float* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
