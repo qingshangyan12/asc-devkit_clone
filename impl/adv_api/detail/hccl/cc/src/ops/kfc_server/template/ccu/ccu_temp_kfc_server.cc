@@ -29,6 +29,15 @@ HcclResult InheritKfcServerKernelArg(
     auto kfcArg = std::make_shared<CcuKernelArgKfcServer>();
 
     kfcArg->role = GetKfcServerRole(param.algName, missionIndex);
+    if (param.algName != nullptr && std::strcmp(param.algName, KFC_PARALLEL_ALL_GATHER_ALG_NAME) == 0) {
+        const auto* baseArg = static_cast<const CcuKernelArgBase*>(srcKernel.kernelArg);
+        CHK_PTR_NULL(baseArg);
+        kfcArg->algSubType = baseArg->algSubType;
+        kfcArg->algArg = baseArg->algArg;
+        CHK_PRT_RET(
+            kfcArg->algSubType != KFC_PARALLEL_ALL_GATHER_SUB_TYPE || !kfcArg->algArg,
+            HCCL_ERROR("[ParallelAllGather] missing algorithm arguments"), HCCL_E_PARA);
+    }
     const bool isAllGather =
         srcName == "CcuKernelAllGatherMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
     const bool isAllGatherKfc =
@@ -176,8 +185,9 @@ HcclResult CcuTempKfcServer::CalcRes(
         const bool roleMatches = missionNum == 1U || (missionIndex == 0U && (isAllGather || isAllGatherKfc)) ||
                                  (missionIndex == 1U && isAllGatherNhr) ||
                                  (missionNum == KFC_MAX_MISSION_NUM && isAlltoAllKfcMultiJetty);
-        if ((!isAllGather && !isAllGatherNhr && !isReduceScatter && !isAlltoAll && !isAlltoAllKfcMultiJetty &&
-             !isAllReduce && !isAllToAllV && !isReduceScatterPeerOnly && !isReduceScatterNhr) ||
+        if ((!isAllGather && !isAllGatherKfc && !isAllGatherNhr && !isReduceScatter && !isAlltoAll &&
+             !isAlltoAllKfcMultiJetty && !isAllReduce && !isAllToAllV && !isReduceScatterPeerOnly &&
+             !isReduceScatterNhr) ||
             !roleMatches) {
             HCCL_ERROR(
                 "[CcuTempKfcServer::CalcRes] unsupported or misordered source kernel[%s] at mission[%u]",
