@@ -64,7 +64,7 @@
         MOCKER_CPP(                                                                                                 \
             instr, void(                                                                                            \
                        __cc__ c_type*, __ca__ a_type*, __cb__ b_instr_type*, uint16_t, uint16_t, uint16_t, uint8_t, \
-                       bool, bool))                                                                                 \
+                       bool, bool, bool))                                                                           \
             .times(1)                                                                                               \
             .will(invoke(mad_##type_prefix##_Stub));                                                                \
                                                                                                                     \
@@ -82,7 +82,7 @@
         MOCKER_CPP(                                                                                                 \
             instr, void(                                                                                            \
                        __cc__ c_type*, __ca__ a_type*, __cb__ b_instr_type*, uint16_t, uint16_t, uint16_t, uint8_t, \
-                       bool, bool))                                                                                 \
+                       bool, bool, bool))                                                                           \
             .times(1)                                                                                               \
             .will(invoke(mad_bias_##type_prefix##_Stub));                                                           \
                                                                                                                     \
