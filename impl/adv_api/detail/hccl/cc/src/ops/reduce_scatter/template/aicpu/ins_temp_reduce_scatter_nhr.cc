@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "ins_temp_reduce_scatter_nhr.h"
+#include <set>
 
 namespace mc2_ops_hccl {
 InsTempReduceScatterNHR::InsTempReduceScatterNHR(
@@ -17,6 +18,145 @@ InsTempReduceScatterNHR::InsTempReduceScatterNHR(
 {}
 
 InsTempReduceScatterNHR::~InsTempReduceScatterNHR() {}
+
+namespace {
+bool ValidRange(const void* ptr, u64 size, u64& end)
+{
+    const u64 begin = reinterpret_cast<uintptr_t>(ptr);
+    if (ptr == nullptr || size == 0 || size > UINT64_MAX - begin) {
+        return false;
+    }
+    end = begin + size;
+    return true;
+}
+
+bool Disjoint(const void* left, u64 leftSize, const void* right, u64 rightSize)
+{
+    u64 leftEnd = 0;
+    u64 rightEnd = 0;
+    return ValidRange(left, leftSize, leftEnd) && ValidRange(right, rightSize, rightEnd) &&
+           (leftEnd <= reinterpret_cast<uintptr_t>(right) || rightEnd <= reinterpret_cast<uintptr_t>(left));
+}
+} // namespace
+
+HcclResult InsTempReduceScatterNHR::PlanLoopBoundaries(
+    const OpParam& param, const std::vector<TemplateDataParams>& loops, const TemplateResource& resource,
+    std::vector<NhrLoopBoundary>& boundaries, std::string& reason)
+{
+    boundaries.assign(loops.size(), NhrLoopBoundary{});
+    reason = "unproven_thread_ownership";
+    if (loops.size() < 2) {
+        reason = "single_loop";
+        return HCCL_SUCCESS;
+    }
+    if (param.supportSymmetricMemory || param.opMode != OpMode::OPBASE || templateRankSize_ < 2 ||
+        resource.channels.empty()) {
+        return HCCL_SUCCESS;
+    }
+    if (IsPcieProtocol(resource.channels)) {
+        reason = "pcie_path";
+        return HCCL_SUCCESS;
+    }
+    CHK_RET(SetchannelsPerRank(resource.channels));
+    std::vector<AicpuNHRStepInfo> steps;
+    CHK_RET(GetStepInfoList(steps));
+    for (const auto& step : steps) {
+        if (step.toRank >= subCommRanks_[0].size() || step.fromRank >= subCommRanks_[0].size() ||
+            resource.channels.count(subCommRanks_[0][step.toRank]) == 0 ||
+            resource.channels.count(subCommRanks_[0][step.fromRank]) == 0) {
+            return HCCL_SUCCESS;
+        }
+    }
+    if (channelsPerRank_ < 2 || channelsPerRank_ > resource.threads.size()) {
+        reason = "single_thread_or_incomplete_resource";
+        return HCCL_SUCCESS;
+    }
+    std::set<ThreadHandle> threads;
+    for (u32 c = 0; c < channelsPerRank_; ++c) {
+        if (resource.threads[c] == 0 || !threads.insert(resource.threads[c]).second) {
+            return HCCL_SUCCESS;
+        }
+    }
+    const auto& first = loops.front();
+    if (!Disjoint(param.inputPtr, param.inputSize, first.buffInfo.hcclBuff.addr, first.buffInfo.hcclBuff.size) ||
+        !Disjoint(param.outputPtr, param.outputSize, first.buffInfo.hcclBuff.addr, first.buffInfo.hcclBuff.size) ||
+        !Disjoint(param.inputPtr, param.inputSize, param.outputPtr, param.outputSize)) {
+        reason = "scratch_alias";
+        return HCCL_SUCCESS;
+    }
+    if (static_cast<u32>(param.DataDes.dataType) >= HCCL_DATA_TYPE_RESERVED ||
+        DATATYPE_SIZE_TABLE[param.DataDes.dataType] == 0) {
+        return HCCL_E_PARA;
+    }
+    const u64 elementSize = DATATYPE_SIZE_TABLE[param.DataDes.dataType];
+    // Preflight every loop, including the isolated tail, before pruning any boundary.
+    for (const auto& loop : loops) {
+        if (loop.repeatNum != 1 || loop.sliceSize == 0 || loop.sliceSize % elementSize != 0 ||
+            loop.count != loop.sliceSize / elementSize || loop.tailSize != loop.sliceSize ||
+            loop.enableRemoteMemAccess || loop.buffInfo.hcclBuffBaseOff != 0 ||
+            loop.sliceSize > loop.buffInfo.hcclBuff.size / templateRankSize_ ||
+            loop.inputSliceStride < loop.sliceSize || loop.inputSliceStride > UINT64_MAX / (templateRankSize_ - 1)) {
+            return HCCL_SUCCESS;
+        }
+        const u64 rankOffset = loop.inputSliceStride * (templateRankSize_ - 1);
+        if (rankOffset > param.inputSize || loop.buffInfo.inBuffBaseOff > param.inputSize - rankOffset ||
+            loop.sliceSize > param.inputSize - rankOffset - loop.buffInfo.inBuffBaseOff ||
+            loop.buffInfo.outBuffBaseOff > param.outputSize ||
+            loop.sliceSize > param.outputSize - loop.buffInfo.outBuffBaseOff) {
+            return HCCL_SUCCESS;
+        }
+        std::vector<u64> expectedSizes;
+        std::vector<u64> expectedOffsets;
+        std::map<ChannelHandle, u32> channelOwners;
+        for (const auto& peer : resource.channels) {
+            if (peer.second.size() < channelsPerRank_) {
+                return HCCL_SUCCESS;
+            }
+            std::vector<u64> counts, sizes, offsets;
+            CHK_RET(CalcDataSplitByPortGroup(loop.count, elementSize, peer.second, counts, sizes, offsets));
+            if (sizes.size() != channelsPerRank_ || offsets.size() != channelsPerRank_) {
+                return HCCL_SUCCESS;
+            }
+            u64 end = 0;
+            for (u32 c = 0; c < channelsPerRank_; ++c) {
+                const auto& channel = peer.second[c];
+                u64 remoteEnd = 0;
+                if (channel.handle == 0 || channel.protocol == COMM_PROTOCOL_PCIE || offsets[c] != end ||
+                    sizes[c] == 0 || sizes[c] > loop.sliceSize - end ||
+                    channel.remoteCclMem.size / templateRankSize_ < loop.sliceSize ||
+                    !ValidRange(channel.remoteCclMem.addr, channel.remoteCclMem.size, remoteEnd)) {
+                    return HCCL_SUCCESS;
+                }
+                auto owner = channelOwners.emplace(channel.handle, c);
+                if (!owner.second && owner.first->second != c) {
+                    return HCCL_SUCCESS;
+                }
+                end += sizes[c];
+            }
+            if (end != loop.sliceSize) {
+                return HCCL_SUCCESS;
+            }
+            if (expectedSizes.empty()) {
+                expectedSizes = sizes;
+                expectedOffsets = offsets;
+            } else if (sizes != expectedSizes || offsets != expectedOffsets) {
+                return HCCL_SUCCESS;
+            }
+        }
+    }
+    reason = "layout_changed";
+    for (size_t i = 1; i < loops.size(); ++i) {
+        // Resources and dtype are immutable for this executor invocation. Equal slice
+        // lengths produce identical per-rank/channel scratch partitions and NHR steps.
+        if (loops[i - 1].count == loops[i].count && loops[i - 1].sliceSize == loops[i].sliceSize &&
+            loops[i - 1].tailSize == loops[i].tailSize && loops[i - 1].inputSliceStride == loops[i].inputSliceStride) {
+            boundaries[i - 1].exitSync = false;
+            boundaries[i].entrySync = false;
+            reason = "enabled";
+        }
+    }
+    return HCCL_SUCCESS;
+}
 
 HcclResult InsTempReduceScatterNHR::CalcRes(
     HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
@@ -74,6 +214,13 @@ u64 InsTempReduceScatterNHR::GetThreadNum() const { return 1 * channelsPerRank_;
 HcclResult InsTempReduceScatterNHR::KernelRun(
     const OpParam& param, const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource)
 {
+    return KernelRunWithBoundary(param, tempAlgParams, templateResource, NhrLoopBoundary{});
+}
+
+HcclResult InsTempReduceScatterNHR::KernelRunWithBoundary(
+    const OpParam& param, const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource,
+    const NhrLoopBoundary& boundary)
+{
     HCCL_INFO("[InsTempReduceScatterNHR] GenExtIns start");
     if (tempAlgParams.sliceSize == 0 && tempAlgParams.tailSize == 0) {
         HCCL_INFO("[InsTempReduceScatterNHR] sliceSize and tailSize are both 0, skip");
@@ -118,7 +265,7 @@ HcclResult InsTempReduceScatterNHR::KernelRun(
     }
 
     threadNum_ = GetThreadNum();
-    if (threadNum_ > 1) {
+    if (boundary.entrySync && threadNum_ > 1) {
         std::vector<ThreadHandle> subThreads(
             templateResource.threads.begin() + 1, templateResource.threads.begin() + threadNum_);
         GetNotifyIdxMainToSub(notifyIdxMainToSub_);
@@ -140,7 +287,7 @@ HcclResult InsTempReduceScatterNHR::KernelRun(
         for (u32 channelIdx = 0; channelIdx < channelsPerRank_; channelIdx++) {
             CHK_RET(PostLocalCopy(templateResource.threads, channelIdx));
         }
-        if (threadNum_ > 1) {
+        if (boundary.exitSync && threadNum_ > 1) {
             std::vector<ThreadHandle> subThreads(
                 templateResource.threads.begin() + 1, templateResource.threads.begin() + threadNum_);
             GetNotifyIdxSubToMain(notifyIdxSubToMain_);
@@ -154,7 +301,7 @@ HcclResult InsTempReduceScatterNHR::KernelRun(
     for (u32 channelIdx = 0; channelIdx < channelsPerRank_; channelIdx++) {
         CHK_RET(PostLocalCopy(templateResource.threads, channelIdx));
     }
-    if (threadNum_ > 1) {
+    if (boundary.exitSync && threadNum_ > 1) {
         std::vector<ThreadHandle> subThreads(
             templateResource.threads.begin() + 1, templateResource.threads.begin() + threadNum_);
         GetNotifyIdxSubToMain(notifyIdxSubToMain_);

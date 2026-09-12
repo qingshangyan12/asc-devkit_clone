@@ -544,7 +544,8 @@ bool AddResourceFields(const OpParam& param, const AlgResourceCtxSerializable& r
 } // namespace
 
 HcclResult BuildMc2AicpuTaskCachePlan(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx, Mc2AicpuTaskCachePlan& plan)
+    const OpParam& param, const AlgResourceCtxSerializable& resCtx, Mc2AicpuTaskCachePlan& plan,
+    const std::string& executionPolicy)
 {
     plan = Mc2AicpuTaskCachePlan{};
     if (GetExternalInputHcclAicpuCacheEnable() == 0U) {
@@ -594,6 +595,9 @@ HcclResult BuildMc2AicpuTaskCachePlan(
     }
 
     AddShapeFields(param, inputSpan, outputSpan, shape);
+    if (!executionPolicy.empty()) {
+        shape.AddString(executionPolicy.c_str(), executionPolicy.size());
+    }
     Digest128Builder resource("mc2-task-cache-resource-v1");
     if (!AddResourceFields(param, resCtx, resource)) {
         SetBypass(plan, "unsupported or empty channel resource");

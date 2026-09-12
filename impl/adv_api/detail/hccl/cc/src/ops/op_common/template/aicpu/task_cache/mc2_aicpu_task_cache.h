@@ -38,7 +38,8 @@ struct Mc2AicpuTaskCachePlan {
 };
 
 HcclResult BuildMc2AicpuTaskCachePlan(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx, Mc2AicpuTaskCachePlan& plan);
+    const OpParam& param, const AlgResourceCtxSerializable& resCtx, Mc2AicpuTaskCachePlan& plan,
+    const std::string& executionPolicy = "");
 
 HcclResult Mc2AicpuTaskCacheLookup(const Mc2AicpuTaskCachePlan& plan, bool& isHit);
 HcclResult Mc2AicpuTaskCacheStart(const Mc2AicpuTaskCachePlan& plan);

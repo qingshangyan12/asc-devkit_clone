@@ -17,6 +17,11 @@
 
 namespace mc2_ops_hccl {
 
+struct NhrLoopBoundary {
+    bool entrySync{true};
+    bool exitSync{true};
+};
+
 class InsTempReduceScatterNHR : public InsAlgTemplateBase {
 public:
     InsTempReduceScatterNHR() = default;
@@ -39,6 +44,12 @@ public:
     HcclResult KernelRun(
         const OpParam& param, const TemplateDataParams& tempAlgParams,
         const TemplateResource& templateResource) override;
+    HcclResult KernelRunWithBoundary(
+        const OpParam& param, const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource,
+        const NhrLoopBoundary& boundary);
+    HcclResult PlanLoopBoundaries(
+        const OpParam& param, const std::vector<TemplateDataParams>& loops, const TemplateResource& resource,
+        std::vector<NhrLoopBoundary>& boundaries, std::string& reason);
     u64 CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) override;
     u64 GetThreadNum() const override;
 

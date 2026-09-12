@@ -13,8 +13,20 @@
 #include "executor_common_ops.h"
 #include "topo_match_1d.h"
 #include "topo_match_base.h"
+#include "ins_temp_reduce_scatter_nhr.h"
 
 namespace mc2_ops_hccl {
+struct ReduceScatterNhrLoopPlan {
+    std::vector<TemplateDataParams> loops;
+    TemplateResource resource;
+    std::vector<NhrLoopBoundary> boundaries;
+    std::string reason;
+    std::string cachePolicy;
+};
+HcclResult PrepareReduceScatterNhrLoopPlan(
+    const OpParam& param, const AlgResourceCtxSerializable& resCtx, ReduceScatterNhrLoopPlan& plan);
+HcclResult ExecuteReduceScatterNhrLoopPlan(
+    const OpParam& param, const AlgResourceCtxSerializable& resCtx, const ReduceScatterNhrLoopPlan& plan);
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 class InsV2ReduceScatterSoleExecutor : public InsCollAlgBase {
 public:
@@ -22,6 +34,8 @@ public:
     ~InsV2ReduceScatterSoleExecutor() override = default;
 
     HcclResult Orchestrate(const OpParam& param, const AlgResourceCtxSerializable& resCtx) override;
+    HcclResult CollectLoops(
+        const OpParam& param, const AlgResourceCtxSerializable& resCtx, ReduceScatterNhrLoopPlan& plan);
 
     /* *************** 资源计算 *************** */
 
@@ -43,6 +57,7 @@ protected:
 
     std::vector<std::map<u32, std::vector<ChannelInfo>>> remoteRankToChannelInfo_;
     std::vector<ThreadHandle> threads_;
+    ReduceScatterNhrLoopPlan* collectingPlan_{nullptr};
 };
 } // namespace mc2_ops_hccl
 
