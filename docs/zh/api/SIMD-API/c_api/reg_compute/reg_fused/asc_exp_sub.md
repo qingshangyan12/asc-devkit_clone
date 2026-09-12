@@ -66,19 +66,17 @@
 
   ```c
   // 通过函数返回值返回结果（占位符形式）
-  __simd_callee__ inline vector_float asc_exp_sub_half2float(
-      vector_half src0,
-      vector_half src1,
-      vector_bool mask,
-      std::integral_constant<asc_position_mode, <src_pos>> src_pos)
+  __simd_callee__ inline vector_float asc_exp_sub_half2float(vector_half src0,
+                                                             vector_half src1,
+                                                             vector_bool mask,
+                                                             std::integral_constant<asc_position_mode, <src_pos>> src_pos)
 
   // 通过引用参数输出结果（占位符形式）
-  __simd_callee__ inline void asc_exp_sub_half2float(
-      vector_float& dst,
-      vector_half src0,
-      vector_half src1,
-      vector_bool mask,
-      std::integral_constant<asc_position_mode, <src_pos>> src_pos)
+  __simd_callee__ inline void asc_exp_sub_half2float(vector_float& dst,
+                                                     vector_half src0,
+                                                     vector_half src1,
+                                                     vector_bool mask,
+                                                     std::integral_constant<asc_position_mode, <src_pos>> src_pos)
   ```
 
   **占位符说明如下：**
@@ -112,17 +110,18 @@
 - `mask`掩码位为0时，结果对应元素置0。
 - 只有当输出数据类型位宽大于输入时，计算时才会有精度提升。
 
-<!-- npu="950" id8 -->
 
 ## 调用示例
 
 将以下代码保存为`example.asc`后，可通过`bisheng`命令编译运行。其中，`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
+<!-- npu="950" id8 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+<!-- end id8 -->
 
 ```cpp
 #include <cmath>
@@ -284,6 +283,3 @@ int main()
     return passed ? 0 : 1;
 }
 ```
-
-
-<!-- end id8 -->
