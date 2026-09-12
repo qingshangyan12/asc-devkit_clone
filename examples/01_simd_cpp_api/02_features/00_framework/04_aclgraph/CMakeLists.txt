@@ -16,12 +16,13 @@ set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201,
 # SCENARIO_NUM: ACLGraph捕获场景编号
 #   1 - 单流捕获
 #   2 - 双流捕获
-set(SCENARIO_NUM "1" CACHE STRING "ACLGraph scenario number: 1-2")
+#   3 - 单流捕获 + Exception Dump
+set(SCENARIO_NUM "1" CACHE STRING "ACLGraph scenario number: 1-3")
 
 message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
 
-if(NOT SCENARIO_NUM MATCHES "^[1-2]$")
-    message(FATAL_ERROR "SCENARIO_NUM must be 1 or 2, got: ${SCENARIO_NUM}")
+if(NOT SCENARIO_NUM MATCHES "^[1-3]$")
+    message(FATAL_ERROR "SCENARIO_NUM must be 1, 2 or 3, got: ${SCENARIO_NUM}")
 endif()
 
 find_package(ASC REQUIRED)
@@ -31,6 +32,9 @@ project(aclgraph_add_demo LANGUAGES ASC CXX)
 add_executable(demo
     add.asc
 )
+
+# 场景3通过acl.json使能Exception Dump，需要与demo放在同一目录下
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/acl.json ${CMAKE_CURRENT_BINARY_DIR}/acl.json COPYONLY)
 
 target_compile_definitions(demo PRIVATE
     SCENARIO_NUM=${SCENARIO_NUM}

@@ -6,7 +6,7 @@ When a fixed data copy and computation process must be executed repeatedly, the 
 
 ACLGraph can capture a group of runtime tasks on a specified stream, and then execute these tasks repeatedly as a whole. The process is as follows: call `aclmdlRICaptureBegin` and `aclmdlRICaptureEnd` to generate an `aclmdlRI` execution instance. Then call `aclmdlRIExecuteAsync` to execute the instance without submitting the same tasks one by one again. For more information about ACLGraph, refer to [ACLGraph Documentation](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/programug/acldevg/runtime_doc_dev_0045.html).
 
-This example uses the Add operator to show how to capture Ascend C `<<<>>>` kernel function invocations and the related data copy tasks. It demonstrates single-stream linear task capture and double-stream event dependency capture.
+This example uses the Add operator to show how to capture Ascend C `<<<>>>` kernel function invocations and the related data copy tasks. It demonstrates single-stream linear task capture, double-stream event dependency capture, and Exception Dump when an AI Core exception occurs during graph replay.
 
 ## Supported Products and CANN Versions
 
@@ -24,6 +24,7 @@ This example uses the Add operator to show how to capture Ascend C `<<<>>>` kern
 │   │   ├── single_stream_capture.png  // Single-stream capture flowchart
 │   │   └── double_stream_capture.png  // Double-stream capture flowchart
 │   ├── CMakeLists.txt                 // Build project
+│   ├── acl.json                       // aclInit configuration file that enables Exception Dump (scenario 3 only)
 │   ├── add.asc                        // Ascend C kernel implementation and ACLGraph capture invocation example
 │   └── README.md                      // Example documentation
 ```
@@ -38,6 +39,7 @@ This example uses the CMake build parameter `SCENARIO_NUM` to select different A
 <tr><td rowspan="1" align="center">SCENARIO_NUM</td><td align="center">Scenario</td><td align="center">Task organization</td><td align="center">Description</td></tr>
 <tr><td align="center">1</td><td align="center">Single stream</td><td align="center">All tasks are submitted to <code>mainStream</code></td><td align="center">Demonstrates the basic linear task capture and repeated execution process</td></tr>
 <tr><td align="center">2</td><td align="center">Double stream</td><td align="center"><code>mainStream</code> and <code>computeStream</code> synchronize through events</td><td align="center">Demonstrates how to capture cross-stream tasks and event synchronization relationships</td></tr>
+<tr><td align="center">3</td><td align="center">Single stream + Exception Dump</td><td align="center">All tasks are submitted to <code>mainStream</code>, and the kernel triggers an AI Core exception</td><td align="center">Demonstrates how to implement a custom exception callback and save tensor data in the <code>&lt;&lt;&lt;&gt;&gt;&gt;</code> scenario</td></tr>
 </table>
 
 **Scenario 1: Single-stream capture**
@@ -59,6 +61,12 @@ This example uses the CMake build parameter `SCENARIO_NUM` to select different A
 <p align="center">
   <img src="figures/double_stream_capture.png" width="800">
 </p>
+
+**Scenario 3: Single-stream capture + Exception Dump**
+- Input: x [8, 2048], float; y [8, 2048], float
+- Output: z [8, 2048], float
+- Captured content: The task organization is identical to scenario 1. The only difference is that the kernel is replaced with `add_custom_fault`, which executes a `trap` instruction on a specified block after the computation to trigger an AI Core exception.
+- Description: In the `<<<>>>` direct invocation scenario, there is no operator description information, so CANN cannot automatically dump the tensor data of the kernel. Users must register an exception callback and save the data themselves. This scenario demonstrates how to implement such a callback.
 
 ## Example Implementation
 
@@ -106,7 +114,60 @@ for (int i = 0; i < 5; ++i) {
 }
 ```
 
-The example also calls `aclmdlRIDebugJsonPrint` to output the captured task information to JSON files. The single-stream scenario outputs `modelRI_single_stream.json`, and the double-stream scenario outputs `modelRI_double_stream.json`.
+The example also calls `aclmdlRIDebugJsonPrint` to output the captured task information to JSON files. The single-stream scenario outputs `modelRI_single_stream.json`, the double-stream scenario outputs `modelRI_double_stream.json`, and the Exception Dump scenario outputs `modelRI_exception_dump.json`.
+
+### Exception Dump Implementation (Scenario 3)
+
+When a kernel is launched directly through `<<<>>>`, CANN has no operator description for it. Exception Dump therefore cannot know which tensors the kernel has, or their shapes and data types. Users must register an exception callback to supply this information. This scenario combines the following two groups of interfaces:
+
+- `aclrtExceptionInfoCallbackRegister`: registers the exception callback. After an AI Core exception occurs, the runtime invokes the callback from an internal thread and passes in `aclrtExceptionInfo`.
+- `acldumpSaveExceptionInfo`: saves user-constructed tensor data to the Exception Dump path from within the callback.
+
+**Enable Exception Dump**
+
+Exception Dump must be enabled through the `aclInit` configuration file. The `acl.json` file of this example is shown below, and it is copied to the `build` directory automatically at build time.
+
+```json
+{
+    "dump": {
+        "dump_path": "./",
+        "dump_scene": "aic_err_brief_dump"
+    }
+}
+```
+
+**Register the exception callback**
+
+Registering the exception callback is not a stream task, so it is not captured, but it must be completed before the graph is replayed. It is also recommended to set the stream to stop on failure so that subsequent tasks do not mask the exception site.
+
+```cpp
+aclInit("./acl.json");
+aclrtSetDevice(deviceId);
+aclrtExceptionInfoCallbackRegister(ExceptionCallback);
+aclrtSetStreamFailureMode(mainStream, ACL_STOP_ON_FAILURE);
+```
+
+**Obtain exception information and save data in the callback**
+
+The callback first obtains the fault location information through the `aclrtGetXxxFromExceptionInfo` interfaces, and then obtains the device address of the kernel args through `aclrtGetArgsFromExceptionInfo`. The args of a `<<<>>>` invocation are packed in the order of the kernel parameters, which are the GM addresses of x, y, and z in this example. After copying them back to the host, `acldumpTensorInfo` can be constructed and saved.
+
+```cpp
+void ExceptionCallback(aclrtExceptionInfo* exceptionInfo)
+{
+    // 1. Obtain the fault location information: deviceId, streamId, taskId, and errorCode.
+    // 2. Obtain the faulty kernel name through aclrtGetFuncHandleFromExceptionInfo and aclrtGetFunctionName.
+    // 3. Obtain the args address through aclrtGetArgsFromExceptionInfo, copy it back to the host,
+    //    and parse out the GM addresses of x, y, and z.
+    // 4. Construct acldumpTensorInfo and call acldumpSaveExceptionInfo to save the data.
+    acldumpSaveExceptionInfo("aclgraph_add_exception", userTag, tensors, argNum);
+}
+```
+
+> [!NOTE]Note
+> The exception callback runs in an internal runtime thread and cannot access local variables of the business function. Therefore, the example records the tensor description required for the dump in a global variable before the capture starts. Do not call blocking interfaces such as `aclrtSynchronizeStream` in the callback, and do not submit further tasks to the faulty stream.
+
+
+The saved data is stored in the `<dump_path>/extra-info/data-dump/<deviceId>/` directory, and the file name is `aclgraph_add_exception.custom.{timestamp}`. The root path can be queried through `acldumpGetExceptionInfoPath`.
 
 ## Build and Run
 
@@ -131,21 +192,38 @@ The example also calls `aclmdlRIDebugJsonPrint` to output the captured task info
   ./demo
   ```
 
-  `SCENARIO_NUM=1` builds the single-stream capture scenario. `SCENARIO_NUM=2` builds the double-stream capture scenario. If `SCENARIO_NUM` is not specified, the single-stream capture scenario is built by default.
+  `SCENARIO_NUM=1` builds the single-stream capture scenario. `SCENARIO_NUM=2` builds the double-stream capture scenario. `SCENARIO_NUM=3` builds the Exception Dump scenario. If `SCENARIO_NUM` is not specified, the single-stream capture scenario is built by default.
 
 - Build option description
 
   | Option | Values | Description |
   |--------|--------|-------------|
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products; dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | `1` (default), `2` | Capture scenario number: 1 indicates single-stream capture, and 2 indicates double-stream capture |
+  | `SCENARIO_NUM` | `1` (default), `2`, `3` | Capture scenario number: 1 indicates single-stream capture, 2 indicates double-stream capture, and 3 indicates single-stream capture with Exception Dump |
 
 - Execution result
 
-  The following output is observed upon success:
+  For scenarios 1 and 2, the following output is observed upon success:
 
   ```bash
   Output: 0 0.3 0.6 0.9 1.2 ...
   Golden: 0 0.3 0.6 0.9 1.2 ...
   test pass!
   ```
+
+  Scenario 3 triggers an AI Core exception on purpose, so the kernel always fails and the computation result is not verified. The following output is observed upon success:
+
+  ```bash
+  [Host] exception dump path: .../extra-info/data-dump/0/
+  [Host] executing captured graph, an AI Core exception is expected on block 4.
+  [Exception] deviceId=0, streamId=..., taskId=..., errorCode=...
+  [Exception] kernel name: ...add_custom_fault...
+  [Exception] x=0x..., y=0x..., z=0x...
+  [Exception] acldumpSaveExceptionInfo ret=0
+  [Host] aclrtSynchronizeStream failed as expected, ret=...
+  [Host] recent error message: ...
+  exception dump scenario finished, check the dump files under <dump_path>/extra-info/data-dump/<deviceId>/.
+  ```
+
+  > [!NOTE]Note
+  > If `exception dump is not enabled` appears in the log, `acl.json` was not loaded correctly. Make sure the file is in the same directory as `demo`.
