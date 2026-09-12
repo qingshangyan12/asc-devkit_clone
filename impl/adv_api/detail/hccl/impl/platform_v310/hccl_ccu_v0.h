@@ -279,6 +279,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         if (GetAlgorithmType(handleId) == static_cast<uint32_t>(AlgorithmType::CcuSchedAllToAllMesh1DMultiJetty)) {
             ccuUsedXnNum_ = KFC_A2A_MJ_PARAM_NUM;
             CcuPrepareForAllToAllMultiJetty(&handleParamGM_[handleId]);
+        } else if (GetKfcMissionNum(handleId) == KFC_MAX_MISSION_NUM) {
+            ccuUsedXnNum_ = KFC_CONCURRENT_A2A_PARAM_NUM;
+            CcuPrepareForConcurrentAllToAll(&handleParamGM_[handleId]);
         } else {
             ccuUsedXnNum_ = 11;
             CcuPrepareForAllToAll(&handleParamGM_[handleId]);
@@ -544,7 +547,8 @@ __aicore__ inline uint8_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
 {
     const uint32_t algorithmType = GetAlgorithmType(handleId);
     uint8_t missionNum = 1U;
-    if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherConcurMeshNHRMultiLink)) {
+    if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherConcurMeshNHRMultiLink) ||
+        algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllToAllSoleMeshConcurrent)) {
         missionNum = KFC_MAX_MISSION_NUM;
     }
     return missionNum;
