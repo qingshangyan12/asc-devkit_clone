@@ -25,8 +25,7 @@ inline void mad(
 
 inline void mad(
     __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t m, uint16_t k,
-    uint16_t n, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
-    bool c_matrix_init_val)
+    uint16_t n, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {}
 
 inline void mad(
@@ -176,7 +175,7 @@ inline void mad_mx(
 
 inline void mad_mx(
     __cc__ float* c_matrix, uint64_t bias, __ca__ half* a_matrix, uint64_t scale_a_addr, __cb__ hif4x2_t* b_matrix,
-    uint64_t scale_b_addr, uuint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag, bool disable_gemv,
+    uint64_t scale_b_addr, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag, bool disable_gemv,
     bool c_matrix_source, bool c_matrix_init_val)
 {}
 
