@@ -234,8 +234,8 @@ HcclResult InsTempReduceScatterAicpuReduceNHR::RunAllGather(const std::vector<Th
                     tempAlgParams_.count);
             }
         }
-        // write模式使用tx,rx地址不生效，仅使用对端link做Post/Wait
-        // read 模式使用rx, tx地址不生效，仅使用对端link做Post/Wait
+        // write模式仅使用tx地址，rx地址不生效，仅使用对端link做Post/Wait
+        // read 模式仅使用rx地址，tx地址不生效，仅使用对端link做Post/Wait
         TxRxSlicesList sendRecvSlicesList({txSrcSlicesAll, txDstSlicesAll}, {rxSrcSlicesAll, rxDstSlicesAll});
         TxRxChannels sendRecvChannels(channelSend, channelRecv);
         SendRecvInfo sendRecvInfo(sendRecvChannels, sendRecvSlicesList);
