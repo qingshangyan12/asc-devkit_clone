@@ -22,15 +22,15 @@
 
 ## 样例描述
 - 样例功能：  
-  对两个相同大小的向量做逐元素乘法，向量shape为[1, 1024]，数据类型为float。
+  对两个相同大小的向量做逐元素乘法，向量shape为[1, 1024]，数据类型为complex64。
 
 - 样例规格：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
   <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
-  <tr><td align="center">x</td><td align="center">[1, 1024]</td><td align="center">float</td></tr>
-  <tr><td align="center">y</td><td align="center">[1, 1024]</td><td align="center">float</td></tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[1, 1024]</td><td align="center">float</td></tr>
+  <tr><td align="center">x</td><td align="center">[1, 1024]</td><td align="center">complex64</td></tr>
+  <tr><td align="center">y</td><td align="center">[1, 1024]</td><td align="center">complex64</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[1, 1024]</td><td align="center">complex64</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="3" align="center">mul</td></tr>
   </table>
 

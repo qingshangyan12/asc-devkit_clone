@@ -22,15 +22,15 @@ This example implements element-wise multiplication based on the Reg programming
 
 ## Example Description
 - Example functionality:
-  Performs element-wise multiplication on two vectors of the same size. The vector shape is [1, 1024] and the data type is float.
+  Performs element-wise multiplication on two vectors of the same size. The vector shape is [1, 1024] and the data type is complex64.
 
 - Example specifications:
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="3" align="center">AIV Example</td></tr>
   <tr><td rowspan="3" align="center">Example Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
-  <tr><td align="center">x</td><td align="center">[1, 1024]</td><td align="center">float</td></tr>
-  <tr><td align="center">y</td><td align="center">[1, 1024]</td><td align="center">float</td></tr>
-  <tr><td rowspan="1" align="center">Example Output</td><td align="center">z</td><td align="center">[1, 1024]</td><td align="center">float</td></tr>
+  <tr><td align="center">x</td><td align="center">[1, 1024]</td><td align="center">complex64</td></tr>
+  <tr><td align="center">y</td><td align="center">[1, 1024]</td><td align="center">complex64</td></tr>
+  <tr><td rowspan="1" align="center">Example Output</td><td align="center">z</td><td align="center">[1, 1024]</td><td align="center">complex64</td></tr>
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="3" align="center">mul</td></tr>
   </table>
 

@@ -18,9 +18,13 @@ import numpy as np
 
 def gen_golden_data():
     total_length = 1024
-    data_type = np.float32
-    x = np.random.uniform(1, 2, [1, total_length]).astype(data_type)
-    y = np.random.uniform(1, 2, [1, total_length]).astype(data_type)
+    real_type = np.float32
+    x_real = np.random.uniform(1, 2, [1, total_length]).astype(real_type)
+    x_imag = np.random.uniform(1, 2, [1, total_length]).astype(real_type)
+    y_real = np.random.uniform(1, 2, [1, total_length]).astype(real_type)
+    y_imag = np.random.uniform(1, 2, [1, total_length]).astype(real_type)
+    x = (x_real + 1j * x_imag).astype(np.complex64)
+    y = (y_real + 1j * y_imag).astype(np.complex64)
     golden = x * y
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
