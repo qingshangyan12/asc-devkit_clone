@@ -56,48 +56,6 @@ HcclResult CcuTempKfcAllToAllMesh1DMultiJettySliced::CalcRes(
     return HCCL_SUCCESS;
 }
 
-HcclResult CcuTempKfcAllToAllMesh1DMultiJettySliced::KernelRun(
-    const OpParam& param, const TemplateDataParams& templateDataParams, TemplateResource& templateResource)
-{
-    buffInfo_ = templateDataParams.buffInfo;
-
-    const uint64_t inputAddr = PointerToAddr(buffInfo_.inputPtr) + buffInfo_.inBuffBaseOff;
-    const uint64_t outputAddr = PointerToAddr(buffInfo_.outputPtr) + buffInfo_.outBuffBaseOff;
-    uint64_t token = 0;
-    CHK_RET(GetToken(buffInfo_, token));
-
-    const uint64_t sliceSize = templateDataParams.sliceSize;
-    if (sliceSize == 0) {
-        HCCL_INFO("[CcuTempKfcAllToAllMesh1DMultiJettySliced] sliceSize is 0, skip.");
-        return HCCL_SUCCESS;
-    }
-
-    const auto& sdispls = templateDataParams.sdispls;
-    const uint32_t dataTypeSize = DATATYPE_SIZE_TABLE[param.all2AllVDataDes.sendType];
-    const uint64_t srcStride = (sdispls.size() >= 2U) ? (sdispls[1] - sdispls[0]) * dataTypeSize : sliceSize;
-    const uint64_t srcOffset = 0U;
-    const uint64_t dstOffset = static_cast<uint64_t>(mySubCommRank_) * srcStride;
-
-    LoopGroupConfig config{};
-    config.msInterleave = CCU_MS_INTERLEAVE;
-    config.loopCount = CCU_MS_LOCAL_COPY_LOOP_COUNT;
-    config.memSlice = CCU_MS_SIZE * LOCAL_COPY_MS_PER_LOOP;
-    const auto goSize = CalGoSize(sliceSize, config);
-
-    CcuKernelSubmitInfo submitInfo{};
-    submitInfo.kernelHandle = templateResource.ccuKernels[0];
-    CHK_RET(FillCachedArgs(
-        submitInfo, 1ULL, inputAddr, outputAddr, sliceSize, srcStride, srcOffset, dstOffset, goSize[0], goSize[1],
-        goSize[2], goSize[3]));
-    templateResource.submitInfos.push_back(submitInfo);
-
-    HCCL_INFO(
-        "[CcuTempKfcAllToAllMesh1DMultiJettySliced] inputAddr[%llu], outputAddr[%llu], sliceSize[%llu], "
-        "srcStride[%llu], srcOffset[%llu], dstOffset[%llu]",
-        inputAddr, outputAddr, sliceSize, srcStride, srcOffset, dstOffset);
-    return HCCL_SUCCESS;
-}
-
 HcclResult CcuTempKfcAllToAllMesh1DMultiJettySliced::GetRes(AlgResourceRequest& resourceRequest) const
 {
     resourceRequest.slaveThreadNum = 0;
