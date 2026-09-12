@@ -213,6 +213,14 @@ HcclResult BuildTagsAndValidate(
             ctxTag += "_" + std::to_string(ccTiling->opType) + "_" + std::string(ccTiling->algConfig) + "_" +
                       std::to_string(ccTiling->commEngine);
         }
+        bool loopSyncEnabled = false;
+        CHK_PRT_RET(
+            !HcclApi::DecodeLoopSyncPolicy(
+                reinterpret_cast<const uint8_t*>(ccTiling->reserved2), sizeof(ccTiling->reserved2), loopSyncEnabled),
+            HCCL_ERROR("Invalid MC2 loop sync extension"), HCCL_E_PARA);
+        if (loopSyncEnabled) {
+            ctxTag += "_lsyn_v1_" + std::to_string(i);
+        }
     }
     CHK_RET(HcomCheckUserRank(rankSize, userRank));
     return HCCL_SUCCESS;

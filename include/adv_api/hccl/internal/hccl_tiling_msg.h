@@ -15,6 +15,7 @@
 #define IMPL_HCCL_HCCL_TILING_MSG_H
 
 #include <cstdint>
+#include "hccl_loop_sync_policy.h"
 
 namespace HcclApi {
 constexpr uint32_t INIT_TILING_VERSION = 100U;
@@ -49,6 +50,8 @@ struct Mc2CcTilingInner {
     uint32_t reduceType;
     char reserved2[232];
 };
+static_assert(sizeof(Mc2CcTilingInner) == 512, "MC2 tiling wire size must remain unchanged");
+static_assert(offsetof(Mc2CcTilingInner, reserved2) == 280, "MC2 extension offset must remain unchanged");
 } // namespace HcclApi
 
 #endif // IMPL_HCCL_HCCL_TILING_MSG_H

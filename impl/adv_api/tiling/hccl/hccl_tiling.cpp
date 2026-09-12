@@ -79,6 +79,10 @@ void PrintMc2CcTiling(const Mc2CcTilingInner& tiling)
     TILING_LOG_DEBUG("Mc2CcTiling msg dstDataType:%u", tiling.dstDataType);
     TILING_LOG_DEBUG("Mc2CcTiling msg srcDataType:%u", tiling.srcDataType);
     TILING_LOG_DEBUG("Mc2CcTiling msg commEngine:%u", tiling.commEngine);
+    bool loopSyncEnabled = false;
+    const bool validLoopSync = HcclApi::DecodeLoopSyncPolicy(
+        reinterpret_cast<const uint8_t*>(tiling.reserved2), sizeof(tiling.reserved2), loopSyncEnabled);
+    TILING_LOG_DEBUG("Mc2CcTiling loopSyncCoalescing:%u valid:%u", loopSyncEnabled, validLoopSync);
     TILING_LOG_DEBUG("Mc2CcTiling msg end.");
 }
 
@@ -200,6 +204,8 @@ uint32_t Mc2CcTilingConfig::GetTiling(::Mc2CcTiling& tiling)
 
     Mc2CcTilingInner* tilingInner = reinterpret_cast<Mc2CcTilingInner*>(&tiling);
     tilingInner->skipLocalRankCopy = impl_.skipLocalRankCopy_;
+    HcclApi::EncodeLoopSyncPolicy(
+        reinterpret_cast<uint8_t*>(tilingInner->reserved2), impl_.enableLoopSyncCoalescing_ != 0);
     tilingInner->skipBufferWindowCopy = impl_.skipBufferWindowCopy_;
     tilingInner->stepSize = impl_.stepSize_;
     tilingInner->version = 1U;
@@ -286,6 +292,15 @@ uint32_t Mc2CcTilingConfig::SetSkipLocalRankCopy(uint8_t skipLocalRankCopy)
         skipLocalRankCopy <= 1, return EXIT_FAILURE, "skipLocalRankCopy(%u) must be less than or equal 1.",
         skipLocalRankCopy);
     impl_.skipLocalRankCopy_ = skipLocalRankCopy;
+    return EXIT_SUCCESS;
+}
+
+uint32_t Mc2CcTilingConfig::SetEnableLoopSyncCoalescing(uint8_t enable)
+{
+    if (enable > 1) {
+        return EXIT_FAILURE;
+    }
+    impl_.enableLoopSyncCoalescing_ = enable;
     return EXIT_SUCCESS;
 }
 

@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include <gtest/gtest.h>
+#include <cstring>
 #include "graph/tensor.h"
 #include <dlfcn.h>
 #define private public
@@ -32,6 +33,30 @@ protected:
     virtual void SetUp() {}
     void TearDown() {}
 };
+
+TEST_F(TestHcclTiling, LoopSyncExtensionDefaultsOffAndRejectsCorruption)
+{
+    Mc2CcTilingConfig config("test", 3, "ReduceScatter=level0:nhr", 0);
+    ::Mc2InitTiling init{};
+    ASSERT_EQ(config.GetTiling(init), EXIT_SUCCESS);
+    ::Mc2CcTiling tiling{};
+    ASSERT_EQ(config.GetTiling(tiling), EXIT_SUCCESS);
+    auto* inner = reinterpret_cast<Mc2CcTilingInner*>(&tiling);
+    bool enabled = true;
+    auto* bytes = reinterpret_cast<uint8_t*>(inner->reserved2);
+    ASSERT_TRUE(DecodeLoopSyncPolicy(bytes, sizeof(inner->reserved2), enabled));
+    EXPECT_FALSE(enabled);
+    EXPECT_EQ(config.SetEnableLoopSyncCoalescing(2), EXIT_FAILURE);
+    EXPECT_EQ(config.SetEnableLoopSyncCoalescing(1), EXIT_SUCCESS);
+    ASSERT_EQ(config.GetTiling(tiling), EXIT_SUCCESS);
+    ASSERT_TRUE(DecodeLoopSyncPolicy(bytes, sizeof(inner->reserved2), enabled));
+    EXPECT_TRUE(enabled);
+    bytes[4] = 2;
+    EXPECT_FALSE(DecodeLoopSyncPolicy(bytes, sizeof(inner->reserved2), enabled));
+    std::memset(bytes, 0, sizeof(inner->reserved2));
+    EXPECT_TRUE(DecodeLoopSyncPolicy(bytes, sizeof(inner->reserved2), enabled));
+    EXPECT_FALSE(enabled);
+}
 
 TEST_F(TestHcclTiling, Mc2CcTilingConfig_normal)
 {

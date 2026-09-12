@@ -251,15 +251,28 @@ HcclResult AllocOpParamMemory(
                 "OpParam[%u] varMemSize[%llu] is too large.", i,
                 static_cast<unsigned long long>(opParamVec[i].varMemSize)),
             HCCL_E_PARA);
-        const size_t opParamSize = sizeof(OpParam) + static_cast<size_t>(opParamVec[i].varMemSize);
+        const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
+        bool loopSyncEnabled = false;
+        CHK_PRT_RET(
+            !HcclApi::DecodeLoopSyncPolicy(
+                reinterpret_cast<const uint8_t*>(ccTiling->reserved2), sizeof(ccTiling->reserved2), loopSyncEnabled),
+            HCCL_ERROR("Invalid loop sync tiling extension"), HCCL_E_PARA);
+        const size_t baseSize = sizeof(OpParam) + static_cast<size_t>(opParamVec[i].varMemSize);
+        CHK_PRT_RET(
+            baseSize > SIZE_MAX - HcclApi::LOOP_SYNC_EXTENSION_SIZE, HCCL_ERROR("OpParam extension size overflow"),
+            HCCL_E_PARA);
+        const size_t opParamSize = baseSize + (loopSyncEnabled ? HcclApi::LOOP_SYNC_EXTENSION_SIZE : 0);
         serializedOpParam.assign(opParamSize, 0U);
         CHK_SAFETY_FUNC_RET(
             memcpy_s(serializedOpParam.data(), serializedOpParam.size(), &opParamVec[i], sizeof(OpParam)));
 
         std::string tagParam = ctxTag + "_" + std::to_string(i);
+        if (loopSyncEnabled) {
+            HcclApi::EncodeLoopSyncPolicy(serializedOpParam.data() + baseSize, true);
+            tagParam += "_lsyn_v1";
+        }
         void* opParamPtr = nullptr;
         uint64_t allocatedOpParamSize = opParamSize;
-        const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
         CommEngine commEngine = OpExecuteConfigToCommEngine(ccTiling->commEngine);
         if (HcclEngineCtxGet(comm, tagParam.c_str(), commEngine, &opParamPtr, &allocatedOpParamSize) == HCCL_SUCCESS) {
             CHK_PRT_RET(
