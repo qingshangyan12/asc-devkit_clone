@@ -263,24 +263,6 @@ __aicore__ inline void DataCopyL12PTImpl(const uint64_t dst, __cbuf__ T* src, co
         intriParams.dstStride);
 }
 
-template <typename T> // temporary code for ptable compilation.
-__aicore__ inline void DataCopyUB2UBIntf(
-    const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& intriParams)
-{
-    (void)dst;
-    (void)src;
-    (void)intriParams;
-}
-
-template <typename T> // temporary code for ptable compilation.
-__aicore__ inline void DataCopyL12UBIntf(
-    const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& intriParams)
-{
-    (void)dst;
-    (void)src;
-    (void)intriParams;
-}
-
 /* **************************************************************************************************
  * ND2NZ                                         *
  * ************************************************************************************************* */
