@@ -246,14 +246,13 @@ __aicore__ inline void DataCopyL12BTImpl(
 }
 
 template <typename T>
-__aicore__ inline void DataCopyL12FBImpl(__fbuf__ T* dst, __cbuf__ T* src, const DataCopyParams& intriParams)
+__aicore__ inline void DataCopyL12FBImpl(uint64_t dst, __cbuf__ T* src, const DataCopyParams& intriParams)
 {
     constexpr uint8_t POS_DST_MEM_BLOCK = 16;
-    uint64_t dstAddr = reinterpret_cast<uint64_t>(dst) |
-                       (static_cast<uint64_t>(intriParams.postProcBufBlock) << POS_DST_MEM_BLOCK);
+    dst |= static_cast<uint64_t>(intriParams.postProcBufBlock) << POS_DST_MEM_BLOCK;
     copy_cbuf_to_fbuf_v2(
-        (__fbuf__ void*)dstAddr, (__cbuf__ void*)src, intriParams.blockCount, intriParams.blockLen,
-        intriParams.srcStride, intriParams.dstStride);
+        (__fbuf__ void*)dst, (__cbuf__ void*)src, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride,
+        intriParams.dstStride);
 }
 
 template <typename T>
@@ -264,23 +263,6 @@ __aicore__ inline void DataCopyL12PTImpl(const uint64_t dst, __cbuf__ T* src, co
         intriParams.dstStride);
 }
 
-template <typename T>
-__aicore__ inline void DataCopyUB2UBIntf(
-    const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& intriParams)
-{
-    (void)dst;
-    (void)src;
-    (void)intriParams;
-}
-
-template <typename T>
-__aicore__ inline void DataCopyL12UBIntf(
-    const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& intriParams)
-{
-    (void)dst;
-    (void)src;
-    (void)intriParams;
-}
 /* **************************************************************************************************
  * ND2NZ                                         *
  * ************************************************************************************************* */
