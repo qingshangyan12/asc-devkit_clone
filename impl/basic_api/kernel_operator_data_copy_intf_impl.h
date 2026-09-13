@@ -1752,7 +1752,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     if (srcHWPos == Hardware::UB) {
         DataCopyPadUB2GMImpl<T, mode>(
             (__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), dataCopyParams, cacheMode);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
     } else if (srcHWPos == Hardware::L1) {
         DataCopyPadL12GMImpl<T, mode>(
             (__gm__ PrimType*)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(), dataCopyParams);
