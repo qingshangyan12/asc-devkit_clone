@@ -647,13 +647,36 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
 #ifndef ASCENDC_CPU_DEBUG
     if (workingFlag_) {
         const uint8_t missionNum = GetKfcMissionNum(handleId);
-        for (uint8_t mission = 0; mission < missionNum; ++mission) {
-            GM_ADDR waitCKEAddr = GetWaitCkeAddr(reqId, mission);
-            while (true) {
-                uint64_t waitCke = ReadHBMData(waitCKEAddr);
-                if (waitCke != 0) {
-                    WriteHBMData(reinterpret_cast<__gm__ uint64_t*>(waitCKEAddr), CCU_MSG_CKE_INIT_VALUE);
-                    break;
+        if (missionNum == KFC_MAX_MISSION_NUM) {
+            GM_ADDR waitCKEAddr0 = GetWaitCkeAddr(reqId, 0);
+            GM_ADDR waitCKEAddr1 = GetWaitCkeAddr(reqId, 1);
+            bool done0 = false;
+            bool done1 = false;
+            while (!done0 || !done1) {
+                if (!done0) {
+                    uint64_t waitCke0 = ReadHBMData(waitCKEAddr0);
+                    if (waitCke0 != 0) {
+                        WriteHBMData(reinterpret_cast<__gm__ uint64_t*>(waitCKEAddr0), CCU_MSG_CKE_INIT_VALUE);
+                        done0 = true;
+                    }
+                }
+                if (!done1) {
+                    uint64_t waitCke1 = ReadHBMData(waitCKEAddr1);
+                    if (waitCke1 != 0) {
+                        WriteHBMData(reinterpret_cast<__gm__ uint64_t*>(waitCKEAddr1), CCU_MSG_CKE_INIT_VALUE);
+                        done1 = true;
+                    }
+                }
+            }
+        } else {
+            for (uint8_t mission = 0; mission < missionNum; ++mission) {
+                GM_ADDR waitCKEAddr = GetWaitCkeAddr(reqId, mission);
+                while (true) {
+                    uint64_t waitCke = ReadHBMData(waitCKEAddr);
+                    if (waitCke != 0) {
+                        WriteHBMData(reinterpret_cast<__gm__ uint64_t*>(waitCKEAddr), CCU_MSG_CKE_INIT_VALUE);
+                        break;
+                    }
                 }
             }
         }

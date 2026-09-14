@@ -265,7 +265,7 @@ HcclResult InsV2AllToAllConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlg
 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 HcclResult InsV2AllToAllConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::CalcMaxDataCountPerLoop(
-    const std::vector<u64>& scratchMultipliers, std::vector<u64>& maxDataCountPerLoop) const
+    const std::vector<u64>& scratchMultipliers, std::vector<u64>& maxDataCountPerLoop, CommEngine engine) const
 {
     CHK_PRT_RET(
         scratchMultipliers.size() != CONCURRENT_TEMPLATE_NUM || dataTypeSize_ == 0U || rankSize_ == 0U,
@@ -284,7 +284,11 @@ HcclResult InsV2AllToAllConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlg
             const u64 scratchBound = maxTmpMemSize_ / multiplierSum / HCCL_MIN_SLICE_ALIGN * HCCL_MIN_SLICE_ALIGN;
             maxDataSize = std::min(maxDataSize, scratchBound);
         }
-        maxDataCountPerLoop[index] = maxDataSize / dataTypeSize_ / rankSize_;
+        if (engine == CommEngine::COMM_ENGINE_CCU) {
+            maxDataCountPerLoop[index] = maxDataSize / dataTypeSize_;
+        } else {
+            maxDataCountPerLoop[index] = maxDataSize / dataTypeSize_ / rankSize_;
+        }
         CHK_PRT_RET(
             maxDataCountPerLoop[index] == 0U,
             HCCL_ERROR("[InsV2AllToAllConcurrentExecutor] max data count per loop is zero."), HCCL_E_INTERNAL);
@@ -432,7 +436,7 @@ HcclResult InsV2AllToAllConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlg
         template0.CalcScratchMultiple(BufferType::INPUT, BufferType::OUTPUT),
         template1.CalcScratchMultiple(BufferType::INPUT, BufferType::OUTPUT)};
     std::vector<u64> maxDataCountPerLoop;
-    CHK_RET(CalcMaxDataCountPerLoop(scratchMultipliers, maxDataCountPerLoop));
+    CHK_RET(CalcMaxDataCountPerLoop(scratchMultipliers, maxDataCountPerLoop, param.engine));
     CHK_PRT_RET(
         MultiplyOverflows(scratchMultipliers[0], maxDataCountPerLoop[0]) ||
             MultiplyOverflows(scratchMultipliers[0] * maxDataCountPerLoop[0], dataTypeSize_),
