@@ -112,11 +112,14 @@ __aicore__ inline void check_exp_diff_positions_and_muls_cast()
 
     reg_type<half> half_src0{};
     reg_type<half> half_src1{};
-    half_src0.mask = asc::te::experimental::all_mask<half>().reg;
+    auto output_mask = asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::vl3, float>();
+    half_src0.mask = output_mask.reg;
+    auto default_exp_diff = asc::te::experimental::exp_diff(half_src0, half_src1);
     auto even_exp_diff = asc::te::experimental::exp_diff(half_src0, half_src1, ASC_POSITION_EVEN);
     auto odd_exp_diff = asc::te::experimental::exp_diff(half_src0, half_src1, ASC_POSITION_ODD);
-    EXPECT_EQ(even_exp_diff.mask, half_src0.mask);
-    EXPECT_EQ(odd_exp_diff.mask, half_src0.mask);
+    EXPECT_EQ(default_exp_diff.mask, output_mask.reg);
+    EXPECT_EQ(even_exp_diff.mask, output_mask.reg);
+    EXPECT_EQ(odd_exp_diff.mask, output_mask.reg);
 
     reg_type<float> float_src{};
     float_src.mask = asc::te::experimental::all_mask<float>().reg;

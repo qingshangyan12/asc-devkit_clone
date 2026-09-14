@@ -62,7 +62,7 @@ __simd_callee__ inline reg_tensor<float> exp_diff(
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `src0` | 输入 | 被减数，类型为`reg_tensor<float>`或`reg_tensor<half>`。`src0.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
+| `src0` | 输入 | 被减数，类型为`reg_tensor<float>`或`reg_tensor<half>`。`src0.mask`按输出元素编号，对应位置为`1`时该输出元素参与计算，为`0`时不参与计算。 |
 | `src1` | 输入 | 减数，类型与`src0`相同。`src1.mask`不用于本次计算。 |
 | `src_pos` | 输入 | 仅用于half输入，支持`ASC_POSITION_EVEN`和`ASC_POSITION_ODD`，分别表示选择偶数位置和奇数位置。 |
 
@@ -75,11 +75,13 @@ __simd_callee__ inline reg_tensor<float> exp_diff(
 
 ## 返回值说明
 
-返回`reg_tensor<float>`。`reg`保存逐元素计算结果，`src0.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`src0.mask`相同。输入为`half`时，返回值中的每个元素对应所选位置上的一个输入元素。
+返回`reg_tensor<float>`。`reg`保存逐元素计算结果，`src0.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`src0.mask`相同。输入为`half`时，mask第`i`位控制输出的第`i`个`float`元素；`ASC_POSITION_EVEN`和`ASC_POSITION_ODD`分别使该输出元素读取源操作数的第`2 * i`和第`2 * i + 1`个元素。
 
 ## 约束说明
 
-src0.mask需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。half输入未指定`src_pos`时选择偶数位置参与计算。
+- `src0.mask`需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
+- 输入为`half`时，mask按照输出`float`元素解释，应使用`all_mask<float>`、`make_mask<..., float>`或`update_mask<float>`生成。不要将mask设置成交替的奇偶位；源元素位置由`src_pos`选择。
+- 输入为`half`且未指定`src_pos`时，默认选择偶数位置参与计算。
 
 ## 调用示例
 
@@ -92,7 +94,7 @@ template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void exp_diff_example(
     InputTensor input0, InputTensor input1, OutputTensor output)
 {
-    auto mask = asc::te::experimental::all_mask<half>();
+    auto mask = asc::te::experimental::all_mask<float>();
     auto src0 = asc::te::experimental::load(input0, asc::te::make_coord(0)).with_mask(mask);
     auto src1 = asc::te::experimental::load(input1, asc::te::make_coord(0)).with_mask(mask);
     auto dst = asc::te::experimental::exp_diff(src0, src1, ASC_POSITION_ODD);
