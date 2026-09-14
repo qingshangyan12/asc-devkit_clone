@@ -16,7 +16,7 @@
 #define IMPL_UTILS_DEBUG_NPU_ARCH_5162_ASC_AICORE_DUMP_UTILS_H
 
 #include "impl/utils/debug/asc_debug_utils.h"
-#include "impl/utils/sys_macros_impl.h"
+#include "impl/utils/sys_macros.h"
 #include "kernel_macros.h"
 
 namespace __asc_aicore {
@@ -31,7 +31,7 @@ template <typename T>
 __aicore__ inline uint32_t mem_copy_l1buf_to_gm_impl(__gm__ T* dst, __cbuf__ T* src, const uint32_t alignDumpBytes)
 {
     fixp_trans_mode_t transMode = fixp_trans_mode_t::NORMAL_DMA;
-    fix_cbuf_to_gm((__gm__ T *)(dst), (__cbuf__ T *)(src), 1, alignDumpBytes, 0, 0, 0, transMode);
+    fix_cbuf_to_gm((__gm__ T*)(dst), (__cbuf__ T*)(src), 1, alignDumpBytes, 0, 0, 0, transMode);
     return 1;
 }
 
@@ -49,8 +49,7 @@ __aicore__ inline uint32_t mem_copy_ub_to_gm_impl(__gm__ T* dst, __ubuf__ T* src
     uint32_t srcStride1 = srcStride * byte_32_align + burstLen;
     srcStride1 = div_ceil(srcStride1, byte_32_align) * byte_32_align;
     uint64_t dstStride1 = dstStride * unitOfBytes + burstLen;
-    copy_ubuf_to_gm_align_v2(
-        (__gm__ void*)dst, (__ubuf__ void*)src, 0, blockCount, burstLen, dstStride1, srcStride1);
+    copy_ubuf_to_gm_align_v2((__gm__ void*)dst, (__ubuf__ void*)src, 0, blockCount, burstLen, dstStride1, srcStride1);
     return 0;
 }
 
