@@ -64,7 +64,7 @@
 
 ## 函数原型
 
-```c
+```cpp
 // 占位符形式
 __aicore__ inline void asc_copy_gm2l1_align(__cbuf__ <dtype>* dst,
                                             __gm__ <dtype>* src,
@@ -84,7 +84,7 @@ dtype取值为：`int8_t`、`uint8_t`、`hifloat8_t`、`int16_t`、`uint16_t`、
 
 ### 函数原型典型示例
 
-```c
+```cpp
 // 示例：int8_t类型的搬运
 __aicore__ inline void asc_copy_gm2l1_align(__cbuf__ int8_t* dst,
                                             __gm__ int8_t* src,
