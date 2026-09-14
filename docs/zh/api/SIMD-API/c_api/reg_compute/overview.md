@@ -58,9 +58,9 @@ __global__ __vector__ void asc_add_kernel(__gm__ float* dst, __gm__ float* src0,
 }
 ```
 
->[!NOTE]说明
+>[!NOTE] 说明
 >- GM与UB间的数据搬运需通过C API数据搬运接口完成；
->- Vector Function的流水类型为PIPE_V，Vector Function内部如存在UB地址重叠或跨流水依赖，需要根据具体接口约束插入[asc_mem_bar](./reg_sync/asc_mem_bar.md)或使用同步控制接口。
+>- Vector Function的流水类型为PIPE_V，Vector Function内部如存在UB地址重叠或跨流水依赖，需要根据具体接口约束插入[asc_mem_bar](./reg_sync/asc_mem_bar.md)。
 
 ## 通用约束
 
