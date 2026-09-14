@@ -383,6 +383,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         "PeerOnly RS prepare: input=0x%llx, output=0x%llx, rankOffset=0x%llx, slice=0x%llx, "
         "chunk=0x%llx, tail=0x%llx, loop=0x%llx\n",
         xnData_[1], xnData_[2], xnData_[4], sliceSize, CCU_MAX_COMM_DATA, xnData_[7], xnData_[8]);
+}
+
 // SoleNHRMultiLink（CcuSchedReduceScatterSoleNHRMultiLink）的 AIV prepare：
 // 将 hccl InsV2ReduceScatterSoleExecutor::OrchestrateLoop（loopTimes=1 单趟）+
 // CcuTempReduceScatterNhrMultiJettyMem2Mem1D::KernelRun 的 host 侧参数计算搬到设备侧。
