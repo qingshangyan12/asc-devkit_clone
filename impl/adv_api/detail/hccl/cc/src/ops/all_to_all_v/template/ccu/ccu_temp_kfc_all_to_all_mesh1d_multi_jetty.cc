@@ -13,6 +13,9 @@
 #include "ccu_temp_kfc_all_to_all_mesh1d_multi_jetty.h"
 
 namespace mc2_ops_hccl {
+namespace {
+constexpr uint32_t A2A_JETTY_NUM = 1U;
+} // namespace
 
 CcuTempKfcAllToAllMesh1DMultiJetty::CcuTempKfcAllToAllMesh1DMultiJetty(
     const OpParam& param, u32 rankId, const std::vector<std::vector<u32>>& subCommRanks)
@@ -45,12 +48,13 @@ HcclResult CcuTempKfcAllToAllMesh1DMultiJetty::CalcResByChannelDescsImpl(
     auto kernelArg = std::make_shared<CcuKernelArgKfcAllToAllMesh1DMultiJetty>();
     kernelArg->rankSize = tempRankSize_;
     kernelArg->rankId = mySubCommRank_;
+    kernelArg->jettyNum = A2A_JETTY_NUM;
     kernelArg->opParam = param;
     kernelArg->subCommRanks = subCommRanks_;
 
     CcuKernelInfo kernelInfo{};
     CHK_SAFETY_FUNC_RET(
-        strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelKfcAllToAllMesh1DMultiJetty"));
+        strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuAllToAllMesh1DMultiJettyKernel"));
     kernelInfo.channels = channelDescs;
     kernelInfo.setKernelArg(kernelArg);
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);
@@ -85,17 +89,20 @@ HcclResult CcuTempKfcAllToAllMesh1DMultiJetty::KernelRun(
     config.memSlice = CCU_MS_SIZE * LOCAL_COPY_MS_PER_LOOP;
     const auto goSize = CalGoSize(sliceSize, config);
 
+    const uint64_t sliceSizePerJetty = (A2A_JETTY_NUM > 0U) ? (sliceSize / A2A_JETTY_NUM / HCCL_MIN_SLICE_ALIGN * HCCL_MIN_SLICE_ALIGN) : 0U;
+    const uint64_t lastSliceSizePerJetty = (A2A_JETTY_NUM > 0U) ? (sliceSize - sliceSizePerJetty * (A2A_JETTY_NUM - 1U)) : sliceSize;
+
     CcuKernelSubmitInfo submitInfo{};
     submitInfo.kernelHandle = templateResource.ccuKernels[0];
     CHK_RET(FillCachedArgs(
         submitInfo, 1ULL, inputAddr, outputAddr, sliceSize, srcStride, srcOffset, dstOffset, goSize[0], goSize[1],
-        goSize[2], goSize[3]));
+        goSize[2], goSize[3], sliceSizePerJetty, lastSliceSizePerJetty, A2A_JETTY_NUM));
     templateResource.submitInfos.push_back(submitInfo);
 
     HCCL_INFO(
         "[CcuTempKfcAllToAllMesh1DMultiJetty] inputAddr[%llu], outputAddr[%llu], sliceSize[%llu], "
-        "srcStride[%llu], srcOffset[%llu], dstOffset[%llu]",
-        inputAddr, outputAddr, sliceSize, srcStride, srcOffset, dstOffset);
+        "srcStride[%llu], srcOffset[%llu], dstOffset[%llu], jettyNum[%u], sliceSizePerJetty[%llu], lastSliceSizePerJetty[%llu]",
+        inputAddr, outputAddr, sliceSize, srcStride, srcOffset, dstOffset, A2A_JETTY_NUM, sliceSizePerJetty, lastSliceSizePerJetty);
     return HCCL_SUCCESS;
 }
 

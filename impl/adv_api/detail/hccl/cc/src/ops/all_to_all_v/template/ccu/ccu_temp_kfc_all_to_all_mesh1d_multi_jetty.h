@@ -13,13 +13,14 @@
 
 #include "utils.h"
 #include "ccu_alg_template_base.h"
-#include "kernel/ccu_kernel_kfc_all_to_all_mesh1d_multi_jetty.h"
+#include "kernel/ccu_kernel_all_to_all_mesh1d_multi_jetty.h"
 
 namespace mc2_ops_hccl {
 
 struct CcuKernelArgKfcAllToAllMesh1DMultiJetty : CcuKernelArgBase {
     uint64_t rankSize = 0;
     uint32_t rankId = 0;
+    uint32_t jettyNum = 1U;
     OpParam opParam;
     std::vector<std::vector<uint32_t>> subCommRanks;
 };
