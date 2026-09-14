@@ -1,6 +1,6 @@
 # 基于Mutex实现多流水同步
 
-在Ascend 950PR/Ascend 950DT上，矢量算子可通过Mutex管理AI Core内多条异步流水之间的依赖。本文以使用双缓冲的Add算子为例，说明如何使用`AscendC::Mutex::Lock`和`AscendC::Mutex::Unlock`串联数据搬入、矢量计算和数据搬出，并在Buffer复用时建立反向同步。
+在Ascend 950PR/Ascend 950DT上，矢量算子可通过Mutex实现AI Core内多条异步流水之间的同步，从而解决彼此之间的数据依赖问题。本文以使用双缓冲的Add算子为例，说明如何使用`AscendC::Mutex::Lock`和`AscendC::Mutex::Unlock`串联数据搬入、矢量计算和数据搬出三个阶段，并在此基础上说明Buffer复用时的反向同步为何无需额外处理。
 
 Mutex的核心语义是：`Lock<当前pipe>(mutexId)`只指定需要阻塞的当前流水，其解除阻塞的条件是此前所有流水中使用相同MutexID的Mutex均已执行`Unlock`。因此开发者无需判断或传入前序流水类型，无论前序阶段是`PIPE_MTE2`、`PIPE_V`还是`PIPE_MTE3`，均由同一MutexID统一约束。
 
