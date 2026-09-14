@@ -34,6 +34,7 @@
 #include <unistd.h>
 #include "stub_def.h"
 
+
 namespace AscendC {
 #if !defined(__NPU_DEVICE__) && !defined(__ASCC_DEVICE__)
 
