@@ -15,7 +15,7 @@ This is an independent custom operator project. It does not change the compilati
 │   │   ├── CMakeLists.txt
 │   │   ├── add_custom_template
 │   │   └── config
-│   │       └── ascendxxx
+│   │       └── ascend910b
 │   │           └── add_custom_template_binary.json
 │   ├── op_kernel
 │   │   ├── CMakeLists.txt
@@ -36,7 +36,7 @@ The Host-side `GenSimplifiedKeyFunc` returns a key according to the first input 
 | `float16` | `custom_fp16` | `AddCustomTemplate_FP16.o` |
 | `float32` | `custom_fp32` | `AddCustomTemplate_FP32.o` |
 
-`op_host/config/ascendxxx/add_custom_template_binary.json` describes the two Kernel Binaries and their input/output `dtype`, `format`, and `shape`. The Kernel compilation option passes this file through `--kernel-json-file`.
+`op_host/config/ascend910b/add_custom_template_binary.json` describes the two Kernel Binaries and their input/output `dtype`, `format`, and `shape`. The Kernel compilation option passes this file through `--kernel-json-file`.
 
 ## Build
 
