@@ -776,7 +776,7 @@
                 -   [reg数据类型](SIMD-API/c_api/defs/type/data_type_definition.md)
             -   [宏](SIMD-API/c_api/defs/macro/macro.md)
                 -   [ASC_DEPRECATED](SIMD-API/c_api/defs/macro/asc_deprecation.md)
-                -   [ASC_IS_AIC/ASC_IS_AIV](SIMD-API/c_api/defs/macro/asc_is_ai_core.md)
+                -   [ASC_IS_AIC/ASC_IS_AIV](SIMD-API/c_api/defs/macro/asc_is_aic-asc_is_aiv.md)
             -   [常量](SIMD-API/c_api/defs/constant/constant.md)
                 -   [ASC_C_API_MRGSORT_ELEMENT_LEN](SIMD-API/c_api/defs/constant/asc_c_api_mrgsort_element_len.md)
                 -   [ASC_VDEQ_SIZE](SIMD-API/c_api/defs/constant/asc_vdeq_size.md)
