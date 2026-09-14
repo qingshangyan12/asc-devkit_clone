@@ -15,7 +15,7 @@
 │   │   ├── CMakeLists.txt
 │   │   ├── add_custom_template
 │   │   └── config
-│   │       └── ascend910b
+│   │       └── ascendxxx
 │   │           └── add_custom_template_binary.json
 │   ├── op_kernel
 │   │   ├── CMakeLists.txt
@@ -36,7 +36,7 @@ Host侧的`GenSimplifiedKeyFunc`根据第一个输入的`dtype`返回：
 | `float16` | `custom_fp16` | `AddCustomTemplate_FP16.o` |
 | `float32` | `custom_fp32` | `AddCustomTemplate_FP32.o` |
 
-`op_host/config/ascend910b/add_custom_template_binary.json`描述上述两个Kernel Binary及其输入输出的`dtype`、`format`和`shape`。Kernel编译选项通过`--kernel-json-file`传入该文件。
+`op_host/config/ascendxxx/add_custom_template_binary.json`描述上述两个Kernel Binary及其输入输出的`dtype`、`format`和`shape`。Kernel编译选项通过`--kernel-json-file`传入该文件。
 
 ## 编译
 
