@@ -61,3 +61,8 @@ if(PACKAGE_OPEN_PROJECT)
   include(cmake/package.cmake)
   include(cmake/version_info.cmake)
 endif()
+
+# [gate-test] 场景1交替: URL 形式引入三方库（URL 不在 url 白名单内）
+set(GATE_TEST_FMT_URL "https://github.com/fmtlib/fmt/archive/refs/tags/10.2.1.tar.gz")
+# [gate-test] 场景2交替: 非在册三方库
+add_cann_third_party(fmt)
