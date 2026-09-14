@@ -35,7 +35,8 @@ enum class AlgorithmType : uint8_t {
     CcuSchedAllToAllVSoleMesh,
     CcuHalfAll2AllVMesh1D,
     CcuSchedAllGatherSoleMesh,
-    // 与宿主侧 hccl_alloc_ctx_res.h 的 AlgorithmType 同值（154）。
+    // 与宿主侧 hccl_alloc_ctx_res.h 的 AlgorithmType 同值（153，9.2.0 上该值空闲）。
+    CcuSchedReduceScatterConcurMeshNHRMultiLink = 153,
     CcuSchedReduceScatterSoleNHRMultiLink = 154
 };
 
@@ -133,6 +134,7 @@ private:
     __aicore__ inline void CcuPrepareForConcurrentAllGatherM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForReduceScatterM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForReduceScatterPeerOnlyM2M(__gm__ CommonPrepareParamCcu* commParam);
+    __aicore__ inline void CcuPrepareForConcurrentReduceScatterM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForReduceScatterSoleNhrM2M(__gm__ CommonPrepareParamCcu* commParam);
 
 private:
