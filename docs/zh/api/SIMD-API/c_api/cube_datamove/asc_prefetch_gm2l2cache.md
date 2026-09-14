@@ -75,7 +75,7 @@ PIPE_MTE2
 
 ## 约束说明
 
-- 本接口在AIC和AIV上均执行有效。
+- 本接口Cube及Vector核均支持。
 - 本接口仅将GM数据预取到L2 Cache，不写入L1 Buffer、Unified Buffer等片上存储单元，也不改变GM中的数据内容。
 
 ## 调用示例

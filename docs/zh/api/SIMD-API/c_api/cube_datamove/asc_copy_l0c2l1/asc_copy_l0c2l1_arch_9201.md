@@ -126,26 +126,6 @@ __aicore__ inline void asc_copy_l0c2l1(__cbuf__ <dst_dtype>* dst,
                                        uint8_t eltwise_antq_en,
                                        bool c0_pad_en,
                                        bool enable_nz2dn)
-__aicore__ inline void asc_copy_l0c2l1(__cbuf__ <dst_dtype>* dst,
-                                       __cc__ <src_dtype>* src,
-                                       uint16_t n_size,
-                                       uint16_t m_size,
-                                       uint32_t dst_stride,
-                                       uint16_t src_stride,
-                                       bool quant_pre_rnd,
-                                       uint8_t enable_clip_relu_pre,
-                                       uint8_t unit_flag_mode,
-                                       uint64_t quant_pre_mode,
-                                       uint8_t relu_pre_mode,
-                                       bool enable_channel_split,
-                                       bool enable_nz2nd,
-                                       uint64_t quant_post,
-                                       uint8_t relu_post,
-                                       bool clip_relu_post,
-                                       uint8_t eltwise_op,
-                                       uint8_t eltwise_antq_en,
-                                       bool c0_pad_en,
-                                       bool enable_nz2dn)
 __aicore__ inline void asc_copy_l0c2l1(__cbuf__ void* dst,
                                        __cc__ <src_dtype>* src,
                                        uint16_t n_size,
@@ -319,12 +299,12 @@ uint64_t quant_pre_mode = QuantMode_t::NoQuant;
 uint8_t relu_pre_mode = 0;
 bool enable_channel_split = false;
 bool enable_nz2nd = false;
-uint64_t quant_post = 0;  // 无效参数
-uint8_t relu_post = 0;  // 无效参数
-bool clip_relu_post = false;  // 无效参数
-uint8_t eltwise_op = 0;  // 无效参数
-uint8_t eltwise_antq_en = 0;  // 无效参数
-bool c0_pad_en = false;  // 无效参数
+uint64_t quant_post = 0;
+uint8_t relu_post = 0;
+bool clip_relu_post = false;
+uint8_t eltwise_op = 0;
+uint8_t eltwise_antq_en = 0;
+bool c0_pad_en = false;
 asc_copy_l0c2l1(
     dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode,
     quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, quant_post, relu_post,
@@ -340,20 +320,20 @@ uint16_t n_size = 64;
 uint16_t m_size = 128;
 uint32_t dst_stride = 2048;
 uint16_t src_stride = 128;
-uint8_t l2_cache_mode = 0;  // 无效参数
+uint8_t l2_cache_mode = 0;
 uint8_t enable_clip_relu_pre = 0;
 uint8_t unit_flag_mode = 0;
 uint64_t quant_pre_mode = QuantMode_t::QF322S4_PRE;  // float随路量化成int4b_t
 uint8_t relu_pre_mode = 0;
 bool enable_channel_split = false;
 bool enable_nz2nd = false;
-uint64_t quant_post = 0;  // 无效参数
-uint8_t relu_post = 0;  // 无效参数
-bool clip_relu_post = false;  // 无效参数
-uint8_t eltwise_op = 0;  // 无效参数
-bool eltwise_antq_en = false;  // 无效参数
-bool c0_pad_en = false;  // 无效参数
-bool broadcast_en = false;  // 预留参数
+uint64_t quant_post = 0;
+uint8_t relu_post = 0;
+bool clip_relu_post = false;
+uint8_t eltwise_op = 0;
+bool eltwise_antq_en = false;
+bool c0_pad_en = false;
+bool broadcast_en = false;
 bool enable_nz2dn = false;
 asc_copy_l0c2l1(reinterpret_cast<__cbuf__ void*>(dst), src, n_size, m_size, dst_stride,
     src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode, relu_pre_mode,
