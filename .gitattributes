@@ -1,3 +1,7 @@
 docs/zh/api/context/c_api/figures/*.png filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
 docs/zh/figures/*.png filter=lfs diff=lfs merge=lfs -text
+# examples 下的插图不使用 Git LFS，按普通文件存储。
+# 原因：CI 门禁 check_oss_dep 会把 LFS 指针文件里的 git-lfs 版本标记当作未授权
+# URL 引入并拦截，导致目录搬移类 PR 无法通过门禁（详见 issue #1665）。
+examples/02_simd_c_api/**/figures/*.png -filter -diff -merge -text
