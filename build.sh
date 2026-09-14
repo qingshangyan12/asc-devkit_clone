@@ -826,3 +826,7 @@ if [[ $# -eq 0 ]]; then
 fi
 
 main "$@"
+
+
+# [gate-test] 场景4: build.sh 新增 python 组件（版本在 opensource_py 范围内）
+pip3 install pybind11==2.13.6
