@@ -379,7 +379,7 @@ HcclResult InsTempUBXAllToAllVMesh1D::RunPairwiseStep(const std::vector<ThreadHa
 HcclResult InsTempUBXAllToAllVMesh1D::RunPairwiseChannel(
     const TemplateDataParams& tempAlgParams, const std::vector<ChannelInfo>& channelSendRecv,
     const std::vector<ThreadHandle>& threads, u32 targetRank, u32 channelIndex, u64& innerSendOffset,
-    u64& innerRecvOffset, u64 curSendDataCount, u64 curRecvDataCount)
+    u64& innerRecvOffset, u64 curSendDataCount, u64 curRecvDataCount) const
 {
     const u32 linkNumSendRecv = channelSendRecv.size();
     const float dataSplitRate = static_cast<float>(1.0) / static_cast<float>(linkNumSendRecv);
@@ -666,33 +666,33 @@ HcclResult InsTempUBXAllToAllVMesh1D::KernelRun(
     return HcclResult::HCCL_SUCCESS;
 }
 
-void InsTempUBXAllToAllVMesh1D::GetNotifyIdxMainToSub(std::vector<u32>& notifyIdxMianToSub)
+void InsTempUBXAllToAllVMesh1D::GetNotifyIdxMainToSub(std::vector<u32>& notifyIdxMainToSub)
 {
-    (void)notifyIdxMianToSub;
+    (void)notifyIdxMainToSub;
     return;
 }
 
-void InsTempUBXAllToAllVMesh1D::GetNotifyIdxMainToClos(std::vector<u32>& notifyIdxMianToSub) const
+void InsTempUBXAllToAllVMesh1D::GetNotifyIdxMainToClos(std::vector<u32>& notifyIdxMainToSub) const
 {
-    notifyIdxMianToSub.clear();
+    notifyIdxMainToSub.clear();
     if (threadNum_ <= 1) {
         return;
     }
     u32 slaveThreadNum = threadNum_ - 1 - maxRankNumPerBoard_;
     for (u32 slaveThreadIdx = 0; slaveThreadIdx < slaveThreadNum; slaveThreadIdx++) {
-        notifyIdxMianToSub.push_back(0);
+        notifyIdxMainToSub.push_back(0);
     }
 }
 
-void InsTempUBXAllToAllVMesh1D::GetNotifyIdxMainToFullMesh(std::vector<u32>& notifyIdxMianToSub) const
+void InsTempUBXAllToAllVMesh1D::GetNotifyIdxMainToFullMesh(std::vector<u32>& notifyIdxMainToSub) const
 {
-    notifyIdxMianToSub.clear();
+    notifyIdxMainToSub.clear();
     if (threadNum_ <= 1) {
         return;
     }
     u32 slaveThreadNum = threadNum_ - 1 - maxPathNum_;
     for (u32 slaveThreadIdx = 0; slaveThreadIdx < slaveThreadNum; slaveThreadIdx++) {
-        notifyIdxMianToSub.push_back(0);
+        notifyIdxMainToSub.push_back(0);
     }
 }
 

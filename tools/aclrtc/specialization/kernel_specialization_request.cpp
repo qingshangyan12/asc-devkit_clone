@@ -73,7 +73,7 @@ bool FindAsciiControlCharacter(
 bool OverridesCompilerOutputPath(const std::string& compilerOption)
 {
     return compilerOption == "-o" || compilerOption == "--output" ||
-           (compilerOption.size() > 2U && compilerOption.compare(0, 2, "-o") == 0) ||
+           (compilerOption.size() > sizeof("-o") - 1U && compilerOption.compare(0, sizeof("-o") - 1U, "-o") == 0) ||
            compilerOption.compare(0, sizeof("--output=") - 1U, "--output=") == 0;
 }
 
@@ -198,7 +198,7 @@ aclError NormalizeSuperKernelCompilerOptions(
         return ACLRTC_SUCCESS;
     }
 
-    normalizedRequest.compilationVariant = KernelCompilationVariant::BasicWithSuperKernel;
+    normalizedRequest.enableSuperKernel = true;
     for (size_t optionIndex = 0U; optionIndex < copiedSuperKernelOptions.size(); ++optionIndex) {
         std::string& superKernelOption = copiedSuperKernelOptions[optionIndex];
         if (superKernelOption == SUPER_KERNEL_ENABLE_OPTION) {
