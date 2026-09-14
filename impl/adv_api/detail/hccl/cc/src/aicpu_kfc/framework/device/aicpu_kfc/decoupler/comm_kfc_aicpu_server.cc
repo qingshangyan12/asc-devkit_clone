@@ -734,18 +734,9 @@ HcclResult CommKfcAicpuServer::CheckTimeOut(u32 msgPos)
     if (!IsTimeout()) {
         return HCCL_SUCCESS;
     }
-    const bool error = (timeout_ >= TIMEOUT_ERROR_THRESHOLD);
-    DumpTimeoutDfx(msgPos, error);
-    HcclResult ret;
-    if (error) {
-        HCCL_ERROR("Group %u: timeout %u seconds at message pos %u.", groupIdx_, timeout_, msgPos);
-        ret = HCCL_E_TIMEOUT;
-    } else {
-        HCCL_RUN_INFO("Group %u: timeout %u seconds at message pos %u.", groupIdx_, timeout_, msgPos);
-        ret = HCCL_E_AGAIN;
-    }
     timeout_ *= 2U;
-    return ret;
+    DumpTimeoutDfx(msgPos, false);
+    return HCCL_SUCCESS;
 }
 
 void CommKfcAicpuServer::UpdateProgress(
