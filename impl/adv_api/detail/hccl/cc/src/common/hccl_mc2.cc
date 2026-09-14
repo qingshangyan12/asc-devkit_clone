@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "include/adv_api/hccl/hccl_mc2.h"
+#include "include/adv_api/hccl/internal/hccl_msg.h"
 #include "log.h"
 #include "sal.h"
 #include "alg_env_config.h"
@@ -440,6 +441,170 @@ HcclResult __attribute__((visibility("default"))) CheckOpResSufficient(HcclComm 
     HcclResult ret = HcclAllocComResourceByTilingImpl(comm, stream, mc2Tiling, &opResCtx, true);
     HCCL_RUN_INFO(
         "[CheckOpResSufficient] finished, comm[%p], stream[%p], tiling[%p], ret[%d].", comm, stream, mc2Tiling, ret);
+    return ret;
+}
+
+namespace {
+// Mc2CcArgs为Mc2GetCcArgs/Mc2SetCc*系列接口维护的不透明参数对象（ccArgs），
+// 与HcclOpArgs语义对齐：commEngine决定launch版本，srcDataType/dstDataType/reduceType/algConfig参与算法选择。
+struct Mc2CcArgs {
+    HcclApi::Mc2LaunchVersion version = HcclApi::Mc2LaunchVersion::MC2_AICPU_LAUNCH_VERSION;
+    uint8_t commEngine = static_cast<uint8_t>(OpExecuteConfig::AICPU);
+    HcclDataType srcDataType = HCCL_DATA_TYPE_FP16;
+    HcclDataType dstDataType = HCCL_DATA_TYPE_FP16;
+    HcclReduceOp reduceType = HCCL_REDUCE_SUM;
+    char algConfig[ALG_CONFIG_SIZE] = {0};
+};
+
+// 与老版CheckOpResSufficient(comm, stream, mc2Tiling)保持同一业务逻辑：
+// 参数直接从ccArgs取值（与Mc2AcquireCcResCtx的解析一致），复用同一条checkOnly预检链。
+HcclResult HcclAllocCcResByArgsImpl(HcclComm comm, uint8_t ccType, void* ccArgs, bool checkOnly)
+{
+    HcclUs startut = TIME_NOW();
+    DevType deviceType = DevType::DEV_TYPE_COUNT;
+    CHK_RET(hrtGetDeviceType(deviceType));
+    if (deviceType != DevType::DEV_TYPE_950) {
+        HCCL_ERROR("[%s] invalid deviceType[%u]", __func__, deviceType);
+        return HCCL_E_NOT_SUPPORT;
+    }
+    CHK_RET(InitEnvConfig());
+
+    const HcclCMDType opType = static_cast<HcclCMDType>(ccType);
+    if (opType >= HcclCMDType::HCCL_CMD_MAX) {
+        HCCL_ERROR("[%s] invalid ccType[%u]", __func__, ccType);
+        return HCCL_E_PARA;
+    }
+
+    u32 rankSize = INVALID_VALUE_RANKSIZE;
+    CHK_RET(HcclGetRankSize(comm, &rankSize));
+    u32 userRank = INVALID_VALUE_RANKID;
+    CHK_RET(HcclGetRankId(comm, &userRank));
+    char commName[COMM_INDENTIFIER_MAX_LENGTH];
+    CHK_RET(HcclGetCommName(comm, commName));
+
+    // 直接从ccArgs取参数，与Mc2AcquireCcResCtx入口处的读取保持一致
+    const auto* args = static_cast<const Mc2CcArgs*>(ccArgs);
+    const uint8_t commEngine = args->commEngine;
+    HCCL_INFO(
+        "[%s] start, comm[%p], ccType[%u], args[%p], commEngine[%u], srcDataType[%u], dstDataType[%u], "
+        "reduceType[%u], algConfig[%s].",
+        __func__, comm, ccType, ccArgs, commEngine, static_cast<uint32_t>(args->srcDataType),
+        static_cast<uint32_t>(args->dstDataType), static_cast<uint32_t>(args->reduceType), args->algConfig);
+
+    // 与老版入口一致：单rank必然资源充足、非CCU_SCHED引擎暂不支持，直接返回SUCCESS
+    if (checkOnly && (rankSize == 1 || commEngine != static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED))) {
+        HCCL_INFO("[%s]checkOnly, rankSize[%u], commEngine[%u], return SUCCESS.", __func__, rankSize, commEngine);
+        return HCCL_SUCCESS;
+    }
+    if (commEngine != static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
+        HCCL_ERROR("[%s] unsupported commEngine[%u]", __func__, commEngine);
+        return HCCL_E_NOT_SUPPORT;
+    }
+
+    // algConfig校验：非空时必须在算法注册表中（GetForcedAlgName对空algConfig返回false，走默认selector）
+    std::string forcedAlgName;
+    const bool hasForcedAlg = [&]() {
+        if (args->algConfig[0] == '\0') {
+            return false;
+        }
+        forcedAlgName = args->algConfig;
+        if (forcedAlgName.find('=') != std::string::npos) {
+            HCCL_INFO("[%s] legacy algConfig[%s], use default selector.", __func__, forcedAlgName.c_str());
+            forcedAlgName.clear();
+            return false;
+        }
+        return true;
+    }();
+    if (hasForcedAlg && !HcclIsCcuAlgorithmRegistered(static_cast<uint32_t>(opType), forcedAlgName.c_str())) {
+        HCCL_ERROR("[%s] algConfig[%s] not registered for opType[%u]", __func__, forcedAlgName.c_str(),
+            static_cast<uint32_t>(opType));
+        return HCCL_E_ALG_NOT_SUPPORTED;
+    }
+    // 与CheckCcuKfcFlow中的opType白名单校验一致：仅支持ALLGATHER/ALLREDUCE/REDUCE_SCATTER/ALLTOALL/ALLTOALLV
+    if (!IsCcuKfcSupportedOp(static_cast<uint32_t>(opType))) {
+        HCCL_ERROR("[%s] unsupported opType[%u]", __func__, static_cast<uint32_t>(opType));
+        return HCCL_E_NOT_SUPPORT;
+    }
+
+    // checkOnly=true时跳过AllocCcuOpResCtx/OpParam H2D/OpResCtx落盘，仅探测资源是否充足。
+    // topoTag/OpParam的构造与BuildTagsAndValidate/InitOpParamByTiling保持一致（opType_srcDataType_commName）。
+    OpParam opParam{};
+    opParam.checkRes = checkOnly;
+    opParam.opType = opType;
+    opParam.engine = OpExecuteConfigToCommEngine(commEngine);
+    opParam.commOpExpansionMode = HCCL_OP_EXPANSION_CCU_SCHED;
+    CHK_RET(HcclGetCommName(comm, opParam.commName));
+    const std::string topoTag = std::to_string(static_cast<uint32_t>(opType)) + "_" +
+                                std::to_string(static_cast<uint32_t>(args->srcDataType)) + "_" + commName;
+    CHK_RET(HcclCheckTag(topoTag.c_str()));
+    const bool isReduce = opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER || opType == HcclCMDType::HCCL_CMD_REDUCE ||
+                          opType == HcclCMDType::HCCL_CMD_ALLREDUCE;
+    CHK_RET(CheckDataType(args->srcDataType, isReduce));
+    // 与BuildTagsAndValidate末尾的HcomCheckUserRank校验保持一致
+    CHK_RET(HcomCheckUserRank(rankSize, userRank));
+    std::string algName;
+    auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
+
+    // 算法选择：优先使用algConfig指定的算法（注册/层级/资源计算均校验通过才接受），失败回退默认selector
+    bool forcedAlgAccepted = false;
+    if (hasForcedAlg) {
+        OpParam opParamBackup = opParam;
+        CHK_RET(PrepareTopoInfoForOp(comm, opParam, topoInfo));
+        HcclResult ret = PrepareEngineForAlg(opParam, forcedAlgName);
+        if (ret != HCCL_SUCCESS) {
+            opParam = opParamBackup;
+            HCCL_ERROR(
+                "[%s] prepare engine failed, algName[%s], ret[%d].", __func__, forcedAlgName.c_str(),
+                static_cast<int>(ret));
+            return ret;
+        }
+        ret = CheckForcedAlgResource(comm, opParam, topoInfo.get(), forcedAlgName);
+        if (ret != HCCL_SUCCESS) {
+            opParam = opParamBackup;
+            topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
+            algName.clear();
+            HCCL_WARNING("[%s] fallback to default selector, opType[%u], algConfig[%s].", __func__,
+                static_cast<uint32_t>(opType), forcedAlgName.c_str());
+        } else {
+            algName = forcedAlgName;
+            forcedAlgAccepted = true;
+            HCCL_INFO("[%s] use configured algorithm[%s].", __func__, algName.c_str());
+        }
+    }
+    if (!forcedAlgAccepted) {
+        CHK_RET(SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo));
+    }
+
+    // 资源充足性检查：获取executor、计算层级资源、计算资源请求、判定是否充足
+    // 复用PrepareCcuAlgorithmResource/GetCcuOpParamResCtx链路，checkRes时HCCL_E_UNAVAIL映射为
+    // HCCL_E_RES_NOT_SUFFICIENT，且不申请device ctx
+    OpResCtx resCtx{};
+    resCtx.rankId = userRank;
+    resCtx.rankSize = rankSize;
+    bool skipGetRes = false;
+    CHK_RET(HandleSingleRankAndCommMode(comm, opParam, skipGetRes));
+    if (!skipGetRes) {
+        void* resCtxOut = nullptr;
+        CHK_RET(GetCcuOpParamResCtx(comm, algName, opParam, topoInfo.get(), resCtx, &resCtxOut));
+    }
+
+    CHK_RET(LogHcclExit("CheckOpResSufficient", "", startut));
+    return HCCL_SUCCESS;
+}
+} // namespace
+
+HcclResult __attribute__((visibility("default"))) CheckOpResSufficient(HcclComm comm, uint8_t ccType, void* ccArgs)
+{
+    CHK_PTR_NULL(comm);
+    CHK_PTR_NULL(ccArgs);
+
+    if (GetExternalInputHcclEnableEntryLog()) {
+        HCCL_RUN_INFO(
+            "Entry-CheckOpResSufficient(ccArgs), comm[%p], ccType[%u], ccArgs[%p].", comm, ccType, ccArgs);
+    }
+    HcclResult ret = HcclAllocCcResByArgsImpl(comm, ccType, ccArgs, true);
+    HCCL_RUN_INFO(
+        "[CheckOpResSufficient] finished, comm[%p], ccType[%u], ccArgs[%p], ret[%d].", comm, ccType, ccArgs, ret);
     return ret;
 }
 
