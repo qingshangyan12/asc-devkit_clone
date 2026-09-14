@@ -74,18 +74,6 @@ for (j = 0; j < m_size; j++) {
 - 当NZ2NZ与F32 Channel Split特性组合开启时，搬出到GM的NZ分形中的小分形维度为16\*8，确保小z分形的大小为512B。
 - 对于B8数据类型NZ输出时，Channel Merge默认开启，搬出GM/L1 Buffer小分形维度为16\*32，确保小z分形的大小为512B。
 - 对于B4数据类型NZ输出时，Channel Merge默认开启，小分形维度为16\*64，确保小z分形的大小为512B。
-
-<!-- npu="910b,A3" id5 -->
-
-2201的int4b_t输出使用L0C Buffer到L1 Buffer通路，不能据此推断GM通路也提供4位输出重载。
-
-<!-- end id5 -->
-
-<!-- npu="950" id6 -->
-
-3510的int4b_t输出可使用GM、L1 Buffer或UB目标通路，具体模式按对应重载配置。
-
-<!-- end id6 -->
 - 目标操作数地址之间不能重叠。
 
 ## 使用示例

@@ -3,9 +3,7 @@
 **特性说明：**
 
 <!-- npu="910b,A3" id1 -->
-
 Atlas A2 训练系列产品/Atlas A2 推理系列产品/Atlas A3 训练系列产品/Atlas A3 推理系列产品，asc_mmad接口支持开启此特性。
-
 <!-- end id1 -->
 
 <!-- npu="950" id2 -->
@@ -13,7 +11,6 @@ Ascend 950PR/Ascend 950DT产品上L0A Buffer为Nz排布，非Zz排布，A矩阵�
 <!-- end id2 -->
 
 <!-- npu="910b,A3" id3 -->
-
 K方向对齐的核心功能是通过k_direction_align参数控制在使用float数据类型（其他数据类型无需关注此特性）时，L0A Buffer和L0B Buffer矩阵在K方向上的对齐方式。
 
 当设置k_direction_align = true时，L0A Buffer/L0B Buffer中的矩阵会将K方向对齐到 `ceil\(K/16\)\*16`。
@@ -41,11 +38,7 @@ K方向对齐的核心功能是通过k_direction_align参数控制在使用float
 **使用示例：**
 
 ```cpp
-#if __NPU_ARCH__ == 2201
-// a、b为float矩阵，输入搬运已完成，按K方向16对齐准备数据。
 asc_mmad(c, a, b, m, k, n, asc_unit_flag_mode::DISABLE,
          true /* k_direction_align */, false, true);
-#endif
 ```
-
 <!-- end id3 -->

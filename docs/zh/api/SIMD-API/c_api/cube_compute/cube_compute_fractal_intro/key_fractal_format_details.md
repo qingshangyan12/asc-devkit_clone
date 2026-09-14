@@ -14,7 +14,7 @@
   - Atlas A3训练系列产品/Atlas A3推理系列产品
   <!-- end id3 -->
 
-  **图1** 矩阵乘法场景涉及的数据格式<a name="zh-cn_topic_0000002545089965_fig18172115901518"></a>
+  **图1** 矩阵乘法场景涉及的数据格式<a name="zh-cn_topic_0000002545089965_fig18172115901518"></a>  
   ![](../../../../figures/fractals_involved_in_matrix_calculation_a2a3.png "矩阵乘法场景涉及的数据格式")
 <!-- end id1 -->
 
@@ -22,7 +22,7 @@
 - Nz × Zn = Nz（A × B = C）组合
   针对Ascend 950PR/Ascend 950DT，矩阵乘法C = A×B要求：左矩阵A使用Nz格式，右矩阵B使用Zn格式，结果矩阵C使用Nz格式，如图2所示：
 
-  **图2** 矩阵乘法场景涉及的数据格式<a name="zh-cn_topic_0000002545089965_fig11172355102017"></a>
+  **图2** 矩阵乘法场景涉及的数据格式<a name="zh-cn_topic_0000002545089965_fig11172355102017"></a>  
   ![](../../../../figures/fractals_involved_in_matrix_calculation_950.png "矩阵乘法场景涉及的数据格式-27")
 <!-- end id4 -->
 
@@ -47,14 +47,14 @@
         - 右侧L1 Buffer中，数据被重组为3 x 4个分形块。
         - 分形内按行主序（小z）存放，分形间按列主序（大N）存放（如图中折线箭头所示），完成了从“线性”到“分形”的物理映射，做好了进入Cube计算的准备。
 
-**图3** ND（GM）到Nz（L1 Buffer）的数据转换<a name="zh-cn_topic_0000002545089965_fig1541710246162"></a>
+**图3** ND（GM）到Nz（L1 Buffer）的数据转换<a name="zh-cn_topic_0000002545089965_fig1541710246162"></a>  
 ![](../../../../figures/nd2nz_gm2l1_fractals_transform.png "ND-(GM)-到-Nz-(L1 Buffer)-的数据转换")
 
 ## DN格式（Dimension-N）
 
 - 定义：通用的N维张量格式，其物理存储顺序对应于ND格式在内存维度上的转置排列，即ND遵循row major（行主序）规则，DN遵循column major（列主序）。列主序示意图如下所示：
 
-![列优先排布](../../../../figures/column_major_layout.png)
+    ![列优先排布](../../../../figures/column_major_layout.png)
 - 场景：通常存在于Global Memory（GM）中。若此输入要作为矩阵计算的输入，需要转换成Nz格式。
 <!-- npu="950" id5 -->
 - 转换示例：针对Ascend 950PR/Ascend 950DT，可以使用[矩阵搬入数据搬运 DN2NZ接口](../../cube_datamove/asc_copy_gm2l1_dn2nz.md)将其转换为Nz格式以适配Cube单元。
@@ -67,7 +67,7 @@
 
     **图4** Zz格式（以half类型为例）<a name="zh-cn_topic_0000002545089965_fig18376432205510"></a>
 
-![Zz格式示意图](../../../../figures/zz_fractals_of_half.png)
+    ![Zz格式示意图](../../../../figures/zz_fractals_of_half.png)
 
 - **物理位置：** 通常位于**L0A Buffer**，作为左矩阵。
 - **设计原理：**
@@ -95,7 +95,7 @@
 
 - **定义：** 大Z外部row major（行主序）+ 小n内部column major（列主序），见[图5](#zh-cn_topic_0000002545089965_fig9884894817)。
 
-    **图5** Zn格式（以half类型为例）<a name="zh-cn_topic_0000002545089965_fig9884894817"></a>
+    **图5** Zn格式（以half类型为例）<a name="zh-cn_topic_0000002545089965_fig9884894817"></a>  
     ![](../../../../figures/zn_fractals_of_half.png "Zn-格式(以half类型为例)")
 
 - **物理位置：**
@@ -120,7 +120,7 @@
 
 - **定义：** 大N外部column major（列主序）+ 小z内部row major（行主序），见[图6](#zh-cn_topic_0000002545089965_fig583717713334)。
 
-    **图6** Nz格式<a name="zh-cn_topic_0000002545089965_fig583717713334"></a>
+    **图6** Nz格式<a name="zh-cn_topic_0000002545089965_fig583717713334"></a>  
     ![](../../../../figures/nz_fractals_of_half_for_cmatrix.png "Nz-格式")
 
 - **物理位置：**
@@ -151,7 +151,7 @@
 
 - **转换公式：**
 
-    ```py
+    ```text
     (…, B, M, N)->pad->(…, B, M1 * M0, N1 * N0)->reshape->(…, B, M1, M0, N1, N0)->transpose->(…, B, N1, M1, M0, N0)
     ```
 
@@ -168,7 +168,7 @@
 
     原始Tensor数据打印如下：
 
-    ```py
+    ```text
     [[  0.   1.   2.   3.   4.   5.   6.   7.   8.   9.  10.  11.  12.  13.
     14.  15.  16.  17.  18.  19.  20.  21.  22.  23.  24.  25.  26.  27.]
     ...
@@ -193,11 +193,11 @@
 
     转换过程示意图如下：
 
-![ND转Nz转换示意图](../../../../figures/nd2nz_transform_demo.png)
+    ![ND转Nz转换示意图](../../../../figures/nd2nz_transform_demo.png)
 
     转换后Tensor打印如下：
 
-    ```py
+    ```text
     [[[[  0.   1.   2. ...  13.  14.  15.]
     [ 28.  29.  30. ...  41.  42.  43.]
     [ 56.  57.  58. ...  69.  70.  71.]
@@ -221,7 +221,7 @@
 
 C0表示元素个数。对于这里的输入FeatureMap，`C0 = 32B / sizeof(Datatype)`，`C1 = ceil(C / C0)`；尾块补齐到C0个元素。L0C Buffer输出分形的通道粒度固定为16个累加元素，不能沿用输入的32B规则。
 
-**图7** NHWC->NC1HWC0<a name="zh-cn_topic_0000002545089965_fig4805172135014"></a>
+**图7** NHWC->NC1HWC0<a name="zh-cn_topic_0000002545089965_fig4805172135014"></a>  
 ![](../../../../figures/nhwc2nc1hwc0.png "NHWC--NC1HWC0")
 
 - **物理位置：** 通常位于Global Memory（GM）或者L1 Buffer中，作为卷积的Feature Map输入。
@@ -230,4 +230,4 @@ C0表示元素个数。对于这里的输入FeatureMap，`C0 = 32B / sizeof(Data
 
     通过二维数据排布变换表达格式转换过程：
 
-![NHWC到NC1HWC0分形转换](../../../../figures/nhwc2nc1hwc0_of_fractals.png)
+    ![NHWC到NC1HWC0分形转换](../../../../figures/nhwc2nc1hwc0_of_fractals.png)

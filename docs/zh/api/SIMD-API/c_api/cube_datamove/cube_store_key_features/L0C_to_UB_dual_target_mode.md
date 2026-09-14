@@ -1,7 +1,5 @@
 # L0C Buffer到UB双目标模式
 
-<!-- npu="950" id1 -->
-
 ## 特性说明
 
 本特性仅适用于3510。同一AI Core内有一个Cube Core和两个Vector Core，当启用双目标模式控制时，L0C Buffer中的M×N矩阵将被分成两半，并同时分别写入两个Vector Core各自的Unified Buffer（UB）中，其中前半部分写入SUB BLOCK0，后半部分写入SUB BLOCK1。
@@ -52,5 +50,3 @@ M方向切分：
 ![](../../../../figures/nz2nd_l0c2ub_dual_dst_c_api.png)
 
 图中`nd_num`、`src_nd_stride`、`dst_nd_stride`分别对应[asc_set_l0c_copy_nz_para](../asc_set_l0c_copy_nz_para.md)的`matrix_num`、`src_nz_matrix_stride`、`dst_matrix_stride`，本例取2、240、4096。`asc_copy_l0c2ub`通过`asc_dual_dst_mode::DUAL_DST_SPLIT_M`或`DUAL_DST_SPLIT_N`选择切分方向。NZ输出示例中的C0为16，`dst_stride`按目标元素计数。
-
-<!-- end id1 -->

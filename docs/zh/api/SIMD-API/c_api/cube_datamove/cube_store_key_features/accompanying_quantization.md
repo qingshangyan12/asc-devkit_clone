@@ -2,12 +2,14 @@
 
 ## 特性说明
 
-矩阵搬出支持Cast和带系数的量化。Cast使用`asc_quant_mode::F322F16`或`asc_quant_mode::F322BF16`将float转换成half/bfloat16_t，无需量化系数，舍入采用CAST_RINT。不开启转换时使用`asc_quant_mode::NoQuant`，并匹配源/目的类型。
+矩阵搬出支持Cast和带系数的量化。
+
+使用`asc_quant_mode::F322F16`或`asc_quant_mode::F322BF16`将float转换成half/bfloat16_t，无需量化系数，舍入模式采用CAST_RINT。
 
 带参数量化包括两种粒度：
 
 - Scalar：整个C矩阵共享一个量化参数。
-- Vector：C矩阵每一列（N方向）对应一个8B量化参数，参数shape为[N]。先用[asc_copy_l12fb](../asc_copy_l12fb/asc_copy_l12fb.md)从L1 Buffer搬入量化区，再设置起始地址索引。量化地址索引为量化区字节地址除以128，不是元素下标；激活地址索引为激活区字节地址除以64。两个参数区分别寻址，起始地址与长度都不能超过对应区域。
+- Tensor/Vector：C矩阵每一列对应一个8B量化参数，参数shape为[N]。先用[asc_copy_l12fb](../asc_copy_l12fb/asc_copy_l12fb.md)从L1 Buffer搬入量化区，再设置起始地址索引。量化地址索引为量化区字节地址除以128，不是元素下标；激活地址索引为激活区字节地址除以64。两个参数区分别寻址，起始地址与长度都不能超过对应区域。
 
 <!-- npu="950" id1 -->
 
@@ -53,30 +55,6 @@ QF322F32_PRE,          // Quant_Float32_2_Float32: float量化成float，scalar�
 VQF322F32_PRE,         // Vector_Quant_Float32_2_Float32: float量化成float，tensor量化，使用有限精度的量化系数，需按输入范围验证误差
 ```
 <!-- end id3 -->
-
-**C API补充模式与通路：**
-
-<!-- npu="910b,A3" id4 -->
-
-| 模式 | 输入→输出 | 2201 |
-| --- | --- | --- |
-| `REQ4` / `VREQ4` | int32_t→int4b_t，Scalar/Vector | L0C Buffer→L1 Buffer对应4位重载 |
-| `QF322S4_PRE` / `VQF322S4_PRE` | float→int4b_t，Scalar/Vector | L0C Buffer→L1 Buffer对应4位重载 |
-
-<!-- end id4 -->
-
-<!-- npu="950" id5 -->
-
-| 模式 | 输入→输出 | 3510 |
-| --- | --- | --- |
-| `REQ4` / `VREQ4` | int32_t→int4b_t，Scalar/Vector | L0C Buffer→GM/L1 Buffer/UB |
-| `QF322S4_PRE` / `VQF322S4_PRE` | float→int4b_t，Scalar/Vector | L0C Buffer→GM/L1 Buffer/UB |
-
-<!-- end id5 -->
-
-<!-- npu="950" id6 -->
-
-3510 FP8量化输出类型为`fp8_e4m3fn_t`，不能因为矩阵输入支持`fp8_e5m2_t`就推定搬出也有同类型量化重载。HiFloat8的普通和HYBRID模式舍入不同，应与下游数值格式约定一致。4位输出的物理小分形和通道合并见[Int8 Channel Merge及位宽扩展](Int8-Channel-Merge.md)。
 
 <!-- end id6 -->
 

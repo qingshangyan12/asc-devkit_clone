@@ -25,9 +25,3 @@
 **图3** Fixpipe Buffer内存排布图
 
 ![](../../../../figures/fixpipe_buffer.png)
-
-<!-- npu="950" id4 -->
-
-3510还支持NZ2DN格式转换、L0C Buffer到Unified Buffer（UB）的搬出及UB双目标模式。图中的QUANT_POST、RELU_POST等硬件处理阶段不表示当前公开C API均有对应能力；本资料按所选搬出重载实际开放的参数说明功能。
-
-<!-- end id4 -->

@@ -1,72 +1,31 @@
 # 矩阵计算输入搬运约束<a name="ZH-CN_TOPIC_0000002568950895"></a>
 
-## C API接口与图例对应
-
-本页保留原有分形图用于说明硬件布局。图中的转置表示搬运时的布局变换；实际调用方式如下。
-
-<!-- npu="910b,A3" id1 -->
-
-| 图例功能 | 2201 |
-| --- | --- |
-| GM→L1 Buffer普通/ND2NZ | `asc_copy_gm2l1` / `asc_copy_gm2l1_nd2nz` |
-| GM→L0 | `asc_copy_gm2l0a` / `asc_copy_gm2l0b` |
-| 2D分形搬入 | `asc_copy_l12l0a` / `asc_copy_l12l0b`，用转置参数控制 |
-| 块转置搬入 | `asc_copy_l12l0a_trans` / `asc_copy_l12l0b_trans` |
-| 3D展开 | `asc_copy_l12l0a` / `asc_copy_l12l0b`的3D重载 |
-| 稀疏B及索引 | `asc_copy_l12l0b_sparse` |
-
-<!-- end id1 -->
-
-<!-- npu="950" id2 -->
-
-| 图例功能 | 3510 |
-| --- | --- |
-| GM→L1 Buffer普通/ND2NZ | `asc_copy_gm2l1` / `asc_copy_gm2l1_nd2nz`；DN输入另用`asc_copy_gm2l1_dn2nz` |
-| 2D分形搬入 | 普通2D用`asc_copy_l12l0a` / `asc_copy_l12l0b`；转置用`asc_copy_l12l0a_transpose` / `asc_copy_l12l0b_transpose` |
-| 块转置搬入 | `asc_copy_l12l0b_trans` |
-| 3D展开 | `asc_copy_l12l0a` / `asc_copy_l12l0b`的3D重载 |
-| MX系数 | `asc_copy_l12l0a_mx` / `asc_copy_l12l0b_mx` |
-
-<!-- end id2 -->
-
-<!-- npu="950" id3 -->
-
-3510的普通2D与转置2D分别把同一`load_cbuf_to_ca/cb`指令的转置位设为0与1；`_trans`调用`load_cbuf_to_cb_transpose`，是另一种块拼接转置指令，不能凭名称近似混用。下文3510中沿用的“2D”和“2DV2”图例在C API统一选择当前2D重载；普通矩阵优先用2D，卷积展开用3D。
-
-<!-- end id3 -->
-
 ## 对齐约束
 
 具体可见[表数据通路和存储层级](overall_description.md#zh-cn_topic_0000002543771563_table3523123518108)。
 
-- L1 Buffer源地址通常需32B对齐；GM普通字节搬运的最小粒度不能作为所有分形和格式转换接口的统一地址约束，需核对所选重载。
+- 当源地址位于L1 Buffer时，该地址必须32Byte对齐；当源地址位于GM时，该地址必须1Byte对齐。
 - 当目的地址位于L0A Buffer/L0B Buffer时，该地址必须512Byte对齐；当目的地址位于L1 Buffer时，该地址必须32Byte对齐。
 
 ## 搬运粒度约束
 
-- 2D分形搬运以大小为512Byte的分形为单位进行搬运。
-- asc_copy_l12l0a/asc_copy_l12l0b（3D）以大小为512Byte的分形为单位进行搬运。
+- 2D矩阵搬运以大小为512Byte的分形为单位进行搬运。
+- 3D矩阵搬运以大小为512Byte的分形为单位进行搬运。
 <!-- npu="910b,A3" id4 -->
-
 - asc_copy_l12l0b_sparse搬运以512Byte为单位存放的压缩权重矩阵到L0B Buffer里，同时搬运以128Byte为单位的索引矩阵到内置的专用buffer空间。
-
 <!-- end id4 -->
 
 ## 分形约束
 
 数据搬运（GM-\>L1 Buffer）在不使能随路进行ND到NZ转换的时候，不会改变分形间和分形内排布，如Nz2Nz，在使能ND到NZ转换的情况下，一定会改变分形排布，如ND2Nz。
 
-<!-- npu="910b,A3" id5 -->
+2D矩阵搬运在不使能转置情况下，只能改变分形间的排布，如Nz2Zz；在使能转置情况下，既能改变分形内的排布，又能改变分形间的排布，如Nz2Zn。
 
-2201的2D分形搬运在不使能转置情况下，可以改变分形间的排布，如Nz2Zz；在使能转置情况下，既能改变分形内的排布，又能改变分形间的排布，如Nz2Zn。
+转置搬运一定改变分形内的排布，可以按需改变分形间的排布，如Nz2Zn。
 
-<!-- end id5 -->
+转置搬运在B32场景下，源操作数2个连续的16\*8分形将被合并为1个16\*16的方块矩阵，然后再基于该方块矩阵做转置，因此要求两个连续分形合并为方块矩阵，要求L1 Buffer上的矩阵满足Nz排布（当且仅当Row==16）或Zn排布（当且仅当Col==16）。
 
-块转置搬运一定改变分形内的排布，可以按需改变分形间的排布，如Nz2Zn。
-
-块转置搬运在B32场景下，源操作数2个连续的16\*8分形将被合并为1个16\*16的方块矩阵，然后再基于该方块矩阵做转置，因此要求两个连续分形合并为方块矩阵，要求L1 Buffer上的矩阵满足Nz排布（当且仅当Row==16）或Zn排布（当且仅当Col==16）。
-
-asc_copy_l12l0a/asc_copy_l12l0b（3D）主要用于对NC1HWC0格式的feature map完成image to column操作，并将展开后的二维矩阵搬入对应内存位置，因此对于asc_copy_l12l0a/asc_copy_l12l0b（3D）的源操作数中数据必须按照NC1HWC0格式排布，目的操作数数据必须按照目的地址L0A Buffer/L0B Buffer中支持的排布方式排布。
+3D矩阵搬运主要用于对NC1HWC0格式的feature map完成image to column操作，并将展开后的二维矩阵搬入对应内存位置，因此对于3D矩阵搬运的源操作数中数据必须按照NC1HWC0格式排布，目的操作数数据必须按照目的地址L0A Buffer/L0B Buffer中支持的排布方式排布。
 
 <!-- npu="910b,A3" id6 -->
 asc_copy_l12l0b_sparse主要用于搬运以512Byte为单位存放的压缩权重矩阵到L0B Buffer里，同时搬运以128Byte为单位的索引矩阵到内置的专用buffer空间（用于后续asc_mmad_sparse接口进行读取），因此源操作数中的压缩权重矩阵和索引矩阵都需要按照Zn格式排布，其中压缩权重矩阵排布方式为32\*16\*8bit=512Byte，索引矩阵排布方式为32\*16\*2bit=128Byte。
@@ -90,7 +49,7 @@ asc_copy_l12l0b_sparse主要用于搬运以512Byte为单位存放的压缩权重
         - Zn->Zn：
 
             ![](../../../../figures/datacopy_gm2l1_zn2zn.png)
-- **2D分形搬运**
+- **2D矩阵搬运**
     - GM->L1 Buffer（不支持转置）
         - Nz->Nz：
 
@@ -110,7 +69,7 @@ asc_copy_l12l0b_sparse主要用于搬运以512Byte为单位存放的压缩权重
     - L1 Buffer->L0B Buffer（使能转置，仅支持b16数据类型）（Zn->Zn）
 
         ![](../../../../figures/load2d_l12l0b_zn2zn.png)
-- **块转置搬运**
+- **转置搬运**
     - L1 Buffer->L0A Buffer（b8）（Nz->Zz）
 
         ![](../../../../figures/loaddatawithtranspose_l12l0a_b8_nz2zz.png)
@@ -129,7 +88,7 @@ asc_copy_l12l0b_sparse主要用于搬运以512Byte为单位存放的压缩权重
     - L1 Buffer->L0B Buffer（b32）（Zn（<span>当且仅当Col==16</span>）->Zn）
 
         ![](../../../../figures/loaddatawithtranspose_l12l0b_b32_zn2zn.png)
-- **asc_copy_l12l0a/asc_copy_l12l0b（3D）**
+- **3D矩阵搬运**
     - L1 Buffer->L0A Buffer（NC1HWC0->Zz）
 
         ![](../../../../figures/load3d_l12l0a_nc1hwc02zz.png)
@@ -166,7 +125,7 @@ asc_copy_l12l0b_sparse主要用于搬运以512Byte为单位存放的压缩权重
 
 数据搬运（GM-\>L1 Buffer）支持使能随路进行DN到NZ转换，一定会改变分形排布。
 
-asc_copy_l12l0a/asc_copy_l12l0b（2D）在不使能转置情况下，不改变分形间排布及分形内的排布，如Nz2Nz；在使能转置情况下，既改变分形内的排布，又改变分形间的排布，如Nz2Zn。
+2D矩阵搬运在不使能转置情况下，不改变分形间排布及分形内的排布，如Nz2Nz；在使能转置情况下，既改变分形内的排布，又改变分形间的排布，如Nz2Zn。
 
 MX矩阵的数据和系数分别搬运：A/B数据使用普通2D重载或`_transpose`变体；`asc_copy_l12l0a_mx`/`asc_copy_l12l0b_mx`只搬运E8M0系数，不提供矩阵数据搬运或转置开关。系数需预先按对应布局准备，系数搬运本身不改变分形内排布。
 
@@ -186,27 +145,7 @@ MX矩阵的数据和系数分别搬运：A/B数据使用普通2D重载或`_trans
         - Zn->Zn：
 
             ![](../../../../figures/datacopy_gm2l1_zn2zn.png)
-- **2D分形搬运**
-    - GM->L1 Buffer（不支持转置）
-        - Nz->Nz：
-
-            ![](../../../../figures/load2d_gm2l1_nz2nz.png)
-        - Zn->Zn：
-
-            ![](../../../../figures/load2d_gm2l1_zn2zn.png)
-    - L1 Buffer->L0A Buffer（不使能转置）（Nz->Nz）
-
-        ![](../../../../figures/load2d_l12l0a_nz2nz.png)
-    - L1 Buffer->L0B Buffer（不使能转置）（Zn->Zn）
-
-        ![](../../../../figures/load2d_l12l0b_zn2zn.png)
-    - L1 Buffer->L0A Buffer（使能转置，图中以b16为例）（Zn->Nz）
-
-        ![](../../../../figures/load2d_l12l0a_zn2nz.png)
-    - L1 Buffer->L0B Buffer（使能转置，图中以b16为例）（Zn->Zn）
-
-        ![](../../../../figures/load2d_l12l0b_zn2zn.png)
-- **asc_copy_l12l0a/asc_copy_l12l0b（2D）**
+- **2D矩阵搬运**
     - L1 Buffer->L0A Buffer（Nz->Nz）
 
         ![](../../../../figures/load2dv2_l12l0a_nz2nz.png)
@@ -232,7 +171,7 @@ MX矩阵的数据和系数分别搬运：A/B数据使用普通2D重载或`_trans
     - L1 Buffer->L0B_MX Buffer（系数，调用asc_copy_l12l0b_mx）
 
         ![](../../../../figures/load2dv2mx_l12l0bmx.png)
-- **块转置搬运**
+- **转置搬运**
     - L1 Buffer->L0B Buffer（b4/b8）（Zn->Zn）
 
         ![](../../../../figures/loaddatawithtranspose_l12l0b_b4b8_zn2zn.png)
@@ -242,7 +181,7 @@ MX矩阵的数据和系数分别搬运：A/B数据使用普通2D重载或`_trans
     - L1 Buffer->L0B Buffer（b32）（Zn（<span>当且仅当Col==16</span>）->Zn）
 
         ![](../../../../figures/loaddatawithtranspose_l12l0b_b32_zn2zn.png)
-- **asc_copy_l12l0a/asc_copy_l12l0b（3D）**
+- **3D矩阵搬运**
     - L1 Buffer->L0A Buffer（NC1HWC0->Nz）
 
         ![](../../../../figures/load3d_l12l0a_nc1hwc02nz.png)
@@ -258,23 +197,22 @@ MX矩阵的数据和系数分别搬运：A/B数据使用普通2D重载或`_trans
 
 | 搬运指令 | 数据通路 | 分形支持情况 |
 | --- | --- | --- |
-| 2D分形搬运 | GM->L1 Buffer（不支持转置） | Nz->Zz、Zn->Nn、Zz->Zz、Zz->Nz、Nn->Nn、Nn->Zn |
-| 2D分形搬运 | L1 Buffer->L0A Buffer（不使能转置） | Nz->Nz、Zn->Nn、Zn->Zn、Zz->Zz、Zz->Nz、Nn->Nn、Nn->Zn |
-| 2D分形搬运 | L1 Buffer->L0B Buffer（不使能转置） | Nz->Zz、Nz->Nz、Zn->Nn、Zz->Zz、Zz->Nz、Nn->Nn、Nn->Zn |
-| 2D分形搬运 | L1 Buffer->L0A Buffer（使能转置，图中以b16为例） | Nz->Nz、Zn->Nn、Zn->Zn、Zz->Zz、Zz->Nz、Nn->Nn、Nn->Zn |
-| 2D分形搬运 | L1 Buffer->L0B Buffer（使能转置，图中以b16为例） | Nz->Zz、Nz->Nz、Zn->Nn、Zz->Zz、Zz->Nz、Nn->Nn、Nn->Zn |
-| 块转置搬运 | L1 Buffer->L0B Buffer（b4/b8）、<br>L1 Buffer->L0B Buffer（b16） | Nz->Zz、Nz->Nz、Zn->Nn、Zz->Zz、Zz->Nz、Nn->Nn、Nn->Zn |
-| 块转置搬运 | L1 Buffer->L0B Buffer（b32） | Nn->Zn、Nn->Nn |
+| 2D矩阵搬运 | GM->L1 Buffer（不支持转置） | Nz->Zz、Zn->Nn、Zz->Zz、Zz->Nz、Nn->Nn、Nn->Zn |
+| 2D矩阵搬运 | L1 Buffer->L0A Buffer（不使能转置） | Nz->Nz、Zn->Nn、Zn->Zn、Zz->Zz、Zz->Nz、Nn->Nn、Nn->Zn |
+| 2D矩阵搬运 | L1 Buffer->L0B Buffer（不使能转置） | Nz->Zz、Nz->Nz、Zn->Nn、Zz->Zz、Zz->Nz、Nn->Nn、Nn->Zn |
+| 2D矩阵搬运 | L1 Buffer->L0A Buffer（使能转置，图中以b16为例） | Nz->Nz、Zn->Nn、Zn->Zn、Zz->Zz、Zz->Nz、Nn->Nn、Nn->Zn |
+| 2D矩阵搬运 | L1 Buffer->L0B Buffer（使能转置，图中以b16为例） | Nz->Zz、Nz->Nz、Zn->Nn、Zz->Zz、Zz->Nz、Nn->Nn、Nn->Zn |
+| 转置搬运 | L1 Buffer->L0B Buffer（b4/b8）、<br>L1 Buffer->L0B Buffer（b16） | Nz->Zz、Nz->Nz、Zn->Nn、Zz->Zz、Zz->Nz、Nn->Nn、Nn->Zn |
+| 转置搬运 | L1 Buffer->L0B Buffer（b32） | Nn->Zn、Nn->Nn |
 
 <!-- end id8 -->
 
 ## 数据类型约束
 
-下面按本仓库实际C API重载整理。位宽相同并不代表计算指令支持该类型；没有列出的类型不要仅根据Basic API模板支持范围推断。
-
 <!-- npu="910b,A3" id9 -->
+针对Atlas A2训练系列产品/Atlas A2推理系列产品和Atlas A3训练系列产品/Atlas A3推理系列产品，数据类型约束如表3所示：
 
-**表3** 2201数据类型约束
+**表3** 数据类型约束
 
 | 接口/重载 | C API指针类型 |
 | --- | --- |
@@ -285,13 +223,12 @@ MX矩阵的数据和系数分别搬运：A/B数据使用普通2D重载或`_trans
 | `asc_copy_l12l0a`的3D重载 | half、bfloat16_t、int8_t、uint8_t、int4b_t、int32_t、uint32_t、float |
 | `asc_copy_l12l0b`的3D重载 | half、bfloat16_t、int32_t、uint32_t、float |
 
-2201普通2D分形搬运的转置仅针对L1 Buffer→L0的16位数据；GM→L0不提供转置开关。上文b4/b8块转置图描述硬件分形，当前2201 C API的`_trans`公开实现未提供int4b_t重载，因此该图的b4路径不能作为可直接调用的C API方案。
-
 <!-- end id9 -->
 
 <!-- npu="950" id10 -->
+针对Ascend 950PR/Ascend 950DT，数据类型约束如表4所示：
 
-**表4** 3510数据类型约束
+**表4** 数据类型约束
 
 | 接口/重载 | C API指针类型 |
 | --- | --- |
@@ -300,8 +237,6 @@ MX矩阵的数据和系数分别搬运：A/B数据使用普通2D重载或`_trans
 | `asc_copy_l12l0b_trans` | int8_t、uint8_t、half、bfloat16_t、int32_t、uint32_t、float、int4b_t、fp4x2_e1m2_t、fp4x2_e2m1_t、fp8_e4m3fn_t、fp8_e5m2_t、hifloat8_t |
 | `asc_copy_l12l0a`/`asc_copy_l12l0b`的3D重载 | int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、fp8_e4m3fn_t、fp8_e5m2_t、hifloat8_t |
 | `asc_copy_l12l0a_mx`/`asc_copy_l12l0b_mx` | fp8_e8m0_t系数；32B分形，不搬A/B数据 |
-
-3510的2D数据重载使用512B分形；MX系数接口使用32B分形。FP4打包类型的字节数与逻辑元素数不同，不能用普通`sizeof(T)`直接推导逻辑分形宽度。
 
 <!-- end id10 -->
 

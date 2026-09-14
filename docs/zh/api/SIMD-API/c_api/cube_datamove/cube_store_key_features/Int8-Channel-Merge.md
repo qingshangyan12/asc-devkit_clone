@@ -15,17 +15,3 @@
 **图1** Int8 Channel Merge示意图<a name="zh-cn_topic_0000002547260781_fig1935632714360"></a>
 
 ![](../../../../figures/Fixpipe_Int8_Channel_Merge.png)
-
-4位输出的小分形扩展为16×64；应按实际输出位宽分配空间，不能按int8_t的16×32布局解释4位打包数据。
-
-<!-- npu="910b,A3" id1 -->
-
-2201的4位输出只在L0C Buffer到L1 Buffer对应重载中提供。
-
-<!-- end id1 -->
-
-<!-- npu="950" id2 -->
-
-3510的8位输出还包括fp8_e4m3fn_t和hifloat8_t，NZ输出同样按16×32小分形处理；int4b_t输出可使用GM、L1 Buffer或UB通路。
-
-<!-- end id2 -->
