@@ -255,7 +255,12 @@ __aicore__ inline __gm__ BlockRingBufInfo* GetBlockRingBufInfo()
     uint32_t blockLength = reinterpret_cast<__gm__ BlockRingBufInfo*>(g_sysPrintFifoSpace)->length;
     __gm__ BlockRingBufInfo* ringBufInfo =
         reinterpret_cast<__gm__ BlockRingBufInfo*>(g_sysPrintFifoSpace + blockLength * blockIdx);
-    return ringBufInfo->magic == 0xAE86 ? ringBufInfo : nullptr;
+    if (ringBufInfo->magic != 0xAE86) {
+        return nullptr;
+    }
+    ringBufInfo->flag = 0;
+    asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(ringBufInfo));
+    return ringBufInfo;
 }
 
 __aicore__ inline void UpdateWriteInfo(__gm__ RingBufWriteInfo* writeInfo, const uint32_t& tlvLen)
@@ -331,9 +336,9 @@ __aicore__ inline void DumpTensorL0C2GMImpl(const LocalTensor<T>& src, __gm__ ui
     uint16_t m = (burstLen * ONE_BLK_SIZE / B32_BYTE_SIZE) / BLOCK_CUBE;
 
     copy_matrix_cc_to_gm(
-        (__gm__ float*)(dumpAddr), (__cc__ float*)(src.GetPhyAddr()), 0, n, m, 0, 0, 0, 0, 0,
-        static_cast<uint64_t>(QuantMode_t::NoQuant), static_cast<uint8_t>(false), false, false,
-        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, true, false, false, false);
+        (__gm__ float*)(dumpAddr), (__cc__ float*)(src.GetPhyAddr()), 0, n, m, static_cast<uint16_t>(m * BLOCK_CUBE), m,
+        0, 0, static_cast<uint64_t>(QuantMode_t::NoQuant), static_cast<uint8_t>(false), false, false,
+        static_cast<uint64_t>(QuantMode_post::NoConv), 0, 0, 0, 0, false);
 }
 
 __aicore__ inline void WriteRingBufShapeInfo(const ShapeInfo& shapeInfo)
@@ -437,9 +442,6 @@ __aicore__ inline void WriteRingBufTlvData(
         DataCopyL12GMImpl(dumpDataAddr, reinterpret_cast<__cbuf__ T*>(src.GetPhyAddr()), copyParams);
     } else if (dumpTensorTlv->position == static_cast<uint16_t>(Hardware::L0C)) { // L0C to GM
         // keep the original m300 L0C -> GM implementation (copy_matrix_cc_to_gm)
-        if ASCEND_IS_NOT_AIC {
-            return;
-        }
         DumpTensorL0C2GMImpl(src, reinterpret_cast<__gm__ uint8_t*>(dumpDataAddr), dumpSize);
     }
 
