@@ -547,6 +547,14 @@ HcclResult BuildMc2AicpuTaskCachePlan(
     const OpParam& param, const AlgResourceCtxSerializable& resCtx, Mc2AicpuTaskCachePlan& plan)
 {
     plan = Mc2AicpuTaskCachePlan{};
+    if (param.opType == HCCL_CMD_ALLREDUCE &&
+        std::strcmp(param.algName, "AicpuAllReduceSoleNHR") == 0) {
+        SetBypass(plan, "AicpuAllReduceSoleNHR task cache disabled for validation");
+        HCCL_INFO(
+            "[MC2_TASK_CACHE][Bypass] algName[%s], task cache disabled for validation.",
+            param.algName);
+        return HCCL_SUCCESS;
+    }
     if (GetExternalInputHcclAicpuCacheEnable() == 0U) {
         SetBypass(plan, "AICPU_CacheDisable");
         return HCCL_SUCCESS;
