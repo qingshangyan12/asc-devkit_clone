@@ -58,33 +58,18 @@ template <typename T, bool isSetMask = true>
 __aicore__ inline void MinsImpl(__ubuf__ T* dst, __ubuf__ T* src, T scalarValue, const int32_t& calCount)
 {
     static_assert(
-        (SupportType<T, uint8_t, int8_t, half, bfloat16_t, float, int16_t, int32_t, int64_t, uint64_t>()),
+        (SupportType<T, uint8_t, int8_t, half, bfloat16_t, float, int16_t, int32_t>()),
         "Mins not support current datatype!");
-    if constexpr (SupportBytes<T, 8>()) {
-        constexpr auto func = Reg::Mins<T, T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T, Reg::RegTraitNumTwo>>;
-        Internal::VecBinaryScalarLevel2ImplTemplate<func, T>(dst, src, scalarValue, calCount);
-    } else {
-        constexpr auto func = Reg::Mins<T, T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
-        Internal::VecBinaryScalarLevel2ImplTemplate<func, T>(dst, src, scalarValue, calCount);
-    }
+    constexpr auto func = Reg::Mins<T, T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
+    Internal::VecBinaryScalarLevel2ImplTemplate<func, T>(dst, src, scalarValue, calCount);
 }
-/* **************************************************************************************************
- * LeakyRelu                                             *
- * ************************************************************************************************* */
-namespace RegLeakyRelu {
-template <typename T, typename RegT>
-__simd_callee__ inline void LeakyRelu(RegT& dstReg, RegT& srcReg, T scalarValue, Reg::MaskReg& mask)
-{
-    vlrelu(dstReg, srcReg, scalarValue, mask, MODE_ZEROING);
-}
-} // namespace RegLeakyRelu
 
 // LeakyRelu::Level 2
 template <typename T, bool isSetMask = true>
 __aicore__ inline void LeakyReluImpl(__ubuf__ T* dst, __ubuf__ T* src, T scalarValue, const int32_t& calCount)
 {
     static_assert((SupportType<T, half, float>()), "LeakyRelu not support current datatype!");
-    constexpr auto func = RegLeakyRelu::LeakyRelu<T, Reg::RegTensor<T>>;
+    constexpr auto func = Reg::LeakyRelu<T, T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
     Internal::VecBinaryScalarLevel2ImplTemplate<func, T>(dst, src, scalarValue, calCount);
 }
 } // namespace AscendC

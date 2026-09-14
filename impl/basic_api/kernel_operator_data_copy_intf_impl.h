@@ -1633,14 +1633,8 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
     const uint8_t cacheMode = ExtractCacheMode(src);
     if (dstHWPos == Hardware::UB) {
-#if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5165))
-        DataCopyPadGm2UBImpl<T, mode>(
-            (__ubuf__ T*)dst.GetPhyAddr(), (__gm__ T*)src.GetPhyAddr(), dataCopyParams, padParams);
-#else
         DataCopyPadGm2UBImpl<T, mode>(
             (__ubuf__ T*)dst.GetPhyAddr(), (__gm__ T*)src.GetPhyAddr(), dataCopyParams, padParams, cacheMode);
-#endif
     } else if (dstHWPos == Hardware::L1) {
         DataCopyPadGm2L1Impl<T, mode>(
             (__cbuf__ T*)dst.GetPhyAddr(), (__gm__ T*)src.GetPhyAddr(), dataCopyParams, padParams, cacheMode);
@@ -1756,14 +1750,8 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
     const uint8_t cacheMode = ExtractCacheMode(dst);
     if (srcHWPos == Hardware::UB) {
-#if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5165))
-        DataCopyPadUB2GMImpl<T, mode>(
-            (__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), dataCopyParams);
-#else
         DataCopyPadUB2GMImpl<T, mode>(
             (__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), dataCopyParams, cacheMode);
-#endif
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
     } else if (srcHWPos == Hardware::L1) {
         DataCopyPadL12GMImpl<T, mode>(
