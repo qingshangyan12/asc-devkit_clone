@@ -36,7 +36,7 @@ namespace te {
  * @param b : Right input tensor.
  */
 template <typename Atom, typename CTensor, typename ATensor, typename BTensor>
-__aicore__ inline void mmad(const mmad_atom<Atom>& atom, const CTensor& c, const ATensor& a,
+__aicore__ inline void Mmad(const mmad_atom<Atom>& atom, const CTensor& c, const ATensor& a,
                             const BTensor& b);
 
 /**
@@ -49,7 +49,7 @@ __aicore__ inline void mmad(const mmad_atom<Atom>& atom, const CTensor& c, const
  */
 template <typename Atom, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor,
           Std::enable_if_t<is_attr_tensor_v<BiasTensor>, int> Enable>
-__aicore__ inline void mmad(const mmad_atom<Atom>& atom, const CTensor& c, const ATensor& a, const BTensor& b,
+__aicore__ inline void Mmad(const mmad_atom<Atom>& atom, const CTensor& c, const ATensor& a, const BTensor& b,
                             const BiasTensor& bias);
 
 /**
