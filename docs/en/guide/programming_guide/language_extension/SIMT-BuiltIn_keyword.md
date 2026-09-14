@@ -275,7 +275,7 @@ Where:
 
 -   threads_per_block: dim3 type, used to specify the dimensions and size of each thread block. threads_per_block.x * threads_per_block.y * threads_per_block.z is equal to the number of threads in each thread block, which must be less than or equal to the __launch_bounds__ configuration.
 
--   dyn_ubuf_size: size_t type, used to specify the size of shared memory dynamically allocated for each thread block, in bytes. This memory is used by arrays. For specific usage, see the "dynamic allocation" method in [Shared Memory](../编程模型/AI-Core-SIMT编程/内存层级.md#共享内存).
+-   dyn_ubuf_size: size_t type, used to specify the size of shared memory dynamically allocated for each thread block, in bytes. This memory is used by arrays. For specific usage, see the "dynamic allocation" method in [Shared Memory](../programming_model/ai_core_simt_programming/memory_hierarchy.md#shared-memory).
 
 -   stream: aclrtStream type, specifies the associated stream, used to maintain the execution order of asynchronous operations.
 

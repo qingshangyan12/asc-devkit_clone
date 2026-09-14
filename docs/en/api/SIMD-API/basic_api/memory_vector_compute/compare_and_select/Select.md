@@ -184,7 +184,7 @@ Atlas training products support only mode 0.
     <!-- end id10 -->
 
     <!-- npu="310p" id11 -->
-    - Atlas inference series product AI Core: half/float.
+    - Atlas inference products AI Core: half/float.
     <!-- end id11 -->
 
     <!-- npu="910" id12 -->
