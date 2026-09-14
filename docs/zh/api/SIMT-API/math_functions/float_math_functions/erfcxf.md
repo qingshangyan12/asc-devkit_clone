@@ -54,9 +54,9 @@ inline float erfcxf(float x)
 
 ## 约束说明
 
-<!-- npu="950" id7 -->
-针对Ascend 950PR/Ascend 950DT，本接口不支持Subnormal场景：本接口内部实现使用到了除法运算符，由于除法运算符不支持Subnormal场景，在极少数场景下内部计算的除法结果为Subnormal数据，导致本接口最终结果为0。
-<!-- end id7 -->
+本接口受编译选项[--cce-use-fast-math](../../../../guide/programming_guide/compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#常用的编译选项)的影响。
+-   --cce-use-fast-math=true：开启快速计算模式，本接口内部实现使用到了除法运算符，由于快速计算模式下除法运算符不支持Subnormal场景，在极少数场景下内部计算的除法结果为Subnormal数据，导致本接口最终结果为0。
+-   --cce-use-fast-math=false：支持Subnormal场景的高精度计算。
 
 ## 调用示例
 
