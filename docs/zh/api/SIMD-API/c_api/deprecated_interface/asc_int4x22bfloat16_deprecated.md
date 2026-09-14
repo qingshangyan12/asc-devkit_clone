@@ -61,10 +61,6 @@ __simd_callee__ inline void asc_int4x22bfloat16_v4(vector_bfloat16_t& dst, vecto
 
 无
 
-## 流水类型
-
-PIPE_V
-
 ## 约束说明
 
 无

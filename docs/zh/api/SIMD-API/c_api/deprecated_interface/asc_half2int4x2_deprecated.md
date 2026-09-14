@@ -133,10 +133,6 @@ __simd_callee__ inline void asc_half2int4x2_rz_sat_v4(vector_int4x2_t& dst, vect
 
 无
 
-## 流水类型
-
-PIPE_V
-
 ## 约束说明
 
 - 开启饱和模式和非饱和模式时，需配置ctrl寄存器，ctrl寄存器的详细说明请参见[asc_set_ctrl.md](../spr/asc_set_ctrl.md)。

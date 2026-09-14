@@ -61,10 +61,6 @@ __simd_callee__ inline void asc_int4x22half_v4(vector_half& dst, vector_int4x2_t
 
 无
 
-## 流水类型
-
-PIPE_V
-  
 ## 约束说明
 
 无

@@ -72,10 +72,6 @@ __simd_callee__ inline void asc_half2int4x2_<round_mode>_sat(
 
 无。
 
-## 流水类型
-
-`PIPE_V`
-
 ## 约束说明
 
 - 位置选择标签参数仅能使用上述编译期常量。

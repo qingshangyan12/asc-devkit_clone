@@ -63,10 +63,6 @@ __simd_callee__ inline void asc_int4x22int16(
 
 无。
 
-## 流水类型
-
-`PIPE_V`
-
 ## 约束说明
 
 - 位置选择标签参数仅能使用上述编译期常量。
