@@ -4,7 +4,7 @@
 
 回调的编写和注册方式见[GenSimplifiedKey回调实现](../design_and_implementation/gen_simplified_key.md)，运行时选择过程见[基于simplified key的运行时选择流程](../invocation/simplified_key_runtime_flow.md)。
 
-完整可运行样例请参考[自定义simplified key编译样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op_simplified_key)。
+完整可运行样例请参考[自定义simplified key编译样例](../../../../../../../examples/01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op_simplified_key)。
 
 ## 配置目录和文件准备
 
