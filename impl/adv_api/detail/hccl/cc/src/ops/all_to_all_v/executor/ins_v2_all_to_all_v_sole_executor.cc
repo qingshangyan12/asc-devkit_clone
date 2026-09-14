@@ -18,7 +18,7 @@
 #include "topo_match_ubx_1d.h"
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 #include "ccu_temp_all_to_all_v_mesh_1D.h"
-#include "ccu_temp_kfc_all_to_all_mesh1d_multi_jetty_sliced.h"
+#include "ccu_temp_all_to_all_mesh1d_multi_jetty.h"
 #endif
 #ifndef AICPU_COMPILE
 #include "ccu_temp_all_to_all_mesh_1D.h"
@@ -336,7 +336,7 @@ REGISTER_EXEC_V2(
     CcuTempAlltoAllVMesh1D);
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLTOALL, CcuSchedAllToAllMesh1DMultiJetty, InsV2AlltoAllVSoleExecutor, TopoMatchUBX1d,
-    CcuTempKfcAllToAllMesh1DMultiJettySliced);
+    CcuTempAllToAllMesh1DMultiJetty);
 #endif
 #ifndef AICPU_COMPILE
 REGISTER_EXEC_V2(

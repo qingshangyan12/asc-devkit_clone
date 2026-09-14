@@ -105,7 +105,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     uint64_t loopCount = 8;
     CalcGoSize(sliceSizeAlltoall, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[KFC_A2A_MJ_GO_SIZE_0]);
     constexpr uint64_t splitAlignment = 128U;
-    // 升 N>1 时须与 template 侧 KFC_A2A_JETTY_NUM 同步修改（ccu_temp_kfc_all_to_all_mesh1d_multi_jetty_sliced.cc）
+    // 升 N>1 时须与 template 侧 A2A_JETTY_NUM 同步修改（ccu_temp_all_to_all_mesh1d_multi_jetty.cc）
     constexpr uint64_t a2aJettyNum = 1U;
     const uint64_t a2aSliceSizePerJetty = (sliceSizeAlltoall / a2aJettyNum / splitAlignment) * splitAlignment;
     const uint64_t a2aLastSliceSizePerJetty = sliceSizeAlltoall - a2aSliceSizePerJetty * (a2aJettyNum - 1U);

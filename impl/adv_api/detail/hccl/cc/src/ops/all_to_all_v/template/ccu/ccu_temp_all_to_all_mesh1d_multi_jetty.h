@@ -8,16 +8,16 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#ifndef HCCL_CCU_TEMP_KFC_ALL_TO_ALL_MESH1D_MULTI_JETTY_SLICED_H
-#define HCCL_CCU_TEMP_KFC_ALL_TO_ALL_MESH1D_MULTI_JETTY_SLICED_H
+#ifndef HCCL_CCU_TEMP_ALL_TO_ALL_MESH1D_MULTI_JETTY_H
+#define HCCL_CCU_TEMP_ALL_TO_ALL_MESH1D_MULTI_JETTY_H
 
 #include "utils.h"
 #include "ccu_alg_template_base.h"
-#include "kernel/ccu_kernel_kfc_all_to_all_mesh1d_multi_jetty_sliced.h"
+#include "kernel/ccu_kernel_all_to_all_mesh1d_multi_jetty.h"
 
 namespace mc2_ops_hccl {
 
-struct CcuKernelArgKfcAllToAllMesh1DMultiJettySliced : CcuKernelArgBase {
+struct CcuKernelArgAllToAllMesh1DMultiJetty : CcuKernelArgBase {
     uint64_t rankSize = 0;
     uint32_t rankId = 0;
     uint32_t jettyNum = 1U;
@@ -25,16 +25,16 @@ struct CcuKernelArgKfcAllToAllMesh1DMultiJettySliced : CcuKernelArgBase {
     std::vector<std::vector<uint32_t>> subCommRanks;
 };
 
-class CcuTempKfcAllToAllMesh1DMultiJettySliced : public CcuAlgTemplateBase {
+class CcuTempAllToAllMesh1DMultiJetty : public CcuAlgTemplateBase {
 public:
-    CcuTempKfcAllToAllMesh1DMultiJettySliced() = default;
-    CcuTempKfcAllToAllMesh1DMultiJettySliced(
+    CcuTempAllToAllMesh1DMultiJetty() = default;
+    CcuTempAllToAllMesh1DMultiJetty(
         const OpParam& param, u32 rankId, const std::vector<std::vector<u32>>& subCommRanks);
-    ~CcuTempKfcAllToAllMesh1DMultiJettySliced() override = default;
+    ~CcuTempAllToAllMesh1DMultiJetty() override = default;
 
     std::string Describe() const override
     {
-        return StringFormat("Template of KFC AllToAll Mesh1D MultiJetty Sliced with tempRankSize [%u].", tempRankSize_);
+        return StringFormat("Template of AllToAll Mesh1D MultiJetty with tempRankSize [%u].", tempRankSize_);
     }
 
     HcclResult CalcRes(

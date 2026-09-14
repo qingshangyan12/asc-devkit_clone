@@ -18,7 +18,7 @@
 #include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_mesh1d.h"
 #include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_v_mesh1d.h"
 #include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_kfc_all_to_all_mesh1d_multi_jetty.h"
-#include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_kfc_all_to_all_mesh1d_multi_jetty_sliced.h"
+#include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_mesh1d_multi_jetty.h"
 #include "ccu_kernel_kfc_server.h"
 #include "ccu_variable_dl.hpp"
 #include "ccu_func_dl.hpp"
@@ -258,8 +258,8 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
             param[HBM_PARAM_IDX_8], ctx.arg->channels, ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize),
             ctx.arg->rankId);
     } else if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALL) {
-        if (ctx.arg->role == KfcServerRole::ALL_TO_ALL_MULTI_JETTY_SLICED) {
-            CcuKfcAllToAllMesh1DMultiJettySlicedKernel(
+        if (ctx.arg->role == KfcServerRole::ALL_TO_ALL_MULTI_JETTY) {
+            CcuAllToAllMesh1DMultiJettyKernel(
                 param[KFC_A2A_MJ_INPUT], param[KFC_A2A_MJ_OUTPUT], ctx.token, param[KFC_A2A_MJ_SLICE_SIZE],
                 param[KFC_A2A_MJ_SRC_STRIDE], param[KFC_A2A_MJ_SRC_OFFSET], param[KFC_A2A_MJ_DST_OFFSET],
                 param[KFC_A2A_MJ_GO_SIZE_0], param[KFC_A2A_MJ_GO_SIZE_1], param[KFC_A2A_MJ_GO_SIZE_2],

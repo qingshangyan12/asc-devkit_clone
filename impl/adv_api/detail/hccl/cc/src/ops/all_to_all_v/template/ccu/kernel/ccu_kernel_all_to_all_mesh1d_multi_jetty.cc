@@ -8,7 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#include "ccu_kernel_kfc_all_to_all_mesh1d_multi_jetty_sliced.h"
+#include "ccu_kernel_all_to_all_mesh1d_multi_jetty.h"
 
 namespace mc2_ops_hccl {
 namespace {
@@ -17,7 +17,7 @@ constexpr uint16_t A2A_TOKEN_XN_ID = 2U;
 constexpr uint16_t A2A_POST_SYNC_BIT = static_cast<uint16_t>(1U << 5U);
 constexpr uint16_t A2A_CKE_IDX = 0U;
 
-struct KfcAllToAllSlicedContext : CcuKernelCtxBase {
+struct AllToAllMesh1DMultiJettyContext : CcuKernelCtxBase {
     const ChannelHandle* channels = nullptr;
     uint32_t channelCount = 0;
     uint32_t rankSize = 0;
@@ -39,11 +39,11 @@ struct KfcAllToAllSlicedContext : CcuKernelCtxBase {
     std::vector<ccu::Event> eventList;
 };
 
-CcuResult InitResource(KfcAllToAllSlicedContext& ctx)
+CcuResult InitResource(AllToAllMesh1DMultiJettyContext& ctx)
 {
     if (ctx.channelCount == 0U || ctx.rankSize == 0U || ctx.rankId >= ctx.rankSize || ctx.jettyNum == 0U) {
         HCCL_ERROR(
-            "[CcuKfcAllToAllSliced] invalid resource, channelCount[%u], rankSize[%u], rankId[%u], jetty[%u]",
+            "[CcuAllToAllMultiJetty] invalid resource, channelCount[%u], rankSize[%u], rankId[%u], jetty[%u]",
             ctx.channelCount, ctx.rankSize, ctx.rankId, ctx.jettyNum);
         return CCU_E_INTERNAL;
     }
@@ -63,7 +63,7 @@ CcuResult InitResource(KfcAllToAllSlicedContext& ctx)
     return CCU_SUCCESS;
 }
 
-CcuResult PreSync(KfcAllToAllSlicedContext& ctx)
+CcuResult PreSync(AllToAllMesh1DMultiJettyContext& ctx)
 {
     for (uint32_t i = 0; i < ctx.channelCount; ++i) {
         CCU_CHK_RET(ccu::WriteVariableWithNotify(
@@ -78,7 +78,7 @@ CcuResult PreSync(KfcAllToAllSlicedContext& ctx)
     return CCU_SUCCESS;
 }
 
-CcuResult PostSync(KfcAllToAllSlicedContext& ctx)
+CcuResult PostSync(AllToAllMesh1DMultiJettyContext& ctx)
 {
     for (uint32_t i = 0; i < ctx.channelCount; ++i) {
         CCU_CHK_RET(ccu::NotifyRecord(ctx.channels[i], A2A_CKE_IDX, A2A_POST_SYNC_BIT));
@@ -89,7 +89,7 @@ CcuResult PostSync(KfcAllToAllSlicedContext& ctx)
     return CCU_SUCCESS;
 }
 
-CcuResult DoAllToAllSliced(KfcAllToAllSlicedContext& ctx)
+CcuResult DoAllToAll(AllToAllMesh1DMultiJettyContext& ctx)
 {
     ctx.srcOffset += ctx.input;
 
@@ -156,14 +156,14 @@ CcuResult DoAllToAllSliced(KfcAllToAllSlicedContext& ctx)
 }
 } // namespace
 
-CcuResult CcuKfcAllToAllMesh1DMultiJettySlicedKernel(
+CcuResult CcuAllToAllMesh1DMultiJettyKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable sliceSize,
     ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset, ccu::Variable goSize0,
     ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable sliceSizePerJetty,
     ccu::Variable lastSliceSizePerJetty, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize,
     uint32_t rankId, uint32_t jettyNum)
 {
-    KfcAllToAllSlicedContext ctx;
+    AllToAllMesh1DMultiJettyContext ctx;
     ctx.channels = channels;
     ctx.channelCount = channelCount;
     ctx.rankSize = rankSize;
@@ -187,7 +187,7 @@ CcuResult CcuKfcAllToAllMesh1DMultiJettySlicedKernel(
     ctx.goSize.residual = goSize3;
 
     CCU_CHK_RET(PreSync(ctx));
-    CCU_CHK_RET(DoAllToAllSliced(ctx));
+    CCU_CHK_RET(DoAllToAll(ctx));
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
 }

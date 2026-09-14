@@ -8,8 +8,8 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#ifndef HCCL_CCU_ALL_TO_ALL_MJ_SLICED_ADAPTER_H
-#define HCCL_CCU_ALL_TO_ALL_MJ_SLICED_ADAPTER_H
+#ifndef HCCL_CCU_ALL_TO_ALL_MJ_ADAPTER_H
+#define HCCL_CCU_ALL_TO_ALL_MJ_ADAPTER_H
 
 #include "ccu_kernel_proxy.h"
 #include "ccu_fixture.h"
@@ -23,14 +23,14 @@ namespace CcuSt {
 // CcuPrepareForAllToAllMultiJetty）
 constexpr uint32_t ALL_TO_ALL_MJ_TASK_ARG_COUNT = 13;
 
-struct AllToAllMjSlicedKernelConfig {
+struct AllToAllMjKernelConfig {
     uint32_t rankId{0};
     uint32_t rankSize{0};
     uint32_t jettyNum{1};
     std::vector<ChannelHandle> channels;
 };
 
-struct AllToAllMjSlicedLaunchConfig {
+struct AllToAllMjLaunchConfig {
     uint64_t inputAddress{0};
     uint64_t outputAddress{0};
     uint64_t token{0};
@@ -43,11 +43,11 @@ struct AllToAllMjSlicedLaunchConfig {
     uint64_t lastSliceSizePerJetty{0};
 };
 
-Result CaptureAllToAllMjSlicedKernel(void* kernelArg);
-std::vector<uint64_t> PrepareAllToAllMjSlicedTaskArgs(const AllToAllMjSlicedLaunchConfig& config);
-ScenarioData BuildMjSlicedScenario(const CcuStScenario& scenario, const std::vector<KernelHandle>& handles);
+Result CaptureAllToAllMjKernel(void* kernelArg);
+std::vector<uint64_t> PrepareAllToAllMjTaskArgs(const AllToAllMjLaunchConfig& config);
+ScenarioData BuildMjScenario(const CcuStScenario& scenario, const std::vector<KernelHandle>& handles);
 
 } // namespace CcuSt
 } // namespace HcclSim
 
-#endif // HCCL_CCU_ALL_TO_ALL_MJ_SLICED_ADAPTER_H
+#endif // HCCL_CCU_ALL_TO_ALL_MJ_ADAPTER_H

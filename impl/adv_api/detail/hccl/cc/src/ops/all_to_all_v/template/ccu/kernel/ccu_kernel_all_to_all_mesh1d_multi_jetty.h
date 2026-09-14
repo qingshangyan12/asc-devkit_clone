@@ -8,15 +8,15 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#ifndef HCCL_CCU_KERNEL_KFC_ALL_TO_ALL_MESH1D_MULTI_JETTY_SLICED_H
-#define HCCL_CCU_KERNEL_KFC_ALL_TO_ALL_MESH1D_MULTI_JETTY_SLICED_H
+#ifndef HCCL_CCU_KERNEL_ALL_TO_ALL_MESH1D_MULTI_JETTY_H
+#define HCCL_CCU_KERNEL_ALL_TO_ALL_MESH1D_MULTI_JETTY_H
 
 #include "ccu_kernel_alg_base.h"
 #include "kfc_server_protocol.h"
 
 namespace mc2_ops_hccl {
 
-CcuResult CcuKfcAllToAllMesh1DMultiJettySlicedKernel(
+CcuResult CcuAllToAllMesh1DMultiJettyKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable sliceSize,
     ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset, ccu::Variable goSize0,
     ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable sliceSizePerJetty,

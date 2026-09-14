@@ -8,11 +8,11 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#include "ccu_all_to_all_mj_sliced_adapter.h"
+#include "ccu_all_to_all_mj_adapter.h"
 #include "ccu_all_to_all.h"
 
-#include "ccu_temp_kfc_all_to_all_mesh1d_multi_jetty_sliced.h"
-#include "ccu_kernel_kfc_all_to_all_mesh1d_multi_jetty_sliced.h"
+#include "ccu_temp_all_to_all_mesh1d_multi_jetty.h"
+#include "ccu_kernel_all_to_all_mesh1d_multi_jetty.h"
 #include "ccu_primitives_stub.h"
 #include "ccu_kernel_alg_base.h"
 #include "alg_param.h"
@@ -22,17 +22,17 @@ namespace CcuSt {
 
 namespace {
 
-// 与 prepare 侧 a2aJettyNum（hccl_ccu_v0_prepare.h）和 template 侧 KFC_A2A_JETTY_NUM 保持一致
+// 与 prepare 侧 a2aJettyNum（hccl_ccu_v0_prepare.h）和 template 侧 A2A_JETTY_NUM 保持一致
 constexpr uint64_t MJ_JETTY_NUM = 1;
 constexpr uint64_t MJ_SPLIT_ALIGNMENT = 128;
 
-void* ConvertAllToAllMjSlicedArg(const void* productArg, uint32_t argNum)
+void* ConvertAllToAllMjArg(const void* productArg, uint32_t argNum)
 {
     if (productArg == nullptr) {
         return nullptr;
     }
-    const auto* src = static_cast<const mc2_ops_hccl::CcuKernelArgKfcAllToAllMesh1DMultiJettySliced*>(productArg);
-    auto* config = new AllToAllMjSlicedKernelConfig();
+    const auto* src = static_cast<const mc2_ops_hccl::CcuKernelArgAllToAllMesh1DMultiJetty*>(productArg);
+    auto* config = new AllToAllMjKernelConfig();
     config->rankId = src->rankId;
     config->rankSize = static_cast<uint32_t>(src->rankSize);
     config->jettyNum = src->jettyNum;
@@ -44,24 +44,24 @@ void* ConvertAllToAllMjSlicedArg(const void* productArg, uint32_t argNum)
 
 bool g_registered = []() {
     RegisterCaptureFunction(
-        "CcuKernelKfcAllToAllMesh1DMultiJettySliced", CaptureAllToAllMjSlicedKernel, ConvertAllToAllMjSlicedArg,
-        [](void* p) { delete static_cast<AllToAllMjSlicedKernelConfig*>(p); });
+        "CcuAllToAllMesh1DMultiJettyKernel", CaptureAllToAllMjKernel, ConvertAllToAllMjArg,
+        [](void* p) { delete static_cast<AllToAllMjKernelConfig*>(p); });
 
     CcuStAllToAll::RegisterVariant(
         "CcuSchedAllToAllMesh1DMultiJetty",
         [](const CcuStScenario& scenario, const std::vector<KernelHandle>& handles) -> ScenarioData {
-            return BuildMjSlicedScenario(scenario, handles);
+            return BuildMjScenario(scenario, handles);
         });
     return true;
 }();
 } // namespace
 
-Result CaptureAllToAllMjSlicedKernel(void* kernelArg)
+Result CaptureAllToAllMjKernel(void* kernelArg)
 {
     if (kernelArg == nullptr) {
         return Result::PARAM_ERROR;
     }
-    const auto& config = *static_cast<AllToAllMjSlicedKernelConfig*>(kernelArg);
+    const auto& config = *static_cast<AllToAllMjKernelConfig*>(kernelArg);
     if (config.rankSize < 2 || config.rankId >= config.rankSize || config.jettyNum == 0 ||
         config.channels.size() != config.rankSize - 1) {
         return Result::PARAM_ERROR;
@@ -75,14 +75,14 @@ Result CaptureAllToAllMjSlicedKernel(void* kernelArg)
     }
     CompilerContext::Current().ConfigureProgram(config.rankId, config.rankSize, config.channels);
 
-    const CcuResult result = mc2_ops_hccl::CcuKfcAllToAllMesh1DMultiJettySlicedKernel(
+    const CcuResult result = mc2_ops_hccl::CcuAllToAllMesh1DMultiJettyKernel(
         arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7],
         arguments[8], arguments[9], arguments[10], arguments[11], arguments[12], config.channels.data(),
         static_cast<uint32_t>(config.channels.size()), config.rankSize, config.rankId, config.jettyNum);
     return result == CCU_SUCCESS ? Result::SUCCESS : Result::CONTRACT_ERROR;
 }
 
-std::vector<uint64_t> PrepareAllToAllMjSlicedTaskArgs(const AllToAllMjSlicedLaunchConfig& config)
+std::vector<uint64_t> PrepareAllToAllMjTaskArgs(const AllToAllMjLaunchConfig& config)
 {
     return {
         config.inputAddress,
@@ -100,7 +100,7 @@ std::vector<uint64_t> PrepareAllToAllMjSlicedTaskArgs(const AllToAllMjSlicedLaun
         config.lastSliceSizePerJetty};
 }
 
-ScenarioData BuildMjSlicedScenario(const CcuStScenario& scenario, const std::vector<KernelHandle>& handles)
+ScenarioData BuildMjScenario(const CcuStScenario& scenario, const std::vector<KernelHandle>& handles)
 {
     const uint32_t rankSize = CcuStFixture::CountRanks(scenario.topoMeta);
     const uint64_t sliceSize = scenario.sizes[0][0];
@@ -111,7 +111,7 @@ ScenarioData BuildMjSlicedScenario(const CcuStScenario& scenario, const std::vec
     ScenarioData data;
     data.memories.resize(rankSize);
     data.launches.resize(rankSize);
-    std::vector<AllToAllMjSlicedLaunchConfig> mjConfigs(rankSize);
+    std::vector<AllToAllMjLaunchConfig> mjConfigs(rankSize);
     data.srcOffsets.assign(rankSize, std::vector<uint64_t>(rankSize, 0));
     data.dstOffsets.assign(rankSize, std::vector<uint64_t>(rankSize, 0));
 
@@ -132,7 +132,7 @@ ScenarioData BuildMjSlicedScenario(const CcuStScenario& scenario, const std::vec
         RankMemory& memory = data.memories[rank];
         memory.input.assign(inputSize, 0x5a);
         memory.output.assign(outputSize, 0xa5);
-        AllToAllMjSlicedLaunchConfig& config = mjConfigs[rank];
+        AllToAllMjLaunchConfig& config = mjConfigs[rank];
         config.inputAddress = memory.InputAddress() + sourceBaseOffset;
         config.outputAddress = memory.OutputAddress();
         config.token = 0x1000U + rank;
@@ -151,7 +151,7 @@ ScenarioData BuildMjSlicedScenario(const CcuStScenario& scenario, const std::vec
             data.srcOffsets[rank][dest] = sourceBaseOffset + static_cast<uint64_t>(dest) * sliceSize;
             data.dstOffsets[rank][dest] = destinationBaseOffset + static_cast<uint64_t>(rank) * sliceSize;
         }
-        data.launches[rank] = RankLaunch{handles[rank], PrepareAllToAllMjSlicedTaskArgs(config), &memory};
+        data.launches[rank] = RankLaunch{handles[rank], PrepareAllToAllMjTaskArgs(config), &memory};
     }
     return data;
 }

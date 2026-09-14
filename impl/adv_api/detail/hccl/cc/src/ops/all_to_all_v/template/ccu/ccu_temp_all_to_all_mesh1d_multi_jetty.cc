@@ -10,15 +10,15 @@
 
 #include "alg_data_trans_wrapper.h"
 #include "channel.h"
-#include "ccu_temp_kfc_all_to_all_mesh1d_multi_jetty_sliced.h"
+#include "ccu_temp_all_to_all_mesh1d_multi_jetty.h"
 
 namespace mc2_ops_hccl {
 namespace {
 // 升 N>1 时须与 prepare 侧 a2aJettyNum 同步修改（hccl_ccu_v0_prepare.h）
-constexpr uint32_t KFC_A2A_JETTY_NUM = 1U;
+constexpr uint32_t A2A_JETTY_NUM = 1U;
 } // namespace
 
-CcuTempKfcAllToAllMesh1DMultiJettySliced::CcuTempKfcAllToAllMesh1DMultiJettySliced(
+CcuTempAllToAllMesh1DMultiJetty::CcuTempAllToAllMesh1DMultiJetty(
     const OpParam& param, u32 rankId, const std::vector<std::vector<u32>>& subCommRanks)
     : CcuAlgTemplateBase(param, rankId, subCommRanks)
 {
@@ -30,7 +30,7 @@ CcuTempKfcAllToAllMesh1DMultiJettySliced::CcuTempKfcAllToAllMesh1DMultiJettySlic
     tempRankSize_ = static_cast<uint32_t>(ranks.size());
 }
 
-HcclResult CcuTempKfcAllToAllMesh1DMultiJettySliced::CalcRes(
+HcclResult CcuTempAllToAllMesh1DMultiJetty::CalcRes(
     HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
     AlgResourceRequest& resourceRequest)
 {
@@ -40,23 +40,23 @@ HcclResult CcuTempKfcAllToAllMesh1DMultiJettySliced::CalcRes(
     std::vector<HcclChannelDesc> channelDescs;
     CHK_RET(CalcChannelRequestMeshClosMultiJetty(comm, param, topoInfo, subCommRanks_, channelDescs));
 
-    auto kernelArg = std::make_shared<CcuKernelArgKfcAllToAllMesh1DMultiJettySliced>();
+    auto kernelArg = std::make_shared<CcuKernelArgAllToAllMesh1DMultiJetty>();
     kernelArg->rankSize = tempRankSize_;
     kernelArg->rankId = mySubCommRank_;
-    kernelArg->jettyNum = KFC_A2A_JETTY_NUM;
+    kernelArg->jettyNum = A2A_JETTY_NUM;
     kernelArg->opParam = param;
     kernelArg->subCommRanks = subCommRanks_;
 
     CcuKernelInfo kernelInfo{};
-    CHK_SAFETY_FUNC_RET(strcpy_s(
-        kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelKfcAllToAllMesh1DMultiJettySliced"));
+    CHK_SAFETY_FUNC_RET(
+        strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuAllToAllMesh1DMultiJettyKernel"));
     kernelInfo.channels = channelDescs;
     kernelInfo.setKernelArg(kernelArg);
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);
     return HCCL_SUCCESS;
 }
 
-HcclResult CcuTempKfcAllToAllMesh1DMultiJettySliced::GetRes(AlgResourceRequest& resourceRequest) const
+HcclResult CcuTempAllToAllMesh1DMultiJetty::GetRes(AlgResourceRequest& resourceRequest) const
 {
     resourceRequest.slaveThreadNum = 0;
     resourceRequest.notifyNumOnMainThread = 0;
@@ -64,9 +64,9 @@ HcclResult CcuTempKfcAllToAllMesh1DMultiJettySliced::GetRes(AlgResourceRequest& 
     return HCCL_SUCCESS;
 }
 
-u64 CcuTempKfcAllToAllMesh1DMultiJettySliced::GetThreadNum() const { return 1; }
+u64 CcuTempAllToAllMesh1DMultiJetty::GetThreadNum() const { return 1; }
 
-u64 CcuTempKfcAllToAllMesh1DMultiJettySliced::CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType)
+u64 CcuTempAllToAllMesh1DMultiJetty::CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType)
 {
     (void)inBuffType;
     (void)outBuffType;
