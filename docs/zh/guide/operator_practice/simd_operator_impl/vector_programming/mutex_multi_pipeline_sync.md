@@ -2,7 +2,7 @@
 
 在Ascend 950PR/Ascend 950DT上，矢量算子可通过Mutex管理AI Core内多条异步流水之间的依赖。本文以使用双缓冲的Add算子为例，说明如何使用`AscendC::Mutex::Lock`和`AscendC::Mutex::Unlock`串联数据搬入、矢量计算和数据搬出，并在Buffer复用时建立反向同步。
 
-`Lock<当前pipe>(mutexId)`只指定需要阻塞的当前流水。其解除阻塞的条件是：此前所有流水中使用相同MutexID的Mutex均已执行`Unlock`。因此，开发者不需要判断或传入前序流水类型；无论前序阶段是`PIPE_MTE2`、`PIPE_V`还是`PIPE_MTE3`，均由同一MutexID统一约束。
+Mutex的核心语义是：`Lock<当前pipe>(mutexId)`只指定需要阻塞的当前流水，其解除阻塞的条件是此前所有流水中使用相同MutexID的Mutex均已执行`Unlock`。因此开发者无需判断或传入前序流水类型，无论前序阶段是`PIPE_MTE2`、`PIPE_V`还是`PIPE_MTE3`，均由同一MutexID统一约束。
 
 ## 前置说明
 
@@ -92,6 +92,32 @@ AscendC::ReleaseMutexID(mutexId1);
 
 完整的可编译示例请参考仓内[Mutex核内流水线同步样例](../../../../../../examples/01_simd_cpp_api/03_basic_api/05_sync_control/mutex)。
 
+## 反向同步原理
+
+双缓冲的正向依赖是当前tile的`PIPE_MTE2 -> PIPE_V -> PIPE_MTE3`。反向依赖发生在Buffer复用时：第`i + 2`轮与第`i`轮使用相同的Buffer，必须等第`i`轮的MTE3从该Buffer搬出完成后，才能开始第`i + 2`轮的MTE2搬入。因此，反向同步表达的是`PIPE_MTE3 -> PIPE_MTE2`，而不是当前tile内部的正向依赖。
+
+使用Mutex时，`mutexId`与Buffer绑定，MutexID记录的是该Buffer此前所有阶段的完成状态，而非某个指定生产者的完成状态。每个阶段只锁定当前流水；`Lock<PIPE_MTE2>(mutexId)`会阻塞`PIPE_MTE2`后续指令，直至此前`PIPE_MTE2`、`PIPE_V`、`PIPE_MTE3`等所有流水中同一MutexID的Mutex均已Unlock。因此，第`i + 2`轮复用Buffer时，MTE2上的Lock自然包含对第`i`轮MTE3的等待，而无需额外表达`PIPE_MTE3 -> PIPE_MTE2`的源、目的流水组合。
+
+这正是Mutex能够简化反向同步的原因：第`i + 2`轮的MTE2不需要知道前一次使用该Buffer的是哪一条流水，也不需要为反向依赖维护专用事件。只要所有访问该Buffer的阶段复用同一MutexID，Lock便会统一等待其此前全部阶段完成。
+
+```cpp
+// Mutex：只指定当前流水，MutexID表达整个Buffer生命周期。
+for (uint32_t i = 0; i < loopCount; ++i) {
+    uint32_t bufferIndex = i % 2;
+    uint8_t mutexId = (bufferIndex == 0) ? mutexId0 : mutexId1;
+
+    AscendC::Mutex::Lock<PIPE_MTE2>(mutexId);
+    // MTE2搬入bufferIndex。
+    AscendC::Mutex::Unlock<PIPE_MTE2>(mutexId);
+    AscendC::Mutex::Lock<PIPE_V>(mutexId);
+    // V计算bufferIndex。
+    AscendC::Mutex::Unlock<PIPE_V>(mutexId);
+    AscendC::Mutex::Lock<PIPE_MTE3>(mutexId);
+    // MTE3搬出bufferIndex。
+    AscendC::Mutex::Unlock<PIPE_MTE3>(mutexId);
+}
+```
+
 ## 与SetFlag/WaitFlag的选择
 
 `SetFlag/WaitFlag`和Mutex都可以建立核内多流水依赖。对于双缓冲算子中按Buffer生命周期组织的依赖，Mutex能将同步状态聚合到对应的MutexID：开发者在当前阶段只需调用`Lock<当前pipe>(mutexId)`和`Unlock<当前pipe>(mutexId)`，无需关心或传入前序生产者流水。Lock阻塞当前流水，直至此前所有流水中相同MutexID的Mutex均已Unlock；它等待的是该资源此前所有阶段的完成状态，而不是某一条指定源流水。因此，不需要像SetFlag/WaitFlag一样传入或维护源流水、目的流水组合及其事件ID。
@@ -100,20 +126,8 @@ AscendC::ReleaseMutexID(mutexId1);
 
 SetFlag/WaitFlag以一对源流水和目的流水为同步方向。以MTE2流水搬入数据、V流水读取数据进行计算为例，需要通过`HardEvent::MTE2_V`明确指定源流水和目的流水，并为这组同步分配事件ID。MTE2流水的前序指令执行完成后，`SetFlag`将对应事件置为1；V流水执行到`WaitFlag`时，如果事件为0，则阻塞V流水的后续指令，如果事件为1，则将事件清零并继续执行。
 
-```mermaid
-sequenceDiagram
-    participant MTE2 as PIPE_MTE2
-    participant Event as MTE2_V事件
-    participant V as PIPE_V
-    Note over MTE2,V: 指令已下发到两条异步流水
-    V->>Event: WaitFlag(MTE2_V, eventId)，事件为0
-    Event-->>V: 阻塞V流水后续指令
-    MTE2->>MTE2: DataCopy搬入数据
-    MTE2->>Event: SetFlag(MTE2_V, eventId)，事件置1
-    Note over MTE2,Event: SetFlag等待MTE2前序读写完成
-    Event-->>V: WaitFlag将事件清零，解除阻塞
-    V->>V: Vector计算
-```
+**图1**  SetFlag/WaitFlag同步时序示意图    
+![](../../../figures/set_flag_wait_flag_sequence_diagram.png)
 
 `SetFlag`和`WaitFlag`必须使用完全相同的HardEvent和事件ID。图中的`MTE2_V`同时编码了源流水MTE2和目的流水V；如果同步方向或参与流水发生变化，开发者需要选择对应的HardEvent并管理其事件ID。
 
@@ -121,22 +135,8 @@ sequenceDiagram
 
 Lock/Unlock不指定源流水和目的流水组合。在相同场景中，MTE2和V流水分别通过`Lock<当前pipe>(mutexId)`指定当前流水，并在操作完成后通过相同pipe和MutexID的`Unlock`释放。V流水执行Lock时，会等待此前所有流水中具有相同MutexID的Mutex均已释放，其中包括MTE2流水的Unlock。
 
-```mermaid
-sequenceDiagram
-    participant MTE2 as PIPE_MTE2
-    participant Mutex as MutexID
-    participant V as PIPE_V
-    MTE2->>Mutex: Lock(MTE2, mutexId)
-    Mutex-->>MTE2: 获取Mutex
-    V->>Mutex: Lock(V, mutexId)
-    Mutex-->>V: 阻塞V流水后续指令
-    MTE2->>MTE2: DataCopy搬入数据
-    MTE2->>Mutex: Unlock(MTE2, mutexId)
-    Note over MTE2,Mutex: MTE2前序指令完成后释放Mutex
-    Mutex-->>V: 获取Mutex，解除阻塞
-    V->>V: Vector计算
-    V->>Mutex: Unlock(V, mutexId)
-```
+**图2**  Lock/Unlock同步时序示意图    
+![](../../../figures/mutex_lock_unlock_sequence_diagram.png)
 
 图中MTE2流水只指定`PIPE_MTE2`，V流水只指定`PIPE_V`，两条流水通过相同的MutexID建立依赖。与SetFlag/WaitFlag相比，Lock/Unlock不需要通过HardEvent同时编码源流水和目的流水；V流水只需关注自身和待访问资源对应的MutexID。
 
@@ -157,15 +157,11 @@ Mutex并不用于同一条流水内的指令排序。例如，同一`PIPE_MTE2`�
 
 由于Mutex不需要传入源流水、目的流水组合，因此也不依赖对应的HardEvent。在不同硬件架构上，HardEvent支持的取值可能不同；使用SetFlag/WaitFlag时，需要针对目标架构确认所需的流水组合是否存在。使用Mutex时，开发者只需关注当前流水和MutexID，可减少这部分事件配置。Mutex不提供跨硬件版本兼容性，仍需以Ascend 950PR/Ascend 950DT的产品支持范围为准。
 
-### 反向同步原理
+### SetFlag/WaitFlag的反向同步
 
-双缓冲的正向依赖是当前tile的`PIPE_MTE2 -> PIPE_V -> PIPE_MTE3`。反向依赖发生在Buffer复用时：第`i + 2`轮与第`i`轮使用相同的Buffer，必须等第`i`轮的MTE3从该Buffer搬出完成后，才能开始第`i + 2`轮的MTE2搬入。因此，反向同步表达的是`PIPE_MTE3 -> PIPE_MTE2`，而不是当前tile内部的正向依赖。
-
-使用SetFlag/WaitFlag时，开发者需要为这条反向依赖显式维护一组源流水为MTE3、目的流水为MTE2的事件，并在下一次复用该Buffer前等待该事件。除反向依赖外，当前tile的`MTE2 -> V`和`V -> MTE3`也分别需要事件配对。
+使用SetFlag/WaitFlag时，开发者需要为反向依赖显式维护一组源流水为MTE3、目的流水为MTE2的事件，并在下一次复用该Buffer前等待该事件。除反向依赖外，当前tile的`MTE2 -> V`和`V -> MTE3`也分别需要事件配对。
 
 反向事件是否需要插入还取决于循环位置：前两个tile首次使用两个Buffer，没有前序MTE3需要等待；最后两个tile后没有下一轮复用该Buffer，也不应再为反向依赖设置事件。开发者需要根据`loopCount`和Buffer数量维护这些边界判断，并保证MTE3设置事件与后续MTE2等待事件严格配对。这会增加循环代码的分支和事件ID管理负担。
-
-仓内矩阵算子样例在复用工作空间前使用`HardEvent::MTE3_MTE2`获取事件ID，并显式插入对应的SetFlag/WaitFlag。这说明反向同步不仅出现在双缓冲矢量算子中；只要后续流水需要复用仍被前序流水访问的存储资源，就需要表达这类依赖。详见[matmul_partial_output样例](../../../../../../examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_partial_output/matmul_partial_output.asc)。
 
 ```text
 SetFlag/WaitFlag伪代码：需要分别表达正向和反向的流水组合。
@@ -189,27 +185,7 @@ for (uint32_t i = 0; i < loopCount; ++i) {
 }
 ```
 
-使用Mutex时，`mutexId`与Buffer绑定，MutexID记录的是该Buffer此前所有阶段的完成状态，而非某个指定生产者的完成状态。每个阶段只锁定当前流水；`Lock<PIPE_MTE2>(mutexId)`会阻塞`PIPE_MTE2`后续指令，直至此前`PIPE_MTE2`、`PIPE_V`、`PIPE_MTE3`等所有流水中同一MutexID的Mutex均已Unlock。因此，第`i + 2`轮复用Buffer时，MTE2上的Lock自然包含对第`i`轮MTE3的等待，而无需额外表达`PIPE_MTE3 -> PIPE_MTE2`的源、目的流水组合。
-
-这正是Mutex能够简化反向同步的原因：第`i + 2`轮的MTE2不需要知道前一次使用该Buffer的是哪一条流水，也不需要为反向依赖维护专用事件。只要所有访问该Buffer的阶段复用同一MutexID，Lock便会统一等待其此前全部阶段完成。相较之下，WaitFlag只能等待指定源流水发出的事件，开发者需要显式维护`PIPE_MTE3 -> PIPE_MTE2`组合，并根据循环次数增加首轮跳过等待、末轮跳过通知等边界分支。
-
-```cpp
-// Mutex：只指定当前流水，MutexID表达整个Buffer生命周期。
-for (uint32_t i = 0; i < loopCount; ++i) {
-    uint32_t bufferIndex = i % 2;
-    uint8_t mutexId = (bufferIndex == 0) ? mutexId0 : mutexId1;
-
-    AscendC::Mutex::Lock<PIPE_MTE2>(mutexId);
-    // MTE2搬入bufferIndex。
-    AscendC::Mutex::Unlock<PIPE_MTE2>(mutexId);
-    AscendC::Mutex::Lock<PIPE_V>(mutexId);
-    // V计算bufferIndex。
-    AscendC::Mutex::Unlock<PIPE_V>(mutexId);
-    AscendC::Mutex::Lock<PIPE_MTE3>(mutexId);
-    // MTE3搬出bufferIndex。
-    AscendC::Mutex::Unlock<PIPE_MTE3>(mutexId);
-}
-```
+仓内矩阵算子样例在复用工作空间前使用`HardEvent::MTE3_MTE2`获取事件ID，并显式插入对应的SetFlag/WaitFlag。这说明反向同步不仅出现在双缓冲矢量算子中；只要后续流水需要复用仍被前序流水访问的存储资源，就需要表达这类依赖。详见[matmul_partial_output样例](../../../../../../examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_partial_output/matmul_partial_output.asc)。
 
 ## 使用约束
 
