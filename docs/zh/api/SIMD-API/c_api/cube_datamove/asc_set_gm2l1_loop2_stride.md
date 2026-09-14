@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/cube_datamove/cube_datamove.h"`。
 
-将数据从Global Memory（GM）搬运到L1 Buffer时，设置[asc_copy_gm2l1_align](asc_copy_gm2l1_align.md)循环填充模式外层循环中相邻迭代数据块的源和目的L1间隔。
+将数据从Global Memory（GM）搬运到L1 Buffer时，设置[asc_copy_gm2l1_align](asc_copy_gm2l1_align/asc_copy_gm2l1_align.md)循环填充模式外层循环中相邻迭代数据块的源和目的L1间隔。
 
 内层循环步长和两层循环次数需分别通过[asc_set_gm2l1_loop1_stride](asc_set_gm2l1_loop1_stride.md)和[asc_set_gm2l1_loop_size](asc_set_gm2l1_loop_size.md)配置。
 
@@ -60,7 +60,7 @@ PIPE_S
 ## 约束说明
 
 - 本接口在非AIC上调用直接返回。
-- 配置仅由[asc_copy_gm2l1_align](asc_copy_gm2l1_align.md)循环填充模式取用；循环填充模式不支持左右填充。
+- 配置仅由[asc_copy_gm2l1_align](asc_copy_gm2l1_align/asc_copy_gm2l1_align.md)循环填充模式取用；循环填充模式不支持左右填充。
 - `loop2_dst_stride`必须32字节对齐，即使`loop2_size`为1也生效。
 
 ## 调用示例

@@ -33,7 +33,7 @@
 
 将数据从Global Memory搬运到L1 Buffer，并在搬运过程中进行DN到Nz格式转换。本接口仅在AIC上执行有效。
 
-调用本接口前，需通过[asc_set_gm2l1_nz_para](asc_set_gm2l1_nz_para.md)配置目的Nz矩阵布局。
+调用本接口前，需通过[asc_set_gm2l1_nz_para](../asc_set_gm2l1_nz_para.md)配置目的Nz矩阵布局。
 
 ## 函数原型
 
@@ -58,7 +58,7 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(__cbuf__ <dtype>* dst,
 | dst | 输出 | 目的操作数，存储位置为L1 Buffer。起始地址需32字节对齐。 |
 | src | 输入 | 源操作数，存储位置为Global Memory。起始地址需1字节对齐。 |
 | src_d_value | 输入 | 源矩阵相邻行起始地址之间的偏移，单位为字节。取值范围：[0, $2^{40}-1$]。 |
-| l2_cache_mode | 输入 | 配置源端Global Memory数据在L2 Cache中的管理策略，类型和取值说明请参见[asc_load_l2_cache_mode](../defs/enum/asc_load_l2_cache_mode.md)。 |
+| l2_cache_mode | 输入 | 配置源端Global Memory数据在L2 Cache中的管理策略，类型和取值说明请参见[asc_load_l2_cache_mode](../../defs/enum/asc_load_l2_cache_mode.md)。 |
 | n_value | 输入 | 单个DN矩阵的列数，单位为元素。取值范围：[1, 65535]。 |
 | d_value | 输入 | 单个DN矩阵的行数，单位为元素。取值范围：[1, $2^{21}-1$]。 |
 | src_nd_matrix_stride | 输入 | 源端相邻DN矩阵起始地址之间的偏移，单位为字节。取值范围：[0, $2^{40}-1$]。搬运一个DN矩阵时设置为0；搬运多个DN矩阵且设置为0时，将重复读取第一个DN矩阵。 |
@@ -81,7 +81,7 @@ PIPE_MTE2
 - `n_value`超出16 bit取值范围或`d_value`超出21 bit取值范围时，高位会被截断。
 - `enable_small_c0`设置为`true`时，需满足`d_value <= 4`。
 - 开启`enable_pre_load_ignore_sync`前，需确保本次搬运与前序访问相同地址的指令不存在数据依赖，否则可能产生异常数据。
-- 如果本指令与其他指令存在数据依赖，需使用[asc_sync_notify](../sync/asc_sync_notify.md)和[asc_sync_wait](../sync/asc_sync_wait.md)进行同步。
+- 如果本指令与其他指令存在数据依赖，需使用[asc_sync_notify](../../sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/asc_sync_wait.md)进行同步。
 - `dst`偏移量与搬运大小之和不可超出L1 Buffer容量。
 
 ## 调用示例

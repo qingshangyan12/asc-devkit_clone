@@ -63,7 +63,7 @@ __aicore__ inline void asc_copy_gm2l1_align(__cbuf__ <dtype>* dst,
 | right_padding_count | 输入 | 每个数据块右侧填充的元素个数。填充字节数需满足`right_padding_count * sizeof(dtype) <= 32`。 |
 | enable_data_select | 输入 | 填充数据来源选择。`false`表示使用数据块首元素，`true`表示使用预先配置的填充值。 |
 | enable_pre_load_ignore_sync | 输入 | 是否开启预加载忽略同步功能。`false`表示关闭，`true`表示开启。 |
-| l2_cache_mode | 输入 | 配置源端Global Memory数据在L2 Cache中的管理策略，类型和取值说明请参见[asc_load_l2_cache_mode](../defs/enum/asc_load_l2_cache_mode.md)。 |
+| l2_cache_mode | 输入 | 配置源端Global Memory数据在L2 Cache中的管理策略，类型和取值说明请参见[asc_load_l2_cache_mode](../../defs/enum/asc_load_l2_cache_mode.md)。 |
 | src_stride | 输入 | 源端相邻数据块起始地址之间的间隔，单位为字节。取值范围：[0, $2^{40}-1$]。 |
 | dst_stride | 输入 | 目的端相邻数据块起始地址之间的间隔，单位为字节。取值范围：[0, $2^{21}-1$]。 |
 
@@ -79,9 +79,9 @@ PIPE_MTE2
 
 - 本接口非AIC调用直接返回。
 - `burst_count`、`burst_len`和`dst_stride`超出21 bit取值范围时，高位会被截断；`src_stride`超出40 bit取值范围时，高位会被截断。
-- `enable_data_select`设置为`true`或使用左右Padding时，需先调用[asc_set_gm2l1_pad](asc_set_gm2l1_pad.md)配置填充值。
+- `enable_data_select`设置为`true`或使用左右Padding时，需先调用[asc_set_gm2l1_pad](../asc_set_gm2l1_pad.md)配置填充值。
 - 开启`enable_pre_load_ignore_sync`前，需确保本次搬运与前序访问相同地址的指令不存在数据依赖，否则可能产生异常数据。
-- 如果本指令与其他指令存在数据依赖，需使用[asc_sync_notify](../sync/asc_sync_notify.md)和[asc_sync_wait](../sync/asc_sync_wait.md)进行同步。
+- 如果本指令与其他指令存在数据依赖，需使用[asc_sync_notify](../../sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/asc_sync_wait.md)进行同步。
 - `dst`偏移量与搬运大小之和不可超出L1 Buffer容量。
 
 ## 调用示例

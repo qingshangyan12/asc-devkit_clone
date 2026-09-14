@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/cube_datamove/cube_datamove.h"`。
 
-用于设置[asc_copy_gm2l1_align](asc_copy_gm2l1_align.md)接口的常量填充值。调用`asc_copy_gm2l1_align`时，以下场景使用本接口设置的值：
+用于设置[asc_copy_gm2l1_align](asc_copy_gm2l1_align/asc_copy_gm2l1_align.md)接口的常量填充值。调用`asc_copy_gm2l1_align`时，以下场景使用本接口设置的值：
 
 - `data_select_bit`设置为`true`，且`left_padding_count`与`right_padding_count`均为`0`时，Normal填充模式或Compact填充模式的填充数据使用本接口设置的值。
 - `left_padding_count`或`right_padding_count`非`0`时，进入左右填充模式。此时硬件强制使用本接口设置的值，`data_select_bit`设置无效。
@@ -62,11 +62,11 @@ PIPE_S
 ## 约束说明
 
 - 本接口非AIC调用直接返回。
-- 调用[asc_copy_gm2l1_align](asc_copy_gm2l1_align.md)前调用本接口配置填充值。
+- 调用[asc_copy_gm2l1_align](asc_copy_gm2l1_align/asc_copy_gm2l1_align.md)前调用本接口配置填充值。
 
 ## 调用示例
 
-完整的Normal填充、Compact填充和左右填充场景示例请参见[asc_copy_gm2l1_align调用示例](asc_copy_gm2l1_align.md#调用示例)。
+完整的Normal填充、Compact填充和左右填充场景示例请参见[asc_copy_gm2l1_align调用示例](asc_copy_gm2l1_align/asc_copy_gm2l1_align_arch_3510.md#调用示例)。
 
 将代码保存为`examples.asc`后，可通过`bisheng`命令编译，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 

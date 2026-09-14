@@ -487,11 +487,11 @@
 
 - [asc_copy_gm2l1_align_sync（废弃）](../SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_align_sync_deprecated.md)接口
 
-    `asc_copy_gm2l1_align_sync()`已废弃，请使用[对应的非同步接口](../SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_align.md)和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口替代。
+    `asc_copy_gm2l1_align_sync()`已废弃，请使用[对应的非同步接口](../SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_align/asc_copy_gm2l1_align.md)和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口替代。
 
 - [asc_copy_gm2l1_dn2nz_sync（废弃）](../SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_dn2nz_sync_deprecated.md)接口
 
-    `asc_copy_gm2l1_dn2nz_sync()`已废弃，请使用[对应的非同步接口](../SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_dn2nz.md)和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口替代。
+    `asc_copy_gm2l1_dn2nz_sync()`已废弃，请使用[对应的非同步接口](../SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_dn2nz/asc_copy_gm2l1_dn2nz.md)和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口替代。
 
 - [asc_copy_gm2l1_nd2nz_sync_arch_2201（废弃）](../SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_nd2nz_sync_arch_2201_deprecated.md)接口
 
