@@ -15,7 +15,7 @@
 #endif
 
 /*!
-* \file copy_op.h
+* \file vector_copy_op.h
 * \brief
 */
 #ifndef INCLUDE_TENSOR_API_ARCH_VECTOR_COPY_OP_H

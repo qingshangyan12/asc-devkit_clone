@@ -24,7 +24,7 @@
 
 #include "impl/tensor_api/utils/utils_impl.h"
 #include "impl/tensor_api/tensor/layout_size.h"
-#include "impl/tensor_api/tensor/tuple_impl.h"
+#include "impl/tensor_api/tensor/tensor_tuple_impl.h"
 
 namespace AscendC {
 namespace Te {

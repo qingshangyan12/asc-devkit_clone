@@ -22,7 +22,7 @@
 #define IMPL_TENSOR_API_ATOM_CUBE_MMAD_H
 
 #include "impl/tensor_api/atom/mmad_traits_impl.h"
-#include "impl/tensor_api/arch/cube/mmad/mmad.h"
+#include "impl/tensor_api/arch/cube/mmad/mmad_impl.h"
 
 namespace AscendC {
 namespace Te {

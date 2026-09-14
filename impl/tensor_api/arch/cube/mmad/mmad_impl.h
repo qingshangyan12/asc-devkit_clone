@@ -9,17 +9,17 @@
 */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning "impl/tensor_api/arch/cube/mmad/mmad.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
+#warning "impl/tensor_api/arch/cube/mmad/mmad_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
 
 /*!
-* \file mmad.h
+* \file mmad_impl.h
 * \brief
 */
-#ifndef IMPL_TENSOR_API_ARCH_CUBE_MMAD_MMAD_H
-#define IMPL_TENSOR_API_ARCH_CUBE_MMAD_MMAD_H
+#ifndef IMPL_TENSOR_API_ARCH_CUBE_MMAD_MMAD_IMPL_H
+#define IMPL_TENSOR_API_ARCH_CUBE_MMAD_MMAD_IMPL_H
 
 #include "impl/tensor_api/arch/cube/mmad/routing.h"
 
@@ -95,7 +95,7 @@ private:
 }
 }
 
-#endif // IMPL_TENSOR_API_ARCH_CUBE_MMAD_MMAD_H
+#endif // IMPL_TENSOR_API_ARCH_CUBE_MMAD_MMAD_IMPL_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
