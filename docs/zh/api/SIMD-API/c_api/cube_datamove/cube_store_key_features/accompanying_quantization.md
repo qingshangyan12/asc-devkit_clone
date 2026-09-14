@@ -12,14 +12,20 @@
 - Tensor/Vector：C矩阵每一列对应一个8B量化参数，参数shape为[N]。先用[asc_copy_l12fb](../asc_copy_l12fb/asc_copy_l12fb.md)从L1 Buffer搬入量化区，再设置起始地址索引。量化地址索引为量化区字节地址除以128，不是元素下标；激活地址索引为激活区字节地址除以64。两个参数区分别寻址，起始地址与长度都不能超过对应区域。
 
 <!-- npu="950" id1 -->
-
-3510的Scalar系数使用[asc_set_l0c_copy_prequant(scale, offset, is_signed)](../asc_set_l0c_copy_prequant.md)配置，Vector地址使用[asc_set_l0c_copy_config](../asc_set_l0c_copy_config.md)配置。搬出调用的`quant_pre_mode`使用`asc_quant_mode`枚举。
-
+针对Ascend 950PR/Ascend 950DT产品，Scalar系数使用[asc_set_l0c_copy_prequant(scale, offset, is_signed)](../asc_set_l0c_copy_prequant.md)配置，Vector地址使用[asc_set_l0c_copy_config](../asc_set_l0c_copy_config.md)配置。搬出调用的`quant_pre_mode`使用`asc_quant_mode`枚举。
 <!-- end id1 -->
 
 <!-- npu="910b,A3" id2 -->
+针对如下产品型号：
 
-2201的Scalar系数通过[asc_set_l0c_copy_prequant](../asc_set_l0c_copy_prequant.md)传入打包后的`uint64_t config`，低32位必须是float的位模式，不能将浮点数数值转换成uint64_t；Vector地址使用[asc_set_l0c2gm_config](../asc_set_l0c2gm_config.md)配置。搬出调用的`quant_pre`使用整数，可显式转换`asc_quant_mode`枚举得到模式编码。
+<!-- npu="A3" id4 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品
+<!-- end id4 -->
+<!-- npu="910b" id5 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品
+<!-- end id5 -->
+
+Scalar系数通过[asc_set_l0c_copy_prequant](../asc_set_l0c_copy_prequant.md)传入打包后的`uint64_t config`，低32位必须是float的位模式，不能将浮点数数值转换成uint64_t；Vector地址使用[asc_set_l0c2gm_config](../asc_set_l0c2gm_config.md)配置。搬出调用的`quant_pre`使用整数，可显式转换`asc_quant_mode`枚举得到模式编码。
 
 <!-- end id2 -->
 
@@ -58,7 +64,6 @@ VQF322F32_PRE,         // Vector_Quant_Float32_2_Float32: float量化成float，
 
 不同量化模式的量化算法详细介绍参见[随路量化与随路ReLU场景组合](accompanying_quantization_and_relu_scenario_combination.md)。
 
-<!-- npu="950,A3,910b" id7 -->
 量化参数比特位含义见下表：
 
 <!-- npu="A3,910b" id8 -->
@@ -72,7 +77,6 @@ VQF322F32_PRE,         // Vector_Quant_Float32_2_Float32: float量化成float，
 | &bull;(V)REQ8<br>&bull;(V)QF322B8_PRE<br>&bull;(V)DEQF16 | 37~45 | Offset | 9bit的整型数据，源数据乘以量化系数或者随路系数的计算结果，可以与Offset表示的整数值进行相加。若不使用offset，请置为0。<br>当模式为(V)DEQF16时，此变量为无效变量。 |
 | &bull;(V)REQ8<br>&bull;(V)QF322B8_PRE<br>&bull;(V)DEQF16 | 46 | Sign标志位 | 如果置为1，表明量化结果是signed(int8)；如果置为0，表明量化结果是unsigned(uint8)。仅在(V)REQ8、(V)QF322B8_PRE中会用到。 |
 | &bull;(V)REQ8<br>&bull;(V)QF322B8_PRE<br>&bull;(V)DEQF16 | 47~63 | - | 无效比特位，用户无需关注。 |
-
 <!-- end id8 -->
 
 <!-- npu="950" id9 -->
@@ -86,6 +90,4 @@ VQF322F32_PRE,         // Vector_Quant_Float32_2_Float32: float量化成float，
 | 同第一行 | 37~45 | Offset | 9bit整形数据，源数据乘以量化系数或者随路系数的计算结果，可以与Offset表示的整数值进行相加。若不使用offset，请置为0。当模式为(V)REQ8、(V)QF322B8_PRE、(V)REQ4、(V)QF322S4_PRE时该变量生效。 |
 | 同第一行 | 46 | Sign标志位 | 如果置为1，表明量化结果是signed(int8)；如果为置为0，表明量化结果是unsigned(uint8)。仅在(V)REQ8、(V)QF322B8_PRE中会用到。 |
 | 同第一行 | 47~63 | - | 无效比特位，用户无需关注。 |
-
 <!-- end id9 -->
-<!-- end id7 -->
