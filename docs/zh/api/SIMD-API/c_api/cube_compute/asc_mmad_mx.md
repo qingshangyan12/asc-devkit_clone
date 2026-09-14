@@ -31,7 +31,7 @@
 
 头文件路径为：`"c_api/cube_compute/cube_compute.h"`。
 
-本接口用于完成带有量化系数的矩阵乘加计算（MmadMx），即左矩阵A和右矩阵B均有对应的量化系数矩阵，左量化系数矩阵ScaleA和右量化系数矩阵ScaleB。在MmadMx场景中，左量化系数矩阵与左矩阵相乘，右量化系数矩阵与右矩阵相乘，然后对两个乘积的结果做矩阵乘法，其计算公式如下：
+本接口用于完成带有量化系数的矩阵乘加计算（MmadMx），即左矩阵A和右矩阵B有对应的量化系数矩阵，左量化系数矩阵ScaleA和右量化系数矩阵ScaleB。在MmadMx场景中，左量化系数矩阵与左矩阵相乘，右量化系数矩阵与右矩阵相乘，然后对两个乘积的结果做矩阵乘法，其计算公式如下：
 
 $$
 C_{M \times N} = \left(ScaleA_{M \times (K/32)} \otimes A_{M \times K}\right) \times \left(ScaleB_{(K/32) \times N} \otimes B_{K \times N}\right) + C_{M \times N}
@@ -40,7 +40,7 @@ $$
 其中，$\otimes$表示广播乘法，矩阵A、B沿K维度每连续32个元素共享对应量化系数矩阵ScaleA、ScaleB中的一个量化系数。C矩阵可以通过配置本接口的参数，初始化为全0矩阵、L0C Buffer中的矩阵或Bias矩阵。
 
 <!-- npu="960" id9 -->
-在Ascend 960PR/Ascend 960DT上，支持独立传入Scale矩阵地址。各矩阵的信息说明见下表：
+在Ascend 960PR/Ascend 960DT上，需要传入Scale矩阵地址。各矩阵的信息说明见下表：
 
 **表1** 矩阵信息说明
 
@@ -83,30 +83,7 @@ $$
 **占位符形式：**
 
 ```c
-// 不显式传入Scale矩阵和Bias起始地址，根据A、B矩阵的起始地址，按照固定的地址映射关系从L0A_MX Buffer和L0B_MX Buffer读取对应的Scale矩阵，通过参数控制C矩阵初始化方式
-__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
-                                    __ca__ <a_dtype>* a_matrix,
-                                    __cb__ <b_dtype>* b_matrix,
-                                    uint16_t m,
-                                    uint16_t k,
-                                    uint16_t n,
-                                    asc_unit_flag_mode unit_flag_mode,
-                                    bool disable_gemv,
-                                    bool c_matrix_source,
-                                    bool c_matrix_init_val)
-
-// 显式传入Bias起始地址，根据A、B矩阵的起始地址，按照固定的地址映射关系从L0A_MX Buffer和L0B_MX Buffer读取对应的Scale矩阵
-__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
-                                    __ca__ <a_dtype>* a_matrix,
-                                    __cb__ <b_dtype>* b_matrix,
-                                    uint64_t bias,
-                                    uint16_t m,
-                                    uint16_t k,
-                                    uint16_t n,
-                                    asc_unit_flag_mode unit_flag_mode,
-                                    bool disable_gemv)
-
-// 显式传入Scale矩阵起始地址，通过参数控制C矩阵初始化方式
+// 不显式传入Bias起始地址，通过参数控制C矩阵初始化方式
 __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
                                     __ca__ <a_dtype>* a_matrix,
                                     __ca__ <scale_a_dtype>* scale_a_matrix,
@@ -120,7 +97,7 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
                                     bool c_matrix_source,
                                     bool c_matrix_init_val)
 
-// 显式传入Scale矩阵起始地址和Bias起始地址，C矩阵使用Bias矩阵初始化
+// 显式传入Bias起始地址，C矩阵使用Bias矩阵初始化
 __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
                                     __ca__ <a_dtype>* a_matrix,
                                     __ca__ <scale_a_dtype>* scale_a_matrix,
@@ -162,30 +139,7 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
 **典型示例：**
 
 ```c
-// 不显式传入Scale矩阵和Bias起始地址，根据A、B矩阵的起始地址，按照固定的地址映射关系从L0A_MX Buffer和L0B_MX Buffer读取对应的Scale矩阵，通过参数控制C矩阵初始化方式
-__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
-                                    __ca__ fp4x2_e1m2_t* a_matrix,
-                                    __cb__ fp4x2_e1m2_t* b_matrix,
-                                    uint16_t m,
-                                    uint16_t k,
-                                    uint16_t n,
-                                    asc_unit_flag_mode unit_flag_mode,
-                                    bool disable_gemv,
-                                    bool c_matrix_source,
-                                    bool c_matrix_init_val)
-
-// 显式传入Bias起始地址，根据A、B矩阵的起始地址，按照固定的地址映射关系从L0A_MX Buffer和L0B_MX Buffer读取对应的Scale矩阵
-__aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
-                                    __ca__ fp4x2_e1m2_t* a_matrix,
-                                    __cb__ fp4x2_e2m1_t* b_matrix,
-                                    uint64_t bias,
-                                    uint16_t m,
-                                    uint16_t k,
-                                    uint16_t n,
-                                    asc_unit_flag_mode unit_flag_mode,
-                                    bool disable_gemv)
-
-// 显式传入Scale矩阵起始地址，通过参数控制C矩阵初始化方式
+// 不显式传入Bias起始地址，通过参数控制C矩阵初始化方式
 __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
                                     __ca__ fp4x2_e1m2_t* a_matrix,
                                     __ca__ fp8_e8m0_t* scale_a_matrix,
@@ -199,7 +153,7 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
                                     bool c_matrix_source,
                                     bool c_matrix_init_val)
 
-// 显式传入Scale矩阵起始地址和Bias起始地址，C矩阵使用Bias矩阵初始化
+// 显式传入Bias起始地址，C矩阵使用Bias矩阵初始化
 __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
                                     __ca__ fp4x2_e1m2_t* a_matrix,
                                     __ca__ fp8_e8m0_t* scale_a_matrix,
@@ -297,10 +251,10 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | c_matrix | 输出 | 目的操作数，结果矩阵C在L0C Buffer中的起始地址，数据类型为`float`，需按照1024字节对齐。 |
-| a_matrix | 输入 | 源操作数，左矩阵A在L0A Buffer中的起始地址。数据类型由接口重载决定，具体请参见[表3](#asc_mmad_mx_data_type_960)。<br>矩阵数据类型为`fp8_e5m2_t`、`fp8_e4m3fn_t`时需按照1024字节对齐，其余矩阵数据类型需按照512字节对齐。<br>不显式传入ScaleA矩阵地址时ScaleA矩阵在L0A_MX Buffer中的起始地址为`a_matrix`起始地址除以16。 |
-| scale_a_matrix | 输入 | ScaleA矩阵在L0A_MX Buffer中的起始地址，仅显式传入Scale矩阵起始地址的接口包含该参数。数据类型由接口重载决定，具体请参见[表3](#asc_mmad_mx_data_type_960)。 |
-| b_matrix | 输入 | 源操作数，右矩阵B在L0B Buffer中的起始地址。数据类型由接口重载决定，具体请参见[表3](#asc_mmad_mx_data_type_960)。<br>矩阵数据类型为`fp8_e5m2_t`、`fp8_e4m3fn_t`时需按照1024字节对齐，其余矩阵数据类型需按照512字节对齐。<br>不显式传入ScaleB矩阵地址时ScaleB矩阵在L0B_MX Buffer中的起始地址为`b_matrix`起始地址除以16。 |
-| scale_b_matrix | 输入 | ScaleB矩阵在L0B_MX Buffer中的起始地址，仅显式传入Scale矩阵起始地址的接口包含该参数。数据类型由接口重载决定，具体请参见[表3](#asc_mmad_mx_data_type_960)。 |
+| a_matrix | 输入 | 源操作数，左矩阵A在L0A Buffer中的起始地址。数据类型由接口重载决定，具体请参见[表3](#asc_mmad_mx_data_type_960)。<br>矩阵数据类型为`fp8_e5m2_t`、`fp8_e4m3fn_t`时需按照1024字节对齐，其余矩阵数据类型需按照512字节对齐。|
+| scale_a_matrix | 输入 | ScaleA矩阵在L0A_MX Buffer中的起始地址，数据类型由接口重载决定，具体请参见[表3](#asc_mmad_mx_data_type_960)。当a_matrix的数据类型为`half`或`bfloat16_t`时，此参数无意义。a_matrix为其他数据类型时，需要按照64字节对齐。 |
+| b_matrix | 输入 | 源操作数，右矩阵B在L0B Buffer中的起始地址。数据类型由接口重载决定，具体请参见[表3](#asc_mmad_mx_data_type_960)。<br>矩阵数据类型为`fp8_e5m2_t`、`fp8_e4m3fn_t`时需按照1024字节对齐，其余矩阵数据类型需按照512字节对齐。 |
+| scale_b_matrix | 输入 | ScaleB矩阵在L0B_MX Buffer中的起始地址，数据类型由接口重载决定，具体请参见[表3](#asc_mmad_mx_data_type_960)，需要按照64字节对齐。 |
 | bias | 输入 | Bias矩阵在BiasTable Buffer中的起始地址，需按照64字节对齐，可以为非零地址，仅显式传入Bias起始地址的接口包含该参数。<br>Bias支持的数据类型为`float`，调用本接口前，需将Bias数据通过[asc_copy_l12bt](../cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md)接口搬运到该地址，Bias占用长度为`n * sizeof(float)`向上补齐到64字节。 |
 | m | 输入 | 左矩阵A和结果矩阵C的M维大小，单位为元素，取值范围为[0, 4095]。 |
 | k | 输入 | 左矩阵A和右矩阵B的K维大小，单位为元素，取值范围为[0, 4095]，并且需为64的倍数。 |
