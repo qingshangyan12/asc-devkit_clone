@@ -144,6 +144,10 @@ HcclResult ObtainCommEngine(const void* ccTilingList[], uint32_t tilingNum, uint
 
 HcclResult CheckCcuKfcFlow(const void* mc2Tiling, const void* ccTilingList[], uint32_t tilingNum, uint32_t rankSize);
 
+// peer-only ReduceScatter 的 rankSize 约束校验：真实分配路径(CheckCcuKfcFlow)与
+// checkOnly 预检路径(HcclAllocCcResByArgsImpl)共用，避免预检漏判。
+HcclResult CheckCcuKfcPeerOnlyRankSize(const Mc2CcTilingInner* ccTiling, uint32_t rankSize, uint32_t tilingIndex);
+
 // 构建 opResCtx 基础字段
 HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSize, u32 userRank, OpResCtx& opResCtx);
 
