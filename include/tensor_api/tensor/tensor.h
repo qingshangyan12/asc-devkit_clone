@@ -22,7 +22,7 @@
 
 #include "tensor_api/tensor/layout_interface.h"
 #include "tensor_api/tensor/pointer.h"
-#include "impl/tensor_api/tensor/tensor_tuple.h"
+#include "impl/tensor_api/tensor/tensor_tuple_impl.h"
 #include "tensor_api/utils/utils.h"
 
 namespace asc {
