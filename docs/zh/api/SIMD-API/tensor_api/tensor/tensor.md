@@ -46,8 +46,8 @@ struct base_tensor {
 
     static constexpr int rank = LayoutT::rank_size;
 
-    __aicore__ inline base_tensor();
-    __aicore__ inline base_tensor(const EngineT& engine, const LayoutT& layout);
+    __aicore__ inline constexpr base_tensor();
+    __aicore__ inline constexpr base_tensor(const EngineT& engine, const LayoutT& layout);
 
     __aicore__ inline constexpr decltype(auto) tensor() const;
     __aicore__ inline constexpr decltype(auto) engine() const;
@@ -67,22 +67,22 @@ struct base_tensor {
     __aicore__ inline constexpr decltype(auto) operator[](const Coord& coord) const;
 
     template <typename Coord>
-    __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord);
+    __aicore__ inline decltype(auto) operator()(const Coord& coord);
 
     template <typename Coord>
-    __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) const;
+    __aicore__ inline decltype(auto) operator()(const Coord& coord) const;
 
     template <typename Coord0, typename Coord1, typename... Coords>
-    __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs);
+    __aicore__ inline decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs);
 
     template <typename Coord0, typename Coord1, typename... Coords>
-    __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs) const;
+    __aicore__ inline decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs) const;
 
     template <typename Coord, typename Info>
-    __aicore__ inline constexpr decltype(auto) slice(const Coord& coord, const Info& info);
+    __aicore__ inline decltype(auto) slice(const Coord& coord, const Info& info);
 
     template <typename Coord, typename Info>
-    __aicore__ inline constexpr decltype(auto) slice(const Coord& coord, const Info& info) const;
+    __aicore__ inline decltype(auto) slice(const Coord& coord, const Info& info) const;
 
 };
 
@@ -91,7 +91,7 @@ struct global_tensor : public base_tensor<EngineT, LayoutT> {
     using tensor_api_base = base_tensor<EngineT, LayoutT>;
     using tensor_api_base::tensor_api_base;
 
-    __aicore__ inline global_tensor();
+    __aicore__ inline constexpr global_tensor();
     __aicore__ inline constexpr cache_mode get_cache_mode() const;
     __aicore__ inline constexpr void set_l2_cache_hint(cache_mode mode);
 };
@@ -102,8 +102,8 @@ struct local_tensor : public base_tensor<EngineT, LayoutT> {
     using element_type = typename tensor_api_base::element_type;
     using data_type = get_attribute_element_type<element_type*>;
 
-    __aicore__ inline local_tensor();
-    __aicore__ inline local_tensor(const EngineT& engine, const LayoutT& layout);
+    __aicore__ inline constexpr local_tensor();
+    __aicore__ inline constexpr local_tensor(const EngineT& engine, const LayoutT& layout);
 };
 ```
 
@@ -315,16 +315,16 @@ Tensor相关类型本身为类型定义，不直接返回值。
 
   ```cpp
   template <typename Coord>
-  __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord)
+  __aicore__ inline decltype(auto) operator()(const Coord& coord)
 
   template <typename Coord>
-  __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) const
+  __aicore__ inline decltype(auto) operator()(const Coord& coord) const
 
   template <typename Coord0, typename Coord1, typename... Coords>
-  __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs)
+  __aicore__ inline decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs)
 
   template <typename Coord0, typename Coord1, typename... Coords>
-  __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs) const
+  __aicore__ inline decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs) const
   ```
 
 - 参数说明
@@ -352,10 +352,10 @@ Tensor相关类型本身为类型定义，不直接返回值。
 
   ```cpp
   template <typename Coord, typename Info>
-  __aicore__ inline constexpr decltype(auto) slice(const Coord& coord, const Info& info)
+  __aicore__ inline decltype(auto) slice(const Coord& coord, const Info& info)
 
   template <typename Coord, typename Info>
-  __aicore__ inline constexpr decltype(auto) slice(const Coord& coord, const Info& info) const
+  __aicore__ inline decltype(auto) slice(const Coord& coord, const Info& info) const
   ```
 
 - 参数说明
