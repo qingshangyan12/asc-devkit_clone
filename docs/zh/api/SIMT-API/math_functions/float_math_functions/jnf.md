@@ -54,9 +54,13 @@ inline float jnf(int n, float x)
 -   当x=inf或-inf时，返回值为0。
 -   当x=nan时，返回值为nan。
 
+本接口受编译选项[--cce-use-fast-math](../../../../guide/programming_guide/compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#常用的编译选项)的影响。
+-   --cce-use-fast-math=true：开启快速计算模式，本接口内部实现使用到了expf，由于快速计算模式下expf不支持Subnormal场景，在极少数场景下内部计算的expf结果为Subnormal数据，导致本接口最终结果为0。
+-   --cce-use-fast-math=false：支持Subnormal场景的高精度计算。
+
 ## 约束说明
 
--   n的最大取值为128。
+n的最大取值为128。
 
 ## 调用示例
 
