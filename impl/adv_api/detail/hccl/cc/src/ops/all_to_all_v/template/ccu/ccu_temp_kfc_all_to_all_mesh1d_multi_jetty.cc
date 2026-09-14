@@ -10,6 +10,8 @@
 
 #include "alg_data_trans_wrapper.h"
 #include "channel.h"
+#include "ccu_launch_dl.h"
+#include "ccu_log.h"
 #include "ccu_temp_kfc_all_to_all_mesh1d_multi_jetty.h"
 
 namespace mc2_ops_hccl {
@@ -115,5 +117,44 @@ u64 CcuTempKfcAllToAllMesh1DMultiJetty::CalcScratchMultiple(BufferType inBuffTyp
     (void)outBuffType;
     return 0;
 }
+
+#ifndef AICPU_COMPILE
+HcclResult CcuTempKfcAllToAllMesh1DMultiJetty::FastLaunch(
+    const OpParam& param, const TemplateFastLaunchCtx& tempFastLaunchCtx)
+{
+    if (tempFastLaunchCtx.ccuKernelSubmitInfos.empty()) {
+        HCCL_INFO("[CcuTempKfcAllToAllMesh1DMultiJetty::FastLaunch] ccu kernel num is 0, just success.");
+        return HCCL_SUCCESS;
+    }
+    HCCL_DEBUG("[CcuTempKfcAllToAllMesh1DMultiJetty::FastLaunch] start");
+    buffInfo_ = tempFastLaunchCtx.buffInfo;
+
+    const uint64_t* cachedArgs = tempFastLaunchCtx.ccuKernelSubmitInfos[0].cachedArgs;
+    uint64_t token = PointerToAddr(buffInfo_.hcclBuff.addr);
+
+    uint64_t taskArgs[11];
+    taskArgs[0] = cachedArgs[1];
+    taskArgs[1] = cachedArgs[2];
+    taskArgs[2] = token;
+    taskArgs[3] = cachedArgs[3];
+    taskArgs[4] = cachedArgs[4];
+    taskArgs[5] = cachedArgs[5];
+    taskArgs[6] = cachedArgs[6];
+    taskArgs[7] = cachedArgs[7];
+    taskArgs[8] = cachedArgs[8];
+    taskArgs[9] = cachedArgs[9];
+    taskArgs[10] = cachedArgs[10];
+
+    CcuResult launchRet = HcommCcuKernelLaunch(
+        tempFastLaunchCtx.threads[0], tempFastLaunchCtx.ccuKernelSubmitInfos[0].kernelHandle, taskArgs, 11);
+    if (launchRet != CCU_SUCCESS) {
+        HCCL_ERROR("[CcuTempKfcAllToAllMesh1DMultiJetty::FastLaunch] kernel launch failed, ccuRet -> %d", launchRet);
+        return ConvertCcuToHccl(launchRet);
+    }
+
+    HCCL_DEBUG("[CcuTempKfcAllToAllMesh1DMultiJetty::FastLaunch] end");
+    return HCCL_SUCCESS;
+}
+#endif
 
 } // namespace mc2_ops_hccl

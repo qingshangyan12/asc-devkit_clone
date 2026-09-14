@@ -351,8 +351,8 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForConcurrentAllToAll(
     __gm__ CommonPrepareParamCcu* commParam)
 {
-    constexpr uint64_t meshBandwidth = 11U;
-    constexpr uint64_t totalBandwidth = 21U;
+    constexpr uint64_t meshBandwidth = 100U;
+    constexpr uint64_t totalBandwidth = 193U;
     constexpr uint64_t splitAlignment = 128U;
     const uint64_t dataTypeSize = GetHcclDataTypeSize(commParam->dataType);
     const uint64_t totalSize = commParam->count * dataTypeSize;
