@@ -28,7 +28,7 @@
 
 头文件路径：`"tensor_api/experimental/vector_compute.h"`。
 
-将`float`输入与标量逐元素相乘，并将结果转换为`half`，写入返回寄存器的偶数`half`位置。
+将`float`输入与标量逐元素相乘，并将结果按指定布局转换为`half`。默认写入返回寄存器的偶数`half`位置。
 
 $$
 dst_{2i} = \operatorname{RNA}_{half}(src_i \times scalar)
@@ -50,7 +50,7 @@ __simd_callee__ inline reg_tensor<T> muls_cast(
 | --- | --- |
 | `T` | 返回值元素类型，当前仅支持`half`。 |
 | `U` | 源操作数和标量类型，当前仅支持`float`。 |
-| `Layout` | 结果布局。仅支持`cast_layout::zero`，默认值为`cast_layout::zero`。 |
+| `Layout` | 结果布局。支持`cast_layout::zero`和`cast_layout::one`，默认值为`cast_layout::zero`。 |
 
 **表2**  参数说明
 
@@ -65,13 +65,13 @@ src和scalar的数据类型为float，返回值的元素类型为half。
 
 ## 返回值说明
 
-返回`reg_tensor<half>`。`reg`保存乘法及类型转换结果，结果写入偶数位置，奇数位置置零。`src.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`src.mask`相同。
+返回`reg_tensor<half>`。`reg`保存乘法及类型转换结果。`Layout`为`cast_layout::zero`时结果写入偶数位置，为`cast_layout::one`时结果写入奇数位置，另一组位置置零。`src.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`src.mask`相同。
 
 ## 约束说明
 
 - src.mask需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
 - `T`和`U`当前仅支持`half`和`float`的组合。
-- `Layout`仅支持`cast_layout::zero`。
+- `Layout`仅支持`cast_layout::zero`和`cast_layout::one`。
 
 ## 调用示例
 
