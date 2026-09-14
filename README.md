@@ -1,5 +1,4 @@
 <div align="center">
-test commit
 
 # Ascend C
 
