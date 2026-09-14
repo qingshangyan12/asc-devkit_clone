@@ -1081,7 +1081,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_norm_sqrt(float x)
     if (!use_slowpath) {
         // Fast path: rsqrt approximation followed by the same residual
         // correction sequence used by the reciprocal-square-root refinement.
-        float inverse_sqrt = rsqrtf(x);
+        float inverse_sqrt = 1.0f / __sqrtf(x);
         const float product = x * inverse_sqrt;
         inverse_sqrt = inverse_sqrt * 0.5f; // Halve the reciprocal square root.
         const float residual = fmaf(-product, product, x);
@@ -1109,7 +1109,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_norm_sqrt(float x)
             constexpr float scale_up = 1.84467440737095516160e+19f;  // 2^64, lifts small inputs.
             constexpr float scale_down = 2.3283064365386962891e-10f; // 2^-32, restores the sqrt scale.
             const float scaled_x = fmaf(x, scale_up, 0.0f);          // Zero addend keeps the multiply exact.
-            float inverse_sqrt = rsqrtf(scaled_x);
+            float inverse_sqrt = 1.0f / __sqrtf(scaled_x);
             const float product = scaled_x * inverse_sqrt;
             inverse_sqrt = inverse_sqrt * 0.5f; // Halve the reciprocal square root.
             const float residual = fmaf(product, -product, scaled_x);
@@ -1156,8 +1156,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float hypotf(float x, float y)
     // Identify max/min via unsigned integer comparison.  For non-negative
     // IEEE-754 floats, larger bit pattern <=> larger value, so this avoids a
     // float compare and preserves NaN bit patterns for later propagation.
-    const uint32_t max_bits = abs_x_bits > abs_y_bits ? abs_x_bits : abs_y_bits;
-    const uint32_t min_bits = abs_x_bits < abs_y_bits ? abs_x_bits : abs_y_bits;
+    const bool x_is_greater = abs_x_bits > abs_y_bits;
+    const uint32_t max_bits = x_is_greater ? abs_x_bits : abs_y_bits;
+    const uint32_t min_bits = x_is_greater ? abs_y_bits : abs_x_bits;
     const float max_abs = __uint_as_float(max_bits);
     const float min_abs = __uint_as_float(min_bits);
 
