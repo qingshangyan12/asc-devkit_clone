@@ -186,7 +186,6 @@ target_link_libraries(
   tiling_api
   PRIVATE $<BUILD_INTERFACE:intf_pub_cxx14>
           $<BUILD_INTERFACE:slog_headers>
-          $<BUILD_INTERFACE:runtime_headers>
           -Wl,--no-as-needed
           c_sec
           -Wl,--as-needed
