@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-**本页所列接口均不带位置参数，包括无后缀接口以及\`_v2\`、\`_v3\`、\`_v4\`接口，均已废弃，后续版本将不再支持。请使用[asc_int4x22int16](../reg_compute/reg_convert/asc_int4x22int16.md)的编译期位置标签重载。**
+**该接口的无显式位置参数原型已废弃，请使用[asc_int4x22int16](../reg_compute/reg_convert/asc_int4x22int16.md)的显式位置参数重载替代。**
 
 将int4x2_t类型转化为int16_t类型。
 
