@@ -2,27 +2,30 @@
 
 ## 产品支持情况
 
-<!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+<!-- npu="960" id1 -->
+- Ascend 960PR/Ascend 960DT：支持
 <!-- end id1 -->
-<!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- npu="950" id2 -->
+- Ascend 950PR/Ascend 950DT：支持
 <!-- end id2 -->
-<!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+<!-- npu="A3" id3 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
 <!-- end id3 -->
-<!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+<!-- npu="910b" id4 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
 <!-- end id4 -->
-<!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+<!-- npu="310b" id5 -->
+- Atlas 200I/500 A2 推理产品：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas 推理系列产品AI Core：不支持
 <!-- end id6 -->
-<!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+<!-- npu="310p" id7 -->
+- Atlas 推理系列产品Vector Core：不支持
 <!-- end id7 -->
+<!-- npu="910" id8 -->
+- Atlas 训练系列产品：不支持
+<!-- end id8 -->
 
 ## 功能说明
 
@@ -36,8 +39,21 @@ $$
 
 其中，A、B、C分别为左、右、结果矩阵，C矩阵可以通过配置本接口的参数，初始化为全0矩阵、L0C Buffer中的矩阵或Bias矩阵，各矩阵的信息说明见下表：
 
-<!-- npu="950" id8 -->
-**表** 矩阵信息说明（[NPU架构版本3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
+<!-- npu="960" id9 -->
+**表1** 矩阵信息说明（[NPU架构版本9201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
+
+| 矩阵 | 存储位置 | 形状（行数×列数） | 数据格式 | 分形大小（行数×列数） |
+| --- | --- | --- | --- | --- |
+| A | L0A Buffer | M×K | Nz | 16×K0_A |
+| B | L0B Buffer | K×N | Zn | K0_B×16 |
+| C | L0C Buffer | M×N | Nz | 16×16 |
+| Bias（用于C矩阵初始化） | BiasTable Buffer | 1×N，使用时通过广播复制M行来初始化C矩阵 | ND | - |
+
+表格中K0_A、K0_B的取值分别为`32B / sizeof(dtype_A)`、`32B / sizeof(dtype_B)`，`dtype_A`、`dtype_B`分别为A矩阵和B矩阵的数据类型。
+<!-- end id9 -->
+
+<!-- npu="950" id10 -->
+**表2** 矩阵信息说明（[NPU架构版本3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
 
 | 矩阵 | 存储位置 | 形状（行数×列数） | 数据格式 | 分形大小（行数×列数） |
 | --- | --- | --- | --- | --- |
@@ -47,10 +63,10 @@ $$
 | Bias（用于C矩阵初始化） | BiasTable Buffer | 1×N，使用时通过广播复制M行来初始化C矩阵 | ND | - |
 
 表格中K0的取值为`32B / sizeof(dtype)`，`dtype`为矩阵的数据类型。
-<!-- end id8 -->
+<!-- end id10 -->
 
-<!-- npu="A3,910b" id9 -->
-**表** 矩阵信息说明（[NPU架构版本2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
+<!-- npu="A3,910b" id11 -->
+**表3** 矩阵信息说明（[NPU架构版本2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
 
 | 矩阵 | 存储位置 | 形状 | 数据格式 | 分形大小 |
 | --- | --- | --- | --- | --- |
@@ -60,14 +76,14 @@ $$
 | Bias（用于C矩阵初始化） | BiasTable Buffer | 1×N，使用时通过广播复制M行来初始化C矩阵 | ND | - |
 
 表格中K0的取值为`32B / sizeof(dtype)`，`dtype`为矩阵的数据类型。特别地，当数据类型为`int4b_t`时，`K0 = 64`。
-<!-- end id9 -->
+<!-- end id11 -->
 
 本接口为矩阵计算接口，仅在AIC上生效。
 
 ## 函数原型
 
-<!-- npu="950" id12 -->
-### 函数原型（[NPU架构版本3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
+<!-- npu="950,960" id12 -->
+### 函数原型（[NPU架构版本3510/9201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
 
 **占位符形式：**
 
@@ -100,7 +116,7 @@ __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
 
 `c_dtype`、`a_dtype`、`b_dtype`的取值组合见下表：
 
-**表** 支持的数据类型组合（[NPU架构版本3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="asc_mmad_data_type"></a>
+**表4** 支持的数据类型组合（[NPU架构版本3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="asc_mmad_data_type_950"></a>
 
 | a_dtype | b_dtype | c_dtype | Bias数据类型 |
 | --- | --- | --- | --- |
@@ -113,6 +129,19 @@ __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
 | `half` | `half` | `float` | `float` |
 | `bfloat16_t` | `bfloat16_t` | `float` | `float` |
 | `float` | `float` | `float` | `float` |
+
+<!-- npu="960" id13 -->
+**表5** Ascend 960PR/Ascend 960DT新增支持的数据类型组合（[NPU架构版本9201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="asc_mmad_data_type_960"></a>
+| a_dtype | b_dtype | c_dtype | Bias数据类型 |
+| --- | --- | --- | --- |
+| `half` | `fp8_e4m3fn_t` | `float` | `float` |
+| `bfloat16_t` | `fp8_e4m3fn_t` | `float` | `float` |
+| `int8_t` | `int4b_t` | `int32_t` | `int32_t` |
+| `half` | `int8_t` | `float` | `float` |
+| `bfloat16_t` | `int8_t` | `float` | `float` |
+| `half` | `int4b_t` | `float` | `float` |
+| `bfloat16_t` | `int4b_t` | `float` | `float` |
+<!-- end id13 -->
 
 **典型示例：**
 
@@ -142,7 +171,7 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 ```
 <!-- end id12 -->
 
-<!-- npu="A3,910b" id13 -->
+<!-- npu="A3,910b" id14 -->
 ### 函数原型（[NPU架构版本2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
 
 **占位符形式：**
@@ -155,7 +184,7 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 
   `c_dtype`、`a_dtype`、`b_dtype`的取值组合见下表：
 
-  **表** 支持的数据类型组合（[NPU架构版本2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
+  **表6** 支持的数据类型组合（[NPU架构版本2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
 
   | a_dtype | b_dtype | c_dtype | Bias数据类型 |
   | --- | --- | --- | --- |
@@ -169,18 +198,18 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
   ```c
   __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c_matrix, __ca__ int4b_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
   ```
-<!-- end id13 -->
+<!-- end id14 -->
 
 ## 参数说明
 
-<!-- npu="950" id14 -->
-**表** 参数说明（[NPU架构版本3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="asc_mmad_param_table"></a>
+<!-- npu="950,960" id15 -->
+**表7** 参数说明（[NPU架构版本3510/9201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="asc_mmad_param_table"></a>
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| c_matrix | 输出 | 目的操作数，结果矩阵C在L0C Buffer中的起始地址，需按照1024字节对齐。数据类型由接口重载决定，具体请参见[支持的数据类型组合](#asc_mmad_data_type)。 |
-| a_matrix | 输入 | 源操作数，左矩阵A在L0A Buffer中的起始地址，需按照512字节对齐。数据类型由接口重载决定，具体请参见[支持的数据类型组合](#asc_mmad_data_type)。 |
-| b_matrix | 输入 | 源操作数，右矩阵B在L0B Buffer中的起始地址，需按照512字节对齐。数据类型由接口重载决定，具体请参见[支持的数据类型组合](#asc_mmad_data_type)。 |
+| c_matrix | 输出 | 目的操作数，结果矩阵C在L0C Buffer中的起始地址，需按照1024字节对齐。数据类型由接口重载决定，具体请参见[表4](#asc_mmad_data_type_950)、[表5](#asc_mmad_data_type_960)。 |
+| a_matrix | 输入 | 源操作数，左矩阵A在L0A Buffer中的起始地址，需按照512字节对齐。数据类型由接口重载决定，具体请参见[表4](#asc_mmad_data_type_950)、[表5](#asc_mmad_data_type_960)。 |
+| b_matrix | 输入 | 源操作数，右矩阵B在L0B Buffer中的起始地址，需按照512字节对齐。数据类型由接口重载决定，具体请参见[表4](#asc_mmad_data_type_950)、[表5](#asc_mmad_data_type_960)。 |
 | bias | 输入 | Bias矩阵在BiasTable Buffer中的起始地址，需按照64字节对齐，可以为非零地址，仅显式传入Bias起始地址的接口包含该参数。<br>Bias的数据类型需与C矩阵的数据类型保持一致，调用本接口前，需将Bias数据通过[asc_copy_l12bt](../cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md)接口搬运到该地址，Bias占用长度为`n * sizeof(c_dtype)`向上补齐到64字节。 |
 | m | 输入 | 左矩阵A和结果矩阵C的M维大小，单位为元素，取值范围为[0, 4095]。 |
 | k | 输入 | 左矩阵A和右矩阵B的K维大小，单位为元素，取值范围为[0, 4095]。 |
@@ -190,10 +219,10 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 | c_matrix_source | 输入 | 仅不显式传入Bias起始地址的重载包含该参数。当参数`c_matrix_init_val`为false时，配置矩阵C的初始值来源。<br>&nbsp;&nbsp;&bull; false：矩阵C的初始值来源于L0C Buffer。<br>&nbsp;&nbsp;&bull; true：矩阵C的初始值来源于BiasTable Buffer，并固定从0地址开始读取。 |
 | c_matrix_init_val | 输入 | 仅不显式传入Bias起始地址的重载包含该参数。配置是否将矩阵C的初始值设置为0。<br>&nbsp;&nbsp;&bull; true：将矩阵C的初始值设置为0，参数`c_matrix_source`不生效。<br>&nbsp;&nbsp;&bull; false：不执行清零操作，矩阵C的初始值由参数`c_matrix_source`配置。 |
 
-<!-- end id14 -->
+<!-- end id15 -->
 
-<!-- npu="A3,910b" id15 -->
-**表** 参数说明（[NPU架构版本2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
+<!-- npu="A3,910b" id16 -->
+**表8** 参数说明（[NPU架构版本2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -208,7 +237,7 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 | c_matrix_source | 输入 | 当参数`c_matrix_init_val`为false时，配置矩阵C的初始值来源。<br>&nbsp;&nbsp;&bull; false：矩阵C的初始值来源于L0C Buffer。<br>&nbsp;&nbsp;&bull; true：矩阵C的初始值来源于BiasTable Buffer。 |
 | c_matrix_init_val | 输入 | 配置是否将矩阵C的初始值设置为0。<br>&nbsp;&nbsp;&bull; true：将矩阵C的初始值设置为0，参数`c_matrix_source`不生效。<br>&nbsp;&nbsp;&bull; false：不执行清零操作，矩阵C的初始值由参数`c_matrix_source`配置。 |
 
-<!-- end id15 -->
+<!-- end id16 -->
 
 ## 返回值说明
 
@@ -224,26 +253,32 @@ PIPE_M
 - `m`、`k`、`n`中的任意一个值为0时，接口将被视为NOP（空操作）。
 
 - 内存使用约束说明：
-  <!-- npu="950" id10 -->
-  - 针对Ascend 950PR/Ascend 950DT:
+  <!-- npu="950,960" id17 -->
+  - 针对如下产品型号：
+    <!-- npu="950" id18 -->
+    Ascend 950PR/Ascend 950DT：
+    <!-- end id18 -->
+    <!-- npu="960" id19 -->
+    Ascend 960PR/Ascend 960DT：
+    <!-- end id19 -->
 
       - L0C Buffer大小为256KB，L0A Buffer和L0B Buffer大小均为64KB。BiasTable Buffer大小为4KB。矩阵的起始地址和占用空间不能超出对应Buffer的范围。
       - 各矩阵的起始地址需满足[参数说明](#asc_mmad_param_table)中的对齐要求。操作数的其他地址约束请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
       - 申请矩阵存储空间时，需使用按照分形大小补齐后的数值进行申请：M、N分别向上补齐到16的倍数，K向上补齐到K0的倍数，K0的取值为`32B / sizeof(dtype)`，`dtype`为矩阵的数据类型。`m`、`k`和`n`仍传入矩阵的有效M、K、N值，补齐部分为无效数据，不参与结果矩阵有效区域的计算。
       - 当M为1且`disable_gemv`为false时，将开启GEMV模式。此时从L0A Buffer读取矩阵A时按照ND格式读取，矩阵A需按照ND格式排布，起始地址仍需按照512字节对齐。
-  <!-- end id10 -->
+  <!-- end id17 -->
 
-  <!-- npu="A3,910b" id11 -->
+  <!-- npu="A3,910b" id20 -->
   - 针对如下产品型号：
 
- 	  <!-- npu="A3" id16 -->
+ 	  <!-- npu="A3" id21 -->
     Atlas A3 训练系列产品/Atlas A3 推理系列产品
- 	  <!-- end id16 -->
- 	  <!-- npu="910b" id17 -->
+ 	  <!-- end id21 -->
+ 	  <!-- npu="910b" id22 -->
  	  Atlas A2 训练系列产品/Atlas A2 推理系列产品
- 	  <!-- end id17 -->
+ 	  <!-- end id22 -->
  	  L0C Buffer大小为128KB，L0A Buffer和L0B Buffer大小均为64KB。BiasTable Buffer大小为1KB。矩阵的起始地址和占用空间不能超出对应Buffer的范围。
- <!-- end id11 -->
+ <!-- end id20 -->
 
 - 同步约束说明：
 
@@ -264,6 +299,7 @@ PIPE_M
 
   注意，应避免nan输入，否则可能会产生执行报错；整数类型仅支持饱和模式。
 
+<!-- npu="950" id23 -->
 ## 调用示例
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
@@ -383,3 +419,4 @@ int main()
 ```
 
 更多场景使用样例请参考[asc_mmad样例](../../../../../../examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad)。
+<!-- end id23 -->
