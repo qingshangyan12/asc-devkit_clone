@@ -110,6 +110,26 @@ extern HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByT
 extern HcclResult __attribute__((visibility("default"))) CheckOpResSufficient(
     HcclComm comm, void* stream, void* mc2Tiling);
 
+#ifdef __cplusplus
+} // extern "C"
+
+/**
+ * @brief Check whether communication resource can be allocated for the given MC2 ccArgs
+ * @param comm A pointer identifying the communication resource based on.
+ * @param ccType The MC2 operation type (HcclCMDType).
+ * @param ccArgs Opaque argument object created by Mc2GetCcArgs and filled by Mc2SetCc* APIs.
+ * @return HcclResult - HCCL_SUCCESS on success, error code otherwise.
+ *
+ * @note C++ overload of CheckOpResSufficient(comm, stream, mc2Tiling) with the same business
+ *       logic: the ccType/ccArgs pair is converted to an Mc2CcTilingInner first, then the same
+ *       checkOnly pre-check chain is reused. ccArgs must be created by Mc2GetCcArgs.
+ */
+extern HcclResult __attribute__((visibility("default"))) CheckOpResSufficient(
+    HcclComm comm, uint8_t ccType, void* ccArgs);
+
+extern "C" {
+#endif // __cplusplus
+
 extern CcuResult CcuKernelLaunch(HcclComm comm, void* opResCtx);
 
 #ifdef __cplusplus
