@@ -13,11 +13,7 @@
 
 为减少Vector等待时间，DoubleBuffer机制将待处理的数据一分为二，比如Tensor1、Tensor2。如[图2](#fig189541246194710)所示，当Vector对Tensor1中数据进行Compute时，Tensor2可以执行CopyIn的过程；而当Vector切换到计算Tensor2时，Tensor1可以执行CopyOut的过程。由此，数据的进出搬运和Vector计算实现并行执行，Vector闲置问题得以有效缓解。
 
-总体来说，DoubleBuffer是基于MTE指令队列与Vector指令队列的独立性和可并行性，通过将数据搬运与Vector计算并行执行以隐藏数据搬运时间并降低Vector指令的等待时间，最终提高Vector单元的利用效率，您可以通过为队列申请内存时设置内存块的个数来实现数据并行，简单代码示例如下：
-
-```
-pipe.InitBuffer(inQueueX, 2, 256);
-```
+总体来说，DoubleBuffer是基于MTE指令队列与Vector指令队列的独立性和可并行性，通过将数据搬运与Vector计算并行执行以隐藏数据搬运时间并降低Vector指令的等待时间，最终提高Vector单元的利用效率。具体实现请参见[开启Double Buffer](../../../operator_practice/simd_operator_optimization/pipeline_scheduling/enable_double_buffer.md)。
 
 **图2**  DoubleBuffer机制<a name="fig189541246194710"></a>  
 ![](../../../figures/dbuf.png "DoubleBuffer机制")
