@@ -77,3 +77,4 @@ C API提供纯C风格的接口，符合C语言算子开发习惯，开放芯片�
 | [api-design.md](./docs/zh/contributing/api-design.md) | API 接口设计、模板参数、`__aicore__` 使用、Tiling 接口 |
 | [directory-structure.md](./docs/zh/contributing/directory-structure.md) | 目录结构、文件命名后缀、架构目录、新增 API 操作清单 |
 | [testing.md](./docs/zh/contributing/testing.md) | 测试框架、文件命名、UT 编写、Header Checker、覆盖率要求 |
+
