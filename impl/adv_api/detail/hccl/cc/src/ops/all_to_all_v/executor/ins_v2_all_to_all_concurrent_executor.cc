@@ -17,6 +17,7 @@
 #include "ins_temp_all_to_all_v_mesh_1D.h"
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 #include "ccu_temp_kfc_all_to_all_mesh1d_multi_jetty.h"
+#include "ccu_temp_all_to_all_mesh1d_multi_jetty.h"
 #endif
 
 namespace mc2_ops_hccl {
@@ -486,7 +487,7 @@ REGISTER_EXECUTOR_BY_TWO_TEMPS(
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 REGISTER_EXECUTOR_BY_TWO_TEMPS(
     HcclCMDType::HCCL_CMD_ALLTOALL, CcuSchedAllToAllSoleMeshConcurrent, InsV2AllToAllConcurrentExecutor, TopoMatchUBX,
-    CcuTempKfcAllToAllMesh1DMultiJetty, CcuTempKfcAllToAllMesh1DMultiJetty);
+    CcuTempKfcAllToAllMesh1DMultiJetty, CcuTempAllToAllMesh1DMultiJetty);
 #endif
 
 } // namespace mc2_ops_hccl
