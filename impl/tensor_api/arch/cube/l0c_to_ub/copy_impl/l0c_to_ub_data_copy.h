@@ -9,37 +9,38 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
-    "impl/tensor_api/arch/cube/l0c_to_gm/copy_impl/data_copy.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
+#warning \
+    "impl/tensor_api/arch/cube/l0c_to_ub/copy_impl/l0c_to_ub_data_copy.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
 
 /*!
- * \file data_copy.h
+ * \file l0c_to_ub_data_copy.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_CUBE_L0C_TO_GM_COPY_IMPL_DATA_COPY_H
-#define IMPL_TENSOR_API_ARCH_CUBE_L0C_TO_GM_COPY_IMPL_DATA_COPY_H
+#ifndef IMPL_TENSOR_API_ARCH_CUBE_L0C_TO_UB_COPY_IMPL_DATA_COPY_H
+#define IMPL_TENSOR_API_ARCH_CUBE_L0C_TO_UB_COPY_IMPL_DATA_COPY_H
 
 #include "impl/tensor_api/utils/utils_impl.h"
-#include "impl/tensor_api/arch/cube/l1_to_fb/copy.h"
+#include "impl/tensor_api/arch/cube/l1_to_fb/l1_to_fb_copy.h"
 #include "impl/tensor_api/arch/cube/utils/l0c2out_utils.h"
-#include "impl/tensor_api/arch/cube/l0c_to_gm/copy_impl/instruction.h"
+#include "impl/tensor_api/arch/cube/l0c_to_ub/copy_impl/instruction.h"
 
 namespace asc {
 namespace te {
 
-__aicore__ constexpr l0c_to_gm_trait::l0c_to_gm_trait(asc::te::round_mode round_mode, bool enable_relu,
-                                                      bool enable_channel_split) :
-    round_mode(round_mode), enable_relu(enable_relu), enable_channel_split(enable_channel_split)
+__aicore__ constexpr l0c_to_ub_trait::l0c_to_ub_trait(asc::te::round_mode round_mode, bool enable_relu,
+                                                      bool enable_channel_split, dual_dst_mode dual_dst_ctl) :
+    round_mode(round_mode), enable_relu(enable_relu), enable_channel_split(enable_channel_split),
+    dual_dst_ctl(dual_dst_ctl)
 {}
 
-class data_copy_l0c_to_gm_no_vector_quant {
+class data_copy_l0c_to_ub_no_vector_quant {
 public:
-    template <const l0c_to_gm_trait& trait, QuantMode_t quant_pre, typename DstTensor, typename SrcTensor>
+    template <const l0c_to_ub_trait& trait, QuantMode_t quant_pre, typename DstTensor, typename SrcTensor>
     __aicore__ inline static void data_copy_impl(const DstTensor& dst, const SrcTensor& src,
-                                                 const l0c_to_gm_params& params)
+                                                 const l0c_to_ub_params& params)
     {
         if constexpr (is_l0c_out_src_batch_layout_v<SrcTensor> && !is_l0c_out_batch_nz2nz_v<DstTensor, SrcTensor>) {
             emit_data_copy<trait, quant_pre>(dst, src, get<1>(dst.layout()), get<1>(src.layout()), params);
@@ -48,36 +49,31 @@ public:
         }
     }
 
-    template <const l0c_to_gm_trait& trait, QuantMode_t quant_pre, typename DstTensor, typename SrcTensor,
+    template <const l0c_to_ub_trait& trait, QuantMode_t quant_pre, typename DstTensor, typename SrcTensor,
               typename DstCoord, typename SrcCoord, typename CopyShape>
     __aicore__ inline static void data_copy_with_offset(const DstTensor& dst, const SrcTensor& src,
                                                         const DstCoord& dst_coord, const SrcCoord& src_coord,
-                                                        const CopyShape& copy_shape, const l0c_to_gm_params& params)
+                                                        const CopyShape& copy_shape, const l0c_to_ub_params& params)
     {
+        auto dst_shape = make_slice_shape(dst_coord, dst.layout(), copy_shape);
         auto dst_offset = dst.layout()(dst_coord);
         auto src_offset = src.layout()(src_coord);
-        l0c_out_copy_params copy_params;
-        if constexpr (is_l0c_out_nc1hwc0_v<DstTensor>) {
-            auto src_shape = make_slice_shape(src_coord, src.layout(), copy_shape);
-            copy_params = make_nc1hwc0_params(dst.layout(), src.layout(), src_shape);
-        } else {
-            auto dst_shape = make_slice_shape(dst_coord, dst.layout(), copy_shape);
-            copy_params = make_l0c_out_copy_params<DstTensor, SrcTensor>(dst.layout(), src.layout(), dst_shape);
-        }
+        auto copy_params = make_l0c_out_copy_params<DstTensor, SrcTensor>(dst.layout(), src.layout(), dst_shape);
         constexpr bool is_nd_format = is_l0c_out_nd_format_v<DstTensor>;
         constexpr bool is_dn_format = is_l0c_out_dn_format_v<DstTensor>;
-        copy_l0c_to_gm_instr::data_copy_with_offset<quant_pre, DstTensor, SrcTensor>(
+        copy_l0c_to_ub_instr::data_copy_with_offset<quant_pre, DstTensor, SrcTensor>(
             dst, src, dst_offset, src_offset, copy_params.n_size, copy_params.m_size, copy_params.src_stride,
-            copy_params.dst_stride, dst.engine().get_cache_mode(), trait.enable_relu,
-            static_cast<uint8_t>(params.unit_flag), trait.enable_channel_split, is_nd_format, is_dn_format);
+            copy_params.dst_stride, static_cast<uint8_t>(trait.dual_dst_ctl), trait.enable_relu,
+            static_cast<uint8_t>(params.unit_flag), params.sub_block_id, trait.enable_channel_split, is_nd_format,
+            is_dn_format);
     }
 
 private:
-    template <const l0c_to_gm_trait& trait, QuantMode_t quant_pre, typename DstTensor, typename SrcTensor,
+    template <const l0c_to_ub_trait& trait, QuantMode_t quant_pre, typename DstTensor, typename SrcTensor,
               typename DstLayout, typename SrcLayout>
     __aicore__ inline static void emit_data_copy(const DstTensor& dst, const SrcTensor& src,
                                                  const DstLayout& dst_layout, const SrcLayout& src_layout,
-                                                 const l0c_to_gm_params& params)
+                                                 const l0c_to_ub_params& params)
     {
         constexpr bool is_nd_format = is_l0c_out_nd_format_v<DstTensor>;
         constexpr bool is_dn_format = is_l0c_out_dn_format_v<DstTensor>;
@@ -88,21 +84,23 @@ private:
         bool nz2nd_en = is_nd_format;
         bool nz2dn_en = is_dn_format;
 
-        uint8_t cache_mode = dst.engine().get_cache_mode();
         bool is_channel_split = trait.enable_channel_split;
 
-        copy_l0c_to_gm_instr::data_copy<quant_pre>(
-            dst.data().get(), src.data().get(), copy_params.n_size, copy_params.m_size, copy_params.src_stride,
-            copy_params.dst_stride, cache_mode, relu_en, unit_flag, is_channel_split, nz2nd_en, nz2dn_en);
+        uint8_t dual_dst_ctl = static_cast<uint8_t>(trait.dual_dst_ctl);
+        uint8_t sub_block_id = params.sub_block_id;
+        copy_l0c_to_ub_instr::data_copy<quant_pre>(dst.data().get(), src.data().get(), copy_params.n_size,
+                                                   copy_params.m_size, copy_params.src_stride, copy_params.dst_stride,
+                                                   dual_dst_ctl, relu_en, unit_flag, sub_block_id, is_channel_split,
+                                                   nz2nd_en, nz2dn_en);
     }
 };
 
-class data_copy_l0c_to_gm_vector_quant {
+class data_copy_l0c_to_ub_vector_quant {
 public:
-    template <const l0c_to_gm_trait& trait, QuantMode_t quant_pre, typename DstTensor, typename SrcTensor,
+    template <const l0c_to_ub_trait& trait, QuantMode_t quant_pre, typename DstTensor, typename SrcTensor,
               typename Quant>
     __aicore__ inline static void data_copy_impl(const DstTensor& dst, const SrcTensor& src, const Quant& quant,
-                                                 const l0c_to_gm_params& params)
+                                                 const l0c_to_ub_params& params)
     {
         if constexpr (is_l0c_out_batch_nz2nz_v<DstTensor, SrcTensor>) {
             emit_batch_nz2_nz_data_copy<trait, quant_pre>(dst, src, quant, params);
@@ -113,22 +111,16 @@ public:
         }
     }
 
-    template <const l0c_to_gm_trait& trait, QuantMode_t quant_pre, typename DstTensor, typename SrcTensor,
+    template <const l0c_to_ub_trait& trait, QuantMode_t quant_pre, typename DstTensor, typename SrcTensor,
               typename Quant, typename DstCoord, typename SrcCoord, typename CopyShape>
     __aicore__ inline static void data_copy_with_offset(const DstTensor& dst, const SrcTensor& src, const Quant& quant,
                                                         const DstCoord& dst_coord, const SrcCoord& src_coord,
-                                                        const CopyShape& copy_shape, const l0c_to_gm_params& params)
+                                                        const CopyShape& copy_shape, const l0c_to_ub_params& params)
     {
+        auto dst_shape = make_slice_shape(dst_coord, dst.layout(), copy_shape);
         auto base_dst_offset = dst.layout()(dst_coord);
         auto src_offset = src.layout()(src_coord);
-        l0c_out_copy_params copy_params;
-        if constexpr (is_l0c_out_nc1hwc0_v<DstTensor>) {
-            auto src_shape = make_slice_shape(src_coord, src.layout(), copy_shape);
-            copy_params = make_nc1hwc0_params(dst.layout(), src.layout(), src_shape);
-        } else {
-            auto dst_shape = make_slice_shape(dst_coord, dst.layout(), copy_shape);
-            copy_params = make_l0c_out_copy_params<DstTensor, SrcTensor>(dst.layout(), src.layout(), dst_shape);
-        }
+        auto copy_params = make_l0c_out_copy_params<DstTensor, SrcTensor>(dst.layout(), src.layout(), dst_shape);
         uint16_t n_iter_num = Std::ceil_division(copy_params.n_size, main_loop_n_size);
         for (uint16_t i = 0; i < n_iter_num; ++i) {
             uint32_t n_offset = i * main_loop_n_size;
@@ -138,22 +130,22 @@ public:
             auto src_coord = make_src_coord<SrcTensor>(i * cburst_num);
             auto dst_coord = make_dst_coord<DstTensor>(n_offset);
             auto dst_offset = base_dst_offset + dst.layout()(dst_coord);
-            copy_l0c_to_gm_instr::data_copy_with_offset<quant_pre>(
+            copy_l0c_to_ub_instr::data_copy_with_offset<quant_pre>(
                 dst, src(src_coord), dst_offset, src_offset, cal_n_size, copy_params.m_size, copy_params.src_stride,
-                copy_params.dst_stride, dst.engine().get_cache_mode(), trait.enable_relu,
-                static_cast<uint8_t>(params.unit_flag), trait.enable_channel_split, is_l0c_out_nd_format_v<DstTensor>,
-                is_l0c_out_dn_format_v<DstTensor>);
+                copy_params.dst_stride, static_cast<uint8_t>(trait.dual_dst_ctl), trait.enable_relu,
+                static_cast<uint8_t>(params.unit_flag), params.sub_block_id, trait.enable_channel_split,
+                is_l0c_out_nd_format_v<DstTensor>, is_l0c_out_dn_format_v<DstTensor>);
         }
     }
 
 private:
-    template <const l0c_to_gm_trait& trait, QuantMode_t quant_pre, typename DstTensor, typename SrcTensor,
+    template <const l0c_to_ub_trait& trait, QuantMode_t quant_pre, typename DstTensor, typename SrcTensor,
               typename Quant>
     __aicore__ inline static void emit_batch_nz2_nz_data_copy(const DstTensor& dst, const SrcTensor& src,
-                                                              const Quant& quant, const l0c_to_gm_params& params)
+                                                              const Quant& quant, const l0c_to_ub_params& params)
     {
-        auto src_layout = src.layout();
         auto dst_layout = dst.layout();
+        auto src_layout = src.layout();
         for (uint32_t batch_index = 0; batch_index < get<0>(src_layout.shape()); ++batch_index) {
             emit_data_copy<trait, quant_pre>(
                 dst(make_coord(batch_index, make_coord(make_coord(0, 0), make_coord(0, 0)))),
@@ -162,11 +154,11 @@ private:
         }
     }
 
-    template <const l0c_to_gm_trait& trait, QuantMode_t quant_pre, typename DstTensor, typename SrcTensor,
+    template <const l0c_to_ub_trait& trait, QuantMode_t quant_pre, typename DstTensor, typename SrcTensor,
               typename Quant, typename DstLayout, typename SrcLayout>
     __aicore__ inline static void emit_data_copy(const DstTensor& dst, const SrcTensor& src, const Quant& quant,
                                                  const DstLayout& dst_layout, const SrcLayout& src_layout,
-                                                 const l0c_to_gm_params& params)
+                                                 const l0c_to_ub_params& params)
     {
         uint32_t n_size = Std::min(get_total_column_shape(src_layout), get_total_column_shape(dst_layout));
         uint16_t n_iter_num = 1;
@@ -181,9 +173,9 @@ private:
                                             src_layout, params);
     }
 
-    template <const l0c_to_gm_trait& trait, typename DstTensor, bool is_tail, typename DstLayout, typename SrcLayout>
-    __aicore__ inline static auto generate_params(const DstTensor& dst, const DstLayout& dst_layout,
-                                                  const SrcLayout& src_layout, const l0c_to_gm_params& params)
+    template <const l0c_to_ub_trait& trait, typename DstTensor, bool is_tail, typename DstLayout, typename SrcLayout>
+    __aicore__ inline static auto generate_params(const DstLayout& dst_layout, const SrcLayout& src_layout,
+                                                  const l0c_to_ub_params& params)
     {
         constexpr bool is_nd_format = is_l0c_out_nd_format_v<DstTensor>;
         constexpr bool is_dn_format = is_l0c_out_dn_format_v<DstTensor>;
@@ -208,16 +200,18 @@ private:
             dst_stride = get_element<attr_info::stride, attr_info::column, 1>(dst_layout);
         }
 
-        const bool relu_enable = trait.enable_relu;
+        const bool relu_en = trait.enable_relu;
         const uint8_t unit_flag = static_cast<uint8_t>(params.unit_flag);
 
-        constexpr bool nz2nd_enable = is_nd_format;
-        constexpr bool nz2dn_enable = is_dn_format;
+        constexpr bool nz2nd_en = is_nd_format;
+        constexpr bool nz2dn_en = is_dn_format;
 
-        const uint8_t cache_mode = dst.engine().get_cache_mode();
         const bool channel_split = trait.enable_channel_split;
-        return Std::make_tuple(n_size, m_size, src_stride, dst_stride, cache_mode, relu_enable, unit_flag,
-                               channel_split, nz2nd_enable, nz2dn_enable);
+        uint8_t sub_block_id = params.sub_block_id;
+        uint8_t dual_dst_ctl = static_cast<uint8_t>(trait.dual_dst_ctl);
+
+        return Std::make_tuple(n_size, m_size, src_stride, dst_stride, dual_dst_ctl, relu_en, unit_flag, sub_block_id,
+                               channel_split, nz2nd_en, nz2dn_en);
     }
 
     template <typename SrcTensor>
@@ -236,7 +230,7 @@ private:
     __aicore__ inline static void data_copy_wrapper(const DstTensor& dst, const SrcTensor& src,
                                                     const ParamTuple& param_tuple, Std::index_sequence<Is...>)
     {
-        copy_l0c_to_gm_instr::data_copy<quant_pre>(dst.data().get(), src.data().get(), Std::get<Is>(param_tuple)...);
+        copy_l0c_to_ub_instr::data_copy<quant_pre>(dst.data().get(), src.data().get(), Std::get<Is>(param_tuple)...);
     }
 
     template <typename DstTensor>
@@ -267,14 +261,14 @@ private:
         }
     }
 
-    template <const l0c_to_gm_trait& trait, QuantMode_t quant_pre, typename DstTensor, typename SrcTensor,
+    template <const l0c_to_ub_trait& trait, QuantMode_t quant_pre, typename DstTensor, typename SrcTensor,
               typename Quant, typename DstLayout, typename SrcLayout>
     __aicore__ inline static void execute_data_copy(const DstTensor& dst, const SrcTensor& src, const Quant& quant,
                                                     uint16_t n_iter_num, uint32_t cal_n_size, uint32_t tail_n_size,
                                                     const DstLayout& dst_layout, const SrcLayout& src_layout,
-                                                    const l0c_to_gm_params& params)
+                                                    const l0c_to_ub_params& params)
     {
-        const auto main_loop_param = generate_params<trait, DstTensor, false>(dst, dst_layout, src_layout, params);
+        const auto main_loop_param = generate_params<trait, DstTensor, false>(dst_layout, src_layout, params);
 
         for (uint16_t i = 0; i < n_iter_num; ++i) {
             copy_l1_to_fixbuf(quant, cal_n_size, i);
@@ -282,72 +276,74 @@ private:
 
             const auto src_coord = make_src_coord<SrcTensor>(i * cburst_num);
             const auto dst_coord = make_dst_coord<DstTensor>(i * main_loop_n_size);
+
             data_copy_wrapper<quant_pre>(dst(dst_coord), src(src_coord), main_loop_param,
                                          Std::make_index_sequence<Std::tuple_size_v<decltype(main_loop_param)>>{});
         }
 
         if (tail_n_size) {
-            const auto tail_param = generate_params<trait, DstTensor, true>(dst, dst_layout, src_layout, params);
+            const auto tail_param = generate_params<trait, DstTensor, true>(dst_layout, src_layout, params);
 
             copy_l1_to_fixbuf(quant, tail_n_size, n_iter_num);
             insert_sync();
 
             const auto src_coord = make_src_coord<SrcTensor>(n_iter_num * cburst_num);
             const auto dst_coord = make_dst_coord<DstTensor>(n_iter_num * main_loop_n_size);
+
             data_copy_wrapper<quant_pre>(dst(dst_coord), src(src_coord), tail_param,
                                          Std::make_index_sequence<Std::tuple_size_v<decltype(tail_param)>>{});
         }
     }
 };
 
-class data_copy_l0c_to_gm {
+class data_copy_l0c_to_ub {
 public:
-    template <const l0c_to_gm_trait& trait, typename DstTensor, typename SrcTensor>
-    __aicore__ inline static void run(const DstTensor& dst, const SrcTensor& src, const l0c_to_gm_params& params)
+    template <const l0c_to_ub_trait& trait, typename DstTensor, typename SrcTensor>
+    __aicore__ inline static void run(const DstTensor& dst, const SrcTensor& src, const l0c_to_ub_params& params)
     {
         constexpr QuantMode_t quant_pre = get_quant_mode<trait.round_mode, DstTensor, SrcTensor>();
-        check_data_type::check_l0c_to_gm_data_type<quant_pre, DstTensor, SrcTensor>();
+        check_data_type::check_l0c_to_ub_data_type<quant_pre, DstTensor, SrcTensor>();
         set_register_impl<DstTensor, SrcTensor>(dst, src);
-        data_copy_l0c_to_gm_no_vector_quant::data_copy_impl<trait, quant_pre, DstTensor, SrcTensor>(dst, src, params);
+        data_copy_l0c_to_ub_no_vector_quant::data_copy_impl<trait, quant_pre, DstTensor, SrcTensor>(dst, src, params);
     }
 
-    template <const l0c_to_gm_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord,
+    template <const l0c_to_ub_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord,
               typename SrcCoord, typename CopyShape>
     __aicore__ inline static void run(const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord,
                                       const SrcCoord& src_coord, const CopyShape& copy_shape,
-                                      const l0c_to_gm_params& params)
+                                      const l0c_to_ub_params& params)
     {
         constexpr QuantMode_t quant_pre = get_quant_mode<trait.round_mode, DstTensor, SrcTensor>();
-        check_data_type::check_l0c_to_gm_data_type<quant_pre, DstTensor, SrcTensor>();
+        check_data_type::check_l0c_to_ub_data_type<quant_pre, DstTensor, SrcTensor>();
         set_register_impl<DstTensor, SrcTensor>(dst, src);
-        data_copy_l0c_to_gm_no_vector_quant::data_copy_with_offset<trait, quant_pre>(dst, src, dst_coord, src_coord,
+        data_copy_l0c_to_ub_no_vector_quant::data_copy_with_offset<trait, quant_pre>(dst, src, dst_coord, src_coord,
                                                                                      copy_shape, params);
     }
 
-    template <const l0c_to_gm_trait& trait, typename DstTensor, typename SrcTensor>
+    template <const l0c_to_ub_trait& trait, typename DstTensor, typename SrcTensor>
     __aicore__ inline static void run(const DstTensor& dst, const SrcTensor& src, uint64_t quant,
-                                      const l0c_to_gm_params& params)
+                                      const l0c_to_ub_params& params)
     {
         constexpr QuantMode_t quant_pre = get_quant_mode<trait.round_mode, DstTensor, SrcTensor, uint64_t>();
         set_register_impl<DstTensor, SrcTensor>(dst, src, quant);
-        data_copy_l0c_to_gm_no_vector_quant::data_copy_impl<trait, quant_pre, DstTensor, SrcTensor>(dst, src, params);
+        data_copy_l0c_to_ub_no_vector_quant::data_copy_impl<trait, quant_pre, DstTensor, SrcTensor>(dst, src, params);
     }
 
-    template <const l0c_to_gm_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord,
+    template <const l0c_to_ub_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord,
               typename SrcCoord, typename CopyShape>
     __aicore__ inline static void run(const DstTensor& dst, const SrcTensor& src, uint64_t quant,
                                       const DstCoord& dst_coord, const SrcCoord& src_coord, const CopyShape& copy_shape,
-                                      const l0c_to_gm_params& params)
+                                      const l0c_to_ub_params& params)
     {
         constexpr QuantMode_t quant_pre = get_quant_mode<trait.round_mode, DstTensor, SrcTensor, uint64_t>();
         set_register_impl<DstTensor, SrcTensor>(dst, src, quant);
-        data_copy_l0c_to_gm_no_vector_quant::data_copy_with_offset<trait, quant_pre>(dst, src, dst_coord, src_coord,
+        data_copy_l0c_to_ub_no_vector_quant::data_copy_with_offset<trait, quant_pre>(dst, src, dst_coord, src_coord,
                                                                                      copy_shape, params);
     }
 
-    template <const l0c_to_gm_trait& trait, typename DstTensor, typename SrcTensor, typename Quant>
+    template <const l0c_to_ub_trait& trait, typename DstTensor, typename SrcTensor, typename Quant>
     __aicore__ inline static void run(const DstTensor& dst, const SrcTensor& src, const Quant& quant,
-                                      const l0c_to_gm_params& params)
+                                      const l0c_to_ub_params& params)
     {
         constexpr QuantMode_t quant_pre = get_quant_mode<trait.round_mode, DstTensor, SrcTensor, Quant>();
         constexpr bool quant_batched = check_vector_quant_batch_consistency<DstTensor, SrcTensor, Quant>();
@@ -363,22 +359,22 @@ public:
                 auto sub_src = make_single_batch_sub_tensor(src, b);
                 auto sub_quant = make_single_batch_sub_tensor(quant, b);
                 set_register_impl<decltype(sub_dst), decltype(sub_src)>(sub_dst, sub_src);
-                data_copy_l0c_to_gm_vector_quant::data_copy_impl<trait, quant_pre, decltype(sub_dst), decltype(sub_src),
+                data_copy_l0c_to_ub_vector_quant::data_copy_impl<trait, quant_pre, decltype(sub_dst), decltype(sub_src),
                                                                  decltype(sub_quant)>(sub_dst, sub_src, sub_quant,
                                                                                       params);
             }
         } else {
             set_register_impl<DstTensor, SrcTensor>(dst, src);
-            data_copy_l0c_to_gm_vector_quant::data_copy_impl<trait, quant_pre, DstTensor, SrcTensor, Quant>(
+            data_copy_l0c_to_ub_vector_quant::data_copy_impl<trait, quant_pre, DstTensor, SrcTensor, Quant>(
                 dst, src, quant, params);
         }
     }
 
-    template <const l0c_to_gm_trait& trait, typename DstTensor, typename SrcTensor, typename Quant, typename DstCoord,
+    template <const l0c_to_ub_trait& trait, typename DstTensor, typename SrcTensor, typename Quant, typename DstCoord,
               typename SrcCoord, typename CopyShape>
     __aicore__ inline static void run(const DstTensor& dst, const SrcTensor& src, const Quant& quant,
                                       const DstCoord& dst_coord, const SrcCoord& src_coord, const CopyShape& copy_shape,
-                                      const l0c_to_gm_params& params)
+                                      const l0c_to_ub_params& params)
     {
         constexpr QuantMode_t quant_pre = get_quant_mode<trait.round_mode, DstTensor, SrcTensor, Quant>();
         constexpr bool quant_batched = check_vector_quant_batch_consistency<DstTensor, SrcTensor, Quant>();
@@ -390,12 +386,12 @@ public:
                 auto sub_src = make_single_batch_sub_tensor(src, get<0>(src_coord) + b);
                 auto sub_quant = make_single_batch_sub_tensor(quant, b);
                 set_register_impl<decltype(sub_dst), decltype(sub_src)>(sub_dst, sub_src);
-                data_copy_l0c_to_gm_vector_quant::data_copy_with_offset<trait, quant_pre>(
+                data_copy_l0c_to_ub_vector_quant::data_copy_with_offset<trait, quant_pre>(
                     sub_dst, sub_src, sub_quant, get<1>(dst_coord), get<1>(src_coord), get<1>(copy_shape), params);
             }
         } else {
             set_register_impl<DstTensor, SrcTensor>(dst, src);
-            data_copy_l0c_to_gm_vector_quant::data_copy_with_offset<trait, quant_pre>(dst, src, quant, dst_coord,
+            data_copy_l0c_to_ub_vector_quant::data_copy_with_offset<trait, quant_pre>(dst, src, quant, dst_coord,
                                                                                       src_coord, copy_shape, params);
         }
     }
@@ -404,7 +400,7 @@ public:
 } // namespace te
 } // namespace asc
 
-#endif // IMPL_TENSOR_API_ARCH_CUBE_L0C_TO_GM_COPY_IMPL_DATA_COPY_H
+#endif // IMPL_TENSOR_API_ARCH_CUBE_L0C_TO_UB_COPY_IMPL_DATA_COPY_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
