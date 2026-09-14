@@ -23,6 +23,7 @@
 #define IMPL_SIMT_API_MATH_FUNCTIONS_IMPL_H
 
 #include "simt_api/device_types.h"
+#include "simt_api/device_functions.h"
 #include "simt_api/math_constants.h"
 #include "impl/simt_api/device_functions_impl.h"
 #include "impl/simt_api/internal_functions_impl.h"
