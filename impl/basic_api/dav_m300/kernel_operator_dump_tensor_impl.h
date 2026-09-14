@@ -36,6 +36,7 @@
 #elif __NPU_ARCH__ == 3002
 #include "kernel_operator_fixpipe_impl.h"
 #endif
+#include "../../utils/debug/asc_aicore_printf_impl.h"
 
 namespace AscendC {
 __BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_dumpWorkspaceReserved;
@@ -71,8 +72,6 @@ __aicore__ inline uint32_t GetDataType(T data)
         return static_cast<uint32_t>(Internal::DumpTensorDataType::ACL_MAX);
     }
 }
-
-__aicore__ inline uint8_t GetDumpBlockIdx() { return GetBlockIdxImpl(); }
 
 __aicore__ inline void InitDumpImpl(bool mixFlag, uint32_t gmLen) {}
 __aicore__ inline DataCopyParams GetDataCopyParamImpl(uint32_t offset)
@@ -499,225 +498,15 @@ __aicore__ __attribute__((noinline)) void DumpTensorRingBufImpl(
 #endif // ASCENDC_DUMP
 }
 
-__aicore__ inline uint32_t GetArgsNum() { return 0; }
-
-template <typename T, typename... Args>
-__aicore__ inline uint32_t GetArgsNum(T scalar, Args... args)
-{
-    return 1 + GetArgsNum(args...);
-}
-
-__aicore__ inline uint32_t GetStringLength(__gm__ const char* s)
-{
-    uint32_t i = 0;
-    while (*(s + i) != '\0') {
-        i++;
-    }
-    return i + 1;
-}
-
-__aicore__ inline uint32_t GetArgsSize() { return 0; }
-
-template <typename... Args>
-__aicore__ inline uint32_t GetArgsSize(Args&&... args);
-
-template <typename... Args>
-__aicore__ inline uint32_t GetArgsSizeImpl(__gm__ const char* s, Args&&... args)
-{
-    uint32_t strLen = GetStringLength(s);
-    uint32_t strParamSize = ONE_PARAM_SIZE + strLen;
-    return strParamSize + GetArgsSize(args...);
-}
-
-template <typename T, typename... Args>
-__aicore__ inline uint32_t GetArgsSizeImpl(T scalar, Args&&... args)
-{
-    return ONE_PARAM_SIZE + GetArgsSize(args...);
-}
-
-template <typename... Args>
-__aicore__ inline uint32_t GetArgsSize(Args&&... args)
-{
-    return GetArgsSizeImpl(args...);
-}
-
-template <typename... Args>
-__aicore__ inline uint32_t GetParamSize(__gm__ const char* fmt, Args&&... args)
-{
-    uint32_t fmtSize = GetStringLength(fmt);
-    uint32_t argsSize = GetArgsSize(args...);
-    return fmtSize + argsSize + ONE_PARAM_SIZE;
-}
-
-__aicore__ __gm__ inline BlockInfo* GetBlockInfo()
-{
-    uint8_t core = GetDumpBlockIdx();
-    uint64_t dumpWorkspaceStart = reinterpret_cast<uint64_t>(g_dumpWorkspaceReserved) - DUMP_WORKSPACE_SIZE;
-    __gm__ BlockInfo* blockInfo = (__gm__ BlockInfo*)(dumpWorkspaceStart + DUMP_UINTSIZE * core);
-    return blockInfo;
-}
-
-__aicore__ inline void WriteString(__gm__ uint8_t* paramAddr, uint32_t paramIdx, __gm__ const char* s, uint32_t& offset)
-{
-    __gm__ uint64_t* stringAddr = reinterpret_cast<__gm__ uint64_t*>(paramAddr) + paramIdx;
-    __gm__ uint64_t* dstStrAddr = reinterpret_cast<__gm__ uint64_t*>(paramAddr + offset);
-
-    // write string value offset
-    *((__gm__ uint64_t*)stringAddr) = static_cast<uint64_t>(offset - ONE_PARAM_SIZE * paramIdx);
-    dcci((__gm__ uint64_t*)stringAddr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
-
-    // write string content
-    __gm__ char* d = (__gm__ char*)(dstStrAddr);
-    uint32_t strLen = GetStringLength(s);
-
-    for (uint32_t i = 0; i < strLen; i++) {
-        *(d + i) = *(s + i);
-        dcci((__gm__ uint64_t*)d, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
-    }
-    offset += strLen;
-}
-
-template <typename T>
-__aicore__ inline void WriteScalar(__gm__ uint8_t* paramAddr, uint32_t paramIdx, T scalar)
-{
-    __gm__ uint64_t* scalarAddr = (__gm__ uint64_t*)paramAddr + paramIdx;
-    *scalarAddr = 0;
-    static_assert(!SupportType<T, double>(), "printf unsupport double type");
-
-    if constexpr (SupportType<T, half, float>()) {
-        *((__gm__ float*)scalarAddr) = static_cast<float>(scalar);
-    } else if constexpr (SupportType<T, bfloat16_t>()) {
-        *((__gm__ float*)scalarAddr) = ToFloat(scalar);
-    } else if constexpr (std::is_signed<T>::value) {
-        *((__gm__ int64_t*)scalarAddr) = static_cast<int64_t>(scalar);
-    } else if constexpr (std::is_unsigned<T>::value) {
-        *((__gm__ uint64_t*)scalarAddr) = static_cast<uint64_t>(scalar);
-    } else if constexpr (std::is_pointer<T>::value) {
-        *((__gm__ uint64_t*)scalarAddr) = (uintptr_t)scalar;
-    } else if constexpr (std::is_enum<T>::value) {
-        *((__gm__ uint64_t*)scalarAddr) = static_cast<uint64_t>(scalar);
-    }
-
-    dcci((__gm__ uint64_t*)scalarAddr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
-}
-
-__aicore__ inline void SetParam(__gm__ uint8_t* paramAddr, uint32_t paramIdx, uint32_t& offset) { return; }
-
-template <typename... Args>
-__aicore__ inline void SetParam(__gm__ uint8_t* paramAddr, uint32_t paramIdx, uint32_t& offset, Args&&... args);
-
-template <typename... Args>
-__aicore__ inline void SetParamImpl(
-    __gm__ uint8_t* paramAddr, uint32_t paramIdx, uint32_t& offset, __gm__ const char* s, Args&&... args)
-{
-    WriteString(paramAddr, paramIdx, s, offset);
-    SetParam(paramAddr, paramIdx + 1, offset, args...);
-}
-
-template <typename T, typename... Args>
-__aicore__ inline void SetParamImpl(
-    __gm__ uint8_t* paramAddr, uint32_t paramIdx, uint32_t& offset, T scalar, Args&&... args)
-{
-    WriteScalar(paramAddr, paramIdx, scalar);
-    SetParam(paramAddr, paramIdx + 1, offset, args...);
-}
-
-template <typename... Args>
-__aicore__ inline void SetParam(__gm__ uint8_t* paramAddr, uint32_t paramIdx, uint32_t& offset, Args&&... args)
-{
-    SetParamImpl(paramAddr, paramIdx, offset, args...);
-}
-
-__aicore__ inline void WriteTLHead(DumpType printType, __gm__ uint8_t* tlv, uint32_t valueSize)
-{
-    *((__gm__ uint32_t*)tlv) = static_cast<uint32_t>(printType);
-    *((__gm__ uint32_t*)tlv + 1) = valueSize;
-    dcci((__gm__ uint64_t*)tlv, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
-}
-__aicore__ inline void UpdateBlockInfo(uint32_t tlvSize)
-{
-    __gm__ BlockInfo* blockInfo = GetBlockInfo();
-    uint32_t remainSize = blockInfo->dumpOffset;
-    uint64_t lastDumpAddr = blockInfo->dumpAddr;
-
-    __gm__ uint8_t* blockInfoStart = (__gm__ uint8_t*)blockInfo;
-    *((__gm__ uint32_t*)blockInfoStart + BLOCK_INFO_DUMPOFFSET_POS) = remainSize - tlvSize;
-    *((__gm__ uint64_t*)((__gm__ uint32_t*)blockInfoStart + BLOCK_INFO_DUMP_ADDR)) = lastDumpAddr + tlvSize;
-    dcci((__gm__ uint64_t*)blockInfoStart, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
-}
-
-template <class... Args>
-__aicore__ inline void PrintfEntityImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
-{
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-    uint8_t blockIdx = GetDumpBlockIdx();
-    if (blockIdx >= DUMP_CORE_COUNT) {
-        return;
-    }
-    __gm__ BlockInfo* blockInfo = GetBlockInfo();
-    uint32_t remainSize = blockInfo->dumpOffset;
-    uint64_t dumpAddr = blockInfo->dumpAddr;
-
-    uint32_t paramSize = GetParamSize(fmt, args...);
-    uint32_t paramNum = GetArgsNum(args...) + 1;
-    paramSize = (paramSize + ONE_PARAM_SIZE - 1) & (~(ONE_PARAM_SIZE - 1));
-
-    uint32_t tlvSize = paramSize + ONE_PARAM_SIZE;
-    if (tlvSize > remainSize) {
-        __gm__ uint8_t* blockInfoStart = (__gm__ uint8_t*)blockInfo;
-        *((__gm__ uint32_t*)blockInfoStart + BLOCK_INFO_RSV_POS) = DUMP_EXC_FLAG;
-        dcci((__gm__ uint64_t*)blockInfoStart, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
-        return;
-    }
-
-    __gm__ uint8_t* tlvAddr = (__gm__ uint8_t*)dumpAddr;
-    WriteTLHead(printType, tlvAddr, paramSize);
-    __gm__ uint8_t* paramAddr = tlvAddr + ONE_PARAM_SIZE;
-    uint32_t offset = paramNum * ONE_PARAM_SIZE;
-    WriteString(paramAddr, 0, fmt, offset);
-    uint32_t paramIdx = 1;
-    SetParam(paramAddr, paramIdx, offset, args...);
-
-    // update next print addr
-    UpdateBlockInfo(tlvSize);
-#endif
-}
-
 template <class... Args>
 __aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
 {
-    uint64_t ctrlValue = get_ctrl();
-    set_atomic_none();
-    PrintfEntityImpl(printType, fmt, args...);
-    set_ctrl(ctrlValue);
+    __asc_aicore::printf_impl(fmt, args...);
 }
 
-__aicore__ inline void DumpTimeStampImpl(uint32_t descId)
-{
-#ifdef ASCENDC_TIME_STAMP_ON
-    __gm__ BlockInfo* blockInfo = GetBlockInfo();
-    uint64_t dumpAddr = blockInfo->dumpAddr;
-    // WriteTLHead
-    *((__gm__ uint32_t*)dumpAddr) = static_cast<uint32_t>(DumpType::DUMP_TIME_STAMP);
-    *((__gm__ uint32_t*)dumpAddr + DUMP_TIME_STAMP_LEN_POS) = DUMP_TIME_STAMP_LEN;
-    // write value
-    *((__gm__ uint32_t*)dumpAddr + DUMP_TIME_STAMP_ID_POS) = descId;
-    *((__gm__ uint64_t*)((__gm__ uint32_t*)dumpAddr + DUMP_TIME_STAMP_CYCLE_POS)) =
-        static_cast<uint64_t>(GetSystemCycle());
-    *((__gm__ uint64_t*)((__gm__ uint32_t*)dumpAddr + DUMP_TIME_STAMP_PTR_POS)) = static_cast<uint64_t>(get_pc());
-    // update block addr
-    *((__gm__ uint64_t*)((__gm__ uint32_t*)blockInfo + BLOCK_INFO_DUMP_ADDR)) = dumpAddr + DUMP_TIME_STAMP_TOTAL_LEN;
-    *((__gm__ uint32_t*)blockInfo + BLOCK_INFO_DUMPOFFSET_POS) = blockInfo->dumpOffset - DUMP_TIME_STAMP_TOTAL_LEN;
-    dcci((__gm__ uint64_t*)blockInfo, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
-#endif
-}
+__aicore__ inline void DumpTimeStampImpl(uint32_t descId) { return; }
 
-__aicore__ inline void AscendCTimeStamp(uint32_t descId, uint64_t pcPtr = 0)
-{
-#ifdef ASCENDC_TIME_STAMP_ON
-    DumpTimeStampImpl(descId);
-#endif
-}
+__aicore__ inline void AscendCTimeStamp(uint32_t descId, uint64_t pcPtr = 0) { return; }
 
 __aicore__ inline void InitDump(bool mixFlag, uint32_t gmLen) {}
 __aicore__ inline void InitDump(bool mixFlag, GM_ADDR dumpStartAddr, uint32_t gmLen) {}
