@@ -26,9 +26,7 @@
 
 ## 功能说明
 
-头文件路径为：`"c_api/reg_compute/reg_convert.h"`。
-
-**本页所列无位置标签及\`_v2\`、\`_v3\`、\`_v4\`接口已废弃，后续版本将不再支持。请使用[asc_int4x22half](../reg_compute/reg_convert/asc_int4x22half.md)的显式位置参数重载。**
+**本页所列接口均不带位置参数，包括无后缀接口以及\`_v2\`、\`_v3\`、\`_v4\`接口，均已废弃，后续版本将不再支持。请使用[asc_int4x22half](../reg_compute/reg_convert/asc_int4x22half.md)的编译期位置标签重载。**
 
 将int4x2类型数据转换为half类型。
 
