@@ -63,7 +63,7 @@ for (int h = 0; h < matrix_num; h++) {
 
 **图1** NZ2DN示意图<a name="fig3981319172211"></a>
 
-![](../../../../figures/fixpipe_nz2dn.png)
+![](../../../../figures/fixpipe_nz2dn_c_api.png)
 
 对于该场景，图中参数与C API配置的对应关系如下：
 

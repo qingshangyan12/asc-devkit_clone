@@ -95,7 +95,7 @@ for (j = 0; j < m_size; j++) {
 <!-- npu="A3,910b" id7 -->
 **图1** NZ2NZ示意图（[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a name="zh-cn_topic_0000002515820868_fig199191646174210"></a>
 
-![](../../../../figures/Fixpipe_NZ2NZ.png)
+![](../../../../figures/fixpipe_nz2nz_c_api.png)
 
 示意图中参数设置示例（通过L0C Buffer搬出接口搬运并去除dummy数据）和解释说明如下：
 
@@ -109,7 +109,7 @@ for (j = 0; j < m_size; j++) {
 <!-- npu="950" id8 -->
 **图2** NZ2NZ示意图（[NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a name="zh-cn_topic_0000002515820868_fig199191646174233"></a>
 
-![](../../../../figures/Fixpipe_NZ2NZ_950.png)
+![](../../../../figures/fixpipe_nz2nz_c_api_950.png)
 
 示意图中参数设置示例（通过L0C Buffer搬出接口搬运并去除dummy数据）和解释说明如下：
 

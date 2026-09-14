@@ -35,7 +35,7 @@ M方向切分：
 
 **图1** NZ2NZ双目标搬运模式设置示意图<a name="fig1386816164556"></a>
 
-![](../../../../figures/nz2nz_l0c2ub_dual_dst.png)
+![](../../../../figures/nz2nz_l0c2ub_dual_dst_c_api.png)
 
 在NZ2ND模式下启用双目标模式如下图所示，分为按M维度拆分和按N维度拆分，按M维度拆分M必须为2的倍数，按N维度拆分N必须为32的倍数：
 
@@ -49,7 +49,7 @@ M方向切分：
 
 **图2** NZ2ND双目标搬出模式设置示意图<a name="fig715654093716"></a>
 
-![](../../../../figures/nz2nd_l0c2ub_dual_dst.png)
+![](../../../../figures/nz2nd_l0c2ub_dual_dst_c_api.png)
 
 图中`nd_num`、`src_nd_stride`、`dst_nd_stride`分别对应[asc_set_l0c_copy_nz_para](../asc_set_l0c_copy_nz_para.md)的`matrix_num`、`src_nz_matrix_stride`、`dst_matrix_stride`，本例取2、240、4096。`asc_copy_l0c2ub`通过`asc_dual_dst_mode::DUAL_DST_SPLIT_M`或`DUAL_DST_SPLIT_N`选择切分方向。NZ输出示例中的C0为16，`dst_stride`按目标元素计数。
 

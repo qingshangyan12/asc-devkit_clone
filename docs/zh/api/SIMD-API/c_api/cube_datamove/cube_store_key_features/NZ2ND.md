@@ -52,7 +52,7 @@ for (i = 0; i < matrix_num; i++) {
 
 **图1** NZ2ND示意图<a name="zh-cn_topic_0000002547300777_fig862819576334"></a>
 
-![](../../../../figures/Fixpipe_NZ2ND.png)
+![](../../../../figures/fixpipe_nz2nd_c_api.png)
 
 对于该场景，图中参数与C API配置的对应关系如下：
 

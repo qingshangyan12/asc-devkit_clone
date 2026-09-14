@@ -18,7 +18,7 @@ K方向对齐的核心功能是通过k_direction_align参数控制在使用float
 
 当设置k_direction_align = true时，L0A Buffer/L0B Buffer中的矩阵会将K方向对齐到 `ceil\(K/16\)\*16`。
 
-![K方向对齐示意图](../../../../figures/mmad_kdirectionalign.png)
+![K方向对齐示意图](../../../../figures/mmad_kdirectionalign_c_api.png)
 
 例如，当K=44和K=36时，都会被对齐到48。在这种情况下，对于K=44，L0A Buffer/L0B Buffer中的12个分形块都会被完整读入CUBE；而对于K=36的情况，虽然对齐后也是48，但只有其中的10个分形块会被读入CUBE。
 
