@@ -308,7 +308,7 @@ Reg矢量计算相关接口的完整接口清单请参考[Reg矢量计算](../..
 - 存储规格：[SSBuffer](../../programming_guide/advanced_programming/hardware_implementation/architecture_spec/npu_arch_3510.md)是3510架构AI Core内新增的核间通信存储单元，容量为3KB。SSBuffer使用独立于L1 Buffer和UB的地址空间，对应的地址空间限定符为`__ssbuf__`。详情请参见[SIMD BuiltIn关键字](../../programming_guide/language_extension/simd_builtin_keywords.md)。
 - 使用范围：
 
-  - SSBuffer在分离模式的AIC核数与AIV核数之比为1:2的混合算子中，AIC核与对应AIV核可通过SSBuffer交换数据，核函数类型和AIC核数与AIV核数之比必须满足核间同步接口的约束。
+  - SSBuffer在分离模式的AIC核数与AIV核数之比为1:2的混合算子中，AIC核与对应AIV核可通过SSBuffer交换数据，核函数（Kernel）类型和AIC核数与AIV核数之比必须满足核间同步接口的约束。
 
 - 访问方式：
 
