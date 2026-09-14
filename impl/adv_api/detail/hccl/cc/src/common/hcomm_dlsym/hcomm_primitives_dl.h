@@ -93,20 +93,7 @@ DECL_WEAK_FUNC(
     HcclResult, HcclSymWinGetPeerPointer, HcclCommSymWindow winHandle, size_t offset, uint32_t peerRank, void** ptr);
 DECL_WEAK_FUNC(
     HcclResult, HcclCommSymWinGet, HcclComm comm, void* ptr, size_t size, HcclCommSymWindow* winHandle, size_t* offset);
-#ifdef HCOMM_TIMEOUT_FLOAT_TYPE
-DECL_WEAK_FUNC(int32_t, HcommSetNotifyWaitTimeOut, float timeOut);
-#else
-DECL_WEAK_FUNC(int32_t, HcommSetNotifyWaitTimeOut, uint32_t timeOut);
-#endif
-DECL_WEAK_FUNC(
-    int32_t, HcommChannelNotifyWaitOnThreadWithDefaultTimeout, ThreadHandle thread, ChannelHandle channel,
-    uint32_t localNotifyIdx);
 DECL_SUPPORT_FLAG(HcommBatchTransferOnThread);
-DECL_SUPPORT_FLAG(HcommSetNotifyWaitTimeOut);
-DECL_SUPPORT_FLAG(HcommChannelNotifyWaitOnThreadWithDefaultTimeout);
-
-HcclResult HcclChannelNotifyWaitOnThreadDefault(
-    ThreadHandle thread, ChannelHandle channel, uint32_t localNotifyIdx, uint32_t fallbackTimeout);
 
 bool Mc2HcommIsSupportAicpuTsTaskCache(void);
 int32_t Mc2HcommAicpuTsTaskCacheLookup(const char* tag, bool* isHit);

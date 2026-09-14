@@ -95,11 +95,6 @@ private:
     std::vector<u32> rankList_;
 
     bool isDmaRead_{false};
-    bool supportSymmetricMemAccess_{false};
-    u64 inputOffset_{0};
-    u64 outputOffset_{0};
-    void* inputSymWindow_{nullptr};
-    void* outputSymWindow_{nullptr};
     std::vector<u64> dataSplit_;
     std::vector<u64> dataOffset_;
     std::vector<u64> dataSplitTail_;
