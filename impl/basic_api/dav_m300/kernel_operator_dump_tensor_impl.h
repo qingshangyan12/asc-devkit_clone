@@ -369,6 +369,56 @@ __aicore__ inline void DumpShapeImpl(const ShapeInfo& shapeInfo)
     }
 }
 
+#ifdef ASCENDC_TIME_STAMP_ON
+// 3002 has no __get_entry_sys_cnt() builtin, so the kernel entry cycle is captured on the first
+// PrintTimeStamp call of each block and then reused as the baseline of the following TLVs.
+__BLOCK_LOCAL__ __inline__ uint8_t g_timeStampEntryFlag = 0;
+__BLOCK_LOCAL__ __inline__ uint64_t g_timeStampEntryCycle = 0;
+#endif
+
+__aicore__ inline void WriteRingBufTimeStampInfo(uint32_t descId, uint64_t cycle, uint64_t entry)
+{
+    using TimeStampTlvInfo = __asc_aicore::TimeStampTlv;
+    __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
+    if (blockRingBufInfo == nullptr) {
+        return;
+    }
+    uint32_t tlvLen = sizeof(TimeStampTlvInfo);
+    if (!CheckAndWaitRingBufSpace(blockRingBufInfo, tlvLen)) {
+        return;
+    }
+    __gm__ TimeStampTlvInfo* timeStampTlv = reinterpret_cast<__gm__ TimeStampTlvInfo*>(GetRingBufTlv(blockRingBufInfo));
+    timeStampTlv->type = static_cast<uint32_t>(DumpType::DUMP_TIME_STAMP);
+    timeStampTlv->length = tlvLen - sizeof(uint32_t[2]);
+    timeStampTlv->descId = descId;
+    timeStampTlv->blockIdx = static_cast<uint16_t>(GetBlockIdxImpl());
+    timeStampTlv->resv = static_cast<uint16_t>(0U);
+    timeStampTlv->cycle = cycle;
+    timeStampTlv->pc = static_cast<uint64_t>(__asc_aicore::asc_debug_get_program_counter());
+    timeStampTlv->entry = entry;
+    timeStampTlv->resvMem[0] = static_cast<uint32_t>(0U);
+    timeStampTlv->resvMem[1] = static_cast<uint32_t>(0U);
+    dcci((__gm__ uint64_t*)timeStampTlv, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
+
+    __gm__ RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockRingBufInfo);
+
+    UpdateWriteInfo(writeInfo, tlvLen);
+}
+
+__aicore__ inline void DumpTimeStampRingBufImpl(uint32_t descId)
+{
+#ifdef ASCENDC_TIME_STAMP_ON
+    EnablePrintf();
+    const uint64_t cycle = static_cast<uint64_t>(__asc_aicore::asc_debug_get_system_cycle());
+    if (g_timeStampEntryFlag == 0) {
+        g_timeStampEntryFlag = 1;
+        g_timeStampEntryCycle = cycle;
+        WriteRingBufTimeStampInfo(static_cast<uint32_t>(TimeStampId::TIME_STAMP_WRAP_FIRST), cycle, cycle);
+    }
+    WriteRingBufTimeStampInfo(descId, cycle, g_timeStampEntryCycle);
+#endif
+}
+
 template <typename T>
 __aicore__ inline void WriteRingBufTlvData(
     const LocalTensor<T>& src, __gm__ DumpTensorTlvInfoHead* dumpTensorTlv, const uint32_t& alignDumpDataLen,
@@ -504,7 +554,16 @@ __aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Ar
     __asc_aicore::printf_impl(fmt, args...);
 }
 
-__aicore__ inline void DumpTimeStampImpl(uint32_t descId) { return; }
+__aicore__ inline void DumpTimeStampImpl(uint32_t descId)
+{
+    uint64_t ctrlValue = get_ctrl();
+    set_atomic_none();
+    dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
+    if (g_sysPrintFifoSpace != nullptr) {
+        DumpTimeStampRingBufImpl(descId);
+    }
+    set_ctrl(ctrlValue);
+}
 
 __aicore__ inline void AscendCTimeStamp(uint32_t descId, uint64_t pcPtr = 0) { return; }
 
