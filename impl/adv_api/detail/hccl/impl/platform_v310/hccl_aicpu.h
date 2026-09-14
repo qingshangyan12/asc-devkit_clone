@@ -30,8 +30,6 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::InitV2(
     GM_ADDR context, const void* initTiling)
 {
-    // ASCENDC_HCCL_API_ASSERT(
-    //     initTiling != nullptr, { return; }, "Call InitV2 failed, ensure initTiling is not nullptr!");
     if (initTiling != nullptr) {
         const Mc2InitTilingInner* initTilingPtr = static_cast<const Mc2InitTilingInner*>(initTiling);
         debugMode_ = initTilingPtr->debugMode;
@@ -44,23 +42,15 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
         return;
     }
     // initTiling is nullptr, get opType from context
-    // debugMode_ = context->debugMode;
-    // devType_ = context->devType;
     hcclContext_ = (__gm__ OpResCtx*)context;
     ASCENDC_HCCL_API_ASSERT(
         hcclContext_ != nullptr, { return; }, "Init Hccl failed, context addr is nullptr.");
     InitInner(hcclContext_->workspace, HcclTilingVersion::CONTEXT_DECOUPLE_VERSION);
-
-    
-    for (uint8_t i = 0; i < HCCL_ALG_SUPPORT_NUM; i++) {
-        const uint32_t opType = hcclContext_->opType;
-        ASCENDC_HCCL_API_ASSERT(
-            opType < static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL), { return ; },
-            "Call InitV2 failed, ensure cmdType is valid");
-        ccOpTilingDataTable_[opType] = 0;
-        ccOpParamTable_[opType] = hcclContext_->algInfo[i].opParam;
-    }
-    
+    const uint32_t opType = hcclContext_->opType[0];
+    ASCENDC_HCCL_API_ASSERT(
+        opType < static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL), { return ; },
+        "Call InitV2 failed, ensure cmdType is valid");
+    ccOpParamTable_[opType] = hcclContext_->algInfo[0].opParam;
 }
 
 template <const auto& config>
@@ -69,6 +59,9 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, confi
     ASCENDC_HCCL_API_ASSERT(
         curVersion_ == HcclTilingVersion::CONTEXT_DECOUPLE_VERSION, { return HCCL_FAILED; },
         "Call SetCcTiling failed, ensure Hccl::InitV2 func has been called successfully!");
+    ASCENDC_HCCL_API_ASSERT(
+        tilingBaseAddr_ != 0UL, { return HCCL_FAILED; },
+        "Call SetCcTilingV2 failed, InitV2 must be called with valid initTiling!");
     const uint32_t opType = (reinterpret_cast<Mc2CcTilingInner*>(tilingBaseAddr_ + offset))->opType;
     ASCENDC_HCCL_API_ASSERT(
         opType < static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL), { return HCCL_FAILED; },
