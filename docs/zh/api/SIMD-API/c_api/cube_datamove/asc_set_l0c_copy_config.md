@@ -6,10 +6,10 @@
 - Ascend 950PR/Ascend 950DT：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
@@ -64,6 +64,7 @@ PIPE_S
 
 ## 约束说明
 
+- 量化参数不能为inf/nan和非规格化数。
 - 本接口仅在AIC上生效，在AIV上调用将直接返回。
 <!-- npu="950" id8 -->
 - 针对Ascend 950PR/Ascend 950DT，用于存储tensor量化参数的Fixpipe Buffer大小为4KB，用于存储tensor激活参数的Fixpipe Buffer大小为2KB，两块存储空间相互独立，地址均从0开始。tensor量化参数和tensor激活参数的起始地址和占用空间不能超出对应Buffer的范围。
