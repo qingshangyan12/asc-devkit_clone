@@ -1377,7 +1377,7 @@ __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163\n"
     class_body += "    copy_gm_to_ubuf_align_v2((__ubuf__ uint8_t *)tilingdata_in_ub, \
 (__gm__ uint8_t *)p_tilingdata, 0, 1, len_burst * 32, 0, 0, false, 0, 0);\n"
 
-    class_body += "#elif __NPU_ARCH__ != 3102\n"
+    class_body += "#elif __NPU_ARCH__ != 3102 &&  __NPU_ARCH__ != 3103 \n"
     class_body += "    copy_gm_to_ubuf(((__ubuf__ uint8_t *)tilingdata_in_ub), p_tilingdata, 0, 1,\
 len_burst, 0, 0);\n"
     class_body += "#else\n"
