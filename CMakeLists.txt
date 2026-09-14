@@ -61,3 +61,6 @@ if(PACKAGE_OPEN_PROJECT)
   include(cmake/package.cmake)
   include(cmake/version_info.cmake)
 endif()
+
+# [gate-test] 场景2: add_cann_third_party 形式引入在册三方库（9.2.0 分支）
+add_cann_third_party(json)
