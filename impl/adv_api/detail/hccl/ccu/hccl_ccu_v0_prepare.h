@@ -354,6 +354,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     constexpr uint64_t meshBandwidth = 11U;
     constexpr uint64_t totalBandwidth = 21U;
     constexpr uint64_t splitAlignment = 128U;
+    constexpr uint64_t memsliceSize = CCU_MEMSLICE_SIZE * 8U;
+    constexpr uint64_t threshold8M = 8U * 1024U * 1024U;
+    constexpr uint64_t threshold32M = 32U * 1024U * 1024U;
     const uint64_t dataTypeSize = GetHcclDataTypeSize(commParam->dataType);
     const uint64_t totalSize = commParam->count * dataTypeSize;
     const uint64_t repeatOffset = totalSize * ccuParam_.repeatIndex;
@@ -363,6 +366,13 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     const uint64_t inputBase = reinterpret_cast<uint64_t>(commParam->sendBuf) + repeatOffset;
     const uint64_t outputBase = reinterpret_cast<uint64_t>(commParam->recvBuf) + repeatOffset;
 
+    uint64_t loopCount = CCU_LOOP_COUNT_M2M_AG;
+    if (totalSize > threshold32M) {
+        loopCount = CCU_LOOP_COUNT_M2M_AG * 4U;
+    } else if (totalSize > threshold8M) {
+        loopCount = CCU_LOOP_COUNT_M2M_AG * 2U;
+    }
+
     xnData_[KFC_CONCURRENT_A2A_OP_ID] = GetOpId(commParam);
     xnData_[KFC_CONCURRENT_A2A_MESH_INPUT] = inputBase;
     xnData_[KFC_CONCURRENT_A2A_MESH_OUTPUT] = outputBase;
@@ -370,7 +380,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[KFC_CONCURRENT_A2A_MESH_SRC_STRIDE] = strideSize;
     xnData_[KFC_CONCURRENT_A2A_MESH_SRC_OFFSET] = 0U;
     xnData_[KFC_CONCURRENT_A2A_MESH_DST_OFFSET] = strideSize * ccuParam_.rankId;
-    CalcGoSize(meshSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_CONCURRENT_A2A_MESH_GO_SIZE_0]);
+    CalcGoSize(meshSize, loopCount, memsliceSize, &xnData_[KFC_CONCURRENT_A2A_MESH_GO_SIZE_0]);
 
     xnData_[KFC_CONCURRENT_A2A_CLOS_INPUT] = inputBase + meshSize;
     xnData_[KFC_CONCURRENT_A2A_CLOS_OUTPUT] = outputBase + meshSize;
@@ -378,7 +388,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[KFC_CONCURRENT_A2A_CLOS_SRC_STRIDE] = strideSize;
     xnData_[KFC_CONCURRENT_A2A_CLOS_SRC_OFFSET] = 0U;
     xnData_[KFC_CONCURRENT_A2A_CLOS_DST_OFFSET] = strideSize * ccuParam_.rankId;
-    CalcGoSize(closSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_CONCURRENT_A2A_CLOS_GO_SIZE_0]);
+    CalcGoSize(closSize, loopCount, memsliceSize, &xnData_[KFC_CONCURRENT_A2A_CLOS_GO_SIZE_0]);
 }
 
 template <const auto& config>
