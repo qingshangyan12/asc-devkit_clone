@@ -34,14 +34,12 @@ __aicore__ inline constexpr StoreDist GetStoreDist()
 {
     if constexpr (dist == StoreDist::DIST_NORM) {
         static_assert(
-            SupportBytes<T, 1, 2, 4, 8>(), "StoreDist DIST_NORM only support type b8/b16/b32/b64 on current device");
+            SupportBytes<T, 1, 2, 4, 8>(), "StoreDist DIST_NORM only support type b8/b16/b32 on current device");
         if constexpr (sizeof(T) == 1) {
             return StoreDist::DIST_NORM_B8;
         } else if constexpr (sizeof(T) == 2) {
             return StoreDist::DIST_NORM_B16;
         } else if constexpr (sizeof(T) == 4) {
-            return StoreDist::DIST_NORM_B32;
-        } else if constexpr (sizeof(T) == 8) {
             return StoreDist::DIST_NORM_B32;
         }
     }
@@ -175,18 +173,6 @@ __simd_callee__ inline void CopyMerging(RegT& dstReg, RegT& srcReg, MaskReg& mas
             vmov((RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg.reg[1], mask, modeValue);
         }
     }
-}
-
-template <typename T, typename U>
-__simd_callee__ inline void B64TraitOneToTraitTwo(T& dstReg, U& srcReg)
-{
-    TraitOneToTraitTwoTmpl<T, U, uint32_t>(dstReg, srcReg);
-}
-
-template <typename T, typename U>
-__simd_callee__ inline void B64TraitTwoToTraitOne(T& dstReg, U& srcReg)
-{
-    TraitTwoToTraitOneTmpl<T, U, uint32_t>(dstReg, srcReg);
 }
 
 template <typename T, typename U>

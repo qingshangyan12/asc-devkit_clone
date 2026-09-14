@@ -30,22 +30,6 @@
 
 namespace AscendC {
 namespace Reg {
-template <typename T, typename U>
-__simd_callee__ inline void DuplicateB64Impl(U& dstReg, T scalarValue)
-{
-    using ActualT = typename U::ActualT;
-    static_assert(sizeof(ActualT) == 8, "data type should be B64");
-    static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "U should be RegTraitNumTwo for DuplicateB64Impl");
-    vbr((RegTensor<uint32_t>&)dstReg.reg[0], static_cast<uint32_t>(scalarValue));
-    if constexpr (sizeof(T) == 8) {
-        vbr((RegTensor<uint32_t>&)dstReg.reg[1], static_cast<uint32_t>(scalarValue >> 32));
-    } else if constexpr (IsSameType<T, uint32_t>::value) {
-        vbr((RegTensor<uint32_t>&)dstReg.reg[1], 0);
-    } else {
-        vbr((RegTensor<uint32_t>&)dstReg.reg[1], static_cast<uint32_t>(scalarValue >> 31));
-    }
-}
-
 template <typename T = DefaultType, typename U, typename S>
 __simd_callee__ inline void DuplicateImpl(S& dstReg, U scalarValue)
 {
@@ -54,7 +38,7 @@ __simd_callee__ inline void DuplicateImpl(S& dstReg, U scalarValue)
     static_assert(
         (SupportType<
             ActualT, bool, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t,
-            fp8_e8m0_t, uint16_t, int16_t, bfloat16_t, uint32_t, int32_t, float, half, uint64_t, int64_t>()),
+            fp8_e8m0_t, uint16_t, int16_t, bfloat16_t, uint32_t, int32_t, float, half>()),
         "current data type is not supported on current device!");
     static_assert(Std::is_convertible<U, ActualT>(), "scalarValue data type could be converted to RegTensor data type");
 
@@ -65,33 +49,8 @@ __simd_callee__ inline void DuplicateImpl(S& dstReg, U scalarValue)
         IsSameType<ActualT, hifloat8_t>::value || IsSameType<ActualT, fp8_e8m0_t>::value ||
         IsSameType<ActualT, fp8_e5m2_t>::value || IsSameType<ActualT, fp8_e4m3fn_t>::value) {
         vbr((RegTensor<int8_t>&)dstReg, (int8_t&)scalarValue);
-    } else if constexpr (sizeof(ActualT) != 8) {
+    } else {
         vbr(dstReg, (ActualT)scalarValue);
-    } else {
-        if constexpr (CheckRegTrait<S, RegTraitNumOne>()) {
-            RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
-            DuplicateB64Impl(traitTwoDstReg, scalarValue);
-            B64TraitTwoToTraitOne(dstReg, traitTwoDstReg);
-        } else if constexpr (CheckRegTrait<S, RegTraitNumTwo>()) {
-            DuplicateB64Impl(dstReg, scalarValue);
-        }
-    }
-}
-
-template <MaskMergeMode mode = MaskMergeMode::ZEROING, typename T, typename U>
-__simd_callee__ inline void DuplicateB64Impl(U& dstReg, T scalarValue, MaskReg& mask)
-{
-    using ActualT = typename U::ActualT;
-    static_assert(sizeof(ActualT) == 8, "data type should be B64");
-    static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "U should be RegTraitNumTwo for DuplicateB64Impl");
-    constexpr auto modeValue = GetMaskMergeMode<mode>();
-    vdup((RegTensor<uint32_t>&)dstReg.reg[0], static_cast<uint32_t>(scalarValue), mask, modeValue);
-    if constexpr (sizeof(T) == 8) {
-        vdup((RegTensor<uint32_t>&)dstReg.reg[1], static_cast<uint32_t>(scalarValue >> 32), mask, modeValue);
-    } else if constexpr (IsSameType<T, uint32_t>::value) {
-        vdup((RegTensor<uint32_t>&)dstReg.reg[1], 0, mask, modeValue);
-    } else {
-        vdup((RegTensor<uint32_t>&)dstReg.reg[1], static_cast<uint32_t>(scalarValue >> 31), mask, modeValue);
     }
 }
 
@@ -103,7 +62,7 @@ __simd_callee__ inline void DuplicateImpl(S& dstReg, U scalarValue, MaskReg& mas
     static_assert(
         (SupportType<
             ActualT, bool, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t,
-            fp8_e8m0_t, uint16_t, int16_t, bfloat16_t, uint32_t, int32_t, float, half, uint64_t, int64_t>()),
+            fp8_e8m0_t, uint16_t, int16_t, bfloat16_t, uint32_t, int32_t, float, half>()),
         "current data type is not supported on current device!");
     static_assert(Std::is_convertible<U, ActualT>(), "scalarValue data type could be converted to RegTensor data type");
     ASCENDC_ASSERT((mode != MaskMergeMode::UNKNOWN), {
@@ -117,38 +76,9 @@ __simd_callee__ inline void DuplicateImpl(S& dstReg, U scalarValue, MaskReg& mas
         IsSameType<ActualT, hifloat8_t>::value || IsSameType<ActualT, fp8_e8m0_t>::value ||
         IsSameType<ActualT, fp8_e5m2_t>::value || IsSameType<ActualT, fp8_e4m3fn_t>::value) {
         vdup((RegTensor<int8_t>&)dstReg, (int8_t&)scalarValue, mask, modeValue);
-    } else if constexpr (sizeof(ActualT) != 8) {
-        vdup(dstReg, (ActualT)scalarValue, mask, modeValue);
     } else {
-        if constexpr (CheckRegTrait<S, RegTraitNumOne>()) {
-            MaskReg maskTrait2;
-            Pack(maskTrait2, mask);
-            if constexpr (mode == MaskMergeMode::MERGING) {
-                RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
-                B64TraitOneToTraitTwo(traitTwoDstReg, dstReg);
-                DuplicateB64Impl<mode>(traitTwoDstReg, scalarValue, maskTrait2);
-                B64TraitTwoToTraitOne(dstReg, traitTwoDstReg);
-            } else {
-                RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
-                DuplicateB64Impl<mode>(traitTwoDstReg, scalarValue, maskTrait2);
-                B64TraitTwoToTraitOne(dstReg, traitTwoDstReg);
-            }
-        } else if constexpr (CheckRegTrait<S, RegTraitNumTwo>()) {
-            DuplicateB64Impl<mode>(dstReg, scalarValue, mask);
-        }
+        vdup(dstReg, (ActualT)scalarValue, mask, modeValue);
     }
-}
-
-template <HighLowPart pos = HighLowPart::LOWEST, MaskMergeMode mode = MaskMergeMode::ZEROING, typename T>
-__simd_callee__ inline void DuplicateB64Impl(T& dstReg, T& srcReg, MaskReg& mask)
-{
-    using ActualT = typename T::ActualT;
-    static_assert(sizeof(ActualT) == 8, "data type should be B64");
-    static_assert(CheckRegTrait<T, RegTraitNumTwo>(), "T should be RegTraitNumTwo for DuplicateB64Impl");
-    constexpr auto posValue = std::integral_constant<::Pos, static_cast<::Pos>(pos)>();
-    constexpr auto modeValue = GetMaskMergeMode<mode>();
-    vdup((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)srcReg.reg[0], mask, posValue, modeValue);
-    vdup((RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg.reg[1], mask, posValue, modeValue);
 }
 
 template <
@@ -161,7 +91,7 @@ __simd_callee__ inline void DuplicateImpl(U& dstReg, U& srcReg, MaskReg& mask)
     static_assert(
         (SupportType<
             ActualT, bool, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t,
-            fp8_e8m0_t, uint16_t, int16_t, bfloat16_t, uint32_t, int32_t, float, half, uint64_t, int64_t>()),
+            fp8_e8m0_t, uint16_t, int16_t, bfloat16_t, uint32_t, int32_t, float, half>()),
         "current data type is not supported on current device!");
     ASCENDC_ASSERT((mode != MaskMergeMode::UNKNOWN), {
         KERNEL_LOG(KERNEL_ERROR, "The MergeMode only support: MODE_MERGING, MODE_ZEROING.");
@@ -175,38 +105,9 @@ __simd_callee__ inline void DuplicateImpl(U& dstReg, U& srcReg, MaskReg& mask)
         IsSameType<ActualT, hifloat8_t>::value || IsSameType<ActualT, fp8_e8m0_t>::value ||
         IsSameType<ActualT, fp8_e5m2_t>::value || IsSameType<ActualT, fp8_e4m3fn_t>::value) {
         vdup((RegTensor<int8_t>&)dstReg, (RegTensor<int8_t>&)srcReg, mask, posValue, modeValue);
-    } else if constexpr (sizeof(ActualT) != 8) {
-        vdup(dstReg, srcReg, mask, posValue, modeValue);
     } else {
-        if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
-            MaskReg maskTrait2;
-            Pack(maskTrait2, mask);
-            RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
-            RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg;
-            if constexpr (mode == MaskMergeMode::MERGING) {
-                B64TraitOneToTraitTwo(traitTwoDstReg, dstReg);
-            }
-            B64TraitOneToTraitTwo(traitTwoSrcReg, srcReg);
-            DuplicateB64Impl<pos, mode>(traitTwoDstReg, traitTwoSrcReg, maskTrait2);
-            B64TraitTwoToTraitOne(dstReg, traitTwoDstReg);
-        } else if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
-            DuplicateB64Impl<pos, mode>(dstReg, srcReg, mask);
-        }
+        vdup(dstReg, srcReg, mask, posValue, modeValue);
     }
-}
-
-template <typename T>
-__simd_callee__ inline void InterleaveB64Impl(T& dstReg0, T& dstReg1, T& srcReg0, T& srcReg1)
-{
-    using ActualT = typename T::ActualT;
-    static_assert(sizeof(ActualT) == 8, "data type should be B64");
-    static_assert(CheckRegTrait<T, RegTraitNumTwo>(), "T should be RegTraitNumTwo for InterleaveB64Impl");
-    Interleave(
-        (RegTensor<uint32_t>&)dstReg0.reg[0], (RegTensor<uint32_t>&)dstReg1.reg[0],
-        (RegTensor<uint32_t>&)srcReg0.reg[0], (RegTensor<uint32_t>&)srcReg1.reg[0]);
-    Interleave(
-        (RegTensor<uint32_t>&)dstReg0.reg[1], (RegTensor<uint32_t>&)dstReg1.reg[1],
-        (RegTensor<uint32_t>&)srcReg0.reg[1], (RegTensor<uint32_t>&)srcReg1.reg[1]);
 }
 
 template <typename T = DefaultType, typename U>
@@ -214,8 +115,7 @@ __simd_callee__ inline void InterleaveImpl(U& dstReg0, U& dstReg1, U& srcReg0, U
 {
     using ActualT = typename U::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(
-        SupportBytes<ActualT, 1, 2, 4, 8>(), "Interleave only support type bool/b8/b16/b32/b64 on current device");
+    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "Interleave only support type bool/b8/b16/b32 on current device");
     if constexpr (sizeof(ActualT) == 1) {
         vintlv(
             (RegTensor<int8_t>&)dstReg0, (RegTensor<int8_t>&)dstReg1, (RegTensor<int8_t>&)srcReg0,
@@ -224,32 +124,11 @@ __simd_callee__ inline void InterleaveImpl(U& dstReg0, U& dstReg1, U& srcReg0, U
         vintlv(
             (RegTensor<int16_t>&)dstReg0, (RegTensor<int16_t>&)dstReg1, (RegTensor<int16_t>&)srcReg0,
             (RegTensor<int16_t>&)srcReg1);
-    } else if constexpr (sizeof(ActualT) == 4) {
+    } else {
         vintlv(
             (RegTensor<int32_t>&)dstReg0, (RegTensor<int32_t>&)dstReg1, (RegTensor<int32_t>&)srcReg0,
             (RegTensor<int32_t>&)srcReg1);
-    } else {
-        static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "Interleave only support RegTraitNumTwo on current device");
-        U dstTemp0;
-        U dstTemp1;
-        InterleaveB64Impl(dstTemp0, dstTemp1, srcReg0, srcReg1);
-        dstReg0 = dstTemp0;
-        dstReg1 = dstTemp1;
     }
-}
-
-template <typename T>
-__simd_callee__ inline void DeInterleaveB64Impl(T& dstReg0, T& dstReg1, T& srcReg0, T& srcReg1)
-{
-    using ActualT = typename T::ActualT;
-    static_assert(sizeof(ActualT) == 8, "data type should be B64");
-    static_assert(CheckRegTrait<T, RegTraitNumTwo>(), "T should be RegTraitNumTwo for DeInterleaveB64Impl");
-    DeInterleave(
-        (RegTensor<uint32_t>&)dstReg0.reg[0], (RegTensor<uint32_t>&)dstReg1.reg[0],
-        (RegTensor<uint32_t>&)srcReg0.reg[0], (RegTensor<uint32_t>&)srcReg1.reg[0]);
-    DeInterleave(
-        (RegTensor<uint32_t>&)dstReg0.reg[1], (RegTensor<uint32_t>&)dstReg1.reg[1],
-        (RegTensor<uint32_t>&)srcReg0.reg[1], (RegTensor<uint32_t>&)srcReg1.reg[1]);
 }
 
 template <typename T = DefaultType, typename U>
@@ -257,8 +136,7 @@ __simd_callee__ inline void DeInterleaveImpl(U& dstReg0, U& dstReg1, U& srcReg0,
 {
     using ActualT = typename U::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(
-        SupportBytes<ActualT, 1, 2, 4, 8>(), "DeInterleave only support type bool/b8/b16/b32/b64 on current device");
+    static_assert(SupportBytes<ActualT, 1, 2, 4>(), "DeInterleave only support type bool/b8/b16/b32 on current device");
     if constexpr (sizeof(ActualT) == 1) {
         vdintlv(
             (RegTensor<int8_t>&)dstReg0, (RegTensor<int8_t>&)dstReg1, (RegTensor<int8_t>&)srcReg0,
@@ -267,17 +145,10 @@ __simd_callee__ inline void DeInterleaveImpl(U& dstReg0, U& dstReg1, U& srcReg0,
         vdintlv(
             (RegTensor<int16_t>&)dstReg0, (RegTensor<int16_t>&)dstReg1, (RegTensor<int16_t>&)srcReg0,
             (RegTensor<int16_t>&)srcReg1);
-    } else if constexpr (sizeof(ActualT) == 4) {
+    } else {
         vdintlv(
             (RegTensor<int32_t>&)dstReg0, (RegTensor<int32_t>&)dstReg1, (RegTensor<int32_t>&)srcReg0,
             (RegTensor<int32_t>&)srcReg1);
-    } else {
-        static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "DeInterleave only support RegTraitNumTwo on current device");
-        U dstTemp0;
-        U dstTemp1;
-        DeInterleaveB64Impl(dstTemp0, dstTemp1, srcReg0, srcReg1);
-        dstReg0 = dstTemp0;
-        dstReg1 = dstTemp1;
     }
 }
 } // namespace Reg

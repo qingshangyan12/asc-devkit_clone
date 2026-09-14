@@ -29,36 +29,6 @@
 
 namespace AscendC {
 namespace Reg {
-template <typename T0 = DefaultType, typename T1, typename T2 = DefaultType, typename T3, typename T4>
-__simd_callee__ inline void DataCopyGatherB64Impl(T3& dstReg, __ubuf__ T1* baseAddr, T4& index, MaskReg& mask)
-{
-    // index u32
-    if constexpr (CheckRegTrait<T3, RegTraitNumOne>()) {
-        MaskReg dstMask;
-        RegTensor<uint32_t> oddIndex;
-        RegTensor<uint32_t> evenIndex;
-        RegTensor<uint32_t> oddReg;
-        RegTensor<uint32_t> evenReg;
-        RegTensor<uint32_t> tmpReg;
-        Pack(dstMask, mask);
-        MaskReg lowerMask = CreateMask<uint32_t, MaskPattern::VL32>();
-        MaskReg preg = CreateMask<uint32_t, MaskPattern::ALL>();
-        And(dstMask, dstMask, lowerMask, preg);
-        Muls(oddIndex, index, uint32_t(2), dstMask);
-        Adds(evenIndex, oddIndex, uint32_t(1), dstMask);
-        vgather2(oddReg, (__ubuf__ uint32_t*)baseAddr, oddIndex, dstMask);
-        vgather2(evenReg, (__ubuf__ uint32_t*)baseAddr, evenIndex, dstMask);
-        Interleave((RegTensor<uint32_t>&)dstReg, tmpReg, oddReg, evenReg);
-    } else {
-        RegTensor<uint32_t> oddIndex;
-        RegTensor<uint32_t> evenIndex;
-        Muls(oddIndex, index, uint32_t(2), mask);
-        Adds(evenIndex, oddIndex, uint32_t(1), mask);
-        vgather2((RegTensor<uint32_t>&)dstReg.reg[0], (__ubuf__ uint32_t*)baseAddr, oddIndex, mask);
-        vgather2((RegTensor<uint32_t>&)dstReg.reg[1], (__ubuf__ uint32_t*)baseAddr, evenIndex, mask);
-    }
-}
-
 // vgather2
 template <typename T0 = DefaultType, typename T1, typename T2 = DefaultType, typename T3, typename T4>
 __simd_callee__ inline void DataCopyGatherImpl(T3& dstReg, __ubuf__ T1* baseAddr, T4& index, MaskReg& mask)
@@ -70,36 +40,15 @@ __simd_callee__ inline void DataCopyGatherImpl(T3& dstReg, __ubuf__ T1* baseAddr
     static_assert(
         (sizeof(T1) == 1 && sizeof(ActualDstT) == 2 && Std::is_same_v<ActualIndexT, uint16_t>) ||
             (sizeof(T1) == 2 && sizeof(ActualDstT) == 2 && Std::is_same_v<ActualIndexT, uint16_t>) ||
-            (sizeof(T1) == 4 && sizeof(ActualDstT) == 4 && Std::is_same_v<ActualIndexT, uint32_t>) ||
-            (sizeof(T1) == 8 && sizeof(ActualDstT) == 8 && SupportType<ActualIndexT, uint32_t, uint64_t>()),
-        "Gather only support src data type b8/b16/b32/b64 with dst type is b16/b16/b32/b64 respectively and "
-        "each index type is u16/u16/u32/(u32/u64) respectively on current device");
-    // when index T4<b64, 1> only 32 element valid not support T3<b64, 2> mode
-    static_assert(
-        !(sizeof(T1) == 8 && Std::is_same_v<ActualIndexT, uint64_t> && CheckRegTrait<T4, RegTraitNumOne>() &&
-          CheckRegTrait<T3, RegTraitNumTwo>()),
-        "current data type is not supported on current device!");
+            (sizeof(T1) == 4 && sizeof(ActualDstT) == 4 && Std::is_same_v<ActualIndexT, uint32_t>),
+        "Gather only support src data type b8/b16/b32 with dst type is b16/b16/b32 respectively and "
+        "each index type is u16/u16/u32 respectively on current device");
     if constexpr (sizeof(T1) == 1 && sizeof(ActualDstT) == 2) {
         vgather2((vector_s16&)dstReg, (__ubuf__ int8_t*)baseAddr, index, mask);
     } else if constexpr (sizeof(T1) == 2 && sizeof(ActualDstT) == 2) {
         vgather2((vector_s16&)dstReg, (__ubuf__ int16_t*)baseAddr, index, mask);
-    } else if constexpr (sizeof(T1) == 4 && sizeof(ActualDstT) == 4) {
-        vgather2((vector_s32&)dstReg, (__ubuf__ int32_t*)baseAddr, index, mask);
     } else {
-        if constexpr (Std::is_same_v<ActualIndexT, uint32_t>) {
-            DataCopyGatherB64Impl(dstReg, baseAddr, index, mask);
-        } else if constexpr (Std::is_same_v<ActualIndexT, uint64_t>) {
-            if constexpr (CheckRegTrait<T4, RegTraitNumOne>() && CheckRegTrait<T3, RegTraitNumOne>()) {
-                RegTensor<uint32_t> lowIndex;
-                RegTensor<uint32_t> highIndex;
-                DeInterleave(lowIndex, highIndex, (RegTensor<uint32_t>&)index, (RegTensor<uint32_t>&)index);
-                DataCopyGatherB64Impl(dstReg, baseAddr, lowIndex, mask);
-            } else if constexpr (
-                (CheckRegTrait<T4, RegTraitNumTwo>() && CheckRegTrait<T3, RegTraitNumOne>()) ||
-                (CheckRegTrait<T4, RegTraitNumTwo>() && CheckRegTrait<T3, RegTraitNumTwo>())) {
-                DataCopyGatherB64Impl(dstReg, baseAddr, (RegTensor<uint32_t>&)index.reg[0], mask);
-            }
-        }
+        vgather2((vector_s32&)dstReg, (__ubuf__ int32_t*)baseAddr, index, mask);
     }
 }
 
@@ -114,47 +63,13 @@ __simd_callee__ inline void DataCopyGatherBImpl(U& dstReg, __ubuf__ T* baseAddr,
     static_assert(CheckRegTrait<U, RegTraitNumOne>(), "RegTensor only support RegTraitNumOne on current device!");
     static_assert(CheckRegTrait<S, RegTraitNumOne>(), "RegTensor only support RegTraitNumOne on current device!");
     static_assert(
-        SupportBytes<ActualT, 1, 2, 4, 8>(),
-        "GatherB only support src & dst datatype b8/b16/b32/b64 on current device");
+        SupportBytes<ActualT, 1, 2, 4>(), "GatherB only support src & dst datatype b8/b16/b32 on current device");
     if constexpr (sizeof(ActualT) == 1) {
         vgatherb((vector_s8&)dstReg, (__ubuf__ int8_t*)baseAddr, index, mask);
     } else if constexpr (sizeof(ActualT) == 2) {
         vgatherb((vector_s16&)dstReg, (__ubuf__ int16_t*)baseAddr, index, mask);
-    } else if constexpr (sizeof(ActualT) == 4) {
+    } else {
         vgatherb((vector_s32&)dstReg, (__ubuf__ int32_t*)baseAddr, index, mask);
-    } else {
-        vgatherb((vector_s64&)dstReg, (__ubuf__ int64_t*)baseAddr, index, mask);
-    }
-}
-
-template <typename T = DefaultType, typename U = DefaultType, typename S, typename V>
-__simd_callee__ inline void DataCopyScatterB64Impl(__ubuf__ T* baseAddr, S& srcReg, V& index, MaskReg& mask)
-{
-    // index b32
-    if constexpr (CheckRegTrait<S, RegTraitNumOne>()) {
-        MaskReg dstMask;
-        RegTensor<uint32_t> oddIndex;
-        RegTensor<uint32_t> evenIndex;
-        RegTensor<uint32_t> oddReg;
-        RegTensor<uint32_t> evenReg;
-        RegTensor<uint32_t> dstReg0;
-        RegTensor<uint32_t> dstReg1;
-        Pack(dstMask, mask);
-        MaskReg lowerMask = CreateMask<uint32_t, MaskPattern::VL32>();
-        MaskReg preg = CreateMask<uint32_t, MaskPattern::ALL>();
-        And(dstMask, dstMask, lowerMask, preg);
-        Muls(oddIndex, index, uint32_t(2), dstMask);
-        Adds(evenIndex, oddIndex, uint32_t(1), dstMask);
-        DeInterleave(dstReg0, dstReg1, (RegTensor<uint32_t>&)srcReg, (RegTensor<uint32_t>&)srcReg);
-        vscatter(dstReg0, (__ubuf__ uint32_t*)baseAddr, oddIndex, dstMask);
-        vscatter(dstReg1, (__ubuf__ uint32_t*)baseAddr, evenIndex, dstMask);
-    } else {
-        RegTensor<uint32_t> oddIndex;
-        RegTensor<uint32_t> evenIndex;
-        Muls(oddIndex, index, uint32_t(2), mask);
-        Adds(evenIndex, oddIndex, uint32_t(1), mask);
-        vscatter((RegTensor<uint32_t>&)srcReg.reg[0], (__ubuf__ uint32_t*)baseAddr, oddIndex, mask);
-        vscatter((RegTensor<uint32_t>&)srcReg.reg[1], (__ubuf__ uint32_t*)baseAddr, evenIndex, mask);
     }
 }
 
@@ -169,40 +84,16 @@ __simd_callee__ inline void DataCopyScatterImpl(__ubuf__ T* baseAddr, S& srcReg,
     static_assert(
         (sizeof(ActualT) == 1 && Std::is_same_v<ActualIndexT, uint16_t>) ||
             (sizeof(ActualT) == 2 && Std::is_same_v<ActualIndexT, uint16_t>) ||
-            (sizeof(ActualT) == 4 && Std::is_same_v<ActualIndexT, uint32_t>) ||
-            (sizeof(ActualT) == 8 && SupportType<ActualIndexT, uint32_t, uint64_t>()),
-        "Scatter only support data type b8/b16/b32/b64"
-        "with each index type is u16/u16/u32/(u32/u64) respectively on current device");
-    // when index V<b64, 1> only 32 element valid not support S<b64, 2> mode
-    static_assert(
-        !(sizeof(ActualT) == 8 && Std::is_same_v<ActualIndexT, uint64_t> && CheckRegTrait<S, RegTraitNumTwo>() &&
-          CheckRegTrait<V, RegTraitNumOne>()),
-        "current data type is not supported on current device!");
-    if constexpr (sizeof(ActualT) == 8) {
-        if constexpr (Std::is_same_v<ActualIndexT, uint32_t>) {
-            DataCopyScatterB64Impl(baseAddr, srcReg, index, mask);
-        } else if constexpr (Std::is_same_v<ActualIndexT, uint64_t>) {
-            if constexpr (CheckRegTrait<S, RegTraitNumOne>() && CheckRegTrait<V, RegTraitNumOne>()) {
-                RegTensor<uint32_t> lowIndex;
-                RegTensor<uint32_t> highIndex;
-                DeInterleave(lowIndex, highIndex, (RegTensor<uint32_t>&)index, (RegTensor<uint32_t>&)index);
-                DataCopyScatterB64Impl(baseAddr, srcReg, lowIndex, mask);
-            } else if constexpr (
-                (CheckRegTrait<S, RegTraitNumOne>() && CheckRegTrait<V, RegTraitNumTwo>()) ||
-                (CheckRegTrait<S, RegTraitNumTwo>() && CheckRegTrait<V, RegTraitNumTwo>())) {
-                DataCopyScatterB64Impl(baseAddr, srcReg, (RegTensor<uint32_t>&)index.reg[0], mask);
-            }
-        }
-    } else {
-        vscatter(srcReg, baseAddr, index, mask);
-    }
+            (sizeof(ActualT) == 4 && Std::is_same_v<ActualIndexT, uint32_t>),
+        "Scatter only support data type b8/b16/b32 with each index type is u16/u16/u32 respectively on current device");
+    vscatter(srcReg, baseAddr, index, mask);
 }
 
 // pld
 template <typename T, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void DataCopyImpl(MaskReg& mask, __ubuf__ T* srcAddr, AddrReg offset)
 {
-    static_assert(SupportBytes<T, 1, 2, 4, 8>(), "LoadAlign only support type b8/b16/b32/b64 on current device");
+    static_assert(SupportBytes<T, 1, 2, 4>(), "LoadAlign only support type b8/b16/b32 on current device");
     static_assert(
         SupportEnum<dist, MaskDist::DIST_NORM, MaskDist::DIST_US, MaskDist::DIST_DS>(),
         "LoadAlign not support this dist on current device");
@@ -214,7 +105,7 @@ __simd_callee__ inline void DataCopyImpl(MaskReg& mask, __ubuf__ T* srcAddr, Add
 template <typename T, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void DataCopyImpl(MaskReg& mask, __ubuf__ T* srcAddr)
 {
-    static_assert(SupportBytes<T, 1, 2, 4, 8>(), "LoadAlign only support type b8/b16/b32/b64 on current device");
+    static_assert(SupportBytes<T, 1, 2, 4>(), "LoadAlign only support type b8/b16/b32 on current device");
     static_assert(
         SupportEnum<dist, MaskDist::DIST_NORM, MaskDist::DIST_US, MaskDist::DIST_DS>(),
         "LoadAlign not support this dist on current device");
@@ -225,7 +116,7 @@ __simd_callee__ inline void DataCopyImpl(MaskReg& mask, __ubuf__ T* srcAddr)
 template <typename T, PostLiteral postMode, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void DataCopyImpl(MaskReg& mask, __ubuf__ T*& srcAddr, int32_t offset)
 {
-    static_assert(SupportBytes<T, 1, 2, 4, 8>(), "LoadAlign only support type b8/b16/b32/b64 on current device");
+    static_assert(SupportBytes<T, 1, 2, 4>(), "LoadAlign only support type b8/b16/b32 on current device");
     static_assert(
         SupportEnum<dist, MaskDist::DIST_NORM, MaskDist::DIST_US, MaskDist::DIST_DS>(),
         "LoadAlign not support this dist on current device");
@@ -238,7 +129,7 @@ __simd_callee__ inline void DataCopyImpl(MaskReg& mask, __ubuf__ T*& srcAddr, in
 template <typename T, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, MaskReg& mask, AddrReg offset)
 {
-    static_assert(SupportBytes<T, 1, 2, 4, 8>(), "StoreAlign only support type b8/b16/b32/b64 on current device");
+    static_assert(SupportBytes<T, 1, 2, 4>(), "StoreAlign only support type b8/b16/b32 on current device");
     static_assert(
         SupportEnum<dist, MaskDist::DIST_NORM, MaskDist::DIST_PACK>(),
         "StoreAlign not support this dist on current device");
@@ -250,7 +141,7 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, MaskReg& mask, Add
 template <typename T, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, MaskReg& mask)
 {
-    static_assert(SupportBytes<T, 1, 2, 4, 8>(), "StoreAlign only support type b8/b16/b32/b64 on current device");
+    static_assert(SupportBytes<T, 1, 2, 4>(), "StoreAlign only support type b8/b16/b32 on current device");
     static_assert(
         SupportEnum<dist, MaskDist::DIST_NORM, MaskDist::DIST_PACK>(),
         "StoreAlign not support this dist on current device");
@@ -261,7 +152,7 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, MaskReg& mask)
 template <typename T, PostLiteral postMode, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void DataCopyImpl(__ubuf__ T*& dstAddr, MaskReg& mask, int32_t offset)
 {
-    static_assert(SupportBytes<T, 1, 2, 4, 8>(), "StoreAlign only support type b8/b16/b32/b64 on current device");
+    static_assert(SupportBytes<T, 1, 2, 4>(), "StoreAlign only support type b8/b16/b32 on current device");
     static_assert(
         SupportEnum<dist, MaskDist::DIST_NORM, MaskDist::DIST_PACK>(),
         "StoreAlign not support this dist on current device");
