@@ -455,6 +455,41 @@ __aicore__ inline void MmadMx(
 }
 #endif
 
+/* **************************************************************************************************
+ * ConvFix                                             *
+ * ************************************************************************************************* */
+template <typename T, typename U, typename S>
+__aicore__ inline void ConvFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
+    const ConvFixParams& convFixParams)
+{
+    ConvFixImpl(dst, fm, filter, convFixParams);
+}
+
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void ConvFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
+    const ConvFixParams& convFixParams)
+{
+    ConvFixImpl(dst, fm, filter, bias, convFixParams);
+}
+
+template <typename T, typename U, typename S>
+__aicore__ inline void ConvFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const uint64_t config)
+{
+    ConvFixImpl(dst, fm, filter, config);
+}
+
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void ConvFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
+    const uint64_t config)
+{
+    ConvFixImpl(dst, fm, filter, bias, config);
+}
+#endif
+
 #if __NPU_ARCH__ == 2201
 template <
     typename T, typename U, typename Std::enable_if<Std::is_same<PrimT<T>, int32_t>::value, bool>::type,
