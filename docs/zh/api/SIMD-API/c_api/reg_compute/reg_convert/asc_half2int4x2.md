@@ -39,6 +39,7 @@
 ## 函数原型
 
 ```cpp
+// 占位符形式
 // 非饱和模式
 __simd_callee__ inline void asc_half2int4x2_<round_mode>(
     vector_int4x2_t& dst,

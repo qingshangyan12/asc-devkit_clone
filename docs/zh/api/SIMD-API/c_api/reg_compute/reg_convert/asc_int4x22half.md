@@ -37,6 +37,7 @@
 ## 函数原型
 
 ```cpp
+// 占位符形式
 __simd_callee__ inline void asc_int4x22half(
     vector_half& dst,
     vector_int4x2_t src,
