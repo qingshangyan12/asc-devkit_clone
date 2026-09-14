@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "include/adv_api/hccl/hccl_mc2.h"
+#include "include/adv_api/hccl/internal/hccl_msg.h"
 #include "log.h"
 #include "sal.h"
 #include "alg_env_config.h"
@@ -440,6 +441,110 @@ HcclResult __attribute__((visibility("default"))) CheckOpResSufficient(HcclComm 
     HcclResult ret = HcclAllocComResourceByTilingImpl(comm, stream, mc2Tiling, &opResCtx, true);
     HCCL_RUN_INFO(
         "[CheckOpResSufficient] finished, comm[%p], stream[%p], tiling[%p], ret[%d].", comm, stream, mc2Tiling, ret);
+    return ret;
+}
+
+namespace {
+// Mc2CcArgs为Mc2GetCcArgs/Mc2SetCc*系列接口维护的不透明参数对象（ccArgs），
+// 与HcclOpArgs语义对齐：commEngine决定launch版本，srcDataType/dstDataType/reduceType/algConfig参与算法选择。
+struct Mc2CcArgs {
+    HcclApi::Mc2LaunchVersion version = HcclApi::Mc2LaunchVersion::MC2_AICPU_LAUNCH_VERSION;
+    uint8_t commEngine = static_cast<uint8_t>(OpExecuteConfig::AICPU);
+    HcclDataType srcDataType = HCCL_DATA_TYPE_FP16;
+    HcclDataType dstDataType = HCCL_DATA_TYPE_FP16;
+    HcclReduceOp reduceType = HCCL_REDUCE_SUM;
+    char algConfig[ALG_CONFIG_SIZE] = {0};
+};
+
+// 与老版CheckOpResSufficient(comm, stream, mc2Tiling)保持同一业务逻辑：
+// ccType/ccArgs与Mc2AcquireCcResCtx的参数解析完全一致后，合成Mc2CcTilingInner并复用同一条checkOnly预检链。
+HcclResult HcclAllocCcResByArgsImpl(HcclComm comm, uint8_t ccType, void* ccArgs, bool checkOnly)
+{
+    HcclUs startut = TIME_NOW();
+    DevType deviceType = DevType::DEV_TYPE_COUNT;
+    CHK_RET(hrtGetDeviceType(deviceType));
+    if (deviceType != DevType::DEV_TYPE_950) {
+        HCCL_ERROR("[%s] invalid deviceType[%u]", __func__, deviceType);
+        return HCCL_E_NOT_SUPPORT;
+    }
+    CHK_RET(InitEnvConfig());
+
+    const HcclCMDType opType = static_cast<HcclCMDType>(ccType);
+    if (opType >= HcclCMDType::HCCL_CMD_MAX) {
+        HCCL_ERROR("[%s] invalid ccType[%u]", __func__, ccType);
+        return HCCL_E_PARA;
+    }
+
+    u32 rankSize = INVALID_VALUE_RANKSIZE;
+    CHK_RET(HcclGetRankSize(comm, &rankSize));
+    u32 userRank = INVALID_VALUE_RANKID;
+    CHK_RET(HcclGetRankId(comm, &userRank));
+    char commName[COMM_INDENTIFIER_MAX_LENGTH];
+    CHK_RET(HcclGetCommName(comm, commName));
+
+    // ccArgs -> Mc2CcTilingInner：与HcclAllocComResourceByTilingImpl经HcclGetTilingList得到的ccTiling同构
+    const auto* args = static_cast<const Mc2CcArgs*>(ccArgs);
+    Mc2CcTilingInner ccTiling{};
+    CHK_SAFETY_FUNC_RET(strcpy_s(ccTiling.algConfig, sizeof(ccTiling.algConfig), args->algConfig));
+    ccTiling.version = static_cast<uint8_t>(static_cast<uint32_t>(args->version));
+    ccTiling.commEngine = args->commEngine;
+    ccTiling.srcDataType = static_cast<uint8_t>(args->srcDataType);
+    ccTiling.dstDataType = static_cast<uint8_t>(args->dstDataType);
+    ccTiling.opType = static_cast<uint32_t>(opType);
+    ccTiling.reduceType = static_cast<uint32_t>(args->reduceType);
+
+    const void* ccTilingList[Hccl::MC2_MAX_OP_NUM] = {&ccTiling};
+    uint8_t commEngine;
+    CHK_RET(ObtainCommEngine(ccTilingList, 1U, commEngine));
+
+    // 与老版入口一致：单rank必然资源充足、非CCU_SCHED引擎暂不支持，直接返回SUCCESS
+    if (checkOnly && (rankSize == 1 || commEngine != static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED))) {
+        HCCL_INFO("[%s]checkOnly, rankSize[%u], commEngine[%u], return SUCCESS.", __func__, rankSize, commEngine);
+        return HCCL_SUCCESS;
+    }
+
+    Mc2InitTilingInner initTiling{};
+    initTiling.version = INIT_TILING_CCU_NEW_VERSION;
+    initTiling.mc2HcommCnt = 1U;
+    initTiling.offset[0] = 0U;
+    const void* mc2Tiling = &initTiling;
+
+    if (commEngine == static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
+        if (!CheckCcuAlgorithmsRegistered(ccTilingList, 1U)) {
+            return HCCL_E_ALG_NOT_SUPPORTED;
+        }
+        CHK_RET(CheckCcuKfcFlow(mc2Tiling, ccTilingList, 1U, rankSize));
+    } else {
+        HCCL_ERROR("[%s] unsupported commEngine[%u]", __func__, commEngine);
+        return HCCL_E_NOT_SUPPORT;
+    }
+
+    // checkOnly=true时跳过AllocCcuOpResCtx/OpParam H2D/OpResCtx落盘，仅探测资源是否充足
+    void* opResCtx = nullptr;
+    std::string ctxTag;
+    HcclResult ret = AllocComResourceByTilingCcu(
+        comm, nullptr, mc2Tiling, ccTilingList, 1U, commName, rankSize, userRank, &opResCtx, ctxTag, checkOnly);
+    CHK_PRT_RET(
+        ret != HCCL_SUCCESS,
+        HCCL_ERROR("[MC2_CCU_RESOURCE_ALLOC_FAIL] Failed to allocate CCU resource, please check topo information."),
+        ret);
+    CHK_RET(LogHcclExit("CheckOpResSufficient", ctxTag.c_str(), startut));
+    return ret;
+}
+} // namespace
+
+HcclResult __attribute__((visibility("default"))) CheckOpResSufficient(HcclComm comm, uint8_t ccType, void* ccArgs)
+{
+    CHK_PTR_NULL(comm);
+    CHK_PTR_NULL(ccArgs);
+
+    if (GetExternalInputHcclEnableEntryLog()) {
+        HCCL_RUN_INFO(
+            "Entry-CheckOpResSufficient(ccArgs), comm[%p], ccType[%u], ccArgs[%p].", comm, ccType, ccArgs);
+    }
+    HcclResult ret = HcclAllocCcResByArgsImpl(comm, ccType, ccArgs, true);
+    HCCL_RUN_INFO(
+        "[CheckOpResSufficient] finished, comm[%p], ccType[%u], ccArgs[%p], ret[%d].", comm, ccType, ccArgs, ret);
     return ret;
 }
 
