@@ -105,10 +105,6 @@ __aicore__ inline void check_exp_diff_positions_and_muls_cast()
                   decltype(asc::te::experimental::muls_cast<half, float>(
                       AscendC::Std::declval<const reg_type<float>&>(), AscendC::Std::declval<const float&>())),
                   reg_type<half>>);
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::muls_cast<half, float, asc::te::experimental::cast_layout::one>(
-                      AscendC::Std::declval<const reg_type<float>&>(), AscendC::Std::declval<const float&>())),
-                  reg_type<half>>);
 
     reg_type<half> half_src0{};
     reg_type<half> half_src1{};
@@ -120,11 +116,8 @@ __aicore__ inline void check_exp_diff_positions_and_muls_cast()
 
     reg_type<float> float_src{};
     float_src.mask = asc::te::experimental::all_mask<float>().reg;
-    auto zero_result = asc::te::experimental::muls_cast<half, float>(float_src, 1.0f);
-    auto one_result =
-        asc::te::experimental::muls_cast<half, float, asc::te::experimental::cast_layout::one>(float_src, 1.0f);
-    EXPECT_EQ(zero_result.mask, float_src.mask);
-    EXPECT_EQ(one_result.mask, float_src.mask);
+    auto result = asc::te::experimental::muls_cast<half, float>(float_src, 1.0f);
+    EXPECT_EQ(result.mask, float_src.mask);
 }
 
 TEST(test_tensor_api_composite_compute, compile_public_apis_and_supported_types)

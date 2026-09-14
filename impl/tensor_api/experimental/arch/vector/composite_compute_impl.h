@@ -105,16 +105,9 @@ template <typename T, typename U, cast_layout Layout>
 __simd_callee__ inline reg_tensor<T> muls_cast(const reg_tensor<U>& src, const U& scalar)
 {
     static_assert(detail::supports_muls_cast_v<T, U>, "muls_cast supports only float to half");
-    static_assert(
-        Layout == cast_layout::zero || Layout == cast_layout::one,
-        "muls_cast layout supports cast_layout::zero and cast_layout::one");
-    reg_tensor<T> dst;
-    if constexpr (Layout == cast_layout::zero) {
-        asc_mul_scalar_float2half_rn(dst.reg, src.reg, scalar, src.mask, ASC_POSITION_EVEN);
-    } else {
-        asc_mul_scalar_float2half_rn(dst.reg, src.reg, scalar, src.mask, ASC_POSITION_ODD);
-    }
-    dst.mask = src.mask;
+    static_assert(Layout == cast_layout::zero, "muls_cast layout supports only cast_layout::zero");
+    reg_tensor<T> dst(src.mask);
+    dst.reg = asc_mul_scalar_float2half_rn(src.reg, scalar, src.mask, ASC_POSITION_EVEN);
     return dst;
 }
 
