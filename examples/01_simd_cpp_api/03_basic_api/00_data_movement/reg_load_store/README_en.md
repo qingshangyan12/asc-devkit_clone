@@ -59,7 +59,7 @@ All four scenarios transfer 512 bytes in total. The `RegTraitNumOne` scenarios t
   Run the following commands in the example directory. NPU mode is used by default:
 
   ```bash
-  SCENARIO_NUM=4
+  SCENARIO_NUM=1
   mkdir -p build && cd build;      # Create and enter the build directory
   cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;    # Build the project in the default NPU mode
   python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM   # Generate test input data
