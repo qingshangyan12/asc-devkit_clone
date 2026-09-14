@@ -31,6 +31,13 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |---|---|---|
 |[reg数据类型定义](defs/type/data_type_definition.md)|介绍C API的矢量数据寄存器、掩码寄存器、非对齐寄存器和地址寄存器数据类型。|`c_api/defs/type.h`|
 
+### 宏
+
+|API名称|说明|最细粒度公共头文件|
+|---|---|---|
+|[ASC_DEPRECATED](defs/macro/asc_deprecation.md)|为C API声明添加废弃属性和编译告警信息。|`c_api/defs/macro.h`|
+|[ASC_IS_AIC/ASC_IS_AIV](defs/macro/asc_is_ai_core.md)|判断当前编译的代码路径是Cube Core（AIC）还是Vector Core（AIV）代码路径。|`c_api/defs/macro.h`|
+
 ### 常量
 
 |API名称|说明|最细粒度公共头文件|

@@ -67,6 +67,8 @@ CANN 9.2.0在CANN 9.1.0的基础上继续增强C API。本版本新增矩阵与�
 
 - 公共头文件按`defs`、`utils`、`cube_compute`、`cube_datamove`、`vector_compute`、`vector_datamove`、`reg_compute`、`scalar_compute`、`atomic`、`cache_ctrl`、`sync`和`spr`等模块拆分，API资料同步使用最细粒度公共头文件路径。
 - `c_api/asc_simd.h`仍作为全局聚合入口；新增`c_api/asc_cube.h`、`c_api/asc_memory_vector.h`和`c_api/asc_reg_vector.h`作为分域聚合入口。已有代码可以继续包含全局聚合头，新代码可按使用范围选择更细粒度的头文件。
+- [ASC_DEPRECATED](../../SIMD-API/c_api/defs/macro/asc_deprecation.md)新增至公共头文件`c_api/defs/macro.h`，用于为C API声明添加废弃属性和包含废弃版本、计划移除日期、替代接口的编译告警信息。
+- [ASC_IS_AIC](../../SIMD-API/c_api/defs/macro/asc_is_ai_core.md)和[ASC_IS_AIV](../../SIMD-API/c_api/defs/macro/asc_is_ai_core.md)迁移至公共头文件`c_api/defs/macro.h`，用于在AIC和AIV分离模式的融合算子中隔离对应核的代码路径。
 - 旧兼容头`c_api/misc/misc.h`、`c_api/utils_intf.h`、`c_api/utils/union.h`、`c_api/sys_var/sys_var.h`、`c_api/reg_compute/reg_vector.h`、`c_api/reg_compute/reg_load.h`和`c_api/reg_compute/reg_store.h`仍保留，但会给出废弃提示；建议迁移到对应的`c_api/utils/*`、`c_api/defs/*`、`c_api/reg_compute/reg_compute.h`或Reg搬入、搬出、聚合、离散操作的最细粒度公共头文件。
 
 ## Bug修复
