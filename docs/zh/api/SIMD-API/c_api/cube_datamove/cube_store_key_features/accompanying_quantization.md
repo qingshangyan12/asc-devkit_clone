@@ -56,8 +56,6 @@ VQF322F32_PRE,         // Vector_Quant_Float32_2_Float32: float量化成float，
 ```
 <!-- end id3 -->
 
-<!-- end id6 -->
-
 不同量化模式的量化算法详细介绍参见[随路量化与随路ReLU场景组合](accompanying_quantization_and_relu_scenario_combination.md)。
 
 <!-- npu="950,A3,910b" id7 -->
