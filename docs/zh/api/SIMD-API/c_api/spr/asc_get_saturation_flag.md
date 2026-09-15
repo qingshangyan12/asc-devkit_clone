@@ -85,4 +85,4 @@ if (!cast_sat_enabled) {
 }
 ```
 
-数据搬运与Reg cast模式可参考[Cast样例](../../../../../../examples/02_simd_c_api/04_reg_vector_compute/cast)。
+数据搬运与Reg cast 模式可参考[Cast样例](../../../../../../examples/02_simd_c_api/05_reg_vector_compute/cast)。

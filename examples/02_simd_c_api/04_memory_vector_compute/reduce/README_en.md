@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example implements Reduce based on C API programming interfaces. It primarily calls [asc_repeat_reduce_sum](../../../../../docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_sum.md) and [asc_datablock_reduce_sum](../../../../../docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_sum.md) for sum reduction.
+This example implements Reduce based on C API programming interfaces. It primarily calls [asc_repeat_reduce_sum](../../../../docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_sum.md) and [asc_datablock_reduce_sum](../../../../docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_sum.md) for sum reduction.
 
 This example supports two sum-reduction scenarios, selected with the CMake build parameter `SCENARIO_NUM`.
 
@@ -81,7 +81,7 @@ Run the following steps in the root directory of this example to build and run i
 
 - Configure environment variables
 
-  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment.
+  Configure environment variables based on the [installation method](../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment.
 
   ```bash
   source ${install_path}/cann/set_env.sh

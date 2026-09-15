@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example implements comparison based on C API programming interfaces. It primarily calls [asc_lt](../../../../../docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md), [asc_gt_scalar](../../../../../docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt_scalar.md), and [asc_get_cmp_mask](../../../../../docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md) for data comparison.
+This example implements comparison based on C API programming interfaces. It primarily calls [asc_lt](../../../../docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md), [asc_gt_scalar](../../../../docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt_scalar.md), and [asc_get_cmp_mask](../../../../docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md) for data comparison.
 
 This example supports three comparison scenarios, selected with the CMake build parameter `SCENARIO_NUM`.
 
@@ -105,7 +105,7 @@ Run the following steps in the root directory of this example to build and run i
 
 - Configure environment variables
 
-  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment.
+  Configure environment variables based on the [installation method](../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment.
 
   ```bash
   source ${install_path}/cann/set_env.sh

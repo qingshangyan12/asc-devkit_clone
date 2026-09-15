@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example implements Cast based on C API programming interfaces. It primarily calls [asc_half2int4_ru](../../../../../docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int4.md) and [asc_half2int32_ru](../../../../../docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int32.md) for data type conversion.
+This example implements Cast based on C API programming interfaces. It primarily calls [asc_half2int4_ru](../../../../docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int4.md) and [asc_half2int32_ru](../../../../docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int32.md) for data type conversion.
 
 This example supports two conversion scenarios, selected with the CMake build parameter `SCENARIO_NUM`.
 
@@ -81,7 +81,7 @@ Run the following steps in the root directory of this example to build and run i
 
 - Configure environment variables
 
-  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment.
+  Configure environment variables based on the [installation method](../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment.
 
   ```bash
   source ${install_path}/cann/set_env.sh

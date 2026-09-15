@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于C API编程接口实现比较运算，主要调用[asc_lt](../../../../../docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md)、[asc_gt_scalar](../../../../../docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt_scalar.md)和[asc_get_cmp_mask](../../../../../docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md)接口实现数据比较。
+本样例基于C API编程接口实现比较运算，主要调用[asc_lt](../../../../docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md)、[asc_gt_scalar](../../../../docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt_scalar.md)和[asc_get_cmp_mask](../../../../docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md)接口实现数据比较。
 
 本样例支持三种比较场景，通过CMake编译参数`SCENARIO_NUM`选择。
 
@@ -105,7 +105,7 @@
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
 
   ```bash
   source ${install_path}/cann/set_env.sh

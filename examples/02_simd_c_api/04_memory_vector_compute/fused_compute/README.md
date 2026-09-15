@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于C API编程接口实现复合计算，主要调用[asc_leakyrelu](../../../../../docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_leakyrelu.md)接口实现Leaky ReLU。
+本样例基于C API编程接口实现复合计算，主要调用[asc_leakyrelu](../../../../docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_leakyrelu.md)接口实现Leaky ReLU。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -54,7 +54,7 @@
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
+  请 根据当前环境上CANN开发套件包的[安装方式](../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
 
   ```bash
   source ${install_path}/cann/set_env.sh

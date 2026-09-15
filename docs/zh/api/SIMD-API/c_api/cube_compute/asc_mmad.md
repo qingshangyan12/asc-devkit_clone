@@ -382,4 +382,4 @@ int main()
 }
 ```
 
-更多场景使用样例请参考[asc_mmad样例](../../../../../../examples/02_simd_c_api/05_matrix_compute/mmad)。
+更多场景使用样例请参考[asc_mmad样例](../../../../../../examples/02_simd_c_api/06_matrix_compute/mmad)。
