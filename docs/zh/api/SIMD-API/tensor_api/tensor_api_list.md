@@ -106,6 +106,7 @@
 | [make_mask](reg_vector_compute/mask_reg_compute/make_mask.md) | 根据Mask模式和数据元素宽度创建Mask寄存器。 |
 | [none_mask](reg_vector_compute/mask_reg_compute/none_mask.md) | 创建与指定元素类型位宽匹配的全无效Mask寄存器。 |
 | [update_mask](reg_vector_compute/mask_reg_compute/update_mask.md) | 根据剩余待处理元素数生成有效位Mask，并更新剩余元素数量。 |
+| [interleave（掩码寄存器交织）](reg_vector_compute/mask_reg_compute/interleave.md) | 将两个Mask寄存器按指定元素宽度交织，返回低半部分和高半部分结果。 |
 | [deinterleave（掩码寄存器解交织）](reg_vector_compute/mask_reg_compute/deinterleave.md) | 将两个Mask寄存器按指定元素宽度解交织，返回偶数组和奇数组结果。 |
 | [load](reg_vector_compute/reg_data_load/load.md) | 将Unified Buffer中的数据搬入`reg_tensor`，支持多种数据排列方式。 |
 | [load_broadcast](reg_vector_compute/reg_data_load/load_broadcast.md) | 从Unified Buffer搬入数据，并按指定模式广播到`reg_tensor`。 |

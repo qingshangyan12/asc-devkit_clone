@@ -1613,6 +1613,7 @@
                 -   [make_mask](SIMD-API/tensor_api/reg_vector_compute/mask_reg_compute/make_mask.md)
                 -   [none_mask](SIMD-API/tensor_api/reg_vector_compute/mask_reg_compute/none_mask.md)
                 -   [update_mask](SIMD-API/tensor_api/reg_vector_compute/mask_reg_compute/update_mask.md)
+                -   [interleave（掩码交织）](SIMD-API/tensor_api/reg_vector_compute/mask_reg_compute/interleave.md)
                 -   [deinterleave（掩码解交织）](SIMD-API/tensor_api/reg_vector_compute/mask_reg_compute/deinterleave.md)
             -   [寄存器数据搬入](SIMD-API/tensor_api/reg_vector_compute/reg_data_load/reg_data_load.md)
                 -   [load](SIMD-API/tensor_api/reg_vector_compute/reg_data_load/load.md)
