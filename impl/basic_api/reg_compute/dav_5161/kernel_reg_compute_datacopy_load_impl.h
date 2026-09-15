@@ -78,17 +78,6 @@ __simd_callee__ inline void DataCopyImpl(U& dstReg, __ubuf__ T*& srcAddr, int32_
 
     if constexpr (SupportBytes<ActualT, 1>()) {
         vlds((RegTensor<uint8_t>&)dstReg, (__ubuf__ uint8_t*&)srcAddr, postUpdateStride, distValue, postValue);
-    } else if constexpr (SupportBytes<ActualT, 8>()) {
-        if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
-            vlds(
-                (RegTensor<uint32_t>&)dstReg, (__ubuf__ uint32_t*&)srcAddr, postUpdateStride * 2, distValue, postValue);
-        } else if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
-            constexpr auto dintlvDist =
-                std::integral_constant<::Dist, static_cast<::Dist>(LoadDist::DIST_DINTLV_B32)>();
-            vlds(
-                (RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)dstReg.reg[1], (__ubuf__ uint32_t*&)srcAddr,
-                postUpdateStride * 2, dintlvDist, postValue);
-        }
     } else {
         static_assert(SupportBytes<ActualT, 1, 2, 4>(), "LoadAlign only support type b8/b16/b32 on current device");
         if constexpr (Std::is_same_v<T, bool>) {
@@ -208,8 +197,6 @@ __simd_callee__ inline void DataCopyUnAlignPreImpl(UnalignReg& ureg, __ubuf__ T*
     static_assert(SupportBytes<T, 1, 2, 4>(), "LoadUnAlignPre only support type b8/b16/b32 on current device");
     if constexpr (SupportBytes<T, 1>()) {
         vldas(ureg, (__ubuf__ uint8_t*)srcAddr);
-    } else if constexpr (sizeof(T) == 8) {
-        vldas(ureg, (__ubuf__ uint32_t*)srcAddr);
     } else {
         if constexpr (Std::is_same_v<T, bool>) {
             vldas(ureg, (__ubuf__ int8_t*)srcAddr);

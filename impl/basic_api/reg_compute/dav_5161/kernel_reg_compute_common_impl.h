@@ -33,8 +33,7 @@ template <typename T, StoreDist dist>
 __aicore__ inline constexpr StoreDist GetStoreDist()
 {
     if constexpr (dist == StoreDist::DIST_NORM) {
-        static_assert(
-            SupportBytes<T, 1, 2, 4, 8>(), "StoreDist DIST_NORM only support type b8/b16/b32 on current device");
+        static_assert(SupportBytes<T, 1, 2, 4>(), "StoreDist DIST_NORM only support type b8/b16/b32 on current device");
         if constexpr (sizeof(T) == 1) {
             return StoreDist::DIST_NORM_B8;
         } else if constexpr (sizeof(T) == 2) {
@@ -109,42 +108,6 @@ __aicore__ inline constexpr auto GetMaskMergeMode()
 }
 #endif // #ifndef __ASC_NPU_HOST__
 
-template <typename T, typename U, typename ShortType>
-__simd_callee__ inline void TraitOneToTraitTwoTmpl(T& dstReg, U& srcReg)
-{
-    using ActualT1 = typename U::ActualT;
-    using ActualT2 = typename T::ActualT;
-    static_assert(
-        CheckRegTrait<T, RegTraitNumTwo>() && CheckRegTrait<U, RegTraitNumOne>(),
-        "T should be RegTraitNumTwo and U should be RegTraitNumOne");
-    static_assert(
-        sizeof(ActualT2) == (sizeof(ShortType) * 2) && sizeof(ActualT1) == (sizeof(ShortType) * 2),
-        "T and U should be 2 times of shortType length");
-    RegTensor<ShortType> zeroReg;
-    MaskReg maskFull = CreateMask<ShortType, MaskPattern::ALL>();
-    Duplicate(zeroReg, 0, maskFull);
-    DeInterleave(
-        (RegTensor<ShortType>&)dstReg.reg[0], (RegTensor<ShortType>&)dstReg.reg[1], (RegTensor<ShortType>&)srcReg,
-        zeroReg);
-}
-
-template <typename T, typename U, typename ShortType>
-__simd_callee__ inline void TraitTwoToTraitOneTmpl(T& dstReg, U& srcReg)
-{
-    using ActualT1 = typename T::ActualT;
-    using ActualT2 = typename U::ActualT;
-    static_assert(
-        CheckRegTrait<T, RegTraitNumOne>() && CheckRegTrait<U, RegTraitNumTwo>(),
-        "T should be RegTraitNumOne and U should be RegTraitNumTwo");
-    static_assert(
-        sizeof(ActualT2) == (sizeof(ShortType) * 2) && sizeof(ActualT1) == (sizeof(ShortType) * 2),
-        "U and T should be 2 times of shortType length");
-    RegTensor<ShortType> dstRegShortFake;
-    Interleave(
-        (RegTensor<ShortType>&)dstReg, dstRegShortFake, (RegTensor<ShortType>&)srcReg.reg[0],
-        (RegTensor<ShortType>&)srcReg.reg[1]);
-}
-
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::MERGING, typename RegT>
 __simd_callee__ inline void CopyMerging(RegT& dstReg, RegT& srcReg, MaskReg& mask)
 {
@@ -156,35 +119,9 @@ __simd_callee__ inline void CopyMerging(RegT& dstReg, RegT& srcReg, MaskReg& mas
         vmov((RegTensor<uint8_t>&)dstReg, (RegTensor<uint8_t>&)srcReg, mask, modeValue);
     } else if constexpr (sizeof(ActualT) == 2) {
         vmov((RegTensor<uint16_t>&)dstReg, (RegTensor<uint16_t>&)srcReg, mask, modeValue);
-    } else if constexpr (sizeof(ActualT) == 4) {
+    } else {
         vmov((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg, mask, modeValue);
-    } else if constexpr (sizeof(ActualT) == 8) {
-        if constexpr (CheckRegTrait<RegT, RegTraitNumOne>()) {
-            constexpr auto lowerDist =
-                std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>();
-            MaskReg dstMask;
-            MaskReg tmpMask;
-            MaskReg dumpMask;
-            ppack(tmpMask, mask, lowerDist);
-            pintlv_b32(dstMask, dumpMask, tmpMask, tmpMask);
-            vmov((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg, dstMask, modeValue);
-        } else if constexpr (CheckRegTrait<RegT, RegTraitNumTwo>()) {
-            vmov((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)srcReg.reg[0], mask, modeValue);
-            vmov((RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg.reg[1], mask, modeValue);
-        }
     }
-}
-
-template <typename T, typename U>
-__simd_callee__ inline void B32TraitOneToTraitTwo(T& dstReg, U& srcReg)
-{
-    TraitOneToTraitTwoTmpl<T, U, uint16_t>(dstReg, srcReg);
-}
-
-template <typename T, typename U>
-__simd_callee__ inline void B32TraitTwoToTraitOne(T& dstReg, U& srcReg)
-{
-    TraitTwoToTraitOneTmpl<T, U, uint16_t>(dstReg, srcReg);
 }
 } // namespace Reg
 } // namespace AscendC

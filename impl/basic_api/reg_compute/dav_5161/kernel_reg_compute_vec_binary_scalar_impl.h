@@ -50,34 +50,6 @@ __simd_callee__ inline void AddsImpl(S& dstReg, S& srcReg, U scalarValue, MaskRe
 }
 
 template <typename T = DefaultType, typename U, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S>
-__simd_callee__ inline void MulsKernel(S& dstReg, S& srcReg, const U& scalarValue, MaskReg& mask)
-{
-    using ActualT = typename S::ActualT;
-    static_assert(CheckRegTrait<S, RegTraitNumTwo>(), "S should be RegTraitNumTwo");
-    constexpr auto modeValue = GetMaskMergeMode<mode>();
-    RegTensor<typename ActualT::EleType> src1Real;
-    RegTensor<typename ActualT::EleType> src1Imag;
-    U scalarAux(scalarValue);
-    Duplicate(src1Real, scalarAux.real, mask);
-    Duplicate(src1Imag, scalarAux.imag, mask);
-
-    RegTensor<typename ActualT::EleType>& src0Real = (RegTensor<typename ActualT::EleType>&)srcReg.reg[0];
-    RegTensor<typename ActualT::EleType>& src0Imag = (RegTensor<typename ActualT::EleType>&)srcReg.reg[1];
-    RegTensor<typename ActualT::EleType>& dstReal = (RegTensor<typename ActualT::EleType>&)dstReg.reg[0];
-    RegTensor<typename ActualT::EleType>& dstImag = (RegTensor<typename ActualT::EleType>&)dstReg.reg[1];
-    RegTensor<typename ActualT::EleType> e;
-    RegTensor<typename ActualT::EleType> f;
-    RegTensor<typename ActualT::EleType> g;
-    RegTensor<typename ActualT::EleType> h;
-    vmul(e, src0Real, src1Real, mask, modeValue);
-    vmul(f, src0Imag, src1Imag, mask, modeValue);
-    vmul(g, src0Imag, src1Real, mask, modeValue);
-    vmul(h, src0Real, src1Imag, mask, modeValue);
-    vsub(dstReal, e, f, mask, modeValue);
-    vadd(dstImag, g, h, mask, modeValue);
-}
-
-template <typename T = DefaultType, typename U, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S>
 __simd_callee__ inline void MulsImpl(S& dstReg, S& srcReg, U scalarValue, MaskReg& mask)
 {
     using ActualT = typename S::ActualT;

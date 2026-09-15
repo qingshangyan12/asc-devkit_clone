@@ -70,26 +70,6 @@ __aicore__ inline constexpr LogSpecificMode GetLogSpecificMode(const LogSpecific
 {
     return {.mrgMode = sprMode->mrgMode, .algo = sprMode->algo};
 }
-
-__aicore__ inline constexpr Log2SpecificMode GetLog2SpecificMode(MaskMergeMode mrgMode)
-{
-    return {.mrgMode = mrgMode, .algo = Log2Algo::INTRINSIC};
-}
-
-__aicore__ inline constexpr Log2SpecificMode GetLog2SpecificMode(const Log2SpecificMode* sprMode)
-{
-    return {.mrgMode = sprMode->mrgMode, .algo = sprMode->algo};
-}
-
-__aicore__ inline constexpr Log10SpecificMode GetLog10SpecificMode(MaskMergeMode mrgMode)
-{
-    return {.mrgMode = mrgMode, .algo = Log10Algo::INTRINSIC};
-}
-
-__aicore__ inline constexpr Log10SpecificMode GetLog10SpecificMode(const Log10SpecificMode* sprMode)
-{
-    return {.mrgMode = sprMode->mrgMode, .algo = sprMode->algo};
-}
 } // namespace Internal
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
@@ -400,48 +380,6 @@ __simd_callee__ inline void LogImpl(U& dstReg, U& srcReg, MaskReg& mask)
     }
 }
 
-template <MaskMergeMode mode = MaskMergeMode::ZEROING>
-__simd_callee__ inline void LogXImpl(
-    RegTensor<half>& dstReg, RegTensor<half>& srcReg, MaskReg& mask, const float lnXReciprocal)
-{
-    vector_f16 f16RegLow;
-    vector_f16 f16RegHigh;
-    vector_f32 f32RegLow;
-    vector_f32 f32RegHigh;
-    vector_bool MaskLow;
-    vector_bool MaskHigh;
-    vector_f16 tmpReg;
-    constexpr auto patAll = std::integral_constant<::Pat, static_cast<::Pat>(Reg::MaskPattern::ALL)>();
-    vector_bool maskAll = pset_b32(patAll);
-    constexpr auto patVal = std::integral_constant<::Pat, static_cast<::Pat>(Reg::MaskPattern::H)>();
-    vector_bool selMask = pset_b16(patVal);
-    constexpr auto partModeEvenVal = std::integral_constant<::Part, static_cast<::Part>(RegLayout::ZERO)>();
-    constexpr auto satModeValue =
-        std::integral_constant<::RoundingSaturation, static_cast<::RoundingSaturation>(SatMode::NO_SAT)>();
-    constexpr auto roundModeValue = std::integral_constant<::ROUND, GetRound<RoundMode::CAST_RINT>()>();
-    constexpr auto modeValue = GetMaskMergeMode<mode>();
-    punpack(MaskLow, mask, LOWER);
-    punpack(MaskHigh, mask, HIGHER);
-
-    vintlv(f16RegLow, f16RegHigh, srcReg, srcReg);
-
-    vcvt(f32RegLow, f16RegLow, maskAll, partModeEvenVal, modeValue);
-    vcvt(f32RegHigh, f16RegHigh, maskAll, partModeEvenVal, modeValue);
-
-    vln(f32RegLow, f32RegLow, maskAll, modeValue);
-    vln(f32RegHigh, f32RegHigh, maskAll, modeValue);
-
-    vmuls(f32RegLow, f32RegLow, lnXReciprocal, maskAll, modeValue);
-    vmuls(f32RegHigh, f32RegHigh, lnXReciprocal, maskAll, modeValue);
-
-    vcvt(f16RegLow, f32RegLow, MaskLow, roundModeValue, satModeValue, partModeEvenVal, modeValue);
-    vcvt(f16RegHigh, f32RegHigh, MaskHigh, roundModeValue, satModeValue, partModeEvenVal, modeValue);
-
-    vdintlv(f16RegLow, tmpReg, f16RegLow, tmpReg);
-    vdintlv(f16RegHigh, tmpReg, tmpReg, f16RegHigh);
-    vsel(dstReg, f16RegLow, f16RegHigh, selMask);
-}
-
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void NegImpl(U& dstReg, U& srcReg, MaskReg& mask)
 {
@@ -454,20 +392,6 @@ __simd_callee__ inline void NegImpl(U& dstReg, U& srcReg, MaskReg& mask)
         SupportEnum<mode, MaskMergeMode::ZEROING>(), "current Neg api only supported Mode ZEROING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vneg(dstReg, srcReg, mask, modeValue);
-}
-
-template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
-__simd_callee__ inline void NotImpl(U& dstReg, U& srcReg, MaskReg& mask)
-{
-    using ActualT = typename U::ActualT;
-    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(
-        SupportType<ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float>(),
-        "current data type is not supported on current device!");
-    static_assert(
-        SupportEnum<mode, MaskMergeMode::ZEROING>(), "current Not api only supported Mode ZEROING on current device!");
-    constexpr auto modeValue = GetMaskMergeMode<mode>();
-    vnot(dstReg, srcReg, mask, modeValue);
 }
 } // namespace Reg
 } // namespace AscendC

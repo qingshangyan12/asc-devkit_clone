@@ -40,24 +40,11 @@ __simd_callee__ inline MaskReg UpdateMaskImpl(uint32_t& scalarValue)
     return reg;
 }
 
-template <typename T, MaskPattern mode, const RegTrait& regTrait>
-__simd_callee__ inline constexpr MaskPattern GetMaskPattern()
-{
-    if constexpr ((regTrait.REG_NUM == 1) && (sizeof(T) == 8)) {
-        if constexpr (mode == MaskPattern::H) {
-            return MaskPattern::VL16;
-        } else if constexpr (mode == MaskPattern::Q) {
-            return MaskPattern::VL8;
-        }
-    }
-    return mode;
-}
-
 template <typename T, MaskPattern mode = MaskPattern::ALL, const RegTrait& regTrait = RegTraitNumOne>
 __simd_callee__ inline MaskReg CreateMaskImpl()
 {
     static_assert(SupportBytes<T, 1, 2, 4>(), "CreateMask only support type b8/b16/b32 on current device");
-    constexpr auto modeValue = std::integral_constant<::Pat, static_cast<::Pat>(GetMaskPattern<T, mode, regTrait>())>();
+    constexpr auto modeValue = std::integral_constant<::Pat, static_cast<::Pat>(mode)>();
     MaskReg reg;
     if constexpr (sizeof(T) == 1) {
         reg = pset_b8(modeValue);
@@ -67,72 +54,6 @@ __simd_callee__ inline MaskReg CreateMaskImpl()
         reg = pset_b32(modeValue);
     }
     return reg;
-}
-
-__simd_callee__ inline void MaskNotImpl(MaskReg& dst, MaskReg& src, MaskReg& mask) { pnot(dst, src, mask); }
-
-__simd_callee__ inline void MaskAndImpl(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
-{
-    pand(dst, src0, src1, mask);
-}
-
-__simd_callee__ inline void MaskOrImpl(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
-{
-    por(dst, src0, src1, mask);
-}
-
-__simd_callee__ inline void MaskXorImpl(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
-{
-    pxor(dst, src0, src1, mask);
-}
-
-__simd_callee__ inline void MaskMovImpl(MaskReg& dst, MaskReg& src, MaskReg& mask) { pmov(dst, src, mask); }
-
-__simd_callee__ inline void MaskMovImpl(MaskReg& dst, MaskReg& src) { pmov(dst, src); }
-
-template <typename T>
-__simd_callee__ inline void MaskInterleaveImpl(MaskReg& dst0, MaskReg& dst1, MaskReg& src0, MaskReg& src1)
-{
-    static_assert(SupportBytes<T, 1, 2, 4>(), "MaskInterleave only support type b8/b16/b32 on current device");
-    if constexpr (sizeof(T) == 1) {
-        pintlv_b8(dst0, dst1, src0, src1);
-    } else if constexpr (sizeof(T) == 2) {
-        pintlv_b16(dst0, dst1, src0, src1);
-    } else if constexpr (sizeof(T) == 4) {
-        pintlv_b32(dst0, dst1, src0, src1);
-    }
-}
-
-template <typename T>
-__simd_callee__ inline void MaskDeInterleaveImpl(MaskReg& dst0, MaskReg& dst1, MaskReg& src0, MaskReg& src1)
-{
-    static_assert(SupportBytes<T, 1, 2, 4>(), "MaskDeInterleave only support type b8/b16/b32 on current device");
-    if constexpr (sizeof(T) == 1) {
-        pdintlv_b8(dst0, dst1, src0, src1);
-    } else if constexpr (sizeof(T) == 2) {
-        pdintlv_b16(dst0, dst1, src0, src1);
-    } else if constexpr (sizeof(T) == 4) {
-        pdintlv_b32(dst0, dst1, src0, src1);
-    }
-}
-
-__simd_callee__ inline void MaskSelImpl(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
-{
-    psel(dst, src0, src1, mask);
-}
-
-template <HighLowPart part = HighLowPart::LOWEST>
-__simd_callee__ inline void MaskPackImpl(MaskReg& dst, MaskReg& src)
-{
-    constexpr auto partValue = std::integral_constant<::HiloPart, static_cast<::HiloPart>(part)>();
-    ppack(dst, src, partValue);
-}
-
-template <HighLowPart part = HighLowPart::LOWEST>
-__simd_callee__ inline void MaskUnPackImpl(MaskReg& dst, MaskReg& src)
-{
-    constexpr auto partValue = std::integral_constant<::HiloPart, static_cast<::HiloPart>(part)>();
-    punpack(dst, src, partValue);
 }
 } // namespace Reg
 } // namespace AscendC
