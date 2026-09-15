@@ -209,25 +209,25 @@ private:
 
     __aicore__ inline void ComputeLoadTraitTwo(__ubuf__ T* dst, __ubuf__ T* src)
     {
-        Reg::RegTensor<T, Reg::RegTraitNumTwo> vreg0;
+        Reg::RegTensor<T, Reg::RegTraitNumTwo> srcReg;
         Reg::MaskReg mask = Reg::CreateMask<T, Reg::MaskPattern::ALL, Reg::RegTraitNumTwo>();
-        Reg::Load(vreg0, src);
-        Reg::StoreAlign(dst, vreg0, mask);
+        Reg::Load(srcReg, src);
+        Reg::StoreAlign(dst, srcReg, mask);
     }
 
     __aicore__ inline void ComputeStoreTraitTwo(__ubuf__ T* dst, __ubuf__ T* src)
     {
-        Reg::RegTensor<T, Reg::RegTraitNumTwo> vreg0;
-        Reg::Load(vreg0, src);
-        Reg::Store(dst, vreg0);
+        Reg::RegTensor<T, Reg::RegTraitNumTwo> srcReg;
+        Reg::Load(srcReg, src);
+        Reg::Store(dst, srcReg);
     }
 
     __aicore__ inline void ComputeStoreTraitTwoWithCount(__ubuf__ T* dst, __ubuf__ T* src)
     {
-        Reg::RegTensor<T, Reg::RegTraitNumTwo> vreg0;
+        Reg::RegTensor<T, Reg::RegTraitNumTwo> srcReg;
         constexpr uint32_t calcount = GetVecLen() * 2 / sizeof(T);
-        Reg::Load(vreg0, src);
-        Reg::Store(dst, vreg0, calcount);
+        Reg::Load(srcReg, src);
+        Reg::Store(dst, srcReg, calcount);
     }
 
     __aicore__ inline void Compute()
