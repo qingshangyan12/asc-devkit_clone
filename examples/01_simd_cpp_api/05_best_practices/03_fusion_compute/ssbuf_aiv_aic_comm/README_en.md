@@ -27,7 +27,7 @@ This sample uses the `dav-3510` architecture and supports only NPU and NPU simul
 ### Example Function
 
 - AIC initializes the two message queues in SSBuffer.
-- AIC uses inter-core synchronization to notify the two AIVs that sending can start.
+- AIC uses mode 4 inter-core synchronization to notify the two AIVs that sending can start.
 - Each AIV sends 12 messages. AIC receives 24 messages in total according to the sender and sequence number.
 - AIC checks the message header, sender ID, sequence number, and checksum, then writes the results to GM.
 - The host reads the results from GM and verifies that messages are not lost, overwritten, or sent to the wrong queue.
@@ -52,7 +52,7 @@ This sample uses the `dav-3510` architecture and supports only NPU and NPU simul
 - `[2048, 3072)` is not used by this sample.
 - The two queues do not overlap, and each AIV writes only to its own queue.
 
-Each message is represented by `CommMessage` and contains a message header, sequence number, message value, and checksum. `alignas(128)` keeps messages 128-byte aligned, and the shared message header is declared `volatile`.
+Each message is represented by `CommMessage` and contains a message header, sequence number, message value, and checksum. `alignas(128)` keeps messages 128-byte aligned, and the shared message fields are declared `volatile`.
 
 ## Example Implementation
 
@@ -69,14 +69,15 @@ __aicore__ inline __ssbuf__ SsbufWorkspace* GetWorkspace()
 
 ### 2. Initialize the Message Queues on AIC
 
-The initial contents of SSBuffer are not guaranteed to be zero, and `AscendC::InitSocState()` does not clear SSBuffer. After starting, AIC clears each message header in both queues and uses mode 2 inter-core synchronization to notify the two AIVs that initialization is complete.
+The initial contents of SSBuffer are not guaranteed to be zero, and `AscendC::InitSocState()` does not clear SSBuffer. After starting, AIC clears all message headers and uses mode 4 inter-core synchronization to notify AIV0 and AIV1 separately.
 
 ```cpp
 InitQueues(workspace);
-AscendC::CrossCoreSetFlag<2, PIPE_MTE1>(READY_FLAG_ID);
+AscendC::CrossCoreSetFlag<4, PIPE_S>(GetAicFlagId(0, START_FLAG_ID));
+AscendC::CrossCoreSetFlag<4, PIPE_S>(GetAicFlagId(1, START_FLAG_ID));
 ```
 
-`CrossCoreSetFlag<2>` sends a start notification from AIC to both AIVs in the same AI Core. Each AIV calls the matching `CrossCoreWaitFlag<2>` before accessing its message queue.
+Mode 4 synchronizes AIC with one AIV in the same AI Core. AIV0 and AIV1 both use local flag IDs in the range `0-15`. On AIC, IDs `0-15` map to AIV0 and IDs `16-31` map to AIV1. `GetAicFlagId` calculates the AIC-side flag ID as `sender * 16 + aivFlagId`.
 
 ### 3. Send Messages from AIV
 
@@ -86,20 +87,30 @@ An AIV calls `AscendC::GetSubBlockIdx()` to obtain its Vector core ID and select
 queueIndex = sequence & (QUEUE_DEPTH - 1);
 ```
 
-The queue depth is 8, which is a power of two, so the bitwise AND is equivalent to taking the remainder after division by 8. The AIV writes the message body first and sets the `valid` bit in the message header last to indicate that the message is ready.
+The queue depth is 8, which is a power of two, so the bitwise AND is equivalent to taking the remainder after division by 8. The AIV writes `sequence`, `value`, `checksum`, and `head`, then sends a message-ready notification:
 
-When the sequence number exceeds the queue depth, a new message returns to storage at the beginning of the queue. For example, sequences 0 and 8 both use position 0. Before reusing a position, the AIV polls its `valid` bit and continues only after AIC has cleared the message header. This prevents an unread message from being overwritten.
+```cpp
+AscendC::CrossCoreSetFlag<4, PIPE_S>(MESSAGE_READY_FLAG_ID);
+```
+
+The notification tells AIC that the message is ready to read. When the sequence number exceeds the queue depth, a new message returns to storage at the beginning of the queue. For example, sequences 0 and 8 both use position 0. Before reusing a position, the AIV waits for an ACK to make sure AIC has consumed the previous message.
 
 ### 4. Receive Messages on AIC
 
-AIC reads the two queues according to the sender ID and expected sequence number. Before each read, AIC polls the message header until the `valid` bit is set, then checks the following fields:
+AIC reads the two queues according to the sender ID and expected sequence number. Before each read, AIC uses mode 4 inter-core synchronization to wait for the selected AIV's message-ready notification, then checks the following fields:
 
 - Whether the function ID is `0x5A01`.
+- Whether the `valid` bit is set.
 - Whether the sender ID matches the queue being read.
 - Whether the sequence number is the expected value.
 - Whether the checksum matches the sender ID, sequence number, and message value.
 
-AIC writes the check result and message contents to `CommResult` in GM. After reading, AIC clears the message header so that the message storage can be reused.
+AIC writes the check result and message contents to `CommResult` in GM. After reading, AIC clears the message header and sends an ACK through the sender-specific flag ID so that the AIV can reuse the message storage:
+
+```cpp
+ClearMessage(message);
+AscendC::CrossCoreSetFlag<4, PIPE_S>(GetAicFlagId(expectedSender, MESSAGE_ACK_FLAG_ID));
+```
 
 ### 5. Kernel Entry and Host Invocation
 
@@ -159,4 +170,5 @@ test pass!
 - The custom message layout must fit within 3 KB and must not overlap with another SSBuffer protocol.
 - Do not change the order in which the message fields and `valid` bit are written or the message header is cleared.
 - Keep the queue depth as a power of two when using the bitwise queue-index calculation.
-- The shared message header requires `volatile`. Message publication and queue-space reuse must be completed through matching inter-core synchronization or message-state checks.
+- Shared message fields require `volatile`. Message publication and queue-space reuse must use matching mode 4 inter-core synchronization notifications.
+- AIV flag IDs range from `0` to `15`. AIC uses IDs `0-15` and `16-31` to pair with AIV0 and AIV1, respectively.

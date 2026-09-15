@@ -1,7 +1,7 @@
 # 算子实现
 
 >[!NOTE]说明
->阅读本节前，请先了解[SSBuffer基础知识](./basics.md)。
+>阅读本节前，请先了解[CV融合算子](../cv_fusion/basics.md)以及[地址空间限定符](../../../../programming_guide/language_extension/simd_builtin_keywords.md#地址空间限定符)。
 >本节内容适用于Ascend 950PR/Ascend 950DT。
 
 下文以基于SSBuffer的AIV/AIC通信算子为例，介绍显式SSBuffer通信的设计和实现过程。该算子在一个`__mix__(1, 2)`任务中启动一个AIC和两个AIV。每个AIV通过自己的环形消息队列发送12条消息，AIC接收消息并将结果写入GM，最后由Host侧逐条校验。

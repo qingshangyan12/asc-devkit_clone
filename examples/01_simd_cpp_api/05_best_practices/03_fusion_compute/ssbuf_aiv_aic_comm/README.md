@@ -27,7 +27,7 @@
 ### 样例功能
 
 - AIC初始化SSBuffer中的两条消息队列。
-- AIC通过核间同步通知两个AIV开始发送。
+- AIC通过模式4核间同步通知两个AIV开始发送。
 - 两个AIV分别发送12条消息，AIC按发送方和消息序号接收24条消息。
 - AIC检查消息头、发送方编号、消息序号和校验值，并将结果写入GM。
 - Host侧回读GM中的结果，确认消息没有丢失、覆盖或进入错误的消息队列。
@@ -52,7 +52,7 @@
 - `[2048, 3072)`在本样例中不使用。
 - 两条消息队列互不重叠，每个AIV只写自己的消息队列。
 
-每条消息由`CommMessage`表示，包含消息头、消息序号、消息数据和校验值。`alignas(128)`保证消息按128B对齐，跨核共享的消息头使用`volatile`。
+每条消息由`CommMessage`表示，包含消息头、消息序号、消息数据和校验值。`alignas(128)`保证消息按128B对齐，跨核共享的消息字段使用`volatile`。
 
 ## 样例实现
 
@@ -69,14 +69,15 @@ __aicore__ inline __ssbuf__ SsbufWorkspace* GetWorkspace()
 
 ### 2. AIC初始化消息队列
 
-SSBuffer初始内容不保证为0，`AscendC::InitSocState()`也不会清空SSBuffer。AIC启动后遍历两个AIV的消息队列，清除每个消息的消息头，再通过模式2核间同步通知两个AIV开始工作。
+SSBuffer初始内容不保证为0，`AscendC::InitSocState()`也不会清空SSBuffer。AIC启动后遍历两个AIV的消息队列，清除全部消息头，再通过模式4核间同步分别通知AIV0和AIV1开始工作。
 
 ```cpp
 InitQueues(workspace);
-AscendC::CrossCoreSetFlag<2, PIPE_MTE1>(READY_FLAG_ID);
+AscendC::CrossCoreSetFlag<4, PIPE_S>(GetAicFlagId(0, START_FLAG_ID));
+AscendC::CrossCoreSetFlag<4, PIPE_S>(GetAicFlagId(1, START_FLAG_ID));
 ```
 
-`CrossCoreSetFlag<2>`表示AIC向同一AI Core内的两个AIV发送启动通知。AIV必须先调用对应的`CrossCoreWaitFlag<2>`，收到通知后才能访问消息队列。
+模式4用于同一AI Core内AIC与单个AIV之间的同步。AIV0和AIV1都使用本地标记ID `0~15`，AIC侧使用`0~15`对应AIV0，使用`16~31`对应AIV1。`GetAicFlagId`按照`sender * 16 + aivFlagId`计算AIC侧标记ID。
 
 ### 3. AIV发送消息
 
@@ -86,20 +87,30 @@ AIV通过`AscendC::GetSubBlockIdx()`获取自己的Vector核编号，并选择�
 queueIndex = sequence & (QUEUE_DEPTH - 1);
 ```
 
-当前队列深度为8，是2的幂，因此位与计算等价于对8取模。AIV先写入消息体，最后设置消息头的`valid`位，表示消息已经准备完成。
+当前队列深度为8，是2的幂，因此位与计算等价于对8取模。AIV依次写入`sequence`、`value`、`checksum`和`head`，再调用：
 
-当序号超过队列深度时，新的消息会回到队列开头的存储位置。例如序号0和序号8都会使用位置0。AIV在复用位置前轮询该位置的`valid`位，只有AIC清除消息头后才继续写入，避免覆盖尚未消费的消息。
+```cpp
+AscendC::CrossCoreSetFlag<4, PIPE_S>(MESSAGE_READY_FLAG_ID);
+```
+
+该通知表示消息已经准备完成，AIC收到通知后才读取消息。当序号超过队列深度时，新的消息会回到队列开头的存储位置。例如序号0和序号8都会使用位置0。AIV在复用位置前等待ACK，确保旧消息已经由AIC处理完成。
 
 ### 4. AIC接收消息
 
-AIC按发送方编号和消息序号读取两条消息队列。每次读取前轮询消息头，直到`valid`位置为1，然后检查以下内容：
+AIC按发送方编号和消息序号读取两条消息队列。每次读取前通过模式4核间同步等待对应AIV的消息准备完成通知，然后检查以下内容：
 
 - 功能号是否为`0x5A01`。
+- `valid`位是否已经设置。
 - 发送方编号是否与当前消息队列一致。
 - 消息序号是否为当前期待值。
 - 校验值是否与发送方、序号和消息数据匹配。
 
-检查结果和消息内容写入GM中的`CommResult`。AIC完成读取后清除消息头，表示该消息空间可以再次使用。
+检查结果和消息内容写入GM中的`CommResult`。AIC完成读取后清除消息头，并通过发送方对应的ACK标记ID通知AIV释放该消息空间：
+
+```cpp
+ClearMessage(message);
+AscendC::CrossCoreSetFlag<4, PIPE_S>(GetAicFlagId(expectedSender, MESSAGE_ACK_FLAG_ID));
+```
 
 ### 5. Kernel入口和Host调用
 
@@ -159,4 +170,5 @@ test pass!
 - 自定义消息布局不能超过3KB，也不能与其他SSBuffer协议重叠。
 - 消息字段的写入顺序、`valid`位和消息头清理顺序不能随意调整。
 - 队列深度需要保持为2的幂，才能使用位与方式计算队列位置。
-- 跨核共享字段需要使用`volatile`，消息发布和空间复用需要通过配对的核间同步或状态检查完成。
+- 跨核共享字段需要使用`volatile`，消息发布和空间复用需要使用配对的模式4核间同步通知。
+- AIV侧标记ID范围为`0~15`；AIC侧通过`0~15`和`16~31`分别与AIV0和AIV1配对。
