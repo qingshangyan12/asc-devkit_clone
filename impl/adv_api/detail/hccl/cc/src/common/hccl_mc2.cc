@@ -364,9 +364,16 @@ HcclResult BuildTagsAndValidate(
         const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
         topoTag[i] = std::to_string(ccTiling->opType) + "_" + std::to_string(ccTiling->srcDataType) + "_" +
                      std::string(commName);
+        printf("[DBG] BuildTagsAndValidate topoTag[%u]=%s (len=%zu)\n", i, topoTag[i].c_str(), topoTag[i].length());
+        HcclResult tagRet = HcclCheckTag(topoTag[i].c_str());
+        printf("[DBG] HcclCheckTag ret=%d\n", tagRet);
         CHK_RET(HcclCheckTag(topoTag[i].c_str()));
         bool isReduce;
+        HcclResult reduceRet = CheckIsReduce(ccTiling, &isReduce);
+        printf("[DBG] CheckIsReduce ret=%d, isReduce=%d\n", reduceRet, isReduce ? 1 : 0);
         CHK_RET(CheckIsReduce(ccTiling, &isReduce));
+        HcclResult dtRet = CheckDataType(static_cast<HcclDataType>(ccTiling->srcDataType), isReduce);
+        printf("[DBG] CheckDataType ret=%d, srcDataType=%u\n", dtRet, ccTiling->srcDataType);
         CHK_RET(CheckDataType(static_cast<HcclDataType>(ccTiling->srcDataType), isReduce));
 
         if (i == 0) {
@@ -376,7 +383,10 @@ HcclResult BuildTagsAndValidate(
             ctxTag += "_" + std::to_string(ccTiling->opType) + "_" + std::string(ccTiling->algConfig) + "_" +
                       std::to_string(ccTiling->commEngine);
         }
+        printf("[DBG] ctxTag=%s (len=%zu)\n", ctxTag.c_str(), ctxTag.length());
     }
+    HcclResult rankRet = HcomCheckUserRank(rankSize, userRank);
+    printf("[DBG] HcomCheckUserRank ret=%d, rankSize=%u, userRank=%u\n", rankRet, rankSize, userRank);
     CHK_RET(HcomCheckUserRank(rankSize, userRank));
     return HCCL_SUCCESS;
 }
@@ -472,6 +482,9 @@ HcclResult AllocComResourceByTilingCcu(
     }
 
     // 逐算子选择算法 + 资源准备（executor->CalcRes + GetAlgResCcu）
+    printf("[DBG] AllocComResourceByTilingCcu: calling CcuSelectAlg, checkOnly=%d\n", checkOnly ? 1 : 0);
+    HcclResult algRet = CcuSelectAlg(comm, stream, topoTag, ccTilingList, tilingNum, mc2Tiling, resCtx, checkOnly);
+    printf("[DBG] CcuSelectAlg ret=%d\n", algRet);
     CHK_RET(CcuSelectAlg(comm, stream, topoTag, ccTilingList, tilingNum, mc2Tiling, resCtx, checkOnly));
     HCCL_INFO("[AllocComResourceByTilingCcu]CcuSelectAlg successfully!");
     if (checkOnly) {
@@ -508,15 +521,21 @@ HcclResult DispatchAllocByCommEngine(
             comm, stream, mc2Tiling, ccTilingList, tilingNum, commName, rankSize, userRank, opResCtx, ctxTag));
     } else if (commEngine == static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
         HCCL_INFO("[HcclAllocComResourceByTiling]commEngine == CCU_SCHED!");
-        if (!CheckCcuAlgorithmsRegistered(ccTilingList, tilingNum)) {
+        bool algRegistered = CheckCcuAlgorithmsRegistered(ccTilingList, tilingNum);
+        printf("[DBG] CheckCcuAlgorithmsRegistered -> %s\n", algRegistered ? "true" : "false");
+        if (!algRegistered) {
             HCCL_INFO("[HcclAllocComResourceByTiling]Current ccu algorithm is not supported in mc2_client.");
+            printf("[DBG] return HCCL_E_ALG_NOT_SUPPORTED(%d)\n", HCCL_E_ALG_NOT_SUPPORTED);
             return HCCL_E_ALG_NOT_SUPPORTED;
         }
+        HcclResult kfcRet = CheckCcuKfcFlow(mc2Tiling, ccTilingList, tilingNum, rankSize);
+        printf("[DBG] CheckCcuKfcFlow ret=%d\n", kfcRet);
         CHK_RET(CheckCcuKfcFlow(mc2Tiling, ccTilingList, tilingNum, rankSize));
         HCCL_INFO("[MC2_DEBUG] before AllocComResourceByTilingCcu.");
         HcclResult ret = AllocComResourceByTilingCcu(
             comm, stream, mc2Tiling, ccTilingList, tilingNum, commName, rankSize, userRank, opResCtx, ctxTag,
             checkOnly);
+        printf("[DBG] AllocComResourceByTilingCcu ret=%d\n", ret);
         HCCL_INFO("[MC2_DEBUG] after AllocComResourceByTilingCcu, ret[%d].", ret);
         CHK_PRT_RET(
             ret != HCCL_SUCCESS,
@@ -524,6 +543,7 @@ HcclResult DispatchAllocByCommEngine(
             ret);
     } else {
         HCCL_ERROR("[%s] unsupported commEngine[%u]", __func__, commEngine);
+        printf("[DBG] unsupported commEngine=%u -> return HCCL_E_NOT_SUPPORT\n", commEngine);
         return HCCL_E_NOT_SUPPORT;
     }
 
@@ -605,6 +625,100 @@ HcclResult __attribute__((visibility("default"))) CheckOpResSufficient(HcclComm 
         "[CheckOpResSufficient] finished, comm[%p], stream[%p], tiling[%p], ret[%d].", comm, stream, mc2Tiling, ret);
     return ret;
 }
+
+namespace {
+// 与老版CheckOpResSufficient(comm, stream, mc2Tiling)保持同一业务逻辑：
+// ccArgs统一为Mc2GetCcArgs分配的Mc2OpArgs；由ccArgs合成单算子ccTiling/InitTiling后，
+// 直接复用 HcclAllocComResourceByTilingImpl 的分发链 DispatchAllocByCommEngine（checkOnly=true），
+// 语义固定为check-only：不落盘OpResCtx、不申请device ctx。
+// algConfig契约与mc2Tiling版一致：必须是非空、不含'='的已注册算法名，否则返回HCCL_E_ALG_NOT_SUPPORTED。
+HcclResult HcclAllocCcResByArgsImpl(HcclComm comm, uint8_t ccType, void* ccArgs)
+{
+    HcclUs startut = TIME_NOW();
+    DevType deviceType = DevType::DEV_TYPE_COUNT;
+    printf("[DBG] HcclAllocCcResByArgsImpl ENTER, comm=%p, ccType=%u, ccArgs=%p\n", comm, ccType, ccArgs);
+    HcclResult dbgRet = hrtGetDeviceType(deviceType);
+    printf("[DBG] hrtGetDeviceType ret=%d, deviceType=%u\n", dbgRet, deviceType);
+    CHK_RET(hrtGetDeviceType(deviceType));
+    if (deviceType != DevType::DEV_TYPE_950) {
+        HCCL_ERROR("[%s] invalid deviceType[%u]", __func__, deviceType);
+        printf("[DBG] deviceType != 950, return HCCL_E_NOT_SUPPORT\n");
+        return HCCL_E_NOT_SUPPORT;
+    }
+    printf("[DBG] InitEnvConfig before...\n");
+    CHK_RET(InitEnvConfig());
+    printf("[DBG] InitEnvConfig done\n");
+
+    const HcclCMDType opType = static_cast<HcclCMDType>(ccType);
+    printf("[DBG] ccType=%u, opType(host enum)=%d, HCCL_CMD_MAX=%d\n", ccType, static_cast<int>(opType),
+           static_cast<int>(HcclCMDType::HCCL_CMD_MAX));
+    if (opType >= HcclCMDType::HCCL_CMD_MAX) {
+        HCCL_ERROR("[%s] invalid ccType[%u]", __func__, ccType);
+        printf("[DBG] opType >= HCCL_CMD_MAX -> return HCCL_E_PARA(1)\n");
+        return HCCL_E_PARA;
+    }
+    printf("[DBG] opType check passed\n");
+
+    // 直接从ccArgs取参数，与Mc2AcquireCcResCtx入口处的读取保持一致
+    const auto* args = static_cast<const Mc2OpArgs*>(ccArgs);
+    const uint8_t commEngine = args->commEngine;
+    HCCL_INFO(
+        "[%s] start, comm[%p], ccType[%u], args[%p], commEngine[%u], srcDataType[%u], dstDataType[%u], "
+        "reduceType[%u], algConfig[%s].",
+        __func__, comm, ccType, ccArgs, commEngine, static_cast<uint32_t>(args->srcDataType),
+        static_cast<uint32_t>(args->dstDataType), static_cast<uint32_t>(args->reduceType), args->algConfig.c_str());
+    printf("[DBG] args: commEngine=%u, srcDataType=%u, dstDataType=%u, reduceType=%u, algConfig=%s\n",
+           commEngine, static_cast<uint32_t>(args->srcDataType), static_cast<uint32_t>(args->dstDataType),
+           static_cast<uint32_t>(args->reduceType), args->algConfig.c_str());
+
+    u32 rankSize = INVALID_VALUE_RANKSIZE;
+    dbgRet = HcclGetRankSize(comm, &rankSize);
+    printf("[DBG] HcclGetRankSize ret=%d, rankSize=%u\n", dbgRet, rankSize);
+    CHK_RET(HcclGetRankSize(comm, &rankSize));
+    u32 userRank = INVALID_VALUE_RANKID;
+    dbgRet = HcclGetRankId(comm, &userRank);
+    printf("[DBG] HcclGetRankId ret=%d, userRank=%u\n", dbgRet, userRank);
+    CHK_RET(HcclGetRankId(comm, &userRank));
+    char commName[COMM_INDENTIFIER_MAX_LENGTH];
+    dbgRet = HcclGetCommName(comm, commName);
+    printf("[DBG] HcclGetCommName ret=%d, commName=%s\n", dbgRet, commName);
+    CHK_RET(HcclGetCommName(comm, commName));
+
+    // 与老版入口一致：单rank必然资源充足；非CCU_SCHED引擎的资源充足性不在本预检路径覆盖范围内，直接返回SUCCESS。
+    // 该守卫必须保留：DispatchAllocByCommEngine 的 AICPU_TS 分支会执行真实分配（忽略checkOnly）。
+    if (rankSize == 1 || commEngine != static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
+        HCCL_INFO("[%s]checkOnly, rankSize[%u], commEngine[%u], return SUCCESS.", __func__, rankSize, commEngine);
+        printf("[DBG] rankSize=%u, commEngine=%u, CCU_SCHED=%u, return SUCCESS early\n", rankSize, commEngine,
+               static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED));
+        return HCCL_SUCCESS;
+    }
+    printf("[DBG] rankSize=%u commEngine=%u -> proceeding to BuildMc2CcTiling\n", rankSize, commEngine);
+
+    // 由ccArgs构造单算子ccTiling（与BuildMc2BuiltinCtx同源；内部完成opType白名单校验）
+    Mc2CcTilingInner ccTiling{};
+    dbgRet = BuildMc2CcTiling(comm, ccType, *args, ccTiling);
+    printf("[DBG] BuildMc2CcTiling ret=%d, opType=%u, commEngine=%u, algConfig=%s, groupName=%s\n",
+           dbgRet, ccTiling.opType, ccTiling.commEngine, ccTiling.algConfig, ccTiling.groupName);
+    CHK_RET(BuildMc2CcTiling(comm, ccType, *args, ccTiling));
+    const void* ccTilingList[Hccl::MC2_MAX_OP_NUM] = {&ccTiling};
+
+    // 合成InitTiling（与BuildMc2BuiltinCtx同源；DispatchAllocByCommEngine 内的 CheckCcuKfcFlow 需要）
+    Mc2InitTilingInner initTiling{};
+    initTiling.version = INIT_TILING_CCU_NEW_VERSION;
+    initTiling.mc2HcommCnt = 1U;
+    initTiling.offset[0] = 0U;
+    printf("[DBG] initTiling.version=%u, mc2HcommCnt=%u\n", initTiling.version, initTiling.mc2HcommCnt);
+
+    // 复用mc2Tiling版分发链：CheckCcuAlgorithmsRegistered + CheckCcuKfcFlow + AllocComResourceByTilingCcu
+    void* opResCtx = nullptr;
+    printf("[DBG] calling DispatchAllocByCommEngine...\n");
+    HcclResult dispatchRet = DispatchAllocByCommEngine(
+        comm, nullptr, &initTiling, ccTilingList, 1U, commName, rankSize, userRank, commEngine, &opResCtx,
+        /*checkOnly=*/true, startut);
+    printf("[DBG] DispatchAllocByCommEngine returned %d\n", dispatchRet);
+    return dispatchRet;
+}
+} // namespace
 
 extern "C" HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTilingA5Mc2(
     HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
@@ -799,6 +913,22 @@ CcuResult CcuKernelLaunch(const HcclComm comm, void* opResCtx)
     return LaunchCcuKernel(comm, opParamHost);
 }
 
+// 资源探测入口：CheckOpResSufficient在Mc2AcquireCcResCtx前调用，参数直接从ccArgs取值，
+// 与CheckOpResSufficient(comm, stream, mc2Tiling)业务逻辑一致（checkOnly预检链）。
+HcclResult __attribute__((visibility("default"))) CheckOpResSufficient(HcclComm comm, uint8_t ccType, void* ccArgs)
+{
+    CHK_PTR_NULL(comm);
+    CHK_PTR_NULL(ccArgs);
+
+    if (GetExternalInputHcclEnableEntryLog()) {
+        HCCL_RUN_INFO("Entry-CheckOpResSufficient(ccArgs), comm[%p], ccType[%u], ccArgs[%p].", comm, ccType, ccArgs);
+    }
+    HcclResult ret = HcclAllocCcResByArgsImpl(comm, ccType, ccArgs);
+    HCCL_RUN_INFO(
+        "[CheckOpResSufficient] finished, comm[%p], ccType[%u], ccArgs[%p], ret[%d].", comm, ccType, ccArgs, ret);
+    return ret;
+}
+
 extern "C" {
 uint32_t __attribute__((visibility("default"))) Mc2GetCcArgs(void** ccArgs)
 {
@@ -836,6 +966,13 @@ uint32_t __attribute__((visibility("default"))) Mc2SetCcAlgConfig(void* ccArgs, 
 {
     CHK_PTR_NULL(ccArgs);
     CHK_PTR_NULL(algConfig);
+    // 与Mc2KfcOpArgsSetAlgConfig一致：algConfig最终要装入Mc2CcTilingInner::algConfig[ALG_CONFIG_SIZE]，
+    // 超长在设置阶段就以E_PARA拒绝，避免延迟到BuildMc2CcTiling的strcpy_s才失败
+    const size_t algConfigLen = strlen(algConfig);
+    if (algConfigLen >= ALG_CONFIG_SIZE) {
+        HCCL_ERROR("[Mc2SetCcAlgConfig] algConfig length[%zu] exceeds max[%u]", algConfigLen, ALG_CONFIG_SIZE);
+        return HCCL_E_PARA;
+    }
     auto* args = static_cast<Mc2OpArgs*>(ccArgs);
     args->algConfig = algConfig;
     return HCCL_SUCCESS;

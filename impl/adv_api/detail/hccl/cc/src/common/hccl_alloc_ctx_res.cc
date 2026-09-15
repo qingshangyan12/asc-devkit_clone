@@ -704,12 +704,17 @@ HcclResult TryForcedAlgAndPrepareEngine(
     forcedAlgAccepted = false;
     std::string forcedAlgName;
     if (!GetForcedAlgName(ccTiling, forcedAlgName)) {
+        printf("[DBG] TryForcedAlgAndPrepareEngine: GetForcedAlgName false, no forced alg\n");
         return HCCL_SUCCESS;
     }
+    printf("[DBG] TryForcedAlgAndPrepareEngine: forcedAlgName=%s\n", forcedAlgName.c_str());
 
     OpParam opParamBackup = opParam;
+    HcclResult topoRet = PrepareTopoInfoForOp(comm, opParam, topoInfo);
+    printf("[DBG] PrepareTopoInfoForOp ret=%d\n", topoRet);
     CHK_RET(PrepareTopoInfoForOp(comm, opParam, topoInfo));
     HcclResult ret = PrepareEngineForAlg(opParam, forcedAlgName);
+    printf("[DBG] PrepareEngineForAlg ret=%d\n", ret);
     if (ret != HCCL_SUCCESS) {
         opParam = opParamBackup;
         HCCL_ERROR(
@@ -719,6 +724,7 @@ HcclResult TryForcedAlgAndPrepareEngine(
     }
 
     ret = CheckForcedAlgResource(comm, opParam, topoInfo.get(), forcedAlgName);
+    printf("[DBG] CheckForcedAlgResource ret=%d\n", ret);
     if (ret != HCCL_SUCCESS) {
         opParam = opParamBackup;
         topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
@@ -733,6 +739,7 @@ HcclResult TryForcedAlgAndPrepareEngine(
     algName = forcedAlgName;
     forcedAlgAccepted = true;
     HCCL_INFO("[MC2_FORCE_ALG] accepted, opType[%u], algName[%s].", static_cast<u32>(opParam.opType), algName.c_str());
+    printf("[DBG] forced alg accepted: %s\n", algName.c_str());
     return HCCL_SUCCESS;
 }
 
@@ -1007,14 +1014,23 @@ HcclResult SelectCcuAlgorithm(
     OpParam& opParam, std::string& algName, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo,
     AlgorithmType& algorithmType, bool onlyCheck = false)
 {
+    printf("[DBG] SelectCcuAlgorithm ENTER, onlyCheck=%d, topoTag=%s\n", onlyCheck ? 1 : 0, topoTag.c_str());
+    HcclResult initRet = InitOpParamByTiling(comm, stream, topoTag, ccTiling, opParam);
+    printf("[DBG] InitOpParamByTiling ret=%d\n", initRet);
     CHK_RET(InitOpParamByTiling(comm, stream, topoTag, ccTiling, opParam));
     HCCL_INFO("[CcuSelectAlg]InitOpParamByTiling[%u] successfully!", tilingIndex);
 
     if (onlyCheck) {
         // 校验路径：强制算法 + 计算校验回退默认selector
         bool forcedAlgAccepted = false;
+        HcclResult forcedRet = TryForcedAlgAndPrepareEngine(comm, ccTiling, opParam, algName, topoInfo, forcedAlgAccepted);
+        printf("[DBG] TryForcedAlgAndPrepareEngine ret=%d, forcedAlgAccepted=%d, algName=%s\n",
+               forcedRet, forcedAlgAccepted ? 1 : 0, algName.c_str());
         CHK_RET(TryForcedAlgAndPrepareEngine(comm, ccTiling, opParam, algName, topoInfo, forcedAlgAccepted));
         if (!forcedAlgAccepted) {
+            printf("[DBG] forced alg not accepted, falling back to SelectAlgAndPrepareEngine...\n");
+            HcclResult selRet = SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo);
+            printf("[DBG] SelectAlgAndPrepareEngine ret=%d, algName=%s\n", selRet, algName.c_str());
             CHK_RET(SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo));
             HCCL_INFO(
                 "[CcuSelectAlg]SelectAlgAndPrepareEngine[%u] successfully, algName = [%s]!", tilingIndex,

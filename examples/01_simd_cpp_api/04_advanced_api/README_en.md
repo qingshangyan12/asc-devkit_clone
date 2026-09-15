@@ -20,3 +20,4 @@ This section contains usage samples based on Ascend C high-level APIs, introduci
 | [09_random](./09_random) | This sample set introduces typical usage of random functions with different features and provides corresponding end-to-end implementations |
 | [10_math](./10_math) | This sample set introduces typical usage of math computations with different operator features and provides corresponding end-to-end implementations |
 | [11_utils](./11_utils) | This sample set introduces typical usage of data type features and provides corresponding end-to-end implementations |
+| [12_hccl_ccu](./12_hccl_ccu) | This sample set introduces typical usage of preparing CCU communication resources via MC2 builtin APIs and collective communication via HCCL high-level APIs, and provides corresponding end-to-end implementations |
