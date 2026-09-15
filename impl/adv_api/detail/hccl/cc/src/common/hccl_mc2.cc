@@ -597,6 +597,8 @@ HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTiling(
     return HcclAllocComResourceByTilingImpl(comm, stream, mc2Tiling, opResCtx);
 }
 
+// 资源探测入口（mc2Tiling版）：复用真实分配链做checkOnly预检，不落盘OpResCtx。
+// 业务语义与下方ccArgs版重载CheckOpResSufficient(comm, ccType, ccArgs)一致。
 HcclResult __attribute__((visibility("default"))) CheckOpResSufficient(HcclComm comm, void* stream, void* mc2Tiling)
 {
     void* opResCtx = nullptr;
@@ -605,6 +607,82 @@ HcclResult __attribute__((visibility("default"))) CheckOpResSufficient(HcclComm 
         "[CheckOpResSufficient] finished, comm[%p], stream[%p], tiling[%p], ret[%d].", comm, stream, mc2Tiling, ret);
     return ret;
 }
+
+namespace {
+// 与老版CheckOpResSufficient(comm, stream, mc2Tiling)保持同一业务逻辑：
+// ccArgs统一为Mc2GetCcArgs分配的Mc2OpArgs；由ccArgs合成单算子ccTiling/InitTiling后，
+// 直接复用 HcclAllocComResourceByTilingImpl 的分发链 DispatchAllocByCommEngine（checkOnly=true），
+// 语义固定为check-only：不落盘OpResCtx、不申请device ctx。
+// algConfig契约与mc2Tiling版一致：必须是非空、不含'='的已注册算法名，否则返回HCCL_E_ALG_NOT_SUPPORTED。
+HcclResult HcclAllocCcResByArgsImpl(HcclComm comm, uint8_t ccType, void* ccArgs)
+{
+    HcclUs startut = TIME_NOW();
+    DevType deviceType = DevType::DEV_TYPE_COUNT;
+    CHK_RET(hrtGetDeviceType(deviceType));
+    if (deviceType != DevType::DEV_TYPE_950) {
+        HCCL_ERROR("[%s] invalid deviceType[%u]", __func__, deviceType);
+        return HCCL_E_NOT_SUPPORT;
+    }
+    CHK_RET(InitEnvConfig());
+
+    // 差异点：mc2Tiling版不在此处显式校验opType（等价校验下沉到HcclGetTilingList解析的tiling内容），
+    // 本版ccType是裸数值，需先挡掉非法值再转HcclCMDType。
+    const HcclCMDType opType = static_cast<HcclCMDType>(ccType);
+    if (opType >= HcclCMDType::HCCL_CMD_MAX) {
+        HCCL_ERROR("[%s] invalid ccType[%u]", __func__, ccType);
+        return HCCL_E_PARA;
+    }
+
+    // 直接从ccArgs取参数，与Mc2AcquireCcResCtx入口处的读取保持一致
+    // 差异点：mc2Tiling版的commEngine经ObtainCommEngine从各ccTiling逐个读出并比对一致性；
+    // 本版只有单算子，直接取args->commEngine即可，无需比对。
+    const auto* args = static_cast<const Mc2OpArgs*>(ccArgs);
+    const uint8_t commEngine = args->commEngine;
+    HCCL_INFO(
+        "[%s] start, comm[%p], ccType[%u], args[%p], commEngine[%u], srcDataType[%u], dstDataType[%u], "
+        "reduceType[%u], algConfig[%s].",
+        __func__, comm, ccType, ccArgs, commEngine, static_cast<uint32_t>(args->srcDataType),
+        static_cast<uint32_t>(args->dstDataType), static_cast<uint32_t>(args->reduceType), args->algConfig.c_str());
+
+    // 差异点：Mc2AcquireCcResCtx会校验args->version与commEngine匹配；本版预检不做该校验
+    // （BuildMc2CcTiling内部按commEngine推导所需字段，不依赖version）。
+    u32 rankSize = INVALID_VALUE_RANKSIZE;
+    CHK_RET(HcclGetRankSize(comm, &rankSize));
+    u32 userRank = INVALID_VALUE_RANKID;
+    CHK_RET(HcclGetRankId(comm, &userRank));
+    char commName[COMM_INDENTIFIER_MAX_LENGTH];
+    CHK_RET(HcclGetCommName(comm, commName));
+
+    // 与老版入口一致：单rank必然资源充足；非CCU_SCHED引擎的资源充足性不在本预检路径覆盖范围内，直接返回SUCCESS。
+    // 该守卫必须保留：DispatchAllocByCommEngine 的 AICPU_TS 分支会执行真实分配（忽略checkOnly）。
+    // 差异点：mc2Tiling版的同款守卫在HcclAllocComResourceByTilingImpl内（此时已解析完全部tiling）；
+    // 本版在读取args->commEngine后即可判断，提前返回位置更靠前。
+    if (rankSize == 1 || commEngine != static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
+        HCCL_INFO("[%s]checkOnly, rankSize[%u], commEngine[%u], return SUCCESS.", __func__, rankSize, commEngine);
+        return HCCL_SUCCESS;
+    }
+
+    // 差异点：mc2Tiling版由用户传入mc2Tiling，经HcclGetTilingList解析出ccTilingList（可为多算子）；
+    // 本版由ccArgs经BuildMc2CcTiling现场合成单算子ccTiling（与BuildMc2BuiltinCtx同源；内部完成opType白名单校验）。
+    Mc2CcTilingInner ccTiling{};
+    CHK_RET(BuildMc2CcTiling(comm, ccType, *args, ccTiling));
+    const void* ccTilingList[Hccl::MC2_MAX_OP_NUM] = {&ccTiling};
+
+    // 合成InitTiling（与BuildMc2BuiltinCtx同源；DispatchAllocByCommEngine 内的 CheckCcuKfcFlow 需要）
+    Mc2InitTilingInner initTiling{};
+    initTiling.version = INIT_TILING_CCU_NEW_VERSION;
+    initTiling.mc2HcommCnt = 1U;
+    initTiling.offset[0] = 0U;
+
+    // 复用mc2Tiling版分发链：CheckCcuAlgorithmsRegistered + CheckCcuKfcFlow + AllocComResourceByTilingCcu
+    // 差异点：stream传nullptr——mc2Tiling版因CheckInputParam校验stream非空而有真实stream传入；
+    // 本版预检不涉及下发，仅CCU_SCHED分支会用到ccTilingList做资源计算，不需要stream。
+    void* opResCtx = nullptr;
+    return DispatchAllocByCommEngine(
+        comm, nullptr, &initTiling, ccTilingList, 1U, commName, rankSize, userRank, commEngine, &opResCtx,
+        /*checkOnly=*/true, startut);
+}
+} // namespace
 
 extern "C" HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTilingA5Mc2(
     HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
@@ -799,6 +877,22 @@ CcuResult CcuKernelLaunch(const HcclComm comm, void* opResCtx)
     return LaunchCcuKernel(comm, opParamHost);
 }
 
+// 资源探测入口（ccArgs版）：CheckOpResSufficient在Mc2AcquireCcResCtx前调用，参数直接从ccArgs取值，
+// 业务逻辑与CheckOpResSufficient(comm, stream, mc2Tiling)一致（checkOnly预检链），
+// 内部处理逻辑差异已逐点标注在HcclAllocCcResByArgsImpl各处对应代码行前。
+// 与Mc2CreateOpResCtx不同，本例入口和mc2Tiling版均不使用HCCL_ENTRY_LOG_ENABLE门控日志，
+// finished日志为非条件RUN_INFO，两版一致。
+HcclResult __attribute__((visibility("default"))) CheckOpResSufficient(HcclComm comm, uint8_t ccType, void* ccArgs)
+{
+    CHK_PTR_NULL(comm);
+    CHK_PTR_NULL(ccArgs);
+
+    HcclResult ret = HcclAllocCcResByArgsImpl(comm, ccType, ccArgs);
+    HCCL_RUN_INFO(
+        "[CheckOpResSufficient] finished, comm[%p], ccType[%u], ccArgs[%p], ret[%d].", comm, ccType, ccArgs, ret);
+    return ret;
+}
+
 extern "C" {
 uint32_t __attribute__((visibility("default"))) Mc2GetCcArgs(void** ccArgs)
 {
@@ -836,6 +930,13 @@ uint32_t __attribute__((visibility("default"))) Mc2SetCcAlgConfig(void* ccArgs, 
 {
     CHK_PTR_NULL(ccArgs);
     CHK_PTR_NULL(algConfig);
+    // 与Mc2KfcOpArgsSetAlgConfig一致：algConfig最终要装入Mc2CcTilingInner::algConfig[ALG_CONFIG_SIZE]，
+    // 超长在设置阶段就以E_PARA拒绝，避免延迟到BuildMc2CcTiling的strcpy_s才失败
+    const size_t algConfigLen = strlen(algConfig);
+    if (algConfigLen >= ALG_CONFIG_SIZE) {
+        HCCL_ERROR("[Mc2SetCcAlgConfig] algConfig length[%zu] exceeds max[%u]", algConfigLen, ALG_CONFIG_SIZE);
+        return HCCL_E_PARA;
+    }
     auto* args = static_cast<Mc2OpArgs*>(ccArgs);
     args->algConfig = algConfig;
     return HCCL_SUCCESS;
