@@ -1035,66 +1035,6 @@ __simd_callee__ inline vector_float asc_int642float_rna(
     vector_int64_t src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos);
 
 __simd_callee__ inline void asc_cast(
-    vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask,
-    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN> round_mode);
-
-__simd_callee__ inline void asc_cast(
-    vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask,
-    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RNA> round_mode);
-
-__simd_callee__ inline void asc_cast(
-    vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask,
-    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RD> round_mode);
-
-__simd_callee__ inline void asc_cast(
-    vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask,
-    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RU> round_mode);
-
-__simd_callee__ inline void asc_cast(
-    vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask,
-    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RZ> round_mode);
-
-__simd_callee__ inline void asc_cast(
-    vector_float& dst, vector_float src, vector_bool mask,
-    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN> round_mode);
-
-__simd_callee__ inline void asc_cast(
-    vector_float& dst, vector_float src, vector_bool mask,
-    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RNA> round_mode);
-
-__simd_callee__ inline void asc_cast(
-    vector_float& dst, vector_float src, vector_bool mask,
-    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RD> round_mode);
-
-__simd_callee__ inline void asc_cast(
-    vector_float& dst, vector_float src, vector_bool mask,
-    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RU> round_mode);
-
-__simd_callee__ inline void asc_cast(
-    vector_float& dst, vector_float src, vector_bool mask,
-    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RZ> round_mode);
-
-__simd_callee__ inline void asc_cast(
-    vector_half& dst, vector_half src, vector_bool mask,
-    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN> round_mode);
-
-__simd_callee__ inline void asc_cast(
-    vector_half& dst, vector_half src, vector_bool mask,
-    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RNA> round_mode);
-
-__simd_callee__ inline void asc_cast(
-    vector_half& dst, vector_half src, vector_bool mask,
-    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RD> round_mode);
-
-__simd_callee__ inline void asc_cast(
-    vector_half& dst, vector_half src, vector_bool mask,
-    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RU> round_mode);
-
-__simd_callee__ inline void asc_cast(
-    vector_half& dst, vector_half src, vector_bool mask,
-    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RZ> round_mode);
-
-__simd_callee__ inline void asc_cast(
     vector_half& dst, vector_int16_t src, vector_bool mask,
     std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN> round_mode);
 
