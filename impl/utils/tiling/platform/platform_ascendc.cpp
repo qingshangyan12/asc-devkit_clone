@@ -26,7 +26,7 @@
 namespace platform_ascendc {
 const static uint64_t LOCAL_RESERV_SIZE = 256;
 const static uint64_t KIRIN_UB_RESERVED_SIZE = 8 * 1024;
-const static uint32_t WORK_SPACE_SIZE_MC62 = 0;
+const static uint32_t WORK_SPACE_SIZE_MC62 = 1024;
 const static uint32_t WORK_SPACE_SIZE_910B = 16 * 1024 * 1024;
 const static uint32_t WORK_SPACE_SIZE_950 = 16 * 1024 * 1024;
 const static uint32_t WORK_SPACE_SIZE = 2 * 1024 * 1024;

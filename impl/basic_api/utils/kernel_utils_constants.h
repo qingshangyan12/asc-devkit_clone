@@ -332,7 +332,7 @@ constexpr size_t RESERVED_WORKSPACE = 16 * 1024 * 1024;
 #elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510))
 constexpr size_t RESERVED_WORKSPACE = 16 * 1024 * 1024;
 #elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102))
-constexpr size_t RESERVED_WORKSPACE = 0;
+constexpr size_t RESERVED_WORKSPACE = 1024;
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003)
 constexpr size_t RESERVED_WORKSPACE = 0;
 #elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3113))
