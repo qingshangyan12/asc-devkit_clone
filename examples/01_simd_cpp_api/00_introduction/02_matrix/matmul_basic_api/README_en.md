@@ -239,8 +239,6 @@ AscendC::DumpTensor(cLocal, baseM * baseN);
 
 ## Performance Debugging
 
-> **Note:** The current version of msOpProf does not support performance profiling on Ascend 960PR/Ascend 960DT.
-
 ### Introduction to the msOpProf Tool
 
 msOpProf is a single-operator performance analysis tool with two usage modes: `msopprof` and `msopprof simulator`. It helps users identify anomalies in operator memory, code, and instructions for comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and file types (executables or operator binary `.o` files).
