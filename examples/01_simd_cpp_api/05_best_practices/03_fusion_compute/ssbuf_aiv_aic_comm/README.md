@@ -18,7 +18,8 @@
 ├── ssbuf_aiv_aic_comm
 │   ├── CMakeLists.txt                 // 编译工程文件
 │   ├── ssbuf_aiv_aic_comm.asc         // Ascend C算子实现、Kernel调用和结果校验
-│   └── README.md                      // 样例说明文档
+│   ├── README.md                      // 中文样例说明文档
+│   └── README_en.md                   // 英文样例说明文档
 ```
 
 ## 样例描述
