@@ -25,6 +25,7 @@ from tbe.tvm.runtime import cce_runtime
 from tbe.common.buildcfg import get_current_build_config
 from tbe.tvm.error_mgr import raise_tbe_python_err, TBE_DEFAULT_PYTHON_ERROR_CODE
 from tbe.tvm.contrib.ccec import CCECInfo
+from tbe.common.platform.platform_info import COMPILER_ARCH, get_soc_spec
 from .ascendc_common_utility import (
     CommonUtility,
     write_mk,
@@ -45,6 +46,7 @@ from .ascendc_kernel_feature_manager import global_ascendc_kernel_feature_manage
 
 
 def compile_pre_process(op_info: OpInfo, compile_options: list):
+    global_var_storage.set_variable("ascendc_compile_options", list(compile_options))
     cce_runtime.TBE_WORKSPACE_SIZE_LIST.local_list = []
     cce_runtime.TBE_WORKSPACE_IND_LIST.local_list = []
     cce_runtime.MULTI_CORE_SYNC_WORKSPACE_SIZE_LIST.local_list = []
@@ -141,6 +143,28 @@ def fatbin_objs(obj_files: list, dst_file: str, is_debug: bool, compile_log_path
         "ascendc_enable_super_kernel"
     ) is True and global_var_storage.get_variable("ascendc_is_static_op"):
         return
+    from .static_compile_resource_id import ResourceIdError, generate_resource_id_object
+
+    resource_object = "%s.resource_id.o" % dst_file
+    compile_command = [global_var_storage.get_variable("ascendc_compiler_path")]
+    if global_var_storage.get_variable("ascendc_enable_ccache") == True:
+        compile_command.insert(0, os.environ.get("ASCENDC_CCACHE_EXECUTABLE"))
+    try:
+        resource_id = generate_resource_id_object(
+            obj_files,
+            resource_object,
+            compile_command,
+            global_var_storage.get_variable("ascendc_compile_options"),
+            get_soc_spec(COMPILER_ARCH),
+        )
+        global_var_storage.set_variable(
+            "ascendc_resource_id_" + os.path.abspath(dst_file), resource_id
+        )
+    except ResourceIdError as error:
+        raise RuntimeError(
+            "generate Resource ID metadata failed: %s" % error
+        ) from error
+    obj_files = list(obj_files) + [resource_object]
     compile_cmd = [
         CCECInfo.get_exe("ld.lld"),
         "-m",

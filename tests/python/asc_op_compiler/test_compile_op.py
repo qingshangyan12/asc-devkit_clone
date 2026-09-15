@@ -199,7 +199,7 @@ def read_resource_id_section_for_test(binary_file):
             [
                 objcopy,
                 "--dump-section",
-                f".ascend.resource_id={dump_file}",
+                f".ascend.meta={dump_file}",
                 binary_file,
             ],
             stdout=subprocess.PIPE,
@@ -209,7 +209,16 @@ def read_resource_id_section_for_test(binary_file):
         )
         if result.returncode != 0:
             raise AssertionError(f"Failed to read Resource ID: {result.stdout}")
-        return Path(dump_file).read_text(encoding="ascii")
+        section_data = Path(dump_file).read_bytes()
+        offset = 0
+        while offset + 4 <= len(section_data):
+            entry_type = int.from_bytes(section_data[offset : offset + 2], "little")
+            length = int.from_bytes(section_data[offset + 2 : offset + 4], "little")
+            value = section_data[offset + 4 : offset + 4 + length]
+            if entry_type == 6:
+                return value.decode("ascii")
+            offset += 4 + length
+        raise AssertionError("Resource ID entry not found in .ascend.meta")
 
 
 def compile_manifest_resources(manifest, manifest_dir, source_file_path):
@@ -528,13 +537,6 @@ class TestCompileOp(unittest.TestCase):
                     stack.enter_context(
                         mock.patch.object(compile_op_module, "_json_post_process")
                     )
-                    mock_write_resource_id = stack.enter_context(
-                        mock.patch.object(
-                            static_compile_resource_generator,
-                            "generate_and_write_resource_id",
-                            return_value="resource-id",
-                        )
-                    )
                     record_sk_function = (
                         compile_op_module._record_kernel_spec_sk_commands
                     )
@@ -798,18 +800,6 @@ class TestCompileOp(unittest.TestCase):
         kernel_spec.sk_cap_bitmap = None
 
         cases = (
-            (
-                "resource_id",
-                mock.patch.object(
-                    static_compile_resource_generator,
-                    "generate_and_write_resource_id",
-                    side_effect=static_compile_resource_generator.ResourceIdError(
-                        "resource failed"
-                    ),
-                ),
-                lambda: kernel_spec.attach_resource_id(),
-                "generate Resource ID failed, reason is: resource failed",
-            ),
             (
                 "manifest",
                 mock.patch.object(
