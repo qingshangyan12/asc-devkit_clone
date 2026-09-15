@@ -318,6 +318,21 @@
     -   和C++函数修饰符inline的主要区别是Device侧\_\_inline\_\_是强制内联，C++的inline则是根据编译器优化选择性内联。
     -   AI Core对函数嵌套深度有限制，一般推荐嵌套深度不超过4层。使用强制内联可以减少调用层次。
 
+## 函数参数标记<a name="function-parameter-annotations"></a>
+
+-   \_\_kfc\_workspace\_\_
+
+    KFC（Kernel Function Call）表示核间通信调用。在使用Matmul高阶API的mix算子中，Vector核向Cube核发起通信时，需要使用KFC系统workspace。`__kfc_workspace__`用于修饰核函数（Kernel）入口的workspace指针参数，供编译器识别并初始化KFC系统workspace地址。使用示例如下：
+
+    ```cpp
+    extern "C" __global__ __mix__(1, 2) void batch_matmul_custom(
+        __gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* c, __kfc_workspace__ __gm__ uint8_t* workspace,
+        __gm__ uint8_t* tilingGm);
+    ```
+
+    -   workspace参数使用`__kfc_workspace__`修饰，表示Host侧申请并传入的系统workspace。Kernel侧注册Matmul对象时，通过`GetSysWorkSpacePtr()`将该workspace传递给`REGIST_MATMUL_OBJ`。
+    -   `__kfc_workspace__`仅适用于使用Matmul高阶API的场景，且通过`__mix__(1, 2)`或`__mix__(1, 1)`声明的算子，即Cube核与Vector核的比例为1:2或1:1。
+
 ## 地址空间限定符<a name="section1624210295308"></a>
 
 AI Core具备多级独立片上存储，各个地址空间独立编址，具备各自的访存指令，根据架构差异，有些存储空间具备统一地址空间（Generic Address Space），有些则没有。设备侧编程基于语法扩展允许地址空间作为合法的类型限定符，以提供针对不同地址空间的访问能力和地址空间合法性检查。
@@ -496,15 +511,13 @@ $$
 
 -   使用**C API**时，对于纯Cube/纯Vector/Mix（1,1）场景，应使用内置变量block_idx获取当前核的逻辑位置；对于Mix（1,2）场景，应使用内置变量block_idx、asc_get_sub_block_num和asc_get_sub_block_id按公式计算logic_idx。
 
-## API内置数据类型
+## 内置数据类型
 
-使用以下数据类型时需要导入[SIMD API的头文件](../../../api/api_list.md#调用接口依赖的头文件和库文件说明)。
-
-**表5**  API内置数据类型
+**表5**  内置数据类型
 
 | 类型 | 数据类型 | 描述 | Size（bit） | 取值范围 |
 | --- | --- | --- | --- | --- |
-| 整型 | int4b_t | 有符号4位整数。 | 4 | [-8, 7] |
+| 整型 | int4b_t | 有符号4位整数。 | 8 | [-8, 7] |
 | 布尔型 | bool | 全0代表false，否则代表true。 | 8 | true、false |
 | 整型 | int4x2_t | 两个有符号4位整数打包为一个8比特存储单元。 | 8 | 每个元素的取值范围为[-8, 7]。 |
 | 整型 | int8_t | signed char | 8 | [-128, 127] |

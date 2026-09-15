@@ -175,16 +175,16 @@ HcclResult InsTempReduceScatterNHR::LocalDataCopy(const std::vector<ThreadHandle
         if (skipStep0TxPreCopy_ && step0TxSliceIdxs_.count(localRandId) > 0) {
             continue;
         }
-        u64 sliceSize = tempAlgParams_.sliceSize;
         std::vector<u64> sizeOut;
         std::vector<u64> elemOffset;
         sizeOut = sizeOut_;
         elemOffset = elemOffset_;
         if (localRandId == templateRankSize_ - 1 && tempAlgParams_.tailSize > 0) {
-            sliceSize = tempAlgParams_.tailSize;
             sizeOut = sizeOutTail_;
             elemOffset = elemOffsetTail_;
         }
+        (void)sizeOut;
+        (void)elemOffset;
         for (u64 rpt = 0; rpt < rptNum; ++rpt) {
             const u64 inBaseOff = tempAlgParams_.buffInfo.inBuffBaseOff + rpt * tempAlgParams_.inputRepeatStride;
             const u64 scratchBase = tempAlgParams_.buffInfo.hcclBuffBaseOff + rpt * tempAlgParams_.outputRepeatStride;
@@ -211,18 +211,17 @@ HcclResult InsTempReduceScatterNHR::PostLocalCopy(const std::vector<ThreadHandle
 
     u32 myAlgIdx = 0;
     CHK_RET(GetAlgRank(myRank_, subCommRanks_[0], myAlgIdx));
-    u64 sliceSize = 0;
     std::vector<u64> sizeOut;
     std::vector<u64> elemOffset;
     if (myAlgIdx == templateRankSize_ - 1 && tempAlgParams_.tailSize > 0) {
-        sliceSize = tempAlgParams_.tailSize;
         sizeOut = sizeOutTail_;
         elemOffset = elemOffsetTail_;
     } else {
-        sliceSize = tempAlgParams_.sliceSize;
         sizeOut = sizeOut_;
         elemOffset = elemOffset_;
     }
+    (void)sizeOut;
+    (void)elemOffset;
     ThreadHandle q = threads[channelIdx];
 
     const u64 rptNum = std::max<u64>(1, tempAlgParams_.repeatNum);
