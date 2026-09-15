@@ -1238,6 +1238,7 @@
             -   [位运算](SIMD-API/c_api/scalar_compute/scalar_bit/scalar_bit.md)
                 -   [asc_clear_nthbit](SIMD-API/c_api/scalar_compute/scalar_bit/asc_clear_nthbit.md)
                 -   [asc_clz](SIMD-API/c_api/scalar_compute/scalar_bit/asc_clz.md)
+                -   [asc_get_uintdiv_magic_and_shift](SIMD-API/c_api/scalar_compute/scalar_bit/asc_get_uintdiv_magic_and_shift.md)
                 -   [asc_ffs](SIMD-API/c_api/scalar_compute/scalar_bit/asc_ffs.md)
                 -   [asc_ffz](SIMD-API/c_api/scalar_compute/scalar_bit/asc_ffz.md)
                 -   [asc_popc](SIMD-API/c_api/scalar_compute/scalar_bit/asc_popc.md)
