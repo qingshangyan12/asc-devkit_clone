@@ -10,7 +10,13 @@
 #ifndef ALG_ATTRS_H
 #define ALG_ATTRS_H
 
+#include <cstdint>
+#include <functional>
+#include <set>
 #include <string>
+#include <vector>
+
+#include "alg_param.h"
 
 namespace mc2_ops_hccl {
 
@@ -40,6 +46,7 @@ struct TopoAttrs {
     bool isSupport2DieFullMesh = false;
     bool isSupportLevel0PcieMix = false;
     bool requireAllMeshConnected = false;
+    uint32_t maxSupportRankSize = 0;
     // 空表示支持全部设备类型，非空时仅支持集合中的设备
     std::set<DevType> supportDevTypes = {};
     bool isHostDpuOnly = false;

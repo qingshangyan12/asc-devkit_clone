@@ -30,7 +30,7 @@
 
 将矩阵计算结果从L0C Buffer搬运至Global Memory，搬运过程中可同步支持随路量化、随路激活、随路格式转换（Nz2ND/Nz2DN）等能力组合。
 
-下图展示了随路量化、随路ReLU、随路格式转换、随路通道拆分以及随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为Cast，其余为随路scalar/tensor量化模式。
+下图展示了随路量化、随路ReLU、随路格式转换、随路通道拆分以及随路通道合并的有效组合、中间数据类型和数据路径，通过连线颜色区分支持的场景组合。下图中的F32-\>F16与F32-\>BF16为Cast，其余为随路scalar/tensor量化模式。
 
 **图1** asc_copy_l0c2gm随路功能组合
 
@@ -41,8 +41,8 @@
 - Nz2ND格式转换场景下，需通过[asc_set_l0c_copy_nz_para](../asc_set_l0c_copy_nz_para.md)预先配置格式转换参数，并且需要搭配本接口`enable_nz2nd`使用；
 - Nz2DN格式转换场景下，需通过[asc_set_l0c_copy_nz_para](../asc_set_l0c_copy_nz_para.md)、[asc_set_l0c_copy_channel_para](../asc_set_l0c_copy_channel_para.md)预先配置格式转换参数，并且需要搭配本接口`enable_nz2dn`使用；
 - 随路scalar量化模式下，需通过[asc_set_l0c_copy_prequant](../asc_set_l0c_copy_prequant.md)设置随路scalar量化参数，并且需要搭配本接口`quant_pre_mode`使用;
-- 随路tensor量化模式下，需通过[asc_set_l0c2gm_config](../asc_set_l0c2gm_config.md)设置随路tensor量化使用tensor的起始地址，其中量化tensor的每个元素都代表一个量化参数，并且需要搭配本接口`quant_pre_mode`使用;
-- 随路激活模式下，需通过[asc_set_l0c2gm_relu_alpha](../asc_set_l0c2gm_relu_alpha.md)、[asc_set_l0c2gm_lrelu_alpha](../asc_set_l0c2gm_lrelu_alpha.md)预先配置ReLU/Leaky ReLU激活参数，并且需要搭配本接口`enable_clip_relu_pre`与`relu_pre_mode`使用；
+- 随路tensor量化模式下，需通过[asc_set_l0c_copy_config](../asc_set_l0c_copy_config.md)设置随路tensor量化使用tensor的起始地址，其中量化tensor的每个元素都代表一个量化参数，并且需要搭配本接口`quant_pre_mode`使用;
+- 随路激活模式下，需通过[asc_set_l0c_copy_relu_alpha](../asc_set_l0c_copy_relu_alpha.md)、[asc_set_l0c_copy_lrelu_alpha](../asc_set_l0c_copy_lrelu_alpha.md)预先配置ReLU/Leaky ReLU激活参数，并且需要搭配本接口`enable_clip_relu_pre`与`relu_pre_mode`使用；
 
 `quant_pre_mode`量化模式参数支持的枚举值如下：
 
@@ -78,29 +78,8 @@
 
 ## 函数原型
 
-```cpp
+```c
 __aicore__ inline void asc_copy_l0c2gm(__gm__ <dst_dtype>* dst,
-                                       __cc__ <src_dtype>* src,
-                                       uint16_t n_size,
-                                       uint16_t m_size,
-                                       uint32_t dst_stride,
-                                       uint16_t src_stride,
-                                       uint8_t l2_cache_mode,
-                                       uint8_t enable_clip_relu_pre,
-                                       uint8_t unit_flag_mode,
-                                       uint64_t quant_pre_mode,
-                                       uint8_t relu_pre_mode,
-                                       bool enable_channel_split,
-                                       bool enable_nz2nd,
-                                       uint64_t quant_post,
-                                       uint8_t relu_post,
-                                       bool clip_relu_post,
-                                       uint8_t eltwise_op,
-                                       bool eltwise_antq_en,
-                                       bool c0_pad_en,
-                                       bool broadcast_en,
-                                       bool enable_nz2dn)
-__aicore__ inline void asc_copy_l0c2gm_sync(__gm__ <dst_dtype>* dst,
                                        __cc__ <src_dtype>* src,
                                        uint16_t n_size,
                                        uint16_t m_size,
@@ -127,12 +106,9 @@ __aicore__ inline void asc_copy_l0c2gm_sync(__gm__ <dst_dtype>* dst,
 
 src dtype与dst dtype支持以下组合：
 
-- `src_dtype`为`int32_t`时，`dst_dtype`支持`int4b_t`、`int8_t`、`uint8_t`、`half`、`bfloat16_t`、`int32_t`。
-- `src_dtype`为`float`时，`dst_dtype`支持`int4b_t`、`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e4m3fn_t`、`half`、`bfloat16_t`、`float`。
-
 ### 函数原型典型示例
 
-```cpp
+```c
 // 示例：将float类型数据转换为bfloat16_t类型后搬运。
 __aicore__ inline void asc_copy_l0c2gm(__gm__ bfloat16_t* dst,
                                        __cc__ float* src,
@@ -218,7 +194,7 @@ PIPE_FIX
 - `n_size`、`m_size`、`dst_stride`需根据dtype与功能模式确定对齐约束，详见参数说明，不满足对齐约束会导致搬运结果不符合预期。
 - src与dst dtype组合需与`quant_pre_mode`量化模式匹配，否则会导致搬运结果不符合预期。
 - `enable_channel_split`仅在输出dtype为`float`且输出为Nz格式时可设为true。
-- 量化与激活模式中使用的量化系数不可为INF/NaN和非规格化数，否则会导致量化激活结果错误。
+- 量化与激活模式中使用的量化系数不可为INF/NAN和非规格化数，否则会导致量化激活结果错误。
 - 开启Nz2DN转换时，需通过[asc_set_l0c_copy_channel_para](../asc_set_l0c_copy_channel_para.md)预先配置源矩阵步长，且源矩阵步长不可为0，否则会导致搬运异常。
 - 开启Nz2DN转换时，仅当通过[asc_set_l0c_copy_channel_para](../asc_set_l0c_copy_channel_para.md)配置源矩阵步长为1时，可同时开启UnitFlag功能。
 - `enable_clip_relu_pre`设为Clip ReLU（标量模式）时需搭配`relu_pre_mode`与量化功能一起使用。
@@ -287,7 +263,7 @@ __global__ __cube__ void AscCopyL0c2gmKernel(__gm__ int8_t* a, __gm__ int8_t* b,
     asc_copy_l0c2gm(output, c_l0, N, M, N, M, 0, 0, 0,
         static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
         static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
-    asc_sync_pipe(PIPE_FIX);
+    asc_sync_pipe(PIPE_ALL);
 }
 
 template <typename T>
