@@ -9,19 +9,17 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
-"""Calculate a stable Resource ID and atomically attach it to an ELF object."""
+"""Build a Resource ID metadata object from the linked object inputs."""
 
 from contextlib import suppress
 import hashlib
 import os
-import re
 import shutil
 import subprocess
 import tempfile
 
 
-_RESOURCE_ID_SECTION = ".ascend.resource_id"
-_RESOURCE_ID_PATTERN = re.compile(r"^[0-9a-f]{64}$")
+_RESOURCE_ID_TYPE = 6
 
 
 class ResourceIdError(RuntimeError):
@@ -74,80 +72,74 @@ def _run_tool(command):
     return result.stdout
 
 
-def calculate_resource_id(dynamic_object_path: str) -> str:
-    # Calculate the digest before the Resource ID section changes the ELF.
-    _validate_elf(dynamic_object_path)
-    digest = hashlib.sha256()
-    try:
-        with open(dynamic_object_path, "rb") as file_obj:
-            for chunk in iter(lambda: file_obj.read(1024 * 1024), b""):
-                digest.update(chunk)
-    except OSError as error:
-        raise ResourceIdError(
-            f"failed to hash ELF object: {dynamic_object_path}"
-        ) from error
-    return digest.hexdigest()
+def calculate_resource_id(object_paths):
+    """OR the SHA256 digests of objects in their final link order."""
+    digest = bytearray(32)
+    if not object_paths:
+        raise ResourceIdError("object list for resource_id must not be empty")
+    for object_path in object_paths:
+        _validate_elf(object_path)
+        try:
+            with open(object_path, "rb") as file_obj:
+                current = hashlib.sha256(file_obj.read()).digest()
+        except OSError as error:
+            raise ResourceIdError(
+                f"failed to hash ELF object: {object_path}"
+            ) from error
+        for index, value in enumerate(current):
+            digest[index] |= value
+    return digest.hex()
 
 
-def write_resource_id_section(dynamic_object_path: str, resource_id: str) -> None:
-    if not isinstance(resource_id, str) or not _RESOURCE_ID_PATTERN.fullmatch(
-        resource_id
-    ):
-        raise ResourceIdError("resource_id must be 64 lowercase hex characters")
-    objcopy = _find_tool("llvm-objcopy")
-    directory = os.path.dirname(os.path.realpath(dynamic_object_path))
-    object_fd = None
+def generate_resource_id_object(object_paths, output_path: str) -> str:
+    resource_id = calculate_resource_id(object_paths)
+    directory = os.path.dirname(os.path.realpath(output_path))
+    os.makedirs(directory, exist_ok=True)
     payload_fd = None
-    temporary_object = None
     payload_path = None
     try:
-        # Keep temporary files beside the ELF so the final replacement is atomic.
-        object_fd, temporary_object = tempfile.mkstemp(
-            prefix=".resource_id.object.", suffix=".o", dir=directory
-        )
-        os.close(object_fd)
-        object_fd = None
         payload_fd, payload_path = tempfile.mkstemp(
             prefix=".resource_id.payload.", dir=directory
         )
         payload_file = os.fdopen(payload_fd, "wb")
         payload_fd = None
         with payload_file:
-            payload_file.write(resource_id.encode("ascii"))
-            payload_file.flush()
-            os.fsync(payload_file.fileno())
-        # Mutate a private copy and publish it only after objcopy succeeds.
-        shutil.copy2(dynamic_object_path, temporary_object)
+            payload_file.write(
+                (
+                    _RESOURCE_ID_TYPE.to_bytes(2, "little")
+                    + len(resource_id).to_bytes(2, "little")
+                    + resource_id.encode("ascii")
+                )
+            )
+        linker = _find_tool("ld.lld")
+        objcopy = _find_tool("llvm-objcopy")
         _run_tool(
             [
-                objcopy,
-                "--add-section",
-                f"{_RESOURCE_ID_SECTION}={payload_path}",
-                "--set-section-flags",
-                f"{_RESOURCE_ID_SECTION}=readonly",
-                temporary_object,
+                linker,
+                "-m",
+                "aicorelinux",
+                "-r",
+                "-b",
+                "binary",
+                payload_path,
+                "-o",
+                output_path,
             ]
         )
-        with open(temporary_object, "rb") as temporary_file:
-            os.fsync(temporary_file.fileno())
-        os.replace(temporary_object, dynamic_object_path)
+        _run_tool(
+            [objcopy, "--rename-section", ".data=.ascend.meta,readonly", output_path]
+        )
+        return resource_id
     finally:
-        # Cover failures before descriptors are transferred to file objects.
-        for file_descriptor in (object_fd, payload_fd):
+        for file_descriptor in (payload_fd,):
             if file_descriptor is None:
                 continue
             with suppress(OSError):
                 os.close(file_descriptor)
-        for path in (temporary_object, payload_path):
+        for path in (payload_path,):
             if path is None:
                 continue
             try:
                 os.unlink(path)
             except FileNotFoundError:
                 pass
-
-
-def generate_and_write_resource_id(dynamic_object_path: str) -> str:
-    resource_id = calculate_resource_id(dynamic_object_path)
-    write_resource_id_section(dynamic_object_path, resource_id)
-    return resource_id

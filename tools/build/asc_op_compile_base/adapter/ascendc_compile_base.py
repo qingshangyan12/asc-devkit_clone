@@ -141,6 +141,19 @@ def fatbin_objs(obj_files: list, dst_file: str, is_debug: bool, compile_log_path
         "ascendc_enable_super_kernel"
     ) is True and global_var_storage.get_variable("ascendc_is_static_op"):
         return
+    from .static_compile_resource_id import ResourceIdError, generate_resource_id_object
+
+    resource_object = "%s.resource_id.o" % dst_file
+    try:
+        resource_id = generate_resource_id_object(obj_files, resource_object)
+        global_var_storage.set_variable(
+            "ascendc_resource_id_" + os.path.abspath(dst_file), resource_id
+        )
+    except ResourceIdError as error:
+        raise RuntimeError(
+            "generate Resource ID metadata failed: %s" % error
+        ) from error
+    obj_files = list(obj_files) + [resource_object]
     compile_cmd = [
         CCECInfo.get_exe("ld.lld"),
         "-m",
