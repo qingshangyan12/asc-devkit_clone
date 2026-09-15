@@ -34,6 +34,47 @@ __aicore__ inline uint64_t asc_clear_nthbit(uint64_t bits, int64_t idx) { return
 
 __aicore__ inline uint64_t asc_set_nthbit(uint64_t bits, int64_t idx) { return sbitset1(bits, idx); }
 
+__aicore__ inline uint64_t asc_get_uintdiv_magic_impl(uint64_t dividend, uint64_t divisor)
+{
+    uint64_t quotient = 0;
+    uint64_t remainder = dividend;
+    for (int i = 0; i < 64; ++i) {
+        quotient <<= 1;
+        const uint64_t borrow = remainder >> 63;
+        remainder <<= 1;
+        if (borrow != 0) {
+            remainder -= divisor;
+            quotient |= 1;
+        } else if (remainder >= divisor) {
+            remainder -= divisor;
+            quotient |= 1;
+        }
+    }
+    return quotient + 1;
+}
+
+__aicore__ inline void asc_get_uintdiv_magic_and_shift(uint32_t* magic, uint32_t* shift, uint32_t divisor)
+{
+    const int64_t pos = 64 - asc_clz(static_cast<uint64_t>(divisor));
+    const int64_t cnt1 = asc_popc(static_cast<uint64_t>(divisor));
+    *shift = cnt1 == 1 ? pos - 1 : pos;
+    *magic = (1ULL << 32) * ((1ULL << *shift) - divisor) / divisor + 1;
+}
+
+__aicore__ inline void asc_get_uintdiv_magic_and_shift(uint64_t* magic, uint64_t* shift, uint64_t divisor)
+{
+    const int64_t pos = 64 - asc_clz(divisor);
+    const int64_t cnt1 = asc_popc(divisor);
+    *shift = cnt1 == 1 ? pos - 1 : pos;
+    uint64_t dividend = 0;
+    if (*shift < 64) {
+        dividend = (1ULL << *shift) - divisor;
+    } else {
+        dividend = UINT64_MAX - divisor + 1;
+    }
+    *magic = asc_get_uintdiv_magic_impl(dividend, divisor);
+}
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
