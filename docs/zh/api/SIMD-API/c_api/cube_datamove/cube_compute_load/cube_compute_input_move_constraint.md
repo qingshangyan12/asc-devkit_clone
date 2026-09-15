@@ -2,7 +2,7 @@
 
 ## 对齐约束
 
-具体可见[表数据通路和存储层级](overall_description.md#zh-cn_topic_0000002543771563_table3523123518108)。
+具体可见[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
 
 - 当源地址位于L1 Buffer时，该地址必须32Byte对齐；当源地址位于GM时，该地址必须1Byte对齐。
 - 当目的地址位于L0A Buffer/L0B Buffer时，该地址必须512Byte对齐；当目的地址位于L1 Buffer时，该地址必须32Byte对齐。

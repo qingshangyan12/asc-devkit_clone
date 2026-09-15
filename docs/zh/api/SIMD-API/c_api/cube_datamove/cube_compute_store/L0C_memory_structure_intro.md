@@ -12,7 +12,7 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
 <!-- end id3 -->
 L0C Buffer的总容量为128K字节，由16个Bank组成。每个Bank的容量为8K字节，由128行组成，每行的宽度为64字节。这16个Bank被进一步组织为16个Bank Group。每个Bank Group包含1个Bank。
 
-L0C Buffer的内存结构如[图1](#zh-cn_topic_0000002555148561_fig1715315610160)所示，L0C Buffer的地址编码格式及其bit位对应的含义说明如下：
+L0C Buffer的内存结构如下图1所示，L0C Buffer的地址编码格式及其bit位对应的含义说明如下：
 
 ```text
 L0C_ADDR[16:0] = { BANK_DEPTH[6:0], BANK[3:0], BANK_WIDTH[5:0] }    // bit位顺序为从高位到低位，共17位
@@ -29,7 +29,7 @@ L0C_ADDR[16:0] = { BANK_DEPTH[6:0], BANK[3:0], BANK_WIDTH[5:0] }    // bit位顺
 <!-- npu="950" id4 -->
 以Ascend 950PR/Ascend 950DT为例，L0C Buffer总容量为256K字节，由16个Bank组成。每个Bank的容量为16K字节，由256行组成，每行的宽度为64字节。这16个Bank被进一步组织为16个Bank Group。每个 Bank Group包含1个Bank。
 
-L0C Buffer的内存结构如[图2](#fig179810301543)所示，L0C Buffer的地址编码格式及其bit位对应的含义说明如下：
+L0C Buffer的内存结构如下图2所示，L0C Buffer的地址编码格式及其bit位对应的含义说明如下：
 
 ```text
 L0C_ADDR[17:0] = { BANK_DEPTH[7:0], BANK[3:0], BANK_WIDTH[5:0] }    // bit位顺序为从高位到低位，共18位

@@ -10,7 +10,7 @@ L1 Buffer的总容量为512K字节，由16个Bank组成。每个Bank的容量为
 
 这16个Bank被进一步组织为8个Bank Group。每个Bank Group包含2个Bank（Bank0和Bank1）。**同属于一个Bank Group的两个Bank支持一个读、另一个写，但不支持同时读或同时写**。
 
-L1 Buffer的内存结构如[图1](#zh-cn_topic_0000002545385271_fig5383229131020)所示，地址编码格式如下：
+L1 Buffer的内存结构如下图1所示，地址编码格式如下：
 
 ```cpp
 L1_ADDR[18:0] = {BANK[0:0], BANK_DEPTH[9:0], BG[2:0], BANK_WIDTH[4:0]}    // bit位顺序为从高位到低位，共19位
@@ -27,7 +27,7 @@ L1_ADDR[18:0] = {BANK[0:0], BANK_DEPTH[9:0], BG[2:0], BANK_WIDTH[4:0]}    // bit
 
 L0A Buffer和L0B Buffer的容量各为64K字节，只包含1个Bank，有128行，每行的宽度为512字节。**不允许同时读写同一个地址，允许矩阵搬入同时写入和asc_mmad同时读取同一Bank的不同地址。**
 
-L0A Buffer/L0B Buffer的内存结构如[图2](#zh-cn_topic_0000002545385271_fig2046019020496)所示，L0A Buffer和L0B Buffer采用相同的地址编码格式：
+L0A Buffer/L0B Buffer的内存结构如下图2所示，L0A Buffer和L0B Buffer采用相同的地址编码格式：
 
 ```cpp
 L0A_ADDR[15:0] = { BANK_DEPTH[6:0], BANK_WIDTH[8:0] }    // bit位顺序为从高位到低位，共16位

@@ -32,7 +32,7 @@
 
 - 定义：通用的N维张量格式，即“线性格式”；数据在内存中是连续线性的。
 - 场景：通常存在于Global Memory（GM）中。在进行矩阵运算前，通常需要将其转换为Nz格式以适配Cube单元。
-- 转换示例：从ND（GM）到Nz（L1 Buffer）的数据格式转换见[图3](#zh-cn_topic_0000002545089965_fig1541710246162)，图中展示了一个具体的M=40，K=56的矩阵（数据类型为half），在从Global Memory（GM）搬运至L1 Buffer并转换为Nz格式时的内存排布变化：
+- 转换示例：从ND（GM）到Nz（L1 Buffer）的数据格式转换见下图3，图中展示了一个具体的M=40，K=56的矩阵（数据类型为half），在从Global Memory（GM）搬运至L1 Buffer并转换为Nz格式时的内存排布变化：
     - 原始数据（ND格式）：
         - 左侧GM中存储的是原始矩阵，shape为40 x 56。
         - 数据呈线性连续排布（图中长箭头所示），遵循row major（行主序）规则。
@@ -63,7 +63,7 @@
 <!-- npu="910b,A3" id6 -->
 ## Zz格式（FRACTAL_Zz）
 
-- **定义：** 大Z外部row major（行主序）+ 小z内部row major（行主序），见[图4](#zh-cn_topic_0000002545089965_fig18376432205510)。
+- **定义：** 大Z外部row major（行主序）+ 小z内部row major（行主序），见下图。
 
     **图4** Zz格式（以half类型为例）
 
@@ -93,7 +93,7 @@
 
 ## Zn格式（FRACTAL_Zn）
 
-- **定义：** 大Z外部row major（行主序）+ 小n内部column major（列主序），见[图5](#zh-cn_topic_0000002545089965_fig9884894817)。
+- **定义：** 大Z外部row major（行主序）+ 小n内部column major（列主序），见下图。
 
     **图5** Zn格式（以half类型为例）  
     ![](../../../../figures/zn_fractals_of_half.png "Zn-格式(以half类型为例)")
@@ -118,7 +118,7 @@
 
 ## Nz格式（FRACTAL_Nz）
 
-- **定义：** 大N外部column major（列主序）+ 小z内部row major（行主序），见[图6](#zh-cn_topic_0000002545089965_fig583717713334)。
+- **定义：** 大N外部column major（列主序）+ 小z内部row major（行主序），见下图。
 
     **图6** Nz格式  
     ![](../../../../figures/nz_fractals_of_half_for_cmatrix.png "Nz-格式")

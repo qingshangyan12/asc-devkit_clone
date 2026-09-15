@@ -40,7 +40,7 @@ MX矩阵乘法（Microscaling矩阵乘加）为带有量化系数的矩阵乘法
 **图 3** 4选2稀疏矩阵基础计算流程图  
 ![](../../../../figures/sparse_matrix_computation_workflow_c_api.png "4选2稀疏矩阵基础计算流程图")
 
-1. 首先将原始矩阵B按照固定粒度划分连续4个元素为一组，按照4选2结构化稀疏压缩规则，离线生成对应的压缩矩阵B与[索引矩阵](../cube_compute_fractal_intro/aux_cube_fractal_format_details.md#zh-cn_topic_0000002563445163_section1873692415233)作为输入。
+1. 首先将原始矩阵B按照固定粒度划分连续4个元素为一组，按照4选2结构化稀疏压缩规则，离线生成对应的压缩矩阵B与[索引矩阵](../cube_compute_fractal_intro/aux_cube_fractal_format_details.md#4选2稀疏索引矩阵)作为输入。
 
 2. 通过asc_copy_gm2l1接口将原始矩阵A、压缩矩阵B、索引矩阵的GM数据搬运到L1 Buffer中（如果存在随路量化，则同样通过asc_copy_gm2l1搬到L1 Buffer中）。详细内容请参考[矩阵数据搬入至L1 Buffer](../../cube_datamove/cube_compute_load/cube_compute_load.md)。
 
@@ -58,7 +58,7 @@ Conv2D前向计算的本质是将卷积运算转换为矩阵乘：先通过img2c
 **图 4** Conv2D前向计算流程图  
 ![](../../../../figures/conv2d_forward_c_api.png "Conv2D前向计算流程图")
 
-1. 将FeatureMap和Weight从GM搬入L1 Buffer。FeatureMap按[NC1HWC0格式](../cube_compute_fractal_intro/key_fractal_format_details.md#zh-cn_topic_0000002545089965_section217615301084)准备；Weight按后续L0B Buffer搬运所需布局准备。
+1. 将FeatureMap和Weight从GM搬入L1 Buffer。FeatureMap按[NC1HWC0格式](../cube_compute_fractal_intro/key_fractal_format_details.md#nc1hwc0格式)准备；Weight按后续L0B Buffer搬运所需布局准备。
 
 2. 使用`asc_copy_l12l0a`的3D重载执行img2col，并通过`asc_copy_l12l0b`搬入Weight。调用前配置FeatureMap属性、重复步长、边界与Padding，具体接口见[搬入总体说明](../../cube_datamove/cube_compute_load/overall_description.md)。
 
