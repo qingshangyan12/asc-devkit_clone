@@ -770,8 +770,8 @@
 | [__ffs](../math_functions/integer_math_functions/__ffs.md) | 从二进制输入数据的最低位开始，查找第一个值为1的比特位的位置，并返回该位置的索引，索引从1开始计数；如果二进制数据中没有1，则返回0。 |
 | [__popc](../math_functions/integer_math_functions/__popc.md) | 统计输入数据从二进制的高位到低位比特位为1的数量。 |
 | [__byte_perm](../math_functions/integer_math_functions/__byte_perm.md) | 由输入的两个4字节的uint32_t类型数据组成一个8个字节的64比特位的整数，通过选择器s指定选取其中的4个字节，将这4个字节从低位到高位拼成一个uint32_t类型的整数。 |
-| [__sad](../math_functions/integer_math_functions/__sad.md) | 对输入数据x、y、z，计算|x - y|+z的结果，即第一个入参和第二个入参之差的绝对值与第三个入参的和。 |
-| [__usad](../math_functions/integer_math_functions/__usad.md) | 对输入数据x、y、z，计算|x - y|+z的结果，即第一个入参和第二个入参之差的绝对值与第三个入参的和。 |
+| [__sad](../math_functions/integer_math_functions/__sad.md) | 对输入数据x、y、z，计算\|x - y\|+z的结果，即第一个入参和第二个入参之差的绝对值与第三个入参的和。 |
+| [__usad](../math_functions/integer_math_functions/__usad.md) | 对输入数据x、y、z，计算\|x - y\|+z的结果，即第一个入参和第二个入参之差的绝对值与第三个入参的和。 |
 | [__mul24](../math_functions/integer_math_functions/__mul24.md) | 获取输入int32类型数据x和y低24位乘积的低32位结果。x和y的高8位被忽略。 |
 | [__umul24](../math_functions/integer_math_functions/__umul24.md) | 获取输入uint32类型数据x和y低24位乘积的低32位结果。x和y的高8位被忽略。 |
 | [__hadd](../math_functions/integer_math_functions/__hadd.md) | 获取输入int32类型数据x和y的平均值，避免中间求和溢出。 |
