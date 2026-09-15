@@ -38,6 +38,13 @@ public:
     HcclResult KernelRun(
         const OpParam& param, const TemplateDataParams& templateDataParams,
         TemplateResource& templateResource) override;
+    HcclResult FastLaunch(const OpParam& param, const TemplateFastLaunchCtx& tempFastLaunchCtx) override;
+
+private:
+    void SaveSubmitInfo(
+        const uint64_t inputAddr, const uint64_t outputAddr, const uint64_t scratchAddr,
+        const uint64_t inputOffset, const uint64_t outputOffset, const uint64_t scratchOffset,
+        TemplateResource& templateResource) const;
 };
 
 } // namespace mc2_ops_hccl
