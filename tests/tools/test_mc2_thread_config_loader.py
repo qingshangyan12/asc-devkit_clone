@@ -1,3 +1,11 @@
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+
 """Host-only regression for the production MC2 loader, without CANN libraries.
 
 Run with python3 tests/tools/test_mc2_thread_config_loader.py.
@@ -116,14 +124,30 @@ class Mc2ThreadConfigLoaderTest(unittest.TestCase):
         cls.addClassCleanup(cls.temp.cleanup)
         work = Path(cls.temp.name)
         (work / "hccl_res.h").write_text(TYPES)
-        (work / "mc2_thread_config_compat.h").write_text((SOURCE / "mc2_thread_config_compat.h").read_text())
+        (work / "mc2_thread_config_compat.h").write_text(
+            (SOURCE / "mc2_thread_config_compat.h").read_text()
+        )
         source = (SOURCE / "hccl_res_dl.cc").read_text()
-        loader = source[:source.index("DEFINE_WEAK_FUNC(")]
-        loader = loader.replace('#include "hccl_res_dl.h"', '')
+        loader = source[: source.index("DEFINE_WEAK_FUNC(")]
+        loader = loader.replace('#include "hccl_res_dl.h"', "")
         (work / "test.cc").write_text(HARNESS + loader + MAIN)
         cls.binary = work / "test"
-        subprocess.run([compiler, "-std=c++11", "-pthread", "-Wall", "-Wextra", "-Werror",
-                        "-I", str(work), str(work / "test.cc"), "-o", str(cls.binary)], check=True)
+        subprocess.run(
+            [
+                compiler,
+                "-std=c++11",
+                "-pthread",
+                "-Wall",
+                "-Wextra",
+                "-Werror",
+                "-I",
+                str(work),
+                str(work / "test.cc"),
+                "-o",
+                str(cls.binary),
+            ],
+            check=True,
+        )
 
     def test_first_use_concurrency_and_markers(self):
         subprocess.run([str(self.binary), "0"], check=True)
