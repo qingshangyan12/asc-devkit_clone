@@ -312,10 +312,11 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void write_ring_buf_tlv_head(
     }
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t write_string_bytes(
-    __simt_gm__ BlockRingBufInfo* block_ring_buf_info, __simt_gm__ const char* str, uint32_t write_ptr,
-    uint32_t str_len)
+// Writes the string including its '\0' terminator.
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t write_string(
+    __simt_gm__ BlockRingBufInfo* block_ring_buf_info, __simt_gm__ const char* str, uint32_t write_ptr)
 {
+    uint32_t str_len = get_string_length(str);
     write_ptr = write_ptr % block_ring_buf_info->ringBufLen;
     volatile __simt_gm__ char* data_ptr =
         reinterpret_cast<volatile __simt_gm__ char*>(block_ring_buf_info->ringBufAddr);
@@ -335,13 +336,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t write_string_bytes(
         }
     }
     return str_len;
-}
-
-// Writes the string including its '\0' terminator.
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t write_string(
-    __simt_gm__ BlockRingBufInfo* block_ring_buf_info, __simt_gm__ const char* str, uint32_t write_ptr)
-{
-    return write_string_bytes(block_ring_buf_info, str, write_ptr, get_string_length(str));
 }
 
 template <typename T>
@@ -427,8 +421,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void write_ring_buf_tlv_data_with_head(
     __simt_gm__ const char* fmt, __simt_gm__ const char* dump_head, Args&&... args)
 {
     uint32_t head_offset = args_num * sizeof(uint64_t);
-    uint32_t head_len = write_string_bytes(
-        block_ring_buf_info, dump_head, start_offset + head_offset, get_string_length(dump_head) - 1);
+    uint32_t head_len =
+        write_string(block_ring_buf_info, dump_head, start_offset + head_offset) - 1; // exclude the '\0' of dump_head
     uint32_t fmt_len = write_string(block_ring_buf_info, fmt, start_offset + head_offset + head_len);
     set_param(block_ring_buf_info, start_offset, 0, head_offset + head_len + fmt_len, args...);
 }
@@ -489,8 +483,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void simt_printf_impl(
 // (dump_head) and its args come before the user args, so the host formats both with a single fmt string.
 template <typename... Args>
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void simt_printf_impl_assert_msg(
-    __simt_gm__ const char* assertion, __simt_gm__ const char* file, unsigned int line,
-    __simt_gm__ const char* function, __simt_gm__ const char* fmt, Args&&... args)
+    __simt_gm__ const char* head_fmt, __simt_gm__ const char* file, unsigned int line, __simt_gm__ const char* function,
+    __simt_gm__ const char* assertion, __simt_gm__ const char* fmt, Args&&... args)
 {
 #ifndef ASCENDC_CPU_DEBUG
     enable_printf();
@@ -504,8 +498,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void simt_printf_impl_assert_msg(
     }
 
     uint32_t args_num = 0;
-    uint32_t tlv_len = get_print_tlv_len_with_head(
-        args_num, fmt, "[ASSERT] %s:%u: %s: Assertion `%s' failed. ", file, line, function, assertion, args...);
+    uint32_t tlv_len = get_print_tlv_len_with_head(args_num, fmt, head_fmt, file, line, function, assertion, args...);
     tlv_len = (tlv_len + BYTE_ALGIN - 1) & (~(BYTE_ALGIN - 1)); // 8 byte align
     uint64_t start_offset = check_and_wait_ring_buf_space(block_ring_buf_info, tlv_len);
     start_offset = start_offset % block_ring_buf_info->ringBufLen;
@@ -513,8 +506,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void simt_printf_impl_assert_msg(
     uint32_t write_ptr = static_cast<uint32_t>(start_offset);
     write_ring_buf_tlv_head(block_ring_buf_info, write_ptr, tlv_len, args_num);
     write_ring_buf_tlv_data_with_head(
-        block_ring_buf_info, write_ptr, args_num, fmt, "[ASSERT] %s:%u: %s: Assertion `%s' failed. ", file, line,
-        function, assertion, args...);
+        block_ring_buf_info, write_ptr, args_num, fmt, head_fmt, file, line, function, assertion, args...);
 
     __threadfence();
     write_finish(block_ring_buf_info, start_offset, DumpType::DUMP_SIMT_ASSERT);
