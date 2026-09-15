@@ -1760,7 +1760,7 @@ def get_tiling_info_v2(
         tiling_info.static_workspace_size = total_workspace_size
         run_info["tiling_data"] = tiling_info.tiling_data.hex()
         tiling_info.raw_run_info = run_info
-        if total_workspace_size > 0:
+        if total_workspace_size >= 0:
             if len(run_info["workspaces"]) > 1:
                 msg = "the num of workspace can not large than 1"
                 raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, msg)
