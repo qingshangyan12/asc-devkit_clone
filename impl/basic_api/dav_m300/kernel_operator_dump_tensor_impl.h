@@ -259,7 +259,7 @@ __aicore__ inline __gm__ BlockRingBufInfo* GetBlockRingBufInfo()
         return nullptr;
     }
     ringBufInfo->flag = 0;
-    asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(ringBufInfo));
+    dcci(reinterpret_cast<__gm__ uint64_t*>(ringBufInfo), cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     return ringBufInfo;
 }
 
@@ -501,6 +501,7 @@ __aicore__ inline void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t 
     DumpTensorGM2GMImpl(src, desc, dumpSize, nullptr, 0);
 }
 
+#ifndef ASCENDC_CPU_DEBUG
 template <template <typename> class Tensor, typename T>
 __aicore__ static __attribute__((noinline)) void DumpTensorRingBufImpl(
     const Tensor<T>& src, uint32_t desc, uint32_t dumpSize, const uint32_t* shape, const uint32_t shapeDim)
@@ -550,12 +551,6 @@ __aicore__ static __attribute__((noinline)) void DumpTensorRingBufImpl(
 #endif // ASCENDC_DUMP
 }
 
-template <class... Args>
-__aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
-{
-    __asc_aicore::printf_impl(fmt, args...);
-}
-
 __aicore__ static __attribute__((noinline)) void DumpTimeStampImpl(uint32_t descId)
 {
     uint64_t ctrlValue = get_ctrl();
@@ -565,6 +560,27 @@ __aicore__ static __attribute__((noinline)) void DumpTimeStampImpl(uint32_t desc
         DumpTimeStampRingBufImpl(descId);
     }
     set_ctrl(ctrlValue);
+}
+#else
+#include <cstdio>
+
+template <template <typename> class Tensor, typename T>
+__aicore__ static __attribute__((noinline)) void DumpTensorRingBufImpl(
+    const Tensor<T>& src, uint32_t desc, uint32_t dumpSize, const uint32_t* shape, const uint32_t shapeDim)
+{
+    assert(false && "DumpTensorRingBuf is not supported in cpu mode.");
+}
+
+__aicore__ static __attribute__((noinline)) void DumpTimeStampImpl(uint32_t descId)
+{
+    assert(false && "DumpTimeStampImpl is not supported in cpu mode.");
+}
+#endif
+
+template <class... Args>
+__aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
+{
+    __asc_aicore::printf_impl(fmt, args...);
 }
 
 __aicore__ inline void AscendCTimeStamp(uint32_t descId, uint64_t pcPtr = 0)
