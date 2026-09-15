@@ -13,6 +13,7 @@
 #include "sim_communicator.h"
 #include "sim_world.h"
 #include "hccl_alloc_ctx_res.h"
+#include "mc2_thread_config_compat.h"
 
 namespace mc2_ops_hccl {
 extern bool g_rejectDirectAclrtMemcpy;
@@ -21,6 +22,22 @@ extern uint32_t g_hcclEngineCtxCopyCallCount;
 } // namespace mc2_ops_hccl
 
 namespace checker {
+TEST(Mc2ThreadConfigTest, OnlyLastReservedByteOptsIntoDeferredProfiling)
+{
+    for (uint16_t notifyNum : {uint16_t{0}, uint16_t{1}, uint16_t{65535}}) {
+        const auto config = mc2_thread_config::MakeConfig(notifyNum);
+        EXPECT_EQ(config.header.version, 1U);
+        EXPECT_EQ(config.header.magicWord, 0x0f0f0f2fU);
+        EXPECT_EQ(config.header.size, 32U);
+        EXPECT_EQ(config.header.reserved, 0U);
+        EXPECT_EQ(config.notifyNumPerThread, notifyNum);
+        for (size_t i = 0; i < 13; ++i) {
+            EXPECT_EQ(config.reserved[i], 0U);
+        }
+        EXPECT_EQ(config.reserved[13], 1U);
+    }
+}
+
 namespace {
 using namespace HcclSim;
 using namespace mc2_ops_hccl;
