@@ -291,25 +291,6 @@ __simd_callee__ inline void MulB64Impl(U& dstReg, U& srcReg0, U& srcReg1, MaskRe
 }
 
 template <typename T, MaskMergeMode mode, typename U>
-__simd_callee__ inline void Complex64MulKernel(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
-{
-    using ActualT = typename U::ActualT;
-    static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "U should be RegTraitNumTwo");
-    RegTensor<typename ActualT::EleType>& src0Real = (RegTensor<typename ActualT::EleType>&)srcReg0.reg[0];
-    RegTensor<typename ActualT::EleType>& src0Imag = (RegTensor<typename ActualT::EleType>&)srcReg0.reg[1];
-    RegTensor<typename ActualT::EleType>& src1Real = (RegTensor<typename ActualT::EleType>&)srcReg1.reg[0];
-    RegTensor<typename ActualT::EleType>& src1Imag = (RegTensor<typename ActualT::EleType>&)srcReg1.reg[1];
-    RegTensor<typename ActualT::EleType>& dstReal = (RegTensor<typename ActualT::EleType>&)dstReg.reg[0];
-    RegTensor<typename ActualT::EleType>& dstImag = (RegTensor<typename ActualT::EleType>&)dstReg.reg[1];
-    RegTensor<typename ActualT::EleType> src0ImagMinus;
-    Muls(src0ImagMinus, src0Imag, -1, mask);
-    Mul(dstReal, src0ImagMinus, src1Imag, mask);
-    MulAddDst(dstReal, src0Real, src1Real, mask);
-    Mul(dstImag, src0Imag, src1Real, mask);
-    MulAddDst(dstImag, src0Real, src1Imag, mask);
-}
-
-template <typename T, MaskMergeMode mode, typename U>
 __simd_callee__ inline void ComplexMulKernel(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
 {
     using ActualT = typename U::ActualT;
@@ -320,16 +301,25 @@ __simd_callee__ inline void ComplexMulKernel(U& dstReg, U& srcReg0, U& srcReg1, 
     RegTensor<typename ActualT::EleType>& src1Imag = (RegTensor<typename ActualT::EleType>&)srcReg1.reg[1];
     RegTensor<typename ActualT::EleType>& dstReal = (RegTensor<typename ActualT::EleType>&)dstReg.reg[0];
     RegTensor<typename ActualT::EleType>& dstImag = (RegTensor<typename ActualT::EleType>&)dstReg.reg[1];
-    RegTensor<typename ActualT::EleType> e;
-    RegTensor<typename ActualT::EleType> f;
-    RegTensor<typename ActualT::EleType> g;
-    RegTensor<typename ActualT::EleType> h;
-    Mul(e, src0Real, src1Real, mask);
-    Mul(f, src0Imag, src1Imag, mask);
-    Mul(g, src0Imag, src1Real, mask);
-    Mul(h, src0Real, src1Imag, mask);
-    Sub(dstReal, e, f, mask);
-    Add(dstImag, g, h, mask);
+    if constexpr (SupportType<ActualT, complex32>()) {
+        RegTensor<typename ActualT::EleType> e;
+        RegTensor<typename ActualT::EleType> f;
+        RegTensor<typename ActualT::EleType> g;
+        RegTensor<typename ActualT::EleType> h;
+        Mul(e, src0Real, src1Real, mask);
+        Mul(f, src0Imag, src1Imag, mask);
+        Mul(g, src0Imag, src1Real, mask);
+        Mul(h, src0Real, src1Imag, mask);
+        Sub(dstReal, e, f, mask);
+        Add(dstImag, g, h, mask);
+    } else {
+        RegTensor<typename ActualT::EleType> src0ImagMinus;
+        Muls(src0ImagMinus, src0Imag, -1, mask);
+        Mul(dstReal, src0ImagMinus, src1Imag, mask);
+        MulAddDst(dstReal, src0Real, src1Real, mask);
+        Mul(dstImag, src0Imag, src1Real, mask);
+        MulAddDst(dstImag, src0Real, src1Imag, mask);
+    }
 }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
@@ -338,7 +328,7 @@ __simd_callee__ inline void MulComplex64Impl(U& dstReg, U& srcReg0, U& srcReg1, 
     using ActualT = typename U::ActualT;
     static_assert(sizeof(ActualT) == 8, "data type should be B64");
     static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "U should be RegTraitNumTwo");
-    Complex64MulKernel<T, mode, Reg::RegTensor<ActualT, Reg::RegTraitNumTwo>>(dstReg, srcReg0, srcReg1, mask);
+    ComplexMulKernel<T, mode, Reg::RegTensor<ActualT, Reg::RegTraitNumTwo>>(dstReg, srcReg0, srcReg1, mask);
 }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
