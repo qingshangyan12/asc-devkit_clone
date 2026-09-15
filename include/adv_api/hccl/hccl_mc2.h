@@ -21,69 +21,6 @@ extern "C" {
 #endif // __cplusplus
 
 /**
- * @brief  Alloc Mc2OpArgs memory
- * @param opArgs A pointer to the allocated Mc2OpArgs memory.
- */
-extern HcclResult Mc2KfcAllocOpArgs(void** opArgs);
-
-/**
- * @brief  Free Mc2OpArgs memory
- * @param opArgs A pointer to the Mc2OpArgs memory.
- */
-extern HcclResult Mc2KfcFreeOpArgs(void* opArgs);
-
-/**
- * @brief  Set the source data type param of Mc2OpArgs
- * @param opArgs A pointer to the Mc2OpArgs.
- * @param srcDataType The source data type to set.
- */
-extern HcclResult Mc2KfcOpArgsSetSrcDataType(void* opArgs, uint8_t srcDataType);
-
-/**
- * @brief  Set the destination data type param of Mc2OpArgs
- * @param opArgs A pointer to the Mc2OpArgs.
- * @param dstDataType The destination data type to set.
- */
-extern HcclResult Mc2KfcOpArgsSetDstDataType(void* opArgs, uint8_t dstDataType);
-
-/**
- * @brief  Set the reduce type param of Mc2OpArgs
- * @param opArgs A pointer to the Mc2OpArgs.
- * @param reduceType The reduce type to set.
- */
-extern HcclResult Mc2KfcOpArgsSetReduceType(void* opArgs, uint32_t reduceType);
-
-/**
- * @brief  Set the data count param of Mc2OpArgs
- * @param opArgs A pointer to the Mc2OpArgs.
- * @param count The data count to set.
- */
-extern HcclResult Mc2KfcOpArgsSetCount(void* opArgs, uint64_t count);
-
-/**
- * @brief  Set the algConfig param of Mc2OpArgs
- * @param opArgs A pointer to the Mc2OpArgs.
- * @param algConfig The algConfig to set.
- */
-extern HcclResult Mc2KfcOpArgsSetAlgConfig(void* opArgs, char* algConfig);
-
-/**
- * @brief  Set the comm engine param of Mc2OpArgs
- * @param opArgs A pointer to the Mc2OpArgs.
- * @param commEngine The comm engine type to set.
- */
-extern HcclResult Mc2KfcOpArgsSetCommEngine(void* opArgs, uint8_t commEngine);
-
-/**
- * @brief  Create the OpResCtx for communication
- * @param comm A pointer identifying the communication resource based on.
- * @param opType The opType param.
- * @param opArgs A pointer to the Mc2OpArgs.
- * @param opResCtx A pointer to the created OpResCtx.
- */
-extern HcclResult Mc2CreateOpResCtx(HcclComm comm, uint8_t opType, void* opArgs, void** opResCtx);
-
-/**
  * @brief Allocate communication resource by MC2 Tiling data
  * @param comm A pointer identifying the communication resource based on.
  * @param stream A pointer identifying the stream information.
