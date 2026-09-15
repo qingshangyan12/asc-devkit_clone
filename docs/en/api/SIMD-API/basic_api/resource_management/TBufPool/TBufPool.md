@@ -2,9 +2,9 @@
 
 <!-- md-trans-meta sourceCommit=f6490d1e030d257ee55f3f1600bffece5a8bd3f7 translatedAt=2026-08-27T14:30:21.486Z -->
 
--   **[TBufPool Overview](tbuf_introduction.md)**  
+-   **[TBufPool Overview](tbufpool_introduction.md)**  
 
--   **[TBufPool Constructor](tbuf_constructor.md)**  
+-   **[TBufPool Constructor](tbufpool_constructor.md)**  
 
 -   **[InitBufPool](InitBufPool-55.md)**  
 

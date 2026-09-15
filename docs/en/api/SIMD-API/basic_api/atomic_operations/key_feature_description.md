@@ -283,7 +283,6 @@ As shown in Figure 4, the inter-core synchronization scheme also needs to be use
 
     ```cpp
     // The expected execution order of the four cores is core 0 --> core 2 --> core 3 --> core 1.
-Core 0 initializes GM with src0Local before the atomic accumulation; cores 2, 3, and 1 perform atomic accumulation in order.e 1.
     // Core 0 initializes GM with src0Local before the atomic accumulation; cores 2, 3, and 1 perform the atomic accumulation in order.
     if (blockIdx == 0) {
         AscendC::DataCopy(src0Local, src0Global, DATA_LENGTH);

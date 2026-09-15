@@ -4,7 +4,7 @@
 
 ## Layout Data Structure
 
-- **[Layout and Hierarchical Representation](Layout-and-Hierarchical-Representation.md)**
+- **[Layout and Hierarchical Representation](layout_and_hierarchical_representation.md)**
 - **[Layout](Layout.md)**
 - **[Shape](Shape.md)**
 - **[Stride](Stride.md)**

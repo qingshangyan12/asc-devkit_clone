@@ -8,7 +8,7 @@ The cube loading APIs for cube computation support multiple data movement scenar
 
 The cube loading APIs for cube computation support multiple data paths, each corresponding to a specific storage level and access characteristic.
 
-**Table 1** **Data paths and storage levels**
+**Table 1** **Data paths and storage hierarchy**
 
 <a name="zh-cn_topic_0000002543771563_table3523123518108"></a>
 
@@ -39,7 +39,7 @@ The cube loading APIs for cube computation support multiple data paths, each cor
 | [GM->L1 Buffer Continuous Data Movement (DataCopy)](DataCopy_GMToL1_continuous.md) | Moves a cube from Global Memory to the L1 Buffer continuously, with the format and content unchanged. | GM->L1 Buffer | Cube computation data is loaded from off-chip into the L1 Buffer. |
 | [GM->L1 Buffer High-Dimensional Split Data Movement (DataCopy)](DataCopy_GMToL1_highdim_split.md) | Moves data from GM to the L1 Buffer, supporting non-continuous movement by configuring the number of data blocks, length, and address interval. | GM->L1 Buffer | Non-continuous movement of cube tiles and multi-channel data. |
 | [GM->L1 Buffer On-the-fly Conversion - ND2NZ Movement (DataCopy)](DataCopy_GMToL1_ND2NZ.md) | Moves data from GM to the L1 Buffer while simultaneously completing the conversion from ND to NZ fractal format. | GM->L1 Buffer | Converts ND-format feature maps to NZ fractal format before cube computation. |
-| [GM->L1 Buffer Load2D Instruction Movement](GMToL1-Load2D-Instruction-Movement.md) | Moves 2D-format cube data from GM to the L1 Buffer in units of 512B data fractals. | GM->L1 Buffer | 2D fractal data required for general cube computation is loaded into the L1 Buffer. |
+| [GM->L1 Buffer Load2D Instruction Movement](gmtol1_load2d_instruction_movement.md) | Moves 2D-format cube data from GM to the L1 Buffer in units of 512B data fractals. | GM->L1 Buffer | 2D fractal data required for general cube computation is loaded into the L1 Buffer. |
 
 <!-- npu="950" id2 -->
 For Ascend 950PR/Ascend 950DT, the following GM->L1 Buffer APIs are newly added. Developers are advised to refer to Table 3.

@@ -4,7 +4,7 @@
 
 ## Alignment Constraints
 
-For details, see [Table Data Path and Storage Hierarchy](overview.md#zh-cn_topic_0000002543771563_table3523123518108).
+For details, see [Table Data Path and Storage Hierarchy](general_description.md#zh-cn_topic_0000002543771563_table3523123518108).
 
 - When the source address is located at **L1 Buffer**, the address must be 32-byte aligned; when the source address is located at **GM**, the address must be 1-byte aligned.
 - When the destination address is located at **L0A Buffer**/**L0B Buffer**, the address must be 512-byte aligned; when the destination address is located at **L1 Buffer**, the address must be 32-byte aligned.

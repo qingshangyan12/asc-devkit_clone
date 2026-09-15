@@ -62,5 +62,5 @@ None
 
 ## Example<a name="section1234017553610"></a>
 
-See [Example](EXTERN_IMPL_BUFPOOLmacro.md#section1234017553610).
+See [Example](extern_impl_bufpool_macro.md#section1234017553610).
 

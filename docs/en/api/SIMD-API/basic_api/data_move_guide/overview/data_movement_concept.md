@@ -47,7 +47,7 @@ In the Ascend cube computation process, data usually needs to be converted from 
 
 - **ND2NZ movement**: While data is moved from Global Memory to Unified Buffer/L1 Buffer, the ND format is converted to NZ format. The fractal dimension information of the source cube is configured through the Nd2NzParams parameter. See [DataCopy (GM -> UB - inline conversion ND2NZ movement)](../gm_and_ub_data_movement.md#ZH-CN_TOPIC_0000002349187356), [DataCopy (GM -> L1 - inline conversion ND2NZ movement)](../gm_and_l1_or_l0_data_movement.md#ZH-CN_TOPIC_0000002573902841), and other sections.
 - **NZ2ND movement**: While data is moved from Unified Buffer to Global Memory, the NZ format is converted back to ND format. The dimension information of the destination cube is configured through the Nz2NdParamsFull parameter. See [DataCopy (UBToGM - inline conversion NZ2ND movement)](../gm_and_ub_data_movement.md#ZH-CN_TOPIC_0000002391805265) and other sections.
-- **DN2NZ movement**: (Supported by ISASI products) Conversion movement from the DN format of depthwise convolution to the NZ format. See [DataCopy (GM -> L1 - inline conversion - DN2NZ movement)](../gm_and_l1_or_l0_data_movement.md#datacopygm---l1-inline-conversion-dn2nz-movement) section.
+- **DN2NZ movement**: (Supported by ISASI products) Conversion movement from the DN format of depthwise convolution to the NZ format. See [DataCopy (GM -> L1 - inline conversion - DN2NZ movement)](../gm_and_l1_or_l0_data_movement.md#datacopy-gm---l1---inline-conversion---dn2nz-movement) section.
 
 **Figure 4**  ND2NZ format conversion schematic diagram  
 
@@ -63,7 +63,7 @@ The output results of cube computation (Cube unit) are stored in the L0C Buffer,
 
 The standard DataCopy API requires that the start addresses of the source and destination operands satisfy alignment constraints (for example, UB requires 32-byte alignment). When the actual data length does not satisfy the alignment requirement (for example, moving 17 half elements, totaling 34 bytes, which is not a multiple of 32), the DataCopyPad API is required. This API allows the last data block moved to be of unaligned length, and the padding value and padding mode can be configured through the padParams parameter, so that the destination address after movement remains aligned.
 
-**Applicable scenarios**: Movement when the total data length does not satisfy the 32-byte alignment requirement, and scenarios where the tail data needs to be padded during movement. See [DataCopyPad (GM -> UB - Unaligned Data Movement)](../gm_and_ub_data_movement.md#ZH-CN_TOPIC_0000001894460401), [DataCopyPad (GM -> L1 - Unaligned Data Movement)](../gm_and_l1_or_l0_data_movement.md#datacopypadgm---l1-unaligned-data-movement), and other sections.
+**Applicable scenarios**: Movement when the total data length does not satisfy the 32-byte alignment requirement, and scenarios where the tail data needs to be padded during movement. See [DataCopyPad (GM -> UB - Unaligned Data Movement)](../gm_and_ub_data_movement.md#ZH-CN_TOPIC_0000001894460401), [DataCopyPad (GM -> L1 - Unaligned Data Movement)](../gm_and_l1_or_l0_data_movement.md#datacopypad-gm---l1-unaligned-data-movement), and other sections.
 
 ## UB Internal Movement (Copy)
 
@@ -71,7 +71,7 @@ Copy is a data movement instruction dedicated to the Unified Buffer, supporting 
 
 ## Cube Fractal Movement (Load2D/Load3D)
 
-Load2D and Load3D are 2D/3D format fractal movement APIs dedicated to the cube computation path. They are responsible for moving cube data in L1 to the L0A Buffer/L0B Buffer according to the special fractal format (such as NZ arrangement) required by the Cube computation unit. These APIs can be accompanied by a transpose operation (LoadDataWithTranspose) and support loading sparse weight matrices (LoadDataWithSparse). See [LoadData (L1ToL0A-2D format fractal cube movement)](../l1_and_l0_data_movement.md#loaddatal1---l0a-2d-format-fractal-cube-movement), [LoadData (L1ToL0A-3D format fractal cube movement)](../l1_and_l0_data_movement.md#loaddatal1---l0a-3d-format-fractal-cube-movement), and other sections.
+Load2D and Load3D are 2D/3D format fractal movement APIs dedicated to the cube computation path. They are responsible for moving cube data in L1 to the L0A Buffer/L0B Buffer according to the special fractal format (such as NZ arrangement) required by the Cube computation unit. These APIs can be accompanied by a transpose operation (LoadDataWithTranspose) and support loading sparse weight matrices (LoadDataWithSparse). See [LoadData (L1ToL0A-2D format fractal cube movement)](../l1_and_l0_data_movement.md#loaddata-l1---l0a-2d-format-fractal-cube-movement), [LoadData (L1ToL0A-3D format fractal cube movement)](../l1_and_l0_data_movement.md#loaddata-l1---l0a-3d-format-fractal-cube-movement), and other sections.
 
 ## Multi-dimensional Data Movement NDDMA (DataCopy)
 

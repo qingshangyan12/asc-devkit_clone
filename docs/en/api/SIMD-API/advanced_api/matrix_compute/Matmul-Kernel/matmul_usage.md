@@ -114,7 +114,7 @@ The specific steps for implementing matrix multiplication using the Matmul API a
 <a name="li5878185413338"></a>
 
     ```
-    REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling); // 初始化matmul对象，参数含义请参考REGIST_MATMUL_OBJ章节
+    REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling); // Initialize the Matmul object. For the parameter meaning, see the REGIST_MATMUL_OBJ chapter.
     ```
 
 3.  Set the left matrix A, right matrix B, and Bias.

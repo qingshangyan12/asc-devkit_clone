@@ -282,13 +282,13 @@ Where:
 The following example shows how kernel functions are declared and called.
 
 ```
-// 声明
+// Declaration
 __global__ void add_custom(float* x, float* y, float* z, uint64_t total_length);
-// 调用
+// Call
 uint32_t blocks_per_grid = 48; // Number of thread blocks (Grid size)
 uint32_t threads_per_block = 256; // Number of threads per block (Block size)
 size_t dyn_ubuf_size = 1024; // need 1024 Byte dynamic memory
-add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(x, y, z, 1024); //blocks_per_grid和threads_per_block会被隐式转换为dim3类型
+add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(x, y, z, 1024); // blocks_per_grid and threads_per_block will be implicitly converted to the dim3 type.
 ```
 
     Before the function is executed, the preceding configuration parameters are validated. If blocks_per_grid or threads_per_block exceeds the maximum allowed scale of the device, or if dyn_ubuf_size exceeds the remaining shared memory available after static memory is allocated, the function will fail to execute.

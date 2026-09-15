@@ -29,7 +29,7 @@
 
 ## Description<a name="section618mcpsimp"></a>
 
-Obtains the workspace pointer used by the user. In the Kernel direct invocation development mode, if the HAVE\_WORKSPACE compilation option is not enabled, the framework does not automatically set the system workspace. If high-level APIs that require the system workspace, such as [Matmul Kernel side API](../../../advanced_api/matrix_compute/Matmul-Kernel/matmul-kernel-side-API.md), are used, the kernel side needs to set the system workspace through [SetSysWorkSpace](SetSysWorkSpace.md). In this case, the user workspace needs to be obtained through this API.
+Obtains the workspace pointer used by the user. In the Kernel direct invocation development mode, if the HAVE\_WORKSPACE compilation option is not enabled, the framework does not automatically set the system workspace. If high-level APIs that require the system workspace, such as [Matmul Kernel side API](../../../advanced_api/matrix_compute/Matmul-Kernel/matmul_kernel_api.md), are used, the kernel side needs to set the system workspace through [SetSysWorkSpace](SetSysWorkSpace.md). In this case, the user workspace needs to be obtained through this API.
 
 ## Prototype<a name="section620mcpsimp"></a>
 

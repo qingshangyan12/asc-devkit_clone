@@ -4,7 +4,7 @@
 
 -   **[TensorDesc Overview](tensordesc_introduction.md)**  
 
--   **[Constructors and Destructors](constructors_and_destructors.md)**  
+-   **[Constructors and Destructors](constructor_and_destructor.md)**  
 
 -   **[SetShapeAddr](SetShapeAddr.md)**  
 

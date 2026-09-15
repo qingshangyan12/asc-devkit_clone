@@ -79,7 +79,7 @@ template <TPosition pos> __aicore__ inline bool InitBuffer(TBuf<pos>& buf, uint3
 </tbody>
 </table>
 
-**Table 3** Parameter description of the InitBuffer(TBuf<pos>& buf, uint32_t len) prototype
+**Table 3** Parameter description of the InitBuffer(TBuf<pos\>& buf, uint32_t len) prototype
 
 <a name="table5376122715308"></a>
 <table><thead align="left"><tr id="row1337716275309"><th class="cellrowborder" valign="top" width="12.36%" id="mcps1.2.4.1.1"><p id="p1537762711305"><a name="p1537762711305"></a><a name="p1537762711305"></a>Parameter</p></th>
