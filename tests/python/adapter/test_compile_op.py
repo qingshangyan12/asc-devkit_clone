@@ -5971,7 +5971,6 @@ Contents of section
 
         with (
             mock.patch.object(CommonUtility, "is_c310", return_value=True),
-            mock.patch.object(CommonUtility, "is_m510", return_value=False),
             mock.patch.object(
                 CommonUtility,
                 "is_support_workspace_offset",
@@ -5989,7 +5988,6 @@ Contents of section
 
         with (
             mock.patch.object(CommonUtility, "is_c310", return_value=False),
-            mock.patch.object(CommonUtility, "is_m510", return_value=True),
             mock.patch.object(
                 CommonUtility,
                 "is_support_workspace_offset",

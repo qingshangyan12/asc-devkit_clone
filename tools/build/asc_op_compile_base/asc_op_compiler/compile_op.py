@@ -633,17 +633,15 @@ def _gen_kernel_func_declare_head(
 def _gen_usr_workspace_codes():
     workspace_ptr = "AscendC::GetUserWorkspace(workspace)"
     if CommonUtility.is_support_workspace_offset():
-        workspace_ptr = "workspace"
-    if CommonUtility.is_c310():
-        return (
-            "#if ENABLE_CV_COMM_VIA_SSBUF != 0 && __MIX_CORE_AIC_RATION__ != 1\n"
-            f"    GM_ADDR usrWorkspace = {workspace_ptr};\n"
-            "#else\n"
-            f"    GM_ADDR usrWorkspace = {workspace_ptr} + AscendC::RESERVED_WORKSPACE;\n"
-            "#endif\n"
-        )
-    if CommonUtility.is_m510():
-        return f"    GM_ADDR usrWorkspace = {workspace_ptr} + AscendC::RESERVED_WORKSPACE;\n"
+        workspace_ptr = "workspace + AscendC::RESERVED_WORKSPACE"
+        if CommonUtility.is_c310():
+            return (
+                "#if ENABLE_CV_COMM_VIA_SSBUF != 0 && __MIX_CORE_AIC_RATION__ != 1\n"
+                "    GM_ADDR usrWorkspace = workspace;\n"
+                "#else\n"
+                f"    GM_ADDR usrWorkspace = {workspace_ptr};\n"
+                "#endif\n"
+            )
     return f"    GM_ADDR usrWorkspace = {workspace_ptr};\n"
 
 
