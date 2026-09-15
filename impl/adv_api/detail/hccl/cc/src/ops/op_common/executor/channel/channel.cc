@@ -496,9 +496,6 @@ HcclResult CalcChannelRequestNhr(
                 "[CalcChannelRequestNhr] isNeedLevel0NhrChannel[%d] Need to calc NHR channel in level0",
                 isNeedLevel0NhrChannel);
             if (netLayerNum > 1 && netLayer == 0 && !isNeedLevel0NhrChannel) {
-                HCCL_INFO(
-                    "[CalcChannelRequestNhr] skip netLayer[0] for upper-layer NHR, remoteRank[%u].",
-                    subcommInfo[0][rankIdx]);
                 continue;
             }
             CommLink* linkList = nullptr;
@@ -518,10 +515,6 @@ HcclResult CalcChannelRequestNhr(
                 break;
             }
         }
-
-        HCCL_INFO(
-            "[CalcChannelRequestNhr] myRank=%u, remoteRank=%u, channelsCreated=%zu, totalChannels=%zu.", myRank,
-            subcommInfo[0][rankIdx], channels.size() - channelCountBefore, channels.size());
 
         CHK_PRT_RET(
             channels.size() == channelCountBefore,
