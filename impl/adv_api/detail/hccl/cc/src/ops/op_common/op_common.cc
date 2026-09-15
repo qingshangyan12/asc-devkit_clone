@@ -1098,7 +1098,8 @@ HcclResult HcclGetThread(
         u32 threadNum = resRequest.slaveThreadNum + 1;
         std::vector<ThreadHandle> threads(threadNum);
         // maxNotifyNum需要再增加一个用于host-device同步
-        CHK_PRT_RET(maxNotifyNum >= UINT16_MAX,
+        CHK_PRT_RET(
+            maxNotifyNum >= UINT16_MAX,
             HCCL_ERROR("[HcclGetThread] notify count[%u] cannot fit ThreadConfig v1 with host notify", maxNotifyNum),
             HCCL_E_PARA);
         CHK_RET(Mc2ThreadAcquireWithConfig(comm, COMM_ENGINE_AICPU, threadNum, maxNotifyNum + 1, threads.data()));
