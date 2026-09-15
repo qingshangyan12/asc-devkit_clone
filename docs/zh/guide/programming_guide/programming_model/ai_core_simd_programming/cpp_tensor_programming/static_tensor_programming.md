@@ -267,7 +267,7 @@
 </tr>
 <tr id="row166701142174317"><td class="cellrowborder" valign="top" width="30.28%" headers="mcps1.2.3.1.1 "><p id="p126701142174316"><a name="p126701142174316"></a><a name="p126701142174316"></a>基础API &gt; 同步控制 &gt; 核内同步</p>
 </td>
-<td class="cellrowborder" valign="top" width="69.72%" headers="mcps1.2.3.1.2 "><p id="p167024224318"><a name="p167024224318"></a><a name="p167024224318"></a>SetFlag/WaitFlag、PipeBarrier</p>
+<td class="cellrowborder" valign="top" width="69.72%" headers="mcps1.2.3.1.2 "><p id="p167024224318"><a name="p167024224318"></a><a name="p167024224318"></a>SetFlag/WaitFlag、PipeBarrier、Mutex::Lock/Mutex::Unlock、AllocMutexID/ReleaseMutexID</p>
 </td>
 </tr>
 <tr id="row166719424430"><td class="cellrowborder" valign="top" width="30.28%" headers="mcps1.2.3.1.1 "><p id="p1067184244310"><a name="p1067184244310"></a><a name="p1067184244310"></a>基础API &gt; 缓存控制</p>
@@ -431,7 +431,7 @@
 </tr>
 <tr id="row114761053204315"><td class="cellrowborder" valign="top" width="29.9%" headers="mcps1.2.4.1.1 "><p id="p2047615394311"><a name="p2047615394311"></a><a name="p2047615394311"></a>基础API &gt; 同步控制 &gt; 核内同步</p>
 </td>
-<td class="cellrowborder" valign="top" width="44.25%" headers="mcps1.2.4.1.2 "><p id="p14476853154310"><a name="p14476853154310"></a><a name="p14476853154310"></a>SetFlag/WaitFlag、PipeBarrier、DataSyncBarrier</p>
+<td class="cellrowborder" valign="top" width="44.25%" headers="mcps1.2.4.1.2 "><p id="p14476853154310"><a name="p14476853154310"></a><a name="p14476853154310"></a>SetFlag/WaitFlag、PipeBarrier、DataSyncBarrier、Mutex::Lock/Mutex::Unlock、AllocMutexID/ReleaseMutexID</p>
 </td>
 <td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p947605334315"><a name="p947605334315"></a><a name="p947605334315"></a>-</p>
 </td>
@@ -633,7 +633,7 @@
 </tr>
 <tr id="row177081648422"><td class="cellrowborder" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p113885518108"><a name="p113885518108"></a><a name="p113885518108"></a>基础API &gt; 同步控制 &gt; 核内同步</p>
 </td>
-<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p1538855191014"><a name="p1538855191014"></a><a name="p1538855191014"></a>SetFlag/WaitFlag、PipeBarrier、DataSyncBarrier</p>
+<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p1538855191014"><a name="p1538855191014"></a><a name="p1538855191014"></a>SetFlag/WaitFlag、PipeBarrier、DataSyncBarrier、Mutex::Lock/Mutex::Unlock、AllocMutexID/ReleaseMutexID</p>
 </td>
 <td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p838255191017"><a name="p838255191017"></a><a name="p838255191017"></a>-</p>
 </td>
@@ -864,7 +864,7 @@
 </tr>
 <tr id="row6778713162710"><td class="cellrowborder" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p20882139162713"><a name="p20882139162713"></a><a name="p20882139162713"></a>基础API &gt; 同步控制 &gt; 核内同步</p>
 </td>
-<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p2882133915277"><a name="p2882133915277"></a><a name="p2882133915277"></a>SetFlag/WaitFlag、PipeBarrier、DataSyncBarrier</p>
+<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p2882133915277"><a name="p2882133915277"></a><a name="p2882133915277"></a>SetFlag/WaitFlag、PipeBarrier、DataSyncBarrier、Mutex::Lock/Mutex::Unlock、AllocMutexID/ReleaseMutexID</p>
 </td>
 <td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p8882133922716"><a name="p8882133922716"></a><a name="p8882133922716"></a>-</p>
 </td>
