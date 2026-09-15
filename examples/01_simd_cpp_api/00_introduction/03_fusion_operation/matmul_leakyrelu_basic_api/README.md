@@ -8,6 +8,7 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
+| Ascend 960DT | >= CANN 9.2.0 |
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 | Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
@@ -207,7 +208,7 @@
 
                   // ==================== L1 → L0A/L0B: LoadData ====================
                   // ⚠️ 架构约束：不同产品的L0A排布格式不同，LoadData参数需对应调整
-                  // A2/A3(2201)为Zz排布需逐块搬运，950PR(3510)为Nz排布可一次完成
+                  // A2/A3(2201)为Zz排布需逐块搬运，950PR(3510)/960DT(9201)为Nz排布可一次完成
                   // A2/A3架构 (dav-2201): L0A排布为Zz格式，需逐块搬运
           #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
                   for (int i = 0; i < baseM / CUBE_BLOCK; ++i) {
@@ -219,8 +220,8 @@
                       AscendC::LoadData(b2Local[i * baseN * CUBE_BLOCK], b1Local[i * 512 / sizeof(half)],
                           AscendC::LoadData2DParams{0, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, 0, 0, true, 0});
                   }
-                  // Ascend 950PR架构 (dav-3510): L0A排布为Nz格式，一次搬运完成
-          #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+                  // Ascend 950PR架构 (dav-3510)/Ascend 960DT架构 (dav-9201): L0A排布为Nz格式，一次搬运完成
+          #elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201))
                   AscendC::LoadData(a2Local, a1Local,
                       AscendC::LoadData2DParamsV2{0, 0, baseM / CUBE_BLOCK, baseK / CUBE_BLOCK,
                           baseM / CUBE_BLOCK, baseM / CUBE_BLOCK, false, 0});
@@ -465,7 +466,7 @@
   | 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |
   | ----------------| -----------------------------| --------------------------------------------------------------------------------------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　　　　　　　　　　　　　　　　　　 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510`、`dav-9201` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT，dav-9201 对应 Ascend 960DT |
 
 - 执行结果
 

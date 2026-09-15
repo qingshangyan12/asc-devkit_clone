@@ -8,6 +8,7 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
+| Ascend 960DT | >= CANN 9.2.0 |
 | Ascend 950PR/Ascend 950DT | > CANN 9.1.0 |
 
 > **说明：** 该样例依赖尚未正式发布的CANN特性，请使用最新的CANN master包。
@@ -126,9 +127,9 @@
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`、`dav-9201` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT，dav-9201 对应 Ascend 960DT |
 
-  > **说明：** 本样例仅支持dav-3510架构（对应 Ascend 950PR/Ascend 950DT）。
+  > **说明：** 本样例支持dav-3510架构（对应 Ascend 950PR/Ascend 950DT）、dav-9201架构（对应 Ascend 960DT）。
 
 - 执行结果
   执行结果如下，说明精度对比成功。

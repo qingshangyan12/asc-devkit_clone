@@ -8,6 +8,7 @@ This example implements multi-core matrix multiplication computation based on th
 
 | Product | CANN Software Version |
 |---------|----------------------|
+| Ascend 960DT | >= CANN 9.2.0 |
 | Ascend 950PR/Ascend 950DT | > CANN 9.1.0 |
 
 > **Note:** This example depends on CANN features that are not yet officially released. Please use the latest CANN master package.
@@ -126,9 +127,9 @@ Execute the following steps in the root directory of this example to build and r
   | Option | Available Values | Description |
   |--------|------------------|-------------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`, `dav-9201` | NPU architecture: dav-3510 corresponds to Ascend 950PR/Ascend 950DT, dav-9201 corresponds to Ascend 960DT |
 
-  > **Note:** This example only supports dav-3510 architecture (corresponding to Ascend 950PR/Ascend 950DT).
+  > **Note:** This example supports dav-3510 architecture (corresponding to Ascend 950PR/Ascend 950DT) and dav-9201 architecture (corresponding to Ascend 960DT).
 
 - Execution Result
   The execution result is as follows, indicating that the precision comparison succeeded.

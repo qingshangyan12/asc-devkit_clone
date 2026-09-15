@@ -40,6 +40,7 @@ The complete data path is: GM → UB → Register (step-by-step computation) →
 
 | Product | CANN Software Version |
 |------|-------------|
+| Ascend 960DT | >= CANN 9.2.0 |
 | Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Operator Implementation
@@ -273,7 +274,7 @@ Execute the following steps in the root directory of this example to build and r
   | Option | Available Values | Description |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` (default) | NPU architecture: Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` (default), `dav-9201` | NPU architecture: dav-3510 corresponds to Ascend 950PR/Ascend 950DT, dav-9201 corresponds to Ascend 960DT |
   | `CMAKE_VF_MODE` | `true` (default), `false` | VF fusion mode: enable or disable `--cce-simd-vf-fusion` |
 
 

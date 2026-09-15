@@ -8,6 +8,7 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
 
 | Product | CANN Software Version |
 |---------|----------------------|
+| Ascend 960DT | >= CANN 9.2.0 |
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 | Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.0.0 |
 | Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
@@ -207,7 +208,7 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
 
                   // ==================== L1 → L0A/L0B: LoadData ====================
                   // ⚠️ Architecture constraint: L0A layout format differs across products, LoadData parameters need to be adjusted accordingly
-                  // A2/A3(2201) uses Zz layout requiring block-by-block transfer, 950PR(3510) uses Nz layout allowing one-time completion
+                  // A2/A3(2201) uses Zz layout requiring block-by-block transfer, 950PR(3510)/960DT(9201) uses Nz layout allowing one-time completion
                   // A2/A3 architecture (dav-2201): L0A layout is Zz format, requires block-by-block transfer
           #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
                   for (int i = 0; i < baseM / CUBE_BLOCK; ++i) {
@@ -219,8 +220,8 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
                       AscendC::LoadData(b2Local[i * baseN * CUBE_BLOCK], b1Local[i * 512 / sizeof(half)],
                           AscendC::LoadData2DParams{0, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, 0, 0, true, 0});
                   }
-                  // Ascend 950PR architecture (dav-3510): L0A layout is Nz format, one-time transfer completion
-          #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+                  // Ascend 950PR architecture (dav-3510)/Ascend 960DT architecture (dav-9201): L0A layout is Nz format, one-time transfer completion
+          #elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201))
                   AscendC::LoadData(a2Local, a1Local,
                       AscendC::LoadData2DParamsV2{0, 0, baseM / CUBE_BLOCK, baseK / CUBE_BLOCK,
                           baseM / CUBE_BLOCK, baseM / CUBE_BLOCK, false, 0});
@@ -465,7 +466,7 @@ Execute the following steps in the root directory of this example to compile and
   | Option | Possible Values | Description |
   | -------| ----------------| --------------------------------------------------------------------------------------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debugging, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products, dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510`, `dav-9201` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products, dav-3510 corresponds to Ascend 950PR/Ascend 950DT, dav-9201 corresponds to Ascend 960DT |
 
 - Execution Result
 
