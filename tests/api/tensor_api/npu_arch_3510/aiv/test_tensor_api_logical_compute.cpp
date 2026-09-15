@@ -22,94 +22,124 @@ template <typename T>
 using reg_type = asc::te::experimental::reg_tensor<T>;
 
 template <typename T>
-void check_logical_not()
+__aicore__ inline void TestLogicalNot()
 {
-    static_assert(AscendC::Std::is_same_v<decltype(!AscendC::Std::declval<const reg_type<T>&>()), reg_type<T>>);
+    reg_type<T> src{};
+    src.mask = all_mask<T>().reg;
+
+    auto dst = !src;
+    static_assert(AscendC::Std::is_same_v<decltype(dst), reg_type<T>>);
+    EXPECT_EQ(dst.mask, src.mask);
 }
 
 template <typename T>
-void check_bitwise_and()
+__aicore__ inline void TestBitwiseAnd()
 {
     reg_type<T> src0{};
     reg_type<T> src1{};
-    src0.mask = asc::te::experimental::all_mask<T>().reg;
-    auto dst = src0 & src1;
-    EXPECT_EQ(dst.mask, src0.mask);
+    src0.mask = all_mask<T>().reg;
 
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(AscendC::Std::declval<const reg_type<T>&>() & AscendC::Std::declval<const reg_type<T>&>()),
-                  reg_type<T>>);
+    auto dst = src0 & src1;
+    static_assert(AscendC::Std::is_same_v<decltype(dst), reg_type<T>>);
+    EXPECT_EQ(dst.mask, src0.mask);
 }
 
 template <typename T>
-void check_bitwise_xor()
+__aicore__ inline void TestBitwiseXor()
 {
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(AscendC::Std::declval<const reg_type<T>&>() ^ AscendC::Std::declval<const reg_type<T>&>()),
-                  reg_type<T>>);
+    reg_type<T> src0{};
+    reg_type<T> src1{};
+    src0.mask = all_mask<T>().reg;
+
+    auto dst = src0 ^ src1;
+    static_assert(AscendC::Std::is_same_v<decltype(dst), reg_type<T>>);
+    EXPECT_EQ(dst.mask, src0.mask);
 }
 
 template <typename T, typename ShiftType>
-void check_shift()
+__aicore__ inline void TestShiftLeft()
 {
-    static_assert(
-        AscendC::Std::is_same_v<
-            decltype(AscendC::Std::declval<const reg_type<T>&>() << AscendC::Std::declval<const reg_type<ShiftType>&>()),
-            reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(AscendC::Std::declval<const reg_type<T>&>() << AscendC::Std::declval<const int16_t&>()),
-                  reg_type<T>>);
-    static_assert(
-        AscendC::Std::is_same_v<
-            decltype(AscendC::Std::declval<const reg_type<T>&>() >> AscendC::Std::declval<const reg_type<ShiftType>&>()),
-            reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(AscendC::Std::declval<const reg_type<T>&>() >> AscendC::Std::declval<const int16_t&>()),
-                  reg_type<T>>);
+    reg_type<T> src{};
+    reg_type<ShiftType> shift{};
+    int16_t scalar_shift{};
+    src.mask = all_mask<T>().reg;
+
+    auto reg_dst = src << shift;
+    auto scalar_dst = src << scalar_shift;
+    static_assert(AscendC::Std::is_same_v<decltype(reg_dst), reg_type<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(scalar_dst), reg_type<T>>);
+    EXPECT_EQ(reg_dst.mask, src.mask);
+    EXPECT_EQ(scalar_dst.mask, src.mask);
 }
 
-TEST(test_tensor_api_logical_compute, compile_public_apis_and_supported_types)
+template <typename T, typename ShiftType>
+__aicore__ inline void TestShiftRight()
 {
-    check_logical_not<int8_t>();
-    check_logical_not<uint8_t>();
-    check_logical_not<int16_t>();
-    check_logical_not<uint16_t>();
-    check_logical_not<half>();
-    check_logical_not<int32_t>();
-    check_logical_not<uint32_t>();
-    check_logical_not<float>();
-    check_logical_not<bool>();
+    reg_type<T> src{};
+    reg_type<ShiftType> shift{};
+    int16_t scalar_shift{};
+    src.mask = all_mask<T>().reg;
 
-    check_bitwise_and<int8_t>();
-    check_bitwise_and<uint8_t>();
-    check_bitwise_and<int16_t>();
-    check_bitwise_and<uint16_t>();
-    check_bitwise_and<int32_t>();
-    check_bitwise_and<uint32_t>();
-
-    check_bitwise_xor<int8_t>();
-    check_bitwise_xor<uint8_t>();
-    check_bitwise_xor<int16_t>();
-    check_bitwise_xor<uint16_t>();
-    check_bitwise_xor<int32_t>();
-    check_bitwise_xor<uint32_t>();
-
-    using predicate_type = reg_type<bool>;
-    static_assert(
-        AscendC::Std::is_same_v<
-            decltype(AscendC::Std::declval<const predicate_type&>() & AscendC::Std::declval<const predicate_type&>()),
-            predicate_type>);
-    static_assert(
-        AscendC::Std::is_same_v<
-            decltype(AscendC::Std::declval<const predicate_type&>() ^ AscendC::Std::declval<const predicate_type&>()),
-            predicate_type>);
-
-    check_shift<int8_t, int8_t>();
-    check_shift<uint8_t, int8_t>();
-    check_shift<int16_t, int16_t>();
-    check_shift<uint16_t, int16_t>();
-    check_shift<int32_t, int32_t>();
-    check_shift<uint32_t, int32_t>();
+    auto reg_dst = src >> shift;
+    auto scalar_dst = src >> scalar_shift;
+    static_assert(AscendC::Std::is_same_v<decltype(reg_dst), reg_type<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(scalar_dst), reg_type<T>>);
+    EXPECT_EQ(reg_dst.mask, src.mask);
+    EXPECT_EQ(scalar_dst.mask, src.mask);
 }
+
+#define LOGICAL_COMPUTE_TEST(Function, DataType)                 \
+    TEST(test_tensor_api_logical_compute, Function##_##DataType) \
+    {                                                            \
+        Test##Function<DataType>();                              \
+        SUCCEED();                                               \
+    }
+
+#define SHIFT_TEST(Function, DataType, ShiftType)                              \
+    TEST(test_tensor_api_logical_compute, Function##_##DataType##_##ShiftType) \
+    {                                                                          \
+        Test##Function<DataType, ShiftType>();                                 \
+        SUCCEED();                                                             \
+    }
+
+LOGICAL_COMPUTE_TEST(LogicalNot, int8_t)
+LOGICAL_COMPUTE_TEST(LogicalNot, uint8_t)
+LOGICAL_COMPUTE_TEST(LogicalNot, int16_t)
+LOGICAL_COMPUTE_TEST(LogicalNot, uint16_t)
+LOGICAL_COMPUTE_TEST(LogicalNot, half)
+LOGICAL_COMPUTE_TEST(LogicalNot, int32_t)
+LOGICAL_COMPUTE_TEST(LogicalNot, uint32_t)
+LOGICAL_COMPUTE_TEST(LogicalNot, float)
+LOGICAL_COMPUTE_TEST(LogicalNot, bool)
+
+LOGICAL_COMPUTE_TEST(BitwiseAnd, int8_t)
+LOGICAL_COMPUTE_TEST(BitwiseAnd, uint8_t)
+LOGICAL_COMPUTE_TEST(BitwiseAnd, int16_t)
+LOGICAL_COMPUTE_TEST(BitwiseAnd, uint16_t)
+LOGICAL_COMPUTE_TEST(BitwiseAnd, int32_t)
+LOGICAL_COMPUTE_TEST(BitwiseAnd, uint32_t)
+LOGICAL_COMPUTE_TEST(BitwiseAnd, bool)
+
+LOGICAL_COMPUTE_TEST(BitwiseXor, int8_t)
+LOGICAL_COMPUTE_TEST(BitwiseXor, uint8_t)
+LOGICAL_COMPUTE_TEST(BitwiseXor, int16_t)
+LOGICAL_COMPUTE_TEST(BitwiseXor, uint16_t)
+LOGICAL_COMPUTE_TEST(BitwiseXor, int32_t)
+LOGICAL_COMPUTE_TEST(BitwiseXor, uint32_t)
+LOGICAL_COMPUTE_TEST(BitwiseXor, bool)
+
+SHIFT_TEST(ShiftLeft, int8_t, int8_t)
+SHIFT_TEST(ShiftLeft, uint8_t, int8_t)
+SHIFT_TEST(ShiftLeft, int16_t, int16_t)
+SHIFT_TEST(ShiftLeft, uint16_t, int16_t)
+SHIFT_TEST(ShiftLeft, int32_t, int32_t)
+SHIFT_TEST(ShiftLeft, uint32_t, int32_t)
+
+SHIFT_TEST(ShiftRight, int8_t, int8_t)
+SHIFT_TEST(ShiftRight, uint8_t, int8_t)
+SHIFT_TEST(ShiftRight, int16_t, int16_t)
+SHIFT_TEST(ShiftRight, uint16_t, int16_t)
+SHIFT_TEST(ShiftRight, int32_t, int32_t)
+SHIFT_TEST(ShiftRight, uint32_t, int32_t)
 
 } // namespace

@@ -22,132 +22,228 @@ template <typename T>
 using reg_type = asc::te::experimental::reg_tensor<T>;
 
 template <typename T>
-void check_unary_arithmetic()
+__aicore__ inline void TestAbs()
 {
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::abs(AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
+    reg_type<T> src{};
+    src.mask = all_mask<T>().reg;
+
+    auto dst = asc::te::experimental::abs(src);
+    static_assert(AscendC::Std::is_same_v<decltype(dst), reg_type<T>>);
+    EXPECT_EQ(dst.mask, src.mask);
 }
 
 template <typename T>
-void check_float_math()
+__aicore__ inline void TestExp()
 {
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::exp(AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::sqrt(AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::log2(AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::log10(AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::prelu(
-                      AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>())),
-                  reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::leaky_relu(
-                      AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const T&>())),
-                  reg_type<T>>);
+    reg_type<T> src{};
+    src.mask = all_mask<T>().reg;
+
+    auto dst = asc::te::experimental::exp(src);
+    static_assert(AscendC::Std::is_same_v<decltype(dst), reg_type<T>>);
+    EXPECT_EQ(dst.mask, src.mask);
 }
 
 template <typename T>
-void check_relu()
+__aicore__ inline void TestSqrt()
 {
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::relu(AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
+    reg_type<T> src{};
+    src.mask = all_mask<T>().reg;
+
+    auto dst = asc::te::experimental::sqrt(src);
+    static_assert(AscendC::Std::is_same_v<decltype(dst), reg_type<T>>);
+    EXPECT_EQ(dst.mask, src.mask);
 }
 
 template <typename T>
-void check_register_div()
+__aicore__ inline void TestLog2()
 {
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(AscendC::Std::declval<const reg_type<T>&>() / AscendC::Std::declval<const reg_type<T>&>()),
-                  reg_type<T>>);
+    reg_type<T> src{};
+    src.mask = all_mask<T>().reg;
+
+    auto dst = asc::te::experimental::log2(src);
+    static_assert(AscendC::Std::is_same_v<decltype(dst), reg_type<T>>);
+    EXPECT_EQ(dst.mask, src.mask);
 }
 
 template <typename T>
-void check_min()
+__aicore__ inline void TestLog10()
 {
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::min(
-                      AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>())),
-                  reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::min(
-                      AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const T&>())),
-                  reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::min(
-                      AscendC::Std::declval<const T&>(), AscendC::Std::declval<const reg_type<T>&>())),
-                  reg_type<T>>);
+    reg_type<T> src{};
+    src.mask = all_mask<T>().reg;
+
+    auto dst = asc::te::experimental::log10(src);
+    static_assert(AscendC::Std::is_same_v<decltype(dst), reg_type<T>>);
+    EXPECT_EQ(dst.mask, src.mask);
 }
 
 template <typename T>
-void check_carry()
+__aicore__ inline void TestRelu()
 {
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::addc(
-                      AscendC::Std::declval<reg_type<bool>&>(), AscendC::Std::declval<const reg_type<T>&>(),
-                      AscendC::Std::declval<const reg_type<T>&>())),
-                  reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::addc(
-                      AscendC::Std::declval<reg_type<bool>&>(), AscendC::Std::declval<const reg_type<T>&>(),
-                      AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<bool>&>())),
-                  reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::subc(
-                      AscendC::Std::declval<reg_type<bool>&>(), AscendC::Std::declval<const reg_type<T>&>(),
-                      AscendC::Std::declval<const reg_type<T>&>())),
-                  reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::subc(
-                      AscendC::Std::declval<reg_type<bool>&>(), AscendC::Std::declval<const reg_type<T>&>(),
-                      AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<bool>&>())),
-                  reg_type<T>>);
+    reg_type<T> src{};
+    src.mask = all_mask<T>().reg;
+
+    auto dst = asc::te::experimental::relu(src);
+    static_assert(AscendC::Std::is_same_v<decltype(dst), reg_type<T>>);
+    EXPECT_EQ(dst.mask, src.mask);
 }
 
 template <typename T>
-void check_mull()
+__aicore__ inline void TestPrelu()
 {
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::mull(
-                      AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>())),
-                  asc::te::experimental::reg_pair<T>>);
+    reg_type<T> src{};
+    reg_type<T> slope{};
+    src.mask = all_mask<T>().reg;
+
+    auto dst = asc::te::experimental::prelu(src, slope);
+    static_assert(AscendC::Std::is_same_v<decltype(dst), reg_type<T>>);
+    EXPECT_EQ(dst.mask, src.mask);
 }
 
-TEST(test_tensor_api_basic_arithmetic, compile_public_apis_and_supported_types)
+template <typename T>
+__aicore__ inline void TestLeakyRelu()
 {
-    check_unary_arithmetic<int8_t>();
-    check_unary_arithmetic<int16_t>();
-    check_unary_arithmetic<half>();
-    check_unary_arithmetic<int32_t>();
-    check_unary_arithmetic<float>();
-    check_float_math<half>();
-    check_float_math<float>();
-    check_relu<half>();
-    check_relu<int32_t>();
-    check_relu<float>();
+    reg_type<T> src{};
+    T slope{};
+    src.mask = all_mask<T>().reg;
 
-    check_register_div<int16_t>();
-    check_register_div<uint16_t>();
-    check_register_div<half>();
-    check_register_div<int32_t>();
-    check_register_div<uint32_t>();
-    check_register_div<float>();
-
-    check_min<int8_t>();
-    check_min<uint8_t>();
-    check_min<int16_t>();
-    check_min<uint16_t>();
-    check_min<half>();
-    check_min<bfloat16_t>();
-    check_min<int32_t>();
-    check_min<uint32_t>();
-    check_min<float>();
-    check_carry<int32_t>();
-    check_carry<uint32_t>();
-    check_mull<int32_t>();
-    check_mull<uint32_t>();
+    auto dst = asc::te::experimental::leaky_relu(src, slope);
+    static_assert(AscendC::Std::is_same_v<decltype(dst), reg_type<T>>);
+    EXPECT_EQ(dst.mask, src.mask);
 }
+
+template <typename T>
+__aicore__ inline void TestAddc()
+{
+    reg_type<T> src0{};
+    reg_type<T> src1{};
+    reg_type<bool> carry_src{};
+    src0.mask = all_mask<T>().reg;
+
+    auto result = asc::te::experimental::addc(src0, src1);
+    auto result_with_carry = asc::te::experimental::addc(src0, src1, carry_src);
+    static_assert(AscendC::Std::is_same_v<decltype(result), carry_result<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(result.value), reg_type<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(result.carry), reg_type<bool>>);
+    static_assert(AscendC::Std::is_same_v<decltype(result_with_carry), carry_result<T>>);
+    EXPECT_EQ(result.value.mask, src0.mask);
+    EXPECT_EQ(result.carry.mask, src0.mask);
+    EXPECT_EQ(result_with_carry.value.mask, src0.mask);
+    EXPECT_EQ(result_with_carry.carry.mask, src0.mask);
+}
+
+template <typename T>
+__aicore__ inline void TestSubc()
+{
+    reg_type<T> src0{};
+    reg_type<T> src1{};
+    reg_type<bool> carry_src{};
+    src0.mask = all_mask<T>().reg;
+
+    auto result = asc::te::experimental::subc(src0, src1);
+    auto result_with_carry = asc::te::experimental::subc(src0, src1, carry_src);
+    static_assert(AscendC::Std::is_same_v<decltype(result), carry_result<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(result.value), reg_type<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(result.carry), reg_type<bool>>);
+    static_assert(AscendC::Std::is_same_v<decltype(result_with_carry), carry_result<T>>);
+    EXPECT_EQ(result.value.mask, src0.mask);
+    EXPECT_EQ(result.carry.mask, src0.mask);
+    EXPECT_EQ(result_with_carry.value.mask, src0.mask);
+    EXPECT_EQ(result_with_carry.carry.mask, src0.mask);
+}
+
+template <typename T>
+__aicore__ inline void TestMull()
+{
+    reg_type<T> src0{};
+    reg_type<T> src1{};
+    src0.mask = all_mask<T>().reg;
+
+    auto result = asc::te::experimental::mull(src0, src1);
+    static_assert(AscendC::Std::is_same_v<decltype(result), reg_pair<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(result.first), reg_type<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(result.second), reg_type<T>>);
+    EXPECT_EQ(result.first.mask, src0.mask);
+    EXPECT_EQ(result.second.mask, src0.mask);
+}
+
+template <typename T>
+__aicore__ inline void TestDiv()
+{
+    reg_type<T> src0{};
+    reg_type<T> src1{};
+    src0.mask = all_mask<T>().reg;
+
+    auto dst = src0 / src1;
+    static_assert(AscendC::Std::is_same_v<decltype(dst), reg_type<T>>);
+    EXPECT_EQ(dst.mask, src0.mask);
+}
+
+template <typename T>
+__aicore__ inline void TestMin()
+{
+    reg_type<T> src0{};
+    reg_type<T> src1{};
+    T scalar{};
+    src0.mask = all_mask<T>().reg;
+
+    auto reg_dst = asc::te::experimental::min(src0, src1);
+    auto right_scalar_dst = asc::te::experimental::min(src0, scalar);
+    auto left_scalar_dst = asc::te::experimental::min(scalar, src0);
+    static_assert(AscendC::Std::is_same_v<decltype(reg_dst), reg_type<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(right_scalar_dst), reg_type<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(left_scalar_dst), reg_type<T>>);
+    EXPECT_EQ(reg_dst.mask, src0.mask);
+    EXPECT_EQ(right_scalar_dst.mask, src0.mask);
+    EXPECT_EQ(left_scalar_dst.mask, src0.mask);
+}
+
+#define BASIC_ARITHMETIC_TEST(Function, DataType)                 \
+    TEST(test_tensor_api_basic_arithmetic, Function##_##DataType) \
+    {                                                             \
+        Test##Function<DataType>();                               \
+        SUCCEED();                                                \
+    }
+
+BASIC_ARITHMETIC_TEST(Abs, int8_t)
+BASIC_ARITHMETIC_TEST(Abs, int16_t)
+BASIC_ARITHMETIC_TEST(Abs, half)
+BASIC_ARITHMETIC_TEST(Abs, int32_t)
+BASIC_ARITHMETIC_TEST(Abs, float)
+BASIC_ARITHMETIC_TEST(Exp, half)
+BASIC_ARITHMETIC_TEST(Exp, float)
+BASIC_ARITHMETIC_TEST(Sqrt, half)
+BASIC_ARITHMETIC_TEST(Sqrt, float)
+BASIC_ARITHMETIC_TEST(Log2, half)
+BASIC_ARITHMETIC_TEST(Log2, float)
+BASIC_ARITHMETIC_TEST(Log10, half)
+BASIC_ARITHMETIC_TEST(Log10, float)
+BASIC_ARITHMETIC_TEST(Relu, half)
+BASIC_ARITHMETIC_TEST(Relu, int32_t)
+BASIC_ARITHMETIC_TEST(Relu, float)
+BASIC_ARITHMETIC_TEST(Prelu, half)
+BASIC_ARITHMETIC_TEST(Prelu, float)
+BASIC_ARITHMETIC_TEST(LeakyRelu, half)
+BASIC_ARITHMETIC_TEST(LeakyRelu, float)
+BASIC_ARITHMETIC_TEST(Addc, int32_t)
+BASIC_ARITHMETIC_TEST(Addc, uint32_t)
+BASIC_ARITHMETIC_TEST(Subc, int32_t)
+BASIC_ARITHMETIC_TEST(Subc, uint32_t)
+BASIC_ARITHMETIC_TEST(Mull, int32_t)
+BASIC_ARITHMETIC_TEST(Mull, uint32_t)
+BASIC_ARITHMETIC_TEST(Div, int16_t)
+BASIC_ARITHMETIC_TEST(Div, uint16_t)
+BASIC_ARITHMETIC_TEST(Div, half)
+BASIC_ARITHMETIC_TEST(Div, int32_t)
+BASIC_ARITHMETIC_TEST(Div, uint32_t)
+BASIC_ARITHMETIC_TEST(Div, float)
+BASIC_ARITHMETIC_TEST(Min, int8_t)
+BASIC_ARITHMETIC_TEST(Min, uint8_t)
+BASIC_ARITHMETIC_TEST(Min, int16_t)
+BASIC_ARITHMETIC_TEST(Min, uint16_t)
+BASIC_ARITHMETIC_TEST(Min, half)
+BASIC_ARITHMETIC_TEST(Min, bfloat16_t)
+BASIC_ARITHMETIC_TEST(Min, int32_t)
+BASIC_ARITHMETIC_TEST(Min, uint32_t)
+BASIC_ARITHMETIC_TEST(Min, float)
 
 } // namespace

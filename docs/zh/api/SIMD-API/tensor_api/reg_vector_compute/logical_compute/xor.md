@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-头文件路径：`"tensor_api/experimental/vector_compute.h"`。
+头文件路径：`"tensor_api/experimental/arch/vector/logical_compute.h"`。
 
 对两个寄存器逐元素执行按位异或运算。
 
@@ -76,7 +76,11 @@ src0、src1与返回值的数据类型保持一致。支持的数据类型为：
 再执行计算并将结果写回UB。
 
 ```cpp
-#include "tensor_api/experimental/vector_compute.h"
+#include "tensor_api/tensor.h"
+#include "tensor_api/experimental/arch/vector/logical_compute.h"
+#include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
+#include "tensor_api/experimental/arch/vector/reg_data_load.h"
+#include "tensor_api/experimental/arch/vector/reg_data_store.h"
 
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void bit_xor_example(

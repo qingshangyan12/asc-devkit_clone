@@ -10,10 +10,10 @@
 - **[max](max.md)**
 - **[min](min.md)**
 - **[mull](mull.md)**
-- **[operator+](operator_add.md)**
-- **[operator-](operator_sub.md)**
-- **[operator*](operator_mul.md)**
-- **[operator/](div.md)**
+- **[+](operator_add.md)**
+- **[-](operator_sub.md)**
+- **[*](operator_mul.md)**
+- **[/](div.md)**
 - **[prelu](prelu.md)**
 - **[relu](relu.md)**
 - **[sqrt](sqrt.md)**
