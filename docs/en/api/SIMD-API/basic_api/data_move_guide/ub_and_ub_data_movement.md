@@ -21,13 +21,13 @@ Data transfer between Unified Buffers (UBs) provides flexible API support throug
 
 Supports continuous data transfer between Unified Buffers, with the original format and content preserved during transmission.
 
-The specifically supported data paths are as follows (represented by [logical position TPosition](../auxiliary-data_structures/TPosition.md)):
+The specifically supported data paths are as follows (represented by [logical position TPosition](../aux_data_structures/TPosition.md)):
 
 - Unified Buffer -> Unified Buffer
     - VECIN -> VECCALC
     - VECCALC -> VECOUT
 
-The transferred data is used for [vector computation](../memory_vector_compute/Memory-vector-computation.md). For the specific API, refer to [DataCopy (UB -> UB - Continuous Data Transfer)](../memory_vector_compute/data-transfer/DataCopy_UBToUB_continuous.md).
+The transferred data is used for [vector computation](../memory_vector_compute/memory_vector_computation.md). For the specific API, refer to [DataCopy (UB -> UB - Continuous Data Transfer)](../memory_vector_compute/data_move/Copy_UBToUB_continuous.md).
 
 **src** and **dst** are the source operand and destination operand, respectively; **count** is the number of elements to be transferred continuously.
 
@@ -42,13 +42,13 @@ Supports high-dimensional splitting data transfer between Unified Buffers, with 
 
 High-dimensional splitting data transfer can be configured with transfer parameters such as the number of data blocks, the length of a single data block, and address offsets, supporting both non-contiguous and contiguous data transfer.
 
-The specific supported data paths are (represented by [logical position TPosition](../AuxiliaryDataStructures/TPosition.md)):
+The specific supported data paths are (represented by [logical position TPosition](../aux_data_structures/TPosition.md)):
 
 - Unified Buffer -> Unified Buffer
     - VECIN -> VECCALC
     - VECCALC -> VECOUT
 
-The transferred data is used for [vector computation](../MemoryVectorComputation/MemoryVectorComputation.md). For the specific API, refer to [DataCopy (UB -> UB - High-Dimensional Splitting Data Transfer)](../MemoryVectorComputation/DataTransfer/DataCopy_UBToUB_highdim_split.md).
+The transferred data is used for [vector computation](../memory_vector_compute/memory_vector_computation.md). For the specific API, refer to [DataCopy (UB -> UB - High-Dimensional Splitting Data Transfer)](../memory_vector_compute/data_move/DataCopy_UBToUB_highdim_split.md).
 
 **src** and **dst** are the source operand and destination operand, respectively. **repeatParams** is a transfer parameter of the **DataCopyParams** type, through which the data block size, number of blocks, interval, and other information can be configured, supporting both non-contiguous and contiguous transfer.
 
@@ -84,7 +84,7 @@ __aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src
 
 Supports data transfer between Unified Buffers. The format and content remain unchanged during the transfer, and mask operations and DataBlock interval operations are supported.
 
-The specifically supported data paths are as follows (represented by the [logical position TPosition](../auxiliary-data_structures/TPosition.md)):
+The specifically supported data paths are as follows (represented by the [logical position TPosition](../aux_data_structures/TPosition.md)):
 
 - Unified Buffer -> Unified Buffer
     - VECIN -> VECCALC
@@ -94,7 +94,7 @@ The specifically supported data paths are as follows (represented by the [logica
     - VECOUT -> VECIN
     - VECOUT -> VECCALC
 
-The transferred data is used for [vector computation](../MemoryVectorComputation/MemoryVectorComputation.md). For the specific API, refer to [Copy (UB -> UB - masked high-dimensional data transfer)](../MemoryVectorComputation/DataTransfer/Copy_UBToUB_mask_highdim_split.md).
+The transferred data is used for [vector computation](../memory_vector_compute/memory_vector_computation.md). For the specific API, refer to [Copy (UB -> UB - masked high-dimensional data transfer)](../memory_vector_compute/data_move/Copy_UBToUB_mask_highdim_split.md).
 
 **src** and **dst** are the source operand and destination operand, respectively. **mask** controls the elements involved in computation within each iteration. **repeatTime** is the number of repeated iterations. **repeatParams** is the transfer parameter of the **CopyRepeatParams** type.
 

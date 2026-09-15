@@ -220,7 +220,7 @@ MX Mmad supports the following data type combinations for the left cube A, right
 | `fp8_e5m2_t` | `fp8_e4m3fn_t` | `float` |
 | `fp8_e5m2_t` | `fp8_e5m2_t` | `float` |
 
-MX Mmad typically requires the movement of the left cube scaling data ScaleA and the right cube scaling data ScaleB to be completed before calling `Mmad`. For ScaleA movement, see [L1-to-L0 ScaleA data movement](../cube-computation-copy-in/Copy_L1ToL0ScaleA.md); for ScaleB movement, see [L1-to-L0 ScaleB data movement](../cube-computation-copy-in/Copy_L1ToL0ScaleB.md). The cube scaling data is not passed as a parameter of the `Mmad` function; instead, it is moved in advance to the L0ScaleA Buffer and L0ScaleB Buffer through the `Copy` API.
+MX Mmad typically requires the movement of the left cube scaling data ScaleA and the right cube scaling data ScaleB to be completed before calling `Mmad`. For ScaleA movement, see [L1-to-L0 ScaleA data movement](../cube_compute_load/Copy_L1ToL0ScaleA.md); for ScaleB movement, see [L1-to-L0 ScaleB data movement](../cube_compute_load/Copy_L1ToL0ScaleB.md). The cube scaling data is not passed as a parameter of the `Mmad` function; instead, it is moved in advance to the L0ScaleA Buffer and L0ScaleB Buffer through the `Copy` API.
 
 ## Related APIs
 

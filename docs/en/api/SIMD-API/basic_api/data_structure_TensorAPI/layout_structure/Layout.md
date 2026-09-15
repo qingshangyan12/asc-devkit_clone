@@ -211,7 +211,7 @@ struct Layout : private Std::tuple<T, U>
 
     Maps multidimensional logical coordinates to a one-dimensional linear index.
 
-    This API internally calls [Crd2Idx](../../Auxiliary Data Structures/Coordinate/Crd2Idx.md) and computes the linear position of the coordinates in memory based on the **Shape** and **Stride** of the current **Layout**.
+    This API internally calls [Crd2Idx](../../aux_data_structures/Coordinate/Crd2Idx.md) and computes the linear position of the coordinates in memory based on the **Shape** and **Stride** of the current **Layout**.
 
 - Function Prototype
 

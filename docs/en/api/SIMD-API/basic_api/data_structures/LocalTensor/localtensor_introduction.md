@@ -75,7 +75,7 @@ public:
 </tr>
 </thead>
 <tbody><tr id="row1545073919457"><td class="cellrowborder" valign="top" width="21.8%" headers="mcps1.2.3.1.1 "><p id="p1745103924512"><a name="p1745103924512"></a><a name="p1745103924512"></a>T</p></td>
-<td class="cellrowborder" valign="top" width="78.2%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000001441184464_p1742518920145"><a name="zh-cn_topic_0000001441184464_p1742518920145"></a><a name="zh-cn_topic_0000001441184464_p1742518920145"></a>Type **T** can support basic data types as well as the <a href="../../Auxiliary Data Structures/TensorTrait/TensorTrait.md">TensorTrait</a> type, but must comply with the data type support of the **LocalTensor** API being used.</p>
+<td class="cellrowborder" valign="top" width="78.2%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000001441184464_p1742518920145"><a name="zh-cn_topic_0000001441184464_p1742518920145"></a><a name="zh-cn_topic_0000001441184464_p1742518920145"></a>Type **T** can support basic data types as well as the <a href="../../aux_data_structures/TensorTrait/TensorTrait.md">TensorTrait</a> type, but must comply with the data type support of the **LocalTensor** API being used.</p>
 <p id="p2740141254519"><a name="p2740141254519"></a><a name="p2740141254519"></a>In particular, for constructors that return a Tensor object based on a specified logical position/address/length, type **T** supports only basic data types.</p></td>
 </tr>
 </tbody>

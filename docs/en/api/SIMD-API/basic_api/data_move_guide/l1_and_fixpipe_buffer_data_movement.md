@@ -11,7 +11,7 @@ The supported data paths are as follows (represented by [logical position TPosit
 - L1 Buffer -> Fixpipe Buffer
     - C1 -> C2PIPE2GM
 
-The data moved consists of [inline quantization](../cube_compute_ISASI/cube-offload-key-features/on_the_fly_quantization.md) and [inline ReLU](../cube_compute_ISASI/cube-offload-key-features/on_the_fly_relu.md) parameters. For details about the API, see [DataCopy (L1 -> Fixpipe-Buffer - Continuous Data Movement)](../cube_compute_ISASI/cube_compute_load/DataCopy_L1ToFixpipe.md).
+The data moved consists of [inline quantization](../cube_compute_ISASI/cube_store_key_features/on_the_fly_quantization.md) and [inline ReLU](../cube_compute_ISASI/cube_store_key_features/on_the_fly_relu.md) parameters. For details about the API, see [DataCopy (L1 -> Fixpipe-Buffer - Continuous Data Movement)](../cube_compute_ISASI/cube_compute_load/DataCopy_L1ToFixpipe.md).
 
 **src** and **dst** are the source operand and destination operand, respectively; **count** is the number of elements to be moved continuously.
 
@@ -31,7 +31,7 @@ The specifically supported data paths are as follows (represented by [logical po
 - L1 Buffer -> Fixpipe Buffer
     - C1 -> C2PIPE2GM
 
-The moved data consists of [inline quantization](../cube_compute_ISASI/cube-offload-key-feature/on_the_fly_quantization.md) and [inline ReLU](../cube_compute_ISASI/cube-offload-key-feature/on_the_fly_relu.md) parameters. For details about the API, see [DataCopy (L1 -> Fixpipe-Buffer High-Dimensional Partitioning Data Movement)](../cube_compute_ISASI/cube-computation-input/DataCopy_L1ToFixpipe.md).
+The moved data consists of [inline quantization](../cube_compute_ISASI/cube_store_key_features/on_the_fly_quantization.md) and [inline ReLU](../cube_compute_ISASI/cube_store_key_features/on_the_fly_relu.md) parameters. For details about the API, see [DataCopy (L1 -> Fixpipe-Buffer High-Dimensional Partitioning Data Movement)](../cube_compute_ISASI/cube_compute_load/DataCopy_L1ToFixpipe.md).
 
 **src** and **dst** are the source operand and destination operand, respectively; **repeatParams** specifies the movement parameters.
 

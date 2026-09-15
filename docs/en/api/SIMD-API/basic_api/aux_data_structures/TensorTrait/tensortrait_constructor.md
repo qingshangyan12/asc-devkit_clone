@@ -47,7 +47,7 @@ __aicore__ inline TensorTrait(const LayoutType& t = {})
 </thead>
 <tbody><tr id="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_row152234713443"><td class="cellrowborder" valign="top" width="17.22%" headers="mcps1.1.4.1.1 "><p id="p18419104127"><a name="p18419104127"></a><a name="p18419104127"></a>**t**</p></td>
 <td class="cellrowborder" valign="top" width="15.340000000000002%" headers="mcps1.1.4.1.2 "><p id="p1641874129"><a name="p1641874129"></a><a name="p1641874129"></a>Input</p></td>
-<td class="cellrowborder" valign="top" width="67.44%" headers="mcps1.1.4.1.3 "><p id="p14181041623"><a name="p14181041623"></a><a name="p14181041623"></a>Input <a href="../Layout/Layout.md">Layout</a> object. The input data type is **LayoutType**, which must meet the <a href="../Layout/LayoutConstructor.md#zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section19165124931511">Constraints</a>.</p></td>
+<td class="cellrowborder" valign="top" width="67.44%" headers="mcps1.1.4.1.3 "><p id="p14181041623"><a name="p14181041623"></a><a name="p14181041623"></a>Input <a href="../Layout/Layout.md">Layout</a> object. The input data type is **LayoutType**, which must meet the <a href="../Layout/layout_constructor.md#zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section19165124931511">Constraints</a>.</p></td>
 </tr>
 </tbody>
 </table>

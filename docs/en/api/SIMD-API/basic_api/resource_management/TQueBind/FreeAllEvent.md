@@ -29,7 +29,7 @@
 
 ## Description<a name="section618mcpsimp"></a>
 
-Releases all synchronization events requested in the queue. The **Buffer** allocated by the queue is associated with the **eventID** of the synchronization event. Because the number of synchronization events is limited, if the number of queue **Buffer** objects used simultaneously exceeds the limit, no more queues can be requested. After the events in the queue are released using this API, queues can be requested again. For details, see [TQue Buffer Limits](../TQue/TQueIntroduction.md#section466543213575).
+Releases all synchronization events requested in the queue. The **Buffer** allocated by the queue is associated with the **eventID** of the synchronization event. Because the number of synchronization events is limited, if the number of queue **Buffer** objects used simultaneously exceeds the limit, no more queues can be requested. After the events in the queue are released using this API, queues can be requested again. For details, see [TQue Buffer Limits](../TQue/tque_introduction.md#section466543213575).
 
 ## Prototype<a name="section620mcpsimp"></a>
 
@@ -43,7 +43,7 @@ None
 
 ## Constraints<a name="section633mcpsimp"></a>
 
-This API does not support [Tensor in-place operation](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/appendix/common-operations/how-to-use-tensor-in-place-operation-to-improve-operator-performance.md), that is, the scenario where the depth of **TQue** is set to 0.
+This API does not support [Tensor in-place operation](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/appendix/common_operations/how_to_use_tensor_in_place_operations_to_improve_operator_performance.md), that is, the scenario where the depth of **TQue** is set to 0.
 
 ## Return Value<a name="section640mcpsimp"></a>
 

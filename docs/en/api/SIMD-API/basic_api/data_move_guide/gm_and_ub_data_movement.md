@@ -28,7 +28,7 @@ Data movement between Global Memory (GM) and Unified Buffer (UB) provides a vari
 
 Supports contiguous data movement between Global Memory and Unified Buffer, with the data retaining its original format and content during transmission.
 
-The specifically supported data paths are as follows (represented by [logical position TPosition](../auxiliary-data_structures/TPosition.md)):
+The specifically supported data paths are as follows (represented by [logical position TPosition](../aux_data_structures/TPosition.md)):
 
 - Global Memory -> Unified Buffer
     - GM -> VECIN
@@ -38,7 +38,7 @@ The specifically supported data paths are as follows (represented by [logical po
     - CO2 -> GM (supported only on the AI Core of Atlas inference products)
     <!-- end id1 -->
 
-The moved data is used for [vector computation](../memory_vector_compute/Memory-vector-computation.md). For the specific APIs, see [DataCopy (GM and UB - Contiguous Data Movement)](../memory_vector_compute/data-movement/DataCopy_GMAndUB_continuous.md).
+The moved data is used for [vector computation](../memory_vector_compute/memory_vector_computation.md). For the specific APIs, see [DataCopy (GM and UB - Contiguous Data Movement)](../memory_vector_compute/data_move/DataCopy_GMAndUB_continuous.md).
 
 **src** and **dst** are the source operand and destination operand, respectively; **count** is the number of elements to be moved contiguously.
 
@@ -62,7 +62,7 @@ Supports high-dimensional slicing data movement between Global Memory and Unifie
 
 High-dimensional slicing data movement supports both non-contiguous and contiguous data movement by configuring movement parameters such as the number of data blocks, the length of a single data block, and address offsets.
 
-The specific supported data paths are as follows (represented by [logical position TPosition](../auxiliary-data_structures/TPosition.md)):
+The specific supported data paths are as follows (represented by [logical position TPosition](../aux_data_structures/TPosition.md)):
 
 - Global Memory -> Unified Buffer
     - GM -> VECIN
@@ -72,7 +72,7 @@ The specific supported data paths are as follows (represented by [logical positi
     - CO2 -> GM (supported only on the AI Core of Atlas inference products)
     <!-- end id2 -->
 
-The moved data is used for [vector computation](../memory_vector_compute/Memory-vector-computation.md). For the specific API, see [DataCopy (GM and UB - High-Dimensional Slicing Data Movement)](../memory_vector_compute/data-movement/DataCopy_GMAndUB_highdim_split.md).
+The moved data is used for [vector computation](../memory_vector_compute/memory_vector_computation.md). For the specific API, see [DataCopy (GM and UB - High-Dimensional Slicing Data Movement)](../memory_vector_compute/data_move/DataCopy_GMAndUB_highdim_split.md).
 
 **src** and **dst** are the source operand and destination operand, respectively. **repeatParams** is the movement parameters of the **DataCopyParams** type, through which you can configure the size, count, and interval of the data blocks to be moved, supporting both non-contiguous and contiguous data movement.
 
@@ -155,7 +155,7 @@ The moved data is used for [vector computation](../memory_vector_compute/Memory 
 
 This API is a software simulation API designed from the perspective of ease of use. It supports conversion from NZ to ND format during data movement from Unified Buffer to Global Memory.
 
-The supported data paths are as follows (represented by [logical position TPosition](../auxiliary-data_structures/TPosition.md)):
+The supported data paths are as follows (represented by [logical position TPosition](../aux_data_structures/TPosition.md)):
 
 - Unified Buffer -> Global Memory
     - VECOUT -> GM
@@ -163,7 +163,7 @@ The supported data paths are as follows (represented by [logical position TPosit
     - CO2 -> GM (supported only on the AI Core of Atlas inference products)
     <!-- end id5 -->
 
-The moved data is used for [vector computation](../memory_vector_compute/Memory-vector-computation.md). For the specific API, see [DataCopy (UB -> GM - inline conversion NZ2ND movement)](../memory_vector_compute/data-movement/DataCopy_UBToGM_NZ2ND.md).
+The moved data is used for [vector computation](../memory_vector_compute/memory_vector_computation.md). For the specific API, see [DataCopy (UB -> GM - inline conversion NZ2ND movement)](../memory_vector_compute/data_move/DataCopy_UBToGM_NZ2ND.md).
 
 **src** and **dst** are the source operand and destination operand, respectively; **intriParams** is the movement parameters of the **Nz2NdParamsFull** type, which configures the NZ-to-ND format conversion information.
 
@@ -215,7 +215,7 @@ The specifically supported data paths are as follows (expressed in terms of [log
     - GM -> VECCALC (supported only on Ascend 950PR/Ascend 950DT)
     <!-- end id7 -->
 
-The moved data is used for [vector computation](../memory_vector_compute/Memory-vector-computation.md). For the specific API, see [DataCopyPad (GM -> UB - Unaligned Data Movement)](../memory_vector_compute/data-movement/DataCopyPad_GMToUB.md).
+The moved data is used for [vector computation](../memory_vector_compute/memory_vector_computation.md). For the specific API, see [DataCopyPad (GM -> UB - Unaligned Data Movement)](../memory_vector_compute/data_move/DataCopyPad_GMToUB.md).
 
 **src** and **dst** are the source operand and destination operand, respectively; **dataCopyParams** is the movement parameters of the **DataCopyExtParams** type; **padParams** is the padding control parameters of the **DataCopyPadExtParams** type.
 
@@ -247,7 +247,7 @@ The supported data paths are as follows (represented by [logical position TPosit
     - VECIN -> GM
     - VECOUT -> GM
 
-The moved data is used for [vector computation](../memory_vector_compute/Memory-vector-computation.md). For the specific API, see [DataCopyPad (UB -> GM - Unaligned Data Movement)](../memory_vector_compute/data-movement/DataCopyPad_UBToGM.md).
+The moved data is used for [vector computation](../memory_vector_compute/memory_vector_computation.md). For the specific API, see [DataCopyPad (UB -> GM - Unaligned Data Movement)](../memory_vector_compute/data_move/DataCopyPad_UBToGM.md).
 
 **src** and **dst** are the source operand and destination operand, respectively; **dataCopyParams** is the movement parameters of the **DataCopyExtParams** type.
 

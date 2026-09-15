@@ -50,7 +50,7 @@ For Ascend 950PR/Ascend 950DT, the following GM->L1 Buffer APIs are newly added.
 | --- | --- | --- | --- |
 | [GM->L1 Buffer On-the-fly Conversion DN2NZ Movement (DataCopy)](DataCopy_GMToL1_DN2NZ.md) | Moves data from GM to the L1 Buffer while simultaneously completing the conversion from DN to NZ format. | GM->L1 Buffer | DN-format weight data is loaded into the L1 Buffer and converted to NZ format. |
 | [GM->L1 Buffer Non-Aligned Data Movement (DataCopyPad)](DataCopyPad_GMToL1.md) | Moves data from GM to the L1 Buffer in a non-aligned manner, supporting self-padding on the left/right sides of the data. | GM->L1 Buffer | Padding is performed when non-aligned data in GM is loaded into the L1 Buffer. |
-| [GM->L1 Buffer Load2DV2 Instruction Movement](GMToL1-Load2DV2-Instruction-Movement.md) | Uses the 2DV2 instruction to move 2D-format data from GM to the L1 Buffer in units of 512B fractals. | GM->L1 Buffer | 2D fractal data for cube computation is moved from GM into the L1 Buffer. |
+| [GM->L1 Buffer Load2DV2 Instruction Movement](gmtol1_load2dv2_instruction_movement.md) | Uses the 2DV2 instruction to move 2D-format data from GM to the L1 Buffer in units of 512B fractals. | GM->L1 Buffer | 2D fractal data for cube computation is moved from GM into the L1 Buffer. |
 <!-- end id2 -->
 
 ## API Classification and Usage Scenarios for UB->L1 Buffer<a name="zh-cn_topic_0000002543771563_section_ub2l1"></a>

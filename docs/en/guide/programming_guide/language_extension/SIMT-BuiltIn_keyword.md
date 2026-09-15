@@ -100,7 +100,7 @@ The following built-in variables of the dim3 structure are available only on the
 
     -   For a one-dimensional thread block, the thread ID is blockIdx.x \* blockDim.x + threadIdx.x.
 
-        ![](../../figures/thread-id-illustration-1.png)
+        ![](../../figures/thread_id_illustration_1.png)
 
     -   For a two-dimensional thread block, the thread ID is a two-dimensional structure, and its calculation formula is as follows:
 

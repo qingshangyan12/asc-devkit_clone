@@ -62,5 +62,5 @@ Returns the specified memory block, of the **TBufHandle** type.
 
 ## Example<a name="section1234017553610"></a>
 
-See [Example](EXTERN_IMPL_BUFPOOLMacro.md#section1234017553610).
+See [Example](extern_impl_bufpool_macro.md#section1234017553610).
 

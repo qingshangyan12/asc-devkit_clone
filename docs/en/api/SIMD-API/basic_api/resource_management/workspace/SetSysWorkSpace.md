@@ -29,7 +29,7 @@
 
 ## Description<a name="section618mcpsimp"></a>
 
-The workspace required by the framework is called the system workspace. High-level APIs such as the [Matmul Kernel side API](../../../advanced_api/matrix_compute/Matmul-Kernel/Matmul-Kernel-side-API.md) require the system workspace. Therefore, when using such APIs, you need to call this API to set the pointer to the system workspace. When using the engineering-based operator development method or the kernel direct invocation method (with the HAVE\_WORKSPACE compilation option enabled), developers do not need to set it manually because the framework sets it automatically. In other scenarios, developers need to call **SetSysWorkSpace** to set it.
+The workspace required by the framework is called the system workspace. High-level APIs such as the [Matmul Kernel side API](../../../advanced_api/matrix_compute/Matmul-Kernel/matmul_kernel_api.md) require the system workspace. Therefore, when using such APIs, you need to call this API to set the pointer to the system workspace. When using the engineering-based operator development method or the kernel direct invocation method (with the HAVE\_WORKSPACE compilation option enabled), developers do not need to set it manually because the framework sets it automatically. In other scenarios, developers need to call **SetSysWorkSpace** to set it.
 
 Before calling this API on the kernel side, you need to call **GetLibApiWorkSpaceSize** on the host side to obtain the size of the system workspace, and set the workspace size on the host side. The following is an example:
 

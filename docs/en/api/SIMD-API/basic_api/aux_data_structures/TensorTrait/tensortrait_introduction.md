@@ -49,7 +49,7 @@ public:
 </tr>
 <tr id="row1076563718543"><td class="cellrowborder" valign="top" width="21.8%" headers="mcps1.2.3.1.1 "><p id="p167661637135419"><a name="p167661637135419"></a><a name="p167661637135419"></a>LayoutType</p></td>
 <td class="cellrowborder" valign="top" width="78.2%" headers="mcps1.2.3.1.2 "><p id="p1776623725413"><a name="p1776623725413"></a><a name="p1776623725413"></a><a href="../Layout/Layout.md">Layout</a> data type, which defaults to an empty type, that is, Layout&lt;Shape&lt;&gt;, Stride&lt;&gt;&gt;.</p>
-<p id="p183241815132114"><a name="p183241815132114"></a><a name="p183241815132114"></a>The input data type LayoutType must satisfy the <a href="../Layout/LayoutConstructor.md#zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section19165124931511">Constraints</a>.</p></td>
+<p id="p183241815132114"><a name="p183241815132114"></a><a name="p183241815132114"></a>The input data type LayoutType must satisfy the <a href="../Layout/layout_constructor.md#zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section19165124931511">Constraints</a>.</p></td>
 </tr>
 </tbody>
 </table>

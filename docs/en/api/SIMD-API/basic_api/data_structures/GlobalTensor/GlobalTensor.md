@@ -4,7 +4,7 @@
 
 -   **[GlobalTensor Introduction](globaltensor_introduction.md)**  
 
--   **[GlobalTensor Constructor](GlobalTensor-Constructor.md)**  
+-   **[GlobalTensor Constructor](globaltensor_constructor.md)**  
 
 -   **[SetGlobalBuffer](SetGlobalBuffer.md)**  
 

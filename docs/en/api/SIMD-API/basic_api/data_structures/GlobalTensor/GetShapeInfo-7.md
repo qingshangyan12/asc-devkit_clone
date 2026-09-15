@@ -43,7 +43,7 @@ None
 
 ## Return Value<a name="section640mcpsimp"></a>
 
-Shape information of **GlobalTensor**, of the [ShapeInfo](../../Auxiliary Data Structures/ShapeInfo.md) type.
+Shape information of **GlobalTensor**, of the [ShapeInfo](../../aux_data_structures/ShapeInfo.md) type.
 
 ## Constraints<a name="section633mcpsimp"></a>
 

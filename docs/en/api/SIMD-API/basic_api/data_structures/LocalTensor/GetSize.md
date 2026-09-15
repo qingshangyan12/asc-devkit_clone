@@ -51,7 +51,7 @@ None
 
 ## Example<a name="section17531157161314"></a>
 
-See [Example](LocalTensor constructor.md#section17531157161314).
+See [Example](localtensor_constructor.md#section17531157161314).
 
 ```cpp
 // Example.

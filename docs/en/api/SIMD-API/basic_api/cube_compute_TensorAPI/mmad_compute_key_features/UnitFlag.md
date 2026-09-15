@@ -45,11 +45,11 @@ When calling the Mmad API, use the [SetMMColumnMajor/SetMMRowMajor](../../cube_c
 
 ## Related APIs
 
-- [Mmad](../MmadCompute/Mmad.md)
-- [L0C-to-GM data copy (Copy)](../CubeCopyOut/Copy_L0CToGM.md)
-- [L0C-to-UB data copy (Copy)](../CubeCopyOut/Copy_L0CToUB.md)
-- [SetFixPipeConfig](../../cube_compute_ISASI/CubeCopyOutAuxiliaryConfigAPIs/SetFixPipeConfig.md)
-- [SetMMColumnMajor/SetMMRowMajor](../../cube_compute_ISASI/MmadComputeAuxiliaryConfigAPIs/SetMMColumnMajor-SetMMRowMajor.md)
+- [Mmad](../mmad_compute/Mmad.md)
+- [L0C-to-GM data copy (Copy)](../cube_compute_store/Copy_L0CToGM.md)
+- [L0C-to-UB data copy (Copy)](../cube_compute_store/Copy_L0CToUB.md)
+- [SetFixPipeConfig](../../cube_compute_ISASI/cube_store_aux_config/SetFixPipeConfig.md)
+- [SetMMColumnMajor/SetMMRowMajor](../../cube_compute_ISASI/mmad_compute_aux_config/SetMMColumnMajor-SetMMRowMajor.md)
 
 ## Example Snippet of Iterative Loop Along the K Axis
 

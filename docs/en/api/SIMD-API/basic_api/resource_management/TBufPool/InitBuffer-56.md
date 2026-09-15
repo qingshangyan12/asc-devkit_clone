@@ -51,7 +51,7 @@ template <TPosition pos> __aicore__ inline bool InitBuffer(TBuf<pos>& buf, uint3
 <td class="cellrowborder" valign="top" width="87.86%" headers="mcps1.2.3.1.2 "><p id="p12101541625"><a name="p12101541625"></a><a name="p12101541625"></a><span>Type of the **que** parameter.</span></p></td>
 </tr>
 <tr id="row758993611212"><td class="cellrowborder" valign="top" width="12.139999999999999%" headers="mcps1.2.3.1.1 "><p id="p12692424332"><a name="p12692424332"></a><a name="p12692424332"></a>pos</p></td>
-<td class="cellrowborder" valign="top" width="87.86%" headers="mcps1.2.3.1.2 "><p id="p35011591693"><a name="p35011591693"></a><a name="p35011591693"></a>Logical position of the buffer, which can be <span>**VECIN**, **VECOUT**, </span>**VECCALC**, **A1**<span>, </span>**B1**, or **C1**.<span>For details about **TPosition**, see </span><a href="../../Auxiliary Data Structures/TPosition.md">TPosition</a>.</p></td>
+<td class="cellrowborder" valign="top" width="87.86%" headers="mcps1.2.3.1.2 "><p id="p35011591693"><a name="p35011591693"></a><a name="p35011591693"></a>Logical position of the buffer, which can be <span>**VECIN**, **VECOUT**, </span>**VECCALC**, **A1**<span>, </span>**B1**, or **C1**.<span>For details about **TPosition**, see </span><a href="../../aux_data_structures/TPosition.md">TPosition</a>.</p></td>
 </tr>
 </tbody>
 </table>

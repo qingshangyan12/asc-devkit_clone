@@ -66,7 +66,7 @@ __aicore__ inline void InitStartBufHandle(TBufHandle startBufhandle, uint8_t num
 
 -   **TQue** and **TBuf** inherit from the **TQueBind** class, so **TQue** and **TBuf** objects can also use this API.
 
--   This API is currently provided only for [custom TBufPool](../custom TBufPool/custom TBufPool.md) to initialize the memory blocks of **TQue** and **TBuf**.
+-   This API is currently provided only for [custom TBufPool](../custom_TBufPool/custom TBufPool.md) to initialize the memory blocks of **TQue** and **TBuf**.
 -   When this API is called by a **TBuf** object, the input parameter **num** must be 1.
 
 ## Return Value<a name="section640mcpsimp"></a>
@@ -75,7 +75,7 @@ None
 
 ## Example<a name="section642mcpsimp"></a>
 
-For the complete example, see [Example](../custom TBufPool/EXTERN_IMPL_BUFPOOL macro.md#section1234017553610).
+For the complete example, see [Example](../custom_TBufPool/extern_impl_bufpool_macro.md#section1234017553610).
 
 ```
 // Assume the custom tbufpool class is MyBufPool.

@@ -4,7 +4,7 @@
 
 - **[Overview](overview/overview.md)**  
 
-- **[Cube Computation Fractal Introduction](Cube Computation Fractal Introduction/Cube Computation Fractal Introduction.md)**  
+- **[Cube Computation Fractal Introduction](cube_compute_fractal_intro/Cube Computation Fractal Introduction.md)**  
 
 - **[Cube Load-in](Cube Load-in/Cube Load-in.md)**  
 

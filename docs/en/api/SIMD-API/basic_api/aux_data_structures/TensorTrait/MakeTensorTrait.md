@@ -55,7 +55,7 @@ __aicore__ inline constexpr auto MakeTensorTrait(const LayoutType& t)
 <td class="cellrowborder" valign="top" width="78.2%" headers="mcps1.1.3.1.2 "><p id="p1401735165413"><a name="p1401735165413"></a><a name="p1401735165413"></a>Logical location where data is stored, of the <a href="../TPosition.md">Tposition</a> type.</p></td>
 </tr>
 <tr id="row1076563718543"><td class="cellrowborder" valign="top" width="21.8%" headers="mcps1.1.3.1.1 "><p id="p167661637135419"><a name="p167661637135419"></a><a name="p167661637135419"></a>**LayoutType**</p></td>
-<td class="cellrowborder" valign="top" width="78.2%" headers="mcps1.1.3.1.2 "><p id="p64121946112013"><a name="p64121946112013"></a><a name="p64121946112013"></a><a href="../Layout/Layout.md">Layout</a> data type, the input data type **LayoutType**, which must meet the <a href="../Layout/LayoutConstructor.md#zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section19165124931511">Constraints</a>.</p></td>
+<td class="cellrowborder" valign="top" width="78.2%" headers="mcps1.1.3.1.2 "><p id="p64121946112013"><a name="p64121946112013"></a><a name="p64121946112013"></a><a href="../Layout/Layout.md">Layout</a> data type, the input data type **LayoutType**, which must meet the <a href="../Layout/layout_constructor.md#zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section19165124931511">Constraints</a>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -70,4 +70,4 @@ None
 
 ## Example<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section320753512363"></a>
 
-See [Call Example](TensorTraitConstructor.md#zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section320753512363).
+See [Call Example](tensortrait_constructor.md#zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section320753512363).

@@ -47,7 +47,7 @@ inline uint8_t* GetBaseAddr(int8_t logicPos)
 </thead>
 <tbody><tr id="row11660173845017"><td class="cellrowborder" valign="top" width="12.36%" headers="mcps1.1.4.1.1 "><p id="p3887155315568"><a name="p3887155315568"></a><a name="p3887155315568"></a>logicPos</p></td>
 <td class="cellrowborder" valign="top" width="12.379999999999999%" headers="mcps1.1.4.1.2 "><p id="p9331531865"><a name="p9331531865"></a><a name="p9331531865"></a>Input</p></td>
-<td class="cellrowborder" valign="top" width="75.26%" headers="mcps1.1.4.1.3 "><p id="p143308311967"><a name="p143308311967"></a><a name="p143308311967"></a>Logical position type. For details about this type, see <a href="../../Auxiliary Data Structures/TPosition.md">TPosition</a>.</p></td>
+<td class="cellrowborder" valign="top" width="75.26%" headers="mcps1.1.4.1.3 "><p id="p143308311967"><a name="p143308311967"></a><a name="p143308311967"></a>Logical position type. For details about this type, see <a href="../../aux_data_structures/TPosition.md">TPosition</a>.</p></td>
 </tr>
 </tbody>
 </table>

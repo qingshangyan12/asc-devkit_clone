@@ -65,7 +65,7 @@ Returns the corresponding **LocalTensor** object based on the logical position, 
 </tr>
 </thead>
 <tbody><tr id="row18835145716587"><td class="cellrowborder" valign="top" width="17.43%" headers="mcps1.2.3.1.1 "><p id="p1383515717581"><a name="p1383515717581"></a><a name="p1383515717581"></a>pos</p></td>
-<td class="cellrowborder" valign="top" width="82.57%" headers="mcps1.2.3.1.2 "><p id="p18689719202918"><a name="p18689719202918"></a><a name="p18689719202918"></a><a href="../../aux_data_structures/TPosition.md">TPosition</a> position, which must comply with the Hardware physical position specified in <a href="LocalMemAllocator-Introduction.md">LocalMemAllocator</a> (this parameter can be omitted in static Tensor programming scenarios).</p></td>
+<td class="cellrowborder" valign="top" width="82.57%" headers="mcps1.2.3.1.2 "><p id="p18689719202918"><a name="p18689719202918"></a><a name="p18689719202918"></a><a href="../../aux_data_structures/TPosition.md">TPosition</a> position, which must comply with the Hardware physical position specified in <a href="localmemallocator_introduction.md">LocalMemAllocator</a> (this parameter can be omitted in static Tensor programming scenarios).</p></td>
 </tr>
 <tr id="row199212475441"><td class="cellrowborder" valign="top" width="17.43%" headers="mcps1.2.3.1.1 "><p id="p352033512453"><a name="p352033512453"></a><a name="p352033512453"></a>DataType</p></td>
 <td class="cellrowborder" valign="top" width="82.57%" headers="mcps1.2.3.1.2 "><p id="p4921114784410"><a name="p4921114784410"></a><a name="p4921114784410"></a>Data type of LocalTensor. Only basic data types are supported; TensorTrait types are not supported.</p></td>
@@ -100,7 +100,7 @@ Returns the corresponding **LocalTensor** object based on the logical position, 
 </tr>
 </thead>
 <tbody><tr id="row945854624614"><td class="cellrowborder" valign="top" width="27.839999999999996%" headers="mcps1.2.3.1.1 "><p id="p8458184610468"><a name="p8458184610468"></a><a name="p8458184610468"></a>**TensorTraitType**</p></td>
-<td class="cellrowborder" valign="top" width="72.16%" headers="mcps1.2.3.1.2 "><p id="p10458194684613"><a name="p10458194684613"></a><a name="p10458194684613"></a>Only supports passing the <a href="../../Auxiliary Data Structures/TensorTrait/TensorTrait.md">TensorTrait</a> type. The data type/logical position/shape size of TensorTrait must match the physical position specified in **LocalMemAllocator** and its remaining space.</p></td>
+<td class="cellrowborder" valign="top" width="72.16%" headers="mcps1.2.3.1.2 "><p id="p10458194684613"><a name="p10458194684613"></a><a name="p10458194684613"></a>Only supports passing the <a href="../../aux_data_structures/TensorTrait/TensorTrait.md">TensorTrait</a> type. The data type/logical position/shape size of TensorTrait must match the physical position specified in **LocalMemAllocator** and its remaining space.</p></td>
 </tr>
 </tbody>
 </table>
@@ -112,7 +112,7 @@ Returns the **LocalTensor** object constructed based on the user input.
 ## Constraints<a name="section633mcpsimp"></a>
 
 <!-- npu="950" id1 -->
-- For Ascend 950PR/Ascend 950DT, UB memory allocation is performed on top of static memory. That is, the initial position of dynamic memory is determined by referring to [memory hierarchy](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/advanced_programming/advanced-ai-core-programming-model/simd-and-simt-hybrid-programming/memory-hierarchy.md).
+- For Ascend 950PR/Ascend 950DT, UB memory allocation is performed on top of static memory. That is, the initial position of dynamic memory is determined by referring to [memory hierarchy](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/advanced_programming/advanced_ai_core_programming_model/simd_simt_hybrid_programming/memory_hierarchy.md).
 <!-- end id1 -->
 - Mixing with static arrays of **L1 Buffer**, **L0A Buffer**, **L0B Buffer**, **L0C Buffer**, and **BiasTable** is not supported.
 

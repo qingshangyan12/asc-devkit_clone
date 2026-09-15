@@ -4,7 +4,7 @@
 
 ## Overview<a name="ZH-CN_TOPIC_0000002574022823"></a>
 
-Data movement between L1 Buffer/L0C Buffer and Unified Buffer provides flexible API support that can fully adapt to diverse computation scenarios (see [Table 1](#zh-cn_topic_0000002534897870_table1417935217588)). Among them, data movement from Unified Buffer to L1 Buffer is used for cube computation (see [Cube Computation Data Loading](../cube_compute_ISASI/Cube Computation Fractal Introduction/Cube Computation Data Loading.md)), while data movement from L0C Buffer to Unified Buffer and from L1 Buffer to Unified Buffer is used to move cube computation results out, completing the output flow of cube computation (see [Cube Computation Data Moving Out](../cube_compute_ISASI/Cube Computation Fractal Introduction/Cube Computation Data Moving Out.md)).
+Data movement between L1 Buffer/L0C Buffer and Unified Buffer provides flexible API support that can fully adapt to diverse computation scenarios (see [Table 1](#zh-cn_topic_0000002534897870_table1417935217588)). Among them, data movement from Unified Buffer to L1 Buffer is used for cube computation (see [Cube Computation Data Loading](../cube_compute_ISASI/cube_compute_fractal_intro/Cube Computation Data Loading.md)), while data movement from L0C Buffer to Unified Buffer and from L1 Buffer to Unified Buffer is used to move cube computation results out, completing the output flow of cube computation (see [Cube Computation Data Moving Out](../cube_compute_ISASI/cube_compute_fractal_intro/Cube Computation Data Moving Out.md)).
 
 **Table 1**  Overview of data movement APIs between L1 Buffer/L0C Buffer and Unified Buffer<a name="zh-cn_topic_0000002534897870_table1417935217588"></a>
 
@@ -12,7 +12,7 @@ Data movement between L1 Buffer/L0C Buffer and Unified Buffer provides flexible 
 |----------|------|------|
 | Unified Buffer->L1 Buffer | **DataCopy** (UB -> L1 - continuous data movement) | Provides basic data movement capability. Data remains in its original format and content during transmission, supporting continuous data movement. |
 | Unified Buffer->L1 Buffer | **DataCopy** (UB -> L1 - high-dimensional split data movement) | Provides basic data movement capability. Data remains in its original format and content during transmission, supporting continuous and non-continuous data movement. |
-| Unified Buffer->L1 Buffer | In-path conversion - [ND2NZ](<../cube_compute_ISASI/Cube Computation Fractal Introduction/Key Fractal Format Details.md#ZH-CN_TOPIC_0000002568950893>) movement | Supports conversion from [ND](<../cube_compute_ISASI/Cube Computation Fractal Introduction/Key Fractal Format Details.md#zh-cn_topic_0000002545089965_section958745018719>) to [NZ](<../cube_compute_ISASI/Cube Computation Fractal Introduction/Key Fractal Format Details.md#zh-cn_topic_0000002545089965_section363412741113>) format during data movement. |
+| Unified Buffer->L1 Buffer | In-path conversion - [ND2NZ](<../cube_compute_ISASI/cube_compute_fractal_intro/key_fractal_format_detailed_explanation.md#ZH-CN_TOPIC_0000002568950893>) movement | Supports conversion from [ND](<../cube_compute_ISASI/cube_compute_fractal_intro/key_fractal_format_detailed_explanation.md#zh-cn_topic_0000002545089965_section958745018719>) to [NZ](<../cube_compute_ISASI/cube_compute_fractal_intro/key_fractal_format_detailed_explanation.md#zh-cn_topic_0000002545089965_section363412741113>) format during data movement. |
 | Unified Buffer->L1 Buffer | **DataCopyPad** (UB -> L1 - unaligned data movement) | Supports unaligned data movement, allowing developers to fill data as needed. |
 | L0C Buffer->Unified Buffer | **DataCopy** (L0C -> UB - in-path conversion and quantization) | Supports the combination of multiple in-path capabilities. The **DataCopy** API includes register setting and data movement capabilities. |
 | L0C Buffer->Unified Buffer | **Fixpipe** (L0C -> UB - in-path quantization activation movement) | Supports the combination of multiple in-path capabilities. The **FixPipe** API includes register setting and data movement capabilities. |
@@ -28,7 +28,7 @@ The supported data path is as follows (represented by [logical position TPositio
 - Unified Buffer -> L1 Buffer
     - UB -> C1
 
-The moved data is used for [cube computation](../cube_compute_ISASI/cube_compute_ISASI.md). For details about the API, see [DataCopy (UB -> L1 - Continuous Data Movement)](../cube_compute_ISASI/cube_computation_input/DataCopy_UBToL1_continuous.md).
+The moved data is used for [cube computation](../cube_compute_ISASI/cube_compute_ISASI.md). For details about the API, see [DataCopy (UB -> L1 - Continuous Data Movement)](../cube_compute_ISASI/cube_compute_load/DataCopy_UBToL1_continuous.md).
 
 **src** and **dst** are the source operand and destination operand, respectively; **count** is the number of elements for continuous movement.
 
@@ -43,7 +43,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 High-dimensional split means that non-continuous movement can be implemented by configuring movement parameters such as the number of data blocks, the length of a single data block, and the address offset.
 
-The specifically supported data paths are (represented by [logical position TPosition](../auxiliary-data_structures/TPosition.md)):
+The specifically supported data paths are (represented by [logical position TPosition](../aux_data_structures/TPosition.md)):
 
 - Unified Buffer -> L1 Buffer
     - UB -> C1
@@ -61,7 +61,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 This API mainly moves data from the Unified Buffer to the L1 Buffer and supports conversion from the [ND](../cube_compute_ISASI/cube_compute_fractal_intro/key_fractal_format_detailed_explanation.md) format to the [NZ](../cube_compute_ISASI/cube_compute_fractal_intro/key_fractal_format_detailed_explanation.md) format during data movement.
 
-The specifically supported data paths (represented by the [logical position TPosition](../auxiliary-data_structures/TPosition.md)) are as follows:
+The specifically supported data paths (represented by the [logical position TPosition](../aux_data_structures/TPosition.md)) are as follows:
 
 - Unified Buffer -> L1 Buffer
     - UB -> C1
@@ -84,7 +84,7 @@ The specific supported data paths are (represented by [logical position TPositio
 - Unified Buffer -> L1 Buffer
     - UB -> C1
 
-The moved data is used for [cube computation](../cube_compute_ISASI/cube_compute_ISASI.md). For details about the API, see [DataCopyPad (UB -> L1 - Unaligned Data Movement)](../cube_compute_ISASI/cube_computation_data_movement_in/DataCopyPad_UBToL1.md).
+The moved data is used for [cube computation](../cube_compute_ISASI/cube_compute_ISASI.md). For details about the API, see [DataCopyPad (UB -> L1 - Unaligned Data Movement)](../cube_compute_ISASI/cube_compute_load/DataCopyPad_UBToL1.md).
 
 **src** and **dst** are the source operand and destination operand, respectively; **dataCopyParams** and **nd2nzParams** are movement parameters.
 
@@ -98,7 +98,7 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const LocalTensor<
 
 This API moves data from the L0C Buffer to the Unified Buffer and supports combinations of multiple in-path capabilities. The API includes register configuration and data movement capabilities.
 
-The specific supported data paths (expressed as [logical position TPosition](../auxiliary-data_structures/TPosition.md)) are as follows:
+The specific supported data paths (expressed as [logical position TPosition](../aux_data_structures/TPosition.md)) are as follows:
 
 - L0C Buffer -> Unified Buffer
     - CO1 -> UB
@@ -128,7 +128,7 @@ This API is supported only on Atlas inference products AI Core.
 
 This API mainly moves data from the L0C Buffer to the Unified Buffer and supports the combination of multiple in-path capabilities. The API includes register configuration and data movement capabilities.
 
-The specific supported data paths are (represented by [logical position TPosition](../auxiliary-data_structures/TPosition.md)):
+The specific supported data paths are (represented by [logical position TPosition](../aux_data_structures/TPosition.md)):
 
 - L0C Buffer -> Unified Buffer
     - CO1 -> UB
@@ -139,14 +139,14 @@ Note that the API prototypes may differ across product models. For details, see 
 
 **src** and **dst** are the source operand and destination operand, respectively; **intriParams** is the movement parameter, and **cbufWorkspace** is the quantization parameter required when tensor quantization is enabled.
 
-- When the in-path [tensor quantization](../cube_compute_ISASI/cube_store_key_features/in-path-quantization.md) function is not enabled:
+- When the in-path [tensor quantization](../cube_compute_ISASI/cube_store_key_features/on_the_fly_quantization.md) function is not enabled:
 
     ```cpp
     template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
     __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsArch3510<config.format>& intriParams)
     ```
 
-- When the in-path [tensor quantization](../cube_compute_ISASI/cube_store_key_features/in-path-quantization.md) function is enabled:
+- When the in-path [tensor quantization](../cube_compute_ISASI/cube_store_key_features/on_the_fly_quantization.md) function is enabled:
 
     ```cpp
     template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
@@ -158,7 +158,7 @@ Note that the API prototypes may differ across product models. For details, see 
 
 **DataCopyL1ToUB** implements continuous data movement from the L1 Buffer to the Unified Buffer. The format and content remain unchanged during data movement.
 
-The supported data paths are as follows (represented by the [logical position TPosition](../auxiliary-data_structures/TPosition.md)):
+The supported data paths are as follows (represented by the [logical position TPosition](../aux_data_structures/TPosition.md)):
 
 - L1 Buffer -> Unified Buffer
     - C1 -> UB
@@ -182,7 +182,7 @@ __aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTens
 
 High-dimensional split means that non-continuous movement can be implemented by configuring movement parameters such as the number of data blocks, the length of a single data block, and the address offset.
 
-The specifically supported data paths are (represented by [logical position TPosition](../auxiliary-data_structures/TPosition.md)):
+The specifically supported data paths are (represented by [logical position TPosition](../aux_data_structures/TPosition.md)):
 
 - L1 Buffer -> Unified Buffer
     - C1 -> UB

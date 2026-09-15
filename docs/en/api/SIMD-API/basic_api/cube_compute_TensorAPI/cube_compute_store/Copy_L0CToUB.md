@@ -189,7 +189,7 @@ When `quant` is not passed in, the API selects the non-quantized or direct conve
 
 ## Key Features
 
-The move from L0C Buffer to Unified Buffer involves key features such as [inline quantization](../cube_move_out_key_feature_description/quant_pre.md), [inline ReLU](../cube_move_out_key_feature_description/relu_pre.md), [Int8 Channel Merge](../cube_move_out_key_feature_description/int8_channel_merge.md), [L0C Buffer to Unified Buffer dual-objective mode](../cube_move_out_key_feature_description/l0c_to_ub_dual_dst.md), and [batch move](../cube_move_out_key_feature_description/batch_copy.md).
+The move from L0C Buffer to Unified Buffer involves key features such as [inline quantization](../cube_store_key_features/quant_pre.md), [inline ReLU](../cube_store_key_features/relu_pre.md), [Int8 Channel Merge](../cube_store_key_features/int8_channel_merge.md), [L0C Buffer to Unified Buffer dual-objective mode](../cube_store_key_features/l0c_to_ub_dual_dst.md), and [batch move](../cube_store_key_features/batch_copy.md).
 
 ## Example
 

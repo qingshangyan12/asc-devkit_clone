@@ -55,7 +55,7 @@ __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParam
 | Parameter | Description |
 | ------- | ------ |
 | T | Data type of **dst**. |
-| U | Data type of the initialization value.<br>&nbsp;&nbsp;&bull;When **dst** uses a basic data type, **U** and the data type **T** of **dst** must be consistent; otherwise, compilation fails.<br>&nbsp;&nbsp;&bull;When **dst** uses the [TensorTrait](../../Auxiliary Data Structures/TensorTrait/TensorTrait.md) type, the **LiteType** of **U** and the data type **T** of **dst** must be consistent; otherwise, compilation fails.<br>&nbsp;&nbsp;The last template parameter is used only for the data type check described above and does not require user attention. |
+| U | Data type of the initialization value.<br>&nbsp;&nbsp;&bull;When **dst** uses a basic data type, **U** and the data type **T** of **dst** must be consistent; otherwise, compilation fails.<br>&nbsp;&nbsp;&bull;When **dst** uses the [TensorTrait](../../aux_data_structures/TensorTrait/TensorTrait.md) type, the **LiteType** of **U** and the data type **T** of **dst** must be consistent; otherwise, compilation fails.<br>&nbsp;&nbsp;The last template parameter is used only for the data type check described above and does not require user attention. |
 
 **Table 2** Parameter Description
 

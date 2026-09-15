@@ -2,7 +2,7 @@
 
 <!-- md-trans-meta sourceCommit=f6490d1e030d257ee55f3f1600bffece5a8bd3f7 translatedAt=2026-08-27T15:00:40.359Z -->
 
--   **[TSCM Introduction](TSCM-Introduction.md)**  
+-   **[TSCM Introduction](tscm_introduction.md)**  
 
 -   **[AllocTensor](AllocTensor-60.md)**  
 

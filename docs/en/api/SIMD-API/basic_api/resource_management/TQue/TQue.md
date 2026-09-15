@@ -2,7 +2,7 @@
 
 <!-- md-trans-meta sourceCommit=f6490d1e030d257ee55f3f1600bffece5a8bd3f7 translatedAt=2026-08-27T14:45:59.798Z -->
 
--   **[TQue Introduction](TQue-Introduction.md)**  
+-   **[TQue Introduction](tque_introduction.md)**  
 
 -   **[AllocTensor](AllocTensor.md)**  
 

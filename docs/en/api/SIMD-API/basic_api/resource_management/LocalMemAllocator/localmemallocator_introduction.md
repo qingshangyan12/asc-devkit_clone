@@ -2,7 +2,7 @@
 
 <!-- md-trans-meta sourceCommit=f6490d1e030d257ee55f3f1600bffece5a8bd3f7 translatedAt=2026-08-27T14:25:02.658Z -->
 
-**LocalMemAllocator** is a class used for memory management when using [static Tensor programming](../../../../../guide/programming-model/ai_core_simd_programming/cpp_tensor_programming/static_tensor_programming.md). Instead of building **TPipe**/**TQue**, you can directly create a **LocalTensor** object (or construct it directly through the [LocalTensor constructor](../../data_structures/LocalTensor/LocalTensor-constructor.md)) and develop the operator, thereby reducing runtime overhead and achieving better performance.
+**LocalMemAllocator** is a class used for memory management when using [static Tensor programming](../../../../../guide/programming_guide/programming_model/ai_core_simd_programming/cpp_tensor_programming/static_tensor_programming.md). Instead of building **TPipe**/**TQue**, you can directly create a **LocalTensor** object (or construct it directly through the [LocalTensor constructor](../../data_structures/LocalTensor/localtensor_constructor.md)) and develop the operator, thereby reducing runtime overhead and achieving better performance.
 
 **LocalMemAllocator** is supported only in the Ascend C static Tensor programming mode and cannot be mixed with APIs such as **TPipe**.
 

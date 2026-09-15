@@ -82,7 +82,7 @@
 </tr>
 </thead>
 <tbody><tr id="zh-cn_topic_0000001429830437_row1835857145817"><td class="cellrowborder" valign="top" width="16.28%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000001429830437_p5835457165816"><a name="zh-cn_topic_0000001429830437_p5835457165816"></a><a name="zh-cn_topic_0000001429830437_p5835457165816"></a>T</p></td>
-<td class="cellrowborder" valign="top" width="83.72%" headers="mcps1.2.3.1.2 "><a name="ul171781281310"></a><a name="ul171781281310"></a><ul id="ul171781281310"><li>Prototype applicable to the Pipe programming framework, supporting basic data types and the <a href="../../Auxiliary Data Structures/TensorTrait/TensorTrait.md">TensorTrait</a> type.</li><li>Prototype applicable to static Tensor programming, supporting the following data types:<pre class="screen" id="screen148501140172610"><a name="screen148501140172610"></a><a name="screen148501140172610"></a>// Only basic data types are supported.
+<td class="cellrowborder" valign="top" width="83.72%" headers="mcps1.2.3.1.2 "><a name="ul171781281310"></a><a name="ul171781281310"></a><ul id="ul171781281310"><li>Prototype applicable to the Pipe programming framework, supporting basic data types and the <a href="../../aux_data_structures/TensorTrait/TensorTrait.md">TensorTrait</a> type.</li><li>Prototype applicable to static Tensor programming, supporting the following data types:<pre class="screen" id="screen148501140172610"><a name="screen148501140172610"></a><a name="screen148501140172610"></a>// Only basic data types are supported.
 __aicore__ inline LocalTensor&lt;T&gt;(TPosition pos, uint32_t addr, uint32_t tileSize)
 // Only the TensorTrait type is supported.
 __aicore__ inline LocalTensor&lt;T&gt;(uint32_t addr)</pre>

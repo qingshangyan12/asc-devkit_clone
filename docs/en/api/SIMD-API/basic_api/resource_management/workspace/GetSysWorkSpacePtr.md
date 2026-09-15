@@ -29,7 +29,7 @@
 
 ## Description<a name="section618mcpsimp"></a>
 
-Obtains the system workspace pointer. Some high-level APIs such as **Matmul** require the system workspace, and the related APIs need to pass in the system workspace pointer, which can be obtained through this API. When using the system workspace, developers on the host side need to apply for the system workspace space by themselves, and the reserved space size can be obtained through the [GetLibApiWorkSpaceSize](../../../../Utils-API/Platform-Information/PlatformAscendC/GetLibApiWorkSpaceSize.md) API.
+Obtains the system workspace pointer. Some high-level APIs such as **Matmul** require the system workspace, and the related APIs need to pass in the system workspace pointer, which can be obtained through this API. When using the system workspace, developers on the host side need to apply for the system workspace space by themselves, and the reserved space size can be obtained through the [GetLibApiWorkSpaceSize](../../../../Utils-API/platform_info/PlatformAscendC/GetLibApiWorkSpaceSize.md) API.
 
 ## Prototype<a name="section620mcpsimp"></a>
 

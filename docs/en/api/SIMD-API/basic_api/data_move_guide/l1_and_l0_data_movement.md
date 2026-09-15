@@ -33,7 +33,7 @@ The specifically supported data paths are (represented by [logical location TPos
 - L1 Buffer -> L0A Buffer
     - A1 -> A2
 
-The moved data is used for [cube computation](../cube_compute_ISASI/cube_compute_ISASI.md). For details about the API, see [LoadData (2D Format Fractal Cube Movement)](../cube_compute_ISASI/cube_computation_input/Load2D.md).
+The moved data is used for [cube computation](../cube_compute_ISASI/cube_compute_ISASI.md). For details about the API, see [LoadData (2D Format Fractal Cube Movement)](../cube_compute_ISASI/cube_compute_load/Load2D.md).
 
 **src** and **dst** are the source operand and destination operand, respectively; **loadDataParams** is the movement parameter.
 
@@ -52,7 +52,7 @@ The specifically supported data paths are (represented by [logical location TPos
 - L1 Buffer -> L0A Buffer
     - A1 -> A2
 
-The moved data is used for [cube computation](../cube_compute_ISASI/cube_compute_ISASI.md). For details about the API, see [LoadData (2D Format Fractal Cube Movement V2)](../cube_compute_ISASI/cube_computation_input/Load2DV2.md).
+The moved data is used for [cube computation](../cube_compute_ISASI/cube_compute_ISASI.md). For details about the API, see [LoadData (2D Format Fractal Cube Movement V2)](../cube_compute_ISASI/cube_compute_load/Load2DV2.md).
 
 **src** and **dst** are the source operand and destination operand, respectively; **loadDataParams** is the movement parameter.
 
@@ -74,7 +74,7 @@ The specifically supported data paths are (represented by [logical location TPos
 - L1 Buffer -> L0A Buffer
     - A1 -> A2
 
-The moved data is used for [cube computation](../cube_compute_ISASI/cube_compute_ISASI.md). For details about the API, see [LoadData (L1 -> L0A-2D Format Fractal Cube Movement MX)](../cube_compute_ISASI/cube_computation_input/Load2DMX.md).
+The moved data is used for [cube computation](../cube_compute_ISASI/cube_compute_ISASI.md). For details about the API, see [LoadData (L1 -> L0A-2D Format Fractal Cube Movement MX)](../cube_compute_ISASI/cube_compute_load/Load2DMX.md).
 
 src and srcMx are source operands, and dst is the destination operand; loadDataParams and loadMxDataParams are movement parameters.
 
@@ -102,7 +102,7 @@ The specifically supported data paths are as follows (represented by [logical lo
 - L1 Buffer -> L0A Buffer
     - A1 -> A2
 
-The moved data is used for [cube computation](../cube_compute_ISASI/cube_compute_ISASI.md). For details about the API, see [LoadDataWithTranspose (L1 -> L0A-2D format fractal cube transpose movement)](../cube_compute_ISASI/cube-computation-input/LoadDataWithTranspose.md).
+The moved data is used for [cube computation](../cube_compute_ISASI/cube_compute_ISASI.md). For details about the API, see [LoadDataWithTranspose (L1 -> L0A-2D format fractal cube transpose movement)](../cube_compute_ISASI/cube_compute_load/LoadDataWithTranspose.md).
 
 **src** and **dst** are the source operand and destination operand, respectively; **loadDataParams** is the movement parameter.
 
@@ -125,7 +125,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 
 Load3D is essentially used to perform Image to Column expansion on the Feature Map in NC1HWC0 format, and then select a specified data block from the expanded two-dimensional cube and move it to the corresponding memory location.
 
-The specifically supported data paths are (represented by [logical location TPosition](../auxiliary-data_structures/TPosition.md)):
+The specifically supported data paths are (represented by [logical location TPosition](../aux_data_structures/TPosition.md)):
 
 - L1 Buffer -> L0A Buffer
     - A1 -> A2
@@ -161,12 +161,12 @@ src and dst are the source operand and destination operand, respectively; loadDa
 
 Load2D implements data movement between the L1 Buffer and the L0B Buffer. It is responsible for moving 2D-format data required for ordinary cube computation, moving data in units of 512-byte data fractals.
 
-The specifically supported data paths are (represented by [logical location TPosition](../auxiliary-data_structures/TPosition.md)):
+The specifically supported data paths are (represented by [logical location TPosition](../aux_data_structures/TPosition.md)):
 
 - L1 Buffer -> L0B Buffer
     - B1 -> B2
 
-The moved data is used for [cube computation](../cube_compute_ISASI/cube_compute_ISASI.md). For details about the API, see [LoadData (L1 -> L0B-2D Format Fractal Cube Movement)](../cube_compute_ISASI/cube-computation-data-loading/Load2D.md).
+The moved data is used for [cube computation](../cube_compute_ISASI/cube_compute_ISASI.md). For details about the API, see [LoadData (L1 -> L0B-2D Format Fractal Cube Movement)](../cube_compute_ISASI/cube_compute_load/Load2D.md).
 
 **src** and **dst** are the source operand and destination operand, respectively; **loadDataParams** is the movement parameter.
 
@@ -185,7 +185,7 @@ The specifically supported data paths are (represented by [logical location TPos
 - L1 Buffer -> L0B Buffer
     - B1 -> B2
 
-The moved data is used for [cube computation](../cube_compute_ISASI/cube_compute_ISASI.md). For details about the API, see [LoadData (L1 -> L0B-2D Format Fractal Cube Movement V2)](../cube_compute_ISASI/cube_computation_move_in/Load2DV2.md).
+The moved data is used for [cube computation](../cube_compute_ISASI/cube_compute_ISASI.md). For details about the API, see [LoadData (L1 -> L0B-2D Format Fractal Cube Movement V2)](../cube_compute_ISASI/cube_compute_load/Load2DV2.md).
 
 **src** and **dst** are the source operand and destination operand, respectively; **loadDataParams** is the movement parameter.
 
@@ -202,12 +202,12 @@ The moved data is used for [cube computation](../cube_compute_ISASI/cube_compute
 
 Load2DMX is responsible for moving the left and right cube data required for cube computation and the corresponding left and right quantization coefficient cube data. The left and right cube data is moved in units of 512-byte data fractals, and the left and right quantization coefficient matrices are moved in units of 32-byte data fractals.
 
-The specifically supported data paths are (represented by [logical location TPosition](../auxiliary-data_structures/TPosition.md)):
+The specifically supported data paths are (represented by [logical location TPosition](../aux_data_structures/TPosition.md)):
 
 - L1 Buffer -> L0B Buffer
     - B1 -> B2
 
-The moved data is used for [cube computation](../cube_compute_ISASI/cube_compute_ISASI.md). For details about the API, see [LoadData (L1 -> L0B-2D Format Fractal Cube Movement MX)](../cube_compute_ISASI/cube-computation-input/Load2DMX.md).
+The moved data is used for [cube computation](../cube_compute_ISASI/cube_compute_ISASI.md). For details about the API, see [LoadData (L1 -> L0B-2D Format Fractal Cube Movement MX)](../cube_compute_ISASI/cube_compute_load/Load2DMX.md).
 
 **src** and **srcMx** are source operands, and **dst** is the destination operand; **loadDataParams** and **loadMxDataParams** are movement parameters.
 
@@ -235,7 +235,7 @@ The specifically supported data paths are (represented by [logical location TPos
 - L1 Buffer -> L0B Buffer
     - B1 -> B2
 
-The moved data is used for [cube computation](../cube_compute_ISASI/cube_compute_ISASI.md). For details about the API, see [LoadDataWithTranspose (L1 -> L0B-2D Format Fractal Cube Transpose Movement)](../cube_compute_ISASI/cube_computation_input/LoadDataWithTranspose.md).
+The moved data is used for [cube computation](../cube_compute_ISASI/cube_compute_ISASI.md). For details about the API, see [LoadDataWithTranspose (L1 -> L0B-2D Format Fractal Cube Transpose Movement)](../cube_compute_ISASI/cube_compute_load/LoadDataWithTranspose.md).
 
 **src** and **dst** are the source operand and destination operand, respectively; **loadDataParams** is the movement parameter.
 
@@ -258,12 +258,12 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 
 Load3D is essentially used to perform Image to Column expansion on the Feature Map in NC1HWC0 format, and then select a specified data block from the expanded two-dimensional cube and move it to the corresponding memory location.
 
-The specifically supported data paths are (represented by [logical location TPosition](../auxiliary-data_structures/TPosition.md)):
+The specifically supported data paths are (represented by [logical location TPosition](../aux_data_structures/TPosition.md)):
 
 - L1 Buffer -> L0B Buffer
     - B1 -> B2
 
-The moved data is used for [cube computation](../cube_compute_ISASI/cube_compute_ISASI.md). For details about the API, see [LoadData (L1 -> L0B-3D Format Fractal Cube Movement)](../cube_compute_ISASI/cube-computation-input/Load3D.md).
+The moved data is used for [cube computation](../cube_compute_ISASI/cube_compute_ISASI.md). For details about the API, see [LoadData (L1 -> L0B-3D Format Fractal Cube Movement)](../cube_compute_ISASI/cube_compute_load/Load3D.md).
 
 src and dst are the source operand and destination operand, respectively; loadDataParams is the movement parameter.
 
@@ -295,7 +295,7 @@ src and dst are the source operand and destination operand, respectively; loadDa
 
 Used to move a dense weight cube stored in units of 512 bytes from L1 to L0B, and simultaneously move an index cube in units of 128 bytes to the built-in dedicated buffer space (for subsequent reading by the MmadWithSparse API).
 
-The specifically supported data paths are (represented by [logical location TPosition](../auxiliary-data_structures/TPosition.md)):
+The specifically supported data paths are (represented by [logical location TPosition](../aux_data_structures/TPosition.md)):
 
 - L1 Buffer -> L0B Buffer
     - B1 -> B2
@@ -322,12 +322,12 @@ The moved data is used for [cube computation](../cube_compute_ISASI/cube_compute
 
 This API mainly implements data movement from the L0C Buffer to the L1 Buffer, and supports combinations of multiple inline capabilities, which require setting different registers.
 
-The specifically supported data paths are (represented by [logical location TPosition](../auxiliary-data_structures/TPosition.md)):
+The specifically supported data paths are (represented by [logical location TPosition](../aux_data_structures/TPosition.md)):
 
 - L0C Buffer -> L1 Buffer
     - CO1 -> C1
 
-The moved data is the result of [cube computation](../cube_compute_ISASI/cube_compute_ISASI.md). For details about the API, see [DataCopy (L0C -> L1 - Inline Quantization Activation Movement)](../cube_compute_ISASI/cube-computation-output/DataCopy_L0CToL1.md).
+The moved data is the result of [cube computation](../cube_compute_ISASI/cube_compute_ISASI.md). For details about the API, see [DataCopy (L0C -> L1 - Inline Quantization Activation Movement)](../cube_compute_ISASI/cube_compute_store/DataCopy_L0CToL1.md).
 
 **src** and **dst** are the source operand and destination operand, respectively; **intriParams** is the movement parameter.
 
@@ -347,18 +347,18 @@ The specific supported data paths are (represented by [logical location TPositio
 
 The moved data is the result of [cube computation](../cube_compute_ISASI/cube_compute_ISASI.md). Taking Ascend 950PR/Ascend 950DT as an example, the API example is as follows:
 
-Note that the API prototypes may differ across product models. For details, see [Fixpipe (L0C -> L1 - inline quantization activation movement)](../cube_compute_ISASI/cube_computation_output/Fixpipe_L0CToL1.md).
+Note that the API prototypes may differ across product models. For details, see [Fixpipe (L0C -> L1 - inline quantization activation movement)](../cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToL1.md).
 
 **src** and **dst** are the source operand and destination operand, respectively; **intriParams** is the movement parameter, and **cbufWorkspace** is the quantization parameter required when tensor quantization is enabled.
 
-- When the inline [tensor quantization](../cube_compute_ISASI/cube_output_key_features/inline_quantization.md) feature is not enabled:
+- When the inline [tensor quantization](../cube_compute_ISASI/cube_store_key_features/on_the_fly_quantization.md) feature is not enabled:
 
     ```cpp
     template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
     __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsArch3510<config.format>& intriParams)
     ```
 
-- When the inline [tensor quantization](../cube_compute_ISASI/cube_output_key_features/inline_quantization.md) feature is enabled:
+- When the inline [tensor quantization](../cube_compute_ISASI/cube_store_key_features/on_the_fly_quantization.md) feature is enabled:
 
     ```cpp
     template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>

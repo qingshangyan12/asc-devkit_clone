@@ -2,12 +2,12 @@
 
 <!-- md-trans-meta sourceCommit=8fad0c67f83ebd2b956accc16a2052471ba091cc translatedAt=2026-08-27T18:08:14.220Z -->
 
-- **[Built-in Data Types](../data_structures/built_in_data_types.md)**
+- **[Built-in Data Types](../data_structures/built_in_data_type.md)**
 
 - **[Precision Conversion](../data_structures/precision_conversion.md)**
 
 - **Layout-related basic data structures**
-    - **[Layout and hierarchical representation](layout_structure/Layout_and_hierarchical_representation.md)**
+    - **[Layout and hierarchical representation](layout_structure/layout_and_hierarchical_representation.md)**
     - **[Layout](layout_structure/Layout.md)**
     - **[Shape](layout_structure/Shape.md)**
     - **[Stride](layout_structure/Stride.md)**

@@ -8,7 +8,7 @@
 
 -   **[TBufPool](TBufPool/TBufPool.md)**  
 
--   **[Custom TBufPool](CustomTBufPool/CustomTBufPool.md)**  
+-   **[Custom TBufPool](custom_TBufPool/custom_tbufpool.md)**  
 
 -   **[TQue](TQue/TQue.md)**  
 

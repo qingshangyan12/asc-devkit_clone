@@ -2,9 +2,9 @@
 
 <!-- md-trans-meta sourceCommit=0364dcce9ab16d714270f168ec9546fd7620f90f translatedAt=2026-08-27T11:53:47.786Z -->
 
--   **[TensorDesc Overview](TensorDesc-Overview.md)**  
+-   **[TensorDesc Overview](tensordesc_introduction.md)**  
 
--   **[Constructors and Destructors](Constructors-and-Destructors.md)**  
+-   **[Constructors and Destructors](constructors_and_destructors.md)**  
 
 -   **[SetShapeAddr](SetShapeAddr.md)**  
 

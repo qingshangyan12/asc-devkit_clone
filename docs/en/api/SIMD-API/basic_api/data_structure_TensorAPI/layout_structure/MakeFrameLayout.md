@@ -91,7 +91,7 @@ auto batchLayout = MakeFrameLayout<LayoutPattern, TraitType>(batch, m, n);
 
 | Parameter | Input/Output | Description |
 | :--- | :---: | :--- |
-| LayoutPattern | Input | Layout pattern template parameter. For supported **LayoutPattern** values and data layout formats, see [Layout and hierarchical representation](Layout-and-hierarchical-representation.md). |
+| LayoutPattern | Input | Layout pattern template parameter. For supported **LayoutPattern** values and data layout formats, see [Layout and hierarchical representation](layout_and_hierarchical_representation.md). |
 | TraitType | Input | Layout trait type, which is automatically deduced from **LayoutPattern** by default. The four passing methods above are supported. |
 | Args | Input | Construction parameters. They are commonly the number of rows **m** and the number of columns **n** of a cube; in **Batch** mode, they are **batch**, **m**, and **n**. The number of construction parameters may vary with **LayoutPattern**. |
 

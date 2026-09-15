@@ -188,7 +188,7 @@ When `quant` is not passed in, the API selects the non-quantized or direct conve
 
 ## Key Features
 
-Moving data from the L0C Buffer to Global Memory involves the following key features: [inline quantization](../cube_move-out_key_feature_description/quant_pre.md), [inline Relu](../cube_move-out_key_feature_description/relu_pre.md), [F32 Channel Split](../cube_move-out_key_feature_description/f32_channel_split.md), [Int8 Channel Merge](../cube_move-out_key_feature_description/int8_channel_merge.md), and [batch move](../cube_move-out_key_feature_description/batch_copy.md).
+Moving data from the L0C Buffer to Global Memory involves the following key features: [inline quantization](../cube_store_key_features/quant_pre.md), [inline Relu](../cube_store_key_features/relu_pre.md), [F32 Channel Split](../cube_store_key_features/f32_channel_split.md), [Int8 Channel Merge](../cube_store_key_features/int8_channel_merge.md), and [batch move](../cube_store_key_features/batch_copy.md).
 
 ## Call Example
 
