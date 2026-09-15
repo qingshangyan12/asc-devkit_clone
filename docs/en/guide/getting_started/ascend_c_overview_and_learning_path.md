@@ -14,7 +14,7 @@ In the era of large models, the demand for computing power is surging at an unpr
 
 To meet the requirements of different scenarios, Ascend C builds a multi-level API system ranging from single-instruction abstraction and single-core common algorithms to multi-core operators. Its overall logical architecture is as follows:
 
-<img src="../../figures/architecture.png" alt="Architecture" width="850px" height="580px">
+<img src="../../../figures/architecture.png" alt="Architecture" width="850px" height="580px">
 
 - **Language extension layer C API**: A pure C interface that provides array memory allocation and pointer-based computation interfaces, continuing the familiar C programming experience in the industry while fully opening up chip capabilities. Ascend 950PR/Ascend 950DT add SIMT and SIMD/SIMT hybrid programming capabilities.
 - **Basic API**: A C++ class library abstracted at the single-instruction level, generally based on Tensor programming, and gradually improving the Tensor programming experience through Layout.
