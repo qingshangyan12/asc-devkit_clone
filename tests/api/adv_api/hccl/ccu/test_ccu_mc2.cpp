@@ -174,6 +174,7 @@ static OpResCtx BuildLaunchOpResCtx(OpParam& opParam, HcclComm comm, CommEngine 
     opParam.ctxSize = 1U;
 
     OpResCtx opResCtx{};
+    opResCtx.commEngine = static_cast<uint64_t>(engine);
     opResCtx.workSpace = 1U;
     opResCtx.workSpaceSize = 1U;
     opResCtx.algInfo[0].opParam = reinterpret_cast<uint64_t>(&opParam);
@@ -1557,7 +1558,7 @@ TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunch_RejectsUnsupportedDevice)
     mc2_ops_hccl::g_stubDeviceType = DevType::DEV_TYPE_910B;
     Mc2CcKernelLaunch(nullptr, &opResCtx, sizeof(opResCtx));
 
-    EXPECT_EQ(mc2_ops_hccl::g_stubAclrtMemcpyCallCount, 2U);
+    EXPECT_EQ(mc2_ops_hccl::g_stubAclrtMemcpyCallCount, 1U);
     EXPECT_EQ(mc2_ops_hccl::g_stubHcommCcuKernelLaunchCallCount, 0U);
 }
 
