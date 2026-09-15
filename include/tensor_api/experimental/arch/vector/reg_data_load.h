@@ -61,6 +61,34 @@ __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor, const
 template <broadcast_mode brc_mode = broadcast_mode::elem, typename Tensor>
 __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor);
 
+/**
+ * @brief Maintains the hardware state for a sequence of unaligned UB-to-register loads.
+ * @note Call prepare() before load(). The prepared address and all load addresses must
+ * form one contiguous stream, with the first load using the prepared address.
+ */
+struct unalign_load {
+    __simd_callee__ unalign_load() = default;
+
+    /**
+     * @brief Prepares an unaligned load stream at the beginning of a UB tensor.
+     * @param src_base Tensor whose beginning is the first address of the stream.
+     */
+    template <typename Tensor>
+    __simd_callee__ inline void prepare(const Tensor& src_base);
+
+    /**
+     * @brief Loads one full vector register from the next address in an unaligned stream.
+     * @param src_tile Tensor whose beginning is the source address for this load.
+     * @return One register tensor containing the loaded data. An int4b_t source
+     * returns reg_tensor<int4x2_t>.
+     */
+    template <typename Tensor>
+    __simd_callee__ inline auto load(const Tensor& src_tile);
+
+private:
+    vector_load_unalign ureg_;
+};
+
 } // namespace experimental
 } // namespace te
 } // namespace asc

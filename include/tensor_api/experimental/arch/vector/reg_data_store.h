@@ -73,6 +73,40 @@ template <store_sideband_mode sideband_mode = store_sideband_mode::intlv, typena
 __simd_callee__ inline void store(
     Tensor& tensor, const reg_tensor<RegDataType>& src0, const reg_tensor<RegDataType>& src1);
 
+/**
+ * @brief Maintains the hardware state for a sequence of unaligned register-to-UB stores.
+ * @note Each store writes one full vector register and does not use reg_tensor::mask.
+ * Destination addresses must form one contiguous stream. All tensors passed to one
+ * session must have the same element type. Call flush() exactly once with the first
+ * destination address after the stores are complete.
+ */
+struct unalign_store {
+    __simd_callee__ unalign_store() = default;
+
+    /** @brief Starts a new unaligned store stream. */
+    __simd_callee__ inline void prepare();
+
+    /**
+     * @brief Stores one full vector register at the beginning of a UB tensor.
+     * @param dst_tile Tensor whose beginning is the destination address for this store.
+     * @param src Source register tensor. Its mask is not used. An int4b_t destination
+     * requires reg_tensor<int4x2_t>.
+     */
+    template <typename Tensor, typename RegDataType>
+    __simd_callee__ inline void store(Tensor dst_tile, const reg_tensor<RegDataType>& src);
+
+    /**
+     * @brief Commits the pending unaligned stores.
+     * @param dst_base Tensor whose beginning is the destination address of the first store.
+     */
+    template <typename Tensor>
+    __simd_callee__ inline void flush(Tensor dst_base);
+
+private:
+    vector_store_unalign ureg_;
+    uint32_t count_ = 0;
+};
+
 } // namespace experimental
 } // namespace te
 } // namespace asc

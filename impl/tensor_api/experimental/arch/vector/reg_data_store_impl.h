@@ -160,6 +160,55 @@ __simd_callee__ inline void store(
     detail::store_to_ptr<sideband_mode>(tensor.engine().begin().get(), src0, src1);
 }
 
+__simd_callee__ inline void unalign_store::prepare()
+{
+    count_ = 0;
+}
+
+template <typename Tensor, typename RegDataType>
+__simd_callee__ inline void unalign_store::store(Tensor dst_tile, const reg_tensor<RegDataType>& src)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    using reg_data_type = detail::get_reg_data_type<data_type>;
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "unalign_store only supports tensors located in UB");
+    static_assert(
+        Std::is_same_v<reg_data_type, RegDataType>,
+        "unalign_store requires matching tensor and register element types");
+    static_assert(
+        detail::is_b4_type_v<reg_data_type> || detail::is_b8_type_v<reg_data_type> ||
+            detail::is_b16_type_v<reg_data_type> || detail::is_b32_type_v<reg_data_type> ||
+            detail::is_b64_type_v<reg_data_type>,
+        "unalign_store supports b4, b8, b16, b32, and b64 element types only");
+
+    constexpr uint32_t elements_per_register = static_cast<uint32_t>(asc_get_vf_len()) / sizeof(RegDataType);
+    asc_storeunalign(dst_tile.engine().begin().get(), ureg_, src.reg, elements_per_register);
+    count_ += elements_per_register;
+}
+
+template <typename Tensor>
+__simd_callee__ inline void unalign_store::flush(Tensor dst_base)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    using reg_data_type = detail::get_reg_data_type<data_type>;
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "unalign_store only supports tensors located in UB");
+    static_assert(
+        detail::is_b4_type_v<reg_data_type> || detail::is_b8_type_v<reg_data_type> ||
+            detail::is_b16_type_v<reg_data_type> || detail::is_b32_type_v<reg_data_type> ||
+            detail::is_b64_type_v<reg_data_type>,
+        "unalign_store supports b4, b8, b16, b32, and b64 element types only");
+
+    if (count_ != 0) {
+        asc_storeunalign_post(dst_base.engine().begin().get(), ureg_, static_cast<int32_t>(count_));
+        count_ = 0;
+    }
+}
+
 } // namespace experimental
 } // namespace te
 } // namespace asc

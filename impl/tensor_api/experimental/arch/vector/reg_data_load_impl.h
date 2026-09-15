@@ -220,6 +220,44 @@ __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor)
     return detail::load_broadcast_from_ptr<brc_mode, data_type>(tensor.engine().begin().get());
 }
 
+template <typename Tensor>
+__simd_callee__ inline void unalign_load::prepare(const Tensor& src_base)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    using reg_data_type = detail::get_reg_data_type<data_type>;
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "unalign_load only supports tensors located in UB");
+    static_assert(
+        detail::is_b4_type_v<reg_data_type> || detail::is_b8_type_v<reg_data_type> ||
+            detail::is_b16_type_v<reg_data_type> || detail::is_b32_type_v<reg_data_type> ||
+            detail::is_b64_type_v<reg_data_type>,
+        "unalign_load supports b4, b8, b16, b32, and b64 element types only");
+
+    asc_loadunalign_pre(ureg_, src_base.engine().begin().get());
+}
+
+template <typename Tensor>
+__simd_callee__ inline auto unalign_load::load(const Tensor& src_tile)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    using reg_data_type = detail::get_reg_data_type<data_type>;
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "unalign_load only supports tensors located in UB");
+    static_assert(
+        detail::is_b4_type_v<reg_data_type> || detail::is_b8_type_v<reg_data_type> ||
+            detail::is_b16_type_v<reg_data_type> || detail::is_b32_type_v<reg_data_type> ||
+            detail::is_b64_type_v<reg_data_type>,
+        "unalign_load supports b4, b8, b16, b32, and b64 element types only");
+
+    reg_tensor<reg_data_type> dst;
+    asc_loadunalign(dst.reg, ureg_, src_tile.engine().begin().get());
+    return dst;
+}
+
 } // namespace experimental
 } // namespace te
 } // namespace asc
