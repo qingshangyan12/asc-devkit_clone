@@ -30,10 +30,6 @@ constexpr uint32_t C_API_AIV_TYPE = AscendC::AIV;
 
 constexpr uint32_t C_API_MIX_TYPE = AscendC::MIX;
 
-#define ASC_IS_AIV ASCEND_IS_AIV
-
-#define ASC_IS_AIC ASCEND_IS_AIC
-
 #define ASC_IS_NOT_AIV ASCEND_IS_NOT_AIV
 
 #define ASC_IS_NOT_AIC ASCEND_IS_NOT_AIC
@@ -120,6 +116,18 @@ union asc_scalar_bitcode {
     half input_half;
     int16_t input_int16_t;
     uint16_t input_uint16_t;
+    uint64_t output;
+};
+
+union asc_3d_padding_bitcode {
+    __aicore__ asc_3d_padding_bitcode() {}
+    half input_half;
+    bfloat16_t input_bfloat16;
+    int16_t input_int16;
+    uint16_t input_uint16;
+    int32_t input_int32;
+    uint32_t input_uint32;
+    float input_float;
     uint64_t output;
 };
 

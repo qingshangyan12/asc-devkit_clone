@@ -265,7 +265,11 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     ccuUsedXnNum_ = 8; // 算法默认使用的xn num
     FlushDataCache(&handleParamGM_[handleId]);
     if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLGATHER) {
-        if (GetKfcMissionNum(handleId) == KFC_MAX_MISSION_NUM) {
+        if (GetAlgorithmType(handleId) ==
+            static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherParallelMeshNHRMultiLink)) {
+            ccuUsedXnNum_ = KFC_PARALLEL_AG_STORAGE_NUM;
+            CcuPrepareForParallelAllGatherM2M(&handleParamGM_[handleId]);
+        } else if (GetKfcMissionNum(handleId) == KFC_MAX_MISSION_NUM) {
             ccuUsedXnNum_ = KFC_CONCURRENT_AG_PARAM_NUM;
             CcuPrepareForConcurrentAllGatherM2M(&handleParamGM_[handleId]);
         } else {
@@ -276,7 +280,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         ccuUsedXnNum_ = 26;
         CcuPrepareForAllReduceM2M(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALL) {
-        if (GetKfcMissionNum(handleId) == KFC_MAX_MISSION_NUM) {
+        if (GetAlgorithmType(handleId) == static_cast<uint32_t>(AlgorithmType::CcuSchedAllToAllMesh1DMultiJetty)) {
+            ccuUsedXnNum_ = KFC_A2A_MJ_PARAM_NUM;
+            CcuPrepareForAllToAllMultiJetty(&handleParamGM_[handleId]);
+        } else if (GetKfcMissionNum(handleId) == KFC_MAX_MISSION_NUM) {
             ccuUsedXnNum_ = KFC_CONCURRENT_A2A_PARAM_NUM;
             CcuPrepareForConcurrentAllToAll(&handleParamGM_[handleId]);
         } else {
@@ -296,7 +303,11 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         FlushDataCache(reinterpret_cast<__gm__ uint8_t*>(&handleParamGM_[handleId]) + MAX_DCCI_CNT);
         CcuPrepareForAllToAllVWrite(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
-        if (GetAlgorithmType(handleId) == static_cast<uint32_t>(AlgorithmType::CcuReduceScatterMeshMem2Mem1DPeerOnly)) {
+        if (GetKfcMissionNum(handleId) == KFC_MAX_MISSION_NUM) {
+            ccuUsedXnNum_ = KFC_CONCURRENT_RS_PARAM_NUM;
+            CcuPrepareForConcurrentReduceScatterM2M(&handleParamGM_[handleId]);
+        } else if (
+            GetAlgorithmType(handleId) == static_cast<uint32_t>(AlgorithmType::CcuReduceScatterMeshMem2Mem1DPeerOnly)) {
             ccuUsedXnNum_ = 9;
             CcuPrepareForReduceScatterPeerOnlyM2M(&handleParamGM_[handleId]);
         } else if (
@@ -545,7 +556,9 @@ __aicore__ inline uint8_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     const uint32_t algorithmType = GetAlgorithmType(handleId);
     uint8_t missionNum = 1U;
     if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherConcurMeshNHRMultiLink) ||
-        algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllToAllSoleMeshConcurrent)) {
+        algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherParallelMeshNHRMultiLink) ||
+        algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllToAllSoleMeshConcurrent) ||
+        algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterConcurMeshNHRMultiLink)) {
         missionNum = KFC_MAX_MISSION_NUM;
     }
     return missionNum;

@@ -201,6 +201,13 @@ TEST_F(TestHcclTilingCcuKfc, AllToAllCcuSchedUsesCcuNewVersion)
         INIT_TILING_CCU_NEW_VERSION);
 }
 
+TEST_F(TestHcclTilingCcuKfc, AllToAllMultiJettyCcuSchedUsesCcuNewVersion)
+{
+    ExpectInitTilingVersion(
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL), "CcuSchedAllToAllMesh1DMultiJetty", 6U,
+        INIT_TILING_CCU_NEW_VERSION);
+}
+
 TEST_F(TestHcclTilingCcuKfc, UnsupportedCommEngineUsesDefaultVersion)
 {
     ExpectInitTilingVersion(
@@ -245,6 +252,13 @@ TEST_F(TestHcclTilingCcuKfc, ReduceScatterCcuSchedUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterSoleMesh", 6U,
+        INIT_TILING_CCU_NEW_VERSION);
+}
+
+TEST_F(TestHcclTilingCcuKfc, ReduceScatterConcurMeshNHRMultiLinkCcuSchedUsesCcuNewVersion)
+{
+    ExpectInitTilingVersion(
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterConcurMeshNHRMultiLink", 6U,
         INIT_TILING_CCU_NEW_VERSION);
 }
 
