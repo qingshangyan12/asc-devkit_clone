@@ -61,46 +61,48 @@ __simd_callee__ inline reg_tensor<T> operator^(const reg_tensor<T>& src0, const 
     return dst;
 }
 
-template <typename T, typename U>
-__simd_callee__ inline reg_tensor<T> operator<<(const reg_tensor<T>& src, const U& shift)
+template <typename T, typename ShiftType>
+__simd_callee__ inline reg_tensor<T> operator<<(const reg_tensor<T>& src, const reg_tensor<ShiftType>& shift)
 {
     static_assert(detail::supports_shift_v<T>, "operator<< does not support this element type");
-
+    static_assert(
+        detail::supports_shift_pair_v<T, ShiftType>,
+        "register operator<< requires a signed shift register of the same width");
     reg_tensor<T> dst;
-    if constexpr (is_reg_tensor_v<U>) {
-        using shift_type = detail::reg_elem_t<U>;
-        static_assert(
-            detail::supports_shift_pair_v<T, shift_type>,
-            "register operator<< requires a signed shift register of the same width");
-        asc_shiftleft(dst.reg, src.reg, shift.reg, src.mask);
-    } else {
-        static_assert(
-            ::AscendC::Std::is_same_v<::AscendC::Std::remove_cvref_t<U>, int16_t>,
-            "scalar operator<< requires an int16_t shift value");
-        asc_shiftleft_scalar(dst.reg, src.reg, shift, src.mask);
-    }
+    asc_shiftleft(dst.reg, src.reg, shift.reg, src.mask);
     dst.mask = src.mask;
     return dst;
 }
 
-template <typename T, typename U>
-__simd_callee__ inline reg_tensor<T> operator>>(const reg_tensor<T>& src, const U& shift)
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator<<(const reg_tensor<T>& src, const int16_t& shift)
+{
+    static_assert(detail::supports_shift_v<T>, "operator<< does not support this element type");
+    reg_tensor<T> dst;
+    asc_shiftleft_scalar(dst.reg, src.reg, shift, src.mask);
+    dst.mask = src.mask;
+    return dst;
+}
+
+template <typename T, typename ShiftType>
+__simd_callee__ inline reg_tensor<T> operator>>(const reg_tensor<T>& src, const reg_tensor<ShiftType>& shift)
 {
     static_assert(detail::supports_shift_v<T>, "operator>> does not support this element type");
-
+    static_assert(
+        detail::supports_shift_pair_v<T, ShiftType>,
+        "register operator>> requires a signed shift register of the same width");
     reg_tensor<T> dst;
-    if constexpr (is_reg_tensor_v<U>) {
-        using shift_type = detail::reg_elem_t<U>;
-        static_assert(
-            detail::supports_shift_pair_v<T, shift_type>,
-            "register operator>> requires a signed shift register of the same width");
-        asc_shiftright(dst.reg, src.reg, shift.reg, src.mask);
-    } else {
-        static_assert(
-            ::AscendC::Std::is_same_v<::AscendC::Std::remove_cvref_t<U>, int16_t>,
-            "scalar operator>> requires an int16_t shift value");
-        asc_shiftright_scalar(dst.reg, src.reg, shift, src.mask);
-    }
+    asc_shiftright(dst.reg, src.reg, shift.reg, src.mask);
+    dst.mask = src.mask;
+    return dst;
+}
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator>>(const reg_tensor<T>& src, const int16_t& shift)
+{
+    static_assert(detail::supports_shift_v<T>, "operator>> does not support this element type");
+    reg_tensor<T> dst;
+    asc_shiftright_scalar(dst.reg, src.reg, shift, src.mask);
     dst.mask = src.mask;
     return dst;
 }

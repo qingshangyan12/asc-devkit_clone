@@ -93,6 +93,19 @@ struct reg_pair {
     reg_tensor<DataType> second;
 };
 
+/**
+ * @brief Holds an arithmetic result together with its carry flag.
+ * @tparam DataType Element type represented by the arithmetic result.
+ */
+template <typename DataType>
+struct carry_result {
+    /** @brief Arithmetic result. */
+    reg_tensor<DataType> value;
+
+    /** @brief Carry flag, or no-borrow flag for subtraction. */
+    reg_tensor<bool> carry;
+};
+
 } // namespace experimental
 } // namespace te
 } // namespace asc

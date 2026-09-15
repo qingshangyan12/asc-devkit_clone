@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-头文件路径：`"tensor_api/experimental/vector_compute.h"`。
+头文件路径：`"tensor_api/experimental/arch/vector/basic_arithmetic.h"`。
 
 该接口根据src0携带的mask，对两个32位整数源操作数按元素相乘，返回由低32位和高32位组成的结果。计算公式如下：
 
@@ -72,7 +72,11 @@ src0.mask需通过`with_mask`接口预先设置。未设置时，mask的内容�
 ## 调用示例
 
 ```cpp
-#include "tensor_api/experimental/vector_compute.h"
+#include "tensor_api/tensor.h"
+#include "tensor_api/experimental/arch/vector/basic_arithmetic.h"
+#include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
+#include "tensor_api/experimental/arch/vector/reg_data_load.h"
+#include "tensor_api/experimental/arch/vector/reg_data_store.h"
 
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void mull_example(InputTensor input0, InputTensor input1, OutputTensor output)
