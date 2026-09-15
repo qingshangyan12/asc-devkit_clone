@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/scalar_compute/compute/scalar_bit.h"`。
 
-给定除数`divisor`，计算快速除法乘法因子`magic`和移位量`shift`。整数快除算法分为两步计算商。本接口用于第一步计算，需要配合[asc_uintdiv](../../../../SIMT-API/math_functions/integer_math_functions/asc_uintdiv.md)完成除法运算。本接口的计算过程如下：
+给定除数`divisor`，计算快速除法乘法因子`magic`和移位量`shift`。整数快除算法分为两步计算商。本接口用于第一步计算，生成的参数供SIMT侧快除接口`asc_uintdiv`使用。本接口的计算过程如下：
 
 $$
 \begin{aligned}
@@ -43,7 +43,7 @@ $$
 >
 > 整数快除算法使用方式：
 > 1. 在标量计算逻辑中，调用[asc_get_uintdiv_magic_and_shift](asc_get_uintdiv_magic_and_shift.md)接口，计算除数的`magic`和`shift`值。
-> 2. 在SIMT VF计算逻辑中，调用[asc_uintdiv](../../../../SIMT-API/math_functions/integer_math_functions/asc_uintdiv.md)接口，完成指定被除数的除法运算。
+> 2. 在SIMT VF计算逻辑中，调用`asc_uintdiv`接口，完成指定被除数的除法运算。
 
 ## 函数原型
 
@@ -80,25 +80,20 @@ __aicore__ inline void asc_get_uintdiv_magic_and_shift(uint64_t* magic, uint64_t
 
 完整样例请参考[SIMD与SIMT混合编程实现快速除法算子样例](../../../../../../../examples/05_simd_simt_hybrid/02_best_practices/simd_simt_integer_fast_div/README.md)。
 
--   SIMD与SIMT混合编程场景：
+-   标量侧预计算（同一除数只需计算一次）：
 
     ```cpp
-    #include "kernel_operator.h"
-    #include "simt_api/math_functions.h"
+    #include "c_api/scalar_compute/compute/scalar_bit.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void simt_fast_div(
-        __gm__ uint32_t* output, uint32_t value, uint32_t magic, uint32_t shift)
+    __aicore__ inline void prepare_uintdiv(uint32_t* magic, uint32_t* shift)
     {
-        uint32_t idx = threadIdx.x;
-        output[idx] = asc_uintdiv(value, magic, shift);
+        asc_get_uintdiv_magic_and_shift(magic, shift, static_cast<uint32_t>(7));
+        // magic = 613566757，shift = 3；供后续SIMT计算复用。
     }
 
-    __global__ __vector__ void integer_div_kernel(__gm__ uint32_t* output, uint32_t value, uint32_t divisor)
+    __aicore__ inline void prepare_uintdiv(uint64_t* magic, uint64_t* shift)
     {
-        // 在SIMD侧根据固定除数计算magic和shift，并传递给SIMT侧复用。
-        uint32_t magic = 0;
-        uint32_t shift = 0;
-        asc_get_uintdiv_magic_and_shift(&magic, &shift, divisor);
-        asc_vf_call<simt_fast_div>(dim3(1024), output, value, magic, shift);
+        asc_get_uintdiv_magic_and_shift(magic, shift, static_cast<uint64_t>(7));
+        // magic = 2635249153387078803，shift = 3；供后续SIMT计算复用。
     }
     ```

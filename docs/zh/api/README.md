@@ -2917,7 +2917,6 @@
             -   [\_\_umulhi](SIMT-API/math_functions/integer_math_functions/__umulhi.md)
             -   [\_\_mul64hi](SIMT-API/math_functions/integer_math_functions/__mul64hi.md)
             -   [\_\_umul64hi](SIMT-API/math_functions/integer_math_functions/__umul64hi.md)
-            -   [asc_uintdiv](SIMT-API/math_functions/integer_math_functions/asc_uintdiv.md)
             -   [\_\_mul\_i32toi64](SIMT-API/math_functions/integer_math_functions/__mul_i32toi64.md)
             -   [\_\_brev](SIMT-API/math_functions/integer_math_functions/__brev.md)
             -   [\_\_clz](SIMT-API/math_functions/integer_math_functions/__clz.md)
