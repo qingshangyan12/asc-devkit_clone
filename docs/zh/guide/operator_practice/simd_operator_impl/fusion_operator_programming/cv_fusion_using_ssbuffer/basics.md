@@ -1,7 +1,7 @@
 # 基础知识
 
 >[!NOTE]说明
->学习本节前，请先了解[CV融合算子](../basics.md)以及[地址空间限定符](../../../../../programming_guide/language_extension/simd_builtin_keywords.md#地址空间限定符)。
+>学习本节前，请先了解[CV融合算子](../cv_fusion/basics.md)以及[地址空间限定符](../../../../programming_guide/language_extension/simd_builtin_keywords.md#地址空间限定符)。
 
 ## SSBuffer
 
@@ -41,7 +41,7 @@ SSBuffer容量有限，不用于保存大块中间计算结果，也不能替代
 
 ### 基础 API下获取SSBuffer地址
 
-使用基础API时，通过[`GetSsbufBaseAddr`](../../../../../../api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetSsbufBaseAddr.md)获取SSBuffer基地址。返回值属于`__ssbuf__`地址空间，后续指针必须保留`__ssbuf__`限定，不能作为普通GM地址使用。
+使用基础API时，通过[`GetSsbufBaseAddr`](../../../../../api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetSsbufBaseAddr.md)获取SSBuffer基地址。返回值属于`__ssbuf__`地址空间，后续指针必须保留`__ssbuf__`限定，不能作为普通GM地址使用。
 
 ```cpp
 __ssbuf__ void* base = AscendC::GetSsbufBaseAddr(); // __ssbuf__表示指针指向SSBuffer地址空间。

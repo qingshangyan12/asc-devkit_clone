@@ -5,7 +5,7 @@
 
 下文以基于SSBuffer的AIV/AIC通信算子为例，介绍显式SSBuffer通信的设计和实现过程。该算子在一个`__mix__(1, 2)`任务中启动一个AIC和两个AIV。每个AIV通过自己的环形消息队列发送12条消息，AIC接收消息并将结果写入GM，最后由Host侧逐条校验。
 
-算子的设计过程分为**算子分析、数据流分析、SSBuffer空间规划、通信规则设计、算子实现**五部分。完整代码请参考[SSBuffer AIV/AIC通信C API样例](../../../../../../../../examples/02_simd_c_api/05_best_practices/03_fusion_compute/ssbuf_aiv_aic_comm)。
+算子的设计过程分为**算子分析、数据流分析、SSBuffer空间规划、通信规则设计、算子实现**五部分。完整代码请参考[SSBuffer AIV/AIC通信C API样例](../../../../../../../examples/02_simd_c_api/05_best_practices/03_fusion_compute/ssbuf_aiv_aic_comm)。
 
 ## 算子分析
 
@@ -133,7 +133,7 @@ __aicore__ inline uint32_t make_head(uint32_t sender) // __aicore__表示该函�
 
 ### 核间同步
 
-样例使用[`asc_sync_intra_arrive`](../../../../../../api/SIMD-API/c_api/sync/asc_sync_intra_arrive.md)和[`asc_sync_intra_wait`](../../../../../../api/SIMD-API/c_api/sync/asc_sync_intra_wait.md)。这两个接口属于核间同步，对应模式4，可以在同一AI Core内让AIC与单个AIV互相发送通知。
+样例使用[`asc_sync_intra_arrive`](../../../../../api/SIMD-API/c_api/sync/asc_sync_intra_arrive.md)和[`asc_sync_intra_wait`](../../../../../api/SIMD-API/c_api/sync/asc_sync_intra_wait.md)。这两个接口属于核间同步，对应模式4，可以在同一AI Core内让AIC与单个AIV互相发送通知。
 
 ### 发布和确认顺序
 
@@ -176,7 +176,7 @@ __aicore__ inline __ssbuf__ SsbufWorkspace* get_workspace() // __aicore__表示�
 
 ### 初始化消息队列
 
-SSBuffer中的初始内容不保证为0。核函数入口先调用[`asc_init`](../../../../../../api/SIMD-API/c_api/utils/sys_init/asc_init.md)恢复NPU控制状态，但该接口不会清零SSBuffer，因此仍需要由AIC清理全部16个消息头。
+SSBuffer中的初始内容不保证为0。核函数入口先调用[`asc_init`](../../../../../api/SIMD-API/c_api/utils/sys_init/asc_init.md)恢复NPU控制状态，但该接口不会清零SSBuffer，因此仍需要由AIC清理全部16个消息头。
 
 ```cpp
 __aicore__ inline void init_queues(__ssbuf__ SsbufWorkspace* workspace)
@@ -191,7 +191,7 @@ __aicore__ inline void init_queues(__ssbuf__ SsbufWorkspace* workspace)
 
 ### AIV发送消息
 
-AIV通过[`asc_get_sub_block_id`](../../../../../../api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_id.md)取得Vector核ID，并选择自己的消息队列。发送流程如下：
+AIV通过[`asc_get_sub_block_id`](../../../../../api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_id.md)取得Vector核ID，并选择自己的消息队列。发送流程如下：
 
 ```cpp
 __aicore__ inline void send_messages(__ssbuf__ SsbufWorkspace* workspace, uint32_t sender)

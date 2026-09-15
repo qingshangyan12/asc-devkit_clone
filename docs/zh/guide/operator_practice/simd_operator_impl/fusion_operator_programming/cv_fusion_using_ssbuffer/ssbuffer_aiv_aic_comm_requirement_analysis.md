@@ -27,7 +27,7 @@
 本说明主要依据以下两份材料整理：
 
 - [SSBuffer基础知识](./basics.md)，用于确认SSBuffer的用途、容量、访问限制和推荐的通信顺序。
-- [SSBuffer AIV/AIC通信C API样例](../../../../../../../../examples/02_simd_c_api/05_best_practices/03_fusion_compute/ssbuf_aiv_aic_comm/ssbuf_aiv_aic_comm.asc)，用于还原一套可以落地的消息布局、收发流程和Host侧校验方法。
+- [SSBuffer AIV/AIC通信C API样例](../../../../../../../examples/02_simd_c_api/05_best_practices/03_fusion_compute/ssbuf_aiv_aic_comm/ssbuf_aiv_aic_comm.asc)，用于还原一套可以落地的消息布局、收发流程和Host侧校验方法。
 
 SSBuffer是AI Core内部的物理存储单元。在`__mix__(1, 2)`模式下，一个AIC和两个AIV共享3KB空间。它离AIC和AIV都很近，适合放控制消息，但容量不大，因此需要先划好区域，再约定谁写、谁读、什么时候可以复用。
 
