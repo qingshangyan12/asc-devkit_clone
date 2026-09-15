@@ -70,6 +70,20 @@ protected:
     HcclComm comm_ = nullptr;
 };
 
+TEST_F(AicpuAllocCtxResTest, Mc2ThreadAdapterUsesSimulatorResources)
+{
+    for (const auto engine : {COMM_ENGINE_AICPU, COMM_ENGINE_CPU}) {
+        ThreadHandle threads[2] = {};
+        ASSERT_EQ(Mc2ThreadAcquireWithConfig(comm_, engine, 2, 7, threads), HCCL_SUCCESS);
+        EXPECT_NE(threads[0], 0U);
+        EXPECT_NE(threads[1], 0U);
+        EXPECT_NE(threads[0], threads[1]);
+    }
+    EXPECT_EQ(Mc2ThreadAcquireWithConfig(comm_, COMM_ENGINE_AICPU, 1, 65536U, nullptr), HCCL_E_PARA);
+    ThreadHandle thread = 0;
+    EXPECT_EQ(Mc2ThreadAcquireWithConfig(nullptr, COMM_ENGINE_CPU, 1, 0, &thread), HCCL_E_PTR);
+}
+
 TEST_F(AicpuAllocCtxResTest, CaptureSafeCopyCoversOpParamAndOpResCtx)
 {
     constexpr uint32_t tilingOffset = 64U;
