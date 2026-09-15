@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/vector_compute/compute/vector_permute_sel.h"`。
+
 用于实现16*16的二维矩阵数据块转置。
 
 ## 函数原型
@@ -33,12 +35,6 @@
   ```cpp
     __aicore__ inline void asc_transpose(__ubuf__ int16_t* dst, __ubuf__ int16_t* src)
     __aicore__ inline void asc_transpose(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src)
-  ```
-
-- 同步计算
-  ```cpp
-    __aicore__ inline void asc_transpose_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src)
-    __aicore__ inline void asc_transpose_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src)
   ```
 
 ## 参数说明
@@ -67,7 +63,7 @@ PIPE_V
 
 ```cpp
 // total_length指参与计算的数据总长度
-constexpr int total_length = 256; 
+constexpr int total_length = 256;
 __ubuf__ int16_t dst[total_length];
 __ubuf__ int16_t src[total_length];
 // dst指目的操作数的地址

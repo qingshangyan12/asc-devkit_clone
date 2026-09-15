@@ -26,10 +26,16 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/load/loadalign.h"`。
+
 从Unified Buffer（UB）中32字节对齐的起始地址读取连续数据并进行2倍下采样。接口采用Post Update模式，搬运完成后自动更新源地址指针。
 
 - 当`dst`为矢量数据寄存器时，读取2×VL（512字节）长度数据，保留偶数下标元素后写入VL长度数据。
 - 当`dst`为掩码寄存器时，读取VL/4（64字节）长度数据，保留偶数下标bit后写入VL/8长度数据。
+
+**图1** 下采样搬入掩码寄存器
+
+![](../../figures/capi_loadalign_mask_downsample.png)
 
 本接口仅在AIV上生效，非AIV调用直接返回。
 
@@ -90,7 +96,6 @@ __simd_callee__ inline void asc_loadalign_downsample_postupdate(vector_int16_t& 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash

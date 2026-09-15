@@ -14,7 +14,7 @@
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_EXPERIMENTAL_ASC_GET_PIPE_IDLE_SLOT_COUNT_H
 #endif
 
 #ifndef INCLUDE_C_API_EXPERIMENTAL_ASC_GET_PIPE_IDLE_SLOT_COUNT_H
@@ -28,7 +28,7 @@
 #include "c_api/defs/defs.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_pipe_idle_slot_count_impl.h"
+#include "impl/c_api/reg_base_impl/asc_get_pipe_idle_slot_count_intf_impl.h"
 #endif
 
 __aicore__ inline uint8_t asc_get_pipe_mte2_idle_slot_count();
@@ -45,7 +45,7 @@ __aicore__ inline uint8_t asc_get_pipe_fix_idle_slot_count();
 
 #endif
 
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_EXPERIMENTAL_ASC_GET_PIPE_IDLE_SLOT_COUNT_H)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_EXPERIMENTAL_ASC_GET_PIPE_IDLE_SLOT_COUNT_H
 #endif

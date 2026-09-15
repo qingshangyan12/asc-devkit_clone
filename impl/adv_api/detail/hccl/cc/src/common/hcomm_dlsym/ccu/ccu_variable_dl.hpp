@@ -15,9 +15,9 @@
 #include "ccu_variable.hpp"
 #else
 #include <cstdint>
-#include <type_traits>
 #include "ccu_types_dl.h"
 #include "ccu_utils_dl.hpp"
+#include "hcomm_primitives.h"
 #include "ccu_primitives_impl_dl.h"
 
 namespace AscendC {
@@ -29,10 +29,10 @@ class RemoteAddr;
 template <typename U>
 class Array;
 template <typename T>
-T GetResByChannel(ChannelHandle channel, uint32_t index);
+T GetResByChannel(ChannelHandle channel, uint32_t varIndex);
 
 struct CondExpr {
-    Variable* var;
+    const Variable* var;
     uint64_t imm;
     CcuConditionType cond;
 };
@@ -81,9 +81,9 @@ public:
             *this, that, detail::CcuArithmeticOperatorType::ADDITION);
     }
 
-    CondExpr operator==(uint64_t immediate) { return CondExpr{this, immediate, CCU_CONDITION_EQ}; }
+    CondExpr operator==(uint64_t immediate) const { return CondExpr{this, immediate, CCU_CONDITION_EQ}; }
 
-    CondExpr operator!=(uint64_t immediate) { return CondExpr{this, immediate, CCU_CONDITION_NE}; }
+    CondExpr operator!=(uint64_t immediate) const { return CondExpr{this, immediate, CCU_CONDITION_NE}; }
 
     CcuVariableHandle handle{0};
 
@@ -94,7 +94,7 @@ private:
     friend class LocalAddr;
     friend class RemoteAddr;
     template <typename T>
-    friend T GetResByChannel(ChannelHandle channel, uint32_t index);
+    friend T GetResByChannel(ChannelHandle channel, uint32_t varIndex);
 };
 
 } // namespace ccu

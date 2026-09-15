@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/store/storeunalign.h"`。
+
 将矢量数据寄存器或掩码寄存器中的数据连续搬出到非32字节对齐的Unified Buffer（UB）地址，启用Post Update模式在搬出后自动累加目的地址指针或地址寄存器，便于硬件循环内连续多次调用时无需手动维护目的地址。本接口在Vector Function（`__simd_vf__` 标记的函数）内使用。
 
 针对矢量数据寄存器，本接口提供以下两种模式：
@@ -53,6 +55,7 @@
 ### 立即数偏移搬出模式
 
 ```c
+// 占位符形式
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ <dtype>*& dst,
                                                         vector_store_unalign& unalign_reg,
                                                         vector_<dtype> src,
@@ -75,6 +78,7 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t*& dst,
 ### 地址寄存器偏移搬出模式
 
 ```c
+// 占位符形式
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ <dtype>* dst,
                                                         vector_store_unalign& unalign_reg,
                                                         vector_<dtype> src,
@@ -97,6 +101,7 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t* dst,
 ### 掩码寄存器搬出模式
 
 ```c
+// 占位符形式
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ <dtype>*& dst,
                                                         vector_store_unalign& unalign_reg,
                                                         vector_bool src)
@@ -104,12 +109,12 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ <dtype>*& dst,
 
 #### dtype支持数据类型
 
-`dtype`支持的数据类型为`uint8_t`、`uint16_t`、`uint32_t`。
+`dtype`支持的数据类型为`uint16_t`、`uint32_t`。
 
 #### 函数原型典型示例
 
 ```c
-__simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t*& dst,
+__simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint16_t*& dst,
                                                         vector_store_unalign& unalign_reg,
                                                         vector_bool src)
 ```

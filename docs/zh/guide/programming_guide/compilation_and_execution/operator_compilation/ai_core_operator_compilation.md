@@ -88,6 +88,7 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 ![aicore simt编译流程示意图](../../../figures/aicore_simt_comilation.png)
 
 ## 基本编译命令汇总
+
 |编译方式|AI Core SIMD编译命令| AI Core SIMT编译命令|
 |-|-|-|
 |异构编译| bisheng <source_file>.asc -o \<output_file\> --npu-arch=dav-\<npu architecture\> | bisheng <source_file>.asc -o <output_file> --npu-arch=dav-\<npu architecture\> **--enable-simt**|
@@ -97,6 +98,7 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 
 
 ## 常用的编译选项<a name="ZH-CN_TOPIC_0000002462746461"></a>
+
 | 选项 | 是否必需 | 说明 |
 |------|----------|------|
 | -help | 否 | 查看帮助。 |
@@ -207,7 +209,7 @@ add_executable(demo
 编译AI Core SIMT代码时，需要在编译选项中增加`--enable-simt`，或通过`CMAKE_ASC_ENABLE_SIMT`设置为ON启用SIMT编译模式，示例如下，完整样例请参考：[LINK](../../../../../../examples/03_simt_api/00_introduction/00_quickstart/hello_world_simt)。
 
 ```cmake
-# CMAKE_ASC_ARCHITECTURES：指定NPU架构版本，可通过-DCMAKE_ASC_ARCHITECTURES=dav-xxxx覆盖默认值
+# CMAKE_ASC_ARCHITECTURES：指定NPU架构版本，可通过-DCMAKE_ASC_ARCHITECTURES=dav-xxxx覆盖默认值，需要在find_package(ASC)前设置
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture")
 # CMAKE_ASC_ENABLE_SIMT：启用SIMT编译模式，需要在find_package(ASC)前设置
 set(CMAKE_ASC_ENABLE_SIMT ON)
@@ -244,6 +246,7 @@ add_executable(demo
     )
     ```
 **表1常用的CMAKE配置变量说明**
+
 | 变量名称 | 配置说明 |
 |--|--|
 | CMAKE_BUILD_TYPE | 编译模式选项，可配置为：Release或Debug。Release版本，不包含调试信息，编译最终发布的版本。Debug版本，包含调试信息，便于开发者开发和调试。配置其他值时CMake会发出警告，但不中止构建。 |
@@ -307,10 +310,19 @@ add_executable(demo
   该编译选项用于在没有地址重叠的情况下移除不必要的内存同步指令，以提升性能。针对Ascend 950PR/Ascend 950DT，使用基础API的高维切分计算API时，默认会插入内存同步指令以确保在地址重叠等复杂场景下的数据正确性，但这些同步指令会带来性能开销。在追求极致性能的场景下，如果您可以确定代码在任何情况下都不会发生内存重叠，可以使用此选项。
  <!-- end id12 -->
 
+ <!-- npu="950" id20 -->
+ -   **ASCENDC\_USE\_LEGACY\_PRECISION** 用于控制SIMT API的实现版本，默认开关关闭。针对Ascend 950PR/Ascend 950DT，CANN 9.2.0版本对部分SIMT API的实现做了精度提升。如果您的算子对精度不敏感且发现性能发生劣化，可以开启此宏，让相关SIMT API回退到旧版本实现，以恢复原有性能水平，示例如下：
+     ```shell
+     bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture> -DASCENDC_USE_LEGACY_PRECISION
+     ```
+     仅在Ascend 950PR/Ascend 950DT支持该选项。
+ <!-- end id20 -->
+
 
 ### 内置链接库<a name="section57020345148"></a>
 
 毕昇编译器默认链接的库文件，列表如下：
+
 | 名称 | 作用描述 |
 |------|----------|
 | libascendc_runtime.a | Ascend C算子参数等组装库。 |
@@ -325,6 +337,7 @@ add_executable(demo
 
 ### 高阶API常用链接库
 在使用高阶API时，必须链接以下库，因为这些库是高阶API功能所依赖的。在其他场景下，可以根据具体需求选择是否链接这些库。
+
 |链接库名称|作用描述|使用场景|动态库路径|
 |--|--|--|--|
 |libtiling_api.a|Tiling函数相关库。|使用高阶API相关的Tiling接口时需要链接。|${ASCEND_HOME_PATH}/lib64|

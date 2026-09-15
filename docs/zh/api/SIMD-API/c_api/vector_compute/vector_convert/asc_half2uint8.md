@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/vector_compute/compute/vector_convert.h"`。
+
 将half类型数据转换为uint8_t类型，支持多种舍入模式：
 
 - NONE舍入模式：在转换有精度损失时表示RINT舍入模式，不涉及精度损失时代表不舍入
@@ -69,23 +71,6 @@
     __aicore__ inline void asc_half2uint8_ru(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     // TRUNC舍入模式
     __aicore__ inline void asc_half2uint8_rz(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-    ```
-
-- 同步计算
-
-    ```cpp
-    // NONE舍入模式
-    __aicore__ inline void asc_half2uint8_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
-    // RINT舍入模式
-    __aicore__ inline void asc_half2uint8_rn_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
-    // FLOOR舍入模式
-    __aicore__ inline void asc_half2uint8_rd_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
-    // ROUND舍入模式
-    __aicore__ inline void asc_half2uint8_rna_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
-    // CEIL舍入模式
-    __aicore__ inline void asc_half2uint8_ru_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
-    // TRUNC舍入模式
-    __aicore__ inline void asc_half2uint8_rz_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count)
     ```
 
 ## 参数说明

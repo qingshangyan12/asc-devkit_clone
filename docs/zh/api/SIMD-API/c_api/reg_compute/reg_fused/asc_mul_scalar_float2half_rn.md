@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/compute/reg_fused.h"`。
+
 根据`mask`将源操作数`src`（float类型）按元素与标量`value`相乘后，按照RINT舍入模式转换为half类型，得到计算结果。计算公式如下：
 
 $$
@@ -38,33 +40,41 @@ $$
 
 ```c
 // 通过函数返回值返回结果，数据写入索引为偶数的位置
-__simd_callee__ inline vector_half asc_mul_scalar_float2half_rn(
-    vector_float src, float value, vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+__simd_callee__ inline vector_half asc_mul_scalar_float2half_rn(vector_float src,
+                                                                float value,
+                                                                vector_bool mask,
+                                                                std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 
 // 通过函数返回值返回结果，数据写入索引为奇数的位置
-__simd_callee__ inline vector_half asc_mul_scalar_float2half_rn(
-    vector_float src, float value, vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+__simd_callee__ inline vector_half asc_mul_scalar_float2half_rn(vector_float src,
+                                                                float value,
+                                                                vector_bool mask,
+                                                                std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 
 // 通过引用参数输出结果，数据写入索引为偶数的位置
-__simd_callee__ inline void asc_mul_scalar_float2half_rn(
-    vector_half& dst, vector_float src, float value, vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+__simd_callee__ inline void asc_mul_scalar_float2half_rn(vector_half& dst,
+                                                         vector_float src,
+                                                         float value,
+                                                         vector_bool mask,
+                                                         std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 
 // 通过引用参数输出结果，数据写入索引为奇数的位置
-__simd_callee__ inline void asc_mul_scalar_float2half_rn(
-    vector_half& dst, vector_float src, float value, vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+__simd_callee__ inline void asc_mul_scalar_float2half_rn(vector_half& dst,
+                                                         vector_float src,
+                                                         float value,
+                                                         vector_bool mask,
+                                                         std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 ```
 
 ### 函数原型典型示例
 
 ```c
 // 示例：对float矢量数据寄存器与float标量执行乘法后转换为half类型，结果写入偶数位置
-__simd_callee__ inline void asc_mul_scalar_float2half_rn(
-    vector_half& dst, vector_float src, float value, vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+__simd_callee__ inline void asc_mul_scalar_float2half_rn(vector_half& dst,
+                                                         vector_float src,
+                                                         float value,
+                                                         vector_bool mask,
+                                                         std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 ```
 
 ## 参数说明
@@ -94,16 +104,17 @@ __simd_callee__ inline void asc_mul_scalar_float2half_rn(
 - `mask`掩码位为0时，结果对应元素置0。
 - 当`dst_pos`为`ASC_POSITION_EVEN`时，结果写入`dst`的偶数索引位置，奇数索引位置置0；当`dst_pos`为`ASC_POSITION_ODD`时，结果写入`dst`的奇数索引位置，偶数索引位置置0。
 
-<!-- npu="950" id8 -->
 ## 调用示例
 
 将以下代码保存为`example.asc`后，可通过`bisheng`命令编译运行。其中，`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
+<!-- npu="950" id8 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+<!-- end id8 -->
 
 ```cpp
 #include <cmath>
@@ -191,5 +202,3 @@ int main()
     return passed ? 0 : 1;
 }
 ```
-
-<!-- end id8 -->

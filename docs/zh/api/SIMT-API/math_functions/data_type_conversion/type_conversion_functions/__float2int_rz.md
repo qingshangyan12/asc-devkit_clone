@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/device_functions.h"`。
+
 遵循CAST\_TRUNC模式，将浮点数转换为有符号整数，返回转换后的值。
 
 ## 函数原型
@@ -58,32 +60,39 @@ inline int __float2int_rz(const float x)
 
 无
 
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/device_functions.h`头文件。
-
-```cpp
-#include "simt_api/device_functions.h"
-```
-
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void kernel__float2int_rz(int32_t* dst, float* x)
+    #include "simt_api/device_functions.h"
+
+    __global__ __launch_bounds__(1024) void kernel__float2int_rz(int32_t* dst, float* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __float2int_rz(x[idx]);
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__float2int_rz(__gm__ int32_t* dst, __gm__ float* x)
+    #include "simt_api/device_functions.h"
+
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__float2int_rz(__gm__ int32_t* dst, __gm__ float* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __float2int_rz(x[idx]);
+    }
+
+    __global__ __vector__ void run_kernel__float2int_rz(__gm__ int32_t* dst, __gm__ float* x, uint32_t total_length)
+    {
+        asc_vf_call<kernel__float2int_rz>(dim3(256), dst, x, total_length);
     }
     ```

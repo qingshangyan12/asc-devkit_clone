@@ -42,12 +42,26 @@
         const DstTensor& dst, const SrcTensor& src)
     ```
 
+- 根据源张量和目的张量的存储位置自动推导搬运通路，使用默认trait执行L0C Buffer到L1 Buffer的非量化搬运。
+
+    ```cpp
+    template <typename DstTensor, typename SrcTensor>
+    __aicore__ inline void copy(const DstTensor& dst, const SrcTensor& src)
+    ```
+
 - 执行L0C Buffer到L1 Buffer的量化搬运。
 
     ```cpp
     template <typename Atom, typename DstTensor, typename SrcTensor, typename Quant>
     __aicore__ inline void copy(const copy_atom<Atom>& atom, const DstTensor& dst,
         const SrcTensor& src, const Quant& quant)
+    ```
+
+- 根据源张量和目的张量的存储位置自动推导搬运通路，使用默认trait执行L0C Buffer到L1 Buffer的量化搬运。
+
+    ```cpp
+    template <typename DstTensor, typename SrcTensor, typename Quant>
+    __aicore__ inline void copy(const DstTensor& dst, const SrcTensor& src, const Quant& quant)
     ```
 
 - 按指定源坐标、目的坐标和搬运形状执行非量化搬运。
@@ -60,12 +74,32 @@
         const CopyShape& copy_shape)
     ```
 
+- 根据源张量和目的张量的存储位置自动推导搬运通路，使用默认trait按指定源坐标、目的坐标和搬运形状执行非量化搬运。
+
+    ```cpp
+    template <typename DstTensor, typename SrcTensor, typename DstCoord,
+        typename SrcCoord, typename CopyShape>
+    __aicore__ inline void copy(const DstTensor& dst,
+        const SrcTensor& src, const DstCoord& dst_coord, const SrcCoord& src_coord,
+        const CopyShape& copy_shape)
+    ```
+
 - 按指定源坐标、目的坐标和搬运形状执行量化搬运。
 
     ```cpp
     template <typename Atom, typename DstTensor, typename SrcTensor, typename Quant,
         typename DstCoord, typename SrcCoord, typename CopyShape>
     __aicore__ inline void copy(const copy_atom<Atom>& atom, const DstTensor& dst,
+        const SrcTensor& src, const Quant& quant, const DstCoord& dst_coord,
+        const SrcCoord& src_coord, const CopyShape& copy_shape)
+    ```
+
+- 根据源张量和目的张量的存储位置自动推导搬运通路，使用默认trait按指定源坐标、目的坐标和搬运形状执行量化搬运。
+
+    ```cpp
+    template <typename DstTensor, typename SrcTensor, typename Quant,
+        typename DstCoord, typename SrcCoord, typename CopyShape>
+    __aicore__ inline void copy(const DstTensor& dst,
         const SrcTensor& src, const Quant& quant, const DstCoord& dst_coord,
         const SrcCoord& src_coord, const CopyShape& copy_shape)
     ```
@@ -201,6 +235,7 @@ struct l0c_to_l1_params {
 
 ## 约束说明
 
+- 量化和ReLU参数不能为inf/nan和非规格化数。
 - `dst`必须位于L1 Buffer，`src`必须位于L0C Buffer。
 - Trait和Params的配置需要与数据类型、Layout和量化模式匹配。
 - 使用坐标搬运时，coord和copy_shape需要与对应张量的形状结构匹配，且搬运范围不能越界。

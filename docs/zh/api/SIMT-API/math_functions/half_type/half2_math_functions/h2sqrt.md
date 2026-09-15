@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_fp16.h"`。
+
 获取输入数据x各元素的平方根。
 
 ![](../../../../figures/zh-cn_formulaimage_0000002513334406.png)
@@ -58,34 +60,36 @@ inline half2 h2sqrt(half2 x)
 
 ## 约束说明
 
-本接口支持的输入数据各元素范围为x大于等于0，否则返回值为nan。
-
-## 需要包含的头文件
-
-使用half2类型接口需要包含`simt_api/asc_fp16.h`头文件。
-
-```cpp
-#include "simt_api/asc_fp16.h"
-```
+本接口支持的输入数据各元素范围为`x`大于等于0，否则在非饱和模式下返回值为`nan`。
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelSqrt(half2* dst, half2* x)
+    #include "simt_api/asc_fp16.h"
+
+    __global__ __launch_bounds__(1024) void kernel_sqrt(half2* dst, half2* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = h2sqrt(x[idx]);
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void KernelSqrt(__gm__ half2* dst, __gm__ half2* x)
+    #include "simt_api/asc_fp16.h"
+
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_sqrt(__gm__ half2* dst, __gm__ half2* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = h2sqrt(x[idx]);
     }
     ```

@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/cube_compute/cube_compute.h"`。
+
 本接口用于设置HF32模式舍入方式，使用该接口前需要先使用[asc_enable_hf32](asc_enable_hf32.md)开启HF32模式。
 
 ## 函数原型
@@ -56,16 +58,17 @@ PIPE_S
 - 本接口配置的舍入模式仅在HF32模式开启期间生效，需先开启HF32模式再调用本接口，否则舍入模式配置不产生实际作用。
 - 舍入模式配置后会持续生效，HF32模式关闭后再次开启仍将沿用上次的舍入模式配置，如需切换舍入模式，请重新调用本接口。
 
-<!-- npu="950" id8 -->
 ## 调用示例
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
+<!-- npu="950" id8 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+<!-- end id8 -->
 
 以下调用示例代码仅Ascend 950PR/Ascend 950DT产品支持。
 
@@ -155,4 +158,3 @@ int main()
     return passed ? 0 : 1;
 }
 ```
-<!-- end id8 -->

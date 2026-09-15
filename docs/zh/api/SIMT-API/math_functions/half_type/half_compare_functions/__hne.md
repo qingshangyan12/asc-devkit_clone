@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_fp16.h"`。
+
 比较两个half类型数据是否不相等，不相等时返回true。
 
 ## 函数原型
@@ -48,9 +50,9 @@ bool __hne(half x, half y)
 
 | x值 | y值 | 返回值 |
 | --- | --- | --- |
-| nan | 任意值 | true |
-| 任意值 | nan | true |
-| nan | nan | true |
+| nan | 任意值 | false |
+| 任意值 | nan | false |
+| nan | nan | false |
 | 0 | -0 | false |
 | -0 | 0 | false |
 | inf | inf | false |
@@ -61,32 +63,34 @@ bool __hne(half x, half y)
 
 无
 
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/asc_fp16.h`头文件。
-
-```cpp
-#include "simt_api/asc_fp16.h"
-```
-
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelHne(bool* dst, half* x, half* y)
+    #include "simt_api/asc_fp16.h"
+
+    __global__ __launch_bounds__(1024) void kernel_hne(bool* dst, half* x, half* y, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __hne(x[idx], y[idx]);
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void KernelHne(__gm__ bool* dst, __gm__ half* x, __gm__ half* y)
+    #include "simt_api/asc_fp16.h"
+
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_hne(__gm__ bool* dst, __gm__ half* x, __gm__ half* y, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __hne(x[idx], y[idx]);
     }
     ```

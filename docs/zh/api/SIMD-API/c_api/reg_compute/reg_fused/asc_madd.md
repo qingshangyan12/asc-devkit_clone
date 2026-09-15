@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/compute/reg_fused.h"`。
+
 根据`mask`对目的操作数`dst`与源操作数`src0`按元素相乘后，与源操作数`src1`中的对应元素相加，将结果写入`dst`。其中，`dst`既作为输入参与计算，又用于存储最终结果。计算公式如下：
 
 $$
@@ -79,14 +81,15 @@ __simd_callee__ inline void asc_madd(vector_float& dst,
 
 ## 调用示例
 
-<!-- npu="950" id8 -->
 将以下代码保存为`example.asc`后，可通过`bisheng`命令编译运行。其中，`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
+<!-- npu="950" id8 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+<!-- end id8 -->
 
 ```cpp
 #include <cmath>
@@ -190,5 +193,3 @@ int main()
     return passed ? 0 : 1;
 }
 ```
-
-<!-- end id8 -->

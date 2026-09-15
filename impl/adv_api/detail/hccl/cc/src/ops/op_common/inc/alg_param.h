@@ -19,6 +19,7 @@
 #include <functional>
 #include <functional>
 #include <memory>
+#include <type_traits>
 #include "ccu_datatype_v1.h"
 #include "hccl_comm.h"
 #include "hccl_common.h"
@@ -31,6 +32,7 @@
 #include "binary_stream.h"
 #include "hccl_ccu_res_dl.h"
 #include "ccu_types.h"
+#include "acl_base_rt.h"
 
 namespace mc2_ops_hccl {
 
@@ -401,15 +403,28 @@ static_assert(
 static_assert(
     sizeof(CcuFastLaunchCtx) % alignof(ThreadHandle) == 0, "CcuFastLaunchCtx must preserve ThreadHandle alignment");
 
+struct ParallelChannelPortInfo {
+    bool isValid = false;
+    bool isInterPod = false;
+    uint64_t intraPortGroupSize = 0;
+    uint64_t interPortGroupSize = 0;
+};
+
+static_assert(
+    std::is_trivially_copyable<ParallelChannelPortInfo>::value,
+    "ParallelChannelPortInfo must be trivially copyable for serialization");
+
 // A5用了cntNotify
 struct AlgResourceRequest {
     double dieSplitRatio = 0.0;
+    ParallelChannelPortInfo parallelPortInfo;
     u32 notifyNumOnMainThread = 0;
     u32 slaveThreadNum = 0;
     std::vector<u32> notifyNumPerThread;
     std::vector<std::vector<HcclChannelDesc>> channels;
     std::vector<CcuKernelInfo> ccuKernelInfos;
     std::vector<u32> ccuKernelNum;
+    std::vector<ChannelHandle> acquiredChannels;
 };
 
 struct SubCommInfo {
@@ -501,6 +516,7 @@ struct AlgResourceCtxSerializable {
     // ccu的
     std::vector<u32> ccuKernelNum;
     std::vector<CcuKernelHandle> ccuKernels;
+    ParallelChannelPortInfo parallelPortInfo;
     u32 topoInfoSeqSize = 0;
     TopoInfoWithNetLayerDetails topoInfo; // 提取的拓扑信息
     std::vector<uint64_t> kfcServerArgs;  // kfc server算子入参
@@ -532,6 +548,7 @@ struct AlgResourceCtxSerializable {
         binaryStream << ccuKernelNum;
         binaryStream << ccuKernels;
         binaryStream << dieSplitRatio;
+        binaryStream << parallelPortInfo;
         binaryStream << kfcServerArgs;
         binaryStream << kfcServerArgSize;
         std::vector<char> seq = topoInfo.Serialize();
@@ -570,6 +587,7 @@ struct AlgResourceCtxSerializable {
         binaryStream >> ccuKernelNum;
         binaryStream >> ccuKernels;
         binaryStream >> dieSplitRatio;
+        binaryStream >> parallelPortInfo;
         binaryStream >> kfcServerArgs;
         binaryStream >> kfcServerArgSize;
         binaryStream >> topoInfoSeqSize;
@@ -654,6 +672,7 @@ struct OpParam { // 不申请ctx，每个算子单独下发
             void* recvCounts;
             void* sdispls;
             void* rdispls; // 指向变长区指针
+            void* peerRdispls;
         } all2AllVDataDes;
         struct {
             HcclDataType sendType;
@@ -684,8 +703,9 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     ThreadHandle deviceOrderThread = 0;     // device侧保序流
     u64 varMemSize{0};
     u8 varData[0];
-    u64 ccuKfcArgs[4];  // 测试，ccu-kfc作为通信算子
-    bool isKfc = false; // 标记是否使用KFC Server kernel
+    u64 ccuKfcArgs[4];     // 测试，ccu-kfc作为通信算子
+    bool isKfc = false;    // 标记是否使用KFC Server kernel
+    bool checkRes = false; // 仅校验资源是否充足，不实际下发
 };
 
 struct AlgDesc {

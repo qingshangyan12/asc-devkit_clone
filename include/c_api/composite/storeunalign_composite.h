@@ -14,7 +14,7 @@
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_COMPOSITE_STOREUNALIGN_COMPOSITE_H
 #endif
 
 #ifndef INCLUDE_C_API_COMPOSITE_STOREUNALIGN_COMPOSITE_H
@@ -22,7 +22,7 @@
 #include "c_api/defs/defs.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl.h"
+#include "impl/c_api/reg_base_impl/storeunalign_composite_intf_impl.h"
 #endif
 
 __simd_callee__ inline void asc_store(__ubuf__ int8_t* dst, vector_int8_t src);
@@ -71,6 +71,8 @@ __simd_callee__ inline void asc_store(__ubuf__ int32_t* dst, vector_int32_t src,
 
 __simd_callee__ inline void asc_store(__ubuf__ uint32_t* dst, vector_uint32_t src, uint32_t count);
 
+__simd_callee__ inline void asc_store(__ubuf__ half* dst, vector_half src, uint32_t count);
+
 __simd_callee__ inline void asc_store(__ubuf__ float* dst, vector_float src, uint32_t count);
 
 __simd_callee__ inline void asc_store(__ubuf__ int64_t* dst, vector_int64_t src, uint32_t count);
@@ -93,7 +95,7 @@ __simd_callee__ inline void asc_store(__ubuf__ int4b_t* dst, vector_int4x2_t src
 
 #endif
 
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_COMPOSITE_STOREUNALIGN_COMPOSITE_H)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_COMPOSITE_STOREUNALIGN_COMPOSITE_H
 #endif

@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/composite/vector_compute_composite.h"`。
+
 该接口废弃，请通过[asc_abs](../vector_compute/vector_arith/asc_abs.md)和同步接口[asc_sync](../sync/asc_sync.md)实现精细化调优，达成最优性能。
 
 按元素取绝对值，计算公式如下：
@@ -72,5 +74,5 @@ PIPE_V
 constexpr uint32_t total_length = 128;
 __ubuf__ half src[total_length];
 __ubuf__ half dst[total_length];
-asc_abs(dst, src, total_length);
+asc_abs_sync(dst, src, total_length);
 ```

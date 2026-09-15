@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_fp16.h"`。
+
 指定输入x，获取2的x次方。
 
 ![](../../../../figures/zh-cn_formulaimage_0000002533360279.png)
@@ -45,45 +47,48 @@ inline half hexp2(half x)
 
 ## 返回值说明
 
-2的x次方。特殊值如下：
+2的x次方。本接口受全局饱和寄存器的影响，特殊值如下：
 
-| x值 | 返回值 |
-| --- | --- |
-| inf | inf |
-| -inf | 0 |
-| nan | nan |
-| x>ASCRT\_MAX\_NORMAL\_F | inf |
+| x值 | 非饱和模式返回值 | 饱和模式返回值 |
+| --- | --- | --- |
+| ±0 | 1 | 1 |
+| inf | inf | ASCRT\_MAX\_NORMAL\_FP16 |
+| -inf | 0 | 0 |
+| nan | nan | 0 |
+| 其他 | 2的x次方，当结果超出half最大有限值时，结果为inf | 2的x次方，当结果超出half最大有限值时，结果为ASCRT\_MAX\_NORMAL\_FP16 |
 
 ## 约束说明
 
 无
 
-## 需要包含的头文件
-
-使用half类型接口需要包含`simt_api/asc_fp16.h`头文件。
-
-```cpp
-#include "simt_api/asc_fp16.h"
-```
-
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelExp2(half* dst, half* x)
+    #include "simt_api/asc_fp16.h"
+
+    __global__ __launch_bounds__(1024) void kernel_exp2(half* dst, half* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = hexp2(x[idx]);
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void KernelExp2(__gm__ half* dst, __gm__ half* x)
+    #include "simt_api/asc_fp16.h"
+
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_exp2(__gm__ half* dst, __gm__ half* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = hexp2(x[idx]);
     }
     ```

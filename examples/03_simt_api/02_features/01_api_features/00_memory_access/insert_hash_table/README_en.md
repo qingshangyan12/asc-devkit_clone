@@ -103,14 +103,10 @@ When a hash collision occurs, a thread needs to determine whether the key stored
 - Operator Specifications:  
   <table>
   <tr><td rowspan="1" align="center">OpType</td><td colspan="4" align="center">insert_hash_table</td></tr>
-  </tr>
   <tr><td rowspan="3" align="center">Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">keys</td><td align="center">[1,N]</td><td align="center">int64_t</td><td align="center">ND</td></tr>
   <tr><td align="center">values</td><td align="center">[N,M]</td><td align="center">float</td><td align="center">ND</td></tr>
-  </tr>
-  </tr>
   <tr><td rowspan="1" align="center">Output</td><td align="center">table_addr</td><td align="center">[1,Z]</td><td align="center">Bucket</td><td align="center">ND</td></tr>
-  </tr>
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">insert_hash_table</td></tr>
   </table>
 
@@ -141,10 +137,20 @@ Run the following steps in the root directory of this example to build and execu
   ./demo                        # Run the example
   ```
 
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+
   Build Options Description
 
   | Option | Values | Description |
   |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
 
   The following output indicates that the accuracy verification is successful.

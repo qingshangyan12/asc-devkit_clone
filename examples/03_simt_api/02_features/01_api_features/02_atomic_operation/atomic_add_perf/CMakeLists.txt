@@ -10,12 +10,13 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-find_package(ASC REQUIRED)
+set(SCENARIO_NUM "1" CACHE STRING "Scenario number (1-16)")
+set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU ARCH, e.g. dav-3510")
+set(CMAKE_ASC_ENABLE_SIMT ON)
 
+find_package(ASC REQUIRED)
 project(atomic_add_perf LANGUAGES ASC CXX)
 
-set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU ARCH, e.g. dav-3510")
-set(SCENARIO_NUM "1" CACHE STRING "Scenario number (1-16)")
 option(SKIP_VALIDATION "Skip result validation for replay-based profiling tools" OFF)
 
 if(NOT SCENARIO_NUM MATCHES "^([1-9]|1[0-6])$")
@@ -29,10 +30,6 @@ add_executable(atomic_add_perf
 target_compile_definitions(atomic_add_perf PRIVATE
     SCENARIO_NUM=${SCENARIO_NUM}
     SKIP_VALIDATION=$<BOOL:${SKIP_VALIDATION}>
-)
-
-target_compile_options(atomic_add_perf PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES} --enable-simt>
 )
 
 target_link_libraries(atomic_add_perf PRIVATE

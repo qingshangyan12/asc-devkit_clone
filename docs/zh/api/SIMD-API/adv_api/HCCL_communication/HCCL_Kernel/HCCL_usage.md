@@ -75,6 +75,7 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
     **表1**  HcclDataType参数说明
 
     <a name="table116710585514"></a>
+
     | 数据类型 | 说明 |
     | --- | --- |
     | HcclDataType | HCCL任务的数据类型。HcclDataType为枚举类型，定义如下代码所示。<br>    HCCL_DATA_TYPE_INT8：int8 <br>    HCCL_DATA_TYPE_INT16：int16 <br>    HCCL_DATA_TYPE_INT32：int32 <br>    HCCL_DATA_TYPE_FP16： half或float16 <br>    HCCL_DATA_TYPE_FP32： float <br>    HCCL_DATA_TYPE_INT64：int64 <br>    HCCL_DATA_TYPE_UINT64：uint64 <br>    HCCL_DATA_TYPE_UINT8：uint8 <br>    HCCL_DATA_TYPE_UINT16：uint16 <br>    HCCL_DATA_TYPE_UINT32：uint32 <br>    HCCL_DATA_TYPE_FP64：float64 <br>    HCCL_DATA_TYPE_BFP16：bfloat16 <br>    HCCL_DATA_TYPE_INT128：int128，预留类型，暂不支持 <br>    HCCL_DATA_TYPE_HIF8：hif8 <br>    HCCL_DATA_TYPE_FP8E4M3：fp8e4m3 <br>    HCCL_DATA_TYPE_FP8E5M2：fp8e5m2 <br>    HCCL_DATA_TYPE_FP8E8M0：fp8e8m0 <br>    HCCL_DATA_TYPE_RESERVED：暂不支持使用  |
@@ -105,6 +106,7 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
     **表2**  HcclReduceOp参数说明
 
     <a name="table2469980529"></a>
+
     | 数据类型 | 说明 |
     | --- | --- |
     | HcclReduceOp | Reduce操作类型。HcclReduceOp为枚举类型，定义如下代码所示。<br> HCCL_REDUCE_SUM：sum <br>    HCCL_REDUCE_PROD：prod <br>    HCCL_REDUCE_MAX：max <br>    HCCL_REDUCE_MIN：min <br>    HCCL_REDUCE_RESERVED：暂不支持使用 |
@@ -249,4 +251,4 @@ extern "C" __global__ __aicore__ void reduce_scatter_custom(
 | --- | --- |
 | MC2_BUFFER_LOCATION | 预留参数。计算和通信中间结果的Buffer存放位置。用户在Tiling侧可设置该字段。 |
 
-提示：调试含有HCCL高阶API的算子时，在算子编译工程中增加编译选项-DASCENDC\_DEBUG，可以开启异常场景拦截的能力，具体内容请参考并使用[assert接口](../../../basic_api/debug_interface/exception_detection/assert.md)。
+提示：调试含有HCCL高阶API的算子时，在算子编译工程中增加编译选项-DASCENDC\_DEBUG，可以开启异常场景拦截的能力，具体内容请参考并使用[assert接口](../../../../Utils-API/tuning_interface/assert.md)。

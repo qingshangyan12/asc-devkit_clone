@@ -170,7 +170,7 @@ __global__ void reduce_block_tile(const int32_t* input, int32_t* output, int32_t
 
 The performance data of the three cases is listed below:
 
-| Case | Threads in the reduction | Halving rounds | Synchronization count and scope | Task Duration(us) |
+| Case | Threads in the reduction | Halving rounds | Synchronization count and scope | Task Duration(μs) |
 | :--: | :----: | :--: | :--: | :-----------------: |
 | Cross-block reduction | 4096 | 12 | 24 grid-level | 16.101 |
 | Whole-block reduction | 1024 | 10 | 20 block-level | 3.514 |
@@ -209,10 +209,20 @@ Run the following steps in the root directory of this example to build and execu
   ./cooperative_groups 2                                  # Run the warp-internal reduction case
   ```
 
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+
 - Build Options Description
 
   | Option | Values | Description |
   |---------------------------|------------|---------------------------------------------------|
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
 
 

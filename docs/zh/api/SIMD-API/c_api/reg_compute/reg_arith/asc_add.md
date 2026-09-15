@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/compute/reg_arith.h"`。
+
 该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求和操作，将结果写入目的操作数`dst`。
 
 Carry flag（进位/借位标志）用于表示加法进位或者减法无借位。该接口可以在`carry`（掩码寄存器）中标记每次加法是否产生进位，若`src0`，`src1`输入按位相加后最高位有进位，在`carry`中对应位置每4bit的最低位写1，否则写0。
@@ -50,16 +52,16 @@ $$
 
 ## 函数原型
 
-### 无进位输出加法（占位符形式）
+### 无进位输出加法
 
 ```c
-// 通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_add(vector_<dtype>& dst,
                                     vector_<dtype> src0,
                                     vector_<dtype> src1,
                                     vector_bool mask)
 
-// 通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_add(vector_<dtype> src0,
                                               vector_<dtype> src1,
                                               vector_bool mask)
@@ -84,7 +86,7 @@ __simd_callee__ inline vector_float asc_add(vector_float src0,
                                             vector_bool mask)
 ```
 
-### 带进位输出加法（占位符形式）
+### 带进位输出加法
 
 ```c
 __simd_callee__ inline void asc_add(vector_bool& carry,

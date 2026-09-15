@@ -14,7 +14,7 @@
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_CUBE_COMPUTE_CUBE_COMPUTE_H
 #endif
 
 #ifndef INCLUDE_C_API_CUBE_COMPUTE_CUBE_COMPUTE_H
@@ -22,19 +22,12 @@
 #include "c_api/defs/defs.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-
-#include "impl/c_api/instr_impl/npu_arch_2201/cube_compute_impl.h"
-
+#include "impl/c_api/memory_base_impl/cube_compute_intf_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-
-#include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl.h"
-
+#include "impl/c_api/reg_base_impl/cube_compute_intf_impl.h"
 #endif
 
 #include "c_api/composite/cube_compute_composite.h"
-
-__aicore__ inline void asc_set_l0c_copy_config(
-    uint64_t relu_pre_addr, uint64_t quant_pre_addr, bool is_clean_unit_flag);
 
 __aicore__ inline void asc_mmad(
     __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ bfloat16_t* b_matrix, uint16_t m, uint16_t k,
@@ -119,8 +112,6 @@ __aicore__ inline void asc_enable_hf32_trans(uint32_t mode);
 __aicore__ inline void asc_enable_hf32();
 __aicore__ inline void asc_disable_hf32();
 __aicore__ inline void asc_set_fp32_mode();
-__aicore__ inline void asc_set_l0c_copy_nz_para(
-    uint16_t matrix_num, uint16_t src_nz_matrix_stride, uint32_t dst_matrix_stride);
 // ==========mmad_mx(e1m2/e1m2, e4m3/e5m2)==========
 __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __cb__ fp4x2_e1m2_t* b_matrix, uint16_t m, uint16_t k,
@@ -273,13 +264,83 @@ __aicore__ inline void asc_mmad(
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val);
 
+// ==========mmad with bias==========
+__aicore__ inline void asc_mmad(
+    __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ bfloat16_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv);
+
+__aicore__ inline void asc_mmad(
+    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv);
+
+__aicore__ inline void asc_mmad(
+    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv);
+
+__aicore__ inline void asc_mmad(
+    __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv);
+
+__aicore__ inline void asc_mmad(
+    __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv);
+
+__aicore__ inline void asc_mmad(
+    __cc__ float* c_matrix, __ca__ half* a_matrix, __cb__ half* b_matrix, uint64_t bias, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv);
+
+__aicore__ inline void asc_mmad(
+    __cc__ float* c_matrix, __ca__ float* a_matrix, __cb__ float* b_matrix, uint64_t bias, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv);
+
+__aicore__ inline void asc_mmad(
+    __cc__ int32_t* c_matrix, __ca__ int8_t* a_matrix, __cb__ int8_t* b_matrix, uint64_t bias, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv);
+
+__aicore__ inline void asc_mmad(
+    __cc__ float* c_matrix, __ca__ hifloat8_t* a_matrix, __cb__ hifloat8_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv);
+
+// ==========mmad_mx with bias==========
+__aicore__ inline void asc_mmad_mx(
+    __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __cb__ fp4x2_e1m2_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv);
+
+__aicore__ inline void asc_mmad_mx(
+    __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __cb__ fp4x2_e2m1_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv);
+
+__aicore__ inline void asc_mmad_mx(
+    __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, __cb__ fp4x2_e1m2_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv);
+
+__aicore__ inline void asc_mmad_mx(
+    __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, __cb__ fp4x2_e2m1_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv);
+
+__aicore__ inline void asc_mmad_mx(
+    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv);
+
+__aicore__ inline void asc_mmad_mx(
+    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv);
+
+__aicore__ inline void asc_mmad_mx(
+    __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv);
+
+__aicore__ inline void asc_mmad_mx(
+    __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv);
+
 __aicore__ inline void asc_enable_hif8();
 __aicore__ inline void asc_enable_fp8();
 
 #endif
 
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_CUBE_COMPUTE_CUBE_COMPUTE_H)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_CUBE_COMPUTE_CUBE_COMPUTE_H
 
 #endif

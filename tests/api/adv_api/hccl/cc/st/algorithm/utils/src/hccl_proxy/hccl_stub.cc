@@ -393,6 +393,29 @@ HcclResult HcclChannelAcquire(
         simComm->GetIdentifier(), channelTag.c_str(), engine, channelDescList, listNum, channelList);
 }
 
+HcclResult HcclChannelQuery(
+    HcclComm comm, CommEngine engine, const HcclChannelDesc* channelDescList, uint32_t listNum,
+    ChannelHandle* channelList)
+{
+    CHK_PTR_NULL(comm);
+    (void)engine;
+    for (uint32_t i = 0; i < listNum; i++) {
+        channelList[i] = 0; // 全部视为新建
+    }
+    return HCCL_SUCCESS;
+}
+
+HcclResult HcclChannelDestroy(HcclComm comm, const ChannelHandle* channels, uint32_t channelNum)
+{
+    CHK_PTR_NULL(comm);
+    (void)channels;
+    (void)channelNum;
+    return HCCL_SUCCESS;
+}
+
+bool HcommIsSupportHcclChannelQuery() { return true; }
+bool HcommIsSupportHcclChannelDestroy() { return true; }
+
 HcclResult HcclEngineCtxCreate(HcclComm comm, const char* ctxTag, CommEngine engine, uint64_t size, void** ctx)
 {
     auto simComm = static_cast<HcclSim::SimCommunicator*>(comm);
@@ -927,6 +950,12 @@ int32_t HcommWaitResponse(uint64_t handle, void* dst, size_t sizeByte, uint32_t*
 HcclResult HcclChannelGetRemoteMems(
     HcclComm comm, ChannelHandle channel, uint32_t* memNum, CommMem** remoteMems, char*** memTags)
 {
+    CHK_PTR_NULL(memNum);
+    CHK_PTR_NULL(remoteMems);
+    CHK_PTR_NULL(memTags);
+    *memNum = 0U;
+    *remoteMems = nullptr;
+    *memTags = nullptr;
     HCCL_WARNING("[%s] not support.", __func__);
     return HCCL_SUCCESS;
 }

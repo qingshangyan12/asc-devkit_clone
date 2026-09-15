@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/compute/reg_compare.h"`。
+
 根据`mask`将源操作数`src`按元素与标量`value`进行二进制比较，若$src_i = value$则计算结果对应位为1，否则为0。计算结果作为返回值返回或写入目的操作数`dst`，每个元素的比较结果占一个bit。计算公式如下：
 
 $$
@@ -41,12 +43,12 @@ $$
 ## 函数原型
 
 ```c
-// 通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_bool asc_eq_scalar(vector_<dtype> src,
                                                  <dtype> value,
                                                  vector_bool mask)
 
-// 通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_eq_scalar(vector_bool& dst,
                                           vector_<dtype> src,
                                           <dtype> value,

@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/cube_datamove/cube_datamove.h"`。
+
 将数据从Global Memory搬运到L1 Buffer，并在搬运过程中进行DN到Nz格式的转换，使其满足后续矩阵计算对分形列连续性的要求。
 
 进行DN2Nz格式搬运前，需先通过[asc_set_gm2l1_nz_para](asc_set_gm2l1_nz_para.md)接口配置DN2Nz搬运的目的Nz矩阵步长与DN矩阵搬运个数。
@@ -51,14 +53,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(__cbuf__ <dtype>* dst,
                                             uint32_t d_value,
                                             uint64_t loop4_src_stride,
                                             bool smallc0_en)
-__aicore__ inline void asc_copy_gm2l1_dn2nz_sync(__cbuf__ <dtype>* dst,
-                                                 __gm__ <dtype>* src,
-                                                 uint64_t loop1_src_stride,
-                                                 uint8_t l2_cache_ctl,
-                                                 uint16_t n_value,
-                                                 uint32_t d_value,
-                                                 uint64_t loop4_src_stride,
-                                                 bool smallc0_en)
 ```
 
 ### dtype支持的数据类型

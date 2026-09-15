@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/compute/reg_permute_sel.h"`。
+
 将两个源操作数矢量数据寄存器中的数据交织后分别写入两个目的矢量数据寄存器。根据操作数类型，本接口提供两种功能模式：
 
 - **操作数为矢量数据寄存器：** 以元素为单位进行交织。`src0`和`src1`前半部分的元素依次交替写入`dst0`，后半部分的元素依次交替写入`dst1`。以`int8_t`类型为例，交织过程如下图所示。
@@ -42,6 +44,7 @@
 ### 矢量数据寄存器交织模式
 
 ```c
+// 占位符形式
 __simd_callee__ inline void asc_intlv(vector_<dtype>& dst0,
                                       vector_<dtype>& dst1,
                                       vector_<dtype> src0,

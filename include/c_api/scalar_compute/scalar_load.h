@@ -14,7 +14,7 @@
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_SCALAR_COMPUTE_SCALAR_LOAD_H
 #endif
 
 #ifndef INCLUDE_C_API_SCALAR_COMPUTE_SCALAR_LOAD_H
@@ -22,10 +22,8 @@
 
 #include "c_api/defs/defs.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-#include "impl/c_api/instr_impl/npu_arch_2201/scalar_compute_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl.h"
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#include "impl/c_api/reg_base_impl/scalar_load_intf_impl.h"
 #endif
 
 __aicore__ inline int8_t asc_load_dev(__gm__ int8_t* addr);
@@ -39,7 +37,7 @@ __aicore__ inline uint64_t asc_load_dev(__gm__ uint64_t* addr);
 
 #endif
 
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_SCALAR_COMPUTE_SCALAR_LOAD_H)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_SCALAR_COMPUTE_SCALAR_LOAD_H
 #endif

@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/compute/reg_arith.h"`。
+
 根据`mask`对源操作数`src`按元素取相反数，并将结果作为返回值返回或写入目的操作数`dst`。
 
 计算公式如下：
@@ -39,11 +41,11 @@ $$
 ## 函数原型
 
 ```c
-// 通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_neg(vector_<dtype> src,
                                               vector_bool mask)
 
-// 通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_neg(vector_<dtype>& dst,
                                     vector_<dtype> src,
                                     vector_bool mask)

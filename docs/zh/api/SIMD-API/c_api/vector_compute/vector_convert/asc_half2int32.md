@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/vector_compute/compute/vector_convert.h"`。
+
 将half类型转化为int32_t类型，并支持多种舍入模式：
 
 * RINT舍入模式：四舍六入五成双舍入
@@ -33,13 +35,12 @@
 * FLOOR舍入模式：向负无穷舍入
 * CEIL舍入模式：向正无穷舍入
 * TRUNC舍入模式：向零舍入
-  
-  
+
 
 ## 函数原型
 
 * 前n个数据计算
-  
+
   ```cpp
   //RINT舍入模式
   __aicore__ inline void asc_half2int32_rn(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t count)
@@ -54,7 +55,7 @@
   ```
 
 - 高维切分计算
-  
+
   ```cpp
   //RINT舍入模式
   __aicore__ inline void asc_half2int32_rn(__ubuf__ int32_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
@@ -66,21 +67,6 @@
   __aicore__ inline void asc_half2int32_ru(__ubuf__ int32_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
   //TRUNC舍入模式
   __aicore__ inline void asc_half2int32_rz(__ubuf__ int32_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-  ```
-
-- 同步计算
-  
-  ```cpp
-  //RINT舍入模式
-  __aicore__ inline void asc_half2int32_rn_sync(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t count)
-  //ROUND舍入模式
-  __aicore__ inline void asc_half2int32_rna_sync(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t count)
-  //FLOOR舍入模式
-  __aicore__ inline void asc_half2int32_rd_sync(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t count)
-  //CEIL舍入模式
-  __aicore__ inline void asc_half2int32_ru_sync(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t count)
-  //TRUNC舍入模式
-  __aicore__ inline void asc_half2int32_rz_sync(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t count)
   ```
 
 ## 参数说明

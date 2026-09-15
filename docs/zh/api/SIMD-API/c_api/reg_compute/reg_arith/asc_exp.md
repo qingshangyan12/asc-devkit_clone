@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/compute/reg_arith.h"`。
+
 该接口根据mask，对源操作数src进行按元素求自然指数操作，将结果写入目的操作数dst。
 
 计算公式如下：
@@ -33,15 +35,15 @@ $$
 dst_i = e^{src_i}
 $$
 
-## 函数原型（占位符形式）
+## 函数原型
 
 ```c
-// 通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_exp(vector_<dtype>& dst,
                                     vector_<dtype> src,
                                     vector_bool mask)
 
-// 通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_exp(vector_<dtype> src,
                                               vector_bool mask)
 ```

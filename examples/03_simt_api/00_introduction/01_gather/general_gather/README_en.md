@@ -10,7 +10,7 @@ This example implements a generalized shape Gather operator based on the Ascend 
 
 ## Supported CANN Software Versions
 
-- \>= CANN 9.0.0
+- \>= CANN 9.1.0
 
 ## Directory Structure
 
@@ -116,6 +116,7 @@ This example implements a generalized shape Gather operator based on the Ascend 
   <tr><td rowspan="1" align="center">Operator Output</td><td align="center">output</td><td align="center">[128,2048,512]</td><td align="center">float</td><td align="center">ND</td><td align="center">output tensor after collection</td></tr>
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="5" align="center">gather_custom_v2</td></tr>
   </table>
+
 - Constraint Description:
   * indices: The first batch_dims dimensions of indices must match the first batch_dims dimensions of input, that is, indices.shape[0:batch_dims] = input.shape[0:batch_dims]
   * axis: The collection dimension axis cannot be less than batch_dims and must be less than the number of dimensions of input, that is, batch_dims <= axis < input.rank
@@ -158,10 +159,20 @@ Execute the following steps in the root directory of this example to compile and
   ./gather_v2                   # Execute the example
   ```
 
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+
   Compilation Option Description
 
   | Option | Available Values | Description |
   |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution or NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU Architecture: This example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
 
   The execution result is as follows, indicating that the accuracy comparison succeeds:

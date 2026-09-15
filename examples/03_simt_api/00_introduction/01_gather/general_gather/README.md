@@ -10,7 +10,7 @@
 
 ## 支持的CANN软件版本
 
-- \>= CANN 9.0.0
+- \>= CANN 9.1.0
 
 ## 目录结构介绍
 
@@ -116,6 +116,7 @@
   <tr><td rowspan="1" align="center">算子输出</td><td align="center">output</td><td align="center">[128,2048,512]</td><td align="center">float</td><td align="center">ND</td><td align="center">收集后的输出张量</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">gather_custom_v2</td></tr>
   </table>
+
 - 约束说明：
   * indices：indices的前batch_dims维必须与input的前batch_dims维相同，即indices.shape[0:batch_dims] = input.shape[0:batch_dims]
   * axis：收集维度axis不能小于batch_dims，且必须小于input的维度数，即batch_dims <= axis < input.rank
@@ -158,10 +159,20 @@
   ./gather_v2                   # 执行样例
   ```
 
+  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
+
+  示例如下：
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
+
   编译选项说明
 
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
 
   执行结果如下，说明精度对比成功：

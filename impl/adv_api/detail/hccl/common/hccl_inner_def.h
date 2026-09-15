@@ -103,6 +103,12 @@ __aicore__ inline constexpr bool IsValidCcuRankNum(uint32_t rankNum)
 {
     return rankNum > 0U && rankNum <= HCCL_CCU_MAX_RANK_NUM;
 }
+
+__aicore__ inline constexpr bool IsValidMsgExtRankNum(uint32_t rankNum)
+{
+    return rankNum > 0U && rankNum <= HCCL_MAX_RANK_NUM_V2;
+}
+
 struct HcclCombineOpParam {
     uint64_t workSpace;     // Address for communication between client and server,
                             // hccl requests and clears
@@ -110,7 +116,7 @@ struct HcclCombineOpParam {
     uint32_t rankId;        // id of this rank
     uint32_t rankNum;       // num of ranks in this comm group
     uint64_t winSize;       // size of each windows memory
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
     uint64_t windowsIn[HCCL_MAX_RANK_NUM_V310];
     uint64_t windowsOut[HCCL_MAX_RANK_NUM_V310];
     GM_ADDR xnOffset;

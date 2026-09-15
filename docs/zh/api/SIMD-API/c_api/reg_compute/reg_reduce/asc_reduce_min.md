@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/compute/reg_reduce.h"`。
+
 根据`mask`对源操作数`src`进行归约最小值操作，得到归约结果。结果保存在`dst`的第0个元素，最小值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最小值，则保留最小的索引。计算公式如下：
 
 $$
@@ -38,11 +40,11 @@ $$
 ## 函数原型
 
 ```c
-// 通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_reduce_min(vector_<dtype> src,
                                                       vector_bool mask)
 
-// 通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_reduce_min(vector_<dtype>& dst,
                                             vector_<dtype> src,
                                             vector_bool mask)
@@ -95,14 +97,15 @@ __simd_callee__ inline void asc_reduce_min(vector_half& dst,
 
 ## 调用示例
 
-<!-- npu="950" id8 -->
 将以下代码保存为`example.asc`后，可通过`bisheng`命令编译运行。其中，`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
+<!-- npu="950" id8 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+<!-- end id8 -->
 
 ```cpp
 // 本例使用half类型演示归约结果"值+索引"的分别提取，
@@ -168,5 +171,3 @@ int main()
     return passed ? 0 : 1;
 }
 ```
-
-<!-- end id8 -->

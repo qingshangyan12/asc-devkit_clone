@@ -1,7 +1,7 @@
 # gather Example
 
 ## Overview
-This example implements the functionality of collecting elements from a vector data register by index, based on the C API programming interface, primarily calling the [asc_gather](../../../../../docs/zh/api/SIMD-API/c_api/reg_compute/gather/asc_gather.md) API.
+This example implements the functionality of collecting elements from a vector data register by index, based on the C API programming interface, primarily calling the [asc_gather](../../../../../docs/zh/api/SIMD-API/c_api/reg_compute/reg_gather/asc_gather.md) API.
 
 ## Supported Products and CANN Versions
 
@@ -50,7 +50,7 @@ Run the following steps in the root directory of this example to build and run i
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
+  > **Note:** `${install_path}` is the CANN package installation directory. The default is `/usr/local/Ascend` for the root user and `${HOME}/Ascend` for non-root users.
 
 - Run the example
 

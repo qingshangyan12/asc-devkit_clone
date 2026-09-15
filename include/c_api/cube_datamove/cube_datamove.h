@@ -14,7 +14,7 @@
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_CUBE_DATAMOVE_CUBE_DATAMOVE_H
 #endif
 
 #ifndef INCLUDE_C_API_CUBE_DATAMOVE_CUBE_DATAMOVE_H
@@ -22,14 +22,9 @@
 #include "c_api/defs/defs.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-
-#include "impl/c_api/instr_impl/npu_arch_2201/cube_datamove_impl.h"
-
+#include "impl/c_api/memory_base_impl/cube_datamove_intf_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-
-#include "impl/c_api/instr_impl/npu_arch_3510/cube_datamove_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl.h"
-
+#include "impl/c_api/reg_base_impl/cube_datamove_intf_impl.h"
 #endif
 
 #include "c_api/composite/cube_datamove_composite.h"
@@ -57,6 +52,10 @@ __aicore__ inline uint64_t asc_get_l0c2gm_prequant();
 __aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num, uint64_t src_nd_stride, uint64_t dst_nd_stride);
 
 __aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag);
+__aicore__ inline void asc_set_l0c_copy_config(
+    uint64_t relu_pre_addr, uint64_t quant_pre_addr, bool is_clean_unit_flag);
+__aicore__ inline void asc_set_l0c_copy_nz_para(
+    uint16_t matrix_num, uint16_t src_nz_matrix_stride, uint32_t dst_matrix_stride);
 __aicore__ inline void asc_set_l0c_copy_channel_para(uint16_t src_nz_fractal_stride);
 
 __aicore__ inline void asc_set_l3d_rpt_b(uint64_t config);
@@ -2066,8 +2065,8 @@ __aicore__ inline void asc_copy_l0c2ub(
 
 #endif
 
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_CUBE_DATAMOVE_CUBE_DATAMOVE_H)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_CUBE_DATAMOVE_CUBE_DATAMOVE_H
 
 #endif

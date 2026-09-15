@@ -53,6 +53,8 @@ bisheng -lib kernel.asc -o libkernel.a --npu-arch=dav-3510 --enable-simt
 在 CMake 工程中，使用 `add_library` 配置 `STATIC` 关键字即可将 `.asc` 文件编译为静态库：
 
 ```cmake
+# 启用SIMT编译模式
+set(CMAKE_ASC_ENABLE_SIMT ON)
 # 将.asc文件编译为静态库
 add_library(kernel STATIC
     kernel.asc)
@@ -91,13 +93,13 @@ add_library(kernel STATIC
     ./demo                                                          # 执行样例
     ```
 
-    使用 NPU 仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。示例如下：
+    使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。示例如下：
 
     ```bash
     cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
     ```
 
-    > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+    > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
 
 - 执行结果
 

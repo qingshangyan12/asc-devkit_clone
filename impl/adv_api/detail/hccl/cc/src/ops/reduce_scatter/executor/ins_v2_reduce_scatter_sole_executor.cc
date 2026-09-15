@@ -15,6 +15,8 @@
 #include "ins_temp_reduce_scatter_mesh_1D_Z_axis_detour.h"
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 #include "ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem.h"
+#include "ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem_peer_only.h"
+#include "ccu_temp_kfc_reduce_scatter_nhr_1D_multi_jetty_mem2mem.h"
 // Legacy direct-launch CCU headers are retained in source but are incompatible with the current hcomm API.
 #endif
 
@@ -43,7 +45,7 @@ HcclResult InsV2ReduceScatterSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcRes
     std::shared_ptr<InsAlgTemplate> algTemplate =
         std::make_shared<InsAlgTemplate>(param, topoInfo->userRank, algHierarchyInfo.infos[0]);
     // 调用计算资源的函数
-    algTemplate->CalcRes(comm, param, topoInfo, resourceRequest);
+    CHK_RET(algTemplate->CalcRes(comm, param, topoInfo, resourceRequest));
     return HCCL_SUCCESS;
 }
 
@@ -62,7 +64,13 @@ HcclResult InsV2ReduceScatterSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchest
     dataCount_ = param.DataDes.count;
     strideCount_ = param.DataDes.strideCount;
     dataType_ = param.DataDes.dataType;
+    CHK_PRT_RET(
+        static_cast<u32>(dataType_) >= HCCL_DATA_TYPE_RESERVED || DATATYPE_SIZE_TABLE[dataType_] == 0,
+        HCCL_ERROR("Invalid ReduceScatter datatype"), HCCL_E_PARA);
     dataTypeSize_ = DATATYPE_SIZE_TABLE[param.DataDes.dataType];
+    CHK_PRT_RET(
+        dataCount_ > UINT64_MAX / dataTypeSize_ || strideCount_ > UINT64_MAX / dataTypeSize_,
+        HCCL_ERROR("ReduceScatter count or stride overflows byte size"), HCCL_E_PARA);
     dataSize_ = dataCount_ * dataTypeSize_;
 
     HcclResult ret = OrchestrateLoop(param, resCtx);
@@ -259,6 +267,12 @@ REGISTER_EXEC_V2(
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleMesh, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
     CcuTempKfcReduceScatterMesh1DMem2Mem);
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleMeshPeerOnly, InsV2ReduceScatterSoleExecutor,
+    TopoMatch1D, CcuTempKfcReduceScatterMesh1DMem2MemPeerOnly);
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleNHRMultiLink, InsV2ReduceScatterSoleExecutor,
+    TopoMatch1D, CcuTempKfcReduceScatterNHR1DMultiJettyMem2Mem);
 #endif
 
 } // namespace mc2_ops_hccl

@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/device_functions.h"`。
+
 将输入数据的位序反转，返回反转后的值。
 
 ## 函数原型
@@ -53,57 +55,69 @@ unsigned long __brev(unsigned long x)
 
 输入数据的位反转值。当输入的类型为uint32_t时，返回值的第n位对应输入数据的第31-n位；当输入的类型为uint64_t时，返回值的第n位对应输入数据的第63-n位。
 
--   当x为0时，类型为uint32\_t时，返回值为0。
--   当x为0时，类型为uint64\_t时，返回值为0。
--   当x为1时，类型为uint32\_t时，返回值为2147483648。
--   当x为1时，类型为uint64\_t时，返回值为9223372036854775808。
+- 当x为0时，类型为uint32\_t时，返回值为0。
+- 当x为0时，类型为uint64\_t时，返回值为0。
+- 当x为1时，类型为uint32\_t时，返回值为2147483648。
+- 当x为1时，类型为uint64\_t时，返回值为9223372036854775808。
 
 ## 约束说明
 
 无
 
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/device_functions.h`头文件。
-
-```cpp
-#include "simt_api/device_functions.h"
-```
-
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelBrev(unsigned int* dst, unsigned int* x)
+    #include "simt_api/device_functions.h"
+
+    __global__ __launch_bounds__(1024) void kernel_brev(unsigned int* dst, unsigned int* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __brev(x[idx]);
     }
     ```
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelBrev(unsigned long long* dst, unsigned long long* x)
+    #include "simt_api/device_functions.h"
+
+    __global__ __launch_bounds__(1024) void kernel_brev(unsigned long long* dst, unsigned long long* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __brev(x[idx]);
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void KernelBrev(__gm__ unsigned int* dst, __gm__ unsigned int* x)
+    #include "simt_api/device_functions.h"
+
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_brev(__gm__ unsigned int* dst, __gm__ unsigned int* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __brev(x[idx]);
     }
     ```
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void KernelBrev(__gm__ unsigned long long* dst, __gm__ unsigned long long* x)
+    #include "simt_api/device_functions.h"
+
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_brev(__gm__ unsigned long long* dst, __gm__ unsigned long long* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __brev(x[idx]);
     }
     ```

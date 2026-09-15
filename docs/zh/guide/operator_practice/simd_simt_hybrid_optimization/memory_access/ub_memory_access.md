@@ -1,10 +1,11 @@
 # 使用Unified Buffer提升内存访问效率<a name="ZH-CN_TOPIC_0000002511242528"></a>
 
-<!-- npu="950" id1 -->
 >[!NOTE]说明 
 >该性能优化建议适用于如下型号：
+     <!-- npu="950" id1 -->
 >-   Ascend 950PR/Ascend 950DT
-<!-- end id1 -->
+     <!-- end id1 -->
+<!-- @ref: asc-devkit/res/docs/zh/guide/operator_practice/simd_simt_hybrid_optimization/memory_access/ub_memory_access_res.md#id1 -->
 
 【优先级】高
 
@@ -122,7 +123,7 @@ __aicore__ inline void process_tiles(__gm__ int32_t* x, __gm__ int32_t* y, __gm_
     asc_sync_notify(PIPE_MTE3, PIPE_V, EVENT_ID1);
 
     for (uint32_t tile_idx = 0; tile_idx < TILE_NUM_PER_CORE; ++tile_idx) {
-        int32_t event_id = ((tile_idx & 1) == 0 ? EVENT_ID0 : EVENT_ID1);
+        event_t event_id = ((tile_idx & 1) == 0 ? EVENT_ID0 : EVENT_ID1);
         uint32_t tile_offset = tile_idx * TILE_LENGTH;
         constexpr uint32_t tile_bytes = TILE_LENGTH * sizeof(int32_t);
         __ubuf__ int32_t* x_local = ((tile_idx & 1) == 0 ? x_ping : x_pong);

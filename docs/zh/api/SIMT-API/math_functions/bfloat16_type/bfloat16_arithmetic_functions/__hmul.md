@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_bf16.h"`。
+
 计算两个bfloat16类型数据相乘的结果，并遵循CAST\_RINT模式对结果进行舍入。
 
 ## 函数原型
@@ -57,32 +59,39 @@ bfloat16_t __hmul(const bfloat16_t x, const bfloat16_t y)
 
 无
 
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/asc_bf16.h`头文件。
-
-```cpp
-#include "simt_api/asc_bf16.h"
-```
-
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelHmul(bfloat16_t* dst, bfloat16_t* x, bfloat16_t* y)
+    #include "simt_api/asc_bf16.h"
+
+    __global__ __launch_bounds__(1024) void kernel_hmul(bfloat16_t* dst, bfloat16_t* x, bfloat16_t* y, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __hmul(x[idx], y[idx]);
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void KernelHmul(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x, __gm__ bfloat16_t* y)
+    #include "simt_api/asc_bf16.h"
+
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_hmul(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x, __gm__ bfloat16_t* y, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __hmul(x[idx], y[idx]);
+    }
+
+    __global__ __vector__ void compute_kernel(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x, __gm__ bfloat16_t* y, uint32_t total_length)
+    {
+        asc_vf_call<kernel_hmul>(dim3(1024), dst, x, y, total_length);
     }
     ```

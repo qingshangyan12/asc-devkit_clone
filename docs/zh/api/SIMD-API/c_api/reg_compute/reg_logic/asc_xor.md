@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/compute/reg_logic.h"`。
+
 asc_xor支持两种接口：
 
 - 对矢量数据寄存器操作：
@@ -33,7 +35,7 @@ asc_xor支持两种接口：
 - 对掩码寄存器操作：
     根据`mask`对两个源掩码寄存器`src0`和`src1`进行按位异或（^）操作，将结果写入目的掩码数据寄存器`dst`或通过函数返回值返回。未被`mask`筛选的位置被置为0。
 
-计算公式如下：
+伪代码如下：
 
 ```python
 def asc_xor(dst, src0, src1, mask):
@@ -48,12 +50,12 @@ def asc_xor(dst, src0, src1, mask):
 ### 矢量数据寄存器按位异或
 
 ```c
-// 通过函数返回值返回结果。
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_xor(vector_<dtype> src0,
                                                vector_<dtype> src1,
                                                vector_bool mask)
 
-// 通过引用参数输出结果。
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_xor(vector_<dtype>& dst,
                                     vector_<dtype> src0,
                                     vector_<dtype> src1,

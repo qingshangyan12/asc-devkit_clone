@@ -14,7 +14,7 @@
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_SYNC_SYNC_H
 #endif
 
 #ifndef INCLUDE_C_API_SYNC_SYNC_H
@@ -22,9 +22,9 @@
 #include "c_api/defs/defs.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-#include "impl/c_api/instr_impl/npu_arch_2201/sync_impl.h"
+#include "impl/c_api/memory_base_impl/sync_intf_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/instr_impl/npu_arch_3510/sync_impl.h"
+#include "impl/c_api/reg_base_impl/sync_intf_impl.h"
 #endif
 
 __aicore__ inline void asc_sync_notify(pipe_t pipe, pipe_t tpipe, event_t id);
@@ -67,13 +67,12 @@ __aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id);
 
 __aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id, const asc_mutex_execute_mode mode);
 
-[[deprecated("NOTICE: asc_sync_vec() is deprecated. "
-             "Please use asc_sync() instead")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_sync)
 __aicore__ inline void asc_sync_vec();
 
 #endif
 
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_SYNC_SYNC_H)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_SYNC_SYNC_H
 #endif

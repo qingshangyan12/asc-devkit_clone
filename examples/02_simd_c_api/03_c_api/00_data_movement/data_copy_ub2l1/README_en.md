@@ -8,7 +8,7 @@ This example uses the Ascend C C API to move matrix data from UB (Unified Buffer
 
 | Product | CANN version |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -77,7 +77,7 @@ Run the following steps in the example root directory.
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **Note:**`${install_path}` is the CANN package installation directory. The default is `/usr/local/Ascend` for the root user and `${HOME}/Ascend` for non-root users.
+  > **Note:** `${install_path}` is the CANN package installation directory. The default is `/usr/local/Ascend` for the root user and `${HOME}/Ascend` for non-root users.
 
 - Run the example
 

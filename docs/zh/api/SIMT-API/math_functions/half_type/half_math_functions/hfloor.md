@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_fp16.h"`。
+
 获取小于或等于输入数据的最大整数值。
 
 ## 函数原型
@@ -56,32 +58,39 @@ inline half hfloor(half x)
 
 无
 
-## 需要包含的头文件
-
-使用half类型接口需要包含`simt_api/asc_fp16.h`头文件。
-
-```cpp
-#include "simt_api/asc_fp16.h"
-```
-
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void kernel_hfloor(half* dst, half* x)
+    #include "simt_api/asc_fp16.h"
+
+    __global__ __launch_bounds__(1024) void kernel_hfloor(half* dst, half* x, uint32_t total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = hfloor(x[idx]);
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void kernel_hfloor(__gm__ half* dst, __gm__ half* x)
+    #include "simt_api/asc_fp16.h"
+
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_hfloor(__gm__ half* dst, __gm__ half* x, uint32_t total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = hfloor(x[idx]);
+    }
+
+    __global__ __vector__ void run_hfloor(__gm__ half* dst, __gm__ half* x, uint32_t total_length)
+    {
+        asc_vf_call<kernel_hfloor>(dim3(1024), dst, x, total_length);
     }
     ```

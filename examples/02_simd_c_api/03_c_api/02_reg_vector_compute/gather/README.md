@@ -1,7 +1,7 @@
 # gather样例
 
 ## 概述
-本样例基于C API编程接口实现按索引从矢量数据寄存器收集元素功能，主要调用[asc_gather](../../../../../docs/zh/api/SIMD-API/c_api/reg_compute/gather/asc_gather.md)接口。
+本样例基于C API编程接口实现按索引从矢量数据寄存器收集元素功能，主要调用[asc_gather](../../../../../docs/zh/api/SIMD-API/c_api/reg_compute/reg_gather/asc_gather.md)接口。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -50,7 +50,7 @@
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
+  > **说明：** `${install_path}`为CANN包安装目录；root用户默认为`/usr/local/Ascend`，非root用户默认为`${HOME}/Ascend`。
 
 - 样例执行
 

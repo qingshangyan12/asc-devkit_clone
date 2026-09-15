@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/reg_convert.h"`。
+
 根据`mask`将`src`中的每个`int32_t`类型数据转换成`float`类型，并支持多种舍入模式，结果写入`dst`。参考伪代码如下：
 
 ```python
@@ -42,6 +44,7 @@ def asc_int322float_rn(dst, src, mask):
 ## 函数原型
 
 ```c
+// 占位符形式
 __simd_callee__ inline void asc_int322float_<round_mode>(vector_float& dst,
                                                          vector_int32_t src,
                                                          vector_bool mask)
@@ -82,15 +85,15 @@ __simd_callee__ inline void asc_int322float_rn(vector_float& dst,
 
 ## 调用示例
 
-<!-- npu="950" id8 -->
-
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
+<!-- npu="950" id8 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+<!-- end id8 -->
 
 ```c
 #include <cstdint>
@@ -184,4 +187,3 @@ int main()
 }
 ```
 
-<!-- end id8 -->

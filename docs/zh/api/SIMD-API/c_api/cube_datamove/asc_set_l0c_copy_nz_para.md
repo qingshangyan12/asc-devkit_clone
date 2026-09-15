@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/cube_compute/cube_compute.h"`。
+
 本接口用于在L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)启用随路Nz转ND/DN格式功能时，配置格式转换所需的相关参数。
 
 本接口为矩阵搬出相关配置接口，仅在AIC上生效。
@@ -46,7 +48,7 @@ __aicore__ inline void asc_set_l0c_copy_nz_para(uint16_t matrix_num,
 | :----- | :------- | :------- |
 | matrix_num | 输入 | ND/DN矩阵的数量，取值范围为[1, 65535]。 |
 | src_nz_matrix_stride | 输入 | 源相邻Nz矩阵之间的偏移（相邻Nz矩阵头与头的间隔）。当nd_num配置为1时，src_nd_stride不生效，配置为0即可。取值范围为[0, 65535]，单位为64字节（`16 × sizeof(dtype)`，`dtype`为L0C Buffer上数据的类型，支持`int32_t`和`float`）。 |
-| dst_matrix_stride | 输入 | 目的相邻ND矩阵之间的偏移（相邻ND矩阵头与头的间隔）。当nd_num配置为1时，dst_nd_stride不生效，配置为0即可。取值范围为[0, 2^32-1]，单位为元素。 |
+| dst_matrix_stride | 输入 | 目的相邻ND/DN矩阵之间的偏移（相邻ND/DN矩阵头与头的间隔）。当matrix_num配置为1时，dst_matrix_stride不生效，配置为0即可。取值范围为[0, 2^32-1]，单位为元素。 |
 
 ## 返回值说明
 
@@ -61,16 +63,17 @@ PIPE_S
 - 本接口非AIC调用直接返回。
 - 调用L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)并且需要进行随路Nz转ND/DN格式之前，即搬出接口内参数`enable_nz2nd`与`enable_nz2dn`其一设置为`true`时，必须先调用本接口配置格式转换参数。
 
-<!-- npu="950" id8 -->
 ## 调用示例
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
+<!-- npu="950" id8 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+<!-- end id8 -->
 
 以下调用示例代码仅Ascend 950PR/Ascend 950DT产品支持。
 
@@ -154,4 +157,3 @@ int main()
     return passed ? 0 : 1;
 }
 ```
-<!-- end id8 -->

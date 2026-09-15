@@ -21,7 +21,8 @@
 │   ├── sync_barrier.asc      // 场景1：小shape归约样例，展示 asc_syncthreads() 的线程块内同步用法
 │   ├── memory_fence.asc      // 场景2：大shape归约样例，展示 asc_threadfence() 与原子计数的线程块间协作用法
 │   ├── CMakeLists.txt        // 编译工程文件
-│   └── README.md
+│   ├── README.md
+│   └── README_en.md      // 英文版样例说明
 ```
 
 ## 样例描述
@@ -158,14 +159,24 @@
   ./demo                        # 执行样例
   ```
 
+  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
+
+  示例如下：
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;   # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
+
   编译选项说明
 
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
   | `SCENARIO_NUM` | `1`、`2` | 场景编号：1表示小shape归约场景，2表示大shape归约场景 |
 
   执行结果如下，说明精度对比成功。
   ```
-  [Success] Case accuracy is verification passed.
+  [Success] Case accuracy verification passed.
   ```

@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_fp16.h"`。
+
 指定输入x，对x的各元素，获取2的该元素次方。
 
 ![](../../../../figures/zh-cn_formulaimage_0000002513334398.png)
@@ -45,7 +47,7 @@ inline half2 h2exp2(half2 x)
 
 ## 返回值说明
 
-输入的各元素，2的该元素次方。特殊值如下：
+输入的各元素，2的该元素次方。本接口受全局饱和寄存器影响，特殊值如下：
 
 | x值 | 非饱和模式返回值 | 饱和模式返回值 |
 | --- | --- | --- |
@@ -59,32 +61,34 @@ inline half2 h2exp2(half2 x)
 
 无
 
-## 需要包含的头文件
-
-使用half2类型接口需要包含`simt_api/asc_fp16.h`头文件。
-
-```cpp
-#include "simt_api/asc_fp16.h"
-```
-
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelExp2(half2* dst, half2* x)
+    #include "simt_api/asc_fp16.h"
+
+    __global__ __launch_bounds__(1024) void kernel_exp2(half2* dst, half2* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = h2exp2(x[idx]);
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void KernelExp2(__gm__ half2* dst, __gm__ half2* x)
+    #include "simt_api/asc_fp16.h"
+
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_exp2(__gm__ half2* dst, __gm__ half2* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = h2exp2(x[idx]);
     }
     ```

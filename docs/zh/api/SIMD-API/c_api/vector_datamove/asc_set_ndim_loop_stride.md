@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/vector_datamove/vector_datamove.h"`。
+
 本接口用于设置[asc_ndim_copy_gm2ub](asc_ndim_copy_gm2ub.md)进行NDDMA多维数据搬运时，`loop0`至`loop4`各循环维度的源操作数步长和目的操作数步长。
 
 本接口包含5个函数，分别用于配置`loop0`至`loop4`的步长，其中`loop0`为最内层循环，`loop4`为最外层循环。
@@ -79,7 +81,6 @@ PIPE_S
 将以下代码保存为`example.asc`后，执行对应的编译运行命令。
 
 <!-- npu="950" id8 -->
-
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash

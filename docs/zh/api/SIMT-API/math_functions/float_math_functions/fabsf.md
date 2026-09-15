@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/math_functions.h"`。
+
 获取输入数据的绝对值。
 
 ![](../../../figures/zh-cn_formulaimage_0000002486622044.png)
@@ -47,28 +49,22 @@ inline float fabsf(float x)
 
 输入数据的绝对值。
 
--   当x为±0时，返回值为+0。
--   当x为nan时，返回值为nan。
--   当x为inf时，返回值为inf。
--   当x为-inf时，返回值为inf。
+- 当x为±0时，返回值为+0。
+- 当x为nan时，返回值为nan。
+- 当x为inf时，返回值为inf。
+- 当x为-inf时，返回值为inf。
 
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/math_functions.h`头文件。
-
-```cpp
-#include "simt_api/math_functions.h"
-```
 
 ## 调用示例
 
 - SIMT编程场景：
 
     ```cpp
+    #include "simt_api/math_functions.h"
+
     __global__ __launch_bounds__(256) void compute_fabsf(float *result, const float *x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -82,6 +78,8 @@ inline float fabsf(float x)
 - SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/math_functions.h"
+
     __simt_vf__ __launch_bounds__(256) inline void compute_fabsf_vf(__gm__ float *result, __gm__ const float *x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;

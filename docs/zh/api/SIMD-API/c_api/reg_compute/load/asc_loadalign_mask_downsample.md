@@ -26,9 +26,15 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/load/loadalign.h"`。
+
 从Unified Buffer（UB）中32字节对齐的起始地址读取VL/4长度数据，保留偶数下标bit，得到VL/8长度数据，并通过函数返回值返回掩码寄存器。
 
 本接口与[asc_loadalign_downsample](asc_loadalign_downsample.md)对齐搬入模式中目的操作数为掩码寄存器的原型功能相同，区别在于本接口通过函数返回值返回结果。
+
+**图1** 下采样搬入掩码寄存器
+
+![](../../figures/capi_loadalign_mask_downsample.png)
 
 本接口仅在AIV上生效，非AIV调用直接返回。
 
@@ -62,7 +68,6 @@ __simd_callee__ inline vector_bool asc_loadalign_mask_downsample(__ubuf__ uint32
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash

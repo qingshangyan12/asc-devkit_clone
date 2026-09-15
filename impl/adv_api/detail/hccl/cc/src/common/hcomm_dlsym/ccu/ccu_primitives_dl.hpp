@@ -14,6 +14,10 @@
 #if CANN_VERSION_NUM >= 90100000
 #include "ccu_primitives.hpp"
 #else
+#include <cstdint>
+#include "ccu_types_dl.h"
+#include "hccl_types.h"
+#include "hcomm_primitives.h"
 #include "ccu_primitives_impl_dl.h"
 #include "ccu_control_flow_macro_dl.h"
 #include "ccu_variable_dl.hpp"
@@ -36,7 +40,7 @@ using LoopGroupConfig = ::CcuLoopGroupConfig;
 // ==================== 资源创建 ====================
 
 template <typename T>
-inline T GetResByChannel(ChannelHandle /*channel*/, uint32_t /*index*/)
+inline T GetResByChannel(ChannelHandle /*channel*/, uint32_t /*varIndex*/)
 {
     static_assert(
         sizeof(T) == 0, "ccu::GetResByChannel<T> is not specialized for this type T; "

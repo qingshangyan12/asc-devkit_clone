@@ -114,7 +114,7 @@ u64 InsTempUBXAllToAllVMesh1D::CalcScratchMultiple(BufferType inBuffType, Buffer
     return templateRankSize_;
 }
 
-HcclResult InsTempUBXAllToAllVMesh1D::GetBoardSendRecvMatrix(u32 n, std::vector<std::vector<u32>>& sendRecvMatrix)
+HcclResult InsTempUBXAllToAllVMesh1D::GetBoardSendRecvMatrix(u32 n, std::vector<std::vector<u32>>& sendRecvMatrix) const
 {
     // n必须是
     if (n < UBX_BOARD_PAIR_SIZE || n % UBX_BOARD_PAIR_SIZE != 0) {
@@ -125,14 +125,14 @@ HcclResult InsTempUBXAllToAllVMesh1D::GetBoardSendRecvMatrix(u32 n, std::vector<
     // 创建环形排列：0固定，其余1到n-1
     std::vector<int> ring(n);
     ring[0] = 0;
-    for (int i = 1; i < n; i++) {
+    for (u32 i = 1; i < n; i++) {
         ring[i] = i;
     }
 
     // 生成n-1轮调度
-    for (int round = 0; round < n - 1; round++) {
+    for (u32 round = 0; round < n - 1; round++) {
         // 生成本轮配对：首尾对称配对
-        for (int i = 0; i < n / UBX_BOARD_PAIR_SIZE; i++) {
+        for (u32 i = 0; i < n / UBX_BOARD_PAIR_SIZE; i++) {
             int a = ring[i];
             int b = ring[n - 1 - i];
 
@@ -152,9 +152,9 @@ HcclResult InsTempUBXAllToAllVMesh1D::GetBoardSendRecvMatrix(u32 n, std::vector<
         ring[1] = last;
     }
     // 打印矩阵
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n - 1; j++) {
-            HCCL_DEBUG("sendRecvMatrix[%d][%d] = %d", i, j, sendRecvMatrix[i][j]);
+    for (u32 i = 0; i < n; i++) {
+        for (u32 j = 0; j < n - 1; j++) {
+            HCCL_DEBUG("sendRecvMatrix[%u][%u] = %u", i, j, sendRecvMatrix[i][j]);
         }
     }
     // 举个例子：n = 8 的时候，矩阵如下
@@ -171,7 +171,7 @@ HcclResult InsTempUBXAllToAllVMesh1D::GetBoardSendRecvMatrix(u32 n, std::vector<
 }
 
 HcclResult InsTempUBXAllToAllVMesh1D::GetRankSendRecvMatrix(
-    u32 board1, u32 board2, std::vector<std::vector<u32>>& rankSendRecvMatrix)
+    u32 board1, u32 board2, std::vector<std::vector<u32>>& rankSendRecvMatrix) const
 {
     u32 boardSmall = std::min(board1, board2);
     u32 boardBig = std::max(board1, board2);
@@ -184,10 +184,10 @@ HcclResult InsTempUBXAllToAllVMesh1D::GetRankSendRecvMatrix(
         }
     }
     // 打印矩阵
-    for (int i = 0; i < rankSendRecvMatrix.size(); i++) {
-        for (int j = 0; j < rankNumPerBoard_; j++) {
+    for (size_t i = 0; i < rankSendRecvMatrix.size(); i++) {
+        for (u32 j = 0; j < rankNumPerBoard_; j++) {
             HCCL_DEBUG(
-                "myRank is [%u], board1 is[%u], board2 is [%u], rankSendRecvMatrix[%d][%d] = [%d]", myAlgRank_, board1,
+                "myRank is [%u], board1 is[%u], board2 is [%u], rankSendRecvMatrix[%zu][%u] = [%u]", myAlgRank_, board1,
                 board2, i, j, rankSendRecvMatrix[i][j]);
         }
     }
@@ -247,7 +247,7 @@ HcclResult InsTempUBXAllToAllVMesh1D::GetRankNumPerBoard(const TemplateResource&
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult InsTempUBXAllToAllVMesh1D::CheckPathNum(const TemplateResource& templateResource)
+HcclResult InsTempUBXAllToAllVMesh1D::CheckPathNum(const TemplateResource& templateResource) const
 {
     // 校验是不是最多4jetty
     const std::map<u32, std::vector<ChannelInfo>>& channels = templateResource.channels;
@@ -269,7 +269,7 @@ HcclResult InsTempUBXAllToAllVMesh1D::CheckPathNum(const TemplateResource& templ
 
 HcclResult InsTempUBXAllToAllVMesh1D::RunFullMeshSelfCopy(
     const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource, u32 targetRank,
-    u32 fullMeshThreadId)
+    u32 fullMeshThreadId) const
 {
     const std::vector<ThreadHandle>& threads = templateResource.threads;
     u64 inputOffset = 0U;
@@ -379,12 +379,12 @@ HcclResult InsTempUBXAllToAllVMesh1D::RunPairwiseStep(const std::vector<ThreadHa
 HcclResult InsTempUBXAllToAllVMesh1D::RunPairwiseChannel(
     const TemplateDataParams& tempAlgParams, const std::vector<ChannelInfo>& channelSendRecv,
     const std::vector<ThreadHandle>& threads, u32 targetRank, u32 channelIndex, u64& innerSendOffset,
-    u64& innerRecvOffset, u64 curSendDataCount, u64 curRecvDataCount)
+    u64& innerRecvOffset, u64 curSendDataCount, u64 curRecvDataCount) const
 {
     const u32 linkNumSendRecv = channelSendRecv.size();
-    const float dataSplitRate = (float)1.0 / (float)linkNumSendRecv;
-    u64 innerCurrSendDataCount = curSendDataCount * dataSplitRate;
-    u64 innerCurrRecvDataCount = curRecvDataCount * dataSplitRate;
+    const float dataSplitRate = static_cast<float>(1.0) / static_cast<float>(linkNumSendRecv);
+    u64 innerCurrSendDataCount = static_cast<u64>(curSendDataCount * dataSplitRate);
+    u64 innerCurrRecvDataCount = static_cast<u64>(curRecvDataCount * dataSplitRate);
     if (channelIndex == linkNumSendRecv - 1) {
         innerCurrSendDataCount = curSendDataCount - innerSendOffset;
         innerCurrRecvDataCount = curRecvDataCount - innerRecvOffset;
@@ -435,7 +435,7 @@ HcclResult InsTempUBXAllToAllVMesh1D::RunPairwiseTransfer(
     const ChannelInfo& channel, const std::vector<ThreadHandle>& threads, u32 queId,
     const std::vector<DataSlice>& txSrcSlices, const std::vector<DataSlice>& txDstSlices,
     const std::vector<DataSlice>& rxSrcSlices, const std::vector<DataSlice>& rxDstSlices, u64 sendDataSize,
-    u64 recvDataSize)
+    u64 recvDataSize) const
 {
     if (sendDataSize > 0 && recvDataSize > 0) {
         SendRecvInfo sendRecvInfo{{channel, channel}, {{txSrcSlices, txDstSlices}, {rxSrcSlices, rxDstSlices}}};
@@ -572,7 +572,7 @@ HcclResult InsTempUBXAllToAllVMesh1D::InitThreadState(const TemplateResource& te
     return HcclResult::HCCL_SUCCESS;
 }
 
-void InsTempUBXAllToAllVMesh1D::LogInitState()
+void InsTempUBXAllToAllVMesh1D::LogInitState() const
 {
     HCCL_INFO(
         "[InsTempUBXAllToAllVMesh1D] myRank_ is [%u], myAlgRank_ is [%u], rankNumPerBoard_ is [%u], "
@@ -583,7 +583,7 @@ void InsTempUBXAllToAllVMesh1D::LogInitState()
         threadNum_, scratchBufferSizePerRank_, dataStridePerRank_, curProcessedDataCount_, curDataCount_, curDataSize_);
 }
 
-void InsTempUBXAllToAllVMesh1D::LogDataSlices(const TemplateDataParams& tempAlgParams)
+void InsTempUBXAllToAllVMesh1D::LogDataSlices(const TemplateDataParams& tempAlgParams) const
 {
     for (u32 i = 0; i < templateRankSize_; i++) {
         HCCL_DEBUG(
@@ -666,33 +666,33 @@ HcclResult InsTempUBXAllToAllVMesh1D::KernelRun(
     return HcclResult::HCCL_SUCCESS;
 }
 
-void InsTempUBXAllToAllVMesh1D::GetNotifyIdxMainToSub(std::vector<u32>& notifyIdxMianToSub)
+void InsTempUBXAllToAllVMesh1D::GetNotifyIdxMainToSub(std::vector<u32>& notifyIdxMainToSub)
 {
-    (void)notifyIdxMianToSub;
+    (void)notifyIdxMainToSub;
     return;
 }
 
-void InsTempUBXAllToAllVMesh1D::GetNotifyIdxMainToClos(std::vector<u32>& notifyIdxMianToSub)
+void InsTempUBXAllToAllVMesh1D::GetNotifyIdxMainToClos(std::vector<u32>& notifyIdxMainToSub) const
 {
-    notifyIdxMianToSub.clear();
+    notifyIdxMainToSub.clear();
     if (threadNum_ <= 1) {
         return;
     }
     u32 slaveThreadNum = threadNum_ - 1 - maxRankNumPerBoard_;
     for (u32 slaveThreadIdx = 0; slaveThreadIdx < slaveThreadNum; slaveThreadIdx++) {
-        notifyIdxMianToSub.push_back(0);
+        notifyIdxMainToSub.push_back(0);
     }
 }
 
-void InsTempUBXAllToAllVMesh1D::GetNotifyIdxMainToFullMesh(std::vector<u32>& notifyIdxMianToSub)
+void InsTempUBXAllToAllVMesh1D::GetNotifyIdxMainToFullMesh(std::vector<u32>& notifyIdxMainToSub) const
 {
-    notifyIdxMianToSub.clear();
+    notifyIdxMainToSub.clear();
     if (threadNum_ <= 1) {
         return;
     }
     u32 slaveThreadNum = threadNum_ - 1 - maxPathNum_;
     for (u32 slaveThreadIdx = 0; slaveThreadIdx < slaveThreadNum; slaveThreadIdx++) {
-        notifyIdxMianToSub.push_back(0);
+        notifyIdxMainToSub.push_back(0);
     }
 }
 
@@ -702,7 +702,7 @@ void InsTempUBXAllToAllVMesh1D::GetNotifyIdxSubToMain(std::vector<u32>& notifyId
     return;
 }
 
-void InsTempUBXAllToAllVMesh1D::GetNotifyIdxClosToMain(std::vector<u32>& notifyIdxSubToMain)
+void InsTempUBXAllToAllVMesh1D::GetNotifyIdxClosToMain(std::vector<u32>& notifyIdxSubToMain) const
 {
     notifyIdxSubToMain.clear();
     u32 notifyNum = threadNum_ - 1 - maxRankNumPerBoard_;
@@ -711,7 +711,7 @@ void InsTempUBXAllToAllVMesh1D::GetNotifyIdxClosToMain(std::vector<u32>& notifyI
     }
 }
 
-void InsTempUBXAllToAllVMesh1D::GetNotifyIdxFullMeshToMain(std::vector<u32>& notifyIdxSubToMain)
+void InsTempUBXAllToAllVMesh1D::GetNotifyIdxFullMeshToMain(std::vector<u32>& notifyIdxSubToMain) const
 {
     notifyIdxSubToMain.clear();
     u32 notifyNum = threadNum_ - 1;

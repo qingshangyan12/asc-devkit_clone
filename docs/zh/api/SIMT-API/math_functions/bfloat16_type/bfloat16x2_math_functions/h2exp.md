@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_bf16.h"`。
+
 指定输入x，对x的各元素，获取e的该元素次方。
 
 ![](../../../../figures/zh-cn_formulaimage_0000002545900876.png)
@@ -55,6 +57,7 @@ inline bfloat16x2_t h2exp(bfloat16x2_t x)
 | inf | inf | ASCRT_MAX_NORMAL_BF16 |
 | -inf | 0 | 0 |
 | ASCRT_MAX_NORMAL_BF16 | inf | ASCRT_MAX_NORMAL_BF16 |
+| -ASCRT_MAX_NORMAL_BF16 | 0 | 0 |
 
 ## 约束说明
 
@@ -62,32 +65,34 @@ inline bfloat16x2_t h2exp(bfloat16x2_t x)
 针对Ascend 950PR/Ascend 950DT，本接口不支持Subnormal场景：处于Subnormal范围内的输入和输出值，都会被刷新为保留符号的0。
 <!-- end id7 -->
 
-## 需要包含的头文件
-
-使用bfloat16x2_t类型接口需要包含`simt_api/asc_bf16.h`头文件。
-
-```cpp
-#include "simt_api/asc_bf16.h"
-```
-
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelExp(bfloat16x2_t* dst, bfloat16x2_t* x)
+    #include "simt_api/asc_bf16.h"
+
+    __global__ __launch_bounds__(1024) void kernel_exp(bfloat16x2_t* dst, bfloat16x2_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = h2exp(x[idx]);
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void KernelExp(__gm__ bfloat16x2_t* dst, __gm__ bfloat16x2_t* x)
+    #include "simt_api/asc_bf16.h"
+
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_exp(__gm__ bfloat16x2_t* dst, __gm__ bfloat16x2_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = h2exp(x[idx]);
     }
     ```

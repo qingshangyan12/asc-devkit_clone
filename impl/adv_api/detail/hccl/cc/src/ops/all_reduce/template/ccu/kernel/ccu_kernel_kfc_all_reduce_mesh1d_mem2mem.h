@@ -10,7 +10,6 @@
 #ifndef HCCL_CCU_KERNEL_KFC_ALL_REDUCE_MESH_1D_MEM2MEM_H
 #define HCCL_CCU_KERNEL_KFC_ALL_REDUCE_MESH_1D_MEM2MEM_H
 
-#include <vector>
 #include <ios>
 #include "utils.h"
 #include "ccu_kernel.h"
@@ -20,12 +19,21 @@
 namespace mc2_ops_hccl {
 using namespace hcomm;
 
+struct CcuKernelArgAllReduceKfc : CcuKernelArgBase {
+    uint64_t rankSize;
+    uint32_t rankId;
+    OpParam opParam;
+    std::vector<std::vector<uint32_t>> subCommRanks;
+};
+
 CcuResult CcuKfcAllReduceMesh1DMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable scratch,
     ccu::Variable currentRankSliceInputOffset, ccu::Variable currentRankSliceOutputOffset,
     ccu::Variable normalSliceSize, ccu::Variable lastSliceSize, ccu::Variable mySliceSize, ccu::Variable sliceOffset,
     ccu::Variable isInputOutputEqual, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2,
     ccu::Variable goSize3, ccu::Variable chunkSize, ccu::Variable tailSize, ccu::Variable chunkLoopNum,
+    ccu::Variable fullGoSize0, ccu::Variable fullGoSize1, ccu::Variable fullGoSize2, ccu::Variable fullGoSize3,
+    ccu::Variable tailGoSize0, ccu::Variable tailGoSize1, ccu::Variable tailGoSize2, ccu::Variable tailGoSize3,
     const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
     const HcclDataType& dataType, const HcclDataType& outputType, const HcclReduceOp& reduceType);
 

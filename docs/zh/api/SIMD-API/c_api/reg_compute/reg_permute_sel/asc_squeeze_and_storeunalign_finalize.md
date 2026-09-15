@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/compute/reg_permute_sel.h"`。
+
 Reg计算数据搬运接口，用于结束一组[asc_squeeze_and_storeunalign](asc_squeeze_and_storeunalign.md)连续搬出操作，将暂存在非对齐寄存器中的尾块写入Unified Buffer（UB）。
 
 本接口仅在AIV上生效。
@@ -33,6 +35,7 @@ Reg计算数据搬运接口，用于结束一组[asc_squeeze_and_storeunalign](a
 ## 函数原型
 
 ```c
+// 占位符形式
 __simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(
     __ubuf__ <dtype>* dst, vector_store_unalign src)
 ```

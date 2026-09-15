@@ -14,7 +14,7 @@
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ATOMIC_DATAMOVE_ATOMIC_H
 #endif
 
 #ifndef INCLUDE_C_API_ATOMIC_DATAMOVE_ATOMIC_H
@@ -23,9 +23,9 @@
 #include "c_api/defs/defs.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-#include "impl/c_api/instr_impl/npu_arch_2201/atomic_impl.h"
+#include "impl/c_api/memory_base_impl/datamove_atomic_intf_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/c_api/instr_impl/npu_arch_3510/atomic_impl.h"
+#include "impl/c_api/reg_base_impl/datamove_atomic_intf_impl.h"
 #endif
 
 __aicore__ inline void asc_set_atomic_add_float();
@@ -33,8 +33,6 @@ __aicore__ inline void asc_set_atomic_add_int8();
 __aicore__ inline void asc_set_atomic_add_int16();
 __aicore__ inline void asc_set_atomic_add_int32();
 __aicore__ inline void asc_disable_dma_atomic();
-[[deprecated("NOTICE: asc_set_atomic_none is deprecated. Please use asc_disable_dma_atomic instead.")]]
-__aicore__ inline void asc_set_atomic_none();
 __aicore__ inline void asc_set_atomic_add_bfloat();
 __aicore__ inline void asc_set_atomic_add_float16();
 __aicore__ inline void asc_set_atomic_max_bfloat();
@@ -50,18 +48,21 @@ __aicore__ inline void asc_set_atomic_min_int8();
 __aicore__ inline void asc_set_atomic_min_int16();
 __aicore__ inline void asc_set_atomic_min_int32();
 
-[[deprecated("NOTICE: asc_set_atomic_add_int is deprecated. Please use asc_set_atomic_add_int32 instead.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_disable_dma_atomic)
+__aicore__ inline void asc_set_atomic_none();
+
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_set_atomic_add_int32)
 __aicore__ inline void asc_set_atomic_add_int();
 
-[[deprecated("NOTICE: asc_set_atomic_max_int is deprecated. Please use asc_set_atomic_max_int32 instead.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_set_atomic_max_int32)
 __aicore__ inline void asc_set_atomic_max_int();
 
-[[deprecated("NOTICE: asc_set_atomic_min_int is deprecated. Please use asc_set_atomic_min_int32 instead.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_set_atomic_min_int32)
 __aicore__ inline void asc_set_atomic_min_int();
 
 #endif
 
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ATOMIC_DATAMOVE_ATOMIC_H)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ATOMIC_DATAMOVE_ATOMIC_H
 #endif

@@ -21,7 +21,8 @@ The 2 scenarios correspond to reduction sum for small shape input and large shap
 │   ├── sync_barrier.asc      // Scenario 1: Small shape reduction example, demonstrating asc_syncthreads() intra-block synchronization usage
 │   ├── memory_fence.asc      // Scenario 2: Large shape reduction example, demonstrating asc_threadfence() and atomic counter inter-block coordination usage
 │   ├── CMakeLists.txt        // Build project file
-│   └── README.md
+│   ├── README.md
+│   └── README_en.md      // English version of the sample description
 ```
 
 ## Example Description
@@ -158,14 +159,24 @@ Run the following steps in the root directory of this example to build and execu
   ./demo                        # Run the example
   ```
 
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+
   Build Options Description
 
   | Option | Values | Description |
   |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
   | `SCENARIO_NUM` | `1`, `2` | Scenario number: 1 indicates small shape reduction scenario, 2 indicates large shape reduction scenario |
 
   The following output indicates that the accuracy verification is successful.
   ```
-  [Success] Case accuracy is verification passed.
+  [Success] Case accuracy verification passed.
   ```
