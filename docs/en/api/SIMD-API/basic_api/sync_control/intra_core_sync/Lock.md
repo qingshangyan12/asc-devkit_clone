@@ -63,8 +63,8 @@ None
 ## Constraint Description<a name="section184751024101111"></a>
 
 - Each lock has a fixed **MutexID**. In different programming paradigms, the way this ID is obtained and released differs:
-    - When the [TPipe-TQue framework programming paradigm](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/programming_model/ai_core_simd_programming/tpipe_tque_programming/tpipe_tque_framework_programming_paradigm.md) is used, the **MutexID** must be applied for and released through [AllocMutexID](AllocMutexID_ISASI.md)/[ReleaseMutexID](ReleaseMutexID_ISASI.md).
-    - When the [static Tensor programming paradigm](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/programming_model/ai_core_simd_programming/cpp_tensor_programming/static_tensor_programming.md) is used, the **MutexID** is managed by the developer. It is recommended to use 0 to 27, while 28 to 31 are reserved for internal system planning and are not recommended.
+    - When the [TPipe-TQue framework programming paradigm](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/programming_model/ai_core_simd_programming/tpipe_tque_programming/tpipe_tque_framework_programming_paradigm.md) is used, the **MutexID** must be applied for and released through [AllocMutexID](AllocMutexID_ISASI.md)/[ReleaseMutexID](ReleaseMutexID_ISASI.md).
+    - When the [static Tensor programming paradigm](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/programming_model/ai_core_simd_programming/cpp_tensor_programming/static_tensor_programming.md) is used, the **MutexID** is managed by the developer. It is recommended to use 0 to 27, while 28 to 31 are reserved for internal system planning and are not recommended.
 - For the same **MutexID**, **Lock** must be executed before **Unlock**, and the specified **pipe** must be the same. If **Lock** and **Unlock** are not arranged in this "paired" order, the hardware behavior will be unpredictable. The following are examples of common incorrect and correct usage:
 
     ```cpp

@@ -8,7 +8,7 @@ Cube storage supports multiple combinations of on-the-fly quantization and on-th
 The combinations of on-the-fly quantization and on-the-fly ReLU are shown in the following table:
 
 <!-- npu="A3,910b" id2 -->
-**Table 1** Combination table of on-the-fly quantization and on-the-fly ReLU ([NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md))
+**Table 1** Combination table of on-the-fly quantization and on-the-fly ReLU ([NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md))
 
 | quantPre\reluPre | no ReLU | Normal ReLU |
 | ------------------ | --------- | ------------ |
@@ -17,7 +17,7 @@ The combinations of on-the-fly quantization and on-the-fly ReLU are shown in the
 <!-- end id2 -->
 
 <!-- npu="950" id3 -->
-**Table 2** Combination table of on-the-fly quantization and on-the-fly ReLU ([NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md))
+**Table 2** Combination table of on-the-fly quantization and on-the-fly ReLU ([NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md))
 
 | quantPre\reluPre | no ReLU | Normal ReLU |
 | --- | --- | --- |
@@ -32,12 +32,12 @@ The following are the jump links to the Python example code for several quantiza
 
 - \(V\)REQ8 quantization (\(Vector\)ReQuant \(u\)int8 quantization) combined with on-the-fly ReLU
 
-    Converts the int32_t data on the L0C Buffer to int8_t/uint8_t during data storage. For the complete Python example code of the on-the-fly quantization and ReLU algorithm, please refer to [(V)REQ8 quantization algorithm](https://gitcode.com/cann/asc-devkit/blob/9.1.0/examples/01_simd_cpp_api/03_basic_api/03_cube_compute/fixpipe_l0c2gm/scripts/gen_data_s322s8.py).
+    Converts the int32_t data on the L0C Buffer to int8_t/uint8_t during data storage. For the complete Python example code of the on-the-fly quantization and ReLU algorithm, please refer to [(V)REQ8 quantization algorithm](https://gitcode.com/cann/asc-devkit/blob/9.1.0/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2gm/scripts/gen_data_s322s8.py).
 
 - DEQF16 and VDEQF16 quantization combined with on-the-fly ReLU
 
-    Converts the int32_t data on the L0C Buffer to half (float16) during data storage. For the complete Python example code of the on-the-fly quantization and ReLU algorithm, please refer to [(V)DEQF16 algorithm](https://gitcode.com/cann/asc-devkit/blob/9.1.0/examples/01_simd_cpp_api/03_basic_api/03_cube_compute/fixpipe_l0c2gm/scripts/gen_data_s322f16.py).
+    Converts the int32_t data on the L0C Buffer to half (float16) during data storage. For the complete Python example code of the on-the-fly quantization and ReLU algorithm, please refer to [(V)DEQF16 algorithm](https://gitcode.com/cann/asc-devkit/blob/9.1.0/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2gm/scripts/gen_data_s322f16.py).
 
 - QF322B8_PRE and VQF322B8_PRE quantization combined with on-the-fly ReLU
 
-    Converts the float data on the L0C Buffer to int8_t/uint8_t during data storage. For the complete Python example code of the on-the-fly quantization and ReLU algorithm, please refer to [(V)QF322B8_PRE algorithm](https://gitcode.com/cann/asc-devkit/blob/9.1.0/examples/01_simd_cpp_api/03_basic_api/03_cube_compute/fixpipe_l0c2gm/scripts/gen_data_f322s8.py).
+    Converts the float data on the L0C Buffer to int8_t/uint8_t during data storage. For the complete Python example code of the on-the-fly quantization and ReLU algorithm, please refer to [(V)QF322B8_PRE algorithm](https://gitcode.com/cann/asc-devkit/blob/9.1.0/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2gm/scripts/gen_data_f322s8.py).

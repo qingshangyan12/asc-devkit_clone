@@ -60,7 +60,7 @@ Because Load3D moves data in units of 512-byte data fractals during the transfer
 
 Load3D supports only the following data paths: L1 Buffer->L0A Buffer and L1 Buffer->L0B Buffer.
 
-For the implementation principle, see the pseudocode: [Load3D Pseudocode](https://gitcode.com/cann/asc-devkit/blob/9.1.0/examples/01_simd_cpp_api/03_basic_api/03_cube_compute/load_data_l12l0/scripts/load3d.py).
+For the implementation principle, see the pseudocode: [Load3D Pseudocode](https://gitcode.com/cann/asc-devkit/blob/9.1.0/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0/scripts/load3d.py).
 
 **Figure 1** Load3D to L0A Buffer function diagram<a id="zh-cn_topic_0000002512171652_fig54450833715"></a>  
 

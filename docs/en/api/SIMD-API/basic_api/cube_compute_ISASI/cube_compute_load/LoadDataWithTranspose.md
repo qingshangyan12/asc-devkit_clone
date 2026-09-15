@@ -38,7 +38,7 @@ L1 Buffer->L0A Buffer, L1 Buffer->L0B Buffer.
 For Ascend 950PR/Ascend 950DT, this API does not support the L1 Buffer->L0A Buffer path and supports only the L1 Buffer->L0B Buffer path.
 <!-- end id10 -->
 
-For the implementation principle, see the pseudocode: [LoadDataWithTranspose Pseudocode](https://gitcode.com/cann/asc-devkit/blob/9.1.0/examples/01_simd_cpp_api/03_basic_api/03_cube_compute/load_data_l12l0/scripts/load_data_with_transpose.py).
+For the implementation principle, see the pseudocode: [LoadDataWithTranspose Pseudocode](https://gitcode.com/cann/asc-devkit/blob/9.1.0/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0/scripts/load_data_with_transpose.py).
 
 ## Function Prototype<a id="zh-cn_topic_0000002543851571_section82039854412"></a>
 

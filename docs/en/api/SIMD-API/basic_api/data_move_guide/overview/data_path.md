@@ -5,7 +5,7 @@
 ## AI Core Hardware Architecture and Storage Units
 
 <!-- npu="910b,A3" id1 -->
-The AI Core is the core compute unit of the Ascend processor. Taking [NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md) as an example, its internal hierarchical storage architecture is shown in Figure 1, which mainly consists of the following components:
+The AI Core is the core compute unit of the Ascend processor. Taking [NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md) as an example, its internal hierarchical storage architecture is shown in Figure 1, which mainly consists of the following components:
 
 - **Compute units (highlighted in yellow in the figure):** These include the Cube (cube) compute unit, the Vector compute unit, and the Scalar compute unit, which are responsible for cube multiply-accumulate operations, vector operations, and scalar control flow, respectively.
 - **Storage units:** From outside to inside by hierarchy, these are Global Memory (GM, located outside the AI Core), L1 Buffer, L0A/L0B/L0C Buffer, Unified Buffer (UB), BiasTable Buffer, Fixpipe Buffer, and so on. The capacity and alignment requirements of each storage unit vary. For details, see [Memory Hierarchy Architecture](./general_constraint_description.md#address-alignment-constraints).
@@ -17,7 +17,7 @@ The AI Core is the core compute unit of the Ascend processor. Taking [NPU archit
 <!-- end id1 -->
 
 <!-- npu="950" id2 -->
-Taking [NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md) as an example, its internal hierarchical storage architecture is shown in Figure 2. This architecture has the following changes in data paths:
+Taking [NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md) as an example, its internal hierarchical storage architecture is shown in Figure 2. This architecture has the following changes in data paths:
 
 - A unidirectional data path from L0C Buffer to UB is added.
 - A data path from UB to L1 Buffer is added.

@@ -11,13 +11,13 @@ The overall process of cube computation copy-out is shown in the following figur
 <!-- end id1 -->
 
 <!-- npu="A3,910b" id2 -->
-**Figure 1** Overall process of cube computation copy-out ([NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md))
+**Figure 1** Overall process of cube computation copy-out ([NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md))
 
 ![](../../../../figures/fixpipe_execution_flow_a2a3.png)
 <!-- end id2 -->
 
 <!-- npu="950" id3 -->
-**Figure 2** Overall process of cube computation copy-out ([NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md))
+**Figure 2** Overall process of cube computation copy-out ([NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md))
 
 ![](../../../../figures/fixpipe_execution_flow_a5.png)
 <!-- end id3 -->

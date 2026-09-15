@@ -114,7 +114,7 @@ None
 - In actual execution, these values may be modified by previously executed operators. If this API is not called for initialization, unexpected values may cause precision errors in the computation results.
 
   For example, if a previous operator uses Counter mode but does not reset it to Normal mode, when the current operator sets the Mask in the default Normal mode, the Mask setting will not meet expectations, thereby causing precision errors.
-- In [TPipe framework programming](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/Programming Model/AI Core SIMD Programming/TPipe TQue Framework Programming/TPipe TQue Framework Programming Principles.md), the initialization process is completed by TPipe, and developers do not need to pay attention to it. In the [static Tensor programming](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/Programming Model/AI Core SIMD Programming/Tensor Based CPP Programming/Static Tensor Programming.md) scenario, users must call this function at the Kernel entry to initialize the AI Core state.
+- In [TPipe framework programming](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/Programming Model/AI Core SIMD Programming/TPipe TQue Framework Programming/TPipe TQue Framework Programming Principles.md), the initialization process is completed by TPipe, and developers do not need to pay attention to it. In the [static Tensor programming](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/Programming Model/AI Core SIMD Programming/Tensor Based CPP Programming/Static Tensor Programming.md) scenario, users must call this function at the Kernel entry to initialize the AI Core state.
 
 ## Calling Example
 

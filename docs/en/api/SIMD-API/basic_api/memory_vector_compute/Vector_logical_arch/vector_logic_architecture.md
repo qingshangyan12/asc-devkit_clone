@@ -61,7 +61,7 @@ To improve the efficiency and throughput of data access, the Unified Buffer adop
 
   - Bank conflict optimization
 
-    For details, see [Avoiding Bank Conflicts (NPU Architecture Version 2201)](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/operator_practice/simd_operator_optimization/memory_access/avoid_ub_bank_conflict/avoid_bank_conflict_npu_arch_2201.md).
+    For details, see [Avoiding Bank Conflicts (NPU Architecture Version 2201)](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/operator_practice/simd_operator_optimization/memory_access/avoid_ub_bank_conflict/avoid_bank_conflict_npu_arch_2201.md).
 <!-- end id3 -->
 
 <!-- npu="950" id4 -->
@@ -79,5 +79,5 @@ To improve the efficiency and throughput of data access, the Unified Buffer adop
 
   - Bank conflict optimization
 
-    For details, see [Avoiding Bank Conflicts (NPU Architecture Version 3510)](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/operator_practice/simd_operator_optimization/memory_access/avoid_ub_bank_conflict/avoid_bank_conflict_npu_arch_3510.md).
+    For details, see [Avoiding Bank Conflicts (NPU Architecture Version 3510)](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/operator_practice/simd_operator_optimization/memory_access/avoid_ub_bank_conflict/avoid_bank_conflict_npu_arch_3510.md).
 <!-- end id4 -->

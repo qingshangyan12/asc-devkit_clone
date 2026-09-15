@@ -55,7 +55,7 @@ None
 
 ## Constraints<a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_section794123819592"></a>
 
-- To preserve API compatibility, it is recommended to compile and use [<<<>>>](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/Debugging and Tuning/Function Debugging/CPU Domain Twin Debugging.md).
+- To preserve API compatibility, it is recommended to compile and use [<<<>>>](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/Debugging and Tuning/Function Debugging/CPU Domain Twin Debugging.md).
 - Except for **func** and **blkdim**, all other variables must be pointers to shared memory allocated through [GmAlloc](GmAlloc.md). The number and order of the passed parameters must be consistent with those of **kernel**.
 
 ## Example<a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_section82241477610"></a>

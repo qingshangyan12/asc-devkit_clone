@@ -76,10 +76,8 @@ For Ascend 950PR/Ascend 950DT, the following GM->L1 Buffer APIs are newly added.
 | [L1 Buffer->BiasTable Buffer data movement](DataCopy_L1ToBiasTable.md) | Moves the bias parameters of cube computation from L1 Buffer to BiasTable Buffer. | L1 Buffer->BiasTable Buffer | Loading of bias add parameters after cube multiplication. |
 | [L1 Buffer->Fixpipe Buffer data movement](DataCopy_L1ToFixpipe.md) | Moves the on-the-fly quantization and on-the-fly ReLU parameters from L1 Buffer to Fixpipe Buffer. | L1 Buffer->Fixpipe Buffer | Loading of on-the-fly quantization and activation parameters for cube computation results. |
 
-<!-- npu="950" id_l12l0_950note -->
 > [!NOTE]Note
 > For Ascend 950PR/Ascend 950DT, LoadDataWithTranspose supports only the L1 Buffer->L0B Buffer path, and does not support the L1 Buffer->L0A Buffer path.
-<!-- end id_l12l0_950note -->
 
 <!-- npu="910b,A3" id3 -->
 For Atlas A2 training products/Atlas A2 inference products and Atlas A3 training products/Atlas A3 inference products, the following L1 Buffer->L0B Buffer APIs are supported. Developers are advised to refer to Table 6.

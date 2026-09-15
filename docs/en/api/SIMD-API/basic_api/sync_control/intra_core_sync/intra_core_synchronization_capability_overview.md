@@ -8,7 +8,7 @@ The execution units inside the AI Core (such as the MTE2 move engine and the Vec
 
 <!-- npu="910b,A3" id1 -->
 
-For [NPU architecture 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md#table65291052154114), the hardware architecture diagram is as follows. The highlighted parts show the compute units and move engines that execute in parallel.
+For [NPU architecture 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md#table65291052154114), the hardware architecture diagram is as follows. The highlighted parts show the compute units and move engines that execute in parallel.
 
 **Figure 1**  Architecture diagram<a name="zh-cn_topic_0000002542725361_fig11732135516285"></a>  
 ![](../../../../figures/atlas_a2_a3_architecture.png "Atlas_A2_A3_hardware_architecture_diagram")
@@ -17,7 +17,7 @@ For [NPU architecture 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/
 
 <!-- npu="950" id2 -->
 
-For [NPU architecture 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md#table65291052154114), the hardware architecture diagram is as follows. The highlighted parts show the compute units and move engines that execute in parallel.
+For [NPU architecture 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md#table65291052154114), the hardware architecture diagram is as follows. The highlighted parts show the compute units and move engines that execute in parallel.
 
 **Figure 2**  Architecture diagram<a name="zh-cn_topic_0000002542725361_fig31512113433"></a>  
 ![](../../../../figures/ascend_950pr_950dt_architecture.png "Ascend_950PR_950DT_hardware_architecture_diagram")
@@ -41,7 +41,7 @@ The four execution units Scalar, Vector, DMA (MTE2), and DMA (MTE3) execute in p
 The parallel instruction pipeline types inside the AI Core and their descriptions are as follows:
 
 > [!NOTE]
-> Different hardware architectures may have different specific pipelines under each hardware pipeline type. For details, see [Hardware Implementation](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/Advanced programming/Hardware implementation/Hardware implementation.md).
+> Different hardware architectures may have different specific pipelines under each hardware pipeline type. For details, see [Hardware Implementation](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/Advanced programming/Hardware implementation/Hardware implementation.md).
 
 **Table 1** Instruction pipeline types and related descriptions
 
@@ -75,7 +75,7 @@ The synchronization control over the intra-core parallel pipelines described abo
 
 <!-- npu="910b,A3" id4 -->
 
-Taking [NPU architecture 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md#table65291052154114) as an example, all legal intra-core synchronization combinations under this hardware architecture are shown in [Table 2](#zh-cn_topic_0000002542725361_table13753342164113) and [Table 3](#zh-cn_topic_0000002542725361_table1555712177426). Among them, "Not involved" indicates that this synchronization combination does not exist at the hardware level, and "No application scenario" indicates that this synchronization combination exists but is not required in actual development scenarios.
+Taking [NPU architecture 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md#table65291052154114) as an example, all legal intra-core synchronization combinations under this hardware architecture are shown in [Table 2](#zh-cn_topic_0000002542725361_table13753342164113) and [Table 3](#zh-cn_topic_0000002542725361_table1555712177426). Among them, "Not involved" indicates that this synchronization combination does not exist at the hardware level, and "No application scenario" indicates that this synchronization combination exists but is not required in actual development scenarios.
 
 **Table 2**  All legal intra-core synchronization combinations in AIC<a name="zh-cn_topic_0000002542725361_table13753342164113"></a>
 

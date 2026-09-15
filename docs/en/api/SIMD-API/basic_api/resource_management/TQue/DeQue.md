@@ -41,7 +41,7 @@ Retrieves a Tensor from the queue for subsequent processing.
         __aicore__ inline LocalTensor<T> DeQue()
         ```
 
-    -   Inplace API: Returns the result through an output parameter, which reduces the overhead of repeatedly creating tensors. For usage guidance, see [Tensor In-place Operation](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/appendix/common_operations/how_to_use_tensor_in_place_operations_to_improve_operator_performance.md).
+    -   Inplace API: Returns the result through an output parameter, which reduces the overhead of repeatedly creating tensors. For usage guidance, see [Tensor In-place Operation](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/appendix/common_operations/how_to_use_tensor_in_place_operations_to_improve_operator_performance.md).
 
         ```
         template <typename T>

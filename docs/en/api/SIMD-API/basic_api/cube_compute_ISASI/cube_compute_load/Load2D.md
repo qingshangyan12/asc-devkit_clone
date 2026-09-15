@@ -42,7 +42,7 @@ For different data types, the cube corresponding to each data fractal is as foll
 - For the b16 data type, each data fractal is a 16×16 cube.
 - For the b32 data type, each data fractal is a 16×8 cube in the L0A Buffer and an 8×16 cube in the L0B Buffer.
 
-For the implementation principle, see the pseudocode: [Load2D pseudocode](https://gitcode.com/cann/asc-devkit/blob/9.1.0/examples/01_simd_cpp_api/03_basic_api/03_cube_compute/load_data_l12l0/scripts/load2d.py).
+For the implementation principle, see the pseudocode: [Load2D pseudocode](https://gitcode.com/cann/asc-devkit/blob/9.1.0/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0/scripts/load2d.py).
 
 ## Prototype
 
