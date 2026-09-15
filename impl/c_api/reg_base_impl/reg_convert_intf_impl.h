@@ -7418,7 +7418,141 @@ __simd_callee__ inline void asc_int4x22int16(
     }
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+__simd_callee__ inline void asc_cast(
+    vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN> round_mode)
+{
+    if ASC_IS_AIV {
+        vtrc(dst, src, ROUND_R, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_cast(
+    vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RNA> round_mode)
+{
+    if ASC_IS_AIV {
+        vtrc(dst, src, ROUND_A, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_cast(
+    vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RD> round_mode)
+{
+    if ASC_IS_AIV {
+        vtrc(dst, src, ROUND_F, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_cast(
+    vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RU> round_mode)
+{
+    if ASC_IS_AIV {
+        vtrc(dst, src, ROUND_C, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_cast(
+    vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RZ> round_mode)
+{
+    if ASC_IS_AIV {
+        vtrc(dst, src, ROUND_Z, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_cast(
+    vector_float& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN> round_mode)
+{
+    if ASC_IS_AIV {
+        vtrc(dst, src, ROUND_R, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_cast(
+    vector_float& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RNA> round_mode)
+{
+    if ASC_IS_AIV {
+        vtrc(dst, src, ROUND_A, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_cast(
+    vector_float& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RD> round_mode)
+{
+    if ASC_IS_AIV {
+        vtrc(dst, src, ROUND_F, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_cast(
+    vector_float& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RU> round_mode)
+{
+    if ASC_IS_AIV {
+        vtrc(dst, src, ROUND_C, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_cast(
+    vector_float& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RZ> round_mode)
+{
+    if ASC_IS_AIV {
+        vtrc(dst, src, ROUND_Z, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_cast(
+    vector_half& dst, vector_half src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN> round_mode)
+{
+    if ASC_IS_AIV {
+        vtrc(dst, src, ROUND_R, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_cast(
+    vector_half& dst, vector_half src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RNA> round_mode)
+{
+    if ASC_IS_AIV {
+        vtrc(dst, src, ROUND_A, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_cast(
+    vector_half& dst, vector_half src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RD> round_mode)
+{
+    if ASC_IS_AIV {
+        vtrc(dst, src, ROUND_F, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_cast(
+    vector_half& dst, vector_half src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RU> round_mode)
+{
+    if ASC_IS_AIV {
+        vtrc(dst, src, ROUND_C, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_cast(
+    vector_half& dst, vector_half src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RZ> round_mode)
+{
+    if ASC_IS_AIV {
+        vtrc(dst, src, ROUND_Z, mask, MODE_ZEROING);
+    }
+}
+
 __simd_callee__ inline void asc_cast(
     vector_half& dst, vector_int16_t src, vector_bool mask,
     std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN> round_mode)
@@ -11917,8 +12051,6 @@ __simd_callee__ inline void asc_cast(
         vcvt(dst, src, mask, RS_ENABLE, PART_P3, MODE_ZEROING);
     }
 }
-#endif
-
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
