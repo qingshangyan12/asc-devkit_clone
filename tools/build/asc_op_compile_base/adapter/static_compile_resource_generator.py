@@ -25,12 +25,10 @@ from typing import Optional, Tuple
 if __package__:
     from .static_compile_resource_id import (
         ResourceIdError,
-        generate_and_write_resource_id,
     )
 else:
     from static_compile_resource_id import (
         ResourceIdError,
-        generate_and_write_resource_id,
     )
 
 _TILING_DATA_TEMPLATE = "@@STATIC_VALUE_tiling_data@@"
@@ -1104,11 +1102,12 @@ class KernelSpecCompilation:
     def attach_resource_id(self):
         if not self.enabled:
             return
-        _, error_mgr, utility_module, _ = _kernel_spec_runtime()
+        _, error_mgr, utility_module, storage_module = _kernel_spec_runtime()
         try:
-            self.resource_id = generate_and_write_resource_id(
-                self.compile_info.dst_file
-            )
+            key = "ascendc_resource_id_" + os.path.abspath(self.compile_info.dst_file)
+            self.resource_id = storage_module.global_var_storage.get_variable(key)
+            if not self.resource_id:
+                raise ResourceIdError("resource ID was not generated before final link")
         except ResourceIdError as error:
             utility_module.CommonUtility.ascendc_raise_python_err(
                 error_mgr.TBE_DEFAULT_PYTHON_ERROR_CODE,
