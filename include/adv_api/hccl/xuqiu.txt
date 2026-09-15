@@ -1,0 +1,25 @@
+
+
+ccArgs 版本内部流程
+该版本与mc2Tiling 版本的目标一致，只是输入来源改为ccArgs
+
+1、校验输入参数
+comm非空
+ccArgs非空
+ccType属于支持的通信类型
+2、ccArgs映射为内部算子描述
+ccType 映射为内部opType
+读取algConfig、commEngine、srcDataType、dstDataType、reduceType
+3、构造内部Tiling/OpParam
+复用与mc2Tiling版本一致的参数准备逻辑
+生成与算法选择器一致的输入对象
+4、执行算法选择
+algConfig必须为非空、不含'='的已注册算法名（否则HCCL_E_ALG_NOT_SUPPORTED）
+优先使用algConfig指定的算法；该算法在当前拓扑/资源下不可用时回退默认selector
+5、执行资源充足性检查
+获取executor
+计算层级资源信息
+计算资源请求
+判断资源是否足够
+
+
