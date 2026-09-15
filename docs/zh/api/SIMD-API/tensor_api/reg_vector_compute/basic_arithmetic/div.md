@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-头文件路径：`"tensor_api/experimental/vector_compute.h"`。
+头文件路径：`"tensor_api/experimental/arch/vector/basic_arithmetic.h"`。
 
 该接口根据src0携带的mask，对两个源操作数按元素相除，并返回计算结果。计算公式如下：
 
@@ -69,13 +69,17 @@ __simd_callee__ inline reg_tensor<T> operator/(
 
 - src0.mask需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
 - 使用整数类型时，除数不能为0。
-- 使用half或float类型时，非零有限值除以0得到带符号的inf，0除以0、inf除以inf或任一操作数为nan时得到nan，有限值除以inf得到0，inf除以有限值或0得到带符号的inf。
-- half在饱和模式下，结果为inf时输出带符号的最大有限值65504.0或-65504.0，结果为nan时输出0。float在饱和模式下的结果与INF/NAN模式相同。
+- 注意除零错误，结果请参考[Div特殊值/边界值输入的计算结果说明](../../../../appendix/reg_vector_compute_interface_boundary_value_summary.md#table1325925915217)。
+- `half`、`float`数据类型的计算结果与标准`IEEE 754`二进制浮点除法相比可能存在1 ULP精度差异。
 
 ## 调用示例
 
 ```cpp
-#include "tensor_api/experimental/vector_compute.h"
+#include "tensor_api/tensor.h"
+#include "tensor_api/experimental/arch/vector/basic_arithmetic.h"
+#include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
+#include "tensor_api/experimental/arch/vector/reg_data_load.h"
+#include "tensor_api/experimental/arch/vector/reg_data_store.h"
 
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void div_example(InputTensor input0, InputTensor input1, OutputTensor output)

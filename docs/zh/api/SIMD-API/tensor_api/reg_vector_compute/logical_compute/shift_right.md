@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-头文件路径：`"tensor_api/experimental/vector_compute.h"`。
+头文件路径：`"tensor_api/experimental/arch/vector/logical_compute.h"`。
 
 按照寄存器或标量给出的移位量，对`src`逐元素右移。
 
@@ -84,7 +84,11 @@ __simd_callee__ inline reg_tensor<T> operator>>(
 再执行计算并将结果写回UB。
 
 ```cpp
-#include "tensor_api/experimental/vector_compute.h"
+#include "tensor_api/tensor.h"
+#include "tensor_api/experimental/arch/vector/logical_compute.h"
+#include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
+#include "tensor_api/experimental/arch/vector/reg_data_load.h"
+#include "tensor_api/experimental/arch/vector/reg_data_store.h"
 
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void shift_right_example(InputTensor input, OutputTensor output)

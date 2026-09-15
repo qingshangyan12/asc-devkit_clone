@@ -26,9 +26,9 @@
 
 ## 功能说明
 
-头文件路径：`"tensor_api/experimental/vector_compute.h"`。
+头文件路径：`"tensor_api/experimental/arch/vector/basic_arithmetic.h"`。
 
-该接口根据src_reg携带的mask，对源操作数按元素执行PReLU计算，并返回计算结果。计算公式如下：
+该接口根据src携带的mask，对源操作数按元素执行PReLU计算，并返回计算结果。计算公式如下：
 
 $$
 dst_i = \begin{cases}
@@ -42,7 +42,7 @@ $$
 ```cpp
 template <typename T>
 __simd_callee__ inline reg_tensor<T> prelu(
-    const reg_tensor<T>& src_reg, const reg_tensor<T>& slope)
+    const reg_tensor<T>& src, const reg_tensor<T>& slope)
 ```
 
 ## 参数说明
@@ -57,25 +57,29 @@ __simd_callee__ inline reg_tensor<T> prelu(
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| src_reg | 输入 | 源操作数，类型为reg_tensor&lt;T&gt;。其中，src_reg.reg保存矢量数据，src_reg.mask用于控制各元素是否参与计算。src_reg.mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
+| src | 输入 | 源操作数，类型为reg_tensor&lt;T&gt;。其中，src.reg保存矢量数据，src.mask用于控制各元素是否参与计算。src.mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
 | slope | 输入 | 斜率，类型为reg_tensor&lt;T&gt;。slope.reg保存各元素使用的斜率，slope.mask不参与本次计算。 |
 
 ## 数据类型
 
-src_reg、slope与返回值的数据类型保持一致。支持的数据类型为：half、float。
+src、slope与返回值的数据类型保持一致。支持的数据类型为：half、float。
 
 ## 返回值说明
 
-返回PReLU计算结果，类型为reg_tensor&lt;T&gt;。返回值mask与src_reg.mask相同；src_reg.mask对应位置为0时，返回值的对应元素置零。
+返回PReLU计算结果，类型为reg_tensor&lt;T&gt;。返回值mask与src.mask相同；src.mask对应位置为0时，返回值的对应元素置零。
 
 ## 约束说明
 
-src_reg.mask需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
+src.mask需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
 
 ## 调用示例
 
 ```cpp
-#include "tensor_api/experimental/vector_compute.h"
+#include "tensor_api/tensor.h"
+#include "tensor_api/experimental/arch/vector/basic_arithmetic.h"
+#include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
+#include "tensor_api/experimental/arch/vector/reg_data_load.h"
+#include "tensor_api/experimental/arch/vector/reg_data_store.h"
 
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void prelu_example(InputTensor input, InputTensor slope_input, OutputTensor output)

@@ -26,12 +26,12 @@
 
 ## 功能说明
 
-头文件路径：`"tensor_api/experimental/vector_compute.h"`。
+头文件路径：`"tensor_api/experimental/arch/vector/basic_arithmetic.h"`。
 
 减法运算在硬件底层通过补码加法实现，carry中的进位标志为1表示减法未借位，为0表示减法发生借位。该接口支持以下两种按元素减法：
 
-- 带进位输出减法：对src0和src1求差，返回计算结果的低32位，并通过carry输出进位标志。
-- 带进位输入和输出减法：对src0、src1和carry_src中的进位求差，返回计算结果的低32位，并通过carry输出新的进位标志。
+- 带进位输出减法：对src0和src1求差，通过返回值同时输出计算结果的低32位和进位标志。
+- 带进位输入和输出减法：对src0、src1和carry_src中的进位求差，通过返回值同时输出计算结果的低32位和新的进位标志。
 
 计算公式如下：
 
@@ -49,18 +49,15 @@ $$
 
     ```cpp
     template <typename T>
-    __simd_callee__ inline reg_tensor<T> subc(
-        reg_tensor<bool>& carry,
-        const reg_tensor<T>& src0,
-        const reg_tensor<T>& src1)
+    __simd_callee__ inline carry_result<T> subc(
+        const reg_tensor<T>& src0, const reg_tensor<T>& src1)
     ```
 
 - 带进位输入和输出减法
 
     ```cpp
     template <typename T>
-    __simd_callee__ inline reg_tensor<T> subc(
-        reg_tensor<bool>& carry,
+    __simd_callee__ inline carry_result<T> subc(
         const reg_tensor<T>& src0,
         const reg_tensor<T>& src1,
         const reg_tensor<bool>& carry_src)
@@ -80,7 +77,6 @@ $$
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| carry | 输出 | 进位标志，类型为reg_tensor&lt;bool&gt;。carry.reg中，未发生借位的元素为1，发生借位的元素为0；返回时carry.mask与src0.mask相同。 |
 | src0 | 输入 | 被减数，类型为reg_tensor&lt;T&gt;。src0.reg保存矢量数据，src0.mask控制各元素是否参与计算。 |
 | src1 | 输入 | 减数，类型为reg_tensor&lt;T&gt;。src1.mask不参与本次计算。 |
 
@@ -90,18 +86,22 @@ $$
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| carry | 输出 | 新的进位标志，类型为reg_tensor&lt;bool&gt;。carry.reg中，未发生借位的元素为1，发生借位的元素为0；返回时carry.mask与src0.mask相同。 |
 | src0 | 输入 | 被减数，类型为reg_tensor&lt;T&gt;。src0.reg保存矢量数据，src0.mask控制各元素是否参与计算。 |
 | src1 | 输入 | 减数，类型为reg_tensor&lt;T&gt;。src1.mask不参与本次计算。 |
 | carry_src | 输入 | 输入进位，类型为reg_tensor&lt;bool&gt;。carry_src.reg中的进位标志参与计算，carry_src.mask不参与本次计算。 |
 
 ## 数据类型
 
-src0、src1与返回值的数据类型保持一致，支持int32_t、uint32_t。carry和carry_src的元素类型为bool。
+src0、src1与返回值中`value`的数据类型保持一致，支持int32_t、uint32_t。返回值中`carry`和输入参数carry_src的元素类型为bool。
 
 ## 返回值说明
 
-返回减法结果的低32位，类型为reg_tensor&lt;T&gt;。返回值mask与src0.mask相同；src0.mask对应位置为0时，返回值和carry的对应元素均置零。
+返回`carry_result<T>`类型的双输出结果：
+
+- `value`：类型为`reg_tensor<T>`，保存减法结果的低32位。
+- `carry`：类型为`reg_tensor<bool>`，未发生借位的元素为1，发生借位的元素为0。
+
+`value.mask`和`carry.mask`均与`src0.mask`相同；`src0.mask`对应位置为0时，两个输出的对应元素均置零。
 
 ## 约束说明
 
@@ -110,7 +110,11 @@ src0.mask需通过`with_mask`接口预先设置。未设置时，mask的内容�
 ## 调用示例
 
 ```cpp
-#include "tensor_api/experimental/vector_compute.h"
+#include "tensor_api/tensor.h"
+#include "tensor_api/experimental/arch/vector/basic_arithmetic.h"
+#include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
+#include "tensor_api/experimental/arch/vector/reg_data_load.h"
+#include "tensor_api/experimental/arch/vector/reg_data_store.h"
 
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void subc_example(InputTensor input0, InputTensor input1, OutputTensor output)
@@ -121,12 +125,10 @@ __simd_vf__ inline void subc_example(InputTensor input0, InputTensor input1, Out
     auto src0_high = asc::te::experimental::load(input0, asc::te::make_coord(1)).with_mask(mask);
     auto src1_high = asc::te::experimental::load(input1, asc::te::make_coord(1));
 
-    asc::te::experimental::reg_tensor<bool> carry_low;
-    auto low = asc::te::experimental::subc(carry_low, src0_low, src1_low);
-    asc::te::experimental::reg_tensor<bool> carry_high;
-    auto high = asc::te::experimental::subc(carry_high, src0_high, src1_high, carry_low);
+    auto low = asc::te::experimental::subc(src0_low, src1_low);
+    auto high = asc::te::experimental::subc(src0_high, src1_high, low.carry);
 
-    asc::te::experimental::store(output, asc::te::make_coord(0), low);
-    asc::te::experimental::store(output, asc::te::make_coord(1), high);
+    asc::te::experimental::store(output, asc::te::make_coord(0), low.value);
+    asc::te::experimental::store(output, asc::te::make_coord(1), high.value);
 }
 ```
