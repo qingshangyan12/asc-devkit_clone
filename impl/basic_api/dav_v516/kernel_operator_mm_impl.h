@@ -18,6 +18,7 @@
 #define ASCENDC_MODULE_OPERATOR_MM_IMPL_H
 
 #include "../../../include/basic_api/kernel_operator_mm_bitmode_intf.h"
+#include "../../../includebasic_api/kernel_struct_macro.h"
 
 namespace AscendC {
 /* **************************************************************************************************
