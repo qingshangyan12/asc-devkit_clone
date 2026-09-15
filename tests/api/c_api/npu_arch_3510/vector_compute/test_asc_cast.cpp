@@ -13,32 +13,32 @@
 #include "tests/api/c_api/stub/cce_stub.h"
 #include "include/c_api/asc_simd.h"
 
-#define TEST_ASC_CAST_ROUND(type, tag, expected_round)                                                        \
-    namespace {                                                                                              \
-    void AscCast##type##tag##Stub(type& dst, type src, int32_t round, vector_bool mask, int32_t mode)        \
-    {                                                                                                        \
-        EXPECT_EQ(round, expected_round);                                                                    \
-        EXPECT_EQ(mode, MODE_ZEROING);                                                                       \
-    }                                                                                                        \
-    }                                                                                                        \
-                                                                                                             \
-    TEST(AscCastRound, type##tag)                                                                             \
-    {                                                                                                        \
-        type dst;                                                                                            \
-        type src;                                                                                            \
-        vector_bool mask;                                                                                    \
-                                                                                                             \
-        MOCKER_CPP(vtrc, void(type&, type, int32_t, vector_bool, int32_t))                                   \
-            .times(1)                                                                                        \
-            .will(invoke(AscCast##type##tag##Stub));                                                         \
-                                                                                                             \
-        asc_cast(dst, src, mask, ASC_CAST_##tag);                                                            \
-        GlobalMockObject::verify();                                                                          \
+#define TEST_ASC_CAST_ROUND(type, tag, expected_round)                                                \
+    namespace {                                                                                       \
+    void AscCast##type##tag##Stub(type& dst, type src, int32_t round, vector_bool mask, int32_t mode) \
+    {                                                                                                 \
+        EXPECT_EQ(round, expected_round);                                                             \
+        EXPECT_EQ(mode, MODE_ZEROING);                                                                \
+    }                                                                                                 \
+    }                                                                                                 \
+                                                                                                      \
+    TEST(AscCastRound, type##tag)                                                                     \
+    {                                                                                                 \
+        type dst;                                                                                     \
+        type src;                                                                                     \
+        vector_bool mask;                                                                             \
+                                                                                                      \
+        MOCKER_CPP(vtrc, void(type&, type, int32_t, vector_bool, int32_t))                            \
+            .times(1)                                                                                 \
+            .will(invoke(AscCast##type##tag##Stub));                                                  \
+                                                                                                      \
+        asc_cast(dst, src, mask, ASC_CAST_##tag);                                                     \
+        GlobalMockObject::verify();                                                                   \
     }
 
-#define TEST_ASC_CAST_ROUND_TYPES(tag, expected_round)                  \
-    TEST_ASC_CAST_ROUND(vector_half, tag, expected_round);              \
-    TEST_ASC_CAST_ROUND(vector_bfloat16_t, tag, expected_round);        \
+#define TEST_ASC_CAST_ROUND_TYPES(tag, expected_round)           \
+    TEST_ASC_CAST_ROUND(vector_half, tag, expected_round);       \
+    TEST_ASC_CAST_ROUND(vector_bfloat16_t, tag, expected_round); \
     TEST_ASC_CAST_ROUND(vector_float, tag, expected_round)
 
 TEST_ASC_CAST_ROUND_TYPES(RN, ROUND_R);
