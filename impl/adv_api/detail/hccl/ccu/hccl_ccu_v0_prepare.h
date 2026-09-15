@@ -351,12 +351,13 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForConcurrentAllToAll(
     __gm__ CommonPrepareParamCcu* commParam)
 {
-    constexpr uint64_t meshBandwidth = 11U;
-    constexpr uint64_t totalBandwidth = 21U;
+    constexpr uint64_t meshBandwidth = 100U;
+    constexpr uint64_t totalBandwidth = 193U;
     constexpr uint64_t splitAlignment = 128U;
     constexpr uint64_t memsliceSize = CCU_MEMSLICE_SIZE * 8U;
     constexpr uint64_t threshold8M = 8U * 1024U * 1024U;
     constexpr uint64_t threshold32M = 32U * 1024U * 1024U;
+    constexpr uint64_t jettyNum = 1U;
     const uint64_t dataTypeSize = GetHcclDataTypeSize(commParam->dataType);
     const uint64_t totalSize = commParam->count * dataTypeSize;
     const uint64_t repeatOffset = totalSize * ccuParam_.repeatIndex;
@@ -373,6 +374,11 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         loopCount = CCU_LOOP_COUNT_M2M_AG * 2U;
     }
 
+    const uint64_t meshSliceSizePerJetty = (jettyNum > 0U) ? (meshSize / jettyNum / splitAlignment * splitAlignment) : 0U;
+    const uint64_t meshLastSliceSizePerJetty = (jettyNum > 0U) ? (meshSize - meshSliceSizePerJetty * (jettyNum - 1U)) : meshSize;
+    const uint64_t closSliceSizePerJetty = (jettyNum > 0U) ? (closSize / jettyNum / splitAlignment * splitAlignment) : 0U;
+    const uint64_t closLastSliceSizePerJetty = (jettyNum > 0U) ? (closSize - closSliceSizePerJetty * (jettyNum - 1U)) : closSize;
+
     xnData_[KFC_CONCURRENT_A2A_OP_ID] = GetOpId(commParam);
     xnData_[KFC_CONCURRENT_A2A_MESH_INPUT] = inputBase;
     xnData_[KFC_CONCURRENT_A2A_MESH_OUTPUT] = outputBase;
@@ -381,6 +387,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[KFC_CONCURRENT_A2A_MESH_SRC_OFFSET] = 0U;
     xnData_[KFC_CONCURRENT_A2A_MESH_DST_OFFSET] = strideSize * ccuParam_.rankId;
     CalcGoSize(meshSize, loopCount, memsliceSize, &xnData_[KFC_CONCURRENT_A2A_MESH_GO_SIZE_0]);
+    xnData_[KFC_CONCURRENT_A2A_MESH_SLICE_SIZE_PER_JETTY] = meshSliceSizePerJetty;
+    xnData_[KFC_CONCURRENT_A2A_MESH_LAST_SLICE_SIZE_PER_JETTY] = meshLastSliceSizePerJetty;
+    xnData_[KFC_CONCURRENT_A2A_MESH_JETTY_NUM] = jettyNum;
 
     xnData_[KFC_CONCURRENT_A2A_CLOS_INPUT] = inputBase + meshSize;
     xnData_[KFC_CONCURRENT_A2A_CLOS_OUTPUT] = outputBase + meshSize;
@@ -389,6 +398,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[KFC_CONCURRENT_A2A_CLOS_SRC_OFFSET] = 0U;
     xnData_[KFC_CONCURRENT_A2A_CLOS_DST_OFFSET] = strideSize * ccuParam_.rankId;
     CalcGoSize(closSize, loopCount, memsliceSize, &xnData_[KFC_CONCURRENT_A2A_CLOS_GO_SIZE_0]);
+    xnData_[KFC_CONCURRENT_A2A_CLOS_SLICE_SIZE_PER_JETTY] = closSliceSizePerJetty;
+    xnData_[KFC_CONCURRENT_A2A_CLOS_LAST_SLICE_SIZE_PER_JETTY] = closLastSliceSizePerJetty;
+    xnData_[KFC_CONCURRENT_A2A_CLOS_JETTY_NUM] = jettyNum;
 }
 
 template <const auto& config>

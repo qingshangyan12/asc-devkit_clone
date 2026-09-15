@@ -20,6 +20,7 @@ namespace mc2_ops_hccl {
 struct CcuKernelArgKfcAllToAllMesh1DMultiJetty : CcuKernelArgBase {
     uint64_t rankSize = 0;
     uint32_t rankId = 0;
+    uint32_t jettyNum = 1U;
     OpParam opParam;
     std::vector<std::vector<uint32_t>> subCommRanks;
 };
@@ -50,6 +51,7 @@ public:
     HcclResult KernelRun(
         const OpParam& param, const TemplateDataParams& templateDataParams,
         TemplateResource& templateResource) override;
+    HcclResult FastLaunch(const OpParam& param, const TemplateFastLaunchCtx& tempFastLaunchCtx) override;
     HcclResult GetRes(AlgResourceRequest& resourceRequest) const override;
     u64 GetThreadNum() const override;
     u64 CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) override;
@@ -60,6 +62,7 @@ private:
         AlgResourceRequest& resourceRequest) const;
     uint32_t mySubCommRank_ = 0;
     uint32_t tempRankSize_ = 0;
+    uint32_t jettyNum_ = 1U;
 };
 
 } // namespace mc2_ops_hccl

@@ -22,6 +22,7 @@ struct KfcAllToAllContext : CcuKernelCtxBase {
     uint32_t channelCount = 0;
     uint32_t rankSize = 0;
     uint32_t rankId = 0;
+    uint32_t jettyNum = 1U;
 
     ccu::Variable input;
     ccu::Variable output;
@@ -32,21 +33,23 @@ struct KfcAllToAllContext : CcuKernelCtxBase {
     ccu::Variable srcStride;
     ccu::Variable srcOffset;
     ccu::Variable dstOffset;
+    ccu::Variable sliceSizePerJetty;
+    ccu::Variable lastSliceSizePerJetty;
     GroupOpSizeVars goSize;
-    ccu::Event event;
-    ccu::Event localCopyEvent;
+    std::vector<ccu::Event> eventList;
 };
 
 CcuResult InitResource(KfcAllToAllContext& ctx)
 {
-    if (ctx.channelCount == 0U || ctx.rankSize == 0U || ctx.rankId >= ctx.rankSize) {
+    if (ctx.channelCount == 0U || ctx.rankSize == 0U || ctx.rankId >= ctx.rankSize || ctx.jettyNum == 0U) {
         HCCL_ERROR(
-            "[CcuKfcAllToAll] invalid resource, channelCount[%u], rankSize[%u], rankId[%u]", ctx.channelCount,
-            ctx.rankSize, ctx.rankId);
+            "[CcuKfcAllToAll] invalid resource, channelCount[%u], rankSize[%u], rankId[%u], jettyNum[%u]",
+            ctx.channelCount, ctx.rankSize, ctx.rankId, ctx.jettyNum);
         return CCU_E_INTERNAL;
     }
     ctx.peerOutput.resize(ctx.rankSize);
     ctx.peerToken.resize(ctx.rankSize);
+    ctx.eventList.resize(ctx.rankSize);
     uint32_t channelIdx = 0;
     for (uint32_t peerId = 0; peerId < ctx.rankSize; ++peerId) {
         if (peerId == ctx.rankId) {
@@ -100,18 +103,35 @@ CcuResult DoAllToAll(KfcAllToAllContext& ctx)
         for (uint32_t i = 0; i < rankIdx; ++i) {
             src.addr += ctx.srcStride;
         }
-        src.token = ctx.token;
+        src.token = ctx.peerToken[rankIdx];
         ccu::RemoteAddr dst;
         dst.addr = ctx.peerOutput[rankIdx];
         dst.addr += ctx.dstOffset;
         dst.token = ctx.peerToken[rankIdx];
 
-        const uint16_t rankMask = static_cast<uint16_t>(1U << rankIdx);
-        CCU_IF(ctx.sliceSize != 0)
+        CCU_IF(ctx.sliceSizePerJetty != 0)
         {
-            CCU_CHK_RET(ccu::Write(ctx.channels[channelId], dst, src, ctx.sliceSize, ctx.event, rankMask));
+            for (uint32_t jetty = 0; jetty + 1U < ctx.jettyNum; ++jetty) {
+                const uint16_t jettyMask = static_cast<uint16_t>(1U << jetty);
+                CCU_CHK_RET(ccu::Write(
+                    ctx.channels[channelId], dst, src, ctx.sliceSizePerJetty, ctx.eventList[rankIdx], jettyMask));
+                src.addr += ctx.sliceSizePerJetty;
+                dst.addr += ctx.sliceSizePerJetty;
+            }
         }
-        CCU_ELSE { CCU_CHK_RET(ccu::EventRecord(ctx.event, rankMask)); }
+        CCU_ELSE
+        {
+            for (uint32_t jetty = 0; jetty + 1U < ctx.jettyNum; ++jetty) {
+                CCU_CHK_RET(ccu::EventRecord(ctx.eventList[rankIdx], static_cast<uint16_t>(1U << jetty)));
+            }
+        }
+        const uint16_t lastMask = static_cast<uint16_t>(1U << (ctx.jettyNum - 1U));
+        CCU_IF(ctx.lastSliceSizePerJetty != 0)
+        {
+            CCU_CHK_RET(ccu::Write(
+                ctx.channels[channelId], dst, src, ctx.lastSliceSizePerJetty, ctx.eventList[rankIdx], lastMask));
+        }
+        CCU_ELSE { CCU_CHK_RET(ccu::EventRecord(ctx.eventList[rankIdx], lastMask)); }
         ++channelId;
     }
 
@@ -125,18 +145,13 @@ CcuResult DoAllToAll(KfcAllToAllContext& ctx)
     localDst.addr = ctx.output;
     localDst.addr += ctx.dstOffset;
     localDst.token = ctx.token;
-    CCU_IF(ctx.sliceSize != 0)
-    {
-        CCU_CHK_RET(ccu::LocalCopy(localDst, localSrc, ctx.sliceSize, ctx.localCopyEvent, 1));
-        CCU_CHK_RET(ccu::EventWait(ctx.localCopyEvent, 1));
-    }
-    CCU_CHK_RET(ccu::EventRecord(ctx.event, static_cast<uint16_t>(1U << ctx.rankId)));
+    CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(GroupCopy(ctx, localDst, localSrc, ctx.goSize)); }
+    CCU_CHK_RET(ccu::EventRecord(ctx.eventList[ctx.rankId], 1U));
 
-    uint16_t waitMask = 0;
     for (uint32_t r = 0; r < ctx.rankSize; ++r) {
-        waitMask |= 1U << r;
+        const uint16_t waitMask = (r == ctx.rankId) ? 1U : static_cast<uint16_t>((1U << ctx.jettyNum) - 1U);
+        CCU_CHK_RET(ccu::EventWait(ctx.eventList[r], waitMask));
     }
-    CCU_CHK_RET(ccu::EventWait(ctx.event, waitMask));
     return CCU_SUCCESS;
 }
 } // namespace
@@ -144,14 +159,16 @@ CcuResult DoAllToAll(KfcAllToAllContext& ctx)
 CcuResult CcuKfcAllToAllMesh1DMultiJettyKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable sliceSize,
     ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset, ccu::Variable goSize0,
-    ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3, const ChannelHandle channels[],
-    uint32_t channelCount, uint32_t rankSize, uint32_t rankId)
+    ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable sliceSizePerJetty,
+    ccu::Variable lastSliceSizePerJetty, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize,
+    uint32_t rankId, uint32_t jettyNum)
 {
     KfcAllToAllContext ctx;
     ctx.channels = channels;
     ctx.channelCount = channelCount;
     ctx.rankSize = rankSize;
     ctx.rankId = rankId;
+    ctx.jettyNum = jettyNum;
     InitCcuKernelCtxBase(ctx);
     CCU_CHK_RET(InitResource(ctx));
 
@@ -162,6 +179,8 @@ CcuResult CcuKfcAllToAllMesh1DMultiJettyKernel(
     ctx.srcStride = srcStride;
     ctx.srcOffset = srcOffset;
     ctx.dstOffset = dstOffset;
+    ctx.sliceSizePerJetty = sliceSizePerJetty;
+    ctx.lastSliceSizePerJetty = lastSliceSizePerJetty;
     ctx.goSize.addrOffset = goSize0;
     ctx.goSize.loopParam = goSize1;
     ctx.goSize.parallelParam = goSize2;

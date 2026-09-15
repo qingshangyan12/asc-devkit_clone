@@ -28,6 +28,13 @@ public:
         const AlgHierarchyInfoForAllLevel& algHierarchyInfo, AlgResourceRequest& resourceRequest) override;
     HcclResult Orchestrate(const OpParam& param, const AlgResourceCtxSerializable& resCtx) override;
 
+#ifndef AICPU_COMPILE
+    HcclResult FastLaunch(const OpParam& param, const CcuFastLaunchCtx* resCtx) override;
+    HcclResult FastLaunchSaveCtx(
+        const OpParam& param, const TemplateResource& templateAlgRes0, const TemplateResource& templateAlgRes1,
+        u32 notifyNumOnMainThread);
+#endif
+
 private:
     struct SendRecvData {
         std::vector<u64> sendCounts;

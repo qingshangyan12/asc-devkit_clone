@@ -23,8 +23,8 @@ namespace mc2_ops_hccl {
 namespace {
 constexpr u32 CONCURRENT_TEMPLATE_NUM = 2U;
 constexpr u32 CLOS_PORT_NUM = 4U;
-constexpr u32 MESH_BW_CCU = 11U;
-constexpr u32 CLOS_BW_CCU = 10U;
+constexpr u32 MESH_BW_CCU = 100U;
+constexpr u32 CLOS_BW_CCU = 93U;
 constexpr u32 MESH_BW_AICPU_TS = 10U;
 constexpr u32 CLOS_BW_AICPU_TS = 12U;
 
@@ -477,8 +477,116 @@ HcclResult InsV2AllToAllConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlg
         }
     }
     CHK_RET(PostSyncInterThreads(resource0.threads[0], {resource1.threads[0]}, postSyncNotify));
+#ifndef AICPU_COMPILE
+    if (loopTimes0 == 1U && loopTimes1 == 1U && param.engine == CommEngine::COMM_ENGINE_CCU) {
+        CHK_RET(FastLaunchSaveCtx(param, resource0, resource1, resCtx.notifyNumOnMainThread));
+    }
+#endif
     return HCCL_SUCCESS;
 }
+
+#ifndef AICPU_COMPILE
+template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
+HcclResult InsV2AllToAllConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::FastLaunchSaveCtx(
+    const OpParam& param, const TemplateResource& templateAlgRes0, const TemplateResource& templateAlgRes1,
+    u32 notifyNumOnMainThread)
+{
+    HCCL_INFO("[InsV2AllToAllConcurrentExecutor] loopTimes==1, save fast launch ctx.");
+    const u32 ccuKernelNum0 = static_cast<u32>(templateAlgRes0.submitInfos.size());
+    const u32 ccuKernelNum1 = static_cast<u32>(templateAlgRes1.submitInfos.size());
+    const u32 totalCcuKernelNum = ccuKernelNum0 + ccuKernelNum1;
+    if (totalCcuKernelNum < 1U) {
+        HCCL_INFO("[InsV2AllToAllConcurrentExecutor] ccu kernel num is 0, no need to save.");
+        return HCCL_SUCCESS;
+    }
+    const u32 threadNum = static_cast<u32>(template0Threads_.size() + template1Threads_.size());
+    HCCL_INFO(
+        "[InsV2AllToAllConcurrentExecutor][FastLaunchSaveCtx] threadNum[%u], ccuKernelNum[%u]", threadNum,
+        totalCcuKernelNum);
+
+    const u64 size = CcuFastLaunchCtx::GetCtxSize(threadNum, totalCcuKernelNum);
+    void* ctxPtr = nullptr;
+    HCCL_INFO("[InsV2AllToAllConcurrentExecutor][FastLaunchSaveCtx] Tag[%s], size[%llu]", param.fastLaunchTag, size);
+    CHK_RET(HcclEngineCtxCreate(param.hcclComm, param.fastLaunchTag, CommEngine::COMM_ENGINE_CCU, size, &ctxPtr));
+
+    CcuFastLaunchCtx* ccuFastLaunchCtx = reinterpret_cast<CcuFastLaunchCtx*>(ctxPtr);
+    CHK_SAFETY_FUNC_RET(strcpy_s(ccuFastLaunchCtx->algName, sizeof(ccuFastLaunchCtx->algName), param.algName));
+    HCCL_INFO("[InsV2AllToAllConcurrentExecutor][FastLaunchSaveCtx] algName[%s]", ccuFastLaunchCtx->algName);
+
+    ccuFastLaunchCtx->threadNum = threadNum;
+    ccuFastLaunchCtx->notifyNumOnMainThread = notifyNumOnMainThread;
+    ThreadHandle* threadHandles = ccuFastLaunchCtx->GetThreadHandlePtr();
+    for (size_t i = 0; i < template0Threads_.size(); ++i) {
+        threadHandles[i] = template0Threads_[i];
+    }
+    for (size_t i = 0; i < template1Threads_.size(); ++i) {
+        threadHandles[template0Threads_.size() + i] = template1Threads_[i];
+    }
+
+    ccuFastLaunchCtx->ccuKernelNum[0] = ccuKernelNum0;
+    ccuFastLaunchCtx->ccuKernelNum[1] = ccuKernelNum1;
+    CcuKernelSubmitInfo* kernelSubmitInfos = ccuFastLaunchCtx->GetCcuKernelSubmitInfoPtr();
+    u32 kernelIdx = 0;
+    for (u32 i = 0; i < ccuKernelNum0; ++i) {
+        kernelSubmitInfos[kernelIdx++] = templateAlgRes0.submitInfos[i];
+    }
+    for (u32 i = 0; i < ccuKernelNum1; ++i) {
+        kernelSubmitInfos[kernelIdx++] = templateAlgRes1.submitInfos[i];
+    }
+    return HCCL_SUCCESS;
+}
+
+template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
+HcclResult InsV2AllToAllConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::FastLaunch(
+    const OpParam& param, const CcuFastLaunchCtx* fastLaunchCtx)
+{
+    HCCL_INFO("[InsV2AllToAllConcurrentExecutor][FastLaunch] Start.");
+    InsAlgTemplate0 tempAlg0{};
+    InsAlgTemplate1 tempAlg1{};
+
+    ThreadHandle* threads = fastLaunchCtx->GetThreadHandlePtr();
+    const u32 meshThreadNum = static_cast<u32>(tempAlg0.GetThreadNum());
+    if (meshThreadNum > fastLaunchCtx->threadNum) {
+        HCCL_ERROR(
+            "[InsV2AllToAllConcurrentExecutor][FastLaunch] meshThreadNum[%u] exceeds total threads[%u]",
+            meshThreadNum, fastLaunchCtx->threadNum);
+        return HCCL_E_PARA;
+    }
+    std::vector<ThreadHandle> temp0Threads(threads, threads + meshThreadNum);
+    std::vector<ThreadHandle> temp1Threads(threads + meshThreadNum, threads + fastLaunchCtx->threadNum);
+
+    CcuKernelSubmitInfo* allSubmitInfos = fastLaunchCtx->GetCcuKernelSubmitInfoPtr();
+
+    TemplateFastLaunchCtx tempFastLaunchCtx0;
+    tempFastLaunchCtx0.threads = temp0Threads;
+    tempFastLaunchCtx0.ccuKernelSubmitInfos.assign(
+        allSubmitInfos, allSubmitInfos + fastLaunchCtx->ccuKernelNum[0]);
+    CHK_RET(SetTempFastLaunchAddr(tempFastLaunchCtx0, param.inputPtr, param.outputPtr, param.hcclBuff));
+
+    TemplateFastLaunchCtx tempFastLaunchCtx1;
+    tempFastLaunchCtx1.threads = temp1Threads;
+    tempFastLaunchCtx1.ccuKernelSubmitInfos.assign(
+        allSubmitInfos + fastLaunchCtx->ccuKernelNum[0],
+        allSubmitInfos + fastLaunchCtx->ccuKernelNum[0] + fastLaunchCtx->ccuKernelNum[1]);
+    CHK_RET(SetTempFastLaunchAddr(tempFastLaunchCtx1, param.inputPtr, param.outputPtr, param.hcclBuff));
+
+    const std::vector<u32> preSyncNotify = {static_cast<u32>(temp1Threads.size() - 1U)};
+    CHK_RET(PreSyncInterThreads(temp0Threads[0], {temp1Threads[0]}, preSyncNotify));
+
+    if (fastLaunchCtx->ccuKernelNum[0] > 0U) {
+        CHK_RET(tempAlg0.FastLaunch(param, tempFastLaunchCtx0));
+    }
+    if (fastLaunchCtx->ccuKernelNum[1] > 0U) {
+        CHK_RET(tempAlg1.FastLaunch(param, tempFastLaunchCtx1));
+    }
+
+    const std::vector<u32> postSyncNotify = {static_cast<u32>(temp0Threads.size() - 1U)};
+    CHK_RET(PostSyncInterThreads(temp0Threads[0], {temp1Threads[0]}, postSyncNotify));
+
+    HCCL_INFO("[InsV2AllToAllConcurrentExecutor][FastLaunch] End.");
+    return HCCL_SUCCESS;
+}
+#endif
 
 REGISTER_EXECUTOR_BY_TWO_TEMPS(
     HcclCMDType::HCCL_CMD_ALLTOALL, AicpuAllToAllSoleMeshConcurrent, InsV2AllToAllConcurrentExecutor, TopoMatchUBX,
