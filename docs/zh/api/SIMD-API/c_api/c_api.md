@@ -101,9 +101,9 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_copy_gm2l1_dn2nz](cube_datamove/asc_copy_gm2l1_dn2nz.md)|将GM中的数据搬运到L1中，在此过程中执行DN->NZ/NCHW->NC1HWC0/NCHW->C1HWNC0操作。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_copy_l0c2ub](cube_datamove/asc_copy_l0c2ub.md)|将L0C中的数据搬运到UB中。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_copy_l12gm](cube_datamove/asc_copy_l12gm.md)|将数据从L1搬运到GM。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_copy_l12l0a_mx](cube_datamove/asc_copy_l12l0a_mx.md)|将Mx scale矩阵从L1 Buffer搬运到L0A Buffer。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_copy_l12l0a_mx](cube_datamove/asc_copy_l12l0a_mx/asc_copy_l12l0a_mx.md)|将Mx scale矩阵从L1 Buffer搬运到L0A Buffer。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_copy_l12l0a_trans](cube_datamove/asc_copy_l12l0a_trans.md)|该接口实现带转置的2D格式数据从L1 Buffer到L0A Buffer的加载。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_copy_l12l0b_mx](cube_datamove/asc_copy_l12l0b_mx.md)|将Mx scale矩阵从L1 Buffer搬运到L0B Buffer。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_copy_l12l0b_mx](cube_datamove/asc_copy_l12l0b_mx/asc_copy_l12l0b_mx.md)|将Mx scale矩阵从L1 Buffer搬运到L0B Buffer。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_copy_l12l0b_sparse](cube_datamove/asc_copy_l12l0b_sparse.md)|用于搬运存放在L1 Buffer里的512B大小的稠密权重矩阵到L0B Buffer里，同时读取128B大小的索引矩阵用于稠密矩阵的稀疏化。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_copy_l12l0c](cube_datamove/asc_copy_l12l0c.md)|将矩阵由L1 Buffer搬运到L0C Buffer中。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_copy_l12ub](cube_datamove/asc_copy_l12ub.md)|将数据从L1 Buffer搬运到UB中。|`c_api/cube_datamove/cube_datamove.h`|

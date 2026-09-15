@@ -555,7 +555,7 @@
 
 - [asc_copy_l12l0a_mx_sync（废弃）](../SIMD-API/c_api/deprecated_interface/asc_copy_l12l0a_mx_sync_deprecated.md)接口
 
-    `asc_copy_l12l0a_mx_sync()`已废弃，请使用[对应的非同步接口](../SIMD-API/c_api/cube_datamove/asc_copy_l12l0a_mx.md)和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口替代。
+    `asc_copy_l12l0a_mx_sync()`已废弃，请使用[对应的非同步接口](../SIMD-API/c_api/cube_datamove/asc_copy_l12l0a_mx/asc_copy_l12l0a_mx.md)和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口替代。
 
 - [asc_copy_l12l0a_sync_2d_arch_3510（废弃）](../SIMD-API/c_api/deprecated_interface/asc_copy_l12l0a_sync_2d_arch_3510_deprecated.md)接口
 
@@ -575,7 +575,7 @@
 
 - [asc_copy_l12l0b_mx_sync（废弃）](../SIMD-API/c_api/deprecated_interface/asc_copy_l12l0b_mx_sync_deprecated.md)接口
 
-    `asc_copy_l12l0b_mx_sync()`已废弃，请使用[对应的非同步接口](../SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_mx.md)和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口替代。
+    `asc_copy_l12l0b_mx_sync()`已废弃，请使用[对应的非同步接口](../SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_mx/asc_copy_l12l0b_mx.md)和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口替代。
 
 - [asc_copy_l12l0b_sparse_sync（废弃）](../SIMD-API/c_api/deprecated_interface/asc_copy_l12l0b_sparse_sync_deprecated.md)接口
 
