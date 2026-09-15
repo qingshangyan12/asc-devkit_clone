@@ -25,7 +25,7 @@ set(kirindev0001_list kirindev0001)
 set(kirindev0002_list kirindev0002)
 set(kirindev0003_list kirindev0003)
 set(MC62_list MC62CM13AA MC62DM23AA MC62CM13AB MC62DM23AB MC62CM12AA MC62DM22AA MC62CM12AC MC62DM22AC MC62CM12AD MC62DM22AD MC62CM12AE MC62DM22AE MC62CM12AF MC62DM22AF MC62CM12AB MC62DM22AB)
-set(all_product ${ascend910b_list} ${ascend910_list} ${ascend310p_list} ${ascend950_list} ${ascend960_list} ${kirinx90_list} ${kirin9030_list} ${kirindev0000_list} ${kirindev0001_list} ${kirindev0002_list} ${kirindev0003_list} ${MC62_list})
+set(all_product ${ascend910b_list} ${ascend910_list} ${ascend310p_list} ${ascend950_list} ${ascend960_list} ${kirinx90_list} ${kirin9020_list} ${kirin9030_list} ${kirindev0000_list} ${kirindev0001_list} ${kirindev0002_list} ${kirindev0003_list} ${MC62_list})
 
 if(NOT DEFINED SOC_VERSION)
     message(FATAL_ERROR "SOC_VERSION value not set.")
