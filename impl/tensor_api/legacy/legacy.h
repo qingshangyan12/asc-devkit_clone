@@ -235,14 +235,14 @@ __aicore__ inline constexpr auto Crd2Idx(const CoordType& coord, const LayoutTyp
 
 template <typename LayoutPattern, typename TraitType = Std::ignore_t, typename... Args>
 ASC_DEPRECATED(9.2.0, "2027/09/07", make_frame_layout)
-__aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args)
+__aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args)
 {
     return make_frame_layout<LayoutPattern, TraitType>(args...);
 }
 
 template <typename LayoutPattern, size_t C0Element, typename... Args>
 ASC_DEPRECATED(9.2.0, "2027/09/07", make_frame_layout)
-__aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args)
+__aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args)
 {
     return make_frame_layout<LayoutPattern, C0Element>(args...);
 }
@@ -270,47 +270,22 @@ __aicore__ inline auto MakeMemPtr(Addr address)
 }
 
 template <typename PtrPattern, typename Iterator, asc::te::enable_make_hardware_ptr<PtrPattern, Iterator> = 0>
-<<<<<<< HEAD
 ASC_DEPRECATED(9.2.0, "2027/09/07", make_mem_ptr)
-__aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
-=======
-<<<<<<< HEAD
-ASCENDC_TENSOR_API_LEGACY_DEPRECATED __aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
-=======
 __aicore__ inline auto MakeMemPtr(Iterator iterator)
->>>>>>> 88695640d (fea:Follow the rule: constexpr cannot call non-constexpr)
->>>>>>> 254d388d8 (fea:Follow the rule: constexpr cannot call non-constexpr)
 {
     return make_mem_ptr<PtrPattern>(iterator);
 }
 
 template <typename Iterator, asc::te::enable_make_ptr_by_iter<Iterator> = 0>
-<<<<<<< HEAD
 ASC_DEPRECATED(9.2.0, "2027/09/07", make_mem_ptr)
-__aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
-=======
-<<<<<<< HEAD
-ASCENDC_TENSOR_API_LEGACY_DEPRECATED __aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
-=======
 __aicore__ inline auto MakeMemPtr(Iterator iterator)
->>>>>>> 88695640d (fea:Follow the rule: constexpr cannot call non-constexpr)
->>>>>>> 254d388d8 (fea:Follow the rule: constexpr cannot call non-constexpr)
 {
     return make_mem_ptr(iterator);
 }
 
 template <typename Iterator, typename... Args>
-<<<<<<< HEAD
 ASC_DEPRECATED(9.2.0, "2027/09/07", make_tensor)
-__aicore__ inline constexpr auto MakeTensor(const Iterator& iterator, const Args&... args)
-=======
-<<<<<<< HEAD
-ASCENDC_TENSOR_API_LEGACY_DEPRECATED __aicore__ inline constexpr auto MakeTensor(
-    const Iterator& iterator, const Args&... args)
-=======
 __aicore__ inline auto MakeTensor(const Iterator& iterator, const Args&... args)
->>>>>>> 88695640d (fea:Follow the rule: constexpr cannot call non-constexpr)
->>>>>>> 254d388d8 (fea:Follow the rule: constexpr cannot call non-constexpr)
 {
     return make_tensor(iterator, args...);
 }
@@ -319,16 +294,8 @@ template <
     size_t... SqueezeDims, typename Input,
     typename = Std::enable_if_t<
         (asc::te::is_layout_v<Input> || asc::te::is_attr_tensor_v<Input>) && (sizeof...(SqueezeDims) > 0)>>
-<<<<<<< HEAD
 ASC_DEPRECATED(9.2.0, "2027/09/07", squeeze)
-__aicore__ inline constexpr auto Squeeze(const Input& value)
-=======
-<<<<<<< HEAD
-ASCENDC_TENSOR_API_LEGACY_DEPRECATED __aicore__ inline constexpr auto Squeeze(const Input& value)
-=======
 __aicore__ inline auto Squeeze(const Input& value)
->>>>>>> 88695640d (fea:Follow the rule: constexpr cannot call non-constexpr)
->>>>>>> 254d388d8 (fea:Follow the rule: constexpr cannot call non-constexpr)
 {
     return squeeze<SqueezeDims...>(value);
 }
@@ -338,17 +305,8 @@ template <
     typename = Std::enable_if_t<
         (asc::te::is_layout_v<Input> || asc::te::is_attr_tensor_v<Input>) &&
         Std::is_tuple_v<Std::remove_cvref_t<Pattern>>>>
-<<<<<<< HEAD
 ASC_DEPRECATED(9.2.0, "2027/09/07", squeeze)
-__aicore__ inline constexpr auto Squeeze(const Input& value, const Pattern& pattern)
-=======
-<<<<<<< HEAD
-ASCENDC_TENSOR_API_LEGACY_DEPRECATED __aicore__ inline constexpr auto Squeeze(
-    const Input& value, const Pattern& pattern)
-=======
 __aicore__ inline auto Squeeze(const Input& value, const Pattern& pattern)
->>>>>>> 88695640d (fea:Follow the rule: constexpr cannot call non-constexpr)
->>>>>>> 254d388d8 (fea:Follow the rule: constexpr cannot call non-constexpr)
 {
     return squeeze(value, pattern);
 }
