@@ -1,4 +1,4 @@
-# L0C Buffer内存结构介绍<a id="ZH-CN_TOPIC_0000002538071268"></a>
+# L0C Buffer内存结构介绍
 
 为提升数据访问效率和吞吐量，L0C Buffer采用了等容量的内存模块（Bank）结构设计。内存空间被划分为多个Bank，并以Bank为单位进一步分组形成多个Bank Group（BG）；每个Bank Group包含若干Bank，每个Bank都是一个可独立操作的存储单元子模块。
 
@@ -21,7 +21,7 @@ L0C_ADDR[16:0] = { BANK_DEPTH[6:0], BANK[3:0], BANK_WIDTH[5:0] }    // bit位顺
 // BANK_WIDTH表示地址在Bank一行上的偏移量，占用6位bit位，取值范围为[0, 63]
 ```
 
-**图1** L0C Buffer内存结构图（[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="zh-cn_topic_0000002555148561_fig1715315610160"></a>
+**图1** L0C Buffer内存结构图（[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
 
 ![](../../../../figures/L0C_Memory_Structure.png)
 <!-- end id1 -->
@@ -38,7 +38,7 @@ L0C_ADDR[17:0] = { BANK_DEPTH[7:0], BANK[3:0], BANK_WIDTH[5:0] }    // bit位顺
 // BANK_WIDTH表示地址在Bank一行上的偏移量，占用6位bit位，取值范围为[0, 63]
 ```
 
-**图2** L0C Buffer内存结构图（[NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="fig179810301543"></a>
+**图2** L0C Buffer内存结构图（[NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
 
 ![](../../../../figures/L0C_Memory_Structure_950.png)
 <!-- end id4 -->

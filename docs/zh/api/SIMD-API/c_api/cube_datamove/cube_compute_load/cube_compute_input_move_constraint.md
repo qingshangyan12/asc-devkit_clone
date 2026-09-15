@@ -1,4 +1,4 @@
-# 矩阵计算输入搬运约束<a name="ZH-CN_TOPIC_0000002568950895"></a>
+# 矩阵计算输入搬运约束
 
 ## 对齐约束
 
@@ -104,8 +104,6 @@ asc_copy_l12l0b_sparse主要用于搬运以512Byte为单位存放的压缩权重
 
 **表1** 扩展分形转换支持情况
 
-<a name="zh-cn_topic_0000002513935478_table471251721314"></a>
-
 | 搬运指令 | 数据通路 | 分形支持情况 |
 | --- | --- | --- |
 | 2D分形搬运 | GM->L1 Buffer（不支持转置） | Nz->Zz、Zn->Nn、Zz->Zz、Zz->Nz、Nn->Nn、Nn->Zn |
@@ -193,8 +191,6 @@ MX矩阵的数据和系数分别搬运：A/B数据使用普通2D重载或`_trans
 
 **表2** 扩展分形转换支持情况
 
-<a name="zh-cn_topic_0000002513935478_table150925964717"></a>
-
 | 搬运指令 | 数据通路 | 分形支持情况 |
 | --- | --- | --- |
 | 2D矩阵搬运 | GM->L1 Buffer（不支持转置） | Nz->Zz、Zn->Nn、Zz->Zz、Zz->Nz、Nn->Nn、Nn->Zn |
@@ -248,8 +244,6 @@ MX矩阵的数据和系数分别搬运：A/B数据使用普通2D重载或`_trans
 针对Atlas A2训练系列产品/Atlas A2推理系列产品和Atlas A3训练系列产品/Atlas A3推理系列产品，**从L1 Buffer->L0A Buffer/L0B Buffer通路，常用的搬运指令有2D分形搬运、块转置搬运和asc_copy_l12l0a/asc_copy_l12l0b（3D），可以调用指令总结如表5所示：**
 
 **表5** L1 Buffer->L0A Buffer/L0B Buffer通路调用指令总结
-
-<a name="zh-cn_topic_0000002513935478_table0327183312611"></a>
 
 | 是否转置/数据类型 | b4（int4b_t） | b8 | b16 | b32 |
 | --- | --- | --- | --- | --- |

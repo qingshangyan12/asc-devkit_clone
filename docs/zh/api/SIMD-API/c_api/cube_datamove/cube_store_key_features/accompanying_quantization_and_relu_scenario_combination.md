@@ -1,4 +1,4 @@
-# 随路量化与随路ReLU场景组合<a name="ZH-CN_TOPIC_0000002538071282"></a>
+# 随路量化与随路ReLU场景组合
 
 矩阵搬出支持多种随路量化与随路ReLU的组合，常用的不激活/Normal ReLU组合参考下表，Scalar/Vector扩展组合见后文。
 

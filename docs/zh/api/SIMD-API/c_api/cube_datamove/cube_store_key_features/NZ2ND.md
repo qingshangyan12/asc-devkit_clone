@@ -1,4 +1,4 @@
-# NZ2ND<a name="ZH-CN_TOPIC_0000002568950981"></a>
+# NZ2ND
 
 ## 特性说明
 
@@ -50,7 +50,7 @@ for (i = 0; i < matrix_num; i++) {
 
 如下图所示，在L0C Buffer中有两个Nz格式的矩阵，每个矩阵N方向上维度为32，M方向上维度为48，经过Nz2ND转换，将数据格式变为右部分所示排布。
 
-**图1** Nz2ND示意图<a name="zh-cn_topic_0000002547300777_fig862819576334"></a>
+**图1** Nz2ND示意图
 
 ![](../../../../figures/fixpipe_nz2nd_c_api.png)
 

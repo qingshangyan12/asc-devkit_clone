@@ -1,4 +1,4 @@
-# 随路量化<a name="ZH-CN_TOPIC_0000002568950983"></a>
+# 随路量化
 
 ## 特性说明
 
@@ -67,7 +67,7 @@ VQF322F32_PRE,         // Vector_Quant_Float32_2_Float32: float量化成float，
 量化参数比特位含义见下表：
 
 <!-- npu="A3,910b" id8 -->
-**表1** 量化参数QUANT\_PRE比特位含义映射表（[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="zh-cn_topic_0000002547300781_table1273124313613"></a>
+**表1** 量化参数QUANT\_PRE比特位含义映射表（[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
 
 | 模式 | 比特位数 | 变量名 | 作用介绍 |
 | ------ | ---------- | -------- | ---------- |
@@ -80,7 +80,7 @@ VQF322F32_PRE,         // Vector_Quant_Float32_2_Float32: float量化成float，
 <!-- end id8 -->
 
 <!-- npu="950" id9 -->
-**表2** 量化参数QUANT\_PRE比特位含义映射表（[NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="zh-cn_topic_0000002547300781_table1273124313714"></a>
+**表2** 量化参数QUANT\_PRE比特位含义映射表（[NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
 
 | 模式 | 比特位数 | 变量名 | 作用介绍 |
 | --- | --- | --- | --- |

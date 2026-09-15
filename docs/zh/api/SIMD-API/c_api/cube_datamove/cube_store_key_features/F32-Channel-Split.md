@@ -1,4 +1,4 @@
-# F32 Channel Split<a name="ZH-CN_TOPIC_0000002569070989"></a>
+# F32 Channel Split
 
 ## 特性说明
 
@@ -28,12 +28,12 @@
 
 如下图所示，当开启Channel Split功能后，shape为\[64,32\]的源操作数将会被拆分为16个独立的16x8分形矩阵。
 
-**图1** F32 Channel Split示意图（无无效数据）<a name="zh-cn_topic_0000002515660950_fig222295694112"></a>
+**图1** F32 Channel Split示意图（无无效数据）
 
 ![](../../../../figures/Fixpipe_Channel_Split.png)
 
 当开启Channel Split功能后，n_size（源Nz矩阵在N方向上的大小）必须为8的倍数。如下图所示，shape为\[64,24\]的源操作数将会被拆分为3列16x8分形矩阵。
 
-**图2** F32 Channel Split示意图（有无效数据）<a name="zh-cn_topic_0000002515660950_fig5809145844116"></a>
+**图2** F32 Channel Split示意图（有无效数据）
 
 ![](../../../../figures/Fixpipe_Channel_Split_with_dirty.png)

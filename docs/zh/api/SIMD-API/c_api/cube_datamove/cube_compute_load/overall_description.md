@@ -1,4 +1,4 @@
-# 总体说明<a name="ZH-CN_TOPIC_0000002569070899"></a>
+# 总体说明
 
 矩阵计算的搬入是Ascend C编程框架中用于数据搬运的一类核心接口，主要实现Global Memory到L0A Buffer/L0B Buffer之间的数据高效传输。该类接口提供了多种数据搬运模式，能够满足矩阵计算中左右矩阵等数据的搬运需求，通常与Mmad接口配合使用。
 
@@ -7,8 +7,6 @@
 矩阵计算的搬入接口支持多种数据通路，每种通路对应特定的存储层级和访问特性。
 
 **表1** **数据通路和存储层级**
-
-<a name="zh-cn_topic_0000002543771563_table3523123518108"></a>
 
 | 源位置 | 源地址对齐要求 | 目的位置 | 目的地址对齐要求 | 典型应用场景 |
 | --- | --- | --- | --- | --- |
@@ -26,7 +24,7 @@
 > Ascend 950PR/Ascend 950DT因硬件变更，删除GM到L0A Buffer、L0B Buffer的数据通路。产生的影响是原GM到L0A Buffer和L0B Buffer的数据搬运需要拆分为两步，即从GM到L1 Buffer的数据搬运和从L1 Buffer到L0A Buffer、L0B Buffer的数据搬运。
 <!-- end id1 -->
 
-## GM->L1 Buffer的接口分类与使用场景<a name="zh-cn_topic_0000002543771563_section_gm2l1"></a>
+## GM->L1 Buffer的接口分类与使用场景
 
 **表2** GM->L1 Buffer接口
 
@@ -50,17 +48,17 @@
 <!-- end id2 -->
 
 <!-- npu="950" id5 -->
-## UB->L1 Buffer的接口分类与使用场景<a name="zh-cn_topic_0000002543771563_section_ub2l1"></a>
+## UB->L1 Buffer的接口分类与使用场景
 
 **表4** UB->L1 Buffer接口
 
 | 接口类别 | 主要功能 | 支持通路 | 典型应用场景 |
 | --- | --- | --- | --- |
-| [asc_copy_ub2l1](../../vector_datamove/asc_copy_ub2l1.md)连续重载 | 连续数据搬运 | UB-\>L1 Buffer | 3510矢量结果送入矩阵计算 |
-| 同接口高维切分重载 | 按32B块配置长度和间隔 | UB-\>L1 Buffer | 3510非连续矢量结果搬运 |
+| [asc_copy_ub2l1](../../vector_datamove/asc_copy_ub2l1.md)连续重载 | 连续数据搬运 | UB-\>L1 Buffer | 矢量结果送入矩阵计算 |
+| 同接口高维切分重载 | 按32B块配置长度和间隔 | UB-\>L1 Buffer | 非连续矢量结果搬运 |
 <!-- end id5 -->
 
-## L1 Buffer->L0A Buffer/L0B Buffer的接口分类与使用场景<a name="zh-cn_topic_0000002543771563_section_l12l0"></a>
+## L1 Buffer->L0A Buffer/L0B Buffer的接口分类与使用场景
 
 **表5** L1 Buffer->L0A/B Buffer接口
 
@@ -94,7 +92,7 @@
 | [asc_copy_l12l0a_mx](../asc_copy_l12l0a_mx.md) / [asc_copy_l12l0b_mx](../asc_copy_l12l0b_mx.md) | 只搬运32B分形的E8M0系数 | 与A/B数据搬运分别调用，匹配映射地址 |
 <!-- end id9 -->
 
-## 辅助配置接口说明<a name="zh-cn_topic_0000002543771563_section_aux"></a>
+## 辅助配置接口说明
 
 **表8** 辅助配置接口
 
@@ -102,9 +100,9 @@
 | --- | --- | --- |
 | [asc_fill_l1](../asc_fill_l1.md)、[asc_fill_l0a](../asc_fill_l0a.md)、[asc_fill_l0b](../asc_fill_l0b.md) | 初始化Buffer | 支持L1 Buffer、L0A Buffer、L0B Buffer |
 | [asc_set_l13d_fmatrix](../asc_set_l13d_fmatrix.md)、[asc_set_l13d_fmatrix_b](../asc_set_l13d_fmatrix_b.md) | FeatureMap尺寸和Padding边界 | 根据A/B侧与`f_matrix_ctrl`选择 |
-| [asc_set_l13d_padding](../asc_set_l13d_padding.md) | Padding配置 | 按2201接口位编码使用 |
-| [asc_set_l13d_size](../asc_set_l13d_size.md) | L1 Buffer边界大小 | 2201；按对应3D接口要求 |
-| [asc_set_l13d_rpt](../asc_set_l13d_rpt.md) | 3D重复和步长 | 按2201对应重载配置 |
+| [asc_set_l13d_padding](../asc_set_l13d_padding.md) | Padding配置 | 按位编码使用 |
+| [asc_set_l13d_size](../asc_set_l13d_size.md) | L1 Buffer边界大小 | 按对应3D接口要求 |
+| [asc_set_l13d_rpt](../asc_set_l13d_rpt.md) | 3D重复和步长 | 按对应重载配置 |
 | [asc_load_image_to_cbuf](../asc_load_image_to_cbuf.md) | 图像搬入L1 Buffer | 按该接口支持范围配置 |
 | [asc_copy_l12l0c](../asc_copy_l12l0c.md) | L1 Buffer-\>L0C Buffer初值搬运 | 初始化路径的补充 |
-| [asc_set_l12l0a_3d_padding](../asc_set_l12l0a_3d_padding.md)、[asc_set_l12l0b_3d_padding](../asc_set_l12l0b_3d_padding.md) | 带类型的Padding值配置 | 3510，注意两侧寄存器及共享配置 |
+| [asc_set_l12l0a_3d_padding](../asc_set_l12l0a_3d_padding.md)、[asc_set_l12l0b_3d_padding](../asc_set_l12l0b_3d_padding.md) | 带类型的Padding值配置 | 注意两侧寄存器及共享配置 |

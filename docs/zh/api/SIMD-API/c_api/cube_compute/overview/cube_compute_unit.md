@@ -1,4 +1,4 @@
-# 矩阵计算单元<a name="ZH-CN_TOPIC_0000002538071190"></a>
+# 矩阵计算单元
 
 Cube计算单元专用于执行矩阵运算，直接访问的专用缓存如下：L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer则用于存储初始化累加值和矩阵计算结果。
 
@@ -7,12 +7,12 @@ Cube计算单元专用于执行矩阵运算，直接访问的专用缓存如下�
 <!-- end id1 -->
 
 <!-- npu="910b,A3" id2 -->
-**图1** [NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)矩阵计算单元架构图<a name="zh-cn_topic_0000002513373312_fig88330137205"></a>  
+**图1** [NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)矩阵计算单元架构图  
 ![](../../../../figures/architecture_of_cube_compute_unit_a2a3.png "矩阵计算单元架构图-A2A3")
 <!-- end id2 -->
 
 <!-- npu="950" id3 -->
-**图2** [NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)矩阵计算单元架构图<a name="zh-cn_topic_0000002513373312_fig1082103513519"></a>  
+**图2** [NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)矩阵计算单元架构图  
 ![](../../../../figures/npu_3510_hw_arch_cube.png "矩阵计算单元架构图-950")
 <!-- end id3 -->
 
