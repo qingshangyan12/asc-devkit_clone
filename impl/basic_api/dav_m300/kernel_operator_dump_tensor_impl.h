@@ -366,7 +366,7 @@ __aicore__ inline void WriteRingBufShapeInfo(const ShapeInfo& shapeInfo)
     UpdateWriteInfo(writeInfo, tlvLen);
 }
 
-__aicore__ inline void DumpShapeImpl(const ShapeInfo& shapeInfo)
+__aicore__ static __attribute__((noinline)) void DumpShapeImpl(const ShapeInfo& shapeInfo)
 {
     dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
@@ -460,7 +460,7 @@ __aicore__ inline void WriteRingBufTlvData(
 }
 
 template <template <typename> class Tensor, typename T>
-__aicore__ __attribute__((noinline)) void DumpTensorRingBufImpl(
+__aicore__ static __attribute__((noinline)) void DumpTensorRingBufImpl(
     const Tensor<T>& src, uint32_t desc, uint32_t dumpSize, const uint32_t* shape, const uint32_t shapeDim);
 
 template <typename T>
@@ -502,7 +502,7 @@ __aicore__ inline void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t 
 }
 
 template <template <typename> class Tensor, typename T>
-__aicore__ __attribute__((noinline)) void DumpTensorRingBufImpl(
+__aicore__ static __attribute__((noinline)) void DumpTensorRingBufImpl(
     const Tensor<T>& src, uint32_t desc, uint32_t dumpSize, const uint32_t* shape, const uint32_t shapeDim)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
@@ -556,7 +556,7 @@ __aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Ar
     __asc_aicore::printf_impl(fmt, args...);
 }
 
-__aicore__ inline void DumpTimeStampImpl(uint32_t descId)
+__aicore__ static __attribute__((noinline)) void DumpTimeStampImpl(uint32_t descId)
 {
     uint64_t ctrlValue = get_ctrl();
     set_atomic_none();
@@ -567,7 +567,12 @@ __aicore__ inline void DumpTimeStampImpl(uint32_t descId)
     set_ctrl(ctrlValue);
 }
 
-__aicore__ inline void AscendCTimeStamp(uint32_t descId, uint64_t pcPtr = 0) { return; }
+__aicore__ inline void AscendCTimeStamp(uint32_t descId, uint64_t pcPtr = 0)
+{
+#ifdef ASCENDC_TIME_STAMP_ON
+    DumpTimeStampImpl(descId);
+#endif
+}
 
 __aicore__ inline void InitDump(bool mixFlag, uint32_t gmLen) {}
 __aicore__ inline void InitDump(bool mixFlag, GM_ADDR dumpStartAddr, uint32_t gmLen) {}
