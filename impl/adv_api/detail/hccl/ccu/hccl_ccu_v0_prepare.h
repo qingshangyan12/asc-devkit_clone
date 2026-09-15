@@ -519,9 +519,24 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[KFC_RS_SOLE_NHR_REPEAT_NUM_INV] = UINT64_MAX - 1U; // sole executor repeatNum=1
     xnData_[KFC_RS_SOLE_NHR_INPUT_REPEAT_STRIDE] = 0U;         // sole executor 双 stride=0
     xnData_[KFC_RS_SOLE_NHR_OUTPUT_REPEAT_STRIDE] = 0U;
-    KERNEL_LOG(
-        KERNEL_INFO, "RS sole-NHR prepare: slice=0x%llx, stride=0x%llx, lastJetty=0x%llx\n", sliceSize, sliceStride,
-        sliceLastJettySize);
+    // RS_NHR_DBG A1：算子传入的原始参数（判别 count 口径：per-rank 元素数，16B FP16 应为 count=8）
+    printf(
+        "[RS_NHR_DBG][A1] soleNHR raw: cnt=%llu dtype=%d strideCnt=%llu sendBuf=0x%llx recvBuf=0x%llx "
+        "repIdx=%u rank=%u/%u\n",
+        (unsigned long long)commParam->count, static_cast<int>(commParam->dataType),
+        (unsigned long long)commParam->strideCount, (unsigned long long)reinterpret_cast<uint64_t>(commParam->sendBuf),
+        (unsigned long long)reinterpret_cast<uint64_t>(commParam->recvBuf), ccuParam_.repeatIndex, ccuParam_.rankId,
+        ccuParam_.rankNum);
+    // RS_NHR_DBG A2：AIV 实际写入的 10 槽 xnData（sliceSize/sliceStride 正确值应为 0x10/0x10）
+    printf(
+        "[RS_NHR_DBG][A2] soleNHR xn: opId=0x%llx in=0x%llx out=0x%llx slice=0x%llx stride=0x%llx "
+        "oneJetty=0x%llx lastJetty=0x%llx repInv=0x%llx\n",
+        (unsigned long long)xnData_[KFC_RS_SOLE_NHR_OP_ID], (unsigned long long)xnData_[KFC_RS_SOLE_NHR_INPUT],
+        (unsigned long long)xnData_[KFC_RS_SOLE_NHR_OUTPUT], (unsigned long long)xnData_[KFC_RS_SOLE_NHR_SLICE_SIZE],
+        (unsigned long long)xnData_[KFC_RS_SOLE_NHR_INPUT_SLICE_STRIDE],
+        (unsigned long long)xnData_[KFC_RS_SOLE_NHR_SLICE_ONE_JETTY_SIZE],
+        (unsigned long long)xnData_[KFC_RS_SOLE_NHR_SLICE_LAST_JETTY_SIZE],
+        (unsigned long long)xnData_[KFC_RS_SOLE_NHR_REPEAT_NUM_INV]);
 }
 
 template <const auto& config>
@@ -578,6 +593,22 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         "RS concur chunk debug: slice=0x%llx, mesh=0x%llx, nhr=0x%llx, chunk=0x%llx, meshLoop=0x%llx, "
         "meshTail=0x%llx\n",
         sliceSize, meshSize, nhrSize, chunkSize, xnData_[KFC_CONCURRENT_RS_MESH_CHUNK_LOOP_NUM], meshTailSize);
+    // RS_NHR_DBG A1c：并发 RS 的原始参数与 mesh/NHR 切分（16B 场景 mesh=0、全量走 NHR 流）
+    printf(
+        "[RS_NHR_DBG][A1c] concurRS raw: cnt=%llu dtype=%d strideCnt=%llu sendBuf=0x%llx recvBuf=0x%llx "
+        "repIdx=%u rank=%u/%u\n",
+        (unsigned long long)commParam->count, static_cast<int>(commParam->dataType),
+        (unsigned long long)commParam->strideCount, (unsigned long long)reinterpret_cast<uint64_t>(commParam->sendBuf),
+        (unsigned long long)reinterpret_cast<uint64_t>(commParam->recvBuf), ccuParam_.repeatIndex, ccuParam_.rankId,
+        ccuParam_.rankNum);
+    printf(
+        "[RS_NHR_DBG][A1c] concurRS split: slice=0x%llx mesh=0x%llx nhr=0x%llx stride=0x%llx "
+        "nhrIn=0x%llx nhrOut=0x%llx nhrLastJetty=0x%llx rankOff=0x%llx\n",
+        (unsigned long long)sliceSize, (unsigned long long)meshSize, (unsigned long long)nhrSize,
+        (unsigned long long)sliceStride, (unsigned long long)xnData_[KFC_CONCURRENT_RS_NHR_INPUT],
+        (unsigned long long)xnData_[KFC_CONCURRENT_RS_NHR_OUTPUT],
+        (unsigned long long)xnData_[KFC_CONCURRENT_RS_NHR_SLICE_LAST_JETTY_SIZE],
+        (unsigned long long)xnData_[KFC_CONCURRENT_RS_MESH_RANK_SLICE_OFFSET]);
 }
 } // namespace AscendC
 
