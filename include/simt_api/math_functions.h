@@ -18,6 +18,7 @@
 
 #include "simt_api/math_constants.h"
 #include "simt_api/device_types.h"
+#include "simt_api/device_functions.h"
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long int lroundf(float x);
 
@@ -258,6 +259,16 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int umin(const unsigned int x, co
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fdividef(float x, float y);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int signbit(float x);
+
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t asc_uintdiv(uint32_t dividend, uint32_t magic, uint32_t shift);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t asc_uintdiv(uint64_t dividend, uint64_t magic, uint64_t shift);
+
+__aicore__ inline void asc_get_uintdiv_magic_and_shift(uint32_t* magic, uint32_t* shift, uint32_t divisor);
+
+__aicore__ inline void asc_get_uintdiv_magic_and_shift(uint64_t* magic, uint64_t* shift, uint64_t divisor);
+#endif
 
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #if (__NPU_ARCH__ == 3510)
