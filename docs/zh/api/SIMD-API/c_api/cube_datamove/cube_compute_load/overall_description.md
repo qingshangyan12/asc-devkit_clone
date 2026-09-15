@@ -43,7 +43,7 @@
 
 | 接口类别 | 主要功能 | 支持通路 | 典型应用场景 |
 | --- | --- | --- | --- |
-| [asc_copy_gm2l1_dn2nz](../asc_copy_gm2l1_dn2nz.md) | DN-\>NZ | GM-\>L1 Buffer | 列主序矩阵输入 |
+| [asc_copy_gm2l1_dn2nz](../asc_copy_gm2l1_dn2nz.md) | DN-\>Nz | GM-\>L1 Buffer | 列主序矩阵输入 |
 | [asc_copy_gm2l1_align](../asc_copy_gm2l1_align.md) | 非对齐搬运及左右Padding | GM-\>L1 Buffer | 字节长度、边界不满足普通块拷贝要求 |
 | [asc_copy_gm2l1（2D）](../asc_copy_gm2l1/asc_copy_gm2l1_2d_arch_3510.md) | 2DV2分形搬运，可配L2 Cache策略 | GM-\>L1 Buffer | 多方向分形块输入 |
 | [asc_copy_gm2l1（高维切分）](../asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md) | 支持`asc_channel_pad_mode`通道填充/压缩 | GM-\>L1 Buffer | 按32B通道扩展有效区或去除高位字节 |

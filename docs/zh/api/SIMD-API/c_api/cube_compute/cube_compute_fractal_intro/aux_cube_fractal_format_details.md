@@ -41,7 +41,7 @@ MX矩阵乘法为带有量化系数X的矩阵乘法，即左矩阵和右矩阵�
 
     - **分形大小约束：** 数据类型为fp8\_e8m0\_t，分形大小为16x2（M0，K0）
 
-    如下图所示，若GM上scaleA矩阵为ND排布，可以通过ND2NZ.b16/DN2NZ.b16指令搬运到L1 Buffer，确保L1 Buffer上分形为Zz排布，满足asc_copy_l12l0a_mx/asc_copy_l12l0b_mx（系数搬运）接口要求。
+    如下图所示，若GM上scaleA矩阵为ND排布，可以通过ND2Nz.b16/DN2Nz.b16指令搬运到L1 Buffer，确保L1 Buffer上分形为Zz排布，满足asc_copy_l12l0a_mx/asc_copy_l12l0b_mx（系数搬运）接口要求。
 
     **图3** scaleA矩阵在不同位置上的排布格式<a name="zh-cn_topic_0000002563445163_fig6871154411446"></a>  
     ![](../../../../figures/mx_scaleA_format.png "scaleA矩阵在不同位置上的排布格式")
@@ -62,7 +62,7 @@ MX矩阵乘法为带有量化系数X的矩阵乘法，即左矩阵和右矩阵�
 
     - **分形大小约束：** 数据类型为fp8\_e8m0\_t，分形大小为2x16（K0，N0）
 
-    如下图所示，若Global Memory（GM）上scaleB矩阵为ND排布，可以通过ND2NZ.b16/DN2NZ.b16指令搬运到L1 Buffer，确保L1 Buffer上分形为Nn排布，满足asc_copy_l12l0a_mx/asc_copy_l12l0b_mx（系数搬运）接口要求。
+    如下图所示，若Global Memory（GM）上scaleB矩阵为ND排布，可以通过ND2Nz.b16/DN2Nz.b16指令搬运到L1 Buffer，确保L1 Buffer上分形为Nn排布，满足asc_copy_l12l0a_mx/asc_copy_l12l0b_mx（系数搬运）接口要求。
 
     **图4** scaleB矩阵在不同位置上的排布格式<a name="zh-cn_topic_0000002563445163_fig599218260112"></a>  
     ![](../../../../figures/mx_scaleB_format.png "scaleB矩阵在不同位置上的排布格式")

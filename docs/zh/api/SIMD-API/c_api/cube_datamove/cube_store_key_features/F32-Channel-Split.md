@@ -17,11 +17,11 @@
     Atlas A2 训练系列产品/Atlas A2 推理系列产品
     <!-- end id5 -->
 
-    当Fixpipe指令的输入和输出数据类型都为float，NZ输出到GM，并且不开启NZ2ND与unitFlag时，才能够开启Channel Split功能。
+    当Fixpipe指令的输入和输出数据类型都为float，Nz输出到GM，并且不开启Nz2ND与unitFlag时，才能够开启Channel Split功能。
 <!-- end id3 -->
 
 <!-- npu="950" id6 -->
-- 针对Ascend 950PR/Ascend 950DT，当Fixpipe指令的输入和输出数据类型都为float,NZ输出到GM，并且不开启NZ2ND、NZ2DN与unitFlag时，才能够开启Channel Split功能。当前搬出到L1 Buffer和Unified Buffer（UB）不支持该功能。
+- 针对Ascend 950PR/Ascend 950DT，当Fixpipe指令的输入和输出数据类型都为float,Nz输出到GM，并且不开启Nz2ND、Nz2DN与unitFlag时，才能够开启Channel Split功能。当前搬出到L1 Buffer和Unified Buffer（UB）不支持该功能。
 <!-- end id6 -->
 
 ## 使用示例
@@ -32,7 +32,7 @@
 
 ![](../../../../figures/Fixpipe_Channel_Split.png)
 
-当开启Channel Split功能后，n_size（源NZ矩阵在N方向上的大小）必须为8的倍数。如下图所示，shape为\[64,24\]的源操作数将会被拆分为3列16x8分形矩阵。
+当开启Channel Split功能后，n_size（源Nz矩阵在N方向上的大小）必须为8的倍数。如下图所示，shape为\[64,24\]的源操作数将会被拆分为3列16x8分形矩阵。
 
 **图2** F32 Channel Split示意图（有无效数据）<a name="zh-cn_topic_0000002515660950_fig5809145844116"></a>
 

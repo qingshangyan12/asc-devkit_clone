@@ -64,4 +64,4 @@ Conv2D前向计算的本质是将卷积运算转换为矩阵乘：先通过img2c
 
 3. 使用[asc_mmad](../asc_mmad.md)完成矩阵乘加，结果存放在L0C Buffer。
 
-4. 使用`asc_copy_l0c2gm`的[NZ2ND](../../cube_datamove/cube_store_key_features/NZ2ND.md)能力，将卷积结果输出为NHWC。维度映射见[卷积格式转换](../../cube_datamove/cube_store_key_features/convolution_format_conversion.md)。<!-- npu="950" id3 -->特别地，针对Ascend 950PR/Ascend 950DT产品，还可通过[NZ2DN](../../cube_datamove/cube_store_key_features/NZ2DN.md)将卷积结果输出为NCHW格式。<!-- end id3 -->
+4. 使用`asc_copy_l0c2gm`的[Nz2ND](../../cube_datamove/cube_store_key_features/NZ2ND.md)能力，将卷积结果输出为NHWC。维度映射见[卷积格式转换](../../cube_datamove/cube_store_key_features/convolution_format_conversion.md)。<!-- npu="950" id3 -->特别地，针对Ascend 950PR/Ascend 950DT产品，还可通过[Nz2DN](../../cube_datamove/cube_store_key_features/NZ2DN.md)将卷积结果输出为NCHW格式。<!-- end id3 -->
