@@ -234,7 +234,7 @@ HcclResult InsTempAllReduceMesh1DTwoShotMeshChunk::ReduceScatterMeshChunk(
         SendRecvReduceInfo sendRecvReduceInfo{
             {linkSend, linkRecv}, {{txSrcSlices, txDstSlices}, {rxSrcSlices, rxDstSlices}}, dataType_, reduceOp_};
         CHK_PRT_RET(
-            SendRecvBatchWriteReduce(sendRecvReduceInfo, threads[queIdx], true),
+            SendRecvBatchWriteReduce(sendRecvReduceInfo, threads[queIdx]),
             HCCL_ERROR("[InsTempAllReduceMesh1DTwoShotMeshChunk] RunReduceScatter SendRecvWriteReduce failed"),
             HcclResult::HCCL_E_INTERNAL);
     }

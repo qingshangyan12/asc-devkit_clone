@@ -118,7 +118,6 @@ HcclResult DoSendRecvBatchTx(
     ProcessSliceFunc processSlice, FallbackFunc fallback, bool fusePostNotify = false)
 {
     if (!IsHcommBatchTransferOnThreadSupported()) {
-        HCCL_WARNING("[AlgDataTransWrapper][%s] hcomm batch transfer on thread not supported, use fallback.", funcName);
         return fallback(sendRecvInfo, thread);
     }
     const std::vector<DataSlice>& srcSlices = sendRecvInfo.sendRecvSlices_.txSlicesList_.srcSlices_;
