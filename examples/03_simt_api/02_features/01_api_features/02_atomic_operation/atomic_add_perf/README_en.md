@@ -247,7 +247,7 @@ An atomic add must complete three steps: "read old value → compute new value �
 
 **Principle 2: GM atomic operations work at Sector granularity.**
 
-When an atomic add accesses a GM address, it passes through the L2 Cache hierarchy and completes the "read–compute–write" on the L2 side. The L2 Cache manages memory in units of 512B Cache Lines, each containing 4 contiguous 128B Sectors; GM atomic operations are processed at 128B Sector granularity. When the target addresses of atomic operations are concentrated within the same Sector, processing efficiency is lower; when the target addresses are spread across more Sectors, processing efficiency is higher.
+When an atomic add accesses a GM address, it passes through the L2 cache hierarchy and completes the "read–compute–write" on the L2 side. The L2 cache manages memory in units of 512B Cache Lines, each containing 4 contiguous 128B Sectors; GM atomic operations are processed at 128B Sector granularity. When the target addresses of atomic operations are concentrated within the same Sector, processing efficiency is lower; when the target addresses are spread across more Sectors, processing efficiency is higher.
 
 **Controlled design**:
 
