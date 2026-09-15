@@ -13,6 +13,8 @@ set(ASC_COMM_TAG_ID a8d91611858d3dddb92fa101fecbbcddb6d9fc73)
 
 # asc-comm 与 asc-devkit 按同级目录放置。路径以本文件所在目录(<devkit>/cmake/third_party)为锚，
 # 对于CI环境已经存在asc-comm代码, 不去拉取代码否则使用submodule方式拉取asc-comm仓代码
+set(ASC_COMM_GIT_REPOSITORY "https://gitcode.com/DragonBornHD84/asc-comm.git"
+    CACHE STRING "asc-comm repository used when the source tree is not preinstalled")
 message(STATUS "[ThirdPartyLib][asc-comm] project source dir: ${PROJECT_SOURCE_DIR}")
 get_filename_component(_ASC_COMM_DEVKIT_ROOT "${CMAKE_CURRENT_LIST_DIR}/../.." REALPATH)
 if(NOT ASC_COMM_SOURCE_DIR)
@@ -43,7 +45,7 @@ else()
 
     FetchContent_Declare(
         asc-comm
-        GIT_REPOSITORY https://gitcode.com/cann/asc-comm.git
+        GIT_REPOSITORY ${ASC_COMM_GIT_REPOSITORY}
         GIT_TAG ${ASC_COMM_TAG_ID}
         GIT_PROGRESS TRUE
         SOURCE_DIR ${ASC_COMM_SOURCE_DIR}
