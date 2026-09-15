@@ -768,6 +768,7 @@ public:
         return true;
     }
 
+private:
     // Wait for the AIC result-ready event. On dav-3510/9201 GM compatible mode this is the
     // point-to-point intra-block flag set by the server (MatmulService::NotifyAivEvent), so the
     // sibling AIV's event counter is never touched; other modes keep the broadcast event counter.
@@ -782,6 +783,7 @@ public:
         WaitEvent(this->devEvtID);
     }
 
+public:
     // Only support the mode that the IterateAll is asynchronous and GM output is continuous.
     // In discontinuous scenarios, the system stops responding.
     __aicore__ inline void WaitIterateAll()
