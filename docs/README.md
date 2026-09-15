@@ -1,81 +1,38 @@
-# 项目文档
-
-简体中文 | [English](./README_en.md)
-
-## 目录说明
-关键目录结构如下：
-```
-├── zh                             # 中文文档目录
-│   ├── api                        # API文档目录
-│   ├── contributing               # 代码贡献规范目录（代码风格、接口设计、目录结构、测试等）
-│   ├── figures                    # 图片目录
-│   ├── guide                      # Ascend C 算子开发指南
-│   ├── vitepress                      # 文档构建脚本目录
-│   ├── asc_adv_api_contributing.md    # Ascend C 高阶API贡献指南
-│   ├── asc_basic_api_contributing.md  # Ascend C 基础API贡献指南
-│   ├── asc_c_api_contributing.md      # Ascend C C API贡献指南
-│   ├── asc_doc_contributing.md        # Ascend C 资料贡献指南
-│   ├── asc_doc_design_rules.md        # Ascend C 资料设计规范
-│   ├── asc_how_to_choose_api.md       # Ascend C多层级编程接口选择参考文档
-│   └── quick_start.md                 # 快速入门文档
-├── en                                 # 英文文档目录
-│   ├── contributing                   # 代码贡献规范目录（代码风格、接口设计、目录结构、测试等）
-│   ├── asc_adv_api_contributing.md    # Ascend C 高阶API贡献指南
-│   ├── asc_basic_api_contributing.md  # Ascend C 基础API贡献指南
-│   ├── asc_c_api_contributing.md      # Ascend C C API贡献指南
-│   ├── asc_doc_contributing.md        # Ascend C 资料贡献指南
-│   ├── asc_doc_design_rules.md        # Ascend C 资料设计规范
-│   ├── asc_how_to_choose_api.md       # Ascend C多层级编程接口选择参考文档
-│   └── quick_start.md                 # 快速入门文档
-├── README_en.md
-└── README.md
-```
-
-
-## 文档说明
-为方便开发者快速熟悉本项目，可按需获取对应文档，文档内容包括：
-
-| 文档  | 面向对象  | 内容介绍  |
-|---|---|---|
-| [API列表](./zh/api/README.md) | 基于Ascend C开源仓，开发定制化API或算子的开发者。 | 介绍项目包含的所有API。  |
-| [高阶API贡献指南](./zh/asc_adv_api_contributing.md) | 基于Ascend C开源仓，开发定制化API的开发者。 | 介绍如何扩展或开发Ascend C高阶API。高阶API基于单核对常见算法进行抽象和封装，实现常用的计算算法，旨在提高算子开发效率。  |
-| [基础API贡献指南](./zh/asc_basic_api_contributing.md) | 基于Ascend C开源仓，开发定制化API的开发者。 | 介绍如何扩展或开发Ascend C基础API。基础API实现对硬件能力的抽象，开放芯片的能力，保证完备性和兼容性。  |
-| [C API贡献指南](./zh/asc_c_api_contributing.md) | 基于Ascend C开源仓，开发定制化API的开发者。 | 介绍如何扩展或开发Ascend C C API。C API提供纯C风格的接口，符合C语言算子开发习惯，开放芯片完备编程能力。  |
-| [资料贡献指南](./zh/asc_doc_contributing.md) | 完善Ascend C现有资料的开发者。 |  介绍Ascend C资料各大章节的编写与贡献规范。|
-| [资料设计规范](./zh/asc_doc_design_rules.md) | 完善Ascend C现有资料的开发者。 |  介绍Ascend C资料体系架构与总体设计原则。|
-| [代码贡献规范](./zh/contributing/README.md) | 参与Ascend C代码贡献的开发者。 | 代码风格、接口设计、目录结构、测试等贡献规范索引。 |
-| [Ascend C入门教程](./zh/guide/getting_started/ascend_c_overview_and_learning_path.md) | Ascend C初学者 | 介绍算子编程基本概念与Ascend C学习路径，旨在帮助开发者快速上手算子开发。 |
-| [Ascend C编程指南](./zh/guide/programming_guide/document_structure.md) | 基于昇腾AI硬件，使用Ascend C编写算子程序，开发自定义算子的开发者。 | Ascend C是CANN针对算子开发场景推出的编程语言，原生支持C和C++标准规范，兼具开发效率和运行性能。使用Ascend C编写算子程序，运行在昇腾AI处理器上，实现自定义的创新算法。 |
-| [Ascend C算子实践参考](./zh/guide/operator_practice/document_structure.md) | 基于已完成开发的Ascend C算子，需要进一步优化算子性能的开发者。 | 异构计算的特点、算子功能的调试方法以及算子性能的优化策略。通过介绍Ascend C编程中的调试与优化思路，结合多种性能优化手段，并辅以具体案例，旨在帮助开发者实现高性能算子的开发。|
-| [Ascend C兼容性迁移指南](./zh/guide/cross_gen_migration_guide/overview.md) | 需将已有算子跨代迁移至不同昇腾AI处理器的开发者。 | 指导如何实现跨代芯片间的功能对等与性能最优适配。|
-
-
-## 附录
-除了上述系统性介绍的相关开发文档外，您还可以根据实际场景和开发阶段，有选择性地快速了解相应的专题内容。
-- 技术文章  
-  - 基础入门
-    - [Ascend C编程介绍](https://www.hiascend.com/zh/developer/techArticles/20230830-1)
-    - [Ascend C快速入门](https://www.hiascend.com/zh/developer/techArticles/20230830-2)
-    - [Ascend C孪生调试](https://www.hiascend.com/zh/developer/techArticles/20231215-2)
-    - [Ascend C算子的调用方式](https://www.hiascend.com/zh/developer/techArticles/20240523-1)
-  - 概念原理
-    - [Ascend C非对齐数据的处理方案](https://www.hiascend.com/zh/developer/techArticles/20250627-1)
-    - [深度理解多核并行/流水计算/double buffer技术](https://www.hiascend.com/zh/developer/techArticles/20230807-1)
-  - 问题案例
-    - [Ascend C算子开发常见问题案例](https://www.hiascend.com/zh/developer/techArticles/20240106-1) 
-    - [含有Matmul高阶API的算子精度问题定位](https://www.hiascend.com/zh/developer/techArticles/20250107-1)
-  - 性能优化
-    - [Ascend C算子性能优化实用技巧01——流水优化](https://www.hiascend.com/zh/developer/techArticles/20240819-1)
-    - [Ascend C算子性能优化实用技巧02——内存优化](https://www.hiascend.com/zh/developer/techArticles/20240823-1)
-    - [Ascend C算子性能优化实用技巧03——搬运优化](https://www.hiascend.com/zh/developer/techArticles/20240906-1)
-    - [Ascend C算子性能优化实用技巧04——Tiling优化](https://www.hiascend.com/zh/developer/techArticles/20240920-1)
-    - [Ascend C算子性能优化实用技巧05——API使用优化](https://www.hiascend.com/zh/developer/techArticles/20241107-1)
-  - 优秀实践
-    - [基于Ascend C的Matmul算子性能优化最佳实践](https://www.hiascend.com/zh/developer/techArticles/20240816-1)
-    - [基于Ascend C的FlashAttention算子性能优化最佳实践](https://www.hiascend.com/zh/developer/techArticles/20240607-1)
-
-
-- 培训视频
-  - [Ascend C系列教程（入门）](https://www.hiascend.com/developer/courses/detail/1691696509765107713)
-  - [Ascend C系列教程（进阶）](https://www.hiascend.com/zh/developer/courses/detail/1696414606799486977)
-  - [Ascend C系列教程（高级）](https://www.hiascend.com/zh/developer/courses/detail/1696690858236694530)
+AscendC::Hccl::AllReduce：融合算子 Kernel 调用 AllReduce 高阶 API，传入运行时输入输出地址、count、数据类型和归约类型。
+-> HcclImpl::AllReduce：校验归约类型，并构造 HCCL_CMD_ALLREDUCE 通信参数。
+-> CommonPrepareImpl：分配通信 handle，将通信参数组装成消息，并记录 repeat、消息位置和通信类型。
+-> SendMsgToServer：将 HcclMsg 写入 AICore 与 KFC/AICPU server 的共享消息区。
+-> SetCommitTurnCntToGm：当调用 AllReduce<true> 时直接更新提交计数，触发 server 执行该通信任务。
+AscendC::Hccl::Commit：当调用 AllReduce<false> 时，由 Kernel 显式提交指定 handle 对应的通信任务。
+-> HcclImpl::Commit：校验 handle，并通过 SetCommitTurnCntToGm 更新共享消息区中的提交计数。
+KFC/AICPU server 消息轮询：持续检查共享消息区中是否出现 AICore 写入的有效 HcclMsg。
+-> GetCurrentMsg：从共享消息区读取当前待处理的 HcclMsg。
+-> PrepareProcess：校验消息序号，并将有效通信消息交给 server 编排。
+-> CommKfcAicpuServer::Orchestrate：根据消息中的 opParamKey 匹配资源上下文，并按 repeat 次数执行通信任务。
+-> FormatOpParamFromMsg：使用 Host 侧保存的基础 OpParam 和当前 HcclMsg 构造本次运行参数。
+-> FormatOpenOpParamDataFromMsg：处理 repeat 偏移，并将消息字段更新到运行参数。
+-> CreateOpParamByBaseOpParam：写入 sendBuffer、recvBuffer、dataCnt、dataType、reduceType 和 stream。
+-> LaunchOpenCcoreWait：等待 AICore 通过 AllReduce<true> 或 Commit 更新提交计数。
+-> LaunchOpenAicpuKernelServer：使用运行参数和已恢复的资源上下文启动本地 AICPU 算法。
+-> useCannBridge：按算子类型判断 Device 执行是否交给外部 CANN。
+-> false：使用本地 mc2_ops_hccl registry；当前 AllReduce 走此分支。
+-> CollAlgExecRegistryV2::GetAlgExec：根据 HCCL_CMD_ALLREDUCE 和 InsAllReduceMesh1DTwoShot 获取 executor。
+-> RunWithMc2TaskCache 走task cache
+-> HcommBatchModeStart 用于开启批量模式，在HcommBatchModeStart和HcommBatchModeEnd之间的所有数据面接口调用（如HcommLocalCopy、HcommWrite等）将被缓存，不会立即执行。所有操作将在调用HcommBatchModeEnd时统一提交并执行。
+-> BuildMc2AicpuTaskCachePlan 判定能否启用任务缓存（首次执行时捕获底层 hcomm 原语调用序列，之后同 tag 直接 replay，跳过重新编排），并生成缓存计划 Mc2AicpuTaskCachePlan
+-> 如果无法开启cache 每次走func() 真实执行
+-> Mc2AicpuTaskCacheLookup 查询缓存
+-> isHit=true 命中路径（重放）
+-> Mc2AicpuTaskCacheExecute 重放  -> HcommAicpuTsTaskCacheExecute
+-> isHit=false 未命中路径（首次捕获）
+-> Mc2AicpuTaskCacheStart 启动捕获
+-> func() 真实执行一次（同时被捕获）
+-> InsV2AllReduceSoleExecutor::Orchestrate：恢复 channel 和 thread，并读取运行时 count 与数据类型。
+-> InsV2AllReduceSoleExecutor::OrchestrateLoop：根据 HCCL buffer 容量计算单轮 count，循环处理全部数据。
+-> InsTempAllReduceMesh1DTwoShot::KernelRun：切分当前轮数据，依次执行 ReduceScatter 和 AllGather。
+-> InsTempAllReduceMesh1DTwoShot::RunReduceScatter：交换各 rank 的目标切片，并在本地完成归约。
+-> InsTempAllReduceMesh1DTwoShot::RunAllGather：交换已归约的数据片，生成每个 rank 的完整输出。
+-> Mc2AicpuTaskCacheEnd 发布缓存；失败则清缓存
+-> HcommBatchModeEnd
+-> LaunchOpenCcorePost：更新完成计数，通知 AICore 当前 repeat 的通信任务已经完成。
+AscendC::Hccl::Wait：等待完成计数达到预期值，确保 AllReduce 输出可以被后续计算安全使用。
