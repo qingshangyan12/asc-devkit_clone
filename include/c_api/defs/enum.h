@@ -91,8 +91,15 @@ enum class asc_position_quarter_mode {
     DISPERSE_FOURTH_QUARTER
 };
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-enum class asc_cast_round_mode : uint8_t { RN = 0, RNA, RD, RU, RZ, RO, RH };
+enum class asc_cast_round_mode : uint8_t {
+    RN = 0, // 四舍六入五成双舍入模式
+    RNA,    // 四舍五入舍入模式
+    RD,     // 向负无穷方向舍入模式
+    RU,     // 向正无穷方向舍入模式
+    RZ,     // 向零方向舍入模式
+    RO,     // 最近邻奇数舍入模式
+    RH      // 混合舍入模式，特指输出结果为hifloat8_t数据时使用的一种随机舍入模式
+};
 
 constexpr std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN> ASC_CAST_RN;
 constexpr std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RNA> ASC_CAST_RNA;
@@ -102,11 +109,13 @@ constexpr std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RZ> A
 constexpr std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RO> ASC_CAST_RO;
 constexpr std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RH> ASC_CAST_RH;
 
-enum class asc_cast_saturation_mode : uint8_t { NO_SAT = 0, SAT };
+enum class asc_cast_saturation_mode : uint8_t {
+    NO_SAT = 0, // 非饱和模式
+    SAT         // 饱和模式
+};
 
 constexpr std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> ASC_CAST_NO_SAT;
 constexpr std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> ASC_CAST_SAT;
-#endif
 
 enum class asc_dual_dst_mode : uint8_t { DUAL_DST_DISABLE = 0, DUAL_DST_SPLIT_M = 1, DUAL_DST_SPLIT_N = 2 };
 
