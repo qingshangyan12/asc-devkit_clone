@@ -600,7 +600,6 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |---|---|---|
 |[asc_clear_nthbit](scalar_compute/scalar_bit/asc_clear_nthbit.md)|位操作函数，用于将一个uint64_t整数bits的第idx位设置为0。|`c_api/scalar_compute/compute/scalar_bit.h`|
 |[asc_clz](scalar_compute/scalar_bit/asc_clz.md)|计算参数前导零的数量（二进制从最高位到第一个1共有多少个0）。|`c_api/scalar_compute/compute/scalar_bit.h`|
-|[asc_get_uintdiv_magic_and_shift](scalar_compute/scalar_bit/asc_get_uintdiv_magic_and_shift.md)|根据无符号除数计算快速除法所需的magic和shift参数。|`c_api/scalar_compute/compute/scalar_bit.h`|
 |[asc_ffs](scalar_compute/scalar_bit/asc_ffs.md)|FindFirstSet接口，输入数据的二进制表示中从最低位向最高位查找第一个值为1的位，并返回其位置，如果没找到则返回-1。|`c_api/scalar_compute/compute/scalar_bit.h`|
 |[asc_ffz](scalar_compute/scalar_bit/asc_ffz.md)|获取一个uint64_t类型数字的二进制表示中从最低有效位开始的第一个0出现的位置，如果没找到则返回-1。|`c_api/scalar_compute/compute/scalar_bit.h`|
 |[asc_popc](scalar_compute/scalar_bit/asc_popc.md)|获取一个uint64_t类型数字的二进制中1的个数。|`c_api/scalar_compute/compute/scalar_bit.h`|

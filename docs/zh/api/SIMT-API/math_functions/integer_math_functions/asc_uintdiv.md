@@ -26,10 +26,10 @@
 
 头文件路径为：`"simt_api/math_functions.h"`。
 
-整数快除算法分为两步计算商`quotient`。第一步调用[asc_get_uintdiv_magic_and_shift](../../../SIMD-API/c_api/scalar_compute/scalar_bit/asc_get_uintdiv_magic_and_shift.md)接口，根据除数计算`magic`和`shift`；第二步调用本接口，根据被除数`dividend`、`magic`和`shift`计算商。计算公式如下：
+整数快除算法分为两步计算商`quotient`。第一步根据固定除数预计算`magic`和`shift`，可由配套标量接口`asc_get_uintdiv_magic_and_shift`完成；第二步调用本接口，根据被除数`dividend`、`magic`和`shift`计算商。计算公式如下：
 
 $$
-quotient = \left(\frac{dividend \times magic}{2^N} + dividend\right) \gg shift
+quotient = \left(\left\lfloor\frac{dividend \times magic}{2^N}\right\rfloor + dividend\right) \gg shift
 $$
 
 根据被除数数据类型的不同，公式中$N$的取值不同：当被除数为`uint32_t`数据类型时，$N$为32；当被除数为`uint64_t`数据类型时，$N$为64。
@@ -37,7 +37,7 @@ $$
 > [!NOTE]说明
 >
 > 整数快除算法使用方式：
-> 1. 在标量计算逻辑中，调用[asc_get_uintdiv_magic_and_shift](../../../SIMD-API/c_api/scalar_compute/scalar_bit/asc_get_uintdiv_magic_and_shift.md)接口，计算除数的`magic`和`shift`值。
+> 1. 预计算固定除数的`magic`和`shift`值，或在标量计算逻辑中调用`asc_get_uintdiv_magic_and_shift`接口生成参数。
 > 2. 在SIMT VF计算逻辑中，调用`asc_uintdiv`接口，完成指定被除数的除法运算。
 
 ## 函数原型
@@ -57,8 +57,8 @@ inline uint64_t asc_uintdiv(uint64_t dividend, uint64_t magic, uint64_t shift)
 | 参数名 | 输入/输出 | 描述 |
 | :------ | :--- | :------------ |
 | dividend | 输入 | 被除数。 |
-| magic | 输入 | 整数快除算法第一步调用[asc_get_uintdiv_magic_and_shift](../../../SIMD-API/c_api/scalar_compute/scalar_bit/asc_get_uintdiv_magic_and_shift.md)接口，根据指定除数计算得到的快速除法乘法因子。 |
-| shift | 输入 | 整数快除算法第一步调用[asc_get_uintdiv_magic_and_shift](../../../SIMD-API/c_api/scalar_compute/scalar_bit/asc_get_uintdiv_magic_and_shift.md)接口，根据指定除数计算得到的快速除法移位量。 |
+| magic | 输入 | 根据指定除数预计算得到的快速除法乘法因子。 |
+| shift | 输入 | 根据指定除数预计算得到的快速除法移位量。 |
 
 ## 返回值说明
 
@@ -67,6 +67,7 @@ inline uint64_t asc_uintdiv(uint64_t dividend, uint64_t magic, uint64_t shift)
 ## 约束说明
 
 - 当被除数为`uint32_t`数据类型时，支持的被除数最大值为`INT32_MAX`，即2的31次方减1；当被除数为`uint64_t`数据类型时，支持的被除数最大值为`INT64_MAX`，即2的63次方减1。
+- `magic`和`shift`必须对应同一非零除数；uint32和uint64对应除数的最大值分别为`INT32_MAX`和`INT64_MAX`。
 - 整数快除算法可以用于性能优化，适用于一个除数被用于多次除法计算的场景。
 - 纯SIMT编程场景当前不支持使用该接口。
 
@@ -77,7 +78,8 @@ inline uint64_t asc_uintdiv(uint64_t dividend, uint64_t magic, uint64_t shift)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
-    #include "kernel_operator.h"
+    #include "c_api/asc_simd.h"
+    #include "simt_api/asc_simt.h"
     #include "simt_api/math_functions.h"
 
     __simt_vf__ __launch_bounds__(1024) inline void simt_fast_div(
@@ -87,12 +89,11 @@ inline uint64_t asc_uintdiv(uint64_t dividend, uint64_t magic, uint64_t shift)
         output[idx] = asc_uintdiv(value, magic, shift);
     }
 
-    __global__ __vector__ void integer_div_kernel(__gm__ uint32_t* output, uint32_t value, uint32_t divisor)
+    __global__ __vector__ void integer_div_kernel(__gm__ uint32_t* output, uint32_t value)
     {
-        // 在SIMD侧根据固定除数计算magic和shift，并传递给SIMT侧复用。
-        uint32_t magic = 0;
-        uint32_t shift = 0;
-        asc_get_uintdiv_magic_and_shift(&magic, &shift, divisor);
+        // 本例固定除数为7，使用预先计算的参数，不依赖标量快除接口。
+        uint32_t magic = 613566757U;
+        uint32_t shift = 3U;
         asc_vf_call<simt_fast_div>(dim3(1024), output, value, magic, shift);
     }
     ```
