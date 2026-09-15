@@ -116,7 +116,7 @@ Atlas 200I/500 A2 推理产品，支持的数据类型为：int8_t、uint8_t、i
 
 - 操作数地址对齐要求请参见[Unified Buffer地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
 - 不支持源操作数与目的操作数使用同一块内存地址。
-- 当GatherRepeatParams配置不当，导致相邻迭代的写入地址发生重叠时，行为未定义。
+- 当GatherRepeatParams的配置导致相邻迭代间的目的地址重叠时，会产生未定义行为。典型场景如，每次迭代完成8个DataBlock的数据收集，如果dstBlkStride配置为2，dstRepStride配置为8，第一轮循环写入的DataBlock编号为0、2、4、6、8、10、12、14，第二轮循环写入的编号为8、10、12、14、16、18、20、22，即上一轮迭代会踩踏前一轮迭代的后4个DataBlock，导致无法得到预期的结果。
 - offset的取值要求如下：
   - 取值应保证src元素类型位宽对齐。
   - 偏移地址后需要32字节对齐。
