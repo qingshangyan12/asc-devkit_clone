@@ -167,6 +167,7 @@ HcclResult CheckCcuKfcFlow(const void* mc2Tiling, const void* ccTilingList[], ui
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         const auto* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
         CHK_PTR_NULL(ccTiling);
+        // peer-only ReduceScatter 仅支持 rankSize==2
         if (std::strcmp(ccTiling->algConfig, KFC_REDUCE_SCATTER_PEER_ONLY_ALG_NAME) == 0 && rankSize != 2U) {
             HCCL_ERROR(
                 "Peer-only ReduceScatter requires rankSize 2, but got rankSize %u at tiling index %u.", rankSize, i);
