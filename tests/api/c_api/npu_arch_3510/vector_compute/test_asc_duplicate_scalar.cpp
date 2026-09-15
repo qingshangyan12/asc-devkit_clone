@@ -125,10 +125,38 @@ TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_mer
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_merge, vdup, uint16_t);
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_merge, vdup, int16_t);
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_merge, vdup, half);
-TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_merge, vdup, bfloat16_t);
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_merge, vdup, uint32_t);
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_merge, vdup, int32_t);
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_MERGE_INSTR(Vdups, asc_duplicate_scalar_merge, vdup, float);
+
+namespace {
+constexpr uint16_t BFLOAT16_VALUE_BITS = 0x3F80;
+vector_bfloat16_t* expectedBfloat16Dst = nullptr;
+
+void vdupMergingBfloat16ViaHalfStub(vector_half& dst, half value, vector_bool mask, Literal mode)
+{
+    EXPECT_EQ(reinterpret_cast<void*>(&dst), reinterpret_cast<void*>(expectedBfloat16Dst));
+    EXPECT_EQ(*reinterpret_cast<uint16_t*>(&value), BFLOAT16_VALUE_BITS);
+    EXPECT_EQ(mode, MODE_MERGING);
+}
+} // namespace
+
+TEST(TestVectorComputeVdupsBfloat16MergeCApi, asc_duplicate_scalar_merge_bfloat16_t_via_half_Succ)
+{
+    vector_bfloat16_t dst;
+    bfloat16_t value;
+    *reinterpret_cast<uint16_t*>(&value) = BFLOAT16_VALUE_BITS;
+    vector_bool mask;
+    expectedBfloat16Dst = &dst;
+
+    MOCKER_CPP(vdup, void(vector_half&, half, vector_bool, Literal))
+        .times(1)
+        .will(invoke(vdupMergingBfloat16ViaHalfStub));
+
+    asc_duplicate_scalar_merge(dst, value, mask);
+    GlobalMockObject::verify();
+    expectedBfloat16Dst = nullptr;
+}
 
 #define TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(class_name, c_api_name, cce_name, data_type) \
                                                                                                     \

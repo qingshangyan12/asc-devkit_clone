@@ -415,7 +415,8 @@ __simd_callee__ inline void asc_duplicate_scalar_merge(vector_half& dst, half va
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_bfloat16_t& dst, bfloat16_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
-        vdup(dst, value, mask, MODE_MERGING);
+        // vdup is bitwise for equal-width types; use the half overload to preserve masked-off BF16 elements.
+        vdup(reinterpret_cast<vector_half&>(dst), reinterpret_cast<half&>(value), mask, MODE_MERGING);
     }
 }
 
