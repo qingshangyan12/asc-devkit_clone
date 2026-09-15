@@ -94,4 +94,4 @@ asc_set_saturation_flag(asc_saturation_mode::CAST, old_cast_sat);
 asc_set_saturation_strategy(old_strategy);
 ```
 
-数据搬运与Reg cast模式可参考[Cast样例](../../../../../../examples/02_simd_c_api/03_c_api/02_reg_vector_compute/cast)。
+数据搬运与Reg cast 模式可参考[Cast样例](../../../../../../examples/02_simd_c_api/05_reg_vector_compute/cast)。
