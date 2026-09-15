@@ -25,7 +25,7 @@
 #endif
 
 #include "tensor_api/tensor.h"
-
+111
 #if (ASC_DEVKIT_VERSION_NUM >= 902000000)
 #if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510))
 #include "tensor_api/experimental/utils/reg_enum.h"
