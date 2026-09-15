@@ -7,7 +7,7 @@ This example implements vector self-addition based on the RegBase programming pa
 
 | Product | CANN Software Version |
 |---------|----------------------|
-| Ascend 960PR/Ascend 960DT | >= CANN 9.2.0 |
+| Ascend 960DT | >= CANN 9.2.0 |
 | Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
