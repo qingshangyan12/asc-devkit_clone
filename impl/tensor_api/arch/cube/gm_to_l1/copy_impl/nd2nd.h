@@ -79,9 +79,10 @@ public:
             src_stride >>= 1;
             dst_stride >>= 1;
         }
-        uint8_t cache_mode = src.engine().get_cache_mode();
+        auto cache_mode = static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode());
         copy_gm_to_l1_align_v2_instr::data_copy_with_offset(
-            dst, src, dst_offset, src_offset, block_count, block_len, 0, 0, cache_mode, src_stride, dst_stride);
+            dst, src, dst_offset, src_offset, block_count, block_len, 0, 0, cache_mode, src_stride, dst_stride,
+            trait.pre_allocation);
     }
 
 private:
@@ -125,7 +126,7 @@ private:
             dst_stride_rows = get_element<attr_info::stride, attr_info::row, 1>(dst_layout);
         }
 
-        uint8_t cache_mode = src.engine().get_cache_mode();
+        auto cache_mode = static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode());
 
         // normal mode, dst_stride % c0_size should be 0
         // compact mode, block_len equals dst_stride
@@ -152,7 +153,8 @@ private:
             dst_stride = dst_stride >> 1;
         }
         copy_gm_to_l1_align_v2_instr::data_copy(
-            dst.data().get(), src.data().get(), block_count, block_len, 0, 0, cache_mode, src_stride, dst_stride);
+            dst.data().get(), src.data().get(), block_count, block_len, 0, 0, cache_mode, src_stride, dst_stride,
+            trait.pre_allocation);
     }
 
     // Batch case: layout is (B, (M, N)) with strides (sB, (sM, sN)). Per-matrix internal
@@ -191,7 +193,7 @@ private:
         }
 
         uint32_t matrix_elems = src_shape_rows * src_shape_columns;
-        uint8_t cache_mode = src.engine().get_cache_mode();
+        auto cache_mode = static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode());
 
         // batch-strided: B blocks, stride = per-matrix start-to-start in bytes.
         uint32_t block_count = batch_size;
@@ -206,7 +208,8 @@ private:
             dst_stride = dst_stride >> 1;
         }
         copy_gm_to_l1_align_v2_instr::data_copy(
-            dst.data().get(), src.data().get(), block_count, block_len, 0, 0, cache_mode, src_stride, dst_stride);
+            dst.data().get(), src.data().get(), block_count, block_len, 0, 0, cache_mode, src_stride, dst_stride,
+            trait.pre_allocation);
     }
 };
 } // namespace te
