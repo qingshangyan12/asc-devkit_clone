@@ -12,7 +12,7 @@
 
 ## 功能说明
 
-头文件路径：`"tensor_api/experimental/vector_compute.h"`。
+头文件路径：`"tensor_api/experimental/arch/vector/logical_compute.h"`。
 
 命名空间：`asc::te::experimental`。
 
@@ -49,7 +49,11 @@ __simd_callee__ inline reg_tensor<T> operator!(const reg_tensor<T>& src)
 以下示例展示接口在AIV计算函数中的典型调用方式。
 
 ```cpp
-#include "tensor_api/experimental/vector_compute.h"
+#include "tensor_api/tensor.h"
+#include "tensor_api/experimental/arch/vector/logical_compute.h"
+#include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
+#include "tensor_api/experimental/arch/vector/reg_data_load.h"
+#include "tensor_api/experimental/arch/vector/reg_data_store.h"
 
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void logical_not_example(InputTensor input, OutputTensor output)

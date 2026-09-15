@@ -84,26 +84,27 @@ void check_min()
 template <typename T>
 void check_carry()
 {
+    using result_type = asc::te::experimental::carry_result<T>;
     static_assert(AscendC::Std::is_same_v<
                   decltype(asc::te::experimental::addc(
-                      AscendC::Std::declval<reg_type<bool>&>(), AscendC::Std::declval<const reg_type<T>&>(),
-                      AscendC::Std::declval<const reg_type<T>&>())),
-                  reg_type<T>>);
+                      AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>())),
+                  result_type>);
     static_assert(AscendC::Std::is_same_v<
                   decltype(asc::te::experimental::addc(
-                      AscendC::Std::declval<reg_type<bool>&>(), AscendC::Std::declval<const reg_type<T>&>(),
-                      AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<bool>&>())),
-                  reg_type<T>>);
+                      AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>(),
+                      AscendC::Std::declval<const reg_type<bool>&>())),
+                  result_type>);
     static_assert(AscendC::Std::is_same_v<
                   decltype(asc::te::experimental::subc(
-                      AscendC::Std::declval<reg_type<bool>&>(), AscendC::Std::declval<const reg_type<T>&>(),
-                      AscendC::Std::declval<const reg_type<T>&>())),
-                  reg_type<T>>);
+                      AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>())),
+                  result_type>);
     static_assert(AscendC::Std::is_same_v<
                   decltype(asc::te::experimental::subc(
-                      AscendC::Std::declval<reg_type<bool>&>(), AscendC::Std::declval<const reg_type<T>&>(),
-                      AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<bool>&>())),
-                  reg_type<T>>);
+                      AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>(),
+                      AscendC::Std::declval<const reg_type<bool>&>())),
+                  result_type>);
+    static_assert(AscendC::Std::is_same_v<decltype(AscendC::Std::declval<result_type>().value), reg_type<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(AscendC::Std::declval<result_type>().carry), reg_type<bool>>);
 }
 
 template <typename T>
