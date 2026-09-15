@@ -190,8 +190,8 @@ void HcommPrimitivesDlInit(void* libHcommHandle)
     INIT_SUPPORT_FLAG(libHcommHandle, HcommThreadJoin);
     INIT_SUPPORT_FLAG(libHcommHandle, HcclSymWinGetPeerPointer);
     INIT_SUPPORT_FLAG(libHcommHandle, HcclCommSymWinGet);
-    dlerror();
 
+    dlerror();
     g_HcommBatchTransferOnThread =
         reinterpret_cast<HcclHcommBatchTransferOnThreadFunc>(dlsym(libHcommHandle, "HcommBatchTransferOnThread"));
     const char* batchTransferError = dlerror();
