@@ -489,8 +489,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void simt_printf_impl(
 // (dump_head) and its args come before the user args, so the host formats both with a single fmt string.
 template <typename... Args>
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void simt_printf_impl_assert_msg(
-    __simt_gm__ const char* assertion, __simt_gm__ const char* file, unsigned int line,
-    __simt_gm__ const char* function, __simt_gm__ const char* fmt, Args&&... args)
+    __simt_gm__ const char* head_fmt, __simt_gm__ const char* file, unsigned int line, __simt_gm__ const char* function,
+    __simt_gm__ const char* assertion, __simt_gm__ const char* fmt, Args&&... args)
 {
 #ifndef ASCENDC_CPU_DEBUG
     enable_printf();
@@ -504,8 +504,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void simt_printf_impl_assert_msg(
     }
 
     uint32_t args_num = 0;
-    uint32_t tlv_len = get_print_tlv_len_with_head(
-        args_num, fmt, "[ASSERT] %s:%u: %s: Assertion `%s' failed. ", file, line, function, assertion, args...);
+    uint32_t tlv_len = get_print_tlv_len_with_head(args_num, fmt, head_fmt, file, line, function, assertion, args...);
     tlv_len = (tlv_len + BYTE_ALGIN - 1) & (~(BYTE_ALGIN - 1)); // 8 byte align
     uint64_t start_offset = check_and_wait_ring_buf_space(block_ring_buf_info, tlv_len);
     start_offset = start_offset % block_ring_buf_info->ringBufLen;
@@ -513,8 +512,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void simt_printf_impl_assert_msg(
     uint32_t write_ptr = static_cast<uint32_t>(start_offset);
     write_ring_buf_tlv_head(block_ring_buf_info, write_ptr, tlv_len, args_num);
     write_ring_buf_tlv_data_with_head(
-        block_ring_buf_info, write_ptr, args_num, fmt, "[ASSERT] %s:%u: %s: Assertion `%s' failed. ", file, line,
-        function, assertion, args...);
+        block_ring_buf_info, write_ptr, args_num, fmt, head_fmt, file, line, function, assertion, args...);
 
     __threadfence();
     write_finish(block_ring_buf_info, start_offset, DumpType::DUMP_SIMT_ASSERT);
