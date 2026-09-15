@@ -522,13 +522,6 @@ class TestCompileOp(unittest.TestCase):
                     stack.enter_context(
                         mock.patch.object(compile_op_module, "_json_post_process")
                     )
-                    mock_write_resource_id = stack.enter_context(
-                        mock.patch.object(
-                            static_compile_resource_generator,
-                            "generate_and_write_resource_id",
-                            return_value="resource-id",
-                        )
-                    )
                     record_sk_function = (
                         compile_op_module._record_kernel_spec_sk_commands
                     )
@@ -792,18 +785,6 @@ class TestCompileOp(unittest.TestCase):
         kernel_spec.sk_cap_bitmap = None
 
         cases = (
-            (
-                "resource_id",
-                mock.patch.object(
-                    static_compile_resource_generator,
-                    "generate_and_write_resource_id",
-                    side_effect=static_compile_resource_generator.ResourceIdError(
-                        "resource failed"
-                    ),
-                ),
-                lambda: kernel_spec.attach_resource_id(),
-                "generate Resource ID failed, reason is: resource failed",
-            ),
             (
                 "manifest",
                 mock.patch.object(
