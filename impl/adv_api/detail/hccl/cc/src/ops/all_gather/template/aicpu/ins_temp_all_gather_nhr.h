@@ -11,6 +11,7 @@
 #define INS_TEMP_ALL_GATHER_NHR_H
 
 #include "alg_v2_template_base.h"
+#include "mc2_algorithm_boundary_sync.h"
 #include "executor_base.h"
 
 namespace mc2_ops_hccl {
@@ -32,6 +33,9 @@ public:
     HcclResult KernelRun(
         const OpParam& param, const TemplateDataParams& tempAlgParams,
         const TemplateResource& templateResource) override;
+    HcclResult KernelRunBoundary(
+        const OpParam& param, const TemplateDataParams& tempAlgParams,
+        const TemplateResource& templateResource, const mc2_boundary::TurnPolicy& policy);
     HcclResult CalcRes(
         HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
         AlgResourceRequest& resourceRequest) override;

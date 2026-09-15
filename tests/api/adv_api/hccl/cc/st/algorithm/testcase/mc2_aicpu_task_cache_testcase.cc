@@ -24,10 +24,13 @@
 namespace {
 using namespace mc2_ops_hccl;
 
-int32_t TaskCacheLookupStub(const char*, bool* isHit)
+std::string lastLookupTag;
+
+int32_t TaskCacheLookupStub(const char* tag, bool* isHit)
 {
     auto& state = GetMc2TaskCacheTestStubState();
     ++state.lookupCalls;
+    lastLookupTag = tag;
     *isHit = state.lookupHit;
     return state.lookupRet;
 }
@@ -318,6 +321,27 @@ TEST_F(Mc2AicpuTaskCacheTest, CacheMissCapturesAndCacheHitSkipsExecutor)
     EXPECT_EQ(executorCalls, 1U);
     EXPECT_EQ(state.executeCalls, 1U);
     EXPECT_EQ(state.cacheStartCalls, 0U);
+}
+
+TEST_F(Mc2AicpuTaskCacheTest, BoundarySlotsAndEntryPolicyUseDifferentCacheGraphs)
+{
+    auto inputs = MakeTaskCacheInputs(HCCL_CMD_ALLGATHER);
+    Mc2AicpuTaskCacheManager manager(8U, 4096U);
+    uint32_t calls = 0U;
+    auto execute = [&]() { ++calls; return HCCL_SUCCESS; };
+    ASSERT_EQ(RunWithMc2TaskCache(inputs.param, inputs.resCtx, execute, manager), HCCL_SUCCESS);
+    const auto original = lastLookupTag;
+    ASSERT_EQ(RunWithMc2TaskCache(inputs.param, inputs.resCtx, execute, manager, ":mb1:0:3"), HCCL_SUCCESS);
+    const auto first = lastLookupTag;
+    ASSERT_EQ(RunWithMc2TaskCache(inputs.param, inputs.resCtx, execute, manager, ":mb1:1:4"), HCCL_SUCCESS);
+    const auto second = lastLookupTag;
+    EXPECT_NE(original, first);
+    EXPECT_NE(first, second);
+    EXPECT_EQ(calls, 3U);
+    GetMc2TaskCacheTestStubState().lookupHit = true;
+    ASSERT_EQ(RunWithMc2TaskCache(inputs.param, inputs.resCtx, execute, manager, ":mb1:1:4"), HCCL_SUCCESS);
+    EXPECT_EQ(lastLookupTag, second);
+    EXPECT_EQ(calls, 3U);
 }
 
 TEST_F(Mc2AicpuTaskCacheTest, CapacityFullBypassesAllHcommCacheCalls)

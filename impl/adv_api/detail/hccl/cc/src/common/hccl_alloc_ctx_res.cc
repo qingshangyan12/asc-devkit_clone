@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "hccl_alloc_ctx_res.h"
+#include "mc2_algorithm_boundary_sync.h"
 #include "kfc_server_protocol.h"
 
 #include <limits>
@@ -251,15 +252,30 @@ HcclResult AllocOpParamMemory(
                 "OpParam[%u] varMemSize[%llu] is too large.", i,
                 static_cast<unsigned long long>(opParamVec[i].varMemSize)),
             HCCL_E_PARA);
-        const size_t opParamSize = sizeof(OpParam) + static_cast<size_t>(opParamVec[i].varMemSize);
+        const auto* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
+        mc2_boundary::Config boundary;
+        CHK_PRT_RET(
+            !mc2_boundary::Decode(ccTiling->reserved2, sizeof(ccTiling->reserved2), boundary),
+            HCCL_ERROR("Invalid MC2 boundary tiling extension."), HCCL_E_PARA);
+        const size_t baseSize = sizeof(OpParam) + static_cast<size_t>(opParamVec[i].varMemSize);
+        const size_t extensionSize = boundary.mode == 0U ? 0U : sizeof(boundary);
+        CHK_PRT_RET(baseSize > SIZE_MAX - extensionSize,
+            HCCL_ERROR("Boundary OpParam size overflow."), HCCL_E_PARA);
+        const size_t opParamSize = baseSize + extensionSize;
         serializedOpParam.assign(opParamSize, 0U);
         CHK_SAFETY_FUNC_RET(
             memcpy_s(serializedOpParam.data(), serializedOpParam.size(), &opParamVec[i], sizeof(OpParam)));
 
+        if (extensionSize != 0U) {
+            mc2_boundary::Encode(serializedOpParam.data() + baseSize, boundary);
+        }
         std::string tagParam = ctxTag + "_" + std::to_string(i);
+        if (extensionSize != 0U) {
+            tagParam += ":mb1:" + std::to_string(boundary.mode) + ":" +
+                        std::to_string(boundary.groupId) + ":" + std::to_string(boundary.totalTurns);
+        }
         void* opParamPtr = nullptr;
         uint64_t allocatedOpParamSize = opParamSize;
-        const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
         CommEngine commEngine = OpExecuteConfigToCommEngine(ccTiling->commEngine);
         if (HcclEngineCtxGet(comm, tagParam.c_str(), commEngine, &opParamPtr, &allocatedOpParamSize) == HCCL_SUCCESS) {
             CHK_PRT_RET(
@@ -823,7 +839,7 @@ static HcclResult AcquireAlgResources(
 
 HcclResult GetOpParamResCtx(
     HcclComm comm, const std::string& algName, OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo,
-    void** resCtxOut)
+    void** resCtxOut, uint32_t boundaryTurns)
 {
     CHK_PTR_NULL(topoInfo);
     CHK_PTR_NULL(resCtxOut);
@@ -851,7 +867,7 @@ HcclResult GetOpParamResCtx(
         CHK_RET(HcclThreadAcquireWithStream(comm, COMM_ENGINE_CPU_TS, opParam.stream, 1, &cpuTsThread));
         CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
     }
-    CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
+    CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused, boundaryTurns));
     CHK_PTR_NULL(*resCtxOut);
     opParam.cacheValid = isResourceReused;
     opParam.resCtx = *resCtxOut;
@@ -901,7 +917,21 @@ HcclResult GetOpParam(
     CHK_PTR_NULL(comm);
     CHK_PTR_NULL(stream);
     CHK_PTR_NULL(ccTiling);
-    CHK_RET(InitOpParamByTiling(comm, stream, tag, ccTiling, opParam));
+    mc2_boundary::Config boundary;
+    CHK_PRT_RET(
+        !mc2_boundary::Decode(ccTiling->reserved2, sizeof(ccTiling->reserved2), boundary),
+        HCCL_ERROR("Invalid MC2 boundary tiling extension."), HCCL_E_PARA);
+    std::string resourceTag = tag;
+    if (boundary.mode != 0U) {
+        resourceTag += ":mb1:" + std::to_string(boundary.mode) + ":" +
+                       std::to_string(boundary.groupId) + ":" + std::to_string(boundary.totalTurns);
+    }
+    CHK_RET(InitOpParamByTiling(comm, stream, resourceTag, ccTiling, opParam));
+    CHK_PRT_RET(
+        (boundary.mode == 1U && opParam.opType != HCCL_CMD_ALLGATHER) ||
+            (boundary.mode == 2U && opParam.opType != HCCL_CMD_REDUCE_SCATTER &&
+                opParam.opType != HCCL_CMD_ALLREDUCE),
+        HCCL_ERROR("Boundary mode does not match collective type."), HCCL_E_PARA);
 
     // ALLTOALL场景下sendCounts需指向host侧真实数组，且必须在整个GetOpParam调用链
     // (含SelectAlgAndPrepareEngine、GetOpParamResCtx中的GetAlgExecViaCann)期间保持存活。
@@ -928,8 +958,13 @@ HcclResult GetOpParam(
     }
 
     void* resCtxSequence = nullptr;
-    HcclResult resRet = GetOpParamResCtx(comm, algName, opParam, topoInfo.get(), &resCtxSequence);
-    if (resRet != HCCL_SUCCESS && forcedAlgAccepted && resCtxSequence == nullptr) {
+    const auto boundaryBudget = [&]() -> uint32_t {
+        return boundary.mode == 1U && opParam.engine == COMM_ENGINE_AICPU_TS &&
+                       algName == "AicpuAllGatherSoleNHR" ? boundary.totalTurns : 0U;
+    };
+    HcclResult resRet = GetOpParamResCtx(
+        comm, algName, opParam, topoInfo.get(), &resCtxSequence, boundaryBudget());
+    if (resRet != HCCL_SUCCESS && forcedAlgAccepted && resCtxSequence == nullptr && boundary.mode == 0U) {
         HCCL_WARNING(
             "[MC2_FORCE_ALG] fallback to default selector after resource failure, algName[%s], ret[%d].",
             algName.c_str(), static_cast<int>(resRet));
@@ -943,7 +978,7 @@ HcclResult GetOpParam(
             opParam.all2AllVDataDes.sendCounts = origSendCounts;
             return HCCL_SUCCESS;
         }
-        CHK_RET(GetOpParamResCtx(comm, algName, opParam, topoInfo.get(), &resCtxSequence));
+        CHK_RET(GetOpParamResCtx(comm, algName, opParam, topoInfo.get(), &resCtxSequence, boundaryBudget()));
     } else {
         CHK_RET(resRet);
     }
