@@ -114,16 +114,17 @@ PIPE_S
 - HF32模式启用后，FP32转换为HF32格式的舍入模式由配套的[asc_set_hf32_round_mode](asc_set_hf32_round_mode.md)接口配置，须在本接口之后调用该配套接口配置舍入模式，否则舍入模式沿用上次配置或默认值。
 - HF32模式仅对输入矩阵数据类型为`float`的矩阵乘加运算场景生效。
 
-<!-- npu="950" id12 -->
 ## 调用示例
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
+<!-- npu="950" id12 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+<!-- end id12 -->
 
 以下调用示例代码仅Ascend 950PR/Ascend 950DT产品支持。
 
@@ -151,9 +152,11 @@ __global__ __cube__ void asc_enable_hf32_kernel(
     __cc__ float hf32_l0[ELEMENTS];
 
     asc_set_gm2l1_nz_para(1, 1, 16, 0);
-    asc_copy_gm2l1_nd2nz(a_l1, a, DIM * sizeof(float), 0, DIM, DIM, 0, false);
+    asc_copy_gm2l1_nd2nz(a_l1, a, DIM * sizeof(float), asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM,
+        DIM, DIM, 0, false);
     asc_set_gm2l1_nz_para(1, 1, 16, 0);
-    asc_copy_gm2l1_nd2nz(b_l1, b, DIM * sizeof(float), 0, DIM, DIM, 0, false);
+    asc_copy_gm2l1_nd2nz(b_l1, b, DIM * sizeof(float), asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM,
+        DIM, DIM, 0, false);
     asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
     asc_copy_l12l0a(a_l0, a_l1, 0, 0, 1, 2, 1, 1);
@@ -161,22 +164,22 @@ __global__ __cube__ void asc_enable_hf32_kernel(
     asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
     asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);
     asc_disable_hf32();
-    asc_mmad(fp32_l0, a_l0, b_l0, DIM, DIM, DIM, 0, true, false, true);
+    asc_mmad(fp32_l0, a_l0, b_l0, DIM, DIM, DIM, asc_unit_flag_mode::DISABLE, true, false, true);
     asc_sync_pipe(PIPE_M);
     asc_enable_hf32();
     asc_set_hf32_round_mode(asc_hf32_round_mode::NEAREST_EVEN);
-    asc_mmad(hf32_l0, a_l0, b_l0, DIM, DIM, DIM, 0, true, false, true);
+    asc_mmad(hf32_l0, a_l0, b_l0, DIM, DIM, DIM, asc_unit_flag_mode::DISABLE, true, false, true);
     asc_sync_pipe(PIPE_M);
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_set_l0c_copy_nz_para(1, 0, 0);
-    asc_copy_l0c2gm(fp32_output, fp32_l0, DIM, DIM, DIM, DIM, 0, 0, 0,
-        static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
-        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
+    asc_copy_l0c2gm(fp32_output, fp32_l0, DIM, DIM, DIM, DIM,
+        asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, asc_unit_flag_mode::DISABLE, asc_quant_mode::NoQuant,
+        asc_relu_pre_mode::NONE, false, true, false, false);
     asc_set_l0c_copy_nz_para(1, 0, 0);
-    asc_copy_l0c2gm(hf32_output, hf32_l0, DIM, DIM, DIM, DIM, 0, 0, 0,
-        static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
-        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
+    asc_copy_l0c2gm(hf32_output, hf32_l0, DIM, DIM, DIM, DIM,
+        asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, asc_unit_flag_mode::DISABLE, asc_quant_mode::NoQuant,
+        asc_relu_pre_mode::NONE, false, true, false, false);
     asc_sync_pipe(PIPE_ALL);
 }
 
@@ -232,4 +235,3 @@ int main()
     return passed ? 0 : 1;
 }
 ```
-<!-- end id12 -->

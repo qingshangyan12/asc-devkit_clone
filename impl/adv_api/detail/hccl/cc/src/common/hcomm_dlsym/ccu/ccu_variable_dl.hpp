@@ -17,6 +17,7 @@
 #include <cstdint>
 #include "ccu_types_dl.h"
 #include "ccu_utils_dl.hpp"
+#include "hcomm_primitives.h"
 #include "ccu_primitives_impl_dl.h"
 
 namespace AscendC {
@@ -28,7 +29,7 @@ class RemoteAddr;
 template <typename U>
 class Array;
 template <typename T>
-T GetResByChannel(ChannelHandle channel, uint32_t index);
+T GetResByChannel(ChannelHandle channel, uint32_t varIndex);
 
 struct CondExpr {
     const Variable* var;
@@ -93,7 +94,7 @@ private:
     friend class LocalAddr;
     friend class RemoteAddr;
     template <typename T>
-    friend T GetResByChannel(ChannelHandle channel, uint32_t index);
+    friend T GetResByChannel(ChannelHandle channel, uint32_t varIndex);
 };
 
 } // namespace ccu

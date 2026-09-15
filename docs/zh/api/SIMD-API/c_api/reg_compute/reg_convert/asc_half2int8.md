@@ -36,22 +36,22 @@
 
 ```c
 // 通过引用参数输出结果（占位符形式）
-__simd_callee__ inline void asc_half2int8<round_mode><sat_mode>(vector_int8_t& dst,
+__simd_callee__ inline void asc_half2int8_<round_mode><sat_mode>(vector_int8_t& dst,
                                                                 vector_half src,
                                                                 vector_bool mask,
                                                                 std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 
-__simd_callee__ inline void asc_half2int8<round_mode><sat_mode>(vector_int8_t& dst,
+__simd_callee__ inline void asc_half2int8_<round_mode><sat_mode>(vector_int8_t& dst,
                                                                 vector_half src,
                                                                 vector_bool mask,
                                                                 std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 
 // 通过函数返回值返回结果（占位符形式）
-__simd_callee__ inline vector_int8_t asc_half2int8<round_mode><sat_mode>(vector_half src,
+__simd_callee__ inline vector_int8_t asc_half2int8_<round_mode><sat_mode>(vector_half src,
                                                                          vector_bool mask,
                                                                          std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 
-__simd_callee__ inline vector_int8_t asc_half2int8<round_mode><sat_mode>(vector_half src,
+__simd_callee__ inline vector_int8_t asc_half2int8_<round_mode><sat_mode>(vector_half src,
                                                                          vector_bool mask,
                                                                          std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 ```
@@ -97,7 +97,6 @@ __simd_callee__ inline vector_int8_t asc_half2int8_rn(vector_half src,
 
 - 位置选择标签参数仅能使用编译期常量，编译器据此在编译期分发至对应的重载。
 - 位置选择标签选择目的操作数的写入地址，其他位置清零。
-
 - 通过引用参数输出结果的函数原型在非AIV上调用时直接返回。
 - 通过函数返回值输出结果的函数原型在非AIV上调用时返回对应矢量类型的默认构造值。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。

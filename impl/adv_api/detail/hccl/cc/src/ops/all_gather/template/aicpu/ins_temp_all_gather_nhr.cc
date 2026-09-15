@@ -441,6 +441,7 @@ HcclResult InsTempAllGatherNHR::LocalDataCopy(const std::vector<ThreadHandle>& t
     CHK_RET(GetAlgRank(myRank_, subCommRanks_[0], myAlgRank));
 
     u64 sliceSize = tempAlgParams_.sliceSize;
+    (void)sliceSize;
     const u32 dataTypeSize = DATATYPE_SIZE_TABLE[dataType_];
     u64 partialSliceSize = dataSplit_[channelIdx];
     u64 partialOffset = dataOffset_[channelIdx];
@@ -506,13 +507,13 @@ HcclResult InsTempAllGatherNHR::PostLocalCopy(const ThreadHandle& thread, const 
     }
     return HCCL_SUCCESS;
 }
-void InsTempAllGatherNHR::GetNotifyIdxMainToSub(std::vector<u32>& notifyIdxMianToSub)
+void InsTempAllGatherNHR::GetNotifyIdxMainToSub(std::vector<u32>& notifyIdxMainToSub)
 {
-    notifyIdxMianToSub.clear();
+    notifyIdxMainToSub.clear();
     u32 threadNum = GetThreadNum();
     u32 slaveThreadNum = threadNum - 1;
     for (u32 slaveThreadIdx = 0; slaveThreadIdx < slaveThreadNum; slaveThreadIdx++) {
-        notifyIdxMianToSub.push_back(0);
+        notifyIdxMainToSub.push_back(0);
     }
 }
 
