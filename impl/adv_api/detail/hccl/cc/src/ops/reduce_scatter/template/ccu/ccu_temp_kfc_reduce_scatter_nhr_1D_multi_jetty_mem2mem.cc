@@ -12,6 +12,8 @@
 #include "channel.h"
 #include "ccu_temp_kfc_reduce_scatter_nhr_1D_multi_jetty_mem2mem.h"
 
+#include <string>
+
 namespace mc2_ops_hccl {
 namespace {
 // 与 hccl CcuTempReduceScatterNhrMultiJettyMem2Mem1D 保持一致：当前 portNum 为 1。
@@ -62,6 +64,29 @@ HcclResult CcuTempKfcReduceScatterNHR1DMultiJettyMem2Mem::CalcRes(
     kernelArg->opParam = param;
     kernelArg->subCommRanks = subCommRanks_;
     CHK_RET(CalcNhrInfo(kernelArg->stepInfoVector));
+
+    // RS_NHR_DBG H1：真机通道/stepInfo 建立详情（host 注册期，plog 搜索 RS_NHR_DBG）
+    HCCL_INFO(
+        "[RS_NHR_DBG][H1] NHR CalcRes: rank=%u/%u portNum=%u rawChannels=%zu dedupChannels=%zu stepNum=%zu", myRank_,
+        tempRankSize_, kernelArg->portNum, channelDescs.size(), channelResort.size(), kernelArg->stepInfoVector.size());
+    for (size_t ci = 0; ci < channelResort.size(); ++ci) {
+        HCCL_INFO(
+            "[RS_NHR_DBG][H1] channel[%zu]: remoteRank=%u protocol=%u", ci, channelResort[ci].remoteRank,
+            static_cast<uint32_t>(channelResort[ci].channelProtocol));
+    }
+    for (const auto& entry : kernelArg->rank2ChannelIdx) {
+        HCCL_INFO("[RS_NHR_DBG][H1] rank2ChannelIdx: peer=%u -> idx=%u", entry.first, entry.second);
+    }
+    for (size_t si = 0; si < kernelArg->stepInfoVector.size(); ++si) {
+        const auto& st = kernelArg->stepInfoVector[si];
+        std::string txIdxs;
+        for (u32 idx : st.txSliceIdxs) {
+            txIdxs += std::to_string(idx) + ",";
+        }
+        HCCL_INFO(
+            "[RS_NHR_DBG][H1] step[%zu]: toRank=%u fromRank=%u nSlices=%u txIdxs=[%s]", si, st.toRank, st.fromRank,
+            st.nSlices, txIdxs.c_str());
+    }
 
     CcuKernelInfo kernelInfo{};
     CHK_SAFETY_FUNC_RET(strcpy_s(

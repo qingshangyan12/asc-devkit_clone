@@ -250,6 +250,11 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
                 ctx.arg->opParam.reduceType);
         } else if (ctx.arg->role == KfcServerRole::REDUCE_SCATTER_SOLE_NHR) {
             // SoleNHRMultiLink 单帧布局见 KfcReduceScatterSoleNhrParamIndex（[0]=opId，[1..9] 为 NHR 参数）。
+            // RS_NHR_DBG H2：dispatch 分支确认（host 注册期，plog 搜索 RS_NHR_DBG）
+            HCCL_INFO(
+                "[RS_NHR_DBG][H2] dispatch soleNHR: algName=%s role=%u channels=%u rank=%u/%u steps=%zu",
+                ctx.arg->opParam.algName, static_cast<uint32_t>(ctx.arg->role), ctx.arg->channelCount, ctx.arg->rankId,
+                static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->nhrStepInfoVector.size());
             CcuKfcReduceScatterNHR1DMultiJettyMem2MemKernel(
                 param[KFC_RS_SOLE_NHR_INPUT], param[KFC_RS_SOLE_NHR_OUTPUT], ctx.token,
                 param[KFC_RS_SOLE_NHR_SLICE_SIZE], param[KFC_RS_SOLE_NHR_INPUT_SLICE_STRIDE],
@@ -261,6 +266,11 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
                 ctx.arg->nhrStepInfoVector, ctx.arg->nhrRank2ChannelIdx);
         } else if (ctx.arg->role == KfcServerRole::REDUCE_SCATTER_NHR) {
             // 并发 RS 的 NHR mission 读 [16..24] 区间（见 KfcConcurrentReduceScatterParamIndex）。
+            // RS_NHR_DBG H2：并发 NHR mission 的 dispatch 确认
+            HCCL_INFO(
+                "[RS_NHR_DBG][H2] dispatch concurNHR: algName=%s channels=%u rank=%u/%u steps=%zu",
+                ctx.arg->opParam.algName, ctx.arg->channelCount, ctx.arg->rankId,
+                static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->nhrStepInfoVector.size());
             CcuKfcReduceScatterNHR1DMultiJettyMem2MemKernel(
                 param[KFC_CONCURRENT_RS_NHR_INPUT], param[KFC_CONCURRENT_RS_NHR_OUTPUT], ctx.token,
                 param[KFC_CONCURRENT_RS_NHR_SLICE_SIZE], param[KFC_CONCURRENT_RS_NHR_INPUT_SLICE_STRIDE],

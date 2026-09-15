@@ -303,6 +303,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         FlushDataCache(reinterpret_cast<__gm__ uint8_t*>(&handleParamGM_[handleId]) + MAX_DCCI_CNT);
         CcuPrepareForAllToAllVWrite(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
+        // RS_NHR_DBG A3：RS 场景的算法分流确认（concurrent/PeerOnly/soleNHR/Mesh）
+        printf(
+            "[RS_NHR_DBG][A3] prepareOp RS: handle=%u algType=%u missionNum=%u\n", handleId, GetAlgorithmType(handleId),
+            GetKfcMissionNum(handleId));
         if (GetKfcMissionNum(handleId) == KFC_MAX_MISSION_NUM) {
             ccuUsedXnNum_ = KFC_CONCURRENT_RS_PARAM_NUM;
             CcuPrepareForConcurrentReduceScatterM2M(&handleParamGM_[handleId]);
@@ -682,6 +686,38 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     finishNum_++;
     globalCurWaitId_++;
     globalCurWaitId_ %= CCU_MAX_MSG_NUM;
+
+    // RS_NHR_DBG A4：RS（soleNHR/并发）Wait 完成后 dump buffer 状态——三分判别：
+    // input=部分和(0x4000系)=WriteReduce正常收尾错 / input=0x3C00未动=写飞 / input=其他=推错数据
+    if (workingFlag_ && handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
+        const uint32_t dbgAlgType = GetAlgorithmType(handleId);
+        if (dbgAlgType == 154U || dbgAlgType == 156U) { // SoleNHRMultiLink / ConcurMeshNHRMultiLink
+            const uint64_t dbgTypeSize = GetHcclDataTypeSize(handleParamGM_[handleId].dataType);
+            const uint64_t dbgSlice = handleParamGM_[handleId].count * dbgTypeSize;
+            const uint64_t dbgInBase = reinterpret_cast<uint64_t>(handleParamGM_[handleId].sendBuf);
+            const uint64_t dbgOutBase = reinterpret_cast<uint64_t>(handleParamGM_[handleId].recvBuf);
+            printf(
+                "[RS_NHR_DBG][A4] afterWait: handle=%u algType=%u cnt=%llu slice=0x%llx in=0x%llx out=0x%llx\n",
+                handleId, dbgAlgType, (unsigned long long)handleParamGM_[handleId].count, (unsigned long long)dbgSlice,
+                (unsigned long long)dbgInBase, (unsigned long long)dbgOutBase);
+            // dump input 前 64B（8 个 u64，覆盖 4P 全部 slice / 8P 前半）
+            for (uint32_t w = 0; w < 8U; ++w) {
+                const uint64_t v = ReadHBMData(reinterpret_cast<__gm__ uint64_t*>(dbgInBase + w * 8U));
+                printf("[RS_NHR_DBG][A4] in+%u: 0x%llx\n", w * 8U, (unsigned long long)v);
+            }
+            // dump 本 rank slice 起点（rankId × sliceSize）与 output 前 32B
+            const uint64_t dbgMySlice = dbgInBase + ccuParam_.rankId * dbgSlice;
+            for (uint32_t w = 0; w < 2U; ++w) {
+                const uint64_t v = ReadHBMData(reinterpret_cast<__gm__ uint64_t*>(dbgMySlice + w * 8U));
+                printf(
+                    "[RS_NHR_DBG][A4] mySlice(rank%u)+%u: 0x%llx\n", ccuParam_.rankId, w * 8U, (unsigned long long)v);
+            }
+            for (uint32_t w = 0; w < 4U; ++w) {
+                const uint64_t v = ReadHBMData(reinterpret_cast<__gm__ uint64_t*>(dbgOutBase + w * 8U));
+                printf("[RS_NHR_DBG][A4] out+%u: 0x%llx\n", w * 8U, (unsigned long long)v);
+            }
+        }
+    }
 
     // 补发消息
     // 场景1:同一个handleId需要补发

@@ -497,7 +497,9 @@ TEST_F(CcuMc2TestSuite, algorithmMap_AllEntries)
     EXPECT_EQ(
         algorithmMap.at("CcuSchedReduceScatterConcurMeshNHRMultiLink"),
         AlgorithmType::CcuSchedReduceScatterConcurMeshNHRMultiLink);
-    EXPECT_EQ(algorithmMap.size(), 14U);
+    EXPECT_EQ(
+        algorithmMap.at("CcuSchedReduceScatterSoleNHRMultiLink"), AlgorithmType::CcuSchedReduceScatterSoleNHRMultiLink);
+    EXPECT_EQ(algorithmMap.size(), 15U);
 }
 
 TEST_F(CcuMc2TestSuite, AlgorithmType_EnumValues)
