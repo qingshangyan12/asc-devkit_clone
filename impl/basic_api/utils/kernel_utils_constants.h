@@ -304,8 +304,7 @@ const int32_t B16_DATA_NUM_PER_REPEAT = 128;
 const int32_t B32_DATA_NUM_PER_REPEAT = 64;
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
-                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5165))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 const uint32_t B64_DATA_NUM_PER_REPEAT = 32;
 const uint32_t B4_BYTE_SIZE_PER_REPEAT = 64;
 const uint32_t L1_DUMP_UB_SIZE = TOTAL_UB_SIZE - 32 * 1024;

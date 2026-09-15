@@ -1030,24 +1030,6 @@ __simd_callee__ inline void MulAddDstImpl(U& dstReg, U& srcReg0, U& srcReg1, Mas
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     vmula(dstReg, srcReg0, srcReg1, mask, modeValue);
 }
-
-template <typename T = DefaultType, typename U>
-__simd_callee__ inline void AddCarryOutImpl(MaskReg& carry, U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
-{
-    using ActualT = typename U::ActualT;
-    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(SupportType<ActualT, uint32_t, int32_t>(), "current data type is not supported on current device!");
-    vaddc(carry, dstReg, srcReg0, srcReg1, mask);
-}
-
-template <typename T = DefaultType, typename U>
-__simd_callee__ inline void SubCarryOutImpl(MaskReg& carry, U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
-{
-    using ActualT = typename U::ActualT;
-    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(SupportType<ActualT, uint32_t, int32_t>(), "current data type is not supported on current device!");
-    vsubc(carry, dstReg, srcReg0, srcReg1, mask);
-}
 } // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_REG_COMPUTE_VEC_BINARY_IMPL_H

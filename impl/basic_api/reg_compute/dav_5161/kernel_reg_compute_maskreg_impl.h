@@ -28,7 +28,7 @@ namespace Reg {
 template <typename T, const RegTrait& regTrait = RegTraitNumOne>
 __simd_callee__ inline MaskReg UpdateMaskImpl(uint32_t& scalarValue)
 {
-    static_assert(SupportBytes<T, 1, 2, 4, 8>(), "UpdateMask only support type b8/b16/b32/b64 on current device");
+    static_assert(SupportBytes<T, 1, 2, 4>(), "UpdateMask only support type b8/b16/b32 on current device");
     MaskReg reg;
     if constexpr (sizeof(T) == 1) {
         reg = plt_b8(scalarValue, POST_UPDATE);
@@ -36,16 +36,6 @@ __simd_callee__ inline MaskReg UpdateMaskImpl(uint32_t& scalarValue)
         reg = plt_b16(scalarValue, POST_UPDATE);
     } else if constexpr (sizeof(T) == 4) {
         reg = plt_b32(scalarValue, POST_UPDATE);
-    } else if constexpr (sizeof(T) == 8) {
-        if constexpr (regTrait.REG_NUM == 2) {
-            reg = plt_b32(scalarValue, POST_UPDATE);
-        } else {
-            uint32_t updateScalar = scalarValue;
-            reg = plt_b32(scalarValue, POST_UPDATE);
-            punpack(reg, reg, LOWER);
-            constexpr uint32_t one_repeat_num = VECTOR_REG_WIDTH / sizeof(T);
-            scalarValue = (updateScalar > one_repeat_num) ? (updateScalar - one_repeat_num) : 0;
-        }
     }
     return reg;
 }
@@ -66,7 +56,7 @@ __simd_callee__ inline constexpr MaskPattern GetMaskPattern()
 template <typename T, MaskPattern mode = MaskPattern::ALL, const RegTrait& regTrait = RegTraitNumOne>
 __simd_callee__ inline MaskReg CreateMaskImpl()
 {
-    static_assert(SupportBytes<T, 1, 2, 4, 8>(), "CreateMask only support type b8/b16/b32/b64 on current device");
+    static_assert(SupportBytes<T, 1, 2, 4>(), "CreateMask only support type b8/b16/b32 on current device");
     constexpr auto modeValue = std::integral_constant<::Pat, static_cast<::Pat>(GetMaskPattern<T, mode, regTrait>())>();
     MaskReg reg;
     if constexpr (sizeof(T) == 1) {
@@ -75,11 +65,6 @@ __simd_callee__ inline MaskReg CreateMaskImpl()
         reg = pset_b16(modeValue);
     } else if constexpr (sizeof(T) == 4) {
         reg = pset_b32(modeValue);
-    } else if constexpr (sizeof(T) == 8) {
-        reg = pset_b32(modeValue);
-        if constexpr (regTrait.REG_NUM == 1) {
-            punpack(reg, reg, LOWER);
-        }
     }
     return reg;
 }

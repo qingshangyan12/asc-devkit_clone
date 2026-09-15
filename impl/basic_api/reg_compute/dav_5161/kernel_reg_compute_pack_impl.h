@@ -40,26 +40,10 @@ __simd_callee__ inline void PackImpl(S& dstReg, V& srcReg)
     static_assert(
         (SupportType<
             Tuple<ActualT, ActualU>, Tuple<uint8_t, uint16_t>, Tuple<uint8_t, int16_t>, Tuple<uint16_t, uint32_t>,
-            Tuple<uint16_t, int32_t>, Tuple<uint32_t, uint64_t>, Tuple<uint32_t, int64_t>>()),
+            Tuple<uint16_t, int32_t>>()),
         "unsupport datatype");
     constexpr auto partValue = std::integral_constant<::HiloPart, static_cast<::HiloPart>(part)>();
-    if constexpr (sizeof(ActualU) != 8) {
-        vpack(dstReg, srcReg, partValue);
-    } else {
-        if constexpr (CheckRegTrait<V, RegTraitNumOne>()) {
-            RegTensor<uint32_t> zeroReg;
-            RegTensor<uint32_t> dumpReg;
-            MaskReg mask0 = CreateMask<uint32_t, MaskPattern::ALL>();
-            Duplicate(zeroReg, 0, mask0);
-            if constexpr (part == HighLowPart::LOWEST) {
-                DeInterleave((RegTensor<uint32_t>&)dstReg, dumpReg, (RegTensor<uint32_t>&)srcReg, zeroReg);
-            } else {
-                DeInterleave((RegTensor<uint32_t>&)dstReg, dumpReg, zeroReg, (RegTensor<uint32_t>&)srcReg);
-            }
-        } else if constexpr (CheckRegTrait<V, RegTraitNumTwo>()) {
-            Move((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg.reg[0]);
-        }
-    }
+    vpack(dstReg, srcReg, partValue);
 }
 
 template <
@@ -73,31 +57,10 @@ __simd_callee__ inline void UnPackImpl(S& dstReg, V& srcReg)
     static_assert(
         (SupportType<
             Tuple<ActualT, ActualU>, Tuple<uint32_t, uint16_t>, Tuple<int32_t, int16_t>, Tuple<uint16_t, uint8_t>,
-            Tuple<int16_t, int8_t>, Tuple<uint64_t, uint32_t>, Tuple<int64_t, int32_t>>()),
+            Tuple<int16_t, int8_t>>()),
         "unsupport datatype");
     constexpr auto partValue = std::integral_constant<::HiloPart, static_cast<::HiloPart>(part)>();
-    if constexpr (sizeof(ActualT) != 8) {
-        vunpack(dstReg, srcReg, partValue);
-    } else {
-        RegTensor<uint32_t> padReg;
-        MaskReg mask0 = CreateMask<ActualU, MaskPattern::ALL>();
-        if constexpr (Std::is_same_v<ActualU, int32_t>) {
-            ShiftRights<int32_t, int16_t>((RegTensor<int32_t>&)padReg, srcReg, 31, mask0);
-        } else {
-            Duplicate(padReg, 0, mask0);
-        }
-        if constexpr (CheckRegTrait<S, RegTraitNumOne>()) {
-            RegTensor<uint32_t> dumpReg;
-            if constexpr (part == HighLowPart::LOWEST) {
-                Interleave((RegTensor<uint32_t>&)dstReg, dumpReg, (RegTensor<uint32_t>&)srcReg, padReg);
-            } else {
-                Interleave(dumpReg, (RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg, padReg);
-            }
-        } else if constexpr (CheckRegTrait<S, RegTraitNumTwo>()) {
-            Move((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)srcReg);
-            Move((RegTensor<uint32_t>&)dstReg.reg[1], padReg);
-        }
-    }
+    vunpack(dstReg, srcReg, partValue);
 }
 } // namespace Reg
 } // namespace AscendC
