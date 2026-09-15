@@ -66,6 +66,7 @@ struct AlgInfo {
 
 struct OpResCtx {
     uint64_t version;
+    uint64_t commEngine;
     uint64_t workSpace;
     uint64_t workSpaceSize;
     uint64_t rankId;
@@ -151,6 +152,9 @@ HcclResult HcclAllocOpResCtx(
     const HcclComm comm, const std::string& ctxTag, const std::vector<OpParam>& opParamVec, const void* mc2Tiling,
     const void* ccTilingList[], void** opResCtxPtr);
 
+HcclResult HcclAllocOpResCtx(
+    HcclComm comm, const std::string& ctxTag, const OpParam& opParam, CommEngine commEngine, void** opResCtxPtr);
+
 // AllToAll适配AllToAllV
 HcclResult ConvertAlltoAllParam(
     const u64 recvCount, const u32 rankSize, std::vector<u64>& sdispls, std::vector<u64>& rdispls);
@@ -212,6 +216,8 @@ HcclResult GetCcuOpParamResCtx(
 
 HcclResult GetOpParam(
     HcclComm comm, void* stream, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& opParam);
+
+HcclResult PrepareCcAlgResources(HcclComm comm, const char* algConfig, OpParam& opParam, bool skipStreamCheck = false);
 
 HcclResult CcuSelectAlgCheck(const Mc2CcTilingInner* ccTiling, uint32_t tilingIndex);
 
