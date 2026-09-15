@@ -2,19 +2,27 @@
 
 在Ascend 950PR/Ascend 950DT上，矢量算子可通过Mutex实现AI Core内多条异步流水之间的同步，从而解决彼此之间的数据依赖问题。本文以使用双缓冲的Add算子为例，说明如何使用`AscendC::Mutex::Lock`和`AscendC::Mutex::Unlock`串联数据搬入、矢量计算和数据搬出三个阶段，并在此基础上说明Buffer复用时的反向同步为何无需额外处理。
 
-Mutex的核心语义是：`Lock<当前pipe>(mutexId)`只指定需要阻塞的当前流水，其解除阻塞的条件是此前所有流水中使用相同MutexID的Mutex均已执行`Unlock`。因此开发者无需判断或传入前序流水类型，无论前序阶段是`PIPE_MTE2`、`PIPE_V`还是`PIPE_MTE3`，均由同一MutexID统一约束。
+Mutex中Lock和Unlock必须配合使用，两个接口的功能描述如下：
+- `Lock`：阻塞由模板参数pipe指定的流水，其解除阻塞的条件是此前所有流水中使用相同MutexID的Mutex均已执行`Unlock`。
+- `Unlock`：指定流水的前序指令执行完成后，根据mutex_id释放对应Mutex。
 
 ## 前置说明
 
 - 本文适用于Ascend 950PR/Ascend 950DT。Mutex为NPU架构版本3510新增能力，其他产品应使用[SetFlag/WaitFlag](../../../../api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag-WaitFlag.md)等可用同步接口。
 - 需要了解[DoubleBuffer场景](double_buffer_scenario.md)和[内存一致性](../../../programming_guide/advanced_programming/memory_model/memory_consistency.md)中关于跨流水依赖与Buffer复用的说明。
-- 本文示例采用TPipe-TQue框架编程范式，MutexID通过[AllocMutexID](../../../../api/SIMD-API/basic_api/sync_control/intra_core_sync/AllocMutexID_ISASI.md)申请，并在使用结束后通过[ReleaseMutexID](../../../../api/SIMD-API/basic_api/sync_control/intra_core_sync/ReleaseMutexID_ISASI.md)释放。
+- 本文示例聚焦主块均匀切分场景，用于说明Mutex管理双缓冲多流水同步的原理；尾块处理不在本文展开。实际算子中若存在尾块，可参考[DoubleBuffer场景](double_buffer_scenario.md)单独处理尾块，避免将不满足DoubleBuffer条件的尾块纳入相同切分逻辑。
+- 本文以Basic API中的[AscendC::Mutex::Lock](../../../../api/SIMD-API/basic_api/sync_control/intra_core_sync/Mutex_ISASI.md)/[AscendC::Mutex::Unlock](../../../../api/SIMD-API/basic_api/sync_control/intra_core_sync/Mutex_ISASI.md)为例说明Mutex实现多流水同步的原理，相关结论同样适用于C API中的[asc_lock](../../../../api/SIMD-API/c_api/sync/asc_lock.md)/[asc_unlock](../../../../api/SIMD-API/c_api/sync/asc_unlock.md)接口。
+- 本文示例采用TPipe-TQue框架编程范式（这句话应该是错的，应该改为采用静态tensor编程方式），MutexID通过[AllocMutexID](../../../../api/SIMD-API/basic_api/sync_control/intra_core_sync/AllocMutexID_ISASI.md)申请，并在使用结束后通过[ReleaseMutexID](../../../../api/SIMD-API/basic_api/sync_control/intra_core_sync/ReleaseMutexID_ISASI.md)释放。
 
-## 适用场景
+## 适用场景（<span style="color:red">说明正向同步和反向同步是什么</span>）<a name="section_mutex_sync_scenario"></a>
 
 一个典型的矢量算子会将每个数据块分为数据搬入、计算和数据搬出三个阶段：`PIPE_MTE2 -> PIPE_V -> PIPE_MTE3`。当数据量超过单个Unified Buffer（UB）可容纳范围时，算子通常按tile循环处理；采用双缓冲后，当前tile的计算可以与相邻tile的搬运重叠执行。
 
-对于同一个Buffer，下一次搬入前必须等待上一次搬出完成，否则`PIPE_MTE2`可能覆盖仍被`PIPE_MTE3`读取的数据。MutexID可以表示一个Buffer的完整生命周期：同一Buffer上的MTE2、V、MTE3阶段使用同一个MutexID；两个Buffer使用不同的MutexID。调用`Lock<当前pipe>(mutexId)`时，当前流水会等待此前所有流水中相同MutexID的`Unlock`全部完成。开发者无需指定该流水依赖哪一条前序流水，也无需判断前序流水类型。
+从数据依赖和指令执行关系看，多流水同步包括正向同步和反向同步。正向同步用于约束同一tile内的流水顺序：数据搬入完成后才能开始计算，即`PIPE_MTE2 -> PIPE_V`；计算完成后才能搬出结果，即`PIPE_V -> PIPE_MTE3`。
+
+反向同步用于约束不同tile之间的Buffer复用。下一轮复用输入Buffer进行数据搬入前，需要等待上一轮计算完成，即`PIPE_V -> PIPE_MTE2`，避免`PIPE_MTE2`覆盖仍被`PIPE_V`读取的数据；下一轮复用输出Buffer进行计算前，需要等待上一轮数据搬出完成，即`PIPE_MTE3 -> PIPE_V`，避免`PIPE_V`覆盖仍被`PIPE_MTE3`读取的数据。
+
+MutexID可以表示一个Buffer的完整生命周期。同一Buffer上的MTE2、V、MTE3阶段使用同一个MutexID，两个Buffer使用不同的MutexID。调用`Lock<当前pipe>(mutexId)`时，当前流水会等待此前所有流水中相同MutexID的`Unlock`全部完成。开发者无需识别前序流水类型，也无需显式指定流水间的依赖关系。
 
 ```mermaid
 sequenceDiagram
@@ -88,17 +96,19 @@ AscendC::ReleaseMutexID(mutexId0);
 AscendC::ReleaseMutexID(mutexId1);
 ```
 
-在每条流水上，`Lock<当前pipe>`后的指令会等待此前所有流水中相同MutexID的`Unlock`全部完成。MTE2、V和MTE3使用同一MutexID时，代码顺序即表达了当前tile的正向依赖；再次使用该MutexID的MTE2时，会同时检查该MutexID此前全部阶段的完成状态，从而自然表达Buffer复用前的反向依赖。
+在每条流水上，`Lock<当前pipe>`后的指令会等待此前所有流水中相同MutexID的`Unlock`全部完成。MTE2、V和MTE3使用同一MutexID时，代码顺序即表达了当前tile的正向依赖；再次使用该MutexID的MTE2或V时，会同时检查该MutexID此前全部阶段的完成状态，从而自然表达Buffer复用前的反向依赖。
 
 完整的可编译示例请参考仓内[Mutex核内流水线同步样例](../../../../../../examples/01_simd_cpp_api/03_basic_api/05_sync_control/mutex)。
 
-## 反向同步原理
+## 反向同步原理（<span style="color:red">说明Mutex如何表达反向同步</span>）
 
-双缓冲的正向依赖是当前tile的`PIPE_MTE2 -> PIPE_V -> PIPE_MTE3`。反向依赖发生在Buffer复用时：第`i + 2`轮与第`i`轮使用相同的Buffer，必须等第`i`轮的MTE3从该Buffer搬出完成后，才能开始第`i + 2`轮的MTE2搬入。因此，反向同步表达的是`PIPE_MTE3 -> PIPE_MTE2`，而不是当前tile内部的正向依赖。
+双缓冲的正向依赖是当前tile的`PIPE_MTE2 -> PIPE_V -> PIPE_MTE3`。反向依赖发生在Buffer复用时，不属于当前tile内部的正向依赖。
 
-使用Mutex时，`mutexId`与Buffer绑定，MutexID记录的是该Buffer此前所有阶段的完成状态，而非某个指定生产者的完成状态。每个阶段只锁定当前流水；`Lock<PIPE_MTE2>(mutexId)`会阻塞`PIPE_MTE2`后续指令，直至此前`PIPE_MTE2`、`PIPE_V`、`PIPE_MTE3`等所有流水中同一MutexID的Mutex均已Unlock。因此，第`i + 2`轮复用Buffer时，MTE2上的Lock自然包含对第`i`轮MTE3的等待，而无需额外表达`PIPE_MTE3 -> PIPE_MTE2`的源、目的流水组合。
+第`i + 2`轮与第`i`轮复用同一组Buffer时，MTE2搬入输入Buffer前必须等待第`i`轮V流水完成计算，对应`PIPE_V -> PIPE_MTE2`；V流水写入输出Buffer前必须等待第`i`轮MTE3流水完成搬出，对应`PIPE_MTE3 -> PIPE_V`。这两个等待共同保证输入、输出Buffer复用时不会覆盖前序tile仍在读取或搬出的数据。
 
-这正是Mutex能够简化反向同步的原因：第`i + 2`轮的MTE2不需要知道前一次使用该Buffer的是哪一条流水，也不需要为反向依赖维护专用事件。只要所有访问该Buffer的阶段复用同一MutexID，Lock便会统一等待其此前全部阶段完成。
+使用Mutex时，`mutexId`与Buffer绑定，MutexID记录的是该Buffer此前所有阶段的完成状态，而非某个指定生产者的完成状态。每个阶段只锁定当前流水；`Lock<PIPE_MTE2>(mutexId)`和`Lock<PIPE_V>(mutexId)`会阻塞对应流水的后续指令，直至此前所有流水中同一MutexID的Mutex均已Unlock。
+
+这正是Mutex能够简化反向同步的原因：第`i + 2`轮的MTE2或V不需要知道前一次使用该Buffer的是哪一条流水，也不需要为反向依赖维护专用事件。只要所有访问该Buffer的阶段复用同一MutexID，Lock便会统一等待其此前全部阶段完成。
 
 ```cpp
 // Mutex：只指定当前流水，MutexID表达整个Buffer生命周期。
@@ -144,7 +154,7 @@ Lock/Unlock不指定源流水和目的流水组合。在相同场景中，MTE2�
 | --- | --- | --- |
 | 依赖表达 | 调用`Lock<当前pipe>(mutexId)`即可等待此前所有流水对该MutexID的Unlock，以MutexID关联同一Buffer生命周期内的多个阶段。 | 以源流水、目标流水和事件ID明确配对。 |
 | 解除阻塞条件 | 此前所有流水中相同MutexID的Mutex均已Unlock，不需要识别前序流水类型。 | 指定源流水已通过对应事件通知指定目标流水。 |
-| 反向同步 | 后续复用Buffer时再次Lock同一MutexID即可等待前序使用者释放，无需在当前调用中指定MTE3到下一轮MTE2的流水组合。 | 需要为反向依赖额外设置与等待相应的事件。 |
+| 反向同步 | 后续复用Buffer时再次Lock同一MutexID即可等待前序使用者释放，无需在当前调用中指定V到下一轮MTE2、MTE3到下一轮V等流水组合。 | 需要为反向依赖额外设置与等待相应的事件。 |
 | 同步信号量 | 建议使用MutexID 0-27，共28个ID，适合区分较多并发Buffer或资源。 | Ascend 950PR/Ascend 950DT支持事件ID 0-7；静态Tensor编程范式建议使用0-5，事件ID 6和7为系统或框架规划保留。 |
 | 架构相关配置 | 不依赖HardEvent，不需要根据源、目的流水组合选择事件类型。 | HardEvent的取值随硬件架构变化，需要根据目标架构支持的事件选择源、目的流水组合。 |
 | 跨硬件版本 | 仅适用于支持Mutex的Ascend 950PR/Ascend 950DT。 | TQueSync的SetFlag/WaitFlag可保证跨硬件版本兼容。 |
@@ -157,30 +167,38 @@ Mutex并不用于同一条流水内的指令排序。例如，同一`PIPE_MTE2`�
 
 由于Mutex不需要传入源流水、目的流水组合，因此也不依赖对应的HardEvent。在不同硬件架构上，HardEvent支持的取值可能不同；使用SetFlag/WaitFlag时，需要针对目标架构确认所需的流水组合是否存在。使用Mutex时，开发者只需关注当前流水和MutexID，可减少这部分事件配置。Mutex不提供跨硬件版本兼容性，仍需以Ascend 950PR/Ascend 950DT的产品支持范围为准。
 
-### SetFlag/WaitFlag的反向同步
+### SetFlag/WaitFlag的反向同步（<span style="color:red">说明SetFlag/WaitFlag表达反向同步时为什么更复杂</span>）
 
-使用SetFlag/WaitFlag时，开发者需要为反向依赖显式维护一组源流水为MTE3、目的流水为MTE2的事件，并在下一次复用该Buffer前等待该事件。除反向依赖外，当前tile的`MTE2 -> V`和`V -> MTE3`也分别需要事件配对。
+使用SetFlag/WaitFlag时，开发者需要为反向依赖显式维护`V -> MTE2`和`MTE3 -> V`等事件，并在下一次复用对应Buffer前等待这些事件。除反向依赖外，当前tile的`MTE2 -> V`和`V -> MTE3`也分别需要事件配对。
 
-反向事件是否需要插入还取决于循环位置：前两个tile首次使用两个Buffer，没有前序MTE3需要等待；最后两个tile后没有下一轮复用该Buffer，也不应再为反向依赖设置事件。开发者需要根据`loopCount`和Buffer数量维护这些边界判断，并保证MTE3设置事件与后续MTE2等待事件严格配对。这会增加循环代码的分支和事件ID管理负担。
+反向事件是否需要插入还取决于循环位置：前两个tile首次使用两个Buffer，没有前序V或MTE3需要等待；最后两个tile后没有下一轮复用该Buffer，也不应再为反向依赖设置事件。开发者需要根据`loopCount`和Buffer数量维护这些边界判断，并保证反向事件的设置与后续等待严格配对。这会增加循环代码的分支和事件ID管理负担。
 
 ```text
 SetFlag/WaitFlag伪代码：需要分别表达正向和反向的流水组合。
 for (uint32_t i = 0; i < loopCount; ++i) {
     uint32_t bufferIndex = i % 2;
     if (i >= BUFFER_NUM) {
-        // 等待前两轮的MTE3释放当前要复用的Buffer：MTE3 -> MTE2。
-        wait_mte3_to_mte2(bufferIndex);
+        // 等待前两轮的V释放当前要复用的输入Buffer：V -> MTE2。
+        wait_v_to_mte2(bufferIndex);
     }
     // MTE2搬入bufferIndex。
     set_mte2_to_v(bufferIndex);
     wait_mte2_to_v(bufferIndex);
+    if (i >= BUFFER_NUM) {
+        // 等待前两轮的MTE3释放当前要复用的输出Buffer：MTE3 -> V。
+        wait_mte3_to_v(bufferIndex);
+    }
     // V计算bufferIndex。
+    if (i + BUFFER_NUM < loopCount) {
+        // 仅当后续仍会复用输入Buffer时，设置V -> MTE2事件。
+        set_v_to_mte2(bufferIndex);
+    }
     set_v_to_mte3(bufferIndex);
     wait_v_to_mte3(bufferIndex);
     // MTE3搬出bufferIndex。
     if (i + BUFFER_NUM < loopCount) {
-        // 仅当后续仍会复用该Buffer时，设置MTE3 -> MTE2事件。
-        set_mte3_to_mte2(bufferIndex);
+        // 仅当后续仍会复用输出Buffer时，设置MTE3 -> V事件。
+        set_mte3_to_v(bufferIndex);
     }
 }
 ```
@@ -196,3 +214,21 @@ for (uint32_t i = 0; i < loopCount; ++i) {
 - 本文示例为C++ Tensor接口的阻塞式`Mutex::Lock/Unlock`用法。C API的`asc_lock/asc_unlock`另提供阻塞和非阻塞模式，调用约束和头文件请参见[asc_lock](../../../../api/SIMD-API/c_api/sync/asc_lock.md)和[asc_unlock](../../../../api/SIMD-API/c_api/sync/asc_unlock.md)。
 
 具体接口约束请参见[Mutex](../../../../api/SIMD-API/basic_api/sync_control/intra_core_sync/Mutex_ISASI.md)、[Lock](../../../../api/SIMD-API/basic_api/sync_control/intra_core_sync/Lock.md)和[Unlock](../../../../api/SIMD-API/basic_api/sync_control/intra_core_sync/Unlock.md)。
+
+## 相关参考
+
+- [新增Mutex核内同步能力](../../../cross_gen_migration_guide/instructions_for_new_features/3510_new_features.md#section_mutex)
+
+  介绍3510架构新增Mutex能力的应用场景、接口入口和典型样例，可用于了解Mutex相对SetFlag/WaitFlag在反向同步场景中的简化作用。
+
+- [静态Tensor编程方式的同步管理](../../../programming_guide/programming_model/ai_core_simd_programming/cpp_tensor_programming/static_tensor_programming.md#section4338114663610)
+
+  说明静态Tensor编程中正向同步和反向同步的划分，并给出`MTE2_V`、`V_MTE3`、`V_MTE2`和`MTE3_V`等事件的使用位置。
+
+- [内存一致性中的反向依赖](../../../programming_guide/advanced_programming/memory_model/memory_consistency.md#反向依赖)
+
+  从Buffer复用角度说明反向依赖的产生原因。可进一步参考[单Buffer示例](../../../programming_guide/advanced_programming/memory_model/memory_consistency.md#单buffer示例)和[Double Buffer示例](../../../programming_guide/advanced_programming/memory_model/memory_consistency.md#double-buffer示例)，了解不同Buffer复用方式下的等待关系。
+
+- [NPU架构版本2201硬件约束](../../../programming_guide/advanced_programming/hardware_implementation/hardware_constraints/npu_arch_2201.md#p12395184212116)
+
+  说明核间流水同步中CrossCoreSetFlag计数器的反向同步约束。该约束属于核间同步场景，与本文的核内Mutex同步场景不同。
