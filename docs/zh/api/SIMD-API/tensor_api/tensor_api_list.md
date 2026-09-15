@@ -119,6 +119,12 @@
 | [operator*](reg_vector_compute/basic_arithmetic/operator_mul.md) | 对两个源操作数逐元素执行乘法计算。 |
 | [or](reg_vector_compute/logical_compute/or.md) | 对两个源操作数逐元素执行按位或计算。 |
 | [选择与比较](reg_vector_compute/compare_and_select/compare_and_select.md) | 根据mask的比特位值，从源操作数src0、src1中选择元素，得到目的操作数。 |
+| [operator==](reg_vector_compute/compare_and_select/operator_compare.md#operator-eq) | 对两个源操作数逐元素执行相等比较。 |
+| [operator!=](reg_vector_compute/compare_and_select/operator_compare.md#operator-ne) | 对两个源操作数逐元素执行不等比较。 |
+| [operator<](reg_vector_compute/compare_and_select/operator_compare.md#operator-lt) | 对两个源操作数逐元素执行小于比较。 |
+| [operator<=](reg_vector_compute/compare_and_select/operator_compare.md#operator-le) | 对两个源操作数逐元素执行小于等于比较。 |
+| [operator>](reg_vector_compute/compare_and_select/operator_compare.md#operator-gt) | 对两个源操作数逐元素执行大于比较。 |
+| [operator>=](reg_vector_compute/compare_and_select/operator_compare.md#operator-ge) | 对两个源操作数逐元素执行大于等于比较。 |
 | [select](reg_vector_compute/compare_and_select/select.md) | 根据条件Mask从两个源寄存器中逐元素选择数据。 |
 | [数据填充](reg_vector_compute/data_padding/data_padding.md) | 根据mask将源操作数src的最低位元素或者一个scalar操作数填充到目的操作数。 |
 | [fill](reg_vector_compute/data_padding/fill.md) | 将标量或源寄存器最低位元素广播并填充到目的寄存器。 |

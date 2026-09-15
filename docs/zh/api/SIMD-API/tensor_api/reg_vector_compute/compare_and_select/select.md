@@ -34,7 +34,8 @@
 
 ```cpp
 template <typename T>
-__simd_callee__ inline reg_tensor<T> select(reg_tensor<bool> condition, reg_tensor<T> src0, reg_tensor<T> src1)
+__simd_callee__ inline reg_tensor<T> select(
+    const reg_tensor<bool>& condition, const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 ```
 
 ## 参数说明
