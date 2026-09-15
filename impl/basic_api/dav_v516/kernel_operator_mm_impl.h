@@ -707,6 +707,220 @@ __aicore__ inline void LoadData3DV2L12UBCal(
     ASCENDC_ASSERT(
         false, { KERNEL_LOG(KERNEL_ERROR, "LoadData3DV2L12UB is not supported 3DParamsV2Pro on current device"); });
 }
+
+/* **************************************************************************************************
+ * ConvFix                                                                                          *
+ * ************************************************************************************************* */
+__aicore__ inline void SetConvStrideParaCal(uint64_t config)
+{
+    set_cube_stride_para(config);
+}
+
+__aicore__ inline void SetConvStrideParaCal(const ConvStrideParams &params)
+{
+    uint64_t config = 0;
+
+    config = (((uint64_t)params.loop3DstStride & 0xffff) << 0) |
+             (((uint64_t)params.loop4DstStride & 0xffff) << 16);
+    set_cube_stride_para(config);
+}
+
+__aicore__ inline void SetConvPaddingCal(uint64_t config)
+{
+    set_m_padding(config);
+}
+
+template <typename T>
+__aicore__ inline void SetConvPaddingCal(const ConvPaddingParams<T> &params)
+{
+    T tmpValue = params.paddingValue;
+    uint64_t config = 0;
+
+    if constexpr (sizeof(T) == B16_BYTE_SIZE) {
+        uint64_t paddingValue = static_cast<uint64_t>(tmpValue) & 0xffff;
+        config = paddingValue;
+    } else if constexpr (sizeof(T) == B8_BYTE_SIZE) {
+        uint64_t paddingValue = static_cast<uint64_t>(tmpValue) & 0xff;
+        config = (paddingValue << 8 | paddingValue);
+    } else {
+        uint64_t paddingValue = static_cast<uint64_t>(tmpValue) & 0xf;
+        config = (paddingValue << 12 | paddingValue << 8 | paddingValue << 4 | paddingValue);
+    }
+
+    config |= (((uint64_t)params.paddingMode & 0x3) << 32) |
+             (((uint64_t)params.paddingAddr & 0xffff) << 34);
+    set_m_padding(config);
+}
+
+__aicore__ inline void SetConvFMatrixDualCal(uint64_t config0, uint64_t config1)
+{
+    set_m_fmatrix_dual_0(config0);
+    set_m_fmatrix_dual_1(config1);
+}
+
+__aicore__ inline void SetConvFMatrixDualCal(const ConvFMatrixDualParams &params)
+{
+    uint64_t config0 = 0;
+    uint64_t config1 = 0;
+
+    config0 |= (uint64_t)params.dualAddr & 0xffffffff;
+    config0 |= (((uint64_t)params.dualSize & 0xffff) << 32);
+
+    config1 |= (uint64_t)params.dualStride1 & 0xffff;
+    config1 |= (((uint64_t)params.dualStride2 & 0xffff) << 32);
+
+    set_m_fmatrix_dual_0(config0);
+    set_m_fmatrix_dual_1(config1);
+}
+
+__aicore__ inline void SetConvFMatrixStepPosCal(uint64_t config)
+{
+    set_m_step_pos(config);
+}
+
+__aicore__ inline void SetConvFMatrixStepPosCal(const ConvFMatrixStepPosParams &params)
+{
+    uint64_t config = 0;
+    config |= (((uint64_t)params.wStartPos & 0xffff) << 0);
+    config |= (((uint64_t)params.hStartPos & 0xffff) << 16);
+    config |= (((uint64_t)params.wStep & 0xffff) << 32);
+    config |= (((uint64_t)params.hStep & 0xffff) << 48);
+
+    set_m_step_pos(config);
+}
+
+__aicore__ inline void SetConvFMatrixCal(uint64_t config)
+{
+    set_m_fmatrix(config);
+}
+
+__aicore__ inline void SetConvFMatrixCal(const ConvFMatrixParams &params)
+{
+    uint64_t config = 0;
+    config |= (((uint64_t)params.w & 0xffff) << 0);
+    config |= (((uint64_t)params.h & 0xffff) << 16);
+    config |= (((uint64_t)params.leftPaddingSize & 0xff) << 32);
+    config |= (((uint64_t)params.rightPaddingSize & 0xff) << 40);
+    config |= (((uint64_t)params.topPaddingSize & 0xff) << 48);
+    config |= (((uint64_t)params.bottomPaddingSize & 0xff) << 56);
+
+    set_m_fmatrix(config);
+}
+
+__aicore__ inline void SetConvKernelCal(uint64_t config)
+{
+    set_kernel(config);
+}
+
+__aicore__ inline void SetConvKernelCal(const ConvKernelParams &params)
+{
+    uint64_t config = 0;
+    config |= (((uint64_t)params.wStride & 0x3f) << 0);
+    config |= (((uint64_t)params.hStride & 0x3f) << 6);
+    config |= (((uint64_t)params.wKernelSize & 0x1ff) << 12);
+    config |= (((uint64_t)params.hKernelSize & 0x1ff) << 21);
+    config |= (((uint64_t)params.wDilation & 0xff) << 30);
+    config |= (((uint64_t)params.hDilation & 0xff) << 38);
+    config |= (((uint64_t)params.kernelNum & 0xfff) << 46);
+
+    set_kernel(config);
+}
+
+__aicore__ inline void GenConvFixConfig(const ConvFixParams& params, uint64_t &config)
+{
+    config = 0;
+    config |= (((uint64_t)params.biasMatrixInitVal & 0x1) << 0);
+    config |= (((uint64_t)params.biasMatrixBroadcast & 0x1) << 1);
+    config |= (((uint64_t)GetQuantPreMode(params.preQuantMode) & 0x1F) << 2);
+    config |= (((uint64_t)params.preReluMode & 0x7) << 7);
+    config |= (((uint64_t)params.postQuantMode & 0x1f) << 10);
+    config |= (((uint64_t)params.actPostEnable & 0x7) << 15);
+    config |= (((uint64_t)params.preClipReluMode & 0x1) << 18);
+    config |= (((uint64_t)params.eltwiseOp & 0x7) << 20);
+    config |= (((uint64_t)params.eltwiseAntiqEnable & 0x1) << 23);
+    config |= (((uint64_t)params.eltwiseBroadcastEnable & 0x1) << 24);
+    config |= (((uint64_t)params.lsbMask & 0x7) << 28);
+    config |= (((uint64_t)params.dualSrcEnable & 0x1) << 34);
+    config |= (((uint64_t)params.dependEnable & 0x1) << 36);
+    config |= (((uint64_t)params.instrId & 0x3) << 37);
+    config |= (((uint64_t)params.postProcessBandwithCtrl & 0x1) << 39);
+    config |= (((uint64_t)params.nonBroadcastBias & 0x1) << 40);
+    config |= (((uint64_t)params.n & 0xffff) << 48);
+}
+
+template <typename DstT, typename Src0T, typename Src1T>
+__aicore__ inline void Convolution(__cbuf__ DstT* c, __cbuf__ Src0T* a, __cb__ Src1T* b, uint64_t bias, uint64_t config)
+{
+    if constexpr (SupportType<Tuple<Src0T, Src1T>, Tuple<int4b_t, int4b_t>>()) {
+        convolution_s4s4((__cbuf__ void *)c, a, b, (__cbuf__ int32_t *)get_imm(0), bias, config);
+    } else if constexpr (SupportType<Tuple<Src0T, Src1T>, Tuple<int8_t, int4b_t>>()) {
+        convolution_s8s4((__cbuf__ void *)c, a, b, (__cbuf__ int32_t *)get_imm(0), bias, config);
+    } else if constexpr (SupportType<Tuple<Src0T, Src1T>, Tuple<fp8_e4m3fn_t, int4b_t>>()) {
+        convolution_e4m3s4((__cbuf__ void *)c, a, b, (__cbuf__ int32_t *)get_imm(0), bias, config);
+    } else {
+        convolution((__cbuf__ void *)c, a, b, (__cbuf__ int32_t *)get_imm(0), bias, config);
+    }
+}
+
+template <typename DstT, typename Src0T, typename Src1T>
+__aicore__ inline void ConvolutionNoBroadcast(__cbuf__ DstT* c, __cbuf__ Src0T* a, __cb__ Src1T* b, uint64_t bias, uint64_t config)
+{
+
+    if constexpr (SupportType<Tuple<Src0T, Src1T>, Tuple<int4b_t, int4b_t>>()) {
+        convolution_s4s4((__cbuf__ void *)c, a, b, (__cbuf__ int32_t *)bias, 0ULL, config);
+    } else if constexpr (SupportType<Tuple<Src0T, Src1T>, Tuple<int8_t, int4b_t>>()) {
+        convolution_s8s4((__cbuf__ void *)c, a, b, (__cbuf__ int32_t *)bias, 0ULL, config);
+    } else if constexpr (SupportType<Tuple<Src0T, Src1T>, Tuple<fp8_e4m3fn_t, int4b_t>>()) {
+        convolution_e4m3s4((__cbuf__ void *)c, a, b, (__cbuf__ int32_t *)bias, 0ULL, config);
+    } else {
+        convolution((__cbuf__ void *)c, a, b, (__cbuf__ int32_t *)bias, 0ULL, config);
+    }
+}
+
+template <typename DstT, typename Src0T, typename Src1T>
+__aicore__ inline void ConvFixCal(__cbuf__ DstT* c, __cbuf__ Src0T* a, __cb__ Src1T* b, const ConvFixParams &params)
+{
+    uint64_t config = 0;
+    CheckCubeFixSupportTypes<DstT, Src0T, Src1T>(c, a, b);
+    GenConvFixConfig(params, config);
+    Convolution<DstT, Src0T, Src1T>(c, a, b, 0ULL, config);
+}
+
+template <typename DstT, typename Src0T, typename Src1T>
+__aicore__ inline void ConvFixCal(__cbuf__ DstT* c, __cbuf__ Src0T* a, __cb__ Src1T* b, uint64_t bias,
+    const ConvFixParams& params)
+{
+    uint64_t config = 0;
+    CheckCubeFixSupportTypes<DstT, Src0T, Src1T>(c, a, b);
+    GenConvFixConfig(params, config);
+    if (params.biasMatrixBroadcast) {
+        Convolution<DstT, Src0T, Src1T>(c, a, b, bias, config);
+    } else {
+        ConvolutionNoBroadcast<DstT, Src0T, Src1T>(c, a, b, bias, config);
+    }
+}
+
+template <typename DstT, typename Src0T, typename Src1T>
+__aicore__ inline void ConvFixCal(__cbuf__ DstT* c, __cbuf__ Src0T* a, __cb__ Src1T* b, uint64_t config)
+{
+    CheckCubeFixSupportTypes<DstT, Src0T, Src1T>(c, a, b);
+    Convolution<DstT, Src0T, Src1T>(c, a, b, 0ULL, config);
+}
+
+template <typename DstT, typename Src0T, typename Src1T>
+__aicore__ inline void ConvFixCal(__cbuf__ DstT* c, __cbuf__ Src0T* a, __cb__ Src1T* b, uint64_t bias, 
+    uint64_t config)
+{
+    CheckCubeFixSupportTypes<DstT, Src0T, Src1T>(c, a, b);
+    if (config & 0x2) {
+        Convolution<DstT, Src0T, Src1T>(c, a, b, bias, config);
+    } else {
+        ConvolutionNoBroadcast<DstT, Src0T, Src1T>(c, a, b, bias, config);
+    }
+}
+
+
+/* **************************************************************************************************
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_MM_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_IMPL_H__)

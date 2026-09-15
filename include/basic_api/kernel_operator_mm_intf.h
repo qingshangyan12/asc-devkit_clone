@@ -341,6 +341,55 @@ __aicore__ inline void MmadMx(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
     const MmadBitModeParams& mmadParams);
 
+/* **************************************************************************************************
+ * ConvFix                                                                                          *
+ * **************************************************************************************************/
+/*
+ * @ingroup ConvFix
+ * @brief Convolution computation with fix-point post-processing, output to L1
+ * @param [out] dst output LocalTensor, stored in L1
+ * @param [in] fm input LocalTensor, stored in L1 (left matrix / feature)
+ * @param [in] filter input LocalTensor, stored in L0B (right matrix / weight)
+ * @param [in] convFixParams.n right matrix column number
+ * @param [in] convFixParams.biasMatrixInitVal indicates the initial bias matrix, 1: init to 0, 0: use real value
+ * @param [in] convFixParams.biasMatrixBroadcast whether bias matrix is broadcast
+ * @param [in] convFixParams.preQuantMode pre-quantization mode
+ * @param [in] convFixParams.preReluMode pre-ReLU mode
+ * @param [in] convFixParams.postQuantMode post-quantization mode
+ * @param [in] convFixParams.actPostEnable activation post-processing enable
+ * @param [in] convFixParams.preClipReluMode pre-clip ReLU mode
+ * @param [in] convFixParams.eltwiseOp element-wise operation mode
+ * @param [in] convFixParams.eltwiseAntiqEnable element-wise anti-quantization enable
+ * @param [in] convFixParams.eltwiseBroadcastEnable element-wise broadcast enable
+ * @param [in] convFixParams.lsbMask LSB mask mode
+ * @param [in] convFixParams.dualSrcEnable dual source enable
+ * @param [in] convFixParams.compactEnable compact enable
+ * @param [in] convFixParams.dependEnable dependency enable
+ * @param [in] convFixParams.postProcessBandwithCtrl post-process bandwidth control
+ * @param [in] convFixParams.nonBroadcastBias non-broadcast bias
+ * @param [in] convFixParams.instrId instruction ID
+ */
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+template <typename T, typename U, typename S>
+__aicore__ inline void ConvFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
+    const ConvFixParams& convFixParams);
+
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void ConvFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
+    const ConvFixParams& convFixParams);
+
+template <typename T, typename U, typename S>
+__aicore__ inline void ConvFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const uint64_t config);
+
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void ConvFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
+    const uint64_t config);
+#endif
+
 template <
     typename T = int32_t, typename U = int8_t,
     typename Std::enable_if<Std::is_same<PrimT<T>, int32_t>::value, bool>::type = true,

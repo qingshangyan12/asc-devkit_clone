@@ -441,6 +441,23 @@ struct MmadParams {
 #endif
 };
 
+struct ConvFMatrixDualParams {
+    __aicore__ ConvFMatrixDualParams() {}
+
+    __aicore__ ConvFMatrixDualParams(
+        const uint32_t dualAddrIn, const uint16_t dualSizeIn, const uint16_t dualStride1In, const uint16_t dualStride2In)
+        : dualAddr(dualAddrIn),
+          dualSize(dualSizeIn),
+          dualStride1(dualStride1In),
+          dualStride2(dualStride2In)
+    {}
+
+    uint32_t dualAddr = 0;
+    uint16_t dualSize = 0;
+    uint16_t dualStride1 = 0;
+    uint16_t dualStride2 = 0;
+};
+
 template <typename T>
 struct InitConstValueParams {
     __aicore__ InitConstValueParams() {}
