@@ -2,7 +2,7 @@
 
 ## Overview
 
-Instruction optimization samples, implemented through direct `<<<>>>` invocation, introduce instruction tuning approaches based on SIMT programming. Currently, an atomic operation instruction optimization case is provided, demonstrating optimization methods such as hierarchical reduction and instruction cost control to improve instruction execution efficiency.
+Instruction optimization samples, implemented through direct `<<<>>>` invocation, introduce instruction tuning approaches based on SIMT programming. Currently, two kinds of cases are provided: atomic operation optimization and in-place add instruction optimization, demonstrating optimization methods such as hierarchical reduction and instruction cost control to improve instruction execution efficiency.
 
 ## Sample List
 
