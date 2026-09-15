@@ -201,6 +201,10 @@ struct CommKfcParamDesc {
     uint64_t isDyn : 48;
 };
 
+constexpr uint64_t MC2_AICPU_SIMPLE_CTX_PROTOCOL = 1ULL << 63;
+static_assert(
+    (MC2_AICPU_SIMPLE_CTX_PROTOCOL & 0xFFULL) == 0U, "Simple-ctx sentinel must decode to version=0, itemNum=0");
+
 struct CommKfcApiContext {
     uint64_t version;
     uint64_t workSpace;

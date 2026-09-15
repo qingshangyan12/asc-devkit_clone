@@ -27,23 +27,6 @@ constexpr uint32_t RANK_NUM = 4U;
 constexpr size_t WORKSPACE_SIZE = sizeof(HcclMsgArea);
 constexpr uint32_t REPEAT_TIME_3 = 3U;
 
-OpResCtx GetOpResCtx(const vector<uint8_t>& workSpace)
-{
-    OpResCtx opResCtx{
-        1, reinterpret_cast<uintptr_t>(workSpace.data()), WORKSPACE_SIZE, 0, RANK_NUM, {{100, 0x1000}, {200, 0x2000}},
-    };
-    return opResCtx;
-}
-
-static HcclMsgArea* GetHcclMsgArea(uint8_t* workspaceGM)
-{
-    uint64_t msgAddr = reinterpret_cast<uintptr_t>(workspaceGM);
-    if (msgAddr & 0x1ff) {
-        msgAddr = (msgAddr & (~((uint64_t)0x1ff))) + 0x200;
-    }
-    return reinterpret_cast<HcclMsgArea*>(msgAddr);
-}
-
 class Mc2InitTilingAicpuTest {
     uint32_t version = 0U;
     uint32_t mc2HcommCnt = 0U;
@@ -72,6 +55,28 @@ class Mc2TilingAicpuTest {
     Mc2InitTilingAicpuTest init;
     Mc2CcTilingAicpuTest cc;
 };
+
+// SetCcTilingV2 looks up ccOpParamTable_ by matching OpResCtx::algInfo[i].offset against the tiling offset.
+constexpr uint64_t CC_TILING_OFFSET = sizeof(Mc2InitTilingAicpuTest);
+constexpr uint64_t CC_OP_PARAM_ADDR = 0x1000UL;
+
+OpResCtx GetOpResCtx(const vector<uint8_t>& workSpace)
+{
+    OpResCtx opResCtx{
+        1,        reinterpret_cast<uintptr_t>(workSpace.data()),         WORKSPACE_SIZE, 0,
+        RANK_NUM, {{CC_TILING_OFFSET, CC_OP_PARAM_ADDR}, {200, 0x2000}},
+    };
+    return opResCtx;
+}
+
+static HcclMsgArea* GetHcclMsgArea(uint8_t* workspaceGM)
+{
+    uint64_t msgAddr = reinterpret_cast<uintptr_t>(workspaceGM);
+    if (msgAddr & 0x1ff) {
+        msgAddr = (msgAddr & (~((uint64_t)0x1ff))) + 0x200;
+    }
+    return reinterpret_cast<HcclMsgArea*>(msgAddr);
+}
 
 TEST_F(HcclSuiteAICPU, AllGather_repeat1_prepare1_commit1_wait1_success)
 {
