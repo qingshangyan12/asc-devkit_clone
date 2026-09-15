@@ -2,7 +2,7 @@
 
 ## 概述
 
-本目录提供融合计算相关的最佳实践样例，覆盖SSBuffer通信、SSBuffer边界场景，以及QuantGroupMatmul分组量化矩阵乘和Matmul+GELU的Cube-Vector融合实现。
+本目录提供融合计算相关的最佳实践样例，覆盖SSBuffer通信以及QuantGroupMatmul分组量化矩阵乘和Matmul+GELU的Cube-Vector融合实现。
 
 ## 样例列表
 

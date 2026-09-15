@@ -2,6 +2,7 @@
 
 >[!NOTE]说明
 >学习本节前，请先了解[CV融合算子](../cv_fusion/basics.md)以及[地址空间限定符](../../../../programming_guide/language_extension/simd_builtin_keywords.md#地址空间限定符)。
+>本节内容适用于Ascend 950PR/Ascend 950DT。
 
 ## SSBuffer
 

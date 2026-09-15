@@ -2,6 +2,7 @@
 
 >[!NOTE]说明
 >阅读本节前，请先了解[SSBuffer基础知识](./basics.md)。
+>本节内容适用于Ascend 950PR/Ascend 950DT。
 
 下文以基于SSBuffer的AIV/AIC通信算子为例，介绍显式SSBuffer通信的设计和实现过程。该算子在一个`__mix__(1, 2)`任务中启动一个AIC和两个AIV。每个AIV通过自己的环形消息队列发送12条消息，AIC接收消息并将结果写入GM，最后由Host侧逐条校验。
 
@@ -9,18 +10,14 @@
 
 ## 算子分析
 
-该样例用于验证AIV到AIC的消息通信，不处理外部输入Tensor。两个AIV在Device侧生成消息，AIC将收到的消息整理为`CommResult`并写入GM。
-
-算子的处理逻辑如下：
+该样例用于验证AIV到AIC的消息通信，两个AIV在Device侧生成消息，AIC将收到的消息整理为`CommResult`并写入GM。算子的处理逻辑如下：
 
 1. AIC清理两条消息队列，并分别通知AIV0和AIV1开始发送。
 2. AIV0和AIV1各自生成12条消息。消息中包含发送方编号、消息序号、消息数据和校验值。
 3. AIV发布一条消息后发送消息准备完成通知；AIC收到通知后读取消息，并在处理完成后返回ACK通知。
 4. AIC共接收24条消息并写入GM，Host侧回读结果，确认消息没有丢失、覆盖或进入错误的消息队列。
 
-核函数（Kernel）名称为`c_api_ssbuf_aiv_aic_comm`，参数为`output`。`output`指向GM中的结果数组，数组包含24个`CommResult`。每个结果占32B，字段如下。
-
-消息数量、队列深度和单条消息占用空间都是编译期常量，样例不需要根据输入shape切分数据，因此没有单独的Tiling实现。实际算子的消息规模如果随输入变化，应在Host侧统一计算相关参数，再传给AIC和AIV，避免两侧使用不一致的消息数量或退出条件。
+核函数（Kernel）名称为`c_api_ssbuf_aiv_aic_comm`，参数为`output`。`output`指向GM中的结果数组，数组包含24个`CommResult`。每个结果占32B，字段如下。注：实际算子的消息规模如果随输入变化，应在Host侧统一设计、补充计算相关参数，再传给AIC和AIV，避免两侧使用不一致的消息数量或退出条件。
 
 **表1**  `CommResult`字段说明
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This directory provides best-practice samples for fusion compute, covering SSBuffer communication and boundary scenarios, QuantGroupMatmul grouped quantized matrix multiplication, and Cube-Vector fusion for Matmul+GELU.
+This directory provides best-practice samples for fusion compute, covering SSBuffer communication, QuantGroupMatmul grouped quantized matrix multiplication, and Cube-Vector fusion for Matmul+GELU.
 
 ## Sample List
 
