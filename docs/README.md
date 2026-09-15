@@ -38,3 +38,4 @@ KFC/AICPU server 消息轮询：持续检查共享消息区中是否出现 AICor
             -> LaunchOpenCcorePost：更新完成计数，通知 AICore 当前 repeat 的通信任务已经完成。
 AscendC::Hccl::Wait：等待完成计数达到预期值，确保 AllReduce 输出可以被后续计算安全使用。
 ```
+![img.png](img.png)
