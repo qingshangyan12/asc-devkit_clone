@@ -5,7 +5,7 @@
 
 下文以基于SSBuffer的AIV/AIC通信算子为例，介绍显式SSBuffer通信的设计和实现过程。该算子在一个`__mix__(1, 2)`任务中启动一个AIC和两个AIV。每个AIV通过自己的环形消息队列发送12条消息，AIC接收消息并将结果写入GM，最后由Host侧逐条校验。
 
-算子的设计过程分为**算子分析、数据流分析、SSBuffer空间规划、通信规则设计、算子实现**五部分。完整代码请参考[SSBuffer AIV/AIC通信C API样例](../../../../../../../../examples/02_simd_c_api/03_c_api/05_sync_control/ssbuf_aiv_aic_comm)。
+算子的设计过程分为**算子分析、数据流分析、SSBuffer空间规划、通信规则设计、算子实现**五部分。完整代码请参考[SSBuffer AIV/AIC通信C API样例](../../../../../../../../examples/02_simd_c_api/05_best_practices/03_fusion_compute/ssbuf_aiv_aic_comm)。
 
 ## 算子分析
 

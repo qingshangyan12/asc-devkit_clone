@@ -21,8 +21,6 @@
 | [group_barrier](./group_barrier) |  基于GroupBarrier实现两组存在依赖关系的AIV之间的同步，A组AIV计算完成后，B组AIV依赖该结果进行后续计算 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 | [ib_set_wait](./ib_set_wait) |  基于IBSet和IBWait实现核间同步，适用于不同核操作同一块全局内存且存在数据依赖问题的场景 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 | [sequential_block_sync](./sequential_block_sync) |  基于InitDetermineComputeWorkspace、WaitPreBlock、NotifyNextBlock三个接口组合实现核间顺序同步，确保多核按blockIdx升序执行 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
-| [ssbuf_aiv_aic_comm](./ssbuf_aiv_aic_comm) | 参考KFC消息状态机，使用SSBuffer环形队列实现AIV到AIC通信，不调用内部KFC接口 | Ascend 950PR/Ascend 950DT |
-| [ssbuf_boundary_cases](./ssbuf_boundary_cases) | 验证SSBuffer首尾32B对齐地址、AIV分区和多次任务复用的安全边界场景 | Ascend 950PR/Ascend 950DT |
 | [sync_all](./sync_all) |  基于SyncAll实现核间同步，适用于不同核操作同一块全局内存且存在读后写、写后读、写后写等数据依赖问题的场景 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 
 ### 任务间同步
