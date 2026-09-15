@@ -2,9 +2,9 @@
 
 【优先级】中
 
-【描述】执行于AI Core上的指令队列主要包括如下几类：[Vector（矢量）](../../../technical_appendix/concepts_and_terms/glossary.md#p203923211517)指令队列（V）、[Cube（矩阵）](../../../technical_appendix/concepts_and_terms/glossary.md#p1038918214519)指令队列（M）、[Scalar（标量）](../../../technical_appendix/concepts_and_terms/glossary.md#p1739112219516)指令队列（S）和搬运指令队列（[Memory Transfer Engine 1（MTE1）](../../../technical_appendix/concepts_and_terms/glossary.md#p339019220518)/[Memory Transfer Engine 2（MTE2）](../../../technical_appendix/concepts_and_terms/glossary.md#p53901325511)/[Memory Transfer Engine 3（MTE3）](../../../technical_appendix/concepts_and_terms/glossary.md#p183901322511)）。不同指令队列间的相互独立性和可并行执行特性，是Double Buffer优化机制的基石。
+【描述】执行于AI Core上的指令队列主要包括如下几类：[Vector（矢量）](../../../technical_appendix/concepts_and_terms/glossary.md#p203923211517)指令队列V、[Cube（矩阵）](../../../technical_appendix/concepts_and_terms/glossary.md#p1038918214519)指令队列M、[Scalar（标量）](../../../technical_appendix/concepts_and_terms/glossary.md#p1739112219516)指令队列S和搬运指令队列[Memory Transfer Engine 1（MTE1）](../../../technical_appendix/concepts_and_terms/glossary.md#p339019220518)/[Memory Transfer Engine 2（MTE2）](../../../technical_appendix/concepts_and_terms/glossary.md#p53901325511)/[Memory Transfer Engine 3（MTE3）](../../../technical_appendix/concepts_and_terms/glossary.md#p183901322511)。不同指令队列间的相互独立性和可并行执行特性，是Double Buffer优化机制的基石。
 
-以纯Vector计算为例，矢量计算前后的CopyIn、CopyOut过程使用搬运指令队列（MTE2/MTE3），Compute过程使用Vector指令队列（V）。不同指令队列可并行执行，意味着CopyIn、CopyOut过程和Compute过程可以并行。如[图1](#fig_data_vector_compute)所示，考虑一个完整的数据搬运和计算过程，CopyIn过程将数据从[Global Memory（GM）](../../../technical_appendix/concepts_and_terms/glossary.md#p1439018225112)搬运到[Local Memory（LM）](../../../technical_appendix/concepts_and_terms/glossary.md#p193901420518)，Vector计算单元完成Compute计算后，经过CopyOut过程将计算结果搬回GM。
+以纯Vector计算为例，矢量计算前后的CopyIn、CopyOut过程使用搬运指令队列（MTE2/MTE3），Compute过程使用Vector指令队列（V）。不同指令队列可并行执行，意味着CopyIn、CopyOut过程和Compute过程可以并行。如下图所示，考虑一个完整的数据搬运和计算过程，CopyIn过程将数据从[Global Memory（GM）](../../../technical_appendix/concepts_and_terms/glossary.md#p1439018225112)搬运到[Local Memory（LM）](../../../technical_appendix/concepts_and_terms/glossary.md#p193901420518)，Vector计算单元完成Compute计算后，经过CopyOut过程将计算结果搬回GM。
 
 **图1** 数据搬运与Vector计算过程<a name="fig_data_vector_compute"></a>  
 ![](../../../figures/data_vec_54.png "数据搬运与Vector计算过程")
@@ -14,14 +14,20 @@
 
 在此过程中，数据搬运与Vector计算串行执行，Vector计算单元不可避免地存在资源闲置问题。假设CopyIn、Compute、CopyOut三个阶段的耗时均为$t$，则Vector的利用率仅为三分之一，等待时间过长，Vector利用率严重不足。
 
-为减少Vector等待时间，Double Buffer为待处理数据准备Ping和Pong两组缓冲区。如[图3](#fig_double_buffer_timeline)所示，t0时，MTE2将数据块0的输入搬入Ping；t1时，MTE2将数据块1的输入搬入Pong，Vector同时使用Ping计算数据块0；t2时，MTE2将数据块2的输入搬入Ping，Vector使用Pong计算数据块1，MTE3同时从Ping搬出数据块0的结果。由此，数据搬入、Vector计算和数据搬出可以跨数据块并行执行，缓解Vector计算单元闲置问题。
+为减少Vector等待时间，Double Buffer为待处理数据准备Ping和Pong两组缓冲区。如下表所示，t0时，MTE2将数据块0的输入搬入Ping；t1时，MTE2将数据块1的输入搬入Pong，Vector同时使用Ping计算数据块0；t2时，MTE2将数据块2的输入搬入Ping，Vector使用Pong计算数据块1，MTE3同时从Ping搬出数据块0的结果。由此，数据搬入、Vector计算和数据搬出可以跨数据块并行执行，缓解Vector计算单元闲置问题。
 
-**图3** Ping/Pong Double Buffer的三个时间点<a name="fig_double_buffer_timeline"></a>  
-![](../../../figures/double_buffer_timeline.png "Ping/Pong Double Buffer的三个时间点")
+**表1** Ping/Pong Double Buffer的三个时间点  
+| 执行阶段 | t0 | t1 | t2 |
+| --- | --- | --- | --- |
+| MTE2搬入 | 数据块0输入到Ping输入区 | 数据块1输入到Pong输入区 | 数据块2输入到Ping输入区 |
+| Vector计算 | 无 | 计算数据块0（Ping） | 计算数据块1（Pong） |
+| MTE3搬出 | 无 | 无 | 数据块0结果从Ping输出区搬出 |
 
-总体来说，Double Buffer是基于MTE指令队列与Vector指令队列的独立性和可并行性，通过将数据搬运与Vector计算并行执行以隐藏大部分的数据搬运时间，并降低Vector指令的等待时间，最终提高Vector单元的利用效率。开启Double Buffer后的整体流水如[图4](#fig_enable_double_buffer_pipeline)所示。
+t2时，Ping中的输入区和输出区相互独立，因此数据块2搬入和数据块0搬出可以同时执行。
 
-**图4** 开启Double Buffer的流水图<a name="fig_enable_double_buffer_pipeline"></a>  
+总体来说，Double Buffer是基于MTE指令队列与Vector指令队列的独立性和可并行性，通过将数据搬运与Vector计算并行执行以隐藏大部分的数据搬运时间，并降低Vector指令的等待时间，最终提高Vector单元的利用效率。开启Double Buffer后的整体流水如下图所示。
+
+**图3** 开启Double Buffer的流水图<a name="fig_enable_double_buffer_pipeline"></a>  
 ![](../../../figures/dbuf_pipe.png "开启Double Buffer的流水图")
 
 ## 使用说明
@@ -117,9 +123,9 @@ __aicore__ inline void Process()
 
 ### 基于指针的C语言编程方式
 
-采用基于指针的C语言编程方式时，Double Buffer不是单一开关，需要在Kernel中手动申请Ping和Pong两组UB缓冲区，根据数据块序号交替选择缓冲区，并使用`asc_lock`和`asc_unlock`接口约束同一缓冲区的读取、写入和再次复用。
+采用基于指针的C语言编程方式时，Double Buffer不是单一开关，需要在Kernel中手动申请Ping和Pong两组UB缓冲区，根据数据块序号交替选择缓冲区，并使用[asc_lock](../../../../api/SIMD-API/c_api/sync/asc_lock.md)和[asc_unlock](../../../../api/SIMD-API/c_api/sync/asc_unlock.md)接口约束同一缓冲区的读取、写入和再次复用。
 
-下面的代码省略了核间切分、搬运参数配置和Host侧逻辑，只保留Double Buffer所在的Kernel及其关键逻辑。`BLOCK_LENGTH`表示单个数据块的最大元素个数，`currentLength`表示当前数据块的实际元素个数。
+下面的代码省略了核间切分、搬运参数配置和Host侧逻辑，只保留Double Buffer所在的Kernel及其关键逻辑。完整的单缓冲区基线和Double Buffer实现请参见[融合向量计算Double Buffer样例](../../../../../../examples/02_simd_c_api/02_features/01_reg_vector_compute/00_add_double_buffer/README.md)。`BLOCK_LENGTH`表示单个数据块的最大元素个数，`currentLength`表示当前数据块的实际元素个数。
 
 ```cpp
 __global__ __vector__ void add_double_buffer(__gm__ half* xGm, __gm__ half* yGm, __gm__ half* zGm,
@@ -189,8 +195,5 @@ MTE2向Ping的`x/y`搬入新数据时，MTE3可以同时从Ping的`z`搬出上�
 
 - 需要根据可用UB容量静态确定Ping/Pong缓冲区的大小、偏移和对齐方式。
 - 尾块需要通过`currentLength`按照实际长度搬运和计算。
-- [asc_lock](../../../../api/SIMD-API/c_api/sync/asc_lock.md)和[asc_unlock](../../../../api/SIMD-API/c_api/sync/asc_unlock.md)必须成对使用，且不能嵌套使用相同的`mutex_id`。
-- `asc_lock/asc_unlock`当前仅支持Ascend 950PR/Ascend 950DT；其他产品应根据同步接口支持情况，使用`asc_sync_notify/asc_sync_wait`等接口建立等价的数据依赖，不能直接照搬本节代码。
+- 注意`asc_lock/asc_unlock`接口的产品支持情况；若在其他产品上开启Double Buffer，应根据同步接口支持情况，使用`asc_sync_notify/asc_sync_wait`等接口建立等价的数据依赖，不能直接照搬本节代码。
 - Kernel退出前需要等待已提交的异步操作完成。示例使用`asc_sync_pipe(PIPE_ALL)`排空流水。
-
-完整的单缓冲区基线和Double Buffer实现请参见[融合向量计算Double Buffer样例](../../../../../../examples/02_simd_c_api/02_features/01_reg_vector_compute/00_add_double_buffer/README.md)。
