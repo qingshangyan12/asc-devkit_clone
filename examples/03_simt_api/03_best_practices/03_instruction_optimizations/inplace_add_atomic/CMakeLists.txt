@@ -14,14 +14,20 @@ set(CMAKE_ASC_ENABLE_SIMT ON)
 
 find_package(ASC REQUIRED)
 
-project(vector_muladd_atomic LANGUAGES ASC CXX)
+project(inplace_add_atomic LANGUAGES ASC CXX)
 
-add_executable(vector_muladd_atomic
-    vector_muladd_atomic.asc
+add_executable(inplace_add_atomic
+    inplace_add_atomic.asc
 )
 
+set(SCENARIO_NUM "0" CACHE STRING "Scenario number (0-3)")
 option(SKIP_VALIDATION "Skip result validation for replay-based profiling tools" OFF)
 
-target_compile_definitions(vector_muladd_atomic PRIVATE
+if(NOT SCENARIO_NUM MATCHES "^([0-3])$")
+    message(FATAL_ERROR "SCENARIO_NUM must be one of 0..3, but got ${SCENARIO_NUM}")
+endif()
+
+target_compile_definitions(inplace_add_atomic PRIVATE
+    SCENARIO_NUM=${SCENARIO_NUM}
     SKIP_VALIDATION=$<BOOL:${SKIP_VALIDATION}>
 )
