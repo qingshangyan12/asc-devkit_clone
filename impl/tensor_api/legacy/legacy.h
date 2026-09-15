@@ -247,32 +247,19 @@ ASCENDC_TENSOR_API_LEGACY_DEPRECATED __aicore__ inline auto MakeMemPtr(Addr addr
 }
 
 template <typename PtrPattern, typename Iterator, asc::te::enable_make_hardware_ptr<PtrPattern, Iterator> = 0>
-<<<<<<< HEAD
-ASCENDC_TENSOR_API_LEGACY_DEPRECATED __aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
-=======
-__aicore__ inline auto MakeMemPtr(Iterator iterator)
->>>>>>> 88695640d (fea:Follow the rule: constexpr cannot call non-constexpr)
+ASCENDC_TENSOR_API_LEGACY_DEPRECATED __aicore__ inline auto MakeMemPtr(Iterator iterator)
 {
     return make_mem_ptr<PtrPattern>(iterator);
 }
 
 template <typename Iterator, asc::te::enable_make_ptr_by_iter<Iterator> = 0>
-<<<<<<< HEAD
-ASCENDC_TENSOR_API_LEGACY_DEPRECATED __aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
-=======
-__aicore__ inline auto MakeMemPtr(Iterator iterator)
->>>>>>> 88695640d (fea:Follow the rule: constexpr cannot call non-constexpr)
+ASCENDC_TENSOR_API_LEGACY_DEPRECATED __aicore__ inline auto MakeMemPtr(Iterator iterator)
 {
     return make_mem_ptr(iterator);
 }
 
 template <typename Iterator, typename... Args>
-<<<<<<< HEAD
-ASCENDC_TENSOR_API_LEGACY_DEPRECATED __aicore__ inline constexpr auto MakeTensor(
-    const Iterator& iterator, const Args&... args)
-=======
-__aicore__ inline auto MakeTensor(const Iterator& iterator, const Args&... args)
->>>>>>> 88695640d (fea:Follow the rule: constexpr cannot call non-constexpr)
+ASCENDC_TENSOR_API_LEGACY_DEPRECATED __aicore__ inline auto MakeTensor(const Iterator& iterator, const Args&... args)
 {
     return make_tensor(iterator, args...);
 }
@@ -281,11 +268,7 @@ template <
     size_t... SqueezeDims, typename Input,
     typename = Std::enable_if_t<
         (asc::te::is_layout_v<Input> || asc::te::is_attr_tensor_v<Input>) && (sizeof...(SqueezeDims) > 0)>>
-<<<<<<< HEAD
-ASCENDC_TENSOR_API_LEGACY_DEPRECATED __aicore__ inline constexpr auto Squeeze(const Input& value)
-=======
-__aicore__ inline auto Squeeze(const Input& value)
->>>>>>> 88695640d (fea:Follow the rule: constexpr cannot call non-constexpr)
+ASCENDC_TENSOR_API_LEGACY_DEPRECATED __aicore__ inline auto Squeeze(const Input& value)
 {
     return squeeze<SqueezeDims...>(value);
 }
@@ -295,12 +278,7 @@ template <
     typename = Std::enable_if_t<
         (asc::te::is_layout_v<Input> || asc::te::is_attr_tensor_v<Input>) &&
         Std::is_tuple_v<Std::remove_cvref_t<Pattern>>>>
-<<<<<<< HEAD
-ASCENDC_TENSOR_API_LEGACY_DEPRECATED __aicore__ inline constexpr auto Squeeze(
-    const Input& value, const Pattern& pattern)
-=======
-__aicore__ inline auto Squeeze(const Input& value, const Pattern& pattern)
->>>>>>> 88695640d (fea:Follow the rule: constexpr cannot call non-constexpr)
+ASCENDC_TENSOR_API_LEGACY_DEPRECATED __aicore__ inline auto Squeeze(const Input& value, const Pattern& pattern)
 {
     return squeeze(value, pattern);
 }
