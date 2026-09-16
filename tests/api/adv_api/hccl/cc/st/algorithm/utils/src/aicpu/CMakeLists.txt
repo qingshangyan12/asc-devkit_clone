@@ -118,6 +118,8 @@ add_library(${HCCL_CHECKER_EXECUTOR_TARGET} STATIC
     ${HCCL_DEV_BASE}/src/ops/all_reduce/executor/ins_v2_all_reduce_sole_executor.cc
     ${HCCL_DEV_BASE}/src/ops/all_reduce/template/aicpu/ins_temp_all_reduce_mesh_1D_one_shot.cc
     ${HCCL_DEV_BASE}/src/ops/all_reduce/template/aicpu/ins_temp_all_reduce_mesh_1D_two_shot.cc
+    ${HCCL_DEV_BASE}/src/ops/all_reduce/template/aicpu/ins_temp_all_reduce_aicpu_reduce_nhr.cc
+    ${HCCL_DEV_BASE}/src/ops/all_reduce/template/aicpu/ins_temp_all_reduce_mesh_1D_two_shot_mesh_chunk.cc
 )
 
 target_include_directories(${HCCL_CHECKER_EXECUTOR_TARGET} PRIVATE
@@ -195,6 +197,8 @@ add_library(${HCCL_CHECKER_KERNEL_TARGET} STATIC
     ${HCCL_DEV_BASE}/src/ops/all_reduce/executor/ins_v2_all_reduce_sole_executor.cc
     ${HCCL_DEV_BASE}/src/ops/all_reduce/template/aicpu/ins_temp_all_reduce_mesh_1D_one_shot.cc
     ${HCCL_DEV_BASE}/src/ops/all_reduce/template/aicpu/ins_temp_all_reduce_mesh_1D_two_shot.cc
+    ${HCCL_DEV_BASE}/src/ops/all_reduce/template/aicpu/ins_temp_all_reduce_aicpu_reduce_nhr.cc
+    ${HCCL_DEV_BASE}/src/ops/all_reduce/template/aicpu/ins_temp_all_reduce_mesh_1D_two_shot_mesh_chunk.cc
 )
 
 target_sources(${HCCL_CHECKER_KERNEL_TARGET} PRIVATE
