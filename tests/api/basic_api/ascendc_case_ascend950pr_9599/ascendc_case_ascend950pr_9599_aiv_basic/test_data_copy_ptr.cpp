@@ -259,6 +259,73 @@ inline void FillRamp(std::vector<uint8_t>& buf, const uint32_t mul, const uint32
 }
 
 /*
+ * ---------------------------------------------------------------------------------------------
+ * Simulation-engine availability probe.
+ * ---------------------------------------------------------------------------------------------
+ * ascend950pr_9599_AIV_BASIC is a CPU *twin-debug* target: the kernels below are invoked as plain
+ * host calls, and the CANN CPU-debug runtime reaches the on-core engines through the PV wrappers
+ * declared in tests/api/common/k3_pvwrap.cpp. In that regime pv_mem_read() zero-fills its
+ * destination and pv_mem_write() returns without copying, so the MTE/vector engines are inert:
+ * DataCopy, DataCopyPad and even Duplicate leave their destination untouched.
+ *
+ * The scalar path is unaffected (LocalTensor::SetValue/GetValue and GlobalTensor::SetValue do move
+ * data), so an inert engine cannot be detected with scalar accesses. This probe instead asks the
+ * engine itself to move a known pattern UB -> GM and reports whether anything arrived.
+ *
+ * Cases that assert *data* consequently have to skip here, exactly like the cases that skip when a
+ * pointer overload is absent: with an inert engine, byte-equality is unobservable rather than
+ * false. The answer is memoised because it is a property of the regime, not of an individual case.
+ */
+__aicore__ inline void DmaEngineProbeKernel(__gm__ uint8_t* dstGm, const uint32_t count)
+{
+    TPipe tpipe;
+    TBuf<TPosition::VECCALC> buf;
+    tpipe.InitBuffer(buf, count * sizeof(float));
+    LocalTensor<float> local = buf.Get<float>();
+    float* raw = reinterpret_cast<float*>(local.GetPhyAddr());
+    for (uint32_t i = 0; i < count; ++i) {
+        raw[i] = 100.0f + static_cast<float>(i);
+    }
+    GlobalTensor<float> dst;
+    dst.SetGlobalBuffer(reinterpret_cast<__gm__ float*>(dstGm), count);
+    DataCopy(dst, local, count);
+    pipe_barrier(PIPE_ALL);
+}
+
+inline bool DmaEngineMovesData()
+{
+    static const bool moves = []() {
+        constexpr uint32_t probeCount = 8;
+        const uint32_t probeBytes = probeCount * sizeof(float);
+        std::vector<uint8_t> expected(probeBytes);
+        for (uint32_t i = 0; i < probeCount; ++i) {
+            const float value = 100.0f + static_cast<float>(i);
+            std::memcpy(expected.data() + i * sizeof(float), &value, sizeof(float));
+        }
+        std::vector<uint8_t> gm(probeBytes, 0x5A);
+        DmaEngineProbeKernel(gm.data(), probeCount);
+        return std::memcmp(gm.data(), expected.data(), probeBytes) == 0;
+    }();
+    return moves;
+}
+
+/*
+ * ---------------------------------------------------------------------------------------------
+ * GM -> L1 routing probe.
+ * ---------------------------------------------------------------------------------------------
+ * On __NPU_ARCH__ == 3510 an AIV-side GM -> L1 copy is software-emulated: DataCopyGM2L1Impl()
+ * forwards the transfer to the cube side with ScmDataCopyMsg(), which is reached through the KFC
+ * client. With no Matmul object registered (REGISTER_MATMUL_OBJ) the client is null and
+ * ScmDataCopyMsg() trips an ASCENDC_DEBUG_ASSERT -> abort().
+ *
+ * abort() is far worse than a failure here: it tears down the whole test binary, so every suite
+ * scheduled after it is silently lost. Whether the client exists is directly observable from the
+ * host, so the case can skip instead of killing the run. Note this only inspects the handle; it
+ * never performs the GM -> L1 copy itself.
+ */
+inline bool Gm2L1BridgeAvailable() { return AscendC::GetKfcClient() != nullptr; }
+
+/*
  * `GlobalTensor<T>::operator[]` returns a `LocalTensor`, not a view onto GM, so a second GM region is
  * addressed by re-binding a GlobalTensor to `base + offset`. These two helpers express the
  * "second half of the output buffer" pattern used by every kernel below.
@@ -437,6 +504,9 @@ TEST_F(PtrMixOperandSuite, PTR_MIX_01_TensorAndPointerMixedOperands)
 {
     if (!HasDataCopyCount<__ubuf__ float*, GlobalTensor<float>>::value) {
         GTEST_SKIP() << "mixed Tensor/pointer DataCopy overload absent (PTR-MIX-01)";
+    }
+    if (!DmaEngineMovesData()) {
+        GTEST_SKIP() << "CPU twin-debug has no simulation engine: DataCopy moves no data (PTR-MIX-01)";
     }
     constexpr uint32_t count = 1024;
     const uint32_t bytes = count * sizeof(float);
@@ -844,6 +914,9 @@ TEST_F(PtrPadSuite, PTR_PAD_01_Gm2UbNonAlignedTailWithPadValue)
     if (!HasDataCopyPadExtParams<float, __ubuf__ float*, __gm__ float*>::value) {
         GTEST_SKIP() << "pointer DataCopyPad GM->UB overload absent (PTR-PAD-01)";
     }
+    if (!DmaEngineMovesData()) {
+        GTEST_SKIP() << "CPU twin-debug has no simulation engine: DataCopyPad moves no data (PTR-PAD-01)";
+    }
     constexpr uint32_t elemCount = 64;
     constexpr uint32_t tailLen = 21; // 84B: deliberately not 32B-aligned for float
     const uint32_t validBytes = tailLen * sizeof(float);
@@ -860,6 +933,9 @@ TEST_F(PtrPadSuite, PTR_PAD_02_Ub2GmNonAlignedTail)
 {
     if (!HasDataCopyPadExtNoPad<__gm__ half*, __ubuf__ half*>::value) {
         GTEST_SKIP() << "pointer DataCopyPad UB->GM overload absent (PTR-PAD-02)";
+    }
+    if (!DmaEngineMovesData()) {
+        GTEST_SKIP() << "CPU twin-debug has no simulation engine: DataCopyPad moves no data (PTR-PAD-02)";
     }
     constexpr uint32_t elemCount = 64;
     constexpr uint32_t tailLen = 21; // 42B: not 32B-aligned for half
@@ -934,6 +1010,16 @@ TEST_P(PtrL1ToUbSuite, PTR_L1UB_01_CountAndParamsForms)
     if (!available) {
         GTEST_SKIP() << "pointer DataCopyL1ToUB overload absent (PTR-L1UB-01), paramsForm=" << paramsForm;
     }
+    if (!Gm2L1BridgeAvailable()) {
+        GTEST_SKIP() << "CPU twin-debug has no GM->L1 bridge (no REGISTER_MATMUL_OBJ): the AIV-side "
+                        "GM->L1 copy aborts the test binary (PTR-L1UB-01), paramsForm="
+                     << paramsForm;
+    }
+    if (!DmaEngineMovesData()) {
+        GTEST_SKIP() << "CPU twin-debug has no simulation engine: DataCopyL1ToUB moves no data (PTR-L1UB-01), "
+                        "paramsForm="
+                     << paramsForm;
+    }
     constexpr uint32_t count = 512;
     const uint32_t bytes = count * sizeof(float);
     std::vector<uint8_t> srcGm(bytes, 0x00);
@@ -997,6 +1083,9 @@ TEST_F(PtrCacheSuite, PTR_CACHE_01_02_PointerOpsKeepDataIntact)
 {
     if (!HasDcciPtr<float, __gm__ float*>::value) {
         GTEST_SKIP() << "pointer DataCacheCleanAndInvalid overload absent (PTR-CACHE-01)";
+    }
+    if (!DmaEngineMovesData()) {
+        GTEST_SKIP() << "CPU twin-debug has no simulation engine: DataCopy moves no data (PTR-CACHE-01)";
     }
     constexpr uint32_t count = 256;
     const uint32_t bytes = count * sizeof(float);
