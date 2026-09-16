@@ -231,7 +231,28 @@ for r in rows:
 n = 8 if smoke else 10**9
 sel = []
 for api in ("mmad", "load_data", "fixpipe"):
-    sel.extend(by.get(api, [])[:n])
+    pool = by.get(api, [])
+    if not smoke or len(pool) <= n:
+        sel.extend(pool[:n])
+        continue
+    # smoke: round-robin by scenario so dtype/场景都冒到
+    buckets = {}
+    for r in pool:
+        buckets.setdefault(r.get("scenario"), []).append(r)
+    keys = sorted(buckets)
+    i = 0
+    picked = []
+    while len(picked) < n and keys:
+        k = keys[i % len(keys)]
+        if buckets[k]:
+            picked.append(buckets[k].pop(0))
+        else:
+            keys = [x for x in keys if buckets[x]]
+            if not keys:
+                break
+            continue
+        i += 1
+    sel.extend(picked)
 outp.write_text("".join(json.dumps(x) + "\n" for x in sel), encoding="utf-8")
 print("SELECTED", len(sel), "smoke" if smoke else "full")
 PY
