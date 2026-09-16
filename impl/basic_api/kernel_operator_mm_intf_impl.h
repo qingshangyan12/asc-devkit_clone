@@ -734,6 +734,9 @@ __aicore__ inline void SetMMColumnMajor() { SetMMLayoutTransformImpl(false); }
 __aicore__ inline void SetMMLayoutTransform(bool mmLayoutMode) { SetMMLayoutTransformImpl(mmLayoutMode); }
 
 } // namespace AscendC
+
+#include "kernel_operator_mm_ptr_impl.h"
+
 #endif // ASCENDC_MODULE_OPERATOR_MM_INTERFACE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_INTF_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
