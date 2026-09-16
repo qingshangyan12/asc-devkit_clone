@@ -180,6 +180,13 @@ protected:
                     nullptr, handle),
                 Result::SUCCESS);
             ASSERT_EQ(registry.RegisterEnd(rank + 1), Result::SUCCESS);
+            const Program* program = registry.GetProgram(handle);
+            ASSERT_NE(program, nullptr);
+            if (mesh) {
+                // Parallel Mesh 必须保留 hccl 原版的 GroupCopy/LoopGroup 本地搬运，
+                // 防止再次退化成逐次 LocalCopy + EventWait。
+                ASSERT_FALSE(program->groupCopies.empty());
+            }
             launches[rank] = {
                 handle,
                 {memory.ParameterAddress(), memory.ParameterAddress() + CKE_WORD * 8, 1, 2, mission, 0x1000U + rank},
