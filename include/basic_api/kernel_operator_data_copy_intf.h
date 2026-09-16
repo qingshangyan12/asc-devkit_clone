@@ -30,6 +30,7 @@
 #include "../../impl/basic_api/utils/kernel_utils_macros.h"
 #include "../../impl/basic_api/utils/kernel_utils_struct_confusion_pad.h"
 #include "kernel_tensor.h"
+#include "../../impl/basic_api/utils/kernel_ptr_utils.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstddef>
@@ -318,6 +319,134 @@ template <typename T, typename U>
 __aicore__ inline void DataCopy(
     const GlobalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyCO12DstParams& intriParams);
 
+/* **************************************************************************************************
+ * DataCopyPad (pointer extended overloads)                          *
+ * ************************************************************************************************* */
+/*
+ * The overloads below accept a raw address-space pointer in place of the equivalent LocalTensor /
+ * GlobalTensor operand. They are enabled only when at least one operand is a raw pointer, so every
+ * Tensor/Tensor call keeps resolving to the Tensor-only signatures declared above and the original overload
+ * resolution is untouched.
+ */
+/*
+ * @ingroup DataCopyPad Level 0
+ * @brief non aligned datacopy from GM to UB / L1, legacy DataCopyParams + DataCopyPadParams form
+ * @param [out] dst output LocalTensor or __ubuf__ / __cbuf__ pointer
+ * @param [in] src input GlobalTensor or __gm__ pointer
+ */
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+template <
+    typename DstT, typename SrcT, PaddingMode mode = PaddingMode::Normal,
+    typename Std::enable_if<
+        IsDmaLocalOperand<DstT> && IsDmaGmOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
+    const DstT& dst, const SrcT& src, const DataCopyParams& dataCopyParams, const DataCopyPadParams& padParams);
+#else
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaLocalOperand<DstT> && IsDmaGmOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
+    const DstT& dst, const SrcT& src, const DataCopyParams& dataCopyParams, const DataCopyPadParams& padParams);
+#endif
+
+/*
+ * @ingroup DataCopyPad Level 0
+ * @brief non aligned datacopy from UB / L1 to GM, legacy DataCopyParams form
+ * @param [out] dst output GlobalTensor or __gm__ pointer
+ * @param [in] src input LocalTensor or __ubuf__ / __cbuf__ pointer
+ */
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+template <
+    typename DstT, typename SrcT, PaddingMode mode = PaddingMode::Normal,
+    typename Std::enable_if<
+        IsDmaGmOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
+    const DstT& dst, const SrcT& src, const DataCopyParams& dataCopyParams);
+#else
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaGmOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
+    const DstT& dst, const SrcT& src, const DataCopyParams& dataCopyParams);
+#endif
+
+/*
+ * @ingroup DataCopyPad Level 0
+ * @brief non aligned datacopy from UB to L1 (TSCM), DataCopyParams + Nd2NzParams form
+ * @param [out] dst output LocalTensor or __cbuf__ pointer
+ * @param [in] src input LocalTensor or __ubuf__ pointer
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaLocalOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
+__aicore__ inline void DataCopyPad(
+    const DstT& dst, const SrcT& src, const DataCopyParams& dataCopyParams, const Nd2NzParams& nd2nzParams);
+
+/*
+ * @ingroup DataCopyPad Level 0
+ * @brief non aligned datacopy from GM to UB / L1, DataCopyExtParams + DataCopyPadExtParams form
+ * @param [out] dst output LocalTensor or __ubuf__ / __cbuf__ pointer
+ * @param [in] src input GlobalTensor or __gm__ pointer
+ * @param [in] padParams pad parameters whose element type is taken from the source operand
+ */
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
+    (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
+template <
+    typename DstT, typename SrcT, PaddingMode mode = PaddingMode::Normal,
+    typename Std::enable_if<
+        IsDmaLocalOperand<DstT> && IsDmaGmOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
+    const DstT& dst, const SrcT& src, const DataCopyExtParams& dataCopyParams,
+    const DataCopyPadExtParams<DmaOperandElem<SrcT>>& padParams);
+#else
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaLocalOperand<DstT> && IsDmaGmOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
+    const DstT& dst, const SrcT& src, const DataCopyExtParams& dataCopyParams,
+    const DataCopyPadExtParams<DmaOperandElem<SrcT>>& padParams);
+#endif
+
+/*
+ * @ingroup DataCopyPad Level 0
+ * @brief non aligned datacopy from UB / L1 to GM, DataCopyExtParams form
+ * @param [out] dst output GlobalTensor or __gm__ pointer
+ * @param [in] src input LocalTensor or __ubuf__ / __cbuf__ pointer
+ */
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
+    (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
+template <
+    typename DstT, typename SrcT, PaddingMode mode = PaddingMode::Normal,
+    typename Std::enable_if<
+        IsDmaGmOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
+    const DstT& dst, const SrcT& src, const DataCopyExtParams& dataCopyParams);
+#else
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaGmOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
+    const DstT& dst, const SrcT& src, const DataCopyExtParams& dataCopyParams);
+#endif
+
+/*
+ * @ingroup DataCopyPad Level 0
+ * @brief non aligned datacopy from UB to L1 (TSCM), DataCopyExtParams + Nd2NzParams form
+ * @param [out] dst output LocalTensor or __cbuf__ pointer
+ * @param [in] src input LocalTensor or __ubuf__ pointer
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaLocalOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
+__aicore__ inline void DataCopyPad(
+    const DstT& dst, const SrcT& src, const DataCopyExtParams& dataCopyParams, const Nd2NzParams& nd2nzParams);
+
 #if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201))
 // float to bfloat16_t
 template <
@@ -456,6 +585,23 @@ __aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTens
 template <typename T, uint8_t subBlockId = 0>
 __aicore__ inline void DataCopyL1ToUB(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams);
+
+/*!
+ * \brief Pointer overload of DataCopyL1ToUB, count form. The operand slots are separated by parameter types
+ *        (uint32_t count vs DataCopyParams), so no extra disambiguation is needed; at least one operand must be
+ *        a raw pointer, which keeps the Tensor-only signatures resolving as before.
+ */
+template <
+    typename DstT, typename SrcT, uint8_t subBlockId = 0,
+    typename Std::enable_if<
+        IsDmaLocalOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
+__aicore__ inline void DataCopyL1ToUB(const DstT& dst, const SrcT& src, const uint32_t count);
+
+template <
+    typename DstT, typename SrcT, uint8_t subBlockId = 0,
+    typename Std::enable_if<
+        IsDmaLocalOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
+__aicore__ inline void DataCopyL1ToUB(const DstT& dst, const SrcT& src, const DataCopyParams& repeatParams);
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, uint8_t dim, const NdDmaConfig& config = kDefaultNdDmaConfig>

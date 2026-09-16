@@ -313,6 +313,65 @@ template <typename DstT, typename SrcT>
 constexpr bool IsDmaPtrInvolved = IsDmaPtrOperand<DstT> || IsDmaPtrOperand<SrcT>;
 
 /*!
+ * \brief Compile-time hardware position of a local-memory operand, used to reproduce the runtime
+ *        GetPosition() dispatch of the Tensor path inside an `if constexpr`.
+ *
+ *        It resolves to Hardware::MAX for anything that is not a hardware-address-space pointer, which is
+ *        exactly what an implementation wants from a Tensor operand: keep dispatching on it at run time. In CPU
+ *        twin-debug the address qualifiers are empty, so every pointer also resolves to Hardware::MAX and the
+ *        runtime dispatch is used, which is the documented degradation of the pointer path there.
+ */
+template <typename T, DmaAddrSpace space = (IsDmaPtr<T> ? DmaAddrSpaceOfV<T> : DmaAddrSpace::kUnknown)>
+struct DmaHardwarePos {
+    static constexpr Hardware value = Hardware::MAX;
+};
+
+template <typename T>
+struct DmaHardwarePos<T, DmaAddrSpace::kGm> {
+    static constexpr Hardware value = Hardware::GM;
+};
+
+template <typename T>
+struct DmaHardwarePos<T, DmaAddrSpace::kUb> {
+    static constexpr Hardware value = Hardware::UB;
+};
+
+template <typename T>
+struct DmaHardwarePos<T, DmaAddrSpace::kL1> {
+    static constexpr Hardware value = Hardware::L1;
+};
+
+template <typename T>
+struct DmaHardwarePos<T, DmaAddrSpace::kL0A> {
+    static constexpr Hardware value = Hardware::L0A;
+};
+
+template <typename T>
+struct DmaHardwarePos<T, DmaAddrSpace::kL0B> {
+    static constexpr Hardware value = Hardware::L0B;
+};
+
+template <typename T>
+struct DmaHardwarePos<T, DmaAddrSpace::kL0C> {
+    static constexpr Hardware value = Hardware::L0C;
+};
+
+template <typename T>
+struct DmaHardwarePos<T, DmaAddrSpace::kFb> {
+    static constexpr Hardware value = Hardware::FIXBUF;
+};
+
+template <typename T>
+constexpr Hardware DmaHardwarePosV = DmaHardwarePos<T>::value;
+
+/*!
+ * \brief True when the runtime position of a Tensor operand must still be consulted. A Tensor operand has no
+ *        compile-time position, so the dispatcher keeps its original runtime branch for it.
+ */
+template <typename T>
+constexpr bool IsDmaPosRuntime = DmaHardwarePosV<T> == Hardware::MAX;
+
+/*!
  * \brief Pointer extraction: a raw pointer is passed through unchanged (no reinterpret, no offset fixup), a
  *        Tensor degrades to its physical address. Fully resolved at compile time, so no runtime instruction is
  *        generated for either branch.
