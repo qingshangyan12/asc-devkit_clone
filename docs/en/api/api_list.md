@@ -31,7 +31,7 @@ You can include the required files based on the Ascend C APIs actually used. The
 | --- | --- | --- |
 | simt/asc_simt.h | Provides the external APIs of the SIMT API. If the computation requires only a specific data type such as fp8, you can include only simt_api/asc_fp8.h. | Not applicable |
 
-**For more details about the header files included in SIMT programming, see [SIMT-API](SIMT-API/overview.md).**
+For more details about the header files included in SIMT programming, see [SIMT-API](SIMT-API/overview.md).
 
 **Table 3** SIMD basic programming capability header file list
 

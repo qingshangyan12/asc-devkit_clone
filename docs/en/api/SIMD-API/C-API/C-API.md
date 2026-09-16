@@ -8,7 +8,7 @@ This is the table of contents for the C API documentation. You can include **asc
 
 |Structure |Description|
 |-----------------------|-----------------------|
-| [asc_load3d_v2_config](struct/asc_load3d_v2_config.md) | The **repeat** parameter of the **Load3Dv2** API. |
+| [asc_load3d_v2_config](struct/asc_load3d_v2_config.md) | The repeat parameter of the Load3Dv2 API. |
 | [asc_store_atomic_config](struct/asc_store_atomic_config.md) | The values of the atomic operation enable bit and the atomic operation type. |
 | [asc_fill_value_config](struct/asc_fill_value_config.md) | The initialization parameter structure for **fill_value**, containing the various initialization parameters that need to be configured for the [asc_fill_l0a](cube_datamove/asc_fill_l0a.md)/[asc_fill_l0b](cube_datamove/asc_fill_l0b.md)/[asc_fill_l1](cube_datamove/asc_fill_l1.md) APIs. |
 | [asc_l13d_fmatrix_config](struct/asc_l13d_fmatrix_config.md) | Used to set the Feature map attribute parameters of the [asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md) 3D format move APIs. |
@@ -494,5 +494,3 @@ Reg vector computation APIs. When used independently, you can include reg_vector
 | [asc_unsqueeze](reg/reg_vector/asc_unsqueeze.md) | Performs decompression based on **mask** and outputs the generated data to **dst**. |
 | [asc_update_mask](reg/reg_vector/asc_update_mask.md) | Generates the value in the corresponding mask register based on the size of **value**. |
 | [asc_xor](reg/reg_vector/asc_xor.md) | Performs an element-wise XOR (^) operation on the input **src0** and **src1** based on **mask**, and writes the result to **dst**. |
-
-
