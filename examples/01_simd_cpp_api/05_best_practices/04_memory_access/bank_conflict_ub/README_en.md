@@ -8,6 +8,7 @@ This example is based on the Add instruction. By configuring different LocalTens
 
 | Product | CANN Software Version |
 |---------|----------------------|
+| Ascend 960DT | >=CANN 9.2.0 |
 | Atlas A3 Training Series Products / Atlas A3 Inference Series Products | >= CANN 9.0.0 |
 | Atlas A2 Training Series Products / Atlas A2 Inference Series Products | >= CANN 9.0.0 |
 
@@ -31,7 +32,7 @@ This example is based on the Add instruction. By configuring different LocalTens
 
 ![UB Memory Layout](./figures/ub_memory_layout.png)
 
-- On the A2/A3 architecture, the UB space size is 192KB;
+- On the A2/A3/A5 architecture, the UB space size is 192KB;
 - There are 48 **banks** in total, forming 16 **bank groups**, with each bank group containing 3 banks (`bank_id` = 0, 1, 2);
 - Each bank consists of 128 rows (`BANK_DEPTH = 128`), with each row being 32B long (`BANK_WIDTH = 32B`), making each bank 4KB in size;
 - **Bank global numbering rule**: `bank_number = bank_group_id + bank_id * 16`;
@@ -405,9 +406,9 @@ Execute the following steps in the root directory of this sample to build and ru
 
 - Build option description
 
-  | Option | Valid Values | Description |
-  |--------|--------------|-------------|
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` | NPU architecture: dav-2201 corresponds to Atlas A2 training series products / Atlas A2 inference series products and Atlas A3 training series products / Atlas A3 inference series products |
+  | Option | Valid Values | Description                                                                                                                                                                                                                                                                                                             |
+  |--------|--------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`、`dav-9201` | NPU architecture: dav-2201 corresponds to Atlas A2 training series products / Atlas A2 inference series products and Atlas A3 training series products / Atlas A3 inference series products, dav-9201 corresponds to Ascend 960DT                                                                                       |
   | `SCENARIO_NUM` | `1`~`8` | Scenario number: 1 (no-conflict baseline), 2 (same-bank read-read conflict), 3 (same-bank-group read-read conflict), 4 (same-bank read-write conflict — hardware optimized), 5 (read-write conflict), 6 (address overlap — hardware optimized), 7 (src0RepStride=1 read-read conflict), 8 (src0RepStride=8 no conflict) |
 
 - Execution result

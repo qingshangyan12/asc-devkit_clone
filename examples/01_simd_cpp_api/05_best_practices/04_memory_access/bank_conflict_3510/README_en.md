@@ -1,11 +1,11 @@
-# UB Bank Conflict Scenario Verification and Analysis (Architecture 3510)
+# UB Bank Conflict Scenario Verification and Analysis (Architecture 3510、9201)
 
 
 ## UB Memory Structure Introduction
 
 ![UB Architecture](./figures/ub_arch.png)
 
-- In Ascend 950PR/Ascend 950DT, the UB space size is 256KB;
+- In Ascend 950PR/Ascend 950DT and Ascend 9201PR/Ascend 9201DT, the UB space size is 256KB;
 - There are 16 **banks**, forming 8 **bank groups**, each bank group contains 2 banks (`bank_id` = 0, 1);
 - Each bank consists of 512 rows (`BANK_DEPTH = 512`), each row is 32B long (`BANK_WIDTH = 32B`), i.e., each bank size is 16KB;
 - Each bank group supports up to two reads or one read and one write.
@@ -22,7 +22,7 @@ bank internal layout (one row 32B):
 
 ## UB Address Encoding Rules
 
-The Ascend 950PR/Ascend 950DT UB 18-bit address uses **low-bit interleaving** encoding rules:
+The Ascend 950PR/Ascend 950DT and Ascend 9201PR/Ascend 9201DT UB 18-bit address uses **low-bit interleaving** encoding rules:
 
 `UB_ADDR[17:0] = { DEPTH[8:0], BANK[0], BG[2:0], WIDTH[4:0] }`
 
@@ -107,7 +107,7 @@ This document focuses on verification and analysis of bank conflict scenarios fo
 
 ### Continuous Aligned Load/Store Bank Conflict Scenarios (Case 1-8)
 
-**Note: In Ascend 950PR/Ascend 950DT, the scenario where src0/src1/dst starting addresses are distributed in different banks of different bank groups does not exist, and the read-write conflict cannot be avoided in two-read-one-write scenarios**
+**Note: In Ascend 950PR/Ascend 950DT and Ascend 9201PR/Ascend 9201DT, the scenario where src0/src1/dst starting addresses are distributed in different banks of different bank groups does not exist, and the read-write conflict cannot be avoided in two-read-one-write scenarios**
 
 | Case | Formula | Scenario Description | Bank Conflict | src0 Address | src1 Address | dst Address | Single VF Data Volume (B) | Benchmark Performance (cycles) | LDU Conflict Ratio (%) | STU Conflict Ratio (%) | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -485,7 +485,7 @@ Same as Case 6.
 
 ## Summary
 
-1. On Ascend 950PR/Ascend 950DT, two-read-one-write inevitably has bank conflicts. In actual scenarios, since the Regbase architecture is adopted, UB read/write frequency is reduced, and bank conflicts are often not the bottleneck.
+1. On Ascend 950PR/Ascend and Ascend 9201PR/Ascend 9201DT, two-read-one-write inevitably has bank conflicts. In actual scenarios, since the Regbase architecture is adopted, UB read/write frequency is reduced, and bank conflicts are often not the bottleneck.
 7. When using scatter and gather APIs, continuous indices dispersed across subbanks can reduce conflicts.
 8. Loop unrolling can optimize bank conflicts, as shown in the following trace analysis.
     | case6 pipeline | case7 pipeline |
@@ -557,11 +557,11 @@ python3 ../scripts/verify_result.py output/output_z.bin output/golden.bin
 
 ### CMake Options
 
-| Option | Valid Values | Description |
-|:------:|:------------:|:------------|
-| `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture version |
-| `SCENARIO_NUM` | 1-14 | Switch test scenario |
-| `CMAKE_ASC_RUN_MODE` | `npu` | On-board run mode |
+| Option |      Valid Values      | Description |
+|:------:|:----------------------:|:------------|
+| `CMAKE_ASC_ARCHITECTURES` | `dav-3510`、`dav-9201` | NPU architecture version |
+| `SCENARIO_NUM` |          1-14          | Switch test scenario |
+| `CMAKE_ASC_RUN_MODE` |         `npu`          | On-board run mode |
 
 ### Conflict Performance Collection
 
