@@ -162,6 +162,40 @@ __aicore__ inline void DumpAccChkPoint(
     return;
 }
 
+/*
+ * Definitions of the raw-pointer GM dump overloads declared in the interface header.  The GM
+ * address is re-wrapped as the GlobalTensor view it denotes and handed to the Tensor overload
+ * above, so the dump FIFO and the entity selection are exactly the Tensor path's.
+ */
+template <typename T>
+__aicore__ inline void DumpTensor(__gm__ T* tensor, uint32_t desc, uint32_t dumpSize)
+{
+    GlobalTensor<T> tmp;
+    tmp.SetGlobalBuffer(tensor);
+    DumpTensor<T>(tmp, desc, dumpSize);
+}
+
+template <typename T>
+__aicore__ inline void DumpTensor(__gm__ T* tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
+{
+    GlobalTensor<T> tmp;
+    tmp.SetGlobalBuffer(tensor);
+    DumpTensor<T>(tmp, desc, dumpSize, shapeInfo);
+}
+
+template <typename T>
+__aicore__ inline void DumpAccChkPoint(__gm__ T* tensor, uint32_t index, uint32_t countOff, uint32_t dumpSize)
+{
+    GlobalTensor<T> tmp;
+    // The Tensor path first rejects a countOff beyond the tensor extent.  A raw pointer carries no
+    // extent, so that one runtime check cannot be evaluated here and is omitted -- the same omission
+    // the design records for the pointer path's position check.  An unbounded extent omits exactly
+    // that check and leaves the compile-time guards and the assert inside the Tensor overload intact.
+    constexpr uint64_t unknownExtent = ~static_cast<uint64_t>(0);
+    tmp.SetGlobalBuffer(tensor, unknownExtent);
+    DumpAccChkPoint<T>(tmp, index, countOff, dumpSize);
+}
+
 // only 51, 71, 82 supports printf/assert. the other code is left to avoid errors in test cases.
 #if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 5102
 template <class... Args>
