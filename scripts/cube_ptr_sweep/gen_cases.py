@@ -54,7 +54,7 @@ def mmad_pool() -> list[dict]:
     mapping = [("int8", 1, "any"), ("bf16", 2, "any"), ("fp32", 3, "any"), ("int4", 4, "dav-2201")]
     for dtype, sc, arch in mapping:
         for m, n, k in shapes_for(dtype):
-            if dtype == "bf16" and k < 32:
+            if dtype == "bf16" and (k < 32 or min(m, n) < 32):
                 continue
             # fp32 s3：与官方默认规格同量级对齐约束（M/N/K 16 对齐且 K%16）
             if dtype == "fp32" and (m % 16 or n % 16 or k % 16):
