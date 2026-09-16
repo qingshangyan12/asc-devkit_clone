@@ -11,7 +11,7 @@ C API针对矩阵计算编程模型提供了数据搬入、矩阵计算和结果
 
 3. 通过[asc_mmad](../asc_mmad.md)计算，输出至L0C Buffer。参数顺序为`m, k, n`，初次从零计算时设置`c_matrix_init_val=true`；后续K块累加时设置`c_matrix_source=false`、`c_matrix_init_val=false`。Bias初始化的参数说明见[asc_mmad](../asc_mmad.md)。
 
-4. 通过[asc_copy_l0c2gm](../../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm.md)搬出结果，配置随路量化、激活和输出格式。也可搬到L1 Buffer，见[搬出总体说明](../../cube_datamove/cube_compute_store/overall_description.md)。
+4. 通过[asc_copy_l0c2gm](../../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm.md)搬出结果，配置随路量化、激活和输出格式。也可搬到L1 Buffer，见[搬出总体说明](../../cube_datamove/cube_compute_store_overall_description.md)。
 
 <!-- npu="950" id1 -->
 # Mx矩阵计算流程
@@ -42,9 +42,9 @@ MX矩阵乘法（Microscaling矩阵乘加）为带有量化系数的矩阵乘法
 
 1. 首先将原始矩阵B按照固定粒度划分连续4个元素为一组，按照4选2结构化稀疏压缩规则，离线生成对应的压缩矩阵B与[索引矩阵](../cube_compute_fractal_intro/aux_cube_fractal_format_details.md#4选2稀疏索引矩阵)作为输入。
 
-2. 通过asc_copy_gm2l1接口将原始矩阵A、压缩矩阵B、索引矩阵的GM数据搬运到L1 Buffer中（如果存在随路量化，则同样通过asc_copy_gm2l1搬到L1 Buffer中）。详细内容请参考[矩阵数据搬入至L1 Buffer](../../cube_datamove/cube_compute_load/cube_compute_load.md)。
+2. 通过asc_copy_gm2l1接口将原始矩阵A、压缩矩阵B、索引矩阵的GM数据搬运到L1 Buffer中（如果存在随路量化，则同样通过asc_copy_gm2l1搬到L1 Buffer中）。
 
-3. 通过asc_copy_l12l0a接口将原始矩阵A加载到L0A Buffer，通过[asc_copy_l12l0b_sparse接口](../../cube_datamove/asc_copy_l12l0b_sparse.md)将压缩矩阵B与索引矩阵分别加载到L0B Buffer与内置IDX Buffer上准备计算（如果存在随路量化，则通过asc_copy_l12fb将L1 Buffer中的量化系数数据搬运到Fixpipe Buffer上）。详细内容请参考[矩阵数据搬入至L0A Buffer/L0B Buffer](../../cube_datamove/cube_compute_load/cube_compute_load.md)。
+3. 通过asc_copy_l12l0a接口将原始矩阵A加载到L0A Buffer，通过[asc_copy_l12l0b_sparse接口](../../cube_datamove/asc_copy_l12l0b_sparse.md)将压缩矩阵B与索引矩阵分别加载到L0B Buffer与内置IDX Buffer上准备计算（如果存在随路量化，则通过asc_copy_l12fb将L1 Buffer中的量化系数数据搬运到Fixpipe Buffer上）。
 
 4. 通过asc_mmad_sparse接口对L0A Buffer、L0B Buffer、内置IDX Buffer上面的数据进行4选2稀疏矩阵计算，并输出结果到L0C Buffer上。详细内容请参考[asc_mmad_sparse计算](../asc_mmad_sparse.md)。
 
@@ -60,7 +60,7 @@ Conv2D前向计算的本质是将卷积运算转换为矩阵乘：先通过img2c
 
 1. 将FeatureMap和Weight从GM搬入L1 Buffer。FeatureMap按[NC1HWC0格式](../cube_compute_fractal_intro/key_fractal_format_details.md#nc1hwc0格式)准备；Weight按后续L0B Buffer搬运所需布局准备。
 
-2. 使用`asc_copy_l12l0a`的3D重载执行img2col，并通过`asc_copy_l12l0b`搬入Weight。调用前配置FeatureMap属性、重复步长、边界与Padding，具体接口见[搬入总体说明](../../cube_datamove/cube_compute_load/overall_description.md)。
+2. 使用`asc_copy_l12l0a`的3D重载执行img2col，并通过`asc_copy_l12l0b`搬入Weight。调用前配置FeatureMap属性、重复步长、边界与Padding，具体接口见[搬入总体说明](../../cube_datamove/cube_compute_load_overall_description.md)。
 
 3. 使用[asc_mmad](../asc_mmad.md)完成矩阵乘加，结果存放在L0C Buffer。
 
