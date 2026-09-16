@@ -390,8 +390,7 @@ constexpr bool DmaLocalToGmShape = DmaProveGm<DstT> && DmaAcceptLocal<SrcT>;
 template <typename DstT, typename SrcT>
 constexpr bool DmaLocalToLocalShape = DmaProveLocal<DstT> && DmaProveLocal<SrcT>;
 
-/*!
- * \brief Compile-time hardware position of a local-memory operand, used to reproduce the runtime
+/*! * \brief Compile-time hardware position of a local-memory operand, used to reproduce the runtime
  *        GetPosition() dispatch of the Tensor path inside an `if constexpr`.
  *
  *        It resolves to Hardware::MAX for anything that is not a hardware-address-space pointer, which is
@@ -459,7 +458,6 @@ constexpr bool IsDmaPosRuntime = DmaHardwarePosV<T> == Hardware::MAX;
 /*! \brief The two shapes handled by the MTE3 store family: local -> GM and the local -> local copies. */
 template <typename DstT, typename SrcT>
 constexpr bool DmaLocalToGmOrLocalShape = DmaLocalToGmShape<DstT, SrcT> || DmaLocalToLocalShape<DstT, SrcT>;
-
 /*!
  * \brief Pointer extraction: a raw pointer is passed through unchanged (no reinterpret, no offset fixup), a
  *        Tensor degrades to its physical address. Fully resolved at compile time, so no runtime instruction is
@@ -563,7 +561,6 @@ __aicore__ inline TPosition GetDmaOperandPosition(const T& operand)
         return static_cast<TPosition>(operand.GetPosition());
     }
 }
-
 } // namespace AscendC
 
 #endif // ASCENDC_MODULE_KERNEL_PTR_UTILS_H
