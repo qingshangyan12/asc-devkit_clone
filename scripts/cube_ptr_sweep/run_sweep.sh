@@ -156,18 +156,29 @@ sample_dir() {
   esac
 }
 
+append_summary() {
+  local line="$1"
+  if command -v flock >/dev/null 2>&1; then
+    flock "$SUMMARY.lock" bash -c "printf '%s\n' \"\$1\" >> \"\$2\"" _ "$line" "$SUMMARY"
+  else
+    printf '%s\n' "$line" >> "$SUMMARY"
+  fi
+}
+
 run_one() {
   local api="$1" cid="$2" dtype="$3" M="$4" N="$5" K="$6" sc="$7"
   local srcdir work blog rlog vlog glog
+  local dev="${ASCEND_DEVICE_ID:-0}"
   srcdir=$(sample_dir "$api")
   work="$RUNROOT/${cid}"
-  echo "==== $cid ===="
-  [ -d "$srcdir" ] || { echo -e "${api}\t${cid}\t${ARCH}\t${dtype}\t${M}\t${N}\t${K}\t${sc}\tMISSING\t-\t-\t" >> "$SUMMARY"; return; }
+  echo "==== $cid device=$dev ===="
+  [ -d "$srcdir" ] || { append_summary "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tMISSING\t-\t-\t' "$api" "$cid" "$ARCH" "$dtype" "$M" "$N" "$K" "$sc")"; return; }
   rm -rf "$work"; mkdir -p "$work/build" "$work/input" "$work/output"
   cp -a "$srcdir"/. "$work/"
   find "$work" -name '*.asc' -print0 | xargs -0 sed -i \
     -e 's|Mmad\*/Fixpipe\*/LoadData\*|Mmad/Fixpipe/LoadData|g' \
-    -e 's/ceil_div(/ceil_division(/g' 2>/dev/null || true
+    -e 's/ceil_div(/ceil_division(/g' \
+    -e "s/int32_t deviceId = 0;/int32_t deviceId = ${dev};/g" 2>/dev/null || true
   cd "$work"
   glog="$work/gendata.log"; blog="$work/build.log"; rlog="$work/run.log"; vlog="$work/verify.log"
   set +e
@@ -176,7 +187,7 @@ run_one() {
   set -e
   if [ "$grc" -ne 0 ] || ! ls ./input/* >/dev/null 2>&1; then
     err=$(grep -m1 -E 'Error|ModuleNotFound|Traceback' "$glog" | tr '\t' ' ' | cut -c1-80 || true)
-    echo -e "${api}\t${cid}\t${ARCH}\t${dtype}\t${M}\t${N}\t${K}\t${sc}\tGENDATA_FAIL\t-\t-\t${err}" >> "$SUMMARY"
+    append_summary "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tGENDATA_FAIL\t-\t-\t%s' "$api" "$cid" "$ARCH" "$dtype" "$M" "$N" "$K" "$sc" "$err")"
     return
   fi
   cd "$work/build"
@@ -185,11 +196,11 @@ run_one() {
     -DCASE_M="$M" -DCASE_N="$N" -DCASE_K="$K" \
     -DCMAKE_CXX_COMPILER="$CXX" -DCMAKE_C_COMPILER="${CC:-$CXX}" \
     -DCMAKE_ASC_FLAGS="$ASC_FLAGS" .. >"$blog" 2>&1
-  cmake --build . -j8 >>"$blog" 2>&1
+  cmake --build . -j"${CMAKE_JOBS}" >>"$blog" 2>&1
   set -e
   if [ ! -x ./demo ]; then
     err=$(grep -m1 -E 'error:|FATAL_ERROR' "$blog" | tr '\t' ' ' | cut -c1-80 || true)
-    echo -e "${api}\t${cid}\t${ARCH}\t${dtype}\t${M}\t${N}\t${K}\t${sc}\tBUILD_FAIL\t-\t-\t${err}" >> "$SUMMARY"
+    append_summary "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tBUILD_FAIL\t-\t-\t%s' "$api" "$cid" "$ARCH" "$dtype" "$M" "$N" "$K" "$sc" "$err")"
     return
   fi
   cd "$work"; rm -f ./output/output.bin
@@ -197,7 +208,7 @@ run_one() {
   for _try in 1 2 3; do
     set +e; ./build/demo >"$rlog" 2>&1; rrc=$?; set -e
     if [ "$rrc" -ne 0 ] || [ ! -f ./output/output.bin ]; then
-      echo -e "${api}\t${cid}\t${ARCH}\t${dtype}\t${M}\t${N}\t${K}\t${sc}\tPASS\tRUN_FAIL\t-\texit=$rrc" >> "$SUMMARY"
+      append_summary "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tPASS\tRUN_FAIL\t-\texit=%s' "$api" "$cid" "$ARCH" "$dtype" "$M" "$N" "$K" "$sc" "$rrc")"
       echo "DONE $cid run=FAIL"
       return
     fi
@@ -215,8 +226,8 @@ run_one() {
       break
     fi
   done
-  echo -e "${api}\t${cid}\t${ARCH}\t${dtype}\t${M}\t${N}\t${K}\t${sc}\tPASS\tPASS\t${vstr}\t" >> "$SUMMARY"
-  echo "DONE $cid verify=$vstr"
+  append_summary "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tPASS\tPASS\t%s\t' "$api" "$cid" "$ARCH" "$dtype" "$M" "$N" "$K" "$sc" "$vstr")"
+  echo "DONE $cid device=$dev verify=$vstr"
 }
 
 "$PY" - "$JSONL" "$SMOKE" "$ARCH" "$RUNROOT/selected.jsonl" <<'PY'
@@ -267,10 +278,19 @@ outp.write_text("".join(json.dumps(x) + "\n" for x in sel), encoding="utf-8")
 print("SELECTED", len(sel), "smoke" if smoke else "full")
 PY
 SEL="$RUNROOT/selected.jsonl"
+DEVICES="${DEVICES:-}"
+if [ -n "$DEVICES" ]; then
+  CMAKE_JOBS="${PARALLEL_CMAKE_JOBS:-2}"
+else
+  CMAKE_JOBS="${CMAKE_JOBS:-8}"
+fi
 
-while IFS=$'\t' read -r api cid dtype M N K sc; do
-  run_one "$api" "$cid" "$dtype" "$M" "$N" "$K" "$sc"
-done < <("$PY" -c '
+run_list() {
+  local list="$1"
+  while IFS=$'\t' read -r api cid dtype M N K sc; do
+    [ -n "${api:-}" ] || continue
+    run_one "$api" "$cid" "$dtype" "$M" "$N" "$K" "$sc"
+  done < <("$PY" -c '
 import json,sys
 from pathlib import Path
 for ln in Path(sys.argv[1]).read_text(encoding="utf-8").splitlines():
@@ -278,7 +298,49 @@ for ln in Path(sys.argv[1]).read_text(encoding="utf-8").splitlines():
         continue
     r=json.loads(ln)
     print("\t".join([r["api"], r["case_id"], r["dtype"], str(r["M"]), str(r["N"]), str(r["K"]), str(r["scenario"])]))
-' "$SEL")
+' "$list")
+}
+
+if [ -n "$DEVICES" ]; then
+  "$PY" - "$SEL" "$RUNROOT" "$DEVICES" <<'PY'
+import json, sys
+from pathlib import Path
+sel, root, devices = Path(sys.argv[1]), Path(sys.argv[2]), [d.strip() for d in sys.argv[3].split(",") if d.strip()]
+rows = [ln for ln in sel.read_text(encoding="utf-8").splitlines() if ln.strip()]
+n = len(devices)
+for i, dev in enumerate(devices):
+    chunk = rows[i::n]
+    p = root / f"shard_{dev}.jsonl"
+    p.write_text("".join(x + "\n" for x in chunk), encoding="utf-8")
+    print(f"SHARD device={dev} n={len(chunk)} file={p}")
+PY
+  pids=()
+  IFS=',' read -r -a DEVS <<< "$DEVICES"
+  for dev in "${DEVS[@]}"; do
+    dev="${dev// /}"
+    [ -n "$dev" ] || continue
+    (
+      export ASCEND_DEVICE_ID="$dev"
+      echo "WORKER start device=$dev"
+      run_list "$RUNROOT/shard_${dev}.jsonl"
+      echo "WORKER done device=$dev"
+    ) >"$RUNROOT/worker_${dev}.log" 2>&1 &
+    pids+=("$!")
+  done
+  echo "PARALLEL devices=$DEVICES pids=${pids[*]} cmake_jobs=$CMAKE_JOBS"
+  failw=0
+  for pid in "${pids[@]}"; do
+    if ! wait "$pid"; then failw=$((failw + 1)); fi
+  done
+  echo "PARALLEL wait done fail_workers=$failw"
+  for f in "$RUNROOT"/worker_*.log; do
+    [ -f "$f" ] || continue
+    echo "----- $(basename "$f") tail -----"
+    tail -n 8 "$f" || true
+  done
+else
+  run_list "$SEL"
+fi
 
 "$PY" - <<PY
 from pathlib import Path
