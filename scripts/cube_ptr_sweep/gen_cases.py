@@ -134,11 +134,15 @@ def fixpipe_pool() -> list[dict]:
     return rows
 
 
-def stamp(rows: list[dict], api: str) -> list[dict]:
+def stamp(rows: list[dict], api: str, start: int = 1) -> list[dict]:
     out = []
-    for i, r in enumerate(rows, 1):
+    for i, r in enumerate(rows, start):
         item = dict(r)
-        item["case_id"] = f"{api}_{i:03d}_{item['dtype']}_m{item['M']}n{item['N']}k{item['K']}_s{item['scenario']}"
+        # load_data case_id uses scenario field; prefer 2201 for id stability when both exist
+        sc = item.get("scenario")
+        if item["api"] == "load_data" or api == "load_data":
+            sc = item.get("scenario_2201", item.get("scenario_3510", sc))
+        item["case_id"] = f"{api}_{i:03d}_{item['dtype']}_m{item['M']}n{item['N']}k{item['K']}_s{sc}"
         out.append(item)
     return out
 
@@ -149,7 +153,15 @@ def main() -> None:
     counts = {}
     for api, pool_fn in (("mmad", mmad_pool), ("load_data", loaddata_pool), ("fixpipe", fixpipe_pool)):
         pool = pool_fn()
-        chosen = stamp(pick(pool, PER_API, rng), api)
+        # 主集：arch=any，保证 910B/950 都能跑满 PER_API
+        pool_any = [r for r in pool if r.get("arch", "any") == "any"]
+        chosen = stamp(pick(pool_any, PER_API, rng), api)
+        # 910B 专属 extras（如 int4），不挤占主集名额
+        pool_2201 = [r for r in pool if r.get("arch") == "dav-2201"]
+        if pool_2201:
+            n_extra = min(40, len(pool_2201))
+            extras = stamp(pick(pool_2201, n_extra, rng), api, start=len(chosen) + 1)
+            chosen.extend(extras)
         counts[api] = len(chosen)
         selected.extend(chosen)
 
@@ -160,7 +172,7 @@ def main() -> None:
 
     md = ["# CUBE ptr sweep cases", "", f"- seed: `{SEED}`", f"- dims: `{list(DIMS)}`", ""]
     for api, n in counts.items():
-        md.append(f"- **{api}**: {n}")
+        md.append(f"- **{api}**: {n} (200 arch=any + optional 910B-only extras)")
     md.append("")
     md.append("Full table: `cases.jsonl` (one JSON object per line).")
     (OUT_DIR / "CASES.md").write_text("\n".join(md) + "\n", encoding="utf-8")
