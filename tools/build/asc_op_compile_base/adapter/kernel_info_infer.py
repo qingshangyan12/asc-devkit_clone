@@ -162,7 +162,14 @@ processed as numeric variables in the precompilation phase. please use numeric c
 
     @staticmethod
     def get_kernel_type_enum(kernel_type, compile_log_path):
-        if CommonUtility.is_v220() or CommonUtility.is_c310():
+        if any(
+            (
+                CommonUtility.is_v220(),
+                CommonUtility.is_c310(),
+                CommonUtility.is_920r1(),
+                CommonUtility.is_920r2(),
+            )
+        ):
             if kernel_type in STR_TO_KERNEL_TYPE_V220.keys():
                 return STR_TO_KERNEL_TYPE_V220[kernel_type]
             else:
@@ -198,7 +205,14 @@ processed as numeric variables in the precompilation phase. please use numeric c
 
     @staticmethod
     def get_kernel_type_enum_for_group(kernel_type):
-        if CommonUtility.is_v220() or CommonUtility.is_c310():
+        if any(
+            (
+                CommonUtility.is_v220(),
+                CommonUtility.is_c310(),
+                CommonUtility.is_920r1(),
+                CommonUtility.is_920r2(),
+            )
+        ):
             if kernel_type in STR_TO_KERNEL_TYPE_V220.keys():
                 return STR_TO_KERNEL_TYPE_V220[kernel_type]
             elif kernel_type in STR_TO_KERNEL_TYPE_V200.keys():
@@ -421,7 +435,12 @@ REGISTER_TILING_DEFAULT"
         tiling_struct_expr_map = {}
         register_tiling_struct = set()
         tpl_tiling_struct = set()
-        if not (CommonUtility.is_v220() or CommonUtility.is_c310()):
+        if not (
+            CommonUtility.is_v220()
+            or CommonUtility.is_c310()
+            or CommonUtility.is_920r1()
+            or CommonUtility.is_920r2()
+        ):
             code_channel = CORE_TYPE_MIX
         if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
             check_exist_instrinsic_when_super_kernel(dst_i_file)
@@ -791,7 +810,14 @@ REGISTER_TILING_DEFAULT"
         )
         chip_version = CommonUtility.get_chip_version()
         # generate .i file
-        if CommonUtility.is_v220() or CommonUtility.is_c310():
+        if any(
+            (
+                CommonUtility.is_v220(),
+                CommonUtility.is_c310(),
+                CommonUtility.is_920r1(),
+                CommonUtility.is_920r2(),
+            )
+        ):
             arch = f"dav-{chip_version}-cube"
             dis_i_file_cube = dst_i_file[:-2] + "_cube" + dst_i_file[-2:]
             pre_compile_cmd = gen_compile_cmd_v220(

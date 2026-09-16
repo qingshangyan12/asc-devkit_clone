@@ -515,7 +515,10 @@ def _gen_kernel_func_declare_head_with_workspace(
             super_kernel_params.append("workspace")
         else:
             func_params.append("GM_ADDR workspace")
-            func_params.append("GM_ADDR tiling")
+            if CommonUtility.is_920r1() or CommonUtility.is_920r2():
+                func_params.append("GM_ADDR __early_read_before_pre_task_done__ tiling")
+            else:
+                func_params.append("GM_ADDR tiling")
             super_kernel_params.append("workspace")
             super_kernel_params.append("tiling")
             dfx_generator.insert_param(DFXArgInfo("tiling", DFXParamType.TILING))
@@ -534,7 +537,10 @@ def _gen_kernel_func_declare_head(
     func_params = []
     super_kernel_params = []
     needs_ffts = (is_mix or is_single_and_using_hard_sync) and not (
-        CommonUtility.is_c310() or CommonUtility.is_m510()
+        CommonUtility.is_c310()
+        or CommonUtility.is_920r1()
+        or CommonUtility.is_920r2()
+        or CommonUtility.is_m510()
     )
     workspace_idx = 0
     if needs_ffts:
@@ -627,6 +633,9 @@ def _gen_kernel_func_declare_head(
         source += ", ".join(func_params) + ") {\n"
         called_func_params_type = ", ".join(func_params)
         called_func_params = called_func_params_type.replace("GM_ADDR ", "")
+        called_func_params = called_func_params.replace(
+            "__early_read_before_pre_task_done__ ", ""
+        )
     return source, workspace_idx, called_func_params, called_func_params_type
 
 
@@ -657,9 +666,9 @@ def _gen_set_workspace_codes(
             opinfo, tiling_info, source, compile_options, compile_info
         )
 
-    needs_ffts = (
-        is_mix or is_single_and_using_hard_sync
-    ) and not CommonUtility.is_c310()
+    needs_ffts = (is_mix or is_single_and_using_hard_sync) and not (
+        CommonUtility.is_c310() or CommonUtility.is_920r1() or CommonUtility.is_920r2()
+    )
     # set ffts_addr for ascend910b mix op or is_single_and_using_hard_sync scene
     if needs_ffts:
         source += "    icache_preload(1);\n"
@@ -672,7 +681,10 @@ def _gen_set_workspace_codes(
         source += "do {\n"
 
     # is_single_and_using_hard_sync scene not need clear workspace
-    if is_mix and (not CommonUtility.is_c310()):  # c310 doesn't need clearWorkspace
+    # c310/920r1/920r2 do not need clearWorkspace
+    if is_mix and not (
+        CommonUtility.is_c310() or CommonUtility.is_920r1() or CommonUtility.is_920r2()
+    ):
         source += f"#ifdef {MIX_CORE_MACRO} \n"
         source += "    if constexpr (g_coreType == AscendC::AIC) {\n"
         source += "        matmul::clearWorkspace(workspace);\n"
@@ -973,7 +985,10 @@ def gen_kernel_fun(
         source += "    AscendC::WriteBackOverflow(overflowStatus);\n"
 
     if not global_var_storage.get_variable("ascendc_enable_super_kernel") and (
-        CommonUtility.is_c310() or CommonUtility.is_m510()
+        CommonUtility.is_c310()
+        or CommonUtility.is_920r1()
+        or CommonUtility.is_920r2()
+        or CommonUtility.is_m510()
     ):
         check_custom_dcci_end_false(compile_option_tuple)
 
@@ -1021,7 +1036,14 @@ def gen_kernel_fun_with_tiling_key_slave(
     source_declare: str,
 ):
     source = ""
-    if CommonUtility.is_v220() or CommonUtility.is_c310():
+    if any(
+        (
+            CommonUtility.is_v220(),
+            CommonUtility.is_c310(),
+            CommonUtility.is_920r1(),
+            CommonUtility.is_920r2(),
+        )
+    ):
         chip_version = CommonUtility.get_chip_version().upper()
         cube_core_type = f"__DAV_{chip_version}_CUBE__"
         vec_core_type = f"__DAV_{chip_version}_VEC__"
@@ -1459,7 +1481,7 @@ def gen_op_stub_kernel_func(
         kernel_meta_dir, op_info.kernel_name + file_name_tag
     )
 
-    if CommonUtility.is_c310():
+    if CommonUtility.is_c310() or CommonUtility.is_920r1() or CommonUtility.is_920r2():
         gen_meta_info_section(compile_info, op_info)
     workspace_idx = gen_kernel_fun(
         compile_info,
@@ -1534,7 +1556,14 @@ def compile_kernel_and_meta(
 
     DFXSectionGenerator().generate_dfx_binary(compile_info, op_info, tiling_info)
 
-    if CommonUtility.is_v220() or CommonUtility.is_c310():
+    if any(
+        (
+            CommonUtility.is_v220(),
+            CommonUtility.is_c310(),
+            CommonUtility.is_920r1(),
+            CommonUtility.is_920r2(),
+        )
+    ):
         if compile_info.no_set_kernel_type is True:
             _compile_ascendc_cce_v220(compile_info, compile_option_tuple, tiling_info)
         else:
@@ -1567,7 +1596,14 @@ def compile_kernel_and_meta(
             compile_info, tiling_info, tiling_key_struct_size_map
         )
         chip_version = CommonUtility.get_chip_version()
-        if CommonUtility.is_c310() or CommonUtility.is_v220():
+        if any(
+            (
+                CommonUtility.is_v220(),
+                CommonUtility.is_c310(),
+                CommonUtility.is_920r1(),
+                CommonUtility.is_920r2(),
+            )
+        ):
             arch = f"dav-{chip_version}-vec"
         else:
             arch = f"dav-{chip_version}"
@@ -2170,7 +2206,12 @@ def compile_op(
         [] if compile_options is None else compile_options, []
     )
     need_impl_mode_macro = (
-        (CommonUtility.is_c310() or CommonUtility.is_m510())
+        (
+            CommonUtility.is_c310()
+            or CommonUtility.is_920r1()
+            or CommonUtility.is_920r2()
+            or CommonUtility.is_m510()
+        )
         and isinstance(op_info.impl_mode, str)
         and op_info.impl_mode != ""
     )
@@ -2278,7 +2319,12 @@ def compile_op_with_customized_config(
         [] if compile_options is None else compile_options, []
     )
     need_impl_mode_macro = (
-        (CommonUtility.is_c310() or CommonUtility.is_m510())
+        (
+            CommonUtility.is_c310()
+            or CommonUtility.is_920r1()
+            or CommonUtility.is_920r2()
+            or CommonUtility.is_m510()
+        )
         and isinstance(op_info.impl_mode, str)
         and op_info.impl_mode != ""
     )
