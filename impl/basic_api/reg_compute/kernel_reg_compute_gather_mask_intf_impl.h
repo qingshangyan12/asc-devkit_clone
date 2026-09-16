@@ -42,6 +42,7 @@ namespace Reg {
 #if !(                       \
     defined(__NPU_ARCH__) && \
     (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163))
+// Kirin v516 平台不支持如下历史接口
 template <SpecialPurposeReg spr>
 __aicore__ inline int64_t GetSpr()
 {
