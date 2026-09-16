@@ -280,16 +280,13 @@ run_case() {
   vstr=SKIP
   if [ -f scripts/verify_result.py ]; then
     set +e
-    # 兼容两种写法：
-    # 1) argparse/ -scenarioNum FLAG
-    # 2) 位置参数 output golden scenarioNum (argv[3])
-    if grep -qE 'add_argument.*scenarioNum|ArgumentParser' scripts/verify_result.py 2>/dev/null; then
+    # 1) 显式 -scenarioNum / add_argument scenarioNum
+    # 2) 位置参数 output golden scenario (argv[3])
+    # 3) 仅 output golden（含 argparse 无 scenario）
+    if grep -qE 'add_argument\(.*scenarioNum|\"-scenarioNum\"|'\''-scenarioNum'\''' scripts/verify_result.py 2>/dev/null; then
       $PY scripts/verify_result.py -scenarioNum "$scenario" ./output/output.bin ./output/golden.bin >"$vlog" 2>&1
     elif grep -q 'sys.argv\[3\]' scripts/verify_result.py 2>/dev/null; then
       $PY scripts/verify_result.py ./output/output.bin ./output/golden.bin "$scenario" >"$vlog" 2>&1
-    elif grep -q 'scenarioNum' scripts/verify_result.py 2>/dev/null; then
-      $PY scripts/verify_result.py -scenarioNum "$scenario" ./output/output.bin ./output/golden.bin >"$vlog" 2>&1 \
-        || $PY scripts/verify_result.py ./output/output.bin ./output/golden.bin "$scenario" >"$vlog" 2>&1
     else
       $PY scripts/verify_result.py ./output/output.bin ./output/golden.bin >"$vlog" 2>&1
     fi
