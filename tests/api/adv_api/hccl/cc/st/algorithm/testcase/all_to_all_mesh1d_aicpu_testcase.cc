@@ -53,6 +53,20 @@ TopoInfoWithNetLayerDetails MakeConcurrentTopo(u32 rankSize = 4U)
     return topo;
 }
 
+TopoInfoWithNetLayerDetails MakeMesh1DTopo(u32 rankSize = 4U)
+{
+    TopoInfoWithNetLayerDetails topo{};
+    topo.userRank = 0U;
+    topo.userRankSize = rankSize;
+    topo.serverNum = 1U;
+    topo.level0Topo = Level0Shape::MESH_1D;
+    topo.topoLevelNums = 1U;
+    topo.level0PcieMix = false;
+    topo.topoInstDetailsOfLayer.resize(1U);
+    topo.topoInstDetailsOfLayer[0].rankNumForTopoType[COMM_TOPO_1DMESH] = {rankSize};
+    return topo;
+}
+
 std::vector<HcclChannelDesc> MakeMultiJettyChannels(u32 rankSize, u32 channelsPerRank)
 {
     std::vector<HcclChannelDesc> channels;
@@ -91,7 +105,7 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_collectives_use_expected_cann_brid
 TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, execute_selector_uses_local_devkit_for_allreduce)
 {
     ExecuteSelector selector;
-    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
+    TopoInfoWithNetLayerDetails topo = MakeMesh1DTopo();
     OpParam param = MakeAicpuParam(HCCL_CMD_ALLREDUCE);
     std::string algName;
 
