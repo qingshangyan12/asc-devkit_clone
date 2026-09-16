@@ -443,7 +443,7 @@ __aicore__ inline void ReduceSumCounterMode(
     if constexpr (shapeScope <= oneRepSize) {
         ReduceSumCount(dstLocal, srcLocal, count, 1, srcRepStride);
         return;
-    } 
+    }
     uint32_t curCount = CeilDivision(count, oneRepSize);
     ReduceSumCount(workLocal, srcLocal, count, curCount, srcRepStride);
     Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();

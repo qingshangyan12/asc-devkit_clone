@@ -22,8 +22,8 @@
 
 #ifndef ASCENDC_MODULE_OPERATOR_MACRO_BASE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_MACRO_BASE_IMPL_H
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5162 || \
+                              __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 #include "../../include/basic_api/kernel_tensor.h"
 #include "kernel_npu_debug.h"
 #include "kernel_operator_macro_check.h"
@@ -150,7 +150,8 @@ __aicore__ inline void ConvFixImpl(
     const Hardware biasScope = GetPhyType((TPosition)bias.GetPosition());
     if (biasScope != Hardware::L0C && biasScope != Hardware::BIAS) {
         ASCENDC_ASSERT((false), {
-            KERNEL_LOG(KERNEL_ERROR, "Failed to check bias tensor position in ConvFix, supported positions are CO1 or C2");
+            KERNEL_LOG(
+                KERNEL_ERROR, "Failed to check bias tensor position in ConvFix, supported positions are CO1 or C2");
         });
     }
     ConvFixCal(
@@ -166,7 +167,8 @@ __aicore__ inline void ConvFixImpl(
     const Hardware biasScope = GetPhyType((TPosition)bias.GetPosition());
     if (biasScope != Hardware::L0C && biasScope != Hardware::BIAS) {
         ASCENDC_ASSERT((false), {
-            KERNEL_LOG(KERNEL_ERROR, "Failed to check bias tensor position in ConvFix, supported positions are CO1 or C2");
+            KERNEL_LOG(
+                KERNEL_ERROR, "Failed to check bias tensor position in ConvFix, supported positions are CO1 or C2");
         });
     }
     ConvFixCal(
