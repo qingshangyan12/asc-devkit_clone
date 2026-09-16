@@ -1,12 +1,12 @@
 # Ascend910B3 CUBE self-test matrix
 
-- HEAD: 2db0ea1db
+- HEAD: 3df356ec2
 - ARCH: dav-2201
-- STAMP: 20260916_133003
+- STAMP: 20260916_134216
 - MODE: full
 
-- verify PASS: **48**
-- FAIL: 1
+- verify PASS: **49**
+- FAIL: 0
 
 | case | scenario | arch | build | run | verify | note |
 |---|---|---|---|---|---|---|
@@ -16,7 +16,7 @@
 | mmad | 4 | dav-2201 | PASS | PASS | PASS | s4 |
 | mmad | 1 | dav-2201 | PASS | PASS | PASS | s1_m16n16k32 |
 | mmad | 1 | dav-2201 | PASS | PASS | PASS | s1_m64n64k64 |
-| mmad | 2 | dav-2201 | PASS | PASS | FAIL | s2_m16n16k32 |
+| mmad | 2 | dav-2201 | PASS | PASS | PASS | s2_m32n32k64 |
 | mmad | 2 | dav-2201 | PASS | PASS | PASS | s2_m48n32k64 |
 | mmad | 3 | dav-2201 | PASS | PASS | PASS | s3_m16n16k32 |
 | mmad | 4 | dav-2201 | PASS | PASS | PASS | s4_m16n16k32 |

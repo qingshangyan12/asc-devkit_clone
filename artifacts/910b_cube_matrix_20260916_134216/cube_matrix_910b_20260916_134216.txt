@@ -1,0 +1,171 @@
+=== CUBE 910B matrix START 2026-09-16T13:42:16+00:00 ===
+WS=/home/Temp_room/wj_cub_cube_ptr BRANCH=feature/cube-basic-api-pointerization STAMP=20260916_134216 ARCH=dav-2201 DEVICE=7 MODE=full DEMO_TIMEOUT=90
+ASCEND_HOME_PATH=/home/Temp_room/wj_cub_cube_ptr/cann_local CXX=/home/Temp_room/te_npu_30/tools/bin/g++
+From https://gitcode.com/baibai_Uu/asc-devkit
+ * branch                feature/cube-basic-api-pointerization -> FETCH_HEAD
+Your branch is up to date with 'origin/feature/cube-basic-api-pointerization'.
+HEAD is now at 3df356ec2 Add Ascend910B3 CUBE matrix 20260916_133003 MODE=full INCOMPLETE
+REPO_HEAD=3df356ec2 @ /home/Temp_room/wj_cub_cube_ptr/helper_repo
+TEST_HEAD=3df356ec2
+OVERLAY_OK SYNC_SMOKE=0
+CASE_COUNT=49 MODE=full SYNC_SMOKE=0
+==== RUN mmad s1 ====
+DONE mmad s1 verify=PASS
+==== RUN mmad s2 ====
+DONE mmad s2 verify=PASS
+==== RUN mmad s3 ====
+DONE mmad s3 verify=PASS
+==== RUN mmad s4 ====
+DONE mmad s4 verify=PASS
+==== RUN mmad s1_m16n16k32 ====
+DONE mmad s1_m16n16k32 verify=PASS
+==== RUN mmad s1_m64n64k64 ====
+DONE mmad s1_m64n64k64 verify=PASS
+==== RUN mmad s2_m32n32k64 ====
+DONE mmad s2_m32n32k64 verify=PASS
+==== RUN mmad s2_m48n32k64 ====
+DONE mmad s2_m48n32k64 verify=PASS
+==== RUN mmad s3_m16n16k32 ====
+DONE mmad s3_m16n16k32 verify=PASS
+==== RUN mmad s4_m16n16k32 ====
+DONE mmad s4_m16n16k32 verify=PASS
+==== RUN fixpipe_l0c2gm s1 ====
+DONE fixpipe_l0c2gm s1 verify=PASS
+==== RUN fixpipe_l0c2gm s2 ====
+DONE fixpipe_l0c2gm s2 verify=PASS
+==== RUN fixpipe_l0c2gm s4 ====
+DONE fixpipe_l0c2gm s4 verify=PASS
+==== RUN fixpipe_l0c2gm s5 ====
+DONE fixpipe_l0c2gm s5 verify=PASS
+==== RUN fixpipe_l0c2gm s6 ====
+DONE fixpipe_l0c2gm s6 verify=PASS
+==== RUN fixpipe_l0c2gm s7 ====
+DONE fixpipe_l0c2gm s7 verify=PASS
+==== RUN fixpipe_l0c2gm s1_m64n64k64 ====
+DONE fixpipe_l0c2gm s1_m64n64k64 verify=PASS
+==== RUN fixpipe_l0c2gm s2_m64n64k64 ====
+DONE fixpipe_l0c2gm s2_m64n64k64 verify=PASS
+==== RUN load_data_l12l0 s1 ====
+DONE load_data_l12l0 s1 verify=PASS
+==== RUN load_data_l12l0 s2 ====
+DONE load_data_l12l0 s2 verify=PASS
+==== RUN load_data_l12l0 s3 ====
+DONE load_data_l12l0 s3 verify=PASS
+==== RUN load_data_l12l0 s4 ====
+DONE load_data_l12l0 s4 verify=PASS
+==== RUN load_data_l12l0 s5 ====
+DONE load_data_l12l0 s5 verify=PASS
+==== RUN load_data_l12l0 s6 ====
+DONE load_data_l12l0 s6 verify=PASS
+==== RUN load_data_l12l0 s7 ====
+DONE load_data_l12l0 s7 verify=PASS
+==== RUN load_data_l12l0 s8 ====
+DONE load_data_l12l0 s8 verify=PASS
+==== RUN load_data_l12l0 s9 ====
+DONE load_data_l12l0 s9 verify=PASS
+==== RUN load_data_l12l0 s10 ====
+DONE load_data_l12l0 s10 verify=PASS
+==== RUN load_data_l12l0 s11 ====
+DONE load_data_l12l0 s11 verify=PASS
+==== RUN load_data_l12l0 s12 ====
+DONE load_data_l12l0 s12 verify=PASS
+==== RUN load_data_l12l0 s13 ====
+DONE load_data_l12l0 s13 verify=PASS
+==== RUN load_data_l12l0 s14 ====
+DONE load_data_l12l0 s14 verify=PASS
+==== RUN load_data_l12l0 s1_m16n16k32 ====
+DONE load_data_l12l0 s1_m16n16k32 verify=PASS
+==== RUN load_data_l12l0 s1_m64n48k64 ====
+DONE load_data_l12l0 s1_m64n48k64 verify=PASS
+==== RUN load_data_l12l0 s6_m16n16k32 ====
+DONE load_data_l12l0 s6_m16n16k32 verify=PASS
+==== RUN load_data_l12l0 s11_m32n32k64 ====
+DONE load_data_l12l0 s11_m32n32k64 verify=PASS
+==== RUN fixpipe_l0c2l1 s1 ====
+DONE fixpipe_l0c2l1 s1 verify=PASS
+==== RUN fixpipe_l0c2l1 s2 ====
+DONE fixpipe_l0c2l1 s2 verify=PASS
+==== RUN fixpipe_l0c2l1 s3 ====
+DONE fixpipe_l0c2l1 s3 verify=PASS
+==== RUN fixpipe_l0c2l1 s4 ====
+DONE fixpipe_l0c2l1 s4 verify=PASS
+==== RUN mmad_load3dv2 s1 ====
+DONE mmad_load3dv2 s1 verify=PASS
+==== RUN mmad_load3dv2 s2 ====
+DONE mmad_load3dv2 s2 verify=PASS
+==== RUN mmad_load3dv2 s3 ====
+DONE mmad_load3dv2 s3 verify=PASS
+==== RUN mmad_load3dv2 s4 ====
+DONE mmad_load3dv2 s4 verify=PASS
+==== RUN mmad_load3dv2 s5 ====
+DONE mmad_load3dv2 s5 verify=PASS
+==== RUN batch_matmul s1 ====
+DONE batch_matmul s1 verify=PASS
+==== RUN mmad_gemv s1 ====
+DONE mmad_gemv s1 verify=PASS
+==== RUN mmad_unitflag s1 ====
+DONE mmad_unitflag s1 verify=PASS
+==== RUN mmad_with_sparse s1 ====
+DONE mmad_with_sparse s1 verify=PASS
+# Ascend910B3 CUBE self-test matrix
+
+- HEAD: 3df356ec2
+- ARCH: dav-2201
+- STAMP: 20260916_134216
+- MODE: full
+
+- verify PASS: **49**
+- FAIL: 0
+
+| case | scenario | arch | build | run | verify | note |
+|---|---|---|---|---|---|---|
+| mmad | 1 | dav-2201 | PASS | PASS | PASS | s1 |
+| mmad | 2 | dav-2201 | PASS | PASS | PASS | s2 |
+| mmad | 3 | dav-2201 | PASS | PASS | PASS | s3 |
+| mmad | 4 | dav-2201 | PASS | PASS | PASS | s4 |
+| mmad | 1 | dav-2201 | PASS | PASS | PASS | s1_m16n16k32 |
+| mmad | 1 | dav-2201 | PASS | PASS | PASS | s1_m64n64k64 |
+| mmad | 2 | dav-2201 | PASS | PASS | PASS | s2_m32n32k64 |
+| mmad | 2 | dav-2201 | PASS | PASS | PASS | s2_m48n32k64 |
+| mmad | 3 | dav-2201 | PASS | PASS | PASS | s3_m16n16k32 |
+| mmad | 4 | dav-2201 | PASS | PASS | PASS | s4_m16n16k32 |
+| fixpipe_l0c2gm | 1 | dav-2201 | PASS | PASS | PASS | s1 |
+| fixpipe_l0c2gm | 2 | dav-2201 | PASS | PASS | PASS | s2 |
+| fixpipe_l0c2gm | 4 | dav-2201 | PASS | PASS | PASS | s4 |
+| fixpipe_l0c2gm | 5 | dav-2201 | PASS | PASS | PASS | s5 |
+| fixpipe_l0c2gm | 6 | dav-2201 | PASS | PASS | PASS | s6 |
+| fixpipe_l0c2gm | 7 | dav-2201 | PASS | PASS | PASS | s7 |
+| fixpipe_l0c2gm | 1 | dav-2201 | PASS | PASS | PASS | s1_m64n64k64 |
+| fixpipe_l0c2gm | 2 | dav-2201 | PASS | PASS | PASS | s2_m64n64k64 |
+| load_data_l12l0 | 1 | dav-2201 | PASS | PASS | PASS | s1 |
+| load_data_l12l0 | 2 | dav-2201 | PASS | PASS | PASS | s2 |
+| load_data_l12l0 | 3 | dav-2201 | PASS | PASS | PASS | s3 |
+| load_data_l12l0 | 4 | dav-2201 | PASS | PASS | PASS | s4 |
+| load_data_l12l0 | 5 | dav-2201 | PASS | PASS | PASS | s5 |
+| load_data_l12l0 | 6 | dav-2201 | PASS | PASS | PASS | s6 |
+| load_data_l12l0 | 7 | dav-2201 | PASS | PASS | PASS | s7 |
+| load_data_l12l0 | 8 | dav-2201 | PASS | PASS | PASS | s8 |
+| load_data_l12l0 | 9 | dav-2201 | PASS | PASS | PASS | s9 |
+| load_data_l12l0 | 10 | dav-2201 | PASS | PASS | PASS | s10 |
+| load_data_l12l0 | 11 | dav-2201 | PASS | PASS | PASS | s11 |
+| load_data_l12l0 | 12 | dav-2201 | PASS | PASS | PASS | s12 |
+| load_data_l12l0 | 13 | dav-2201 | PASS | PASS | PASS | s13 |
+| load_data_l12l0 | 14 | dav-2201 | PASS | PASS | PASS | s14 |
+| load_data_l12l0 | 1 | dav-2201 | PASS | PASS | PASS | s1_m16n16k32 |
+| load_data_l12l0 | 1 | dav-2201 | PASS | PASS | PASS | s1_m64n48k64 |
+| load_data_l12l0 | 6 | dav-2201 | PASS | PASS | PASS | s6_m16n16k32 |
+| load_data_l12l0 | 11 | dav-2201 | PASS | PASS | PASS | s11_m32n32k64 |
+| fixpipe_l0c2l1 | 1 | dav-2201 | PASS | PASS | PASS | s1 |
+| fixpipe_l0c2l1 | 2 | dav-2201 | PASS | PASS | PASS | s2 |
+| fixpipe_l0c2l1 | 3 | dav-2201 | PASS | PASS | PASS | s3 |
+| fixpipe_l0c2l1 | 4 | dav-2201 | PASS | PASS | PASS | s4 |
+| mmad_load3dv2 | 1 | dav-2201 | PASS | PASS | PASS | s1 |
+| mmad_load3dv2 | 2 | dav-2201 | PASS | PASS | PASS | s2 |
+| mmad_load3dv2 | 3 | dav-2201 | PASS | PASS | PASS | s3 |
+| mmad_load3dv2 | 4 | dav-2201 | PASS | PASS | PASS | s4 |
+| mmad_load3dv2 | 5 | dav-2201 | PASS | PASS | PASS | s5 |
+| batch_matmul | 1 | dav-2201 | PASS | PASS | PASS | s1 |
+| mmad_gemv | 1 | dav-2201 | PASS | PASS | PASS | s1 |
+| mmad_unitflag | 1 | dav-2201 | PASS | PASS | PASS | s1 |
+| mmad_with_sparse | 1 | dav-2201 | PASS | PASS | PASS | s1 |
+bad_rows 0
