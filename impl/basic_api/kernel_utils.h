@@ -36,7 +36,9 @@
 #include "../utils/debug/asc_aicore_printf_impl.h"
 #endif
 
+#if __has_include("../utils/base/helpers_impl.h")
 #include "../utils/base/helpers_impl.h"
+#endif
 #include "../../include/basic_api/kernel_struct_data_copy.h"
 #include "kernel_scalar_convert.h"
 #include "kernel_utils_base.h"

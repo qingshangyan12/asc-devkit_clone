@@ -140,7 +140,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_nop()
 {
 #pragma unroll 8
     for (uint32_t i = 0; i < count; ++i) {
-        __nop();
+        // 9.1/9.2 编译器无 __nop 内建，与 CANN 原装实现保持一致（跳过 15 cycle）
+        asm volatile("NOP wait:0b0000000 stall:15" ::);
     }
 }
 

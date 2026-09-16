@@ -85,6 +85,13 @@ __aicore__ inline void DataCopy(__ubuf__ T* dst, __cbuf__ T* src, const DataCopy
     DataCopyL12UBImpl<PrimType, 0>((__ubuf__ PrimType*)dst, (__cbuf__ PrimType*)src, repeatParams);
 }
 
+/* DataCopy: L1 -> BT, DataCopyParams, mixed types (44 条清单 #16) */
+template <typename T, typename U>
+__aicore__ inline void DataCopy(__cbuf__ T* dst, __cbuf__ U* src, const DataCopyParams& repeatParams)
+{
+    DataCopyL12BTImpl((uint64_t)dst, (__cbuf__ PrimT<U>*)src, static_cast<uint16_t>(0), repeatParams);
+}
+
 /* DataCopy count forms */
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(__ubuf__ T* dst, __gm__ T* src, const uint32_t count)
