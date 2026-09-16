@@ -1911,7 +1911,7 @@ __aicore__ inline void ResetLoopModePara(DataCopyMVType type)
 template <
     typename DstT, typename SrcT, PaddingMode mode,
     typename Std::enable_if<
-        IsDmaLocalOperand<DstT> && IsDmaGmOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
+        IsDmaLocalOperand<DstT> && IsDmaGmOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     const DstT& dst, const SrcT& src, const DataCopyParams& dataCopyParams, const DataCopyPadParams& padParams)
 {
@@ -1921,7 +1921,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     using PrimType = DmaPrimT<SrcT>;
     const uint8_t cacheMode = ExtractCacheMode(src);
     if constexpr (IsDmaPosRuntime<DstT>) {
-        const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
+        const Hardware dstHWPos = GetPhyType(DmaOperandPos(dst));
         if (dstHWPos == Hardware::UB) {
             DataCopyPadGm2UBImpl<PrimType, mode>(
                 (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), dataCopyParams,
@@ -1933,7 +1933,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
         } else {
             ASCENDC_CHECK_TPOSITION(
                 false, "dst", "UB(VECIN/VECOUT)", "DataCopyPad from GlobalTensor to LocalTensor",
-                GetPositionDisplay(static_cast<TPosition>(dst.GetPosition())));
+                GetPositionDisplay(DmaOperandPos(dst)));
         }
     } else {
         if constexpr (DmaHardwarePosV<DstT> == Hardware::UB) {
@@ -1957,7 +1957,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
 template <
     typename DstT, typename SrcT, PaddingMode mode,
     typename Std::enable_if<
-        IsDmaLocalOperand<DstT> && IsDmaGmOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
+        IsDmaLocalOperand<DstT> && IsDmaGmOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     const DstT& dst, const SrcT& src, const DataCopyExtParams& dataCopyParams,
     const DataCopyPadExtParams<DmaOperandElem<SrcT>>& padParams)
@@ -1968,7 +1968,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     using PrimType = DmaPrimT<SrcT>;
     const uint8_t cacheMode = ExtractCacheMode(src);
     if constexpr (IsDmaPosRuntime<DstT>) {
-        const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
+        const Hardware dstHWPos = GetPhyType(DmaOperandPos(dst));
         if (dstHWPos == Hardware::UB) {
             DataCopyPadGm2UBImpl<PrimType, mode>(
                 (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), dataCopyParams,
@@ -1980,7 +1980,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
         } else {
             ASCENDC_CHECK_TPOSITION(
                 false, "dst", "UB(VECIN/VECOUT)", "DataCopyPad from GM to UB(VECIN/VECOUT)",
-                GetPositionDisplay(static_cast<TPosition>(dst.GetPosition())));
+                GetPositionDisplay(DmaOperandPos(dst)));
         }
     } else {
         if constexpr (DmaHardwarePosV<DstT> == Hardware::UB) {
@@ -2003,7 +2003,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
 template <
     typename DstT, typename SrcT, PaddingMode mode,
     typename Std::enable_if<
-        IsDmaGmOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
+        IsDmaGmOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     const DstT& dst, const SrcT& src, const DataCopyParams& dataCopyParams)
 {
@@ -2015,7 +2015,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
 #endif
     const uint8_t cacheMode = ExtractCacheMode(dst);
     if constexpr (IsDmaPosRuntime<SrcT>) {
-        const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
+        const Hardware srcHWPos = GetPhyType(DmaOperandPos(src));
         if (srcHWPos == Hardware::UB) {
             DataCopyPadUB2GMImpl<PrimType, mode>(
                 (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), dataCopyParams,
@@ -2023,7 +2023,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
         } else {
             ASCENDC_CHECK_TPOSITION(
                 false, "src", "UB(VECIN/VECOUT)", "DataCopyPad from LocalTensor to GlobalTensor",
-                GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
+                GetPositionDisplay(DmaOperandPos(src)));
         }
     } else {
         if constexpr (DmaHardwarePosV<SrcT> == Hardware::UB) {
@@ -2042,7 +2042,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
 template <
     typename DstT, typename SrcT, PaddingMode mode,
     typename Std::enable_if<
-        IsDmaGmOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
+        IsDmaGmOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     const DstT& dst, const SrcT& src, const DataCopyExtParams& dataCopyParams)
 {
@@ -2054,7 +2054,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
 #endif
     const uint8_t cacheMode = ExtractCacheMode(dst);
     if constexpr (IsDmaPosRuntime<SrcT>) {
-        const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
+        const Hardware srcHWPos = GetPhyType(DmaOperandPos(src));
         if (srcHWPos == Hardware::UB) {
             DataCopyPadUB2GMImpl<PrimType, mode>(
                 (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), dataCopyParams,
@@ -2067,7 +2067,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
         } else {
             ASCENDC_CHECK_TPOSITION(
                 false, "src", "UB(VECIN/VECOUT)", "DataCopyPad from LocalTensor to GlobalTensor with DataCopyExtParams",
-                GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
+                GetPositionDisplay(DmaOperandPos(src)));
         }
     } else {
         if constexpr (DmaHardwarePosV<SrcT> == Hardware::UB) {
@@ -2097,7 +2097,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
 template <
     typename DstT, typename SrcT,
     typename Std::enable_if<
-        IsDmaLocalOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
+        IsDmaLocalOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type>
 __aicore__ inline void DataCopyPad(
     const DstT& dst, const SrcT& src, const DataCopyParams& dataCopyParams, const Nd2NzParams& nd2nzParams)
 {
@@ -2111,7 +2111,7 @@ __aicore__ inline void DataCopyPad(
 template <
     typename DstT, typename SrcT,
     typename Std::enable_if<
-        IsDmaLocalOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
+        IsDmaLocalOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type>
 __aicore__ inline void DataCopyPad(
     const DstT& dst, const SrcT& src, const DataCopyExtParams& dataCopyParams, const Nd2NzParams& nd2nzParams)
 {
@@ -2129,7 +2129,7 @@ __aicore__ inline void DataCopyPad(
 template <
     typename DstT, typename SrcT,
     typename Std::enable_if<
-        IsDmaLocalOperand<DstT> && IsDmaGmOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
+        IsDmaLocalOperand<DstT> && IsDmaGmOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     const DstT& dst, const SrcT& src, const DataCopyParams& dataCopyParams, const DataCopyPadParams& padParams)
 {
@@ -2138,7 +2138,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
         return;
     }
     if constexpr (IsDmaPosRuntime<DstT>) {
-        const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
+        const Hardware dstHWPos = GetPhyType(DmaOperandPos(dst));
         if (dstHWPos == Hardware::UB) {
             DataCopyPadGm2UBImpl(
                 (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), dataCopyParams,
@@ -2156,7 +2156,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
         } else {
             ASCENDC_CHECK_TPOSITION(
                 false, "dst", "UB(VECIN/VECOUT)", "DataCopyPad from GlobalTensor to LocalTensor",
-                GetPositionDisplay(static_cast<TPosition>(dst.GetPosition())));
+                GetPositionDisplay(DmaOperandPos(dst)));
 #endif
         }
     } else {
@@ -2186,7 +2186,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
 template <
     typename DstT, typename SrcT,
     typename Std::enable_if<
-        IsDmaLocalOperand<DstT> && IsDmaGmOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
+        IsDmaLocalOperand<DstT> && IsDmaGmOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     const DstT& dst, const SrcT& src, const DataCopyExtParams& dataCopyParams,
     const DataCopyPadExtParams<DmaOperandElem<SrcT>>& padParams)
@@ -2196,7 +2196,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
         return;
     }
     if constexpr (IsDmaPosRuntime<DstT>) {
-        const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
+        const Hardware dstHWPos = GetPhyType(DmaOperandPos(dst));
         if (dstHWPos == Hardware::UB) {
             DataCopyPadGm2UBImpl(
                 (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), dataCopyParams,
@@ -2214,7 +2214,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
         } else {
             ASCENDC_CHECK_TPOSITION(
                 false, "dst", "UB(VECIN/VECOUT)", "DataCopyPad from GM to UB(VECIN/VECOUT)",
-                GetPositionDisplay(static_cast<TPosition>(dst.GetPosition())));
+                GetPositionDisplay(DmaOperandPos(dst)));
 #endif
         }
     } else {
@@ -2244,7 +2244,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
 template <
     typename DstT, typename SrcT,
     typename Std::enable_if<
-        IsDmaGmOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
+        IsDmaGmOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     const DstT& dst, const SrcT& src, const DataCopyParams& dataCopyParams)
 {
@@ -2253,7 +2253,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
         return;
     }
     if constexpr (IsDmaPosRuntime<SrcT>) {
-        const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
+        const Hardware srcHWPos = GetPhyType(DmaOperandPos(src));
         if (srcHWPos == Hardware::UB) {
             DataCopyPadUB2GMImpl(
                 (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), dataCopyParams);
@@ -2268,7 +2268,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
         } else {
             ASCENDC_CHECK_TPOSITION(
                 false, "src", "UB(VECIN/VECOUT)", "DataCopyPad from LocalTensor to GlobalTensor",
-                GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
+                GetPositionDisplay(DmaOperandPos(src)));
 #endif
         }
     } else {
@@ -2295,7 +2295,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
 template <
     typename DstT, typename SrcT,
     typename Std::enable_if<
-        IsDmaGmOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
+        IsDmaGmOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     const DstT& dst, const SrcT& src, const DataCopyExtParams& dataCopyParams)
 {
@@ -2304,7 +2304,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
         return;
     }
     if constexpr (IsDmaPosRuntime<SrcT>) {
-        const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
+        const Hardware srcHWPos = GetPhyType(DmaOperandPos(src));
         if (srcHWPos == Hardware::UB) {
             DataCopyPadUB2GMImpl(
                 (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), dataCopyParams);
@@ -2319,7 +2319,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
         } else {
             ASCENDC_CHECK_TPOSITION(
                 false, "src", "UB(VECIN/VECOUT)", "DataCopyPad from LocalTensor to GlobalTensor with DataCopyExtParams",
-                GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
+                GetPositionDisplay(DmaOperandPos(src)));
 #endif
         }
     } else {
@@ -2355,7 +2355,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
 template <
     typename DstT, typename SrcT, uint8_t subBlockId,
     typename Std::enable_if<
-        IsDmaLocalOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
+        IsDmaLocalOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type>
 __aicore__ inline void DataCopyL1ToUB(const DstT& dst, const SrcT& src, const DataCopyParams& repeatParams)
 {
 #if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510))
@@ -2370,7 +2370,7 @@ __aicore__ inline void DataCopyL1ToUB(const DstT& dst, const SrcT& src, const Da
 template <
     typename DstT, typename SrcT, uint8_t subBlockId,
     typename Std::enable_if<
-        IsDmaLocalOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
+        IsDmaLocalOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type>
 __aicore__ inline void DataCopyL1ToUB(const DstT& dst, const SrcT& src, const uint32_t count)
 {
 #if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510))

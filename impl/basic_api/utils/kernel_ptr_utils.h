@@ -368,8 +368,37 @@ constexpr Hardware DmaHardwarePosV = DmaHardwarePos<T>::value;
  * \brief True when the runtime position of a Tensor operand must still be consulted. A Tensor operand has no
  *        compile-time position, so the dispatcher keeps its original runtime branch for it.
  */
+/*!
+ * \brief True when the runtime position of an operand must be consulted instead of a compile-time decision.
+ *
+ *        A Tensor operand has no compile-time position, so the dispatcher keeps its original runtime branch.
+ *        In CPU twin-debug the address space qualifiers are empty, so a pointer's space is unrecoverable and
+ *        its compile-time position would be a fabricated Hardware::UB; the runtime branch is used instead,
+ *        pairing with the predicate degradation in IsDmaPtrOperand. This is what keeps the pointer paths
+ *        compilable -- and therefore executable -- in CPU twin-debug.
+ */
 template <typename T>
 constexpr bool IsDmaPosRuntime = DmaHardwarePosV<T> == Hardware::MAX;
+
+/*!
+ * \brief Position consulted by the runtime branch of a pointer-extended overload.
+ *
+ *        A Tensor reports its own position. A raw pointer carries no position metadata, so the slot's expected
+ *        position is substituted: the pointer overloads are already selected by slot, so GM->local targets UB
+ *        and local->GM reads UB. On device a pointer never reaches the runtime branch (its space is known at
+ *        compile time); this substitution is what the CPU twin-debug regime relies on, where the empty
+ *        qualifiers make the runtime path the only remaining one. GetPhyType maps both VECCALC and the
+ *        other vector positions to Hardware::UB, so the substituted position selects the UB implementation.
+ */
+template <typename T>
+__aicore__ inline TPosition DmaOperandPos(const T& operand)
+{
+    if constexpr (IsDmaTensorV<T>) {
+        return static_cast<TPosition>(operand.GetPosition());
+    } else {
+        return TPosition::VECCALC;
+    }
+}
 
 /*!
  * \brief Pointer extraction: a raw pointer is passed through unchanged (no reinterpret, no offset fixup), a
