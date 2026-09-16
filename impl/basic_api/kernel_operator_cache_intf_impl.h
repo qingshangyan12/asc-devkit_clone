@@ -74,14 +74,14 @@ __aicore__ inline void DataCachePreload(__gm__ uint64_t* src, const T cacheOffse
 template <typename T, CacheLine entireType, DcciDst dcciDst>
 __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst)
 {
-    DcciGMImpl<T, entireType, dcciDst>(const_cast<__gm__ T*>(GetUnderlyingPtr(dst)));
+    DcciGMImpl<T, entireType, dcciDst>((__gm__ T*)GetUnderlyingPtr(dst));
 }
 
 #if !defined(ASCENDC_CPU_DEBUG) || ASCENDC_CPU_DEBUG != 1
 template <typename T, CacheLine entireType, DcciDst dcciDst>
 __aicore__ inline void DataCacheCleanAndInvalid(__gm__ T* dst)
 {
-    DcciGMImpl<T, entireType, dcciDst>(const_cast<__gm__ T*>(GetUnderlyingPtr(dst)));
+    DcciGMImpl<T, entireType, dcciDst>((__gm__ T*)GetUnderlyingPtr(dst));
 }
 #endif
 
@@ -107,14 +107,14 @@ __aicore__ inline void DataCacheCleanAndInvalid(__ubuf__ T* dst)
 template <typename T, CacheLine entireType>
 __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst)
 {
-    DcciGMImpl<T, entireType>(const_cast<__gm__ T*>(GetUnderlyingPtr(dst)));
+    DcciGMImpl<T, entireType>((__gm__ T*)GetUnderlyingPtr(dst));
 }
 
 #if !defined(ASCENDC_CPU_DEBUG) || ASCENDC_CPU_DEBUG != 1
 template <typename T, CacheLine entireType>
 __aicore__ inline void DataCacheCleanAndInvalid(__gm__ T* dst)
 {
-    DcciGMImpl<T, entireType>(const_cast<__gm__ T*>(GetUnderlyingPtr(dst)));
+    DcciGMImpl<T, entireType>((__gm__ T*)GetUnderlyingPtr(dst));
 }
 #endif
 #endif

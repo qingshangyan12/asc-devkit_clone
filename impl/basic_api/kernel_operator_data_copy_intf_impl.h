@@ -453,6 +453,61 @@ __aicore__ inline void DataCopy(
 }
 
 /*
+ * L1 -> BiasTable: select isEnableConv from dst/src dtype.
+ * Shared by Tensor and pointer DataCopy so the two paths cannot drift.
+ * dst is the BiasTable address (uint64 handle); there is no dedicated BT
+ * address space, so the pointer overload passes it as __cbuf__*.
+ */
+template <typename T, typename U>
+__aicore__ inline void DataCopyL12BTByDtype(uint64_t dst, __cbuf__ U* src, const DataCopyParams& repeatParams)
+{
+    using PrimDstType = PrimT<T>;
+    using PrimSrcType = PrimT<U>;
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+    if constexpr (
+        Std::is_same<PrimDstType, int32_t>::value &&
+            (Std::is_same<PrimSrcType, half>::value || Std::is_same<PrimSrcType, bfloat16_t>::value ||
+             Std::is_same<PrimSrcType, float>::value) ||
+        Std::is_same<PrimSrcType, int16_t>::value) {
+        DataCopyL12BTImpl(dst, (__cbuf__ PrimSrcType*)src, (uint16_t)2, repeatParams);
+        return;
+    }
+#endif
+    if constexpr (Std::is_same<PrimSrcType, bfloat16_t>::value && (!Std::is_same<PrimDstType, float>::value)) {
+        ASCENDC_ASSERT((false), {
+            KERNEL_LOG(
+                KERNEL_ERROR, "unsupported case where src dtype is bfloat16, dst dtype is not float on current device");
+        });
+    } else if constexpr (
+        Std::is_same<PrimDstType, PrimSrcType>::value ||
+        (Std::is_same<PrimSrcType, bfloat16_t>::value && Std::is_same<PrimDstType, float>::value)) {
+#else
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+    if constexpr (
+        Std::is_same<PrimDstType, int32_t>::value &&
+        (Std::is_same<PrimSrcType, half>::value || Std::is_same<PrimSrcType, float>::value ||
+         Std::is_same<PrimSrcType, int32_t>::value)) {
+        DataCopyL12BTImpl(dst, (__cbuf__ PrimSrcType*)src, (uint16_t)2, repeatParams);
+    } else if constexpr (Std::is_same<PrimDstType, PrimSrcType>::value) {
+#else
+    if constexpr (Std::is_same<PrimDstType, PrimSrcType>::value) {
+#endif
+#endif
+        DataCopyL12BTImpl(dst, (__cbuf__ PrimSrcType*)src, static_cast<uint16_t>(0), repeatParams);
+    } else if constexpr (Std::is_same<PrimDstType, float>::value && Std::is_same<PrimSrcType, half>::value) {
+        DataCopyL12BTImpl(dst, (__cbuf__ half*)src, static_cast<uint16_t>(1), repeatParams);
+    } else {
+        ASCENDC_ASSERT(false, {
+            KERNEL_LOG(
+                KERNEL_ERROR, "Failed to check dtype in DataCopy from L1 Buffer(C1) to BiasTable Buffer(C2), "
+                              "current api support dtype combination is U = T or src: half, dst: float.");
+        });
+    }
+}
+
+/*
  * @ingroup DataCopy Level 0
  * @brief datacopy from L1 to bt, applicable to vector data
  * @param [out] dst output LocalTensor
@@ -469,8 +524,6 @@ __aicore__ inline void DataCopy(
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxDataCopyInfo(dst, src, repeatParams, "DataCopy");
 #endif
-    using PrimDstType = PrimT<T>;
-    using PrimSrcType = PrimT<U>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
     CheckBasicDataCopyMixedTypeSupport<T, U>("DataCopy from LocalTensor to LocalTensor with T / U");
@@ -487,57 +540,8 @@ __aicore__ inline void DataCopy(
             CheckTensorAlign<T>(dst, 64, "dst", "DataCopy from L1 Buffer(C1) to BiasTable Buffer(C2)"); // 64B align
             CheckTensorAlign<U>(
                 src, ONE_BLK_SIZE, "src", "DataCopy from L1 Buffer(C1) to BiasTable Buffer(C2)"); // 32B align
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
-            if constexpr (
-                Std::is_same<PrimDstType, int32_t>::value &&
-                    (Std::is_same<PrimSrcType, half>::value || Std::is_same<PrimSrcType, bfloat16_t>::value ||
-                     Std::is_same<PrimSrcType, float>::value) ||
-                Std::is_same<PrimSrcType, int16_t>::value) {
-                DataCopyL12BTImpl(
-                    (uint64_t)GetUnderlyingPtr(dst), (__cbuf__ PrimSrcType*)GetUnderlyingPtr(src), (uint16_t)2,
-                    repeatParams);
-                return;
-            }
-#endif
-            if constexpr (Std::is_same<PrimSrcType, bfloat16_t>::value && (!Std::is_same<PrimDstType, float>::value)) {
-                ASCENDC_ASSERT((false), {
-                    KERNEL_LOG(
-                        KERNEL_ERROR,
-                        "unsupported case where src dtype is bfloat16, dst dtype is not float on current device");
-                });
-            } else if constexpr (
-                Std::is_same<PrimDstType, PrimSrcType>::value ||
-                (Std::is_same<PrimSrcType, bfloat16_t>::value && Std::is_same<PrimDstType, float>::value)) {
-#else
-#if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
-            if constexpr (
-                Std::is_same<PrimDstType, int32_t>::value &&
-                (Std::is_same<PrimSrcType, half>::value || Std::is_same<PrimSrcType, float>::value ||
-                 Std::is_same<PrimSrcType, int32_t>::value)) {
-                DataCopyL12BTImpl(
-                    (uint64_t)GetUnderlyingPtr(dst), (__cbuf__ PrimSrcType*)GetUnderlyingPtr(src), (uint16_t)2,
-                    repeatParams);
-            } else if constexpr (Std::is_same<PrimDstType, PrimSrcType>::value) {
-#else
-            if constexpr (Std::is_same<PrimDstType, PrimSrcType>::value) {
-#endif
-#endif
-                DataCopyL12BTImpl(
-                    (uint64_t)GetUnderlyingPtr(dst), (__cbuf__ PrimSrcType*)GetUnderlyingPtr(src),
-                    static_cast<uint16_t>(0), repeatParams);
-            } else if constexpr (Std::is_same<PrimDstType, float>::value && Std::is_same<PrimSrcType, half>::value) {
-                DataCopyL12BTImpl(
-                    (uint64_t)GetUnderlyingPtr(dst), (__cbuf__ half*)GetUnderlyingPtr(src), static_cast<uint16_t>(1),
-                    repeatParams);
-            } else {
-                ASCENDC_ASSERT(false, {
-                    KERNEL_LOG(
-                        KERNEL_ERROR, "Failed to check dtype in DataCopy from L1 Buffer(C1) to BiasTable Buffer(C2), "
-                                      "current api support dtype combination is U = T or src: half, dst: float.");
-                });
-            }
+            DataCopyL12BTByDtype<T, U>(
+                (uint64_t)GetUnderlyingPtr(dst), (__cbuf__ U*)GetUnderlyingPtr(src), repeatParams);
         } else {
             ASCENDC_CHECK_TPOSITION(
                 false, "dst", "BiasTable Buffer(C2)", "DataCopy from LocalTensor to LocalTensor with T / U",
