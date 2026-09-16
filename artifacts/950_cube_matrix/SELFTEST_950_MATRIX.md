@@ -1,8 +1,8 @@
 # Ascend950 CUBE self-test matrix
 
-- HEAD: 05de76665
+- HEAD: c8be4b713
 - ARCH: dav-3510
-- STAMP: 20260916_143134
+- STAMP: 20260916_143301
 
 - verify PASS: **5**
 - FAIL: 0
