@@ -193,12 +193,19 @@ struct HasDataCopyL1ToUbParams<
  * Cache APIs currently only accept Tensor operands, so the pointer forms must be probed too: until
  * the extension lands these calls would be a hard instantiation error, not a skip.
  */
+/*
+ * The pointer form of `DataCacheCleanAndInvalid` is declared as `void DataCacheCleanAndInvalid(const T*)`,
+ * so the address space is carried by the FIRST template argument rather than the parameter list. The element
+ * type is therefore derived from the operand type here, which keeps the call sites' `<T, __gm__ T*>` spelling
+ * valid; `T` is retained so existing spellings keep compiling.
+ */
 template <typename T, typename DstT, typename = void>
 struct HasDcciPtr : std::false_type {};
 template <typename T, typename DstT>
 struct HasDcciPtr<
     T, DstT,
-    std::void_t<decltype(AscendC::DataCacheCleanAndInvalid<T, CacheLine::ENTIRE_DATA_CACHE, DcciDst::CACHELINE_OUT>(
+    std::void_t<decltype(AscendC::DataCacheCleanAndInvalid< //
+                         std::remove_pointer_t<DstT>, CacheLine::ENTIRE_DATA_CACHE, DcciDst::CACHELINE_OUT>(
         std::declval<const DstT&>()))>> : std::true_type {};
 
 template <typename SrcT, typename OffsetT, typename = void>
@@ -961,12 +968,12 @@ __global__ __aicore__ void KernelPtrCacheOps(
 
     // PTR-CACHE-01, GM specialisation on the raw global pointer
     if constexpr (HasDcciPtr<T, __gm__ T*>::value) {
-        DataCacheCleanAndInvalid<T, CacheLine::ENTIRE_DATA_CACHE, DcciDst::CACHELINE_OUT>(
+        DataCacheCleanAndInvalid<__gm__ T, CacheLine::ENTIRE_DATA_CACHE, DcciDst::CACHELINE_OUT>(
             const_cast<__gm__ T*>(srcGlobal.GetPhyAddr()));
     }
     // PTR-CACHE-01, UB specialisation on the raw UB pointer
     if constexpr (HasDcciPtr<T, __ubuf__ T*>::value) {
-        DataCacheCleanAndInvalid<T, CacheLine::ENTIRE_DATA_CACHE, DcciDst::CACHELINE_OUT>(
+        DataCacheCleanAndInvalid<__ubuf__ T, CacheLine::ENTIRE_DATA_CACHE, DcciDst::CACHELINE_OUT>(
             const_cast<__ubuf__ T*>(ub.ptrSide.GetPhyAddr()));
     }
     // PTR-CACHE-02, preload from a raw global pointer (see CallDataCachePreload for why it is wrapped)
