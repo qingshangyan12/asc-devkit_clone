@@ -8,8 +8,8 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "ccu_kernel_kfc_all_gather_mesh1d_mem2mem.h"
+#include "../ccu_temp_kfc_all_gather_nhr_1D_multi_jetty_mem2mem.h"
 #include "ccu_func_dl.hpp"
-#include "kfc_server_protocol.h"
 
 namespace mc2_ops_hccl {
 

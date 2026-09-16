@@ -13,7 +13,6 @@
 
 #include <cstdint>
 #include <cstring>
-#include <map>
 #include <vector>
 #include "../../../common/kfc_server_message.h"
 
@@ -41,7 +40,6 @@ constexpr char KFC_CONCURRENT_REDUCE_SCATTER_ALG_NAME[] = "CcuSchedReduceScatter
 constexpr char KFC_REDUCE_SCATTER_PEER_ONLY_ALG_NAME[] = "CcuSchedReduceScatterSoleMeshPeerOnly";
 constexpr char KFC_REDUCE_SCATTER_PEER_ONLY_KERNEL_NAME[] = "CcuKernelKfcReduceScatterMesh1DMem2MemPeerOnly";
 constexpr char KFC_RS_SOLE_NHR_ALG_NAME[] = "CcuSchedReduceScatterSoleNHRMultiLink";
-constexpr uint32_t KFC_PARALLEL_ALL_GATHER_SUB_TYPE = 4U;
 
 struct KfcNhrStepInfo {
     uint32_t step = 0;
@@ -51,17 +49,6 @@ struct KfcNhrStepInfo {
     uint32_t fromRank = 0;
     std::vector<uint32_t> txSliceIdxs;
     std::vector<uint32_t> rxSliceIdxs;
-};
-
-// 仅在定义跨 kernel Func 时读取；运行时地址和长度仍由 Func 参数传入。
-struct KfcParallelAllGatherArg {
-    uint32_t rankSizeLevel0 = 0;
-    uint32_t rankIdxLevel0 = 0;
-    uint32_t rankSizeLevel1 = 0;
-    uint32_t rankIdxLevel1 = 0;
-    uint32_t jettyNum = 1;
-    std::vector<KfcNhrStepInfo> stepInfoVector;
-    std::map<uint32_t, uint32_t> rank2ChannelIdx;
 };
 
 inline uint32_t GetKfcServerMissionNum(const char* algName)
