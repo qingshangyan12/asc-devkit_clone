@@ -1,0 +1,741 @@
+=== CUBE ptr sweep START 2026-09-16T17:33:07+00:00 ARCH=dav-3510 SMOKE=0 WS=/home/Temp_room/wj_cub_cube_ptr_950 ===
+ASCEND_HOME_PATH=/usr/local/Ascend/cann-9.1.0-beta.3 CXX=/usr/bin/g++
+From https://gitcode.com/qq_53202098/asc-devkit
+ * branch                feature/cube-basic-api-pointerization -> FETCH_HEAD
+Your branch is up to date with 'origin/feature/cube-basic-api-pointerization'.
+HEAD is now at 69aa4d862 perf(cube-ptr): continuous multi-shape demo + reuse gendata
+REPO_HEAD=69aa4d862 @ /home/Temp_room/wj_cub_cube_ptr_950/helper_repo
+TEST_HEAD=69aa4d862
+OVERLAY_OK
+PY=/usr/local/python3.12.13/bin/python3
+SELECTED 600 full
+BATCH_MODE=1 CHUNK=16 DEVICES=0 CMAKE_JOBS=8
+SELECTED 600 full ARCH dav-3510 CHUNK 16
+BATCH_UNITS 38 from_groups 9 cases 600
+BUILD_START iov2_mmad_s3_16_489680_643248_488016 shapes 16
+BUILD_START iov2_mmad_s3_16_488096_484896_161648 shapes 16
+BUILD_START iov2_mmad_s3_16_809632_963248_321648 shapes 16
+BUILD_START iov2_mmad_s3_16_646416_964880_328048 shapes 16
+BUILD_OK iov2_mmad_s3_16_489680_643248_488016
+BUILD_START iov2_mmad_s3_16_644896_169616_164848 shapes 16
+BUILD_OK iov2_mmad_s3_16_646416_964880_328048
+BUILD_OK iov2_mmad_s3_16_488096_484896_161648
+BUILD_START iov2_mmad_s3_16_804848_803232_326464 shapes 16
+BUILD_START iov2_mmad_s3_2_648064_808032 shapes 2
+BUILD_OK iov2_mmad_s3_16_809632_963248_321648
+BUILD_START iov2_mmad_s1_16_323232_806432_641664 shapes 16
+BUILD_OK iov2_mmad_s3_2_648064_808032
+BUILD_START iov2_mmad_s1_16_648032_166432_488032 shapes 16
+BUILD_OK iov2_mmad_s3_16_804848_803232_326464
+BUILD_START iov2_mmad_s1_16_161664_484896_808096 shapes 16
+BUILD_OK iov2_mmad_s3_16_644896_169616_164848
+BUILD_START iov2_mmad_s1_3_646432_968064_323264 shapes 3
+BUILD_OK iov2_mmad_s1_16_323232_806432_641664
+BUILD_START iov2_mmad_s2_16_806464_804848_328032 shapes 16
+BUILD_OK iov2_mmad_s1_16_648032_166432_488032
+BUILD_START iov2_mmad_s2_16_963232_969632_489664 shapes 16
+BUILD_OK iov2_mmad_s1_3_646432_968064_323264
+BUILD_START iov2_mmad_s2_16_808096_969680_643232 shapes 16
+BUILD_OK iov2_mmad_s1_16_161664_484896_808096
+BUILD_START iov2_mmad_s2_3_803264_963248_646464 shapes 3
+BUILD_OK iov2_mmad_s2_16_806464_804848_328032
+BUILD_START iov2_load_data_s5_16_326464_489632_649680 shapes 16
+BUILD_OK iov2_mmad_s2_16_963232_969632_489664
+BUILD_START iov2_load_data_s5_16_648048_808048_966464 shapes 16
+BUILD_OK iov2_mmad_s2_16_808096_969680_643232
+BUILD_START iov2_load_data_s5_16_323280_809664_963232 shapes 16
+BUILD_OK iov2_mmad_s2_3_803264_963248_646464
+BUILD_START iov2_load_data_s5_16_483248_484816_483216 shapes 16
+BUILD_OK iov2_load_data_s5_16_326464_489632_649680
+BUILD_START iov2_load_data_s5_16_486480_486464_483296 shapes 16
+BUILD_OK iov2_load_data_s5_16_648048_808048_966464
+BUILD_START iov2_load_data_s1_16_963296_806496_163264 shapes 16
+BUILD_OK iov2_load_data_s5_16_323280_809664_963232
+BUILD_START iov2_load_data_s1_16_648096_644896_168032 shapes 16
+BUILD_OK iov2_load_data_s5_16_483248_484816_483216
+BUILD_START iov2_load_data_s1_6_643232_964832_483264 shapes 6
+BUILD_OK iov2_load_data_s5_16_486480_486464_483296
+BUILD_START iov2_load_data_s3_16_326448_641696_969616 shapes 16
+BUILD_OK iov2_load_data_s1_6_643232_964832_483264
+BUILD_START iov2_load_data_s3_16_809696_324848_164816 shapes 16
+BUILD_OK iov2_load_data_s1_16_648096_644896_168032
+BUILD_START iov2_load_data_s3_16_808032_801616_969680 shapes 16
+BUILD_OK iov2_load_data_s1_16_963296_806496_163264
+BUILD_START iov2_load_data_s3_16_163248_961680_161680 shapes 16
+BUILD_OK iov2_load_data_s3_16_326448_641696_969616
+BUILD_START iov2_load_data_s3_16_648080_163280_968032 shapes 16
+BUILD_OK iov2_load_data_s3_16_809696_324848_164816
+BUILD_START iov2_load_data_s3_2_644848_963232 shapes 2
+BUILD_OK iov2_load_data_s3_16_808032_801616_969680
+BUILD_START iov2_fixpipe_s1_16_323232_323264_323296 shapes 16
+BUILD_OK iov2_load_data_s3_16_163248_961680_161680
+BUILD_START iov2_fixpipe_s1_16_489664_489696_643232 shapes 16
+BUILD_OK iov2_load_data_s3_16_648080_163280_968032
+BUILD_START iov2_fixpipe_s1_13_806496_809632_809664 shapes 13
+BUILD_OK iov2_load_data_s3_2_644848_963232
+BUILD_START iov2_fixpipe_s6_16_323232_323264_323296 shapes 16
+BUILD_OK iov2_fixpipe_s1_16_323232_323264_323296
+BUILD_START iov2_fixpipe_s6_16_489664_489696_643232 shapes 16
+BUILD_OK iov2_fixpipe_s1_16_489664_489696_643232
+BUILD_START iov2_fixpipe_s6_13_806496_809632_809664 shapes 13
+BUILD_OK iov2_fixpipe_s1_13_806496_809632_809664
+BUILD_START iov2_fixpipe_s7_16_323232_323264_323296 shapes 16
+BUILD_OK iov2_fixpipe_s6_16_323232_323264_323296
+BUILD_START iov2_fixpipe_s7_16_489664_489696_643232 shapes 16
+BUILD_OK iov2_fixpipe_s6_16_489664_489696_643232
+BUILD_START iov2_fixpipe_s7_13_806496_809632_809664 shapes 13
+BUILD_OK iov2_fixpipe_s6_13_806496_809632_809664
+BUILD_OK iov2_fixpipe_s7_16_323232_323264_323296
+BUILD_OK iov2_fixpipe_s7_16_489664_489696_643232
+BUILD_OK iov2_fixpipe_s7_13_806496_809632_809664
+RUN_CONT mmad s3 shapes 16
+DONE mmad_001_fp32_m48n96k80_s3 verify=PASS device=0
+DONE mmad_003_fp32_m64n32k48_s3 verify=PASS device=0
+DONE mmad_006_fp32_m48n80k16_s3 verify=PASS device=0
+DONE mmad_009_fp32_m16n80k32_s3 verify=PASS device=0
+DONE mmad_011_fp32_m80n48k32_s3 verify=PASS device=0
+DONE mmad_012_fp32_m32n96k64_s3 verify=PASS device=0
+DONE mmad_014_fp32_m48n96k64_s3 verify=PASS device=0
+DONE mmad_015_fp32_m32n80k16_s3 verify=PASS device=0
+DONE mmad_016_fp32_m48n16k64_s3 verify=PASS device=0
+DONE mmad_017_fp32_m16n64k96_s3 verify=PASS device=0
+DONE mmad_018_fp32_m64n96k96_s3 verify=PASS device=0
+DONE mmad_019_fp32_m32n64k16_s3 verify=PASS device=0
+DONE mmad_020_fp32_m48n32k48_s3 verify=PASS device=0
+DONE mmad_021_fp32_m32n16k80_s3 verify=PASS device=0
+DONE mmad_027_fp32_m32n32k32_s3 verify=PASS device=0
+DONE mmad_028_fp32_m48n64k64_s3 verify=PASS device=0
+RUN_CONT mmad s3 shapes 16
+DONE mmad_030_fp32_m80n96k32_s3 verify=PASS device=0
+DONE mmad_032_fp32_m96n32k48_s3 verify=PASS device=0
+DONE mmad_034_fp32_m32n16k48_s3 verify=PASS device=0
+DONE mmad_037_fp32_m80n32k16_s3 verify=PASS device=0
+DONE mmad_038_fp32_m16n48k64_s3 verify=PASS device=0
+DONE mmad_040_fp32_m80n80k64_s3 verify=PASS device=0
+DONE mmad_042_fp32_m16n32k80_s3 verify=PASS device=0
+DONE mmad_043_fp32_m48n16k16_s3 verify=PASS device=0
+DONE mmad_045_fp32_m64n32k32_s3 verify=PASS device=0
+DONE mmad_046_fp32_m96n16k48_s3 verify=PASS device=0
+DONE mmad_047_fp32_m64n80k16_s3 verify=PASS device=0
+DONE mmad_048_fp32_m16n48k16_s3 verify=PASS device=0
+DONE mmad_056_fp32_m16n32k96_s3 verify=PASS device=0
+DONE mmad_059_fp32_m48n32k16_s3 verify=PASS device=0
+DONE mmad_062_fp32_m96n48k64_s3 verify=PASS device=0
+DONE mmad_063_fp32_m32n96k32_s3 verify=PASS device=0
+RUN_CONT mmad s3 shapes 16
+DONE mmad_065_fp32_m64n64k16_s3 verify=PASS device=0
+DONE mmad_067_fp32_m96n48k80_s3 verify=PASS device=0
+DONE mmad_070_fp32_m32n80k48_s3 verify=PASS device=0
+DONE mmad_071_fp32_m48n48k32_s3 verify=PASS device=0
+DONE mmad_074_fp32_m32n80k80_s3 verify=PASS device=0
+DONE mmad_075_fp32_m16n64k32_s3 verify=PASS device=0
+DONE mmad_078_fp32_m32n48k80_s3 verify=PASS device=0
+DONE mmad_080_fp32_m80n64k64_s3 verify=PASS device=0
+DONE mmad_083_fp32_m64n16k48_s3 verify=PASS device=0
+DONE mmad_085_fp32_m96n64k80_s3 verify=PASS device=0
+DONE mmad_087_fp32_m80n80k16_s3 verify=PASS device=0
+DONE mmad_088_fp32_m48n96k96_s3 verify=PASS device=0
+DONE mmad_095_fp32_m96n80k80_s3 verify=PASS device=0
+DONE mmad_096_fp32_m32n32k64_s3 verify=PASS device=0
+DONE mmad_098_fp32_m96n32k96_s3 verify=PASS device=0
+DONE mmad_100_fp32_m96n64k96_s3 verify=PASS device=0
+RUN_CONT mmad s3 shapes 16
+DONE mmad_103_fp32_m48n80k96_s3 verify=PASS device=0
+DONE mmad_104_fp32_m48n48k96_s3 verify=PASS device=0
+DONE mmad_105_fp32_m16n16k48_s3 verify=PASS device=0
+DONE mmad_106_fp32_m16n32k64_s3 verify=PASS device=0
+DONE mmad_111_fp32_m64n16k16_s3 verify=PASS device=0
+DONE mmad_112_fp32_m48n48k48_s3 verify=PASS device=0
+DONE mmad_113_fp32_m80n64k16_s3 verify=PASS device=0
+DONE mmad_115_fp32_m32n32k96_s3 verify=PASS device=0
+DONE mmad_116_fp32_m80n96k80_s3 verify=PASS device=0
+DONE mmad_117_fp32_m64n32k64_s3 verify=PASS device=0
+DONE mmad_119_fp32_m48n80k64_s3 verify=PASS device=0
+DONE mmad_121_fp32_m80n16k32_s3 verify=PASS device=0
+DONE mmad_122_fp32_m64n64k96_s3 verify=PASS device=0
+DONE mmad_124_fp32_m80n16k80_s3 verify=PASS device=0
+DONE mmad_126_fp32_m32n80k32_s3 verify=PASS device=0
+DONE mmad_128_fp32_m96n64k16_s3 verify=PASS device=0
+RUN_CONT mmad s3 shapes 16
+DONE mmad_130_fp32_m64n48k96_s3 verify=PASS device=0
+DONE mmad_131_fp32_m16n96k16_s3 verify=PASS device=0
+DONE mmad_134_fp32_m16n48k48_s3 verify=PASS device=0
+DONE mmad_135_fp32_m16n96k48_s3 verify=PASS device=0
+DONE mmad_136_fp32_m16n32k16_s3 verify=PASS device=0
+DONE mmad_139_fp32_m48n48k80_s3 verify=PASS device=0
+DONE mmad_140_fp32_m48n32k80_s3 verify=PASS device=0
+DONE mmad_142_fp32_m16n80k80_s3 verify=PASS device=0
+DONE mmad_145_fp32_m80n64k48_s3 verify=PASS device=0
+DONE mmad_147_fp32_m32n32k16_s3 verify=PASS device=0
+DONE mmad_150_fp32_m96n48k48_s3 verify=PASS device=0
+DONE mmad_152_fp32_m80n48k80_s3 verify=PASS device=0
+DONE mmad_154_fp32_m64n96k48_s3 verify=PASS device=0
+DONE mmad_156_fp32_m96n96k96_s3 verify=PASS device=0
+DONE mmad_157_fp32_m96n64k64_s3 verify=PASS device=0
+DONE mmad_160_fp32_m48n64k96_s3 verify=PASS device=0
+RUN_CONT mmad s3 shapes 16
+DONE mmad_162_fp32_m80n48k48_s3 verify=PASS device=0
+DONE mmad_170_fp32_m80n32k32_s3 verify=PASS device=0
+DONE mmad_171_fp32_m32n64k64_s3 verify=PASS device=0
+DONE mmad_172_fp32_m32n64k96_s3 verify=PASS device=0
+DONE mmad_173_fp32_m16n16k64_s3 verify=PASS device=0
+DONE mmad_175_fp32_m64n96k80_s3 verify=PASS device=0
+DONE mmad_178_fp32_m16n48k32_s3 verify=PASS device=0
+DONE mmad_179_fp32_m96n80k48_s3 verify=PASS device=0
+DONE mmad_180_fp32_m48n80k32_s3 verify=PASS device=0
+DONE mmad_181_fp32_m64n32k80_s3 verify=PASS device=0
+DONE mmad_182_fp32_m64n80k48_s3 verify=PASS device=0
+DONE mmad_185_fp32_m80n16k96_s3 verify=PASS device=0
+DONE mmad_187_fp32_m96n16k64_s3 verify=PASS device=0
+DONE mmad_188_fp32_m64n16k80_s3 verify=PASS device=0
+DONE mmad_193_fp32_m16n48k96_s3 verify=PASS device=0
+DONE mmad_195_fp32_m32n64k80_s3 verify=PASS device=0
+RUN_CONT mmad s3 shapes 2
+DONE mmad_196_fp32_m64n80k64_s3 verify=PASS device=0
+DONE mmad_197_fp32_m80n80k32_s3 verify=PASS device=0
+RUN_CONT mmad s1 shapes 16
+DONE mmad_002_int8_m32n32k32_s1 verify=PASS device=0
+DONE mmad_005_int8_m80n64k32_s1 verify=PASS device=0
+DONE mmad_007_int8_m64n16k64_s1 verify=PASS device=0
+DONE mmad_024_int8_m80n96k64_s1 verify=PASS device=0
+DONE mmad_036_int8_m64n64k96_s1 verify=PASS device=0
+DONE mmad_039_int8_m32n32k96_s1 verify=PASS device=0
+DONE mmad_041_int8_m96n32k32_s1 verify=PASS device=0
+DONE mmad_049_int8_m96n48k64_s1 verify=PASS device=0
+DONE mmad_050_int8_m16n96k32_s1 verify=PASS device=0
+DONE mmad_051_int8_m48n16k96_s1 verify=PASS device=0
+DONE mmad_052_int8_m32n48k32_s1 verify=PASS device=0
+DONE mmad_054_int8_m16n80k32_s1 verify=PASS device=0
+DONE mmad_060_int8_m32n48k64_s1 verify=PASS device=0
+DONE mmad_066_int8_m64n48k96_s1 verify=PASS device=0
+DONE mmad_068_int8_m64n32k96_s1 verify=PASS device=0
+DONE mmad_069_int8_m32n64k32_s1 verify=PASS device=0
+RUN_CONT mmad s1 shapes 16
+DONE mmad_076_int8_m64n80k32_s1 verify=PASS device=0
+DONE mmad_077_int8_m16n64k32_s1 verify=PASS device=0
+DONE mmad_079_int8_m48n80k32_s1 verify=PASS device=0
+DONE mmad_084_int8_m64n48k32_s1 verify=PASS device=0
+DONE mmad_086_int8_m80n80k64_s1 verify=PASS device=0
+DONE mmad_089_int8_m80n80k32_s1 verify=PASS device=0
+DONE mmad_090_int8_m16n32k64_s1 verify=PASS device=0
+DONE mmad_091_int8_m32n64k96_s1 verify=PASS device=0
+DONE mmad_099_int8_m96n64k96_s1 verify=PASS device=0
+DONE mmad_102_int8_m80n32k64_s1 verify=PASS device=0
+DONE mmad_108_int8_m96n16k64_s1 verify=PASS device=0
+DONE mmad_110_int8_m48n80k64_s1 verify=PASS device=0
+DONE mmad_114_int8_m64n32k64_s1 verify=PASS device=0
+DONE mmad_123_int8_m64n16k32_s1 verify=PASS device=0
+DONE mmad_127_int8_m64n96k32_s1 verify=PASS device=0
+DONE mmad_137_int8_m48n48k32_s1 verify=PASS device=0
+RUN_CONT mmad s1 shapes 16
+DONE mmad_141_int8_m16n16k64_s1 verify=PASS device=0
+DONE mmad_143_int8_m48n48k96_s1 verify=PASS device=0
+DONE mmad_144_int8_m80n80k96_s1 verify=PASS device=0
+DONE mmad_149_int8_m80n32k96_s1 verify=PASS device=0
+DONE mmad_153_int8_m16n48k64_s1 verify=PASS device=0
+DONE mmad_158_int8_m64n80k96_s1 verify=PASS device=0
+DONE mmad_159_int8_m48n96k96_s1 verify=PASS device=0
+DONE mmad_161_int8_m80n48k32_s1 verify=PASS device=0
+DONE mmad_163_int8_m16n96k64_s1 verify=PASS device=0
+DONE mmad_165_int8_m48n32k64_s1 verify=PASS device=0
+DONE mmad_168_int8_m80n16k64_s1 verify=PASS device=0
+DONE mmad_177_int8_m16n16k32_s1 verify=PASS device=0
+DONE mmad_183_int8_m96n96k32_s1 verify=PASS device=0
+DONE mmad_184_int8_m16n64k96_s1 verify=PASS device=0
+DONE mmad_189_int8_m32n96k32_s1 verify=PASS device=0
+DONE mmad_191_int8_m64n64k64_s1 verify=PASS device=0
+RUN_CONT mmad s1 shapes 3
+DONE mmad_194_int8_m64n64k32_s1 verify=PASS device=0
+DONE mmad_198_int8_m96n80k64_s1 verify=PASS device=0
+DONE mmad_200_int8_m32n32k64_s1 verify=PASS device=0
+RUN_CONT mmad s2 shapes 16
+DONE mmad_004_bf16_m80n64k64_s2 verify=PASS device=0
+DONE mmad_008_bf16_m80n48k48_s2 verify=PASS device=0
+DONE mmad_010_bf16_m32n80k32_s2 verify=PASS device=0
+DONE mmad_013_bf16_m96n80k48_s2 verify=PASS device=0
+DONE mmad_022_bf16_m32n80k48_s2 verify=PASS device=0
+DONE mmad_023_bf16_m32n80k96_s2 verify=PASS device=0
+DONE mmad_025_bf16_m96n80k32_s2 verify=PASS device=0
+DONE mmad_026_bf16_m48n32k96_s2 verify=PASS device=0
+DONE mmad_029_bf16_m96n96k96_s2 verify=PASS device=0
+DONE mmad_031_bf16_m96n32k64_s2 verify=PASS device=0
+DONE mmad_033_bf16_m96n48k32_s2 verify=PASS device=0
+DONE mmad_035_bf16_m80n96k96_s2 verify=PASS device=0
+DONE mmad_044_bf16_m48n96k32_s2 verify=PASS device=0
+DONE mmad_053_bf16_m80n32k80_s2 verify=PASS device=0
+DONE mmad_055_bf16_m64n48k80_s2 verify=PASS device=0
+DONE mmad_057_bf16_m32n96k96_s2 verify=PASS device=0
+RUN_CONT mmad s2 shapes 16
+DONE mmad_058_bf16_m96n32k32_s2 verify=PASS device=0
+DONE mmad_061_bf16_m96n96k32_s2 verify=PASS device=0
+DONE mmad_064_bf16_m48n96k64_s2 verify=PASS device=0
+DONE mmad_072_bf16_m32n32k64_s2 verify=PASS device=0
+DONE mmad_073_bf16_m48n64k32_s2 verify=PASS device=0
+DONE mmad_081_bf16_m64n80k48_s2 verify=PASS device=0
+DONE mmad_082_bf16_m32n48k32_s2 verify=PASS device=0
+DONE mmad_092_bf16_m64n96k80_s2 verify=PASS device=0
+DONE mmad_093_bf16_m80n64k32_s2 verify=PASS device=0
+DONE mmad_094_bf16_m80n64k96_s2 verify=PASS device=0
+DONE mmad_097_bf16_m96n96k48_s2 verify=PASS device=0
+DONE mmad_101_bf16_m80n64k80_s2 verify=PASS device=0
+DONE mmad_107_bf16_m96n32k80_s2 verify=PASS device=0
+DONE mmad_109_bf16_m48n48k96_s2 verify=PASS device=0
+DONE mmad_118_bf16_m48n32k64_s2 verify=PASS device=0
+DONE mmad_120_bf16_m64n64k32_s2 verify=PASS device=0
+RUN_CONT mmad s2 shapes 16
+DONE mmad_125_bf16_m80n80k96_s2 verify=PASS device=0
+DONE mmad_129_bf16_m96n96k80_s2 verify=PASS device=0
+DONE mmad_132_bf16_m64n32k32_s2 verify=PASS device=0
+DONE mmad_133_bf16_m80n96k32_s2 verify=PASS device=0
+DONE mmad_138_bf16_m80n80k80_s2 verify=PASS device=0
+DONE mmad_146_bf16_m64n96k64_s2 verify=PASS device=0
+DONE mmad_148_bf16_m96n80k64_s2 verify=PASS device=0
+DONE mmad_151_bf16_m32n64k80_s2 verify=PASS device=0
+DONE mmad_155_bf16_m32n48k96_s2 verify=PASS device=0
+DONE mmad_164_bf16_m64n80k32_s2 verify=PASS device=0
+DONE mmad_166_bf16_m48n64k96_s2 verify=PASS device=0
+DONE mmad_167_bf16_m80n32k48_s2 verify=PASS device=0
+DONE mmad_169_bf16_m48n96k48_s2 verify=PASS device=0
+DONE mmad_174_bf16_m80n96k64_s2 verify=PASS device=0
+DONE mmad_176_bf16_m48n32k80_s2 verify=PASS device=0
+DONE mmad_186_bf16_m80n32k96_s2 verify=PASS device=0
+RUN_CONT mmad s2 shapes 3
+DONE mmad_190_bf16_m80n32k64_s2 verify=PASS device=0
+DONE mmad_192_bf16_m96n32k48_s2 verify=PASS device=0
+DONE mmad_199_bf16_m64n64k64_s2 verify=PASS device=0
+RUN_CONT load_data s5 shapes 16
+DONE load_data_001_fp32_m32n64k64_s11 verify=PASS device=0
+DONE load_data_003_fp32_m48n96k32_s11 verify=PASS device=0
+DONE load_data_007_fp32_m64n96k80_s11 verify=PASS device=0
+DONE load_data_011_fp32_m16n32k96_s11 verify=PASS device=0
+DONE load_data_012_fp32_m64n16k16_s11 verify=PASS device=0
+DONE load_data_013_fp32_m80n48k48_s11 verify=PASS device=0
+DONE load_data_014_fp32_m32n48k48_s11 verify=PASS device=0
+DONE load_data_016_fp32_m80n64k32_s11 verify=PASS device=0
+DONE load_data_019_fp32_m96n96k80_s11 verify=PASS device=0
+DONE load_data_020_fp32_m16n64k96_s11 verify=PASS device=0
+DONE load_data_021_fp32_m80n96k32_s11 verify=PASS device=0
+DONE load_data_022_fp32_m32n64k80_s11 verify=PASS device=0
+DONE load_data_024_fp32_m48n32k80_s11 verify=PASS device=0
+DONE load_data_027_fp32_m80n80k80_s11 verify=PASS device=0
+DONE load_data_031_fp32_m64n64k48_s11 verify=PASS device=0
+DONE load_data_033_fp32_m96n16k80_s11 verify=PASS device=0
+RUN_CONT load_data s5 shapes 16
+DONE load_data_037_fp32_m64n80k48_s11 verify=PASS device=0
+DONE load_data_040_fp32_m80n80k48_s11 verify=PASS device=0
+DONE load_data_041_fp32_m96n64k64_s11 verify=PASS device=0
+DONE load_data_042_fp32_m16n16k80_s11 verify=PASS device=0
+DONE load_data_044_fp32_m48n64k32_s11 verify=PASS device=0
+DONE load_data_047_fp32_m64n48k16_s11 verify=PASS device=0
+DONE load_data_049_fp32_m96n32k48_s11 verify=PASS device=0
+DONE load_data_056_fp32_m48n48k48_s11 verify=PASS device=0
+DONE load_data_058_fp32_m64n48k48_s11 verify=PASS device=0
+DONE load_data_063_fp32_m32n32k96_s11 verify=PASS device=0
+DONE load_data_065_fp32_m64n96k96_s11 verify=PASS device=0
+DONE load_data_070_fp32_m48n48k64_s11 verify=PASS device=0
+DONE load_data_072_fp32_m48n80k48_s11 verify=PASS device=0
+DONE load_data_074_fp32_m80n48k16_s11 verify=PASS device=0
+DONE load_data_075_fp32_m16n80k32_s11 verify=PASS device=0
+DONE load_data_077_fp32_m64n16k32_s11 verify=PASS device=0
+RUN_CONT load_data s5 shapes 16
+DONE load_data_078_fp32_m32n32k80_s11 verify=PASS device=0
+DONE load_data_080_fp32_m80n96k64_s11 verify=PASS device=0
+DONE load_data_082_fp32_m96n32k32_s11 verify=PASS device=0
+DONE load_data_084_fp32_m16n64k16_s11 verify=PASS device=0
+DONE load_data_085_fp32_m48n48k80_s11 verify=PASS device=0
+DONE load_data_087_fp32_m48n16k48_s11 verify=PASS device=0
+DONE load_data_088_fp32_m64n64k80_s11 verify=PASS device=0
+DONE load_data_091_fp32_m32n96k96_s11 verify=PASS device=0
+DONE load_data_097_fp32_m96n80k32_s11 verify=PASS device=0
+DONE load_data_100_fp32_m48n80k80_s11 verify=PASS device=0
+DONE load_data_102_fp32_m96n64k32_s11 verify=PASS device=0
+DONE load_data_103_fp32_m16n64k64_s11 verify=PASS device=0
+DONE load_data_104_fp32_m80n64k16_s11 verify=PASS device=0
+DONE load_data_106_fp32_m96n48k48_s11 verify=PASS device=0
+DONE load_data_113_fp32_m96n64k48_s11 verify=PASS device=0
+DONE load_data_119_fp32_m96n64k16_s11 verify=PASS device=0
+RUN_CONT load_data s5 shapes 16
+DONE load_data_120_fp32_m48n32k48_s11 verify=PASS device=0
+DONE load_data_121_fp32_m48n48k16_s11 verify=PASS device=0
+DONE load_data_127_fp32_m48n32k16_s11 verify=PASS device=0
+DONE load_data_128_fp32_m64n16k80_s11 verify=PASS device=0
+DONE load_data_130_fp32_m16n48k16_s11 verify=PASS device=0
+DONE load_data_131_fp32_m64n96k48_s11 verify=PASS device=0
+DONE load_data_132_fp32_m16n80k96_s11 verify=PASS device=0
+DONE load_data_137_fp32_m64n96k16_s11 verify=PASS device=0
+DONE load_data_140_fp32_m16n64k48_s11 verify=PASS device=0
+DONE load_data_141_fp32_m80n32k64_s11 verify=PASS device=0
+DONE load_data_147_fp32_m16n48k64_s11 verify=PASS device=0
+DONE load_data_148_fp32_m32n32k48_s11 verify=PASS device=0
+DONE load_data_149_fp32_m48n48k96_s11 verify=PASS device=0
+DONE load_data_150_fp32_m96n48k96_s11 verify=PASS device=0
+DONE load_data_154_fp32_m32n80k96_s11 verify=PASS device=0
+DONE load_data_155_fp32_m80n80k64_s11 verify=PASS device=0
+RUN_CONT load_data s5 shapes 16
+DONE load_data_158_fp32_m48n64k80_s11 verify=PASS device=0
+DONE load_data_161_fp32_m48n64k64_s11 verify=PASS device=0
+DONE load_data_162_fp32_m48n32k96_s11 verify=PASS device=0
+DONE load_data_163_fp32_m64n80k80_s11 verify=PASS device=0
+DONE load_data_169_fp32_m64n80k64_s11 verify=PASS device=0
+DONE load_data_171_fp32_m80n64k80_s11 verify=PASS device=0
+DONE load_data_173_fp32_m32n80k64_s11 verify=PASS device=0
+DONE load_data_174_fp32_m64n80k32_s11 verify=PASS device=0
+DONE load_data_177_fp32_m96n64k96_s11 verify=PASS device=0
+DONE load_data_182_fp32_m16n96k64_s11 verify=PASS device=0
+DONE load_data_185_fp32_m96n80k64_s11 verify=PASS device=0
+DONE load_data_191_fp32_m64n48k80_s11 verify=PASS device=0
+DONE load_data_193_fp32_m96n96k48_s11 verify=PASS device=0
+DONE load_data_195_fp32_m16n48k96_s11 verify=PASS device=0
+DONE load_data_197_fp32_m80n32k16_s11 verify=PASS device=0
+DONE load_data_200_fp32_m80n80k16_s11 verify=PASS device=0
+RUN_CONT load_data s1 shapes 16
+DONE load_data_002_int8_m96n32k96_s3 verify=PASS device=0
+DONE load_data_004_int8_m80n64k96_s3 verify=PASS device=0
+DONE load_data_005_int8_m16n32k64_s3 verify=PASS device=0
+DONE load_data_006_int8_m96n80k64_s3 verify=PASS device=0
+DONE load_data_015_int8_m32n48k32_s3 verify=PASS device=0
+DONE load_data_017_int8_m96n96k96_s3 verify=PASS device=0
+DONE load_data_018_int8_m80n80k64_s3 verify=PASS device=0
+DONE load_data_023_int8_m48n64k32_s3 verify=PASS device=0
+DONE load_data_026_int8_m32n64k96_s3 verify=PASS device=0
+DONE load_data_029_int8_m80n32k96_s3 verify=PASS device=0
+DONE load_data_036_int8_m16n80k96_s3 verify=PASS device=0
+DONE load_data_039_int8_m96n48k64_s3 verify=PASS device=0
+DONE load_data_048_int8_m16n64k96_s3 verify=PASS device=0
+DONE load_data_050_int8_m96n16k96_s3 verify=PASS device=0
+DONE load_data_052_int8_m80n32k64_s3 verify=PASS device=0
+DONE load_data_054_int8_m48n64k96_s3 verify=PASS device=0
+RUN_CONT load_data s1 shapes 16
+DONE load_data_057_int8_m64n80k96_s3 verify=PASS device=0
+DONE load_data_064_int8_m64n48k96_s3 verify=PASS device=0
+DONE load_data_067_int8_m16n80k32_s3 verify=PASS device=0
+DONE load_data_068_int8_m48n16k96_s3 verify=PASS device=0
+DONE load_data_073_int8_m16n48k32_s3 verify=PASS device=0
+DONE load_data_081_int8_m80n80k96_s3 verify=PASS device=0
+DONE load_data_098_int8_m16n96k32_s3 verify=PASS device=0
+DONE load_data_105_int8_m48n80k64_s3 verify=PASS device=0
+DONE load_data_108_int8_m32n16k64_s3 verify=PASS device=0
+DONE load_data_116_int8_m32n64k64_s3 verify=PASS device=0
+DONE load_data_118_int8_m80n80k32_s3 verify=PASS device=0
+DONE load_data_133_int8_m48n96k64_s3 verify=PASS device=0
+DONE load_data_145_int8_m48n32k96_s3 verify=PASS device=0
+DONE load_data_156_int8_m48n16k32_s3 verify=PASS device=0
+DONE load_data_159_int8_m16n64k64_s3 verify=PASS device=0
+DONE load_data_164_int8_m64n64k32_s3 verify=PASS device=0
+RUN_CONT load_data s1 shapes 6
+DONE load_data_165_int8_m64n32k32_s3 verify=PASS device=0
+DONE load_data_178_int8_m96n48k32_s3 verify=PASS device=0
+DONE load_data_179_int8_m48n32k64_s3 verify=PASS device=0
+DONE load_data_184_int8_m32n64k32_s3 verify=PASS device=0
+DONE load_data_186_int8_m32n32k32_s3 verify=PASS device=0
+DONE load_data_196_int8_m48n16k64_s3 verify=PASS device=0
+RUN_CONT load_data s3 shapes 16
+DONE load_data_008_half_m32n64k48_s6 verify=PASS device=0
+DONE load_data_009_half_m64n16k96_s6 verify=PASS device=0
+DONE load_data_010_half_m96n96k16_s6 verify=PASS device=0
+DONE load_data_025_half_m64n96k64_s6 verify=PASS device=0
+DONE load_data_028_half_m64n48k96_s6 verify=PASS device=0
+DONE load_data_030_half_m64n96k32_s6 verify=PASS device=0
+DONE load_data_032_half_m64n48k80_s6 verify=PASS device=0
+DONE load_data_034_half_m16n64k48_s6 verify=PASS device=0
+DONE load_data_035_half_m64n48k64_s6 verify=PASS device=0
+DONE load_data_038_half_m32n32k64_s6 verify=PASS device=0
+DONE load_data_043_half_m32n16k96_s6 verify=PASS device=0
+DONE load_data_045_half_m32n96k16_s6 verify=PASS device=0
+DONE load_data_046_half_m64n96k16_s6 verify=PASS device=0
+DONE load_data_051_half_m32n80k80_s6 verify=PASS device=0
+DONE load_data_053_half_m80n80k48_s6 verify=PASS device=0
+DONE load_data_055_half_m80n48k16_s6 verify=PASS device=0
+RUN_CONT load_data s3 shapes 16
+DONE load_data_059_half_m80n96k96_s6 verify=PASS device=0
+DONE load_data_060_half_m32n48k48_s6 verify=PASS device=0
+DONE load_data_061_half_m16n48k16_s6 verify=PASS device=0
+DONE load_data_062_half_m64n96k80_s6 verify=PASS device=0
+DONE load_data_066_half_m32n80k48_s6 verify=PASS device=0
+DONE load_data_069_half_m80n48k48_s6 verify=PASS device=0
+DONE load_data_071_half_m16n32k16_s6 verify=PASS device=0
+DONE load_data_076_half_m16n48k80_s6 verify=PASS device=0
+DONE load_data_079_half_m64n32k32_s6 verify=PASS device=0
+DONE load_data_083_half_m48n16k32_s6 verify=PASS device=0
+DONE load_data_086_half_m96n80k96_s6 verify=PASS device=0
+DONE load_data_089_half_m96n96k96_s6 verify=PASS device=0
+DONE load_data_090_half_m80n32k80_s6 verify=PASS device=0
+DONE load_data_092_half_m64n64k16_s6 verify=PASS device=0
+DONE load_data_093_half_m48n64k16_s6 verify=PASS device=0
+DONE load_data_094_half_m80n32k48_s6 verify=PASS device=0
+RUN_CONT load_data s3 shapes 16
+DONE load_data_095_half_m80n80k32_s6 verify=PASS device=0
+DONE load_data_096_half_m80n16k16_s6 verify=PASS device=0
+DONE load_data_099_half_m96n96k80_s6 verify=PASS device=0
+DONE load_data_101_half_m48n80k16_s6 verify=PASS device=0
+DONE load_data_107_half_m80n32k16_s6 verify=PASS device=0
+DONE load_data_109_half_m48n96k80_s6 verify=PASS device=0
+DONE load_data_110_half_m64n16k64_s6 verify=PASS device=0
+DONE load_data_111_half_m16n64k32_s6 verify=PASS device=0
+DONE load_data_112_half_m80n96k64_s6 verify=PASS device=0
+DONE load_data_114_half_m96n48k64_s6 verify=PASS device=0
+DONE load_data_115_half_m48n32k48_s6 verify=PASS device=0
+DONE load_data_117_half_m48n64k48_s6 verify=PASS device=0
+DONE load_data_122_half_m16n80k48_s6 verify=PASS device=0
+DONE load_data_123_half_m64n48k32_s6 verify=PASS device=0
+DONE load_data_124_half_m32n48k16_s6 verify=PASS device=0
+DONE load_data_125_half_m96n96k32_s6 verify=PASS device=0
+RUN_CONT load_data s3 shapes 16
+DONE load_data_126_half_m16n32k48_s6 verify=PASS device=0
+DONE load_data_129_half_m96n16k80_s6 verify=PASS device=0
+DONE load_data_134_half_m16n16k80_s6 verify=PASS device=0
+DONE load_data_135_half_m96n64k48_s6 verify=PASS device=0
+DONE load_data_136_half_m48n80k64_s6 verify=PASS device=0
+DONE load_data_138_half_m16n48k64_s6 verify=PASS device=0
+DONE load_data_139_half_m32n80k16_s6 verify=PASS device=0
+DONE load_data_142_half_m16n96k48_s6 verify=PASS device=0
+DONE load_data_143_half_m32n32k16_s6 verify=PASS device=0
+DONE load_data_144_half_m64n64k80_s6 verify=PASS device=0
+DONE load_data_146_half_m16n64k80_s6 verify=PASS device=0
+DONE load_data_151_half_m16n48k48_s6 verify=PASS device=0
+DONE load_data_152_half_m48n80k80_s6 verify=PASS device=0
+DONE load_data_153_half_m48n16k48_s6 verify=PASS device=0
+DONE load_data_157_half_m80n80k16_s6 verify=PASS device=0
+DONE load_data_160_half_m64n64k48_s6 verify=PASS device=0
+RUN_CONT load_data s3 shapes 16
+DONE load_data_166_half_m64n80k80_s6 verify=PASS device=0
+DONE load_data_167_half_m16n32k80_s6 verify=PASS device=0
+DONE load_data_168_half_m96n80k32_s6 verify=PASS device=0
+DONE load_data_170_half_m80n16k32_s6 verify=PASS device=0
+DONE load_data_172_half_m80n16k48_s6 verify=PASS device=0
+DONE load_data_175_half_m32n32k96_s6 verify=PASS device=0
+DONE load_data_176_half_m48n48k16_s6 verify=PASS device=0
+DONE load_data_180_half_m80n96k48_s6 verify=PASS device=0
+DONE load_data_181_half_m96n16k16_s6 verify=PASS device=0
+DONE load_data_183_half_m80n48k80_s6 verify=PASS device=0
+DONE load_data_187_half_m64n80k48_s6 verify=PASS device=0
+DONE load_data_188_half_m32n96k64_s6 verify=PASS device=0
+DONE load_data_189_half_m32n96k96_s6 verify=PASS device=0
+DONE load_data_190_half_m80n32k64_s6 verify=PASS device=0
+DONE load_data_192_half_m16n16k48_s6 verify=PASS device=0
+DONE load_data_194_half_m32n32k32_s6 verify=PASS device=0
+RUN_CONT load_data s3 shapes 2
+DONE load_data_198_half_m64n48k48_s6 verify=PASS device=0
+DONE load_data_199_half_m96n32k32_s6 verify=PASS device=0
+RUN_CONT fixpipe s1 shapes 16
+DONE fixpipe_001_fp32_m32n32k32_s1 verify=PASS device=0
+DONE fixpipe_145_fp32_m32n32k32_s1 verify=PASS device=0
+DONE fixpipe_002_fp32_m32n32k64_s1 verify=PASS device=0
+DONE fixpipe_003_fp32_m32n32k96_s1 verify=PASS device=0
+DONE fixpipe_004_fp32_m32n64k32_s1 verify=PASS device=0
+DONE fixpipe_194_fp32_m32n64k32_s1 verify=PASS device=0
+DONE fixpipe_005_fp32_m32n64k64_s1 verify=PASS device=0
+DONE fixpipe_006_fp32_m32n64k96_s1 verify=PASS device=0
+DONE fixpipe_007_fp32_m32n96k32_s1 verify=PASS device=0
+DONE fixpipe_191_fp32_m32n96k32_s1 verify=PASS device=0
+DONE fixpipe_008_fp32_m32n96k64_s1 verify=PASS device=0
+DONE fixpipe_187_fp32_m32n96k64_s1 verify=PASS device=0
+DONE fixpipe_009_fp32_m32n96k96_s1 verify=PASS device=0
+DONE fixpipe_010_fp32_m48n32k32_s1 verify=PASS device=0
+DONE fixpipe_189_fp32_m48n32k32_s1 verify=PASS device=0
+DONE fixpipe_011_fp32_m48n32k64_s1 verify=PASS device=0
+DONE fixpipe_012_fp32_m48n32k96_s1 verify=PASS device=0
+DONE fixpipe_013_fp32_m48n64k32_s1 verify=PASS device=0
+DONE fixpipe_192_fp32_m48n64k32_s1 verify=PASS device=0
+DONE fixpipe_014_fp32_m48n64k64_s1 verify=PASS device=0
+DONE fixpipe_147_fp32_m48n64k64_s1 verify=PASS device=0
+DONE fixpipe_148_fp32_m48n64k64_s1 verify=PASS device=0
+DONE fixpipe_015_fp32_m48n64k96_s1 verify=PASS device=0
+DONE fixpipe_016_fp32_m48n96k32_s1 verify=PASS device=0
+RUN_CONT fixpipe s1 shapes 16
+DONE fixpipe_017_fp32_m48n96k64_s1 verify=PASS device=0
+DONE fixpipe_018_fp32_m48n96k96_s1 verify=PASS device=0
+DONE fixpipe_019_fp32_m64n32k32_s1 verify=PASS device=0
+DONE fixpipe_020_fp32_m64n32k64_s1 verify=PASS device=0
+DONE fixpipe_021_fp32_m64n32k96_s1 verify=PASS device=0
+DONE fixpipe_179_fp32_m64n32k96_s1 verify=PASS device=0
+DONE fixpipe_022_fp32_m64n64k32_s1 verify=PASS device=0
+DONE fixpipe_167_fp32_m64n64k32_s1 verify=PASS device=0
+DONE fixpipe_023_fp32_m64n64k64_s1 verify=PASS device=0
+DONE fixpipe_161_fp32_m64n64k64_s1 verify=PASS device=0
+DONE fixpipe_024_fp32_m64n64k96_s1 verify=PASS device=0
+DONE fixpipe_025_fp32_m64n96k32_s1 verify=PASS device=0
+DONE fixpipe_026_fp32_m64n96k64_s1 verify=PASS device=0
+DONE fixpipe_196_fp32_m64n96k64_s1 verify=PASS device=0
+DONE fixpipe_027_fp32_m64n96k96_s1 verify=PASS device=0
+DONE fixpipe_176_fp32_m64n96k96_s1 verify=PASS device=0
+DONE fixpipe_028_fp32_m80n32k32_s1 verify=PASS device=0
+DONE fixpipe_029_fp32_m80n32k64_s1 verify=PASS device=0
+DONE fixpipe_030_fp32_m80n32k96_s1 verify=PASS device=0
+DONE fixpipe_031_fp32_m80n64k32_s1 verify=PASS device=0
+DONE fixpipe_142_fp32_m80n64k32_s1 verify=PASS device=0
+DONE fixpipe_165_fp32_m80n64k32_s1 verify=PASS device=0
+DONE fixpipe_032_fp32_m80n64k64_s1 verify=PASS device=0
+RUN_CONT fixpipe s1 shapes 13
+DONE fixpipe_033_fp32_m80n64k96_s1 verify=PASS device=0
+DONE fixpipe_199_fp32_m80n64k96_s1 verify=PASS device=0
+DONE fixpipe_034_fp32_m80n96k32_s1 verify=PASS device=0
+DONE fixpipe_155_fp32_m80n96k32_s1 verify=PASS device=0
+DONE fixpipe_035_fp32_m80n96k64_s1 verify=PASS device=0
+DONE fixpipe_166_fp32_m80n96k64_s1 verify=PASS device=0
+DONE fixpipe_036_fp32_m80n96k96_s1 verify=PASS device=0
+DONE fixpipe_173_fp32_m80n96k96_s1 verify=PASS device=0
+DONE fixpipe_037_fp32_m96n32k32_s1 verify=PASS device=0
+DONE fixpipe_038_fp32_m96n32k64_s1 verify=PASS device=0
+DONE fixpipe_039_fp32_m96n32k96_s1 verify=PASS device=0
+DONE fixpipe_040_fp32_m96n64k32_s1 verify=PASS device=0
+DONE fixpipe_041_fp32_m96n64k64_s1 verify=PASS device=0
+DONE fixpipe_143_fp32_m96n64k64_s1 verify=PASS device=0
+DONE fixpipe_042_fp32_m96n64k96_s1 verify=PASS device=0
+DONE fixpipe_043_fp32_m96n96k32_s1 verify=PASS device=0
+DONE fixpipe_044_fp32_m96n96k64_s1 verify=PASS device=0
+DONE fixpipe_178_fp32_m96n96k64_s1 verify=PASS device=0
+DONE fixpipe_045_fp32_m96n96k96_s1 verify=PASS device=0
+DONE fixpipe_138_fp32_m96n96k96_s1 verify=PASS device=0
+DONE fixpipe_169_fp32_m96n96k96_s1 verify=PASS device=0
+RUN_CONT fixpipe s6 shapes 16
+DONE fixpipe_046_fp32_m32n32k32_s6 verify=PASS device=0
+DONE fixpipe_047_fp32_m32n32k64_s6 verify=PASS device=0
+DONE fixpipe_048_fp32_m32n32k96_s6 verify=PASS device=0
+DONE fixpipe_049_fp32_m32n64k32_s6 verify=PASS device=0
+DONE fixpipe_050_fp32_m32n64k64_s6 verify=PASS device=0
+DONE fixpipe_153_fp32_m32n64k64_s6 verify=PASS device=0
+DONE fixpipe_051_fp32_m32n64k96_s6 verify=PASS device=0
+DONE fixpipe_052_fp32_m32n96k32_s6 verify=PASS device=0
+DONE fixpipe_053_fp32_m32n96k64_s6 verify=PASS device=0
+DONE fixpipe_152_fp32_m32n96k64_s6 verify=PASS device=0
+DONE fixpipe_054_fp32_m32n96k96_s6 verify=PASS device=0
+DONE fixpipe_055_fp32_m48n32k32_s6 verify=PASS device=0
+DONE fixpipe_056_fp32_m48n32k64_s6 verify=PASS device=0
+DONE fixpipe_183_fp32_m48n32k64_s6 verify=PASS device=0
+DONE fixpipe_057_fp32_m48n32k96_s6 verify=PASS device=0
+DONE fixpipe_186_fp32_m48n32k96_s6 verify=PASS device=0
+DONE fixpipe_058_fp32_m48n64k32_s6 verify=PASS device=0
+DONE fixpipe_059_fp32_m48n64k64_s6 verify=PASS device=0
+DONE fixpipe_159_fp32_m48n64k64_s6 verify=PASS device=0
+DONE fixpipe_060_fp32_m48n64k96_s6 verify=PASS device=0
+DONE fixpipe_061_fp32_m48n96k32_s6 verify=PASS device=0
+DONE fixpipe_184_fp32_m48n96k32_s6 verify=PASS device=0
+RUN_CONT fixpipe s6 shapes 16
+DONE fixpipe_062_fp32_m48n96k64_s6 verify=PASS device=0
+DONE fixpipe_063_fp32_m48n96k96_s6 verify=PASS device=0
+DONE fixpipe_064_fp32_m64n32k32_s6 verify=PASS device=0
+DONE fixpipe_065_fp32_m64n32k64_s6 verify=PASS device=0
+DONE fixpipe_066_fp32_m64n32k96_s6 verify=PASS device=0
+DONE fixpipe_158_fp32_m64n32k96_s6 verify=PASS device=0
+DONE fixpipe_067_fp32_m64n64k32_s6 verify=PASS device=0
+DONE fixpipe_170_fp32_m64n64k32_s6 verify=PASS device=0
+DONE fixpipe_190_fp32_m64n64k32_s6 verify=PASS device=0
+DONE fixpipe_068_fp32_m64n64k64_s6 verify=PASS device=0
+DONE fixpipe_181_fp32_m64n64k64_s6 verify=PASS device=0
+DONE fixpipe_182_fp32_m64n64k64_s6 verify=PASS device=0
+DONE fixpipe_185_fp32_m64n64k64_s6 verify=PASS device=0
+DONE fixpipe_069_fp32_m64n64k96_s6 verify=PASS device=0
+DONE fixpipe_164_fp32_m64n64k96_s6 verify=PASS device=0
+DONE fixpipe_070_fp32_m64n96k32_s6 verify=PASS device=0
+DONE fixpipe_156_fp32_m64n96k32_s6 verify=PASS device=0
+DONE fixpipe_174_fp32_m64n96k32_s6 verify=PASS device=0
+DONE fixpipe_071_fp32_m64n96k64_s6 verify=PASS device=0
+DONE fixpipe_072_fp32_m64n96k96_s6 verify=PASS device=0
+DONE fixpipe_073_fp32_m80n32k32_s6 verify=PASS device=0
+DONE fixpipe_074_fp32_m80n32k64_s6 verify=PASS device=0
+DONE fixpipe_075_fp32_m80n32k96_s6 verify=PASS device=0
+DONE fixpipe_076_fp32_m80n64k32_s6 verify=PASS device=0
+DONE fixpipe_140_fp32_m80n64k32_s6 verify=PASS device=0
+DONE fixpipe_180_fp32_m80n64k32_s6 verify=PASS device=0
+DONE fixpipe_077_fp32_m80n64k64_s6 verify=PASS device=0
+DONE fixpipe_188_fp32_m80n64k64_s6 verify=PASS device=0
+RUN_CONT fixpipe s6 shapes 13
+DONE fixpipe_078_fp32_m80n64k96_s6 verify=PASS device=0
+DONE fixpipe_079_fp32_m80n96k32_s6 verify=PASS device=0
+DONE fixpipe_200_fp32_m80n96k32_s6 verify=PASS device=0
+DONE fixpipe_080_fp32_m80n96k64_s6 verify=PASS device=0
+DONE fixpipe_081_fp32_m80n96k96_s6 verify=PASS device=0
+DONE fixpipe_082_fp32_m96n32k32_s6 verify=PASS device=0
+DONE fixpipe_149_fp32_m96n32k32_s6 verify=PASS device=0
+DONE fixpipe_083_fp32_m96n32k64_s6 verify=PASS device=0
+DONE fixpipe_084_fp32_m96n32k96_s6 verify=PASS device=0
+DONE fixpipe_085_fp32_m96n64k32_s6 verify=PASS device=0
+DONE fixpipe_086_fp32_m96n64k64_s6 verify=PASS device=0
+DONE fixpipe_087_fp32_m96n64k96_s6 verify=PASS device=0
+DONE fixpipe_193_fp32_m96n64k96_s6 verify=PASS device=0
+DONE fixpipe_088_fp32_m96n96k32_s6 verify=PASS device=0
+DONE fixpipe_154_fp32_m96n96k32_s6 verify=PASS device=0
+DONE fixpipe_162_fp32_m96n96k32_s6 verify=PASS device=0
+DONE fixpipe_089_fp32_m96n96k64_s6 verify=PASS device=0
+DONE fixpipe_171_fp32_m96n96k64_s6 verify=PASS device=0
+DONE fixpipe_090_fp32_m96n96k96_s6 verify=PASS device=0
+RUN_CONT fixpipe s7 shapes 16
+DONE fixpipe_091_fp32_m32n32k32_s7 verify=PASS device=0
+DONE fixpipe_092_fp32_m32n32k64_s7 verify=PASS device=0
+DONE fixpipe_093_fp32_m32n32k96_s7 verify=PASS device=0
+DONE fixpipe_094_fp32_m32n64k32_s7 verify=PASS device=0
+DONE fixpipe_095_fp32_m32n64k64_s7 verify=PASS device=0
+DONE fixpipe_096_fp32_m32n64k96_s7 verify=PASS device=0
+DONE fixpipe_177_fp32_m32n64k96_s7 verify=PASS device=0
+DONE fixpipe_097_fp32_m32n96k32_s7 verify=PASS device=0
+DONE fixpipe_175_fp32_m32n96k32_s7 verify=PASS device=0
+DONE fixpipe_098_fp32_m32n96k64_s7 verify=PASS device=0
+DONE fixpipe_099_fp32_m32n96k96_s7 verify=PASS device=0
+DONE fixpipe_168_fp32_m32n96k96_s7 verify=PASS device=0
+DONE fixpipe_100_fp32_m48n32k32_s7 verify=PASS device=0
+DONE fixpipe_137_fp32_m48n32k32_s7 verify=PASS device=0
+DONE fixpipe_163_fp32_m48n32k32_s7 verify=PASS device=0
+DONE fixpipe_101_fp32_m48n32k64_s7 verify=PASS device=0
+DONE fixpipe_102_fp32_m48n32k96_s7 verify=PASS device=0
+DONE fixpipe_103_fp32_m48n64k32_s7 verify=PASS device=0
+DONE fixpipe_150_fp32_m48n64k32_s7 verify=PASS device=0
+DONE fixpipe_198_fp32_m48n64k32_s7 verify=PASS device=0
+DONE fixpipe_104_fp32_m48n64k64_s7 verify=PASS device=0
+DONE fixpipe_157_fp32_m48n64k64_s7 verify=PASS device=0
+DONE fixpipe_105_fp32_m48n64k96_s7 verify=PASS device=0
+DONE fixpipe_106_fp32_m48n96k32_s7 verify=PASS device=0
+RUN_CONT fixpipe s7 shapes 16
+DONE fixpipe_107_fp32_m48n96k64_s7 verify=PASS device=0
+DONE fixpipe_144_fp32_m48n96k64_s7 verify=PASS device=0
+DONE fixpipe_108_fp32_m48n96k96_s7 verify=PASS device=0
+DONE fixpipe_197_fp32_m48n96k96_s7 verify=PASS device=0
+DONE fixpipe_109_fp32_m64n32k32_s7 verify=PASS device=0
+DONE fixpipe_110_fp32_m64n32k64_s7 verify=PASS device=0
+DONE fixpipe_139_fp32_m64n32k64_s7 verify=PASS device=0
+DONE fixpipe_111_fp32_m64n32k96_s7 verify=PASS device=0
+DONE fixpipe_112_fp32_m64n64k32_s7 verify=PASS device=0
+DONE fixpipe_113_fp32_m64n64k64_s7 verify=PASS device=0
+DONE fixpipe_114_fp32_m64n64k96_s7 verify=PASS device=0
+DONE fixpipe_115_fp32_m64n96k32_s7 verify=PASS device=0
+DONE fixpipe_146_fp32_m64n96k32_s7 verify=PASS device=0
+DONE fixpipe_116_fp32_m64n96k64_s7 verify=PASS device=0
+DONE fixpipe_195_fp32_m64n96k64_s7 verify=PASS device=0
+DONE fixpipe_117_fp32_m64n96k96_s7 verify=PASS device=0
+DONE fixpipe_118_fp32_m80n32k32_s7 verify=PASS device=0
+DONE fixpipe_119_fp32_m80n32k64_s7 verify=PASS device=0
+DONE fixpipe_120_fp32_m80n32k96_s7 verify=PASS device=0
+DONE fixpipe_121_fp32_m80n64k32_s7 verify=PASS device=0
+DONE fixpipe_122_fp32_m80n64k64_s7 verify=PASS device=0
+RUN_CONT fixpipe s7 shapes 13
+DONE fixpipe_123_fp32_m80n64k96_s7 verify=PASS device=0
+DONE fixpipe_136_fp32_m80n64k96_s7 verify=PASS device=0
+DONE fixpipe_160_fp32_m80n64k96_s7 verify=PASS device=0
+DONE fixpipe_124_fp32_m80n96k32_s7 verify=PASS device=0
+DONE fixpipe_125_fp32_m80n96k64_s7 verify=PASS device=0
+DONE fixpipe_126_fp32_m80n96k96_s7 verify=PASS device=0
+DONE fixpipe_127_fp32_m96n32k32_s7 verify=PASS device=0
+DONE fixpipe_151_fp32_m96n32k32_s7 verify=PASS device=0
+DONE fixpipe_172_fp32_m96n32k32_s7 verify=PASS device=0
+DONE fixpipe_128_fp32_m96n32k64_s7 verify=PASS device=0
+DONE fixpipe_129_fp32_m96n32k96_s7 verify=PASS device=0
+DONE fixpipe_130_fp32_m96n64k32_s7 verify=PASS device=0
+DONE fixpipe_131_fp32_m96n64k64_s7 verify=PASS device=0
+DONE fixpipe_132_fp32_m96n64k96_s7 verify=PASS device=0
+DONE fixpipe_141_fp32_m96n64k96_s7 verify=PASS device=0
+DONE fixpipe_133_fp32_m96n96k32_s7 verify=PASS device=0
+DONE fixpipe_134_fp32_m96n96k64_s7 verify=PASS device=0
+DONE fixpipe_135_fp32_m96n96k96_s7 verify=PASS device=0
+BATCH_DONE ok=600 fail=0 total=600 units=38
+# CUBE ptr sweep
+
+- HEAD: 69aa4d862
+- ARCH: dav-3510
+- MODE: full
+- STAMP: 20260916_173307
+
+- verify PASS: **600**
+- FAIL: 0
+- total: 600
+
+ok 600 fail 0 n 600
