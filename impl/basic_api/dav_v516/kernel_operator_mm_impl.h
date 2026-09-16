@@ -23,7 +23,6 @@
 #include "kernel_operator_mm_bitmode_intf.h"
 #include "kernel_operator_sys_var_intf.h"
 
-
 namespace AscendC {
 /* **************************************************************************************************
  * LoadData 2dv1                                             *
@@ -31,14 +30,14 @@ namespace AscendC {
 template <typename T>
 __aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParam)
 {
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, 
-        "unsupported loaddata_2d from L1 to L0A Buffer(A2) on current device"); });
+    ASCENDC_ASSERT(
+        (false), { KERNEL_LOG(KERNEL_ERROR, "unsupported loaddata_2d from L1 to L0A Buffer(A2) on current device"); });
 }
 template <typename T>
 __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParam)
 {
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, 
-        "unsupported loaddata_2d from L1 to L0B Buffer(B2) on current device"); });
+    ASCENDC_ASSERT(
+        (false), { KERNEL_LOG(KERNEL_ERROR, "unsupported loaddata_2d from L1 to L0B Buffer(B2) on current device"); });
 }
 /* **************************************************************************************************
  * LoadData 2dv2                                             *
@@ -46,8 +45,8 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const
 template <typename T>
 __aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const Load2DBitModeParam& loadDataParam)
 {
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, 
-        "unsupported loaddata_2d from L1 to L0A Buffer(A2) on current device"); });
+    ASCENDC_ASSERT(
+        (false), { KERNEL_LOG(KERNEL_ERROR, "unsupported loaddata_2d from L1 to L0A Buffer(A2) on current device"); });
 }
 
 template <typename T>
@@ -108,8 +107,9 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const
 template <typename T>
 __aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParam)
 {
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, 
-        "unsupported loaddata_2d_v2 from L1 to L0A Buffer(A2) on current device"); });
+    ASCENDC_ASSERT((false), {
+        KERNEL_LOG(KERNEL_ERROR, "unsupported loaddata_2d_v2 from L1 to L0A Buffer(A2) on current device");
+    });
 }
 
 template <typename T>
@@ -178,8 +178,8 @@ __aicore__ inline void LoadData2DL12L0ACal(
     const LoadData2DMxParams& loadMxDataParams)
 {
 #if ASCENDC_CPU_DEBUG
-    uint64_t l0ABaseAddr = static_cast<uint64_t>(
-        reinterpret_cast<uintptr_t>(ConstDefiner::Instance().GetHardwareBaseAddr(Hardware::L0A)));
+    uint64_t l0ABaseAddr =
+        static_cast<uint64_t>(reinterpret_cast<uintptr_t>(ConstDefiner::Instance().GetHardwareBaseAddr(Hardware::L0A)));
     uint64_t bufferOffset = (static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst)) - l0ABaseAddr) / 8;
     uint64_t mxDstAddr =
         static_cast<uint64_t>(reinterpret_cast<uintptr_t>(ConstDefiner::Instance().cpuL0AMx)) + bufferOffset;
@@ -187,9 +187,8 @@ __aicore__ inline void LoadData2DL12L0ACal(
     uint64_t mxDstAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst)) / 8;
 #endif
     load_cbuf_to_ca_mx(
-        mxDstAddr, static_cast<__cbuf__ void*>(src1), loadMxDataParams.xStartPosition,
-        loadMxDataParams.yStartPosition, loadMxDataParams.xStep, loadMxDataParams.yStep, loadMxDataParams.srcStride,
-        loadMxDataParams.dstStride);
+        mxDstAddr, static_cast<__cbuf__ void*>(src1), loadMxDataParams.xStartPosition, loadMxDataParams.yStartPosition,
+        loadMxDataParams.xStep, loadMxDataParams.yStep, loadMxDataParams.srcStride, loadMxDataParams.dstStride);
 }
 
 template <typename T, typename U = T>
@@ -199,8 +198,8 @@ __aicore__ inline void LoadData2DL12L0BCal(
 {
     LoadData2DL12L0BCal(dst, src0, loadDataParam);
 #if ASCENDC_CPU_DEBUG
-    uint64_t l0BBaseAddr = static_cast<uint64_t>(
-        reinterpret_cast<uintptr_t>(ConstDefiner::Instance().GetHardwareBaseAddr(Hardware::L0B)));
+    uint64_t l0BBaseAddr =
+        static_cast<uint64_t>(reinterpret_cast<uintptr_t>(ConstDefiner::Instance().GetHardwareBaseAddr(Hardware::L0B)));
     uint64_t bufferOffset = (static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst)) - l0BBaseAddr) / 8;
     uint64_t mxDstAddr =
         static_cast<uint64_t>(reinterpret_cast<uintptr_t>(ConstDefiner::Instance().cpuL0BMx)) + bufferOffset;
@@ -208,17 +207,17 @@ __aicore__ inline void LoadData2DL12L0BCal(
     uint64_t mxDstAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst)) / 8;
 #endif
     load_cbuf_to_cb_mx(
-        mxDstAddr, static_cast<__cbuf__ void*>(src1), loadMxDataParams.xStartPosition,
-        loadMxDataParams.yStartPosition, loadMxDataParams.xStep, loadMxDataParams.yStep, loadMxDataParams.srcStride,
-        loadMxDataParams.dstStride);
+        mxDstAddr, static_cast<__cbuf__ void*>(src1), loadMxDataParams.xStartPosition, loadMxDataParams.yStartPosition,
+        loadMxDataParams.xStep, loadMxDataParams.yStep, loadMxDataParams.srcStride, loadMxDataParams.dstStride);
 }
 
 template <typename T>
 __aicore__ inline void LoadData2DGM2L0ACal(
     __ca__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParam, const uint8_t cacheMode = 0)
 {
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, 
-        "unsupported loaddata_2d_v2 from gm to L0A Buffer(A2) on current device"); });
+    ASCENDC_ASSERT((false), {
+        KERNEL_LOG(KERNEL_ERROR, "unsupported loaddata_2d_v2 from gm to L0A Buffer(A2) on current device");
+    });
 }
 
 template <typename T>
@@ -232,14 +231,14 @@ __aicore__ inline void LoadData2DGM2L0BCal(
             loadDataParam.dstStride, loadDataParam.mStep, loadDataParam.kStep, loadDataParam.sid, 0, cacheMode);
     } else {
         load_gm_to_cb_2dv2(
-            dst, src, loadDataParam.mStartPosition, loadDataParam.kStartPosition, 
-            loadDataParam.dstStride, loadDataParam.mStep, loadDataParam.kStep, loadDataParam.sid, 0, cacheMode);
+            dst, src, loadDataParam.mStartPosition, loadDataParam.kStartPosition, loadDataParam.dstStride,
+            loadDataParam.mStep, loadDataParam.kStep, loadDataParam.sid, 0, cacheMode);
     }
 }
 
 template <typename T, typename U>
 __aicore__ inline void LoadData2DGM2L0BCal(
-    __cb__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParam, const Nd2NzParamsV2 &nd2nzParams)
+    __cb__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParam, const Nd2NzParamsV2& nd2nzParams)
 {
     static_assert(
         ((IsSameType<T, int8_t>::value && IsSameType<U, int4b_t>::value) ||
@@ -273,7 +272,8 @@ __aicore__ inline void LoadData2DGM2L1Cal(
         SupportType<
             T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, half,
             bfloat16_t, uint16_t, int16_t, float, int32_t, uint32_t>(),
-        "LoadData 2dv2 only support int4b_t fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, "
+        "LoadData 2dv2 only support int4b_t fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, "
+        "fp8_e4m3fn_t, "
         "half, bfloat16_t, uint16_t, int16_t, float, int32_t, uint32_t on current device!");
     set_mte2_src_para(uint64_t(loadDataParam.srcStride));
     if constexpr (SupportType<T, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t>()) {
@@ -326,32 +326,36 @@ template <typename T>
 __aicore__ inline void LoadData2DL12L0ATransposeCal(
     __ca__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParam)
 {
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, 
-        "LoadDataWithTranspose from L1 to L0A Buffer(A2) is not supported on current device"); });
+    ASCENDC_ASSERT((false), {
+        KERNEL_LOG(KERNEL_ERROR, "LoadDataWithTranspose from L1 to L0A Buffer(A2) is not supported on current device");
+    });
 }
 
 template <typename T>
 __aicore__ inline void LoadData2DL12L0BTransposeCal(
     __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParam)
 {
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, 
-        "LoadDataWithTranspose from L1 to L0B Buffer(B2) is not supported on current device"); });
+    ASCENDC_ASSERT((false), {
+        KERNEL_LOG(KERNEL_ERROR, "LoadDataWithTranspose from L1 to L0B Buffer(B2) is not supported on current device");
+    });
 }
 
 template <typename T>
 __aicore__ inline void LoadData2DL12L0ATransposeCal(
     __ca__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParamsV2& loadDataParam)
 {
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, 
-        "LoadDataWithTranspose from L1 to L0A Buffer(A2) is not supported on current device"); });
+    ASCENDC_ASSERT((false), {
+        KERNEL_LOG(KERNEL_ERROR, "LoadDataWithTranspose from L1 to L0A Buffer(A2) is not supported on current device");
+    });
 }
 
 template <typename T>
 __aicore__ inline void LoadData2DL12L0BTransposeCal(
     __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParamsV2& loadDataParam)
 {
-    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, 
-        "LoadDataWithTranspose from L1 to L0B Buffer(B2) is not supported on current device"); });
+    ASCENDC_ASSERT((false), {
+        KERNEL_LOG(KERNEL_ERROR, "LoadDataWithTranspose from L1 to L0B Buffer(B2) is not supported on current device");
+    });
 }
 
 /* **************************************************************************************************
@@ -389,13 +393,13 @@ __aicore__ inline void InitL1BufferCal(__cbuf__ T* dst, const InitConstValuePara
 {
     if constexpr (sizeof(T) == 2) {
         T tmpValue = initConstValueParams.initValue;
-        half initValue = (half &)tmpValue;
+        half initValue = (half&)tmpValue;
         set_l0_set_value_h(initValue);
         int64_t config = 0;
         config |= (uint64_t)initConstValueParams.repeatTimes;
         config |= (uint64_t)initConstValueParams.blockNum << 16;
         config |= (uint64_t)initConstValueParams.dstGap << 32;
-        set_l1_2d((__cbuf__ half *)dst, config);
+        set_l1_2d((__cbuf__ half*)dst, config);
     } else {
         ASCENDC_ASSERT(
             false, { KERNEL_LOG(KERNEL_ERROR, "InitConstValue doesn't support current data type on current device"); });
@@ -408,8 +412,8 @@ __aicore__ inline void InitL1BufferCal(__cbuf__ T* dst, const InitConstValuePara
 template <typename T>
 __aicore__ inline void InitL0ANzMatrixCal(__ca__ T* dst, const InitConstValueParams<T>& initConstValueParams)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, 
-        "InitConstValue in L0A Buffer(A2) is not supported on current device"); });
+    ASCENDC_ASSERT(
+        false, { KERNEL_LOG(KERNEL_ERROR, "InitConstValue in L0A Buffer(A2) is not supported on current device"); });
 }
 
 /* **************************************************************************************************
@@ -418,8 +422,8 @@ __aicore__ inline void InitL0ANzMatrixCal(__ca__ T* dst, const InitConstValuePar
 template <typename T>
 __aicore__ inline void InitL0BNzMatrixCal(__cb__ T* dst, const InitConstValueParams<T>& initConstValueParams)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, 
-        "InitConstValue in L0B Buffer(B2) is not supported on current device"); });
+    ASCENDC_ASSERT(
+        false, { KERNEL_LOG(KERNEL_ERROR, "InitConstValue in L0B Buffer(B2) is not supported on current device"); });
 }
 
 /* **************************************************************************************************
@@ -454,8 +458,8 @@ __aicore__ inline void Load3DSetFMatrixCal(uint16_t l1H, uint16_t l1W, const uin
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Load3DSetFMatrix is not supported on current device"); });
 }
 
-__aicore__ inline void Load3DSetFMatrixCal(uint64_t regFMatrix) 
-{ 
+__aicore__ inline void Load3DSetFMatrixCal(uint64_t regFMatrix)
+{
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Load3DSetFMatrix is not supported on current device"); });
 }
 
@@ -464,8 +468,8 @@ __aicore__ inline void Load3DSetFMatrixBCal(uint16_t l1H, uint16_t l1W, const ui
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Load3DSetFMatrixB is not supported on current device"); });
 }
 
-__aicore__ inline void Load3DSetFMatrixBCal(uint64_t regFMatrix) 
-{ 
+__aicore__ inline void Load3DSetFMatrixBCal(uint64_t regFMatrix)
+{
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "Load3DSetFMatrixB is not supported on current device"); });
 }
 
@@ -477,7 +481,8 @@ __aicore__ inline void Load3DSetPaddingCal(const T padValue)
 
 __aicore__ inline void SetLoadDataRepeatWithStrideCal(const LoadDataRepeatParamWithStride repeatParams)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "SetLoadDataRepeatWithStride is not supported on current device"); });
+    ASCENDC_ASSERT(
+        false, { KERNEL_LOG(KERNEL_ERROR, "SetLoadDataRepeatWithStride is not supported on current device"); });
 }
 
 __aicore__ inline void SetLoadDataRepeatCal(const LoadDataRepeatParam repeatParams)
@@ -533,33 +538,38 @@ template <typename T>
 __aicore__ inline void LoadData3DV2L12L0AWithStrideCal(
     __ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<T>& loadDataParams)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "LoadData3DV2L12L0AWithStride is not supported on current device"); });
+    ASCENDC_ASSERT(
+        false, { KERNEL_LOG(KERNEL_ERROR, "LoadData3DV2L12L0AWithStride is not supported on current device"); });
 }
 
 template <typename T>
 __aicore__ inline void LoadData3DV2L12L0BWithStrideCal(
     __cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<T>& loadDataParams)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "LoadData3DV2L12L0BWithStride is not supported on current device"); });
+    ASCENDC_ASSERT(
+        false, { KERNEL_LOG(KERNEL_ERROR, "LoadData3DV2L12L0BWithStride is not supported on current device"); });
 }
 
 __aicore__ inline void LoadData3DV2L12L0AWithStrideCal(
     __ca__ half* dst, __cbuf__ half* src, const LoadData3DParamsV2<bfloat16_t>& loadDataParams)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "LoadData3DV2L12L0AWithStride is not supported on current device"); });
+    ASCENDC_ASSERT(
+        false, { KERNEL_LOG(KERNEL_ERROR, "LoadData3DV2L12L0AWithStride is not supported on current device"); });
 }
 
 __aicore__ inline void LoadData3DV2L12L0BWithStrideCal(
     __cb__ half* dst, __cbuf__ half* src, const LoadData3DParamsV2<bfloat16_t>& loadDataParams)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "LoadData3DV2L12L0BWithStride is not supported on current device"); });
+    ASCENDC_ASSERT(
+        false, { KERNEL_LOG(KERNEL_ERROR, "LoadData3DV2L12L0BWithStride is not supported on current device"); });
 }
 
 template <typename T>
 __aicore__ inline void LoadData3DV2L12UBWithStrideCal(
     __ubuf__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<T>& loadDataParams)
 {
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "LoadData3DV2L12UBWithStride is not supported on current device"); });
+    ASCENDC_ASSERT(
+        false, { KERNEL_LOG(KERNEL_ERROR, "LoadData3DV2L12UBWithStride is not supported on current device"); });
 }
 
 template <typename T>

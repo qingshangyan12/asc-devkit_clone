@@ -80,23 +80,15 @@ struct GatherMaskParams {
     uint8_t src1RepeatStride = DEFAULT_REPEAT_STRIDE;
 };
 
-enum class GatherPaddingMode : uint8_t {
-    FIRST_ELEM_EVERY_BRUST = 0,
-    CONSTANT_PADDING_MODE = 1,
-    INVALID = 2
-};
+enum class GatherPaddingMode : uint8_t { FIRST_ELEM_EVERY_BRUST = 0, CONSTANT_PADDING_MODE = 1, INVALID = 2 };
 
 template <typename T>
 struct GatherPadParams {
     using TYPE = typename GetPadValueType<T>::Type;
-    __aicore__ GatherPadParams()
-        : padSel(GatherPaddingMode::FIRST_ELEM_EVERY_BRUST),
-          paddingValue(0)
-    {}
+    __aicore__ GatherPadParams() : padSel(GatherPaddingMode::FIRST_ELEM_EVERY_BRUST), paddingValue(0) {}
 
     __aicore__ GatherPadParams(const GatherPaddingMode padSelect, const T padValue)
-        : padSel(padSelect),
-          paddingValue(padValue)
+        : padSel(padSelect), paddingValue(padValue)
     {}
 
     GatherPaddingMode padSel;
@@ -107,11 +99,9 @@ struct GatherParams {
     __aicore__ GatherParams() {}
 
     __aicore__ GatherParams(const uint16_t offsetCount, const uint32_t len, const uint32_t stride)
-        : offsetNum(offsetCount),
-          burstLen(len),
-          dstStride(stride)
+        : offsetNum(offsetCount), burstLen(len), dstStride(stride)
     {}
-    
+
     uint16_t offsetNum = DEFAULT_DATA_COPY_NBURST;
     uint32_t burstLen = 0;
     uint32_t dstStride = DEFAULT_DATA_COPY_STRIDE;
@@ -121,11 +111,9 @@ struct ScatterParams {
     __aicore__ ScatterParams() {}
 
     __aicore__ ScatterParams(const uint16_t offsetCount, const uint32_t len, const uint32_t stride)
-        : offsetNum(offsetCount),
-          burstLen(len),
-          dstStride(stride)
+        : offsetNum(offsetCount), burstLen(len), dstStride(stride)
     {}
-    
+
     uint16_t offsetNum = DEFAULT_DATA_COPY_NBURST;
     uint32_t burstLen = 0;
     uint32_t dstStride = DEFAULT_DATA_COPY_STRIDE;

@@ -110,8 +110,8 @@ __aicore__ inline void Gather(
  */
 template <typename T, typename U = int32_t>
 __aicore__ inline void GatherFromGlobal(
-    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LocalTensor<U>& offsetSrc,
-    GatherParams& gatherParam, GatherPadParams<T>& gatherPadParam);
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LocalTensor<U>& offsetSrc, GatherParams& gatherParam,
+    GatherPadParams<T>& gatherPadParam);
 } // namespace AscendC
 #pragma end_pipe
 #if defined(__NPU_ARCH__)
