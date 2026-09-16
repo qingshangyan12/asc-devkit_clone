@@ -48,10 +48,10 @@ def mmad_pool() -> list[dict]:
     mapping = [("int8", 1, "any"), ("bf16", 2, "any"), ("fp32", 3, "any"), ("int4", 4, "dav-2201")]
     for dtype, sc, arch in mapping:
         for m, n, k in shapes_for(dtype):
-            # s2 两次 Mmad：K 过小易留下未对齐碎块；s3 kDirectionAlign 要求 K 按 32 对齐
+            # s2 两次 Mmad：K 过小易留下未对齐碎块；s3 kDirectionAlign：K%32、M%32
             if dtype == "bf16" and k < 32:
                 continue
-            if dtype == "fp32" and k % 32:
+            if dtype == "fp32" and (k % 32 or m % 32):
                 continue
             rows.append(
                 {
