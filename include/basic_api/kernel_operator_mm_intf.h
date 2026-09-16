@@ -160,6 +160,129 @@ template <
 __aicore__ inline void LoadData(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV1<U>& loadDataParams);
 
+
+/* [CUBE-PTR-BGROUP] LoadData 3DV1 pointer paths (caller ensures reset via defaultConfig) */
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadData(
+    __ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV1<U>& loadDataParams);
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadData(
+    __cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV1<U>& loadDataParams);
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadData(
+    __ubuf__ T* dst, __cbuf__ T* src, const LoadData3DParamsV1<U>& loadDataParams);
+
+/* [CUBE-PTR-BGROUP] LoadData 3DV2 pointer paths */
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadData(
+    __ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams);
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadData(
+    __cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams);
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadData(
+    __ubuf__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams);
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadDataWithStride(
+    __ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams);
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadDataWithStride(
+    __cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams);
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadDataWithStride(
+    __ubuf__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams);
+
+/* [CUBE-PTR-BGROUP] LoadData 3DV2Pro pointer paths */
+template <typename T>
+__aicore__ inline void LoadData(
+    __ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2Pro& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadData(
+    __cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2Pro& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadData(
+    __ubuf__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2Pro& loadDataParams);
+
+/* [CUBE-PTR-BGROUP] MmadMx pointer paths */
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadMx(
+    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadParams& mmadParams);
+
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadMx(
+    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, uint64_t bias,
+    const MmadParams& mmadParams, bool cmatrixSource = false);
+
+/* [CUBE-PTR-BGROUP] BroadCastVecToMM / Fill / InitConstValue / LoadDataUnzip */
+template <typename T, typename U>
+__aicore__ inline __inout_pipe__(V) void BroadCastVecToMM(
+    __cc__ T* dst, __ubuf__ U* src, const int32_t blockCount, const uint8_t blockLen,
+    const uint8_t srcGap, const uint8_t dstGap);
+
+template <typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void Fill(__ca__ T* dst, const InitConstValueParams<U>& initConstValueParams);
+
+template <typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void Fill(__cb__ T* dst, const InitConstValueParams<U>& initConstValueParams);
+
+template <typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void Fill(__cbuf__ T* dst, const InitConstValueParams<U>& initConstValueParams);
+
+template <typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void InitConstValue(__ca__ T* dst, const InitConstValueParams<U>& initConstValueParams);
+
+template <typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void InitConstValue(__cb__ T* dst, const InitConstValueParams<U>& initConstValueParams);
+
+template <typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void InitConstValue(__cbuf__ T* dst, const InitConstValueParams<U>& initConstValueParams);
+
+template <typename T>
+__aicore__ inline void LoadDataUnzip(__cbuf__ T* dst, __gm__ T* src);
+
+template <typename T>
+__aicore__ inline void LoadDataUnzip(__ca__ T* dst, __gm__ T* src);
+
+template <typename T>
+__aicore__ inline void LoadDataUnzip(__cb__ T* dst, __gm__ T* src);
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+/* [CUBE-PTR-BGROUP] Sparse Mmad (arch 2201 only; 950 skip). LoadDataWithSparse Cal 仍吃 Tensor，暂不指针化 */
+template <
+    typename T = int32_t, typename U = int8_t,
+    typename Std::enable_if<Std::is_same<PrimT<T>, int32_t>::value, bool>::type = true,
+    typename Std::enable_if<Std::is_same<PrimT<U>, int8_t>::value, bool>::type = true>
+__aicore__ inline void MmadWithSparse(
+    __cc__ T* dst, __ca__ U* fm, __cb__ U* filter, const MmadParams& mmadParams);
+#endif
+
 /* **************************************************************************************************
  * LoadData 3dv2                                             *
  * enhanced from v1, suitable for aicore > 200                                             *
