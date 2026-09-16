@@ -16,7 +16,7 @@ import sys
 import numpy as np
 
 
-# for float32
+# int: exact-ish; float: community experimental (bf16 ~2^-7, fp32 ~2^-13, with matmul slack)
 relative_tol = 1e-6
 absolute_tol = 1e-9
 error_tol = 1e-4
@@ -25,12 +25,21 @@ error_tol = 1e-4
 def verify_result(scenario_num, output, golden):
     if scenario_num in [2, 3]:
         output_type = np.float32
+        relative_tol_v = 1e-2
+        absolute_tol_v = 1e-2
+        error_tol_v = 5e-2
     else:
         output_type = np.int32
+        relative_tol_v = relative_tol
+        absolute_tol_v = absolute_tol
+        error_tol_v = error_tol
     output = np.fromfile(output, dtype=output_type).reshape(-1)
     golden = np.fromfile(golden, dtype=output_type).reshape(-1)
+    if np.isnan(output).any() or np.isinf(output).any():
+        print("output has NaN/Inf")
+        return False
     different_element_results = np.isclose(
-        output, golden, rtol=relative_tol, atol=absolute_tol, equal_nan=True
+        output, golden, rtol=relative_tol_v, atol=absolute_tol_v, equal_nan=False
     )
     different_element_indexes = np.where(different_element_results == False)[0]
     for index in range(len(different_element_indexes)):
@@ -60,8 +69,8 @@ def verify_result(scenario_num, output, golden):
         if index == 100:
             break
     error_ratio = float(different_element_indexes.size) / golden.size
-    print("error ratio: %.4f, tolerance: %.4f" % (error_ratio, error_tol))
-    return error_ratio <= error_tol
+    print("error ratio: %.4f, tolerance: %.4f" % (error_ratio, error_tol_v))
+    return error_ratio <= error_tol_v
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # Deterministic 200 cases per CUBE ptr API (LoadData / Mmad / Fixpipe).
+from __future__ import annotations
 import json
 import random
 from itertools import product
@@ -47,6 +48,11 @@ def mmad_pool() -> list[dict]:
     mapping = [("int8", 1, "any"), ("bf16", 2, "any"), ("fp32", 3, "any"), ("int4", 4, "dav-2201")]
     for dtype, sc, arch in mapping:
         for m, n, k in shapes_for(dtype):
+            # s2 两次 Mmad：K 过小易留下未对齐碎块；s3 kDirectionAlign 要求 K 按 32 对齐
+            if dtype == "bf16" and k < 32:
+                continue
+            if dtype == "fp32" and k % 32:
+                continue
             rows.append(
                 {
                     "api": "mmad",
@@ -96,7 +102,8 @@ def fixpipe_pool() -> list[dict]:
     rows = []
     for sc, dtype, arch in mapping:
         for m, n, k in shapes_for("half"):
-            if k % 2:
+            # K_ROUND=2，baseK=K/2 需 16 对齐
+            if k % 32:
                 continue
             rows.append(
                 {
