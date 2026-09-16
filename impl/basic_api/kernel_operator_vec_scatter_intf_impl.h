@@ -160,7 +160,8 @@ __aicore__ inline void Scatter(
     using PrimType = PrimT<T>;
     ScatterCheck<T>();
     uint32_t vectorRegWidth = 256;
-#if (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
+    (__NPU_ARCH__ == 5162)
     ScatterImpl(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ uint32_t*)dstOffset.GetPhyAddr(), dstBaseAddr, count);
@@ -213,8 +214,7 @@ __aicore__ inline void Scatter(
  */
 template <typename T, typename U>
 __aicore__ inline void ScatterToGlobal(
-    const GlobalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<U>& offsetSrc,
-    ScatterParams& scatterParam)
+    const GlobalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<U>& offsetSrc, ScatterParams& scatterParam)
 {
     using PrimType = PrimT<T>;
     using OffsetPrimType = PrimT<U>;
@@ -224,9 +224,7 @@ __aicore__ inline void ScatterToGlobal(
         (__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ OffsetPrimType*)offsetSrc.GetPhyAddr(), scatterParam, cacheMode);
 #else
-    ASCENDC_ASSERT(false, {
-        KERNEL_LOG(KERNEL_ERROR, "ScatterToGlobal is not supported on current device");
-    });
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "ScatterToGlobal is not supported on current device"); });
 #endif
 }
 } // namespace AscendC

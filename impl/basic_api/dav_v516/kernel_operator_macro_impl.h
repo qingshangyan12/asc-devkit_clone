@@ -303,8 +303,8 @@ __aicore__ inline uint8_t GetQuantPreMode(pre_quant_t quantPre)
     return quantPreMode;
 }
 
-__aicore__ inline void GenConvFixConfig(const ConvFixParams& params, uint64_t &config)
-{   
+__aicore__ inline void GenConvFixConfig(const ConvFixParams& params, uint64_t& config)
+{
     constexpr uint8_t POS_BIAS_MATRIX_INIT = 0;
     constexpr uint8_t POS_BIAS_MATRIX_BRC = 1;
     constexpr uint8_t POS_PRE_QUANT_MODE = 2;
@@ -345,31 +345,32 @@ __aicore__ inline void GenConvFixConfig(const ConvFixParams& params, uint64_t &c
 }
 
 template <typename DstT, typename Src0T, typename Src1T>
-__aicore__ inline void Convolution(__cbuf__ DstT* dst, __cbuf__ Src0T* fm, __cb__ Src1T* filter, uint64_t bias, uint64_t config)
+__aicore__ inline void Convolution(
+    __cbuf__ DstT* dst, __cbuf__ Src0T* fm, __cb__ Src1T* filter, uint64_t bias, uint64_t config)
 {
     if constexpr (SupportType<Tuple<Src0T, Src1T>, Tuple<int4b_t, int4b_t>>()) {
-        convolution_s4s4((__cbuf__ void *)dst, fm, filter, (__cbuf__ int32_t *)get_imm(0), bias, config);
+        convolution_s4s4((__cbuf__ void*)dst, fm, filter, (__cbuf__ int32_t*)get_imm(0), bias, config);
     } else if constexpr (SupportType<Tuple<Src0T, Src1T>, Tuple<int8_t, int4b_t>>()) {
-        convolution_s8s4((__cbuf__ void *)dst, fm, filter, (__cbuf__ int32_t *)get_imm(0), bias, config);
+        convolution_s8s4((__cbuf__ void*)dst, fm, filter, (__cbuf__ int32_t*)get_imm(0), bias, config);
     } else if constexpr (SupportType<Tuple<Src0T, Src1T>, Tuple<fp8_e4m3fn_t, int4b_t>>()) {
-        convolution_e4m3s4((__cbuf__ void *)dst, fm, filter, (__cbuf__ int32_t *)get_imm(0), bias, config);
+        convolution_e4m3s4((__cbuf__ void*)dst, fm, filter, (__cbuf__ int32_t*)get_imm(0), bias, config);
     } else {
-        convolution((__cbuf__ void *)dst, fm, filter, (__cbuf__ int32_t *)get_imm(0), bias, config);
+        convolution((__cbuf__ void*)dst, fm, filter, (__cbuf__ int32_t*)get_imm(0), bias, config);
     }
 }
 
 template <typename DstT, typename Src0T, typename Src1T>
-__aicore__ inline void ConvolutionNoBroadcast(__cbuf__ DstT* dst, __cbuf__ Src0T* fm, __cb__ Src1T* filter, uint64_t bias, uint64_t config)
+__aicore__ inline void ConvolutionNoBroadcast(
+    __cbuf__ DstT* dst, __cbuf__ Src0T* fm, __cb__ Src1T* filter, uint64_t bias, uint64_t config)
 {
-
     if constexpr (SupportType<Tuple<Src0T, Src1T>, Tuple<int4b_t, int4b_t>>()) {
-        convolution_s4s4((__cbuf__ void *)dst, fm, filter, (__cbuf__ int32_t *)bias, 0ULL, config);
+        convolution_s4s4((__cbuf__ void*)dst, fm, filter, (__cbuf__ int32_t*)bias, 0ULL, config);
     } else if constexpr (SupportType<Tuple<Src0T, Src1T>, Tuple<int8_t, int4b_t>>()) {
-        convolution_s8s4((__cbuf__ void *)dst, fm, filter, (__cbuf__ int32_t *)bias, 0ULL, config);
+        convolution_s8s4((__cbuf__ void*)dst, fm, filter, (__cbuf__ int32_t*)bias, 0ULL, config);
     } else if constexpr (SupportType<Tuple<Src0T, Src1T>, Tuple<fp8_e4m3fn_t, int4b_t>>()) {
-        convolution_e4m3s4((__cbuf__ void *)dst, fm, filter, (__cbuf__ int32_t *)bias, 0ULL, config);
+        convolution_e4m3s4((__cbuf__ void*)dst, fm, filter, (__cbuf__ int32_t*)bias, 0ULL, config);
     } else {
-        convolution((__cbuf__ void *)dst, fm, filter, (__cbuf__ int32_t *)bias, 0ULL, config);
+        convolution((__cbuf__ void*)dst, fm, filter, (__cbuf__ int32_t*)bias, 0ULL, config);
     }
 }
 
@@ -406,8 +407,7 @@ __aicore__ inline void ConvFixCal(
 
 template <typename DstT, typename Src0T, typename Src1T>
 __aicore__ inline void ConvFixCal(
-    __cbuf__ DstT* dst, __cbuf__ Src0T* fm, __cb__ Src1T* filter, uint64_t bias,
-    const ConvFixParams& convFixParams)
+    __cbuf__ DstT* dst, __cbuf__ Src0T* fm, __cb__ Src1T* filter, uint64_t bias, const ConvFixParams& convFixParams)
 {
     uint64_t config = 0;
     CheckCubeFixSupportTypes<DstT, Src0T, Src1T>(dst, fm, filter);

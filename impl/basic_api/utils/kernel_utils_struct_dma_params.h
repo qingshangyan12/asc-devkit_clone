@@ -142,56 +142,54 @@ struct FixpipeParams {
     uint8_t unitFlag = 0;
 };
 
-enum class lut_mode_t {
-    Gelu,
-    Silu,
-    Sigmoid,
-    Tanh
-};
+enum class lut_mode_t { Gelu, Silu, Sigmoid, Tanh };
 
 struct FixPipeConfigParams {
     __aicore__ FixPipeConfigParams() {}
 
-    __aicore__ FixPipeConfigParams(const uint32_t preReluAddrIn, const uint32_t preQuantAddrIn,
-        const uint32_t postQuantAddrIn, const uint32_t antiquantAddrIn, const uint8_t shiftValueIn)
-    : preReluAddr(preReluAddrIn),
-      preQuantAddr(preQuantAddrIn),
-      postQuantAddr(postQuantAddrIn),
-      antiquantAddr(antiquantAddrIn),
-      shiftValue(shiftValueIn)
+    __aicore__ FixPipeConfigParams(
+        const uint32_t preReluAddrIn, const uint32_t preQuantAddrIn, const uint32_t postQuantAddrIn,
+        const uint32_t antiquantAddrIn, const uint8_t shiftValueIn)
+        : preReluAddr(preReluAddrIn),
+          preQuantAddr(preQuantAddrIn),
+          postQuantAddr(postQuantAddrIn),
+          antiquantAddr(antiquantAddrIn),
+          shiftValue(shiftValueIn)
     {}
 
     uint32_t preReluAddr = 0;
     uint32_t preQuantAddr = 0;
     uint32_t postQuantAddr = 0;
     uint32_t antiquantAddr = 0;
-    uint8_t  shiftValue = 0;
-    uint8_t  restorationCtrl = 0;
+    uint8_t shiftValue = 0;
+    uint8_t restorationCtrl = 0;
 };
 
 template <typename T = int16_t>
 struct FixPipePreQuantParams {
     __aicore__ FixPipePreQuantParams() {}
 
-    __aicore__ FixPipePreQuantParams(const int8_t shiftScaleIn, const int8_t mulScaleIn, const int32_t offset0In,
-        const int8_t offset1In, const int16_t offset2In, const T clipMaxValPreIn)
-    : shiftScale(shiftScaleIn),
-      mulScale(mulScaleIn),
-      offset0(offset0In),
-      offset1(offset1In),
-      offset2(offset2In),
-      clipMaxValPre(clipMaxValPreIn)
+    __aicore__ FixPipePreQuantParams(
+        const int8_t shiftScaleIn, const int8_t mulScaleIn, const int32_t offset0In, const int8_t offset1In,
+        const int16_t offset2In, const T clipMaxValPreIn)
+        : shiftScale(shiftScaleIn),
+          mulScale(mulScaleIn),
+          offset0(offset0In),
+          offset1(offset1In),
+          offset2(offset2In),
+          clipMaxValPre(clipMaxValPreIn)
     {
         isSft = true;
     }
 
-    __aicore__ FixPipePreQuantParams(const float scalarValueIn, const int32_t offset0In,
-        const int8_t offset1In, const int16_t offset2In, const T clipMaxValPreIn)
-    : scalarValue(scalarValueIn),
-      offset0(offset0In),
-      offset1(offset1In),
-      offset2(offset2In),
-      clipMaxValPre(clipMaxValPreIn)
+    __aicore__ FixPipePreQuantParams(
+        const float scalarValueIn, const int32_t offset0In, const int8_t offset1In, const int16_t offset2In,
+        const T clipMaxValPreIn)
+        : scalarValue(scalarValueIn),
+          offset0(offset0In),
+          offset1(offset1In),
+          offset2(offset2In),
+          clipMaxValPre(clipMaxValPreIn)
     {
         isSft = false;
     }
@@ -210,13 +208,14 @@ struct FixPipePreQuantParams {
 struct FixPipePostQuantParams {
     __aicore__ FixPipePostQuantParams() {}
 
-    __aicore__ FixPipePostQuantParams(const int8_t shiftScaleIn, const float scalarValueIn, const int8_t offset0In,
-        const int16_t offset1In, const int32_t offset2In)
-    : shiftScale(shiftScaleIn),
-      scalarValue(scalarValueIn),
-      offset0(offset0In),
-      offset1(offset1In),
-      offset2(offset2In)
+    __aicore__ FixPipePostQuantParams(
+        const int8_t shiftScaleIn, const float scalarValueIn, const int8_t offset0In, const int16_t offset1In,
+        const int32_t offset2In)
+        : shiftScale(shiftScaleIn),
+          scalarValue(scalarValueIn),
+          offset0(offset0In),
+          offset1(offset1In),
+          offset2(offset2In)
     {}
 
     int8_t shiftScale = 0;
@@ -231,25 +230,27 @@ template <typename T = int8_t>
 struct FixPipeEltAntiqParams {
     __aicore__ FixPipeEltAntiqParams() {}
 
-    __aicore__ FixPipeEltAntiqParams(const int8_t shiftScaleIn, const int8_t mulScaleIn, const int8_t s4OffsetIn,
-        const int8_t b8OffsetIn, const int16_t s16OffsetIn, const T clipMaxValPreIn, const eltwise_antiq_t eltAntiqCfgIn)
-    : shiftScale(shiftScaleIn),
-      mulScale(mulScaleIn),
-      s4Offset(s4OffsetIn),
-      b8Offset(b8OffsetIn),
-      s16Offset(s16OffsetIn),
-      eltAntiqCfg(eltAntiqCfgIn)
+    __aicore__ FixPipeEltAntiqParams(
+        const int8_t shiftScaleIn, const int8_t mulScaleIn, const int8_t s4OffsetIn, const int8_t b8OffsetIn,
+        const int16_t s16OffsetIn, const T clipMaxValPreIn, const eltwise_antiq_t eltAntiqCfgIn)
+        : shiftScale(shiftScaleIn),
+          mulScale(mulScaleIn),
+          s4Offset(s4OffsetIn),
+          b8Offset(b8OffsetIn),
+          s16Offset(s16OffsetIn),
+          eltAntiqCfg(eltAntiqCfgIn)
     {
         isSft = true;
     }
 
-    __aicore__ FixPipeEltAntiqParams(const half scalarValueIn, const int8_t s4OffsetIn,
-        const int8_t b8OffsetIn, const int16_t s16OffsetIn, const T clipMaxValPreIn, const eltwise_antiq_t eltAntiqCfgIn)
-    : scalarValue(scalarValueIn),
-      s4Offset(s4OffsetIn),
-      b8Offset(b8OffsetIn),
-      s16Offset(s16OffsetIn),
-      eltAntiqCfg(eltAntiqCfgIn)
+    __aicore__ FixPipeEltAntiqParams(
+        const half scalarValueIn, const int8_t s4OffsetIn, const int8_t b8OffsetIn, const int16_t s16OffsetIn,
+        const T clipMaxValPreIn, const eltwise_antiq_t eltAntiqCfgIn)
+        : scalarValue(scalarValueIn),
+          s4Offset(s4OffsetIn),
+          b8Offset(b8OffsetIn),
+          s16Offset(s16OffsetIn),
+          eltAntiqCfg(eltAntiqCfgIn)
     {
         isSft = false;
     }
@@ -267,12 +268,9 @@ struct FixPipeEltAntiqParams {
 struct FixpipeEltwiseAddrParams {
     __aicore__ FixpipeEltwiseAddrParams() {}
 
-    __aicore__ FixpipeEltwiseAddrParams(const bool c0IndicatorIn, const uint32_t eltSrcAddrIn,
-        const uint32_t srcStride1In, const uint32_t srcStride2In)
-    : c0Indicator(c0IndicatorIn),
-      eltSrcAddr(eltSrcAddrIn),
-      srcStride1(srcStride1In),
-      srcStride2(srcStride2In)
+    __aicore__ FixpipeEltwiseAddrParams(
+        const bool c0IndicatorIn, const uint32_t eltSrcAddrIn, const uint32_t srcStride1In, const uint32_t srcStride2In)
+        : c0Indicator(c0IndicatorIn), eltSrcAddr(eltSrcAddrIn), srcStride1(srcStride1In), srcStride2(srcStride2In)
     {}
 
     bool c0Indicator = false;
@@ -286,8 +284,7 @@ struct FixpipeClipReluParams {
     __aicore__ FixpipeClipReluParams() {}
 
     __aicore__ FixpipeClipReluParams(const T1 preValueIn, const T2 postValueIn)
-    : preValue(preValueIn),
-      postValue(postValueIn)
+        : preValue(preValueIn), postValue(postValueIn)
     {}
 
     T1 preValue = 0;
