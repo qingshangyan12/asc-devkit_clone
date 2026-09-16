@@ -229,6 +229,141 @@ template <
         bool>::type = true>
 __aicore__ inline void DataCopy(const DstT& dst, const SrcT& src, const DataCopyParams& repeatParams);
 
+/* **************************************************************************************************
+ * Enhanced and conversion pointer extended overloads
+ *
+ * These families take DataCopyParams together with DataCopyEnhancedParams (the enhanced family), the
+ * conversion parameters (DataCopyCO12DstParams), or are distinguished from each other purely by the element
+ * type pair of their operands (the dtype conversion family). They all operate on local operands, so the
+ * direction predicate is only needed where a GM slot takes part, and the element type pair is expressed with
+ * DmaPrimT, which reduces a Tensor operand to its PrimType exactly as the Tensor-only guards do.
+ * ************************************************************************************************* */
+
+/*! \brief Pointer-extended DataCopy with DataCopyEnhancedParams, GM -> UB / L1. */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaGmToLocalShape<DstT, SrcT>, bool>::type =
+        true>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    const DstT& dst, const SrcT& src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
+
+/*! \brief Pointer-extended DataCopy with DataCopyEnhancedParams, UB / L1 -> GM. */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToGmShape<DstT, SrcT>, bool>::type =
+        true>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
+    const DstT& dst, const SrcT& src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
+
+/*!
+ * \brief Pointer-extended DataCopy with DataCopyEnhancedParams, local -> local (UB -> UB / UB -> L1 /
+ *        UB -> L0C / L1 -> UB / L1 -> L0C / L0C -> UB).
+ *
+ *        The same-element clause mirrors the Tensor-only overload, which spells both operands with one
+ *        element type T. Keeping it makes this generic mutually exclusive with the dtype conversion overloads
+ *        declared further down, which share the parameter list:
+ *        the conversion overloads require a specific, unequal element pair, so no call can satisfy both.
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToLocalShape<DstT, SrcT> &&
+            Std::is_same<DmaPrimT<DstT>, DmaPrimT<SrcT>>::value,
+        bool>::type = true>
+__aicore__ inline void DataCopy(
+    const DstT& dst, const SrcT& src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
+
+/*! \brief Pointer-extended DataCopy(dstLocal, srcLocal, DataCopyCO12DstParams): L0C -> L1. */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToLocalShape<DstT, SrcT>,
+        bool>::type = true>
+__aicore__ inline void DataCopy(const DstT& dst, const SrcT& src, const DataCopyCO12DstParams& intriParams);
+
+/*! \brief Pointer-extended DataCopy(dstGlobal, srcLocal, DataCopyCO12DstParams): L0C -> GM. */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToGmShape<DstT, SrcT>, bool>::type =
+        true>
+__aicore__ inline void DataCopy(const DstT& dst, const SrcT& src, const DataCopyCO12DstParams& intriParams);
+
+#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201))
+// float to bfloat16_t
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToLocalShape<DstT, SrcT> &&
+            Std::is_same<DmaPrimT<DstT>, bfloat16_t>::value && Std::is_same<DmaPrimT<SrcT>, float>::value,
+        bool>::type = true>
+__aicore__ inline __inout_pipe__(V) void DataCopy(
+    const DstT& dst, const SrcT& src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
+
+#endif
+
+// float to half
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToLocalShape<DstT, SrcT> &&
+            Std::is_same<DmaPrimT<DstT>, half>::value && Std::is_same<DmaPrimT<SrcT>, float>::value,
+        bool>::type = true>
+__aicore__ inline __inout_pipe__(V) void DataCopy(
+    const DstT& dst, const SrcT& src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
+
+// int32_t to half
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToLocalShape<DstT, SrcT> &&
+            Std::is_same<DmaPrimT<DstT>, half>::value && Std::is_same<DmaPrimT<SrcT>, int32_t>::value,
+        bool>::type = true>
+__aicore__ inline __inout_pipe__(V) void DataCopy(
+    const DstT& dst, const SrcT& src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
+
+// int32_t to int16_t
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToLocalShape<DstT, SrcT> &&
+            Std::is_same<DmaPrimT<DstT>, int16_t>::value && Std::is_same<DmaPrimT<SrcT>, int32_t>::value,
+        bool>::type = true>
+__aicore__ inline __inout_pipe__(V) void DataCopy(
+    const DstT& dst, const SrcT& src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
+
+// int32_t to int8_t
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToLocalShape<DstT, SrcT> &&
+            Std::is_same<DmaPrimT<DstT>, int8_t>::value && Std::is_same<DmaPrimT<SrcT>, int32_t>::value,
+        bool>::type = true>
+__aicore__ inline __inout_pipe__(V) void DataCopy(
+    const DstT& dst, const SrcT& src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
+
+// int32_t to uint8_t
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToLocalShape<DstT, SrcT> &&
+            Std::is_same<DmaPrimT<DstT>, uint8_t>::value && Std::is_same<DmaPrimT<SrcT>, int32_t>::value,
+        bool>::type = true>
+__aicore__ inline __inout_pipe__(V) void DataCopy(
+    const DstT& dst, const SrcT& src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
+
+// half to float
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToLocalShape<DstT, SrcT> &&
+            Std::is_same<DmaPrimT<DstT>, float>::value && Std::is_same<DmaPrimT<SrcT>, half>::value,
+        bool>::type = true>
+__aicore__ inline __inout_pipe__(V) void DataCopy(
+    const DstT& dst, const SrcT& src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
+
 /*
  * @ingroup DataCopy Level 0
  * @brief datacopy from L1 to bt, applicable to vector data

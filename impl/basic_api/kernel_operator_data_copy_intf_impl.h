@@ -2538,6 +2538,342 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
 }
 #endif
 
+/* **************************************************************************************************
+ * Enhanced / conversion pointer extended overloads
+ *
+ * Same contract as the families above: an overload is viable only when a raw pointer takes part, the position
+ * of every operand comes from GetDmaOperandHardwarePos (compile time for a pointer, the TPosition for a
+ * Tensor), and every bottom level call site keeps the cast shape of the Tensor-only code it mirrors.
+ *
+ * What the pointer path does not do, as for the families above, is derive a Tensor size: the Tensor size /
+ * overflow checks and the CPU debug position checks need Tensor metadata, so they are not emitted for a
+ * pointer operand. The element type of each operand is expressed with DmaPrimT, which yields a Tensor's
+ * PrimType -- exactly the expression the Tensor-only bodies cast to.
+ * ************************************************************************************************* */
+
+/*!
+ * \brief Pointer-extended DataCopy with DataCopyEnhancedParams, GM -> UB / L1.
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaGmToLocalShape<DstT, SrcT>, bool>::type>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    const DstT& dst, const SrcT& src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
+{
+#ifdef ASCENDC_TIME_STAMP_ON
+    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE2_DATACOPY));
+#endif
+    using PrimType = DmaPrimT<SrcT>;
+    const Hardware dstHWPos = GetDmaOperandHardwarePos(dst);
+    if (dstHWPos == Hardware::UB) {
+        // gm -> ub
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+        DataCopyGM2UBImpl(
+            (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams,
+            DataCopyPtrInternal::ExtractCacheModeForOperand(src));
+#else
+        DataCopyGM2UBImpl(
+            (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams);
+#endif
+    } else if (dstHWPos == Hardware::L1) {
+        // gm -> l1
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+        DataCopyGM2L1Impl(
+            (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams,
+            DataCopyPtrInternal::ExtractCacheModeForOperand(src));
+#else
+        DataCopyGM2L1Impl(
+            (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams);
+#endif
+    } else {
+        ASCENDC_CHECK_TPOSITION(
+            false, "dst", "L1 Buffer(A1/B1)/UB(VECIN)",
+            "DataCopy from GlobalTensor to LocalTensor with DataCopyEnhancedParams",
+            GetPositionDisplay(GetDmaOperandPosition(dst)));
+    }
+}
+
+/*!
+ * \brief Pointer-extended DataCopy with DataCopyEnhancedParams, UB / L1 -> GM.
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToGmShape<DstT, SrcT>, bool>::type>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
+    const DstT& dst, const SrcT& src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
+{
+    using PrimType = DmaPrimT<SrcT>;
+    const Hardware srcHWPos = GetDmaOperandHardwarePos(src);
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+    const uint8_t cacheMode = DataCopyPtrInternal::ExtractCacheModeForOperand(dst);
+#endif
+    if (srcHWPos == Hardware::UB) {
+        // ub -> gm
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+        DataCopyUB2GMImpl(
+            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), intriParams, cacheMode);
+#else
+        DataCopyUB2GMImpl(
+            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), intriParams);
+#endif
+    } else if (srcHWPos == Hardware::L1) {
+        // l1 -> gm
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+        DataCopyL12GMImpl(
+            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), intriParams, cacheMode);
+#else
+        DataCopyL12GMImpl(
+            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), intriParams);
+#endif
+    } else {
+        ASCENDC_CHECK_TPOSITION(
+            false, "src", "L1 Buffer(A1/B1)/UB(VECOUT)",
+            "DataCopy from LocalTensor to GlobalTensor with DataCopyEnhancedParams",
+            GetPositionDisplay(GetDmaOperandPosition(src)));
+    }
+}
+
+/*!
+ * \brief Pointer-extended DataCopy with DataCopyEnhancedParams, local -> local. Covers UB -> UB, UB -> L1,
+ *        UB -> L0C, L1 -> UB, L1 -> L0C and L0C -> UB, each resolved from the operand positions.
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToLocalShape<DstT, SrcT> &&
+            Std::is_same<DmaPrimT<DstT>, DmaPrimT<SrcT>>::value,
+        bool>::type>
+__aicore__ inline void DataCopy(
+    const DstT& dst, const SrcT& src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
+{
+    using PrimType = DmaPrimT<SrcT>;
+    const Hardware dstHWPos = GetDmaOperandHardwarePos(dst);
+    const Hardware srcHWPos = GetDmaOperandHardwarePos(src);
+    if (srcHWPos == Hardware::UB) {
+        if (dstHWPos == Hardware::L1) {
+            // ub -> l1
+            DataCopyUB2L1Impl(
+                (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), intriParams);
+        } else if (dstHWPos == Hardware::L0C) {
+            // ub -> l0c
+            DataCopyUB2L0CImpl(
+                (__cc__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), intriParams,
+                enhancedParams);
+        } else if (dstHWPos == Hardware::UB) {
+            // ub -> ub
+            DataCopyPtrInternal::CopyUB2UB<PrimType>(dst, src, intriParams);
+        } else {
+            ASCENDC_CHECK_TPOSITION(
+                false, "dst", "UB(VECCALC/VECOUT)/L1 Buffer(A1/B1/TSCM)",
+                "DataCopy from LocalTensor(UB(VECIN/VECCALC/VECOUT)) to LocalTensor with DataCopyEnhancedParams",
+                GetPositionDisplay(GetDmaOperandPosition(dst)));
+        }
+    } else if (srcHWPos == Hardware::L1) {
+        if (dstHWPos == Hardware::UB) {
+            // l1 -> ub
+            DataCopyL12UBImpl(
+                (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), intriParams);
+        } else if (dstHWPos == Hardware::L0C) {
+            // l1 -> l0c
+            DataCopyL12L0CImpl(
+                (__cc__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), intriParams,
+                enhancedParams);
+        } else {
+            ASCENDC_CHECK_TPOSITION(
+                false, "dst", "L0C Buffer(CO1)",
+                "DataCopy from LocalTensor(L1 Buffer(A1/B1)) to LocalTensor with DataCopyEnhancedParams",
+                GetPositionDisplay(GetDmaOperandPosition(dst)));
+        }
+    } else if (srcHWPos == Hardware::L0C) {
+        if (dstHWPos == Hardware::UB) {
+            // l0c -> ub
+            DataCopyL0C2UBImpl(
+                (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__cc__ PrimType*)GetUnderlyingPtr(src), intriParams,
+                enhancedParams);
+        } else {
+            ASCENDC_CHECK_TPOSITION(
+                false, "dst", "UB(CO2)",
+                "DataCopy from LocalTensor(L0C Buffer(CO1)) to LocalTensor with DataCopyEnhancedParams",
+                GetPositionDisplay(GetDmaOperandPosition(dst)));
+        }
+    } else {
+        ASCENDC_CHECK_TPOSITION(
+            false, "src", "UB(VECIN)", "DataCopy from LocalTensor to LocalTensor with DataCopyEnhancedParams",
+            GetPositionDisplay(GetDmaOperandPosition(src)));
+    }
+}
+
+/*!
+ * \brief Pointer-extended DataCopy(dstLocal, srcLocal, DataCopyCO12DstParams): L0C -> L1.
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToLocalShape<DstT, SrcT>, bool>::type>
+__aicore__ inline void DataCopy(const DstT& dst, const SrcT& src, const DataCopyCO12DstParams& intriParams)
+{
+    const Hardware dstHWPos = GetDmaOperandHardwarePos(dst);
+    const Hardware srcHWPos = GetDmaOperandHardwarePos(src);
+    if (srcHWPos != Hardware::L0C) {
+        ASCENDC_CHECK_TPOSITION(
+            false, "src", "CO1", "DataCopy from LocalTensor to LocalTensor with DataCopyCO12DstParams",
+            GetPositionDisplay(GetDmaOperandPosition(src)));
+    } else if (dstHWPos != Hardware::L1) {
+        ASCENDC_CHECK_TPOSITION(
+            false, "dst", "A1", "DataCopy from LocalTensor to LocalTensor with DataCopyCO12DstParams",
+            GetPositionDisplay(GetDmaOperandPosition(dst)));
+    } else {
+        // l0c -> l1
+        DataCopyL0C2L1Impl(
+            (__cbuf__ DmaPrimT<DstT>*)GetUnderlyingPtr(dst), (__cc__ DmaPrimT<SrcT>*)GetUnderlyingPtr(src),
+            intriParams);
+    }
+}
+
+/*!
+ * \brief Pointer-extended DataCopy(dstGlobal, srcLocal, DataCopyCO12DstParams): L0C -> GM.
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToGmShape<DstT, SrcT>, bool>::type>
+__aicore__ inline void DataCopy(const DstT& dst, const SrcT& src, const DataCopyCO12DstParams& intriParams)
+{
+    const Hardware srcHWPos = GetDmaOperandHardwarePos(src);
+    if (srcHWPos != Hardware::L0C) {
+        ASCENDC_CHECK_TPOSITION(
+            false, "src", "CO1", "DataCopy from LocalTensor to GlobalTensor with DataCopyCO12DstParams",
+            GetPositionDisplay(GetDmaOperandPosition(src)));
+    } else {
+        // l0c -> gm
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+        DataCopyL0C2GMImpl(
+            (__gm__ DmaPrimT<DstT>*)GetUnderlyingPtr(dst), (__cc__ DmaPrimT<SrcT>*)GetUnderlyingPtr(src), intriParams,
+            DataCopyPtrInternal::ExtractCacheModeForOperand(dst));
+#else
+        DataCopyL0C2GMImpl(
+            (__gm__ DmaPrimT<DstT>*)GetUnderlyingPtr(dst), (__cc__ DmaPrimT<SrcT>*)GetUnderlyingPtr(src), intriParams);
+#endif
+    }
+}
+
+/* **************************************************************************************************
+ * dtype conversion pointer extended overloads
+ *
+ * The Tensor-only forms of this family are told apart from each other purely by the element type pair of
+ * their operands, so the generic twins keep that pair as their constraint and express it with DmaPrimT:
+ * DmaPrimT<DstT> / DmaPrimT<SrcT> reduce a Tensor operand to its PrimType, exactly the expression the
+ * Tensor-only guards and casts use, and a pointer to its pointee type. The same-element enhanced overload
+ * declared above requires the pair to be equal, so the two groups can never both be viable for one call.
+ *
+ * Each body mirrors its Tensor-only counterpart: the same supported position pairs, the same bottom level
+ * entry point, and the element type the Tensor-only code casts to. As everywhere on the pointer path the
+ * Tensor size / overflow check is not emitted for a pointer operand.
+ * ************************************************************************************************* */
+
+/*!
+ * \brief Pointer-extended conversion DataCopy, L0C -> UB and L1 -> L0C. Covers the dtype conversions whose
+ *        destination or source kind is fixed by the Tensor-only overload of the same element pair.
+ */
+#define ASCENDC_DATACOPY_PTR_CONVERSION(dstElem, srcElem)                                                         \
+    template <                                                                                                    \
+        typename DstT, typename SrcT,                                                                             \
+        typename Std::enable_if<                                                                                  \
+            IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToLocalShape<DstT, SrcT> && \
+                Std::is_same<DmaPrimT<DstT>, dstElem>::value && Std::is_same<DmaPrimT<SrcT>, srcElem>::value,     \
+            bool>::type>                                                                                          \
+    __aicore__ inline __inout_pipe__(V) void DataCopy(                                                            \
+        const DstT& dst, const SrcT& src, const DataCopyParams& intriParams,                                      \
+        const DataCopyEnhancedParams& enhancedParams)                                                             \
+    {                                                                                                             \
+        const Hardware dstHWPos = GetDmaOperandHardwarePos(dst);                                                  \
+        const Hardware srcHWPos = GetDmaOperandHardwarePos(src);                                                  \
+        if (srcHWPos == Hardware::L1 && dstHWPos == Hardware::L0C) {                                              \
+            /* l1 -> l0c */                                                                                       \
+            DataCopyL12L0CImpl(                                                                                   \
+                (__cc__ dstElem*)GetUnderlyingPtr(dst), (__cbuf__ srcElem*)GetUnderlyingPtr(src), intriParams,    \
+                enhancedParams);                                                                                  \
+        } else if (srcHWPos == Hardware::L0C && dstHWPos == Hardware::UB) {                                       \
+            /* l0c -> ub */                                                                                       \
+            DataCopyL0C2UBImpl(                                                                                   \
+                (__ubuf__ dstElem*)GetUnderlyingPtr(dst), (__cc__ srcElem*)GetUnderlyingPtr(src), intriParams,    \
+                enhancedParams);                                                                                  \
+        } else {                                                                                                  \
+            ASCENDC_CHECK_TPOSITION(                                                                              \
+                false, "dst", "L0C Buffer(CO1)/UB(CO2)",                                                          \
+                "DataCopy from LocalTensor(U) to LocalTensor(T) with DataCopyEnhancedParams",                     \
+                GetPositionDisplay(GetDmaOperandPosition(dst)));                                                  \
+        }                                                                                                         \
+    }
+
+/*!
+ * \brief Pointer-extended conversion DataCopy restricted to L0C -> UB, for the conversions whose Tensor-only
+ *        overload supports that pair only.
+ */
+#define ASCENDC_DATACOPY_PTR_CONVERSION_L0C2UB(dstElem, srcElem)                                                  \
+    template <                                                                                                    \
+        typename DstT, typename SrcT,                                                                             \
+        typename Std::enable_if<                                                                                  \
+            IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToLocalShape<DstT, SrcT> && \
+                Std::is_same<DmaPrimT<DstT>, dstElem>::value && Std::is_same<DmaPrimT<SrcT>, srcElem>::value,     \
+            bool>::type>                                                                                          \
+    __aicore__ inline __inout_pipe__(V) void DataCopy(                                                            \
+        const DstT& dst, const SrcT& src, const DataCopyParams& intriParams,                                      \
+        const DataCopyEnhancedParams& enhancedParams)                                                             \
+    {                                                                                                             \
+        const Hardware dstHWPos = GetDmaOperandHardwarePos(dst);                                                  \
+        const Hardware srcHWPos = GetDmaOperandHardwarePos(src);                                                  \
+        if (srcHWPos == Hardware::L0C && dstHWPos == Hardware::UB) {                                              \
+            /* l0c -> ub */                                                                                       \
+            DataCopyL0C2UBImpl(                                                                                   \
+                (__ubuf__ dstElem*)GetUnderlyingPtr(dst), (__cc__ srcElem*)GetUnderlyingPtr(src), intriParams,    \
+                enhancedParams);                                                                                  \
+        } else {                                                                                                  \
+            ASCENDC_CHECK_TPOSITION(                                                                              \
+                false, "src", "L0C Buffer(CO1)",                                                                  \
+                "DataCopy from LocalTensor(L0C Buffer(CO1)) to LocalTensor(UB(CO2)) with DataCopyEnhancedParams", \
+                GetPositionDisplay(GetDmaOperandPosition(src)));                                                  \
+        }                                                                                                         \
+    }
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+ASCENDC_DATACOPY_PTR_CONVERSION(bfloat16_t, float) // float to bfloat16_t
+#endif
+ASCENDC_DATACOPY_PTR_CONVERSION(half, float)             // float to half
+ASCENDC_DATACOPY_PTR_CONVERSION_L0C2UB(half, int32_t)    // int32_t to half
+ASCENDC_DATACOPY_PTR_CONVERSION_L0C2UB(int16_t, int32_t) // int32_t to int16_t
+ASCENDC_DATACOPY_PTR_CONVERSION_L0C2UB(int8_t, int32_t)  // int32_t to int8_t
+ASCENDC_DATACOPY_PTR_CONVERSION_L0C2UB(uint8_t, int32_t) // int32_t to uint8_t
+
+/*!
+ * \brief Pointer-extended conversion DataCopy, UB -> L0C (half to float). The Tensor-only overload of this
+ *        pair converts in the opposite direction, so it has its own body.
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToLocalShape<DstT, SrcT> &&
+            Std::is_same<DmaPrimT<DstT>, float>::value && Std::is_same<DmaPrimT<SrcT>, half>::value,
+        bool>::type>
+__aicore__ inline __inout_pipe__(V) void DataCopy(
+    const DstT& dst, const SrcT& src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
+{
+    const Hardware dstHWPos = GetDmaOperandHardwarePos(dst);
+    const Hardware srcHWPos = GetDmaOperandHardwarePos(src);
+    if (srcHWPos == Hardware::UB && dstHWPos == Hardware::L0C) {
+        // ub -> l0c
+        DataCopyUB2L0CImpl(
+            (__cc__ float*)GetUnderlyingPtr(dst), (__ubuf__ half*)GetUnderlyingPtr(src), intriParams, enhancedParams);
+    } else {
+        ASCENDC_CHECK_TPOSITION(
+            false, "src", "UB(CO2)",
+            "DataCopy from LocalTensor(UB(CO2)) to LocalTensor(CO1) with DataCopyEnhancedParams",
+            GetPositionDisplay(GetDmaOperandPosition(src)));
+    }
+}
+
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_VCONV_INTERFACE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_INTF_IMPL_H__)
