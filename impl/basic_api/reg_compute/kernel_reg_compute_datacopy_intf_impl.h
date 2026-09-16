@@ -304,6 +304,8 @@ __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, MaskReg& mask, Un
 #if !(                       \
     defined(__NPU_ARCH__) && \
     (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163))
+// Kirin v516 平台不支持如下历史接口
+// vld
 template <typename T = DefaultType, LoadDist dist = LoadDist::DIST_NORM, typename U>
 __simd_callee__ inline void DataCopy(U& dstReg, __ubuf__ T* srcAddr)
 {
@@ -322,6 +324,7 @@ __simd_callee__ inline void DataCopy(U& dstReg, __ubuf__ T* srcAddr, AddrReg off
     DataCopyImpl<T, dist, U>(dstReg, srcAddr, offset);
 }
 
+// vld dual
 template <typename T = DefaultType, LoadDist dist, typename U>
 __simd_callee__ inline void DataCopy(U& dstReg0, U& dstReg1, __ubuf__ T* srcAddr)
 {
@@ -340,6 +343,7 @@ __simd_callee__ inline void DataCopy(U& dstReg0, U& dstReg1, __ubuf__ T* srcAddr
     DataCopyImpl<T, dist, U>(dstReg0, dstReg1, srcAddr, offset);
 }
 
+// vst
 template <typename T = DefaultType, StoreDist dist = StoreDist::DIST_NORM, typename U>
 __simd_callee__ inline void DataCopy(__ubuf__ T* dstAddr, U& srcReg, MaskReg& mask)
 {
@@ -358,6 +362,7 @@ __simd_callee__ inline void DataCopy(__ubuf__ T* dstAddr, U& srcReg, AddrReg off
     DataCopyImpl<T, dist, U>(dstAddr, srcReg, offset, mask);
 }
 
+// vst dual
 template <typename T = DefaultType, StoreDist dist, typename U>
 __simd_callee__ inline void DataCopy(__ubuf__ T* dstAddr, U& srcReg0, U& srcReg1, MaskReg& mask)
 {
@@ -370,6 +375,7 @@ __simd_callee__ inline void DataCopy(__ubuf__ T* dstAddr, U& srcReg0, U& srcReg1
     DataCopyImpl<T, dist, U>(dstAddr, srcReg0, srcReg1, offset, mask);
 }
 
+// vsldb
 template <typename T = DefaultType, DataCopyMode dataMode, typename U>
 __simd_callee__ inline void DataCopy(U& dstReg, __ubuf__ T* srcAddr, uint32_t dataBlockStride, MaskReg& mask)
 {
@@ -383,6 +389,7 @@ __simd_callee__ inline void DataCopy(
     DataCopyImpl<T, dataMode, postMode, U>(dstReg, srcAddr, dataBlockStride, repeatStride, mask);
 }
 
+// vsstb
 template <typename T = DefaultType, DataCopyMode dataMode, typename U>
 __simd_callee__ inline void DataCopy(__ubuf__ T* dstAddr, U& srcReg, uint32_t dataBlockStride, MaskReg& mask)
 {
@@ -396,6 +403,7 @@ __simd_callee__ inline void DataCopy(
     DataCopyImpl<T, dataMode, postMode, U>(dstAddr, srcReg, dataBlockStride, repeatStride, mask);
 }
 
+// vldas/vldus
 template <typename T>
 __simd_callee__ inline void DataCopyUnAlignPre(UnalignReg& ureg, __ubuf__ T* srcAddr)
 {
@@ -415,6 +423,7 @@ __simd_callee__ inline void DataCopyUnAlign(U& dstReg, UnalignReg& ureg, __ubuf_
     DataCopyUnAlignImpl<T, U>(dstReg, ureg, srcAddr);
 }
 
+// vlda/vldu
 template <typename T>
 __simd_callee__ inline void DataCopyUnAlignPre(UnalignReg& ureg, __ubuf__ T* srcAddr, AddrReg& areg)
 {
@@ -428,6 +437,7 @@ __simd_callee__ inline void DataCopyUnAlign(
     DataCopyUnAlignImpl<T, U>(dstReg, ureg, srcAddr, areg, inc);
 }
 
+// vstus/vstas
 template <typename T = DefaultType, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE, typename U>
 __simd_callee__ inline void DataCopyUnAlign(
     __ubuf__ T*& dstAddr, U& srcReg, UnalignReg& ureg, uint32_t postUpdateStride)
@@ -441,6 +451,7 @@ __simd_callee__ inline void DataCopyUnAlignPost(__ubuf__ T*& dstAddr, UnalignReg
     DataCopyUnAlignPostImpl<T, postMode>(dstAddr, ureg, postUpdateStride);
 }
 
+// vstu/vsta
 template <typename T = DefaultType, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE, typename U>
 __simd_callee__ inline void DataCopyUnAlign(__ubuf__ T*& dstAddr, U& srcReg, UnalignReg& ureg, AddrReg& areg)
 {
@@ -453,6 +464,7 @@ __simd_callee__ inline void DataCopyUnAlignPost(__ubuf__ T*& dstAddr, UnalignReg
     DataCopyUnAlignPostImpl<T>(dstAddr, ureg, areg);
 }
 
+// vstur/vstar
 template <typename T = DefaultType, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE, typename U>
 __simd_callee__ inline void DataCopyUnAlign(__ubuf__ T* dstAddr, U& srcReg, UnalignReg& ureg)
 {
@@ -465,30 +477,35 @@ __simd_callee__ inline void DataCopyUnAlignPost(__ubuf__ T* dstAddr, UnalignReg&
     DataCopyUnAlignPostImpl(dstAddr, ureg);
 }
 
+// vgather2
 template <typename T0 = DefaultType, typename T1, typename T2 = DefaultType, typename T3, typename T4>
 __simd_callee__ inline void DataCopyGather(T3& dstReg, __ubuf__ T1* baseAddr, T4& index, MaskReg& mask)
 {
     DataCopyGatherImpl<T0, T1, T2, T3, T4>(dstReg, baseAddr, index, mask);
 }
 
+// vgatherb
 template <typename T = DefaultType, typename U, typename S>
 __simd_callee__ inline void DataCopyGatherB(U& dstReg, __ubuf__ T* baseAddr, S& index, MaskReg& mask)
 {
     DataCopyGatherBImpl<T, U, S>(dstReg, baseAddr, index, mask);
 }
 
+// vscatter
 template <typename T = DefaultType, typename U = DefaultType, typename S, typename V>
 __simd_callee__ inline void DataCopyScatter(__ubuf__ T* baseAddr, S& srcReg, V& index, MaskReg& mask)
 {
     DataCopyScatterImpl<T, U, S, V>(baseAddr, srcReg, index, mask);
 }
 
+// pld
 template <typename T, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void DataCopy(MaskReg& mask, __ubuf__ T* srcAddr, AddrReg offset)
 {
     DataCopyImpl<T, dist>(mask, srcAddr, offset);
 }
 
+// plds
 template <typename T, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void DataCopy(MaskReg& mask, __ubuf__ T* srcAddr)
 {
@@ -501,12 +518,14 @@ __simd_callee__ inline void DataCopy(MaskReg& mask, __ubuf__ T*& srcAddr, int32_
     DataCopyImpl<T, postMode, dist>(mask, srcAddr, offset);
 }
 
+// st
 template <typename T, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void DataCopy(__ubuf__ T* dstAddr, MaskReg& mask, AddrReg offset)
 {
     DataCopyImpl<T, dist>(dstAddr, mask, offset);
 }
 
+// psts
 template <typename T, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void DataCopy(__ubuf__ T* dstAddr, MaskReg& mask)
 {
@@ -519,6 +538,7 @@ __simd_callee__ inline void DataCopy(__ubuf__ T*& dstAddr, MaskReg& mask, int32_
     DataCopyImpl<T, postMode, dist>(dstAddr, mask, offset);
 }
 
+// pstu
 template <typename T>
 __simd_callee__ inline void DataCopyUnAlign(__ubuf__ T*& dstAddr, MaskReg& mask, UnalignReg& ureg)
 {
