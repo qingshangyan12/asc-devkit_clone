@@ -142,7 +142,9 @@ def _size_block_fixpipe():
 
 
 def _size_block_loaddata():
-    return """
+    # 910B load_data_l12l0 vs 950 load_data_2dv2_l12l0：scenario→dtype 编号不同
+    if ARCH == "dav-2201":
+        return """
     size_t aFileSize = 0, bFileSize = 0, cFileSize = 0;
     if constexpr (scenarioNum <= 2) {
         aFileSize = (size_t)M * K * sizeof(int8_t);
@@ -159,6 +161,23 @@ def _size_block_loaddata():
     } else {
         aFileSize = (size_t)M * K * sizeof(float);
         bFileSize = (size_t)K * N * sizeof(float);
+        cFileSize = (size_t)M * N * sizeof(float);
+    }
+"""
+    # dav-3510 / load_data_2dv2_l12l0
+    return """
+    size_t aFileSize = 0, bFileSize = 0, cFileSize = 0;
+    if constexpr (scenarioNum <= 2 || scenarioNum == 7) {
+        aFileSize = (size_t)M * K * sizeof(int8_t);
+        bFileSize = (size_t)N * K * sizeof(int8_t);
+        cFileSize = (size_t)M * N * sizeof(int32_t);
+    } else if constexpr (scenarioNum <= 4) {
+        aFileSize = (size_t)M * K * sizeof(half);
+        bFileSize = (size_t)N * K * sizeof(half);
+        cFileSize = (size_t)M * N * sizeof(float);
+    } else {
+        aFileSize = (size_t)M * K * sizeof(float);
+        bFileSize = (size_t)N * K * sizeof(float);
         cFileSize = (size_t)M * N * sizeof(float);
     }
 """
