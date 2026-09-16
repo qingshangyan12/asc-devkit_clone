@@ -277,7 +277,7 @@ template <typename T, typename U>
 __aicore__ inline void FixpipeL0C2UBImpl(__ubuf__ T* dst, __cc__ U* src, FixpipeInfoParams<U>& fixpipeInfo)
 {
     if (fixpipeInfo.nz2ndEn) {
-        uint64_t ndPara = static_cast<uint64_t>(fixpipeInfo.dstNdStride) << 32; // ND_PARA[47:32]
+        uint64_t ndPara = static_cast<uint64_t>(fixpipeInfo.dstNdStride) << 32;  // ND_PARA[47:32]
         ndPara |= static_cast<uint64_t>(fixpipeInfo.srcNdStride) << 16;         // ND_PARA[31:16]
         ndPara |= static_cast<uint64_t>(fixpipeInfo.ndNum);                     // ND_PARA[15:0]
         SetNdParaImpl(ndPara);
@@ -300,7 +300,7 @@ __aicore__ inline void FixpipeL0C2UBImpl(__ubuf__ T* dst, __cc__ U* src, Fixpipe
             FixpipeL0C2UBImplN(dst, src, fixpipeInfo, fixpipeInfo.tiling.tailNSize, fixpipeInfo.tiling.nIterNum);
         }
         return;
-    }
+    } /* repeated SetNdParaImpl overload at source line 303 */
 
     /*
     make code for scalar quant mode:

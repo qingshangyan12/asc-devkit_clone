@@ -134,7 +134,7 @@ __aicore__ inline void SoftmaxFlashV2NoUpdateExtImpl(
     PipeBarrier<PIPE_V>();
     for (uint32_t i = 0; i <= tiling.rangeM; i++) {
         SoftmaxFlashV2NoUpdateImpl(
-            dst, expSumTensor, maxTensor, src, workLocal, reduceParam, tiling, offset1, offset2, splitSize, reduceSize);
+            dst, expSumTensor, maxTensor, src, workLocal, reduceParam, tiling, offset1, offset2, splitSize, reduceSize); /* repeated SoftmaxFlashV2NoUpdateImpl overload at source line 137 */
         offset1 += tiling.splitSize;
         offset2 += tiling.reduceSize;
         if (i == (tiling.rangeM - 1)) {

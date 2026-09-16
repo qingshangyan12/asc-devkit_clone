@@ -204,7 +204,7 @@ __aicore__ inline void SelectCal(
     __ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, int32_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
     if constexpr (selMode == SELMODE::VSEL_CMPMASK_SPR) {
-        vsel(
+        vsel( /* repeated VselIntrinsicsImpl overload at source line 207 */
             dst, src0, src1, repeatTime, repeatParams.dstBlkStride, repeatParams.src0BlkStride,
             repeatParams.src1BlkStride, repeatParams.dstRepStride, repeatParams.src0RepStride,
             repeatParams.src1RepStride);

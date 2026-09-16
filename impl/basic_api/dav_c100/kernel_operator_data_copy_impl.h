@@ -655,7 +655,7 @@ __aicore__ inline void DataCopyVectorL0C2UBImpl(
     } else if (enhancedParams.deqScale == DeqScale::DEQ16) {
         copy_vector_cc_to_ubuf(
             (__ubuf__ half*)dst, (__cc__ int32_t*)src, enhancedParams.sidStoreMode, intriParams.blockCount,
-            intriParams.blockLen, intriParams.srcStride, intriParams.dstStride, CRMODE_DEQSCALE_DEQ16);
+            intriParams.blockLen, intriParams.srcStride, intriParams.dstStride, CRMODE_DEQSCALE_DEQ16); /* repeated DataCopyVectorL0C2UBImpl overload at source line 658 */
     } else {
         ASCENDC_ASSERT(false, {
             KERNEL_LOG(

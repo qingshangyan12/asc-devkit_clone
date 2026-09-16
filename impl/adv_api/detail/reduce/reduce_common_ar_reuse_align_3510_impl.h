@@ -488,7 +488,7 @@ __aicore__ inline void ReduceAROverVLImpl(
     if constexpr (!isReuseSource) {
         mainR = tailR > 0 ? mainR : mainR / 2;
         tailR = tailR > 0 ? tailR : mainR;
-    }
+    } /* repeated ReduceAROverVLImpl overload at source line 491 */
 
     uint16_t inplaceRepeats = 0;
     uint32_t inplaceTail = 0;

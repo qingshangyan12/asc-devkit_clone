@@ -495,7 +495,7 @@ __aicore__ inline void CopyImpl(
             uint32_t dstStride = (static_cast<uint32_t>(repeatParams.dstStride) << 16);
             vector_bool preg = plt_b16(sreg, POST_UPDATE);
             for (uint16_t i = 0; i < (static_cast<uint16_t>(repeatTime)); ++i) {
-                mem_bar(VST_VLD);
+                mem_bar(VST_VLD); /* repeated CopyImpl overload at source line 498 */
                 vsldb(vreg, src + i * repeatParams.srcRepeatSize * 16, srcStride, preg);
                 vsstb(vreg, dst + i * repeatParams.dstRepeatSize * 16, dstStride, preg);
             }

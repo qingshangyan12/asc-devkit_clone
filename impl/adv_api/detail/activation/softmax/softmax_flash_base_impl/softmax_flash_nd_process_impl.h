@@ -170,7 +170,7 @@ __aicore__ inline void SoftmaxFlashNDImpl(
     const LocalTensor<float>& inMaxTensor, const LocalTensor<float>& workLocal, const LastAxisShapeND& originalSrcShape,
     const SoftMaxTiling& tiling)
 {
-    const LocalTensor<float>& tmpBuffer0 = workLocal[0];
+    const LocalTensor<float>& tmpBuffer0 = workLocal[0]; /* repeated SoftmaxFlashNDImpl overload at source line 173 */
     const LocalTensor<float>& tmpBuffer1 = workLocal[tiling.splitSize];
     const LocalTensor<float>& tmpBuffer2 = workLocal[tiling.splitSize + tiling.splitSize];
     const LocalTensor<float>& reduceSumBuffer = workLocal[tiling.splitSize + tiling.splitSize + tiling.reduceSize];
@@ -405,7 +405,7 @@ __aicore__ inline void SoftmaxFlashNDImpl(
             Mul(tmpBuffer1, tmpBuffer1, tmpBuffer0, tiling.splitSize);
             PipeBarrier<PIPE_V>();
             Cast(dst[offset1], tmpBuffer1, FLOAT2HALF_ROUND_MODE, tiling.splitSize);
-        }
+        } /* repeated BroadCastLastImpl overload at source line 408 */
     }
     PipeBarrier<PIPE_V>();
     if (tiling.tailM != 0) {

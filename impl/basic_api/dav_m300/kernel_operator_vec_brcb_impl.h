@@ -90,7 +90,7 @@ __aicore__ inline void BrcbImpl(
         int32_t sreg1 = 0;
         vector_bool preg0;
         preg0 = pset_b16(PAT_VL16);
-        for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
+        for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) { /* repeated BrcbImpl overload at source line 93 */
             sreg0 = ((int32_t)repeatParams.dstRepStride * i * ONE_BLK_HALF_NUM);
             sreg1 = (int32_t)BRCB_BROADCAST_NUMBER * i;
             for (uint16_t j = 0; j < static_cast<uint16_t>(BRCB_BROADCAST_NUMBER); ++j) {

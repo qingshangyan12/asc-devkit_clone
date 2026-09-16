@@ -792,7 +792,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
     uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride,
-    uint16_t dst_nz_matrix_stride)
+    uint16_t dst_nz_matrix_stride) /* repeated asc_copy_gm2l1_nd2nz overload at source line 795 */
 {
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_nd2nz_b8(
@@ -898,7 +898,7 @@ __aicore__ inline void asc_copy_l0c2l1(
 
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
-    uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool enable_channel_split, bool enable_nz2nd)
+    uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool enable_channel_split, bool enable_nz2nd) /* repeated asc_copy_l0c2l1 overload at source line 901 */
 {
     if ASC_IS_AIC {
         copy_matrix_cc_to_cbuf(
@@ -1075,7 +1075,7 @@ __aicore__ inline void asc_copy_l12l0a(
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
-    uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
+    uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, /* repeated asc_copy_l12l0a overload at source line 1078 */
     bool f_matrix_ctrl, uint16_t channel_size)
 {
     if ASC_IS_AIC {
@@ -1236,7 +1236,7 @@ __aicore__ inline void asc_copy_l12l0b(
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
-    uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
+    uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, /* repeated asc_copy_l12l0b overload at source line 1239 */
     bool f_matrix_ctrl, uint16_t channel_size)
 {
     if ASC_IS_AIC {
@@ -1300,7 +1300,7 @@ __aicore__ inline void asc_copy_l0c2gm(
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
-    bool nz2nd_en)
+    bool nz2nd_en) /* repeated asc_copy_l0c2gm overload at source line 1303 */
 {
     if ASC_IS_AIC {
         copy_matrix_cc_to_gm(

@@ -362,7 +362,7 @@ __aicore__ inline void BasicBlockReduceAddImpl(
 
         PipeBarrier<PIPE_V>();
         BroadCastNDImpl(src, dst, originalSrcM);
-        PipeBarrier<PIPE_V>();
+        PipeBarrier<PIPE_V>(); /* repeated BroadCastNDImpl overload at source line 365 */
         if (reduceK == FLOAT_NUM_PER_BLK) {
             SetMaskCount();
             SetVectorMask<float, MaskMode::COUNTER>(0, originalSrcM * FLOAT_NUM_PER_BLK);

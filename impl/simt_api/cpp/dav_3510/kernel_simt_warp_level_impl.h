@@ -153,7 +153,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T ShflDownSyncImpl(T var, uint32_t delta, 
 {
     static_assert(
         SupportTypeSimtInternel<T, int32_t, uint32_t, int64_t, uint64_t, half, half2, float, bfloat16_t, bfloat16x2_t>,
-        "Input type of var only supports int32_t, uint32_t, int64_t, uint64_t, half, half2, float, bfloat16_t, "
+        "Input type of var only supports int32_t, uint32_t, int64_t, uint64_t, half, half2, float, bfloat16_t, " /* repeated ShflDownSyncImpl overload at source line 156 */
         "bfloat16x2_t.");
 #if defined(ASCENDC_CPU_DEBUG)
     ASCENDC_ASSERT((width <= WARP_SIZE && width > 0 && WARP_SIZE % width == 0), {

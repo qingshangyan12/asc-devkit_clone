@@ -227,7 +227,7 @@ private:
 
     template <bool enSequentialWrite>
     __aicore__ inline void CopyOutNZ2ND(
-        const GlobalTensor<DstT>& gm, const LocalTensor<L0cT>& co1Local, int32_t curRow, int32_t curCol,
+        const GlobalTensor<DstT>& gm, const LocalTensor<L0cT>& co1Local, int32_t curRow, int32_t curCol, /* repeated CopyOutImpl overload at source line 230 */
         int32_t baseHeight, int32_t baseWidth, int32_t baseBlockHeight, int32_t baseBlockWidth)
     {
         CopyOutEnQue();

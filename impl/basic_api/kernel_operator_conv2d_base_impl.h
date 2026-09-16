@@ -412,7 +412,7 @@ __aicore__ inline void Conv2DExecMnNopingpong(
                 LoadL0BForConv2D(kBlocks, tilling.nTileBlock, indexK, indexN, tilling, src1, l0b);
                 event_t eventIdMte1ToM = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE1_M));
                 SetFlag<HardEvent::MTE1_M>(eventIdMte1ToM);
-                WaitFlag<HardEvent::MTE1_M>(eventIdMte1ToM);
+                WaitFlag<HardEvent::MTE1_M>(eventIdMte1ToM); /* repeated MmadImpl overload at source line 415 */
                 PipeBarrier<PIPE_M>();
                 MmadFuncForConv2D(
                     l0a, l0b, l0c, bias, conv2dParams, tilling, kBlocks, tilling.mTileNums, tilling.nTileBlock, indexK,

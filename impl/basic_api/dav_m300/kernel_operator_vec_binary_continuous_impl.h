@@ -65,7 +65,7 @@ __aicore__ inline void AddImpl(
         uint32_t sreg = static_cast<uint32_t>(count);
         vector_bool preg;
         uint32_t sregLower = static_cast<uint32_t>(128);
-        uint16_t repeatTime = CeilDivision(count, 128);
+        uint16_t repeatTime = CeilDivision(count, 128); /* repeated AddImpl overload at source line 68 */
         for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
             preg = plt_b16(sreg, POST_UPDATE);
             vlds(vreg0, src0, i * sregLower, NORM);
@@ -132,7 +132,7 @@ __aicore__ inline void SubImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* sr
 __aicore__ inline void SubImpl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, const int32_t& count)
 {
     __VEC_SCOPE__
-    {
+    { /* repeated SubImpl overload at source line 135 */
         vector_f16 vreg0;
         vector_f16 vreg1;
         vector_f16 vreg2;
@@ -228,7 +228,7 @@ __aicore__ inline void MulImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* sr
 __aicore__ inline void MulImpl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, const int32_t& count)
 {
     __VEC_SCOPE__
-    {
+    { /* repeated MulImpl overload at source line 231 */
         vector_f16 vreg0;
         vector_f16 vreg1;
         vector_f16 vreg2;
@@ -376,7 +376,7 @@ __aicore__ inline void MaxImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* sr
 __aicore__ inline void MaxImpl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, const int32_t& count)
 {
     __VEC_SCOPE__
-    {
+    { /* repeated MaxImpl overload at source line 379 */
         vector_f16 vreg0;
         vector_f16 vreg1;
         vector_f16 vreg2;
@@ -472,7 +472,7 @@ __aicore__ inline void MinImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* sr
 __aicore__ inline void MinImpl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, const int32_t& count)
 {
     __VEC_SCOPE__
-    {
+    { /* repeated MinImpl overload at source line 475 */
         vector_f16 vreg0;
         vector_f16 vreg1;
         vector_f16 vreg2;
@@ -569,7 +569,7 @@ __aicore__ inline void AndImpl(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, const int32_t& count)
 {
     __VEC_SCOPE__
-    {
+    { /* repeated AndImpl overload at source line 572 */
         vector_s16 vreg0;
         vector_s16 vreg1;
         vector_s16 vreg2;
@@ -623,7 +623,7 @@ __aicore__ inline void OrImpl(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, const int32_t& count)
 {
     __VEC_SCOPE__
-    {
+    { /* repeated OrImpl overload at source line 626 */
         vector_s16 vreg0;
         vector_s16 vreg1;
         vector_s16 vreg2;
@@ -871,7 +871,7 @@ __aicore__ inline void MulAddDstImpl(__ubuf__ half* dst, __ubuf__ half* src0, __
 
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
+        vector_f16 vreg0; /* repeated MulAddDstImpl overload at source line 874 */
         vector_f16 vreg1;
         vector_f16 vreg2;
         uint32_t sreg = static_cast<uint32_t>(count);

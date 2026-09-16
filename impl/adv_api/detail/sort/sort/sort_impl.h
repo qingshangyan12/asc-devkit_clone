@@ -965,7 +965,7 @@ __aicore__ inline void SortImpl(
         });
     if constexpr (sortType == SortType::MERGE_SORT) {
         static_assert(
-            SupportType<T, half, float>(),
+            SupportType<T, half, float>(), /* repeated SortImpl overload at source line 968 */
             "Advanced Sort API MERGE_MODE only supports data value with half/float types.");
         ASCENDC_ASSERT((count % singleSortElementCount == 0), {
             KERNEL_LOG(KERNEL_ERROR, "calCount should be align to 32 in MERGE_MODE!");

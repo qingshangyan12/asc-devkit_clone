@@ -49,7 +49,7 @@ bool CheckFunDup(
 template <typename T>
 bool CheckFunDup(
     const LocalTensor<T>& dst, const uint64_t mask[], const uint8_t repeatTime, const uint16_t dstBlockStride,
-    const uint8_t dstRepeatStride, const char* intriName)
+    const uint8_t dstRepeatStride, const char* intriName) /* repeated CheckFunDupImpl overload at source line 52 */
 {
     check::VecDupApiParams chkParams{
         static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst.GetPhyAddr())),
@@ -204,7 +204,7 @@ bool CheckFuncCreateVecIndex(
     const uint16_t dstRepStride, const char* intriName)
 {
     check::VecCreateVecIndexApiParams chkParams{
-        static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst.GetPhyAddr())),
+        static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst.GetPhyAddr())), /* repeated CheckFuncCreateVecIndexImpl overload at source line 207 */
         repeatTime,
         dstBlkStride,
         dstRepStride,
@@ -322,7 +322,7 @@ bool CheckFunTranspose(
     const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<U>& sharedTmpBuffer,
     const TransposeParamsExt& transposeParams, const char* intriName)
 {
-    const uint16_t defaultStride = 16;
+    const uint16_t defaultStride = 16; /* repeated CheckFunTransposeImpl overload at source line 325 */
     check::VecTransposeApiParams chkParams{
         static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst.GetPhyAddr())),
         static_cast<uint64_t>(reinterpret_cast<uintptr_t>(src0.GetPhyAddr())),

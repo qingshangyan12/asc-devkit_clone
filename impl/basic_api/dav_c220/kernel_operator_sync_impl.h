@@ -341,7 +341,7 @@ __aicore__ inline void WaitPreTaskEndImpl()
         }
     } else if constexpr (earlyStartConfig == ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_MIX) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(AscendC::SYNC_AIC_FLAG);
+            wait_flag_dev(AscendC::SYNC_AIC_FLAG); /* repeated WaitPreTaskEndV2Impl overload at source line 344 */
             ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG));
             wait_flag_dev(AscendC::SYNC_AIV_FLAG);
         }
@@ -413,7 +413,7 @@ __aicore__ inline void SuperKernelAutoSyncAllImpl()
         return;
     }
     // trans software sync to hardware sync
-    if ASCEND_IS_AIC {
+    if ASCEND_IS_AIC { /* repeated SuperKernelAutoSyncAllImpl overload at source line 416 */
         wait_flag_dev(SYNC_AIV_FLAG);
         ffts_cross_core_sync(PIPE_FIX, GetffstMsg(0x0, SYNC_AIC_FLAG));
         wait_flag_dev(SYNC_AIC_FLAG);

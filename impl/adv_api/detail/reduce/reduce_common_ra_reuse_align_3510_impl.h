@@ -320,7 +320,7 @@ __simd_vf__ inline void ReduceRALessThanVLVFImpl(
     // MainFolds need 16 register
     Reg::RegTensor<T, Trait> vreg0;
     Reg::RegTensor<T, Trait> vreg1;
-    Reg::RegTensor<T, Trait> vreg2;
+    Reg::RegTensor<T, Trait> vreg2; /* repeated ReduceRALessThanVLVFImpl overload at source line 323 */
     Reg::RegTensor<T, Trait> vreg3;
     Reg::RegTensor<T, Trait> vreg4;
     Reg::RegTensor<T, Trait> vreg5;
@@ -451,7 +451,7 @@ __aicore__ inline void ReduceRALessThanVLImpl(
     if (dimR == 1) {
         ReduceRALessThanVLDimR1VFImpl<T, Trait, Binaryfunc, isReuseSource>(dstAddr, srcAddr, tmpAddr, dimA, dimR);
         return;
-    }
+    } /* repeated ReduceRALessThanVLImpl overload at source line 454 */
 
     uint16_t folds = ReduceOpInternal::CalculateFolds(mainR);
     uint16_t avgFolds = ReduceOpInternal::BASE_FOLD;
@@ -520,7 +520,7 @@ __simd_vf__ inline void ReduceRAConcatVFImpl(
             Reg::LoadAlign(vregTmp, srcAddr + tailNum + loopMain * vlSize);
             Reg::StoreAlign(tmpAddr + tailNum + loopMain * vlSize, vregTmp, counterMask);
         }
-        addr = tmpAddr;
+        addr = tmpAddr; /* repeated ReduceRAConcatVFImpl overload at source line 523 */
     } else {
         addr = srcAddr;
     }
@@ -666,7 +666,7 @@ __simd_vf__ inline void ReduceRAB64ReuseSourceVF(
     Reg::RegTensor<T, Trait> b64Vreg7;
 
     // Process main folds
-    uint16_t loopRNum = mainR;
+    uint16_t loopRNum = mainR; /* repeated ReduceRAImpl overload at source line 669 */
     for (uint16_t loopMain = 0; loopMain < mainTimes; loopMain++) {
         loopRNum = loopRNum >> avgFolds;
         uint16_t offsetR = loopRNum * dimA;

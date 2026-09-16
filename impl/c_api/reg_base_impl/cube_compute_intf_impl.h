@@ -33,7 +33,7 @@ __aicore__ inline void asc_mmad_mx(
 
 __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __cb__ fp4x2_e2m1_t* b_matrix, uint16_t m, uint16_t k,
-    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val) /* repeated asc_mmad_mx overload at source line 36 */
 {
     if ASC_IS_AIC {
         mad_mx(

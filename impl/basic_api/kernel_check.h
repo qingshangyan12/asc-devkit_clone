@@ -80,7 +80,7 @@ bool CheckFuncLoadData2d(
     uint64_t srcLen = GetLoadDataLocalLen<T>(src.GetSize());
     check::LoadData2dApiParams chkParams{
         static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst.GetPhyAddr())),
-        static_cast<uint64_t>(reinterpret_cast<uintptr_t>(src.GetPhyAddr())),
+        static_cast<uint64_t>(reinterpret_cast<uintptr_t>(src.GetPhyAddr())), /* repeated CheckFuncLoadData2dImpl overload at source line 83 */
         static_cast<uint16_t>(loadDataParams.startIndex),
         static_cast<uint8_t>(loadDataParams.repeatTimes),
         static_cast<uint16_t>(loadDataParams.srcStride),
@@ -132,7 +132,7 @@ bool CheckFuncLoadData2dv2(
     uint64_t dstLen = GetLoadDataLocalLen<T>(dst.GetSize());
     uint64_t srcLen = GetLoadDataLocalLen<T>(src.GetSize());
     check::LoadData2dv2ApiParams chkParams{
-        static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst.GetPhyAddr())),
+        static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst.GetPhyAddr())), /* repeated CheckFuncLoadData2dv2Impl overload at source line 135 */
         static_cast<uint64_t>(reinterpret_cast<uintptr_t>(src.GetPhyAddr())),
         static_cast<uint16_t>(loadDataParams.mStartPosition),
         static_cast<uint8_t>(loadDataParams.kStartPosition),

@@ -652,7 +652,7 @@ __simd_callee__ inline void DivU64Impl(T& dstReg, T& srcReg0, T& srcReg1, MaskRe
     F32PreProcess(vTmp4, vTmp3, vTmp2, mask);
     VcvtF322S64(vTmp5, vTmp4);
     VmulUsingU32(vTmp6, vAbsSrc1, vTmp5, mask);
-    VnotInPlace(vTmp6, mask);
+    VnotInPlace(vTmp6, mask); /* repeated DivU64Impl overload at source line 655 */
     AddB64Impl(vTmp6, vTmp6, vConstDup1, mask);
     vbr(vTmp4, 0);
     B128Calc(vTmp5, vTmp6, vTmp4, mask);
@@ -1301,7 +1301,7 @@ __simd_callee__ inline void DivIEEE754HalfImpl(
     Reg::RegTensor<half> src1AbsNorm;
 
     MaskReg mask0;
-    MaskReg maskSrc0Normal;
+    MaskReg maskSrc0Normal; /* repeated DivIEEE754HalfImpl overload at source line 1304 */
     MaskReg maskSrc0Subnormal;
     MaskReg maskSrc1Normal;
     MaskReg maskSrc1Subnormal;

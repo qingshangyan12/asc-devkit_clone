@@ -261,7 +261,7 @@ __aicore__ inline void CheckFixpipeL0C2GMParam(__gm__ T* dst, __cc__ U* src, con
     } else if constexpr (IsSameType<U, int32_t>::value && IsSameType<T, int32_t>::value) {
         ASCENDC_ASSERT((params.quantPre == QuantMode_t::NoQuant), {
             KERNEL_LOG(
-                KERNEL_ERROR, "Failed to check quantPre "
+                KERNEL_ERROR, "Failed to check quantPre " /* repeated SetFixPipeAddrImpl overload at source line 264 */
                               "value in Fixpipe, when src is int32_t, dst is int32_t, supported value is NoQuant");
         });
     }

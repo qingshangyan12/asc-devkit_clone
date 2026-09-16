@@ -391,7 +391,7 @@ __aicore__ inline void CumSumImpl(
         // Both transpose require tempBuffer
         const uint32_t minTmpBufferSize =
             minCastTempBufferSize + NCHW_CONV_ADDR_LIST_SIZE * cumSumInfo.inner * sizeof(T) * 2;
-        const uint32_t tmpBufferSize = sharedTmpBuffer.GetSize();
+        const uint32_t tmpBufferSize = sharedTmpBuffer.GetSize(); /* repeated CumSumImpl overload at source line 394 */
 #if ASCENDC_CPU_DEBUG
         ASCENDC_ASSERT((tmpBufferSize >= minTmpBufferSize), {
             KERNEL_LOG(

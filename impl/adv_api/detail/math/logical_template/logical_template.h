@@ -141,7 +141,7 @@ __simd_vf__ inline void LogicalTemplateBothTensorVF(
         func(cmpMask2, cmpMask0, cmpMask1, mask);
         if constexpr (sizeof(U) == 2) {
             Reg::MaskPack(cmpMask2, cmpMask2);
-            Reg::MaskPack(mask, mask);
+            Reg::MaskPack(mask, mask); /* repeated LogicalTemplateImpl overload at source line 144 */
         } else if constexpr (sizeof(U) == 4 || sizeof(U) == 8) {
             Reg::MaskPack(cmpMask2, cmpMask2);
             Reg::MaskPack(cmpMask2, cmpMask2);

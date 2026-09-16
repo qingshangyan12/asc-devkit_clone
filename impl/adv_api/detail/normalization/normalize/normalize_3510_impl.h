@@ -250,7 +250,7 @@ __simd_vf__ inline void NormalizeVFImpl(
                 if constexpr (!config.isNoGamma) {
                     Reg::RegTensor<U> gammaRegOrigin;
                     Reg::LoadAlign<U, Reg::LoadDist::DIST_UNPACK_B16>(gammaRegOrigin, gammaUb + i * sregLower);
-                    Cast<float, U, layoutZMrgZ>(gammaReg, gammaRegOrigin, preg);
+                    Cast<float, U, layoutZMrgZ>(gammaReg, gammaRegOrigin, preg); /* repeated NormalizeVFImpl overload at source line 253 */
                 }
                 if constexpr (!config.isNoBeta) {
                     Reg::RegTensor<U> betaRegOrigin;

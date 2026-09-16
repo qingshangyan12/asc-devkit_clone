@@ -164,7 +164,7 @@ bool CheckFuncSelectVec(
         static_cast<uint64_t>(reinterpret_cast<uintptr_t>(src0.GetPhyAddr())),
         static_cast<uint64_t>(reinterpret_cast<uintptr_t>(src1.GetPhyAddr())),
         static_cast<uint32_t>(sizeof(PrimDstSrcType)),
-        static_cast<uint32_t>(sizeof(PrimSelMaskType)),
+        static_cast<uint32_t>(sizeof(PrimSelMaskType)), /* repeated CheckFuncVecSelectImpl overload at source line 167 */
         static_cast<uint32_t>(sizeof(PrimDstSrcType)),
         static_cast<uint32_t>(sizeof(PrimDstSrcType)),
         static_cast<uint64_t>(dst.GetSize() * sizeof(PrimDstSrcType)),
@@ -258,7 +258,7 @@ check::VecBinaryApiParams BuildVecBinaryApiParamsCmp(
     const BinaryRepeatParams& repeatParams)
 {
     return check::VecBinaryApiParams{
-        static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst.GetPhyAddr())),
+        static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst.GetPhyAddr())), /* repeated CheckFuncVecBinaryImpl overload at source line 261 */
         static_cast<uint64_t>(reinterpret_cast<uintptr_t>(src0.GetPhyAddr())),
         static_cast<uint64_t>(reinterpret_cast<uintptr_t>(src1.GetPhyAddr())),
         repeatTime,

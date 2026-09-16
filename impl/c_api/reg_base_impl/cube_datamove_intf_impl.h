@@ -1090,7 +1090,7 @@ __aicore__ inline void asc_copy_gm2l1_align(
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ half* dst, __gm__ half* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count,
     uint8_t right_padding_count, bool enable_data_select, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
-    uint32_t dst_stride)
+    uint32_t dst_stride) /* repeated asc_copy_gm2l1_align overload at source line 1093 */
 {
     if ASC_IS_AIC {
         copy_gm_to_cbuf_align_v2(
@@ -1316,7 +1316,7 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
 
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
-    uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
+    uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0) /* repeated asc_copy_gm2l1_dn2nz overload at source line 1319 */
 {
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_dn2nz(
@@ -1879,7 +1879,7 @@ __aicore__ inline void asc_copy_gm2l1(
 
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint32_t m_start_position, uint32_t k_start_position,
-    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
+    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode) /* repeated asc_copy_gm2l1 overload at source line 1882 */
 {
     if ASC_IS_AIC {
         load_gm_to_cbuf_2dv2(

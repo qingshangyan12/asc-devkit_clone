@@ -69,7 +69,7 @@ __simd_vf__ inline void BilinearInterpolationNoRepeatModeLevel0VFImpl(
     Reg::MaskReg maskFull = Reg::CreateMask<T>();
     Reg::MaskReg maskReg = VecMicroGetMaskReg<T, true, true, isMaskBitMode>(maskBuf, count);
     Reg::RegTensor<T> dstReg;
-    Reg::RegTensor<T> srcReg0;
+    Reg::RegTensor<T> srcReg0; /* repeated BilinearInterpolationNoRepeatModeLevel0VFImpl overload at source line 72 */
     Reg::RegTensor<T> srcReg1;
     Reg::RegTensor<T> tmpReg;
     Reg::RegTensor<uint32_t> indexReg;

@@ -107,7 +107,7 @@ __aicore__ inline void SoftmaxFlashV2M1NDUpdateImpl(
 template <typename T1, typename T2, bool isOutputReduceMax = false>
 __simd_vf__ inline void SoftmaxFlashV2M1NDWithTailUpdateVFImpl(
     __ubuf__ T1* dstUb, __ubuf__ T2* reduceMaxUb, __ubuf__ T2* expSumUb, __ubuf__ T2* inExpSumUb, __ubuf__ T2* maxUb,
-    __ubuf__ T2* inMaxUb, __ubuf__ T1* srcUb, __ubuf__ T1* expMaxUb, const LastAxisShapeND originalSrcShape,
+    __ubuf__ T2* inMaxUb, __ubuf__ T1* srcUb, __ubuf__ T1* expMaxUb, const LastAxisShapeND originalSrcShape, /* repeated SoftmaxFlashV2M1NDWithTailUpdateVFImpl overload at source line 110 */
     const SoftMaxTiling tiling)
 {
     uint16_t srcM = originalSrcShape.m;
@@ -175,7 +175,7 @@ template <typename T1, typename T2, bool isOutputReduceMax = false>
 __aicore__ inline void SoftmaxFlashV2M1NDWithTailUpdateImpl(
     const LocalTensor<T1>& dstTensor, const LocalTensor<T2>& outReduceMax, const LocalTensor<T2>& expSumTensor,
     const LocalTensor<T2>& maxTensor, const LocalTensor<T1>& srcTensor, const LocalTensor<T1>& expMaxTensor,
-    const LocalTensor<T2>& inExpSumTensor, const LocalTensor<T2>& inMaxTensor, const LocalTensor<float>& workLocal,
+    const LocalTensor<T2>& inExpSumTensor, const LocalTensor<T2>& inMaxTensor, const LocalTensor<float>& workLocal, /* repeated SoftmaxFlashV2M1NDWithTailUpdateImpl overload at source line 178 */
     const LastAxisShapeND& originalSrcShape, const SoftMaxTiling& tiling)
 {
     __ubuf__ T1* dstUb = (__ubuf__ T1*)dstTensor.GetPhyAddr();
@@ -379,7 +379,7 @@ __simd_vf__ inline void SoftmaxFlashV2NZWithTailNoUpdateVFImpl(
             workUb + i * HALF_REPEAT_SIZE, maxVreg, maxVreg, pregFull);
     }
 
-    Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
+    Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>(); /* repeated SoftmaxFlashV2NZWithTailNoUpdateVFImpl overload at source line 382 */
 
     uint32_t sreg = originM * dtypeBlkStride;
     for (uint16_t i = 0; i < e2bRep; ++i) {
@@ -522,7 +522,7 @@ __simd_vf__ inline void SoftmaxFlashV2NZUpdateVFImpl(
     // reducemax
     for (uint16_t i = 0; i < mRepeatTimes; ++i) {
         Duplicate(maxVreg, notNum.f);
-        for (uint16_t j = 0; j < kRepeatTimes; ++j) {
+        for (uint16_t j = 0; j < kRepeatTimes; ++j) { /* repeated SoftmaxFlashV2NZUpdateVFImpl overload at source line 525 */
             LoadIfNeedCast<T1>(srcVreg, srcUb + i * FLOAT_REPEAT_SIZE + j * dataBlock, pregFull);
             Reg::Max(maxVreg, maxVreg, srcVreg, pregFull);
         }
@@ -686,7 +686,7 @@ __simd_vf__ inline void SoftmaxFlashV2NZWithTailUpdateVFImpl(
     uint16_t dtypeRepStride = IsSameType<T2, half>::value ? HALF_REPEAT_SIZE : FLOAT_REPEAT_SIZE;
     uint16_t dtypeBlkStride = dtypeRepStride / DEFAULT_BLK_NUM;
     uint32_t expMaxBlkStride = ONE_BLOCK_SIZE / sizeof(T1);
-    NotNumUnion notNum;
+    NotNumUnion notNum; /* repeated SoftmaxFlashV2NZWithTailUpdateVFImpl overload at source line 689 */
     notNum.i = F32_NEG_INF;
 
     Reg::MaskReg pregDst;
@@ -867,7 +867,7 @@ __aicore__ inline void SoftmaxFlashV2NZWithTailUpdateImpl(
     SetVectorMask<uint32_t>(mask[1], mask[0]);
 
     __ubuf__ T1* dstUb = (__ubuf__ T1*)dstTensor.GetPhyAddr();
-    __ubuf__ T2* expSumUb = (__ubuf__ T2*)expSumTensor.GetPhyAddr();
+    __ubuf__ T2* expSumUb = (__ubuf__ T2*)expSumTensor.GetPhyAddr(); /* repeated SoftmaxFlashV2NZWithTailUpdateImpl overload at source line 870 */
     __ubuf__ T2* inExpSumUb = (__ubuf__ T2*)inExpSumTensor.GetPhyAddr();
     __ubuf__ T2* maxUb = (__ubuf__ T2*)maxTensor.GetPhyAddr();
     __ubuf__ T2* inMaxUb = (__ubuf__ T2*)inMaxTensor.GetPhyAddr();
@@ -940,7 +940,7 @@ __simd_vf__ inline void SoftmaxFlashV2NDUpdateVFImpl(
     }
     Reg::RegTensor<float> srcVreg;
     Reg::RegTensor<float> maxVreg;
-    Reg::RegTensor<float> expMaxVreg;
+    Reg::RegTensor<float> expMaxVreg; /* repeated SoftmaxFlashV2NDUpdateVFImpl overload at source line 943 */
     Reg::RegTensor<float> sumVreg;
     Reg::RegTensor<float> tmpVreg;
     Reg::RegTensor<float> dstVreg;
@@ -1005,7 +1005,7 @@ __aicore__ inline void SoftmaxFlashV2NDUpdateImpl(
 template <typename T1, typename T2>
 __simd_vf__ inline void SoftmaxFlashV2NDWithTailUpdateVFImpl(
     __ubuf__ T1* dstUb, __ubuf__ T2* expSumUb, __ubuf__ T2* inExpSumUb, __ubuf__ T2* maxUb, __ubuf__ T2* inMaxUb,
-    __ubuf__ T1* srcUb, __ubuf__ T1* expMaxUb, const LastAxisShapeND originalSrcShape, const SoftMaxTiling tiling)
+    __ubuf__ T1* srcUb, __ubuf__ T1* expMaxUb, const LastAxisShapeND originalSrcShape, const SoftMaxTiling tiling) /* repeated SoftmaxFlashV2NDWithTailUpdateVFImpl overload at source line 1008 */
 {
     uint16_t srcM = originalSrcShape.m;
     uint16_t srcK = tiling.srcK;
@@ -1083,7 +1083,7 @@ template <typename T1, typename T2>
 __aicore__ inline void SoftmaxFlashV2NDWithTailUpdateImpl(
     const LocalTensor<T1>& dstTensor, const LocalTensor<T2>& expSumTensor, const LocalTensor<T2>& maxTensor,
     const LocalTensor<T1>& srcTensor, const LocalTensor<T1>& expMaxTensor, const LocalTensor<T2>& inExpSumTensor,
-    const LocalTensor<T2>& inMaxTensor, const LocalTensor<float>& workLocal, const LastAxisShapeND& originalSrcShape,
+    const LocalTensor<T2>& inMaxTensor, const LocalTensor<float>& workLocal, const LastAxisShapeND& originalSrcShape, /* repeated SoftmaxFlashV2NDWithTailUpdateImpl overload at source line 1086 */
     const SoftMaxTiling& tiling)
 {
     __ubuf__ T1* dstUb = (__ubuf__ T1*)dstTensor.GetPhyAddr();
@@ -1163,7 +1163,7 @@ __aicore__ inline void SoftmaxFlashV2M1PostProcess(
 
 template <typename T1, typename T2, bool isUpdate = false, bool isBasicBlock = false, const SoftmaxConfig& config>
 __aicore__ inline void SoftmaxFlashV2PostProcess(
-    const LocalTensor<T1>& dstTensor, const LocalTensor<T2>& expSumTensor, const LocalTensor<T2>& maxTensor,
+    const LocalTensor<T1>& dstTensor, const LocalTensor<T2>& expSumTensor, const LocalTensor<T2>& maxTensor, /* repeated SoftmaxFlashV2NDNoUpdateImpl overload at source line 1166 */
     const LocalTensor<T1>& srcTensor, const LocalTensor<T1>& expMaxTensor, const LocalTensor<T2>& inExpSumTensor,
     const LocalTensor<T2>& inMaxTensor, const LocalTensor<float>& workLocal, const LastAxisShapeND& originalSrcShape,
     const SoftMaxTiling& tiling)

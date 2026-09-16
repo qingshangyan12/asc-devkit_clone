@@ -206,7 +206,7 @@ __aicore__ inline void Exp(
 template <typename T, bool isSetMask>
 __aicore__ inline void Exp(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime,
-    const UnaryRepeatParams& repeatParams)
+    const UnaryRepeatParams& repeatParams) /* repeated ReluImpl overload at source line 209 */
 {
     using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
@@ -530,7 +530,7 @@ __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<U>& src,
  * @param [in] intriParams.dstRepStride dst repeat stride
  * @param [in] intriParams.src0RepStride src repeat stride
  */
-#if (__NPU_ARCH__ == 3510)
+#if (__NPU_ARCH__ == 3510) /* repeated AbsImpl overload at source line 533 */
 template <typename T, bool isSetMask, const ReciprocalConfig& config>
 __aicore__ inline void Reciprocal(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[], const uint8_t repeatTime,

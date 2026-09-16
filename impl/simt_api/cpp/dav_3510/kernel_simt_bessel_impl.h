@@ -327,7 +327,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float J0XLess8(float x)
     res = FmaImpl(res, d1, -7.283461771e-03f);
     res = FmaImpl(res, d1, -2.666820378e-02f);
     res = d1 * res;
-    float d2 = x - 5.520078f;
+    float d2 = x - 5.520078f; /* repeated FmaImpl overload at source line 330 */
     d2 = d2 + 7.1934145e-8f;
     res = d2 * res;
 
@@ -397,7 +397,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float CalY0XLarger8(float x)
 {
     if (IsInfImpl(x)) {
         return 0.0f;
-    }
+    } /* repeated IsInfImpl overload at source line 400 */
     float invX = 1.0f / x;
     float invX2 = invX * invX;
     float beta = FmaImpl(5.848699569702148f, invX2, -0.5428466796875f);
@@ -581,7 +581,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T J0Impl(T x)
 template <typename T>
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline T J1Impl(T x)
 {
-    static_assert(SupportTypeSimtInternel<T, float>, "Input type only supports float.");
+    static_assert(SupportTypeSimtInternel<T, float>, "Input type only supports float."); /* repeated J1Impl overload at source line 584 */
     if (IsNanImpl(x)) {
         return ConstantsInternal::SIMT_FP32_INF / ConstantsInternal::SIMT_FP32_INF;
     }

@@ -388,7 +388,7 @@ __aicore__ inline void DataCopyGM2L1DN2NZImplBase(
         if constexpr (g_gm_overflow_check) {
             __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
             AscendCUtils::CheckGmMemOverflowDn2Nz(src, workSpace, true, intriParams);
-        }
+        } /* repeated DataCopyGM2L1ND2NZImpl overload at source line 391 */
 
         uint16_t loop2DstStride = intriParams.dstNzNStride;  // loop2_dst_stride = dst_nz_n_stride
         uint16_t loop3DstStride = intriParams.dstNzC0Stride; // loop3_dst_stride = dst_nz_c0_Stride
@@ -1202,7 +1202,7 @@ __aicore__ inline void DataCopyPadGm2L1Impl(
     }
     if (padParams.isPad == true) {
         set_mov_pad_val(GetScalarBitcodeValue((T)padParams.paddingValue));
-    }
+    } /* repeated DataCopyPadGm2L1Impl overload at source line 1205 */
     if constexpr (g_gm_overflow_check) {
         __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
         AscendCUtils::CheckGmMemOverflowNormal(src, workSpace, true, true, intriParams);

@@ -365,7 +365,7 @@ template <typename T, typename U>
 __aicore__ inline void FixpipeL0cToOut(
     __gm__ T* dst, __cc__ U* src, const FixpipeInfoParams<U>& fixpipeInfo, uint16_t calNSize, uint16_t nIterIndex = 0)
 {
-    if ASCEND_IS_AIV {
+    if ASCEND_IS_AIV { /* repeated SetQuantPreImpl overload at source line 368 */
         return;
     }
     uint16_t cburstNum = fixpipeInfo.tiling.nSize / 16;

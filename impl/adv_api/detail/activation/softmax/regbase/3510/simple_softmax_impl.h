@@ -109,7 +109,7 @@ __simd_vf__ inline void SimpleSoftMaxGenericNDWithTailImpl(
 {
     Reg::MaskReg maskCnt;
     Reg::MaskReg maskFull = Reg::CreateMask<uint32_t, Reg::MaskPattern::ALL>();
-    Reg::RegTensor<float> srcVreg;
+    Reg::RegTensor<float> srcVreg; /* repeated SimpleSoftMaxGenericNDWithTailImpl overload at source line 112 */
     Reg::RegTensor<float> maxVreg;
     Reg::RegTensor<float> sumVreg;
     Reg::RegTensor<float> tmpVreg;

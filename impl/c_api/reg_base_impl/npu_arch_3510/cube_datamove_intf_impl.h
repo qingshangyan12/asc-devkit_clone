@@ -266,7 +266,7 @@ __aicore__ inline void asc_copy_l0c2ub(
     uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
     uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post,
     uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, bool eltwise_antq_en, bool c0_pad_en, bool broadcast_en,
-    bool enable_nz2dn)
+    bool enable_nz2dn) /* repeated asc_copy_l0c2ub overload at source line 269 */
 {
     if ASC_IS_AIC {
         copy_matrix_cc_to_ub(

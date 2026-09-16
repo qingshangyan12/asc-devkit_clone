@@ -33,7 +33,7 @@ __aicore__ inline void asc_lt(
 
 __aicore__ inline void asc_lt(
     __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
-    uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+    uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride) /* repeated asc_lt overload at source line 36 */
 {
     if ASC_IS_AIV {
         vcmp_lt(
@@ -79,7 +79,7 @@ __aicore__ inline void asc_gt(
 
 __aicore__ inline void asc_gt(
     __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
-    uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+    uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride) /* repeated asc_gt overload at source line 82 */
 {
     if ASC_IS_AIV {
         vcmp_gt(
@@ -125,7 +125,7 @@ __aicore__ inline void asc_ge(
 
 __aicore__ inline void asc_ge(
     __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
-    uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+    uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride) /* repeated asc_ge overload at source line 128 */
 {
     if ASC_IS_AIV {
         vcmp_ge(
@@ -171,7 +171,7 @@ __aicore__ inline void asc_eq(
 
 __aicore__ inline void asc_eq(
     __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
-    uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+    uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride) /* repeated asc_eq overload at source line 174 */
 {
     if ASC_IS_AIV {
         vcmp_eq(
@@ -229,7 +229,7 @@ __aicore__ inline void asc_ne(
 
 __aicore__ inline void asc_ne(
     __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
-    uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+    uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride) /* repeated asc_ne overload at source line 232 */
 {
     if ASC_IS_AIV {
         vcmp_ne(
@@ -275,7 +275,7 @@ __aicore__ inline void asc_le(
 
 __aicore__ inline void asc_le(
     __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
-    uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+    uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride) /* repeated asc_le overload at source line 278 */
 {
     if ASC_IS_AIV {
         vcmp_le(

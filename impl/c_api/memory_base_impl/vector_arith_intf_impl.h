@@ -35,7 +35,7 @@ __aicore__ inline void asc_max(
 __aicore__ inline void asc_max(
     __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
-    uint8_t src1_repeat_stride)
+    uint8_t src1_repeat_stride) /* repeated asc_max overload at source line 38 */
 {
     if ASC_IS_AIV {
         vmax(
@@ -123,7 +123,7 @@ __aicore__ inline void asc_mul(
 __aicore__ inline void asc_mul(
     __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
-    uint8_t src1_repeat_stride)
+    uint8_t src1_repeat_stride) /* repeated asc_mul overload at source line 126 */
 {
     if ASC_IS_AIV {
         vmul(
@@ -211,7 +211,7 @@ __aicore__ inline void asc_add(
 __aicore__ inline void asc_add(
     __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
-    uint8_t src1_repeat_stride)
+    uint8_t src1_repeat_stride) /* repeated asc_add overload at source line 214 */
 {
     if ASC_IS_AIV {
         vadd(
@@ -299,7 +299,7 @@ __aicore__ inline void asc_sub(
 __aicore__ inline void asc_sub(
     __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
-    uint8_t src1_repeat_stride)
+    uint8_t src1_repeat_stride) /* repeated asc_sub overload at source line 302 */
 {
     if ASC_IS_AIV {
         vsub(
@@ -387,7 +387,7 @@ __aicore__ inline void asc_min(
 __aicore__ inline void asc_min(
     __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
-    uint8_t src1_repeat_stride)
+    uint8_t src1_repeat_stride) /* repeated asc_min overload at source line 390 */
 {
     if ASC_IS_AIV {
         vmin(
@@ -474,7 +474,7 @@ __aicore__ inline void asc_div(
 
 __aicore__ inline void asc_div(
     __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
-    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
+    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, /* repeated asc_div overload at source line 477 */
     uint8_t src1_repeat_stride)
 {
     if ASC_IS_AIV {

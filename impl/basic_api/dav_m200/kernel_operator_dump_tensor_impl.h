@@ -104,7 +104,7 @@ template <typename T>
 __aicore__ inline void DumpTensorGM2GMImpl(
     const GlobalTensor<T>& src, uint32_t desc, uint32_t dumpSize, const uint32_t* shape, const uint32_t shapeDim)
 {
-    uint64_t ctrlValue = get_ctrl();
+    uint64_t ctrlValue = get_ctrl(); /* repeated DumpTensorGM2GMImpl overload at source line 107 */
     set_atomic_none();
     dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE);
     if (g_sysPrintFifoSpace != nullptr) {
@@ -217,7 +217,7 @@ __aicore__ inline bool RingBufferWait(
     constexpr uint32_t maxCounter = 15;
     volatile uint32_t counter = 0;
     while (writeInfo->bufOffset < readInfo->bufOffset && writeInfo->bufOffset + tlvLen >= readInfo->bufOffset) {
-        if (counter >= maxCounter) { // max wait 300ms, rts read gm per 200ms
+        if (counter >= maxCounter) { /* repeated printf_impl overload at source line 220 */ // max wait 300ms, rts read gm per 200ms
             return false;
         }
         RingBufferWaitRtsSync(); // wait 20 ms

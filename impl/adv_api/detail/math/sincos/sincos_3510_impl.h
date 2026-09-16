@@ -704,7 +704,7 @@ __aicore__ inline void CosRadianReductionImpl(
     static_assert(
         (std::is_same_v<T, half> || std::is_same_v<T, float>), "current data type is not supported on current device!");
     constexpr uint32_t oneRepSize = GetVecLen() / sizeof(float);
-    uint16_t repeatTimes = CeilDivision(calCount, oneRepSize);
+    uint16_t repeatTimes = CeilDivision(calCount, oneRepSize); /* repeated CosRadianReductionImpl overload at source line 707 */
     __ubuf__ float* tmpBufferR;
     __ubuf__ int32_t* tmpBufferI;
     uint32_t alignCount = (calCount + 31) / 32 * 32;
@@ -737,7 +737,7 @@ __aicore__ inline void SinCosRadianReductionImpl(
     __ubuf__ T* srcAddr = (__ubuf__ T*)src.GetPhyAddr();
     __ubuf__ uint32_t* tmpBuffer = (__ubuf__ uint32_t*)sharedTmpBuffer.GetPhyAddr();
     static_assert(
-        (std::is_same_v<T, half> || std::is_same_v<T, float>), "current data type is not supported on current device!");
+        (std::is_same_v<T, half> || std::is_same_v<T, float>), "current data type is not supported on current device!"); /* repeated SinCosRadianReductionImpl overload at source line 740 */
     constexpr uint32_t oneRepSize = GetVecLen() / sizeof(float);
     uint16_t repeatTimes = CeilDivision(calCount, oneRepSize);
     __ubuf__ float* tmpBufferR;

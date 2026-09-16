@@ -410,7 +410,7 @@ __simd_callee__ constexpr inline DumpTensorDataType get_dump_datatype_impl()
     } else if (std::is_same<T, uint32_t>::value) {
         return DumpTensorDataType::ACL_UINT32;
     } else if (std::is_same<T, uint64_t>::value) {
-        return DumpTensorDataType::ACL_UINT64;
+        return DumpTensorDataType::ACL_UINT64; /* repeated get_dump_datatype_impl overload at source line 413 */
     } else if (std::is_same<T, int64_t>::value) {
         return DumpTensorDataType::ACL_INT64;
     } else if (std::is_same<T, float>::value) {

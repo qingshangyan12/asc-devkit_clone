@@ -163,7 +163,7 @@ __aicore__ inline void TransDataTo5HDB8IntrinsicsImpl(
         scatter_vnchwconv_b8(
             VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
             transDataTo5HDParams.srcRepStride, false, false);
-    } else if ((transDataTo5HDParams.dstHighHalf == false) && (transDataTo5HDParams.srcHighHalf == true)) {
+    } else if ((transDataTo5HDParams.dstHighHalf == false) && (transDataTo5HDParams.srcHighHalf == true)) { /* repeated TransDataTo5HDB8IntrinsicsImpl overload at source line 166 */
         scatter_vnchwconv_b8(
             VA0, VA2, transDataTo5HDParams.repeatTimes, transDataTo5HDParams.dstRepStride,
             transDataTo5HDParams.srcRepStride, false, true);

@@ -151,7 +151,7 @@ __aicore__ inline void PairReduceSumImpl(
     __ubuf__ half* dst, __ubuf__ half* src, const int32_t repeatTime, const int32_t mask, const int32_t dstRepStride,
     const int32_t srcBlkStride, const int32_t srcRepStride)
 {
-    int32_t newRepeat = repeatTime;
+    int32_t newRepeat = repeatTime; /* repeated PairReduceSumImpl overload at source line 154 */
     uint32_t srcStrideOffset = srcRepStride * ONE_BLK_HALF_NUM;
     uint32_t newDstRepStride = dstRepStride;
     __ubuf__ half* newSrc = src;
@@ -204,7 +204,7 @@ __aicore__ inline void BlockReduceSumImpl(
     const int32_t srcBlkStride, const int32_t srcRepStride)
 {
     if constexpr (isSetMask) {
-        SetVectorMask<T>(mask[1], mask[0]);
+        SetVectorMask<T>(mask[1], mask[0]); /* repeated BlockReduceSumImpl overload at source line 207 */
     }
 
     int32_t newRepeat = repeatTime;
@@ -300,7 +300,7 @@ __aicore__ inline void BlockReduceMaxImpl(
     const int32_t srcBlkStride, const int32_t srcRepStride)
 {
     if constexpr (isSetMask) {
-        SetVectorMask<T>(mask[1], mask[0]);
+        SetVectorMask<T>(mask[1], mask[0]); /* repeated BlockReduceMaxImpl overload at source line 303 */
     }
 
     int32_t newRepeat = repeatTime;
@@ -396,7 +396,7 @@ __aicore__ inline void BlockReduceMinImpl(
     const int32_t srcBlkStride, const int32_t srcRepStride)
 {
     if constexpr (isSetMask) {
-        SetVectorMask<T>(mask[1], mask[0]);
+        SetVectorMask<T>(mask[1], mask[0]); /* repeated BlockReduceMinImpl overload at source line 399 */
     }
 
     int32_t newRepeat = repeatTime;
@@ -549,7 +549,7 @@ __aicore__ inline void WholeReduceMaxImpl(
         vector_align ureg;
         uint32_t sreg = static_cast<uint32_t>(mask);
         vector_bool preg = plt_b32(sreg, POST_UPDATE);
-        uint32_t strideConfig = ((static_cast<uint32_t>(srcBlkStride)) << 16);
+        uint32_t strideConfig = ((static_cast<uint32_t>(srcBlkStride)) << 16); /* repeated WholeReduceMaxImpl overload at source line 552 */
         for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeat); ++i) {
             vsldb(vreg0, newSrc + i * srcStrideOffset, strideConfig, preg);
             vcmax(vreg1, vreg0, preg, MODE_ZEROING);
@@ -655,7 +655,7 @@ __aicore__ inline void WholeReduceMinImpl(
     uint32_t srcStrideOffset = srcRepStride * ONE_BLK_HALF_NUM;
     uint32_t dstStrideOffset = (order == ReduceOrder::ORDER_VALUE_INDEX) ? 2 : 1;
     uint32_t dstStrideOffsetPost = dstStrideOffset * (dstRepStride - 1);
-    __ubuf__ half* newSrc = src;
+    __ubuf__ half* newSrc = src; /* repeated WholeReduceMinImpl overload at source line 658 */
     if (dstRepStride == 0 && repeatTime > 0) {
         newRepeat = 1;
         srcStrideOffset = srcRepStride * ONE_BLK_HALF_NUM * (repeatTime - 1);
@@ -803,7 +803,7 @@ template <typename T = half, bool isSetMask = true>
 __aicore__ inline void WholeReduceSumImpl(
     __ubuf__ half* dst, __ubuf__ half* src, const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride,
     const int32_t srcBlkStride, const int32_t srcRepStride)
-{
+{ /* repeated WholeReduceSumImpl overload at source line 806 */
     int32_t newRepeat = repeatTime;
     uint32_t srcStrideOffset = srcRepStride * ONE_BLK_HALF_NUM;
     uint32_t newDstRepStride = dstRepStride;
@@ -972,7 +972,7 @@ __aicore__ inline void ReduceMaxIntrinsicsImpl(
 __aicore__ inline void ReduceMaxIntrinsicsImpl(
     __ubuf__ float* sharedTmpBuffer, __ubuf__ float* srcLocal, const uint64_t mask[], const int32_t repeatTime,
     const int32_t srcRepStride)
-{
+{ /* repeated ReduceMaxIntrinsicsImpl overload at source line 975 */
     __ubuf__ uint8_t* tempBuf = AscendCUtils::GetTemporaryBufferAddr<uint8_t>(TMP_UB_OFFSET, 16);
     *((__ubuf__ uint64_t*)tempBuf) = mask[0];
     *((__ubuf__ uint64_t*)tempBuf + 1) = mask[1];
@@ -1020,7 +1020,7 @@ __aicore__ inline void ReduceMinIntrinsicsImpl(
 __aicore__ inline void ReduceMinIntrinsicsImpl(
     __ubuf__ half* sharedTmpBuffer, __ubuf__ half* srcLocal, const int32_t mask, const int32_t repeatTime,
     const int32_t srcRepStride)
-{
+{ /* repeated ReduceMinIntrinsicsImpl overload at source line 1023 */
     __VEC_SCOPE__
     {
         vector_f16 vreg0;
@@ -1142,7 +1142,7 @@ __aicore__ inline void ReduceSumIntrinsicsImpl(
 __aicore__ inline void ReduceSumIntrinsicsImpl(
     __ubuf__ half* sharedTmpBuffer, __ubuf__ half* srcLocal, const int32_t mask, const int32_t repeatTime,
     const int32_t srcRepStride)
-{
+{ /* repeated ReduceSumIntrinsicsImpl overload at source line 1145 */
     __VEC_SCOPE__
     {
         vector_f16 vreg0;

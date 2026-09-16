@@ -121,7 +121,7 @@ __aicore__ inline void SoftmaxFlashV2BasicBlockImpl(
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
         SetWaitFlagVToS();
         for (uint32_t j = 0; j < splitCeilM; j++) {
-            AlignedBrcbImpl(
+            AlignedBrcbImpl( /* repeated AlignedBrcbImpl overload at source line 124 */
                 tmpBuffer1[FLOAT_REPEAT_SIZE * j * HALF_FACTOR], tmpBuffer3[FLOAT_NUM_PER_BLK * j],
                 HALF_FACTOR * DEFAULT_REPEAT_STRIDE);
         }
@@ -562,7 +562,7 @@ __aicore__ inline void SoftmaxFlashV2NoUpdateBasicBlock(
         BasicBlockReduceSumImpl(tmpBuffer2, dst[offset1], tmpBuffer1, splitBlock, tiling.splitM, tiling.splitK);
         PipeBarrier<PIPE_V>();
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
-        SetWaitFlagVToS();
+        SetWaitFlagVToS(); /* repeated BasicBlockReduceSumImpl overload at source line 565 */
         for (uint32_t j = 0; j < splitCeilM; j++) {
             AlignedBrcbImpl(
                 expSumTensor[offset2 + FLOAT_REPEAT_SIZE * j], tmpBuffer2[FLOAT_NUM_PER_BLK * j], FLOAT_NUM_PER_BLK);

@@ -484,7 +484,7 @@ __simd_vf__ inline void ComputePowFBaseLogStepTwoImpl(
 
     GetLogFExtStepTwo(tmpLHIReg, tmpLLOReg, tmpIReg, tmpMReg, tmpRReg, params, fullMask);
 
-    for (uint16_t i = 0; i < repeatTime; i++) {
+    for (uint16_t i = 0; i < repeatTime; i++) { /* repeated ComputePowFBaseLogStepTwoImpl overload at source line 487 */
         mask = Reg::UpdateMask<float>(calCount);
         Reg::StoreAlign(tmpLHIBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLHIReg, mask);
         Reg::StoreAlign(tmpLLOBuffer + i * B32_DATA_NUM_PER_REPEAT, tmpLLOReg, mask);
@@ -626,7 +626,7 @@ __aicore__ inline void PowFComputeImpl(
     __ubuf__ T* dst, __ubuf__ T* src0, const T& scalarValue, __ubuf__ uint32_t* tmpBuffer, uint32_t calCount)
 {
     constexpr uint16_t eleCountPerVL = GetVecLen() / sizeof(float);
-    uint16_t repeatTime = DivCeil(calCount, eleCountPerVL);
+    uint16_t repeatTime = DivCeil(calCount, eleCountPerVL); /* repeated PowFComputeImpl overload at source line 629 */
     __ubuf__ float* tmpLowBuffer;
     __ubuf__ float* tmpHighBuffer;
     __ubuf__ float* tmpLogBuffer;
@@ -958,7 +958,7 @@ template <typename T>
 __simd_vf__ inline void PowIComputeImpl(
     __ubuf__ T* dst, __ubuf__ T* src0, const T scalarValue, uint32_t calCount, uint16_t maxLoop)
 {
-    using ConvType = typename PowICastType<T>::type;
+    using ConvType = typename PowICastType<T>::type; /* repeated PowIComputeImpl overload at source line 961 */
     constexpr uint16_t eleCountPerVL = GetVecLen() / sizeof(ConvType);
     uint16_t repeatTime = DivCeil(calCount, eleCountPerVL);
 

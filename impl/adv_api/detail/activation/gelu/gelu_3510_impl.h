@@ -330,7 +330,7 @@ template <typename T, bool highPrecision = false, bool highPerformance = false>
 __aicore__ inline void FasterGeluV2Impl(
     const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& sharedTmpBuffer,
     const uint32_t dataSize)
-{
+{ /* repeated FasterGeluV2Impl overload at source line 333 */
     (void)sharedTmpBuffer;
     (void)highPerformance;
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");

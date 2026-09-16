@@ -188,7 +188,7 @@ __aicore__ inline void VecBinaryScalarLevel0Template(
     BasicAPIMaskStruct maskArrayStruct;
     if constexpr (isMaskBitMode) {
         ASCENDC_ASSERT(
-            maskCount == 0, { KERNEL_LOG(KERNEL_ERROR, "maskCount must be 0 when isMaskBitMode is true."); });
+            maskCount == 0, { KERNEL_LOG(KERNEL_ERROR, "maskCount must be 0 when isMaskBitMode is true."); }); /* repeated VecBinaryScalarLevel0VFImpl overload at source line 191 */
         maskArrayStruct = *(reinterpret_cast<const BasicAPIMaskStruct*>(maskArray));
     } else {
         ASCENDC_ASSERT(maskArray == nullptr, {
@@ -1038,7 +1038,7 @@ __aicore__ inline void MaxsImpl(
     static_assert((SupportType<T, half, bfloat16_t, float, int16_t, int32_t>()), "Maxs not support current datatype!");
     static_assert(scalarIdx == 0 || scalarIdx == 1);
     constexpr auto func = Reg::Max<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
-    if constexpr (sizeof(T) == 2) {
+    if constexpr (sizeof(T) == 2) { /* repeated MaxsImpl overload at source line 1041 */
         Internal::VecBinaryScalarLevel0Template<func, isSetMask, true, T, Reg::LoadDist::DIST_BRC_B16, scalarIdx>(
             dst, src0, src1, mask, 0, repeatTime, repeatParams);
     } else if constexpr (sizeof(T) == 4) {
@@ -1093,7 +1093,7 @@ __aicore__ inline void MinsImpl(
     static_assert((SupportType<T, half, bfloat16_t, float, int16_t, int32_t>()), "Mins not support current datatype!");
     static_assert(scalarIdx == 0 || scalarIdx == 1);
     constexpr auto func = Reg::Min<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
-    if constexpr (sizeof(T) == 2) {
+    if constexpr (sizeof(T) == 2) { /* repeated MinsImpl overload at source line 1096 */
         Internal::VecBinaryScalarLevel0Template<func, isSetMask, true, T, Reg::LoadDist::DIST_BRC_B16, scalarIdx>(
             dst, src0, src1, mask, 0, repeatTime, repeatParams);
     } else if constexpr (sizeof(T) == 4) {
@@ -1148,7 +1148,7 @@ __aicore__ inline void MulsImpl(
     static_assert((SupportType<T, half, bfloat16_t, float, int16_t, int32_t>()), "Muls not support current datatype!");
     static_assert(scalarIdx == 0 || scalarIdx == 1);
     constexpr auto func = Reg::Mul<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
-    if constexpr (sizeof(T) == 2) {
+    if constexpr (sizeof(T) == 2) { /* repeated MulsImpl overload at source line 1151 */
         Internal::VecBinaryScalarLevel0Template<func, isSetMask, true, T, Reg::LoadDist::DIST_BRC_B16, scalarIdx>(
             dst, src0, src1, mask, 0, repeatTime, repeatParams);
     } else if constexpr (sizeof(T) == 4) {
@@ -1200,7 +1200,7 @@ __aicore__ inline void SubsImpl(
     static_assert((SupportType<T, half, bfloat16_t, float, int16_t, int32_t>()), "Subs not support current datatype!");
     static_assert(scalarIdx == 0 || scalarIdx == 1);
     constexpr auto func = Reg::Sub<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
-    if constexpr (sizeof(T) == 2) {
+    if constexpr (sizeof(T) == 2) { /* repeated SubsImpl overload at source line 1203 */
         Internal::VecBinaryScalarLevel0Template<func, isSetMask, true, T, Reg::LoadDist::DIST_BRC_B16, scalarIdx>(
             dst, src0, src1, mask, 0, repeatTime, repeatParams);
     } else if constexpr (sizeof(T) == 4) {
@@ -1252,7 +1252,7 @@ __aicore__ inline void DivsImpl(
     static_assert((SupportType<T, half, float>()), "Divs not support current datatype!");
     static_assert(scalarIdx == 0 || scalarIdx == 1);
     constexpr auto func = Reg::Div<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
-    if constexpr (sizeof(T) == 2) {
+    if constexpr (sizeof(T) == 2) { /* repeated DivsImpl overload at source line 1255 */
         Internal::VecBinaryScalarLevel0Template<func, isSetMask, true, T, Reg::LoadDist::DIST_BRC_B16, scalarIdx>(
             dst, src0, src1, mask, 0, repeatTime, repeatParams);
     } else if constexpr (sizeof(T) == 4) {
@@ -1303,7 +1303,7 @@ __aicore__ inline void AndsImpl(
     static_assert((SupportType<T, int16_t, uint16_t>()), "Ands not support current datatype!");
     static_assert(scalarIdx == 0 || scalarIdx == 1);
     constexpr auto func = Reg::And<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
-    if constexpr (sizeof(T) == 2) {
+    if constexpr (sizeof(T) == 2) { /* repeated AndsImpl overload at source line 1306 */
         Internal::VecBinaryScalarLevel0Template<func, isSetMask, true, T, Reg::LoadDist::DIST_BRC_B16, scalarIdx>(
             dst, src0, src1, mask, 0, repeatTime, repeatParams);
     } else if constexpr (sizeof(T) == 4) {
@@ -1353,7 +1353,7 @@ __aicore__ inline void OrsImpl(
     static_assert((SupportType<T, int16_t, uint16_t>()), "Ors not support current datatype!");
     static_assert(scalarIdx == 0 || scalarIdx == 1);
     constexpr auto func = Reg::Or<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>;
-    if constexpr (sizeof(T) == 2) {
+    if constexpr (sizeof(T) == 2) { /* repeated OrsImpl overload at source line 1356 */
         Internal::VecBinaryScalarLevel0Template<func, isSetMask, true, T, Reg::LoadDist::DIST_BRC_B16, scalarIdx>(
             dst, src0, src1, mask, 0, repeatTime, repeatParams);
     } else if constexpr (sizeof(T) == 4) {

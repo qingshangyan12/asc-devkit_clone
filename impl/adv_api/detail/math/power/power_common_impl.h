@@ -194,7 +194,7 @@ __aicore__ inline void PowerImpl(
     for (uint32_t i = 0; i < loopCount; ++i) {
         Cast<float, half, false>(
             stackSrc0, srcTensor0[i * splitSize], RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1, fp162fp32Param);
-        PipeBarrier<PIPE_V>();
+        PipeBarrier<PIPE_V>(); /* repeated PowerImpl overload at source line 197 */
         CommonPowerF(stackDst, stackSrc0, stackSrc1, tmpScalar, powerParam, splitSize);
         Cast<half, float, false>(
             dstTensor[i * splitSize], stackDst, RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1, fp322fp16Param);

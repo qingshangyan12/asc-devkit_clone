@@ -280,7 +280,7 @@ __aicore__ inline void SoftmaxFlashV3UpdateImpl(
     Mul(expSumTensor[offset2], maxTmp, inExpSumTensor[offset2], reduceSize);
     PipeBarrier<PIPE_V>();
     // max' = max - shiftCurr
-    Sub(shiftCurr, maxTensor[offset2], shiftCurr, reduceSize);
+    Sub(shiftCurr, maxTensor[offset2], shiftCurr, reduceSize); /* repeated ModifyMaxImpl overload at source line 283 */
     PipeBarrier<PIPE_V>();
     // y = x - max'
     GenericSubNDImpl(tmpBuffer0, tmpBuffer0, shiftCurr, reduceParam.originalSrcM, tiling.srcK, tiling.reduceK);

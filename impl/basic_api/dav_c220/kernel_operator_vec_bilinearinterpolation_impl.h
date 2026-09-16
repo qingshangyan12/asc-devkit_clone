@@ -113,7 +113,7 @@ __aicore__ inline void BilinearInterpolationCalc(
     BinaryRepeatParams mulRepeatParams;
     if (repeatMode == false) {
         mulRepeatParams.src0RepStride = 1;
-        mulRepeatParams.src0BlkStride = 0;
+        mulRepeatParams.src0BlkStride = 0; /* repeated GatherbImpl overload at source line 116 */
     }
 
     SetMaskCount();

@@ -264,6 +264,7 @@ __aicore__ inline void SetCmpMask(const LocalTensor<T>& src)
 /* **************************************************************************************************
  * Compares                                           *
  * ************************************************************************************************* */
+
 /*
  * @ingroup Compare Level 0
  * @brief Compare the size of a tensor and a scalar one by one. If true, the corresponding bit is 1, otherwise it is 0
@@ -340,7 +341,7 @@ __aicore__ inline void CompareScalar(
     if (!CheckFuncVecBinaryScalarCmp(
             dst, src0, src1Scalar, ONE_REPEAT_BYTE_SIZE / sizeof(T), repeatTime, repeatParams, "CompareScalar")) {
         ASCENDC_REPORT_CHECK_ERROR("CompareScalar", KernelFuncType::MASK_BIT_MODE);
-    }
+    } /* repeated SetCmpMaskImpl overload at source line 343 */
 #endif
     VcmpvsImpl<T, U, isSetMask>(
         (__ubuf__ U*)dst.GetPhyAddr(), (__ubuf__ T*)src0.GetPhyAddr(), src1Scalar, cmpMode, mask, repeatTime,
@@ -564,6 +565,7 @@ __aicore__ inline void Select(
 }
 
 // ================================
+
 /*
  * @ingroup Select Level 0
  * @brief Select element according to the bit value of sel
@@ -661,6 +663,7 @@ __aicore__ inline void Select(
 /* **************************************************************************************************
  * Compares                                           *
  * ************************************************************************************************* */
+
 /*
  * @ingroup Compare Level 0
  * @brief Compare the size of a tensor and a scalar one by one. If true, the corresponding bit is 1, otherwise it is 0
@@ -934,6 +937,7 @@ __aicore__ inline void Select(
 #endif
     SelectCommon<T1, isSetMask, config>(dst, selMask, src0, src1, selMode, mask, repeatTime, repeatParams);
 }
+
 
 // select mode: 1
 /*

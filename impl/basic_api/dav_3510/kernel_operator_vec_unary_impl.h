@@ -311,7 +311,7 @@ template <typename T, bool isSetMask = true, const ExpConfig& config = DEFAULT_E
 __aicore__ inline void ExpImpl(
     __ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask, const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
-{
+{ /* repeated ExpImpl overload at source line 314 */
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
     if constexpr (
 #if !defined(__ASC_FTZ__)
@@ -369,7 +369,7 @@ template <typename T, bool isSetMask = true, const LnConfig& config = DEFAULT_LN
 __aicore__ inline void LnImpl(
     __ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask, const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
-{
+{ /* repeated LnImpl overload at source line 372 */
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
     if constexpr (
 #if !defined(__ASC_FTZ__)
@@ -464,7 +464,7 @@ __aicore__ inline void ReciprocalImpl(
     __ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask, const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
-    static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
+    static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!"); /* repeated ReciprocalImpl overload at source line 467 */
     if constexpr (
 #if !defined(__ASC_FTZ__)
         config.algo == ReciprocalAlgo::PRECISION_1ULP_FTZ_TRUE
@@ -533,7 +533,7 @@ __aicore__ inline void SqrtImpl(
     __ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask, const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
-    static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
+    static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!"); /* repeated SqrtImpl overload at source line 536 */
     if constexpr (
 #if !defined(__ASC_FTZ__)
         config.algo == SqrtAlgo::PRECISION_1ULP_FTZ_TRUE
@@ -640,7 +640,7 @@ __aicore__ inline void RsqrtImpl(
     const UnaryRepeatParams& repeatParams)
 {
     static_assert((SupportType<T, half, float>()), "current data type is not supported on current device!");
-    if constexpr (
+    if constexpr ( /* repeated RsqrtImpl overload at source line 643 */
 #if !defined(__ASC_FTZ__)
         config.algo == RsqrtAlgo::PRECISION_1ULP_FTZ_TRUE
 #else

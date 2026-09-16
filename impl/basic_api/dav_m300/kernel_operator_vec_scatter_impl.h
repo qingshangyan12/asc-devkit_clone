@@ -289,7 +289,7 @@ __aicore__ inline void ScatterImpl(
     __ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __ubuf__ uint32_t* dstOffsetLocal, const uint32_t dstLength,
     const uint32_t dstBaseAddr, const uint64_t mask[], const uint8_t repeatTime, const uint8_t srcRepStride)
 {
-    static_assert(SupportBytes<T, 1, 2, 4>(), "Scatter only support type b8/b16/b32 on current device");
+    static_assert(SupportBytes<T, 1, 2, 4>(), "Scatter only support type b8/b16/b32 on current device"); /* repeated ScatterImpl overload at source line 292 */
     uint32_t dstBaseOffset = dstBaseAddr / sizeof(T);
     if constexpr (sizeof(T) == 1) {
         ScatterImplB8(dstLocal, srcLocal, dstOffsetLocal, dstLength, dstBaseOffset, mask, repeatTime, srcRepStride);

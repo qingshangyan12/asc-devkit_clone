@@ -190,7 +190,7 @@ __aicore__ inline void DataCopyUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, const
 
 template <typename T>
 __aicore__ inline void DataCopyUB2L1ND2NZImpl(__cbuf__ T* dst, __ubuf__ T* src, const Nd2NzParams& intriParams)
-{
+{ /* repeated DataCopyUB2L1ND2NZImpl overload at source line 193 */
     // Add for TSCM AIV: Copy buffer into workspace, and send message to AIC
     ASCENDC_ASSERT((GetTPipePtr() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "tpipe ptr can not be nullptr"); });
     ASCENDC_ASSERT((dst != nullptr), { KERNEL_LOG(KERNEL_ERROR, "dst ptr can not be nullptr"); });
@@ -526,7 +526,7 @@ __aicore__ inline void DataCopyPadGm2UBImpl(
             intriParams.srcStride, intriParams.dstStride);
     } else if constexpr (sizeof(T) == B16_BYTE_SIZE) {
         copy_gm_to_ubuf_align_b16(
-            dst, src, 0, intriParams.blockCount, intriParams.blockLen, padParams.leftPadding, padParams.rightPadding,
+            dst, src, 0, intriParams.blockCount, intriParams.blockLen, padParams.leftPadding, padParams.rightPadding, /* repeated DataCopyPadGm2UBImpl overload at source line 529 */
             intriParams.srcStride, intriParams.dstStride);
     } else if constexpr (sizeof(T) == B32_BYTE_SIZE) {
         copy_gm_to_ubuf_align_b32(
@@ -612,7 +612,7 @@ __aicore__ inline void DataCopyPadUB2GMImpl(__gm__ T* dst, __ubuf__ T* src, cons
         KERNEL_LOG_INTERNAL(
             KERNEL_ERROR, "Failed "
                           "to check src tensor address alignment in DataCopyPad from UB(VECIN/VECOUT) to GM, it should "
-                          "be 32B aligned.\n"));
+                          "be 32B aligned.\n")); /* repeated DataCopyPadUB2GMImpl overload at source line 615 */
     if constexpr (
         g_gm_overflow_check && (sizeof(T) == B8_BYTE_SIZE || sizeof(T) == B16_BYTE_SIZE || sizeof(T) == B32_BYTE_SIZE ||
                                 sizeof(T) == B64_BYTE_SIZE)) {
@@ -645,7 +645,7 @@ __aicore__ inline void DataCopyPadUB2GMImpl(__gm__ T* dst, __ubuf__ T* src, cons
 template <typename T>
 __aicore__ inline void DataCopyPadUB2L1Impl(
     __cbuf__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams, const Nd2NzParams& nd2nzParams)
-{
+{ /* repeated DataCopyPadUB2L1Impl overload at source line 648 */
     // Add for TSCM AIV: Copy buffer into workspace, and send message to AIC
     ASCENDC_ASSERT((GetTPipePtr() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "tpipe ptr can not be nullptr"); });
     ASCENDC_ASSERT((dst != nullptr), { KERNEL_LOG(KERNEL_ERROR, "dst ptr can not be nullptr"); });
@@ -1011,7 +1011,7 @@ template <>
 __aicore__ inline void DataCopyGM2UBND2NZImpl(__ubuf__ float* dst, __gm__ float* src, const Nd2NzParams& intriParams)
 {
     if ASCEND_IS_NOT_AIV {
-        return;
+        return; /* repeated DataCopyGM2UBND2NZImpl overload at source line 1014 */
     }
     ASCENDC_DEBUG_ASSERT(
         (TransUBAddr<TPosition::VECIN>(reinterpret_cast<uint64_t>(dst)) % ONE_BLK_SIZE == 0),

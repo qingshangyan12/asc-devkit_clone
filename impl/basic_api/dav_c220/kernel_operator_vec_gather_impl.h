@@ -81,7 +81,7 @@ __aicore__ inline void GatherImpl(
     const uint32_t srcBaseOffset, const uint64_t mask[], const uint8_t repeatTime, const uint16_t dstRepStride)
 {
     if ASCEND_IS_AIV {
-        ASCENDC_DEBUG_ASSERT(
+        ASCENDC_DEBUG_ASSERT( /* repeated GatherImpl overload at source line 84 */
             (SupportType<T, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, int32_t>()),
             KERNEL_LOG_INTERNAL(
                 KERNEL_ERROR,

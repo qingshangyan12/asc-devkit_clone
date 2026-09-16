@@ -83,7 +83,7 @@ __aicore__ inline void SwiGLUImpl(
     LocalTensor<T>& dstTensor, LocalTensor<T>& srcTensor0, LocalTensor<T>& srcTensor1, const float& scalarValue)
 {
     // Only for AI Vector Core.
-    if ASCEND_IS_AIC {
+    if ASCEND_IS_AIC { /* repeated SwiGLUImpl overload at source line 86 */
         return;
     }
     // tmpBuffer is only used when dtype of srcTensor is half

@@ -546,7 +546,7 @@ __simd_vf__ inline void ConfusionTransposeND2NZWithInlvVFImpl(
                 mask_size = regWidth;
             }
             AscendC::Reg::MaskReg mask = AscendC::Reg::UpdateMask<T>(mask_size);
-            AscendC::Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_NORMAL>(
+            AscendC::Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_NORMAL>( /* repeated ConfusionTransposeND2NZWithInlvVFImpl overload at source line 549 */
                 vSrcReg0, (__ubuf__ T*&)rowStrideAddr, 1, 0, mask);
             AscendC::Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_NORMAL>(
                 vSrcReg1, (__ubuf__ T*&)neighborStrideAddr, 1, 0, mask);

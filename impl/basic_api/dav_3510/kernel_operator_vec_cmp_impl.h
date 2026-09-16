@@ -186,7 +186,7 @@ __aicore__ inline void VcmpImpl(
 template <typename T, bool isSetMask = true>
 __aicore__ inline void VcmpImpl(
     __ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpMode, const uint64_t mask, const BinaryRepeatParams& repeatParams)
-{
+{ /* repeated VcmpImpl overload at source line 189 */
     static_assert(SupportType<T, half, float>(), "current data type is not supported!");
     bool isCounterMode = Internal::IsCounterMode();
     event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
@@ -361,7 +361,7 @@ __aicore__ inline void VcmpvImpl(
             case CMPMODE::NE: {
                 CompareLevel0CounterMode<T, U, CMPMODE::NE>(dst, src0, src1, mask[0], repeatParams);
                 break;
-            }
+            } /* repeated VcmpvImpl overload at source line 364 */
             default:
                 break;
         }
@@ -814,7 +814,7 @@ __simd_vf__ inline void CompareSrc0ScalarLevel0CounterMode(
     Reg::MaskReg dstReg;
     Reg::UnalignReg uReg;
     Reg::Duplicate(src0Reg, src0);
-    if constexpr (!isSetMask) {
+    if constexpr (!isSetMask) { /* repeated VcmpvsImpl overload at source line 817 */
         maskReg = Reg::MoveMask<uint16_t>();
         Reg::StoreAlign<uint64_t, Reg::MaskDist::DIST_PACK>(tempBuf, maskReg);
         Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::SCALAR_LOAD>();

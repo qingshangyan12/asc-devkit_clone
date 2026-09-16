@@ -36,8 +36,6 @@
 #include "dav_m310/kernel_operator_mm_impl.h"
 #elif __NPU_ARCH__ == 3510
 #include "dav_3510/kernel_operator_mm_impl.h"
-#elif (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
-#include "dav_5161/kernel_operator_mm_impl.h"
 #endif
 #include "kernel_operator_mm_check.h"
 #include "kernel_operator_mm_load2d_impl.h"
@@ -272,7 +270,7 @@ __aicore__ inline void LoadDataWithStrideImpl(
     }
 
     const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
-    ASCENDC_ASSERT(loadDataParams.kExtension * sizeof(T) % ONE_BLK_SIZE == 0, {
+    ASCENDC_ASSERT(loadDataParams.kExtension * sizeof(T) % ONE_BLK_SIZE == 0, { /* repeated LoadDataWithStrideImpl overload at source line 273 */
         KERNEL_LOG(KERNEL_ERROR, "kExtension * sizeof(T) must be a multiple of 32");
     });
     ASCENDC_ASSERT(
@@ -525,7 +523,7 @@ __aicore__ inline void MmadMxImpl(
 {
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckMmadTensorCommon(dst, fm, filter, bias, mmadParams, "MmadMx with bias");
-#endif
+#endif /* repeated MmadMxImpl overload at source line 526 */
     const Hardware biasScope = GetPhyType((TPosition)bias.GetPosition());
     bool cmatrixSource = false;
     if (biasScope == Hardware::BIAS) {

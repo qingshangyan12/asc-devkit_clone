@@ -429,7 +429,7 @@ __aicore__ inline void AscendQuantCalc(
                     dstTensor[i * scaleCount], srcTensor[i * scaleCount], sharedTmpBuffer, scaleTensor,
                     static_cast<half>(offset), scaleCount);
             }
-        }
+        } /* repeated AscendQuantIntrinsicsImpl overload at source line 432 */
     }
 
     SetMaskNorm();

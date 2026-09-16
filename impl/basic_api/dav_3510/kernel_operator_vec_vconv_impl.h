@@ -452,7 +452,7 @@ __simd_callee__ inline void SelectNanInfZero00(
     Reg::MaskReg maskNegative, maskPositive;
     Reg::CompareScalar<uint32_t, CMPMODE::LT>(maskPositive, dst, num1, maskMax);
     Reg::CompareScalar<uint32_t, CMPMODE::GE>(maskNegative, dst, num1, maskMax);
-    constexpr uint32_t numInfPositive = 0x7f800000;
+    constexpr uint32_t numInfPositive = 0x7f800000; /* repeated CastIntrinsicsImpl overload at source line 455 */
     constexpr uint32_t numInfNegative = 0xff800000;
     constexpr uint32_t numNan = 0x7f800001;
     Reg::RegTensor<uint32_t> dstNan, dstInfPositive, dstInfNegative;
@@ -1113,7 +1113,7 @@ __simd_callee__ inline void ShiftRightDual32(
 __simd_callee__ inline void ShiftLeftDual32(
     Reg::RegTensor<int32_t>& dstVregLow, Reg::RegTensor<int32_t>& dstVregHigh, Reg::RegTensor<int32_t>& mLow,
     Reg::RegTensor<int32_t>& mHigh, Reg::RegTensor<int32_t>& shiftReg, Reg::RegTensor<int32_t>& tmpReg0,
-    Reg::RegTensor<int32_t>& tmpReg1, Reg::RegTensor<int32_t>& scalar, Reg::MaskReg& cmpMask0, Reg::MaskReg& cmpMask1,
+    Reg::RegTensor<int32_t>& tmpReg1, Reg::RegTensor<int32_t>& scalar, Reg::MaskReg& cmpMask0, Reg::MaskReg& cmpMask1, /* repeated CastDoubleToInt32Impl overload at source line 1116 */
     Reg::MaskReg& mask)
 {
     constexpr int32_t i32 = 32;
@@ -1190,7 +1190,7 @@ __simd_callee__ inline void CastDoubleToInt64Impl(
     Reg::Duplicate(resRegHigh, static_cast<int32_t>(0));
 
     // m_low = bits_low
-    Reg::Copy(mLow, (Reg::RegTensor<int32_t>&)tmpSrcReg.reg[0], mask);
+    Reg::Copy(mLow, (Reg::RegTensor<int32_t>&)tmpSrcReg.reg[0], mask); /* repeated CastDoubleToInt64Impl overload at source line 1193 */
     // exponent = (bits_high >> 20) & 0x7ff
     Reg::ShiftRights(exponent, (Reg::RegTensor<int32_t>&)tmpSrcReg.reg[1], static_cast<int16_t>(20), mask);
     Reg::And(exponent, exponent, scalar1, mask);
@@ -1999,7 +1999,7 @@ __simd_vf__ inline void CastIntrinsicsB64ImplVF1(
         } else {
             // b64 -> b32
             Reg::DeInterleave(
-                (Reg::RegTensor<uint32_t>&)dstVreg, tmpVreg, (Reg::RegTensor<uint32_t>&)dstVreg, zeroVreg);
+                (Reg::RegTensor<uint32_t>&)dstVreg, tmpVreg, (Reg::RegTensor<uint32_t>&)dstVreg, zeroVreg); /* repeated CastImpl overload at source line 2002 */
             Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_STORE>();
             Reg::StoreAlign<uint32_t, Reg::DataCopyMode::DATA_BLOCK_COPY>(
                 (__ubuf__ uint32_t*&)dst + i * repeatParams.dstRepStride * elePerBlk,
@@ -2558,7 +2558,7 @@ __simd_vf__ inline void CastDeqLevel0ImplVF(
             Reg::StoreAlign<uint64_t, Reg::MaskDist::DIST_PACK>(tempBuf, maskReg0);
             Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::SCALAR_LOAD>();
             sreg = static_cast<uint32_t>(tempBuf[0]);
-        }
+        } /* repeated CastDeqImpl overload at source line 2561 */
         repeatTime = CeilDivision(sreg, oneRepSize);
     } else {
         if constexpr (isBitMap) {
@@ -2951,7 +2951,7 @@ __simd_vf__ inline void SubReluCastImpl(__ubuf__ T1* dst, __ubuf__ T2* src0, __u
     const T2 scalarValue = 0;
 
     if constexpr (sizeof(T2) == 8) {
-        constexpr uint32_t sregLower = static_cast<uint32_t>(B64_DATA_NUM_PER_REPEAT * 2);
+        constexpr uint32_t sregLower = static_cast<uint32_t>(B64_DATA_NUM_PER_REPEAT * 2); /* repeated SubReluCastImpl overload at source line 2954 */
         const uint16_t repeatTime = static_cast<uint16_t>(CeilDivision(calCount, sregLower));
         Reg::RegTensor<T1> vDstReg0;
         Reg::RegTensor<T2, Reg::RegTraitNumTwo> vDstReg1;

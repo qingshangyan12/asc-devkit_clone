@@ -102,7 +102,7 @@ __aicore__ inline void AddsImpl(
         vector_s32 vreg0;
         vector_s32 vreg1;
         vector_bool preg;
-        preg = movp_b32();
+        preg = movp_b32(); /* repeated AddsImpl overload at source line 105 */
         uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.srcBlkStride)) << 16);
         uint32_t strideConfig1 = ((static_cast<uint32_t>(repeatParams.dstBlkStride)) << 16);
         for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
@@ -1261,7 +1261,7 @@ __aicore__ inline void ShiftLeftImpl(
 {
     if constexpr (isSetMask) {
         SetVectorMask<T>(mask[1], mask[0]);
-    }
+    } /* repeated ShiftLeftImpl overload at source line 1264 */
 
     __VEC_SCOPE__
     {
@@ -1506,7 +1506,7 @@ __aicore__ inline void ShiftRightImpl(
 {
     if constexpr (isSetMask) {
         SetVectorMask<T>(mask[1], mask[0]);
-    }
+    } /* repeated ShiftRightImpl overload at source line 1509 */
 
     __VEC_SCOPE__
     {
@@ -1800,7 +1800,7 @@ __aicore__ inline void LeakyReluImpl(
     const UnaryRepeatParams& repeatParams)
 {
     if constexpr (isSetMask) {
-        SetVectorMask<T>(mask[1], mask[0]);
+        SetVectorMask<T>(mask[1], mask[0]); /* repeated LeakyReluImpl overload at source line 1803 */
     }
 
     __VEC_SCOPE__

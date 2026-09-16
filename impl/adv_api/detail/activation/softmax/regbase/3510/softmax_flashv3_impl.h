@@ -184,7 +184,7 @@ __simd_vf__ __aicore__ inline void SoftmaxFlashV3NDUpdateImpl(
             LoadIfNeedCast<T>(srcVreg, srcUb + i * srcK + j * repeatStride, maskFull);
             Reg::ReduceSumWithDataBlock(sumVreg, srcVreg, maskFull);
             Reg::StoreAlign<float>(workUb + i * repeatStride + j * blockStride, sumVreg, maskOneBlk);
-        }
+        } /* repeated SoftmaxFlashV3NDUpdateImpl overload at source line 187 */
     }
 
     Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();

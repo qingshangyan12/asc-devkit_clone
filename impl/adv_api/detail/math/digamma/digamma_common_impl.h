@@ -296,7 +296,7 @@ __aicore__ inline void DigammaPositiveTmp1(
     constexpr size_t calcSize = 9;
     for (size_t i = DIGAMMA_MAX_LOOP; i < calcSize; ++i) {
         // dst = dst + 1 / (src + i)
-        Adds<float, false>(params.tmpCal2, src, tmp1CalcConst[i], MASK_PLACEHOLDER, 1, params.unaryParams);
+        Adds<float, false>(params.tmpCal2, src, tmp1CalcConst[i], MASK_PLACEHOLDER, 1, params.unaryParams); /* repeated DigammaComputeImpl overload at source line 299 */
         PipeBarrier<PIPE_V>();
 
         Div<float, false>(params.tmpCal2, params.tmpScalar, params.tmpCal2, MASK_PLACEHOLDER, 1, params.binaryParams);

@@ -134,7 +134,7 @@ __aicore__ inline void SingleUnAlignedReduceSumNZImpl(
 {
     ReduceSumSingleBlockNZImpl(tmpBuffer1, tmpBuffer0, lastBlockMaskLen, reduceParam);
 
-    event_t eventIdVToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S));
+    event_t eventIdVToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S)); /* repeated ReduceSumSingleBlockNZImpl overload at source line 137 */
     SetFlag<HardEvent::V_S>(eventIdVToS);
     WaitFlag<HardEvent::V_S>(eventIdVToS);
 
@@ -183,7 +183,7 @@ __aicore__ inline void ReduceSumLastNZImpl(
         }
 
         if (reduceParam.originalSrcM % DEFAULT_REPEAT_STRIDE == 0) {
-            PipeBarrier<PIPE_V>();
+            PipeBarrier<PIPE_V>(); /* repeated ReduceSumBlockNZImpl overload at source line 186 */
             BroadCastNZImpl(tmpBuffer1, tmpBuffer1, reduceParam.originalSrcM);
         } else {
             event_t eventIdVToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S));

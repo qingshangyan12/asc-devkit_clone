@@ -103,7 +103,7 @@ __aicore__ inline void SoftMaxImpl(
         SoftMax, (T1, T2, isReuseSource, isBasicBlock, isDataFormatNZ, config),
         (dst, sumTensor, maxTensor, src, workLocal, tiling, softmaxShapeInfo));
 
-    ShapeInfo srcShape = src.GetShapeInfo();
+    ShapeInfo srcShape = src.GetShapeInfo(); /* repeated SoftMaxImpl overload at source line 106 */
     LastAxisShapeND srcNDinfo;
     LastAxisShapeND originalSrcShape;
     if (softmaxShapeInfo.srcM == 0 || softmaxShapeInfo.srcK == 0) {

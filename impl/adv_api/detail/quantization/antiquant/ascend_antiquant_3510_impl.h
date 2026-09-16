@@ -840,7 +840,7 @@ __aicore__ inline void AntiQuantInnerLoop(
         src2f16unaryParams.srcRepStride = ONE_FOURTH_DEFAULT_REPEAT_STRIDE;
     }
     UnaryRepeatParams unaryParams;
-    unaryParams.srcRepStride = HALF_DEFAULT_REPEAT_STRIDE;
+    unaryParams.srcRepStride = HALF_DEFAULT_REPEAT_STRIDE; /* repeated AntiQuantPerchannelImpl overload at source line 843 */
     UnaryRepeatParams f322f16Params;
     f322f16Params.dstRepStride = HALF_DEFAULT_REPEAT_STRIDE;
 

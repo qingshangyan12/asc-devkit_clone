@@ -700,7 +700,7 @@ __aicore__ inline void AddReluCastImpl(
         uint32_t strideOffset0 = static_cast<uint32_t>(repeatParams.src0RepStride * 256 / 16);
         uint32_t strideOffset1 = static_cast<uint32_t>(repeatParams.src1RepStride * 256 / 16);
         uint32_t strideOffset2 = static_cast<uint32_t>(repeatParams.dstRepStride * 256 / 8);
-        for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
+        for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) { /* repeated AddReluCastImpl overload at source line 703 */
             mem_bar(VST_VLD);
             vsldb(vreg0, src0 + i * strideOffset0, strideConfig0, preg);
             vsldb(vreg1, src1 + i * strideOffset1, strideConfig1, preg);

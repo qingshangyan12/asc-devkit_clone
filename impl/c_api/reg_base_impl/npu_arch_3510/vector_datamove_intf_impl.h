@@ -39,7 +39,7 @@ __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint8_t* dst, __gm__ uint8_
 
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
-    uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
+    uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride, /* repeated asc_copy_gm2ub_align overload at source line 42 */
     uint32_t dst_stride)
 {
     if ASC_IS_AIV {
@@ -433,7 +433,7 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_l2_cache_mode)
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
-    uint8_t cache_mode)
+    uint8_t cache_mode) /* repeated asc_ndim_copy_gm2ub overload at source line 436 */
 {
     if ASC_IS_AIV {
         nddma_out_to_ub_b8(
@@ -768,7 +768,7 @@ __aicore__ inline void asc_copy_ub2gm_align(
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_store_l2_cache_mode)
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ int8_t* dst, __ubuf__ int8_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t l2_cache_mode,
-    uint64_t dst_stride, uint32_t src_stride)
+    uint64_t dst_stride, uint32_t src_stride) /* repeated asc_copy_ub2gm_align overload at source line 771 */
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_v2(

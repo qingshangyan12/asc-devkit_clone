@@ -240,7 +240,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T CosImpl(T x)
 template <typename T>
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline T SinImpl(T x)
 {
-    static_assert(SupportTypeSimtInternel<T, float>, "Input type of input only supports float.");
+    static_assert(SupportTypeSimtInternel<T, float>, "Input type of input only supports float."); /* repeated SinImpl overload at source line 243 */
 
     // Step 1: Reduce the angle to the range [0, pi/2) and determine the quadrant
     int quadrant;

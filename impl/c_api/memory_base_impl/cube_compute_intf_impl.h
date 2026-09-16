@@ -190,7 +190,7 @@ __aicore__ inline void asc_mmad(
 
 __aicore__ inline void asc_mmad(
     __cc__ float* c_matrix, __ca__ float* a_matrix, __cb__ float* b_matrix, uint16_t left_height, uint16_t n_dim,
-    uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align,
+    uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, /* repeated asc_mmad overload at source line 193 */
     bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
 {
     if ASC_IS_AIC {

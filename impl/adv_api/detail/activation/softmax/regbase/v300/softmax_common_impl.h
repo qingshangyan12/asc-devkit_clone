@@ -146,7 +146,7 @@ __aicore__ inline void ReduceMaxImpl(
             {(uint16_t)reduceParam.originalSrcM, DEFAULT_REPEAT_STRIDE,
              (uint16_t)((reduceParam.srcK - FLOAT_REPEAT_SIZE) / DEFAULT_REPEAT_STRIDE), 0});
 
-        MainBlockMaxImpl(
+        MainBlockMaxImpl( /* repeated MainBlockMaxImpl overload at source line 149 */
             tmpTensor, src, (uint8_t)(reduceParam.originalSrcM), srcRepeatStride, splitCount, reduceParam.srcK);
 
         if (tailSrcK != 0) { // mask norm mode
@@ -239,7 +239,7 @@ __aicore__ inline void DivNDImpl(
 }
 
 __aicore__ inline void SubNDImpl(
-    const LocalTensor<float>& dst, const LocalTensor<float>& src0, const LocalTensor<float>& src1,
+    const LocalTensor<float>& dst, const LocalTensor<float>& src0, const LocalTensor<float>& src1, /* repeated SubNDImpl overload at source line 242 */
     const uint32_t originalSrcM, const uint32_t srcK, const uint32_t srcReduceK)
 {
     const uint8_t dstStride = srcK / FLOAT_NUM_PER_BLK;

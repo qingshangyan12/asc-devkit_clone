@@ -207,7 +207,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNZWithTailVFImpl(
             workUb + i * HALF_REPEAT_SIZE, maxVreg, maxVreg, pregFull);
     }
 
-    Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
+    Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>(); /* repeated SoftMaxGenericNZWithTailVFImpl overload at source line 210 */
 
     uint32_t sreg = originM * dtypeBlkStride;
     for (uint16_t i = 0; i < e2bRep; ++i) {
@@ -478,7 +478,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNDWithTailVFImpl(
         Reg::Select(srcVreg, srcVreg, minVreg, pregCnt);
         Reg::Max(maxVreg, maxVreg, srcVreg, pregFull);
 
-        Reg::ReduceMax(maxVreg, maxVreg, pregFull);
+        Reg::ReduceMax(maxVreg, maxVreg, pregFull); /* repeated SoftMaxGenericNDWithTailVFImpl overload at source line 481 */
         if constexpr (outputBrc) {
             Duplicate(maxVreg, maxVreg, pregOneBlk);
             StoreIfNeedCast<T2>(maxUb + i * blockStride, maxVreg, pregOneBlk);
@@ -542,7 +542,7 @@ __aicore__ inline void SoftMaxGenericNDWithTailImpl(
     const LocalTensor<T1>& src, const LocalTensor<float>& workLocal, const LastAxisShapeND& originalSrcShape,
     const SoftMaxTiling& tiling)
 {
-    uint16_t srcM = originalSrcShape.m;
+    uint16_t srcM = originalSrcShape.m; /* repeated SoftMaxGenericNDWithTailImpl overload at source line 545 */
     uint16_t srcK = tiling.srcK;
     uint16_t originK = originalSrcShape.k;
     uint16_t repeatTimes = static_cast<uint16_t>(CeilDivision(originK, FLOAT_REPEAT_SIZE));
@@ -700,7 +700,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SingleSoftMaxGenericNDAlignedWithB
 
     Reg::MaskReg pregDst;
     Reg::MaskReg pregTmp;
-    Reg::MaskReg pregOut;
+    Reg::MaskReg pregOut; /* repeated SingleSoftMaxGenericNDAlignedWithBlkVFImpl overload at source line 703 */
     Reg::MaskReg pregCnt = Reg::MoveMask<uint32_t>();
     Reg::MaskReg pregFull = Reg::CreateMask<uint32_t, Reg::MaskPattern::ALL>();
     Reg::MaskReg pregOneBlk = Reg::CreateMask<uint32_t, Reg::MaskPattern::VL8>();
@@ -878,7 +878,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SingleSoftMaxGenericNDVFImpl(
     Reg::MaskReg pregFull = Reg::CreateMask<uint32_t, Reg::MaskPattern::ALL>();
     Reg::MaskReg pregOnePt = Reg::CreateMask<uint32_t, Reg::MaskPattern::VL1>();
     Reg::MaskReg pregOneBlk;
-    if constexpr (IsSameType<T2, half>::value) {
+    if constexpr (IsSameType<T2, half>::value) { /* repeated SingleSoftMaxGenericNDVFImpl overload at source line 881 */
         pregOneBlk = Reg::CreateMask<uint32_t, Reg::MaskPattern::VL16>();
     } else {
         pregOneBlk = Reg::CreateMask<uint32_t, Reg::MaskPattern::VL8>();

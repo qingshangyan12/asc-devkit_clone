@@ -267,7 +267,7 @@ __aicore__ inline void GenericDivNDImpl(
         SetVectorMask<float, MaskMode::COUNTER>(0, srcK);
         for (uint32_t j = 0; j < originalSrcM; j++) {
             Div<float, false>(
-                dst[j * srcK], src0[j * srcK], src1[j * srcReduceK], 1, 1,
+                dst[j * srcK], src0[j * srcK], src1[j * srcReduceK], 1, 1, /* repeated GenericDivNDImpl overload at source line 270 */
                 {1, 1, 0, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE, 0});
         }
         SetMaskNorm();
@@ -298,7 +298,7 @@ __aicore__ inline void GenericMulNDImpl(
         SetVectorMask<float, MaskMode::COUNTER>(0, srcK);
         for (uint32_t j = 0; j < originalSrcM; j++) {
             Mul<float, false>(
-                dst[j * srcK], src0[j * srcK], src1[j * srcReduceK], 1, 1,
+                dst[j * srcK], src0[j * srcK], src1[j * srcReduceK], 1, 1, /* repeated GenericMulNDImpl overload at source line 301 */
                 {1, 1, 0, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE, 0});
         }
         SetMaskNorm();

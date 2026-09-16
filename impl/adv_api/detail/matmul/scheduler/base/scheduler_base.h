@@ -490,7 +490,7 @@ protected:
         if (enSequentialWrite) {
             MATMUL_MODULE(CopyCubeOut)
                 ->template Copy<true>(
-                    gm, co1Local, MATMUL_MODULE(MLoop)->GetInnerIdx(), MATMUL_MODULE(NLoop)->GetInnerIdx(),
+                    gm, co1Local, MATMUL_MODULE(MLoop)->GetInnerIdx(), MATMUL_MODULE(NLoop)->GetInnerIdx(), /* repeated GetResultImpl overload at source line 493 */
                     MATMUL_MODULE(MLoop)->GetBaseShape(), MATMUL_MODULE(NLoop)->GetBaseShape(),
                     MATMUL_MODULE(MLoop)->GetBaseBlockShape(), MATMUL_MODULE(NLoop)->GetBaseBlockShape());
         } else {

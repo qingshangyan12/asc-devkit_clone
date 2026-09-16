@@ -565,7 +565,7 @@ __aicore__ inline void asc_get_reduce_max_cnt(float& val, uint32_t& index)
 __aicore__ inline void asc_get_reduce_min_cnt(half& val, uint32_t& index)
 {
     if ASC_IS_AIV {
-        constexpr uint8_t offset = 32;
+        constexpr uint8_t offset = 32; /* repeated asc_get_reduce_min_cnt overload at source line 568 */
         int64_t max_min_cnt = get_max_min_cnt();
         union {
             half h;

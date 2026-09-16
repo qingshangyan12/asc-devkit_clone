@@ -87,7 +87,7 @@ __aicore__ inline void DequantPerchannelImpl(
 template <typename dstT, typename scaleT, DeQuantMode mode>
 __simd_vf__ inline void DequantPerchannelVFImpl(
     __ubuf__ dstT* dstUb, __ubuf__ int32_t* srcUb, __ubuf__ scaleT* scaleUb, DequantParams params)
-{
+{ /* repeated DequantPerchannelVFImpl overload at source line 90 */
     uint32_t rowNum = params.m;
     uint32_t N = params.n;
     uint32_t calCount = params.calCount;
@@ -149,7 +149,7 @@ __aicore__ inline void DequantPerchannelImpl(
 template <typename dstT, typename scaleT, DeQuantMode mode>
 __simd_vf__ inline void DequantPertensorVFImpl(
     __ubuf__ dstT* dstUb, __ubuf__ int32_t* srcUb, const scaleT deqScale, DequantParams params)
-{
+{ /* repeated DequantPertensorVFImpl overload at source line 152 */
     uint32_t rowNum = params.m;
     uint32_t N = params.n;
     uint32_t calCount = params.calCount;

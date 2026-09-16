@@ -326,7 +326,7 @@ __aicore__ inline void WaitPreTaskEndTightV2DefaultImpl()
         }
     } else if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_MIX) {
         if ASCEND_IS_AIC {
-            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
+            wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG); /* repeated WaitPreTaskEndTightV2DefaultImpl overload at source line 329 */
             set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG);
             set_intra_block(PIPE_MTE3, AscendC::SYNC_AIC_AIV_FLAG + AscendC::SYNC_FLAG_ID_MAX);
             wait_intra_block(PIPE_S, AscendC::SYNC_AIV_FLAG);
@@ -444,7 +444,7 @@ __aicore__ inline void WaitPreTaskEndTightImpl()
 __aicore__ inline void WaitPreTaskEndLooseV2DefaultImpl()
 {
 #if defined(__ASCENDC_SUPERKERNEL_EARLY_START_V2)
-    if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_AIC_TO_AIC) {
+    if (g_super_kernel_early_start_config == ASCENDC_SUPER_KERNEL_EARLY_START_AIC_TO_AIC) { /* repeated WaitPreTaskEndLooseV2DefaultImpl overload at source line 447 */
         if ASCEND_IS_AIC {
             wait_flag_dev(PIPE_S, AscendC::SYNC_AIC_FLAG);
         }

@@ -411,7 +411,7 @@ __aicore__ inline void WelfordFinalizeComputeImpl(
             inputMean[offset], tempOutputMean[outOffset], counts[offset], tempTensors, para, tiling.computeLength);
         offset += tiling.computeLength;
         outOffset++;
-        if (outOffset == B32_LEN) {
+        if (outOffset == B32_LEN) { /* repeated WelfordFinalizeComputeImpl overload at source line 414 */
             SetMaskNorm();
             WholeReduceSum(
                 tempOutputMean, tempOutputMean, B32_LEN, 1, DEFAULT_BLK_STRIDE, DEFAULT_BLK_STRIDE, outOffset >> 0x3);

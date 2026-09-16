@@ -149,7 +149,7 @@ __aicore__ inline void SimpleSoftMaxGenericNZImpl(
     }
     PipeBarrier<PIPE_V>();
     for (uint32_t j = 0; j < splitNZBlockCount; j++) {
-        Sub<float, false>(
+        Sub<float, false>( /* repeated SimpleSoftMaxGenericNZImpl overload at source line 152 */
             tmpBuffer0[splitOffset * j], tmpBuffer0[splitOffset * j], tmpBuffer1, MASK_PLACEHOLDER, 1,
             {1, 1, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
     }

@@ -331,7 +331,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T FloorIntrinsicsImpl(T x)
     } else if constexpr (SupportTypeSimtInternel<T, half, float, bfloat16_t>) {
         return __floorf(x);
     }
-}
+} /* repeated FloorIntrinsicsImpl overload at source line 334 */
 
 template <typename DstType, typename SrcType>
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline DstType Floor_(SrcType x)
@@ -482,7 +482,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T RintIntrinsicsImpl(T x)
     }
 }
 
-template <typename DstType, typename SrcType>
+template <typename DstType, typename SrcType> /* repeated RintIntrinsicsImpl overload at source line 485 */
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline DstType Rint_(SrcType x)
 {
     if constexpr (SupportTypeSimtInternel<Tuple<DstType, SrcType>, Tuple<bfloat16_t, float>>) {
@@ -565,7 +565,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T CeilIntrinsicsImpl(T x)
     } else if constexpr (SupportTypeSimtInternel<T, half, float, bfloat16_t>) {
         return __ceilf(x);
     }
-}
+} /* repeated CeilIntrinsicsImpl overload at source line 568 */
 
 template <typename DstType, typename SrcType>
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline DstType Ceil_(SrcType x)

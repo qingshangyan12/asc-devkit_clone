@@ -51,7 +51,7 @@ __aicore__ inline void SoftMaxFlashV2NZImpl(
     const LocalTensor<float>& inMaxTensor, const LocalTensor<float>& workLocal, const LastAxisShapeND& originalSrcShape,
     const SoftMaxTiling& tiling)
 {
-    SetMaskNorm();
+    SetMaskNorm(); /* repeated SoftMaxFlashV2NZImpl overload at source line 54 */
     ResetMask();
     if constexpr (!isUpdate) {
         SoftmaxFlashV2NZNoUpdateImpl<T1, T2, isBasicBlock>(
@@ -118,7 +118,7 @@ __aicore__ inline void SoftmaxFlashV2NoUpdate(
             ReduceLastND reduceParam = {tiling.splitM, originalSrcShape.k, tiling.splitM,
                                         tiling.splitK, tiling.reduceM,     tiling.reduceK};
             SoftmaxFlashV2NoUpdateExtImpl(
-                dst, expSumTensor, maxTensor, src, workLocal, originalSrcShape, tiling, reduceParam);
+                dst, expSumTensor, maxTensor, src, workLocal, originalSrcShape, tiling, reduceParam); /* repeated SoftmaxFlashV2NoUpdateExtImpl overload at source line 121 */
         }
     } else {
         constexpr uint32_t basicBlockMaxK = 2048;
@@ -237,7 +237,7 @@ __aicore__ inline void SoftmaxFlashV2NDExtImpl(
         SoftmaxFlashV2UpdateImpl(
             dst, expSumTensor, maxTensor, src, expMaxTensor, inExpSumTensor, inMaxTensor, workLocal, reduceParam,
             tiling, offset1, offset2, splitSize, reduceSize);
-        offset1 += tiling.splitSize;
+        offset1 += tiling.splitSize; /* repeated SoftmaxFlashV2UpdateImpl overload at source line 240 */
         offset2 += tiling.reduceSize;
         if (i == (tiling.rangeM - 1)) {
             if (tiling.tailM == 0) {

@@ -207,7 +207,7 @@ __aicore__ inline void DivImpl(
     const BinaryRepeatParams& repeatParams)
 {
     static_assert(
-        (SupportType<T, uint16_t, int16_t, uint32_t, int32_t, half, float>()),
+        (SupportType<T, uint16_t, int16_t, uint32_t, int32_t, half, float>()), /* repeated DivImpl overload at source line 210 */
         "current data type is not supported on current device!");
     if constexpr (
 #if !defined(__ASC_FTZ__)

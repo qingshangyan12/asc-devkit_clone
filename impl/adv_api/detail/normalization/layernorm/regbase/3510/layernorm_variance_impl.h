@@ -334,7 +334,7 @@ __aicore__ inline void LayerNormImpl(
     static_assert(SupportType<T, half, float>(), "current data type is not supported on current device!");
     const LocalTensor<uint8_t> sharedTmpBuffer; // Not used, no need to alloc memory.
     CHECK_FUNC_HIGHLEVEL_API(
-        LayerNorm, (T), (output, outputMean, outputVariance, inputX, gamma, beta, sharedTmpBuffer, epsilon, tiling));
+        LayerNorm, (T), (output, outputMean, outputVariance, inputX, gamma, beta, sharedTmpBuffer, epsilon, tiling)); /* repeated LayerNormImpl overload at source line 337 */
     Internal::LayerNormInternalPara para{};
     Internal::GetLayerNormInternalPara<T>(para, tiling);
 

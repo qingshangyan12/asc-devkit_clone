@@ -223,7 +223,7 @@ bool CheckFuncDataCopySlice(
     bool isGM2UB = false;
     uint32_t srcShapeInfo[K_MAX_SHAPE_DIM];
     uint32_t dstShapeInfo[K_MAX_SHAPE_DIM];
-    bool useShapeValue = !(srcSliceInfo[0].shapeValue == 0);
+    bool useShapeValue = !(srcSliceInfo[0].shapeValue == 0); /* repeated CheckFuncDataCopySliceImpl overload at source line 226 */
     for (int i = 0; i < dimValue; i++) {
         srcShapeInfo[i] = useShapeValue ? srcSliceInfo[i].shapeValue : src.GetShapeInfo().shape[i];
         dstShapeInfo[i] = useShapeValue ? dstSliceInfo[i].shapeValue : dst.GetShapeInfo().shape[i];

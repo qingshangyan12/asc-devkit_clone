@@ -184,7 +184,7 @@ __simd_vf__ inline void SoftmaxGradGenericNZVFImpl(
     for (uint16_t i = 0; i < VcgFoldRepeat; i++) {
         Reg::LoadAlign<float, Reg::LoadDist::DIST_DINTLV_B32>(sumVreg, tmpVreg, workUb + i * HALF_REPEAT_SIZE);
         Reg::Add(sumVreg, sumVreg, tmpVreg, pregFull);
-        if constexpr (isFront) {
+        if constexpr (isFront) { /* repeated SoftmaxGradGenericNZVFImpl overload at source line 187 */
             StoreIfNeedCast<T>(workUbFront + i * FLOAT_REPEAT_SIZE, sumVreg, pregFull);
         } else {
             Reg::StoreAlign<float, Reg::StoreDist::DIST_INTLV_B32>(

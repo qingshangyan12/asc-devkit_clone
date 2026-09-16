@@ -129,7 +129,7 @@ __aicore__ inline void VcmpIntrinsicsImpl(
                 repeatParams.dstRepStride, repeatParams.src0RepStride, repeatParams.src1RepStride);
             break;
         }
-        default:
+        default: /* repeated VcmpIntrinsicsImpl overload at source line 132 */
             ASCENDC_DEBUG_ASSERT(
                 (false), KERNEL_LOG_INTERNAL(
                              KERNEL_ERROR,

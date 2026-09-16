@@ -703,7 +703,7 @@ __aicore__ inline void AddDeqReluImpl(
 template <bool isSetMask = true>
 __aicore__ inline void AddDeqReluImpl(
     __ubuf__ half* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, const uint64_t mask, const uint8_t repeatTime,
-    const BinaryRepeatParams& repeatParams)
+    const BinaryRepeatParams& repeatParams) /* repeated AddDeqReluImpl overload at source line 706 */
 {
     (void)dst;
     (void)src0;

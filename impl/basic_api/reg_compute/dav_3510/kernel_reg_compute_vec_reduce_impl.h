@@ -176,7 +176,7 @@ __simd_callee__ inline void ReduceMaxB64Impl(T& dstReg, T srcReg, MaskReg mask)
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void ReduceMinImpl(U& dstReg, U srcReg, MaskReg mask)
 {
-    using ActualT = typename U::ActualT;
+    using ActualT = typename U::ActualT; /* repeated ReduceMinImpl overload at source line 179 */
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
         (SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half, uint64_t, int64_t>()),
@@ -282,7 +282,7 @@ __simd_callee__ inline void ReduceSumWithDataBlockImpl(U& dstReg, U srcReg, Mask
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void ReduceMaxWithDataBlockImpl(U& dstReg, U srcReg, MaskReg mask)
-{
+{ /* repeated ReduceMaxWithDataBlockImpl overload at source line 285 */
     using ActualT = typename U::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
@@ -297,7 +297,7 @@ __simd_callee__ inline void ReduceMaxWithDataBlockImpl(U& dstReg, U srcReg, Mask
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void ReduceMinWithDataBlockImpl(U& dstReg, U srcReg, MaskReg mask)
-{
+{ /* repeated ReduceMinWithDataBlockImpl overload at source line 300 */
     using ActualT = typename U::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(

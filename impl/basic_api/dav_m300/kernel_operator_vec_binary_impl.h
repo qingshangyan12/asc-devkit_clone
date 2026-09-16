@@ -1702,7 +1702,7 @@ __aicore__ inline void AddReluImpl(
         uint32_t strideConfig0 = (static_cast<uint32_t>(repeatParams.src0BlkStride) << 16);
         uint32_t strideConfig1 = (static_cast<uint32_t>(repeatParams.src1BlkStride) << 16);
         uint32_t strideConfig2 = (static_cast<uint32_t>(repeatParams.dstBlkStride) << 16);
-        for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
+        for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) { /* repeated AddReluImpl overload at source line 1705 */
             mem_bar(VST_VLD);
             vsldb(vreg0, src0 + i * repeatParams.src0RepStride * 16, strideConfig0, preg);
             vsldb(vreg1, src1 + i * repeatParams.src1RepStride * 16, strideConfig1, preg);
@@ -1761,7 +1761,7 @@ __aicore__ inline void FusedMulAddImpl(
 {
     static_assert(SupportType<T, half>(), "FusedMulAdd level-0 api only support half/float on current device");
 
-    if constexpr (isSetMask) {
+    if constexpr (isSetMask) { /* repeated FusedMulAddImpl overload at source line 1764 */
         SetVectorMask<T>(mask[1], mask[0]);
     }
 

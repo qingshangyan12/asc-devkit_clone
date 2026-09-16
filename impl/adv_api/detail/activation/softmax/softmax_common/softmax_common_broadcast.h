@@ -83,7 +83,7 @@ __aicore__ inline void ContinuousColumnBrcbImpl(
 __ASC_USE_RESERVED_UBUF__(3510, "SoftMax is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void AlignedColumnBrcbImpl(
     const LocalTensor<float>& dstLocal, const LocalTensor<float>& srcLocal, const uint32_t& repeat,
-    const uint32_t& brcbCount)
+    const uint32_t& brcbCount) /* repeated AlignedColumnBrcbImpl overload at source line 86 */
 {
     float scalarList[SCALAR_STACK_DEPTH] = {0};
     SetVectorMask<float>(brcbCount);

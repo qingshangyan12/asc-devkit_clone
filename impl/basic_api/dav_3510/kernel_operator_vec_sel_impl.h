@@ -457,7 +457,7 @@ __simd_vf__ inline void SelectMode1Level0(
             newRepeatTimes = CeilDivision(sreg, oneRepSize);
         } else {
             if constexpr (isBitMap) {
-                maskReg = Reg::MoveMask<T>();
+                maskReg = Reg::MoveMask<T>(); /* repeated VselImpl overload at source line 460 */
             } else {
                 sreg = static_cast<uint32_t>(mask);
                 maskReg = Reg::UpdateMask<T>(sreg);

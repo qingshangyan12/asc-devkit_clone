@@ -428,7 +428,7 @@ __simd_vf__ inline void DeInterleaveImplB64(
         Reg::StoreAlign(dst0Local + i * sregLower, dst0Reg, b64Preg);
         Reg::StoreAlign(dst1Local + i * sregLower, dst1Reg, b64Preg);
     }
-    if constexpr (!hasSrc1) {
+    if constexpr (!hasSrc1) { /* repeated InterleaveImpl overload at source line 431 */
         return;
     }
     // second process src1Local

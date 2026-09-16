@@ -461,7 +461,7 @@ __simd_vf__ inline void FusedMulAddReluImpl(__ubuf__ T* dst, __ubuf__ T* src0, _
     uint32_t sreg = static_cast<uint32_t>(calCount);
     if constexpr (sizeof(T) == 8) {
         constexpr uint32_t sregLower = static_cast<uint32_t>(B64_DATA_NUM_PER_REPEAT * 2);
-        const uint16_t repeatTime = static_cast<uint16_t>(CeilDivision(calCount, sregLower));
+        const uint16_t repeatTime = static_cast<uint16_t>(CeilDivision(calCount, sregLower)); /* repeated FusedMulAddReluImpl overload at source line 464 */
         Reg::RegTensor<T, Reg::RegTraitNumTwo> vDstReg0;
         Reg::RegTensor<T, Reg::RegTraitNumTwo> vDstReg1;
         Reg::RegTensor<T, Reg::RegTraitNumTwo> vSrcReg0;
@@ -577,7 +577,7 @@ __simd_vf__ inline void SubReluImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ 
     uint32_t sreg = static_cast<uint32_t>(calCount);
     const T scalarValue = 0;
     if constexpr (sizeof(T) == 8) {
-        constexpr uint32_t sregLower = static_cast<uint32_t>(B64_DATA_NUM_PER_REPEAT * 2);
+        constexpr uint32_t sregLower = static_cast<uint32_t>(B64_DATA_NUM_PER_REPEAT * 2); /* repeated SubReluImpl overload at source line 580 */
         const uint16_t repeatTime = static_cast<uint16_t>(CeilDivision(calCount, sregLower));
         Reg::RegTensor<T, Reg::RegTraitNumTwo> vDstReg;
         Reg::RegTensor<T, Reg::RegTraitNumTwo> vSrcReg0;
@@ -704,7 +704,7 @@ __simd_vf__ inline void FusedAbsSubImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubu
         SupportType<T, half, float>(), "Failed to check dtype in FusedAbsSub, current api support "
                                        "dtype is src and dst both: half, float.");
     constexpr uint32_t sregLower = static_cast<uint32_t>(GetVecLen() / sizeof(T));
-    const uint16_t repeatTime = static_cast<uint16_t>(CeilDivision(calCount, sregLower));
+    const uint16_t repeatTime = static_cast<uint16_t>(CeilDivision(calCount, sregLower)); /* repeated FusedAbsSubImpl overload at source line 707 */
     uint32_t sreg = static_cast<uint32_t>(calCount);
     Reg::RegTensor<T> vDstReg0;
     Reg::RegTensor<T> vSrcReg0;

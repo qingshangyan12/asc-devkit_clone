@@ -50,7 +50,7 @@ __aicore__ inline void asc_mrgsort4(
 
 __aicore__ inline void asc_mrgsort4(
     __ubuf__ float* dst, __ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0,
-    uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension,
+    uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, /* repeated asc_mrgsort4 overload at source line 53 */
     uint8_t valid_bit)
 {
     if ASC_IS_AIV {

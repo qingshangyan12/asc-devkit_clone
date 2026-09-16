@@ -382,27 +382,19 @@ class AdpBuilder(opdesc_parser.OpDesc):
             else:
                 src_file = os.path.join(impl_path, self.op_file + ".cpp")
             if not os.path.exists(src_file):
-                src_file = os.path.join(
-                    impl_path, optype_snake(self.op_type), self.op_file + ".cpp"
+                raise FileNotFoundError(
+                    f"operator: {self.op_file} source file does not found, "
+                    f"which should correctly set in {os.path.join(impl_path, 'CMakeLists.txt')}, please check."
                 )
-                if not os.path.exists(src_file):
-                    raise FileNotFoundError(
-                        f"operator: {src_file} source file does not found, "
-                        f"which should correctly set in {os.path.join(impl_path, 'CMakeLists.txt')}, please check."
-                    )
 
         out_path = os.path.abspath(path)
         if self.dynamic_shape and not out_path.endswith("dynamic"):
             out_path = os.path.join(path, "dynamic")
             os.makedirs(out_path, exist_ok=True)
-        if os.path.dirname(self.op_file) != "":
-            adpfile = os.path.join(out_path, os.path.basename(self.op_file) + ".py")
-        else:
-            adpfile = os.path.join(out_path, self.op_file + ".py")
-        os.makedirs(os.path.dirname(adpfile), exist_ok=True)
+        adpfile = os.path.join(out_path, self.op_file + ".py")
         self._gen_op_compile_option(op_compile_option_all)
         with os.fdopen(os.open(adpfile, const_var.WFLAGS, const_var.WMODES), "w") as fd:
-            self._write_head(fd, src_ini_config)
+            self._write_head(fd)
             self._write_argparse(fd)
             self._get_impl_mode()
             self._write_impl(fd, impl_path, src_ini_config)
@@ -560,21 +552,12 @@ class AdpBuilder(opdesc_parser.OpDesc):
             else:
                 self.argsdefv.append(None)
 
-    def _write_head(self: any, fd: object, src_ini_config=None):
+    def _write_head(self: any, fd: object):
         now = datetime.datetime.now()
         curr_year = now.year
         former_year = curr_year - 1
-
-        impl_head = IMPL_HEAD
-        if src_ini_config is not None:
-            for sub_sections in src_ini_config.sections():
-                if sub_sections[65:] == "IMPL_HEAD":
-                    impl_head_file = src_ini_config.get(sub_sections, "impl_head")
-                    if os.path.exists(impl_head_file):
-                        with open(impl_head_file, "r", newline="") as fh:
-                            impl_head = fh.read()
         fd.write(
-            impl_head.format(
+            IMPL_HEAD.format(
                 former_year, curr_year, self.input_ori_name, self.output_ori_name
             )
         )
@@ -715,18 +698,8 @@ class AdpBuilder(opdesc_parser.OpDesc):
         src_file_dict = self._write_src_file_dict_impl(src_ini_config)
         src = self.op_file + ".cpp"
         virt_exprs = self._build_virtual()
-
-        impl_api = IMPL_API
-        if src_ini_config is not None:
-            for sub_sections in src_ini_config.sections():
-                if sub_sections[65:] == "IMPL_API":
-                    impl_api_file = src_ini_config.get(sub_sections, "impl_api")
-                    if os.path.exists(impl_api_file):
-                        with open(impl_api_file, "r", newline="") as fh:
-                            impl_api = fh.read()
-
         fd.write(
-            impl_api.format(
+            IMPL_API.format(
                 self.op_type,
                 pchk,
                 self.op_intf,
@@ -834,10 +807,8 @@ def write_scripts(
 ):
     batch_lists = cfgs.get(const_var.REPLAY_BATCH).split(";")
     iterator_lists = cfgs.get(const_var.REPLAY_ITERATE).split(";")
-    if isinstance(kernel_source_ini_file, str) and os.path.exists(
-        kernel_source_ini_file
-    ):
-        src_ini_config = configparser.ConfigParser(interpolation=None)
+    if os.path.exists(kernel_source_ini_file):
+        src_ini_config = configparser.ConfigParser()
         src_ini_config.read(kernel_source_ini_file)
     else:
         src_ini_config = None
@@ -878,31 +849,11 @@ def get_ops_info_files(opsinfo_dir: List[str]) -> List[str]:
     return sorted(ops_info_files)
 
 
-def get_ops(ops_file: str) -> List[str]:
-    """Get ops list."""
-    ops = None
-    if isinstance(ops_file, str) and os.path.exists(ops_file):
-        with open(ops_file, "r", encoding="utf-8") as fh:
-            ops = [line.strip() for line in fh if line.strip()]
-    return ops
-
-
-def get_op_compile_option(option_file: str) -> dict:
-    op_compile_option = None
-    if isinstance(option_file, str) and os.path.exists(option_file):
-        with open(option_file, "r", encoding="utf-8") as fh:
-            op_compile_option = json.load(fh)
-    return op_compile_option
-
-
 def parse_args(argv):
     """Command line parameter parsing"""
     parser = argparse.ArgumentParser()
     parser.add_argument("argv", nargs="+")
     parser.add_argument("--opsinfo-dir", nargs="*", default=None)
-    parser.add_argument("--ops", nargs="?", default=None)
-    parser.add_argument("--op_compile_option", nargs="?", default=None)
-    parser.add_argument("--kernel_source_ini", nargs="?", default=None)
     return parser.parse_args(argv)
 
 
@@ -929,16 +880,5 @@ if __name__ == "__main__":
     else:
         ops_infos.append(args.argv[1])
 
-    ops = get_ops(args.ops)
-    op_compile_option = get_op_compile_option(args.op_compile_option)
-    kernel_source_ini_file = args.kernel_source_ini
-
     for ops_info in ops_infos:
-        write_scripts(
-            cfgfile=ops_info,
-            cfgs=rep_cfg,
-            dirs=cfg_dir,
-            ops=ops,
-            op_compile_option=op_compile_option,
-            kernel_source_ini_file=kernel_source_ini_file,
-        )
+        write_scripts(cfgfile=ops_info, cfgs=rep_cfg, dirs=cfg_dir)

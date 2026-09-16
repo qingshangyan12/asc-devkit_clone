@@ -342,7 +342,7 @@ __aicore__ inline void asc_sync_subblock_arrive(pipe_t pipe, int64_t flag_id)
         ffts_cross_core_sync(pipe_t::PIPE_S, config);
     } else if (pipe == pipe_t::PIPE_V) {
         ffts_cross_core_sync(pipe_t::PIPE_V, config);
-    } else if (pipe == pipe_t::PIPE_M) {
+    } else if (pipe == pipe_t::PIPE_M) { /* repeated asc_sync_subblock_arrive overload at source line 345 */
         ffts_cross_core_sync(pipe_t::PIPE_M, config);
     } else if (pipe == pipe_t::PIPE_MTE1) {
         ffts_cross_core_sync(pipe_t::PIPE_MTE1, config);
@@ -368,7 +368,7 @@ __aicore__ inline void asc_sync_inter_arrive(pipe_t pipe, int64_t flag_id)
         ffts_cross_core_sync(pipe_t::PIPE_S, config);
     } else if (pipe == pipe_t::PIPE_V) {
         ffts_cross_core_sync(pipe_t::PIPE_V, config);
-    } else if (pipe == pipe_t::PIPE_M) {
+    } else if (pipe == pipe_t::PIPE_M) { /* repeated asc_sync_inter_arrive overload at source line 371 */
         ffts_cross_core_sync(pipe_t::PIPE_M, config);
     } else if (pipe == pipe_t::PIPE_MTE1) {
         ffts_cross_core_sync(pipe_t::PIPE_MTE1, config);

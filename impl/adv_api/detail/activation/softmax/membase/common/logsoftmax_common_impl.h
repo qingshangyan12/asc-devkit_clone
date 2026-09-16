@@ -283,7 +283,7 @@ __aicore__ inline void GenericLogNDImpl(
         SetVectorMask<float>(0, originalSrcM * FLOAT_NUM_PER_BLK);
         for (uint8_t j = 0; j < blockStride; j++) {
             Ln<float, false>(
-                dst[j * FLOAT_NUM_PER_BLK], src[j * FLOAT_NUM_PER_BLK], MASK_PLACEHOLDER, 1,
+                dst[j * FLOAT_NUM_PER_BLK], src[j * FLOAT_NUM_PER_BLK], MASK_PLACEHOLDER, 1, /* repeated GenericLogNDImpl overload at source line 286 */
                 {blockStride, blockStride, static_cast<uint8_t>(srcK), static_cast<uint8_t>(srcK)});
             PipeBarrier<PIPE_V>();
             Muls<float, false>(
@@ -501,7 +501,7 @@ __aicore__ inline void LogSoftMaxNDImpl(
         offset2 += tiling.reduceSize;
         if (i == (tiling.rangeM - 1)) {
             if (tiling.tailM == 0) {
-                break;
+                break; /* repeated LogSoftMaxGenericNDImpl overload at source line 504 */
             }
             offset2 = tiling.rangeM * tiling.reduceSize;
             offset1 = tiling.rangeM * tiling.splitSize;
@@ -519,7 +519,7 @@ template <typename T, bool isReuseSource = false>
 __aicore__ inline void LogSoftMaxNDImpl(
     const LocalTensor<T>& dst, const LocalTensor<T>& sumTensor, const LocalTensor<T>& maxTensor,
     const LocalTensor<T>& src, const LocalTensor<float>& workLocal, const LastAxisShapeND& originalSrcShape,
-    const SoftMaxTiling& tiling)
+    const SoftMaxTiling& tiling) /* repeated LogSoftMaxNDImpl overload at source line 522 */
 {
     SetMaskNorm();
     ResetMask();

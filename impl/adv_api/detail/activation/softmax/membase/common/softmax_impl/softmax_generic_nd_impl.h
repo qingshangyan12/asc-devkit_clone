@@ -167,7 +167,7 @@ __aicore__ inline void SoftMaxNDExtImpl(
         offset2 += tiling.reduceSize;
         if (i == (tiling.rangeM - 1)) {
             if (tiling.tailM == 0) {
-                break;
+                break; /* repeated SoftMaxGenericNDImpl overload at source line 170 */
             }
             offset2 = tiling.rangeM * tiling.reduceSize;
             offset1 = tiling.rangeM * tiling.splitSize;

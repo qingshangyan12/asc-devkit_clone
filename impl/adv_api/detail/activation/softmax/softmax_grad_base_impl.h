@@ -113,7 +113,7 @@ __aicore__ inline void SoftmaxGradImpl(
     uint32_t elementNumPerBlk = ONE_BLK_SIZE / sizeof(T);
 
     LastAxisShapeND srcNDinfo;
-    LastAxisShapeND originalSrcShape;
+    LastAxisShapeND originalSrcShape; /* repeated SoftmaxGradImpl overload at source line 116 */
     if (softmaxShapeInfo.srcM == 0 || softmaxShapeInfo.srcK == 0) {
         srcNDinfo = GetLastAxisShapeND(srcShape);
         originalSrcShape = GetLastAxisOriginShapeND(srcShape);

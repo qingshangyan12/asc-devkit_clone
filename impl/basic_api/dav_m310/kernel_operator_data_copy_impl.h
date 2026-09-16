@@ -762,7 +762,7 @@ __aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, cons
     if constexpr (sizeof(T) > 4) {
         ASCENDC_ASSERT((false), {
             KERNEL_LOG(
-                KERNEL_ERROR, "unsupported dtype for data copy from L1 Buffer(TSCM) to global on current device");
+                KERNEL_ERROR, "unsupported dtype for data copy from L1 Buffer(TSCM) to global on current device"); /* repeated DataCopyPadL12GMImpl overload at source line 765 */
         });
     }
     if constexpr (g_gm_overflow_check) {
@@ -780,7 +780,7 @@ __aicore__ inline void DataCopyPadGM2L1Impl(
 {
     if (padParams.isPad) {
         set_pad_val_outtol1(padParams.paddingValue);
-    }
+    } /* repeated DataCopyPadGM2L1Impl overload at source line 783 */
     if constexpr (sizeof(T) > 4) {
         ASCENDC_ASSERT((false), {
             KERNEL_LOG(KERNEL_ERROR, "unsupported dtype for data copy from global to local on current device");

@@ -128,7 +128,7 @@ __simd_vf__ inline void SoftmaxFlashNDWithTailImpl(
     Reg::MaskReg maskCnt;
     Reg::MaskReg maskFull = Reg::CreateMask<uint32_t, Reg::MaskPattern::ALL>();
     Reg::MaskReg maskExpMax = Reg::CreateMask<uint32_t, Reg::MaskPattern::VL16>();
-    Reg::MaskReg maskOneBlk;
+    Reg::MaskReg maskOneBlk; /* repeated SoftmaxFlashNDWithTailImpl overload at source line 131 */
     if constexpr (IsSameType<T2, half>::value) {
         maskOneBlk = Reg::CreateMask<uint32_t, Reg::MaskPattern::VL16>();
     } else {
@@ -322,7 +322,7 @@ __aicore__ inline void SoftmaxFlashTmpBufCommonImpl(
     LastAxisShapeND srcNDinfo;
     LastAxisShapeND originalSrcShape;
     if (softmaxShapeInfo.srcM == 0 || softmaxShapeInfo.srcK == 0) {
-        ShapeInfo srcShape = srcTensor.GetShapeInfo();
+        ShapeInfo srcShape = srcTensor.GetShapeInfo(); /* repeated SoftmaxFlashTmpBufCommonImpl overload at source line 325 */
         srcNDinfo = GetLastAxisShapeND(srcShape);
         originalSrcShape = GetLastAxisOriginShapeND(srcShape);
     } else {

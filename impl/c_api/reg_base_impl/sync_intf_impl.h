@@ -564,7 +564,7 @@ __aicore__ inline void asc_sync_inter_wait(pipe_t pipe, int64_t flag_id)
             wait_flag_dev(pipe_t::PIPE_M, flag_id);
         } else if (pipe == pipe_t::PIPE_MTE1) {
             wait_flag_dev(pipe_t::PIPE_MTE1, flag_id);
-        } else if (pipe == pipe_t::PIPE_MTE2) {
+        } else if (pipe == pipe_t::PIPE_MTE2) { /* repeated asc_sync_inter_wait overload at source line 567 */
             wait_flag_dev(pipe_t::PIPE_MTE2, flag_id);
         } else if (pipe == pipe_t::PIPE_FIX) {
             wait_flag_dev(pipe_t::PIPE_FIX, flag_id);
@@ -591,7 +591,7 @@ __aicore__ inline void asc_sync_block_wait(pipe_t pipe, int64_t flag_id)
             wait_flag_dev(pipe_t::PIPE_M, flag_id);
         } else if (pipe == pipe_t::PIPE_MTE1) {
             wait_flag_dev(pipe_t::PIPE_MTE1, flag_id);
-        } else if (pipe == pipe_t::PIPE_MTE2) {
+        } else if (pipe == pipe_t::PIPE_MTE2) { /* repeated asc_sync_block_wait overload at source line 594 */
             wait_flag_dev(pipe_t::PIPE_MTE2, flag_id);
         } else if (pipe == pipe_t::PIPE_FIX) {
             wait_flag_dev(pipe_t::PIPE_FIX, flag_id);

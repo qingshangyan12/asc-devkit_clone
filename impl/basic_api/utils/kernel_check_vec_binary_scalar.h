@@ -214,7 +214,7 @@ check::VecBinaryScalarApiParams BuildVecBinaryParams(
         static_cast<uint16_t>(repeatParams.dstRepStride),
         static_cast<uint16_t>(repeatParams.src0RepStride),
         static_cast<uint32_t>(sizeof(PrimType)),
-        static_cast<uint32_t>(sizeof(PrimType)),
+        static_cast<uint32_t>(sizeof(PrimType)), /* repeated CheckFunVecBinaryScalarImpl overload at source line 217 */
         static_cast<uint64_t>(dst.GetSize() * sizeof(PrimType)),
         static_cast<uint64_t>(src.GetSize() * sizeof(PrimType)),
         static_cast<uint8_t>(dst.GetPosition()),

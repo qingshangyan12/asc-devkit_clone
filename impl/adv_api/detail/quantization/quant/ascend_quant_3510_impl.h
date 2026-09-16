@@ -563,7 +563,7 @@ __aicore__ inline void AscendQuantImpl(
     CheckTensorPosition(scaleTensor, "scaleTensor", "VECIN/VECOUT/VECCALC");
     CheckTensorPosition(offsetTensor, "offsetTensor", "VECIN/VECOUT/VECCALC");
     static_assert(
-        SupportType<srcT, half, float, bfloat16_t>(),
+        SupportType<srcT, half, float, bfloat16_t>(), /* repeated AscendQuantImpl overload at source line 566 */
         "This AscendQuant only support half/float/bfloat16_t input dtype");
     static_assert(
         SupportType<dstT, int8_t, fp8_e4m3fn_t, fp8_e5m2_t, hifloat8_t>(),

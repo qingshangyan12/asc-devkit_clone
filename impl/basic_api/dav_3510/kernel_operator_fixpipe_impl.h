@@ -262,7 +262,7 @@ __aicore__ inline void FixpipeL0cToUB(
     uint32_t srcOffset = cburstNum * nIterIndex * intriParams.srcStride * BLOCK_CUBE;
     uint32_t dstOffset = 0;
     bool nz2ndEn = false;
-    bool nz2dnEn = false;
+    bool nz2dnEn = false; /* repeated SetFixpipePreQuantFlagImpl overload at source line 265 */
     if constexpr (config.format == CO2Layout::ROW_MAJOR) {
         dstOffset = nIterIndex * fixpipeTiling.nSize;
         nz2ndEn = true;
@@ -606,7 +606,7 @@ __aicore__ inline void FixpipeL0C2L1Impl(
     const FixpipeParamsArch3510<config.format>& intriParams)
 {
     if ASCEND_IS_AIC {
-        CheckFixpipeL0C2L1Param<DstT, SrcT, config>(dst, src, intriParams);
+        CheckFixpipeL0C2L1Param<DstT, SrcT, config>(dst, src, intriParams); /* repeated FixpipeL0C2L1Impl overload at source line 609 */
         // nz2nd/nz2dn need set LOOP3_PARA
         SetLoop3Para<config>(intriParams);
 
@@ -674,7 +674,7 @@ __aicore__ inline void FixpipeL0C2UBImpl(
     __ubuf__ DstT* dst, __cc__ SrcT* src, __cbuf__ uint64_t* cbufWorkspace,
     const FixpipeParamsArch3510<config.format>& intriParams)
 {
-    if ASCEND_IS_AIC {
+    if ASCEND_IS_AIC { /* repeated FixpipeL0C2UBImpl overload at source line 677 */
         CheckFixpipeL0C2UBParam<DstT, SrcT, config>(dst, src, intriParams);
         // nz2nd/nz2dn need set LOOP3_PARA
         SetLoop3Para<config>(intriParams);
@@ -741,7 +741,7 @@ __aicore__ inline void FixpipeL0C2GMImpl(
     __gm__ DstT* dst, __cc__ SrcT* src, __cbuf__ uint64_t* cbufWorkspace,
     const FixpipeParamsArch3510<config.format>& intriParams, const uint8_t cacheMode = 0)
 {
-    if ASCEND_IS_AIC {
+    if ASCEND_IS_AIC { /* repeated FixpipeL0C2GMImpl overload at source line 744 */
         CheckFixpipeL0C2GMParam<DstT, SrcT, config>(dst, src, intriParams);
         // nz2nd/nz2dn need set LOOP3_PARA
         SetLoop3Para<config>(intriParams);

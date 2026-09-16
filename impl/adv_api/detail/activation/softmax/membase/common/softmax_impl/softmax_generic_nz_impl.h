@@ -282,7 +282,7 @@ __aicore__ inline void SoftMaxGenericNZImpl(
         }
         SetMaskNorm();
         ResetMask();
-        BinaryComputeWithSpecialMask(
+        BinaryComputeWithSpecialMask( /* repeated ReduceSumLastNZImpl overload at source line 285 */
             tmpBuffer0[lastSplitNZBlockOffset], tmpBuffer0[lastSplitNZBlockOffset], tmpBuffer1, mask, lastBlockMaskLen,
             splitCount, Div<float>);
 
@@ -360,7 +360,7 @@ __aicore__ inline void SoftMaxNZImpl(
     uint32_t offset2 = 0;
     uint32_t splitCount = tiling.splitM * SOFTMAX_SHAPE_NZ_BASIC_COUNT;
 
-    for (uint32_t i = 0; i < tiling.rangeM; i++) {
+    for (uint32_t i = 0; i < tiling.rangeM; i++) { /* repeated SoftMaxNZImpl overload at source line 363 */
         offset1 = i * splitCount;
         offset2 = i * tiling.reduceSize;
         SoftMaxGenericNZImpl(

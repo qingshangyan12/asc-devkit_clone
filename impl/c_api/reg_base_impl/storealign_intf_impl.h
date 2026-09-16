@@ -1653,7 +1653,7 @@ __simd_callee__ inline void asc_storealign(
 
 __simd_callee__ inline void asc_storealign(
     __ubuf__ uint8_t* dst, vector_uint8_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-{
+{ /* repeated asc_storealign overload at source line 1656 */
     if ASC_IS_AIV {
         asc_store_align_config config;
         config.block_stride = block_stride;
@@ -1798,7 +1798,7 @@ __simd_callee__ inline void asc_storealign_postupdate(
 
 __simd_callee__ inline void asc_storealign_postupdate(
     __ubuf__ uint8_t*& dst, vector_uint8_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
-{
+{ /* repeated asc_storealign_postupdate overload at source line 1801 */
     if ASC_IS_AIV {
         asc_store_align_config_post config;
         config.block_stride = block_stride;

@@ -155,7 +155,7 @@ public:
                     auto batchLoop = MATMUL_MODULE(BatchLoop);
                     for (batchLoop->InnerStart(); !batchLoop->InnerEnd(); batchLoop->InnerNext()) {
                         BASE_MODULE::isFirstIter_ = true;
-                        if (batchOffsetInfo.setBiasFlag &&
+                        if (batchOffsetInfo.setBiasFlag && /* repeated GetBatchResultImpl overload at source line 158 */
                             (batchLoop->GetBatchIndex() % batchOffsetInfo.divisorBias == 1)) {
                             MATMUL_MODULE(BiasScheduler)->StopBias(bias);
                         }

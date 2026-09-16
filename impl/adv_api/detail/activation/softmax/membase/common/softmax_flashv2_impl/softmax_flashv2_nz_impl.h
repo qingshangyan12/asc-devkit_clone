@@ -199,7 +199,7 @@ __aicore__ inline void FlashV2NZUpdateGenericImpl(
     ResetMask();
     BinaryComputeWithSpecialMask(
         tmpBuffer0[lastSplitNZBlockOffset], tmpBuffer0[lastSplitNZBlockOffset], tmpBuffer1, mask, lastBlockMaskLen,
-        splitCount, Sub<float>);
+        splitCount, Sub<float>); /* repeated ReduceMaxLastNZImpl overload at source line 202 */
 
     PipeBarrier<PIPE_V>();
     SetMaskCount();
@@ -245,7 +245,7 @@ __aicore__ inline void FlashV2NZUpdateGenericImpl(
 __aicore__ inline void FlashV2NZUpdateGenericImpl(
     const LocalTensor<half>& dst, const LocalTensor<float>& sumTensor, const LocalTensor<float>& maxTensor,
     const LocalTensor<half>& src, const LocalTensor<half>& expMaxTensor, const LocalTensor<float>& inSumTensor,
-    const LocalTensor<float>& inMaxTensor, const LocalTensor<float>& workLocal, const SoftMaxTiling& tiling,
+    const LocalTensor<float>& inMaxTensor, const LocalTensor<float>& workLocal, const SoftMaxTiling& tiling, /* repeated FlashV2NZUpdateGenericImpl overload at source line 248 */
     uint64_t mask[2], const uint32_t& offset1, const uint32_t& offset2, const uint32_t& splitCount,
     const ReduceLastND& reduceParam)
 {
@@ -434,7 +434,7 @@ __aicore__ inline void SoftmaxFlashV2NZUpdateImpl(
     uint32_t offset2 = 0;
     uint32_t splitCount = tiling.splitM * SOFTMAX_SHAPE_NZ_BASIC_COUNT;
     uint32_t paddingTailCount = (tiling.srcM - originalSrcShape.m) * SOFTMAX_SHAPE_NZ_BASIC_COUNT;
-    for (uint32_t i = 0; i < tiling.rangeM; i++) {
+    for (uint32_t i = 0; i < tiling.rangeM; i++) { /* repeated SoftmaxFlashV2NZUpdateImpl overload at source line 437 */
         offset1 = i * splitCount;
         offset2 = i * tiling.reduceSize;
         if (tiling.tailM == 0 && i == tiling.rangeM - 1 && splitCount > paddingTailCount) {
@@ -474,7 +474,7 @@ __aicore__ inline void SoftmaxFlashV2NZNoUpdateImpl(
     uint64_t mask[2] = {0, 0};
     CreateSpecialFormatMask(mask[0], lastBlockMaskLen, FLOAT_REPEAT_SIZE / SOFTMAX_SHAPE_NZ_BASIC_COUNT);
 
-    uint32_t offset1 = 0;
+    uint32_t offset1 = 0; /* repeated SoftmaxFlashV2NZNoUpdateImpl overload at source line 477 */
     uint32_t offset2 = 0;
     uint32_t splitCount = tiling.splitM * SOFTMAX_SHAPE_NZ_BASIC_COUNT;
     uint32_t paddingTailCount = (tiling.srcM - originalSrcShape.m) * SOFTMAX_SHAPE_NZ_BASIC_COUNT;

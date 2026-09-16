@@ -79,7 +79,7 @@ __aicore__ inline void SoftMaxNDImpl(
     const LocalTensor<half>& dst, const LocalTensor<float>& sumTensor, const LocalTensor<float>& maxTensor,
     const LocalTensor<half>& src, const LocalTensor<float>& workLocal, const LastAxisShapeND& originalSrcShape,
     const SoftMaxTiling& tiling)
-{
+{ /* repeated SoftMaxNDImpl overload at source line 82 */
     SetMaskNorm();
     ResetMask();
     PipeBarrier<PIPE_V>();

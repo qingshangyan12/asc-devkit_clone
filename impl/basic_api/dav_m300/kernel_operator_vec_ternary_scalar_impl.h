@@ -230,7 +230,7 @@ __aicore__ inline void AxpyImpl(
 template <typename T, typename U, bool isSetMask = true>
 __aicore__ inline void AxpyImpl(
     __ubuf__ T* dst, __ubuf__ U* src, const U& scalarValue, uint64_t mask, const uint8_t repeatTime,
-    const UnaryRepeatParams& repeatParams)
+    const UnaryRepeatParams& repeatParams) /* repeated AxpyImpl overload at source line 233 */
 {
     if constexpr (sizeof(T) == sizeof(U)) {
         return AxpyIntrinsicsImpl(dst, src, scalarValue, mask, repeatTime, repeatParams);

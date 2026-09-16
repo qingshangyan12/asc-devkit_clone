@@ -190,7 +190,7 @@ __aicore__ inline void asc_add_relu(
 
 __aicore__ inline void asc_add_relu(
     __ubuf__ int8_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
-{
+{ /* repeated asc_add_relu overload at source line 193 */
     asc_set_mask_count_begin(count);
     asc_add_relu(
         dst, src0, src1, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8,
@@ -367,7 +367,7 @@ __aicore__ inline void asc_fma(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__
 
 __aicore__ inline void asc_fma(
     __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
-    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
+    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, /* repeated asc_fma overload at source line 370 */
     uint8_t src1_repeat_stride)
 {
     if ASC_IS_AIV {
@@ -433,7 +433,7 @@ __aicore__ inline void asc_mul_add(__ubuf__ half* dst, __ubuf__ half* src0, __ub
 
 __aicore__ inline void asc_mul_add(
     __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
-    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
+    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, /* repeated asc_mul_add overload at source line 436 */
     uint8_t src1_repeat_stride)
 {
     if ASC_IS_AIV {
@@ -477,7 +477,7 @@ __aicore__ inline void asc_mul_add_relu(__ubuf__ half* dst, __ubuf__ half* src0,
 
 __aicore__ inline void asc_mul_add_relu(
     __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
-    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
+    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, /* repeated asc_mul_add_relu overload at source line 480 */
     uint8_t src1_repeat_stride)
 {
     if ASC_IS_AIV {
@@ -582,7 +582,7 @@ __aicore__ inline void asc_sub_relu(
 }
 
 __aicore__ inline void asc_sub_relu(__ubuf__ half* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
-{
+{ /* repeated asc_sub_relu overload at source line 585 */
     asc_set_mask_count_begin(count);
     asc_sub_relu(
         dst, src0, src1, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8,

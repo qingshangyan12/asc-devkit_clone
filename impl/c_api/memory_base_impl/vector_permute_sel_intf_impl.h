@@ -44,7 +44,7 @@ __aicore__ inline void asc_select(__ubuf__ half* dst, __ubuf__ half* src0, __ubu
 
 __aicore__ inline void asc_select(
     __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
-    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
+    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, /* repeated asc_select overload at source line 47 */
     uint8_t src1_repeat_stride)
 {
     if ASC_IS_AIV {
@@ -355,7 +355,7 @@ __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int8_t** src_arr
 }
 
 __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint8_t** src_array)
-{
+{ /* repeated asc_set_va_reg overload at source line 358 */
     if ASC_IS_AIV {
         uint64_t vaRegArray[8];
         for (int32_t i = 0; i < 8; ++i) {
@@ -445,7 +445,7 @@ __aicore__ inline void asc_squeeze(
 
 __aicore__ inline void asc_squeeze(
     __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src0, __ubuf__ uint32_t* src1, uint8_t repeat, uint8_t dst_block_stride,
-    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
+    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, /* repeated asc_squeeze overload at source line 448 */
     uint8_t src1_repeat_stride)
 {
     if ASC_IS_AIV {

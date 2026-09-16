@@ -83,7 +83,7 @@ public:
     {
         using dst_pos = get_mem_location<DstTensor>;
         using src_pos = get_mem_location<SrcTensor>;
-        static_assert(
+        static_assert( /* repeated data_copy_impl overload at source line 86 */
             Std::is_same_v<dst_pos, location::gm>, "For copy_l0c_to_gm, the destination tensor must be located in GM.");
         static_assert(
             Std::is_same_v<src_pos, location::l0c>, "For copy_l0c_to_gm, the source tensor must be located in L0C.");

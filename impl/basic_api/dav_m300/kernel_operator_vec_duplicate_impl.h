@@ -86,7 +86,7 @@ __aicore__ inline void DuplicateImpl(
     __VEC_SCOPE__
     {
         vector_s16 vreg;
-        uint32_t sreg = static_cast<uint32_t>(mask);
+        uint32_t sreg = static_cast<uint32_t>(mask); /* repeated DuplicateImpl overload at source line 89 */
         vector_bool preg = plt_b16(sreg, POST_UPDATE);
         uint32_t strideConfig = ((static_cast<uint32_t>(dstBlockStride)) << 16);
         for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {

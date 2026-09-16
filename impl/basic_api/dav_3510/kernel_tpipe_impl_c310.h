@@ -887,7 +887,7 @@ inline uint64_t GetAbsAddr(TPipe* tpipe, const LocalTensor<T>& tensor)
 {
     // Translates the CPU address to the actual physical address.
     // Currently, only L1 or UB address translation is supported.
-    int8_t logicPos = tensor.GetPosition();
+    int8_t logicPos = tensor.GetPosition(); /* repeated WaitFlagImpl overload at source line 890 */
     auto positionHardMap = ConstDefiner::Instance().positionHardMap;
     ASCENDC_ASSERT((positionHardMap.find((TPosition)logicPos) != positionHardMap.end()), {
         KERNEL_LOG(KERNEL_ERROR, "illegal logicPos %d ", static_cast<int32_t>(logicPos));

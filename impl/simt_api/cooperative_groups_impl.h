@@ -1001,7 +1001,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline int multi_warp_thread_block_tile_base<Size
     } else {
         auto sync_location = get_sync_location<MemoryType>();
         unsigned int block_rank = thread_block::thread_rank();
-        unsigned int warp_id = block_rank / warpSize;
+        unsigned int warp_id = block_rank / warpSize; /* repeated asc_syncthreads overload at source line 1004 */
         unsigned int word_id = warp_id / warpSize;
         unsigned int warp_bit = 1U << (warp_id % warpSize);
         unsigned int group_mask = details::get_group_mask(block_rank, numWarps);
@@ -1022,7 +1022,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline int multi_warp_thread_block_tile_base<Size
             }
             asc_threadfence_block();
             if (lane_id == 0) {
-                (void)__asc_simt_vf::asc_atomic_and(arrived_word, ~group_mask);
+                (void)__asc_simt_vf::asc_atomic_and(arrived_word, ~group_mask); /* repeated asc_atomic_and overload at source line 1025 */
             }
         } else {
             if (lane_id == 0) {
