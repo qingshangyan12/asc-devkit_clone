@@ -14,7 +14,7 @@
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/basic_api/kernel_operator_data_copy_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_data_copy_intf.h\"\" and use public functions or variables defined in interface headers files.")
+        "impl/basic_api/kernel_operator_data_copy_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_data_copy_intf.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_INTF_IMPL_H__
 #endif
@@ -1889,6 +1889,655 @@ __aicore__ inline void ResetLoopModePara(DataCopyMVType type)
     }
 }
 #endif
+/* **************************************************************************************************
+ * DataCopy pointer extended overloads
+ *
+ * Each overload below accepts a raw address-space pointer in place of the equivalent LocalTensor /
+ * GlobalTensor operand of the Tensor-only signature declared next to it in the interface header. Two
+ * properties keep the existing behaviour intact:
+ *
+ *   - an overload is only viable when at least one operand is a raw pointer (IsDmaPtrInvolved), and its
+ *     direction predicate pins which operand is GM and which is local, so a Tensor / Tensor call still
+ *     resolves to the original Tensor-only signature. A pointer / pointer call pins no direction in CPU
+ *     twin-debug, where the address-space qualifiers are empty, so it is rejected there;
+ *   - a pointer operand contributes its position at compile time (DmaHardwarePosV, a constexpr), while a
+ *     Tensor operand keeps the original runtime GetPosition() dispatch. For a pointer operand the position
+ *     switch below therefore folds to a single branch and emits no runtime test: that is the compile-time
+ *     dispatch of the design, while the Tensor operand of a mixed call keeps its runtime dispatch.
+ *
+ * What the pointer path does not do is derive a Tensor size, so the Tensor size / overflow checks and the
+ * CPU debug shape checks are not emitted for a pointer operand: its length is the caller's responsibility,
+ * which is the documented degradation of the pointer path. The Tensor path never reaches these overloads and
+ * therefore keeps every check it had.
+ *
+ * The address space cast stays at the call sites below and keeps the exact form of the Tensor-only code,
+ * `(__ubuf__ PrimType*)GetUnderlyingPtr(dst)`, which for a pointer operand is the identity conversion.
+ * ************************************************************************************************* */
+namespace DataCopyPtrInternal {
+// The guard mirrors the one that introduces ExtractCacheMode in kernel_utils_macros.h, so that every
+// architecture whose DataCopy accepts a cache hint can also resolve one for a pointer operand.
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || \
+    (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
+/*!
+ * \brief L2 cache hint of a GM operand. A GlobalTensor spells the hint in its own field and a GM pointer
+ *        carries it in the high address bits, so a mixed call resolves the hint the same way the Tensor-only
+ *        code did.
+ */
+template <typename T>
+__aicore__ inline uint8_t ExtractCacheModeForOperand(const T& operand)
+{
+    return ExtractCacheMode(operand);
+}
+
+template <typename T>
+__aicore__ inline uint8_t ExtractCacheModeForOperand(const __gm__ T* operand)
+{
+    return ExtractCacheMode(const_cast<__gm__ T*>(operand));
+}
+#endif // cache-hint architectures
+
+/*!
+ * \brief UB -> UB copy of the pointer path. It mirrors DataCopyUB2UBIntf, which takes Tensors, for pointer
+ *        operands; the pipe marker of that helper is reproduced here.
+ */
+#pragma begin_pipe(V)
+template <typename PrimType, typename DstT, typename SrcT>
+__aicore__ inline void CopyUB2UB(const DstT& dst, const SrcT& src, const DataCopyParams& repeatParams)
+{
+    DataCopyUB2UBImpl(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), repeatParams);
+}
+#pragma end_pipe
+} // namespace DataCopyPtrInternal
+
+/*!
+ * \brief GM -> local dispatch of the pointer path (MTE2 family).
+ *
+ *        The destination may be UB or L1: for a Tensor it is resolved from its TPosition exactly as before, for
+ *        a pointer from its address space at compile time. An unsupported position is reported the same way the
+ *        Tensor-only code reports it.
+ */
+template <typename PrimType, typename DstT, typename SrcT>
+__aicore__ inline void DataCopyPtrGm2Local(const DstT& dst, const SrcT& src, const DataCopyParams& repeatParams)
+{
+    const Hardware dstHWPos = GetDmaOperandHardwarePos(dst);
+    if (dstHWPos == Hardware::UB) {
+        // gm -> ub
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+        DataCopyGM2UBImpl(
+            (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), repeatParams,
+            DataCopyPtrInternal::ExtractCacheModeForOperand(src));
+#else
+        DataCopyGM2UBImpl(
+            (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), repeatParams);
+#endif
+    } else if (dstHWPos == Hardware::L1) {
+        // gm -> l1
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+        DataCopyGM2L1Impl(
+            (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), repeatParams,
+            DataCopyPtrInternal::ExtractCacheModeForOperand(src));
+#else
+        DataCopyGM2L1Impl(
+            (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), repeatParams);
+#endif
+    } else {
+        ASCENDC_CHECK_TPOSITION(
+            false, "dst", "L1 Buffer(A1/B1/C1)/UB(VECIN)",
+            "DataCopy from GlobalTensor to LocalTensor with DataCopyParams",
+            GetPositionDisplay(GetDmaOperandPosition(dst)));
+    }
+}
+
+/*!
+ * \brief local -> GM dispatch of the pointer path (MTE3 family). The source may be UB or L1.
+ */
+template <typename PrimType, typename DstT, typename SrcT>
+__aicore__ inline void DataCopyPtrLocal2Gm(const DstT& dst, const SrcT& src, const DataCopyParams& repeatParams)
+{
+    const Hardware srcHWPos = GetDmaOperandHardwarePos(src);
+    if (srcHWPos == Hardware::UB) {
+        // ub -> gm
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+        DataCopyUB2GMImpl(
+            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), repeatParams,
+            DataCopyPtrInternal::ExtractCacheModeForOperand(dst));
+#else
+        DataCopyUB2GMImpl(
+            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), repeatParams);
+#endif
+    } else if (srcHWPos == Hardware::L1) {
+        // l1 -> gm
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+        DataCopyL12GMImpl(
+            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), repeatParams,
+            DataCopyPtrInternal::ExtractCacheModeForOperand(dst));
+#else
+        DataCopyL12GMImpl(
+            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), repeatParams);
+#endif
+    } else {
+        ASCENDC_CHECK_TPOSITION(
+            false, "src", "L1 Buffer(A1/B1/C1)/UB(VECOUT)",
+            "DataCopy from LocalTensor to GlobalTensor with DataCopyParams",
+            GetPositionDisplay(GetDmaOperandPosition(src)));
+    }
+}
+
+/*!
+ * \brief local -> local dispatch of the pointer path: UB -> UB and UB -> L1.
+ */
+template <typename PrimType, typename DstT, typename SrcT>
+__aicore__ inline void DataCopyPtrLocal2Local(const DstT& dst, const SrcT& src, const DataCopyParams& repeatParams)
+{
+    const Hardware dstHWPos = GetDmaOperandHardwarePos(dst);
+    const Hardware srcHWPos = GetDmaOperandHardwarePos(src);
+    if (srcHWPos != Hardware::UB) {
+        ASCENDC_CHECK_TPOSITION(
+            false, "src", "UB(VECIN/VECCALC/VECOUT)", "DataCopy from LocalTensor to LocalTensor with DataCopyParams",
+            GetPositionDisplay(GetDmaOperandPosition(src)));
+    } else if (dstHWPos == Hardware::UB) {
+        // ub -> ub
+        DataCopyPtrInternal::CopyUB2UB<PrimType>(dst, src, repeatParams);
+    } else if (dstHWPos == Hardware::L1) {
+        // ub -> l1
+        DataCopyUB2L1Impl(
+            (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), repeatParams);
+    } else {
+        ASCENDC_CHECK_TPOSITION(
+            false, "dst", "UB(VECCALC/VECOUT)/L1 Buffer(A1/B1)",
+            "DataCopy from LocalTensor(UB(VECIN/VECCALC/VECOUT)) to LocalTensor with DataCopyParams",
+            GetPositionDisplay(GetDmaOperandPosition(dst)));
+    }
+}
+
+/*!
+ * \brief Pointer-extended DataCopy(dstLocal, srcGlobal, repeatParams): GM -> UB / L1.
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaGmToLocalShape<DstT, SrcT>, bool>::type>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    const DstT& dst, const SrcT& src, const DataCopyParams& repeatParams)
+{
+#ifdef ASCENDC_TIME_STAMP_ON
+    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE2_DATACOPY));
+#endif
+    // The direction predicate proves the source is GM, so its element type is the one the Tensor-only code
+    // used as its PrimType.
+    DataCopyPtrGm2Local<DmaPrimT<SrcT>>(dst, src, repeatParams);
+}
+
+/*!
+ * \brief Pointer-extended DataCopy(dstGlobal, srcLocal, repeatParams): UB / L1 -> GM.
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToGmShape<DstT, SrcT>, bool>::type>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
+    const DstT& dst, const SrcT& src, const DataCopyParams& repeatParams)
+{
+    DataCopyPtrLocal2Gm<DmaPrimT<SrcT>>(dst, src, repeatParams);
+}
+
+/*!
+ * \brief Pointer-extended DataCopy(dstLocal, srcLocal, repeatParams): UB -> UB and UB -> L1.
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToLocalShape<DstT, SrcT>, bool>::type>
+__aicore__ inline void DataCopy(const DstT& dst, const SrcT& src, const DataCopyParams& repeatParams)
+{
+    DataCopyPtrLocal2Local<DmaPrimT<SrcT>>(dst, src, repeatParams);
+}
+
+/*!
+ * \brief Pointer-extended DataCopy(dstLocal, srcGlobal, count): GM -> UB. The count form folds the count into
+ *        DataCopyParams and forwards, exactly like the Tensor-only overload does.
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaGmToLocalShape<DstT, SrcT>, bool>::type>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(const DstT& dst, const SrcT& src, const uint32_t count)
+{
+#ifdef ASCENDC_TIME_STAMP_ON
+    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE2_DATACOPY));
+#endif
+    using PrimType = DmaPrimT<SrcT>;
+    struct DataCopyParams repeatParams;
+    DataCopyCheck<PrimType>(count, repeatParams);
+    DataCopyPtrGm2Local<PrimType>(dst, src, repeatParams);
+}
+
+/*!
+ * \brief Pointer-extended DataCopy(dstGlobal, srcLocal, count): UB / L1 -> GM.
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToGmShape<DstT, SrcT>, bool>::type>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(const DstT& dst, const SrcT& src, const uint32_t count)
+{
+    using PrimType = DmaPrimT<SrcT>;
+    struct DataCopyParams repeatParams;
+    DataCopyCheck<PrimType>(count, repeatParams);
+    DataCopyPtrLocal2Gm<PrimType>(dst, src, repeatParams);
+}
+
+/*!
+ * \brief Pointer-extended DataCopy(dstLocal, srcLocal, count): UB -> UB.
+ *
+ *        The count is turned into a block length exactly as the Tensor-only overload does; the BT / FB
+ *        destinations that overload also handles are reached from a Tensor source only, so they are not
+ *        repeated here and an unsupported destination is reported instead of copying.
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToLocalShape<DstT, SrcT>, bool>::type>
+__aicore__ inline void DataCopy(const DstT& dst, const SrcT& src, const uint32_t count)
+{
+    using PrimType = DmaPrimT<SrcT>;
+    ASCENDC_ASSERT((count % AscendCUtils::GetC0Count(sizeof(PrimType)) == 0), {
+        KERNEL_LOG(
+            KERNEL_ERROR,
+            "Failed to "
+            "check count value in DataCopy from LocalTensor to LocalTensor, count * sizeof(T) must be 32B align, "
+            "current count value is %u. In NPU mode, no error is reported. The value is rounded down by 32B.",
+            count);
+    });
+    struct DataCopyParams repeatParams;
+    repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(PrimType));
+    DataCopyPtrLocal2Local<PrimType>(dst, src, repeatParams);
+}
+
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || \
+    (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
+/*!
+ * \brief Pointer-extended DataCopy(dstLocal, srcGlobal, Nd2NzParams): GM -> UB / L1 with format conversion.
+ *
+ *        The destination kind is resolved from the operand position exactly as the Tensor-only overload does
+ *        (there from the TPosition, for a pointer here from its address space at compile time). The parameter
+ *        check and the CacheMode hint follow that overload. The Tensor size / overflow check needs Tensor
+ *        metadata and is therefore not repeated for a pointer operand, which is the documented degradation of
+ *        the pointer path.
+ *
+ *        The enableSmallC0 template parameter keeps the position its declaration gives it, so a call that spells
+ *        it out selects the same variant as before.
+ */
+template <
+    typename DstT, typename SrcT, bool enableSmallC0,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaGmToLocalShape<DstT, SrcT>, bool>::type>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(const DstT& dst, const SrcT& src, const Nd2NzParams& intriParams)
+{
+#ifdef ASCENDC_TIME_STAMP_ON
+    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE2_DATACOPY));
+#endif
+    CheckNd2NzParams(intriParams, "DataCopy with Nd2NzParams");
+    using PrimType = DmaPrimT<SrcT>;
+    const Hardware dstHWPos = GetDmaOperandHardwarePos(dst);
+    const uint8_t cacheMode = DataCopyPtrInternal::ExtractCacheModeForOperand(src);
+    if (dstHWPos == Hardware::L1) {
+        // gm -> l1
+        DataCopyGM2L1ND2NZImpl(
+            (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams, cacheMode);
+    } else if (dstHWPos == Hardware::UB) {
+        // gm -> ub
+        DataCopyGM2UBND2NZImpl(
+            (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams, cacheMode);
+    } else {
+        ASCENDC_CHECK_TPOSITION(
+            false, "dst", "L1 Buffer(A1/B1)/UB(VECIN)", "DataCopy from GlobalTensor to LocalTensor with Nd2NzParams",
+            GetPositionDisplay(GetDmaOperandPosition(dst)));
+    }
+}
+#else
+/*!
+ * \brief Pointer-extended DataCopy(dstLocal, srcGlobal, Nd2NzParams), on the architectures whose bottom level
+ *        entry point takes no cache hint. Mirrors the variant above; see it for the design notes.
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaGmToLocalShape<DstT, SrcT>, bool>::type>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(const DstT& dst, const SrcT& src, const Nd2NzParams& intriParams)
+{
+#ifdef ASCENDC_TIME_STAMP_ON
+    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE2_DATACOPY));
+#endif
+    CheckNd2NzParams(intriParams, "DataCopy with Nd2NzParams");
+    using PrimType = DmaPrimT<SrcT>;
+    const Hardware dstHWPos = GetDmaOperandHardwarePos(dst);
+    if (dstHWPos == Hardware::L1) {
+        // gm -> l1
+        DataCopyGM2L1ND2NZImpl(
+            (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams);
+    } else if (dstHWPos == Hardware::UB) {
+        // gm -> ub
+        DataCopyGM2UBND2NZImpl(
+            (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams);
+    } else {
+        ASCENDC_CHECK_TPOSITION(
+            false, "dst", "L1 Buffer(A1/B1)/UB(VECIN)", "DataCopy from GlobalTensor to LocalTensor with Nd2NzParams",
+            GetPositionDisplay(GetDmaOperandPosition(dst)));
+    }
+}
+#endif
+/*!
+ * \brief Pointer-extended DataCopy(dstLocal, srcLocal, Nd2NzParams): UB -> L1 (TSCM) with format conversion.
+ *        This overload shares its parameter list with the GM -> local form above; the direction predicates keep
+ *        the two mutually exclusive, so the operand positions decide which one a call takes.
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToLocalShape<DstT, SrcT>, bool>::type>
+__aicore__ inline void DataCopy(const DstT& dst, const SrcT& src, const Nd2NzParams& intriParams)
+{
+#ifdef ASCENDC_TIME_STAMP_ON
+    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE3_DATACOPY));
+#endif
+    CheckNd2NzParams(intriParams, "DataCopy with Nd2NzParams");
+    using PrimType = DmaPrimT<SrcT>;
+    const Hardware dstHWPos = GetDmaOperandHardwarePos(dst);
+    const Hardware srcHWPos = GetDmaOperandHardwarePos(src);
+    if (srcHWPos != Hardware::UB) {
+        ASCENDC_CHECK_TPOSITION(
+            false, "src", "UB(VECIN/VECCALC/VECOUT)", "DataCopy from LocalTensor to LocalTensor with Nd2NzParams",
+            GetPositionDisplay(GetDmaOperandPosition(src)));
+    } else if (dstHWPos == Hardware::L1) {
+        // ub -> l1(tscm)
+        DataCopyUB2L1ND2NZImpl(
+            (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), intriParams);
+    } else {
+        ASCENDC_CHECK_TPOSITION(
+            false, "dst", "L1 Buffer(A1/B1)", "DataCopy from LocalTensor to LocalTensor with Nd2NzParams",
+            GetPositionDisplay(GetDmaOperandPosition(dst)));
+    }
+}
+
+/*!
+ * \brief Pointer-extended DataCopy(dstLocal, srcGlobal, Dn2NzParams): GM -> L1 with format conversion. Mirrors
+ *        the Nd2Nz pointer overload above; a DN2NZ conversion targets L1 only.
+ *
+ *        The enableSmallC0 variant is forwarded to the same bottom level entry point the Tensor-only overload
+ *        uses, so a call that spells the variant out moves the same amount of data.
+ */
+template <
+    typename DstT, typename SrcT, bool enableSmallC0,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaGmToLocalShape<DstT, SrcT>, bool>::type>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(const DstT& dst, const SrcT& src, const Dn2NzParams& intriParams)
+{
+#ifdef ASCENDC_TIME_STAMP_ON
+    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE2_DATACOPY));
+#endif
+    using PrimType = DmaPrimT<SrcT>;
+    const Hardware dstHWPos = GetDmaOperandHardwarePos(dst);
+    if (dstHWPos == Hardware::L1) { // GM -> L1
+        const uint8_t cacheMode = DataCopyPtrInternal::ExtractCacheModeForOperand(src);
+        DataCopyGM2L1DN2NZImpl(
+            (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams,
+            enableSmallC0, cacheMode);
+        return;
+    }
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "DataCopy dn2nz only support position:GM to position: L1"); });
+}
+
+/*!
+ * \brief Pointer-extended DataCopy(dstGlobal, srcLocal, SliceInfo..., dimValue): multi-dimensional slice copy.
+ *
+ *        Only the operand addresses change with respect to the Tensor-only overload: the slice metadata is read
+ *        from the SliceInfo arrays, and the shape fallback reads `GetShapeInfo()` of the operands, which a raw
+ *        pointer does not carry. A mixed call therefore still needs the SliceInfo arrays to carry the shapes
+ *        (`shapeValue`); when they do not, the shape-dependent path is not available for a pointer operand.
+ *        The offset lists, the repeat parameters and the bottom level call mirror the Tensor-only overload.
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaGmToLocalShape<DstT, SrcT>, bool>::type>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    const DstT& dst, const SrcT& src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[],
+    const uint32_t dimValue)
+{
+#ifdef ASCENDC_TIME_STAMP_ON
+    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE2_DATACOPY));
+#endif
+    using PrimType = DmaPrimT<SrcT>;
+    ASCENDC_ASSERT((srcSliceInfo[0].shapeValue != 0), {
+        KERNEL_LOG(
+            KERNEL_ERROR,
+            "DataCopy with SliceInfo on a pointer operand requires the shapeValue of the slice arrays, because a "
+            "raw pointer carries no shape metadata.");
+    });
+    uint32_t srcStartIndex = 0;
+    uint32_t dstStartIndex = 0;
+    uint32_t srcOffsetListSize = 0;
+    uint32_t dstOffsetListSize = 0;
+    uint32_t srcShapeInfo[K_MAX_SHAPE_DIM];
+    uint32_t dstShapeInfo[K_MAX_SHAPE_DIM];
+    for (int i = 0; i < dimValue; i++) {
+        srcShapeInfo[i] = srcSliceInfo[i].shapeValue;
+        dstShapeInfo[i] = dstSliceInfo[i].shapeValue;
+    }
+    srcStartIndex = DataCopyGetPhyStartIndex(srcSliceInfo, srcShapeInfo, dimValue);
+    dstStartIndex = DataCopyGetPhyStartIndex(dstSliceInfo, dstShapeInfo, dimValue);
+    uint32_t srcOffsetList[MAX_SLICE_SIZE];
+    uint32_t dstOffsetList[MAX_SLICE_SIZE];
+    DataCopyGetOffsetList(srcSliceInfo, srcShapeInfo, dimValue, &srcOffsetListSize, srcOffsetList);
+    DataCopyGetOffsetList(dstSliceInfo, dstShapeInfo, dimValue, &dstOffsetListSize, dstOffsetList);
+    struct DataCopyParams repeatParams;
+    repeatParams.blockLen = srcSliceInfo[0].burstLen;
+    uint32_t oneSliceLen =
+        srcSliceInfo[0].burstLen * AscendCUtils::GetC0Count(sizeof(PrimType)) + srcSliceInfo[0].stride;
+    repeatParams.blockCount =
+        (srcSliceInfo[0].endIndex - srcSliceInfo[0].startIndex + 1 + srcSliceInfo[0].stride) / oneSliceLen;
+    repeatParams.dstStride = dstSliceInfo[0].stride * sizeof(PrimType) / AscendCUtils::GetC0Size();
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+    const uint8_t cacheMode = DataCopyPtrInternal::ExtractCacheModeForOperand(src);
+#endif
+    if ((srcSliceInfo[0].stride * sizeof(PrimType)) % AscendCUtils::GetC0Size() == 0) {
+        repeatParams.srcStride = srcSliceInfo[0].stride * sizeof(PrimType) / AscendCUtils::GetC0Size();
+        for (uint32_t i = 0; i < srcOffsetListSize; i++) {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+            DataCopyGM2UBImpl(
+                (__ubuf__ PrimType*)GetUnderlyingPtr(dst) + dstStartIndex + dstOffsetList[i],
+                (__gm__ PrimType*)GetUnderlyingPtr(src) + srcStartIndex + srcOffsetList[i], repeatParams, cacheMode);
+#else
+            DataCopyGM2UBImpl(
+                (__ubuf__ PrimType*)GetUnderlyingPtr(dst) + dstStartIndex + dstOffsetList[i],
+                (__gm__ PrimType*)GetUnderlyingPtr(src) + srcStartIndex + srcOffsetList[i], repeatParams);
+#endif
+        }
+    } else {
+        repeatParams.srcStride = srcSliceInfo[0].stride * sizeof(PrimType);
+        for (uint32_t i = 0; i < srcOffsetListSize; i++) {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+            DataCopySliceGm2UBImpl(
+                (__ubuf__ PrimType*)GetUnderlyingPtr(dst) + dstStartIndex + dstOffsetList[i],
+                (__gm__ PrimType*)GetUnderlyingPtr(src) + srcStartIndex + srcOffsetList[i], repeatParams, cacheMode);
+#else
+            DataCopySliceGm2UBImpl(
+                (__ubuf__ PrimType*)GetUnderlyingPtr(dst) + dstStartIndex + dstOffsetList[i],
+                (__gm__ PrimType*)GetUnderlyingPtr(src) + srcStartIndex + srcOffsetList[i], repeatParams);
+#endif
+        }
+    }
+}
+
+/*!
+ * \brief Pointer-extended DataCopy(dstGlobal, srcLocal, SliceInfo..., dimValue): the store direction of the
+ *        slice family. Mirrors the load direction above.
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToGmShape<DstT, SrcT>, bool>::type>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
+    const DstT& dst, const SrcT& src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[],
+    const uint32_t dimValue)
+{
+    using PrimType = DmaPrimT<SrcT>;
+    ASCENDC_ASSERT((srcSliceInfo[0].shapeValue != 0), {
+        KERNEL_LOG(
+            KERNEL_ERROR,
+            "DataCopy with SliceInfo on a pointer operand requires the shapeValue of the slice arrays, because a "
+            "raw pointer carries no shape metadata.");
+    });
+    uint32_t srcStartIndex = 0;
+    uint32_t dstStartIndex = 0;
+    uint32_t srcOffsetListSize = 0;
+    uint32_t dstOffsetListSize = 0;
+    uint32_t srcShapeInfo[K_MAX_SHAPE_DIM];
+    uint32_t dstShapeInfo[K_MAX_SHAPE_DIM];
+    for (int i = 0; i < dimValue; i++) {
+        srcShapeInfo[i] = srcSliceInfo[i].shapeValue;
+        dstShapeInfo[i] = dstSliceInfo[i].shapeValue;
+    }
+    srcStartIndex = DataCopyGetPhyStartIndex(srcSliceInfo, srcShapeInfo, dimValue);
+    dstStartIndex = DataCopyGetPhyStartIndex(dstSliceInfo, dstShapeInfo, dimValue);
+    uint32_t dstOffsetList[MAX_SLICE_SIZE];
+    uint32_t srcOffsetList[MAX_SLICE_SIZE];
+    DataCopyGetOffsetList(srcSliceInfo, srcShapeInfo, dimValue, &srcOffsetListSize, srcOffsetList);
+    DataCopyGetOffsetList(dstSliceInfo, dstShapeInfo, dimValue, &dstOffsetListSize, dstOffsetList);
+    struct DataCopyParams repeatParams;
+    repeatParams.blockLen = srcSliceInfo[0].burstLen;
+    uint32_t oneSliceLen =
+        srcSliceInfo[0].burstLen * AscendCUtils::GetC0Count(sizeof(PrimType)) + srcSliceInfo[0].stride;
+    repeatParams.blockCount =
+        (srcSliceInfo[0].endIndex - srcSliceInfo[0].startIndex + 1 + srcSliceInfo[0].stride) / oneSliceLen;
+    repeatParams.srcStride = srcSliceInfo[0].stride * sizeof(PrimType) / AscendCUtils::GetC0Size();
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+    const uint8_t cacheMode = DataCopyPtrInternal::ExtractCacheModeForOperand(dst);
+#endif
+    if ((dstSliceInfo[0].stride * sizeof(PrimType)) % AscendCUtils::GetC0Size() == 0) {
+        repeatParams.dstStride = dstSliceInfo[0].stride * sizeof(PrimType) / AscendCUtils::GetC0Size();
+        for (uint32_t i = 0; i < srcOffsetListSize; i++) {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+            DataCopyUB2GMImpl(
+                (__gm__ PrimType*)GetUnderlyingPtr(dst) + dstStartIndex + dstOffsetList[i],
+                (__ubuf__ PrimType*)GetUnderlyingPtr(src) + srcStartIndex + srcOffsetList[i], repeatParams, cacheMode);
+#else
+            DataCopyUB2GMImpl(
+                (__gm__ PrimType*)GetUnderlyingPtr(dst) + dstStartIndex + dstOffsetList[i],
+                (__ubuf__ PrimType*)GetUnderlyingPtr(src) + srcStartIndex + srcOffsetList[i], repeatParams);
+#endif
+        }
+    } else {
+        repeatParams.dstStride = dstSliceInfo[0].stride * sizeof(PrimType);
+        for (uint32_t i = 0; i < srcOffsetListSize; i++) {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+            DataCopySliceUB2GMImpl(
+                (__gm__ PrimType*)GetUnderlyingPtr(dst) + dstStartIndex + dstOffsetList[i],
+                (__ubuf__ PrimType*)GetUnderlyingPtr(src) + srcStartIndex + srcOffsetList[i], repeatParams, cacheMode);
+#else
+            DataCopySliceUB2GMImpl(
+                (__gm__ PrimType*)GetUnderlyingPtr(dst) + dstStartIndex + dstOffsetList[i],
+                (__ubuf__ PrimType*)GetUnderlyingPtr(src) + srcStartIndex + srcOffsetList[i], repeatParams);
+#endif
+        }
+    }
+}
+
+/*!
+ * \brief Pointer-extended DataCopy(dstGlobal, srcLocal, Nz2NdParamsFull): NZ -> ND store from UB or L1.
+ *        The source kind is resolved from the operand position as in the Tensor-only overload.
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToGmShape<DstT, SrcT>, bool>::type>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
+    const DstT& dst, const SrcT& src, const Nz2NdParamsFull& intriParams)
+{
+    using PrimType = DmaPrimT<SrcT>;
+    const Hardware srcHWPos = GetDmaOperandHardwarePos(src);
+    if (srcHWPos != Hardware::UB) {
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || \
+                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+        if (srcHWPos == Hardware::L1) {
+            DataCopyL12GMNZ2NDImpl(
+                (__gm__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), intriParams);
+            return;
+        }
+#endif
+        ASCENDC_CHECK_TPOSITION(
+            false, "src", "UB(VECOUT)", "DataCopy with Nz2NdParamsFull",
+            GetPositionDisplay(GetDmaOperandPosition(src)));
+    }
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+    const uint8_t cacheMode = DataCopyPtrInternal::ExtractCacheModeForOperand(dst);
+    DataCopyUB2GMNZ2NDImpl(
+        (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), intriParams, cacheMode);
+#else
+    DataCopyUB2GMNZ2NDImpl(
+        (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), intriParams);
+#endif
+}
+
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+/*!
+ * \brief Pointer-extended DataCopy(dstGlobal, srcLocal, Nz2DnParamsFull): NZ -> DN store from L1.
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToGmShape<DstT, SrcT>, bool>::type>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
+    const DstT& dst, const SrcT& src, const Nz2DnParamsFull& intriParams)
+{
+    using PrimType = DmaPrimT<SrcT>;
+    const Hardware srcHWPos = GetDmaOperandHardwarePos(src);
+    if (srcHWPos == Hardware::L1) {
+        DataCopyL12GMNZ2DNImpl(
+            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), intriParams);
+        return;
+    }
+    ASCENDC_CHECK_TPOSITION(
+        false, "src", "UB(VECOUT)", "DataCopy with Nz2DnParamsFull", GetPositionDisplay(GetDmaOperandPosition(src)));
+}
+#endif
+
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+/*!
+ * \brief Pointer-extended DataCopy<T, dim, config>(dstLocal, srcGlobal, MultiCopyParams): ND DMA load.
+ *
+ *        The element type and the dimension stay explicit template parameters exactly as in the Tensor-only
+ *        declaration, so a call that spells them out selects the same variant; the loop info and the constant
+ *        value come from the parameters, and only the operand addresses change.
+ */
+template <
+    typename T, uint8_t dim, const NdDmaConfig& config, typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaGmToLocalShape<DstT, SrcT> &&
+            Std::is_same<DmaPrimT<SrcT>, T>::value,
+        bool>::type>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    const DstT& dst, const SrcT& src, const MultiCopyParams<T, dim>& params)
+{
+#ifdef ASCENDC_TIME_STAMP_ON
+    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE2_DATACOPY));
+#endif
+#if (__NPU_ARCH__ != 5102)
+    if ASCEND_IS_AIC {
+        return;
+    }
+#endif
+    using PrimType = DmaPrimT<SrcT>;
+    const uint8_t cacheMode = DataCopyPtrInternal::ExtractCacheModeForOperand(src);
+    DataCopyWithNDDMAImpl<PrimType, dim, config>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), params.loopInfo,
+        params.constantValue, cacheMode);
+}
+#endif
+
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_VCONV_INTERFACE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_INTF_IMPL_H__)

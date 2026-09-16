@@ -334,7 +334,7 @@ template <typename T>
 constexpr bool DmaProveGm = IsDmaGlobalTensorV<T> || IsDmaGmPtr<T>;
 
 template <typename T>
-constexpr bool DmaProveLocal = IsDmaLocalTensorV<T> || IsDmaLocalPtr<T>;
+constexpr bool DmaProveLocal = IsDmaLocalTensorV<T> || IsDmaLocalPtrOperand<T>;
 #else
 // In CPU twin-debug a raw pointer carries no address space, so it can not prove a local slot: a pointer paired
 // with a LocalTensor is read as the GM operand (GM -> local), and a pointer paired with a GlobalTensor as the
@@ -472,6 +472,95 @@ __aicore__ inline constexpr auto GetUnderlyingPtr(const T& val)
         return val;
     } else {
         return val.GetPhyAddr();
+    }
+}
+
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+/*!
+ * \brief CPU twin-debug only: recover the hardware position of a raw address by locating it inside one of the
+ *        simulated buffers.
+ *
+ *        This is what keeps the Tensor / pointer mixed DataCopy forms executable in CPU twin-debug. The
+ *        address-space qualifiers are empty there, so a pointer operand carries no compile-time position and
+ *        its dispatch has to fall back to a runtime lookup. A Tensor keeps resolving its position from its
+ *        TPosition, exactly as the previous Tensor-only code did.
+ */
+__aicore__ inline Hardware GetDmaHardwarePosByAddress(const void* addr)
+{
+    const uintptr_t target = reinterpret_cast<uintptr_t>(addr);
+    const auto& definer = ConstDefiner::Instance();
+    for (const auto& entry : definer.hardwareCpuBufferMap) {
+        const auto lenIt = definer.bufferInitLen.find(entry.first);
+        if (lenIt == definer.bufferInitLen.end()) {
+            continue;
+        }
+        const uintptr_t base = reinterpret_cast<uintptr_t>(entry.second);
+        if (target >= base && target < base + lenIt->second) {
+            return entry.first;
+        }
+    }
+    // The simulated GM window is not part of hardwareCpuBufferMap: cpuGM is allocated on its own and never
+    // inserted there. Since the only meaningful raw pointer outside a local buffer is a GM one, an address
+    // that matches no local buffer is GM. Answering MAX instead would misreport every GM pointer of a mixed
+    // call as an unsupported position.
+    return Hardware::GM;
+}
+#endif // ASCENDC_CPU_DEBUG
+
+/*!
+ * \brief Hardware position of an operand of a generic movement family.
+ *
+ *        A Tensor keeps its original runtime resolution from its TPosition -- literally
+ *        `GetPhyType((TPosition)dst.GetPosition())` of the Tensor-only code. A pointer resolves at compile time
+ *        from its address space on device. In CPU twin-debug a pointer falls back to the simulated buffers,
+ *        which is the documented degradation there (on device such a lookup is not needed and not compiled).
+ */
+template <typename T>
+__aicore__ inline Hardware GetDmaOperandHardwarePos(const T& operand)
+{
+    if constexpr (!IsDmaPosRuntime<T>) {
+        return DmaHardwarePosV<T>;
+    } else if constexpr (Std::is_pointer_v<Std::remove_cv_t<T>>) {
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+        return GetDmaHardwarePosByAddress(GetUnderlyingPtr(operand));
+#else
+        return Hardware::MAX;
+#endif
+    } else {
+        return GetPhyType((TPosition)operand.GetPosition());
+    }
+}
+
+/*!
+ * \brief A representative TPosition of a hardware position, used for diagnostics only.
+ */
+constexpr TPosition DmaHardwareToPosition(Hardware hardPos)
+{
+    return (hardPos == Hardware::GM)   ? TPosition::GM :
+           (hardPos == Hardware::UB)   ? TPosition::VECCALC :
+           (hardPos == Hardware::L1)   ? TPosition::A1 :
+           (hardPos == Hardware::L0A)  ? TPosition::A2 :
+           (hardPos == Hardware::L0B)  ? TPosition::B2 :
+           (hardPos == Hardware::L0C)  ? TPosition::CO1 :
+           (hardPos == Hardware::BIAS) ? TPosition::C2 :
+                                         TPosition::MAX;
+}
+
+/*!
+ * \brief Position of an operand as a TPosition, for the position diagnostics of the generic families.
+ *
+ *        A Tensor reports its own TPosition, which is what the Tensor-only code passed to GetPositionDisplay. A
+ *        pointer reports the representative TPosition of its hardware position. The value is only consumed as an
+ *        argument of the check macros, whose arguments are dropped entirely on device, so a pointer operand
+ *        costs nothing there.
+ */
+template <typename T>
+__aicore__ inline TPosition GetDmaOperandPosition(const T& operand)
+{
+    if constexpr (Std::is_pointer_v<Std::remove_cv_t<T>>) {
+        return DmaHardwareToPosition(GetDmaOperandHardwarePos(operand));
+    } else {
+        return static_cast<TPosition>(operand.GetPosition());
     }
 }
 
