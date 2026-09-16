@@ -115,8 +115,9 @@ def fixpipe_pool() -> list[dict]:
             # 过小 MN 在 ND/ChannelSplit 变 shape 下易错位
             if min(m, n) < 32:
                 continue
-            # s7 channel-split：N=48 等非 32 倍数在变 K 时与 golden NZ 不一致
-            if sc == 7 and n % 32:
+            # 样例 Compute: mmadParams.n = CeilAlign(baseN, C0_SIZE=32)；
+            # N 非 32 倍数时 L0C 按对齐宽度计算，K>32（baseK>16）下与 ND/NZ golden 不一致
+            if n % 32:
                 continue
             rows.append(
                 {
