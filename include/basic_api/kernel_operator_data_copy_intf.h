@@ -29,6 +29,7 @@
 #include "kernel_struct_data_copy.h"
 #include "../../impl/basic_api/utils/kernel_utils_macros.h"
 #include "../../impl/basic_api/utils/kernel_utils_struct_confusion_pad.h"
+#include "../../impl/basic_api/utils/kernel_ptr_utils.h"
 #include "kernel_tensor.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
@@ -56,6 +57,27 @@ template <typename T>
 __aicore__ inline void __inout_pipe__(MTE2)
     DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& repeatParams);
 
+/*!
+ * \brief Pointer-extended form of DataCopy(dstLocal, srcGlobal, DataCopyParams): GM -> UB / L1. Either operand
+ *        may be a Tensor or the equal-address-space raw pointer.
+ *
+ *        A single generic overload per direction is deliberate. On device the mirrored directions differ only by
+ *        the address spaces of dst and src, so splitting a direction further per address-space pair would
+ *        multiply the signatures and collapse into redefinitions under CPU twin-debug, where the address-space
+ *        qualifiers are empty. The implementation therefore resolves the concrete position of every operand
+ *        itself (compile time from the address space, runtime from the Tensor TPosition).
+ *
+ *        The overload is only viable when at least one operand is a raw pointer, so a Tensor / Tensor call keeps
+ *        resolving to the original signature above and no ambiguity is introduced.
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaGmToLocalShape<DstT, SrcT>, bool>::type =
+        true>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    const DstT& dst, const SrcT& src, const DataCopyParams& repeatParams);
+
 /*
  * @ingroup DataCopy Level 0
  * @brief format transform(such as nd2nz) during data load from OUT to L1
@@ -75,10 +97,26 @@ __aicore__ inline void __inout_pipe__(MTE2)
 template <typename T, bool enableSmallC0 = false>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams);
+
+// Pointer-extended form, GM -> UB / L1 ND2NZ; see the DataCopyParams overload above for the design notes.
+template <
+    typename DstT, typename SrcT, bool enableSmallC0 = false,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaGmToLocalShape<DstT, SrcT>, bool>::type =
+        true>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(const DstT& dst, const SrcT& src, const Nd2NzParams& intriParams);
 #else
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams);
+
+// Pointer-extended form, GM -> UB / L1 ND2NZ; see the DataCopyParams overload above for the design notes.
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaGmToLocalShape<DstT, SrcT>, bool>::type =
+        true>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(const DstT& dst, const SrcT& src, const Nd2NzParams& intriParams);
 #endif
 
 /*
@@ -97,6 +135,19 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
  */
 template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const Nd2NzParams& intriParams);
+
+/*!
+ * \brief Pointer-extended form of DataCopy(dstLocal, srcLocal, Nd2NzParams): UB -> L1 (TSCM) ND2NZ. This
+ *        overload shares its parameter list with the GM -> local ND2NZ form above, because the two differ only
+ *        by the operand slots; the slot predicates keep them mutually exclusive, so the right one is chosen from
+ *        the operand positions. The local -> local direction carries no pipe attribute.
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToLocalShape<DstT, SrcT>,
+        bool>::type = true>
+__aicore__ inline void DataCopy(const DstT& dst, const SrcT& src, const Nd2NzParams& intriParams);
 
 /*
  * @ingroup DataCopy Level 0
@@ -117,6 +168,14 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 template <typename T, bool enableSmallC0 = false>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Dn2NzParams& intriParams);
+
+// Pointer-extended form, GM -> L1 DN2NZ; see the DataCopyParams overload above for the design notes.
+template <
+    typename DstT, typename SrcT, bool enableSmallC0 = false,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaGmToLocalShape<DstT, SrcT>, bool>::type =
+        true>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(const DstT& dst, const SrcT& src, const Dn2NzParams& intriParams);
 #endif
 
 /*
@@ -133,6 +192,18 @@ template <typename T>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
     const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams);
 
+/*!
+ * \brief Pointer-extended form of DataCopy(dstGlobal, srcLocal, DataCopyParams): local -> GM. The local operand
+ *        may be a UB or an L1 buffer, which the implementation resolves from the operand position.
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToGmShape<DstT, SrcT>, bool>::type =
+        true>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
+    const DstT& dst, const SrcT& src, const DataCopyParams& repeatParams);
+
 /*
  * @ingroup DataCopy Level 0
  * @brief datacopy from src to dst, applicable to vector data
@@ -146,6 +217,17 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
 template <typename T>
 __aicore__ inline void DataCopy(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams);
+
+/*!
+ * \brief Pointer-extended form of DataCopy(dstLocal, srcLocal, DataCopyParams): UB -> UB and UB -> L1 (TSCM).
+ *        Both belong to the local -> local direction and are dispatched inside the implementation.
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToLocalShape<DstT, SrcT>,
+        bool>::type = true>
+__aicore__ inline void DataCopy(const DstT& dst, const SrcT& src, const DataCopyParams& repeatParams);
 
 /*
  * @ingroup DataCopy Level 0
@@ -233,6 +315,17 @@ template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const uint32_t count);
 
+/*!
+ * \brief Pointer-extended form of DataCopy(dstLocal, srcGlobal, count): GM -> UB. The count form only collects
+ *        the count into DataCopyParams and forwards to the DataCopyParams overload, so it shares its design.
+ */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaGmToLocalShape<DstT, SrcT>, bool>::type =
+        true>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(const DstT& dst, const SrcT& src, const uint32_t count);
+
 /*
  * @ingroup DataCopy Level 2
  * @brief datacopy from src to dst, applicable to vector data
@@ -244,6 +337,14 @@ template <typename T>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
     const GlobalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count);
 
+/*! \brief Pointer-extended form of DataCopy(dstGlobal, srcLocal, count): local -> GM. */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToGmShape<DstT, SrcT>, bool>::type =
+        true>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(const DstT& dst, const SrcT& src, const uint32_t count);
+
 /*
  * @ingroup DataCopy Level 2
  * @brief datacopy from src to dst, applicable to vector data
@@ -253,6 +354,14 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
  */
 template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count);
+
+/*! \brief Pointer-extended form of DataCopy(dstLocal, srcLocal, count): UB -> UB. */
+template <
+    typename DstT, typename SrcT,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && DmaLocalToLocalShape<DstT, SrcT>,
+        bool>::type = true>
+__aicore__ inline void DataCopy(const DstT& dst, const SrcT& src, const uint32_t count);
 
 /*
  * @ingroup DataCopy Level 2
