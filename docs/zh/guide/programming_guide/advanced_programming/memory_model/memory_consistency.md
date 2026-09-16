@@ -2,6 +2,8 @@
 
 本文介绍NPU编程中的内存一致性问题，说明不同执行单元、不同AI Core、不同Stream以及Host侧和Device侧之间如何建立可预期的读写顺序。本文重点讨论“操作顺序和可见性”，缓存副本写回、失效等问题请参考[缓存一致性](cache_coherence.md)。
 
+相关示例涉及Global Memory（GM）、Unified Buffer（UB）和Data Cache（DCache）等内存。
+
 ## 内存一致性基本概念
 
 ### 什么是内存一致性
@@ -75,14 +77,14 @@ T3        STORE flag = 1
 
 NPU硬件架构中有多个层级，它们具有异步并行的特征：
 - Host侧通过Stream向Device侧异步下发任务；
-- Device侧的一个Kernel可以由多个AI Core并行执行；
+- Device侧的一个核函数（Kernel）可以由多个AI Core并行执行；
 - 每个AI Core内部又存在多条可以异步并行执行的流水。
 
 这些硬件层级决定了NPU编程中的内存一致性维护通常需要按访问范围分层处理：
 
 - 同一AI Core内，不同流水访问同一地址或通过UB/GM传递数据时，需要核内同步。
 - 不同AI Core之间，通过GM共享数据或传递标志时，需要核间同步。
-- Host侧和Device侧之间，由于Kernel执行、异步拷贝和Stream任务下发都是异步的，需要Host-Device同步。
+- Host侧和Device侧之间，由于核函数（Kernel）执行、异步拷贝和Stream任务下发都是异步的，需要Host-Device同步。
 
 #### 流水间一致性
 
@@ -105,7 +107,7 @@ AI Core内部存在Scalar流水、MTE流水、Fixpipe流水<!-- npu="950" id1 --
 Scalar负责标量控制、地址计算、标量计算、Scalar访存以及发射其他流水指令等操作。Scalar流水内的GM访问需要按GM地址、访问路径以及DCache的Cache Line粒度区分：
 
 - **访问不同GM地址**：不同地址之间没有天然的数据依赖，无论访问是否经过DCache，硬件不保证这些访问的完成顺序或对其他观察者的可见顺序与代码顺序一致。例如先写`data`、后写`flag`时，不能仅依赖代码顺序推断其他流水、其他AI Core或Host侧一定先看到`data`、再看到`flag`。
-- **访问同一GM地址**：普通Scalar通过DCache访问同一GM地址时，同地址访问结果与程序序保持一致。虽然流水内同地址访问结果与程序序保持一致，但是其他流水或其他AI Core想要观察到该写入结果时，还需要按CacheLine处理DCache中的Dirty副本或旧副本，参考[DCache与GM的缓存一致性](./cache_coherence.md#dcache与gm的缓存一致性)。
+- **访问同一GM地址**：普通Scalar通过DCache访问同一GM地址时，同地址访问结果与程序序保持一致。虽然流水内同地址访问结果与程序序保持一致，但是其他流水或其他AI Core想要观察到该写入结果时，还需要按Cache Line处理DCache中的Dirty副本或旧副本，参考[DCache与GM的缓存一致性](./cache_coherence.md#dcache与gm的缓存一致性)。
 - **同一GM地址混用不同访问路径**：同一地址访问中如果混用经过DCache和不经过DCache的路径，硬件不保证最终结果一定符合代码顺序，需要由软件额外处理访问完成和Cache副本问题。例如Scalar经过DCache读写和Scalar原子操作混用，需要用户显式插入同步保证内存一致性。
 
 ##### MTE/Fixpipe流水
@@ -719,7 +721,7 @@ T1        ARRIVE sync_point
 
 ### 异步下发语义
 
-Host侧通过Runtime向Device侧下发Kernel、异步内存拷贝等任务。对于异步任务，Host侧接口返回通常只表示任务已经下发到Stream，不表示任务已经在Device侧执行完成。Host线程会继续向下执行，Device任务则在对应Stream中等待调度和执行。
+Host侧通过Runtime向Device侧下发核函数（Kernel）、异步内存拷贝等任务。对于异步任务，Host侧接口返回通常只表示任务已经下发到Stream，不表示任务已经在Device侧执行完成。Host线程会继续向下执行，Device任务则在对应Stream中等待调度和执行。
 
 如果Host后续代码依赖Device任务的结果，不能只依赖Host侧代码顺序，需要显式等待Device任务完成。
 

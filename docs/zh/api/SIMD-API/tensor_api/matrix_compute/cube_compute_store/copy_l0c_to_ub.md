@@ -167,7 +167,7 @@ L0C Buffer到UB搬运支持不量化输出、`float`到`half`或`bfloat16_t`的�
 
 ### copy_l0c_to_ub说明
 
-`copy_l0c_to_ub`用于标识L0C Buffer到Unified Buffer数据搬运通路，仅列出其public内容：
+`copy_l0c_to_ub`用于标识L0C Buffer到UB数据搬运通路，仅列出其public内容：
 
 ```cpp
 struct copy_l0c_to_ub {
@@ -176,7 +176,7 @@ struct copy_l0c_to_ub {
 };
 ```
 
-`copy`静态成员函数用于接收Trait和搬运参数，并分发L0C Buffer到Unified Buffer数据搬运。
+`copy`静态成员函数用于接收Trait和搬运参数，并分发L0C Buffer到UB数据搬运。
 
 ### l0c_to_ub_trait说明
 
@@ -286,6 +286,7 @@ L0C Buffer到UB搬运根据是否传入量化参数自动选择量化模式。
 
 ## 约束说明
 
+- 量化和ReLU参数不能为inf/nan和非规格化数。
 - 源矩阵`NZ`格式，地址要求64字节对齐。目的矩阵地址要求32字节对齐。
 - 目的矩阵为`NZ`输出时，N方向大小需要为16的倍数；`b8`类型通道合并场景为32的倍数，`float`使能`enable_channel_split`通道拆分场景为8的倍数。
 - tensor量化参数张量应位于L1 Buffer，元素类型为`uint64_t`，地址要求32字节对齐。详细约束参见[随路量化](../cube_store_key_features/quant_pre.md)。

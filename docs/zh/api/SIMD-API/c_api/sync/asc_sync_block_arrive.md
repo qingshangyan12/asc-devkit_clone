@@ -37,6 +37,8 @@
   - 单AI Core内M个AIV都执行`asc_sync_block_arrive`后向调度模块发送通知，接着调度模块将AIC对应`flag_id`的计数器增加1。
   - AIC上配对的`asc_sync_block_wait`检测到对应`flag_id`的计数器非0后解除阻塞并将计数器减1。
 
+该同步模式的具体执行原理，请参考[单个AI Core中AIC与AIV全核同步（模式2）](key_features.md#single_ai_core_aic_aiv_full_sync)中的代码片段及配套时序图。
+
 核间同步具体使用方法，请参考[调用示例](#调用示例)。
 
 ## 函数原型
@@ -65,6 +67,7 @@ PIPE_S
 
 ## 约束说明
 
+- 调用本接口的核函数（Kernel）不能使用`__cube__`或`__vector__`[函数执行空间限定符](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#函数执行空间限定符)。使用这两种函数执行空间限定符时，硬件不会开启调度模块，无法正常进行核间同步。对于`asc_sync_block_arrive`和`asc_sync_block_wait`这对接口，支持的函数执行空间限定符为`__mix__(1, 1)`、`__mix__(1, 2)`。
 - 针对`asc_sync_block_arrive`接口，传入的`pipe`参数在不同NPU架构中**均生效**；针对`asc_sync_block_wait`接口，传入的`pipe`参数**是否生效与NPU架构有关**，具体请参考[asc_sync_block_wait](asc_sync_block_wait.md#约束说明)的约束说明。
 - 不同NPU架构中AIC和AIV支持的`pipe`取值存在差异，具体情况如下：<a id="supported_pipe_combinations"></a>
     <!-- npu="950" id9 -->
@@ -125,7 +128,7 @@ constexpr int64_t FLAG_ID = 8;
 
 /*
  * 本示例说明：
- * - 采用__mix__(1, 2)标识核函数，同一AI Core内包含1个AIC和2个AIV。
+ * - 采用__mix__(1, 2)标识核函数（Kernel），同一AI Core内包含1个AIC和2个AIV。
  * - AIV0和AIV1分别将矩阵从GM搬入UB，通过asc_get_sub_block_id区分不同的AIV。
  * - 两个AIV将矩阵从UB搬运至L1 Buffer（PIPE_MTE3）操作执行完后，才能执行asc_sync_block_arrive向调度模块发送通知。
  * - AIC中从L1 Buffer搬运数据到L0A Buffer、L0B Buffer（PIPE_MTE1）的操作被asc_sync_block_wait阻塞，直到两个AIV均执行了asc_sync_block_arrive后才能执行。
@@ -157,13 +160,13 @@ __global__ __mix__(1, 2) void asc_sync_block_kernel(__gm__ half* input, __gm__ f
         asc_copy_l12l0b_transpose(matrix_b_l0, matrix_b_l1, 0, 0, 1, 1, 1, 1);
         asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
         asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);
-        asc_mmad(output_l0, matrix_a_l0, matrix_b_l0, MATRIX_DIM, MATRIX_DIM, MATRIX_DIM, 0, false, false, true);
+        asc_mmad(output_l0, matrix_a_l0, matrix_b_l0, MATRIX_DIM, MATRIX_DIM, MATRIX_DIM, asc_unit_flag_mode::DISABLE, false, false, true);
         asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
         asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
         asc_set_l0c_copy_nz_para(1, 2, MATRIX_ELEMENTS);
-        asc_copy_l0c2gm(output, output_l0, MATRIX_DIM, MATRIX_DIM, MATRIX_DIM, MATRIX_DIM, 0, 0, 0,
-                        static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
-                        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
+        asc_copy_l0c2gm(output, output_l0, MATRIX_DIM, MATRIX_DIM, MATRIX_DIM, MATRIX_DIM,
+                        asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, asc_unit_flag_mode::DISABLE,
+                        asc_quant_mode::NoQuant, asc_relu_pre_mode::NONE, false, true, false, false);
     }
     asc_sync_pipe(PIPE_ALL);
 }

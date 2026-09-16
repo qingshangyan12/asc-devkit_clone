@@ -92,7 +92,7 @@ For users with NPU devices, you can use the CANN official Docker image for devel
     | `--device /dev/davinci_manager` | Map NPU device management interface | - |
     | `--device /dev/devmm_svm` | Map device memory management interface | - |
     | `--device /dev/hisi_hdc` | Map communication interface between host and device | - |
-    | `-v /usr/local/dcmi:/usr/local/dcmi` | Mount device container management interface (DCMI) related tools and libraries | - |
+    | `-v /usr/local/dcmi:/usr/local/dcmi` | Mount tools and libraries related to the Device Control Management Interface (DCMI) | - |
     | `-v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi` | Mount `npu-smi` tool | Enables running this command directly in the container to query NPU status and performance information |
     | `-v /usr/local/Ascend/driver/lib64/:/usr/local/Ascend/driver/lib64/` | Map host NPU driver libraries to container | - |
     | `-v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info` | Mount driver version information file | - |
@@ -202,11 +202,12 @@ git clone https://gitcode.com/cann/asc-devkit.git
 > [!NOTE] Before Use
 > If you use **containerization technology**, dependencies are already installed in the container. You can skip this step.
 
-The following are basic dependencies for source code compilation and examples operator compilation and running in this open source repository:
+The following are basic dependencies for compiling the source code and compiling and running the operator examples in this repository. For Python dependencies, see [DevContainer Python dependencies (Python 3.12 example)](../../.devcontainer/requirements.txt):
 
 - python >= 3.9.0
 - gcc >= 7.3.0 / g++ >= 7.3.0 (Note: gcc and g++ versions must be consistent)
 - cmake >= 3.16.0
+- pkg-config >= 0.29.0
 
 ### ⚡ Compile and Install<a name="compile&install"></a>
 

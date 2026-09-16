@@ -111,7 +111,7 @@ ascendc_assert(expr, fmt, args...)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| expr | 输入 | 断言条件。为`true`时，Kernel继续运行；为`false`时，接口打印断言失败信息并触发异常。 |
+| expr | 输入 | 断言条件。为`true`时，核函数（Kernel）继续运行；为`false`时，接口打印断言失败信息并触发异常。 |
 | fmt | 输入 | 可选。自定义错误信息的格式控制字符串，包含普通字符和转换说明。普通字符原样输出；转换说明以百分号（%）开始，用于控制`args`中对应参数的转换和输出。支持的转换类型和数据类型参见[printf](printf.md)的参数说明。 |
 | args | 输入 | 可选。与`fmt`中的转换说明对应的附加参数。每个参数替换`fmt`中对应的转换说明，参数数量和类型应与转换说明匹配。 |
 
@@ -128,15 +128,18 @@ ascendc_assert(expr, fmt, args...)
 
 ### SIMD编程场景
 
+- CPU域调试时，多参数调用仅检查断言条件，不打印`fmt`和`args`指定的自定义错误信息，行为与单参数调用相同。
 - 单次调用本接口打印的数据总量不可超过打印大小限制，默认为30KB。超出限制时，断言失败信息不会打印，但接口仍会触发异常。可以通过[aclInit接口](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/latest/API/runtimeapi/aclcppdevg_03_0022.html)中的`simd_printf_fifo_size_per_core`字段配置，配置范围为`[1KB,64MB]`。PyTorch调用和算子入图场景暂不支持该配置。
 
 ### SIMT VF编程场景
 
-不输出`fmt`和`args`指定的自定义错误信息。
+- 不支持CPU域调试。
+- 不输出`fmt`和`args`指定的自定义错误信息。
 
 ### SIMD VF编程场景
 
-- `fmt`可以直接使用字符串字面量。使用字符串指针时，该指针必须指向UB中的字符串，示例如下：
+- CPU域调试时，多参数调用仅检查断言条件，不打印`fmt`和`args`指定的自定义错误信息，行为与单参数调用相同。
+- `fmt`可以直接使用字符串字面量。使用字符串指针时，该指针必须指向Unified Buffer（UB）中的字符串，示例如下：
 
     ```cpp
     __ubuf__ const char* fmt = "value is %d.\n";
