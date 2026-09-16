@@ -12,12 +12,12 @@
 
 | 接口      | 硬件支持的模板参数枚举值 | 软件支持的模板参数枚举值 |
 | :-------- | :----------------------- | :----------------------- |
-| Add       | MaskMergeMode::ZEROING   | MaskMergeMode::MERGING   |
+| Add       | <!-- npu="950" id1 -->针对Ascend 950PR/Ascend 950DT：<br>MaskMergeMode::ZEROING。<br><!-- end id1 --><!-- npu="960" id2 -->针对Ascend 960PR/Ascend 960DT：<br>MaskMergeMode::ZEROING、MaskMergeMode::MERGING。<br><!-- end id2 -->   | <!-- npu="950" id3 -->针对Ascend 950PR/Ascend 950DT：<br>MaskMergeMode::MERGING。<br><!-- end id3 --><!-- npu="960" id4 -->针对Ascend 960PR/Ascend 960DT：<br>无。<br><!-- end id4 -->   |
 | Sub       | MaskMergeMode::ZEROING   | 无                       |
 | Exp       | MaskMergeMode::ZEROING   | 无                       |
 | Sqrt      | MaskMergeMode::ZEROING   | 无                       |
-| Max       | MaskMergeMode::ZEROING   | MaskMergeMode::MERGING   |
-| Min       | MaskMergeMode::ZEROING   | MaskMergeMode::MERGING   |
+| Max       | <!-- npu="950" id5 -->针对Ascend 950PR/Ascend 950DT：<br>MaskMergeMode::ZEROING。<br><!-- end id5 --><!-- npu="960" id6 -->针对Ascend 960PR/Ascend 960DT：<br>MaskMergeMode::ZEROING、MaskMergeMode::MERGING。<br><!-- end id6 -->   | <!-- npu="950" id7 -->针对Ascend 950PR/Ascend 950DT：<br>MaskMergeMode::MERGING。<br><!-- end id7 --><!-- npu="960" id8 -->针对Ascend 960PR/Ascend 960DT：<br>无。<br><!-- end id8 -->   |
+| Min       | <!-- npu="950" id9 -->针对Ascend 950PR/Ascend 950DT：<br>MaskMergeMode::ZEROING。<br><!-- end id9 --><!-- npu="960" id10 -->针对Ascend 960PR/Ascend 960DT：<br>MaskMergeMode::ZEROING、MaskMergeMode::MERGING。<br><!-- end id10 -->   | <!-- npu="950" id11 -->针对Ascend 950PR/Ascend 950DT：<br>MaskMergeMode::MERGING。<br><!-- end id11 --><!-- npu="960" id12 -->针对Ascend 960PR/Ascend 960DT：<br>无。<br><!-- end id12 -->   |
 | Mul       | MaskMergeMode::ZEROING   | 无                       |
 | Div       | MaskMergeMode::ZEROING   | 无                       |
 | Adds      | MaskMergeMode::ZEROING   | 无                       |
@@ -61,7 +61,7 @@
 
 | 接口     | 硬件支持的模板参数枚举值 | 软件支持的模板参数枚举值 |
 | :------- | :----------------------- | :----------------------- |
-| Cast     | MaskMergeMode::ZEROING   | 无                       |
+| Cast     | <!-- npu="950" id13 -->针对Ascend 950PR/Ascend 950DT：<br>MaskMergeMode::ZEROING。<br><!-- end id13 --><!-- npu="960" id14 -->针对Ascend 960PR/Ascend 960DT：<br>仅f162s8、f162s4、f322f16、f322bf16、f322HiF8、f322e4m3、f322e5m2、f162e4m3、f162e5m2、bf162e4m3、bf162e5m2、bf162e2m1、bf162e1m2、s162s4支持MaskMergeMode::ZEROING。<br><!-- end id14 -->   | 无                       |
 | Truncate | MaskMergeMode::ZEROING   | 无                       |
 
 **表6**  归约计算接口MergeMode支持情况
@@ -77,4 +77,3 @@
 | 接口      | 硬件支持的模板参数枚举值                       | 软件支持的模板参数枚举值 |
 | :-------- | :--------------------------------------------- | :----------------------- |
 | Duplicate | MaskMergeMode::ZEROING、MaskMergeMode::MERGING | 无                       |
-

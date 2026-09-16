@@ -1,7 +1,9 @@
 # API流水类型汇总<a name="ZH-CN_TOPIC_0000002533354434"></a>
 
 本节汇总介绍了一些主要的API的流水类型，以下内容针对如下型号生效：
-
+<!-- npu="960" id1 -->
+- Ascend 960PR/Ascend 960DT
+<!-- end id1 -->
 <!-- npu="950" id2 -->
 - Ascend 950PR/Ascend 950DT
 <!-- end id2 -->
@@ -50,7 +52,6 @@
 | 基础算术 | Prelu | AIV | PIPE_V |
 | 基础算术 | LeakyRelu | AIV | PIPE_V |
 | 基础算术 | BilinearInterpolation | AIV | PIPE_V |
-| 基础算术 | Reciprocal | AIV | PIPE_V |
 | 逻辑计算 | Not | AIV | PIPE_V |
 | 逻辑计算 | And | AIV | PIPE_V |
 | 逻辑计算 | Or | AIV | PIPE_V |
@@ -59,7 +60,7 @@
 | 逻辑计算 | Ands | AIV | PIPE_V |
 | 逻辑计算 | Ors | AIV | PIPE_V |
 | 逻辑计算 | ShiftLeft（左移位数为Tensor） | AIV | PIPE_V |
-| 逻辑计算 | ShiftRights（左移位数为Tensor） | AIV | PIPE_V |
+| 逻辑计算 | ShiftRight（右移位数为Tensor） | AIV | PIPE_V |
 | 复合计算 | Axpy | AIV | PIPE_V |
 | 复合计算 | MulAddDst | AIV | PIPE_V |
 | 复合计算 | MulCast | AIV | PIPE_V |
@@ -117,6 +118,7 @@
 | 数据搬运 | DataCopy(UB->UB) | AIV | PIPE_V |
 | 数据搬运 | Copy | AIV | PIPE_V |
 
+
 **表2**  Cube API流水类型汇总
 
 <a name="table12311219174812"></a>
@@ -132,7 +134,7 @@
 | LoadDataWithSparse(L1->L0) | AIC | PIPE_MTE1 |
 | DataCopy(L1->BT) | AIC | PIPE_MTE1 |
 | DataCopy(L1->FB) | AIC | PIPE_FIX |
-| DataCopyPad(UB->L1) | AIC | <!-- npu="950" id6 -->针对Ascend 950PR/Ascend 950DT：<br>PIPE_MTE3。<br><!-- end id6 --><!-- npu="A3" id7 -->针对Atlas A3 训练系列产品/Atlas A3 推理系列产品：<br>PIPE_MTE3、PIPE_MTE2。<br><!-- end id7 --><!-- npu="910b" id8 -->针对Atlas A2 训练系列产品/Atlas A2 推理系列产品：<br>PIPE_MTE3、PIPE_MTE2。<br><!-- end id8 --> |
+| DataCopyPad(UB->L1) | AIC | <!-- npu="950" id10 -->针对Ascend 950PR/Ascend 950DT：<br>PIPE_MTE3。<br><!-- end id10 --><!-- npu="A3" id11 -->针对Atlas A3 训练系列产品/Atlas A3 推理系列产品：<br>PIPE_MTE3、PIPE_MTE2。<br><!-- end id11 --><!-- npu="910b" id12 -->针对Atlas A2 训练系列产品/Atlas A2 推理系列产品：<br>PIPE_MTE3、PIPE_MTE2。<br><!-- end id12 --> |
 | Fill(L1) | AIC | PIPE_MTE2 |
 | Fill(L0) | AIC | PIPE_MTE1 |
 | SetFmatrix | AIC | PIPE_S |
@@ -169,6 +171,7 @@
 | Cast（float转bfloat16_t） | PIPE_S |
 | Cast（bfloat16_t转float） | PIPE_S |
 | Nop | PIPE_S |
+
 
 **表4**  同步指令流水类型汇总
 
@@ -238,3 +241,16 @@
 | DataCacheCleanAndInvalid | PIPE_S |
 | ICachePreLoad(ISASI) | PIPE_S |
 | GetICachePreloadStatus(ISASI) | PIPE_S |
+
+<!-- npu="960" id6 -->
+**表8**  Ascend 960PR/Ascend 960DT新增流水类型汇总
+
+| API类型 | API接口名称 | 流水类型 |
+| --- | --- | --- |
+| Memory矢量计算（类型转换） | ReciprocalCast(AIV) | PIPE_V |
+| Memory矢量计算（数据搬运） | GatherDataCopy(AIV) | PIPE_MTE2 |
+| Memory矢量计算（数据搬运） | RemoteDataCopy(AIV) | PIPE_MTE3 |
+| Memory矢量计算（数据搬运） | ScatterDataCopy(AIV) | PIPE_MTE3 |
+| 缓存控制 | MultiDataCachePreload | PIPE_S |
+| 缓存控制 | Prefetch | PIPE_MTE2 |
+<!-- end id6 -->

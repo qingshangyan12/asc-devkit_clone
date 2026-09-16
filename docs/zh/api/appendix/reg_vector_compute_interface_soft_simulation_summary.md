@@ -2,7 +2,12 @@
 
 本节汇总介绍了Reg矢量计算接口软仿数据类型的情况，本节内容仅针对如下型号生效：
 
-Ascend 950PR/Ascend 950DT
+<!-- npu="960" id1 -->
+- Ascend 960PR/Ascend 960DT
+<!-- end id1 -->
+<!-- npu="950" id2 -->
+- Ascend 950PR/Ascend 950DT
+<!-- end id2 -->
 
 [Reg数据搬入](../SIMD-API/basic_api/reg_vector_compute/reg_data_load/reg_data_load.md)和[Reg数据搬出](../SIMD-API/basic_api/reg_vector_compute/reg_data_store/reg_data_store.md)目录下提供了Unified Buffer（UB）与RegTensor、UB与MaskReg之间的数据搬运接口。
 
@@ -104,7 +109,7 @@ UB与RegTensor之间的数据搬运根据操作数的数据类型位宽来搬运
 
 | 接口     | 软仿支持数据类型     |
 | :------- | :------------------- |
-| Cast     | e8m02bf16、bf162e8m0 |
+| Cast     | <!-- npu="950" id3 -->针对Ascend 950PR/Ascend 950DT：<br>e8m02bf16、bf162e8m0。<br><!-- end id3 --><!-- npu="960" id4 -->针对Ascend 960PR/Ascend 960DT：<br>-<br><!-- end id4 --> |
 | Truncate | -                    |
 
 **表8**  归约计算

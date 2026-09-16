@@ -2,9 +2,13 @@
 
 本节汇总介绍了C-API Reg矢量计算接口的理论性能，本节内容仅针对如下型号生效：
 
-<!-- npu="950" id1 -->
-Ascend 950PR/Ascend 950DT
+<!-- npu="960" id1 -->
+Ascend 960PR/Ascend 960DT
 <!-- end id1 -->
+<!-- npu="950" id2 -->
+Ascend 950PR/Ascend 950DT
+<!-- end id2 -->
+
 
 本节汇总的理论性能均为单指令理论性能，软仿实现的接口和数据类型不提供理论性能。
 
@@ -12,22 +16,22 @@ Ascend 950PR/Ascend 950DT
 
 | 接口 | 源操作数数据类型 | 目的操作数数据类型 | 理论并行度（elements/cycle） |
 | -------- | ---------------- | ---------------- | ---------------- |
-| asc_abs | int8_t | int8_t | 128 |
-| asc_abs | int16_t | int16_t | 64 |
+| asc_abs | int8_t | int8_t | <!-- npu="950" id3 -->针对Ascend 950PR/Ascend 950DT：<br>128<br><!-- end id3 --><!-- npu="960" id4 -->针对Ascend 960PR/Ascend 960DT：<br>256<br><!-- end id4 --> |
+| asc_abs | int16_t | int16_t | <!-- npu="950" id5 -->针对Ascend 950PR/Ascend 950DT：<br>64<br><!-- end id5 --><!-- npu="960" id6 -->针对Ascend 960PR/Ascend 960DT：<br>128<br><!-- end id6 --> |
 | asc_abs | half | half | 128 |
-| asc_abs | int32_t | int32_t | 32 |
+| asc_abs | int32_t | int32_t | <!-- npu="950" id7 -->针对Ascend 950PR/Ascend 950DT：<br>32<br><!-- end id7 --><!-- npu="960" id8 -->针对Ascend 960PR/Ascend 960DT：<br>64<br><!-- end id8 --> |
 | asc_abs | float | float | 64 |
-| asc_add_scalar | int8_t | int8_t | 128 |
-| asc_add_scalar | uint8_t | uint8_t | 128 |
-| asc_add_scalar | int16_t | int16_t | 64 |
-| asc_add_scalar | uint16_t | uint16_t | 64 |
+| asc_add_scalar | int8_t | int8_t | <!-- npu="950" id9 -->针对Ascend 950PR/Ascend 950DT：<br>128<br><!-- end id9 --><!-- npu="960" id10 -->针对Ascend 960PR/Ascend 960DT：<br>256<br><!-- end id10 --> |
+| asc_add_scalar | uint8_t | uint8_t | <!-- npu="950" id11 -->针对Ascend 950PR/Ascend 950DT：<br>128<br><!-- end id11 --><!-- npu="960" id12 -->针对Ascend 960PR/Ascend 960DT：<br>256<br><!-- end id12 --> |
+| asc_add_scalar | int16_t | int16_t | <!-- npu="950" id13 -->针对Ascend 950PR/Ascend 950DT：<br>64<br><!-- end id13 --><!-- npu="960" id14 -->针对Ascend 960PR/Ascend 960DT：<br>128<br><!-- end id14 --> |
+| asc_add_scalar | uint16_t | uint16_t | <!-- npu="950" id15 -->针对Ascend 950PR/Ascend 950DT：<br>64<br><!-- end id15 --><!-- npu="960" id16 -->针对Ascend 960PR/Ascend 960DT：<br>128<br><!-- end id16 --> |
 | asc_add_scalar | half | half | 128 |
 | asc_add_scalar | bfloat16_t | bfloat16_t | 128 |
-| asc_add_scalar | int32_t | int32_t | 32 |
-| asc_add_scalar | uint32_t | uint32_t | 32 |
+| asc_add_scalar | int32_t | int32_t | 64 |
+| asc_add_scalar | uint32_t | uint32_t | 64 |
 | asc_add_scalar | float | float | 64 |
-| asc_ln | half | half | 16 |
-| asc_ln | float | float | 16 |
+| asc_ln | half | half | 32 |
+| asc_ln | float | float | 32 |
 | asc_max_scalar | int8_t | int8_t | 256 |
 | asc_max_scalar | uint8_t | uint8_t | 256 |
 | asc_max_scalar | int16_t | int16_t | 128 |
@@ -51,10 +55,10 @@ Ascend 950PR/Ascend 950DT
 | asc_mul_scalar | int32_t | int32_t | 32 |
 | asc_mul_scalar | uint32_t | uint32_t | 32 |
 | asc_mul_scalar | float | float | 64 |
-| asc_neg | int8_t | int8_t | 128 |
-| asc_neg | int16_t | int16_t | 64 |
+| asc_neg | int8_t | int8_t | 256 |
+| asc_neg | int16_t | int16_t | 128 |
 | asc_neg | half | half | 128 |
-| asc_neg | int32_t | int32_t | 32 |
+| asc_neg | int32_t | int32_t | 64 |
 | asc_neg | float | float | 64 |
 | asc_relu | half | half | 128 |
 | asc_relu | int32_t | int32_t | 64 |
