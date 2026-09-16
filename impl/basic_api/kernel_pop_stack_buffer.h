@@ -22,6 +22,7 @@
 #define TIKCFW_IMPL_KERNEL_POP_STACK_BUFFER_H
 
 #include "kernel_tpipe_impl.h"
+#include "kernel_cube_pointer_traits.h"
 namespace AscendC {
 template <TPosition pos>
 __aicore__ inline uint64_t GetEndAddress()
@@ -69,6 +70,22 @@ __aicore__ inline bool PopStackBuffer(LocalTensor<T>& pop)
     pop.SetAddr(addr);
     return true;
 }
+
+#if defined(__NPU_ARCH__) && !defined(ASCENDC_CPU_DEBUG)
+template <typename T, TPosition pos = TPosition::VECCALC>
+__aicore__ inline bool PopStackBuffer(__ubuf__ T*& pop)
+{
+    static_assert(!Std::is_const<T>::value, "PopStackBuffer output must be writable");
+    static_assert(pos == TPosition::VECCALC || pos == TPosition::VECIN || pos == TPosition::VECOUT,
+        "Pointer PopStackBuffer requires UB position");
+    LocalTensor<T> allocated;
+    const bool result = PopStackBuffer<T, pos>(allocated);
+    if (result) {
+        pop = (__ubuf__ T*)allocated.GetPhyAddr();
+    }
+    return result;
+}
+#endif
 
 template <TPosition pos>
 __aicore__ inline bool PopStackBuffer(TBuf<pos>& popBuffer, TBufType& bufStart)

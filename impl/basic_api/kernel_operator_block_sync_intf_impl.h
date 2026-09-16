@@ -136,9 +136,9 @@ __aicore__ inline void DataSyncBarrier()
  * @param [in] blockIdx the idx number waiting for the core
  * @param [in] eventID Set and wait events
  */
-template <bool isAIVOnly>
-__aicore__ inline void IBSet(
-    const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace, int32_t blockIdx,
+template <bool isAIVOnly, typename G, typename U>
+__aicore__ inline void IBSetWorkspaceImpl(
+    const G& gmWorkspace, const U& ubWorkspace, int32_t blockIdx,
     int32_t eventID)
 {
     int32_t blockNum = GetBlockNum();
@@ -178,9 +178,9 @@ __aicore__ inline void IBSet(
 #endif
 }
 
-template <bool isAIVOnly>
-__aicore__ inline void IBWait(
-    const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace, int32_t blockIdx,
+template <bool isAIVOnly, typename G, typename U>
+__aicore__ inline void IBWaitWorkspaceImpl(
+    const G& gmWorkspace, const U& ubWorkspace, int32_t blockIdx,
     int32_t eventID)
 {
     int32_t blockNum = GetBlockNum();
@@ -218,6 +218,19 @@ __aicore__ inline void IBWait(
 #if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002
     __ib_wait_stub(blockIdx, eventID, isAIVOnly);
 #endif
+}
+
+template <bool isAIVOnly>
+__aicore__ inline void IBSet(const GlobalTensor<int32_t>& gmWorkspace,
+    const LocalTensor<int32_t>& ubWorkspace, int32_t blockIdx, int32_t eventID)
+{
+    IBSetWorkspaceImpl<isAIVOnly>(gmWorkspace, ubWorkspace, blockIdx, eventID);
+}
+template <bool isAIVOnly>
+__aicore__ inline void IBWait(const GlobalTensor<int32_t>& gmWorkspace,
+    const LocalTensor<int32_t>& ubWorkspace, int32_t blockIdx, int32_t eventID)
+{
+    IBWaitWorkspaceImpl<isAIVOnly>(gmWorkspace, ubWorkspace, blockIdx, eventID);
 }
 
 /*

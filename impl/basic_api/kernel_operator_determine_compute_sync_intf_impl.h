@@ -72,6 +72,32 @@ __aicore__ inline void NotifyNextBlock(GlobalTensor<int32_t>& gmWorkspace, Local
 {
     NotifyNextBlockCalc(gmWorkspace, ubWorkspace);
 }
+#if __NPU_ARCH__ == 3510 && !defined(ASCENDC_CPU_DEBUG)
+template <typename G, typename U,
+    typename Std::enable_if<Impl::CubeHasPointer<G, U>::value, bool>::type = true>
+__aicore__ inline void InitDetermineComputeWorkspace(const G& gmWorkspace, const U& ubWorkspace)
+{
+    auto gm = Impl::CubeSyncGlobal(gmWorkspace);
+    auto ub = Impl::CubeSyncLocal(ubWorkspace);
+    InitDetermineComputeWorkspaceCalc(gm, ub);
+}
+template <typename G, typename U,
+    typename Std::enable_if<Impl::CubeHasPointer<G, U>::value, bool>::type = true>
+__aicore__ inline void WaitPreBlock(const G& gmWorkspace, const U& ubWorkspace)
+{
+    auto gm = Impl::CubeSyncGlobal(gmWorkspace);
+    auto ub = Impl::CubeSyncLocal(ubWorkspace);
+    WaitPreBlockCalc(gm, ub);
+}
+template <typename G, typename U,
+    typename Std::enable_if<Impl::CubeHasPointer<G, U>::value, bool>::type = true>
+__aicore__ inline void NotifyNextBlock(const G& gmWorkspace, const U& ubWorkspace)
+{
+    auto gm = Impl::CubeSyncGlobal(gmWorkspace);
+    auto ub = Impl::CubeSyncLocal(ubWorkspace);
+    NotifyNextBlockCalc(gm, ub);
+}
+#endif
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_DETERMINE_COMPUTE_SYNC_INTF_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DETERMINE_COMPUTE_SYNC_INTF_IMPL_H__)
