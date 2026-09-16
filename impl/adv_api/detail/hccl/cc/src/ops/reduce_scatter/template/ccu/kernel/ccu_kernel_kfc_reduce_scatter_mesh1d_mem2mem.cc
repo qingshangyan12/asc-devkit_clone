@@ -9,6 +9,8 @@
  */
 #include "ccu_kernel_alg_base.h"
 #include "ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.h"
+#include "ccu_func_dl.hpp"
+#include "kfc_server_protocol.h"
 #include "mc2_type.h"
 
 namespace mc2_ops_hccl {
@@ -38,6 +40,7 @@ struct KfcReduceScatterMesh1DMem2MemContext : CcuKernelCtxBase {
     HcclDataType dataType;
     HcclDataType outputDataType;
     HcclReduceOp reduceOp;
+    bool loadSoleArgs{false};
 
     std::vector<ccu::Variable> input;
     ccu::Variable output;
@@ -101,6 +104,31 @@ static CcuResult InitResource(KfcReduceScatterMesh1DMem2MemContext& ctx)
     uint32_t numEventsPerIter = (ctx.rankSize + BIT_NUM_PER_CKE - 1) / BIT_NUM_PER_CKE;
     ctx.events.resize(RS_UNROLL_NUM * numEventsPerIter);
     ctx.constVar1 = 1;
+    return CCU_SUCCESS;
+}
+
+static CcuResult LoadArgs(
+    KfcReduceScatterMesh1DMem2MemContext& ctx, ccu::Array<ccu::Variable>& args)
+{
+    uint32_t argId = 0;
+    ctx.input[ctx.rankId] = args[argId++];
+    ctx.output = args[argId++];
+    ctx.token[ctx.rankId] = args[argId++];
+    ctx.scratch[ctx.rankId] = args[argId++];
+    ctx.currentRankSliceInputOffset = args[argId++];
+    ctx.currentRankSliceOutputOffset = 0;
+    const uint32_t chunkArg = ctx.loadSoleArgs ? 13U : 5U;
+    ctx.chunkSize = args[chunkArg];
+    ctx.chunkLoopNum = args[chunkArg + 1U];
+    ctx.tailSize = args[chunkArg + 2U];
+    ctx.fullGoSize.addrOffset = args[chunkArg + 3U];
+    ctx.fullGoSize.loopParam = args[chunkArg + 4U];
+    ctx.fullGoSize.parallelParam = args[chunkArg + 5U];
+    ctx.fullGoSize.residual = args[chunkArg + 6U];
+    ctx.tailGoSize.addrOffset = args[chunkArg + 7U];
+    ctx.tailGoSize.loopParam = args[chunkArg + 8U];
+    ctx.tailGoSize.parallelParam = args[chunkArg + 9U];
+    ctx.tailGoSize.residual = args[chunkArg + 10U];
     return CCU_SUCCESS;
 }
 
@@ -411,6 +439,16 @@ static CcuResult DoRepeatReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx
     return CCU_SUCCESS;
 }
 
+static CcuResult RunReduceScatterMesh(
+    KfcReduceScatterMesh1DMem2MemContext& ctx, ccu::Array<ccu::Variable>& args)
+{
+    CCU_CHK_RET(LoadArgs(ctx, args));
+    CCU_CHK_RET(PreSync(ctx));
+    CCU_CHK_RET(DoRepeatReduceScatter(ctx));
+    CCU_CHK_RET(PostSync(ctx));
+    return CCU_SUCCESS;
+}
+
 CcuResult CcuReduceScatterMesh1DMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable scratch,
     ccu::Variable currentRankSliceInputOffset, ccu::Variable chunkSize, ccu::Variable chunkLoopNum,
@@ -456,7 +494,37 @@ CcuResult CcuReduceScatterMesh1DMem2MemKernel(
     CCU_CHK_RET(DoRepeatReduceScatter(ctx));
     CCU_CHK_RET(PostSync(ctx));
     HCCL_INFO("[CcuKernelReduceScatterMesh1DMem2Mem] ReduceScatterMesh1DMem2Mem end");
-
     return CCU_SUCCESS;
 }
+
+CcuResult CcuReduceScatterMesh1DMem2MemDefineKernel(CcuKernelArg arg)
+{
+    const auto* kernelArg = static_cast<CcuKernelArgKfcReduceScatterMesh1DMem2Mem*>(arg);
+    KfcReduceScatterMesh1DMem2MemContext ctx;
+    ctx.channels = kernelArg->channels;
+    ctx.channelCount = kernelArg->channelCount;
+    ctx.rankSize = static_cast<uint32_t>(kernelArg->rankSize);
+    ctx.rankId = kernelArg->rankId;
+    ctx.dataType = kernelArg->opParam.DataDes.dataType;
+    ctx.outputDataType = kernelArg->opParam.DataDes.outputType;
+    if (ctx.outputDataType == HcclDataType::HCCL_DATA_TYPE_RESERVED) {
+        ctx.outputDataType = ctx.dataType;
+    }
+    ctx.reduceOp = kernelArg->opParam.reduceType;
+    ctx.loadSoleArgs = kernelArg->opParam.algName == nullptr ||
+                       std::strcmp(kernelArg->opParam.algName, KFC_CONCURRENT_REDUCE_SCATTER_ALG_NAME) != 0;
+    ctx.resourceAllocated = false;
+    ctx.moConfig.msInterleave = CCU_MS_INTERLEAVE;
+    ctx.moConfig.loopCount = CCU_LOOP_COUNT_M2M_RE;
+    ctx.moConfig.memSlice = CCU_MS_SIZE;
+    ctx.moRes.eventCount = 0;
+    ctx.moRes.bufCount = 0;
+    CCU_CHK_RET(InitResource(ctx));
+    CcuResult bodyRet = CCU_SUCCESS;
+    ccu::Func subKernel(
+        [&ctx, &bodyRet](ccu::Array<ccu::Variable>& args) { bodyRet = RunReduceScatterMesh(ctx, args); },
+        CCU_FUNC_XKERNEL_ARG_MAX, KFC_SUB_KERNEL_FUNC_NAME);
+    return bodyRet;
+}
+
 } // namespace mc2_ops_hccl

@@ -12,17 +12,9 @@
 
 #include "utils.h"
 #include "ccu_temp_kfc_mesh_1D_mem2mem_base.h"
+#include "kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.h"
 
 namespace mc2_ops_hccl {
-
-// KFC 直调捕获（ST）与 KFC server 继承共用的注册期元数据；InheritKfcServerKernelArg 的
-// isReduceScatter 分支不读该 arg（按 subCommRanks 重建），此处填充不影响生产 KFC 路径。
-struct CcuKernelArgKfcReduceScatterMesh1DMem2Mem : CcuKernelArgBase {
-    uint64_t rankSize = 0;
-    uint32_t rankId = 0;
-    OpParam opParam;
-    std::vector<std::vector<uint32_t>> subCommRanks;
-};
 
 class CcuTempKfcReduceScatterMesh1DMem2Mem : public CcuTempKfcMesh1DMem2MemBase {
 public:

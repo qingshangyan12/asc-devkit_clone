@@ -9,6 +9,9 @@
  */
 
 #include "ccu_kernel_all_to_all_v_mesh1d.h"
+#include "../ccu_temp_all_to_all_v_mesh_1D.h"
+#include "ccu_func_dl.hpp"
+#include "kfc_server_protocol.h"
 
 namespace mc2_ops_hccl {
 
@@ -188,6 +191,21 @@ CcuResult CcuAlltoAllVMesh1DKernel(
         ccu::NotifyWait(channels[i], A2AV_POST_SYNC_CKE_IDX, A2AV_POST_SYNC_BIT);
     }
     return CCU_SUCCESS;
+}
+
+CcuResult CcuAlltoAllVMesh1DDefineKernel(CcuKernelArg arg)
+{
+    const auto* kernelArg = static_cast<CcuKernelArgAlltoAllVMesh1D*>(arg);
+    CcuResult bodyRet = CCU_SUCCESS;
+    ccu::Func subKernel(
+        [kernelArg, &bodyRet](ccu::Array<ccu::Variable>& args) {
+            bodyRet = CcuAlltoAllVMesh1DKernel(
+                args[0], args[1], args[2], args[3], args[4], args[9], args[5], args[6], args[7], args[8],
+                kernelArg->channels, kernelArg->channelCount, static_cast<uint32_t>(kernelArg->rankSize),
+                kernelArg->rankId);
+        },
+        CCU_FUNC_XKERNEL_ARG_MAX, KFC_SUB_KERNEL_FUNC_NAME);
+    return bodyRet;
 }
 
 } // namespace mc2_ops_hccl

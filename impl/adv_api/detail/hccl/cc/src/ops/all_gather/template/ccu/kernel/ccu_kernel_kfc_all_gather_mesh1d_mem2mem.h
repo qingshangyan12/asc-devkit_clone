@@ -14,6 +14,11 @@
 
 namespace mc2_ops_hccl {
 
+struct CcuKernelArgKfcAllGatherMesh1DMem2Mem : CcuKernelArgBase {
+    uint64_t rankSize = 0;
+    uint32_t rankId = 0;
+};
+
 // 每个 repeat 批次最多展开 16 次 Write/LocalCopy/Wait 三阶段流水。
 constexpr uint32_t AG_M2M_UNROLL_NUM = 1;
 
@@ -23,6 +28,7 @@ CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
     ccu::Variable currentRankSliceInputOffset, ccu::Variable tmpRepeatNum, ccu::Variable inputRepeatStride,
     ccu::Variable outputRepeatStride, ccu::Variable lastSliceSize, ccu::Variable isInputOutputEqual,
     const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId);
+CcuResult CcuKfcAllGatherMesh1DMem2MemDefineKernel(CcuKernelArg arg);
 
 CcuResult CcuKfcParallelAllGatherMesh1DMem2MemKernel(
     ccu::Variable inputBase, ccu::Variable outputBase, ccu::Variable tokenInfo, ccu::Variable outputStride,
@@ -31,6 +37,7 @@ CcuResult CcuKfcParallelAllGatherMesh1DMem2MemKernel(
     ccu::Variable part0GoSize3, ccu::Variable part1GoSize0, ccu::Variable part1GoSize1, ccu::Variable part1GoSize2,
     ccu::Variable part1GoSize3, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSizeLevel0,
     uint32_t rankIdxLevel0, uint32_t rankSizeLevel1, uint32_t rankIdxLevel1);
+CcuResult CcuKfcParallelAllGatherMesh1DMem2MemDefineKernel(CcuKernelArg arg);
 
 } // namespace mc2_ops_hccl
 

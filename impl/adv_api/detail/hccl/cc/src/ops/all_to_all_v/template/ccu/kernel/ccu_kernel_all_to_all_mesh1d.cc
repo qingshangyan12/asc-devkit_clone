@@ -10,6 +10,8 @@
 
 #include "ccu_kernel_all_to_all_mesh1d.h"
 #include "ccu_kernel_alg_base.h"
+#include "ccu_func_dl.hpp"
+#include "kfc_server_protocol.h"
 
 namespace mc2_ops_hccl {
 
@@ -45,6 +47,24 @@ static CcuResult InitResource(AlltoAllMesh1DContext& ctx)
 
     ctx.resourceAllocated = false;
 
+    return CCU_SUCCESS;
+}
+
+static CcuResult LoadArgs(AlltoAllMesh1DContext& ctx, ccu::Array<ccu::Variable>& args)
+{
+    uint32_t argId = 0;
+    ctx.input[ctx.rankId] = args[argId++];
+    ctx.output[ctx.rankId] = args[argId++];
+    ctx.token[ctx.rankId] = args[argId++];
+    ctx.sliceSize = args[argId++];
+    ctx.srcStride = args[argId++];
+    ctx.srcOffset = args[argId++];
+    ctx.dstOffset = args[argId++];
+    ctx.goSize.addrOffset = args[argId++];
+    ctx.goSize.loopParam = args[argId++];
+    ctx.goSize.parallelParam = args[argId++];
+    ctx.goSize.residual = args[argId++];
+    ctx.srcOffset += ctx.input[ctx.rankId];
     return CCU_SUCCESS;
 }
 
@@ -158,6 +178,15 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext& ctx)
 // ============================================================================
 // 主入口 Kernel 函数
 // ============================================================================
+static CcuResult RunAlltoAllMesh(AlltoAllMesh1DContext& ctx, ccu::Array<ccu::Variable>& args)
+{
+    CCU_CHK_RET(LoadArgs(ctx, args));
+    PreSync(ctx);
+    CCU_CHK_RET(DoAlltoAll(ctx));
+    PostSync(ctx);
+    return CCU_SUCCESS;
+}
+
 CcuResult CcuAlltoAllMesh1DKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable sliceSize,
     ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset, ccu::Variable goSize1,
@@ -177,15 +206,29 @@ CcuResult CcuAlltoAllMesh1DKernel(
     CCU_CHK_RET(LoadArgs(
         ctx, inputAddr, outputAddr, tokenInfo, sliceSize, srcStride, srcOffset, dstOffset, goSize1, goSize2, goSize3,
         goSize4));
-
     PreSync(ctx);
-
     CCU_CHK_RET(DoAlltoAll(ctx));
-
     PostSync(ctx);
     HCCL_INFO("[CcuKernelAlltoAllMesh1D] AlltoAllMesh1D end");
-
     return CCU_SUCCESS;
+}
+
+CcuResult CcuAlltoAllMesh1DDefineKernel(CcuKernelArg arg)
+{
+    const auto* kernelArg = static_cast<CcuKernelArgAlltoAllMesh1D*>(arg);
+    AlltoAllMesh1DContext ctx;
+    ctx.channels = kernelArg->channels;
+    ctx.channelCount = kernelArg->channelCount;
+    ctx.rankSize = static_cast<uint32_t>(kernelArg->rankSize);
+    ctx.rankId = kernelArg->rankId;
+    ctx.loadFromMem = kernelArg->loadFromMem;
+    InitCcuKernelCtxBase(ctx);
+    CCU_CHK_RET(InitResource(ctx));
+    CcuResult bodyRet = CCU_SUCCESS;
+    ccu::Func subKernel(
+        [&ctx, &bodyRet](ccu::Array<ccu::Variable>& args) { bodyRet = RunAlltoAllMesh(ctx, args); },
+        CCU_FUNC_XKERNEL_ARG_MAX, KFC_SUB_KERNEL_FUNC_NAME);
+    return bodyRet;
 }
 
 } // namespace mc2_ops_hccl
