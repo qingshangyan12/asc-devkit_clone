@@ -207,8 +207,9 @@ __aicore__ inline void LoadDataImpl(
 #endif
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 5101) || \
-                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+#if defined(__NPU_ARCH__) &&                                                                                 \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 5101) || \
+     (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
 template <typename T, typename U, typename V>
 __aicore__ inline void LoadDataImpl(
     const LocalTensor<U>& dst, const LocalTensor<T>& src, const LocalTensor<V>& srcMx,

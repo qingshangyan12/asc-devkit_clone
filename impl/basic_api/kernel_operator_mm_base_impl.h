@@ -325,7 +325,9 @@ LoadDataWithStride(
 }
 #endif
 
-#if ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if (                                                                                                       \
+    (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
+    (__NPU_ARCH__ == 5162))
 // cce compiler process load3d bfloat16_t using B8, so use the half dtype instead
 template <const IsResetLoad3dConfig& defaultConfig>
 [[deprecated("NOTICE: LoadData<IsResetLoad3dConfig> has been deprecated and will be removed in the next version."
@@ -352,9 +354,11 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(
         LoadData2DGM2L0BCal((__cb__ T*)dst.GetPhyAddr(), (__gm__ U*)src.GetPhyAddr(), loadDataParams, nd2nzParams);
     }
 #endif
-    } else {
-        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "dst only supports L1 Buffer(A1/B1)"); });
-    }
+}
+else
+{
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "dst only supports L1 Buffer(A1/B1)"); });
+}
 }
 #endif
 
