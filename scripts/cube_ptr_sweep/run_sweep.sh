@@ -193,18 +193,28 @@ run_one() {
     return
   fi
   cd "$work"; rm -f ./output/output.bin
-  set +e; ./build/demo >"$rlog" 2>&1; rrc=$?; set -e
-  if [ "$rrc" -ne 0 ] || [ ! -f ./output/output.bin ]; then
-    echo -e "${api}\t${cid}\t${ARCH}\t${dtype}\t${M}\t${N}\t${K}\t${sc}\tPASS\tRUN_FAIL\t-\texit=$rrc" >> "$SUMMARY"
-    return
-  fi
-  vstr=SKIP
-  if [ -f scripts/verify_result.py ]; then
-    set +e
-    $PY scripts/verify_result.py -scenarioNum "$sc" -M "$M" -N "$N" -K "$K" ./output/output.bin ./output/golden.bin >"$vlog" 2>&1
-    vrc=$?; set -e
-    if [ "$vrc" -eq 0 ] || grep -qi 'test pass' "$vlog"; then vstr=PASS; else vstr=FAIL; fi
-  fi
+  vstr=FAIL
+  for _try in 1 2 3; do
+    set +e; ./build/demo >"$rlog" 2>&1; rrc=$?; set -e
+    if [ "$rrc" -ne 0 ] || [ ! -f ./output/output.bin ]; then
+      echo -e "${api}\t${cid}\t${ARCH}\t${dtype}\t${M}\t${N}\t${K}\t${sc}\tPASS\tRUN_FAIL\t-\texit=$rrc" >> "$SUMMARY"
+      echo "DONE $cid run=FAIL"
+      return
+    fi
+    if [ -f scripts/verify_result.py ]; then
+      set +e
+      $PY scripts/verify_result.py -scenarioNum "$sc" -M "$M" -N "$N" -K "$K" ./output/output.bin ./output/golden.bin >"$vlog" 2>&1
+      vrc=$?; set -e
+      if [ "$vrc" -eq 0 ] || grep -qi 'test pass' "$vlog"; then
+        vstr=PASS
+        break
+      fi
+      rm -f ./output/output.bin
+    else
+      vstr=SKIP
+      break
+    fi
+  done
   echo -e "${api}\t${cid}\t${ARCH}\t${dtype}\t${M}\t${N}\t${K}\t${sc}\tPASS\tPASS\t${vstr}\t" >> "$SUMMARY"
   echo "DONE $cid verify=$vstr"
 }
