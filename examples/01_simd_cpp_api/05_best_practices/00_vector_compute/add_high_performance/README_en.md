@@ -15,9 +15,10 @@ This example uses addition to introduce performance tuning methods based on stat
 
 ## Supported Products and CANN Versions
 
-| Product | CANN Version |
-|------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+| Product                                                              | CANN Version |
+|----------------------------------------------------------------------|-------------|
+| Ascend 960DT                                                         | >= CANN 9.2.0  |
+| Ascend 950PR/Ascend 950DT                                            | >= CANN 9.2.0 |
 | Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.2.0 |
 | Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.2.0 |
 
@@ -544,9 +545,9 @@ $$
 
 The read-write mixed bandwidth is higher than 1.8 TB/s because this metric is not pure read bandwidth, but combined read and write bandwidth. After double buffer is enabled, the read and write pipelines run in parallel. In addition, z writes hit the L2 Cache, which provides high bandwidth. Therefore, when mte2 is used as the mixed read-write time, the numerator includes the total amount of data read and written, so the resulting mixed bandwidth can exceed 1.8 TB/s.
 
-### Ascend 950 Series Performance Comparison
+### Ascend 950/960 Series Performance Comparison
 
-The table below shows performance data comparison for this example running on Ascend 950 Series Products:
+The table below shows performance data comparison for this example running on Ascend 950/960 Series Products:
 
 | Case | Optimization Strategy | Cores | dataCopyLen | Task Duration(μs) | aiv_vec_time(μs) | Theoretical Vector Duration (μs) | Read Bandwidth (TB/S) | Read-Write Mixed Bandwidth (TB/S) | End-to-End Duration vs Case 0 |
 |:---:|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -557,22 +558,22 @@ The table below shows performance data comparison for this example running on As
 | 4 | Double buffer | 64 | 21760 | 247.665 | 10.976 | 4.965 | NA | 1.712 | 4960.2x |
 | 5 | L2 Cache bypass | 64 | 21760 | 182.04 | 10.997 | 4.965 | NA | 2.256 | 6748.4x |
 
-The main reason `dataCopyLen` is increased on Ascend 950 Series is that UB capacity increases. In double buffer scenarios, this example needs to simultaneously place `x/y/z` Ping-Pong totaling 6 buffer blocks, so single block available space can be approximated as `UBSIZE/6`:
+The main reason `dataCopyLen` is increased on Ascend /960 Series is that UB capacity increases. In double buffer scenarios, this example needs to simultaneously place `x/y/z` Ping-Pong totaling 6 buffer blocks, so single block available space can be approximated as `UBSIZE/6`:
 - Atlas A2/A3 Series: `192KB / 6 = 32KB`, corresponding to `32KB / 2B = 16384` `half` elements
-- Ascend 950 Series: `256KB / 6 ≈ 42.67KB`, corresponding to approximately `21840` `half` elements
+- Ascend 950/960 Series: `256KB / 6 ≈ 42.67KB`, corresponding to approximately `21840` `half` elements
 
-Therefore on Ascend 950 Series, estimated by capacity upper limit, single block `dataCopyLen` can be increased to approximately `21840` `half` data elements.
+Therefore on Ascend 950/960 Series, estimated by capacity upper limit, single block `dataCopyLen` can be increased to approximately `21840` `half` data elements.
 In actual implementation, it is recommended that users align both transfer granularity and computation granularity to 512B for more stable performance. Therefore cases 3-5 use `dataCopyLen=21760`, corresponding to `21760 * 2B = 43520B = 85 * 512B` bytes.
 
-On Ascend 950 Series Products, BANK arrangement is different. This example does not need to consider Bank conflicts for now, so only case 0 to case 5 performance data is listed. This processor processes 128 half data per cycle, with clock frequency 1.65GHz and AIV core count 64, so theoretical vector duration is:
+On Ascend 950/960 Series Products, BANK arrangement is different. This example does not need to consider Bank conflicts for now, so only case 0 to case 5 performance data is listed. This processor processes 128 half data per cycle, with clock frequency 1.65GHz and AIV core count 64, so theoretical vector duration is:
 $$
 T_{\text{theory}} = \frac{8192 \times 8192}{128 \times 1.65 \times 10^9 \times 64} = \frac{67108864}{1.35168 \times 10^{13}} \approx 4.965 \times 10^{-6} \text{ s} = 4.965 \text{ μs}
 $$
 
-The reasons why the Ascend 950 Series does not reach the theoretical vector duration peak are as follows:
+The reasons why the Ascend 950/960 Series does not reach the theoretical vector duration peak are as follows:
 
 - The theoretical value covers only pure Vector computation and excludes data transfer, event synchronization, pipeline scheduling, and other overhead. In the measured Case 5, `aiv_vec_time=10.997μs`, Task Duration is `182.04μs`, and `aiv_mte2_ratio` reaches 98.3%. This indicates that the end-to-end bottleneck is bandwidth rather than pure computation.
-- The main benefits of RegBase on the Ascend 950 Series come from reducing redundant Load/Store operations, reusing registers, and increasing the proportion of independent instructions that can execute concurrently. The core computation in this Add example is essentially a single Add instruction, with a short computation chain and limited opportunities for fusion or dual issue, so it cannot fully realize the benefits of RegBase.
+- The main benefits of RegBase on the Ascend 950/960 Series come from reducing redundant Load/Store operations, reusing registers, and increasing the proportion of independent instructions that can execute concurrently. The core computation in this Add example is essentially a single Add instruction, with a short computation chain and limited opportunities for fusion or dual issue, so it cannot fully realize the benefits of RegBase.
 
 ### Optimization Summary
 
@@ -594,7 +595,7 @@ The reasons why the Ascend 950 Series does not reach the theoretical vector dura
   Specify the case to build through `-DSCENARIO_NUM=N` during cmake build:
 
   ```bash
-  cmake -DSCENARIO_NUM=6 -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..   # Build case 6 (can be replaced with 0-6)
+  cmake -DSCENARIO_NUM=6 -DCMAKE_ASC_ARCHITECTURES=dav-9201 ..   # Build case 6 (can be replaced with 0-6)
   ```
 
   Case descriptions:
@@ -619,7 +620,7 @@ The reasons why the Ascend 950 Series does not reach the theoretical vector dura
   Run the following commands in this example directory.
   ```bash 
   mkdir -p build && cd build;   # Create and enter the build directory
-  cmake -DSCENARIO_NUM=6 -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;  # Build the project, default npu mode
+  cmake -DSCENARIO_NUM=6 -DCMAKE_ASC_ARCHITECTURES=dav-9201 ..;make -j;  # Build the project, default npu mode
   python3 ../scripts/gen_data.py   # Generate test input data
   ./demo                           # Run (using the case specified at build time)
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # Verify whether the output result is correct and confirm algorithm logic correctness
@@ -629,8 +630,8 @@ The reasons why the Ascend 950 Series does not reach the theoretical vector dura
 
   Examples:
   ```bash
-  cmake -DSCENARIO_NUM=6 -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # CPU debug mode
-  cmake -DSCENARIO_NUM=6 -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU simulation mode
+  cmake -DSCENARIO_NUM=6 -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-9201 ..;make -j; # CPU debug mode
+  cmake -DSCENARIO_NUM=6 -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-9201 ..;make -j; # NPU simulation mode
   ```
 
   > **Notice:** Clear the cmake cache before switching build modes. Run `rm CMakeCache.txt` in the build directory and then re-run cmake.
@@ -638,11 +639,11 @@ The reasons why the Ascend 950 Series does not reach the theoretical vector dura
 
 - Build option description
 
-  | Option | Values | Description |
-  |------|--------|------|
-  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debug, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products, dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | `0` (default), `1`, `2`, `3`, `4`, `5`, `6` | Performance optimization case number |
+  | Option | Values                                       | Description                                                                                                                                                                                                                                                                      |
+  |------|----------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim`                | Run mode: NPU execution, CPU debug, NPU simulation                                                                                                                                                                                                                               |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510`, `dav-9201` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products, dav-3510 corresponds to Ascend 950PR/Ascend 950DT, dav-9201 corresponds to Ascend 960DT |
+  | `SCENARIO_NUM` | `0` (default), `1`, `2`, `3`, `4`, `5`, `6`  | Performance optimization case number                                                                                                                                                                                                                                             |
   
   The following execution result indicates that the accuracy comparison succeeded.
   ```bash
