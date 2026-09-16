@@ -14,7 +14,7 @@
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-        "impl/basic_api/kernel_operator_data_copy_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_data_copy_intf.h\"\" and use public functions or variables defined in interface headers files.")
+    "impl/basic_api/kernel_operator_data_copy_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_data_copy_intf.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_INTF_IMPL_H__
 #endif
@@ -2522,6 +2522,16 @@ template <
         bool>::type>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     const DstT& dst, const SrcT& src, const MultiCopyParams<T, dim>& params)
+{
+    using PrimType = DmaPrimT<SrcT>;
+    const uint8_t cacheMode = DataCopyPtrInternal::ExtractCacheModeForOperand(src);
+    DataCopyWithNDDMAImpl<PrimType, dim, config>(
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), params.loopInfo,
+        params.constantValue, cacheMode);
+}
+#endif
+
+/* **************************************************************************************************
  * DataCopyPad / DataCopyL1ToUB pointer extended overloads
  *
  * Each overload accepts a raw address-space pointer in place of the equivalent LocalTensor / GlobalTensor
@@ -2544,7 +2554,8 @@ template <
     typename Std::enable_if<
         IsDmaLocalOperand<DstT> && IsDmaGmOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
-    const DstT& dst, const SrcT& src, const DataCopyParams& dataCopyParams, const DataCopyPadParams& padParams){
+    const DstT& dst, const SrcT& src, const DataCopyParams& dataCopyParams, const DataCopyPadParams& padParams)
+{
 #ifdef ASCENDC_TIME_STAMP_ON
     PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE2_DATACOPY));
 #endif
@@ -2637,18 +2648,36 @@ template <
 __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     const DstT& dst, const SrcT& src, const DataCopyParams& dataCopyParams)
 {
-    using PrimType = DmaPrimT<SrcT>;#if (__NPU_ARCH__ != 5102)
+    using PrimType = DmaPrimT<SrcT>;
+#if (__NPU_ARCH__ != 5102)
     if ASCEND_IS_AIC {
         return;
     }
 #endif
-    using PrimType = DmaPrimT<SrcT>;
-    const uint8_t cacheMode = DataCopyPtrInternal::ExtractCacheModeForOperand(src);
-    DataCopyWithNDDMAImpl<PrimType, dim, config>(
-        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), params.loopInfo,
-        params.constantValue, cacheMode);
+    const uint8_t cacheMode = ExtractCacheMode(dst);
+    if constexpr (IsDmaPosRuntime<SrcT>) {
+        const Hardware srcHWPos = GetPhyType(GetDmaOperandPosition(src));
+        if (srcHWPos == Hardware::UB) {
+            DataCopyPadUB2GMImpl<PrimType, mode>(
+                (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), dataCopyParams,
+                cacheMode);
+        } else {
+            ASCENDC_CHECK_TPOSITION(
+                false, "src", "UB(VECIN/VECOUT)", "DataCopyPad from LocalTensor to GlobalTensor",
+                GetPositionDisplay(GetDmaOperandPosition(src)));
+        }
+    } else {
+        if constexpr (DmaHardwarePosV<SrcT> == Hardware::UB) {
+            DataCopyPadUB2GMImpl<PrimType, mode>(
+                (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), dataCopyParams,
+                cacheMode);
+        } else {
+            static_assert(
+                DmaHardwarePosV<SrcT> == Hardware::UB || DmaHardwarePosV<SrcT> == Hardware::L1,
+                "DataCopyPad src->GM: src pointer must be UB or L1");
+        }
+    }
 }
-#endif
 
 /* **************************************************************************************************
  * Enhanced / conversion pointer extended overloads
@@ -3349,7 +3378,8 @@ __aicore__ inline void DataCopyL1ToUB(const DstT& dst, const SrcT& src, const ui
     struct DataCopyParams repeatParams;
     repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(PrimType));
     DataCopyL1ToUB<DstT, SrcT, subBlockId>(dst, src, repeatParams);
-#endif}
+#endif
+}
 
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_VCONV_INTERFACE_IMPL_H
