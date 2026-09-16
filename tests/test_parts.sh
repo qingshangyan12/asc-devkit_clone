@@ -117,6 +117,9 @@ basic_test_five_targets=(
     ascendc_ut_c_api_ascend960dt_AIC
     ascendc_ut_c_api_ascend960dt_AIV
     ascendc_ut_reg_compute_ascend950pr_9599
+    # ascendc_ut_reg_compute_kirin9050  # activate with CANN >= 9.2.0 (needs tikicpulib::Kirin9050 for run-level;
+    #                                     # on 9.1.0 GA the compile-level fallback cannot pass either — dav_5161
+    #                                     # host chain requires 9.2.0 stubs, see .kirinharness/dev_notes/m1l-kirin9050-ut-degradation.md)
     ascendc_ut_tensor_api_NPU_ARCH_3510_AIC
     ascendc_ut_tensor_api_NPU_ARCH_3510_AIV
     ascendc_run_all_tensor_api_header_checks_npu
