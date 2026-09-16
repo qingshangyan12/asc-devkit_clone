@@ -236,6 +236,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     }
     ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "DataCopy dn2nz only support position:GM to position: L1"); });
 }
+#endif // Dn2Nz pointer-extended architectures
 #endif
 
 /*
@@ -2262,12 +2263,15 @@ __aicore__ inline void DataCopy(const DstT& dst, const SrcT& src, const Nd2NzPar
     }
 }
 
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
+    (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
 /*!
  * \brief Pointer-extended DataCopy(dstLocal, srcGlobal, Dn2NzParams): GM -> L1 with format conversion. Mirrors
  *        the Nd2Nz pointer overload above; a DN2NZ conversion targets L1 only.
  *
  *        The enableSmallC0 variant is forwarded to the same bottom level entry point the Tensor-only overload
- *        uses, so a call that spells the variant out moves the same amount of data.
+ *        uses, so a call that spells the variant out moves the same amount of data. Guarded by the same
+ *        architecture list as its declaration, which also matches the cache-hint helper this body calls.
  */
 template <
     typename DstT, typename SrcT, bool enableSmallC0,
