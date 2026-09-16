@@ -75,12 +75,10 @@ __simd_callee__ inline void AddsImpl(S& dstReg, S& srcReg, U scalarValue, MaskRe
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
         SupportType<
-            ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t,
-            complex32>(),
+            ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t, complex32>(),
         "current data type is not supported on current device!");
     static_assert(
-        SupportType<
-            U, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t, complex32>(),
+        SupportType<U, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t, complex32>(),
         "current scalarValue data type is not supported on current device!");
     static_assert(Std::is_convertible<U, ActualT>(), "scalarValue data type could be converted to RegTensor data type");
     static_assert(
@@ -132,8 +130,7 @@ __simd_callee__ inline void MulsImpl(S& dstReg, S& srcReg, U scalarValue, MaskRe
     using ActualT = typename S::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
-        SupportType<
-            ActualT, uint16_t, int16_t, uint32_t, int32_t, half, float, complex32>(),
+        SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, half, float, complex32>(),
         "current data type is not supported on current device!");
     static_assert(
         SupportType<U, uint16_t, int16_t, uint32_t, int32_t, half, float, complex32>(),
@@ -166,12 +163,10 @@ __simd_callee__ inline void MaxsImpl(S& dstReg, S& srcReg, U scalarValue, MaskRe
     using ActualT = typename S::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
-        SupportType<
-            ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t>(),
+        SupportType<ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t>(),
         "current data type is not supported on current device!");
     static_assert(
-        SupportType<
-            U, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t>(),
+        SupportType<U, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t>(),
         "current scalarValue data type is not supported on current device!");
     static_assert(Std::is_convertible<U, ActualT>(), "scalarValue data type could be converted to RegTensor data type");
     static_assert(
@@ -186,12 +181,10 @@ __simd_callee__ inline void MinsImpl(S& dstReg, S& srcReg, U scalarValue, MaskRe
     using ActualT = typename S::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
-        SupportType<
-            ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t>(),
+        SupportType<ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t>(),
         "current data type is not supported on current device!");
     static_assert(
-        SupportType<
-            U, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t>(),
+        SupportType<U, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t>(),
         "current scalarValue data type is not supported on current device!");
     static_assert(Std::is_convertible<U, ActualT>(), "scalarValue data type could be converted to RegTensor data type");
     static_assert(
