@@ -14,7 +14,7 @@
 - **SPMD+SIMT**：将硬件抽象为Grid→Thread Block→Thread架构，以Thread为视角编程，关注每个Thread需处理的数据；
 - **SPMD+SIMD/SIMT混合**：核函数本质遵循SPMD+SIMD，内部以向量函数（Vector Function, VF）为粒度进行SIMD与SIMT切换——SIMT VF抽象为一个SIMT Thread Block，内部基于Thread编程；SIMD VF内部直接调用SIMD指令。
 
-为简化表述，下文以 SIMD 和 SIMT 分别指代对应的编程模型。二者定义了指令驱动多计算单元协同工作的核心机制，是提升数据吞吐量、优化计算性能的关键技术，也是 Ascend C 编程的核心内容，下文将分别展开介绍。
+为简化表述，下文以SIMD和SIMT分别指代对应的编程模型。二者定义了指令驱动多计算单元协同工作的核心机制，是提升数据吞吐量、优化计算性能的关键技术，也是Ascend C编程的核心内容，下文将分别展开介绍。
 
 ### SIMD（单指令多数据）
 
