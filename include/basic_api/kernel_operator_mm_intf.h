@@ -33,6 +33,7 @@
 #include "../../impl/basic_api/utils/kernel_utils_macros.h"
 
 #include "kernel_operator_mm_bitmode_intf.h"
+#include "kernel_operator_ptr_utils.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>

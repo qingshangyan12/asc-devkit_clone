@@ -28,6 +28,7 @@
 #include "kernel_struct_fixpipe.h"
 #include "kernel_tensor.h"
 #include "../../impl/basic_api/utils/kernel_utils_macros.h"
+#include "kernel_operator_ptr_utils.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
