@@ -56,9 +56,9 @@ using namespace AscendC;
 
 namespace {
 
-constexpr uint32_t BLK = ONE_BLK_SIZE; // 32B
+constexpr uint32_t PTR_UT_BLK = ONE_BLK_SIZE; // 32B (renamed: BLK clashes with stub_fun.h Literal::BLK under the CPU-debug regime)
 
-__aicore__ inline constexpr uint32_t BlkCeil(const uint32_t bytes) { return (bytes + BLK - 1) / BLK; }
+__aicore__ inline constexpr uint32_t BlkCeil(const uint32_t bytes) { return (bytes + PTR_UT_BLK - 1) / PTR_UT_BLK; }
 
 // ---------------------------------------------------------------------------------------------
 // Local-memory operand pairs (Tensor side + pointer side) on disjoint storage.
@@ -779,7 +779,7 @@ __global__ __aicore__ void KernelPtrPadGm2Ub(
 {
     TPipe tpipe;
     LocalPair<T, TPosition::VECCALC> ub;
-    ub.Init(tpipe, elemCount + BLK / sizeof(T));
+    ub.Init(tpipe, elemCount + PTR_UT_BLK / sizeof(T));
 
     GlobalTensor<T> srcGlobal = MakeGlobal<T>(srcGm, elemCount);
     GlobalTensor<T> outPtrHalf = MakeGlobal<T>(dstGm, elemCount);
@@ -896,7 +896,7 @@ __global__ __aicore__ void KernelPtrL1ToUb(
     pipe_barrier(PIPE_ALL);
 
     if (paramsForm) {
-        DataCopyParams repeatParams{1, static_cast<uint16_t>(count * sizeof(T) / BLK), 0, 0};
+        DataCopyParams repeatParams(1, static_cast<uint16_t>(count * sizeof(T) / PTR_UT_BLK), 0, 0);
         // ---- pointer path: L1 pointer -> UB pointer (DataCopyParams form) ----
         if constexpr (HasDataCopyL1ToUbParams<__ubuf__ T*, __cbuf__ T*>::value) {
             DataCopyL1ToUB(ub.UbPtr(), l1.L1Ptr(), repeatParams);
