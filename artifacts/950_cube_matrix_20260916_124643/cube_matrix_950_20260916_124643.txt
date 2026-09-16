@@ -1,0 +1,38 @@
+=== CUBE 950 matrix START 2026-09-16T12:46:43+00:00 ===
+WS=/home/Temp_room/wj_cub_cube_ptr_950 BRANCH=feature/cube-basic-api-pointerization STAMP=20260916_124643 ARCH=dav-3510
+ASCEND_HOME_PATH=/usr/local/Ascend/cann-9.1.0-beta.3 CXX=/usr/bin/g++
+From https://gitcode.com/qq_53202098/asc-devkit
+ * branch                feature/cube-basic-api-pointerization -> FETCH_HEAD
+Your branch is up to date with 'origin/feature/cube-basic-api-pointerization'.
+HEAD is now at 2b3830d17 chore(scripts): add 950/910B CUBE matrix runners (plaintext PTA, auto upload logs)
+REPO_HEAD=2b3830d17 @ /home/Temp_room/wj_cub_cube_ptr_950/helper_repo
+Cloning into '/home/Temp_room/wj_cub_cube_ptr_950/src/asc-devkit'...
+From https://gitcode.com/qq_53202098/asc-devkit
+ * branch                feature/cube-basic-api-pointerization -> FETCH_HEAD
+Your branch is up to date with 'origin/feature/cube-basic-api-pointerization'.
+HEAD is now at 2b3830d17 chore(scripts): add 950/910B CUBE matrix runners (plaintext PTA, auto upload logs)
+REPO_HEAD=2b3830d17 @ /home/Temp_room/wj_cub_cube_ptr_950/src/asc-devkit
+TEST_HEAD=2b3830d17
+OVERLAY_OK
+==== RUN mmad s1 ====
+==== RUN fixpipe_l0c2gm s1 ====
+==== RUN load_data_l12l0 s1 ====
+==== RUN batch_matmul s1 ====
+==== RUN mmad_gemv s1 ====
+# Ascend950 CUBE self-test matrix
+
+- HEAD: 2b3830d17
+- ARCH: dav-3510
+- STAMP: 20260916_124643
+
+- verify PASS: **0**
+- FAIL: 5
+
+| case | scenario | arch | build | run | verify | note |
+|---|---|---|---|---|---|---|
+| mmad | 1 | dav-3510 | BUILD_FAIL | - | - | /home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_124643/mmad_s1/mmad.asc:15:54: error: unknown type name 'Fixpipe' |
+| fixpipe_l0c2gm | 1 | dav-3510 | BUILD_FAIL | - | - | /home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_124643/fixpipe_l0c2gm_s1/fixpipe_l0c2gm.asc:14:54: error: unknown |
+| load_data_l12l0 | 1 | dav-3510 | BUILD_FAIL | - | - |  |
+| batch_matmul | 1 | dav-3510 | BUILD_FAIL | - | - | /home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_124643/batch_matmul_s1/batch_matmul.asc:14:54: error: unknown type |
+| mmad_gemv | 1 | dav-3510 | BUILD_FAIL | - | - | /home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_124643/mmad_gemv_s1/mmad_gemv.asc:14:54: error: unknown type name |
+bad_rows 5

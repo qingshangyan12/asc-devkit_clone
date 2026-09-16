@@ -1,0 +1,6 @@
+case	scenario	arch	build	run	verify	note
+mmad	1	dav-3510	BUILD_FAIL	-	-	/home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_124643/mmad_s1/mmad.asc:15:54: error: unknown type name 'Fixpipe'
+fixpipe_l0c2gm	1	dav-3510	BUILD_FAIL	-	-	/home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_124643/fixpipe_l0c2gm_s1/fixpipe_l0c2gm.asc:14:54: error: unknown 
+load_data_l12l0	1	dav-3510	BUILD_FAIL	-	-	
+batch_matmul	1	dav-3510	BUILD_FAIL	-	-	/home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_124643/batch_matmul_s1/batch_matmul.asc:14:54: error: unknown type
+mmad_gemv	1	dav-3510	BUILD_FAIL	-	-	/home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_124643/mmad_gemv_s1/mmad_gemv.asc:14:54: error: unknown type name 

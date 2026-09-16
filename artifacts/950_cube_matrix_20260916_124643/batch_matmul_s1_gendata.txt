@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_124643/batch_matmul_s1/scripts/gen_data.py", line 15, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+Traceback (most recent call last):
+  File "/home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_124643/batch_matmul_s1/scripts/gen_data.py", line 15, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
