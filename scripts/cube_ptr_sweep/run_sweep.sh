@@ -285,6 +285,23 @@ else
   CMAKE_JOBS="${CMAKE_JOBS:-8}"
 fi
 
+# CUBE_BATCH=1 (default): all_ok-style group compile once, run many shapes
+CUBE_BATCH="${CUBE_BATCH:-1}"
+if [ "$CUBE_BATCH" = "1" ]; then
+  # few group builds — use more compile jobs even under multi-device
+  CMAKE_JOBS="${CUBE_BATCH_CMAKE_JOBS:-8}"
+  export CUBE_ARCH="$ARCH" CUBE_SRC="$SRC" RUN_ROOT="$RUNROOT"
+  export CXX CC CMAKE_ASC_FLAGS="$ASC_FLAGS" CMAKE_ASC_ARCHITECTURES="$ARCH"
+  export PY CUBE_JSONL="$JSONL" CMAKE_JOBS DEVICES
+  export CUBE_BATCH_CHUNK="${CUBE_BATCH_CHUNK:-16}"
+  echo "BATCH_MODE=1 CHUNK=${CUBE_BATCH_CHUNK} DEVICES=${DEVICES:-0} CMAKE_JOBS=$CMAKE_JOBS"
+  "$PY" "$SRC/scripts/cube_ptr_sweep/run_batch.py"
+else
+if [ -n "$DEVICES" ]; then
+  CMAKE_JOBS="${PARALLEL_CMAKE_JOBS:-2}"
+else
+  CMAKE_JOBS="${CMAKE_JOBS:-8}"
+fi
 run_list() {
   local list="$1"
   while IFS=$'\t' read -r api cid dtype M N K sc; do
@@ -340,6 +357,7 @@ PY
   done
 else
   run_list "$SEL"
+fi
 fi
 
 "$PY" - <<PY
