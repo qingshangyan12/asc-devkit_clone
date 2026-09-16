@@ -92,7 +92,7 @@
     | `--device /dev/davinci_manager` | 映射NPU设备管理接口 | - |
     | `--device /dev/devmm_svm` | 映射设备内存管理接口 | - |
     | `--device /dev/hisi_hdc` | 映射主机与设备间的通信接口 | - |
-    | `-v /usr/local/dcmi:/usr/local/dcmi` | 挂载设备容器管理接口（DCMI）相关工具和库 | - |
+    | `-v /usr/local/dcmi:/usr/local/dcmi` | 挂载设备控制管理接口（DCMI）相关工具和库 | - |
     | `-v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi` | 挂载`npu-smi`工具 | 使容器内可以直接运行此命令来查询NPU状态和性能信息 |
     | `-v /usr/local/Ascend/driver/lib64/:/usr/local/Ascend/driver/lib64/` | 将宿主机的NPU驱动库映射到容器内 | - |
     | `-v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info` | 挂载驱动版本信息文件 | - |
@@ -203,7 +203,7 @@ git clone https://gitcode.com/cann/asc-devkit.git
 > [!NOTE] 使用前须知
 > 如您使用**容器化技术**，容器中已为您安装好依赖，可跳过此步骤。
 
-以下为本开源仓源码编译和examples算子样例编译运行的基础依赖条件，您可参考仓库内[DevContainer Python依赖（以 Python 3.12 为例）](../../.devcontainer/requirements.txt)：
+以下为本开源仓源码编译和examples算子样例编译运行的基础依赖条件。Python依赖可参考仓库内[DevContainer Python依赖（以 Python 3.12 为例）](../../.devcontainer/requirements.txt)：
 
 - python >= 3.9.0
 - gcc >= 7.3.0 / g++ >= 7.3.0 (注意：要求gcc与g++版本一致)

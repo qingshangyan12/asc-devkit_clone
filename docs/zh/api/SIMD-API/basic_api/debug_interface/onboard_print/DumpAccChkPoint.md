@@ -37,7 +37,7 @@
 
 该接口Dump指定Tensor的内容。同时支持打印自定义的标签（仅支持uint32_t数据类型的信息），比如打印当前行号等。区别于[DumpTensor](DumpTensor.md)，使用该接口可以支持指定偏移位置的Tensor打印。
 
-在算子kernel侧实现代码中需要打印偏移后Tensor数据的地方，调用DumpAccChkPoint接口打印相关内容。样例如下：
+在算子核函数（Kernel）侧实现代码中需要打印偏移后Tensor数据的地方，调用DumpAccChkPoint接口打印相关内容。样例如下：
 
 ```cpp
 AscendC::DumpAccChkPoint(srcLocal, 5, 32, dataLen);
@@ -95,7 +95,7 @@ __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &tensor, uint32_t i
 
 - 当前仅支持打印存储位置为Unified Buffer（UB）/L1 Buffer/L0C Buffer/Global Memory的Tensor信息。
 <!-- npu="950" id100 -->
-- 针对Ascend 950PR/Ascend 950DT，使用该接口打印L1 Tensor数据时，HDK版本需要至少升级到25.7.0以上。
+- 针对Ascend 950PR/Ascend 950DT，使用该接口打印L1 Tensor数据时，HDK版本需要至少升级到25.7.RC1.6以上。
 <!-- end id100 -->
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
 - 单次调用DumpAccChkPoint打印的数据总量不可超过30KB（还包括少量框架需要的头尾信息，通常可忽略）。使用时应注意，如果超出这个限制，则数据不会被打印。
