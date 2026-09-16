@@ -1,0 +1,3 @@
+[AIC Block 0/1] C in L1 buffer:
+[AIC Block 0] DumpTensor: desc=1, addr=0x12800, data_type=float16, position=L1, dump_size=10
+[1217.000000, 1354.000000, 1328.000000, 1093.000000, 1144.000000, 1296.000000, 1332.000000, 1254.000000, 1168.000000, 1262.000000]
