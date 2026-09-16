@@ -23,12 +23,6 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
-<!-- npu="x90" id8 -->
-- Kirin X90：支持
-<!-- end id8 -->
-<!-- npu="9030" id9 -->
-- Kirin 9030：支持
-<!-- end id9 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cache_control/DataCacheCleanAndInvalid_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -38,9 +32,9 @@
 如图1所示，在AI Core内部，Scalar单元和DMA单元都可能对GM进行访问：
 
 - DMA搬运单元读写GM，数据通过DataCopy等接口在Unified Buffer（UB）等Local Memory和GM间交互，没有Cache一致性问题。
-- Scalar单元访问GM，首先会访问每个核内的Data Cache，因此存在Data Cache与GM的Cache一致性问题，具体原因请参考[缓存一致性](../../../../guide/programming_guide/advanced_programming/memory_model/cache_coherence.md)。
+- Scalar单元访问GM，首先会访问每个核内的Data Cache（DCache），因此存在DCache与GM的Cache一致性问题，具体原因请参考[缓存一致性](../../../../guide/programming_guide/advanced_programming/memory_model/cache_coherence.md)。
 
-**图1**  DataCache内存层次示意图<a name="zh-cn_topic_0000002530021782_fig1161014168448"></a>  
+**图1**  DCache内存层次示意图<a name="zh-cn_topic_0000002530021782_fig1161014168448"></a>
 
 ![](../../../figures/datacache.png)
 
