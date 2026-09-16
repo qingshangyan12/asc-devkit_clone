@@ -77,22 +77,22 @@ __aicore__ inline void SetConvPadding(const ConvPaddingParams<T>& params)
 
 // __aicore__ inline void SetFixPipeConfig(const FixPipeConfigBitModeParams& params) { SetFixPipeConfigImpl(params); }
 
-// __aicore__ inline void SetFixPipeConfig(const FixPipeConfigParams& params) { SetFixPipeConfigImpl(params); }
+__aicore__ inline void SetFixPipeConfig(const FixPipeConfigParams& params) { SetFixPipeConfigImpl(params); }
 
-// __aicore__ inline void SetFixPipeReluAlpha(const FixPipeReluAlphaBitModeParams& params)
-// {
-//     SetFixPipeReluAlphaImpl(params);
-// }
+__aicore__ inline void SetFixPipeReluAlpha(const FixPipeReluAlphaBitModeParams& params)
+{
+    SetFixPipeReluAlphaImpl(params);
+}
 
-// __aicore__ inline void SetFixPipeReluAlpha(const FixPipeReluAlphaParams& params) { SetFixPipeReluAlphaImpl(params); }
+__aicore__ inline void SetFixPipeReluAlpha(const FixPipeReluAlphaParams& params) { SetFixPipeReluAlphaImpl(params); }
 
-// __aicore__ inline void SetFixpipePostQuantFlag(uint64_t config) { SetFixpipePostQuantFlagImpl(config); }
+__aicore__ inline void SetFixpipePostQuantFlag(uint64_t config) { SetFixpipePostQuantFlagImpl(config); }
 
-// __aicore__ inline void SetFixpipeEltAntiq(uint64_t config) { SetFixpipeEltAntiqImpl(config); }
+__aicore__ inline void SetFixpipeEltAntiq(uint64_t config) { SetFixpipeEltAntiqImpl(config); }
 
-// __aicore__ inline void SetFixPipeAddr(const FixPipeAddrBitModeParams& params) { SetFixPipeAddrImpl(params); }
+__aicore__ inline void SetFixPipeAddr(const FixPipeAddrBitModeParams& params) { SetFixPipeAddrImpl(params); }
 
-// __aicore__ inline void SetFixPipeAddr(const FixPipeAddrParams& params) { SetFixPipeAddrImpl(params); }
+__aicore__ inline void SetFixPipeAddr(const FixPipeAddrParams& params) { SetFixPipeAddrImpl(params); }
 
 __aicore__ inline void SetConvStridePara(const ConvStrideBitModeParams& params) { SetConvStrideParaImpl(params); }
 
