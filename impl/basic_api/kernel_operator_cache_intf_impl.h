@@ -88,14 +88,14 @@ __aicore__ inline void DataCacheCleanAndInvalid(__gm__ T* dst)
 template <typename T, CacheLine entireType, DcciDst dcciDst>
 __aicore__ inline void DataCacheCleanAndInvalid(const LocalTensor<T>& dst)
 {
-    DcciUBImpl<T, entireType, dcciDst>(const_cast<__ubuf__ T*>(GetUnderlyingPtr(dst)));
+    DcciUBImpl<T, entireType, dcciDst>((__ubuf__ T*)GetUnderlyingPtr(dst));
 }
 
 #if !defined(ASCENDC_CPU_DEBUG) || ASCENDC_CPU_DEBUG != 1
 template <typename T, CacheLine entireType, DcciDst dcciDst>
 __aicore__ inline void DataCacheCleanAndInvalid(__ubuf__ T* dst)
 {
-    DcciUBImpl<T, entireType, dcciDst>(const_cast<__ubuf__ T*>(GetUnderlyingPtr(dst)));
+    DcciUBImpl<T, entireType, dcciDst>((__ubuf__ T*)GetUnderlyingPtr(dst));
 }
 #endif
 #endif

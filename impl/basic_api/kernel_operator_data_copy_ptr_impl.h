@@ -118,6 +118,14 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(__gm__ T* dst, __ubuf__ T* 
 }
 
 template <typename T>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(__gm__ T* dst, __cbuf__ T* src, const uint32_t count)
+{
+    DataCopyParams repeatParams;
+    DataCopyCheck<T>(count, repeatParams);
+    DataCopy(dst, src, repeatParams);
+}
+
+template <typename T>
 __aicore__ inline void DataCopy(__ubuf__ T* dst, __ubuf__ T* src, const uint32_t count)
 {
     using PrimType = PrimT<T>;
