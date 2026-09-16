@@ -40,7 +40,11 @@ if(SCENARIO_NUM STREQUAL "3" AND CMAKE_ASC_ARCHITECTURES STREQUAL "dav-2201")
     message(FATAL_ERROR "SCENARIO_NUM=${SCENARIO_NUM} only supports dav-3510, not dav-2201")
 endif()
 
-add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
+set(CASE_M "128" CACHE STRING "matrix M")
+set(CASE_N "256" CACHE STRING "matrix N")
+set(CASE_K "128" CACHE STRING "matrix K")
+add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM} -DCASE_M=${CASE_M} -DCASE_N=${CASE_N} -DCASE_K=${CASE_K})
+message(STATUS "[INFO] SCENARIO_NUM=${SCENARIO_NUM} CASE_MNK=${CASE_M}x${CASE_N}x${CASE_K}")
 
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>

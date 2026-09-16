@@ -20,10 +20,7 @@ except ImportError:
     bfloat16 = None
 
 
-def gen_golden_data(scenario_num=1):
-    m = 30
-    k = 70
-    n = 40
+def gen_golden_data(scenario_num=1, m=30, n=40, k=70):
     if scenario_num == 1:
         x1_gm = np.random.randint(1, 10, [m, k]).astype(np.int8)
         x2_gm = np.random.randint(1, 10, [k, n]).astype(np.int8)
@@ -91,5 +88,8 @@ def gen_golden_data(scenario_num=1):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 5))
+    parser.add_argument("-M", type=int, default=30)
+    parser.add_argument("-N", type=int, default=40)
+    parser.add_argument("-K", type=int, default=70)
     args = parser.parse_args()
-    gen_golden_data(args.scenarioNum)
+    gen_golden_data(args.scenarioNum, args.M, args.N, args.K)
