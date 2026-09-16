@@ -2,13 +2,13 @@
 
 ## Overview
 
-This sample uses two element-wise accumulation operations — three-operand multiply-add (`a[index] += b[index] * c[index]`) and two-operand add (`a[index] += b[index]`) — as vehicles to demonstrate how to optimize performance with atomic add.
+This sample uses two in-place accumulation operations — three-operand multiply-add (`a[index] += b[index] * c[index]`) and two-operand add (`a[index] += b[index]`) — as vehicles to demonstrate how to optimize performance with atomic add.
 
 ## Supported Products and CANN Versions
 
 | Product | CANN Version |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -160,9 +160,9 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void vector_add_atomic(
 
 The performance data shows one phenomenon: switching to atomic add reduces the Task Duration by 6.8%.
 
-First, the basic data flow; the paths of the two scenarios are the same as in Case 0: in Scenario 2, `b[index]` and the old value of `a[index]` must both be read into registers; after the addition completes in a register, the result is written back, so the old value likewise makes an L2 Cache→register→L2 Cache round trip. Scenario 3 switches to the atomic path, where the read, addition, and write-back of the old value are completed at the L2 Cache side, and the old value never passes through the registers.
+The basic data flow is the same as in Case 0: in Scenario 2 the old value still makes an L2 Cache→register→L2 Cache round trip, while Scenario 3 switches to the atomic path, where the old value never passes through the registers.
 
-**Principle 1: The data round trip of the old value in and out of the registers is eliminated.** As in Case 0, after Scenario 3 switches to the atomic path, the L2 Cache→register→L2 Cache round trip that the old value makes in Scenario 2 is eliminated.
+**Principle 1: The data round trip of the old value in and out of the registers is eliminated.** As in Case 0, after Scenario 3 switches to the atomic path, the data round trip of the old value in and out of the registers in Scenario 2 is eliminated.
 
 **Conclusion**: For element-wise accumulation in two-operand add, prefer completing the accumulation with atomic add in L2.
 
@@ -184,7 +184,7 @@ The conclusion of both controlled groups is consistent: the scenarios using atom
 ## Tuning Recommendations
 
 1. **Prefer atomic add for element-wise in-place accumulation**: When the old value of the target address is used only for accumulation and does not participate in other computations, switching to atomic add completes the read, addition, and write-back of the old value in L2, eliminating the data round trip of the old value in and out of the registers.
-2. **Note the applicability boundary**: This optimization applies only to element-wise in-place updates; before use, confirm that the target addresses of each thread's atomic operations do not overlap.
+2. **Note the applicability boundary**: This optimization applies only to element-wise in-place updates; before use, confirm that the target addresses of each thread's atomic operations do not overlap. Its boundary differs from reduction-style accumulation (multiple threads accumulating into the same address, e.g. the histogram counting in the [atomic_histogram](../atomic_histogram/README_en.md) sample): in reduction accumulation, atomic operations on the same address can only execute serially, so under address contention, using atomic add directly degrades performance instead; use the block-local accumulation and merge strategy shown in that sample.
 
 ## Build and Run
 
