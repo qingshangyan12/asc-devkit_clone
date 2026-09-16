@@ -812,6 +812,7 @@
                 -   [HF32](SIMD-API/c_api/cube_compute/mmad_compute_key_features/HF32.md)
                 -   [UnitFlag](SIMD-API/c_api/cube_compute/mmad_compute_key_features/UnitFlag.md)
                 -   [K方向对齐约束](SIMD-API/c_api/cube_compute/mmad_compute_key_features/k_direction_alignment_constraint.md)
+            -   [asc_enable_fp8](SIMD-API/c_api/cube_compute/asc_enable_fp8.md)
             -   [asc_enable_hf32](SIMD-API/c_api/cube_compute/asc_enable_hf32.md)
             -   [asc_enable_hf32_trans](SIMD-API/c_api/cube_compute/asc_enable_hf32_trans.md)
             -   [asc_enable_hif8](SIMD-API/c_api/cube_compute/asc_enable_hif8.md)
