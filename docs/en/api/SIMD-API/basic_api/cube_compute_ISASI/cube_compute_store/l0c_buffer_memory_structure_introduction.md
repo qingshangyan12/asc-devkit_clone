@@ -23,7 +23,7 @@ L0C_ADDR[16:0] = { BANK_DEPTH[6:0], BANK[3:0], BANK_WIDTH[5:0] }    // The bit o
 // BANK_WIDTH indicates the offset of the address within a row of the Bank, occupying 6 bits, with a value range of [0, 63].
 ```
 
-**Figure 1** L0C Buffer memory structure diagram ([NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn Keywords.md))<a id="zh-cn_topic_0000002555148561_fig1715315610160"></a>  
+**Figure 1** L0C Buffer memory structure diagram ([NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn Keywords.md))<a id="zh-cn_topic_0000002555148561_fig1715315610160"></a>  
 
 ![](../../../../figures/L0C_Memory_Structure.png)
 <!-- end id2 -->
@@ -40,7 +40,7 @@ L0C_ADDR[17:0] = { BANK_DEPTH[7:0], BANK[3:0], BANK_WIDTH[5:0] }    // The bit o
 // BANK_WIDTH indicates the offset of the address within a row of the Bank, occupying 6 bits, with a value range of [0, 63].
 ```
 
-**Figure 2** L0C Buffer memory structure diagram ([NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn Keywords.md))<a id="fig179810301543"></a>  
+**Figure 2** L0C Buffer memory structure diagram ([NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn Keywords.md))<a id="fig179810301543"></a>  
 
 ![](../../../../figures/L0C_Memory_Structure_950.png)
 <!-- end id1 -->

@@ -8,7 +8,7 @@ Cube storage supports multiple combinations of on-the-fly quantization and on-th
 The combinations of on-the-fly quantization and on-the-fly ReLU are shown in the following table:
 
 <!-- npu="A3,910b" id2 -->
-**Table 1** Combination table of on-the-fly quantization and on-the-fly ReLU ([NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md))
+**Table 1** Combination table of on-the-fly quantization and on-the-fly ReLU ([NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md))
 
 | quantPre\reluPre | no ReLU | Normal ReLU |
 | ------------------ | --------- | ------------ |
@@ -17,7 +17,7 @@ The combinations of on-the-fly quantization and on-the-fly ReLU are shown in the
 <!-- end id2 -->
 
 <!-- npu="950" id3 -->
-**Table 2** Combination table of on-the-fly quantization and on-the-fly ReLU ([NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md))
+**Table 2** Combination table of on-the-fly quantization and on-the-fly ReLU ([NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md))
 
 | quantPre\reluPre | no ReLU | Normal ReLU |
 | --- | --- | --- |

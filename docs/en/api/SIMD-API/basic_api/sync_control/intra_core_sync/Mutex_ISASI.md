@@ -12,8 +12,8 @@ Mutex is used for synchronization control between asynchronous pipeline instruct
 
 Each lock has a fixed MutexID. The way this ID is obtained and released differs across programming paradigms:
 
-- When the [TPipe-TQue framework programming paradigm](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/programming_model/ai_core_simd_programming/tpipe_tque_programming/tpipe_tque_framework_programming_paradigm.md) is used, the MutexID must be applied for and released through [AllocMutexID](AllocMutexID_ISASI.md)/[ReleaseMutexID](ReleaseMutexID_ISASI.md).
-- When the [static Tensor programming paradigm](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/programming_model/ai_core_simd_programming/cpp_tensor_programming/static_tensor_programming.md) is used, the MutexID is managed by the developer. It is recommended to use 0-27, while 28-31 are reserved for internal system planning and are not recommended for use.
+- When the [TPipe-TQue framework programming paradigm](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/programming_model/ai_core_simd_programming/tpipe_tque_programming/tpipe_tque_framework_programming_paradigm.md) is used, the MutexID must be applied for and released through [AllocMutexID](AllocMutexID_ISASI.md)/[ReleaseMutexID](ReleaseMutexID_ISASI.md).
+- When the [static Tensor programming paradigm](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/programming_model/ai_core_simd_programming/cpp_tensor_programming/static_tensor_programming.md) is used, the MutexID is managed by the developer. It is recommended to use 0-27, while 28-31 are reserved for internal system planning and are not recommended for use.
 
 Compared with the [SetFlag/WaitFlag](SetFlag_WaitFlag_ISASI.md) synchronization mechanism, the **Lock**/**Unlock** APIs offer the following advantages:
 

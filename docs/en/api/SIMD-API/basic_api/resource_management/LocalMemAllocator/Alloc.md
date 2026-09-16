@@ -112,7 +112,7 @@ Returns the **LocalTensor** object constructed based on the user input.
 ## Constraints<a name="section633mcpsimp"></a>
 
 <!-- npu="950" id1 -->
-- For Ascend 950PR/Ascend 950DT, UB memory allocation is performed on top of static memory. That is, the initial position of dynamic memory is determined by referring to [memory hierarchy](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/advanced_programming/advanced_ai_core_programming_model/simd_simt_hybrid_programming/memory_hierarchy.md).
+- For Ascend 950PR/Ascend 950DT, UB memory allocation is performed on top of static memory. That is, the initial position of dynamic memory is determined by referring to [memory hierarchy](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/advanced_programming/advanced_ai_core_programming_model/simd_simt_hybrid_programming/memory_hierarchy.md).
 <!-- end id1 -->
 - Mixing with static arrays of **L1 Buffer**, **L0A Buffer**, **L0B Buffer**, **L0C Buffer**, and **BiasTable** is not supported.
 

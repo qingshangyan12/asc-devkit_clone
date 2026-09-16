@@ -173,7 +173,7 @@ Used to allocate memory for queues such as **TQue** and for **TBuf**.
 -   The total number of buffers used in a kernel cannot exceed 64.
 -   Mixing the custom-address **InitBuffer** allocation method with the method that does not specify an address is not recommended, as it may cause memory conflicts.
 <!-- npu="950" id1 -->
-- For Ascend 950PR/Ascend 950DT, UB memory allocation is performed on top of static memory. That is, the initial position of dynamic memory is based on static memory. For details, see [memory hierarchy](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/advanced_programming/advanced_ai_core_programming_model/simd_simt_hybrid_programming/memory_hierarchy.md).
+- For Ascend 950PR/Ascend 950DT, UB memory allocation is performed on top of static memory. That is, the initial position of dynamic memory is based on static memory. For details, see [memory hierarchy](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/advanced_programming/advanced_ai_core_programming_model/simd_simt_hybrid_programming/memory_hierarchy.md).
 <!-- end id1 -->
 - Mixing with static arrays such as L1 Buffer, L0A Buffer, L0B Buffer, L0C Buffer, and BiasTable is not supported currently.
 

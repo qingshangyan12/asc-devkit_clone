@@ -269,7 +269,7 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
 
 ### Mask Mechanism Comparison Between NPU Architecture Version 2201 and NPU Architecture Version 3510
 
-This section compares the Mask mechanism in the per-bit computation of [NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md) in Normal mode with the Mask mechanism based on Reg vector computation in [NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md).
+This section compares the Mask mechanism in the per-bit computation of [NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md) in Normal mode with the Mask mechanism based on Reg vector computation in [NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md).
 
 - For Atlas A2 training products/Atlas A2 inference products and Atlas A3 training products/Atlas A3 inference products
 

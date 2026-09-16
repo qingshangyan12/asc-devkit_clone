@@ -39,7 +39,7 @@ __aicore__ inline TPipe()
 
 ## Constraints<a name="section633mcpsimp"></a>
 
--   Avoid the creation and initialization of **TPipe** within the object. Creating **TPipe** within the object may affect the compiler's optimization of constants within the object, causing scalar performance degradation. For details, see [Avoiding the Creation and Initialization of TPipe Within the Object](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/operator_practice/simd_operator_optimization/overhead_optimization/avoid_creating_and_initializing_tpipe_inside_object.md).
+-   Avoid the creation and initialization of **TPipe** within the object. Creating **TPipe** within the object may affect the compiler's optimization of constants within the object, causing scalar performance degradation. For details, see [Avoiding the Creation and Initialization of TPipe Within the Object](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/operator_practice/simd_operator_optimization/overhead_optimization/avoid_creating_and_initializing_tpipe_inside_object.md).
 -   Only one **TPipe** object can exist globally at a time. Defining multiple **TPipe** objects simultaneously may cause random behaviors such as hanging. If you need to use multiple **TPipe** objects, call the [Destroy](Destroy.md) API first to release the previous **TPipe**.
 
 ## Return Value<a name="section640mcpsimp"></a>

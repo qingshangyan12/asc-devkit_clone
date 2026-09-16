@@ -15,7 +15,7 @@ In the Reg vector computation architecture, the Vector Function (VF) is the core
 - To use the count of an outer loop as the loop boundary, assign the outer loop counter to a scalar and then use it as the inner loop boundary.
 
 ## Dual-Issue Optimization
-For detailed performance optimization content of dual-issue optimization, see [Operator Practice Reference - Dual-Issue Optimization](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/operator_practice/simd_operator_optimization/vector_compute/vf_optimization/dual_instruction_issue_optimization.md).
+For detailed performance optimization content of dual-issue optimization, see [Operator Practice Reference - Dual-Issue Optimization](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/operator_practice/simd_operator_optimization/vector_compute/vf_optimization/dual_instruction_issue_optimization.md).
 
 ### Dual-Issue
 
@@ -34,10 +34,10 @@ If a loop contains instructions with excessive dependencies, the instructions ca
 ## VF Fusion
 VF fusion combines multiple VF functions in the code into a single VF function, effectively improving performance. The VF fusion feature is a compiler optimization feature, enabled through the compilation option --cce-simd-vf-fusion=true. VF automatic fusion uses the Loop Fuse algorithm to convert VFs into Loop form, then fuses control-flow-equivalent VFs, and finally restores the VFs. The compiler first performs a legality check before fusion to determine whether two VFs are equivalent, whether the intermediate code on the Main side can be executed within the VF, and whether positive benefits can be generated after fusion. If the VF fusion conditions are met, the compiler automatically performs VF fusion optimization. To ensure that the execution logic and semantics of the fused VF are consistent with those before fusion, synchronization instructions are conservatively inserted between the original two VFs. The compiler also attempts to hoist and merge instructions in the fused VF to optimize the VF code. The fusion strategy is to fuse as much as possible. Users can increase the opportunities for VF fusion by coding according to patterns that comply with the fusion legality check. Users can also refer to the fusion principles to perform fusion optimization manually.
 
-For detailed information on VF fusion performance optimization, see [Operator Practice Reference - VF Fusion Optimization](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/operator_practice/simd_operator_optimization/vector_compute/vf_optimization/vf_fusion_optimization.md).
+For detailed information on VF fusion performance optimization, see [Operator Practice Reference - VF Fusion Optimization](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/operator_practice/simd_operator_optimization/vector_compute/vf_optimization/vf_fusion_optimization.md).
 
 ## Data Loading Optimization
-The Reg vector computation API provides multiple loading instructions as shown in the following table. Select loading APIs appropriately and leverage their capabilities for optimization. For details on performance optimization for continuous non-alignment scenarios, see [Operator Practice Reference - Continuous Non-alignment Scenario Optimization](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/operator_practice/simd_operator_optimization/vector_compute/vf_optimization/continuous_unaligned_scenario_optimization.md).
+The Reg vector computation API provides multiple loading instructions as shown in the following table. Select loading APIs appropriately and leverage their capabilities for optimization. For details on performance optimization for continuous non-alignment scenarios, see [Operator Practice Reference - Continuous Non-alignment Scenario Optimization](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/operator_practice/simd_operator_optimization/vector_compute/vf_optimization/continuous_unaligned_scenario_optimization.md).
 | Scenario | Description |
 | :-- | :-- | 
 | Continuous aligned loading (LoadAlign) | Loads data continuously from UB with a 32B-aligned start address into RegTensor. |

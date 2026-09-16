@@ -48,7 +48,7 @@ For detailed descriptions of the quantization algorithms of different quantizati
 The following table describes the bit field meanings of the quantization parameters:
 
 <!-- npu="A3,910b" id3 -->
-**Table 1** Mapping of quantization parameter QUANT\_PRE bit field meanings ([NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md))<a id="zh-cn_topic_0000002547300781_table1273124313613"></a>
+**Table 1** Mapping of quantization parameter QUANT\_PRE bit field meanings ([NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md))<a id="zh-cn_topic_0000002547300781_table1273124313613"></a>
 
 | Mode | Bit field count | Variable name | Description |
 | ------ | ---------- | -------- | ---------- |
@@ -61,7 +61,7 @@ The following table describes the bit field meanings of the quantization paramet
 <!-- end id3 -->
 
 <!-- npu="950" id4 -->
-**Table 2** Mapping table of the bit field meanings of the quantization parameter QUANT\_PRE ([NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md))<a id="zh-cn_topic_0000002547300781_table1273124313714"></a>
+**Table 2** Mapping table of the bit field meanings of the quantization parameter QUANT\_PRE ([NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md))<a id="zh-cn_topic_0000002547300781_table1273124313714"></a>
 
 | Mode | Bit field count | Variable name | Description |
 | --- | --- | --- | --- |

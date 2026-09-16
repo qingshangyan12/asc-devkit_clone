@@ -14,7 +14,7 @@ Taking Ascend 950PR/Ascend 950DT as an example, Figure 1 shows the positional re
 ![](../../../../api/figures/atlas_950_cache_architecture_diagram.png "atlas_950_cache_architecture_diagram")
 <!-- end id1 -->
 <!-- npu="A3,910b" id2 -->
-Taking [NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md) as an example, Figure 2 shows the positional relationships of the three Cache types supported in the AI Core (L2 Cache, DCache, and ICache) within the hardware architecture.
+Taking [NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md) as an example, Figure 2 shows the positional relationships of the three Cache types supported in the AI Core (L2 Cache, DCache, and ICache) within the hardware architecture.
 
 **Figure 2**  Positional relationship diagram of the three Cache types in the AI Core<a name="zh-cn_topic_0000002583420201_fig496311278412"></a>  
 ![](../../../../api/figures/atlas_a2_a3_cache_architecture_diagram.png "atlas_a2_a3_cache_architecture_diagram")
@@ -82,7 +82,7 @@ The following describes whether each type of cache in different products needs t
     - SIMT DCache: In SIMT, data is written to GM immediately when written, so there is no consistency issue; when reading data from GM, it is a multi-core independent cache, so inter-core data consistency must be considered.
 <!-- end id3 -->
 <!-- npu="A3,910b" id4 -->
-- For [NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md), the three supported cache types behave as follows in terms of inter-core data consistency:
+- For [NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md), the three supported cache types behave as follows in terms of inter-core data consistency:
     - L2 Cache: A cache shared among multiple cores, so inter-core data inconsistency does not need to be considered.
     - DCache: A multi-core independent cache, so inter-core data consistency must be considered.
     - ICache: Read-only, so inter-core data inconsistency does not need to be considered.

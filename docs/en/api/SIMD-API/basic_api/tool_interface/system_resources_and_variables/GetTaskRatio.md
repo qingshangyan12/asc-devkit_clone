@@ -30,12 +30,12 @@
 
 The header file path is `"basic_api/kernel_operator_sys_var_intf.h"`.
 
-In [Separated Mode](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md), obtains the ratio of the number of Cube Cores (AIC) or Vector Cores (AIV) started by the task to the number of logical AI Cores.
+In [Separated Mode](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md), obtains the ratio of the number of Cube Cores (AIC) or Vector Cores (AIV) started by the task to the number of logical AI Cores.
 
 - When called on an AIC, returns the ratio of the number of AICs to the number of logical AI Cores.
 - When called on an AIV, returns the ratio of the number of AIVs to the number of logical AI Cores.
 
-In [Coupled Mode](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md), it always returns 1.
+In [Coupled Mode](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md), it always returns 1.
 
 ## Prototype
 
@@ -49,7 +49,7 @@ None
 
 ## Return Value
 
-- For [Separated Mode](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md), under different Kernel types (set through the [Setting the Kernel Type](../../Kernel-Tiling/set_kernel_type.md) API), the return values of this API when called on AIC and AIV are as follows:
+- For [Separated Mode](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md), under different Kernel types (set through the [Setting the Kernel Type](../../Kernel-Tiling/set_kernel_type.md) API), the return values of this API when called on AIC and AIV are as follows:
 
     **Table 1** Return value list
 
@@ -58,7 +58,7 @@ None
     | AIV | 1 | - | 2 | 1 | - | 1 |
     | AIC | - | 1 | 1 | 1 | 1 | - |
 
-- For [Coupled Mode](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md), it always returns 1.
+- For [Coupled Mode](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md), it always returns 1.
 
 ## Constraints
 

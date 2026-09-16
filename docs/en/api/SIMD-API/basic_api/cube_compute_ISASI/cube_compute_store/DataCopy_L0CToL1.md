@@ -36,13 +36,13 @@ The results of cube computation are stored in the L0C Buffer. The DataCopy API i
 The following figure shows the valid combinations of on-the-fly quantization, on-the-fly ReLU, and on-the-fly channel merging, as well as the intermediate data types and data paths. In the following figure, F32-\>F16 and F32-\>BF16 are non-quantization modes and are only Cast, while the rest are on-the-fly scalar/tensor quantization modes.
 
 <!-- npu="A3,910b" id9 -->
-**Figure 1** L0C2L1 flowchart ([NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md))<a id="zh-cn_topic_0000002511188540_fig8956371257"></a>  
+**Figure 1** L0C2L1 flowchart ([NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md))<a id="zh-cn_topic_0000002511188540_fig8956371257"></a>  
 
 ![](../../../../figures/L0C2L1_Function_Combination.png)
 <!-- end id9 -->
 
 <!-- npu="950" id11 -->
-**Figure 2** L0C2L1 flowchart ([NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md))<a id="zh-cn_topic_0000002542828493_fig1828513492475"></a>  
+**Figure 2** L0C2L1 flowchart ([NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md))<a id="zh-cn_topic_0000002542828493_fig1828513492475"></a>  
 
 ![](../../../../figures/L0C2L1_Function_Combination_DataCopy_950.png)
 <!-- end id11 -->

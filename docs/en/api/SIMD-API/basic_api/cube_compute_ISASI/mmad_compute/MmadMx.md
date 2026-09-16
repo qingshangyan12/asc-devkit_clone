@@ -175,4 +175,4 @@ None
 
 ## Example
 
-For a complete usage example, see [MmadMx best practices](https://gitcode.com/cann/asc-devkit/tree/9.1.0/examples/01_simd_cpp_api/05_best_practices/01_cube_compute/matmul_mxfp4_basic_api_high_performance).
+For a complete usage example, see [MmadMx best practices](https://gitcode.com/cann/asc-devkit/tree/9.1.0/examples/01_simd_cpp_api/05_best_practices/03_matrix_compute/matmul_mxfp4_basic_api_high_performance).
