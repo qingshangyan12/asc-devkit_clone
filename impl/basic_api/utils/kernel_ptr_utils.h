@@ -264,19 +264,44 @@ using DmaPrimT = typename DmaPrimTImpl<T>::type;
 
 /*!
  * \brief Operand shape predicates for the address-space generic overloads.
- *        GlobalTensor / LocalTensor are told apart by type, so a GM operand slot never accepts a LocalTensor.
- *        A raw pointer contributes its address space; the concrete space of a Tensor operand is runtime
- *        metadata and is therefore accepted by the local-operand slot (the original runtime dispatch inside the
- *        implementation keeps validating it).
+ *
+ * Disambiguation never relies on the address space: every generic family is separated by the operand slot
+ * (GlobalTensor vs LocalTensor, checked by type) and by the parameter types. The address space is only used
+ * to accept or reject a pointer in a slot, which is what the following predicates express.
+ *
+ * In CPU twin-debug the qualifiers are empty, so the space of a pointer is unrecoverable at compile time and
+ * every raw pointer is accepted in either slot; the address space check then degrades to the caller, which is
+ * the documented behaviour of the pointer paths. This keeps the pointer overloads viable -- and therefore
+ * executable in CPU twin-debug tests -- instead of removing them from that build.
  */
+#if !defined(ASCENDC_CPU_DEBUG) || ASCENDC_CPU_DEBUG != 1
 template <typename T>
-constexpr bool IsDmaGmOperand = IsDmaGmPtr<T> || IsDmaGlobalTensorV<T>;
+constexpr bool IsDmaPtrOperand = IsDmaPtr<T>;
 
-// A local-memory slot accepts a UB/L1/L0C/... pointer or a LocalTensor, but never a GlobalTensor: the GM and
-// the local operand shapes are mutually exclusive, so the GM->local and local->GM generic families can never
-// both be viable for the same call.
 template <typename T>
-constexpr bool IsDmaLocalOperand = IsDmaPtr<T> || IsDmaLocalTensorV<T>;
+constexpr bool IsDmaGmPtrOperand = IsDmaGmPtr<T>;
+
+template <typename T>
+constexpr bool IsDmaLocalPtrOperand = IsDmaPtr<T> && !IsDmaGmPtr<T>;
+#else
+template <typename T>
+constexpr bool IsDmaPtrOperand = Std::is_pointer_v<Std::remove_cv_t<T>>;
+
+template <typename T>
+constexpr bool IsDmaGmPtrOperand = Std::is_pointer_v<Std::remove_cv_t<T>>;
+
+template <typename T>
+constexpr bool IsDmaLocalPtrOperand = Std::is_pointer_v<Std::remove_cv_t<T>>;
+#endif // !ASCENDC_CPU_DEBUG
+
+// GM slot: a GlobalTensor, or a GM pointer. Never a LocalTensor, so the GM and the local slot of a family can
+// not both be satisfied by the same Tensor operand.
+template <typename T>
+constexpr bool IsDmaGmOperand = IsDmaGlobalTensorV<T> || IsDmaGmPtrOperand<T>;
+
+// Local slot: a LocalTensor, or a non-GM hardware pointer. Never a GlobalTensor.
+template <typename T>
+constexpr bool IsDmaLocalOperand = IsDmaLocalTensorV<T> || IsDmaLocalPtrOperand<T>;
 
 /*!
  * \brief `true` when at least one operand is a raw pointer. The generic overloads are only enabled by this
@@ -285,7 +310,7 @@ constexpr bool IsDmaLocalOperand = IsDmaPtr<T> || IsDmaLocalTensorV<T>;
  *        introduced and the original overload resolution is untouched.
  */
 template <typename DstT, typename SrcT>
-constexpr bool IsDmaPtrInvolved = IsDmaPtr<DstT> || IsDmaPtr<SrcT>;
+constexpr bool IsDmaPtrInvolved = IsDmaPtrOperand<DstT> || IsDmaPtrOperand<SrcT>;
 
 /*!
  * \brief Pointer extraction: a raw pointer is passed through unchanged (no reinterpret, no offset fixup), a
