@@ -190,8 +190,8 @@ __aicore__ inline void SetFixPipeReluAlphaCal(const FixPipeReluAlphaParams& para
     constexpr uint8_t POS_PRE_VALUE = 13;
 
     uint64_t reluAlpha = 0;
-    reluAlpha |= (uint64_t)(static_cast<uint8_t>(params.lut)) << POS_LUT;
-    reluAlpha |= (uint64_t)(params.preValue) << POS_PRE_VALUE;
+    reluAlpha |= (uint64_t)(static_cast<uint8_t>(params.lut) & 0x7) << POS_LUT;
+    reluAlpha |= (((uint64_t)GetScalarBitcodeValue(params.preValue) >> 13) & 0x7FFFF) << POS_PRE_VALUE;
 
     set_m_relu_alpha(reluAlpha);
 }
