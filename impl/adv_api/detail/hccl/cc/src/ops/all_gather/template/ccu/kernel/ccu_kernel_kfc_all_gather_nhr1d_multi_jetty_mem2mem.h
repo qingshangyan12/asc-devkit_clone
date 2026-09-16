@@ -18,14 +18,6 @@
 
 namespace mc2_ops_hccl {
 
-CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
-    ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable sliceSize,
-    ccu::Variable sliceSizePerJetty, ccu::Variable lastSliceSizePerJetty, ccu::Variable repeatNumInv,
-    ccu::Variable inputSliceStride, ccu::Variable outputSliceStride, ccu::Variable inputRepeatStride,
-    ccu::Variable outputRepeatStride, ccu::Variable isInputOutputEqual, ccu::Variable goSize0, ccu::Variable goSize1,
-    ccu::Variable goSize2, ccu::Variable goSize3, const ChannelHandle channels[], uint32_t channelCount,
-    uint32_t rankSize, uint32_t rankId, uint32_t jettyNum, const std::vector<KfcNhrStepInfo>& stepInfoVector,
-    const std::map<uint32_t, uint32_t>& rank2ChannelIdx);
 CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemDefineKernel(CcuKernelArg arg);
 
 CcuResult CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemKernel(

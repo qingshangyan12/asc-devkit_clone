@@ -339,44 +339,6 @@ static CcuResult LoadArgs(KfcAllReduceMesh1DMem2MemContext& ctx, ccu::Array<ccu:
     return CCU_SUCCESS;
 }
 
-static CcuResult LoadArgs(
-    KfcAllReduceMesh1DMem2MemContext& ctx, ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
-    ccu::Variable scratch, ccu::Variable currentRankSliceInputOffset, ccu::Variable currentRankSliceOutputOffset,
-    ccu::Variable normalSliceSize, ccu::Variable lastSliceSize, ccu::Variable mySliceSize, ccu::Variable sliceOffset,
-    ccu::Variable isInputOutputEqual, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2,
-    ccu::Variable goSize3, ccu::Variable chunkSize, ccu::Variable tailSize, ccu::Variable chunkLoopNum,
-    ccu::Variable fullGoSize0, ccu::Variable fullGoSize1, ccu::Variable fullGoSize2, ccu::Variable fullGoSize3,
-    ccu::Variable tailGoSize0, ccu::Variable tailGoSize1, ccu::Variable tailGoSize2, ccu::Variable tailGoSize3)
-{
-    ctx.input[ctx.rankId] = inputAddr;
-    ctx.output[ctx.rankId] = outputAddr;
-    ctx.token[ctx.rankId] = tokenInfo;
-    ctx.myScratch = scratch;
-    ctx.currentRankSliceInputOffset = currentRankSliceInputOffset;
-    ctx.currentRankSliceOutputOffset = currentRankSliceOutputOffset;
-    ctx.normalSliceSize = normalSliceSize;
-    ctx.lastSliceSize = lastSliceSize;
-    ctx.mySliceSize = mySliceSize;
-    ctx.sliceOffset = sliceOffset;
-    ctx.isInputOutputEqual = isInputOutputEqual;
-    ctx.goSize.addrOffset = goSize0;
-    ctx.goSize.loopParam = goSize1;
-    ctx.goSize.parallelParam = goSize2;
-    ctx.goSize.residual = goSize3;
-    ctx.chunkSize = chunkSize;
-    ctx.tailSize = tailSize;
-    ctx.chunkLoopNum = chunkLoopNum;
-    ctx.fullGoSize.addrOffset = fullGoSize0;
-    ctx.fullGoSize.loopParam = fullGoSize1;
-    ctx.fullGoSize.parallelParam = fullGoSize2;
-    ctx.fullGoSize.residual = fullGoSize3;
-    ctx.tailGoSize.addrOffset = tailGoSize0;
-    ctx.tailGoSize.loopParam = tailGoSize1;
-    ctx.tailGoSize.parallelParam = tailGoSize2;
-    ctx.tailGoSize.residual = tailGoSize3;
-    return CCU_SUCCESS;
-}
-
 static CcuResult PreSync(KfcAllReduceMesh1DMem2MemContext& ctx)
 {
     for (uint32_t i = 0; i < ctx.channelCount; i++) {
@@ -666,50 +628,6 @@ static CcuResult RunAllReduce(
     CCU_CHK_RET(PreSync(ctx));
     CCU_IF(ctx.mySliceSize != 0) { CCU_CHK_RET(DoRepeatAllReduceChunking(ctx)); }
     CCU_CHK_RET(PostSync(ctx));
-    return CCU_SUCCESS;
-}
-
-CcuResult CcuKfcAllReduceMesh1DMem2MemKernel(
-    ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable scratch,
-    ccu::Variable currentRankSliceInputOffset, ccu::Variable currentRankSliceOutputOffset,
-    ccu::Variable normalSliceSize, ccu::Variable lastSliceSize, ccu::Variable mySliceSize, ccu::Variable sliceOffset,
-    ccu::Variable isInputOutputEqual, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2,
-    ccu::Variable goSize3, ccu::Variable chunkSize, ccu::Variable tailSize, ccu::Variable chunkLoopNum,
-    ccu::Variable fullGoSize0, ccu::Variable fullGoSize1, ccu::Variable fullGoSize2, ccu::Variable fullGoSize3,
-    ccu::Variable tailGoSize0, ccu::Variable tailGoSize1, ccu::Variable tailGoSize2, ccu::Variable tailGoSize3,
-    const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
-    const HcclDataType& dataType, const HcclDataType& outputType, const HcclReduceOp& reduceType)
-{
-    KfcAllReduceMesh1DMem2MemContext ctx;
-    ctx.channels = channels;
-    ctx.channelCount = channelCount;
-    ctx.rankSize = rankSize;
-    ctx.rankId = rankId;
-    ctx.dataType = dataType;
-    ctx.outputDataType = outputType;
-    if (ctx.outputDataType == HcclDataType::HCCL_DATA_TYPE_RESERVED) {
-        ctx.outputDataType = ctx.dataType;
-        HCCL_DEBUG("[CcuMSAllReduceSoleMesh] outputDataType is [INVALID], set outputDataType to[%d]", ctx.dataType);
-    }
-    ctx.reduceOp = reduceType;
-    HCCL_INFO(
-        "[CcuKernelAllReduceMeshMem2Mem1D] Init, KernelArgs are rankId[%u], rankSize_[%u], dataType[%d], "
-        "outputDataType[%d], reduceOp[%d]",
-        ctx.rankId, ctx.rankSize, ctx.dataType, ctx.outputDataType, ctx.reduceOp);
-
-    InitCcuKernelCtxBase(ctx);
-
-    HCCL_INFO("[CcuKernelAllReduceMeshMem2Mem1D] AllReduceMeshMem2Mem1D run");
-    CCU_CHK_RET(InitResource(ctx));
-    CCU_CHK_RET(LoadArgs(
-        ctx, inputAddr, outputAddr, tokenInfo, scratch, currentRankSliceInputOffset, currentRankSliceOutputOffset,
-        normalSliceSize, lastSliceSize, mySliceSize, sliceOffset, isInputOutputEqual, goSize0, goSize1, goSize2,
-        goSize3, chunkSize, tailSize, chunkLoopNum, fullGoSize0, fullGoSize1, fullGoSize2, fullGoSize3, tailGoSize0,
-        tailGoSize1, tailGoSize2, tailGoSize3));
-    CCU_CHK_RET(PreSync(ctx));
-    CCU_IF(ctx.mySliceSize != 0) { CCU_CHK_RET(DoRepeatAllReduceChunking(ctx)); }
-    CCU_CHK_RET(PostSync(ctx));
-    HCCL_INFO("[CcuKernelAllReduceMeshMem2Mem1D] AllReduceMeshMem2Mem1D end");
     return CCU_SUCCESS;
 }
 
