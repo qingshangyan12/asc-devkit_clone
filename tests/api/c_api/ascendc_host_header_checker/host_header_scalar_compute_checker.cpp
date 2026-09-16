@@ -14,6 +14,9 @@ static void test_host_c_api_scalar_compute_0()
 {
     using ::asc_clear_nthbit;
     using ::asc_clz;
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    using ::asc_get_uintdiv_magic_and_shift;
+#endif
     using ::asc_ffs;
     using ::asc_ffz;
     using ::asc_float2half_ro;
