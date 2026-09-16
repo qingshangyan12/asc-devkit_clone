@@ -13,6 +13,10 @@
 namespace mc2_ops_hccl {
 using namespace hcomm;
 
+#ifndef CCU_AR_ABLATION
+#define CCU_AR_ABLATION 0
+#endif
+
 #define MAX_LOOP_NUM 2
 constexpr int INPUT_XN_ID = 0;
 constexpr int OUTPUT_XN_ID = 1;
@@ -546,6 +550,7 @@ static CcuResult ReduceRmtToLocChunking(
         }
         ccu::EventWait(ctx.events[i], static_cast<uint16_t>((1 << sigNum) - 1));
     }
+#if CCU_AR_ABLATION == 0
     if (ctx.rankSize <= GROUP_REDUCE_MAX_PIECE_CNT) {
         std::vector<ccu::LocalAddr> scratch = ctx.reduceScatterDst;
         scratch[ctx.rankId].addr = ctx.reduceScatterSrc[ctx.rankId].addr;
@@ -557,6 +562,7 @@ static CcuResult ReduceRmtToLocChunking(
             ctx, ctx.localDstMem, ctx.reduceScatterDst, ctx.currentSliceSize, ctx.dataType, ctx.outputDataType,
             ctx.reduceOp));
     }
+#endif
     return CCU_SUCCESS;
 }
 
@@ -614,7 +620,9 @@ static CcuResult DoRepeatAllReduceChunking(KfcAllReduceMesh1DMem2MemContext& ctx
         }
         ctx.chunkLoopNum += one;
         CCU_CHK_RET(ReduceRmtToLocChunking(ctx, ctx.input, ctx.output[ctx.rankId]));
+#if CCU_AR_ABLATION != 3
         CCU_CHK_RET(BcastLocToRmtChunking(ctx, ctx.output[ctx.rankId], ctx.output));
+#endif
         for (uint32_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
             ctx.input[rankIdx] += ctx.currentSliceSize;
             ctx.output[rankIdx] += ctx.currentSliceSize;
@@ -654,6 +662,9 @@ CcuResult CcuKfcAllReduceMesh1DMem2MemKernel(
     InitCcuKernelCtxBase(ctx);
 
     HCCL_INFO("[CcuKernelAllReduceMeshMem2Mem1D] AllReduceMeshMem2Mem1D run");
+#if CCU_AR_ABLATION != 0
+    HCCL_INFO("[CcuKernelAllReduceMeshMem2Mem1D] ablation mode[%d]", CCU_AR_ABLATION);
+#endif
     CCU_CHK_RET(InitResource(ctx));
     CCU_CHK_RET(LoadArgs(
         ctx, inputAddr, outputAddr, tokenInfo, scratch, currentRankSliceInputOffset, currentRankSliceOutputOffset,
@@ -662,7 +673,9 @@ CcuResult CcuKfcAllReduceMesh1DMem2MemKernel(
         tailGoSize1, tailGoSize2, tailGoSize3));
     CCU_CHK_RET(PreSync(ctx));
 
+#if CCU_AR_ABLATION != 1
     CCU_IF(ctx.mySliceSize != 0) { CCU_CHK_RET(DoRepeatAllReduceChunking(ctx)); }
+#endif
 
     CCU_CHK_RET(PostSync(ctx));
     HCCL_INFO("[CcuKernelAllReduceMeshMem2Mem1D] AllReduceMeshMem2Mem1D end");
