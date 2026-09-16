@@ -21,9 +21,9 @@ L0C_ADDR[16:0] = { BANK_DEPTH[6:0], BANK[3:0], BANK_WIDTH[5:0] }    // bit位顺
 // BANK_WIDTH表示地址在Bank一行上的偏移量，占用6位bit位，取值范围为[0, 63]
 ```
 
-**图1** L0C Buffer内存结构图（[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
+**图1** L0C Buffer内存结构图（[NPU架构版本2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
 
-![](../../../../figures/L0C_Memory_Structure.png)
+![](../../../figures/L0C_Memory_Structure.png)
 <!-- end id1 -->
 
 <!-- npu="950" id4 -->
@@ -38,13 +38,13 @@ L0C_ADDR[17:0] = { BANK_DEPTH[7:0], BANK[3:0], BANK_WIDTH[5:0] }    // bit位顺
 // BANK_WIDTH表示地址在Bank一行上的偏移量，占用6位bit位，取值范围为[0, 63]
 ```
 
-**图2** L0C Buffer内存结构图（[NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
+**图2** L0C Buffer内存结构图（[NPU架构版本3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
 
-![](../../../../figures/L0C_Memory_Structure_950.png)
+![](../../../figures/L0C_Memory_Structure_950.png)
 <!-- end id4 -->
 
 ## C API寻址与同步
 
 L0C Buffer使用`__cc__ float*`或`__cc__ int32_t*`存放累加结果，一个16×16结果分形占1024B，地址需同时满足计算和搬出接口的对齐要求。搬出起始地址按64B对齐，`src_stride`按64B计数；不能把L0A Buffer/L0B Buffer的512B输入分形单位用作该步长单位。
 
-[UnitFlag](../../cube_compute/mmad_compute_key_features/UnitFlag.md)以512B块管理读写状态，一个完整的1024B结果分形涉及两个标志块。Bank结构、结果分形和UnitFlag块是不同概念。
+[UnitFlag](../cube_compute/mmad_compute_key_features/UnitFlag.md)以512B块管理读写状态，一个完整的1024B结果分形涉及两个标志块。Bank结构、结果分形和UnitFlag块是不同概念。

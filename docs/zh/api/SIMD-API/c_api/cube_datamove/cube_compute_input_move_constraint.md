@@ -2,7 +2,7 @@
 
 ## 对齐约束
 
-具体可见[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
+具体可见[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
 
 - 当源地址位于L1 Buffer时，该地址必须32Byte对齐；当源地址位于GM时，该地址必须1Byte对齐。
 - 当目的地址位于L0A Buffer/L0B Buffer时，该地址必须512Byte对齐；当目的地址位于L1 Buffer时，该地址必须32Byte对齐。
@@ -42,63 +42,63 @@ asc_copy_l12l0b_sparse主要用于搬运以512Byte为单位存放的压缩权重
     - GM->L1 Buffer
         - ND->Nz：
 
-            ![](../../../../figures/datacopy_gm2l1_nd2nz.png)
+            ![](../../../figures/datacopy_gm2l1_nd2nz.png)
         - Nz->Nz：
 
-            ![](../../../../figures/datacopy_gm2l1_nz2nz.png)
+            ![](../../../figures/datacopy_gm2l1_nz2nz.png)
         - Zn->Zn：
 
-            ![](../../../../figures/datacopy_gm2l1_zn2zn.png)
+            ![](../../../figures/datacopy_gm2l1_zn2zn.png)
 - **2D矩阵搬运**
     - GM->L1 Buffer（不支持转置）
         - Nz->Nz：
 
-            ![](../../../../figures/load2d_gm2l1_nz2nz.png)
+            ![](../../../figures/load2d_gm2l1_nz2nz.png)
         - Zn->Zn：
 
-            ![](../../../../figures/load2d_gm2l1_zn2zn.png)
+            ![](../../../figures/load2d_gm2l1_zn2zn.png)
     - GM->L0A Buffer（不支持转置）L1 Buffer->L0A Buffer（不使能转置）（Nz->Zz）
 
-        ![](../../../../figures/load2d_gm2l0a_nz2zz.png)
+        ![](../../../figures/load2d_gm2l0a_nz2zz.png)
     - GM->L0B Buffer（不支持转置）L1 Buffer->L0B Buffer（不使能转置）（Zn->Zn）
 
-        ![](../../../../figures/load2d_gm2l0b_zn2zn.png)
+        ![](../../../figures/load2d_gm2l0b_zn2zn.png)
     - L1 Buffer->L0A Buffer（使能转置，仅支持b16数据类型）（Nz->Zz）
 
-        ![](../../../../figures/load2d_l12l0a_nz2zz.png)
+        ![](../../../figures/load2d_l12l0a_nz2zz.png)
     - L1 Buffer->L0B Buffer（使能转置，仅支持b16数据类型）（Zn->Zn）
 
-        ![](../../../../figures/load2d_l12l0b_zn2zn.png)
+        ![](../../../figures/load2d_l12l0b_zn2zn.png)
 - **转置搬运**
     - L1 Buffer->L0A Buffer（b8）（Nz->Zz）
 
-        ![](../../../../figures/loaddatawithtranspose_l12l0a_b8_nz2zz.png)
+        ![](../../../figures/loaddatawithtranspose_l12l0a_b8_nz2zz.png)
     - L1 Buffer->L0B Buffer（b4/b8）（Zn->Zn）
 
-        ![](../../../../figures/loaddatawithtranspose_l12l0b_b4b8_zn2zn.png)
+        ![](../../../figures/loaddatawithtranspose_l12l0b_b4b8_zn2zn.png)
     - L1 Buffer->L0A Buffer（b16）（Nz->Zz）
 
-        ![](../../../../figures/loaddatawithtranspose_l12l0a_b16_nz2zz.png)
+        ![](../../../figures/loaddatawithtranspose_l12l0a_b16_nz2zz.png)
     - L1 Buffer->L0B Buffer（b16）（Zn->Zn）
 
-        ![](../../../../figures/loaddatawithtranspose_l12l0b_b16_zn2zn.png)
+        ![](../../../figures/loaddatawithtranspose_l12l0b_b16_zn2zn.png)
     - L1 Buffer->L0A Buffer（b32）（Nz（<span>当且仅当Row==16</span>）->Zz）
 
-        ![](../../../../figures/loaddatawithtranspose_l12l0a_b32_nz2zz.png)
+        ![](../../../figures/loaddatawithtranspose_l12l0a_b32_nz2zz.png)
     - L1 Buffer->L0B Buffer（b32）（Zn（<span>当且仅当Col==16</span>）->Zn）
 
-        ![](../../../../figures/loaddatawithtranspose_l12l0b_b32_zn2zn.png)
+        ![](../../../figures/loaddatawithtranspose_l12l0b_b32_zn2zn.png)
 - **3D矩阵搬运**
     - L1 Buffer->L0A Buffer（NC1HWC0->Zz）
 
-        ![](../../../../figures/load3d_l12l0a_nc1hwc02zz.png)
+        ![](../../../figures/load3d_l12l0a_nc1hwc02zz.png)
     - L1 Buffer->L0B Buffer（NC1HWC0->Zn）
 
-        ![](../../../../figures/load3d_l12l0b_nc1hwc02zn.png)
+        ![](../../../figures/load3d_l12l0b_nc1hwc02zn.png)
 - **asc_copy_l12l0b_sparse**
     - L1 Buffer->L0B Buffer（Zn->Zn）
 
-        ![](../../../../figures/loaddatawithsparse_l12l0b_zn2zn.png)
+        ![](../../../figures/loaddatawithsparse_l12l0b_zn2zn.png)
 
 针对一些不常用的分形转换的支持情况，开发者可参考下表：
 
@@ -133,59 +133,59 @@ MX矩阵的数据和系数分别搬运：A/B数据使用普通2D重载或`_trans
     - GM->L1 Buffer
         - ND->Nz：
 
-            ![](../../../../figures/datacopy_gm2l1_nd2nz.png)
+            ![](../../../figures/datacopy_gm2l1_nd2nz.png)
         - DN->Nz：
 
-            ![](../../../../figures/datacopy_gm2l1_dn2nz.png)
+            ![](../../../figures/datacopy_gm2l1_dn2nz.png)
         - Nz->Nz：
 
-            ![](../../../../figures/datacopy_gm2l1_nz2nz.png)
+            ![](../../../figures/datacopy_gm2l1_nz2nz.png)
         - Zn->Zn：
 
-            ![](../../../../figures/datacopy_gm2l1_zn2zn.png)
+            ![](../../../figures/datacopy_gm2l1_zn2zn.png)
 - **2D矩阵搬运**
     - L1 Buffer->L0A Buffer（Nz->Nz）
 
-        ![](../../../../figures/load2dv2_l12l0a_nz2nz.png)
+        ![](../../../figures/load2dv2_l12l0a_nz2nz.png)
     - L1 Buffer->L0A Buffer（使能转置）（Zn->Nz）
 
-        ![](../../../../figures/load2dv2_l12l0a_zn2nz.png)
+        ![](../../../figures/load2dv2_l12l0a_zn2nz.png)
     - L1 Buffer->L0B Buffer（Zn->Zn）
 
-        ![](../../../../figures/load2dv2_l12l0b_zn2zn.png)
+        ![](../../../figures/load2dv2_l12l0b_zn2zn.png)
     - L1 Buffer->L0B Buffer（使能转置）（Nz->Zn）
 
-        ![](../../../../figures/load2dv2_l12l0b_nz2zn.png)
+        ![](../../../figures/load2dv2_l12l0b_nz2zn.png)
 - **MX数据与系数的独立搬运**
     - L1 Buffer->L0A Buffer（数据，调用asc_copy_l12l0a，Nz->Nz）
 
-        ![](../../../../figures/load2dv2mx_l12l0a_nz2nz.png)
+        ![](../../../figures/load2dv2mx_l12l0a_nz2nz.png)
     - L1 Buffer->L0A_MX Buffer（系数，调用asc_copy_l12l0a_mx）
 
-        ![](../../../../figures/load2dv2mx_l12l0amx.png)
+        ![](../../../figures/load2dv2mx_l12l0amx.png)
     - L1 Buffer->L0B Buffer（数据，调用asc_copy_l12l0b，Zn->Zn）
 
-        ![](../../../../figures/load2dv2mx_l12l0b_zn2zn.png)
+        ![](../../../figures/load2dv2mx_l12l0b_zn2zn.png)
     - L1 Buffer->L0B_MX Buffer（系数，调用asc_copy_l12l0b_mx）
 
-        ![](../../../../figures/load2dv2mx_l12l0bmx.png)
+        ![](../../../figures/load2dv2mx_l12l0bmx.png)
 - **转置搬运**
     - L1 Buffer->L0B Buffer（b4/b8）（Zn->Zn）
 
-        ![](../../../../figures/loaddatawithtranspose_l12l0b_b4b8_zn2zn.png)
+        ![](../../../figures/loaddatawithtranspose_l12l0b_b4b8_zn2zn.png)
     - L1 Buffer->L0B Buffer（b16）（Zn->Zn）
 
-        ![](../../../../figures/loaddatawithtranspose_l12l0b_b16_zn2zn.png)
+        ![](../../../figures/loaddatawithtranspose_l12l0b_b16_zn2zn.png)
     - L1 Buffer->L0B Buffer（b32）（Zn（<span>当且仅当Col==16</span>）->Zn）
 
-        ![](../../../../figures/loaddatawithtranspose_l12l0b_b32_zn2zn.png)
+        ![](../../../figures/loaddatawithtranspose_l12l0b_b32_zn2zn.png)
 - **3D矩阵搬运**
     - L1 Buffer->L0A Buffer（NC1HWC0->Nz）
 
-        ![](../../../../figures/load3d_l12l0a_nc1hwc02nz.png)
+        ![](../../../figures/load3d_l12l0a_nc1hwc02nz.png)
     - L1 Buffer->L0B Buffer（NC1HWC0->Zn）
 
-        ![](../../../../figures/load3d_l12l0b_nc1hwc02zn.png)
+        ![](../../../figures/load3d_l12l0b_nc1hwc02zn.png)
 
 针对一些不常用的分形转换的支持情况，开发者可参考下表：
 

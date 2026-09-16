@@ -9,19 +9,19 @@
 <!-- end id1 -->
 
 <!-- npu="A3,910b" id2 -->
-**图1** 矩阵计算的搬出整体流程图（[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
+**图1** 矩阵计算的搬出整体流程图（[NPU架构版本2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
 
-![](../../../../figures/fixpipe_execution_flow_a2a3.png)
+![](../../../figures/fixpipe_execution_flow_a2a3.png)
 <!-- end id2 -->
 
 <!-- npu="950" id3 -->
-**图2** 矩阵计算的搬出整体流程图（[NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
+**图2** 矩阵计算的搬出整体流程图（[NPU架构版本3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
 
-![](../../../../figures/fixpipe_execution_flow_a5.png)
+![](../../../figures/fixpipe_execution_flow_a5.png)
 <!-- end id3 -->
 
 其中，Fixpipe Buffer不同的量化模式对应的内存排布如下：
 
 **图3** Fixpipe Buffer内存排布图
 
-![](../../../../figures/fixpipe_buffer.png)
+![](../../../figures/fixpipe_buffer.png)
