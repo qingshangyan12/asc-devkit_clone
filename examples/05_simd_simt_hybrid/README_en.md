@@ -76,6 +76,7 @@ The [`02_best_practices`](./02_best_practices) path provides performance optimiz
 | simd_simt_high_performance | Uses FloorMod computation as an example to compare implementations such as direct GM access by SIMT, SIMD Reg vector computation, SIMT access to UB, and continuous thread mapping. Sample link: [simd_simt_high_performance](./02_best_practices/simd_simt_high_performance). |
 | simd_simt_grid_dim_config | Uses Gather computation as an example to introduce thread block count configuration and VF function invocation optimization. Sample link: [simd_simt_grid_dim_config](./02_best_practices/simd_simt_grid_dim_config). |
 | simd_simt_integer_fast_div | Uses integer division by a fixed divisor as an example to demonstrate the instruction optimization method of replacing normal division with multiplication and shift operations. Sample link: [simd_simt_integer_fast_div](./02_best_practices/simd_simt_integer_fast_div). |
+| simd_simt_stream_compaction | Uses the stable stream compaction operator as an example to demonstrate the optimization method of using warp functions to replace explicit loops and UB array accesses. Sample link: [simd_simt_stream_compaction](./02_best_practices/simd_simt_stream_compaction). |
 
 In addition, SIMT VF optimization methods in SIMD and SIMT hybrid programming scenarios can refer to the SIMT samples under `03_simt_api/03_best_practices`, as follows:
 
