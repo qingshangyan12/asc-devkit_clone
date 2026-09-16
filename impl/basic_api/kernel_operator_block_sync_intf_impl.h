@@ -231,6 +231,18 @@ __aicore__ inline void SyncAll(const GlobalTensor<int32_t> &gmWorkspace,
 #endif
 }
 
+/* Definitions of the raw-pointer SyncAll overloads declared in the interface header. */
+template <bool isAIVOnly, typename GmPtr, typename UbPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<GmPtr, UbPtr>::value, bool>::type>
+__aicore__ inline void SyncAll(GmPtr gmWorkspace, UbPtr ubWorkspace, const int usedCores)
+{
+#if ASCENDC_CPU_DEBUG
+    SoftSyncAllImpl<false>((__gm__ int32_t*)gmWorkspace, (__ubuf__ int32_t*)ubWorkspace, usedCores);
+#else
+    SoftSyncAllImpl<isAIVOnly>((__gm__ int32_t*)gmWorkspace, (__ubuf__ int32_t*)ubWorkspace, usedCores);
+#endif
+}
+
 #if (__NPU_ARCH__ == 3510) 
 template<bool isAIVOnly, const SyncAllConfig& config>
 __aicore__ inline void SyncAll()

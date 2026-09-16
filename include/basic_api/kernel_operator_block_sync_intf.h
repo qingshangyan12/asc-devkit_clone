@@ -26,6 +26,8 @@
 #include "../../impl/basic_api/kernel_tensor_base.h"
 #include "../../impl/basic_api/utils/kernel_utils_mode.h"
 
+#include "../../impl/basic_api/utils/kernel_utils_ptr_overload.h"
+
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
 #include "stub_def.h"
@@ -70,6 +72,19 @@ __aicore__ inline void IBWait(const GlobalTensor<int32_t>& gmWorkspace, const Lo
 template <bool isAIVOnly = true>
 __aicore__ inline void SyncAll(const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace,
                                  const int32_t usedCores = 0);
+
+/*
+ * SyncAll with raw workspace pointers.
+ *
+ * Both workspaces are int32_t by contract, so the pointer operands need no element-type parameter;
+ * the operands are deduced and constrained to "at least one is a raw pointer", which keeps this
+ * overload invisible to the Tensor calls above.  It forwards to the same SoftSyncAllImpl the Tensor
+ * overload uses; the Tensor path's optional position check is omitted because a raw pointer carries
+ * no TPosition.
+ */
+template <bool isAIVOnly = true, typename GmPtr, typename UbPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<GmPtr, UbPtr>::value, bool>::type = true>
+__aicore__ inline void SyncAll(GmPtr gmWorkspace, UbPtr ubWorkspace, const int32_t usedCores = 0);
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510))
 template <bool isAIVOnly = true, const SyncAllConfig& config = DEFAULT_SYNC_ALL_CONFIG>

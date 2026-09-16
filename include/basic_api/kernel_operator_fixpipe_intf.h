@@ -24,6 +24,8 @@
 #include "kernel_tensor.h"
 #include "../../impl/basic_api/utils/kernel_utils_macros.h"
 
+#include "../../impl/basic_api/utils/kernel_utils_ptr_overload.h"
+
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
 #include "stub_def.h"
@@ -159,6 +161,60 @@ template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
 __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src,
     const LocalTensor<uint64_t>& cbufWorkspace, const FixpipeParamsArch3510<config.format>& intriParams);
 #endif
+/* ---- Fixpipe / SetFixPipeConfig with raw pointer operands -------------------- */
+/*
+ * Fixpipe with explicit element types: the pointer operands are deduced *after* the explicit
+ * <T, U, config> parameters, which is the shape the corpus uses for the L0C -> GM / L1 / UB calls.
+ * The address space of `dst` selects the destination pipe.
+ */
+template <typename T, typename U, const FixpipeConfig& config, typename DstPtr, typename SrcPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void Fixpipe(DstPtr dst, SrcPtr src, const FixpipeParamsArch3510<config.format>& intriParams);
+
+template <typename T, typename U, const FixpipeConfig& config, typename DstPtr, typename SrcPtr, typename WorkspacePtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr, WorkspacePtr>::value, bool>::type = true>
+__aicore__ inline void Fixpipe(
+    DstPtr dst, SrcPtr src, WorkspacePtr cbufWorkspace, const FixpipeParamsArch3510<config.format>& intriParams);
+
+template <typename T, typename U, const FixpipeConfig& config, typename DstPtr, typename SrcPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void Fixpipe(DstPtr dst, SrcPtr src, const FixpipeParamsV220& intriParams);
+
+template <typename T, typename U, const FixpipeConfig& config, typename DstPtr, typename SrcPtr, typename WorkspacePtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr, WorkspacePtr>::value, bool>::type = true>
+__aicore__ inline void Fixpipe(DstPtr dst, SrcPtr src, WorkspacePtr cbufWorkspace, const FixpipeParamsV220& intriParams);
+
+/*
+ * Fixpipe without explicit element types.  The element types are re-deduced from the address-space
+ * qualified pointer parameters of the CubePtrOverload::Fp helpers below; `config` is deduced from
+ * the FixpipeParamsArch3510<> parameter, whose CO2Layout is carried in the config constant.
+ */
+template <typename DstPtr, typename SrcPtr, const FixpipeConfig& config = CFG_ROW_MAJOR,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void Fixpipe(DstPtr dst, SrcPtr src, const FixpipeParamsArch3510<config.format>& intriParams);
+
+template <typename DstPtr, typename SrcPtr, typename WorkspacePtr, const FixpipeConfig& config = CFG_ROW_MAJOR,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr, WorkspacePtr>::value, bool>::type = true>
+__aicore__ inline void Fixpipe(
+    DstPtr dst, SrcPtr src, WorkspacePtr cbufWorkspace, const FixpipeParamsArch3510<config.format>& intriParams);
+
+template <typename DstPtr, typename SrcPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void Fixpipe(DstPtr dst, SrcPtr src, const FixpipeParamsV220& intriParams);
+
+template <typename DstPtr, typename SrcPtr, typename WorkspacePtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr, WorkspacePtr>::value, bool>::type = true>
+__aicore__ inline void Fixpipe(DstPtr dst, SrcPtr src, WorkspacePtr cbufWorkspace, const FixpipeParamsV220& intriParams);
+
+/*
+ * SetFixPipeConfig with a raw pointer pre-tensor.  `setRelu` selects the FPC field the address is
+ * written into, exactly as in SetFixPipeConfigImpl; T is kept as an explicit template parameter so
+ * that a pointer call cannot be confused with the LocalTensor overloads.
+ */
+template <typename T, bool setRelu = false, typename DstPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr>::value, bool>::type = true>
+__aicore__ inline void SetFixPipeConfig(DstPtr preData, bool isUnitFlag = false);
+
 } // namespace AscendC
 
 #if defined(__NPU_ARCH__)

@@ -275,6 +275,158 @@ __aicore__ inline void Fixpipe(const GlobalTensor<T> &dst, const LocalTensor<U> 
 #endif
 }
 #endif
+/* **************************************************************************************************
+ * Pointer-input overloads for Fixpipe -- definitions.
+ *
+ * The *Impl backends already take raw address-space pointers, so these are a pure forwarding layer
+ * and share the Tensor path's implementation of the arithmetic.  The address space of `dst` selects
+ * the destination pipe:  __gm__ -> GM, __cbuf__ -> L1, __ubuf__ -> UB.
+ * ************************************************************************************************* */
+namespace CubePtrOverload {
+// -------------------------------------------------------------------------------------------
+// Address-space dispatch, and how it degenerates under ASCENDC_CPU_DEBUG.
+//
+// On the device build an address-space qualifier is a real, distinct type, so __gm__ / __cbuf__ /
+// __ubuf__ select three different destination pipes (GM / L1 / UB) at compile time.
+//
+// Under ASCENDC_CPU_DEBUG the platform's own tikicpulib/include/stub_def.h defines those
+// qualifiers as *empty* macros, so the three signatures are one and defining all three is a
+// redefinition.  The call site collapses with them, so the destination simply does not exist in
+// that build and no implementation can recover it.  One definition per group is all the build can
+// express; it routes to the GM backend.  This carries no numeric consequence -- the CPU-debug
+// build does not observably execute the pipe at all (the PV memory model is stubbed out).
+// -------------------------------------------------------------------------------------------
+
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+
+template <const FixpipeConfig& config, typename D, typename S, typename P>
+__aicore__ inline void Fp(D* dst, S* src, const P& intriParams)
+{
+    FixpipeL0C2GMImpl<D, S, config>(dst, src, intriParams);
+}
+
+template <const FixpipeConfig& config, typename D, typename S, typename P>
+__aicore__ inline void Fp(D* dst, S* src, uint64_t* cbufWorkspace, const P& intriParams)
+{
+    FixpipeL0C2GMImpl<D, S, config>(dst, src, cbufWorkspace, intriParams);
+}
+
+#else  // device build: the address space selects the destination pipe
+
+template <const FixpipeConfig& config, typename D, typename S, typename P>
+__aicore__ inline void Fp(__gm__ D* dst, __cc__ S* src, const P& intriParams)
+{
+    FixpipeL0C2GMImpl<D, S, config>(dst, src, intriParams);
+}
+
+template <const FixpipeConfig& config, typename D, typename S, typename P>
+__aicore__ inline void Fp(__cbuf__ D* dst, __cc__ S* src, const P& intriParams)
+{
+    FixpipeL0C2L1Impl<D, S, config>(dst, src, intriParams);
+}
+
+template <const FixpipeConfig& config, typename D, typename S, typename P>
+__aicore__ inline void Fp(__ubuf__ D* dst, __cc__ S* src, const P& intriParams)
+{
+    FixpipeL0C2UBImpl<D, S, config>(dst, src, intriParams);
+}
+
+template <const FixpipeConfig& config, typename D, typename S, typename P>
+__aicore__ inline void Fp(__gm__ D* dst, __cc__ S* src, __cbuf__ uint64_t* cbufWorkspace, const P& intriParams)
+{
+    FixpipeL0C2GMImpl<D, S, config>(dst, src, cbufWorkspace, intriParams);
+}
+
+template <const FixpipeConfig& config, typename D, typename S, typename P>
+__aicore__ inline void Fp(__cbuf__ D* dst, __cc__ S* src, __cbuf__ uint64_t* cbufWorkspace, const P& intriParams)
+{
+    FixpipeL0C2L1Impl<D, S, config>(dst, src, cbufWorkspace, intriParams);
+}
+
+template <const FixpipeConfig& config, typename D, typename S, typename P>
+__aicore__ inline void Fp(__ubuf__ D* dst, __cc__ S* src, __cbuf__ uint64_t* cbufWorkspace, const P& intriParams)
+{
+    FixpipeL0C2UBImpl<D, S, config>(dst, src, cbufWorkspace, intriParams);
+}
+
+#endif  // ASCENDC_CPU_DEBUG
+}  // namespace CubePtrOverload
+
+template <typename T, typename U, const FixpipeConfig& config, typename DstPtr, typename SrcPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type>
+__aicore__ inline void Fixpipe(DstPtr dst, SrcPtr src, const FixpipeParamsArch3510<config.format>& intriParams)
+{
+    CubePtrOverload::Fp<config, T, U>(dst, src, intriParams);
+}
+
+template <typename T, typename U, const FixpipeConfig& config, typename DstPtr, typename SrcPtr, typename WorkspacePtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr, WorkspacePtr>::value, bool>::type>
+__aicore__ inline void Fixpipe(
+    DstPtr dst, SrcPtr src, WorkspacePtr cbufWorkspace, const FixpipeParamsArch3510<config.format>& intriParams)
+{
+    CubePtrOverload::Fp<config, T, U>(dst, src, cbufWorkspace, intriParams);
+}
+
+template <typename T, typename U, const FixpipeConfig& config, typename DstPtr, typename SrcPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type>
+__aicore__ inline void Fixpipe(DstPtr dst, SrcPtr src, const FixpipeParamsV220& intriParams)
+{
+    CubePtrOverload::Fp<config, T, U>(dst, src, intriParams);
+}
+
+template <typename T, typename U, const FixpipeConfig& config, typename DstPtr, typename SrcPtr, typename WorkspacePtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr, WorkspacePtr>::value, bool>::type>
+__aicore__ inline void Fixpipe(
+    DstPtr dst, SrcPtr src, WorkspacePtr cbufWorkspace, const FixpipeParamsV220& intriParams)
+{
+    CubePtrOverload::Fp<config, T, U>(dst, src, cbufWorkspace, intriParams);
+}
+
+template <typename DstPtr, typename SrcPtr, const FixpipeConfig& config,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type>
+__aicore__ inline void Fixpipe(DstPtr dst, SrcPtr src, const FixpipeParamsArch3510<config.format>& intriParams)
+{
+    CubePtrOverload::Fp<config>(dst, src, intriParams);
+}
+
+template <typename DstPtr, typename SrcPtr, typename WorkspacePtr, const FixpipeConfig& config,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr, WorkspacePtr>::value, bool>::type>
+__aicore__ inline void Fixpipe(
+    DstPtr dst, SrcPtr src, WorkspacePtr cbufWorkspace, const FixpipeParamsArch3510<config.format>& intriParams)
+{
+    CubePtrOverload::Fp<config>(dst, src, cbufWorkspace, intriParams);
+}
+
+template <typename DstPtr, typename SrcPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type>
+__aicore__ inline void Fixpipe(DstPtr dst, SrcPtr src, const FixpipeParamsV220& intriParams)
+{
+    CubePtrOverload::Fp<CFG_ROW_MAJOR>(dst, src, intriParams);
+}
+
+template <typename DstPtr, typename SrcPtr, typename WorkspacePtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr, WorkspacePtr>::value, bool>::type>
+__aicore__ inline void Fixpipe(DstPtr dst, SrcPtr src, WorkspacePtr cbufWorkspace, const FixpipeParamsV220& intriParams)
+{
+    CubePtrOverload::Fp<CFG_ROW_MAJOR>(dst, src, cbufWorkspace, intriParams);
+}
+
+template <typename T, bool setRelu, typename DstPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr>::value, bool>::type>
+__aicore__ inline void SetFixPipeConfig(DstPtr preData, bool isUnitFlag)
+{
+    if ASCEND_IS_AIC {
+        uint64_t config = 0;
+        if constexpr (setRelu) {
+            config = config | ((uint64_t)preData >> 6); // FPC[7:0], ReluPreAddr, 64bit aligned
+        } else {
+            config = config | (((uint64_t)preData >> 7) << 8); // FPC[15:8], QuantPreAddr, 128bit aligned
+        }
+        config = config | (static_cast<uint64_t>(isUnitFlag) << 63); // FPC[63], UnitFlag
+        set_fpc(config);
+    }
+}
+
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_FIXPIPE_INTERFACE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_FIXPIPE_INTF_IMPL_H__)

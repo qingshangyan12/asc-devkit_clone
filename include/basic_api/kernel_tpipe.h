@@ -455,6 +455,24 @@ public:
     template <typename T>
     __aicore__ inline void ReadSpmBuffer(const LocalTensor<T>& readBuffer, const int32_t readSize,
         int32_t readOffset = 0);
+
+    /*
+     * ReadSpmBuffer with a raw UB pointer.
+     *
+     * The read target is always UB, so a raw pointer identifies it unambiguously and T is deduced
+     * from the operand.  The address is re-wrapped as the LocalTensor view it denotes and handed to
+     * the Tensor overloads above, so the FIFO events and the data movement are exactly theirs.
+     *
+     * A raw pointer carries no ShapeInfo, so the Tensor `readSize` overload's shape-derived default
+     * (readSize == 0 -> size taken from the tensor shape) has no pointer equivalent: on the pointer
+     * path readSize is the size, and 0 means 0.
+     */
+    template <typename T>
+    __aicore__ inline void ReadSpmBuffer(__ubuf__ T* readBuffer, const DataCopyParams& copyParams,
+        int32_t readOffset = 0);
+    template <typename T>
+    __aicore__ inline void ReadSpmBuffer(__ubuf__ T* readBuffer, const int32_t readSize,
+        int32_t readOffset = 0);
     __aicore__ inline void DestroyWithoutPipeAll();
     __aicore__ inline void Destroy();
     __aicore__ inline void Reset();

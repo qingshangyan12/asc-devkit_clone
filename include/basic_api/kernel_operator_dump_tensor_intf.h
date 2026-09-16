@@ -50,6 +50,22 @@ template <typename T>
 __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &tensor,
     uint32_t index, uint32_t countOff, uint32_t dumpSize);
 
+/*
+ * DumpTensor / DumpAccChkPoint with a raw GM pointer.
+ *
+ * Only the GM role is pointerised.  A raw on-chip address cannot be expressed through these
+ * interfaces: the UB / L1 / CO1 roles are carried by LocalTensor because the dump path needs the
+ * position and the buffer metadata that go with it to select its FIFO and dump entity, and a raw
+ * pointer carries neither.  Callers that dump from on-chip memory keep using the Tensor interface
+ * above; there is no pointer form of those two roles by design.
+ */
+template <typename T>
+__aicore__ inline void DumpTensor(__gm__ T* tensor, uint32_t desc, uint32_t dumpSize);
+template <typename T>
+__aicore__ inline void DumpTensor(__gm__ T* tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo);
+template <typename T>
+__aicore__ inline void DumpAccChkPoint(__gm__ T* tensor, uint32_t index, uint32_t countOff, uint32_t dumpSize);
+
 using __asc_aicore::printf;
 using __asc_aicore::PRINTF;
 }  // namespace AscendC

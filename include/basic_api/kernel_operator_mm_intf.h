@@ -27,6 +27,8 @@
 #include "../../impl/basic_api/utils/kernel_utils_constants.h"
 #include "../../impl/basic_api/utils/kernel_utils_macros.h"
 
+#include "../../impl/basic_api/utils/kernel_utils_ptr_overload.h"
+
 #include "kernel_operator_mm_bitmode_intf.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
@@ -499,6 +501,124 @@ __aicore__ inline void SetMMColumnMajor();
  */
 // SetMMLayoutTransform has been updated, please use SetMMRowMajor/SetMMColumnMajor instead.
 __aicore__ inline void SetMMLayoutTransform(bool mmLayoutMode);
+
+/* **************************************************************************************************
+ * Pointer-input overloads for the CUBE basic API
+ *
+ * A raw hardware pointer carries its memory role in its own type -- __ca__ (L0A), __cb__ (L0B),
+ * __cc__ (L0C), __cbuf__ (L1), __ubuf__ (UB), __gm__ (GM) -- so overload resolution selects exactly
+ * the backend implementation that the equivalent LocalTensor / GlobalTensor call reaches.
+ * The overloads below are a pure forwarding layer: they add no arithmetic, reinterpret no parameter
+ * and silence no check that the Tensor path performs on the caller's behalf.  A pointer call is
+ * therefore numerically identical to the equivalent Tensor call.
+ *
+ * Every overload is SFINAE-constrained on "at least one operand is a raw pointer", so no existing
+ * Tensor call site can become ambiguous.
+ * ************************************************************************************************* */
+
+/* ---- Mmad / MmadMx with raw pointer operands -------------------------------- */
+template <typename DstPtr, typename Src0Ptr, typename Src1Ptr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr>::value, bool>::type = true>
+__aicore__ inline void Mmad(DstPtr dst, Src0Ptr fm, Src1Ptr filter, const MmadParams& mmadParams);
+
+template <typename DstPtr, typename Src0Ptr, typename Src1Ptr, typename BiasPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr, BiasPtr>::value, bool>::type = true>
+__aicore__ inline void Mmad(DstPtr dst, Src0Ptr fm, Src1Ptr filter, BiasPtr bias, const MmadParams& mmadParams);
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+template <typename DstPtr, typename Src0Ptr, typename Src1Ptr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr>::value, bool>::type = true>
+__aicore__ inline void MmadMx(DstPtr dst, Src0Ptr fm, Src1Ptr filter, const MmadParams& mmadParams);
+
+template <typename DstPtr, typename Src0Ptr, typename Src1Ptr, typename BiasPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr, BiasPtr>::value, bool>::type = true>
+__aicore__ inline void MmadMx(DstPtr dst, Src0Ptr fm, Src1Ptr filter, BiasPtr bias, const MmadParams& mmadParams);
+#endif
+
+#if __NPU_ARCH__ == 2201
+template <typename DstPtr, typename Src0Ptr, typename Src1Ptr,
+    typename std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr>::value, bool>::type = true>
+__aicore__ inline void MmadWithSparse(DstPtr dst, Src0Ptr fm, Src1Ptr filter, const MmadParams& mmadParams);
+#endif
+
+/* ---- LoadData family with raw pointer operands ------------------------------ */
+template <typename DstPtr, typename SrcPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void LoadData(DstPtr dst, SrcPtr src, const LoadData2DParams& loadDataParams);
+
+template <typename DstPtr, typename SrcPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void LoadData(DstPtr dst, SrcPtr src, const LoadData2DParamsV2& loadDataParams);
+
+template <typename DstPtr, typename SrcPtr, typename U,
+    typename std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void LoadData(DstPtr dst, SrcPtr src, const LoadData3DParamsV2<U>& loadDataParams);
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+template <typename DstPtr, typename SrcPtr, typename SrcMxPtr,
+    typename std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr, SrcMxPtr>::value, bool>::type = true>
+__aicore__ inline void LoadData(DstPtr dst, SrcPtr src, SrcMxPtr srcMx, const LoadData2DParamsV2& loadDataParams,
+    const LoadData2DMxParams& loadMxDataParams);
+#endif
+
+// No explicit template arguments: the element type comes from the pointer operands.
+template <typename DstPtr, typename SrcPtr, typename U,
+    typename std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void LoadDataWithStride(DstPtr dst, SrcPtr src, const LoadData3DParamsV2<U>& loadDataParams);
+
+// Explicit <element type, IsResetLoad3dConfig>: mirrors the Tensor overload's parameter list, so a
+// call site written as LoadDataWithStride<SrcT, LOAD3D_CONFIG>(ptr, ptr, params) still resolves.
+// `config` selects whether the two global load-3d settings are reprogrammed on the pointer path.
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
+    typename DstPtr, typename SrcPtr,
+    typename std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void LoadDataWithStride(DstPtr dst, SrcPtr src, const LoadData3DParamsV2<U>& loadDataParams);
+
+template <typename DstPtr, typename SrcPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void LoadDataWithTranspose(DstPtr dst, SrcPtr src, const LoadData2dTransposeParams& loadDataParams);
+
+
+/* ---- LoadData with a bit-mode descriptor, raw pointer operands -------------- */
+// Dst / Src stay explicit and the pointer operands follow them, so a call site written as
+// LoadData<TPosition::A2, TPosition::A1>(ptr, ptr, params) resolves.  No <..., T> form is provided:
+// with the address-space cast unavailable on this path no re-view is possible, so an explicit T
+// could not reach a different backend than the deduced form.
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+template <TPosition Dst, TPosition Src, typename DstPtr, typename SrcPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void LoadData(DstPtr dst, SrcPtr src, const Load3DBitModeParam& loadDataParams);
+
+template <TPosition Dst, TPosition Src, typename DstPtr, typename SrcPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void LoadData(DstPtr dst, SrcPtr src, const Load2DBitModeParam& loadDataParams);
+#endif
+
+/* ---- LoadData 3dv2Pro with raw pointer operands ----------------------------- */
+template <typename DstPtr, typename SrcPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void LoadData(DstPtr dst, SrcPtr src, const LoadData3DParamsV2Pro& loadDataParams);
+
+/* ---- LoadImageToLocal with a raw pointer destination ------------------------ */
+template <typename DstPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr>::value, bool>::type = true>
+__aicore__ inline void LoadImageToLocal(DstPtr dst, const LoadImageToLocalParams& loadDataParams);
+
+/* ---- InitConstValue with a raw pointer destination -------------------------- */
+template <typename DstPtr, typename U,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr>::value, bool>::type = true>
+__aicore__ inline void InitConstValue(DstPtr dst, const InitConstValueParams<U>& initConstValueParams);
+
+template <typename T, typename U = PrimT<T>, typename DstPtr,
+    typename Std::enable_if<IsSameType<PrimT<T>, U>::value, bool>::type = true,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr>::value, bool>::type = true>
+__aicore__ inline void InitConstValue(DstPtr dst, const InitConstValueParams<U>& initConstValueParams);
+
+template <typename DstPtr, typename SrcPtr,
+    typename std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void LoadDataWithTranspose(
+    DstPtr dst, SrcPtr src, const LoadData2dTransposeParamsV2& loadDataParams);
 
 } // namespace AscendC
 #if defined(__NPU_ARCH__)

@@ -707,6 +707,540 @@ __aicore__ inline void SetMMColumnMajor() { SetMMLayoutTransformImpl(false); }
 // SetMMLayoutTransform has been updated, please use SetMMRowMajor/SetMMColumnMajor instead.
 __aicore__ inline void SetMMLayoutTransform(bool mmLayoutMode) { SetMMLayoutTransformImpl(mmLayoutMode); }
 
+/* **************************************************************************************************
+ * Pointer-input overloads for the CUBE basic API -- definitions.
+ *
+ * All of these land on the same *Cal backend that the Tensor overload in this header reaches, so
+ * the Tensor path and the pointer path share one implementation of the arithmetic.
+ * ************************************************************************************************* */
+namespace CubePtrOverload {
+// -------------------------------------------------------------------------------------------
+// Address-space dispatch, and how it degenerates under ASCENDC_CPU_DEBUG.
+//
+// On the device build an address-space qualifier is a real, distinct type (bisheng defines
+// __ca__ as __attribute__((cce_cube_a))), so `__ca__ D*` and `__cb__ D*` are two different
+// overloads and the target pipe is selected at compile time -- no TPosition lookup is needed.
+//
+// Under ASCENDC_CPU_DEBUG the platform's own tikicpulib/include/stub_def.h defines
+// __gm__ / __cbuf__ / __ubuf__ / __cc__ / __ca__ / __cb__ as *empty* macros.  Those two
+// signatures therefore collapse into one and defining both is a redefinition.  The call site
+// collapses with them -- `(__ca__ T*)p` and `(__cb__ T*)p` are the same expression in that build
+// -- so the position simply does not exist there and no implementation can recover it.  Exactly
+// one definition per helper is thus both necessary and all the build can express.
+// -------------------------------------------------------------------------------------------
+
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+
+// L1 -> L0A.  The address space is erased in this build, so the A pipe is taken as the single
+// representative.  This carries no numeric consequence: the CPU-debug build does not observably
+// execute the CUBE pipe at all (the PV memory model behind it is stubbed out).
+template <typename D, typename S, typename P>
+__aicore__ inline void Ld12L0(D* dst, S* src, const P& loadDataParams)
+{
+    LoadData2DL12L0ACal(dst, src, loadDataParams);
+}
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+// L1 -> L0A together with the scale matrix (mx) operand.
+template <typename D, typename S>
+__aicore__ inline void Ld12L0Mx(D* dst, S* src, fp8_e8m0_t* srcMx,
+    const LoadData2DParamsV2& loadDataParams, const LoadData2DMxParams& loadMxDataParams)
+{
+    LoadData2DL12L0ACal<D, S>(dst, src, srcMx, loadDataParams, loadMxDataParams);
+}
+#endif
+
+template <typename D, typename S, typename U>
+__aicore__ inline void Ld3DV2(D* dst, S* src, const LoadData3DParamsV2<U>& loadDataParams)
+{
+    LoadData3DV2L12L0ACal<U>((U*)dst, (U*)src, loadDataParams);
+}
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+// LoadDataWithStride additionally reprograms two global load-3d settings, exactly as the Tensor
+// path does in LoadDataWithStrideImpl: F-matrix (l1H / l1W / padList) and the padding value.
+// Those are global machine state, not parameters of the transfer, so the *Cal backend does not
+// touch them -- the pointer path must reproduce them per DefaultConfig flag rather than forward.
+template <const IsResetLoad3dConfig& DefaultConfig, typename D, typename S, typename U>
+__aicore__ inline void Ld3DV2Stride(D* dst, S* src, const LoadData3DParamsV2<U>& loadDataParams)
+{
+    if constexpr (DefaultConfig.isSetFMatrix) {
+        Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
+    }
+    if constexpr (DefaultConfig.isSetPadding) {
+        Load3DSetPaddingCal(loadDataParams.padValue);
+    }
+    LoadData3DV2L12L0AWithStrideCal<U>((U*)dst, (U*)src, loadDataParams);
+}
+#endif
+
+// L1 -> L0A with transpose.
+template <typename D, typename S, typename P>
+__aicore__ inline void Ld12L0Transpose(D* dst, S* src, const P& loadDataParams)
+{
+    LoadData2DL12L0ATransposeCal(dst, src, loadDataParams);
+}
+
+#else  // device build: the address space selects the pipe
+
+// L1 -> L0A / L0B.  The address space of `dst` selects the pipe, so no TPosition lookup is needed.
+template <typename D, typename S, typename P>
+__aicore__ inline void Ld12L0(__ca__ D* dst, __cbuf__ S* src, const P& loadDataParams)
+{
+    LoadData2DL12L0ACal(dst, src, loadDataParams);
+}
+
+template <typename D, typename S, typename P>
+__aicore__ inline void Ld12L0(__cb__ D* dst, __cbuf__ S* src, const P& loadDataParams)
+{
+    LoadData2DL12L0BCal(dst, src, loadDataParams);
+}
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+// L1 -> L0A / L0B together with the scale matrix (mx) operand.
+template <typename D, typename S>
+__aicore__ inline void Ld12L0Mx(__ca__ D* dst, __cbuf__ S* src, __cbuf__ fp8_e8m0_t* srcMx,
+    const LoadData2DParamsV2& loadDataParams, const LoadData2DMxParams& loadMxDataParams)
+{
+    LoadData2DL12L0ACal<D, S>(dst, src, srcMx, loadDataParams, loadMxDataParams);
+}
+
+template <typename D, typename S>
+__aicore__ inline void Ld12L0Mx(__cb__ D* dst, __cbuf__ S* src, __cbuf__ fp8_e8m0_t* srcMx,
+    const LoadData2DParamsV2& loadDataParams, const LoadData2DMxParams& loadMxDataParams)
+{
+    LoadData2DL12L0BCal<D, S>(dst, src, srcMx, loadDataParams, loadMxDataParams);
+}
+#endif
+
+/*
+ * L1 -> L0A / L0B, 3dv2 (plain and with L1 stride).
+ *
+ * LoadData3DParamsV2<U> is authoritative for the transfer geometry: kExtension / mExtension /
+ * channelSize / strideW / strideH are all expressed in U units.  Equally, the *Cal backends below
+ * never use their element type for address arithmetic -- they forward dst and src unchanged to
+ * img2colv2_cbuf_to_ca / _cb, and T only selects the overload (a half / bfloat16 specialisation
+ * exists) and feeds a supported-dtype static_assert.  The element type of the pointer operand is
+ * therefore a *view*, not part of the transfer description, and a caller may present the L1
+ * operand through a wider view of the same data (a float* view of half data, an int* view of int8
+ * data) exactly as the address-space cast in the call site expresses.  The pointer is re-viewed as
+ * U so that the backend is selected by the authoritative type; no address is recomputed and no
+ * parameter is reinterpreted, so the instruction issued is byte-for-byte the same.
+ */
+template <typename D, typename S, typename U>
+__aicore__ inline void Ld3DV2(__ca__ D* dst, __cbuf__ S* src, const LoadData3DParamsV2<U>& loadDataParams)
+{
+    LoadData3DV2L12L0ACal<U>((__ca__ U*)dst, (__cbuf__ U*)src, loadDataParams);
+}
+
+template <typename D, typename S, typename U>
+__aicore__ inline void Ld3DV2(__cb__ D* dst, __cbuf__ S* src, const LoadData3DParamsV2<U>& loadDataParams)
+{
+    LoadData3DV2L12L0BCal<U>((__cb__ U*)dst, (__cbuf__ U*)src, loadDataParams);
+}
+
+/*
+ * LoadDataWithStride additionally reprograms two global load-3d settings, exactly as the Tensor
+ * path does in LoadDataWithStrideImpl: F-matrix (l1H / l1W / padList) and the padding value.  Those
+ * are global machine state, not parameters of the transfer, so the backend *Cal entry does not
+ * touch them -- the pointer path must reproduce them per DefaultConfig flag rather than forward.
+ * A caller that passes explicit <T, {false,false}> gets the same behaviour as the Tensor overload
+ * with that config: both settings are left alone (the call site is expected to have set them).
+ */
+template <const IsResetLoad3dConfig& DefaultConfig, typename D, typename S, typename U>
+__aicore__ inline void Ld3DV2Stride(__ca__ D* dst, __cbuf__ S* src, const LoadData3DParamsV2<U>& loadDataParams)
+{
+    if constexpr (DefaultConfig.isSetFMatrix) {
+        Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
+    }
+    if constexpr (DefaultConfig.isSetPadding) {
+        Load3DSetPaddingCal(loadDataParams.padValue);
+    }
+    LoadData3DV2L12L0AWithStrideCal<U>((__ca__ U*)dst, (__cbuf__ U*)src, loadDataParams);
+}
+
+template <const IsResetLoad3dConfig& DefaultConfig, typename D, typename S, typename U>
+__aicore__ inline void Ld3DV2Stride(__cb__ D* dst, __cbuf__ S* src, const LoadData3DParamsV2<U>& loadDataParams)
+{
+    if constexpr (DefaultConfig.isSetFMatrix) {
+        Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
+    }
+    if constexpr (DefaultConfig.isSetPadding) {
+        Load3DSetPaddingCal(loadDataParams.padValue);
+    }
+    LoadData3DV2L12L0BWithStrideCal<U>((__cb__ U*)dst, (__cbuf__ U*)src, loadDataParams);
+}
+
+// L1 -> L0A / L0B with transpose.
+template <typename D, typename S, typename P>
+__aicore__ inline void Ld12L0Transpose(__ca__ D* dst, __cbuf__ S* src, const P& loadDataParams)
+{
+    LoadData2DL12L0ATransposeCal(dst, src, loadDataParams);
+}
+
+template <typename D, typename S, typename P>
+__aicore__ inline void Ld12L0Transpose(__cb__ D* dst, __cbuf__ S* src, const P& loadDataParams)
+{
+    LoadData2DL12L0BTransposeCal(dst, src, loadDataParams);
+}
+
+#endif  // ASCENDC_CPU_DEBUG
+
+/* ---- InitConstValue: L1 (A1/B1) / L0A (A2) / L0B (B2) ----------------------- */
+/*
+ * The Tensor path picks the backend from the operand's TPosition (InitConstValueImpl,
+ * kernel_operator_mm_base_impl.h:737).  A raw pointer carries that role in its own address space,
+ * so the device overloads below recover the same selection at compile time.
+ *
+ * On dav_3510 the A2 and B2 backends are themselves "not supported on current device" stubs, so L1
+ * is both the only form with real behaviour there and the representative kept under
+ * ASCENDC_CPU_DEBUG, where the three address spaces collapse into a single signature.
+ */
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+
+template <typename D, typename P>
+__aicore__ inline void InitConst(D* dst, const P& initConstValueParams)
+{
+    InitL1BufferCal(dst, initConstValueParams);
+}
+
+#else
+
+template <typename D, typename P>
+__aicore__ inline void InitConst(__cbuf__ D* dst, const P& initConstValueParams)
+{
+    InitL1BufferCal(dst, initConstValueParams);
+}
+
+template <typename D, typename P>
+__aicore__ inline void InitConst(__ca__ D* dst, const P& initConstValueParams)
+{
+    InitL0ANzMatrixCal(dst, initConstValueParams);
+}
+
+template <typename D, typename P>
+__aicore__ inline void InitConst(__cb__ D* dst, const P& initConstValueParams)
+{
+    InitL0BNzMatrixCal(dst, initConstValueParams);
+}
+
+#endif
+
+/* ---- LoadImageToLocal: the destination is always L1 (__cbuf__) -------------- */
+/*
+ * LoadImageToLocal reaches exactly one backend, LoadImageToLocalCal(__cbuf__ T*,
+ * const LoadImageToLocalParams&) (dav_3510/kernel_operator_mm_impl.h:1495), so there is no pipe
+ * to select and therefore no address-space dispatch to perform.
+ */
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+
+template <typename D>
+__aicore__ inline void LdImage(D* dst, const LoadImageToLocalParams& loadDataParams)
+{
+    LoadImageToLocalCal(dst, loadDataParams);
+}
+
+#else
+
+template <typename D>
+__aicore__ inline void LdImage(__cbuf__ D* dst, const LoadImageToLocalParams& loadDataParams)
+{
+    LoadImageToLocalCal(dst, loadDataParams);
+}
+
+#endif
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+
+/* ---- LoadData with a bit-mode descriptor: L1 -> L0A / L0B ------------------- */
+/*
+ * The Tensor path selects the backend from the Dst TPosition *template argument*
+ * (kernel_operator_mm_base_impl.h:333 for 3D, kernel_operator_mm_load2d_impl.h:83 for 2D, both
+ * dav_3510-only).  The pointer path keeps that explicit Dst / Src template argument list, and
+ * additionally checks it against the address space of the pointer, which is the same information
+ * expressed in the type of the operand itself.
+ *
+ * No cast to the address space is available on this path: bisheng rejects casting a generic `D*`
+ * to `__ca__ T*` inside an aicore function ("casting 'D *' to type '__ca__ T *' is not allowed in
+ * aicore function").  The backend is therefore selected by an address-space overload -- the same
+ * shape already used for Ld12L0 above -- and dst / src must carry the address space of the operand
+ * they name.  The backend also takes one element type for both operands, exactly as the Tensor form
+ * takes LocalTensor<T> twice, so dst and src must share a pointee type; no re-view is possible and
+ * none is performed, so the instruction issued is the one the operands describe.
+ */
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+
+// The address space is erased in this build, so the A pipe is the single representative, exactly
+// as for Ld12L0 above.  Dst still has to name a destination the bit-mode form supports.
+template <TPosition Dst, typename D, typename S>
+__aicore__ inline void LdBm3D(D* dst, S* src, const Load3DBitModeParam& loadDataParams)
+{
+    static_assert(Dst == TPosition::A2 || Dst == TPosition::B2,
+        "LoadData with Load3DBitModeParam supports dst TPosition A2 / B2 only.");
+    LoadData3DV2L12L0ACal(dst, src, loadDataParams);
+}
+
+template <TPosition Dst, typename D, typename S>
+__aicore__ inline void LdBm2D(D* dst, S* src, const Load2DBitModeParam& loadDataParams)
+{
+    static_assert(Dst == TPosition::A2 || Dst == TPosition::B2,
+        "LoadData with Load2DBitModeParam supports dst TPosition A2 / B2 only.");
+    LoadData2DL12L0ACal(dst, src, loadDataParams);
+}
+
+#else
+
+template <TPosition Dst, typename D, typename S>
+__aicore__ inline void LdBm3D(__ca__ D* dst, __cbuf__ S* src, const Load3DBitModeParam& loadDataParams)
+{
+    static_assert(Dst == TPosition::A2,
+        "LoadData with Load3DBitModeParam: dst TPosition A2 requires an L0A (__ca__) pointer.");
+    LoadData3DV2L12L0ACal(dst, src, loadDataParams);
+}
+
+template <TPosition Dst, typename D, typename S>
+__aicore__ inline void LdBm3D(__cb__ D* dst, __cbuf__ S* src, const Load3DBitModeParam& loadDataParams)
+{
+    static_assert(Dst == TPosition::B2,
+        "LoadData with Load3DBitModeParam: dst TPosition B2 requires an L0B (__cb__) pointer.");
+    LoadData3DV2L12L0BCal(dst, src, loadDataParams);
+}
+
+template <TPosition Dst, typename D, typename S>
+__aicore__ inline void LdBm2D(__ca__ D* dst, __cbuf__ S* src, const Load2DBitModeParam& loadDataParams)
+{
+    static_assert(Dst == TPosition::A2,
+        "LoadData with Load2DBitModeParam: dst TPosition A2 requires an L0A (__ca__) pointer.");
+    LoadData2DL12L0ACal(dst, src, loadDataParams);
+}
+
+template <TPosition Dst, typename D, typename S>
+__aicore__ inline void LdBm2D(__cb__ D* dst, __cbuf__ S* src, const Load2DBitModeParam& loadDataParams)
+{
+    static_assert(Dst == TPosition::B2,
+        "LoadData with Load2DBitModeParam: dst TPosition B2 requires an L0B (__cb__) pointer.");
+    LoadData2DL12L0BCal(dst, src, loadDataParams);
+}
+
+#endif
+
+#endif
+
+/* ---- LoadData 3dv2Pro: L1 -> L0A / L0B / UB --------------------------------- */
+/*
+ * LoadDataImpl for LoadData3DParamsV2Pro (kernel_operator_mm_base_impl.h:379) selects the pipe
+ * from GetPhyType(dst.GetPosition()) and forwards the address to LoadData3DV2L12L0{A,B,UB}Cal.
+ * The pointer path makes the same selection from the destination's address space; under
+ * ASCENDC_CPU_DEBUG the three spaces collapse into one signature, so exactly one definition is
+ * both necessary and all that build can express.
+ */
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+
+template <typename D, typename S>
+__aicore__ inline void Ld3DV2Pro(D* dst, S* src, const LoadData3DParamsV2Pro& loadDataParams)
+{
+    LoadData3DV2L12L0ACal(dst, src, loadDataParams);
+}
+
+#else
+
+template <typename D, typename S>
+__aicore__ inline void Ld3DV2Pro(__ca__ D* dst, __cbuf__ S* src, const LoadData3DParamsV2Pro& loadDataParams)
+{
+    LoadData3DV2L12L0ACal(dst, src, loadDataParams);
+}
+
+template <typename D, typename S>
+__aicore__ inline void Ld3DV2Pro(__cb__ D* dst, __cbuf__ S* src, const LoadData3DParamsV2Pro& loadDataParams)
+{
+    LoadData3DV2L12L0BCal(dst, src, loadDataParams);
+}
+
+template <typename D, typename S>
+__aicore__ inline void Ld3DV2Pro(__ubuf__ D* dst, __cbuf__ S* src, const LoadData3DParamsV2Pro& loadDataParams)
+{
+    LoadData3DV2L12UBCal(dst, src, loadDataParams);
+}
+
+#endif
+}  // namespace CubePtrOverload
+
+template <typename DstPtr, typename Src0Ptr, typename Src1Ptr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr>::value, bool>::type>
+__aicore__ inline void Mmad(DstPtr dst, Src0Ptr fm, Src1Ptr filter, const MmadParams& mmadParams)
+{
+    MmadCal(dst, fm, filter, mmadParams);
+}
+
+template <typename DstPtr, typename Src0Ptr, typename Src1Ptr, typename BiasPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr, BiasPtr>::value, bool>::type>
+__aicore__ inline void Mmad(DstPtr dst, Src0Ptr fm, Src1Ptr filter, BiasPtr bias, const MmadParams& mmadParams)
+{
+    // A raw pointer no longer carries the TPosition of the bias operand, so the CO1 / C2 distinction
+    // that MmadImpl() derives from it cannot be recovered here.  This signature exists to source the
+    // C matrix from the bias table buffer, which is the only role the Tensor overload maps onto it,
+    // and the corpus passes a C2 operand; cmatrixSource is therefore fixed to true.  A caller that
+    // needs a CO1 bias and cmatrixSource == false must keep using the LocalTensor overload, where the
+    // operand position is still known.
+    MmadCal(dst, fm, filter, (uint64_t)bias, mmadParams, true);
+}
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+template <typename DstPtr, typename Src0Ptr, typename Src1Ptr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr>::value, bool>::type>
+__aicore__ inline void MmadMx(DstPtr dst, Src0Ptr fm, Src1Ptr filter, const MmadParams& mmadParams)
+{
+    MmadMxCal(dst, fm, filter, mmadParams);
+}
+
+template <typename DstPtr, typename Src0Ptr, typename Src1Ptr, typename BiasPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr, BiasPtr>::value, bool>::type>
+__aicore__ inline void MmadMx(DstPtr dst, Src0Ptr fm, Src1Ptr filter, BiasPtr bias, const MmadParams& mmadParams)
+{
+    // Same TPosition caveat as the pointer form of Mmad above.
+    MmadMxCal(dst, fm, filter, (uint64_t)bias, mmadParams, true);
+}
+#endif
+
+template <typename DstPtr, typename SrcPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type>
+__aicore__ inline void LoadData(DstPtr dst, SrcPtr src, const LoadData2DParams& loadDataParams)
+{
+    CubePtrOverload::Ld12L0(dst, src, loadDataParams);
+}
+
+template <typename DstPtr, typename SrcPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type>
+__aicore__ inline void LoadData(DstPtr dst, SrcPtr src, const LoadData2DParamsV2& loadDataParams)
+{
+    CubePtrOverload::Ld12L0(dst, src, loadDataParams);
+}
+
+template <typename DstPtr, typename SrcPtr, typename U,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type>
+__aicore__ inline void LoadData(DstPtr dst, SrcPtr src, const LoadData3DParamsV2<U>& loadDataParams)
+{
+    CubePtrOverload::Ld3DV2(dst, src, loadDataParams);
+}
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+template <typename DstPtr, typename SrcPtr, typename SrcMxPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr, SrcMxPtr>::value, bool>::type>
+__aicore__ inline void LoadData(DstPtr dst, SrcPtr src, SrcMxPtr srcMx, const LoadData2DParamsV2& loadDataParams,
+    const LoadData2DMxParams& loadMxDataParams)
+{
+    CubePtrOverload::Ld12L0Mx(dst, src, srcMx, loadDataParams, loadMxDataParams);
+}
+#endif
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+// LoadDataWithStride reaches LoadData3DV2L12L0{A,B}WithStrideCal, which exists only in
+// impl/basic_api/dav_3510.  The Tensor declaration and definition carry the same guard,
+// so the pointer overloads must too, or a non-3510 arch fails to declare the backend.
+template <typename DstPtr, typename SrcPtr, typename U,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type>
+__aicore__ inline void LoadDataWithStride(DstPtr dst, SrcPtr src, const LoadData3DParamsV2<U>& loadDataParams)
+{
+    CubePtrOverload::Ld3DV2Stride<IS_RESER_LOAD3D_DEFAULT_CONFIG>(dst, src, loadDataParams);
+}
+
+template <typename T, const IsResetLoad3dConfig& defaultConfig, typename U, typename DstPtr, typename SrcPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type>
+__aicore__ inline void LoadDataWithStride(DstPtr dst, SrcPtr src, const LoadData3DParamsV2<U>& loadDataParams)
+{
+    CubePtrOverload::Ld3DV2Stride<defaultConfig>(dst, src, loadDataParams);
+}
+#endif
+
+/* ---- LoadData with a bit-mode descriptor, raw pointer operands -------------- */
+/*
+ * Dst and Src stay explicit because neither is deducible from the arguments -- the same reason the
+ * Tensor declaration carries them -- and the pointer operands follow them, so a call site written
+ * as LoadData<TPosition::A2, TPosition::A1>(ptr, ptr, params) resolves.
+ *
+ * There is no `<..., T>` form here, unlike the Tensor overload where T is deduced from the
+ * LocalTensor pair: with the address-space cast unavailable on this path (see the helpers above) no
+ * re-view is possible, so an explicitly named T could not change the backend that is reached.  It
+ * would be exactly equivalent to the deduced form and is therefore not provided.
+ *
+ * As in the overloads above, a definition repeats no default argument that the declaration in
+ * kernel_operator_mm_intf.h already gives.
+ */
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+
+template <TPosition Dst, TPosition Src, typename DstPtr, typename SrcPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type>
+__aicore__ inline void LoadData(DstPtr dst, SrcPtr src, const Load3DBitModeParam& loadDataParams)
+{
+    CubePtrOverload::LdBm3D<Dst>(dst, src, loadDataParams);
+}
+
+template <TPosition Dst, TPosition Src, typename DstPtr, typename SrcPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type>
+__aicore__ inline void LoadData(DstPtr dst, SrcPtr src, const Load2DBitModeParam& loadDataParams)
+{
+    CubePtrOverload::LdBm2D<Dst>(dst, src, loadDataParams);
+}
+
+#endif
+
+/* ---- LoadData 3dv2Pro with raw pointer operands ----------------------------- */
+template <typename DstPtr, typename SrcPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type>
+__aicore__ inline void LoadData(DstPtr dst, SrcPtr src, const LoadData3DParamsV2Pro& loadDataParams)
+{
+    CubePtrOverload::Ld3DV2Pro(dst, src, loadDataParams);
+}
+
+/* ---- LoadImageToLocal with a raw pointer destination ------------------------ */
+template <typename DstPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr>::value, bool>::type>
+__aicore__ inline void LoadImageToLocal(DstPtr dst, const LoadImageToLocalParams& loadDataParams)
+{
+    CubePtrOverload::LdImage(dst, loadDataParams);
+}
+
+/* ---- InitConstValue with a raw pointer destination -------------------------- */
+template <typename DstPtr, typename U,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr>::value, bool>::type>
+__aicore__ inline void InitConstValue(DstPtr dst, const InitConstValueParams<U>& initConstValueParams)
+{
+    CubePtrOverload::InitConst(dst, initConstValueParams);
+}
+
+// The explicit element type mirrors the Tensor declaration's <T, U = PrimT<T>>: a call site written
+// InitConstValue<half>(ptr, params) resolves here, exactly as it does against the Tensor overload.
+template <typename T, typename U, typename DstPtr,
+    typename Std::enable_if<IsSameType<PrimT<T>, U>::value, bool>::type,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr>::value, bool>::type>
+__aicore__ inline void InitConstValue(DstPtr dst, const InitConstValueParams<U>& initConstValueParams)
+{
+    CubePtrOverload::InitConst(dst, initConstValueParams);
+}
+
+template <typename DstPtr, typename SrcPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type>
+__aicore__ inline void LoadDataWithTranspose(DstPtr dst, SrcPtr src, const LoadData2dTransposeParams& loadDataParams)
+{
+    CubePtrOverload::Ld12L0Transpose(dst, src, loadDataParams);
+}
+
+template <typename DstPtr, typename SrcPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type>
+__aicore__ inline void LoadDataWithTranspose(DstPtr dst, SrcPtr src, const LoadData2dTransposeParamsV2& loadDataParams)
+{
+    CubePtrOverload::Ld12L0Transpose(dst, src, loadDataParams);
+}
+
+#if __NPU_ARCH__ == 2201
+template <typename DstPtr, typename Src0Ptr, typename Src1Ptr,
+    typename std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr>::value, bool>::type>
+__aicore__ inline void MmadWithSparse(DstPtr dst, Src0Ptr fm, Src1Ptr filter, const MmadParams& mmadParams)
+{
+    MmadSpCal(dst, fm, filter, mmadParams);
+}
+#endif
+
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_MM_INTERFACE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_INTF_IMPL_H__)
