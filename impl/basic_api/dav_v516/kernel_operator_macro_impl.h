@@ -388,7 +388,7 @@ __aicore__ inline void ConvFixCal(
     uint64_t config = 0;
     CheckCubeFixSupportTypes<DstT, Src0T, Src1T>(dst, fm, filter);
     GenConvFixConfig(convFixParams, config);
-    Convolution<DstT, Src0T, Src1T>(dst, fm, filter, 0ULL, convFixParams.GetConfig0());
+    Convolution<DstT, Src0T, Src1T>(dst, fm, filter, 0ULL, config);
 }
 
 template <typename DstT, typename Src0T, typename Src1T>
@@ -397,7 +397,7 @@ __aicore__ inline void ConvFixCal(
     const ConvFixBitModeParams& convFixParams)
 {
     CheckCubeFixSupportTypes<DstT, Src0T, Src1T>(dst, fm, filter);
-    if (ConvFixBitModeParams.GetConfig0() & 0x2) {
+    if (convFixParams.GetConfig0() & 0x2) {
         Convolution<DstT, Src0T, Src1T>(dst, fm, filter, bias, convFixParams.GetConfig0());
     } else {
         ConvolutionNoBroadcast<DstT, Src0T, Src1T>(dst, fm, filter, bias, convFixParams.GetConfig0());
@@ -407,12 +407,12 @@ __aicore__ inline void ConvFixCal(
 template <typename DstT, typename Src0T, typename Src1T>
 __aicore__ inline void ConvFixCal(
     __cbuf__ DstT* dst, __cbuf__ Src0T* fm, __cb__ Src1T* filter, uint64_t bias,
-    const ConvFixParams& params)
+    const ConvFixParams& convFixParams)
 {
     uint64_t config = 0;
     CheckCubeFixSupportTypes<DstT, Src0T, Src1T>(dst, fm, filter);
-    GenConvFixConfig(params, config);
-    if (params.biasMatrixBroadcast) {
+    GenConvFixConfig(convFixParams, config);
+    if (convFixParams.biasMatrixBroadcast) {
         Convolution<DstT, Src0T, Src1T>(dst, fm, filter, bias, config);
     } else {
         ConvolutionNoBroadcast<DstT, Src0T, Src1T>(dst, fm, filter, bias, config);
