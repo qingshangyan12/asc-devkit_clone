@@ -1456,6 +1456,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2exp10(half2 x)
 
 #endif // ASCENDC_USE_LEGACY_PRECISION
 
+
 #endif
 #endif // IMPL_SIMT_API_ASC_FP16_IMPL_H
 
