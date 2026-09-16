@@ -1,0 +1,3 @@
+[ERROR]  failed to get file
+[ERROR]  failed to get file
+[ERROR]  Open file failed. path = ./output/output.bin

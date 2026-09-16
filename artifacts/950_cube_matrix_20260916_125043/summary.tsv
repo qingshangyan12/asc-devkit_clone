@@ -1,0 +1,6 @@
+case	scenario	arch	build	run	verify	note
+mmad	1	dav-3510	PASS	RUN_FAIL	-	exit=0
+fixpipe_l0c2gm	1	dav-3510	PASS	RUN_FAIL	-	exit=0
+load_data_l12l0	1	dav-3510	BUILD_FAIL	-	-	
+batch_matmul	1	dav-3510	PASS	RUN_FAIL	-	exit=0
+mmad_gemv	1	dav-3510	PASS	RUN_FAIL	-	exit=0
