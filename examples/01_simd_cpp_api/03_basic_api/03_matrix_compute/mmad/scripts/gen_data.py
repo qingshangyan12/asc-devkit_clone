@@ -14,7 +14,10 @@
 import argparse
 import os
 import numpy as np
-from ml_dtypes import bfloat16
+try:
+    from ml_dtypes import bfloat16
+except ImportError:
+    bfloat16 = None
 
 
 def gen_golden_data(scenario_num=1):
