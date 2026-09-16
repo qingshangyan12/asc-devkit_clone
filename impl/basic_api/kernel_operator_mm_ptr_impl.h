@@ -249,6 +249,177 @@ __aicore__ inline void LoadDataWithSparse(
 }
 #endif
 
+/* **************************************************************************************************
+ * LoadData (pointer) — GM -> L0A / L0B / L1
+ * ************************************************************************************************* */
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    __ca__ T* dst, __gm__ T* src, const LoadData2DParams& loadDataParams)
+{
+    LoadData2DGM2L0ACal(dst, src, loadDataParams);
+}
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    __cb__ T* dst, __gm__ T* src, const LoadData2DParams& loadDataParams)
+{
+    LoadData2DGM2L0BCal(dst, src, loadDataParams);
+}
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    __cbuf__ T* dst, __gm__ T* src, const LoadData2DParams& loadDataParams)
+{
+    LoadData2DGM2L1Cal(dst, src, loadDataParams);
+}
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    __ca__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParams)
+{
+    LoadData2DGM2L0ACal(dst, src, loadDataParams);
+}
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    __cb__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParams)
+{
+    LoadData2DGM2L0BCal(dst, src, loadDataParams);
+}
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    __cbuf__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParams)
+{
+    LoadData2DGM2L1Cal(dst, src, loadDataParams);
+}
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+template <typename T, typename U>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    __cbuf__ T* dst, __gm__ U* src, const LoadData2DParamsV2& loadDataParams, const Nd2NzParamsV2& nd2nzParams)
+{
+    LoadData2DGM2L1Cal(dst, src, loadDataParams, nd2nzParams);
+}
+#endif
+
+/* **************************************************************************************************
+ * LoadData (pointer) — LoadData3DParamsV1 / V2Pro / BitMode
+ * ************************************************************************************************* */
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = T,
+    typename std::enable_if<IsSameType<T, U>::value, bool>::type = true>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV1<U>& loadDataParams)
+{
+    if constexpr (defaultConfig.isSetFMatrix) {
+        Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
+    }
+    if constexpr (defaultConfig.isSetPadding) {
+        Load3DSetPaddingCal(loadDataParams.padValue);
+    }
+    LoadData3DV1L12L0ACal(dst, src, loadDataParams);
+}
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = T,
+    typename std::enable_if<IsSameType<T, U>::value, bool>::type = true>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV1<U>& loadDataParams)
+{
+    if constexpr (defaultConfig.isSetFMatrix) {
+        Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
+    }
+    if constexpr (defaultConfig.isSetPadding) {
+        Load3DSetPaddingCal(loadDataParams.padValue);
+    }
+    LoadData3DV1L12L0BCal(dst, src, loadDataParams);
+}
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = T,
+    typename std::enable_if<IsSameType<T, U>::value, bool>::type = true>
+__aicore__ inline void LoadData(__ubuf__ T* dst, __cbuf__ T* src, const LoadData3DParamsV1<U>& loadDataParams)
+{
+    if constexpr (defaultConfig.isSetFMatrix) {
+        Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
+    }
+    if constexpr (defaultConfig.isSetPadding) {
+        Load3DSetPaddingCal(loadDataParams.padValue);
+    }
+    LoadData3DV1L12UBCal(dst, src, loadDataParams);
+}
+
+template <typename T>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2Pro& loadDataParams)
+{
+    LoadData3DV2L12L0ACal(dst, src, loadDataParams);
+}
+
+template <typename T>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2Pro& loadDataParams)
+{
+    LoadData3DV2L12L0BCal(dst, src, loadDataParams);
+}
+
+template <typename T>
+__aicore__ inline void LoadData(__ubuf__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2Pro& loadDataParams)
+{
+    LoadData3DV2L12UBCal(dst, src, loadDataParams);
+}
+
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+template <typename T>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const Load2DBitModeParam& loadDataParams)
+{
+    LoadData2DL12L0ACal(dst, src, loadDataParams);
+}
+
+template <typename T>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const Load2DBitModeParam& loadDataParams)
+{
+    LoadData2DL12L0BCal(dst, src, loadDataParams);
+}
+
+template <typename T>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const Load3DBitModeParam& loadDataParams)
+{
+    LoadData3DV2L12L0ACal(dst, src, loadDataParams);
+}
+
+template <typename T>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const Load3DBitModeParam& loadDataParams)
+{
+    LoadData3DV2L12L0BCal(dst, src, loadDataParams);
+}
+#endif
+
+/* **************************************************************************************************
+ * InitConstValue / LoadImageToLocal (pointer)
+ * ************************************************************************************************* */
+template <typename T, typename U = T, typename std::enable_if<IsSameType<T, U>::value, bool>::type = true>
+__aicore__ inline void InitConstValue(__ca__ T* dst, const InitConstValueParams<U>& initConstValueParams)
+{
+    InitL0ANzMatrixCal(dst, initConstValueParams);
+}
+
+template <typename T, typename U = T, typename std::enable_if<IsSameType<T, U>::value, bool>::type = true>
+__aicore__ inline void InitConstValue(__cb__ T* dst, const InitConstValueParams<U>& initConstValueParams)
+{
+    InitL0BNzMatrixCal(dst, initConstValueParams);
+}
+
+template <typename T, typename U = T, typename std::enable_if<IsSameType<T, U>::value, bool>::type = true>
+__aicore__ inline void InitConstValue(__cbuf__ T* dst, const InitConstValueParams<U>& initConstValueParams)
+{
+    InitL1BufferCal(dst, initConstValueParams);
+}
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadImageToLocal(
+    __cbuf__ T* dst, const LoadImageToLocalParams& loadDataParams)
+{
+    LoadImageToLocalCal(dst, loadDataParams);
+}
+
 } // namespace AscendC
 
 #endif // ASCENDC_MODULE_OPERATOR_MM_PTR_IMPL_H

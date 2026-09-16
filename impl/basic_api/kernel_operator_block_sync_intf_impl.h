@@ -295,6 +295,8 @@ __aicore__ inline void WaitEvent(uint16_t flagId)
 
 } // namespace AscendC
 
+#include "kernel_operator_block_sync_ptr_impl.h"
+
 #endif // ASCENDC_MODULE_OPERATOR_BLOCK_SYNC_INTERFACE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_BLOCK_SYNC_INTF_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

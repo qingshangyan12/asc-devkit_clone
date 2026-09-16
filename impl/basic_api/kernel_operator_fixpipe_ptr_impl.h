@@ -59,8 +59,10 @@ __aicore__ inline void SetFixPipeConfig(__cc__ T* reluPre, __cc__ T* quantPre, b
 /* **************************************************************************************************
  * Fixpipe (pointer) — V220 params
  * ************************************************************************************************* */
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
-                              __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3003 || \
+                              __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 3510 || \
+                              __NPU_ARCH__ == 5102)
+// Note: FixpipeParamsM300 / M310 are typedef aliases of FixpipeParamsV220.
 template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
 __aicore__ inline void Fixpipe(__cbuf__ T* dst, __cc__ U* src, const FixpipeParamsV220& intriParams)
 {
