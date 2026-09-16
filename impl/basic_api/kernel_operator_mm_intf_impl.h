@@ -26,6 +26,7 @@
 #include "kernel_reg.h"
 #include "kernel_npu_debug.h"
 #include "kernel_operator_mm_base_impl.h"
+#include "utils/kernel_utils_ptr.h"
 #include "../../include/basic_api/kernel_struct_mm.h"
 
 namespace AscendC {
@@ -55,6 +56,23 @@ __aicore__ inline void LoadData(
     CheckLoadData2dParams<T>(loadDataParams, true);
 #endif
     LoadDataImpl(dst, src, loadDataParams);
+}
+
+/* [CUBE-PTR-EXPAND] LoadData 2D L1 -> L0A/L0B */
+template <typename T>
+__aicore__ inline void LoadData(
+    __ca__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParams)
+{
+    CheckLoadData2dDatatype<T>();
+    LoadData2DL12L0ACal(dst, src, loadDataParams);
+}
+
+template <typename T>
+__aicore__ inline void LoadData(
+    __cb__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParams)
+{
+    CheckLoadData2dDatatype<T>();
+    LoadData2DL12L0BCal(dst, src, loadDataParams);
 }
 
 template <typename T>
@@ -125,6 +143,59 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     CheckLoadData2dGlobal2Local(dst, "LoadData with LoadData2DParamsV2");
 #endif
     LoadDataImpl(dst, src, loadDataParams);
+}
+
+/* [CUBE-PTR-EXPAND] LoadData 2DV2 GM -> L0A/L0B/L1 ; cacheMode fixed to 0 (bare __gm__ has no ExtractCacheMode) */
+template <typename T>
+__aicore__ inline void LoadData(
+    __ca__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParams)
+{
+    CheckLoadData2dDatatype<T>();
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    LoadData2DGM2L0ACal(dst, src, loadDataParams, static_cast<uint8_t>(0));
+#else
+    LoadData2DGM2L0ACal(dst, src, loadDataParams);
+#endif
+}
+
+template <typename T>
+__aicore__ inline void LoadData(
+    __cb__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParams)
+{
+    CheckLoadData2dDatatype<T>();
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    LoadData2DGM2L0BCal(dst, src, loadDataParams, static_cast<uint8_t>(0));
+#else
+    LoadData2DGM2L0BCal(dst, src, loadDataParams);
+#endif
+}
+
+template <typename T>
+__aicore__ inline void LoadData(
+    __cbuf__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParams)
+{
+    CheckLoadData2dDatatype<T>();
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    LoadData2DGM2L1Cal(dst, src, loadDataParams, static_cast<uint8_t>(0));
+#else
+    LoadData2DGM2L1Cal(dst, src, loadDataParams);
+#endif
+}
+
+template <typename T>
+__aicore__ inline void LoadData(
+    __ca__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParams)
+{
+    CheckLoadData2dDatatype<T>();
+    LoadData2DL12L0ACal(dst, src, loadDataParams);
+}
+
+template <typename T>
+__aicore__ inline void LoadData(
+    __cb__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParams)
+{
+    CheckLoadData2dDatatype<T>();
+    LoadData2DL12L0BCal(dst, src, loadDataParams);
 }
 
 /* **************************************************************************************************
@@ -323,6 +394,21 @@ __aicore__ inline void LoadDataWithTranspose(
     LoadDataWithTransposeImpl(dst, src, loadDataParams);
 }
 
+/* [CUBE-PTR-EXPAND] LoadDataWithTranspose V1 */
+template <typename T>
+__aicore__ inline void LoadDataWithTranspose(
+    __ca__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParams)
+{
+    LoadData2DL12L0ATransposeCal(dst, src, loadDataParams);
+}
+
+template <typename T>
+__aicore__ inline void LoadDataWithTranspose(
+    __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParams)
+{
+    LoadData2DL12L0BTransposeCal(dst, src, loadDataParams);
+}
+
 /*
  * @ingroup DataLoad
  * @brief Cube data loading
@@ -346,6 +432,21 @@ __aicore__ inline void LoadDataWithTranspose(
         "LoadDataWithTranspose with LoadData2dTransposeParamsV2");
 #endif
     LoadDataWithTransposeImpl(dst, src, loadDataParams);
+}
+
+/* [CUBE-PTR-EXPAND] LoadDataWithTranspose V2 */
+template <typename T>
+__aicore__ inline void LoadDataWithTranspose(
+    __ca__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParamsV2& loadDataParams)
+{
+    LoadData2DL12L0ATransposeCal(dst, src, loadDataParams);
+}
+
+template <typename T>
+__aicore__ inline void LoadDataWithTranspose(
+    __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParamsV2& loadDataParams)
+{
+    LoadData2DL12L0BTransposeCal(dst, src, loadDataParams);
 }
 
 /* **************************************************************************************************
@@ -375,12 +476,29 @@ __aicore__ inline void Mmad(
     MmadImpl(dst, fm, filter, mmadParams);
 }
 
+template <typename T, typename U, typename S>
+__aicore__ inline void Mmad(
+    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadParams& mmadParams)
+{
+    MmadCal(
+        (__cc__ PrimT<T>*)dst, (__ca__ PrimT<U>*)fm, (__cb__ PrimT<S>*)filter, mmadParams);
+}
+
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
     const MmadParams& mmadParams)
 {
     MmadImpl(dst, fm, filter, bias, mmadParams);
+}
+
+/* [CUBE-PTR-EXPAND] Mmad + bias pointer path */
+template <typename T, typename U, typename S>
+__aicore__ inline void Mmad(
+    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, uint64_t bias,
+    const MmadParams& mmadParams, bool cmatrixSource)
+{
+    MmadCal(dst, fm, filter, bias, mmadParams, cmatrixSource);
 }
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)

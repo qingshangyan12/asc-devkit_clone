@@ -59,6 +59,15 @@ template <typename T>
 __aicore__ inline void LoadData(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2DParams& loadDataParams);
 
+/* [CUBE-PTR-EXPAND] LoadData 2D L1(__cbuf__) -> L0A/L0B */
+template <typename T>
+__aicore__ inline void LoadData(
+    __ca__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadData(
+    __cb__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParams);
+
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams);
@@ -87,6 +96,27 @@ __aicore__ inline void LoadData(
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParamsV2& loadDataParams);
+
+/* [CUBE-PTR-EXPAND] LoadData 2DV2 GM(__gm__) -> L0A/L0B/L1 ; cacheMode=0 */
+template <typename T>
+__aicore__ inline void LoadData(
+    __ca__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadData(
+    __cb__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadData(
+    __cbuf__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadData(
+    __ca__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadData(
+    __cb__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParams);
 
 #if (__NPU_ARCH__ == 3510) 
 template <typename T, typename U = T>
@@ -229,6 +259,15 @@ template <typename T>
 __aicore__ inline void LoadDataWithTranspose(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2dTransposeParams& loadDataParams);
 
+/* [CUBE-PTR-EXPAND] LoadDataWithTranspose V1 */
+template <typename T>
+__aicore__ inline void LoadDataWithTranspose(
+    __ca__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadDataWithTranspose(
+    __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParams);
+
 /*
  * @ingroup DataLoad
  * @brief Cube data loading
@@ -245,6 +284,15 @@ __aicore__ inline void LoadDataWithTranspose(
 template <typename T>
 __aicore__ inline void LoadDataWithTranspose(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2dTransposeParamsV2& loadDataParams);
+
+/* [CUBE-PTR-EXPAND] LoadDataWithTranspose V2 */
+template <typename T>
+__aicore__ inline void LoadDataWithTranspose(
+    __ca__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParamsV2& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadDataWithTranspose(
+    __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParamsV2& loadDataParams);
 
 /* **************************************************************************************************
  * Mmad                                             *
@@ -270,10 +318,20 @@ template <typename T, typename U, typename S>
 __aicore__ inline void Mmad(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const MmadParams& mmadParams);
 
+template <typename T, typename U, typename S>
+__aicore__ inline void Mmad(
+    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadParams& mmadParams);
+
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
     const MmadParams& mmadParams);
+
+/* [CUBE-PTR-EXPAND] Mmad + bias pointer path (cmatrixSource: true=BIAS table, false=L0C) */
+template <typename T, typename U, typename S>
+__aicore__ inline void Mmad(
+    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, uint64_t bias,
+    const MmadParams& mmadParams, bool cmatrixSource = false);
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 template <typename T, typename U, typename S>
