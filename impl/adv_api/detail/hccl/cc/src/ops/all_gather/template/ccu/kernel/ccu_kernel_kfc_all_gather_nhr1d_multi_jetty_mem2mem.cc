@@ -9,6 +9,7 @@
  */
 
 #include "ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem.h"
+#include "ccu_func_dl.hpp"
 
 namespace mc2_ops_hccl {
 namespace {
@@ -66,6 +67,29 @@ CcuResult InitResource(KfcAllGatherNhrContext& ctx)
     }
     ctx.outputSliceOffset.resize(ctx.rankSize);
     ctx.resourceAllocated = false;
+    return CCU_SUCCESS;
+}
+
+CcuResult LoadArgs(KfcAllGatherNhrContext& ctx, ccu::Array<ccu::Variable>& args)
+{
+    const uint32_t localIdx = ctx.channelCount;
+    uint32_t argId = 0;
+    ctx.input = args[argId++];
+    ctx.output[localIdx] = args[argId++];
+    ctx.token[localIdx] = args[argId++];
+    ctx.sliceSize = args[argId++];
+    ctx.sliceSizePerJetty = args[argId++];
+    ctx.lastSliceSizePerJetty = args[argId++];
+    ctx.repeatNumInv = args[argId++];
+    ctx.inputSliceStride = args[argId++];
+    ctx.outputSliceStride = args[argId++];
+    ctx.inputRepeatStride = args[argId++];
+    ctx.outputRepeatStride = args[argId++];
+    ctx.isInputOutputEqual = args[argId++];
+    ctx.goSize.addrOffset = args[argId++];
+    ctx.goSize.loopParam = args[argId++];
+    ctx.goSize.parallelParam = args[argId++];
+    ctx.goSize.residual = args[argId++];
     return CCU_SUCCESS;
 }
 
@@ -257,6 +281,16 @@ void AddVariableNTimes(ccu::Variable& result, const ccu::Variable& value, uint32
 }
 } // namespace
 
+static CcuResult RunAllGatherNhr(KfcAllGatherNhrContext& ctx, ccu::Array<ccu::Variable>& args)
+{
+    CCU_CHK_RET(LoadArgs(ctx, args));
+    ctx.constVar1 = 1U;
+    CCU_CHK_RET(PreSync(ctx));
+    CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(RunNhr(ctx)); }
+    CCU_CHK_RET(PostSync(ctx));
+    return CCU_SUCCESS;
+}
+
 CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable sliceSize,
     ccu::Variable sliceSizePerJetty, ccu::Variable lastSliceSizePerJetty, ccu::Variable repeatNumInv,
@@ -276,16 +310,34 @@ CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
     ctx.rank2ChannelIdx = &rank2ChannelIdx;
     InitCcuKernelCtxBase(ctx);
     CCU_CHK_RET(InitResource(ctx));
-
     CCU_CHK_RET(LoadNhrArgs(
         ctx, inputAddr, outputAddr, tokenInfo, sliceSize, sliceSizePerJetty, lastSliceSizePerJetty, repeatNumInv,
         inputSliceStride, outputSliceStride, inputRepeatStride, outputRepeatStride, isInputOutputEqual, goSize0,
         goSize1, goSize2, goSize3));
-
     CCU_CHK_RET(PreSync(ctx));
     CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(RunNhr(ctx)); }
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
+}
+
+CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemDefineKernel(CcuKernelArg arg)
+{
+    const auto* kernelArg = static_cast<CcuKernelArgKfcAllGatherNHR1DMultiJettyMem2Mem*>(arg);
+    KfcAllGatherNhrContext ctx;
+    ctx.channels = kernelArg->channels;
+    ctx.channelCount = kernelArg->channelCount;
+    ctx.rankSize = static_cast<uint32_t>(kernelArg->rankSize);
+    ctx.rankId = kernelArg->rankId;
+    ctx.jettyNum = kernelArg->jettyNum;
+    ctx.stepInfoVector = &kernelArg->stepInfoVector;
+    ctx.rank2ChannelIdx = &kernelArg->rank2ChannelIdx;
+    InitCcuKernelCtxBase(ctx);
+    CCU_CHK_RET(InitResource(ctx));
+    CcuResult bodyRet = CCU_SUCCESS;
+    ccu::Func subKernel(
+        [&ctx, &bodyRet](ccu::Array<ccu::Variable>& args) { bodyRet = RunAllGatherNhr(ctx, args); }, 16U,
+        KFC_SUB_KERNEL_FUNC_NAME);
+    return bodyRet;
 }
 
 CcuResult CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemKernel(
@@ -351,6 +403,24 @@ CcuResult CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemKernel(
     CCU_IF(part0Size != 0) { CCU_CHK_RET(RunNhr(ctx)); }
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
+}
+
+CcuResult CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemDefineKernel(CcuKernelArg arg)
+{
+    const auto* kernelArg = static_cast<CcuKernelArgKfcAllGatherNHR1DMultiJettyMem2Mem*>(arg);
+    const auto* parallelArg = static_cast<const KfcParallelAllGatherArg*>(kernelArg->algArg.get());
+    CcuResult bodyRet = CCU_SUCCESS;
+    ccu::Func subKernel(
+        [kernelArg, parallelArg, &bodyRet](ccu::Array<ccu::Variable>& args) {
+            bodyRet = CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemKernel(
+                args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9],
+                args[10], args[11], args[12], args[13], args[14], args[15], args[16], args[17], args[18],
+                args[19], args[20], kernelArg->channels, kernelArg->channelCount, parallelArg->rankSizeLevel0,
+                parallelArg->rankIdxLevel0, parallelArg->rankSizeLevel1, parallelArg->rankIdxLevel1,
+                parallelArg->jettyNum, parallelArg->stepInfoVector, parallelArg->rank2ChannelIdx);
+        },
+        21U, KFC_SUB_KERNEL_FUNC_NAME);
+    return bodyRet;
 }
 
 } // namespace mc2_ops_hccl

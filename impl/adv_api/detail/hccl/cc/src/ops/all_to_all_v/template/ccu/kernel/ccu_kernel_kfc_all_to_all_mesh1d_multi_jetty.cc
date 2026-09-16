@@ -9,6 +9,7 @@
  */
 
 #include "ccu_kernel_kfc_all_to_all_mesh1d_multi_jetty.h"
+#include "ccu_func_dl.hpp"
 
 namespace mc2_ops_hccl {
 namespace {
@@ -57,6 +58,23 @@ CcuResult InitResource(KfcAllToAllContext& ctx)
         ++channelIdx;
     }
     ctx.resourceAllocated = false;
+    return CCU_SUCCESS;
+}
+
+CcuResult LoadArgs(KfcAllToAllContext& ctx, ccu::Array<ccu::Variable>& args)
+{
+    uint32_t argId = 0;
+    ctx.input = args[argId++];
+    ctx.output = args[argId++];
+    ctx.token = args[argId++];
+    ctx.sliceSize = args[argId++];
+    ctx.srcStride = args[argId++];
+    ctx.srcOffset = args[argId++];
+    ctx.dstOffset = args[argId++];
+    ctx.goSize.addrOffset = args[argId++];
+    ctx.goSize.loopParam = args[argId++];
+    ctx.goSize.parallelParam = args[argId++];
+    ctx.goSize.residual = args[argId++];
     return CCU_SUCCESS;
 }
 
@@ -141,6 +159,15 @@ CcuResult DoAllToAll(KfcAllToAllContext& ctx)
 }
 } // namespace
 
+static CcuResult RunAllToAll(KfcAllToAllContext& ctx, ccu::Array<ccu::Variable>& args)
+{
+    CCU_CHK_RET(LoadArgs(ctx, args));
+    CCU_CHK_RET(PreSync(ctx));
+    CCU_CHK_RET(DoAllToAll(ctx));
+    CCU_CHK_RET(PostSync(ctx));
+    return CCU_SUCCESS;
+}
+
 CcuResult CcuKfcAllToAllMesh1DMultiJettyKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable sliceSize,
     ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset, ccu::Variable goSize0,
@@ -171,6 +198,24 @@ CcuResult CcuKfcAllToAllMesh1DMultiJettyKernel(
     CCU_CHK_RET(DoAllToAll(ctx));
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
+}
+
+CcuResult CcuKfcAllToAllMesh1DMultiJettyDefineKernel(CcuKernelArg arg)
+{
+    const auto* kernelArg = static_cast<CcuKernelArgKfcAllToAllMesh1DMultiJetty*>(arg);
+    KfcAllToAllContext ctx;
+    ctx.channels = kernelArg->channels;
+    ctx.channelCount = kernelArg->channelCount;
+    ctx.rankSize = static_cast<uint32_t>(kernelArg->rankSize);
+    ctx.rankId = kernelArg->rankId;
+    InitCcuKernelCtxBase(ctx);
+    CCU_CHK_RET(InitResource(ctx));
+
+    CcuResult bodyRet = CCU_SUCCESS;
+    ccu::Func subKernel(
+        [&ctx, &bodyRet](ccu::Array<ccu::Variable>& args) { bodyRet = RunAllToAll(ctx, args); },
+        11, KFC_SUB_KERNEL_FUNC_NAME);
+    return bodyRet;
 }
 
 } // namespace mc2_ops_hccl

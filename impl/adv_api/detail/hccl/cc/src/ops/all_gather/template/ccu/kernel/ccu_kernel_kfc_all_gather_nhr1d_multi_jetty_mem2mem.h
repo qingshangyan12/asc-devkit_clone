@@ -18,6 +18,16 @@
 
 namespace mc2_ops_hccl {
 
+struct CcuKernelArgKfcAllGatherNHR1DMultiJettyMem2Mem : CcuKernelArgBase {
+    uint64_t rankSize = 0;
+    uint32_t rankId = 0;
+    uint32_t jettyNum = 4;
+    OpParam opParam;
+    std::vector<KfcNhrStepInfo> stepInfoVector;
+    std::map<uint32_t, uint32_t> rank2ChannelIdx;
+    std::vector<std::vector<uint32_t>> subCommRanks;
+};
+
 CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable sliceSize,
     ccu::Variable sliceSizePerJetty, ccu::Variable lastSliceSizePerJetty, ccu::Variable repeatNumInv,
@@ -26,6 +36,7 @@ CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
     ccu::Variable goSize2, ccu::Variable goSize3, const ChannelHandle channels[], uint32_t channelCount,
     uint32_t rankSize, uint32_t rankId, uint32_t jettyNum, const std::vector<KfcNhrStepInfo>& stepInfoVector,
     const std::map<uint32_t, uint32_t>& rank2ChannelIdx);
+CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemDefineKernel(CcuKernelArg arg);
 
 CcuResult CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemKernel(
     ccu::Variable inputBase, ccu::Variable outputBase, ccu::Variable tokenInfo, ccu::Variable outputStride,
@@ -37,6 +48,7 @@ CcuResult CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemKernel(
     uint32_t channelCount, uint32_t rankSizeLevel0, uint32_t rankIdxLevel0, uint32_t rankSizeLevel1,
     uint32_t rankIdxLevel1, uint32_t jettyNum, const std::vector<KfcNhrStepInfo>& stepInfoVector,
     const std::map<uint32_t, uint32_t>& rank2ChannelIdx);
+CcuResult CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemDefineKernel(CcuKernelArg arg);
 
 } // namespace mc2_ops_hccl
 

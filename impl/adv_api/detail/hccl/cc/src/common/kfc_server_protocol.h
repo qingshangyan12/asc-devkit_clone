@@ -13,6 +13,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <map>
 #include <vector>
 #include "../../../common/kfc_server_message.h"
 
@@ -21,14 +22,16 @@ namespace mc2_ops_hccl {
 using namespace HcclKfcProtocol;
 
 constexpr uint32_t KFC_SERVER_PROTOCOL_VERSION = 2U;
-constexpr uint32_t KFC_SERVER_ARG_NUM = 6U;
+constexpr uint32_t KFC_SERVER_ARG_NUM = 7U;
 constexpr uint32_t KFC_SERVER_XN_ADDR_ARG_INDEX = 0U;
 constexpr uint32_t KFC_SERVER_CKE_ADDR_ARG_INDEX = 1U;
 constexpr uint32_t KFC_SERVER_MISSION_NUM_ARG_INDEX = 3U;
 constexpr uint32_t KFC_SERVER_MISSION_INDEX_ARG_INDEX = 4U;
 constexpr uint32_t KFC_SERVER_TOKEN_ARG_INDEX = 5U;
+constexpr uint32_t KFC_SERVER_SUB_KERNEL_PC_ARG_INDEX = 6U;
 constexpr uint32_t KFC_SERVER_MAX_MISSION_NUM = KFC_MAX_MISSION_NUM;
 constexpr uint32_t KFC_SERVER_SIGNAL_REGION_NUM = KFC_SIGNAL_REGION_NUM;
+constexpr char KFC_SUB_KERNEL_FUNC_NAME[] = "KfcSubKernelFunc";
 
 constexpr char KFC_CONCURRENT_ALL_GATHER_ALG_NAME[] = "CcuSchedAllGatherConcurMeshNHRMultiLink";
 constexpr char KFC_PARALLEL_ALL_GATHER_ALG_NAME[] = "CcuSchedAllGatherParallelMeshNHRMultiLink";
@@ -38,6 +41,7 @@ constexpr char KFC_CONCURRENT_REDUCE_SCATTER_ALG_NAME[] = "CcuSchedReduceScatter
 constexpr char KFC_REDUCE_SCATTER_PEER_ONLY_ALG_NAME[] = "CcuSchedReduceScatterSoleMeshPeerOnly";
 constexpr char KFC_REDUCE_SCATTER_PEER_ONLY_KERNEL_NAME[] = "CcuKernelKfcReduceScatterMesh1DMem2MemPeerOnly";
 constexpr char KFC_RS_SOLE_NHR_ALG_NAME[] = "CcuSchedReduceScatterSoleNHRMultiLink";
+constexpr uint32_t KFC_PARALLEL_ALL_GATHER_SUB_TYPE = 4U;
 
 struct KfcNhrStepInfo {
     uint32_t step = 0;
@@ -47,6 +51,17 @@ struct KfcNhrStepInfo {
     uint32_t fromRank = 0;
     std::vector<uint32_t> txSliceIdxs;
     std::vector<uint32_t> rxSliceIdxs;
+};
+
+// 仅在定义跨 kernel Func 时读取；运行时地址和长度仍由 Func 参数传入。
+struct KfcParallelAllGatherArg {
+    uint32_t rankSizeLevel0 = 0;
+    uint32_t rankIdxLevel0 = 0;
+    uint32_t rankSizeLevel1 = 0;
+    uint32_t rankIdxLevel1 = 0;
+    uint32_t jettyNum = 1;
+    std::vector<KfcNhrStepInfo> stepInfoVector;
+    std::map<uint32_t, uint32_t> rank2ChannelIdx;
 };
 
 inline uint32_t GetKfcServerMissionNum(const char* algName)
@@ -73,6 +88,7 @@ enum class KfcServerRole : uint32_t {
     REDUCE_SCATTER_SOLE_NHR = 6,
     ALL_TO_ALL_MESH = 7,
     ALL_TO_ALL_CLOS = 8,
+    REDUCE_SCATTER_PEER_ONLY = 9,
 };
 
 inline KfcServerRole GetKfcServerRole(const char* algName, uint32_t missionIndex)
@@ -82,6 +98,9 @@ inline KfcServerRole GetKfcServerRole(const char* algName, uint32_t missionIndex
     }
     if (std::strcmp(algName, KFC_A2A_MULTI_JETTY_ALG_NAME) == 0) {
         return KfcServerRole::ALL_TO_ALL_MULTI_JETTY;
+    }
+    if (std::strcmp(algName, KFC_REDUCE_SCATTER_PEER_ONLY_ALG_NAME) == 0) {
+        return KfcServerRole::REDUCE_SCATTER_PEER_ONLY;
     }
     if (GetKfcServerMissionNum(algName) == KFC_MAX_MISSION_NUM) {
         if (std::strcmp(algName, KFC_CONCURRENT_ALL_TO_ALL_ALG_NAME) == 0) {

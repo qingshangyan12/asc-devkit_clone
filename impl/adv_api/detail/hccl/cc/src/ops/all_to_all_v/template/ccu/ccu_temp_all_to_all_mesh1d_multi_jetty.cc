@@ -50,6 +50,7 @@ HcclResult CcuTempAllToAllMesh1DMultiJetty::CalcRes(
     CcuKernelInfo kernelInfo{};
     CHK_SAFETY_FUNC_RET(
         strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuAllToAllMesh1DMultiJettyKernel"));
+    kernelInfo.kernelFunc = reinterpret_cast<void*>(CcuAllToAllMesh1DMultiJettyDefineKernel);
     kernelInfo.channels = channelDescs;
     kernelInfo.setKernelArg(kernelArg);
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);

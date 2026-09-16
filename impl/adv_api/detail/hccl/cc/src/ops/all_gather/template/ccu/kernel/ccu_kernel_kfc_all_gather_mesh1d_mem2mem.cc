@@ -8,6 +8,8 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "ccu_kernel_kfc_all_gather_mesh1d_mem2mem.h"
+#include "ccu_func_dl.hpp"
+#include "kfc_server_protocol.h"
 
 namespace mc2_ops_hccl {
 
@@ -83,28 +85,49 @@ static CcuResult InitResource(KfcAllGatherMesh1DMem2MemContext& ctx)
     return CCU_SUCCESS;
 }
 
+static CcuResult LoadArgs(KfcAllGatherMesh1DMem2MemContext& ctx, ccu::Array<ccu::Variable>& args)
+{
+    uint32_t argId = 0;
+    ctx.input = args[argId++];
+    ctx.output[ctx.rankId] = args[argId++];
+    ctx.token[ctx.rankId] = args[argId++];
+    ctx.currentRankSliceOutputOffset = args[argId++];
+    ctx.normalSliceSize = args[argId++];
+    ctx.goSize.addrOffset = args[argId++];
+    ctx.goSize.loopParam = args[argId++];
+    ctx.goSize.parallelParam = args[argId++];
+    ctx.goSize.residual = args[argId++];
+    ctx.currentRankSliceInputOffset = args[argId++];
+    ctx.tmpRepeatNum = args[argId++];
+    ctx.inputRepeatStride = args[argId++];
+    ctx.outputRepeatStride = args[argId++];
+    ctx.lastSliceSize = args[argId++];
+    ctx.isInputOutputEqual = args[argId++];
+    return CCU_SUCCESS;
+}
+
 static CcuResult LoadArgs(
-    KfcAllGatherMesh1DMem2MemContext& ctx, ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
-    ccu::Variable outputOffset, ccu::Variable sliceSize, ccu::Variable goSize0, ccu::Variable goSize1,
-    ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable currentRankSliceInputOffset, ccu::Variable tmpRepeatNum,
-    ccu::Variable inputRepeatStride, ccu::Variable outputRepeatStride, ccu::Variable lastSliceSize,
-    ccu::Variable isInputOutputEqual)
+    KfcAllGatherMesh1DMem2MemContext& ctx, ccu::Variable inputAddr, ccu::Variable outputAddr,
+    ccu::Variable tokenInfo, ccu::Variable outputOffset, ccu::Variable sliceSize, ccu::Variable goSize0,
+    ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3,
+    ccu::Variable currentRankSliceInputOffset, ccu::Variable tmpRepeatNum, ccu::Variable inputRepeatStride,
+    ccu::Variable outputRepeatStride, ccu::Variable lastSliceSize, ccu::Variable isInputOutputEqual)
 {
     ctx.input = inputAddr;
     ctx.output[ctx.rankId] = outputAddr;
     ctx.token[ctx.rankId] = tokenInfo;
     ctx.currentRankSliceOutputOffset = outputOffset;
-    ctx.currentRankSliceInputOffset = currentRankSliceInputOffset;
     ctx.normalSliceSize = sliceSize;
-    ctx.lastSliceSize = lastSliceSize;
-    ctx.tmpRepeatNum = tmpRepeatNum;
-    ctx.inputRepeatStride = inputRepeatStride;
-    ctx.outputRepeatStride = outputRepeatStride;
-    ctx.isInputOutputEqual = isInputOutputEqual;
     ctx.goSize.addrOffset = goSize0;
     ctx.goSize.loopParam = goSize1;
     ctx.goSize.parallelParam = goSize2;
     ctx.goSize.residual = goSize3;
+    ctx.currentRankSliceInputOffset = currentRankSliceInputOffset;
+    ctx.tmpRepeatNum = tmpRepeatNum;
+    ctx.inputRepeatStride = inputRepeatStride;
+    ctx.outputRepeatStride = outputRepeatStride;
+    ctx.lastSliceSize = lastSliceSize;
+    ctx.isInputOutputEqual = isInputOutputEqual;
     return CCU_SUCCESS;
 }
 
@@ -283,6 +306,17 @@ static void AddVariableNTimes(ccu::Variable& result, const ccu::Variable& value,
     }
 }
 
+static CcuResult RunAllGatherMesh(
+    KfcAllGatherMesh1DMem2MemContext& ctx, ccu::Array<ccu::Variable>& args)
+{
+    CCU_CHK_RET(LoadArgs(ctx, args));
+    CCU_CHK_RET(PreSync(ctx));
+    ctx.sliceSize = (ctx.rankId == ctx.rankSize - 1) ? ctx.lastSliceSize : ctx.normalSliceSize;
+    CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx)); }
+    CCU_CHK_RET(PostSync(ctx));
+    return CCU_SUCCESS;
+}
+
 CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable outputOffset,
     ccu::Variable sliceSize, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3,
@@ -306,12 +340,28 @@ CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
         "[KFC][AllGather][Kernel] rankId[%u], rankSize[%u], channelCount[%u], repeatBatch[%u], "
         "localCopy[direct]",
         rankId, rankSize, channelCount, AG_M2M_UNROLL_NUM);
-
     CCU_CHK_RET(PreSync(ctx));
     ctx.sliceSize = (ctx.rankId == ctx.rankSize - 1) ? ctx.lastSliceSize : ctx.normalSliceSize;
     CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx)); }
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
+}
+
+CcuResult CcuKfcAllGatherMesh1DMem2MemDefineKernel(CcuKernelArg arg)
+{
+    const auto* kernelArg = static_cast<CcuKernelArgKfcAllGatherMesh1DMem2Mem*>(arg);
+    KfcAllGatherMesh1DMem2MemContext ctx;
+    ctx.channels = kernelArg->channels;
+    ctx.channelCount = kernelArg->channelCount;
+    ctx.rankSize = static_cast<uint32_t>(kernelArg->rankSize);
+    ctx.rankId = kernelArg->rankId;
+    InitCcuKernelCtxBase(ctx);
+    CCU_CHK_RET(InitResource(ctx));
+    CcuResult bodyRet = CCU_SUCCESS;
+    ccu::Func subKernel(
+        [&ctx, &bodyRet](ccu::Array<ccu::Variable>& args) { bodyRet = RunAllGatherMesh(ctx, args); }, 15U,
+        KFC_SUB_KERNEL_FUNC_NAME);
+    return bodyRet;
 }
 
 CcuResult CcuKfcParallelAllGatherMesh1DMem2MemKernel(
@@ -377,6 +427,23 @@ CcuResult CcuKfcParallelAllGatherMesh1DMem2MemKernel(
     CCU_IF(part1Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx)); }
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
+}
+
+CcuResult CcuKfcParallelAllGatherMesh1DMem2MemDefineKernel(CcuKernelArg arg)
+{
+    const auto* kernelArg = static_cast<CcuKernelArgBase*>(arg);
+    const auto* parallelArg = static_cast<const KfcParallelAllGatherArg*>(kernelArg->algArg.get());
+    CcuResult bodyRet = CCU_SUCCESS;
+    ccu::Func subKernel(
+        [kernelArg, parallelArg, &bodyRet](ccu::Array<ccu::Variable>& args) {
+            bodyRet = CcuKfcParallelAllGatherMesh1DMem2MemKernel(
+                args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9],
+                args[10], args[11], args[12], args[13], args[14], args[15], args[16], kernelArg->channels,
+                kernelArg->channelCount, parallelArg->rankSizeLevel0, parallelArg->rankIdxLevel0,
+                parallelArg->rankSizeLevel1, parallelArg->rankIdxLevel1);
+        },
+        17U, KFC_SUB_KERNEL_FUNC_NAME);
+    return bodyRet;
 }
 
 } // namespace mc2_ops_hccl

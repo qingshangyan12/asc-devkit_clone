@@ -18,29 +18,6 @@
 
 namespace mc2_ops_hccl {
 
-constexpr uint32_t KFC_PARALLEL_ALL_GATHER_SUB_TYPE = 4U;
-
-// 只在 Host 上构建两阶段 CCU 程序时读取。运行时地址/长度仍从 XN 队列读取。
-struct KfcParallelAllGatherArg {
-    uint32_t rankSizeLevel0 = 0;
-    uint32_t rankIdxLevel0 = 0;
-    uint32_t rankSizeLevel1 = 0;
-    uint32_t rankIdxLevel1 = 0;
-    uint32_t jettyNum = 1;
-    std::vector<KfcNhrStepInfo> stepInfoVector;
-    std::map<uint32_t, uint32_t> rank2ChannelIdx;
-};
-
-struct CcuKernelArgKfcAllGatherNHR1DMultiJettyMem2Mem : CcuKernelArgBase {
-    uint64_t rankSize = 0;
-    uint32_t rankId = 0;
-    uint32_t jettyNum = 4;
-    OpParam opParam;
-    std::vector<KfcNhrStepInfo> stepInfoVector;
-    std::map<uint32_t, uint32_t> rank2ChannelIdx;
-    std::vector<std::vector<uint32_t>> subCommRanks;
-};
-
 class CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem : public CcuAlgTemplateBase {
 public:
     CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem() = default;
