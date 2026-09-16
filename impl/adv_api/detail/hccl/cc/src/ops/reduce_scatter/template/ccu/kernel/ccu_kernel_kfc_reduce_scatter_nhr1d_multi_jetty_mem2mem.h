@@ -28,6 +28,8 @@ CcuResult CcuKfcReduceScatterNHR1DMultiJettyMem2MemKernel(
     const HcclDataType& dataType, const HcclDataType& outputType, const HcclReduceOp& reduceType,
     const std::vector<KfcNhrStepInfo>& stepInfoVector, const std::map<uint32_t, uint32_t>& rank2ChannelIdx);
 
+CcuResult CcuKfcReduceScatterNHR1DMultiJettyMem2MemDefineKernel(CcuKernelArg arg);
+
 } // namespace mc2_ops_hccl
 
 #endif

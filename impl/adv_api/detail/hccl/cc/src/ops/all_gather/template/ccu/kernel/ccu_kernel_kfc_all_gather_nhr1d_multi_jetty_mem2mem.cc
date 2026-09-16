@@ -9,6 +9,8 @@
  */
 
 #include "ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem.h"
+#include "../ccu_temp_kfc_all_gather_nhr_1D_multi_jetty_mem2mem.h"
+#include "ccu_func_dl.hpp"
 
 namespace mc2_ops_hccl {
 namespace {
@@ -66,6 +68,28 @@ CcuResult InitResource(KfcAllGatherNhrContext& ctx)
     }
     ctx.outputSliceOffset.resize(ctx.rankSize);
     ctx.resourceAllocated = false;
+    return CCU_SUCCESS;
+}
+
+CcuResult LoadArgs(KfcAllGatherNhrContext& ctx, ccu::Array<ccu::Variable>& args)
+{
+    const uint32_t localIdx = ctx.channelCount;
+    ctx.token[localIdx] = args[2];
+    ctx.input = args[KFC_CONCURRENT_AG_NHR_INPUT];
+    ctx.output[localIdx] = args[KFC_CONCURRENT_AG_NHR_OUTPUT];
+    ctx.sliceSize = args[KFC_CONCURRENT_AG_NHR_SLICE_SIZE];
+    ctx.sliceSizePerJetty = args[KFC_CONCURRENT_AG_NHR_SLICE_SIZE_PER_JETTY];
+    ctx.lastSliceSizePerJetty = args[KFC_CONCURRENT_AG_NHR_LAST_SLICE_SIZE_PER_JETTY];
+    ctx.repeatNumInv = args[KFC_CONCURRENT_AG_NHR_REPEAT_NUM_INV];
+    ctx.inputSliceStride = args[KFC_CONCURRENT_AG_NHR_INPUT_SLICE_STRIDE];
+    ctx.outputSliceStride = args[KFC_CONCURRENT_AG_NHR_OUTPUT_SLICE_STRIDE];
+    ctx.inputRepeatStride = args[KFC_CONCURRENT_AG_NHR_INPUT_REPEAT_STRIDE];
+    ctx.outputRepeatStride = args[KFC_CONCURRENT_AG_NHR_OUTPUT_REPEAT_STRIDE];
+    ctx.isInputOutputEqual = args[KFC_CONCURRENT_AG_NHR_INPUT_OUTPUT_EQUAL];
+    ctx.goSize.addrOffset = args[KFC_CONCURRENT_AG_NHR_GO_SIZE_0];
+    ctx.goSize.loopParam = args[KFC_CONCURRENT_AG_NHR_GO_SIZE_1];
+    ctx.goSize.parallelParam = args[KFC_CONCURRENT_AG_NHR_GO_SIZE_2];
+    ctx.goSize.residual = args[KFC_CONCURRENT_AG_NHR_GO_SIZE_3];
     return CCU_SUCCESS;
 }
 
@@ -257,6 +281,16 @@ void AddVariableNTimes(ccu::Variable& result, const ccu::Variable& value, uint32
 }
 } // namespace
 
+static CcuResult RunAllGatherNhr(KfcAllGatherNhrContext& ctx, ccu::Array<ccu::Variable>& args)
+{
+    CCU_CHK_RET(LoadArgs(ctx, args));
+    ctx.constVar1 = 1U;
+    CCU_CHK_RET(PreSync(ctx));
+    CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(RunNhr(ctx)); }
+    CCU_CHK_RET(PostSync(ctx));
+    return CCU_SUCCESS;
+}
+
 CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable sliceSize,
     ccu::Variable sliceSizePerJetty, ccu::Variable lastSliceSizePerJetty, ccu::Variable repeatNumInv,
@@ -276,16 +310,35 @@ CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
     ctx.rank2ChannelIdx = &rank2ChannelIdx;
     InitCcuKernelCtxBase(ctx);
     CCU_CHK_RET(InitResource(ctx));
-
     CCU_CHK_RET(LoadNhrArgs(
         ctx, inputAddr, outputAddr, tokenInfo, sliceSize, sliceSizePerJetty, lastSliceSizePerJetty, repeatNumInv,
         inputSliceStride, outputSliceStride, inputRepeatStride, outputRepeatStride, isInputOutputEqual, goSize0,
         goSize1, goSize2, goSize3));
-
     CCU_CHK_RET(PreSync(ctx));
     CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(RunNhr(ctx)); }
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
+}
+
+CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemDefineKernel(CcuKernelArg arg)
+{
+    const auto* kernelArg = static_cast<CcuKernelArgKfcAllGatherNHR1DMultiJettyMem2Mem*>(arg);
+    KfcAllGatherNhrContext ctx;
+    ctx.channels = kernelArg->channels;
+    ctx.channelCount = kernelArg->channelCount;
+    ctx.rankSize = static_cast<uint32_t>(kernelArg->rankSize);
+    ctx.rankId = kernelArg->rankId;
+    ctx.jettyNum = kernelArg->jettyNum;
+    ctx.stepInfoVector = &kernelArg->stepInfoVector;
+    ctx.rank2ChannelIdx = &kernelArg->rank2ChannelIdx;
+    InitCcuKernelCtxBase(ctx);
+    CCU_CHK_RET(InitResource(ctx));
+    CcuResult bodyRet = CCU_SUCCESS;
+    ccu::Func subKernel(
+        [&ctx, &bodyRet](ccu::Array<ccu::Variable>& args) { bodyRet = RunAllGatherNhr(ctx, args); },
+        CCU_FUNC_XKERNEL_ARG_MAX,
+        KFC_SUB_KERNEL_FUNC_NAME);
+    return bodyRet;
 }
 
 CcuResult CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemKernel(
@@ -351,6 +404,32 @@ CcuResult CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemKernel(
     CCU_IF(part0Size != 0) { CCU_CHK_RET(RunNhr(ctx)); }
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
+}
+
+CcuResult CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemDefineKernel(CcuKernelArg arg)
+{
+    const auto* kernelArg = static_cast<CcuKernelArgKfcAllGatherNHR1DMultiJettyMem2Mem*>(arg);
+    const auto* parallelArg = static_cast<const KfcParallelAllGatherArg*>(kernelArg->algArg.get());
+    CcuResult bodyRet = CCU_SUCCESS;
+    ccu::Func subKernel(
+        [kernelArg, parallelArg, &bodyRet](ccu::Array<ccu::Variable>& args) {
+            bodyRet = CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemKernel(
+                args[0], args[1], args[2],
+                args[KFC_PARALLEL_AG_OUTPUT_STRIDE], args[KFC_PARALLEL_AG_PART0_SIZE],
+                args[KFC_PARALLEL_AG_PART1_SIZE], args[KFC_PARALLEL_AG_PART1_OFFSET],
+                args[KFC_PARALLEL_AG_MESH_PHASE_DONE_ADDR], args[KFC_PARALLEL_AG_NHR_PHASE_DONE_ADDR],
+                args[KFC_PARALLEL_AG_PART0_SLICE_PER_JETTY], args[KFC_PARALLEL_AG_PART0_LAST_SLICE_PER_JETTY],
+                args[KFC_PARALLEL_AG_PART1_SLICE_PER_JETTY], args[KFC_PARALLEL_AG_PART1_LAST_SLICE_PER_JETTY],
+                args[KFC_PARALLEL_AG_PART0_GO_SIZE_0], args[KFC_PARALLEL_AG_PART0_GO_SIZE_1],
+                args[KFC_PARALLEL_AG_PART0_GO_SIZE_2], args[KFC_PARALLEL_AG_PART0_GO_SIZE_3],
+                args[KFC_PARALLEL_AG_PART1_GO_SIZE_0], args[KFC_PARALLEL_AG_PART1_GO_SIZE_1],
+                args[KFC_PARALLEL_AG_PART1_GO_SIZE_2], args[KFC_PARALLEL_AG_PART1_GO_SIZE_3], kernelArg->channels,
+                kernelArg->channelCount, parallelArg->rankSizeLevel0,
+                parallelArg->rankIdxLevel0, parallelArg->rankSizeLevel1, parallelArg->rankIdxLevel1,
+                parallelArg->jettyNum, parallelArg->stepInfoVector, parallelArg->rank2ChannelIdx);
+        },
+        CCU_FUNC_XKERNEL_ARG_MAX, KFC_SUB_KERNEL_FUNC_NAME);
+    return bodyRet;
 }
 
 } // namespace mc2_ops_hccl

@@ -458,6 +458,12 @@ CcuResult HcommCcuKernelRegisterEnd(CcuInsHandle insHandle)
     return r == HcclSim::CcuSt::Result::SUCCESS ? CCU_SUCCESS : CCU_E_INTERNAL;
 }
 
+CcuResult HcommCcuFunctionGet(CcuKernelHandle kernelHandle, const char* funcName, uint64_t* pc)
+{
+    *pc = 0x1000U;
+    return CCU_SUCCESS;
+}
+
 CcuResult HcommCcuKernelLaunch(
     ThreadHandle threadHandle, CcuKernelHandle kernelHandle, const void* taskArgs, uint32_t argSize)
 {
