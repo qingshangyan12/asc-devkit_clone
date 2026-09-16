@@ -4,4 +4,7 @@
 | [00_introduction](./00_introduction) | Simple examples based on Ascend C, demonstrating custom function implementations through Ascend C programming language with corresponding C_API implementations |
 | [01_utilities](./01_utilities) | Simple examples based on Ascend C, demonstrating system utility usage including on-board printing, exception detection, and CPU twin debugging through APIs such as printf, assert, and DumpTensor, suitable for debugging phases |
 | [02_features](./02_features) | Feature examples based on Ascend C, demonstrating sample implementation methods using Framework, C_API, and other features |
-| [03_c_api](./03_c_api) | C_API examples based on Ascend C, introducing usage methods of C_APIs such as data movement and computation |
+| [03_data_movement](./03_data_movement) | C_API data movement examples based on Ascend C, demonstrating the usage of data movement interfaces |
+| [04_memory_vector_compute](./04_memory_vector_compute) | This directory contains Memory vector compute examples. |
+| [05_reg_vector_compute](./05_reg_vector_compute) | C_API register vector compute examples based on Ascend C, demonstrating computation in the register domain using asc_* interfaces |
+| [06_matrix_compute](./06_matrix_compute) | C_API matrix compute examples based on Ascend C, demonstrating the usage of matrix computation interfaces |
