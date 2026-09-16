@@ -178,7 +178,8 @@ __simd_callee__ inline void SubImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
         SupportType<
-            ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t, complex32, complex64>(),
+            ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t, complex32,
+            complex64>(),
         "current data type is not supported on current device!");
     static_assert(
         SupportEnum<mode, MaskMergeMode::ZEROING>(), "current Sub api only supported Mode ZEROING on current device!");
@@ -260,8 +261,7 @@ __simd_callee__ inline void MulImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
     using ActualT = typename U::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
-        SupportType<
-            ActualT, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t, complex32>(),
+        SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t, complex32>(),
         "current data type is not supported on current device!");
     static_assert(
         SupportEnum<mode, MaskMergeMode::ZEROING>(), "current Mul api only supported Mode ZEROING on current device!");
@@ -965,8 +965,8 @@ __simd_callee__ inline void DivImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     constexpr DivSpecificMode sprMode = Internal::GetDivSpecificMode(mode);
     static_assert(
-        SupportType<
-            ActualT, uint16_t, int16_t, uint32_t, int32_t, half, float, complex32>(), "current data type is not supported on current device!");
+        SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, half, float, complex32>(),
+        "current data type is not supported on current device!");
     static_assert(
         SupportEnum<sprMode.mrgMode, MaskMergeMode::ZEROING>(),
         "current Div api only supported Mode ZEROING on current device!");
@@ -1047,8 +1047,7 @@ __simd_callee__ inline void MaxImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
     using ActualT = typename U::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
-        SupportType<
-            ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t>(),
+        SupportType<ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t>(),
         "current data type is not supported on current device!");
     static_assert(
         SupportEnum<mode, MaskMergeMode::ZEROING, MaskMergeMode::MERGING>(),
@@ -1096,8 +1095,7 @@ __simd_callee__ inline void MinImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
     using ActualT = typename U::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
-        SupportType<
-            ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t>(),
+        SupportType<ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t>(),
         "current data type is not supported on current device!");
     static_assert(
         SupportEnum<mode, MaskMergeMode::ZEROING, MaskMergeMode::MERGING>(),
