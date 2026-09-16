@@ -25,7 +25,7 @@ Atlas A3 训练系列产品/Atlas A3 推理系列产品
 Atlas A2 训练系列产品/Atlas A2 推理系列产品
 <!-- end id5 -->
 
-Scalar系数通过[asc_set_l0c_copy_prequant](../asc_set_l0c_copy_prequant.md)传入打包后的`uint64_t config`，低32位必须是float的位模式，不能将浮点数数值转换成uint64_t；Vector地址使用[asc_set_l0c2gm_config](../asc_set_l0c2gm_config.md)配置。搬出调用的`quant_pre`使用整数，可显式转换`asc_quant_mode`枚举得到模式编码。
+Scalar系数通过[asc_set_l0c_copy_prequant](../asc_set_l0c_copy_prequant.md)传入打包后的`uint64_t config`，低32位必须是float的位模式，不能将浮点数数值转换成uint64_t；Vector地址使用[asc_set_l0c_copy_config](../asc_set_l0c_copy_config.md)配置。搬出调用的`quant_pre`使用整数，可显式转换`asc_quant_mode`枚举得到模式编码。
 
 <!-- end id2 -->
 

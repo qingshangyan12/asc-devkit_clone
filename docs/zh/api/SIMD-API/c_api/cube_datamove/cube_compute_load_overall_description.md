@@ -100,7 +100,7 @@
 | --- | --- | --- |
 | [asc_fill_l1](asc_fill_l1.md)、[asc_fill_l0a](asc_fill_l0a.md)、[asc_fill_l0b](asc_fill_l0b.md) | 初始化Buffer | 支持L1 Buffer、L0A Buffer、L0B Buffer |
 | [asc_set_l13d_fmatrix](asc_set_l13d_fmatrix.md)、[asc_set_l13d_fmatrix_b](asc_set_l13d_fmatrix_b.md) | FeatureMap尺寸和Padding边界 | 根据A/B侧与`f_matrix_ctrl`选择 |
-| [asc_set_l13d_padding](asc_set_l13d_padding.md) | Padding配置 | 按位编码使用 |
+| [asc_set_l12l0a_3d_padding](asc_set_l12l0a_3d_padding.md)、[asc_set_l12l0b_3d_padding](asc_set_l12l0b_3d_padding.md) | Padding配置 | 根据A/B侧与`f_matrix_ctrl`选择 |
 | [asc_set_l13d_size](asc_set_l13d_size.md) | L1 Buffer边界大小 | 按对应3D接口要求 |
 | [asc_set_l13d_rpt](asc_set_l13d_rpt.md) | 3D重复和步长 | 按对应重载配置 |
 | [asc_load_image_to_cbuf](asc_load_image_to_cbuf.md) | 图像搬入L1 Buffer | 按该接口支持范围配置 |
