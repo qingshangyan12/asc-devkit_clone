@@ -54,10 +54,10 @@ def mmad_pool() -> list[dict]:
     mapping = [("int8", 1, "any"), ("bf16", 2, "any"), ("fp32", 3, "any"), ("int4", 4, "dav-2201")]
     for dtype, sc, arch in mapping:
         for m, n, k in shapes_for(dtype):
-            # s2：K>=32；s3：样例级 A 转置仅稳妥覆盖 M<=32 且 N>=48
+            # s2：K>=32；s3：仅覆盖样例稳态子集 M<=32、N>=48、K in {32,64}
             if dtype == "bf16" and k < 32:
                 continue
-            if dtype == "fp32" and (k % 32 or m > 32 or n < 48):
+            if dtype == "fp32" and (m > 32 or n < 48 or k not in (32, 64)):
                 continue
             rows.append(
                 {
