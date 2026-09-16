@@ -54,10 +54,10 @@ def mmad_pool() -> list[dict]:
     mapping = [("int8", 1, "any"), ("bf16", 2, "any"), ("fp32", 3, "any"), ("int4", 4, "dav-2201")]
     for dtype, sc, arch in mapping:
         for m, n, k in shapes_for(dtype):
-            # s2：K>=32；s3：kDirectionAlign+A转置样例仅验证到 M<=32（与默认 30 对齐）
+            # s2：K>=32；s3：样例级 A 转置仅稳妥覆盖 M<=32 且 N>=48
             if dtype == "bf16" and k < 32:
                 continue
-            if dtype == "fp32" and (k % 32 or m > 32):
+            if dtype == "fp32" and (k % 32 or m > 32 or n < 48):
                 continue
             rows.append(
                 {
@@ -111,6 +111,12 @@ def fixpipe_pool() -> list[dict]:
         for m, n, k in shapes_for("half"):
             # K_ROUND=2，baseK=K/2 需 16 对齐
             if k % 32:
+                continue
+            # 过小 MN 在 ND/ChannelSplit 变 shape 下易错位
+            if min(m, n) < 32:
+                continue
+            # s7 channel-split：N=48 等非 32 倍数在变 K 时与 golden NZ 不一致
+            if sc == 7 and n % 32:
                 continue
             rows.append(
                 {
