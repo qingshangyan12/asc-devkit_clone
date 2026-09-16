@@ -29,6 +29,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/cube_datamove/cube_datamove.h"`。
+
 将没有执行的Prefetch指令删除，用于在预加载流程发生变化时清理尚未生效的预加载指令,Cube核与Vector核均支持。
 
 本接口需要与[asc_prefetch_gm2l2cache](asc_prefetch_gm2l2cache.md)、[asc_prefetch_gm2l2cache_dn2nz](asc_prefetch_gm2l2cache_dn2nz.md)、[asc_prefetch_gm2l2cache_nd2nz](asc_prefetch_gm2l2cache_nd2nz.md)等预取接口配合使用。
@@ -57,38 +59,153 @@ PIPE_MTE2
 
 ## 调用示例
 
-```c
-// 设置源操作数，A矩阵按128×128的half类型分片（tile）在GM中连续存放
-constexpr uint32_t M = 128;
-constexpr uint32_t K = 128;
-constexpr uint32_t tileNum = 4;
-__gm__ half* a;
+将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
-// 预加载过程中的配置：每个tile按行预加载，
-// 每行为1个连续传输数据块（128×2=256字节），共128个数据块
-uint32_t burstNum = M;                       // 数据块个数：128
-uint32_t burstLen = K * sizeof(half);        // 每个数据块长度：256字节
-uint64_t burstSrcStride = K * sizeof(half);  // 相邻数据块间隔：256字节
-bool needStop = false;                       // 迭代终止条件，由实际计算逻辑决定
+本示例固定`M=128、K=128`（`int16_t`类型），模拟分tile迭代场景：先预取当前tile数据，随后下发下一轮tile的预取指令（此处用相同地址模拟）；当前轮数据完成GM到L1 Buffer的搬运（命中L2 Cache）后，通过本接口删除尚未执行的下一轮预取指令，避免无效预加载占用搬运带宽和L2 Cache空间。数据经UB回传GM后与Host侧原始输入比较，验证已执行完成的预加载数据不受影响。
 
-// 分tile迭代处理：每轮先预加载下一轮tile，使预加载与当前轮计算重叠
-for (uint32_t tile = 0; tile < tileNum; ++tile) {
-    // 当前轮：从GM搬入第tile个分片并执行计算，
-    // 访问的GM地址可命中L2 Cache中已预加载的数据。
+<!-- npu="960" id9 -->
+以Ascend 960PR/Ascend 960DT产品（对应NPU架构为`dav-9201`）为例，编译运行命令如下：
 
-    // 预加载下一轮tile数据（若存在）
-    if (tile + 1 < tileNum) {
-        asc_prefetch_gm2l2cache(a + (tile + 1) * M * K, burstNum, burstLen, burstSrcStride);
+```bash
+bisheng examples.asc -o main --npu-arch=dav-9201 && ./main
+```
+<!-- end id9 -->
+
+```cpp
+#include <cstdint>
+#include <cstdio>
+#include <vector>
+#include "acl/acl.h"
+#include "kernel_operator.h"
+#include "c_api/cube_datamove/cube_datamove.h"
+using namespace AscendC;
+
+namespace {
+constexpr uint32_t M = 128, K = 128;
+constexpr uint32_t TOTAL = M * K;
+
+class KernelAscPrefetchStop {
+public:
+    __aicore__ inline KernelAscPrefetchStop() {}
+
+    __aicore__ inline void Init(__gm__ int16_t* a, __gm__ int16_t* output)
+    {
+        srcGm = a;
+        srcGlobal.SetGlobalBuffer(a, TOTAL);
+        cGlobal.SetGlobalBuffer(output, TOTAL);
+
+        pipe.InitBuffer(qidA1, 1, TOTAL * sizeof(int16_t));
+        pipe.InitBuffer(qidUB, 1, TOTAL * sizeof(int16_t));
+
+        l1Local = qidA1.template AllocTensor<int16_t>();
+        ubLocal = qidUB.template AllocTensor<int16_t>();
     }
 
-    // 若预加载流程发生变化（如满足终止条件提前退出迭代），
-    // 已下发的下一轮tile预加载指令不再需要
-    if (needStop) {
-        // 删除尚未执行（未生效）的Prefetch指令，
-        // 避免无效预加载占用搬运带宽和L2 Cache空间；
-        // 已执行完成的预加载数据不受影响，仍保留在L2 Cache中
-        asc_prefetch_stop();
-        break;
+    __aicore__ inline void Process()
+    {
+        Prefetch();
+        CopyIn();
+        Stop();
+        CopyOut();
     }
+
+private:
+    // Prefetch: 预取当前tile数据后，再下发下一轮tile的预取指令（用相同地址模拟），
+    // 每行为1个连续传输数据块（128 * 2 = 256字节），矩阵共128行，即128个数据块，
+    // 相邻数据块首地址的间隔为256字节
+    __aicore__ inline void Prefetch()
+    {
+        if ASCEND_IS_AIC {
+            uint32_t burstNum = M;                      // 数据块个数：128
+            uint32_t burstLen = K * sizeof(int16_t);    // 每个数据块长度：256字节
+            uint64_t burstSrcStride = K * sizeof(int16_t);  // 相邻数据块间隔：256字节
+            // 预取当前tile数据
+            asc_prefetch_gm2l2cache(srcGm, burstNum, burstLen, burstSrcStride);
+            // 预加载流程发生变化（如满足终止条件提前退出迭代），
+            // 已下发的下一轮tile预取指令不再需要（此处用相同地址模拟下一轮tile的预取）
+            asc_prefetch_gm2l2cache(srcGm, burstNum, burstLen, burstSrcStride);
+        }
+    }
+
+    // CopyIn: GM -> L1，访问已预加载的GM地址时可命中L2 Cache中缓存的数据
+    __aicore__ inline void CopyIn()
+    {
+        if ASCEND_IS_AIC {
+            DataCopy(l1Local, srcGlobal, TOTAL);
+            pipe_barrier(PIPE_ALL);
+        }
+    }
+
+    // Stop: 删除尚未执行（未生效）的Prefetch指令，避免无效预加载占用搬运带宽和
+    // L2 Cache空间；已在执行中及已执行完成的Prefetch指令不受影响
+    __aicore__ inline void Stop()
+    {
+        if ASCEND_IS_AIC {
+            asc_prefetch_stop();
+            pipe_barrier(PIPE_ALL);
+        }
+    }
+
+    // CopyOut: L1 -> UB -> GM
+    __aicore__ inline void CopyOut()
+    {
+        if ASCEND_IS_AIC {
+            copy_cbuf_to_ubuf((__ubuf__ void*)ubLocal.GetPhyAddr(), (__cbuf__ void*)l1Local.GetPhyAddr(), 0, 1,
+                static_cast<uint16_t>(TOTAL * sizeof(int16_t) / 32), 0, 0);
+        }
+        SyncAll<false>();
+        if (GetSubBlockIdx() == 0) {
+            DataCopy(cGlobal, ubLocal, TOTAL);
+        }
+    }
+
+private:
+    TPipe pipe;
+    TQue<TPosition::A1, 1> qidA1;
+    TQue<TPosition::VECOUT, 1> qidUB;
+
+    __gm__ int16_t* srcGm = nullptr;
+    GlobalTensor<int16_t> srcGlobal;
+    GlobalTensor<int16_t> cGlobal;
+
+    LocalTensor<int16_t> l1Local;
+    LocalTensor<int16_t> ubLocal;
+};
+
+__global__ __mix__(1, 2) void PrefetchStopKernel(__gm__ int16_t* a, __gm__ int16_t* output)
+{
+    KernelAscPrefetchStop op;
+    op.Init(a, output);
+    op.Process();
+}
+} // namespace
+
+int main()
+{
+    std::vector<int16_t> a(TOTAL), output(TOTAL);
+    for (uint32_t r = 0; r < M; ++r) {
+        for (uint32_t k = 0; k < K; ++k) {
+            a[r * K + k] = static_cast<int16_t>((r * 31 + k * 7) % 1000 - 500);
+        }
+    }
+
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    int16_t *ad = nullptr, *od = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&ad), a.size() * sizeof(int16_t), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&od), output.size() * sizeof(int16_t), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(ad, a.size() * sizeof(int16_t), a.data(), a.size() * sizeof(int16_t), ACL_MEMCPY_HOST_TO_DEVICE);
+    PrefetchStopKernel<<<1, 0>>>(ad, od);
+    const aclError ret = aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(int16_t), od,
+        output.size() * sizeof(int16_t), ACL_MEMCPY_DEVICE_TO_HOST);
+    // 已执行完成的预加载数据不受asc_prefetch_stop影响，输出应与原始输入完全一致
+    const bool passed = ret == ACL_SUCCESS && output == a;
+    std::printf("M=%u K=%u asc_prefetch_stop=%s\n", M, K, passed ? "PASS" : "FAIL");
+    aclrtFree(ad);
+    aclrtFree(od);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
 }
 ```

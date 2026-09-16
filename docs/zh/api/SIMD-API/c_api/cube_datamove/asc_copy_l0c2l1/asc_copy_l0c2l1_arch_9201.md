@@ -126,7 +126,7 @@ __aicore__ inline void asc_copy_l0c2l1(__cbuf__ <dst_dtype>* dst,
                                        uint8_t eltwise_antq_en,
                                        bool c0_pad_en,
                                        bool enable_nz2dn)
-__aicore__ inline void asc_copy_l0c2l1(__cbuf__ void* dst,
+__aicore__ inline void asc_copy_l0c2l1(__cbuf__ <dst_dtype>* dst,
                                        __cc__ <src_dtype>* src,
                                        uint16_t n_size,
                                        uint16_t m_size,
@@ -147,7 +147,7 @@ __aicore__ inline void asc_copy_l0c2l1(__cbuf__ void* dst,
                                        bool c0_pad_en,
                                        bool broadcast_en,
                                        bool enable_nz2dn)
-__aicore__ inline void asc_copy_l0c2l1(__cbuf__ void* dst,
+__aicore__ inline void asc_copy_l0c2l1(__cbuf__ <dst_dtype>* dst,
                                        __cc__ <src_dtype>* src,
                                        uint16_t n_size,
                                        uint16_t m_size,
@@ -181,7 +181,7 @@ src dtype与dst dtype支持以下组合：
 - `src_dtype`为`int32_t`时：
     - 基础形式与`quant_pre_rnd`形式下，`dst_dtype`支持`half`、`int8_t`、`uint8_t`、`int32_t`。
     - `enable_nz2dn`形式下，`dst_dtype`支持`half`、`bfloat16_t`、`int8_t`、`uint8_t`、`int32_t`。
-- `dst`为`void*`的形式下，`src_dtype`支持`float`、`int32_t`，输出数据类型由`quant_pre_mode`确定的量化模式决定（如REQ4/VREQ4量化输出`int4b_t`类型）。
+- `l2_cache_mode`及`quant_pre_rnd`与`enable_nz2dn`的组合形式下，`src_dtype`支持`float`、`int32_t`，输出数据类型由`quant_pre_mode`确定的量化模式决定（如REQ4/VREQ4量化输出`int4b_t`类型）。
 
 ### 函数原型典型示例
 
@@ -205,8 +205,8 @@ __aicore__ inline void asc_copy_l0c2l1(__cbuf__ half* dst,
                                        uint8_t eltwise_op,
                                        uint8_t eltwise_antq_en,
                                        bool c0_pad_en)
-// 示例2：dst为void*的形式，输出数据类型由quant_pre_mode确定。
-__aicore__ inline void asc_copy_l0c2l1(__cbuf__ void* dst,
+// 示例2：将float类型源矩阵搬运并转换为int4b_t类型。
+__aicore__ inline void asc_copy_l0c2l1(__cbuf__ int4b_t* dst,
                                        __cc__ float* src,
                                        uint16_t n_size,
                                        uint16_t m_size,
@@ -237,10 +237,10 @@ __aicore__ inline void asc_copy_l0c2l1(__cbuf__ void* dst,
 |:-----------------|:------|:-----------------------------------|
 | dst | 输出 | 目的操作数的起始地址。数据格式为NZ、ND或DN格式，地址需要满足32字节对齐。 |
 | src | 输入 | 源操作数的起始地址。数据格式为NZ格式，地址需要满足64字节对齐。 |
-| n_size | 输入 | 源NZ矩阵在N方向上的大小，取值范围：[1, 4095]。 |
-| m_size | 输入 | 源NZ矩阵在M方向上的大小。<br>&nbsp;&nbsp;&bull; 不开启NZ2ND功能，取值范围：[1, 65535]；<br>&nbsp;&nbsp;&bull; 开启NZ2ND功能，取值范围：[1, 8192]。 |
-| dst_stride | 输入 | &nbsp;&nbsp;&bull; 若不开启NZ2ND功能，dst_stride表示目的NZ矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：element。<br>&nbsp;&nbsp;&bull; 若开启NZ2ND/NZ2DN功能，dst_stride表示目的ND矩阵每一行中的元素个数，取值不为0，单位：element。 |
-| src_stride | 输入 | 源NZ矩阵中相邻Z排布的起始地址偏移，取值范围：[0, 65535]，单位：C0_Size(16*sizeof(T)，T为src的数据类型)。 |
+| n_size | 输入 | 源Nz矩阵在N方向上的大小，取值范围：[1, 4095]。<br>对于Nz输出场景：<br>&nbsp;&nbsp;&bull; 若`enable_channel_split`设置为`true`开启Channel Split功能，`n_size`必须为8的倍数。<br>&nbsp;&nbsp;&bull; 若不开启Channel Split功能，`n_size`必须为16的倍数。<br>对于ND输出场景：<br>&nbsp;&nbsp;&bull; $n\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`n_size`必须为64的倍数。<br> |
+| m_size | 输入 | 源Nz矩阵在M方向上的大小。<br>&nbsp;&nbsp;&bull; 不开启Nz2ND功能，取值范围：[1, 65535]；<br>&nbsp;&nbsp;&bull; 开启Nz2ND功能，取值范围：[1, 8192]。<br>&nbsp;&nbsp;&bull;对于DN输出场景：$m\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`m_size`必须为64的倍数。<br> |
+| dst_stride | 输入 | &nbsp;&nbsp;&bull; 若不开启Nz2ND功能，dst_stride表示目的Nz矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：element。<br>&nbsp;&nbsp;&bull; 若开启Nz2ND/Nz2DN功能，dst_stride表示目的ND矩阵每一行中的元素个数，取值不为0，单位：element对于不同`dst_dtype`的对齐约束如下：`int4b_t`输出需为64的倍数，8位输出需为32的倍数，16位输出需为16的倍数，32位输出需为8的倍数。<br> |
+| src_stride | 输入 | 源Nz矩阵中相邻Z排布的起始地址偏移，取值范围：[0, 65535]，单位为64字节，即$16\times\operatorname{sizeof}(src\_dtype)$。 |
 | quant_pre_rnd | 输入 | 预处理量化阶段的舍入模式控制。<br>&nbsp;&nbsp;&bull; `false`：关闭；<br>&nbsp;&nbsp;&bull; `true`：开启，舍入行为与`quant_pre_mode`确定的量化模式相关。 |
 | l2_cache_mode | 输入 | 无效参数，用户无需关注，传入0即可。 |
 | enable_clip_relu_pre | 输入 | 是否开启Clip ReLU，需搭配Normal ReLU一起使用，且需要开启量化功能，取值如下：<br>&nbsp;&nbsp;&bull; 0：不开启Clip ReLU；<br>&nbsp;&nbsp;&bull; 1：开启Clip ReLU（scalar 模式）。 |
@@ -270,73 +270,270 @@ PIPE_FIX
 
 ### 通用约束
 
-- 本接口仅在AIC上执行有效，非AIC调用直接返回。
-- 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
+- 本接口仅在AIC上生效，非AIC调用直接返回。
+- `dst`起始地址需32字节对齐（L1 Buffer对齐要求），否则会导致搬运异常。
+- `src`起始地址需64字节对齐（L0C Buffer对齐要求，`src`为`int32_t`或`float`时），否则会导致搬运异常。
+- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../../sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
+- L0C Buffer容量上限：L0C Buffer总容量256KB，`src`偏移加搬运大小不可越界，否则触发异常。
+- L1 Buffer容量上限：L1 Buffer总容量512KB，`dst`偏移加搬运大小不可越界，否则触发异常。
 
 ### 随路转换约束
 
-- 随路scalar量化场景下，须先调用asc_set_l0c_copy_prequant接口配置量化计算所需的缩放系数、偏移量和量化结果符号，再搭配本接口`quant_pre_mode`使用。
-- NZ2ND/NZ2DN格式转换场景下，须先调用asc_set_l0c_copy_nz_para接口配置格式转换参数，再搭配本接口`enable_nz2nd`或`enable_nz2dn`使用。
+- `n_size`、`m_size`、`dst_stride`需根据dtype与功能模式确定对齐约束，详见参数说明，不满足对齐约束会导致搬运结果不符合预期。
 - src与dst dtype组合需与`quant_pre_mode`量化模式匹配，否则会导致搬运结果不符合预期。
-- `dst`为`void*`的形式下，`quant_pre_mode`确定的量化模式决定了实际输出数据类型，需按输出数据类型的大小进行地址对齐与空间预留。
-- `enable_channel_split`仅在src和dst均为float时可开启，且不能与NZ2ND功能同时开启。
+- `enable_channel_split`仅在输出dtype为`float`且输出为Nz格式时可设为true。
+- 量化与激活模式中使用的量化系数不可为INF/NAN和非规格化数，否则会导致量化激活结果错误。
+- 开启Nz2DN转换时，需通过[asc_set_l0c_copy_channel_para](../asc_set_l0c_copy_channel_para.md)预先配置源矩阵步长，且源矩阵步长不可为0，否则会导致搬运异常。
+- 开启Nz2DN转换时，仅当通过[asc_set_l0c_copy_channel_para](../asc_set_l0c_copy_channel_para.md)配置源矩阵步长为1时，可同时开启UnitFlag功能。
+- `enable_clip_relu_pre`设为Clip ReLU（标量模式）时需搭配`relu_pre_mode`与量化功能一起使用。
 
 ## 调用示例
 
-```cpp
-// dst和src分别对应目的操作数的输出地址和源操作数的输入地址
-constexpr uint64_t total_length = 128 * 64;
-__cbuf__ int32_t dst[total_length];
-__cc__ int32_t src[total_length];
-// 其余入参均已默认数值传入
-uint16_t n_size = 64;
-uint16_t m_size = 128;
-uint32_t dst_stride = 2048;
-uint16_t src_stride = 128;
-uint8_t enable_clip_relu_pre = 0;
-uint8_t unit_flag_mode = 0;
-uint64_t quant_pre_mode = QuantMode_t::NoQuant;
-uint8_t relu_pre_mode = 0;
-bool enable_channel_split = false;
-bool enable_nz2nd = false;
-uint64_t quant_post = 0;
-uint8_t relu_post = 0;
-bool clip_relu_post = false;
-uint8_t eltwise_op = 0;
-uint8_t eltwise_antq_en = 0;
-bool c0_pad_en = false;
-asc_copy_l0c2l1(
-    dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode,
-    quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, quant_post, relu_post,
-    clip_relu_post, eltwise_op, eltwise_antq_en, c0_pad_en);
+将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
+
+本示例固定`M=N=K=128`，通过MMAD生成L0C Buffer结果，调用本接口搬至L1 Buffer（保持NZ排布），随后经UB回传GM与Host侧Golden结果比较。
+
+<!-- npu="960" id9 -->
+以Ascend 960PR/Ascend 960DT产品（对应NPU架构为`dav-9201`）为例，编译运行命令如下：
+
+```bash
+bisheng examples.asc -o main --npu-arch=dav-9201 && ./main
 ```
+<!-- end id9 -->
 
 ```cpp
-// dst为void*的变体：源矩阵为float类型，随路量化输出int4b_t类型数据
-constexpr uint64_t total_length = 128 * 64;
-__cbuf__ int4b_t dst[total_length];
-__cc__ float src[total_length];
-uint16_t n_size = 64;
-uint16_t m_size = 128;
-uint32_t dst_stride = 2048;
-uint16_t src_stride = 128;
-uint8_t l2_cache_mode = 0;
-uint8_t enable_clip_relu_pre = 0;
-uint8_t unit_flag_mode = 0;
-uint64_t quant_pre_mode = QuantMode_t::QF322S4_PRE;  // float随路量化成int4b_t
-uint8_t relu_pre_mode = 0;
-bool enable_channel_split = false;
-bool enable_nz2nd = false;
-uint64_t quant_post = 0;
-uint8_t relu_post = 0;
-bool clip_relu_post = false;
-uint8_t eltwise_op = 0;
-bool eltwise_antq_en = false;
-bool c0_pad_en = false;
-bool broadcast_en = false;
-bool enable_nz2dn = false;
-asc_copy_l0c2l1(reinterpret_cast<__cbuf__ void*>(dst), src, n_size, m_size, dst_stride,
-    src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode, relu_pre_mode,
-    enable_channel_split, enable_nz2nd, quant_post, relu_post, clip_relu_post, eltwise_op,
-    eltwise_antq_en, c0_pad_en, broadcast_en, enable_nz2dn);
+#include <cstdint>
+#include <cstdio>
+#include <vector>
+#include "acl/acl.h"
+#include "kernel_operator.h"
+#include "c_api/cube_datamove/cube_datamove.h"
+using namespace AscendC;
+
+namespace {
+constexpr uint32_t M = 128, N = 128, K = 128;
+constexpr uint32_t ELEMENTS = M * N;
+
+class KernelAscCopyL0c2l1 {
+public:
+    __aicore__ inline KernelAscCopyL0c2l1() {}
+
+    __aicore__ inline void Init(__gm__ int8_t* a, __gm__ int8_t* b, __gm__ int32_t* output)
+    {
+        aGlobal.SetGlobalBuffer(a, M * K);
+        bGlobal.SetGlobalBuffer(b, K * N);
+        cGlobal.SetGlobalBuffer(output, M * N);
+
+        pipe.InitBuffer(qidA1, 1, M * K * sizeof(int8_t));
+        pipe.InitBuffer(qidB1, 1, K * N * sizeof(int8_t));
+        pipe.InitBuffer(qidA2, 1, M * K * sizeof(int8_t));
+        pipe.InitBuffer(qidB2, 1, K * N * sizeof(int8_t));
+        pipe.InitBuffer(qidCO1, 1, M * N * sizeof(int32_t));
+        pipe.InitBuffer(qidC1, 1, M * N * sizeof(int32_t));
+        pipe.InitBuffer(qidUB, 1, M * N * sizeof(int32_t));
+
+        leftMatrix = qidA1.template AllocTensor<int8_t>();
+        rightMatrix = qidB1.template AllocTensor<int8_t>();
+        a2 = qidA2.template AllocTensor<int8_t>();
+        b2 = qidB2.template AllocTensor<int8_t>();
+        co1Local = qidCO1.template AllocTensor<int32_t>();
+        c1Local = qidC1.template AllocTensor<int32_t>();
+        ubLocal = qidUB.template AllocTensor<int32_t>();
+    }
+
+    __aicore__ inline void Process()
+    {
+        CopyIn();
+        Split();
+        Compute();
+        CopyOut();
+    }
+
+private:
+    // CopyIn: GM -> L1(A1/B1)，ND转NZ
+    __aicore__ inline void CopyIn()
+    {
+        if ASCEND_IS_AIC {
+            Nd2NzParams nd2nzParams;
+            nd2nzParams.ndNum = 1;
+            nd2nzParams.nValue = M;
+            nd2nzParams.dValue = K;
+            nd2nzParams.srcNdMatrixStride = 0;
+            nd2nzParams.srcDValue = K;
+            nd2nzParams.dstNzC0Stride = M;
+            nd2nzParams.dstNzNStride = 1;
+            nd2nzParams.dstNzMatrixStride = 0;
+            DataCopy(leftMatrix, aGlobal, nd2nzParams);
+            pipe_barrier(PIPE_ALL);
+
+            nd2nzParams.ndNum = 1;
+            nd2nzParams.nValue = K;
+            nd2nzParams.dValue = N;
+            nd2nzParams.srcNdMatrixStride = 0;
+            nd2nzParams.srcDValue = N;
+            nd2nzParams.dstNzC0Stride = K;
+            nd2nzParams.dstNzNStride = 1;
+            nd2nzParams.dstNzMatrixStride = 0;
+            DataCopy(rightMatrix, bGlobal, nd2nzParams);
+            pipe_barrier(PIPE_ALL);
+        }
+    }
+
+    // Split: L1(A1/B1) -> L0A/L0B
+    __aicore__ inline void Split()
+    {
+        if ASCEND_IS_AIC {
+            LoadData2DParamsV2 loadDataParams;
+            loadDataParams.mStartPosition = 0;
+            loadDataParams.kStartPosition = 0;
+            loadDataParams.mStep = DivCeil(M, BLOCK_CUBE);
+            loadDataParams.kStep = DivCeil(K * sizeof(int8_t), 32);
+            loadDataParams.srcStride = DivCeil(M, BLOCK_CUBE);
+            loadDataParams.dstStride = DivCeil(M, BLOCK_CUBE);
+            loadDataParams.sid = 0;
+            loadDataParams.ifTranspose = false;
+            LoadData(a2, leftMatrix, loadDataParams);
+            pipe_barrier(PIPE_ALL);
+
+            uint16_t kAlign = CeilDivision(K, BLOCK_CUBE);
+            uint16_t nAlign = CeilDivision(N * sizeof(int8_t), 32);
+
+            loadDataParams.mStartPosition = 0;
+            loadDataParams.kStartPosition = 0;
+            loadDataParams.mStep = kAlign;
+            loadDataParams.kStep = nAlign;
+            loadDataParams.srcStride = kAlign;
+            // int8_t类型在L0B中按16B对齐存放，dstStride需乘2
+            loadDataParams.dstStride = nAlign * 2;
+
+            loadDataParams.sid = 0;
+            loadDataParams.ifTranspose = true;
+            LoadData(b2, rightMatrix, loadDataParams);
+            pipe_barrier(PIPE_ALL);
+        }
+    }
+
+    // Compute: Mmad -> L0C(CO1)
+    __aicore__ inline void Compute()
+    {
+        if ASCEND_IS_AIC {
+            MmadParams mmadParams;
+            mmadParams.m = M;
+            mmadParams.n = N;
+            mmadParams.k = K;
+            mmadParams.isBias = false;
+            Mmad(co1Local, a2, b2, mmadParams);
+            pipe_barrier(PIPE_ALL);
+        }
+    }
+
+    // CopyOut: L0C -> L1 by asc_copy_l0c2l1，随后L1 -> UB -> GM
+    __aicore__ inline void CopyOut()
+    {
+        if ASCEND_IS_AIC {
+            // src_stride: L0C中相邻Z分形起始地址的偏移，单位: C0_Size(16 * sizeof(int32_t))
+            uint16_t srcStride = static_cast<uint16_t>(DivCeil(M, BLOCK_CUBE) * BLOCK_CUBE);
+            // dst_stride: L1目的NZ矩阵中相邻Z分形起始地址的偏移，单位: element
+            uint32_t dstStride = static_cast<uint32_t>(M) * BLOCK_CUBE;
+            asc_copy_l0c2l1((__cbuf__ int32_t*)c1Local.GetPhyAddr(), (__cc__ int32_t*)co1Local.GetPhyAddr(),
+                static_cast<uint16_t>(N), static_cast<uint16_t>(M), dstStride, srcStride, 0, 0,
+                static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, false, 0, 0, false, 0, 0, false);
+            pipe_barrier(PIPE_ALL);
+
+            copy_cbuf_to_ubuf((__ubuf__ void*)ubLocal.GetPhyAddr(), (__cbuf__ void*)c1Local.GetPhyAddr(), 0, 1,
+                static_cast<uint16_t>(M * N * sizeof(int32_t) / 32), 0, 0);
+        }
+        SyncAll<false>();
+        if (GetSubBlockIdx() == 0) {
+            DataCopy(cGlobal, ubLocal, M * N);
+        }
+    }
+
+private:
+    TPipe pipe;
+    TQue<TPosition::A1, 1> qidA1;
+    TQue<TPosition::B1, 1> qidB1;
+    TQue<TPosition::A2, 1> qidA2;
+    TQue<TPosition::B2, 1> qidB2;
+    TQue<TPosition::CO1, 1> qidCO1;
+    TQue<TPosition::A1, 1> qidC1;
+    TQue<TPosition::VECOUT, 1> qidUB;
+
+    GlobalTensor<int8_t> aGlobal;
+    GlobalTensor<int8_t> bGlobal;
+    GlobalTensor<int32_t> cGlobal;
+
+    LocalTensor<int8_t> leftMatrix;
+    LocalTensor<int8_t> rightMatrix;
+    LocalTensor<int8_t> a2;
+    LocalTensor<int8_t> b2;
+    LocalTensor<int32_t> co1Local;
+    LocalTensor<int32_t> c1Local;
+    LocalTensor<int32_t> ubLocal;
+};
+
+__global__ __mix__(1, 2) void CopyL0c2l1Kernel(
+    __gm__ int8_t* a, __gm__ int8_t* b, __gm__ int32_t* output)
+{
+    KernelAscCopyL0c2l1 op;
+    op.Init(a, b, output);
+    op.Process();
+}
+} // namespace
+
+int main()
+{
+    std::vector<int8_t> a(M * K), b(K * N);
+    std::vector<int32_t> output(ELEMENTS), golden(ELEMENTS), goldenNz(ELEMENTS);
+    for (uint32_t r = 0; r < M; ++r) {
+        for (uint32_t k = 0; k < K; ++k) {
+            a[r * K + k] = static_cast<int8_t>(static_cast<int32_t>((r + 2 * k) % 5) - 2);
+        }
+    }
+    for (uint32_t c = 0; c < N; ++c) {
+        for (uint32_t k = 0; k < K; ++k) {
+            b[c * K + k] = static_cast<int8_t>(static_cast<int32_t>((3 * c + k) % 5) - 2);
+        }
+    }
+    for (uint32_t r = 0; r < M; ++r) {
+        for (uint32_t c = 0; c < N; ++c) {
+            for (uint32_t k = 0; k < K; ++k) {
+                golden[r * N + c] += a[r * K + k] * b[c * K + k];
+            }
+        }
+    }
+    // L1目的矩阵保持NZ排布: [N/16][M/16][16(m)][16(n)]，按该排布重排Golden
+    for (uint32_t nf = 0; nf < N / 16; ++nf) {
+        for (uint32_t mf = 0; mf < M / 16; ++mf) {
+            for (uint32_t mi = 0; mi < 16; ++mi) {
+                for (uint32_t ni = 0; ni < 16; ++ni) {
+                    goldenNz[((nf * (M / 16) + mf) * 16 + mi) * 16 + ni] =
+                        golden[(mf * 16 + mi) * N + nf * 16 + ni];
+                }
+            }
+        }
+    }
+
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    int8_t *ad = nullptr, *bd = nullptr;
+    int32_t* od = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&ad), a.size(), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&bd), b.size(), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&od), output.size() * sizeof(int32_t), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(ad, a.size(), a.data(), a.size(), ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(bd, b.size(), b.data(), b.size(), ACL_MEMCPY_HOST_TO_DEVICE);
+    CopyL0c2l1Kernel<<<1, 0>>>(ad, bd, od);
+    const aclError ret = aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(int32_t), od,
+        output.size() * sizeof(int32_t), ACL_MEMCPY_DEVICE_TO_HOST);
+    const bool passed = ret == ACL_SUCCESS && output == goldenNz;
+    std::printf("M=%u N=%u K=%u asc_copy_l0c2l1=%s\n", M, N, K, passed ? "PASS" : "FAIL");
+    aclrtFree(ad);
+    aclrtFree(bd);
+    aclrtFree(od);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```

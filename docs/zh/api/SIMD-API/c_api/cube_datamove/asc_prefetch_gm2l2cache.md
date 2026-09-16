@@ -29,6 +29,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/cube_datamove/cube_datamove.h"`。
+
 将Global Memory中的数据预加载到L2 Cache中，不实际搬进内核（L1 Buffer/Unified Buffer）。预加载的数据后续被核间指令访问时可命中L2 Cache，从而降低访问延迟。
 
 ## 函数原型
@@ -62,7 +64,7 @@ __aicore__ inline void asc_prefetch_gm2l2cache(__gm__ half* src,
 | --- | --- | --- |
 | src | 输入 | 源操作数，存储位置为GM。起始地址需要按照32字节对齐。 |
 | burst_num | 输入 | 预取的连续传输数据块个数。 |
-| burst_len | 输入 | 预取的每个连续传输数据块的长度，单位为字节。 |
+| burst_len | 输入 | 预取的每个连续传输数据块的长度，单位为字节。需满足dtype字节对齐：dtype为`int16_t`、`uint16_t`、`half`、`bfloat16_t`时，burst_len必须为2的倍数；dtype为`int32_t`、`uint32_t`、`float`时，burst_len必须为4的倍数。 |
 | burst_src_stride | 输入 | 源操作数相邻连续数据块的距离（前面一个数据块的头与后面一个数据块的头的间隔），单位为字节。<br>只预取1个数据块，即burst_num=1时，可以将此参数设置为0。 |
 
 ## 返回值说明
@@ -80,20 +82,138 @@ PIPE_MTE2
 
 ## 调用示例
 
+将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
+
+本示例固定`M=128、K=128`（`int16_t`类型，GM中按行连续存放），先将源矩阵通过本接口预加载到L2 Cache，随后发起GM到L1 Buffer的正常搬运（访问已预加载的GM地址时可命中L2 Cache），数据经UB回传GM后与Host侧原始输入比较，验证预加载不改变数据内容。
+
+<!-- npu="960" id9 -->
+以Ascend 960PR/Ascend 960DT产品（对应NPU架构为`dav-9201`）为例，编译运行命令如下：
+
+```bash
+bisheng examples.asc -o main --npu-arch=dav-9201 && ./main
+```
+<!-- end id9 -->
+
 ```cpp
-// 设置源操作数，A矩阵为128×128的half类型矩阵，在GM中按行连续存放
-constexpr uint32_t M = 128;
-constexpr uint32_t K = 128;
-__gm__ half* a;
+#include <cstdint>
+#include <cstdio>
+#include <vector>
+#include "acl/acl.h"
+#include "kernel_operator.h"
+#include "c_api/cube_datamove/cube_datamove.h"
+using namespace AscendC;
 
-// 预加载过程中的配置：每行为1个连续传输数据块（128×2=256字节），
-// 矩阵共128行，即128个数据块；相邻数据块首地址的间隔为256字节
-uint32_t burstNum = M;                       // 数据块个数：128
-uint32_t burstLen = K * sizeof(half);        // 每个数据块长度：256字节
-uint64_t burstSrcStride = K * sizeof(half);  // 相邻数据块间隔：256字节
+namespace {
+constexpr uint32_t M = 128, K = 128;
+constexpr uint32_t TOTAL = M * K;
 
-// 预加载过程：将A矩阵预加载到L2 Cache，不实际搬进L1 Buffer/Unified Buffer
-asc_prefetch_gm2l2cache(a, burstNum, burstLen, burstSrcStride);
-// 后续核间指令访问A矩阵所在的GM地址时，可命中L2 Cache中已预加载的数据，
-// 降低访问延迟；此处可继续下发当前轮的搬运、计算等指令
+class KernelAscPrefetchGm2l2cache {
+public:
+    __aicore__ inline KernelAscPrefetchGm2l2cache() {}
+
+    __aicore__ inline void Init(__gm__ int16_t* a, __gm__ int16_t* output)
+    {
+        srcGm = a;
+        srcGlobal.SetGlobalBuffer(a, TOTAL);
+        cGlobal.SetGlobalBuffer(output, TOTAL);
+
+        pipe.InitBuffer(qidA1, 1, TOTAL * sizeof(int16_t));
+        pipe.InitBuffer(qidUB, 1, TOTAL * sizeof(int16_t));
+
+        l1Local = qidA1.template AllocTensor<int16_t>();
+        ubLocal = qidUB.template AllocTensor<int16_t>();
+    }
+
+    __aicore__ inline void Process()
+    {
+        Prefetch();
+        CopyIn();
+        CopyOut();
+    }
+
+private:
+    // Prefetch: 将GM中的源矩阵预加载到L2 Cache，不实际搬进L1 Buffer/Unified Buffer。
+    // 每行为1个连续传输数据块（128 * 2 = 256字节），矩阵共128行，即128个数据块，
+    // 相邻数据块首地址的间隔为256字节
+    __aicore__ inline void Prefetch()
+    {
+        if ASCEND_IS_AIC {
+            uint32_t burstNum = M;                      // 数据块个数：128
+            uint32_t burstLen = K * sizeof(int16_t);    // 每个数据块长度：256字节
+            uint64_t burstSrcStride = K * sizeof(int16_t);  // 相邻数据块间隔：256字节
+            asc_prefetch_gm2l2cache(srcGm, burstNum, burstLen, burstSrcStride);
+        }
+    }
+
+    // CopyIn: GM -> L1，访问已预加载的GM地址时可命中L2 Cache中缓存的数据
+    __aicore__ inline void CopyIn()
+    {
+        if ASCEND_IS_AIC {
+            DataCopy(l1Local, srcGlobal, TOTAL);
+            pipe_barrier(PIPE_ALL);
+        }
+    }
+
+    // CopyOut: L1 -> UB -> GM
+    __aicore__ inline void CopyOut()
+    {
+        if ASCEND_IS_AIC {
+            copy_cbuf_to_ubuf((__ubuf__ void*)ubLocal.GetPhyAddr(), (__cbuf__ void*)l1Local.GetPhyAddr(), 0, 1,
+                static_cast<uint16_t>(TOTAL * sizeof(int16_t) / 32), 0, 0);
+        }
+        SyncAll<false>();
+        if (GetSubBlockIdx() == 0) {
+            DataCopy(cGlobal, ubLocal, TOTAL);
+        }
+    }
+
+private:
+    TPipe pipe;
+    TQue<TPosition::A1, 1> qidA1;
+    TQue<TPosition::VECOUT, 1> qidUB;
+
+    __gm__ int16_t* srcGm = nullptr;
+    GlobalTensor<int16_t> srcGlobal;
+    GlobalTensor<int16_t> cGlobal;
+
+    LocalTensor<int16_t> l1Local;
+    LocalTensor<int16_t> ubLocal;
+};
+
+__global__ __mix__(1, 2) void PrefetchGm2l2cacheKernel(__gm__ int16_t* a, __gm__ int16_t* output)
+{
+    KernelAscPrefetchGm2l2cache op;
+    op.Init(a, output);
+    op.Process();
+}
+} // namespace
+
+int main()
+{
+    std::vector<int16_t> a(TOTAL), output(TOTAL);
+    for (uint32_t r = 0; r < M; ++r) {
+        for (uint32_t k = 0; k < K; ++k) {
+            a[r * K + k] = static_cast<int16_t>((r * 31 + k * 7) % 1000 - 500);
+        }
+    }
+
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    int16_t *ad = nullptr, *od = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&ad), a.size() * sizeof(int16_t), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&od), output.size() * sizeof(int16_t), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(ad, a.size() * sizeof(int16_t), a.data(), a.size() * sizeof(int16_t), ACL_MEMCPY_HOST_TO_DEVICE);
+    PrefetchGm2l2cacheKernel<<<1, 0>>>(ad, od);
+    const aclError ret = aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(int16_t), od,
+        output.size() * sizeof(int16_t), ACL_MEMCPY_DEVICE_TO_HOST);
+    // 预加载仅将数据缓存到L2 Cache，不改变GM中的数据内容，输出应与原始输入完全一致
+    const bool passed = ret == ACL_SUCCESS && output == a;
+    std::printf("M=%u K=%u asc_prefetch_gm2l2cache=%s\n", M, K, passed ? "PASS" : "FAIL");
+    aclrtFree(ad);
+    aclrtFree(od);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```
