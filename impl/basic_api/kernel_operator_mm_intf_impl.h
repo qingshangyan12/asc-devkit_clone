@@ -59,6 +59,7 @@ __aicore__ inline void LoadData(
     LoadDataImpl(dst, src, loadDataParams);
 }
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
 /* [CUBE-PTR-EXPAND] LoadData 2D L1 -> L0A/L0B */
 template <typename T>
 __aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParams)
@@ -74,6 +75,7 @@ __aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData2D
     LoadData2DL12L0BCal(dst, src, loadDataParams);
 }
 
+#endif  // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams)
@@ -151,6 +153,7 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     LoadDataImpl(dst, src, loadDataParams);
 }
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
 /* [CUBE-PTR-EXPAND] LoadData 2DV2 GM -> L0A/L0B/L1 ; cacheMode fixed to 0 (bare __gm__ has no ExtractCacheMode) */
 template <typename T>
 __aicore__ inline void LoadData(__ca__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParams)
@@ -199,6 +202,7 @@ __aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData2D
     LoadData2DL12L0BCal(dst, src, loadDataParams);
 }
 
+#endif  // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
 template <typename T, typename U>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
@@ -261,6 +265,7 @@ __aicore__ inline void LoadData(
     LoadDataImpl<T, defaultConfig>(dst, src, loadDataParams);
 }
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
 /* [CUBE-PTR-BGROUP] LoadData 3DV1 pointer impl */
 template <
     typename T, const IsResetLoad3dConfig& defaultConfig, typename U,
@@ -485,7 +490,9 @@ __aicore__ inline void LoadDataUnzip(__cb__ T* dst, __gm__ T* src)
     LoadDataUnzipToL0BCal((__cb__ PrimT<T>*)dst, (__gm__ PrimT<T>*)src);
 }
 
+#endif  // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
 template <
     typename T, typename U, typename Std::enable_if<Std::is_same<PrimT<T>, int32_t>::value, bool>::type,
     typename Std::enable_if<Std::is_same<PrimT<U>, int8_t>::value, bool>::type>
@@ -493,6 +500,7 @@ __aicore__ inline void MmadWithSparse(__cc__ T* dst, __ca__ U* fm, __cb__ U* fil
 {
     MmadSpCal((__cc__ int32_t*)dst, (__ca__ int8_t*)fm, (__cb__ int8_t*)filter, mmadParams);
 }
+#endif  // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 #endif
 
 /* **************************************************************************************************
@@ -643,6 +651,7 @@ __aicore__ inline void LoadDataWithTranspose(
     LoadDataWithTransposeImpl(dst, src, loadDataParams);
 }
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
 /* [CUBE-PTR-EXPAND] LoadDataWithTranspose V1 */
 template <typename T>
 __aicore__ inline void LoadDataWithTranspose(
@@ -658,6 +667,7 @@ __aicore__ inline void LoadDataWithTranspose(
     LoadData2DL12L0BTransposeCal(dst, src, loadDataParams);
 }
 
+#endif  // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 /*
  * @ingroup DataLoad
  * @brief Cube data loading
@@ -684,6 +694,7 @@ __aicore__ inline void LoadDataWithTranspose(
     LoadDataWithTransposeImpl(dst, src, loadDataParams);
 }
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
 /* [CUBE-PTR-EXPAND] LoadDataWithTranspose V2 */
 template <typename T>
 __aicore__ inline void LoadDataWithTranspose(
@@ -699,6 +710,7 @@ __aicore__ inline void LoadDataWithTranspose(
     LoadData2DL12L0BTransposeCal(dst, src, loadDataParams);
 }
 
+#endif  // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 /* **************************************************************************************************
  * Mmad                                             *
  * ************************************************************************************************* */
@@ -726,12 +738,14 @@ __aicore__ inline void Mmad(
     MmadImpl(dst, fm, filter, mmadParams);
 }
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
 template <typename T, typename U, typename S>
 __aicore__ inline void Mmad(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadParams& mmadParams)
 {
     MmadCal((__cc__ PrimT<T>*)dst, (__ca__ PrimT<U>*)fm, (__cb__ PrimT<S>*)filter, mmadParams);
 }
 
+#endif  // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
@@ -740,6 +754,7 @@ __aicore__ inline void Mmad(
     MmadImpl(dst, fm, filter, bias, mmadParams);
 }
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
 /* [CUBE-PTR-EXPAND] Mmad + bias pointer path */
 template <typename T, typename U, typename S>
 __aicore__ inline void Mmad(
@@ -748,6 +763,7 @@ __aicore__ inline void Mmad(
     MmadCal(dst, fm, filter, bias, mmadParams, cmatrixSource);
 }
 
+#endif  // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 template <typename T, typename U, typename S>
 __aicore__ inline void Mmad(

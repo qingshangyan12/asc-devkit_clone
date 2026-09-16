@@ -185,6 +185,7 @@ __aicore__ inline void Fixpipe(
         (__cbuf__ uint64_t*)cbufWorkspace.GetPhyAddr(), intriParams);
 }
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
 /* [CUBE-PTR-EXPAND] Fixpipe V220 pointer paths */
 template <typename T, typename U, const FixpipeConfig& config>
 __aicore__ inline void Fixpipe(__cbuf__ T* dst, __cc__ U* src, const FixpipeParamsV220& intriParams)
@@ -225,6 +226,7 @@ __aicore__ inline void Fixpipe(
     FixpipeL0C2GMImpl<T, U, config>(dst, src, cbufWorkspace, intriParams);
 }
 
+#endif  // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 // L0C->L1/UB
 template <typename T, typename U, const FixpipeConfig& config>
@@ -306,6 +308,7 @@ __aicore__ inline void Fixpipe(
 #endif // ASCENDC_CPU_DEBUG
 }
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
 template <typename T, typename U, const FixpipeConfig& config>
 __aicore__ inline void Fixpipe(__gm__ T* dst, __cc__ U* src, const FixpipeParamsArch3510<config.format>& intriParams)
 {
@@ -316,6 +319,7 @@ __aicore__ inline void Fixpipe(__gm__ T* dst, __cc__ U* src, const FixpipeParams
         (__gm__ DstPrimType*)dst, (__cc__ SrcPrimType*)src, intriParams, cacheMode);
 }
 
+#endif  // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 // L0C->GM deq tensor quant
 template <typename T, typename U, const FixpipeConfig& config>
 __aicore__ inline void Fixpipe(
@@ -338,6 +342,7 @@ __aicore__ inline void Fixpipe(
 #endif
 }
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
 /* [CUBE-PTR-EXPAND] Fixpipe Arch3510 L0C->L1/UB (+ws) and GM+ws (cacheMode=0) */
 template <typename T, typename U, const FixpipeConfig& config>
 __aicore__ inline void Fixpipe(__cbuf__ T* dst, __cc__ U* src, const FixpipeParamsArch3510<config.format>& intriParams)
@@ -378,6 +383,7 @@ __aicore__ inline void Fixpipe(
     FixpipeL0C2GMImpl<T, U, config>(dst, src, cbufWorkspace, intriParams);
 #endif
 }
+#endif  // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 #endif
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_FIXPIPE_INTERFACE_IMPL_H
