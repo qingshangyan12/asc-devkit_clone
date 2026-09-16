@@ -9,6 +9,8 @@
  */
 #include "ccu_kernel_alg_base.h"
 #include "ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem_peer_only.h"
+#include "ccu_func_dl.hpp"
+#include "kfc_server_protocol.h"
 #include "mc2_type.h"
 
 namespace mc2_ops_hccl {
@@ -148,6 +150,21 @@ CcuResult CcuReduceScatterMeshMem2Mem1DPeerOnlyKernel(
     CCU_CHK_RET(PeerOnlyPostSync(ctx));
     HCCL_INFO("[CcuSchedReduceScatterSoleMeshPeerOnly] end.");
     return CCU_SUCCESS;
+}
+
+CcuResult CcuReduceScatterMeshMem2Mem1DPeerOnlyDefineKernel(CcuKernelArg arg)
+{
+    const auto* kernelArg = static_cast<CcuKernelArgKfcReduceScatterMesh1DMem2Mem*>(arg);
+    CcuResult bodyRet = CCU_SUCCESS;
+    ccu::Func subKernel(
+        [kernelArg, &bodyRet](ccu::Array<ccu::Variable>& args) {
+            bodyRet = CcuReduceScatterMeshMem2Mem1DPeerOnlyKernel(
+                args[0], args[1], args[2], args[3], args[4], args[5], kernelArg->channels,
+                kernelArg->channelCount, static_cast<uint32_t>(kernelArg->rankSize), kernelArg->rankId,
+                kernelArg->opParam.DataDes.dataType, kernelArg->opParam.reduceType);
+        },
+        6, KFC_SUB_KERNEL_FUNC_NAME);
+    return bodyRet;
 }
 
 } // namespace mc2_ops_hccl

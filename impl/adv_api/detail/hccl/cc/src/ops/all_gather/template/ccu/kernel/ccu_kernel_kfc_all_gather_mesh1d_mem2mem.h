@@ -14,6 +14,46 @@
 
 namespace mc2_ops_hccl {
 
+struct CcuKernelArgKfcAllGatherMesh1DMem2Mem : CcuKernelArgBase {
+    uint64_t rankSize = 0;
+    uint32_t rankId = 0;
+};
+
+struct KfcAllGatherMesh1DMem2MemContext : CcuKernelCtxBase {
+    const ChannelHandle* channels{nullptr};
+    uint32_t channelCount{0};
+    uint32_t rankSize{0};
+    uint32_t rankId{0};
+
+    ccu::Variable input;
+    std::vector<ccu::Variable> output;
+    std::vector<ccu::Variable> token;
+    ccu::Variable currentRankSliceInputOffset;
+    ccu::Variable currentRankSliceOutputOffset;
+    ccu::Variable tmpRepeatNum;
+    ccu::Variable inputRepeatStride;
+    ccu::Variable outputRepeatStride;
+    ccu::Variable normalSliceSize;
+    ccu::Variable lastSliceSize;
+    ccu::Variable isInputOutputEqual;
+    // Kept to consume queue payload slots [5..8].  The KFC path must not
+    // create a GroupCopy/LoopGroup from inside the server's persistent loop.
+    GroupOpSizeVars goSize;
+    ccu::LocalAddr srcLocCopy;
+    ccu::LocalAddr localDst;
+    std::vector<ccu::Event> events;
+    ccu::Event localCopyEvent;
+
+    ccu::Variable constVar1;
+    ccu::Variable repeatTimeFlag;
+    ccu::Variable remoteRepeatTimeFlag;
+    ccu::Variable waitRepeatNum;
+    ccu::Variable localCopyRepeatNum;
+    ccu::Variable sliceSize;
+    ccu::LocalAddr src;
+    std::vector<ccu::RemoteAddr> dst;
+};
+
 // 每个 repeat 批次最多展开 16 次 Write/LocalCopy/Wait 三阶段流水。
 constexpr uint32_t AG_M2M_UNROLL_NUM = 1;
 
@@ -23,6 +63,7 @@ CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
     ccu::Variable currentRankSliceInputOffset, ccu::Variable tmpRepeatNum, ccu::Variable inputRepeatStride,
     ccu::Variable outputRepeatStride, ccu::Variable lastSliceSize, ccu::Variable isInputOutputEqual,
     const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId);
+CcuResult CcuKfcAllGatherMesh1DMem2MemDefineKernel(CcuKernelArg arg);
 
 CcuResult CcuKfcParallelAllGatherMesh1DMem2MemKernel(
     ccu::Variable inputBase, ccu::Variable outputBase, ccu::Variable tokenInfo, ccu::Variable outputStride,
@@ -31,6 +72,7 @@ CcuResult CcuKfcParallelAllGatherMesh1DMem2MemKernel(
     ccu::Variable part0GoSize3, ccu::Variable part1GoSize0, ccu::Variable part1GoSize1, ccu::Variable part1GoSize2,
     ccu::Variable part1GoSize3, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSizeLevel0,
     uint32_t rankIdxLevel0, uint32_t rankSizeLevel1, uint32_t rankIdxLevel1);
+CcuResult CcuKfcParallelAllGatherMesh1DMem2MemDefineKernel(CcuKernelArg arg);
 
 } // namespace mc2_ops_hccl
 

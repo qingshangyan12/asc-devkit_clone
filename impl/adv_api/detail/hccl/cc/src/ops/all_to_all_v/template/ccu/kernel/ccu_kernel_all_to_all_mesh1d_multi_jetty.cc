@@ -9,6 +9,7 @@
  */
 
 #include "ccu_kernel_all_to_all_mesh1d_multi_jetty.h"
+#include "ccu_func_dl.hpp"
 
 namespace mc2_ops_hccl {
 namespace {
@@ -190,6 +191,22 @@ CcuResult CcuAllToAllMesh1DMultiJettyKernel(
     CCU_CHK_RET(DoAllToAll(ctx));
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
+}
+
+CcuResult CcuAllToAllMesh1DMultiJettyDefineKernel(CcuKernelArg arg)
+{
+    const auto* kernelArg = static_cast<CcuKernelArgAllToAllMesh1DMultiJetty*>(arg);
+    CcuResult bodyRet = CCU_SUCCESS;
+    ccu::Func subKernel(
+        [kernelArg, &bodyRet](ccu::Array<ccu::Variable>& args) {
+            bodyRet = CcuAllToAllMesh1DMultiJettyKernel(
+                args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9],
+                args[10], args[11], args[12],
+                kernelArg->channels, kernelArg->channelCount, static_cast<uint32_t>(kernelArg->rankSize),
+                kernelArg->rankId, kernelArg->jettyNum);
+        },
+        13, KFC_SUB_KERNEL_FUNC_NAME);
+    return bodyRet;
 }
 
 } // namespace mc2_ops_hccl

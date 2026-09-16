@@ -18,6 +18,16 @@
 
 namespace mc2_ops_hccl {
 
+struct CcuKernelArgKfcReduceScatterNHR1DMultiJettyMem2Mem : CcuKernelArgBase {
+    uint64_t rankSize = 0;
+    uint32_t rankId = 0;
+    uint32_t portNum = 1;
+    OpParam opParam;
+    std::vector<KfcNhrStepInfo> stepInfoVector;
+    std::map<uint32_t, uint32_t> rank2ChannelIdx;
+    std::vector<std::vector<uint32_t>> subCommRanks;
+};
+
 // KFC 版 ReduceScatter NHR MultiJetty Mem2Mem kernel：算法逻辑与 hccl
 // CcuReduceScatterNhrMem2Mem1DMultiJettyKernel 逐行对照，参数改为 dispatch 显式传参。
 CcuResult CcuKfcReduceScatterNHR1DMultiJettyMem2MemKernel(
@@ -27,6 +37,8 @@ CcuResult CcuKfcReduceScatterNHR1DMultiJettyMem2MemKernel(
     const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId, uint32_t jettyNum,
     const HcclDataType& dataType, const HcclDataType& outputType, const HcclReduceOp& reduceType,
     const std::vector<KfcNhrStepInfo>& stepInfoVector, const std::map<uint32_t, uint32_t>& rank2ChannelIdx);
+
+CcuResult CcuKfcReduceScatterNHR1DMultiJettyMem2MemDefineKernel(CcuKernelArg arg);
 
 } // namespace mc2_ops_hccl
 

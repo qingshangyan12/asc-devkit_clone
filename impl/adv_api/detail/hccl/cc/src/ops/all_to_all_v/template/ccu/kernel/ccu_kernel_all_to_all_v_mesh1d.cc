@@ -9,6 +9,8 @@
  */
 
 #include "ccu_kernel_all_to_all_v_mesh1d.h"
+#include "ccu_func_dl.hpp"
+#include "kfc_server_protocol.h"
 
 namespace mc2_ops_hccl {
 
@@ -30,19 +32,21 @@ constexpr uint64_t A2AV_MAX_TRANSPORT_SIZE = 256ULL * 1024ULL * 1024ULL;
 constexpr uint64_t A2AV_GROUP_MEMSLICE_SIZE = 32ULL * 1024ULL;
 constexpr uint64_t A2AV_GROUP_LOOP_COUNT = 8ULL;
 
-CcuResult CcuAlltoAllVMesh1DKernel(
+static CcuResult RunAlltoAllV(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable srcOffset,
-    ccu::Variable dstOffset, ccu::Variable extAddr, ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3,
-    ccu::Variable goSize4, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId)
+    ccu::Variable dstOffset, ccu::Variable extAddr, ccu::Variable goSize1, ccu::Variable goSize2,
+    ccu::Variable goSize3, ccu::Variable goSize4, const ChannelHandle channels[], uint32_t channelCount,
+    uint32_t rankSize, uint32_t rankId)
 {
+    CcuKernelCtxBase ctx;
+    InitCcuKernelCtxBase(ctx);
+
     std::vector<ccu::Variable> output(rankSize);
     std::vector<ccu::Variable> token(rankSize);
     std::vector<ccu::LocalAddr> src(rankSize);
     std::vector<ccu::RemoteAddr> dst(rankSize);
     ccu::LocalAddr localDst;
     std::vector<ccu::Event> events((rankSize + A2AV_BITS_PER_EVENT - 1) / A2AV_BITS_PER_EVENT);
-    CcuKernelCtxBase ctx;
-    InitCcuKernelCtxBase(ctx);
     GroupOpSizeVars tailGoSize{goSize1, goSize2, goSize3, goSize4};
     GroupOpSizeVars fullBlockGoSize;
     fullBlockGoSize.addrOffset = A2AV_MAX_TRANSPORT_SIZE;
@@ -188,6 +192,32 @@ CcuResult CcuAlltoAllVMesh1DKernel(
         ccu::NotifyWait(channels[i], A2AV_POST_SYNC_CKE_IDX, A2AV_POST_SYNC_BIT);
     }
     return CCU_SUCCESS;
+}
+
+CcuResult CcuAlltoAllVMesh1DKernel(
+    ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable srcOffset,
+    ccu::Variable dstOffset, ccu::Variable extAddr, ccu::Variable goSize1, ccu::Variable goSize2,
+    ccu::Variable goSize3, ccu::Variable goSize4, const ChannelHandle channels[], uint32_t channelCount,
+    uint32_t rankSize, uint32_t rankId)
+{
+    return RunAlltoAllV(
+        inputAddr, outputAddr, tokenInfo, srcOffset, dstOffset, extAddr, goSize1, goSize2, goSize3, goSize4, channels,
+        channelCount, rankSize, rankId);
+}
+
+CcuResult CcuAlltoAllVMesh1DDefineKernel(CcuKernelArg arg)
+{
+    const auto* kernelArg = static_cast<CcuKernelArgAlltoAllVMesh1D*>(arg);
+    CcuResult bodyRet = CCU_SUCCESS;
+    ccu::Func subKernel(
+        [kernelArg, &bodyRet](ccu::Array<ccu::Variable>& args) {
+            bodyRet = RunAlltoAllV(
+                args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9],
+                kernelArg->channels, kernelArg->channelCount, static_cast<uint32_t>(kernelArg->rankSize),
+                kernelArg->rankId);
+        },
+        10, KFC_SUB_KERNEL_FUNC_NAME);
+    return bodyRet;
 }
 
 } // namespace mc2_ops_hccl

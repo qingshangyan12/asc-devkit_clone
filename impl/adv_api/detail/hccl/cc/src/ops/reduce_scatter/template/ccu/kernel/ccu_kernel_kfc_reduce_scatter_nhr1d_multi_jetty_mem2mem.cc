@@ -9,6 +9,7 @@
  */
 
 #include "ccu_kernel_kfc_reduce_scatter_nhr1d_multi_jetty_mem2mem.h"
+#include "ccu_func_dl.hpp"
 
 namespace mc2_ops_hccl {
 namespace {
@@ -256,6 +257,23 @@ CcuResult CcuKfcReduceScatterNHR1DMultiJettyMem2MemKernel(
     CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(RunNhr(ctx)); }
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
+}
+
+CcuResult CcuKfcReduceScatterNHR1DMultiJettyMem2MemDefineKernel(CcuKernelArg arg)
+{
+    const auto* kernelArg = static_cast<CcuKernelArgKfcReduceScatterNHR1DMultiJettyMem2Mem*>(arg);
+    CcuResult bodyRet = CCU_SUCCESS;
+    ccu::Func subKernel(
+        [kernelArg, &bodyRet](ccu::Array<ccu::Variable>& args) {
+            bodyRet = CcuKfcReduceScatterNHR1DMultiJettyMem2MemKernel(
+                args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9],
+                kernelArg->channels, kernelArg->channelCount,
+                static_cast<uint32_t>(kernelArg->rankSize), kernelArg->rankId, kernelArg->portNum,
+                kernelArg->opParam.DataDes.dataType, kernelArg->opParam.DataDes.outputType,
+                kernelArg->opParam.reduceType, kernelArg->stepInfoVector, kernelArg->rank2ChannelIdx);
+        },
+        10, KFC_SUB_KERNEL_FUNC_NAME);
+    return bodyRet;
 }
 
 } // namespace mc2_ops_hccl

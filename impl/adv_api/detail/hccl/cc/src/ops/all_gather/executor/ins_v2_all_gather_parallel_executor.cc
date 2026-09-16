@@ -123,6 +123,10 @@ HcclResult InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
         arg->rank2ChannelIdx = nhr->rank2ChannelIdx;
         mesh->algSubType = nhr->algSubType = KFC_PARALLEL_ALL_GATHER_SUB_TYPE;
         mesh->algArg = nhr->algArg = arg;
+        intraTempRequest.ccuKernelInfos[0].kernelFunc =
+            reinterpret_cast<void*>(CcuKfcParallelAllGatherMesh1DMem2MemDefineKernel);
+        interTempRequest.ccuKernelInfos[0].kernelFunc =
+            reinterpret_cast<void*>(CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemDefineKernel);
     }
 #endif
     constexpr u32 SUB_MAIN_THREAD_NUM = 2;

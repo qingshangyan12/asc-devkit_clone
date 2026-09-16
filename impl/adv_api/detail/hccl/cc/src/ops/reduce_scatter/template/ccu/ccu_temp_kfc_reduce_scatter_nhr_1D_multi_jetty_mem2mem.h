@@ -18,16 +18,6 @@
 
 namespace mc2_ops_hccl {
 
-struct CcuKernelArgKfcReduceScatterNHR1DMultiJettyMem2Mem : CcuKernelArgBase {
-    uint64_t rankSize = 0;
-    uint32_t rankId = 0;
-    uint32_t portNum = 1;
-    OpParam opParam;
-    std::vector<KfcNhrStepInfo> stepInfoVector;
-    std::map<uint32_t, uint32_t> rank2ChannelIdx;
-    std::vector<std::vector<uint32_t>> subCommRanks;
-};
-
 // KFC 版 ReduceScatter NHR MultiJetty Mem2Mem 模板：CalcRes 产出 kernelInfo，
 // 与 hccl CcuTempReduceScatterNhrMultiJettyMem2Mem1D::CalcRes 对照（通道/jetty/stepInfo 同源公式）。
 class CcuTempKfcReduceScatterNHR1DMultiJettyMem2Mem : public CcuAlgTemplateBase {
