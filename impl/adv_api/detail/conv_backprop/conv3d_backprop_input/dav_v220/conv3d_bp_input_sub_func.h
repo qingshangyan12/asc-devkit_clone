@@ -327,7 +327,7 @@ __aicore__ inline void LoadToB2ProGemm(
                 static_cast<uint16_t>(self->ctx.baseUseN_), // kExtension
                 AscendC::BLOCK_CUBE,                        // mExtension
                 kStart,                                     // kStartPt
-                mStart,                                     // mStartPt
+                mStart,  // mStartPt
                 1,                                          // strideW
                 1,                                          // strideH
                 1,                                          // filterW

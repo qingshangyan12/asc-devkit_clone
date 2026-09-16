@@ -164,7 +164,7 @@ private:
         // params.m * params.n <= srcTensor element num
         ASCENDC_ASSERT(params.m * params.n <= srcTensor.GetSize() || HighLevelAPIParametersPrint, {
             KERNEL_LOG(
-                KERNEL_ERROR, "[AscendDequant] params.m %u * params.n %u \
+                KERNEL_ERROR, "[AscendDequant] params.m %u * params.n %u  \
             must not be larger than element num of srcTensor %u",
                 params.m, params.n, srcTensor.GetSize());
         });

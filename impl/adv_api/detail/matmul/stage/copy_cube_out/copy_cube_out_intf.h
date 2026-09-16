@@ -60,6 +60,7 @@ public:
                                    int32_t baseBlockWidth, const ScheduleContext& context = 0)
     {}
 
+
     /**
      * @description: Copy data from L0C to LocalTensor
      * @param: co2Local: The Copy dst address

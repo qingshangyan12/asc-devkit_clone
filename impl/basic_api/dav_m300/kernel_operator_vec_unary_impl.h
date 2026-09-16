@@ -90,7 +90,7 @@ namespace AscendC {
 
 // for normal 16-bit types: s16, f16
 #define UNARY_VEC_NORMAL_T16(FUNC_NAME, OP_NAME, DATA_TYPE, REG_TYPE)                                    \
-    template <typename T = DATA_TYPE, bool isSetMask = true>                                             \
+    template <typename T = DATA_TYPE, bool isSetMask = true>  \
     __aicore__ inline void FUNC_NAME(                                                                    \
         __ubuf__ DATA_TYPE* dst, __ubuf__ DATA_TYPE* src, const uint64_t mask, const uint8_t repeatTime, \
         const UnaryRepeatParams& repeatParams)                                                           \
@@ -113,7 +113,7 @@ namespace AscendC {
 
 // for normal 32-bit types: s32, f32
 #define UNARY_VEC_NORMAL_T32(FUNC_NAME, OP_NAME, DATA_TYPE, REG_TYPE)                                    \
-    template <typename T = DATA_TYPE, bool isSetMask = true>                                             \
+    template <typename T = DATA_TYPE, bool isSetMask = true>  \
     __aicore__ inline void FUNC_NAME(                                                                    \
         __ubuf__ DATA_TYPE* dst, __ubuf__ DATA_TYPE* src, const uint64_t mask, const uint8_t repeatTime, \
         const UnaryRepeatParams& repeatParams)                                                           \
@@ -196,7 +196,7 @@ namespace AscendC {
 #define UNARY_VEC_BITWISE_T32(FUNC_NAME, OP_NAME, DATA_TYPE, REG_TYPE)                                     \
     template <typename T = DATA_TYPE, bool isSetMask = true>                                               \
     __aicore__ inline void FUNC_NAME(                                                                      \
-        __ubuf__ DATA_TYPE* dst, __ubuf__ DATA_TYPE* src, const uint64_t mask[], const uint8_t repeatTime, \
+        __ubuf__ DATA_TYPE* dst, __ubuf__ DATA_TYPE* src, const uint64_t mask[], const uint8_t repeatTime,  \
         const UnaryRepeatParams& repeatParams)                                                             \
     {                                                                                                      \
         if constexpr (isSetMask) {                                                                         \

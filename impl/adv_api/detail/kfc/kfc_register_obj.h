@@ -348,7 +348,7 @@ __aicore__ inline void CountMatmulObj(AscendC::TPipe* tpipe, T& a, Args&&... b)
         AscendC::CrossCoreWaitFlag<matmul::INTRA_MODE, PIPE_S>(AscendC::KFC_SYNC_ID);                \
     }
 #else
-#define REGIST_CUBE_OBJ(tpipe, workspace, ...)                                                         \
+#define REGIST_CUBE_OBJ(tpipe, workspace, ...)  \
     using ASCubeObjConfig = AscendC::GetCubeObjConfig<decltype(AscendC::GetObjType(__VA_ARGS__))>;     \
     static_assert(                                                                                     \
         ASCubeObjConfig::enableABShareValue != AscendC::CUBEOBJ_MIX_MODE,                              \
