@@ -113,85 +113,44 @@ namespace {
 constexpr uint32_t M = 128, K = 128;
 constexpr uint32_t TOTAL = M * K;
 
-class KernelAscPrefetchGm2l2cacheDn2nz {
-public:
-    __aicore__ inline KernelAscPrefetchGm2l2cacheDn2nz() {}
+__global__ __mix__(1, 2) void PrefetchGm2l2cacheDn2nzKernel(__gm__ int16_t* a, __gm__ int16_t* output)
+{
+    __gm__ int16_t* srcGm = a;
+    GlobalTensor<int16_t> srcGlobal, cGlobal;
+    srcGlobal.SetGlobalBuffer(a, TOTAL);
+    cGlobal.SetGlobalBuffer(output, TOTAL);
 
-    __aicore__ inline void Init(__gm__ int16_t* a, __gm__ int16_t* output)
-    {
-        srcGm = a;
-        srcGlobal.SetGlobalBuffer(a, TOTAL);
-        cGlobal.SetGlobalBuffer(output, TOTAL);
-
-        pipe.InitBuffer(qidA1, 1, TOTAL * sizeof(int16_t));
-        pipe.InitBuffer(qidUB, 1, TOTAL * sizeof(int16_t));
-
-        l1Local = qidA1.template AllocTensor<int16_t>();
-        ubLocal = qidUB.template AllocTensor<int16_t>();
-    }
-
-    __aicore__ inline void Process()
-    {
-        Prefetch();
-        CopyIn();
-        CopyOut();
-    }
-
-private:
-    // Prefetch: 将GM中的DN矩阵预加载到L2 Cache，预加载过程中执行DN->NZ格式转换，
-    // 不实际搬进L1 Buffer
-    __aicore__ inline void Prefetch()
-    {
-        if ASCEND_IS_AIC {
-            // 源矩阵按DN格式存放：共128行（D维），每行128个N维元素连续存放
-            uint64_t loop1SrcStride = M * sizeof(int16_t);  // 同一DN矩阵相邻行起始地址间隔：256字节
-            uint16_t nValue = M;                             // DN矩阵的列数：128
-            uint32_t dValue = K;                             // DN矩阵的行数：128
-            uint64_t loop4SrcStride = 0;                     // 仅预加载1个DN矩阵，设置为0
-            asc_prefetch_gm2l2cache_dn2nz(srcGm, loop1SrcStride, nValue, dValue, loop4SrcStride);
-        }
-    }
-
-    // CopyIn: GM -> L1，访问已预加载的GM地址时可命中L2 Cache中缓存的数据
-    __aicore__ inline void CopyIn()
-    {
-        if ASCEND_IS_AIC {
-            DataCopy(l1Local, srcGlobal, TOTAL);
-            pipe_barrier(PIPE_ALL);
-        }
-    }
-
-    // CopyOut: L1 -> UB -> GM
-    __aicore__ inline void CopyOut()
-    {
-        if ASCEND_IS_AIC {
-            copy_cbuf_to_ubuf((__ubuf__ void*)ubLocal.GetPhyAddr(), (__cbuf__ void*)l1Local.GetPhyAddr(), 0, 1,
-                static_cast<uint16_t>(TOTAL * sizeof(int16_t) / 32), 0, 0);
-        }
-        SyncAll<false>();
-        if (GetSubBlockIdx() == 0) {
-            DataCopy(cGlobal, ubLocal, TOTAL);
-        }
-    }
-
-private:
     TPipe pipe;
     TQue<TPosition::A1, 1> qidA1;
     TQue<TPosition::VECOUT, 1> qidUB;
+    pipe.InitBuffer(qidA1, 1, TOTAL * sizeof(int16_t));
+    pipe.InitBuffer(qidUB, 1, TOTAL * sizeof(int16_t));
 
-    __gm__ int16_t* srcGm = nullptr;
-    GlobalTensor<int16_t> srcGlobal;
-    GlobalTensor<int16_t> cGlobal;
+    LocalTensor<int16_t> a_l1 = qidA1.template AllocTensor<int16_t>();
+    LocalTensor<int16_t> output_ub = qidUB.template AllocTensor<int16_t>();
 
-    LocalTensor<int16_t> l1Local;
-    LocalTensor<int16_t> ubLocal;
-};
+    if ASCEND_IS_AIC {
+        // Prefetch: 将GM中的DN矩阵预加载到L2 Cache，预加载过程中执行DN->NZ格式转换，
+        // 不实际搬进L1 Buffer
+        // 源矩阵按DN格式存放：共128行（D维），每行128个N维元素连续存放
+        uint64_t loop1SrcStride = M * sizeof(int16_t);  // 同一DN矩阵相邻行起始地址间隔：256字节
+        uint16_t nValue = M;                             // DN矩阵的列数：128
+        uint32_t dValue = K;                             // DN矩阵的行数：128
+        uint64_t loop4SrcStride = 0;                     // 仅预加载1个DN矩阵，设置为0
+        asc_prefetch_gm2l2cache_dn2nz(srcGm, loop1SrcStride, nValue, dValue, loop4SrcStride);
 
-__global__ __mix__(1, 2) void PrefetchGm2l2cacheDn2nzKernel(__gm__ int16_t* a, __gm__ int16_t* output)
-{
-    KernelAscPrefetchGm2l2cacheDn2nz op;
-    op.Init(a, output);
-    op.Process();
+        // CopyIn: GM -> L1，访问已预加载的GM地址时可命中L2 Cache中缓存的数据
+        DataCopy(a_l1, srcGlobal, TOTAL);
+        pipe_barrier(PIPE_ALL);
+
+        // CopyOut: L1 -> UB
+        copy_cbuf_to_ubuf((__ubuf__ void*)output_ub.GetPhyAddr(), (__cbuf__ void*)a_l1.GetPhyAddr(), 0, 1,
+            static_cast<uint16_t>(TOTAL * sizeof(int16_t) / 32), 0, 0);
+    }
+    SyncAll<false>();
+    if (GetSubBlockIdx() == 0) {
+        DataCopy(cGlobal, output_ub, TOTAL);
+    }
 }
 } // namespace
 

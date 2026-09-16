@@ -314,170 +314,118 @@ namespace {
 constexpr uint32_t M = 128, N = 128, K = 128;
 constexpr uint32_t ELEMENTS = M * N;
 
-class KernelAscCopyL0c2l1 {
-public:
-    __aicore__ inline KernelAscCopyL0c2l1() {}
+__global__ __mix__(1, 2) void CopyL0c2l1Kernel(
+    __gm__ int8_t* a, __gm__ int8_t* b, __gm__ int32_t* output)
+{
+    GlobalTensor<int8_t> aGlobal, bGlobal;
+    GlobalTensor<int32_t> cGlobal;
+    aGlobal.SetGlobalBuffer(a, M * K);
+    bGlobal.SetGlobalBuffer(b, K * N);
+    cGlobal.SetGlobalBuffer(output, M * N);
 
-    __aicore__ inline void Init(__gm__ int8_t* a, __gm__ int8_t* b, __gm__ int32_t* output)
-    {
-        aGlobal.SetGlobalBuffer(a, M * K);
-        bGlobal.SetGlobalBuffer(b, K * N);
-        cGlobal.SetGlobalBuffer(output, M * N);
-
-        pipe.InitBuffer(qidA1, 1, M * K * sizeof(int8_t));
-        pipe.InitBuffer(qidB1, 1, K * N * sizeof(int8_t));
-        pipe.InitBuffer(qidA2, 1, M * K * sizeof(int8_t));
-        pipe.InitBuffer(qidB2, 1, K * N * sizeof(int8_t));
-        pipe.InitBuffer(qidCO1, 1, M * N * sizeof(int32_t));
-        pipe.InitBuffer(qidC1, 1, M * N * sizeof(int32_t));
-        pipe.InitBuffer(qidUB, 1, M * N * sizeof(int32_t));
-
-        leftMatrix = qidA1.template AllocTensor<int8_t>();
-        rightMatrix = qidB1.template AllocTensor<int8_t>();
-        a2 = qidA2.template AllocTensor<int8_t>();
-        b2 = qidB2.template AllocTensor<int8_t>();
-        co1Local = qidCO1.template AllocTensor<int32_t>();
-        c1Local = qidC1.template AllocTensor<int32_t>();
-        ubLocal = qidUB.template AllocTensor<int32_t>();
-    }
-
-    __aicore__ inline void Process()
-    {
-        CopyIn();
-        Split();
-        Compute();
-        CopyOut();
-    }
-
-private:
-    // CopyIn: GM -> L1(A1/B1)，ND转NZ
-    __aicore__ inline void CopyIn()
-    {
-        if ASCEND_IS_AIC {
-            Nd2NzParams nd2nzParams;
-            nd2nzParams.ndNum = 1;
-            nd2nzParams.nValue = M;
-            nd2nzParams.dValue = K;
-            nd2nzParams.srcNdMatrixStride = 0;
-            nd2nzParams.srcDValue = K;
-            nd2nzParams.dstNzC0Stride = M;
-            nd2nzParams.dstNzNStride = 1;
-            nd2nzParams.dstNzMatrixStride = 0;
-            DataCopy(leftMatrix, aGlobal, nd2nzParams);
-            pipe_barrier(PIPE_ALL);
-
-            nd2nzParams.ndNum = 1;
-            nd2nzParams.nValue = K;
-            nd2nzParams.dValue = N;
-            nd2nzParams.srcNdMatrixStride = 0;
-            nd2nzParams.srcDValue = N;
-            nd2nzParams.dstNzC0Stride = K;
-            nd2nzParams.dstNzNStride = 1;
-            nd2nzParams.dstNzMatrixStride = 0;
-            DataCopy(rightMatrix, bGlobal, nd2nzParams);
-            pipe_barrier(PIPE_ALL);
-        }
-    }
-
-    // Split: L1(A1/B1) -> L0A/L0B
-    __aicore__ inline void Split()
-    {
-        if ASCEND_IS_AIC {
-            LoadData2DParamsV2 loadDataParams;
-            loadDataParams.mStartPosition = 0;
-            loadDataParams.kStartPosition = 0;
-            loadDataParams.mStep = DivCeil(M, BLOCK_CUBE);
-            loadDataParams.kStep = DivCeil(K * sizeof(int8_t), 32);
-            loadDataParams.srcStride = DivCeil(M, BLOCK_CUBE);
-            loadDataParams.dstStride = DivCeil(M, BLOCK_CUBE);
-            loadDataParams.sid = 0;
-            loadDataParams.ifTranspose = false;
-            LoadData(a2, leftMatrix, loadDataParams);
-            pipe_barrier(PIPE_ALL);
-
-            uint16_t kAlign = CeilDivision(K, BLOCK_CUBE);
-            uint16_t nAlign = CeilDivision(N * sizeof(int8_t), 32);
-
-            loadDataParams.mStartPosition = 0;
-            loadDataParams.kStartPosition = 0;
-            loadDataParams.mStep = kAlign;
-            loadDataParams.kStep = nAlign;
-            loadDataParams.srcStride = kAlign;
-            // int8_t类型在L0B中按16B对齐存放，dstStride需乘2
-            loadDataParams.dstStride = nAlign * 2;
-
-            loadDataParams.sid = 0;
-            loadDataParams.ifTranspose = true;
-            LoadData(b2, rightMatrix, loadDataParams);
-            pipe_barrier(PIPE_ALL);
-        }
-    }
-
-    // Compute: Mmad -> L0C(CO1)
-    __aicore__ inline void Compute()
-    {
-        if ASCEND_IS_AIC {
-            MmadParams mmadParams;
-            mmadParams.m = M;
-            mmadParams.n = N;
-            mmadParams.k = K;
-            mmadParams.isBias = false;
-            Mmad(co1Local, a2, b2, mmadParams);
-            pipe_barrier(PIPE_ALL);
-        }
-    }
-
-    // CopyOut: L0C -> L1 by asc_copy_l0c2l1，随后L1 -> UB -> GM
-    __aicore__ inline void CopyOut()
-    {
-        if ASCEND_IS_AIC {
-            // src_stride: L0C中相邻Z分形起始地址的偏移，单位: C0_Size(16 * sizeof(int32_t))
-            uint16_t srcStride = static_cast<uint16_t>(DivCeil(M, BLOCK_CUBE) * BLOCK_CUBE);
-            // dst_stride: L1目的NZ矩阵中相邻Z分形起始地址的偏移，单位: element
-            uint32_t dstStride = static_cast<uint32_t>(M) * BLOCK_CUBE;
-            asc_copy_l0c2l1((__cbuf__ int32_t*)c1Local.GetPhyAddr(), (__cc__ int32_t*)co1Local.GetPhyAddr(),
-                static_cast<uint16_t>(N), static_cast<uint16_t>(M), dstStride, srcStride, 0, 0,
-                static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, false, 0, 0, false, 0, 0, false);
-            pipe_barrier(PIPE_ALL);
-
-            copy_cbuf_to_ubuf((__ubuf__ void*)ubLocal.GetPhyAddr(), (__cbuf__ void*)c1Local.GetPhyAddr(), 0, 1,
-                static_cast<uint16_t>(M * N * sizeof(int32_t) / 32), 0, 0);
-        }
-        SyncAll<false>();
-        if (GetSubBlockIdx() == 0) {
-            DataCopy(cGlobal, ubLocal, M * N);
-        }
-    }
-
-private:
     TPipe pipe;
-    TQue<TPosition::A1, 1> qidA1;
+    TQue<TPosition::A1, 1> qidA1, qidC1;
     TQue<TPosition::B1, 1> qidB1;
     TQue<TPosition::A2, 1> qidA2;
     TQue<TPosition::B2, 1> qidB2;
     TQue<TPosition::CO1, 1> qidCO1;
-    TQue<TPosition::A1, 1> qidC1;
     TQue<TPosition::VECOUT, 1> qidUB;
+    pipe.InitBuffer(qidA1, 1, M * K * sizeof(int8_t));
+    pipe.InitBuffer(qidB1, 1, K * N * sizeof(int8_t));
+    pipe.InitBuffer(qidA2, 1, M * K * sizeof(int8_t));
+    pipe.InitBuffer(qidB2, 1, K * N * sizeof(int8_t));
+    pipe.InitBuffer(qidCO1, 1, M * N * sizeof(int32_t));
+    pipe.InitBuffer(qidC1, 1, M * N * sizeof(int32_t));
+    pipe.InitBuffer(qidUB, 1, M * N * sizeof(int32_t));
 
-    GlobalTensor<int8_t> aGlobal;
-    GlobalTensor<int8_t> bGlobal;
-    GlobalTensor<int32_t> cGlobal;
+    LocalTensor<int8_t> a_l1 = qidA1.template AllocTensor<int8_t>();
+    LocalTensor<int8_t> b_l1 = qidB1.template AllocTensor<int8_t>();
+    LocalTensor<int8_t> a_l0 = qidA2.template AllocTensor<int8_t>();
+    LocalTensor<int8_t> b_l0 = qidB2.template AllocTensor<int8_t>();
+    LocalTensor<int32_t> c_l0 = qidCO1.template AllocTensor<int32_t>();
+    LocalTensor<int32_t> output_l1 = qidC1.template AllocTensor<int32_t>();
+    LocalTensor<int32_t> output_ub = qidUB.template AllocTensor<int32_t>();
 
-    LocalTensor<int8_t> leftMatrix;
-    LocalTensor<int8_t> rightMatrix;
-    LocalTensor<int8_t> a2;
-    LocalTensor<int8_t> b2;
-    LocalTensor<int32_t> co1Local;
-    LocalTensor<int32_t> c1Local;
-    LocalTensor<int32_t> ubLocal;
-};
+    if ASCEND_IS_AIC {
+        // CopyIn: GM -> L1(A1/B1)，ND转NZ
+        Nd2NzParams nd2nzParams;
+        nd2nzParams.ndNum = 1;
+        nd2nzParams.nValue = M;
+        nd2nzParams.dValue = K;
+        nd2nzParams.srcNdMatrixStride = 0;
+        nd2nzParams.srcDValue = K;
+        nd2nzParams.dstNzC0Stride = M;
+        nd2nzParams.dstNzNStride = 1;
+        nd2nzParams.dstNzMatrixStride = 0;
+        DataCopy(a_l1, aGlobal, nd2nzParams);
+        pipe_barrier(PIPE_ALL);
 
-__global__ __mix__(1, 2) void CopyL0c2l1Kernel(
-    __gm__ int8_t* a, __gm__ int8_t* b, __gm__ int32_t* output)
-{
-    KernelAscCopyL0c2l1 op;
-    op.Init(a, b, output);
-    op.Process();
+        nd2nzParams.ndNum = 1;
+        nd2nzParams.nValue = K;
+        nd2nzParams.dValue = N;
+        nd2nzParams.srcNdMatrixStride = 0;
+        nd2nzParams.srcDValue = N;
+        nd2nzParams.dstNzC0Stride = K;
+        nd2nzParams.dstNzNStride = 1;
+        nd2nzParams.dstNzMatrixStride = 0;
+        DataCopy(b_l1, bGlobal, nd2nzParams);
+        pipe_barrier(PIPE_ALL);
+
+        // Split: L1(A1/B1) -> L0A/L0B
+        LoadData2DParamsV2 loadDataParams;
+        loadDataParams.mStartPosition = 0;
+        loadDataParams.kStartPosition = 0;
+        loadDataParams.mStep = DivCeil(M, BLOCK_CUBE);
+        loadDataParams.kStep = DivCeil(K * sizeof(int8_t), 32);
+        loadDataParams.srcStride = DivCeil(M, BLOCK_CUBE);
+        loadDataParams.dstStride = DivCeil(M, BLOCK_CUBE);
+        loadDataParams.sid = 0;
+        loadDataParams.ifTranspose = false;
+        LoadData(a_l0, a_l1, loadDataParams);
+        pipe_barrier(PIPE_ALL);
+
+        uint16_t kAlign = CeilDivision(K, BLOCK_CUBE);
+        uint16_t nAlign = CeilDivision(N * sizeof(int8_t), 32);
+
+        loadDataParams.mStartPosition = 0;
+        loadDataParams.kStartPosition = 0;
+        loadDataParams.mStep = kAlign;
+        loadDataParams.kStep = nAlign;
+        loadDataParams.srcStride = kAlign;
+        // int8_t类型在L0B中按16B对齐存放，dstStride需乘2
+        loadDataParams.dstStride = nAlign * 2;
+
+        loadDataParams.sid = 0;
+        loadDataParams.ifTranspose = true;
+        LoadData(b_l0, b_l1, loadDataParams);
+        pipe_barrier(PIPE_ALL);
+
+        // Compute: Mmad -> L0C(CO1)
+        MmadParams mmadParams;
+        mmadParams.m = M;
+        mmadParams.n = N;
+        mmadParams.k = K;
+        mmadParams.isBias = false;
+        Mmad(c_l0, a_l0, b_l0, mmadParams);
+        pipe_barrier(PIPE_ALL);
+
+        // CopyOut: L0C -> L1 by asc_copy_l0c2l1，随后L1 -> UB
+        // src_stride: L0C中相邻Z分形起始地址的偏移，单位: C0_Size(16 * sizeof(int32_t))
+        uint16_t srcStride = static_cast<uint16_t>(DivCeil(M, BLOCK_CUBE) * BLOCK_CUBE);
+        // dst_stride: L1目的NZ矩阵中相邻Z分形起始地址的偏移，单位: element
+        uint32_t dstStride = static_cast<uint32_t>(M) * BLOCK_CUBE;
+        asc_copy_l0c2l1((__cbuf__ int32_t*)output_l1.GetPhyAddr(), (__cc__ int32_t*)c_l0.GetPhyAddr(),
+            static_cast<uint16_t>(N), static_cast<uint16_t>(M), dstStride, srcStride, 0, 0,
+            static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, false, 0, 0, false, 0, 0, false);
+        pipe_barrier(PIPE_ALL);
+
+        copy_cbuf_to_ubuf((__ubuf__ void*)output_ub.GetPhyAddr(), (__cbuf__ void*)output_l1.GetPhyAddr(), 0, 1,
+            static_cast<uint16_t>(M * N * sizeof(int32_t) / 32), 0, 0);
+    }
+    SyncAll<false>();
+    if (GetSubBlockIdx() == 0) {
+        DataCopy(cGlobal, output_ub, M * N);
+    }
 }
 } // namespace
 

@@ -107,84 +107,43 @@ namespace {
 constexpr uint32_t M = 128, K = 128;
 constexpr uint32_t TOTAL = M * K;
 
-class KernelAscPrefetchGm2l2cache {
-public:
-    __aicore__ inline KernelAscPrefetchGm2l2cache() {}
+__global__ __mix__(1, 2) void PrefetchGm2l2cacheKernel(__gm__ int16_t* a, __gm__ int16_t* output)
+{
+    __gm__ int16_t* srcGm = a;
+    GlobalTensor<int16_t> srcGlobal, cGlobal;
+    srcGlobal.SetGlobalBuffer(a, TOTAL);
+    cGlobal.SetGlobalBuffer(output, TOTAL);
 
-    __aicore__ inline void Init(__gm__ int16_t* a, __gm__ int16_t* output)
-    {
-        srcGm = a;
-        srcGlobal.SetGlobalBuffer(a, TOTAL);
-        cGlobal.SetGlobalBuffer(output, TOTAL);
-
-        pipe.InitBuffer(qidA1, 1, TOTAL * sizeof(int16_t));
-        pipe.InitBuffer(qidUB, 1, TOTAL * sizeof(int16_t));
-
-        l1Local = qidA1.template AllocTensor<int16_t>();
-        ubLocal = qidUB.template AllocTensor<int16_t>();
-    }
-
-    __aicore__ inline void Process()
-    {
-        Prefetch();
-        CopyIn();
-        CopyOut();
-    }
-
-private:
-    // Prefetch: 将GM中的源矩阵预加载到L2 Cache，不实际搬进L1 Buffer/Unified Buffer。
-    // 每行为1个连续传输数据块（128 * 2 = 256字节），矩阵共128行，即128个数据块，
-    // 相邻数据块首地址的间隔为256字节
-    __aicore__ inline void Prefetch()
-    {
-        if ASCEND_IS_AIC {
-            uint32_t burstNum = M;                      // 数据块个数：128
-            uint32_t burstLen = K * sizeof(int16_t);    // 每个数据块长度：256字节
-            uint64_t burstSrcStride = K * sizeof(int16_t);  // 相邻数据块间隔：256字节
-            asc_prefetch_gm2l2cache(srcGm, burstNum, burstLen, burstSrcStride);
-        }
-    }
-
-    // CopyIn: GM -> L1，访问已预加载的GM地址时可命中L2 Cache中缓存的数据
-    __aicore__ inline void CopyIn()
-    {
-        if ASCEND_IS_AIC {
-            DataCopy(l1Local, srcGlobal, TOTAL);
-            pipe_barrier(PIPE_ALL);
-        }
-    }
-
-    // CopyOut: L1 -> UB -> GM
-    __aicore__ inline void CopyOut()
-    {
-        if ASCEND_IS_AIC {
-            copy_cbuf_to_ubuf((__ubuf__ void*)ubLocal.GetPhyAddr(), (__cbuf__ void*)l1Local.GetPhyAddr(), 0, 1,
-                static_cast<uint16_t>(TOTAL * sizeof(int16_t) / 32), 0, 0);
-        }
-        SyncAll<false>();
-        if (GetSubBlockIdx() == 0) {
-            DataCopy(cGlobal, ubLocal, TOTAL);
-        }
-    }
-
-private:
     TPipe pipe;
     TQue<TPosition::A1, 1> qidA1;
     TQue<TPosition::VECOUT, 1> qidUB;
+    pipe.InitBuffer(qidA1, 1, TOTAL * sizeof(int16_t));
+    pipe.InitBuffer(qidUB, 1, TOTAL * sizeof(int16_t));
 
-    __gm__ int16_t* srcGm = nullptr;
-    GlobalTensor<int16_t> srcGlobal;
-    GlobalTensor<int16_t> cGlobal;
+    LocalTensor<int16_t> a_l1 = qidA1.template AllocTensor<int16_t>();
+    LocalTensor<int16_t> output_ub = qidUB.template AllocTensor<int16_t>();
 
-    LocalTensor<int16_t> l1Local;
-    LocalTensor<int16_t> ubLocal;
-};
+    if ASCEND_IS_AIC {
+        // Prefetch: 将GM中的源矩阵预加载到L2 Cache，不实际搬进L1 Buffer/Unified Buffer。
+        // 每行为1个连续传输数据块（128 * 2 = 256字节），矩阵共128行，即128个数据块，
+        // 相邻数据块首地址的间隔为256字节
+        uint32_t burstNum = M;                      // 数据块个数：128
+        uint32_t burstLen = K * sizeof(int16_t);    // 每个数据块长度：256字节
+        uint64_t burstSrcStride = K * sizeof(int16_t);  // 相邻数据块间隔：256字节
+        asc_prefetch_gm2l2cache(srcGm, burstNum, burstLen, burstSrcStride);
 
-__global__ __mix__(1, 2) void PrefetchGm2l2cacheKernel(__gm__ int16_t* a, __gm__ int16_t* output)
-{
-    KernelAscPrefetchGm2l2cache op;
-    op.Init(a, output);
-    op.Process();
+        // CopyIn: GM -> L1，访问已预加载的GM地址时可命中L2 Cache中缓存的数据
+        DataCopy(a_l1, srcGlobal, TOTAL);
+        pipe_barrier(PIPE_ALL);
+
+        // CopyOut: L1 -> UB
+        copy_cbuf_to_ubuf((__ubuf__ void*)output_ub.GetPhyAddr(), (__cbuf__ void*)a_l1.GetPhyAddr(), 0, 1,
+            static_cast<uint16_t>(TOTAL * sizeof(int16_t) / 32), 0, 0);
+    }
+    SyncAll<false>();
+    if (GetSubBlockIdx() == 0) {
+        DataCopy(cGlobal, output_ub, TOTAL);
+    }
 }
 } // namespace
 
