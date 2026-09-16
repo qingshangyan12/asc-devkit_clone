@@ -24,7 +24,12 @@ enum class round_mode : uint8_t { default_round = 0, hybrid = 1 };
 
 enum class dual_dst_mode : uint8_t { disable = 0, split_m = 1, split_n = 2 };
 
-struct gm_to_l1_trait {};
+struct gm_to_l1_trait {
+    __aicore__ constexpr gm_to_l1_trait() = default;
+    __aicore__ constexpr gm_to_l1_trait(bool pre_allocation);
+
+    bool pre_allocation = false;
+};
 struct l1_to_ub_trait {};
 struct l1_to_l0a_trait {};
 struct l1_to_l0b_trait {};
