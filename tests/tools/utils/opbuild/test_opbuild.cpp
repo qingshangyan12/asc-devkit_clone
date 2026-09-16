@@ -1674,34 +1674,6 @@ TEST_F(TEST_OPBUILD, AclnnGenAttrFailed01)
     EXPECT_TRUE(hasErrorMessage);
 }
 
-TEST_F(TEST_OPBUILD, AclnnKirinX90socVersion)
-{
-    std::string fileName = "kirinx90_soc_" + std::to_string(getpid()) + ".txt";
-    std::ofstream outfile = std::ofstream(fileName);
-    OpDef opDef("Test");
-    opDef.Input("x1").DataType({ge::DT_FLOAT16});
-    opDef.Output("x2").DataType({ge::DT_FLOAT16});
-    opDef.AICore().AddConfig("kirinx90");
-
-    std::vector<std::string> opsvec({"Test"});
-    AclnnOpGenerator opGen(opsvec);
-    auto socEntries = opGen.BuildUnifiedSocList(opDef);
-    opGen.AclnnOpGenSocSupportList(socEntries, outfile);
-    outfile.close();
-
-    std::vector<std::string> errMessage = Generator::GetErrorMessage();
-    bool hasErrorMessage = false;
-    const std::string err = "Invalid socVersion kirinx90 of op Test, "
-                            "please check whether AddConfig are correctly configured in Opdef.";
-    for (size_t i = 0U; i < errMessage.size(); i++) {
-        if (errMessage[i] == err) {
-            hasErrorMessage = true;
-            break;
-        }
-    }
-    EXPECT_FALSE(hasErrorMessage);
-}
-
 void setInputHasErrorMessage(bool& hasErrorMessage, std::vector<std::string> errMessage)
 {
     const std::string err = "The dtype size of input[0] of op ErrorInput is 0.";

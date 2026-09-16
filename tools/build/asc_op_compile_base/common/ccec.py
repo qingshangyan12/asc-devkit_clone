@@ -113,12 +113,6 @@ def check_is_regbase_v2():
     from .platform.platform_info import BS9SX2A
     from .platform.platform_info import MC61AM21A
     from .platform.platform_info import ASCEND_950
-    from .platform.platform_info import KIRIN_X90
-    from .platform.platform_info import KIRIN_9030
-    from .platform.platform_info import KIRIN_DEV_0000
-    from .platform.platform_info import KIRIN_DEV_0001
-    from .platform.platform_info import KIRIN_DEV_0002
-    from .platform.platform_info import KIRIN_DEV_0003
 
     if get_soc_spec("SHORT_SOC_VERSION") in [
         ASCEND_031,
@@ -128,12 +122,6 @@ def check_is_regbase_v2():
         MC61AM21A,
         AS31XM1,
         ASCEND_950,
-        KIRIN_X90,
-        KIRIN_9030,
-        KIRIN_DEV_0000,
-        KIRIN_DEV_0001,
-        KIRIN_DEV_0002,
-        KIRIN_DEV_0003,
     ]:
         return True
     return False
@@ -223,8 +211,6 @@ def _build_aicore_compile_cmd(
 
     def get_init_cmd():
         optimization_level = "-O2"
-        if cce_arch == "dav-l300" or cce_arch == "dav-l311":
-            optimization_level = "-O3"
         # 2 enable tbe debug : ccec compiler with "O0 - g"
         if current_build_config().get(
             tbe_debug_level

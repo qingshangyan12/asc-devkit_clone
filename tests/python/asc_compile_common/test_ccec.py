@@ -66,7 +66,7 @@ class TestCcec(unittest.TestCase):
     def test_build_aicore_compile_cmd(self, mock_get_soc_spec):
         def get_soc_spec_mock(key):
             mock_map = {
-                COMPILER_ARCH: "dav-l300",
+                COMPILER_ARCH: "dav-c220",
                 "SHORT_SOC_VERSION": "Ascend910B",
                 "AICORE_TYPE": "AiCore",
                 "VECTOR_REG_WIDTH": 128,
@@ -79,9 +79,9 @@ class TestCcec(unittest.TestCase):
         expect_cmd = [
             "ccec",
             "-c",
-            "-O3",
+            "-O2",
             "test_src",
-            "--cce-aicore-arch=dav-l300",
+            "--cce-aicore-arch=dav-c220",
             "--cce-aicore-only",
             "-o",
             "test_dst",

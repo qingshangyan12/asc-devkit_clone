@@ -62,12 +62,6 @@ enum class DPLATFORM {
     MC61AM21A,
     ASCEND_950, // C310
     ASCEND_350, // C310
-    KIRINX90,
-    KIRIN9030,
-    KIRIN_DEV_0000,
-    KIRIN_DEV_0001,
-    KIRIN_DEV_0002,
-    KIRIN_DEV_0003,
     MC62,
     MC32DM11A,
     DEFAULT_CURRENT
@@ -209,12 +203,6 @@ constexpr const char* Ascend_031 = "Ascend031";
 constexpr const char* Ascend_035 = "Ascend035";
 constexpr const char* Ascend_035A = "Ascend035A";
 constexpr const char* Ascend_035B = "Ascend035B";
-constexpr const char* KirinX90 = "KirinX90";
-constexpr const char* Kirin9030 = "Kirin9030";
-constexpr const char* KirinDev0000 = "KirinDev0000";
-constexpr const char* KirinDev0001 = "KirinDev0001";
-constexpr const char* KirinDev0002 = "KirinDev0002";
-constexpr const char* KirinDev0003 = "KirinDev0003";
 constexpr const char* Hi3796CV300ES = "Hi3796CV300ES";
 constexpr const char* Hi3796CV300CS = "Hi3796CV300CS";
 constexpr const char* SD3403 = "SD3403";
@@ -648,15 +636,14 @@ private:
         Ascend_035,       Ascend_035A,       Ascend_035B,      AS31XM1,          AS31XM1X,           MC62CM13AA,
         MC62DM23AA,       MC62CM13AB,        MC62DM23AB,       MC62CM12AA,       MC62DM22AA,         MC62CM12AC,
         MC62DM22AC,       MC62CM12AD,        MC62DM22AD,       MC62CM12AE,       MC62DM22AE,         MC62CM12AF,
-        MC62DM22AF,       MC62CM12AB,        MC62DM22AB,       KirinX90,         Kirin9030,          Ascend950PR_9599,
+        MC62DM22AF,       MC62CM12AB,        MC62DM22AB,       Ascend950PR_9599,
         Ascend950PR_958a, Ascend950PR_9589,  Ascend950PR_958b, Ascend950PR_9579, Ascend950PR_957b,   Ascend950PR_957bx,
         Ascend950PR_957c, Ascend950PR_957d,  Ascend950PR_950z, Ascend950DT_950x, Ascend950DT_950y,   Ascend950DT_95A1,
         Ascend950DT_95A2, Ascend950DT_9591,  Ascend950DT_9592, Ascend950DT_9595, Ascend950DT_9596,   Ascend950DT_9581,
         Ascend950DT_9582, Ascend950DT_9582x, Ascend950DT_9583, Ascend950DT_9584, Ascend950DT_9585,   Ascend950DT_9586,
         Ascend950DT_9587, Ascend950DT_9588,  Ascend950DT_9571, Ascend950DT_9572, Ascend950DT_9573,   Ascend950DT_9574,
         Ascend950DT_9575, Ascend950DT_9576,  Ascend950DT_9577, Ascend950DT_9578, MC32DM11AA,         MC32DM11AB,
-        MC32DM11AC,       Ascend350_354f,    Ascend350_355e,   KirinDev0000,     KirinDev0001,       KirinDev0002,
-        KirinDev0003};
+        MC32DM11AC,       Ascend350_354f,    Ascend350_355e};
     enum platformconf::TIK_VERSION current_tik_version_ = platformconf::TIK_VERSION::TIK_1_0;
     const std::map<const std::string, platformconf::TIK_VERSION> kStringToTikVersion = {
         {"TIK1.0", platformconf::TIK_VERSION::TIK_1_0}, {"TIK1.5", platformconf::TIK_VERSION::TIK_1_5}};
