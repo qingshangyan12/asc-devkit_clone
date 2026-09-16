@@ -51,5 +51,7 @@ CcuResult CcuAlltoAllMesh1DKernel(
     ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable goSize4, const ChannelHandle channels[],
     uint32_t channelCount, uint32_t rankSize, uint32_t rankId, bool loadFromMem);
 
+CcuResult CcuAlltoAllMesh1DDefineKernel(CcuKernelArg arg);
+
 } // namespace mc2_ops_hccl
 #endif // HCCL_CCU_KERNEL_ALL_TO_ALL_MESH_1D_H

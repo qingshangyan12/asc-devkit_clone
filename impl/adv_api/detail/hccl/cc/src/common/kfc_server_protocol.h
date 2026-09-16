@@ -21,14 +21,16 @@ namespace mc2_ops_hccl {
 using namespace HcclKfcProtocol;
 
 constexpr uint32_t KFC_SERVER_PROTOCOL_VERSION = 2U;
-constexpr uint32_t KFC_SERVER_ARG_NUM = 6U;
+constexpr uint32_t KFC_SERVER_ARG_NUM = 7U;
 constexpr uint32_t KFC_SERVER_XN_ADDR_ARG_INDEX = 0U;
 constexpr uint32_t KFC_SERVER_CKE_ADDR_ARG_INDEX = 1U;
 constexpr uint32_t KFC_SERVER_MISSION_NUM_ARG_INDEX = 3U;
 constexpr uint32_t KFC_SERVER_MISSION_INDEX_ARG_INDEX = 4U;
 constexpr uint32_t KFC_SERVER_TOKEN_ARG_INDEX = 5U;
+constexpr uint32_t KFC_SERVER_SUB_KERNEL_PC_ARG_INDEX = 6U;
 constexpr uint32_t KFC_SERVER_MAX_MISSION_NUM = KFC_MAX_MISSION_NUM;
 constexpr uint32_t KFC_SERVER_SIGNAL_REGION_NUM = KFC_SIGNAL_REGION_NUM;
+constexpr char KFC_SUB_KERNEL_FUNC_NAME[] = "KfcSubKernelFunc";
 
 constexpr char KFC_CONCURRENT_ALL_GATHER_ALG_NAME[] = "CcuSchedAllGatherConcurMeshNHRMultiLink";
 constexpr char KFC_PARALLEL_ALL_GATHER_ALG_NAME[] = "CcuSchedAllGatherParallelMeshNHRMultiLink";
@@ -73,6 +75,7 @@ enum class KfcServerRole : uint32_t {
     REDUCE_SCATTER_SOLE_NHR = 6,
     ALL_TO_ALL_MESH = 7,
     ALL_TO_ALL_CLOS = 8,
+    REDUCE_SCATTER_PEER_ONLY = 9,
 };
 
 inline KfcServerRole GetKfcServerRole(const char* algName, uint32_t missionIndex)
@@ -82,6 +85,9 @@ inline KfcServerRole GetKfcServerRole(const char* algName, uint32_t missionIndex
     }
     if (std::strcmp(algName, KFC_A2A_MULTI_JETTY_ALG_NAME) == 0) {
         return KfcServerRole::ALL_TO_ALL_MULTI_JETTY;
+    }
+    if (std::strcmp(algName, KFC_REDUCE_SCATTER_PEER_ONLY_ALG_NAME) == 0) {
+        return KfcServerRole::REDUCE_SCATTER_PEER_ONLY;
     }
     if (GetKfcServerMissionNum(algName) == KFC_MAX_MISSION_NUM) {
         if (std::strcmp(algName, KFC_CONCURRENT_ALL_TO_ALL_ALG_NAME) == 0) {

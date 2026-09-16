@@ -9,6 +9,8 @@
  */
 
 #include "ccu_kernel_kfc_reduce_scatter_nhr1d_multi_jetty_mem2mem.h"
+#include "../ccu_temp_kfc_reduce_scatter_nhr_1D_multi_jetty_mem2mem.h"
+#include "ccu_func_dl.hpp"
 
 namespace mc2_ops_hccl {
 namespace {
@@ -256,6 +258,44 @@ CcuResult CcuKfcReduceScatterNHR1DMultiJettyMem2MemKernel(
     CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(RunNhr(ctx)); }
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
+}
+
+CcuResult CcuKfcReduceScatterNHR1DMultiJettyMem2MemDefineKernel(CcuKernelArg arg)
+{
+    const auto* kernelArg = static_cast<CcuKernelArgKfcReduceScatterNHR1DMultiJettyMem2Mem*>(arg);
+    CcuResult bodyRet = CCU_SUCCESS;
+    if (kernelArg->opParam.algName != nullptr &&
+        std::strcmp(kernelArg->opParam.algName, KFC_RS_SOLE_NHR_ALG_NAME) == 0) {
+        ccu::Func subKernel(
+            [kernelArg, &bodyRet](ccu::Array<ccu::Variable>& args) {
+                bodyRet = CcuKfcReduceScatterNHR1DMultiJettyMem2MemKernel(
+                    args[0], args[1], args[2],
+                    args[KFC_RS_SOLE_NHR_SLICE_SIZE], args[KFC_RS_SOLE_NHR_INPUT_SLICE_STRIDE],
+                    args[KFC_RS_SOLE_NHR_SLICE_ONE_JETTY_SIZE], args[KFC_RS_SOLE_NHR_SLICE_LAST_JETTY_SIZE],
+                    args[KFC_RS_SOLE_NHR_REPEAT_NUM_INV], args[KFC_RS_SOLE_NHR_INPUT_REPEAT_STRIDE],
+                    args[KFC_RS_SOLE_NHR_OUTPUT_REPEAT_STRIDE], kernelArg->channels, kernelArg->channelCount,
+                    static_cast<uint32_t>(kernelArg->rankSize), kernelArg->rankId, kernelArg->portNum,
+                    kernelArg->opParam.DataDes.dataType, kernelArg->opParam.DataDes.outputType,
+                    kernelArg->opParam.reduceType, kernelArg->stepInfoVector, kernelArg->rank2ChannelIdx);
+            },
+            CCU_FUNC_XKERNEL_ARG_MAX, KFC_SUB_KERNEL_FUNC_NAME);
+        return bodyRet;
+    }
+    ccu::Func subKernel(
+        [kernelArg, &bodyRet](ccu::Array<ccu::Variable>& args) {
+            bodyRet = CcuKfcReduceScatterNHR1DMultiJettyMem2MemKernel(
+                args[KFC_CONCURRENT_RS_NHR_INPUT], args[KFC_CONCURRENT_RS_NHR_OUTPUT], args[2],
+                args[KFC_CONCURRENT_RS_NHR_SLICE_SIZE], args[KFC_CONCURRENT_RS_NHR_INPUT_SLICE_STRIDE],
+                args[KFC_CONCURRENT_RS_NHR_SLICE_ONE_JETTY_SIZE],
+                args[KFC_CONCURRENT_RS_NHR_SLICE_LAST_JETTY_SIZE], args[KFC_CONCURRENT_RS_NHR_REPEAT_NUM_INV],
+                args[KFC_CONCURRENT_RS_NHR_INPUT_REPEAT_STRIDE], args[KFC_CONCURRENT_RS_NHR_OUTPUT_REPEAT_STRIDE],
+                kernelArg->channels, kernelArg->channelCount,
+                static_cast<uint32_t>(kernelArg->rankSize), kernelArg->rankId, kernelArg->portNum,
+                kernelArg->opParam.DataDes.dataType, kernelArg->opParam.DataDes.outputType,
+                kernelArg->opParam.reduceType, kernelArg->stepInfoVector, kernelArg->rank2ChannelIdx);
+        },
+        CCU_FUNC_XKERNEL_ARG_MAX, KFC_SUB_KERNEL_FUNC_NAME);
+    return bodyRet;
 }
 
 } // namespace mc2_ops_hccl
