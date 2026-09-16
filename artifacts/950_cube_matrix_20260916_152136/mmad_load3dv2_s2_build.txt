@@ -1,0 +1,23 @@
+-- System processer: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.1.0/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.1.0/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.1.0/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 11.4.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/g++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- [INFO] SCENARIO_NUM is 2
+-- Configuring done (0.2s)
+-- Generating done (0.0s)
+CMake Warning (unused-cli):
+  Manually-specified variables were not used by the project:
+
+    CMAKE_C_COMPILER
+
+
+-- Build files have been written to: /home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_152136/mmad_load3dv2_s2/build
+[ 50%] Building ASC object CMakeFiles/demo.dir/mmad_load3dv2.asc.o
+[100%] Linking ASC executable demo
+[100%] Built target demo

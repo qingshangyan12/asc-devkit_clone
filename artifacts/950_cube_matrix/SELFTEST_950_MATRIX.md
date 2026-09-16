@@ -1,12 +1,12 @@
 # Ascend950 CUBE self-test matrix
 
-- HEAD: 707d27e6a
+- HEAD: 8455fa7b5
 - ARCH: dav-3510
-- STAMP: 20260916_145655
+- STAMP: 20260916_152136
 - MODE: full
 
 - verify PASS: **49**
-- FAIL: 10
+- FAIL: 0
 
 | case | scenario | arch | build | run | verify | note |
 |---|---|---|---|---|---|---|
@@ -43,12 +43,6 @@
 | load_data_with_stride | 4 | dav-3510 | PASS | PASS | PASS | s4 |
 | load_data_with_stride | 5 | dav-3510 | PASS | PASS | PASS | s5 |
 | load_data_with_stride | 6 | dav-3510 | PASS | PASS | PASS | s6 |
-| load_data_2dmx_l12l0 | 1 | dav-3510 | PASS | PASS | FAIL | s1 |
-| load_data_2dmx_l12l0 | 2 | dav-3510 | PASS | PASS | FAIL | s2 |
-| load_data_2dmx_l12l0 | 3 | dav-3510 | PASS | PASS | FAIL | s3 |
-| load_data_2dmx_l12l0 | 4 | dav-3510 | PASS | PASS | FAIL | s4 |
-| load_data_2dmx_l12l0 | 5 | dav-3510 | PASS | PASS | FAIL | s5 |
-| load_data_2dmx_l12l0 | 6 | dav-3510 | PASS | PASS | FAIL | s6 |
 | fixpipe_l0c2ub | 1 | dav-3510 | PASS | PASS | PASS | s1 |
 | fixpipe_l0c2ub | 2 | dav-3510 | PASS | PASS | PASS | s2 |
 | fixpipe_l0c2ub | 3 | dav-3510 | PASS | PASS | PASS | s3 |
@@ -62,10 +56,6 @@
 | mmad_load3dv2 | 3 | dav-3510 | PASS | PASS | PASS | s3 |
 | mmad_load3dv2 | 4 | dav-3510 | PASS | PASS | PASS | s4 |
 | mmad_load3dv2 | 5 | dav-3510 | PASS | PASS | PASS | s5 |
-| mmad_mx | 1 | dav-3510 | PASS | PASS | FAIL | s1 |
-| mmad_mx | 2 | dav-3510 | PASS | PASS | FAIL | s2 |
-| mmad_mx | 3 | dav-3510 | PASS | PASS | FAIL | s3 |
-| mmad_mx | 4 | dav-3510 | PASS | PASS | FAIL | s4 |
 | batch_matmul | 1 | dav-3510 | PASS | PASS | PASS | s1 |
 | mmad_gemv | 1 | dav-3510 | PASS | PASS | PASS | s1 |
 | mmad_unitflag | 1 | dav-3510 | PASS | PASS | PASS | s1 |
