@@ -113,8 +113,8 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |---|---|---|
 |[asc_copy_gm2l0a](cube_datamove/asc_copy_gm2l0a.md)|将GM中的数据搬运到L0A中。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_copy_gm2l0b](cube_datamove/asc_copy_gm2l0b.md)|将GM中的数据搬运到L0B中。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_copy_gm2l1_align](cube_datamove/asc_copy_gm2l1_align.md)|将GM中的数据padding后搬运到L1中。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_copy_gm2l1_dn2nz](cube_datamove/asc_copy_gm2l1_dn2nz.md)|将GM中的数据搬运到L1中，在此过程中执行DN->NZ/NCHW->NC1HWC0/NCHW->C1HWNC0操作。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_copy_gm2l1_align](cube_datamove/asc_copy_gm2l1_align/asc_copy_gm2l1_align.md)|将GM中的数据padding后搬运到L1中。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_copy_gm2l1_dn2nz](cube_datamove/asc_copy_gm2l1_dn2nz/asc_copy_gm2l1_dn2nz.md)|将GM中的数据搬运到L1中，在此过程中执行DN->NZ/NCHW->NC1HWC0/NCHW->C1HWNC0操作。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_copy_l0c2ub](cube_datamove/asc_copy_l0c2ub.md)|将L0C中的数据搬运到UB中。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_copy_l12gm](cube_datamove/asc_copy_l12gm.md)|将数据从L1搬运到GM。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_copy_l12l0a_mx](cube_datamove/asc_copy_l12l0a_mx.md)|将Mx scale矩阵从L1 Buffer搬运到L0A Buffer。|`c_api/cube_datamove/cube_datamove.h`|
@@ -135,7 +135,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_set_gm2l1_loop_size](cube_datamove/asc_set_gm2l1_loop_size.md)|将数据从GM搬运到L1 Buffer时，设置数据搬运流程中的循环次数。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_gm2l1_nz_para](cube_datamove/asc_set_gm2l1_nz_para.md)|设置MTE2_NZ_PARA寄存器的值。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_gm2l1_padding](cube_datamove/asc_set_gm2l1_padding.md)|设置[asc_copy_gm2l1_arch_3510（高维切分数据搬运）](cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md)的填充值。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_gm2l1_pad](cube_datamove/asc_set_gm2l1_pad.md)|设置[asc_copy_gm2l1_align](cube_datamove/asc_copy_gm2l1_align.md)接口的常量填充值。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_set_gm2l1_pad](cube_datamove/asc_set_gm2l1_pad.md)|设置[asc_copy_gm2l1_align](cube_datamove/asc_copy_gm2l1_align/asc_copy_gm2l1_align.md)接口的常量填充值。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c_copy_nz_para](cube_datamove/asc_set_l0c_copy_nz_para.md)|数据搬运过程中进行随路格式转换（NZ格式转换为ND格式）时，设置格式转换的相关配置。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c_copy_channel_para](cube_datamove/asc_set_l0c_copy_channel_para.md)|配置Nz2DN格式转换时源Nz矩阵中相邻行的地址偏移。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c2gm_channel_para](cube_datamove/asc_set_l0c2gm_channel_para.md)|对通道步长参数的专用寄存器的比特位进行设置。|`c_api/cube_datamove/cube_datamove.h`|

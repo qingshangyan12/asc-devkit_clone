@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/composite/cube_datamove_composite.h"`。
 
-**`asc_copy_gm2l1_align_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/asc_copy_gm2l1_align.md)和同步接口[asc_sync](../sync/asc_sync.md)替代。**
+**`asc_copy_gm2l1_align_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/asc_copy_gm2l1_align/asc_copy_gm2l1_align.md)和同步接口[asc_sync](../sync/asc_sync.md)替代。**
 
 将数据从Global Memory搬运到L1 Buffer，提供非32B对齐搬运能力，搬运过程中对支持对数据进行padding。
 
