@@ -52,12 +52,14 @@ def pick(pool: list[dict], n: int, rng: random.Random) -> list[dict]:
 def mmad_pool() -> list[dict]:
     rows = []
     mapping = [("int8", 1, "any"), ("bf16", 2, "any"), ("fp32", 3, "any"), ("int4", 4, "dav-2201")]
+    # fp32 s3（A/B 转置 + kDirectionAlign）在 2201 上仅部分 shape 稳态
+    fp32_ok = [(32, 48, 32), (32, 80, 64)]
     for dtype, sc, arch in mapping:
-        for m, n, k in shapes_for(dtype):
-            # s2：K>=32；s3：仅覆盖样例稳态子集 M<=32、N>=48、K in {32,64}
+        shapes = list(shapes_for(dtype))
+        if dtype == "fp32":
+            shapes = list(fp32_ok)
+        for m, n, k in shapes:
             if dtype == "bf16" and k < 32:
-                continue
-            if dtype == "fp32" and (m > 32 or n < 48 or k not in (32, 64)):
                 continue
             rows.append(
                 {
@@ -71,6 +73,11 @@ def mmad_pool() -> list[dict]:
                     "skip_reason": "",
                 }
             )
+    # 保证 fp32 在 200 抽样中一定出现：重复注入
+    fp_rows = [r for r in rows if r["dtype"] == "fp32"]
+    while sum(1 for r in rows if r["dtype"] == "fp32") < 40:
+        for r in fp_rows:
+            rows.append(dict(r))
     return rows
 
 
