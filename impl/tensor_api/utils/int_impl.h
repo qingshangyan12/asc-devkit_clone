@@ -55,7 +55,7 @@ STD_INT_NAMED_BINARY_FN(min, t < u);
     ASCENDC_HOST_AICORE inline constexpr Int<EXPR> OP(Int<t>, Int<u>)                    \
     {                                                                                    \
         return {};                                                                       \
-    }                                                                                    \
+    }  \
     template <auto t, typename Right, typename = enable_if_t<is_integral<Right>::value>> \
     ASCENDC_HOST_AICORE inline constexpr auto OP(Int<t>, const Right& u)                 \
     {                                                                                    \

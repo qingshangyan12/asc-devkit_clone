@@ -98,7 +98,7 @@ namespace AscendC {
         vector_bool preg0;                                                                        \
         plds(preg0, ((__ubuf__ uint32_t*)tempBuf), 0, US);                                        \
         vector_bool preg1;                                                                        \
-        uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.src0BlkStride)) << 16);     \
+        uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.src0BlkStride)) << 16);  \
         uint32_t strideConfig1 = ((static_cast<uint32_t>(repeatParams.src1BlkStride)) << 16);     \
         uint32_t blockElm = ONE_BLK_SIZE / sizeof(half);                                          \
         for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {                        \
