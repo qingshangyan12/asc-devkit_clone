@@ -27,6 +27,7 @@
 
 #include "../../impl/basic_api/kernel_macros.h"
 #include "../../impl/basic_api/kernel_reg.h"
+#include "kernel_operator_ptr_utils.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -43,14 +44,34 @@ class LocalTensor;
 template <typename T>
 __aicore__ inline void DataCachePreload(const GlobalTensor<uint64_t>& src, const T cacheOffset);
 
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+template <typename T>
+__aicore__ inline void DataCachePreload(__gm__ uint64_t* src, const T cacheOffset);
+#endif
+
 template <typename T, CacheLine entireType, DcciDst dcciDst>
 __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst);
+
+#if !defined(ASCENDC_CPU_DEBUG) || ASCENDC_CPU_DEBUG != 1
+template <typename T, CacheLine entireType, DcciDst dcciDst>
+__aicore__ inline void DataCacheCleanAndInvalid(__gm__ T* dst);
+#endif
 
 template <typename T, CacheLine entireType, DcciDst dcciDst>
 __aicore__ inline void DataCacheCleanAndInvalid(const LocalTensor<T>& dst);
 
+#if !defined(ASCENDC_CPU_DEBUG) || ASCENDC_CPU_DEBUG != 1
+template <typename T, CacheLine entireType, DcciDst dcciDst>
+__aicore__ inline void DataCacheCleanAndInvalid(__ubuf__ T* dst);
+#endif
+
 template <typename T, CacheLine entireType>
 __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst);
+
+#if !defined(ASCENDC_CPU_DEBUG) || ASCENDC_CPU_DEBUG != 1
+template <typename T, CacheLine entireType>
+__aicore__ inline void DataCacheCleanAndInvalid(__gm__ T* dst);
+#endif
 
 __aicore__ inline void ICachePreLoad(const int64_t preFetchLen);
 

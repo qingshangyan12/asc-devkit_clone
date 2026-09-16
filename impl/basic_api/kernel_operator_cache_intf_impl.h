@@ -22,6 +22,7 @@
 #define ASCENDC_MODULE_OPERATOR_CACHE_INTERFACE_IMPL_H
 
 #include "../../include/basic_api/kernel_tensor.h"
+#include "../../include/basic_api/kernel_operator_ptr_utils.h"
 #include "kernel_reg.h"
 
 #if __NPU_ARCH__ == 1001
@@ -52,11 +53,19 @@ template <typename T>
 __aicore__ inline void DataCachePreload(const GlobalTensor<uint64_t>& src, const T cacheOffset)
 {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
-    DataCachePreloadImpl((__gm__ uint64_t*)src.GetPhyAddr(), cacheOffset);
+    DataCachePreloadImpl((__gm__ uint64_t*)GetUnderlyingPtr(src), cacheOffset);
 #else
     DataCachePreloadImpl(src, cacheOffset);
 #endif
 }
+
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+template <typename T>
+__aicore__ inline void DataCachePreload(__gm__ uint64_t* src, const T cacheOffset)
+{
+    DataCachePreloadImpl(src, cacheOffset);
+}
+#endif
 
 #if defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
@@ -65,14 +74,30 @@ __aicore__ inline void DataCachePreload(const GlobalTensor<uint64_t>& src, const
 template <typename T, CacheLine entireType, DcciDst dcciDst>
 __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst)
 {
-    DcciGMImpl<T, entireType, dcciDst>(const_cast<__gm__ T*>(dst.GetPhyAddr()));
+    DcciGMImpl<T, entireType, dcciDst>(const_cast<__gm__ T*>(GetUnderlyingPtr(dst)));
 }
+
+#if !defined(ASCENDC_CPU_DEBUG) || ASCENDC_CPU_DEBUG != 1
+template <typename T, CacheLine entireType, DcciDst dcciDst>
+__aicore__ inline void DataCacheCleanAndInvalid(__gm__ T* dst)
+{
+    DcciGMImpl<T, entireType, dcciDst>(const_cast<__gm__ T*>(GetUnderlyingPtr(dst)));
+}
+#endif
 
 template <typename T, CacheLine entireType, DcciDst dcciDst>
 __aicore__ inline void DataCacheCleanAndInvalid(const LocalTensor<T>& dst)
 {
-    DcciUBImpl<T, entireType, dcciDst>(const_cast<__ubuf__ T*>(dst.GetPhyAddr()));
+    DcciUBImpl<T, entireType, dcciDst>(const_cast<__ubuf__ T*>(GetUnderlyingPtr(dst)));
 }
+
+#if !defined(ASCENDC_CPU_DEBUG) || ASCENDC_CPU_DEBUG != 1
+template <typename T, CacheLine entireType, DcciDst dcciDst>
+__aicore__ inline void DataCacheCleanAndInvalid(__ubuf__ T* dst)
+{
+    DcciUBImpl<T, entireType, dcciDst>(const_cast<__ubuf__ T*>(GetUnderlyingPtr(dst)));
+}
+#endif
 #endif
 
 #if defined(__NPU_ARCH__) &&                                                                                 \
@@ -82,8 +107,16 @@ __aicore__ inline void DataCacheCleanAndInvalid(const LocalTensor<T>& dst)
 template <typename T, CacheLine entireType>
 __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst)
 {
-    DcciGMImpl<T, entireType>(const_cast<__gm__ T*>(dst.GetPhyAddr()));
+    DcciGMImpl<T, entireType>(const_cast<__gm__ T*>(GetUnderlyingPtr(dst)));
 }
+
+#if !defined(ASCENDC_CPU_DEBUG) || ASCENDC_CPU_DEBUG != 1
+template <typename T, CacheLine entireType>
+__aicore__ inline void DataCacheCleanAndInvalid(__gm__ T* dst)
+{
+    DcciGMImpl<T, entireType>(const_cast<__gm__ T*>(GetUnderlyingPtr(dst)));
+}
+#endif
 #endif
 
 __aicore__ inline void ICachePreLoad(const int64_t preFetchLen) { PreLoad(preFetchLen); }

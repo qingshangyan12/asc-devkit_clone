@@ -22,6 +22,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_DATA_COPY_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_DATA_COPY_INTERFACE_IMPL_H
 #include "../../include/basic_api/kernel_tensor.h"
+#include "../../include/basic_api/kernel_operator_ptr_utils.h"
 #include "kernel_process_lock.h"
 #include "mstx_local_tensor_info.h"
 
@@ -77,17 +78,21 @@ __aicore__ inline void __inout_pipe__(MTE2)
         // gm -> ub
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
         DataCopyGM2UBImpl(
-            (__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), repeatParams, cacheMode);
+            (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), repeatParams,
+            cacheMode);
 #else
-        DataCopyGM2UBImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), repeatParams);
+        DataCopyGM2UBImpl(
+            (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), repeatParams);
 #endif
     } else if (dstHWPos == Hardware::L1) {
         // gm -> l1
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
         DataCopyGM2L1Impl(
-            (__cbuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), repeatParams, cacheMode);
+            (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), repeatParams,
+            cacheMode);
 #else
-        DataCopyGM2L1Impl((__cbuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), repeatParams);
+        DataCopyGM2L1Impl(
+            (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), repeatParams);
 #endif
     } else {
         ASCENDC_CHECK_TPOSITION(
@@ -151,17 +156,19 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
     (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
         DataCopyGM2L1ND2NZImpl(
-            (__cbuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), intriParams, cacheMode);
+            (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams, cacheMode);
 #else
-        DataCopyGM2L1ND2NZImpl((__cbuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), intriParams);
+        DataCopyGM2L1ND2NZImpl(
+            (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams);
 #endif
     } else if (dstHWPos == Hardware::UB) {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || \
     (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
         DataCopyGM2UBND2NZImpl(
-            (__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), intriParams, cacheMode);
+            (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams, cacheMode);
 #else
-        DataCopyGM2UBND2NZImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), intriParams);
+        DataCopyGM2UBND2NZImpl(
+            (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams);
 #endif
     } else {
         ASCENDC_CHECK_TPOSITION(
@@ -189,9 +196,11 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     ASCENDC_REPORT_OVERFLOW_MEM(CheckDataCopyTensorSizeOverflow(dst, src, intriParams));
     if (dstHWPos == Hardware::L1) {
         // gm -> l1
-        DataCopyGM2L1ND2NZImpl((__cbuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), intriParams);
+        DataCopyGM2L1ND2NZImpl(
+            (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams);
     } else if (dstHWPos == Hardware::UB) {
-        DataCopyGM2UBND2NZImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), intriParams);
+        DataCopyGM2UBND2NZImpl(
+            (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams);
     } else {
         ASCENDC_CHECK_TPOSITION(
             false, "dst", "L1 Buffer(A1/B1)/UB(VECIN)", "DataCopy from GlobalTensor to LocalTensor with Nd2NzParams",
@@ -229,8 +238,8 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     if (dstHWPos == Hardware::L1) { // GM -> L1
         const uint8_t cacheMode = ExtractCacheMode(src);
         DataCopyGM2L1DN2NZImpl(
-            (__cbuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), intriParams, enableSmallC0,
-            cacheMode);
+            (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams,
+            enableSmallC0, cacheMode);
         return;
     }
     ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "DataCopy dn2nz only support position:GM to position: L1"); });
@@ -262,7 +271,8 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 #endif
 #endif
     ASCENDC_REPORT_OVERFLOW_MEM(CheckDataCopyTensorSizeOverflow(dst, src, intriParams));
-    DataCopyUB2L1ND2NZImpl((__cbuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), intriParams);
+    DataCopyUB2L1ND2NZImpl(
+        (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), intriParams);
 }
 
 /*
@@ -308,17 +318,21 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
         // ub -> gm
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
         DataCopyUB2GMImpl(
-            (__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), repeatParams, cacheMode);
+            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), repeatParams,
+            cacheMode);
 #else
-        DataCopyUB2GMImpl((__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), repeatParams);
+        DataCopyUB2GMImpl(
+            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), repeatParams);
 #endif
     } else if (srcHWPos == Hardware::L1) {
         // l1 -> gm
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
         DataCopyL12GMImpl(
-            (__gm__ PrimType*)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(), repeatParams, cacheMode);
+            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), repeatParams,
+            cacheMode);
 #else
-        DataCopyL12GMImpl((__gm__ PrimType*)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(), repeatParams);
+        DataCopyL12GMImpl(
+            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), repeatParams);
 #endif
     } else {
 #if __NPU_ARCH__ == 2002
@@ -382,7 +396,8 @@ __aicore__ inline void DataCopy(
             DataCopyUB2UBIntf(dst, src, repeatParams);
         } else if (dstHWPos == Hardware::L1) {
             // ub -> l1
-            DataCopyUB2L1Impl((__cbuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), repeatParams);
+            DataCopyUB2L1Impl(
+                (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), repeatParams);
         } else {
 #if __NPU_ARCH__ == 2201
             ASCENDC_CHECK_TPOSITION(
@@ -405,7 +420,7 @@ __aicore__ inline void DataCopy(
             CheckTensorAlign<T>(
                 src, ONE_BLK_SIZE, "src", "DataCopy from L1 Buffer(C1) to BiasTable Buffer(C2)"); // 32B align
             DataCopyL12BTImpl(
-                (uint64_t)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(), static_cast<uint16_t>(0),
+                (uint64_t)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), static_cast<uint16_t>(0),
                 repeatParams);
 #if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || \
     (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161) || \
@@ -416,11 +431,12 @@ __aicore__ inline void DataCopy(
             CheckTensorAlign<T>(
                 src, ONE_BLK_SIZE, "src",
                 "DataCopy from L1 Buffer(A1/B1/C1) to Fixpipe Buffer(C2PIPE2GM)"); // 32B align
-            DataCopyL12FBImpl((__fbuf__ PrimType*)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(), repeatParams);
+            DataCopyL12FBImpl(
+                (__fbuf__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), repeatParams);
 #endif
 #if (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
         } else if (dstHWPos == Hardware::PT) {
-            DataCopyL12PTImpl((uint64_t)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(), repeatParams);
+            DataCopyL12PTImpl((uint64_t)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), repeatParams);
 #endif
         } else {
             ASCENDC_CHECK_TPOSITION(
@@ -479,7 +495,8 @@ __aicore__ inline void DataCopy(
                      Std::is_same<PrimSrcType, float>::value) ||
                 Std::is_same<PrimSrcType, int16_t>::value) {
                 DataCopyL12BTImpl(
-                    (uint64_t)dst.GetPhyAddr(), (__cbuf__ PrimSrcType*)src.GetPhyAddr(), (uint16_t)2, repeatParams);
+                    (uint64_t)GetUnderlyingPtr(dst), (__cbuf__ PrimSrcType*)GetUnderlyingPtr(src), (uint16_t)2,
+                    repeatParams);
                 return;
             }
 #endif
@@ -500,18 +517,19 @@ __aicore__ inline void DataCopy(
                 (Std::is_same<PrimSrcType, half>::value || Std::is_same<PrimSrcType, float>::value ||
                  Std::is_same<PrimSrcType, int32_t>::value)) {
                 DataCopyL12BTImpl(
-                    (uint64_t)dst.GetPhyAddr(), (__cbuf__ PrimSrcType*)src.GetPhyAddr(), (uint16_t)2, repeatParams);
+                    (uint64_t)GetUnderlyingPtr(dst), (__cbuf__ PrimSrcType*)GetUnderlyingPtr(src), (uint16_t)2,
+                    repeatParams);
             } else if constexpr (Std::is_same<PrimDstType, PrimSrcType>::value) {
 #else
             if constexpr (Std::is_same<PrimDstType, PrimSrcType>::value) {
 #endif
 #endif
                 DataCopyL12BTImpl(
-                    (uint64_t)dst.GetPhyAddr(), (__cbuf__ PrimSrcType*)src.GetPhyAddr(), static_cast<uint16_t>(0),
-                    repeatParams);
+                    (uint64_t)GetUnderlyingPtr(dst), (__cbuf__ PrimSrcType*)GetUnderlyingPtr(src),
+                    static_cast<uint16_t>(0), repeatParams);
             } else if constexpr (Std::is_same<PrimDstType, float>::value && Std::is_same<PrimSrcType, half>::value) {
                 DataCopyL12BTImpl(
-                    (uint64_t)dst.GetPhyAddr(), (__cbuf__ half*)src.GetPhyAddr(), static_cast<uint16_t>(1),
+                    (uint64_t)GetUnderlyingPtr(dst), (__cbuf__ half*)GetUnderlyingPtr(src), static_cast<uint16_t>(1),
                     repeatParams);
             } else {
                 ASCENDC_ASSERT(false, {
@@ -542,7 +560,7 @@ __aicore__ inline void DataCopyL1ToUB(
     CheckTensorAlign<T>(dst, ONE_BLK_SIZE, "dst", "DataCopy from L1 Buffer(A1/B1) to UB(VECIN/VECOUT)"); // 32B align
     CheckTensorAlign<T>(src, ONE_BLK_SIZE, "src", "DataCopy from L1 Buffer(A1/B1) to UB(VECIN/VECOUT)"); // 32B align
     DataCopyL12UBImpl<PrimType, subBlockId>(
-        (__ubuf__ PrimType*)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(), repeatParams);
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), repeatParams);
 #endif
 }
 
@@ -575,7 +593,8 @@ __aicore__ inline __inout_pipe__(V) void Copy(
     }
 #endif
     CopyImpl<PrimType, IsSetMask>(
-        (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime,
+        repeatParams);
 }
 
 // Copy::Level 0 - mask count mode
@@ -595,7 +614,8 @@ __aicore__ inline __inout_pipe__(V) void Copy(
     }
 #endif
     CopyImpl<PrimType, IsSetMask>(
-        (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), mask, repeatTime, repeatParams);
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), mask, repeatTime,
+        repeatParams);
 }
 
 /*
@@ -616,7 +636,7 @@ __aicore__ inline __inout_pipe__(V) void Copy(
         ASCENDC_REPORT_CHECK_ERROR("Copy", KernelFuncType::CALCOUNT_MODE);
     }
 #endif
-    CopyImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
+    CopyImpl<PrimType>((__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), count);
 }
 #endif
 
@@ -678,12 +698,12 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
         for (uint32_t i = 0; i < srcOffsetListSize; i++) {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
             DataCopyGM2UBImpl(
-                (__ubuf__ T*)dst.GetPhyAddr() + dstStartIndex + dstOffsetList[i],
-                (__gm__ T*)src.GetPhyAddr() + srcStartIndex + srcOffsetList[i], repeatParams, cacheMode);
+                (__ubuf__ T*)GetUnderlyingPtr(dst) + dstStartIndex + dstOffsetList[i],
+                (__gm__ T*)GetUnderlyingPtr(src) + srcStartIndex + srcOffsetList[i], repeatParams, cacheMode);
 #else
             DataCopyGM2UBImpl(
-                (__ubuf__ T*)dst.GetPhyAddr() + dstStartIndex + dstOffsetList[i],
-                (__gm__ T*)src.GetPhyAddr() + srcStartIndex + srcOffsetList[i], repeatParams);
+                (__ubuf__ T*)GetUnderlyingPtr(dst) + dstStartIndex + dstOffsetList[i],
+                (__gm__ T*)GetUnderlyingPtr(src) + srcStartIndex + srcOffsetList[i], repeatParams);
 #endif
         }
     } else {
@@ -691,12 +711,12 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
         for (uint32_t i = 0; i < srcOffsetListSize; i++) {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
             DataCopySliceGm2UBImpl(
-                (__ubuf__ T*)dst.GetPhyAddr() + dstStartIndex + dstOffsetList[i],
-                (__gm__ T*)src.GetPhyAddr() + srcStartIndex + srcOffsetList[i], repeatParams, cacheMode);
+                (__ubuf__ T*)GetUnderlyingPtr(dst) + dstStartIndex + dstOffsetList[i],
+                (__gm__ T*)GetUnderlyingPtr(src) + srcStartIndex + srcOffsetList[i], repeatParams, cacheMode);
 #else
             DataCopySliceGm2UBImpl(
-                (__ubuf__ T*)dst.GetPhyAddr() + dstStartIndex + dstOffsetList[i],
-                (__gm__ T*)src.GetPhyAddr() + srcStartIndex + srcOffsetList[i], repeatParams);
+                (__ubuf__ T*)GetUnderlyingPtr(dst) + dstStartIndex + dstOffsetList[i],
+                (__gm__ T*)GetUnderlyingPtr(src) + srcStartIndex + srcOffsetList[i], repeatParams);
 #endif
         }
     }
@@ -758,12 +778,12 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
         for (uint32_t i = 0; i < srcOffsetListSize; i++) {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
             DataCopyUB2GMImpl(
-                (__gm__ T*)dst.GetPhyAddr() + dstStartIndex + dstOffsetList[i],
-                (__ubuf__ T*)src.GetPhyAddr() + srcStartIndex + srcOffsetList[i], repeatParams, cacheMode);
+                (__gm__ T*)GetUnderlyingPtr(dst) + dstStartIndex + dstOffsetList[i],
+                (__ubuf__ T*)GetUnderlyingPtr(src) + srcStartIndex + srcOffsetList[i], repeatParams, cacheMode);
 #else
             DataCopyUB2GMImpl(
-                (__gm__ T*)dst.GetPhyAddr() + dstStartIndex + dstOffsetList[i],
-                (__ubuf__ T*)src.GetPhyAddr() + srcStartIndex + srcOffsetList[i], repeatParams);
+                (__gm__ T*)GetUnderlyingPtr(dst) + dstStartIndex + dstOffsetList[i],
+                (__ubuf__ T*)GetUnderlyingPtr(src) + srcStartIndex + srcOffsetList[i], repeatParams);
 #endif
         }
     } else {
@@ -771,12 +791,12 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
         for (uint32_t i = 0; i < srcOffsetListSize; i++) {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
             DataCopySliceUB2GMImpl(
-                (__gm__ T*)dst.GetPhyAddr() + dstStartIndex + dstOffsetList[i],
-                (__ubuf__ T*)src.GetPhyAddr() + srcStartIndex + srcOffsetList[i], repeatParams, cacheMode);
+                (__gm__ T*)GetUnderlyingPtr(dst) + dstStartIndex + dstOffsetList[i],
+                (__ubuf__ T*)GetUnderlyingPtr(src) + srcStartIndex + srcOffsetList[i], repeatParams, cacheMode);
 #else
             DataCopySliceUB2GMImpl(
-                (__gm__ T*)dst.GetPhyAddr() + dstStartIndex + dstOffsetList[i],
-                (__ubuf__ T*)src.GetPhyAddr() + srcStartIndex + srcOffsetList[i], repeatParams);
+                (__gm__ T*)GetUnderlyingPtr(dst) + dstStartIndex + dstOffsetList[i],
+                (__ubuf__ T*)GetUnderlyingPtr(src) + srcStartIndex + srcOffsetList[i], repeatParams);
 #endif
         }
     }
@@ -985,7 +1005,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || \
                               (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
         if (srcHWPos == Hardware::L1) {
-            DataCopyL12GMNZ2NDImpl((__gm__ T*)dst.GetPhyAddr(), (__cbuf__ T*)src.GetPhyAddr(), intriParams);
+            DataCopyL12GMNZ2NDImpl((__gm__ T*)GetUnderlyingPtr(dst), (__cbuf__ T*)GetUnderlyingPtr(src), intriParams);
             return;
         }
 #endif
@@ -998,9 +1018,10 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     const uint8_t cacheMode = ExtractCacheMode(dst);
     DataCopyUB2GMNZ2NDImpl(
-        (__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), intriParams, cacheMode);
+        (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), intriParams, cacheMode);
 #else
-    DataCopyUB2GMNZ2NDImpl((__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), intriParams);
+    DataCopyUB2GMNZ2NDImpl(
+        (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), intriParams);
 #endif
 #ifdef ASCENDC_CPU_DEBUG
     if (isUsedProcessLock == true) {
@@ -1024,7 +1045,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
 {
     const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
     if (srcHWPos == Hardware::L1) {
-        DataCopyL12GMNZ2DNImpl((__gm__ T*)dst.GetPhyAddr(), (__cbuf__ T*)src.GetPhyAddr(), intriParams);
+        DataCopyL12GMNZ2DNImpl((__gm__ T*)GetUnderlyingPtr(dst), (__cbuf__ T*)GetUnderlyingPtr(src), intriParams);
         return;
     }
     ASCENDC_CHECK_TPOSITION(
@@ -1071,18 +1092,20 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
         const uint8_t cacheMode = ExtractCacheMode(src);
         DataCopyGM2UBImpl(
-            (__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), intriParams, cacheMode);
+            (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams, cacheMode);
 #else
-        DataCopyGM2UBImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), intriParams);
+        DataCopyGM2UBImpl(
+            (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams);
 #endif
     } else if (dstHWPos == Hardware::L1) {
         // gm -> l1
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
         const uint8_t cacheMode = ExtractCacheMode(src);
         DataCopyGM2L1Impl(
-            (__cbuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), intriParams, cacheMode);
+            (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams, cacheMode);
 #else
-        DataCopyGM2L1Impl((__cbuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), intriParams);
+        DataCopyGM2L1Impl(
+            (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams);
 #endif
     } else {
         ASCENDC_CHECK_TPOSITION(
@@ -1112,17 +1135,19 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
         // ub -> gm
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
         DataCopyUB2GMImpl(
-            (__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), intriParams, cacheMode);
+            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), intriParams, cacheMode);
 #else
-        DataCopyUB2GMImpl((__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), intriParams);
+        DataCopyUB2GMImpl(
+            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), intriParams);
 #endif
     } else if (srcHWPos == Hardware::L1) {
         // l1 -> gm
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
         DataCopyL12GMImpl(
-            (__gm__ PrimType*)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(), intriParams, cacheMode);
+            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), intriParams, cacheMode);
 #else
-        DataCopyL12GMImpl((__gm__ PrimType*)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(), intriParams);
+        DataCopyL12GMImpl(
+            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), intriParams);
 #endif
     } else {
         ASCENDC_CHECK_TPOSITION(
@@ -1148,7 +1173,8 @@ __aicore__ inline void DataCopy(
     if (srcHWPos == Hardware::UB) {
         if (dstHWPos == Hardware::L1) {
             // ub -> l1
-            DataCopyUB2L1Impl((__cbuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), intriParams);
+            DataCopyUB2L1Impl(
+                (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), intriParams);
         } else if (dstHWPos == Hardware::L0C) {
             // ub -> l0c
             DataCopyUB2L0CIntf(dst, src, intriParams, enhancedParams);
@@ -1168,7 +1194,8 @@ __aicore__ inline void DataCopy(
         } else if (dstHWPos == Hardware::L0C) {
             // l1 -> l0c
             DataCopyL12L0CImpl(
-                (__cc__ PrimType*)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(), intriParams, enhancedParams);
+                (__cc__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), intriParams,
+                enhancedParams);
         } else {
             ASCENDC_CHECK_TPOSITION(
                 false, "dst", "L0C Buffer(CO1)",
@@ -1179,7 +1206,8 @@ __aicore__ inline void DataCopy(
         if (dstHWPos == Hardware::UB) {
             // l0c -> ub
             DataCopyL0C2UBImpl(
-                (__ubuf__ PrimType*)dst.GetPhyAddr(), (__cc__ PrimType*)src.GetPhyAddr(), intriParams, enhancedParams);
+                (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__cc__ PrimType*)GetUnderlyingPtr(src), intriParams,
+                enhancedParams);
         } else {
             ASCENDC_CHECK_TPOSITION(
                 false, "dst", "UB(CO2)",
@@ -1210,7 +1238,7 @@ __aicore__ inline void DataCopy(
         dst, Hardware::L1, "dst", "A1", "DataCopy from LocalTensor to LocalTensor with DataCopyCO12DstParams");
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst, src, intriParams)));
     // l0c -> l1
-    DataCopyL0C2L1Impl((__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cc__ PrimT<U>*)src.GetPhyAddr(), intriParams);
+    DataCopyL0C2L1Impl((__cbuf__ PrimT<T>*)GetUnderlyingPtr(dst), (__cc__ PrimT<U>*)GetUnderlyingPtr(src), intriParams);
 }
 
 template <typename T, typename U>
@@ -1223,9 +1251,10 @@ __aicore__ inline void DataCopy(
     // l0c -> gm
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     const uint8_t cacheMode = ExtractCacheMode(dst);
-    DataCopyL0C2GMImpl((__gm__ PrimT<T>*)dst.GetPhyAddr(), (__cc__ PrimT<U>*)src.GetPhyAddr(), intriParams, cacheMode);
+    DataCopyL0C2GMImpl(
+        (__gm__ PrimT<T>*)GetUnderlyingPtr(dst), (__cc__ PrimT<U>*)GetUnderlyingPtr(src), intriParams, cacheMode);
 #else
-    DataCopyL0C2GMImpl((__gm__ PrimT<T>*)dst.GetPhyAddr(), (__cc__ PrimT<U>*)src.GetPhyAddr(), intriParams);
+    DataCopyL0C2GMImpl((__gm__ PrimT<T>*)GetUnderlyingPtr(dst), (__cc__ PrimT<U>*)GetUnderlyingPtr(src), intriParams);
 #endif
 }
 
@@ -1249,7 +1278,8 @@ __aicore__ inline void DataCopy(
         if (dstHWPos == Hardware::L0C) {
             // l1 -> l0c
             DataCopyL12L0CImpl(
-                (__cc__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)src.GetPhyAddr(), intriParams, enhancedParams);
+                (__cc__ PrimT<T>*)GetUnderlyingPtr(dst), (__cbuf__ PrimT<U>*)GetUnderlyingPtr(src), intriParams,
+                enhancedParams);
         } else {
             ASCENDC_CHECK_TPOSITION(
                 false, "dst", "L0C Buffer(CO1)",
@@ -1283,7 +1313,8 @@ __aicore__ inline void DataCopy(
         if (dstHWPos == Hardware::L0C) {
             // l1 -> l0c
             DataCopyL12L0CImpl(
-                (__cc__ half*)dst.GetPhyAddr(), (__cbuf__ float*)src.GetPhyAddr(), intriParams, enhancedParams);
+                (__cc__ half*)GetUnderlyingPtr(dst), (__cbuf__ float*)GetUnderlyingPtr(src), intriParams,
+                enhancedParams);
         } else {
             ASCENDC_CHECK_TPOSITION(
                 false, "dst", "L0C Buffer(CO1)",
@@ -1294,7 +1325,8 @@ __aicore__ inline void DataCopy(
         if (dstHWPos == Hardware::UB) {
             // l0c -> ub
             DataCopyL0C2UBImpl(
-                (__ubuf__ half*)dst.GetPhyAddr(), (__cc__ float*)src.GetPhyAddr(), intriParams, enhancedParams);
+                (__ubuf__ half*)GetUnderlyingPtr(dst), (__cc__ float*)GetUnderlyingPtr(src), intriParams,
+                enhancedParams);
         } else {
             ASCENDC_CHECK_TPOSITION(
                 false, "dst", "UB(CO2)",
@@ -1334,7 +1366,7 @@ __aicore__ inline __inout_pipe__(V) void DataCopy(
     CheckTensorL0C2UB(dst, src);
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst, src, intriParams, enhancedParams)));
     DataCopyL0C2UBImpl(
-        (__ubuf__ half*)dst.GetPhyAddr(), (__cc__ int32_t*)src.GetPhyAddr(), intriParams, enhancedParams);
+        (__ubuf__ half*)GetUnderlyingPtr(dst), (__cc__ int32_t*)GetUnderlyingPtr(src), intriParams, enhancedParams);
 }
 
 // int32_t to int16_t
@@ -1352,7 +1384,7 @@ __aicore__ inline __inout_pipe__(V) void DataCopy(
     CheckTensorL0C2UB(dst, src);
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst, src, intriParams, enhancedParams)));
     DataCopyL0C2UBImpl(
-        (__ubuf__ int16_t*)dst.GetPhyAddr(), (__cc__ int32_t*)src.GetPhyAddr(), intriParams, enhancedParams);
+        (__ubuf__ int16_t*)GetUnderlyingPtr(dst), (__cc__ int32_t*)GetUnderlyingPtr(src), intriParams, enhancedParams);
 }
 
 // int32_t to int8_t
@@ -1370,7 +1402,7 @@ __aicore__ inline __inout_pipe__(V) void DataCopy(
     CheckTensorL0C2UB(dst, src);
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst, src, intriParams, enhancedParams)));
     DataCopyL0C2UBImpl(
-        (__ubuf__ int8_t*)dst.GetPhyAddr(), (__cc__ int32_t*)src.GetPhyAddr(), intriParams, enhancedParams);
+        (__ubuf__ int8_t*)GetUnderlyingPtr(dst), (__cc__ int32_t*)GetUnderlyingPtr(src), intriParams, enhancedParams);
 }
 
 // int32_t to uint8_t
@@ -1388,7 +1420,7 @@ __aicore__ inline __inout_pipe__(V) void DataCopy(
     CheckTensorL0C2UB(dst, src);
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst, src, intriParams, enhancedParams)));
     DataCopyL0C2UBImpl(
-        (__ubuf__ uint8_t*)dst.GetPhyAddr(), (__cc__ int32_t*)src.GetPhyAddr(), intriParams, enhancedParams);
+        (__ubuf__ uint8_t*)GetUnderlyingPtr(dst), (__cc__ int32_t*)GetUnderlyingPtr(src), intriParams, enhancedParams);
 }
 
 // half to float
@@ -1409,7 +1441,8 @@ __aicore__ inline __inout_pipe__(V) void DataCopy(
         dst, Hardware::L0C, "dst", "CO1",
         "DataCopy from LocalTensor(UB(CO2)) to LocalTensor(CO1) with DataCopyEnhancedParams");
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyTensorSizeOverflow(dst, src, intriParams, enhancedParams)));
-    DataCopyUB2L0CImpl((__cc__ float*)dst.GetPhyAddr(), (__ubuf__ half*)src.GetPhyAddr(), intriParams, enhancedParams);
+    DataCopyUB2L0CImpl(
+        (__cc__ float*)GetUnderlyingPtr(dst), (__ubuf__ half*)GetUnderlyingPtr(src), intriParams, enhancedParams);
 }
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
@@ -1445,12 +1478,12 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     });
     if (dstHWPos == Hardware::UB) {
         DataCopyPadGm2UBImpl<PrimType, mode>(
-            (__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), dataCopyParams, padParams,
-            cacheMode);
+            (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), dataCopyParams,
+            padParams, cacheMode);
     } else if (dstHWPos == Hardware::L1) {
         DataCopyPadGm2L1Impl<PrimType, mode>(
-            (__cbuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), dataCopyParams, padParams,
-            cacheMode);
+            (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), dataCopyParams,
+            padParams, cacheMode);
     } else {
         ASCENDC_CHECK_TPOSITION(
             false, "dst", "UB(VECIN/VECOUT)", "DataCopyPad from GlobalTensor to LocalTensor with DataCopyPadParams",
@@ -1483,7 +1516,8 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     const uint8_t cacheMode = ExtractCacheMode(dst);
     if (srcHWPos == Hardware::UB) {
         DataCopyPadUB2GMImpl<T, mode>(
-            (__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), dataCopyParams, cacheMode);
+            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), dataCopyParams,
+            cacheMode);
     } else {
         ASCENDC_CHECK_TPOSITION(
             false, "src", "UB(VECIN/VECOUT)", "DataCopyPad from LocalTensor to GlobalTensor with DataCopyParams",
@@ -1522,14 +1556,17 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
     if (dstHWPos == Hardware::UB) {
         DataCopyPadGm2UBImpl(
-            (__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), dataCopyParams, padParams);
+            (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), dataCopyParams,
+            padParams);
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
     } else {
-        DataCopyPadGm2L1Impl((__cbuf__ T*)dst.GetPhyAddr(), (__gm__ T*)src.GetPhyAddr(), dataCopyParams, padParams);
+        DataCopyPadGm2L1Impl(
+            (__cbuf__ T*)GetUnderlyingPtr(dst), (__gm__ T*)GetUnderlyingPtr(src), dataCopyParams, padParams);
 #else
     } else if (dstHWPos == Hardware::L1) {
         DataCopyPadGM2L1Impl(
-            (__cbuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), dataCopyParams, padParams);
+            (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), dataCopyParams,
+            padParams);
     } else {
 #if (__NPU_ARCH__ == 3102)
         ASCENDC_CHECK_TPOSITION(
@@ -1566,13 +1603,15 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyPadTensorSizeOverflow(dst, src, dataCopyParams)));
     const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
     if (srcHWPos == Hardware::UB) {
-        DataCopyPadUB2GMImpl((__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), dataCopyParams);
+        DataCopyPadUB2GMImpl(
+            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), dataCopyParams);
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
     } else {
-        DataCopyPadL12GMImpl((__gm__ T*)dst.GetPhyAddr(), (__cbuf__ T*)src.GetPhyAddr(), dataCopyParams);
+        DataCopyPadL12GMImpl((__gm__ T*)GetUnderlyingPtr(dst), (__cbuf__ T*)GetUnderlyingPtr(src), dataCopyParams);
 #else
     } else if (srcHWPos == Hardware::L1) {
-        DataCopyPadL12GMImpl((__gm__ PrimType*)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(), dataCopyParams);
+        DataCopyPadL12GMImpl(
+            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), dataCopyParams);
     } else {
 #if (__NPU_ARCH__ == 3102)
         ASCENDC_CHECK_TPOSITION(
@@ -1606,7 +1645,8 @@ __aicore__ inline void DataCopyPad(
     CheckTensorPos<T>(src, Hardware::UB, "src", "VECIN/VECOUT", "DataCopyPad with Nd2NzParams");
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyPadTensorSizeOverflow(dst, src, dataCopyParams, nd2nzParams)));
     DataCopyPadUB2L1Impl(
-        (__cbuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), dataCopyParams, nd2nzParams);
+        (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), dataCopyParams,
+        nd2nzParams);
 }
 
 // override DataCopyPad, use new param DataCopyExtParams
@@ -1634,10 +1674,10 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     const uint8_t cacheMode = ExtractCacheMode(src);
     if (dstHWPos == Hardware::UB) {
         DataCopyPadGm2UBImpl<T, mode>(
-            (__ubuf__ T*)dst.GetPhyAddr(), (__gm__ T*)src.GetPhyAddr(), dataCopyParams, padParams, cacheMode);
+            (__ubuf__ T*)GetUnderlyingPtr(dst), (__gm__ T*)GetUnderlyingPtr(src), dataCopyParams, padParams, cacheMode);
     } else if (dstHWPos == Hardware::L1) {
         DataCopyPadGm2L1Impl<T, mode>(
-            (__cbuf__ T*)dst.GetPhyAddr(), (__gm__ T*)src.GetPhyAddr(), dataCopyParams, padParams, cacheMode);
+            (__cbuf__ T*)GetUnderlyingPtr(dst), (__gm__ T*)GetUnderlyingPtr(src), dataCopyParams, padParams, cacheMode);
     } else {
         ASCENDC_CHECK_TPOSITION(
             false, "dst", "UB(VECIN/VECOUT)", "DataCopyPad from GM to UB(VECIN/VECOUT)",
@@ -1673,13 +1713,16 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
 #endif
     const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
     if (dstHWPos == Hardware::UB) {
-        DataCopyPadGm2UBImpl((__ubuf__ T*)dst.GetPhyAddr(), (__gm__ T*)src.GetPhyAddr(), dataCopyParams, padParams);
+        DataCopyPadGm2UBImpl(
+            (__ubuf__ T*)GetUnderlyingPtr(dst), (__gm__ T*)GetUnderlyingPtr(src), dataCopyParams, padParams);
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
     } else {
-        DataCopyPadGm2L1Impl((__cbuf__ T*)dst.GetPhyAddr(), (__gm__ T*)src.GetPhyAddr(), dataCopyParams, padParams);
+        DataCopyPadGm2L1Impl(
+            (__cbuf__ T*)GetUnderlyingPtr(dst), (__gm__ T*)GetUnderlyingPtr(src), dataCopyParams, padParams);
 #else
     } else if (dstHWPos == Hardware::L1) {
-        DataCopyPadGM2L1Impl((__cbuf__ T*)dst.GetPhyAddr(), (__gm__ T*)src.GetPhyAddr(), dataCopyParams, padParams);
+        DataCopyPadGM2L1Impl(
+            (__cbuf__ T*)GetUnderlyingPtr(dst), (__gm__ T*)GetUnderlyingPtr(src), dataCopyParams, padParams);
     } else {
 #if (__NPU_ARCH__ == 3102)
         ASCENDC_CHECK_TPOSITION(
@@ -1728,7 +1771,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
 #endif
     CheckTensorPos<T>(dst, Hardware::UB, "dst", "VECIN/VECOUT", "DataCopyPad from GM to UB(VECIN/VECOUT)");
     DataCopyPadGm2UBImpl(
-        (__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), dataCopyParams, padParams);
+        (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), dataCopyParams, padParams);
 }
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
@@ -1751,11 +1794,12 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     const uint8_t cacheMode = ExtractCacheMode(dst);
     if (srcHWPos == Hardware::UB) {
         DataCopyPadUB2GMImpl<T, mode>(
-            (__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), dataCopyParams, cacheMode);
+            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), dataCopyParams,
+            cacheMode);
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
     } else if (srcHWPos == Hardware::L1) {
         DataCopyPadL12GMImpl<T, mode>(
-            (__gm__ PrimType*)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(), dataCopyParams);
+            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), dataCopyParams);
 #endif
     } else {
         ASCENDC_CHECK_TPOSITION(
@@ -1785,13 +1829,15 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyPadTensorSizeOverflow(dst, src, dataCopyParams)));
     const Hardware srcHWPos = GetPhyType((TPosition)src.GetPosition());
     if (srcHWPos == Hardware::UB) {
-        DataCopyPadUB2GMImpl((__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), dataCopyParams);
+        DataCopyPadUB2GMImpl(
+            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), dataCopyParams);
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
     } else {
-        DataCopyPadL12GMImpl((__gm__ T*)dst.GetPhyAddr(), (__cbuf__ T*)src.GetPhyAddr(), dataCopyParams);
+        DataCopyPadL12GMImpl((__gm__ T*)GetUnderlyingPtr(dst), (__cbuf__ T*)GetUnderlyingPtr(src), dataCopyParams);
 #else
     } else if (srcHWPos == Hardware::L1) {
-        DataCopyPadL12GMImpl((__gm__ PrimType*)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(), dataCopyParams);
+        DataCopyPadL12GMImpl(
+            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), dataCopyParams);
     } else {
 #if (__NPU_ARCH__ == 3102)
         ASCENDC_CHECK_TPOSITION(
@@ -1825,7 +1871,8 @@ __aicore__ inline void DataCopyPad(
     CheckTensorPos<T>(src, Hardware::UB, "src", "VECIN/VECOUT", "DataCopyPad with Nd2NzParams");
     ASCENDC_REPORT_OVERFLOW_MEM((CheckDataCopyPadTensorSizeOverflow(dst, src, dataCopyParams, nd2nzParams)));
     DataCopyPadUB2L1Impl(
-        (__cbuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), dataCopyParams, nd2nzParams);
+        (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), dataCopyParams,
+        nd2nzParams);
 }
 
 template <typename T, TPosition pos>
@@ -1866,8 +1913,8 @@ __aicore__ inline void DataCopy(
 #endif
     const uint8_t cacheMode = ExtractCacheMode(src);
     DataCopyWithNDDMAImpl<T, dim, config>(
-        (__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr(), params.loopInfo, params.constantValue,
-        cacheMode);
+        (__ubuf__ PrimT<T>*)GetUnderlyingPtr(dst), (__gm__ PrimT<T>*)GetUnderlyingPtr(src), params.loopInfo,
+        params.constantValue, cacheMode);
 }
 
 __aicore__ inline void NdDmaDci() { NdDmaDciImpl(); }
@@ -1889,6 +1936,7 @@ __aicore__ inline void ResetLoopModePara(DataCopyMVType type)
     }
 }
 #endif
+#include "kernel_operator_data_copy_ptr_impl.h"
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_VCONV_INTERFACE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_INTF_IMPL_H__)
