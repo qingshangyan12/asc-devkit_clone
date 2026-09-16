@@ -489,6 +489,12 @@ protected:
     template<TPosition pos, uint32_t bufIDSize> friend class TBufPool;
     template <TPosition pos> friend __aicore__ inline bool PopStackBuffer(TBuf<pos>& popBuffer, TBufType& bufStart);
     template <typename T, TPosition pos> friend __aicore__ inline bool PopStackBuffer(LocalTensor<T>& popBuffer);
+    // Raw-pointer form: the out-parameter is a reference to a raw UB pointer.  `S` is deduced
+    // instead of being the explicit `T`, because the call this has to accept is
+    // PopStackBuffer<float, TPosition::VECCALC>(p) with p of type __ubuf__ float*, and `T&` would be
+    // `float&`.  Defined in impl/basic_api/kernel_pop_stack_buffer.h.
+    template <typename T, TPosition pos, typename S>
+    friend __aicore__ inline bool PopStackBuffer(S *&popBuffer);
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     void inline SetBufferCtx(Hardware hard, struct BufPoolExtra* bufPool);
 #endif

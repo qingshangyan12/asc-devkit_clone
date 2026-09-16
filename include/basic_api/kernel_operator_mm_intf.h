@@ -342,6 +342,44 @@ __aicore__ inline void LoadDataWithSparse(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<U>& idx,
     const LoadData2dParams& loadDataParam);
 
+#if __NPU_ARCH__ == 2201
+/* Raw-pointer form of LoadDataWithSparse.
+ *
+ * CLASS OF CHANGE: isomorphic rewrite, not a forwarding layer and not a lower-level
+ * reconstruction.  LoadDataWithSparseCal uses its three tensor operands *only* through
+ * GetPhyAddr() -- the two primitives underneath it, SetIndexMatrix and load_cbuf_to_cb_sp, are
+ * already raw-pointer interfaces -- so the pointer form is the same statements with the address
+ * carrier supplied directly instead of extracted.  See the definition in
+ * impl/basic_api/kernel_operator_mm_intf_impl.h.
+ *
+ * ARCH REACHABILITY -- deliberate, and narrower than the Tensor declaration above.  The Tensor
+ * declaration is not arch-guarded, but its definition and everything behind it exists only for
+ * __NPU_ARCH__ == 2201:
+ *   impl/basic_api/kernel_operator_mm_base_impl.h:610   `#if __NPU_ARCH__ == 2201` around
+ *                                                       LoadDataWithSparseImpl
+ *   impl/basic_api/kernel_operator_mm_intf_impl.h:435   `#if __NPU_ARCH__ == 2201` around the
+ *                                                       Tensor definition
+ *   impl/basic_api/dav_c220/kernel_operator_mm_impl.h:395  the only LoadDataWithSparseCal that
+ *                                                       computes anything; dav_c100 :214 and
+ *                                                       dav_m200 :419 ASCENDC_REPORT_NOT_SUPPORT,
+ *                                                       dav_m300 :353 and dav_m310 :335 assert false.
+ * dav_3510 has no LoadDataWithSparseCal at all.  A pointer overload declared for every
+ * architecture would therefore be a declaration with no definition on 3510 -- it would satisfy a
+ * compile-only probe and then fail to link, which would read as "implemented" when it is not.
+ * Guarding it to the one architecture that has a backend keeps that visible as "no matching
+ * function" instead.  The pre-existing gap is on the upstream side: the Tensor declaration itself
+ * is not arch-guarded, so on 3510 the Tensor form is also declared-but-undefined.  This overload
+ * does not reproduce that inconsistency.
+ */
+template <
+    typename T = int8_t, typename U = uint8_t, typename DstPtr, typename SrcPtr, typename IdxPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr, IdxPtr>::value, bool>::type = true,
+    typename Std::enable_if<Std::is_same<PrimT<T>, int8_t>::value, bool>::type = true,
+    typename Std::enable_if<Std::is_same<PrimT<U>, uint8_t>::value, bool>::type = true>
+__aicore__ inline void LoadDataWithSparse(
+    DstPtr dst, SrcPtr src, IdxPtr idx, const LoadData2dParams& loadDataParam);
+#endif
+
 template <typename T = int8_t, typename Std::enable_if<Std::is_same<PrimT<T>, int8_t>::value, bool>::type = true>
 __aicore__ inline void LoadUnzipIndex(const GlobalTensor<T>& src, uint32_t numOfIndexTabEntry);
 
@@ -524,6 +562,25 @@ __aicore__ inline void Mmad(DstPtr dst, Src0Ptr fm, Src1Ptr filter, const MmadPa
 template <typename DstPtr, typename Src0Ptr, typename Src1Ptr, typename BiasPtr,
     typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr, BiasPtr>::value, bool>::type = true>
 __aicore__ inline void Mmad(DstPtr dst, Src0Ptr fm, Src1Ptr filter, BiasPtr bias, const MmadParams& mmadParams);
+/*
+ * BitMode forms of Mmad with raw pointer operands.
+ *
+ * The bias form keeps the non-const `MmadBitModeParams&` of the Tensor declaration above, because
+ * the backend it forwards to -- MmadCal(dav_3510/kernel_operator_mm_impl.h:556) -- calls
+ * mmadParams.SetCmatrixInitVal(false) on it.  A const reference could not carry that write.
+ */
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+
+template <typename DstPtr, typename Src0Ptr, typename Src1Ptr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr>::value, bool>::type = true>
+__aicore__ inline void Mmad(DstPtr dst, Src0Ptr fm, Src1Ptr filter, const MmadBitModeParams& mmadParams);
+
+template <typename DstPtr, typename Src0Ptr, typename Src1Ptr, typename BiasPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr, BiasPtr>::value, bool>::type = true>
+__aicore__ inline void Mmad(DstPtr dst, Src0Ptr fm, Src1Ptr filter, BiasPtr bias, MmadBitModeParams& mmadParams);
+
+#endif
+
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 template <typename DstPtr, typename Src0Ptr, typename Src1Ptr,
@@ -537,7 +594,7 @@ __aicore__ inline void MmadMx(DstPtr dst, Src0Ptr fm, Src1Ptr filter, BiasPtr bi
 
 #if __NPU_ARCH__ == 2201
 template <typename DstPtr, typename Src0Ptr, typename Src1Ptr,
-    typename std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr>::value, bool>::type = true>
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr>::value, bool>::type = true>
 __aicore__ inline void MmadWithSparse(DstPtr dst, Src0Ptr fm, Src1Ptr filter, const MmadParams& mmadParams);
 #endif
 
@@ -551,19 +608,19 @@ template <typename DstPtr, typename SrcPtr,
 __aicore__ inline void LoadData(DstPtr dst, SrcPtr src, const LoadData2DParamsV2& loadDataParams);
 
 template <typename DstPtr, typename SrcPtr, typename U,
-    typename std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
 __aicore__ inline void LoadData(DstPtr dst, SrcPtr src, const LoadData3DParamsV2<U>& loadDataParams);
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 template <typename DstPtr, typename SrcPtr, typename SrcMxPtr,
-    typename std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr, SrcMxPtr>::value, bool>::type = true>
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr, SrcMxPtr>::value, bool>::type = true>
 __aicore__ inline void LoadData(DstPtr dst, SrcPtr src, SrcMxPtr srcMx, const LoadData2DParamsV2& loadDataParams,
     const LoadData2DMxParams& loadMxDataParams);
 #endif
 
 // No explicit template arguments: the element type comes from the pointer operands.
 template <typename DstPtr, typename SrcPtr, typename U,
-    typename std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
 __aicore__ inline void LoadDataWithStride(DstPtr dst, SrcPtr src, const LoadData3DParamsV2<U>& loadDataParams);
 
 // Explicit <element type, IsResetLoad3dConfig>: mirrors the Tensor overload's parameter list, so a
@@ -572,7 +629,7 @@ __aicore__ inline void LoadDataWithStride(DstPtr dst, SrcPtr src, const LoadData
 template <
     typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
     typename DstPtr, typename SrcPtr,
-    typename std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
 __aicore__ inline void LoadDataWithStride(DstPtr dst, SrcPtr src, const LoadData3DParamsV2<U>& loadDataParams);
 
 template <typename DstPtr, typename SrcPtr,
@@ -616,9 +673,19 @@ template <typename T, typename U = PrimT<T>, typename DstPtr,
 __aicore__ inline void InitConstValue(DstPtr dst, const InitConstValueParams<U>& initConstValueParams);
 
 template <typename DstPtr, typename SrcPtr,
-    typename std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
 __aicore__ inline void LoadDataWithTranspose(
     DstPtr dst, SrcPtr src, const LoadData2dTransposeParamsV2& loadDataParams);
+
+#if defined(__NPU_ARCH__) &&                                                                        \
+    ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||                  \
+     (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102))
+/* ---- LoadDataUnzip with raw pointer operands -------------------------------- */
+// Selected by the destination's address space (L1 / L0A / L0B); the source is a GM pointer.
+template <typename DstPtr, typename SrcPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type = true>
+__aicore__ inline void LoadDataUnzip(DstPtr dst, SrcPtr src);
+#endif
 
 } // namespace AscendC
 #if defined(__NPU_ARCH__)

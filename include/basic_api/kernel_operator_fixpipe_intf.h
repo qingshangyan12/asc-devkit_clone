@@ -211,9 +211,27 @@ __aicore__ inline void Fixpipe(DstPtr dst, SrcPtr src, WorkspacePtr cbufWorkspac
  * written into, exactly as in SetFixPipeConfigImpl; T is kept as an explicit template parameter so
  * that a pointer call cannot be confused with the LocalTensor overloads.
  */
+
+/*
+ * SetFixPipeAddr with a raw pointer eleWise operand, selected by its address space (L1 / UB).
+ * The operand is re-materialised as a LocalTensor over the same address and forwarded to the same
+ * implementation the Tensor overload reaches.
+ */
+template <typename DstPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr>::value, bool>::type = true>
+__aicore__ inline void SetFixPipeAddr(DstPtr eleWiseData, uint16_t c0ChStride);
+
 template <typename T, bool setRelu = false, typename DstPtr,
     typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr>::value, bool>::type = true>
 __aicore__ inline void SetFixPipeConfig(DstPtr preData, bool isUnitFlag = false);
+/*
+ * SetFixPipeConfig, two-operand form, with raw pointer pre-tensors.  Mirrors the Tensor overload
+ * SetFixPipeConfig(const LocalTensor<T>& reluPre, const LocalTensor<T>& quantPre, bool).
+ */
+template <typename ReluPtr, typename QuantPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<ReluPtr, QuantPtr>::value, bool>::type = true>
+__aicore__ inline void SetFixPipeConfig(ReluPtr reluPre, QuantPtr quantPre, bool isUnitFlag = false);
+
 
 } // namespace AscendC
 

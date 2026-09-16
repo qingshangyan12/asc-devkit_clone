@@ -350,6 +350,55 @@ __aicore__ inline void Fp(__ubuf__ D* dst, __cc__ S* src, __cbuf__ uint64_t* cbu
 }
 
 #endif  // ASCENDC_CPU_DEBUG
+
+/* ---- SetFixPipeAddr: the eleWiseData operand is an L1 or UB address ---------- */
+/*
+ * SetFixPipeAddrImpl takes a LocalTensor that it never reads.  On every implementation that exists
+ * -- dav_3510/...:35, dav_c100/...:59, dav_c220/..._v2_impl.h:34, dav_l300/...:34, dav_l311/...:34,
+ * dav_m200/...:60, dav_m300/..._v2_impl.h:33, dav_m310/...:76 -- the body is
+ * ASCENDC_REPORT_NOT_SUPPORT(false, "SetFixPipeAddr") and nothing else.
+ *
+ * The pointer overload is still a real forwarding layer rather than a copy of that stub: it
+ * re-materialises a LocalTensor over the caller's address and calls the same impl, so the two paths
+ * cannot drift apart, and an arch that later starts reading the operand keeps working through the
+ * pointer form too.
+ *
+ * The address space of the pointer says which buffer the operand lives in: __cbuf__ (L1) or
+ * __ubuf__ (UB).  Only the buffer class is recoverable -- a bare pointer cannot separate A1 from B1
+ * within L1, nor VECIN from VECCALC within UB.  That residue is inert here *because* the callee
+ * reads neither the position nor the length: the position is set to the representative the pointer
+ * does determine (A1 for L1, VECCALC for UB) and the length is left at the tensor default.
+ *
+ * Under ASCENDC_CPU_DEBUG the qualifiers are empty macros, so the two overloads would collapse
+ * into a single signature; exactly one definition is all that build can express, and it takes the
+ * UB representative.
+ */
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+
+template <typename D>
+__aicore__ inline void FpAddr(D* eleWiseData, uint16_t c0ChStride)
+{
+    LocalTensor<D> eleWise(TPosition::VECCALC, (uint32_t)(uint64_t)eleWiseData, 0);
+    SetFixPipeAddrImpl(eleWise, c0ChStride);
+}
+
+#else
+
+template <typename D>
+__aicore__ inline void FpAddr(__cbuf__ D* eleWiseData, uint16_t c0ChStride)
+{
+    LocalTensor<D> eleWise(TPosition::A1, (uint32_t)(uint64_t)eleWiseData, 0);
+    SetFixPipeAddrImpl(eleWise, c0ChStride);
+}
+
+template <typename D>
+__aicore__ inline void FpAddr(__ubuf__ D* eleWiseData, uint16_t c0ChStride)
+{
+    LocalTensor<D> eleWise(TPosition::VECCALC, (uint32_t)(uint64_t)eleWiseData, 0);
+    SetFixPipeAddrImpl(eleWise, c0ChStride);
+}
+
+#endif
 }  // namespace CubePtrOverload
 
 template <typename T, typename U, const FixpipeConfig& config, typename DstPtr, typename SrcPtr,
@@ -425,6 +474,43 @@ __aicore__ inline void SetFixPipeConfig(DstPtr preData, bool isUnitFlag)
         config = config | (static_cast<uint64_t>(isUnitFlag) << 63); // FPC[63], UnitFlag
         set_fpc(config);
     }
+}
+/*
+ * SetFixPipeConfig, two-operand form, with raw pointer pre-tensors.
+ *
+ * SetFixPipeConfigImpl for this form (dav_3510/kernel_operator_fixpipe_impl.h:44-53) reads exactly
+ * two things from its operands -- reluPre.GetPhyAddr() and quantPre.GetPhyAddr() -- and nothing
+ * else; it never reads a position or a length.  A raw pointer *is* that address, so unlike the
+ * TPosition-carrying operands elsewhere in this file there is no information to lose here and
+ * nothing to reconstruct: the config word below is the same expression on the same values.
+ *
+ * This mirrors the single-operand pointer overload directly above, which expresses its operand's
+ * address the same way.
+ */
+template <typename ReluPtr, typename QuantPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<ReluPtr, QuantPtr>::value, bool>::type>
+__aicore__ inline void SetFixPipeConfig(ReluPtr reluPre, QuantPtr quantPre, bool isUnitFlag)
+{
+    if ASCEND_IS_AIC {
+        uint64_t config = 0;
+        config = config | ((uint64_t)reluPre >> 6);                  // FPC[7:0], ReluPreAddr, 64bit aligned
+        config = config | (((uint64_t)quantPre >> 7) << 8);          // FPC[15:8], QuantPreAddr, 128bit aligned
+        config = config | (static_cast<uint64_t>(isUnitFlag) << 63); // FPC[63], UnitFlag
+        set_fpc(config);
+    }
+}
+
+
+/*
+ * SetFixPipeAddr with a raw pointer eleWise operand.  The operand lives in L1 or UB, so the
+ * overloads are selected by the pointer's address space; see CubePtrOverload::FpAddr above for why
+ * this is a faithful forwarding layer and not a re-implementation of the callee.
+ */
+template <typename DstPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr>::value, bool>::type>
+__aicore__ inline void SetFixPipeAddr(DstPtr eleWiseData, uint16_t c0ChStride)
+{
+    CubePtrOverload::FpAddr(eleWiseData, c0ChStride);
 }
 
 } // namespace AscendC

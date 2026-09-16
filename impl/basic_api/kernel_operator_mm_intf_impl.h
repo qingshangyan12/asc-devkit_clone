@@ -780,6 +780,22 @@ __aicore__ inline void Ld12L0Transpose(D* dst, S* src, const P& loadDataParams)
 {
     LoadData2DL12L0ATransposeCal(dst, src, loadDataParams);
 }
+/*
+ * The V2 descriptor reaches a different backend set from the V1 one, so it gets its own
+ * overloads rather than being absorbed by the generic `const P&` forms above.
+ *
+ * LoadDataWithTransposeImpl's V2 overload (impl/basic_api/kernel_operator_mm_load2d_impl.h:155-166)
+ * has a branch for L0B *only*: for an L0A destination it compiles and performs no transfer.  The
+ * address space that would distinguish the two is erased in this build, and the single V2 backend
+ * that exists -- LoadData2DL12L0BTransposeCal(dav_3510/kernel_operator_mm_impl.h:289) -- is the L0B
+ * one, so that is the representative taken here.
+ */
+template <typename D, typename S>
+__aicore__ inline void Ld12L0Transpose(D* dst, S* src, const LoadData2dTransposeParamsV2& loadDataParams)
+{
+    LoadData2DL12L0BTransposeCal(dst, src, loadDataParams);
+}
+
 
 #else  // device build: the address space selects the pipe
 
@@ -883,6 +899,33 @@ __aicore__ inline void Ld12L0Transpose(__cb__ D* dst, __cbuf__ S* src, const P& 
 {
     LoadData2DL12L0BTransposeCal(dst, src, loadDataParams);
 }
+/*
+ * V2 descriptor, device build -- it reaches a backend for L0B only, exactly as
+ * LoadDataWithTransposeImpl does (impl/basic_api/kernel_operator_mm_load2d_impl.h:155-166).
+ *
+ *   - L0B forwards to LoadData2DL12L0BTransposeCal(dav_3510/kernel_operator_mm_impl.h:289), the
+ *     real V2 implementation.
+ *   - L0A has no V2 backend to forward to.  The only A1 -> A2 transpose backend,
+ *     LoadData2DL12L0ATransposeCal(dav_3510/kernel_operator_mm_impl.h:445), takes the *V1*
+ *     descriptor and reports "not supported on current device".  The Tensor V2 overload calls no
+ *     backend at all for an L0A destination -- its L0A branch does not exist -- so this overload
+ *     performs no transfer either.  Mirroring that is what keeps a pointer call identical to the
+ *     equivalent Tensor call; the silence is inherited from the Tensor path, not introduced here.
+ */
+template <typename D, typename S>
+__aicore__ inline void Ld12L0Transpose(__ca__ D* dst, __cbuf__ S* src, const LoadData2dTransposeParamsV2& loadDataParams)
+{
+    (void)dst;
+    (void)src;
+    (void)loadDataParams;
+}
+
+template <typename D, typename S>
+__aicore__ inline void Ld12L0Transpose(__cb__ D* dst, __cbuf__ S* src, const LoadData2dTransposeParamsV2& loadDataParams)
+{
+    LoadData2DL12L0BTransposeCal(dst, src, loadDataParams);
+}
+
 
 #endif  // ASCENDC_CPU_DEBUG
 
@@ -1063,7 +1106,70 @@ __aicore__ inline void Ld3DV2Pro(__ubuf__ D* dst, __cbuf__ S* src, const LoadDat
 }
 
 #endif
+
+/* ---- LoadDataUnzip: L1 / L0A / L0B destination, GM source -------------------- */
+/*
+ * LoadDataUnzipImpl (kernel_operator_mm_base_impl.h:824) selects the backend from
+ * GetPhyType(dst.GetPosition()) and forwards (__cbuf__|__ca__|__cb__ PrimT<T>*, __gm__ PrimT<T>*)
+ * to LoadDataUnzipToL1Cal / ToL0ACal / ToL0BCal.  All three take raw pointers, so the pointer form
+ * is a pure forwarding layer over the destination's address space.
+ *
+ * ARCH AVAILABILITY IS THE TENSOR OVERLOAD'S, EXACTLY -- AND IT IS EMPTY ON dav_3510.  The three
+ * backends exist only in dav_c100:395, dav_c220:697, dav_m200:605, dav_m300:611 and dav_m310:606;
+ * there is no LoadDataUnzip symbol of any kind in impl/basic_api/dav_3510/.  On dav_3510
+ * LoadDataUnzipImpl therefore does not compile for ANY operand form -- measured, not inferred:
+ * the Tensor probe fails there with "use of undeclared identifier 'LoadDataUnzipToL1Cal'".  The
+ * repository says the same thing itself, wrapping its own header-check test in
+ * `#if __NPU_ARCH__ != 3510` (tests/api/basic_api/ascendc_header_checker/kernel_operator_mm_intf.cpp:262).
+ *
+ * This overload deliberately carries NO arch guard, so that on dav_3510 a pointer call fails in the
+ * same way, with the same message, as the Tensor call it mirrors, rather than appearing available.
+ */
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+
+// The address space is erased in this build, so the L1 backend is the single representative.
+template <typename D, typename S>
+__aicore__ inline void LdUnzip(D* dst, S* src)
+{
+    LoadDataUnzipToL1Cal(dst, src);
+}
+
+#else
+
+template <typename D, typename S>
+__aicore__ inline void LdUnzip(__cbuf__ D* dst, __gm__ S* src)
+{
+    LoadDataUnzipToL1Cal(dst, src);
+}
+
+template <typename D, typename S>
+__aicore__ inline void LdUnzip(__ca__ D* dst, __gm__ S* src)
+{
+    LoadDataUnzipToL0ACal(dst, src);
+}
+
+template <typename D, typename S>
+__aicore__ inline void LdUnzip(__cb__ D* dst, __gm__ S* src)
+{
+    LoadDataUnzipToL0BCal(dst, src);
+}
+
+#endif
 }  // namespace CubePtrOverload
+
+/* ---- LoadDataUnzip with raw pointer operands -------------------------------- */
+// Same arch availability as the Tensor overload, deliberately and for the reason spelled out at
+// CubePtrOverload::LdUnzip above.
+#if defined(__NPU_ARCH__) &&                                                                        \
+    ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||                  \
+     (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102))
+template <typename DstPtr, typename SrcPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr>::value, bool>::type>
+__aicore__ inline void LoadDataUnzip(DstPtr dst, SrcPtr src)
+{
+    CubePtrOverload::LdUnzip(dst, src);
+}
+#endif
 
 template <typename DstPtr, typename Src0Ptr, typename Src1Ptr,
     typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr>::value, bool>::type>
@@ -1084,6 +1190,37 @@ __aicore__ inline void Mmad(DstPtr dst, Src0Ptr fm, Src1Ptr filter, BiasPtr bias
     // operand position is still known.
     MmadCal(dst, fm, filter, (uint64_t)bias, mmadParams, true);
 }
+
+/*
+ * BitMode forms of Mmad with raw pointer operands.
+ *
+ * Both land on the pointer-parameter BitMode backends in dav_3510/kernel_operator_mm_impl.h --
+ * MmadCal(__cc__ DstT*, __ca__ Src0T*, __cb__ Src1T*, const MmadBitModeParams&) at :522 and
+ * MmadCal(__cc__ DstT*, __ca__ Src0T*, __cb__ Src1T*, uint64_t, MmadBitModeParams&) at :556 --
+ * which take the same operands the pointer form receives, so these are pure forwarding layers:
+ * no address is recomputed and no parameter is reinterpreted.
+ *
+ * The backend of the bias form takes the descriptor by non-const reference and writes it
+ * (SetCmatrixInitVal(false)), which is why that parameter is non-const here too, exactly as in the
+ * Tensor declaration it mirrors.
+ */
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+
+template <typename DstPtr, typename Src0Ptr, typename Src1Ptr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr>::value, bool>::type>
+__aicore__ inline void Mmad(DstPtr dst, Src0Ptr fm, Src1Ptr filter, const MmadBitModeParams& mmadParams)
+{
+    MmadCal(dst, fm, filter, mmadParams);
+}
+
+template <typename DstPtr, typename Src0Ptr, typename Src1Ptr, typename BiasPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr, BiasPtr>::value, bool>::type>
+__aicore__ inline void Mmad(DstPtr dst, Src0Ptr fm, Src1Ptr filter, BiasPtr bias, MmadBitModeParams& mmadParams)
+{
+    MmadCal(dst, fm, filter, (uint64_t)bias, mmadParams);
+}
+
+#endif
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 template <typename DstPtr, typename Src0Ptr, typename Src1Ptr,
@@ -1234,13 +1371,58 @@ __aicore__ inline void LoadDataWithTranspose(DstPtr dst, SrcPtr src, const LoadD
 
 #if __NPU_ARCH__ == 2201
 template <typename DstPtr, typename Src0Ptr, typename Src1Ptr,
-    typename std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr>::value, bool>::type>
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, Src0Ptr, Src1Ptr>::value, bool>::type>
 __aicore__ inline void MmadWithSparse(DstPtr dst, Src0Ptr fm, Src1Ptr filter, const MmadParams& mmadParams)
 {
     MmadSpCal(dst, fm, filter, mmadParams);
 }
 #endif
 
+
+#if __NPU_ARCH__ == 2201
+/* Raw-pointer form of LoadDataWithSparse -- definition.
+ *
+ * Isomorphic rewrite: statement for statement the same as LoadDataWithSparseCal in
+ * impl/basic_api/dav_c220/kernel_operator_mm_impl.h:395-413, with each `X.GetPhyAddr()` replaced by
+ * the operand itself.  Nothing else changes -- no address is recomputed, no parameter is
+ * reinterpreted, and the two primitives called at the bottom (SetIndexMatrix, load_cbuf_to_cb_sp)
+ * were already raw-pointer interfaces.  The Tensor body of LoadDataWithSparse is
+ * LoadDataWithSparseImpl -> LoadDataWithSparseCal, so the two paths issue the same instruction with
+ * the same operands.
+ *
+ * NOT reproduced: the debug-only checks that LoadDataWithSparseImpl performs on the caller's behalf
+ * before dispatching -- CheckTensorPhyPosition on dst/src/idx and CheckTensorAlignment on all three
+ * (impl/basic_api/kernel_operator_mm_base_impl.h:640-647).  Those read the tensor's TPosition and
+ * its buffer base, neither of which a raw pointer carries, and they are compiled in only under
+ * `#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)`, so they have no effect on the device
+ * build.  A pointer caller gives up that diagnosis; it is the one place where the pointer path is
+ * weaker than the Tensor path rather than merely different.
+ */
+template <
+    typename T, typename U, typename DstPtr, typename SrcPtr, typename IdxPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<DstPtr, SrcPtr, IdxPtr>::value, bool>::type,
+    typename Std::enable_if<std::is_same<PrimT<T>, int8_t>::value, bool>::type,
+    typename Std::enable_if<std::is_same<PrimT<U>, uint8_t>::value, bool>::type>
+__aicore__ inline void LoadDataWithSparse(
+    DstPtr dst, SrcPtr src, IdxPtr idx, const LoadData2dParams& loadDataParam)
+{
+    if ASCEND_IS_AIC {
+#ifdef ASCENDC_CPU_DEBUG
+        SetIndexMatrix((void *)idx);
+        __cbuf__ int8_t *srcAddr = (__cbuf__ int8_t *)src;
+#else
+        uint64_t src0tmp = reinterpret_cast<uint64_t>(src);
+        uint64_t src1tmp = reinterpret_cast<uint64_t>(idx);
+        // src[31:0], dense weight matrix addr.
+        // src[63:32], index matrix addr.
+        uint64_t srctmp = (src0tmp & 0xffffffff) | ((src1tmp & 0xffffffff) << 32);
+        __cbuf__ int8_t *srcAddr = reinterpret_cast<__cbuf__ int8_t *>(srctmp);
+#endif
+        load_cbuf_to_cb_sp((__cb__ int8_t *)dst, srcAddr, loadDataParam.startIndex,
+            loadDataParam.repeatTimes);
+    }
+}
+#endif
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_MM_INTERFACE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_INTF_IMPL_H__)

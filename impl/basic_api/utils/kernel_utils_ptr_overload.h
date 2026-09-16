@@ -63,6 +63,105 @@ __aicore__ inline LocalTensor<T> LocalTensorFromPtr(__ubuf__ T* ptr)
     tensor.SetAddr(bufferAddr);
     return tensor;
 }
+/* Scalar access through a raw UB pointer.
+ *
+ * These two are the pointer-level equivalents of the LocalTensor accessors that carry no addressing
+ * of their own -- their whole body is one dereference of the buffer address:
+ *
+ *   LocalTensor<T>::GetValue(index)
+ *       -> *(reinterpret_cast<__ubuf__ PrimType*>(static_cast<uint64_t>(address_.bufferAddr)) + index)
+ *   LocalTensor<T>::SetValue(index, value)
+ *       -> the same address, assigned static_cast<PrimType>(value)
+ *
+ * (impl/basic_api/kernel_tensor_impl.h, the final `else` branch of each accessor.)  They reproduce
+ * exactly those two statements for a primitive that is neither half-byte nor complex, which is the
+ * case for every operand of the synchronisation APIs that use them (int32_t).  Note that the address
+ * the accessors use is `address_.bufferAddr` reinterpreted as a pointer, which is the same quantity
+ * a caller obtains from GetPhyAddr() -- so a raw pointer substituted here denotes the same address.
+ *
+ * NOT reproduced here, on purpose: both accessors are void for a UB operand on AIC
+ * (`if ASCEND_IS_AIC { ... return PrimType(0); }` / `return;`).  A caller whose body can reach an
+ * AIC path must apply that rule itself; see the comment at the IBSet / IBWait pointer overloads in
+ * impl/basic_api/kernel_operator_block_sync_intf_impl.h.  It is not baked in here because the
+ * determine-compute-sync pointer overloads are already inside `if ASCEND_IS_AIV`, where the rule is
+ * provably unreachable.
+ *
+ * Not reproduced either: the `__inout_pipe__(S)` scheduling attribute on the two accessors.  It is a
+ * compiler hint about which pipe performs the access and has no numeric effect; it is not attached
+ * to these free functions.
+ */
+template <typename T>
+__aicore__ inline T UbScalarRead(__ubuf__ T* addr, uint32_t index)
+{
+    return *(addr + index);
+}
+
+template <typename T>
+__aicore__ inline void UbScalarWrite(__ubuf__ T* addr, uint32_t index, T value)
+{
+    *(addr + index) = value;
+}
+/* Tensor views over a raw pointer operand.
+ *
+ * These exist so that the raw-pointer overloads of the synchronisation APIs can hand the caller's
+ * pointer to the *same* function the Tensor form calls, instead of re-expressing that function's
+ * body.  A raw pointer is the same quantity the corresponding GetPhyAddr() returns, so building a
+ * view over it adds no arithmetic and reinterprets nothing.
+ *
+ * Why a view rather than a re-expressed body: impl/basic_api/kernel_operator_block_sync_intf_impl.h
+ * sits inside an include cycle (kernel_operator_data_copy_intf_impl.h -> kernel_operator_data_copy_
+ * base_impl.h -> dav_<arch>/kernel_operator_data_copy_impl.h -> kernel_tpipe.h -> kernel_tpipe_impl.h ->
+ * kernel_tquebind_impl.h -> include/basic_api/kernel_operator_block_sync_intf.h ->
+ * kernel_operator_block_sync_intf_impl.h).  In a translation unit that enters the cycle from the
+ * data-copy side, that last file is parsed while kernel_operator_data_copy_intf_impl.h is only a
+ * third of the way through, so the pointer-level primitives declared further down in it
+ * (DataCopyCheck at :713, and the arch DataCopyGM2UBImpl / DataCopyUB2GMImpl) are not yet visible.
+ * Naming them there is therefore only valid in some include orders -- the single-header checker
+ * (ascendc_run_all_header_checks_cpu_single) compiles exactly the orders where it is not.  A view
+ * built from declarations that are already complete inside the cycle -- LocalTensor, GlobalTensor
+ * and TBuffAddr, all from include/basic_api/kernel_tensor.h -- is order-independent.
+ */
+
+// A GlobalTensor view over a raw GM pointer.  SetGlobalBuffer re-seats the tensor on exactly the
+// address it is given, which is the address GlobalTensor::GetPhyAddr() hands back to the caller in
+// the first place, so the view denotes the same memory.
+template <typename T, typename GmPtr>
+__aicore__ inline GlobalTensor<T> GmTensorOver(GmPtr gmPtr)
+{
+    GlobalTensor<T> t;
+    t.SetGlobalBuffer(reinterpret_cast<__gm__ PrimT<T>*>(gmPtr));
+    return t;
+}
+
+// A LocalTensor view over a raw UB pointer, of `lenHint` elements.
+//
+// The validated LocalTensor(TPosition, offset, length) constructor is not usable here: on the device
+// build it takes a buffer offset and a raw UB pointer obtained from GetPhyAddr() is exactly that
+// offset, but under ASCENDC_CPU_DEBUG GetPhyAddr() returns an absolute host address and that
+// constructor would add the platform base to it a second time.  A tensor's address is the TBuffAddr
+// it holds, and each build fills the one field its own GetPhyAddr() reads -- bufferAddr on the
+// device, absAddr under ASCENDC_CPU_DEBUG -- so the field is filled from the pointer directly.
+//
+// `lenHint` is the region length this API's own accesses need, not something the caller supplied: a
+// bare pointer carries no length, unlike the LocalTensor the Tensor form is given.  It is in
+// elements.  It only affects the length-dependent debug checks and the tensor's declared size; it
+// takes no part in addressing.  A caller that needs a particular declared length on the workspace
+// must keep using the Tensor form.
+template <typename T, typename UbPtr>
+__aicore__ inline LocalTensor<T> UbTensorOver(UbPtr ubPtr, uint32_t lenHint)
+{
+    TBuffAddr addr;
+    addr.logicPos = static_cast<int8_t>(TPosition::VECCALC);
+    addr.bufferAddr = static_cast<uint32_t>(reinterpret_cast<uint64_t>(ubPtr));
+    addr.bufferHandle = nullptr;
+    addr.dataLen = lenHint * sizeof(PrimT<T>);
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+    addr.absAddr = reinterpret_cast<uint8_t*>(ubPtr);
+#endif
+    LocalTensor<T> t;
+    t.SetAddr(addr);
+    return t;
+}
 }  // namespace CubePtrOverload
 }  // namespace AscendC
 
