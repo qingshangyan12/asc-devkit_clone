@@ -1,0 +1,2 @@
+usage: verify_result.py [-h] output golden
+verify_result.py: error: unrecognized arguments: -scenarioNum ./output/golden.bin
