@@ -15,3 +15,4 @@
 | [simd_simt_hash_table_mte_queue](./simd_simt_hash_table_mte_queue) |  本样例以HashTable插入或更新键值对场景为例，介绍SIMD与SIMT混合编程场景下使用MTE任务队列搬运value向量的性能优化方法。 | Ascend 950PR&950DT系列产品 |
 | [simd_simt_grid_dim_config](./simd_simt_grid_dim_config) |  本样例以Gather计算为例，介绍Ascend C SIMD与SIMT混合编程场景下的gridDim配置和vf函数调用优化思路。 | Ascend 950PR&950DT系列产品 |
 | [simd_simt_integer_fast_div](./simd_simt_integer_fast_div) |  本样例以整数除法为例，展示SIMD与SIMT混合编程场景下针对固定除数使用乘法和移位替代普通除法的指令优化方式。 | Ascend 950PR&950DT系列产品 |
+| [simd_simt_stream_compaction](./simd_simt_stream_compaction) |  本样例以稳定流压缩算子为例，介绍混合编程场景下使用Warp函数替代显式循环，从而加速计算的优化方法。 | Ascend 950PR&950DT系列产品 |
