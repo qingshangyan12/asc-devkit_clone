@@ -181,8 +181,8 @@ __aicore__ inline void Gather(
     const uint32_t srcBaseOffset, const uint32_t count)
 {
     using PrimType = PrimT<T>;
-#if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || \
+                              (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
     ASCENDC_ASSERT(
         (SupportType<PrimType, uint8_t, int8_t, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, int32_t>()), {
             KERNEL_LOG(
@@ -249,8 +249,8 @@ __aicore__ inline void Gather(
  */
 template <typename T, typename U>
 __aicore__ inline void GatherFromGlobal(
-    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LocalTensor<U>& offsetSrc,
-    GatherParams& gatherParam, GatherPadParams<T>& gatherPadParam)
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LocalTensor<U>& offsetSrc, GatherParams& gatherParam,
+    GatherPadParams<T>& gatherPadParam)
 {
     using PrimType = PrimT<T>;
     using OffsetPrimType = PrimT<U>;
@@ -260,9 +260,7 @@ __aicore__ inline void GatherFromGlobal(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ OffsetPrimType*)offsetSrc.GetPhyAddr(), gatherParam, gatherPadParam, cacheMode);
 #else
-    ASCENDC_ASSERT(false, {
-        KERNEL_LOG(KERNEL_ERROR, "GatherFromGlobal is not supported on current device");
-    });
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "GatherFromGlobal is not supported on current device"); });
 #endif
 }
 } // namespace AscendC

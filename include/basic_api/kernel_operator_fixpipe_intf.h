@@ -198,13 +198,13 @@ __aicore__ inline void Fixpipe(
 #elif (__NPU_ARCH__ == 5162)
 // L1->UB,L1
 template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
-__aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src,
-    const FixpipeParamsV516& intriParams);
+__aicore__ inline void Fixpipe(
+    const LocalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsV516& intriParams);
 
 // L1->GM
 template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
-__aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src,
-    const FixpipeParamsV516& intriParams);
+__aicore__ inline void Fixpipe(
+    const GlobalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsV516& intriParams);
 #endif
 } // namespace AscendC
 
