@@ -142,8 +142,8 @@ private:
     u64 outputPtrOffsetIntra_;
 
     double multipleDimensionSplitRatio_{0.5};
-    MultipleDimensionSplitRatioSource multipleDimensionSplitRatioSource_
-        = MultipleDimensionSplitRatioSource::BUILTIN_FORMULA;
+    MultipleDimensionSplitRatioSource multipleDimensionSplitRatioSource_ =
+        MultipleDimensionSplitRatioSource::BUILTIN_FORMULA;
 
     std::vector<std::vector<std::vector<u32>>> vTopo_;
 
