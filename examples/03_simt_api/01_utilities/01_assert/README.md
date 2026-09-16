@@ -4,12 +4,11 @@
 
 本样例演示在SIMT编程下使用`assert()`接口实现上板进行功能调试的方法。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-- \>= CANN 9.1.0
+| 产品 | CANN软件版本 |
+|---|---|
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -101,6 +100,6 @@
   [SIMT] trap check start 2!
   [SIMT] trap check start 3!
   [SIMT] trap check start 3!
-  [ASSERT] xxx/assert.asc:32: void simt_assert(float *, uint32_t): Assertion `in_shape < 1' failed.
-  [ASSERT] xxx/assert.asc:32: void simt_assert(float *, uint32_t): Assertion `in_shape < 1' failed.
+  [ASSERT] xxx/assert.asc:31: void simt_assert(float *, uint32_t): Assertion `in_shape < 1' failed.
+  [ASSERT] xxx/assert.asc:31: void simt_assert(float *, uint32_t): Assertion `in_shape < 1' failed.
   ```

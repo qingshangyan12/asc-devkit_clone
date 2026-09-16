@@ -331,6 +331,10 @@ struct CcuKernelArgBase {
     // std::vector<ChannelHandle> channels;
     ChannelHandle channels[CCU_MAX_RANK_SIZE];
     uint32_t channelCount;
+    // Host 编译 CCU 指令时使用；不序列化为设备 XN 参数。
+    // 框架只保留所有权并透传，具体算法在 dispatch 中解释。
+    uint32_t algSubType = 0;
+    std::shared_ptr<void> algArg;
 };
 
 // ccu kernel register所需信息
@@ -424,6 +428,7 @@ struct AlgResourceRequest {
     std::vector<std::vector<HcclChannelDesc>> channels;
     std::vector<CcuKernelInfo> ccuKernelInfos;
     std::vector<u32> ccuKernelNum;
+    std::vector<ChannelHandle> acquiredChannels;
 };
 
 struct SubCommInfo {

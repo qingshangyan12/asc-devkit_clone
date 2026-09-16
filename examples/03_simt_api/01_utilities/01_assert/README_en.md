@@ -4,12 +4,11 @@
 
 This example demonstrates how to use the `assert()` interface in the SIMT programming model for on-board functional debugging.
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Software Version
-- \>= CANN 9.1.0
+| Products | CANN Versions |
+|---|---|
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -101,6 +100,6 @@ Run the following steps in the root directory of this example to build and execu
   [SIMT] trap check start 2!
   [SIMT] trap check start 3!
   [SIMT] trap check start 3!
-  [ASSERT] xxx/assert.asc:32: void simt_assert(float *, uint32_t): Assertion `in_shape < 1' failed.
-  [ASSERT] xxx/assert.asc:32: void simt_assert(float *, uint32_t): Assertion `in_shape < 1' failed.
+  [ASSERT] xxx/assert.asc:31: void simt_assert(float *, uint32_t): Assertion `in_shape < 1' failed.
+  [ASSERT] xxx/assert.asc:31: void simt_assert(float *, uint32_t): Assertion `in_shape < 1' failed.
   ```
