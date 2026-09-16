@@ -14,7 +14,6 @@
  */
 
 #include "context_builder_impl.h"
-#include <map>
 #include <fstream>
 #include <limits.h>
 #include <stdlib.h>

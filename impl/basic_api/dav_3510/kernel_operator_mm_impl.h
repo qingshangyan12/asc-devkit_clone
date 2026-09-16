@@ -305,9 +305,9 @@ __aicore__ inline void LoadData2DL12L0BTransposeCal(
     }
 }
 
-template <typename T, typename U = T, typename V = fp8_e8m0_t>
+template <typename T, typename U = T>
 __aicore__ inline void LoadData2DL12L0ACal(
-    __ca__ U* dst, __cbuf__ T* src0, __cbuf__ V* src1, const LoadData2DParamsV2& loadDataParam,
+    __ca__ U* dst, __cbuf__ T* src0, __cbuf__ fp8_e8m0_t* src1, const LoadData2DParamsV2& loadDataParam,
     const LoadData2DMxParams& loadMxDataParams)
 {
     static_assert(
@@ -355,9 +355,9 @@ __aicore__ inline void LoadData2DL12L0ACal(
     }
 }
 
-template <typename T, typename U = T, typename V = fp8_e8m0_t>
+template <typename T, typename U = T>
 __aicore__ inline void LoadData2DL12L0BCal(
-    __cb__ U* dst, __cbuf__ T* src0, __cbuf__ V* src1, const LoadData2DParamsV2& loadDataParam,
+    __cb__ U* dst, __cbuf__ T* src0, __cbuf__ fp8_e8m0_t* src1, const LoadData2DParamsV2& loadDataParam,
     const LoadData2DMxParams& loadMxDataParams)
 {
     static_assert(
