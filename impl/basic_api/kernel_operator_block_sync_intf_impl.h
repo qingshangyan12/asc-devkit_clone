@@ -219,6 +219,89 @@ __aicore__ inline void IBWait(
     __ib_wait_stub(blockIdx, eventID, isAIVOnly);
 #endif
 }
+/* **************************************************************************************************
+ * Raw-pointer forms of IBSet / IBWait -- definitions.
+ *
+ * CLASS OF CHANGE: these are NOT "take the address and call the same backend".  The Tensor bodies
+ * above drive the transfer through LocalTensor / GlobalTensor *operations*, and a raw pointer is not
+ * an object that carries them.  What follows is the same body re-expressed on the pointer-level
+ * primitives that those operations themselves reach, i.e. the lowest layer the Tensor path also
+ * ends up in.  The Tensor path and the pointer path therefore do NOT call one function, and
+ * "identical by construction" does not hold; the mapping below is the equivalence argument.
+ *
+ *   Tensor operation                pointer-level primitive used below
+ *   ------------------------------  ------------------------------------------------------------
+ *   gmWorkspace[k]                  gmPtr + k  (element offset).  GlobalTensor::operator[] adds
+ *                                   `offset` to the GM address (kernel_tensor_impl.h:1348-1365);
+ *                                   DEFAULT_BLK_NUM == B32_DATA_NUM_PER_BLOCK == 8
+ *                                   (utils/kernel_utils_constants.h:27,232), so one slot is 8
+ *                                   int32_t == ONE_BLK_SIZE == 32 B, exactly what
+ *                                   DataCopy(..., ONE_BLK_SIZE / sizeof(int32_t)) moves.
+ *   DataCopy(ub, gmSlice, n)        DataCopyGM2UBImpl(ub, gmSlice, params, ExtractCacheMode(gmSlice))
+ *   DataCopy(gmSlice, ub, n)        DataCopyUB2GMImpl(gmSlice, ub, params, ExtractCacheMode(gmSlice))
+ *                                   where `params` is built by the *same* DataCopyCheck<int32_t>(n,
+ *                                   params) helper that the calCount Tensor overload of DataCopy
+ *                                   calls (impl/basic_api/kernel_operator_data_copy_intf_impl.h
+ *                                   :713-734 and :741-750), and ExtractCacheMode is the same
+ *                                   function the Tensor DataCopy applies to its GlobalTensor
+ *                                   operand.  Same helper, same backend, same parameters.
+ *   ubWorkspace.GetValue(0)         CubePtrOverload::UbScalarReadOnCore(ub, 0)
+ *   ubWorkspace.SetValue(0, v)      CubePtrOverload::UbScalarWriteOnCore(ub, 0, v)
+ *   SetFlag / WaitFlag /            unchanged -- already free functions, no tensor operand.
+ *   pipe_barrier / GetTPipePtr
+ *                                   -> FetchEventID
+ *
+ * The two *OnCore helpers apply the "a UB scalar access on AIC does nothing" rule of
+ * LocalTensor<int32_t>::GetValue / ::SetValue (impl/basic_api/kernel_tensor_impl.h:605-619 read,
+ * :677-682 write) on top of the shared CubePtrOverload::UbScalarRead / ::UbScalarWrite primitives.
+ * IBSet / IBWait return early for AIC only on 2201 / 3510, so on the other architectures the Tensor
+ * body does reach that rule and the pointer form reproduces it rather than dropping it.
+ *
+ * What a raw pointer cannot carry, and therefore does not reproduce:
+ *   * the TPosition of each operand.  Both parameters are documented as a GM workspace and a UB
+ *     workspace, so the pointer form casts to __gm__ / __ubuf__ and needs no lookup.
+ *   * an L2 cache hint, which the Tensor path reads from GlobalTensor::address_ via
+ *     ExtractCacheMode.  The pointer form applies ExtractCacheMode to the pointer it was given, so a
+ *     caller who put a hint on the pointer keeps it -- but a pointer obtained from
+ *     GlobalTensor::GetPhyAddr() has the hint bits already masked off on 3510
+ *     (kernel_tensor_impl.h:1079-1086).  Both workspaces here are scratch workspaces whose Tensor
+ *     form is default-constructed, so both paths observe cacheMode 0.
+ * ************************************************************************************************* */
+namespace CubePtrOverload {
+template <typename T>
+__aicore__ inline T UbScalarReadOnCore(__ubuf__ T* addr, uint32_t index)
+{
+    if ASCEND_IS_AIC {
+        return T(0);
+    }
+    return UbScalarRead(addr, index);
+}
+
+template <typename T>
+__aicore__ inline void UbScalarWriteOnCore(__ubuf__ T* addr, uint32_t index, T value)
+{
+    if ASCEND_IS_AIC {
+        return;
+    }
+    UbScalarWrite(addr, index, value);
+}
+}  // namespace CubePtrOverload
+
+template <bool isAIVOnly, typename GmPtr, typename UbPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<GmPtr, UbPtr>::value, bool>::type>
+__aicore__ inline void IBSet(GmPtr gmWorkspace, UbPtr ubWorkspace, int32_t blockIdx, int32_t eventID)
+{
+    IBSet<isAIVOnly>(CubePtrOverload::GmTensorOver<int32_t>(gmWorkspace),
+        CubePtrOverload::UbTensorOver<int32_t>(ubWorkspace, ONE_BLK_SIZE / sizeof(int32_t)), blockIdx, eventID);
+}
+
+template <bool isAIVOnly, typename GmPtr, typename UbPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<GmPtr, UbPtr>::value, bool>::type>
+__aicore__ inline void IBWait(GmPtr gmWorkspace, UbPtr ubWorkspace, int32_t blockIdx, int32_t eventID)
+{
+    IBWait<isAIVOnly>(CubePtrOverload::GmTensorOver<int32_t>(gmWorkspace),
+        CubePtrOverload::UbTensorOver<int32_t>(ubWorkspace, ONE_BLK_SIZE / sizeof(int32_t)), blockIdx, eventID);
+}
 
 /*
  * @ingroup：SyncALL
@@ -236,6 +319,17 @@ __aicore__ inline void SyncAll(
 #else
     SoftSyncAllImpl<isAIVOnly>(
         (__gm__ int32_t*)gmWorkspace.GetPhyAddr(), (__ubuf__ int32_t*)ubWorkspace.GetPhyAddr(), usedCores);
+#endif
+}
+
+template <bool isAIVOnly, typename GmPtr, typename UbPtr,
+    typename Std::enable_if<CubePtrOverload::AnyPtr<GmPtr, UbPtr>::value, bool>::type>
+__aicore__ inline void SyncAll(GmPtr gmWorkspace, UbPtr ubWorkspace, const int32_t usedCores)
+{
+#if ASCENDC_CPU_DEBUG
+    SoftSyncAllImpl<false>((__gm__ int32_t*)gmWorkspace, (__ubuf__ int32_t*)ubWorkspace, usedCores);
+#else
+    SoftSyncAllImpl<isAIVOnly>((__gm__ int32_t*)gmWorkspace, (__ubuf__ int32_t*)ubWorkspace, usedCores);
 #endif
 }
 
