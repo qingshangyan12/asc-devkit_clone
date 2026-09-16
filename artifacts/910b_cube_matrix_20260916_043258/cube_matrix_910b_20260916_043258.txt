@@ -1,0 +1,39 @@
+=== CUBE 910B matrix START 2026-09-16T04:32:58+00:00 ===
+WS=/home/Temp_room/wj_cub_cube_ptr BRANCH=feature/cube-basic-api-pointerization STAMP=20260916_043258 ARCH=dav-2201 DEVICE=7
+ASCEND_HOME_PATH=/home/Temp_room/wj_cub_cube_ptr/cann_local CXX=/home/Temp_room/te_npu_30/tools/bin/g++
+From https://gitcode.com/qq_53202098/asc-devkit
+ * branch                feature/cube-basic-api-pointerization -> FETCH_HEAD
+   d79f77722..a9e0433ec  feature/cube-basic-api-pointerization -> origin/feature/cube-basic-api-pointerization
+Your branch is behind 'origin/feature/cube-basic-api-pointerization' by 1 commit, and can be fast-forwarded.
+  (use "git pull" to update your local branch)
+HEAD is now at a9e0433ec fix(examples): make mmad gen_data work without ml_dtypes for s1
+REPO_HEAD=a9e0433ec @ /home/Temp_room/wj_cub_cube_ptr/helper_repo
+TEST_HEAD=a9e0433ec
+OVERLAY_OK
+==== RUN mmad s1 ====
+DONE mmad s1 verify=PASS
+==== RUN fixpipe_l0c2gm s1 ====
+DONE fixpipe_l0c2gm s1 verify=PASS
+==== RUN load_data_l12l0 s1 ====
+DONE load_data_l12l0 s1 verify=PASS
+==== RUN batch_matmul s1 ====
+DONE batch_matmul s1 verify=PASS
+==== RUN mmad_gemv s1 ====
+DONE mmad_gemv s1 verify=PASS
+# Ascend910B3 CUBE self-test matrix
+
+- HEAD: a9e0433ec
+- ARCH: dav-2201
+- STAMP: 20260916_043258
+
+- verify PASS: **5**
+- FAIL: 0
+
+| case | scenario | arch | build | run | verify | note |
+|---|---|---|---|---|---|---|
+| mmad | 1 | dav-2201 | PASS | PASS | PASS |  |
+| fixpipe_l0c2gm | 1 | dav-2201 | PASS | PASS | PASS |  |
+| load_data_l12l0 | 1 | dav-2201 | PASS | PASS | PASS |  |
+| batch_matmul | 1 | dav-2201 | PASS | PASS | PASS |  |
+| mmad_gemv | 1 | dav-2201 | PASS | PASS | PASS |  |
+bad_rows 0
