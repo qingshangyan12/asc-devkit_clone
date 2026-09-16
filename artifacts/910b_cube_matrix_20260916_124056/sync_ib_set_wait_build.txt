@@ -1,0 +1,36 @@
+-- System processer: aarch64
+-- CMAKE_ASC_COMPILER: /home/Temp_room/cann-9.1.0/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /home/Temp_room/wj_cub_cube_ptr/cann_local/aarch64-linux
+-- CMAKE_ASC_LLD_LINKER: /home/Temp_room/wj_cub_cube_ptr/cann_local/aarch64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 9.5.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /home/Temp_room/te_npu_30/tools/bin/g++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done
+-- Generating done
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_C_COMPILER
+
+
+-- Build files have been written to: /home/Temp_room/wj_cub_cube_ptr/runs_910b/20260916_124056/sync_ib_set_wait/build
+[ 50%] Building ASC object CMakeFiles/demo.dir/ib_set_wait.asc.o
+/home/Temp_room/wj_cub_cube_ptr/runs_910b/20260916_124056/sync_ib_set_wait/ib_set_wait.asc:49:9: error: no matching function for call to 'IBWait'
+        AscendC::IBWait((__gm__ int32_t*)sync_gm.GetPhyAddr(), (__ubuf__ int32_t*)sync_buf.GetPhyAddr(), 0, 0);
+        ^~~~~~~~~~~~~~~
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_block_sync_intf_impl.h:175:24: note: candidate function template not viable: no known conversion from '__gm__ int32_t *' (aka '__gm__ int *') to 'const GlobalTensor<int32_t>' (aka 'const GlobalTensor<int>') for 1st argument
+__aicore__ inline void IBWait(const GlobalTensor<int32_t> &gmWorkspace,
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/runs_910b/20260916_124056/sync_ib_set_wait/ib_set_wait.asc:84:9: error: no matching function for call to 'IBSet'
+        AscendC::IBSet((__gm__ int32_t*)sync_gm.GetPhyAddr(), (__ubuf__ int32_t*)sync_buf.GetPhyAddr(), 0, 0);
+        ^~~~~~~~~~~~~~
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_block_sync_intf_impl.h:134:24: note: candidate function template not viable: no known conversion from '__gm__ int32_t *' (aka '__gm__ int *') to 'const GlobalTensor<int32_t>' (aka 'const GlobalTensor<int>') for 1st argument
+__aicore__ inline void IBSet(const GlobalTensor<int32_t> &gmWorkspace,
+                       ^
+2 errors generated.
+gmake[2]: *** [CMakeFiles/demo.dir/build.make:76: CMakeFiles/demo.dir/ib_set_wait.asc.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:83: CMakeFiles/demo.dir/all] Error 2
+gmake: *** [Makefile:91: all] Error 2

@@ -1,11 +1,12 @@
 # Ascend910B3 CUBE self-test matrix
 
-- HEAD: a9e0433ec
+- HEAD: 333a41011
 - ARCH: dav-2201
-- STAMP: 20260916_043258
+- STAMP: 20260916_124056
+- MODE: smoke
 
-- verify PASS: **5**
-- FAIL: 0
+- verify PASS: **8**
+- FAIL: 3
 
 | case | scenario | arch | build | run | verify | note |
 |---|---|---|---|---|---|---|
@@ -14,3 +15,9 @@
 | load_data_l12l0 | 1 | dav-2201 | PASS | PASS | PASS |  |
 | batch_matmul | 1 | dav-2201 | PASS | PASS | PASS |  |
 | mmad_gemv | 1 | dav-2201 | PASS | PASS | PASS |  |
+| fixpipe_l0c2l1 | 1 | dav-2201 | PASS | PASS | FAIL |  |
+| mmad_load3dv2 | 1 | dav-2201 | BUILD_FAIL | - | - | /home/Temp_room/wj_cub_cube_ptr/runs_910b/20260916_124056/mmad_load3dv2_s1/mmad_load3dv2.asc:217:9: error: no matching f |
+| mmad_unitflag | 1 | dav-2201 | PASS | PASS | PASS |  |
+| mmad_with_sparse | 1 | dav-2201 | PASS | PASS | PASS |  |
+| sync/ib_set_wait | 0 | dav-2201 | BUILD_FAIL | - | - | /home/Temp_room/wj_cub_cube_ptr/runs_910b/20260916_124056/sync_ib_set_wait/ib_set_wait.asc:49:9: error: no matching func |
+| sync/sync_all | 0 | dav-2201 | PASS | PASS | PASS |  |

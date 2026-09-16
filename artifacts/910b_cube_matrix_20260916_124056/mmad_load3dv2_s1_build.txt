@@ -1,0 +1,205 @@
+-- System processer: aarch64
+-- CMAKE_ASC_COMPILER: /home/Temp_room/cann-9.1.0/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /home/Temp_room/wj_cub_cube_ptr/cann_local/aarch64-linux
+-- CMAKE_ASC_LLD_LINKER: /home/Temp_room/wj_cub_cube_ptr/cann_local/aarch64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 9.5.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /home/Temp_room/te_npu_30/tools/bin/g++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- [INFO] SCENARIO_NUM is 1
+-- Configuring done
+-- Generating done
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_C_COMPILER
+
+
+-- Build files have been written to: /home/Temp_room/wj_cub_cube_ptr/runs_910b/20260916_124056/mmad_load3dv2_s1/build
+[ 50%] Building ASC object CMakeFiles/demo.dir/mmad_load3dv2.asc.o
+/home/Temp_room/wj_cub_cube_ptr/runs_910b/20260916_124056/mmad_load3dv2_s1/mmad_load3dv2.asc:217:9: error: no matching function for call to 'LoadData'
+        AscendC::LoadData((__ca__ U*)a2Local.GetPhyAddr(), (__cbuf__ U*)a1Local.GetPhyAddr(), loadDataParams);
+        ^~~~~~~~~~~~~~~~~
+/home/Temp_room/wj_cub_cube_ptr/runs_910b/20260916_124056/mmad_load3dv2_s1/mmad_load3dv2.asc:107:13: note: in instantiation of member function 'KernelMmad<half, float, 30, 70, 40, false, false>::SplitALoad3Dv2' requested here
+            SplitALoad3Dv2(a1Local, a2Local);
+            ^
+/home/Temp_room/wj_cub_cube_ptr/runs_910b/20260916_124056/mmad_load3dv2_s1/mmad_load3dv2.asc:371:12: note: in instantiation of member function 'KernelMmad<half, float, 30, 70, 40, false, false>::Process' requested here
+        op.Process();
+           ^
+/home/Temp_room/wj_cub_cube_ptr/runs_910b/20260916_124056/mmad_load3dv2_s1/mmad_load3dv2.asc:441:5: note: in instantiation of function template specialization 'mmad_custom<30U, 70U, 40U>' requested here
+    mmad_custom<M, N, K><<<numBlocks, 0, stream>>>(aDevice, bDevice, cDevice);
+    ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:33:24: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData2DParams' for 3rd argument
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParams)
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:39:24: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData2DParams' for 3rd argument
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParams)
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:45:24: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData2DParamsV2' for 3rd argument
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParams)
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:51:24: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData2DParamsV2' for 3rd argument
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParams)
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:257:45: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData2DParams' for 3rd argument
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+                                            ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:264:45: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData2DParams' for 3rd argument
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+                                            ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:271:45: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData2DParams' for 3rd argument
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+                                            ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:278:45: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData2DParamsV2' for 3rd argument
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+                                            ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:285:45: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData2DParamsV2' for 3rd argument
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+                                            ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:292:45: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData2DParamsV2' for 3rd argument
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+                                            ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:353:24: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData3DParamsV2Pro' for 3rd argument
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2Pro& loadDataParams)
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:359:24: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData3DParamsV2Pro' for 3rd argument
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2Pro& loadDataParams)
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:365:24: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData3DParamsV2Pro' for 3rd argument
+__aicore__ inline void LoadData(__ubuf__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2Pro& loadDataParams)
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_base_impl.h:322:1: note: candidate template ignored: couldn't infer template argument 'defaultConfig'
+LoadData(
+^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_intf_impl.h:49:24: note: candidate template ignored: could not match 'LocalTensor<T>' against '__ca__ float *'
+__aicore__ inline void LoadData(
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_intf_impl.h:61:45: note: candidate template ignored: could not match 'LocalTensor<T>' against '__ca__ float *'
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+                                            ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_intf_impl.h:99:24: note: candidate template ignored: could not match 'LocalTensor<T>' against '__ca__ float *'
+__aicore__ inline void LoadData(
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_intf_impl.h:120:45: note: candidate template ignored: could not match 'LocalTensor<T>' against '__ca__ float *'
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+                                            ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_intf_impl.h:161:24: note: candidate template ignored: could not match 'LocalTensor<T>' against '__ca__ float *'
+__aicore__ inline void LoadData(
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_intf_impl.h:209:24: note: candidate template ignored: could not match 'LocalTensor<T>' against '__ca__ float *'
+__aicore__ inline void LoadData(
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_intf_impl.h:283:24: note: candidate template ignored: could not match 'LocalTensor<T>' against '__ca__ float *'
+__aicore__ inline void LoadData(
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:62:24: note: candidate template ignored: requirement 'IsSameType<float, half>::value' was not satisfied [with T = float, defaultConfig = AscendC::IS_RESER_LOAD3D_DEFAULT_CONFIG, U = half]
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams)
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:76:24: note: candidate template ignored: requirement 'IsSameType<float, half>::value' was not satisfied [with T = float, defaultConfig = AscendC::IS_RESER_LOAD3D_DEFAULT_CONFIG, U = half]
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams)
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:313:24: note: candidate template ignored: could not match 'LoadData3DParamsV1' against 'LoadData3DParamsV2'
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV1<U>& loadDataParams)
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:327:24: note: candidate template ignored: could not match 'LoadData3DParamsV1' against 'LoadData3DParamsV2'
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV1<U>& loadDataParams)
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:341:24: note: candidate template ignored: could not match 'LoadData3DParamsV1' against 'LoadData3DParamsV2'
+__aicore__ inline void LoadData(__ubuf__ T* dst, __cbuf__ T* src, const LoadData3DParamsV1<U>& loadDataParams)
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/runs_910b/20260916_124056/mmad_load3dv2_s1/mmad_load3dv2.asc:285:9: error: no matching function for call to 'LoadData'
+        AscendC::LoadData((__cb__ U*)b2Local.GetPhyAddr(), (__cbuf__ U*)b1Local.GetPhyAddr(), loadDataParams);
+        ^~~~~~~~~~~~~~~~~
+/home/Temp_room/wj_cub_cube_ptr/runs_910b/20260916_124056/mmad_load3dv2_s1/mmad_load3dv2.asc:114:13: note: in instantiation of member function 'KernelMmad<half, float, 30, 70, 40, false, false>::SplitBTransposeLoad3Dv2' requested here
+            SplitBTransposeLoad3Dv2(b1Local, b2Local);
+            ^
+/home/Temp_room/wj_cub_cube_ptr/runs_910b/20260916_124056/mmad_load3dv2_s1/mmad_load3dv2.asc:371:12: note: in instantiation of member function 'KernelMmad<half, float, 30, 70, 40, false, false>::Process' requested here
+        op.Process();
+           ^
+/home/Temp_room/wj_cub_cube_ptr/runs_910b/20260916_124056/mmad_load3dv2_s1/mmad_load3dv2.asc:441:5: note: in instantiation of function template specialization 'mmad_custom<30U, 70U, 40U>' requested here
+    mmad_custom<M, N, K><<<numBlocks, 0, stream>>>(aDevice, bDevice, cDevice);
+    ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:33:24: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData2DParams' for 3rd argument
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParams)
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:39:24: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData2DParams' for 3rd argument
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParams)
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:45:24: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData2DParamsV2' for 3rd argument
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParams)
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:51:24: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData2DParamsV2' for 3rd argument
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParams)
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:257:45: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData2DParams' for 3rd argument
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+                                            ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:264:45: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData2DParams' for 3rd argument
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+                                            ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:271:45: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData2DParams' for 3rd argument
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+                                            ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:278:45: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData2DParamsV2' for 3rd argument
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+                                            ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:285:45: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData2DParamsV2' for 3rd argument
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+                                            ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:292:45: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData2DParamsV2' for 3rd argument
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+                                            ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:353:24: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData3DParamsV2Pro' for 3rd argument
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2Pro& loadDataParams)
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:359:24: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData3DParamsV2Pro' for 3rd argument
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2Pro& loadDataParams)
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:365:24: note: candidate function template not viable: no known conversion from 'AscendC::LoadData3DParamsV2<half>' to 'const AscendC::LoadData3DParamsV2Pro' for 3rd argument
+__aicore__ inline void LoadData(__ubuf__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2Pro& loadDataParams)
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_base_impl.h:322:1: note: candidate template ignored: couldn't infer template argument 'defaultConfig'
+LoadData(
+^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_intf_impl.h:49:24: note: candidate template ignored: could not match 'LocalTensor<T>' against '__cb__ float *'
+__aicore__ inline void LoadData(
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_intf_impl.h:61:45: note: candidate template ignored: could not match 'LocalTensor<T>' against '__cb__ float *'
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+                                            ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_intf_impl.h:99:24: note: candidate template ignored: could not match 'LocalTensor<T>' against '__cb__ float *'
+__aicore__ inline void LoadData(
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_intf_impl.h:120:45: note: candidate template ignored: could not match 'LocalTensor<T>' against '__cb__ float *'
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+                                            ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_intf_impl.h:161:24: note: candidate template ignored: could not match 'LocalTensor<T>' against '__cb__ float *'
+__aicore__ inline void LoadData(
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_intf_impl.h:209:24: note: candidate template ignored: could not match 'LocalTensor<T>' against '__cb__ float *'
+__aicore__ inline void LoadData(
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_intf_impl.h:283:24: note: candidate template ignored: could not match 'LocalTensor<T>' against '__cb__ float *'
+__aicore__ inline void LoadData(
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:62:24: note: candidate template ignored: requirement 'IsSameType<float, half>::value' was not satisfied [with T = float, defaultConfig = AscendC::IS_RESER_LOAD3D_DEFAULT_CONFIG, U = half]
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams)
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:76:24: note: candidate template ignored: requirement 'IsSameType<float, half>::value' was not satisfied [with T = float, defaultConfig = AscendC::IS_RESER_LOAD3D_DEFAULT_CONFIG, U = half]
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams)
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:313:24: note: candidate template ignored: could not match 'LoadData3DParamsV1' against 'LoadData3DParamsV2'
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV1<U>& loadDataParams)
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:327:24: note: candidate template ignored: could not match 'LoadData3DParamsV1' against 'LoadData3DParamsV2'
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV1<U>& loadDataParams)
+                       ^
+/home/Temp_room/wj_cub_cube_ptr/cann_local/asc/include/basic_api/../../impl/basic_api/kernel_operator_mm_ptr_impl.h:341:24: note: candidate template ignored: could not match 'LoadData3DParamsV1' against 'LoadData3DParamsV2'
+__aicore__ inline void LoadData(__ubuf__ T* dst, __cbuf__ T* src, const LoadData3DParamsV1<U>& loadDataParams)
+                       ^
+2 errors generated.
+gmake[2]: *** [CMakeFiles/demo.dir/build.make:76: CMakeFiles/demo.dir/mmad_load3dv2.asc.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:83: CMakeFiles/demo.dir/all] Error 2
+gmake: *** [Makefile:91: all] Error 2
