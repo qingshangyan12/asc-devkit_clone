@@ -8,7 +8,6 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
-
 cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, sim")
@@ -19,16 +18,7 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    compare_reg_api.asc
-)
-
-set(ASCEND_HOME "$ENV{ASCEND_HOME_PATH}")
-set(ASC_INCLUDE_DIR "${ASCEND_HOME}/asc/")
-include_directories(
-    "${ASC_INCLUDE_DIR}"
-)
-
-target_link_libraries(demo PRIVATE
+    compare.asc
 )
 
 message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
@@ -48,4 +38,5 @@ target_compile_definitions(demo PRIVATE
 
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
+    $<$<AND:$<COMPILE_LANGUAGE:ASC>,$<BOOL:${CANN_ASC_USE_EXPERIMENTAL}>>:-DCANN_ASC_USE_EXPERIMENTAL>
 )
