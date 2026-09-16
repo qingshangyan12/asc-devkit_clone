@@ -39,6 +39,7 @@ template <uint32_t kThreadCount, uint32_t kBucketCols>
 __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
     __ubuf__ half* output_ub, __ubuf__ const half* input_ub, uint32_t row_count, uint32_t cols)
 {
+    // 每个线程分到的元素个数，为编译期常量。
     constexpr uint32_t kWarpIterations = (kBucketCols + WARP_SIZE - 1) / WARP_SIZE;
     const uint32_t row_in_tile = threadIdx.x / WARP_SIZE;
     const uint32_t thread_in_warp = threadIdx.x % WARP_SIZE;
@@ -46,20 +47,25 @@ __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
         return;
     }
 
+    // tile内每行按kBucketCols的步长存放，真实数据之外的余量空置。
     const uint32_t row_offset = row_in_tile * kBucketCols;
+    // 定长数组：长度和访问下标均为编译期常量，可驻留寄存器。
     float elements[kWarpIterations];
 
+    // 一轮读入线程分到的元素，尾部无效列用-inf屏蔽，不参与后续计算。
     for (uint32_t iter = 0; iter < kWarpIterations; ++iter) {
         const uint32_t col = thread_in_warp + iter * WARP_SIZE;
         elements[iter] = col < cols ? static_cast<float>(input_ub[row_offset + col]) : -ASCRT_INF_F;
     }
 
+    // 在寄存器上完成max，再经Warp归约得到行最大值。
     float max_value = elements[0];
     for (uint32_t iter = 1; iter < kWarpIterations; ++iter) {
         max_value = max(max_value, elements[iter]);
     }
     max_value = asc_reduce_max(max_value);
 
+    // exp只计算一次，结果写回数组复用，并经Warp归约得到行指数和。
     float sum_value = 0.0F;
     for (uint32_t iter = 0; iter < kWarpIterations; ++iter) {
         elements[iter] = __expf(elements[iter] - max_value);
@@ -67,6 +73,7 @@ __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
     }
     sum_value = asc_reduce_add(sum_value);
 
+    // 归一化写回，只处理真实cols内的列。
     for (uint32_t iter = 0; iter < kWarpIterations; ++iter) {
         const uint32_t col = thread_in_warp + iter * WARP_SIZE;
         output_ub[row_offset + col] = static_cast<half>(elements[iter] / sum_value);
