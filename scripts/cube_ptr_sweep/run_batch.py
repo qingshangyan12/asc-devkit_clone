@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""CUBE ptr sweep: group by (api, scenario), compile once, run many MNK (all_ok style).
+"""CUBE ptr sweep: group by (api, scenario), compile once, continuous multi-MNK.
+
+One ./demo process per unit runs many shapes (I/O under m{M}n{N}k{K}/).
+gendata is once per shape and reused across retries / re-runs if present.
 
 Env:
   CUBE_ARCH / CMAKE_ASC_ARCHITECTURES, CUBE_SRC, RUN_ROOT, CXX, CMAKE_ASC_FLAGS,
@@ -183,34 +186,53 @@ def _size_block_loaddata():
 """
 
 
+def _io_paths_decl():
+    return """
+    char p_x1[320], p_x2[320], p_out[320], p_bias[320], p_quant[320];
+    snprintf(p_x1, sizeof(p_x1), "m%un%uk%u/input/x1_gm.bin", M, N, K);
+    snprintf(p_x2, sizeof(p_x2), "m%un%uk%u/input/x2_gm.bin", M, N, K);
+    snprintf(p_out, sizeof(p_out), "m%un%uk%u/output/output.bin", M, N, K);
+    snprintf(p_bias, sizeof(p_bias), "m%un%uk%u/input/bias_gm.bin", M, N, K);
+    snprintf(p_quant, sizeof(p_quant), "m%un%uk%u/input/quant_pre.bin", M, N, K);
+"""
+
+
 def gen_main(api, shapes):
-    """Generate batch main: ./demo M N K [M N K ...]"""
+    """Generate batch main: one process, many MNK (subdir m{M}n{N}k{K}/)."""
     tries = []
     for m, n, k in shapes:
-        tries.append("    if (M == %du && N == %du && K == %du) return run_one<%du, %du, %du>(stream);" % (m, n, k, m, n, k))
+        tries.append(
+            "    if (M == %du && N == %du && K == %du) return run_one<%du, %du, %du>(stream);"
+            % (m, n, k, m, n, k)
+        )
     dispatch = "\n".join(tries) if tries else "    (void)M; (void)N; (void)K;"
+    paths = _io_paths_decl()
 
     if api == "mmad":
         size_blk = _size_block_mmad()
-        run_one = """
+        run_one = (
+            """
 template <uint32_t M, uint32_t N, uint32_t K>
 static int run_one(aclrtStream stream) {
-""" + size_blk + """
+"""
+            + size_blk
+            + paths
+            + """
     uint32_t numBlocks = 1;
     uint8_t *aHost=nullptr,*aDevice=nullptr,*bHost=nullptr,*bDevice=nullptr;
     uint8_t *biasHost=nullptr,*biasDevice=nullptr,*cHost=nullptr,*cDevice=nullptr;
     aclrtMallocHost((void**)(&aHost), aFileSize);
     aclrtMalloc((void**)&aDevice, aFileSize, ACL_MEM_MALLOC_HUGE_FIRST);
-    ReadFile("./input/x1_gm.bin", aFileSize, aHost, aFileSize);
+    ReadFile(p_x1, aFileSize, aHost, aFileSize);
     aclrtMemcpy(aDevice, aFileSize, aHost, aFileSize, ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMallocHost((void**)(&bHost), bFileSize);
     aclrtMalloc((void**)&bDevice, bFileSize, ACL_MEM_MALLOC_HUGE_FIRST);
-    ReadFile("./input/x2_gm.bin", bFileSize, bHost, bFileSize);
+    ReadFile(p_x2, bFileSize, bHost, bFileSize);
     aclrtMemcpy(bDevice, bFileSize, bHost, bFileSize, ACL_MEMCPY_HOST_TO_DEVICE);
     if constexpr (HAS_BIAS_TENSOR) {
         aclrtMallocHost((void**)(&biasHost), biasFileSize);
         aclrtMalloc((void**)&biasDevice, biasFileSize, ACL_MEM_MALLOC_HUGE_FIRST);
-        ReadFile("./input/bias_gm.bin", biasFileSize, biasHost, biasFileSize);
+        ReadFile(p_bias, biasFileSize, biasHost, biasFileSize);
         aclrtMemcpy(biasDevice, biasFileSize, biasHost, biasFileSize, ACL_MEMCPY_HOST_TO_DEVICE);
     }
     aclrtMallocHost((void**)(&cHost), cFileSize);
@@ -218,7 +240,7 @@ static int run_one(aclrtStream stream) {
     mmad_custom<M, N, K><<<numBlocks, 0, stream>>>(aDevice, bDevice, biasDevice, cDevice);
     aclrtSynchronizeStream(stream);
     aclrtMemcpy(cHost, cFileSize, cDevice, cFileSize, ACL_MEMCPY_DEVICE_TO_HOST);
-    WriteFile("./output/output.bin", cHost, cFileSize);
+    WriteFile(p_out, cHost, cFileSize);
     printf("SHAPE=%u,%u,%u done\\n", M, N, K);
     aclrtFree(aDevice); aclrtFreeHost(aHost);
     aclrtFree(bDevice); aclrtFreeHost(bHost);
@@ -227,36 +249,40 @@ static int run_one(aclrtStream stream) {
     return 0;
 }
 """
-        launch_name = "mmad"
+        )
     elif api == "fixpipe":
         size_blk = _size_block_fixpipe()
-        run_one = """
+        run_one = (
+            """
 template <uint32_t M, uint32_t N, uint32_t K>
 static int run_one(aclrtStream stream) {
-""" + size_blk + """
+"""
+            + size_blk
+            + paths
+            + """
     uint32_t numBlocks = 1;
     uint8_t *aHost=nullptr,*aDevice=nullptr,*bHost=nullptr,*bDevice=nullptr;
     uint8_t *cHost=nullptr,*cDevice=nullptr,*quantAlphaHost=nullptr,*quantAlphaDevice=nullptr;
     aclrtMallocHost((void**)(&aHost), aFileSize);
     aclrtMalloc((void**)&aDevice, aFileSize, ACL_MEM_MALLOC_HUGE_FIRST);
-    ReadFile("./input/x1_gm.bin", aFileSize, aHost, aFileSize);
+    ReadFile(p_x1, aFileSize, aHost, aFileSize);
     aclrtMemcpy(aDevice, aFileSize, aHost, aFileSize, ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMallocHost((void**)(&bHost), bFileSize);
     aclrtMalloc((void**)&bDevice, bFileSize, ACL_MEM_MALLOC_HUGE_FIRST);
-    ReadFile("./input/x2_gm.bin", bFileSize, bHost, bFileSize);
+    ReadFile(p_x2, bFileSize, bHost, bFileSize);
     aclrtMemcpy(bDevice, bFileSize, bHost, bFileSize, ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMallocHost((void**)(&cHost), cFileSize);
     aclrtMalloc((void**)&cDevice, cFileSize, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMallocHost((void**)(&quantAlphaHost), quantAlphaSize);
     aclrtMalloc((void**)&quantAlphaDevice, quantAlphaSize, ACL_MEM_MALLOC_HUGE_FIRST);
     if constexpr (SCENARIO_NUM == 5) {
-        ReadFile("./input/quant_pre.bin", quantAlphaSize, quantAlphaHost, quantAlphaSize);
+        ReadFile(p_quant, quantAlphaSize, quantAlphaHost, quantAlphaSize);
     }
     aclrtMemcpy(quantAlphaDevice, quantAlphaSize, quantAlphaHost, quantAlphaSize, ACL_MEMCPY_HOST_TO_DEVICE);
     fixpipe_l0c2gm<M, K, N><<<numBlocks, 0, stream>>>(aDevice, bDevice, cDevice, quantAlphaDevice);
     aclrtSynchronizeStream(stream);
     aclrtMemcpy(cHost, cFileSize, cDevice, cFileSize, ACL_MEMCPY_DEVICE_TO_HOST);
-    WriteFile("./output/output.bin", cHost, cFileSize);
+    WriteFile(p_out, cHost, cFileSize);
     printf("SHAPE=%u,%u,%u done\\n", M, N, K);
     aclrtFree(aDevice); aclrtFreeHost(aHost);
     aclrtFree(bDevice); aclrtFreeHost(bHost);
@@ -265,30 +291,34 @@ static int run_one(aclrtStream stream) {
     return 0;
 }
 """
-        launch_name = "fixpipe"
-    else:  # load_data — __CUBE_LOAD_KERNEL__ replaced in replace_main
+        )
+    else:
         size_blk = _size_block_loaddata()
-        run_one = """
+        run_one = (
+            """
 template <uint32_t M, uint32_t N, uint32_t K>
 static int run_one(aclrtStream stream) {
-""" + size_blk + """
+"""
+            + size_blk
+            + paths
+            + """
     uint32_t numBlocks = 1;
     uint8_t *aHost=nullptr,*aDevice=nullptr,*bHost=nullptr,*bDevice=nullptr;
     uint8_t *cHost=nullptr,*cDevice=nullptr;
     aclrtMallocHost((void**)(&aHost), aFileSize);
     aclrtMalloc((void**)&aDevice, aFileSize, ACL_MEM_MALLOC_HUGE_FIRST);
-    ReadFile("./input/x1_gm.bin", aFileSize, aHost, aFileSize);
+    ReadFile(p_x1, aFileSize, aHost, aFileSize);
     aclrtMemcpy(aDevice, aFileSize, aHost, aFileSize, ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMallocHost((void**)(&bHost), bFileSize);
     aclrtMalloc((void**)&bDevice, bFileSize, ACL_MEM_MALLOC_HUGE_FIRST);
-    ReadFile("./input/x2_gm.bin", bFileSize, bHost, bFileSize);
+    ReadFile(p_x2, bFileSize, bHost, bFileSize);
     aclrtMemcpy(bDevice, bFileSize, bHost, bFileSize, ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMallocHost((void**)(&cHost), cFileSize);
     aclrtMalloc((void**)&cDevice, cFileSize, ACL_MEM_MALLOC_HUGE_FIRST);
     __CUBE_LOAD_KERNEL__<M, N, K><<<numBlocks, 0, stream>>>(aDevice, bDevice, cDevice);
     aclrtSynchronizeStream(stream);
     aclrtMemcpy(cHost, cFileSize, cDevice, cFileSize, ACL_MEMCPY_DEVICE_TO_HOST);
-    WriteFile("./output/output.bin", cHost, cFileSize);
+    WriteFile(p_out, cHost, cFileSize);
     printf("SHAPE=%u,%u,%u done\\n", M, N, K);
     aclrtFree(aDevice); aclrtFreeHost(aHost);
     aclrtFree(bDevice); aclrtFreeHost(bHost);
@@ -296,7 +326,7 @@ static int run_one(aclrtStream stream) {
     return 0;
 }
 """
-        launch_name = "load_data"
+        )
 
     main = """
 #include <cstdio>
@@ -324,23 +354,13 @@ int32_t main(int32_t argc, char* argv[])
     int nTriples = (argc > 1) ? ((argc - 1) / 3) : 0;
     int allOk = 1;
     if (nTriples <= 0) {
-#ifndef CASE_M
-#define CASE_M 32
-#endif
-#ifndef CASE_N
-#define CASE_N 32
-#endif
-#ifndef CASE_K
-#define CASE_K 32
-#endif
-        if (dispatch_shape(CASE_M, CASE_N, CASE_K, stream) != 0) allOk = 0;
+        printf("usage: ./demo M N K [M N K ...]\\n");
+        allOk = 0;
     } else {
         for (int i = 0; i < nTriples; i++) {
             uint32_t M = (uint32_t)atoi(argv[1 + i * 3 + 0]);
             uint32_t N = (uint32_t)atoi(argv[1 + i * 3 + 1]);
             uint32_t K = (uint32_t)atoi(argv[1 + i * 3 + 2]);
-            // per-shape: caller stages input/output for single triple runs;
-            // multi-triple in one process expects pre-staged last shape only — runner uses 1 triple.
             if (dispatch_shape(M, N, K, stream) != 0) allOk = 0;
         }
     }
@@ -349,8 +369,11 @@ int32_t main(int32_t argc, char* argv[])
     aclFinalize();
     return allOk ? 0 : 1;
 }
-""" % (run_one, dispatch)
-    return main, launch_name
+""" % (
+        run_one,
+        dispatch,
+    )
+    return main, api
 
 
 def replace_main(asc_path, api, shapes):
@@ -424,11 +447,14 @@ def chunked(seq, n):
         yield seq[i : i + n]
 
 
+def shape_dir_name(M, N, K):
+    return "m%un%uk%u" % (int(M), int(N), int(K))
+
+
 def build_group(api, sc, shapes, build_root):
-    key = "%s_s%s_n%d" % (api, sc, len(shapes))
-    # include shape fingerprint for cache correctness
+    # iov2: multi-shape I/O under m{M}n{N}k{K}/ — bust old flat-input demo cache
     sig = "_".join("%dx%dx%d" % t for t in shapes[:3])
-    key = "%s_s%s_%d_%s" % (api, sc, len(shapes), sig.replace("x", ""))
+    key = "iov2_%s_s%s_%d_%s" % (api, sc, len(shapes), sig.replace("x", ""))
     bin_dir = os.path.join(build_root, "_bin", key)
     demo_cached = os.path.join(bin_dir, "demo")
     if os.path.isfile(demo_cached):
@@ -488,89 +514,160 @@ def append_summary(path, line):
             f.write(line + "\n")
 
 
-def run_one_case(case, demo, summary_path, note_how):
-    api = case["api"]
-    cid = case["case_id"]
-    dtype = case["dtype"]
-    M, N, K = int(case["M"]), int(case["N"]), int(case["K"])
-    sc = int(case["scenario"])
-    work = os.path.join(RUN_ROOT, cid)
-    if os.path.isdir(work):
-        shutil.rmtree(work)
-    os.makedirs(os.path.join(work, "input"), exist_ok=True)
-    os.makedirs(os.path.join(work, "output"), exist_ok=True)
-    # need scripts from sample
-    src = sample_dir(api)
-    for sub in ("scripts",):
-        s = os.path.join(src, sub)
-        if os.path.isdir(s):
-            shutil.copytree(s, os.path.join(work, sub))
-    # copy data_utils / headers if demo needs relative includes? demo is binary — only input/output matter
-    shutil.copy2(demo, os.path.join(work, "demo"))
-    os.chmod(os.path.join(work, "demo"), 0o755)
-
-    env = os.environ.copy()
-    glog = os.path.join(work, "gendata.log")
+def _gen_shape_data(api, sc, M, N, K, shape_work, scripts_dir, env):
+    """Generate input/golden once under shape_work; skip if already present."""
+    inp = os.path.join(shape_work, "input")
+    outp = os.path.join(shape_work, "output")
+    os.makedirs(inp, exist_ok=True)
+    os.makedirs(outp, exist_ok=True)
+    marker = os.path.join(inp, "x1_gm.bin")
+    golden = os.path.join(outp, "golden.bin")
+    if os.path.isfile(marker) and os.path.isfile(golden):
+        return True, "REUSE"
+    gen_py = os.path.join(scripts_dir, "gen_data.py")
+    glog = os.path.join(shape_work, "gendata.log")
     rc, _ = sh(
-        '"%s" scripts/gen_data.py -scenarioNum %s -M %s -N %s -K %s' % (PY, sc, M, N, K),
-        cwd=work,
+        '"%s" "%s" -scenarioNum %s -M %s -N %s -K %s' % (PY, gen_py, sc, M, N, K),
+        cwd=shape_work,
         log_path=glog,
         env=env,
         timeout=120,
     )
-    if rc != 0 or not os.listdir(os.path.join(work, "input")):
-        append_summary(
-            summary_path,
-            "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tGENDATA_FAIL\t-\t-\t" % (api, cid, ARCH, dtype, M, N, K, sc),
-        )
-        print("DONE", cid, "gendata=FAIL", flush=True)
+    if rc != 0 or not os.path.isfile(marker):
+        return False, "GENDATA_FAIL"
+    return True, "GEN"
+
+
+def _verify_shape(sc, M, N, K, shape_work, scripts_dir, env):
+    vpy = os.path.join(scripts_dir, "verify_result.py")
+    out_bin = os.path.join(shape_work, "output", "output.bin")
+    if not os.path.isfile(out_bin):
+        return "FAIL"
+    if not os.path.isfile(vpy):
+        return "SKIP"
+    vlog = os.path.join(shape_work, "verify.log")
+    vrc, _ = sh(
+        '"%s" "%s" -scenarioNum %s -M %s -N %s -K %s ./output/output.bin ./output/golden.bin'
+        % (PY, vpy, sc, M, N, K),
+        cwd=shape_work,
+        log_path=vlog,
+        env=env,
+        timeout=120,
+    )
+    ok = vrc == 0
+    if not ok and os.path.isfile(vlog):
+        ok = "test pass" in open(vlog, encoding="utf-8", errors="replace").read().lower()
+    return "PASS" if ok else "FAIL"
+
+
+def run_unit(api, sc, cases, shapes, demo, summary_path, note_how, unit_idx):
+    """One process: gen each shape once (reuse if present), ./demo continuous, verify."""
+    work = os.path.join(RUN_ROOT, "_run", "u%d_%s_s%s" % (unit_idx, api, sc))
+    os.makedirs(work, exist_ok=True)
+    src = sample_dir(api)
+    scripts_dst = os.path.join(work, "scripts")
+    if not os.path.isdir(scripts_dst):
+        s = os.path.join(src, "scripts")
+        if os.path.isdir(s):
+            shutil.copytree(s, scripts_dst)
+    shutil.copy2(demo, os.path.join(work, "demo"))
+    os.chmod(os.path.join(work, "demo"), 0o755)
+
+    env = os.environ.copy()
+    by_shape = OrderedDict()
+    for c in cases:
+        t = (int(c["M"]), int(c["N"]), int(c["K"]))
+        by_shape.setdefault(t, []).append(c)
+
+    ready_shapes = []
+    for t in shapes:
+        M, N, K = t
+        sdir = os.path.join(work, shape_dir_name(M, N, K))
+        ok, how = _gen_shape_data(api, sc, M, N, K, sdir, scripts_dst, env)
+        if not ok:
+            for c in by_shape.get(t, []):
+                append_summary(
+                    summary_path,
+                    "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tGENDATA_FAIL\t-\t-\t"
+                    % (api, c["case_id"], ARCH, c["dtype"], M, N, K, sc),
+                )
+                print("DONE", c["case_id"], "gendata=FAIL", flush=True)
+            continue
+        ready_shapes.append(t)
+        if how == "REUSE":
+            print("GENDATA_REUSE", shape_dir_name(M, N, K), flush=True)
+
+    if not ready_shapes:
         return
 
+    args = " ".join("%d %d %d" % t for t in ready_shapes)
     rlog = os.path.join(work, "run.log")
-    vstr = "FAIL"
-    for _try in range(3):
-        rc, _ = sh("./demo %d %d %d" % (M, N, K), cwd=work, log_path=rlog, env=env, timeout=120)
-        out_bin = os.path.join(work, "output", "output.bin")
-        if rc != 0 or not os.path.isfile(out_bin):
+    timeout = max(120, 30 * len(ready_shapes))
+    print("RUN_CONT", api, "s%s" % sc, "shapes", len(ready_shapes), flush=True)
+    rc, _ = sh("./demo %s" % args, cwd=work, log_path=rlog, env=env, timeout=timeout)
+    run_ok = rc == 0
+
+    for t in ready_shapes:
+        M, N, K = t
+        sdir = os.path.join(work, shape_dir_name(M, N, K))
+        out_bin = os.path.join(sdir, "output", "output.bin")
+        clist = by_shape.get(t, [])
+        if not run_ok and not os.path.isfile(out_bin):
+            for c in clist:
+                append_summary(
+                    summary_path,
+                    "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tPASS\tRUN_FAIL\t-\texit=%s"
+                    % (api, c["case_id"], ARCH, c["dtype"], M, N, K, sc, rc),
+                )
+                print("DONE", c["case_id"], "run=FAIL", flush=True)
+            continue
+
+        vstr = "FAIL"
+        for _try in range(3):
+            if _try > 0:
+                try:
+                    if os.path.isfile(out_bin):
+                        os.remove(out_bin)
+                except OSError:
+                    pass
+                trc, _ = sh(
+                    "./demo %d %d %d" % (M, N, K),
+                    cwd=work,
+                    log_path=os.path.join(sdir, "run_retry.log"),
+                    env=env,
+                    timeout=120,
+                )
+                if trc != 0 or not os.path.isfile(out_bin):
+                    vstr = "FAIL"
+                    break
+            vstr = _verify_shape(sc, M, N, K, sdir, scripts_dst, env)
+            if vstr in ("PASS", "SKIP"):
+                break
+
+        if not os.path.isfile(out_bin) and vstr == "FAIL":
+            for c in clist:
+                append_summary(
+                    summary_path,
+                    "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tPASS\tRUN_FAIL\t-\tretry"
+                    % (api, c["case_id"], ARCH, c["dtype"], M, N, K, sc),
+                )
+                print("DONE", c["case_id"], "run=FAIL", flush=True)
+            continue
+
+        for i, c in enumerate(clist):
+            note = note_how if i == 0 else (note_how + "_SHAREdata")
             append_summary(
                 summary_path,
-                "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tPASS\tRUN_FAIL\t-\texit=%s"
-                % (api, cid, ARCH, dtype, M, N, K, sc, rc),
+                "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tPASS\tPASS\t%s\t%s"
+                % (api, c["case_id"], ARCH, c["dtype"], M, N, K, sc, vstr, note),
             )
-            print("DONE", cid, "run=FAIL", flush=True)
-            return
-        vpy = os.path.join(work, "scripts", "verify_result.py")
-        if os.path.isfile(vpy):
-            vlog = os.path.join(work, "verify.log")
-            golden = os.path.join(work, "output", "golden.bin")
-            vrc, _ = sh(
-                '"%s" scripts/verify_result.py -scenarioNum %s -M %s -N %s -K %s ./output/output.bin ./output/golden.bin'
-                % (PY, sc, M, N, K),
-                cwd=work,
-                log_path=vlog,
-                env=env,
-                timeout=120,
+            print(
+                "DONE",
+                c["case_id"],
+                "verify=%s" % vstr,
+                "device=%s" % env.get("ASCEND_DEVICE_ID", ""),
+                flush=True,
             )
-            ok = vrc == 0
-            if not ok and os.path.isfile(vlog):
-                ok = "test pass" in open(vlog, encoding="utf-8", errors="replace").read().lower()
-            if ok:
-                vstr = "PASS"
-                break
-            try:
-                os.remove(out_bin)
-            except OSError:
-                pass
-        else:
-            vstr = "SKIP"
-            break
-
-    append_summary(
-        summary_path,
-        "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tPASS\tPASS\t%s\t%s"
-        % (api, cid, ARCH, dtype, M, N, K, sc, vstr, note_how),
-    )
-    print("DONE", cid, "verify=%s" % vstr, "device=%s" % env.get("ASCEND_DEVICE_ID", ""), flush=True)
 
 
 def main():
@@ -579,23 +676,13 @@ def main():
     cases = load_cases(smoke)
     print("SELECTED", len(cases), "smoke" if smoke else "full", "ARCH", ARCH, "CHUNK", CHUNK, flush=True)
 
-    # group (api, scenario) then chunk shapes
     groups = OrderedDict()
     for c in cases:
         gk = (c["api"], int(c["scenario"]))
         groups.setdefault(gk, []).append(c)
 
-    units = []  # (api, sc, cases_chunk, shapes)
+    units = []
     for (api, sc), clist in groups.items():
-        # unique shapes preserve order
-        seen = set()
-        shapes = []
-        for c in clist:
-            t = (int(c["M"]), int(c["N"]), int(c["K"]))
-            if t not in seen:
-                seen.add(t)
-                shapes.append(t)
-        # map shape -> cases
         by_shape = OrderedDict()
         for c in clist:
             t = (int(c["M"]), int(c["N"]), int(c["K"]))
@@ -605,7 +692,7 @@ def main():
             sub_cases = []
             for t in ch:
                 sub_cases.extend(by_shape[t])
-            units.append((api, sc, sub_cases, ch))
+            units.append((api, sc, sub_cases, list(ch)))
 
     print("BATCH_UNITS", len(units), "from_groups", len(groups), "cases", len(cases), flush=True)
 
@@ -618,22 +705,21 @@ def main():
     if not devices:
         devices = [os.environ.get("ASCEND_DEVICE_ID", "0")]
 
-    # Build all units first (parallel limited)
     demos = {}
     build_workers = min(4, max(1, len(units)))
     with ThreadPoolExecutor(max_workers=build_workers) as ex:
         futs = {
-            ex.submit(build_group, api, sc, shapes, RUN_ROOT): (api, sc, shapes, sub)
-            for api, sc, sub, shapes in units
+            ex.submit(build_group, api, sc, shapes, RUN_ROOT): (ui, api, sc, shapes, sub)
+            for ui, (api, sc, sub, shapes) in enumerate(units)
         }
         for fut in as_completed(futs):
-            api, sc, shapes, sub = futs[fut]
+            ui, api, sc, shapes, sub = futs[fut]
             demo, how = fut.result()
-            demos[(api, sc, tuple(shapes))] = (demo, how, sub)
+            demos[ui] = (demo, how, api, sc, shapes, sub)
 
-    # Run cases: assign device round-robin
-    run_list = []
-    for (api, sc, shapes), (demo, how, sub) in demos.items():
+    run_units = []
+    for ui in sorted(demos.keys()):
+        demo, how, api, sc, shapes, sub = demos[ui]
         if demo is None:
             for c in sub:
                 append_summary(
@@ -652,32 +738,26 @@ def main():
                     ),
                 )
             continue
-        for c in sub:
-            run_list.append((c, demo, how))
+        run_units.append((ui, api, sc, sub, shapes, demo, how))
 
-    def _run_idx(item_idx):
-        c, demo, how = run_list[item_idx]
+    def _run_unit_idx(item_idx):
+        ui, api, sc, sub, shapes, demo, how = run_units[item_idx]
         dev = devices[item_idx % len(devices)]
-        env_dev = os.environ.copy()
-        env_dev["ASCEND_DEVICE_ID"] = str(dev)
-        # temporarily set for child
         old = os.environ.get("ASCEND_DEVICE_ID")
         os.environ["ASCEND_DEVICE_ID"] = str(dev)
         try:
-            run_one_case(c, demo, summary, how + "_BATCH")
+            run_unit(api, sc, sub, shapes, demo, summary, how + "_CONT", ui)
         finally:
             if old is None:
                 os.environ.pop("ASCEND_DEVICE_ID", None)
             else:
                 os.environ["ASCEND_DEVICE_ID"] = old
 
-    # Limit concurrency to number of devices (1 case per device)
     with ThreadPoolExecutor(max_workers=len(devices)) as ex:
-        futs = [ex.submit(_run_idx, i) for i in range(len(run_list))]
+        futs = [ex.submit(_run_unit_idx, i) for i in range(len(run_units))]
         for f in as_completed(futs):
             f.result()
 
-    # summary stats
     body = open(summary, encoding="utf-8").read().splitlines()[1:]
     ok = sum(1 for ln in body if ln.split("\t")[10:11] == ["PASS"])
     fail = sum(
@@ -693,7 +773,7 @@ def main():
     print("BATCH_DONE ok=%d fail=%d total=%d units=%d" % (ok, fail, len(body), len(units)), flush=True)
     md = os.path.join(RUN_ROOT, "SELFTEST_SWEEP.md")
     open(md, "w", encoding="utf-8").write(
-        "# CUBE ptr sweep (batch)\n\n- ARCH: %s\n- verify PASS: **%d**\n- FAIL: %d\n- total: %d\n- units: %d\n"
+        "# CUBE ptr sweep (batch continuous)\n\n- ARCH: %s\n- verify PASS: **%d**\n- FAIL: %d\n- total: %d\n- units: %d\n"
         % (ARCH, ok, fail, len(body), len(units))
     )
 
