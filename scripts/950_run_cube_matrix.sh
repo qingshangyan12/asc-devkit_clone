@@ -161,9 +161,11 @@ run_case() {
   set +e
   if [ -n "$M" ] && [ -n "$N" ] && [ -n "$K" ]; then
     $PY scripts/gen_data.py -scenarioNum "$scenario" -M "$M" -N "$N" -K "$K" >"$glog" 2>&1 || \
+      $PY scripts/gen_data.py "-scenarioNum=$scenario" -M "$M" -N "$N" -K "$K" >"$glog" 2>&1 || \
       $PY scripts/gen_data.py -scenarioNum "$scenario" >"$glog" 2>&1
   else
     $PY scripts/gen_data.py -scenarioNum "$scenario" >"$glog" 2>&1 || \
+      $PY scripts/gen_data.py "-scenarioNum=$scenario" >"$glog" 2>&1 || \
       $PY scripts/gen_data.py >>"$glog" 2>&1
   fi
   set -e

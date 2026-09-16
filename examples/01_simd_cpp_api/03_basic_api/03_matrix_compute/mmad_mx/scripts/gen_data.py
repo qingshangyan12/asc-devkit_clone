@@ -195,11 +195,24 @@ def gen_golden_data_fp8(scenario_num, m, n, k):
 
 
 if __name__ == "__main__":
-    m, n, k = 40, 50, 70
+    import argparse
 
-    scenario_num = 1
-    if len(sys.argv) > 1:
-        scenario_num = int(sys.argv[1].split("=")[1])
+    m, n, k = 40, 50, 70
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 5))
+    parser.add_argument("-M", type=int, default=m)
+    parser.add_argument("-N", type=int, default=n)
+    parser.add_argument("-K", type=int, default=k)
+    # legacy: -scenarioNum=1
+    if len(sys.argv) > 1 and "=" in sys.argv[1] and not sys.argv[1].startswith("-scenarioNum"):
+        pass
+    args, _ = parser.parse_known_args()
+    # also accept bare -scenarioNum=N as single token
+    for a in sys.argv[1:]:
+        if a.startswith("-scenarioNum="):
+            args.scenarioNum = int(a.split("=", 1)[1])
+    scenario_num = args.scenarioNum
+    m, n, k = args.M, args.N, args.K
 
     if scenario_num in [1, 2]:
         gen_golden_data_fp4(scenario_num, m, n, k)
