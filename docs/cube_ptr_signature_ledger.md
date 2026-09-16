@@ -3,6 +3,8 @@
 任务：`09-AscendC-Basic-API-CUBE` · tip 以 fork 分支 HEAD 为准  
 硬件主路径：Ascend950PR / CANN 9.1.0 / `dav-3510`
 
+English: [cube_ptr_signature_ledger_en.md](./cube_ptr_signature_ledger_en.md)
+
 说明：官方腾讯文档共 **21 API / 61 签名**；本表按源码入口归档改造状态。  
 `P`=已加指针重载 · `T`=保留 Tensor · `S`=架构跳过 · `D`=底层 Cal 仍吃 Tensor/依赖 Position · `N`=未覆盖
 
@@ -41,9 +43,10 @@
 | ID | 结果 |
 |----|------|
 | C-01~C-06 核心三刀 | PASS |
-| E 组 / 3D / Mx / Fill | 待 950 补测 |
+| E-Fixpipe L1/UB | PASS |
+| B-Load3DV2 S4 / MX S3 | PASS |
 
 ## 关联
 
-- PR：https://gitcode.com/cann/asc-devkit/merge_requests/6109
+- PR：https://gitcode.com/cann/asc-devkit/merge_requests/6111
 - Issue：#1685 #1686
