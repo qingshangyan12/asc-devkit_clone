@@ -99,7 +99,7 @@ namespace AscendC {
         vector_bool preg0;                                                                        \
         plds(preg0, ((__ubuf__ uint32_t*)tempBuf), 0, US);                                        \
         vector_bool preg1;                                                                        \
-        uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.src0BlkStride)) << 16);     \
+        uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.src0BlkStride)) << 16);  \
         uint32_t strideConfig1 = ((static_cast<uint32_t>(repeatParams.src1BlkStride)) << 16);     \
         uint32_t blockElm = ONE_BLK_SIZE / sizeof(half);                                          \
         for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {                        \
@@ -274,7 +274,7 @@ namespace AscendC {
         dataType0 vreg0;                                                                         \
         uint32_t sreg = static_cast<uint32_t>(mask);                                             \
         vector_bool preg0 = plt_b16(sreg, POST_UPDATE);                                          \
-        vector_bool preg1;                                                                       \
+        vector_bool preg1;  \
         uint32_t strideConfig0 = (static_cast<uint32_t>(repeatParams.srcBlkStride) << 16);       \
         uint32_t blockElm = ONE_BLK_SIZE / sizeof(uint16_t);                                     \
         for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {                       \
@@ -341,7 +341,7 @@ namespace AscendC {
         dataType vreg0;                                                        \
         dataType vreg2;                                                        \
         vector_bool preg0;                                                     \
-        uint32_t sreg = static_cast<uint32_t>(count);                          \
+        uint32_t sreg = static_cast<uint32_t>(count);  \
         vector_bool preg1;                                                     \
         vector_bool preg2;                                                     \
         vector_bool preg3;                                                     \

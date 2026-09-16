@@ -217,7 +217,7 @@ __aicore__ inline bool RingBufferWait(
     constexpr uint32_t maxCounter = 15;
     volatile uint32_t counter = 0;
     while (writeInfo->bufOffset < readInfo->bufOffset && writeInfo->bufOffset + tlvLen >= readInfo->bufOffset) {
-        if (counter >= maxCounter) { // max wait 300ms, rts read gm per 200ms
+        if (counter >= maxCounter) {  // max wait 300ms, rts read gm per 200ms
             return false;
         }
         RingBufferWaitRtsSync(); // wait 20 ms

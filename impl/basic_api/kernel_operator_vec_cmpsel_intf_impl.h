@@ -264,6 +264,7 @@ __aicore__ inline void SetCmpMask(const LocalTensor<T>& src)
 /* **************************************************************************************************
  * Compares                                           *
  * ************************************************************************************************* */
+
 /*
  * @ingroup Compare Level 0
  * @brief Compare the size of a tensor and a scalar one by one. If true, the corresponding bit is 1, otherwise it is 0
@@ -564,6 +565,7 @@ __aicore__ inline void Select(
 }
 
 // ================================
+
 /*
  * @ingroup Select Level 0
  * @brief Select element according to the bit value of sel
@@ -661,6 +663,7 @@ __aicore__ inline void Select(
 /* **************************************************************************************************
  * Compares                                           *
  * ************************************************************************************************* */
+
 /*
  * @ingroup Compare Level 0
  * @brief Compare the size of a tensor and a scalar one by one. If true, the corresponding bit is 1, otherwise it is 0
@@ -934,6 +937,7 @@ __aicore__ inline void Select(
 #endif
     SelectCommon<T1, isSetMask, config>(dst, selMask, src0, src1, selMode, mask, repeatTime, repeatParams);
 }
+
 
 // select mode: 1
 /*
