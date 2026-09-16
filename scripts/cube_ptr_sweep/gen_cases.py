@@ -7,7 +7,7 @@ from itertools import product
 from pathlib import Path
 
 SEED = 20260916
-DIMS = (16, 32, 48, 64, 80)
+DIMS = (16, 32, 48, 64, 80, 96)
 PER_API = 200
 OUT_DIR = Path(__file__).resolve().parent
 
@@ -25,7 +25,7 @@ def k_ok(dtype: str, k: int) -> bool:
 def shapes_for(dtype: str) -> list[tuple[int, int, int]]:
     out = []
     for m, n, k in product(DIMS, DIMS, DIMS):
-        if max(m, n, k) > 80:
+        if max(m, n, k) > 96:
             continue
         if m % 16 or n % 16 or k % 16:
             continue
@@ -38,9 +38,15 @@ def shapes_for(dtype: str) -> list[tuple[int, int, int]]:
 
 
 def pick(pool: list[dict], n: int, rng: random.Random) -> list[dict]:
-    if len(pool) < n:
-        raise SystemExit(f"pool too small: {len(pool)} < {n}")
-    return rng.sample(pool, n)
+    if not pool:
+        raise SystemExit("empty pool")
+    if len(pool) >= n:
+        return rng.sample(pool, n)
+    # 合法 shape 不足时允许重复（case_id 仍唯一）
+    out = list(pool)
+    while len(out) < n:
+        out.append(dict(rng.choice(pool)))
+    return out
 
 
 def mmad_pool() -> list[dict]:
