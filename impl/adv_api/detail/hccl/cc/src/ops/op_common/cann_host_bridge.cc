@@ -13,6 +13,7 @@
 
 #include <memory>
 #include <string>
+#include <cstring>
 
 #include "log.h"
 #include "executor_v2_base.h"
@@ -141,6 +142,14 @@ const CannSyms& LoadCannSyms()
 
 bool UseCannBridge(const OpParam& param)
 {
+    // These PCIe AllReduce executors are implemented in mc2_client and must not
+    // be looked up through the host-side CANN bridge, including forced-algorithm
+    // resource validation.
+    if (param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE &&
+        (std::strcmp(param.algName, "AicpuAllreduceParallelMeshNHRPcie") == 0 ||
+         std::strcmp(param.algName, "AicpuAllReducePipeLinePcie") == 0)) {
+        return false;
+    }
     return (param.engine == COMM_ENGINE_AICPU_TS || param.engine == COMM_ENGINE_AICPU) &&
            (param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV || param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE);
 }
