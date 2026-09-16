@@ -3017,29 +3017,6 @@ __aicore__ inline __inout_pipe__(V) void DataCopy(
             "DataCopy from LocalTensor(UB(CO2)) to LocalTensor(CO1) with DataCopyEnhancedParams",
             GetPositionDisplay(GetDmaOperandPosition(src)));
     }
-    const uint8_t cacheMode = ExtractCacheMode(dst);
-    if constexpr (IsDmaPosRuntime<SrcT>) {
-        const Hardware srcHWPos = GetPhyType(GetDmaOperandPosition(src));
-        if (srcHWPos == Hardware::UB) {
-            DataCopyPadUB2GMImpl<PrimType, mode>(
-                (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), dataCopyParams,
-                cacheMode);
-        } else {
-            ASCENDC_CHECK_TPOSITION(
-                false, "src", "UB(VECIN/VECOUT)", "DataCopyPad from LocalTensor to GlobalTensor",
-                GetPositionDisplay(GetDmaOperandPosition(src)));
-        }
-    } else {
-        if constexpr (DmaHardwarePosV<SrcT> == Hardware::UB) {
-            DataCopyPadUB2GMImpl<PrimType, mode>(
-                (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), dataCopyParams,
-                cacheMode);
-        } else {
-            static_assert(
-                DmaHardwarePosV<SrcT> == Hardware::UB || DmaHardwarePosV<SrcT> == Hardware::L1,
-                "DataCopyPad src->GM: src pointer must be UB or L1");
-        }
-    }
 }
 
 // UB / L1 -> GM, DataCopyExtParams form.
