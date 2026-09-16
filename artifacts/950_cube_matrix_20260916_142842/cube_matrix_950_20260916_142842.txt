@@ -1,0 +1,41 @@
+=== CUBE 950 matrix START 2026-09-16T14:28:42+00:00 ===
+WS=/home/Temp_room/wj_cub_cube_ptr_950 BRANCH=feature/cube-basic-api-pointerization STAMP=20260916_142842 ARCH=dav-3510
+ASCEND_HOME_PATH=/usr/local/Ascend/cann-9.1.0 CXX=/usr/bin/g++
+Cloning into '/home/Temp_room/wj_cub_cube_ptr_950/helper_repo'...
+From https://gitcode.com/baibai_Uu/asc-devkit
+ * branch                feature/cube-basic-api-pointerization -> FETCH_HEAD
+Your branch is up to date with 'origin/feature/cube-basic-api-pointerization'.
+HEAD is now at 17ebcc8fd Add Ascend910B3 CUBE matrix 20260916_134216 MODE=full GREEN
+REPO_HEAD=17ebcc8fd @ /home/Temp_room/wj_cub_cube_ptr_950/helper_repo
+TEST_HEAD=17ebcc8fd
+patched /usr/local/Ascend/cann-9.1.0/asc/impl/basic_api/kernel_operator_mm_intf_impl.h
+patched /usr/local/Ascend/cann-9.1.0/asc/impl/basic_api/kernel_operator_fixpipe_intf_impl.h
+OVERLAY_OK
+PY=/usr/bin/python3.10 (numpy 1.21.5)
+==== RUN mmad s1 ====
+DONE mmad s1 verify=PASS
+==== RUN fixpipe_l0c2gm s1 ====
+DONE fixpipe_l0c2gm s1 verify=PASS
+==== RUN load_data_2dv2_l12l0 s1 ====
+DONE load_data_2dv2_l12l0 s1 verify=PASS
+==== RUN batch_matmul s1 ====
+DONE batch_matmul s1 verify=PASS
+==== RUN mmad_gemv s1 ====
+DONE mmad_gemv s1 verify=PASS
+# Ascend950 CUBE self-test matrix
+
+- HEAD: 17ebcc8fd
+- ARCH: dav-3510
+- STAMP: 20260916_142842
+
+- verify PASS: **5**
+- FAIL: 0
+
+| case | scenario | arch | build | run | verify | note |
+|---|---|---|---|---|---|---|
+| mmad | 1 | dav-3510 | PASS | PASS | PASS |  |
+| fixpipe_l0c2gm | 1 | dav-3510 | PASS | PASS | PASS |  |
+| load_data_2dv2_l12l0 | 1 | dav-3510 | PASS | PASS | PASS |  |
+| batch_matmul | 1 | dav-3510 | PASS | PASS | PASS |  |
+| mmad_gemv | 1 | dav-3510 | PASS | PASS | PASS |  |
+bad_rows 0
