@@ -44,9 +44,8 @@ struct KfcAllGatherMesh1DMem2MemContext : CcuKernelCtxBase {
 
     ccu::Variable constVar1;
     ccu::Variable repeatTimeFlag;
-    ccu::Variable remoteRepeatTimeFlag;
     ccu::Variable waitRepeatNum;
-    ccu::Variable localCopyRepeatNum;
+    ccu::Variable groupCopyRepeatNum;
     ccu::Variable sliceSize;
     ccu::LocalAddr src;
     std::vector<ccu::RemoteAddr> dst;
@@ -77,7 +76,6 @@ static CcuResult InitResource(KfcAllGatherMesh1DMem2MemContext& ctx)
     ctx.events.resize(AG_M2M_UNROLL_NUM * eventNumPerIter);
     ctx.constVar1 = 1;
     ctx.repeatTimeFlag = 0;
-    ctx.remoteRepeatTimeFlag = 0;
     ctx.resourceAllocated = false;
     return CCU_SUCCESS;
 }
@@ -199,18 +197,17 @@ static CcuResult DoAllGatherGroupCopy(KfcAllGatherMesh1DMem2MemContext& ctx)
 {
     CCU_IF(ctx.isInputOutputEqual == 0)
     {
-        for (uint32_t unrollIdx = 0; unrollIdx < AG_M2M_UNROLL_NUM; ++unrollIdx) {
-            CCU_IF(ctx.localCopyRepeatNum != UINT64_MAX)
+        CCU_IF(ctx.groupCopyRepeatNum != UINT64_MAX)
+        {
+            ctx.repeatTimeFlag = 0;
+            CCU_WHILE(ctx.groupCopyRepeatNum != UINT64_MAX)
             {
-                ctx.localCopyRepeatNum += ctx.constVar1;
+                ctx.groupCopyRepeatNum += ctx.constVar1;
                 CCU_IF(ctx.repeatTimeFlag != 0)
                 {
                     ctx.localDst.addr += ctx.outputRepeatStride;
                     ctx.srcLocCopy.addr += ctx.inputRepeatStride;
                 }
-                // Same as hccl: GroupCopy chunks the slice by goSize and its
-                // loop body waits on its own chunk events, so no external
-                // event wait is needed here.
                 CCU_CHK_RET(GroupCopy(ctx, ctx.localDst, ctx.srcLocCopy, ctx.goSize));
                 ctx.repeatTimeFlag = 1;
             }
@@ -222,47 +219,37 @@ static CcuResult DoAllGatherGroupCopy(KfcAllGatherMesh1DMem2MemContext& ctx)
 static CcuResult DoRepeatAllGather(KfcAllGatherMesh1DMem2MemContext& ctx)
 {
     CCU_CHK_RET(InitAllGatherAddr(ctx));
+    ctx.waitRepeatNum = ctx.tmpRepeatNum;
+    ctx.groupCopyRepeatNum = ctx.tmpRepeatNum;
     ctx.repeatTimeFlag = 0;
-    ctx.remoteRepeatTimeFlag = 0;
 
-    // One event set contains AG_M2M_UNROLL_NUM groups.  A queue entry may
-    // carry more repeats, so consume it in batches and reuse the event set
-    // only after every group in the current batch has been waited on.
-    CCU_WHILE(ctx.tmpRepeatNum != UINT64_MAX)
+    CCU_IF(ctx.tmpRepeatNum != UINT64_MAX)
     {
-        ctx.waitRepeatNum = ctx.tmpRepeatNum;
-        ctx.localCopyRepeatNum = ctx.tmpRepeatNum;
+        ctx.tmpRepeatNum += ctx.constVar1;
+        CCU_CHK_RET(DoAllGatherWrite(ctx, ctx.src, ctx.dst, ctx.normalSliceSize, 0));
+    }
 
-        // Phase 1: issue at most one event group per unrolled repeat.
-        for (uint32_t unrollIdx = 0; unrollIdx < AG_M2M_UNROLL_NUM; ++unrollIdx) {
-            CCU_IF(ctx.tmpRepeatNum != UINT64_MAX)
-            {
-                CCU_IF(ctx.remoteRepeatTimeFlag != 0)
-                {
-                    ctx.src.addr += ctx.inputRepeatStride;
-                    for (uint32_t rankIdx = 0; rankIdx < ctx.rankSize; ++rankIdx) {
-                        if (rankIdx != ctx.rankId) {
-                            ctx.dst[rankIdx].addr += ctx.outputRepeatStride;
-                        }
-                    }
+    for (uint32_t unrollIdx = 1; unrollIdx < AG_M2M_UNROLL_NUM; ++unrollIdx) {
+        CCU_IF(ctx.tmpRepeatNum != UINT64_MAX)
+        {
+            ctx.tmpRepeatNum += ctx.constVar1;
+            ctx.src.addr += ctx.inputRepeatStride;
+            for (uint32_t rankIdx = 0; rankIdx < ctx.rankSize; ++rankIdx) {
+                if (rankIdx != ctx.rankId) {
+                    ctx.dst[rankIdx].addr += ctx.outputRepeatStride;
                 }
-                ctx.tmpRepeatNum += ctx.constVar1;
-                CCU_CHK_RET(DoAllGatherWrite(ctx, ctx.src, ctx.dst, ctx.normalSliceSize, unrollIdx));
-                ctx.remoteRepeatTimeFlag = 1;
             }
+            CCU_CHK_RET(DoAllGatherWrite(ctx, ctx.src, ctx.dst, ctx.normalSliceSize, unrollIdx));
         }
+    }
 
-        // Phase 2: copy this rank's slice locally while remote writes are in flight.
-        CCU_CHK_RET(DoAllGatherGroupCopy(ctx));
+    CCU_CHK_RET(DoAllGatherGroupCopy(ctx));
 
-        // Phase 3: wait before the corresponding event group is reused by
-        // the next batch.
-        for (uint32_t unrollIdx = 0; unrollIdx < AG_M2M_UNROLL_NUM; ++unrollIdx) {
-            CCU_IF(ctx.waitRepeatNum != UINT64_MAX)
-            {
-                ctx.waitRepeatNum += ctx.constVar1;
-                CCU_CHK_RET(DoAllGatherWait(ctx, unrollIdx));
-            }
+    for (uint32_t unrollIdx = 0; unrollIdx < AG_M2M_UNROLL_NUM; ++unrollIdx) {
+        CCU_IF(ctx.waitRepeatNum != UINT64_MAX)
+        {
+            ctx.waitRepeatNum += ctx.constVar1;
+            CCU_CHK_RET(DoAllGatherWait(ctx, unrollIdx));
         }
     }
 
