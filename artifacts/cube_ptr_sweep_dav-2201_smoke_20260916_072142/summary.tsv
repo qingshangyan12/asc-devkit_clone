@@ -1,0 +1,25 @@
+api	case_id	arch	dtype	M	N	K	scenario	build	run	verify	note
+mmad	mmad_001_int8_m48n48k64_s1	dav-2201	int8	48	48	64	1	PASS	PASS	PASS	
+mmad	mmad_003_bf16_m64n32k96_s2	dav-2201	bf16	64	32	96	2	PASS	PASS	PASS	
+mmad	mmad_002_fp32_m80n48k48_s3	dav-2201	fp32	80	48	48	3	PASS	PASS	PASS	
+mmad	mmad_006_int4_m64n80k64_s4	dav-2201	int4	64	80	64	4	PASS	PASS	PASS	
+mmad	mmad_022_int8_m48n64k96_s1	dav-2201	int8	48	64	96	1	PASS	PASS	PASS	
+mmad	mmad_004_bf16_m32n32k80_s2	dav-2201	bf16	32	32	80	2	PASS	PASS	PASS	
+mmad	mmad_005_fp32_m80n16k32_s3	dav-2201	fp32	80	16	32	3	PASS	PASS	PASS	
+mmad	mmad_009_int4_m64n64k32_s4	dav-2201	int4	64	64	32	4	PASS	PASS	PASS	
+load_data	load_data_015_int4_m32n48k96_s1	dav-2201	int4	32	48	96	1	PASS	PASS	PASS	
+load_data	load_data_001_int8_m64n80k32_s1	dav-2201	int8	64	80	32	3	PASS	PASS	PASS	
+load_data	load_data_003_half_m16n64k48_s3	dav-2201	half	16	64	48	6	PASS	PASS	PASS	
+load_data	load_data_002_fp32_m32n32k80_s5	dav-2201	fp32	32	32	80	11	PASS	PASS	PASS	
+load_data	load_data_020_int4_m64n96k64_s1	dav-2201	int4	64	96	64	1	PASS	PASS	PASS	
+load_data	load_data_010_int8_m96n16k32_s1	dav-2201	int8	96	16	32	3	PASS	PASS	PASS	
+load_data	load_data_006_half_m16n64k16_s3	dav-2201	half	16	64	16	6	PASS	PASS	PASS	
+load_data	load_data_004_fp32_m48n64k80_s5	dav-2201	fp32	48	64	80	11	PASS	PASS	PASS	
+fixpipe	fixpipe_001_fp32_m32n32k32_s1	dav-2201	fp32	32	32	32	1	PASS	PASS	PASS	
+fixpipe	fixpipe_076_fp32_m32n32k32_s6	dav-2201	fp32	32	32	32	6	PASS	PASS	PASS	
+fixpipe	fixpipe_151_fp32_m32n32k32_s7	dav-2201	fp32	32	32	32	7	PASS	PASS	PASS	
+fixpipe	fixpipe_002_fp32_m32n32k64_s1	dav-2201	fp32	32	32	64	1	PASS	PASS	PASS	
+fixpipe	fixpipe_077_fp32_m32n32k64_s6	dav-2201	fp32	32	32	64	6	PASS	PASS	PASS	
+fixpipe	fixpipe_152_fp32_m32n32k64_s7	dav-2201	fp32	32	32	64	7	PASS	PASS	PASS	
+fixpipe	fixpipe_003_fp32_m32n32k96_s1	dav-2201	fp32	32	32	96	1	PASS	PASS	PASS	
+fixpipe	fixpipe_078_fp32_m32n32k96_s6	dav-2201	fp32	32	32	96	6	PASS	PASS	PASS	
