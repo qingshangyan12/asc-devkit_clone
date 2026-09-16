@@ -16,6 +16,7 @@
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 #include "ccu_temp_kfc_all_gather_mesh_1D_mem2mem.h"
 #include "ccu_temp_kfc_all_gather_nhr_1D_multi_jetty_mem2mem.h"
+#include "../template/ccu/kernel/ccu_kernel_kfc_all_gather_mesh1d_mem2mem.h"
 #endif
 #include "topo_match_pcie_mix.h"
 #include "alg_data_trans_wrapper.h"
