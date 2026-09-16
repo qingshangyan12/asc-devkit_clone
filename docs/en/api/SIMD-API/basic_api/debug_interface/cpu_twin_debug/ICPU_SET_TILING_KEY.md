@@ -29,7 +29,7 @@ None
 
 ## Constraints<a name="zh-cn_topic_0000002000279997_zh-cn_topic_0000001610028277_section794123819592"></a>
 
-- To preserve API compatibility, it is recommended to compile with [<<<>>>](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/Debugging and Tuning/Function Debugging/CPU Domain Twin Debugging.md).
+- To preserve API compatibility, it is recommended to compile with [<<<>>>](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/Debugging and Tuning/Function Debugging/CPU Domain Twin Debugging.md).
 - It is recommended to pass a positive integer for **tilingKey**. If it is set to a negative number or 0, a warning is issued and debugging continues. If 0 is passed, the branch with **tilingKey** 0 is executed; passing a negative number for **tilingKey** results in undefined behavior.
 - This API must be called before [ICPU_RUN_KF](ICPU_RUN_KF.md).
 

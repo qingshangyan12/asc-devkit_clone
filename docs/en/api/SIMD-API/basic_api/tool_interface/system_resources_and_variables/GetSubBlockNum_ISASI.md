@@ -30,7 +30,7 @@
 
 The header file path is `"basic_api/kernel_operator_sys_var_intf.h"`.
 
-In the [separate-mode architecture](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md), obtains the number of Cube Cores (AIC) or Vector Cores (AIV) on a logical AI Core in the current configuration.
+In the [separate-mode architecture](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md), obtains the number of Cube Cores (AIC) or Vector Cores (AIV) on a logical AI Core in the current configuration.
 
 ## Prototype
 
@@ -44,7 +44,7 @@ None
 
 ## Return Value
 
-In the fusion compilation scenario, the return values of calling this API on AIC and AIV for different [operator types](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md#section1074418132518) are as follows:
+In the fusion compilation scenario, the return values of calling this API on AIC and AIV for different [operator types](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md#section1074418132518) are as follows:
 
 **Table 1** Return values in the fusion compilation scenario
 
@@ -57,7 +57,7 @@ In the fusion compilation scenario, the return values of calling this API on AIC
 | Mix operator | \_\_mix\_\_(1, 1) | 1 | 1 |
 | Mix operator | \_\_mix\_\_(1, 2) | 1 | 2 |
 
-In the custom operator project and Kernel direct invocation project scenarios, the return values of calling this API on AIC and AIV for different Kernel types (set through [Setting the Kernel Type](../../Kernel-Tiling/Setting the Kernel Type.md)) are as follows:
+In the custom operator project and Kernel direct invocation project scenarios, the return values of calling this API on AIC and AIV for different Kernel types (set through [Setting the Kernel Type](../../Kernel-Tiling/set_kernel_type.md)) are as follows:
 
 **Table 2** Return values in the custom operator project and Kernel direct invocation project scenarios
 

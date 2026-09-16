@@ -36,13 +36,13 @@ The results of cube computation are stored in the L0C Buffer. The Fixpipe API is
 The following figure shows the valid combinations, intermediate data types, and data paths of inline quantization, inline ReLU, inline format conversion, inline channel split, and inline channel merge. In the figure, F32-\>F16 and F32-\>BF16 are non-quantization modes that perform only Cast, while the rest are inline scalar/tensor quantization modes.
 
 <!-- npu="A3,910b" id11 -->
-**Figure 1** L0C2GM flowchart ([NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md))<a id="zh-cn_topic_0000002542828493_fig542810249417"></a>  
+**Figure 1** L0C2GM flowchart ([NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md))<a id="zh-cn_topic_0000002542828493_fig542810249417"></a>  
 
 ![](../../../../figures/L0C2GM_Function_Combination.png)
 <!-- end id11 -->
 
 <!-- npu="950" id13 -->
-**Figure 2** L0C2GM flowchart ([NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md))<a id="zh-cn_topic_0000002542828493_fig542810249613"></a>  
+**Figure 2** L0C2GM flowchart ([NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md))<a id="zh-cn_topic_0000002542828493_fig542810249613"></a>  
 
 ![](../../../../figures/L0C2GM_Function_Combination_950.png)
 <!-- end id13 -->
@@ -269,7 +269,7 @@ None
 ## Example<a id="zh-cn_topic_0000002542828493_section088124295117"></a>
 
 <!-- npu="950,A3,910b" id30 -->
-For the complete Fixpipe sample, see [fixpipe\_l0c2gm sample](https://gitcode.com/cann/asc-devkit/tree/9.1.0/examples/01_simd_cpp_api/03_basic_api/03_cube_compute/fixpipe_l0c2gm).
+For the complete Fixpipe sample, see [fixpipe\_l0c2gm sample](https://gitcode.com/cann/asc-devkit/tree/9.1.0/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2gm).
 
 - Example: path L0C Buffer-\>GM. The input matrices A and B are of the half data type, and the output cube C is of the float data type, with NZ2ND format conversion enabled.
 

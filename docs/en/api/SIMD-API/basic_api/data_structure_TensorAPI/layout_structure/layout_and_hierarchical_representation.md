@@ -42,7 +42,7 @@ Each element in Stride corresponds to an element in Shape, indicating the interv
 
 ## Common Layout Fractals
 
-In cube programming scenarios based on Ascend C, the following common layouts are used. These formats are all expressed using the hierarchical representation introduced above, which requires two layers of matrices: an inner layer and an outer layer. The specific expression is as follows, where _x is the abbreviated form of `Std::Int<x>`. For example, _16 represents the type Std::Int<16>, with the value 16 stored in the type:
+In cube programming scenarios based on Ascend C, the following common layouts are used. These formats are all expressed using the hierarchical representation introduced above, which requires two layers of matrices: an inner layer and an outer layer. The specific expression is as follows, where _x is the abbreviated form of Std::Int<x>. For example, _16 represents the type Std::Int<16>, with the value 16 stored in the type:
 
 ```cpp
 Layout = ((Shape): (Stride))

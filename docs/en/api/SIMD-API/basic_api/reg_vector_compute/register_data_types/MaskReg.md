@@ -207,7 +207,7 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
 
 - Method 3<a id="method3"></a>
 
-  Adopt [LoadAlign](../Reg data move-in/LoadAlign_MaskReg.md) to move the Mask from UB to MaskReg. Set the Mask in UB.
+  Adopt [LoadAlign](../reg_data_load/LoadAlign_MaskReg.md) to move the Mask from UB to MaskReg. Set the Mask in UB.
 
   ```cpp
   template <typename T>
@@ -227,7 +227,7 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
 
 - Method 4<a id="method4"></a>
 
-  Adopt [MaskGenWithRegTensor](../Reg data move-in/MaskGenWithRegTensor_MaskReg.md) to move the Mask from RegTensor to MaskReg. Set the Mask in RegTensor.
+  Adopt [MaskGenWithRegTensor](../reg_data_load/MaskGenWithRegTensor_MaskReg.md) to move the Mask from RegTensor to MaskReg. Set the Mask in RegTensor.
 
   ```cpp
   template <typename T>
@@ -250,7 +250,7 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
 
 - Method 5<a id="method5"></a>
 
-  Adopt [MoveMask](../MaskReg computation/MoveMask.md) to read the Mask value from the mask register {MASK1,MASK0} set by SetVectorMask, convert it according to the data format corresponding to the template parameter T, and then write it to the return value MaskReg. For the b16 type, the complete 128-bit {MASK1,MASK0} is read, and each bit is replicated as 2 bits; for the b32 type, the 64-bit MASK0 is read, and each bit is replicated as 4 bits.
+  Adopt [MoveMask](../MaskReg_compute/MoveMask.md) to read the Mask value from the mask register {MASK1,MASK0} set by SetVectorMask, convert it according to the data format corresponding to the template parameter T, and then write it to the return value MaskReg. For the b16 type, the complete 128-bit {MASK1,MASK0} is read, and each bit is replicated as 2 bits; for the b32 type, the 64-bit MASK0 is read, and each bit is replicated as 4 bits.
 
   ```cpp
   template <typename T>
@@ -269,7 +269,7 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
 
 ### Mask Mechanism Comparison Between NPU Architecture Version 2201 and NPU Architecture Version 3510
 
-This section compares the Mask mechanism in the per-bit computation of [NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md) in Normal mode with the Mask mechanism based on Reg vector computation in [NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md).
+This section compares the Mask mechanism in the per-bit computation of [NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md) in Normal mode with the Mask mechanism based on Reg vector computation in [NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md).
 
 - For Atlas A2 training products/Atlas A2 inference products and Atlas A3 training products/Atlas A3 inference products
 

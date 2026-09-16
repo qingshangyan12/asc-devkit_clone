@@ -53,7 +53,7 @@ Returns the first address of the shared memory space.
 
 ## Constraints<a name="zh-cn_topic_0000001963639306_zh-cn_topic_0000001541764188_section794123819592"></a>
 
-- To preserve API compatibility, it is recommended to compile and use it with [<<<>>>](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/debug_and_tuning/functional_debug/cpu_domain_twin_debugging.md).
+- To preserve API compatibility, it is recommended to compile and use it with [<<<>>>](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/debug_and_tuning/functional_debug/cpu_domain_twin_debugging.md).
 - This API generates a temporary file in the /tmp directory of the system, so sufficient disk space is required to create the shared memory normally.
 - It must be released together with [GmFree](GmFree.md).
 

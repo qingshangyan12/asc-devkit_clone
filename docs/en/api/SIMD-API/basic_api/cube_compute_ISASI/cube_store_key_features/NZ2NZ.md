@@ -83,7 +83,7 @@ The following parameters are user-configurable parameters of **NZ2NZ**. For thei
 As shown in the following figure, there is an NZ-format cube in the L0C Buffer. The cube has a dimension of 48 in the N direction and 24 in the M direction. After NZ2NZ conversion, the data format is changed to the arrangement shown in the right part.
 
 <!-- npu="A3,910b" id6 -->
-**Figure 1** NZ2NZ diagram ([NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md))<a name="zh-cn_topic_0000002515820868_fig199191646174210"></a>  
+**Figure 1** NZ2NZ diagram ([NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md))<a name="zh-cn_topic_0000002515820868_fig199191646174210"></a>  
 
 ![](../../../../figures/Fixpipe_NZ2NZ.png)
 
@@ -97,7 +97,7 @@ The parameter setting example in the diagram (copying through the Fixpipe API an
 <!-- end id6 -->
 
 <!-- npu="950" id5 -->
-**Figure 2** NZ2NZ schematic diagram ([NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md))<a name="zh-cn_topic_0000002515820868_fig199191646174233"></a>  
+**Figure 2** NZ2NZ schematic diagram ([NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md))<a name="zh-cn_topic_0000002515820868_fig199191646174233"></a>  
 
 ![](../../../../figures/Fixpipe_NZ2NZ_950.png)
 

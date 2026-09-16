@@ -53,7 +53,7 @@ None
 
 ## Constraints<a name="zh-cn_topic_0000002000199397_zh-cn_topic_0000001592243993_section794123819592"></a>
 
-- To preserve API compatibility, it is recommended to compile and use it with [CPU Domain Twin Debugging](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/debug_and_tuning/functional_debug/cpu_domain_twin_debugging.md).
+- To preserve API compatibility, it is recommended to compile and use it with [CPU Domain Twin Debugging](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/debug_and_tuning/functional_debug/cpu_domain_twin_debugging.md).
 - The pointer passed in must be a pointer to shared memory previously allocated through **GmAlloc**.
 
 ## Example<a name="zh-cn_topic_0000002000199397_zh-cn_topic_0000001592243993_section82241477610"></a>

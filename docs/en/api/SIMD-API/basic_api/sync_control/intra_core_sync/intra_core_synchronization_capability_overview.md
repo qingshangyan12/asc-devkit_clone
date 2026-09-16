@@ -8,7 +8,7 @@ The execution units inside the AI Core (such as the MTE2 move engine and the Vec
 
 <!-- npu="910b,A3" id1 -->
 
-For [NPU architecture 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md#table65291052154114), the hardware architecture diagram is as follows. The highlighted parts show the compute units and move engines that execute in parallel.
+For [NPU architecture 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md#table65291052154114), the hardware architecture diagram is as follows. The highlighted parts show the compute units and move engines that execute in parallel.
 
 **Figure 1**  Architecture diagram<a name="zh-cn_topic_0000002542725361_fig11732135516285"></a>  
 ![](../../../../figures/atlas_a2_a3_architecture.png "Atlas_A2_A3_hardware_architecture_diagram")
@@ -17,7 +17,7 @@ For [NPU architecture 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/
 
 <!-- npu="950" id2 -->
 
-For [NPU architecture 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md#table65291052154114), the hardware architecture diagram is as follows. The highlighted parts show the compute units and move engines that execute in parallel.
+For [NPU architecture 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md#table65291052154114), the hardware architecture diagram is as follows. The highlighted parts show the compute units and move engines that execute in parallel.
 
 **Figure 2**  Architecture diagram<a name="zh-cn_topic_0000002542725361_fig31512113433"></a>  
 ![](../../../../figures/ascend_950pr_950dt_architecture.png "Ascend_950PR_950DT_hardware_architecture_diagram")
@@ -41,7 +41,7 @@ The four execution units Scalar, Vector, DMA (MTE2), and DMA (MTE3) execute in p
 The parallel instruction pipeline types inside the AI Core and their descriptions are as follows:
 
 > [!NOTE]
-> Different hardware architectures may have different specific pipelines under each hardware pipeline type. For details, see [Hardware Implementation](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/Advanced programming/Hardware implementation/Hardware implementation.md).
+> Different hardware architectures may have different specific pipelines under each hardware pipeline type. For details, see [Hardware Implementation](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/Advanced programming/Hardware implementation/Hardware implementation.md).
 
 **Table 1** Instruction pipeline types and related descriptions
 
@@ -60,7 +60,7 @@ The parallel instruction pipeline types inside the AI Core and their description
 The synchronization control over the intra-core parallel pipelines described above falls into two categories:
 
 - Multi-pipeline synchronization: synchronization between instructions of different pipeline types that have data dependencies within the same core.
-    The difference between the [TQueSync](TQueSync Template Parameters.md) class APIs and the synchronization control APIs provided in [SetFlag/WaitFlag\(ISASI\)](SetFlag_WaitFlag_ISASI.md) is that the APIs in [SetFlag/WaitFlag\(ISASI\)](SetFlag_WaitFlag_ISASI.md) are marked as the ISASI category and cannot guarantee cross-hardware-version compatibility, whereas the TQueSync class APIs can guarantee cross-hardware-version compatibility.
+    The difference between the [TQueSync](tquesync_template_parameter.md) class APIs and the synchronization control APIs provided in [SetFlag/WaitFlag\(ISASI\)](SetFlag_WaitFlag_ISASI.md) is that the APIs in [SetFlag/WaitFlag\(ISASI\)](SetFlag_WaitFlag_ISASI.md) are marked as the ISASI category and cannot guarantee cross-hardware-version compatibility, whereas the TQueSync class APIs can guarantee cross-hardware-version compatibility.
     Synchronization control between different pipelines is performed through the SetFlag/WaitFlag APIs. In the SetFlag/WaitFlag instructions, a pair of instruction pipelines (a source pipeline and a destination pipeline) can be specified to define their execution order, representing a "lock" mechanism between the two instruction pipelines. Its working principle is as follows:
     - SetFlag: After all read and write operations of the preceding instructions in the source pipeline are completed, the current instruction starts executing and sets the corresponding flag in the hardware to 1.
     - **WaitFlag**: When the destination pipeline executes this instruction, if the corresponding flag bit in the hardware is found to be 0, the subsequent instructions of the destination pipeline are blocked; if the corresponding flag bit in the hardware is found to be 1, the corresponding flag bit in the hardware is set to 0, and the subsequent instructions of the destination pipeline start executing.
@@ -75,7 +75,7 @@ The synchronization control over the intra-core parallel pipelines described abo
 
 <!-- npu="910b,A3" id4 -->
 
-Taking [NPU architecture 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md#table65291052154114) as an example, all legal intra-core synchronization combinations under this hardware architecture are shown in [Table 2](#zh-cn_topic_0000002542725361_table13753342164113) and [Table 3](#zh-cn_topic_0000002542725361_table1555712177426). Among them, "Not involved" indicates that this synchronization combination does not exist at the hardware level, and "No application scenario" indicates that this synchronization combination exists but is not required in actual development scenarios.
+Taking [NPU architecture 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md#table65291052154114) as an example, all legal intra-core synchronization combinations under this hardware architecture are shown in [Table 2](#zh-cn_topic_0000002542725361_table13753342164113) and [Table 3](#zh-cn_topic_0000002542725361_table1555712177426). Among them, "Not involved" indicates that this synchronization combination does not exist at the hardware level, and "No application scenario" indicates that this synchronization combination exists but is not required in actual development scenarios.
 
 **Table 2**  All legal intra-core synchronization combinations in AIC<a name="zh-cn_topic_0000002542725361_table13753342164113"></a>
 

@@ -5,11 +5,11 @@
 ## AI Core Hardware Architecture and Storage Units
 
 <!-- npu="910b,A3" id1 -->
-The AI Core is the core compute unit of the Ascend processor. Taking [NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md) as an example, its internal hierarchical storage architecture is shown in Figure 1, which mainly consists of the following components:
+The AI Core is the core compute unit of the Ascend processor. Taking [NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md) as an example, its internal hierarchical storage architecture is shown in Figure 1, which mainly consists of the following components:
 
 - **Compute units (highlighted in yellow in the figure):** These include the Cube (cube) compute unit, the Vector compute unit, and the Scalar compute unit, which are responsible for cube multiply-accumulate operations, vector operations, and scalar control flow, respectively.
 - **Storage units:** From outside to inside by hierarchy, these are Global Memory (GM, located outside the AI Core), L1 Buffer, L0A/L0B/L0C Buffer, Unified Buffer (UB), BiasTable Buffer, Fixpipe Buffer, and so on. The capacity and alignment requirements of each storage unit vary. For details, see [Memory Hierarchy Architecture](./general_constraint_description.md#address-alignment-constraints).
-- **Movement units (highlighted in yellow in the figure):** These include MTE1 (Memory Transfer Engine 1), MTE2, MTE3, and FixPipe, which are responsible for DMA transfers of data between different storage units. Among them, MTE2 is responsible for moving data in the GM  ->  Local Memory direction, MTE3 is responsible for moving data in the Local Memory -> GM direction, MTE1 is responsible for moving data from L1 Buffer to L0 Buffer, and FixPipe is responsible for moving the computation result out of L0C Buffer via [on-the-fly quantization](../../cube_compute_ISASI/Cube Move-out Key Feature Description/On-the-fly Quantization.md) and [on-the-fly activation](../../cube_compute_ISASI/Cube Move-out Key Feature Description/On-the-fly ReLU.md).
+- **Movement units (highlighted in yellow in the figure):** These include MTE1 (Memory Transfer Engine 1), MTE2, MTE3, and FixPipe, which are responsible for DMA transfers of data between different storage units. Among them, MTE2 is responsible for moving data in the GM  ->  Local Memory direction, MTE3 is responsible for moving data in the Local Memory -> GM direction, MTE1 is responsible for moving data from L1 Buffer to L0 Buffer, and FixPipe is responsible for moving the computation result out of L0C Buffer via [on-the-fly quantization](../../cube_compute_ISASI/cube_store_key_features/on_the_fly_quantization.md) and [on-the-fly activation](../../cube_compute_ISASI/cube_store_key_features/on_the_fly_relu.md).
 
 **Figure 1**  Schematic diagram of the AI Core hardware architecture under NPU architecture version 2201  
 
@@ -17,7 +17,7 @@ The AI Core is the core compute unit of the Ascend processor. Taking [NPU archit
 <!-- end id1 -->
 
 <!-- npu="950" id2 -->
-Taking [NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md) as an example, its internal hierarchical storage architecture is shown in Figure 2. This architecture has the following changes in data paths:
+Taking [NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md) as an example, its internal hierarchical storage architecture is shown in Figure 2. This architecture has the following changes in data paths:
 
 - A unidirectional data path from L0C Buffer to UB is added.
 - A data path from UB to L1 Buffer is added.

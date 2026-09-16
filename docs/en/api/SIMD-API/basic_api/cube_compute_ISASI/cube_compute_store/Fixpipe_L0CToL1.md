@@ -36,13 +36,13 @@ The result of cube computation is stored in the L0C Buffer. The Fixpipe API is u
 The following figure shows the valid combinations of inline quantization, inline ReLU, and inline channel merging, as well as the intermediate data types and data paths. In the figure, F32->F16 and F32->BF16 are non-quantization modes that perform only Cast, while the rest are inline scalar/tensor quantization modes.
 
 <!-- npu="A3,910b" id11 -->
-**Figure 1** L0C2L1 flowchart ([NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md))<a id="zh-cn_topic_0000002511188540_fig8956371257"></a>  
+**Figure 1** L0C2L1 flowchart ([NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md))<a id="zh-cn_topic_0000002511188540_fig8956371257"></a>  
 
 ![](../../../../figures/L0C2L1_Function_Combination.png)
 <!-- end id11 -->
 
 <!-- npu="950" id13 -->
-**Figure 2** L0C2L1 flowchart ([NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md))<a id="zh-cn_topic_0000002542828493_fig1828513492547"></a>  
+**Figure 2** L0C2L1 flowchart ([NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md))<a id="zh-cn_topic_0000002542828493_fig1828513492547"></a>  
 
 ![](../../../../figures/L0C2L1_Function_Combination_950.png)
 <!-- end id13 -->
@@ -91,7 +91,7 @@ To facilitate user usage and reduce learning and understanding costs, a combined
 | Parameter | Description |
 | ---------- | ---------- |
 | T/U | Data type of the destination operand/source operand. For supported data types, see [Data Types](#zh-cn_topic_0000002511188540_section4219135304818). |
-| config | Fixpipe-related configuration parameter, of the type **FixpipeConfig**. The values are as follows:<br>&nbsp;&nbsp;&bull; **CFG_ROW_MAJOR (default value)**: Enables NZ2ND, and the output data format is ND. For Atlas A3 training products/Atlas A3 inference products, Atlas A2 training products/Atlas A2 inference products, this value does not take effect on the L0C Buffer -> L1 Buffer path. <br>&nbsp;&nbsp;&bull; CFG_NZ: NZ2NZ, and the output data format is NZ.<br><!-- npu="950" id14 -->&nbsp;&nbsp;&bull; CFG_COLUMN_MAJOR: For Ascend 950PR/Ascend 950DT, enables NZ2DN, and the output data format is DN.<br><!-- end id14 --><br>struct FixpipeConfig {<br>    CO2Layout format;<br>    bool isToUB; // Used to specify whether the destination address is in UB. <br>};<br>enum class CO2Layout : uint8_t {<br>    NZ = 0, // The output data format remains NZ.<br>    ROW_MAJOR, // Enables NZ2ND, and the output data format is ND.<br><!-- npu="950" id15 -->    COLUMN_MAJOR, // Supported only by Ascend 950PR/Ascend 950DT. Enables NZ2DN, and the output data format is DN.<br><!-- end id15 -->};<br>constexpr FixpipeConfig CFG_NZ = {CO2Layout::NZ};<br>constexpr FixpipeConfig CFG_ROW_MAJOR = {CO2Layout::ROW_MAJOR};<!-- npu="950" id16 --><br>constexpr FixpipeConfig CFG_COLUMN_MAJOR = {CO2Layout::COLUMN_MAJOR}; // Supported only by Ascend 950PR/Ascend 950DT. <!-- end id16 --><br>|
+| config | Fixpipe-related configuration parameter, of the type **FixpipeConfig**. The values are as follows:<br>&nbsp;&nbsp;&bull; **CFG_ROW_MAJOR (default value)**: Enables NZ2ND, and the output data format is ND. <!-- npu="A3,910b" id17 -->For <!-- npu="A3" id18 -->Atlas A3 training products/Atlas A3 inference products, <!-- end id18 --><!-- npu="910b" id19 -->Atlas A2 training products/Atlas A2 inference products, <!-- end id19 -->this value does not take effect on the L0C Buffer -> L1 Buffer path. <!-- end id17 --><br>&nbsp;&nbsp;&bull; CFG_NZ: NZ2NZ, and the output data format is NZ.<br><!-- npu="950" id14 -->&nbsp;&nbsp;&bull; CFG_COLUMN_MAJOR: For Ascend 950PR/Ascend 950DT, enables NZ2DN, and the output data format is DN.<br><!-- end id14 --><br>struct FixpipeConfig {<br>    CO2Layout format;<br>    bool isToUB; // Used to specify whether the destination address is in UB. <br>};<br>enum class CO2Layout : uint8_t {<br>    NZ = 0, // The output data format remains NZ.<br>    ROW_MAJOR, // Enables NZ2ND, and the output data format is ND.<br><!-- npu="950" id15 -->    COLUMN_MAJOR, // Supported only by Ascend 950PR/Ascend 950DT. Enables NZ2DN, and the output data format is DN.<br><!-- end id15 -->};<br>constexpr FixpipeConfig CFG_NZ = {CO2Layout::NZ};<br>constexpr FixpipeConfig CFG_ROW_MAJOR = {CO2Layout::ROW_MAJOR};<!-- npu="950" id16 --><br>constexpr FixpipeConfig CFG_COLUMN_MAJOR = {CO2Layout::COLUMN_MAJOR}; // Supported only by Ascend 950PR/Ascend 950DT. <!-- end id16 --><br>|
 | S | Data type of the **cbufWorkspace** parameter, that is, the data type of the inline quantization parameter.<br>&nbsp;&nbsp;&bull; When the destination operand, source operand, and **cbufWorkspace** use basic data types, the template parameter **S** must be of the **uint64_t** type; otherwise, compilation fails.<br>&nbsp;&nbsp;&bull; When the destination operand, source operand, and **cbufWorkspace** use the **TensorTrait** type, the LiteType of the template parameter **S** must be of the **uint64_t** type; otherwise, compilation fails.<br>The template parameter following **S** is used only for the preceding data type check, and users do not need to pay attention to it. |
 
 **Table 2** Fixpipe parameter description
@@ -226,7 +226,7 @@ None
 ## Example<a id="zh-cn_topic_0000002511188540_section088124295117"></a>
 
 <!-- npu="950,A3,910b" id32 -->
-For the complete Fixpipe sample, see [fixpipe\_l0c2l1 sample](https://gitcode.com/cann/asc-devkit/tree/9.1.0/examples/01_simd_cpp_api/03_basic_api/03_cube_compute/fixpipe_l0c2l1).
+For the complete Fixpipe sample, see [fixpipe\_l0c2l1 sample](https://gitcode.com/cann/asc-devkit/tree/9.1.0/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2l1).
 
 - Example: The path is L0C Buffer -> L1 Buffer. The input matrices A and B are of the **half** data type, and the output cube C is of the **int8_t** data type. NZ2ND format conversion is disabled, and scalar quantization is enabled.
 

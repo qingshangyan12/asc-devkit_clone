@@ -32,7 +32,7 @@ In the static tensor programming paradigm, developers can create tensors in two 
 
     LocalMemAllocator is a linear memory allocator. Developers can call the Alloc method to allocate memory. Address allocation starts from 0 and proceeds linearly in the order of calls. LocalMemAllocator is only a simple linear allocator and does not provide memory release or other memory management capabilities. When bank conflicts are not a concern or during initial operator function development, you can use LocalMemAllocator to simplify operator implementation, and switch to address allocation using LocalTensor during subsequent performance optimization.
 
--   Create tensors through the [LocalTensor constructor](../../../../../api/SIMD-API/basic_api/data_structures/LocalTensor/localtensor_constructor.md). This method is recommended for ultimate performance scenarios.
+-   Create tensors through the [LocalTensor constructor](../../../../../api/SIMD-API/basic_api/data_structures/LocalTensor/LocalTensor_constructor.md). This method is recommended for ultimate performance scenarios.
 
 Developers can use the LocalTensor constructor to directly specify memory addresses, achieving fully autonomous memory management (essentially without applying for or releasing memory). When using this method, you need to specify addresses reasonably as required (not exceeding the physical storage limit) and reuse memory while ensuring functional correctness. This method is recommended when you need to achieve extreme performance by avoiding bank conflicts or reusing memory.
 

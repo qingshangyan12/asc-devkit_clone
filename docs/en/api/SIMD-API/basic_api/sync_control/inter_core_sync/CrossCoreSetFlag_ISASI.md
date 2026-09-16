@@ -117,7 +117,7 @@ None
 
 ## Constraints<a name="section633mcpsimp"></a>
 
-- When the Kernel type is **KERNEL_TYPE_AIC_ONLY** or **KERNEL_TYPE_AIV_ONLY**, the hardware does not enable the scheduling module, so inter-core synchronization cannot be performed normally. Therefore, the [Kernel type](../../Kernel-Tiling/set_kernel_type.md) or [function modifier](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md#section1074418132518) configured for different synchronization modes is as follows:
+- When the Kernel type is **KERNEL_TYPE_AIC_ONLY** or **KERNEL_TYPE_AIV_ONLY**, the hardware does not enable the scheduling module, so inter-core synchronization cannot be performed normally. Therefore, the [Kernel type](../../Kernel-Tiling/set_kernel_type.md) or [function modifier](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md#section1074418132518) configured for different synchronization modes is as follows:
     - In pure Vector/Cube scenarios (mode 0 or mode 1), it is recommended to set the Kernel type to **KERNEL_TYPE_MIX_AIV_1_0** or **KERNEL_TYPE_MIX_AIC_1_0**. For other supported Kernel types, see Table 3.
     - For mixed Vector and Cube scenarios (mode 2 and mode 4), configure the Kernel type flexibly based on the ratio of AIC to AIV in the AI Core. For the function modifiers and Kernel types supported by different modes, see Table 3.
 
@@ -154,7 +154,7 @@ None
     - ≥2 concurrent operators use the inter-core synchronization feature.
 
     Specifically, in a multi-stream scenario, although an inter-core synchronization operator of a certain stream is allocated n physical cores, only n-m cores may be scheduled and executed first, while the remaining m cores have not yet started because they are preempted by inter-core synchronization operators of other streams. The n-m cores that start first wait for the remaining m cores to complete when they reach the inter-core synchronization point, while the remaining m cores cannot be released because they are occupied by inter-core synchronization operators of other streams, resulting in a deadlock.
-    In the Kernel direct invocation scenario, set batchmode through the [\_\_schedmode\_\_\(mode\)](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md) qualifier; in the engineering operator development scenario, set batchmode through the **SetScheduleMode** API of **TilingContext**. For details, see *Basic Data Structures and APIs*.
+    In the Kernel direct invocation scenario, set batchmode through the [\_\_schedmode\_\_\(mode\)](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMT-BuiltIn_keyword.md) qualifier; in the engineering operator development scenario, set batchmode through the **SetScheduleMode** API of **TilingContext**. For details, see *Basic Data Structures and APIs*.
 
 ## Example<a name="section837496171220"></a>
 

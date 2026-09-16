@@ -30,9 +30,9 @@
 
 The header file path is `"basic_api/kernel_operator_sys_var_intf.h"`.
 
-In the [separated mode architecture](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md), obtains the logical index of the Cube Core (AIC) or Vector Core (AIV) on a logical AI Core.
+In the [separated mode architecture](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md), obtains the logical index of the Cube Core (AIC) or Vector Core (AIV) on a logical AI Core.
 
-When `__mix__(1, 2)` is used as the [function execution space qualifier](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md#section1074418132518), **GetSubBlockIdx** can be used to distinguish the two different Vector Cores on the same core, with values of 0 and 1 respectively.
+When `__mix__(1, 2)` is used as the [function execution space qualifier](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md#section1074418132518), **GetSubBlockIdx** can be used to distinguish the two different Vector Cores on the same core, with values of 0 and 1 respectively.
 
 ## Prototype
 

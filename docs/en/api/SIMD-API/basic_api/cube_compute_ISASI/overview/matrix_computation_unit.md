@@ -9,12 +9,12 @@ The highlighted part in the following figure shows the Cube compute unit and the
 <!-- end id1 -->
 
 <!-- npu="910b,A3" id2 -->
-**Figure 1** [NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md) cube computation unit architecture diagram<a name="zh-cn_topic_0000002513373312_fig88330137205"></a>  
+**Figure 1** [NPU architecture version 2201](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md) cube computation unit architecture diagram<a name="zh-cn_topic_0000002513373312_fig88330137205"></a>  
 ![](../../../../figures/architecture_of_cube_compute_unit_a2a3.png "Cube computation unit architecture diagram - A2A3")
 <!-- end id2 -->
 
 <!-- npu="950" id3 -->
-**Figure 2** [NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md) cube computation unit architecture diagram<a name="zh-cn_topic_0000002513373312_fig1082103513519"></a>  
+**Figure 2** [NPU architecture version 3510](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/language_extension/SIMD-BuiltIn_keyword.md) cube computation unit architecture diagram<a name="zh-cn_topic_0000002513373312_fig1082103513519"></a>  
 ![](../../../../figures/architecture_of_cube_compute_unit_950.png "Cube computation unit architecture diagram - 950")
 <!-- end id3 -->
 

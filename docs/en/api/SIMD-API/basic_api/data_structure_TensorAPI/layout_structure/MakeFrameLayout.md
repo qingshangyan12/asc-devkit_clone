@@ -58,13 +58,13 @@ auto batchLayout = MakeFrameLayout<LayoutPattern, TraitType>(batch, m, n);
 
 **LayoutTrait** is used to specify the data type and the C0 dimension cardinality. **MakeFrameLayout** supports the following four passing methods:
 
-1. **LayoutTraitDefault\<T\>**: Specifies the data type T, with C0 calculated automatically.
+1. **LayoutTraitDefault<T>**: Specifies the data type T, with C0 calculated automatically.
 
    ```cpp
    MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(m, n)
    ```
 
-2. **_C0**: Directly specifies the number of elements in the C0 dimension, with the data type being [Std::Int](../../../../Utils-API/cpp_stdlib/type_traits/integral_constant.md). **_C0** is the shorthand form of **Std::Int\<C0\>**.
+2. **_C0**: Directly specifies the number of elements in the C0 dimension, with the data type being [Std::Int](../../../../Utils-API/cpp_stdlib/type_traits/integral_constant.md). **_C0** is the shorthand form of **Std::Int<C0>**.
 
    ```cpp
    MakeFrameLayout<NZLayoutPtn, _16>(m, n)

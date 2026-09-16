@@ -30,7 +30,7 @@
 
 The header file path is `"basic_api/kernel_operator_utils_intf.h"`.
 
-When developing a fusion operator based on [separate mode](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/en/guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md) (with AIC and AIV separated), the operator logic usually contains both AIV and AIC processing logic. In this case, you need to use the macros `ASCEND_IS_AIV`/`ASCEND_IS_AIC` provided by Ascend C to implement the following hardware conditional branches to isolate the AIV and AIC code:
+When developing a fusion operator based on [separate mode](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md) (with AIC and AIV separated), the operator logic usually contains both AIV and AIC processing logic. In this case, you need to use the macros `ASCEND_IS_AIV`/`ASCEND_IS_AIC` provided by Ascend C to implement the following hardware conditional branches to isolate the AIV and AIC code:
 
 ```cpp
 if ASCEND_IS_AIV {

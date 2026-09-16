@@ -171,7 +171,7 @@ None
 - K must be a multiple of 64.
 - For the fp4 scenario, the start addresses of matrices A and B must be aligned to 512 bytes. For the fp8 scenario, the start addresses of matrices A and B must be aligned to 1024 bytes.
 - The start address of the scale cube corresponding to the left cube **A**/**B** is: the corresponding address of the **A**/**B** cube start divided by 16.
-- For constraints in other special scenarios, see [Mmad API constraints](Mmad.md#Constraints).
+- For constraints in other special scenarios, see [Mmad API constraints](Mmad.md#constraints).
 
 ## Example
 
