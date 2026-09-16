@@ -26,6 +26,7 @@
 #include "kernel_reg.h"
 #include "kernel_npu_debug.h"
 #include "kernel_operator_mm_base_impl.h"
+#include "utils/kernel_utils_ptr.h"
 #include "../../include/basic_api/kernel_struct_mm.h"
 
 namespace AscendC {
@@ -58,6 +59,23 @@ __aicore__ inline void LoadData(
     LoadDataImpl(dst, src, loadDataParams);
 }
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-EXPAND] LoadData 2D L1 -> L0A/L0B */
+template <typename T>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParams)
+{
+    CheckLoadData2dDatatype<T>();
+    LoadData2DL12L0ACal(dst, src, loadDataParams);
+}
+
+template <typename T>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParams)
+{
+    CheckLoadData2dDatatype<T>();
+    LoadData2DL12L0BCal(dst, src, loadDataParams);
+}
+
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams)
@@ -136,6 +154,56 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     LoadDataImpl(dst, src, loadDataParams);
 }
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-EXPAND] LoadData 2DV2 GM -> L0A/L0B/L1 ; cacheMode fixed to 0 (bare __gm__ has no ExtractCacheMode) */
+template <typename T>
+__aicore__ inline void LoadData(__ca__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParams)
+{
+    CheckLoadData2dDatatype<T>();
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    LoadData2DGM2L0ACal(dst, src, loadDataParams, static_cast<uint8_t>(0));
+#else
+    LoadData2DGM2L0ACal(dst, src, loadDataParams);
+#endif
+}
+
+template <typename T>
+__aicore__ inline void LoadData(__cb__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParams)
+{
+    CheckLoadData2dDatatype<T>();
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    LoadData2DGM2L0BCal(dst, src, loadDataParams, static_cast<uint8_t>(0));
+#else
+    LoadData2DGM2L0BCal(dst, src, loadDataParams);
+#endif
+}
+
+template <typename T>
+__aicore__ inline void LoadData(__cbuf__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParams)
+{
+    CheckLoadData2dDatatype<T>();
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    LoadData2DGM2L1Cal(dst, src, loadDataParams, static_cast<uint8_t>(0));
+#else
+    LoadData2DGM2L1Cal(dst, src, loadDataParams);
+#endif
+}
+
+template <typename T>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParams)
+{
+    CheckLoadData2dDatatype<T>();
+    LoadData2DL12L0ACal(dst, src, loadDataParams);
+}
+
+template <typename T>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParams)
+{
+    CheckLoadData2dDatatype<T>();
+    LoadData2DL12L0BCal(dst, src, loadDataParams);
+}
+
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
 template <typename T, typename U>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
@@ -197,6 +265,244 @@ __aicore__ inline void LoadData(
 #endif
     LoadDataImpl<T, defaultConfig>(dst, src, loadDataParams);
 }
+
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-BGROUP] LoadData 3DV1 pointer impl */
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig, typename U,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV1<U>& loadDataParams)
+{
+    if constexpr (defaultConfig.isSetFMatrix) {
+        Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
+    }
+    if constexpr (defaultConfig.isSetPadding) {
+        Load3DSetPaddingCal(loadDataParams.padValue);
+    }
+    LoadData3DV1L12L0ACal((__ca__ PrimT<T>*)dst, (__cbuf__ PrimT<T>*)src, loadDataParams);
+}
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig, typename U,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV1<U>& loadDataParams)
+{
+    if constexpr (defaultConfig.isSetFMatrix) {
+        Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
+    }
+    if constexpr (defaultConfig.isSetPadding) {
+        Load3DSetPaddingCal(loadDataParams.padValue);
+    }
+    LoadData3DV1L12L0BCal((__cb__ PrimT<T>*)dst, (__cbuf__ PrimT<T>*)src, loadDataParams);
+}
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig, typename U,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type>
+__aicore__ inline void LoadData(__ubuf__ T* dst, __cbuf__ T* src, const LoadData3DParamsV1<U>& loadDataParams)
+{
+    if constexpr (defaultConfig.isSetFMatrix) {
+        Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
+    }
+    if constexpr (defaultConfig.isSetPadding) {
+        Load3DSetPaddingCal(loadDataParams.padValue);
+    }
+    LoadData3DV1L12UBCal((__ubuf__ PrimT<T>*)dst, (__cbuf__ PrimT<T>*)src, loadDataParams);
+}
+
+/* [CUBE-PTR-BGROUP] LoadData 3DV2 / WithStride pointer impl */
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig, typename U,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams)
+{
+    if constexpr (defaultConfig.isSetFMatrix) {
+        Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
+    }
+    if constexpr (defaultConfig.isSetPadding) {
+        Load3DSetPaddingCal(loadDataParams.padValue);
+    }
+    LoadData3DV2L12L0ACal((__ca__ PrimT<T>*)dst, (__cbuf__ PrimT<T>*)src, loadDataParams);
+}
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig, typename U,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams)
+{
+    if constexpr (defaultConfig.isSetFMatrix) {
+        Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
+    }
+    if constexpr (defaultConfig.isSetPadding) {
+        Load3DSetPaddingCal(loadDataParams.padValue);
+    }
+    LoadData3DV2L12L0BCal((__cb__ PrimT<T>*)dst, (__cbuf__ PrimT<T>*)src, loadDataParams);
+}
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig, typename U,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type>
+__aicore__ inline void LoadData(__ubuf__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams)
+{
+    if constexpr (defaultConfig.isSetFMatrix) {
+        Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
+    }
+    if constexpr (defaultConfig.isSetPadding) {
+        Load3DSetPaddingCal(loadDataParams.padValue);
+    }
+    LoadData3DV2L12UBCal((__ubuf__ PrimT<T>*)dst, (__cbuf__ PrimT<T>*)src, loadDataParams);
+}
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig, typename U,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type>
+__aicore__ inline void LoadDataWithStride(__ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams)
+{
+    if constexpr (defaultConfig.isSetFMatrix) {
+        Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
+    }
+    if constexpr (defaultConfig.isSetPadding) {
+        Load3DSetPaddingCal(loadDataParams.padValue);
+    }
+    LoadData3DV2L12L0AWithStrideCal((__ca__ PrimT<T>*)dst, (__cbuf__ PrimT<T>*)src, loadDataParams);
+}
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig, typename U,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type>
+__aicore__ inline void LoadDataWithStride(__cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams)
+{
+    if constexpr (defaultConfig.isSetFMatrix) {
+        Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
+    }
+    if constexpr (defaultConfig.isSetPadding) {
+        Load3DSetPaddingCal(loadDataParams.padValue);
+    }
+    LoadData3DV2L12L0BWithStrideCal((__cb__ PrimT<T>*)dst, (__cbuf__ PrimT<T>*)src, loadDataParams);
+}
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig, typename U,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type>
+__aicore__ inline void LoadDataWithStride(__ubuf__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams)
+{
+    if constexpr (defaultConfig.isSetFMatrix) {
+        Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
+    }
+    if constexpr (defaultConfig.isSetPadding) {
+        Load3DSetPaddingCal(loadDataParams.padValue);
+    }
+    LoadData3DV2L12UBWithStrideCal((__ubuf__ PrimT<T>*)dst, (__cbuf__ PrimT<T>*)src, loadDataParams);
+}
+
+/* [CUBE-PTR-BGROUP] LoadData 3DV2Pro pointer impl */
+template <typename T>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2Pro& loadDataParams)
+{
+    LoadData3DV2L12L0ACal((__ca__ PrimT<T>*)dst, (__cbuf__ PrimT<T>*)src, loadDataParams);
+}
+
+template <typename T>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2Pro& loadDataParams)
+{
+    LoadData3DV2L12L0BCal((__cb__ PrimT<T>*)dst, (__cbuf__ PrimT<T>*)src, loadDataParams);
+}
+
+template <typename T>
+__aicore__ inline void LoadData(__ubuf__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2Pro& loadDataParams)
+{
+    LoadData3DV2L12UBCal((__ubuf__ PrimT<T>*)dst, (__cbuf__ PrimT<T>*)src, loadDataParams);
+}
+
+/* [CUBE-PTR-BGROUP] MmadMx pointer impl */
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadMx(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadParams& mmadParams)
+{
+    MmadMxCal((__cc__ PrimT<T>*)dst, (__ca__ PrimT<U>*)fm, (__cb__ PrimT<S>*)filter, mmadParams);
+}
+
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadMx(
+    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, uint64_t bias, const MmadParams& mmadParams, bool cmatrixSource)
+{
+    MmadMxCal((__cc__ PrimT<T>*)dst, (__ca__ PrimT<U>*)fm, (__cb__ PrimT<S>*)filter, bias, mmadParams, cmatrixSource);
+}
+
+/* [CUBE-PTR-BGROUP] BroadCast / Fill / InitConstValue / LoadDataUnzip */
+template <typename T, typename U>
+__aicore__ inline __inout_pipe__(V) void BroadCastVecToMM(
+    __cc__ T* dst, __ubuf__ U* src, const int32_t blockCount, const uint8_t blockLen, const uint8_t srcGap,
+    const uint8_t dstGap)
+{
+    BroadCastVecToMMCal((__cc__ PrimT<T>*)dst, (__ubuf__ PrimT<U>*)src, blockCount, blockLen, srcGap, dstGap);
+}
+
+template <typename T, typename U, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type>
+__aicore__ inline void Fill(__ca__ T* dst, const InitConstValueParams<U>& initConstValueParams)
+{
+    InitL0ANzMatrixCal((__ca__ PrimT<T>*)dst, initConstValueParams);
+}
+
+template <typename T, typename U, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type>
+__aicore__ inline void Fill(__cb__ T* dst, const InitConstValueParams<U>& initConstValueParams)
+{
+    InitL0BNzMatrixCal((__cb__ PrimT<T>*)dst, initConstValueParams);
+}
+
+template <typename T, typename U, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type>
+__aicore__ inline void Fill(__cbuf__ T* dst, const InitConstValueParams<U>& initConstValueParams)
+{
+    InitL1BufferCal((__cbuf__ PrimT<T>*)dst, initConstValueParams);
+}
+
+template <typename T, typename U, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type>
+__aicore__ inline void InitConstValue(__ca__ T* dst, const InitConstValueParams<U>& initConstValueParams)
+{
+    InitL0ANzMatrixCal((__ca__ PrimT<T>*)dst, initConstValueParams);
+}
+
+template <typename T, typename U, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type>
+__aicore__ inline void InitConstValue(__cb__ T* dst, const InitConstValueParams<U>& initConstValueParams)
+{
+    InitL0BNzMatrixCal((__cb__ PrimT<T>*)dst, initConstValueParams);
+}
+
+template <typename T, typename U, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type>
+__aicore__ inline void InitConstValue(__cbuf__ T* dst, const InitConstValueParams<U>& initConstValueParams)
+{
+    InitL1BufferCal((__cbuf__ PrimT<T>*)dst, initConstValueParams);
+}
+
+template <typename T>
+__aicore__ inline void LoadDataUnzip(__cbuf__ T* dst, __gm__ T* src)
+{
+    LoadDataUnzipToL1Cal((__cbuf__ PrimT<T>*)dst, (__gm__ PrimT<T>*)src);
+}
+
+template <typename T>
+__aicore__ inline void LoadDataUnzip(__ca__ T* dst, __gm__ T* src)
+{
+    LoadDataUnzipToL0ACal((__ca__ PrimT<T>*)dst, (__gm__ PrimT<T>*)src);
+}
+
+template <typename T>
+__aicore__ inline void LoadDataUnzip(__cb__ T* dst, __gm__ T* src)
+{
+    LoadDataUnzipToL0BCal((__cb__ PrimT<T>*)dst, (__gm__ PrimT<T>*)src);
+}
+
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+template <
+    typename T, typename U, typename Std::enable_if<Std::is_same<PrimT<T>, int32_t>::value, bool>::type,
+    typename Std::enable_if<Std::is_same<PrimT<U>, int8_t>::value, bool>::type>
+__aicore__ inline void MmadWithSparse(__cc__ T* dst, __ca__ U* fm, __cb__ U* filter, const MmadParams& mmadParams)
+{
+    MmadSpCal((__cc__ int32_t*)dst, (__ca__ int8_t*)fm, (__cb__ int8_t*)filter, mmadParams);
+}
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
+#endif
 
 /* **************************************************************************************************
  * LoadData 3dv2                                             *
@@ -346,6 +652,23 @@ __aicore__ inline void LoadDataWithTranspose(
     LoadDataWithTransposeImpl(dst, src, loadDataParams);
 }
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-EXPAND] LoadDataWithTranspose V1 */
+template <typename T>
+__aicore__ inline void LoadDataWithTranspose(
+    __ca__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParams)
+{
+    LoadData2DL12L0ATransposeCal(dst, src, loadDataParams);
+}
+
+template <typename T>
+__aicore__ inline void LoadDataWithTranspose(
+    __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParams)
+{
+    LoadData2DL12L0BTransposeCal(dst, src, loadDataParams);
+}
+
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 /*
  * @ingroup DataLoad
  * @brief Cube data loading
@@ -372,6 +695,23 @@ __aicore__ inline void LoadDataWithTranspose(
     LoadDataWithTransposeImpl(dst, src, loadDataParams);
 }
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-EXPAND] LoadDataWithTranspose V2 */
+template <typename T>
+__aicore__ inline void LoadDataWithTranspose(
+    __ca__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParamsV2& loadDataParams)
+{
+    LoadData2DL12L0ATransposeCal(dst, src, loadDataParams);
+}
+
+template <typename T>
+__aicore__ inline void LoadDataWithTranspose(
+    __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParamsV2& loadDataParams)
+{
+    LoadData2DL12L0BTransposeCal(dst, src, loadDataParams);
+}
+
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 /* **************************************************************************************************
  * LoadDataWithDecomp                                             *
  * ************************************************************************************************* */
@@ -416,6 +756,14 @@ __aicore__ inline void Mmad(
     MmadImpl(dst, fm, filter, mmadParams);
 }
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+template <typename T, typename U, typename S>
+__aicore__ inline void Mmad(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadParams& mmadParams)
+{
+    MmadCal((__cc__ PrimT<T>*)dst, (__ca__ PrimT<U>*)fm, (__cb__ PrimT<S>*)filter, mmadParams);
+}
+
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
@@ -424,6 +772,16 @@ __aicore__ inline void Mmad(
     MmadImpl(dst, fm, filter, bias, mmadParams);
 }
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-EXPAND] Mmad + bias pointer path */
+template <typename T, typename U, typename S>
+__aicore__ inline void Mmad(
+    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, uint64_t bias, const MmadParams& mmadParams, bool cmatrixSource)
+{
+    MmadCal(dst, fm, filter, bias, mmadParams, cmatrixSource);
+}
+
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 template <typename T, typename U, typename S>
 __aicore__ inline void Mmad(
