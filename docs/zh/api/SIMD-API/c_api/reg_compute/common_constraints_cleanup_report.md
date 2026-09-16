@@ -1,0 +1,321 @@
+# Reg Compute通用约束清理报告
+
+## 自动处理范围
+
+- 仅自动删除与`overview.md`中`## 通用约束`语义完整等同的独立段落或列表项。
+- 自动添加指向`overview.md#通用约束`的相对链接。
+- 未自动处理混合了接口专属语义的列表项。
+- 功能说明中的“本接口在Vector Function（`__simd_vf__` 标记的函数）内使用。本接口仅在AIV上生效。”按要求保留。
+
+## 自动修改统计
+
+- 修改文件数：180
+- 删除通用约束条目/段落数：502
+
+## 自动修改文件
+
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/reg_load_overview.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_load.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem2datablock.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem2datablock_postupdate.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem_postupdate.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_datablock_strided.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_deintlv.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_deintlv_postupdate.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_downsample.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_downsample_postupdate.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_downsample.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_upsample.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_postupdate.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack4.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack4_postupdate.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack_postupdate.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_upsample.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_upsample_postupdate.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_postupdate.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_pre.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_add.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_addc.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_add_scalar.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_div.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_exp.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_max.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_max_scalar.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_min.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_min_scalar.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_mul.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_mull.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_mul_scalar.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_neg.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_sqrt.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_sub.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_subc.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_highest.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_highest_merge.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_scalar.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_scalar_merge.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_eq.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_eq_scalar.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_ge.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_ge_scalar.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_gt.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_gt_scalar.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_le.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_le_scalar.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_lt.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_lt_scalar.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_ne.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_ne_scalar.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162e1m2x2.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162e2m1x2.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162float.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162half.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162int32.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_ceil.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e1m2x22bfloat16.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e2m1x22bfloat16.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e4m32float.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e5m22float.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2bfloat16.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e5m2.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2half.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2hif8.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int16.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int32.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int64.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_floor.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2bfloat16.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2float.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2hif8.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int16.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int32.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int4x2.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int8.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2uint8.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82float.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82half.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162float.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162half.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162int32.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162uint32.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162uint8.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322int16.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322int64.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322uint16.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322uint8.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22bfloat16.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22half.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22int16.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int642float.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int642int32.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int82half.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int82int16.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int82int32.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_rint.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_round.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_trunc.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint162uint32.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint162uint8.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint322int16.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint322uint16.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint322uint8.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82half.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82uint16.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82uint32.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_extract_mask.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_mask.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_abs_sub.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_exp_sub.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_leakyrelu.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mul_scalar_float2half_rn.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_prelu.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_relu.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_gather/asc_gather.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/asc_cumulative_histogram.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/asc_frequency_histogram.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_index/asc_arange.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_and.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_not.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_or.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftleft.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftleft_scalar.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftright.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftright_scalar.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_xor.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_create_mask.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_get_mask_spr.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_update_mask.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_deintlv.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_intlv.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_high.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_low.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_select.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unpack.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unsqueeze.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_pair_reduce_sum.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_max.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_max_datablock.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_min.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_min_datablock.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_sum.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_sum_datablock.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/scatter/asc_scatter.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_store.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_1st.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_1st_postupdate.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_intlv.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack_postupdate.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter_postupdate.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_postupdate.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_squeeze_status.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_squeeze_status_postupdate.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_postupdate.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post_postupdate.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/ub_gather/asc_gather.md`
+- `docs/zh/api/SIMD-API/c_api/reg_compute/ub_gather/asc_gather_datablock.md`
+
+## 需人工判断的混合条目
+
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md:210`：各功能模式下的实际读取地址必须按32字节对齐，且实际读取范围必须在UB地址空间内且不越界，否则会报错。非连续对齐搬入模式中，当某个`DataBlock`的`mask`包含的元素全部无效时，该`DataBlock`即使越界也不会报错。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_postupdate.md:130`：各功能模式下的当前实际读取地址及Post Update更新后的下一次实际读取地址必须按32字节对齐，且实际读取范围必须在UB地址空间内且不越界，否则会报错。非连续对齐搬入模式中，当某个`DataBlock`的`mask`包含的元素全部无效时，该`DataBlock`即使越界也不会报错。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md:86`：`mask`掩码位为0时，结果对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_add_scalar.md:90`：`mask`掩码位为0时，结果对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_ln.md:77`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_log.md:78`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_max_scalar.md:90`：`mask`掩码位为0时，结果对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_min_scalar.md:90`：`mask`掩码位为0时，结果对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_mul_scalar.md:89`：`mask`掩码位为0时，结果对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_neg.md:90`：本接口在Vector Function（`__simd_vf__`标记的函数）内调用，`src`为矢量数据寄存器；无返回值原型中的`dst`为矢量数据寄存器。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate.md:82`：本接口为Reg矢量计算接口，只能在使用`__simd_vf__`标记的VF函数内调用，不支持在`__aicore__`函数中直接调用，仅在AIV上生效，在AIC上调用将直接返回。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate.md:85`：mask仅筛选dst中写入广播值的位置，不筛选src中的元素。无论mask的最低位是否有效，待广播的数据均为src的最低位元素。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_highest.md:76`：本接口只能在使用`__simd_vf__`标记的Vector Function内调用，不支持在`__aicore__`函数中直接调用，仅在AIV上生效，在AIC上调用将直接返回。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_highest.md:78`：`mask`仅筛选`dst`中写入广播值的位置，不筛选`src`中的元素。无论`mask`的最高位是否有效，待广播的数据均为`src`的最高位元素。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_highest_merge.md:76`：本接口只能在使用`__simd_vf__`标记的Vector Function内调用，不支持在`__aicore__`函数中直接调用，仅在AIV上生效，在AIC上调用将直接返回。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_highest_merge.md:78`：`mask`仅筛选`dst`中写入广播值的位置，不筛选`src`中的元素。无论`mask`的最高位是否有效，待广播的数据均为`src`的最高位元素。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_highest_merge.md:79`：调用接口前需要初始化`dst`，否则未被`mask`筛选的元素值不确定。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_scalar.md:114`：本接口只能在使用`__simd_vf__`标记的Vector Function内调用，不支持在`__aicore__`函数中直接调用，仅在AIV上生效，在AIC上调用将直接返回。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_scalar_merge.md:76`：本接口只能在使用`__simd_vf__`标记的Vector Function内调用，不支持在`__aicore__`函数中直接调用，仅在AIV上生效，在AIC上调用将直接返回。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_scalar_merge.md:78`：调用接口前需要初始化`dst`，否则未被`mask`筛选的元素值不确定。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_eq.md:97`：本接口在Vector Function（`__simd_vf__`标记的函数）内调用，`src0`、`src1`为矢量数据寄存器；无返回值原型中的`dst`为掩码寄存器。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_eq_scalar.md:97`：本接口在Vector Function（`__simd_vf__`标记的函数）内调用，`src`为矢量数据寄存器；无返回值原型中的`dst`为掩码寄存器。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_ge.md:95`：本接口在Vector Function（`__simd_vf__`标记的函数）内调用，`src0`和`src1`为矢量数据寄存器；无返回值原型中的`dst`为掩码寄存器。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_ge_scalar.md:94`：`mask`掩码位为0时，结果对应比特位置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_gt.md:95`：本接口在Vector Function（`__simd_vf__`标记的函数）内调用，`src0`和`src1`为矢量数据寄存器；无返回值原型中的`dst`为掩码寄存器。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_gt_scalar.md:93`：`mask`掩码位为0时，结果对应比特位置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_le.md:95`：本接口在Vector Function（`__simd_vf__`标记的函数）内调用，`src0`和`src1`为矢量数据寄存器；无返回值原型中的`dst`为掩码寄存器。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_le_scalar.md:97`：本接口在Vector Function（`__simd_vf__`标记的函数）内调用，`src`为矢量数据寄存器；无返回值原型中的`dst`为掩码寄存器。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_lt.md:95`：本接口在Vector Function（`__simd_vf__`标记的函数）内调用，`src0`和`src1`为矢量数据寄存器；无返回值原型中的`dst`为掩码寄存器。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_lt_scalar.md:97`：本接口在Vector Function（`__simd_vf__`标记的函数）内调用，`src`为矢量数据寄存器；无返回值原型中的`dst`为掩码寄存器。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_ne.md:95`：本接口在Vector Function（`__simd_vf__`标记的函数）内调用，`src0`和`src1`为矢量数据寄存器；无返回值原型中的`dst`为掩码寄存器。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_ne_scalar.md:94`：`mask`掩码位为0时，结果对应比特位置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162e1m2x2.md:82`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162e2m1x2.md:82`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162float.md:82`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162half.md:89`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162int32.md:104`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_ceil.md:88`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e1m2x22bfloat16.md:78`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e2m1x22bfloat16.md:78`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e4m32float.md:78`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e5m22float.md:78`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2bfloat16.md:112`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3.md:82`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e5m2.md:82`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2half.md:111`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2hif8.md:83`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int16.md:113`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int32.md:91`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int64.md:112`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_floor.md:88`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2bfloat16.md:84`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2float.md:82`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2hif8.md:106`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int16.md:89`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int32.md:99`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int4x2.md:85`：`mask`需通过掩码设置接口预先赋值后再传入；`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int8.md:106`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2uint8.md:104`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82float.md:78`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82half.md:96`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162float.md:96`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162half.md:76`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162int32.md:96`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162uint32.md:96`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162uint8.md:110`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322int16.md:108`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322int64.md:90`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322uint16.md:106`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322uint8.md:82`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22bfloat16.md:71`：`mask`需通过掩码设置接口预先赋值后再传入；`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22half.md:71`：`mask`需通过掩码设置接口预先赋值后再传入；`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22int16.md:71`：`mask`需通过掩码设置接口预先赋值后再传入；`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int642float.md:114`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int642int32.md:112`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int82half.md:96`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int82int16.md:96`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int82int32.md:78`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_rint.md:88`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_round.md:88`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_trunc.md:93`：本接口在Vector Function（`__simd_vf__`标记的函数）内调用，`dst`与`mask`为矢量数据寄存器/掩码寄存器。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint162uint32.md:106`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint162uint8.md:112`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint322int16.md:112`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint322uint16.md:112`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint322uint8.md:82`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82half.md:96`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82uint16.md:93`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82uint32.md:78`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md:128`：本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst与src均为矢量数据寄存器或掩码寄存器。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md:129`：针对矢量数据寄存器复制到矢量数据寄存器：dst中未被mask筛选的位置保持原值。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md:130`：针对掩码寄存器复制到掩码寄存器：带mask的接口dst中未被mask筛选的位置填0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_extract_mask.md:71`：本接口在Vector Function（`__simd_vf__`标记的函数）内调用，src为矢量数据寄存器。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_mask.md:96`：本接口在Vector Function（`__simd_vf__`标记的函数）内调用，src为矢量数据寄存器或掩码寄存器。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_abs_sub.md:90`：`mask`掩码位为0时，结果对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_exp_sub.md:110`：`mask`掩码位为0时，结果对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_fma.md:79`：`mask`掩码位为0时，返回值对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_madd.md:80`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mula.md:78`：`mask`掩码位为0时，`dst`对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mul_scalar_float2half_rn.md:104`：`mask`掩码位为0时，结果对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_relu.md:86`：`mask`掩码位为0时，结果对应元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_xor.md:127`：`dst`中未被`mask`筛选的位置被置为0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_intlv.md:118`：本接口在Vector Function（`__simd_vf__`标记的函数）内调用，源操作数和目的操作数为矢量数据寄存器或掩码寄存器。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_high.md:95`：本接口在Vector Function（`__simd_vf__`标记的函数）内调用，源操作数和目的操作数为矢量数据寄存器或掩码寄存器。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_low.md:95`：本接口在Vector Function（`__simd_vf__`标记的函数）内调用，源操作数和目的操作数为矢量数据寄存器或掩码寄存器。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze.md:86`：本接口在Vector Function（`__simd_vf__`标记的函数）内调用，`src`为矢量数据寄存器；无返回值原型中的`dst`为矢量数据寄存器。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze.md:88`：`mask`比特位为1的`src`元素按原顺序紧凑排列到计算结果低位；`mask`比特位为0的`src`元素不参与压缩，计算结果中压缩结果之后的剩余高位统一写0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unpack.md:136`：本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst与src均为矢量数据寄存器或掩码寄存器。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unsqueeze.md:98`：本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst与mask为矢量数据寄存器/掩码寄存器。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_pair_reduce_sum.md:92`：`mask`指定源操作数是否参与计算，不参与计算的元素被当作0进行累加。例如：
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_max.md:88`：未被`mask`选中的元素被视为对应数据类型的最小值，浮点数类型的最小值为`-inf`。如果`src`中的所有元素均未被`mask`选中，则将该最小值写入`dst`的第0个元素，并将其余元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_max_datablock.md:90`：未被`mask`选中的元素被视为对应数据类型的最小值，浮点数类型的最小值为`-inf`。如果一个`DataBlock`中的所有元素均未被`mask`选中，则将该最小值写入`dst`的对应位置。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_min.md:88`：未被`mask`选中的元素被视为对应数据类型的最大值，浮点数类型的最大值为`+inf`。如果`src`中的所有元素均未被`mask`选中，则将该最大值写入`dst`的第0个元素，并将其余元素置0。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_min_datablock.md:89`：未被`mask`选中的元素被视为对应数据类型的最大值，浮点数类型的最大值为`+inf`。如果一个`DataBlock`中的所有元素均未被`mask`选中，则将该最大值写入`dst`的对应位置。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_sum.md:100`：当所有元素均不参与计算（`mask`全为0）时，将0写入目的操作数对应位置（特别的，对于浮点数为+0）。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_sum_datablock.md:106`：当`DataBlock`中的元素均不参与计算（`mask`全为0）时，将0写入`dst`对应位置（对于浮点数则为+0）。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/scatter/asc_scatter.md:98`：本接口在Vector Function（`__simd_vf__`标记的函数）内调用，源操作数和索引为矢量数据寄存器，目的操作数为UB地址。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_store.md:111`：本接口在Vector Function（`__simd_vf__`标记的函数）内调用，源操作数为矢量数据寄存器，目的操作数为UB地址，UB地址空间外的指针不可作为`dst`传入。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_1st.md:152`：本接口在Vector Function（`__simd_vf__`标记的函数）内调用，源操作数为矢量数据寄存器，目的操作数为UB地址，UB地址空间外的指针不可作为`dst`传入。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack.md:256`：本接口在Vector Function（`__simd_vf__`标记的函数）内调用，源操作数为矢量数据寄存器或掩码寄存器，目的操作数为UB地址。UB地址空间外的指针不可作为目的地址传入。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack_postupdate.md:127`：本接口在Vector Function（`__simd_vf__`标记的函数）内调用，源操作数为矢量数据寄存器或掩码寄存器，目的操作数为UB地址。UB地址空间外的指针不可作为目的地址传入。
+- `docs/zh/api/SIMD-API/c_api/reg_compute/ub_gather/asc_gather.md:121`：本接口在Vector Function（`__simd_vf__` 标记的函数）内调用，源操作数为UB地址、目的操作数为矢量数据寄存器。
