@@ -236,7 +236,6 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     }
     ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "DataCopy dn2nz only support position:GM to position: L1"); });
 }
-#endif // Dn2Nz pointer-extended architectures
 #endif
 
 /*
@@ -2293,6 +2292,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(const DstT& dst, const SrcT
     }
     ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "DataCopy dn2nz only support position:GM to position: L1"); });
 }
+#endif // Dn2Nz pointer-extended architectures
 
 /*!
  * \brief Pointer-extended DataCopy(dstGlobal, srcLocal, SliceInfo..., dimValue): multi-dimensional slice copy.
