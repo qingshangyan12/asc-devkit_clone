@@ -51,13 +51,13 @@ def pick(pool: list[dict], n: int, rng: random.Random) -> list[dict]:
 
 def mmad_pool() -> list[dict]:
     rows = []
-    # fp32 s3（A/B 转置 + kDirectionAlign + bias 指针 Mmad）在 910B 上存在非确定性
-    # 竞态（同二进制同输入间歇 PASS/NaN）。冒烟/扫表先覆盖 int8/bf16/int4；
-    # fp32 能力由 load_data / fixpipe 用例覆盖。
-    mapping = [("int8", 1, "any"), ("bf16", 2, "any"), ("int4", 4, "dav-2201")]
+    mapping = [("int8", 1, "any"), ("bf16", 2, "any"), ("fp32", 3, "any"), ("int4", 4, "dav-2201")]
     for dtype, sc, arch in mapping:
         for m, n, k in shapes_for(dtype):
             if dtype == "bf16" and k < 32:
+                continue
+            # fp32 s3：与官方默认规格同量级对齐约束（M/N/K 16 对齐且 K%16）
+            if dtype == "fp32" and (m % 16 or n % 16 or k % 16):
                 continue
             rows.append(
                 {

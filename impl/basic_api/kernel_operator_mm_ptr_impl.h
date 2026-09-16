@@ -179,8 +179,9 @@ template <typename T, typename U, typename S>
 __aicore__ inline void Mmad(
     __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __cc__ T* bias, const MmadParams& mmadParams)
 {
-    // Pointer bias from L0C: cmatrixSource = false
-    MmadCal(dst, fm, filter, (uint64_t)bias, mmadParams, false);
+    // 与 Tensor 路径一致：由 mmadParams.cmatrixSource 区分
+    // BiasTable(C2)=true / L0C(CO1)=false；不得写死 false（官方 mmad s3 bias 在 C2）。
+    MmadCal(dst, fm, filter, (uint64_t)bias, mmadParams, mmadParams.cmatrixSource);
 }
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
@@ -207,7 +208,7 @@ template <typename T, typename U, typename S>
 __aicore__ inline void MmadMx(
     __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __cc__ T* bias, const MmadParams& mmadParams)
 {
-    MmadMxCal(dst, fm, filter, (uint64_t)bias, mmadParams, false);
+    MmadMxCal(dst, fm, filter, (uint64_t)bias, mmadParams, mmadParams.cmatrixSource);
 }
 
 template <typename T, typename U, typename S>
