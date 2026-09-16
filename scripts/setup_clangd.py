@@ -39,7 +39,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--npu-arch",
         default="2201",
-        choices=("2201", "3510"),
+        choices=("2201", "3510", "5101"),
         help="Value for __NPU_ARCH__.",
     )
     parser.add_argument(

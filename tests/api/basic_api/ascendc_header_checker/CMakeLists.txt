@@ -48,6 +48,7 @@ set(CONFIGS_LIST
     "dav-m300|3002|-D__DAV_M300__|-DASCENDC_DEBUG=1|-DASCENDC_DUMP=1"
     "dav-m310|3102|-D__DAV_M310__"
     "dav-510r2|5102|-DASCENDC_DEBUG=1|-DASCENDC_DUMP=1"
+    "dav-l510|5101|-D__DAV_L510__|-D__DAV_L510_VEC__"
 )
 
 # ==========================================

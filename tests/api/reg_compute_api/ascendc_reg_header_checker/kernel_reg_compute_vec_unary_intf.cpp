@@ -18,7 +18,9 @@ extern "C" __simd_vf__ void vec_unary_test()
 {
     AscendC::Reg::RegTensor<float> dstReg, srcReg, srcReg2;
     AscendC::Reg::RegTensor<int32_t> srcRegInt;
+#if !defined(__DAV_L510__) // complex dtype is out of the dav_l510 capability set (follows dav_l311)
     AscendC::Reg::RegTensor<complex64> a, b, c;
+#endif
     AscendC::Reg::MaskReg mask;
 
     // template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
@@ -28,7 +30,9 @@ extern "C" __simd_vf__ void vec_unary_test()
     // template <typename T = DefaultType, typename U = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING,
     //           typename S, typename V>
     // __simd_callee__ inline void Abs(S& dstReg, V& srcReg, MaskReg& mask);
+#if !defined(__DAV_L510__) // complex dtype is out of the dav_l510 capability set (follows dav_l311)
     AscendC::Reg::Abs(dstReg, a, mask);
+#endif
 
     // template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
     // __simd_callee__ inline void Relu(U& dstReg, U& srcReg, MaskReg& mask);
