@@ -1,0 +1,57 @@
+-- System processer: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.1.0/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.1.0/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.1.0/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 11.4.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/g++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- [INFO] SCENARIO_NUM is 3
+-- Configuring done (0.2s)
+-- Generating done (0.0s)
+CMake Warning (unused-cli):
+  Manually-specified variables were not used by the project:
+
+    CMAKE_C_COMPILER
+
+
+-- Build files have been written to: /home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_144224/load_data_2dmx_l12l0_s3/build
+[ 50%] Building ASC object CMakeFiles/demo.dir/load_data_2dmx_l12l0.asc.o
+/home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_144224/load_data_2dmx_l12l0_s3/load_data_2dmx_l12l0.asc:211:66: error: unknown type name 'T'
+        AscendC::MmadMx((__cc__ U*)c1Local.GetPhyAddr(), (__ca__ T*)a2Local.GetPhyAddr(), (__cb__ T*)b2Local.GetPhyAddr(),
+                                                                 ^
+/home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_144224/load_data_2dmx_l12l0_s3/load_data_2dmx_l12l0.asc:211:99: error: unknown type name 'T'
+        AscendC::MmadMx((__cc__ U*)c1Local.GetPhyAddr(), (__ca__ T*)a2Local.GetPhyAddr(), (__cb__ T*)b2Local.GetPhyAddr(),
+                                                                                                  ^
+2 errors generated.
+/home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_144224/load_data_2dmx_l12l0_s3/load_data_2dmx_l12l0.asc:211:66: error: unknown type name 'T'
+        AscendC::MmadMx((__cc__ U*)c1Local.GetPhyAddr(), (__ca__ T*)a2Local.GetPhyAddr(), (__cb__ T*)b2Local.GetPhyAddr(),
+                                                                 ^
+/home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_144224/load_data_2dmx_l12l0_s3/load_data_2dmx_l12l0.asc:211:99: error: unknown type name 'T'
+        AscendC::MmadMx((__cc__ U*)c1Local.GetPhyAddr(), (__ca__ T*)a2Local.GetPhyAddr(), (__cb__ T*)b2Local.GetPhyAddr(),
+                                                                                                  ^
+2 errors generated.
+gmake[2]: *** [CMakeFiles/demo.dir/build.make:79: CMakeFiles/demo.dir/load_data_2dmx_l12l0.asc.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:87: CMakeFiles/demo.dir/all] Error 2
+gmake: *** [Makefile:91: all] Error 2
+make[2]: Warning: File '/usr/local/Ascend/cann-9.1.0/asc/include/basic_api/kernel_operator_data_copy_intf.h' has modification time 9905 s in the future
+[ 50%] Building ASC object CMakeFiles/demo.dir/load_data_2dmx_l12l0.asc.o
+/home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_144224/load_data_2dmx_l12l0_s3/load_data_2dmx_l12l0.asc:211:66: error: unknown type name 'T'
+        AscendC::MmadMx((__cc__ U*)c1Local.GetPhyAddr(), (__ca__ T*)a2Local.GetPhyAddr(), (__cb__ T*)b2Local.GetPhyAddr(),
+                                                                 ^
+/home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_144224/load_data_2dmx_l12l0_s3/load_data_2dmx_l12l0.asc:211:99: error: unknown type name 'T'
+        AscendC::MmadMx((__cc__ U*)c1Local.GetPhyAddr(), (__ca__ T*)a2Local.GetPhyAddr(), (__cb__ T*)b2Local.GetPhyAddr(),
+                                                                                                  ^
+2 errors generated.
+/home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_144224/load_data_2dmx_l12l0_s3/load_data_2dmx_l12l0.asc:211:66: error: unknown type name 'T'
+        AscendC::MmadMx((__cc__ U*)c1Local.GetPhyAddr(), (__ca__ T*)a2Local.GetPhyAddr(), (__cb__ T*)b2Local.GetPhyAddr(),
+                                                                 ^
+/home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_144224/load_data_2dmx_l12l0_s3/load_data_2dmx_l12l0.asc:211:99: error: unknown type name 'T'
+        AscendC::MmadMx((__cc__ U*)c1Local.GetPhyAddr(), (__ca__ T*)a2Local.GetPhyAddr(), (__cb__ T*)b2Local.GetPhyAddr(),
+                                                                                                  ^
+2 errors generated.
+make[2]: *** [CMakeFiles/demo.dir/build.make:79: CMakeFiles/demo.dir/load_data_2dmx_l12l0.asc.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:87: CMakeFiles/demo.dir/all] Error 2
+make: *** [Makefile:91: all] Error 2
