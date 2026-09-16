@@ -46,5 +46,5 @@ cd examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad
 
 ## 账号
 
-Fork：`qq_53202098/asc-devkit`  
-分支：`feature/cube-basic-api-pointerization`
+Fork：`baibai_Uu/asc-devkit`（private）  
+**验收分支：** `feature/cube-basic-api-pointerization`（以分支最新为准）
