@@ -125,7 +125,14 @@ __aicore__ inline void DataCacheCleanAndInvalid(const T* dst)
     if constexpr (space == DmaAddrSpace::kGm || space == DmaAddrSpace::kUnknown) {
         DcciGMImpl<ElemT, entireType>(const_cast<__gm__ ElemT*>(dst));
     } else if constexpr (space == DmaAddrSpace::kUb) {
-        DcciUBImpl<ElemT, entireType>(const_cast<__ubuf__ ElemT*>(dst));
+        // The two-argument DcciUBImpl does not exist: the UB flavour of the "entireType" form is only
+        // wired up on the architectures that also provide the three-argument Dcci*Impl family (the
+        // Tensor-only counterpart only declares, and never defines, a LocalTensor operand there).
+        static_assert(
+            (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) ||
+                (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) ||
+                (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163),
+            "DataCacheCleanAndInvalid with a UB pointer operand is not supported on this architecture");
     } else {
         static_assert(space == DmaAddrSpace::kGm, "DataCacheCleanAndInvalid pointer operand must be GM or UB");
     }
