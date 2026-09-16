@@ -75,12 +75,40 @@ ACT_INC="${ASCEND_HOME_PATH}/asc/include/basic_api"
 ACT_IMPL="${ASCEND_HOME_PATH}/asc/impl/basic_api"
 if [ -d "$ACT_INC" ] && [ -d "$ACT_IMPL" ]; then
   cp -a "$SRC/include/basic_api/kernel_operator_ptr_utils.h" "$ACT_INC/" 2>/dev/null || true
-  for f in kernel_operator_mm_ptr_impl.h kernel_operator_fixpipe_ptr_impl.h \
-           kernel_operator_dump_tensor_ptr_impl.h kernel_operator_block_sync_ptr_impl.h \
-           kernel_operator_determine_compute_sync_ptr_impl.h; do
+  # 矩阵自测只 overlay mm/fixpipe；dump/sync 另走合入路径（避免 AscendC::AscendC）
+  for f in kernel_operator_mm_ptr_impl.h kernel_operator_fixpipe_ptr_impl.h; do
     [ -f "$SRC/impl/basic_api/$f" ] && cp -a "$SRC/impl/basic_api/$f" "$ACT_IMPL/" || true
   done
+  for pair in \
+    "kernel_operator_mm_intf_impl.h:kernel_operator_mm_ptr_impl.h" \
+    "kernel_operator_fixpipe_intf_impl.h:kernel_operator_fixpipe_ptr_impl.h"
+  do
+    host=${pair%%:*}; inc=${pair##*:}
+    tgt="$ACT_IMPL/$host"
+    [ -f "$tgt" ] || continue
+    if ! grep -q "$inc" "$tgt" 2>/dev/null; then
+      python3 - "$tgt" "$inc" <<'PY'
+from pathlib import Path
+import sys
+p = Path(sys.argv[1])
+inc = sys.argv[2]
+t = p.read_text(encoding="utf-8", errors="replace")
+line = '#include "%s"\n' % inc
+marker = "} // namespace AscendC"
+i = t.rfind(marker)
+if i != -1:
+    j = i + len(marker)
+    t = t[:j] + "\n" + line + t[j:]
+else:
+    t = t + line
+p.write_text(t, encoding="utf-8")
+print("patched", p)
+PY
+    fi
+  done
   echo "OVERLAY_OK"
+else
+  echo "WARN: CANN asc headers not found under ASCEND_HOME_PATH=${ASCEND_HOME_PATH:-}"
 fi
 
 EX="$SRC/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute"
@@ -98,7 +126,11 @@ run_case() {
   echo "==== RUN $name s$scenario ===="
   [ -d "$srcdir" ] || { echo -e "${name}\t${scenario}\t${ARCH}\tMISSING\t-\t-\t" >> "$SUMMARY"; return; }
   rm -rf "$work"; mkdir -p "$work/build"; cp -a "$srcdir"/. "$work/"
-  find "$work" -name '*.asc' -print0 | xargs -0 sed -i -e 's/ceil_divisionision/ceil_division/g' 2>/dev/null || true
+  # Mmad*/ in block comments terminates /* early → "unknown type name 'Fixpipe'"
+  find "$work" -name '*.asc' -print0 | xargs -0 sed -i \
+    -e 's|Mmad\*/Fixpipe\*/LoadData\*|Mmad/Fixpipe/LoadData|g' \
+    -e 's/ceil_divisionision/ceil_division/g' \
+    -e 's/ceil_div(/ceil_division(/g' 2>/dev/null || true
   cd "$work"
   set +e; $PY scripts/gen_data.py -scenarioNum "$scenario" >"$RUNROOT/${name}_s${scenario}_gendata.log" 2>&1 || $PY scripts/gen_data.py >>"$RUNROOT/${name}_s${scenario}_gendata.log" 2>&1; set -e
   cd "$work/build"
