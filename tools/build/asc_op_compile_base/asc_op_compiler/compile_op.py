@@ -872,7 +872,9 @@ def gen_kernel_fun(
             source += "    GM_ADDR usrWorkspace = nullptr;\n"
         else:
             source += "    AscendC::SetSysWorkspaceForce(workspace);\n"
-            source += "    GM_ADDR usrWorkspace = AscendC::GetUserWorkspace(workspace);\n"
+            source += (
+                "    GM_ADDR usrWorkspace = AscendC::GetUserWorkspace(workspace);\n"
+            )
 
         # restart enable begin position
         if global_var_storage.get_variable("ascendc_enable_aicore_exception_restart"):
