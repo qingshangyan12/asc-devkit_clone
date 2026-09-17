@@ -17,7 +17,10 @@
 
 #include "impl/utils/debug/asc_simd_debug_traits.h"
 
+#ifndef ASCENDC_SYS_PRINT_FIFO_SPACE_DEFINED
+#define ASCENDC_SYS_PRINT_FIFO_SPACE_DEFINED
 inline __gm__ uint8_t* __gm__ g_sysPrintFifoSpace = nullptr;
+#endif
 
 #ifndef ASCENDC_CPU_DEBUG
 #include <type_traits>
@@ -277,6 +280,34 @@ __aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo,
     }
 
     return true;
+}
+
+// Equal read/write offsets represent an empty FIFO, so a complete record and
+// any private staging bytes must always leave one byte of slack.
+__aicore__ inline bool can_write_single_tlv(__gm__ DebugBlockHeadInfo* blockInfo, uint64_t length)
+{
+    return blockInfo != nullptr && length < blockInfo->ringBufLen && length <= UINT32_MAX;
+}
+
+__aicore__ inline uint32_t get_max_tlv_payload(
+    __gm__ DebugBlockHeadInfo* blockInfo, uint32_t headerLen, uint32_t alignment, uint32_t scratchLen = 0)
+{
+    if (blockInfo == nullptr || alignment == 0 || headerLen > UINT32_MAX - scratchLen - 1) {
+        return 0;
+    }
+    const uint64_t overhead = static_cast<uint64_t>(headerLen) + scratchLen + 1;
+    if (overhead >= blockInfo->ringBufLen) {
+        return 0;
+    }
+    const uint64_t available = blockInfo->ringBufLen - overhead;
+    return static_cast<uint32_t>(available / alignment * alignment);
+}
+
+__aicore__ inline void publish_dump_tlv(__gm__ DebugBlockHeadInfo* blockInfo, uint32_t tlvLen)
+{
+    sync_all();
+    asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(get_ringbuf_tlv_addr(blockInfo)));
+    update_write_info(get_block_write_info(blockInfo), tlvLen);
 }
 
 template <typename T>

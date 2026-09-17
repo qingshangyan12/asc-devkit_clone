@@ -28,6 +28,8 @@
 #include "kernel_operator_data_copy_impl.h"
 #include "../kernel_pop_stack_buffer.h"
 #include "../../utils/debug/asc_aicore_printf_impl.h"
+#include "../../utils/debug/asc_dump_super_tensor_capability.h"
+#include "../../utils/debug/asc_dump_super_tensor_engine.h"
 
 namespace AscendC {
 /* **************************************************************************************************
@@ -520,7 +522,7 @@ __aicore__ inline void SetDumpDataL0C2GM(__gm__ uint8_t* dst, const LocalTensor<
         param); // recover data in UB
     PipeBarrier<PIPE_ALL>();
     uint32_t tailLen = copyLen * 2 - alignDumpDataLen;
-    ClearGmData(gmBackAddr + alignDumpDataLen, tailLen);
+    ClearGmData(dst + alignDumpDataLen, tailLen);
 }
 
 template <typename T>
@@ -555,6 +557,8 @@ __aicore__ inline void WriteRingBufTlvData(
     MemCopyGm2Gm(dst, reinterpret_cast<__gm__ const uint8_t*>(src.GetPhyAddr()), dumpSize * sizeof(T));
 }
 
+#include "kernel_operator_dump_tensor_transport.h"
+
 template <template <typename> class Tensor, typename T>
 __aicore__ inline void DumpTensorRingBufImpl(
     const Tensor<T>& src, uint32_t desc, uint32_t dumpSize, const uint32_t* shape, const uint32_t shapeDim)
@@ -578,6 +582,20 @@ __aicore__ inline void DumpTensorRingBufImpl(
     __gm__ BlockRingBufInfo* blockRingBufInfo = GetBlockRingBufInfo();
     if (blockRingBufInfo == nullptr) {
         return;
+    }
+    if (__asc_aicore::has_super_tensor_protocol()) {
+        Hardware position = Hardware::GM;
+        if constexpr (IsSameType<Tensor<T>, LocalTensor<T>>::value) {
+            position = CheckDumpTensorPosition(src);
+        }
+        if (position != Hardware::MAX) {
+            IndependentDumpTransport<Tensor, T> transport(src, blockRingBufInfo, position);
+            __asc_aicore::dump_super_tensor(transport, static_cast<uint64_t>(dumpSize) * sizeof(T),
+                static_cast<uint32_t>(reinterpret_cast<uintptr_t>(src.GetPhyAddr())),
+                static_cast<uint32_t>(GetTensorDataType<T>()), static_cast<uint16_t>(position),
+                static_cast<uint16_t>(GetBlockIdxImpl()), desc, shape, shapeDim);
+            return;
+        }
     }
     constexpr uint32_t blockSize = 16 * 16 * sizeof(uint32_t);
     uint32_t alignDumpDataLen = AlignUp(dumpSize * sizeof(T), ONE_BLK_SIZE);
