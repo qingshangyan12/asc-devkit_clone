@@ -107,8 +107,8 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const
                 const uint64_t dstFractalIndex =
                     static_cast<uint64_t>(i) * (static_cast<uint64_t>(loadDataParam.dstGap) + 1);
                 load_cbuf_to_cb(
-                    dst + dstFractalIndex * VALUE_512 / sizeof(T),
-                    src + srcFractalIndex * VALUE_512 / sizeof(T), mStartPosition, 0, 1, 1, srcStride, dstStride, 1);
+                    dst + dstFractalIndex * VALUE_512 / sizeof(T), src + srcFractalIndex * VALUE_512 / sizeof(T),
+                    mStartPosition, 0, 1, 1, srcStride, dstStride, 1);
             }
         } else {
             load_cbuf_to_cb(dst, src, mStartPosition, kStartPosition, 1, kStep, srcStride, dstStride, 0);
