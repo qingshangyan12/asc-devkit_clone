@@ -2687,17 +2687,8 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
 /* **************************************************************************************************
  * DataCopyPad / DataCopyL1ToUB pointer extended overloads
  *
- * Each overload accepts a raw address-space pointer in place of the equivalent LocalTensor / GlobalTensor
- * operand. Two properties keep the existing behaviour intact:
- *   - they are enabled only when at least one operand is a raw pointer (IsDmaPtrInvolved), so every
- *     Tensor/Tensor call still resolves to the Tensor-only signatures declared in the interface header;
- *   - a pointer operand contributes its position at compile time (DmaHardwarePosV), while a Tensor operand
- *     keeps the original runtime GetPosition() dispatch.
- *
- * The Tensor size / overflow and the CPU debug shape checks need Tensor metadata, which a raw pointer does not
- * carry. They are therefore applied to the Tensor operands of a mixed call only; for a pointer operand the
- * length is the caller's responsibility. This is the documented degradation of the pointer path and is the
- * reason no check call is emitted here for a pointer operand.
+ * Same two properties and the same documented degradation as the DataCopy pointer overloads above; these
+ * overloads differ only in the API family they extend.
  * ************************************************************************************************* */
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 

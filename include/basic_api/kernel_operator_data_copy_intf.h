@@ -98,7 +98,7 @@ template <typename T, bool enableSmallC0 = false>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams);
 
-// Pointer-extended form, GM -> UB / L1 ND2NZ; see the DataCopyParams overload above for the design notes.
+// Pointer-extended form of the GM -> UB / L1 ND2NZ overload above (design notes there).
 template <
     typename DstT, typename SrcT, bool enableSmallC0 = false,
     typename Std::enable_if<
@@ -110,7 +110,7 @@ template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams);
 
-// Pointer-extended form, GM -> UB / L1 ND2NZ; see the DataCopyParams overload above for the design notes.
+// Pointer-extended form of the GM -> UB / L1 ND2NZ overload above (design notes there).
 template <
     typename DstT, typename SrcT,
     typename Std::enable_if<
@@ -615,7 +615,6 @@ __aicore__ inline void DataCopy(
  * resolution is untouched.
  */
 /*
- * @ingroup DataCopyPad Level 0
  * @brief non aligned datacopy from GM to UB / L1, legacy DataCopyParams + DataCopyPadParams form
  * @param [out] dst output LocalTensor or __ubuf__ / __cbuf__ pointer
  * @param [in] src input GlobalTensor or __gm__ pointer
@@ -637,7 +636,6 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
 #endif
 
 /*
- * @ingroup DataCopyPad Level 0
  * @brief non aligned datacopy from UB / L1 to GM, legacy DataCopyParams form
  * @param [out] dst output GlobalTensor or __gm__ pointer
  * @param [in] src input LocalTensor or __ubuf__ / __cbuf__ pointer
@@ -659,7 +657,6 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
 #endif
 
 /*
- * @ingroup DataCopyPad Level 0
  * @brief non aligned datacopy from UB to L1 (TSCM), DataCopyParams + Nd2NzParams form
  * @param [out] dst output LocalTensor or __cbuf__ pointer
  * @param [in] src input LocalTensor or __ubuf__ pointer
@@ -672,7 +669,6 @@ __aicore__ inline void DataCopyPad(
     const DstT& dst, const SrcT& src, const DataCopyParams& dataCopyParams, const Nd2NzParams& nd2nzParams);
 
 /*
- * @ingroup DataCopyPad Level 0
  * @brief non aligned datacopy from GM to UB / L1, DataCopyExtParams + DataCopyPadExtParams form
  * @param [out] dst output LocalTensor or __ubuf__ / __cbuf__ pointer
  * @param [in] src input GlobalTensor or __gm__ pointer
@@ -714,7 +710,6 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
 #endif
 
 /*
- * @ingroup DataCopyPad Level 0
  * @brief non aligned datacopy from UB / L1 to GM, DataCopyExtParams form
  * @param [out] dst output GlobalTensor or __gm__ pointer
  * @param [in] src input LocalTensor or __ubuf__ / __cbuf__ pointer
@@ -739,7 +734,6 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
 #endif
 
 /*
- * @ingroup DataCopyPad Level 0
  * @brief non aligned datacopy from UB to L1 (TSCM), DataCopyExtParams + Nd2NzParams form
  * @param [out] dst output LocalTensor or __cbuf__ pointer
  * @param [in] src input LocalTensor or __ubuf__ pointer
