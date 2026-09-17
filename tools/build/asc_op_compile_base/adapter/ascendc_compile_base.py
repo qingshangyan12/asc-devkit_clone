@@ -46,7 +46,6 @@ from .ascendc_kernel_feature_manager import global_ascendc_kernel_feature_manage
 
 
 def compile_pre_process(op_info: OpInfo, compile_options: list):
-    global_var_storage.set_variable("ascendc_compile_options", list(compile_options))
     cce_runtime.TBE_WORKSPACE_SIZE_LIST.local_list = []
     cce_runtime.TBE_WORKSPACE_IND_LIST.local_list = []
     cce_runtime.MULTI_CORE_SYNC_WORKSPACE_SIZE_LIST.local_list = []
@@ -145,26 +144,31 @@ def fatbin_objs(obj_files: list, dst_file: str, is_debug: bool, compile_log_path
         return
     from .static_compile_resource_id import ResourceIdError, generate_resource_id_object
 
-    resource_object = "%s.resource_id.o" % dst_file
-    compile_command = [global_var_storage.get_variable("ascendc_compiler_path")]
-    if global_var_storage.get_variable("ascendc_enable_ccache") == True:
-        compile_command.insert(0, os.environ.get("ASCENDC_CCACHE_EXECUTABLE"))
-    try:
-        resource_id = generate_resource_id_object(
-            obj_files,
-            resource_object,
-            compile_command,
-            global_var_storage.get_variable("ascendc_compile_options"),
-            get_soc_spec(COMPILER_ARCH),
-        )
-        global_var_storage.set_variable(
-            "ascendc_resource_id_" + os.path.abspath(dst_file), resource_id
-        )
-    except ResourceIdError as error:
-        raise RuntimeError(
-            "generate Resource ID metadata failed: %s" % error
-        ) from error
-    obj_files = list(obj_files) + [resource_object]
+    obj_files = list(obj_files)
+    if global_var_storage.get_variable("ascendc_kernel_spec_enabled"):
+        resource_object = "%s.resource_id.o" % dst_file
+        compile_command = [global_var_storage.get_variable("ascendc_compiler_path")]
+        if global_var_storage.get_variable("ascendc_enable_ccache") == True:
+            compile_command.insert(0, os.environ.get("ASCENDC_CCACHE_EXECUTABLE"))
+        try:
+            resource_id = generate_resource_id_object(
+                obj_files,
+                resource_object,
+                compile_command,
+                get_soc_spec(COMPILER_ARCH),
+                compile_log_path,
+            )
+            global_var_storage.get_variable("ascendc_resource_ids")[
+                os.path.abspath(dst_file)
+            ] = resource_id
+        except ResourceIdError as error:
+            raise RuntimeError(
+                "generate Resource ID metadata failed: %s" % error
+            ) from error
+        if os.path.abspath(resource_object) not in {
+            os.path.abspath(obj) for obj in obj_files if isinstance(obj, str)
+        }:
+            obj_files.append(resource_object)
     compile_cmd = [
         CCECInfo.get_exe("ld.lld"),
         "-m",

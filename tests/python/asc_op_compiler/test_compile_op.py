@@ -481,6 +481,7 @@ class TestCompileOp(unittest.TestCase):
                         mock.patch.object(compile_op_module, "handle_compile_options")
                     )
                     compile_states = []
+                    mock_write_resource_id = mock.Mock()
 
                     def record_compile_state(compile_info, *_args, **_kwargs):
                         state = (
@@ -495,6 +496,14 @@ class TestCompileOp(unittest.TestCase):
                             ),
                         )
                         compile_states.append(state)
+                        if (
+                            compile_info.compile_command_session.mode
+                            is CompileCommandMode.EXECUTE_AND_RECORD
+                        ):
+                            mock_write_resource_id(compile_info.dst_file)
+                            global_var_storage.get_variable("ascendc_resource_ids")[
+                                os.path.abspath(compile_info.dst_file)
+                            ] = "resource-id"
                         if (
                             compile_info.compile_command_session.mode
                             is not CompileCommandMode.EXECUTE
