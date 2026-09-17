@@ -231,8 +231,11 @@ run_case() {
     if [ -n "$M" ] && [ -n "$N" ] && [ -n "$K" ]; then
       mnk_args=(-M "$M" -N "$N" -K "$K")
     fi
-    if grep -qE 'scenarioNum' scripts/verify_result.py 2>/dev/null; then
+    # only use argparse -scenarioNum when the script actually defines that flag
+    if grep -qE 'add_argument\(.*scenarioNum|"\-scenarioNum"|'\''\-scenarioNum'\''' scripts/verify_result.py 2>/dev/null; then
       $PY scripts/verify_result.py -scenarioNum "$scenario" "${mnk_args[@]}" ./output/output.bin ./output/golden.bin >"$vlog" 2>&1
+    elif grep -q 'sys.argv\[3\]' scripts/verify_result.py 2>/dev/null; then
+      $PY scripts/verify_result.py ./output/output.bin ./output/golden.bin "$scenario" >"$vlog" 2>&1
     else
       $PY scripts/verify_result.py ./output/output.bin ./output/golden.bin >"$vlog" 2>&1
     fi
@@ -375,7 +378,8 @@ TASKBOOK_CASES=(
   "load_data_l12l0:1:32:32:32"
   "load_data_l12l0:1:16:16:1024"
   "fixpipe_l0c2gm:1:32:32:32"
-  "fixpipe_l0c2gm:1:16:16:1024"
+  "fixpipe_l0c2gm:1:64:64:64"
+  "fixpipe_l0c2gm:1:1024:16:16"
 )
 
 echo "CASE_COUNT=${#TASKBOOK_CASES[@]} MODE=$MODE"
