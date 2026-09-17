@@ -28,6 +28,7 @@
 #include "kernel_struct_fixpipe.h"
 #include "kernel_tensor.h"
 #include "../../impl/basic_api/utils/kernel_utils_macros.h"
+#include "../../impl/basic_api/utils/kernel_utils_pointer.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -59,6 +60,19 @@ __aicore__ inline void SetFixPipeConfig(
 
 template <typename T, bool setRelu = false>
 __aicore__ inline void SetFixPipeConfig(const LocalTensor<T>& preData, bool isUnitFlag = false);
+
+template <
+    typename ReluPre, typename QuantPre,
+    typename Std::enable_if<
+        Internal::IsTensorOrPointerOperand<ReluPre> && Internal::IsTensorOrPointerOperand<QuantPre> &&
+            (Internal::IsPointerOperand<ReluPre> || Internal::IsPointerOperand<QuantPre>),
+        bool>::type = true>
+__aicore__ inline void SetFixPipeConfig(const ReluPre& reluPre, const QuantPre& quantPre, bool isUnitFlag = false);
+
+template <
+    typename PreData, bool setRelu = false,
+    typename Std::enable_if<Internal::IsPointerOperand<PreData>, bool>::type = true>
+__aicore__ inline void SetFixPipeConfig(const PreData& preData, bool isUnitFlag = false);
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint32_t dstNdStride);
@@ -100,6 +114,20 @@ template <
 __aicore__ inline void Fixpipe(
     const GlobalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<S>& cbufWorkspace,
     const FixpipeParamsV220& intriParams);
+
+template <
+    typename Dst, typename Src, const FixpipeConfig& config = CFG_ROW_MAJOR,
+    typename Std::enable_if<Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>, bool>::type = true>
+__aicore__ inline void Fixpipe(const Dst& dst, const Src& src, const FixpipeParamsV220& intriParams);
+
+template <
+    typename Dst, typename Src, const FixpipeConfig& config = CFG_ROW_MAJOR, typename Workspace,
+    typename Std::enable_if<
+        (Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src> || Internal::IsPointerOperand<Workspace>) &&
+            Std::is_same<Internal::OperandPrimT<Workspace>, uint64_t>::value,
+        bool>::type = true>
+__aicore__ inline void Fixpipe(
+    const Dst& dst, const Src& src, const Workspace& cbufWorkspace, const FixpipeParamsV220& intriParams);
 #endif
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3002
@@ -128,6 +156,20 @@ template <
 __aicore__ inline void Fixpipe(
     const GlobalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<S>& cbufWorkspace,
     const FixpipeParamsM300& intriParams);
+
+template <
+    typename Dst, typename Src, const FixpipeConfig& config = CFG_ROW_MAJOR,
+    typename Std::enable_if<Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>, bool>::type = true>
+__aicore__ inline void Fixpipe(const Dst& dst, const Src& src, const FixpipeParamsM300& intriParams);
+
+template <
+    typename Dst, typename Src, const FixpipeConfig& config = CFG_ROW_MAJOR, typename Workspace,
+    typename Std::enable_if<
+        (Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src> || Internal::IsPointerOperand<Workspace>) &&
+            Std::is_same<Internal::OperandPrimT<Workspace>, uint64_t>::value,
+        bool>::type = true>
+__aicore__ inline void Fixpipe(
+    const Dst& dst, const Src& src, const Workspace& cbufWorkspace, const FixpipeParamsM300& intriParams);
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3102
 // L0C->L1/UB
 template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
@@ -154,6 +196,20 @@ template <
 __aicore__ inline void Fixpipe(
     const GlobalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<S>& cbufWorkspace,
     const FixpipeParamsM310& intriParams);
+
+template <
+    typename Dst, typename Src, const FixpipeConfig& config = CFG_ROW_MAJOR,
+    typename Std::enable_if<Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>, bool>::type = true>
+__aicore__ inline void Fixpipe(const Dst& dst, const Src& src, const FixpipeParamsM310& intriParams);
+
+template <
+    typename Dst, typename Src, const FixpipeConfig& config = CFG_ROW_MAJOR, typename Workspace,
+    typename Std::enable_if<
+        (Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src> || Internal::IsPointerOperand<Workspace>) &&
+            Std::is_same<Internal::OperandPrimT<Workspace>, uint64_t>::value,
+        bool>::type = true>
+__aicore__ inline void Fixpipe(
+    const Dst& dst, const Src& src, const Workspace& cbufWorkspace, const FixpipeParamsM310& intriParams);
 #elif !defined(__NPU_ARCH__) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // L0C->L1
 template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
@@ -175,6 +231,21 @@ __aicore__ inline void Fixpipe(
 template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
 __aicore__ inline void Fixpipe(
     const GlobalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<uint64_t>& cbufWorkspace,
+    const FixpipeParamsArch3510<config.format>& intriParams);
+
+template <
+    typename Dst, typename Src, const FixpipeConfig& config = CFG_ROW_MAJOR,
+    typename Std::enable_if<Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>, bool>::type = true>
+__aicore__ inline void Fixpipe(const Dst& dst, const Src& src, const FixpipeParamsArch3510<config.format>& intriParams);
+
+template <
+    typename Dst, typename Src, const FixpipeConfig& config = CFG_ROW_MAJOR, typename Workspace,
+    typename Std::enable_if<
+        (Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src> || Internal::IsPointerOperand<Workspace>) &&
+            Std::is_same<Internal::OperandPrimT<Workspace>, uint64_t>::value,
+        bool>::type = true>
+__aicore__ inline void Fixpipe(
+    const Dst& dst, const Src& src, const Workspace& cbufWorkspace,
     const FixpipeParamsArch3510<config.format>& intriParams);
 #endif
 } // namespace AscendC

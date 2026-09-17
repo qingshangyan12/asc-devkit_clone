@@ -84,6 +84,20 @@ extern "C" __global__ __aicore__ void KernelTestSyncAll1()
 // __aicore__ inline void SyncAll();
 extern "C" __global__ __aicore__ void KernelTestSyncAll2() { AscendC::SyncAll(); }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+extern "C" __global__ __aicore__ void KernelTestCubePointerBlockSync()
+{
+    __gm__ int32_t* gmWorkspace;
+    __ubuf__ int32_t* ubWorkspace;
+    AscendC::IBSet(gmWorkspace, ubWorkspace, 0, 0);
+    AscendC::IBWait(gmWorkspace, ubWorkspace, 0, 0);
+    AscendC::SyncAll(gmWorkspace, ubWorkspace, 1);
+
+    AscendC::GlobalTensor<int32_t> gmTensor;
+    AscendC::IBSet(gmTensor, ubWorkspace, 0, 0);
+}
+#endif
+
 // template <uint8_t modeId, pipe_t pipe>
 // __aicore__ inline void CrossCoreSetFlag(uint16_t flagId);
 extern "C" __global__ __aicore__ void KernelTestCrossCoreSetFlag1()

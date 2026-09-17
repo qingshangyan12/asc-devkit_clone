@@ -72,6 +72,168 @@ __aicore__ inline void NotifyNextBlock(GlobalTensor<int32_t>& gmWorkspace, Local
 {
     NotifyNextBlockCalc(gmWorkspace, ubWorkspace);
 }
+
+template <typename GmWorkspace, typename UbWorkspace>
+__aicore__ inline void CheckDetermineComputePointerPositions(
+    const GmWorkspace& gmWorkspace, const UbWorkspace& ubWorkspace)
+{
+    using GmType = Internal::WritableOperandPrimT<GmWorkspace>;
+    using UbType = Internal::WritableOperandPrimT<UbWorkspace>;
+    static_assert(
+        Std::is_same<GmType, int32_t>::value && Std::is_same<UbType, int32_t>::value,
+        "Determine-compute workspaces must contain int32_t");
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(gmWorkspace)) == Hardware::GM), {
+        KERNEL_LOG(KERNEL_ERROR, "Determine-compute gmWorkspace must be in Global Memory");
+    });
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(ubWorkspace)) == Hardware::UB), {
+        KERNEL_LOG(KERNEL_ERROR, "Determine-compute ubWorkspace must be in Unified Buffer");
+    });
+}
+
+template <typename GmWorkspace>
+__aicore__ inline void DetermineComputeCopyGM2UB(
+    __ubuf__ int32_t* dst, const GmWorkspace& gmWorkspace, __gm__ int32_t* src, uint32_t count)
+{
+    DataCopyParams params;
+    DataCopyCheck<int32_t>(count, params);
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+    DataCopyGM2UBImpl(dst, src, params, GetOperandCacheMode(gmWorkspace));
+#else
+    DataCopyGM2UBImpl(dst, src, params);
+#endif
+}
+
+template <typename GmWorkspace>
+__aicore__ inline void DetermineComputeCopyUB2GM(
+    const GmWorkspace& gmWorkspace, __gm__ int32_t* dst, __ubuf__ int32_t* src, uint32_t count)
+{
+    DataCopyParams params;
+    DataCopyCheck<int32_t>(count, params);
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+    DataCopyUB2GMImpl(dst, src, params, GetOperandCacheMode(gmWorkspace));
+#else
+    DataCopyUB2GMImpl(dst, src, params);
+#endif
+}
+
+__aicore__ inline bool CheckUBWorkspacePointer(__ubuf__ int32_t* ubWorkspace, int64_t blockIdx, int64_t blockNum)
+{
+    const int32_t repeatTime = ubWorkspace[blockNum * B32_DATA_NUM_PER_BLOCK];
+    int64_t offset = 0;
+    for (; offset < blockIdx * B32_DATA_NUM_PER_BLOCK; offset += B32_DATA_NUM_PER_BLOCK) {
+        if (ubWorkspace[offset] != repeatTime) {
+            return false;
+        }
+    }
+    for (; offset < blockNum * B32_DATA_NUM_PER_BLOCK; offset += B32_DATA_NUM_PER_BLOCK) {
+        if (ubWorkspace[offset] != 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+template <
+    typename GmWorkspace, typename UbWorkspace,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<GmWorkspace> || Internal::IsPointerOperand<UbWorkspace>, bool>::type>
+__aicore__ inline void InitDetermineComputeWorkspace(const GmWorkspace& gmWorkspace, const UbWorkspace& ubWorkspace)
+{
+    CheckDetermineComputePointerPositions(gmWorkspace, ubWorkspace);
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+    if ASCEND_IS_AIV {
+        __gm__ int32_t* gmPtr = (__gm__ int32_t*)GetUnderlyingPtr(gmWorkspace);
+        __ubuf__ int32_t* ubPtr = (__ubuf__ int32_t*)GetUnderlyingPtr(ubWorkspace);
+        PipeBarrier<PIPE_ALL>();
+        const int64_t blockNum = GetBlockNum();
+        if (GetBlockIdx() == 0) {
+            DuplicateImpl(ubPtr, 0, B32_DATA_NUM_PER_BLOCK * blockNum);
+            event_t eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE3));
+            SetFlag<HardEvent::V_MTE3>(eventID);
+            WaitFlag<HardEvent::V_MTE3>(eventID);
+            DetermineComputeCopyUB2GM(gmWorkspace, gmPtr, ubPtr, B32_DATA_NUM_PER_BLOCK * blockNum);
+        }
+        ubPtr[blockNum * B32_DATA_NUM_PER_BLOCK] = 1;
+        PipeBarrier<PIPE_ALL>();
+    }
+#else
+    ASCENDC_ASSERT((false), {
+        KERNEL_LOG(KERNEL_ERROR, "Pointer InitDetermineComputeWorkspace is not supported on this device");
+    });
+#endif
+}
+
+template <
+    typename GmWorkspace, typename UbWorkspace,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<GmWorkspace> || Internal::IsPointerOperand<UbWorkspace>, bool>::type>
+__aicore__ inline void WaitPreBlock(const GmWorkspace& gmWorkspace, const UbWorkspace& ubWorkspace)
+{
+    CheckDetermineComputePointerPositions(gmWorkspace, ubWorkspace);
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+    if ASCEND_IS_AIV {
+        __gm__ int32_t* gmPtr = (__gm__ int32_t*)GetUnderlyingPtr(gmWorkspace);
+        __ubuf__ int32_t* ubPtr = (__ubuf__ int32_t*)GetUnderlyingPtr(ubWorkspace);
+        PipeBarrier<PIPE_ALL>();
+        const int64_t blockIdx = GetBlockIdx();
+        const int64_t blockNum = GetBlockNum();
+        bool matchFlag;
+        do {
+            DetermineComputeCopyGM2UB(ubPtr, gmWorkspace, gmPtr, B32_DATA_NUM_PER_BLOCK * blockNum);
+            event_t eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_S));
+            SetFlag<HardEvent::MTE2_S>(eventID);
+            WaitFlag<HardEvent::MTE2_S>(eventID);
+            matchFlag = CheckUBWorkspacePointer(ubPtr, blockIdx, blockNum);
+            eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_MTE2));
+            SetFlag<HardEvent::S_MTE2>(eventID);
+            WaitFlag<HardEvent::S_MTE2>(eventID);
+        } while (!matchFlag);
+        PipeBarrier<PIPE_ALL>();
+    }
+#else
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "Pointer WaitPreBlock is not supported on this device"); });
+#endif
+}
+
+template <
+    typename GmWorkspace, typename UbWorkspace,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<GmWorkspace> || Internal::IsPointerOperand<UbWorkspace>, bool>::type>
+__aicore__ inline void NotifyNextBlock(const GmWorkspace& gmWorkspace, const UbWorkspace& ubWorkspace)
+{
+    CheckDetermineComputePointerPositions(gmWorkspace, ubWorkspace);
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+    if ASCEND_IS_AIV {
+        __gm__ int32_t* gmPtr = (__gm__ int32_t*)GetUnderlyingPtr(gmWorkspace);
+        __ubuf__ int32_t* ubPtr = (__ubuf__ int32_t*)GetUnderlyingPtr(ubWorkspace);
+        PipeBarrier<PIPE_ALL>();
+        const int64_t blockIdx = GetBlockIdx();
+        const int64_t blockNum = GetBlockNum();
+        const int32_t repeatTime = ubPtr[blockNum * B32_DATA_NUM_PER_BLOCK];
+        if (blockIdx + 1 == blockNum) {
+            DuplicateImpl(ubPtr, 0, blockNum * B32_DATA_NUM_PER_BLOCK);
+            event_t eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE3));
+            SetFlag<HardEvent::V_MTE3>(eventID);
+            WaitFlag<HardEvent::V_MTE3>(eventID);
+            DetermineComputeCopyUB2GM(gmWorkspace, gmPtr, ubPtr, blockNum * B32_DATA_NUM_PER_BLOCK);
+        } else {
+            const int64_t offset = blockIdx * B32_DATA_NUM_PER_BLOCK;
+            event_t eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
+            SetFlag<HardEvent::S_V>(eventID);
+            WaitFlag<HardEvent::S_V>(eventID);
+            DuplicateImpl(ubPtr + offset, repeatTime, B32_DATA_NUM_PER_BLOCK);
+            eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE3));
+            SetFlag<HardEvent::V_MTE3>(eventID);
+            WaitFlag<HardEvent::V_MTE3>(eventID);
+            DetermineComputeCopyUB2GM(gmWorkspace, gmPtr + offset, ubPtr + offset, B32_DATA_NUM_PER_BLOCK);
+        }
+        ubPtr[blockNum * B32_DATA_NUM_PER_BLOCK] = repeatTime + 1;
+        PipeBarrier<PIPE_ALL>();
+    }
+#else
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "Pointer NotifyNextBlock is not supported on this device"); });
+#endif
+}
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_DETERMINE_COMPUTE_SYNC_INTF_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DETERMINE_COMPUTE_SYNC_INTF_IMPL_H__)

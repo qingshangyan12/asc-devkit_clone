@@ -146,6 +146,27 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadData(
 #endif
     LoadDataImpl(dst, src, loadDataParams, nd2nzParams);
 }
+
+template <
+    typename Dst, typename Src,
+    typename Std::enable_if<Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>, bool>::type>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    const Dst& dst, const Src& src, const LoadData2DParamsV2& loadDataParams, const Nd2NzParamsV2& nd2nzParams)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    using SrcType = Internal::OperandPrimT<Src>;
+#ifdef ASCENDC_TIME_STAMP_ON
+    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE2_DATACOPY));
+#endif
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(dst)) == Hardware::L1), {
+        KERNEL_LOG(KERNEL_ERROR, "LoadData ND2NZ dst only supports L1 Buffer(A1/B1)");
+    });
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(src)) == Hardware::GM), {
+        KERNEL_LOG(KERNEL_ERROR, "LoadData ND2NZ src only supports Global Memory");
+    });
+    LoadData2DGM2L1Cal(
+        (__cbuf__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src), loadDataParams, nd2nzParams);
+}
 #endif
 
 /* **************************************************************************************************
@@ -406,6 +427,67 @@ __aicore__ inline void Mmad(
     MmadImpl(dst, fm, filter, bias, mmadParams);
 }
 
+template <
+    typename Dst, typename Fm, typename Filter,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Fm> || Internal::IsPointerOperand<Filter>,
+        bool>::type>
+__aicore__ inline void Mmad(const Dst& dst, const Fm& fm, const Filter& filter, const MmadParams& mmadParams)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    using FmType = Internal::OperandPrimT<Fm>;
+    using FilterType = Internal::OperandPrimT<Filter>;
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckMmadParamsCommon(mmadParams, "Mmad");
+#endif
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(dst)) == Hardware::L0C), {
+        KERNEL_LOG(KERNEL_ERROR, "Mmad dst only supports L0C Buffer(CO1)");
+    });
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(fm)) == Hardware::L0A), {
+        KERNEL_LOG(KERNEL_ERROR, "Mmad fm only supports L0A Buffer(A2)");
+    });
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(filter)) == Hardware::L0B), {
+        KERNEL_LOG(KERNEL_ERROR, "Mmad filter only supports L0B Buffer(B2)");
+    });
+    MmadCal(
+        (__cc__ DstType*)GetUnderlyingPtr(dst), (__ca__ FmType*)GetUnderlyingPtr(fm),
+        (__cb__ FilterType*)GetUnderlyingPtr(filter), mmadParams);
+}
+
+template <
+    typename Dst, typename Fm, typename Filter, typename Bias,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Fm> || Internal::IsPointerOperand<Filter> ||
+            Internal::IsPointerOperand<Bias>,
+        bool>::type>
+__aicore__ inline void Mmad(
+    const Dst& dst, const Fm& fm, const Filter& filter, const Bias& bias, const MmadParams& mmadParams)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    using FmType = Internal::OperandPrimT<Fm>;
+    using FilterType = Internal::OperandPrimT<Filter>;
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckMmadParamsCommon(mmadParams, "Mmad with bias");
+#endif
+    const Hardware biasScope = GetPhyType(GetOperandPosition(bias));
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(dst)) == Hardware::L0C), {
+        KERNEL_LOG(KERNEL_ERROR, "Mmad dst only supports L0C Buffer(CO1)");
+    });
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(fm)) == Hardware::L0A), {
+        KERNEL_LOG(KERNEL_ERROR, "Mmad fm only supports L0A Buffer(A2)");
+    });
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(filter)) == Hardware::L0B), {
+        KERNEL_LOG(KERNEL_ERROR, "Mmad filter only supports L0B Buffer(B2)");
+    });
+    ASCENDC_ASSERT((biasScope == Hardware::BIAS || biasScope == Hardware::L0C), {
+        KERNEL_LOG(KERNEL_ERROR, "Mmad bias only supports L0C Buffer(CO1) or BiasTable Buffer(C2)");
+    });
+    MmadCal(
+        (__cc__ DstType*)GetUnderlyingPtr(dst), (__ca__ FmType*)GetUnderlyingPtr(fm),
+        (__cb__ FilterType*)GetUnderlyingPtr(filter), (uint64_t)GetUnderlyingPtr(bias), mmadParams,
+        biasScope == Hardware::BIAS);
+}
+
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 template <typename T, typename U, typename S>
 __aicore__ inline void Mmad(
@@ -413,6 +495,14 @@ __aicore__ inline void Mmad(
     const MmadBitModeParams& mmadParams)
 {
     MmadImpl(dst, fm, filter, mmadParams);
+}
+
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void Mmad(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
+    MmadBitModeParams& mmadParams)
+{
+    MmadImpl(dst, fm, filter, bias, mmadParams);
 }
 
 template <typename T, typename U, typename S, typename V>
@@ -438,7 +528,7 @@ __aicore__ inline void MmadMx(
     MmadMxImpl(dst, fm, filter, bias, mmadParams);
 }
 
-template <typename T, typename U, typename S, typename R>
+template <typename T, typename U, typename S>
 __aicore__ inline void MmadMx(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
     const MmadBitModeParams& mmadParams)
@@ -446,12 +536,214 @@ __aicore__ inline void MmadMx(
     MmadMxImpl(dst, fm, filter, mmadParams);
 }
 
-template <typename T, typename U, typename S, typename V, typename R>
+template <typename T, typename U, typename S, typename V>
 __aicore__ inline void MmadMx(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
     const MmadBitModeParams& mmadParams)
 {
     MmadMxImpl(dst, fm, filter, bias, mmadParams);
+}
+
+template <
+    typename Dst, typename Fm, typename Filter,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Fm> || Internal::IsPointerOperand<Filter>,
+        bool>::type>
+__aicore__ inline void Mmad(const Dst& dst, const Fm& fm, const Filter& filter, const MmadBitModeParams& mmadParams)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    using FmType = Internal::OperandPrimT<Fm>;
+    using FilterType = Internal::OperandPrimT<Filter>;
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(dst)) == Hardware::L0C), {
+        KERNEL_LOG(KERNEL_ERROR, "Mmad dst only supports L0C Buffer(CO1)");
+    });
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(fm)) == Hardware::L0A), {
+        KERNEL_LOG(KERNEL_ERROR, "Mmad fm only supports L0A Buffer(A2)");
+    });
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(filter)) == Hardware::L0B), {
+        KERNEL_LOG(KERNEL_ERROR, "Mmad filter only supports L0B Buffer(B2)");
+    });
+    MmadCal(
+        (__cc__ DstType*)GetUnderlyingPtr(dst), (__ca__ FmType*)GetUnderlyingPtr(fm),
+        (__cb__ FilterType*)GetUnderlyingPtr(filter), mmadParams);
+}
+
+template <
+    typename Dst, typename Fm, typename Filter, typename Bias,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Fm> || Internal::IsPointerOperand<Filter> ||
+            Internal::IsPointerOperand<Bias>,
+        bool>::type>
+__aicore__ inline void Mmad(
+    const Dst& dst, const Fm& fm, const Filter& filter, const Bias& bias, MmadBitModeParams& params)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    using FmType = Internal::OperandPrimT<Fm>;
+    using FilterType = Internal::OperandPrimT<Filter>;
+    const Hardware biasScope = GetPhyType(GetOperandPosition(bias));
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(dst)) == Hardware::L0C), {
+        KERNEL_LOG(KERNEL_ERROR, "Mmad dst only supports L0C Buffer(CO1)");
+    });
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(fm)) == Hardware::L0A), {
+        KERNEL_LOG(KERNEL_ERROR, "Mmad fm only supports L0A Buffer(A2)");
+    });
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(filter)) == Hardware::L0B), {
+        KERNEL_LOG(KERNEL_ERROR, "Mmad filter only supports L0B Buffer(B2)");
+    });
+    ASCENDC_ASSERT((biasScope == Hardware::BIAS || biasScope == Hardware::L0C), {
+        KERNEL_LOG(KERNEL_ERROR, "Mmad bias only supports L0C Buffer(CO1) or BiasTable Buffer(C2)");
+    });
+    MmadCal(
+        (__cc__ DstType*)GetUnderlyingPtr(dst), (__ca__ FmType*)GetUnderlyingPtr(fm),
+        (__cb__ FilterType*)GetUnderlyingPtr(filter), (uint64_t)GetUnderlyingPtr(bias), params);
+}
+
+template <
+    typename Dst, typename Fm, typename Filter, typename Bias,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Fm> || Internal::IsPointerOperand<Filter> ||
+            Internal::IsPointerOperand<Bias>,
+        bool>::type>
+__aicore__ inline void Mmad(
+    const Dst& dst, const Fm& fm, const Filter& filter, const Bias& bias, const MmadBitModeParams& mmadParams)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    using FmType = Internal::OperandPrimT<Fm>;
+    using FilterType = Internal::OperandPrimT<Filter>;
+    const Hardware biasScope = GetPhyType(GetOperandPosition(bias));
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(dst)) == Hardware::L0C), {
+        KERNEL_LOG(KERNEL_ERROR, "Mmad dst only supports L0C Buffer(CO1)");
+    });
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(fm)) == Hardware::L0A), {
+        KERNEL_LOG(KERNEL_ERROR, "Mmad fm only supports L0A Buffer(A2)");
+    });
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(filter)) == Hardware::L0B), {
+        KERNEL_LOG(KERNEL_ERROR, "Mmad filter only supports L0B Buffer(B2)");
+    });
+    ASCENDC_ASSERT((biasScope == Hardware::BIAS || biasScope == Hardware::L0C), {
+        KERNEL_LOG(KERNEL_ERROR, "Mmad bias only supports L0C Buffer(CO1) or BiasTable Buffer(C2)");
+    });
+    MmadBitModeParams mutableParams = mmadParams;
+    MmadCal(
+        (__cc__ DstType*)GetUnderlyingPtr(dst), (__ca__ FmType*)GetUnderlyingPtr(fm),
+        (__cb__ FilterType*)GetUnderlyingPtr(filter), (uint64_t)GetUnderlyingPtr(bias), mutableParams);
+}
+
+template <
+    typename Dst, typename Fm, typename Filter,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Fm> || Internal::IsPointerOperand<Filter>,
+        bool>::type>
+__aicore__ inline void MmadMx(const Dst& dst, const Fm& fm, const Filter& filter, const MmadParams& mmadParams)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    using FmType = Internal::OperandPrimT<Fm>;
+    using FilterType = Internal::OperandPrimT<Filter>;
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckMmadParamsCommon(mmadParams, "MmadMx");
+#endif
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(dst)) == Hardware::L0C), {
+        KERNEL_LOG(KERNEL_ERROR, "MmadMx dst only supports L0C Buffer(CO1)");
+    });
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(fm)) == Hardware::L0A), {
+        KERNEL_LOG(KERNEL_ERROR, "MmadMx fm only supports L0A Buffer(A2)");
+    });
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(filter)) == Hardware::L0B), {
+        KERNEL_LOG(KERNEL_ERROR, "MmadMx filter only supports L0B Buffer(B2)");
+    });
+    MmadMxCal(
+        (__cc__ DstType*)GetUnderlyingPtr(dst), (__ca__ FmType*)GetUnderlyingPtr(fm),
+        (__cb__ FilterType*)GetUnderlyingPtr(filter), mmadParams);
+}
+
+template <
+    typename Dst, typename Fm, typename Filter, typename Bias,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Fm> || Internal::IsPointerOperand<Filter> ||
+            Internal::IsPointerOperand<Bias>,
+        bool>::type>
+__aicore__ inline void MmadMx(
+    const Dst& dst, const Fm& fm, const Filter& filter, const Bias& bias, const MmadParams& mmadParams)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    using FmType = Internal::OperandPrimT<Fm>;
+    using FilterType = Internal::OperandPrimT<Filter>;
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckMmadParamsCommon(mmadParams, "MmadMx with bias");
+#endif
+    const Hardware biasScope = GetPhyType(GetOperandPosition(bias));
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(dst)) == Hardware::L0C), {
+        KERNEL_LOG(KERNEL_ERROR, "MmadMx dst only supports L0C Buffer(CO1)");
+    });
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(fm)) == Hardware::L0A), {
+        KERNEL_LOG(KERNEL_ERROR, "MmadMx fm only supports L0A Buffer(A2)");
+    });
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(filter)) == Hardware::L0B), {
+        KERNEL_LOG(KERNEL_ERROR, "MmadMx filter only supports L0B Buffer(B2)");
+    });
+    ASCENDC_ASSERT((biasScope == Hardware::BIAS || biasScope == Hardware::L0C), {
+        KERNEL_LOG(KERNEL_ERROR, "MmadMx bias only supports L0C Buffer(CO1) or BiasTable Buffer(C2)");
+    });
+    MmadMxCal(
+        (__cc__ DstType*)GetUnderlyingPtr(dst), (__ca__ FmType*)GetUnderlyingPtr(fm),
+        (__cb__ FilterType*)GetUnderlyingPtr(filter), (uint64_t)GetUnderlyingPtr(bias), mmadParams,
+        biasScope == Hardware::BIAS);
+}
+
+template <
+    typename Dst, typename Fm, typename Filter,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Fm> || Internal::IsPointerOperand<Filter>,
+        bool>::type>
+__aicore__ inline void MmadMx(const Dst& dst, const Fm& fm, const Filter& filter, const MmadBitModeParams& mmadParams)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    using FmType = Internal::OperandPrimT<Fm>;
+    using FilterType = Internal::OperandPrimT<Filter>;
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(dst)) == Hardware::L0C), {
+        KERNEL_LOG(KERNEL_ERROR, "MmadMx dst only supports L0C Buffer(CO1)");
+    });
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(fm)) == Hardware::L0A), {
+        KERNEL_LOG(KERNEL_ERROR, "MmadMx fm only supports L0A Buffer(A2)");
+    });
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(filter)) == Hardware::L0B), {
+        KERNEL_LOG(KERNEL_ERROR, "MmadMx filter only supports L0B Buffer(B2)");
+    });
+    MmadBitModeParams mutableParams = mmadParams;
+    MmadMxCal(
+        (__cc__ DstType*)GetUnderlyingPtr(dst), (__ca__ FmType*)GetUnderlyingPtr(fm),
+        (__cb__ FilterType*)GetUnderlyingPtr(filter), mutableParams);
+}
+
+template <
+    typename Dst, typename Fm, typename Filter, typename Bias,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Fm> || Internal::IsPointerOperand<Filter> ||
+            Internal::IsPointerOperand<Bias>,
+        bool>::type>
+__aicore__ inline void MmadMx(
+    const Dst& dst, const Fm& fm, const Filter& filter, const Bias& bias, const MmadBitModeParams& mmadParams)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    using FmType = Internal::OperandPrimT<Fm>;
+    using FilterType = Internal::OperandPrimT<Filter>;
+    const Hardware biasScope = GetPhyType(GetOperandPosition(bias));
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(dst)) == Hardware::L0C), {
+        KERNEL_LOG(KERNEL_ERROR, "MmadMx dst only supports L0C Buffer(CO1)");
+    });
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(fm)) == Hardware::L0A), {
+        KERNEL_LOG(KERNEL_ERROR, "MmadMx fm only supports L0A Buffer(A2)");
+    });
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(filter)) == Hardware::L0B), {
+        KERNEL_LOG(KERNEL_ERROR, "MmadMx filter only supports L0B Buffer(B2)");
+    });
+    ASCENDC_ASSERT((biasScope == Hardware::BIAS || biasScope == Hardware::L0C), {
+        KERNEL_LOG(KERNEL_ERROR, "MmadMx bias only supports L0C Buffer(CO1) or BiasTable Buffer(C2)");
+    });
+    MmadBitModeParams mutableParams = mmadParams;
+    MmadMxCal(
+        (__cc__ DstType*)GetUnderlyingPtr(dst), (__ca__ FmType*)GetUnderlyingPtr(fm),
+        (__cb__ FilterType*)GetUnderlyingPtr(filter), (uint64_t)GetUnderlyingPtr(bias), mutableParams);
 }
 #endif
 
@@ -544,6 +836,25 @@ __aicore__ inline void InitConstValue(const LocalTensor<T>& dst, const InitConst
 {
     CheckInitParams(dst, initConstValueParams, Impl::INITCONSTVALUE_INTRINSIC_NAME);
     InitConstValueImpl(dst, initConstValueParams);
+}
+
+template <
+    typename Dst, typename U,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<Dst> && Std::is_same<Internal::OperandPrimT<Dst>, U>::value, bool>::type>
+__aicore__ inline void InitConstValue(const Dst& dst, const InitConstValueParams<U>& initConstValueParams)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    constexpr Hardware dstScope = GetPhyType(GetStaticOperandPosition<Dst>());
+    if constexpr (dstScope == Hardware::L0A) {
+        InitL0ANzMatrixCal((__ca__ DstType*)GetUnderlyingPtr(dst), initConstValueParams);
+    } else if constexpr (dstScope == Hardware::L0B) {
+        InitL0BNzMatrixCal((__cb__ DstType*)GetUnderlyingPtr(dst), initConstValueParams);
+    } else if constexpr (dstScope == Hardware::L1) {
+        InitL1BufferCal((__cbuf__ DstType*)GetUnderlyingPtr(dst), initConstValueParams);
+    } else {
+        ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "InitConstValue dst only supports L0A/L0B/L1 Buffer"); });
+    }
 }
 
 /* **************************************************************************************************
@@ -657,6 +968,575 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadImageToLocal(
             false, "dst", "L1 Buffer(A1/B1)", "LoadImageToLocal",
             GetPositionDisplay(static_cast<TPosition>(dst.GetPosition())));
     }
+}
+
+template <
+    typename Dst, typename Src,
+    typename Std::enable_if<Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>, bool>::type>
+__aicore__ inline void LoadData(const Dst& dst, const Src& src, const LoadData2DParams& loadDataParams)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    using SrcType = Internal::OperandPrimT<Src>;
+    static_assert(Std::is_same<DstType, SrcType>::value, "LoadData requires identical source and destination types");
+    const Hardware srcScope = GetPhyType(GetOperandPosition(src));
+#ifdef ASCENDC_TIME_STAMP_ON
+    if (srcScope == Hardware::GM) {
+        PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE2_DATACOPY));
+    }
+#endif
+    CheckLoadData2dDatatype<DstType>();
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckLoadData2dParams<DstType>(loadDataParams, srcScope == Hardware::L1);
+#endif
+    if constexpr (Internal::IsPointerOperand<Dst>) {
+        constexpr Hardware dstScope = GetPhyType(GetStaticOperandPosition<Dst>());
+        if constexpr (Internal::IsPointerOperand<Src> || Internal::IsGlobalTensorOperand<Src>) {
+            constexpr Hardware staticSrcScope = GetPhyType(GetStaticOperandPosition<Src>());
+            if constexpr (staticSrcScope == Hardware::L1 && dstScope == Hardware::L0A) {
+                LoadData2DL12L0ACal(
+                    (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
+                    loadDataParams);
+            } else if constexpr (staticSrcScope == Hardware::L1 && dstScope == Hardware::L0B) {
+                LoadData2DL12L0BCal(
+                    (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
+                    loadDataParams);
+            } else if constexpr (staticSrcScope == Hardware::GM && dstScope == Hardware::L0A) {
+                LoadData2DGM2L0ACal(
+                    (__ca__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+            } else if constexpr (staticSrcScope == Hardware::GM && dstScope == Hardware::L0B) {
+                LoadData2DGM2L0BCal(
+                    (__cb__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+            } else if constexpr (staticSrcScope == Hardware::GM && dstScope == Hardware::L1) {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+                const uint8_t cacheMode = GetOperandCacheMode(src);
+                LoadData2DGM2L1Cal(
+                    (__cbuf__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src),
+                    loadDataParams, cacheMode);
+#else
+                LoadData2DGM2L1Cal(
+                    (__cbuf__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src),
+                    loadDataParams);
+#endif
+            } else {
+                ASCENDC_ASSERT(
+                    (false), { KERNEL_LOG(KERNEL_ERROR, "LoadData does not support the pointer position pair"); });
+            }
+        } else {
+            ASCENDC_ASSERT((srcScope == Hardware::L1), {
+                KERNEL_LOG(KERNEL_ERROR, "LoadData local source must be in L1");
+            });
+            if constexpr (dstScope == Hardware::L0A) {
+                LoadData2DL12L0ACal(
+                    (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
+                    loadDataParams);
+            } else if constexpr (dstScope == Hardware::L0B) {
+                LoadData2DL12L0BCal(
+                    (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
+                    loadDataParams);
+            }
+        }
+    } else {
+        constexpr Hardware staticSrcScope = GetPhyType(GetStaticOperandPosition<Src>());
+        const Hardware dstScope = GetPhyType(GetOperandPosition(dst));
+        if constexpr (staticSrcScope == Hardware::L1) {
+            if (dstScope == Hardware::L0A) {
+                LoadData2DL12L0ACal(
+                    (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
+                    loadDataParams);
+            } else if (dstScope == Hardware::L0B) {
+                LoadData2DL12L0BCal(
+                    (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
+                    loadDataParams);
+            }
+        } else if constexpr (staticSrcScope == Hardware::GM) {
+            if (dstScope == Hardware::L0A) {
+                LoadData2DGM2L0ACal(
+                    (__ca__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+            } else if (dstScope == Hardware::L0B) {
+                LoadData2DGM2L0BCal(
+                    (__cb__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+            } else if (dstScope == Hardware::L1) {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+                const uint8_t cacheMode = GetOperandCacheMode(src);
+                LoadData2DGM2L1Cal(
+                    (__cbuf__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src),
+                    loadDataParams, cacheMode);
+#else
+                LoadData2DGM2L1Cal(
+                    (__cbuf__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src),
+                    loadDataParams);
+#endif
+            }
+        }
+    }
+}
+
+template <
+    typename Dst, typename Src,
+    typename Std::enable_if<Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>, bool>::type>
+__aicore__ inline void LoadData(const Dst& dst, const Src& src, const LoadData2DParamsV2& loadDataParams)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    using SrcType = Internal::OperandPrimT<Src>;
+    static_assert(Std::is_same<DstType, SrcType>::value, "LoadData requires identical source and destination types");
+    CheckLoadData2dDatatype<DstType>();
+    if constexpr (Internal::IsPointerOperand<Dst>) {
+        constexpr Hardware dstScope = GetPhyType(GetOperandPosition(static_cast<Dst>(nullptr)));
+        if constexpr (Internal::IsPointerOperand<Src> || Internal::IsGlobalTensorOperand<Src>) {
+            constexpr Hardware srcScope = GetPhyType(GetStaticOperandPosition<Src>());
+            if constexpr (srcScope == Hardware::L1 && dstScope == Hardware::L0A) {
+                LoadData2DL12L0ACal(
+                    (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
+                    loadDataParams);
+            } else if constexpr (srcScope == Hardware::L1 && dstScope == Hardware::L0B) {
+                LoadData2DL12L0BCal(
+                    (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
+                    loadDataParams);
+            } else if constexpr (srcScope == Hardware::GM) {
+#ifdef ASCENDC_TIME_STAMP_ON
+                PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE2_DATACOPY));
+#endif
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+                const uint8_t cacheMode = GetOperandCacheMode(src);
+                if constexpr (dstScope == Hardware::L0A) {
+                    LoadData2DGM2L0ACal(
+                        (__ca__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src),
+                        loadDataParams, cacheMode);
+                } else if constexpr (dstScope == Hardware::L0B) {
+                    LoadData2DGM2L0BCal(
+                        (__cb__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src),
+                        loadDataParams, cacheMode);
+                } else if constexpr (dstScope == Hardware::L1) {
+                    LoadData2DGM2L1Cal(
+                        (__cbuf__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src),
+                        loadDataParams, cacheMode);
+                }
+#else
+                if constexpr (dstScope == Hardware::L0A) {
+                    LoadData2DGM2L0ACal(
+                        (__ca__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src),
+                        loadDataParams);
+                } else if constexpr (dstScope == Hardware::L0B) {
+                    LoadData2DGM2L0BCal(
+                        (__cb__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src),
+                        loadDataParams);
+                } else if constexpr (dstScope == Hardware::L1) {
+                    LoadData2DGM2L1Cal(
+                        (__cbuf__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src),
+                        loadDataParams);
+                }
+#endif
+            } else {
+                ASCENDC_ASSERT(
+                    (false), { KERNEL_LOG(KERNEL_ERROR, "LoadData does not support the pointer position pair"); });
+            }
+        } else {
+            const Hardware srcScope = GetPhyType(GetOperandPosition(src));
+            ASCENDC_ASSERT((srcScope == Hardware::L1), {
+                KERNEL_LOG(KERNEL_ERROR, "LoadData local source must be in L1");
+            });
+            if constexpr (dstScope == Hardware::L0A) {
+                LoadData2DL12L0ACal(
+                    (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
+                    loadDataParams);
+            } else if constexpr (dstScope == Hardware::L0B) {
+                LoadData2DL12L0BCal(
+                    (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
+                    loadDataParams);
+            } else {
+                ASCENDC_ASSERT(
+                    (false), { KERNEL_LOG(KERNEL_ERROR, "LoadData dst pointer position is not supported"); });
+            }
+        }
+    } else {
+        constexpr Hardware srcScope = GetPhyType(GetOperandPosition(static_cast<Src>(nullptr)));
+        const Hardware dstScope = GetPhyType(GetOperandPosition(dst));
+        if constexpr (srcScope == Hardware::L1) {
+            if (dstScope == Hardware::L0A) {
+                LoadData2DL12L0ACal(
+                    (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
+                    loadDataParams);
+            } else if (dstScope == Hardware::L0B) {
+                LoadData2DL12L0BCal(
+                    (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
+                    loadDataParams);
+            } else {
+                ASCENDC_ASSERT(
+                    (false), { KERNEL_LOG(KERNEL_ERROR, "LoadData destination position is not supported"); });
+            }
+        } else if constexpr (srcScope == Hardware::GM) {
+#ifdef ASCENDC_TIME_STAMP_ON
+            PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE2_DATACOPY));
+#endif
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+            const uint8_t cacheMode = GetOperandCacheMode(src);
+            if (dstScope == Hardware::L0A) {
+                LoadData2DGM2L0ACal(
+                    (__ca__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src), loadDataParams,
+                    cacheMode);
+            } else if (dstScope == Hardware::L0B) {
+                LoadData2DGM2L0BCal(
+                    (__cb__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src), loadDataParams,
+                    cacheMode);
+            } else if (dstScope == Hardware::L1) {
+                LoadData2DGM2L1Cal(
+                    (__cbuf__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src), loadDataParams,
+                    cacheMode);
+            }
+#else
+            if (dstScope == Hardware::L0A) {
+                LoadData2DGM2L0ACal(
+                    (__ca__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+            } else if (dstScope == Hardware::L0B) {
+                LoadData2DGM2L0BCal(
+                    (__cb__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+            } else if (dstScope == Hardware::L1) {
+                LoadData2DGM2L1Cal(
+                    (__cbuf__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+            }
+#endif
+        } else {
+            ASCENDC_ASSERT(
+                (false), { KERNEL_LOG(KERNEL_ERROR, "LoadData does not support the pointer position pair"); });
+        }
+    }
+}
+
+template <
+    typename Dst, typename Src, const IsResetLoad3dConfig& defaultConfig, typename U,
+    typename Std::enable_if<
+        (Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>) &&
+            Std::is_same<Internal::OperandPrimT<Src>, U>::value,
+        bool>::type>
+__aicore__ inline void LoadData(const Dst& dst, const Src& src, const LoadData3DParamsV1<U>& loadDataParams)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    using SrcType = Internal::OperandPrimT<Src>;
+    static_assert(Std::is_same<DstType, SrcType>::value, "LoadData requires identical source and destination types");
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckLoadData3dv1Params<U>(loadDataParams);
+    CheckLoadData3dParams(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.strideW, loadDataParams.strideH);
+#endif
+    if constexpr (defaultConfig.isSetFMatrix) {
+        Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
+    }
+    if constexpr (defaultConfig.isSetPadding) {
+        Load3DSetPaddingCal(loadDataParams.padValue);
+    }
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(src)) == Hardware::L1), {
+        KERNEL_LOG(KERNEL_ERROR, "LoadData3D src only supports L1 Buffer(A1/B1)");
+    });
+    if constexpr (Internal::IsPointerOperand<Dst>) {
+        constexpr Hardware dstScope = GetPhyType(GetStaticOperandPosition<Dst>());
+        if constexpr (dstScope == Hardware::L0A) {
+            LoadData3DV1L12L0ACal(
+                (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+        } else if constexpr (dstScope == Hardware::L0B) {
+            LoadData3DV1L12L0BCal(
+                (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+        } else if constexpr (dstScope == Hardware::UB) {
+            LoadData3DV1L12UBCal(
+                (__ubuf__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+        }
+    } else {
+        const Hardware dstScope = GetPhyType(GetOperandPosition(dst));
+        if (dstScope == Hardware::L0A) {
+            LoadData3DV1L12L0ACal(
+                (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+        } else if (dstScope == Hardware::L0B) {
+            LoadData3DV1L12L0BCal(
+                (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+        } else if (dstScope == Hardware::UB) {
+            LoadData3DV1L12UBCal(
+                (__ubuf__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+        } else {
+            ASCENDC_ASSERT(
+                (false), { KERNEL_LOG(KERNEL_ERROR, "LoadData3D dst pointer position is not supported"); });
+        }
+    }
+}
+
+template <
+    typename Dst, typename Src, const IsResetLoad3dConfig& defaultConfig, typename U,
+    typename Std::enable_if<
+        (Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>) &&
+            Std::is_same<Internal::OperandPrimT<Src>, U>::value,
+        bool>::type>
+__aicore__ inline void LoadData(const Dst& dst, const Src& src, const LoadData3DParamsV2<U>& loadDataParams)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    using SrcType = Internal::OperandPrimT<Src>;
+    static_assert(Std::is_same<DstType, SrcType>::value, "LoadData requires identical source and destination types");
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckLoadData3dv2Params<U>(loadDataParams);
+    CheckLoadData3dv2ChannelSize<DstType>(loadDataParams.channelSize);
+    CheckLoadData3dParams(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.strideW, loadDataParams.strideH);
+    CheckLoadData3dv2MatrixParams<DstType>(
+        loadDataParams.kExtension, loadDataParams.mExtension, loadDataParams.kStartPt, loadDataParams.mStartPt);
+#endif
+    if constexpr (defaultConfig.isSetFMatrix) {
+        Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
+    }
+    if constexpr (defaultConfig.isSetPadding) {
+        Load3DSetPaddingCal(loadDataParams.padValue);
+    }
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(src)) == Hardware::L1), {
+        KERNEL_LOG(KERNEL_ERROR, "LoadData3D src only supports L1 Buffer(A1/B1)");
+    });
+    if constexpr (Internal::IsPointerOperand<Dst>) {
+        constexpr Hardware dstScope = GetPhyType(GetStaticOperandPosition<Dst>());
+        if constexpr (dstScope == Hardware::L0A) {
+            LoadData3DV2L12L0ACal(
+                (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+        } else if constexpr (dstScope == Hardware::L0B) {
+            LoadData3DV2L12L0BCal(
+                (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+        } else if constexpr (dstScope == Hardware::UB) {
+            LoadData3DV2L12UBCal(
+                (__ubuf__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+        }
+    } else {
+        const Hardware dstScope = GetPhyType(GetOperandPosition(dst));
+        if (dstScope == Hardware::L0A) {
+            LoadData3DV2L12L0ACal(
+                (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+        } else if (dstScope == Hardware::L0B) {
+            LoadData3DV2L12L0BCal(
+                (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+        } else if (dstScope == Hardware::UB) {
+            LoadData3DV2L12UBCal(
+                (__ubuf__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+        } else {
+            ASCENDC_ASSERT(
+                (false), { KERNEL_LOG(KERNEL_ERROR, "LoadData3D dst pointer position is not supported"); });
+        }
+    }
+}
+
+template <
+    typename Dst, typename Src,
+    typename Std::enable_if<Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>, bool>::type>
+__aicore__ inline void LoadData(const Dst& dst, const Src& src, const LoadData3DParamsV2Pro& loadDataParams)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    using SrcType = Internal::OperandPrimT<Src>;
+    static_assert(Std::is_same<DstType, SrcType>::value, "LoadData requires identical source and destination types");
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(src)) == Hardware::L1), {
+        KERNEL_LOG(KERNEL_ERROR, "LoadData3D src only supports L1 Buffer(A1/B1)");
+    });
+    if constexpr (Internal::IsPointerOperand<Dst>) {
+        constexpr Hardware dstScope = GetPhyType(GetStaticOperandPosition<Dst>());
+        if constexpr (dstScope == Hardware::L0A) {
+            LoadData3DV2L12L0ACal(
+                (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+        } else if constexpr (dstScope == Hardware::L0B) {
+            LoadData3DV2L12L0BCal(
+                (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+        } else if constexpr (dstScope == Hardware::UB) {
+            LoadData3DV2L12UBCal(
+                (__ubuf__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+        }
+    } else {
+        const Hardware dstScope = GetPhyType(GetOperandPosition(dst));
+        if (dstScope == Hardware::L0A) {
+            LoadData3DV2L12L0ACal(
+                (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+        } else if (dstScope == Hardware::L0B) {
+            LoadData3DV2L12L0BCal(
+                (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+        } else if (dstScope == Hardware::UB) {
+            LoadData3DV2L12UBCal(
+                (__ubuf__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+        } else {
+            ASCENDC_ASSERT(
+                (false), { KERNEL_LOG(KERNEL_ERROR, "LoadData3D dst pointer position is not supported"); });
+        }
+    }
+}
+
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+template <
+    TPosition DstPos, TPosition SrcPos, typename Dst, typename Src,
+    typename Std::enable_if<Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>, bool>::type>
+__aicore__ inline void LoadData(const Dst& dst, const Src& src, const Load2DBitModeParam& loadDataParams)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    using SrcType = Internal::OperandPrimT<Src>;
+    static_assert(SrcPos == TPosition::A1 || SrcPos == TPosition::B1, "LoadData source must be in L1");
+    ASCENDC_ASSERT((GetOperandPosition(dst) == DstPos && GetPhyType(GetOperandPosition(src)) == Hardware::L1), {
+        KERNEL_LOG(KERNEL_ERROR, "LoadData pointer positions must match DstPos and SrcPos");
+    });
+    if constexpr (DstPos == TPosition::A2) {
+        LoadData2DL12L0ACal(
+            (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+    } else if constexpr (DstPos == TPosition::B2) {
+        LoadData2DL12L0BCal(
+            (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+    } else {
+        static_assert(DstPos == TPosition::A2 || DstPos == TPosition::B2, "LoadData destination must be in L0A/L0B");
+    }
+}
+
+template <
+    TPosition DstPos, TPosition SrcPos, typename Dst, typename Src,
+    typename Std::enable_if<Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>, bool>::type>
+__aicore__ inline void LoadData(const Dst& dst, const Src& src, const Load3DBitModeParam& loadDataParams)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    using SrcType = Internal::OperandPrimT<Src>;
+    static_assert(SrcPos == TPosition::A1 || SrcPos == TPosition::B1, "LoadData source must be in L1");
+    ASCENDC_ASSERT((GetOperandPosition(dst) == DstPos && GetPhyType(GetOperandPosition(src)) == Hardware::L1), {
+        KERNEL_LOG(KERNEL_ERROR, "LoadData pointer positions must match DstPos and SrcPos");
+    });
+    if constexpr (DstPos == TPosition::A2) {
+        LoadData3DV2L12L0ACal(
+            (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+    } else if constexpr (DstPos == TPosition::B2) {
+        LoadData3DV2L12L0BCal(
+            (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+    } else {
+        static_assert(DstPos == TPosition::A2 || DstPos == TPosition::B2, "LoadData destination must be in L0A/L0B");
+    }
+}
+#endif
+
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5161) || \
+                              (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+template <
+    typename Dst, typename Src, typename SrcMx,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src> || Internal::IsPointerOperand<SrcMx>,
+        bool>::type>
+__aicore__ inline void LoadData(
+    const Dst& dst, const Src& src, const SrcMx& srcMx, const LoadData2DParamsV2& loadDataParams,
+    const LoadData2DMxParams& loadMxDataParams)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    using SrcType = Internal::OperandPrimT<Src>;
+    using MxType = Internal::OperandPrimT<SrcMx>;
+    ASCENDC_ASSERT(
+        (GetPhyType(GetOperandPosition(src)) == Hardware::L1 && GetPhyType(GetOperandPosition(srcMx)) == Hardware::L1),
+        { KERNEL_LOG(KERNEL_ERROR, "LoadData MX inputs only support L1 Buffer(A1/B1)"); });
+    if constexpr (Internal::IsPointerOperand<Dst>) {
+        constexpr Hardware dstScope = GetPhyType(GetStaticOperandPosition<Dst>());
+        if constexpr (dstScope == Hardware::L0A) {
+#if !(                       \
+    defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)))
+            LoadData2DL12L0ACal(
+                (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
+                (__cbuf__ MxType*)GetUnderlyingPtr(srcMx), loadDataParams, loadMxDataParams);
+#endif
+        } else if constexpr (dstScope == Hardware::L0B) {
+            LoadData2DL12L0BCal(
+                (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
+                (__cbuf__ MxType*)GetUnderlyingPtr(srcMx), loadDataParams, loadMxDataParams);
+        }
+    } else {
+        const Hardware dstScope = GetPhyType(GetOperandPosition(dst));
+        if (dstScope == Hardware::L0A) {
+#if !(                       \
+    defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)))
+            LoadData2DL12L0ACal(
+                (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
+                (__cbuf__ MxType*)GetUnderlyingPtr(srcMx), loadDataParams, loadMxDataParams);
+#endif
+        } else if (dstScope == Hardware::L0B) {
+            LoadData2DL12L0BCal(
+                (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
+                (__cbuf__ MxType*)GetUnderlyingPtr(srcMx), loadDataParams, loadMxDataParams);
+        } else {
+            ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "LoadData MX dst only supports L0A/L0B"); });
+        }
+    }
+}
+#endif
+
+template <
+    typename Dst, typename Src,
+    typename Std::enable_if<Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>, bool>::type>
+__aicore__ inline void LoadDataWithTranspose(
+    const Dst& dst, const Src& src, const LoadData2dTransposeParams& loadDataParams)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    using SrcType = Internal::OperandPrimT<Src>;
+    static_assert(
+        Std::is_same<DstType, SrcType>::value, "LoadDataWithTranspose requires identical source and destination types");
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    ReportNopWarning<uint8_t>(
+        loadDataParams.repeatTimes, "loadDataParams.repeatTimes",
+        "LoadDataWithTranspose with LoadData2dTransposeParams");
+#endif
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(src)) == Hardware::L1), {
+        KERNEL_LOG(KERNEL_ERROR, "LoadDataWithTranspose src only supports L1 Buffer(A1/B1)");
+    });
+    if constexpr (Internal::IsPointerOperand<Dst>) {
+        constexpr Hardware dstScope = GetPhyType(GetStaticOperandPosition<Dst>());
+        if constexpr (dstScope == Hardware::L0A) {
+            LoadData2DL12L0ATransposeCal(
+                (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+        } else if constexpr (dstScope == Hardware::L0B) {
+            LoadData2DL12L0BTransposeCal(
+                (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+        }
+    } else {
+        const Hardware dstScope = GetPhyType(GetOperandPosition(dst));
+        if (dstScope == Hardware::L0A) {
+            LoadData2DL12L0ATransposeCal(
+                (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+        } else if (dstScope == Hardware::L0B) {
+            LoadData2DL12L0BTransposeCal(
+                (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+        } else {
+            ASCENDC_ASSERT(
+                (false), { KERNEL_LOG(KERNEL_ERROR, "LoadDataWithTranspose dst only supports L0A/L0B"); });
+        }
+    }
+}
+
+template <
+    typename Dst, typename Src,
+    typename Std::enable_if<Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>, bool>::type>
+__aicore__ inline void LoadDataWithTranspose(
+    const Dst& dst, const Src& src, const LoadData2dTransposeParamsV2& loadDataParams)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    using SrcType = Internal::OperandPrimT<Src>;
+    static_assert(
+        Std::is_same<DstType, SrcType>::value, "LoadDataWithTranspose requires identical source and destination types");
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    ReportNopWarning<uint8_t>(
+        loadDataParams.repeatTimes, "loadDataParams.repeatTimes",
+        "LoadDataWithTranspose with LoadData2dTransposeParamsV2");
+#endif
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(src)) == Hardware::L1), {
+        KERNEL_LOG(KERNEL_ERROR, "LoadDataWithTranspose src only supports L1 Buffer(A1/B1)");
+    });
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(dst)) == Hardware::L0B), {
+        KERNEL_LOG(KERNEL_ERROR, "LoadDataWithTranspose V2 dst only supports L0B");
+    });
+    LoadData2DL12L0BTransposeCal(
+        (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
+}
+
+template <typename Dst, typename Std::enable_if<Internal::IsPointerOperand<Dst>, bool>::type>
+__aicore__ inline void LoadImageToLocal(const Dst& dst, const LoadImageToLocalParams& loadDataParams)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(dst)) == Hardware::L1), {
+        KERNEL_LOG(KERNEL_ERROR, "LoadImageToLocal dst only supports L1 Buffer(A1/B1)");
+    });
+    ASCENDC_CHECK_VALUE_RANGE(loadDataParams.horizSize, 2, UINT12_MAX, "horizSize", "LoadImageToLocal");
+    ASCENDC_CHECK_VALUE_RANGE(loadDataParams.vertSize, 2, UINT12_MAX, "vertSize", "LoadImageToLocal");
+    ASCENDC_CHECK_VALUE_RANGE(loadDataParams.horizStartPos, 0, UINT12_MAX, "horizStartPos", "LoadImageToLocal");
+    ASCENDC_CHECK_VALUE_RANGE(loadDataParams.vertStartPos, 0, UINT12_MAX, "vertStartPos", "LoadImageToLocal");
+    ASCENDC_CHECK_VALUE_RANGE(loadDataParams.srcHorizSize, 2, UINT12_MAX, "srcHorizSize", "LoadImageToLocal");
+    ASCENDC_CHECK_VALUE_RANGE(loadDataParams.topPadSize, 0, 32, "topPadSize", "LoadImageToLocal");
+    ASCENDC_CHECK_VALUE_RANGE(loadDataParams.botPadSize, 0, 32, "botPadSize", "LoadImageToLocal");
+    ASCENDC_CHECK_VALUE_RANGE(loadDataParams.leftPadSize, 0, 32, "leftPadSize", "LoadImageToLocal");
+    ASCENDC_CHECK_VALUE_RANGE(loadDataParams.rightPadSize, 0, 32, "rightPadSize", "LoadImageToLocal");
+    LoadImageToLocalCal((__cbuf__ DstType*)GetUnderlyingPtr(dst), loadDataParams);
 }
 
 /* **************************************************************************************************

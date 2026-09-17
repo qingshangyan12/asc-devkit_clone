@@ -75,6 +75,21 @@ extern "C" __global__ __aicore__ void KernelTestDumpAccChkPoint2()
     uint32_t dumpSize = 0;
     AscendC::DumpAccChkPoint(tensor, index, countOff, dumpSize);
 }
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+extern "C" __global__ __aicore__ void KernelTestCubePointerDump()
+{
+    __gm__ float* gmInput;
+    __ubuf__ float* ubInput;
+    AscendC::ShapeInfo shapeInfo;
+    AscendC::DumpTensor(gmInput, 0, 16);
+    AscendC::DumpTensor(gmInput, 0, 16, shapeInfo);
+    AscendC::DumpTensor(ubInput, 1, 16);
+    AscendC::DumpTensor(ubInput, 1, 16, shapeInfo);
+    AscendC::DumpAccChkPoint(gmInput, 0, 0, 16);
+    AscendC::DumpAccChkPoint(ubInput, 1, 0, 16);
+}
+#endif
 #endif
 
 // // __aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args);

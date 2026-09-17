@@ -9,7 +9,7 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+| Ascend 950PR/Ascend 950DT | CANN 9.0.0 ~ CANN 9.1.0（本任务指针路径验收范围，须使用版本匹配的 ASC 编译器） |
 | Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.2.0 |
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.2.0 |
 
@@ -195,9 +195,40 @@ fixpipeParams.srcNdStride = (CeilAlign(m, cubeShape[0]) * CeilAlign(n, cubeShape
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU运行、CPU调试、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品/Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `ASCENDC_USE_POINTER_API` | `OFF`（默认）、`ON` | 在 dav-3510 上切换 `LoadData`、`Mmad`、`Fixpipe` 的 Tensor 路径与指针/混合路径。 |
+  | `BATCH_MATMUL_B/M/K/N` | `4/30/40/70` | 设置样例的编译期矩阵维度；必须与 `gen_data.py` 参数一致。 |
 
   执行结果如下，说明精度对比成功。
 
   ```bash
   test pass!
   ```
+
+### Ascend 950 指针 API 对比验证
+
+在 CANN 9.0.0 ~ CANN 9.1.0 环境中确认 ASC 编译器与目标架构匹配后，执行以下命令。命令使用相同的固定随机种子和 `[-100, 100]` 输入，覆盖维度 1、32、1024 和 2048。每个 case 分别构建并运行 Tensor 与指针/混合路径：
+
+```bash
+run_case() {
+  tag=$1; b=$2; m=$3; k=$4; n=$5
+  python3 scripts/gen_data.py --batch "$b" --m "$m" --k "$k" --n "$n"
+  for mode in tensor pointer; do
+    flag=OFF; [ "$mode" = pointer ] && flag=ON
+    build="build_${mode}_${tag}"
+    cmake -S . -B "$build" -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCMAKE_ASC_RUN_MODE=npu \
+      -DASCENDC_USE_POINTER_API="$flag" -DBATCH_MATMUL_B="$b" -DBATCH_MATMUL_M="$m" \
+      -DBATCH_MATMUL_K="$k" -DBATCH_MATMUL_N="$n"
+    cmake --build "$build" -j && "./${build}/demo"
+    mv output/output.bin "output/${mode}_${tag}.bin"
+    python3 scripts/verify_result.py "output/${mode}_${tag}.bin" output/golden.bin
+  done
+  python3 scripts/verify_result.py "output/pointer_${tag}.bin" "output/tensor_${tag}.bin"
+}
+
+run_case scalar1 1 1 1 1
+run_case cube32 1 32 32 32
+run_case m1024 1 1024 1 1
+run_case m2048 1 2048 1 1
+```
+
+脚本按[生态算子开源精度标准（实验标准）](https://gitcode.com/cann/opbase/blob/master/docs/zh/ops_precision_standard/experimental_standard.md#2-%E8%AF%AF%E5%B7%AE%E6%8C%87%E6%A0%87%E4%B8%8E%E9%80%9A%E8%BF%87%E6%A0%87%E5%87%86)检查 FP32 结果：`rtol=2^-10`、`atol=2^-16`、匹配率不低于 0.99，且每个元素的绝对误差不超过 `max(1e-2, 32*ULP)`。三次检查均须输出 `test pass!`。

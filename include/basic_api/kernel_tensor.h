@@ -33,6 +33,7 @@
 #include "kernel_struct_data_copy.h"
 #include "../../impl/basic_api/kernel_tensor_base.h"
 #include "../../impl/basic_api/utils/kernel_utils_macros.h"
+#include "../../impl/basic_api/utils/kernel_utils_pointer.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -167,6 +168,8 @@ public:
 
     template <typename S>
     void SetAddrWithOffset(LocalTensor<S>& src, uint32_t offset);
+    template <typename Src, typename Std::enable_if<Internal::IsPointerOperand<Src>, bool>::type = true>
+    void SetAddrWithOffset(const Src& src, uint32_t offset);
     inline void Print();
     inline void Print(uint32_t len);
     int32_t ToFile(const std::string& fileName) const;
@@ -185,6 +188,10 @@ public:
     [[deprecated("NOTICE: SetAddrWithOffset has been deprecated and will be removed in the next version. "
                  "Please do not use it!")]] __aicore__ inline void
     SetAddrWithOffset(LocalTensor<S>& src, uint32_t offset);
+    template <typename Src, typename Std::enable_if<Internal::IsPointerOperand<Src>, bool>::type = true>
+    [[deprecated("NOTICE: SetAddrWithOffset has been deprecated and will be removed in the next version. "
+                 "Please do not use it!")]] __aicore__ inline void
+    SetAddrWithOffset(const Src& src, uint32_t offset);
 #endif
     __aicore__ inline LocalTensor<T>(TPosition pos, uint32_t addr, uint32_t tileSize);
     template <typename U>
