@@ -27,6 +27,9 @@
 
 #include "../../impl/basic_api/kernel_macros.h"
 #include "../../impl/basic_api/kernel_reg.h"
+#if !defined(ASCENDC_CPU_DEBUG) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 2201))
+#include "../../impl/basic_api/utils/kernel_utils_dma_pointer.h"
+#endif
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -51,6 +54,38 @@ __aicore__ inline void DataCacheCleanAndInvalid(const LocalTensor<T>& dst);
 
 template <typename T, CacheLine entireType>
 __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst);
+
+#if !defined(ASCENDC_CPU_DEBUG) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 2201))
+template <
+    typename Offset, typename S,
+    typename Std::enable_if<
+        DmaInternal::DmaTraits<S>::isPointer && DmaInternal::DmaCanUse<S, Hardware::GM>::value &&
+            Std::is_same<DmaInternal::DmaElem<S>, uint64_t>::value &&
+            (Std::is_same<Offset, int16_t>::value || Std::is_same<Offset, int64_t>::value),
+        bool>::type = true>
+__aicore__ inline void DataCachePreload(const S& src, const Offset cacheOffset);
+
+template <
+    typename T, CacheLine entireType, DcciDst dcciDst,
+    typename Std::enable_if<
+        DmaInternal::DmaTraits<__gm__ T*>::isPointer && DmaInternal::DmaTraits<__gm__ T*>::isWritable, bool>::type =
+        true>
+__aicore__ inline void DataCacheCleanAndInvalid(__gm__ T* dst);
+
+template <
+    typename T, CacheLine entireType, DcciDst dcciDst,
+    typename Std::enable_if<
+        DmaInternal::DmaTraits<__ubuf__ T*>::isPointer && DmaInternal::DmaTraits<__ubuf__ T*>::isWritable, bool>::type =
+        true>
+__aicore__ inline void DataCacheCleanAndInvalid(__ubuf__ T* dst);
+
+template <
+    typename T, CacheLine entireType,
+    typename Std::enable_if<
+        DmaInternal::DmaTraits<__gm__ T*>::isPointer && DmaInternal::DmaTraits<__gm__ T*>::isWritable, bool>::type =
+        true>
+__aicore__ inline void DataCacheCleanAndInvalid(__gm__ T* dst);
+#endif
 
 __aicore__ inline void ICachePreLoad(const int64_t preFetchLen);
 

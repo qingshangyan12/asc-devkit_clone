@@ -1852,7 +1852,8 @@ __aicore__ inline void SetPadValue(T paddingValue)
 }
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-template <typename T, uint8_t dim, const NdDmaConfig& config>
+template <
+    typename T, uint8_t dim, const NdDmaConfig& config, typename Std::enable_if<(dim >= 1 && dim <= 5), bool>::type>
 __aicore__ inline void DataCopy(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const MultiCopyParams<T, dim>& params)
 {
@@ -1890,6 +1891,9 @@ __aicore__ inline void ResetLoopModePara(DataCopyMVType type)
 }
 #endif
 } // namespace AscendC
+#include "kernel_operator_data_copy_pointer_impl.h"
+#include "kernel_operator_data_copy_pad_pointer_impl.h"
+
 #endif // ASCENDC_MODULE_OPERATOR_VEC_VCONV_INTERFACE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_INTF_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

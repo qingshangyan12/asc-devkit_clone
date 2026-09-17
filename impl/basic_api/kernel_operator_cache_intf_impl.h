@@ -71,7 +71,11 @@ __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst)
 template <typename T, CacheLine entireType, DcciDst dcciDst>
 __aicore__ inline void DataCacheCleanAndInvalid(const LocalTensor<T>& dst)
 {
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     DcciUBImpl<T, entireType, dcciDst>(const_cast<__ubuf__ T*>(dst.GetPhyAddr()));
+#else
+    DcciUBImpl<T, entireType, dcciDst>(reinterpret_cast<__ubuf__ T*>(dst.GetPhyAddr()));
+#endif
 }
 #endif
 
@@ -91,6 +95,8 @@ __aicore__ inline void ICachePreLoad(const int64_t preFetchLen) { PreLoad(preFet
 __aicore__ inline int64_t GetICachePreloadStatus() { return GetICachePreloadStatusImpl(); }
 
 } // namespace AscendC
+
+#include "kernel_operator_cache_pointer_impl.h"
 
 #endif // ASCENDC_MODULE_OPERATOR_CACHE_INTERFACE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_CACHE_INTF_IMPL_H__)
