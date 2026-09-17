@@ -14,25 +14,6 @@ find_package(tikicpulib REQUIRED)
 
 add_subdirectory(ascendc_header_checker)
 
-option(ASCENDC_ENABLE_DUMP_TENSOR_V2_TESTS "Run FIFO Super Tensor compile and host fixtures" OFF)
-if (ASCENDC_ENABLE_DUMP_TENSOR_V2_TESTS)
-    if (NOT DEFINED ASCEND_CANN_PACKAGE_PATH OR
-        NOT EXISTS "${ASCEND_CANN_PACKAGE_PATH}/tools/bisheng_compiler/bin/bisheng")
-        message(FATAL_ERROR
-            "ASCENDC_ENABLE_DUMP_TENSOR_V2_TESTS requires ASCEND_CANN_PACKAGE_PATH with bisheng")
-    endif()
-    if (NOT DEFINED PYTHON_PYVERSION)
-        find_package(Python3 COMPONENTS Interpreter REQUIRED)
-        set(PYTHON_PYVERSION ${Python3_EXECUTABLE})
-    endif()
-    add_custom_target(ascendc_ut_dump_tensor_v2
-        COMMAND ${PYTHON_PYVERSION} ${CMAKE_CURRENT_SOURCE_DIR}/dump_tensor_v2/run_tests.py
-            --cann-path "${ASCEND_CANN_PACKAGE_PATH}"
-        WORKING_DIRECTORY ${ASCENDC_DIR}
-        COMMENT "Run FIFO Super Tensor DumpTensor tests"
-    )
-endif()
-
 add_subdirectory(ascendc_host_header_checker)
 
 set(BASIC_UT_PRODUCT_TYPE_LIST_INIT

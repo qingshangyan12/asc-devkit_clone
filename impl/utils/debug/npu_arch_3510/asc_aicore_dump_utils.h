@@ -104,7 +104,7 @@ __aicore__ inline uint32_t debug_bus_read_reg(uint64_t debugBusAddr, uint16_t of
 }
 
 template <uint64_t readLen>
-__aicore__ inline bool debug_bus_read_chunk(
+__aicore__ inline void debug_bus_read_chunk(
     const uint64_t debugBusAddr, uint32_t localOffset, const uint32_t modelBase, uint64_t dataDst)
 {
     constexpr uint32_t max_wait_count = 5;
@@ -119,7 +119,7 @@ __aicore__ inline bool debug_bus_read_chunk(
     while ((debug_status & 0x80000000U) != 0x80000000U) {
         if (counter > max_wait_count) {
             // timeout protection, avoid infinite loop
-            return false;
+            break;
         }
         ringbuf_wait_rts_sync();
         sync_all();
@@ -134,7 +134,6 @@ __aicore__ inline bool debug_bus_read_chunk(
             debug_bus_read_reg(debugBusAddr, ASC_DEBUG_BUS_DATA_OFFSET + i * sizeof(uint32_t)));
     }
     sync_all();
-    return true;
 }
 
 __aicore__ inline uint64_t get_debug_bus_addr_impl()
@@ -173,9 +172,7 @@ __aicore__ inline uint32_t debug_bus_copy_local_to_gm_impl(
 
     const int32_t loopCount = alignDumpBytes >> get_debug_bus_loop_shift<hardware>();
     for (uint32_t idx = 0; idx < loopCount; ++idx) {
-        if (!debug_bus_read_chunk<readLen>(debugBusAddr, srcLocalAddr, modelBase, dstGlobalAddr)) {
-            return 1;
-        }
+        debug_bus_read_chunk<readLen>(debugBusAddr, srcLocalAddr, modelBase, dstGlobalAddr);
         srcLocalAddr += localStep;
         dstGlobalAddr += readLen;
     }

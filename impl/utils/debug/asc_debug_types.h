@@ -113,48 +113,8 @@ enum class DumpType : uint8_t {
     DUMP_SIMT,
     DUMP_BUFI,
     DUMP_BUFO,
-    DUMP_SKIP,
-    DUMP_SUPER_TENSOR = 11,
-    DUMP_SUPER_TENSOR_BODY = 12
+    DUMP_SKIP
 };
-
-// The wire header is packed explicitly. Payload bytes follow this fixed
-// header, and the complete TLV is aligned to 32 bytes by the producer.
-struct __attribute__((packed)) DumpTensorInfo {
-    uint32_t dumpType;
-    uint32_t dumpLength;
-    uint32_t addr;
-    uint32_t dataType;
-    uint32_t desc;
-    uint32_t offset;
-    uint16_t position;
-    uint16_t blockIdx;
-    uint32_t dim;
-    uint32_t shape[8];
-    uint32_t resv;
-    uint64_t tensorLength;
-    uint64_t tensorOffset;
-    uint32_t dumpSize;
-};
-static_assert(sizeof(DumpTensorInfo) == 88, "Super Tensor first header size");
-static_assert(__builtin_offsetof(DumpTensorInfo, offset) == 20, "Super Tensor offset field");
-static_assert(__builtin_offsetof(DumpTensorInfo, tensorLength) == 68, "Super Tensor length field");
-static_assert(__builtin_offsetof(DumpTensorInfo, tensorOffset) == 76, "Super Tensor byte offset field");
-static_assert(__builtin_offsetof(DumpTensorInfo, dumpSize) == 84, "Super Tensor payload size field");
-
-struct __attribute__((packed)) DumpTensorBodyInfo {
-    uint32_t dumpType;
-    uint32_t dumpLength;
-    uint32_t resv1;
-    uint32_t resv2;
-    uint64_t tensorLength;
-    uint64_t tensorOffset;
-    uint32_t dumpSize;
-};
-static_assert(sizeof(DumpTensorBodyInfo) == 36, "Super Tensor body header size");
-static_assert(__builtin_offsetof(DumpTensorBodyInfo, tensorLength) == 16, "Super Tensor body length field");
-static_assert(__builtin_offsetof(DumpTensorBodyInfo, tensorOffset) == 24, "Super Tensor body byte offset field");
-static_assert(__builtin_offsetof(DumpTensorBodyInfo, dumpSize) == 32, "Super Tensor body payload size field");
 
 struct DebugBlockHeadInfo {
     uint32_t length = 0U;       // total size per block (include head and r/w info)
