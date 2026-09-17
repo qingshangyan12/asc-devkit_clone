@@ -50,6 +50,42 @@ __simd_callee__ inline reg_tensor<DstType> cast(const reg_tensor<SrcType>& src);
 template <typename T>
 __simd_callee__ inline reg_tensor<T> trunc(const reg_tensor<T>& src);
 
+/**
+ * @brief Computes the ceiling of each active register element.
+ * @param src Source register tensor.
+ * @return The ceiled register tensor with the source mask preserved.
+ * @note Supported element types are half, bfloat16_t, and float.
+ */
+template <typename T>
+__simd_callee__ inline reg_tensor<T> ceil(const reg_tensor<T>& src);
+
+/**
+ * @brief Computes the floor of each active register element.
+ * @param src Source register tensor.
+ * @return The floored register tensor with the source mask preserved.
+ * @note Supported element types are half, bfloat16_t, and float.
+ */
+template <typename T>
+__simd_callee__ inline reg_tensor<T> floor(const reg_tensor<T>& src);
+
+/**
+ * @brief Rounds each active register element to the nearest integer (rint).
+ * @param src Source register tensor.
+ * @return The rounded register tensor with the source mask preserved.
+ * @note Supported element types are half, bfloat16_t, and float.
+ */
+template <typename T>
+__simd_callee__ inline reg_tensor<T> rint(const reg_tensor<T>& src);
+
+/**
+ * @brief Rounds each active register element to the nearest integer (round).
+ * @param src Source register tensor.
+ * @return The rounded register tensor with the source mask preserved.
+ * @note Supported element types are half, bfloat16_t, and float.
+ */
+template <typename T>
+__simd_callee__ inline reg_tensor<T> round(const reg_tensor<T>& src);
+
 } // namespace experimental
 } // namespace te
 } // namespace asc

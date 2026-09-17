@@ -161,6 +161,58 @@ __simd_callee__ inline reg_tensor<T> trunc(const reg_tensor<T>& src)
     }
 }
 
+template <typename T>
+__simd_callee__ inline reg_tensor<T> ceil(const reg_tensor<T>& src)
+{
+    if constexpr (detail::is_supported<T>::value) {
+        reg_tensor<T> dst;
+        asc_ceil(dst.reg, src.reg, src.mask);
+        dst.mask = src.mask;
+        return dst;
+    } else {
+        static_assert(detail::is_supported<T>::value, "reg_tensor ceil supports only half, bfloat16_t, and float");
+    }
+}
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> floor(const reg_tensor<T>& src)
+{
+    if constexpr (detail::is_supported<T>::value) {
+        reg_tensor<T> dst;
+        asc_floor(dst.reg, src.reg, src.mask);
+        dst.mask = src.mask;
+        return dst;
+    } else {
+        static_assert(detail::is_supported<T>::value, "reg_tensor floor supports only half, bfloat16_t, and float");
+    }
+}
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> rint(const reg_tensor<T>& src)
+{
+    if constexpr (detail::is_supported<T>::value) {
+        reg_tensor<T> dst;
+        asc_rint(dst.reg, src.reg, src.mask);
+        dst.mask = src.mask;
+        return dst;
+    } else {
+        static_assert(detail::is_supported<T>::value, "reg_tensor rint supports only half, bfloat16_t, and float");
+    }
+}
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> round(const reg_tensor<T>& src)
+{
+    if constexpr (detail::is_supported<T>::value) {
+        reg_tensor<T> dst;
+        asc_round(dst.reg, src.reg, src.mask);
+        dst.mask = src.mask;
+        return dst;
+    } else {
+        static_assert(detail::is_supported<T>::value, "reg_tensor round supports only half, bfloat16_t, and float");
+    }
+}
+
 } // namespace experimental
 } // namespace te
 } // namespace asc
