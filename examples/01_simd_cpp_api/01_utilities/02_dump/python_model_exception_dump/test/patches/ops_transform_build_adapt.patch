@@ -1,0 +1,92 @@
+diff --git a/examples/fast_kernel_launch_example/csrc/CMakeLists.txt b/examples/fast_kernel_launch_example/csrc/CMakeLists.txt
+index b82b924cc..6fc39b2e0 100644
+--- a/examples/fast_kernel_launch_example/csrc/CMakeLists.txt
++++ b/examples/fast_kernel_launch_example/csrc/CMakeLists.txt
+@@ -1,11 +1,26 @@
+-# ----------------------------------------------------------------------------
+-# Copyright (c) 2025 Huawei Technologies Co., Ltd.
+-# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+-# CANN Open Software License Agreement Version 2.0 (the "License").
+-# Please refer to the License for details. You may not use this file except in compliance with the License.
+-# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+-# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+-# See LICENSE in the root of the software repository for the full text of the License.
+-# ----------------------------------------------------------------------------
+-
+-recursive_add_subdirectory()
++# ----------------------------------------------------------------------------
++# Copyright (c) 2025 Huawei Technologies Co., Ltd.
++# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
++# CANN Open Software License Agreement Version 2.0 (the "License").
++# Please refer to the License for details. You may not use this file except in compliance with the License.
++# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
++# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
++# See LICENSE in the root of the software repository for the full text of the License.
++# ----------------------------------------------------------------------------
++
++# 本地编译适配：OPS_BUILD_FILTER 环境变量可指定只构建部分算子（逗号分隔目录名）
++macro(recursive_add_subdirectory_filtered)
++    file(GLOB CURRENT_DIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/*)
++    foreach(SUB_DIR ${CURRENT_DIRS})
++        if(DEFINED ENV{OPS_BUILD_FILTER})
++            string(FIND ",$ENV{OPS_BUILD_FILTER}," ",${SUB_DIR}," _FOUND)
++            if(_FOUND EQUAL -1)
++                continue()
++            endif()
++        endif()
++        if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${SUB_DIR}/${NPU_SOC_VERSION}/CMakeLists.txt")
++            add_subdirectory(${SUB_DIR}/${NPU_SOC_VERSION})
++        endif()
++    endforeach()
++endmacro()
++recursive_add_subdirectory_filtered()
+diff --git a/examples/fast_kernel_launch_example/csrc/incre_flash_attention/ascend910_93/npu_fused_infer_attention_score.cpp b/examples/fast_kernel_launch_example/csrc/incre_flash_attention/ascend910_93/npu_fused_infer_attention_score.cpp
+index c616f9597..cd68b1a84 100644
+--- a/examples/fast_kernel_launch_example/csrc/incre_flash_attention/ascend910_93/npu_fused_infer_attention_score.cpp
++++ b/examples/fast_kernel_launch_example/csrc/incre_flash_attention/ascend910_93/npu_fused_infer_attention_score.cpp
+@@ -332,6 +332,8 @@ std::tuple<at::Tensor, at::Tensor> npu_fused_infer_attention_score_npu(
+     // blockdim
+     uint32_t blockDim = tilingData.increFlashAttentionSingleCoreParams.get_usedCoreNum();
+ 
++    // 本地 CANN 26.0.rc2 头文件无 aclprofTensor/aclprofStr2Id，默认关闭张量级 trace 上报
++#if defined(IFA_ENABLE_PROF)
+     aclprofTensorInfo tensorInfo;
+     aclprofTensor emptyTensor = {0, 0, 0, 0, {0}};
+     // 本FA demo只支持伪量化场景，非支持场景会被tiling拦截，此处只上报支持范围内的所有参数shape
+@@ -345,6 +347,7 @@ std::tuple<at::Tensor, at::Tensor> npu_fused_infer_attention_score_npu(
+         dequant_scale_value.has_value() ? INPUT(dequant_scale_value.value()) : emptyTensor, OUTPUT(output));
+     aclprofEventAttributes attrs = {1, sizeof(aclprofEventAttributes::message), 0, &tensorInfo};
+     aclprofRangePushEx(&attrs);
++#endif // IFA_ENABLE_PROF
+ 
+     if (fdFlag == 0 && layoutVal == 0 && antiquantMode == 0) {
+         LAUNCH_INCRE_FA(0, 0, 0);
+@@ -366,7 +369,9 @@ std::tuple<at::Tensor, at::Tensor> npu_fused_infer_attention_score_npu(
+         printf("invalid flags: fd=%d layout=%d antiquantMode=%d\n", fdFlag, layoutVal, antiquantMode);
+     }
+ 
++#if defined(IFA_ENABLE_PROF)
+     aclprofRangePop();
++#endif // IFA_ENABLE_PROF
+     return std::tuple<at::Tensor, at::Tensor>(output, softmax_lse);
+ }
+ 
+diff --git a/examples/fast_kernel_launch_example/csrc/incre_flash_attention/ascend910_93/op_kernel/incre_flash_attention_arch22.h b/examples/fast_kernel_launch_example/csrc/incre_flash_attention/ascend910_93/op_kernel/incre_flash_attention_arch22.h
+index 8f64466a0..73d97591e 100644
+--- a/examples/fast_kernel_launch_example/csrc/incre_flash_attention/ascend910_93/op_kernel/incre_flash_attention_arch22.h
++++ b/examples/fast_kernel_launch_example/csrc/incre_flash_attention/ascend910_93/op_kernel/incre_flash_attention_arch22.h
+@@ -93,7 +93,8 @@ __global__ __mix__(1, 2) void incre_flash_attention(
+                                  AMLAMODE::NORMAL);
+ }
+ 
+-// SK Adapt
++// SK Adapt（本地 CANN 26.0.rc2 无 __sk__/SkSystemArgs 支持，默认关闭；定义 IFA_ENABLE_SK 可恢复）
++#if defined(IFA_ENABLE_SK)
+ struct SKArgsStruct {
+     GM_ADDR query;
+     GM_ADDR key;
+@@ -191,3 +192,4 @@ FA_SK_BIND(1, 0, 0);
+ FA_SK_BIND(1, 0, 1);
+ FA_SK_BIND(1, 1, 0);
+ FA_SK_BIND(1, 1, 1);
++#endif // IFA_ENABLE_SK
