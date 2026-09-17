@@ -14,19 +14,35 @@
 import sys
 import numpy as np
 
-# for float32
-relative_tol = 1e-4
-absolute_tol = 1e-6
-error_tol = 1e-4
+# FLOAT32 mixed-tolerance thresholds from the ecosystem operator precision standard.
+relative_tol = 2**-10
+absolute_tol = 2**-16
+required_matched_ratio = 0.99
+fixed_absolute_error_limit = 1e-2
 
 
 def verify_result(output, golden):
     output = np.fromfile(output, dtype=np.float32).reshape(-1)
     golden = np.fromfile(golden, dtype=np.float32).reshape(-1)
-    different_element_results = np.isclose(
-        output, golden, rtol=relative_tol, atol=absolute_tol, equal_nan=True
+    if output.size != golden.size or output.size == 0:
+        raise ValueError(
+            "output and golden must contain the same non-zero number of float32 values"
+        )
+
+    output_fp64 = output.astype(np.float64)
+    golden_fp64 = golden.astype(np.float64)
+    absolute_error = np.abs(output_fp64 - golden_fp64)
+    tolerance = absolute_tol + relative_tol * np.abs(golden_fp64)
+    finite = np.isfinite(output_fp64) & np.isfinite(golden_fp64)
+    matched = finite & (absolute_error <= tolerance)
+    different_element_indexes = np.flatnonzero(~matched)
+    relative_error = absolute_error / np.maximum(np.abs(golden_fp64), absolute_tol)
+
+    ulp = np.abs(np.spacing(np.abs(golden).astype(np.float32))).astype(np.float64)
+    absolute_error_limit = np.maximum(fixed_absolute_error_limit, 32.0 * ulp)
+    absolute_error_limit_passed = bool(
+        np.all(finite & (absolute_error <= absolute_error_limit))
     )
-    different_element_indexes = np.where(different_element_results == False)[0]
     for index in range(len(different_element_indexes)):
         real_index = different_element_indexes[index]
         golden_data = golden[real_index]
@@ -37,13 +53,17 @@ def verify_result(output, golden):
                 real_index,
                 golden_data,
                 output_data,
-                abs(output_data - golden_data) / golden_data,
+                absolute_error[real_index] / max(abs(float(golden_data)), absolute_tol),
             )
         )
         if index == 100:
             break
-    error_ratio = float(different_element_indexes.size) / golden.size
-    return error_ratio <= error_tol
+    matched_ratio = float(np.count_nonzero(matched)) / golden.size
+    print("max absolute error: %.9e" % np.max(absolute_error))
+    print("max relative error: %.9e" % np.max(relative_error))
+    print("matched ratio: %.9e" % matched_ratio)
+    print("absolute error hard limit passed: %s" % absolute_error_limit_passed)
+    return matched_ratio >= required_matched_ratio and absolute_error_limit_passed
 
 
 if __name__ == "__main__":

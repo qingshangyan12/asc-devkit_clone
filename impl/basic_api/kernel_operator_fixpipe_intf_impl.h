@@ -82,6 +82,48 @@ __aicore__ inline void SetFixPipeConfig(const LocalTensor<T>& preData, bool isUn
     SetFixPipeConfigImpl<T, setRelu>(preData, isUnitFlag);
 }
 
+template <
+    typename ReluPre, typename QuantPre,
+    typename Std::enable_if<
+        Internal::IsTensorOrPointerOperand<ReluPre> && Internal::IsTensorOrPointerOperand<QuantPre> &&
+            (Internal::IsPointerOperand<ReluPre> || Internal::IsPointerOperand<QuantPre>),
+        bool>::type>
+__aicore__ inline void SetFixPipeConfig(const ReluPre& reluPre, const QuantPre& quantPre, bool isUnitFlag)
+{
+    using ReluType = Internal::OperandPrimT<ReluPre>;
+    using QuantType = Internal::OperandPrimT<QuantPre>;
+    static_assert(Std::is_same<ReluType, QuantType>::value, "SetFixPipeConfig requires identical operand types");
+    ASCENDC_ASSERT(
+        (GetPhyType(GetOperandPosition(reluPre)) == Hardware::FIXBUF &&
+         GetPhyType(GetOperandPosition(quantPre)) == Hardware::FIXBUF),
+        { KERNEL_LOG(KERNEL_ERROR, "SetFixPipeConfig inputs must be in Fixpipe Buffer(C2PIPE2GM)"); });
+    if ASCEND_IS_AIC {
+        uint64_t config = (uint64_t)GetUnderlyingPtr(reluPre) >> 6;
+        config |= (((uint64_t)GetUnderlyingPtr(quantPre) >> 7) << 8);
+        config |= static_cast<uint64_t>(isUnitFlag) << 63;
+        set_fpc(config);
+    }
+}
+
+template <typename PreData, bool setRelu, typename Std::enable_if<Internal::IsPointerOperand<PreData>, bool>::type>
+__aicore__ inline void SetFixPipeConfig(const PreData& preData, bool isUnitFlag)
+{
+    const Hardware position = GetPhyType(GetOperandPosition(preData));
+    ASCENDC_ASSERT((position == Hardware::FIXBUF || position == Hardware::L0C), {
+        KERNEL_LOG(KERNEL_ERROR, "SetFixPipeConfig input must be in Fixpipe Buffer(C2PIPE2GM) or L0C Buffer(CO1)");
+    });
+    if ASCEND_IS_AIC {
+        uint64_t config = 0;
+        if constexpr (setRelu) {
+            config = (uint64_t)GetUnderlyingPtr(preData) >> 6;
+        } else {
+            config = ((uint64_t)GetUnderlyingPtr(preData) >> 7) << 8;
+        }
+        config |= static_cast<uint64_t>(isUnitFlag) << 63;
+        set_fpc(config);
+    }
+}
+
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5101 || \
                               __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint32_t dstNdStride)
@@ -185,6 +227,133 @@ __aicore__ inline void Fixpipe(
         (__cbuf__ uint64_t*)cbufWorkspace.GetPhyAddr(), intriParams);
 }
 
+#if defined(__NPU_ARCH__) &&                                                                         \
+    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3102 || \
+     __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+template <Hardware dstScope, typename Dst, typename Src, const FixpipeConfig& config>
+__aicore__ inline void FixpipeV220PointerDispatch(const Dst& dst, const Src& src, const FixpipeParamsV220& intriParams)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    using SrcType = Internal::OperandPrimT<Src>;
+    static_assert(
+        dstScope == Hardware::GM || dstScope == Hardware::L1 || dstScope == Hardware::UB,
+        "Fixpipe dst only supports GM/L1/UB");
+    if constexpr (dstScope == Hardware::GM) {
+#ifdef ASCENDC_CPU_DEBUG
+        bool isUsedProcessLock = false;
+        if (g_isAtomic == true) {
+            ProcessLock::GetProcessLock()->Write();
+            isUsedProcessLock = true;
+        }
+#endif
+        FixpipeL0C2GMImpl<DstType, SrcType, config>(
+            (__gm__ DstType*)GetUnderlyingPtr(dst), (__cc__ SrcType*)GetUnderlyingPtr(src), intriParams);
+#ifdef ASCENDC_CPU_DEBUG
+        if (isUsedProcessLock == true) {
+            ProcessLock::GetProcessLock()->Unlock();
+        }
+#endif
+    } else if constexpr (dstScope == Hardware::L1) {
+        FixpipeL0C2L1Impl<DstType, SrcType, config>(
+            (__cbuf__ DstType*)GetUnderlyingPtr(dst), (__cc__ SrcType*)GetUnderlyingPtr(src), intriParams);
+    } else {
+        FixpipeL0C2UBImpl<DstType, SrcType, config>(
+            (__ubuf__ DstType*)GetUnderlyingPtr(dst), (__cc__ SrcType*)GetUnderlyingPtr(src), intriParams);
+    }
+}
+
+template <Hardware dstScope, typename Dst, typename Src, const FixpipeConfig& config, typename Workspace>
+__aicore__ inline void FixpipeV220PointerDispatch(
+    const Dst& dst, const Src& src, const Workspace& cbufWorkspace, const FixpipeParamsV220& intriParams)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    using WorkspaceType = Internal::WritableOperandPrimT<Workspace>;
+    using SrcType = Internal::OperandPrimT<Src>;
+    static_assert(
+        dstScope == Hardware::GM || dstScope == Hardware::L1 || dstScope == Hardware::UB,
+        "Fixpipe dst only supports GM/L1/UB");
+    if constexpr (dstScope == Hardware::GM) {
+        FixpipeL0C2GMImpl<DstType, SrcType, config>(
+            (__gm__ DstType*)GetUnderlyingPtr(dst), (__cc__ SrcType*)GetUnderlyingPtr(src),
+            (__cbuf__ uint64_t*)GetUnderlyingPtr(cbufWorkspace), intriParams);
+    } else if constexpr (dstScope == Hardware::L1) {
+        FixpipeL0C2L1Impl<DstType, SrcType, config>(
+            (__cbuf__ DstType*)GetUnderlyingPtr(dst), (__cc__ SrcType*)GetUnderlyingPtr(src),
+            (__cbuf__ uint64_t*)GetUnderlyingPtr(cbufWorkspace), intriParams);
+    } else {
+        FixpipeL0C2UBImpl<DstType, SrcType, config>(
+            (__ubuf__ DstType*)GetUnderlyingPtr(dst), (__cc__ SrcType*)GetUnderlyingPtr(src),
+            (__cbuf__ uint64_t*)GetUnderlyingPtr(cbufWorkspace), intriParams);
+    }
+}
+
+template <
+    typename Dst, typename Src, const FixpipeConfig& config,
+    typename Std::enable_if<Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>, bool>::type>
+__aicore__ inline void Fixpipe(const Dst& dst, const Src& src, const FixpipeParamsV220& intriParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckFixpipeParamsV220Common<Internal::OperandPrimT<Dst>, Internal::OperandPrimT<Src>, config>(
+        intriParams, "Fixpipe");
+#endif
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(src)) == Hardware::L0C), {
+        KERNEL_LOG(KERNEL_ERROR, "Fixpipe src only supports L0C Buffer(CO1)");
+    });
+    if constexpr (Internal::IsGlobalTensorOperand<Dst>) {
+        FixpipeV220PointerDispatch<Hardware::GM, Dst, Src, config>(dst, src, intriParams);
+    } else if constexpr (Internal::IsPointerOperand<Dst>) {
+        constexpr Hardware dstScope = GetPhyType(GetOperandPosition(static_cast<Dst>(nullptr)));
+        FixpipeV220PointerDispatch<dstScope, Dst, Src, config>(dst, src, intriParams);
+    } else {
+        const Hardware dstScope = GetPhyType(GetOperandPosition(dst));
+        if (dstScope == Hardware::L1) {
+            FixpipeV220PointerDispatch<Hardware::L1, Dst, Src, config>(dst, src, intriParams);
+        } else if (dstScope == Hardware::UB) {
+            FixpipeV220PointerDispatch<Hardware::UB, Dst, Src, config>(dst, src, intriParams);
+        } else {
+            ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "Fixpipe local dst only supports L1/UB"); });
+        }
+    }
+}
+
+template <
+    typename Dst, typename Src, const FixpipeConfig& config, typename Workspace,
+    typename Std::enable_if<
+        (Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src> || Internal::IsPointerOperand<Workspace>) &&
+            Std::is_same<Internal::OperandPrimT<Workspace>, uint64_t>::value,
+        bool>::type>
+__aicore__ inline void Fixpipe(
+    const Dst& dst, const Src& src, const Workspace& cbufWorkspace, const FixpipeParamsV220& intriParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckFixpipeParamsV220Common<Internal::OperandPrimT<Dst>, Internal::OperandPrimT<Src>, config>(
+        intriParams, "Fixpipe");
+    CheckFixpipeQuantPreWithWorkspaceCommon(intriParams.quantPre, "Fixpipe");
+#endif
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(src)) == Hardware::L0C), {
+        KERNEL_LOG(KERNEL_ERROR, "Fixpipe src only supports L0C Buffer(CO1)");
+    });
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(cbufWorkspace)) == Hardware::L1), {
+        KERNEL_LOG(KERNEL_ERROR, "Fixpipe workspace only supports L1 Buffer(C1)");
+    });
+    if constexpr (Internal::IsGlobalTensorOperand<Dst>) {
+        FixpipeV220PointerDispatch<Hardware::GM, Dst, Src, config>(dst, src, cbufWorkspace, intriParams);
+    } else if constexpr (Internal::IsPointerOperand<Dst>) {
+        constexpr Hardware dstScope = GetPhyType(GetOperandPosition(static_cast<Dst>(nullptr)));
+        FixpipeV220PointerDispatch<dstScope, Dst, Src, config>(dst, src, cbufWorkspace, intriParams);
+    } else {
+        const Hardware dstScope = GetPhyType(GetOperandPosition(dst));
+        if (dstScope == Hardware::L1) {
+            FixpipeV220PointerDispatch<Hardware::L1, Dst, Src, config>(dst, src, cbufWorkspace, intriParams);
+        } else if (dstScope == Hardware::UB) {
+            FixpipeV220PointerDispatch<Hardware::UB, Dst, Src, config>(dst, src, cbufWorkspace, intriParams);
+        } else {
+            ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "Fixpipe local dst only supports L1/UB"); });
+        }
+    }
+}
+#endif
+
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 // L0C->L1/UB
 template <typename T, typename U, const FixpipeConfig& config>
@@ -251,7 +420,7 @@ __aicore__ inline void Fixpipe(
 #endif // ASCENDC_CPU_DEBUG
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-    const uint8_t cacheMode = ExtractCacheMode(dst);
+    const uint8_t cacheMode = GetOperandCacheMode(dst);
     FixpipeL0C2GMImpl<DstPrimType, SrcPrimType, config>(
         (__gm__ DstPrimType*)dst.GetPhyAddr(), (__cc__ SrcPrimType*)src.GetPhyAddr(), intriParams, cacheMode);
 #else
@@ -277,7 +446,7 @@ __aicore__ inline void Fixpipe(
     CheckTensorPos(src, Hardware::L0C, "src", "CO1", "Fixpipe");
     CheckTensorPos(cbufWorkspace, Hardware::L1, "cbufWorkspace", "A1", "Fixpipe");
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-    const uint8_t cacheMode = ExtractCacheMode(dst);
+    const uint8_t cacheMode = GetOperandCacheMode(dst);
     FixpipeL0C2GMImpl<DstPrimType, SrcPrimType, config>(
         (__gm__ DstPrimType*)dst.GetPhyAddr(), (__cc__ SrcPrimType*)src.GetPhyAddr(),
         (__cbuf__ uint64_t*)cbufWorkspace.GetPhyAddr(), intriParams, cacheMode);
@@ -286,6 +455,139 @@ __aicore__ inline void Fixpipe(
         (__gm__ DstPrimType*)dst.GetPhyAddr(), (__cc__ SrcPrimType*)src.GetPhyAddr(),
         (__cbuf__ uint64_t*)cbufWorkspace.GetPhyAddr(), intriParams);
 #endif
+}
+
+template <Hardware dstScope, typename Dst, typename Src, const FixpipeConfig& config>
+__aicore__ inline void FixpipeArch3510PointerDispatch(
+    const Dst& dst, const Src& src, const FixpipeParamsArch3510<config.format>& intriParams)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    using SrcType = Internal::OperandPrimT<Src>;
+    static_assert(
+        dstScope == Hardware::GM || dstScope == Hardware::L1 || dstScope == Hardware::UB,
+        "Fixpipe dst only supports GM/L1/UB");
+    if constexpr (dstScope == Hardware::GM) {
+        const uint8_t cacheMode = GetOperandCacheMode(dst);
+        FixpipeL0C2GMImpl<DstType, SrcType, config>(
+            (__gm__ DstType*)GetUnderlyingPtr(dst), (__cc__ SrcType*)GetUnderlyingPtr(src), intriParams, cacheMode);
+    } else if constexpr (dstScope == Hardware::UB) {
+        FixpipeL0C2UBImpl<DstType, SrcType, config>(
+            (__ubuf__ DstType*)GetUnderlyingPtr(dst), (__cc__ SrcType*)GetUnderlyingPtr(src), intriParams);
+    } else {
+        FixpipeL0C2L1Impl<DstType, SrcType, config>(
+            (__cbuf__ DstType*)GetUnderlyingPtr(dst), (__cc__ SrcType*)GetUnderlyingPtr(src), intriParams);
+    }
+}
+
+template <Hardware dstScope, typename Dst, typename Src, const FixpipeConfig& config, typename Workspace>
+__aicore__ inline void FixpipeArch3510PointerDispatch(
+    const Dst& dst, const Src& src, const Workspace& cbufWorkspace,
+    const FixpipeParamsArch3510<config.format>& intriParams)
+{
+    using DstType = Internal::WritableOperandPrimT<Dst>;
+    using WorkspaceType = Internal::WritableOperandPrimT<Workspace>;
+    using SrcType = Internal::OperandPrimT<Src>;
+    static_assert(
+        dstScope == Hardware::GM || dstScope == Hardware::L1 || dstScope == Hardware::UB,
+        "Fixpipe dst only supports GM/L1/UB");
+    if constexpr (dstScope == Hardware::GM) {
+        const uint8_t cacheMode = GetOperandCacheMode(dst);
+        FixpipeL0C2GMImpl<DstType, SrcType, config>(
+            (__gm__ DstType*)GetUnderlyingPtr(dst), (__cc__ SrcType*)GetUnderlyingPtr(src),
+            (__cbuf__ uint64_t*)GetUnderlyingPtr(cbufWorkspace), intriParams, cacheMode);
+    } else if constexpr (dstScope == Hardware::UB) {
+        FixpipeL0C2UBImpl<DstType, SrcType, config>(
+            (__ubuf__ DstType*)GetUnderlyingPtr(dst), (__cc__ SrcType*)GetUnderlyingPtr(src),
+            (__cbuf__ uint64_t*)GetUnderlyingPtr(cbufWorkspace), intriParams);
+    } else {
+        FixpipeL0C2L1Impl<DstType, SrcType, config>(
+            (__cbuf__ DstType*)GetUnderlyingPtr(dst), (__cc__ SrcType*)GetUnderlyingPtr(src),
+            (__cbuf__ uint64_t*)GetUnderlyingPtr(cbufWorkspace), intriParams);
+    }
+}
+
+template <
+    typename Dst, typename Src, const FixpipeConfig& config,
+    typename Std::enable_if<Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>, bool>::type>
+__aicore__ inline void Fixpipe(const Dst& dst, const Src& src, const FixpipeParamsArch3510<config.format>& intriParams)
+{
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(src)) == Hardware::L0C), {
+        KERNEL_LOG(KERNEL_ERROR, "Fixpipe src only supports L0C Buffer(CO1)");
+    });
+    if constexpr (Internal::IsGlobalTensorOperand<Dst>) {
+        FixpipeArch3510PointerDispatch<Hardware::GM, Dst, Src, config>(dst, src, intriParams);
+    } else if constexpr (Internal::IsPointerOperand<Dst>) {
+        constexpr Hardware dstScope = GetPhyType(GetOperandPosition(static_cast<Dst>(nullptr)));
+        if constexpr (dstScope == Hardware::GM) {
+            FixpipeArch3510PointerDispatch<Hardware::GM, Dst, Src, config>(dst, src, intriParams);
+        } else if constexpr (config.isToUB) {
+            ASCENDC_ASSERT((dstScope == Hardware::UB), {
+                KERNEL_LOG(KERNEL_ERROR, "Fixpipe dst must be UB when config.isToUB is enabled");
+            });
+            FixpipeArch3510PointerDispatch<Hardware::UB, Dst, Src, config>(dst, src, intriParams);
+        } else {
+            ASCENDC_ASSERT((dstScope == Hardware::L1), {
+                KERNEL_LOG(KERNEL_ERROR, "Fixpipe dst must be L1 when config.isToUB is disabled");
+            });
+            FixpipeArch3510PointerDispatch<Hardware::L1, Dst, Src, config>(dst, src, intriParams);
+        }
+    } else if constexpr (config.isToUB) {
+        ASCENDC_ASSERT((GetPhyType(GetOperandPosition(dst)) == Hardware::UB), {
+            KERNEL_LOG(KERNEL_ERROR, "Fixpipe dst must be UB when config.isToUB is enabled");
+        });
+        FixpipeArch3510PointerDispatch<Hardware::UB, Dst, Src, config>(dst, src, intriParams);
+    } else {
+        ASCENDC_ASSERT((GetPhyType(GetOperandPosition(dst)) == Hardware::L1), {
+            KERNEL_LOG(KERNEL_ERROR, "Fixpipe dst must be L1 when config.isToUB is disabled");
+        });
+        FixpipeArch3510PointerDispatch<Hardware::L1, Dst, Src, config>(dst, src, intriParams);
+    }
+}
+
+template <
+    typename Dst, typename Src, const FixpipeConfig& config, typename Workspace,
+    typename Std::enable_if<
+        (Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src> || Internal::IsPointerOperand<Workspace>) &&
+            Std::is_same<Internal::OperandPrimT<Workspace>, uint64_t>::value,
+        bool>::type>
+__aicore__ inline void Fixpipe(
+    const Dst& dst, const Src& src, const Workspace& cbufWorkspace,
+    const FixpipeParamsArch3510<config.format>& intriParams)
+{
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(src)) == Hardware::L0C), {
+        KERNEL_LOG(KERNEL_ERROR, "Fixpipe src only supports L0C Buffer(CO1)");
+    });
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(cbufWorkspace)) == Hardware::L1), {
+        KERNEL_LOG(KERNEL_ERROR, "Fixpipe workspace only supports L1 Buffer(C1)");
+    });
+    if constexpr (Internal::IsGlobalTensorOperand<Dst>) {
+        FixpipeArch3510PointerDispatch<Hardware::GM, Dst, Src, config>(dst, src, cbufWorkspace, intriParams);
+    } else if constexpr (Internal::IsPointerOperand<Dst>) {
+        constexpr Hardware dstScope = GetPhyType(GetOperandPosition(static_cast<Dst>(nullptr)));
+        if constexpr (dstScope == Hardware::GM) {
+            FixpipeArch3510PointerDispatch<Hardware::GM, Dst, Src, config>(dst, src, cbufWorkspace, intriParams);
+        } else if constexpr (config.isToUB) {
+            ASCENDC_ASSERT((dstScope == Hardware::UB), {
+                KERNEL_LOG(KERNEL_ERROR, "Fixpipe dst must be UB when config.isToUB is enabled");
+            });
+            FixpipeArch3510PointerDispatch<Hardware::UB, Dst, Src, config>(dst, src, cbufWorkspace, intriParams);
+        } else {
+            ASCENDC_ASSERT((dstScope == Hardware::L1), {
+                KERNEL_LOG(KERNEL_ERROR, "Fixpipe dst must be L1 when config.isToUB is disabled");
+            });
+            FixpipeArch3510PointerDispatch<Hardware::L1, Dst, Src, config>(dst, src, cbufWorkspace, intriParams);
+        }
+    } else if constexpr (config.isToUB) {
+        ASCENDC_ASSERT((GetPhyType(GetOperandPosition(dst)) == Hardware::UB), {
+            KERNEL_LOG(KERNEL_ERROR, "Fixpipe dst must be UB when config.isToUB is enabled");
+        });
+        FixpipeArch3510PointerDispatch<Hardware::UB, Dst, Src, config>(dst, src, cbufWorkspace, intriParams);
+    } else {
+        ASCENDC_ASSERT((GetPhyType(GetOperandPosition(dst)) == Hardware::L1), {
+            KERNEL_LOG(KERNEL_ERROR, "Fixpipe dst must be L1 when config.isToUB is disabled");
+        });
+        FixpipeArch3510PointerDispatch<Hardware::L1, Dst, Src, config>(dst, src, cbufWorkspace, intriParams);
+    }
 }
 #endif
 } // namespace AscendC

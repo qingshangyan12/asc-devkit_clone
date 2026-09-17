@@ -70,6 +70,36 @@ __aicore__ inline bool PopStackBuffer(LocalTensor<T>& pop)
     return true;
 }
 
+template <typename T, TPosition pos>
+__aicore__ inline bool PopStackBuffer(__ubuf__ T*& pop)
+{
+    static_assert(!Std::is_const<T>::value, "PopStackBuffer output pointer must be writable");
+    ASCENDC_ASSERT((GetTPipePtr() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "GetTPipePtr is nullptr"); });
+    const uint64_t endAddress = GetEndAddress<pos>();
+    const uint64_t queEndAddress = GetTPipePtr()->GetQueueEndAddress<pos>();
+    ASCENDC_ASSERT((queEndAddress % ONE_BLK_SIZE == 0), {
+        KERNEL_LOG(KERNEL_ERROR, "queEndAddress is %lu, which must be 32B aligned", queEndAddress);
+    });
+    ASCENDC_ASSERT((endAddress > queEndAddress), {
+        KERNEL_LOG(
+            KERNEL_ERROR, "PopStackBuffer failed, local memory has used %lu bytes, there is no enough memory to pop",
+            queEndAddress);
+    });
+#ifdef ASCENDC_CPU_DEBUG
+    auto absAddr = GetTPipePtr()->GetBaseAddr(static_cast<int8_t>(pos));
+    pop = (__ubuf__ T*)(absAddr + queEndAddress);
+    AscendCBufInit(
+        static_cast<uint8_t>(pos), static_cast<uint8_t>(1), static_cast<uint8_t>(1), (uint64_t)pop,
+        static_cast<uint64_t>(endAddress - queEndAddress));
+    AscendCBufInit(
+        static_cast<uint8_t>(pos), static_cast<uint8_t>(1), static_cast<uint8_t>(1), (uint64_t)(absAddr + endAddress),
+        static_cast<uint64_t>(ONE_BLK_SIZE << 1));
+#else
+    pop = (__ubuf__ T*)queEndAddress;
+#endif
+    return true;
+}
+
 template <TPosition pos>
 __aicore__ inline bool PopStackBuffer(TBuf<pos>& popBuffer, TBufType& bufStart)
 {

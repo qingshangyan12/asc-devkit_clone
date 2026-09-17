@@ -220,6 +220,99 @@ __aicore__ inline void IBWait(
 #endif
 }
 
+template <bool isSet, bool isAIVOnly, typename GmWorkspace, typename UbWorkspace>
+__aicore__ inline void IBSyncPointer(
+    const GmWorkspace& gmWorkspace, const UbWorkspace& ubWorkspace, int32_t blockIdx, int32_t eventID)
+{
+    using GmType = Internal::WritableOperandPrimT<GmWorkspace>;
+    using UbType = Internal::WritableOperandPrimT<UbWorkspace>;
+    static_assert(
+        Std::is_same<GmType, int32_t>::value && Std::is_same<UbType, int32_t>::value,
+        "IBSet and IBWait workspaces must contain int32_t");
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(gmWorkspace)) == Hardware::GM), {
+        KERNEL_LOG(KERNEL_ERROR, "IBSet/IBWait gmWorkspace must be in Global Memory");
+    });
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(ubWorkspace)) == Hardware::UB), {
+        KERNEL_LOG(KERNEL_ERROR, "IBSet/IBWait ubWorkspace must be in Unified Buffer");
+    });
+    int32_t blockNum = GetBlockNum();
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ != 5102)
+    if ASCEND_IS_AIC {
+        return;
+    }
+#endif
+    if (!isAIVOnly) {
+        blockNum = GetBlockNum() * 2;
+    }
+#endif
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002
+    if constexpr (isSet) {
+        __ib_set_stub(blockIdx, eventID, isAIVOnly);
+    } else {
+        __ib_wait_stub(blockIdx, eventID, isAIVOnly);
+    }
+#endif
+    __gm__ int32_t* localSyncGM =
+        (__gm__ int32_t*)GetUnderlyingPtr(gmWorkspace) + blockNum * 8 * eventID + blockIdx * 8;
+    __ubuf__ int32_t* localSyncUB = (__ubuf__ int32_t*)GetUnderlyingPtr(ubWorkspace);
+    DataCopyParams repeatParams;
+    DataCopyCheck<int32_t>(ONE_BLK_SIZE / sizeof(int32_t), repeatParams);
+    pipe_barrier(PIPE_ALL);
+    while (true) {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+        const uint8_t cacheMode = GetOperandCacheMode(gmWorkspace);
+        DataCopyGM2UBImpl(localSyncUB, localSyncGM, repeatParams, cacheMode);
+#else
+        DataCopyGM2UBImpl(localSyncUB, localSyncGM, repeatParams);
+#endif
+        event_t eventIdMte2ToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_S));
+        SetFlag<HardEvent::MTE2_S>(eventIdMte2ToS);
+        WaitFlag<HardEvent::MTE2_S>(eventIdMte2ToS);
+        const int32_t expectedValue = isSet ? 0 : 1;
+        if (localSyncUB[0] == expectedValue) {
+            localSyncUB[0] = isSet ? 1 : 0;
+            event_t eventIdSToMte3 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_MTE3));
+            SetFlag<HardEvent::S_MTE3>(eventIdSToMte3);
+            WaitFlag<HardEvent::S_MTE3>(eventIdSToMte3);
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+            DataCopyUB2GMImpl(localSyncGM, localSyncUB, repeatParams, cacheMode);
+#else
+            DataCopyUB2GMImpl(localSyncGM, localSyncUB, repeatParams);
+#endif
+            break;
+        }
+    }
+    pipe_barrier(PIPE_ALL);
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002
+    if constexpr (isSet) {
+        __ib_set_stub(blockIdx, eventID, isAIVOnly);
+    } else {
+        __ib_wait_stub(blockIdx, eventID, isAIVOnly);
+    }
+#endif
+}
+
+template <
+    bool isAIVOnly, typename GmWorkspace, typename UbWorkspace,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<GmWorkspace> || Internal::IsPointerOperand<UbWorkspace>, bool>::type>
+__aicore__ inline void IBSet(
+    const GmWorkspace& gmWorkspace, const UbWorkspace& ubWorkspace, int32_t blockIdx, int32_t eventID)
+{
+    IBSyncPointer<true, isAIVOnly>(gmWorkspace, ubWorkspace, blockIdx, eventID);
+}
+
+template <
+    bool isAIVOnly, typename GmWorkspace, typename UbWorkspace,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<GmWorkspace> || Internal::IsPointerOperand<UbWorkspace>, bool>::type>
+__aicore__ inline void IBWait(
+    const GmWorkspace& gmWorkspace, const UbWorkspace& ubWorkspace, int32_t blockIdx, int32_t eventID)
+{
+    IBSyncPointer<false, isAIVOnly>(gmWorkspace, ubWorkspace, blockIdx, eventID);
+}
+
 /*
  * @ingroup：SyncALL
  * @brief：Set flag bits of all cores
@@ -236,6 +329,32 @@ __aicore__ inline void SyncAll(
 #else
     SoftSyncAllImpl<isAIVOnly>(
         (__gm__ int32_t*)gmWorkspace.GetPhyAddr(), (__ubuf__ int32_t*)ubWorkspace.GetPhyAddr(), usedCores);
+#endif
+}
+
+template <
+    bool isAIVOnly, typename GmWorkspace, typename UbWorkspace,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<GmWorkspace> || Internal::IsPointerOperand<UbWorkspace>, bool>::type>
+__aicore__ inline void SyncAll(const GmWorkspace& gmWorkspace, const UbWorkspace& ubWorkspace, const int usedCores)
+{
+    using GmType = Internal::WritableOperandPrimT<GmWorkspace>;
+    using UbType = Internal::WritableOperandPrimT<UbWorkspace>;
+    static_assert(
+        Std::is_same<GmType, int32_t>::value && Std::is_same<UbType, int32_t>::value,
+        "SyncAll workspaces must contain int32_t");
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(gmWorkspace)) == Hardware::GM), {
+        KERNEL_LOG(KERNEL_ERROR, "SyncAll gmWorkspace must be in Global Memory");
+    });
+    ASCENDC_ASSERT((GetPhyType(GetOperandPosition(ubWorkspace)) == Hardware::UB), {
+        KERNEL_LOG(KERNEL_ERROR, "SyncAll ubWorkspace must be in Unified Buffer");
+    });
+#if ASCENDC_CPU_DEBUG
+    SoftSyncAllImpl<false>(
+        (__gm__ int32_t*)GetUnderlyingPtr(gmWorkspace), (__ubuf__ int32_t*)GetUnderlyingPtr(ubWorkspace), usedCores);
+#else
+    SoftSyncAllImpl<isAIVOnly>(
+        (__gm__ int32_t*)GetUnderlyingPtr(gmWorkspace), (__ubuf__ int32_t*)GetUnderlyingPtr(ubWorkspace), usedCores);
 #endif
 }
 
