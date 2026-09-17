@@ -12,3 +12,4 @@
 | [01_execution_conf_optimizations](./01_execution_conf_optimizations)   | 介绍SIMT编程方式下执行配置最大线程块设置的优化方法。 |
 | [02_control_flow](./02_control_flow)   | 介绍SIMT编程方式下Warp Divergence对性能的影响及优化方法。 |
 | [03_instruction_optimizations](./03_instruction_optimizations)   | 以Histogram（直方图统计）为载体，展示原子操作性能优化方法。 |
+| [04_predicate_optimizations](./04_predicate_optimizations)   | 以数学接口`hlog10`、`j0f`分支链路为载体，展示predicate（谓词）优化的性能收益与适用场景。 |

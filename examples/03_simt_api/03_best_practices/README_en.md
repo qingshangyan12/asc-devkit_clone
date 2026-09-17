@@ -12,3 +12,4 @@ Operator development practices based on Ascend C SIMT, demonstrating the applica
 | [01_execution_conf_optimizations](./01_execution_conf_optimizations)   | Introduces optimization methods for maximum thread block configuration settings within execution configuration under SIMT programming model. |
 | [02_control_flow](./02_control_flow)   | Introduces the impact of Warp Divergence on performance and optimization methods in SIMT programming. |
 | [03_instruction_optimizations](./03_instruction_optimizations) | A histogram counting case study demonstrating atomic operation performance optimization techniques. |
+| [04_predicate_optimizations](./04_predicate_optimizations) | Case studies on the branch chains of the mathematical functions `hlog10` and `j0f`, demonstrating the performance gains and applicable scenarios of predicate optimization. |
