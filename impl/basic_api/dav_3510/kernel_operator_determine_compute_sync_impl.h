@@ -43,8 +43,8 @@
 #endif // ASCENDC_CPU_DEBUG
 
 namespace AscendC {
-__aicore__ inline void InitDetermineComputeWorkspaceCalc(
-    GlobalTensor<int32_t>& gmWorkspace, LocalTensor<int32_t>& ubWorkspace)
+template <typename G, typename U>
+__aicore__ inline void InitDetermineComputeWorkspaceCalc(G& gmWorkspace, U& ubWorkspace)
 {
     if ASCEND_IS_AIV {
         PipeBarrier<PIPE_ALL>();
@@ -62,7 +62,8 @@ __aicore__ inline void InitDetermineComputeWorkspaceCalc(
     }
 }
 
-__aicore__ inline bool CheckUBWorkspace(LocalTensor<int32_t>& ubWorkspace, int64_t blockIdx, int64_t blockNum)
+template <typename U>
+__aicore__ inline bool CheckUBWorkspace(U& ubWorkspace, int64_t blockIdx, int64_t blockNum)
 {
     int32_t repeatTime = ubWorkspace.GetValue(blockNum * B32_DATA_NUM_PER_BLOCK);
     int64_t offset = 0;
@@ -81,7 +82,8 @@ __aicore__ inline bool CheckUBWorkspace(LocalTensor<int32_t>& ubWorkspace, int64
     return true;
 }
 
-__aicore__ inline void WaitPreBlockCalc(const GlobalTensor<int32_t>& gmWorkspace, LocalTensor<int32_t>& ubWorkspace)
+template <typename G, typename U>
+__aicore__ inline void WaitPreBlockCalc(const G& gmWorkspace, U& ubWorkspace)
 {
     if ASCEND_IS_AIV {
         PipeBarrier<PIPE_ALL>();
@@ -103,7 +105,8 @@ __aicore__ inline void WaitPreBlockCalc(const GlobalTensor<int32_t>& gmWorkspace
     }
 }
 
-__aicore__ inline void NotifyNextBlockCalc(GlobalTensor<int32_t>& gmWorkspace, LocalTensor<int32_t>& ubWorkspace)
+template <typename G, typename U>
+__aicore__ inline void NotifyNextBlockCalc(G& gmWorkspace, U& ubWorkspace)
 {
     if ASCEND_IS_AIV {
         PipeBarrier<PIPE_ALL>();

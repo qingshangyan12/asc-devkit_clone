@@ -102,6 +102,7 @@ public:
 } // namespace AscendC
 #if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_block_sync_intf_impl.h"
+#include "../../impl/basic_api/kernel_operator_block_sync_pointer_impl.h"
 #endif
 #endif // KERNEL_BLOCK_SYNC_INTF_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_BLOCK_SYNC_INTF_H__)
