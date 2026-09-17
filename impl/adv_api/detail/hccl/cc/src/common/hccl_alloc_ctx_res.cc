@@ -192,7 +192,8 @@ HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSi
 {
     // 1. 分配workspace、scratch、comParam（XN）、comSync（CKE）
     constexpr uint32_t comSyncNum = KFC_SERVER_SIGNAL_REGION_NUM;
-    constexpr uint64_t scratchSize = 4 * Hccl::MC2_WORKSPACE_SIZE; // 调试: 16MB->64MB，与AIV侧对齐
+    // 256MB：4P chunk 64MB 对齐 hccl cclBuff 口径（400/4=100MB），压 RS 大尺寸多 chunk 劣势；需与AIV侧对齐
+    constexpr uint64_t scratchSize = 16 * Hccl::MC2_WORKSPACE_SIZE;
     uint64_t comParamBufSize = Hccl::CCU_TASK_NUM_MAX * Hccl::CCU_PARAM_NUM_MAX * Hccl::CCU_ONE_PARAM_SIZE;
     uint64_t comSyncBufSize = Hccl::CCU_TASK_NUM_MAX * comSyncNum * Hccl::CCU_ONE_PARAM_SIZE;
 

@@ -44,7 +44,14 @@ HcclResult CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::CalcRes(
             HCCL_ERROR("[CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem] invalid protocol[%u]", channel.channelProtocol),
             HCCL_E_INTERNAL);
     }
-
+    // 取证日志：多链路环境（UBX 每对端可有多条 CLOS）在此暴露原始通道数，与对端数对照。
+    HCCL_INFO(
+        "[CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem] raw channels[%zu], peers[%u]", channelDescs.size(),
+        tempRankSize_ - 1U);
+    // 每 peer 只保留首条通道（对齐 RS NHR 模板的 channelResort 语义）：kernel 的 InitResource
+    // 要求 channelCount == rank2ChannelIdx.size()，全量下发在多链路环境会触发发射期失败
+    // （错误吞没→挂死），且 PreSync/PostSync 通知扇出按链路数放大。
+    std::vector<HcclChannelDesc> channelResort;
     auto kernelArg = std::make_shared<CcuKernelArgKfcAllGatherNHR1DMultiJettyMem2Mem>();
     kernelArg->rankSize = tempRankSize_;
     kernelArg->rankId = mySubCommRank_;
@@ -54,15 +61,19 @@ HcclResult CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::CalcRes(
             KFC_NHR_JETTY_NUM;
     kernelArg->opParam = param;
     kernelArg->subCommRanks = subCommRanks_;
-    for (u32 i = 0; i < channelDescs.size(); ++i) {
-        kernelArg->rank2ChannelIdx[RemoteRankIdToSubRank(channelDescs[i].remoteRank)] = i;
+    for (const auto& channel : channelDescs) {
+        const uint32_t remoteSubRank = RemoteRankIdToSubRank(channel.remoteRank);
+        if (kernelArg->rank2ChannelIdx.count(remoteSubRank) == 0U) {
+            kernelArg->rank2ChannelIdx[remoteSubRank] = static_cast<uint32_t>(channelResort.size());
+            channelResort.push_back(channel);
+        }
     }
     CHK_RET(CalcNhrInfo(kernelArg->stepInfoVector));
 
     CcuKernelInfo kernelInfo{};
     CHK_SAFETY_FUNC_RET(strcpy_s(
         kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelAllGatherNHR1DMultiJettyMem2Mem"));
-    kernelInfo.channels = channelDescs;
+    kernelInfo.channels = channelResort;
     kernelInfo.setKernelArg(kernelArg);
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);
     return HCCL_SUCCESS;

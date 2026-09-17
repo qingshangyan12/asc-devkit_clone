@@ -449,7 +449,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[8] = UINT64_MAX - 1;
     CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[9]);
     // KFC-specific parameters at [13..23] (homm template ignores these, uses templateDataParams).
-    constexpr uint64_t scratchSize = 64 * 1024 * 1024; // 调试: 16MB->64MB，需与host侧alloc_ctx_res.cc对齐
+    // 64MB->256MB（chunk 对齐 hccl 口径），需与 host 侧 alloc_ctx_res.cc 对齐。
+    constexpr uint64_t scratchSize = 256UL * 1024UL * 1024UL;
     constexpr uint64_t minSliceAlign = 128;
     uint64_t chunkSize = scratchSize / ccuParam_.rankNum / minSliceAlign * minSliceAlign;
     uint64_t fullChunkCount = sliceSize == 0 ? 0 : (sliceSize - 1) / chunkSize;
@@ -549,7 +550,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[KFC_CONCURRENT_RS_MESH_OUTPUT] = outputBase;
     xnData_[KFC_CONCURRENT_RS_MESH_SCRATCH] = ccuParam_.scratchAddr;
     xnData_[KFC_CONCURRENT_RS_MESH_RANK_SLICE_OFFSET] = ccuParam_.rankId * sliceStride;
-    constexpr uint64_t scratchSize = 64 * 1024 * 1024; // 与 host 侧 alloc_ctx_res.cc 对齐（双端契约）
+    constexpr uint64_t scratchSize = 256 * 1024 * 1024; // 与 host 侧 alloc_ctx_res.cc 对齐（双端契约）
     const uint64_t chunkSize = scratchSize / ccuParam_.rankNum / splitAlignment * splitAlignment;
     const uint64_t fullChunkCount = meshSize == 0 ? 0 : (meshSize - 1) / chunkSize;
     const uint64_t chunkCount = meshSize == 0 ? 0 : fullChunkCount + 1;
