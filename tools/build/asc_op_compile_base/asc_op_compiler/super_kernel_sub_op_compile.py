@@ -96,9 +96,14 @@ def gen_gm_get_set_value_dcci_compile_options(
         global_var_storage.set_variable(
             "ascendc_sub_super_kernel_call_dcci_after_kernel_end", True
         )
-    if match_kernel_name_patern(
+    disable_dcci_matched = match_kernel_name_patern(
         match_key, dcci_disable_on_kernel_op_list, use_regex=is_sub_combine
-    ):
+    )
+    if is_sub_combine:
+        compile_option_tuple.compile_options.append(
+            f"-D__ASCENDC_SUPER_KERNEL_DISABLE_DCCI__={int(disable_dcci_matched)}"
+        )
+    if disable_dcci_matched:
         global_var_storage.set_variable(
             "ascendc_sub_super_kernel_call_dcci_disable_on_kernel", True
         )
