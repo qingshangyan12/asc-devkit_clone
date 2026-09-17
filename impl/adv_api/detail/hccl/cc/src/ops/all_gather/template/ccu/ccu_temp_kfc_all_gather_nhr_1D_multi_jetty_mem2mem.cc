@@ -62,6 +62,7 @@ HcclResult CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::CalcRes(
     CcuKernelInfo kernelInfo{};
     CHK_SAFETY_FUNC_RET(strcpy_s(
         kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelAllGatherNHR1DMultiJettyMem2Mem"));
+    kernelInfo.kernelFunc = reinterpret_cast<void*>(CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel);
     kernelInfo.channels = channelDescs;
     kernelInfo.setKernelArg(kernelArg);
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);

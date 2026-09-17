@@ -8,6 +8,8 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "ccu_kernel_kfc_all_gather_mesh1d_mem2mem.h"
+#include "../ccu_temp_kfc_all_gather_nhr_1D_multi_jetty_mem2mem.h"
+#include "ccu_func_dl.hpp"
 
 namespace mc2_ops_hccl {
 
@@ -52,6 +54,22 @@ struct KfcAllGatherMesh1DMem2MemContext : CcuKernelCtxBase {
     std::vector<ccu::RemoteAddr> dst;
 };
 
+struct KfcParallelAllGatherMeshContext : KfcAllGatherMesh1DMem2MemContext {
+    uint32_t rankSizeLevel1{0};
+    uint32_t rankIdxLevel1{0};
+    ccu::Variable parallelInputBase;
+    ccu::Variable parallelOutputBase;
+    ccu::Variable parallelToken;
+    ccu::Variable outputStride;
+    ccu::Variable part0Size;
+    ccu::Variable part1Size;
+    ccu::Variable part1Offset;
+    ccu::Variable meshPhaseDoneAddr;
+    ccu::Variable nhrPhaseDoneAddr;
+    GroupOpSizeVars part0GoSize;
+    GroupOpSizeVars part1GoSize;
+};
+
 static CcuResult InitResource(KfcAllGatherMesh1DMem2MemContext& ctx)
 {
     if (ctx.rankSize == 0 || ctx.rankId >= ctx.rankSize || ctx.channelCount + 1 != ctx.rankSize) {
@@ -75,10 +93,52 @@ static CcuResult InitResource(KfcAllGatherMesh1DMem2MemContext& ctx)
 
     const uint32_t eventNumPerIter = (ctx.rankSize + AG_M2M_BITS_PER_EVENT - 1) / AG_M2M_BITS_PER_EVENT;
     ctx.events.resize(AG_M2M_UNROLL_NUM * eventNumPerIter);
-    ctx.constVar1 = 1;
     ctx.repeatTimeFlag = 0;
     ctx.remoteRepeatTimeFlag = 0;
     ctx.resourceAllocated = false;
+    return CCU_SUCCESS;
+}
+
+static CcuResult LoadArgs(KfcAllGatherMesh1DMem2MemContext& ctx, ccu::Array<ccu::Variable>& args)
+{
+    uint32_t argId = 0;
+    ctx.input = args[argId++];
+    ctx.output[ctx.rankId] = args[argId++];
+    ctx.token[ctx.rankId] = args[argId++];
+    ctx.currentRankSliceOutputOffset = args[argId++];
+    ctx.normalSliceSize = args[argId++];
+    ctx.goSize.addrOffset = args[argId++];
+    ctx.goSize.loopParam = args[argId++];
+    ctx.goSize.parallelParam = args[argId++];
+    ctx.goSize.residual = args[argId++];
+    ctx.currentRankSliceInputOffset = args[argId++];
+    ctx.tmpRepeatNum = args[argId++];
+    ctx.inputRepeatStride = args[argId++];
+    ctx.outputRepeatStride = args[argId++];
+    ctx.lastSliceSize = args[argId++];
+    ctx.isInputOutputEqual = args[argId++];
+    return CCU_SUCCESS;
+}
+
+static CcuResult LoadArgs(KfcParallelAllGatherMeshContext& ctx, ccu::Array<ccu::Variable>& args)
+{
+    ctx.parallelInputBase = args[0];
+    ctx.parallelOutputBase = args[1];
+    ctx.parallelToken = args[2];
+    ctx.outputStride = args[KFC_PARALLEL_AG_OUTPUT_STRIDE];
+    ctx.part0Size = args[KFC_PARALLEL_AG_PART0_SIZE];
+    ctx.part1Size = args[KFC_PARALLEL_AG_PART1_SIZE];
+    ctx.part1Offset = args[KFC_PARALLEL_AG_PART1_OFFSET];
+    ctx.meshPhaseDoneAddr = args[KFC_PARALLEL_AG_MESH_PHASE_DONE_ADDR];
+    ctx.nhrPhaseDoneAddr = args[KFC_PARALLEL_AG_NHR_PHASE_DONE_ADDR];
+    ctx.part0GoSize.addrOffset = args[KFC_PARALLEL_AG_PART0_GO_SIZE_0];
+    ctx.part0GoSize.loopParam = args[KFC_PARALLEL_AG_PART0_GO_SIZE_1];
+    ctx.part0GoSize.parallelParam = args[KFC_PARALLEL_AG_PART0_GO_SIZE_2];
+    ctx.part0GoSize.residual = args[KFC_PARALLEL_AG_PART0_GO_SIZE_3];
+    ctx.part1GoSize.addrOffset = args[KFC_PARALLEL_AG_PART1_GO_SIZE_0];
+    ctx.part1GoSize.loopParam = args[KFC_PARALLEL_AG_PART1_GO_SIZE_1];
+    ctx.part1GoSize.parallelParam = args[KFC_PARALLEL_AG_PART1_GO_SIZE_2];
+    ctx.part1GoSize.residual = args[KFC_PARALLEL_AG_PART1_GO_SIZE_3];
     return CCU_SUCCESS;
 }
 
@@ -221,6 +281,7 @@ static CcuResult DoAllGatherGroupCopy(KfcAllGatherMesh1DMem2MemContext& ctx)
 
 static CcuResult DoRepeatAllGather(KfcAllGatherMesh1DMem2MemContext& ctx)
 {
+    ctx.constVar1 = 1;
     CCU_CHK_RET(InitAllGatherAddr(ctx));
     ctx.repeatTimeFlag = 0;
     ctx.remoteRepeatTimeFlag = 0;
@@ -277,99 +338,96 @@ static void AddVariableNTimes(ccu::Variable& result, const ccu::Variable& value,
     }
 }
 
-CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
-    ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable outputOffset,
-    ccu::Variable sliceSize, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3,
-    ccu::Variable currentRankSliceInputOffset, ccu::Variable tmpRepeatNum, ccu::Variable inputRepeatStride,
-    ccu::Variable outputRepeatStride, ccu::Variable lastSliceSize, ccu::Variable isInputOutputEqual,
-    const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId)
+CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(CcuKernelArg arg)
 {
+    const auto* kernelArg = static_cast<CcuKernelArgKfcAllGatherMesh1DMem2Mem*>(arg);
     KfcAllGatherMesh1DMem2MemContext ctx;
-    ctx.channels = channels;
-    ctx.channelCount = channelCount;
-    ctx.rankSize = rankSize;
-    ctx.rankId = rankId;
+    ctx.channels = kernelArg->channels;
+    ctx.channelCount = kernelArg->channelCount;
+    ctx.rankSize = static_cast<uint32_t>(kernelArg->rankSize);
+    ctx.rankId = kernelArg->rankId;
     InitCcuKernelCtxBase(ctx);
-
     CCU_CHK_RET(InitResource(ctx));
-    CCU_CHK_RET(LoadArgs(
-        ctx, inputAddr, outputAddr, tokenInfo, outputOffset, sliceSize, goSize0, goSize1, goSize2, goSize3,
-        currentRankSliceInputOffset, tmpRepeatNum, inputRepeatStride, outputRepeatStride, lastSliceSize,
-        isInputOutputEqual));
-    HCCL_INFO(
-        "[KFC][AllGather][Kernel] rankId[%u], rankSize[%u], channelCount[%u], repeatBatch[%u], "
-        "localCopy[groupCopy]",
-        rankId, rankSize, channelCount, AG_M2M_UNROLL_NUM);
-
-    CCU_CHK_RET(PreSync(ctx));
-    ctx.sliceSize = (ctx.rankId == ctx.rankSize - 1) ? ctx.lastSliceSize : ctx.normalSliceSize;
-    CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx)); }
-    CCU_CHK_RET(PostSync(ctx));
+    ccu::Func subKernel(
+        [&ctx](ccu::Array<ccu::Variable>& args) -> CcuResult {
+            CCU_CHK_RET(LoadArgs(ctx, args));
+            CCU_CHK_RET(PreSync(ctx));
+            ctx.sliceSize = (ctx.rankId == ctx.rankSize - 1) ? ctx.lastSliceSize : ctx.normalSliceSize;
+            CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx)); }
+            CCU_CHK_RET(PostSync(ctx));
+            return CCU_SUCCESS;
+        },
+        CCU_FUNC_XKERNEL_ARG_MAX, KFC_SUB_KERNEL_FUNC_NAME);
     return CCU_SUCCESS;
 }
 
-CcuResult CcuKfcParallelAllGatherMesh1DMem2MemKernel(
-    ccu::Variable inputBase, ccu::Variable outputBase, ccu::Variable tokenInfo, ccu::Variable outputStride,
-    ccu::Variable part0Size, ccu::Variable part1Size, ccu::Variable part1Offset, ccu::Variable meshPhaseDoneAddr,
-    ccu::Variable nhrPhaseDoneAddr, ccu::Variable part0GoSize0, ccu::Variable part0GoSize1, ccu::Variable part0GoSize2,
-    ccu::Variable part0GoSize3, ccu::Variable part1GoSize0, ccu::Variable part1GoSize1, ccu::Variable part1GoSize2,
-    ccu::Variable part1GoSize3, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSizeLevel0,
-    uint32_t rankIdxLevel0, uint32_t rankSizeLevel1, uint32_t rankIdxLevel1)
+CcuResult CcuKfcParallelAllGatherMesh1DMem2MemKernel(CcuKernelArg arg)
 {
-    KfcAllGatherMesh1DMem2MemContext ctx;
-    ctx.channels = channels;
-    ctx.channelCount = channelCount;
-    ctx.rankSize = rankSizeLevel0;
-    ctx.rankId = rankIdxLevel0;
+    const auto* kernelArg = static_cast<CcuKernelArgBase*>(arg);
+    const auto* parallelArg = static_cast<const KfcParallelAllGatherArg*>(kernelArg->algArg.get());
+    KfcParallelAllGatherMeshContext ctx;
+    ctx.channels = kernelArg->channels;
+    ctx.channelCount = kernelArg->channelCount;
+    ctx.rankSize = parallelArg->rankSizeLevel0;
+    ctx.rankId = parallelArg->rankIdxLevel0;
+    ctx.rankSizeLevel1 = parallelArg->rankSizeLevel1;
+    ctx.rankIdxLevel1 = parallelArg->rankIdxLevel1;
     InitCcuKernelCtxBase(ctx);
     CCU_CHK_RET(InitResource(ctx));
+    ccu::Func subKernel(
+        [&ctx](ccu::Array<ccu::Variable>& args) -> CcuResult {
+            CCU_CHK_RET(LoadArgs(ctx, args));
+            ccu::Variable zero;
+            ccu::Variable one;
+            ccu::Variable phase0Output;
+            ccu::Variable phase0OutputOffset;
+            ccu::Variable phase1Buffer;
+            ccu::Variable phase1RankOffset;
+            ccu::Variable phase1RepeatNumInv;
+            ccu::Variable phase1RepeatStride;
+            ccu::Variable phase0GroupOffset;
+            ccu::Variable phase0RepeatNumInv;
+            zero = 0U;
+            one = 1U;
+            AddVariableNTimes(phase0GroupOffset, ctx.outputStride, ctx.rankIdxLevel1 * ctx.rankSize);
+            phase0Output = ctx.parallelOutputBase + phase0GroupOffset;
+            AddVariableNTimes(phase0OutputOffset, ctx.outputStride, ctx.rankId);
+            phase1Buffer = ctx.parallelOutputBase + ctx.part1Offset;
+            AddVariableNTimes(phase1RankOffset, ctx.outputStride, ctx.rankId);
+            phase1RepeatNumInv = UINT64_MAX - ctx.rankSizeLevel1;
+            phase0RepeatNumInv = UINT64_MAX - 1U;
+            AddVariableNTimes(phase1RepeatStride, ctx.outputStride, ctx.rankSize);
 
-    ccu::Variable zero;
-    ccu::Variable one;
-    ccu::Variable phase0Output;
-    ccu::Variable phase0OutputOffset;
-    ccu::Variable phase1Buffer;
-    ccu::Variable phase1RankOffset;
-    ccu::Variable phase1RepeatNumInv;
-    ccu::Variable phase1RepeatStride;
-    ccu::Variable phase0GroupOffset;
-    ccu::Variable phase0RepeatNumInv;
-    zero = 0U;
-    one = 1U;
-    AddVariableNTimes(phase0GroupOffset, outputStride, rankIdxLevel1 * rankSizeLevel0);
-    phase0Output = outputBase + phase0GroupOffset;
-    AddVariableNTimes(phase0OutputOffset, outputStride, rankIdxLevel0);
-    phase1Buffer = outputBase + part1Offset;
-    AddVariableNTimes(phase1RankOffset, outputStride, rankIdxLevel0);
-    phase1RepeatNumInv = UINT64_MAX - rankSizeLevel1;
-    phase0RepeatNumInv = UINT64_MAX - 1U;
-    AddVariableNTimes(phase1RepeatStride, outputStride, rankSizeLevel0);
+            CCU_CHK_RET(
+                LoadArgs(
+                    ctx, ctx.parallelInputBase, phase0Output, ctx.parallelToken, phase0OutputOffset, ctx.part0Size,
+                    ctx.part0GoSize.addrOffset, ctx.part0GoSize.loopParam, ctx.part0GoSize.parallelParam,
+                    ctx.part0GoSize.residual, zero, phase0RepeatNumInv, zero, zero, ctx.part0Size, zero));
+            CCU_CHK_RET(PreSync(ctx));
+            ctx.sliceSize = ctx.part0Size;
+            CCU_IF(ctx.part0Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx)); }
+            CCU_CHK_RET(PostSync(ctx));
 
-    // Stage 0: Mesh gathers part0 inside each level-0 group.
-    CCU_CHK_RET(LoadArgs(
-        ctx, inputBase, phase0Output, tokenInfo, phase0OutputOffset, part0Size, part0GoSize0, part0GoSize1,
-        part0GoSize2, part0GoSize3, zero, phase0RepeatNumInv, zero, zero, part0Size, zero));
-    CCU_CHK_RET(PreSync(ctx));
-    ctx.sliceSize = part0Size;
-    CCU_IF(part0Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx)); }
-    CCU_CHK_RET(PostSync(ctx));
+            CCU_CHK_RET(ccu::Store(ctx.meshPhaseDoneAddr, one));
+            ccu::Variable nhrDone;
+            nhrDone = 0U;
+            CCU_WHILE(nhrDone != 1U) {
+                CCU_CHK_RET(ccu::Load(ctx.nhrPhaseDoneAddr, nhrDone));
+            }
 
-    // Both missions must finish stage 0 before either reads its stage-0 output.
-    CCU_CHK_RET(ccu::Store(meshPhaseDoneAddr, one));
-    ccu::Variable nhrDone;
-    nhrDone = 0U;
-    CCU_WHILE(nhrDone != 1U) { CCU_CHK_RET(ccu::Load(nhrPhaseDoneAddr, nhrDone)); }
-
-    // Stage 1: Mesh propagates part1 (already gathered by NHR) across all
-    // level-1 groups. Input and output are the same gathered output buffer.
-    CCU_CHK_RET(LoadArgs(
-        ctx, phase1Buffer, phase1Buffer, tokenInfo, phase1RankOffset, part1Size, part1GoSize0, part1GoSize1,
-        part1GoSize2, part1GoSize3, phase1RankOffset, phase1RepeatNumInv, phase1RepeatStride, phase1RepeatStride,
-        part1Size, one));
-    CCU_CHK_RET(PreSync(ctx));
-    ctx.sliceSize = part1Size;
-    CCU_IF(part1Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx)); }
-    CCU_CHK_RET(PostSync(ctx));
+            CCU_CHK_RET(
+                LoadArgs(
+                    ctx, phase1Buffer, phase1Buffer, ctx.parallelToken, phase1RankOffset, ctx.part1Size,
+                    ctx.part1GoSize.addrOffset, ctx.part1GoSize.loopParam, ctx.part1GoSize.parallelParam,
+                    ctx.part1GoSize.residual, phase1RankOffset, phase1RepeatNumInv, phase1RepeatStride,
+                    phase1RepeatStride, ctx.part1Size, one));
+            CCU_CHK_RET(PreSync(ctx));
+            ctx.sliceSize = ctx.part1Size;
+            CCU_IF(ctx.part1Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx)); }
+            CCU_CHK_RET(PostSync(ctx));
+            return CCU_SUCCESS;
+        },
+        CCU_FUNC_XKERNEL_ARG_MAX, KFC_SUB_KERNEL_FUNC_NAME);
     return CCU_SUCCESS;
 }
 

@@ -20,9 +20,8 @@
 namespace HcclSim {
 namespace CcuSt {
 
-// 与 CcuReduceScatterMesh1DMem2MemKernel 的16个 ccu::Variable 形参一一对应
-// （token 亦占一槽，KFC 直调模式下由 taskArgs 提供）。
-constexpr uint32_t REDUCE_SCATTER_MESH_TASK_ARG_COUNT = 16;
+// 与 Sole Mesh 的 KFC dispatch 参数槽位一致，含 8 个预留槽位。
+constexpr uint32_t REDUCE_SCATTER_MESH_TASK_ARG_COUNT = 24;
 
 struct ReduceScatterMeshKernelConfig {
     uint32_t rankId{0};
