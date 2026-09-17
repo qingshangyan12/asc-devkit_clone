@@ -37,7 +37,7 @@ $$
 ## 函数原型
 
 ```cpp
-template <typename T, typename U, cast_layout Layout = cast_layout::zero>
+template <cast_layout Layout = cast_layout::zero, typename T = half, typename U>
 __simd_callee__ inline reg_tensor<T> muls_cast(
     const reg_tensor<U>& src, const U& scalar)
 ```
@@ -48,9 +48,9 @@ __simd_callee__ inline reg_tensor<T> muls_cast(
 
 | 参数名 | 描述 |
 | --- | --- |
-| `T` | 返回值元素类型，当前仅支持`half`。 |
-| `U` | 源操作数和标量类型，当前仅支持`float`。 |
 | `Layout` | 结果布局。支持`cast_layout::zero`和`cast_layout::one`，默认值为`cast_layout::zero`。 |
+| `T` | 返回值元素类型，当前仅支持`half`，默认值为`half`。 |
+| `U` | 源操作数和标量类型，从输入自动推导，当前仅支持`float`。 |
 
 **表2**  参数说明
 
@@ -84,7 +84,7 @@ template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void muls_cast_example(InputTensor input, OutputTensor output)
 {
     auto src = asc::te::experimental::load(input, asc::te::make_coord(0)).with_mask(asc::te::experimental::all_mask<float>());
-    auto result = asc::te::experimental::muls_cast<half>(src, 1.5f);
+    auto result = asc::te::experimental::muls_cast<asc::te::experimental::cast_layout::one>(src, 1.5f);
     asc::te::experimental::store(output, asc::te::make_coord(0), result);
 }
 ```

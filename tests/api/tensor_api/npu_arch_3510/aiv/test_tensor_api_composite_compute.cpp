@@ -32,7 +32,7 @@ __aicore__ inline void check_common_composite()
                       AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>())),
                   reg_type<T>>);
     static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::exp_diff(
+                  decltype(asc::te::experimental::exp_diff<T, float>(
                       AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>())),
                   reg_type<float>>);
 
@@ -42,7 +42,7 @@ __aicore__ inline void check_common_composite()
     T scalar{};
     auto axpy_result = asc::te::experimental::axpy(dst, src, scalar);
     auto abs_diff_result = asc::te::experimental::abs_diff(dst, src);
-    auto exp_diff_result = asc::te::experimental::exp_diff(dst, src);
+    auto exp_diff_result = asc::te::experimental::exp_diff<T, float>(dst, src);
     EXPECT_EQ(axpy_result.mask, dst.mask);
     EXPECT_EQ(abs_diff_result.mask, dst.mask);
     EXPECT_EQ(exp_diff_result.mask, dst.mask);
@@ -92,21 +92,21 @@ __aicore__ inline void check_mula()
 __aicore__ inline void check_exp_diff_positions_and_muls_cast()
 {
     static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::exp_diff(
+                  decltype(asc::te::experimental::exp_diff<half, float>(
                       AscendC::Std::declval<const reg_type<half>&>(), AscendC::Std::declval<const reg_type<half>&>(),
                       ASC_POSITION_EVEN)),
                   reg_type<float>>);
     static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::exp_diff(
+                  decltype(asc::te::experimental::exp_diff<half, float>(
                       AscendC::Std::declval<const reg_type<half>&>(), AscendC::Std::declval<const reg_type<half>&>(),
                       ASC_POSITION_ODD)),
                   reg_type<float>>);
     static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::muls_cast<half, float>(
+                  decltype(asc::te::experimental::muls_cast<asc::te::experimental::cast_layout::zero, half>(
                       AscendC::Std::declval<const reg_type<float>&>(), AscendC::Std::declval<const float&>())),
                   reg_type<half>>);
     static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::muls_cast<half, float, asc::te::experimental::cast_layout::one>(
+                  decltype(asc::te::experimental::muls_cast<asc::te::experimental::cast_layout::one>(
                       AscendC::Std::declval<const reg_type<float>&>(), AscendC::Std::declval<const float&>())),
                   reg_type<half>>);
 
@@ -114,18 +114,17 @@ __aicore__ inline void check_exp_diff_positions_and_muls_cast()
     reg_type<half> half_src1{};
     auto output_mask = asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::vl3, float>();
     half_src0.mask = output_mask.reg;
-    auto default_exp_diff = asc::te::experimental::exp_diff(half_src0, half_src1);
-    auto even_exp_diff = asc::te::experimental::exp_diff(half_src0, half_src1, ASC_POSITION_EVEN);
-    auto odd_exp_diff = asc::te::experimental::exp_diff(half_src0, half_src1, ASC_POSITION_ODD);
+    auto default_exp_diff = asc::te::experimental::exp_diff<half, float>(half_src0, half_src1);
+    auto even_exp_diff = asc::te::experimental::exp_diff<half, float>(half_src0, half_src1, ASC_POSITION_EVEN);
+    auto odd_exp_diff = asc::te::experimental::exp_diff<half, float>(half_src0, half_src1, ASC_POSITION_ODD);
     EXPECT_EQ(default_exp_diff.mask, output_mask.reg);
     EXPECT_EQ(even_exp_diff.mask, output_mask.reg);
     EXPECT_EQ(odd_exp_diff.mask, output_mask.reg);
 
     reg_type<float> float_src{};
     float_src.mask = asc::te::experimental::all_mask<float>().reg;
-    auto zero_result = asc::te::experimental::muls_cast<half, float>(float_src, 1.0f);
-    auto one_result =
-        asc::te::experimental::muls_cast<half, float, asc::te::experimental::cast_layout::one>(float_src, 1.0f);
+    auto zero_result = asc::te::experimental::muls_cast(float_src, 1.0f);
+    auto one_result = asc::te::experimental::muls_cast<asc::te::experimental::cast_layout::one>(float_src, 1.0f);
     EXPECT_EQ(zero_result.mask, float_src.mask);
     EXPECT_EQ(one_result.mask, float_src.mask);
 }

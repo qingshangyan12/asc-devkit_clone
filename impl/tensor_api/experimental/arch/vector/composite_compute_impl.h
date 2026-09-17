@@ -42,31 +42,38 @@ __simd_callee__ inline reg_tensor<T> abs_diff(const reg_tensor<T>& src0, const r
     return dst;
 }
 
-template <typename T>
-__simd_callee__ inline reg_tensor<float> exp_diff(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+template <typename T, typename U>
+__simd_callee__ inline reg_tensor<U> exp_diff(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
-    static_assert(detail::supports_exp_diff_v<T>, "exp_diff does not support this element type");
-    if constexpr (::AscendC::Std::is_same_v<T, half>) {
-        return exp_diff(src0, src1, ASC_POSITION_EVEN);
-    } else {
-        reg_tensor<float> dst(src0.mask);
+    static_assert(detail::supports_exp_diff_v<T, U>, "exp_diff does not support this input-output type combination");
+    if constexpr (::AscendC::Std::is_same_v<T, half> && ::AscendC::Std::is_same_v<U, float>) {
+        return exp_diff<T, U>(src0, src1, ASC_POSITION_EVEN);
+    } else if constexpr (::AscendC::Std::is_same_v<T, float> && ::AscendC::Std::is_same_v<U, float>) {
+        reg_tensor<U> dst(src0.mask);
         dst.reg = asc_exp_sub(src0.reg, src1.reg, src0.mask);
         return dst;
+    } else {
+        return {};
     }
 }
 
-template <typename position_type>
-__simd_callee__ inline reg_tensor<float> exp_diff(
-    const reg_tensor<half>& src0, const reg_tensor<half>& src1, position_type src_pos)
+template <typename T, typename U, typename position_type>
+__simd_callee__ inline reg_tensor<U> exp_diff(
+    const reg_tensor<T>& src0, const reg_tensor<T>& src1, position_type src_pos)
 {
+    static_assert(
+        ::AscendC::Std::is_same_v<T, half> && ::AscendC::Std::is_same_v<U, float>,
+        "exp_diff with a position only supports half input and float output");
     using pos_type = ::AscendC::Std::remove_cvref_t<position_type>;
     static_assert(
         ::AscendC::Std::is_one_of_v<
             pos_type, ::AscendC::Std::remove_cvref_t<decltype(ASC_POSITION_EVEN)>,
             ::AscendC::Std::remove_cvref_t<decltype(ASC_POSITION_ODD)>>,
         "exp_diff position supports ASC_POSITION_EVEN and ASC_POSITION_ODD");
-    reg_tensor<float> dst(src0.mask);
-    dst.reg = asc_exp_sub_half2float(src0.reg, src1.reg, src0.mask, src_pos);
+    reg_tensor<U> dst(src0.mask);
+    if constexpr (::AscendC::Std::is_same_v<T, half> && ::AscendC::Std::is_same_v<U, float>) {
+        dst.reg = asc_exp_sub_half2float(src0.reg, src1.reg, src0.mask, src_pos);
+    }
     return dst;
 }
 
@@ -101,7 +108,7 @@ __simd_callee__ inline reg_tensor<T> fma(
     return dst;
 }
 
-template <typename T, typename U, cast_layout Layout>
+template <cast_layout Layout, typename T, typename U>
 __simd_callee__ inline reg_tensor<T> muls_cast(const reg_tensor<U>& src, const U& scalar)
 {
     static_assert(detail::supports_muls_cast_v<T, U>, "muls_cast supports only float to half");

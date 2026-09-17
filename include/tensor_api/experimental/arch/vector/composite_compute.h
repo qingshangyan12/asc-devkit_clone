@@ -29,12 +29,12 @@ __simd_callee__ inline reg_tensor<T> axpy(const reg_tensor<T>& dst, const reg_te
 template <typename T>
 __simd_callee__ inline reg_tensor<T> abs_diff(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
-template <typename T>
-__simd_callee__ inline reg_tensor<float> exp_diff(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+template <typename T, typename U>
+__simd_callee__ inline reg_tensor<U> exp_diff(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
-template <typename position_type>
-__simd_callee__ inline reg_tensor<float> exp_diff(
-    const reg_tensor<half>& src0, const reg_tensor<half>& src1, position_type src_pos);
+template <typename T, typename U, typename position_type>
+__simd_callee__ inline reg_tensor<U> exp_diff(
+    const reg_tensor<T>& src0, const reg_tensor<T>& src1, position_type src_pos);
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> madd(
@@ -48,7 +48,7 @@ template <typename T>
 __simd_callee__ inline reg_tensor<T> fma(
     const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<T>& src2);
 
-template <typename T, typename U, cast_layout Layout = cast_layout::zero>
+template <cast_layout Layout = cast_layout::zero, typename T = half, typename U>
 __simd_callee__ inline reg_tensor<T> muls_cast(const reg_tensor<U>& src, const U& scalar);
 
 } // namespace experimental
