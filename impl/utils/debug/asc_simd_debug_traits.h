@@ -17,9 +17,7 @@
 
 namespace AscendC {
 namespace Internal {
-namespace {
 struct SimdVfDebugTag {};
-} // namespace
 
 template <typename Tag>
 struct SimdVfDebugTraits {

@@ -63,3 +63,12 @@ extern "C" __global__ __aicore__ void KernelTestICachePreLoad1()
     int64_t preFetchLen = 0;
     AscendC::ICachePreLoad(preFetchLen);
 }
+
+#if defined(ASCENDC_ENABLE_HW_PTR_API)
+extern "C" __global__ __aicore__ void KernelTestDataCachePreloadPtr()
+{
+    __gm__ uint64_t* src = nullptr;
+    int16_t cacheOffset = 0;
+    AscendC::DataCachePreload(src, cacheOffset);
+}
+#endif

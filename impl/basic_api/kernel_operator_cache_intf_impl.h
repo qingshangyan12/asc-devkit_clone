@@ -13,8 +13,10 @@
  * \brief
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#pragma message( \
-    "impl/basic_api/kernel_operator_cache_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_cache_intf.h\"\" and use public functions or variables defined in interface headers files.")
+#pragma message("impl/basic_api/kernel_operator_cache_intf_impl.h is an internal header file and must not "    \
+                "be used directly. Functions or variables defined in this file may be removed in the future. " \
+                "Please use \"#include \"basic_api/kernel_operator_cache_intf.h\"\" and use public functions " \
+                "or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_CACHE_INTF_IMPL_H__
 #endif
@@ -89,6 +91,48 @@ __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst)
 __aicore__ inline void ICachePreLoad(const int64_t preFetchLen) { PreLoad(preFetchLen); }
 
 __aicore__ inline int64_t GetICachePreloadStatus() { return GetICachePreloadStatusImpl(); }
+
+#if defined(ASCENDC_ENABLE_HW_PTR_API)
+template <typename T>
+__aicore__ inline void DataCachePreload(__gm__ uint64_t* src, const T cacheOffset)
+{
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+    DataCachePreloadImpl(src, cacheOffset);
+#else
+    GlobalTensor<uint64_t> tmp;
+    tmp.SetGlobalBuffer(src);
+    DataCachePreloadImpl(tmp, cacheOffset);
+#endif
+}
+
+#if defined(__NPU_ARCH__) &&                                                                                 \
+    ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
+     (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
+     (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+template <typename T, CacheLine entireType, DcciDst dcciDst>
+__aicore__ inline void DataCacheCleanAndInvalid(__gm__ T* dst)
+{
+    DcciGMImpl<T, entireType, dcciDst>(dst);
+}
+
+template <typename T, CacheLine entireType, DcciDst dcciDst>
+__aicore__ inline void DataCacheCleanAndInvalid(__ubuf__ T* dst)
+{
+    DcciUBImpl<T, entireType, dcciDst>(dst);
+}
+#endif
+
+#if defined(__NPU_ARCH__) &&                                                                                 \
+    ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || \
+     (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || \
+     (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+template <typename T, CacheLine entireType>
+__aicore__ inline void DataCacheCleanAndInvalid(__gm__ T* dst)
+{
+    DcciGMImpl<T, entireType>(dst);
+}
+#endif
+#endif
 
 } // namespace AscendC
 

@@ -192,7 +192,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-scenarioNum",
         type=int,
-        default=0,
+        default=1,
         choices=[0, 1, 2, 3, 4],
         help="Scenario number: 0 ~ 4",
     )

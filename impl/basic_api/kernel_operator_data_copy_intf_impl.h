@@ -1890,6 +1890,10 @@ __aicore__ inline void ResetLoopModePara(DataCopyMVType type)
 }
 #endif
 } // namespace AscendC
+
+#if defined(ASCENDC_ENABLE_HW_PTR_API)
+#include "kernel_operator_data_copy_ptr_impl.h"
+#endif
 #endif // ASCENDC_MODULE_OPERATOR_VEC_VCONV_INTERFACE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_INTF_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
