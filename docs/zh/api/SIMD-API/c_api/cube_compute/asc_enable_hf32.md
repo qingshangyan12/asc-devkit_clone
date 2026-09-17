@@ -124,7 +124,6 @@ PIPE_S
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
-<!-- end id12 -->
 
 以下调用示例代码仅Ascend 950PR/Ascend 950DT产品支持。
 
@@ -235,3 +234,4 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+<!-- end id12 -->

@@ -199,7 +199,6 @@ PIPE_M
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
-<!-- end id8 -->
 
 ```cpp
 #include <cmath>
@@ -356,3 +355,4 @@ int main()
 ```
 
 更多场景使用样例请参考[asc_mmad_mx样例](../../../../../../examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad_mx)。
+<!-- end id8 -->
