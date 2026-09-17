@@ -39,6 +39,24 @@
  *   call sits behind `if constexpr (HasXxx<...>::value)`, so this TU compiles both before and after
  *   the implementation arrives. Where a pointer overload is absent the case SKIPs with an explicit
  *   message rather than silently passing, so "green" can never be mistaken for "covered".
+ *
+ * Coverage boundary of this TU -- what it deliberately does NOT cover
+ *   The two-argument `DataCacheCleanAndInvalid<T, CacheLine::X>(const T*)` pointer form is *not*
+ *   exercised here, and cannot be. Two independent reasons, both structural rather than incidental:
+ *     (a) Under CPU twin-debug the address-space qualifiers are defined empty, so `__gm__ T*` and
+ *         `T*` are the same type and the form's SFINAE constraint (`DmaAddrSpaceOfV<const T*> ==
+ *         DmaAddrSpace::kGm`) cannot be satisfied -- the overload is correctly excluded, not missing.
+ *     (b) The two-argument form is GM-only by contract, and the UB flavour of this call does not exist
+ *         (`kernel_reg.h` defines only the three-argument `DcciUBImpl`). There is therefore no UB
+ *         pointer shape for this TU to call even in principle.
+ *   Correct coverage for that form is device-side only. The evidence is the real bisheng compile plus
+ *   device-codegen differential recorded in the validation report:
+ *     .tmp/dma-validation/report/evidence/cache_codegen_evidence.txt  (differential .aicore_binary)
+ *     .tmp/dma-validation/report/evidence/cache_probe3.asc            (negative: __ubuf__ 2-arg rejected)
+ *     .tmp/dma-validation/report/evidence/cache_pos.asc               (positive: GM 2-arg / 3-arg)
+ *   This TU must not be extended to fake that coverage: mocking a function that does not exist would
+ *   be a false green. The three-argument form (GM and UB) IS covered below, since both have real
+ *   implementations and both survive the CPU build.
  */
 
 #include <cstdint>
@@ -56,7 +74,8 @@ using namespace AscendC;
 
 namespace {
 
-constexpr uint32_t PTR_UT_BLK = ONE_BLK_SIZE; // 32B (renamed: BLK clashes with stub_fun.h Literal::BLK under the CPU-debug regime)
+constexpr uint32_t PTR_UT_BLK =
+    ONE_BLK_SIZE; // 32B (renamed: BLK clashes with stub_fun.h Literal::BLK under the CPU-debug regime)
 
 __aicore__ inline constexpr uint32_t BlkCeil(const uint32_t bytes) { return (bytes + PTR_UT_BLK - 1) / PTR_UT_BLK; }
 
@@ -1034,6 +1053,14 @@ TEST_P(PtrL1ToUbSuite, PTR_L1UB_01_CountAndParamsForms)
 // =============================================================================================
 // PTR-CACHE-01  DataCacheCleanAndInvalid on GM / UB pointers (data must stay intact)
 // PTR-CACHE-02  DataCachePreload on a GM pointer
+//
+// PTR-CACHE-01 scope note: only the THREE-argument form is callable from this TU. The two-argument
+// pointer form is GM-only and is excluded under CPU twin-debug, because the empty address-space
+// qualifiers make its SFINAE constraint unsatisfiable. That form is a device-side-only property,
+// verified by compile plus device-codegen evidence
+// (.tmp/dma-validation/report/evidence/cache_codegen_evidence.txt), not by this TU. Do not add a
+// two-argument call here: it would not compile, and mocking the UB implementation it would need is
+// a false green, because kernel_reg.h defines no two-argument DcciUBImpl.
 // =============================================================================================
 
 template <typename T>
