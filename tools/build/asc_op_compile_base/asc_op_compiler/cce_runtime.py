@@ -147,7 +147,7 @@ def _get_kernel_magic_asecnd_910B(
     mix_type_info: str = None,
 ) -> dict:
     """
-    get the magic info for Ascend910B / Ascend910_93 / Ascend950 / MC62 / MC32DM11A
+    get the magic info for Ascend910B / Ascend910_93 / Ascend950 / Ascend960DT / Ascend960PR / MC62 / MC32DM11A
     Parameters
     ----------
     aicore_type: core type, VectorCore or AiCore
@@ -224,6 +224,8 @@ def _add_kernel_magic(
         "Ascend910B",
         "Ascend910_93",
         "Ascend950",
+        "Ascend960DT",
+        "Ascend960PR",
         "MC62",
         "MC32DM11A",
         "Ascend350",
@@ -807,11 +809,21 @@ def tvm_callback_cce_postproc(
     from asc_op_compile_base.common.platform.platform_info import ASCEND_910B
     from asc_op_compile_base.common.platform.platform_info import ASCEND_910_93
     from asc_op_compile_base.common.platform.platform_info import ASCEND_950
+    from asc_op_compile_base.common.platform.platform_info import ASCEND_960DT
+    from asc_op_compile_base.common.platform.platform_info import ASCEND_960PR
     from asc_op_compile_base.common.platform.platform_info import MC62
     from asc_op_compile_base.common.platform.platform_info import MC32DM11A
 
     short_soc_version = get_soc_spec("SHORT_SOC_VERSION")
-    if short_soc_version in [ASCEND_910B, ASCEND_910_93, ASCEND_950, MC62, MC32DM11A]:
+    if short_soc_version in [
+        ASCEND_910B,
+        ASCEND_910_93,
+        ASCEND_950,
+        ASCEND_960DT,
+        ASCEND_960PR,
+        MC62,
+        MC32DM11A,
+    ]:
         if (
             is_ffts_id_needed
             or mix == "MIX"
@@ -832,6 +844,8 @@ def tvm_callback_cce_postproc(
         "Ascend910B",
         "Ascend910_93",
         "Ascend950",
+        "Ascend960DT",
+        "Ascend960PR",
         "MC62",
         "MC32DM11A",
     ]:
