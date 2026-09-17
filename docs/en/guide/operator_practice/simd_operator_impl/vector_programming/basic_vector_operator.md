@@ -182,7 +182,7 @@ The initialization function mainly completes the following:
 
 -   Set the Global Memory addresses of the input and output Global Tensors.
 
-In this example, the allocation scheme is as follows: the total data length TOTAL\_LENGTH is 1 \* 2048. Use the [SetGlobalBuffer](../../../../api/SIMD-API/basic_api/data_structures/GlobalTensor/SetGlobalBuffer.md) API of the GlobalTensor class to set the start address and length of the Global Memory on this core.
+    In this example, the allocation scheme is as follows: the total data length TOTAL\_LENGTH is 1 \* 2048. Use the [SetGlobalBuffer](../../../../api/SIMD-API/basic_api/data_structures/GlobalTensor/SetGlobalBuffer.md) API of the GlobalTensor class to set the start address and length of the Global Memory on this core.
 
     ```
     xGm.SetGlobalBuffer((__gm__ half *)x, TOTAL_LENGTH);
