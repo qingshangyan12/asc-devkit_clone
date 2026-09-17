@@ -31,6 +31,7 @@
 #include "kernel_tensor.h"
 #include "../../impl/basic_api/utils/kernel_utils_constants.h"
 #include "../../impl/basic_api/utils/kernel_utils_macros.h"
+#include "../../impl/basic_api/utils/kernel_utils_pointer.h"
 
 #include "kernel_operator_mm_bitmode_intf.h"
 
@@ -110,6 +111,12 @@ template <typename T, typename U>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     const LocalTensor<T>& dst, const GlobalTensor<U>& src, const LoadData2DParamsV2& loadDataParams,
     const Nd2NzParamsV2& nd2nzParams);
+
+template <
+    typename Dst, typename Src,
+    typename Std::enable_if<Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>, bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    const Dst& dst, const Src& src, const LoadData2DParamsV2& loadDataParams, const Nd2NzParamsV2& nd2nzParams);
 #endif
 
 /* **************************************************************************************************
@@ -303,6 +310,56 @@ __aicore__ inline void Mmad(
     MmadBitModeParams& mmadParams);
 #endif
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void Mmad(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
+    const MmadBitModeParams& params);
+#endif
+
+template <
+    typename Dst, typename Fm, typename Filter,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Fm> || Internal::IsPointerOperand<Filter>,
+        bool>::type = true>
+__aicore__ inline void Mmad(const Dst& dst, const Fm& fm, const Filter& filter, const MmadParams& params);
+
+template <
+    typename Dst, typename Fm, typename Filter, typename Bias,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Fm> || Internal::IsPointerOperand<Filter> ||
+            Internal::IsPointerOperand<Bias>,
+        bool>::type = true>
+__aicore__ inline void Mmad(
+    const Dst& dst, const Fm& fm, const Filter& filter, const Bias& bias, const MmadParams& params);
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+template <
+    typename Dst, typename Fm, typename Filter,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Fm> || Internal::IsPointerOperand<Filter>,
+        bool>::type = true>
+__aicore__ inline void Mmad(const Dst& dst, const Fm& fm, const Filter& filter, const MmadBitModeParams& params);
+
+template <
+    typename Dst, typename Fm, typename Filter, typename Bias,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Fm> || Internal::IsPointerOperand<Filter> ||
+            Internal::IsPointerOperand<Bias>,
+        bool>::type = true>
+__aicore__ inline void Mmad(
+    const Dst& dst, const Fm& fm, const Filter& filter, const Bias& bias, MmadBitModeParams& params);
+
+template <
+    typename Dst, typename Fm, typename Filter, typename Bias,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Fm> || Internal::IsPointerOperand<Filter> ||
+            Internal::IsPointerOperand<Bias>,
+        bool>::type = true>
+__aicore__ inline void Mmad(
+    const Dst& dst, const Fm& fm, const Filter& filter, const Bias& bias, const MmadBitModeParams& params);
+#endif
+
 /* **************************************************************************************************
  * MmadMx                                                                                           *
  * **************************************************************************************************/
@@ -340,6 +397,38 @@ template <typename T, typename U, typename S, typename V>
 __aicore__ inline void MmadMx(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
     const MmadBitModeParams& mmadParams);
+
+template <
+    typename Dst, typename Fm, typename Filter,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Fm> || Internal::IsPointerOperand<Filter>,
+        bool>::type = true>
+__aicore__ inline void MmadMx(const Dst& dst, const Fm& fm, const Filter& filter, const MmadParams& params);
+
+template <
+    typename Dst, typename Fm, typename Filter, typename Bias,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Fm> || Internal::IsPointerOperand<Filter> ||
+            Internal::IsPointerOperand<Bias>,
+        bool>::type = true>
+__aicore__ inline void MmadMx(
+    const Dst& dst, const Fm& fm, const Filter& filter, const Bias& bias, const MmadParams& params);
+
+template <
+    typename Dst, typename Fm, typename Filter,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Fm> || Internal::IsPointerOperand<Filter>,
+        bool>::type = true>
+__aicore__ inline void MmadMx(const Dst& dst, const Fm& fm, const Filter& filter, const MmadBitModeParams& params);
+
+template <
+    typename Dst, typename Fm, typename Filter, typename Bias,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Fm> || Internal::IsPointerOperand<Filter> ||
+            Internal::IsPointerOperand<Bias>,
+        bool>::type = true>
+__aicore__ inline void MmadMx(
+    const Dst& dst, const Fm& fm, const Filter& filter, const Bias& bias, const MmadBitModeParams& params);
 
 template <
     typename T = int32_t, typename U = int8_t,
@@ -387,6 +476,12 @@ __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParam
 template <
     typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
 __aicore__ inline void InitConstValue(const LocalTensor<T>& dst, const InitConstValueParams<U>& initConstValueParams);
+
+template <
+    typename Dst, typename U = Internal::OperandPrimT<Dst>,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<Dst> && Std::is_same<Internal::OperandPrimT<Dst>, U>::value, bool>::type = true>
+__aicore__ inline void InitConstValue(const Dst& dst, const InitConstValueParams<U>& initConstValueParams);
 
 /* **************************************************************************************************
  * SetLoadDataPaddingValue                                             *
@@ -447,6 +542,78 @@ __aicore__ inline void SetLoadDataRepeatWithStride(const LoadDataRepeatParamWith
  */
 template <typename T>
 __aicore__ inline void LoadImageToLocal(const LocalTensor<T>& dst, const LoadImageToLocalParams& loadDataParams);
+
+template <
+    typename Dst, typename Src,
+    typename Std::enable_if<Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>, bool>::type = true>
+__aicore__ inline void LoadData(const Dst& dst, const Src& src, const LoadData2DParams& loadDataParams);
+
+template <
+    typename Dst, typename Src,
+    typename Std::enable_if<Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>, bool>::type = true>
+__aicore__ inline void LoadData(const Dst& dst, const Src& src, const LoadData2DParamsV2& loadDataParams);
+
+template <
+    typename Dst, typename Src, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG,
+    typename U = Internal::OperandPrimT<Dst>,
+    typename Std::enable_if<
+        (Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>) &&
+            Std::is_same<Internal::OperandPrimT<Src>, U>::value,
+        bool>::type = true>
+__aicore__ inline void LoadData(const Dst& dst, const Src& src, const LoadData3DParamsV1<U>& loadDataParams);
+
+template <
+    typename Dst, typename Src, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG,
+    typename U = Internal::OperandPrimT<Dst>,
+    typename Std::enable_if<
+        (Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>) &&
+            Std::is_same<Internal::OperandPrimT<Src>, U>::value,
+        bool>::type = true>
+__aicore__ inline void LoadData(const Dst& dst, const Src& src, const LoadData3DParamsV2<U>& loadDataParams);
+
+template <
+    typename Dst, typename Src,
+    typename Std::enable_if<Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>, bool>::type = true>
+__aicore__ inline void LoadData(const Dst& dst, const Src& src, const LoadData3DParamsV2Pro& loadDataParams);
+
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+template <
+    TPosition DstPos, TPosition SrcPos, typename Dst, typename Src,
+    typename Std::enable_if<Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>, bool>::type = true>
+__aicore__ inline void LoadData(const Dst& dst, const Src& src, const Load2DBitModeParam& loadDataParams);
+
+template <
+    TPosition DstPos, TPosition SrcPos, typename Dst, typename Src,
+    typename Std::enable_if<Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>, bool>::type = true>
+__aicore__ inline void LoadData(const Dst& dst, const Src& src, const Load3DBitModeParam& loadDataParams);
+#endif
+
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5161) || \
+                              (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+template <
+    typename Dst, typename Src, typename SrcMx,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src> || Internal::IsPointerOperand<SrcMx>,
+        bool>::type = true>
+__aicore__ inline void LoadData(
+    const Dst& dst, const Src& src, const SrcMx& srcMx, const LoadData2DParamsV2& loadDataParams,
+    const LoadData2DMxParams& loadMxDataParams);
+#endif
+
+template <
+    typename Dst, typename Src,
+    typename Std::enable_if<Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>, bool>::type = true>
+__aicore__ inline void LoadDataWithTranspose(
+    const Dst& dst, const Src& src, const LoadData2dTransposeParams& loadDataParams);
+
+template <
+    typename Dst, typename Src,
+    typename Std::enable_if<Internal::IsPointerOperand<Dst> || Internal::IsPointerOperand<Src>, bool>::type = true>
+__aicore__ inline void LoadDataWithTranspose(
+    const Dst& dst, const Src& src, const LoadData2dTransposeParamsV2& loadDataParams);
+
+template <typename Dst, typename Std::enable_if<Internal::IsPointerOperand<Dst>, bool>::type = true>
+__aicore__ inline void LoadImageToLocal(const Dst& dst, const LoadImageToLocalParams& loadDataParams);
 
 /* **************************************************************************************************
  * LoadDataUnzip                                             *

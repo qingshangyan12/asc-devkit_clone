@@ -13,3 +13,12 @@
 #else
 #include "kernel_tensor.h"
 #endif
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+extern "C" __global__ __aicore__ void KernelTestCubePointerSetAddrWithOffset()
+{
+    AscendC::LocalTensor<float> dst;
+    __ubuf__ float* src;
+    dst.SetAddrWithOffset(src, 4);
+}
+#endif

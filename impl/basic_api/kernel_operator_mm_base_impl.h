@@ -546,9 +546,10 @@ __aicore__ inline void MmadImpl(
                               "L0C Buffer(CO1)/BiasTable Buffer(C2)");
         });
     }
+    MmadBitModeParams mutableParams = mmadParams;
     MmadCal(
         (__cc__ PrimT<T>*)dst.GetPhyAddr(), (__ca__ PrimT<U>*)fm.GetPhyAddr(), (__cb__ PrimT<S>*)filter.GetPhyAddr(),
-        (uint64_t)bias.GetPhyAddr(), mmadParams);
+        (uint64_t)bias.GetPhyAddr(), mutableParams);
 }
 
 template <typename T, typename U, typename S>
@@ -600,9 +601,10 @@ __aicore__ inline void MmadMxImpl(
     }
     CheckMmadAlign(dst, fm, filter);
 #endif
+    MmadBitModeParams mutableParams = mmadParams;
     MmadMxCal(
         (__cc__ PrimT<T>*)dst.GetPhyAddr(), (__ca__ PrimT<U>*)fm.GetPhyAddr(), (__cb__ PrimT<S>*)filter.GetPhyAddr(),
-        mmadParams);
+        mutableParams);
 }
 
 template <typename T, typename U, typename S, typename V>
@@ -630,9 +632,10 @@ __aicore__ inline void MmadMxImpl(
                               "L0C Buffer(CO1)/BiasTable Buffer(C2)");
         });
     }
+    MmadBitModeParams mutableParams = mmadParams;
     MmadMxCal(
         (__cc__ PrimT<T>*)dst.GetPhyAddr(), (__ca__ PrimT<U>*)fm.GetPhyAddr(), (__cb__ PrimT<S>*)filter.GetPhyAddr(),
-        (uint64_t)bias.GetPhyAddr(), mmadParams);
+        (uint64_t)bias.GetPhyAddr(), mutableParams);
 }
 #endif
 

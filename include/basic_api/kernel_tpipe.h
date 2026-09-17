@@ -538,6 +538,8 @@ protected:
     friend __aicore__ inline bool PopStackBuffer(TBuf<pos>& popBuffer, TBufType& bufStart);
     template <typename T, TPosition pos>
     friend __aicore__ inline bool PopStackBuffer(LocalTensor<T>& popBuffer);
+    template <typename T, TPosition pos>
+    friend __aicore__ inline bool PopStackBuffer(__ubuf__ T*& popBuffer);
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     void inline SetBufferCtx(Hardware hard, struct BufPoolExtra* bufPool);
 #endif

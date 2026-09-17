@@ -30,6 +30,7 @@
 #include "kernel_tensor.h"
 #include "../../impl/basic_api/kernel_tensor_base.h"
 #include "../../impl/basic_api/utils/kernel_utils_mode.h"
+#include "../../impl/basic_api/utils/kernel_utils_pointer.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -68,6 +69,20 @@ template <bool isAIVOnly = true>
 __aicore__ inline void IBWait(
     const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace, int32_t blockIdx,
     int32_t eventID);
+
+template <
+    bool isAIVOnly = true, typename GmWorkspace, typename UbWorkspace,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<GmWorkspace> || Internal::IsPointerOperand<UbWorkspace>, bool>::type = true>
+__aicore__ inline void IBSet(
+    const GmWorkspace& gmWorkspace, const UbWorkspace& ubWorkspace, int32_t blockIdx, int32_t eventID);
+
+template <
+    bool isAIVOnly = true, typename GmWorkspace, typename UbWorkspace,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<GmWorkspace> || Internal::IsPointerOperand<UbWorkspace>, bool>::type = true>
+__aicore__ inline void IBWait(
+    const GmWorkspace& gmWorkspace, const UbWorkspace& ubWorkspace, int32_t blockIdx, int32_t eventID);
 /*
  * @ingroup：SyncALL
  * @brief：Set flag bits of all cores
@@ -77,6 +92,13 @@ __aicore__ inline void IBWait(
 template <bool isAIVOnly = true>
 __aicore__ inline void SyncAll(
     const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace, const int32_t usedCores = 0);
+
+template <
+    bool isAIVOnly = true, typename GmWorkspace, typename UbWorkspace,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<GmWorkspace> || Internal::IsPointerOperand<UbWorkspace>, bool>::type = true>
+__aicore__ inline void SyncAll(
+    const GmWorkspace& gmWorkspace, const UbWorkspace& ubWorkspace, const int32_t usedCores = 0);
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 template <bool isAIVOnly = true, const SyncAllConfig& config = DEFAULT_SYNC_ALL_CONFIG>

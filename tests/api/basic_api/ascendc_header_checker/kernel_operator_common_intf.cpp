@@ -59,6 +59,14 @@ extern "C" __global__ __aicore__ void KernelTestCheckLocalMemoryIA1()
     AscendC::CheckLocalMemoryIA(checkParams);
 }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+extern "C" __global__ __aicore__ void KernelTestCubePointerPopStackBuffer()
+{
+    __ubuf__ uint8_t* buffer;
+    (void)AscendC::PopStackBuffer<uint8_t, AscendC::TPosition::LCM>(buffer);
+}
+#endif
+
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // template <SpecialPurposeReg spr>
 // __aicore__ inline int64_t GetSpr();

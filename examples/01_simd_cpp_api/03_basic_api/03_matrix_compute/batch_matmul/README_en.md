@@ -8,7 +8,7 @@ This example introduces batched matrix multiplication with float data type input
 
 | Product | CANN Version |
 |---------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+| Ascend 950PR/Ascend 950DT | CANN 9.0.0 to CANN 9.1.0 (pointer-path acceptance range for this task; use the matching ASC compiler) |
 | Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.2.0 |
 | Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.2.0 |
 
@@ -194,9 +194,40 @@ Run the following steps in the root directory of this example to build and run t
   |--------|--------|-------------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debug, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products/Atlas A3 Training Series Products/Atlas A3 Inference Series Products, dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
+  | `ASCENDC_USE_POINTER_API` | `OFF` (default), `ON` | On dav-3510, use pointer or mixed Tensor/pointer calls for `LoadData`, `Mmad`, and `Fixpipe`. |
+  | `BATCH_MATMUL_B/M/K/N` | `4/30/40/70` | Set compile-time sample dimensions; values must match the `gen_data.py` arguments. |
 
   The following execution result indicates that the accuracy comparison is successful.
 
   ```bash
   test pass!
   ```
+
+### Pointer API comparison on Ascend 950
+
+After confirming that the ASC compiler matches the target architecture in a CANN 9.0.0 to CANN 9.1.0 environment, run the following commands. They use the same deterministic seed and `[-100, 100]` input while covering dimensions 1, 32, 1024, and 2048. Each case builds and runs both Tensor and pointer/mixed paths:
+
+```bash
+run_case() {
+  tag=$1; b=$2; m=$3; k=$4; n=$5
+  python3 scripts/gen_data.py --batch "$b" --m "$m" --k "$k" --n "$n"
+  for mode in tensor pointer; do
+    flag=OFF; [ "$mode" = pointer ] && flag=ON
+    build="build_${mode}_${tag}"
+    cmake -S . -B "$build" -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCMAKE_ASC_RUN_MODE=npu \
+      -DASCENDC_USE_POINTER_API="$flag" -DBATCH_MATMUL_B="$b" -DBATCH_MATMUL_M="$m" \
+      -DBATCH_MATMUL_K="$k" -DBATCH_MATMUL_N="$n"
+    cmake --build "$build" -j && "./${build}/demo"
+    mv output/output.bin "output/${mode}_${tag}.bin"
+    python3 scripts/verify_result.py "output/${mode}_${tag}.bin" output/golden.bin
+  done
+  python3 scripts/verify_result.py "output/pointer_${tag}.bin" "output/tensor_${tag}.bin"
+}
+
+run_case scalar1 1 1 1 1
+run_case cube32 1 32 32 32
+run_case m1024 1 1024 1 1
+run_case m2048 1 2048 1 1
+```
+
+The verifier applies the ecosystem operator experimental precision standard: `rtol=2^-10`, `atol=2^-16`, a matched ratio of at least 0.99, and a per-element absolute-error cap of `max(1e-2, 32*ULP)`. All three checks must print `test pass!`.
