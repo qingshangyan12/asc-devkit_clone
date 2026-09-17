@@ -97,7 +97,11 @@ template <typename T>
 __aicore__ inline __sync_alias__ LocalTensor<T> TBuf<pos>::GetWithOffset(uint32_t size, uint32_t bufOffset)
 {
     auto ptr = this->bufStart;
-    ptr->dataLen = size * sizeof(T);
+    if constexpr (IsSameType<PrimT<T>, int4b_t>::value) {
+        ptr->dataLen = size / INT4_TWO;
+    } else {
+        ptr->dataLen = size * sizeof(T);
+    }
     TBuffAddr addr;
     addr.logicPos = static_cast<uint8_t>(pos);
     addr.bufferHandle = reinterpret_cast<TBufHandle>(ptr);
