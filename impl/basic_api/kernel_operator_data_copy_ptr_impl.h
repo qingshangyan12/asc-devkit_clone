@@ -28,8 +28,7 @@ __aicore__ inline uint8_t GetPtrCacheMode(__gm__ T* addr)
 }
 
 template <typename T>
-__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
-    __ubuf__ T* dst, __gm__ T* src, const DataCopyParams& repeatParams)
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(__ubuf__ T* dst, __gm__ T* src, const DataCopyParams& repeatParams)
 {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     DataCopyGM2UBImpl(dst, src, repeatParams, GetPtrCacheMode(src));
@@ -39,8 +38,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
 }
 
 template <typename T>
-__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
-    __cbuf__ T* dst, __gm__ T* src, const DataCopyParams& repeatParams)
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(__cbuf__ T* dst, __gm__ T* src, const DataCopyParams& repeatParams)
 {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     DataCopyGM2L1Impl(dst, src, repeatParams, GetPtrCacheMode(src));
@@ -50,8 +48,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
 }
 
 template <typename T>
-__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
-    __gm__ T* dst, __ubuf__ T* src, const DataCopyParams& repeatParams)
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(__gm__ T* dst, __ubuf__ T* src, const DataCopyParams& repeatParams)
 {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     DataCopyUB2GMImpl(dst, src, repeatParams, GetPtrCacheMode(dst));
@@ -61,8 +58,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
 }
 
 template <typename T>
-__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
-    __gm__ T* dst, __cbuf__ T* src, const DataCopyParams& repeatParams)
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(__gm__ T* dst, __cbuf__ T* src, const DataCopyParams& repeatParams)
 {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     DataCopyL12GMImpl(dst, src, repeatParams, GetPtrCacheMode(dst));
@@ -108,8 +104,7 @@ __aicore__ inline void DataCopy(__fbuf__ T* dst, __cbuf__ T* src, const DataCopy
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || \
     (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
 template <typename T, bool enableSmallC0>
-__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
-    __cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(__cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
 {
     CheckNd2NzParams(intriParams, "DataCopy with Nd2NzParams");
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
@@ -122,8 +117,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
 }
 
 template <typename T, bool enableSmallC0>
-__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
-    __ubuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(__ubuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
 {
     CheckNd2NzParams(intriParams, "DataCopy with Nd2NzParams");
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || \
@@ -136,16 +130,14 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
 }
 #else
 template <typename T>
-__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
-    __cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(__cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
 {
     CheckNd2NzParams(intriParams, "DataCopy with Nd2NzParams");
     DataCopyGM2L1ND2NZImpl(dst, src, intriParams);
 }
 
 template <typename T>
-__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
-    __ubuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(__ubuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
 {
     CheckNd2NzParams(intriParams, "DataCopy with Nd2NzParams");
     DataCopyGM2UBND2NZImpl(dst, src, intriParams);
@@ -161,8 +153,7 @@ __aicore__ inline void DataCopy(__cbuf__ T* dst, __ubuf__ T* src, const Nd2NzPar
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
     (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
 template <typename T, bool enableSmallC0>
-__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
-    __cbuf__ T* dst, __gm__ T* src, const Dn2NzParams& intriParams)
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(__cbuf__ T* dst, __gm__ T* src, const Dn2NzParams& intriParams)
 {
     DataCopyGM2L1DN2NZImpl(dst, src, intriParams, enableSmallC0, GetPtrCacheMode(src));
 }
@@ -564,14 +555,12 @@ __aicore__ inline void DataCopy(__ubuf__ T* dst, __gm__ T* src, const MultiCopyP
         return;
     }
 #endif
-    DataCopyWithNDDMAImpl<T, dim, config>(
-        dst, src, params.loopInfo, params.constantValue, GetPtrCacheMode(src));
+    DataCopyWithNDDMAImpl<T, dim, config>(dst, src, params.loopInfo, params.constantValue, GetPtrCacheMode(src));
 }
 #endif
 
 template <typename T>
-__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
-    __gm__ T* dst, __ubuf__ T* src, const Nz2NdParamsFull& intriParams)
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(__gm__ T* dst, __ubuf__ T* src, const Nz2NdParamsFull& intriParams)
 {
     CheckNz2NdParams(intriParams);
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
@@ -584,16 +573,14 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
 #if defined(__NPU_ARCH__) && \
     ((__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
 template <typename T>
-__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
-    __gm__ T* dst, __cbuf__ T* src, const Nz2NdParamsFull& intriParams)
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(__gm__ T* dst, __cbuf__ T* src, const Nz2NdParamsFull& intriParams)
 {
     CheckNz2NdParams(intriParams);
     DataCopyL12GMNZ2NDImpl(dst, src, intriParams);
 }
 
 template <typename T>
-__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
-    __gm__ T* dst, __cbuf__ T* src, const Nz2DnParamsFull& intriParams)
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(__gm__ T* dst, __cbuf__ T* src, const Nz2DnParamsFull& intriParams)
 {
     DataCopyL12GMNZ2DNImpl(dst, src, intriParams);
 }

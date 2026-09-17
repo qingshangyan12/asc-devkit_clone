@@ -500,18 +500,14 @@ __aicore__ inline void DataCopy(__fbuf__ T* dst, __cbuf__ T* src, const DataCopy
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || \
     (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
 template <typename T, bool enableSmallC0 = false>
-__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
-    __cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams);
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(__cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams);
 template <typename T, bool enableSmallC0 = false>
-__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
-    __ubuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams);
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(__ubuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams);
 #else
 template <typename T>
-__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
-    __cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams);
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(__cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams);
 template <typename T>
-__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
-    __ubuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams);
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(__ubuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams);
 #endif
 template <typename T>
 __aicore__ inline void DataCopy(__cbuf__ T* dst, __ubuf__ T* src, const Nd2NzParams& intriParams);
@@ -519,8 +515,7 @@ __aicore__ inline void DataCopy(__cbuf__ T* dst, __ubuf__ T* src, const Nd2NzPar
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
     (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
 template <typename T, bool enableSmallC0 = false>
-__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
-    __cbuf__ T* dst, __gm__ T* src, const Dn2NzParams& intriParams);
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(__cbuf__ T* dst, __gm__ T* src, const Dn2NzParams& intriParams);
 #endif
 
 template <typename T>
@@ -600,12 +595,10 @@ __aicore__ inline void DataCopyPad(
     (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
-    __ubuf__ T* dst, __gm__ T* src, const DataCopyExtParams& dataCopyParams,
-    const DataCopyPadExtParams<T>& padParams);
+    __ubuf__ T* dst, __gm__ T* src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams);
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
-    __cbuf__ T* dst, __gm__ T* src, const DataCopyExtParams& dataCopyParams,
-    const DataCopyPadExtParams<T>& padParams);
+    __cbuf__ T* dst, __gm__ T* src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams);
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     __gm__ T* dst, __ubuf__ T* src, const DataCopyExtParams& dataCopyParams);
@@ -617,8 +610,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
 #else
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
-    __ubuf__ T* dst, __gm__ T* src, const DataCopyExtParams& dataCopyParams,
-    const DataCopyPadExtParams<T>& padParams);
+    __ubuf__ T* dst, __gm__ T* src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams);
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     __gm__ T* dst, __ubuf__ T* src, const DataCopyExtParams& dataCopyParams);
