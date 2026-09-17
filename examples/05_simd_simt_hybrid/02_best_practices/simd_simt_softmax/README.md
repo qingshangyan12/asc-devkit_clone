@@ -16,11 +16,7 @@
 ├── simd_simt_softmax
 │   ├── CMakeLists.txt                  // 编译工程文件
 │   ├── data_utils.h                    // Host侧bin文件读写工具
-│   ├── figures
-│   │   ├── case0.png                  // Case 0 一个Warp处理一行示意图
-│   │   ├── case1.png                  // Case 1 数据流向与流水组织示意图
-│   │   ├── case2.png                  // Case 2 bucket分桶与UB布局示意图
-│   │   └── perf_trend.png             // Case 1与Case 2不同cols下的Task Duration趋势
+│   ├── figures                        // README中的图片资源
 │   ├── scripts
 │   │   ├── gen_data.py                 // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py            // 真值对比脚本
@@ -150,7 +146,7 @@ Case 0的 `aiv_vec_ratio` 达到0.960，耗时集中在SIMT线程的GM读写和�
 
 - 每个Thread Block按tile处理行数据。tile内的行数决定一次VF调用启动的Warp数量（一个Warp处理一行），该行数取以下三者中的最小值：本Thread Block分到的行数、UB容量内四份tile缓冲区可容纳的行数、单次VF调用线程数上限对应的64行。
 - kernel将动态UB划分为双份输入tile缓冲区与双份输出tile缓冲区，两组缓冲区随tile交替使用，各自的生命周期由独立的事件管理。
-- MTE2使用 `asc_copy_gm2ub_align` 二维搬运，按真实cols把GM每行搬入UB；MTE3按同样方式把结果搬回GM。双份tile缓冲区轮换，使搬运与计算重叠。
+- MTE2使用 `asc_copy_gm2ub_align` 二维搬运，按真实cols把GM每行搬入UB；MTE3按同样方式把结果搬回GM。
 - SIMT VF仍按一个Warp一行的方式在UB上完成max、exp/sum和归一化三轮循环。
 
 Case 1的数据流如下图所示。
@@ -218,15 +214,12 @@ Case 1的计算耗时主要集中在行内计算的组织方式上：行内计�
 
 **核心实现**：
 
-- 静态数组缓存整行：本样例覆盖的cols不超过512，一个Warp处理一行时，每个线程分到的元素最多为512/32 = 16个，行内数据量小，适合直接在寄存器中完成计算。为此引入静态数组 `elements[kWarpIterations]` 缓存线程分到的元素，引导编译器将其分配到寄存器，而不是每轮循环重新读取UB输入行。
-- 编译期定长：cols是运行时参数，访问数组的循环边界和下标在编译期均无法确定，编译器不能把动态下标的数组映射到寄存器。将cols按上界划分为64/128/256/384/512五档bucket，按档位实例化 `softmax_bucket_kernel<kThreadCount, kBucketCols>` 模板：`kBucketCols` 为编译期常量，`kWarpIterations = kBucketCols / 32` 为定值，访问数组的循环可完全展开，`elements` 得以驻留寄存器；尾部无效列用 `-ASCRT_INF_F` 屏蔽，不参与归约与归一化。
-- 一轮读入完成全部计算：整行元素一次读入 `elements` 后，max归约、exp、sum归约和归一化写回全部在寄存器上完成，输入行只读一次，`exp` 只计算一次。
+- 编译期bucket：本样例cols不超过512，一个线程分到的元素最多为512/32 = 16个，适合直接驻留寄存器。cols按上界划分为64/128/256/384/512五档bucket，按档位实例化特化kernel：bucket容量为编译期常量，访问数组的循环可完全展开，静态数组 `elements[kWarpIterations]` 驻留寄存器；尾部无效列用 `-ASCRT_INF_F` 屏蔽，不参与归约与归一化。
 - UB布局：tile缓冲区按bucket容量 `kBucketCols` 申请，MTE按运行时的真实cols搬运每行数据，真实元素之后的余量空置；SIMT VF在padded UB上计算，MTE3按真实cols将结果搬回GM。bucket分桶与UB布局如下图所示。
 
   <img src="./figures/case2.png">
 
-- 输入/输出各两份UB缓冲区按tile轮换，配合事件机制管理缓冲区生命周期，使相邻tile的MTE2搬入、SIMT VF计算与MTE3搬出重叠。
-- 动态线程选择：Host按 `rows_per_core = ceil(rows / block_count)` 估算每核行数，`needed_threads = rows_per_core * 32`：不超过512选512线程，不超过1024选1024线程；超过1024且 `cols <= 256` 时选2048线程；`cols > 256` 时考虑寄存器压力，SIMT VF的 `__launch_bounds__` 配置为1024，最多启动1024个线程。一个Warp处理一行，512/1024/2048线程对应每个tile最多处理16/32/64行。
+- 动态线程选择：Host按每核行数选择线程数，512/1024/2048线程对应每个tile最多处理16/32/64行；`cols > 256` 时考虑寄存器压力，最多启动1024个线程。
 
 SIMT VF将整行元素读入定长数组，在寄存器中完成全部计算：
 
@@ -318,14 +311,14 @@ Case 1的 `Task Duration` 随cols增大持续上升：行内计算三轮串行�
 
 - 配置环境变量
 
-  请参考[环境变量配置](../../../../docs/zh/quick_start.md#cann-env-setup)，配置当前环境上的CANN开发套件包环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
 
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
-  >
+
 - 样例执行
 
   在本样例目录下执行如下命令，默认执行shape为[8192, 197]的样例。
@@ -341,12 +334,24 @@ Case 1的 `Task Duration` 随cols增大持续上升：行内计算三轮串行�
 
   也支持自定义shape：先执行 `python3 ../scripts/gen_data.py <rows> <cols>`，再执行 `./softmax <rows> <cols>`，其中cols取值范围为1~512。
 
+  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
+
+  示例如下：
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;   # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
+
 - 编译选项说明
 
-  | 选项                        | 可选值       | 说明                                                       |
-  | --------------------------- | ------------ | ---------------------------------------------------------- |
-  | CMAKE_ASC_ARCHITECTURES | dav-3510 | NPU架构：本样例仅支持dav-3510（Ascend 950PR/Ascend 950DT） |
-  | SCENARIO_NUM            | 0-2    | 样例类型，默认为2：0=SIMT直接读GM，1=UB中转与MTE双缓冲，2=编译期bucket |
+  | 选项 | 可选值 | 说明 |
+  |:---|:---|:---|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构：本样例仅支持dav-3510（Ascend 950PR/Ascend 950DT） |
+  | `SCENARIO_NUM` | `0`、`1`、`2` | 样例类型，默认为2：0=SIMT直接读GM，1=UB中转与MTE双缓冲，2=编译期bucket |
+
+- 执行结果
 
   执行结果如下，说明精度对比成功。
 
