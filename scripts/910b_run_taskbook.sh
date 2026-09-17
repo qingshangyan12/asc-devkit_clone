@@ -108,7 +108,9 @@ if [ ! -d "$ACT_INC" ] && [ -d "$CANN_REAL/asc/include/basic_api" ]; then
 fi
 
 patch_include() {
-  local host="$1" inc="$2" tgt="$ACT_IMPL/$host"
+  local host="$1"
+  local inc="$2"
+  local tgt="$ACT_IMPL/$host"
   [ -f "$tgt" ] || return 0
   grep -q "$inc" "$tgt" 2>/dev/null && return 0
   python3 - "$tgt" "$inc" <<'PY'
