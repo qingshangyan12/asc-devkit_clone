@@ -195,12 +195,14 @@ def read_resource_id_section_for_test(binary_file):
     objcopy = os.path.join(os.environ["ASCEND_HOME_PATH"], "bin", "llvm-objcopy")
     with TemporaryDirectory() as temp_dir:
         dump_file = os.path.join(temp_dir, "resource_id")
+        output_file = os.path.join(temp_dir, "binary.o")
         result = subprocess.run(
             [
                 objcopy,
                 "--dump-section",
                 f".ascend.meta={dump_file}",
                 binary_file,
+                output_file,
             ],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
@@ -486,6 +488,7 @@ class TestCompileOp(unittest.TestCase):
                         mock.patch.object(compile_op_module, "handle_compile_options")
                     )
                     compile_states = []
+                    mock_write_resource_id = mock.Mock()
 
                     def record_compile_state(compile_info, *_args, **_kwargs):
                         state = (
@@ -500,6 +503,14 @@ class TestCompileOp(unittest.TestCase):
                             ),
                         )
                         compile_states.append(state)
+                        if (
+                            compile_info.compile_command_session.mode
+                            is CompileCommandMode.EXECUTE_AND_RECORD
+                        ):
+                            mock_write_resource_id(compile_info.dst_file)
+                            global_var_storage.get_variable("ascendc_resource_ids")[
+                                os.path.abspath(compile_info.dst_file)
+                            ] = "resource-id"
                         if (
                             compile_info.compile_command_session.mode
                             is not CompileCommandMode.EXECUTE

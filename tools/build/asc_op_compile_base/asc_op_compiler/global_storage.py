@@ -36,7 +36,8 @@ class GlobalStorageSingleton:
         self.ascendc_debug_compile_options = False
         self.ascendc_enable_sanitizer = False
         self.ascendc_compiler_path = None
-        self.ascendc_compile_options = []
+        self.ascendc_kernel_spec_enabled = False
+        self.ascendc_resource_ids = {}
         self.ascendc_enable_ccache = False
         self.ascendc_asan_obj_path = {}
         self.ascendc_enable_build_log = False
@@ -74,7 +75,8 @@ class GlobalStorageSingleton:
         self.ascendc_debug_compile_options = False
         self.ascendc_enable_sanitizer = False
         self.ascendc_compiler_path = None
-        self.ascendc_compile_options = []
+        self.ascendc_kernel_spec_enabled = False
+        self.ascendc_resource_ids = {}
         self.ascendc_enable_ccache = False
         self.ascendc_asan_obj_path = {}
         self.ascendc_enable_build_log = False

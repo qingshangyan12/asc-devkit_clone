@@ -1059,6 +1059,7 @@ class KernelSpecCompilation:
             self._kernel_spec_mode in {"Normal", "SK"}
             and not tiling_info.static_shape_flag
         )
+        global_var_storage.set_variable("ascendc_kernel_spec_enabled", self.enabled)
         self._validate_configuration()
         self.record_sk_commands = (
             self.enabled and self._kernel_spec_mode == "SK" and is_sk_double_compile
@@ -1104,8 +1105,9 @@ class KernelSpecCompilation:
             return
         _, error_mgr, utility_module, storage_module = _kernel_spec_runtime()
         try:
-            key = "ascendc_resource_id_" + os.path.abspath(self.compile_info.dst_file)
-            self.resource_id = storage_module.global_var_storage.get_variable(key)
+            self.resource_id = storage_module.global_var_storage.get_variable(
+                "ascendc_resource_ids"
+            ).get(os.path.abspath(self.compile_info.dst_file))
             if not self.resource_id:
                 raise ResourceIdError("resource ID was not generated before final link")
         except ResourceIdError as error:

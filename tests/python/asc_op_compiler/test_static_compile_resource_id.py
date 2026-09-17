@@ -6,25 +6,28 @@
 # CANN Open Software License Agreement Version 2.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
 # THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
 import hashlib
-import importlib.util
 import os
 from pathlib import Path
+import sys
 import tempfile
 import unittest
 from unittest import mock
 
-MODULE_PATH = os.path.join(
-    os.path.dirname(__file__),
-    "../../../tools/build/asc_op_compile_base/asc_op_compiler/static_compile_resource_id.py",
+TOP_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../../")
+FRAMEWORK_PATH = os.path.join(TOP_PATH, "tools/build/")
+if FRAMEWORK_PATH not in sys.path:
+    sys.path.insert(0, FRAMEWORK_PATH)
+
+from asc_op_compile_base.asc_op_compiler import static_compile_resource_id as MODULE
+from asc_op_compile_base.asc_op_compiler.ascendc_common_utility import (
+    CommonUtility,
+    CompileStage,
 )
-SPEC = importlib.util.spec_from_file_location("static_compile_resource_id", MODULE_PATH)
-MODULE = importlib.util.module_from_spec(SPEC)
-SPEC.loader.exec_module(MODULE)
 
 
 class TestStaticCompileResourceId(unittest.TestCase):
@@ -59,46 +62,77 @@ class TestStaticCompileResourceId(unittest.TestCase):
     def test_generates_metadata_object_and_keeps_inputs_unchanged(self):
         output_path = os.path.join(self.temp_dir.name, "resource_id.o")
         commands = []
+        stages = []
+        log_paths = []
         sources = []
         original = [Path(path).read_bytes() for path in self.object_paths]
 
-        def record(command):
-            commands.append(command)
-            source_index = command.index("-xcce") + 1
-            sources.append(Path(command[source_index]).read_text(encoding="utf-8"))
+        def fake_run_cmd_inner(cmds, stage, compile_log_path=None):
+            commands.append(cmds)
+            stages.append(stage)
+            log_paths.append(compile_log_path)
+            source_index = cmds.index("-xcce") + 1
+            sources.append(Path(cmds[source_index]).read_text(encoding="utf-8"))
+            Path(cmds[cmds.index("-o") + 1]).write_bytes(b"\x7fELF")
 
-        with mock.patch.object(MODULE, "_run_tool", side_effect=record):
+        with mock.patch.object(
+            CommonUtility, "run_cmd_inner", side_effect=fake_run_cmd_inner
+        ):
             resource_id = MODULE.generate_resource_id_object(
                 self.object_paths,
                 output_path,
                 ["fake-ccec"],
-                ["-DTEST_OPTION"],
                 "dav-c220-cube",
+                "compile.log",
             )
         self.assertEqual(len(resource_id), 64)
         self.assertEqual(
-            commands[0][:5],
-            ["fake-ccec", "-DTEST_OPTION", "-c", "-O3", "-xcce"],
+            commands[0][:4],
+            ["fake-ccec", "-c", "-O3", "-xcce"],
         )
         self.assertIn("--cce-aicore-arch=dav-c220-cube", commands[0])
         self.assertIn("-std=c++17", commands[0])
         self.assertEqual(commands[0][-1], output_path)
+        self.assertEqual(stages, [CompileStage.COMPILE])
+        self.assertEqual(log_paths, ["compile.log"])
         source = sources[0]
+        self.assertIn("struct BinaryMetaResourceId", source)
         self.assertIn('__attribute__((used, section(".ascend.meta")))', source)
-        self.assertIn('#include "kernel_utils_macros.h"', source)
         self.assertIn(
             "static const struct BinaryMetaResourceId g_ascend_resource_id_section = "
-            "{{{%d, %d}, {%s}}};"
+            "{%d, %d, {%s}};"
             % (
-                MODULE._RESOURCE_ID_VALUE_SIZE,
                 MODULE._RESOURCE_ID_TYPE,
+                MODULE._RESOURCE_ID_VALUE_SIZE,
                 ", ".join(f"'{char}'" for char in resource_id),
             ),
             source,
         )
         self.assertEqual(Path(self.object_paths[0]).read_bytes(), original[0])
         self.assertEqual(Path(self.object_paths[1]).read_bytes(), original[1])
-        self.assertEqual(Path(output_path).exists(), False)
+        self.assertEqual(Path(output_path).read_bytes(), b"\x7fELF")
+
+    def test_compile_failure_and_stale_output_are_detected(self):
+        output_path = os.path.join(self.temp_dir.name, "resource_id.o")
+        for stale in (False, True):
+            with self.subTest(stale_output=stale):
+                if stale:
+                    Path(output_path).write_bytes(b"stale object")
+                with mock.patch.object(
+                    CommonUtility,
+                    "run_cmd_inner",
+                    side_effect=lambda cmds, stage, compile_log_path=None: None,
+                ):
+                    with self.assertRaisesRegex(
+                        MODULE.ResourceIdError, "compile resource id object failed"
+                    ):
+                        MODULE.generate_resource_id_object(
+                            self.object_paths,
+                            output_path,
+                            ["fake-ccec"],
+                            "dav-c220-cube",
+                        )
+                self.assertFalse(Path(output_path).exists())
 
     def test_missing_compiler_or_arch_is_rejected(self):
         output_path = os.path.join(self.temp_dir.name, "resource_id.o")
@@ -115,7 +149,6 @@ class TestStaticCompileResourceId(unittest.TestCase):
                         self.object_paths,
                         output_path,
                         compile_command,
-                        ["-DTEST_OPTION"],
                         cce_arch,
                     )
 
