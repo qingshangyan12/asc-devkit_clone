@@ -48,13 +48,7 @@ exclude = [
     "^https://docs\\.docker\\.com/$",
     "^https://docs\\.docker\\.com/reference/cli/docker/buildx/$",
     "^https://ccache\\.dev/documentation\\.html$",
-    "^https://img\\.shields\\.io/badge/asc--tools-repo-6f42c1\\.svg\\?style=flat$",
-    "^https://img\\.shields\\.io/badge/CONTRIBUTING-teal$",
-    "^https://img\\.shields\\.io/badge/docs-community-brightgreen\\.svg\\?style=flat$",
-    "^https://img\\.shields\\.io/badge/docs-repo-blue\\.svg\\?style=flat$",
-    "^https://img\\.shields\\.io/badge/examples-repo-orange\\.svg\\?style=flat$",
-    "^https://img\\.shields\\.io/badge/license-CANN_Open_2\\.0-lightgrey\\.svg$",
-    "^https://img\\.shields\\.io/badge/SIG-ascendc-yellow$",
+    "//img\\.shields\\.io/badge/",
 ]
 
 exclude_path = [
