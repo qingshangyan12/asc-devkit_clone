@@ -428,6 +428,29 @@ __aicore__ inline void MmadSpCal(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int
     }
 }
 
+/*!
+ * \brief Address level entry of LoadDataWithSparse, shared by the LocalTensor path and the bare hardware
+ *        pointer path so that both call exactly the same low level instruction sequence.
+ */
+__aicore__ inline void LoadDataWithSparseCal(
+    __cb__ int8_t* dst, __cbuf__ int8_t* src, __cbuf__ uint8_t* idx, const LoadData2dParams& loadDataParam)
+{
+    if ASCEND_IS_AIC {
+#ifdef ASCENDC_CPU_DEBUG
+        SetIndexMatrix((void*)idx);
+        __cbuf__ int8_t* srcAddr = src;
+#else
+        uint64_t src0tmp = reinterpret_cast<uint64_t>(src);
+        uint64_t src1tmp = reinterpret_cast<uint64_t>(idx);
+        // src[31:0], dense weight matrix addr.
+        // src[63:32], index matrix addr.
+        uint64_t srctmp = (src0tmp & 0xffffffff) | ((src1tmp & 0xffffffff) << 32);
+        __cbuf__ int8_t* srcAddr = reinterpret_cast<__cbuf__ int8_t*>(srctmp);
+#endif
+        load_cbuf_to_cb_sp(dst, srcAddr, loadDataParam.startIndex, loadDataParam.repeatTimes);
+    }
+}
+
 template <
     typename T = int8_t, typename U = uint8_t,
     typename std::enable_if<IsSameType<PrimT<T>, int8_t>::value, bool>::type = true,
@@ -436,21 +459,9 @@ __aicore__ inline void LoadDataWithSparseCal(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<U>& idx,
     const LoadData2dParams& loadDataParam)
 {
-    if ASCEND_IS_AIC {
-#ifdef ASCENDC_CPU_DEBUG
-        SetIndexMatrix((void*)idx.GetPhyAddr());
-        __cbuf__ int8_t* srcAddr = (__cbuf__ int8_t*)src.GetPhyAddr();
-#else
-        uint64_t src0tmp = reinterpret_cast<uint64_t>(src.GetPhyAddr());
-        uint64_t src1tmp = reinterpret_cast<uint64_t>(idx.GetPhyAddr());
-        // src[31:0], dense weight matrix addr.
-        // src[63:32], index matrix addr.
-        uint64_t srctmp = (src0tmp & 0xffffffff) | ((src1tmp & 0xffffffff) << 32);
-        __cbuf__ int8_t* srcAddr = reinterpret_cast<__cbuf__ int8_t*>(srctmp);
-#endif
-        load_cbuf_to_cb_sp(
-            (__cb__ int8_t*)dst.GetPhyAddr(), srcAddr, loadDataParam.startIndex, loadDataParam.repeatTimes);
-    }
+    LoadDataWithSparseCal(
+        (__cb__ int8_t*)dst.GetPhyAddr(), (__cbuf__ int8_t*)src.GetPhyAddr(), (__cbuf__ uint8_t*)idx.GetPhyAddr(),
+        loadDataParam);
 }
 
 template <typename T = int8_t, typename std::enable_if<IsSameType<PrimT<T>, int8_t>::value, bool>::type = true>
