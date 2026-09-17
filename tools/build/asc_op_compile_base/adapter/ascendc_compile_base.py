@@ -156,6 +156,7 @@ def fatbin_objs(obj_files: list, dst_file: str, is_debug: bool, compile_log_path
             compile_command,
             global_var_storage.get_variable("ascendc_compile_options"),
             get_soc_spec(COMPILER_ARCH),
+            compile_log_path,
         )
         global_var_storage.set_variable(
             "ascendc_resource_id_" + os.path.abspath(dst_file), resource_id

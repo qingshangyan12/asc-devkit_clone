@@ -14,7 +14,6 @@
 from contextlib import suppress
 import hashlib
 import os
-import subprocess
 import tempfile
 
 
@@ -40,25 +39,6 @@ def _validate_elf(dynamic_object_path):
         ) from error
     if magic != b"\x7fELF":
         raise ResourceIdError(f"input is not an ELF object: {dynamic_object_path}")
-
-
-def _run_tool(command):
-    try:
-        result = subprocess.run(
-            command,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            check=False,
-            text=True,
-        )
-    except OSError as error:
-        raise ResourceIdError(
-            f"failed to execute compile tool: {command[0]}"
-        ) from error
-    if result.returncode != 0:
-        output = result.stdout.strip()
-        raise ResourceIdError(f"compile tool failed ({command[0]}): {output}")
-    return result.stdout
 
 
 def calculate_resource_id(object_paths):
@@ -89,19 +69,26 @@ def _render_resource_id_source(resource_id):
         '#include "kernel_utils_macros.h"\n'
         '__attribute__((used, section(".ascend.meta")))\n'
         "static const struct BinaryMetaResourceId g_ascend_resource_id_section = "
-        "{{{%d, %d}, {%s}}};\n"
+        "{{%d, %d}, {%s}};\n"
         % (
-            _RESOURCE_ID_VALUE_SIZE,
             _RESOURCE_ID_TYPE,
+            _RESOURCE_ID_VALUE_SIZE,
             value,
         )
     )
 
 
 def generate_resource_id_object(
-    object_paths, output_path, compile_command, compile_options, cce_arch
+    object_paths,
+    output_path,
+    compile_command,
+    compile_options,
+    cce_arch,
+    compile_log_path=None,
 ):
     """Compile the Resource ID into a .ascend.meta metadata object."""
+    from .ascendc_common_utility import CommonUtility, CompileStage
+
     resource_id = calculate_resource_id(object_paths)
     if not compile_command or not all(compile_command) or not cce_arch:
         raise ResourceIdError("compile command and cce arch must be provided")
@@ -119,7 +106,9 @@ def generate_resource_id_object(
         source_fd = None
         with source_file:
             source_file.write(_render_resource_id_source(resource_id))
-        _run_tool(
+        with suppress(FileNotFoundError):
+            os.unlink(output_path)
+        CommonUtility.run_cmd_inner(
             list(compile_command)
             + list(compile_options)
             + [
@@ -132,8 +121,12 @@ def generate_resource_id_object(
                 "-std=c++17",
                 "-o",
                 output_path,
-            ]
+            ],
+            CompileStage.COMPILE,
+            compile_log_path,
         )
+        if not os.path.isfile(output_path):
+            raise ResourceIdError(f"compile resource id object failed: {output_path}")
         return resource_id
     finally:
         for file_descriptor in (source_fd,):
