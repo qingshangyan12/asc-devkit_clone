@@ -47,9 +47,9 @@ YAML front matter 放在 Markdown 文件第一行，以 `---` 包围。只使用
 
 ```yaml
 ---
-type: reference.api.Cpp
+okftype: reference.api.Cpp
 title: asc_div
-resource: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_div.md
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_div.md
 description: 执行矢量除法运算。
 tags:
   - stage:compute
@@ -57,10 +57,7 @@ tags:
   - operation:divide
   - behavior:elementwise
   - pipeline:PIPE_V
-products:
-  A5: unsupported
-  A3: supported
-  A2: supported
+archs: ["3510"]
 signatures:
   - id: asc_div.contiguous
     prototypes:
