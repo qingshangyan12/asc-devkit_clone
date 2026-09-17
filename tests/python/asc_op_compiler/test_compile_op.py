@@ -111,6 +111,9 @@ compile_op_module = importlib.import_module(
 super_kernel_compile_module = importlib.import_module(
     "asc_op_compile_base.asc_op_compiler.super_kernel_op_compile"
 )
+static_compile_resource_id = importlib.import_module(
+    "asc_op_compile_base.asc_op_compiler.static_compile_resource_id"
+)
 from unittest.mock import Mock, patch
 from tempfile import TemporaryDirectory
 
@@ -276,6 +279,26 @@ def compile_manifest_resources(manifest, manifest_dir, source_file_path):
                     output_name = output[len("${output}/") :]
                     if not os.path.isfile(os.path.join(output_root, output_name)):
                         raise AssertionError(f"Manifest output is missing: {output}")
+
+
+def _fake_generate_resource_id_object(
+    object_paths,
+    output_path,
+    compile_command,
+    compile_options,
+    cce_arch,
+    compile_log_path=None,
+):
+    """Stand in for resource ID generation, mirroring the storage write done
+    by fatbin_objs so that attach_resource_id can look the value up."""
+    resource_id = "0" * 64
+    dst_file = output_path
+    if dst_file.endswith(".resource_id.o"):
+        dst_file = dst_file[: -len(".resource_id.o")]
+    global_var_storage.set_variable(
+        "ascendc_resource_id_" + os.path.abspath(dst_file), resource_id
+    )
+    return resource_id
 
 
 class TestCompileOp(unittest.TestCase):
@@ -528,6 +551,13 @@ class TestCompileOp(unittest.TestCase):
                     )
                     mock_link_sk_norm = stack.enter_context(
                         mock.patch.object(compile_op_module, "link_sk_norm_combine")
+                    )
+                    mock_write_resource_id = stack.enter_context(
+                        mock.patch.object(
+                            static_compile_resource_id,
+                            "generate_resource_id_object",
+                            side_effect=_fake_generate_resource_id_object,
+                        )
                     )
                     stack.enter_context(
                         mock.patch.object(compile_op_module, "_json_post_process")

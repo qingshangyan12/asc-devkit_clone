@@ -159,6 +159,7 @@ def fatbin_objs(obj_files: list, dst_file: str, is_debug: bool, compile_log_path
             compile_command,
             global_var_storage.get_variable("ascendc_compile_options"),
             get_soc_spec(COMPILER_ARCH),
+            compile_log_path,
         )
         global_var_storage.set_variable(
             "ascendc_resource_id_" + os.path.abspath(dst_file), resource_id
@@ -167,7 +168,13 @@ def fatbin_objs(obj_files: list, dst_file: str, is_debug: bool, compile_log_path
         raise RuntimeError(
             "generate Resource ID metadata failed: %s" % error
         ) from error
-    obj_files = list(obj_files) + [resource_object]
+    existing_resource_objects = {
+        os.path.abspath(obj) for obj in obj_files if isinstance(obj, str)
+    }
+    if os.path.abspath(resource_object) not in existing_resource_objects:
+        obj_files = list(obj_files) + [resource_object]
+    else:
+        obj_files = list(obj_files)
     compile_cmd = [
         CCECInfo.get_exe("ld.lld"),
         "-m",
