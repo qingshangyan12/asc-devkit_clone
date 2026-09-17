@@ -7,11 +7,7 @@
 ```
 ├── zh                             # 中文文档目录
 │   ├── api                        # API文档目录
-│   ├── contributing               # 代码贡献规范目录（代码风格、接口设计、目录结构、测试等）
-│   │   ├── asc_adv_api_contributing.md    # Ascend C 高阶API贡献指南
-│   │   ├── asc_basic_api_contributing.md  # Ascend C 基础API贡献指南
-│   │   ├── asc_c_api_contributing.md      # Ascend C C API贡献指南
-│   │   └── asc_doc_contributing.md        # Ascend C 资料贡献指南
+│   ├── contributing               # 贡献指南目录（API贡献指南、代码贡献规范等）
 │   ├── figures                    # 图片目录
 │   ├── guide                      # Ascend C 算子开发指南
 │   ├── vitepress                      # 文档构建脚本目录
@@ -19,11 +15,7 @@
 │   ├── asc_how_to_choose_api.md       # Ascend C多层级编程接口选择参考文档
 │   └── quick_start.md                 # 快速入门文档
 ├── en                                 # 英文文档目录
-│   ├── contributing                   # 代码贡献规范目录（代码风格、接口设计、目录结构、测试等）
-│   │   ├── asc_adv_api_contributing.md    # Ascend C 高阶API贡献指南
-│   │   ├── asc_basic_api_contributing.md  # Ascend C 基础API贡献指南
-│   │   ├── asc_c_api_contributing.md      # Ascend C C API贡献指南
-│   │   └── asc_doc_contributing.md        # Ascend C 资料贡献指南
+│   ├── contributing                   # 贡献指南目录（API贡献指南、代码贡献规范等）
 │   ├── asc_doc_design_rules.md        # Ascend C 资料设计规范
 │   ├── asc_how_to_choose_api.md       # Ascend C多层级编程接口选择参考文档
 │   └── quick_start.md                 # 快速入门文档

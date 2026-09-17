@@ -7,7 +7,7 @@ Key directory structure is as follows:
 ```
 ├── zh                             # Chinese documentation directory
 │   ├── api                        # API documentation directory
-│   ├── contributing               # Code contribution standards directory (code style, API design, directory structure, testing, etc.)
+│   ├── contributing               # Contribution guide directory (API contribution guides, code contribution standards, etc.)
 │   ├── figures                    # Image directory
 │   ├── guide                      # Ascend C operator develop guide
 │   ├── vitepress                      # docs build directory
@@ -15,11 +15,7 @@ Key directory structure is as follows:
 │   ├── asc_how_to_choose_api.md       # Ascend C Multi-Level Programming Interface Selection Guide
 │   └── quick_start.md                 # Quick start documentation
 ├── en                                 # English documentation directory
-│   ├── contributing                   # Code contribution standards directory (code style, API design, directory structure, testing, etc.)
-│   │   ├── asc_adv_api_contributing.md    # Ascend C high-level API contribution guide
-│   │   ├── asc_basic_api_contributing.md  # Ascend C basic API contribution guide
-│   │   ├── asc_c_api_contributing.md      # Ascend C C API contribution guide
-│   │   └── asc_doc_contributing.md        # Ascend C documentation contribution guide
+│   ├── contributing                   # Contribution guide directory (API contribution guides, code contribution standards, etc.)
 │   ├── asc_doc_design_rules.md        # Ascend C documentation design rules
 │   ├── asc_how_to_choose_api.md       # Ascend C Multi-Level Programming Interface Selection Guide
 │   └── quick_start.md                 # Quick start documentation
