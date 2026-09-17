@@ -31,7 +31,7 @@ elseif(CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510")
 elseif(CMAKE_ASC_ARCHITECTURES STREQUAL "dav-9201")
     set(NPU_ARCH_ID 9201)
 else()
-    message(FATAL_ERROR "Unsupported CMAKE_ASC_ARCHITECTURES=${CMAKE_ASC_ARCHITECTURES}, only dav-2201 and dav-3510 are supported")
+    message(FATAL_ERROR "Unsupported CMAKE_ASC_ARCHITECTURES=${CMAKE_ASC_ARCHITECTURES}, only dav-2201、dav-3510 and dav-9201 are supported")
 endif()
 
 target_compile_definitions(demo PRIVATE
