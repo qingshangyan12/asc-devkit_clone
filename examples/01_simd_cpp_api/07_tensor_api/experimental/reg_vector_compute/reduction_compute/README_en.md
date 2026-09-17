@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample demonstrates how to use the experimental Tensor APIs `asc::te::experimental::reduce_sum`, `reduce_max`, and `reduce_min` to reduce a `float` Reg Tensor with element scope. Input `src` is a one-dimensional Tensor with shape `[64]`. The three reduction results are written to three 64-element regions in the output Tensor.
+This sample combines the experimental Tensor API register load, element-scope reduction, and store operations to demonstrate `asc::te::experimental::reduce_sum`, `reduce_max`, and `reduce_min`. Input `src` is a one-dimensional `float` Tensor with shape `[64]`. The three reduction results are written to three 64-element regions in the output Tensor.
 
 The computation is as follows:
 
@@ -12,6 +12,8 @@ dst[64]  = max(src[0:64])
 dst[128] = min(src[0:64])
 ```
 
+Only the first element of each result region is valid. The remaining elements are not verified.
+
 ## Supported Products
 
 - Ascend 950PR/Ascend 950DT
@@ -19,27 +21,38 @@ dst[128] = min(src[0:64])
 ## Directory Structure
 
 ```text
-├── CMakeLists.txt                 // Build project
-├── README.md                      // Chinese sample description
-├── README_en.md                   // English sample description
-└── reduction_compute.asc          // Reduction interface sample implementation
+├── CMakeLists.txt          // Build configuration
+├── README.md               // Chinese sample description
+├── README_en.md            // English sample description
+├── data_utils.h            // Host-side binary file helpers
+├── reduction_compute.asc   // Operator kernel, host invocation, and result verification
+└── scripts
+    └── gen_data.py         // Input and golden data generation script
 ```
 
 ## Sample Description
 
 - Sample function:
 
-  The sample moves the input Tensor from GM to UB, loads it into a register using `load`, calls the experimental Reg Tensor reduction APIs to calculate the sum, maximum, and minimum, and writes the three results back to UB and GM using `store`. The default template argument selects `reduce_scope::element`, and each reduction result is stored in the first element of its output region.
+  The sample reads the input from `input/input.bin`, moves the input Tensor from GM to UB, loads it into a register with `load`, and calls the three experimental Reg Tensor reduction APIs. It then uses `store` to write the results back to UB and GM. The host saves the complete output to `output/output.bin` and verifies the valid results against the three values in `output/golden.bin`.
+
+- Sample specifications:
+
+  | File | Content | Size |
+  | --- | --- | --- |
+  | `input/input.bin` | 64 `float` input elements | 256 B |
+  | `output/output.bin` | Three 64-element `float` result regions | 768 B |
+  | `output/golden.bin` | Three `float` values in sum, max, min order | 12 B |
 
 - Sample implementation:
 
   - Key kernel steps
 
-    1. Use `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and `asc::te::make_frame_layout` to construct one-dimensional Tensors in GM and UB.
-    2. Use `asc_lock/asc_unlock` around the MTE2 pipeline and `asc::te::copy` to move the input from GM to UB.
-    3. Use `all_mask` and `load` to load 64 `float` values into a Reg Tensor.
+    1. Use `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and layouts to construct the GM and UB Tensors.
+    2. Wrap the MTE2 pipeline with `asc_lock/asc_unlock`, and use `make_copy(copy_gm_to_ub{})` and `copy` to move the input from GM to UB.
+    3. Use `all_mask<float>` and `load` to load 64 `float` values into a Reg Tensor.
     4. Call `reduce_sum<float>`, `reduce_max<float>`, and `reduce_min<float>` to perform element-scope reductions.
-    5. Use `store` and `asc::te::copy` to write the results back to UB and GM, and verify the three valid results on the host.
+    5. Use `store` to write the three UB result regions, then use `make_copy(copy_ub_to_gm{})` and `copy` to write them back to GM.
 
   The core computation is as follows:
 
@@ -61,38 +74,37 @@ dst[128] = min(src[0:64])
 
 ## Build and Run
 
-Perform the following steps in the sample root directory to build and run the sample.
+This sample has been verified with CANN 9.2.0, `dav-3510`, and NPU simulation mode. Run the following steps from the sample root directory.
 
 - Configure environment variables
-
-  Configure the CANN package environment variables by following the [environment configuration guide](https://gitcode.com/cann/asc-devkit/blob/master/docs/en/quick_start.md).
 
   ```bash
   source ${install_path}/set_env.sh
   ```
 
-  Replace `${install_path}` with the CANN package installation directory.
+  `${install_path}` is the CANN 9.2.0 installation directory, for example `/usr/local/Ascend/cann-9.2.0`.
 
-- Run the sample
+- Build and run
 
   ```bash
   mkdir -p build && cd build
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
   make -j
+  python3 ../scripts/gen_data.py
   ./demo
   ```
 
-  To use NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` option.
+  On a supported NPU system, omit `-DCMAKE_ASC_RUN_MODE=sim` to use the default `npu` mode. Clear the CMake cache in the `build` directory before switching the run mode or chip model.
 
-  Example:
+- Build options
 
-  ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..;make -j; # NPU simulation mode
-  ```
+  | Option | Description |
+  | --- | --- |
+  | `CMAKE_ASC_RUN_MODE` | Operator execution mode: `npu` or `sim`. The default is `npu`. |
+  | `CMAKE_ASC_ARCHITECTURES` | NPU architecture. This sample supports only `dav-3510`. |
+  | `CANN_ASC_USE_EXPERIMENTAL` | Experimental ASC API switch. This sample requires `ON`. |
 
-  > **Note:** Clear the CMake cache before switching build modes. Run `rm CMakeCache.txt` in the `build` directory, and then run CMake again.
-
-- Result
+- Expected result
 
   Successful verification prints:
 
