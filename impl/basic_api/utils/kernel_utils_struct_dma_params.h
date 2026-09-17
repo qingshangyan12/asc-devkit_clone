@@ -144,27 +144,6 @@ struct FixpipeParams {
 
 enum class lut_mode_t { Gelu, Silu, Sigmoid, Tanh };
 
-struct FixPipeConfigParams {
-    __aicore__ FixPipeConfigParams() {}
-
-    __aicore__ FixPipeConfigParams(
-        const uint32_t preReluAddrIn, const uint32_t preQuantAddrIn, const uint32_t postQuantAddrIn,
-        const uint32_t antiquantAddrIn, const uint8_t shiftValueIn)
-        : preReluAddr(preReluAddrIn),
-          preQuantAddr(preQuantAddrIn),
-          postQuantAddr(postQuantAddrIn),
-          antiquantAddr(antiquantAddrIn),
-          shiftValue(shiftValueIn)
-    {}
-
-    uint32_t preReluAddr = 0;
-    uint32_t preQuantAddr = 0;
-    uint32_t postQuantAddr = 0;
-    uint32_t antiquantAddr = 0;
-    uint8_t shiftValue = 0;
-    uint8_t restorationCtrl = 0;
-};
-
 template <typename T = int16_t>
 struct FixPipePreQuantParams {
     __aicore__ FixPipePreQuantParams() {}
