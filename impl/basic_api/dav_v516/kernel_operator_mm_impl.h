@@ -260,7 +260,7 @@ __aicore__ inline void LoadData2DGM2L0BCal(
         decompressMode = 0b0011;
     }
     load_gm_to_cb_2dv2(
-        (__cbuf__ int8_t*)dst, (__gm__ int8_t*)src, loadDataParam.mStartPosition, loadDataParam.kStartPosition,
+        reinterpret_cast<__cbuf__ int8_t*>(dst), reinterpret_cast<__gm__ int8_t*>(src), loadDataParam.mStartPosition, loadDataParam.kStartPosition,
         loadDataParam.dstStride, loadDataParam.mStep, loadDataParam.kStep, 0, decompressMode, 0);
 }
 

@@ -75,7 +75,7 @@ __aicore__ inline void SetConvPadding(const ConvPaddingParams<T>& params)
     SetConvPaddingImpl(params);
 }
 
-// __aicore__ inline void SetFixPipeConfig(const FixPipeConfigBitModeParams& params) { SetFixPipeConfigImpl(params); }
+__aicore__ inline void SetFixPipeConfig(const FixPipeConfigBitModeParams& params) { SetFixPipeConfigImpl(params); }
 
 __aicore__ inline void SetFixPipeConfig(const FixPipeConfigParams& params) { SetFixPipeConfigImpl(params); }
 
