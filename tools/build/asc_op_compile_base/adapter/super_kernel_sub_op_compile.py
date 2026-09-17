@@ -251,6 +251,28 @@ def gen_sub_super_kernel_compile_options(
         == "1"
     ):
         compile_option_tuple.compile_options.append("-D__ASCENDC_SUPER_KERNEL_DEBUG__")
+
+    # DCCI-disable: append -D__ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__ (device 源码 #ifdef 用)，
+    # 与静态 ConvertDcciDisableOnKernel 产出同名宏对齐，补齐动态路径的「device 宏桥」。
+    # 仅当 sp_options["dcci-disable-on-kernel"] 命中当前 kernel 时追加；未命中不改变现有行为/用例。
+    # 注意：gen_gm_get_set_value_dcci_compile_options 对动态 shape 有 early-return，不会走到其内部的
+    # dcci-disable 匹配，故此处（不受 early-return 影响）是动态路径补宏的正确落点。
+    _dcci_disable_patterns = [
+        _p.strip()
+        for _p in compile_info.super_kernel_info["sp_options"]
+        .get("dcci-disable-on-kernel", "")
+        .split(",")
+        if _p.strip()
+    ]
+    _is_sub_combine = get_context().get_addition("super_kernel_sub_combine") is True
+    _match_key = compile_info.kernel_name if _is_sub_combine else compile_info.op_type
+    if _dcci_disable_patterns and match_kernel_name_patern(
+        _match_key, _dcci_disable_patterns, use_regex=_is_sub_combine
+    ):
+        _dcci_macro = "-D__ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__"
+        if _dcci_macro not in compile_option_tuple.compile_options:
+            compile_option_tuple.compile_options.append(_dcci_macro)
+
     stream_fusion_mode = compile_info.super_kernel_info["sp_options"].get(
         "stream-fusion", SuperKernelStreamFusionMode.StreamFusionDisable
     )
