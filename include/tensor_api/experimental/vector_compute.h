@@ -43,6 +43,7 @@
 #include "tensor_api/experimental/arch/vector/compare_and_select.h"
 #include "tensor_api/experimental/arch/vector/reg_data_load.h"
 #include "tensor_api/experimental/arch/vector/reg_data_store.h"
+#include "tensor_api/experimental/arch/vector/unalign.h"
 #endif
 #else
 #if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510))
@@ -61,6 +62,7 @@
 #include "tensor_api/experimental/arch/vector/compare_and_select.h"
 #include "tensor_api/experimental/arch/vector/reg_data_load.h"
 #include "tensor_api/experimental/arch/vector/reg_data_store.h"
+#include "tensor_api/experimental/arch/vector/unalign.h"
 #endif
 #endif
 
