@@ -96,6 +96,7 @@ __simd_callee__ inline void Select(MaskReg& dst, MaskReg& src0, MaskReg& src1, M
 {
     MaskSelImpl(dst, src0, src1, mask);
 }
+#endif
 
 template <HighLowPart part>
 __simd_callee__ inline void Pack(MaskReg& dst, MaskReg& src)
@@ -114,7 +115,6 @@ __simd_callee__ inline MaskReg MoveMask()
 {
     return MoveMaskImpl<T>();
 }
-#endif
 
 #if !(                       \
     defined(__NPU_ARCH__) && \

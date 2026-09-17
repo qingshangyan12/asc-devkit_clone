@@ -43,8 +43,7 @@ __simd_callee__ inline void CastOperator(RegTensor<T>& dstReg, RegTensor<U>& src
         Tuple<half, fp8_e8m0_t>, Tuple<bfloat16_t, fp8_e8m0_t>>();
     constexpr bool ppCondition = SupportType<
         Tuple<T, U>, Tuple<uint32_t, uint8_t>, Tuple<int32_t, int8_t>, Tuple<float, hifloat8_t>,
-        Tuple<float, fp8_e4m3fn_t>, Tuple<float, fp8_e5m2_t>, Tuple<bfloat16_t, fp4x2_e2m1_t>,
-        Tuple<bfloat16_t, fp4x2_e1m2_t>, Tuple<half, int4x2_t>, Tuple<bfloat16_t, int4x2_t>,
+        Tuple<float, fp8_e4m3fn_t>, Tuple<float, fp8_e5m2_t>, Tuple<half, int4x2_t>, Tuple<bfloat16_t, int4x2_t>,
         Tuple<int16_t, int4x2_t>>();
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     if constexpr (partCondition) {
@@ -271,8 +270,6 @@ template <typename T, typename U, RoundMode roundMode, RegLayout layoutMode, Mas
 __simd_callee__ inline void CastOperator(RegTensor<T>& dstReg, RegTensor<U>& srcReg, MaskReg& mask)
 {
     constexpr bool partCondition = SupportType<Tuple<T, U>, Tuple<int32_t, half>>();
-    constexpr bool ppCondition =
-        SupportType<Tuple<T, U>, Tuple<fp4x2_e2m1_t, bfloat16_t>, Tuple<fp4x2_e1m2_t, bfloat16_t>>();
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     constexpr auto roundModeValue = std::integral_constant<::ROUND, GetRound<roundMode>()>();
     if constexpr (partCondition) {
@@ -282,12 +279,8 @@ __simd_callee__ inline void CastOperator(RegTensor<T>& dstReg, RegTensor<U>& src
             "current cast api RegLayout Mode is not supported on current device!");
         constexpr auto partModeValue = std::integral_constant<::Part, static_cast<::Part>(layoutMode)>();
         vcvt(dstReg, srcReg, mask, roundModeValue, partModeValue, modeValue);
-    } else if constexpr (ppCondition) {
-        // vcvt_ff bf162fp4e2m1/bf162fp4e1m2
-        constexpr auto ppModeValue = std::integral_constant<::Part_T, static_cast<::Part_T>(layoutMode)>();
-        vcvt(dstReg, srcReg, mask, roundModeValue, ppModeValue, modeValue);
     } else {
-        static_assert(!(partCondition && ppCondition), "current cast data type is not supported on current device!");
+        static_assert(!partCondition, "current cast data type is not supported on current device!");
     }
 }
 
@@ -374,18 +367,15 @@ __simd_callee__ inline void CastImpl(S& dstReg, V& srcReg, MaskReg& mask)
             SupportEnum<trait.layoutMode, RegLayout::UNKNOWN, RegLayout::ZERO>(),
             "current Cast api only supported MERGING Mode for RegLayout::UNKNOWN/ZERO on current device!");
         static_assert(
-            !(SupportType<ActualT, fp4x2_e2m1_t, fp4x2_e1m2_t, int4x2_t>() ||
-              SupportType<ActualU, fp4x2_e2m1_t, fp4x2_e1m2_t, int4x2_t>()),
-            "current Cast api do not support MERGING Mode for fp4x2_e2m1_t/fp4x2_e1m2_t/int4x2_t on current device!");
+            !(SupportType<ActualT, int4x2_t>() || SupportType<ActualU, int4x2_t>()),
+            "current Cast api do not support MERGING Mode for int4x2_t on current device!");
     }
     constexpr bool layoutMerge = SupportType<
         Tuple<ActualT, ActualU>, Tuple<uint16_t, uint8_t>, Tuple<int16_t, int8_t>, Tuple<uint32_t, uint16_t>,
         Tuple<uint32_t, int16_t>, Tuple<int32_t, int16_t>, Tuple<float, half>, Tuple<float, bfloat16_t>,
         Tuple<half, hifloat8_t>, Tuple<half, uint8_t>, Tuple<half, int8_t>, Tuple<float, int16_t>,
         Tuple<bfloat16_t, fp8_e8m0_t>, Tuple<uint32_t, uint8_t>, Tuple<int32_t, int8_t>, Tuple<float, hifloat8_t>,
-        Tuple<float, fp8_e4m3fn_t>, Tuple<float, fp8_e5m2_t>, Tuple<bfloat16_t, fp4x2_e2m1_t>,
-        Tuple<bfloat16_t, fp4x2_e1m2_t>, Tuple<half, int4x2_t>, Tuple<bfloat16_t, int4x2_t>, Tuple<half, fp8_e8m0_t>,
-        Tuple<int16_t, int4x2_t>>();
+        Tuple<float, fp8_e4m3fn_t>, Tuple<float, fp8_e5m2_t>, Tuple<half, int4x2_t>, Tuple<int16_t, int4x2_t>>();
     constexpr bool satLayMergeCast = SupportType<
         Tuple<ActualT, ActualU>, Tuple<uint8_t, uint16_t>, Tuple<uint8_t, int16_t>, Tuple<uint16_t, uint32_t>,
         Tuple<int16_t, uint32_t>, Tuple<uint16_t, int32_t>, Tuple<int16_t, int32_t>, Tuple<uint8_t, uint32_t>,
@@ -394,12 +384,10 @@ __simd_callee__ inline void CastImpl(S& dstReg, V& srcReg, MaskReg& mask)
         Tuple<ActualT, ActualU>, Tuple<int16_t, float>, Tuple<uint8_t, half>, Tuple<int8_t, half>,
         Tuple<int32_t, bfloat16_t>, Tuple<half, float>, Tuple<bfloat16_t, float>, Tuple<hifloat8_t, half>,
         Tuple<hifloat8_t, float>, Tuple<fp8_e5m2_t, float>, Tuple<fp8_e4m3fn_t, float>, Tuple<int4x2_t, half>,
-        Tuple<fp8_e8m0_t, bfloat16_t>, Tuple<half, fp8_e8m0_t>>();
+        Tuple<fp8_e8m0_t, bfloat16_t>>();
     constexpr bool rndSatMergeCast =
         SupportType<Tuple<ActualT, ActualU>, Tuple<int32_t, float>, Tuple<int16_t, half>, Tuple<half, bfloat16_t>>();
-    constexpr bool rndLayoutMergeCast = SupportType<
-        Tuple<ActualT, ActualU>, Tuple<int32_t, half>, Tuple<fp4x2_e2m1_t, bfloat16_t>,
-        Tuple<fp4x2_e1m2_t, bfloat16_t>>();
+    constexpr bool rndLayoutMergeCast = SupportType<Tuple<ActualT, ActualU>, Tuple<int32_t, half>>();
     constexpr bool rndMergeCast =
         SupportType<Tuple<ActualT, ActualU>, Tuple<half, int16_t>, Tuple<float, int32_t>, Tuple<bfloat16_t, half>>();
     constexpr bool allNotSupport =

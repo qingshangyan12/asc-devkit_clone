@@ -55,6 +55,20 @@ __simd_callee__ inline MaskReg CreateMaskImpl()
     }
     return reg;
 }
+
+template <HighLowPart part = HighLowPart::LOWEST>
+__simd_callee__ inline void MaskPackImpl(MaskReg& dst, MaskReg& src)
+{
+    constexpr auto partValue = std::integral_constant<::HiloPart, static_cast<::HiloPart>(part)>();
+    ppack(dst, src, partValue);
+}
+
+template <HighLowPart part = HighLowPart::LOWEST>
+__simd_callee__ inline void MaskUnPackImpl(MaskReg& dst, MaskReg& src)
+{
+    constexpr auto partValue = std::integral_constant<::HiloPart, static_cast<::HiloPart>(part)>();
+    punpack(dst, src, partValue);
+}
 } // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_REG_COMPUTE_MASKREG_IMPL_H
