@@ -131,10 +131,6 @@ Atlas 推理系列产品AI Core，支持数据类型为：int4b_t、uint8_t、in
     - 特别针对Ascend 950PR/Ascend 950DT，支持的物理存储位置为L1 Buffer（TPosition: A1/B1）。
     <!-- end id21 -->
 
-<!-- npu="950" id22 -->
-- 特别针对Ascend 950PR/Ascend 950DT，设置dstGap参数无效。
-<!-- end id22 -->
-
 ## 关键特性说明
 
 ### 非连续搬入
