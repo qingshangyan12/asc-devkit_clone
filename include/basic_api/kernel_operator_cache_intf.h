@@ -60,26 +60,34 @@ template <typename T, CacheLine entireType, DcciDst dcciDst>
 __aicore__ inline void DataCacheCleanAndInvalid(const LocalTensor<T>& dst);
 
 /*!
- * \brief Generic pointer overload of DataCacheCleanAndInvalid, "entireType + dcciDst" form. The T of an
- *        address-space qualified pointer carries its address space, so `DataCacheCleanAndInvalid<__gm__ float,
- *        ...>(gmPtr)` and `DataCacheCleanAndInvalid<__ubuf__ float, ...>(ubPtr)` select the GM resp. the UB
- *        implementation at compile time.
+ * \brief Pointer overload of DataCacheCleanAndInvalid, "entireType + dcciDst" form. GM or UB.
  *
- *        This single overload deliberately replaces what would otherwise be two overloads (`__gm__ T*` and
- *        `__ubuf__ T*`): the CPU twin-debug framework defines the qualifiers as empty, which would collapse
- *        two such overloads into one and fail to compile.
+ *        Both spaces are accepted because both have a three-argument implementation to dispatch to
+ *        (`DcciGMImpl` / `DcciUBImpl`): this is the overload that carries the `dcciDst` choice, and UB is one of
+ *        its documented values (`CACHELINE_UB`). The operand must therefore be an explicitly qualified pointer.
+ *
+ *        There is deliberately no fallback for an operand whose address space cannot be determined: on this
+ *        toolchain `__gm__` is the *default* address space, so a bare `T*` is indistinguishable from
+ *        `__gm__ T*`, and accepting it would silently assume GM. Such an operand is rejected by SFINAE.
  */
-template <typename T, CacheLine entireType, DcciDst dcciDst>
+template <
+    typename T, CacheLine entireType, DcciDst dcciDst,
+    typename Std::enable_if<
+        DmaAddrSpaceOfV<const T*> == DmaAddrSpace::kGm || DmaAddrSpaceOfV<const T*> == DmaAddrSpace::kUb, bool>::type =
+        true>
 __aicore__ inline void DataCacheCleanAndInvalid(const T* dst);
 
 template <typename T, CacheLine entireType>
 __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst);
 
 /*!
- * \brief Generic pointer overload of DataCacheCleanAndInvalid, "entireType" form. See the overload above for
- *        why a single pointer overload covers both the GM and the UB operand.
+ * \brief Pointer overload of DataCacheCleanAndInvalid, "entireType" form. GM ONLY -- see the overload above.
+ *        The two-argument UB call does not exist, so a UB operand is rejected by SFINAE rather than turned into
+ *        a silent no-op.
  */
-template <typename T, CacheLine entireType>
+template <
+    typename T, CacheLine entireType,
+    typename Std::enable_if<DmaAddrSpaceOfV<const T*> == DmaAddrSpace::kGm, bool>::type = true>
 __aicore__ inline void DataCacheCleanAndInvalid(const T* dst);
 
 __aicore__ inline void ICachePreLoad(const int64_t preFetchLen);

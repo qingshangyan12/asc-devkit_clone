@@ -87,21 +87,33 @@ __aicore__ inline void DataCacheCleanAndInvalid(const LocalTensor<T>& dst)
     DcciUBImpl<T, entireType, dcciDst>(const_cast<__ubuf__ T*>(dst.GetPhyAddr()));
 }
 
-// Pointer form. T is the address-space qualified element type (or a bare element type where the address space
-// is not recoverable, see the kUnknown fallback below), so the address space picks the GM or the UB
-// implementation at compile time. The element type handed to the implementation is stripped of the address
-// space, because Dcci*Impl adds the space itself in its own signature.
-template <typename T, CacheLine entireType, DcciDst dcciDst>
+// Pointer form of the "dcciDst" overload: GM or UB, both of which have a real three-argument implementation.
+//
+// Space handling, and what changed here:
+//   * Both branches are real. `kernel_reg.h` defines a three-argument `DcciGMImpl` and a three-argument
+//     `DcciUBImpl`, so both the GM and the UB operand have somewhere to dispatch to, and the address space is a
+//     genuine compile-time choice (GM vs UB is one of the few distinctions this toolchain does preserve).
+//   * There is NO kUnknown fallback any more. On this toolchain `__gm__` is the DEFAULT address space, so a bare
+//     `T*` is indistinguishable from `__gm__ T*`; a previous revision folded "unknown" into the GM branch, which
+//     silently assumed GM for an operand whose space cannot be verified -- and, because the `const_cast` to
+//     `__gm__ ElemT*` is a cross-address-space cast for a bare pointer, that branch did not even compile when
+//     reached. The space is now constrained by SFINAE, so an unverifiable operand is rejected up front with a
+//     plain "no matching function" instead of failing inside the body.
+//   * The element type handed to the implementation is stripped of its address space, because the `Dcci*Impl`
+//     signatures add the space themselves. T is the pointee, so the strip is applied to `T*`: the pointer form is
+//     the one the address-space patterns can match.
+template <
+    typename T, CacheLine entireType, DcciDst dcciDst,
+    typename Std::enable_if<
+        DmaAddrSpaceOfV<const T*> == DmaAddrSpace::kGm || DmaAddrSpaceOfV<const T*> == DmaAddrSpace::kUb, bool>::type>
 __aicore__ inline void DataCacheCleanAndInvalid(const T* dst)
 {
-    using ElemT = DmaStripAddrSpaceT<T>;
+    using ElemT = DmaStripAddrSpaceT<T*>;
     constexpr DmaAddrSpace space = DmaAddrSpaceOfV<const T*>;
-    if constexpr (space == DmaAddrSpace::kGm || space == DmaAddrSpace::kUnknown) {
+    if constexpr (space == DmaAddrSpace::kGm) {
         DcciGMImpl<ElemT, entireType, dcciDst>(const_cast<__gm__ ElemT*>(dst));
-    } else if constexpr (space == DmaAddrSpace::kUb) {
-        DcciUBImpl<ElemT, entireType, dcciDst>(const_cast<__ubuf__ ElemT*>(dst));
     } else {
-        static_assert(space == DmaAddrSpace::kGm, "DataCacheCleanAndInvalid pointer operand must be GM or UB");
+        DcciUBImpl<ElemT, entireType, dcciDst>(const_cast<__ubuf__ ElemT*>(dst));
     }
 }
 #endif
@@ -116,29 +128,17 @@ __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst)
     DcciGMImpl<T, entireType>(const_cast<__gm__ T*>(dst.GetPhyAddr()));
 }
 
-// Pointer form of the "entireType" overload.
-template <typename T, CacheLine entireType>
+// Pointer form of the "entireType" overload: GM ONLY, for the same reasons documented on the "dcciDst" form
+// above. In particular this is the overload that the documentation describes as GM-only -- the UB flavour of the
+// two-argument call does not exist in `kernel_reg.h`, so a UB operand is rejected by SFINAE rather than silently
+// discarded by a tautological assertion (which is what a previous revision did).
+template <
+    typename T, CacheLine entireType,
+    typename Std::enable_if<DmaAddrSpaceOfV<const T*> == DmaAddrSpace::kGm, bool>::type>
 __aicore__ inline void DataCacheCleanAndInvalid(const T* dst)
 {
-    using ElemT = DmaStripAddrSpaceT<T>;
-    constexpr DmaAddrSpace space = DmaAddrSpaceOfV<const T*>;
-    if constexpr (space == DmaAddrSpace::kGm || space == DmaAddrSpace::kUnknown) {
-        DcciGMImpl<ElemT, entireType>(const_cast<__gm__ ElemT*>(dst));
-    } else if constexpr (space == DmaAddrSpace::kUb) {
-        // The two-argument DcciUBImpl does not exist: the UB flavour of the "entireType" form is only
-        // wired up on the architectures that also provide the three-argument Dcci*Impl family (the
-        // Tensor-only counterpart only declares, and never defines, a LocalTensor operand there).
-        // The condition mentions `space`, keeping the assertion value-dependent, so it only fires for a
-        // UB operand instead of at the definition on the architectures without the UB flavour.
-        static_assert(
-            space != DmaAddrSpace::kUb ||
-                ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) ||
-                 (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) ||
-                 (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)),
-            "DataCacheCleanAndInvalid with a UB pointer operand is not supported on this architecture");
-    } else {
-        static_assert(space == DmaAddrSpace::kGm, "DataCacheCleanAndInvalid pointer operand must be GM or UB");
-    }
+    using ElemT = DmaStripAddrSpaceT<T*>;
+    DcciGMImpl<ElemT, entireType>(const_cast<__gm__ ElemT*>(dst));
 }
 #endif
 
