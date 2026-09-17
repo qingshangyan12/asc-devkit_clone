@@ -21,19 +21,22 @@ try:
     bfloat16 = ml_dtypes.bfloat16
     fp8_e4m3 = ml_dtypes.float8_e4m3fn
     fp8_e5m2 = ml_dtypes.float8_e5m2
-except ImportError:
-    bfloat16 = np.float16
-    fp8_e4m3 = np.uint8
-    fp8_e5m2 = np.uint8
+except ImportError as e:
+    raise SystemExit(
+        "FP8 MX golden requires ml_dtypes==0.2.0 "
+        "(pip install ml_dtypes==0.2.0). Silent uint8 fallback disabled."
+    ) from e
 
 try:
     import en_dtypes
 
     fp4_e1m2 = en_dtypes.float4_e1m2
     fp4_e2m1 = en_dtypes.float4_e2m1
-except ImportError:
-    fp4_e1m2 = np.uint8
-    fp4_e2m1 = np.uint8
+except ImportError as e:
+    raise SystemExit(
+        "FP4 MX golden requires en_dtypes==0.0.4 "
+        "(pip install en_dtypes==0.0.4). Silent uint8 fallback disabled."
+    ) from e
 
 
 def pack_fp4_to_fp4x2(fp4_data):
