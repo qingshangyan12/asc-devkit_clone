@@ -1117,11 +1117,20 @@ template <typename T>
 __aicore__ inline __sync_noalias__ LocalTensor<T> TBuf<pos>::GetWithOffset(uint32_t size, uint32_t bufOffset)
 {
     auto ptr = this->bufStart;
+    uint32_t dataLen;
     if constexpr (IsSameType<PrimT<T>, int4b_t>::value) {
-        ptr->dataLen = size / INT4_TWO;
+        dataLen = size / INT4_TWO;
     } else {
-        ptr->dataLen = size * sizeof(T);
+        dataLen = size * sizeof(T);
     }
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+    ASCENDC_ASSERT((size > 0), { KERNEL_LOG(KERNEL_ERROR, "size should be larger than 0"); });
+    ASCENDC_ASSERT((bufOffset % ONE_BLK_SIZE == 0), { KERNEL_LOG(KERNEL_ERROR, "bufOffset should be 32B aligned"); });
+    ASCENDC_ASSERT(
+        (bufOffset <= bufLen && dataLen <= bufLen - bufOffset),
+        { KERNEL_LOG(KERNEL_ERROR, "data range exceeds TBuf length"); });
+#endif
+    ptr->dataLen = dataLen;
     TBuffAddr addr;
     addr.logicPos = static_cast<uint8_t>(pos);
     addr.bufferHandle = reinterpret_cast<TBufHandle>(ptr);
