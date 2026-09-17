@@ -1,62 +1,52 @@
-# DMA Pointer Tests
+# DMA 指针接口测试
 
-The compile driver instantiates public DMA APIs using the ASC compiler's real GM,
-UB, L1, L0C, Bias and Fixpipe address spaces. These compile checks do not execute
-kernels. Separate runtime executables below check selected device scenarios.
+[English](README_en.md)
 
-Run from the repository root with the CANN environment activated:
+编译驱动使用 ASC 编译器的真实 GM、UB、L1、L0C、Bias 和 Fixpipe 地址空间实例化公共 DMA API。
+编译检查不执行 kernel；下文的独立运行程序验证部分设备场景。
+
+## 编译检查
+
+在仓库根目录激活 CANN 环境后执行：
 
 ```bash
 python3 tests/api/basic_api/dma_pointer/check_dma_pointer.py \
     --compiler bisheng --extras --output /tmp/dma-pointer-results
 ```
 
-The output directory must be new or empty. It contains each generated translation unit, its compiler
-log including the header trace, and `results.json` with exact commands and source
-hashes. Before/after hashes of Basic API headers and the driver detect source
-changes during a run and invalidate the aggregate result. `--rows 21,31 --forms TT,PP`
-selects a smaller diagnostic set; `--jobs 4` opts into compiler concurrency.
-The default uses one compiler worker, and every case has an isolated directory.
+输出目录必须不存在或为空。每例分别保存生成的编译单元、含头文件追踪的编译日志，
+`results.json` 保存准确命令和源码 hash。运行前后检查 Basic API 头文件与驱动的 hash，
+发现源码变化会使汇总结果失效。可用 `--rows 21,31 --forms TT,PP` 选择诊断子集；
+`--jobs 4` 启用并发。默认单编译进程，各例目录独立。
 
-Rows 1 through 44 correspond to the official DMA inventory in order:
-DataCacheCleanAndInvalid (1-3), DataCachePreload (4), DataCopy (5-31),
-DataCopyL1ToUB (32-33), DataCopyPad (34-44). TT is Tensor/Tensor, PP is
-Pointer/Pointer, TP and PT are mixed destination/source forms. Cache APIs use
-T/P. Row 34 uses TensorTrait/primitive padding and tests its TT/TP/PT forms;
-pure pointers erase Trait identity and use the ordinary row 35 entry instead.
-The extra `LP-C05-explicit-trait-pointer` case separately supplies
-`<TensorTrait<float>, float>` to exercise the bridge with two pointers.
+行号 1 至 44 按官方 DMA 清单排列：DataCacheCleanAndInvalid（1-3）、
+DataCachePreload（4）、DataCopy（5-31）、DataCopyL1ToUB（32-33）、DataCopyPad（34-44）。
+TT 为 Tensor/Tensor，PP 为 Pointer/Pointer，TP、PT 分别表示目标/源混合形式；Cache 用 T/P。
+第 34 行使用 TensorTrait/primitive padding，检查 TT/TP/PT；纯指针擦除了 Trait 身份，
+使用普通第 35 行入口。附加 `LP-C05-explicit-trait-pointer` 用例显式指定
+`<TensorTrait<float>, float>`，检查双指针桥接。
 
-The test selects 2201 for historical rows 5, 19, 39-42 and 3510 for other
-rows. A compile result on 2201 does not establish 950 support. In particular,
-the Enhanced routes in rows 6-11 remain unsupported by the 3510 implementation;
-their 3510 tests establish signature binding only.
-Each row tests one selected route and type pair; this is declaration coverage,
-not exhaustive dtype, layout, parameter-boundary or device-route coverage.
+历史行 5、19、39-42 选择 2201，其余选择 3510。2201 编译结果不证明 950 支持。
+特别是行 6-11 的 Enhanced 路由仍不受 3510 实现支持，其 3510 编译检查仅证明签名绑定。
+每行选择一种路由和类型对，只表示声明覆盖，不是全部 dtype、布局、参数边界或设备路由覆盖。
 
-The extra cases check array decay, automatic type deduction, const sources,
-rejection of const destinations, wrong address spaces, ordinary Host pointers,
-mixed element types, SmallC0 template options and invalid Preload offset types.
-A negative case passes only with a constraint/overload diagnostic and a passing
-positive control. Include failures are not accepted as successful negatives.
+附加用例检查数组退化、自动类型推导、const 源、const 目标拒绝、错误地址空间、普通 Host 指针、
+混合元素类型、SmallC0 模板选项和非法 Preload offset 类型。负例必须出现约束/重载诊断，
+且正向对照通过；头文件加载失败不能当作负例通过。
 
-Each case includes its corresponding standalone public DMA header and uses the supported
-`ASCENDC_DUMP=0` build setting and verifies their worktree paths in `-H` output.
-It rejects installed-SDK Basic API headers in the trace. Add `--umbrella` to
-check the full `kernel_operator.h` graph. The default does not replace the
-official Header Checker, debug-enabled builds or repository test parts.
+每例包含对应的独立公共 DMA 头文件，使用支持的 `ASCENDC_DUMP=0`，
+并核验 `-H` 输出中的 worktree 路径，拒绝已安装 SDK 的 Basic API 头文件。
+`--umbrella` 可检查完整 `kernel_operator.h` 包含图。
+默认检查不能替代官方 Header Checker、启用调试的构建或仓库完整测试分组。
 
-The CPU test `test_dma_pointer_cache_compat.cpp` is discovered by the existing
-950 AIV_BASIC source glob (`basic_test_four`). It checks the old public Tensor
-Preload wrapper's offset type and pointer forwarding with mockcpp, including
-indexed tensors and const handles. Pointer overloads are excluded in CPU Debug
-because Host address spaces are erased. CPU mocks do not validate NPU cache
-effects.
+CPU 测试 `test_dma_pointer_cache_compat.cpp` 由现有 950 AIV_BASIC 源码 glob
+（`basic_test_four`）发现。它使用 mockcpp 检查旧 Tensor Preload 包装的 offset 类型和指针转发，
+包含索引 Tensor 和 const 句柄。CPU Debug 擦除 Host 地址空间，因而排除 Pointer 重载；
+CPU mock 不验证 NPU cache 效果。
 
-## Runtime Smoke Test
+## 搬运运行测试
 
-Build the runtime test with the CANN ASC CMake package available in the active
-environment:
+确保当前环境可以找到 CANN ASC CMake 包，执行：
 
 ```bash
 cmake -S tests/api/basic_api/dma_pointer -B /tmp/dma-pointer-runtime-build
@@ -66,15 +56,12 @@ cmake --build /tmp/dma-pointer-runtime-build -j2
 /tmp/dma-pointer-runtime-build/dma_pointer_l1toub --device DEVICE_ID
 ```
 
-Replace `DEVICE_ID` with an explicitly selected available device. If CMake
-cannot locate ASC, pass `-DASC_DIR=<CANN package>/lib64/cmake` using the active
-installation's actual path. The target defaults to `dav-3510`, uses standalone
-public DMA/synchronization headers, and prioritizes this worktree's headers
-with `-iquote`. It uses `ASCENDC_DUMP=0`; this does not validate debug-enabled
-builds or replace the complete Header Checker.
+将 `DEVICE_ID` 替换为明确选定的空闲设备。若 CMake 无法定位 ASC，按实际安装位置传入
+`-DASC_DIR=<CANN package>/lib64/cmake`。目标默认 `dav-3510`，使用独立公共 DMA/同步头文件，
+通过 `-iquote` 优先使用当前 worktree 头文件。`ASCENDC_DUMP=0` 不验证调试构建，
+也不替代完整 Header Checker。
 
-For a `dav-2201` device, select the architecture explicitly and use a separate
-build directory:
+对 `dav-2201` 设备须显式指定架构并使用独立构建目录：
 
 ```bash
 cmake -S tests/api/basic_api/dma_pointer -B /tmp/dma-pointer-runtime-2201 \
@@ -83,61 +70,47 @@ cmake --build /tmp/dma-pointer-runtime-2201 -j2
 /tmp/dma-pointer-runtime-2201/dma_pointer_runtime --device DEVICE_ID
 ```
 
-The selected CANN compiler must support the worktree baseline and target.
-Results on `dav-2201` do not establish 950 behavior; record the actual device,
-compiler and executable hash with each run. The runtime scenarios use Normal
-padding only and do not require the 950-only Compact mode.
+所选 CANN 编译器必须支持当前仓库基线和目标架构。2201 结果不证明 950 行为；
+每次运行记录真实设备、编译器及可执行文件 hash。运行场景仅用 Normal padding，
+不依赖 950 专属 Compact 模式。
 
-The transfer runner executes 240 cases: lengths 1, 5, 8, 16, 20, 31, 32, 59,
-1024 and 2048, three rounds with changed deterministic inputs, count and
-nonaligned Pad transfers, and TT/PP/TP/PT forms. It compares every
-output uint32 exactly with a host oracle and the corresponding Tensor result.
-UB/GM canaries and defined padding are checked. ACL initialization, allocation,
-copies, synchronization, and cleanup errors cause a nonzero exit status.
-The kernel initializes SoC state explicitly and serializes guard initialization
-and input DMA with a MTE2 barrier because their destinations overlap. It also
-completes its pending pipelines before its local array expires;
-the API adapters themselves retain asynchronous semantics.
+搬运程序执行 240 例：长度 1、5、8、16、20、31、32、59、1024、2048，
+三轮变化的确定性输入，count 和非对齐 Pad 搬运，TT/PP/TP/PT 四种形式。
+输出 uint32 与 Host oracle 及对应 Tensor 结果逐位精确比较，同时检查 UB/GM 保护区和已定义 padding。
+ACL 初始化、分配、复制、同步或清理出错均以非零状态退出。
+kernel 显式初始化 SoC 状态，用 MTE2 barrier 串行化目标重叠的保护区初始化和输入 DMA，
+并在局部数组生命周期结束前完成待处理流水；API 适配器自身保留异步语义。
 
-When no device is available, the same executable can be attempted with the
-950 simulator. Use the `dav-3510` build; the simulator requires device 0:
+无设备时可尝试 950 simulator，使用 `dav-3510` 构建且设备号为 0：
 
 ```bash
 cannsim record /tmp/dma-pointer-runtime-build/dma_pointer_runtime \
     -s Ascend950 -o /tmp/dma-pointer-simulator -u '--device 0'
 ```
 
-Use fresh build/evidence directories for independent runs. A successful build
-does not establish runtime correctness. Runtime success requires process exit
-0 and `ALL_PASS cases=240 comparison=exact_u32_with_canaries_and_tensor_diff`; interrupted or
-incomplete simulator output must not be counted as passing. This smoke test
-does not establish full 44-overload device coverage or performance.
+独立运行使用全新构建/证据目录。构建成功不证明运行正确；搬运通过必须同时满足退出码 0 和
+`ALL_PASS cases=240 comparison=exact_u32_with_canaries_and_tensor_diff`。
+中断或不完整的 simulator 输出不能计为通过；本测试不证明全部 44 重载设备覆盖或性能。
 
-## Cache Runtime Test
+## Cache 运行测试
 
-`dma_pointer_cache` uses an explicitly Vector kernel and runs 48 cases across
-three changed-input rounds. It checks the GM three-template and two-template
-DCCI overloads, UB DCCI, and Preload with int16/int64 offsets 0/64, using
-Tensor/Pointer forms and SINGLE/ENTIRE cache modes where applicable.
-Scalar writes are flushed before observation; the host checks uint64 payload,
-prefix/suffix guards and Tensor/Pointer equality. Success requires exit 0 and
-`ALL_PASS cases=48 comparison=exact_u64_cache_visibility`.
+`dma_pointer_cache` 使用显式 Vector kernel，在三轮变化输入下执行 48 例。
+覆盖 GM 三模板参数和二模板参数 DCCI、UB DCCI、int16/int64 offset 0/64 的 Preload，
+以及适用的 Tensor/Pointer 和 SINGLE/ENTIRE 模式。
+标量写入在观察前刷出，Host 检查 uint64 内容、前后保护区及 Tensor/Pointer 一致性。
+通过必须满足退出码 0 和 `ALL_PASS cases=48 comparison=exact_u64_cache_visibility`。
 
-The UB case first initializes backing memory to a different payload, so data from
-a preceding test cannot mask a missing writeback. This suite checks the stated
-cache visibility/use scenarios, not cache hit rates or performance.
+UB 场景先用不同内容初始化后备存储，防止前一例残留数据掩盖写回缺失。
+该测试检查指定 cache 可见性/使用场景，不测命中率或性能。
 
-## L1ToUB Runtime Test
+## L1ToUB 运行测试
 
-`dma_pointer_l1toub` runs a Mix1:2 kernel using the documented AIC MTE1 producer and
-mode2 cross-core completion flag. Both AIVs consume the notification, and only the
-selected AIV copies its UB data back. There are 48 cases: three input rounds,
-subBlockId 0/1, count/strided Params, and TT/PP/TP/PT forms.
+`dma_pointer_l1toub` 运行 Mix1:2 kernel，使用文档定义的 AIC MTE1 producer 和
+mode2 跨核完成通知。两个 AIV 都消费通知，仅所选 AIV 将其 UB 内容写回。
+共 48 例：三轮输入、subBlockId 0/1、count/带 stride 的 Params、TT/PP/TP/PT。
 
-Before each tested transfer, the old Tensor path fills the selected peer UB with
-canary data and completes MTE1. The test then observes the whole UB payload,
-including strided holes, plus GM guards and the unselected peer's output slot.
-Success requires exit 0 and `L1TOUB_RUNTIME_PASS cases=48`.
+每次待测搬运前，旧 Tensor 路径填充所选 peer UB 的保护值并完成 MTE1。
+随后观察完整 UB 内容（包括 stride 空隙）、GM 保护区和未选 peer 的输出槽。
+通过必须满足退出码 0 和 `L1TOUB_RUNTIME_PASS cases=48`。
 
-The Cache and L1ToUB runtime targets are built only for dav-3510. These scenarios
-do not replace the complete DMA route/dtype/layout matrix or performance testing.
+Cache 和 L1ToUB 运行目标仅为 dav-3510 构建，不替代完整 DMA 路由/dtype/布局矩阵或性能测试。
