@@ -2120,21 +2120,49 @@ __aicore__ inline void DataCopyPtrLocal2Local(const DstT& dst, const SrcT& src, 
                 GetPositionDisplay(GetDmaOperandPosition(dst)));
         }
     } else {
-        // Source must be UB whenever it is a pointer: both supported directions start at UB.
+        // Compile-time mirror of the Tensor local->local direction matrix, restricted to the directions the
+        // DMA book covers (`GM/UB/L1`). The Tensor dispatcher below is written as a runtime chain of
+        // position checks, so the pointer form translates it into `if constexpr` + `static_assert`:
+        //
+        //   in scope and supported by the Tensor path   -> must compile here too
+        //     UB -> UB    (CopyUB2UB)
+        //     UB -> L1    (DataCopyUB2L1Impl)
+        //     L1 -> UB    (DataCopyL12UBImpl)
+        //   not supported by the Tensor path            -> rejected here (no implementation to call)
+        //     L1 -> L1    (the Tensor dispatcher has no L1 destination branch)
+        //   supported by the Tensor path but OUT OF BOOK -> rejected here
+        //     L1 -> C2 / C2PIPE2GM   (`SplitBias`-style BIAS / FIXBUF copies; the book covers only GM/UB/L1)
+        //
+        // The two source spaces are listed explicitly. This is not a narrowing of the Tensor path: every
+        // in-scope direction the Tensor form can reach is reachable here, and the rejections match what the
+        // Tensor form itself does or what the book excludes.
         static_assert(
-            DmaHardwarePosV<SrcT> == Hardware::UB,
-            "DataCopy local->local pointer src must be UB(VECIN/VECCALC/VECOUT)");
-        if constexpr (DmaHardwarePosV<DstT> == Hardware::UB) {
-            // ub -> ub
-            DataCopyPtrInternal::CopyUB2UB<PrimType>(dst, src, repeatParams);
-        } else if constexpr (DmaHardwarePosV<DstT> == Hardware::L1) {
-            // ub -> l1
-            DataCopyUB2L1Impl(
-                (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), repeatParams);
+            DmaHardwarePosV<SrcT> == Hardware::UB || DmaHardwarePosV<SrcT> == Hardware::L1,
+            "DataCopy local->local pointer src must be UB(VECIN/VECCALC/VECOUT) or L1 Buffer(A1/B1/C1)");
+        if constexpr (DmaHardwarePosV<SrcT> == Hardware::UB) {
+            if constexpr (DmaHardwarePosV<DstT> == Hardware::UB) {
+                // ub -> ub
+                DataCopyPtrInternal::CopyUB2UB<PrimType>(dst, src, repeatParams);
+            } else if constexpr (DmaHardwarePosV<DstT> == Hardware::L1) {
+                // ub -> l1
+                DataCopyUB2L1Impl(
+                    (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), repeatParams);
+            } else {
+                static_assert(
+                    DmaHardwarePosV<DstT> == Hardware::UB || DmaHardwarePosV<DstT> == Hardware::L1,
+                    "DataCopy local->local pointer with a UB src: dst must be UB(VECCALC/VECOUT) or L1 Buffer");
+            }
         } else {
-            static_assert(
-                DmaHardwarePosV<DstT> == Hardware::UB || DmaHardwarePosV<DstT> == Hardware::L1,
-                "DataCopy local->local pointer dst must be UB(VECCALC/VECOUT) or L1");
+            if constexpr (DmaHardwarePosV<DstT> == Hardware::UB) {
+                // l1 -> ub
+                DataCopyL12UBImpl<PrimType>(
+                    (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), repeatParams);
+            } else {
+                static_assert(
+                    DmaHardwarePosV<DstT> == Hardware::UB,
+                    "DataCopy local->local pointer with an L1 src: only L1->UB is in scope. L1->L1 has no "
+                    "implementation on the Tensor path either, and L1->C2/C2PIPE2GM lies outside the DMA book");
+            }
         }
     }
 }
