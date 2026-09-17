@@ -85,7 +85,6 @@ class ManifestInputSnapshot:
     tiling_info: object
     workspace_idx: int
     sk_compile_info: Optional[object] = None
-    sk_cap_bitmap: Optional[int] = None
     constant_infos: Optional[Tuple[ConstantInfoRecord, ...]] = None
     constant_info_size_by_tiling_key: Optional[dict] = None
 
@@ -383,8 +382,32 @@ def _normalize_source_include_options(argv, source_file_path, replacement, inser
     return normalized
 
 
-def _static_bind_source(pairs, basic_attribute, sk_attribute, cap_bitmap):
-    lines = ['#include "kernel_operator.h"']
+def gen_sk_bind_source(pairs, basic_attribute, sk_attribute):
+    """Keep DCCI capability selectable when recorded sources are specialized.
+
+    Capability bits are controlled by compile-time macros.
+    """
+    lines = [
+        '#include "kernel_operator.h"',
+        "#ifdef __ASCENDC_ENABLE_WAIT_PRE_TASK_END",
+        "#define __ASCENDC_SK_CAP_WAIT_FLAG__ 1ULL",
+        "#else",
+        "#define __ASCENDC_SK_CAP_WAIT_FLAG__ 0ULL",
+        "#endif",
+        "#ifdef __ASCENDC_ENABLE_SET_NEXT_TASK_START",
+        "#define __ASCENDC_SK_CAP_SET_FLAG__ 2ULL",
+        "#else",
+        "#define __ASCENDC_SK_CAP_SET_FLAG__ 0ULL",
+        "#endif",
+        "#ifndef __ASCENDC_SUPER_KERNEL_DISABLE_DCCI__",
+        "#define __ASCENDC_SUPER_KERNEL_DISABLE_DCCI__ 0",
+        "#endif",
+    ]
+    capability = (
+        "(__ASCENDC_SK_CAP_WAIT_FLAG__ | "
+        "__ASCENDC_SK_CAP_SET_FLAG__ | "
+        "(__ASCENDC_SUPER_KERNEL_DISABLE_DCCI__ ? 4ULL : 0ULL))"
+    )
     for basic_symbol, sk_symbol in pairs:
         lines.extend(
             [
@@ -393,7 +416,7 @@ def _static_bind_source(pairs, basic_attribute, sk_attribute, cap_bitmap):
                 f'extern "C" {sk_attribute} void {sk_symbol}_split1();',
                 f'extern "C" {sk_attribute} void {sk_symbol}_split2();',
                 f'extern "C" {sk_attribute} void {sk_symbol}_split3();',
-                f"SK_BIND({basic_symbol}, {cap_bitmap}, {sk_symbol}, "
+                f"SK_BIND({basic_symbol}, {capability}, {sk_symbol}, "
                 f"{sk_symbol}_split1, {sk_symbol}_split2, {sk_symbol}_split3);",
             ]
         )
@@ -737,8 +760,8 @@ class ManifestPackageWriter:
         bind_logical = _add_resource(
             self._resources,
             "src/" + bind_name,
-            content=_static_bind_source(
-                bind_pairs, basic_attribute or sk_attribute, sk_attribute, self._snapshot.sk_cap_bitmap
+            content=gen_sk_bind_source(
+                bind_pairs, basic_attribute or sk_attribute, sk_attribute,
             ),
         )
         output_name = f"{kernel.kernel_name}.sk_bind.o"
@@ -850,7 +873,6 @@ class KernelSpecCompilation:
         self.basic_compile_info = compile_info
         self.kernel_spec_dir = context.get_addition("kernel_spec_dir")
         self.resource_id = None
-        self.sk_cap_bitmap = None
         self._cleaned = False
         # Save process-global SK state before the record-only replay changes it.
         self._global_state = {name: global_var_storage.get_variable(name) for name in self._GLOBAL_STATE_NAMES}
@@ -920,9 +942,6 @@ class KernelSpecCompilation:
         global_var_storage.set_variable("ascendc_sk_sub_combine_norm_workflow", False)
         return True
 
-    def finish_sk_recording(self, sk_cap_bitmap):
-        self.sk_cap_bitmap = sk_cap_bitmap
-
     def publish_manifest(self, tiling_info, workspace_idx):
         if not self.enabled:
             return
@@ -938,7 +957,6 @@ class KernelSpecCompilation:
                     tiling_info=tiling_info,
                     workspace_idx=workspace_idx,
                     sk_compile_info=self.sk_compile_info,
-                    sk_cap_bitmap=self.sk_cap_bitmap,
                 )
             ).write()
         except ManifestGenerationError as error:
