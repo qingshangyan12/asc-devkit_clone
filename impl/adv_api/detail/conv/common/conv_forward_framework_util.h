@@ -16,7 +16,11 @@
 #ifndef API_CONV2D_FRAMEWORK_H
 #define API_CONV2D_FRAMEWORK_H
 
+#if defined(ASCENDC_CANN) && (ASCENDC_CANN == 0)
+#include "../../../../tikcfw/impl/kernel_utils.h"
+#else
 #include "../../../../basic_api/kernel_utils.h"
+#endif
 
 #define CONV_DECLARE_REG_IMPL(MEMBER, args...)                                                           \
     namespace __AuxCheckImpl {                                                                           \

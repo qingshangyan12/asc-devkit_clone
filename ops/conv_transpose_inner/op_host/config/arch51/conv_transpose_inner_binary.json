@@ -1,0 +1,254 @@
+{
+  "op_type": "ConvTransposeInner",
+  "op_list": [
+    {
+      "bin_filename": "ConvTransposeInner_default",
+      "inputs": [
+        {
+          "name": "input_size",
+          "index": 0,
+          "dtype": "int64",
+          "format": "ND",
+          "paramType": "required",
+          "shape": [
+            -2
+          ]
+        },
+        {
+          "name": "x",
+          "index": 1,
+          "dtype": "float16",
+          "format": "NC1HWC0",
+          "paramType": "required",
+          "shape": [
+            -2
+          ]
+        },
+        {
+          "name": "filter",
+          "index": 2,
+          "dtype": "float16",
+          "format": "FRACTAL_Z",
+          "paramType": "required",
+          "shape": [
+            -2
+          ]
+        },
+        {
+          "name": "bias",
+          "index": 3,
+          "dtype": "float16",
+          "format": "ND",
+          "paramType": "optional",
+          "shape": [
+            -2
+          ]
+        },
+        {
+          "name": "pre_quant",
+          "index": 4,
+          "dtype": "uint64",
+          "format": "ND",
+          "paramType": "optional",
+          "shape": [
+            -2
+          ]
+        },
+        {
+          "name": "pre_relu",
+          "index": 5,
+          "dtype": "uint32",
+          "format": "ND",
+          "paramType": "optional",
+          "shape": [
+            -2
+          ]
+        },
+        {
+          "name": "pre_clip_relu",
+          "index": 6,
+          "dtype": "uint64",
+          "format": "ND",
+          "paramType": "optional",
+          "shape": [
+            -2
+          ]
+        },
+        {
+          "name": "eltwise",
+          "index": 7,
+          "dtype": "float16",
+          "format": "NC1HWC0",
+          "paramType": "optional",
+          "shape": [
+            -2
+          ]
+        },
+        {
+          "name": "anti_quant",
+          "index": 8,
+          "dtype": "uint64",
+          "format": "ND",
+          "paramType": "optional",
+          "shape": [
+            -2
+          ]
+        },
+        {
+          "name": "post_quant",
+          "index": 9,
+          "dtype": "uint64",
+          "format": "ND",
+          "paramType": "optional",
+          "shape": [
+            -2
+          ]
+        },
+        {
+          "name": "post_relu",
+          "index": 10,
+          "dtype": "uint32",
+          "format": "ND",
+          "paramType": "optional",
+          "shape": [
+            -2
+          ]
+        },
+        {
+          "name": "post_clip_relu",
+          "index": 11,
+          "dtype": "uint64",
+          "format": "ND",
+          "paramType": "optional",
+          "shape": [
+            -2
+          ]
+        },
+        {
+          "name": "padding",
+          "index": 12,
+          "dtype": "float16",
+          "format": "ND",
+          "paramType": "optional",
+          "shape": [
+            -2
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "y",
+          "index": 0,
+          "dtype": "float16",
+          "format": "NC1HWC0",
+          "paramType": "required",
+          "shape": [
+            -2
+          ]
+        }
+      ],
+      "attrs": [
+        {
+          "name": "strides",
+          "dtype": "listInt",
+          "value": [
+            1,
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "pads",
+          "dtype": "listInt",
+          "value": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "dilations",
+          "dtype": "listInt",
+          "value": [
+            1,
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "groups",
+          "dtype": "int",
+          "value": 1
+        },
+        {
+          "name": "data_format",
+          "dtype": "str",
+          "value": "NCHW"
+        },
+        {
+          "name": "output_padding",
+          "dtype": "listInt",
+          "value": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "offset_x",
+          "dtype": "int",
+          "value": 0
+        },
+        {
+          "name": "fusion_mode",
+          "dtype": "int",
+          "value": 0
+        },
+        {
+          "name": "y_quant_mode",
+          "dtype": "int",
+          "value": 0
+        },
+        {
+          "name": "pad_mode",
+          "dtype": "str",
+          "value": "SPECIFIC"
+        },
+        {
+          "name": "pre_dtype",
+          "dtype": "int",
+          "value": -1
+        },
+        {
+          "name": "post_dtype",
+          "dtype": "int",
+          "value": -1
+        },
+        {
+          "name": "pre_relu_mode",
+          "dtype": "str",
+          "value": "no"
+        },
+        {
+          "name": "post_relu_mode",
+          "dtype": "str",
+          "value": "no"
+        },
+        {
+          "name": "eltwise_op",
+          "dtype": "str",
+          "value": "no"
+        },
+        {
+          "name": "bit_mask",
+          "dtype": "int",
+          "value": 0
+        }
+      ]
+    }
+  ]
+}

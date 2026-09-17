@@ -16,7 +16,11 @@
 #ifndef API_CONV_UTIL_H
 #define API_CONV_UTIL_H
 
+#if defined(ASCENDC_CANN) && (ASCENDC_CANN == 0)
+#include "../../../../tikcfw/impl/kernel_utils.h"
+#else
 #include "../../../../basic_api/kernel_utils.h"
+#endif
 
 namespace ConvApi {
 constexpr static uint32_t K0_BIAS = 8;

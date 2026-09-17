@@ -16,8 +16,13 @@
 #ifndef API_CONV_COMMON_H
 #define API_CONV_COMMON_H
 
+#if defined(ASCENDC_CANN) && (ASCENDC_CANN == 0)
+#include "../../../lib/matmul/matmul_tiling_base.h"
+#include "../../../lib/conv/common/conv_common.h"
+#else
 #include "../../../../../include/adv_api/matmul/matmul_tiling_base.h"
 #include "../../../../../include/adv_api/conv/common/conv_common.h"
+#endif
 
 namespace ConvCommonApi {
 using matmul_tiling::TPosition;
