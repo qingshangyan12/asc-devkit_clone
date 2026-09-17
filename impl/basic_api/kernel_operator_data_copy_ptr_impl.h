@@ -29,6 +29,17 @@
 #include "kernel_utils_underlying_ptr.h"
 #include "kernel_operator_data_copy_intf_impl.h"
 
+/*
+ * 地址空间限定符仅在设备编译器（ccec，定义 __CCE__）下真实生效；宿主机侧这些宏展开为空，
+ * 仅按地址空间区分的同形重载会塌缩为同一签名。与 ptr_intf.h 保持一致：
+ * 宿主机侧每组同形重载仅保留一个代表（GM -> UB 搬入方向），其余方向为设备编译专用。
+ */
+#if defined(__CCE__)
+#ifndef ASCENDC_PTR_AS_REAL
+#define ASCENDC_PTR_AS_REAL 1
+#endif
+#endif
+
 namespace AscendC {
 /* **************************************************************************************************
  * DataCopy 指针化扩展（Pointer 输入）                                        *
@@ -185,12 +196,13 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(__ubuf__ T* dst, __gm__ T* 
     DataCopy(dst, src, intriParams);
 }
 
+#if defined(ASCENDC_PTR_AS_REAL)
 /*
  * @ingroup DataCopy Level 0
  * @brief datacopy from src to dst, applicable to vector data（GM -> L1 指针入参版本）
  */
 template <typename T>
-__aicore__ inline __inout_pipe__(MTE2)
+__aicore__ inline __inout_pipe__(MTE2) void
     DataCopy(__cbuf__ T* dst, __gm__ T* src, const DataCopyParams& repeatParams)
 {
     auto dstPtr = GetUnderlyingPtr(dst);
@@ -202,13 +214,16 @@ __aicore__ inline __inout_pipe__(MTE2)
     DataCopyGM2L1Impl(dstPtr, srcPtr, repeatParams);
 #endif
 }
+#endif
 
 /*
  * @ingroup DataCopy Level 0
  * @brief format transform(such as nd2nz) during data load from OUT to L1（GM -> L1 指针入参版本）
+ * @par 说明：与 GM -> UB Nd2Nz 版仅地址空间限定不同，宿主机侧塌缩为同签名且无法偏序，设备编译专用。
  */
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || \
     (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
+#if defined(ASCENDC_PTR_AS_REAL)
 template <typename T, bool enableSmallC0>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     __cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
@@ -225,6 +240,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     DataCopyGM2L1ND2NZImpl(dstPtr, srcPtr, intriParams, cacheMode);
 #endif
 }
+#endif
 #endif
 
 /*
@@ -244,6 +260,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
 }
 #endif
 
+#if defined(ASCENDC_PTR_AS_REAL)
 /*
  * @ingroup DataCopy
  * @brief datacopy from src to dst, applicable to cube data（GM -> L1 指针入参版本）
@@ -261,7 +278,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(__cbuf__ T* dst, __gm__ T* 
  * @brief datacopy from src to dst, applicable to vector data（UB -> GM 指针入参版本）
  */
 template <typename T>
-__aicore__ inline __inout_pipe__(MTE3)
+__aicore__ inline __inout_pipe__(MTE3) void
     DataCopy(__gm__ T* dst, __ubuf__ T* src, const DataCopyParams& repeatParams)
 {
     auto dstPtr = GetUnderlyingPtr(dst);
@@ -285,7 +302,9 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(__gm__ T* dst, __ubuf__ T* 
     DataCopyCheck<T>(count, repeatParams);
     DataCopy(dst, src, repeatParams);
 }
+#endif
 
+#if defined(ASCENDC_PTR_AS_REAL)
 /*
  * @ingroup DataCopy Level 1
  * @brief datacopy from src to dst（UB -> GM SliceInfo 指针入参版本）
@@ -359,6 +378,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(__gm__ T* dst, __ubuf__ T* 
         }
     }
 }
+#endif
 
 /*
  * @ingroup DataCopy Level 2
@@ -379,6 +399,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
 #endif
 }
 
+#if defined(ASCENDC_PTR_AS_REAL)
 /*
  * @ingroup DataCopy
  * @brief datacopy from src to dst, applicable to cube data（UB -> GM 指针入参版本）
@@ -396,7 +417,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(__gm__ T* dst, __ubuf__ T* 
  * @brief datacopy from src to dst, applicable to vector data（L1 -> GM 指针入参版本）
  */
 template <typename T>
-__aicore__ inline __inout_pipe__(MTE3)
+__aicore__ inline __inout_pipe__(MTE3) void
     DataCopy(__gm__ T* dst, __cbuf__ T* src, const DataCopyParams& repeatParams)
 {
     auto dstPtr = GetUnderlyingPtr(dst);
@@ -452,11 +473,13 @@ __aicore__ inline void DataCopy(__cbuf__ T* dst, __ubuf__ T* src, const Nd2NzPar
     auto srcPtr = GetUnderlyingPtr(src);
     DataCopyUB2L1ND2NZImpl(dstPtr, srcPtr, intriParams);
 }
+#endif
 
 /*
  * @ingroup DataCopy Level 0
  * @brief datacopy from src to dst, applicable to vector data（UB -> UB 指针入参版本）
  */
+#if defined(ASCENDC_PTR_AS_REAL)
 template <typename T>
 __aicore__ inline void DataCopy(__ubuf__ T* dst, __ubuf__ T* src, const DataCopyParams& repeatParams)
 {
@@ -484,6 +507,7 @@ __aicore__ inline void DataCopy(__ubuf__ T* dst, __ubuf__ T* src, const uint32_t
     repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(T));
     DataCopy(dst, src, repeatParams);
 }
+#endif
 
 /*
  * @ingroup DataCopy Level 0
@@ -502,6 +526,7 @@ __aicore__ inline void DataCopy(__gm__ T* dst, __cc__ U* src, const DataCopyCO12
 #endif
 }
 
+#if defined(ASCENDC_PTR_AS_REAL)
 /*
  * @ingroup DataCopy Level 0
  * @brief datacopy from L0C to L1（L0C -> L1 指针入参版本）
@@ -513,6 +538,7 @@ __aicore__ inline void DataCopy(__cbuf__ T* dst, __cc__ U* src, const DataCopyCO
     auto srcPtr = GetUnderlyingPtr(src);
     DataCopyL0C2L1Impl(dstPtr, srcPtr, intriParams);
 }
+#endif
 
 /*
  * @ingroup DataCopy Level 0
@@ -580,6 +606,7 @@ __aicore__ inline void DataCopy(__cbuf__ T* dst, __cbuf__ U* src, const DataCopy
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || \
      (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161) || \
      (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+#if defined(ASCENDC_PTR_AS_REAL)
 /*
  * @ingroup DataCopy Level 0
  * @brief datacopy from L1 to Fixpipe Buffer C2PIPE2GM（C1 -> C2PIPE2GM 指针入参版本）
@@ -595,6 +622,7 @@ __aicore__ inline void DataCopy(__fbuf__ T* dst, __cbuf__ T* src, const DataCopy
         "DataCopy from L1 Buffer(A1/B1/C1) to Fixpipe Buffer(C2PIPE2GM)"); // 32B align
     DataCopyL12FBImpl((__fbuf__ PrimT<T>*)dstPtr, (__cbuf__ PrimT<T>*)srcPtr, repeatParams);
 }
+#endif
 #endif
 
 /* **************************************************************************************************
@@ -615,6 +643,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     DataCopyPadGm2UBImpl<T, mode>(dstPtr, srcPtr, dataCopyParams, padParams, cacheMode);
 }
 
+#if defined(ASCENDC_PTR_AS_REAL)
 /*
  * @ingroup DataCopyPad
  * @brief datacopy with padding from src to dst（GM -> L1 指针入参版本）
@@ -628,6 +657,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     const uint8_t cacheMode = ExtractCacheMode(srcPtr);
     DataCopyPadGm2L1Impl<T, mode>(dstPtr, srcPtr, dataCopyParams, padParams, cacheMode);
 }
+#endif
 
 /*
  * @ingroup DataCopyPad

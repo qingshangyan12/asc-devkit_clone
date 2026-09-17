@@ -106,11 +106,13 @@ __aicore__ inline void DataCacheCleanAndInvalid(__gm__ T* dst)
     DcciGMImpl<T, entireType, dcciDst>(GetUnderlyingPtr(dst));
 }
 
+#if defined(__CCE__)
 template <typename T, CacheLine entireType, DcciDst dcciDst>
 __aicore__ inline void DataCacheCleanAndInvalid(__ubuf__ T* dst)
 {
     DcciUBImpl<T, entireType, dcciDst>(GetUnderlyingPtr(dst));
 }
+#endif
 #endif
 
 #if defined(__NPU_ARCH__) &&                                                                                 \

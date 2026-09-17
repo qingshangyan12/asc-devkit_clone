@@ -34,6 +34,16 @@
 #include "kernel_struct_data_copy.h"
 #include "kernel_tensor.h"
 
+/*
+ * 地址空间限定符（__ubuf__ / __gm__ / __cbuf__ / __cc__ / __fbuf__）仅在设备编译器
+ * （ccec，定义 __CCE__）下真实生效；宿主机侧（CPU 仿真等，cpu_stub.hpp）这些宏展开为空，
+ * 仅按地址空间区分的同形重载会塌缩为同一签名。因此宿主机侧每组同形重载仅保留一个代表
+ * （统一保留 GM -> UB 搬入方向），其余方向为设备编译专用。
+ */
+#if defined(__CCE__)
+#define ASCENDC_PTR_AS_REAL 1
+#endif
+
 namespace AscendC {
 /* **************************************************************************************************
  * DataCopy 指针化扩展（Pointer 输入）                                        *
@@ -102,6 +112,7 @@ template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(__ubuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams,
     const DataCopyEnhancedParams& enhancedParams);
 
+#if defined(ASCENDC_PTR_AS_REAL)
 /*
  * @ingroup DataCopy Level 0
  * @brief datacopy from src to dst, applicable to vector data（GM -> L1 指针入参版本）
@@ -109,18 +120,24 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(__ubuf__ T* dst, __gm__ T* 
  * @param [in] src input GM pointer (__gm__ T*)
  */
 template <typename T>
-__aicore__ inline __inout_pipe__(MTE2)
+__aicore__ inline __inout_pipe__(MTE2) void
     DataCopy(__cbuf__ T* dst, __gm__ T* src, const DataCopyParams& repeatParams);
+#endif
 
 /*
  * @ingroup DataCopy Level 0
  * @brief format transform(such as nd2nz) during data load from OUT to L1（GM -> L1 指针入参版本）
+ * @par 说明：与 GM -> UB Nd2Nz 版仅地址空间限定不同，且 enableSmallC0 不参与函数形参，
+ *           宿主机侧二者均塌缩为 DataCopy(T*, T*, const Nd2NzParams&) 且无法偏序，调用二义；
+ *           故本重载为设备编译专用。
  */
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || \
     (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
+#if defined(ASCENDC_PTR_AS_REAL)
 template <typename T, bool enableSmallC0 = false>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     __cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams);
+#endif
 #endif
 
 /*
@@ -134,6 +151,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     __cbuf__ T* dst, __gm__ T* src, const Dn2NzParams& intriParams);
 #endif
 
+#if defined(ASCENDC_PTR_AS_REAL)
 /*
  * @ingroup DataCopy
  * @brief datacopy from src to dst, applicable to cube data（GM -> L1 指针入参版本）
@@ -149,7 +167,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(__cbuf__ T* dst, __gm__ T* 
  * @param [in] src input UB pointer (__ubuf__ T*)
  */
 template <typename T>
-__aicore__ inline __inout_pipe__(MTE3)
+__aicore__ inline __inout_pipe__(MTE3) void
     DataCopy(__gm__ T* dst, __ubuf__ T* src, const DataCopyParams& repeatParams);
 
 /*
@@ -166,6 +184,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(__gm__ T* dst, __ubuf__ T* 
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopy(__gm__ T* dst, __ubuf__ T* src, const SliceInfo dstSliceInfo[],
     const SliceInfo srcSliceInfo[], const uint32_t dimValue = 1);
+#endif
 
 /*
  * @ingroup DataCopy Level 2
@@ -175,6 +194,7 @@ template <typename T>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
     __gm__ T* dst, __ubuf__ T* src, const Nz2NdParamsFull& intriParams);
 
+#if defined(ASCENDC_PTR_AS_REAL)
 /*
  * @ingroup DataCopy
  * @brief datacopy from src to dst, applicable to cube data（UB -> GM 指针入参版本）
@@ -190,7 +210,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(__gm__ T* dst, __ubuf__ T* 
  * @param [in] src input L1 pointer (__cbuf__ T*)
  */
 template <typename T>
-__aicore__ inline __inout_pipe__(MTE3)
+__aicore__ inline __inout_pipe__(MTE3) void
     DataCopy(__gm__ T* dst, __cbuf__ T* src, const DataCopyParams& repeatParams);
 
 /*
@@ -215,6 +235,7 @@ __aicore__ inline void DataCopy(__cbuf__ T* dst, __ubuf__ T* src, const uint32_t
  */
 template <typename T>
 __aicore__ inline void DataCopy(__cbuf__ T* dst, __ubuf__ T* src, const Nd2NzParams& intriParams);
+#endif
 
 /*
  * @ingroup DataCopy Level 0
@@ -222,6 +243,7 @@ __aicore__ inline void DataCopy(__cbuf__ T* dst, __ubuf__ T* src, const Nd2NzPar
  * @param [out] dst output UB pointer (__ubuf__ T*)
  * @param [in] src input UB pointer (__ubuf__ T*)
  */
+#if defined(ASCENDC_PTR_AS_REAL)
 template <typename T>
 __aicore__ inline void DataCopy(__ubuf__ T* dst, __ubuf__ T* src, const DataCopyParams& repeatParams);
 
@@ -231,6 +253,7 @@ __aicore__ inline void DataCopy(__ubuf__ T* dst, __ubuf__ T* src, const DataCopy
  */
 template <typename T>
 __aicore__ inline void DataCopy(__ubuf__ T* dst, __ubuf__ T* src, const uint32_t count);
+#endif
 
 /*
  * @ingroup DataCopy Level 0
@@ -242,6 +265,7 @@ template <typename T, typename U>
 __aicore__ inline void DataCopy(
     __gm__ T* dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams);
 
+#if defined(ASCENDC_PTR_AS_REAL)
 /*
  * @ingroup DataCopy Level 0
  * @brief datacopy from L0C to L1（L0C -> L1 指针入参版本）
@@ -251,6 +275,7 @@ __aicore__ inline void DataCopy(
 template <typename T, typename U>
 __aicore__ inline void DataCopy(
     __cbuf__ T* dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams);
+#endif
 
 /*
  * @ingroup DataCopy Level 0
@@ -272,8 +297,10 @@ __aicore__ inline void DataCopy(__cbuf__ T* dst, __cbuf__ U* src, const DataCopy
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || \
     (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
     (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+#if defined(ASCENDC_PTR_AS_REAL)
 template <typename T>
 __aicore__ inline void DataCopy(__fbuf__ T* dst, __cbuf__ T* src, const DataCopyParams& repeatParams);
+#endif
 #endif
 
 /* **************************************************************************************************
@@ -298,9 +325,11 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
  * @brief datacopy with padding from src to dst（GM -> L1 指针入参版本）
  */
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if defined(ASCENDC_PTR_AS_REAL)
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     __cbuf__ T* dst, __gm__ T* src, const DataCopyParams& dataCopyParams, const DataCopyPadParams& padParams);
+#endif
 #endif
 
 /*

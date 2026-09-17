@@ -78,9 +78,13 @@ __aicore__ inline void DataCacheCleanAndInvalid(__gm__ T* dst);
 /*
  * @ingroup DataCacheCleanAndInvalid
  * @brief clean and invalid data cache（__ubuf__ 指针入参版本）
+ * @par 说明：__gm__ 与 __ubuf__ 版本仅地址空间限定不同，宿主机侧（地址空间宏展开为空）
+ *           会塌缩为同一签名，故 __ubuf__ 版本仅在设备编译（ccec）下提供。
  */
+#if defined(__CCE__)
 template <typename T, CacheLine entireType, DcciDst dcciDst>
 __aicore__ inline void DataCacheCleanAndInvalid(__ubuf__ T* dst);
+#endif
 #endif
 
 #if defined(__NPU_ARCH__) &&                                                                                 \
