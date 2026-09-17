@@ -99,3 +99,24 @@ bash tests/api/basic_api/cube_pointer/check_binary.sh /path/to/output
 场景算入 49 个通过场景。本仓内的复现说明见
 `tests/api/basic_api/cube_pointer/ACCEPTANCE.md` 与
 `tests/api/basic_api/cube_pointer/README.md`。
+
+## 推送注意事项
+
+本机 `git config --global credential.helper=store`，而 `/root/.git-credentials`
+里存的是另一个 GitCode 账号（`lunhao2023`）的凭据。git 会优先使用该凭据，导致
+以错误身份推送并收到：
+
+```text
+<CH.00905403> You are not allowed to push code to this project.
+```
+
+推送时须绕过已存凭据，改用 `凭证.md` 中 `Ethan-ki` 的令牌：
+
+```bash
+export GIT_ASKPASS=<返回 Ethan-ki 与该令牌的脚本>
+export GIT_TERMINAL_PROMPT=0
+git -c credential.helper= push origin task/cube-pointer-master
+```
+
+推送后用 `git -c credential.helper= ls-remote origin refs/heads/task/cube-pointer-master`
+核对远端 SHA 与本地 `HEAD` 一致，不要只看 `git push` 的退出码。
