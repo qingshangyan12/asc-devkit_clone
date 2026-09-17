@@ -2,6 +2,8 @@
 
 C API文档按最细粒度公共头文件归类。除试验接口外，整体使用时可以包含`c_api/asc_simd.h`。
 
+数据搬运接口的概念、硬件通路和选型说明请参见[数据搬运导览](data_move_overview/data_move_guide.md)。
+
 ## 基础定义
 
 ### 联合体
@@ -33,11 +35,13 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_store_l2_cache_mode](defs/enum/asc_store_l2_cache_mode.md)|表示数据从UB搬运到GM时的L2 Cache策略，也可用于标量store策略配置。|`c_api/defs/enum.h`|
 |[asc_unit_flag_mode](defs/enum/asc_unit_flag_mode.md)|表示矩阵计算或矩阵搬出接口执行后的UnitFlag行为。|`c_api/defs/enum.h`|
 
-### 数据类型
+### 寄存器类型
 
 |API名称|说明|最细粒度公共头文件|
 |---|---|---|
-|[reg数据类型定义](defs/type/data_type_definition.md)|介绍C API的矢量数据寄存器、掩码寄存器、非对齐寄存器和地址寄存器数据类型。|`c_api/defs/type.h`|
+|[寄存器类型总览](defs/type/reg_data_types.md)|介绍基础API寄存器抽象与C API寄存器类型的对应关系及使用入口。|`c_api/defs/type.h`|
+|[寄存器类型定义](defs/type/data_type_definition.md)|介绍C API的矢量数据寄存器、掩码寄存器、非对齐寄存器和地址寄存器数据类型。|`c_api/defs/type.h`|
+|[asc_get_mask_spr](defs/type/asc_get_mask_spr.md)|从特殊寄存器SPR{MASK1, MASK0}读取mask值并根据数据类型格式返回对应的mask数据。|`c_api/reg_compute/compute/reg_mask.h`|
 
 ### 宏
 
@@ -546,7 +550,6 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |API名称|说明|最细粒度公共头文件|
 |---|---|---|
 |[asc_create_mask](reg_compute/reg_mask/asc_create_mask.md)|根据入参生成相应的掩码寄存器。|`c_api/reg_compute/compute/reg_mask.h`|
-|[asc_get_mask_spr](reg_compute/reg_mask/asc_get_mask_spr.md)|从特殊寄存器SPR{MASK1, MASK0}读取mask值并根据数据类型格式返回对应的mask数据，MASK0、MASK1均为64bit的寄存器。|`c_api/reg_compute/compute/reg_mask.h`|
 |[asc_update_mask](reg_compute/reg_mask/asc_update_mask.md)|根据value大小生成对应的掩码寄存器中的值。|`c_api/reg_compute/compute/reg_mask.h`|
 
 ### 地址寄存器操作
