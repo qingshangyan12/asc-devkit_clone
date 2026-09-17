@@ -181,6 +181,13 @@ private:
 
     uint8_t ccuUsedXnNum_ = 0;
 
+    // GetAlgorithmType 单条目缓存：单 op 流内（prepare 分支判别/CcuSendMsg/Wait）最多查 5 次，
+    // 键为 (handleId, prepareType)，在 CcuPrepareForOp 入口逐 op 失效（0xFFFFFFFFU 即 UINT32_MAX，
+    // 本头不依赖 <cstdint>；未命中/失效态不缓存）。mutable：GetAlgorithmType 为 const 成员。
+    mutable HcclHandle cachedAlgTypeHandleId_ = INVALID_HANDLE_ID;
+    mutable uint32_t cachedAlgTypePrepareType_ = 0xFFFFFFFFU;
+    mutable uint32_t cachedAlgTypeResult_ = 0xFFFFFFFFU;
+
     bool msgQueueIsAvailable_[CCU_MAX_MSG_NUM];
     uint64_t xnData_[CCU_USED_XN_NUM];
 };

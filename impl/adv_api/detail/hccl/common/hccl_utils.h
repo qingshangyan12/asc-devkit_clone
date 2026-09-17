@@ -92,6 +92,25 @@ __aicore__ inline void WriteHBMData(__gm__ T* addr, T value)
     DataSyncBarrier<MemDsbT::ALL>();
 }
 
+// 轻量 HBM 写：仅旁路直写，无 Barrier/Nop/DSB。仅限时序松弛场景——消费者在下一个 op 或
+// 更远（posted 旁路写约 1us 内自然落 HBM）。典型用途：KFC Wait 尾部的 CKE 复位与完成计数
+// 递增（消费者分别是同槽位数 op 之后的 server 写、混合 homm 模式的未来轮询）。
+// 排序关键路径（如 CcuSendMsg 的 commit CKE：xnData 可见性必须先于 commit 可见）必须用
+// WriteHBMData 的全屏障版本。
+template <typename T>
+__aicore__ inline void WriteHbmBypassRaw(__gm__ T* addr, T value)
+{
+    if constexpr (SupportBytes<T, 8>()) {
+        WriteGmBypassDCache(reinterpret_cast<__gm__ uint64_t*>(addr), (uint64_t)value);
+    } else if constexpr (SupportBytes<T, 4>()) {
+        WriteGmBypassDCache(reinterpret_cast<__gm__ uint32_t*>(addr), (uint32_t)value);
+    } else if constexpr (SupportBytes<T, 2>()) {
+        WriteGmBypassDCache(reinterpret_cast<__gm__ uint16_t*>(addr), (uint16_t)value);
+    } else {
+        WriteGmBypassDCache(reinterpret_cast<__gm__ uint8_t*>(addr), (uint8_t)value);
+    }
+}
+
 #endif
 
 } // namespace AscendC
