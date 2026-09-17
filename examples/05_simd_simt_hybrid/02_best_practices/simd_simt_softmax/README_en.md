@@ -16,11 +16,7 @@ This sample uses softmax as an example to introduce tuning methods for in-row re
 ├── simd_simt_softmax
 │   ├── CMakeLists.txt                  // Build project file
 │   ├── data_utils.h                    // Host-side bin file read/write utility
-│   ├── figures
-│   │   ├── case0.png                  // Case 0 one-Warp-per-row diagram
-│   │   ├── case1.png                  // Case 1 data flow and pipeline diagram
-│   │   ├── case2.png                  // Case 2 bucket classification and UB layout diagram
-│   │   └── perf_trend.png             // Task Duration trend of Case 1 and Case 2 with different cols values
+│   ├── figures                        // Image resources for README
 │   ├── scripts
 │   │   ├── gen_data.py                 // Input and golden data generation script
 │   │   └── verify_result.py            // Golden data comparison script
@@ -152,7 +148,7 @@ The `aiv_vec_ratio` of Case 0 reaches 0.960, and the time is concentrated on GM 
 
 - Each Thread Block processes row data in tiles. The number of rows in a tile determines the number of Warps launched by one VF call (one Warp processes one row). The row count takes the minimum of the following three values: the rows assigned to this Thread Block, the maximum number of rows that the four tile buffers can hold within the UB capacity, and the 64 rows corresponding to the thread count limit of a single VF call.
 - The kernel divides the dynamic UB into two input tile buffers and two output tile buffers. The two buffer sets are used alternately by tile, and their lifecycles are managed by separate events.
-- MTE2 uses the two-dimensional movement of `asc_copy_gm2ub_align` to move each GM row into UB by the real cols, and MTE3 moves the result back to GM in the same way. The double tile buffers rotate so that movement and computation overlap.
+- MTE2 uses the two-dimensional movement of `asc_copy_gm2ub_align` to move each GM row into UB by the real cols, and MTE3 moves the result back to GM in the same way.
 - The SIMT VF still completes the max, exp/sum, and normalization in three passes on UB, with one Warp processing one row.
 
 The data flow of Case 1 is shown in the following figure.
@@ -220,15 +216,12 @@ The computation time of Case 1 is mainly spent on how the in-row computation is 
 
 **Core Implementation**:
 
-- Static array caching the whole row: The cols covered by this sample does not exceed 512. With one Warp processing one row, each thread is assigned at most 512/32 = 16 elements. The per-row data volume is small, and the in-row computation fits in registers. A static array `elements[kWarpIterations]` is introduced to cache the elements assigned to each thread, guiding the compiler to allocate it to registers, instead of re-reading the UB input row in each pass.
-- Compile-time fixed length: cols is a runtime parameter. The loop bounds and indices for accessing the array cannot be determined at compile time, so the compiler cannot map an array with dynamic indices to registers. cols is divided into five bucket upper bounds 64/128/256/384/512, and the `softmax_bucket_kernel<kThreadCount, kBucketCols>` template is instantiated per bucket: `kBucketCols` is a compile-time constant, `kWarpIterations = kBucketCols / 32` is a fixed value, the array-access loops can be fully expanded, and `elements` stays in registers. Invalid tail columns are masked with `-ASCRT_INF_F` and do not participate in reduction or normalization.
-- One read completes all computation: after the whole row is read into `elements`, the max reduction, exp, sum reduction, and normalized write-back are all completed in registers. The input row is read only once, and `exp` is computed only once.
+- Compile-time bucket: The cols covered by this sample does not exceed 512, and each thread is assigned at most 512/32 = 16 elements, which fits directly in registers. cols is divided into five buckets by the upper bounds 64/128/256/384/512, and a specialized kernel is instantiated per bucket: the bucket capacity is a compile-time constant, the array-access loops can be fully expanded, and the static array `elements[kWarpIterations]` stays in registers. Invalid tail columns are masked with `-ASCRT_INF_F` and excluded from the reduction and normalization.
 - UB layout: tile buffers are allocated by the bucket capacity `kBucketCols`. MTE moves each row based on the real cols at runtime, and the space after the real elements is left unused. The SIMT VF computes on the padded UB, and MTE3 moves the result back to GM by the real cols. The bucket classification and UB layout are shown in the following figure.
 
   <img src="./figures/case2.png">
 
-- Two UB input buffers and two UB output buffers rotate by tile, and the buffer lifecycle is managed through events, so that the MTE2 load, SIMT VF computation, and MTE3 store of adjacent tiles overlap.
-- Dynamic thread selection: the Host estimates the rows per core with `rows_per_core = ceil(rows / block_count)` and `needed_threads = rows_per_core * 32`. If the value does not exceed 512, 512 threads are selected. If it does not exceed 1024, 1024 threads are selected. If it exceeds 1024 and `cols <= 256`, 2048 threads are selected. When `cols > 256`, considering register pressure, the `__launch_bounds__` of the SIMT VF is set to 1024, so at most 1024 threads are launched. One Warp processes one row, and 512/1024/2048 threads correspond to at most 16/32/64 rows per tile.
+- Dynamic thread selection: the Host selects the thread count based on the rows per core. 512/1024/2048 threads correspond to at most 16/32/64 rows per tile. When `cols > 256`, considering register pressure, at most 1024 threads are launched.
 
 The SIMT VF reads the whole row into a fixed-length array and completes all computation in registers:
 
@@ -325,7 +318,7 @@ In the sample root directory, perform the following steps to build and run the s
 
 - Configure environment variables.
 
-  Configure environment variables for the CANN development kit package in the current environment by referring to [Environment Variable Configuration](../../../../docs/en/quick_start.md#cann-env-setup).
+  Configure environment variables based on the [installation method](../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment.
 
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -348,14 +341,26 @@ In the sample root directory, perform the following steps to build and run the s
 
   A custom shape is also supported. Run `python3 ../scripts/gen_data.py <rows> <cols>` first, and then run `./softmax <rows> <cols>`, where cols must be in the range 1 to 512.
 
-- Build options
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
 
-  | Option | Value | Description |
-  | ------ | ----- | ----------- |
-  | CMAKE_ASC_ARCHITECTURES | dav-3510 | NPU architecture. This sample supports only dav-3510 (Ascend 950PR/Ascend 950DT). |
-  | SCENARIO_NUM | 0-2 | Sample type. The default value is 2. 0 = SIMT direct GM read, 1 = UB staging with MTE double buffering, 2 = compile-time bucket. |
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;   # NPU simulation mode
+  ```
 
-  The following output indicates that the accuracy comparison is successful.
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+
+- Build option description
+
+  | Option | Values | Description |
+  |:---|:---|:---|
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture. This sample supports only dav-3510 (Ascend 950PR/Ascend 950DT). |
+  | `SCENARIO_NUM` | `0`, `1`, `2` | Sample type. The default value is 2. 0 = SIMT direct GM read, 1 = UB staging with MTE double buffering, 2 = compile-time bucket. |
+
+- Execution result
+
+  The following execution result indicates that the accuracy comparison is successful.
 
   ```text
   [Success] Case accuracy verification passed.
