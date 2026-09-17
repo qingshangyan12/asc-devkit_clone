@@ -68,11 +68,12 @@ __aicore__ inline void test_none_mask()
 template <typename T>
 __aicore__ inline void test_update_mask()
 {
-    uint32_t remain = 256;
+    uint32_t total = 256;
+    uint32_t remain = total;
     auto mask = asc::te::experimental::update_mask<T>(remain);
     static_assert(AscendC::Std::is_same_v<decltype(mask), asc::te::experimental::reg_tensor<bool>>);
     EXPECT_EQ(mask.reg, asc::te::experimental::all_mask<T>().reg);
-    uint32_t expect_remain = remain - remain / size_of(T);
+    uint32_t expect_remain = total - total / sizeof(T);
     EXPECT_EQ(remain, expect_remain);
 }
 
@@ -84,8 +85,8 @@ __aicore__ inline void test_interleave()
     auto dst = asc::te::experimental::interleave<T>(src0, src1);
     static_assert(AscendC::Std::is_same_v<decltype(dst), asc::te::experimental::reg_pair<bool>>);
     auto expect_mask = asc::te::experimental::all_mask<T>();
-    EXPECT_EQ(dst.first.mask, expect_mask);
-    EXPECT_EQ(dst.second.mask, expect_mask);
+    EXPECT_EQ(dst.first.mask, expect_mask.reg);
+    EXPECT_EQ(dst.second.mask, expect_mask.reg);
 
     auto restored = asc::te::experimental::deinterleave<T>(dst.first, dst.second);
     EXPECT_EQ(restored.first.reg, src0.reg);
@@ -100,10 +101,11 @@ __aicore__ inline void test_deinterleave()
     auto interleaved = asc::te::experimental::interleave<T>(src0, src1);
     auto dst = asc::te::experimental::deinterleave<T>(interleaved.first, interleaved.second);
     static_assert(AscendC::Std::is_same_v<decltype(dst), asc::te::experimental::reg_pair<bool>>);
+    auto expect_mask = asc::te::experimental::all_mask<T>();
     EXPECT_EQ(dst.first.reg, src0.reg);
     EXPECT_EQ(dst.second.reg, src1.reg);
-    EXPECT_EQ(dst.first.mask, expect_mask);
-    EXPECT_EQ(dst.second.mask, expect_mask);
+    EXPECT_EQ(dst.first.mask, expect_mask.reg);
+    EXPECT_EQ(dst.second.mask, expect_mask.reg);
 }
 
 #define MASK_REG_COMPUTE_TEST(Function, DataType)                          \
