@@ -48,9 +48,7 @@ inline float cospif(float x)
 ## 返回值说明
 
 输入数据与π相乘的余弦值。
-
--   当x\*π超出float最大范围，返回值为nan。
--   当x\*π超出float最小范围，返回值为nan。
+-   当输入x为有限值且Abs\(x\)\>=2^24时，直接返回1.0。
 -   当x为inf时，返回值为nan。
 -   当x为-inf时，返回值为nan。
 -   当x为nan时，返回值为nan。
