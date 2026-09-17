@@ -897,21 +897,15 @@ def gen_kernel_fun(
             source += "do {\n"
 
     need_ffts = is_mix or is_single_and_using_hard_sync
-    context = get_context()
-    enable_inner_core_sync_check = (
-        global_var_storage.get_variable("ascendc_enable_super_kernel") is True
-        and context is not None
-        and context.get_addition("super_kernel_sub_combine") is True
-        and compile_info.super_kernel_info["sp_options"].get(
-            "debug-per-op-max-core-num", "0"
-        )
-        == "1"
-    )
-
+    # inner-core-sync-check 由编译宏 __ENABLE_SUPER_KERNEL_INNER_CORE_SYNC_CHECK__ 驱动，
+    # 使动态(sp_options)与静态(aclrtcKernelSpecialization + -D 宏)两条路径生成完全相同的
+    # assert 源码。该宏由 gen_sub_super_kernel_compile_options(动态) 或
+    # ConvertDebugPerOpMaxCoreNum(静态) 在 debug-per-op-max-core-num=1 时定义。
     # call usr kernel function call
-    if enable_inner_core_sync_check:
-        source += "    AscendC::g_superKernelSetWaitFlagCountDifference = "
-        source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE;\n"
+    source += "#ifdef __ENABLE_SUPER_KERNEL_INNER_CORE_SYNC_CHECK__\n"
+    source += "    AscendC::g_superKernelSetWaitFlagCountDifference = "
+    source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE;\n"
+    source += "#endif\n"
     source += "#if defined(TEMPLATE_PARAMS_LEN) && TEMPLATE_PARAMS_LEN != 0\n"
     source += gen_usr_origin_kernel_function_call(
         func_name, opinfo, tiling_info, has_template=True
@@ -921,20 +915,21 @@ def gen_kernel_fun(
         func_name, opinfo, tiling_info, has_template=False
     )
     source += "#endif\n"
-    if enable_inner_core_sync_check:
-        source += "    if (AscendC::g_superKernelSetWaitFlagCountDifference > "
-        source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE) {\n"
-        source += '        assert(false, "SuperKernel: current operator has %d more '
-        source += 'SetFlag calls than WaitFlag calls; Please check synchronization within the current operator.\\n", '
-        source += "AscendC::g_superKernelSetWaitFlagCountDifference - "
-        source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE);\n"
-        source += "    } else if (AscendC::g_superKernelSetWaitFlagCountDifference < "
-        source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE) {\n"
-        source += '        assert(false, "SuperKernel: current operator has %d more '
-        source += 'WaitFlag calls than SetFlag calls; Please check synchronization within the current operator.\\n", '
-        source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE - "
-        source += "AscendC::g_superKernelSetWaitFlagCountDifference);\n"
-        source += "    }\n"
+    source += "#ifdef __ENABLE_SUPER_KERNEL_INNER_CORE_SYNC_CHECK__\n"
+    source += "    if (AscendC::g_superKernelSetWaitFlagCountDifference > "
+    source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE) {\n"
+    source += '        assert(false, "SuperKernel: current operator has %d more '
+    source += 'SetFlag calls than WaitFlag calls; Please check synchronization within the current operator.\\n", '
+    source += "AscendC::g_superKernelSetWaitFlagCountDifference - "
+    source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE);\n"
+    source += "    } else if (AscendC::g_superKernelSetWaitFlagCountDifference < "
+    source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE) {\n"
+    source += '        assert(false, "SuperKernel: current operator has %d more '
+    source += 'WaitFlag calls than SetFlag calls; Please check synchronization within the current operator.\\n", '
+    source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE - "
+    source += "AscendC::g_superKernelSetWaitFlagCountDifference);\n"
+    source += "    }\n"
+    source += "#endif\n"
 
     if len(compile_info.tiling_key_struct_map) > 0:
         source += _gen_tpl_tiling_struct_section(compile_info, tiling_info)
@@ -1699,9 +1694,16 @@ def _get_dcci_disable_cap_bitmap(
     """
     Check if DCCI should be disabled for any kernel in kernel_symbols.
     Returns 4 if matched, 0 otherwise.
+
+    与 gen_gm_get_set_value_dcci_compile_options 等消费点保持一致：
+    sp_options["dcci-disable-on-kernel"] 经 parse_super_kernel_options 解析后是
+    逗号分隔的字符串（如 "kernel_a,kernel_b"），这里统一按列表处理，
+    使 SK_BIND 的 cap_bitmap bit2(disableDcci) 能在动态与静态两条路径正确置位。
     """
     sp_options = compile_info.super_kernel_info.get("sp_options", {})
     patterns = sp_options.get("dcci-disable-on-kernel", [])
+    if isinstance(patterns, str):
+        patterns = [p.strip() for p in patterns.split(",") if p.strip()]
     if isinstance(patterns, list) and patterns:
         for kernel_name in kernel_symbols:
             if any(_match_regex(p, kernel_name) for p in patterns):
