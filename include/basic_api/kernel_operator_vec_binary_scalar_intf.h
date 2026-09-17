@@ -584,6 +584,34 @@ template <
 __aicore__ inline void LeakyRelu(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, const int32_t& count);
 
+/*!
+ * \brief Pointer-extended forms of LeakyRelu. dst/src may be a LocalTensor, a UB raw pointer or a raw UB
+ *        device address; the element type is taken from the scalar operand or from the explicit argument.
+ */
+template <
+    typename T = void, bool isSetMask = true, typename Dst, typename Src,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src> && Internal::CanResolveVecPrim<T, Dst, Src>, bool>::type = true>
+__ASC_USE_RESERVED_UBUF__(3510, "LeakyRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void LeakyRelu(
+    const Dst& dst, const Src& src, const T& scalarValue, uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams);
+
+template <
+    typename T = void, bool isSetMask = true, typename Dst, typename Src,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src> && Internal::CanResolveVecPrim<T, Dst, Src>, bool>::type = true>
+__ASC_USE_RESERVED_UBUF__(3510, "LeakyRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void LeakyRelu(
+    const Dst& dst, const Src& src, const T& scalarValue, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams);
+
+template <
+    typename T = void, typename Dst, typename Src,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src> && Internal::CanResolveVecPrim<T, Dst, Src>, bool>::type = true>
+__aicore__ inline void LeakyRelu(const Dst& dst, const Src& src, const T& scalarValue, const int32_t& count);
+
 /* **************************************************************************************************
  * Subs                                             *
  * ************************************************************************************************* */

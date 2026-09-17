@@ -33,6 +33,7 @@
 #include "kernel_struct_data_copy.h"
 #include "../../impl/basic_api/kernel_tensor_base.h"
 #include "../../impl/basic_api/utils/kernel_utils_macros.h"
+#include "../../impl/basic_api/utils/kernel_utils_pointer.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>

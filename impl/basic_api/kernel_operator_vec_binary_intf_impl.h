@@ -143,6 +143,48 @@ __aicore__ inline void Add(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
+// Pointer-extended Add overloads: at least one operand is a UB raw pointer or raw device address.
+template <
+    typename T, bool isSetMask, typename Dst, typename Src0, typename Src1,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src0, Src1> && Internal::CanResolveVecPrim<T, Dst, Src0, Src1>, bool>::type
+        enable>
+__aicore__ inline void Add(
+    const Dst& dst, const Src0& src0, const Src1& src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
+{
+    using PrimType = Internal::VecPrimType<T, Dst, Src0, Src1>;
+    AddImpl<PrimType, isSetMask>(
+        GetUbufPtr<PrimType>(dst), GetUbufPtr<PrimType>(src0), GetUbufPtr<PrimType>(src1), mask, repeatTime,
+        repeatParams);
+}
+
+template <
+    typename T, bool isSetMask, typename Dst, typename Src0, typename Src1,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src0, Src1> && Internal::CanResolveVecPrim<T, Dst, Src0, Src1>, bool>::type
+        enable>
+__aicore__ inline void Add(
+    const Dst& dst, const Src0& src0, const Src1& src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
+{
+    using PrimType = Internal::VecPrimType<T, Dst, Src0, Src1>;
+    AddImpl<PrimType, isSetMask>(
+        GetUbufPtr<PrimType>(dst), GetUbufPtr<PrimType>(src0), GetUbufPtr<PrimType>(src1), mask, repeatTime,
+        repeatParams);
+}
+
+template <
+    typename T, typename Dst, typename Src0, typename Src1,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src0, Src1> && Internal::CanResolveVecPrim<T, Dst, Src0, Src1>, bool>::type
+        enable>
+__aicore__ inline void Add(const Dst& dst, const Src0& src0, const Src1& src1, const int32_t& count)
+{
+    using PrimType = Internal::VecPrimType<T, Dst, Src0, Src1>;
+    AddImpl(GetUbufPtr<PrimType>(dst), GetUbufPtr<PrimType>(src0), GetUbufPtr<PrimType>(src1), count);
+}
+
 /* **************************************************************************************************
  * Sub                                             *
  * ************************************************************************************************* */
@@ -1141,6 +1183,48 @@ __aicore__ inline void AddRelu(
     AddReluImpl(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src0.GetPhyAddr(),
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
+}
+
+// Pointer-extended AddRelu overloads: at least one operand is a UB raw pointer or raw device address.
+template <
+    typename T, bool isSetMask, typename Dst, typename Src0, typename Src1,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src0, Src1> && Internal::CanResolveVecPrim<T, Dst, Src0, Src1>, bool>::type
+        enable>
+__aicore__ inline void AddRelu(
+    const Dst& dst, const Src0& src0, const Src1& src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
+{
+    using PrimType = Internal::VecPrimType<T, Dst, Src0, Src1>;
+    AddReluImpl<PrimType, isSetMask>(
+        GetUbufPtr<PrimType>(dst), GetUbufPtr<PrimType>(src0), GetUbufPtr<PrimType>(src1), mask, repeatTime,
+        repeatParams);
+}
+
+template <
+    typename T, bool isSetMask, typename Dst, typename Src0, typename Src1,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src0, Src1> && Internal::CanResolveVecPrim<T, Dst, Src0, Src1>, bool>::type
+        enable>
+__aicore__ inline void AddRelu(
+    const Dst& dst, const Src0& src0, const Src1& src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
+{
+    using PrimType = Internal::VecPrimType<T, Dst, Src0, Src1>;
+    AddReluImpl<PrimType, isSetMask>(
+        GetUbufPtr<PrimType>(dst), GetUbufPtr<PrimType>(src0), GetUbufPtr<PrimType>(src1), mask, repeatTime,
+        repeatParams);
+}
+
+template <
+    typename T, typename Dst, typename Src0, typename Src1,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src0, Src1> && Internal::CanResolveVecPrim<T, Dst, Src0, Src1>, bool>::type
+        enable>
+__aicore__ inline void AddRelu(const Dst& dst, const Src0& src0, const Src1& src1, const int32_t& count)
+{
+    using PrimType = Internal::VecPrimType<T, Dst, Src0, Src1>;
+    AddReluImpl(GetUbufPtr<PrimType>(dst), GetUbufPtr<PrimType>(src0), GetUbufPtr<PrimType>(src1), count);
 }
 
 /* **************************************************************************************************

@@ -134,6 +134,46 @@ __aicore__ inline void Axpy(
 #endif
     AxpyImpl<T, U>((__ubuf__ T*)dst.GetPhyAddr(), (__ubuf__ U*)src.GetPhyAddr(), scalarValue, count);
 }
+
+// Pointer-extended Axpy overloads: at least one operand is a UB raw pointer or raw device address.
+template <
+    typename T, typename U, bool isSetMask, typename Dst, typename Src,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src> && Internal::CanResolveVecPrim<T, Dst, Src, U>, bool>::type enable>
+__aicore__ inline void Axpy(
+    const Dst& dst, const Src& src, const U& scalarValue, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using DstPrim = Internal::VecPrimType<T, Dst, Src, U>;
+    using SrcPrim = Internal::VecPrimType<U, Src, Dst, T>;
+    AxpyImpl<DstPrim, SrcPrim, isSetMask>(
+        GetUbufPtr<DstPrim>(dst), GetUbufPtr<SrcPrim>(src), scalarValue, mask, repeatTime, repeatParams);
+}
+
+template <
+    typename T, typename U, bool isSetMask, typename Dst, typename Src,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src> && Internal::CanResolveVecPrim<T, Dst, Src, U>, bool>::type enable>
+__aicore__ inline void Axpy(
+    const Dst& dst, const Src& src, const U& scalarValue, uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using DstPrim = Internal::VecPrimType<T, Dst, Src, U>;
+    using SrcPrim = Internal::VecPrimType<U, Src, Dst, T>;
+    AxpyImpl<DstPrim, SrcPrim, isSetMask>(
+        GetUbufPtr<DstPrim>(dst), GetUbufPtr<SrcPrim>(src), scalarValue, mask, repeatTime, repeatParams);
+}
+
+template <
+    typename T, typename U, typename Dst, typename Src,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src> && Internal::CanResolveVecPrim<T, Dst, Src, U>, bool>::type enable>
+__aicore__ inline void Axpy(const Dst& dst, const Src& src, const U& scalarValue, const int32_t& count)
+{
+    using DstPrim = Internal::VecPrimType<T, Dst, Src, U>;
+    using SrcPrim = Internal::VecPrimType<U, Src, Dst, T>;
+    AxpyImpl<DstPrim, SrcPrim>(GetUbufPtr<DstPrim>(dst), GetUbufPtr<SrcPrim>(src), scalarValue, count);
+}
 } // namespace AscendC
 #pragma end_pipe
 #endif // ASCENDC_MODULE_OPERATOR_VEC_TERNARY_SCALAR_INTERFACE_IMPL_H

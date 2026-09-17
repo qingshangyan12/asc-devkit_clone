@@ -191,6 +191,52 @@ __aicore__ inline void Cast(
     CastImpl((__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__ubuf__ SrcPrimType*)src.GetPhyAddr(), roundMode, count);
 }
 
+// Pointer-extended Cast overloads: at least one operand is a UB raw pointer or raw device address.
+template <
+    typename T, typename U, bool isSetMask, typename Dst, typename Src,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src> && Internal::CanResolveVecPrim<T, Dst> &&
+            Internal::CanResolveVecPrim<U, Src>,
+        bool>::type enable>
+__aicore__ inline void Cast(
+    const Dst& dst, const Src& src, const RoundMode& roundMode, const uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using DstPrimType = Internal::VecPrimType<T, Dst, Src>;
+    using SrcPrimType = Internal::VecPrimType<U, Src, Dst>;
+    CastImpl<DstPrimType, SrcPrimType, isSetMask>(
+        GetUbufPtr<DstPrimType>(dst), GetUbufPtr<SrcPrimType>(src), roundMode, mask, repeatTime, repeatParams);
+}
+
+template <
+    typename T, typename U, bool isSetMask, typename Dst, typename Src,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src> && Internal::CanResolveVecPrim<T, Dst> &&
+            Internal::CanResolveVecPrim<U, Src>,
+        bool>::type enable>
+__aicore__ inline void Cast(
+    const Dst& dst, const Src& src, const RoundMode& roundMode, const uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using DstPrimType = Internal::VecPrimType<T, Dst, Src>;
+    using SrcPrimType = Internal::VecPrimType<U, Src, Dst>;
+    CastImpl<DstPrimType, SrcPrimType, isSetMask>(
+        GetUbufPtr<DstPrimType>(dst), GetUbufPtr<SrcPrimType>(src), roundMode, mask, repeatTime, repeatParams);
+}
+
+template <
+    typename T, typename U, typename Dst, typename Src,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src> && Internal::CanResolveVecPrim<T, Dst> &&
+            Internal::CanResolveVecPrim<U, Src>,
+        bool>::type enable>
+__aicore__ inline void Cast(const Dst& dst, const Src& src, const RoundMode& roundMode, const uint32_t count)
+{
+    using DstPrimType = Internal::VecPrimType<T, Dst, Src>;
+    using SrcPrimType = Internal::VecPrimType<U, Src, Dst>;
+    CastImpl<DstPrimType, SrcPrimType>(GetUbufPtr<DstPrimType>(dst), GetUbufPtr<SrcPrimType>(src), roundMode, count);
+}
+
 /*
  * @ingroup CastDequant Level 0
  * @brief Dequant from int16_t to uint8_t/int8_t
