@@ -39,27 +39,17 @@ counters after synchronization. No intentionally deadlocking kernel is run.
 
 ## Baseline And Evidence
 
-Without `SAMPLE_DIR`, CMake builds `cube_pointer_validation`. `bash run.sh <output>`
-runs 18 FP16/BF16, 16/32/64, Tensor/pointer/mixed cases. `bash negative.sh <output>`
-checks five invalid operand compilations; `bash check_binary.sh <baseline-output>`
-compares device machine code. `matrix_compile.asc` retains matrix compile coverage.
-The official repository generator creates kernel_tiling.h inside each build tree.
+Without `SAMPLE_DIR`, CMake builds `cube_pointer_validation` and
+`cube_pointer_compile_probe`. `bash run.sh <output>` runs 18 FP16/BF16, 16/32/64,
+Tensor/pointer/mixed cases. `bash negative.sh <output>` checks five invalid operand
+compilations; `bash check_binary.sh <baseline-output>` compares device machine code.
+`matrix_compile.asc` instantiates 950-applicable pointer overloads on Cube and Vector
+cores, including LoadData/Mmad/Fixpipe/Dump/SetAddrWithOffset and SyncAll/IB/Determine.
+`MmadWithSparse` / `LoadDataWithSparse` pointer overloads keep the original dav-2201
+gate; 950 runners skip those archive projects. The official repository generator
+creates kernel_tiling.h inside each build tree.
 
-Recorded validation: 48 applicable attachment scenarios passed after the documented
-attachment corrections; 18 baseline cases matched the independent CPU double golden,
-with identical device machine code across modes. Eight further synchronization runs
-covered Determine APIs and SyncAll/IB handshakes across Tensor, pointer and both mixed
-forms. The standalone sync target above covers three of those operand modes.
-
-Local investigation evidence: [attachment report](../../../../../cube-basic-api/attachment-regression.md),
-[baseline report](../../../../../cube-basic-api/3.2-test-report.md), and
-[eight synchronization runs](../../../../../cube-basic-api/tmp/sync-runtime/results.md).
-These links refer to the adjacent local investigation workspace, not shipped fixtures.
-
-The initial FP4 MX failure came from missing `en_dtypes`: the supplied generator silently
-fell back to uint8 and produced invalid FP4 inputs/golden. Install `en_dtypes` and
-`ml_dtypes` before running; passing reruns used the correct dtypes. The original bias
-cast was also incorrect and requires the explicit opt-in above. Two attachment projects
-are dav-2201-only; the int4 Mmad scenario is unsupported by the 950 LoadData2DV2 baseline.
-Passing these representative tests does not establish all 61 overloads or performance
-for all 48 attachment scenarios.
+The reproducible acceptance record, including which requirements are **not** yet
+verified, lives in [ACCEPTANCE.md](ACCEPTANCE.md). Read it before reusing any older
+claim: the attachment regression needed narrowly scoped fixes to the attachment
+sources, and the `mmad_unitflag` sample fails against its original golden.

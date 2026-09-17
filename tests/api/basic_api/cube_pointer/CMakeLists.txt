@@ -30,6 +30,10 @@ if(NOT SAMPLE_DIR)
     target_compile_options(cube_pointer_validation PRIVATE --npu-arch=dav-3510
         -iquote${REPO}/include -iquote${REPO} -iquote${REPO}/include/basic_api -iquote${REPO}/include/utils)
     target_include_directories(cube_pointer_validation PRIVATE "${GENERATED}")
+    add_executable(cube_pointer_compile_probe matrix_compile.asc)
+    target_compile_options(cube_pointer_compile_probe PRIVATE --npu-arch=dav-3510
+        -iquote${REPO}/include -iquote${REPO} -iquote${REPO}/include/basic_api -iquote${REPO}/include/utils)
+    target_include_directories(cube_pointer_compile_probe PRIVATE "${GENERATED}")
     return()
 endif()
 get_filename_component(SAMPLE_NAME "${SAMPLE_DIR}" NAME)

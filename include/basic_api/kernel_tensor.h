@@ -186,7 +186,6 @@ public:
                  "Please do not use it!")]] __aicore__ inline void
     SetAddrWithOffset(LocalTensor<S>& src, uint32_t offset);
 #endif
-    // sourceSize is the source allocation length in bytes, before applying offset.
 #if defined(__NPU_ARCH__) && !defined(ASCENDC_CPU_DEBUG)
     template <typename S>
     __aicore__ inline void SetAddrWithOffset(__cbuf__ S* src, uint32_t offset,

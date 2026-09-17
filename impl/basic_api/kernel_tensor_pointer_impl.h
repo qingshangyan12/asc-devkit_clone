@@ -11,118 +11,73 @@
 #define ASCENDC_TENSOR_POINTER_IMPL_H
 #if defined(__NPU_ARCH__) && !defined(ASCENDC_CPU_DEBUG)
 namespace AscendC {
+namespace Impl {
+template <typename S>
+__aicore__ inline void FillLocalTensorAddrWithOffset(TBuffAddr& address, uint64_t src, uint32_t offset,
+    TPosition sourcePos, Hardware expected, uint32_t sourceSize)
+{
+    static_assert(!Std::is_const<S>::value, "SetAddrWithOffset requires a writable source");
+    ASCENDC_ASSERT(GetPhyType(sourcePos) == expected, {
+        KERNEL_LOG(KERNEL_ERROR, "SetAddrWithOffset source position does not match pointer space");
+    });
+    ASCENDC_ASSERT(uint64_t(offset) * sizeof(S) <= sourceSize, {
+        KERNEL_LOG(KERNEL_ERROR, "SetAddrWithOffset offset exceeds source size");
+    });
+    address.logicPos = static_cast<int8_t>(sourcePos);
+    address.dataLen = sourceSize;
+    address.bufferAddr = src + uint64_t(offset) * sizeof(S);
+}
+}
+
 template <typename T>
 template <typename S>
 __aicore__ inline void LocalTensor<T>::SetAddrWithOffset(__cbuf__ S* src, uint32_t offset,
     TPosition sourcePos, uint32_t sourceSize)
-    {
-        static_assert(!Std::is_const<S>::value, "SetAddrWithOffset requires a writable source");
-        ASCENDC_ASSERT(GetPhyType(sourcePos) == Hardware::L1, {
-            KERNEL_LOG(KERNEL_ERROR, "SetAddrWithOffset source position does not match pointer space");
-        });
-        ASCENDC_ASSERT(uint64_t(offset) * sizeof(S) <= sourceSize, {
-            KERNEL_LOG(KERNEL_ERROR, "SetAddrWithOffset offset exceeds source size");
-        });
-        this->address_.logicPos = static_cast<int8_t>(sourcePos);
-        this->address_.dataLen = sourceSize;
-        this->address_.bufferAddr = static_cast<uint64_t>((uint64_t)src) + uint64_t(offset) * sizeof(S);
-    }
+{
+    Impl::FillLocalTensorAddrWithOffset<S>(this->address_, (uint64_t)src, offset, sourcePos, Hardware::L1, sourceSize);
+}
 template <typename T>
 template <typename S>
 __aicore__ inline void LocalTensor<T>::SetAddrWithOffset(__ca__ S* src, uint32_t offset,
     TPosition sourcePos, uint32_t sourceSize)
-    {
-        static_assert(!Std::is_const<S>::value, "SetAddrWithOffset requires a writable source");
-        ASCENDC_ASSERT(GetPhyType(sourcePos) == Hardware::L0A, {
-            KERNEL_LOG(KERNEL_ERROR, "SetAddrWithOffset source position does not match pointer space");
-        });
-        ASCENDC_ASSERT(uint64_t(offset) * sizeof(S) <= sourceSize, {
-            KERNEL_LOG(KERNEL_ERROR, "SetAddrWithOffset offset exceeds source size");
-        });
-        this->address_.logicPos = static_cast<int8_t>(sourcePos);
-        this->address_.dataLen = sourceSize;
-        this->address_.bufferAddr = static_cast<uint64_t>((uint64_t)src) + uint64_t(offset) * sizeof(S);
-    }
+{
+    Impl::FillLocalTensorAddrWithOffset<S>(this->address_, (uint64_t)src, offset, sourcePos, Hardware::L0A, sourceSize);
+}
 template <typename T>
 template <typename S>
 __aicore__ inline void LocalTensor<T>::SetAddrWithOffset(__cb__ S* src, uint32_t offset,
     TPosition sourcePos, uint32_t sourceSize)
-    {
-        static_assert(!Std::is_const<S>::value, "SetAddrWithOffset requires a writable source");
-        ASCENDC_ASSERT(GetPhyType(sourcePos) == Hardware::L0B, {
-            KERNEL_LOG(KERNEL_ERROR, "SetAddrWithOffset source position does not match pointer space");
-        });
-        ASCENDC_ASSERT(uint64_t(offset) * sizeof(S) <= sourceSize, {
-            KERNEL_LOG(KERNEL_ERROR, "SetAddrWithOffset offset exceeds source size");
-        });
-        this->address_.logicPos = static_cast<int8_t>(sourcePos);
-        this->address_.dataLen = sourceSize;
-        this->address_.bufferAddr = static_cast<uint64_t>((uint64_t)src) + uint64_t(offset) * sizeof(S);
-    }
+{
+    Impl::FillLocalTensorAddrWithOffset<S>(this->address_, (uint64_t)src, offset, sourcePos, Hardware::L0B, sourceSize);
+}
 template <typename T>
 template <typename S>
 __aicore__ inline void LocalTensor<T>::SetAddrWithOffset(__cc__ S* src, uint32_t offset,
     TPosition sourcePos, uint32_t sourceSize)
-    {
-        static_assert(!Std::is_const<S>::value, "SetAddrWithOffset requires a writable source");
-        ASCENDC_ASSERT(GetPhyType(sourcePos) == Hardware::L0C, {
-            KERNEL_LOG(KERNEL_ERROR, "SetAddrWithOffset source position does not match pointer space");
-        });
-        ASCENDC_ASSERT(uint64_t(offset) * sizeof(S) <= sourceSize, {
-            KERNEL_LOG(KERNEL_ERROR, "SetAddrWithOffset offset exceeds source size");
-        });
-        this->address_.logicPos = static_cast<int8_t>(sourcePos);
-        this->address_.dataLen = sourceSize;
-        this->address_.bufferAddr = static_cast<uint64_t>((uint64_t)src) + uint64_t(offset) * sizeof(S);
-    }
+{
+    Impl::FillLocalTensorAddrWithOffset<S>(this->address_, (uint64_t)src, offset, sourcePos, Hardware::L0C, sourceSize);
+}
 template <typename T>
 template <typename S>
 __aicore__ inline void LocalTensor<T>::SetAddrWithOffset(__ubuf__ S* src, uint32_t offset,
     TPosition sourcePos, uint32_t sourceSize)
-    {
-        static_assert(!Std::is_const<S>::value, "SetAddrWithOffset requires a writable source");
-        ASCENDC_ASSERT(GetPhyType(sourcePos) == Hardware::UB, {
-            KERNEL_LOG(KERNEL_ERROR, "SetAddrWithOffset source position does not match pointer space");
-        });
-        ASCENDC_ASSERT(uint64_t(offset) * sizeof(S) <= sourceSize, {
-            KERNEL_LOG(KERNEL_ERROR, "SetAddrWithOffset offset exceeds source size");
-        });
-        this->address_.logicPos = static_cast<int8_t>(sourcePos);
-        this->address_.dataLen = sourceSize;
-        this->address_.bufferAddr = static_cast<uint64_t>((uint64_t)src) + uint64_t(offset) * sizeof(S);
-    }
+{
+    Impl::FillLocalTensorAddrWithOffset<S>(this->address_, (uint64_t)src, offset, sourcePos, Hardware::UB, sourceSize);
+}
 template <typename T>
 template <typename S>
 __aicore__ inline void LocalTensor<T>::SetAddrWithOffset(__biasbuf__ S* src, uint32_t offset,
     TPosition sourcePos, uint32_t sourceSize)
-    {
-        static_assert(!Std::is_const<S>::value, "SetAddrWithOffset requires a writable source");
-        ASCENDC_ASSERT(GetPhyType(sourcePos) == Hardware::BIAS, {
-            KERNEL_LOG(KERNEL_ERROR, "SetAddrWithOffset source position does not match pointer space");
-        });
-        ASCENDC_ASSERT(uint64_t(offset) * sizeof(S) <= sourceSize, {
-            KERNEL_LOG(KERNEL_ERROR, "SetAddrWithOffset offset exceeds source size");
-        });
-        this->address_.logicPos = static_cast<int8_t>(sourcePos);
-        this->address_.dataLen = sourceSize;
-        this->address_.bufferAddr = static_cast<uint64_t>((uint64_t)src) + uint64_t(offset) * sizeof(S);
-    }
+{
+    Impl::FillLocalTensorAddrWithOffset<S>(this->address_, (uint64_t)src, offset, sourcePos, Hardware::BIAS, sourceSize);
+}
 template <typename T>
 template <typename S>
 __aicore__ inline void LocalTensor<T>::SetAddrWithOffset(__fbuf__ S* src, uint32_t offset,
     TPosition sourcePos, uint32_t sourceSize)
-    {
-        static_assert(!Std::is_const<S>::value, "SetAddrWithOffset requires a writable source");
-        ASCENDC_ASSERT(GetPhyType(sourcePos) == Hardware::FIXBUF, {
-            KERNEL_LOG(KERNEL_ERROR, "SetAddrWithOffset source position does not match pointer space");
-        });
-        ASCENDC_ASSERT(uint64_t(offset) * sizeof(S) <= sourceSize, {
-            KERNEL_LOG(KERNEL_ERROR, "SetAddrWithOffset offset exceeds source size");
-        });
-        this->address_.logicPos = static_cast<int8_t>(sourcePos);
-        this->address_.dataLen = sourceSize;
-        this->address_.bufferAddr = static_cast<uint64_t>((uint64_t)src) + uint64_t(offset) * sizeof(S);
-    }
+{
+    Impl::FillLocalTensorAddrWithOffset<S>(this->address_, (uint64_t)src, offset, sourcePos, Hardware::FIXBUF, sourceSize);
+}
 } // namespace AscendC
 #endif
 #endif

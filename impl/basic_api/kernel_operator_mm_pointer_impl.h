@@ -485,5 +485,53 @@ __aicore__ inline void LoadData(const D& dst, const S& src, const Scale& scale,
     LoadData(dst, src, scale, params, mx);
 }
 #endif
+#if __NPU_ARCH__ == 2201
+template <typename D, typename S, typename I,
+    typename Std::enable_if<Impl::CubeHasPointer<D, S, I>::value, bool>::type = true>
+__aicore__ inline void LoadDataWithSparse(const D& dst, const S& src, const I& idx,
+    const LoadData2dParams& loadDataParam)
+{
+    static_assert(!Std::is_const<Impl::CubeElement<D>>::value, "CUBE destination must be writable");
+    static_assert(Std::is_same<Impl::CubeValue<D>, int8_t>::value &&
+        Std::is_same<Impl::CubeValue<S>, int8_t>::value &&
+        Std::is_same<Impl::CubeValue<I>, uint8_t>::value,
+        "LoadDataWithSparse types must be int8_t/int8_t/uint8_t");
+    Impl::CheckCubeSpace<Hardware::L0B>(dst);
+    Impl::CheckCubeSpace<Hardware::L1>(src);
+    Impl::CheckCubeSpace<Hardware::L1>(idx);
+    if ASCEND_IS_AIC {
+#ifdef ASCENDC_CPU_DEBUG
+        SetIndexMatrix((void*)Impl::GetUnderlyingPtr(idx));
+        auto srcAddr = (__cbuf__ int8_t*)Impl::GetUnderlyingPtr(src);
+#else
+        const uint64_t src0tmp = reinterpret_cast<uint64_t>(Impl::GetUnderlyingPtr(src));
+        const uint64_t src1tmp = reinterpret_cast<uint64_t>(Impl::GetUnderlyingPtr(idx));
+        const uint64_t srctmp = (src0tmp & 0xffffffff) | ((src1tmp & 0xffffffff) << 32);
+        auto srcAddr = reinterpret_cast<__cbuf__ int8_t*>(srctmp);
+#endif
+        load_cbuf_to_cb_sp((__cb__ int8_t*)Impl::GetUnderlyingPtr(dst), srcAddr,
+            loadDataParam.startIndex, loadDataParam.repeatTimes);
+    }
+}
+template <typename D, typename A, typename B,
+    typename Std::enable_if<Impl::CubeHasPointer<D, A, B>::value, bool>::type = true>
+__aicore__ inline void MmadWithSparse(const D& dst, const A& a, const B& b, const MmadParams& mmadParams)
+{
+    static_assert(!Std::is_const<Impl::CubeElement<D>>::value, "CUBE destination must be writable");
+    static_assert(Std::is_same<Impl::CubeValue<D>, int32_t>::value &&
+        Std::is_same<Impl::CubeValue<A>, int8_t>::value &&
+        Std::is_same<Impl::CubeValue<B>, int8_t>::value,
+        "MmadWithSparse types must be int32_t/int8_t/int8_t");
+    Impl::CheckCubeSpace<Hardware::L0C>(dst);
+    Impl::CheckCubeSpace<Hardware::L0A>(a);
+    Impl::CheckCubeSpace<Hardware::L0B>(b);
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckMmadParamsCommon(mmadParams, "MmadWithSparse with MmadParams");
+#endif
+    MmadSpCal((__cc__ int32_t*)Impl::GetUnderlyingPtr(dst),
+        (__ca__ int8_t*)Impl::GetUnderlyingPtr(a),
+        (__cb__ int8_t*)Impl::GetUnderlyingPtr(b), mmadParams);
+}
+#endif
 } // namespace AscendC
 #endif
