@@ -458,7 +458,9 @@ __aicore__ inline void DataCopyL1ToUB(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams);
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
-template <typename T, uint8_t dim, const NdDmaConfig& config = kDefaultNdDmaConfig>
+template <
+    typename T, uint8_t dim, const NdDmaConfig& config = kDefaultNdDmaConfig,
+    typename Std::enable_if<(dim >= 1 && dim <= 5), bool>::type = true>
 __aicore__ inline void DataCopy(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const MultiCopyParams<T, dim>& params);
 #endif
@@ -471,6 +473,275 @@ __aicore__ inline void ResetLoopModePara(DataCopyMVType type);
 } // namespace AscendC
 
 #if defined(__NPU_ARCH__)
+// Pointer DataCopyPad declarations.
+#if !defined(ASCENDC_CPU_DEBUG) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 2201))
+#include "../../impl/basic_api/utils/kernel_utils_dma_pad_traits.h"
+namespace AscendC {
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+template <
+    typename T = void, PaddingMode mode = PaddingMode::Normal, typename D, typename S,
+    typename Std::enable_if<DmaInternal::PadGmToLocal<T, D, S>::value, bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
+    D&& dst, S&& src, const DataCopyParams& params, const DataCopyPadParams& pad);
+
+template <
+    typename T = void, PaddingMode mode = PaddingMode::Normal, typename D, typename S,
+    typename Std::enable_if<
+        DmaInternal::PadLocalToGm<T, D, S>::value && DmaInternal::DmaCanUse<S, Hardware::UB>::value, bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(D&& dst, S&& src, const DataCopyParams& params);
+#else
+template <
+    typename T = void, typename D, typename S,
+    typename Std::enable_if<DmaInternal::PadGmToLocal<T, D, S>::value, bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
+    D&& dst, S&& src, const DataCopyParams& params, const DataCopyPadParams& pad);
+
+template <
+    typename T = void, typename D, typename S,
+    typename Std::enable_if<DmaInternal::PadLocalToGm<T, D, S>::value, bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(D&& dst, S&& src, const DataCopyParams& params);
+#endif
+
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
+    (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
+template <
+    typename T = void, PaddingMode mode = PaddingMode::Normal, typename D, typename S, typename U,
+    typename Std::enable_if<
+        DmaInternal::PadGmToLocal<T, D, S>::value && Std::is_same<DmaInternal::DmaElem<D>, U>::value &&
+            !DmaInternal::PadUsesTrait<T, D, S>::value,
+        bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
+    D&& dst, S&& src, const DataCopyExtParams& params, const DataCopyPadExtParams<U>& pad);
+
+template <
+    typename T = void, PaddingMode mode = PaddingMode::Normal, typename D, typename S,
+    typename Std::enable_if<
+        DmaInternal::PadLocalToGm<T, D, S>::value &&
+#if (__NPU_ARCH__ == 5101)
+            (DmaInternal::DmaCanUse<S, Hardware::UB>::value || DmaInternal::DmaCanUse<S, Hardware::L1>::value),
+#else
+            DmaInternal::DmaCanUse<S, Hardware::UB>::value,
+#endif
+        bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(D&& dst, S&& src, const DataCopyExtParams& params);
+#else
+template <
+    typename T = void, typename D, typename S, typename U,
+    typename Std::enable_if<
+        DmaInternal::PadGmToLocal<T, D, S>::value && Std::is_same<DmaInternal::DmaElem<D>, U>::value &&
+            !DmaInternal::PadUsesTrait<T, D, S>::value,
+        bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
+    D&& dst, S&& src, const DataCopyExtParams& params, const DataCopyPadExtParams<U>& pad);
+
+template <
+    typename T = void, typename D, typename S,
+    typename Std::enable_if<DmaInternal::PadLocalToGm<T, D, S>::value, bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(D&& dst, S&& src, const DataCopyExtParams& params);
+#endif
+
+template <
+    typename T = void, typename U,
+    typename Std::enable_if<
+        Std::is_same<T, void>::value || (Std::is_same<PrimT<T>, U>::value && !Std::is_same<T, U>::value), bool>::type =
+        true,
+    typename D, typename S,
+    typename Std::enable_if<
+        DmaInternal::PadGmToLocal<T, D, S>::value && DmaInternal::PadUsesTrait<T, D, S>::value &&
+            Std::is_same<DmaInternal::DmaElem<D>, U>::value && DmaInternal::DmaCanUse<D, Hardware::UB>::value,
+        bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
+    D&& dst, S&& src, const DataCopyExtParams& params, const DataCopyPadExtParams<U>& pad);
+
+template <
+    typename T = void, typename D, typename S,
+    typename Std::enable_if<DmaInternal::PadUbToL1<T, D, S>::value, bool>::type = true>
+__aicore__ inline void DataCopyPad(D&& dst, S&& src, const DataCopyParams& params, const Nd2NzParams& nd2nzParams);
+
+template <
+    typename T = void, typename D, typename S,
+    typename Std::enable_if<DmaInternal::PadUbToL1<T, D, S>::value, bool>::type = true>
+__aicore__ inline void DataCopyPad(D&& dst, S&& src, const DataCopyExtParams& params, const Nd2NzParams& nd2nzParams);
+
+} // namespace AscendC
+#endif
+
+// Pointer DataCopy and DataCopyL1ToUB declarations.
+#if !defined(ASCENDC_CPU_DEBUG) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 2201))
+#include "../../impl/basic_api/utils/kernel_utils_dma_copy_traits.h"
+
+namespace AscendC {
+
+template <
+    typename T = void, typename D, typename S,
+    typename Std::enable_if<
+        DmaInternal::CopyPair<T, T, D, S>::value && DmaInternal::BasicRoute<D, S>::gmIn, bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(D&& dst, S&& src, const DataCopyParams& params);
+
+template <
+    typename T = void, typename D, typename S,
+    typename Std::enable_if<
+        DmaInternal::CopyPair<T, T, D, S>::value && DmaInternal::BasicRoute<D, S>::gmOut, bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(D&& dst, S&& src, const DataCopyParams& params);
+
+template <
+    typename T = void, typename U = void, typename D, typename S,
+    typename Std::enable_if<
+        DmaInternal::CopyPair<T, U, D, S>::value && DmaInternal::BasicRoute<D, S>::local, bool>::type = true>
+__aicore__ inline void DataCopy(D&& dst, S&& src, const DataCopyParams& params);
+
+template <
+    typename T = void, typename D, typename S,
+    typename Std::enable_if<
+        DmaInternal::CopyPair<T, T, D, S>::value && DmaInternal::BasicRoute<D, S>::gmIn, bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(D&& dst, S&& src, const uint32_t count);
+
+template <
+    typename T = void, typename D, typename S,
+    typename Std::enable_if<
+        DmaInternal::CopyPair<T, T, D, S>::value && DmaInternal::BasicRoute<D, S>::gmOut, bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(D&& dst, S&& src, const uint32_t count);
+
+template <
+    typename T = void, typename D, typename S,
+    typename Std::enable_if<
+        DmaInternal::CopyPair<T, T, D, S>::value && DmaInternal::BasicRoute<D, S>::local &&
+            DmaInternal::BasicRoute<D, S>::same,
+        bool>::type = true>
+__aicore__ inline void DataCopy(D&& dst, S&& src, const uint32_t count);
+
+#if __NPU_ARCH__ == 3510
+template <
+    typename T = void, bool enableSmallC0 = false, typename D, typename S,
+    typename Std::enable_if<
+        DmaInternal::CopyPair<T, T, D, S>::value && DmaInternal::BasicRoute<D, S>::gmIn &&
+            (!enableSmallC0 || DmaInternal::CopyRoute<D, S, Hardware::L1, Hardware::GM>::value),
+        bool>::type = true>
+#else
+template <
+    typename T = void, typename D, typename S,
+    typename Std::enable_if<
+        DmaInternal::CopyPair<T, T, D, S>::value && DmaInternal::BasicRoute<D, S>::gmIn, bool>::type = true>
+#endif
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(D&& dst, S&& src, const Nd2NzParams& params);
+
+template <
+    typename T = void, typename D, typename S,
+    typename Std::enable_if<
+        DmaInternal::CopyPair<T, T, D, S>::value && DmaInternal::BasicRoute<D, S>::same &&
+            DmaInternal::CopyRoute<D, S, Hardware::L1, Hardware::UB>::value,
+        bool>::type = true>
+__aicore__ inline void DataCopy(D&& dst, S&& src, const Nd2NzParams& params);
+
+#if __NPU_ARCH__ == 3510
+template <
+    typename T = void, bool enableSmallC0 = false, typename D, typename S,
+    typename Std::enable_if<
+        DmaInternal::CopyPair<T, T, D, S>::value && DmaInternal::BasicRoute<D, S>::same &&
+            DmaInternal::CopyRoute<D, S, Hardware::L1, Hardware::GM>::value,
+        bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(D&& dst, S&& src, const Dn2NzParams& params);
+#endif
+
+#if __NPU_ARCH__ == 3510
+template <
+    typename T, uint8_t dim, const NdDmaConfig& config = kDefaultNdDmaConfig,
+    typename Std::enable_if<(dim >= 1 && dim <= 5), bool>::type = true, typename D, typename S,
+    typename Std::enable_if<
+        DmaInternal::CopyPair<T, T, D, S>::value && DmaInternal::BasicRoute<D, S>::same &&
+            DmaInternal::CopyRoute<D, S, Hardware::UB, Hardware::GM>::value,
+        bool>::type = true>
+__aicore__ inline void DataCopy(D&& dst, S&& src, const MultiCopyParams<T, dim>& params);
+#endif
+
+#if __NPU_ARCH__ == 3510
+template <
+    typename T = void, uint8_t subBlockId = 0, typename D, typename S,
+    typename Std::enable_if<
+        DmaInternal::CopyPair<T, T, D, S>::value && DmaInternal::BasicRoute<D, S>::same &&
+            DmaInternal::CopyRoute<D, S, Hardware::UB, Hardware::L1>::value,
+        bool>::type = true>
+__aicore__ inline void DataCopyL1ToUB(D&& dst, S&& src, const DataCopyParams& params);
+#endif
+
+#if __NPU_ARCH__ == 3510
+template <
+    typename T = void, uint8_t subBlockId = 0, typename D, typename S,
+    typename Std::enable_if<
+        DmaInternal::CopyPair<T, T, D, S>::value && DmaInternal::BasicRoute<D, S>::same &&
+            DmaInternal::CopyRoute<D, S, Hardware::UB, Hardware::L1>::value,
+        bool>::type = true>
+__aicore__ inline void DataCopyL1ToUB(D&& dst, S&& src, const uint32_t count);
+#endif
+
+template <
+    typename T = void, typename D, typename S,
+    typename Std::enable_if<
+        DmaInternal::CopyPair<T, T, D, S>::value && DmaInternal::BasicRoute<D, S>::same &&
+            DmaInternal::CopyRoute<D, S, Hardware::GM, Hardware::UB>::value,
+        bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(D&& dst, S&& src, const Nz2NdParamsFull& params);
+
+template <
+    typename T = void, typename U = void, typename D, typename S,
+    typename Std::enable_if<
+        DmaInternal::CopyPair<T, U, D, S>::value && (DmaInternal::CopyRoute<D, S, Hardware::GM, Hardware::L0C>::value ||
+                                                     DmaInternal::CopyRoute<D, S, Hardware::L1, Hardware::L0C>::value),
+        bool>::type = true>
+__aicore__ inline void DataCopy(D&& dst, S&& src, const DataCopyCO12DstParams& params);
+
+template <
+    typename T = void, typename D, typename S,
+    typename Std::enable_if<
+        DmaInternal::CopyPair<T, T, D, S>::value && DmaInternal::BasicRoute<D, S>::gmIn, bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    D&& dst, S&& src, const DataCopyParams& params, const DataCopyEnhancedParams& enhanced);
+
+template <
+    typename T = void, typename D, typename S,
+    typename Std::enable_if<
+        DmaInternal::CopyPair<T, T, D, S>::value && DmaInternal::BasicRoute<D, S>::gmOut, bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
+    D&& dst, S&& src, const DataCopyParams& params, const DataCopyEnhancedParams& enhanced);
+
+template <
+    typename T = void, typename U = void, bool enabled = true, typename D, typename S,
+    typename Std::enable_if<
+        DmaInternal::CopyPair<T, U, D, S>::value && DmaInternal::EnhancedRoute<D, S>::local &&
+            !DmaInternal::EnhancedRoute<D, S>::vector,
+        bool>::type = true>
+__aicore__ inline void DataCopy(D&& dst, S&& src, const DataCopyParams& params, const DataCopyEnhancedParams& enhanced);
+
+template <
+    typename T = void, typename U = void, bool enabled = true, typename D, typename S,
+    typename Std::enable_if<
+        DmaInternal::CopyPair<T, U, D, S>::value && DmaInternal::EnhancedRoute<D, S>::local &&
+            DmaInternal::EnhancedRoute<D, S>::vector,
+        bool>::type = true>
+__aicore__ inline __inout_pipe__(V) void DataCopy(
+    D&& dst, S&& src, const DataCopyParams& params, const DataCopyEnhancedParams& enhanced);
+
+template <
+    typename T = void, typename D, typename S,
+    typename Std::enable_if<
+        DmaInternal::CopyPair<T, T, D, S>::value && DmaInternal::BasicRoute<D, S>::same &&
+            DmaInternal::CopyRoute<D, S, Hardware::UB, Hardware::GM>::value,
+        bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    D&& dst, S&& src, const SliceInfo dstSlice[], const SliceInfo srcSlice[], const uint32_t dim = 1);
+
+template <
+    typename T = void, typename D, typename S,
+    typename Std::enable_if<
+        DmaInternal::CopyPair<T, T, D, S>::value && DmaInternal::BasicRoute<D, S>::same &&
+            DmaInternal::CopyRoute<D, S, Hardware::GM, Hardware::UB>::value,
+        bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
+    D&& dst, S&& src, const SliceInfo dstSlice[], const SliceInfo srcSlice[], const uint32_t dim = 1);
+
+} // namespace AscendC
+#endif
+
 #include "../../impl/basic_api/kernel_operator_data_copy_intf_impl.h"
 #endif
 #endif // ASCENDC_MODULE_OPERATOR_VEC_VCONV_INTERFACE_H
