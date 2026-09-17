@@ -132,6 +132,7 @@ from .super_kernel_sub_op_compile import (
 )
 from .static_compile_resource_generator import (
     KernelSpecCompilation,
+    gen_sk_bind_source,
 )
 from .super_kernel_constants import SuperKernelStreamFusionMode
 from .super_kernel_option_parse import parse_super_kernel_options
@@ -883,21 +884,12 @@ def gen_kernel_fun(
             source += "do {\n"
 
     need_ffts = is_mix or is_single_and_using_hard_sync
-    context = get_context()
-    enable_inner_core_sync_check = (
-        global_var_storage.get_variable("ascendc_enable_super_kernel") is True
-        and context is not None
-        and context.get_addition("super_kernel_sub_combine") is True
-        and compile_info.super_kernel_info["sp_options"].get(
-            "debug-per-op-max-core-num", "0"
-        )
-        == "1"
-    )
-
+    # Keep debug guards in recorded sources so specialization can enable them.
     # call usr kernel function call
-    if enable_inner_core_sync_check:
-        source += "    AscendC::g_superKernelSetWaitFlagCountDifference = "
-        source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE;\n"
+    source += "#ifdef __ASCENDC_SUPER_KERNEL_DEBUG__\n"
+    source += "    AscendC::g_superKernelSetWaitFlagCountDifference = "
+    source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE;\n"
+    source += "#endif\n"
     source += "#if defined(TEMPLATE_PARAMS_LEN) && TEMPLATE_PARAMS_LEN != 0\n"
     source += gen_usr_origin_kernel_function_call(
         func_name, opinfo, tiling_info, has_template=True
@@ -907,20 +899,21 @@ def gen_kernel_fun(
         func_name, opinfo, tiling_info, has_template=False
     )
     source += "#endif\n"
-    if enable_inner_core_sync_check:
-        source += "    if (AscendC::g_superKernelSetWaitFlagCountDifference > "
-        source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE) {\n"
-        source += '        assert(false, "SuperKernel: current operator has %d more '
-        source += 'SetFlag calls than WaitFlag calls; Please check synchronization within the current operator.\\n", '
-        source += "AscendC::g_superKernelSetWaitFlagCountDifference - "
-        source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE);\n"
-        source += "    } else if (AscendC::g_superKernelSetWaitFlagCountDifference < "
-        source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE) {\n"
-        source += '        assert(false, "SuperKernel: current operator has %d more '
-        source += 'WaitFlag calls than SetFlag calls; Please check synchronization within the current operator.\\n", '
-        source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE - "
-        source += "AscendC::g_superKernelSetWaitFlagCountDifference);\n"
-        source += "    }\n"
+    source += "#ifdef __ASCENDC_SUPER_KERNEL_DEBUG__\n"
+    source += "    if (AscendC::g_superKernelSetWaitFlagCountDifference > "
+    source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE) {\n"
+    source += '        assert(false, "SuperKernel: current operator has %d more '
+    source += 'SetFlag calls than WaitFlag calls; Please check synchronization within the current operator.\\n", '
+    source += "AscendC::g_superKernelSetWaitFlagCountDifference - "
+    source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE);\n"
+    source += "    } else if (AscendC::g_superKernelSetWaitFlagCountDifference < "
+    source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE) {\n"
+    source += '        assert(false, "SuperKernel: current operator has %d more '
+    source += 'WaitFlag calls than SetFlag calls; Please check synchronization within the current operator.\\n", '
+    source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE - "
+    source += "AscendC::g_superKernelSetWaitFlagCountDifference);\n"
+    source += "    }\n"
+    source += "#endif\n"
 
     if len(compile_info.tiling_key_struct_map) > 0:
         source += _gen_tpl_tiling_struct_section(compile_info, tiling_info)
@@ -1685,9 +1678,13 @@ def _get_dcci_disable_cap_bitmap(
     """
     Check if DCCI should be disabled for any kernel in kernel_symbols.
     Returns 4 if matched, 0 otherwise.
+
+    Accept both parsed comma-separated options and kernel pattern lists.
     """
     sp_options = compile_info.super_kernel_info.get("sp_options", {})
     patterns = sp_options.get("dcci-disable-on-kernel", [])
+    if isinstance(patterns, str):
+        patterns = [p.strip() for p in patterns.split(",") if p.strip()]
     if isinstance(patterns, list) and patterns:
         for kernel_name in kernel_symbols:
             if any(_match_regex(p, kernel_name) for p in patterns):
@@ -1722,23 +1719,16 @@ def compile_sk_bind(
 ):
     sk_bind_src_file = os.path.join(kernel_meta_dir, "sk_bind.cpp")
     sk_bind_dst_file = os.path.join(kernel_meta_dir, "sk_bind.o")
-    source = '#include "kernel_operator.h"\n'
-
     # bitmap definition: bit0:wait_flag(1), bit1:set_flag(2), bit2:dcci_disable(4)
     cap_bitmap = _get_sk_cap_bitmap(
         compile_info, compile_info_origin.global_kernel_symbols
     )
-
-    for idx, global_syb in enumerate(compile_info_origin.global_kernel_symbols):
-        sk_syb = compile_info.global_kernel_symbols[idx]
-        source += f'extern "C" {compile_info_origin.global_kernel_attribute} void {global_syb}();\n'
-        source += (
-            f'extern "C" {compile_info.global_kernel_attribute} void {sk_syb}();\n'
-        )
-        source += f'extern "C" {compile_info.global_kernel_attribute} void {sk_syb}_split1();\n'
-        source += f'extern "C" {compile_info.global_kernel_attribute} void {sk_syb}_split2();\n'
-        source += f'extern "C" {compile_info.global_kernel_attribute} void {sk_syb}_split3();\n'
-        source += f"SK_BIND({global_syb}, {cap_bitmap}, {sk_syb}, {sk_syb}_split1, {sk_syb}_split2, {sk_syb}_split3);\n"
+    source = gen_sk_bind_source(
+        zip(compile_info_origin.global_kernel_symbols, compile_info.global_kernel_symbols),
+        compile_info_origin.global_kernel_attribute,
+        compile_info.global_kernel_attribute,
+        cap_bitmap,
+    ).decode("utf-8")
 
     # write code into file
     try:
