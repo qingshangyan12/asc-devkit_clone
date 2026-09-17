@@ -267,8 +267,7 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForOp(
     const HcclHandle handleId)
 {
-    ccuUsedXnNum_ = 8;                  // 算法默认使用的xn num
-    cachedAlgTypeResult_ = 0xFFFFFFFFU; // 逐 op 失效算法类型缓存，首次查询强制重扫
+    ccuUsedXnNum_ = 8; // 算法默认使用的xn num
     FlushDataCache(&handleParamGM_[handleId]);
     if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLGATHER) {
         if (GetAlgorithmType(handleId) ==
@@ -549,22 +548,13 @@ __aicore__ inline uint32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config
         return UINT32_MAX;
     }
     const uint32_t prepareType = static_cast<uint32_t>(handleParamGM_[handleId].commType.prepareType);
-    // 单条目缓存命中（键 handleId+prepareType，逐 op 在 CcuPrepareForOp 入口失效）：
-    // 免去 op 内后续 4 次重复扫描（每次最多 1+8+1 次 GM 读）。
-    if (handleId == cachedAlgTypeHandleId_ && prepareType == cachedAlgTypePrepareType_ &&
-        cachedAlgTypeResult_ != 0xFFFFFFFFU) {
-        return cachedAlgTypeResult_;
-    }
     for (uint32_t index = 0U; index < HCCL_API_MAX_OP_NUM; ++index) {
         if (prepareType != static_cast<uint32_t>(HcclCMDType::HCCL_CMD_INVALID) &&
             hcclNewContext_->opType[index] == prepareType) {
-            cachedAlgTypeHandleId_ = handleId;
-            cachedAlgTypePrepareType_ = prepareType;
-            cachedAlgTypeResult_ = hcclNewContext_->algorithmType[index];
             return hcclNewContext_->algorithmType[index];
         }
     }
-    return UINT32_MAX; // 未命中不缓存
+    return UINT32_MAX;
 }
 
 template <const auto& config>
@@ -672,29 +662,18 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
 #ifndef ASCENDC_CPU_DEBUG
     if (workingFlag_) {
         const uint8_t missionNum = GetKfcMissionNum(handleId);
-        // 双 mission 合并轮询：单循环同查两个 CKE。原顺序轮询下 mission 1 的完成信号要等
-        // mission 0 检测+复位收尾后才开始被观察，最坏多付一个轮询周期+一次重写时长。
-        GM_ADDR waitCKEAddr0 = GetWaitCkeAddr(reqId, 0);
-        GM_ADDR waitCKEAddr1 = (missionNum > 1U) ? GetWaitCkeAddr(reqId, 1) : waitCKEAddr0;
-        uint32_t done0 = 0U;
-        uint32_t done1 = (missionNum > 1U) ? 0U : 1U; // mission 1 不存在时直接视为已完成
-        while ((done0 & done1) == 0U) {
-            if (done0 == 0U && ReadHBMData(waitCKEAddr0) != 0U) {
-                done0 = 1U;
+        for (uint8_t mission = 0; mission < missionNum; ++mission) {
+            GM_ADDR waitCKEAddr = GetWaitCkeAddr(reqId, mission);
+            while (true) {
+                uint64_t waitCke = ReadHBMData(waitCKEAddr);
+                if (waitCke != 0) {
+                    WriteHBMData(reinterpret_cast<__gm__ uint64_t*>(waitCKEAddr), CCU_MSG_CKE_INIT_VALUE);
+                    break;
+                }
             }
-            if (done1 == 0U && ReadHBMData(waitCKEAddr1) != 0U) {
-                done1 = 1U;
-            }
-        }
-        // 复位/计数改用轻量旁路写（无 Barrier/DSB）：消费者分别是同槽位数 op 之后的 server
-        // 重新置位与混合 homm 模式的未来轮询，posted 写落地余量充足；排序关键路径
-        // （CcuSendMsg 的 commit CKE）仍用 WriteHBMData 全屏障版本。
-        WriteHbmBypassRaw(reinterpret_cast<__gm__ uint64_t*>(waitCKEAddr0), CCU_MSG_CKE_INIT_VALUE);
-        if (missionNum > 1U) {
-            WriteHbmBypassRaw(reinterpret_cast<__gm__ uint64_t*>(waitCKEAddr1), CCU_MSG_CKE_INIT_VALUE);
         }
         finishNumTemp_++;
-        WriteHbmBypassRaw(finishCntGM_, finishNumTemp_);
+        WriteHBMData(finishCntGM_, finishNumTemp_);
     } else {
         while (true) {
             uint64_t finshCnt = ReadHBMData(finishCntGM_);
