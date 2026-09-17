@@ -18,7 +18,8 @@
 
 #include "../utils/std/type_traits.h"
 
-#if defined(__clang__) && (__CCE__)
+#if defined(__clang__) && defined(__CCE__) && (!defined(ASCENDC_CPU_DEBUG) || (ASCENDC_CPU_DEBUG == 0)) && \
+    !defined(__DAV_C310_CUBE__) && !defined(__DAV_C220_CUBE__)
 #define ASCENDC_ENABLE_HW_PTR_API 1
 #endif
 

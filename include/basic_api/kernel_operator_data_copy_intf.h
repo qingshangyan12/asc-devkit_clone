@@ -522,11 +522,11 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(__cbuf__ T* dst, __gm__ T* 
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     __ubuf__ T* dst, __gm__ T* src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[],
-    const uint32_t dimValue = 1);
+    const uint32_t dimValue);
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
     __gm__ T* dst, __ubuf__ T* src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[],
-    const uint32_t dimValue = 1);
+    const uint32_t dimValue);
 
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(__ubuf__ T* dst, __gm__ T* src, const uint32_t count);

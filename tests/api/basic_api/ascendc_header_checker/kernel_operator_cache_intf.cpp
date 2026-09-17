@@ -64,7 +64,7 @@ extern "C" __global__ __aicore__ void KernelTestICachePreLoad1()
     AscendC::ICachePreLoad(preFetchLen);
 }
 
-#if defined(ASCENDC_ENABLE_HW_PTR_API) && !defined(__DAV_C310_CUBE__) && !defined(__DAV_C220_CUBE__)
+#if defined(ASCENDC_ENABLE_HW_PTR_API)
 extern "C" __global__ __aicore__ void KernelTestDataCachePreloadPtr()
 {
     __gm__ uint64_t* src = nullptr;
