@@ -8044,7 +8044,7 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
             lines = " ".join(lines)
             self.assertNotEqual(lines.find(" __attribute__((aligned(512))) "), -1)
             self.assertNotEqual(lines.find(" __sk__"), -1)
-            self.assertNotIn("__ASCENDC_SUPER_KERNEL_DEBUG__", lines)
+            self.assertIn("#ifdef __ASCENDC_SUPER_KERNEL_DEBUG__", lines)
             self.assertIn(
                 "AscendC::g_superKernelSetWaitFlagCountDifference = "
                 "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE;",
@@ -8497,6 +8497,13 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
         self.assertTrue(_match_regex("", ""))
         self.assertFalse(_match_regex("", "a"))
         self.assertFalse(_match_regex("a", ""))
+
+    def test_get_dcci_disable_cap_bitmap_comma_separated_patterns(self):
+        compile_info = CompileInfo()
+        compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": " kernel_a, kernel_.* , "}}
+        self.assertEqual(_get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"]), 4)
+        self.assertEqual(_get_dcci_disable_cap_bitmap(compile_info, ["kernel_b"]), 4)
+        self.assertEqual(_get_dcci_disable_cap_bitmap(compile_info, ["other"]), 0)
 
     def test_get_dcci_disable_cap_bitmap_empty_patterns(self):
         compile_info = CompileInfo()
