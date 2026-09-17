@@ -37,28 +37,43 @@ __aicore__ inline void SetFixPipeAddrImpl(const LocalTensor<T>& eleWiseTensor, u
 /* **************************************************************************************************
  * SPR                                             *
  * ************************************************************************************************* */
+/*!
+ * \brief Address level core of SetFixPipeConfig, shared by the LocalTensor path and the bare hardware
+ *        pointer path. Only the address value is needed to build the FPC register.
+ */
+__aicore__ inline void SetFixPipeFpcCal(uint64_t reluPreAddr, uint64_t quantPreAddr, bool isUnitFlag)
+{
+    uint64_t config = 0;
+    config = config | (reluPreAddr >> 6);         // align with 64bit, FPC[7:0], ReluPreAddr
+    config = config | ((quantPreAddr >> 7) << 8); // align with 128bit, FPC[15:8], QuantPreAddr.
+    config = config | ((uint64_t)isUnitFlag << 63); // FPC[63], UnitFlag.
+    set_fpc(config);
+}
+
+template <bool setRelu = false>
+__aicore__ inline void SetFixPipeFpcCal(uint64_t preAddr, bool isUnitFlag)
+{
+    uint64_t config = 0;
+    if constexpr (setRelu) {
+        config = config | (preAddr >> 6); // align with 64bit, FPC[7:0], ReluPreAddr.
+    } else {
+        config = config | ((preAddr >> 7) << 8); // align with 128bit, FPC[15:8], QuantPreAddr.
+    }
+    config = config | ((uint64_t)isUnitFlag << 63); // FPC[63], UnitFlag.
+    set_fpc(config);
+}
+
 template <typename T>
 __aicore__ inline void SetFixPipeConfigImpl(
     const LocalTensor<T>& reluPre, const LocalTensor<T>& quantPre, bool isUnitFlag = false)
 {
-    uint64_t config = 0;
-    config = config | ((uint64_t)reluPre.GetPhyAddr() >> 6);         // align with 64bit, FPC[7:0], ReluPreAddr
-    config = config | (((uint64_t)quantPre.GetPhyAddr() >> 7) << 8); // align with 128bit, FPC[15:8], QuantPreAddr.
-    config = config | ((uint64_t)isUnitFlag << 63);                  // FPC[63], UnitFlag.
-    set_fpc(config);
+    SetFixPipeFpcCal((uint64_t)reluPre.GetPhyAddr(), (uint64_t)quantPre.GetPhyAddr(), isUnitFlag);
 }
 
 template <typename T, bool setRelu = false>
 __aicore__ inline void SetFixPipeConfigImpl(const LocalTensor<T>& preTensor, bool isUnitFlag = false)
 {
-    uint64_t config = 0;
-    if constexpr (setRelu) {
-        config = config | ((uint64_t)preTensor.GetPhyAddr() >> 6); // align with 64bit, FPC[7:0], ReluPreAddr.
-    } else {
-        config = config | (((uint64_t)preTensor.GetPhyAddr() >> 7) << 8); // align with 128bit, FPC[15:8], QuantPreAddr.
-    }
-    config = config | ((uint64_t)isUnitFlag << 63); // FPC[63], UnitFlag.
-    set_fpc(config);
+    SetFixPipeFpcCal<setRelu>((uint64_t)preTensor.GetPhyAddr(), isUnitFlag);
 }
 
 __aicore__ inline void SetFixpipeNz2ndFlagImpl(uint16_t ndNum, uint16_t srcNdStride, uint32_t dstNdStride)
