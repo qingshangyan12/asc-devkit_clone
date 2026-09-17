@@ -327,16 +327,12 @@ __simd_callee__ inline void ComplexMulKernel(U& dstReg, U& srcReg0, U& srcReg1, 
         RegTensor<float> dstRealF32High;
         RegTensor<float> dstImagF32Low;
         RegTensor<float> dstImagF32High;
-        MaskReg lowMaskB16;
-        MaskReg highMaskB16;
         MaskReg lowMask;
         MaskReg highMask;
         MaskReg zeroMask = CreateMask<typename ActualT::EleType, MaskPattern::ALLF>();
         MaskReg fullMask = CreateMask<typename ActualT::EleType, MaskPattern::ALL>();
         Duplicate(zero, static_cast<typename ActualT::EleType>(0), fullMask);
-        MaskInterleave<typename ActualT::EleType>(lowMaskB16, highMaskB16, mask, zeroMask);
-        MaskUnPack(lowMask, lowMaskB16);
-        MaskUnPack(highMask, highMaskB16);
+        MaskInterleave<typename ActualT::EleType>(lowMask, highMask, mask, zeroMask);
         Interleave(src0RealLow, src0RealHigh, src0Real, zero);
         Interleave(src0ImagLow, src0ImagHigh, src0Imag, zero);
         Interleave(src1RealLow, src1RealHigh, src1Real, zero);
