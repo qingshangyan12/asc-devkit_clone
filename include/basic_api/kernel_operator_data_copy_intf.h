@@ -31,7 +31,6 @@
 #include "../../impl/basic_api/utils/kernel_utils_struct_confusion_pad.h"
 #include "../../impl/basic_api/utils/kernel_ptr_utils.h"
 #include "kernel_tensor.h"
-#include "../../impl/basic_api/utils/kernel_ptr_utils.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstddef>
@@ -678,17 +677,33 @@ __aicore__ inline void DataCopyPad(
  * @param [out] dst output LocalTensor or __ubuf__ / __cbuf__ pointer
  * @param [in] src input GlobalTensor or __gm__ pointer
  * @param [in] padParams pad parameters whose element type is taken from the source operand
+ *
+ * This single pointer-extended overload serves both documented call forms -- `DataCopyPad(dst, src, cp, pp)` with
+ * T deduced from `padParams`, and the task-book explicit form `DataCopyPad<T>(dst, src, cp, pp)`. Declaring a
+ * second overload that derives T from the source operand instead would make the deduced call ambiguous.
+ * T is constrained equal to the operand element type `DmaOperandElem<SrcT>`, so the explicit form must still name
+ * the true element type, and T can never be an address-space-qualified type.
+ *
+ * The template parameter order is `T, mode, DstT, SrcT`, i.e. the same leading order as the Tensor-only
+ * signatures. That is what makes every documented explicit form resolve: `DataCopyPad<T>(...)` (mode then
+ * defaults) and `DataCopyPad<T, PaddingMode::Compact>(...)` (both given), while the fully deduced
+ * `DataCopyPad(dst, src, cp, pp)` still works because T is deduced from `padParams` and mode has a default.
  */
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
     (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
 template <
-    typename DstT, typename SrcT, PaddingMode mode = PaddingMode::Normal,
+    typename T, PaddingMode mode = PaddingMode::Normal, typename DstT, typename SrcT,
     typename Std::enable_if<
-        IsDmaLocalOperand<DstT> && IsDmaGmOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && IsDmaLocalOperand<DstT> &&
+            IsDmaGmOperand<SrcT> && Std::is_same<T, DmaOperandElem<SrcT>>::value,
+        bool>::type = true>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     const DstT& dst, const SrcT& src, const DataCopyExtParams& dataCopyParams,
-    const DataCopyPadExtParams<DmaOperandElem<SrcT>>& padParams);
+    const DataCopyPadExtParams<T>& padParams);
 #else
+// Non-listed architectures keep the original shape of this form (no PaddingMode parameter), exactly as before:
+// only the element type is named, and there is no UB/L1 selection to make. This branch is restored verbatim
+// from the baseline so the declaration surface does not change on architectures this change does not target.
 template <
     typename DstT, typename SrcT,
     typename Std::enable_if<
@@ -712,6 +727,7 @@ template <
         IsDmaGmOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     const DstT& dst, const SrcT& src, const DataCopyExtParams& dataCopyParams);
+
 #else
 template <
     typename DstT, typename SrcT,
@@ -719,6 +735,7 @@ template <
         IsDmaGmOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type = true>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     const DstT& dst, const SrcT& src, const DataCopyExtParams& dataCopyParams);
+
 #endif
 
 /*

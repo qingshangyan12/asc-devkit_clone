@@ -1961,32 +1961,65 @@ __aicore__ inline void CopyUB2UB(const DstT& dst, const SrcT& src, const DataCop
 template <typename PrimType, typename DstT, typename SrcT>
 __aicore__ inline void DataCopyPtrGm2Local(const DstT& dst, const SrcT& src, const DataCopyParams& repeatParams)
 {
-    const Hardware dstHWPos = GetDmaOperandHardwarePos(dst);
-    if (dstHWPos == Hardware::UB) {
-        // gm -> ub
+    // The destination's position is a compile-time constant for a pointer operand and only a runtime value
+    // for a Tensor. The two cases are therefore dispatched separately: an `if constexpr` for the pointer keeps
+    // the non-selected branches out of the instantiation, which matters because a `__ubuf__` pointer can never
+    // be cast to `__cbuf__` (and vice versa) -- casting it unconditionally is a hard error in an aicore
+    // function, not just a warning. The Tensor case keeps the original runtime GetPosition() dispatch.
+    if constexpr (IsDmaPosRuntime<DstT>) {
+        const Hardware dstHWPos = GetPhyType(GetDmaOperandPosition(dst));
+        if (dstHWPos == Hardware::UB) {
+            // gm -> ub
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
-        DataCopyGM2UBImpl(
-            (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), repeatParams,
-            DataCopyPtrInternal::ExtractCacheModeForOperand(src));
+            DataCopyGM2UBImpl(
+                (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), repeatParams,
+                DataCopyPtrInternal::ExtractCacheModeForOperand(src));
 #else
-        DataCopyGM2UBImpl(
-            (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), repeatParams);
+            DataCopyGM2UBImpl(
+                (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), repeatParams);
 #endif
-    } else if (dstHWPos == Hardware::L1) {
-        // gm -> l1
+        } else if (dstHWPos == Hardware::L1) {
+            // gm -> l1
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
-        DataCopyGM2L1Impl(
-            (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), repeatParams,
-            DataCopyPtrInternal::ExtractCacheModeForOperand(src));
+            DataCopyGM2L1Impl(
+                (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), repeatParams,
+                DataCopyPtrInternal::ExtractCacheModeForOperand(src));
 #else
-        DataCopyGM2L1Impl(
-            (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), repeatParams);
+            DataCopyGM2L1Impl(
+                (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), repeatParams);
 #endif
+        } else {
+            ASCENDC_CHECK_TPOSITION(
+                false, "dst", "L1 Buffer(A1/B1/C1)/UB(VECIN)",
+                "DataCopy from GlobalTensor to LocalTensor with DataCopyParams",
+                GetPositionDisplay(GetDmaOperandPosition(dst)));
+        }
     } else {
-        ASCENDC_CHECK_TPOSITION(
-            false, "dst", "L1 Buffer(A1/B1/C1)/UB(VECIN)",
-            "DataCopy from GlobalTensor to LocalTensor with DataCopyParams",
-            GetPositionDisplay(GetDmaOperandPosition(dst)));
+        if constexpr (DmaHardwarePosV<DstT> == Hardware::UB) {
+            // gm -> ub
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+            DataCopyGM2UBImpl(
+                (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), repeatParams,
+                DataCopyPtrInternal::ExtractCacheModeForOperand(src));
+#else
+            DataCopyGM2UBImpl(
+                (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), repeatParams);
+#endif
+        } else if constexpr (DmaHardwarePosV<DstT> == Hardware::L1) {
+            // gm -> l1
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+            DataCopyGM2L1Impl(
+                (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), repeatParams,
+                DataCopyPtrInternal::ExtractCacheModeForOperand(src));
+#else
+            DataCopyGM2L1Impl(
+                (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), repeatParams);
+#endif
+        } else {
+            static_assert(
+                DmaHardwarePosV<DstT> == Hardware::UB || DmaHardwarePosV<DstT> == Hardware::L1,
+                "DataCopy GM->local pointer dst must be UB or L1");
+        }
     }
 }
 
@@ -1996,32 +2029,62 @@ __aicore__ inline void DataCopyPtrGm2Local(const DstT& dst, const SrcT& src, con
 template <typename PrimType, typename DstT, typename SrcT>
 __aicore__ inline void DataCopyPtrLocal2Gm(const DstT& dst, const SrcT& src, const DataCopyParams& repeatParams)
 {
-    const Hardware srcHWPos = GetDmaOperandHardwarePos(src);
-    if (srcHWPos == Hardware::UB) {
-        // ub -> gm
+    // Same split as DataCopyPtrGm2Local: compile-time dispatch for a pointer operand (an unconditional
+    // `__ubuf__` -> `__cbuf__` cast would be rejected in an aicore function), runtime dispatch for a Tensor.
+    if constexpr (IsDmaPosRuntime<SrcT>) {
+        const Hardware srcHWPos = GetPhyType(GetDmaOperandPosition(src));
+        if (srcHWPos == Hardware::UB) {
+            // ub -> gm
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
-        DataCopyUB2GMImpl(
-            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), repeatParams,
-            DataCopyPtrInternal::ExtractCacheModeForOperand(dst));
+            DataCopyUB2GMImpl(
+                (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), repeatParams,
+                DataCopyPtrInternal::ExtractCacheModeForOperand(dst));
 #else
-        DataCopyUB2GMImpl(
-            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), repeatParams);
+            DataCopyUB2GMImpl(
+                (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), repeatParams);
 #endif
-    } else if (srcHWPos == Hardware::L1) {
-        // l1 -> gm
+        } else if (srcHWPos == Hardware::L1) {
+            // l1 -> gm
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
-        DataCopyL12GMImpl(
-            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), repeatParams,
-            DataCopyPtrInternal::ExtractCacheModeForOperand(dst));
+            DataCopyL12GMImpl(
+                (__gm__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), repeatParams,
+                DataCopyPtrInternal::ExtractCacheModeForOperand(dst));
 #else
-        DataCopyL12GMImpl(
-            (__gm__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), repeatParams);
+            DataCopyL12GMImpl(
+                (__gm__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), repeatParams);
 #endif
+        } else {
+            ASCENDC_CHECK_TPOSITION(
+                false, "src", "L1 Buffer(A1/B1/C1)/UB(VECOUT)",
+                "DataCopy from LocalTensor to GlobalTensor with DataCopyParams",
+                GetPositionDisplay(GetDmaOperandPosition(src)));
+        }
     } else {
-        ASCENDC_CHECK_TPOSITION(
-            false, "src", "L1 Buffer(A1/B1/C1)/UB(VECOUT)",
-            "DataCopy from LocalTensor to GlobalTensor with DataCopyParams",
-            GetPositionDisplay(GetDmaOperandPosition(src)));
+        if constexpr (DmaHardwarePosV<SrcT> == Hardware::UB) {
+            // ub -> gm
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+            DataCopyUB2GMImpl(
+                (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), repeatParams,
+                DataCopyPtrInternal::ExtractCacheModeForOperand(dst));
+#else
+            DataCopyUB2GMImpl(
+                (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), repeatParams);
+#endif
+        } else if constexpr (DmaHardwarePosV<SrcT> == Hardware::L1) {
+            // l1 -> gm
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+            DataCopyL12GMImpl(
+                (__gm__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), repeatParams,
+                DataCopyPtrInternal::ExtractCacheModeForOperand(dst));
+#else
+            DataCopyL12GMImpl(
+                (__gm__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), repeatParams);
+#endif
+        } else {
+            static_assert(
+                DmaHardwarePosV<SrcT> == Hardware::UB || DmaHardwarePosV<SrcT> == Hardware::L1,
+                "DataCopy local->GM pointer src must be UB or L1");
+        }
     }
 }
 
@@ -2031,24 +2094,48 @@ __aicore__ inline void DataCopyPtrLocal2Gm(const DstT& dst, const SrcT& src, con
 template <typename PrimType, typename DstT, typename SrcT>
 __aicore__ inline void DataCopyPtrLocal2Local(const DstT& dst, const SrcT& src, const DataCopyParams& repeatParams)
 {
-    const Hardware dstHWPos = GetDmaOperandHardwarePos(dst);
-    const Hardware srcHWPos = GetDmaOperandHardwarePos(src);
-    if (srcHWPos != Hardware::UB) {
-        ASCENDC_CHECK_TPOSITION(
-            false, "src", "UB(VECIN/VECCALC/VECOUT)", "DataCopy from LocalTensor to LocalTensor with DataCopyParams",
-            GetPositionDisplay(GetDmaOperandPosition(src)));
-    } else if (dstHWPos == Hardware::UB) {
-        // ub -> ub
-        DataCopyPtrInternal::CopyUB2UB<PrimType>(dst, src, repeatParams);
-    } else if (dstHWPos == Hardware::L1) {
-        // ub -> l1
-        DataCopyUB2L1Impl(
-            (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), repeatParams);
+    // Same compile-time / runtime split as the GM<->local dispatchers. It is required here as well: with a
+    // `__cbuf__` source the `ub -> ub` branch would be instantiated too, and casting a `__cbuf__` pointer to
+    // `__ubuf__` is a hard error in an aicore function. Only the branch selected by the address space is
+    // instantiated for a pointer operand.
+    if constexpr (IsDmaPosRuntime<SrcT> || IsDmaPosRuntime<DstT>) {
+        const Hardware dstHWPos = GetPhyType(GetDmaOperandPosition(dst));
+        const Hardware srcHWPos = GetPhyType(GetDmaOperandPosition(src));
+        if (srcHWPos != Hardware::UB) {
+            ASCENDC_CHECK_TPOSITION(
+                false, "src", "UB(VECIN/VECCALC/VECOUT)",
+                "DataCopy from LocalTensor to LocalTensor with DataCopyParams",
+                GetPositionDisplay(GetDmaOperandPosition(src)));
+        } else if (dstHWPos == Hardware::UB) {
+            // ub -> ub
+            DataCopyPtrInternal::CopyUB2UB<PrimType>(dst, src, repeatParams);
+        } else if (dstHWPos == Hardware::L1) {
+            // ub -> l1
+            DataCopyUB2L1Impl(
+                (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), repeatParams);
+        } else {
+            ASCENDC_CHECK_TPOSITION(
+                false, "dst", "UB(VECCALC/VECOUT)/L1 Buffer(A1/B1)",
+                "DataCopy from LocalTensor(UB(VECIN/VECCALC/VECOUT)) to LocalTensor with DataCopyParams",
+                GetPositionDisplay(GetDmaOperandPosition(dst)));
+        }
     } else {
-        ASCENDC_CHECK_TPOSITION(
-            false, "dst", "UB(VECCALC/VECOUT)/L1 Buffer(A1/B1)",
-            "DataCopy from LocalTensor(UB(VECIN/VECCALC/VECOUT)) to LocalTensor with DataCopyParams",
-            GetPositionDisplay(GetDmaOperandPosition(dst)));
+        // Source must be UB whenever it is a pointer: both supported directions start at UB.
+        static_assert(
+            DmaHardwarePosV<SrcT> == Hardware::UB,
+            "DataCopy local->local pointer src must be UB(VECIN/VECCALC/VECOUT)");
+        if constexpr (DmaHardwarePosV<DstT> == Hardware::UB) {
+            // ub -> ub
+            DataCopyPtrInternal::CopyUB2UB<PrimType>(dst, src, repeatParams);
+        } else if constexpr (DmaHardwarePosV<DstT> == Hardware::L1) {
+            // ub -> l1
+            DataCopyUB2L1Impl(
+                (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), repeatParams);
+        } else {
+            static_assert(
+                DmaHardwarePosV<DstT> == Hardware::UB || DmaHardwarePosV<DstT> == Hardware::L1,
+                "DataCopy local->local pointer dst must be UB(VECCALC/VECOUT) or L1");
+        }
     }
 }
 
@@ -2181,20 +2268,39 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(const DstT& dst, const SrcT
 #endif
     CheckNd2NzParams(intriParams, "DataCopy with Nd2NzParams");
     using PrimType = DmaPrimT<SrcT>;
-    const Hardware dstHWPos = GetDmaOperandHardwarePos(dst);
     const uint8_t cacheMode = DataCopyPtrInternal::ExtractCacheModeForOperand(src);
-    if (dstHWPos == Hardware::L1) {
-        // gm -> l1
-        DataCopyGM2L1ND2NZImpl(
-            (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams, cacheMode);
-    } else if (dstHWPos == Hardware::UB) {
-        // gm -> ub
-        DataCopyGM2UBND2NZImpl(
-            (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams, cacheMode);
+    if constexpr (IsDmaPosRuntime<DstT>) {
+        const Hardware dstHWPos = GetPhyType(GetDmaOperandPosition(dst));
+        if (dstHWPos == Hardware::L1) {
+            // gm -> l1
+            DataCopyGM2L1ND2NZImpl(
+                (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams,
+                cacheMode);
+        } else if (dstHWPos == Hardware::UB) {
+            // gm -> ub
+            DataCopyGM2UBND2NZImpl(
+                (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams,
+                cacheMode);
+        } else {
+            ASCENDC_CHECK_TPOSITION(
+                false, "dst", "L1 Buffer(A1/B1)/UB(VECIN)",
+                "DataCopy from GlobalTensor to LocalTensor with Nd2NzParams",
+                GetPositionDisplay(GetDmaOperandPosition(dst)));
+        }
     } else {
-        ASCENDC_CHECK_TPOSITION(
-            false, "dst", "L1 Buffer(A1/B1)/UB(VECIN)", "DataCopy from GlobalTensor to LocalTensor with Nd2NzParams",
-            GetPositionDisplay(GetDmaOperandPosition(dst)));
+        if constexpr (DmaHardwarePosV<DstT> == Hardware::L1) {
+            DataCopyGM2L1ND2NZImpl(
+                (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams,
+                cacheMode);
+        } else if constexpr (DmaHardwarePosV<DstT> == Hardware::UB) {
+            DataCopyGM2UBND2NZImpl(
+                (__ubuf__ PrimType*)GetUnderlyingPtr(dst), (__gm__ PrimType*)GetUnderlyingPtr(src), intriParams,
+                cacheMode);
+        } else {
+            static_assert(
+                DmaHardwarePosV<DstT> == Hardware::L1 || DmaHardwarePosV<DstT> == Hardware::UB,
+                "DataCopy GM->local pointer dst with Nd2NzParams must be L1 or UB");
+        }
     }
 }
 #else
@@ -2245,20 +2351,35 @@ __aicore__ inline void DataCopy(const DstT& dst, const SrcT& src, const Nd2NzPar
 #endif
     CheckNd2NzParams(intriParams, "DataCopy with Nd2NzParams");
     using PrimType = DmaPrimT<SrcT>;
-    const Hardware dstHWPos = GetDmaOperandHardwarePos(dst);
-    const Hardware srcHWPos = GetDmaOperandHardwarePos(src);
-    if (srcHWPos != Hardware::UB) {
-        ASCENDC_CHECK_TPOSITION(
-            false, "src", "UB(VECIN/VECCALC/VECOUT)", "DataCopy from LocalTensor to LocalTensor with Nd2NzParams",
-            GetPositionDisplay(GetDmaOperandPosition(src)));
-    } else if (dstHWPos == Hardware::L1) {
+    // Compile-time / runtime split, as in the other dispatchers: with a `__cbuf__` source the UB->L1 cast must
+    // not be instantiated, because casting a `__cbuf__` pointer to `__ubuf__` is a hard error in an aicore
+    // function (it would be dead code at run time, but it still has to type-check).
+    if constexpr (IsDmaPosRuntime<SrcT> || IsDmaPosRuntime<DstT>) {
+        const Hardware dstHWPos = GetPhyType(GetDmaOperandPosition(dst));
+        const Hardware srcHWPos = GetPhyType(GetDmaOperandPosition(src));
+        if (srcHWPos != Hardware::UB) {
+            ASCENDC_CHECK_TPOSITION(
+                false, "src", "UB(VECIN/VECCALC/VECOUT)", "DataCopy from LocalTensor to LocalTensor with Nd2NzParams",
+                GetPositionDisplay(GetDmaOperandPosition(src)));
+        } else if (dstHWPos == Hardware::L1) {
+            // ub -> l1(tscm)
+            DataCopyUB2L1ND2NZImpl(
+                (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), intriParams);
+        } else {
+            ASCENDC_CHECK_TPOSITION(
+                false, "dst", "L1 Buffer(A1/B1)", "DataCopy from LocalTensor to LocalTensor with Nd2NzParams",
+                GetPositionDisplay(GetDmaOperandPosition(dst)));
+        }
+    } else {
+        static_assert(
+            DmaHardwarePosV<SrcT> == Hardware::UB,
+            "DataCopy local->local pointer src with Nd2NzParams must be UB(VECIN/VECCALC/VECOUT)");
+        static_assert(
+            DmaHardwarePosV<DstT> == Hardware::L1,
+            "DataCopy local->local pointer dst with Nd2NzParams must be L1 Buffer(A1/B1)");
         // ub -> l1(tscm)
         DataCopyUB2L1ND2NZImpl(
             (__cbuf__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), intriParams);
-    } else {
-        ASCENDC_CHECK_TPOSITION(
-            false, "dst", "L1 Buffer(A1/B1)", "DataCopy from LocalTensor to LocalTensor with Nd2NzParams",
-            GetPositionDisplay(GetDmaOperandPosition(dst)));
     }
 }
 
@@ -2599,13 +2720,17 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
 
 // GM -> UB / L1, DataCopyExtParams + DataCopyPadExtParams form. The pad element type is derived from the source
 // operand, so it is the same primitive type the Tensor signature used.
+// NOTE: the template head must stay character-identical in condition to the declaration in
+// include/basic_api/kernel_operator_data_copy_intf.h. A differing SFINAE clause makes the definition a
+// *different* template, which does not satisfy the declaration and surfaces as an undefined symbol at link.
 template <
-    typename DstT, typename SrcT, PaddingMode mode,
+    typename T, PaddingMode mode, typename DstT, typename SrcT,
     typename Std::enable_if<
-        IsDmaLocalOperand<DstT> && IsDmaGmOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type>
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && IsDmaLocalOperand<DstT> &&
+            IsDmaGmOperand<SrcT> && Std::is_same<T, DmaOperandElem<SrcT>>::value,
+        bool>::type>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
-    const DstT& dst, const SrcT& src, const DataCopyExtParams& dataCopyParams,
-    const DataCopyPadExtParams<DmaOperandElem<SrcT>>& padParams)
+    const DstT& dst, const SrcT& src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams)
 {
 #ifdef ASCENDC_TIME_STAMP_ON
     PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE2_DATACOPY));
@@ -3024,6 +3149,61 @@ template <
     typename DstT, typename SrcT, PaddingMode mode,
     typename Std::enable_if<
         IsDmaGmOperand<DstT> && IsDmaLocalOperand<SrcT> && IsDmaPtrInvolved<DstT, SrcT>, bool>::type>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
+    const DstT& dst, const SrcT& src, const DataCopyExtParams& dataCopyParams)
+{
+    using PrimType = DmaPrimT<SrcT>;
+#if (__NPU_ARCH__ != 5102)
+    if ASCEND_IS_AIC {
+        return;
+    }
+#endif
+    const uint8_t cacheMode = ExtractCacheMode(dst);
+    if constexpr (IsDmaPosRuntime<SrcT>) {
+        const Hardware srcHWPos = GetPhyType(GetDmaOperandPosition(src));
+        if (srcHWPos == Hardware::UB) {
+            DataCopyPadUB2GMImpl<PrimType, mode>(
+                (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), dataCopyParams,
+                cacheMode);
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
+        } else if (srcHWPos == Hardware::L1) {
+            DataCopyPadL12GMImpl<PrimType, mode>(
+                (__gm__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), dataCopyParams);
+#endif
+        } else {
+            ASCENDC_CHECK_TPOSITION(
+                false, "src", "UB(VECIN/VECOUT)", "DataCopyPad from LocalTensor to GlobalTensor with DataCopyExtParams",
+                GetPositionDisplay(GetDmaOperandPosition(src)));
+        }
+    } else {
+        if constexpr (DmaHardwarePosV<SrcT> == Hardware::UB) {
+            DataCopyPadUB2GMImpl<PrimType, mode>(
+                (__gm__ PrimType*)GetUnderlyingPtr(dst), (__ubuf__ PrimType*)GetUnderlyingPtr(src), dataCopyParams,
+                cacheMode);
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
+        } else if constexpr (DmaHardwarePosV<SrcT> == Hardware::L1) {
+            DataCopyPadL12GMImpl<PrimType, mode>(
+                (__gm__ PrimType*)GetUnderlyingPtr(dst), (__cbuf__ PrimType*)GetUnderlyingPtr(src), dataCopyParams);
+#endif
+        } else {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
+            static_assert(
+                DmaHardwarePosV<SrcT> == Hardware::UB || DmaHardwarePosV<SrcT> == Hardware::L1,
+                "DataCopyPad src->GM: src pointer must be UB or L1");
+#else
+            static_assert(DmaHardwarePosV<SrcT> == Hardware::UB, "DataCopyPad src->GM: src pointer must be UB");
+#endif
+        }
+    }
+}
+
+// UB / L1 -> GM, DataCopyExtParams form, EXPLICIT element type, mirroring the GM -> local explicit form above.
+template <
+    typename T, typename DstT, typename SrcT, PaddingMode mode,
+    typename Std::enable_if<
+        IsDmaPtrInvolved<DstT, SrcT> && DmaPtrShapeAllowed<DstT, SrcT> && IsDmaGmOperand<DstT> &&
+            IsDmaLocalOperand<SrcT>,
+        bool>::type>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     const DstT& dst, const SrcT& src, const DataCopyExtParams& dataCopyParams)
 {

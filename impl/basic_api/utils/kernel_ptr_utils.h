@@ -50,69 +50,129 @@ enum class DmaAddrSpace : uint8_t {
 };
 
 /*!
- * \brief Address space of an address-space qualified pointer. An unqualified pointer (private/local address)
- *        stays kUnknown and therefore never matches a pointer overload.
+ * \brief Address-space tag of a pointer operand. `DmaAddrSpaceOf` answers this from the pointer type
+ *        itself, so that the "which space is this pointer in" and "what is its bare element type"
+ *        questions are both keyed on the form the CCE front end keeps distinguishable.
+ */
+enum class DmaPtrTag : uint8_t { kNotPtr = 0, kGm, kUb, kL1, kL0A, kL0B, kL0C, kFb };
+
+/*!
+ * \brief Address space of a pointer operand, resolved on the POINTER form.
+ *
+ *        Why the pointer form: on the CCE device toolchain `__gm__` expands to the *default* address
+ *        space attribute. A partial specialization written on the bare qualified type, `X<__gm__ T>`,
+ *        is rejected by the front end ("class template partial specialization does not specialize any
+ *        template argument", plus a redefinition error), whereas the pointer pattern `X<__gm__ T*>`
+ *        is accepted and does keep the qualified and the unqualified type distinguishable.
+ *
+ *        Measured on the real 3510 compiler:
+ *          X<T*>        matches `__gm__ T*`  -> the default address space IS GM
+ *          X<__ubuf__ T*> / X<__cbuf__ T*>  are more specialized and win over X<T*>
+ *        So GM is a genuine structural result for plain pointers, not an "unknown means GM" fallback.
+ *
+ *        In CPU twin-debug the address-space macros expand to nothing and every pattern collapses to
+ *        `T*`, which would be a redefinition; the whole table is therefore compiled for the NPU path
+ *        only, and CPU twin-debug reports kNotPtr (no recoverable space), which is what keeps the
+ *        original Tensor overloads in charge there.
  */
 template <typename T>
 struct DmaAddrSpaceOf {
-    static constexpr DmaAddrSpace value = DmaAddrSpace::kUnknown;
+    static constexpr DmaPtrTag value = DmaPtrTag::kNotPtr;
 };
 
 #if !defined(ASCENDC_CPU_DEBUG) || ASCENDC_CPU_DEBUG != 1
-// The CPU twin-debug framework defines __gm__ / __ubuf__ / __cbuf__ / __cc__ as empty, which would fold every
-// specialization below into the same `T*` and produce a redefinition error. Address-space qualified pointers
-// only exist in device compilation, so the mapping is compiled for the NPU path exclusively. In CPU twin-debug
-// every pointer operand degrades to kUnknown, which makes the pointer overloads non-viable instead of
-// redefining them -- CPU twin-debug keeps calling the original Tensor overloads.
-// The specializations match the bare address-space qualified type (no pointer), because
-// DmaAddrSpaceQuery strips the pointer before the lookup. An unqualified type falls through to the
-// kUnknown primary template (private / local address).
+// A plain pointer is the default address space, i.e. GM. `__gm__ T*` is matched here as well, and is
+// deliberately not special-cased: it is the same pattern, and naming `__gm__` in the pattern would
+// simply be redundant.
 template <typename T>
-struct DmaAddrSpaceOf<__gm__ T> {
-    static constexpr DmaAddrSpace value = DmaAddrSpace::kGm;
+struct DmaAddrSpaceOf<T*> {
+    static constexpr DmaPtrTag value = DmaPtrTag::kGm;
+};
+
+// The non-default spaces. These are strictly more specialized than the `T*` pattern above, so they win.
+template <typename T>
+struct DmaAddrSpaceOf<__ubuf__ T*> {
+    static constexpr DmaPtrTag value = DmaPtrTag::kUb;
 };
 
 template <typename T>
-struct DmaAddrSpaceOf<__ubuf__ T> {
-    static constexpr DmaAddrSpace value = DmaAddrSpace::kUb;
+struct DmaAddrSpaceOf<__cbuf__ T*> {
+    static constexpr DmaPtrTag value = DmaPtrTag::kL1;
 };
 
 template <typename T>
-struct DmaAddrSpaceOf<__cbuf__ T> {
-    static constexpr DmaAddrSpace value = DmaAddrSpace::kL1;
+struct DmaAddrSpaceOf<__ca__ T*> {
+    static constexpr DmaPtrTag value = DmaPtrTag::kL0A;
 };
 
 template <typename T>
-struct DmaAddrSpaceOf<__ca__ T> {
-    static constexpr DmaAddrSpace value = DmaAddrSpace::kL0A;
+struct DmaAddrSpaceOf<__cb__ T*> {
+    static constexpr DmaPtrTag value = DmaPtrTag::kL0B;
 };
 
 template <typename T>
-struct DmaAddrSpaceOf<__cb__ T> {
-    static constexpr DmaAddrSpace value = DmaAddrSpace::kL0B;
+struct DmaAddrSpaceOf<__cc__ T*> {
+    static constexpr DmaPtrTag value = DmaPtrTag::kL0C;
 };
 
 template <typename T>
-struct DmaAddrSpaceOf<__cc__ T> {
-    static constexpr DmaAddrSpace value = DmaAddrSpace::kL0C;
-};
-
-template <typename T>
-struct DmaAddrSpaceOf<__fbuf__ T> {
-    static constexpr DmaAddrSpace value = DmaAddrSpace::kFb;
+struct DmaAddrSpaceOf<__fbuf__ T*> {
+    static constexpr DmaPtrTag value = DmaPtrTag::kFb;
 };
 #endif // !ASCENDC_CPU_DEBUG
 
 /*!
- * \brief Compile-time query of the address space of an operand type.
+ * \brief Maps the pointer tag onto the public `DmaAddrSpace` enumeration.
  */
-template <typename T, bool = Std::is_pointer_v<Std::remove_cv_t<T>>>
+template <DmaPtrTag tag>
+struct DmaPtrTagToAddrSpace;
+
+template <>
+struct DmaPtrTagToAddrSpace<DmaPtrTag::kNotPtr> {
+    static constexpr DmaAddrSpace value = DmaAddrSpace::kUnknown;
+};
+
+template <>
+struct DmaPtrTagToAddrSpace<DmaPtrTag::kGm> {
+    static constexpr DmaAddrSpace value = DmaAddrSpace::kGm;
+};
+
+template <>
+struct DmaPtrTagToAddrSpace<DmaPtrTag::kUb> {
+    static constexpr DmaAddrSpace value = DmaAddrSpace::kUb;
+};
+
+template <>
+struct DmaPtrTagToAddrSpace<DmaPtrTag::kL1> {
+    static constexpr DmaAddrSpace value = DmaAddrSpace::kL1;
+};
+
+template <>
+struct DmaPtrTagToAddrSpace<DmaPtrTag::kL0A> {
+    static constexpr DmaAddrSpace value = DmaAddrSpace::kL0A;
+};
+
+template <>
+struct DmaPtrTagToAddrSpace<DmaPtrTag::kL0B> {
+    static constexpr DmaAddrSpace value = DmaAddrSpace::kL0B;
+};
+
+template <>
+struct DmaPtrTagToAddrSpace<DmaPtrTag::kL0C> {
+    static constexpr DmaAddrSpace value = DmaAddrSpace::kL0C;
+};
+
+template <>
+struct DmaPtrTagToAddrSpace<DmaPtrTag::kFb> {
+    static constexpr DmaAddrSpace value = DmaAddrSpace::kFb;
+};
+/*!
+ * \brief Compile-time query of the address space of an operand type: the space of a pointer operand, and
+ *        kUnknown for anything that is not a pointer (a Tensor has no compile-time address space).
+ */
+template <typename T, bool = Std::is_pointer_v<std::remove_cv_t<T>>>
 struct DmaAddrSpaceQuery {
-    // Pointer operand: strip the (possibly address-space qualified) pointer, drop the pointee cv-qualifiers and
-    // look the bare pointee type up. remove_cv on an address-space qualified type only strips the pointee
-    // cv-qualifiers, so the address space itself survives and stays distinguishable.
-    using Pointee = Std::remove_cv_t<Std::remove_pointer_t<Std::remove_cv_t<T>>>;
-    static constexpr DmaAddrSpace value = DmaAddrSpaceOf<Pointee>::value;
+    static constexpr DmaAddrSpace value = DmaPtrTagToAddrSpace<DmaAddrSpaceOf<T>::value>::value;
 };
 
 template <typename T>
@@ -172,50 +232,63 @@ template <typename T>
 constexpr bool IsDmaLocalTensorV = IsDmaLocalTensor<Std::remove_cv_t<T>>::value;
 
 /*!
- * \brief Drops the hardware address space qualifier of a pointee type. An address space qualifier survives
- *        remove_cv, so it has to be peeled off explicitly before the pointee can be used as a template
- *        argument (for instance DataCopyPadExtParams<...> must receive `float`, never `__gm__ float`).
- *        An unqualified type falls through untouched.
+ * \brief Drops the hardware address space qualifier of a pointee type. An address space qualifier
+ *        survives remove_cv and even survives a round trip through a pointer, so it has to be peeled
+ *        off with an explicit pattern before the pointee can be used as a template argument --
+ *        DataCopyPadExtParams<...>, for instance, must receive a bare `float`, never `__gm__ float`.
+ *
+ *        The patterns are written on the POINTER form for the same reason as DmaAddrSpaceOf: the bare
+ *        `__gm__ T` pattern is rejected by the front end, while `__gm__ T*` is accepted. The generic
+ *        `T*` pattern covers plain pointers, i.e. the default (GM) address space, and the identity
+ *        primary covers everything that is not a pointer.
  */
-template <typename T>
+template <typename T, bool = Std::is_pointer_v<std::remove_cv_t<T>>>
 struct DmaStripAddrSpace {
-    using type = T;
+    using type = std::remove_cv_t<T>;
+};
+
+template <typename T>
+struct DmaStripAddrSpace<T, true> {
+    // Plain pointers (the default address space, possibly with a const pointee): drop the pointer and the
+    // pointee cv-qualifiers. The explicitly qualified spaces below are strictly more specialized and win.
+    using type = std::remove_cv_t<std::remove_pointer_t<T>>;
 };
 
 #if !defined(ASCENDC_CPU_DEBUG) || ASCENDC_CPU_DEBUG != 1
+// The explicitly qualified spaces: strip the pointer and the space qualifier together.
 template <typename T>
-struct DmaStripAddrSpace<__gm__ T> {
-    using type = T;
+struct DmaStripAddrSpace<__gm__ T*, true> {
+    using type = std::remove_cv_t<T>;
 };
 
 template <typename T>
-struct DmaStripAddrSpace<__ubuf__ T> {
-    using type = T;
+struct DmaStripAddrSpace<__ubuf__ T*, true> {
+    using type = std::remove_cv_t<T>;
 };
 
 template <typename T>
-struct DmaStripAddrSpace<__cbuf__ T> {
-    using type = T;
+struct DmaStripAddrSpace<__cbuf__ T*, true> {
+    using type = std::remove_cv_t<T>;
 };
 
 template <typename T>
-struct DmaStripAddrSpace<__ca__ T> {
-    using type = T;
+struct DmaStripAddrSpace<__ca__ T*, true> {
+    using type = std::remove_cv_t<T>;
 };
 
 template <typename T>
-struct DmaStripAddrSpace<__cb__ T> {
-    using type = T;
+struct DmaStripAddrSpace<__cb__ T*, true> {
+    using type = std::remove_cv_t<T>;
 };
 
 template <typename T>
-struct DmaStripAddrSpace<__cc__ T> {
-    using type = T;
+struct DmaStripAddrSpace<__cc__ T*, true> {
+    using type = std::remove_cv_t<T>;
 };
 
 template <typename T>
-struct DmaStripAddrSpace<__fbuf__ T> {
-    using type = T;
+struct DmaStripAddrSpace<__fbuf__ T*, true> {
+    using type = std::remove_cv_t<T>;
 };
 #endif // !ASCENDC_CPU_DEBUG
 
@@ -228,7 +301,11 @@ using DmaStripAddrSpaceT = typename DmaStripAddrSpace<T>::type;
  */
 template <typename T, bool = IsDmaTensorV<T>>
 struct DmaOperandElemTImpl {
-    using type = DmaStripAddrSpaceT<Std::remove_cv_t<Std::remove_pointer_t<Std::remove_cv_t<T>>>>;
+    // DmaStripAddrSpaceT receives the operand type as-is: it handles the pointer form itself, dropping both the
+    // pointer and the address-space qualifier of the pointee. The previous hand-rolled remove_pointer/remove_cv
+    // chain could not drop the space qualifier, which made DataCopyPadExtParams<...> instantiate with a
+    // `__gm__ float` field and fail with "field may not be qualified with an address space".
+    using type = DmaStripAddrSpaceT<Std::remove_cv_t<T>>;
 };
 
 template <typename T>
@@ -331,7 +408,7 @@ constexpr bool DmaAcceptLocal = IsDmaLocalTensorV<T> || IsDmaPtrOperand<T>;
 
 #if !defined(ASCENDC_CPU_DEBUG) || ASCENDC_CPU_DEBUG != 1
 template <typename T>
-constexpr bool DmaProveGm = IsDmaGlobalTensorV<T> || IsDmaGmPtr<T>;
+constexpr bool DmaProveGm = IsDmaGlobalTensorV<T> || IsDmaGmPtrOperand<T>;
 
 template <typename T>
 constexpr bool DmaProveLocal = IsDmaLocalTensorV<T> || IsDmaLocalPtrOperand<T>;
