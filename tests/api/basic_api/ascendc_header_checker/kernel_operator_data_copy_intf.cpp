@@ -423,3 +423,63 @@ extern "C" __global__ __aicore__ void KernelTestResetLoopModePara1()
     AscendC::ResetLoopModePara(type);
 }
 #endif
+
+// Pointer path: DataCopy / DataCopyPad / DataCopyL1ToUB
+extern "C" __global__ __aicore__ void KernelTestDataCopyPtrCount()
+{
+    __ubuf__ float* dst = nullptr;
+    __gm__ float* src = nullptr;
+    uint32_t count = 32;
+    AscendC::DataCopy(dst, src, count);
+    auto dstPtr = AscendC::GetUnderlyingPtr(dst);
+    auto srcPtr = AscendC::GetUnderlyingPtr(src);
+    (void)dstPtr;
+    (void)srcPtr;
+}
+
+extern "C" __global__ __aicore__ void KernelTestDataCopyPadPtrExt()
+{
+    __ubuf__ float* dst = nullptr;
+    __gm__ float* src = nullptr;
+    AscendC::DataCopyExtParams dataCopyParams;
+    AscendC::DataCopyPadExtParams<float> padParams;
+    AscendC::DataCopyPad(dst, src, dataCopyParams, padParams);
+}
+
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+extern "C" __global__ __aicore__ void KernelTestDataCopyPtrNdDma()
+{
+    __ubuf__ float* dst = nullptr;
+    __gm__ float* src = nullptr;
+    AscendC::MultiCopyParams<float, 1> params;
+    AscendC::DataCopy(dst, src, params);
+}
+#endif
+
+extern "C" __global__ __aicore__ void KernelTestDataCopyL1ToUBPtr()
+{
+    __ubuf__ float* dst = nullptr;
+    __cbuf__ float* src = nullptr;
+    uint32_t count = 32;
+    AscendC::DataCopyL1ToUB(dst, src, count);
+}
+
+// Pointer path: DataCopy count GM <-> UB
+extern "C" __global__ __aicore__ void KernelTestDataCopyPtrCount()
+{
+    __ubuf__ float* dstUb = nullptr;
+    __gm__ float* srcGm = nullptr;
+    AscendC::DataCopy(dstUb, srcGm, static_cast<uint32_t>(32));
+    AscendC::DataCopy(srcGm, dstUb, static_cast<uint32_t>(32));
+}
+
+// Pointer path: DataCopyPad GM -> UB
+extern "C" __global__ __aicore__ void KernelTestDataCopyPadPtr()
+{
+    __ubuf__ float* dstUb = nullptr;
+    __gm__ float* srcGm = nullptr;
+    AscendC::DataCopyExtParams copyParams{1, 32, 0, 0, 0};
+    AscendC::DataCopyPadExtParams<float> padParams{false, 0, 0, 0};
+    AscendC::DataCopyPad(dstUb, srcGm, copyParams, padParams);
+    AscendC::DataCopyPad(srcGm, dstUb, copyParams);
+}
