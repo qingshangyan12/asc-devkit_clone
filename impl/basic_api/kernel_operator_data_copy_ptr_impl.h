@@ -288,6 +288,14 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(__gm__ T* dst, __ubuf__ T* 
 }
 
 template <typename T>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(__gm__ T* dst, __cbuf__ T* src, const uint32_t count)
+{
+    DataCopyParams repeatParams;
+    DataCopyCheck<T>(count, repeatParams);
+    DataCopy(dst, src, repeatParams);
+}
+
+template <typename T>
 __aicore__ inline void DataCopy(__ubuf__ T* dst, __ubuf__ T* src, const uint32_t count)
 {
     DataCopyParams repeatParams;
@@ -327,6 +335,70 @@ __aicore__ inline void DataCopy(__cbuf__ T* dst, __cc__ U* src, const DataCopyCO
     DataCopyL0C2L1Impl(dst, src, intriParams);
 }
 
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    __ubuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
+{
+    (void)enhancedParams;
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+    DataCopyGM2UBImpl(dst, src, intriParams, GetPtrCacheMode(src));
+#else
+    DataCopyGM2UBImpl(dst, src, intriParams);
+#endif
+}
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    __cbuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
+{
+    (void)enhancedParams;
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+    DataCopyGM2L1Impl(dst, src, intriParams, GetPtrCacheMode(src));
+#else
+    DataCopyGM2L1Impl(dst, src, intriParams);
+#endif
+}
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
+    __gm__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
+{
+    (void)enhancedParams;
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+    DataCopyUB2GMImpl(dst, src, intriParams, GetPtrCacheMode(dst));
+#else
+    DataCopyUB2GMImpl(dst, src, intriParams);
+#endif
+}
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
+    __gm__ T* dst, __cbuf__ T* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
+{
+    (void)enhancedParams;
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+    DataCopyL12GMImpl(dst, src, intriParams, GetPtrCacheMode(dst));
+#else
+    DataCopyL12GMImpl(dst, src, intriParams);
+#endif
+}
+
+template <typename T>
+__aicore__ inline void DataCopy(
+    __cbuf__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
+{
+    (void)enhancedParams;
+    DataCopyUB2L1Impl(dst, src, intriParams);
+}
+
+template <typename T>
+__aicore__ inline void DataCopy(
+    __ubuf__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
+{
+    (void)enhancedParams;
+    DataCopyUB2UBImpl(dst, src, intriParams);
+}
+
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, PaddingMode mode>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
@@ -336,9 +408,21 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
 }
 
 template <typename T, PaddingMode mode>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
+    __cbuf__ T* dst, __gm__ T* src, const DataCopyParams& dataCopyParams, const DataCopyPadParams& padParams)
+{
+    DataCopyPadGm2L1Impl<T, mode>(dst, src, dataCopyParams, padParams, GetPtrCacheMode(src));
+}
+
+template <typename T, PaddingMode mode>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     __gm__ T* dst, __ubuf__ T* src, const DataCopyParams& dataCopyParams)
 {
+#if (__NPU_ARCH__ != 5102)
+    if ASCEND_IS_AIC {
+        return;
+    }
+#endif
     DataCopyPadUB2GMImpl<T, mode>(dst, src, dataCopyParams, GetPtrCacheMode(dst));
 }
 #else
@@ -350,9 +434,23 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
 }
 
 template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
+    __cbuf__ T* dst, __gm__ T* src, const DataCopyParams& dataCopyParams, const DataCopyPadParams& padParams)
+{
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+    DataCopyPadGm2L1Impl(dst, src, dataCopyParams, padParams);
+#else
+    DataCopyPadGM2L1Impl(dst, src, dataCopyParams, padParams);
+#endif
+}
+
+template <typename T>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     __gm__ T* dst, __ubuf__ T* src, const DataCopyParams& dataCopyParams)
 {
+    if ASCEND_IS_AIC {
+        return;
+    }
     DataCopyPadUB2GMImpl(dst, src, dataCopyParams);
 }
 #endif
@@ -377,8 +475,22 @@ template <typename T, PaddingMode mode>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     __gm__ T* dst, __ubuf__ T* src, const DataCopyExtParams& dataCopyParams)
 {
+#if (__NPU_ARCH__ != 5102)
+    if ASCEND_IS_AIC {
+        return;
+    }
+#endif
     DataCopyPadUB2GMImpl<T, mode>(dst, src, dataCopyParams, GetPtrCacheMode(dst));
 }
+
+#if (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
+template <typename T, PaddingMode mode>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
+    __gm__ T* dst, __cbuf__ T* src, const DataCopyExtParams& dataCopyParams)
+{
+    DataCopyPadL12GMImpl<T, mode>(dst, src, dataCopyParams);
+}
+#endif
 #else
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
@@ -391,8 +503,20 @@ template <typename T>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     __gm__ T* dst, __ubuf__ T* src, const DataCopyExtParams& dataCopyParams)
 {
+    if ASCEND_IS_AIC {
+        return;
+    }
     DataCopyPadUB2GMImpl(dst, src, dataCopyParams);
 }
+
+#if (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3102)
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
+    __gm__ T* dst, __cbuf__ T* src, const DataCopyExtParams& dataCopyParams)
+{
+    DataCopyPadL12GMImpl(dst, src, dataCopyParams);
+}
+#endif
 #endif
 
 template <typename T>
@@ -435,6 +559,11 @@ __aicore__ inline void DataCopyL1ToUB(__ubuf__ T* dst, __cbuf__ T* src, const ui
 template <typename T, uint8_t dim, const NdDmaConfig& config>
 __aicore__ inline void DataCopy(__ubuf__ T* dst, __gm__ T* src, const MultiCopyParams<T, dim>& params)
 {
+#if (__NPU_ARCH__ != 5102)
+    if ASCEND_IS_AIC {
+        return;
+    }
+#endif
     DataCopyWithNDDMAImpl<T, dim, config>(
         dst, src, params.loopInfo, params.constantValue, GetPtrCacheMode(src));
 }

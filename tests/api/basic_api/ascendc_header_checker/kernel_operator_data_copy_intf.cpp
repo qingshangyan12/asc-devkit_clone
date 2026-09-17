@@ -465,9 +465,7 @@ extern "C" __global__ __aicore__ void KernelTestDataCopyL1ToUBPtr()
 }
 
 // Pointer path: DataCopy count GM <-> UB
-extern "C" __global__ __aicore__ void KernelTestDataCopyPtrCount()
-{
-    __ubuf__ float* dstUb = nullptr;
+extern "C" __global__ __aicore__ void KernelTestDataCopyPtrCountRoundtrip()
     __gm__ float* srcGm = nullptr;
     AscendC::DataCopy(dstUb, srcGm, static_cast<uint32_t>(32));
     AscendC::DataCopy(srcGm, dstUb, static_cast<uint32_t>(32));
