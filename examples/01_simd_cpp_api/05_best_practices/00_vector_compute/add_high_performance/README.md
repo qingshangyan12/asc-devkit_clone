@@ -15,10 +15,9 @@
 
 ## 本样例支持的产品及CANN软件版本
 
-| 产品                                        | CANN软件版本 |
-|---------------------------------------------|-------------|
-| Ascend 960DT                                | >= CANN 9.2.0 |
-| Ascend 950PR/Ascend 950DT                   | >= CANN 9.2.0 |
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 | Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.2.0 |
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.2.0 |
 
@@ -545,9 +544,9 @@ $$
 
 之所以读写混合带宽会高于 1.8 TB/s，是因为这里统计的不是纯读带宽，而是“读 + 写”的混合带宽。开启双缓冲后，读写流水是并行的；同时，z 写数据时会命中 L2 Cache，而 L2 的带宽很高，所以写的带宽较高。因此，在以 mte2 作为读写混合时间来估算时，分子统计了读写总数据量，最终得到的混合带宽会高于 1.8 TB/s。
 
-### Ascend 950/960 系列性能对比
+### Ascend 950系列性能对比
 
-下表为本样例在Ascend 950/960 系列产品上运行的性能数据对比：
+下表为本样例在Ascend 950系列产品上运行的性能数据对比：
 
 | Case | 优化策略 | 核数 | dataCopyLen | Task Duration(μs) | aiv_vec_time(μs) | 理论vector耗时(μs) | 读带宽(TB/S) | 读写混合带宽(TB/S) | 端到端耗时相对Case 0 |
 |:---:|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -558,19 +557,19 @@ $$
 | 4 | 双缓冲 | 64 | 21760 | 247.665 | 10.976 | 4.965 | NA | 1.712 | 4960.2x |
 | 5 | L2 Cache bypass | 64 | 21760 | 182.04 | 10.997 | 4.965 | NA | 2.256 | 6748.4x |
 
-Ascend 950/960 系列上 `dataCopyLen` 增大的主要原因是UB容量增大。本样例在双缓冲场景下需要同时放置 `x/y/z` 的 Ping-Pong 共6块缓冲区，因此单块可用空间可近似表示为 `UBSIZE/6`：
+Ascend 950系列上 `dataCopyLen` 增大的主要原因是UB容量增大。本样例在双缓冲场景下需要同时放置 `x/y/z` 的 Ping-Pong 共6块缓冲区，因此单块可用空间可近似表示为 `UBSIZE/6`：
 - Atlas A2/A3 系列：`192KB / 6 = 32KB`，对应 `32KB / 2B = 16384` 个`half`
-- Ascend 950/960 系列：`256KB / 6 ≈ 42.67KB`，对应约 `21840` 个`half`
+- Ascend 950系列：`256KB / 6 ≈ 42.67KB`，对应约 `21840` 个`half`
 
-因此在Ascend 950/960 系列上，按容量上限估算，单块 `dataCopyLen` 可提升至约 `21840`个`half`数据。
+因此在Ascend 950系列上，按容量上限估算，单块 `dataCopyLen` 可提升至约 `21840`个`half`数据。
 在实际实现中，推荐用户将搬运粒度和计算粒度都对齐到512B，以获得更稳定的性能表现，因此case3-5选用 `dataCopyLen=21760`，其对应字节数为`21760 * 2B = 43520B = 85 * 512B`。
 
-在Ascend 950/960 系列产品上BANK的排列不同，本样例暂时不需要考虑Bank冲突，因此只列出了case0～case5的性能数据。该处理器每cycle处理128个half数据，主频为1.65GHz，AIV核数为64，因此理论vector耗时为
+在Ascend 950系列产品上BANK的排列不同，本样例暂时不需要考虑Bank冲突，因此只列出了case0～case5的性能数据。该处理器每cycle处理128个half数据，主频为1.65GHz，AIV核数为64，因此理论vector耗时为
 $$
 T_{\text{theory}} = \frac{8192 \times 8192}{128 \times 1.65 \times 10^9 \times 64} = \frac{67108864}{1.35168 \times 10^{13}} \approx 4.965 \times 10^{-6} \text{ s} = 4.965 \text{ μs}
 $$
 
-Ascend 950/960 系列未达到理论vector耗时峰值的原因如下：
+Ascend 950系列未达到理论vector耗时峰值的原因如下：
 
 - 该理论值仅统计“纯Vector计算”时间，不包含数据搬运、事件同步、流水线调度等开销；而实测Case 5中 `aiv_vec_time=10.997μs`、Task Duration为 `182.04μs`，`aiv_mte2_ratio`高达98.3%，受限于带宽限制，说明端到端瓶颈不在纯计算本身。
 - Ascend 950系列 RegBase的主要收益来自“减少冗余Load/Store、寄存器复用、提升无依赖并发指令比例”。当前Add样例核心计算基本是单条Add，计算链较短、可融合/可双发空间有限，难以充分释放RegBase的优势。
@@ -595,7 +594,7 @@ Ascend 950/960 系列未达到理论vector耗时峰值的原因如下：
   在 cmake 编译时通过 `-DSCENARIO_NUM=N` 指定要编译的 case：
 
   ```bash
-  cmake -DSCENARIO_NUM=6 -DCMAKE_ASC_ARCHITECTURES=dav-9201 ..   # 编译 case 6（可替换为0-6）
+  cmake -DSCENARIO_NUM=6 -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..   # 编译 case 6（可替换为0-6）
   ```
 
   各 case 说明：
@@ -620,7 +619,7 @@ Ascend 950/960 系列未达到理论vector耗时峰值的原因如下：
   在本样例目录下执行如下命令。
   ```bash 
   mkdir -p build && cd build;   # 创建并进入build目录
-  cmake -DSCENARIO_NUM=6 -DCMAKE_ASC_ARCHITECTURES=dav-9201 ..;make -j;  # 编译工程，默认npu模式
+  cmake -DSCENARIO_NUM=6 -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;  # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                           # 执行（使用编译时指定的case）
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
@@ -630,8 +629,8 @@ Ascend 950/960 系列未达到理论vector耗时峰值的原因如下：
 
   示例如下：
   ```bash
-  cmake -DSCENARIO_NUM=6 -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-9201 ..;make -j; # CPU调试模式
-  cmake -DSCENARIO_NUM=6 -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-9201 ..;make -j; # NPU仿真模式
+  cmake -DSCENARIO_NUM=6 -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # CPU调试模式
+  cmake -DSCENARIO_NUM=6 -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
@@ -639,11 +638,11 @@ Ascend 950/960 系列未达到理论vector耗时峰值的原因如下：
 
 - 编译选项说明
 
-  | 选项 | 可选值                                     | 说明 |
-  |------|--------------------------------------------|------|
-  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim`                | 运行模式：NPU 运行、CPU调试、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510`, `dav-9201` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT，dav-9201对应Ascend 960DT   |
-  | `SCENARIO_NUM` | `0`（默认）、`1`、`2`、`3`、`4`、`5`、`6`  | 性能优化case编号 |
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `SCENARIO_NUM` | `0`（默认）、`1`、`2`、`3`、`4`、`5`、`6` | 性能优化case编号 |
   
   执行结果如下，说明精度对比成功。
   ```bash

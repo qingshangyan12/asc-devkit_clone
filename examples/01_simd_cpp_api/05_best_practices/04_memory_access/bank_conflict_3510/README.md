@@ -1,10 +1,10 @@
-# UB Bank冲突场景验证与分析(架构3510、9201)
+# UB Bank冲突场景验证与分析(架构3510)
 
 ## UB内存结构介绍
 
 ![UB Architecture](./figures/ub_arch.png)
 
-- 在Ascend 950PR/Ascend 950DT及Ascend 960PR/Ascend 960DT中，UB空间大小为256KB；
+- 在Ascend 950PR/Ascend 950DT中，UB空间大小为256KB；
 - 共有16个 **bank**，组成8个 **bank group**，每个bank group包含2个bank（`bank_id` = 0, 1）；
 - 每个bank由512行组成（`BANK_DEPTH = 512`），每行长度为32B（`BANK_WIDTH = 32B`），即每个bank大小为16KB；
 - 每个bank group最多支持两读或者一读一写。
@@ -21,7 +21,7 @@ bank内部layout（一行32B）：
 
 ## UB地址编码规则
 
-Ascend 950PR/Ascend 950DT及Ascend 960PR/Ascend 960DT的UB 18位地址采用**低位交织**编码规则：
+Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 `UB_ADDR[17:0] = { DEPTH[8:0], BANK[0], BG[2:0], WIDTH[4:0] }`
 
@@ -106,7 +106,7 @@ Ascend 950PR/Ascend 950DT及Ascend 960PR/Ascend 960DT的UB 18位地址采用**�
 
 ### 连续对齐搬入/搬出的bank冲突场景（Case 1-8）
 
-**注意：在Ascend 950PR/Ascend 950DT及Ascend 960PR/Ascend 960DT中，src0/src1/dst首地址分布在不同bank group的不同bank的场景不存在，二读一写场景无法避免读写冲突**
+**注意：在Ascend 950PR/Ascend 950DT中，src0/src1/dst首地址分布在不同bank group的不同bank的场景不存在，二读一写场景无法避免读写冲突**
 
 | case | 计算公式 | 场景描述 | bank冲突情况 | src0首地址 | src1首地址 | dst首地址 | 单次VF计算数据量(B) | 打点性能(cycles) | LDU冲突率(%) | STU冲突率(%) | 备注 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -484,7 +484,7 @@ Ascend 950PR/Ascend 950DT及Ascend 960PR/Ascend 960DT的UB 18位地址采用**�
 
 ## 小结
 
-1. Ascend 950PR/Ascend 950DT及Ascend 960PR/Ascend 960DT上二读一写必然存在bank冲突，而在实际场景中，由于采用Regbase架构，UB读写频率降低，bank冲突往往为非瓶颈点。
+1. Ascend 950PR/Ascend 950DT上二读一写必然存在bank冲突，而在实际场景中，由于采用Regbase架构，UB读写频率降低，bank冲突往往为非瓶颈点。
 7. 使用离散与聚合API时，连续index跨subbank分散可减少冲突
 8. 循环展开可以优化bank冲突，可结合以下trace分析。
     | case6流水 | case7流水 |
@@ -556,11 +556,11 @@ python3 ../scripts/verify_result.py output/output_z.bin output/golden.bin
 
 ### CMake选项
 
-| 选项 |    可选值    | 说明 |
-|:----:|:------------:|:----|
-| `CMAKE_ASC_ARCHITECTURES` | `dav-3510`、`dav-9201` |NPU架构版本 |
-| `SCENARIO_NUM` |     1-14     | 切换测试场景 |
-| `CMAKE_ASC_RUN_MODE` |    `npu`     | 上板运行模式 |
+| 选项 | 可选值 | 说明 |
+|:----:|:------:|:----|
+| `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构版本 |
+| `SCENARIO_NUM` | 1-14 | 切换测试场景 |
+| `CMAKE_ASC_RUN_MODE` | `npu` | 上板运行模式 |
 
 ### 冲突性能采集
 
