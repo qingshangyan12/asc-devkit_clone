@@ -27,6 +27,7 @@
 
 #include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
+#include "../../impl/basic_api/utils/kernel_utils_pointer.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -41,6 +42,12 @@ namespace AscendC {
  */
 __aicore__ inline void InitDetermineComputeWorkspace(
     GlobalTensor<int32_t>& gmWorkspace, LocalTensor<int32_t>& ubWorkspace);
+
+template <
+    typename GmWorkspace, typename UbWorkspace,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<GmWorkspace> || Internal::IsPointerOperand<UbWorkspace>, bool>::type = true>
+__aicore__ inline void InitDetermineComputeWorkspace(const GmWorkspace& gmWorkspace, const UbWorkspace& ubWorkspace);
 /*
  * @ingroup WaitPreBlock
  * @brief wait previous compute finish
@@ -48,12 +55,24 @@ __aicore__ inline void InitDetermineComputeWorkspace(
  */
 __aicore__ inline void WaitPreBlock(GlobalTensor<int32_t>& gmWorkspace, LocalTensor<int32_t>& ubWorkspace);
 
+template <
+    typename GmWorkspace, typename UbWorkspace,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<GmWorkspace> || Internal::IsPointerOperand<UbWorkspace>, bool>::type = true>
+__aicore__ inline void WaitPreBlock(const GmWorkspace& gmWorkspace, const UbWorkspace& ubWorkspace);
+
 /*
  * @ingroup NotifyNextBlock
  * @brief wait previous compute finish
  * @param [in] global memory workspace
  */
 __aicore__ inline void NotifyNextBlock(GlobalTensor<int32_t>& gmWorkspace, LocalTensor<int32_t>& ubWorkspace);
+
+template <
+    typename GmWorkspace, typename UbWorkspace,
+    typename Std::enable_if<
+        Internal::IsPointerOperand<GmWorkspace> || Internal::IsPointerOperand<UbWorkspace>, bool>::type = true>
+__aicore__ inline void NotifyNextBlock(const GmWorkspace& gmWorkspace, const UbWorkspace& ubWorkspace);
 } // namespace AscendC
 
 #if defined(__NPU_ARCH__)

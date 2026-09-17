@@ -38,3 +38,17 @@ extern "C" __global__ __aicore__ void KernelTestNotifyNextBlock1()
     AscendC::LocalTensor<int32_t> ubWorkspace;
     AscendC::NotifyNextBlock(gmWorkspace, ubWorkspace);
 }
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+extern "C" __global__ __aicore__ void KernelTestCubePointerDetermineComputeSync()
+{
+    __gm__ int32_t* gmWorkspace;
+    __ubuf__ int32_t* ubWorkspace;
+    AscendC::InitDetermineComputeWorkspace(gmWorkspace, ubWorkspace);
+    AscendC::WaitPreBlock(gmWorkspace, ubWorkspace);
+    AscendC::NotifyNextBlock(gmWorkspace, ubWorkspace);
+
+    AscendC::LocalTensor<int32_t> ubTensor;
+    AscendC::WaitPreBlock(gmWorkspace, ubTensor);
+}
+#endif

@@ -114,6 +114,21 @@ extern "C" __global__ __aicore__ void KernelTestFixpipe4()
 #endif // __NPU_ARCH__ != 5102
 #endif
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+extern "C" __global__ __aicore__ void KernelTestCubePointerFixpipeV220()
+{
+    __gm__ float* gmDst;
+    __cbuf__ float* l1Dst;
+    __cc__ float* l0cSrc;
+    __cbuf__ uint64_t* workspace;
+    AscendC::FixpipeParamsV220 params;
+    AscendC::Fixpipe(gmDst, l0cSrc, params);
+    AscendC::Fixpipe(l1Dst, l0cSrc, params);
+    AscendC::Fixpipe(gmDst, l0cSrc, workspace, params);
+    AscendC::Fixpipe(l1Dst, l0cSrc, workspace, params);
+}
+#endif
+
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3002
 // __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsM300&
 // intriParams);
@@ -155,6 +170,19 @@ extern "C" __global__ __aicore__ void KernelTestFixpipe8()
     AscendC::LocalTensor<uint64_t> cbufWorkspace;
     AscendC::FixpipeParamsM300 intriParams;
     AscendC::Fixpipe(dst, src, cbufWorkspace, intriParams);
+}
+
+extern "C" __global__ __aicore__ void KernelTestCubePointerFixpipeM300()
+{
+    __gm__ float* gmDst;
+    __ubuf__ float* ubDst;
+    __cc__ float* l0cSrc;
+    __cbuf__ uint64_t* workspace;
+    AscendC::FixpipeParamsM300 params;
+    AscendC::Fixpipe(gmDst, l0cSrc, params);
+    AscendC::Fixpipe(ubDst, l0cSrc, params);
+    AscendC::Fixpipe(gmDst, l0cSrc, workspace, params);
+    AscendC::Fixpipe(ubDst, l0cSrc, workspace, params);
 }
 #endif
 
@@ -200,6 +228,19 @@ extern "C" __global__ __aicore__ void KernelTestFixpipe12()
     AscendC::FixpipeParamsM310 intriParams;
     AscendC::Fixpipe(dst, src, cbufWorkspace, intriParams);
 }
+
+extern "C" __global__ __aicore__ void KernelTestCubePointerFixpipeM310()
+{
+    __gm__ float* gmDst;
+    __cbuf__ float* l1Dst;
+    __cc__ float* l0cSrc;
+    __cbuf__ uint64_t* workspace;
+    AscendC::FixpipeParamsM310 params;
+    AscendC::Fixpipe(gmDst, l0cSrc, params);
+    AscendC::Fixpipe(l1Dst, l0cSrc, params);
+    AscendC::Fixpipe(gmDst, l0cSrc, workspace, params);
+    AscendC::Fixpipe(l1Dst, l0cSrc, workspace, params);
+}
 #endif
 
 #if __NPU_ARCH__ == 3510
@@ -243,5 +284,37 @@ extern "C" __global__ __aicore__ void KernelTestFixpipe16()
     AscendC::LocalTensor<uint64_t> cbufWorkspace;
     AscendC::FixpipeParamsArch3510 intriParams;
     AscendC::Fixpipe(dst, src, cbufWorkspace, intriParams);
+}
+
+extern "C" __global__ __aicore__ void KernelTestCubePointerFixpipe()
+{
+    __gm__ half* gmDst;
+    __cbuf__ half* l1Dst;
+    __cc__ float* l0cSrc;
+    __cbuf__ uint64_t* workspace;
+    AscendC::FixpipeParamsV220 paramsV220;
+    AscendC::Fixpipe(gmDst, l0cSrc, paramsV220);
+    AscendC::Fixpipe(l1Dst, l0cSrc, paramsV220);
+    AscendC::Fixpipe(gmDst, l0cSrc, workspace, paramsV220);
+    AscendC::Fixpipe(l1Dst, l0cSrc, workspace, paramsV220);
+
+    AscendC::FixpipeParamsArch3510<> params3510;
+    AscendC::Fixpipe(gmDst, l0cSrc, params3510);
+    AscendC::Fixpipe(l1Dst, l0cSrc, params3510);
+    AscendC::Fixpipe(gmDst, l0cSrc, workspace, params3510);
+    AscendC::Fixpipe(l1Dst, l0cSrc, workspace, params3510);
+    AscendC::GlobalTensor<half> tensorDst;
+    AscendC::Fixpipe(tensorDst, l0cSrc, paramsV220);
+    AscendC::Fixpipe(tensorDst, l0cSrc, workspace, paramsV220);
+    AscendC::Fixpipe(tensorDst, l0cSrc, params3510);
+    AscendC::Fixpipe(tensorDst, l0cSrc, workspace, params3510);
+}
+
+extern "C" __global__ __aicore__ void KernelTestCubePointerSetFixPipeConfig()
+{
+    __fbuf__ float* reluPre;
+    __fbuf__ float* quantPre;
+    AscendC::SetFixPipeConfig(reluPre, quantPre, false);
+    AscendC::SetFixPipeConfig<decltype(reluPre), true>(reluPre, false);
 }
 #endif

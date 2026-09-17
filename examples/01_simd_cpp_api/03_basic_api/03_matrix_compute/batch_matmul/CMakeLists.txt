@@ -17,8 +17,25 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
+option(ASCENDC_USE_POINTER_API "Use pointer and mixed Tensor/pointer Cube APIs" OFF)
+set(BATCH_MATMUL_B 4 CACHE STRING "Batch dimension used by the sample")
+set(BATCH_MATMUL_M 30 CACHE STRING "M dimension used by the sample")
+set(BATCH_MATMUL_K 40 CACHE STRING "K dimension used by the sample")
+set(BATCH_MATMUL_N 70 CACHE STRING "N dimension used by the sample")
+
 add_executable(demo
     batch_matmul.asc
+)
+
+if(ASCENDC_USE_POINTER_API)
+    target_compile_definitions(demo PRIVATE ASCENDC_USE_POINTER_API=1)
+endif()
+
+target_compile_definitions(demo PRIVATE
+    BATCH_MATMUL_B=${BATCH_MATMUL_B}
+    BATCH_MATMUL_M=${BATCH_MATMUL_M}
+    BATCH_MATMUL_K=${BATCH_MATMUL_K}
+    BATCH_MATMUL_N=${BATCH_MATMUL_N}
 )
 
 target_compile_options(demo PRIVATE

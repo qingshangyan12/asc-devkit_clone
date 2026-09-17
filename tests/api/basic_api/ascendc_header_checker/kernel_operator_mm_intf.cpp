@@ -344,3 +344,84 @@ extern "C" __global__ __aicore__ void KernelTestSetMMLayoutTransform1()
     bool mmLayoutMode = true;
     AscendC::SetMMLayoutTransform(mmLayoutMode);
 }
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+extern "C" __global__ __aicore__ void KernelTestCubePointerLoadData()
+{
+    __ca__ half* l0a;
+    __cb__ half* l0b;
+    __cbuf__ half* l1;
+    __ubuf__ half* ub;
+    AscendC::LoadData2DParams params2d;
+    AscendC::LoadData2DParamsV2 params2dV2;
+    AscendC::LoadData3DParamsV1<half> params3dV1;
+    AscendC::LoadData3DParamsV2<half> params3dV2;
+    AscendC::LoadData3DParamsV2Pro params3dPro;
+    AscendC::LoadData(l0a, l1, params2d);
+    AscendC::LoadData(l0b, l1, params2dV2);
+    AscendC::GlobalTensor<half> gmTensor;
+    AscendC::LoadData(l0a, gmTensor, params2d);
+    AscendC::LoadData(l0b, gmTensor, params2dV2);
+    AscendC::LoadData(l0a, l1, params3dV1);
+    AscendC::LoadData(l0b, l1, params3dV2);
+    AscendC::LoadData(ub, l1, params3dPro);
+
+    AscendC::Load2DBitModeParam bit2d;
+    AscendC::Load3DBitModeParam bit3d;
+    AscendC::LoadData<AscendC::TPosition::A2, AscendC::TPosition::A1>(l0a, l1, bit2d);
+    AscendC::LoadData<AscendC::TPosition::B2, AscendC::TPosition::B1>(l0b, l1, bit3d);
+
+    __ca__ fp4x2_e2m1_t* mxDst;
+    __cbuf__ fp4x2_e2m1_t* mxSrc;
+    __cbuf__ fp8_e8m0_t* mxScale;
+    AscendC::LoadData2DMxParams mxParams;
+    AscendC::LoadData(mxDst, mxSrc, mxScale, params2dV2, mxParams);
+
+    AscendC::LoadData2dTransposeParams transposeParams;
+    AscendC::LoadData2dTransposeParamsV2 transposeParamsV2;
+    AscendC::LoadDataWithTranspose(l0a, l1, transposeParams);
+    AscendC::LoadDataWithTranspose(l0b, l1, transposeParamsV2);
+
+    AscendC::LoadImageToLocalParams imageParams;
+    AscendC::LoadImageToLocal(l1, imageParams);
+    AscendC::InitConstValueParams<half> initParams;
+    AscendC::InitConstValue(l0a, initParams);
+}
+
+extern "C" __global__ __aicore__ void KernelTestCubePointerMmad()
+{
+    __cc__ float* dst;
+    __ca__ half* fm;
+    __cb__ half* filter;
+    __cc__ float* bias;
+    AscendC::MmadParams params;
+    AscendC::Mmad(dst, fm, filter, params);
+    AscendC::Mmad(dst, fm, filter, bias, params);
+    AscendC::LocalTensor<half> fmTensor;
+    AscendC::LocalTensor<half> filterTensor;
+    AscendC::Mmad(dst, fmTensor, filterTensor, params);
+
+    __ca__ fp4x2_e2m1_t* mxFm;
+    __cb__ fp4x2_e2m1_t* mxFilter;
+    AscendC::MmadBitModeParams bitParams;
+    AscendC::Mmad(dst, mxFm, mxFilter, bitParams);
+    AscendC::Mmad(dst, mxFm, mxFilter, bias, bitParams);
+    const AscendC::MmadBitModeParams constBitParams;
+    AscendC::Mmad(dst, mxFm, mxFilter, bias, constBitParams);
+    AscendC::MmadMx(dst, mxFm, mxFilter, params);
+    AscendC::MmadMx(dst, mxFm, mxFilter, bias, params);
+    AscendC::MmadMx(dst, mxFm, mxFilter, bitParams);
+    AscendC::MmadMx(dst, mxFm, mxFilter, bias, bitParams);
+}
+#endif
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+extern "C" __global__ __aicore__ void KernelTestCubePointerNd2Nz()
+{
+    __cbuf__ int8_t* dst;
+    __gm__ AscendC::int4b_t* src;
+    AscendC::LoadData2DParamsV2 params;
+    AscendC::Nd2NzParamsV2 nd2nzParams;
+    AscendC::LoadData(dst, src, params, nd2nzParams);
+}
+#endif

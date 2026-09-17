@@ -162,6 +162,106 @@ __aicore__ inline void DumpAccChkPoint(
     return;
 }
 
+template <typename Input>
+__aicore__ inline void DumpPointerAtPosition(
+    const Input& input, Hardware position, uint32_t desc, uint32_t dumpSize, const uint32_t* shape, uint32_t shapeDim)
+{
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+    using InputType = Internal::OperandPrimT<Input>;
+    if (position == Hardware::GM) {
+        const uint64_t ctrlValue = get_ctrl();
+        set_atomic_none();
+        __asc_aicore::asc_dump_gm((__gm__ InputType*)GetUnderlyingPtr(input), desc, dumpSize, shape, shapeDim);
+        set_ctrl(ctrlValue);
+        return;
+    }
+
+    const uint64_t ctrlValue = get_ctrl();
+    set_atomic_none();
+#if __NPU_ARCH__ == 3510
+    dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
+    if (g_sysPrintFifoSpace != nullptr) {
+        if (position == Hardware::UB) {
+            __asc_aicore::asc_dump_ubuf((__ubuf__ InputType*)GetUnderlyingPtr(input), desc, dumpSize, shape, shapeDim);
+        } else if (position == Hardware::L0C) {
+            if ASCEND_IS_AIC {
+                __asc_aicore::asc_dump_cbuf(
+                    (__cc__ InputType*)GetUnderlyingPtr(input), desc, dumpSize, shape, shapeDim);
+            }
+        } else if (position == Hardware::L1) {
+            if ASCEND_IS_AIC {
+                __asc_aicore::asc_dump_l1buf(
+                    (__cbuf__ InputType*)GetUnderlyingPtr(input), desc, dumpSize, shape, shapeDim);
+            }
+        } else if (position == Hardware::BIAS) {
+            if ASCEND_IS_AIC {
+                __asc_aicore::asc_dump(
+                    (__biasbuf__ InputType*)GetUnderlyingPtr(input), desc, dumpSize, shape, shapeDim);
+            }
+        } else if (position == Hardware::FIXBUF) {
+            if ASCEND_IS_AIC {
+                __asc_aicore::asc_dump((__fbuf__ InputType*)GetUnderlyingPtr(input), desc, dumpSize, shape, shapeDim);
+            }
+        } else {
+            ASCENDC_ASSERT(
+                (false), { KERNEL_LOG(KERNEL_ERROR, "DumpTensor pointer only supports GM/UB/L0C/L1/BIAS/FIXBUF"); });
+        }
+    }
+#else
+    if (position == Hardware::UB) {
+        __asc_aicore::asc_dump_ubuf((__ubuf__ InputType*)GetUnderlyingPtr(input), desc, dumpSize, shape, shapeDim);
+    } else if (position == Hardware::L1) {
+        __asc_aicore::asc_dump_l1buf((__cbuf__ InputType*)GetUnderlyingPtr(input), desc, dumpSize, shape, shapeDim);
+    } else if (position == Hardware::L0C) {
+        __asc_aicore::asc_dump_cbuf((__cc__ InputType*)GetUnderlyingPtr(input), desc, dumpSize, shape, shapeDim);
+    } else {
+        ASCENDC_ASSERT(
+            (false), { KERNEL_LOG(KERNEL_ERROR, "DumpTensor pointer only supports GM/UB/L0C/L1 on this device"); });
+    }
+#endif
+    set_ctrl(ctrlValue);
+#else
+    (void)input;
+    (void)desc;
+    (void)dumpSize;
+    (void)shape;
+    (void)shapeDim;
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "DumpTensor pointer input is not supported on this device"); });
+#endif
+}
+
+template <typename Input>
+__aicore__ inline void DumpPointerImpl(
+    const Input& input, uint32_t desc, uint32_t dumpSize, const uint32_t* shape, uint32_t shapeDim)
+{
+    DumpPointerAtPosition(input, GetPhyType(GetOperandPosition(input)), desc, dumpSize, shape, shapeDim);
+}
+
+template <typename Input, typename Std::enable_if<Internal::IsPointerOperand<Input>, bool>::type>
+__aicore__ inline void DumpTensor(const Input& input, uint32_t desc, uint32_t dumpSize)
+{
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+    DumpPointerImpl(input, desc, dumpSize, nullptr, 0);
+#endif
+}
+
+template <typename Input, typename Std::enable_if<Internal::IsPointerOperand<Input>, bool>::type>
+__aicore__ inline void DumpTensor(const Input& input, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
+{
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+    DumpPointerImpl(input, desc, dumpSize, shapeInfo.shape, shapeInfo.shapeDim);
+#endif
+}
+
+template <typename Input, typename Std::enable_if<Internal::IsPointerOperand<Input>, bool>::type>
+__aicore__ inline void DumpAccChkPoint(const Input& input, uint32_t index, uint32_t countOff, uint32_t dumpSize)
+{
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined(ASCENDC_ACC_DUMP)
+    auto offsetInput = GetUnderlyingPtr(input) + countOff;
+    DumpPointerAtPosition(offsetInput, GetPhyType(GetOperandPosition(input)), index, dumpSize, nullptr, 0);
+#endif
+}
+
 // only 51, 71, 82 supports printf/assert. the other code is left to avoid errors in test cases.
 #if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 5102
 template <class... Args>

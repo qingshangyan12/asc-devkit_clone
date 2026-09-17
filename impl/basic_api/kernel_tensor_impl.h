@@ -495,6 +495,20 @@ LocalTensor<T>::SetAddrWithOffset(LocalTensor<U>& src, uint32_t offset)
     this->address_.absAddr += offset * sizeof(PrimT<U>);
 }
 
+template <typename T>
+template <typename Src, typename Std::enable_if<Internal::IsPointerOperand<Src>, bool>::type>
+[[deprecated("NOTICE: SetAddrWithOffset has been deprecated and will be removed in the next version. "
+             "Please do not use it!")]] void
+LocalTensor<T>::SetAddrWithOffset(const Src& src, uint32_t offset)
+{
+    using SrcType = Internal::OperandPrimT<Src>;
+    const TPosition position = GetOperandPosition(src);
+    uint8_t* absAddr = (uint8_t*)GetUnderlyingPtr(src) + offset * sizeof(SrcType);
+    this->address_.logicPos = static_cast<uint8_t>(position);
+    this->address_.absAddr = absAddr;
+    this->address_.bufferAddr = absAddr - GetBaseAddrCpu(static_cast<int8_t>(position));
+}
+
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T>
 inline std::string GetComplexStr(const T& val)
@@ -959,6 +973,16 @@ LocalTensor<T>::SetAddrWithOffset(LocalTensor<U>& src, uint32_t offset)
 {
     this->address_ = src.address_;
     this->address_.bufferAddr += offset * sizeof(PrimT<U>);
+}
+template <typename T>
+template <typename Src, typename Std::enable_if<Internal::IsPointerOperand<Src>, bool>::type>
+[[deprecated("NOTICE: SetAddrWithOffset has been deprecated and will be removed in the next version. "
+             "Please do not use it!")]] __aicore__ inline void
+LocalTensor<T>::SetAddrWithOffset(const Src& src, uint32_t offset)
+{
+    using SrcType = Internal::OperandPrimT<Src>;
+    this->address_.logicPos = static_cast<uint8_t>(GetOperandPosition(src));
+    this->address_.bufferAddr = static_cast<uint32_t>((uint64_t)GetUnderlyingPtr(src) + offset * sizeof(SrcType));
 }
 #endif
 template <typename T>

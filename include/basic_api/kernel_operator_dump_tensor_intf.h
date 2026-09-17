@@ -30,6 +30,7 @@
 #include "../../impl/basic_api/kernel_log.h"
 #include "utils/debug/asc_assert.h"
 #include "impl/utils/debug/asc_aicore_printf_impl.h"
+#include "../../impl/basic_api/utils/kernel_utils_pointer.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -53,6 +54,15 @@ __aicore__ inline void DumpAccChkPoint(
 template <typename T>
 __aicore__ inline void DumpAccChkPoint(
     const GlobalTensor<T>& tensor, uint32_t index, uint32_t countOff, uint32_t dumpSize);
+
+template <typename Input, typename Std::enable_if<Internal::IsPointerOperand<Input>, bool>::type = true>
+__aicore__ inline void DumpTensor(const Input& input, uint32_t desc, uint32_t dumpSize);
+
+template <typename Input, typename Std::enable_if<Internal::IsPointerOperand<Input>, bool>::type = true>
+__aicore__ inline void DumpTensor(const Input& input, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo);
+
+template <typename Input, typename Std::enable_if<Internal::IsPointerOperand<Input>, bool>::type = true>
+__aicore__ inline void DumpAccChkPoint(const Input& input, uint32_t index, uint32_t countOff, uint32_t dumpSize);
 
 using __asc_aicore::printf;
 using __asc_aicore::PRINTF;
