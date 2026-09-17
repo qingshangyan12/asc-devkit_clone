@@ -300,7 +300,7 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForConcurrentAllGatherM2M(
     __gm__ CommonPrepareParamCcu* commParam)
 {
-    constexpr uint64_t meshBandwidth = 11U;
+    constexpr uint64_t meshBandwidth = 10U;
     constexpr uint64_t totalBandwidth = 21U;
     constexpr uint64_t splitAlignment = 128U;
     constexpr uint64_t nhrJettyNum = 4U;
@@ -531,7 +531,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 {
     // 将 hccl InsReduceScatterConcurrentExecutor::OrchestrateLoop 的 host 侧切分搬到 AIV：
     // CCU_SCHED 带宽比 MESH_BW_SCHED:CLOS_BW_SCHED = 10:12，meshSize 按 128B 对齐下取整。
-    constexpr uint64_t meshBandwidth = 8U;
+    constexpr uint64_t meshBandwidth = 12U;
     constexpr uint64_t totalBandwidth = 22U;
     constexpr uint64_t splitAlignment = 128U;
     constexpr uint64_t nhrJettyNum = 1U; // 与 hccl CcuTempReduceScatterNhrMultiJettyMem2Mem1D 的 portNum=1 一致
