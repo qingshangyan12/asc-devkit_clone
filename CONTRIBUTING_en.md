@@ -1,4 +1,4 @@
-﻿# Contribution Guide
+# Contribution Guide
 
 This project welcomes developers to experience and participate in contributions. Before participating in community contributions, see [cann-community](https://gitcode.com/cann/community) to understand the code of conduct, sign the CLA agreement, and learn about the contribution process for source code repositories.
 
