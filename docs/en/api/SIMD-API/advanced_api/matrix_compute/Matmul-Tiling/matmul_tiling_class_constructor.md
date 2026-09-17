@@ -79,9 +79,7 @@ Creates a **Matmul** single-core tiling object, a multi-core tiling object, or a
 | Parameter | Input/Output | Description |
 | --- | --- | --- |
 | **ascendcPlatform** | Input | Passes the hardware platform information. For the definition of **PlatformAscendC**, see [constructors_and_destructors](../../../../Utils-API/platform_info/PlatformAscendC/constructors_and_destructors.md). |
-| **platform** | Input | Passes the hardware version and the memory size provided by each hardware unit in the AI Core. When **PlatformInfo** is constructed, it is obtained through the [constructors_and_destructors](../../../../Utils-API/platform_info/PlatformAscendC/constructors_and_destructors.md).<br><br>The **PlatformInfo** structure is defined as shown in the following code. **socVersion** is obtained and passed through [GetSocVersion](../../../../Utils-API/platform_info/PlatformAscendC/GetSocVersion.md), and the storage space size of each hardware unit is obtained and passed through [GetCoreMemSize](../../../../Utils-API/platform_info/PlatformAscendC/GetCoreMemSize.md).
-
-<br><br>It is not recommended to call the constructor by directly filling in values to construct **PlatformInfo**, for example, `PlatformInfo(socVersion, 1024, 1024, ..);`. |
+| **platform** | Input | Passes the hardware version and the memory size provided by each hardware unit in the AI Core. When **PlatformInfo** is constructed, it is obtained through the [constructors_and_destructors](../../../../Utils-API/platform_info/PlatformAscendC/constructors_and_destructors.md).<br><br>The **PlatformInfo** structure is defined as shown in the following code. **socVersion** is obtained and passed through [GetSocVersion](../../../../Utils-API/platform_info/PlatformAscendC/GetSocVersion.md), and the storage space size of each hardware unit is obtained and passed through [GetCoreMemSize](../../../../Utils-API/platform_info/PlatformAscendC/GetCoreMemSize.md). <br><br>It is not recommended to call the constructor by directly filling in values to construct **PlatformInfo**, for example, `PlatformInfo(socVersion, 1024, 1024, ..);`. |
 
 ```
 struct PlatformInfo {
