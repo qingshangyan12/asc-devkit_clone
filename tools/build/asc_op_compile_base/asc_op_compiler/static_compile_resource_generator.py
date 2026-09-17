@@ -383,8 +383,22 @@ def _normalize_source_include_options(argv, source_file_path, replacement, inser
     return normalized
 
 
-def _static_bind_source(pairs, basic_attribute, sk_attribute, cap_bitmap):
-    lines = ['#include "kernel_operator.h"']
+def gen_sk_bind_source(pairs, basic_attribute, sk_attribute, cap_bitmap):
+    """Keep DCCI capability selectable when recorded sources are specialized.
+
+    The disable-DCCI capability is independent of GlobalTensor Get/SetValue
+    cache maintenance. An explicit macro overrides bit2; absence preserves the recorded value.
+    """
+    lines = [
+        '#include "kernel_operator.h"',
+        "#ifndef __ASCENDC_SUPER_KERNEL_DISABLE_DCCI__",
+        f"#define __ASCENDC_SUPER_KERNEL_DISABLE_DCCI__ {1 if cap_bitmap & 4 else 0}",
+        "#endif",
+    ]
+    capability = (
+        f"(({cap_bitmap}ULL & ~4ULL) | "
+        "(__ASCENDC_SUPER_KERNEL_DISABLE_DCCI__ ? 4ULL : 0ULL))"
+    )
     for basic_symbol, sk_symbol in pairs:
         lines.extend(
             [
@@ -393,7 +407,7 @@ def _static_bind_source(pairs, basic_attribute, sk_attribute, cap_bitmap):
                 f'extern "C" {sk_attribute} void {sk_symbol}_split1();',
                 f'extern "C" {sk_attribute} void {sk_symbol}_split2();',
                 f'extern "C" {sk_attribute} void {sk_symbol}_split3();',
-                f"SK_BIND({basic_symbol}, {cap_bitmap}, {sk_symbol}, "
+                f"SK_BIND({basic_symbol}, {capability}, {sk_symbol}, "
                 f"{sk_symbol}_split1, {sk_symbol}_split2, {sk_symbol}_split3);",
             ]
         )
@@ -737,8 +751,8 @@ class ManifestPackageWriter:
         bind_logical = _add_resource(
             self._resources,
             "src/" + bind_name,
-            content=_static_bind_source(
-                bind_pairs, basic_attribute or sk_attribute, sk_attribute, self._snapshot.sk_cap_bitmap
+            content=gen_sk_bind_source(
+                bind_pairs, basic_attribute or sk_attribute, sk_attribute, self._snapshot.sk_cap_bitmap,
             ),
         )
         output_name = f"{kernel.kernel_name}.sk_bind.o"
