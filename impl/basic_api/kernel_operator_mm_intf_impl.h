@@ -994,12 +994,10 @@ __aicore__ inline void LoadData(const Dst& dst, const Src& src, const LoadData2D
             constexpr Hardware staticSrcScope = GetPhyType(GetStaticOperandPosition<Src>());
             if constexpr (staticSrcScope == Hardware::L1 && dstScope == Hardware::L0A) {
                 LoadData2DL12L0ACal(
-                    (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
-                    loadDataParams);
+                    (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
             } else if constexpr (staticSrcScope == Hardware::L1 && dstScope == Hardware::L0B) {
                 LoadData2DL12L0BCal(
-                    (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
-                    loadDataParams);
+                    (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
             } else if constexpr (staticSrcScope == Hardware::GM && dstScope == Hardware::L0A) {
                 LoadData2DGM2L0ACal(
                     (__ca__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
@@ -1010,29 +1008,25 @@ __aicore__ inline void LoadData(const Dst& dst, const Src& src, const LoadData2D
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
                 const uint8_t cacheMode = GetOperandCacheMode(src);
                 LoadData2DGM2L1Cal(
-                    (__cbuf__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src),
-                    loadDataParams, cacheMode);
+                    (__cbuf__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src), loadDataParams,
+                    cacheMode);
 #else
                 LoadData2DGM2L1Cal(
-                    (__cbuf__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src),
-                    loadDataParams);
+                    (__cbuf__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
 #endif
             } else {
                 ASCENDC_ASSERT(
                     (false), { KERNEL_LOG(KERNEL_ERROR, "LoadData does not support the pointer position pair"); });
             }
         } else {
-            ASCENDC_ASSERT((srcScope == Hardware::L1), {
-                KERNEL_LOG(KERNEL_ERROR, "LoadData local source must be in L1");
-            });
+            ASCENDC_ASSERT(
+                (srcScope == Hardware::L1), { KERNEL_LOG(KERNEL_ERROR, "LoadData local source must be in L1"); });
             if constexpr (dstScope == Hardware::L0A) {
                 LoadData2DL12L0ACal(
-                    (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
-                    loadDataParams);
+                    (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
             } else if constexpr (dstScope == Hardware::L0B) {
                 LoadData2DL12L0BCal(
-                    (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
-                    loadDataParams);
+                    (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
             }
         }
     } else {
@@ -1041,12 +1035,10 @@ __aicore__ inline void LoadData(const Dst& dst, const Src& src, const LoadData2D
         if constexpr (staticSrcScope == Hardware::L1) {
             if (dstScope == Hardware::L0A) {
                 LoadData2DL12L0ACal(
-                    (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
-                    loadDataParams);
+                    (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
             } else if (dstScope == Hardware::L0B) {
                 LoadData2DL12L0BCal(
-                    (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
-                    loadDataParams);
+                    (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
             }
         } else if constexpr (staticSrcScope == Hardware::GM) {
             if (dstScope == Hardware::L0A) {
@@ -1059,12 +1051,11 @@ __aicore__ inline void LoadData(const Dst& dst, const Src& src, const LoadData2D
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
                 const uint8_t cacheMode = GetOperandCacheMode(src);
                 LoadData2DGM2L1Cal(
-                    (__cbuf__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src),
-                    loadDataParams, cacheMode);
+                    (__cbuf__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src), loadDataParams,
+                    cacheMode);
 #else
                 LoadData2DGM2L1Cal(
-                    (__cbuf__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src),
-                    loadDataParams);
+                    (__cbuf__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
 #endif
             }
         }
@@ -1086,12 +1077,10 @@ __aicore__ inline void LoadData(const Dst& dst, const Src& src, const LoadData2D
             constexpr Hardware srcScope = GetPhyType(GetStaticOperandPosition<Src>());
             if constexpr (srcScope == Hardware::L1 && dstScope == Hardware::L0A) {
                 LoadData2DL12L0ACal(
-                    (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
-                    loadDataParams);
+                    (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
             } else if constexpr (srcScope == Hardware::L1 && dstScope == Hardware::L0B) {
                 LoadData2DL12L0BCal(
-                    (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
-                    loadDataParams);
+                    (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
             } else if constexpr (srcScope == Hardware::GM) {
 #ifdef ASCENDC_TIME_STAMP_ON
                 PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE2_DATACOPY));
@@ -1100,12 +1089,12 @@ __aicore__ inline void LoadData(const Dst& dst, const Src& src, const LoadData2D
                 const uint8_t cacheMode = GetOperandCacheMode(src);
                 if constexpr (dstScope == Hardware::L0A) {
                     LoadData2DGM2L0ACal(
-                        (__ca__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src),
-                        loadDataParams, cacheMode);
+                        (__ca__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src), loadDataParams,
+                        cacheMode);
                 } else if constexpr (dstScope == Hardware::L0B) {
                     LoadData2DGM2L0BCal(
-                        (__cb__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src),
-                        loadDataParams, cacheMode);
+                        (__cb__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src), loadDataParams,
+                        cacheMode);
                 } else if constexpr (dstScope == Hardware::L1) {
                     LoadData2DGM2L1Cal(
                         (__cbuf__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src),
@@ -1114,12 +1103,10 @@ __aicore__ inline void LoadData(const Dst& dst, const Src& src, const LoadData2D
 #else
                 if constexpr (dstScope == Hardware::L0A) {
                     LoadData2DGM2L0ACal(
-                        (__ca__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src),
-                        loadDataParams);
+                        (__ca__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
                 } else if constexpr (dstScope == Hardware::L0B) {
                     LoadData2DGM2L0BCal(
-                        (__cb__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src),
-                        loadDataParams);
+                        (__cb__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
                 } else if constexpr (dstScope == Hardware::L1) {
                     LoadData2DGM2L1Cal(
                         (__cbuf__ DstType*)GetUnderlyingPtr(dst), (__gm__ SrcType*)GetUnderlyingPtr(src),
@@ -1132,17 +1119,14 @@ __aicore__ inline void LoadData(const Dst& dst, const Src& src, const LoadData2D
             }
         } else {
             const Hardware srcScope = GetPhyType(GetOperandPosition(src));
-            ASCENDC_ASSERT((srcScope == Hardware::L1), {
-                KERNEL_LOG(KERNEL_ERROR, "LoadData local source must be in L1");
-            });
+            ASCENDC_ASSERT(
+                (srcScope == Hardware::L1), { KERNEL_LOG(KERNEL_ERROR, "LoadData local source must be in L1"); });
             if constexpr (dstScope == Hardware::L0A) {
                 LoadData2DL12L0ACal(
-                    (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
-                    loadDataParams);
+                    (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
             } else if constexpr (dstScope == Hardware::L0B) {
                 LoadData2DL12L0BCal(
-                    (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
-                    loadDataParams);
+                    (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
             } else {
                 ASCENDC_ASSERT(
                     (false), { KERNEL_LOG(KERNEL_ERROR, "LoadData dst pointer position is not supported"); });
@@ -1154,12 +1138,10 @@ __aicore__ inline void LoadData(const Dst& dst, const Src& src, const LoadData2D
         if constexpr (srcScope == Hardware::L1) {
             if (dstScope == Hardware::L0A) {
                 LoadData2DL12L0ACal(
-                    (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
-                    loadDataParams);
+                    (__ca__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
             } else if (dstScope == Hardware::L0B) {
                 LoadData2DL12L0BCal(
-                    (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src),
-                    loadDataParams);
+                    (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
             } else {
                 ASCENDC_ASSERT(
                     (false), { KERNEL_LOG(KERNEL_ERROR, "LoadData destination position is not supported"); });
@@ -1250,8 +1232,7 @@ __aicore__ inline void LoadData(const Dst& dst, const Src& src, const LoadData3D
             LoadData3DV1L12UBCal(
                 (__ubuf__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
         } else {
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "LoadData3D dst pointer position is not supported"); });
+            ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "LoadData3D dst pointer position is not supported"); });
         }
     }
 }
@@ -1307,8 +1288,7 @@ __aicore__ inline void LoadData(const Dst& dst, const Src& src, const LoadData3D
             LoadData3DV2L12UBCal(
                 (__ubuf__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
         } else {
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "LoadData3D dst pointer position is not supported"); });
+            ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "LoadData3D dst pointer position is not supported"); });
         }
     }
 }
@@ -1348,8 +1328,7 @@ __aicore__ inline void LoadData(const Dst& dst, const Src& src, const LoadData3D
             LoadData3DV2L12UBCal(
                 (__ubuf__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
         } else {
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "LoadData3D dst pointer position is not supported"); });
+            ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "LoadData3D dst pointer position is not supported"); });
         }
     }
 }
@@ -1489,8 +1468,7 @@ __aicore__ inline void LoadDataWithTranspose(
             LoadData2DL12L0BTransposeCal(
                 (__cb__ DstType*)GetUnderlyingPtr(dst), (__cbuf__ SrcType*)GetUnderlyingPtr(src), loadDataParams);
         } else {
-            ASCENDC_ASSERT(
-                (false), { KERNEL_LOG(KERNEL_ERROR, "LoadDataWithTranspose dst only supports L0A/L0B"); });
+            ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "LoadDataWithTranspose dst only supports L0A/L0B"); });
         }
     }
 }
