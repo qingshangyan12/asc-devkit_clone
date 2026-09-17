@@ -25,6 +25,7 @@ CANN 9.2.0在CANN 9.1.0的基础上继续增强C API。本版本新增矩阵与�
 
 - [asc_load_dev](../../SIMD-API/c_api/scalar_compute/scalar_load/asc_load_dev.md)：不经过Data Cache直接从Global Memory读取整型标量数据，适用于多核访问无法按Cache Line对齐的GM地址、需要避免Cache Line粒度数据覆盖的场景。该接口仅支持Ascend 950PR/Ascend 950DT。
 - [asc_float2half_ro](../../SIMD-API/c_api/scalar_compute/scalar_convert/asc_float2half.md)：在标量流水上将`float`转换为`half`并直接返回结果，舍入模式固定为ODD（最近邻奇数舍入）。该接口仅支持Ascend 950PR/Ascend 950DT。
+- [asc_get_uintdiv_magic_and_shift](../../SIMD-API/c_api/scalar_compute/scalar_bit/asc_get_uintdiv_magic_and_shift.md)：根据无符号除数计算整数快除算法所需的乘法因子`magic`和移位量`shift`，供SIMT侧快除接口`asc_uintdiv`使用，适用于同一除数被多次除法计算复用的性能优化场景。该接口仅支持Ascend 950PR/Ascend 950DT。
 
 ### Memory矢量计算
 

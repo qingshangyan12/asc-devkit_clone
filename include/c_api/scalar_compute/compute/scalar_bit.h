@@ -36,6 +36,8 @@ __aicore__ inline int64_t asc_clz(uint64_t value_in);
 __aicore__ inline int64_t asc_zero_bits_cnt(uint64_t value);
 __aicore__ inline uint64_t asc_set_nthbit(uint64_t bits, int64_t idx);
 __aicore__ inline uint64_t asc_clear_nthbit(uint64_t bits, int64_t idx);
+__aicore__ inline void asc_get_uintdiv_magic_and_shift(uint32_t* magic, uint32_t* shift, uint32_t divisor);
+__aicore__ inline void asc_get_uintdiv_magic_and_shift(uint64_t* magic, uint64_t* shift, uint64_t divisor);
 
 #endif
 
