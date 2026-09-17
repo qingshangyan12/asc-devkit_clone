@@ -1,0 +1,23 @@
+{
+  "task_id": "C1",
+  "session_id": "ses_f5197ced8ffeCAYf4EHVYdDFk9",
+  "model": "{\"id\":\"glm-5.3\",\"providerID\":\"cannbot\",\"variant\":\"default\"}",
+  "duration_s": 138.6,
+  "tokens_input": 47744,
+  "tokens_output": 1527,
+  "tokens_reasoning": 4602,
+  "tokens_total": 53873,
+  "tokens_cache_read": 44160,
+  "tokens_cache_write": 0,
+  "cost": 0.0,
+  "tool_calls": {
+    "grep": 5,
+    "read": 6
+  },
+  "docs_read_in_scope": 4,
+  "bytes_read_docs": 30727,
+  "source_files_read": 2,
+  "bytes_read_source": 41942,
+  "isolation_violations": [],
+  "isolation_ok": true
+}
