@@ -11,7 +11,6 @@
 #include "hccl/hccl_types.h"
 #include "hccl/base.h"
 #include "hccl_res.h"
-#include "mc2_thread_config_compat.h"
 #include "dtype_common.h"
 #include "hccl_common.h"
 #include "hccl_rank_graph.h"
@@ -105,17 +104,6 @@ Mc2TaskCacheTestStubState& GetMc2TaskCacheTestStubState()
 void ResetMc2TaskCacheTestStubState() { GetMc2TaskCacheTestStubState() = Mc2TaskCacheTestStubState{}; }
 
 #ifdef __cplusplus
-// The simulator owns its threads; do not load the production HCOMM resource API.
-HcclResult Mc2ThreadAcquireWithConfig(
-    HcclComm comm, CommEngine engine, uint32_t threadNum, uint32_t notifyNum, ThreadHandle* threads)
-{
-    if (notifyNum > UINT16_MAX) {
-        return HCCL_E_PARA;
-    }
-    const CommEngine legacyEngine = engine == COMM_ENGINE_AICPU ? COMM_ENGINE_AICPU_TS : engine;
-    return HcclThreadAcquire(comm, legacyEngine, threadNum, notifyNum, threads);
-}
-
 extern "C" {
 #endif // __cplusplus
 
