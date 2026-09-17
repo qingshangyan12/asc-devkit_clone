@@ -81,6 +81,40 @@ template <typename T, typename U>
 __aicore__ inline void Cast(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const RoundMode& roundMode, const uint32_t count);
 
+/*!
+ * \brief Pointer-extended Cast forms. dst/src may independently be a LocalTensor, a UB raw pointer or a raw
+ *        UB device address. The element type pair (T, U) comes from the explicit arguments or typed operands.
+ */
+template <
+    typename T = void, typename U = void, bool isSetMask = true, typename Dst, typename Src,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src> && Internal::CanResolveVecPrim<T, Dst> &&
+            Internal::CanResolveVecPrim<U, Src>,
+        bool>::type = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Cast is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void Cast(
+    const Dst& dst, const Src& src, const RoundMode& roundMode, const uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams);
+
+template <
+    typename T = void, typename U = void, bool isSetMask = true, typename Dst, typename Src,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src> && Internal::CanResolveVecPrim<T, Dst> &&
+            Internal::CanResolveVecPrim<U, Src>,
+        bool>::type = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Cast is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void Cast(
+    const Dst& dst, const Src& src, const RoundMode& roundMode, const uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams);
+
+template <
+    typename T = void, typename U = void, typename Dst, typename Src,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src> && Internal::CanResolveVecPrim<T, Dst> &&
+            Internal::CanResolveVecPrim<U, Src>,
+        bool>::type = true>
+__aicore__ inline void Cast(const Dst& dst, const Src& src, const RoundMode& roundMode, const uint32_t count);
+
 /*
  * @ingroup CastDequant Level 0
  * @brief Dequant from int16_t to uint8_t/int8_t

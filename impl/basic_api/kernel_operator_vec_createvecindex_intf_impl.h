@@ -106,6 +106,32 @@ __aicore__ inline __in_pipe__(S)
 #endif
     CreateVecIndexCalc(dst, firstValue, count);
 }
+
+// Pointer-extended CreateVecIndex overloads: dst is a UB raw pointer or a raw device address.
+template <typename T, typename Dst, typename Std::enable_if<Internal::IsRawOperandInvolved<Dst>, bool>::type enable>
+__aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(
+    const Dst& dst, const T& firstValue, uint64_t mask, uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride)
+{
+    LocalTensor<T> dstLocal = MakeVecTensor<T>(dst);
+    CreateVecIndexCalc(dstLocal, firstValue, mask, repeatTime, dstBlkStride, dstRepStride);
+}
+
+template <typename T, typename Dst, typename Std::enable_if<Internal::IsRawOperandInvolved<Dst>, bool>::type enable>
+__aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(
+    const Dst& dst, const T& firstValue, uint64_t mask[], uint8_t repeatTime, uint16_t dstBlkStride,
+    uint8_t dstRepStride)
+{
+    LocalTensor<T> dstLocal = MakeVecTensor<T>(dst);
+    CreateVecIndexCalc(dstLocal, firstValue, mask, repeatTime, dstBlkStride, dstRepStride);
+}
+
+template <typename T, typename Dst, typename Std::enable_if<Internal::IsRawOperandInvolved<Dst>, bool>::type enable>
+__aicore__ inline __in_pipe__(S)
+    __out_pipe__(V) void CreateVecIndex(const Dst& dst, const T& firstValue, uint32_t count)
+{
+    LocalTensor<T> dstLocal = MakeVecTensor<T>(dst);
+    CreateVecIndexCalc(dstLocal, firstValue, count);
+}
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_CREATEVECINDEX_INTERFACE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CREATEVECINDEX_INTF_IMPL_H__)

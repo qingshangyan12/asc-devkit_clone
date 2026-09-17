@@ -1159,6 +1159,43 @@ __aicore__ inline void LeakyRelu(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), scalarValue, count);
 }
 
+// Pointer-extended LeakyRelu overloads: at least one operand is a UB raw pointer or raw device address.
+template <
+    typename T, bool isSetMask, typename Dst, typename Src,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src> && Internal::CanResolveVecPrim<T, Dst, Src>, bool>::type enable>
+__aicore__ inline void LeakyRelu(
+    const Dst& dst, const Src& src, const T& scalarValue, uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using PrimType = PrimT<T>;
+    LeakyReluImpl<PrimType, isSetMask>(
+        GetUbufPtr<PrimType>(dst), GetUbufPtr<PrimType>(src), scalarValue, mask, repeatTime, repeatParams);
+}
+
+template <
+    typename T, bool isSetMask, typename Dst, typename Src,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src> && Internal::CanResolveVecPrim<T, Dst, Src>, bool>::type enable>
+__aicore__ inline void LeakyRelu(
+    const Dst& dst, const Src& src, const T& scalarValue, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    using PrimType = PrimT<T>;
+    LeakyReluImpl<PrimType, isSetMask>(
+        GetUbufPtr<PrimType>(dst), GetUbufPtr<PrimType>(src), scalarValue, mask, repeatTime, repeatParams);
+}
+
+template <
+    typename T, typename Dst, typename Src,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src> && Internal::CanResolveVecPrim<T, Dst, Src>, bool>::type enable>
+__aicore__ inline void LeakyRelu(const Dst& dst, const Src& src, const T& scalarValue, const int32_t& count)
+{
+    using PrimType = PrimT<T>;
+    LeakyReluImpl<PrimType>(GetUbufPtr<PrimType>(dst), GetUbufPtr<PrimType>(src), scalarValue, count);
+}
+
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
                               (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 /* **************************************************************************************************

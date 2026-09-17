@@ -82,6 +82,48 @@ template <typename T>
 __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count);
 #endif
 
+/*!
+ * \brief Pointer-extended Duplicate forms. The destination may be a LocalTensor, a UB raw pointer or a raw
+ *        UB device address. For the scalar-fill forms the scalar argument keeps the element type; for the
+ *        tensor-fill form the element type comes from the explicit argument or from a typed operand.
+ */
+template <
+    typename T = void, typename Dst, typename Scalar,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst> && !Internal::IsRawOperandInvolved<Scalar> &&
+            !Internal::IsTensorOperand<Scalar>,
+        bool>::type = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Duplicate is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void Duplicate(
+    const Dst& dst, const Scalar& scalarValue, uint64_t mask, const uint8_t repeatTime, const uint16_t dstBlockStride,
+    const uint8_t dstRepeatStride);
+
+template <
+    typename T = void, typename Dst, typename Scalar,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst> && !Internal::IsRawOperandInvolved<Scalar> &&
+            !Internal::IsTensorOperand<Scalar>,
+        bool>::type = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Duplicate is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void Duplicate(
+    const Dst& dst, const Scalar& scalarValue, uint64_t mask[], const uint8_t repeatTime, const uint16_t dstBlockStride,
+    const uint8_t dstRepeatStride);
+
+template <
+    typename T = void, typename Dst, typename Scalar,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst> && !Internal::IsRawOperandInvolved<Scalar> &&
+            !Internal::IsTensorOperand<Scalar>,
+        bool>::type = true>
+__aicore__ inline void Duplicate(const Dst& dst, const Scalar& scalarValue, const int32_t& count);
+
+template <
+    typename T = void, typename Dst, typename Src,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src> && (Internal::IsRawOperand<Src> || Internal::IsTensorOperand<Src>),
+        bool>::type = true>
+__aicore__ inline void Duplicate(const Dst& dst, const Src& src, const int32_t& count);
+
 /* **************************************************************************************************
  * Interleave                                            *
  * ************************************************************************************************* */

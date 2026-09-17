@@ -83,6 +83,37 @@ template <typename T>
 __aicore__ inline void Add(
     const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const int32_t& count);
 
+/*!
+ * \brief Pointer-extended forms of Add. Each operand may independently be a LocalTensor, a UB raw pointer
+ *        or a raw UB device address; the element type comes from the explicit argument or a typed operand.
+ */
+template <
+    typename T = void, bool isSetMask = true, typename Dst, typename Src0, typename Src1,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src0, Src1> && Internal::CanResolveVecPrim<T, Dst, Src0, Src1>,
+        bool>::type = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Add is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void Add(
+    const Dst& dst, const Src0& src0, const Src1& src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams);
+
+template <
+    typename T = void, bool isSetMask = true, typename Dst, typename Src0, typename Src1,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src0, Src1> && Internal::CanResolveVecPrim<T, Dst, Src0, Src1>,
+        bool>::type = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Add is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void Add(
+    const Dst& dst, const Src0& src0, const Src1& src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams);
+
+template <
+    typename T = void, typename Dst, typename Src0, typename Src1,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src0, Src1> && Internal::CanResolveVecPrim<T, Dst, Src0, Src1>,
+        bool>::type = true>
+__aicore__ inline void Add(const Dst& dst, const Src0& src0, const Src1& src1, const int32_t& count);
+
 /* **************************************************************************************************
  * Sub                                             *
  * ************************************************************************************************* */
@@ -508,6 +539,38 @@ __aicore__ inline void AddRelu(
 template <typename T>
 __aicore__ inline void AddRelu(
     const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const int32_t& count);
+
+/*!
+ * \brief Pointer-extended forms of AddRelu. Each operand may independently be a LocalTensor, a UB raw
+ *        pointer or a raw UB device address. The element type is taken from the explicit template
+ *        argument T or from the first typed operand; the computation reuses the original *Impl.
+ */
+template <
+    typename T = void, bool isSetMask = true, typename Dst, typename Src0, typename Src1,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src0, Src1> && Internal::CanResolveVecPrim<T, Dst, Src0, Src1>,
+        bool>::type = true>
+__ASC_USE_RESERVED_UBUF__(3510, "AddRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void AddRelu(
+    const Dst& dst, const Src0& src0, const Src1& src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams);
+
+template <
+    typename T = void, bool isSetMask = true, typename Dst, typename Src0, typename Src1,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src0, Src1> && Internal::CanResolveVecPrim<T, Dst, Src0, Src1>,
+        bool>::type = true>
+__ASC_USE_RESERVED_UBUF__(3510, "AddRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void AddRelu(
+    const Dst& dst, const Src0& src0, const Src1& src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams);
+
+template <
+    typename T = void, typename Dst, typename Src0, typename Src1,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src0, Src1> && Internal::CanResolveVecPrim<T, Dst, Src0, Src1>,
+        bool>::type = true>
+__aicore__ inline void AddRelu(const Dst& dst, const Src0& src0, const Src1& src1, const int32_t& count);
 
 /* **************************************************************************************************
  * AddDeqRelu                                             *

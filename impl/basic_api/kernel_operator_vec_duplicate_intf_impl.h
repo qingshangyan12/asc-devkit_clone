@@ -159,6 +159,60 @@ __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const LocalTensor<T>
     DuplicateImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), count);
 }
 
+// Pointer-extended Duplicate overloads: the destination is a UB raw pointer or a raw device address.
+template <
+    typename T, bool isSetMask, typename Dst, typename Scalar,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst> && !Internal::IsRawOperandInvolved<Scalar> &&
+            !Internal::IsTensorOperand<Scalar>,
+        bool>::type enable>
+__aicore__ inline void Duplicate(
+    const Dst& dst, const Scalar& scalarValue, uint64_t mask, const uint8_t repeatTime, const uint16_t dstBlockStride,
+    const uint8_t dstRepeatStride)
+{
+    using PrimType = Internal::FillPrimType<T, Dst, Scalar>;
+    DuplicateImpl<PrimType, isSetMask>(
+        GetUbufPtr<PrimType>(dst), scalarValue, mask, repeatTime, dstBlockStride, dstRepeatStride);
+}
+
+template <
+    typename T, bool isSetMask, typename Dst, typename Scalar,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst> && !Internal::IsRawOperandInvolved<Scalar> &&
+            !Internal::IsTensorOperand<Scalar>,
+        bool>::type enable>
+__aicore__ inline void Duplicate(
+    const Dst& dst, const Scalar& scalarValue, uint64_t mask[], const uint8_t repeatTime, const uint16_t dstBlockStride,
+    const uint8_t dstRepeatStride)
+{
+    using PrimType = Internal::FillPrimType<T, Dst, Scalar>;
+    DuplicateImpl<PrimType, isSetMask>(
+        GetUbufPtr<PrimType>(dst), scalarValue, mask, repeatTime, dstBlockStride, dstRepeatStride);
+}
+
+template <
+    typename T, typename Dst, typename Scalar,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst> && !Internal::IsRawOperandInvolved<Scalar> &&
+            !Internal::IsTensorOperand<Scalar>,
+        bool>::type enable>
+__aicore__ inline void Duplicate(const Dst& dst, const Scalar& scalarValue, const int32_t& count)
+{
+    using PrimType = Internal::FillPrimType<T, Dst, Scalar>;
+    DuplicateImpl<PrimType>(GetUbufPtr<PrimType>(dst), scalarValue, count);
+}
+
+template <
+    typename T, typename Dst, typename Src,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src> && (Internal::IsRawOperand<Src> || Internal::IsTensorOperand<Src>),
+        bool>::type enable>
+__aicore__ inline void Duplicate(const Dst& dst, const Src& src, const int32_t& count)
+{
+    using PrimType = Internal::VecPrimType<T, Dst, Src>;
+    DuplicateImpl<PrimType>(GetUbufPtr<PrimType>(dst), GetUbufPtr<PrimType>(src), count);
+}
+
 /* **************************************************************************************************
  * Interleave                                            *
  * ************************************************************************************************* */
