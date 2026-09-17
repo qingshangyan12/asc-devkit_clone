@@ -231,4 +231,4 @@ run_case m1024 1 1024 1 1
 run_case m2048 1 2048 1 1
 ```
 
-脚本按[生态算子开源精度标准（实验标准）](https://gitcode.com/cann/opbase/blob/master/docs/zh/ops_precision_standard/experimental_standard.md#2-%E8%AF%AF%E5%B7%AE%E6%8C%87%E6%A0%87%E4%B8%8E%E9%80%9A%E8%BF%87%E6%A0%87%E5%87%86)检查 FP32 结果：`rtol=2^-10`、`atol=2^-16`、匹配率不低于 0.99，且每个元素的绝对误差不超过 `max(1e-2, 32*ULP)`。三次检查均须输出 `test pass!`。
+脚本按生态算子开源精度标准（实验标准）检查 FP32 结果：`rtol=2^-10`、`atol=2^-16`、匹配率不低于 0.99，且每个元素的绝对误差不超过 `max(1e-2, 32*ULP)`。三次检查均须输出 `test pass!`。
