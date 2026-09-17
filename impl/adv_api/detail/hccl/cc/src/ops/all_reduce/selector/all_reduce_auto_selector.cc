@@ -40,6 +40,7 @@ SelectorStatus AllReduceAutoSelector::SelectAicpuAlgo(
     const bool overMaxDataSize = dataSize * rankRatio > AR_AICPU_1D_MAX_DATA_SIZE;
     const bool overSequenceDataSize = dataSize > AR_AICPU_SEQUENCE_DATA_SIZE;
     if (topoInfo->level0Topo == Level0Shape::MESH_1D) {
+        HCCL_INFO("[topoLevelNum test:][%s]", topoInfo->topoLevelNum);
         const bool twoLevel = IsTwoLevelNetLayer(topoInfo);
         const bool matchChunkTwoShot = overMaxDataSize && !(twoLevel && overSequenceDataSize) &&
                                        !(twoLevel && topoInfo->userRankSize == 2 && dataSize >= AR_2P_DETOUR_DATA_SIZE);
