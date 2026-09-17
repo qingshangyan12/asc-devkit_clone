@@ -16,44 +16,6 @@
 #include "ccu_launch_dl.h"
 
 namespace mc2_ops_hccl {
-static bool IsKfcSourceKernelMatched(const std::string& sourceName, HcclCMDType opType, KfcServerRole role)
-{
-    switch (opType) {
-        case HcclCMDType::HCCL_CMD_ALLGATHER:
-            if (role == KfcServerRole::ALL_GATHER_NHR) {
-                return sourceName == "CcuKernelAllGatherNHR1DMultiJettyMem2Mem";
-            }
-            return (role == KfcServerRole::DEFAULT || role == KfcServerRole::ALL_GATHER_MESH) &&
-                   (sourceName == "CcuKernelAllGatherMesh1DMem2Mem" ||
-                    sourceName == "CcuKernelKfcAllGatherMesh1DMem2Mem");
-        case HcclCMDType::HCCL_CMD_REDUCE_SCATTER:
-            if (role == KfcServerRole::REDUCE_SCATTER_NHR ||
-                role == KfcServerRole::REDUCE_SCATTER_SOLE_NHR) {
-                return sourceName == "CcuKernelReduceScatterNHR1DMultiJettyMem2Mem";
-            }
-            if (role == KfcServerRole::DEFAULT && sourceName == KFC_REDUCE_SCATTER_PEER_ONLY_KERNEL_NAME) {
-                return true;
-            }
-            return (role == KfcServerRole::DEFAULT || role == KfcServerRole::REDUCE_SCATTER_MESH) &&
-                   sourceName == "CcuKernelKfcReduceScatterMesh1DMem2Mem";
-        case HcclCMDType::HCCL_CMD_ALLREDUCE:
-            return role == KfcServerRole::DEFAULT && sourceName == "CcuKernelAllReduceMesh1DMem2Mem";
-        case HcclCMDType::HCCL_CMD_ALLTOALL:
-            if (role == KfcServerRole::ALL_TO_ALL_MULTI_JETTY) {
-                return sourceName == "CcuKernelKfcAllToAllMesh1DMultiJetty" ||
-                       sourceName == "CcuAllToAllMesh1DMultiJettyKernel";
-            }
-            if (role == KfcServerRole::ALL_TO_ALL_MESH || role == KfcServerRole::ALL_TO_ALL_CLOS) {
-                return sourceName == "CcuKernelKfcAllToAllMesh1DMultiJetty";
-            }
-            return role == KfcServerRole::DEFAULT && sourceName == "CcuKernelAlltoAllMesh1D";
-        case HcclCMDType::HCCL_CMD_ALLTOALLV:
-            return role == KfcServerRole::DEFAULT && sourceName == "CcuKernelAlltoAllVMesh1D";
-        default:
-            return false;
-    }
-}
-
 static HcclResult InheritKfcServerKernelArg(
     const CcuKernelInfo& srcKernel, CcuKernelInfo& dstKernel, const OpParam& param, KfcServerRole role,
     uint32_t missionIndex)
@@ -128,19 +90,47 @@ HcclResult CcuTempKfcServer::CalcRes(
         const size_t kernelIndex = firstKernelIndex + missionIndex;
         const CcuKernelInfo& srcKernel = resourceRequest.ccuKernelInfos[kernelIndex];
         const std::string sourceName(srcKernel.kernelFuncName);
-        const KfcServerRole role = GetKfcServerRole(param.algName, missionIndex);
-        if (!IsKfcSourceKernelMatched(sourceName, param.opType, role)) {
+        const bool isAllGather =
+            sourceName == "CcuKernelAllGatherMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
+        const bool isAllGatherKfc =
+            sourceName == "CcuKernelKfcAllGatherMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
+        const bool isAllGatherNhr =
+            sourceName == "CcuKernelAllGatherNHR1DMultiJettyMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
+        const bool isReduceScatter = sourceName == "CcuKernelKfcReduceScatterMesh1DMem2Mem" &&
+                                     param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
+        const bool isReduceScatterPeerOnly = sourceName == KFC_REDUCE_SCATTER_PEER_ONLY_KERNEL_NAME &&
+                                             param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
+        const bool isReduceScatterNhr = sourceName == "CcuKernelReduceScatterNHR1DMultiJettyMem2Mem" &&
+                                        param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
+        const bool isAlltoAll =
+            sourceName == "CcuKernelAlltoAllMesh1D" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALL;
+        const bool isAllToAllV =
+            sourceName == "CcuKernelAlltoAllVMesh1D" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV;
+        const bool isAlltoAllKfcMultiJetty =
+            sourceName == "CcuKernelKfcAllToAllMesh1DMultiJetty" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALL;
+        const bool isAlltoAllMultiJetty =
+            sourceName == "CcuAllToAllMesh1DMultiJettyKernel" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALL;
+        const bool isAllReduce =
+            sourceName == "CcuKernelAllReduceMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE;
+        const bool roleMatches = missionNum == 1U ||
+                                 (missionIndex == 0U && (isAllGather || isAllGatherKfc || isReduceScatter)) ||
+                                 (missionIndex == 1U && (isAllGatherNhr || isReduceScatterNhr)) ||
+                                 (missionNum == KFC_MAX_MISSION_NUM && isAlltoAllKfcMultiJetty) || isAlltoAllMultiJetty;
+        if ((!isAllGather && !isAllGatherKfc && !isAllGatherNhr && !isReduceScatter && !isReduceScatterPeerOnly &&
+             !isReduceScatterNhr && !isAlltoAll && !isAlltoAllKfcMultiJetty && !isAllReduce && !isAllToAllV &&
+             !isAlltoAllMultiJetty) ||
+            !roleMatches) {
             HCCL_ERROR(
-                "[CcuTempKfcServer::CalcRes] unsupported source kernel[%s], opType[%u], role[%u], mission[%u]",
-                srcKernel.kernelFuncName, static_cast<uint32_t>(param.opType), static_cast<uint32_t>(role),
-                missionIndex);
+                "[CcuTempKfcServer::CalcRes] unsupported or misordered source kernel[%s] at mission[%u]",
+                srcKernel.kernelFuncName, missionIndex);
             return HCCL_E_NOT_SUPPORT;
         }
         HCCL_INFO(
             "[CcuTempKfcServer::CalcRes] mission[%u] inheriting kernelargs from[%s]", missionIndex,
             srcKernel.kernelFuncName);
         CcuKernelInfo dstKernel{};
-        CHK_RET(InheritKfcServerKernelArg(srcKernel, dstKernel, param, role, missionIndex));
+        CHK_RET(InheritKfcServerKernelArg(
+            srcKernel, dstKernel, param, GetKfcServerRole(param.algName, missionIndex), missionIndex));
         resourceRequest.ccuKernelInfos[kernelIndex] = dstKernel;
     }
 

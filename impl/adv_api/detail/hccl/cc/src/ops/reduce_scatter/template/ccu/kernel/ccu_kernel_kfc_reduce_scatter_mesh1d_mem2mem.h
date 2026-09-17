@@ -19,13 +19,6 @@
 namespace mc2_ops_hccl {
 using namespace hcomm;
 
-struct CcuKernelArgKfcReduceScatterMesh1DMem2Mem : CcuKernelArgBase {
-    uint64_t rankSize = 0;
-    uint32_t rankId = 0;
-    OpParam opParam;
-    std::vector<std::vector<uint32_t>> subCommRanks;
-};
-
 CcuResult CcuReduceScatterMesh1DMem2MemKernel(CcuKernelArg arg);
 
 } // namespace mc2_ops_hccl

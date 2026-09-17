@@ -17,6 +17,14 @@
 
 namespace mc2_ops_hccl {
 
+struct CcuKernelArgAllToAllMesh1DMultiJetty : CcuKernelArgBase {
+    uint64_t rankSize = 0;
+    uint32_t rankId = 0;
+    uint32_t jettyNum = 1U;
+    OpParam opParam;
+    std::vector<std::vector<uint32_t>> subCommRanks;
+};
+
 class CcuTempAllToAllMesh1DMultiJetty : public CcuAlgTemplateBase {
 public:
     CcuTempAllToAllMesh1DMultiJetty() = default;

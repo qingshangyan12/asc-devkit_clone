@@ -9,6 +9,7 @@
  */
 
 #include "ccu_kernel_all_to_all_mesh1d_multi_jetty.h"
+#include "../ccu_temp_all_to_all_mesh1d_multi_jetty.h"
 #include "ccu_func_dl.hpp"
 
 namespace mc2_ops_hccl {
