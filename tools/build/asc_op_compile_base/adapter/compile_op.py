@@ -130,6 +130,7 @@ from .super_kernel_sub_op_compile import (
 )
 from .static_compile_resource_generator import (
     KernelSpecCompilation,
+    gen_sk_bind_source,
 )
 from .super_kernel_constants import SuperKernelStreamFusionMode
 from .super_kernel_option_parse import parse_super_kernel_options
@@ -926,11 +927,13 @@ def gen_kernel_fun(
         )
         == "1"
     )
-
+    # Preserve the original debug option and SK context conditions.
     # call usr kernel function call
     if enable_inner_core_sync_check:
+        source += "#ifdef __ASCENDC_SUPER_KERNEL_DEBUG__\n"
         source += "    AscendC::g_superKernelSetWaitFlagCountDifference = "
         source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE;\n"
+        source += "#endif\n"
     source += "#if defined(TEMPLATE_PARAMS_LEN) && TEMPLATE_PARAMS_LEN != 0\n"
     source += gen_usr_origin_kernel_function_call(
         func_name, opinfo, tiling_info, has_template=True
@@ -941,6 +944,7 @@ def gen_kernel_fun(
     )
     source += "#endif\n"
     if enable_inner_core_sync_check:
+        source += "#ifdef __ASCENDC_SUPER_KERNEL_DEBUG__\n"
         source += "    if (AscendC::g_superKernelSetWaitFlagCountDifference > "
         source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE) {\n"
         source += '        assert(false, "SuperKernel: current operator has %d more '
@@ -954,6 +958,7 @@ def gen_kernel_fun(
         source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE - "
         source += "AscendC::g_superKernelSetWaitFlagCountDifference);\n"
         source += "    }\n"
+        source += "#endif\n"
 
     if len(compile_info.tiling_key_struct_map) > 0:
         source += _gen_tpl_tiling_struct_section(compile_info, tiling_info)
@@ -1718,6 +1723,8 @@ def _get_dcci_disable_cap_bitmap(
     """
     Check if DCCI should be disabled for any kernel in kernel_symbols.
     Returns 4 if matched, 0 otherwise.
+
+    Accept both parsed comma-separated options and kernel pattern lists.
     """
     sp_options = compile_info.super_kernel_info.get("sp_options", {})
     patterns = sp_options.get("dcci-disable-on-kernel", [])
@@ -1755,23 +1762,19 @@ def compile_sk_bind(
 ):
     sk_bind_src_file = os.path.join(kernel_meta_dir, "sk_bind.cpp")
     sk_bind_dst_file = os.path.join(kernel_meta_dir, "sk_bind.o")
-    source = '#include "kernel_operator.h"\n'
-
     # bitmap definition: bit0:wait_flag(1), bit1:set_flag(2), bit2:dcci_disable(4)
     cap_bitmap = _get_sk_cap_bitmap(
         compile_info, compile_info_origin.global_kernel_symbols
     )
-
-    for idx, global_syb in enumerate(compile_info_origin.global_kernel_symbols):
-        sk_syb = compile_info.global_kernel_symbols[idx]
-        source += f'extern "C" {compile_info_origin.global_kernel_attribute} void {global_syb}();\n'
-        source += (
-            f'extern "C" {compile_info.global_kernel_attribute} void {sk_syb}();\n'
-        )
-        source += f'extern "C" {compile_info.global_kernel_attribute} void {sk_syb}_split1();\n'
-        source += f'extern "C" {compile_info.global_kernel_attribute} void {sk_syb}_split2();\n'
-        source += f'extern "C" {compile_info.global_kernel_attribute} void {sk_syb}_split3();\n'
-        source += f"SK_BIND({global_syb}, {cap_bitmap}, {sk_syb}, {sk_syb}_split1, {sk_syb}_split2, {sk_syb}_split3);\n"
+    source = gen_sk_bind_source(
+        [
+            (symbol, compile_info.global_kernel_symbols[index])
+            for index, symbol in enumerate(compile_info_origin.global_kernel_symbols)
+        ],
+        compile_info_origin.global_kernel_attribute,
+        compile_info.global_kernel_attribute,
+        cap_bitmap,
+    ).decode("utf-8")
 
     # write code into file
     try:
@@ -1814,6 +1817,16 @@ def compile_sk_bind(
 
     for option in compile_option_tuple.compile_options:
         compile_cmd += [option]
+    # The original option path uses the same bit2 macro as specialization.
+    # Explicit caller definitions take precedence over the recorded bitmap.
+    if not any(
+        option == "-D__ASCENDC_SUPER_KERNEL_DISABLE_DCCI__"
+        or option.startswith("-D__ASCENDC_SUPER_KERNEL_DISABLE_DCCI__=")
+        for option in compile_option_tuple.compile_options
+    ):
+        compile_cmd.append(
+            f"-D__ASCENDC_SUPER_KERNEL_DISABLE_DCCI__={1 if cap_bitmap & 4 else 0}"
+        )
     compile_cmd += [
         "-xcce",
         sk_bind_src_file,

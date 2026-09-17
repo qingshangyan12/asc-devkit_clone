@@ -1049,7 +1049,8 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         ).read_text(encoding="utf-8")
         for core_suffix in ("aic", "aiv"):
             self.assertIn(
-                f"SK_BIND(add_custom_100001_mix_{core_suffix}, 3, "
+                f"SK_BIND(add_custom_100001_mix_{core_suffix}, "
+                "((3ULL & ~4ULL) | (__ASCENDC_SUPER_KERNEL_DISABLE_DCCI__ ? 4ULL : 0ULL)), "
                 f"add_custom_100001_mix_{core_suffix}_static_sk,",
                 bind_source,
             )
