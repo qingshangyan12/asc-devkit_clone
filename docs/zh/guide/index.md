@@ -242,8 +242,7 @@
             -   [CV融合](operator_practice/simd_operator_impl/fusion_operator_programming/cv_fusion/basics.md)
                 -   [基础知识](operator_practice/simd_operator_impl/fusion_operator_programming/cv_fusion/basics.md)
                 -   [算子实现](operator_practice/simd_operator_impl/fusion_operator_programming/cv_fusion/operator_impl.md)
-            -   [使用SSBuffer](operator_practice/simd_operator_impl/fusion_operator_programming/cv_fusion_using_ssbuffer/README.md)
-                -   [算子实现](operator_practice/simd_operator_impl/fusion_operator_programming/cv_fusion_using_ssbuffer/operator_impl.md)
+                -   [基于SSBuffer的核间通信特性](operator_practice/simd_operator_impl/fusion_operator_programming/cv_fusion/feature_scenarios.md)
 
             -   [通算融合](operator_practice/simd_operator_impl/fusion_operator_programming/general_fusion/basics.md)
                 -   [基础知识](operator_practice/simd_operator_impl/fusion_operator_programming/general_fusion/basics.md)

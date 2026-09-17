@@ -1,21 +1,35 @@
+# CV融合算子使用SSBuffer
+
+本章节介绍CV融合算子中使用SSBuffer的基础知识、通信规则和算子实现方法。
+
+配套的可执行样例如下：
+
+- [AIV/AIC环形消息队列通信C API样例](../../../../../../../examples/02_simd_c_api/05_best_practices/03_fusion_compute/ssbuf_aiv_aic_comm)：使用C API实现两条AIV到AIC的消息队列，也是当前章节采用的完整样例。
+- [AIV/AIC环形消息队列通信](../../../../../../../examples/01_simd_cpp_api/05_best_practices/03_fusion_compute/ssbuf_aiv_aic_comm)：使用基础 API实现两条AIV到AIC的消息队列。
+
 # 算子实现
 
 >[!NOTE]说明
->阅读本节前，请先了解[CV融合算子](../cv_fusion/basics.md)以及[地址空间限定符](../../../../programming_guide/language_extension/simd_builtin_keywords.md#地址空间限定符)。
+>
+>阅读本节前，请先了解[CV融合算子](./basics.md)以及[地址空间限定符](../../../../programming_guide/language_extension/simd_builtin_keywords.md#地址空间限定符)。
+>
+><!-- npu="950" id1 -->
 >本节内容适用于Ascend 950PR/Ascend 950DT。
+><!-- end id1 -->
 
-下文以基于SSBuffer的AIV/AIC通信算子为例，介绍显式SSBuffer通信的设计和实现过程。该算子在一个`__mix__(1, 2)`任务中启动一个AIC和两个AIV。每个AIV通过自己的环形消息队列发送12条消息，AIC接收消息并将结果写入GM，最后由Host侧逐条校验。
+下文以基于SSBuffer的AIV/AIC通信算子为例，介绍显式SSBuffer通信的设计和实现过程。该核函数使用`__mix__(1, 2)`执行空间限定符，表示每个核函数执行组合包含1个AIC和2个AIV。每个AIV通过自己的环形消息队列发送12条消息；AIC读取消息，校验功能号、发送方、序号和校验值，并将消息字段及校验结果写入GM；Host侧逐条校验24个结果中的`valid`、`sender`、`sequence`、`value`和`checksum`字段。
 
 算子的设计过程分为**算子分析、数据流分析、SSBuffer空间规划、通信规则设计、算子实现**五部分。完整代码请参考[SSBuffer AIV/AIC通信C API样例](../../../../../../../examples/02_simd_c_api/05_best_practices/03_fusion_compute/ssbuf_aiv_aic_comm)。
 
 ## 算子分析
 
-该样例用于验证AIV到AIC的消息通信，两个AIV在Device侧生成消息，AIC将收到的消息整理为`CommResult`并写入GM。算子的处理逻辑如下：
+该样例用于验证AIV到AIC的消息通信。两个AIV在Device侧生成消息；AIC解析收到的消息，校验功能号、发送方、序号和校验值，并将消息字段及校验结果整理为`CommResult`写入GM。算子的处理逻辑如下：
 
 1. AIC清理两条消息队列，并分别通知AIV0和AIV1开始发送。
-2. AIV0和AIV1各自生成12条消息。消息中包含发送方编号、消息序号、消息数据和校验值。
-3. AIV发布一条消息后发送消息准备完成通知；AIC收到通知后读取消息，并在处理完成后返回ACK通知。
-4. AIC共接收24条消息并写入GM，Host侧回读结果，确认消息没有丢失、覆盖或进入错误的消息队列。
+2. AIV0和AIV1各自生成12条消息。消息中包含发送方编号、消息序号、`value`字段和校验值。
+3. AIV写完一条消息的全部字段后发送消息就绪通知，表示对应SSBuffer的消息可以读取。
+4. AIC收到消息就绪通知后读取并校验消息，清除消息头，并返回确认（ACK）通知。该通知表示AIC已读取消息，对应的队列槽位可以由AIV复用。具体通信规则请参见[发布和确认顺序](#发布和确认顺序)和[队列回绕](#队列回绕)。
+5. AIC共接收24条消息并写入GM，Host侧回读结果，逐项校验每个`CommResult`的`valid`、`sender`、`sequence`、`value`和`checksum`字段，确认消息没有丢失、覆盖或进入错误的消息队列。
 
 核函数（Kernel）名称为`c_api_ssbuf_aiv_aic_comm`，参数为`output`。`output`指向GM中的结果数组，数组包含24个`CommResult`。每个结果占32B，字段如下。注：实际算子的消息规模如果随输入变化，应在Host侧统一设计、补充计算相关参数，再传给AIC和AIV，避免两侧使用不一致的消息数量或退出条件。
 
@@ -39,14 +53,14 @@ $$
 checksum = CHECKSUM\_MAGIC \oplus sender \oplus sequence \oplus value
 $$
 
-其中，$\oplus$表示按位异或，$CHECKSUM\_MAGIC$固定为`0x5353425546434D4D`。消息数据便于Host侧检查顺序，校验值用于发现消息内容是否完整。
+其中，$\oplus$表示按位异或。`CHECKSUM_MAGIC`固定为`0x5353425546434D4D`，其字节对应ASCII字符串`SSBUFCMM`，是样例自定义的易识别通信校验常量，不是硬件规定值。消息数据是指`value`字段，其值由发送方编号和消息序号共同生成；Host侧使用相同公式计算期望值并进行比较，从而检查消息是否按预期的发送方和序号写入结果。校验值用于发现消息内容是否完整。
 
 ## 数据流分析
 
 算子涉及两条数据流：任务启动时的同步通知，以及任务运行中的消息收发。
 
 1. 启动同步：AIC清理SSBuffer后，通过核间同步分别通知AIV0和AIV1。该通知表示消息队列已经可以使用。
-2. 消息收发：AIV写完消息后发送消息准备完成通知；AIC收到通知后读取消息并写入GM，处理完成后再返回ACK通知。
+2. 消息收发：AIV写完消息后发送消息就绪通知；AIC收到通知后读取并校验消息，将结果写入GM，清除消息头后再返回确认（ACK）通知。
 
 整体数据流如下。
 
@@ -54,15 +68,15 @@ $$
                        核间同步：启动通知
                 AIC --------------------------> AIV0、AIV1
                  ^                                  |
-                 |             消息准备完成通知      | 写消息
+                 |               消息就绪通知        | 写消息
                  +----------------------------------+
                  |                                  v
 Host <---- GM <---- AIC <----------------------- SSBuffer
                      |
-                     +---- 清消息头并返回ACK通知 ----> AIV0、AIV1
+                     +-- 清消息头并返回确认通知 ----> AIV0、AIV1
 ```
 
-启动通知保证AIV不会访问尚未初始化的消息队列。消息准备完成通知保证AIC在AIV写完消息后再读取；ACK通知保证AIV只在AIC处理完成后复用同一消息空间。因此三个阶段都涉及核间同步。
+启动通知保证AIV不会访问尚未初始化的消息队列。消息就绪通知保证AIC在AIV写完消息后再读取；确认（ACK）通知保证AIV只在AIC读取消息并释放槽位后复用同一消息空间。具体顺序请参见[发布和确认顺序](#发布和确认顺序)，队列槽位的复用方式请参见[队列回绕](#队列回绕)。因此三个阶段都涉及核间同步。
 
 ## SSBuffer空间规划
 
@@ -98,7 +112,7 @@ struct SsbufWorkspace {
 
 ### 队列布局
 
-每个AIV独占一条深度为8的队列，两条消息队列共占2KB。剩余1KB没有被本算子使用。
+每个AIV独占一条深度为8的队列，两条消息队列共占2KB。队列深度8表示每条队列只有8个物理槽位，不是每个AIV只发送8条消息。本样例中每个AIV发送12条消息：前8条分别使用8个槽位，第9至第12条在收到对应的确认（ACK）通知后依次复用前4个槽位，两个AIV最终共生成24个`CommResult`。剩余1KB没有被本算子使用。
 
 ```text
 SSBuffer [0, 1024)       AIV0消息队列：8条消息，每条128B
@@ -126,7 +140,7 @@ __aicore__ inline uint32_t make_head(uint32_t sender) // __aicore__表示该函�
 }
 ```
 
-`valid`为0表示该位置没有待处理消息；`valid`为1表示AIV已经发布消息。AIC处理完后清除消息头，使消息状态恢复为0。样例同时使用ACK同步通知控制空间复用，因此`valid`主要用于检查消息状态是否符合协议。
+`valid`为0表示该位置没有待处理消息；`valid`为1表示AIV已经发布消息。AIC处理完后清除消息头，使消息状态恢复为0。样例同时使用确认（ACK）通知控制空间复用，因此`valid`主要用于检查消息状态是否符合协议。
 
 ### 核间同步
 
@@ -138,10 +152,10 @@ __aicore__ inline uint32_t make_head(uint32_t sender) // __aicore__表示该函�
 
 | AIV发布消息 | AIC消费消息 |
 | --- | --- |
-| 队列回绕前，等待对应的ACK通知。 | 等待对应AIV的消息准备完成通知。 |
+| 队列回绕前，等待对应的确认（ACK）通知。 | 等待对应AIV的消息就绪通知。 |
 | 写入`sequence`、`value`、`checksum`和`head`。 | 读取消息头和消息体，并将检查结果写入GM。 |
 | 调用`asc_sync_intra_arrive(PIPE_S, MESSAGE_READY_SYNC_ID)`。 | 清除消息头。 |
-| 继续使用新的消息空间，或在发送结束后等待剩余ACK。 | 调用`asc_sync_intra_arrive(PIPE_S, MESSAGE_ACK_SYNC_ID)`返回ACK。 |
+| 继续使用新的消息空间，或在发送结束后等待剩余确认通知。 | 调用`asc_sync_intra_arrive(PIPE_S, MESSAGE_ACK_SYNC_ID)`返回确认通知。 |
 
 ### 队列回绕
 
@@ -188,7 +202,7 @@ __aicore__ inline void init_queues(__ssbuf__ SsbufWorkspace* workspace)
 
 ### AIV发送消息
 
-AIV通过[`asc_get_sub_block_id`](../../../../../api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_id.md)取得Vector核ID，并选择自己的消息队列。发送流程如下：
+AIV通过[`asc_get_sub_block_id`](../../../../../api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_id.md)取得当前AIV在执行组合中的编号（subblock ID），并选择自己的消息队列。发送流程如下：
 
 ```cpp
 __aicore__ inline void send_messages(__ssbuf__ SsbufWorkspace* workspace, uint32_t sender)
@@ -219,7 +233,7 @@ __aicore__ inline void send_messages(__ssbuf__ SsbufWorkspace* workspace, uint32
 
 ### AIC接收消息
 
-AIC按照发送方编号和消息序号读取两条消息队列。收到消息准备完成通知后，读取并检查消息，将结果写入GM，最后清除消息头并返回ACK。
+AIC按照发送方编号和消息序号读取两条消息队列。收到消息就绪通知后，读取消息并校验功能号、发送方、序号和校验值，将消息字段及校验结果写入GM，最后清除消息头并返回确认通知。
 
 ```cpp
 // __aicore__表示函数在AI Core上执行，__ssbuf__和__gm__分别表示SSBuffer和GM地址空间。
@@ -257,7 +271,7 @@ __aicore__ inline void receive_messages(__ssbuf__ SsbufWorkspace* workspace, __g
 
 ### Kernel入口
 
-Kernel使用`__mix__(1, 2)`执行空间限定符，在同一个Mix任务中启动一个AIC和两个AIV。`ASC_IS_AIC`和`ASC_IS_AIV`将两侧代码隔离开。
+Kernel使用`__mix__(1, 2)`执行空间限定符，表示每个核函数执行组合包含1个AIC和2个AIV。`ASC_IS_AIC`和`ASC_IS_AIV`将两侧代码隔离开。
 
 ```cpp
 // __global__表示Kernel入口，__mix__(1, 2)表示启动1个AIC和2个AIV，__gm__表示参数指向GM。
@@ -302,9 +316,9 @@ make -j
 
 使用这套方法实现其他算子时，还需要遵守以下约束：
 
-- AIC和AIV必须在同一个`__mix__(1, 2)`任务中访问SSBuffer。
+- AIC和AIV必须由同一个使用`__mix__(1, 2)`执行空间限定符的核函数执行组合访问SSBuffer。
 - 每次任务启动都要由唯一的初始化方清理消息状态。
 - 自定义消息布局不能超过3KB，也不能与KFC、Matmul高阶API或其他SSBuffer通信方案占用重叠空间。
-- 跨核共享字段需要使用`volatile`，消息准备完成和空间复用需要使用配对的核间同步通知。
+- 跨核共享字段需要使用`volatile`，消息就绪和空间复用需要使用配对的核间同步通知。
 - 队列深度和收发节奏需保证核间同步中同步计数器不超过指令约束上限。
 - 消息数量、队列归属、同步ID映射或退出条件不一致时，任务可能一直等待，因此这些内容应由用户统一定义。
