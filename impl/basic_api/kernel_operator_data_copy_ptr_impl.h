@@ -88,6 +88,8 @@ __aicore__ inline void DataCopy(__ubuf__ T* dst, __cbuf__ T* src, const DataCopy
     DataCopyL12UBImpl(dst, src, repeatParams);
 }
 
+// C1(L1) -> BiasTable(C2), same as Tensor Hardware::BIAS. L1->L1 is invalid;
+// C2PIPE2GM uses DataCopy(__fbuf__ T*, __cbuf__ T*, ...).
 template <typename T>
 __aicore__ inline void DataCopy(__cbuf__ T* dst, __cbuf__ T* src, const DataCopyParams& repeatParams)
 {
@@ -163,14 +165,25 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(__cbuf__ T* dst, __gm__ T* 
 #endif
 
 template <typename T>
-__aicore__ inline void DataCopySliceFillShape(
+__aicore__ inline bool DataCopySliceFillShape(
     const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[], const uint32_t dimValue, uint32_t* dstShapeInfo,
     uint32_t* srcShapeInfo)
 {
+    // Tensor SliceInfo may leave shapeValue==0 and fall back to Tensor::GetShapeInfo().
+    // Pointer overloads have no tensor shape; using 0 would compute a silent wrong offset.
+    if (srcSliceInfo[0].shapeValue == 0) {
+        ASCENDC_ASSERT((false), {
+            KERNEL_LOG(
+                KERNEL_ERROR, "DataCopy SliceInfo pointer API requires SliceInfo.shapeValue != 0; "
+                              "raw pointers have no Tensor shape fallback.");
+        });
+        return false;
+    }
     for (uint32_t i = 0; i < dimValue; i++) {
         srcShapeInfo[i] = srcSliceInfo[i].shapeValue;
         dstShapeInfo[i] = dstSliceInfo[i].shapeValue;
     }
+    return true;
 }
 
 template <typename T>
@@ -180,7 +193,9 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
 {
     uint32_t srcShapeInfo[K_MAX_SHAPE_DIM] = {0};
     uint32_t dstShapeInfo[K_MAX_SHAPE_DIM] = {0};
-    DataCopySliceFillShape<T>(dstSliceInfo, srcSliceInfo, dimValue, dstShapeInfo, srcShapeInfo);
+    if (!DataCopySliceFillShape<T>(dstSliceInfo, srcSliceInfo, dimValue, dstShapeInfo, srcShapeInfo)) {
+        return;
+    }
     uint32_t srcStartIndex = DataCopyGetPhyStartIndex(srcSliceInfo, srcShapeInfo, dimValue);
     uint32_t dstStartIndex = DataCopyGetPhyStartIndex(dstSliceInfo, dstShapeInfo, dimValue);
     uint32_t srcOffsetListSize = 0;
@@ -222,7 +237,9 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
 {
     uint32_t srcShapeInfo[K_MAX_SHAPE_DIM] = {0};
     uint32_t dstShapeInfo[K_MAX_SHAPE_DIM] = {0};
-    DataCopySliceFillShape<T>(dstSliceInfo, srcSliceInfo, dimValue, dstShapeInfo, srcShapeInfo);
+    if (!DataCopySliceFillShape<T>(dstSliceInfo, srcSliceInfo, dimValue, dstShapeInfo, srcShapeInfo)) {
+        return;
+    }
     uint32_t srcStartIndex = DataCopyGetPhyStartIndex(srcSliceInfo, srcShapeInfo, dimValue);
     uint32_t dstStartIndex = DataCopyGetPhyStartIndex(dstSliceInfo, dstShapeInfo, dimValue);
     uint32_t srcOffsetListSize = 0;

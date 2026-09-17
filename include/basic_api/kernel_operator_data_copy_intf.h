@@ -489,6 +489,7 @@ template <typename T>
 __aicore__ inline void DataCopy(__cbuf__ T* dst, __ubuf__ T* src, const DataCopyParams& repeatParams);
 template <typename T>
 __aicore__ inline void DataCopy(__ubuf__ T* dst, __cbuf__ T* src, const DataCopyParams& repeatParams);
+// C1(L1) -> BiasTable(C2). L1->L1 is invalid; C2PIPE2GM uses __fbuf__ dst.
 template <typename T>
 __aicore__ inline void DataCopy(__cbuf__ T* dst, __cbuf__ T* src, const DataCopyParams& repeatParams);
 #if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || \
@@ -519,6 +520,7 @@ template <typename T, bool enableSmallC0 = false>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(__cbuf__ T* dst, __gm__ T* src, const Dn2NzParams& intriParams);
 #endif
 
+// Pointer SliceInfo path requires shapeValue != 0; there is no Tensor GetShapeInfo fallback.
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     __ubuf__ T* dst, __gm__ T* src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[],
