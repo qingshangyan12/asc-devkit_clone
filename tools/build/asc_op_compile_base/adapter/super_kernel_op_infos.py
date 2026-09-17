@@ -1163,6 +1163,8 @@ class SuperOperatorInfos:
         if (
             self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
             and CommonUtility.is_c310()
+            or CommonUtility.is_920r1()
+            or CommonUtility.is_920r2()
         ):
             options.append("-D__ASCENDC_DAVID_SPLIT_CORE__")
         if exist_dynamic_sub_ops:
