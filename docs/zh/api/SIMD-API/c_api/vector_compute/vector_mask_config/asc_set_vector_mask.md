@@ -83,7 +83,7 @@ PIPE_S
 ## 约束说明
 
 <!-- npu="950" id14 -->
-- 针对Ascend 950PR&950DT系列产品：该接口用于在VF场景外设置掩码寄存器。在Reg矢量计算配置时，通过[asc_get_mask_spr](../../reg_compute/reg_mask/asc_get_mask_spr.md)接口中的`asc_get_mask_spr_b16`或`asc_get_mask_spr_b32`配合获取掩码寄存器的值。更推荐用户使用VF场景内[掩码寄存器操作](../../reg_compute/reg_mask/reg_mask.md)章节中的接口完成Reg矢量计算掩码配置。
+- 针对Ascend 950PR&950DT系列产品：该接口用于在VF场景外设置掩码寄存器。在Reg矢量计算配置时，通过[asc_get_mask_spr](../../defs/type/asc_get_mask_spr.md)接口中的`asc_get_mask_spr_b16`或`asc_get_mask_spr_b32`配合获取掩码寄存器的值。更推荐用户使用VF场景内[掩码寄存器操作](../../reg_compute/reg_mask/reg_mask.md)章节中的接口完成Reg矢量计算掩码配置。
 <!-- end id14 -->
 <!-- npu="A3,910b" id15 -->
 - 针对如下产品型号：
@@ -100,7 +100,7 @@ PIPE_S
 
 <!-- npu="950" id18 -->
 - 针对Ascend 950PR&950DT系列产品：
-  请参考[asc_get_mask_spr](../../reg_compute/reg_mask/asc_get_mask_spr.md#调用示例)，该示例中`asc_get_mask_spr_b16`或`asc_get_mask_spr_b32`读取的掩码值即为`asc_set_vector_mask`设置值，用户可在VF外设置。
+  请参考[asc_get_mask_spr](../../defs/type/asc_get_mask_spr.md#调用示例)，该示例中`asc_get_mask_spr_b16`或`asc_get_mask_spr_b32`读取的掩码值即为`asc_set_vector_mask`设置值，用户可在VF外设置。
 <!-- end id18 -->
 <!-- npu="A3,910b" id19 -->
 - 针对如下产品型号：
