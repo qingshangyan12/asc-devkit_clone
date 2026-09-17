@@ -353,9 +353,10 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(
     } else if (dstScope == Hardware::L0B) {
         LoadData2DGM2L0BCal((__cb__ T*)dst.GetPhyAddr(), (__gm__ U*)src.GetPhyAddr(), loadDataParams, nd2nzParams);
     }
+#else
+    }
 #endif
-}
-else
+    else
 {
     ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "dst only supports L1 Buffer(A1/B1)"); });
 }
