@@ -235,9 +235,9 @@ Based on the vector programming paradigm, the kernel function implementation is 
     inQueueY.EnQue(yLocal);
     ```
 
-<a id="copyout-implementation"></a>
 2.  Stage2: Compute implementation.
 
+    <a id="copyout-implementation"></a>
     1.  Use [DeQue](../../../../api/SIMD-API/basic_api/resource_management/TQue/DeQue.md) to take LocalTensor out of VECIN.
     2.  Use the Ascend C API [Add](../../../../api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Add.md) to complete the vector computation.
     3.  Use [EnQue](../../../../api/SIMD-API/basic_api/resource_management/TQue/EnQue.md) to put the LocalTensor of the computation result into the VECOUT queue.
