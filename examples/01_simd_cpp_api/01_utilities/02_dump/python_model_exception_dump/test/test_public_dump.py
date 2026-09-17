@@ -1,18 +1,18 @@
-"""
-test_public_dump.py — 引导链路看护入口（D1–D4）
+#!/usr/bin/python3
+# coding=utf-8
 
-用法:
-    python3 test_public_dump.py scene1     # D1/D2：块表损坏注入 -> 异常回调 dump + per-binary 自动挂载
-    python3 test_public_dump.py scene2     # 序列长度损坏注入（独立进程时为首异常）
-    python3 test_public_dump.py baseline   # D4：无注入对照(回调不误触发)
-    python3 test_public_dump.py all        # D3：单进程 scene1 -> scene2 -> baseline
-                                           #     (per-binary 自动挂载后双回调双写；异常后同进程
-                                           #      relaunch 可能主机侧失败，见 README 注意事项 3)
+# ----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# ----------------------------------------------------------------------------------------------------------
 
-退出码: 注入场景 kernel 异常被捕获后以 2 结束(预期成功路径); baseline 正常结束为 0。
-判定以日志与 dump 产物为准，勿按退出码判失败。
-产物落盘: <本脚本目录>/task_fail_dump/dev{d}_task{t}_ts{ms}/（脚本自动切换 CWD 至脚本目录）。
-"""
+"""Exception Dump 看护用例入口：scene1/scene2/baseline/all 四场景。
+注入场景 kernel 异常被捕获后退出码 2 属预期成功路径；产物落盘 <脚本目录>/task_fail_dump/。"""
 import glob
 import os
 import sys

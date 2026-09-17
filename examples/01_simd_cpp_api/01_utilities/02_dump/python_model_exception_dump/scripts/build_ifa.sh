@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
-# build_ifa.sh — 从 ops-transformer 外部仓构建 IFA（+meta）算子 wheel 并安装
-#
-# 算子代码零改动：dump 能力不需要任何算子侧补丁。仅当本地 CANN 与外部仓基线存在
-# 构建环境差异时，按需应用 test/patches/ops_transform_build_adapt.patch
-# （该补丁只做构建适配，与 dump 能力无关）。
-#
-# 环境变量:
-#   OPS_TRANSFORMER_ROOT  必填：ops-transformer 仓根目录
-#   NPU_SOC_VERSION       必填：SoC 版本（如 ascend910_93），构建体系按 <op>/<SOC>/ 匹配目录
-#   IFA_BASELINE_COMMIT   可选：校验外部仓基线 commit（默认 ecfc11431fc6e78eaa4b40632845498813121afd）
-#   SKIP_COMMIT_CHECK=1   可选：跳过基线校验（升级验证时使用，须重新执行完整回归）
+# ----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# ----------------------------------------------------------------------------------------------------------
+
+# 从 ops-transformer 外部仓（固定 commit）构建 IFA(+meta) wheel 并安装，算子零改动；
+# 构建适配补丁仅弥合本地构建环境差异，与 dump 能力无关
+# 环境变量：OPS_TRANSFORMER_ROOT 必填（仓根目录）；NPU_SOC_VERSION 必填（如 ascend910_93）；
+#           IFA_BASELINE_COMMIT / SKIP_COMMIT_CHECK=1 可选（基线 commit 校验）
 set -eu
 
 SAMPLE_DIR="$(cd "$(dirname "$0")/.." && pwd)"

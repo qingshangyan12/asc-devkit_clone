@@ -1,21 +1,20 @@
-"""
-op_exception_dump.py — Exception Dump 能力的 Python API 封装（对用户的主接口）
+#!/usr/bin/python3
+# coding=utf-8
 
-内部经 ctypes 加载样例 runtime/ 目录编译出的回调动态库
-（exception_dump_public.so），屏蔽 CDLL/argtypes 细节；C ABI 声明见
-runtime/exception_dump_public.h（Python 侧无需头文件）。
+# ----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# ----------------------------------------------------------------------------------------------------------
 
-对外三个接口：
-    enable_exception_dump(kernel_name)      使能能力 + 注册目标算子名
-    register_input(name, tensor, ptr_index) 登记输入 handle（自动取 size/shape/dtype）
-    clear_inputs()                          清空输入登记（新一轮调用前）
+"""Exception Dump 能力的 Python API：enable_exception_dump / register_input / clear_inputs。
 
-回调库路径解析优先级：
-    1. lib_path 参数
-    2. 环境变量 EXC_DUMP_LIB
-    3. <本模块目录>/../runtime/exception_dump_public.so
-库不存在或符号缺失时，请先执行 scripts/build_callback.sh 编译回调库。
-"""
+内部经 ctypes 加载回调库（默认 <样例>/runtime/exception_dump_public.so，可用 lib_path
+参数或 EXC_DUMP_LIB 环境变量覆盖），库不存在时先执行 scripts/build_callback.sh。"""
 import ctypes
 import os
 

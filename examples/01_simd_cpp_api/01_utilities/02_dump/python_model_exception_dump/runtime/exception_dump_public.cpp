@@ -1,33 +1,17 @@
 /**
- * exception_dump_public.cpp
- *
- * Exception Dump 能力的公开标准接口实现（CANN acl_rt.h 公开 API，实测基线 9.2.0）。
- *
- * 接口链路（CANN 公开 API）：
- *   引导注册: aclrtExceptionInfoCallbackRegister(global_exception_cb)
- *             （支持按函数指针标识的多回调共存，与宿主框架注册的回调互不覆盖；
- *               旧接口 aclrtSetExceptionInfoCallback 已废弃，配套注销接口
- *               aclrtExceptionInfoCallbackUnregister）
- *   异常回调内（首次异常，自动完成 per-binary 挂载）:
- *     aclrtGetFuncHandleFromExceptionInfo  -> funcHandle
- *     aclrtFunctionGetBinary               -> binHandle
- *     aclrtBinarySetExceptionCallback      -> per-binary 回调（后续异常直走该链路）
- *   异常信息访问器:
- *     aclrtGetDeviceId/TaskId/StreamId/ErrorCodeFromExceptionInfo
- *     aclrtGetArgsFromExceptionInfo        -> devArgsPtr + devArgsLen（kernel args 区位置与长度）
- *     aclrtGetFunctionName                 -> kernel mangled 全名（回调内子串匹配过滤）
- *
- * C API（声明见 exception_dump_public.h，样例自有头文件）:
- *   AddInputInfo(name, ptrIndex, size, shapeStr, dtypeStr)   登记输入（dump 时按 args 槽位取指针）
- *   ClearInputInfo()                                          清空登记
- *   RegisterPublicExceptionDump(kernelName)                   异常回调引导注册（算子零改动）
- *
- * dump 产物目录 task_fail_dump/dev{d}_task{t}_ts{ms}/，含
- *   <name>.bin * N + args_raw.bin + inputs_info.txt
- *
- * Compile（全部公开库/头，无 experiment / runtime 内部依赖）:
- *   g++ -g -std=c++11 -fPIC -shared exception_dump_public.cpp -o exception_dump_public.so \
- *       -lacl_rt -lascendcl -L$ASCEND_HOME_PATH/lib64 -I$ASCEND_HOME_PATH/include
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
+/* !
+ * \file exception_dump_public.cpp
+ * \brief Exception Dump 外挂回调库实现：注册异常回调，在 AICore 任务失败时自动保存
+ * kernel args 区与全部登记输入（仅依赖 CANN 公开接口，算子零改动）
  */
 
 #include <cstdint>

@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
-# run.sh — Exception Dump 看护用例执行入口（分进程执行，退出码语义见 README）
-#
-# 用法: ./run.sh <baseline|scene1|scene2|all|full>
-#   scene1 / scene2 / baseline   单场景独立进程执行
-#   all                          同进程 scene1 -> scene2 -> baseline（D3：验证 per-binary 接管）
-#   full                         完整回归：scene1 -> verify -> parse -> all -> baseline
-#
-# 判定原则：以日志与 dump 产物为准；注入场景 test_public_dump.py 退出码 2 属预期成功路径。
+# ----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# ----------------------------------------------------------------------------------------------------------
+
+# 用例执行入口：./run.sh <baseline|scene1|scene2|all|full>（full = scene1+verify+parse+all+baseline）
+# 判定以日志与 dump 产物为准，注入场景退出码 2 属预期成功路径
 set -u
 
 SAMPLE_DIR="$(cd "$(dirname "$0")/.." && pwd)"

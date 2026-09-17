@@ -1,16 +1,19 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-IFA tiling 解析脚本（D6）：离线解析 Exception Dump 保存的 kernel args 区。
+#!/usr/bin/python3
+# coding=utf-8
 
-输入: test/task_fail_dump/dev*/args_raw.bin —— 异常回调保存的 kernel args 区
-     （前 256B = 32 个入参指针；其后 = IncreFlashAttentionTilingData + 标量参数）
+# ----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# ----------------------------------------------------------------------------------------------------------
 
-字段布局依据: csrc/incre_flash_attention/ascend910_93/op_kernel/incre_flash_attention_tilingdata.h
-             的 IncreFlashAttentionBaseParams 定义顺序。
-
-用法: python parse_tiling.py [args_raw.bin 路径（默认 ../test/task_fail_dump 最新 dump）]
-"""
+"""离线解析 Exception Dump 保存的 kernel args 区（args_raw.bin）：32 槽入参指针区 + tiling 字段。
+字段布局依据 incre_flash_attention_tilingdata.h 的 BaseParams 定义顺序。
+用法: python parse_tiling.py [args_raw.bin 路径（默认 ../test/task_fail_dump 最新 dump）]"""
 import glob
 import os
 import struct

@@ -1,11 +1,18 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""验证 Exception Dump 产物的数据正确性（D5）：
-1. 按 inputs_info.txt 加载所有 bin
-2. 与 model 构造时的原始数据（同 seed 重建 + 注入值回填）逐 tensor 比对
+#!/usr/bin/python3
+# coding=utf-8
 
-用法: python verify_dump.py [dump目录，默认 ../test/task_fail_dump 最新 dev*]
-"""
+# ----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# ----------------------------------------------------------------------------------------------------------
+
+"""验证 Exception Dump 产物数据正确性：与同 seed 重建输入（含注入值回填）逐 tensor bit-exact 比对。
+用法: python verify_dump.py [dump目录，默认 ../test/task_fail_dump 最新 dev*]"""
 import glob
 import os
 import sys

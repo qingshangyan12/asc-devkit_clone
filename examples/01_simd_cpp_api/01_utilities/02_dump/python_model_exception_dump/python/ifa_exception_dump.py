@@ -1,18 +1,18 @@
-"""
-ifa_exception_dump.py — IFA（incre_flash_attention + meta）Exception Dump Python model 本体
+#!/usr/bin/python3
+# coding=utf-8
 
-职责：输入构造（与官方用例 tests/incre_flash_attention 一致，seed 固定保证 bit-exact
-可验证）、经 op_exception_dump Python API 使能能力并登记输入、按场景注入故障并执行
-kernel。算子代码零改动。
+# ----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# ----------------------------------------------------------------------------------------------------------
 
-场景:
-    scene1    block_table[0,0] 注入 0x7FFFFFFF（块表损坏 -> PA 越界 -> AICore error）
-    scene2    actual_seq_kvlen[0] 注入 0x7FFFFFFF（序列长度损坏 -> 读越界）
-    baseline  无注入（对照组，验证回调不误触发）
-
-注入场景 kernel 异常被 Python 捕获属预期路径，由调用方（test/test_public_dump.py）
-以退出码 2 标记；dump 产物按 CWD 落盘（由看护入口切到 test/ 目录）。
-"""
+"""IFA（incre_flash_attention + meta）Exception Dump Python model：固定 seed 构造输入，
+使能能力并登记输入，按场景注入故障执行 kernel（scene1/scene2/baseline）。"""
 import torch
 import torch_npu  # noqa: F401
 import ascend_ops  # noqa: F401

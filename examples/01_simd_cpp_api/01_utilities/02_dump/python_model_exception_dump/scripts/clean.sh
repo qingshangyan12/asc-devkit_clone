@@ -1,8 +1,15 @@
 #!/usr/bin/env bash
-# clean.sh — 清理本轮运行产物
-#
-# 只清理本样例创建的 task_fail_dump 与 CANN 崩溃日志 extra-info/，不删除外部仓
-# 已有文件，也不删除已编译的回调库（如需重编执行 scripts/build_callback.sh）。
+# ----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# ----------------------------------------------------------------------------------------------------------
+
+# 清理本轮运行产物（task_fail_dump/ 与 extra-info/；不动外部仓文件与已编译的回调库）
 set -u
 
 SAMPLE_DIR="$(cd "$(dirname "$0")/.." && pwd)"

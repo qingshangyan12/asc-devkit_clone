@@ -1,9 +1,16 @@
 #!/usr/bin/env bash
-# check_env.sh — Exception Dump 样例环境检查
-#
-# 检查项：CANN 安装与版本、异常回调注册新接口存在性（aclrtExceptionInfoCallbackRegister）、
-# NPU 在位、Python 栈（torch / torch_npu / ascend_ops）。
-# 任一检查失败以非 0 退出并给出明确原因。
+# ----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# ----------------------------------------------------------------------------------------------------------
+
+# 环境检查：CANN 版本、回调注册新接口存在性（aclrtExceptionInfoCallbackRegister）、NPU、Python 栈；
+# 任一检查失败以非 0 退出
 set -u
 
 SAMPLE_DIR="$(cd "$(dirname "$0")/.." && pwd)"
