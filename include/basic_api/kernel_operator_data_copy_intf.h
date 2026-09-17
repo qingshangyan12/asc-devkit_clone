@@ -30,6 +30,7 @@
 #include "../../impl/basic_api/utils/kernel_utils_macros.h"
 #include "../../impl/basic_api/utils/kernel_utils_struct_confusion_pad.h"
 #include "kernel_tensor.h"
+#include "kernel_operator_ptr_utils.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstddef>
@@ -468,6 +469,194 @@ __aicore__ inline void NdDmaDci();
 __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCopyMVType type);
 
 __aicore__ inline void ResetLoopModePara(DataCopyMVType type);
+
+/* **************************************************************************************************
+ * Pointer overloads (DMA): dst/src may be __ubuf__/__gm__/__cbuf__/__cc__/__fbuf__ pointers
+ * ************************************************************************************************* */
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    __ubuf__ T* dst, __gm__ T* src, const DataCopyParams& repeatParams);
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    __cbuf__ T* dst, __gm__ T* src, const DataCopyParams& repeatParams);
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
+    __gm__ T* dst, __ubuf__ T* src, const DataCopyParams& repeatParams);
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
+    __gm__ T* dst, __cbuf__ T* src, const DataCopyParams& repeatParams);
+template <typename T>
+__aicore__ inline void DataCopy(__ubuf__ T* dst, __ubuf__ T* src, const DataCopyParams& repeatParams);
+template <typename T>
+__aicore__ inline void DataCopy(__cbuf__ T* dst, __ubuf__ T* src, const DataCopyParams& repeatParams);
+template <typename T>
+__aicore__ inline void DataCopy(__ubuf__ T* dst, __cbuf__ T* src, const DataCopyParams& repeatParams);
+template <typename T>
+__aicore__ inline void DataCopy(__cbuf__ T* dst, __cbuf__ T* src, const DataCopyParams& repeatParams);
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || \
+    (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161) || \
+    (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
+template <typename T>
+__aicore__ inline void DataCopy(__fbuf__ T* dst, __cbuf__ T* src, const DataCopyParams& repeatParams);
+#endif
+
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || \
+    (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
+template <typename T, bool enableSmallC0 = false>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    __cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams);
+template <typename T, bool enableSmallC0 = false>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    __ubuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams);
+#else
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    __cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams);
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    __ubuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams);
+#endif
+template <typename T>
+__aicore__ inline void DataCopy(__cbuf__ T* dst, __ubuf__ T* src, const Nd2NzParams& intriParams);
+
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
+    (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
+template <typename T, bool enableSmallC0 = false>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    __cbuf__ T* dst, __gm__ T* src, const Dn2NzParams& intriParams);
+#endif
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    __ubuf__ T* dst, __gm__ T* src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[],
+    const uint32_t dimValue = 1);
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
+    __gm__ T* dst, __ubuf__ T* src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[],
+    const uint32_t dimValue = 1);
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(__ubuf__ T* dst, __gm__ T* src, const uint32_t count);
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(__cbuf__ T* dst, __gm__ T* src, const uint32_t count);
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(__gm__ T* dst, __ubuf__ T* src, const uint32_t count);
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(__gm__ T* dst, __cbuf__ T* src, const uint32_t count);
+template <typename T>
+__aicore__ inline void DataCopy(__ubuf__ T* dst, __ubuf__ T* src, const uint32_t count);
+template <typename T>
+__aicore__ inline void DataCopy(__cbuf__ T* dst, __ubuf__ T* src, const uint32_t count);
+template <typename T>
+__aicore__ inline void DataCopy(__ubuf__ T* dst, __cbuf__ T* src, const uint32_t count);
+
+template <typename T, typename U>
+__aicore__ inline void DataCopy(__gm__ T* dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams);
+template <typename T, typename U>
+__aicore__ inline void DataCopy(__cbuf__ T* dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams);
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    __ubuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    __cbuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
+    __gm__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
+    __gm__ T* dst, __cbuf__ T* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
+template <typename T>
+__aicore__ inline void DataCopy(
+    __cbuf__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
+template <typename T>
+__aicore__ inline void DataCopy(
+    __ubuf__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
+
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+template <typename T, PaddingMode mode = PaddingMode::Normal>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
+    __ubuf__ T* dst, __gm__ T* src, const DataCopyParams& dataCopyParams, const DataCopyPadParams& padParams);
+template <typename T, PaddingMode mode = PaddingMode::Normal>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
+    __cbuf__ T* dst, __gm__ T* src, const DataCopyParams& dataCopyParams, const DataCopyPadParams& padParams);
+template <typename T, PaddingMode mode = PaddingMode::Normal>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
+    __gm__ T* dst, __ubuf__ T* src, const DataCopyParams& dataCopyParams);
+#else
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
+    __ubuf__ T* dst, __gm__ T* src, const DataCopyParams& dataCopyParams, const DataCopyPadParams& padParams);
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
+    __cbuf__ T* dst, __gm__ T* src, const DataCopyParams& dataCopyParams, const DataCopyPadParams& padParams);
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
+    __gm__ T* dst, __ubuf__ T* src, const DataCopyParams& dataCopyParams);
+#endif
+template <typename T>
+__aicore__ inline void DataCopyPad(
+    __cbuf__ T* dst, __ubuf__ T* src, const DataCopyParams& dataCopyParams, const Nd2NzParams& nd2nzParams);
+
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
+    (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
+template <typename T, PaddingMode mode = PaddingMode::Normal>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
+    __ubuf__ T* dst, __gm__ T* src, const DataCopyExtParams& dataCopyParams,
+    const DataCopyPadExtParams<T>& padParams);
+template <typename T, PaddingMode mode = PaddingMode::Normal>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
+    __cbuf__ T* dst, __gm__ T* src, const DataCopyExtParams& dataCopyParams,
+    const DataCopyPadExtParams<T>& padParams);
+template <typename T, PaddingMode mode = PaddingMode::Normal>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
+    __gm__ T* dst, __ubuf__ T* src, const DataCopyExtParams& dataCopyParams);
+#if (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
+template <typename T, PaddingMode mode = PaddingMode::Normal>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
+    __gm__ T* dst, __cbuf__ T* src, const DataCopyExtParams& dataCopyParams);
+#endif
+#else
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
+    __ubuf__ T* dst, __gm__ T* src, const DataCopyExtParams& dataCopyParams,
+    const DataCopyPadExtParams<T>& padParams);
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
+    __gm__ T* dst, __ubuf__ T* src, const DataCopyExtParams& dataCopyParams);
+#if (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3102)
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
+    __gm__ T* dst, __cbuf__ T* src, const DataCopyExtParams& dataCopyParams);
+#endif
+#endif
+template <typename T>
+__aicore__ inline void DataCopyPad(
+    __cbuf__ T* dst, __ubuf__ T* src, const DataCopyExtParams& dataCopyParams, const Nd2NzParams& nd2nzParams);
+
+template <typename T, uint8_t subBlockId = 0>
+__aicore__ inline void DataCopyL1ToUB(__ubuf__ T* dst, __cbuf__ T* src, const uint32_t count);
+template <typename T, uint8_t subBlockId = 0>
+__aicore__ inline void DataCopyL1ToUB(__ubuf__ T* dst, __cbuf__ T* src, const DataCopyParams& repeatParams);
+
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+template <typename T, uint8_t dim, const NdDmaConfig& config = kDefaultNdDmaConfig>
+__aicore__ inline void DataCopy(__ubuf__ T* dst, __gm__ T* src, const MultiCopyParams<T, dim>& params);
+#endif
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
+    __gm__ T* dst, __ubuf__ T* src, const Nz2NdParamsFull& intriParams);
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
+    __gm__ T* dst, __cbuf__ T* src, const Nz2NdParamsFull& intriParams);
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
+    __gm__ T* dst, __cbuf__ T* src, const Nz2DnParamsFull& intriParams);
+#endif
 } // namespace AscendC
 
 #if defined(__NPU_ARCH__)
