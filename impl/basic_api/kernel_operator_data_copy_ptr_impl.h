@@ -184,15 +184,15 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     __ubuf__ T* dst, __gm__ T* src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[],
     const uint32_t dimValue)
 {
-    uint32_t srcShapeInfo[K_MAX_SHAPE_DIM];
-    uint32_t dstShapeInfo[K_MAX_SHAPE_DIM];
+    uint32_t srcShapeInfo[K_MAX_SHAPE_DIM] = {0};
+    uint32_t dstShapeInfo[K_MAX_SHAPE_DIM] = {0};
     DataCopySliceFillShape<T>(dstSliceInfo, srcSliceInfo, dimValue, dstShapeInfo, srcShapeInfo);
     uint32_t srcStartIndex = DataCopyGetPhyStartIndex(srcSliceInfo, srcShapeInfo, dimValue);
     uint32_t dstStartIndex = DataCopyGetPhyStartIndex(dstSliceInfo, dstShapeInfo, dimValue);
     uint32_t srcOffsetListSize = 0;
     uint32_t dstOffsetListSize = 0;
-    uint32_t srcOffsetList[MAX_SLICE_SIZE];
-    uint32_t dstOffsetList[MAX_SLICE_SIZE];
+    uint32_t srcOffsetList[MAX_SLICE_SIZE] = {0};
+    uint32_t dstOffsetList[MAX_SLICE_SIZE] = {0};
     DataCopyGetOffsetList(srcSliceInfo, srcShapeInfo, dimValue, &srcOffsetListSize, srcOffsetList);
     DataCopyGetOffsetList(dstSliceInfo, dstShapeInfo, dimValue, &dstOffsetListSize, dstOffsetList);
     DataCopyParams repeatParams;
@@ -226,15 +226,15 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
     __gm__ T* dst, __ubuf__ T* src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[],
     const uint32_t dimValue)
 {
-    uint32_t srcShapeInfo[K_MAX_SHAPE_DIM];
-    uint32_t dstShapeInfo[K_MAX_SHAPE_DIM];
+    uint32_t srcShapeInfo[K_MAX_SHAPE_DIM] = {0};
+    uint32_t dstShapeInfo[K_MAX_SHAPE_DIM] = {0};
     DataCopySliceFillShape<T>(dstSliceInfo, srcSliceInfo, dimValue, dstShapeInfo, srcShapeInfo);
     uint32_t srcStartIndex = DataCopyGetPhyStartIndex(srcSliceInfo, srcShapeInfo, dimValue);
     uint32_t dstStartIndex = DataCopyGetPhyStartIndex(dstSliceInfo, dstShapeInfo, dimValue);
     uint32_t srcOffsetListSize = 0;
     uint32_t dstOffsetListSize = 0;
-    uint32_t srcOffsetList[MAX_SLICE_SIZE];
-    uint32_t dstOffsetList[MAX_SLICE_SIZE];
+    uint32_t srcOffsetList[MAX_SLICE_SIZE] = {0};
+    uint32_t dstOffsetList[MAX_SLICE_SIZE] = {0};
     DataCopyGetOffsetList(srcSliceInfo, srcShapeInfo, dimValue, &srcOffsetListSize, srcOffsetList);
     DataCopyGetOffsetList(dstSliceInfo, dstShapeInfo, dimValue, &dstOffsetListSize, dstOffsetList);
     DataCopyParams repeatParams;

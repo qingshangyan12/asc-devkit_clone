@@ -19,10 +19,6 @@
 #include "../utils/std/type_traits.h"
 
 namespace AscendC {
-/*
- * Extract a hardware pointer from either a raw pointer or a Tensor wrapper.
- * Tensor path uses GetPhyAddr(); pointer path returns the pointer itself.
- */
 template <typename U>
 __aicore__ inline auto GetUnderlyingPtr(const U& val)
 {

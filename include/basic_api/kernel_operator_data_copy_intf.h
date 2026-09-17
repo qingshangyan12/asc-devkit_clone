@@ -470,9 +470,6 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 
 __aicore__ inline void ResetLoopModePara(DataCopyMVType type);
 
-/* **************************************************************************************************
- * Pointer overloads (DMA): dst/src may be __ubuf__/__gm__/__cbuf__/__cc__/__fbuf__ pointers
- * ************************************************************************************************* */
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     __ubuf__ T* dst, __gm__ T* src, const DataCopyParams& repeatParams);

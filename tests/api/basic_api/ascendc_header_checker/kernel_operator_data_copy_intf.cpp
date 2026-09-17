@@ -424,7 +424,6 @@ extern "C" __global__ __aicore__ void KernelTestResetLoopModePara1()
 }
 #endif
 
-// Pointer path: DataCopy / DataCopyPad / DataCopyL1ToUB
 extern "C" __global__ __aicore__ void KernelTestDataCopyPtrCount()
 {
     __ubuf__ float* dst = nullptr;
@@ -441,8 +440,8 @@ extern "C" __global__ __aicore__ void KernelTestDataCopyPadPtrExt()
 {
     __ubuf__ float* dst = nullptr;
     __gm__ float* src = nullptr;
-    AscendC::DataCopyExtParams dataCopyParams;
-    AscendC::DataCopyPadExtParams<float> padParams;
+    AscendC::DataCopyExtParams dataCopyParams{};
+    AscendC::DataCopyPadExtParams<float> padParams{};
     AscendC::DataCopyPad(dst, src, dataCopyParams, padParams);
 }
 
@@ -451,7 +450,7 @@ extern "C" __global__ __aicore__ void KernelTestDataCopyPtrNdDma()
 {
     __ubuf__ float* dst = nullptr;
     __gm__ float* src = nullptr;
-    AscendC::MultiCopyParams<float, 1> params;
+    AscendC::MultiCopyParams<float, 1> params{};
     AscendC::DataCopy(dst, src, params);
 }
 #endif
@@ -464,14 +463,15 @@ extern "C" __global__ __aicore__ void KernelTestDataCopyL1ToUBPtr()
     AscendC::DataCopyL1ToUB(dst, src, count);
 }
 
-// Pointer path: DataCopy count GM <-> UB
 extern "C" __global__ __aicore__ void KernelTestDataCopyPtrCountRoundtrip()
+{
+    __ubuf__ float* dstUb = nullptr;
     __gm__ float* srcGm = nullptr;
-    AscendC::DataCopy(dstUb, srcGm, static_cast<uint32_t>(32));
-    AscendC::DataCopy(srcGm, dstUb, static_cast<uint32_t>(32));
+    uint32_t count = 32;
+    AscendC::DataCopy(dstUb, srcGm, count);
+    AscendC::DataCopy(srcGm, dstUb, count);
 }
 
-// Pointer path: DataCopyPad GM -> UB
 extern "C" __global__ __aicore__ void KernelTestDataCopyPadPtr()
 {
     __ubuf__ float* dstUb = nullptr;
