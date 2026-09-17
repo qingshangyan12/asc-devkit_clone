@@ -1642,7 +1642,7 @@
                 -   [sqrt](SIMD-API/tensor_api/reg_vector_compute/basic_arithmetic/sqrt.md)
                 -   [subc](SIMD-API/tensor_api/reg_vector_compute/basic_arithmetic/subc.md)
             -   [逻辑计算](SIMD-API/tensor_api/reg_vector_compute/logical_compute/logical_compute.md)
-                -   [!](SIMD-API/tensor_api/reg_vector_compute/logical_compute/logical_not.md)
+                -   [not](SIMD-API/tensor_api/reg_vector_compute/logical_compute/not.md)
                 -   [&](SIMD-API/tensor_api/reg_vector_compute/logical_compute/and.md)
                 -   [|](SIMD-API/tensor_api/reg_vector_compute/logical_compute/or.md)
                 -   [^](SIMD-API/tensor_api/reg_vector_compute/logical_compute/xor.md)

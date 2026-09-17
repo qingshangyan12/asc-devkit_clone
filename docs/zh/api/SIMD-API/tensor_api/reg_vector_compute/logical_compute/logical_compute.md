@@ -1,6 +1,6 @@
 # 逻辑计算
 
-- **[!](logical_not.md)**
+- **[not](not.md)**
 - **[&](and.md)**
 - **[|](or.md)**
 - **[^](xor.md)**

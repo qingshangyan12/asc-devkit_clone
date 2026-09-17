@@ -130,7 +130,7 @@
 | [relu](reg_vector_compute/basic_arithmetic/relu.md) | 对源操作数逐元素执行ReLU计算。 |
 | [sqrt](reg_vector_compute/basic_arithmetic/sqrt.md) | 对源操作数逐元素计算平方根。 |
 | [subc](reg_vector_compute/basic_arithmetic/subc.md) | 对源操作数逐元素执行带借位减法。 |
-| [!](reg_vector_compute/logical_compute/logical_not.md) | 对源操作数逐元素执行逻辑非计算。 |
+| [not](reg_vector_compute/logical_compute/not.md) | 对源操作数逐元素执行逻辑非计算。 |
 | [&](reg_vector_compute/logical_compute/and.md) | 对两个源操作数逐元素执行按位与计算。 |
 | [\|](reg_vector_compute/logical_compute/or.md) | 对两个源操作数逐元素执行按位或计算。 |
 | [^](reg_vector_compute/logical_compute/xor.md) | 对两个源操作数逐元素执行按位异或计算。 |
