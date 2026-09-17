@@ -1,13 +1,13 @@
 # Ascend910B3 CUBE task-book self-test
 
-- HEAD: 390798a62
+- HEAD: b1655f16f
 - ARCH: dav-2201
-- STAMP: 20260917_164747
+- STAMP: 20260917_170022
 - MODE: taskbook
 
-- verify PASS: **31**
+- verify PASS: **34**
 - SKIP (documented): 4
-- FAIL: 2
+- FAIL: 0
 
 ## Notes
 
@@ -27,7 +27,7 @@
 | load_data_l12l0 | 1 | dav-2201 | PASS | PASS | PASS | s1 |
 | load_data_l12l0 | 6 | dav-2201 | PASS | PASS | PASS | s6 |
 | load_data_l12l0 | 11 | dav-2201 | PASS | PASS | PASS | s11 |
-| fixpipe_l0c2l1 | 1 | dav-2201 | PASS | PASS | FAIL | s1 |
+| fixpipe_l0c2l1 | 1 | dav-2201 | PASS | PASS | PASS | s1 |
 | mmad_load3dv2 | 1 | dav-2201 | PASS | PASS | PASS | s1 |
 | mmad_unitflag | 1 | dav-2201 | PASS | PASS | PASS | s1 |
 | batch_matmul | 1 | dav-2201 | PASS | PASS | PASS | s1 |
@@ -43,7 +43,8 @@
 | load_data_l12l0 | 1 | dav-2201 | PASS | PASS | PASS | s1_m32n32k32 |
 | load_data_l12l0 | 1 | dav-2201 | PASS | PASS | PASS | s1_m16n16k1024 |
 | fixpipe_l0c2gm | 1 | dav-2201 | PASS | PASS | PASS | s1_m32n32k32 |
-| fixpipe_l0c2gm | 1 | dav-2201 | PASS | PASS | FAIL | s1_m16n16k1024 |
+| fixpipe_l0c2gm | 1 | dav-2201 | PASS | PASS | PASS | s1_m64n64k64 |
+| fixpipe_l0c2gm | 1 | dav-2201 | PASS | PASS | PASS | s1_m1024n16k16 |
 | dual/mmad | 1 | dav-2201 | PASS | PASS | PASS | ptr_eq_tensor_s1 |
 | dual/mmad | 1 | dav-2201 | PASS | PASS | PASS | ptr_eq_tensor_s1_m32n32k32 |
 | dual/fixpipe_l0c2gm | 1 | dav-2201 | PASS | PASS | PASS | ptr_eq_tensor_s1 |
