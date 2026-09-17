@@ -188,26 +188,19 @@ public:
 #endif
 #if defined(__NPU_ARCH__) && !defined(ASCENDC_CPU_DEBUG)
     template <typename S>
-    __aicore__ inline void SetAddrWithOffset(__cbuf__ S* src, uint32_t offset,
-        TPosition sourcePos, uint32_t sourceSize);
+    __aicore__ inline void SetAddrWithOffset(__cbuf__ S* src, uint32_t offset);
     template <typename S>
-    __aicore__ inline void SetAddrWithOffset(__ca__ S* src, uint32_t offset,
-        TPosition sourcePos, uint32_t sourceSize);
+    __aicore__ inline void SetAddrWithOffset(__ca__ S* src, uint32_t offset);
     template <typename S>
-    __aicore__ inline void SetAddrWithOffset(__cb__ S* src, uint32_t offset,
-        TPosition sourcePos, uint32_t sourceSize);
+    __aicore__ inline void SetAddrWithOffset(__cb__ S* src, uint32_t offset);
     template <typename S>
-    __aicore__ inline void SetAddrWithOffset(__cc__ S* src, uint32_t offset,
-        TPosition sourcePos, uint32_t sourceSize);
+    __aicore__ inline void SetAddrWithOffset(__cc__ S* src, uint32_t offset);
     template <typename S>
-    __aicore__ inline void SetAddrWithOffset(__ubuf__ S* src, uint32_t offset,
-        TPosition sourcePos, uint32_t sourceSize);
+    __aicore__ inline void SetAddrWithOffset(__ubuf__ S* src, uint32_t offset);
     template <typename S>
-    __aicore__ inline void SetAddrWithOffset(__biasbuf__ S* src, uint32_t offset,
-        TPosition sourcePos, uint32_t sourceSize);
+    __aicore__ inline void SetAddrWithOffset(__biasbuf__ S* src, uint32_t offset);
     template <typename S>
-    __aicore__ inline void SetAddrWithOffset(__fbuf__ S* src, uint32_t offset,
-        TPosition sourcePos, uint32_t sourceSize);
+    __aicore__ inline void SetAddrWithOffset(__fbuf__ S* src, uint32_t offset);
 #endif
     __aicore__ inline LocalTensor<T>(TPosition pos, uint32_t addr, uint32_t tileSize);
     template <typename U>

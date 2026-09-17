@@ -13,70 +13,62 @@
 namespace AscendC {
 namespace Impl {
 template <typename S>
-__aicore__ inline void FillLocalTensorAddrWithOffset(TBuffAddr& address, uint64_t src, uint32_t offset,
-    TPosition sourcePos, Hardware expected, uint32_t sourceSize)
+__aicore__ inline void FillLocalTensorAddrFromPointer(TBuffAddr& address, uint64_t src, uint32_t offset,
+    TPosition sourcePos)
 {
     static_assert(!Std::is_const<S>::value, "SetAddrWithOffset requires a writable source");
-    ASCENDC_ASSERT(GetPhyType(sourcePos) == expected, {
-        KERNEL_LOG(KERNEL_ERROR, "SetAddrWithOffset source position does not match pointer space");
-    });
-    ASCENDC_ASSERT(uint64_t(offset) * sizeof(S) <= sourceSize, {
-        KERNEL_LOG(KERNEL_ERROR, "SetAddrWithOffset offset exceeds source size");
-    });
     address.logicPos = static_cast<int8_t>(sourcePos);
-    address.dataLen = sourceSize;
     address.bufferAddr = src + uint64_t(offset) * sizeof(S);
 }
+} // namespace Impl
+
+template <typename T>
+template <typename S>
+__aicore__ inline void LocalTensor<T>::SetAddrWithOffset(__cbuf__ S* src, uint32_t offset)
+{
+    Impl::FillLocalTensorAddrFromPointer<S>(this->address_, (uint64_t)src, offset, TPosition::A1);
 }
 
 template <typename T>
 template <typename S>
-__aicore__ inline void LocalTensor<T>::SetAddrWithOffset(__cbuf__ S* src, uint32_t offset,
-    TPosition sourcePos, uint32_t sourceSize)
+__aicore__ inline void LocalTensor<T>::SetAddrWithOffset(__ca__ S* src, uint32_t offset)
 {
-    Impl::FillLocalTensorAddrWithOffset<S>(this->address_, (uint64_t)src, offset, sourcePos, Hardware::L1, sourceSize);
+    Impl::FillLocalTensorAddrFromPointer<S>(this->address_, (uint64_t)src, offset, TPosition::A2);
 }
+
 template <typename T>
 template <typename S>
-__aicore__ inline void LocalTensor<T>::SetAddrWithOffset(__ca__ S* src, uint32_t offset,
-    TPosition sourcePos, uint32_t sourceSize)
+__aicore__ inline void LocalTensor<T>::SetAddrWithOffset(__cb__ S* src, uint32_t offset)
 {
-    Impl::FillLocalTensorAddrWithOffset<S>(this->address_, (uint64_t)src, offset, sourcePos, Hardware::L0A, sourceSize);
+    Impl::FillLocalTensorAddrFromPointer<S>(this->address_, (uint64_t)src, offset, TPosition::B2);
 }
+
 template <typename T>
 template <typename S>
-__aicore__ inline void LocalTensor<T>::SetAddrWithOffset(__cb__ S* src, uint32_t offset,
-    TPosition sourcePos, uint32_t sourceSize)
+__aicore__ inline void LocalTensor<T>::SetAddrWithOffset(__cc__ S* src, uint32_t offset)
 {
-    Impl::FillLocalTensorAddrWithOffset<S>(this->address_, (uint64_t)src, offset, sourcePos, Hardware::L0B, sourceSize);
+    Impl::FillLocalTensorAddrFromPointer<S>(this->address_, (uint64_t)src, offset, TPosition::CO1);
 }
+
 template <typename T>
 template <typename S>
-__aicore__ inline void LocalTensor<T>::SetAddrWithOffset(__cc__ S* src, uint32_t offset,
-    TPosition sourcePos, uint32_t sourceSize)
+__aicore__ inline void LocalTensor<T>::SetAddrWithOffset(__ubuf__ S* src, uint32_t offset)
 {
-    Impl::FillLocalTensorAddrWithOffset<S>(this->address_, (uint64_t)src, offset, sourcePos, Hardware::L0C, sourceSize);
+    Impl::FillLocalTensorAddrFromPointer<S>(this->address_, (uint64_t)src, offset, TPosition::VECCALC);
 }
+
 template <typename T>
 template <typename S>
-__aicore__ inline void LocalTensor<T>::SetAddrWithOffset(__ubuf__ S* src, uint32_t offset,
-    TPosition sourcePos, uint32_t sourceSize)
+__aicore__ inline void LocalTensor<T>::SetAddrWithOffset(__biasbuf__ S* src, uint32_t offset)
 {
-    Impl::FillLocalTensorAddrWithOffset<S>(this->address_, (uint64_t)src, offset, sourcePos, Hardware::UB, sourceSize);
+    Impl::FillLocalTensorAddrFromPointer<S>(this->address_, (uint64_t)src, offset, TPosition::C2);
 }
+
 template <typename T>
 template <typename S>
-__aicore__ inline void LocalTensor<T>::SetAddrWithOffset(__biasbuf__ S* src, uint32_t offset,
-    TPosition sourcePos, uint32_t sourceSize)
+__aicore__ inline void LocalTensor<T>::SetAddrWithOffset(__fbuf__ S* src, uint32_t offset)
 {
-    Impl::FillLocalTensorAddrWithOffset<S>(this->address_, (uint64_t)src, offset, sourcePos, Hardware::BIAS, sourceSize);
-}
-template <typename T>
-template <typename S>
-__aicore__ inline void LocalTensor<T>::SetAddrWithOffset(__fbuf__ S* src, uint32_t offset,
-    TPosition sourcePos, uint32_t sourceSize)
-{
-    Impl::FillLocalTensorAddrWithOffset<S>(this->address_, (uint64_t)src, offset, sourcePos, Hardware::FIXBUF, sourceSize);
+    Impl::FillLocalTensorAddrFromPointer<S>(this->address_, (uint64_t)src, offset, TPosition::C2PIPE2GM);
 }
 } // namespace AscendC
 #endif
