@@ -186,6 +186,22 @@ public:
                  "Please do not use it!")]] __aicore__ inline void
     SetAddrWithOffset(LocalTensor<S>& src, uint32_t offset);
 #endif
+#if defined(__NPU_ARCH__) && !defined(ASCENDC_CPU_DEBUG)
+    template <typename S>
+    __aicore__ inline void SetAddrWithOffset(__cbuf__ S* src, uint32_t offset);
+    template <typename S>
+    __aicore__ inline void SetAddrWithOffset(__ca__ S* src, uint32_t offset);
+    template <typename S>
+    __aicore__ inline void SetAddrWithOffset(__cb__ S* src, uint32_t offset);
+    template <typename S>
+    __aicore__ inline void SetAddrWithOffset(__cc__ S* src, uint32_t offset);
+    template <typename S>
+    __aicore__ inline void SetAddrWithOffset(__ubuf__ S* src, uint32_t offset);
+    template <typename S>
+    __aicore__ inline void SetAddrWithOffset(__biasbuf__ S* src, uint32_t offset);
+    template <typename S>
+    __aicore__ inline void SetAddrWithOffset(__fbuf__ S* src, uint32_t offset);
+#endif
     __aicore__ inline LocalTensor<T>(TPosition pos, uint32_t addr, uint32_t tileSize);
     template <typename U>
     __aicore__ inline LocalTensor<T>(uint32_t addr, const U& layout);
@@ -334,6 +350,7 @@ private:
 } // namespace AscendC
 
 #include "../../impl/basic_api/kernel_tensor_impl.h"
+#include "../../impl/basic_api/kernel_tensor_pointer_impl.h"
 #endif // KERNEL_TENSOR_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TENSOR_H__)

@@ -651,7 +651,7 @@ __aicore__ inline void MmadMxCal(
 }
 
 template <typename DstT, typename Src0T, typename Src1T>
-__aicore__ inline void MmadMxCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, MmadBitModeParams& mmadParams)
+__aicore__ inline void MmadMxCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, const MmadBitModeParams& mmadParams)
 {
     if ASCEND_IS_AIC {
         constexpr bool isMx = SupportType<

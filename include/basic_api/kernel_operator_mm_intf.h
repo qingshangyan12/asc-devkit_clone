@@ -300,7 +300,7 @@ __aicore__ inline void Mmad(
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
-    MmadBitModeParams& mmadParams);
+    const MmadBitModeParams& mmadParams);
 #endif
 
 /* **************************************************************************************************
@@ -519,6 +519,8 @@ __aicore__ inline void SetMMLayoutTransform(bool mmLayoutMode);
 } // namespace AscendC
 #if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_mm_intf_impl.h"
+#include "../../impl/basic_api/kernel_operator_mm_pointer_impl.h"
+#include "../../impl/basic_api/kernel_operator_mm_stride_pointer_impl.h"
 #endif
 #endif // ASCENDC_MODULE_OPERATOR_MM_INTERFACE_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_INTF_H__)
