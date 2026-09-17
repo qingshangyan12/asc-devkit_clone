@@ -18,6 +18,9 @@ constexpr uint16_t NHR_POST_SYNC_BIT = 1U << 3U;
 constexpr uint16_t NHR_STEP_PRE_SYNC_BIT = 1U << 4U;
 constexpr uint16_t NHR_STEP_POST_SYNC_BIT = 1U << 5U;
 constexpr uint16_t NHR_CKE_IDX = 0U;
+// 单个 event 对象可用事件位预算（对齐 mesh kernel 的 BIT_NUM_PER_CKE 口径）。
+// 步内流水的在途操作数（slice 数 × jetty 数）超出预算时回退逐 slice 串行等待。
+constexpr uint32_t AG_NHR_EVENT_BIT_BUDGET = 16U;
 
 struct KfcAllGatherNhrContext : CcuKernelCtxBase {
     const ChannelHandle* channels = nullptr;
@@ -96,7 +99,11 @@ CcuResult PostSync(KfcAllGatherNhrContext& ctx)
     return CCU_SUCCESS;
 }
 
-CcuResult WriteSlice(KfcAllGatherNhrContext& ctx, uint32_t toRank, ccu::LocalAddr& source, ccu::RemoteAddr& destination)
+// 只发射单个 slice 的 Write/占位 EventRecord，不等待；事件位从 baseBit 起按 jetty 展开。
+// 流水路径由调用方统一分配 baseBit 并在步末批量 EventWait；串行路径 baseBit=0 且逐 slice 等待。
+CcuResult IssueSlice(
+    KfcAllGatherNhrContext& ctx, uint32_t toRank, const ccu::LocalAddr& source, const ccu::RemoteAddr& destination,
+    uint32_t baseBit)
 {
     const ChannelHandle channel = ctx.channels[ctx.rank2ChannelIdx->at(toRank)];
     ccu::LocalAddr src = source;
@@ -104,7 +111,7 @@ CcuResult WriteSlice(KfcAllGatherNhrContext& ctx, uint32_t toRank, ccu::LocalAdd
     CCU_IF(ctx.sliceSizePerJetty != 0)
     {
         for (uint32_t jetty = 0; jetty + 1U < ctx.jettyNum; ++jetty) {
-            const uint16_t mask = 1U << jetty;
+            const uint16_t mask = static_cast<uint16_t>(1U << (baseBit + jetty));
             CCU_CHK_RET(ccu::Write(channel, dst, src, ctx.sliceSizePerJetty, ctx.event, mask));
             src.addr += ctx.sliceSizePerJetty;
             dst.addr += ctx.sliceSizePerJetty;
@@ -113,15 +120,22 @@ CcuResult WriteSlice(KfcAllGatherNhrContext& ctx, uint32_t toRank, ccu::LocalAdd
     CCU_ELSE
     {
         for (uint32_t jetty = 0; jetty + 1U < ctx.jettyNum; ++jetty) {
-            CCU_CHK_RET(ccu::EventRecord(ctx.event, 1U << jetty));
+            CCU_CHK_RET(ccu::EventRecord(ctx.event, static_cast<uint16_t>(1U << (baseBit + jetty))));
         }
     }
-    const uint16_t lastMask = 1U << (ctx.jettyNum - 1U);
+    const uint16_t lastMask = static_cast<uint16_t>(1U << (baseBit + ctx.jettyNum - 1U));
     CCU_IF(ctx.lastSliceSizePerJetty != 0)
     {
         CCU_CHK_RET(ccu::Write(channel, dst, src, ctx.lastSliceSizePerJetty, ctx.event, lastMask));
     }
     CCU_ELSE { CCU_CHK_RET(ccu::EventRecord(ctx.event, lastMask)); }
+    return CCU_SUCCESS;
+}
+
+// 串行回退路径：发射单个 slice 并立即等待其完成（保持原 WriteSlice 语义）。
+CcuResult WriteSlice(KfcAllGatherNhrContext& ctx, uint32_t toRank, ccu::LocalAddr& source, ccu::RemoteAddr& destination)
+{
+    CCU_CHK_RET(IssueSlice(ctx, toRank, source, destination, 0U));
     CCU_CHK_RET(ccu::EventWait(ctx.event, static_cast<uint16_t>((1U << ctx.jettyNum) - 1U)));
     return CCU_SUCCESS;
 }
@@ -134,35 +148,83 @@ CcuResult RunStep(KfcAllGatherNhrContext& ctx, const KfcNhrStepInfo& stepInfo)
     const ChannelHandle recvChannel = ctx.channels[fromChannelIdx];
     const uint32_t localIdx = ctx.channelCount;
 
-    CCU_CHK_RET(ccu::NotifyRecord(recvChannel, NHR_CKE_IDX, NHR_STEP_PRE_SYNC_BIT));
-    CCU_CHK_RET(ccu::NotifyWait(sendChannel, NHR_CKE_IDX, NHR_STEP_PRE_SYNC_BIT));
-    for (uint32_t sliceIdx : stepInfo.txSliceIdxs) {
-        ccu::LocalAddr src;
-        if (sliceIdx == ctx.rankId) {
-            src.addr = ctx.input;
-            src.addr += ctx.myRankInputSliceOffset;
-        } else {
-            src.addr = ctx.output[localIdx];
-            src.addr += ctx.outputSliceOffset[sliceIdx];
-        }
-        src.token = ctx.token[localIdx];
-        ccu::RemoteAddr dst;
-        dst.addr = ctx.output[toChannelIdx];
-        dst.addr += ctx.outputSliceOffset[sliceIdx];
-        dst.token = ctx.token[toChannelIdx];
-
-        ctx.repeatFlag = 0;
+    // step 0 的就绪同步冗余于 kernel 级 PreSync（地址/令牌已全量交换，且 step 0 只发送本 rank
+    // 自有 slice、无跨 rank 数据依赖）；对齐 RS NHR 的 step != 0 门控先例（hccl AG 侧为无条件）。
+    if (stepInfo.step != 0U) {
+        CCU_CHK_RET(ccu::NotifyRecord(recvChannel, NHR_CKE_IDX, NHR_STEP_PRE_SYNC_BIT));
+        CCU_CHK_RET(ccu::NotifyWait(sendChannel, NHR_CKE_IDX, NHR_STEP_PRE_SYNC_BIT));
+    }
+    // 发射期分流（宿主期普通 if，只发射命中分支）：在途数（slice×jetty）不超 16 位预算时走
+    // 步内流水——本步所有 slice 先全部发射（各 slice 写对端 output 的互不相交槽位，无数据依赖），
+    // 步末一次 EventWait 批量等完成。先例：RS NHR P4（步内 txSlice 批量发射）与 mesh Phase1/2。
+    const uint32_t sliceNum = static_cast<uint32_t>(stepInfo.txSliceIdxs.size());
+    const uint32_t inflightOps = sliceNum * ctx.jettyNum;
+    if (sliceNum != 0U && inflightOps <= AG_NHR_EVENT_BIT_BUDGET) {
+        const uint16_t waitMask = static_cast<uint16_t>((1U << inflightOps) - 1U);
+        // 流水路径 repeat 外层、slice 内层（与串行路径嵌套相反）：同一 repeat 轮内所有 slice
+        // 共享一组事件位，轮末批量等待清位后进下一轮；src/dst = 基址 + 分片偏移 + 帧偏移
+        // （input/output 两侧分别按各自 repeat stride 推进，AG 中继两基址来源不同需分开计）。
+        ccu::Variable turnIn;
+        ccu::Variable turnOut;
+        turnIn = 0;
+        turnOut = 0;
         ctx.repeatNum = ctx.repeatNumInv;
         CCU_WHILE(ctx.repeatNum != UINT64_MAX)
         {
             ctx.repeatNum += ctx.constVar1;
-            CCU_IF(ctx.repeatFlag != 0)
-            {
-                src.addr += ctx.inputRepeatStride;
-                dst.addr += ctx.outputRepeatStride;
+            for (uint32_t sliceSeq = 0; sliceSeq < sliceNum; ++sliceSeq) {
+                const uint32_t sliceIdx = stepInfo.txSliceIdxs[sliceSeq];
+                ccu::LocalAddr src;
+                if (sliceIdx == ctx.rankId) {
+                    src.addr = ctx.input;
+                    src.addr += ctx.myRankInputSliceOffset;
+                } else {
+                    src.addr = ctx.output[localIdx];
+                    src.addr += ctx.outputSliceOffset[sliceIdx];
+                }
+                src.addr += turnIn;
+                src.token = ctx.token[localIdx];
+                ccu::RemoteAddr dst;
+                dst.addr = ctx.output[toChannelIdx];
+                dst.addr += ctx.outputSliceOffset[sliceIdx];
+                dst.addr += turnOut;
+                dst.token = ctx.token[toChannelIdx];
+                CCU_CHK_RET(IssueSlice(ctx, stepInfo.toRank, src, dst, sliceSeq * ctx.jettyNum));
             }
-            CCU_CHK_RET(WriteSlice(ctx, stepInfo.toRank, src, dst));
-            ctx.repeatFlag = 1U;
+            CCU_CHK_RET(ccu::EventWait(ctx.event, waitMask));
+            turnIn += ctx.inputRepeatStride;
+            turnOut += ctx.outputRepeatStride;
+        }
+    } else {
+        // 串行回退（slice×jetty 超 16 位预算或空步）：保持原"发一个等一个"结构。
+        for (uint32_t sliceIdx : stepInfo.txSliceIdxs) {
+            ccu::LocalAddr src;
+            if (sliceIdx == ctx.rankId) {
+                src.addr = ctx.input;
+                src.addr += ctx.myRankInputSliceOffset;
+            } else {
+                src.addr = ctx.output[localIdx];
+                src.addr += ctx.outputSliceOffset[sliceIdx];
+            }
+            src.token = ctx.token[localIdx];
+            ccu::RemoteAddr dst;
+            dst.addr = ctx.output[toChannelIdx];
+            dst.addr += ctx.outputSliceOffset[sliceIdx];
+            dst.token = ctx.token[toChannelIdx];
+
+            ctx.repeatFlag = 0;
+            ctx.repeatNum = ctx.repeatNumInv;
+            CCU_WHILE(ctx.repeatNum != UINT64_MAX)
+            {
+                ctx.repeatNum += ctx.constVar1;
+                CCU_IF(ctx.repeatFlag != 0)
+                {
+                    src.addr += ctx.inputRepeatStride;
+                    dst.addr += ctx.outputRepeatStride;
+                }
+                CCU_CHK_RET(WriteSlice(ctx, stepInfo.toRank, src, dst));
+                ctx.repeatFlag = 1U;
+            }
         }
     }
     CCU_CHK_RET(ccu::NotifyRecord(sendChannel, NHR_CKE_IDX, NHR_STEP_POST_SYNC_BIT));
