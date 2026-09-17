@@ -470,6 +470,7 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 
 __aicore__ inline void ResetLoopModePara(DataCopyMVType type);
 
+#if defined(_ASCENDC_HAS_BISHENG_COMPILER)
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     __ubuf__ T* dst, __gm__ T* src, const DataCopyParams& repeatParams);
@@ -645,6 +646,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
     __gm__ T* dst, __cbuf__ T* src, const Nz2DnParamsFull& intriParams);
+#endif
 #endif
 } // namespace AscendC
 

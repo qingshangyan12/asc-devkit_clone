@@ -64,9 +64,11 @@ extern "C" __global__ __aicore__ void KernelTestICachePreLoad1()
     AscendC::ICachePreLoad(preFetchLen);
 }
 
+#if defined(_ASCENDC_HAS_BISHENG_COMPILER)
 extern "C" __global__ __aicore__ void KernelTestDataCachePreloadPtr()
 {
     __gm__ uint64_t* src = nullptr;
     int16_t cacheOffset = 0;
     AscendC::DataCachePreload(src, cacheOffset);
 }
+#endif

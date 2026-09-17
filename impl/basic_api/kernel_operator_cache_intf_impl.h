@@ -92,6 +92,7 @@ __aicore__ inline void ICachePreLoad(const int64_t preFetchLen) { PreLoad(preFet
 
 __aicore__ inline int64_t GetICachePreloadStatus() { return GetICachePreloadStatusImpl(); }
 
+#if defined(_ASCENDC_HAS_BISHENG_COMPILER)
 template <typename T>
 __aicore__ inline void DataCachePreload(__gm__ uint64_t* src, const T cacheOffset)
 {
@@ -130,6 +131,7 @@ __aicore__ inline void DataCacheCleanAndInvalid(__gm__ T* dst)
 {
     DcciGMImpl<T, entireType>(dst);
 }
+#endif
 #endif
 
 } // namespace AscendC

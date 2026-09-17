@@ -424,6 +424,7 @@ extern "C" __global__ __aicore__ void KernelTestResetLoopModePara1()
 }
 #endif
 
+#if defined(_ASCENDC_HAS_BISHENG_COMPILER)
 extern "C" __global__ __aicore__ void KernelTestDataCopyPtrCount()
 {
     __ubuf__ float* dst = nullptr;
@@ -481,3 +482,4 @@ extern "C" __global__ __aicore__ void KernelTestDataCopyPadPtr()
     AscendC::DataCopyPad(dstUb, srcGm, copyParams, padParams);
     AscendC::DataCopyPad(srcGm, dstUb, copyParams);
 }
+#endif
