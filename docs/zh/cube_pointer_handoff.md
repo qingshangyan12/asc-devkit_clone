@@ -1,4 +1,16 @@
-# Cube 指针化扩展交接说明
+# Cube 指针化扩展说明（社区任务 09-AscendC-Basic-API-CUBE）
+
+| 项目 | 内容 |
+| --- | --- |
+| 个人代码仓 | https://gitcode.com/Ethan-ki/asc-devkit |
+| 分支 | `task/cube-pointer-master`（基线 `cann/asc-devkit` `master`） |
+| 变更目录 | `include/basic_api`、`impl/basic_api`、`tests/api/basic_api/cube_pointer` |
+| 接口范围 | 任务书 2.4 清单 19 个名称 / 60 行逐行落地，另含 `LoadDataWithStride`、`MmadWithSparse`、`LoadDataWithSparse` 指针重载 |
+| 设计文档 | community task 设计文档 PR（链接见本 PR 的「关联的 Issue」） |
+
+本文件说明当前分支的验收边界、复现方式与已知限制；与
+`tests/api/basic_api/cube_pointer/ACCEPTANCE.md`、`tests/api/basic_api/cube_pointer/README.md`
+互为索引。
 
 当前分支：`task/cube-pointer-master`。本文件供后续 A2 agent 接手编译、复核和提交使用。
 
@@ -99,24 +111,3 @@ bash tests/api/basic_api/cube_pointer/check_binary.sh /path/to/output
 场景算入 49 个通过场景。本仓内的复现说明见
 `tests/api/basic_api/cube_pointer/ACCEPTANCE.md` 与
 `tests/api/basic_api/cube_pointer/README.md`。
-
-## 推送注意事项
-
-本机 `git config --global credential.helper=store`，而 `/root/.git-credentials`
-里存的是另一个 GitCode 账号（`lunhao2023`）的凭据。git 会优先使用该凭据，导致
-以错误身份推送并收到：
-
-```text
-<CH.00905403> You are not allowed to push code to this project.
-```
-
-推送时须绕过已存凭据，改用 `凭证.md` 中 `Ethan-ki` 的令牌：
-
-```bash
-export GIT_ASKPASS=<返回 Ethan-ki 与该令牌的脚本>
-export GIT_TERMINAL_PROMPT=0
-git -c credential.helper= push origin task/cube-pointer-master
-```
-
-推送后用 `git -c credential.helper= ls-remote origin refs/heads/task/cube-pointer-master`
-核对远端 SHA 与本地 `HEAD` 一致，不要只看 `git push` 的退出码。
