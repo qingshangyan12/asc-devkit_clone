@@ -54,8 +54,7 @@ __aicore__ inline void test_all_mask()
 {
     auto mask = asc::te::experimental::all_mask<T>();
     static_assert(AscendC::Std::is_same_v<decltype(mask), asc::te::experimental::reg_tensor<bool>>);
-    EXPECT_EQ(mask.reg,
-        (asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::all, T>().reg));
+    EXPECT_EQ(mask.reg, (asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::all, T>().reg));
 }
 
 template <typename T>
@@ -63,8 +62,7 @@ __aicore__ inline void test_none_mask()
 {
     auto mask = asc::te::experimental::none_mask<T>();
     static_assert(AscendC::Std::is_same_v<decltype(mask), asc::te::experimental::reg_tensor<bool>>);
-    EXPECT_EQ(mask.reg,
-        (asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::none, T>().reg));
+    EXPECT_EQ(mask.reg, (asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::none, T>().reg));
 }
 
 template <typename T>
@@ -108,19 +106,19 @@ __aicore__ inline void test_deinterleave()
     EXPECT_EQ(dst.second.mask, expect_mask);
 }
 
-#define MASK_REG_COMPUTE_TEST(Function, DataType)                         \
+#define MASK_REG_COMPUTE_TEST(Function, DataType)                          \
     TEST_F(tensor_api_vector_mask_reg_compute_3510, Function##_##DataType) \
-    {                                                                     \
-        test_##Function<DataType>();                                      \
-        SUCCEED();                                                        \
+    {                                                                      \
+        test_##Function<DataType>();                                       \
+        SUCCEED();                                                         \
     }
 
-#define MASK_REG_COMPUTE_TYPE_TESTS(DataType)       \
-    MASK_REG_COMPUTE_TEST(make_mask, DataType)      \
-    MASK_REG_COMPUTE_TEST(all_mask, DataType)       \
-    MASK_REG_COMPUTE_TEST(none_mask, DataType)      \
-    MASK_REG_COMPUTE_TEST(update_mask, DataType)    \
-    MASK_REG_COMPUTE_TEST(interleave, DataType)     \
+#define MASK_REG_COMPUTE_TYPE_TESTS(DataType)    \
+    MASK_REG_COMPUTE_TEST(make_mask, DataType)   \
+    MASK_REG_COMPUTE_TEST(all_mask, DataType)    \
+    MASK_REG_COMPUTE_TEST(none_mask, DataType)   \
+    MASK_REG_COMPUTE_TEST(update_mask, DataType) \
+    MASK_REG_COMPUTE_TEST(interleave, DataType)  \
     MASK_REG_COMPUTE_TEST(deinterleave, DataType)
 
 MASK_REG_COMPUTE_TYPE_TESTS(uint8_t)

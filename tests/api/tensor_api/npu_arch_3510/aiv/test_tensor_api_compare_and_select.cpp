@@ -96,16 +96,16 @@ __aicore__ inline void test_select()
     EXPECT_EQ(dst.mask, src0.mask);
 }
 
-#define COMPARE_AND_SELECT_TEST(Function, DataType)                         \
+#define COMPARE_AND_SELECT_TEST(Function, DataType)                          \
     TEST_F(tensor_api_vector_compare_and_select_3510, Function##_##DataType) \
-    {                                                                       \
-        test_##Function<DataType>();                                        \
-        SUCCEED();                                                          \
+    {                                                                        \
+        test_##Function<DataType>();                                         \
+        SUCCEED();                                                           \
     }
 
 #define SELECT_TYPE_TEST(DataType) COMPARE_AND_SELECT_TEST(select, DataType)
 
-#define COMPARE_TYPE_TESTS(DataType)                            \
+#define COMPARE_TYPE_TESTS(DataType)                             \
     COMPARE_AND_SELECT_TEST(compare_reg_tensor, DataType)        \
     COMPARE_AND_SELECT_TEST(compare_reg_tensor_scalar, DataType) \
     COMPARE_AND_SELECT_TEST(compare_scalar_reg_tensor, DataType)
