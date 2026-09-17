@@ -238,6 +238,21 @@ TEST_F(TEST_TPIPE, TBufGetWithOffsetInt4Test)
     EXPECT_EQ(int32Tensor.GetSize(), 8);
 }
 
+TEST_F(TEST_TPIPE, TBufGetWithOffsetParamCheckTest)
+{
+    TBuf<TPosition::A1> buf;
+    TPipe pipe;
+    pipe.InitBuffer(buf, 96);
+
+    KernelRaise::GetInstance().SetRaiseMode(false);
+    const uint64_t startRaiseCount = KernelRaise::GetInstance().GetRaiseCount();
+    (void)buf.GetWithOffset<int4b_t>(0, 0);
+    (void)buf.GetWithOffset<int4b_t>(128, 1);
+    (void)buf.GetWithOffset<int4b_t>(128, 64);
+    EXPECT_EQ(KernelRaise::GetInstance().GetRaiseCount() - startRaiseCount, 3);
+    KernelRaise::GetInstance().SetRaiseMode(true);
+}
+
 /* **************************** TPipe InitBuffer With TQue ****************************** */
 TEST_F(TEST_TPIPE, TPipeInitBufferWithTQueTest)
 {
