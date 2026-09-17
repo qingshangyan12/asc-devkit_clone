@@ -92,7 +92,7 @@ __aicore__ inline void ICachePreLoad(const int64_t preFetchLen) { PreLoad(preFet
 
 __aicore__ inline int64_t GetICachePreloadStatus() { return GetICachePreloadStatusImpl(); }
 
-#if defined(_ASCENDC_HAS_BISHENG_COMPILER)
+#if defined(ASCENDC_ENABLE_HW_PTR_API)
 template <typename T>
 __aicore__ inline void DataCachePreload(__gm__ uint64_t* src, const T cacheOffset)
 {

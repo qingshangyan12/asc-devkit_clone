@@ -47,7 +47,7 @@ python3.12 ../scripts/verify_result.py output/output.bin output/golden.bin \
 Change `SCENARIO_NUM` and `-scenarioNum` to 2 or 3 to cover rightPadding /
 Compact.
 
-### NDDMA multi-dimensional copy
+### NdDma multi-dimensional copy
 
 ```bash
 cd data_copy_gm2ub_nddma

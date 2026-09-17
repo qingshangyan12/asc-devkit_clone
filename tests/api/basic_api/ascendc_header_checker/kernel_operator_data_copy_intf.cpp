@@ -424,7 +424,7 @@ extern "C" __global__ __aicore__ void KernelTestResetLoopModePara1()
 }
 #endif
 
-#if defined(_ASCENDC_HAS_BISHENG_COMPILER)
+#if defined(ASCENDC_ENABLE_HW_PTR_API) && !defined(__DAV_C310_CUBE__) && !defined(__DAV_C220_CUBE__)
 extern "C" __global__ __aicore__ void KernelTestDataCopyPtrCount()
 {
     __ubuf__ float* dst = nullptr;

@@ -18,6 +18,10 @@
 
 #include "../utils/std/type_traits.h"
 
+#if defined(__clang__) && (__CCE__)
+#define ASCENDC_ENABLE_HW_PTR_API 1
+#endif
+
 namespace AscendC {
 template <typename U>
 __aicore__ inline auto GetUnderlyingPtr(const U& val)

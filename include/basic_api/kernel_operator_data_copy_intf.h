@@ -470,7 +470,7 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 
 __aicore__ inline void ResetLoopModePara(DataCopyMVType type);
 
-#if defined(_ASCENDC_HAS_BISHENG_COMPILER)
+#if defined(ASCENDC_ENABLE_HW_PTR_API)
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     __ubuf__ T* dst, __gm__ T* src, const DataCopyParams& repeatParams);

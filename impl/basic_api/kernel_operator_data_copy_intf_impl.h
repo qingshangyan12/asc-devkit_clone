@@ -1891,7 +1891,7 @@ __aicore__ inline void ResetLoopModePara(DataCopyMVType type)
 #endif
 } // namespace AscendC
 
-#if defined(_ASCENDC_HAS_BISHENG_COMPILER)
+#if defined(ASCENDC_ENABLE_HW_PTR_API)
 #include "kernel_operator_data_copy_ptr_impl.h"
 #endif
 #endif // ASCENDC_MODULE_OPERATOR_VEC_VCONV_INTERFACE_IMPL_H

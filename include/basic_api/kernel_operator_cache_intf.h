@@ -53,7 +53,7 @@ __aicore__ inline void DataCacheCleanAndInvalid(const LocalTensor<T>& dst);
 template <typename T, CacheLine entireType>
 __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst);
 
-#if defined(_ASCENDC_HAS_BISHENG_COMPILER)
+#if defined(ASCENDC_ENABLE_HW_PTR_API)
 template <typename T>
 __aicore__ inline void DataCachePreload(__gm__ uint64_t* src, const T cacheOffset);
 

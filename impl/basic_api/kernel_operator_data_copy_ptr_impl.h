@@ -15,7 +15,9 @@
 #ifndef ASCENDC_MODULE_OPERATOR_DATA_COPY_PTR_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_DATA_COPY_PTR_IMPL_H
 
-#if defined(_ASCENDC_HAS_BISHENG_COMPILER)
+#include "../../include/basic_api/kernel_operator_ptr_utils.h"
+
+#if defined(ASCENDC_ENABLE_HW_PTR_API)
 namespace AscendC {
 template <typename T>
 __aicore__ inline uint8_t GetPtrCacheMode(__gm__ T* addr)
@@ -587,6 +589,6 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(__gm__ T* dst, __cbuf__ T* 
 }
 #endif
 } // namespace AscendC
-#endif // _ASCENDC_HAS_BISHENG_COMPILER
+#endif // ASCENDC_ENABLE_HW_PTR_API
 
 #endif // ASCENDC_MODULE_OPERATOR_DATA_COPY_PTR_IMPL_H

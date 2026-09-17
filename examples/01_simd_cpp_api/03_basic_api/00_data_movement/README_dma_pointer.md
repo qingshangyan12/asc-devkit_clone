@@ -45,7 +45,7 @@ python3.12 ../scripts/verify_result.py output/output.bin output/golden.bin \
 
 将 `SCENARIO_NUM` 与 `-scenarioNum` 改为 2 或 3 可覆盖 rightPadding / Compact。
 
-### NDDMA 多维搬运
+### NdDma 多维搬运
 
 ```bash
 cd data_copy_gm2ub_nddma
