@@ -2241,7 +2241,7 @@ def generate_static_tiling_struct_file(
 
 
 def static_post_process_of_workspace(context, run_info, workspace_size):
-    if workspace_size >= 0:
+    if workspace_size > 0:
         if len(run_info["workspaces"]) > 1:
             msg = "the num of workspace can not large than 1"
             raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, msg)
@@ -2364,31 +2364,4 @@ def _add_time_stamp_codes(desc_id: str, space_len: int = 1):
 
 
 def get_tiling_info_by_tiling(
-    op_info: OpInfo, infered_info_from_ifile, value_depends: dict, origin_func_name
-):
-    CommonUtility.print_compile_log(
-        op_info.kernel_name, "get tiling info...", AscendCLogLevel.LOG_INFO
-    )
-    # temp enable avoid
-    enable_vd = CommonUtility.is_c310()
-    if (
-        infered_info_from_ifile.default_tiling_struct != ""
-        or global_var_storage.get_variable("ascendc_tiling_no_register")
-    ):
-        return get_tiling_info_v2(
-            op_info,
-            infered_info_from_ifile.tiling_key_list,
-            infered_info_from_ifile.default_tiling_struct,
-            infered_info_from_ifile.tiling_key_struct_map,
-            value_depends,
-            enable_vd,
-        )
-    else:
-        input_tiling_info_dict = {
-            "tiling_key_list": infered_info_from_ifile.tiling_key_list,
-            "value_depends": value_depends,
-            "enable_vd": enable_vd,
-            "tiling_key_group_map": infered_info_from_ifile.tiling_key_group_map,
-            "origin_func_name": origin_func_name,
-        }
-        return get_tiling_info_isolate(op_info, input_tiling_info_dict)
+    op_info: OpInfo, infered_info_from_ifile, value_depends: dict, origi
