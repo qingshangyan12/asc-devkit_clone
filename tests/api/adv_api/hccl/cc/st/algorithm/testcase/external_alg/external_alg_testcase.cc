@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 
+#include "alg_meta_registry.h"
 #include "coll_alg_v2_exec_registry.h"
 #include "external_alg_parser.h"
 #include "gtest/gtest.h"
@@ -146,4 +147,14 @@ TEST(ExtAlgV2Registry, EnumerateRegisteredTags)
         EXPECT_TRUE(registry.IsRegistered(HcclCMDType::HCCL_CMD_ALLGATHER, tag)) << tag;
     }
     EXPECT_TRUE(registry.GetRegisteredTags(HcclCMDType::HCCL_CMD_KFC_SERVER).empty()); // 本目标无 KFC 注册
+}
+
+TEST(ExtAlgMetaRegistry, RegisterAndQuery)
+{
+    // 用本目标已注册的 sidecar 行验证（Task 4 之前表为空则此用例先红）
+    const AlgMeta* meta =
+        AlgMetaRegistry::Instance().Get(HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "InsReduceScatterMesh1D");
+    ASSERT_NE(meta, nullptr);
+    EXPECT_EQ(meta->engine, AlgEngine::AICPU);
+    EXPECT_EQ(std::string(meta->externalName), "sole[mesh]");
 }
