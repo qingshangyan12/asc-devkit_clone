@@ -1,0 +1,18 @@
+data index: 000000, expected: 641.526916504, actual: 344.846160889, rdiff: 0.462460
+data index: 000001, expected: 482.973022461, actual: 234.070983887, rdiff: 0.515354
+data index: 000002, expected: 433.625274658, actual: 215.531295776, rdiff: 0.502955
+data index: 000003, expected: 437.962677002, actual: 192.434875488, rdiff: 0.560614
+data index: 000004, expected: 599.644409180, actual: 353.106536865, rdiff: 0.411140
+data index: 000005, expected: 550.029602051, actual: 361.581939697, rdiff: 0.342614
+data index: 000006, expected: 566.486206055, actual: 312.609252930, rdiff: 0.448161
+data index: 000007, expected: 542.538940430, actual: 279.977783203, rdiff: 0.483949
+data index: 000008, expected: 403.084625244, actual: 220.645385742, rdiff: 0.452608
+data index: 000009, expected: 606.641235352, actual: 318.377075195, rdiff: 0.475181
+data index: 000010, expected: 500.187927246, actual: 267.592895508, rdiff: 0.465015
+data index: 000011, expected: 427.314575195, actual: 232.232940674, rdiff: 0.456529
+data index: 000012, expected: 517.108154297, actual: 268.479675293, rdiff: 0.480806
+data index: 000013, expected: 423.862548828, actual: 240.380737305, rdiff: 0.432880
+data index: 000014, expected: 485.193145752, actual: 292.877227783, rdiff: 0.396370
+data index: 000015, expected: 508.352172852, actual: 337.408294678, rdiff: 0.336271
+error ratio: 1.0000, tolerance: 0.0001
+[ERROR] result error

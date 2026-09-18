@@ -1,0 +1,3 @@
+data index: 000248, expected: 60249.945312500, actual: 60250.007812500, rdiff: 0.000001
+error ratio: 0.0039, tolerance: 0.0001
+[ERROR] result error
