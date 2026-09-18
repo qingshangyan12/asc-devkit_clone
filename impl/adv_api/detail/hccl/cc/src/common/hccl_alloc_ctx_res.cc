@@ -1105,7 +1105,13 @@ HcclResult SelectCcuAlgorithm(
                 ccTiling->opType, resolveErrMsg.c_str());
             return HCCL_E_NOT_SUPPORT;
         }
-        CHK_RET(PrepareEngineForAlg(opParam, resolvedName));
+        HcclResult prepRet = PrepareEngineForAlg(opParam, resolvedName);
+        if (prepRet != HCCL_SUCCESS) {
+            HCCL_ERROR(
+                "[MC2_EXT_ALG] ERROR: prepare engine failed, algConfig[%s], algName[%s], ret[%d].", ccTiling->algConfig,
+                resolvedName.c_str(), static_cast<int>(prepRet));
+            return prepRet;
+        }
         algName = resolvedName;
         HCCL_INFO(
             "[CcuSelectAlg] use configured external algorithm[%s] for ccTiling[%u].", algName.c_str(), tilingIndex);
@@ -1237,8 +1243,8 @@ HcclResult CcuSelectAlg(
         if (i > 0U && opResCtx.algorithmType[i] != opResCtx.algorithmType[0]) {
             HCCL_ERROR(
                 "[CcuSelectAlg] all tilings in one KFC context must use the same static server algorithm, "
-                "algorithmType[0]=[%u], algorithmType[%u]=[%u].",
-                opResCtx.algorithmType[0], i, opResCtx.algorithmType[i]);
+                "algorithmType[0]=[%u], tiling[%u] algorithmType=[%u], opType[%u], algConfig[%s].",
+                opResCtx.algorithmType[0], i, opResCtx.algorithmType[i], ccTiling->opType, ccTiling->algConfig);
             return HCCL_E_NOT_SUPPORT;
         }
     }

@@ -113,3 +113,39 @@ TEST(ExtAlgGateA, MirrorMatchesSidecar)
     }
     EXPECT_EQ(CcuExternalNameSet(), truth);
 }
+
+// 失败路径三要素（设计 §10/§12）：报错必须含 algConfig 原文/候选或定名/原因。
+// 闸门 B 行为层：语法错 / AICPU-only 候选 → 拒；errMsg 内容层：外部名原文必在。
+TEST(ExtAlgFailure, ErrorMessagesCarryThreeElements)
+{
+    // 闸门 B 行为断言
+    Mc2CcTilingInner rsMeshChunk = MakeTiling("sole[mesh.chunk]", 7U); // RS: AICPU-only 候选
+    const void* badList[] = {&rsMeshChunk};
+    EXPECT_FALSE(CheckCcuAlgorithmsRegistered(badList, 1U));
+
+    // GetForcedAlg 层 errMsg 三要素：解析失败消息含原文
+    Mc2CcTilingInner bad = MakeTiling("sole[ring]", 6U);
+    std::string algName;
+    ExternalAlgSpec spec;
+    std::string errMsg;
+    EXPECT_EQ(GetForcedAlg(&bad, algName, spec, errMsg), ForcedAlgKind::EXTERNAL);
+    EXPECT_NE(errMsg.find("sole[ring]"), std::string::npos); // 要素1: 原文
+    EXPECT_NE(errMsg.find("atom"), std::string::npos);       // 要素3: 原因（词表外原子）
+
+    // resolver 层 errMsg 三要素：候选为空/规则全灭消息含原文与原因分叉
+    ExternalAlgSpec okSpec;
+    std::string parseErr;
+    ASSERT_TRUE(ParseExternalAlg("pipeline[mesh,nhr,nhr]", okSpec, parseErr));
+    OpParam op{};
+    op.opType = HcclCMDType::HCCL_CMD_ALLGATHER;
+    op.engine = CommEngine::COMM_ENGINE_AICPU_TS;
+    TopoInfoWithNetLayerDetails flat{};
+    std::string resolvedName;
+    EXPECT_EQ(ResolveExternalAlg(op, &flat, okSpec, resolvedName, errMsg), ResolveStatus::ERROR_INVALID);
+    EXPECT_NE(errMsg.find("pipeline[mesh,nhr,nhr]"), std::string::npos);                // 要素1
+    EXPECT_NE(errMsg.find("no candidate registered in this build"), std::string::npos); // 要素3 分叉文案
+
+    ASSERT_TRUE(ParseExternalAlg("parallel[mesh,nhr]", okSpec, parseErr));
+    EXPECT_EQ(ResolveExternalAlg(op, &flat, okSpec, resolvedName, errMsg), ResolveStatus::ERROR_INVALID);
+    EXPECT_NE(errMsg.find("all candidates rejected by rules"), std::string::npos); // 全灭分叉文案
+}

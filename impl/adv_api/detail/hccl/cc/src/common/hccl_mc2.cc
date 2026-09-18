@@ -409,8 +409,8 @@ bool CheckCcuAlgorithmsRegistered(const void* ccTilingList[], uint32_t tilingNum
             // 与 TryForcedAlgAndPrepareEngine、SelectCcuAlgorithm 分配路径为同构严格分支，修改报错语义时三处同步。
             if (!extParseErrMsg.empty()) {
                 HCCL_WARNING(
-                    "[MC2_EXT_ALG] ccu gate rejected, algConfig[%s], reason[%s].", ccTiling->algConfig,
-                    extParseErrMsg.c_str());
+                    "[MC2_EXT_ALG] ccu gate rejected, algConfig[%s], opType[%u], reason[%s].", ccTiling->algConfig,
+                    ccTiling->opType, extParseErrMsg.c_str());
                 return false;
             }
             const std::vector<AlgCandidate>& cands =
