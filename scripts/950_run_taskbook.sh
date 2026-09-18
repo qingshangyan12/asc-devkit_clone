@@ -64,6 +64,7 @@ echo "TEST_HEAD=$HEAD"
 # overlay ptr headers into ASCEND_HOME if present
 ACT_INC="${ASCEND_HOME_PATH}/asc/include/basic_api"
 ACT_IMPL="${ASCEND_HOME_PATH}/asc/impl/basic_api"
+TIK_DAV="${ASCEND_HOME_PATH}/tikcpp/tikcfw/impl/dav_3510"
 if [ -d "$ACT_INC" ] && [ -d "$ACT_IMPL" ]; then
   cp -a "$HELPER/include/basic_api/kernel_operator_ptr_utils.h" "$ACT_INC/" 2>/dev/null || true
   for f in kernel_operator_mm_ptr_impl.h kernel_operator_fixpipe_ptr_impl.h \
@@ -71,6 +72,20 @@ if [ -d "$ACT_INC" ] && [ -d "$ACT_IMPL" ]; then
            kernel_operator_block_sync_ptr_impl.h kernel_operator_determine_compute_sync_ptr_impl.h; do
     [ -f "$HELPER/impl/basic_api/$f" ] && cp -a "$HELPER/impl/basic_api/$f" "$ACT_IMPL/" || true
   done
+  # beta.3 LoadData2DMx static_assert omits plain fp8 pairs; dual Tensor MmadMx needs MmadMxImpl.
+  # Overlay Cal/base only — never full newer mm_intf_impl (NEAREST_AWAY break).
+  if [ -f "$HELPER/impl/basic_api/kernel_operator_mm_base_impl.h" ]; then
+    cp -a "$HELPER/impl/basic_api/kernel_operator_mm_base_impl.h" "$ACT_IMPL/"
+    echo "OVERLAY_BASE mm_base_impl.h"
+  fi
+  if [ -f "$HELPER/impl/basic_api/dav_3510/kernel_operator_mm_impl.h" ]; then
+    mkdir -p "$ACT_IMPL/dav_3510" 2>/dev/null || true
+    cp -a "$HELPER/impl/basic_api/dav_3510/kernel_operator_mm_impl.h" "$ACT_IMPL/dav_3510/" 2>/dev/null || true
+    if [ -d "$TIK_DAV" ]; then
+      cp -a "$HELPER/impl/basic_api/dav_3510/kernel_operator_mm_impl.h" "$TIK_DAV/"
+      echo "OVERLAY_DAV tikcfw/impl/dav_3510/kernel_operator_mm_impl.h"
+    fi
+  fi
   for pair in \
     "kernel_operator_mm_intf_impl.h:kernel_operator_mm_ptr_impl.h" \
     "kernel_operator_fixpipe_intf_impl.h:kernel_operator_fixpipe_ptr_impl.h"; do
