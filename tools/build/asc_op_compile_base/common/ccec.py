@@ -113,7 +113,6 @@ def check_is_regbase_v2():
     from .platform.platform_info import BS9SX2A
     from .platform.platform_info import MC61AM21A
     from .platform.platform_info import ASCEND_950
-    from .platform.platform_info import ASCEND_5162
     from .platform.platform_info import KIRIN_X90
     from .platform.platform_info import KIRIN_9030
     from .platform.platform_info import KIRIN_DEV_0000
@@ -198,6 +197,7 @@ def _build_aicore_compile_cmd(
     from .platform.platform_info import BS9SX2A
     from .platform.platform_info import MC61AM21A
     from .platform.platform_info import ASCEND_950
+    from .platform.platform_info import ASCEND_5162
     from .platform.platform_info import COMPILER_ARCH
     from .buildcfg.buildcfg_mapping import tbe_debug_level, op_debug_config
     from .buildcfg.buildcfg_mapping import enable_cce_licm_safe_hoist
