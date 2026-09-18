@@ -33,6 +33,20 @@ Mc2CcTilingInner MakeTiling(const char* algConfig, uint32_t opType = 6U /*ALLGAT
 }
 } // namespace
 
+// 设计不变量 1（spec §14/§21.1）：CCU 候选 ⊆ algorithmMap（三名单一致性：
+// sidecar 注册表 / tiling 白名单 / algorithmMap——前两者由 GateA 镜像断言与
+// tiling 行为用例分别守护，此处锚定第三份名单）
+TEST(ExtAlgFull, CcuCandidatesAreInAlgorithmMap)
+{
+    for (const AlgMetaRow& row : AlgMetaRegistry::Instance().GetAll()) {
+        if (row.meta.engine != AlgEngine::CCU) {
+            continue;
+        }
+        EXPECT_NE(algorithmMap.find(row.registeredName), algorithmMap.end())
+            << row.registeredName << " missing in algorithmMap";
+    }
+}
+
 // 改造点①: 四态识别（P4 兼容性: NONE/LEGACY/BARE_NAME 行为与旧两态强制名接口逐字节等价）
 TEST(ExtAlgForced, FourStateClassification)
 {
