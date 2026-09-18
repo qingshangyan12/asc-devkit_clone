@@ -1,9 +1,9 @@
 # Ascend950 CUBE task-book self-test
 
-- HEAD: b8c346510
+- HEAD: 0f67c4733
 - ARCH: dav-3510
 - MODE: mx_only
-- STAMP: 20260918_184145
+- STAMP: 20260918_184503
 
 - PASS: **14**
 - FAIL: 0
