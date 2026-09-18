@@ -50,9 +50,9 @@ $$
 ## 函数原型
 
 ```cpp
-template <const histogram_options& options = default_histogram_options>
-__simd_callee__ inline reg_tensor<uint16_t> histograms(
-    reg_tensor<uint16_t>& dst, const reg_tensor<uint8_t>& src)
+template <const histogram_options& options = default_histogram_options, typename T, typename U>
+__simd_callee__ inline reg_tensor<T> histograms(
+    reg_tensor<T>& dst, const reg_tensor<U>& src)
 ```
 
 ## 参数说明
@@ -62,6 +62,8 @@ __simd_callee__ inline reg_tensor<uint16_t> histograms(
 | 参数名 | 描述 |
 | --- | --- |
 | options | 直方图配置，类型为histogram_options。默认统计[0, 127]范围内各数值出现的次数。 |
+| T | 输出元素类型。目前支持`uint16_t`。 |
+| U | 输入元素类型。目前支持`uint8_t`。 |
 
 **表2**  参数说明
 

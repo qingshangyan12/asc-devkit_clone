@@ -21,9 +21,12 @@ namespace asc {
 namespace te {
 namespace experimental {
 
-template <const histogram_options& options>
-__simd_callee__ inline reg_tensor<uint16_t> histograms(reg_tensor<uint16_t>& dst, const reg_tensor<uint8_t>& src)
+template <const histogram_options& options, typename T, typename U>
+__simd_callee__ inline reg_tensor<T> histograms(reg_tensor<T>& dst, const reg_tensor<U>& src)
 {
+    static_assert(
+        ::AscendC::Std::is_same_v<T, uint16_t> && ::AscendC::Std::is_same_v<U, uint8_t>,
+        "histograms currently supports reg_tensor<uint16_t> dst and reg_tensor<uint8_t> src");
     static_assert(
         options.half == histogram_half::low || options.half == histogram_half::high, "unsupported histogram half");
     static_assert(
