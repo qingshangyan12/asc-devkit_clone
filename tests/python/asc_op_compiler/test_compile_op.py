@@ -40,6 +40,7 @@ from asc_op_compile_base.common import register
 from asc_op_compile_base.common import buildcfg
 from asc_op_compile_base.asc_op_compiler.global_storage import global_var_storage
 from asc_op_compile_base.asc_op_compiler import static_compile_resource_generator
+from asc_op_compile_base.asc_op_compiler import static_compile_resource_id
 from asc_op_compile_base.asc_op_compiler.ascendc_common_utility import (
     CompileCommandMode,
     CompileCommandSession,
@@ -208,15 +209,22 @@ def read_resource_id_section_for_test(binary_file):
         if result.returncode != 0:
             raise AssertionError(f"Failed to read Resource ID: {result.stdout}")
         section_data = Path(dump_file).read_bytes()
+        head_size = static_compile_resource_id._TLV_HEAD_SIZE
+        values = []
         offset = 0
-        while offset + 4 <= len(section_data):
+        while offset + head_size <= len(section_data):
             entry_type = int.from_bytes(section_data[offset : offset + 2], "little")
             length = int.from_bytes(section_data[offset + 2 : offset + 4], "little")
-            value = section_data[offset + 4 : offset + 4 + length]
-            if entry_type == 6:
-                return value.decode("ascii")
-            offset += 4 + length
-        raise AssertionError("Resource ID entry not found in .ascend.meta")
+            value = section_data[offset + head_size : offset + head_size + length]
+            if entry_type == static_compile_resource_id._RESOURCE_ID_TYPE:
+                values.append(value)
+            offset += head_size + length
+        if len(values) != 1:
+            raise AssertionError(
+                f"expected exactly one Resource ID entry in .ascend.meta, "
+                f"got {len(values)}"
+            )
+        return values[0].decode("ascii")
 
 
 def compile_manifest_resources(manifest, manifest_dir, source_file_path):
