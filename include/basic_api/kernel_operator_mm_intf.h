@@ -77,7 +77,6 @@ template <typename T>
 __aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParams);
 #endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 
-
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams);
@@ -111,7 +110,6 @@ __aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData2D
 template <typename T>
 __aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParams);
 #endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
-
 
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
