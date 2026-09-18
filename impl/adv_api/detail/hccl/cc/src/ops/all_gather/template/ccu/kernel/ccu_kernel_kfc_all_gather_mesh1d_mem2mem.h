@@ -14,8 +14,11 @@
 
 namespace mc2_ops_hccl {
 
-// 每个 repeat 批次最多展开 16 次 Write/LocalCopy/Wait 三阶段流水。
-constexpr uint32_t AG_M2M_UNROLL_NUM = 1;
+// 每个 repeat 批次最多展开 AG_M2M_UNROLL_NUM 组 Write/LocalCopy/Wait 三阶段流水，
+// 对齐 hccl 侧 CcuAllGatherMesh1DMem2MemKernel 的 AG_UNROLL_NUM 机制（hccl 为 16）。
+// 事件按 AG_M2M_UNROLL_NUM * ceil(rankSize/16) 分配，KFC 常驻模式下取 4 以平衡
+// 流水深度与 CCU 事件资源，可按实测上调。
+constexpr uint32_t AG_M2M_UNROLL_NUM = 4;
 
 CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable outputOffset,
