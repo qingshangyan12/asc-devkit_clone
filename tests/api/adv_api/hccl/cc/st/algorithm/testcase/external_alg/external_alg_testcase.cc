@@ -141,15 +141,20 @@ TEST(ExtAlgV2Registry, EnumerateRegisteredTags)
 {
     auto& registry = CollAlgExecRegistryV2::Instance();
     const std::vector<std::string> agTags = registry.GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLGATHER);
-    // AIC UT 目标 (-DAICPU_COMPILE) 下 AG 只注册 AICPU 侧 8 条（3 条 CCU 注册被 #if 排除：
-    // CcuSchedAllGatherSoleMesh / CcuSchedAllGatherParallelMeshNHRMultiLink /
-    // CcuSchedAllGatherConcurMeshNHRMultiLink；omnipipe executor 未编入本目标）；
+    // 本目标全量编译（-DMC2_CLIENT_ENABLE_CCU=1，无 AICPU_COMPILE 守卫裁剪），AG 应为 12 条：
+    // 9 条 AICPU 注册（含 omnipipe）+ 3 条 CCU 注册（CcuSchedAllGatherSoleMesh /
+    // CcuSchedAllGatherParallelMeshNHRMultiLink / CcuSchedAllGatherConcurMeshNHRMultiLink）；
     // 此断言同时防止枚举接口漏实现
     EXPECT_FALSE(agTags.empty());
     for (const std::string& tag : agTags) {
         EXPECT_TRUE(registry.IsRegistered(HcclCMDType::HCCL_CMD_ALLGATHER, tag)) << tag;
     }
-    EXPECT_TRUE(registry.GetRegisteredTags(HcclCMDType::HCCL_CMD_KFC_SERVER).empty()); // 本目标无 KFC 注册
+    // 本目标不编 kfc_server/executor（HCCL_CANN_COMPAT_850 守卫，不属于 46 行范围）；
+    // 保守断言：不依赖构建配置，若注册了则每个 tag 必须可查
+    const std::vector<std::string> kfcTags = registry.GetRegisteredTags(HcclCMDType::HCCL_CMD_KFC_SERVER);
+    for (const std::string& tag : kfcTags) {
+        EXPECT_TRUE(registry.IsRegistered(HcclCMDType::HCCL_CMD_KFC_SERVER, tag)) << tag;
+    }
 }
 
 TEST(ExtAlgMetaRegistry, RegisterAndQuery)
@@ -169,10 +174,9 @@ const HcclCMDType COLL_CMDS[] = {
 };
 } // namespace
 
-// 设计不变量 1（spec §14）：V2 注册表 ↔ AlgMetaRegistry 双向满射（按构建配置：
-// AIC 目标 -DAICPU_COMPILE 只编入部分 executor 文件，可见 AICPU 行 24 条——AG 8 / RS 10 /
-// AR 0（AR executor 未编入本目标）/ A2A 4 / A2AV 2；mc2_ccu 目标全 46 条——后者在
-// external_alg_full_testcase.cpp 断言 46 精确数，属后续任务）。
+// 设计不变量 1（spec §14）：V2 注册表 ↔ AlgMetaRegistry 双向满射。本目标全量编译所有注册现场
+// （15 个 executor 文件，-DMC2_CLIENT_ENABLE_CCU=1 且无 AICPU_COMPILE 守卫裁剪），可见全部
+// 46 行 sidecar——按 cmd 分布：AG 12 / RS 16 / AR 8 / A2A 7 / A2AV 3。
 TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
 {
     for (HcclCMDType cmd : COLL_CMDS) {
@@ -187,4 +191,14 @@ TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
         std::sort(metaNames.begin(), metaNames.end());
         EXPECT_EQ(v2Tags, metaNames) << "cmd=" << static_cast<u32>(cmd);
     }
+    // 本目标全量编译（MC2_CLIENT_ENABLE_CCU=1，无 AICPU_COMPILE）：46 行精确锚
+    size_t total = 0;
+    for (HcclCMDType cmd : COLL_CMDS) {
+        for (const AlgMetaRow& row : AlgMetaRegistry::Instance().GetAll()) {
+            if (row.cmd == cmd) {
+                total++;
+            }
+        }
+    }
+    EXPECT_EQ(total, 46U);
 }
