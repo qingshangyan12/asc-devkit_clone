@@ -1,0 +1,75 @@
+==========================================
+ ELU 算子测试报告
+ 生成时间: 2026-08-12 21:50:50 UTC
+==========================================
+
+━━━ 1. 环境信息 ━━━
+
+--- npu-smi info ---
++-------------------------------------------------------------------------------------------------+
+| npu-smi 25.7.rc1                                 Version: 25.7.rc1                              |
++--------+------------------+---------------+-----------------------------------------------------+
+| NPU ID | Name             | Health        | Power(W)    Temp(C)           Hugepages-Usage(page) |
+|        |                  | Bus-Id        | NPU Util(%) Memory-Usage(MB)  HBM-Usage(MB)         |
++========+==================+===============+=====================================================+
+| 0      | Ascend950PR      | OK            | 202.2       60                0     / 0             |
+|        |                  | 0000:D4:00.0  | 0           0    / 0          5411  / 131072        |
++========+==================+===============+=====================================================+
++---------------------------+---------------+-----------------------------------------------------+
+| NPU ID                    | Process id    | Process name             | Process memory(MB)       |
++===========================+===============+=====================================================+
+| No running processes found in NPU 0                                                             |
++===========================+===============+=====================================================+
+
+--- CANN 版本 ---
+CANN: /usr/local/Ascend/cann-9.1.0
+
+--- 操作系统 ---
+Linux 7ea03669cd14 6.6.0-132.0.0.111.oe2403sp3.x86_64 #1 SMP Mon Dec 29 23:07:38 CST 2025 x86_64 x86_64 x86_64 GNU/Linux
+
+--- 编译工具 ---
+cmake: cmake version 3.22.1
+gcc: gcc (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0
+python3: Python 3.12.13
+
+━━━ 2. 编译 ━━━
+
+--- cmake ---
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /workspace/asc-devkit/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/elu/build
+
+--- make ---
+Consolidate compiler generated dependencies of target demo
+[ 50%] Building ASC object CMakeFiles/demo.dir/elu.asc.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+
+✅ 编译成功（demo 可执行文件已生成）
+
+━━━ 3. 生成测试数据 ━━━
+
+/workspace/asc-devkit/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/elu/scripts/gen_data.py:7: RuntimeWarning: overflow encountered in exp
+  return np.where(x > 0, scale * x, alpha * scale * (np.exp(x * input_scale) - 1))
+fp32 data generated for shapes: [(1,), (32,), (1024,), (2048,)]
+fp16 data generated for shapes: [(1,), (32,), (1024,), (2048,)]
+
+━━━ 4. 运行测试 ━━━
+
+test pass!
+fp16 test pass!
+
+✅ fp32 测试通过
+✅ fp16 测试通过
+
+━━━ 5. 精度验证 ━━━
+
+精度对比脚本未提供，依赖运行输出中的 error 信息
+
+━━━ 6. 测试汇总 ━━━
+
+✅ 最终结论：全部测试通过
+
+==========================================
+ 测试结束时间: 2026-08-12 21:51:06 UTC
+==========================================
