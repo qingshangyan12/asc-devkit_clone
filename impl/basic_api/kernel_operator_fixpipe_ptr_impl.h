@@ -27,6 +27,32 @@
 namespace AscendC {
 
 /* **************************************************************************************************
+ * SetFixPipeAddr (pointer) — L1 eleWise + C0 channel stride
+ * Mirrors dav_m300 SetFixPipeAddrImpl; unsupported dav_* stay NOT_SUPPORT via set_fixp_addr path.
+ * ************************************************************************************************* */
+template <typename T>
+__aicore__ inline void SetFixPipeAddr(__cbuf__ T* eleWiseData, uint16_t c0ChStride)
+{
+    static_assert(
+        SupportType<T, half>(), "Failed to check dtype in SetFixPipeAddr, current api support dtype is : half");
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3003)
+    if ASCEND_IS_AIC {
+        uint64_t config = 0;
+        config = config | c0ChStride; // ELT_SRC_PARA[15:0]
+        config = config | ((static_cast<uint64_t>(eleWiseData) >> 5) << 16); // ELT_SRC_PARA[31:16], 32B align
+        set_fixp_addr(config);
+#if ASCENDC_CPU_DEBUG
+        SetEleSrcPara(static_cast<uint64_t>(eleWiseData));
+#endif
+    }
+#else
+    (void)eleWiseData;
+    (void)c0ChStride;
+    ASCENDC_REPORT_NOT_SUPPORT(false, "SetFixPipeAddr");
+#endif
+}
+
+/* **************************************************************************************************
  * SetFixPipeConfig (pointer)
  * ************************************************************************************************* */
 template <typename T, bool setRelu = false>
@@ -138,7 +164,9 @@ __aicore__ inline void Fixpipe(
 template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
 __aicore__ inline void Fixpipe(__gm__ T* dst, __cc__ U* src, const FixpipeParamsArch3510<config.format>& intriParams)
 {
-    FixpipeL0C2GMImpl<T, U, config>(dst, src, intriParams);
+    // Match Tensor path: pass L2 cache mode encoded in GM address high bits.
+    const uint8_t cacheMode = ExtractCacheMode(dst);
+    FixpipeL0C2GMImpl<T, U, config>(dst, src, intriParams, cacheMode);
 }
 
 template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
@@ -146,7 +174,8 @@ __aicore__ inline void Fixpipe(
     __gm__ T* dst, __cc__ U* src, __cbuf__ uint64_t* cbufWorkspace,
     const FixpipeParamsArch3510<config.format>& intriParams)
 {
-    FixpipeL0C2GMImpl<T, U, config>(dst, src, cbufWorkspace, intriParams);
+    const uint8_t cacheMode = ExtractCacheMode(dst);
+    FixpipeL0C2GMImpl<T, U, config>(dst, src, cbufWorkspace, intriParams, cacheMode);
 }
 #endif
 

@@ -421,6 +421,27 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadImageToLocal(
     LoadImageToLocalCal(dst, loadDataParams);
 }
 
+/* **************************************************************************************************
+ * LoadDataUnzip (pointer) — GM -> L1 / L0A / L0B
+ * ************************************************************************************************* */
+template <typename T>
+__aicore__ inline void LoadDataUnzip(__cbuf__ T* dst, __gm__ T* src)
+{
+    LoadDataUnzipToL1Cal(dst, src);
+}
+
+template <typename T>
+__aicore__ inline void LoadDataUnzip(__ca__ T* dst, __gm__ T* src)
+{
+    LoadDataUnzipToL0ACal(dst, src);
+}
+
+template <typename T>
+__aicore__ inline void LoadDataUnzip(__cb__ T* dst, __gm__ T* src)
+{
+    LoadDataUnzipToL0BCal(dst, src);
+}
+
 } // namespace AscendC
 
 #endif // ASCENDC_MODULE_OPERATOR_MM_PTR_IMPL_H
