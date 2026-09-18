@@ -19,7 +19,6 @@ import tempfile
 
 _RESOURCE_ID_TYPE = 6
 _RESOURCE_ID_VALUE_SIZE = 64
-_TLV_HEAD_SIZE = 4
 _HASH_CHUNK_SIZE = 1024 * 1024
 
 
@@ -27,49 +26,30 @@ class ResourceIdError(RuntimeError):
     pass
 
 
-def _validate_elf(dynamic_object_path):
-    if not isinstance(dynamic_object_path, (str, os.PathLike)):
-        raise ResourceIdError(f"ELF object path is not a path: {dynamic_object_path!r}")
-    if not os.path.isfile(dynamic_object_path) or os.path.islink(dynamic_object_path):
-        raise ResourceIdError(
-            f"ELF object is not a regular file: {dynamic_object_path}"
-        )
-    try:
-        with open(dynamic_object_path, "rb") as file_obj:
-            magic = file_obj.read(4)
-    except OSError as error:
-        raise ResourceIdError(
-            f"failed to read ELF object: {dynamic_object_path}"
-        ) from error
-    if magic != b"\x7fELF":
-        raise ResourceIdError(f"input is not an ELF object: {dynamic_object_path}")
-
-
-def _hash_object(object_path):
-    _validate_elf(object_path)
-    digest = hashlib.sha256()
+def _hash_elf(object_path, digest):
+    """Fold the whole object into digest in one read."""
+    if os.path.islink(object_path):
+        raise ResourceIdError(f"ELF object must not be a symlink: {object_path}")
     try:
         with open(object_path, "rb") as file_obj:
-            for chunk in iter(lambda: file_obj.read(_HASH_CHUNK_SIZE), b""):
+            chunk = file_obj.read(_HASH_CHUNK_SIZE)
+            while chunk:
                 digest.update(chunk)
+                chunk = file_obj.read(_HASH_CHUNK_SIZE)
     except OSError as error:
-        raise ResourceIdError(f"failed to hash ELF object: {object_path}") from error
-    return digest.digest()
+        raise ResourceIdError(f"failed to read ELF object: {object_path}") from error
 
 
 def calculate_resource_id(object_paths):
-    """XOR the SHA256 digests of linked objects."""
-    if not object_paths:
-        raise ResourceIdError("object list for resource_id must not be empty")
-    digest = bytearray(hashlib.sha256().digest_size)
+    """SHA256 of the linked objects' contents concatenated in link order.
+
+    Hashing the merged stream rather than combining per-object digests keeps the
+    link order significant and leaves no way for two objects to cancel out.
+    """
+    digest = hashlib.sha256()
     for object_path in object_paths:
-        for index, value in enumerate(_hash_object(object_path)):
-            digest[index] ^= value
-    if not any(digest):
-        raise ResourceIdError(
-            "resource_id collapsed to zero: object digests cancelled out"
-        )
-    return digest.hex()
+        _hash_elf(object_path, digest)
+    return digest.hexdigest()
 
 
 def _render_resource_id_source(resource_id):
@@ -78,19 +58,16 @@ def _render_resource_id_source(resource_id):
     # exactly 64 chars carries an implicit NUL, which would overflow the array.
     value = ", ".join(f"'{char}'" for char in resource_id)
     return (
-        "struct BinaryMetaResourceId {\n"
+        "struct BinaryMetaSpecializationResourceId {\n"
         "    unsigned short type;\n"
         "    unsigned short len;\n"
         "    char value[%d];\n"
         "};\n"
-        "static_assert(sizeof(BinaryMetaResourceId) == %d,\n"
-        '              "BinaryMetaResourceId must stay packed as type|len|value");\n'
         '__attribute__((used, section(".ascend.meta")))\n'
-        "static const struct BinaryMetaResourceId g_ascend_resource_id_section = "
+        "static const struct BinaryMetaSpecializationResourceId g_ascend_resource_id_section = "
         "{%d, %d, {%s}};\n"
         % (
             _RESOURCE_ID_VALUE_SIZE,
-            _TLV_HEAD_SIZE + _RESOURCE_ID_VALUE_SIZE,
             _RESOURCE_ID_TYPE,
             _RESOURCE_ID_VALUE_SIZE,
             value,
@@ -109,13 +86,6 @@ def generate_resource_id_object(
     from .ascendc_common_utility import CommonUtility, CompileStage
 
     resource_id = calculate_resource_id(object_paths)
-    if len(resource_id) != _RESOURCE_ID_VALUE_SIZE:
-        raise ResourceIdError(
-            "resource_id must be %d characters, got %d"
-            % (_RESOURCE_ID_VALUE_SIZE, len(resource_id))
-        )
-    if not compile_command or not all(compile_command) or not cce_arch:
-        raise ResourceIdError("compile command and cce arch must be provided")
     directory = os.path.dirname(os.path.realpath(output_path))
     os.makedirs(directory, exist_ok=True)
     source_fd = None
@@ -143,22 +113,33 @@ def generate_resource_id_object(
                 "-o",
                 output_path,
             ],
-            CompileStage.COMPILE,
+            CompileStage.SPECIALIZATION,
             compile_log_path,
         )
-        if not os.path.isfile(output_path):
-            raise ResourceIdError(f"compile resource id object failed: {output_path}")
         return resource_id
     finally:
-        for file_descriptor in (source_fd,):
-            if file_descriptor is None:
-                continue
+        if source_fd is not None:
             with suppress(OSError):
-                os.close(file_descriptor)
-        for path in (source_path,):
-            if path is None:
-                continue
-            try:
-                os.unlink(path)
-            except FileNotFoundError:
-                pass
+                os.close(source_fd)
+        if source_path is not None:
+            with suppress(FileNotFoundError):
+                os.unlink(source_path)
+
+
+def build_resource_id_object(dst_file, link_inputs, compile_log_path=None):
+    """Compile the Resource ID of the final link inputs into a metadata object."""
+    from .ascendc_compile_base import COMPILER_ARCH, get_soc_spec
+    from .global_storage import global_var_storage
+
+    resource_object = "%s.resource_id.o" % dst_file
+    compile_command = [global_var_storage.get_variable("ascendc_compiler_path")]
+    if global_var_storage.get_variable("ascendc_enable_ccache") == True:
+        compile_command.insert(0, os.environ.get("ASCENDC_CCACHE_EXECUTABLE"))
+    resource_id = generate_resource_id_object(
+        link_inputs,
+        resource_object,
+        compile_command,
+        get_soc_spec(COMPILER_ARCH),
+        compile_log_path,
+    )
+    return resource_id, resource_object
