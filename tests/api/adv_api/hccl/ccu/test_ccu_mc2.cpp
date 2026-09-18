@@ -18,6 +18,7 @@
 #include "include/adv_api/hccl/hccl_mc2.h"
 #include "include/adv_api/hccl/internal/hccl_msg.h"
 #include "hccl_alloc_ctx_res.h"
+#include "external_alg_rules.h"
 #include "kfc_server_protocol.h"
 #include "sim_communicator.h"
 #include "sim_world.h"
@@ -39,6 +40,15 @@ extern HcclResult g_stubHcomCheckDataTypeResult;
 extern HcclResult g_stubHcomCheckReductionOpResult;
 extern bool g_stubHcommCcuKernelLaunchFail;
 extern uint32_t g_stubHcommCcuKernelLaunchCallCount;
+} // namespace mc2_ops_hccl
+
+// 夹具：ccu_mc2 目标不编 executor 文件，且 -DAICPU_COMPILE 使产品侧 CCU sidecar 注册行
+// （ins_v2_all_gather_sole_executor.cc 的 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU 块）
+// 无法生效，AlgMetaRegistry 无 (ALLGATHER, sole[mesh]) 的 CCU 行，resolver 无候选。
+// 按产品现场同款注册一行，供 EXTERNAL 闸门 C 成功链路用例使用。
+namespace mc2_ops_hccl {
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_ALLGATHER, CcuSchedAllGatherSoleMesh, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE);
 } // namespace mc2_ops_hccl
 
 namespace {
@@ -264,6 +274,31 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_AllGather)
     EXPECT_EQ(RunCcuSelectAlg(comm_, stream_, topoTag, ccTilingList, 1, resCtx), HCCL_SUCCESS);
     EXPECT_EQ(resCtx.opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
     EXPECT_EQ(resCtx.algorithmType[0], static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherSoleMesh));
+}
+
+// EXTERNAL 通道端到端（闸门 C 成功链路）：合法外部名经 tiling algConfig 进入，
+// resolver 定名 CcuSchedAllGatherSoleMesh，algorithmType 回填正确（KFC 衔接证明）
+TEST_F(CcuMc2TestSuite, CcuSelectAlg_ExternalNameAccepted)
+{
+    SetCommEngineEnv(COMM_ENGINE_CCU);
+
+    OpResCtx resCtx{};
+    ASSERT_EQ(AllocCcuOpResCtx(comm_, "external_alg_ctx", g_stubRankSize, g_stubRankId, resCtx), HCCL_SUCCESS);
+
+    Mc2CcTilingInner ccTiling{};
+    ccTiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
+    ccTiling.commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED);
+    ccTiling.srcDataType = HCCL_DATA_TYPE_FP16;
+    ccTiling.dstDataType = HCCL_DATA_TYPE_FP16;
+    ccTiling.reduceType = HCCL_REDUCE_SUM;
+    strcpy(ccTiling.algConfig, "sole[mesh]");
+    const void* ccTilingList[] = {&ccTiling};
+    std::string topoTag[] = {"external_alg_tag"};
+
+    EXPECT_EQ(RunCcuSelectAlg(comm_, stream_, topoTag, ccTilingList, 1, resCtx), HCCL_SUCCESS);
+    EXPECT_EQ(resCtx.opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
+    EXPECT_EQ(resCtx.algorithmType[0], static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherSoleMesh));
+    EXPECT_TRUE(resCtx.isKfc[0]);
 }
 
 TEST_F(CcuMc2TestSuite, CcuSelectAlg_ParallelMeshNhrMultiLink)
@@ -755,7 +790,9 @@ TEST_F(CcuMc2TestSuite, TryForcedAlgExternalResolveFailIsStrict)
     EXPECT_EQ(TryForcedAlgAndPrepareEngine(comm_, &tiling, opParam, algName, topoInfo, accepted), HCCL_E_NOT_SUPPORT);
     EXPECT_FALSE(accepted);
     EXPECT_TRUE(algName.empty());
-    // resolve 失败后 opParam 复位到入口现场
+    // resolve 失败后 opParam 复位到入口现场：hcclComm 入口为 nullptr，PrepareTopoInfoForOp
+    // 会改写为 comm，复位断言钉住 opParam = opParamBackup 真正生效（engine 全程未变，弱断言仅留作旁证）
+    EXPECT_EQ(opParam.hcclComm, nullptr);
     EXPECT_EQ(opParam.engine, CommEngine::COMM_ENGINE_AICPU_TS);
 }
 

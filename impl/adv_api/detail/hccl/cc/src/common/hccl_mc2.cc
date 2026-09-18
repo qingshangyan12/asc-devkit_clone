@@ -406,6 +406,7 @@ bool CheckCcuAlgorithmsRegistered(const void* ccTilingList[], uint32_t tilingNum
         if (kind == ForcedAlgKind::EXTERNAL) {
             // 闸门 B（设计 §11）：解析失败 / 无 CCU 候选 / 候选未过双名单 → 拒（HCCL_E_ALG_NOT_SUPPORTED 语义不变）。
             // 此时不定名，真定名在闸门 C（SelectCcuAlgorithm → resolver → FillCcuAlgTypeAndName）。
+            // 与 TryForcedAlgAndPrepareEngine、SelectCcuAlgorithm 分配路径为同构严格分支，修改报错语义时三处同步。
             if (!extParseErrMsg.empty()) {
                 HCCL_WARNING(
                     "[MC2_EXT_ALG] ccu gate rejected, algConfig[%s], reason[%s].", ccTiling->algConfig,
@@ -424,6 +425,7 @@ bool CheckCcuAlgorithmsRegistered(const void* ccTilingList[], uint32_t tilingNum
                     HCCL_INFO(
                         "[MC2_EXT_ALG] ccu gate passed, algConfig[%s], ccuCandidate[%s].", ccTiling->algConfig,
                         cand.registeredName.c_str());
+                    // tilingNum<=1 已由上方守卫保证，此处早退与逐 tiling 全量检查等价
                     return true; // >=1 过双名单即放行
                 }
             }

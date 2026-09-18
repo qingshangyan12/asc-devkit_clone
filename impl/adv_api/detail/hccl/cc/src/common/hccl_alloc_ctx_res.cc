@@ -725,11 +725,12 @@ HcclResult TryForcedAlgAndPrepareEngine(
     OpParam opParamBackup = opParam;
 
     if (kind == ForcedAlgKind::EXTERNAL) {
-        // 外部名通道：严格语义，无任何静默回退（设计 §10），跳过 CheckForcedAlgResource 预检（§8 注）
+        // 外部名通道：严格语义，无任何静默回退（设计 §10），跳过 CheckForcedAlgResource 预检（§8 注）。
+        // SelectCcuAlgorithm 分配路径与 hccl_mc2.cc 闸门 B 有同构严格分支，修改报错语义时三处同步。
         if (!extParseErrMsg.empty()) {
             HCCL_ERROR(
                 "[MC2_EXT_ALG] ERROR: parse failed, algConfig[%s], opType[%u], reason[%s].", ccTiling->algConfig,
-                static_cast<u32>(opParam.opType), extParseErrMsg.c_str());
+                ccTiling->opType, extParseErrMsg.c_str());
             return HCCL_E_NOT_SUPPORT;
         }
         CHK_RET(PrepareTopoInfoForOp(comm, opParam, topoInfo));
@@ -739,7 +740,7 @@ HcclResult TryForcedAlgAndPrepareEngine(
             ResolveStatus::RESOLVED) {
             HCCL_ERROR(
                 "[MC2_EXT_ALG] ERROR: resolve failed, algConfig[%s], opType[%u], reason[%s].", ccTiling->algConfig,
-                static_cast<u32>(opParam.opType), resolveErrMsg.c_str());
+                ccTiling->opType, resolveErrMsg.c_str());
             opParam = opParamBackup;
             return HCCL_E_NOT_SUPPORT;
         }
@@ -1086,7 +1087,8 @@ HcclResult SelectCcuAlgorithm(
     std::string extParseErrMsg;
     const ForcedAlgKind kind = GetForcedAlg(ccTiling, forcedAlgName, extSpec, extParseErrMsg);
     if (kind == ForcedAlgKind::EXTERNAL) {
-        // 闸门 C：真定名（resolver ①引擎过滤留 CCU 行）→ KFC 衔接（FillCcuAlgTypeAndName 现有机制）
+        // 闸门 C：真定名（resolver ①引擎过滤留 CCU 行）→ KFC 衔接（FillCcuAlgTypeAndName 现有机制）。
+        // 与 TryForcedAlgAndPrepareEngine、hccl_mc2.cc 闸门 B 为同构严格分支，修改报错语义时三处同步。
         if (!extParseErrMsg.empty()) {
             HCCL_ERROR(
                 "[MC2_EXT_ALG] ERROR: parse failed, algConfig[%s], opType[%u], reason[%s].", ccTiling->algConfig,
