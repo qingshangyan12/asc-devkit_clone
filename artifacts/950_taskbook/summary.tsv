@@ -3,6 +3,10 @@ mmad_mx	1	dav-3510	PASS	PASS	PASS	s1
 mmad_mx	2	dav-3510	PASS	PASS	PASS	s2
 mmad_mx	3	dav-3510	PASS	PASS	PASS	s3
 mmad_mx	4	dav-3510	PASS	PASS	PASS	s4
+mmad_mx	5	dav-3510	PASS	PASS	PASS	s5
+mmad_mx	6	dav-3510	PASS	PASS	PASS	s6
+mmad_mx	7	dav-3510	PASS	PASS	PASS	s7
+mmad_mx	8	dav-3510	PASS	PASS	PASS	s8
 load_data_2dmx_l12l0	1	dav-3510	PASS	PASS	PASS	s1
 load_data_2dmx_l12l0	2	dav-3510	PASS	PASS	PASS	s2
 load_data_2dmx_l12l0	3	dav-3510	PASS	PASS	PASS	s3
