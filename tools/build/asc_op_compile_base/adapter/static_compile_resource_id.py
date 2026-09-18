@@ -19,6 +19,8 @@ import tempfile
 
 _RESOURCE_ID_TYPE = 6
 _RESOURCE_ID_VALUE_SIZE = 64
+_TLV_HEAD_SIZE = 4
+_HASH_CHUNK_SIZE = 1024 * 1024
 
 
 class ResourceIdError(RuntimeError):
@@ -43,22 +45,26 @@ def _validate_elf(dynamic_object_path):
         raise ResourceIdError(f"input is not an ELF object: {dynamic_object_path}")
 
 
+def _hash_object(object_path):
+    _validate_elf(object_path)
+    digest = hashlib.sha256()
+    try:
+        with open(object_path, "rb") as file_obj:
+            for chunk in iter(lambda: file_obj.read(_HASH_CHUNK_SIZE), b""):
+                digest.update(chunk)
+    except OSError as error:
+        raise ResourceIdError(f"failed to hash ELF object: {object_path}") from error
+    return digest.digest()
+
+
 def calculate_resource_id(object_paths):
-    """OR the SHA256 digests of objects in their final link order."""
-    digest = bytearray(32)
+    """XOR the SHA256 digests of linked objects."""
     if not object_paths:
         raise ResourceIdError("object list for resource_id must not be empty")
+    digest = bytearray(hashlib.sha256().digest_size)
     for object_path in object_paths:
-        _validate_elf(object_path)
-        try:
-            with open(object_path, "rb") as file_obj:
-                current = hashlib.sha256(file_obj.read()).digest()
-        except OSError as error:
-            raise ResourceIdError(
-                f"failed to hash ELF object: {object_path}"
-            ) from error
-        for index, value in enumerate(current):
-            digest[index] |= value
+        for index, value in enumerate(_hash_object(object_path)):
+            digest[index] ^= value
     return digest.hex()
 
 
@@ -71,12 +77,16 @@ def _render_resource_id_source(resource_id):
         "struct BinaryMetaResourceId {\n"
         "    unsigned short type;\n"
         "    unsigned short len;\n"
-        "    char value[64];\n"
+        "    char value[%d];\n"
         "};\n"
+        "static_assert(sizeof(BinaryMetaResourceId) == %d,\n"
+        '              "BinaryMetaResourceId must stay packed as type|len|value");\n'
         '__attribute__((used, section(".ascend.meta")))\n'
         "static const struct BinaryMetaResourceId g_ascend_resource_id_section = "
         "{%d, %d, {%s}};\n"
         % (
+            _RESOURCE_ID_VALUE_SIZE,
+            _TLV_HEAD_SIZE + _RESOURCE_ID_VALUE_SIZE,
             _RESOURCE_ID_TYPE,
             _RESOURCE_ID_VALUE_SIZE,
             value,
@@ -95,6 +105,11 @@ def generate_resource_id_object(
     from .ascendc_common_utility import CommonUtility, CompileStage
 
     resource_id = calculate_resource_id(object_paths)
+    if len(resource_id) != _RESOURCE_ID_VALUE_SIZE:
+        raise ResourceIdError(
+            "resource_id must be %d characters, got %d"
+            % (_RESOURCE_ID_VALUE_SIZE, len(resource_id))
+        )
     if not compile_command or not all(compile_command) or not cce_arch:
         raise ResourceIdError("compile command and cce arch must be provided")
     directory = os.path.dirname(os.path.realpath(output_path))

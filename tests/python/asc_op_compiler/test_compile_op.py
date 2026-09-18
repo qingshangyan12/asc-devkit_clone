@@ -207,14 +207,15 @@ def read_resource_id_section_for_test(binary_file):
         if result.returncode != 0:
             raise AssertionError(f"Failed to read Resource ID: {result.stdout}")
         section_data = Path(dump_file).read_bytes()
+        head_size = static_compile_resource_id._TLV_HEAD_SIZE
         offset = 0
-        while offset + 4 <= len(section_data):
+        while offset + head_size <= len(section_data):
             entry_type = int.from_bytes(section_data[offset : offset + 2], "little")
             length = int.from_bytes(section_data[offset + 2 : offset + 4], "little")
-            value = section_data[offset + 4 : offset + 4 + length]
-            if entry_type == 6:
+            value = section_data[offset + head_size : offset + head_size + length]
+            if entry_type == static_compile_resource_id._RESOURCE_ID_TYPE:
                 return value.decode("ascii")
-            offset += 4 + length
+            offset += head_size + length
         raise AssertionError("Resource ID entry not found in .ascend.meta")
 
 
