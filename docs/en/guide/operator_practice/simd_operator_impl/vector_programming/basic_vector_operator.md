@@ -235,6 +235,7 @@ Based on the vector programming paradigm, the kernel function implementation is 
     inQueueY.EnQue(yLocal);
     ```
 
+
 2.  Stage2: Compute implementation.
 
     <a id="copyout-implementation"></a>
