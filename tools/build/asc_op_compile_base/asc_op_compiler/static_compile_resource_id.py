@@ -9,18 +9,20 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
-"""Build a Resource ID metadata object from the linked object inputs."""
+"""Derive a Resource ID from the linked object inputs and publish it as metadata."""
 
 from contextlib import suppress
 import hashlib
 import os
+import subprocess
 import tempfile
 
 
 _RESOURCE_ID_TYPE = 6
 _RESOURCE_ID_VALUE_SIZE = 64
-_TLV_HEAD_SIZE = 4
 _HASH_CHUNK_SIZE = 1024 * 1024
+_META_SECTION = ".ascend.meta"
+_OBJCOPY = "llvm-objcopy"
 
 
 class ResourceIdError(RuntimeError):
@@ -72,93 +74,93 @@ def calculate_resource_id(object_paths):
     return digest.hex()
 
 
-def _render_resource_id_source(resource_id):
-    """Render the C++ source that places the Resource ID into .ascend.meta."""
-    # Initialize the value array character by character: a string literal of
-    # exactly 64 chars carries an implicit NUL, which would overflow the array.
-    value = ", ".join(f"'{char}'" for char in resource_id)
-    return (
-        "struct BinaryMetaResourceId {\n"
-        "    unsigned short type;\n"
-        "    unsigned short len;\n"
-        "    char value[%d];\n"
-        "};\n"
-        "static_assert(sizeof(BinaryMetaResourceId) == %d,\n"
-        '              "BinaryMetaResourceId must stay packed as type|len|value");\n'
-        '__attribute__((used, section(".ascend.meta")))\n'
-        "static const struct BinaryMetaResourceId g_ascend_resource_id_section = "
-        "{%d, %d, {%s}};\n"
-        % (
-            _RESOURCE_ID_VALUE_SIZE,
-            _TLV_HEAD_SIZE + _RESOURCE_ID_VALUE_SIZE,
-            _RESOURCE_ID_TYPE,
-            _RESOURCE_ID_VALUE_SIZE,
-            value,
+def _dump_meta_section(object_path, dump_path):
+    """Return the raw .ascend.meta bytes, or None when the object has no such section."""
+    try:
+        result = subprocess.run(
+            [
+                _OBJCOPY,
+                "--dump-section",
+                f"{_META_SECTION}={dump_path}",
+                object_path,
+                os.devnull,
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            check=False,
         )
-    )
+    except OSError as error:
+        raise ResourceIdError(f"failed to execute {_OBJCOPY}") from error
+    # objcopy fails when the section is absent, which simply means nothing is there yet.
+    if result.returncode != 0:
+        return None
+    try:
+        with open(dump_path, "rb") as dump_file:
+            return dump_file.read()
+    except OSError as error:
+        raise ResourceIdError(
+            f"failed to read {_META_SECTION} of {object_path}"
+        ) from error
 
 
-def generate_resource_id_object(
-    object_paths,
-    output_path,
-    compile_command,
-    cce_arch,
-    compile_log_path=None,
-):
-    """Compile the Resource ID into a .ascend.meta metadata object."""
+def attach_resource_id_entry(object_path, resource_id, compile_log_path=None):
+    """Append the Resource ID TLV entry to an already linked object.
+
+    .ascend.meta is a plain concatenation of TLV entries, so the entry is built
+    by hand and appended to whatever the link produced. The layout must stay in
+    step with BinaryMetaResourceId in impl/basic_api/utils/kernel_utils_macros.h.
+    """
     from .ascendc_common_utility import CommonUtility, CompileStage
 
-    resource_id = calculate_resource_id(object_paths)
     if len(resource_id) != _RESOURCE_ID_VALUE_SIZE:
         raise ResourceIdError(
             "resource_id must be %d characters, got %d"
             % (_RESOURCE_ID_VALUE_SIZE, len(resource_id))
         )
-    if not compile_command or not all(compile_command) or not cce_arch:
-        raise ResourceIdError("compile command and cce arch must be provided")
-    directory = os.path.dirname(os.path.realpath(output_path))
-    os.makedirs(directory, exist_ok=True)
-    source_fd = None
-    source_path = None
+    entry = (
+        _RESOURCE_ID_TYPE.to_bytes(2, "little")
+        + _RESOURCE_ID_VALUE_SIZE.to_bytes(2, "little")
+        + resource_id.encode("ascii")
+    )
+    directory = os.path.dirname(os.path.realpath(object_path))
     try:
-        source_fd, source_path = tempfile.mkstemp(
-            prefix=".resource_id.source.", suffix=".cpp", dir=directory
+        payload_fd, payload_path = tempfile.mkstemp(
+            prefix=".ascend.meta.", dir=directory
         )
-        source_file = os.fdopen(source_fd, "w")
-        source_fd = None
-        with source_file:
-            source_file.write(_render_resource_id_source(resource_id))
-        with suppress(FileNotFoundError):
-            os.unlink(output_path)
+    except OSError as error:
+        raise ResourceIdError(f"failed to stage {_META_SECTION} payload") from error
+    os.close(payload_fd)
+    try:
+        existing = _dump_meta_section(object_path, payload_path)
+        try:
+            with open(payload_path, "wb") as payload_file:
+                payload_file.write((existing or b"") + entry)
+        except OSError as error:
+            raise ResourceIdError(f"failed to stage {_META_SECTION} payload") from error
+        if existing is None:
+            command = [
+                _OBJCOPY,
+                "--add-section",
+                f"{_META_SECTION}={payload_path}",
+                "--set-section-flags",
+                f"{_META_SECTION}=readonly",
+                object_path,
+            ]
+        else:
+            command = [
+                _OBJCOPY,
+                "--update-section",
+                f"{_META_SECTION}={payload_path}",
+                object_path,
+            ]
         CommonUtility.run_cmd_inner(
-            list(compile_command)
-            + [
-                "-c",
-                "-O3",
-                "-xcce",
-                source_path,
-                "--cce-aicore-arch=" + cce_arch,
-                "--cce-aicore-only",
-                "-std=c++17",
-                "-o",
-                output_path,
-            ],
-            CompileStage.COMPILE,
-            compile_log_path,
+            command, CompileStage.SPECIALIZATION, compile_log_path
         )
-        if not os.path.isfile(output_path):
-            raise ResourceIdError(f"compile resource id object failed: {output_path}")
-        return resource_id
+        written = _dump_meta_section(object_path, payload_path)
+        if written is None or entry not in written:
+            raise ResourceIdError(
+                f"failed to attach resource id to {_META_SECTION} of {object_path}"
+            )
     finally:
-        for file_descriptor in (source_fd,):
-            if file_descriptor is None:
-                continue
-            with suppress(OSError):
-                os.close(file_descriptor)
-        for path in (source_path,):
-            if path is None:
-                continue
-            try:
-                os.unlink(path)
-            except FileNotFoundError:
-                pass
+        with suppress(OSError):
+            os.unlink(payload_path)

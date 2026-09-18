@@ -87,7 +87,10 @@ class TestStaticCompileResourceId(unittest.TestCase):
         header = Path(
             os.path.join(TOP_PATH, "impl/basic_api/utils/kernel_utils_macros.h")
         ).read_text(encoding="utf-8")
-        self.assertIn(f"B_TYPE_RESOURCE_ID = {MODULE._RESOURCE_ID_TYPE}", header)
+        self.assertIn(
+            f"B_TYPE_SPECIALIZATION_RESOURCE_ID = {MODULE._RESOURCE_ID_TYPE}",
+            header,
+        )
         base_tlv = re.search(r"struct BaseTlv \{(.*?)\}", header, re.S)
         self.assertIsNotNone(base_tlv)
         self.assertEqual(
@@ -98,112 +101,93 @@ class TestStaticCompileResourceId(unittest.TestCase):
         self.assertIn("BaseTlv head;", entry.group(1))
         self.assertIn(f"char value[{MODULE._RESOURCE_ID_VALUE_SIZE}];", entry.group(1))
 
-    def test_empty_or_non_elf_inputs_are_rejected(self):
-        with self.assertRaisesRegex(MODULE.ResourceIdError, "must not be empty"):
-            MODULE.calculate_resource_id([])
-        bad_path = os.path.join(self.temp_dir.name, "bad.o")
-        Path(bad_path).write_bytes(b"not elf")
-        with self.assertRaisesRegex(MODULE.ResourceIdError, "not an ELF"):
-            MODULE.calculate_resource_id([bad_path])
+    def test_adds_section_when_absent(self):
+        object_path = os.path.join(self.temp_dir.name, "kernel.o")
+        Path(object_path).write_bytes(b"\x7fELFobject")
+        resource_id = "a" * MODULE._RESOURCE_ID_VALUE_SIZE
+        commands, stages = [], []
+        section = {"data": None}
 
-    def test_generates_metadata_object_and_keeps_inputs_unchanged(self):
-        output_path = os.path.join(self.temp_dir.name, "resource_id.o")
-        commands = []
-        stages = []
-        log_paths = []
-        sources = []
-        original = [Path(path).read_bytes() for path in self.object_paths]
+        def fake_dump(obj_path, dump_path):
+            return section["data"]
 
         def fake_run_cmd_inner(cmds, stage, compile_log_path=None):
             commands.append(cmds)
             stages.append(stage)
-            log_paths.append(compile_log_path)
-            source_index = cmds.index("-xcce") + 1
-            sources.append(Path(cmds[source_index]).read_text(encoding="utf-8"))
-            Path(cmds[cmds.index("-o") + 1]).write_bytes(b"\x7fELF")
+            payload = cmds[cmds.index("--add-section") + 1].split("=", 1)[1]
+            section["data"] = Path(payload).read_bytes()
 
+        with mock.patch.object(MODULE, "_dump_meta_section", side_effect=fake_dump):
+            with mock.patch.object(
+                CommonUtility, "run_cmd_inner", side_effect=fake_run_cmd_inner
+            ):
+                MODULE.attach_resource_id_entry(object_path, resource_id, "compile.log")
+
+        # Nothing to preserve, so the section is created outright.
+        self.assertEqual(len(commands), 1)
+        self.assertIn("--add-section", commands[0])
+        self.assertNotIn("--update-section", commands[0])
+        self.assertEqual(stages, [CompileStage.SPECIALIZATION])
+        expected = (
+            MODULE._RESOURCE_ID_TYPE.to_bytes(2, "little")
+            + MODULE._RESOURCE_ID_VALUE_SIZE.to_bytes(2, "little")
+            + resource_id.encode("ascii")
+        )
+        self.assertEqual(section["data"], expected)
+        self.assertEqual(len(expected), 4 + MODULE._RESOURCE_ID_VALUE_SIZE)
+
+    def test_updates_section_and_keeps_existing_entries(self):
+        object_path = os.path.join(self.temp_dir.name, "kernel.o")
+        Path(object_path).write_bytes(b"\x7fELFobject")
+        resource_id = "b" * MODULE._RESOURCE_ID_VALUE_SIZE
+        feature = (
+            (4).to_bytes(2, "little") + (4).to_bytes(2, "little") + b"\x03\x00\x00\x00"
+        )
+        section = {"data": feature}
+        commands = []
+
+        def fake_dump(obj_path, dump_path):
+            return section["data"]
+
+        def fake_run_cmd_inner(cmds, stage, compile_log_path=None):
+            commands.append(cmds)
+            payload = cmds[cmds.index("--update-section") + 1].split("=", 1)[1]
+            section["data"] = Path(payload).read_bytes()
+
+        with mock.patch.object(MODULE, "_dump_meta_section", side_effect=fake_dump):
+            with mock.patch.object(
+                CommonUtility, "run_cmd_inner", side_effect=fake_run_cmd_inner
+            ):
+                MODULE.attach_resource_id_entry(object_path, resource_id)
+
+        # One call swaps the whole section, so it is never missing in between.
+        self.assertEqual(len(commands), 1)
+        self.assertIn("--update-section", commands[0])
+        self.assertNotIn("--remove-section", commands[0])
+        self.assertTrue(section["data"].startswith(feature))
+        self.assertTrue(section["data"].endswith(resource_id.encode("ascii")))
+
+    def test_attach_rejects_wrong_length_missing_tool_and_missing_result(self):
+        object_path = os.path.join(self.temp_dir.name, "kernel.o")
+        Path(object_path).write_bytes(b"\x7fELFobject")
+        with self.assertRaisesRegex(MODULE.ResourceIdError, "must be 64 characters"):
+            MODULE.attach_resource_id_entry(object_path, "short")
+        resource_id = "c" * MODULE._RESOURCE_ID_VALUE_SIZE
+        # A missing objcopy must surface as a ResourceIdError, not a bare OSError.
         with mock.patch.object(
-            CommonUtility, "run_cmd_inner", side_effect=fake_run_cmd_inner
+            MODULE.subprocess, "run", side_effect=FileNotFoundError(2, "no such file")
         ):
-            resource_id = MODULE.generate_resource_id_object(
-                self.object_paths,
-                output_path,
-                ["fake-ccec"],
-                "dav-c220-cube",
-                "compile.log",
-            )
-        self.assertEqual(len(resource_id), 64)
-        self.assertEqual(
-            commands[0][:4],
-            ["fake-ccec", "-c", "-O3", "-xcce"],
-        )
-        self.assertIn("--cce-aicore-arch=dav-c220-cube", commands[0])
-        self.assertIn("-std=c++17", commands[0])
-        self.assertEqual(commands[0][-1], output_path)
-        self.assertEqual(stages, [CompileStage.COMPILE])
-        self.assertEqual(log_paths, ["compile.log"])
-        source = sources[0]
-        self.assertIn("struct BinaryMetaResourceId", source)
-        self.assertIn(f"char value[{MODULE._RESOURCE_ID_VALUE_SIZE}];", source)
-        self.assertIn(
-            "static_assert(sizeof(BinaryMetaResourceId) == %d,"
-            % (MODULE._TLV_HEAD_SIZE + MODULE._RESOURCE_ID_VALUE_SIZE),
-            source,
-        )
-        self.assertIn('__attribute__((used, section(".ascend.meta")))', source)
-        self.assertIn(
-            "static const struct BinaryMetaResourceId g_ascend_resource_id_section = "
-            "{%d, %d, {%s}};"
-            % (
-                MODULE._RESOURCE_ID_TYPE,
-                MODULE._RESOURCE_ID_VALUE_SIZE,
-                ", ".join(f"'{char}'" for char in resource_id),
-            ),
-            source,
-        )
-        self.assertEqual(Path(self.object_paths[0]).read_bytes(), original[0])
-        self.assertEqual(Path(self.object_paths[1]).read_bytes(), original[1])
-        self.assertEqual(Path(output_path).read_bytes(), b"\x7fELF")
-
-    def test_compile_failure_and_stale_output_are_detected(self):
-        output_path = os.path.join(self.temp_dir.name, "resource_id.o")
-        for stale in (False, True):
-            with self.subTest(stale_output=stale):
-                if stale:
-                    Path(output_path).write_bytes(b"stale object")
-                with mock.patch.object(
-                    CommonUtility,
-                    "run_cmd_inner",
-                    side_effect=lambda cmds, stage, compile_log_path=None: None,
-                ):
-                    with self.assertRaisesRegex(
-                        MODULE.ResourceIdError, "compile resource id object failed"
-                    ):
-                        MODULE.generate_resource_id_object(
-                            self.object_paths,
-                            output_path,
-                            ["fake-ccec"],
-                            "dav-c220-cube",
-                        )
-                self.assertFalse(Path(output_path).exists())
-
-    def test_missing_compiler_or_arch_is_rejected(self):
-        output_path = os.path.join(self.temp_dir.name, "resource_id.o")
-        for compile_command, cce_arch in (
-            ([], "dav-c220-cube"),
-            ([None], "dav-c220-cube"),
-            (["fake-ccec"], ""),
-        ):
-            with self.subTest(compile_command=compile_command, cce_arch=cce_arch):
+            with self.assertRaisesRegex(MODULE.ResourceIdError, "failed to execute"):
+                MODULE.attach_resource_id_entry(object_path, resource_id)
+        # objcopy reporting success while writing nothing must still be caught.
+        with mock.patch.object(MODULE, "_dump_meta_section", return_value=None):
+            with mock.patch.object(
+                CommonUtility, "run_cmd_inner", side_effect=lambda *a, **k: None
+            ):
                 with self.assertRaisesRegex(
-                    MODULE.ResourceIdError, "compile command and cce arch"
+                    MODULE.ResourceIdError, "failed to attach resource id"
                 ):
-                    MODULE.generate_resource_id_object(
-                        self.object_paths,
-                        output_path,
-                        compile_command,
-                        cce_arch,
-                    )
+                    MODULE.attach_resource_id_entry(object_path, resource_id)
 
 
 if __name__ == "__main__":
