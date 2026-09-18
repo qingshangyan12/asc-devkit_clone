@@ -107,9 +107,9 @@ __aicore__ inline __sync_alias__ LocalTensor<T> TBuf<pos>::GetWithOffset(uint32_
     ASCENDC_DEBUG_ASSERT((size > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "size should be larger than 0"));
     ASCENDC_DEBUG_ASSERT(
         (bufOffset % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "bufOffset should be 32B aligned"));
-    ASCENDC_DEBUG_ASSERT(
-        (bufOffset <= bufLen && dataLen <= bufLen - bufOffset),
-        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "data range exceeds TBuf length"));
+    ASCENDC_ASSERT((bufOffset <= bufLen && dataLen <= bufLen - bufOffset), {
+        KERNEL_LOG(KERNEL_ERROR, "data range exceeds TBuf length");
+    });
 #endif
     ptr->dataLen = dataLen;
     TBuffAddr addr;
