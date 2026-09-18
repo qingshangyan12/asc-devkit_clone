@@ -49,8 +49,10 @@ inline void sincospif(float x, float *s, float *c)
 
 ## 返回值说明
 
--   当x\*π超出float最大范围或超出float最小范围时，输出值为nan。
--   当输入x为inf、-inf、nan时，输出值为nan。
+-   当输入x为有限值且Abs\(x\)\>=2^24时，输出参数s为与x符号一致的零，输出参数c为1.0。
+-   当输入x为整数且|Abs\(x\)\<2^24时，输出参数s为与x符号一致的零。
+-   当输入x为整数且|Abs\(x\)\<2^24时，若x为偶数，输出参数c返回1.0；若x为奇数，输出参数c返回-1.0。
+-   当输入x为inf、-inf或nan时，输出参数s和c均为nan。
 
 ## 约束说明
 
