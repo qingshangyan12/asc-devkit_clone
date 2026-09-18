@@ -236,48 +236,48 @@ __simd_callee__ inline reg_tensor<T> leaky_relu(const reg_tensor<T>& src, const 
 }
 
 template <typename T>
-__simd_callee__ inline carry_result<T> addc(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+__simd_callee__ inline reg_pair<T, bool> addc(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
-    static_assert(detail::supports_carry_v<T>, "addc does not support this element type");
-    carry_result<T> result;
-    asc_add(result.carry.reg, result.value.reg, src0.reg, src1.reg, src0.mask);
-    result.value.mask = src0.mask;
-    result.carry.mask = src0.mask;
+    static_assert(detail::supports_carry_v<T>, "addc supports int32_t and uint32_t");
+    reg_pair<T, bool> result;
+    asc_add(result.second.reg, result.first.reg, src0.reg, src1.reg, src0.mask);
+    result.first.mask = src0.mask;
+    result.second.mask = src0.mask;
     return result;
 }
 
 template <typename T>
-__simd_callee__ inline carry_result<T> addc(
+__simd_callee__ inline reg_pair<T, bool> addc(
     const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<bool>& carry_src)
 {
-    static_assert(detail::supports_carry_v<T>, "addc does not support this element type");
-    carry_result<T> result;
-    asc_addc(result.carry.reg, result.value.reg, src0.reg, src1.reg, carry_src.reg, src0.mask);
-    result.value.mask = src0.mask;
-    result.carry.mask = src0.mask;
+    static_assert(detail::supports_carry_v<T>, "addc supports int32_t and uint32_t");
+    reg_pair<T, bool> result;
+    asc_addc(result.second.reg, result.first.reg, src0.reg, src1.reg, carry_src.reg, src0.mask);
+    result.first.mask = src0.mask;
+    result.second.mask = src0.mask;
     return result;
 }
 
 template <typename T>
-__simd_callee__ inline carry_result<T> subc(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+__simd_callee__ inline reg_pair<T, bool> subc(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
-    static_assert(detail::supports_carry_v<T>, "subc does not support this element type");
-    carry_result<T> result;
-    asc_sub(result.carry.reg, result.value.reg, src0.reg, src1.reg, src0.mask);
-    result.value.mask = src0.mask;
-    result.carry.mask = src0.mask;
+    static_assert(detail::supports_carry_v<T>, "subc supports int32_t and uint32_t");
+    reg_pair<T, bool> result;
+    asc_sub(result.second.reg, result.first.reg, src0.reg, src1.reg, src0.mask);
+    result.first.mask = src0.mask;
+    result.second.mask = src0.mask;
     return result;
 }
 
 template <typename T>
-__simd_callee__ inline carry_result<T> subc(
-    const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<bool>& carry_src)
+__simd_callee__ inline reg_pair<T, bool> subc(
+    const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<bool>& borrow_src)
 {
-    static_assert(detail::supports_carry_v<T>, "subc does not support this element type");
-    carry_result<T> result;
-    asc_subc(result.carry.reg, result.value.reg, src0.reg, src1.reg, carry_src.reg, src0.mask);
-    result.value.mask = src0.mask;
-    result.carry.mask = src0.mask;
+    static_assert(detail::supports_carry_v<T>, "subc supports int32_t and uint32_t");
+    reg_pair<T, bool> result;
+    asc_subc(result.second.reg, result.first.reg, src0.reg, src1.reg, borrow_src.reg, src0.mask);
+    result.first.mask = src0.mask;
+    result.second.mask = src0.mask;
     return result;
 }
 
