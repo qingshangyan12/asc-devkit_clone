@@ -29,30 +29,6 @@
 
 `reviewed_documents` 与 `documents.path` 必须恰好等于任务包分配的路径。某篇文档可以没有 proposal：使用 `proposed_tags: []` 和 `evidence: {}`。每个 proposal 恰有一个非空、逐字匹配正文的 evidence。若范围至少有三篇文档，`peer_paths` 必须包含两条不同、存在且不等于 `path` 的 API Markdown 路径。
 
-## 检索金标准输出
-
-写入 `outputs/retrieval-gold.json`。
-
-```json
-{
-  "schema_version": 1,
-  "purpose": "independent_retrieval_gold",
-  "run_id": "example-v1",
-  "worker": "retrieval-gold",
-  "reviewed_documents": ["docs/.../api.md"],
-  "queries": [
-    {
-      "id": "q-001",
-      "query": "用户自然语言请求",
-      "relevant_paths": ["docs/.../api-a.md", "docs/.../api-b.md"],
-      "confusing_paths": ["docs/.../api-c.md"]
-    }
-  ]
-}
-```
-
-查询数量至少达到任务包声明的最小值，且共同引用每篇被分配文档。relevant 和 confusing 路径必须在任务包内且互不重叠。
-
 ## 主代理评选
 
 仅在所有 worker 报告有效后写入 `main-agent-review.json`。
@@ -71,27 +47,23 @@
     {
       "tag": "operations:example_operation",
       "decision": "approve",
-      "reason": "两个发现子代理均支持，且金标准查询需要该区分。",
+      "reason": "两个发现子代理均支持，且源文证据充分。",
       "definition": "稳定、用户可见的操作定义。",
       "selection_rule": "当 API 自身文档说明执行该操作时使用。",
       "evidence": [
         {"path": "docs/.../api-a.md", "excerpt": "逐字源文证据。"},
         {"path": "docs/.../api-b.md", "excerpt": "逐字源文证据。"}
-      ],
-      "retrieval_cases": [
-        {"query_id": "q-001", "effect": "candidate_filter"},
-        {"query_id": "q-002", "effect": "rank_boost"}
       ]
     }
   ]
 }
 ```
 
-汇总中每个 `requires_main_agent_review` 候选都必须恰有一个 `approve`、`defer` 或 `reject` 决定。`approve` 至少需要两篇不同文档的 evidence，以及 profile 规定数量的不同金标准 `query_id`。记录 normalizations 后，两个发现子代理必须都支持该值。
+汇总中每个 `requires_main_agent_review` 候选都必须恰有一个 `approve`、`defer` 或 `reject` 决定。`approve` 至少需要两篇不同文档的逐字 evidence。记录 normalizations 后，两个发现子代理必须都支持该值。
 
 ## 人工审批
 
-审阅 `approval/release-bundle.json` 与 provisional taxonomy/profile diff 后，才可创建 `approval.json`。
+审阅 `approval/release-bundle.json` 与 provisional taxonomy diff 后，才可创建 `approval.json`。
 
 ```json
 {
@@ -105,7 +77,7 @@
 }
 ```
 
-只有 `decision: "approve"` 才能生成冻结 taxonomy/profile。拒绝或延后必须保留运行工件，不得修改既有 release。
+只有 `decision: "approve"` 才能生成冻结 taxonomy。拒绝或延后必须保留运行工件，不得修改既有 release。
 
 ## 最终 API 标注的必填概念
 

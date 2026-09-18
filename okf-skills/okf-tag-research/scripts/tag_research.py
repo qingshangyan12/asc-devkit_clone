@@ -25,9 +25,9 @@ SCHEMA_VERSION = 1
 TAG_RE = re.compile(r"^(?P<namespace>[a-z][a-z0-9_]*):(?P<value>[a-z][a-z0-9_]*)$")
 RUN_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 SKILL_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_TAXONOMY = SKILL_ROOT / "taxonomy" / "core-v8-frozen.json"
-DEFAULT_PROFILE = SKILL_ROOT / "taxonomy" / "retrieval-profile-v7.json"
-RELEASE_DIR = SKILL_ROOT / "taxonomy" / "releases"
+GENERATOR_SKILL_ROOT = SKILL_ROOT.parent / "okf-tag-generate"
+DEFAULT_TAXONOMY = GENERATOR_SKILL_ROOT / "taxonomy" / "core-v8-frozen.json"
+RELEASE_DIR = GENERATOR_SKILL_ROOT / "taxonomy" / "releases"
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -107,38 +107,6 @@ def known_tags(taxonomy: dict[str, Any]) -> set[str]:
         for namespace, definition in taxonomy_namespaces(taxonomy).items()
         for value in definition["values"]
     }
-
-
-def validate_profile(profile: dict[str, Any], taxonomy: dict[str, Any]) -> tuple[int, int, dict[str, dict[str, Any]]]:
-    requirements = profile.get("proposal_requirements")
-    namespaces = profile.get("namespaces")
-    taxonomy_spaces = taxonomy_namespaces(taxonomy)
-    required = required_namespaces(taxonomy)
-    if not isinstance(requirements, dict) or not isinstance(namespaces, dict):
-        raise ValueError("profile has no proposal requirements or namespaces")
-    if set(namespaces) != set(taxonomy_spaces):
-        raise ValueError("profile namespaces do not match taxonomy namespaces")
-    declared_required = profile.get("required_namespaces")
-    if declared_required is not None and (
-        not isinstance(declared_required, list) or set(declared_required) != required
-    ):
-        raise ValueError("profile required_namespaces do not match taxonomy")
-    minimum_documents = requirements.get("minimum_distinct_documents")
-    minimum_cases = requirements.get("minimum_independent_retrieval_cases")
-    if not isinstance(minimum_documents, int) or minimum_documents < 2:
-        raise ValueError("profile minimum_distinct_documents must be at least 2")
-    if not isinstance(minimum_cases, int) or minimum_cases < 2:
-        raise ValueError("profile minimum_independent_retrieval_cases must be at least 2")
-    for namespace, config in namespaces.items():
-        if not isinstance(config, dict) or not isinstance(config.get("proposal_allowed"), bool):
-            raise ValueError(f"profile namespace is invalid: {namespace}")
-        enabled = config.get("enabled_values")
-        if not isinstance(enabled, list) or len(enabled) != len(set(enabled)):
-            raise ValueError(f"profile enabled values are invalid: {namespace}")
-        unknown = set(enabled) - set(taxonomy_spaces[namespace]["values"])
-        if unknown:
-            raise ValueError(f"profile enables unknown values: {namespace}")
-    return minimum_documents, minimum_cases, namespaces
 
 
 def resolve_inside(root: Path, candidate: Path) -> Path:
@@ -379,61 +347,6 @@ def validation_payload(manifest: dict[str, Any], worker: str, errors: list[str])
     }
 
 
-def gold_validation(manifest: dict[str, Any]) -> dict[str, Any]:
-    worker = "retrieval-gold"
-    errors = validate_source_snapshot(manifest)
-    result_path = output_path(manifest, worker)
-    if not result_path.is_file():
-        errors.append(f"worker output is missing: {result_path}")
-        return validation_payload(manifest, worker, errors)
-    payload = read_json(result_path)
-    expected = assigned_paths(assignment(manifest, worker))
-    minimum = manifest["thresholds"]["minimum_gold_queries"]
-    if payload.get("schema_version") != SCHEMA_VERSION:
-        errors.append("schema_version is invalid")
-    if payload.get("purpose") != "independent_retrieval_gold":
-        errors.append("purpose must be independent_retrieval_gold")
-    if payload.get("run_id") != manifest.get("run_id") or payload.get("worker") != worker:
-        errors.append("run_id or worker does not match the assignment")
-    reviewed = payload.get("reviewed_documents")
-    if not isinstance(reviewed, list) or set(reviewed) != expected or len(reviewed) != len(set(reviewed)):
-        errors.append("reviewed_documents do not exactly match the assignment")
-    queries = payload.get("queries")
-    if not isinstance(queries, list) or len(queries) < minimum:
-        errors.append(f"requires at least {minimum} retrieval queries")
-        queries = [] if not isinstance(queries, list) else queries
-    ids: set[str] = set()
-    covered: set[str] = set()
-    for query in queries:
-        if not isinstance(query, dict):
-            errors.append("retrieval query is invalid")
-            continue
-        query_id = query.get("id")
-        if not isinstance(query_id, str) or not query_id or query_id in ids:
-            errors.append("retrieval query id is invalid or duplicated")
-        else:
-            ids.add(query_id)
-        if not isinstance(query.get("query"), str) or not query["query"].strip():
-            errors.append(f"{query_id}: query text is missing")
-        relevant = query.get("relevant_paths")
-        confusing = query.get("confusing_paths")
-        if not isinstance(relevant, list) or len(relevant) < 2 or len(relevant) != len(set(relevant)):
-            errors.append(f"{query_id}: requires two distinct relevant paths")
-            continue
-        if not isinstance(confusing, list) or not confusing or len(confusing) != len(set(confusing)):
-            errors.append(f"{query_id}: requires a confusing path")
-            continue
-        if set(relevant).union(confusing) - expected:
-            errors.append(f"{query_id}: paths are outside the assignment")
-        if set(relevant).intersection(confusing):
-            errors.append(f"{query_id}: relevant and confusing paths overlap")
-        covered.update(relevant)
-        covered.update(confusing)
-    if queries and covered != expected:
-        errors.append("retrieval queries do not cover every assigned document")
-    return validation_payload(manifest, worker, errors)
-
-
 def require_valid_report(manifest: dict[str, Any], worker: str) -> None:
     report_path = Path(manifest["run_dir"]) / "validation" / f"{worker}.json"
     if not report_path.is_file():
@@ -458,7 +371,6 @@ def summarize_discovery(manifest: dict[str, Any]) -> dict[str, Any]:
     require_valid_report(manifest, "discovery-b")
     taxonomy = read_json(Path(manifest["taxonomy"]["path"]))
     known = known_tags(taxonomy)
-    _, _, profile_spaces = validate_profile(read_json(Path(manifest["profile"]["path"])), taxonomy)
     all_docs = source_documents(manifest)
     observations: dict[str, dict[str, dict[str, dict[str, Any]]]] = defaultdict(lambda: defaultdict(dict))
     for worker in ("discovery-a", "discovery-b"):
@@ -475,8 +387,6 @@ def summarize_discovery(manifest: dict[str, Any]) -> dict[str, Any]:
         workers = sorted(by_worker)
         if tag in known:
             status = "already_frozen"
-        elif not profile_spaces[namespace]["proposal_allowed"]:
-            status = "profile_excluded"
         elif len(paths) < manifest["thresholds"]["minimum_distinct_documents"]:
             status = "insufficient_document_support"
         elif len(directories) < manifest["thresholds"]["minimum_independent_directories"]:
@@ -548,7 +458,6 @@ def canonical_map(review: dict[str, Any], raw_tags: set[str], namespaces: set[st
 def review_validation(manifest: dict[str, Any]) -> dict[str, Any]:
     require_valid_report(manifest, "discovery-a")
     require_valid_report(manifest, "discovery-b")
-    require_valid_report(manifest, "retrieval-gold")
     errors = validate_source_snapshot(manifest)
     review_path = Path(manifest["run_dir"]) / "main-agent-review.json"
     if not review_path.is_file():
@@ -556,8 +465,7 @@ def review_validation(manifest: dict[str, Any]) -> dict[str, Any]:
     review = read_json(review_path)
     summary = read_json(Path(manifest["run_dir"]) / "reports" / "discovery-summary.json")
     taxonomy = read_json(Path(manifest["taxonomy"]["path"]))
-    profile = read_json(Path(manifest["profile"]["path"]))
-    minimum_documents, minimum_cases, profile_spaces = validate_profile(profile, taxonomy)
+    minimum_documents = manifest["thresholds"]["minimum_distinct_documents"]
     raw_candidates = {item["tag"]: item for item in summary.get("candidates", []) if isinstance(item, dict) and isinstance(item.get("tag"), str)}
     raw_tags = set(raw_candidates)
     namespaces = set(taxonomy_namespaces(taxonomy))
@@ -588,7 +496,6 @@ def review_validation(manifest: dict[str, Any]) -> dict[str, Any]:
         coverage = len(paths) / len(source_documents(manifest))
         if (
             normalized not in known
-            and profile_spaces[namespace]["proposal_allowed"]
             and len(paths) >= minimum_documents
             and len(directories) >= manifest["thresholds"]["minimum_independent_directories"]
             and coverage <= manifest["thresholds"]["maximum_coverage"]
@@ -615,8 +522,6 @@ def review_validation(manifest: dict[str, Any]) -> dict[str, Any]:
             errors.append("review is missing decisions: " + ", ".join(missing))
         if extra:
             errors.append("review has decisions outside eligible candidates: " + ", ".join(extra))
-    gold = read_json(output_path(manifest, "retrieval-gold"))
-    gold_ids = {item.get("id") for item in gold.get("queries", []) if isinstance(item, dict)}
     root = Path(manifest["scope"]["devkit_root"])
     for tag, item in by_tag.items():
         decision = item.get("decision")
@@ -646,20 +551,6 @@ def review_validation(manifest: dict[str, Any]) -> dict[str, Any]:
             evidence_paths.add(path)
         if len(evidence_paths) < 2:
             errors.append(f"{tag}: approval requires evidence from two documents")
-        cases = item.get("retrieval_cases")
-        ids: set[str] = set()
-        if not isinstance(cases, list) or len(cases) < minimum_cases:
-            errors.append(f"{tag}: approval requires {minimum_cases} retrieval cases")
-            cases = []
-        for case in cases:
-            if not isinstance(case, dict) or case.get("effect") not in {"candidate_filter", "rank_boost", "related_set"}:
-                errors.append(f"{tag}: retrieval case is invalid")
-                continue
-            query_id = case.get("query_id")
-            if not isinstance(query_id, str) or query_id not in gold_ids or query_id in ids:
-                errors.append(f"{tag}: retrieval case query_id is invalid or duplicated")
-            else:
-                ids.add(query_id)
     return {
         "schema_version": SCHEMA_VERSION,
         "purpose": "review_validation",
@@ -771,7 +662,6 @@ def provisional_taxonomy(manifest: dict[str, Any]) -> dict[str, Any]:
         "run_id": manifest["run_id"],
         "created_at": now_utc(),
         "base_taxonomy_sha256": manifest["taxonomy"]["sha256"],
-        "retrieval_profile_sha256": manifest["profile"]["sha256"],
     }
     additions = list(result.get("approved_additions", []))
     containers = {**result.get("namespaces", {}), **result.get("extension_namespaces", {})}
@@ -786,35 +676,9 @@ def provisional_taxonomy(manifest: dict[str, Any]) -> dict[str, Any]:
                 "definition": decision["definition"],
                 "selection_rule": decision["selection_rule"],
                 "evidence": decision["evidence"],
-                "retrieval_cases": decision["retrieval_cases"],
             }
         )
     result["approved_additions"] = additions
-    return result
-
-
-def provisional_profile(manifest: dict[str, Any], provisional: dict[str, Any]) -> dict[str, Any]:
-    """Enable approved values in a paired, explicitly non-release profile."""
-    base = read_json(Path(manifest["profile"]["path"]))
-    review = read_json(Path(manifest["run_dir"]) / "main-agent-review.json")
-    result = deepcopy(base)
-    result["profile_id"] = f"{base.get('profile_id', 'retrieval-profile')}-provisional-{manifest['run_id']}"
-    result["base_taxonomy"] = "provisional-taxonomy.json"
-    result["provisional_run"] = {
-        "run_id": manifest["run_id"],
-        "created_at": now_utc(),
-        "base_profile_sha256": manifest["profile"]["sha256"],
-    }
-    result["required_namespaces"] = sorted(required_namespaces(provisional))
-    for decision in review["decisions"]:
-        if decision["decision"] != "approve":
-            continue
-        namespace, value = decision["tag"].split(":", 1)
-        enabled = result["namespaces"][namespace]["enabled_values"]
-        if value not in enabled:
-            enabled.append(value)
-            enabled.sort()
-    validate_profile(result, provisional)
     return result
 
 
@@ -826,9 +690,6 @@ def release_bundle(manifest: dict[str, Any]) -> dict[str, Any]:
     provisional_path = Path(manifest["run_dir"]) / "provisional-taxonomy.json"
     if not provisional_path.is_file():
         raise ValueError("provisional taxonomy is missing")
-    provisional_profile_path = Path(manifest["run_dir"]) / "provisional-retrieval-profile.json"
-    if not provisional_profile_path.is_file():
-        raise ValueError("provisional retrieval profile is missing")
     review = read_json(Path(manifest["run_dir"]) / "main-agent-review.json")
     approved = [item for item in review["decisions"] if item.get("decision") == "approve"]
     return {
@@ -839,14 +700,11 @@ def release_bundle(manifest: dict[str, Any]) -> dict[str, Any]:
         "state": "awaiting_human_approval",
         "scope": manifest["scope"],
         "base_taxonomy": manifest["taxonomy"],
-        "retrieval_profile": manifest["profile"],
         "gates": {
             "discovery_a_valid": True,
             "discovery_b_valid": True,
-            "retrieval_gold_valid": True,
             "main_agent_review_valid": True,
             "provisional_taxonomy_sha256": digest_file(provisional_path),
-            "provisional_profile_sha256": digest_file(provisional_profile_path),
         },
         "approved_additions": approved,
         "artifacts": {
@@ -854,7 +712,6 @@ def release_bundle(manifest: dict[str, Any]) -> dict[str, Any]:
             "discovery_summary": "reports/discovery-summary.json",
             "review": "main-agent-review.json",
             "provisional_taxonomy": "provisional-taxonomy.json",
-            "provisional_profile": "provisional-retrieval-profile.json",
         },
     }
 
@@ -869,22 +726,17 @@ def command_prepare(args: argparse.Namespace) -> dict[str, Any]:
     source_dir = args.source_dir if args.source_dir.is_absolute() else devkit_root / args.source_dir
     source_dir = resolve_inside(devkit_root, source_dir)
     taxonomy_path = args.taxonomy.resolve()
-    profile_path = args.profile.resolve()
     taxonomy = read_json(taxonomy_path)
-    profile = read_json(profile_path)
     if taxonomy.get("status") not in {"frozen", "released"}:
         raise ValueError("base taxonomy must be frozen or released")
     required_namespaces(taxonomy)
-    minimum_documents, minimum_cases, _ = validate_profile(profile, taxonomy)
-    if args.discovery_count < 1 or args.holdout_count < 3 or args.minimum_gold_queries < 1:
-        raise ValueError("discovery_count, holdout_count, and minimum_gold_queries are invalid")
+    minimum_documents = 2
+    if args.discovery_count < 1:
+        raise ValueError("discovery_count is invalid")
     if not 0 < args.maximum_coverage <= 1 or args.minimum_independent_directories < 1:
         raise ValueError("coverage or independent directory threshold is invalid")
     documents = scan_documents(devkit_root, source_dir, args.guard_repo.resolve())
-    holdout = stratified_sample(documents, args.holdout_count, "holdout:")
-    holdout_paths = {record["path"] for record in holdout}
-    development = [record for record in documents if record["path"] not in holdout_paths]
-    discovery = stratified_sample(development, args.discovery_count, "discovery:")
+    discovery = stratified_sample(documents, min(args.discovery_count, len(documents)), "discovery:")
     run_dir.mkdir(parents=True, exist_ok=True)
     base_assignment = {
         "schema_version": SCHEMA_VERSION,
@@ -892,7 +744,6 @@ def command_prepare(args: argparse.Namespace) -> dict[str, Any]:
         "devkit_root": str(devkit_root),
         "source_dir": source_dir.relative_to(devkit_root).as_posix(),
         "taxonomy": {"path": str(taxonomy_path), "sha256": digest_file(taxonomy_path)},
-        "retrieval_profile": {"path": str(profile_path), "sha256": digest_file(profile_path)},
         "output_contract": "references/artifact-contract.md",
     }
     assignments: dict[str, str] = {}
@@ -902,18 +753,6 @@ def command_prepare(args: argparse.Namespace) -> dict[str, Any]:
         assignments[worker] = relative
         outputs[worker] = f"outputs/{worker}.json"
         write_json(run_dir / relative, {**base_assignment, "purpose": "independent_open_discovery_assignment", "worker": worker, "documents": discovery})
-    assignments["retrieval-gold"] = "inputs/retrieval-gold.json"
-    outputs["retrieval-gold"] = "outputs/retrieval-gold.json"
-    write_json(
-        run_dir / assignments["retrieval-gold"],
-        {
-            **base_assignment,
-            "purpose": "independent_retrieval_gold_assignment",
-            "worker": "retrieval-gold",
-            "minimum_queries": args.minimum_gold_queries,
-            "documents": holdout,
-        },
-    )
     manifest = {
         "schema_version": SCHEMA_VERSION,
         "purpose": "okf_tag_research_run",
@@ -927,13 +766,10 @@ def command_prepare(args: argparse.Namespace) -> dict[str, Any]:
             "documents": documents,
         },
         "taxonomy": {"path": str(taxonomy_path), "sha256": digest_file(taxonomy_path)},
-        "profile": {"path": str(profile_path), "sha256": digest_file(profile_path)},
         "thresholds": {
             "minimum_distinct_documents": minimum_documents,
             "minimum_independent_directories": args.minimum_independent_directories,
             "maximum_coverage": args.maximum_coverage,
-            "minimum_independent_retrieval_cases": minimum_cases,
-            "minimum_gold_queries": args.minimum_gold_queries,
         },
         "assignments": assignments,
         "outputs": outputs,
@@ -945,7 +781,6 @@ def command_prepare(args: argparse.Namespace) -> dict[str, Any]:
         "run_dir": str(run_dir),
         "source_documents": len(documents),
         "discovery_documents": len(discovery),
-        "holdout_documents": len(holdout),
         "assignments": assignments,
         "isolation_level": args.isolation_level,
     }
@@ -957,13 +792,6 @@ def command_validate_discovery(args: argparse.Namespace) -> dict[str, Any]:
         raise ValueError("worker must be discovery-a or discovery-b")
     result = discovery_validation(manifest, args.worker)
     write_json(Path(manifest["run_dir"]) / "validation" / f"{args.worker}.json", result)
-    return result
-
-
-def command_validate_gold(args: argparse.Namespace) -> dict[str, Any]:
-    manifest = read_manifest(args.run_dir.resolve())
-    result = gold_validation(manifest)
-    write_json(Path(manifest["run_dir"]) / "validation" / "retrieval-gold.json", result)
     return result
 
 
@@ -991,14 +819,11 @@ def command_validate_annotation(args: argparse.Namespace) -> dict[str, Any]:
 def command_freeze_provisional(args: argparse.Namespace) -> dict[str, Any]:
     manifest = read_manifest(args.run_dir.resolve())
     taxonomy = provisional_taxonomy(manifest)
-    profile = provisional_profile(manifest, taxonomy)
     write_json(Path(manifest["run_dir"]) / "provisional-taxonomy.json", taxonomy)
-    write_json(Path(manifest["run_dir"]) / "provisional-retrieval-profile.json", profile)
     return {
         "run_id": manifest["run_id"],
         "status": taxonomy["status"],
         "taxonomy": "provisional-taxonomy.json",
-        "profile": "provisional-retrieval-profile.json",
     }
 
 
@@ -1039,9 +864,6 @@ def command_approve(args: argparse.Namespace) -> dict[str, Any]:
     frozen["status"] = "frozen"
     frozen["approval"] = approval
     frozen.pop("provisional_run", None)
-    provisional_profile = read_json(Path(manifest["run_dir"]) / "provisional-retrieval-profile.json")
-    if provisional_profile.get("provisional_run", {}).get("run_id") != manifest["run_id"]:
-        raise ValueError("provisional retrieval profile does not belong to this run")
     gates = bundle.get("gates")
     if not isinstance(gates, dict):
         raise ValueError("release bundle has no integrity gates")
@@ -1049,44 +871,26 @@ def command_approve(args: argparse.Namespace) -> dict[str, Any]:
         Path(manifest["run_dir"]) / "provisional-taxonomy.json"
     ):
         raise ValueError("provisional taxonomy changed after release bundle creation")
-    if gates.get("provisional_profile_sha256") != digest_file(
-        Path(manifest["run_dir"]) / "provisional-retrieval-profile.json"
-    ):
-        raise ValueError("provisional retrieval profile changed after release bundle creation")
     output = (
         args.output_taxonomy.resolve()
         if args.output_taxonomy is not None
         else RELEASE_DIR / f"{manifest['run_id']}-frozen.json"
     )
-    output_profile = (
-        args.output_profile.resolve()
-        if args.output_profile is not None
-        else RELEASE_DIR / f"{manifest['run_id']}-profile.json"
-    )
-    for candidate in (output, output_profile):
+    for candidate in (output,):
         try:
             candidate.relative_to(RELEASE_DIR.resolve())
         except ValueError as error:
             raise ValueError(
-                "approved taxonomy/profile must be written under the Skill taxonomy/releases directory"
+                "approved taxonomy must be written under okf-tag-generate/taxonomy/releases"
             ) from error
-    if output.exists() or output_profile.exists():
-        raise FileExistsError("refusing to overwrite taxonomy or retrieval profile")
-    frozen_profile = deepcopy(provisional_profile)
-    frozen_profile["profile_id"] = f"{provisional_profile.get('profile_id', 'retrieval-profile')}-approved"
-    frozen_profile["base_taxonomy"] = output.name
-    frozen_profile["approval"] = approval
-    frozen_profile.pop("provisional_run", None)
-    validate_profile(frozen_profile, frozen)
+    if output.exists():
+        raise FileExistsError("refusing to overwrite taxonomy")
     write_json(output, frozen)
-    write_json(output_profile, frozen_profile)
     return {
         "run_id": manifest["run_id"],
         "status": "frozen",
         "output_taxonomy": str(output),
         "taxonomy_sha256": digest_file(output),
-        "output_profile": str(output_profile),
-        "profile_sha256": digest_file(output_profile),
     }
 
 
@@ -1098,17 +902,14 @@ def build_parser() -> argparse.ArgumentParser:
     prepare.add_argument("--source-dir", type=Path, required=True)
     prepare.add_argument("--guard-repo", type=Path, required=True, help="api-yaml-metadata-guard 仓库根目录")
     prepare.add_argument("--taxonomy", type=Path, default=DEFAULT_TAXONOMY)
-    prepare.add_argument("--profile", type=Path, default=DEFAULT_PROFILE)
     prepare.add_argument("--run-id", required=True)
     prepare.add_argument("--output-dir", type=Path, required=True)
     prepare.add_argument("--discovery-count", type=int, default=48)
-    prepare.add_argument("--holdout-count", type=int, default=24)
-    prepare.add_argument("--minimum-gold-queries", type=int, default=12)
     prepare.add_argument("--minimum-independent-directories", type=int, default=2)
     prepare.add_argument("--maximum-coverage", type=float, default=0.30)
     prepare.add_argument("--isolation-level", choices=("filesystem_sandbox", "logical_shared_workspace"), default="logical_shared_workspace")
     prepare.set_defaults(func=command_prepare)
-    for name, func in (("validate-discovery", command_validate_discovery), ("validate-gold", command_validate_gold), ("summarize-discovery", command_summarize), ("validate-review", command_validate_review), ("freeze-provisional", command_freeze_provisional), ("build-release-bundle", command_bundle)):
+    for name, func in (("validate-discovery", command_validate_discovery), ("summarize-discovery", command_summarize), ("validate-review", command_validate_review), ("freeze-provisional", command_freeze_provisional), ("build-release-bundle", command_bundle)):
         item = commands.add_parser(name)
         item.add_argument("--run-dir", type=Path, required=True)
         if name == "validate-discovery":
@@ -1120,11 +921,10 @@ def build_parser() -> argparse.ArgumentParser:
     validate_annotation.add_argument("--run-dir", type=Path, required=True)
     validate_annotation.add_argument("--annotations", type=Path, required=True)
     validate_annotation.set_defaults(func=command_validate_annotation)
-    approve = commands.add_parser("approve", help="冻结已批准的 provisional taxonomy/profile，但不发布。")
+    approve = commands.add_parser("approve", help="冻结已批准的 provisional taxonomy，但不发布。")
     approve.add_argument("--run-dir", type=Path, required=True)
     approve.add_argument("--approval", type=Path, required=True)
     approve.add_argument("--output-taxonomy", type=Path)
-    approve.add_argument("--output-profile", type=Path)
     approve.set_defaults(func=command_approve)
     return parser
 

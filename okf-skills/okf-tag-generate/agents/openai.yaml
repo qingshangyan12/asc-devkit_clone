@@ -1,0 +1,4 @@
+interface:
+  display_name: "OKF Tag Generate"
+  short_description: "从冻结词表生成并写入 API 标签"
+  default_prompt: "使用 $okf-tag-generate 根据冻结词表和正文证据生成 API YAML tag，并先 dry-run 再写入。"
