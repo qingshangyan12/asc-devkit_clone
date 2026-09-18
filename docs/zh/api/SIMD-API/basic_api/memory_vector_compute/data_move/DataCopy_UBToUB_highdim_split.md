@@ -29,7 +29,7 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030：不支持
 <!-- end id9 -->
-<!-- npu="5101" id10 -->
+<!-- npu="KirinDev0001" id10 -->
 - KirinDev0000/KirinDev0001/KirinDev0002/KirinDev0003：支持
 <!-- end id10 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_UBToUB_highdim_split_res.md#id1 -->
@@ -144,7 +144,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 <!-- end id14 -->
 
-<!-- npu="5101" id15 -->
+<!-- npu="KirinDev0001" id15 -->
 
 - KirinDev0000/KirinDev0001/KirinDev0002/KirinDev0003 支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
 

@@ -23,7 +23,7 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
-<!-- npu="5101" id8 -->
+<!-- npu="KirinDev0001" id8 -->
 - KirinDev0000/KirinDev0001/KirinDev0002/KirinDev0003：支持
 <!-- end id8 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/sync_control/LocalMemBar_res.md#id1 -->
