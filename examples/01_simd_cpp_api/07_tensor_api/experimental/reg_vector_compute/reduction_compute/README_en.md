@@ -51,7 +51,7 @@ Only the first element of each result region is valid. The remaining elements ar
     1. Use `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and layouts to construct the GM and UB Tensors.
     2. Wrap the MTE2 pipeline with `asc_lock/asc_unlock`, and use `make_copy(copy_gm_to_ub{})` and `copy` to move the input from GM to UB.
     3. Use `all_mask<float>` and `load` to load 64 `float` values into a Reg Tensor.
-    4. Call `reduce_sum<float>`, `reduce_max<float>`, and `reduce_min<float>` to perform element-scope reductions.
+    4. Call `reduce_sum<reduce_scope::element, float>`, `reduce_max`, and `reduce_min` to perform element-scope reductions.
     5. Use `store` to write the three UB result regions, then use `make_copy(copy_ub_to_gm{})` and `copy` to write them back to GM.
 
   The core computation is as follows:
@@ -61,16 +61,16 @@ Only the first element of each result region is valid. The remaining elements ar
   auto mask = asc::te::experimental::all_mask<float>();
   auto src = asc::te::experimental::load(src_tensor, coord).with_mask(mask);
 
-  auto sum = asc::te::experimental::reduce_sum<float>(src);
-  auto max = asc::te::experimental::reduce_max<float>(src);
-  auto min = asc::te::experimental::reduce_min<float>(src);
+  auto sum = asc::te::experimental::reduce_sum<asc::te::experimental::reduce_scope::element, float>(src);
+  auto max = asc::te::experimental::reduce_max(src);
+  auto min = asc::te::experimental::reduce_min(src);
 
   asc::te::experimental::store(sum_tensor, coord, sum);
   asc::te::experimental::store(max_tensor, coord, max);
   asc::te::experimental::store(min_tensor, coord, min);
   ```
 
-  `reduce_sum` also supports `reduce_scope::datablock` and `reduce_scope::pair`. `reduce_max` and `reduce_min` also support `reduce_scope::datablock`. Specify the reduction scope explicitly with the second template argument.
+  `reduce_sum` also supports `reduce_scope::datablock` and `reduce_scope::pair`; specify both the reduction scope and destination type as `<scope, DstType>`. `reduce_max` and `reduce_min` also support `reduce_scope::datablock`; the output type is deduced from the input `reg_tensor`, and only `<scope>` is needed when selecting a non-default reduction scope.
 
 ## Build and Run
 

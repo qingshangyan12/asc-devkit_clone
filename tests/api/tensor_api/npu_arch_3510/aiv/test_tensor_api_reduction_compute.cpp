@@ -18,21 +18,28 @@ namespace asc {
 namespace te {
 namespace experimental {
 
-static_assert(AscendC::Std::is_same_v<decltype(reduce_sum<float>(reg_tensor<float>{})), reg_tensor<float>>);
-static_assert(AscendC::Std::is_same_v<decltype(reduce_max<int16_t>(reg_tensor<int16_t>{})), reg_tensor<int16_t>>);
-static_assert(AscendC::Std::is_same_v<decltype(reduce_min<uint32_t>(reg_tensor<uint32_t>{})), reg_tensor<uint32_t>>);
+static_assert(AscendC::Std::is_same_v<
+    decltype(reduce_sum<reduce_scope::element, float>(reg_tensor<float>{})), reg_tensor<float>>);
+static_assert(AscendC::Std::is_same_v<
+    decltype(reduce_sum<reduce_scope::element, int32_t>(reg_tensor<int16_t>{})), reg_tensor<int32_t>>);
+static_assert(AscendC::Std::is_same_v<
+    decltype(reduce_sum<reduce_scope::datablock, int32_t>(reg_tensor<int16_t>{})), reg_tensor<int32_t>>);
+static_assert(AscendC::Std::is_same_v<decltype(reduce_max(reg_tensor<int16_t>{})), reg_tensor<int16_t>>);
+static_assert(AscendC::Std::is_same_v<
+    decltype(reduce_max<reduce_scope::datablock>(reg_tensor<int16_t>{})), reg_tensor<int16_t>>);
+static_assert(AscendC::Std::is_same_v<decltype(reduce_min(reg_tensor<uint32_t>{})), reg_tensor<uint32_t>>);
 
 __aicore__ inline void compile_reg_reduction(reg_tensor<float> float_src, reg_tensor<int16_t> int16_src)
 {
-    auto sum = reduce_sum<float>(float_src);
-    auto block_sum = reduce_sum<float, reduce_scope::datablock>(float_src);
-    auto pair_sum = reduce_sum<float, reduce_scope::pair>(float_src);
-    auto wide_sum = reduce_sum<int32_t>(int16_src);
-    auto wide_block_sum = reduce_sum<int32_t, reduce_scope::datablock>(int16_src);
-    auto max = reduce_max<float>(float_src);
-    auto block_max = reduce_max<float, reduce_scope::datablock>(float_src);
-    auto min = reduce_min<float>(float_src);
-    auto block_min = reduce_min<float, reduce_scope::datablock>(float_src);
+    auto sum = reduce_sum<reduce_scope::element, float>(float_src);
+    auto block_sum = reduce_sum<reduce_scope::datablock, float>(float_src);
+    auto pair_sum = reduce_sum<reduce_scope::pair, float>(float_src);
+    auto wide_sum = reduce_sum<reduce_scope::element, int32_t>(int16_src);
+    auto wide_block_sum = reduce_sum<reduce_scope::datablock, int32_t>(int16_src);
+    auto max = reduce_max(float_src);
+    auto block_max = reduce_max<reduce_scope::datablock>(float_src);
+    auto min = reduce_min(float_src);
+    auto block_min = reduce_min<reduce_scope::datablock>(float_src);
 
     (void)sum;
     (void)block_sum;

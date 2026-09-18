@@ -50,8 +50,8 @@ $$
 ## 函数原型
 
 ```cpp
-template <typename DstType, reduce_scope scope = reduce_scope::element, typename SrcType>
-__simd_callee__ inline reg_tensor<DstType> reduce_min(const reg_tensor<SrcType>& src)
+template <reduce_scope scope = reduce_scope::element, typename DataType>
+__simd_callee__ inline reg_tensor<DataType> reduce_min(const reg_tensor<DataType>& src)
 ```
 
 ## 参数说明
@@ -60,23 +60,22 @@ __simd_callee__ inline reg_tensor<DstType> reduce_min(const reg_tensor<SrcType>&
 
 | 参数名 | 描述 |
 | --- | --- |
-| `DstType` | 返回值中数据寄存器的元素类型。必须与`SrcType`保持一致。支持的数据类型请参考[数据类型](#数据类型)。 |
 | `scope` | 归约范围，类型为`reduce_scope`，默认值为`reduce_scope::element`。取值为`reduce_scope::element`时，对所有有效元素求最小值；取值为`reduce_scope::datablock`时，对每个`DataBlock`内的有效元素求最小值。 |
-| `SrcType` | 源操作数的数据类型，由函数实参自动推导。必须与`DstType`保持一致。支持的数据类型请参考[数据类型](#数据类型)。 |
+| `DataType` | 源操作数和返回值中数据寄存器的元素类型，由函数实参自动推导。支持的数据类型请参考[数据类型](#数据类型)。 |
 
 **表 2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `src` | 输入 | 源操作数，类型为[reg_tensor](../reg_tensor/reg_tensor.md)&lt;SrcType&gt;。其中，`src.reg`保存矢量数据，`src.mask`用于控制各元素是否参与归约。`src.mask`中与元素对应的比特位为1时，该元素参与归约；为0时，该元素不参与归约。 |
+| `src` | 输入 | 源操作数，类型为[reg_tensor](../reg_tensor/reg_tensor.md)&lt;DataType&gt;。其中，`src.reg`保存矢量数据，`src.mask`用于控制各元素是否参与归约。`src.mask`中与元素对应的比特位为1时，该元素参与归约；为0时，该元素不参与归约。 |
 
 ## 数据类型
 
-`SrcType`与`DstType`必须保持一致，支持的数据类型为：`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`。
+`DataType`支持的数据类型为：`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`。
 
 ## 返回值说明
 
-返回归约最小值结果，类型为`reg_tensor<DstType>`，返回值的`mask`与`src.mask`保持一致。
+返回归约最小值结果，类型为`reg_tensor<DataType>`，返回值的`mask`与`src.mask`保持一致。
 
 - `scope`为`reduce_scope::element`时，最小值保存在`reg`的第0个元素，最小值在`src`中的索引原始位模式保存在`reg`的第1个元素，其他元素置0。如果存在多个最小值，则保留最小的索引。
 - `scope`为`reduce_scope::datablock`时，每个`DataBlock`内的最小值连续保存在`reg`的前8个元素，其他元素置0；该模式仅输出最小值，不输出索引。
@@ -85,7 +84,7 @@ __simd_callee__ inline reg_tensor<DstType> reduce_min(const reg_tensor<SrcType>&
 
 - `src.mask`需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与归约的元素位置错误。
 - `scope`仅支持`reduce_scope::element`和`reduce_scope::datablock`。配置为其他取值时会产生编译期错误。
-- `SrcType`与`DstType`必须保持一致，且必须为[数据类型](#数据类型)章节中列出的类型。
+- `DataType`必须为[数据类型](#数据类型)章节中列出的类型。
 - 未被`src.mask`选中的元素被视为对应数据类型的最大值，浮点数类型的最大值为`+inf`。
 - `scope`为`reduce_scope::element`时，若`src.mask`全为0，则将对应数据类型的最大值写入返回值`reg`的第0个元素，并将其余元素置0。
 - `scope`为`reduce_scope::datablock`时，若某个`DataBlock`内的元素均不参与计算，则将对应数据类型的最大值写入返回值`reg`的对应位置。
@@ -95,7 +94,7 @@ __simd_callee__ inline reg_tensor<DstType> reduce_min(const reg_tensor<SrcType>&
 
 ## 关键特性说明
 
-`scope`为`reduce_scope::element`时，接口同时返回最小值和索引。索引按照`DstType`的位模式存储在返回值`reg`的第1个元素中，读取索引时需要按`DstType`对应的位宽转换为整数类型。例如，`DstType`为`half`时，可按`uint16_t`读取索引原始位模式；`DstType`为`float`时，可按`uint32_t`读取索引原始位模式。
+`scope`为`reduce_scope::element`时，接口同时返回最小值和索引。索引按照`DataType`的位模式存储在返回值`reg`的第1个元素中，读取索引时需要按`DataType`对应的位宽转换为整数类型。例如，`DataType`为`half`时，可按`uint16_t`读取索引原始位模式；`DataType`为`float`时，可按`uint32_t`读取索引原始位模式。
 
 ## 调用示例
 
@@ -108,11 +107,11 @@ __simd_vf__ inline void reduce_min_example(InputTensor input, OutputTensor outpu
     auto mask = asc::te::experimental::all_mask<float>();
     auto src = asc::te::experimental::load(input, asc::te::make_coord(0)).with_mask(mask);
 
-    auto elemMin = asc::te::experimental::reduce_min<float>(src);
+    auto elemMin = asc::te::experimental::reduce_min(src);
     elemMin.with_mask(asc::te::experimental::update_mask<float>(2));
     asc::te::experimental::store(output, asc::te::make_coord(0), elemMin);
 
-    auto blockMin = asc::te::experimental::reduce_min<float, asc::te::experimental::reduce_scope::datablock>(src);
+    auto blockMin = asc::te::experimental::reduce_min<asc::te::experimental::reduce_scope::datablock>(src);
     blockMin.with_mask(asc::te::experimental::update_mask<float>(8));
     asc::te::experimental::store(output, asc::te::make_coord(8), blockMin);
 }

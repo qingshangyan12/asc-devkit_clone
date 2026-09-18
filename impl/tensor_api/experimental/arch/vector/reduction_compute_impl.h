@@ -38,14 +38,13 @@ template <typename DstType, typename SrcType>
 inline constexpr bool is_pair_reduce_sum_support_type_v =
     AscendC::Std::is_same_v<DstType, SrcType> && AscendC::Std::is_one_of_v<SrcType, half, float>;
 
-template <typename DstType, typename SrcType>
+template <typename DataType>
 inline constexpr bool is_reduce_min_max_support_type_v =
-    AscendC::Std::is_same_v<DstType, SrcType> &&
-    AscendC::Std::is_one_of_v<SrcType, int16_t, uint16_t, half, int32_t, uint32_t, float>;
+    AscendC::Std::is_one_of_v<DataType, int16_t, uint16_t, half, int32_t, uint32_t, float>;
 
 } // namespace detail
 
-template <typename DstType, reduce_scope scope, typename SrcType>
+template <reduce_scope scope, typename DstType, typename SrcType>
 __simd_callee__ inline reg_tensor<DstType> reduce_sum(const reg_tensor<SrcType>& src)
 {
     static_assert(
@@ -78,17 +77,17 @@ __simd_callee__ inline reg_tensor<DstType> reduce_sum(const reg_tensor<SrcType>&
     return dst;
 }
 
-template <typename DstType, reduce_scope scope, typename SrcType>
-__simd_callee__ inline reg_tensor<DstType> reduce_max(const reg_tensor<SrcType>& src)
+template <reduce_scope scope, typename DataType>
+__simd_callee__ inline reg_tensor<DataType> reduce_max(const reg_tensor<DataType>& src)
 {
     static_assert(
         scope == reduce_scope::element || scope == reduce_scope::datablock,
         "reduce_max only supports reduce_scope::element and reduce_scope::datablock");
     static_assert(
-        detail::is_reduce_min_max_support_type_v<DstType, SrcType>,
+        detail::is_reduce_min_max_support_type_v<DataType>,
         "reduce_max only supports int16_t, uint16_t, half, int32_t, uint32_t or float types");
-    reg_tensor<DstType> dst;
-    if constexpr (detail::is_reduce_min_max_support_type_v<DstType, SrcType>) {
+    reg_tensor<DataType> dst;
+    if constexpr (detail::is_reduce_min_max_support_type_v<DataType>) {
         if constexpr (scope == reduce_scope::element) {
             asc_reduce_max(dst.reg, src.reg, src.mask);
         } else if constexpr (scope == reduce_scope::datablock) {
@@ -99,17 +98,17 @@ __simd_callee__ inline reg_tensor<DstType> reduce_max(const reg_tensor<SrcType>&
     return dst;
 }
 
-template <typename DstType, reduce_scope scope, typename SrcType>
-__simd_callee__ inline reg_tensor<DstType> reduce_min(const reg_tensor<SrcType>& src)
+template <reduce_scope scope, typename DataType>
+__simd_callee__ inline reg_tensor<DataType> reduce_min(const reg_tensor<DataType>& src)
 {
     static_assert(
         scope == reduce_scope::element || scope == reduce_scope::datablock,
         "reduce_min only supports reduce_scope::element and reduce_scope::datablock");
     static_assert(
-        detail::is_reduce_min_max_support_type_v<DstType, SrcType>,
+        detail::is_reduce_min_max_support_type_v<DataType>,
         "reduce_min only supports int16_t, uint16_t, half, int32_t, uint32_t or float types");
-    reg_tensor<DstType> dst;
-    if constexpr (detail::is_reduce_min_max_support_type_v<DstType, SrcType>) {
+    reg_tensor<DataType> dst;
+    if constexpr (detail::is_reduce_min_max_support_type_v<DataType>) {
         if constexpr (scope == reduce_scope::element) {
             asc_reduce_min(dst.reg, src.reg, src.mask);
         } else if constexpr (scope == reduce_scope::datablock) {

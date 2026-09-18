@@ -53,7 +53,7 @@ $$
 ## 函数原型
 
 ```cpp
-template <typename DstType, reduce_scope scope = reduce_scope::element, typename SrcType>
+template <reduce_scope scope = reduce_scope::element, typename DstType, typename SrcType>
 __simd_callee__ inline reg_tensor<DstType> reduce_sum(const reg_tensor<SrcType>& src)
 ```
 
@@ -63,8 +63,8 @@ __simd_callee__ inline reg_tensor<DstType> reduce_sum(const reg_tensor<SrcType>&
 
 | 参数名 | 描述 |
 | --- | --- |
-| `DstType` | 返回值中数据寄存器的元素类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 | `scope` | 归约范围，类型为`reduce_scope`，默认值为`reduce_scope::element`。取值为`reduce_scope::element`时，对所有有效元素求和；取值为`reduce_scope::datablock`时，对每个`DataBlock`内的有效元素求和；取值为`reduce_scope::pair`时，对相邻两个元素求和。 |
+| `DstType` | 返回值中数据寄存器的元素类型，需要在`scope`之后显式指定。支持的数据类型请参考[数据类型](#数据类型)。 |
 | `SrcType` | 源操作数的数据类型，由函数实参自动推导。支持的数据类型请参考[数据类型](#数据类型)。 |
 
 **表 2**  参数说明
@@ -122,15 +122,15 @@ __simd_vf__ inline void reduce_sum_example(InputTensor input, OutputTensor outpu
     auto mask = asc::te::experimental::all_mask<float>();
     auto src = asc::te::experimental::load(input, asc::te::make_coord(0)).with_mask(mask);
 
-    auto elemSum = asc::te::experimental::reduce_sum<float>(src);
+    auto elemSum = asc::te::experimental::reduce_sum<asc::te::experimental::reduce_scope::element, float>(src);
     elemSum.with_mask(asc::te::experimental::update_mask<float>(1));
     asc::te::experimental::store(output, asc::te::make_coord(0), elemSum);
 
-    auto blockSum = asc::te::experimental::reduce_sum<float, asc::te::experimental::reduce_scope::datablock>(src);
+    auto blockSum = asc::te::experimental::reduce_sum<asc::te::experimental::reduce_scope::datablock, float>(src);
     blockSum.with_mask(asc::te::experimental::update_mask<float>(8));
     asc::te::experimental::store(output, asc::te::make_coord(8), blockSum);
 
-    auto pairSum = asc::te::experimental::reduce_sum<float, asc::te::experimental::reduce_scope::pair>(src);
+    auto pairSum = asc::te::experimental::reduce_sum<asc::te::experimental::reduce_scope::pair, float>(src);
     pairSum.with_mask(asc::te::experimental::update_mask<float>(32));
     asc::te::experimental::store(output, asc::te::make_coord(16), pairSum);
 }

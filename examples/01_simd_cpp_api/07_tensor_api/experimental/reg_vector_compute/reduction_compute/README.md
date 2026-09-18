@@ -51,7 +51,7 @@ dst[128] = min(src[0:64])
     1. 使用 `asc::te::make_tensor`、`asc::te::make_mem_ptr` 和 layout 构造 GM、UB Tensor。
     2. 使用 `asc_lock/asc_unlock` 包围 MTE2 流水，通过 `make_copy(copy_gm_to_ub{})` 和 `copy` 将输入从 GM 搬运到 UB。
     3. 使用 `all_mask<float>` 和 `load` 将64个 `float` 数据加载为 Reg Tensor。
-    4. 调用 `reduce_sum<float>`、`reduce_max<float>` 和 `reduce_min<float>` 完成 element scope归约。
+    4. 调用 `reduce_sum<reduce_scope::element, float>`、`reduce_max` 和 `reduce_min` 完成 element scope归约。
     5. 使用 `store` 写入三个 UB 结果区，再通过 `make_copy(copy_ub_to_gm{})` 和 `copy` 写回 GM。
 
   核心计算代码如下：
@@ -61,16 +61,16 @@ dst[128] = min(src[0:64])
   auto mask = asc::te::experimental::all_mask<float>();
   auto src = asc::te::experimental::load(src_tensor, coord).with_mask(mask);
 
-  auto sum = asc::te::experimental::reduce_sum<float>(src);
-  auto max = asc::te::experimental::reduce_max<float>(src);
-  auto min = asc::te::experimental::reduce_min<float>(src);
+  auto sum = asc::te::experimental::reduce_sum<asc::te::experimental::reduce_scope::element, float>(src);
+  auto max = asc::te::experimental::reduce_max(src);
+  auto min = asc::te::experimental::reduce_min(src);
 
   asc::te::experimental::store(sum_tensor, coord, sum);
   asc::te::experimental::store(max_tensor, coord, max);
   asc::te::experimental::store(min_tensor, coord, min);
   ```
 
-  `reduce_sum` 还支持 `reduce_scope::datablock` 和 `reduce_scope::pair`，`reduce_max`、`reduce_min` 还支持 `reduce_scope::datablock`。可通过第二个模板参数显式指定归约范围。
+  `reduce_sum` 还支持 `reduce_scope::datablock` 和 `reduce_scope::pair`，需要按 `<scope, DstType>` 显式指定归约范围和输出类型；`reduce_max`、`reduce_min` 还支持 `reduce_scope::datablock`，输出类型由输入 `reg_tensor` 的元素类型推导，显式指定归约范围时只需传入 `<scope>`。
 
 ## 编译运行
 
