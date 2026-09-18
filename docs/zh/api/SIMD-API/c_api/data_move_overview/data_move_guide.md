@@ -21,7 +21,7 @@ C API与基础API最终使用相同的NPU搬运通路。基础API以Tensor和参
 1. 阅读[数据搬运概览](overview/overview.md)，了解C API分类及PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX和PIPE_V的分工。
 2. 阅读[数据搬运概念](overview/data_move_concept.md)，根据连续、高维切分、非对齐、分形转换或NDDMA场景选择接口形态。
 3. 阅读[数据通路](overview/data_path.md)，确认DAV_3510支持的源、目的存储单元组合。
-4. 编码前检查[总体约束说明](overview/overall_constranints.md)，并以具体接口文档中的参数单位、对齐和取值范围为准。
+4. 编码前检查[总体约束说明](overview/overall_constraints.md)，并以具体接口文档中的参数单位、对齐和取值范围为准。
 
 ## 按数据通路选择
 

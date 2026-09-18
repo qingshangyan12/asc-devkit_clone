@@ -26,4 +26,4 @@ DAV_3510的数据搬运接口按照执行核和硬件通路分为矢量数据搬
 
 - [数据搬运概念](data_move_concept.md)
 - [数据通路](data_path.md)
-- [总体约束说明](overall_constranints.md)
+- [总体约束说明](overall_constraints.md)
