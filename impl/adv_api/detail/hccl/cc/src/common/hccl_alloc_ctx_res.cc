@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "hccl_alloc_ctx_res.h"
+#include "external_alg_resolver.h"
 #include "kfc_server_protocol.h"
 
 #include <limits>
@@ -697,17 +698,84 @@ bool GetForcedAlgName(const Mc2CcTilingInner* ccTiling, std::string& algName)
     return true;
 }
 
+ForcedAlgKind GetForcedAlg(
+    const Mc2CcTilingInner* ccTiling, std::string& algName, ExternalAlgSpec& extSpec, std::string& extParseErrMsg)
+{
+    algName.clear();
+    extParseErrMsg.clear();
+    extSpec = ExternalAlgSpec();
+    if (ccTiling == nullptr || ccTiling->algConfig[0] == '\0') {
+        return ForcedAlgKind::NONE; // 等价旧 GetForcedAlgName :686-688
+    }
+
+    std::string algConfig(ccTiling->algConfig);
+    if (algConfig.find('=') != std::string::npos) {
+        HCCL_INFO("[MC2_FORCE_ALG] legacy algConfig[%s], use default selector.", algConfig.c_str());
+        return ForcedAlgKind::LEGACY; // 旧 :692 日志逐字保留
+    }
+
+    if (algConfig.find('[') != std::string::npos) {
+        if (!ParseExternalAlg(algConfig, extSpec, extParseErrMsg)) {
+            extSpec = ExternalAlgSpec(); // 失败态复位（ClassifyForcedAlgConfig 同款契约）
+        }
+        return ForcedAlgKind::EXTERNAL;
+    }
+
+    algName = algConfig; // 旧 :696 语义逐字保留
+    return ForcedAlgKind::BARE_NAME;
+}
+
 HcclResult TryForcedAlgAndPrepareEngine(
     HcclComm comm, const Mc2CcTilingInner* ccTiling, OpParam& opParam, std::string& algName,
     std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo, bool& forcedAlgAccepted)
 {
     forcedAlgAccepted = false;
     std::string forcedAlgName;
-    if (!GetForcedAlgName(ccTiling, forcedAlgName)) {
-        return HCCL_SUCCESS;
+    ExternalAlgSpec extSpec;
+    std::string extParseErrMsg;
+    const ForcedAlgKind kind = GetForcedAlg(ccTiling, forcedAlgName, extSpec, extParseErrMsg);
+    if (kind == ForcedAlgKind::NONE || kind == ForcedAlgKind::LEGACY) {
+        return HCCL_SUCCESS; // 非强制 → 默认 selector（旧 :706-708 语义）
     }
 
     OpParam opParamBackup = opParam;
+
+    if (kind == ForcedAlgKind::EXTERNAL) {
+        // 外部名通道：严格语义，无任何静默回退（设计 §10），跳过 CheckForcedAlgResource 预检（§8 注）
+        if (!extParseErrMsg.empty()) {
+            HCCL_ERROR(
+                "[MC2_EXT_ALG] ERROR: parse failed, algConfig[%s], opType[%u], reason[%s].", ccTiling->algConfig,
+                static_cast<u32>(opParam.opType), extParseErrMsg.c_str());
+            return HCCL_E_NOT_SUPPORT;
+        }
+        CHK_RET(PrepareTopoInfoForOp(comm, opParam, topoInfo));
+        std::string resolvedName;
+        std::string resolveErrMsg;
+        if (ResolveExternalAlg(opParam, topoInfo.get(), extSpec, resolvedName, resolveErrMsg) !=
+            ResolveStatus::RESOLVED) {
+            HCCL_ERROR(
+                "[MC2_EXT_ALG] ERROR: resolve failed, algConfig[%s], opType[%u], reason[%s].", ccTiling->algConfig,
+                static_cast<u32>(opParam.opType), resolveErrMsg.c_str());
+            opParam = opParamBackup;
+            return HCCL_E_NOT_SUPPORT;
+        }
+        HcclResult ret = PrepareEngineForAlg(opParam, resolvedName);
+        if (ret != HCCL_SUCCESS) {
+            HCCL_ERROR(
+                "[MC2_EXT_ALG] ERROR: prepare engine failed, algName[%s], ret[%d].", resolvedName.c_str(),
+                static_cast<int>(ret));
+            opParam = opParamBackup;
+            return ret;
+        }
+        algName = resolvedName;
+        forcedAlgAccepted = true;
+        HCCL_INFO(
+            "[MC2_EXT_ALG] accepted, opType[%u], algConfig[%s] -> algName[%s].", static_cast<u32>(opParam.opType),
+            ccTiling->algConfig, algName.c_str());
+        return HCCL_SUCCESS;
+    }
+
+    // BARE_NAME：现状流程逐字节保留（旧 :710-736），含 CheckForcedAlgResource 预检与静默回退
     CHK_RET(PrepareTopoInfoForOp(comm, opParam, topoInfo));
     HcclResult ret = PrepareEngineForAlg(opParam, forcedAlgName);
     if (ret != HCCL_SUCCESS) {
@@ -932,8 +1000,11 @@ HcclResult GetOpParam(
     }
 
     void* resCtxSequence = nullptr;
+    // EXTERNAL 通道不参与资源失败回退（设计 §10: 定名后资源失败直接报错）
+    const bool isExternalForced = forcedAlgAccepted && ccTiling->algConfig[0] != '\0' &&
+                                  std::string(ccTiling->algConfig).find('[') != std::string::npos;
     HcclResult resRet = GetOpParamResCtx(comm, algName, opParam, topoInfo.get(), &resCtxSequence);
-    if (resRet != HCCL_SUCCESS && forcedAlgAccepted && resCtxSequence == nullptr) {
+    if (resRet != HCCL_SUCCESS && forcedAlgAccepted && !isExternalForced && resCtxSequence == nullptr) {
         HCCL_WARNING(
             "[MC2_FORCE_ALG] fallback to default selector after resource failure, algName[%s], ret[%d].",
             algName.c_str(), static_cast<int>(resRet));

@@ -23,6 +23,7 @@
 #include "mc2_type.h"
 #include "ccu_assist_pub.h"
 #include "hccl_tiling_msg.h"
+#include "external_alg_parser.h"
 
 #include <vector>
 #include <memory>
@@ -190,6 +191,11 @@ HcclResult CheckForcedAlgResource(
     HcclComm comm, const OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo, const std::string& algName);
 
 bool GetForcedAlgName(const Mc2CcTilingInner* ccTiling, std::string& algName);
+
+// algConfig 四态识别（NONE/LEGACY/EXTERNAL/BARE_NAME）。EXTERNAL 解析失败时 spec 复位无效、
+// extParseErrMsg 非空，由调用方按严格语义报错（外部名通道零静默降级）。
+ForcedAlgKind GetForcedAlg(
+    const Mc2CcTilingInner* ccTiling, std::string& algName, ExternalAlgSpec& extSpec, std::string& extParseErrMsg);
 
 HcclResult TryForcedAlgAndPrepareEngine(
     HcclComm comm, const Mc2CcTilingInner* ccTiling, OpParam& opParam, std::string& algName,
