@@ -200,65 +200,8 @@ __aicore__ inline void Mmad(
     MmadCal(dst, fm, filter, (uint64_t)bias, mmadParams);
 }
 
-// Bind pointers to LocalTensor then reuse Tensor Impl → avoids depending on MmadMxCal
-// visibility when ptr_impl is included after namespace close / mixed tikcpp+asc overlay.
-namespace CubePtrMxDetail {
-template <typename T>
-__aicore__ inline LocalTensor<T> BindL0C(__cc__ T* ptr)
-{
-    return LocalTensor<T>(TPosition::CO1, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(ptr)), 1);
-}
-template <typename T>
-__aicore__ inline LocalTensor<T> BindL0A(__ca__ T* ptr)
-{
-    return LocalTensor<T>(TPosition::A2, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(ptr)), 1);
-}
-template <typename T>
-__aicore__ inline LocalTensor<T> BindL0B(__cb__ T* ptr)
-{
-    return LocalTensor<T>(TPosition::B2, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(ptr)), 1);
-}
-template <typename T>
-__aicore__ inline LocalTensor<T> BindBias(__cc__ T* ptr)
-{
-    // Bias table (C2) vs L0C distinguished by MmadMxImpl via GetPosition; samples with
-    // explicit bias ptr use C2. Prefer C2 binding for bias overload.
-    return LocalTensor<T>(TPosition::C2, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(ptr)), 1);
-}
-} // namespace CubePtrMxDetail
-
-template <typename T, typename U, typename S>
-__aicore__ inline void MmadMx(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadParams& mmadParams)
-{
-    MmadMxImpl(
-        CubePtrMxDetail::BindL0C(dst), CubePtrMxDetail::BindL0A(fm), CubePtrMxDetail::BindL0B(filter), mmadParams);
-}
-
-template <typename T, typename U, typename S>
-__aicore__ inline void MmadMx(
-    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __cc__ T* bias, const MmadParams& mmadParams)
-{
-    MmadMxImpl(
-        CubePtrMxDetail::BindL0C(dst), CubePtrMxDetail::BindL0A(fm), CubePtrMxDetail::BindL0B(filter),
-        CubePtrMxDetail::BindBias(bias), mmadParams);
-}
-
-template <typename T, typename U, typename S>
-__aicore__ inline void MmadMx(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadBitModeParams& mmadParams)
-{
-    MmadMxImpl(
-        CubePtrMxDetail::BindL0C(dst), CubePtrMxDetail::BindL0A(fm), CubePtrMxDetail::BindL0B(filter),
-        const_cast<MmadBitModeParams&>(mmadParams));
-}
-
-template <typename T, typename U, typename S>
-__aicore__ inline void MmadMx(
-    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __cc__ T* bias, const MmadBitModeParams& mmadParams)
-{
-    MmadMxImpl(
-        CubePtrMxDetail::BindL0C(dst), CubePtrMxDetail::BindL0A(fm), CubePtrMxDetail::BindL0B(filter),
-        CubePtrMxDetail::BindBias(bias), const_cast<MmadBitModeParams&>(mmadParams));
-}
+// MmadMx pointer overloads live in kernel_operator_mm_intf_impl.h (same TU as Tensor
+// MmadMx / MmadMxImpl) to avoid undeclared MmadMxCal when ptr_impl is included late.
 #endif
 
 #if __NPU_ARCH__ == 2201

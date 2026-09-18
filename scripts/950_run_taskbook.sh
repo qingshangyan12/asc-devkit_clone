@@ -68,7 +68,8 @@ if [ -d "$ACT_INC" ] && [ -d "$ACT_IMPL" ]; then
   cp -a "$HELPER/include/basic_api/kernel_operator_ptr_utils.h" "$ACT_INC/" 2>/dev/null || true
   for f in kernel_operator_mm_ptr_impl.h kernel_operator_fixpipe_ptr_impl.h \
            kernel_operator_dump_tensor_ptr_impl.h kernel_operator_common_ptr_impl.h \
-           kernel_operator_block_sync_ptr_impl.h kernel_operator_determine_compute_sync_ptr_impl.h; do
+           kernel_operator_block_sync_ptr_impl.h kernel_operator_determine_compute_sync_ptr_impl.h \
+           kernel_operator_mm_intf_impl.h kernel_operator_fixpipe_intf_impl.h; do
     [ -f "$HELPER/impl/basic_api/$f" ] && cp -a "$HELPER/impl/basic_api/$f" "$ACT_IMPL/" || true
   done
   for pair in \
