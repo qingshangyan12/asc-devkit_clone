@@ -38,20 +38,25 @@ AscendC::Fixpipe((__gm__ float*)cGm.GetPhyAddr(), (__cc__ float*)c.GetPhyAddr(),
 
 | 平台 | 结果 | 产物 |
 |------|------|------|
-| Ascend910B3 (dav-2201) | 任务书矩阵 GREEN | `artifacts/910b_taskbook_20260917_170022/` |
-| Ascend950 (dav-3510) 主通路 | 49/49 GREEN（不含 MX） | `artifacts/950_cube_matrix*` |
-| Ascend950 MX (`mx_only`) | **GREEN** PASS=6 FAIL=0 @`42530dbf` | `artifacts/950_taskbook_20260918_123923/` |
-| Ascend950 全量 taskbook | **GREEN** PASS=21 FAIL=0 @`7feaf5a1`（含 dual/mmad_mx） | `artifacts/950_taskbook_20260918_124533/` |
+| Ascend910B3 (dav-2201) | 任务书矩阵 **PASS=34** | `artifacts/910b_taskbook_20260917_170022/` |
+| Ascend950 (dav-3510) 主通路 | **PASS=49** | `artifacts/950_cube_matrix_20260916_152136/` |
+| Ascend950 MX (`mx_only`) | **PASS=10**（mmad_mx s1–4 + 2dmx s1–6） | `artifacts/950_taskbook_20260918_171148/` |
+| Ascend950 全量 taskbook | **PASS=40**（含 **mmad:5 half**） | `artifacts/950_taskbook_20260918_170349/` |
+| P1-B fp8 / MX 同构 | 样例已合入 tip `e212999e`；等 950（coord rev36 已同步 runner） | `mmad:6/7`、`mmad_mx:5–8` |
 
 ```bash
-# 950 一次性 bootstrap：见仓库外 docs/950_USER_ONE_SHOT.md
 export CUBE_MATRIX_MODE=mx_only   # 或 taskbook
 bash scripts/950_run_taskbook.sh
 ```
 
-## 账号
+SKIP（xlsx 豁免）：`PopStackBuffer`、`SetAddrWithOffset`。
 
-Fork：`baibai_Uu/asc-devkit`（private）  
-**验收分支：** `feature/cube-basic-api-pointerization`  
-合入目标：[MR #6176](https://gitcode.com/cann/asc-devkit/merge_requests/6176)（已去 WIP）  
-易用性 Issue：[\#1733](https://gitcode.com/cann/asc-devkit/issues/1733)
+## 账号与交付
+
+| 项 | 链接 / 状态 |
+|----|-------------|
+| Fork / 分支 | `baibai_Uu/asc-devkit` @ `feature/cube-basic-api-pointerization` |
+| 合入 PR | [MR #6176](https://gitcode.com/cann/asc-devkit/merge_requests/6176)（已去 WIP · mergeable） |
+| 易用性 Issue | [#1733](https://gitcode.com/cann/asc-devkit/issues/1733) |
+| 设计 Issue | [#1675](https://gitcode.com/cann/asc-devkit/issues/1675) |
+| Ascend-CANN 协作者 | **已邀请**（Developer） |
