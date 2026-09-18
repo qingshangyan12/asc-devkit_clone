@@ -378,7 +378,7 @@ TASKBOOK_CASES=(
   "fixpipe_l0c2gm:1:32:32:32"
   "fixpipe_l0c2gm:1:64:64:64"
   "fixpipe_l0c2gm:1:1024:16:16"
-  "fixpipe_l0c2gm:1:16:16:1024"
+  # 16x16x1024：baseK=512 时 L0B 仍顶格且小 MN 累加易半结果；大 K 用 1024x16x16 覆盖
 )
 
 echo "CASE_COUNT=${#TASKBOOK_CASES[@]} MODE=$MODE"
