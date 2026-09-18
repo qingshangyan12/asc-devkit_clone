@@ -20,7 +20,7 @@
 - `Mmad` / `MmadMx` / `MmadWithSparse`
 - `Fixpipe`（含 Arch3510 `ExtractCacheMode`）/ `SetFixPipeConfig` / `SetFixPipeAddr`
 - `InitConstValue` / `InitOutput`
-- `DumpTensor`（`__cbuf__` 等）
+- `DumpTensor`（`__gm__/__ubuf__/__cbuf__/__cc__/__ca__/__cb__`）
 - `IBSet` / `IBWait` / Soft `SyncAll` / `InitDetermineComputeWorkspace` / `WaitPreBlock` / `NotifyNextBlock`
 
 官方范围以 [discussions/27](https://gitcode.com/cann/asc-devkit/discussions/27) xlsx 为准（60 签名 / 19 名；PopStackBuffer / SetAddrWithOffset 预期豁免）。

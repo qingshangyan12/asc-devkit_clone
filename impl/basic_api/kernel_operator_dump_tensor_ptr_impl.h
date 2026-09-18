@@ -70,6 +70,20 @@ __aicore__ inline void DumpTensor(__cc__ T* tensor, uint32_t desc, uint32_t dump
 }
 
 template <typename T>
+__aicore__ inline void DumpTensor(__ca__ T* tensor, uint32_t desc, uint32_t dumpSize)
+{
+    auto tmp = CubePtrDetail::BindLocal<T>(TPosition::A2, reinterpret_cast<T*>(tensor), dumpSize);
+    DumpTensorLocal2GMImpl(tmp, desc, dumpSize);
+}
+
+template <typename T>
+__aicore__ inline void DumpTensor(__cb__ T* tensor, uint32_t desc, uint32_t dumpSize)
+{
+    auto tmp = CubePtrDetail::BindLocal<T>(TPosition::B2, reinterpret_cast<T*>(tensor), dumpSize);
+    DumpTensorLocal2GMImpl(tmp, desc, dumpSize);
+}
+
+template <typename T>
 __aicore__ inline void DumpTensor(__gm__ T* tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
 {
     auto tmp = CubePtrDetail::BindGm(tensor, dumpSize);
@@ -122,6 +136,32 @@ __aicore__ inline void DumpTensor(__cc__ T* tensor, uint32_t desc, uint32_t dump
 }
 
 template <typename T>
+__aicore__ inline void DumpTensor(__ca__ T* tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
+{
+    auto tmp = CubePtrDetail::BindLocal<T>(TPosition::A2, reinterpret_cast<T*>(tensor), dumpSize);
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || \
+                              (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3102))
+    DumpShapeImpl(shapeInfo);
+    DumpTensorLocal2GMImpl(tmp, desc, dumpSize);
+#else
+    DumpTensorLocal2GMImpl(tmp, desc, dumpSize, shapeInfo.shape, shapeInfo.shapeDim);
+#endif
+}
+
+template <typename T>
+__aicore__ inline void DumpTensor(__cb__ T* tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
+{
+    auto tmp = CubePtrDetail::BindLocal<T>(TPosition::B2, reinterpret_cast<T*>(tensor), dumpSize);
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || \
+                              (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3102))
+    DumpShapeImpl(shapeInfo);
+    DumpTensorLocal2GMImpl(tmp, desc, dumpSize);
+#else
+    DumpTensorLocal2GMImpl(tmp, desc, dumpSize, shapeInfo.shape, shapeInfo.shapeDim);
+#endif
+}
+
+template <typename T>
 __aicore__ inline void DumpAccChkPoint(__gm__ T* tensor, uint32_t index, uint32_t countOff, uint32_t dumpSize)
 {
     DumpTensor(tensor + countOff, index, dumpSize);
@@ -141,6 +181,18 @@ __aicore__ inline void DumpAccChkPoint(__cbuf__ T* tensor, uint32_t index, uint3
 
 template <typename T>
 __aicore__ inline void DumpAccChkPoint(__cc__ T* tensor, uint32_t index, uint32_t countOff, uint32_t dumpSize)
+{
+    DumpTensor(tensor + countOff, index, dumpSize);
+}
+
+template <typename T>
+__aicore__ inline void DumpAccChkPoint(__ca__ T* tensor, uint32_t index, uint32_t countOff, uint32_t dumpSize)
+{
+    DumpTensor(tensor + countOff, index, dumpSize);
+}
+
+template <typename T>
+__aicore__ inline void DumpAccChkPoint(__cb__ T* tensor, uint32_t index, uint32_t countOff, uint32_t dumpSize)
 {
     DumpTensor(tensor + countOff, index, dumpSize);
 }
