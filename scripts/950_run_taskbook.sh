@@ -84,9 +84,13 @@ if [ -d "$ACT_INC" ] && [ -d "$ACT_IMPL" ]; then
     if [ -f "$HELPER/impl/basic_api/$f" ]; then
       cp -a "$HELPER/impl/basic_api/$f" "$ACT_IMPL/"
       echo "OVERLAY_ASC $f"
+      # tikcfw dual path: interface/../../impl/basic_api — create dir if absent
+      mkdir -p "$TIK_IMPL" 2>/dev/null || true
       if [ -d "$TIK_IMPL" ]; then
         cp -a "$HELPER/impl/basic_api/$f" "$TIK_IMPL/"
-        echo "OVERLAY_TIK $f"
+        echo "OVERLAY_TIK $f -> $TIK_IMPL"
+      else
+        echo "OVERLAY_TIK_SKIP $f missing=$TIK_IMPL"
       fi
     fi
   done
