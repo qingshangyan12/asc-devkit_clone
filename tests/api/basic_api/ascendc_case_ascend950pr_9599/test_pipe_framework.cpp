@@ -230,6 +230,10 @@ TEST_F(TEST_TPIPE, TBufGetWithOffsetInt4Test)
     auto int32Tensor = buf.GetWithOffset<int32_t>(8, 64);
     EXPECT_EQ(int32Tensor.address_.dataLen, 32);
     EXPECT_EQ(int32Tensor.GetSize(), 8);
+
+    auto traitTensor = buf.GetWithOffset<TensorTrait<int32_t>>(8, 64);
+    EXPECT_EQ(traitTensor.address_.dataLen, 32);
+    EXPECT_EQ(traitTensor.GetSize(), 8);
 }
 
 TEST_F(TEST_TPIPE, TBufGetWithOffsetParamCheckTest)
