@@ -58,6 +58,24 @@ __aicore__ inline void LoadData(
     LoadDataImpl(dst, src, loadDataParams);
 }
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-PR0] LoadData 2D L1 -> L0A/L0B — Jessicaruan PR-0 */
+template <typename T>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParams)
+{
+    CheckLoadData2dDatatype<T>();
+    LoadData2DL12L0ACal(dst, src, loadDataParams);
+}
+
+template <typename T>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParams)
+{
+    CheckLoadData2dDatatype<T>();
+    LoadData2DL12L0BCal(dst, src, loadDataParams);
+}
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
+
+
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams)
@@ -125,6 +143,24 @@ __aicore__ inline void LoadData(
 #endif
     LoadDataImpl(dst, src, loadDataParams);
 }
+
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-PR0-V2] LoadData 2DV2 L1 -> L0A/L0B — Jessicaruan PR-0 */
+template <typename T>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParams)
+{
+    CheckLoadData2dDatatype<T>();
+    LoadData2DL12L0ACal(dst, src, loadDataParams);
+}
+
+template <typename T>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParams)
+{
+    CheckLoadData2dDatatype<T>();
+    LoadData2DL12L0BCal(dst, src, loadDataParams);
+}
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
+
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
                               (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
