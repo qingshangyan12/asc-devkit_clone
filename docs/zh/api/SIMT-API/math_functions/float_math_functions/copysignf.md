@@ -50,12 +50,12 @@ inline float copysignf(float x, float y)
 
 返回值的数值部分为x的绝对值，符号位与y的符号位一致。
 
--   当y的符号位为0时，返回Abs\(x\)。
--   当y的符号位为1时，返回-Abs\(x\)。
--   y=nan(0x7fc00000)时，返回Abs\(x\)。
--   y=nan(0xffc00000)时，返回-Abs\(x\)。
--   y=-inf时，返回-Abs\(x\)。
--   y=inf时，返回Abs\(x\)。
+- 当y的符号位为0时，返回Abs\(x\)。
+- 当y的符号位为1时，返回-Abs\(x\)。
+- y=nan(0x7fc00000)时，返回Abs\(x\)。
+- y=nan(0xffc00000)时，返回-Abs\(x\)。
+- y=-inf时，返回-Abs\(x\)。
+- y=inf时，返回Abs\(x\)。
 
 ## 约束说明
 
