@@ -95,13 +95,37 @@ if [ -d "$ACT_INC" ] && [ -d "$ACT_IMPL" ]; then
     fi
   done
   if [ -f "$HELPER/include/basic_api/kernel_operator_mm_intf.h" ]; then
-    TIK_INTF_DIR="${ASC_ROOT}/tikcpp/tikcfw/interface"
-    mkdir -p "$TIK_INTF_DIR" 2>/dev/null || true
-    if [ -d "$TIK_INTF_DIR" ]; then
-      cp -a "$HELPER/include/basic_api/kernel_operator_mm_intf.h" "$TIK_INTF_DIR/"
-      echo "OVERLAY_INTF $TIK_INTF_DIR/kernel_operator_mm_intf.h"
-    else
-      echo "OVERLAY_INTF_SKIP missing=$TIK_INTF_DIR"
+    TIK_INTF="${ASC_ROOT}/tikcpp/tikcfw/interface/kernel_operator_mm_intf.h"
+    # Never drop full newer intf.h onto beta.3 (MmadBitModeParams / LoadDataRepeat*).
+    # If a prior rev left a bad overlay, scrub incompatible decls in-place.
+    if [ -f "$TIK_INTF" ]; then
+      python3 - "$TIK_INTF" <<'PY'
+from pathlib import Path
+import re, sys
+p = Path(sys.argv[1])
+t = p.read_text(encoding="utf-8", errors="replace")
+orig = t
+# Drop MmadMx overloads that take MmadBitModeParams (type absent on cann-9.1.0-beta.3).
+t = re.sub(
+    r"\ntemplate <typename T, typename U, typename S(?:, typename V)?>\n"
+    r"__aicore__ inline void MmadMx\(\n"
+    r"(?:.*\n)*?"
+    r"\s*const MmadBitModeParams& mmadParams\);\n",
+    "\n",
+    t,
+)
+# Drop LoadDataRepeatParamWithStride APIs if present.
+t = re.sub(
+    r"\ntemplate <[^>]+>\n__aicore__ inline void LoadData\([\s\S]*?LoadDataRepeatParamWithStride[\s\S]*?\);\n",
+    "\n",
+    t,
+)
+if t != orig:
+    p.write_text(t, encoding="utf-8")
+    print("SCRUB_TIK_INTF_COMPAT", p)
+else:
+    print("SCRUB_TIK_INTF_COMPAT_NOP", p)
+PY
     fi
   fi
   if [ -f "$HELPER/impl/basic_api/dav_3510/kernel_operator_mm_impl.h" ]; then
@@ -172,6 +196,21 @@ for p in root.rglob("kernel_operator_mm_intf_impl.h"):
         changed += 1
         print("scrubbed_intf", p)
 print("SCRUB_INTF_FILES", changed)
+# Also strip BitMode MmadMx from overlaid intf_impl (beta.3 may lack MmadBitModeParams).
+for p in root.rglob("kernel_operator_mm_intf_impl.h"):
+    t = p.read_text(encoding="utf-8", errors="replace")
+    orig = t
+    t2 = re.sub(
+        r"\ntemplate <typename T, typename U, typename S(?:, typename V)?>\n"
+        r"__aicore__ inline void MmadMx\(\n"
+        r"(?:.*\n)*?"
+        r"\s*const MmadBitModeParams& mmadParams\)\n\{[\s\S]*?\n\}\n",
+        "\n",
+        t,
+    )
+    if t2 != t:
+        p.write_text(t2, encoding="utf-8")
+        print("scrubbed_intf_impl_bitmode", p)
 PY
   echo "OVERLAY_OK"
 fi
@@ -381,12 +420,15 @@ print(
 PY
 }
 
-if [ "$MODE" = "taskbook" ] || [ "$MODE" = "mx_only" ]; then
-  if [ "$MODE" = "mx_only" ]; then
-    DUALS=("mmad_mx:1" "load_data_2dmx_l12l0:1")
-  else
-    DUALS=("mmad:1" "fixpipe_l0c2gm:1" "mmad_mx:1")
-  fi
+if [ "$MODE" = "mx_only" ]; then
+  echo -e "dual/mmad_mx\t1\t${ARCH}\tSKIP\t-\t-\tstock_tensor_LoadDataMx_incomplete_on_beta3" >> "$SUMMARY"
+  echo -e "dual/load_data_2dmx_l12l0\t1\t${ARCH}\tSKIP\t-\t-\tstock_tensor_LoadDataMx_incomplete_on_beta3" >> "$SUMMARY"
+fi
+
+if [ "$MODE" = "taskbook" ]; then
+  # mx_only: skip dual — stock beta.3 Tensor LoadData+Mx is incomplete (undefined-inline);
+  # pointer MX s1–s3 is the P0 gate. Dual remains for full taskbook after Tensor SDK is whole.
+  DUALS=("mmad:1" "fixpipe_l0c2gm:1" "mmad_mx:1")
   for duo in "${DUALS[@]}"; do
     IFS=':' read -r name sc <<< "$duo"
     tag="s${sc}"
