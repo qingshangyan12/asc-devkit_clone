@@ -472,6 +472,8 @@ __aicore__ inline void ResetLoopModePara(DataCopyMVType type);
 
 #if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_data_copy_intf_impl.h"
+// 搬运类接口指针化扩展（Pointer / Tensor 双重输入支持），复用底层 *Impl 实现
+#include "kernel_operator_data_copy_ptr_intf.h"
 #endif
 #endif // ASCENDC_MODULE_OPERATOR_VEC_VCONV_INTERFACE_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_INTF_H__)
