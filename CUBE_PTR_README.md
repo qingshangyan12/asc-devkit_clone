@@ -40,7 +40,7 @@ AscendC::Fixpipe((__gm__ float*)cGm.GetPhyAddr(), (__cc__ float*)c.GetPhyAddr(),
 |------|------|------|
 | Ascend910B3 (dav-2201) | 任务书矩阵 GREEN | `artifacts/910b_taskbook_20260917_170022/` |
 | Ascend950 (dav-3510) 主通路 | 49/49 GREEN（不含 MX） | `artifacts/950_cube_matrix*` |
-| Ascend950 MX | 进行中（verify 曾 FAIL；已修 deps 硬失败 + Fixpipe cacheMode + dual Tensor 诊断） | 等 `coord/ascend950` outbox |
+| Ascend950 MX | 待复跑：BUILD_FAIL(`MmadMxCal`)@8b25eabfc → 已修 `a61e3db7`(`MmadMxImpl` bind)；coord rev10 | jump SSH 禁用，待 950 bootstrap |
 
 ```bash
 # 950 一次性 bootstrap：见仓库外 docs/950_USER_ONE_SHOT.md
@@ -52,4 +52,5 @@ bash scripts/950_run_taskbook.sh
 
 Fork：`baibai_Uu/asc-devkit`（private）  
 **验收分支：** `feature/cube-basic-api-pointerization`  
-合入目标：`cann/asc-devkit` master（旧 MR #6066 closed，待 MX 绿后重开）
+合入目标：WIP [MR #6176](https://gitcode.com/cann/asc-devkit/merge_requests/6176)（旧 #6066 closed；MX 绿后去 WIP）  
+易用性 Issue：[\#1733](https://gitcode.com/cann/asc-devkit/issues/1733)
