@@ -76,28 +76,21 @@ if [ -d "$ACT_INC" ] && [ -d "$ACT_IMPL" ]; then
            kernel_operator_block_sync_ptr_impl.h kernel_operator_determine_compute_sync_ptr_impl.h; do
     [ -f "$HELPER/impl/basic_api/$f" ] && cp -a "$HELPER/impl/basic_api/$f" "$ACT_IMPL/" || true
   done
-  # beta.3: LoadData2DMx assert misses plain fp8; Tensor MmadMx needs MmadMxImpl;
-  # Tensor LoadData+Mx needs intf_impl + load2d_impl bodies (else undefined-inline dual link fail).
-  # Overlay base/load2d/dav + intf_impl (scrub NEAREST_AWAY below) — not a raw unscrubbed intf drop.
-  for f in kernel_operator_mm_base_impl.h kernel_operator_mm_load2d_impl.h \
-           kernel_operator_mm_intf_impl.h; do
-    if [ -f "$HELPER/impl/basic_api/$f" ]; then
-      cp -a "$HELPER/impl/basic_api/$f" "$ACT_IMPL/"
-      echo "OVERLAY_ASC $f"
-      # tikcfw dual path: interface/../../impl/basic_api — create dir if absent
-      mkdir -p "$TIK_IMPL" 2>/dev/null || true
-      if [ -d "$TIK_IMPL" ]; then
-        cp -a "$HELPER/impl/basic_api/$f" "$TIK_IMPL/"
-        echo "OVERLAY_TIK $f -> $TIK_IMPL"
-      else
-        echo "OVERLAY_TIK_SKIP $f missing=$TIK_IMPL"
-      fi
-    fi
+  # Restore stock tik mm_intf.h from CANN (never overlay newer feature intf.h).
+  TIK_INTF="${ASC_ROOT}/tikcpp/tikcfw/interface/kernel_operator_mm_intf.h"
+  STOCK_INTF=""
+  for cand in \
+    "${ASCEND_HOME_PATH}/aarch64-linux/tikcpp/tikcfw/interface/kernel_operator_mm_intf.h" \
+    "${ASCEND_HOME_PATH}/x86_64-linux/tikcpp/tikcfw/interface/kernel_operator_mm_intf.h.bak" \
+    "${ASCEND_HOME_PATH}/x86_64-linux/tikcpp/tikcfw/interface/kernel_operator_mm_intf.h.orig" \
+    "/usr/local/Ascend/cann-9.1.0-beta.3.bak/x86_64-linux/tikcpp/tikcfw/interface/kernel_operator_mm_intf.h"; do
+    [ -f "$cand" ] && STOCK_INTF="$cand" && break
   done
-  if [ -f "$HELPER/include/basic_api/kernel_operator_mm_intf.h" ]; then
-    TIK_INTF="${ASC_ROOT}/tikcpp/tikcfw/interface/kernel_operator_mm_intf.h"
-    # Never drop full newer intf.h onto beta.3 (MmadBitModeParams / LoadDataRepeat*).
-    # If a prior rev left a bad overlay, scrub incompatible decls in-place.
+  if [ -n "$STOCK_INTF" ] && [ -f "$TIK_INTF" ]; then
+    cp -a "$STOCK_INTF" "$TIK_INTF"
+    echo "RESTORE_TIK_INTF from $STOCK_INTF"
+  else
+    # Feature intf overlay left MmadBitModeParams decls beta.3 cannot compile. Strip them.
     if [ -f "$TIK_INTF" ]; then
       python3 - "$TIK_INTF" <<'PY'
 from pathlib import Path
@@ -105,7 +98,6 @@ import re, sys
 p = Path(sys.argv[1])
 t = p.read_text(encoding="utf-8", errors="replace")
 orig = t
-# Drop MmadMx overloads that take MmadBitModeParams (type absent on cann-9.1.0-beta.3).
 t = re.sub(
     r"\ntemplate <typename T, typename U, typename S(?:, typename V)?>\n"
     r"__aicore__ inline void MmadMx\(\n"
@@ -114,7 +106,6 @@ t = re.sub(
     "\n",
     t,
 )
-# Drop LoadDataRepeatParamWithStride APIs if present.
 t = re.sub(
     r"\ntemplate <[^>]+>\n__aicore__ inline void LoadData\([\s\S]*?LoadDataRepeatParamWithStride[\s\S]*?\);\n",
     "\n",
@@ -128,6 +119,20 @@ else:
 PY
     fi
   fi
+  # Do not overlay feature mm_intf_impl onto TIK (Fill template breaks sample pad).
+  if [ -f "$HELPER/impl/basic_api/kernel_operator_mm_base_impl.h" ]; then
+    cp -a "$HELPER/impl/basic_api/kernel_operator_mm_base_impl.h" "$ACT_IMPL/"
+    echo "OVERLAY_ASC kernel_operator_mm_base_impl.h"
+  fi
+  if [ -f "$HELPER/impl/basic_api/kernel_operator_mm_load2d_impl.h" ]; then
+    cp -a "$HELPER/impl/basic_api/kernel_operator_mm_load2d_impl.h" "$ACT_IMPL/"
+    echo "OVERLAY_ASC kernel_operator_mm_load2d_impl.h"
+  fi
+  # intf_impl overlay only under asc/ (pointer include), not tikcpp (Fill breakage).
+  if [ -f "$HELPER/impl/basic_api/kernel_operator_mm_intf_impl.h" ]; then
+    cp -a "$HELPER/impl/basic_api/kernel_operator_mm_intf_impl.h" "$ACT_IMPL/"
+    echo "OVERLAY_ASC kernel_operator_mm_intf_impl.h"
+  fi
   if [ -f "$HELPER/impl/basic_api/dav_3510/kernel_operator_mm_impl.h" ]; then
     mkdir -p "$ACT_IMPL/dav_3510" 2>/dev/null || true
     cp -a "$HELPER/impl/basic_api/dav_3510/kernel_operator_mm_impl.h" "$ACT_IMPL/dav_3510/" 2>/dev/null || true
@@ -135,10 +140,10 @@ PY
     if [ -d "$TIK_DAV" ]; then
       cp -a "$HELPER/impl/basic_api/dav_3510/kernel_operator_mm_impl.h" "$TIK_DAV/"
       echo "OVERLAY_DAV_TIK tikcfw/impl/dav_3510/kernel_operator_mm_impl.h"
-    else
-      echo "OVERLAY_DAV_TIK_SKIP missing=$TIK_DAV"
     fi
   fi
+  echo "OVERLAY_SKIP_TIK_IMPL (keep stock Fill/LoadData)"
+  # pointer include hook on asc intf_impl only
   for pair in \
     "kernel_operator_mm_intf_impl.h:kernel_operator_mm_ptr_impl.h" \
     "kernel_operator_fixpipe_intf_impl.h:kernel_operator_fixpipe_ptr_impl.h"; do
@@ -158,60 +163,6 @@ p.write_text(t, encoding='utf-8')
 print('patched', p)
 PY
   done
-  # Scrub accidental prior overlay of NEW intf onto beta.3 CANN (NEAREST_AWAY / CubePtrMxDetail).
-  python3 - "$ASCEND_HOME_PATH" <<'PY'
-from pathlib import Path
-import re, sys
-root = Path(sys.argv[1])
-changed = 0
-for p in root.rglob("kernel_operator_mm_intf_impl.h"):
-    t = p.read_text(encoding="utf-8", errors="replace")
-    orig = t
-    t = t.replace(
-        "SetHF32TransModeImpl(mode == AscendC::HF32TransMode::NEAREST_AWAY);",
-        "SetHF32TransModeImpl(static_cast<uint32_t>(mode) == 0u);",
-    )
-    # drop pointer-MmadMx block inserted in feature intf (keep Tensor MmadMx only)
-    t2 = re.sub(
-        r"\n// Pointer overloads: bind then reuse MmadMxImpl.*?^#endif\n",
-        "\n#endif\n",
-        t,
-        count=1,
-        flags=re.S | re.M,
-    )
-    if t2 != t:
-        t = t2
-    # if CubePtrMxDetail still present without the comment anchor, strip namespace+following 4 MmadMx ptr templates roughly
-    if "namespace CubePtrMxDetail" in t:
-        t = re.sub(
-            r"\nnamespace CubePtrMxDetail \{.*?\n\} // namespace CubePtrMxDetail\n"
-            r"(?:\ntemplate <typename T, typename U, typename S>.*?\{.*?\n\}\n)+",
-            "\n",
-            t,
-            count=1,
-            flags=re.S,
-        )
-    if t != orig:
-        p.write_text(t, encoding="utf-8")
-        changed += 1
-        print("scrubbed_intf", p)
-print("SCRUB_INTF_FILES", changed)
-# Also strip BitMode MmadMx from overlaid intf_impl (beta.3 may lack MmadBitModeParams).
-for p in root.rglob("kernel_operator_mm_intf_impl.h"):
-    t = p.read_text(encoding="utf-8", errors="replace")
-    orig = t
-    t2 = re.sub(
-        r"\ntemplate <typename T, typename U, typename S(?:, typename V)?>\n"
-        r"__aicore__ inline void MmadMx\(\n"
-        r"(?:.*\n)*?"
-        r"\s*const MmadBitModeParams& mmadParams\)\n\{[\s\S]*?\n\}\n",
-        "\n",
-        t,
-    )
-    if t2 != t:
-        p.write_text(t2, encoding="utf-8")
-        print("scrubbed_intf_impl_bitmode", p)
-PY
   echo "OVERLAY_OK"
 fi
 
