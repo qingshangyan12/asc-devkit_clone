@@ -21,6 +21,9 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- npu="KirinDev0001" id7 -->
+- KirinDev0000/KirinDev0001/KirinDev0002/KirinDev0003：支持
+<!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/tensor_transform/Transpose_res.md#id1 -->
 
 ## 功能说明
