@@ -259,12 +259,11 @@ CcuResult CcuKfcReduceScatterNHR1DMultiJettyMem2MemKernel(CcuKernelArg arg)
     InitCcuKernelCtxBase(ctx);
     CCU_CHK_RET(InitResource(ctx));
     ccu::Func subKernel(
-        [&ctx](ccu::Array<ccu::Variable>& args) -> CcuResult {
-            CCU_CHK_RET(LoadArgs(ctx, args));
-            CCU_CHK_RET(PreSync(ctx));
-            CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(RunNhr(ctx)); }
-            CCU_CHK_RET(PostSync(ctx));
-            return CCU_SUCCESS;
+        [&ctx](ccu::Array<ccu::Variable>& args) {
+            LoadArgs(ctx, args);
+            PreSync(ctx);
+            CCU_IF(ctx.sliceSize != 0) { RunNhr(ctx); }
+            PostSync(ctx);
         },
         CCU_FUNC_XKERNEL_ARG_MAX, KFC_SUB_KERNEL_FUNC_NAME);
     return CCU_SUCCESS;

@@ -167,12 +167,11 @@ CcuResult CcuAlltoAllMesh1DKernel(CcuKernelArg arg)
     InitCcuKernelCtxBase(ctx);
     CCU_CHK_RET(InitResource(ctx));
     ccu::Func subKernel(
-        [&ctx](ccu::Array<ccu::Variable>& args) -> CcuResult {
-            CCU_CHK_RET(LoadArgs(ctx, args));
+        [&ctx](ccu::Array<ccu::Variable>& args) {
+            LoadArgs(ctx, args);
             PreSync(ctx);
-            CCU_CHK_RET(DoAlltoAll(ctx));
+            DoAlltoAll(ctx);
             PostSync(ctx);
-            return CCU_SUCCESS;
         },
         CCU_FUNC_XKERNEL_ARG_MAX, KFC_SUB_KERNEL_FUNC_NAME);
     return CCU_SUCCESS;

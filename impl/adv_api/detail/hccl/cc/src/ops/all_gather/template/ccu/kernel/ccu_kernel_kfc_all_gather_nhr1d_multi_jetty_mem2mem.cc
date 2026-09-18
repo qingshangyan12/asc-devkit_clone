@@ -341,13 +341,12 @@ CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(CcuKernelArg arg)
     InitCcuKernelCtxBase(ctx);
     CCU_CHK_RET(InitResource(ctx));
     ccu::Func subKernel(
-        [&ctx](ccu::Array<ccu::Variable>& args) -> CcuResult {
-            CCU_CHK_RET(LoadArgs(ctx, args));
+        [&ctx](ccu::Array<ccu::Variable>& args) {
+            LoadArgs(ctx, args);
             ctx.constVar1 = 1U;
-            CCU_CHK_RET(PreSync(ctx));
-            CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(RunNhr(ctx)); }
-            CCU_CHK_RET(PostSync(ctx));
-            return CCU_SUCCESS;
+            PreSync(ctx);
+            CCU_IF(ctx.sliceSize != 0) { RunNhr(ctx); }
+            PostSync(ctx);
         },
         CCU_FUNC_XKERNEL_ARG_MAX,
         KFC_SUB_KERNEL_FUNC_NAME);
@@ -371,8 +370,8 @@ CcuResult CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemKernel(CcuKernelArg arg)
     InitCcuKernelCtxBase(ctx);
     CCU_CHK_RET(InitResource(ctx));
     ccu::Func subKernel(
-        [&ctx](ccu::Array<ccu::Variable>& args) -> CcuResult {
-            CCU_CHK_RET(LoadArgs(ctx, args));
+        [&ctx](ccu::Array<ccu::Variable>& args) {
+            LoadArgs(ctx, args);
             ccu::Variable zero;
             ccu::Variable one;
             ccu::Variable level1Stride;
@@ -391,33 +390,30 @@ CcuResult CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemKernel(CcuKernelArg arg)
             phase1RepeatNumInv = UINT64_MAX - ctx.rankSizeLevel0;
             phase0RepeatNumInv = UINT64_MAX - 1U;
 
-            CCU_CHK_RET(
-                LoadNhrArgs(
-                    ctx, phase0Input, phase0Output, ctx.parallelToken, ctx.part1Size, ctx.part1SliceSizePerJetty,
-                    ctx.part1LastSliceSizePerJetty, phase0RepeatNumInv, zero, level1Stride, zero, zero, zero,
-                    ctx.part1GoSize.addrOffset, ctx.part1GoSize.loopParam, ctx.part1GoSize.parallelParam,
-                    ctx.part1GoSize.residual));
-            CCU_CHK_RET(PreSync(ctx));
-            CCU_IF(ctx.part1Size != 0) { CCU_CHK_RET(RunNhr(ctx)); }
-            CCU_CHK_RET(PostSync(ctx));
+            LoadNhrArgs(
+                ctx, phase0Input, phase0Output, ctx.parallelToken, ctx.part1Size, ctx.part1SliceSizePerJetty,
+                ctx.part1LastSliceSizePerJetty, phase0RepeatNumInv, zero, level1Stride, zero, zero, zero,
+                ctx.part1GoSize.addrOffset, ctx.part1GoSize.loopParam, ctx.part1GoSize.parallelParam,
+                ctx.part1GoSize.residual);
+            PreSync(ctx);
+            CCU_IF(ctx.part1Size != 0) { RunNhr(ctx); }
+            PostSync(ctx);
 
-            CCU_CHK_RET(ccu::Store(ctx.nhrPhaseDoneAddr, one));
+            ccu::Store(ctx.nhrPhaseDoneAddr, one);
             ccu::Variable meshDone;
             meshDone = 0U;
             CCU_WHILE(meshDone != 1U) {
-                CCU_CHK_RET(ccu::Load(ctx.meshPhaseDoneAddr, meshDone));
+                ccu::Load(ctx.meshPhaseDoneAddr, meshDone);
             }
 
-            CCU_CHK_RET(
-                LoadNhrArgs(
-                    ctx, ctx.parallelOutputBase, ctx.parallelOutputBase, ctx.parallelToken, ctx.part0Size,
-                    ctx.part0SliceSizePerJetty, ctx.part0LastSliceSizePerJetty, phase1RepeatNumInv, level1Stride,
-                    level1Stride, ctx.outputStride, ctx.outputStride, one, ctx.part0GoSize.addrOffset,
-                    ctx.part0GoSize.loopParam, ctx.part0GoSize.parallelParam, ctx.part0GoSize.residual));
-            CCU_CHK_RET(PreSync(ctx));
-            CCU_IF(ctx.part0Size != 0) { CCU_CHK_RET(RunNhr(ctx)); }
-            CCU_CHK_RET(PostSync(ctx));
-            return CCU_SUCCESS;
+            LoadNhrArgs(
+                ctx, ctx.parallelOutputBase, ctx.parallelOutputBase, ctx.parallelToken, ctx.part0Size,
+                ctx.part0SliceSizePerJetty, ctx.part0LastSliceSizePerJetty, phase1RepeatNumInv, level1Stride,
+                level1Stride, ctx.outputStride, ctx.outputStride, one, ctx.part0GoSize.addrOffset,
+                ctx.part0GoSize.loopParam, ctx.part0GoSize.parallelParam, ctx.part0GoSize.residual);
+            PreSync(ctx);
+            CCU_IF(ctx.part0Size != 0) { RunNhr(ctx); }
+            PostSync(ctx);
         },
         CCU_FUNC_XKERNEL_ARG_MAX, KFC_SUB_KERNEL_FUNC_NAME);
     return CCU_SUCCESS;
