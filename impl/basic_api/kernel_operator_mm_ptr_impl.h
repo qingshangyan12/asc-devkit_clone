@@ -200,62 +200,113 @@ __aicore__ inline void Mmad(
     MmadCal(dst, fm, filter, (uint64_t)bias, mmadParams);
 }
 
-// Bind + MmadMxImpl: ptr_impl is overlaid alone on 950; do NOT overlay intf_impl
-// (newer intf breaks cann-9.1.0-beta.3: HF32TransMode::NEAREST_AWAY).
-namespace CubePtrMxDetail {
-template <typename T>
-__aicore__ inline LocalTensor<T> BindL0C(__cc__ T* ptr)
-{
-    return LocalTensor<T>(TPosition::CO1, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(ptr)), 1);
-}
-template <typename T>
-__aicore__ inline LocalTensor<T> BindL0A(__ca__ T* ptr)
-{
-    return LocalTensor<T>(TPosition::A2, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(ptr)), 1);
-}
-template <typename T>
-__aicore__ inline LocalTensor<T> BindL0B(__cb__ T* ptr)
-{
-    return LocalTensor<T>(TPosition::B2, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(ptr)), 1);
-}
-template <typename T>
-__aicore__ inline LocalTensor<T> BindBias(__cc__ T* ptr)
-{
-    return LocalTensor<T>(TPosition::C2, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(ptr)), 1);
-}
-} // namespace CubePtrMxDetail
-
+// Inline mad_mx (same as MmadMxCal). Do NOT call MmadMxImpl/MmadMxCal by name:
+// ptr_impl is included after namespace AscendC closes; those Cal/Impl names are not
+// visible under cann-9.1.0-beta.3 overlay include order. Intrinsic mad_mx is.
 template <typename T, typename U, typename S>
 __aicore__ inline void MmadMx(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadParams& mmadParams)
 {
-    MmadMxImpl(
-        CubePtrMxDetail::BindL0C(dst), CubePtrMxDetail::BindL0A(fm), CubePtrMxDetail::BindL0B(filter), mmadParams);
+    if ASCEND_IS_AIC {
+        using DstT = PrimT<T>;
+        using Src0T = PrimT<U>;
+        using Src1T = PrimT<S>;
+        constexpr bool isMx = SupportType<
+            Tuple<DstT, Src0T, Src1T>, Tuple<float, fp4x2_e1m2_t, fp4x2_e1m2_t>,
+            Tuple<float, fp4x2_e1m2_t, fp4x2_e2m1_t>, Tuple<float, fp4x2_e2m1_t, fp4x2_e1m2_t>,
+            Tuple<float, fp4x2_e2m1_t, fp4x2_e2m1_t>, Tuple<float, fp8_e4m3fn_t, fp8_e4m3fn_t>,
+            Tuple<float, fp8_e4m3fn_t, fp8_e5m2_t>, Tuple<float, fp8_e5m2_t, fp8_e4m3fn_t>,
+            Tuple<float, fp8_e5m2_t, fp8_e5m2_t>>();
+        static_assert(isMx, "MmadMx not support data type on current device!");
+        bool cmatrixInitVal = mmadParams.cmatrixInitVal && (!mmadParams.isBias);
+        mad_mx(
+            (__cc__ DstT*)dst, (__ca__ Src0T*)fm, (__cb__ Src1T*)filter, mmadParams.m, mmadParams.k, mmadParams.n,
+            mmadParams.unitFlag, mmadParams.disableGemv, mmadParams.cmatrixSource, cmatrixInitVal);
+    }
 }
 
 template <typename T, typename U, typename S>
 __aicore__ inline void MmadMx(
     __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __cc__ T* bias, const MmadParams& mmadParams)
 {
-    MmadMxImpl(
-        CubePtrMxDetail::BindL0C(dst), CubePtrMxDetail::BindL0A(fm), CubePtrMxDetail::BindL0B(filter),
-        CubePtrMxDetail::BindBias(bias), mmadParams);
+    if ASCEND_IS_AIC {
+        using DstT = PrimT<T>;
+        using Src0T = PrimT<U>;
+        using Src1T = PrimT<S>;
+        constexpr bool isMx = SupportType<
+            Tuple<DstT, Src0T, Src1T>, Tuple<float, fp4x2_e1m2_t, fp4x2_e1m2_t>,
+            Tuple<float, fp4x2_e1m2_t, fp4x2_e2m1_t>, Tuple<float, fp4x2_e2m1_t, fp4x2_e1m2_t>,
+            Tuple<float, fp4x2_e2m1_t, fp4x2_e2m1_t>, Tuple<float, fp8_e4m3fn_t, fp8_e4m3fn_t>,
+            Tuple<float, fp8_e4m3fn_t, fp8_e5m2_t>, Tuple<float, fp8_e5m2_t, fp8_e4m3fn_t>,
+            Tuple<float, fp8_e5m2_t, fp8_e5m2_t>>();
+        static_assert(isMx, "MmadMx not support data type on current device!");
+        // Explicit bias ptr: treat as BiasTable (C2), matching samples / cmatrixSource=true.
+        bool cmatrixSource = true;
+        bool cmatrixInitVal = mmadParams.cmatrixInitVal && (!mmadParams.isBias);
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+        mad_mx(
+            (__cc__ DstT*)dst, (__ca__ Src0T*)fm, (__cb__ Src1T*)filter, (uint64_t)bias, mmadParams.m, mmadParams.k,
+            mmadParams.n, mmadParams.unitFlag, mmadParams.disableGemv, cmatrixSource, cmatrixInitVal);
+#else
+        uint64_t xd = ((uint64_t)dst) & 0xffffffffULL | ((((uint64_t)bias) & 0xffffffffULL) << 32);
+        mad_mx(
+            (__cc__ DstT*)xd, (__ca__ Src0T*)fm, (__cb__ Src1T*)filter, mmadParams.m, mmadParams.k, mmadParams.n,
+            mmadParams.unitFlag, mmadParams.disableGemv, cmatrixSource, cmatrixInitVal);
+#endif
+    }
 }
 
 template <typename T, typename U, typename S>
 __aicore__ inline void MmadMx(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadBitModeParams& mmadParams)
 {
-    MmadMxImpl(
-        CubePtrMxDetail::BindL0C(dst), CubePtrMxDetail::BindL0A(fm), CubePtrMxDetail::BindL0B(filter),
-        const_cast<MmadBitModeParams&>(mmadParams));
+    if ASCEND_IS_AIC {
+        using DstT = PrimT<T>;
+        using Src0T = PrimT<U>;
+        using Src1T = PrimT<S>;
+        constexpr bool isMx = SupportType<
+            Tuple<DstT, Src0T, Src1T>, Tuple<float, fp4x2_e1m2_t, fp4x2_e1m2_t>,
+            Tuple<float, fp4x2_e1m2_t, fp4x2_e2m1_t>, Tuple<float, fp4x2_e2m1_t, fp4x2_e1m2_t>,
+            Tuple<float, fp4x2_e2m1_t, fp4x2_e2m1_t>, Tuple<float, fp8_e4m3fn_t, fp8_e4m3fn_t>,
+            Tuple<float, fp8_e4m3fn_t, fp8_e5m2_t>, Tuple<float, fp8_e5m2_t, fp8_e4m3fn_t>,
+            Tuple<float, fp8_e5m2_t, fp8_e5m2_t>>();
+        static_assert(isMx, "MmadMx not support data type on current device!");
+        MmadBitModeParams& params = const_cast<MmadBitModeParams&>(mmadParams);
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+        mad_mx(
+            (__cc__ DstT*)dst, (__ca__ Src0T*)fm, (__cb__ Src1T*)filter, params.GetM(), params.GetK(), params.GetN(),
+            params.GetUnitFlag(), params.GetDisableGemv(), params.GetCmatrixSource(), params.GetCmatrixInitVal());
+#else
+        mad_mx((__cc__ DstT*)dst, (__ca__ Src0T*)fm, (__cb__ Src1T*)filter, params.GetConfig0());
+#endif
+    }
 }
 
 template <typename T, typename U, typename S>
 __aicore__ inline void MmadMx(
     __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __cc__ T* bias, const MmadBitModeParams& mmadParams)
 {
-    MmadMxImpl(
-        CubePtrMxDetail::BindL0C(dst), CubePtrMxDetail::BindL0A(fm), CubePtrMxDetail::BindL0B(filter),
-        CubePtrMxDetail::BindBias(bias), const_cast<MmadBitModeParams&>(mmadParams));
+    if ASCEND_IS_AIC {
+        using DstT = PrimT<T>;
+        using Src0T = PrimT<U>;
+        using Src1T = PrimT<S>;
+        constexpr bool isMx = SupportType<
+            Tuple<DstT, Src0T, Src1T>, Tuple<float, fp4x2_e1m2_t, fp4x2_e1m2_t>,
+            Tuple<float, fp4x2_e1m2_t, fp4x2_e2m1_t>, Tuple<float, fp4x2_e2m1_t, fp4x2_e1m2_t>,
+            Tuple<float, fp4x2_e2m1_t, fp4x2_e2m1_t>, Tuple<float, fp8_e4m3fn_t, fp8_e4m3fn_t>,
+            Tuple<float, fp8_e4m3fn_t, fp8_e5m2_t>, Tuple<float, fp8_e5m2_t, fp8_e4m3fn_t>,
+            Tuple<float, fp8_e5m2_t, fp8_e5m2_t>>();
+        static_assert(isMx, "MmadMx not support data type on current device!");
+        MmadBitModeParams& params = const_cast<MmadBitModeParams&>(mmadParams);
+        params.SetCmatrixInitVal(false);
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+        mad_mx(
+            (__cc__ DstT*)dst, (__ca__ Src0T*)fm, (__cb__ Src1T*)filter, (uint64_t)bias, params.GetM(), params.GetK(),
+            params.GetN(), params.GetUnitFlag(), params.GetDisableGemv(), params.GetCmatrixSource(),
+            params.GetCmatrixInitVal());
+#else
+        uint64_t xd = ((uint64_t)dst) & 0xffffffffULL | ((((uint64_t)bias) & 0xffffffffULL) << 32);
+        mad_mx((__cc__ DstT*)xd, (__ca__ Src0T*)fm, (__cb__ Src1T*)filter, params.GetConfig0());
+#endif
+    }
 }
 #endif
 
