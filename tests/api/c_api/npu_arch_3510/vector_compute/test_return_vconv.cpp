@@ -76,31 +76,31 @@ TEST(ReturnValueVconv, ExpSubUsesVexpdif)
     GlobalMockObject::verify();
 }
 
-#define CHECK_RETURN_VALUE_OVERLOAD(api_name, result_type, src_type)      \
-    do {                                                                 \
-        src_type src;                                                    \
-        vector_bool mask;                                                \
-        auto result = api_name(src, mask);                               \
+#define CHECK_RETURN_VALUE_OVERLOAD(api_name, result_type, src_type)       \
+    do {                                                                   \
+        src_type src;                                                      \
+        vector_bool mask;                                                  \
+        auto result = api_name(src, mask);                                 \
         static_assert(std::is_same<decltype(result), result_type>::value); \
-        (void)result;                                                    \
+        (void)result;                                                      \
     } while (false)
 
 #define CHECK_QUARTER_RETURN_VALUE_OVERLOADS(api_name, result_type, src_type) \
-    do {                                                                       \
-        src_type src;                                                          \
-        vector_bool mask;                                                      \
-        auto first = api_name(src, mask, ASC_DISPERSE_FIRST_QUARTER);           \
-        auto second = api_name(src, mask, ASC_DISPERSE_SECOND_QUARTER);         \
-        auto third = api_name(src, mask, ASC_DISPERSE_THIRD_QUARTER);           \
-        auto fourth = api_name(src, mask, ASC_DISPERSE_FOURTH_QUARTER);         \
-        static_assert(std::is_same<decltype(first), result_type>::value);       \
-        static_assert(std::is_same<decltype(second), result_type>::value);      \
-        static_assert(std::is_same<decltype(third), result_type>::value);       \
-        static_assert(std::is_same<decltype(fourth), result_type>::value);      \
-        (void)first;                                                           \
-        (void)second;                                                          \
-        (void)third;                                                           \
-        (void)fourth;                                                          \
+    do {                                                                      \
+        src_type src;                                                         \
+        vector_bool mask;                                                     \
+        auto first = api_name(src, mask, ASC_DISPERSE_FIRST_QUARTER);         \
+        auto second = api_name(src, mask, ASC_DISPERSE_SECOND_QUARTER);       \
+        auto third = api_name(src, mask, ASC_DISPERSE_THIRD_QUARTER);         \
+        auto fourth = api_name(src, mask, ASC_DISPERSE_FOURTH_QUARTER);       \
+        static_assert(std::is_same<decltype(first), result_type>::value);     \
+        static_assert(std::is_same<decltype(second), result_type>::value);    \
+        static_assert(std::is_same<decltype(third), result_type>::value);     \
+        static_assert(std::is_same<decltype(fourth), result_type>::value);    \
+        (void)first;                                                          \
+        (void)second;                                                         \
+        (void)third;                                                          \
+        (void)fourth;                                                         \
     } while (false)
 
 TEST(ReturnValueVconv, AddedConversionFamiliesExposeAllReturnValueOverloads)
