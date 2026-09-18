@@ -52,6 +52,53 @@ __aicore__ inline void DataCacheCleanAndInvalid(const LocalTensor<T>& dst);
 template <typename T, CacheLine entireType>
 __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst);
 
+// DataCache 系列指针化扩展（Pointer 输入）：与 Tensor 入参版本复用同一套底层实现
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+/*
+ * @ingroup DataCachePreload
+ * @brief preload data cache（__gm__ 指针入参版本）
+ * @param [in] src input GM pointer (__gm__ uint64_t*)
+ * @param [in] cacheOffset cache offset
+ */
+template <typename T>
+__aicore__ inline void DataCachePreload(__gm__ uint64_t* src, const T cacheOffset);
+#endif
+
+#if defined(__NPU_ARCH__) &&                                                                                 \
+    ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
+     (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
+     (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+/*
+ * @ingroup DataCacheCleanAndInvalid
+ * @brief clean and invalid data cache（__gm__ 指针入参版本）
+ */
+template <typename T, CacheLine entireType, DcciDst dcciDst>
+__aicore__ inline void DataCacheCleanAndInvalid(__gm__ T* dst);
+
+/*
+ * @ingroup DataCacheCleanAndInvalid
+ * @brief clean and invalid data cache（__ubuf__ 指针入参版本）
+ * @par 说明：__gm__ 与 __ubuf__ 版本仅地址空间限定不同，宿主机侧（地址空间宏展开为空）
+ *           会塌缩为同一签名，故 __ubuf__ 版本仅在设备编译（ccec）下提供。
+ */
+#if defined(__CCE__)
+template <typename T, CacheLine entireType, DcciDst dcciDst>
+__aicore__ inline void DataCacheCleanAndInvalid(__ubuf__ T* dst);
+#endif
+#endif
+
+#if defined(__NPU_ARCH__) &&                                                                                 \
+    ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || \
+     (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || \
+     (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+/*
+ * @ingroup DataCacheCleanAndInvalid
+ * @brief clean and invalid data cache（__gm__ 指针入参版本，不带 dcciDst）
+ */
+template <typename T, CacheLine entireType>
+__aicore__ inline void DataCacheCleanAndInvalid(__gm__ T* dst);
+#endif
+
 __aicore__ inline void ICachePreLoad(const int64_t preFetchLen);
 
 __aicore__ inline int64_t GetICachePreloadStatus();
