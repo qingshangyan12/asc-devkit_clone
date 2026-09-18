@@ -58,6 +58,7 @@ CompileStage = Enum(
         "SPK_INPUT",
         "PACK",
         "UNPACK",
+        "SPECIALIZATION",
     ),
 )
 

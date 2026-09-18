@@ -45,31 +45,26 @@ def _validate_elf(dynamic_object_path):
         raise ResourceIdError(f"input is not an ELF object: {dynamic_object_path}")
 
 
-def _hash_object(object_path):
-    _validate_elf(object_path)
-    digest = hashlib.sha256()
-    try:
-        with open(object_path, "rb") as file_obj:
-            for chunk in iter(lambda: file_obj.read(_HASH_CHUNK_SIZE), b""):
-                digest.update(chunk)
-    except OSError as error:
-        raise ResourceIdError(f"failed to hash ELF object: {object_path}") from error
-    return digest.digest()
-
-
 def calculate_resource_id(object_paths):
-    """XOR the SHA256 digests of linked objects."""
+    """SHA256 of the linked objects' contents concatenated in link order.
+
+    Hashing the merged stream rather than combining per-object digests keeps the
+    link order significant and leaves no way for two objects to cancel out.
+    """
     if not object_paths:
         raise ResourceIdError("object list for resource_id must not be empty")
-    digest = bytearray(hashlib.sha256().digest_size)
+    digest = hashlib.sha256()
     for object_path in object_paths:
-        for index, value in enumerate(_hash_object(object_path)):
-            digest[index] ^= value
-    if not any(digest):
-        raise ResourceIdError(
-            "resource_id collapsed to zero: object digests cancelled out"
-        )
-    return digest.hex()
+        _validate_elf(object_path)
+        try:
+            with open(object_path, "rb") as file_obj:
+                for chunk in iter(lambda: file_obj.read(_HASH_CHUNK_SIZE), b""):
+                    digest.update(chunk)
+        except OSError as error:
+            raise ResourceIdError(
+                f"failed to hash ELF object: {object_path}"
+            ) from error
+    return digest.hexdigest()
 
 
 def _render_resource_id_source(resource_id):
@@ -78,15 +73,15 @@ def _render_resource_id_source(resource_id):
     # exactly 64 chars carries an implicit NUL, which would overflow the array.
     value = ", ".join(f"'{char}'" for char in resource_id)
     return (
-        "struct BinaryMetaResourceId {\n"
+        "struct BinaryMetaSpecializationResourceId {\n"
         "    unsigned short type;\n"
         "    unsigned short len;\n"
         "    char value[%d];\n"
         "};\n"
-        "static_assert(sizeof(BinaryMetaResourceId) == %d,\n"
-        '              "BinaryMetaResourceId must stay packed as type|len|value");\n'
+        "static_assert(sizeof(BinaryMetaSpecializationResourceId) == %d,\n"
+        '              "BinaryMetaSpecializationResourceId must stay packed as type|len|value");\n'
         '__attribute__((used, section(".ascend.meta")))\n'
-        "static const struct BinaryMetaResourceId g_ascend_resource_id_section = "
+        "static const struct BinaryMetaSpecializationResourceId g_ascend_resource_id_section = "
         "{%d, %d, {%s}};\n"
         % (
             _RESOURCE_ID_VALUE_SIZE,
@@ -143,7 +138,7 @@ def generate_resource_id_object(
                 "-o",
                 output_path,
             ],
-            CompileStage.COMPILE,
+            CompileStage.SPECIALIZATION,
             compile_log_path,
         )
         if not os.path.isfile(output_path):
