@@ -326,6 +326,16 @@ template <typename T, typename U, typename S>
 __aicore__ inline void Mmad(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const MmadParams& mmadParams);
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-PR1] Mmad L0A×L0B→L0C (+ optional BiasTable) — Jessicaruan PR-1 */
+template <typename T, typename U, typename S>
+__aicore__ inline void Mmad(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadParams& mmadParams);
+
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void Mmad(
+    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __biasbuf__ V* bias, const MmadParams& mmadParams);
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
+
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
