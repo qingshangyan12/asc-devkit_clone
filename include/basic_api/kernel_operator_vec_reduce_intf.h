@@ -182,6 +182,150 @@ __aicore__ inline void ReduceMax(
 template <typename T, bool isSetMask = true>
 __aicore__ inline void ReduceSum(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const int32_t count);
+
+/*!
+ * \brief Pointer-extended reduce forms. Operands may be a LocalTensor, a UB raw pointer or a raw UB device
+ *        address. The element type pair is taken from the explicit template arguments (T, U) or from the
+ *        typed operands. The original *Impl is reused through MakeVecTensor.
+ */
+#define ASCENDC_VEC_REDUCE_PTR_ENABLE(T, U, Dst, Src)                                           \
+    typename Std::enable_if<                                                                    \
+        Internal::IsRawOperandInvolved<Dst, Src> && Internal::CanResolveVecPrim<T, Dst, Src> && \
+            Internal::CanResolveVecPrim<U, Dst, Src, Internal::PrimTag<T>>,                     \
+        bool>::type = true
+
+template <
+    ReduceType reduceType, typename T = void, typename U = void, bool isSetMask = true, typename Dst, typename Src,
+    ASCENDC_VEC_REDUCE_PTR_ENABLE(T, U, Dst, Src)>
+__ASC_USE_RESERVED_UBUF__(
+    3510, "ReduceDataBlock is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void ReduceDataBlock(
+    const Dst& dst, const Src& src, const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride);
+
+template <
+    ReduceType reduceType, typename T = void, typename U = void, bool isSetMask = true, typename Dst, typename Src,
+    ASCENDC_VEC_REDUCE_PTR_ENABLE(T, U, Dst, Src)>
+__ASC_USE_RESERVED_UBUF__(
+    3510, "ReduceDataBlock is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void ReduceDataBlock(
+    const Dst& dst, const Src& src, const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride);
+
+template <
+    ReduceType reduceType, typename T = void, typename U = void, bool isSetMask = true, typename Dst, typename Src,
+    ASCENDC_VEC_REDUCE_PTR_ENABLE(T, U, Dst, Src)>
+__ASC_USE_RESERVED_UBUF__(
+    3510, "ReducePairElem is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void ReducePairElem(
+    const Dst& dst, const Src& src, const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride);
+
+template <
+    ReduceType reduceType, typename T = void, typename U = void, bool isSetMask = true, typename Dst, typename Src,
+    ASCENDC_VEC_REDUCE_PTR_ENABLE(T, U, Dst, Src)>
+__ASC_USE_RESERVED_UBUF__(
+    3510, "ReducePairElem is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void ReducePairElem(
+    const Dst& dst, const Src& src, const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride);
+
+template <
+    ReduceType reduceType, typename T = void, typename U = void, bool isSetMask = true, typename Dst, typename Src,
+    ASCENDC_VEC_REDUCE_PTR_ENABLE(T, U, Dst, Src)>
+__ASC_USE_RESERVED_UBUF__(
+    3510, "ReduceRepeat is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void ReduceRepeat(
+    const Dst& dst, const Src& src, const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride, ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX);
+
+template <
+    ReduceType reduceType, typename T = void, typename U = void, bool isSetMask = true, typename Dst, typename Src,
+    ASCENDC_VEC_REDUCE_PTR_ENABLE(T, U, Dst, Src)>
+__ASC_USE_RESERVED_UBUF__(
+    3510, "ReduceRepeat is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void ReduceRepeat(
+    const Dst& dst, const Src& src, const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride, ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX);
+
+template <
+    typename T = void, bool isSetMask = true, typename Dst, typename Src, typename Workspace,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src, Workspace> && Internal::CanResolveVecPrim<T, Dst, Src>, bool>::type =
+        true>
+__aicore__ inline void ReduceMax(
+    const Dst& dst, const Src& src, const Workspace& sharedTmpBuffer, const int32_t mask, const int32_t repeatTime,
+    const int32_t srcRepStride, bool calIndex = 0);
+
+template <
+    typename T = void, bool isSetMask = true, typename Dst, typename Src, typename Workspace,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src, Workspace> && Internal::CanResolveVecPrim<T, Dst, Src>, bool>::type =
+        true>
+__aicore__ inline void ReduceMin(
+    const Dst& dst, const Src& src, const Workspace& sharedTmpBuffer, const int32_t mask, const int32_t repeatTime,
+    const int32_t srcRepStride, bool calIndex = 0);
+
+template <
+    typename T = void, bool isSetMask = true, typename Dst, typename Src, typename Workspace,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src, Workspace> && Internal::CanResolveVecPrim<T, Dst, Src>, bool>::type =
+        true>
+__aicore__ inline void ReduceSum(
+    const Dst& dst, const Src& src, const Workspace& sharedTmpBuffer, const int32_t mask, const int32_t repeatTime,
+    const int32_t srcRepStride);
+
+template <
+    typename T = void, bool isSetMask = true, typename Dst, typename Src, typename Workspace,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src, Workspace> && Internal::CanResolveVecPrim<T, Dst, Src>, bool>::type =
+        true>
+__aicore__ inline void ReduceMax(
+    const Dst& dst, const Src& src, const Workspace& sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime,
+    const int32_t srcRepStride, bool calIndex = 0);
+
+template <
+    typename T = void, bool isSetMask = true, typename Dst, typename Src, typename Workspace,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src, Workspace> && Internal::CanResolveVecPrim<T, Dst, Src>, bool>::type =
+        true>
+__aicore__ inline void ReduceMin(
+    const Dst& dst, const Src& src, const Workspace& sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime,
+    const int32_t srcRepStride, bool calIndex = 0);
+
+template <
+    typename T = void, bool isSetMask = true, typename Dst, typename Src, typename Workspace,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src, Workspace> && Internal::CanResolveVecPrim<T, Dst, Src>, bool>::type =
+        true>
+__aicore__ inline void ReduceSum(
+    const Dst& dst, const Src& src, const Workspace& sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime,
+    const int32_t srcRepStride);
+
+template <
+    typename T = void, bool isSetMask = true, typename Dst, typename Src, typename Workspace,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src, Workspace> && Internal::CanResolveVecPrim<T, Dst, Src>, bool>::type =
+        true>
+__aicore__ inline void ReduceMax(
+    const Dst& dst, const Src& src, const Workspace& sharedTmpBuffer, const int32_t count, bool calIndex = 0);
+
+template <
+    typename T = void, bool isSetMask = true, typename Dst, typename Src, typename Workspace,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src, Workspace> && Internal::CanResolveVecPrim<T, Dst, Src>, bool>::type =
+        true>
+__aicore__ inline void ReduceMin(
+    const Dst& dst, const Src& src, const Workspace& sharedTmpBuffer, const int32_t count, bool calIndex = 0);
+
+template <
+    typename T = void, bool isSetMask = true, typename Dst, typename Src, typename Workspace,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src, Workspace> && Internal::CanResolveVecPrim<T, Dst, Src>, bool>::type =
+        true>
+__aicore__ inline void ReduceSum(const Dst& dst, const Src& src, const Workspace& sharedTmpBuffer, const int32_t count);
+
+#undef ASCENDC_VEC_REDUCE_PTR_ENABLE
 #pragma end_pipe
 template <typename T>
 __aicore__ inline __inout_pipe__(S) void GetReduceRepeatMaxMinSpr(T& maxMinValue, T& maxMinIndex);

@@ -48,6 +48,24 @@ __aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(
 template <typename T>
 __aicore__ inline __in_pipe__(S)
     __out_pipe__(V) void CreateVecIndex(LocalTensor<T> dst, const T& firstValue, uint32_t count);
+
+/*!
+ * \brief Pointer-extended CreateVecIndex forms. The destination may be a UB raw pointer or a raw UB device
+ *        address; the element type is the type of firstValue.
+ */
+template <typename T, typename Dst, typename Std::enable_if<Internal::IsRawOperandInvolved<Dst>, bool>::type = true>
+__aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(
+    const Dst& dst, const T& firstValue, uint64_t mask, uint8_t repeatTime, uint16_t dstBlkStride,
+    uint8_t dstRepStride);
+
+template <typename T, typename Dst, typename Std::enable_if<Internal::IsRawOperandInvolved<Dst>, bool>::type = true>
+__aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(
+    const Dst& dst, const T& firstValue, uint64_t mask[], uint8_t repeatTime, uint16_t dstBlkStride,
+    uint8_t dstRepStride);
+
+template <typename T, typename Dst, typename Std::enable_if<Internal::IsRawOperandInvolved<Dst>, bool>::type = true>
+__aicore__ inline __in_pipe__(S)
+    __out_pipe__(V) void CreateVecIndex(const Dst& dst, const T& firstValue, uint32_t count);
 } // namespace AscendC
 
 #if defined(__NPU_ARCH__)

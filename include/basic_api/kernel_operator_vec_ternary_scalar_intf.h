@@ -72,6 +72,35 @@ __aicore__ inline void Axpy(
 template <typename T, typename U>
 __aicore__ inline void Axpy(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const U& scalarValue, const int32_t& count);
+
+/*!
+ * \brief Pointer-extended forms of Axpy. dst/src may independently be a LocalTensor, a UB raw pointer or a
+ *        raw UB device address; the element type pair (T, U) is taken from the explicit template arguments
+ *        or from the typed operands, and the computation reuses the original AxpyImpl.
+ */
+template <
+    typename T = void, typename U = void, bool isSetMask = true, typename Dst, typename Src,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src> && Internal::CanResolveVecPrim<T, Dst, Src, U>, bool>::type = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Axpy is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void Axpy(
+    const Dst& dst, const Src& src, const U& scalarValue, uint64_t mask, const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams);
+
+template <
+    typename T = void, typename U = void, bool isSetMask = true, typename Dst, typename Src,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src> && Internal::CanResolveVecPrim<T, Dst, Src, U>, bool>::type = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Axpy is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__aicore__ inline void Axpy(
+    const Dst& dst, const Src& src, const U& scalarValue, uint64_t mask[], const uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams);
+
+template <
+    typename T = void, typename U = void, typename Dst, typename Src,
+    typename Std::enable_if<
+        Internal::IsRawOperandInvolved<Dst, Src> && Internal::CanResolveVecPrim<T, Dst, Src, U>, bool>::type = true>
+__aicore__ inline void Axpy(const Dst& dst, const Src& src, const U& scalarValue, const int32_t& count);
 } // namespace AscendC
 #pragma end_pipe
 

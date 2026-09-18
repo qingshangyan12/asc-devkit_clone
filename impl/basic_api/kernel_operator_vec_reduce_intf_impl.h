@@ -1660,6 +1660,200 @@ __aicore__ inline __inout_pipe__(S) T GetAccVal()
     });
     return GetReduceRepeatSumSpr<T>();
 }
+
+// Pointer-extended reduce overloads: at least one operand is a UB raw pointer or raw device address.
+// Each operand keeps its element type; the original Tensor implementation is reused through MakeVecTensor.
+#define ASCENDC_VEC_REDUCE_PTR_HEAD(reduceType, T, U, isSetMask, Dst, Src)                          \
+    template <                                                                                      \
+        ReduceType reduceType, typename T, typename U, bool isSetMask, typename Dst, typename Src,  \
+        typename Std::enable_if<                                                                    \
+            Internal::IsRawOperandInvolved<Dst, Src> && Internal::CanResolveVecPrim<T, Dst, Src> && \
+                Internal::CanResolveVecPrim<U, Dst, Src, Internal::PrimTag<T>>,                     \
+            bool>::type enable>
+
+ASCENDC_VEC_REDUCE_PTR_HEAD(reduceType, DstPrim, SrcPrim, isSetMask, Dst, Src)
+__aicore__ inline void ReduceDataBlock(
+    const Dst& dst, const Src& src, const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride)
+{
+    using DstElem = Internal::VecPrimType<DstPrim, Dst, Src, Internal::PrimTag<SrcPrim>>;
+    using SrcElem = Internal::VecPrimType<SrcPrim, Src, Dst, Internal::PrimTag<DstPrim>>;
+    ReduceDataBlock<reduceType, DstElem, SrcElem, isSetMask>(
+        MakeVecTensor<DstElem>(dst), MakeVecTensor<SrcElem>(src), mask, repeatTime, dstRepStride, srcBlkStride,
+        srcRepStride);
+}
+
+ASCENDC_VEC_REDUCE_PTR_HEAD(reduceType, DstPrim, SrcPrim, isSetMask, Dst, Src)
+__aicore__ inline void ReduceDataBlock(
+    const Dst& dst, const Src& src, const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride)
+{
+    using DstElem = Internal::VecPrimType<DstPrim, Dst, Src, Internal::PrimTag<SrcPrim>>;
+    using SrcElem = Internal::VecPrimType<SrcPrim, Src, Dst, Internal::PrimTag<DstPrim>>;
+    ReduceDataBlock<reduceType, DstElem, SrcElem, isSetMask>(
+        MakeVecTensor<DstElem>(dst), MakeVecTensor<SrcElem>(src), mask, repeatTime, dstRepStride, srcBlkStride,
+        srcRepStride);
+}
+
+ASCENDC_VEC_REDUCE_PTR_HEAD(reduceType, DstPrim, SrcPrim, isSetMask, Dst, Src)
+__aicore__ inline void ReducePairElem(
+    const Dst& dst, const Src& src, const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride)
+{
+    using DstElem = Internal::VecPrimType<DstPrim, Dst, Src, Internal::PrimTag<SrcPrim>>;
+    using SrcElem = Internal::VecPrimType<SrcPrim, Src, Dst, Internal::PrimTag<DstPrim>>;
+    ReducePairElem<reduceType, DstElem, SrcElem, isSetMask>(
+        MakeVecTensor<DstElem>(dst), MakeVecTensor<SrcElem>(src), mask, repeatTime, dstRepStride, srcBlkStride,
+        srcRepStride);
+}
+
+ASCENDC_VEC_REDUCE_PTR_HEAD(reduceType, DstPrim, SrcPrim, isSetMask, Dst, Src)
+__aicore__ inline void ReducePairElem(
+    const Dst& dst, const Src& src, const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride)
+{
+    using DstElem = Internal::VecPrimType<DstPrim, Dst, Src, Internal::PrimTag<SrcPrim>>;
+    using SrcElem = Internal::VecPrimType<SrcPrim, Src, Dst, Internal::PrimTag<DstPrim>>;
+    ReducePairElem<reduceType, DstElem, SrcElem, isSetMask>(
+        MakeVecTensor<DstElem>(dst), MakeVecTensor<SrcElem>(src), mask, repeatTime, dstRepStride, srcBlkStride,
+        srcRepStride);
+}
+
+ASCENDC_VEC_REDUCE_PTR_HEAD(reduceType, DstPrim, SrcPrim, isSetMask, Dst, Src)
+__aicore__ inline void ReduceRepeat(
+    const Dst& dst, const Src& src, const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride, ReduceOrder order)
+{
+    using DstElem = Internal::VecPrimType<DstPrim, Dst, Src, Internal::PrimTag<SrcPrim>>;
+    using SrcElem = Internal::VecPrimType<SrcPrim, Src, Dst, Internal::PrimTag<DstPrim>>;
+    ReduceRepeat<reduceType, DstElem, SrcElem, isSetMask>(
+        MakeVecTensor<DstElem>(dst), MakeVecTensor<SrcElem>(src), mask, repeatTime, dstRepStride, srcBlkStride,
+        srcRepStride, order);
+}
+
+ASCENDC_VEC_REDUCE_PTR_HEAD(reduceType, DstPrim, SrcPrim, isSetMask, Dst, Src)
+__aicore__ inline void ReduceRepeat(
+    const Dst& dst, const Src& src, const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride,
+    const int32_t srcBlkStride, const int32_t srcRepStride, ReduceOrder order)
+{
+    using DstElem = Internal::VecPrimType<DstPrim, Dst, Src, Internal::PrimTag<SrcPrim>>;
+    using SrcElem = Internal::VecPrimType<SrcPrim, Src, Dst, Internal::PrimTag<DstPrim>>;
+    ReduceRepeat<reduceType, DstElem, SrcElem, isSetMask>(
+        MakeVecTensor<DstElem>(dst), MakeVecTensor<SrcElem>(src), mask, repeatTime, dstRepStride, srcBlkStride,
+        srcRepStride, order);
+}
+
+#undef ASCENDC_VEC_REDUCE_PTR_HEAD
+
+#define ASCENDC_VEC_REDUCE_SPR_HEAD(T, Dst, Src, Workspace, isSetMask)                                       \
+    template <                                                                                               \
+        typename T, bool isSetMask, typename Dst, typename Src, typename Workspace,                          \
+        typename Std::enable_if<                                                                             \
+            Internal::IsRawOperandInvolved<Dst, Src, Workspace> && Internal::CanResolveVecPrim<T, Dst, Src>, \
+            bool>::type enable>
+
+ASCENDC_VEC_REDUCE_SPR_HEAD(T, Dst, Src, Workspace, isSetMask)
+__aicore__ inline void ReduceMax(
+    const Dst& dst, const Src& src, const Workspace& sharedTmpBuffer, const int32_t mask, const int32_t repeatTime,
+    const int32_t srcRepStride, bool calIndex)
+{
+    using Prim = Internal::VecPrimType<T, Dst, Src, Workspace>;
+    ReduceMax<Prim>(
+        MakeVecTensor<Prim>(dst), MakeVecTensor<Prim>(src), MakeVecTensor<Prim>(sharedTmpBuffer), mask, repeatTime,
+        srcRepStride, calIndex);
+}
+
+ASCENDC_VEC_REDUCE_SPR_HEAD(T, Dst, Src, Workspace, isSetMask)
+__aicore__ inline void ReduceMin(
+    const Dst& dst, const Src& src, const Workspace& sharedTmpBuffer, const int32_t mask, const int32_t repeatTime,
+    const int32_t srcRepStride, bool calIndex)
+{
+    using Prim = Internal::VecPrimType<T, Dst, Src, Workspace>;
+    ReduceMin<Prim>(
+        MakeVecTensor<Prim>(dst), MakeVecTensor<Prim>(src), MakeVecTensor<Prim>(sharedTmpBuffer), mask, repeatTime,
+        srcRepStride, calIndex);
+}
+
+ASCENDC_VEC_REDUCE_SPR_HEAD(T, Dst, Src, Workspace, isSetMask)
+__aicore__ inline void ReduceSum(
+    const Dst& dst, const Src& src, const Workspace& sharedTmpBuffer, const int32_t mask, const int32_t repeatTime,
+    const int32_t srcRepStride)
+{
+    using Prim = Internal::VecPrimType<T, Dst, Src, Workspace>;
+    ReduceSum<Prim>(
+        MakeVecTensor<Prim>(dst), MakeVecTensor<Prim>(src), MakeVecTensor<Prim>(sharedTmpBuffer), mask, repeatTime,
+        srcRepStride);
+}
+
+ASCENDC_VEC_REDUCE_SPR_HEAD(T, Dst, Src, Workspace, isSetMask)
+__aicore__ inline void ReduceMax(
+    const Dst& dst, const Src& src, const Workspace& sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime,
+    const int32_t srcRepStride, bool calIndex)
+{
+    using Prim = Internal::VecPrimType<T, Dst, Src, Workspace>;
+    ReduceMax<Prim>(
+        MakeVecTensor<Prim>(dst), MakeVecTensor<Prim>(src), MakeVecTensor<Prim>(sharedTmpBuffer), mask, repeatTime,
+        srcRepStride, calIndex);
+}
+
+ASCENDC_VEC_REDUCE_SPR_HEAD(T, Dst, Src, Workspace, isSetMask)
+__aicore__ inline void ReduceMin(
+    const Dst& dst, const Src& src, const Workspace& sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime,
+    const int32_t srcRepStride, bool calIndex)
+{
+    using Prim = Internal::VecPrimType<T, Dst, Src, Workspace>;
+    ReduceMin<Prim>(
+        MakeVecTensor<Prim>(dst), MakeVecTensor<Prim>(src), MakeVecTensor<Prim>(sharedTmpBuffer), mask, repeatTime,
+        srcRepStride, calIndex);
+}
+
+ASCENDC_VEC_REDUCE_SPR_HEAD(T, Dst, Src, Workspace, isSetMask)
+__aicore__ inline void ReduceSum(
+    const Dst& dst, const Src& src, const Workspace& sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime,
+    const int32_t srcRepStride)
+{
+    using Prim = Internal::VecPrimType<T, Dst, Src, Workspace>;
+    ReduceSum<Prim>(
+        MakeVecTensor<Prim>(dst), MakeVecTensor<Prim>(src), MakeVecTensor<Prim>(sharedTmpBuffer), mask, repeatTime,
+        srcRepStride);
+}
+
+#undef ASCENDC_VEC_REDUCE_SPR_HEAD
+
+#define ASCENDC_VEC_REDUCE_SPR_COUNT_HEAD(T, Dst, Src, Workspace, isSetMask)                                 \
+    template <                                                                                               \
+        typename T, bool isSetMask, typename Dst, typename Src, typename Workspace,                          \
+        typename Std::enable_if<                                                                             \
+            Internal::IsRawOperandInvolved<Dst, Src, Workspace> && Internal::CanResolveVecPrim<T, Dst, Src>, \
+            bool>::type enable>
+
+ASCENDC_VEC_REDUCE_SPR_COUNT_HEAD(T, Dst, Src, Workspace, isSetMask)
+__aicore__ inline void ReduceMax(
+    const Dst& dst, const Src& src, const Workspace& sharedTmpBuffer, const int32_t count, bool calIndex)
+{
+    using Prim = Internal::VecPrimType<T, Dst, Src, Workspace>;
+    ReduceMax<Prim>(
+        MakeVecTensor<Prim>(dst), MakeVecTensor<Prim>(src), MakeVecTensor<Prim>(sharedTmpBuffer), count, calIndex);
+}
+
+ASCENDC_VEC_REDUCE_SPR_COUNT_HEAD(T, Dst, Src, Workspace, isSetMask)
+__aicore__ inline void ReduceMin(
+    const Dst& dst, const Src& src, const Workspace& sharedTmpBuffer, const int32_t count, bool calIndex)
+{
+    using Prim = Internal::VecPrimType<T, Dst, Src, Workspace>;
+    ReduceMin<Prim>(
+        MakeVecTensor<Prim>(dst), MakeVecTensor<Prim>(src), MakeVecTensor<Prim>(sharedTmpBuffer), count, calIndex);
+}
+
+ASCENDC_VEC_REDUCE_SPR_COUNT_HEAD(T, Dst, Src, Workspace, isSetMask)
+__aicore__ inline void ReduceSum(const Dst& dst, const Src& src, const Workspace& sharedTmpBuffer, const int32_t count)
+{
+    using Prim = Internal::VecPrimType<T, Dst, Src, Workspace>;
+    ReduceSum<Prim, isSetMask>(
+        MakeVecTensor<Prim>(dst), MakeVecTensor<Prim>(src), MakeVecTensor<Prim>(sharedTmpBuffer), count);
+}
+
+#undef ASCENDC_VEC_REDUCE_SPR_COUNT_HEAD
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_REDUCE_INTERFACE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_REDUCE_INTF_IMPL_H__)
