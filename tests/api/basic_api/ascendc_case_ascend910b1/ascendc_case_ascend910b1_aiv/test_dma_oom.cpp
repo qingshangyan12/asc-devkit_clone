@@ -96,16 +96,16 @@ TEST_F(TestDMAOom, TestOOMCheckTensorListRange)
 
 TEST_F(TestDMAOom, TestOOMStorageShapeTensorDescriptor)
 {
-    EXPECT_EQ(g_oomStorageShapeMagic, 0x4FU);
+    EXPECT_EQ(Internal::g_oomStorageShapeMagic, 0x4FU);
     uint8_t* metadata = static_cast<uint8_t*>(AscendC::GmAlloc(64));
     uint8_t* tensor = static_cast<uint8_t*>(AscendC::GmAlloc(128));
-    WritePacked<uint8_t>(metadata, g_oomStorageShapeMagic);
-    WritePacked<uint8_t>(metadata + 1, g_oomStorageShapeVersion);
-    uint8_t* cursor = metadata + g_oomStorageShapeHeaderSize;
+    WritePacked<uint8_t>(metadata, Internal::g_oomStorageShapeMagic);
+    WritePacked<uint8_t>(metadata + 1, Internal::g_oomStorageShapeVersion);
+    uint8_t* cursor = metadata + Internal::g_oomStorageShapeHeaderSize;
     WritePacked<uint64_t>(cursor, 19);
-    WritePacked<uint8_t>(cursor + 8, g_oomDescriptorTypeTensor);
+    WritePacked<uint8_t>(cursor + 8, Internal::g_oomDescriptorTypeTensor);
     WritePacked<uint8_t>(cursor + 9, 0);
-    WritePacked<uint8_t>(cursor + 10, g_oomTensorViewVersion);
+    WritePacked<uint8_t>(cursor + 10, Internal::g_oomTensorViewVersion);
     WritePacked<uint64_t>(cursor + 11, 16);
 
     OOMInit();
@@ -137,12 +137,12 @@ TEST_F(TestDMAOom, TestOOMStorageShapeTensorListDescriptor)
     uint8_t* metadata = static_cast<uint8_t*>(AscendC::GmAlloc(128));
     uint8_t* cursor = metadata;
     WritePacked<uint64_t>(cursor, 30);
-    WritePacked<uint8_t>(cursor + 8, g_oomDescriptorTypeTensorList);
+    WritePacked<uint8_t>(cursor + 8, Internal::g_oomDescriptorTypeTensorList);
     WritePacked<uint8_t>(cursor + 9, 0); // U mode
     WritePacked<uint16_t>(cursor + 10, 2);
-    WritePacked<uint8_t>(cursor + 12, g_oomTensorViewVersion);
+    WritePacked<uint8_t>(cursor + 12, Internal::g_oomTensorViewVersion);
     WritePacked<uint64_t>(cursor + 13, 16);
-    WritePacked<uint8_t>(cursor + 21, g_oomTensorViewVersion);
+    WritePacked<uint8_t>(cursor + 21, Internal::g_oomTensorViewVersion);
     WritePacked<uint64_t>(cursor + 22, 12);
 
     OOMInit();
