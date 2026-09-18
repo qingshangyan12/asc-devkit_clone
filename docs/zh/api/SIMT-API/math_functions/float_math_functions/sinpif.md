@@ -50,6 +50,7 @@ inline float sinpif(float x)
 输入数据与π相乘的正弦值。
 
 -   当输入x为有限值且Abs\(x\)\>=2^24时，返回值为与x符号一致的零。
+-   当输入x为整数时，返回值为与x符号一致的零。
 -   当x为inf时，返回值为nan。
 -   当x为-inf时，返回值为nan。
 -   当x为nan时，返回值为nan。
