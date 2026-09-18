@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "profile_id": "similar-api-retrieval-v7",
+  "base_taxonomy": "core-v8-frozen.json",
+  "required_namespaces": [
+    "api_surfaces",
+    "roles",
+    "families",
+    "operations",
+    "objects",
+    "execution_models",
+    "source_locations",
+    "destination_locations",
+    "traits"
+  ],
+  "purpose": "Retrieve functionally comparable APIs while retaining complete C API navigation coverage. Broad navigation roles and families are indexed for filtering or browsing but do not define same-function similarity.",
+  "proposal_requirements": {
+    "minimum_distinct_documents": 2,
+    "minimum_independent_retrieval_cases": 2
+  },
+  "namespaces": {
+    "api_surfaces": {
+      "mode": "derived",
+      "proposal_allowed": false,
+      "enabled_values": ["adv_api", "basic_api", "c_api", "tensor_api"]
+    },
+    "roles": {
+      "mode": "filter",
+      "proposal_allowed": false,
+      "enabled_values": [
+        "compute", "configuration", "control", "data_initialization", "data_movement",
+        "data_movement_configuration", "query", "workspace_query"
+      ]
+    },
+    "families": {
+      "mode": "derived",
+      "proposal_allowed": false,
+      "enabled_values": ["activation", "arithmetic", "bitwise", "cache_management", "interpolation", "system"]
+    },
+    "operations": {
+      "mode": "core",
+      "proposal_allowed": true,
+      "enabled_values": [
+        "absolute", "add", "bilinear_interpolation", "bitwise_and", "bitwise_not",
+        "bitwise_or", "bitwise_shift", "bitwise_xor", "broadcast", "compact",
+        "comparison", "compression", "conversion", "copy", "deinterleave", "divide",
+        "exponential", "fill", "fused_multiply_add", "gather", "interleave",
+        "layout_transform", "leaky_relu", "load", "log10", "log2",
+        "matrix_multiply_accumulate", "maximum", "minimum", "multiply", "natural_log",
+        "negate", "prelu", "reciprocal", "reciprocal_sqrt", "reduction", "relu",
+        "scatter", "selection", "sqrt", "store", "subtract", "synchronization",
+        "transpose"
+      ]
+    },
+    "objects": {
+      "mode": "boost",
+      "proposal_allowed": true,
+      "enabled_values": ["carry_flag", "mask", "matrix", "scalar", "tensor", "vector"]
+    },
+    "execution_models": {
+      "mode": "boost",
+      "proposal_allowed": false,
+      "enabled_values": ["memory_vector", "register_vector", "tensor_expression"]
+    },
+    "source_locations": {
+      "mode": "filter",
+      "proposal_allowed": false,
+      "enabled_values": ["global_memory", "l1_buffer", "register_tensor", "unified_buffer", "vector_register"]
+    },
+    "destination_locations": {
+      "mode": "filter",
+      "proposal_allowed": false,
+      "enabled_values": ["global_memory", "l1_buffer", "register_tensor", "unified_buffer", "vector_register"]
+    },
+    "traits": {
+      "mode": "boost",
+      "proposal_allowed": true,
+      "enabled_values": [
+        "atomic", "carry_input", "masked", "padding", "post_update", "quantization",
+        "rounding_mode", "saturation_mode", "scalar_operand", "sparse_input", "split_high_low",
+        "supports_carry_output", "temporary_workspace", "unaligned_transfer", "widening_result"
+      ]
+    }
+  }
+}
