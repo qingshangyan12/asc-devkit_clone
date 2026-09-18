@@ -629,7 +629,7 @@ npu_op_kernel_options(<target_name> <op_type> [COMPUTE_UNIT <soc_version>... | S
 | op_type | 必选 | 算子类型。如需对所有算子生效，配置为`ALL`。 |
 | COMPUTE_UNIT | 可选 | AI处理器型号，不配置时对所有型号生效。与`SOC_SERIES`不能同时使用。 |
 | SOC_SERIES | 可选 | AI处理器系列，输入不区分大小写。与`COMPUTE_UNIT`不能同时使用。 |
-| OPTIONS | 必选 | 自定义编译选项，多个选项用空格间隔。支持`--save-temp-files`、`-g`、`-DASCENDC_DEBUG`等。 |
+| OPTIONS | 必选 | 自定义编译选项，多个选项用空格间隔。支持`--save-temp-files`、`--cce-auto-sync`、`--cce-auto-sync-log=<file>`、`-g`、`-DASCENDC_DEBUG`等。 |
 
 **常见示例**：
 
@@ -642,6 +642,9 @@ npu_op_kernel_options(ascendc_kernels AddCustom COMPUTE_UNIT ascendxxxyy OPTIONS
 
 # 使用SOC_SERIES按系列配置，多个值用空格分隔
 npu_op_kernel_options(ascendc_kernels AddCustom SOC_SERIES Ascendxxx OPTIONS -DASCENDC_DEBUG)
+
+# 输出毕昇编译器自动同步插入日志
+npu_op_kernel_options(ascendc_kernels AddCustom OPTIONS -g --cce-auto-sync-log=${CMAKE_BINARY_DIR}/auto_sync.log)
 ```
 
 > [!NOTE]说明
@@ -658,6 +661,8 @@ Ascend C框架提供的编译选项介绍如下：
     ```
 
 -   编译宏开关请参考[内置编译宏开关](../../../compilation_and_execution/operator_compilation/ai_core_operator_compilation.md)。
+-   `--cce-auto-sync`，开启毕昇编译器自动同步功能。自定义算子开发工程默认会开启auto-sync，一般无需手动配置该选项；如果用户需要关闭自动同步，可配置`--cce-auto-sync=off`。
+-   `--cce-auto-sync-log=<file>`，输出毕昇编译器自动同步插入信息到`<file>`文件中。
 -   `--op_relocatable_kernel_binary`，设置该选项为true时，会额外编译一份可被重新链接的二进制文件；不配置或设置为false时该选项均不生效。该选项用于自定义Tiling下沉算子开启SuperKernel的场景，配置该选项所生成的二进制文件，可以使算子在SuperKernel编译时直接复用二进制文件，降低编译耗时。
 -   `--kernel-template-input`，编译指定的模板参数组合相关的核函数（Kernel）代码，用于加速编译过程。更多信息参考[编译加速 — 选择性编译](./compilation_acceleration.md#选择性编译)。
 -   `-DFORCE_TILING_CONST_PROPAGATION`，该选项用于静态shape场景Tiling数据的常量化优化。对于复杂算子，该编译选项可以提升算子静态shape执行性能。该编译选项仅支持自定义算子工程，且仅在算子使用`BEGIN_TILING_DATA_DEF`注册Tiling结构体的情形下生效，对于算子使用标准C++语法定义Tiling结构体的情形下不生效。使用示例如下：
