@@ -328,7 +328,7 @@ def _gen_compile_cmd_516r2(
         "-mllvm",
         "-instcombine-code-sinking=false",
         "-mllvm",
-        "-cce-aicore-mask-opt=false"
+        "-cce-aicore-mask-opt=false",
     ]
     if global_var_storage.get_variable("ascendc_enable_sanitizer"):
         compile_cmd += ["--cce-enable-sanitizer", "-gline-tables-only"]
@@ -348,6 +348,7 @@ def _gen_compile_cmd_516r2(
     if "oom" in get_current_build_config("tir.op_debug_config"):
         compile_cmd += [f"-D{ASCENDC_OOM}={1}"]
     return compile_cmd
+
 
 def gen_compile_cmd_v220(
     src_file: str,
@@ -683,7 +684,9 @@ def compile_single_tiling_v220(param: SingleTilingKeyCompileParams):
         get_compile_target_options(
             param.compile_info,
             param.tiling_key,
-            CommonUtility.is_c310() or CommonUtility.is_m510() or CommonUtility.is_516r2(),
+            CommonUtility.is_c310()
+            or CommonUtility.is_m510()
+            or CommonUtility.is_516r2(),
         )
     )
     compile_cmd += [

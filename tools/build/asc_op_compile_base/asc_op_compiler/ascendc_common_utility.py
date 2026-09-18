@@ -544,7 +544,13 @@ class CommonUtility:
             res: True means soc version support workspace offset way
         """
         short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
-        if short_soc_version in ["Ascend950", "Ascend350", "MC62", "MC32DM11A", "Ascend5162A"]:
+        if short_soc_version in [
+            "Ascend950",
+            "Ascend350",
+            "MC62",
+            "MC32DM11A",
+            "Ascend5162A",
+        ]:
             return True
         return False
 
