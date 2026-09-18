@@ -40,9 +40,9 @@ AscendC::Fixpipe((__gm__ float*)cGm.GetPhyAddr(), (__cc__ float*)c.GetPhyAddr(),
 |------|------|------|
 | Ascend910B3 (dav-2201) | 任务书矩阵 **PASS=34** | `artifacts/910b_taskbook_20260917_170022/` |
 | Ascend950 (dav-3510) 主通路 | **PASS=49** | `artifacts/950_cube_matrix_20260916_152136/` |
-| Ascend950 MX (`mx_only`) | **PASS=10**（mmad_mx s1–4 + 2dmx s1–6） | `artifacts/950_taskbook_20260918_171148/` |
-| Ascend950 全量 taskbook | **PASS=40**（含 **mmad:5 half**） | `artifacts/950_taskbook_20260918_170349/` |
-| P1-B fp8 / MX 同构 | 样例已合入 tip `e212999e`；等 950（coord rev36 已同步 runner） | `mmad:6/7`、`mmad_mx:5–8` |
+| Ascend950 MX (`mx_only`) | **PASS=14**（含 mmad_mx s1–8） | `artifacts/950_taskbook_20260918_185853/` |
+| Ascend950 全量 taskbook | **PASS=46** FAIL=0（含 **mmad:5–7** + **mmad_mx:5–8**） | `artifacts/950_taskbook_20260918_194602/` |
+| P1-B fp8 SplitB | `766fa1fb`：3510 上 `SplitB` 改 `LoadData2DParamsV2` | 已随 `194602` 验证 |
 
 ```bash
 export CUBE_MATRIX_MODE=mx_only   # 或 taskbook
