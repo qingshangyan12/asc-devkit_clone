@@ -31,6 +31,7 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/executor
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/executor/channel
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/executor/registry
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/external_alg
 
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/selector
 
