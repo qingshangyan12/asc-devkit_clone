@@ -1,0 +1,6 @@
+# 编译产物与运行产物不入仓（新环境执行 scripts/build_callback.sh 重新编译）
+runtime/*.so
+task_fail_dump/
+extra-info/
+__pycache__/
+*.pyc
