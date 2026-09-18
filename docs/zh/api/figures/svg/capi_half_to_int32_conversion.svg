@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="842" height="434" viewBox="0 0 842 434" role="img" aria-labelledby="title desc">
+  <title id="title">half转int32_t类型转换过程</title>
+  <desc id="desc">使用CAPI将half数据转换为int32_t数据的过程。</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#686D75"/>
+    </marker>
+  </defs>
+  <style>
+    .label { font-family: '方正兰亭黑简体'; font-size: 14px; fill: #000; }
+    .small { font-family: '方正兰亭黑简体'; font-size: 13px; fill: #000; }
+    .box { fill: #C2D5FE; stroke: #172B4D; stroke-width: 1; }
+    .data { fill: #A9E8D9; stroke: #172B4D; stroke-width: 1; }
+    .line { stroke: #686D75; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+    .frame { fill: none; stroke: #172B4D; stroke-width: 1; }
+  </style>
+  <rect width="842" height="434" fill="#FFFFFF"/>
+
+  <text x="145" y="22" class="label" text-anchor="middle">x_addr</text>
+  <text x="145" y="42" class="label" text-anchor="middle">(half)</text>
+  <rect x="222" y="2" width="322" height="63" class="frame"/>
+  <rect x="229" y="7" width="63" height="48" class="data"/>
+  <rect x="296" y="7" width="63" height="48" class="data"/>
+  <rect x="414" y="7" width="63" height="48" class="data"/>
+  <text x="260" y="36" class="small" text-anchor="middle">0</text>
+  <text x="327" y="36" class="small" text-anchor="middle">1</text>
+  <text x="445" y="36" class="small" text-anchor="middle">63</text>
+  <text x="378" y="36" class="label" text-anchor="middle">...</text>
+  <text x="574" y="37" class="label">64个half元素</text>
+
+  <text x="85" y="94" class="label" text-anchor="middle">asc_loadalign_unpack</text>
+  <text x="85" y="114" class="label" text-anchor="middle">(x_reg, x_addr)</text>
+  <rect x="222" y="139" width="479" height="57" class="frame"/>
+  <rect x="229" y="144" width="63" height="48" class="box"/>
+  <rect x="296" y="144" width="63" height="48" class="box"/>
+  <rect x="363" y="144" width="63" height="48" class="box"/>
+  <rect x="430" y="144" width="63" height="48" class="box"/>
+  <rect x="564" y="144" width="63" height="48" class="box"/>
+  <rect x="631" y="144" width="63" height="48" class="box"/>
+  <text x="260" y="173" class="small" text-anchor="middle">0</text>
+  <text x="327" y="173" class="small" text-anchor="middle">0</text>
+  <text x="394" y="173" class="small" text-anchor="middle">1</text>
+  <text x="461" y="173" class="small" text-anchor="middle">0</text>
+  <text x="530" y="173" class="label" text-anchor="middle">...</text>
+  <text x="595" y="173" class="small" text-anchor="middle">63</text>
+  <text x="662" y="173" class="small" text-anchor="middle">0</text>
+  <text x="145" y="160" class="label" text-anchor="middle">x_reg</text>
+  <text x="145" y="180" class="label" text-anchor="middle">(half)</text>
+  <text x="730" y="171" class="label">128个half元素</text>
+
+  <text x="85" y="220" class="label" text-anchor="middle">asc_half2int32_rd</text>
+  <text x="85" y="240" class="label" text-anchor="middle">(y_reg, x_reg, mask)</text>
+  <rect x="222" y="264" width="479" height="57" class="frame"/>
+  <rect x="229" y="269" width="130" height="48" class="box"/>
+  <rect x="363" y="269" width="130" height="48" class="box"/>
+  <rect x="564" y="269" width="130" height="48" class="box"/>
+  <text x="294" y="298" class="small" text-anchor="middle">0</text>
+  <text x="428" y="298" class="small" text-anchor="middle">1</text>
+  <text x="530" y="298" class="label" text-anchor="middle">...</text>
+  <text x="629" y="298" class="small" text-anchor="middle">63</text>
+  <text x="145" y="286" class="label" text-anchor="middle">y_reg</text>
+  <text x="145" y="306" class="label" text-anchor="middle">(int32_t)</text>
+  <text x="730" y="296" class="label">64个int32_t元素</text>
+
+  <text x="85" y="350" class="label" text-anchor="middle">asc_storealign</text>
+  <text x="85" y="370" class="label" text-anchor="middle">(y_addr, y_reg, mask)</text>
+  <rect x="222" y="375" width="479" height="57" class="frame"/>
+  <rect x="229" y="380" width="130" height="48" class="data"/>
+  <rect x="363" y="380" width="130" height="48" class="data"/>
+  <rect x="564" y="380" width="130" height="48" class="data"/>
+  <text x="294" y="409" class="small" text-anchor="middle">0</text>
+  <text x="428" y="409" class="small" text-anchor="middle">1</text>
+  <text x="530" y="409" class="label" text-anchor="middle">...</text>
+  <text x="629" y="409" class="small" text-anchor="middle">63</text>
+  <text x="145" y="397" class="label" text-anchor="middle">y_addr</text>
+  <text x="145" y="417" class="label" text-anchor="middle">(int32_t)</text>
+  <text x="730" y="407" class="label">64个int32_t元素</text>
+
+  <path d="M260 55 L260 144" class="line"/>
+  <path d="M260 55 L327 144" class="line"/>
+  <path d="M327 55 L394 144" class="line"/>
+  <path d="M327 55 L461 144" class="line"/>
+  <path d="M445 55 L595 144" class="line"/>
+  <path d="M445 55 L662 144" class="line"/>
+  <path d="M260 192 L294 269" class="line"/>
+  <path d="M394 192 L428 269" class="line"/>
+  <path d="M595 192 L629 269" class="line"/>
+  <path d="M294 317 L294 380" class="line"/>
+  <path d="M428 317 L428 380" class="line"/>
+  <path d="M629 317 L629 380" class="line"/>
+</svg>

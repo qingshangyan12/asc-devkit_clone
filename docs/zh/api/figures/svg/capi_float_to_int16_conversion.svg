@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="842" height="434" viewBox="0 0 842 434" role="img" aria-labelledby="title desc">
+  <title id="title">float转int16_t类型转换过程</title>
+  <desc id="desc">使用CAPI将float数据转换为int16_t数据的过程。</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#686D75"/>
+    </marker>
+  </defs>
+  <style>
+    .label { font-family: '方正兰亭黑简体'; font-size: 14px; fill: #000; }
+    .small { font-family: '方正兰亭黑简体'; font-size: 13px; fill: #000; }
+    .box { fill: #C2D5FE; stroke: #172B4D; stroke-width: 1; }
+    .data { fill: #A9E8D9; stroke: #172B4D; stroke-width: 1; }
+    .line { stroke: #686D75; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+    .frame { fill: none; stroke: #172B4D; stroke-width: 1; }
+  </style>
+  <rect width="842" height="434" fill="#FFFFFF"/>
+
+  <text x="145" y="22" class="label" text-anchor="middle">x_addr</text>
+  <text x="145" y="42" class="label" text-anchor="middle">(float)</text>
+  <rect x="198" y="2" width="510" height="63" class="frame"/>
+  <rect x="205" y="7" width="123" height="48" class="data"/>
+  <rect x="335" y="7" width="123" height="48" class="data"/>
+  <rect x="520" y="7" width="123" height="48" class="data"/>
+  <text x="266" y="36" class="small" text-anchor="middle">0</text>
+  <text x="396" y="36" class="small" text-anchor="middle">1</text>
+  <text x="582" y="36" class="small" text-anchor="middle">63</text>
+  <text x="490" y="36" class="label" text-anchor="middle">...</text>
+  <text x="680" y="36" class="label" text-anchor="middle">...</text>
+  <text x="738" y="37" class="label">64个float元素</text>
+
+  <text x="100" y="103" class="label" text-anchor="middle">asc_loadalign</text>
+  <text x="100" y="123" class="label" text-anchor="middle">(x_reg, x_addr)</text>
+  <rect x="191" y="139" width="462" height="57" class="frame"/>
+  <rect x="198" y="144" width="123" height="48" class="box"/>
+  <rect x="328" y="144" width="123" height="48" class="box"/>
+  <rect x="520" y="144" width="123" height="48" class="box"/>
+  <text x="260" y="173" class="small" text-anchor="middle">0</text>
+  <text x="390" y="173" class="small" text-anchor="middle">1</text>
+  <text x="486" y="173" class="label" text-anchor="middle">...</text>
+  <text x="582" y="173" class="small" text-anchor="middle">63</text>
+  <text x="145" y="160" class="label" text-anchor="middle">x_reg</text>
+  <text x="145" y="180" class="label" text-anchor="middle">(float)</text>
+  <text x="680" y="171" class="label">64个float元素</text>
+
+  <text x="100" y="229" class="label" text-anchor="middle">asc_float2int16_rn</text>
+  <text x="100" y="249" class="label" text-anchor="middle">(y_reg, x_reg, mask)</text>
+  <rect x="191" y="264" width="462" height="57" class="frame"/>
+  <rect x="198" y="269" width="59" height="48" class="box"/>
+  <rect x="263" y="269" width="59" height="48" class="box"/>
+  <rect x="328" y="269" width="59" height="48" class="box"/>
+  <rect x="393" y="269" width="59" height="48" class="box"/>
+  <rect x="520" y="269" width="59" height="48" class="box"/>
+  <rect x="585" y="269" width="59" height="48" class="box"/>
+  <text x="228" y="298" class="small" text-anchor="middle">0</text>
+  <text x="293" y="298" class="small" text-anchor="middle">0</text>
+  <text x="358" y="298" class="small" text-anchor="middle">1</text>
+  <text x="423" y="298" class="small" text-anchor="middle">0</text>
+  <text x="486" y="298" class="label" text-anchor="middle">...</text>
+  <text x="549" y="298" class="small" text-anchor="middle">63</text>
+  <text x="614" y="298" class="small" text-anchor="middle">0</text>
+  <text x="145" y="286" class="label" text-anchor="middle">y_reg</text>
+  <text x="145" y="306" class="label" text-anchor="middle">(int16_t)</text>
+  <text x="680" y="296" class="label">128个int16_t元素</text>
+
+  <text x="100" y="337" class="label" text-anchor="middle">asc_storealign_pack</text>
+  <text x="100" y="357" class="label" text-anchor="middle">(y_addr, y_reg, mask)</text>
+
+  <path d="M266 55 L266 144" class="line"/>
+  <path d="M396 55 L396 144" class="line"/>
+  <path d="M582 55 L582 144" class="line"/>
+  <path d="M260 192 L228 269" class="line"/>
+  <path d="M390 192 L358 269" class="line"/>
+  <path d="M582 192 L549 269" class="line"/>
+  <path d="M228 317 L228 363" class="line"/>
+  <path d="M358 317 L293 363" class="line"/>
+  <path d="M549 317 L423 363" class="line"/>
+  <rect x="191" y="358" width="308" height="57" class="frame"/>
+  <rect x="198" y="363" width="59" height="48" class="data"/>
+  <rect x="263" y="363" width="59" height="48" class="data"/>
+  <rect x="393" y="363" width="59" height="48" class="data"/>
+  <text x="228" y="392" class="small" text-anchor="middle">0</text>
+  <text x="293" y="392" class="small" text-anchor="middle">1</text>
+  <text x="358" y="392" class="label" text-anchor="middle">...</text>
+  <text x="423" y="392" class="small" text-anchor="middle">63</text>
+  <text x="145" y="380" class="label" text-anchor="middle">y_addr</text>
+  <text x="145" y="400" class="label" text-anchor="middle">(int16_t)</text>
+  <text x="680" y="391" class="label">64个int16_t元素</text>
+</svg>
