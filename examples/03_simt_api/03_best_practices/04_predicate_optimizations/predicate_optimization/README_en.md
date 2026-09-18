@@ -1,4 +1,4 @@
-# SIMT Predicate Optimization Best Practice Sample
+# Warp Branch Divergence Predication Optimization Sample
 
 ## Overview
 
@@ -133,9 +133,13 @@ This sample demonstrates tuning methods for [Warp Divergence](../../../../../doc
   <tr><td rowspan="1" align="center">Kernel Name</td><td colspan="4" align="center">hlog10_case0_kernel / hlog10_case1_kernel / j0f_case2_kernel / j0f_case3_kernel / j0f_case4_kernel</td></tr>
   </table>
 
-  Since the two gains must be measured separately under different branch hit situations, the j0f group constructs multiple test data batches by hit situation, and the compared sides run on the same batch of input; the hlog10 group directly uses a single batch of input mixing special and normal values:
+  Since the two gains must be measured separately under different branch hit situations, the j0f group constructs multiple test data batches by hit situation; the hlog10 group directly uses a single batch of input mixing special and normal values.
 
-- j0f group (four batches):
+- j0f group:
+
+  case2 and case3 share a regular input batch (most data falls in the low segment with `ax <= 8.0f`, about 1/16 NaN/Inf special values, constructed consistently with the hlog10 group), comparing the real-jump baseline against fully predicating both long and short branches under the regular data distribution;
+
+  case4 further constructs four input batches by hit situation, delimiting the applicable boundary of predicate optimization with performance data at different hit rates:
 
   | Data Batch | Input Composition |
   | --- | --- |
@@ -156,7 +160,7 @@ This sample contains 5 independent kernels, each corresponding to a specific Cas
 | Case 3 | Segmented computation overwriting result level by level, special-value handling last, unified return | j0f_case3_kernel | All branches unified return, both long and short branches predicated |
 | Case 4 | Long-body segments return upon hit, remaining short corrections use unified return | j0f_case4_kernel | Real jumps and predication combined, each used where best |
 
-The two Cases of the same group share identical launch configuration and input reading; the only difference is the organization of the branch chain inside the kernel.
+Each case shares an identical launch configuration and input generation scheme (same-group cases use the same input-batch construction rules); the only difference is the organization of the branch chain inside the kernel.
 
 ### Performance Metrics
 
@@ -190,9 +194,9 @@ __aicore__ inline half hlog10_case0(half x)
     } else if (x == static_cast<half>(2976.0f)) {
         return static_cast<half>(3.474609375f);
     }
-    float x_fp32 = __cvt_float<...>(x);
+    float x_fp32 = __half2float(x);
     float result_fp32 = logf(x_fp32) / logf(10.0f); // log10(x) = log(x) / log(10)
-    return __cvt_half<...>(result_fp32);
+    return __float2half_rn(result_fp32);
 }
 ```
 
@@ -215,9 +219,9 @@ __aicore__ inline half hlog10_case0(half x)
 ```cpp
 __aicore__ inline half hlog10_case1(half x)
 {
-    float x_fp32 = __cvt_float<...>(x);
+    float x_fp32 = __half2float(x);
     float result_fp32 = logf(x_fp32) / logf(10.0f); // log10(x) = log(x) / log(10)
-    half temp = __cvt_half<...>(result_fp32);
+    half temp = __float2half_rn(result_fp32);
     if (x == static_cast<half>(0.2362060546875f)) {
         temp = static_cast<half>(-0.62646484375f);
     } else if (x == static_cast<half>(0.2490234375f)) {
@@ -235,7 +239,7 @@ __aicore__ inline half hlog10_case1(half x)
 }
 ```
 
-**Performance Data** (same input batch as Case 0):
+**Performance Data** (input is the same mixed batch as Case 0: about 1/16 special values, the rest normal values):
 
 | execute cycle | Task Duration(μs) | aiv_total_cycles |
 |:-----------:|:---------------:|:--------------:|
@@ -255,11 +259,11 @@ __aicore__ inline half hlog10_case1(half x)
 ```cpp
 __aicore__ inline float j0f_case2(float x)
 {
-    if (__isnan(x)) {
+    if (isnan(x)) {
         return x;
     }
-    float ax = __fabsf(x);
-    if (__isinf(ax)) {
+    float ax = fabsf(x);
+    if (isinf(ax)) {
         return 0.0f;
     }
     if (ax <= 8.0f) {
@@ -277,11 +281,11 @@ Expanding the early-return style above into the equivalent explicit if-else nest
 ```cpp
 __aicore__ inline float j0f_case2(float x)
 {
-    if (__isnan(x)) {
+    if (isnan(x)) {
         return x;
     } else {
-        float ax = __fabsf(x);
-        if (__isinf(ax)) {
+        float ax = fabsf(x);
+        if (isinf(ax)) {
             return 0.0f;
         } else {
             if (ax <= 8.0f) {
@@ -300,21 +304,16 @@ __aicore__ inline float j0f_case2(float x)
 
 Early returns implicitly carry else branches, and the jump and branch stack overhead accumulates level by level along the 4-level judgment chain.
 
-**Performance Data**:
+**Performance Data** (regular input: most data falls in the low segment with `ax <= 8.0f`, about 1/16 NaN/Inf special values):
 
-| Data Batch | execute cycle | Task Duration(μs) | aiv_total_cycles |
-|:---:|:-----------:|:---------------:|:--------------:|
-| Low-value-dominant batch (low) | 2037 | 13.935 | 4845.96 |
-| High-value-dominant batch (high) | 2478 | 14.578 | 5460.42 |
-| All-special batch (special) | 1986 | 14.036 | 4657.17 |
-| Mixed batch (mixed) | 2837 | 14.733 | 5778.58 |
+| execute cycle | Task Duration(μs) | aiv_total_cycles |
+|:-----------:|:---------------:|:--------------:|
+| 2345 | 14.567 | 5025.12 |
 
 **Performance Data Analysis**:
 
-- Low-value-dominant batch: input must jump past the two special-value checks before hitting the low-segment branch; the missed checks still incur jump and branch stack overhead, with an execute cycle of 2037;
-- High-value-dominant batch: inputs in this batch hit the long middle_range segment body, whose computation itself is heavier; execute cycle rises from the low-dominant batch's 2037 to 2478;
-- All-special batch: NaN/Inf inputs hit and return at the very first branch, skipping all segment computation; both execute cycle (1986) and aiv_total_cycles (4657.17) are low;
-- Mixed batch: threads enter all four branch directions, the Warp diverges, the branch stack pushes and pops repeatedly, divergence overhead is maximal, and both execute cycle (2837) and aiv_total_cycles (5778.58) are high.
+- Most of the regular-batch inputs skip the two special-value checks and hit the low-segment branch, while a small amount of NaN/Inf input hits and returns at the first branch; the missed checks still incur jump and branch stack overhead, but each thread executes only the hit direction's segment body, with an execute cycle of 2345;
+- aiv_total_cycles is the average over all blocks, where the first block includes the extra overhead of kernel launch (same below).
 
 ### Case 3: All Branches Unified Return, Result Overwritten Level by Level (j0f Optimized v1)
 
@@ -325,7 +324,7 @@ Early returns implicitly carry else branches, and the jump and branch stack over
 ```cpp
 __aicore__ inline float j0f_case3(float x)
 {
-    float ax = __fabsf(x);
+    float ax = fabsf(x);
     float result = __internal_j0f_huge_range(ax);   // unconditional high-segment computation
     if (ax <= 1.0e13f) {
         result = __internal_j0f_middle_range(ax);
@@ -333,31 +332,26 @@ __aicore__ inline float j0f_case3(float x)
     if (ax <= 8.0f) {
         result = __internal_j0f_less8(ax);
     }
-    if (__isnan(x)) {
+    if (isnan(x)) {
         result = x;                         // NaN -> NaN
     }
-    if (__isinf(ax)) {
+    if (isinf(ax)) {
         result = 0.0f;                      // ±Inf -> 0
     }
     return result;
 }
 ```
 
-**Performance Data**:
+**Performance Data** (input is the same regular batch as Case 2: low-value dominant + about 1/16 special values):
 
-| Data Batch | execute cycle | Task Duration(μs) | aiv_total_cycles |
-|:---:|:-----------:|:---------------:|:--------------:|
-| Low-value-dominant batch (low) | 2479 | 14.429 | 5447.83 |
-| High-value-dominant batch (high) | 2431 | 14.360 | 5425.92 |
-| All-special batch (special) | 2417 | 14.625 | 5468.25 |
-| Mixed batch (mixed) | 2384 | 14.505 | 5455.04 |
+| execute cycle | Task Duration(μs) | aiv_total_cycles |
+|:-----------:|:---------------:|:--------------:|
+| 14692 | 22.726 | 19514.88 |
 
 **Optimization Analysis**:
 
-- Low-value-dominant batch: after all branches are predicated, every input unconditionally executes the high-segment computation, and most inputs also execute the middle segment additionally; the waste of predicating long branch bodies exceeds the control overhead saved, and execute cycle rises to 2479 from Case 2's 2037;
-- High-value-dominant batch: the high segment is hit, predication produces no extra computation, and execute cycle drops to 2431 from Case 2's 2478;
-- All-special batch: NaN/Inf inputs first pass two missed segment checks, then execute the high-segment computation, and are finally overwritten by special-value correction; aiv_total_cycles rises from Case 2's 4657.17 to 5468.25, about 17% higher;
-- Mixed batch: predicating short branches pays off, but the unconditional execution of long segments drags the whole down; the batch times converge (aiv_total_cycles stable at 5400~5500) and no longer fluctuate with input distribution.
+- Execute cycle rises from Case 2's 2345 to 14692, Task Duration from 14.567μs to 22.726μs, and aiv_total_cycles from 5025.12 to 19514.88. Case 3 is significantly slower than the baseline because of predicating long branch bodies: in the hlog10 group (Case 1) each correction branch body is only one assignment statement, so the extra issue cost is tiny; whereas the three segment bodies of j0f are each polynomial evaluations of dozens of instructions — after predication every input unconditionally executes the high-segment computation, and most low-segment inputs additionally execute the middle segment, so the extra execution far exceeds the saved jump and branch stack overhead.
+- The Case 2 versus Case 3 comparison shows: the control overhead saved by predication is fixed, while the extra issue cost is proportional to branch body length; for long branch bodies the cost exceeds the gain. Case 4 further incorporates hit situations to explore the applicable boundary of predication.
 
 ### Case 4: Long Branch Bodies Return Directly, Remaining Short Corrections Unified Return (j0f Optimized v2)
 
@@ -368,7 +362,7 @@ __aicore__ inline float j0f_case3(float x)
 ```cpp
 __aicore__ inline float j0f_case4(float x)
 {
-    float ax = __fabsf(x);
+    float ax = fabsf(x);
     if (ax <= 8.0f) {
         return __internal_j0f_less8(ax);    // long branch body: return upon hit, execute only the hit direction
     }
@@ -376,10 +370,10 @@ __aicore__ inline float j0f_case4(float x)
         return __internal_j0f_middle_range(ax);
     }
     float result = __internal_j0f_huge_range(ax);
-    if (__isnan(x)) {
+    if (isnan(x)) {
         result = x;
     }
-    if (__isinf(ax)) {
+    if (isinf(ax)) {
         result = 0.0f;
     }
     return result;
@@ -397,17 +391,17 @@ __aicore__ inline float j0f_case4(float x)
 
 **Optimization Analysis**:
 
-- Low-value-dominant batch: hitting the low segment returns immediately, with no extra computation beyond two missed branch checks; execute cycle drops to 1767 from Case 3's 2479 and Case 2's 2037;
-- High-value-dominant batch: only the hit branch executes, execute cycle drops to 2342, close to Case 2's 2478, both faster than Case 3;
-- All-special batch: NaN/Inf inputs first pass two missed segment checks, then execute the high-segment computation, and are finally overwritten by special-value correction; execute cycle rises to 2395 from Case 2's 1986 — the only batch where Case 2 beats Case 4;
-- Mixed batch: real jumps for long branch bodies and predication for short ones, each playing to its strength, with only a little extra execution for inputs of any distribution; execute cycle drops to 2704, best overall.
+- Low-value-dominant batch: hitting the low segment returns immediately, with no extra computation beyond two missed branch checks; execute cycle is 1767, the lowest of the four batches;
+- High-value-dominant batch: only the hit branch executes, execute cycle is 2342, faster than Case 3's fully predicated version;
+- All-special batch: NaN/Inf inputs first pass two missed segment checks, then execute the high-segment computation, and are finally overwritten by special-value correction; execute cycle is 2395;
+- Mixed batch: real jumps for long branch bodies and predication for short ones, each playing to its strength, with only a little extra execution for inputs of any distribution; execute cycle is 2704.
 
 ## Performance Comparison Summary
 
 **Overall Optimization Effect**:
 
 - hlog10 group (short correction branch chain): from the Case 0 baseline to the Case 1 optimized version, execute cycle drops from 1890 to 1406, a decrease of about 25.6%;
-- j0f group (mixed-length segmentation chain): under different branch hit situations, each Case has its wins and losses — Case 4 is fastest on the low- and high-value-dominant batches, Case 2 is fastest on the all-special batch, and Case 3 is fastest on the mixed batch but with a slim lead; comprehensively across batches, Case 4 is the best overall.
+- j0f group (mixed-length segmentation chain): Case 3 predicates both long and short branches, and execute cycle on the regular input rises from Case 2's 2345 to 14692; Case 4 keeps real jumps for long branches and predicates only short corrections, faster than Case 3 on every batch, best overall.
 
 - hlog10 group (regular input with about 1/16 special values):
 
@@ -416,15 +410,23 @@ __aicore__ inline float j0f_case4(float x)
 | Case 0 | 1890 | 14.919 | 5232.88 | Baseline: special values first, early return upon hit |
 | Case 1 | **1406** | 14.946 | **5194.75** | Correction chain with unified return, jumps reduced from 6 to 4 levels, last level predicated |
 
-- j0f group (execute cycle, by data batch):
+- j0f group case2/3 (regular input: low-value dominant + about 1/16 special values):
 
-| Case | Low-dominant | High-dominant | All-special | Mixed | Optimization Point |
-|--------|:---------:|:---------:|:--------:|:-----:|--------------------|
-| Case 2 | 2037 | 2478 | **1986** | 2837 | Baseline: special values first, all branches return upon hit |
-| Case 3 | 2479 | 2431 | 2417 | **2384** | All branches unified return, overwriting level by level, both long and short branches predicated |
-| Case 4 | **1767** | **2342** | 2395 | 2704 | Long branch bodies return directly, short corrections predicated, both mechanisms combined |
+| Case | execute cycle | Task Duration(μs) | aiv_total_cycles | Optimization Point |
+|--------|:-----------:|:---------------:|:--------------:|--------------------|
+| Case 2 | **2345** | **14.567** | **5025.12** | Baseline: special values first, all branches return upon hit |
+| Case 3 | 14692 | 22.726 | 19514.88 | All branches unified return, overwriting level by level, both long and short branches predicated; execute cycle above baseline |
 
-It can be seen that predicate optimization does not mean predicating all branches, but trading off by branch body length and hit situation: predicate short branches; keep real jumps with early return for long or high-hit-rate branches.
+- j0f group case4 (execute cycle, by data batch):
+
+| Data Batch | Case 4 | Hit-rate Characteristic |
+|--------|:-----:|--------------------|
+| Low-value-dominant batch (low) | **1767** | High low-segment hit rate |
+| High-value-dominant batch (high) | 2342 | High middle-segment hit rate |
+| All-special batch (special) | 2395 | High special-value hit rate |
+| Mixed batch (mixed) | 2704 | Hit rates close across directions |
+
+It can be seen that the gains and costs of predicate optimization are jointly determined by branch body length and hit situation: predicating short, low-hit-rate branches pays off clearly; keep real jumps with early return for long or high-hit-rate branches. Combining the two mechanisms by this trade-off covers a mixed-length branch chain (Case 4).
 
 ## Tuning Recommendations
 
@@ -453,20 +455,19 @@ Run the following steps in the root directory of this sample to build and execut
   Run the following commands in this sample directory.
 
   ```bash
-  CASE_NAME=hlog10_case0                              # select the case to run
   mkdir -p build && cd build;                         # create and enter the build directory
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # build the project
-  ./predicate_optimization $CASE_NAME                 # run the sample
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=1 ..; make -j;   # build the project (select case 1)
+  ./predicate_optimization                            # run the sample
   ```
 
   When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
 
   Example:
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU simulation mode
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=1 ..; make -j;   # NPU simulation mode
   ```
 
-  > **Note:** Before switching build modes, clean the cmake cache: run `rm CMakeCache.txt` in the build directory and re-run cmake.
+  > **Note:** Before switching cases or build modes, clean the cmake cache: run `rm CMakeCache.txt` in the build directory and re-run cmake.
 
 - Build Options
 
@@ -474,17 +475,17 @@ Run the following steps in the root directory of this sample to build and execut
   |---------------------------|------------|---------------------------------------------------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this sample supports only dav-3510 (Ascend 950PR/Ascend 950DT) |
-  | Case name (argv[1]) | see table below | hlog10 group is `<kernel>_case<id>`, j0f group is `<kernel>_case<id>_<batch>`, 10 cases in total |
+  | `SCENARIO_NUM` | `1` ~ `8` (default `1`) | Selects the case to run at compile time, see table below |
 
-  | Group | Case Name |
-  | --- | --- |
-  | hlog10 case0 (baseline) | `hlog10_case0` |
-  | hlog10 case1 (optimized) | `hlog10_case1` |
-  | j0f case2 (baseline) | `j0f_case2_low` / `j0f_case2_high` / `j0f_case2_special` / `j0f_case2_mixed` |
-  | j0f case3 (optimized v1) | `j0f_case3_low` / `j0f_case3_high` / `j0f_case3_special` / `j0f_case3_mixed` |
-  | j0f case4 (optimized v2) | `j0f_case4_low` / `j0f_case4_high` / `j0f_case4_special` / `j0f_case4_mixed` |
+  | SCENARIO_NUM | Case | Description |
+  | --- | --- | --- |
+  | 1 | hlog10_case0 | Baseline version |
+  | 2 | hlog10_case1 | Optimized version |
+  | 3 | j0f_case2 | Baseline version |
+  | 4 | j0f_case3 | Fully predicated version |
+  | 5 / 6 / 7 / 8 | j0f_case4_low / j0f_case4_high / j0f_case4_special / j0f_case4_mixed | Optimized version; input batches are low-dominant / high-dominant / all-special / mixed in turn |
 
-  Each run executes the case and its same-group counterpart on the same input and prints both execution cycles. Run each batch case of a group in turn to complete the group's full comparison.
+  Each run builds and runs only the selected case: build with a different SCENARIO_NUM and run in turn to complete the full comparison of each group.
 
 ## Performance Profiling
 
@@ -495,7 +496,7 @@ msOpProf is a single-operator performance profiling tool, with two usage modes: 
 Use the `msOpProf` tool to collect performance data of a single component:
 
 ```bash
-msopprof ./predicate_optimization <case_name>   # profile the sample's performance
+msopprof ./predicate_optimization   # profile the sample's performance (case decided by SCENARIO_NUM at build time)
 ```
 
 After the command completes, a folder named "OPPROF_{timestamp}_XXX" is generated in the default directory. The performance data folder structure is as follows:

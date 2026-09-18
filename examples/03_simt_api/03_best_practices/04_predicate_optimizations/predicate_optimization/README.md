@@ -1,4 +1,4 @@
-# SIMT编程模式Predicate优化最佳实践样例
+# Warp分支发散谓词优化样例
 
 ## 概述
 
@@ -133,9 +133,13 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">hlog10_case0_kernel / hlog10_case1_kernel / j0f_case2_kernel / j0f_case3_kernel / j0f_case4_kernel</td></tr>
   </table>
 
-由于两种收益需在不同的分支命中情况下分别测量，j0f组按命中情况构造多批测试数据，对照双方在同一批输入上运行；hlog10组则直接使用特殊值与正常值并存的一批输入：
+由于不同收益与代价需在不同的分支命中情况下分别测量，j0f组按命中情况构造测试数据；hlog10组则直接使用特殊值与正常值并存的一批输入：
 
-- j0f组（四批）：
+- j0f组：
+
+  case2与case3共用一批常规输入（大量数据落在`ax <= 8.0f`低值段，约1/16为NaN/Inf特殊值，构造思路与hlog10组一致），在常规数据分布下对比真跳转基线与长短分支全部谓词化的开销；
+
+  case4再按命中情况构造四批输入，以不同命中率下的性能数据界定predicate优化的适用边界：
 
   | 数据批 | 输入构成 |
   | --- | --- |
@@ -153,10 +157,10 @@
 | Case 0 | 特殊值处理放在正常值路径之前，命中即提前return | hlog10_case0_kernel | 基线版本，真跳转修正链 |
 | Case 1 | 正常值路径前置，修正链统一return覆盖temp | hlog10_case1_kernel | 谓词化修正链，减少跳转与分支栈操作 |
 | Case 2 | NaN/Inf特殊值前置，所有分支命中即直接返回 | j0f_case2_kernel | 基线版本，全真跳转 |
-| Case 3 | 分段计算逐级覆盖result，特殊值处理放最后，统一return | j0f_case3_kernel | 全分支统一return，长短分支全部谓词化 |
+| Case 3 | 分段计算逐级覆盖result，特殊值处理放最后，统一return | j0f_case3_kernel | 全分支统一return，长短分支全部谓词化；长分支体多发射开销超过控制开销的节省 |
 | Case 4 | 分支体长的分段命中即返回，剩余短修正统一return | j0f_case4_kernel | 真跳转与谓词化混合，各取所长 |
 
-同组的两个Case启动配置与输入读取方式完全一致，区别仅在于kernel内分支链的组织方式。
+各Case启动配置与输入生成方式一致（同组Case共用同一批输入的构造规则），区别仅在于kernel内分支链的组织方式。
 
 ### 性能指标说明
 
@@ -190,9 +194,9 @@ __aicore__ inline half hlog10_case0(half x)
     } else if (x == static_cast<half>(2976.0f)) {
         return static_cast<half>(3.474609375f);
     }
-    float x_fp32 = __cvt_float<...>(x);
+    float x_fp32 = __half2float(x);
     float result_fp32 = logf(x_fp32) / logf(10.0f); // log10(x) = log(x) / log(10)
-    return __cvt_half<...>(result_fp32);
+    return __float2half_rn(result_fp32);
 }
 ```
 
@@ -215,9 +219,9 @@ __aicore__ inline half hlog10_case0(half x)
 ```cpp
 __aicore__ inline half hlog10_case1(half x)
 {
-    float x_fp32 = __cvt_float<...>(x);
+    float x_fp32 = __half2float(x);
     float result_fp32 = logf(x_fp32) / logf(10.0f); // log10(x) = log(x) / log(10)
-    half temp = __cvt_half<...>(result_fp32);
+    half temp = __float2half_rn(result_fp32);
     if (x == static_cast<half>(0.2362060546875f)) {
         temp = static_cast<half>(-0.62646484375f);
     } else if (x == static_cast<half>(0.2490234375f)) {
@@ -235,7 +239,7 @@ __aicore__ inline half hlog10_case1(half x)
 }
 ```
 
-**性能数据**（与Case 0同一批输入）：
+**性能数据**（输入与Case 0同为混合批：约1/16为特殊值，其余为正常值）：
 
 | execute cycle | Task Duration(μs) | aiv_total_cycles |
 |:-----------:|:---------------:|:--------------:|
@@ -255,11 +259,11 @@ __aicore__ inline half hlog10_case1(half x)
 ```cpp
 __aicore__ inline float j0f_case2(float x)
 {
-    if (__isnan(x)) {
+    if (isnan(x)) {
         return x;
     }
-    float ax = __fabsf(x);
-    if (__isinf(ax)) {
+    float ax = fabsf(x);
+    if (isinf(ax)) {
         return 0.0f;
     }
     if (ax <= 8.0f) {
@@ -277,11 +281,11 @@ __aicore__ inline float j0f_case2(float x)
 ```cpp
 __aicore__ inline float j0f_case2(float x)
 {
-    if (__isnan(x)) {
+    if (isnan(x)) {
         return x;
     } else {
-        float ax = __fabsf(x);
-        if (__isinf(ax)) {
+        float ax = fabsf(x);
+        if (isinf(ax)) {
             return 0.0f;
         } else {
             if (ax <= 8.0f) {
@@ -300,23 +304,18 @@ __aicore__ inline float j0f_case2(float x)
 
 提前return隐式携带else分支，跳转与分支栈开销沿4级判断链逐级叠加。
 
-**性能数据**：
+**性能数据**（输入为常规批：大量数据落在`ax <= 8.0f`低值段，约1/16为NaN/Inf特殊值）：
 
-| 数据批 | execute cycle | Task Duration(μs) | aiv_total_cycles |
-|:---:|:-----------:|:---------------:|:--------------:|
-| 低值段为主批（low） | 2037 | 13.935 | 4845.96 |
-| 高值段为主批（high） | 2478 | 14.578 | 5460.42 |
-| 全特殊值批（special） | 1986 | 14.036 | 4657.17 |
-| 混合批（mixed） | 2837 | 14.733 | 5778.58 |
+| execute cycle | Task Duration(μs) | aiv_total_cycles |
+|:-----------:|:---------------:|:--------------:|
+| 2345 | 14.567 | 5025.12 |
 
 **性能数据分析**：
 
-- 低值段为主批：输入需两次跳过特殊值判断后才命中低值段分支，未命中的判断仍产生跳转与分支栈开销，execute cycle为2037；
-- 高值段为主批：该批输入命中的middle_range分段体较长，计算量本身更大，execute cycle从低值段为主批的2037升至2478；
-- 全特殊值批：NaN/Inf输入在第一个分支即命中返回，跳过全部分段计算，execute cycle（1986）与aiv_total_cycles（4657.17）均较低；
-- 混合批：四个分支方向均有线程进入，Warp内分支发散，分支栈反复压栈与弹栈，发散开销最大，execute cycle（2837）与aiv_total_cycles（5778.58）均偏高。
+- 常规批输入多在两次跳过特殊值判断后命中低值段分支，少量NaN/Inf输入在第一个分支即命中返回；未命中的判断仍产生跳转与分支栈开销，但各线程只执行命中方向的分段体，execute cycle为2345；
+- aiv_total_cycles为全部block的平均值，其中首个block包含kernel启动初期的额外开销（下同）。
 
-### Case 3: 全部分支统一return、逐级覆盖result（j0f优化版本一）
+### Case 3: 全部分支统一return、逐级覆盖result（j0f全谓词化版本）
 
 **实现方式**：先按高值段算出result，再依次执行中值段、低值段与NaN/Inf特殊值处理，命中则逐级覆盖result，最后统一返回。
 
@@ -325,7 +324,7 @@ __aicore__ inline float j0f_case2(float x)
 ```cpp
 __aicore__ inline float j0f_case3(float x)
 {
-    float ax = __fabsf(x);
+    float ax = fabsf(x);
     float result = __internal_j0f_huge_range(ax);   // 无条件执行高值段计算
     if (ax <= 1.0e13f) {
         result = __internal_j0f_middle_range(ax);
@@ -333,33 +332,28 @@ __aicore__ inline float j0f_case3(float x)
     if (ax <= 8.0f) {
         result = __internal_j0f_less8(ax);
     }
-    if (__isnan(x)) {
+    if (isnan(x)) {
         result = x;                         // NaN -> NaN
     }
-    if (__isinf(ax)) {
+    if (isinf(ax)) {
         result = 0.0f;                      // ±Inf -> 0
     }
     return result;
 }
 ```
 
-**性能数据**：
+**性能数据**（输入与Case 2同为常规批：低值段为主 + 约1/16特殊值）：
 
-| 数据批 | execute cycle | Task Duration(μs) | aiv_total_cycles |
-|:---:|:-----------:|:---------------:|:--------------:|
-| 低值段为主批（low） | 2479 | 14.429 | 5447.83 |
-| 高值段为主批（high） | 2431 | 14.360 | 5425.92 |
-| 全特殊值批（special） | 2417 | 14.625 | 5468.25 |
-| 混合批（mixed） | 2384 | 14.505 | 5455.04 |
+| execute cycle | Task Duration(μs) | aiv_total_cycles |
+|:-----------:|:---------------:|:--------------:|
+| 14692 | 22.726 | 19514.88 |
 
 **优化效果分析**：
 
-- 低值段为主批：全部分支谓词化后，每个输入都无条件执行高值段计算，多数输入还多执行中值段，长分支体谓词化的浪费超过控制开销的节省，相比Case 2的2037，execute cycle升至2479；
-- 高值段为主批：高值段命中，谓词化不产生多余计算，相比Case 2的2478，execute cycle降至2431；
-- 全特殊值批：NaN/Inf输入先经过两次未命中的分段判断，再执行高值段计算，最后才被特殊值修正覆盖，aiv_total_cycles从Case 2的4657.17升至5468.25，高约17%；
-- 混合批：短分支谓词化有收益，但长分段的无条件执行拖累整体，各批耗时趋于一致（aiv_total_cycles稳定在5400~5500），不再随输入分布波动。
+- 相比Case 2的2345，execute cycle升至14692，Task Duration从14.567μs增至22.726μs，aiv_total_cycles从5025.12升至19514.88。Case 3反而显著慢于基线，原因在于长分支体的谓词化：hlog10组（Case 1）的修正分支体只有一条赋值语句，多发射代价很小；而j0f的三个分段体各是几十条指令的多项式求值，谓词化后每个输入都无条件执行高值段计算，多数低值段输入还多执行中值段计算，多发射的执行量远超节省的跳转与分支栈开销。
+- Case 2与Case 3的对比说明：谓词化节省的控制开销是固定的，而多发射代价正比于分支体长度，分支体长时代价超过收益。Case 4进一步结合命中情况，探究谓词化的适用边界。
 
-### Case 4: 长分支体直接返回、剩余短修正统一return（j0f优化版本二）
+### Case 4: 长分支体直接返回、剩余短修正统一return（j0f优化版本）
 
 **实现方式**：低值段与中值段覆盖范围广且分支体长，命中即返回；未命中的输入按高值段算出result，再经NaN/Inf特殊值处理覆盖result，最后统一返回。
 
@@ -368,7 +362,7 @@ __aicore__ inline float j0f_case3(float x)
 ```cpp
 __aicore__ inline float j0f_case4(float x)
 {
-    float ax = __fabsf(x);
+    float ax = fabsf(x);
     if (ax <= 8.0f) {
         return __internal_j0f_less8(ax);    // 分支体长：命中即返回，只执行命中方向
     }
@@ -376,17 +370,17 @@ __aicore__ inline float j0f_case4(float x)
         return __internal_j0f_middle_range(ax);
     }
     float result = __internal_j0f_huge_range(ax);
-    if (__isnan(x)) {
+    if (isnan(x)) {
         result = x;
     }
-    if (__isinf(ax)) {
+    if (isinf(ax)) {
         result = 0.0f;
     }
     return result;
 }
 ```
 
-**性能数据**：
+**性能数据**（四批输入，考察不同命中情况下的性能表现）：
 
 | 数据批 | execute cycle | Task Duration(μs) | aiv_total_cycles |
 |:---:|:-----------:|:---------------:|:--------------:|
@@ -397,17 +391,19 @@ __aicore__ inline float j0f_case4(float x)
 
 **优化效果分析**：
 
-- 低值段为主批：命中低值段立即返回，除两个未命中的分支判断外无多余计算，相比Case 3的2479与Case 2的2037，execute cycle降至1767；
-- 高值段为主批：只执行命中分支，execute cycle降至2342，与Case 2的2478接近，都快于Case 3；
-- 全特殊值批：NaN/Inf输入先经过两次未命中的分段判断，再执行高值段计算，最后才被特殊值修正覆盖，相比Case 2的1986，execute cycle升至2395，该批为Case 2唯一快于Case 4的数据批；
-- 混合批：长分支体真跳转与短分支谓词化各取所长，对不同分布的输入都只有少量额外执行，execute cycle降至2704，总体最优。
+- 低值段为主批：命中低值段立即返回，除两个未命中的分支判断外无多余计算，execute cycle降至四批中最低的1767；
+- 高值段为主批：只执行命中分支，execute cycle为2342，都快于Case 3的全谓词化；
+- 全特殊值批：NaN/Inf输入先经过两次未命中的分段判断，再执行高值段计算，最后才被特殊值修正覆盖，execute cycle为2395；
+- 混合批：长分支体真跳转与短分支谓词化各取所长，对不同分布的输入都只有少量额外执行，execute cycle为2704。
+
+四批数据命中情况不同，性能表现随之变化：长分支体命中率高时提前return跳过的计算最多、收益最大（低值段为主批）；命中率低时真跳转仍快于全谓词化（高值段为主批）；分支体短的修正谓词化后多发射代价小，又能消除跳转与分支栈开销（混合批）。综合Case 3与Case 4即得predicate优化的边界：分支体短、命中率低的分支谓词化收益明显；分支体长或命中率高的分支保留真跳转、命中即提前return。
 
 ## 性能对比总结
 
 **综合优化效果**：
 
 - hlog10组（短修正分支链）：从Case 0基线版本到Case 1优化版本，execute cycle从1890降低到1406，下降约25.6%；
-- j0f组（长短混合分段链）：不同分支命中情况下各Case互有胜负，Case 4在低值段为主批与高值段为主批上最快，Case 2在全特殊值批上最快，Case 3在混合批上最快但领先有限，综合各数据批表现Case 4总体最优。
+- j0f组（长短混合分段链）：Case 3长短分支全部谓词化，常规输入上execute cycle从Case 2的2345升至14692；Case 4保留长分支真跳转、仅谓词化短修正，各批输入上均快于Case 3，总体最优。
 
 - hlog10组（约1/16特殊值的常规输入）：
 
@@ -416,15 +412,23 @@ __aicore__ inline float j0f_case4(float x)
 | Case 0 | 1890 | 14.919 | 5232.88 | 基线版本，特殊值前置、命中即提前return |
 | Case 1 | **1406** | 14.946 | **5194.75** | 修正链统一return，跳转由6级减至4级、末级谓词化 |
 
-- j0f组（execute cycle，按数据批）：
+- j0f组case2/3（常规输入：低值段为主 + 约1/16特殊值）：
 
-| Case | 低值段为主批 | 高值段为主批 | 全特殊值批 | 混合批 | 优化点 |
-|--------|:---------:|:---------:|:--------:|:-----:|--------------------|
-| Case 2 | 2037 | 2478 | **1986** | 2837 | 基线版本，特殊值前置、全部分支命中即返回 |
-| Case 3 | 2479 | 2431 | 2417 | **2384** | 全部分支统一return、逐级覆盖，长短分支全部谓词化 |
-| Case 4 | **1767** | **2342** | 2395 | 2704 | 长分支体直接返回、短修正谓词化，两种机制组合 |
+| Case | execute cycle | Task Duration(μs) | aiv_total_cycles | 优化点 |
+|--------|:-----------:|:---------------:|:--------------:|--------------------|
+| Case 2 | **2345** | **14.567** | **5025.12** | 基线版本，特殊值前置、全部分支命中即返回 |
+| Case 3 | 14692 | 22.726 | 19514.88 | 全部分支统一return、逐级覆盖，长短分支全部谓词化，execute cycle高于基线 |
 
-可见，predicate优化不是把所有分支都谓词化，而是按分支体长短与命中情况取舍：短分支谓词化，长分支或命中率高的分支保留真跳转、命中即提前return。
+- j0f组case4（execute cycle，按数据批）：
+
+| 数据批 | Case 4 | 命中率特征 |
+|--------|:-----:|--------------------|
+| 低值段为主批（low） | **1767** | 低值段命中率高 |
+| 高值段为主批（high） | 2342 | 中值段命中率高 |
+| 全特殊值批（special） | 2395 | 特殊值命中率高 |
+| 混合批（mixed） | 2704 | 各方向命中率接近 |
+
+可见，predicate优化的收益与代价由分支体长短与命中情况共同决定：分支体短、命中率低的分支谓词化收益明显；分支体长或命中率高的分支保留真跳转、命中即提前return。两种机制按此取舍组合，方能覆盖长短混合的分支链（Case 4）。
 
 ## 调优建议
 
@@ -452,20 +456,19 @@ __aicore__ inline float j0f_case4(float x)
   在本样例目录下执行如下命令。
 
   ```bash
-  CASE_NAME=hlog10_case0                              # 选择执行用例
   mkdir -p build && cd build;                         # 创建并进入build目录
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # 编译工程
-  ./predicate_optimization $CASE_NAME                 # 执行样例
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=1 ..; make -j;   # 编译工程（选择用例1）
+  ./predicate_optimization                            # 执行样例
   ```
 
   使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
 
   示例如下：
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU仿真模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=1 ..; make -j;   # NPU仿真模式
   ```
 
-  > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
+  > **注意：** 切换用例或编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
 
 - 编译选项说明
 
@@ -473,17 +476,17 @@ __aicore__ inline float j0f_case4(float x)
   |---------------------------|------------|---------------------------------------------------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
-  | 用例名（argv[1]） | 见下表 | hlog10组为`<kernel>_case<id>`，j0f组为`<kernel>_case<id>_<batch>`，共10个用例 |
+  | `SCENARIO_NUM` | `1` ~ `8`（默认`1`） | 编译期选择运行的用例，见下表 |
 
-  | 组 | 用例名 |
-  | --- | --- |
-  | hlog10 case0（基线） | `hlog10_case0` |
-  | hlog10 case1（优化） | `hlog10_case1` |
-  | j0f case2（基线） | `j0f_case2_low` / `j0f_case2_high` / `j0f_case2_special` / `j0f_case2_mixed` |
-  | j0f case3（优化一） | `j0f_case3_low` / `j0f_case3_high` / `j0f_case3_special` / `j0f_case3_mixed` |
-  | j0f case4（优化二） | `j0f_case4_low` / `j0f_case4_high` / `j0f_case4_special` / `j0f_case4_mixed` |
+  | SCENARIO_NUM | 用例 | 说明 |
+  | --- | --- | --- |
+  | 1 | hlog10_case0 | 基线版本 |
+  | 2 | hlog10_case1 | 优化版本 |
+  | 3 | j0f_case2 | 基线版本 |
+  | 4 | j0f_case3 | 全谓词化版本 |
+  | 5 / 6 / 7 / 8 | j0f_case4_low / j0f_case4_high / j0f_case4_special / j0f_case4_mixed | 优化版本，输入批依次为低值段为主/高值段为主/全特殊值/混合 |
 
-  每次运行会在同一份输入上执行该case与其同组对照case，并打印两者的执行cycle。逐个运行同组各批用例即可完成该组的完整对比。
+  每次编译只包含选定的用例：换用不同的SCENARIO_NUM重新编译并运行，即可逐个完成各用例、完成各组的完整对比。
 
 ## 性能调试
 
@@ -494,7 +497,7 @@ msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulat
 使用 `msOpProf` 工具获取单个组件上的性能数据：
 
 ```bash
-msopprof ./predicate_optimization <用例名>   # 分析样例的性能
+msopprof ./predicate_optimization   # 分析样例的性能（用例由编译时的SCENARIO_NUM决定）
 ```
 
 命令完成后，会在默认目录下生成以"OPPROF_{timestamp}_XXX"命名的文件夹,性能数据文件夹结构示例如下：
