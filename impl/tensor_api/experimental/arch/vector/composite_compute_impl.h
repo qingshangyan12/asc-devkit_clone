@@ -24,12 +24,11 @@ namespace te {
 namespace experimental {
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> axpy(const reg_tensor<T>& dst, const reg_tensor<T>& src, const T& scalar)
+__simd_callee__ inline reg_tensor<T> axpy(reg_tensor<T>& dst, const reg_tensor<T>& src, const T& scalar)
 {
     static_assert(detail::supports_axpy_v<T>, "axpy does not support this element type");
-    reg_tensor<T> result = dst;
-    asc_axpy(result.reg, src.reg, scalar, dst.mask);
-    return result;
+    asc_axpy(dst.reg, src.reg, scalar, dst.mask);
+    return dst;
 }
 
 template <typename T>
@@ -79,22 +78,20 @@ __simd_callee__ inline reg_tensor<U> exp_diff(
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> madd(
-    const reg_tensor<T>& dst, const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+    reg_tensor<T>& dst, const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
     static_assert(detail::supports_madd_v<T>, "madd does not support this element type");
-    reg_tensor<T> result = dst;
-    asc_madd(result.reg, src0.reg, src1.reg, dst.mask);
-    return result;
+    asc_madd(dst.reg, src0.reg, src1.reg, dst.mask);
+    return dst;
 }
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> mula(
-    const reg_tensor<T>& dst, const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+    reg_tensor<T>& dst, const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
     static_assert(detail::supports_mula_v<T>, "mula does not support this element type");
-    reg_tensor<T> result = dst;
-    asc_mula(result.reg, src0.reg, src1.reg, dst.mask);
-    return result;
+    asc_mula(dst.reg, src0.reg, src1.reg, dst.mask);
+    return dst;
 }
 
 template <typename T>

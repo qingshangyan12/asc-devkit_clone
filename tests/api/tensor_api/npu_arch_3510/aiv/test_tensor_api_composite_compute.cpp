@@ -24,7 +24,7 @@ __aicore__ inline void check_common_composite()
 {
     static_assert(AscendC::Std::is_same_v<
                   decltype(asc::te::experimental::axpy(
-                      AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>(),
+                      AscendC::Std::declval<reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>(),
                       AscendC::Std::declval<const T&>())),
                   reg_type<T>>);
     static_assert(AscendC::Std::is_same_v<
@@ -53,7 +53,7 @@ __aicore__ inline void check_float_fused()
 {
     static_assert(AscendC::Std::is_same_v<
                   decltype(asc::te::experimental::madd(
-                      AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>(),
+                      AscendC::Std::declval<reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>(),
                       AscendC::Std::declval<const reg_type<T>&>())),
                   reg_type<T>>);
     static_assert(AscendC::Std::is_same_v<
@@ -77,7 +77,7 @@ __aicore__ inline void check_mula()
 {
     static_assert(AscendC::Std::is_same_v<
                   decltype(asc::te::experimental::mula(
-                      AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>(),
+                      AscendC::Std::declval<reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>(),
                       AscendC::Std::declval<const reg_type<T>&>())),
                   reg_type<T>>);
 

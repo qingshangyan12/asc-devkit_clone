@@ -52,7 +52,7 @@ $$
 ```cpp
 template <const histogram_options& options = default_histogram_options>
 __simd_callee__ inline reg_tensor<uint16_t> histograms(
-    const reg_tensor<uint16_t>& dst, const reg_tensor<uint8_t>& src)
+    reg_tensor<uint16_t>& dst, const reg_tensor<uint8_t>& src)
 ```
 
 ## 参数说明
@@ -67,7 +67,7 @@ __simd_callee__ inline reg_tensor<uint16_t> histograms(
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `dst` | 输入 | 统计初值，类型为`reg_tensor<uint16_t>`。返回值的`mask`与`dst.mask`相同。 |
+| `dst` | 输入/输出 | 统计初值和结果，类型为`reg_tensor<uint16_t>`。接口直接更新`dst.reg`，返回值的`mask`与`dst.mask`相同。 |
 | `src` | 输入 | 待统计数据，类型为`reg_tensor<uint8_t>`。`src.mask`用于标记参与统计的元素，对应位置为`1`时参与统计，为`0`时不参与统计。 |
 
 ## 数据类型

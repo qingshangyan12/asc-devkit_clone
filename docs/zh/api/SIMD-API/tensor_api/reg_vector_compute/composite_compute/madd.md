@@ -39,7 +39,7 @@ $$
 ```cpp
 template <typename T>
 __simd_callee__ inline reg_tensor<T> madd(
-    const reg_tensor<T>& dst,
+    reg_tensor<T>& dst,
     const reg_tensor<T>& src0,
     const reg_tensor<T>& src1)
 ```
@@ -48,7 +48,7 @@ __simd_callee__ inline reg_tensor<T> madd(
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `dst` | 输入 | 第一个乘数。`dst.mask`控制参与计算的元素。 |
+| `dst` | 输入/输出 | 第一个乘数和结果。接口直接更新`dst.reg`，`dst.mask`控制参与计算的元素。 |
 | `src0` | 输入 | 第二个乘数。`src0.mask`不参与本次计算。 |
 | `src1` | 输入 | 加数。`src1.mask`不参与本次计算。 |
 

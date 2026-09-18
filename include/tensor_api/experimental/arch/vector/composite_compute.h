@@ -24,7 +24,7 @@ namespace te {
 namespace experimental {
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> axpy(const reg_tensor<T>& dst, const reg_tensor<T>& src, const T& scalar);
+__simd_callee__ inline reg_tensor<T> axpy(reg_tensor<T>& dst, const reg_tensor<T>& src, const T& scalar);
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> abs_diff(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
@@ -38,11 +38,11 @@ __simd_callee__ inline reg_tensor<U> exp_diff(
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> madd(
-    const reg_tensor<T>& dst, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+    reg_tensor<T>& dst, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> mula(
-    const reg_tensor<T>& dst, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+    reg_tensor<T>& dst, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> fma(

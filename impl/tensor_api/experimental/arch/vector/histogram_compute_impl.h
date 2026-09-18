@@ -22,7 +22,7 @@ namespace te {
 namespace experimental {
 
 template <const histogram_options& options>
-__simd_callee__ inline reg_tensor<uint16_t> histograms(const reg_tensor<uint16_t>& dst, const reg_tensor<uint8_t>& src)
+__simd_callee__ inline reg_tensor<uint16_t> histograms(reg_tensor<uint16_t>& dst, const reg_tensor<uint8_t>& src)
 {
     static_assert(
         options.half == histogram_half::low || options.half == histogram_half::high, "unsupported histogram half");
@@ -30,21 +30,20 @@ __simd_callee__ inline reg_tensor<uint16_t> histograms(const reg_tensor<uint16_t
         options.mode == histogram_mode::frequency || options.mode == histogram_mode::cumulative,
         "unsupported histogram mode");
 
-    reg_tensor<uint16_t> result = dst;
     if constexpr (options.mode == histogram_mode::frequency) {
         if constexpr (options.half == histogram_half::low) {
-            asc_frequency_histogram_bin0(result.reg, src.reg, src.mask);
+            asc_frequency_histogram_bin0(dst.reg, src.reg, src.mask);
         } else {
-            asc_frequency_histogram_bin1(result.reg, src.reg, src.mask);
+            asc_frequency_histogram_bin1(dst.reg, src.reg, src.mask);
         }
     } else {
         if constexpr (options.half == histogram_half::low) {
-            asc_cumulative_histogram_bin0(result.reg, src.reg, src.mask);
+            asc_cumulative_histogram_bin0(dst.reg, src.reg, src.mask);
         } else {
-            asc_cumulative_histogram_bin1(result.reg, src.reg, src.mask);
+            asc_cumulative_histogram_bin1(dst.reg, src.reg, src.mask);
         }
     }
-    return result;
+    return dst;
 }
 
 } // namespace experimental

@@ -39,7 +39,7 @@ $$
 ```cpp
 template <typename T>
 __simd_callee__ inline reg_tensor<T> axpy(
-    const reg_tensor<T>& dst,
+    reg_tensor<T>& dst,
     const reg_tensor<T>& src,
     const T& scalar)
 ```
@@ -56,7 +56,7 @@ __simd_callee__ inline reg_tensor<T> axpy(
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `dst` | 输入 | 加法操作数，类型为`reg_tensor<T>`。`dst.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
+| `dst` | 输入/输出 | 加法操作数和结果，类型为`reg_tensor<T>`。接口直接更新`dst.reg`，`dst.mask`用于标记参与计算的元素。 |
 | `src` | 输入 | 与标量相乘的源操作数，类型为`reg_tensor<T>`。`src.mask`不用于本次计算。 |
 | `scalar` | 输入 | 标量乘数，类型必须与`T`完全一致。 |
 
