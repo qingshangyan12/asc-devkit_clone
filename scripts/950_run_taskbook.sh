@@ -94,7 +94,16 @@ if [ -d "$ACT_INC" ] && [ -d "$ACT_IMPL" ]; then
       fi
     fi
   done
-  if [ -f "$HELPER/impl/basic_api/dav_3510/kernel_operator_mm_impl.h" ]; then
+  if [ -f "$HELPER/include/basic_api/kernel_operator_mm_intf.h" ]; then
+    TIK_INTF_DIR="${ASC_ROOT}/tikcpp/tikcfw/interface"
+    mkdir -p "$TIK_INTF_DIR" 2>/dev/null || true
+    if [ -d "$TIK_INTF_DIR" ]; then
+      cp -a "$HELPER/include/basic_api/kernel_operator_mm_intf.h" "$TIK_INTF_DIR/"
+      echo "OVERLAY_INTF $TIK_INTF_DIR/kernel_operator_mm_intf.h"
+    else
+      echo "OVERLAY_INTF_SKIP missing=$TIK_INTF_DIR"
+    fi
+  fi
     mkdir -p "$ACT_IMPL/dav_3510" 2>/dev/null || true
     cp -a "$HELPER/impl/basic_api/dav_3510/kernel_operator_mm_impl.h" "$ACT_IMPL/dav_3510/" 2>/dev/null || true
     echo "OVERLAY_DAV_ASC dav_3510/kernel_operator_mm_impl.h"
