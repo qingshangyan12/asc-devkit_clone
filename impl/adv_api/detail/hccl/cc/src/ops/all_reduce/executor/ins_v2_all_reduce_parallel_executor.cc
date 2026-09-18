@@ -16,6 +16,8 @@
 #include "ins_temp_all_gather_nhr.h"
 #include "topo_match_multilevel.h"
 #include "topo_match_pcie_mix.h"
+#include "alg_meta_registry.h"
+#include "external_alg_rules.h"
 #include <cmath>
 
 namespace mc2_ops_hccl {
@@ -991,8 +993,14 @@ InsAllReduceParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, Ins
 REGISTER_EXECUTOR_BY_FOUR_TEMPS(
     HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceParallelMeshNHR, InsAllReduceParallelExecutor, TopoMatchMultilevel,
     InsTempReduceScatterMesh1D, InsTempReduceScatterNHR, InsTempAllGatherMesh1D, InsTempAllGatherNHR);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceParallelMeshNHR, AlgEngine::AICPU, "parallel[mesh,nhr]", COND_NONE,
+    FLAG_MULTI_LEVEL);
 
 REGISTER_EXECUTOR_BY_FOUR_TEMPS(
     HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllreduceParallelMeshNHRPcie, InsAllReduceParallelExecutor, TopoMatchPcieMix,
     InsTempReduceScatterMesh1D, InsTempReduceScatterNHR, InsTempAllGatherMesh1D, InsTempAllGatherNHR);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllreduceParallelMeshNHRPcie, AlgEngine::AICPU, "parallel[mesh,nhr]",
+    COND_NONE, FLAG_PCIE_MIX);
 } // namespace mc2_ops_hccl
