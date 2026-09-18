@@ -147,7 +147,7 @@ protected:
         uint8_t weightGlobal[weightDataSize * sizeof(src1Type)] = {0};                                              \
         uint8_t biasGlobal[biasDataSize * sizeof(biasT1)] = {0};                                                    \
         uint8_t outputGlobal[outputDataSize * sizeof(L0cOutT)] = {0};                                               \
-        MainCpuCmpMmadMxBitModeBiasDemo<dstType, src0Type, src1Type, L0cOutT, biasT1>(                                     \
+        MainCpuCmpMmadMxBitModeBiasDemo<dstType, src0Type, src1Type, L0cOutT, biasT1>(                              \
             featureGlobal, weightGlobal, biasGlobal, outputGlobal, featureDataSize, weightDataSize, biasDataSize,   \
             outputDataSize, biasOp);                                                                                \
         for (int32_t i = 0; i < outputDataSize * sizeof(dstType); i++) {                                            \
