@@ -59,25 +59,25 @@ __simd_callee__ inline reg_tensor<DstType> reduce_sum(const reg_tensor<SrcType>&
 
 ## 参数说明
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
-| `scope` | 归约范围，类型为`reduce_scope`，默认值为`reduce_scope::element`。取值为`reduce_scope::element`时，对所有有效元素求和；取值为`reduce_scope::datablock`时，对每个`DataBlock`内的有效元素求和；取值为`reduce_scope::pair`时，对相邻两个元素求和。 |
-| `DstType` | 返回值中数据寄存器的元素类型，需要在`scope`之后显式指定。支持的数据类型请参考[数据类型](#数据类型)。 |
-| `SrcType` | 源操作数的数据类型，由函数实参自动推导。支持的数据类型请参考[数据类型](#数据类型)。 |
+| scope | 归约范围，类型为`reduce_scope`，默认值为`reduce_scope::element`。取值为`reduce_scope::element`时，对所有有效元素求和；取值为`reduce_scope::datablock`时，对每个`DataBlock`内的有效元素求和；取值为`reduce_scope::pair`时，对相邻两个元素求和。 |
+| DstType | 返回值中数据寄存器的元素类型，需要在`scope`之后显式指定。支持的数据类型请参考[数据类型](#数据类型)。 |
+| SrcType | 源操作数的数据类型，由函数实参自动推导。支持的数据类型请参考[数据类型](#数据类型)。 |
 
-**表 2**  参数说明
+**表2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `src` | 输入 | 源操作数，类型为[reg_tensor](../reg_tensor/reg_tensor.md)&lt;SrcType&gt;。其中，`src.reg`保存矢量数据，`src.mask`用于控制各元素是否参与归约。`src.mask`中与元素对应的比特位为1时，该元素参与归约；为0时，该元素不参与归约。 |
+| src | 输入 | 源操作数，类型为[reg_tensor](../reg_tensor/reg_tensor.md)&lt;SrcType&gt;。其中，`src.reg`保存矢量数据，`src.mask`用于控制各元素是否参与归约。`src.mask`中与元素对应的比特位为1时，该元素参与归约；为0时，该元素不参与归约。 |
 
 ## 数据类型
 
 `scope`为`reduce_scope::element`或`reduce_scope::datablock`时，`SrcType`与`DstType`支持以下组合：
 
-| `SrcType` | `DstType` |
+| SrcType | DstType |
 | --- | --- |
 | `int16_t` | `int32_t` |
 | `uint16_t` | `uint32_t` |
@@ -106,10 +106,7 @@ __simd_callee__ inline reg_tensor<DstType> reduce_sum(const reg_tensor<SrcType>&
 - `scope`为`reduce_scope::datablock`时，若某个`DataBlock`内的元素均不参与计算，则将0写入返回值`reg`的对应位置；对于浮点数类型，写入+0。
 - `scope`为`reduce_scope::pair`时，未被`src.mask`选中的元素被视为0参与相邻元素求和。
 - 返回值的`mask`与`src.mask`保持一致。如果只需搬出有效归约结果，调用`store`前需要根据结果布局重新调用`with_mask`绑定新的mask。
-
-## 关键特性说明
-
-`reduce_scope::element`和`reduce_scope::datablock`采用二叉树累加方式逐层归约，浮点数求和结果受累加顺序影响。`reduce_scope::pair`仅对相邻两个元素进行一次求和，不继续归约低半部分结果。
+- `reduce_scope::element`和`reduce_scope::datablock`采用二叉树累加方式逐层归约，浮点数求和结果受累加顺序影响。`reduce_scope::pair`仅对相邻两个元素进行一次求和，不继续归约低半部分结果。
 
 ## 调用示例
 

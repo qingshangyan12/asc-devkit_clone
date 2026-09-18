@@ -56,18 +56,18 @@ __simd_callee__ inline reg_tensor<DataType> reduce_max(const reg_tensor<DataType
 
 ## 参数说明
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
-| `scope` | 归约范围，类型为`reduce_scope`，默认值为`reduce_scope::element`。取值为`reduce_scope::element`时，对所有有效元素求最大值；取值为`reduce_scope::datablock`时，对每个`DataBlock`内的有效元素求最大值。 |
-| `DataType` | 源操作数和返回值中数据寄存器的元素类型，由函数实参自动推导。支持的数据类型请参考[数据类型](#数据类型)。 |
+| scope | 归约范围，类型为`reduce_scope`，默认值为`reduce_scope::element`。取值为`reduce_scope::element`时，对所有有效元素求最大值；取值为`reduce_scope::datablock`时，对每个`DataBlock`内的有效元素求最大值。 |
+| DataType | 源操作数和返回值中数据寄存器的元素类型，由函数实参自动推导。支持的数据类型请参考[数据类型](#数据类型)。 |
 
-**表 2**  参数说明
+**表2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `src` | 输入 | 源操作数，类型为[reg_tensor](../reg_tensor/reg_tensor.md)&lt;DataType&gt;。其中，`src.reg`保存矢量数据，`src.mask`用于控制各元素是否参与归约。`src.mask`中与元素对应的比特位为1时，该元素参与归约；为0时，该元素不参与归约。 |
+| src | 输入 | 源操作数，类型为[reg_tensor](../reg_tensor/reg_tensor.md)&lt;DataType&gt;。其中，`src.reg`保存矢量数据，`src.mask`用于控制各元素是否参与归约。`src.mask`中与元素对应的比特位为1时，该元素参与归约；为0时，该元素不参与归约。 |
 
 ## 数据类型
 
@@ -91,10 +91,7 @@ __simd_callee__ inline reg_tensor<DataType> reduce_max(const reg_tensor<DataType
 - 比较时遵循$max(-0, +0) = +0$。
 - `scope`为`reduce_scope::element`时，如果输入数据中存在nan，则将nan写入返回值`reg`的第0个元素，并将第一个nan的索引写入返回值`reg`的第1个元素。
 - 返回值的`mask`与`src.mask`保持一致。如果只需搬出有效归约结果，调用`store`前需要根据结果布局重新调用`with_mask`绑定新的mask。
-
-## 关键特性说明
-
-`scope`为`reduce_scope::element`时，接口同时返回最大值和索引。索引按照`DataType`的位模式存储在返回值`reg`的第1个元素中，读取索引时需要按`DataType`对应的位宽转换为整数类型。例如，`DataType`为`half`时，可按`uint16_t`读取索引原始位模式；`DataType`为`float`时，可按`uint32_t`读取索引原始位模式。
+- `scope`为`reduce_scope::element`时，接口同时返回最大值和索引。索引按照`DataType`的位模式存储在返回值`reg`的第1个元素中，读取索引时需要按`DataType`对应的位宽转换为整数类型。例如，`DataType`为`half`时，可按`uint16_t`读取索引原始位模式；`DataType`为`float`时，可按`uint32_t`读取索引原始位模式。
 
 ## 调用示例
 
