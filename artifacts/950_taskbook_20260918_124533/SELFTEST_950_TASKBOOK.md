@@ -1,0 +1,35 @@
+# Ascend950 CUBE task-book self-test
+
+- HEAD: e4a743949
+- ARCH: dav-3510
+- MODE: taskbook
+- STAMP: 20260918_124533
+
+- PASS: **21**
+- FAIL: 0
+
+| case | scenario | arch | build | run | verify | note |
+|---|---|---|---|---|---|---|
+| mmad | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| mmad | 2 | dav-3510 | PASS | PASS | PASS | s2 |
+| mmad | 3 | dav-3510 | PASS | PASS | PASS | s3 |
+| fixpipe_l0c2gm | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| fixpipe_l0c2gm | 2 | dav-3510 | PASS | PASS | PASS | s2 |
+| load_data_2dv2_l12l0 | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| load_data_2dv2_l12l0 | 3 | dav-3510 | PASS | PASS | PASS | s3 |
+| batch_matmul | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| mmad_gemv | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| mmad_unitflag | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| mmad | 1 | dav-3510 | PASS | PASS | PASS | s1_m1n1k16 |
+| mmad | 1 | dav-3510 | PASS | PASS | PASS | s1_m32n32k32 |
+| mmad | 1 | dav-3510 | PASS | PASS | PASS | s1_m1024n16k16 |
+| mmad | 1 | dav-3510 | PASS | PASS | PASS | s1_m16n16k2048 |
+| mmad_mx | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| mmad_mx | 2 | dav-3510 | PASS | PASS | PASS | s2 |
+| load_data_2dmx_l12l0 | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| load_data_2dmx_l12l0 | 2 | dav-3510 | PASS | PASS | PASS | s2 |
+| dual/mmad | 1 | dav-3510 | PASS | PASS | PASS | ptr_eq_tensor=PASS;tensor_vs_golden=PASS |
+| dual/fixpipe_l0c2gm | 1 | dav-3510 | PASS | PASS | PASS | ptr_eq_tensor=PASS;tensor_vs_golden=PASS |
+| dual/mmad_mx | 1 | dav-3510 | PASS | PASS | PASS | ptr_eq_tensor=PASS;tensor_vs_golden=PASS |
+| PopStackBuffer | 0 | dav-3510 | SKIP | - | - | friend_stack_meta |
+| SetAddrWithOffset | 0 | dav-3510 | SKIP | - | - | deprecated_member |
