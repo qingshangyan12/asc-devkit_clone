@@ -43,7 +43,7 @@ def asc_int162half_rn(dst, src, mask):
 
 ## 函数原型
 
-```cpp
+```c
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_int162half_<round_mode>(vector_half& dst,
                                                          vector_int16_t src,
@@ -92,7 +92,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
-```cpp
+```c
 #include <cstdint>
 #include <iostream>
 #include <vector>

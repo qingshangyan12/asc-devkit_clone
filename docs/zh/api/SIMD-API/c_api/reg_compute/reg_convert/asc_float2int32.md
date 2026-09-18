@@ -47,7 +47,7 @@ def asc_float2int32_rn(dst, src, mask):
 
 ### 模板原型
 
-```cpp
+```c
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_float2int32_<round_mode><sat_mode>(vector_int32_t& dst,
                                                                    vector_float src,
@@ -65,7 +65,7 @@ __simd_callee__ inline vector_int32_t asc_float2int32_<round_mode><sat_mode>(vec
 
 ### 函数原型典型示例
 
-```cpp
+```c
 // 示例：向最近且偶数舍入（rn）非饱和模式，通过引用参数输出结果
 __simd_callee__ inline void asc_float2int32_rn(vector_int32_t& dst,
                                                vector_float src,
@@ -112,7 +112,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
-```cpp
+```c
 #include <cstdint>
 #include <iostream>
 #include <vector>

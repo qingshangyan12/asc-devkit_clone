@@ -45,7 +45,7 @@ def asc_int322float_rn(dst, src, mask):
 
 ## 函数原型
 
-```cpp
+```c
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_int322float_<round_mode>(vector_float& dst,
                                                          vector_int32_t src,
@@ -60,7 +60,7 @@ __simd_callee__ inline vector_float asc_int322float_<round_mode>(vector_int32_t 
 
 ### 函数原型典型示例
 
-```cpp
+```c
 // RINT舍入模式，通过引用参数输出结果
 __simd_callee__ inline void asc_int322float_rn(vector_float& dst,
                                                vector_int32_t src,
@@ -107,7 +107,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
-```cpp
+```c
 #include <cstdint>
 #include <iostream>
 #include <vector>
