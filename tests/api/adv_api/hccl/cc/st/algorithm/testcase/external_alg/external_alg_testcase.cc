@@ -239,7 +239,9 @@ TopoInfoWithNetLayerDetails MakeUbxTopo(u32 rankSize = 16U)
     topo.level0PcieMix = false;
     topo.netLayerDetails.netLayerNum = 1U;
     topo.netLayerDetails.netLayers = {0U};
-    topo.netLayerDetails.localNetInsSizeOfLayer = {8U};
+    // 真实 MESH_1D_CLOS 不变量：localNetInsSizeOfLayer[0] == CLOS rank 数（topo_host.cc
+    // CalcLevel0TopoShape 校验），mesh 只覆盖 8 卡 < CLOS 域
+    topo.netLayerDetails.localNetInsSizeOfLayer = {rankSize};
     topo.topoInstDetailsOfLayer.resize(1U);
     topo.topoInstDetailsOfLayer[0].rankNumForTopoType[COMM_TOPO_1DMESH] = {8U};
     topo.topoInstDetailsOfLayer[0].rankNumForTopoType[COMM_TOPO_CLOS] = {rankSize};

@@ -20,16 +20,18 @@ namespace mc2_ops_hccl {
 namespace {
 const AutoSelectorBase kRuleSelectorBase;
 
-// hccl RS selector:30 / :23（reduce_scatter_auto_selector.cc）同名阈值
+// 对应 hccl RS_AICPU_1D_TWO_LEVEL_DATA_SIZE_THRESHOLD（reduce_scatter_auto_selector.cc:23）
+// 与 RS_2P_DETOUR_DATA_SIZE（:30）；命名去 AICPU 前缀因谓词引擎无关
 constexpr u64 RS_2P_DETOUR_DATA_SIZE = 4ULL * 1024 * 1024;                 // 4MB
 constexpr u64 RS_1D_TWO_LEVEL_DATA_SIZE_THRESHOLD = 1536ULL * 1024 * 1024; // 1536MB
 } // namespace
 
 // A1 蓝本（hccl 对齐，用户拍板）:
-//   hccl src/ops/reduce_scatter/selector/reduce_scatter_auto_selector.cc:483-485
-//   hccl src/ops/all_gather/selector/all_gather_auto_selector.cc:338
+//   hccl reduce_scatter_auto_selector.cc:483-485（SelectMeshAlgoAicpuForMesh1D）
+//   hccl all_gather_auto_selector.cc:360-362（SelectMeshAlgoAicpu）
 //   growthring/notes/meetings/algname.md §1.6
-// devkit RS:343-345 现状缺 2P 分支，按 hccl 补全。
+// AG 两层阈值是 1GB（AG_AICPU_1D_TWO_LEVEL_DATA_SIZE_THRESHOLD）与 RS 1536MB 不同；
+// COND_Z_AXIS 仅 RS 候选消费，统一取 RS 阈值。devkit RS:343-345 现状缺 2P 分支，按 hccl 补全。
 bool CondZAxis(const TopoInfoWithNetLayerDetails* topo, const OpParam& opParam)
 {
     if (topo == nullptr) {
@@ -131,17 +133,66 @@ bool EngineMatch(AlgEngine candEngine, const OpParam& opParam)
     }
 }
 
-const VariantCond VARIANT_COND_TABLE[VARIANT_COND_COUNT] = {
+// 表序与枚举序钉扎。extern 表不可用于常量表达式（GCC: "not usable in a constant
+// expression"，constexpr 又不允许出现在变量的非定义声明上），故绑定关系先落 constexpr
+// 内表并 static_assert 钉死；extern 表逐元素按枚举下标引用内表，enum 重排/绑定错位/
+// 漏项（NoHole）全部编译期暴露。
+namespace {
+constexpr VariantCond VARIANT_COND_BINDING[VARIANT_COND_COUNT] = {
     CondZAxis,     // COND_Z_AXIS
     CondPeerOnly,  // COND_PEER_ONLY
     CondSpecialDt, // COND_SPECIAL_DT
 };
-
-const MachineFlag MACHINE_FLAG_TABLE[MACHINE_FLAG_COUNT] = {
+constexpr MachineFlag MACHINE_FLAG_BINDING[MACHINE_FLAG_COUNT] = {
     FlagPcieMix,    // FLAG_PCIE_MIX
     FlagUbx,        // FLAG_UBX
     FlagMultiLevel, // FLAG_MULTI_LEVEL
     FlagFlat1D,     // FLAG_FLAT_1D
+};
+
+// 枚举新增槽位而内表漏填时尾部为 nullptr，编译期拦截
+constexpr bool NoHole(const VariantCond* table, int count)
+{
+    for (int i = 0; i < count; ++i) {
+        if (table[i] == nullptr) {
+            return false;
+        }
+    }
+    return true;
+}
+
+constexpr bool NoHole(const MachineFlag* table, int count)
+{
+    for (int i = 0; i < count; ++i) {
+        if (table[i] == nullptr) {
+            return false;
+        }
+    }
+    return true;
+}
+} // namespace
+
+static_assert(VARIANT_COND_BINDING[COND_Z_AXIS] == CondZAxis, "table binding drifted");
+static_assert(VARIANT_COND_BINDING[COND_PEER_ONLY] == CondPeerOnly, "table binding drifted");
+static_assert(VARIANT_COND_BINDING[COND_SPECIAL_DT] == CondSpecialDt, "table binding drifted");
+static_assert(MACHINE_FLAG_BINDING[FLAG_PCIE_MIX] == FlagPcieMix, "table binding drifted");
+static_assert(MACHINE_FLAG_BINDING[FLAG_UBX] == FlagUbx, "table binding drifted");
+static_assert(MACHINE_FLAG_BINDING[FLAG_MULTI_LEVEL] == FlagMultiLevel, "table binding drifted");
+static_assert(MACHINE_FLAG_BINDING[FLAG_FLAT_1D] == FlagFlat1D, "table binding drifted");
+static_assert(NoHole(VARIANT_COND_BINDING, VARIANT_COND_COUNT), "variant cond binding has holes");
+static_assert(NoHole(MACHINE_FLAG_BINDING, MACHINE_FLAG_COUNT), "machine flag binding has holes");
+
+const VariantCond VARIANT_COND_TABLE[VARIANT_COND_COUNT] = {
+    VARIANT_COND_BINDING[COND_Z_AXIS],
+    VARIANT_COND_BINDING[COND_PEER_ONLY],
+    VARIANT_COND_BINDING[COND_SPECIAL_DT],
+};
+
+const MachineFlag MACHINE_FLAG_TABLE[MACHINE_FLAG_COUNT] = {
+    MACHINE_FLAG_BINDING[FLAG_PCIE_MIX],
+    MACHINE_FLAG_BINDING[FLAG_UBX],
+    MACHINE_FLAG_BINDING[FLAG_MULTI_LEVEL],
+    MACHINE_FLAG_BINDING[FLAG_FLAT_1D],
 };
 
 const char* VariantCondName(int id)
