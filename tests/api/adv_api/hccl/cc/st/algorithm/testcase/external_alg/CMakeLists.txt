@@ -27,8 +27,12 @@ set(EXT_ALG_UTILS_COMMUNICATOR_DIR ${EXT_ALG_UTILS_HCCL_PROXY_DIR}/communicator)
 set(EXT_ALG_UTILS_TOPO_MODEL_DIR ${EXT_ALG_UTILS_HCCL_PROXY_DIR}/topo_model)
 
 # ---- 增长面：注册现场全量收集（未来新增算法文件自动纳入满射断言守护，免人肉同步）----
-# executor/selector 只收 4 个集合通信算子目录；不收 kfc_server（其注册受 HCCL_CANN_COMPAT_850
-# 守卫且不属于 46 行 sidecar 范围）；interface_graph_mode 无 executor/selector/template，天然不收。
+# executor/selector 只收 4 个集合通信算子目录；不收 kfc_server——若编入将注册（本目标
+# AICPU_COMPILE / HCCL_CANN_COMPAT_850 均未定义，ins_kfc_server_sole_executor.cc 的注册行
+# 生效），超出 46 行 sidecar 范围，故 GLOB 不收；interface_graph_mode 无 executor/selector/
+# template，天然不收。
+# 局限：未来新增 ops/<new_op>/executor 目录不会被本 GLOB 收集，且 46 锚对新 cmd 静默——
+# 新增 op 时需同步本清单与测试侧 COLL_CMDS。
 file(GLOB EXT_ALG_EXECUTORS CONFIGURE_DEPENDS
     ${HCCL_CC_SRC_DIR}/ops/all_gather/executor/*.cc
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/executor/*.cc
@@ -45,8 +49,9 @@ file(GLOB EXT_ALG_TEMPLATES CONFIGURE_DEPENDS
     ${HCCL_CC_SRC_DIR}/ops/*/template/aicpu/*.cc
     ${HCCL_CC_SRC_DIR}/ops/*/template/ccu/*.cc
     ${HCCL_CC_SRC_DIR}/ops/*/template/ccu/kernel/*.cc)
-# kfc_server 模板经 ops/*/template/ccu 通配进入，剔除：其注册受 HCCL_CANN_COMPAT_850 守卫，
-# 不属于 46 行 sidecar 范围
+# kfc_server 模板经 ops/*/template/ccu 通配进入，剔除：若编入将注册（本目标
+# AICPU_COMPILE / HCCL_CANN_COMPAT_850 均未定义，kfc_server 注册行生效），超出
+# 46 行 sidecar 范围，故 GLOB 不收
 list(FILTER EXT_ALG_TEMPLATES EXCLUDE REGEX "kfc_server")
 # 与产品构建对齐：all_gather / reduce_scatter 的 Legacy direct-launch ccu 模板产品已停编
 # （对应各 template/ccu/CMakeLists.txt 的注释行，原由：引用已废弃的旧 hcomm::CcuKernelArg
@@ -86,8 +91,9 @@ set(EXT_ALG_EXCLUDED_TEMPLATES
     reduce_scatter/template/ccu/kernel/ccu_kernel_reduce_scatter_nhr1d_multi_jetty_mem2mem.cc
     reduce_scatter/template/ccu/kernel/ccu_kernel_reduce_scatter_mesh2die.cc
 )
+# 逐项按全路径精确移除（REGEX 片段把文件名当正则用有元字符隐患）
 foreach(_excluded IN LISTS EXT_ALG_EXCLUDED_TEMPLATES)
-    list(FILTER EXT_ALG_TEMPLATES EXCLUDE REGEX "${_excluded}")
+    list(REMOVE_ITEM EXT_ALG_TEMPLATES ${HCCL_CC_SRC_DIR}/ops/${_excluded})
 endforeach()
 
 # ---- 固定面：external_alg / common / op_common / topo / stub ----

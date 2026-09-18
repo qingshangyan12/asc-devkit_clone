@@ -149,12 +149,9 @@ TEST(ExtAlgV2Registry, EnumerateRegisteredTags)
     for (const std::string& tag : agTags) {
         EXPECT_TRUE(registry.IsRegistered(HcclCMDType::HCCL_CMD_ALLGATHER, tag)) << tag;
     }
-    // 本目标不编 kfc_server/executor（HCCL_CANN_COMPAT_850 守卫，不属于 46 行范围）；
-    // 保守断言：不依赖构建配置，若注册了则每个 tag 必须可查
-    const std::vector<std::string> kfcTags = registry.GetRegisteredTags(HcclCMDType::HCCL_CMD_KFC_SERVER);
-    for (const std::string& tag : kfcTags) {
-        EXPECT_TRUE(registry.IsRegistered(HcclCMDType::HCCL_CMD_KFC_SERVER, tag)) << tag;
-    }
+    // kfc_server/executor 未编入本目标且 AICPU_COMPILE/HCCL_CANN_COMPAT_850 均未定义，
+    // 若意外编入将注册 CcuKfcServer——此断言是 GLOB 排除防线的测试侧副本
+    EXPECT_TRUE(registry.GetRegisteredTags(HcclCMDType::HCCL_CMD_KFC_SERVER).empty());
 }
 
 TEST(ExtAlgMetaRegistry, RegisterAndQuery)
@@ -191,6 +188,12 @@ TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
         std::sort(metaNames.begin(), metaNames.end());
         EXPECT_EQ(v2Tags, metaNames) << "cmd=" << static_cast<u32>(cmd);
     }
+    // 各 cmd 精确分布锚（AG 12 / RS 16 / AR 8 / A2A 7 / A2AV 3 = 46），失败时定位更直接
+    EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLGATHER).size(), 12U);
+    EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_REDUCE_SCATTER).size(), 16U);
+    EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLREDUCE).size(), 8U);
+    EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLTOALL).size(), 7U);
+    EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLTOALLV).size(), 3U);
     // 本目标全量编译（MC2_CLIENT_ENABLE_CCU=1，无 AICPU_COMPILE）：46 行精确锚
     size_t total = 0;
     for (HcclCMDType cmd : COLL_CMDS) {
