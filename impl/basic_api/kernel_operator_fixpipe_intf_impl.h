@@ -326,8 +326,7 @@ __aicore__ inline void Fixpipe(
 #if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
 /* [CUBE-PTR-PR1] Fixpipe L0C→GM (FixpipeParamsArch3510) — Jessicaruan PR-1 */
 template <typename T, typename U, const FixpipeConfig& config>
-__aicore__ inline void Fixpipe(
-    __gm__ T* dst, __cc__ U* src, const FixpipeParamsArch3510<config.format>& intriParams)
+__aicore__ inline void Fixpipe(__gm__ T* dst, __cc__ U* src, const FixpipeParamsArch3510<config.format>& intriParams)
 {
     // Bare __gm__: no ExtractCacheMode; cacheMode=0 (see usability note / Issue #1686)
     FixpipeL0C2GMImpl<PrimT<T>, PrimT<U>, config>(dst, src, intriParams, 0);
