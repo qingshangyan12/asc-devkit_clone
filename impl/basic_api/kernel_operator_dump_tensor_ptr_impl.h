@@ -35,9 +35,17 @@ __aicore__ inline GlobalTensor<T> BindGm(__gm__ T* ptr, uint32_t dumpSize)
 }
 
 template <typename T>
-__aicore__ inline LocalTensor<T> BindLocal(TPosition pos, T* ptr, uint32_t dumpSize)
+__aicore__ inline LocalTensor<T> BindLocal(TPosition pos, uint32_t addr, uint32_t dumpSize)
 {
-    return LocalTensor<T>(pos, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(ptr)), dumpSize);
+    // Address-space pointers (__ubuf__/__cbuf__/...) cannot reinterpret_cast to T*;
+    // LocalTensor only needs the numeric local address.
+    return LocalTensor<T>(pos, addr, dumpSize);
+}
+
+template <typename PtrT>
+__aicore__ inline uint32_t LocalAddr(PtrT ptr)
+{
+    return static_cast<uint32_t>(reinterpret_cast<uintptr_t>(ptr));
 }
 } // namespace CubePtrDetail
 
@@ -51,35 +59,35 @@ __aicore__ inline void DumpTensor(__gm__ T* tensor, uint32_t desc, uint32_t dump
 template <typename T>
 __aicore__ inline void DumpTensor(__ubuf__ T* tensor, uint32_t desc, uint32_t dumpSize)
 {
-    auto tmp = CubePtrDetail::BindLocal<T>(TPosition::VECCALC, reinterpret_cast<T*>(tensor), dumpSize);
+    auto tmp = CubePtrDetail::BindLocal<T>(TPosition::VECCALC, CubePtrDetail::LocalAddr(tensor), dumpSize);
     DumpTensorLocal2GMImpl(tmp, desc, dumpSize);
 }
 
 template <typename T>
 __aicore__ inline void DumpTensor(__cbuf__ T* tensor, uint32_t desc, uint32_t dumpSize)
 {
-    auto tmp = CubePtrDetail::BindLocal<T>(TPosition::A1, reinterpret_cast<T*>(tensor), dumpSize);
+    auto tmp = CubePtrDetail::BindLocal<T>(TPosition::A1, CubePtrDetail::LocalAddr(tensor), dumpSize);
     DumpTensorLocal2GMImpl(tmp, desc, dumpSize);
 }
 
 template <typename T>
 __aicore__ inline void DumpTensor(__cc__ T* tensor, uint32_t desc, uint32_t dumpSize)
 {
-    auto tmp = CubePtrDetail::BindLocal<T>(TPosition::CO1, reinterpret_cast<T*>(tensor), dumpSize);
+    auto tmp = CubePtrDetail::BindLocal<T>(TPosition::CO1, CubePtrDetail::LocalAddr(tensor), dumpSize);
     DumpTensorLocal2GMImpl(tmp, desc, dumpSize);
 }
 
 template <typename T>
 __aicore__ inline void DumpTensor(__ca__ T* tensor, uint32_t desc, uint32_t dumpSize)
 {
-    auto tmp = CubePtrDetail::BindLocal<T>(TPosition::A2, reinterpret_cast<T*>(tensor), dumpSize);
+    auto tmp = CubePtrDetail::BindLocal<T>(TPosition::A2, CubePtrDetail::LocalAddr(tensor), dumpSize);
     DumpTensorLocal2GMImpl(tmp, desc, dumpSize);
 }
 
 template <typename T>
 __aicore__ inline void DumpTensor(__cb__ T* tensor, uint32_t desc, uint32_t dumpSize)
 {
-    auto tmp = CubePtrDetail::BindLocal<T>(TPosition::B2, reinterpret_cast<T*>(tensor), dumpSize);
+    auto tmp = CubePtrDetail::BindLocal<T>(TPosition::B2, CubePtrDetail::LocalAddr(tensor), dumpSize);
     DumpTensorLocal2GMImpl(tmp, desc, dumpSize);
 }
 
@@ -99,7 +107,7 @@ __aicore__ inline void DumpTensor(__gm__ T* tensor, uint32_t desc, uint32_t dump
 template <typename T>
 __aicore__ inline void DumpTensor(__ubuf__ T* tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
 {
-    auto tmp = CubePtrDetail::BindLocal<T>(TPosition::VECCALC, reinterpret_cast<T*>(tensor), dumpSize);
+    auto tmp = CubePtrDetail::BindLocal<T>(TPosition::VECCALC, CubePtrDetail::LocalAddr(tensor), dumpSize);
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || \
                               (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3102))
     DumpShapeImpl(shapeInfo);
@@ -112,7 +120,7 @@ __aicore__ inline void DumpTensor(__ubuf__ T* tensor, uint32_t desc, uint32_t du
 template <typename T>
 __aicore__ inline void DumpTensor(__cbuf__ T* tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
 {
-    auto tmp = CubePtrDetail::BindLocal<T>(TPosition::A1, reinterpret_cast<T*>(tensor), dumpSize);
+    auto tmp = CubePtrDetail::BindLocal<T>(TPosition::A1, CubePtrDetail::LocalAddr(tensor), dumpSize);
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || \
                               (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3102))
     DumpShapeImpl(shapeInfo);
@@ -125,7 +133,7 @@ __aicore__ inline void DumpTensor(__cbuf__ T* tensor, uint32_t desc, uint32_t du
 template <typename T>
 __aicore__ inline void DumpTensor(__cc__ T* tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
 {
-    auto tmp = CubePtrDetail::BindLocal<T>(TPosition::CO1, reinterpret_cast<T*>(tensor), dumpSize);
+    auto tmp = CubePtrDetail::BindLocal<T>(TPosition::CO1, CubePtrDetail::LocalAddr(tensor), dumpSize);
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || \
                               (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3102))
     DumpShapeImpl(shapeInfo);
@@ -138,7 +146,7 @@ __aicore__ inline void DumpTensor(__cc__ T* tensor, uint32_t desc, uint32_t dump
 template <typename T>
 __aicore__ inline void DumpTensor(__ca__ T* tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
 {
-    auto tmp = CubePtrDetail::BindLocal<T>(TPosition::A2, reinterpret_cast<T*>(tensor), dumpSize);
+    auto tmp = CubePtrDetail::BindLocal<T>(TPosition::A2, CubePtrDetail::LocalAddr(tensor), dumpSize);
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || \
                               (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3102))
     DumpShapeImpl(shapeInfo);
@@ -151,7 +159,7 @@ __aicore__ inline void DumpTensor(__ca__ T* tensor, uint32_t desc, uint32_t dump
 template <typename T>
 __aicore__ inline void DumpTensor(__cb__ T* tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
 {
-    auto tmp = CubePtrDetail::BindLocal<T>(TPosition::B2, reinterpret_cast<T*>(tensor), dumpSize);
+    auto tmp = CubePtrDetail::BindLocal<T>(TPosition::B2, CubePtrDetail::LocalAddr(tensor), dumpSize);
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || \
                               (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3102))
     DumpShapeImpl(shapeInfo);

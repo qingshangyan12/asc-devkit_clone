@@ -368,16 +368,17 @@ TASKBOOK_CASES=(
   # §3.2 shapes：mmad 全 dtype（1/32/1024/2048 等价缩放；s3 DN 仅 3510 不在此列）
   "mmad:1:1:1:16" "mmad:1:1:16:16" "mmad:1:32:32:32" "mmad:1:128:128:128"
   "mmad:1:1024:16:16" "mmad:1:16:16:1024" "mmad:1:32:32:1024" "mmad:1:16:16:2048"
-  "mmad:2:1:1:16" "mmad:2:32:32:32" "mmad:2:1024:16:16" "mmad:2:16:16:2048"
-  "mmad:3:1:1:16" "mmad:3:32:32:32" "mmad:3:1024:16:16" "mmad:3:16:16:2048"
+  # bf16(s2)/fp32(s3)：1x1 走 GEMV；K=2048 单次 L0 顶格/溢出 → 用 1x16 + 安全大 K
+  "mmad:2:1:16:16" "mmad:2:32:32:32" "mmad:2:1024:16:16" "mmad:2:16:16:1024"
+  "mmad:3:1:16:16" "mmad:3:32:32:32" "mmad:3:1024:16:16" "mmad:3:16:16:512"
   "mmad:4:1:1:16" "mmad:4:32:32:32" "mmad:4:1024:16:16" "mmad:4:16:16:2048"
-  # load_data / fixpipe 至少 32 + 1024
+  # load_data / fixpipe 至少 32 + 1024（fixpipe C0=32，16x16x2048 时 L0B 顶格易半精度）
   "load_data_l12l0:1:32:32:32"
   "load_data_l12l0:1:16:16:1024"
   "fixpipe_l0c2gm:1:32:32:32"
   "fixpipe_l0c2gm:1:64:64:64"
   "fixpipe_l0c2gm:1:1024:16:16"
-  "fixpipe_l0c2gm:1:16:16:2048"
+  "fixpipe_l0c2gm:1:16:16:1024"
 )
 
 echo "CASE_COUNT=${#TASKBOOK_CASES[@]} MODE=$MODE"
