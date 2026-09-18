@@ -89,8 +89,9 @@ ACT_INC="${ASCEND_HOME_PATH}/asc/include/basic_api"
 ACT_IMPL="${ASCEND_HOME_PATH}/asc/impl/basic_api"
 if [ -d "$ACT_INC" ] && [ -d "$ACT_IMPL" ]; then
   cp -a "$SRC/include/basic_api/kernel_operator_ptr_utils.h" "$ACT_INC/" 2>/dev/null || true
-  # 950 full：只 overlay mm/fixpipe，不同步（少测）
-  for f in kernel_operator_mm_ptr_impl.h kernel_operator_fixpipe_ptr_impl.h; do
+  # 950 full：overlay mm/fixpipe ptr + intf（含 MmadMx 指针重载）
+  for f in kernel_operator_mm_ptr_impl.h kernel_operator_fixpipe_ptr_impl.h \
+           kernel_operator_mm_intf_impl.h kernel_operator_fixpipe_intf_impl.h; do
     [ -f "$SRC/impl/basic_api/$f" ] && cp -a "$SRC/impl/basic_api/$f" "$ACT_IMPL/" || true
   done
   for pair in \
