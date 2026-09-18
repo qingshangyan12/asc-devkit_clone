@@ -276,6 +276,20 @@ TEST_F(TestHcclTilingCcuKfc, ReduceScatterSoleNhrMultiLinkCcuSchedUsesCcuNewVers
         INIT_TILING_CCU_NEW_VERSION);
 }
 
+// 闸门 A 三段判定③: 外部名 (opType, canonical) 命中镜像对表 → CCU 新版本
+TEST_F(TestHcclTilingCcuKfc, ExternalAlgNameCcuCandidateUsesCcuNewVersion)
+{
+    ExpectInitTilingVersion(
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "sole[mesh]", 6U, INIT_TILING_CCU_NEW_VERSION);
+}
+
+// 闸门 A 三段判定③: 外部名仅有 AICPU 候选（不在镜像对表）→ 默认版本（不设 101）
+TEST_F(TestHcclTilingCcuKfc, ExternalAlgNameAicpuOnlyUsesDefaultVersion)
+{
+    ExpectInitTilingVersion(
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "pipeline[mesh,nhr]", 6U, INIT_TILING_VERSION);
+}
+
 // ============================================================================
 // 以下用例覆盖 commit aaa3d79e5 的改动:
 // 修复 hccl_tiling.cpp 中不安全的动态库加载。

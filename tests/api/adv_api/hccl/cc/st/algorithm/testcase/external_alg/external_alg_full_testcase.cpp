@@ -8,10 +8,15 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include <cstdio>
+#include <set>
 #include <string>
+#include <utility>
 
+#include "alg_meta_registry.h"
+#include "external_alg_ccu_ext_names.h"
 #include "external_alg_parser.h"
 #include "external_alg_resolver.h"
+#include "external_alg_rules.h"
 #include "gtest/gtest.h"
 #include "hccl_alloc_ctx_res.h"
 
@@ -93,4 +98,17 @@ TEST(ExtAlgGateB, ExternalNameGate)
     Mc2CcTilingInner legacy = MakeTiling("allgather=level0:fullmesh", 6U);
     const void* legacyList[] = {&legacy};
     EXPECT_FALSE(CheckCcuAlgorithmsRegistered(legacyList, 1U));
+}
+
+// 闸门 A 镜像漂移断言：镜像对表 ↔ sidecar 真值（engine==CCU 的 (opType, canonical外部名) 集合）逐项相等
+TEST(ExtAlgGateA, MirrorMatchesSidecar)
+{
+    std::set<std::pair<uint32_t, std::string>> truth;
+    for (const AlgMetaRow& row : AlgMetaRegistry::Instance().GetAll()) {
+        if (row.meta.engine != AlgEngine::CCU) {
+            continue;
+        }
+        truth.insert(std::make_pair(static_cast<uint32_t>(row.cmd), std::string(row.meta.externalName)));
+    }
+    EXPECT_EQ(CcuExternalNameSet(), truth);
 }

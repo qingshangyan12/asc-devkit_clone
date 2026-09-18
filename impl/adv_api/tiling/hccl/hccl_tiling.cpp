@@ -22,6 +22,7 @@
 #include "include/adv_api/hccl/internal/hccl_tiling_msg.h"
 #include "tiling/platform/platform_ascendc.h"
 #include "hccl_symbol_loader.h"
+#include "external_alg_ccu_ext_names.h"
 #include <set>
 
 using namespace std;
@@ -44,12 +45,29 @@ static const std::set<std::string> REGISTERED_CCU_ALGORITHMS = {
     "CcuSchedAllToAllSoleMeshConcurrent",
     "CcuSchedReduceScatterConcurMeshNHRMultiLink"};
 
-bool IsCcuAlgorithmRegistered(const std::string& algConfig, uint8_t commEngine)
+// 闸门 A 三段判定（设计 §11）:
+// ① algConfig 裸名且在 REGISTERED_CCU_ALGORITHMS → true（现状）
+// ② 不含 '[' → false（现状）
+// ③ 含 '['：解析成功 && 候选表(opType, 外部名)含 engine==CCU 候选 → true
+//    前提 commEngine ∈ {5,6}（CCU 系，现状保留）。tiling 阶段无 topoInfo——只做静态预判，
+//    不做 ②②′ 消歧。AICPU 外部名不设 101（version=101 消费点仅在 CCU 链）。
+bool IsCcuAlgorithmRegistered(const std::string& algConfig, uint8_t commEngine, uint32_t opType)
 {
     if (commEngine != 5U && commEngine != 6U) {
         return false;
     }
-    return REGISTERED_CCU_ALGORITHMS.count(algConfig) != 0U;
+    if (REGISTERED_CCU_ALGORITHMS.count(algConfig) != 0U) {
+        return true;
+    }
+    if (algConfig.find('[') == std::string::npos) {
+        return false;
+    }
+    mc2_ops_hccl::ExternalAlgSpec spec;
+    std::string errMsg;
+    if (!mc2_ops_hccl::ParseExternalAlg(algConfig, spec, errMsg)) {
+        return false; // 语法错：tiling 静态预判不通过（真报错在 gate B/C，三要素齐全）
+    }
+    return mc2_ops_hccl::CcuExternalNameSet().count(std::make_pair(opType, spec.canonical())) != 0U;
 }
 
 void PrintMc2InitTiling(const Mc2InitTilingInner& tiling)
@@ -168,7 +186,7 @@ uint32_t Mc2CcTilingConfig::GetTiling(::Mc2InitTiling& tiling)
     for (uint32_t i = 0; i < MAX_CC_TILING_NUM; i++) {
         tilingInner->offset[i] = 0;
     }
-    if (IsCcuAlgorithmRegistered(impl_.algConfig_, impl_.commEngine_)) {
+    if (IsCcuAlgorithmRegistered(impl_.algConfig_, impl_.commEngine_, impl_.opType_)) {
         tilingInner->version = INIT_TILING_CCU_NEW_VERSION;
     }
     ASCENDC_HOST_ASSERT(SetDevType(tilingInner) == EXIT_SUCCESS, return EXIT_FAILURE, "SetDevType failed.");
