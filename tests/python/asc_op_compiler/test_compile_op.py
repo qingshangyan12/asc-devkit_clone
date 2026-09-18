@@ -41,6 +41,7 @@ from asc_op_compile_base.common import buildcfg
 from asc_op_compile_base.asc_op_compiler.global_storage import global_var_storage
 from asc_op_compile_base.asc_op_compiler import static_compile_resource_generator
 from asc_op_compile_base.asc_op_compiler import static_compile_resource_id
+from asc_op_compile_base.asc_op_compiler import ascendc_compile_base
 from asc_op_compile_base.asc_op_compiler.ascendc_common_utility import (
     CompileCommandMode,
     CompileCommandSession,
@@ -209,7 +210,7 @@ def read_resource_id_section_for_test(binary_file):
         if result.returncode != 0:
             raise AssertionError(f"Failed to read Resource ID: {result.stdout}")
         section_data = Path(dump_file).read_bytes()
-        head_size = static_compile_resource_id._TLV_HEAD_SIZE
+        head_size = 4  # TLV head: unsigned short type + unsigned short len
         values = []
         offset = 0
         while offset + head_size <= len(section_data):
@@ -520,6 +521,20 @@ class TestCompileOp(unittest.TestCase):
                     compile_states = []
                     mock_write_resource_id = mock.Mock()
 
+                    def fake_build_resource_id_object(
+                        dst_file, link_inputs, compile_log_path=None
+                    ):
+                        mock_write_resource_id(dst_file)
+                        return "resource-id", "%s.resource_id.o" % dst_file
+
+                    stack.enter_context(
+                        mock.patch.object(
+                            ascendc_compile_base,
+                            "build_resource_id_object",
+                            fake_build_resource_id_object,
+                        )
+                    )
+
                     def record_compile_state(compile_info, *_args, **_kwargs):
                         state = (
                             global_var_storage.get_variable(
@@ -537,10 +552,7 @@ class TestCompileOp(unittest.TestCase):
                             compile_info.compile_command_session.mode
                             is CompileCommandMode.EXECUTE_AND_RECORD
                         ):
-                            mock_write_resource_id(compile_info.dst_file)
-                            global_var_storage.get_variable("ascendc_resource_ids")[
-                                os.path.abspath(compile_info.dst_file)
-                            ] = "resource-id"
+                            pass
                         if (
                             compile_info.compile_command_session.mode
                             is not CompileCommandMode.EXECUTE
