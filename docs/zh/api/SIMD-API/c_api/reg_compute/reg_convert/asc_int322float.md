@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/reg_compute/reg_convert.h"`。
 
-根据`mask`将`src`中的每个`int32_t`类型数据转换成`float`类型，并支持多种舍入模式，结果写入`dst`。参考伪代码如下：
+根据`mask`将`src`中的每个`int32_t`类型数据转换成`float`类型，并支持多种舍入模式，可通过引用参数或函数返回值输出结果。参考伪代码如下：
 
 ```python
 def asc_int322float_rn(dst, src, mask):
@@ -43,22 +43,30 @@ def asc_int322float_rn(dst, src, mask):
 
 ## 函数原型
 
-```c
-// 占位符形式
+```cpp
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_int322float_<round_mode>(vector_float& dst,
                                                          vector_int32_t src,
                                                          vector_bool mask)
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_float asc_int322float_<round_mode>(vector_int32_t src,
+                                                                 vector_bool mask)
 ```
 
 `<round_mode>`表示支持的舍入模式，支持`rd`（`FLOOR`）、`rn`（`RINT`）、`rna`（`ROUND`）、`ru`（`CEIL`）和`rz`（`TRUNC`）。
 
 ### 函数原型典型示例
 
-```c
-// RINT舍入模式
+```cpp
+// RINT舍入模式，通过引用参数输出结果
 __simd_callee__ inline void asc_int322float_rn(vector_float& dst,
                                                vector_int32_t src,
                                                vector_bool mask)
+
+// RINT舍入模式，通过函数返回值返回结果
+__simd_callee__ inline vector_float asc_int322float_rn(vector_int32_t src,
+                                                       vector_bool mask)
 ```
 
 ## 参数说明
@@ -75,11 +83,14 @@ __simd_callee__ inline void asc_int322float_rn(vector_float& dst,
 
 ## 返回值说明
 
-无
+- 通过引用参数输出结果的函数原型无返回值。
+- 通过函数返回值输出结果的函数原型返回计算结果，返回值类型与对应引用输出函数原型中`dst`参数的类型一致（去除引用）。
 
 ## 约束说明
 
 - `src`与`dst`的数据类型需要与函数原型匹配。
+- 通过引用参数输出结果的函数原型在非AIV上调用时直接返回。
+- 通过函数返回值输出结果的函数原型在非AIV上调用时返回对应矢量类型的默认构造值。
 - 掩码位为0时，`dst`对应元素置0。
 - 当`int32_t`的绝对值大于$2^{24}$时，按函数后缀指定的舍入模式进行舍入。
 
@@ -95,7 +106,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
-```c
+```cpp
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -186,4 +197,3 @@ int main()
     return passed ? 0 : 1;
 }
 ```
-
