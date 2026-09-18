@@ -14,6 +14,7 @@
 #include "hccl_inner.h"
 #include "param_check.h"
 #include "hccl_alloc_ctx_res.h"
+#include "external_alg_resolver.h"
 #include "op_common.h"
 #include "ccu_assist_pub.h"
 #include "hccl_ccu_res.h"
@@ -399,11 +400,44 @@ bool CheckCcuAlgorithmsRegistered(const void* ccTilingList[], uint32_t tilingNum
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         const auto* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
         std::string algName;
-        if (!GetForcedAlgName(ccTiling, algName)) {
+        ExternalAlgSpec extSpec;
+        std::string extParseErrMsg;
+        const ForcedAlgKind kind = GetForcedAlg(ccTiling, algName, extSpec, extParseErrMsg);
+        if (kind == ForcedAlgKind::EXTERNAL) {
+            // 闸门 B（设计 §11）：解析失败 / 无 CCU 候选 / 候选未过双名单 → 拒（HCCL_E_ALG_NOT_SUPPORTED 语义不变）。
+            // 此时不定名，真定名在闸门 C（SelectCcuAlgorithm → resolver → FillCcuAlgTypeAndName）。
+            if (!extParseErrMsg.empty()) {
+                HCCL_WARNING(
+                    "[MC2_EXT_ALG] ccu gate rejected, algConfig[%s], reason[%s].", ccTiling->algConfig,
+                    extParseErrMsg.c_str());
+                return false;
+            }
+            const std::vector<AlgCandidate>& cands =
+                GetExternalCandidates(static_cast<HcclCMDType>(ccTiling->opType), extSpec.canonical());
+            size_t ccuCount = 0U;
+            for (const AlgCandidate& cand : cands) {
+                if (cand.engine != AlgEngine::CCU) {
+                    continue;
+                }
+                ccuCount++;
+                if (HcclIsCcuAlgorithmRegistered(ccTiling->opType, cand.registeredName.c_str())) {
+                    HCCL_INFO(
+                        "[MC2_EXT_ALG] ccu gate passed, algConfig[%s], ccuCandidate[%s].", ccTiling->algConfig,
+                        cand.registeredName.c_str());
+                    return true; // >=1 过双名单即放行
+                }
+            }
+            HCCL_WARNING(
+                "[MC2_EXT_ALG] ccu gate rejected, algConfig[%s], opType[%u], ccuCandidates[%zu] "
+                "(no CCU-registered candidate passed algorithmMap/V2 registry).",
+                ccTiling->algConfig, ccTiling->opType, ccuCount);
+            return false;
+        }
+        if (kind != ForcedAlgKind::BARE_NAME) { // NONE / LEGACY：现状拒绝（旧 :402-405）
             HCCL_WARNING("[AllocComResourceByTilingCcu] algName[%s] is not supported in mc2_client.", algName.c_str());
             return false;
         }
-        if (!HcclIsCcuAlgorithmRegistered(ccTiling->opType, algName.c_str())) {
+        if (!HcclIsCcuAlgorithmRegistered(ccTiling->opType, algName.c_str())) { // 现状双名单（旧 :406-411）
             HCCL_WARNING(
                 "[AllocComResourceByTilingCcu] algorithm[%s] is not registered in mc2_client for opType[%u].",
                 algName.c_str(), ccTiling->opType);

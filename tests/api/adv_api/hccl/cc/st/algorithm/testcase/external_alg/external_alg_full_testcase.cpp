@@ -11,6 +11,7 @@
 #include <string>
 
 #include "external_alg_parser.h"
+#include "external_alg_resolver.h"
 #include "gtest/gtest.h"
 #include "hccl_alloc_ctx_res.h"
 
@@ -27,7 +28,7 @@ Mc2CcTilingInner MakeTiling(const char* algConfig, uint32_t opType = 6U /*ALLGAT
 }
 } // namespace
 
-// 改造点①: 四态识别（P4 兼容性: NONE/LEGACY/BARE_NAME 行为与旧 GetForcedAlgName 逐字节等价）
+// 改造点①: 四态识别（P4 兼容性: NONE/LEGACY/BARE_NAME 行为与旧两态强制名接口逐字节等价）
 TEST(ExtAlgForced, FourStateClassification)
 {
     std::string algName;
@@ -59,4 +60,37 @@ TEST(ExtAlgForced, FourStateClassification)
     EXPECT_FALSE(spec.orderStrong);
 
     EXPECT_EQ(GetForcedAlg(nullptr, algName, spec, errMsg), ForcedAlgKind::NONE);
+}
+
+// hccl_mc2.cc 内部自由函数，专属目标已编入该翻译单元，符号可见
+bool CheckCcuAlgorithmsRegistered(const void* ccTilingList[], uint32_t tilingNum);
+
+// 闸门 B: 外部名按 CCU 候选子集过双名单；AICPU-only 外部名被拒
+TEST(ExtAlgGateB, ExternalNameGate)
+{
+    // sole[mesh] AG 有 CCU 候选 CcuSchedAllGatherSoleMesh（algorithmMap + V2 注册表均在）→ 过
+    Mc2CcTilingInner agSoleMesh = MakeTiling("sole[mesh]", 6U);
+    const void* goodList[] = {&agSoleMesh};
+    EXPECT_TRUE(CheckCcuAlgorithmsRegistered(goodList, 1U));
+
+    // AG pipeline[mesh,nhr] 仅 AICPU 候选 → 拒
+    Mc2CcTilingInner agPipeline = MakeTiling("pipeline[mesh,nhr]", 6U);
+    const void* badList[] = {&agPipeline};
+    EXPECT_FALSE(CheckCcuAlgorithmsRegistered(badList, 1U));
+
+    // 语法错 → 拒
+    Mc2CcTilingInner badSyntax = MakeTiling("sole[ring]", 6U);
+    const void* badSyntaxList[] = {&badSyntax};
+    EXPECT_FALSE(CheckCcuAlgorithmsRegistered(badSyntaxList, 1U));
+
+    // 裸名/空名/legacy 现状语义不变
+    Mc2CcTilingInner bare = MakeTiling("CcuSchedAllGatherSoleMesh", 6U);
+    const void* bareList[] = {&bare};
+    EXPECT_TRUE(CheckCcuAlgorithmsRegistered(bareList, 1U));
+    Mc2CcTilingInner empty = MakeTiling("", 6U);
+    const void* emptyList[] = {&empty};
+    EXPECT_FALSE(CheckCcuAlgorithmsRegistered(emptyList, 1U));
+    Mc2CcTilingInner legacy = MakeTiling("allgather=level0:fullmesh", 6U);
+    const void* legacyList[] = {&legacy};
+    EXPECT_FALSE(CheckCcuAlgorithmsRegistered(legacyList, 1U));
 }

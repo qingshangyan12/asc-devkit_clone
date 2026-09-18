@@ -722,6 +722,43 @@ TEST_F(CcuMc2TestSuite, AutomaticAndLegacyConfigSkipForcedBridgePrecheck)
     }
 }
 
+// EXTERNAL 严格分支（Task 7 改造点②）：三态零静默回退
+TEST_F(CcuMc2TestSuite, TryForcedAlgExternalParseFailIsStrict)
+{
+    // 语法错：直接报错，不回退 selector
+    Mc2CcTilingInner tiling{};
+    tiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
+    tiling.commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED);
+    strcpy(tiling.algConfig, "sole[ring]");
+    OpParam opParam{};
+    std::string algName;
+    auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
+    bool accepted = true;
+    EXPECT_EQ(TryForcedAlgAndPrepareEngine(comm_, &tiling, opParam, algName, topoInfo, accepted), HCCL_E_NOT_SUPPORT);
+    EXPECT_FALSE(accepted);
+    EXPECT_TRUE(algName.empty());
+}
+
+TEST_F(CcuMc2TestSuite, TryForcedAlgExternalResolveFailIsStrict)
+{
+    // 语义错（无 3 层注册候选）：报错且 opParam 复位
+    Mc2CcTilingInner tiling{};
+    tiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
+    tiling.commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED);
+    strcpy(tiling.algConfig, "pipeline[mesh,nhr,nhr]");
+    OpParam opParam{};
+    opParam.opType = HcclCMDType::HCCL_CMD_ALLGATHER;
+    opParam.engine = CommEngine::COMM_ENGINE_AICPU_TS;
+    std::string algName;
+    auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
+    bool accepted = true;
+    EXPECT_EQ(TryForcedAlgAndPrepareEngine(comm_, &tiling, opParam, algName, topoInfo, accepted), HCCL_E_NOT_SUPPORT);
+    EXPECT_FALSE(accepted);
+    EXPECT_TRUE(algName.empty());
+    // resolve 失败后 opParam 复位到入口现场
+    EXPECT_EQ(opParam.engine, CommEngine::COMM_ENGINE_AICPU_TS);
+}
+
 TEST_F(CcuMc2TestSuite, LocalForcedAlgorithmKeepsLegacyHierarchy)
 {
     using namespace mc2_ops_hccl;
@@ -854,8 +891,10 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_AllGatherMesh1D_KfcServerArgs)
     ASSERT_EQ(InitOpParamByTiling(comm_, stream_, "allgather_tag", &ccTiling, opParam), HCCL_SUCCESS);
 
     std::string algName;
+    ExternalAlgSpec extSpec;
+    std::string extParseErrMsg;
     auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
-    ASSERT_TRUE(GetForcedAlgName(&ccTiling, algName));
+    ASSERT_EQ(GetForcedAlg(&ccTiling, algName, extSpec, extParseErrMsg), ForcedAlgKind::BARE_NAME);
     ASSERT_EQ(PrepareTopoInfoForOp(comm_, opParam, topoInfo), HCCL_SUCCESS);
     ASSERT_EQ(PrepareEngineForAlg(opParam, algName), HCCL_SUCCESS);
     ASSERT_EQ(algName, "CcuSchedAllGatherSoleMesh");
@@ -929,8 +968,10 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_TokenUpdateOnReuse)
     ASSERT_EQ(InitOpParamByTiling(comm_, stream_, "reuse_tag", &ccTiling, opParam1), HCCL_SUCCESS);
 
     std::string algName;
+    ExternalAlgSpec extSpec;
+    std::string extParseErrMsg;
     auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
-    ASSERT_TRUE(GetForcedAlgName(&ccTiling, algName));
+    ASSERT_EQ(GetForcedAlg(&ccTiling, algName, extSpec, extParseErrMsg), ForcedAlgKind::BARE_NAME);
     ASSERT_EQ(PrepareTopoInfoForOp(comm_, opParam1, topoInfo), HCCL_SUCCESS);
     ASSERT_EQ(PrepareEngineForAlg(opParam1, algName), HCCL_SUCCESS);
     ASSERT_EQ(algName, "CcuSchedAllGatherSoleMesh");
@@ -961,7 +1002,7 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_TokenUpdateOnReuse)
 
     OpParam opParam2{};
     ASSERT_EQ(InitOpParamByTiling(comm_, stream_, "reuse_tag", &ccTiling, opParam2), HCCL_SUCCESS); // 相同tag
-    ASSERT_TRUE(GetForcedAlgName(&ccTiling, algName));
+    ASSERT_EQ(GetForcedAlg(&ccTiling, algName, extSpec, extParseErrMsg), ForcedAlgKind::BARE_NAME);
     ASSERT_EQ(PrepareTopoInfoForOp(comm_, opParam2, topoInfo), HCCL_SUCCESS);
     ASSERT_EQ(PrepareEngineForAlg(opParam2, algName), HCCL_SUCCESS);
     result = sprintf_s(opParam2.algName, sizeof(opParam2.algName), "%s", algName.c_str());

@@ -190,8 +190,6 @@ std::unique_ptr<InsCollAlgBase> GetAlgExecutorForOp(const OpParam& opParam, cons
 HcclResult CheckForcedAlgResource(
     HcclComm comm, const OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo, const std::string& algName);
 
-bool GetForcedAlgName(const Mc2CcTilingInner* ccTiling, std::string& algName);
-
 // algConfig 四态识别（NONE/LEGACY/EXTERNAL/BARE_NAME）。EXTERNAL 解析失败时 spec 复位无效、
 // extParseErrMsg 非空，由调用方按严格语义报错（外部名通道零静默降级）。
 ForcedAlgKind GetForcedAlg(

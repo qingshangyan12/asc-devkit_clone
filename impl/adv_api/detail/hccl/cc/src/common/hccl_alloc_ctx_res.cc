@@ -682,22 +682,6 @@ HcclResult CheckForcedAlgResource(
     return HCCL_SUCCESS;
 }
 
-bool GetForcedAlgName(const Mc2CcTilingInner* ccTiling, std::string& algName)
-{
-    if (ccTiling == nullptr || ccTiling->algConfig[0] == '\0') {
-        return false;
-    }
-
-    std::string algConfig(ccTiling->algConfig);
-    if (algConfig.find('=') != std::string::npos) {
-        HCCL_INFO("[MC2_FORCE_ALG] legacy algConfig[%s], use default selector.", algConfig.c_str());
-        return false;
-    }
-
-    algName = algConfig;
-    return true;
-}
-
 ForcedAlgKind GetForcedAlg(
     const Mc2CcTilingInner* ccTiling, std::string& algName, ExternalAlgSpec& extSpec, std::string& extParseErrMsg)
 {
@@ -705,7 +689,7 @@ ForcedAlgKind GetForcedAlg(
     extParseErrMsg.clear();
     extSpec = ExternalAlgSpec();
     if (ccTiling == nullptr || ccTiling->algConfig[0] == '\0') {
-        return ForcedAlgKind::NONE; // 等价旧 GetForcedAlgName :686-688
+        return ForcedAlgKind::NONE; // 空指针/空 algConfig → 非强制
     }
 
     std::string algConfig(ccTiling->algConfig);
@@ -762,8 +746,8 @@ HcclResult TryForcedAlgAndPrepareEngine(
         HcclResult ret = PrepareEngineForAlg(opParam, resolvedName);
         if (ret != HCCL_SUCCESS) {
             HCCL_ERROR(
-                "[MC2_EXT_ALG] ERROR: prepare engine failed, algName[%s], ret[%d].", resolvedName.c_str(),
-                static_cast<int>(ret));
+                "[MC2_EXT_ALG] ERROR: prepare engine failed, algConfig[%s], algName[%s], ret[%d].", ccTiling->algConfig,
+                resolvedName.c_str(), static_cast<int>(ret));
             opParam = opParamBackup;
             return ret;
         }
@@ -1072,7 +1056,8 @@ HcclResult FillCcuAlgTypeAndName(
 
 // 选择CCU算法并回填algorithmType与opParam.algName。
 // onlyCheck为true时（校验路径）：algConfig为合法强制算法名时先尝试强制算法（注册/层级/资源计算均校验通过才接受），
-// 强制算法不可用或校验失败时回退默认selector；分配路径保持GetForcedAlgName直取语义。
+// 强制算法不可用或校验失败时回退默认selector；分配路径按四态分流（EXTERNAL 走闸门 C 真定名，严格报错），
+// BARE_NAME 直取强制名，NONE/LEGACY 走默认 selector。
 HcclResult SelectCcuAlgorithm(
     HcclComm comm, void* stream, const std::string& topoTag, const Mc2CcTilingInner* ccTiling, uint32_t tilingIndex,
     OpParam& opParam, std::string& algName, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo,
@@ -1096,16 +1081,45 @@ HcclResult SelectCcuAlgorithm(
         return FillCcuAlgTypeAndName(tilingIndex, ccTiling, algName, opParam, algorithmType);
     }
 
-    if (GetForcedAlgName(ccTiling, algName)) {
+    std::string forcedAlgName;
+    ExternalAlgSpec extSpec;
+    std::string extParseErrMsg;
+    const ForcedAlgKind kind = GetForcedAlg(ccTiling, forcedAlgName, extSpec, extParseErrMsg);
+    if (kind == ForcedAlgKind::EXTERNAL) {
+        // 闸门 C：真定名（resolver ①引擎过滤留 CCU 行）→ KFC 衔接（FillCcuAlgTypeAndName 现有机制）
+        if (!extParseErrMsg.empty()) {
+            HCCL_ERROR(
+                "[MC2_EXT_ALG] ERROR: parse failed, algConfig[%s], opType[%u], reason[%s].", ccTiling->algConfig,
+                ccTiling->opType, extParseErrMsg.c_str());
+            return HCCL_E_NOT_SUPPORT;
+        }
+        CHK_RET(PrepareTopoInfoForOp(comm, opParam, topoInfo));
+        std::string resolvedName;
+        std::string resolveErrMsg;
+        if (ResolveExternalAlg(opParam, topoInfo.get(), extSpec, resolvedName, resolveErrMsg) !=
+            ResolveStatus::RESOLVED) {
+            HCCL_ERROR(
+                "[MC2_EXT_ALG] ERROR: resolve failed, algConfig[%s], opType[%u], reason[%s].", ccTiling->algConfig,
+                ccTiling->opType, resolveErrMsg.c_str());
+            return HCCL_E_NOT_SUPPORT;
+        }
+        CHK_RET(PrepareEngineForAlg(opParam, resolvedName));
+        algName = resolvedName;
+        HCCL_INFO(
+            "[CcuSelectAlg] use configured external algorithm[%s] for ccTiling[%u].", algName.c_str(), tilingIndex);
+        return FillCcuAlgTypeAndName(tilingIndex, ccTiling, algName, opParam, algorithmType);
+    }
+    if (kind == ForcedAlgKind::BARE_NAME) {
+        algName = forcedAlgName; // 现状 :1028-1031 逐字节保留
         CHK_RET(PrepareTopoInfoForOp(comm, opParam, topoInfo));
         CHK_RET(PrepareEngineForAlg(opParam, algName));
         HCCL_INFO("[CcuSelectAlg] use configured algorithm[%s] for ccTiling[%u].", algName.c_str(), tilingIndex);
-    } else {
-        CHK_RET(SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo));
-        HCCL_INFO(
-            "[CcuSelectAlg]SelectAlgAndPrepareEngine[%u] successfully, algName = [%s]!", tilingIndex, algName.c_str());
+        return FillCcuAlgTypeAndName(tilingIndex, ccTiling, algName, opParam, algorithmType);
     }
-
+    // NONE / LEGACY：默认 selector（现状 :1032-1036 逐字节保留）
+    CHK_RET(SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo));
+    HCCL_INFO(
+        "[CcuSelectAlg]SelectAlgAndPrepareEngine[%u] successfully, algName = [%s]!", tilingIndex, algName.c_str());
     return FillCcuAlgTypeAndName(tilingIndex, ccTiling, algName, opParam, algorithmType);
 }
 
