@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 
+#include "coll_alg_v2_exec_registry.h"
 #include "external_alg_parser.h"
 #include "gtest/gtest.h"
 
@@ -132,4 +133,17 @@ TEST(ExtAlgClassify, FourStates)
     EXPECT_EQ(spec.canonical(), "parallel[mesh,nhr]");
     EXPECT_EQ(ClassifyForcedAlgConfig("sole[ring]", bareName, spec, errMsg), ForcedAlgKind::EXTERNAL);
     EXPECT_FALSE(errMsg.empty());
+}
+
+TEST(ExtAlgV2Registry, EnumerateRegisteredTags)
+{
+    auto& registry = CollAlgExecRegistryV2::Instance();
+    const std::vector<std::string> agTags = registry.GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLGATHER);
+    // AIC UT 目标 (-DAICPU_COMPILE) 下 AG 只注册 AICPU 侧 11 条（CcuSchedAllGatherSoleMesh 被
+    // #if 排除）；此断言同时防止枚举接口漏实现
+    EXPECT_FALSE(agTags.empty());
+    for (const std::string& tag : agTags) {
+        EXPECT_TRUE(registry.IsRegistered(HcclCMDType::HCCL_CMD_ALLGATHER, tag)) << tag;
+    }
+    EXPECT_TRUE(registry.GetRegisteredTags(HcclCMDType::HCCL_CMD_KFC_SERVER).empty()); // 本目标无 KFC 注册
 }
