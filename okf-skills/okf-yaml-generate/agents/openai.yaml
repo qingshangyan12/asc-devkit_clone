@@ -1,0 +1,4 @@
+interface:
+  display_name: "OKF YAML Generate"
+  short_description: "集中生成并校验 Ascend API OKF YAML"
+  default_prompt: "使用 $okf-yaml-generate 生成指定 API 范围的完整 OKF YAML，按范围并发取证，统一处理问题，先 dry-run 后写入。"
