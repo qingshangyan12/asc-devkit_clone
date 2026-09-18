@@ -397,7 +397,7 @@ CcuResult CcuKfcParallelAllGatherMesh1DMem2MemKernel(CcuKernelArg arg)
                 ctx, phase1Buffer, phase1Buffer, tokenInfo, phase1RankOffset, part1Size,
                 part1GoSize.addrOffset, part1GoSize.loopParam, part1GoSize.parallelParam,
                 part1GoSize.residual, phase1RankOffset, phase1RepeatNumInv, phase1RepeatStride,
-                phase1RepeatStride, part1Size, one));
+                phase1RepeatStride, part1Size, one);
             PreSync(ctx);
             ctx.sliceSize = part1Size;
             CCU_IF(part1Size != 0) { DoRepeatAllGather(ctx); }

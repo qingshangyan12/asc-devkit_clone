@@ -11,6 +11,7 @@
 #include "hccl_ccu_res.h"
 #include "ccu_assist_pub.h"
 #include "kfc_server_protocol.h"
+#include "ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem.h"
 #include "ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem_peer_only.h"
 #include "kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem_peer_only.h"
 
