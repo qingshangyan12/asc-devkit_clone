@@ -453,63 +453,6 @@ __aicore__ inline void MmadMx(
 {
     MmadMxImpl(dst, fm, filter, bias, mmadParams);
 }
-
-// Pointer overloads: bind then reuse MmadMxImpl (same TU as Tensor path / MmadMxCal).
-namespace CubePtrMxDetail {
-template <typename T>
-__aicore__ inline LocalTensor<T> BindL0C(__cc__ T* ptr)
-{
-    return LocalTensor<T>(TPosition::CO1, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(ptr)), 1);
-}
-template <typename T>
-__aicore__ inline LocalTensor<T> BindL0A(__ca__ T* ptr)
-{
-    return LocalTensor<T>(TPosition::A2, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(ptr)), 1);
-}
-template <typename T>
-__aicore__ inline LocalTensor<T> BindL0B(__cb__ T* ptr)
-{
-    return LocalTensor<T>(TPosition::B2, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(ptr)), 1);
-}
-template <typename T>
-__aicore__ inline LocalTensor<T> BindBias(__cc__ T* ptr)
-{
-    return LocalTensor<T>(TPosition::C2, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(ptr)), 1);
-}
-} // namespace CubePtrMxDetail
-
-template <typename T, typename U, typename S>
-__aicore__ inline void MmadMx(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadParams& mmadParams)
-{
-    MmadMxImpl(
-        CubePtrMxDetail::BindL0C(dst), CubePtrMxDetail::BindL0A(fm), CubePtrMxDetail::BindL0B(filter), mmadParams);
-}
-
-template <typename T, typename U, typename S>
-__aicore__ inline void MmadMx(
-    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __cc__ T* bias, const MmadParams& mmadParams)
-{
-    MmadMxImpl(
-        CubePtrMxDetail::BindL0C(dst), CubePtrMxDetail::BindL0A(fm), CubePtrMxDetail::BindL0B(filter),
-        CubePtrMxDetail::BindBias(bias), mmadParams);
-}
-
-template <typename T, typename U, typename S>
-__aicore__ inline void MmadMx(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadBitModeParams& mmadParams)
-{
-    MmadMxImpl(
-        CubePtrMxDetail::BindL0C(dst), CubePtrMxDetail::BindL0A(fm), CubePtrMxDetail::BindL0B(filter),
-        const_cast<MmadBitModeParams&>(mmadParams));
-}
-
-template <typename T, typename U, typename S>
-__aicore__ inline void MmadMx(
-    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __cc__ T* bias, const MmadBitModeParams& mmadParams)
-{
-    MmadMxImpl(
-        CubePtrMxDetail::BindL0C(dst), CubePtrMxDetail::BindL0A(fm), CubePtrMxDetail::BindL0B(filter),
-        CubePtrMxDetail::BindBias(bias), const_cast<MmadBitModeParams&>(mmadParams));
-}
 #endif
 
 #if __NPU_ARCH__ == 2201

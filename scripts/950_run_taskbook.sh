@@ -68,8 +68,7 @@ if [ -d "$ACT_INC" ] && [ -d "$ACT_IMPL" ]; then
   cp -a "$HELPER/include/basic_api/kernel_operator_ptr_utils.h" "$ACT_INC/" 2>/dev/null || true
   for f in kernel_operator_mm_ptr_impl.h kernel_operator_fixpipe_ptr_impl.h \
            kernel_operator_dump_tensor_ptr_impl.h kernel_operator_common_ptr_impl.h \
-           kernel_operator_block_sync_ptr_impl.h kernel_operator_determine_compute_sync_ptr_impl.h \
-           kernel_operator_mm_intf_impl.h kernel_operator_fixpipe_intf_impl.h; do
+           kernel_operator_block_sync_ptr_impl.h kernel_operator_determine_compute_sync_ptr_impl.h; do
     [ -f "$HELPER/impl/basic_api/$f" ] && cp -a "$HELPER/impl/basic_api/$f" "$ACT_IMPL/" || true
   done
   for pair in \
@@ -91,6 +90,45 @@ p.write_text(t, encoding='utf-8')
 print('patched', p)
 PY
   done
+  # Scrub accidental prior overlay of NEW intf onto beta.3 CANN (NEAREST_AWAY / CubePtrMxDetail).
+  python3 - "$ASCEND_HOME_PATH" <<'PY'
+from pathlib import Path
+import re, sys
+root = Path(sys.argv[1])
+changed = 0
+for p in root.rglob("kernel_operator_mm_intf_impl.h"):
+    t = p.read_text(encoding="utf-8", errors="replace")
+    orig = t
+    t = t.replace(
+        "SetHF32TransModeImpl(mode == AscendC::HF32TransMode::NEAREST_AWAY);",
+        "SetHF32TransModeImpl(static_cast<uint32_t>(mode) == 0u);",
+    )
+    # drop pointer-MmadMx block inserted in feature intf (keep Tensor MmadMx only)
+    t2 = re.sub(
+        r"\n// Pointer overloads: bind then reuse MmadMxImpl.*?^#endif\n",
+        "\n#endif\n",
+        t,
+        count=1,
+        flags=re.S | re.M,
+    )
+    if t2 != t:
+        t = t2
+    # if CubePtrMxDetail still present without the comment anchor, strip namespace+following 4 MmadMx ptr templates roughly
+    if "namespace CubePtrMxDetail" in t:
+        t = re.sub(
+            r"\nnamespace CubePtrMxDetail \{.*?\n\} // namespace CubePtrMxDetail\n"
+            r"(?:\ntemplate <typename T, typename U, typename S>.*?\{.*?\n\}\n)+",
+            "\n",
+            t,
+            count=1,
+            flags=re.S,
+        )
+    if t != orig:
+        p.write_text(t, encoding="utf-8")
+        changed += 1
+        print("scrubbed_intf", p)
+print("SCRUB_INTF_FILES", changed)
+PY
   echo "OVERLAY_OK"
 fi
 

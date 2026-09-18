@@ -139,9 +139,7 @@ if [ -d "$ACT_INC" ] && [ -d "$ACT_IMPL" ]; then
     kernel_operator_block_sync_ptr_impl.h \
     kernel_operator_determine_compute_sync_ptr_impl.h \
     kernel_operator_dump_tensor_ptr_impl.h \
-    kernel_operator_common_ptr_impl.h \
-    kernel_operator_mm_intf_impl.h \
-    kernel_operator_fixpipe_intf_impl.h
+    kernel_operator_common_ptr_impl.h
   do
     [ -f "$SRC/impl/basic_api/$f" ] && cp -a "$SRC/impl/basic_api/$f" "$ACT_IMPL/" || true
   done
