@@ -1093,8 +1093,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         )
         for mode, expected in [
             ("Normal", ["basic"]),
-            ("SK", ["sk"]),
-            ("All", ["basic", "sk"]),
+            ("SK", ["basic", "sk"]),
         ]:
             with self.subTest(mode=mode):
                 result = self.generate(replace(request, kernel_spec_mode=mode))
@@ -1272,7 +1271,7 @@ class TestManifestPublicationFailure(unittest.TestCase):
         return result
 
     def test_success_without_publication_is_a_compile_error(self):
-        for mode in ("Normal", "SK", "All"):
+        for mode in ("Normal", "SK"):
             with self.subTest(mode=mode):
                 with self.assertRaisesRegex(
                     RuntimeError, "kernel=AddTest.*mode=" + mode + ".*not generated"

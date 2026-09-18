@@ -101,7 +101,7 @@ class ManifestInputSnapshot:
     sk_cap_bitmap: Optional[int] = None
     constant_infos: Optional[Tuple[ConstantInfoRecord, ...]] = None
     constant_info_size_by_tiling_key: Optional[dict] = None
-    kernel_spec_mode: str = "All"
+    kernel_spec_mode: str = "SK"
 
 
 def _read_regular_file(path, description):
@@ -718,19 +718,13 @@ class ManifestPackageWriter:
                 (record for record in kernel.commands if record.object_type == "basic"),
                 key=lambda record: (0 if record.core_type == "cube" else 1),
             )
-            objects = []
-            if self._snapshot.kernel_spec_mode != "SK":
-                objects.append(self._build_basic_object(kernel, basic_records))
+            objects = [self._build_basic_object(kernel, basic_records)]
             sk_records = sorted(
                 (record for record in kernel.commands if record.object_type == "sk"),
                 key=lambda record: (0 if record.core_type == "cube" else 1),
             )
             if sk_records and self._snapshot.kernel_spec_mode != "Normal":
                 objects.append(self._build_sk_object(kernel, basic_records, sk_records))
-            if not objects:
-                raise ManifestGenerationError(
-                    "SK mode requested, but no SK commands were recorded"
-                )
             manifest_kernels.append(
                 {
                     "kernel_name": kernel.kernel_name,
@@ -1061,14 +1055,12 @@ class KernelSpecCompilation:
         )
         self._kernel_spec_mode = context.get_addition("kernel_spec_mode") or "None"
         self.enabled = (
-            self._kernel_spec_mode in {"Normal", "SK", "All"}
+            self._kernel_spec_mode in {"Normal", "SK"}
             and not tiling_info.static_shape_flag
         )
         self._validate_configuration()
         self.record_sk_commands = (
-            self.enabled
-            and self._kernel_spec_mode in {"SK", "All"}
-            and is_sk_double_compile
+            self.enabled and self._kernel_spec_mode == "SK" and is_sk_double_compile
         )
         self.sk_compile_info = None
         self.sk_compile_option_tuple = None
@@ -1214,7 +1206,7 @@ class KernelSpecCompilation:
         if not self.kernel_spec_dir:
             error_mgr.raise_tbe_python_err(
                 error_mgr.TBE_DEFAULT_PYTHON_ERROR_CODE,
-                "kernel_spec_dir is required when kernel_spec_mode is Normal, SK or All.",
+                "kernel_spec_dir is required when kernel_spec_mode is Normal or SK.",
             )
 
     def _initialize_sk_recording(self, compile_option_tuple):

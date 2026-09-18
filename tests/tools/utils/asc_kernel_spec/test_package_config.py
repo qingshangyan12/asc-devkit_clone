@@ -33,11 +33,15 @@ class ExistingPackageConfig(unittest.TestCase):
             )
 
     def test_invalid_mode(self):
-        result = self.configure(
-            "npu_op_package(demo TYPE RUN CONFIG KERNEL_SPEC_MODE Wrong)\n"
-        )
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("KERNEL_SPEC_MODE must be None, Normal, SK or All", result.stderr)
+        for mode in ("Wrong", "All"):
+            with self.subTest(mode=mode):
+                result = self.configure(
+                    f"npu_op_package(demo TYPE RUN CONFIG KERNEL_SPEC_MODE {mode})\n"
+                )
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(
+                    "KERNEL_SPEC_MODE must be None, Normal or SK", result.stderr
+                )
 
     def test_shared_configuration_is_rejected_in_both_orders(self):
         for mode, owner in [("Normal", ""), ("None", "other")]:

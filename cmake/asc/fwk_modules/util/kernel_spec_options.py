@@ -33,8 +33,8 @@ def split_and_write_options(options, config_file, op_type, compute_unit):
         selected[key] = value
     if selected:
         mode = selected.get("--kernel-spec")
-        if mode not in {"None", "Normal", "SK", "All"}:
-            raise ValueError("kernel-spec must be None, Normal, SK or All")
+        if mode not in {"None", "Normal", "SK"}:
+            raise ValueError("kernel-spec must be None, Normal or SK")
         if mode != "None" and "--kernel-spec-dir" not in selected:
             raise ValueError("kernel-spec-dir is required")
         if "--kernel-spec-dir" in selected and not os.path.isabs(
@@ -92,7 +92,7 @@ def shell_options(config_file, op_type, soc):
     # Configuration is an atomic pair: never borrow the directory from another scope.
     selected = scopes[max(scopes)]
     mode = selected.get("--kernel-spec")
-    if mode not in {"None", "Normal", "SK", "All"}:
+    if mode not in {"None", "Normal", "SK"}:
         raise ValueError("Invalid kernel-spec mode")
     if mode == "None":
         return ""

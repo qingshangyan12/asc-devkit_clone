@@ -21,9 +21,31 @@ sys.path.insert(
     0, str(Path(__file__).resolve().parents[4] / "cmake/asc/fwk_modules/util")
 )
 import ascendc_build_kernel_spec as build_bundle
+import kernel_spec_options
 
 
 class SourceUniqueness(unittest.TestCase):
+    def test_kernel_spec_modes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            config = Path(tmp) / "options.ini"
+            for mode in ("None", "Normal", "SK"):
+                with self.subTest(mode=mode):
+                    remaining = kernel_spec_options.split_and_write_options(
+                        [f"--kernel-spec={mode}", f"--kernel-spec-dir={tmp}", "-O2"],
+                        str(config),
+                        "AddCustom",
+                        "ascend910b",
+                    )
+                    self.assertEqual(remaining, ["-O2"])
+                    self.assertIn(f"--kernel-spec={mode}", config.read_text())
+            with self.assertRaisesRegex(ValueError, "None, Normal or SK"):
+                kernel_spec_options.split_and_write_options(
+                    ["--kernel-spec=All", f"--kernel-spec-dir={tmp}"],
+                    str(config),
+                    "AddCustom",
+                    "ascend910b",
+                )
+
     def test_resource_scope_and_shared_dtype_source(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

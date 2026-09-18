@@ -241,7 +241,7 @@ class OpcOptionParser:
         self.__define_option(
             OpcOptions.KERNEL_SPEC,
             "None",
-            "kernel spec mode. Support None, Normal, SK and All.",
+            "kernel spec mode. Support None, Normal and SK.",
         )
         self.__define_option(
             OpcOptions.KERNEL_SPEC_DIR, None, "kernel spec output directory."
@@ -637,9 +637,9 @@ class OpcOptionParser:
         """Validate Kernel Spec mode and normalize its publication directory."""
 
         kernel_spec = self.get_option(OpcOptions.KERNEL_SPEC)
-        if kernel_spec not in {"None", "Normal", "SK", "All"}:
+        if kernel_spec not in {"None", "Normal", "SK"}:
             logger.error(
-                "Invalid kernel-spec option {}, support None/Normal/SK/All.".format(
+                "Invalid kernel-spec option {}, support None/Normal/SK.".format(
                     kernel_spec
                 )
             )

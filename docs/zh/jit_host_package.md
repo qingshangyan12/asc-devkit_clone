@@ -25,8 +25,7 @@ npu_op_package(${vendor_name}
 |---|---|
 | None，默认 | 不增加 JIT 导出和聚合任务 |
 | Normal | manifest 保留 basic 对象的编译信息 |
-| SK | manifest 仅保留 sk 信息；实际执行兼容性仍需验证 |
-| All | 同时保留 basic 和 sk 信息 |
+| SK | 同时保留 basic 和 sk 信息；SK 实际执行兼容性仍需验证 |
 
 如需保留编译临时文件，在原 kernel target 上使用原选项：
 
@@ -116,7 +115,7 @@ python3 tests/python/asc_op_compiler/test_static_compile_resource_generator.py
 
 前者已注册为仓内 `ascendc_pyut_kernel_spec_package`，后者属于原 asc_op_compiler 测试目录。C++ 测试位于原 ACLRTC 和 asc_compile_exporter 测试文件中，使用仓原 runner。
 
-仓内完整示例位于 `examples/01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/jit_host_package`，包含 host、kernel、tiling 头文件及 README，不依赖仓外示例。SDK 修改不要求同时合并算子仓修改；但内置仓要实际启用功能，仍需完成其公共构建适配。
+本变更不新增 example。用户在原有算子工程中增加本文的 package 配置即可。SDK 修改不要求同时合并算子仓修改；但内置仓要实际启用功能，仍需完成其公共构建适配。
 
 ## 9. 已知限制，不应当作已解决
 
