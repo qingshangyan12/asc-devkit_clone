@@ -17,7 +17,7 @@ YAML front matter 放在 Markdown 文件第一行，以 --- 包围。只使用�
 | tag | object[] | 是 | API/架构页 | 受控检索标签，每项为 namespace 及其标签内容数组。 |
 | signature | object[] | API/架构页可选 | API/架构页 | 调用模式或 overload 组。每项包含 prototype_id 或 override_id、archs、headers，可包含 dtype。 |
 | dependencies | object[] | 含明确关联时填写 | 全部 | 有正文依据的关联文档，包含 path、kind，必要时包含 condition。 |
-| examples | object[] | 含示例时填写 | API/架构页 | 示例位置和明确的示例架构，包含 path，可选 anchor、file、archs、override_id。 |
+| examples | object[] | 含示例时填写 | API/架构页 | 样例工程或源码位置和明确的示例架构，包含样例 path，可选 file、archs、override_id。 |
 | timestamp | string | 是 | 全部 | 元数据生成日期。 |
 
 空的可选数组或映射可以省略。不得添加未在本规范定义的顶层字段。
@@ -77,8 +77,10 @@ dependencies.kind 使用 requires、configures、constrained_by 或 related：
 dependencies.path 使用 DevKit 根目录相对路径，并且必须指向已存在的 .md 文件。condition 只保留
 正文中的适用条件，不由工具扩写。
 
-文档内示例的 path 指向当前 Markdown，可用 anchor 标识调用示例；仓库示例的 path 指向示例目录或源码文件。
-只有示例正文明确指定架构时才填写 archs。override_id 必须与 signature 和 include 中的具体声明一致。
+examples.path 必须指向 DevKit 根目录下的样例工程目录或样例源码文件，不能指向当前 API Markdown。
+路径使用仓库根目录形式，通常以 `/examples/` 开头。file 是相对于该样例 path 的源码文件名；同一个样例工程
+包含多个重载时，可以使用多个 examples 项分别关联具体源码文件和 override_id。只有示例正文明确指定架构时才填写
+archs。override_id 必须与 signature 和 include 中的具体声明一致，并与样例源码中的调用标记对应。
 
 ## 示例
 
@@ -109,8 +111,9 @@ dependencies.path 使用 DevKit 根目录相对路径，并且必须指向已存
         kind: requires
         condition: 使用显式向量掩码时参考
     examples:
-      - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_div.md
-        anchor: call-example
+      - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/div
+        file: div.asc
         archs: ["3510"]
+        override_id: "asc_div__Rvf32_vf32_vf32_vb"
     timestamp: '2026-09-18'
     ---
