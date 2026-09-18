@@ -1054,7 +1054,6 @@ class KernelSpecCompilation:
             self._kernel_spec_mode in {"Normal", "SK"}
             and not tiling_info.static_shape_flag
         )
-        global_var_storage.set_variable("ascendc_kernel_spec_enabled", self.enabled)
         self._validate_configuration()
         self.record_sk_commands = (
             self.enabled and self._kernel_spec_mode == "SK" and is_sk_double_compile
@@ -1095,21 +1094,31 @@ class KernelSpecCompilation:
                 )
             )
 
-    def attach_resource_id(self):
+    def generate_resource_id(self, compile_info):
+        """Build the Resource ID metadata object from the final link inputs."""
         if not self.enabled:
-            return
+            return None
         _, error_mgr, utility_module, storage_module = _kernel_spec_runtime()
+        if __package__:
+            from . import static_compile_resource_id
+        else:
+            import static_compile_resource_id
+
+        link_inputs = [compile_info.dst_file]
+        if storage_module.global_var_storage.get_variable("ascendc_tiling_no_register"):
+            link_inputs.append(compile_info.tiling_and_dfx_utils_bin_path)
         try:
-            self.resource_id = storage_module.global_var_storage.get_variable(
-                "ascendc_resource_ids"
-            ).get(os.path.abspath(self.compile_info.dst_file))
-            if not self.resource_id:
-                raise ResourceIdError("resource ID was not generated before final link")
+            self.resource_id, resource_object = (
+                static_compile_resource_id.build_resource_id_object(
+                    compile_info.dst_file, link_inputs, compile_info.compile_log_path
+                )
+            )
         except ResourceIdError as error:
             utility_module.CommonUtility.ascendc_raise_python_err(
                 error_mgr.TBE_DEFAULT_PYTHON_ERROR_CODE,
                 f"generate Resource ID failed, reason is: {error}",
             )
+        return resource_object
 
     def begin_sk_recording(self):
         if not self.record_sk_commands:

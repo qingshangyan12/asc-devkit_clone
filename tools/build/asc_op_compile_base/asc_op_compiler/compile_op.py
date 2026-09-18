@@ -117,6 +117,7 @@ from .ascendc_compile_gen_json import (
 from .ascendc_compile_base import (
     compile_multi_tilingkey,
     link_relocatable,
+    link_resource_id_obj,
     fatbin_objs,
     SingleTilingKeyCompileParams,
     get_actual_kernel_type,
@@ -1611,7 +1612,10 @@ def compile_kernel_and_meta(
 
 
 def link_kernel_obj(
-    compile_info: CompileInfo, op_info: OpInfo, tiling_info: TilingInfo
+    compile_info: CompileInfo,
+    op_info: OpInfo,
+    tiling_info: TilingInfo,
+    resource_object=None,
 ):
     msg_info = "<{}> <{}> link kernel start".format(
         compile_info.op_type, compile_info.tiling_key_list
@@ -1623,6 +1627,13 @@ def link_kernel_obj(
         )
     # split .o 4
     split_sub_kernel_objs(compile_info.dst_file, tiling_info, compile_info)
+    if resource_object is not None:
+        link_resource_id_obj(
+            compile_info.dst_file,
+            resource_object,
+            compile_info.is_debug,
+            compile_info.compile_log_path,
+        )
     CommonUtility.print_compile_log(
         op_info.kernel_name,
         "start to link relocatable for dst obj...",
@@ -2054,8 +2065,11 @@ def compile_op_common_part(
             compile_info, op_info, compile_option_tuple, tiling_info
         )
 
+        # The Resource ID covers the inputs of the final link.
+        resource_object = kernel_spec.generate_resource_id(compile_info)
+
         # link kernel obj
-        link_kernel_obj(compile_info, op_info, tiling_info)
+        link_kernel_obj(compile_info, op_info, tiling_info, resource_object)
 
         # aclnn sk combine compile workflow
         if (
@@ -2115,8 +2129,6 @@ def compile_op_common_part(
                 "ascendc_sk_sub_combine_norm_workflow", False
             )
             DFXSectionGenerator().update_is_support(op_info)
-
-        kernel_spec.attach_resource_id()
 
         # generate opinfo json
         _json_post_process(
