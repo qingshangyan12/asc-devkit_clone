@@ -110,8 +110,8 @@ inline bool ParseExternalAlg(const std::string& algConfig, ExternalAlgSpec& spec
     static const char* const EXECUTORS[] = {"sole", "sequence", "parallel", "concur", "pipeline"};
     const size_t EXECUTOR_COUNT = sizeof(EXECUTORS) / sizeof(EXECUTORS[0]);
     if (!external_alg_internal::WordInTable(executorWord, EXECUTORS, EXECUTOR_COUNT)) {
-        errMsg =
-            "unknown executor \"" + executorWord + "\" (expected one of: sole, sequence, parallel, concur, pipeline)";
+        errMsg = "unknown executor \"" + executorWord +
+                 "\" (expected one of: sole, sequence, parallel, concur, pipeline) in \"" + algConfig + "\"";
         return false;
     }
     for (size_t i = 0; i < EXECUTOR_COUNT; ++i) {
@@ -131,7 +131,8 @@ inline bool ParseExternalAlg(const std::string& algConfig, ExternalAlgSpec& spec
     const std::string tail = text.substr(closePos + 1);
     if (!tail.empty()) {
         if (tail != "[order.strong]") {
-            errMsg = "invalid suffix \"" + tail + "\" after ']' (only \"[order.strong]\" is allowed)";
+            errMsg = "invalid suffix \"" + tail + "\" after ']' (only \"[order.strong]\" is allowed) in \"" +
+                     algConfig + "\"";
             return false;
         }
         spec.orderStrong = true;
@@ -165,8 +166,8 @@ inline bool ParseExternalAlg(const std::string& algConfig, ExternalAlgSpec& spec
             if (!atomSeen) {
                 static const char* const ATOMS[] = {"mesh", "nhr"};
                 if (!external_alg_internal::WordInTable(seg, ATOMS, sizeof(ATOMS) / sizeof(ATOMS[0]))) {
-                    errMsg =
-                        "unknown atom \"" + seg + "\" in layer " + std::to_string(layerNo) + " (expected: mesh or nhr)";
+                    errMsg = "unknown atom \"" + seg + "\" in layer " + std::to_string(layerNo) +
+                             " (expected: mesh or nhr) in \"" + algConfig + "\"";
                     return false;
                 }
                 layer.atom = seg;
@@ -175,7 +176,8 @@ inline bool ParseExternalAlg(const std::string& algConfig, ExternalAlgSpec& spec
                 static const char* const ATTRS[] = {"chunk", "one_shot", "two_shot", "muti_channel", "single_channel"};
                 if (!external_alg_internal::WordInTable(seg, ATTRS, sizeof(ATTRS) / sizeof(ATTRS[0]))) {
                     errMsg = "unknown attribute \"" + seg + "\" in layer " + std::to_string(layerNo) +
-                             " (expected one of: chunk, one_shot, two_shot, muti_channel, single_channel)";
+                             " (expected one of: chunk, one_shot, two_shot, muti_channel, single_channel) in \"" +
+                             algConfig + "\"";
                     return false;
                 }
                 layer.attrs.push_back(seg);
