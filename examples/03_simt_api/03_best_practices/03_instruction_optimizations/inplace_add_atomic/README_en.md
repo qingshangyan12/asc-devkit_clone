@@ -111,7 +111,7 @@ The following figure compares the data flow of the two accumulation methods in t
 
 ![Data flow comparison of the two accumulation methods](figures/inplace_add_atomic_dataflow.png)
 
-- **Left side (Scenario 0)**: `a[index]`, `b[index]`, and `c[index]` are all read into registers through L2 Cache, the multiply-add is completed on the register side, and the new value of `a[index]` is written back from the registers to L2 Cache — the old value completes a full L2 Cache→register→L2 Cache round trip for this.
+- **Left side (Scenario 0)**: `a[index]`, `b[index]`, and `c[index]` are all read into registers through L2 Cache, and after the multiply-add completes, the new value of `a[index]` is written back from the registers to L2 Cache.
 - **Right side (Scenario 1)**: only `b[index]` and `c[index]` are read into registers to compute the product, which is issued as the operand of the atomic add; reading the old value, the addition, and the write-back are completed as one indivisible unit at the L2 Cache side, so `a[index]` never enters the registers and the round trip above does not happen.
 
 In both scenarios, the reads of `b` and `c` and the multiplication are completely identical; the only variable is the elimination of the data round trip of the old value of `a[index]` in and out of the registers. The 8.0% gap comes precisely from this.
