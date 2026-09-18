@@ -807,11 +807,19 @@ def tvm_callback_cce_postproc(
     from asc_op_compile_base.common.platform.platform_info import ASCEND_910B
     from asc_op_compile_base.common.platform.platform_info import ASCEND_910_93
     from asc_op_compile_base.common.platform.platform_info import ASCEND_950
+    from asc_op_compile_base.common.platform.platform_info import ASCEND_960DT
     from asc_op_compile_base.common.platform.platform_info import MC62
     from asc_op_compile_base.common.platform.platform_info import MC32DM11A
 
     short_soc_version = get_soc_spec("SHORT_SOC_VERSION")
-    if short_soc_version in [ASCEND_910B, ASCEND_910_93, ASCEND_950, MC62, MC32DM11A]:
+    if short_soc_version in [
+        ASCEND_910B,
+        ASCEND_910_93,
+        ASCEND_950,
+        ASCEND_960DT,
+        MC62,
+        MC32DM11A,
+    ]:
         if (
             is_ffts_id_needed
             or mix == "MIX"
@@ -832,6 +840,7 @@ def tvm_callback_cce_postproc(
         "Ascend910B",
         "Ascend910_93",
         "Ascend950",
+        "ASCEND_960DT",
         "MC62",
         "MC32DM11A",
     ]:

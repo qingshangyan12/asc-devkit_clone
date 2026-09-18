@@ -424,7 +424,7 @@ class CommonUtility:
                     cmds_i, CompileStage.DEBUG_PRECOMPILE, compile_log_path
                 )
                 CommonUtility.run_cmd_ascendc(cmds_i, "compile")
-                if CommonUtility.is_c310():
+                if CommonUtility.is_c310() or CommonUtility.is_920r1():
                     # common compile .o cmds -> .s cmds
                     cmds_s = copy.deepcopy(cmds)
                     _trans_compile_cmds_to_assemble(cmds_s)
@@ -599,6 +599,18 @@ class CommonUtility:
         return False
 
     @staticmethod
+    def is_920r1():
+        """return if current soc version is 920r1
+
+        Returns:
+            res: True means 920r1
+        """
+        short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
+        if short_soc_version in ["Ascend960DT"]:
+            return True
+        return False
+
+    @staticmethod
     def is_has_ffts_mode():
         """return if current soc version is has ffts mode
 
@@ -608,7 +620,7 @@ class CommonUtility:
             res: True means has ffts addr
         """
         short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
-        if short_soc_version not in ["Ascend950", "Ascend350"]:
+        if short_soc_version not in ["Ascend950", "Ascend350", "Ascend960DT"]:
             return True
         return False
 
@@ -682,6 +694,8 @@ class CommonUtility:
         chip_version = "c220"
         if CommonUtility.is_c310():
             chip_version = "c310"
+        elif CommonUtility.is_920r1():
+            chip_version = "920r1"
         elif CommonUtility.is_m510():
             chip_version = "510r2"
         return chip_version
