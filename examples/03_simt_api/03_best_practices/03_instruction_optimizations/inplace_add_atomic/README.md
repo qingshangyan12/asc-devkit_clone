@@ -110,8 +110,8 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void vector_muladd_atomic(
 
 ![两种累加方式的数据流转对比](figures/inplace_add_atomic_dataflow.png)
 
-- **左侧（场景0）**：`a[index]`、`b[index]`、`c[index]`三者都经L2 Cache读入寄存器，乘加完成后，`a[index]`的新值再从寄存器写回L2 Cache。
-- **右侧（场景1）**：只有`b[index]`与`c[index]`读入寄存器并算出乘积，乘积作为原子加的操作数下发；读旧值、加法、写回三步作为一个不可分割的整体在L2 Cache侧完成，`a[index]`不进入寄存器，上述往返不再发生。
+- **原地加法（场景0）**：`a[index]`、`b[index]`、`c[index]`三者都经L2 Cache读入寄存器，乘加完成后，`a[index]`的新值再从寄存器写回L2 Cache。
+- **原子加法（场景1）**：只有`b[index]`与`c[index]`读入寄存器并算出乘积，乘积作为原子加的操作数下发；读旧值、加法、写回三步作为一个不可分割的整体在L2 Cache侧完成，`a[index]`不进入寄存器，上述往返不再发生。
 
 两个场景中`b`、`c`的读取与乘法完全相同，唯一的变量就是省去`a[index]`旧值进出寄存器的数据往返。8.0%的差距即由此而来。
 
