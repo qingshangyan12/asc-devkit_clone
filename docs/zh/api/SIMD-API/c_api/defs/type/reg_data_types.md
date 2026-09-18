@@ -2,15 +2,15 @@
 
 Ascend 950PR/Ascend 950DT（NPU架构为DAV_3510）的C API提供矢量数据寄存器、掩码寄存器、非对齐搬运寄存器和地址寄存器类型。寄存器类型主要在AIV的Vector Function（`__simd_vf__`标记的函数）内使用，最细粒度公共头文件为`c_api/defs/type.h`。
 
-C API寄存器类型与基础API抽象的对应关系如下。
+各类寄存器的用途如下。
 
-| 基础API类型 | C API类型 | 用途 |
-| --- | --- | --- |
-| `RegTensor<T>` | `vector_<dtype>`，例如`vector_int8_t`、`vector_half`、`vector_float` | 保存矢量计算的数据操作数和结果。DAV_3510的矢量数据寄存器长度为256字节。 |
-| `MaskReg` | `vector_bool` | 按元素控制矢量指令是否生效。掩码寄存器长度为256 bit。 |
-| `UnalignRegForLoad` | `vector_load_unalign` | 保存UB非对齐加载的中间状态。 |
-| `UnalignRegForStore` | `vector_store_unalign` | 保存UB非对齐存储的中间状态。 |
-| `AddrReg` | `addr_reg` | 保存地址偏移，配合支持地址寄存器的Reg接口使用。 |
+| C API类型 | 用途 |
+| --- | --- |
+| `vector_<dtype>`，例如`vector_int8_t`、`vector_half`、`vector_float` | 保存矢量计算的数据操作数和结果。DAV_3510的矢量数据寄存器长度为256字节。 |
+| `vector_bool` | 按元素控制矢量指令是否生效。掩码寄存器长度为256 bit。 |
+| `vector_load_unalign` | 保存UB非对齐加载的中间状态。 |
+| `vector_store_unalign` | 保存UB非对齐存储的中间状态。 |
+| `addr_reg` | 保存地址偏移，配合支持地址寄存器的Reg接口使用。 |
 
 ## 使用说明
 
