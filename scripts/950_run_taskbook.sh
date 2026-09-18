@@ -104,6 +104,7 @@ if [ -d "$ACT_INC" ] && [ -d "$ACT_IMPL" ]; then
       echo "OVERLAY_INTF_SKIP missing=$TIK_INTF_DIR"
     fi
   fi
+  if [ -f "$HELPER/impl/basic_api/dav_3510/kernel_operator_mm_impl.h" ]; then
     mkdir -p "$ACT_IMPL/dav_3510" 2>/dev/null || true
     cp -a "$HELPER/impl/basic_api/dav_3510/kernel_operator_mm_impl.h" "$ACT_IMPL/dav_3510/" 2>/dev/null || true
     echo "OVERLAY_DAV_ASC dav_3510/kernel_operator_mm_impl.h"
