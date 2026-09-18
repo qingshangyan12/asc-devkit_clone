@@ -419,6 +419,12 @@ run_sync_case() {
     -e 's/AscendC::IBWait(sync_gm, sync_buf,/AscendC::IBWait((__gm__ int32_t*)sync_gm.GetPhyAddr(), (__ubuf__ int32_t*)sync_buf.GetPhyAddr(),/g' \
     -e 's/AscendC::IBSet(sync_gm, sync_buf,/AscendC::IBSet((__gm__ int32_t*)sync_gm.GetPhyAddr(), (__ubuf__ int32_t*)sync_buf.GetPhyAddr(),/g' \
     2>/dev/null || true
+  if [ -f "$work/scripts/gen_data.py" ]; then
+    (cd "$work" && $PY scripts/gen_data.py) >"$RUNROOT/sync_${name}_gendata.log" 2>&1 || true
+  fi
+  if [ ! -f "$work/input/input_sync.bin" ]; then
+    echo -e "sync/${name}\t0\t${ARCH}\tMISSING\t-\t-\tno_input_sync_bin" >> "$SUMMARY"; return
+  fi
   cd "$work/build"
   set +e
   cmake -DCMAKE_ASC_ARCHITECTURES="$ARCH" -DCMAKE_CXX_COMPILER="$CXX" -DCMAKE_C_COMPILER="$CC" \
