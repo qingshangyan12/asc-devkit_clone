@@ -142,7 +142,24 @@ PY
       echo "OVERLAY_DAV_TIK tikcfw/impl/dav_3510/kernel_operator_mm_impl.h"
     fi
   fi
-  echo "OVERLAY_SKIP_TIK_IMPL (keep stock Fill/LoadData)"
+  # Replace poisoned tik intf_impl (rev17–21) with Fill enable_if defaults so sample pad compiles.
+  mkdir -p "$TIK_IMPL" 2>/dev/null || true
+  if [ -f "$HELPER/impl/basic_api/kernel_operator_mm_intf_impl.h" ] && [ -d "$TIK_IMPL" ]; then
+    cp -a "$HELPER/impl/basic_api/kernel_operator_mm_intf_impl.h" "$TIK_IMPL/"
+    python3 - "$TIK_IMPL/kernel_operator_mm_intf_impl.h" <<'PY'
+from pathlib import Path
+import sys
+p = Path(sys.argv[1])
+t = p.read_text(encoding="utf-8", errors="replace")
+t = t.replace(
+    "SetHF32TransModeImpl(mode == AscendC::HF32TransMode::NEAREST_AWAY);",
+    "SetHF32TransModeImpl(static_cast<uint32_t>(mode) == 0u);",
+)
+p.write_text(t, encoding="utf-8")
+print("OVERLAY_TIK_INTF_IMPL_FILLFIX", p)
+PY
+  fi
+  echo "OVERLAY_SKIP_TIK_BASE (keep stock base/load2d)"
   # pointer include hook on asc intf_impl only
   for pair in \
     "kernel_operator_mm_intf_impl.h:kernel_operator_mm_ptr_impl.h" \
