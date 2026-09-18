@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include <algorithm>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -16,6 +17,7 @@
 #include "auto_selector_base.h"
 #include "coll_alg_v2_exec_registry.h"
 #include "external_alg_parser.h"
+#include "external_alg_resolver.h"
 #include "external_alg_rules.h"
 #include "gtest/gtest.h"
 
@@ -377,4 +379,266 @@ TEST(ExtAlgRules, EngineMatchMatrix)
     op.engine = CommEngine::COMM_ENGINE_CCU;
     EXPECT_TRUE(EngineMatch(AlgEngine::CCU, op));
     EXPECT_FALSE(EngineMatch(AlgEngine::AICPU, op));
+}
+
+namespace {
+OpParam MakeResolveParam(HcclCMDType cmd, CommEngine engine)
+{
+    OpParam op = MakeOpParam();
+    op.opType = cmd;
+    op.engine = engine;
+    return op;
+}
+} // namespace
+
+// golden：36 个非空 (引擎xopx外部名) 组合的定名全覆盖（专属目标全量编译 46 行 sidecar，
+// 无 AIC 目标截断问题——全表照跑）。期望值与注册现场 sidecar 表逐行核对：
+// AG 12 / RS 16 / AR 8 / A2A 7 / A2AV 3 行（grep REGISTER_ALG_META 可现场复核）。
+TEST(ExtAlgResolver, GoldenAllEngines)
+{
+    struct Case {
+        HcclCMDType cmd;
+        const char* extName;
+        const TopoInfoWithNetLayerDetails* topo;
+        CommEngine engine;
+        const char* expected;
+    };
+    TopoInfoWithNetLayerDetails flat = MakeFlatMesh1DTopo();
+    TopoInfoWithNetLayerDetails ubx = MakeUbxTopo();
+    TopoInfoWithNetLayerDetails pcie = MakePcieMixTopo();
+    TopoInfoWithNetLayerDetails multi = MakeMultiLevelTopo();
+    TopoInfoWithNetLayerDetails twoLevel = MakeTwoLevelNetLayerTopo();
+
+    const Case cases[] = {
+        // ---- 纯查表组合（AICPU/DPU）----
+        {HcclCMDType::HCCL_CMD_ALLGATHER, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_AICPU_TS, "InsAllGatherMesh1D"},
+        {HcclCMDType::HCCL_CMD_ALLGATHER, "sole[nhr]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
+         "AicpuAllGatherSoleNHR"},
+        {HcclCMDType::HCCL_CMD_ALLGATHER, "parallel[mesh,nhr.muti_channel]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
+         "InsAllGatherParallelMesh1DNHRMultiJetty"},
+        {HcclCMDType::HCCL_CMD_ALLGATHER, "concur[mesh,nhr]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
+         "AicpuAllGatherConcurMeshNHR"},
+        {HcclCMDType::HCCL_CMD_ALLGATHER, "pipeline[mesh,nhr]", &pcie, CommEngine::COMM_ENGINE_AICPU_TS,
+         "AicpuAllGatherPipeLinePcie"},
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[mesh.chunk]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
+         "InsReduceScatterMesh1DMeshChunk"},
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sequence[mesh,nhr]", &multi, CommEngine::COMM_ENGINE_AICPU_TS,
+         "InsReduceScatterSequenceMesh1DNhr"},
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "concur[mesh,nhr]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
+         "AicpuReduceScatterConcurMeshNHR"},
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "pipeline[mesh,nhr]", &pcie, CommEngine::COMM_ENGINE_AICPU_TS,
+         "AicpuReduceScatterPipeLinePcie"},
+        {HcclCMDType::HCCL_CMD_ALLREDUCE, "sole[mesh.two_shot]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
+         "AicpuAllReduceSoleMeshTwoShot"},
+        {HcclCMDType::HCCL_CMD_ALLREDUCE, "sole[mesh.one_shot]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
+         "AicpuAllReduceSoleMeshOneShot"},
+        {HcclCMDType::HCCL_CMD_ALLREDUCE, "sole[mesh.two_shot.chunk]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
+         "AicpuAllReduceSoleMeshChunkTwoShot"},
+        {HcclCMDType::HCCL_CMD_ALLTOALL, "sole[mesh.single_channel]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
+         "AicpuAllToAllSoleMeshSingleChannel"},
+        {HcclCMDType::HCCL_CMD_ALLTOALL, "concur[mesh,mesh]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
+         "AicpuAllToAllSoleMeshConcurrent"},
+        {HcclCMDType::HCCL_CMD_ALLTOALLV, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
+         "AicpuAllToAllVSoleMesh"},
+        {HcclCMDType::HCCL_CMD_ALLTOALLV, "concur[mesh,mesh]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
+         "AicpuAllToAllVSoleMeshConcurrent"},
+        // ---- 纯查表组合（CCU）----
+        {HcclCMDType::HCCL_CMD_ALLGATHER, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_CCU,
+         "CcuSchedAllGatherSoleMesh"},
+        {HcclCMDType::HCCL_CMD_ALLGATHER, "parallel[mesh,nhr.muti_channel]", &ubx, CommEngine::COMM_ENGINE_CCU,
+         "CcuSchedAllGatherParallelMeshNHRMultiLink"},
+        {HcclCMDType::HCCL_CMD_ALLGATHER, "concur[mesh,nhr.muti_channel]", &ubx, CommEngine::COMM_ENGINE_CCU,
+         "CcuSchedAllGatherConcurMeshNHRMultiLink"},
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr.muti_channel]", &flat, CommEngine::COMM_ENGINE_CCU,
+         "CcuSchedReduceScatterSoleNHRMultiLink"},
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "concur[mesh,nhr.muti_channel]", &ubx, CommEngine::COMM_ENGINE_CCU,
+         "CcuSchedReduceScatterConcurMeshNHRMultiLink"},
+        {HcclCMDType::HCCL_CMD_ALLREDUCE, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_CCU,
+         "CcuSchedAllReduceSoleMesh"},
+        {HcclCMDType::HCCL_CMD_ALLTOALL, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_CCU, "CcuSchedAllToAllSoleMesh"},
+        {HcclCMDType::HCCL_CMD_ALLTOALL, "sole[mesh.muti_channel]", &ubx, CommEngine::COMM_ENGINE_CCU,
+         "CcuSchedAllToAllMesh1DMultiJetty"},
+        {HcclCMDType::HCCL_CMD_ALLTOALL, "concur[mesh,mesh]", &ubx, CommEngine::COMM_ENGINE_CCU,
+         "CcuSchedAllToAllSoleMeshConcurrent"},
+        {HcclCMDType::HCCL_CMD_ALLTOALLV, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_CCU,
+         "CcuSchedAllToAllVSoleMesh"},
+        // ---- 8 处一对多 ----
+        // A1 AICPU·RS·sole[mesh]：小数据走裸名（大数据触发在下一用例）
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[mesh]", &twoLevel, CommEngine::COMM_ENGINE_AICPU_TS,
+         "InsReduceScatterMesh1D"},
+        // A2 CCU·RS·sole[mesh]：UT 无真实 comm，COND_PEER_ONLY 保守不命中 -> 裸名兜底
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_CCU,
+         "CcuSchedReduceScatterSoleMesh"},
+        // B1 AICPU·AG·parallel[mesh,nhr] 三 flag 互斥分流
+        {HcclCMDType::HCCL_CMD_ALLGATHER, "parallel[mesh,nhr]", &multi, CommEngine::COMM_ENGINE_AICPU_TS,
+         "InsAllGatherParallelMesh1DNHR"},
+        {HcclCMDType::HCCL_CMD_ALLGATHER, "parallel[mesh,nhr]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
+         "InsAllGatherParallelMesh1DNHRUBX"},
+        {HcclCMDType::HCCL_CMD_ALLGATHER, "parallel[mesh,nhr]", &pcie, CommEngine::COMM_ENGINE_AICPU_TS,
+         "InsAllGatherParallelMesh1DNHRPcie"},
+        // B2 AICPU·RS·parallel[mesh,nhr]
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "parallel[mesh,nhr]", &multi, CommEngine::COMM_ENGINE_AICPU_TS,
+         "InsReduceScatterParallelMesh1DNHR"},
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "parallel[mesh,nhr]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
+         "AicpuReduceScatterParallelMeshNHRUBX"},
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "parallel[mesh,nhr]", &pcie, CommEngine::COMM_ENGINE_AICPU_TS,
+         "InsReduceScatterParallelMesh1DNHRPcie"},
+        // B3 AICPU·AR·parallel[mesh,nhr]（无 UBX 变体）
+        {HcclCMDType::HCCL_CMD_ALLREDUCE, "parallel[mesh,nhr]", &multi, CommEngine::COMM_ENGINE_AICPU_TS,
+         "AicpuAllReduceParallelMeshNHR"},
+        {HcclCMDType::HCCL_CMD_ALLREDUCE, "parallel[mesh,nhr]", &pcie, CommEngine::COMM_ENGINE_AICPU_TS,
+         "AicpuAllreduceParallelMeshNHRPcie"},
+        // B4 AICPU·A2A·sole[mesh]
+        {HcclCMDType::HCCL_CMD_ALLTOALL, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
+         "AicpuAllToAllSoleMesh"},
+        {HcclCMDType::HCCL_CMD_ALLTOALL, "sole[mesh]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
+         "AicpuAllToAllSoleMeshUBX"},
+        // ---- HostDPUOnly（DPU 行只在 engine==COMM_ENGINE_CPU 命中）----
+        {HcclCMDType::HCCL_CMD_ALLGATHER, "sequence[mesh,nhr]", &multi, CommEngine::COMM_ENGINE_CPU,
+         "InsAllGatherMeshNhrDPU"},
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sequence[mesh,mesh]", &multi, CommEngine::COMM_ENGINE_CPU,
+         "InsReduceScatterSequenceMeshMeshDPU"},
+    };
+
+    ExternalAlgSpec spec;
+    std::string errMsg;
+    for (const Case& c : cases) {
+        ASSERT_TRUE(ParseExternalAlg(c.extName, spec, errMsg)) << c.extName;
+        OpParam op = MakeResolveParam(c.cmd, c.engine);
+        std::string algName;
+        EXPECT_EQ(ResolveExternalAlg(op, c.topo, spec, algName, errMsg), ResolveStatus::RESOLVED)
+            << "ext=" << c.extName << " engine=" << static_cast<int>(c.engine) << " err=" << errMsg;
+        EXPECT_EQ(algName, std::string(c.expected)) << "ext=" << c.extName;
+    }
+}
+
+TEST(ExtAlgResolver, VariantPairDisambiguation)
+{
+    ExternalAlgSpec spec;
+    std::string errMsg;
+    std::string algName;
+    TopoInfoWithNetLayerDetails twoLevel = MakeTwoLevelNetLayerTopo();
+    TopoInfoWithNetLayerDetails multi = MakeMultiLevelTopo();
+
+    // A1: 两层网 + 大数据 -> ZAxisDetour；小数据 -> 裸 Mesh1D
+    ASSERT_TRUE(ParseExternalAlg("sole[mesh]", spec, errMsg));
+    OpParam big = MakeResolveParam(HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CommEngine::COMM_ENGINE_AICPU_TS);
+    big.DataDes.dataType = HCCL_DATA_TYPE_FP32;
+    big.DataDes.count = 24U * 1024 * 1024 + 1U; // 96MB+4B，x16 rank > 1536MB
+    EXPECT_EQ(ResolveExternalAlg(big, &twoLevel, spec, algName, errMsg), ResolveStatus::RESOLVED);
+    EXPECT_EQ(algName, "InsReduceScatterMesh1DZAxisDetour");
+
+    OpParam small = big;
+    small.DataDes.count = 1024U;
+    EXPECT_EQ(ResolveExternalAlg(small, &twoLevel, spec, algName, errMsg), ResolveStatus::RESOLVED);
+    EXPECT_EQ(algName, "InsReduceScatterMesh1D");
+
+    // A3: specialDT -> AicpuReduceNHR；否则裸 NHR
+    ASSERT_TRUE(ParseExternalAlg("sole[nhr]", spec, errMsg));
+    OpParam int64 = MakeResolveParam(HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CommEngine::COMM_ENGINE_AICPU_TS);
+    int64.DataDes.dataType = HCCL_DATA_TYPE_INT64;
+    EXPECT_EQ(ResolveExternalAlg(int64, &twoLevel, spec, algName, errMsg), ResolveStatus::RESOLVED);
+    EXPECT_EQ(algName, "InsReduceScatterAicpuReduceNHR");
+
+    OpParam fp32 = MakeResolveParam(HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CommEngine::COMM_ENGINE_AICPU_TS);
+    EXPECT_EQ(ResolveExternalAlg(fp32, &twoLevel, spec, algName, errMsg), ResolveStatus::RESOLVED);
+    EXPECT_EQ(algName, "InsReduceScatterNHR");
+
+    // A4: AR sole[nhr]（devkit auto 无选择点，规则表补齐，蓝本 hccl AR:427-434）
+    OpParam arProd = MakeResolveParam(HcclCMDType::HCCL_CMD_ALLREDUCE, CommEngine::COMM_ENGINE_AICPU_TS);
+    arProd.reduceType = HcclReduceOp::HCCL_REDUCE_PROD;
+    EXPECT_EQ(ResolveExternalAlg(arProd, &twoLevel, spec, algName, errMsg), ResolveStatus::RESOLVED);
+    EXPECT_EQ(algName, "AicpuAllReduceSoleNHRAicpuReduce");
+    OpParam arSum = MakeResolveParam(HcclCMDType::HCCL_CMD_ALLREDUCE, CommEngine::COMM_ENGINE_AICPU_TS);
+    EXPECT_EQ(ResolveExternalAlg(arSum, &twoLevel, spec, algName, errMsg), ResolveStatus::RESOLVED);
+    EXPECT_EQ(algName, "AicpuAllReduceSoleNHR");
+
+    // HostDPUOnly: AICPU 引擎下 DPU-only 外部名 -> 候选为空 -> ERROR_INVALID
+    ASSERT_TRUE(ParseExternalAlg("sequence[mesh,nhr]", spec, errMsg));
+    OpParam aicpu = MakeResolveParam(HcclCMDType::HCCL_CMD_ALLGATHER, CommEngine::COMM_ENGINE_AICPU_TS);
+    EXPECT_EQ(ResolveExternalAlg(aicpu, &multi, spec, algName, errMsg), ResolveStatus::ERROR_INVALID);
+}
+
+TEST(ExtAlgResolver, ErrorCasesCarryThreeElements)
+{
+    ExternalAlgSpec spec;
+    std::string errMsg;
+    std::string algName;
+    OpParam op = MakeResolveParam(HcclCMDType::HCCL_CMD_ALLGATHER, CommEngine::COMM_ENGINE_AICPU_TS);
+
+    // 候选为空（devkit 无 3 层注册）
+    TopoInfoWithNetLayerDetails flat = MakeFlatMesh1DTopo();
+    ASSERT_TRUE(ParseExternalAlg("pipeline[mesh,nhr,nhr]", spec, errMsg));
+    EXPECT_EQ(ResolveExternalAlg(op, &flat, spec, algName, errMsg), ResolveStatus::ERROR_INVALID);
+    EXPECT_NE(errMsg.find("pipeline[mesh,nhr,nhr]"), std::string::npos); // 三要素: 外部名原文
+
+    // 规则全灭（AG parallel[mesh,nhr] 在单层 flat 拓扑：三 flag 全不命中）
+    ASSERT_TRUE(ParseExternalAlg("parallel[mesh,nhr]", spec, errMsg));
+    EXPECT_EQ(ResolveExternalAlg(op, &flat, spec, algName, errMsg), ResolveStatus::ERROR_INVALID);
+    EXPECT_NE(errMsg.find("parallel[mesh,nhr]"), std::string::npos);
+}
+
+TEST(ExtAlgResolver, CandidateTableIsDeterministic)
+{
+    // 聚合确定性：对注册行快照反复构建候选表，逐字节一致（不依赖注册顺序）
+    const std::vector<AlgMetaRow> rows = AlgMetaRegistry::Instance().GetAll();
+    const std::map<ExtAlgKey, std::vector<AlgCandidate>> table1 = BuildCandidateTable(rows);
+    const std::map<ExtAlgKey, std::vector<AlgCandidate>> table2 = BuildCandidateTable(rows);
+    ASSERT_EQ(table1.size(), table2.size());
+    for (const auto& entry : table1) {
+        const auto it = table2.find(entry.first);
+        ASSERT_NE(it, table2.end());
+        ASSERT_EQ(entry.second.size(), it->second.size());
+        for (size_t i = 0; i < entry.second.size(); ++i) {
+            EXPECT_EQ(entry.second[i].registeredName, it->second[i].registeredName);
+            EXPECT_EQ(static_cast<int>(entry.second[i].engine), static_cast<int>(it->second[i].engine));
+        }
+    }
+    // 覆盖数锚：30 个 (op,外部名) 键（46 行归并）；36 个 (引擎,op,外部名) 组合（键内引擎去重求和）
+    size_t comboCount = 0;
+    for (const auto& entry : table1) {
+        std::vector<AlgEngine> engines;
+        for (const AlgCandidate& cand : entry.second) {
+            if (std::find(engines.begin(), engines.end(), cand.engine) == engines.end()) {
+                engines.push_back(cand.engine);
+            }
+        }
+        comboCount += engines.size();
+    }
+    EXPECT_EQ(table1.size(), 30U);
+    EXPECT_EQ(comboCount, 36U);
+}
+
+TEST(ExtAlgResolver, SpecificityOrdering)
+{
+    // 特异性排序：特化候选(带 cond/flag)在前，裸名(双-1)在后；同特异性内字典序
+    const std::vector<AlgCandidate>& cands = GetExternalCandidates(HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[mesh]");
+    // 本目标全量：4 候选 = ZAxisDetour(COND) / CcuSchedReduceScatterSoleMesh(裸) /
+    //              CcuSchedReduceScatterSoleMeshPeerOnly(COND) / InsReduceScatterMesh1D(裸)
+    ASSERT_EQ(cands.size(), 4U);
+    int lastSpecificity = 2;
+    for (const AlgCandidate& cand : cands) {
+        const int specificity = (cand.variantCondId != COND_NONE ? 1 : 0) + (cand.machineFlagId != FLAG_NONE ? 1 : 0);
+        EXPECT_LE(specificity, lastSpecificity); // 降序
+        lastSpecificity = specificity;
+    }
+    EXPECT_EQ(cands[0].registeredName, "CcuSchedReduceScatterSoleMeshPeerOnly"); // 特化字典序在前
+    EXPECT_EQ(cands[1].registeredName, "InsReduceScatterMesh1DZAxisDetour");
+    EXPECT_EQ(cands[2].registeredName, "CcuSchedReduceScatterSoleMesh"); // 裸名字典序
+    EXPECT_EQ(cands[3].registeredName, "InsReduceScatterMesh1D");
+}
+
+// 评审备忘闭环：extern 表转发初始化器的运行时绑定断言
+TEST(ExtAlgResolver, RuleTableBinding)
+{
+    EXPECT_EQ(VARIANT_COND_TABLE[COND_Z_AXIS], &CondZAxis);
+    EXPECT_EQ(VARIANT_COND_TABLE[COND_PEER_ONLY], &CondPeerOnly);
+    EXPECT_EQ(VARIANT_COND_TABLE[COND_SPECIAL_DT], &CondSpecialDt);
+    EXPECT_EQ(MACHINE_FLAG_TABLE[FLAG_PCIE_MIX], &FlagPcieMix);
+    EXPECT_EQ(MACHINE_FLAG_TABLE[FLAG_UBX], &FlagUbx);
+    EXPECT_EQ(MACHINE_FLAG_TABLE[FLAG_MULTI_LEVEL], &FlagMultiLevel);
+    EXPECT_EQ(MACHINE_FLAG_TABLE[FLAG_FLAT_1D], &FlagFlat1D);
+    EXPECT_STREQ(VariantCondName(COND_Z_AXIS), "COND_Z_AXIS");
+    EXPECT_STREQ(MachineFlagName(FLAG_FLAT_1D), "FLAG_FLAT_1D");
+    EXPECT_STREQ(VariantCondName(-1), "n/a");
 }

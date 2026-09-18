@@ -100,8 +100,9 @@ endforeach()
 # executor 注册项经 vtable 急切实例化引用模板 out-of-line 虚函数符号，模板文件必须编入；
 # topo / common / stub 条目抄自 mc2_ccu 目标与 aicpu kernel 库的现成清单。
 set(EXT_ALG_FIXED_SOURCES
-    # external_alg 模块本体
+    # external_alg 模块本体（parser 为头文件实现，无 .cc）
     ${HCCL_CC_SRC_DIR}/ops/op_common/external_alg/alg_meta_registry.cc
+    ${HCCL_CC_SRC_DIR}/ops/op_common/external_alg/external_alg_resolver.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/external_alg/external_alg_rules.cc
     # common 链（hccl_alloc_ctx_res / hccl_mc2 及其依赖）
     ${HCCL_CC_SRC_DIR}/common/hccl_alloc_ctx_res.cc
