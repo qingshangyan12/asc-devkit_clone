@@ -16,8 +16,6 @@
 
 namespace mc2_ops_hccl {
 namespace {
-const std::vector<AlgCandidate> EMPTY_CANDIDATES;
-
 const char* EngineName(AlgEngine engine)
 {
     switch (engine) {
@@ -28,6 +26,28 @@ const char* EngineName(AlgEngine engine)
         case AlgEngine::AICPU:
         default:
             return "AICPU";
+    }
+}
+
+// opParam.engine 是请求引擎（CommEngine），与候选引擎（AlgEngine）是两个枚举，分开命名
+const char* EngineName(CommEngine engine)
+{
+    switch (engine) {
+        case CommEngine::COMM_ENGINE_CPU:
+            return "CPU";
+        case CommEngine::COMM_ENGINE_CPU_TS:
+            return "CPU_TS";
+        case CommEngine::COMM_ENGINE_AICPU:
+            return "AICPU";
+        case CommEngine::COMM_ENGINE_AICPU_TS:
+            return "AICPU_TS";
+        case CommEngine::COMM_ENGINE_AIV:
+            return "AIV";
+        case CommEngine::COMM_ENGINE_CCU:
+            return "CCU";
+        case CommEngine::COMM_ENGINE_RESERVED:
+        default:
+            return "RESERVED";
     }
 }
 
@@ -80,9 +100,11 @@ std::map<ExtAlgKey, std::vector<AlgCandidate>> BuildCandidateTable(const std::ve
 
 const std::vector<AlgCandidate>& GetExternalCandidates(HcclCMDType cmd, const std::string& canonicalExtName)
 {
+    // 函数级 static：免疫跨编译单元 static-init 顺序的理论风险
+    static const std::vector<AlgCandidate> kEmpty;
     const auto& table = CandidateTable();
     const auto it = table.find(std::make_pair(cmd, canonicalExtName));
-    return it == table.end() ? EMPTY_CANDIDATES : it->second;
+    return it == table.end() ? kEmpty : it->second;
 }
 
 bool HasCcuCandidate(HcclCMDType cmd, const std::string& canonicalExtName)
@@ -104,19 +126,24 @@ ResolveStatus ResolveExternalAlg(
     const std::vector<AlgCandidate>& candidates = GetExternalCandidates(opParam.opType, spec.canonical());
     const std::string candList = DescribeCandidates(candidates);
 
-    // 选名审计日志（spec §12：一条 INFO 汇总）
+    // 选名审计日志（spec §12：一条 INFO 汇总；engine 打枚举名与 resolved 行风格一致）
     HCCL_INFO(
-        "[MC2_EXT_ALG] op[%u] ext[%s] engine[%d] candidates(%zu): [%s]", static_cast<u32>(opParam.opType),
-        spec.canonical().c_str(), static_cast<int>(opParam.engine), candidates.size(), candList.c_str());
+        "[MC2_EXT_ALG] op[%u] ext[%s] engine[%s] candidates(%zu): [%s]", static_cast<u32>(opParam.opType),
+        spec.canonical().c_str(), EngineName(opParam.engine), candidates.size(), candList.c_str());
 
     for (const AlgCandidate& cand : candidates) {
         if (!EngineMatch(cand.engine, opParam)) { // (1) 引擎
             continue;
         }
-        if (cand.variantCondId >= 0 && !VARIANT_COND_TABLE[cand.variantCondId](topoInfo, opParam)) { // (2)
+        // (2) 变体条件：ID 双边判断消除注册侧写错值的 OOB 调用面（不在 Register() 做值域校验，
+        // 因 rules.h 已 include alg_meta_registry.h，反向 include 会循环依赖）
+        if (cand.variantCondId >= 0 && cand.variantCondId < VARIANT_COND_COUNT &&
+            !VARIANT_COND_TABLE[cand.variantCondId](topoInfo, opParam)) {
             continue;
         }
-        if (cand.machineFlagId >= 0 && !MACHINE_FLAG_TABLE[cand.machineFlagId](topoInfo)) { // (2')
+        // (2') 机型 flag：同上双边判断
+        if (cand.machineFlagId >= 0 && cand.machineFlagId < MACHINE_FLAG_COUNT &&
+            !MACHINE_FLAG_TABLE[cand.machineFlagId](topoInfo)) {
             continue;
         }
         algName = cand.registeredName;
@@ -124,10 +151,13 @@ ResolveStatus ResolveExternalAlg(
         return ResolveStatus::RESOLVED;
     }
 
-    // 报错三要素：外部名原文 / 候选列表 / 失败原因
+    // 报错三要素：外部名原文 / 候选列表 / 失败原因（opType 无现成名字映射，保持数字）
+    const std::string reason =
+        candidates.empty() ?
+            "(no candidate registered in this build for engine " + std::string(EngineName(opParam.engine)) + ")" :
+            "(all candidates rejected by rules for engine " + std::string(EngineName(opParam.engine)) + ")";
     errMsg = "resolve failed, ext=\"" + spec.canonical() + "\" op=" + std::to_string(static_cast<u32>(opParam.opType)) +
-             ", candidates=[" + candList + "] (empty or all rules rejected for engine " +
-             std::to_string(static_cast<int>(opParam.engine)) + ")";
+             ", candidates=[" + candList + "] " + reason;
     HCCL_ERROR("[MC2_EXT_ALG] ERROR: %s", errMsg.c_str());
     return ResolveStatus::ERROR_INVALID;
 }

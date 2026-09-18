@@ -580,18 +580,24 @@ TEST(ExtAlgResolver, ErrorCasesCarryThreeElements)
 
 TEST(ExtAlgResolver, CandidateTableIsDeterministic)
 {
-    // 聚合确定性：对注册行快照反复构建候选表，逐字节一致（不依赖注册顺序）
+    // 聚合确定性：同数据不同输入序（重跑 / 逆序）构建候选表，逐位一致（不依赖注册顺序）
     const std::vector<AlgMetaRow> rows = AlgMetaRegistry::Instance().GetAll();
     const std::map<ExtAlgKey, std::vector<AlgCandidate>> table1 = BuildCandidateTable(rows);
     const std::map<ExtAlgKey, std::vector<AlgCandidate>> table2 = BuildCandidateTable(rows);
-    ASSERT_EQ(table1.size(), table2.size());
-    for (const auto& entry : table1) {
-        const auto it = table2.find(entry.first);
-        ASSERT_NE(it, table2.end());
-        ASSERT_EQ(entry.second.size(), it->second.size());
-        for (size_t i = 0; i < entry.second.size(); ++i) {
-            EXPECT_EQ(entry.second[i].registeredName, it->second[i].registeredName);
-            EXPECT_EQ(static_cast<int>(entry.second[i].engine), static_cast<int>(it->second[i].engine));
+    std::vector<AlgMetaRow> reversedRows = rows;
+    std::reverse(reversedRows.begin(), reversedRows.end());
+    const std::map<ExtAlgKey, std::vector<AlgCandidate>> table3 = BuildCandidateTable(reversedRows);
+    const std::map<ExtAlgKey, std::vector<AlgCandidate>>* otherTables[] = {&table2, &table3};
+    for (const auto* other : otherTables) {
+        ASSERT_EQ(table1.size(), other->size());
+        for (const auto& entry : table1) {
+            const auto it = other->find(entry.first);
+            ASSERT_NE(it, other->end());
+            ASSERT_EQ(entry.second.size(), it->second.size());
+            for (size_t i = 0; i < entry.second.size(); ++i) {
+                EXPECT_EQ(entry.second[i].registeredName, it->second[i].registeredName);
+                EXPECT_EQ(static_cast<int>(entry.second[i].engine), static_cast<int>(it->second[i].engine));
+            }
         }
     }
     // 覆盖数锚：30 个 (op,外部名) 键（46 行归并）；36 个 (引擎,op,外部名) 组合（键内引擎去重求和）
