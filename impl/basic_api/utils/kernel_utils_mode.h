@@ -51,7 +51,16 @@ FRACTAL_Z    -> ND              HCNT  -> HCN   [0:-4,-4,-3*-2,-1] -> [0:-2,-2,-1
 */
 enum class ClipReluMode { NOCLIP_RELU = 0, CLIP_RELU = 1 };
 
-enum class ReluMode { NO_RELU = 0, NORMAL_RELU = 1, SCALAR_RELU = 2, VECTOR_RELU = 3 };
+enum class ReluMode {
+    NO_RELU = 0,
+    NORMAL_RELU = 1,
+    SCALAR_RELU = 2,
+    VECTOR_RELU = 3,
+    LUT_GELU = 4,
+    LUT_SILU = 5,
+    LUT_SIGMOID = 6,
+    LUT_TANH = 7
+};
 
 union NotNumUnion {
     float f;
@@ -99,9 +108,9 @@ enum class RoundMode : uint8_t {
     CAST_ROUND, // away-zero
     CAST_TRUNC, // to-zero
     CAST_ODD,   // Von Neumann rounding
-#if defined(__NPU_ARCH__) &&                                                                                      \
-        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) ||  \
-         (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) ||  \
+                              (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) ||  \
+                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)) || \
     defined(__ASC_NPU_HOST__)
     CAST_HYBRID, // hybrid round
     CAST_EVEN,
