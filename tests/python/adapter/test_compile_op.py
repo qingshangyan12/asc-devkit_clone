@@ -72,6 +72,7 @@ from adapter.ascendc_compile_gen_code import (
     add_op_param_to_workspace,
     get_value,
 )
+from adapter import ascendc_compile_gen_code
 from adapter.super_kernel_constants import (
     SuperKernelStreamFusionMode,
     SuperKernelLinkMode,
@@ -103,6 +104,32 @@ class MockMatch:
 
 
 class TestCompileOp(unittest.TestCase):
+    def test_oom_storage_shape_patterns(self):
+        init_source = ascendc_compile_gen_code.OOM_STORAGE_SHAPE_INIT_PATTERN.format(
+            legacy_len_offset=32
+        )
+        tensor_source = ascendc_compile_gen_code.OOM_TENSOR_REGISTER_PATTERN.format(
+            param_name="x", element_size=4, input_shape_len="inputShapeLen"
+        )
+        tensor_list_source = (
+            ascendc_compile_gen_code.OOM_TENSOR_LIST_REGISTER_PATTERN.format(
+                param_name="xs", element_size=2
+            )
+        )
+
+        self.assertIn("tmpTilingSizeForOOM + 32", init_source)
+        self.assertIn("OOMHasStorageShapeHeader(oomStorageShapeCursor)", init_source)
+        self.assertIn(
+            "OOMTryRegisterTensorWithStorageShape(oomStorageShapeCursor, x, 4)",
+            tensor_source,
+        )
+        self.assertIn("OOMCheckAddrRange(x, inputShapeLen)", tensor_source)
+        self.assertIn(
+            "OOMTryRegisterTensorListWithStorageShape(oomStorageShapeCursor, xs, 2)",
+            tensor_list_source,
+        )
+        self.assertIn("OOMCheckTensorListRange(xs, 2)", tensor_list_source)
+
     def setUp(self):
         # operator before each testcase
         print("-------------------SetUp----------------")
@@ -1384,26 +1411,31 @@ class TestCompileOp(unittest.TestCase):
         compile_info = CompileInfo()
         compile_info.tiling_key_struct_map = {}
 
-        dump_size = 1024
         old_source = ""
         new_source = add_op_param_to_workspace(
-            op_info, tiling_info, old_source, dump_size, compile_options, compile_info
+            op_info, tiling_info, old_source, compile_options, compile_info
         )
         self.assertNotEqual(new_source, old_source)
+        self.assertIn("OOMHasStorageShapeHeader", new_source)
+        self.assertLess(
+            new_source.rfind("OOMCheckAddrRange(workspace"),
+            new_source.rfind("#endif"),
+        )
         tiling_info.static_shape_flag = True
         compile_info.tiling_key_struct_map = {"1": 96, "2": 100}
         new_source = add_op_param_to_workspace(
-            op_info, tiling_info, old_source, dump_size, compile_options, compile_info
+            op_info, tiling_info, old_source, compile_options, compile_info
         )
         self.assertNotEqual(new_source, old_source)
+        self.assertNotIn("OOMHasStorageShapeHeader", new_source)
         tiling_info.tiling_key_data_size = {}
         new_source = add_op_param_to_workspace(
-            op_info, tiling_info, old_source, dump_size, compile_options, compile_info
+            op_info, tiling_info, old_source, compile_options, compile_info
         )
         self.assertNotEqual(new_source, old_source)
         tiling_info.tiling_key_data_size = {"0": 96}
         new_source = add_op_param_to_workspace(
-            op_info, tiling_info, old_source, dump_size, compile_options, compile_info
+            op_info, tiling_info, old_source, compile_options, compile_info
         )
         self.assertNotEqual(new_source, old_source)
 
@@ -1506,7 +1538,6 @@ class TestCompileOp(unittest.TestCase):
             op_info_neg,
             tiling_info,
             old_source,
-            dump_size,
             compile_options,
             compile_info,
         )
