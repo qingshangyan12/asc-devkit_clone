@@ -1,23 +1,43 @@
-# CV融合算子使用SSBuffer
+# 基于SSBuffer的核间通信特性
 
 本章节介绍CV融合算子中使用SSBuffer的基础知识、通信规则和算子实现方法。
+
+>[!NOTE]说明
+>
+>阅读本节前，请先了解[CV融合算子](./basics.md)以及[地址空间限定符](../../../../programming_guide/language_extension/simd_builtin_keywords.md#地址空间限定符)。
 
 配套的可执行样例如下：
 
 - [AIV/AIC环形消息队列通信C API样例](../../../../../../../examples/02_simd_c_api/05_best_practices/03_fusion_compute/ssbuf_aiv_aic_comm)：使用C API实现两条AIV到AIC的消息队列，也是当前章节采用的完整样例。
 - [AIV/AIC环形消息队列通信](../../../../../../../examples/01_simd_cpp_api/05_best_practices/03_fusion_compute/ssbuf_aiv_aic_comm)：使用基础 API实现两条AIV到AIC的消息队列。
 
+# 产品支持情况
+
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
+
 # 算子实现
 
->[!NOTE]说明
->
->阅读本节前，请先了解[CV融合算子](./basics.md)以及[地址空间限定符](../../../../programming_guide/language_extension/simd_builtin_keywords.md#地址空间限定符)。
->
-><!-- npu="950" id1 -->
->本节内容适用于Ascend 950PR/Ascend 950DT。
-><!-- end id1 -->
-
-下文以基于SSBuffer的AIV/AIC通信算子为例，介绍显式SSBuffer通信的设计和实现过程。该核函数使用`__mix__(1, 2)`执行空间限定符，表示每个核函数执行组合包含1个AIC和2个AIV。每个AIV通过自己的环形消息队列发送12条消息；AIC读取消息，校验功能号、发送方、序号和校验值，并将消息字段及校验结果写入GM；Host侧逐条校验24个结果中的`valid`、`sender`、`sequence`、`value`和`checksum`字段。
+下文以基于SSBuffer的AIV/AIC通信算子为例，介绍显式SSBuffer通信的设计和实现过程。该核函数使用[`__mix__(1, 2)`执行空间限定符](../../../../programming_guide/language_extension/simd_builtin_keywords.md#section1074418132518)，表示核函数（Kernel）启动的Cube核和Vector核的配比。每个AIV通过自己的环形消息队列发送12条消息；AIC读取消息，校验功能号、发送方、序号和校验值，并将消息字段及校验结果写入GM；Host侧逐条校验24个结果中的`valid`、`sender`、`sequence`、`value`和`checksum`字段。
 
 算子的设计过程分为**算子分析、数据流分析、SSBuffer空间规划、通信规则设计、算子实现**五部分。完整代码请参考[SSBuffer AIV/AIC通信C API样例](../../../../../../../examples/02_simd_c_api/05_best_practices/03_fusion_compute/ssbuf_aiv_aic_comm)。
 
