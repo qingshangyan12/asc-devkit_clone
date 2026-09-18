@@ -13,8 +13,6 @@
 #include "stub_fun.h"
 #include "c_api/defs/enum.h"
 
-// The compiler supports these types and conversions, but they are missing from the CPU debug stub header.
-// Keep them before any conditional include of c_api/defs/type.h in this file.
 namespace float8_e6m2 {
 struct Fp8e6m2T {
     uint8_t val;
