@@ -1,8 +1,8 @@
 # Ascend910B3 CUBE task-book self-test
 
-- HEAD: bd58ed1f9
+- HEAD: 631a37430
 - ARCH: dav-2201
-- STAMP: 20260918_132629
+- STAMP: 20260918_142531
 - MODE: taskbook
 
 - verify PASS: **51**
