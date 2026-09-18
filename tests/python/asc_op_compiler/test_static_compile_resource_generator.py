@@ -69,14 +69,15 @@ class _CommandSession:
         self._sk_bind_records.append(command)
 
 
-MODULE_DIR = os.path.realpath(
-    os.path.join(
-        os.path.dirname(__file__),
-        "../../../tools/build/asc_op_compile_base/asc_op_compiler",
-    )
+FRAMEWORK_PATH = os.path.realpath(
+    os.path.join(os.path.dirname(__file__), "../../../tools/build")
 )
-sys.path.insert(0, MODULE_DIR)
-import static_compile_resource_generator as generator
+if FRAMEWORK_PATH not in sys.path:
+    sys.path.insert(0, FRAMEWORK_PATH)
+
+from asc_op_compile_base.asc_op_compiler import (
+    static_compile_resource_generator as generator,
+)
 
 
 class TestStaticCompileResourceGenerator(unittest.TestCase):
