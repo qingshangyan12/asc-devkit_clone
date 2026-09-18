@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -159,4 +160,31 @@ TEST(ExtAlgMetaRegistry, RegisterAndQuery)
     ASSERT_NE(meta, nullptr);
     EXPECT_EQ(meta->engine, AlgEngine::AICPU);
     EXPECT_EQ(std::string(meta->externalName), "sole[mesh]");
+}
+
+namespace {
+const HcclCMDType COLL_CMDS[] = {
+    HcclCMDType::HCCL_CMD_ALLGATHER, HcclCMDType::HCCL_CMD_REDUCE_SCATTER, HcclCMDType::HCCL_CMD_ALLREDUCE,
+    HcclCMDType::HCCL_CMD_ALLTOALL,  HcclCMDType::HCCL_CMD_ALLTOALLV,
+};
+} // namespace
+
+// 设计不变量 1（spec §14）：V2 注册表 ↔ AlgMetaRegistry 双向满射（按构建配置：
+// AIC 目标 -DAICPU_COMPILE 只编入部分 executor 文件，可见 AICPU 行 24 条——AG 8 / RS 10 /
+// AR 0（AR executor 未编入本目标）/ A2A 4 / A2AV 2；mc2_ccu 目标全 46 条——后者在
+// external_alg_full_testcase.cpp 断言 46 精确数，属后续任务）。
+TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
+{
+    for (HcclCMDType cmd : COLL_CMDS) {
+        std::vector<std::string> v2Tags = CollAlgExecRegistryV2::Instance().GetRegisteredTags(cmd);
+        std::vector<std::string> metaNames;
+        for (const AlgMetaRow& row : AlgMetaRegistry::Instance().GetAll()) {
+            if (row.cmd == cmd) {
+                metaNames.push_back(row.registeredName);
+            }
+        }
+        std::sort(v2Tags.begin(), v2Tags.end());
+        std::sort(metaNames.begin(), metaNames.end());
+        EXPECT_EQ(v2Tags, metaNames) << "cmd=" << static_cast<u32>(cmd);
+    }
 }
