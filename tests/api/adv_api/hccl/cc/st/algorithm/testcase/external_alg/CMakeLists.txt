@@ -102,6 +102,7 @@ endforeach()
 set(EXT_ALG_FIXED_SOURCES
     # external_alg 模块本体
     ${HCCL_CC_SRC_DIR}/ops/op_common/external_alg/alg_meta_registry.cc
+    ${HCCL_CC_SRC_DIR}/ops/op_common/external_alg/external_alg_rules.cc
     # common 链（hccl_alloc_ctx_res / hccl_mc2 及其依赖）
     ${HCCL_CC_SRC_DIR}/common/hccl_alloc_ctx_res.cc
     ${HCCL_CC_SRC_DIR}/common/hccl_mc2.cc

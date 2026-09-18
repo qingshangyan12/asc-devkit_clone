@@ -138,6 +138,7 @@ if(PRODUCT_SIDE STREQUAL "device")
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/executor/registry/coll_alg_exec_registry.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/executor/registry/coll_alg_v2_exec_registry.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/external_alg/alg_meta_registry.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/external_alg/external_alg_rules.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/executor/executor_base.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/executor/executor_v2_base.cc
 

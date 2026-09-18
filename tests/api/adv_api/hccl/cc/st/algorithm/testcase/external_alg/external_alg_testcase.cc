@@ -12,8 +12,11 @@
 #include <vector>
 
 #include "alg_meta_registry.h"
+#include "alg_param.h"
+#include "auto_selector_base.h"
 #include "coll_alg_v2_exec_registry.h"
 #include "external_alg_parser.h"
+#include "external_alg_rules.h"
 #include "gtest/gtest.h"
 
 using namespace mc2_ops_hccl;
@@ -204,4 +207,172 @@ TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
         }
     }
     EXPECT_EQ(total, 46U);
+}
+
+namespace {
+// ---- topo/opParam 夹具（写法蓝本 testcase/all_gather_aicpu_testcase.cc:34-77）----
+
+TopoInfoWithNetLayerDetails MakeFlatMesh1DTopo(u32 rankSize = 8U)
+{
+    TopoInfoWithNetLayerDetails topo{};
+    topo.userRank = 0U;
+    topo.userRankSize = rankSize;
+    topo.serverNum = 1U;
+    topo.topoLevelNums = 1U;
+    topo.level0Topo = Level0Shape::MESH_1D;
+    topo.netLayerDetails.netLayerNum = 1U;
+    topo.netLayerDetails.netLayers = {0U};
+    topo.netLayerDetails.localNetInsSizeOfLayer = {1U};
+    topo.topoInstDetailsOfLayer.resize(1U);
+    topo.topoInstDetailsOfLayer[0].rankNumForTopoType[COMM_TOPO_1DMESH] = {rankSize};
+    return topo;
+}
+
+TopoInfoWithNetLayerDetails MakeUbxTopo(u32 rankSize = 16U)
+{
+    TopoInfoWithNetLayerDetails topo{};
+    topo.userRank = 0U;
+    topo.userRankSize = rankSize;
+    topo.serverNum = 1U;
+    topo.topoLevelNums = 1U;
+    topo.level0Topo = Level0Shape::MESH_1D_CLOS; // UBX: MESH_1D_CLOS 且非 pcieMix
+    topo.level0PcieMix = false;
+    topo.netLayerDetails.netLayerNum = 1U;
+    topo.netLayerDetails.netLayers = {0U};
+    topo.netLayerDetails.localNetInsSizeOfLayer = {8U};
+    topo.topoInstDetailsOfLayer.resize(1U);
+    topo.topoInstDetailsOfLayer[0].rankNumForTopoType[COMM_TOPO_1DMESH] = {8U};
+    topo.topoInstDetailsOfLayer[0].rankNumForTopoType[COMM_TOPO_CLOS] = {rankSize};
+    return topo;
+}
+
+TopoInfoWithNetLayerDetails MakePcieMixTopo(u32 rankSize = 16U)
+{
+    TopoInfoWithNetLayerDetails topo = MakeUbxTopo(rankSize);
+    topo.level0PcieMix = true;
+    // level0 非全互联夹具（IsLayerAllConnetedWithTopo(0, 1DMESH) == false）。该函数比较
+    // rankNumForTopoType[1DMESH] 与 localNetInsSizeOfLayer[0]（不是 rankSize），真实
+    // MESH_1D_CLOS 不变量为 localNetInsSizeOfLayer[0] == CLOS rank 数（topo_host.cc
+    // CalcLevel0TopoShape 校验），mesh 只覆盖 8 卡 < CLOS 域 16 卡即需跨 pcie 链路
+    topo.netLayerDetails.localNetInsSizeOfLayer = {rankSize};
+    return topo;
+}
+
+TopoInfoWithNetLayerDetails MakeMultiLevelTopo(u32 rankSize = 16U)
+{
+    TopoInfoWithNetLayerDetails topo = MakeFlatMesh1DTopo(rankSize);
+    topo.topoLevelNums = 2U;
+    return topo;
+}
+
+// 两层网（IsTwoLevelNetLayer==true 的最小夹具，蓝本 auto_selector_base.cc:343-377 判定序:
+// netLayerNum>1 / level1 有 COMM_TOPO_CLOS / localNetInsSizeOfLayer[0]>1）
+TopoInfoWithNetLayerDetails MakeTwoLevelNetLayerTopo(u32 rankSize = 16U)
+{
+    TopoInfoWithNetLayerDetails topo{};
+    topo.userRank = 0U;
+    topo.userRankSize = rankSize;
+    topo.topoLevelNums = 2U;
+    topo.level0Topo = Level0Shape::MESH_1D;
+    topo.netLayerDetails.netLayerNum = 2U;
+    topo.netLayerDetails.netLayers = {0U, 1U};
+    topo.netLayerDetails.localNetInsSizeOfLayer = {2U, 1U}; // level0 实例数>1
+    topo.topoInstDetailsOfLayer.resize(2U);
+    topo.topoInstDetailsOfLayer[1].rankNumForTopoType[COMM_TOPO_CLOS] = {rankSize}; // level1 有 CLOS
+    return topo;
+}
+
+OpParam MakeOpParam(
+    HcclDataType dtype = HCCL_DATA_TYPE_FP32, u64 count = 1U, HcclReduceOp reduce = HcclReduceOp::HCCL_REDUCE_SUM)
+{
+    OpParam op{};
+    op.opType = HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
+    op.DataDes.dataType = dtype;
+    op.DataDes.count = count;
+    op.reduceType = reduce;
+    return op;
+}
+} // namespace
+
+TEST(ExtAlgRules, CondZAxisAlignsWithHccl)
+{
+    // hccl RS selector:483-485 / AG selector:338 / algname.md §1.6:
+    // IsTwoLevelNetLayer && (2P 且 dataSize>=4MB ∥ dataSize*rankSize>1536MB)
+    // dataSize = count × dtypeSize（hccl RS:508 同款公式），FP32 为 4B/元素
+    TopoInfoWithNetLayerDetails twoLevel = MakeTwoLevelNetLayerTopo();
+    TopoInfoWithNetLayerDetails flat = MakeFlatMesh1DTopo();
+
+    EXPECT_FALSE(CondZAxis(&flat, MakeOpParam(HCCL_DATA_TYPE_FP32, 100U * 1024 * 1024))); // 非两层网
+    EXPECT_FALSE(CondZAxis(&twoLevel, MakeOpParam(HCCL_DATA_TYPE_FP32, 1024U)));          // 两层网小数据
+    // 2P + 4MB 边界（RS_2P_DETOUR_DATA_SIZE，hccl RS:30）：1M FP32 元素恰为 4MB
+    TopoInfoWithNetLayerDetails twoRank = MakeTwoLevelNetLayerTopo(2U);
+    EXPECT_TRUE(CondZAxis(&twoRank, MakeOpParam(HCCL_DATA_TYPE_FP32, 1024U * 1024)));
+    EXPECT_FALSE(CondZAxis(&twoRank, MakeOpParam(HCCL_DATA_TYPE_FP32, 1024U * 1024 - 1)));
+    // 多 rank + 总量 1536MB 边界（RS_AICPU_1D_TWO_LEVEL_DATA_SIZE_THRESHOLD，hccl RS:23）：
+    // 16 rank 时需 dataSize > 96MB；24M FP32 元素 = 96MB，×16 = 1536MB 恰不超阈值
+    EXPECT_FALSE(CondZAxis(&twoLevel, MakeOpParam(HCCL_DATA_TYPE_FP32, 24U * 1024 * 1024)));
+    EXPECT_TRUE(CondZAxis(&twoLevel, MakeOpParam(HCCL_DATA_TYPE_FP32, 24U * 1024 * 1024 + 1)));
+}
+
+TEST(ExtAlgRules, CondSpecialDtAlignsWithHccl)
+{
+    TopoInfoWithNetLayerDetails flat = MakeFlatMesh1DTopo();
+    EXPECT_TRUE(CondSpecialDt(&flat, MakeOpParam(HCCL_DATA_TYPE_INT64)));
+    EXPECT_TRUE(CondSpecialDt(&flat, MakeOpParam(HCCL_DATA_TYPE_UINT64)));
+    EXPECT_TRUE(CondSpecialDt(&flat, MakeOpParam(HCCL_DATA_TYPE_FP64)));
+    EXPECT_TRUE(CondSpecialDt(&flat, MakeOpParam(HCCL_DATA_TYPE_FP32, 1U, HcclReduceOp::HCCL_REDUCE_PROD)));
+    EXPECT_FALSE(CondSpecialDt(&flat, MakeOpParam(HCCL_DATA_TYPE_FP32)));
+}
+
+TEST(ExtAlgRules, CondPeerOnlySemantics)
+{
+    TopoInfoWithNetLayerDetails twoRank = MakeFlatMesh1DTopo(2U);
+    TopoInfoWithNetLayerDetails eightRank = MakeFlatMesh1DTopo(8U);
+    OpParam op = MakeOpParam();                 // hcclComm 为空 -> 查询前提不满足，保守不命中
+    EXPECT_FALSE(CondPeerOnly(&eightRank, op)); // rankSize!=2 直接 false（peer_only.cc:38-44）
+    EXPECT_FALSE(CondPeerOnly(&twoRank, op));   // 无 comm 环境保守 false（真实链路走 ST）
+}
+
+TEST(ExtAlgRules, MachineFlagsAreMutuallyExclusive)
+{
+    TopoInfoWithNetLayerDetails flat = MakeFlatMesh1DTopo();
+    TopoInfoWithNetLayerDetails ubx = MakeUbxTopo();
+    TopoInfoWithNetLayerDetails pcie = MakePcieMixTopo();
+    TopoInfoWithNetLayerDetails multi = MakeMultiLevelTopo();
+
+    EXPECT_FALSE(FlagPcieMix(&flat));
+    EXPECT_FALSE(FlagUbx(&flat));
+    EXPECT_FALSE(FlagMultiLevel(&flat));
+    EXPECT_TRUE(FlagFlat1D(&flat));
+
+    EXPECT_TRUE(FlagUbx(&ubx));
+    EXPECT_FALSE(FlagPcieMix(&ubx));
+    EXPECT_FALSE(FlagFlat1D(&ubx));
+
+    EXPECT_TRUE(FlagPcieMix(&pcie));
+    EXPECT_FALSE(FlagUbx(&pcie));
+
+    EXPECT_TRUE(FlagMultiLevel(&multi));
+    EXPECT_FALSE(FlagUbx(&multi));
+    // multi 的 level0Topo=MESH_1D != MESH_1D_CLOS，按 FlagFlat1D 谓词语义应为 true
+    EXPECT_TRUE(FlagFlat1D(&multi));
+}
+
+TEST(ExtAlgRules, EngineMatchMatrix)
+{
+    OpParam op = MakeOpParam();
+    op.engine = CommEngine::COMM_ENGINE_CPU; // HostDPUOnly
+    EXPECT_TRUE(EngineMatch(AlgEngine::DPU, op));
+    EXPECT_FALSE(EngineMatch(AlgEngine::AICPU, op));
+    EXPECT_FALSE(EngineMatch(AlgEngine::CCU, op));
+
+    op.engine = CommEngine::COMM_ENGINE_AICPU_TS;
+    EXPECT_TRUE(EngineMatch(AlgEngine::AICPU, op));
+    EXPECT_FALSE(EngineMatch(AlgEngine::DPU, op));
+    op.engine = CommEngine::COMM_ENGINE_AICPU;
+    EXPECT_TRUE(EngineMatch(AlgEngine::AICPU, op));
+
+    op.engine = CommEngine::COMM_ENGINE_CCU;
+    EXPECT_TRUE(EngineMatch(AlgEngine::CCU, op));
+    EXPECT_FALSE(EngineMatch(AlgEngine::AICPU, op));
 }
