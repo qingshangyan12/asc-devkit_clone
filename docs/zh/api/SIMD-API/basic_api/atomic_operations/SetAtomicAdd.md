@@ -106,9 +106,9 @@ __aicore__ inline void SetAtomicAdd()
 - 该接口执行前不会自动清零GM数据。开发者需根据算子逻辑判断是否清零，如需清零，请在执行前手动完成。
 - SetAtomicAdd内部已集成与[SetAtomicType](SetAtomicType.md)相同的功能。建议调用上述接口时，通过设置模板参数显式指定原子操作的数据类型，无需额外调用SetAtomicType接口。
 <!-- npu="A3,910b" id13 -->
-<a name="npu_smi_saturation_mode"></a>
+<a id="npu_smi_saturation_mode"></a>
 
-- 针对[NPU架构版本2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)，整数类型（int8_t、int16_t、int32_t）和bfloat16_t数据类型**默认均为非饱和模式**，原子累加的饱和模式无法通过[SetSaturationStrategy](../special_register_access/SetSaturationStrategy.md)或[SetCtrlSpr](../special_register_access/SetCtrlSpr_ISASI.md)设置，需要通过`npu-smi`命令进行设备级设置，各产品及部署场景的支持情况以对应产品的《npu-smi命令参考》为准。
+- 针对[NPU架构版本2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)，整数类型和bfloat16_t数据类型**默认均为非饱和模式**，原子累加的饱和模式无法通过[SetSaturationStrategy](../special_register_access/SetSaturationStrategy.md)或[SetCtrlSpr](../special_register_access/SetCtrlSpr_ISASI.md)设置，需要通过`npu-smi`命令进行设备级设置，各产品及部署场景的支持情况以对应产品的《npu-smi命令参考》为准。
 
     - 整数类型：设置饱和模式（溢出值饱和为目标数据类型的最大值或最小值）或截断模式（即非饱和模式，溢出值保留低位、舍弃高位，默认为非饱和模式）。
 
