@@ -16,11 +16,8 @@
 
 namespace mc2_ops_hccl {
 
-CcuResult CcuKfcAllToAllMesh1DMultiJettyKernel(
-    ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable sliceSize,
-    ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset, ccu::Variable goSize0,
-    ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3, const ChannelHandle channels[],
-    uint32_t channelCount, uint32_t rankSize, uint32_t rankId);
+CcuResult CcuKfcAllToAllMesh1DMultiJettyKernel(CcuKernelArg arg);
+CcuResult CcuKfcAllToAllClos1DMultiJettyKernel(CcuKernelArg arg);
 
 } // namespace mc2_ops_hccl
 
