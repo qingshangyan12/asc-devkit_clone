@@ -75,7 +75,6 @@ __aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData2D
 }
 #endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 
-
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams)
@@ -160,7 +159,6 @@ __aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData2D
     LoadData2DL12L0BCal(dst, src, loadDataParams);
 }
 #endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
-
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
                               (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
