@@ -2586,7 +2586,9 @@ class TestCompileOp(unittest.TestCase):
                 kernel_type_backend_module, "_gen_non_mix_sub_json", return_value=None
             ):
                 with mock.patch.object(
-                    kernel_type_backend_module, "_dynamic_kernel_list_to_json", return_value=None
+                    kernel_type_backend_module,
+                    "_dynamic_kernel_list_to_json",
+                    return_value=None,
                 ):
                     _compile_ascendc_cce_m510(
                         compile_info, compile_option_tuple, tiling_info
@@ -2626,7 +2628,9 @@ class TestCompileOp(unittest.TestCase):
                 kernel_type_backend_module, "_gen_non_mix_sub_json", return_value=None
             ):
                 with mock.patch.object(
-                    kernel_type_backend_module, "_dynamic_kernel_list_to_json", return_value=None
+                    kernel_type_backend_module,
+                    "_dynamic_kernel_list_to_json",
+                    return_value=None,
                 ):
                     _compile_ascendc_cce_m510(
                         compile_info, compile_option_tuple, tiling_info
@@ -4436,7 +4440,9 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
         )
         arch = "dav-m300"
 
-        from asc_op_compile_base.asc_op_compiler.ascendc_compile_regbase import _call_bisheng_regbase
+        from asc_op_compile_base.asc_op_compiler.ascendc_compile_regbase import (
+            _call_bisheng_regbase,
+        )
 
         os.mknod(compile_info.gen_kernel_func_file)
         with (
@@ -4853,7 +4859,9 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
                 return_value=["bisheng", "-o", "/tmp/typed_record_kernel_7.o"],
             ),
             mock.patch.object(
-                kernel_type_backend_module, "get_compile_target_options", return_value=()
+                kernel_type_backend_module,
+                "get_compile_target_options",
+                return_value=(),
             ),
             mock.patch.object(
                 kernel_type_backend_module,
@@ -4905,7 +4913,9 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
             mock.patch.object(
                 kernel_type_backend_module, "call_bisheng_v220", return_value=["7"]
             ),
-            mock.patch.object(kernel_type_backend_module, "set_soc_spec") as set_soc_spec_mock,
+            mock.patch.object(
+                kernel_type_backend_module, "set_soc_spec"
+            ) as set_soc_spec_mock,
         ):
             kernel_type_backend_module._compile_ascendc_cce_v220(
                 compile_info, compile_option_tuple, tiling_info
@@ -5864,10 +5874,14 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
                         compile_info, compile_option_tuple, tiling_info
                     )
                     with mock.patch.object(
-                        kernel_type_backend_module, "call_bisheng_v220", return_value=["1"]
+                        kernel_type_backend_module,
+                        "call_bisheng_v220",
+                        return_value=["1"],
                     ):
                         with mock.patch.object(
-                            kernel_type_backend_module, "fatbin_objs", return_value=["1"]
+                            kernel_type_backend_module,
+                            "fatbin_objs",
+                            return_value=["1"],
                         ):
                             tiling_info.static_shape_flag = False
                             compile_info.code_channel = CORE_TYPE_MIX

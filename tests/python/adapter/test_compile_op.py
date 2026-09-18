@@ -1654,7 +1654,9 @@ class TestCompileOp(unittest.TestCase):
                 kernel_type_backend_module, "_gen_non_mix_sub_json", return_value=None
             ):
                 with mock.patch.object(
-                    kernel_type_backend_module, "_dynamic_kernel_list_to_json", return_value=None
+                    kernel_type_backend_module,
+                    "_dynamic_kernel_list_to_json",
+                    return_value=None,
                 ):
                     _compile_ascendc_cce_m510(
                         compile_info, compile_option_tuple, tiling_info
@@ -1692,7 +1694,9 @@ class TestCompileOp(unittest.TestCase):
                 kernel_type_backend_module, "_gen_non_mix_sub_json", return_value=None
             ):
                 with mock.patch.object(
-                    kernel_type_backend_module, "_dynamic_kernel_list_to_json", return_value=None
+                    kernel_type_backend_module,
+                    "_dynamic_kernel_list_to_json",
+                    return_value=None,
                 ):
                     _compile_ascendc_cce_m510(
                         compile_info, compile_option_tuple, tiling_info
@@ -4640,10 +4644,14 @@ Contents of section
                         compile_info, compile_option_tuple, tiling_info
                     )
                     with mock.patch.object(
-                        kernel_type_backend_module, "call_bisheng_v220", return_value=["1"]
+                        kernel_type_backend_module,
+                        "call_bisheng_v220",
+                        return_value=["1"],
                     ):
                         with mock.patch.object(
-                            kernel_type_backend_module, "fatbin_objs", return_value=["1"]
+                            kernel_type_backend_module,
+                            "fatbin_objs",
+                            return_value=["1"],
                         ):
                             tiling_info.static_shape_flag = False
                             compile_info.code_channel = CORE_TYPE_MIX
