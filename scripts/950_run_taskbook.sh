@@ -331,7 +331,7 @@ MX_CASES=(
   "load_data_2dmx_l12l0:4" "load_data_2dmx_l12l0:5" "load_data_2dmx_l12l0:6"
 )
 TASKBOOK_CASES=(
-  "mmad:1" "mmad:2" "mmad:3"
+  "mmad:1" "mmad:2" "mmad:3" "mmad:5"
   "fixpipe_l0c2gm:1" "fixpipe_l0c2gm:2" "fixpipe_l0c2gm:3" "fixpipe_l0c2gm:4"
   "fixpipe_l0c2gm:5" "fixpipe_l0c2gm:6" "fixpipe_l0c2gm:7"
   "load_data_2dv2_l12l0:1" "load_data_2dv2_l12l0:2" "load_data_2dv2_l12l0:3"

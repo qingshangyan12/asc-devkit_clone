@@ -64,6 +64,14 @@ def gen_golden_data(scenario_num=1, m=30, n=40, k=70):
         )
         x1_gm = x1_gm.transpose()
         x2_gm = x2_gm.transpose()
+    elif scenario_num == 5:
+        # half input, float output; A no-trans, B trans (like load_data_2dv2 s3)
+        x1_gm = np.random.uniform(1, 10, [m, k]).astype(np.float16)
+        x2_gm = np.random.uniform(1, 10, [k, n]).astype(np.float16)
+        golden = np.matmul(
+            x1_gm.astype(np.float32), x2_gm.astype(np.float32)
+        ).astype(np.float32)
+        x2_gm = x2_gm.transpose()
     else:
         x1_gm_int8 = np.random.randint(1, 7, [m, k]).astype(np.int8)
         x2_gm_int8 = np.random.randint(1, 7, [k, n]).astype(np.int8)
@@ -100,7 +108,7 @@ def gen_golden_data(scenario_num=1, m=30, n=40, k=70):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 5))
+    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 6))
     parser.add_argument("-M", type=int, default=30)
     parser.add_argument("-N", type=int, default=40)
     parser.add_argument("-K", type=int, default=70)

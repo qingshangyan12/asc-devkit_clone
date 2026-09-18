@@ -23,7 +23,7 @@ error_tol = 1e-4
 
 
 def verify_result(scenario_num, output, golden):
-    if scenario_num in [2, 3]:
+    if scenario_num in [2, 3, 5]:
         output_type = np.float32
     else:
         output_type = np.int32
@@ -37,7 +37,7 @@ def verify_result(scenario_num, output, golden):
         real_index = different_element_indexes[index]
         golden_data = golden[real_index]
         output_data = output[real_index]
-        if scenario_num in [2, 3]:
+        if scenario_num in [2, 3, 5]:
             print(
                 "data index: %06d, expected: %-.9f, actual: %-.9f, rdiff: %-.6f"
                 % (
@@ -66,7 +66,7 @@ def verify_result(scenario_num, output, golden):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 5))
+    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 6))
     parser.add_argument("-M", type=int, default=30)
     parser.add_argument("-N", type=int, default=40)
     parser.add_argument("-K", type=int, default=70)

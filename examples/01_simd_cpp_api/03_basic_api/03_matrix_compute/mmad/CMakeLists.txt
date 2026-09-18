@@ -20,9 +20,9 @@ add_executable(demo
     mmad.asc
 )
 
-set(SCENARIO_NUM "1" CACHE STRING "SCENARIO_NUM, e.g. 1 2 3 4")
-if(NOT SCENARIO_NUM MATCHES "^[1-4]$")
-    message(FATAL_ERROR "SCENARIO_NUM must be 1, 2, 3 or 4, but got ${SCENARIO_NUM}")
+set(SCENARIO_NUM "1" CACHE STRING "SCENARIO_NUM, e.g. 1 2 3 4 5")
+if(NOT SCENARIO_NUM MATCHES "^[1-5]$")
+    message(FATAL_ERROR "SCENARIO_NUM must be 1, 2, 3, 4 or 5, but got ${SCENARIO_NUM}")
 endif()
 
 if(SCENARIO_NUM STREQUAL "4" AND CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510")
