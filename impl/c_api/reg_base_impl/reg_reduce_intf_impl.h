@@ -20,6 +20,10 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#include "impl/c_api/reg_base_impl/npu_arch_9201/reg_reduce_intf_impl.h"
+#endif
+
 __simd_callee__ inline void asc_reduce_max(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
