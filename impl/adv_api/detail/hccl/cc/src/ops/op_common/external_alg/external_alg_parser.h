@@ -65,7 +65,8 @@ struct ExternalAlgSpec {
 // tiling algConfig 四态识别（纯函数，改造点①的底座；tiling 闸门 A 与 mc2 侧共用）:
 //   空串 -> NONE
 //   含 '=' -> LEGACY（HCCL_ALGO 老语法，保持现状拒绝语义，由调用方走默认 selector）
-//   含 '[' -> EXTERNAL（解析成功: spec 有效/errMsg 空; 解析失败: spec 无效/errMsg 给出词法错误）
+//   含 '[' -> EXTERNAL（解析成功: spec 有效/errMsg 空; 解析失败: errMsg 给出词法错误；ParseExternalAlg 失败时
+//   spec 为部分解析残留（调用方不得使用），ClassifyForcedAlgConfig 层面已保证失败时 spec 复位无效）
 //   其余 -> BARE_NAME（裸注册名，现状语义逐字节保留）
 enum class ForcedAlgKind { NONE, LEGACY, EXTERNAL, BARE_NAME };
 
@@ -212,7 +213,9 @@ inline ForcedAlgKind ClassifyForcedAlgConfig(
         return ForcedAlgKind::LEGACY;
     }
     if (algConfig.find('[') != std::string::npos) {
-        (void)ParseExternalAlg(algConfig, spec, errMsg); // 失败时 spec 无效、errMsg 非空
+        if (!ParseExternalAlg(algConfig, spec, errMsg)) {
+            spec = ExternalAlgSpec(); // 失败时保证 spec 无效，调用方不得使用
+        }
         return ForcedAlgKind::EXTERNAL;
     }
     bareName = algConfig;

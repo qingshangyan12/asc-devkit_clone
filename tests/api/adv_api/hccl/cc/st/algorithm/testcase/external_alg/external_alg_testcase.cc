@@ -99,6 +99,10 @@ TEST(ExtAlgParser, IllegalNamesAreRejectedWithReason)
         {"sole[mesh] [order.weak]", "suffix"},
         {"parallel[mesh,nhr]]", "suffix"},
         {"sole[mesh.two_shot.chunk.chunk]", ""},
+        {"sole[mesh.]", "empty token"}, // 点号结尾
+        {"[mesh]", "executor"},         // 空 executor
+        {"sole[,,]", "empty layer"},    // 重复逗号
+        {"\t", "empty"},                // 纯空白
     };
     for (const Case& c : cases) {
         ExternalAlgSpec spec;
