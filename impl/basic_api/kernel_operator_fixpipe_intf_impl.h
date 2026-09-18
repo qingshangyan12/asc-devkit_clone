@@ -171,6 +171,18 @@ __aicore__ inline void Fixpipe(
 #endif // ASCENDC_CPU_DEBUG
 }
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+                              __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+/* [CUBE-PTR-PR1] Fixpipe L0C→GM (FixpipeParamsV220) — Jessicaruan PR-1 */
+template <typename T, typename U, const FixpipeConfig& config>
+__aicore__ inline void Fixpipe(__gm__ T* dst, __cc__ U* src, const FixpipeParamsV220& intriParams)
+{
+    FixpipeL0C2GMImpl<PrimT<T>, PrimT<U>, config>(dst, src, intriParams);
+}
+#endif // V220 arches
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
+
 // L0C->GM deq tensor quant
 template <
     typename T, typename U, const FixpipeConfig& config, typename S,
@@ -267,6 +279,16 @@ __aicore__ inline void Fixpipe(
     }
 #endif // ASCENDC_CPU_DEBUG
 }
+
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-PR1] Fixpipe L0C→GM (FixpipeParamsArch3510) — Jessicaruan PR-1 */
+template <typename T, typename U, const FixpipeConfig& config>
+__aicore__ inline void Fixpipe(__gm__ T* dst, __cc__ U* src, const FixpipeParamsArch3510<config.format>& intriParams)
+{
+    // Bare __gm__: no ExtractCacheMode; cacheMode=0 (see usability note / Issue #1686)
+    FixpipeL0C2GMImpl<PrimT<T>, PrimT<U>, config>(dst, src, intriParams, 0);
+}
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 
 // L0C->GM deq tensor quant
 template <typename T, typename U, const FixpipeConfig& config>

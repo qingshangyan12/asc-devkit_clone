@@ -68,6 +68,15 @@ template <typename T>
 __aicore__ inline void LoadData(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2DParams& loadDataParams);
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-PR0] LoadData 2D L1(__cbuf__) -> L0A/L0B — Jessicaruan PR-0 */
+template <typename T>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParams);
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
+
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams);
@@ -92,6 +101,15 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadData(
 template <typename T>
 __aicore__ inline void LoadData(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2DParamsV2& loadDataParams);
+
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-PR0-V2] LoadData 2DV2 L1(__cbuf__) -> L0A/L0B — Jessicaruan PR-0 */
+template <typename T>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParams);
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
@@ -285,6 +303,18 @@ __aicore__ inline void LoadDataWithTranspose(
 template <typename T, typename U, typename S>
 __aicore__ inline void Mmad(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const MmadParams& mmadParams);
+
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-PR1] Mmad L0A×L0B→L0C — Jessicaruan PR-1 */
+template <typename T, typename U, typename S>
+__aicore__ inline void Mmad(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadParams& mmadParams);
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+/* BiasTable (__biasbuf__) — not available on dav-2002 / host_check_npu_2002 */
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void Mmad(
+    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __biasbuf__ V* bias, const MmadParams& mmadParams);
+#endif // __NPU_ARCH__ 2201|3510|5102
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(
