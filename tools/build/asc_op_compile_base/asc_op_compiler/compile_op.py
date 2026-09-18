@@ -2054,6 +2054,9 @@ def compile_op_common_part(
             compile_info, op_info, compile_option_tuple, tiling_info
         )
 
+        # The Resource ID covers the inputs of the final link.
+        kernel_spec.generate_resource_id(compile_info)
+
         # link kernel obj
         link_kernel_obj(compile_info, op_info, tiling_info)
 
@@ -2115,8 +2118,6 @@ def compile_op_common_part(
                 "ascendc_sk_sub_combine_norm_workflow", False
             )
             DFXSectionGenerator().update_is_support(op_info)
-
-        kernel_spec.attach_resource_id()
 
         # generate opinfo json
         _json_post_process(
