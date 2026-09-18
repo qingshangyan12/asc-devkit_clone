@@ -152,14 +152,7 @@ __simd_callee__ inline void asc_exp_sub_v2(vector_float& dst, vector_half src0, 
 ASC_DEPRECATED(9.1.0, "2027/09/07", asc_exp_sub)
 __simd_callee__ inline void asc_exp_sub_v2(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
 
-//=================asc_fma (for 9201, void dst-ref overload)==================
-__simd_callee__ inline void asc_fma(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
-
-__simd_callee__ inline void asc_fma(
-    vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
-
-__simd_callee__ inline void asc_fma(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
-
+//=================asc_fma (for 9201)==================
 __simd_callee__ inline vector_half asc_fma(vector_half src0, vector_half src1, vector_bool mask);
 
 __simd_callee__ inline vector_bfloat16_t asc_fma(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
@@ -167,13 +160,6 @@ __simd_callee__ inline vector_bfloat16_t asc_fma(vector_bfloat16_t src0, vector_
 __simd_callee__ inline vector_float asc_fma(vector_float src0, vector_float src1, vector_bool mask);
 
 //=================asc_fms==================
-__simd_callee__ inline void asc_fms(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
-
-__simd_callee__ inline void asc_fms(
-    vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
-
-__simd_callee__ inline void asc_fms(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
-
 __simd_callee__ inline vector_half asc_fms(vector_half src0, vector_half src1, vector_bool mask);
 
 __simd_callee__ inline vector_bfloat16_t asc_fms(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
@@ -181,13 +167,6 @@ __simd_callee__ inline vector_bfloat16_t asc_fms(vector_bfloat16_t src0, vector_
 __simd_callee__ inline vector_float asc_fms(vector_float src0, vector_float src1, vector_bool mask);
 
 //=================asc_fnma==================
-__simd_callee__ inline void asc_fnma(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
-
-__simd_callee__ inline void asc_fnma(
-    vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
-
-__simd_callee__ inline void asc_fnma(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
-
 __simd_callee__ inline vector_half asc_fnma(vector_half src0, vector_half src1, vector_bool mask);
 
 __simd_callee__ inline vector_bfloat16_t asc_fnma(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
@@ -195,13 +174,6 @@ __simd_callee__ inline vector_bfloat16_t asc_fnma(vector_bfloat16_t src0, vector
 __simd_callee__ inline vector_float asc_fnma(vector_float src0, vector_float src1, vector_bool mask);
 
 //=================asc_fnms==================
-__simd_callee__ inline void asc_fnms(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
-
-__simd_callee__ inline void asc_fnms(
-    vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
-
-__simd_callee__ inline void asc_fnms(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
-
 __simd_callee__ inline vector_half asc_fnms(vector_half src0, vector_half src1, vector_bool mask);
 
 __simd_callee__ inline vector_bfloat16_t asc_fnms(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
