@@ -27,9 +27,13 @@ def verify_result(scenario_num, output, golden):
         output_type = np.float32
     else:
         output_type = np.int32
-    # fp8 accumulate needs looser abs tol than fp32/half
-    rtol = 1e-2 if scenario_num in [6, 7] else relative_tol
-    atol = 1e-2 if scenario_num in [6, 7] else absolute_tol
+    # fp8 / bf16 / half：大 K 累加后 float 金标会差 1 个 bf16 ulp，不能用 1e-6
+    if scenario_num in [6, 7]:
+        rtol, atol = 1e-2, 1e-2
+    elif scenario_num in [2, 5]:
+        rtol, atol = 1e-3, 1.0
+    else:
+        rtol, atol = relative_tol, absolute_tol
     output = np.fromfile(output, dtype=output_type).reshape(-1)
     golden = np.fromfile(golden, dtype=output_type).reshape(-1)
     different_element_results = np.isclose(

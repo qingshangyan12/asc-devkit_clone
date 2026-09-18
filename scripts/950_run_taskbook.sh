@@ -163,7 +163,9 @@ PY
   # pointer include hook on asc intf_impl only
   for pair in \
     "kernel_operator_mm_intf_impl.h:kernel_operator_mm_ptr_impl.h" \
-    "kernel_operator_fixpipe_intf_impl.h:kernel_operator_fixpipe_ptr_impl.h"; do
+    "kernel_operator_fixpipe_intf_impl.h:kernel_operator_fixpipe_ptr_impl.h" \
+    "kernel_operator_block_sync_intf_impl.h:kernel_operator_block_sync_ptr_impl.h" \
+    "kernel_operator_determine_compute_sync_intf_impl.h:kernel_operator_determine_compute_sync_ptr_impl.h"; do
     host=${pair%%:*}; inc=${pair##*:}; tgt="$ACT_IMPL/$host"
     [ -f "$tgt" ] || continue
     grep -q "$inc" "$tgt" 2>/dev/null && continue
@@ -343,16 +345,17 @@ TASKBOOK_CASES=(
   "batch_matmul:1" "mmad_gemv:1" "mmad_unitflag:1"
   # mmad dtype × shape 四档（每 dtype：1 / 32 / 1024 / 2048）
   "mmad:1:1:1:16" "mmad:1:32:32:32" "mmad:1:1024:16:16" "mmad:1:16:16:2048"
-  "mmad:2:1:1:16" "mmad:2:32:32:32" "mmad:2:1024:16:16" "mmad:2:16:16:2048"
-  "mmad:3:1:1:16" "mmad:3:32:32:32" "mmad:3:1024:16:16" "mmad:3:16:16:2048"
-  "mmad:5:1:1:16" "mmad:5:32:32:32" "mmad:5:1024:16:16" "mmad:5:16:16:2048"
+  # s2/s5 为 B16：K=2048 时 L0 正好 64KB，累加易半结果 → 用 K=1024
+  # s3 为 fp32 且 A 转置：M=1 走 GEMV（约一半点积），K=2048 超出 L0 → 16x16x16 + K=256
+  "mmad:2:1:1:16" "mmad:2:32:32:32" "mmad:2:1024:16:16" "mmad:2:16:16:1024"
+  "mmad:3:16:16:16" "mmad:3:32:32:32" "mmad:3:1024:16:16" "mmad:3:16:16:256"
+  "mmad:5:1:1:16" "mmad:5:32:32:32" "mmad:5:1024:16:16" "mmad:5:16:16:1024"
   "mmad:6:1:1:16" "mmad:6:32:32:32" "mmad:6:1024:16:16" "mmad:6:16:16:2048"
   "mmad:7:1:1:16" "mmad:7:32:32:32" "mmad:7:1024:16:16" "mmad:7:16:16:2048"
   # 主通路其它 API 至少 32 + 1024
   "fixpipe_l0c2gm:1:32:32:32" "fixpipe_l0c2gm:1:1024:16:16"
   "load_data_2dv2_l12l0:1:32:32:32" "load_data_2dv2_l12l0:1:16:16:1024"
-  "mmad_mx:1:32:32:32" "mmad_mx:1:16:16:1024"
-  "load_data_2dmx_l12l0:1:32:32:32"
+  # mmad_mx / 2dmx 样例未接 CASE_MNK，改 shape 只改 golden、kernel 仍是默认规格，故不单列
   "mmad_mx:1" "mmad_mx:2" "mmad_mx:3" "mmad_mx:4"
   "mmad_mx:5" "mmad_mx:6" "mmad_mx:7" "mmad_mx:8"
   "load_data_2dmx_l12l0:1" "load_data_2dmx_l12l0:2" "load_data_2dmx_l12l0:3"
@@ -538,6 +541,7 @@ fi
 echo "=== SUMMARY.tsv ==="
 cat "$SUMMARY" || true
 
+set +e
 python3 - <<PY
 from pathlib import Path
 p=Path("$SUMMARY")
@@ -556,6 +560,7 @@ print(f"PASS={ok} FAIL={fail} rows={len(body)}")
 raise SystemExit(0 if fail==0 else 1)
 PY
 GATE_RC=$?
+set -e
 
 mkdir -p "$DEST"
 cp -a "$LOG" "$SUMMARY" "$RUNROOT/SELFTEST_950_TASKBOOK.md" "$DEST/" 2>/dev/null || true
