@@ -20,175 +20,111 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
-__simd_callee__ inline void asc_fma(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vfma(dst, src0, src1, mask, MODE_ZEROING);
-    }
-}
-
-__simd_callee__ inline void asc_fma(
-    vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vfma(dst, src0, src1, mask, MODE_ZEROING);
-    }
-}
-
-__simd_callee__ inline void asc_fma(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vfma(dst, src0, src1, mask, MODE_ZEROING);
-    }
-}
-
 __simd_callee__ inline vector_half asc_fma(vector_half src0, vector_half src1, vector_bool mask)
 {
     vector_half dst;
-    asc_fma(dst, src0, src1, mask);
+    if ASC_IS_AIV {
+        vfma(dst, src0, src1, mask, MODE_ZEROING);
+    }
     return dst;
 }
 
 __simd_callee__ inline vector_bfloat16_t asc_fma(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
     vector_bfloat16_t dst;
-    asc_fma(dst, src0, src1, mask);
+    if ASC_IS_AIV {
+        vfma(dst, src0, src1, mask, MODE_ZEROING);
+    }
     return dst;
 }
 
 __simd_callee__ inline vector_float asc_fma(vector_float src0, vector_float src1, vector_bool mask)
 {
     vector_float dst;
-    asc_fma(dst, src0, src1, mask);
+    if ASC_IS_AIV {
+        vfma(dst, src0, src1, mask, MODE_ZEROING);
+    }
     return dst;
-}
-
-__simd_callee__ inline void asc_fms(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vfnms(dst, src0, src1, mask, MODE_ZEROING);
-    }
-}
-
-__simd_callee__ inline void asc_fms(
-    vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vfnms(dst, src0, src1, mask, MODE_ZEROING);
-    }
-}
-
-__simd_callee__ inline void asc_fms(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vfnms(dst, src0, src1, mask, MODE_ZEROING);
-    }
 }
 
 __simd_callee__ inline vector_half asc_fms(vector_half src0, vector_half src1, vector_bool mask)
 {
     vector_half dst;
-    asc_fms(dst, src0, src1, mask);
+    if ASC_IS_AIV {
+        vfnms(dst, src0, src1, mask, MODE_ZEROING);
+    }
     return dst;
 }
 
 __simd_callee__ inline vector_bfloat16_t asc_fms(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
     vector_bfloat16_t dst;
-    asc_fms(dst, src0, src1, mask);
+    if ASC_IS_AIV {
+        vfnms(dst, src0, src1, mask, MODE_ZEROING);
+    }
     return dst;
 }
 
 __simd_callee__ inline vector_float asc_fms(vector_float src0, vector_float src1, vector_bool mask)
 {
     vector_float dst;
-    asc_fms(dst, src0, src1, mask);
+    if ASC_IS_AIV {
+        vfnms(dst, src0, src1, mask, MODE_ZEROING);
+    }
     return dst;
-}
-
-__simd_callee__ inline void asc_fnma(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vfms(dst, src0, src1, mask, MODE_ZEROING);
-    }
-}
-
-__simd_callee__ inline void asc_fnma(
-    vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vfms(dst, src0, src1, mask, MODE_ZEROING);
-    }
-}
-
-__simd_callee__ inline void asc_fnma(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vfms(dst, src0, src1, mask, MODE_ZEROING);
-    }
 }
 
 __simd_callee__ inline vector_half asc_fnma(vector_half src0, vector_half src1, vector_bool mask)
 {
     vector_half dst;
-    asc_fnma(dst, src0, src1, mask);
+    if ASC_IS_AIV {
+        vfms(dst, src0, src1, mask, MODE_ZEROING);
+    }
     return dst;
 }
 
 __simd_callee__ inline vector_bfloat16_t asc_fnma(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
     vector_bfloat16_t dst;
-    asc_fnma(dst, src0, src1, mask);
+    if ASC_IS_AIV {
+        vfms(dst, src0, src1, mask, MODE_ZEROING);
+    }
     return dst;
 }
 
 __simd_callee__ inline vector_float asc_fnma(vector_float src0, vector_float src1, vector_bool mask)
 {
     vector_float dst;
-    asc_fnma(dst, src0, src1, mask);
+    if ASC_IS_AIV {
+        vfms(dst, src0, src1, mask, MODE_ZEROING);
+    }
     return dst;
-}
-
-__simd_callee__ inline void asc_fnms(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vfnma(dst, src0, src1, mask, MODE_ZEROING);
-    }
-}
-
-__simd_callee__ inline void asc_fnms(
-    vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vfnma(dst, src0, src1, mask, MODE_ZEROING);
-    }
-}
-
-__simd_callee__ inline void asc_fnms(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vfnma(dst, src0, src1, mask, MODE_ZEROING);
-    }
 }
 
 __simd_callee__ inline vector_half asc_fnms(vector_half src0, vector_half src1, vector_bool mask)
 {
     vector_half dst;
-    asc_fnms(dst, src0, src1, mask);
+    if ASC_IS_AIV {
+        vfnma(dst, src0, src1, mask, MODE_ZEROING);
+    }
     return dst;
 }
 
 __simd_callee__ inline vector_bfloat16_t asc_fnms(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
     vector_bfloat16_t dst;
-    asc_fnms(dst, src0, src1, mask);
+    if ASC_IS_AIV {
+        vfnma(dst, src0, src1, mask, MODE_ZEROING);
+    }
     return dst;
 }
 
 __simd_callee__ inline vector_float asc_fnms(vector_float src0, vector_float src1, vector_bool mask)
 {
     vector_float dst;
-    asc_fnms(dst, src0, src1, mask);
+    if ASC_IS_AIV {
+        vfnma(dst, src0, src1, mask, MODE_ZEROING);
+    }
     return dst;
 }
 
