@@ -98,7 +98,7 @@ sequence[mesh, nhr]         # 两层串行
 
 ## 2. 配置方式
 
-外部算法名通过HCCL Tiling配置类`Mc2CcTilingConfig`的`algConfig`参数传入，与裸名强制算法为同一入口。`algConfig`为字符串类型，支持的最大长度为128字节，可通过[构造函数](../api/SIMD-API/adv_api/HCCL_communication/HCCL_Tiling/HCCL_Tiling_constructor.md)的第3个参数或[SetAlgConfig](../api/SIMD-API/adv_api/HCCL_communication/HCCL_Tiling/SetAlgConfig.md)接口设置。
+外部算法名通过HCCL Tiling配置类`Mc2CcTilingConfig`的`algConfig`参数传入，与裸名强制算法为同一入口。`algConfig`为字符串类型，支持的最大长度为128字节，可通过[构造函数](../../api/SIMD-API/adv_api/HCCL_communication/HCCL_Tiling/HCCL_Tiling_constructor.md)的第3个参数或[SetAlgConfig](../../api/SIMD-API/adv_api/HCCL_communication/HCCL_Tiling/SetAlgConfig.md)接口设置。
 
 ```cpp
 const char* groupName = "testGroup";
@@ -114,7 +114,7 @@ AscendC::Mc2CcTilingConfig mc2CcTilingConfig(groupName, opType, algConfig);
 | algConfig内容 | 识别结果 | 行为 |
 | --- | --- | --- |
 | 空字符串 | 未配置 | 走自动选路 |
-| 含`=` | 老语法（如`ReduceScatter=level0:fullmesh`） | 按老语义走默认选路，不强制具体算法 |
+| 含`=` | 老语法（如`ReduceScatter=level0:fullmesh`） | AICPU链走默认选路，不强制具体算法；CCU链报算法不支持（历来如此） |
 | 含`[` | 外部算法名 | 按第1章语法解析并消歧，失败即报错 |
 | 其余 | 裸注册名 | 直接强制指定该注册名（原有语义不变） |
 
@@ -151,7 +151,7 @@ AscendC::Mc2CcTilingConfig mc2CcTilingConfig(groupName, opType, algConfig);
 | --- | --- |
 | `FLAG_MULTI_LEVEL` | 组网层数大于1且第0层为1D Mesh |
 | `FLAG_UBX` | 第0层为1D CLOS且非PCIE混联 |
-| `FLAG_PCIE_MIX` | 第0层为1D CLOS且PCIE混联且非全互联 |
+| `FLAG_PCIE_MIX` | 第0层为1D CLOS且PCIE混联，且第0层无法由单一1D Mesh全覆盖 |
 | `FLAG_FLAT_1D` | 第0层不是1D CLOS（仅AllToAll裸名使用） |
 
 ### 3.3 确定性原则
@@ -247,7 +247,7 @@ AscendC::Mc2CcTilingConfig mc2CcTilingConfig(groupName, opType, algConfig);
 
 ### 4.3 日志格式与示例
 
-相关日志均以`[MC2_EXT_ALG]`为前缀。失败日志统一包含三要素：**外部名原文**（algConfig）、**候选列表或已定名**（algName）、**失败原因**（哪一级、什么约束）。
+相关日志均以`[MC2_EXT_ALG]`为前缀。失败日志包含**外部名原文**（algConfig）与**失败原因**（哪一级、什么约束）；候选列表或已定名（algName）信息按场景给出——解析失败时无候选可言，CCU链预检拒绝时给出CCU候选计数。
 
 注意：日志中的op/opType为算子类型枚举（HcclCMDType）的数值，常用取值：2=ALLREDUCE、6=ALLGATHER、7=REDUCE_SCATTER、8=ALLTOALLV、10=ALLTOALL。
 
@@ -301,7 +301,7 @@ CCU链预检拒绝（WARNING级，随后整体报算法不支持）——第一�
 | algConfig内容 | 当前版本行为 | 旧版本行为 |
 | --- | --- | --- |
 | 空字符串 | 自动选路 | 自动选路（一致） |
-| 老语法（含`=`） | 按老语义走默认选路 | 一致 |
+| 老语法（含`=`） | AICPU链走默认选路；CCU链报算法不支持（历来如此，与外部名行为相同） | 一致 |
 | 裸注册名 | 裸名强制算法（保持原有资源预检与回退语义） | 一致 |
 | 外部名（含`[`） | 解析并消歧为唯一注册名，失败按第4章报错 | 整串按裸名处理：AICPU链因该名字未注册而回退自动选路；CCU链报算法不支持 |
 
