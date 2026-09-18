@@ -361,25 +361,23 @@ TASKBOOK_CASES=(
   # core precision
   "mmad:1" "mmad:2" "mmad:3" "mmad:4"
   "fixpipe_l0c2gm:1" "fixpipe_l0c2gm:2" "fixpipe_l0c2gm:4"
+  "fixpipe_l0c2gm:5" "fixpipe_l0c2gm:6" "fixpipe_l0c2gm:7"
   "load_data_l12l0:1" "load_data_l12l0:6" "load_data_l12l0:11"
   "fixpipe_l0c2l1:1" "mmad_load3dv2:1" "mmad_unitflag:1"
   "batch_matmul:1" "mmad_gemv:1"
-  # task-book shapes on mmad s1
-  "mmad:1:1:1:16"
-  "mmad:1:1:16:16"
-  "mmad:1:32:32:32"
-  "mmad:1:128:128:128"
-  "mmad:1:1024:16:16"
-  "mmad:1:16:16:1024"
-  "mmad:1:32:32:1024"
-  # 2048：探针显示 M=2048 单次 L1 易炸；K=2048 精度 PASS（任务书 shape 等价缩放）
-  "mmad:1:16:16:2048"
-  # same shapes on load_data / fixpipe where CASE_MNK supported
+  # §3.2 shapes：mmad 全 dtype（1/32/1024/2048 等价缩放；s3 DN 仅 3510 不在此列）
+  "mmad:1:1:1:16" "mmad:1:1:16:16" "mmad:1:32:32:32" "mmad:1:128:128:128"
+  "mmad:1:1024:16:16" "mmad:1:16:16:1024" "mmad:1:32:32:1024" "mmad:1:16:16:2048"
+  "mmad:2:1:1:16" "mmad:2:32:32:32" "mmad:2:1024:16:16" "mmad:2:16:16:2048"
+  "mmad:3:1:1:16" "mmad:3:32:32:32" "mmad:3:1024:16:16" "mmad:3:16:16:2048"
+  "mmad:4:1:1:16" "mmad:4:32:32:32" "mmad:4:1024:16:16" "mmad:4:16:16:2048"
+  # load_data / fixpipe 至少 32 + 1024
   "load_data_l12l0:1:32:32:32"
   "load_data_l12l0:1:16:16:1024"
   "fixpipe_l0c2gm:1:32:32:32"
   "fixpipe_l0c2gm:1:64:64:64"
   "fixpipe_l0c2gm:1:1024:16:16"
+  "fixpipe_l0c2gm:1:16:16:2048"
 )
 
 echo "CASE_COUNT=${#TASKBOOK_CASES[@]} MODE=$MODE"
@@ -395,6 +393,8 @@ done
 # dual-path: Tensor regression vs pointer
 run_dual_path "mmad" 1
 run_dual_path "mmad" 1 32 32 32
+run_dual_path "mmad" 2
+run_dual_path "mmad" 4
 run_dual_path "fixpipe_l0c2gm" 1
 run_dual_path "load_data_l12l0" 1
 

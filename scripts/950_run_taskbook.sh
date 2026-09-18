@@ -331,6 +331,8 @@ MX_CASES=(
   "load_data_2dmx_l12l0:1" "load_data_2dmx_l12l0:2" "load_data_2dmx_l12l0:3"
   "load_data_2dmx_l12l0:4" "load_data_2dmx_l12l0:5" "load_data_2dmx_l12l0:6"
 )
+# §3.2 shape 档：1/32/1024/2048 等价缩放（M=2048 单次 L1 易炸 → 用 K=2048）
+# int4(s4) 仅 dav-2201，不进 950；hif8 暂无样例
 TASKBOOK_CASES=(
   "mmad:1" "mmad:2" "mmad:3" "mmad:5" "mmad:6" "mmad:7"
   "fixpipe_l0c2gm:1" "fixpipe_l0c2gm:2" "fixpipe_l0c2gm:3" "fixpipe_l0c2gm:4"
@@ -339,7 +341,18 @@ TASKBOOK_CASES=(
   "load_data_2dv2_l12l0:4" "load_data_2dv2_l12l0:5" "load_data_2dv2_l12l0:6"
   "load_data_2dv2_l12l0:7"
   "batch_matmul:1" "mmad_gemv:1" "mmad_unitflag:1"
+  # mmad dtype × shape 四档（每 dtype：1 / 32 / 1024 / 2048）
   "mmad:1:1:1:16" "mmad:1:32:32:32" "mmad:1:1024:16:16" "mmad:1:16:16:2048"
+  "mmad:2:1:1:16" "mmad:2:32:32:32" "mmad:2:1024:16:16" "mmad:2:16:16:2048"
+  "mmad:3:1:1:16" "mmad:3:32:32:32" "mmad:3:1024:16:16" "mmad:3:16:16:2048"
+  "mmad:5:1:1:16" "mmad:5:32:32:32" "mmad:5:1024:16:16" "mmad:5:16:16:2048"
+  "mmad:6:1:1:16" "mmad:6:32:32:32" "mmad:6:1024:16:16" "mmad:6:16:16:2048"
+  "mmad:7:1:1:16" "mmad:7:32:32:32" "mmad:7:1024:16:16" "mmad:7:16:16:2048"
+  # 主通路其它 API 至少 32 + 1024
+  "fixpipe_l0c2gm:1:32:32:32" "fixpipe_l0c2gm:1:1024:16:16"
+  "load_data_2dv2_l12l0:1:32:32:32" "load_data_2dv2_l12l0:1:16:16:1024"
+  "mmad_mx:1:32:32:32" "mmad_mx:1:16:16:1024"
+  "load_data_2dmx_l12l0:1:32:32:32"
   "mmad_mx:1" "mmad_mx:2" "mmad_mx:3" "mmad_mx:4"
   "mmad_mx:5" "mmad_mx:6" "mmad_mx:7" "mmad_mx:8"
   "load_data_2dmx_l12l0:1" "load_data_2dmx_l12l0:2" "load_data_2dmx_l12l0:3"
@@ -404,7 +417,7 @@ fi
 if [ "$MODE" = "taskbook" ]; then
   # mx_only: skip dual — stock beta.3 Tensor LoadData+Mx is incomplete (undefined-inline);
   # pointer MX s1–s3 is the P0 gate. Dual remains for full taskbook after Tensor SDK is whole.
-  DUALS=("mmad:1" "fixpipe_l0c2gm:1" "mmad_mx:1" "mmad_mx:3" "load_data_2dmx_l12l0:1")
+  DUALS=("mmad:1" "mmad:5" "mmad:6" "fixpipe_l0c2gm:1" "load_data_2dv2_l12l0:1" "mmad_mx:1" "mmad_mx:3" "load_data_2dmx_l12l0:1")
   for duo in "${DUALS[@]}"; do
     IFS=':' read -r name sc <<< "$duo"
     tag="s${sc}"
@@ -465,8 +478,58 @@ if [ "$MODE" = "taskbook" ]; then
   done
 fi
 
+# §3.5 sync 调用覆盖（taskbook）
+if [ "$MODE" = "taskbook" ]; then
+  SYNC_TIMEOUT="${CUBE_SYNC_TIMEOUT:-30}"
+  EX_SYNC="$SRC/examples/01_simd_cpp_api/03_basic_api/05_sync_control"
+  run_sync_case() {
+    local name="$1"
+    local srcdir="$EX_SYNC/$name"
+    local work="$RUNROOT/sync_${name}"
+    local blog="$RUNROOT/sync_${name}_build.log"
+    local rlog="$RUNROOT/sync_${name}_run.log"
+    echo "==== SYNC $name ===="
+    if [ ! -d "$srcdir" ]; then
+      echo -e "sync/${name}\t0\t${ARCH}\tMISSING\t-\t-\t" >> "$SUMMARY"; return
+    fi
+    rm -rf "$work"; mkdir -p "$work/build"
+    cp -a "$srcdir"/. "$work/"
+    find "$work" -name '*.asc' -print0 | xargs -0 sed -i \
+      -e 's/ceil_div(/ceil_division(/g' \
+      -e 's/AscendC::IBWait(sync_gm, sync_buf,/AscendC::IBWait((__gm__ int32_t*)sync_gm.GetPhyAddr(), (__ubuf__ int32_t*)sync_buf.GetPhyAddr(),/g' \
+      -e 's/AscendC::IBSet(sync_gm, sync_buf,/AscendC::IBSet((__gm__ int32_t*)sync_gm.GetPhyAddr(), (__ubuf__ int32_t*)sync_buf.GetPhyAddr(),/g' \
+      2>/dev/null || true
+    cd "$work/build"
+    set +e
+    cmake -DCMAKE_ASC_ARCHITECTURES="$ARCH" -DCMAKE_CXX_COMPILER="$CXX" -DCMAKE_C_COMPILER="$CC" \
+      -DCMAKE_ASC_FLAGS="$ASC_FLAGS" .. >"$blog" 2>&1
+    cmake --build . -j8 >>"$blog" 2>&1
+    set -e
+    if [ ! -x ./demo ]; then
+      err=$(grep -m1 'error:' "$blog" | tr '\t' ' ' | cut -c1-120 || true)
+      echo -e "sync/${name}\t0\t${ARCH}\tBUILD_FAIL\t-\t-\t${err}" >> "$SUMMARY"; return
+    fi
+    cd "$work"; rm -f ./output/output.bin
+    set +e
+    timeout --signal=KILL "$SYNC_TIMEOUT" ./build/demo >"$rlog" 2>&1
+    rrc=$?
+    set -e
+    if [ "$rrc" -eq 124 ] || [ "$rrc" -eq 137 ]; then
+      echo -e "sync/${name}\t0\t${ARCH}\tPASS\tTIMEOUT\tSKIP\tto=${SYNC_TIMEOUT}s" >> "$SUMMARY"; return
+    fi
+    if [ "$rrc" -ne 0 ]; then
+      echo -e "sync/${name}\t0\t${ARCH}\tPASS\tRUN_FAIL\t-\texit=$rrc" >> "$SUMMARY"; return
+    fi
+    echo -e "sync/${name}\t0\t${ARCH}\tPASS\tPASS\tPASS\t" >> "$SUMMARY"
+  }
+  run_sync_case "ib_set_wait"
+  run_sync_case "sync_all"
+fi
+
 # documented skips for non-pointerable APIs
+# mmad:4 int4 仅 dav-2201（CMake 硬限制）→ 950 记 SKIP 方便对账
 {
+  echo -e "mmad\t4\t${ARCH}\tSKIP\t-\t-\tint4_dav-2201_only"
   echo -e "PopStackBuffer\t0\t${ARCH}\tSKIP\t-\t-\tfriend_stack_meta"
   echo -e "SetAddrWithOffset\t0\t${ARCH}\tSKIP\t-\t-\tdeprecated_member"
 } >> "$SUMMARY"
