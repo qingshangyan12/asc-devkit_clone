@@ -23,21 +23,24 @@ error_tol = 1e-4
 
 
 def verify_result(scenario_num, output, golden):
-    if scenario_num in [2, 3, 5]:
+    if scenario_num in [2, 3, 5, 6, 7]:
         output_type = np.float32
     else:
         output_type = np.int32
+    # fp8 accumulate needs looser abs tol than fp32/half
+    rtol = 1e-2 if scenario_num in [6, 7] else relative_tol
+    atol = 1e-2 if scenario_num in [6, 7] else absolute_tol
     output = np.fromfile(output, dtype=output_type).reshape(-1)
     golden = np.fromfile(golden, dtype=output_type).reshape(-1)
     different_element_results = np.isclose(
-        output, golden, rtol=relative_tol, atol=absolute_tol, equal_nan=True
+        output, golden, rtol=rtol, atol=atol, equal_nan=True
     )
     different_element_indexes = np.where(different_element_results == False)[0]
     for index in range(len(different_element_indexes)):
         real_index = different_element_indexes[index]
         golden_data = golden[real_index]
         output_data = output[real_index]
-        if scenario_num in [2, 3, 5]:
+        if scenario_num in [2, 3, 5, 6, 7]:
             print(
                 "data index: %06d, expected: %-.9f, actual: %-.9f, rdiff: %-.6f"
                 % (
@@ -66,7 +69,7 @@ def verify_result(scenario_num, output, golden):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 6))
+    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 8))
     parser.add_argument("-M", type=int, default=30)
     parser.add_argument("-N", type=int, default=40)
     parser.add_argument("-K", type=int, default=70)

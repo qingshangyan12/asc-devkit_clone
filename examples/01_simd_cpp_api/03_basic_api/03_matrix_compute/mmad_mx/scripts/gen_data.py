@@ -105,6 +105,12 @@ def gen_golden_data_fp4(scenario_num, m, n, k):
     elif scenario_num == 2:
         a_dtype = fp4_e2m1
         b_dtype = fp4_e1m2
+    elif scenario_num == 7:
+        a_dtype = fp4_e1m2
+        b_dtype = fp4_e1m2
+    elif scenario_num == 8:
+        a_dtype = fp4_e2m1
+        b_dtype = fp4_e2m1
     else:
         raise ValueError(f"Invalid scenario_num {scenario_num} for FP4")
 
@@ -123,7 +129,7 @@ def gen_golden_data_fp4(scenario_num, m, n, k):
     golden = np.matmul(x1_full.astype(np.float64), x2_full.astype(np.float64)).astype(
         np.float32
     )
-    if scenario_num == 2:
+    if scenario_num in (2, 8):
         bias_gm = np.random.randint(-10, 10, [n]).astype(np.float32)
         golden = golden + bias_gm
         bias_gm.tofile("./input/bias_gm.bin")
@@ -156,6 +162,12 @@ def gen_golden_data_fp8(scenario_num, m, n, k):
     elif scenario_num == 4:
         a_dtype = fp8_e5m2
         b_dtype = fp8_e4m3
+    elif scenario_num == 5:
+        a_dtype = fp8_e4m3
+        b_dtype = fp8_e4m3
+    elif scenario_num == 6:
+        a_dtype = fp8_e5m2
+        b_dtype = fp8_e5m2
     else:
         raise ValueError(f"Invalid scenario_num {scenario_num} for FP8")
 
@@ -174,7 +186,7 @@ def gen_golden_data_fp8(scenario_num, m, n, k):
     golden = np.matmul(x1_full.astype(np.float64), x2_full.astype(np.float64)).astype(
         np.float32
     )
-    if scenario_num == 3:
+    if scenario_num in (3, 5):
         golden = (
             np.matmul(x1_full.astype(np.float64), x2_full.astype(np.float64)).astype(
                 np.float32
@@ -202,7 +214,7 @@ if __name__ == "__main__":
 
     m, n, k = 40, 50, 70
     parser = argparse.ArgumentParser()
-    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 5))
+    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 9))
     parser.add_argument("-M", type=int, default=m)
     parser.add_argument("-N", type=int, default=n)
     parser.add_argument("-K", type=int, default=k)
@@ -217,9 +229,9 @@ if __name__ == "__main__":
     scenario_num = args.scenarioNum
     m, n, k = args.M, args.N, args.K
 
-    if scenario_num in [1, 2]:
+    if scenario_num in [1, 2, 7, 8]:
         gen_golden_data_fp4(scenario_num, m, n, k)
-    elif scenario_num in [3, 4]:
+    elif scenario_num in [3, 4, 5, 6]:
         gen_golden_data_fp8(scenario_num, m, n, k)
     else:
         raise ValueError(f"Invalid scenario_num {scenario_num}")

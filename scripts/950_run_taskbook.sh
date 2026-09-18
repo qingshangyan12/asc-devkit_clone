@@ -327,11 +327,12 @@ run_case() {
 # P0 dtype/format coverage (sample scenarios + runner-only gaps closed)
 MX_CASES=(
   "mmad_mx:1" "mmad_mx:2" "mmad_mx:3" "mmad_mx:4"
+  "mmad_mx:5" "mmad_mx:6" "mmad_mx:7" "mmad_mx:8"
   "load_data_2dmx_l12l0:1" "load_data_2dmx_l12l0:2" "load_data_2dmx_l12l0:3"
   "load_data_2dmx_l12l0:4" "load_data_2dmx_l12l0:5" "load_data_2dmx_l12l0:6"
 )
 TASKBOOK_CASES=(
-  "mmad:1" "mmad:2" "mmad:3" "mmad:5"
+  "mmad:1" "mmad:2" "mmad:3" "mmad:5" "mmad:6" "mmad:7"
   "fixpipe_l0c2gm:1" "fixpipe_l0c2gm:2" "fixpipe_l0c2gm:3" "fixpipe_l0c2gm:4"
   "fixpipe_l0c2gm:5" "fixpipe_l0c2gm:6" "fixpipe_l0c2gm:7"
   "load_data_2dv2_l12l0:1" "load_data_2dv2_l12l0:2" "load_data_2dv2_l12l0:3"
@@ -340,6 +341,7 @@ TASKBOOK_CASES=(
   "batch_matmul:1" "mmad_gemv:1" "mmad_unitflag:1"
   "mmad:1:1:1:16" "mmad:1:32:32:32" "mmad:1:1024:16:16" "mmad:1:16:16:2048"
   "mmad_mx:1" "mmad_mx:2" "mmad_mx:3" "mmad_mx:4"
+  "mmad_mx:5" "mmad_mx:6" "mmad_mx:7" "mmad_mx:8"
   "load_data_2dmx_l12l0:1" "load_data_2dmx_l12l0:2" "load_data_2dmx_l12l0:3"
   "load_data_2dmx_l12l0:4" "load_data_2dmx_l12l0:5" "load_data_2dmx_l12l0:6"
 )

@@ -258,7 +258,7 @@ Mmad计算中包含了补齐的无效数据，需要配合Fixpipe指令在L0C搬
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim`、`cpu` | 运行模式：NPU运行、NPU仿真、CPU调试 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品/Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` |  `1`（默认）、`2`、`3`、`4`、`5` | 场景编号：int8_t / bfloat16 / float / int4b_t / **half**；`4` 仅 `dav-2201`；`5` 支持 dav-2201 与 dav-3510 |
+  | `SCENARIO_NUM` |  `1`…`7` | 场景：int8 / bf16 / float / int4 / half / fp8_e4m3fn / fp8_e5m2；`4` 仅 `dav-2201`；`5` 双架构；`6`/`7` 仅 `dav-3510` |
 
 - 执行结果
 

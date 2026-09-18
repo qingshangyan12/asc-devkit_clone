@@ -27,6 +27,18 @@ def bf16_u16_to_f32(u16):
     return u32.view(np.float32)
 
 
+def _fp8_dtypes():
+    try:
+        import ml_dtypes
+
+        return ml_dtypes.float8_e4m3fn, ml_dtypes.float8_e5m2
+    except ImportError as e:
+        raise SystemExit(
+            "FP8 golden requires ml_dtypes==0.2.0 "
+            "(pip install ml_dtypes==0.2.0)."
+        ) from e
+
+
 def gen_golden_data(scenario_num=1, m=30, n=40, k=70):
     if scenario_num == 1:
         x1_gm = np.random.randint(1, 10, [m, k]).astype(np.int8)
@@ -72,6 +84,16 @@ def gen_golden_data(scenario_num=1, m=30, n=40, k=70):
             x1_gm.astype(np.float32), x2_gm.astype(np.float32)
         ).astype(np.float32)
         x2_gm = x2_gm.transpose()
+    elif scenario_num in (6, 7):
+        # non-MX fp8: A no-trans, B trans, float C, no bias (dav-3510)
+        fp8_e4m3, fp8_e5m2 = _fp8_dtypes()
+        a_dtype = fp8_e4m3 if scenario_num == 6 else fp8_e5m2
+        x1_gm = np.random.uniform(1, 10, [m, k]).astype(a_dtype)
+        x2_gm = np.random.uniform(1, 10, [k, n]).astype(a_dtype)
+        golden = np.matmul(
+            x1_gm.astype(np.float32), x2_gm.astype(np.float32)
+        ).astype(np.float32)
+        x2_gm = x2_gm.transpose()
     else:
         x1_gm_int8 = np.random.randint(1, 7, [m, k]).astype(np.int8)
         x2_gm_int8 = np.random.randint(1, 7, [k, n]).astype(np.int8)
@@ -108,7 +130,7 @@ def gen_golden_data(scenario_num=1, m=30, n=40, k=70):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 6))
+    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 8))
     parser.add_argument("-M", type=int, default=30)
     parser.add_argument("-N", type=int, default=40)
     parser.add_argument("-K", type=int, default=70)
