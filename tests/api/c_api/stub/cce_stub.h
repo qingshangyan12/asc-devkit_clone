@@ -13,6 +13,29 @@
 #include "stub_fun.h"
 #include "c_api/defs/enum.h"
 
+// The compiler supports these types and conversions, but they are missing from the CPU debug stub header.
+// Keep them before any conditional include of c_api/defs/type.h in this file.
+namespace float8_e6m2 {
+struct Fp8e6m2T {
+    uint8_t val;
+};
+} // namespace float8_e6m2
+using fp8_e6m2_t = float8_e6m2::Fp8e6m2T;
+using vector_f8e6m2 = std::array<fp8_e6m2_t, ConstantsInternal::b8EleSize>;
+
+inline void vcvt(
+    vector_f8e4m3& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
+{}
+inline void vcvt(
+    vector_f8e5m2& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
+{}
+inline void vcvt_bf162e6m2(
+    vector_f8e6m2& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2)
+{}
+inline void vcvt_bf162e8m0(
+    vector_f8e8m0& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
+{}
+
 template <typename C, typename A, typename B>
 inline void mad(
     __cc__ C* c_matrix, __ca__ A* a_matrix, __cb__ B* b_matrix, uint16_t left_height, uint16_t n_dim,
