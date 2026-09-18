@@ -79,6 +79,363 @@ __simd_callee__ inline void asc_or(vector_float& dst, vector_float src0, vector_
     }
 }
 
+__simd_callee__ inline void asc_shiftleft_scalar(
+    vector_uint8_t& dst, vector_uint8_t src, int16_t shift, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vshls(dst, src, shift, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_shiftleft_scalar(vector_int8_t& dst, vector_int8_t src, int16_t shift, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vshls(dst, src, shift, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_shiftleft_scalar(
+    vector_uint16_t& dst, vector_uint16_t src, int16_t shift, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vshls(dst, src, shift, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_shiftleft_scalar(
+    vector_int16_t& dst, vector_int16_t src, int16_t shift, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vshls(dst, src, shift, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_shiftleft_scalar(
+    vector_uint32_t& dst, vector_uint32_t src, int16_t shift, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vshls(dst, src, shift, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_shiftleft_scalar(
+    vector_int32_t& dst, vector_int32_t src, int16_t shift, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vshls(dst, src, shift, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline vector_uint8_t asc_shiftleft_scalar(vector_uint8_t src, int16_t shift, vector_bool mask)
+{
+    vector_uint8_t dst;
+    asc_shiftleft_scalar(dst, src, shift, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_int8_t asc_shiftleft_scalar(vector_int8_t src, int16_t shift, vector_bool mask)
+{
+    vector_int8_t dst;
+    asc_shiftleft_scalar(dst, src, shift, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_uint16_t asc_shiftleft_scalar(vector_uint16_t src, int16_t shift, vector_bool mask)
+{
+    vector_uint16_t dst;
+    asc_shiftleft_scalar(dst, src, shift, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_int16_t asc_shiftleft_scalar(vector_int16_t src, int16_t shift, vector_bool mask)
+{
+    vector_int16_t dst;
+    asc_shiftleft_scalar(dst, src, shift, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_uint32_t asc_shiftleft_scalar(vector_uint32_t src, int16_t shift, vector_bool mask)
+{
+    vector_uint32_t dst;
+    asc_shiftleft_scalar(dst, src, shift, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_int32_t asc_shiftleft_scalar(vector_int32_t src, int16_t shift, vector_bool mask)
+{
+    vector_int32_t dst;
+    asc_shiftleft_scalar(dst, src, shift, mask);
+    return dst;
+}
+
+__simd_callee__ inline void asc_shiftright_scalar(
+    vector_uint8_t& dst, vector_uint8_t src, int16_t shift, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vshrs(dst, src, shift, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_shiftright_scalar(
+    vector_int8_t& dst, vector_int8_t src, int16_t shift, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vshrs(dst, src, shift, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_shiftright_scalar(
+    vector_uint16_t& dst, vector_uint16_t src, int16_t shift, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vshrs(dst, src, shift, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_shiftright_scalar(
+    vector_int16_t& dst, vector_int16_t src, int16_t shift, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vshrs(dst, src, shift, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_shiftright_scalar(
+    vector_uint32_t& dst, vector_uint32_t src, int16_t shift, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vshrs(dst, src, shift, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_shiftright_scalar(
+    vector_int32_t& dst, vector_int32_t src, int16_t shift, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vshrs(dst, src, shift, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline vector_uint8_t asc_shiftright_scalar(vector_uint8_t src, int16_t shift, vector_bool mask)
+{
+    vector_uint8_t dst;
+    asc_shiftright_scalar(dst, src, shift, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_int8_t asc_shiftright_scalar(vector_int8_t src, int16_t shift, vector_bool mask)
+{
+    vector_int8_t dst;
+    asc_shiftright_scalar(dst, src, shift, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_uint16_t asc_shiftright_scalar(vector_uint16_t src, int16_t shift, vector_bool mask)
+{
+    vector_uint16_t dst;
+    asc_shiftright_scalar(dst, src, shift, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_int16_t asc_shiftright_scalar(vector_int16_t src, int16_t shift, vector_bool mask)
+{
+    vector_int16_t dst;
+    asc_shiftright_scalar(dst, src, shift, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_uint32_t asc_shiftright_scalar(vector_uint32_t src, int16_t shift, vector_bool mask)
+{
+    vector_uint32_t dst;
+    asc_shiftright_scalar(dst, src, shift, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_int32_t asc_shiftright_scalar(vector_int32_t src, int16_t shift, vector_bool mask)
+{
+    vector_int32_t dst;
+    asc_shiftright_scalar(dst, src, shift, mask);
+    return dst;
+}
+
+__simd_callee__ inline void asc_shiftleft(
+    vector_uint8_t& dst, vector_uint8_t src, vector_int8_t shift, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vshl(dst, src, shift, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_shiftleft(vector_int8_t& dst, vector_int8_t src, vector_int8_t shift, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vshl(dst, src, shift, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_shiftleft(
+    vector_uint16_t& dst, vector_uint16_t src, vector_int16_t shift, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vshl(dst, src, shift, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_shiftleft(
+    vector_int16_t& dst, vector_int16_t src, vector_int16_t shift, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vshl(dst, src, shift, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_shiftleft(
+    vector_uint32_t& dst, vector_uint32_t src, vector_int32_t shift, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vshl(dst, src, shift, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_shiftleft(
+    vector_int32_t& dst, vector_int32_t src, vector_int32_t shift, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vshl(dst, src, shift, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline vector_uint8_t asc_shiftleft(vector_uint8_t src, vector_int8_t shift, vector_bool mask)
+{
+    vector_uint8_t dst;
+    asc_shiftleft(dst, src, shift, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_int8_t asc_shiftleft(vector_int8_t src, vector_int8_t shift, vector_bool mask)
+{
+    vector_int8_t dst;
+    asc_shiftleft(dst, src, shift, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_uint16_t asc_shiftleft(vector_uint16_t src, vector_int16_t shift, vector_bool mask)
+{
+    vector_uint16_t dst;
+    asc_shiftleft(dst, src, shift, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_int16_t asc_shiftleft(vector_int16_t src, vector_int16_t shift, vector_bool mask)
+{
+    vector_int16_t dst;
+    asc_shiftleft(dst, src, shift, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_uint32_t asc_shiftleft(vector_uint32_t src, vector_int32_t shift, vector_bool mask)
+{
+    vector_uint32_t dst;
+    asc_shiftleft(dst, src, shift, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_int32_t asc_shiftleft(vector_int32_t src, vector_int32_t shift, vector_bool mask)
+{
+    vector_int32_t dst;
+    asc_shiftleft(dst, src, shift, mask);
+    return dst;
+}
+
+__simd_callee__ inline void asc_shiftright(
+    vector_uint8_t& dst, vector_uint8_t src, vector_int8_t shift, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vshr(dst, src, shift, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_shiftright(vector_int8_t& dst, vector_int8_t src, vector_int8_t shift, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vshr(dst, src, shift, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_shiftright(
+    vector_uint16_t& dst, vector_uint16_t src, vector_int16_t shift, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vshr(dst, src, shift, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_shiftright(
+    vector_int16_t& dst, vector_int16_t src, vector_int16_t shift, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vshr(dst, src, shift, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_shiftright(
+    vector_uint32_t& dst, vector_uint32_t src, vector_int32_t shift, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vshr(dst, src, shift, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_shiftright(
+    vector_int32_t& dst, vector_int32_t src, vector_int32_t shift, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vshr(dst, src, shift, mask, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline vector_uint8_t asc_shiftright(vector_uint8_t src, vector_int8_t shift, vector_bool mask)
+{
+    vector_uint8_t dst;
+    asc_shiftright(dst, src, shift, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_int8_t asc_shiftright(vector_int8_t src, vector_int8_t shift, vector_bool mask)
+{
+    vector_int8_t dst;
+    asc_shiftright(dst, src, shift, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_uint16_t asc_shiftright(vector_uint16_t src, vector_int16_t shift, vector_bool mask)
+{
+    vector_uint16_t dst;
+    asc_shiftright(dst, src, shift, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_int16_t asc_shiftright(vector_int16_t src, vector_int16_t shift, vector_bool mask)
+{
+    vector_int16_t dst;
+    asc_shiftright(dst, src, shift, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_uint32_t asc_shiftright(vector_uint32_t src, vector_int32_t shift, vector_bool mask)
+{
+    vector_uint32_t dst;
+    asc_shiftright(dst, src, shift, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_int32_t asc_shiftright(vector_int32_t src, vector_int32_t shift, vector_bool mask)
+{
+    vector_int32_t dst;
+    asc_shiftright(dst, src, shift, mask);
+    return dst;
+}
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
