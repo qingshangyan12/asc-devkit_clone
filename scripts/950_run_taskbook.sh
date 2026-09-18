@@ -324,18 +324,24 @@ run_case() {
   echo "DONE $name $tag verify=$vstr"
 }
 
+# P0 dtype/format coverage (sample scenarios + runner-only gaps closed)
 MX_CASES=(
-  "mmad_mx:1" "mmad_mx:2" "mmad_mx:3"
+  "mmad_mx:1" "mmad_mx:2" "mmad_mx:3" "mmad_mx:4"
   "load_data_2dmx_l12l0:1" "load_data_2dmx_l12l0:2" "load_data_2dmx_l12l0:3"
+  "load_data_2dmx_l12l0:4" "load_data_2dmx_l12l0:5" "load_data_2dmx_l12l0:6"
 )
 TASKBOOK_CASES=(
   "mmad:1" "mmad:2" "mmad:3"
-  "fixpipe_l0c2gm:1" "fixpipe_l0c2gm:2"
-  "load_data_2dv2_l12l0:1" "load_data_2dv2_l12l0:3"
+  "fixpipe_l0c2gm:1" "fixpipe_l0c2gm:2" "fixpipe_l0c2gm:3" "fixpipe_l0c2gm:4"
+  "fixpipe_l0c2gm:5" "fixpipe_l0c2gm:6" "fixpipe_l0c2gm:7"
+  "load_data_2dv2_l12l0:1" "load_data_2dv2_l12l0:2" "load_data_2dv2_l12l0:3"
+  "load_data_2dv2_l12l0:4" "load_data_2dv2_l12l0:5" "load_data_2dv2_l12l0:6"
+  "load_data_2dv2_l12l0:7"
   "batch_matmul:1" "mmad_gemv:1" "mmad_unitflag:1"
   "mmad:1:1:1:16" "mmad:1:32:32:32" "mmad:1:1024:16:16" "mmad:1:16:16:2048"
-  "mmad_mx:1" "mmad_mx:2"
-  "load_data_2dmx_l12l0:1" "load_data_2dmx_l12l0:2"
+  "mmad_mx:1" "mmad_mx:2" "mmad_mx:3" "mmad_mx:4"
+  "load_data_2dmx_l12l0:1" "load_data_2dmx_l12l0:2" "load_data_2dmx_l12l0:3"
+  "load_data_2dmx_l12l0:4" "load_data_2dmx_l12l0:5" "load_data_2dmx_l12l0:6"
 )
 
 if [ "$MODE" = "mx_only" ]; then
@@ -396,7 +402,7 @@ fi
 if [ "$MODE" = "taskbook" ]; then
   # mx_only: skip dual — stock beta.3 Tensor LoadData+Mx is incomplete (undefined-inline);
   # pointer MX s1–s3 is the P0 gate. Dual remains for full taskbook after Tensor SDK is whole.
-  DUALS=("mmad:1" "fixpipe_l0c2gm:1" "mmad_mx:1")
+  DUALS=("mmad:1" "fixpipe_l0c2gm:1" "mmad_mx:1" "mmad_mx:3" "load_data_2dmx_l12l0:1")
   for duo in "${DUALS[@]}"; do
     IFS=':' read -r name sc <<< "$duo"
     tag="s${sc}"
