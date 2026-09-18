@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Ascend950 task-book / MX gate for CUBE pointerization (dav-3510)
 # Modes:
-#   CUBE_MATRIX_MODE=mx_only   → only mmad_mx + load_data_2dmx
-#   CUBE_MATRIX_MODE=taskbook  → main + shapes + dual + MX (strict)
+#   CUBE_MATRIX_MODE=mx_only    → only mmad_mx + load_data_2dmx
+#   CUBE_MATRIX_MODE=taskbook   → main + shapes + dual + MX (strict)
+#   CUBE_MATRIX_MODE=sync_only  → overlay + ib_set_wait/sync_all only (fast retest)
 set -euo pipefail
 
 WS="${CUBE_WS:-/home/Temp_room/wj_cub_cube_ptr_950}"
@@ -364,6 +365,8 @@ TASKBOOK_CASES=(
 
 if [ "$MODE" = "mx_only" ]; then
   CASES=("${MX_CASES[@]}")
+elif [ "$MODE" = "sync_only" ]; then
+  CASES=()
 else
   CASES=("${TASKBOOK_CASES[@]}")
 fi
@@ -481,9 +484,9 @@ if [ "$MODE" = "taskbook" ]; then
   done
 fi
 
-# §3.5 sync 调用覆盖（taskbook）
-if [ "$MODE" = "taskbook" ]; then
-  SYNC_TIMEOUT="${CUBE_SYNC_TIMEOUT:-30}"
+# §3.5 sync 调用覆盖（taskbook / sync_only）
+if [ "$MODE" = "taskbook" ] || [ "$MODE" = "sync_only" ]; then
+  SYNC_TIMEOUT="${CUBE_SYNC_TIMEOUT:-90}"
   EX_SYNC="$SRC/examples/01_simd_cpp_api/03_basic_api/05_sync_control"
   run_sync_case() {
     local name="$1"

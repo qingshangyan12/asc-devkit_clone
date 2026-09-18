@@ -24,6 +24,30 @@
 
 namespace AscendC {
 
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+__aicore__ inline void BlockSyncPtrCopyGm2Ub(__ubuf__ int32_t* dst, __gm__ int32_t* src)
+{
+    copy_gm_to_ubuf_align_v2(
+        static_cast<__ubuf__ int32_t*>(dst), static_cast<__gm__ int32_t*>(src), 0, 1, 32, 0, 0, false, 0, 32, 32);
+}
+
+__aicore__ inline void BlockSyncPtrCopyUb2Gm(__gm__ int32_t* dst, __ubuf__ int32_t* src)
+{
+    copy_ubuf_to_gm_align_v2(
+        static_cast<__gm__ int32_t*>(dst), static_cast<__ubuf__ int32_t*>(src), 0, 1, 32, 0, 32, 32);
+}
+#else
+__aicore__ inline void BlockSyncPtrCopyGm2Ub(__ubuf__ int32_t* dst, __gm__ int32_t* src)
+{
+    copy_gm_to_ubuf(static_cast<__ubuf__ void*>(dst), static_cast<__gm__ void*>(src), 0, 1, 1, 0, 0);
+}
+
+__aicore__ inline void BlockSyncPtrCopyUb2Gm(__gm__ int32_t* dst, __ubuf__ int32_t* src)
+{
+    copy_ubuf_to_gm(static_cast<__gm__ void*>(dst), static_cast<__ubuf__ void*>(src), 0, 1, 1, 0, 0);
+}
+#endif
+
 template <bool isAIVOnly = true>
 __aicore__ inline void SyncAll(
     __gm__ int32_t* gmWorkspace, __ubuf__ int32_t* ubWorkspace, const int32_t usedCores = 0)
@@ -57,8 +81,7 @@ __aicore__ inline void IBSet(
     pipe_barrier(PIPE_ALL);
 
     while (true) {
-        copy_gm_to_ubuf(
-            static_cast<__ubuf__ void*>(ubWorkspace), static_cast<__gm__ void*>(localSyncGM), 0, 1, 1, 0, 0);
+        BlockSyncPtrCopyGm2Ub(ubWorkspace, localSyncGM);
         event_t eventIdMte2ToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_S));
         SetFlag<HardEvent::MTE2_S>(eventIdMte2ToS);
         WaitFlag<HardEvent::MTE2_S>(eventIdMte2ToS);
@@ -67,8 +90,7 @@ __aicore__ inline void IBSet(
             event_t eventIdSToMte3 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_MTE3));
             SetFlag<HardEvent::S_MTE3>(eventIdSToMte3);
             WaitFlag<HardEvent::S_MTE3>(eventIdSToMte3);
-            copy_ubuf_to_gm(
-                static_cast<__gm__ void*>(localSyncGM), static_cast<__ubuf__ void*>(ubWorkspace), 0, 1, 1, 0, 0);
+            BlockSyncPtrCopyUb2Gm(localSyncGM, ubWorkspace);
             break;
         }
     }
@@ -100,8 +122,7 @@ __aicore__ inline void IBWait(
     pipe_barrier(PIPE_ALL);
 
     while (true) {
-        copy_gm_to_ubuf(
-            static_cast<__ubuf__ void*>(ubWorkspace), static_cast<__gm__ void*>(localSyncGM), 0, 1, 1, 0, 0);
+        BlockSyncPtrCopyGm2Ub(ubWorkspace, localSyncGM);
         event_t eventIdMte2ToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_S));
         SetFlag<HardEvent::MTE2_S>(eventIdMte2ToS);
         WaitFlag<HardEvent::MTE2_S>(eventIdMte2ToS);
@@ -110,8 +131,7 @@ __aicore__ inline void IBWait(
             event_t eventIdSToMte3 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_MTE3));
             SetFlag<HardEvent::S_MTE3>(eventIdSToMte3);
             WaitFlag<HardEvent::S_MTE3>(eventIdSToMte3);
-            copy_ubuf_to_gm(
-                static_cast<__gm__ void*>(localSyncGM), static_cast<__ubuf__ void*>(ubWorkspace), 0, 1, 1, 0, 0);
+            BlockSyncPtrCopyUb2Gm(localSyncGM, ubWorkspace);
             break;
         }
     }
