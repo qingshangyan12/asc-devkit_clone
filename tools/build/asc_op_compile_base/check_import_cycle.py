@@ -25,6 +25,7 @@ ascendc_compile_gen_code，立刻就会成环，而 Python 的循环 import 报�
     python3 tools/build/asc_op_compile_base/check_import_cycle.py
 退出码 0 表示无环。
 """
+
 import ast
 import glob
 import os
@@ -47,9 +48,9 @@ def build_graph(pkg_dir):
         for node in ast.walk(tree):
             if not isinstance(node, ast.ImportFrom) or not node.module:
                 continue
-            if node.level == 1:                       # from .xxx import ...
+            if node.level == 1:  # from .xxx import ...
                 deps.add(node.module.split(".")[0])
-            elif "asc_op_compiler." in node.module:   # 绝对路径写法
+            elif "asc_op_compiler." in node.module:  # 绝对路径写法
                 deps.add(node.module.split("asc_op_compiler.")[1].split(".")[0])
         graph[mod] = deps
     return graph
@@ -67,7 +68,7 @@ def find_cycles(graph):
             if nxt not in graph:
                 continue
             if state[nxt] == gray:
-                cycles.append(" -> ".join(path[path.index(nxt):] + [nxt]))
+                cycles.append(" -> ".join(path[path.index(nxt) :] + [nxt]))
             elif state[nxt] == white:
                 visit(nxt, path + [nxt])
         state[node] = black
@@ -95,9 +96,11 @@ def main():
         else:
             print(f"[OK] {pkg} 无 import 环")
     if failed:
-        print("\n新增的 import 让包内产生了环。"
-              "通常的解法是把被共用的那部分下沉到更底层的模块"
-              "（比如 ascendc_constants / ascendc_common_utility），而不是互相 import。")
+        print(
+            "\n新增的 import 让包内产生了环。"
+            "通常的解法是把被共用的那部分下沉到更底层的模块"
+            "（比如 ascendc_constants / ascendc_common_utility），而不是互相 import。"
+        )
     return 1 if failed else 0
 
 
