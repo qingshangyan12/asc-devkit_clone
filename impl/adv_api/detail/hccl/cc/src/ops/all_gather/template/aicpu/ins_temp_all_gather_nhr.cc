@@ -46,9 +46,9 @@ HcclResult InsTempAllGatherNHR::CalcRes(
         CHK_RET(CalcChannelRequestNhr(comm, param, topoInfo, subCommRanks_, myChannelDescs));
         level1Channels = myChannelDescs;
     }
-//     CHK_PRT_RET(
-//         level1Channels.empty(), HCCL_ERROR("[InsTempAllGatherNHR][CalcRes] level1Channels is empty."),
-//         HcclResult::HCCL_E_INTERNAL);
+    CHK_PRT_RET(
+        level1Channels.empty(), HCCL_ERROR("[InsTempAllGatherNHR][CalcRes] level1Channels is empty."),
+        HcclResult::HCCL_E_INTERNAL);
     resourceRequest.channels.push_back(level1Channels);
     channelsPerRank_ = CalcChannelsPerRankMin(level1Channels);
     maxChannelsPerRank_ = CalcChannelsPerRank(level1Channels);
