@@ -16,7 +16,7 @@
 #include <utility>
 #include <vector>
 
-#include "hccl_common.h" // HcclCMDType / HcclResult
+#include "hccl_types.h" // HcclCMDType / HcclResult
 
 namespace mc2_ops_hccl {
 
@@ -58,7 +58,7 @@ private:
 };
 
 // sidecar 注册宏（与 REGISTER_EXEC_V2 同款 static-init 套路，见
-// coll_alg_v2_exec_registry.h:43-45）。必须写在主注册同一条件编译块内，
+// coll_alg_v2_exec_registry.h:46-48）。必须写在主注册同一条件编译块内，
 // 保证 sidecar 与主注册同生共死（守卫天然同步）。
 #define REGISTER_ALG_META_HELPER(ctr, cmd, regName, engine, extName, condId, flagId) \
     static HcclResult g_alg_meta_##regName##_##ctr =                                 \

@@ -140,8 +140,10 @@ TEST(ExtAlgV2Registry, EnumerateRegisteredTags)
 {
     auto& registry = CollAlgExecRegistryV2::Instance();
     const std::vector<std::string> agTags = registry.GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLGATHER);
-    // AIC UT 目标 (-DAICPU_COMPILE) 下 AG 只注册 AICPU 侧 11 条（CcuSchedAllGatherSoleMesh 被
-    // #if 排除）；此断言同时防止枚举接口漏实现
+    // AIC UT 目标 (-DAICPU_COMPILE) 下 AG 只注册 AICPU 侧 8 条（3 条 CCU 注册被 #if 排除：
+    // CcuSchedAllGatherSoleMesh / CcuSchedAllGatherParallelMeshNHRMultiLink /
+    // CcuSchedAllGatherConcurMeshNHRMultiLink；omnipipe executor 未编入本目标）；
+    // 此断言同时防止枚举接口漏实现
     EXPECT_FALSE(agTags.empty());
     for (const std::string& tag : agTags) {
         EXPECT_TRUE(registry.IsRegistered(HcclCMDType::HCCL_CMD_ALLGATHER, tag)) << tag;
