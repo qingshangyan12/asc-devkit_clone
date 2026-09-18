@@ -79,18 +79,20 @@ Result CaptureCcuKfcReduceScatterNhrMultiLinkKernel(void* kernelArg)
         config.jettyNum == 0U) {
         return Result::PARAM_ERROR;
     }
-    std::array<AscendC::ccu::Variable, REDUCE_SCATTER_NHR_ML_TASK_ARG_COUNT> arguments;
-    for (uint32_t index = 0; index < arguments.size(); ++index) {
-        if (AscendC::ccu::LoadArg(arguments[index], index) != Result::SUCCESS) {
-            return Result::CONTRACT_ERROR;
-        }
-    }
     CompilerContext::Current().ConfigureProgram(config.rankId, config.rankSize, config.channels);
-    const CcuResult result = mc2_ops_hccl::CcuKfcReduceScatterNHR1DMultiJettyMem2MemKernel(
-        arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7],
-        arguments[8], arguments[9], config.channels.data(), static_cast<uint32_t>(config.channels.size()),
-        config.rankSize, config.rankId, config.jettyNum, config.dataType, config.outputType, config.reduceType,
-        config.stepInfoVector, config.rank2ChannelIdx);
+    mc2_ops_hccl::CcuKernelArgKfcReduceScatterNHR1DMultiJettyMem2Mem arg{};
+    arg.rankSize = config.rankSize;
+    arg.rankId = config.rankId;
+    arg.portNum = config.jettyNum;
+    arg.opParam.DataDes.dataType = config.dataType;
+    arg.opParam.DataDes.outputType = config.outputType;
+    arg.opParam.reduceType = config.reduceType;
+    std::strncpy(arg.opParam.algName, mc2_ops_hccl::KFC_RS_SOLE_NHR_ALG_NAME, sizeof(arg.opParam.algName) - 1);
+    arg.stepInfoVector = config.stepInfoVector;
+    arg.rank2ChannelIdx = config.rank2ChannelIdx;
+    arg.channelCount = static_cast<uint32_t>(config.channels.size());
+    std::copy(config.channels.begin(), config.channels.end(), arg.channels);
+    const CcuResult result = mc2_ops_hccl::CcuKfcReduceScatterNHR1DMultiJettyMem2MemKernel(&arg);
     return result == CCU_SUCCESS ? Result::SUCCESS : Result::CONTRACT_ERROR;
 }
 

@@ -11,6 +11,7 @@
 #include "hccl_ccu_res.h"
 #include "ccu_assist_pub.h"
 #include "ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem.h"
+#include "kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.h"
 
 namespace mc2_ops_hccl {
 
@@ -31,6 +32,13 @@ HcclResult CcuTempKfcReduceScatterMesh1DMem2Mem::CalcRes(
     CcuKernelInfo kernelInfo;
     CHK_SAFETY_FUNC_RET(strcpy_s(
         kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelKfcReduceScatterMesh1DMem2Mem"));
+    kernelInfo.kernelFunc = reinterpret_cast<void*>(CcuReduceScatterMesh1DMem2MemKernel);
+    auto kernelArg = std::make_shared<CcuKernelArgKfcReduceScatterMesh1DMem2Mem>();
+    kernelArg->rankSize = subCommRanks_[0].size();
+    kernelArg->rankId = mySubCommRank_;
+    kernelArg->opParam = param;
+    kernelArg->subCommRanks = subCommRanks_;
+    kernelInfo.setKernelArg(kernelArg);
 
     std::vector<HcclChannelDesc> channelDescs;
     // UBX（MESH_1D_CLOS，mesh/clos 同层）机型：CalcChannelRequestMesh1D 按协议逐链路建通道，会把每对端
@@ -50,14 +58,6 @@ HcclResult CcuTempKfcReduceScatterMesh1DMem2Mem::CalcRes(
         }
     }
 
-    auto kernelArg = std::make_shared<CcuKernelArgKfcReduceScatterMesh1DMem2Mem>();
-    kernelArg->rankSize = subCommRanks_[0].size();
-    kernelArg->rankId = mySubCommRank_;
-    kernelArg->opParam = param;
-    kernelArg->subCommRanks = subCommRanks_;
-    kernelInfo.setKernelArg(kernelArg);
-
-    // CcuKernelKfcServer replaces this placeholder before registration and reuses these Mesh1D channels.
     kernelInfo.channels = channelDescs;
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);
     return HcclResult::HCCL_SUCCESS;

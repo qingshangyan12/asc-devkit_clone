@@ -11,7 +11,9 @@
 #include "hccl_ccu_res.h"
 #include "ccu_assist_pub.h"
 #include "kfc_server_protocol.h"
+#include "ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem.h"
 #include "ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem_peer_only.h"
+#include "kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem_peer_only.h"
 
 namespace mc2_ops_hccl {
 
@@ -39,6 +41,13 @@ HcclResult CcuTempKfcReduceScatterMesh1DMem2MemPeerOnly::CalcRes(
     CcuKernelInfo kernelInfo;
     CHK_SAFETY_FUNC_RET(strcpy_s(
         kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), KFC_REDUCE_SCATTER_PEER_ONLY_KERNEL_NAME));
+    kernelInfo.kernelFunc = reinterpret_cast<void*>(CcuReduceScatterMeshMem2Mem1DPeerOnlyKernel);
+    auto kernelArg = std::make_shared<CcuKernelArgKfcReduceScatterMesh1DMem2Mem>();
+    kernelArg->rankSize = subCommRanks_[0].size();
+    kernelArg->rankId = mySubCommRank_;
+    kernelArg->opParam = param;
+    kernelArg->subCommRanks = subCommRanks_;
+    kernelInfo.setKernelArg(kernelArg);
 
     std::vector<HcclChannelDesc> channelDescs;
     CHK_RET(CalcChannelRequestMesh1D(comm, param, topoInfo, subCommRanks_, channelDescs));

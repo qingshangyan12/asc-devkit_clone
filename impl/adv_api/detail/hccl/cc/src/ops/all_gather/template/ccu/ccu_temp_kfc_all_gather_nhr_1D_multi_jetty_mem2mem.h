@@ -17,8 +17,6 @@
 
 namespace mc2_ops_hccl {
 
-constexpr uint32_t KFC_PARALLEL_ALL_GATHER_SUB_TYPE = 4U;
-
 // 只在 Host 上构建两阶段 CCU 程序时读取。运行时地址/长度仍从 XN 队列读取。
 struct KfcParallelAllGatherArg {
     uint32_t rankSizeLevel0 = 0;

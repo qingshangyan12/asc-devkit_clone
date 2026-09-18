@@ -50,6 +50,7 @@ HcclResult CcuTempAlltoAllVMesh1D::CalcRes(
     CcuKernelInfo kernelInfo{};
     CHK_SAFETY_FUNC_RET(
         strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelAlltoAllVMesh1D"));
+    kernelInfo.kernelFunc = reinterpret_cast<void*>(CcuAlltoAllVMesh1DKernel);
     std::vector<HcclChannelDesc> channelDescs;
     if (topoInfo->level0Topo != Level0Shape::MESH_1D_CLOS) {
         CHK_RET(CalcChannelRequestMesh1D(comm, param, topoInfo, subCommRanks_, channelDescs));
