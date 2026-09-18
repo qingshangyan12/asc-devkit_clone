@@ -180,3 +180,27 @@ TEST_F(DataCopyPadStrideBoundarySuite, DstStrideAtUpperBoundRaises)
 {
     ExpectDstStrideRaiseCount(STRIDE_UPPER_BOUND, 1);
 }
+
+TEST(DataCopyPadPointerSuite, NonAlignedGmUbRoundTrip)
+{
+    constexpr uint32_t elementCount = 5;
+    float srcGm[elementCount] = {1.0f, -2.0f, 3.5f, 4.0f, 9.25f};
+    float dstGm[elementCount] = {0.0f};
+    LocalTensor<float> local;
+    TBuffAddr localAddr;
+    localAddr.logicPos = static_cast<uint8_t>(TPosition::VECIN);
+    local.SetAddr(localAddr);
+    local.InitBuffer(0, 8);
+
+    auto ub = reinterpret_cast<__ubuf__ float*>(local.GetPhyAddr());
+    auto src = reinterpret_cast<__gm__ float*>(srcGm);
+    auto dst = reinterpret_cast<__gm__ float*>(dstGm);
+    DataCopyExtParams copyParams{1, elementCount * sizeof(float), 0, 0, 0};
+    DataCopyPadExtParams<float> padParams{false, 0, 0, 0.0f};
+    DataCopyPad(ub, src, copyParams, padParams);
+    DataCopyPad(dst, ub, copyParams);
+
+    for (uint32_t i = 0; i < elementCount; ++i) {
+        EXPECT_FLOAT_EQ(dstGm[i], srcGm[i]);
+    }
+}
