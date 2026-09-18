@@ -416,7 +416,11 @@ __aicore__ inline void DataCopy(
             CheckTensorAlign<T>(
                 src, ONE_BLK_SIZE, "src",
                 "DataCopy from L1 Buffer(A1/B1/C1) to Fixpipe Buffer(C2PIPE2GM)"); // 32B align
+#if (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
+            DataCopyL12FBImpl((uint64_t)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(), repeatParams);
+#else
             DataCopyL12FBImpl((__fbuf__ PrimType*)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(), repeatParams);
+#endif
 #endif
 #if (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
         } else if (dstHWPos == Hardware::PT) {
@@ -663,6 +667,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     uint32_t dstOffsetList[MAX_SLICE_SIZE];
     DataCopyGetOffsetList(srcSliceInfo, srcShapeInfo, dimValue, &srcOffsetListSize, srcOffsetList);
     DataCopyGetOffsetList(dstSliceInfo, dstShapeInfo, dimValue, &dstOffsetListSize, dstOffsetList);
+    const uint32_t offsetListSize = (srcOffsetListSize < dstOffsetListSize) ? srcOffsetListSize : dstOffsetListSize;
     struct DataCopyParams repeatParams;
     repeatParams.blockLen = srcSliceInfo[0].burstLen;
     uint32_t oneSliceLen = srcSliceInfo[0].burstLen * AscendCUtils::GetC0Count(sizeof(T)) + srcSliceInfo[0].stride;
@@ -675,7 +680,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
 #endif
     if ((srcSliceInfo[0].stride * sizeof(T)) % AscendCUtils::GetC0Size() == 0) {
         repeatParams.srcStride = srcSliceInfo[0].stride * sizeof(T) / AscendCUtils::GetC0Size();
-        for (uint32_t i = 0; i < srcOffsetListSize; i++) {
+        for (uint32_t i = 0; i < offsetListSize; i++) {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
             DataCopyGM2UBImpl(
                 (__ubuf__ T*)dst.GetPhyAddr() + dstStartIndex + dstOffsetList[i],
@@ -688,7 +693,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
         }
     } else {
         repeatParams.srcStride = srcSliceInfo[0].stride * sizeof(T);
-        for (uint32_t i = 0; i < srcOffsetListSize; i++) {
+        for (uint32_t i = 0; i < offsetListSize; i++) {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
             DataCopySliceGm2UBImpl(
                 (__ubuf__ T*)dst.GetPhyAddr() + dstStartIndex + dstOffsetList[i],
@@ -742,6 +747,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
     uint32_t srcOffsetList[MAX_SLICE_SIZE];
     DataCopyGetOffsetList(srcSliceInfo, srcShapeInfo, dimValue, &srcOffsetListSize, srcOffsetList);
     DataCopyGetOffsetList(dstSliceInfo, dstShapeInfo, dimValue, &dstOffsetListSize, dstOffsetList);
+    const uint32_t offsetListSize = (srcOffsetListSize < dstOffsetListSize) ? srcOffsetListSize : dstOffsetListSize;
 
     struct DataCopyParams repeatParams;
     repeatParams.blockLen = srcSliceInfo[0].burstLen;
@@ -755,7 +761,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
 #endif
     if ((dstSliceInfo[0].stride * sizeof(T)) % AscendCUtils::GetC0Size() == 0) {
         repeatParams.dstStride = dstSliceInfo[0].stride * sizeof(T) / AscendCUtils::GetC0Size();
-        for (uint32_t i = 0; i < srcOffsetListSize; i++) {
+        for (uint32_t i = 0; i < offsetListSize; i++) {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
             DataCopyUB2GMImpl(
                 (__gm__ T*)dst.GetPhyAddr() + dstStartIndex + dstOffsetList[i],
@@ -768,7 +774,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
         }
     } else {
         repeatParams.dstStride = dstSliceInfo[0].stride * sizeof(T);
-        for (uint32_t i = 0; i < srcOffsetListSize; i++) {
+        for (uint32_t i = 0; i < offsetListSize; i++) {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
             DataCopySliceUB2GMImpl(
                 (__gm__ T*)dst.GetPhyAddr() + dstStartIndex + dstOffsetList[i],
@@ -941,7 +947,7 @@ __aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTens
 
 __aicore__ inline void CheckNz2NdParams(const Nz2NdParamsFull& params)
 {
-    constexpr uint16_t nz2NdLimit = 8192; // nValue, dstNzC0Stride, dstNzNStride must be in range [0, 16384]
+    constexpr uint16_t nz2NdLimit = 8192; // nValue and dValue must be in range [1, 8192]
     ASCENDC_CHECK_VALUE_RANGE(params.ndNum, 0, UINT12_MAX, "ndNum", "DataCopy with Nz2NdParamsFull");
     ASCENDC_CHECK_VALUE_RANGE(params.nValue, 1, nz2NdLimit, "nValue", "DataCopy with Nz2NdParamsFull");
     ASCENDC_CHECK_VALUE_RANGE(params.dValue, 1, nz2NdLimit, "dValue", "DataCopy with Nz2NdParamsFull");
@@ -1752,7 +1758,8 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     if (srcHWPos == Hardware::UB) {
         DataCopyPadUB2GMImpl<T, mode>(
             (__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), dataCopyParams, cacheMode);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
     } else if (srcHWPos == Hardware::L1) {
         DataCopyPadL12GMImpl<T, mode>(
             (__gm__ PrimType*)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(), dataCopyParams);

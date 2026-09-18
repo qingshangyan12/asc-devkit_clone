@@ -159,7 +159,7 @@ __aicore__ inline void CopyCbufToGmAlignV2(
     // ISA/API: Is the ND matrix number to be moved
     uint64_t ndNum = 1;
     // ISA/API: unit of element
-    uint16_t loop2Size = burstLength;
+    uint16_t loop2Size = burstLength / sizeof(T);
     // ISA/API: unit of element
     uint32_t loop3Size = blockCount;
     // ISA: loop2SrcStride = 1, and does not to be set by programmer.
@@ -283,13 +283,6 @@ __aicore__ inline void DataCopyL12FBImpl(uint64_t dst, __cbuf__ T* src, const Da
     copy_cbuf_to_fbuf_v2(
         (__fbuf__ void*)dst, (__cbuf__ void*)src, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride,
         intriParams.dstStride);
-}
-
-template <typename T>
-__aicore__ inline __in_pipe__(FIX)
-    __out_pipe__(FIX) void DataCopyL12FBImpl(__fbuf__ T* dst, __cbuf__ T* src, const DataCopyParams& intriParams)
-{
-    ASSERT(false && "unsupported data type of copy from cbuf to fbuf on current device");
 }
 
 template <typename T>
@@ -930,7 +923,7 @@ __aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, cons
     // ISA/API: Is the ND matrix number to be moved
     uint64_t ndNum = 1;
     // ISA/API: unit of element
-    uint16_t loop2Size = intriParams.blockLen;
+    uint16_t loop2Size = intriParams.blockLen / sizeof(T);
     // ISA/API: unit of element
     uint32_t loop3Size = intriParams.blockCount;
     // ISA: loop2SrcStride = 1, and does not to be set by programmer.
@@ -980,7 +973,7 @@ __aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, cons
     // ISA/API: Is the ND matrix number to be moved
     uint64_t ndNum = 1;
     // ISA/API: unit of element
-    uint16_t loop2Size = intriParams.blockLen;
+    uint16_t loop2Size = intriParams.blockLen / sizeof(T);
     // ISA/API: unit of element
     uint32_t loop3Size = intriParams.blockCount;
     // ISA: loop2SrcStride = 1, and does not to be set by programmer.
@@ -1015,14 +1008,11 @@ __aicore__ inline void DataCopyUB2UBIntf(
 #pragma end_pipe
 
 template <typename T>
-__aicore__ inline __in_pipe__(MTE1) __out_pipe__(MTE1) void DataCopyL12UBIntf(
+__aicore__ inline void DataCopyL12UBIntf(
     const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const DataCopyParams& intriParams)
 {
-    ASCENDC_ASSERT((false), {
-        KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from L1 Buffer(A1/B1) to UB(VECIN/VECOUT) on current device");
-    });
+    DataCopyL12UBImpl((__ubuf__ T*)dstLocal.GetPhyAddr(), (__cbuf__ T*)srcLocal.GetPhyAddr(), intriParams);
 }
-
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
 
