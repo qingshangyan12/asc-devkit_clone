@@ -208,7 +208,7 @@ def read_resource_id_section_for_test(binary_file):
         if result.returncode != 0:
             raise AssertionError(f"Failed to read Resource ID: {result.stdout}")
         section_data = Path(dump_file).read_bytes()
-        head_size = static_compile_resource_id._TLV_HEAD_SIZE
+        head_size = 4  # TLV head: unsigned short type + unsigned short len
         values = []
         offset = 0
         while offset + head_size <= len(section_data):

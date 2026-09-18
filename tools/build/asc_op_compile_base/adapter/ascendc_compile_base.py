@@ -25,7 +25,6 @@ from tbe.tvm.runtime import cce_runtime
 from tbe.common.buildcfg import get_current_build_config
 from tbe.tvm.error_mgr import raise_tbe_python_err, TBE_DEFAULT_PYTHON_ERROR_CODE
 from tbe.tvm.contrib.ccec import CCECInfo
-from tbe.common.platform.platform_info import COMPILER_ARCH, get_soc_spec
 from .ascendc_common_utility import (
     CommonUtility,
     write_mk,
@@ -142,33 +141,27 @@ def fatbin_objs(obj_files: list, dst_file: str, is_debug: bool, compile_log_path
         "ascendc_enable_super_kernel"
     ) is True and global_var_storage.get_variable("ascendc_is_static_op"):
         return
-    from .static_compile_resource_id import ResourceIdError, generate_resource_id_object
+    from .static_compile_resource_id import (
+        ResourceIdError,
+        attach_resource_id_entry,
+        calculate_resource_id,
+    )
 
     obj_files = list(obj_files)
-    if global_var_storage.get_variable("ascendc_kernel_spec_enabled"):
-        resource_object = "%s.resource_id.o" % dst_file
-        compile_command = [global_var_storage.get_variable("ascendc_compiler_path")]
-        if global_var_storage.get_variable("ascendc_enable_ccache") == True:
-            compile_command.insert(0, os.environ.get("ASCENDC_CCACHE_EXECUTABLE"))
+    kernel_spec_enabled = global_var_storage.get_variable("ascendc_kernel_spec_enabled")
+    resource_id = None
+    if kernel_spec_enabled:
+        # The Resource ID covers the link inputs, so it has to be derived before
+        # the link; it is written into the result once the link has produced it.
         try:
-            resource_id = generate_resource_id_object(
-                obj_files,
-                resource_object,
-                compile_command,
-                get_soc_spec(COMPILER_ARCH),
-                compile_log_path,
-            )
-            global_var_storage.get_variable("ascendc_resource_ids")[
-                os.path.abspath(dst_file)
-            ] = resource_id
+            resource_id = calculate_resource_id(obj_files)
         except ResourceIdError as error:
             raise RuntimeError(
                 "generate Resource ID metadata failed: %s" % error
             ) from error
-        if os.path.abspath(resource_object) not in {
-            os.path.abspath(obj) for obj in obj_files if isinstance(obj, str)
-        }:
-            obj_files.append(resource_object)
+        global_var_storage.get_variable("ascendc_resource_ids")[
+            os.path.abspath(dst_file)
+        ] = resource_id
     compile_cmd = [
         CCECInfo.get_exe("ld.lld"),
         "-m",
@@ -183,6 +176,13 @@ def fatbin_objs(obj_files: list, dst_file: str, is_debug: bool, compile_log_path
         compile_cmd += [obj]
     compile_cmd += ["-static", "-o", "%s" % dst_file]
     CommonUtility.run_cmd_inner(compile_cmd, CompileStage.FATBIN, compile_log_path)
+    if resource_id is not None:
+        try:
+            attach_resource_id_entry(dst_file, resource_id, compile_log_path)
+        except ResourceIdError as error:
+            raise RuntimeError(
+                "generate Resource ID metadata failed: %s" % error
+            ) from error
     if not global_var_storage.get_variable(
         "ascendc_compile_debug_config"
     ) and not global_var_storage.get_variable("super_kenel_save_sub_op_files"):
