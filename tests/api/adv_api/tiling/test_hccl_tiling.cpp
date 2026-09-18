@@ -290,6 +290,13 @@ TEST_F(TestHcclTilingCcuKfc, ExternalAlgNameAicpuOnlyUsesDefaultVersion)
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "pipeline[mesh,nhr]", 6U, INIT_TILING_VERSION);
 }
 
+// opType 维度负例：BROADCAST 的 sole[mesh] 无 CCU 候选，不得设 101
+TEST_F(TestHcclTilingCcuKfc, ExternalAlgNameOpTypeMismatchUsesDefaultVersion)
+{
+    ExpectInitTilingVersion(
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_BROADCAST), "sole[mesh]", 6U, INIT_TILING_VERSION);
+}
+
 // ============================================================================
 // 以下用例覆盖 commit aaa3d79e5 的改动:
 // 修复 hccl_tiling.cpp 中不安全的动态库加载。

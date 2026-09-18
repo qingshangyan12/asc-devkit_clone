@@ -101,6 +101,7 @@ TEST(ExtAlgGateB, ExternalNameGate)
 }
 
 // 闸门 A 镜像漂移断言：镜像对表 ↔ sidecar 真值（engine==CCU 的 (opType, canonical外部名) 集合）逐项相等
+// 漂移时同步修改 external_alg_ccu_ext_names.h 的 CcuExternalNameSet（sidecar 加/改 CCU 行时）
 TEST(ExtAlgGateA, MirrorMatchesSidecar)
 {
     std::set<std::pair<uint32_t, std::string>> truth;

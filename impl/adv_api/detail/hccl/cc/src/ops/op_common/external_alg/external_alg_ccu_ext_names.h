@@ -24,6 +24,8 @@ namespace mc2_ops_hccl {
 // 而漏改此表时 CI 必红。
 // 内容来源：46 行 sidecar 中 engine==CCU 的 12 行归并（opType 数值见 hccl_common.h:
 // ALLREDUCE=2 / ALLGATHER=6 / REDUCE_SCATTER=7 / ALLTOALLV=8 / ALLTOALL=10）。
+// 边界：本表不随 MC2_CLIENT_ENABLE_CCU 裁剪——裁剪构建下 mc2 侧 CCU sidecar 不注册而本表
+// 仍 11 项（当前无害：101 消费点全在 CCU 链，链不存在即无人读）。
 inline const std::set<std::pair<uint32_t, std::string>>& CcuExternalNameSet()
 {
     static const std::set<std::pair<uint32_t, std::string>> kSet = {
