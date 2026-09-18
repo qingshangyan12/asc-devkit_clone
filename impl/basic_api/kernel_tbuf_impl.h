@@ -85,11 +85,18 @@ template <typename T>
 __aicore__ inline __sync_alias__ LocalTensor<T> TBuf<pos>::GetWithOffset(uint32_t size, uint32_t bufOffset)
 {
     auto ptr = this->bufStart;
+    using PrimType = PrimT<T>;
     uint32_t dataLen;
-    if constexpr (IsSameType<PrimT<T>, int4b_t>::value) {
+    if constexpr (IsSameType<PrimType, int4b_t>::value) {
         dataLen = size / INT4_TWO;
+#if (__NPU_ARCH__ == 5102)
+    } else if constexpr (IsSameType<PrimType, int2b_t>::value) {
+        dataLen = size / INT2_FOUR;
+    } else if constexpr (IsSameType<PrimType, uint1b_t>::value) {
+        dataLen = size / INT1_EIGHT;
+#endif
     } else {
-        dataLen = size * sizeof(T);
+        dataLen = size * sizeof(PrimType);
     }
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     ASCENDC_DEBUG_ASSERT((size > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "size should be larger than 0"));
