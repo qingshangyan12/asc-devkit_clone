@@ -86,7 +86,7 @@ operator>之类的比较接口一般与select接口配合使用，该样例仅�
   ```bash
   SCENARIO_NUM=1
   mkdir -p build && cd build
-  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
+  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510  -DCANN_ASC_USE_EXPERIMENTAL=ON..
   make -j
   python3 ../scripts/gen_data.py -scenarioNum=${SCENARIO_NUM}
   ./demo
@@ -97,7 +97,7 @@ operator>之类的比较接口一般与select接口配合使用，该样例仅�
   示例如下：
 
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..;make -j; # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。

@@ -97,7 +97,7 @@ Perform the following steps in the sample root directory to build and run the sa
   ```bash
   SCENARIO_NUM=1
   mkdir -p build && cd build
-  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
+  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510  -DCANN_ASC_USE_EXPERIMENTAL=ON..
   make -j
   python3 ../scripts/gen_data.py -scenarioNum=${SCENARIO_NUM}
   ./demo
@@ -108,7 +108,7 @@ Perform the following steps in the sample root directory to build and run the sa
   Example:
 
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU simulation mode
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..;make -j; # NPU simulation mode
   ```
 
   > **Note:** Clear the CMake cache before switching build modes. Run `rm CMakeCache.txt` in the `build` directory, and then run CMake again.
