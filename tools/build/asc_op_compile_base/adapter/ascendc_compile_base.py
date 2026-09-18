@@ -137,38 +137,37 @@ SingleTilingKeyCompileParams = namedtuple(
 )
 
 
+def link_resource_id_obj(
+    bin_file_path, resource_object, is_debug, compile_log_path=None
+):
+    """Merge the Resource ID metadata object into the kernel object."""
+    link_cmd = [
+        CCECInfo.get_exe("ld.lld"),
+        "-m",
+        "aicorelinux",
+        "-r",
+        "-Ttext=0",
+        "-q",
+    ]
+    if not is_debug:
+        link_cmd.append("-x")
+    link_cmd += [
+        "%s" % bin_file_path,
+        "%s" % resource_object,
+        "-static",
+        "-o",
+        "%s" % bin_file_path,
+    ]
+    CommonUtility.run_cmd_inner(link_cmd, CompileStage.SPECIALIZATION, compile_log_path)
+    if not global_var_storage.get_variable("ascendc_compile_debug_config"):
+        CommonUtility.remove_temp_file(resource_object)
+
+
 def fatbin_objs(obj_files: list, dst_file: str, is_debug: bool, compile_log_path=None):
     if global_var_storage.get_variable(
         "ascendc_enable_super_kernel"
     ) is True and global_var_storage.get_variable("ascendc_is_static_op"):
         return
-    from .static_compile_resource_id import ResourceIdError, generate_resource_id_object
-
-    obj_files = list(obj_files)
-    if global_var_storage.get_variable("ascendc_kernel_spec_enabled"):
-        resource_object = "%s.resource_id.o" % dst_file
-        compile_command = [global_var_storage.get_variable("ascendc_compiler_path")]
-        if global_var_storage.get_variable("ascendc_enable_ccache") == True:
-            compile_command.insert(0, os.environ.get("ASCENDC_CCACHE_EXECUTABLE"))
-        try:
-            resource_id = generate_resource_id_object(
-                obj_files,
-                resource_object,
-                compile_command,
-                get_soc_spec(COMPILER_ARCH),
-                compile_log_path,
-            )
-            global_var_storage.get_variable("ascendc_resource_ids")[
-                os.path.abspath(dst_file)
-            ] = resource_id
-        except ResourceIdError as error:
-            raise RuntimeError(
-                "generate Resource ID metadata failed: %s" % error
-            ) from error
-        if os.path.abspath(resource_object) not in {
-            os.path.abspath(obj) for obj in obj_files if isinstance(obj, str)
-        }:
-            obj_files.append(resource_object)
     compile_cmd = [
         CCECInfo.get_exe("ld.lld"),
         "-m",
