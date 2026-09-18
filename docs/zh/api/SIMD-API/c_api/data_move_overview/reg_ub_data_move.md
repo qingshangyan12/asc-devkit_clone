@@ -11,7 +11,7 @@ Reg与UB数据搬运在AIV的Vector Function（`__simd_vf__`标记的函数）�
 | 对齐存储 | [Reg数据搬出概述](../reg_compute/store/reg_store_overview.md) | [asc_storealign](../reg_compute/store/asc_storealign.md)、[asc_storealign_postupdate](../reg_compute/store/asc_storealign_postupdate.md) |
 | 非对齐存储 | [Reg数据搬出概述](../reg_compute/store/reg_store_overview.md#非对齐搬出) | [asc_storeunalign](../reg_compute/store/asc_storeunalign.md)、[asc_storeunalign_post](../reg_compute/store/asc_storeunalign_post.md) |
 
-寄存器类型与基础API类型的对应关系请参见[寄存器类型](../defs/type/reg_data_types.md)。
+寄存器类型及使用说明请参见[寄存器类型](../defs/type/reg_data_types.md)。
 
 ## 使用要点
 
