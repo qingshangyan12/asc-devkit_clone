@@ -118,10 +118,6 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     tempAlgParams.buffInfo.inputSize = param.inputSize;
     tempAlgParams.buffInfo.outputSize = param.outputSize;
     tempAlgParams.enableRemoteMemAccess = param.opMode == OpMode::OFFLOAD;
-    // 不需要重复
-    tempAlgParams.repeatNum = 1;
-    tempAlgParams.inputRepeatStride = 0;
-    tempAlgParams.outputRepeatStride = 0;
     HCCL_INFO(
         "[InsV2AllGatherSoleExecutor][OrchestrateLoop] myRank[%u], inputPtr[%#llx] outputPtr[%#llx], "
         "cclAddr[%#llx], cclSize[%llu], channelSize[%lu], threadSize[%lu], ",
@@ -153,37 +149,58 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
         "[InsV2AllGatherSoleExecutor][OrchestrateLoop] myRank[%u], templateScratchMultiplier[%u] "
         "maxCountPerLoop[%llu], loopTimes[%llu]",
         myRank_, templateScratchMultiplier, maxCountPerLoop, loopTimes);
-    for (u64 loop = 0; loop < loopTimes; loop++) {
-        u64 currDataCount = (loop == loopTimes - 1) ? dataCount_ - processedDataCount : maxCountPerLoop;
-        tempAlgParams.buffInfo.inBuffBaseOff = processedDataCount * dataTypeSize_;
-        tempAlgParams.buffInfo.outBuffBaseOff = processedDataCount * dataTypeSize_;
+    const u64 outputSliceStride = (strideCount_ == 0) ? dataSize_ : strideCount_ * dataTypeSize_;
+    auto submitSegment = [&](u64 baseCount, u64 segCount, u64 repeatNum, u64 inputRepeatStride, u64 outputRepeatStride,
+                             const char* segment) -> HcclResult {
+        tempAlgParams.buffInfo.inBuffBaseOff = baseCount * dataTypeSize_;
+        tempAlgParams.buffInfo.outBuffBaseOff = baseCount * dataTypeSize_;
         tempAlgParams.buffInfo.hcclBuffBaseOff = 0;
-
-        tempAlgParams.count = currDataCount;
-        tempAlgParams.sliceSize = currDataCount * dataTypeSize_;
+        tempAlgParams.count = segCount;
+        tempAlgParams.sliceSize = segCount * dataTypeSize_;
         tempAlgParams.tailSize = tempAlgParams.sliceSize;
         tempAlgParams.inputSliceStride = 0;
-        tempAlgParams.outputSliceStride = (strideCount_ == 0) ? dataSize_ : strideCount_ * dataTypeSize_;
-
-        HCCL_DEBUG(
-            "[InsV2AllGatherSoleExecutor] myRank[%u], loop [%u] tempAlgParams.inputSliceStride [%u],"
-            "tempAlgParams.outputSliceStride [%u] tempAlgParams.sliceSize [%u]",
-            myRank_, loop, tempAlgParams.inputSliceStride, tempAlgParams.outputSliceStride, tempAlgParams.sliceSize);
-        HCCL_DEBUG(
-            "[InsV2AllGatherSoleExecutor] myRank[%u], loop [%u] tempAlgParams.buffInfo.inBuffBaseOff [%u],"
-            "tempAlgParams.buffInfo.outBuffBaseOff [%u]",
-            myRank_, loop, tempAlgParams.buffInfo.inBuffBaseOff, tempAlgParams.buffInfo.outBuffBaseOff);
-
+        tempAlgParams.outputSliceStride = outputSliceStride;
+        tempAlgParams.repeatNum = repeatNum;
+        tempAlgParams.inputRepeatStride = inputRepeatStride;
+        tempAlgParams.outputRepeatStride = outputRepeatStride;
         HCCL_INFO(
-            "[KFCAG_DEBUG][OrchestrateLoop] rank[%u] loop[%llu] dataCount[%llu] dataTypeSize[%llu] "
-            "strideCount[%llu] dataSize[%llu] currDataCount[%llu] sliceSize[%llu] outputSliceStride[%llu] "
-            "inBuffBaseOff[%llu] outBuffBaseOff[%llu] repeatNum[%llu]",
-            myRank_, loop, dataCount_, dataTypeSize_, strideCount_, dataSize_, currDataCount, tempAlgParams.sliceSize,
+            "[KFCAG_DEBUG][OrchestrateLoop] rank[%u] segment[%s] dataCount[%llu] dataTypeSize[%llu] "
+            "strideCount[%llu] dataSize[%llu] segCount[%llu] sliceSize[%llu] outputSliceStride[%llu] "
+            "inBuffBaseOff[%llu] outBuffBaseOff[%llu] repeatNum[%llu] inputRepeatStride[%llu] "
+            "outputRepeatStride[%llu]",
+            myRank_, segment, dataCount_, dataTypeSize_, strideCount_, dataSize_, segCount, tempAlgParams.sliceSize,
             tempAlgParams.outputSliceStride, tempAlgParams.buffInfo.inBuffBaseOff,
-            tempAlgParams.buffInfo.outBuffBaseOff, tempAlgParams.repeatNum);
-
-        CHK_RET(algTemplate.KernelRun(param, tempAlgParams, templateAlgRes));
-        processedDataCount += currDataCount;
+            tempAlgParams.buffInfo.outBuffBaseOff, repeatNum, inputRepeatStride, outputRepeatStride);
+        return algTemplate.KernelRun(param, tempAlgParams, templateAlgRes);
+    };
+    if (param.engine == CommEngine::COMM_ENGINE_CCU) {
+        // CCU(KFC)队列协议自带repeat/repeatStride字段：等长分片折叠为单个repeat项，
+        // 非整尾块单独成项，队列项数从loopTimes降到最多2个；所有rank按相同输入
+        // 计算，保证KFC server各rank mission序列一致
+        u64 fullLoopTimes = dataCount_ / maxCountPerLoop;
+        u64 tailDataCount = dataCount_ % maxCountPerLoop;
+        if (fullLoopTimes > 0) {
+            const u64 repeatStride = maxCountPerLoop * dataTypeSize_;
+            CHK_RET(submitSegment(0, maxCountPerLoop, fullLoopTimes, repeatStride, repeatStride, "full"));
+        }
+        if (tailDataCount != 0) {
+            CHK_RET(submitSegment(fullLoopTimes * maxCountPerLoop, tailDataCount, 1, 0, 0, "tail"));
+        }
+    } else {
+        for (u64 loop = 0; loop < loopTimes; loop++) {
+            u64 currDataCount = (loop == loopTimes - 1) ? dataCount_ - processedDataCount : maxCountPerLoop;
+            CHK_RET(submitSegment(processedDataCount, currDataCount, 1, 0, 0, "loop"));
+            HCCL_DEBUG(
+                "[InsV2AllGatherSoleExecutor] myRank[%u], loop [%u] tempAlgParams.inputSliceStride [%u],"
+                "tempAlgParams.outputSliceStride [%u] tempAlgParams.sliceSize [%u]",
+                myRank_, loop, tempAlgParams.inputSliceStride, tempAlgParams.outputSliceStride,
+                tempAlgParams.sliceSize);
+            HCCL_DEBUG(
+                "[InsV2AllGatherSoleExecutor] myRank[%u], loop [%u] tempAlgParams.buffInfo.inBuffBaseOff [%u],"
+                "tempAlgParams.buffInfo.outBuffBaseOff [%u]",
+                myRank_, loop, tempAlgParams.buffInfo.inBuffBaseOff, tempAlgParams.buffInfo.outBuffBaseOff);
+            processedDataCount += currDataCount;
+        }
     }
     HCCL_INFO("[InsV2AllGatherSoleExecutor][OrchestrateLoop] End.");
     return HCCL_SUCCESS;
