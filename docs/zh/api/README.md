@@ -754,7 +754,7 @@
             -   [概览](SIMD-API/c_api/data_move_overview/overview/overview.md)
                 -   [数据搬运概念](SIMD-API/c_api/data_move_overview/overview/data_move_concept.md)
                 -   [数据通路](SIMD-API/c_api/data_move_overview/overview/data_path.md)
-                -   [总体约束说明](SIMD-API/c_api/data_move_overview/overview/overall_constranints.md)
+                -   [总体约束说明](SIMD-API/c_api/data_move_overview/overview/overall_constraints.md)
             -   [GM与L1/L0数据搬运](SIMD-API/c_api/data_move_overview/gm_l1_or_l0_data_move.md)
             -   [GM与UB数据搬运](SIMD-API/c_api/data_move_overview/gm_ub_data_move.md)
             -   [L1与L0数据搬运](SIMD-API/c_api/data_move_overview/l1_l0_data_move.md)
