@@ -18,10 +18,7 @@ import numpy as np
 np.random.seed(9)
 
 
-def gen_golden_data(scenarioNum=1):
-    m = 40
-    n = 50
-    k = 70
+def gen_golden_data(scenarioNum=1, m=40, n=50, k=70):
 
     x1_gm = None
     x2_gm = None
@@ -95,5 +92,8 @@ def gen_golden_data(scenarioNum=1):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 8))
+    parser.add_argument("-M", type=int, default=40)
+    parser.add_argument("-N", type=int, default=50)
+    parser.add_argument("-K", type=int, default=70)
     args = parser.parse_args()
-    gen_golden_data(args.scenarioNum)
+    gen_golden_data(args.scenarioNum, args.M, args.N, args.K)

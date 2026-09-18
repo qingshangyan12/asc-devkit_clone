@@ -291,6 +291,9 @@ __aicore__ inline void Fixpipe(
 }
 #endif
 } // namespace AscendC
+
+#include "kernel_operator_fixpipe_ptr_impl.h"
+
 #endif // ASCENDC_MODULE_OPERATOR_FIXPIPE_INTERFACE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_FIXPIPE_INTF_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

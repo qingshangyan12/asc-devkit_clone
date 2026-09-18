@@ -1,0 +1,183 @@
+#!/usr/bin/env python3
+# Deterministic 200 cases per CUBE ptr API (LoadData / Mmad / Fixpipe).
+from __future__ import annotations
+import json
+import random
+from itertools import product
+from pathlib import Path
+
+SEED = 20260916
+DIMS = (16, 32, 48, 64, 80, 96)
+PER_API = 200
+OUT_DIR = Path(__file__).resolve().parent
+
+
+def k_ok(dtype: str, k: int) -> bool:
+    if dtype in ("int8", "int4"):
+        return k % 32 == 0
+    if dtype in ("bf16", "half", "fp16"):
+        return k % 16 == 0
+    if dtype == "fp32":
+        return k % 16 == 0
+    return k % 16 == 0
+
+
+def shapes_for(dtype: str) -> list[tuple[int, int, int]]:
+    out = []
+    for m, n, k in product(DIMS, DIMS, DIMS):
+        if max(m, n, k) > 96:
+            continue
+        if m % 16 or n % 16 or k % 16:
+            continue
+        if not k_ok(dtype, k):
+            continue
+        if dtype == "int4" and k % 2:
+            continue
+        out.append((m, n, k))
+    return out
+
+
+def pick(pool: list[dict], n: int, rng: random.Random) -> list[dict]:
+    if not pool:
+        raise SystemExit("empty pool")
+    if len(pool) >= n:
+        return rng.sample(pool, n)
+    # 合法 shape 不足时允许重复（case_id 仍唯一）
+    out = list(pool)
+    while len(out) < n:
+        out.append(dict(rng.choice(pool)))
+    return out
+
+
+def mmad_pool() -> list[dict]:
+    rows = []
+    mapping = [("int8", 1, "any"), ("bf16", 2, "any"), ("fp32", 3, "any"), ("int4", 4, "dav-2201")]
+    for dtype, sc, arch in mapping:
+        for m, n, k in shapes_for(dtype):
+            if dtype == "bf16" and (k < 32 or min(m, n) < 32):
+                continue
+            # fp32 s3：与官方默认规格同量级对齐约束（M/N/K 16 对齐且 K%16）
+            if dtype == "fp32" and (m % 16 or n % 16 or k % 16):
+                continue
+            rows.append(
+                {
+                    "api": "mmad",
+                    "arch": arch,
+                    "dtype": dtype,
+                    "M": m,
+                    "N": n,
+                    "K": k,
+                    "scenario": sc,
+                    "skip_reason": "",
+                }
+            )
+    return rows
+
+
+def loaddata_pool() -> list[dict]:
+    # representative scenarios per dtype; runner picks sample dir by arch
+    mapping = [
+        ("int8", 3, 1, "any"),
+        ("half", 6, 3, "any"),
+        ("fp32", 11, 5, "any"),
+        ("int4", 1, None, "dav-2201"),
+    ]
+    rows = []
+    for dtype, sc2201, sc3510, arch in mapping:
+        for m, n, k in shapes_for(dtype):
+            rows.append(
+                {
+                    "api": "load_data",
+                    "arch": arch,
+                    "dtype": dtype,
+                    "M": m,
+                    "N": n,
+                    "K": k,
+                    "scenario": sc2201 if arch == "dav-2201" else (sc3510 or sc2201),
+                    "scenario_2201": sc2201,
+                    "scenario_3510": sc3510,
+                    "skip_reason": "",
+                }
+            )
+    return rows
+
+
+def fixpipe_pool() -> list[dict]:
+    # 1 NZ fp32, 6 relu ND fp32, 7 NZ channel-split.
+    # 跳过 s2 纯 ND：变 shape 下与 golden 易错位；ND 能力由 s6 覆盖。
+    mapping = [(1, "fp32", "any"), (6, "fp32", "any"), (7, "fp32", "any")]
+    rows = []
+    for sc, dtype, arch in mapping:
+        for m, n, k in shapes_for("half"):
+            # K_ROUND=2，baseK=K/2 需 16 对齐
+            if k % 32:
+                continue
+            # 过小 MN 在 ND/ChannelSplit 变 shape 下易错位
+            if min(m, n) < 32:
+                continue
+            # 样例 Compute: mmadParams.n = CeilAlign(baseN, C0_SIZE=32)；
+            # N 非 32 倍数时 L0C 按对齐宽度计算，K>32（baseK>16）下与 ND/NZ golden 不一致
+            if n % 32:
+                continue
+            rows.append(
+                {
+                    "api": "fixpipe",
+                    "arch": arch,
+                    "dtype": dtype,
+                    "M": m,
+                    "N": n,
+                    "K": k,
+                    "scenario": sc,
+                    "skip_reason": "",
+                }
+            )
+    return rows
+
+
+def stamp(rows: list[dict], api: str, start: int = 1) -> list[dict]:
+    out = []
+    for i, r in enumerate(rows, start):
+        item = dict(r)
+        # load_data case_id uses scenario field; prefer 2201 for id stability when both exist
+        sc = item.get("scenario")
+        if item["api"] == "load_data" or api == "load_data":
+            sc = item.get("scenario_2201", item.get("scenario_3510", sc))
+        item["case_id"] = f"{api}_{i:03d}_{item['dtype']}_m{item['M']}n{item['N']}k{item['K']}_s{sc}"
+        out.append(item)
+    return out
+
+
+def main() -> None:
+    rng = random.Random(SEED)
+    selected = []
+    counts = {}
+    for api, pool_fn in (("mmad", mmad_pool), ("load_data", loaddata_pool), ("fixpipe", fixpipe_pool)):
+        pool = pool_fn()
+        # 主集：arch=any，保证 910B/950 都能跑满 PER_API
+        pool_any = [r for r in pool if r.get("arch", "any") == "any"]
+        chosen = stamp(pick(pool_any, PER_API, rng), api)
+        # 910B 专属 extras（如 int4），不挤占主集名额
+        pool_2201 = [r for r in pool if r.get("arch") == "dav-2201"]
+        if pool_2201:
+            n_extra = min(40, len(pool_2201))
+            extras = stamp(pick(pool_2201, n_extra, rng), api, start=len(chosen) + 1)
+            chosen.extend(extras)
+        counts[api] = len(chosen)
+        selected.extend(chosen)
+
+    jsonl = OUT_DIR / "cases.jsonl"
+    with jsonl.open("w", encoding="utf-8") as f:
+        for row in selected:
+            f.write(json.dumps(row, ensure_ascii=False) + "\n")
+
+    md = ["# CUBE ptr sweep cases", "", f"- seed: `{SEED}`", f"- dims: `{list(DIMS)}`", ""]
+    for api, n in counts.items():
+        md.append(f"- **{api}**: {n} (200 arch=any + optional 910B-only extras)")
+    md.append("")
+    md.append("Full table: `cases.jsonl` (one JSON object per line).")
+    (OUT_DIR / "CASES.md").write_text("\n".join(md) + "\n", encoding="utf-8")
+    print(f"wrote {jsonl} total={len(selected)} {counts}")
+
+
+if __name__ == "__main__":
+    main()

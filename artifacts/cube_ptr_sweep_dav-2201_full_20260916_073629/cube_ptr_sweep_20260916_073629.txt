@@ -1,0 +1,86 @@
+=== CUBE ptr sweep START 2026-09-16T07:36:29+00:00 ARCH=dav-2201 SMOKE=0 WS=/home/Temp_room/wj_cub_cube_ptr ===
+ASCEND_HOME_PATH=/home/Temp_room/wj_cub_cube_ptr/cann_local CXX=/home/Temp_room/te_npu_30/tools/bin/g++
+From https://gitcode.com/qq_53202098/asc-devkit
+ * branch                feature/cube-basic-api-pointerization -> FETCH_HEAD
+M	scripts/cube_ptr_sweep/run_sweep.sh
+Your branch is up to date with 'origin/feature/cube-basic-api-pointerization'.
+HEAD is now at 64c594578 feat(cube-ptr): run full sweep in parallel on ASCEND devices
+REPO_HEAD=64c594578 @ /home/Temp_room/wj_cub_cube_ptr/helper_repo
+TEST_HEAD=64c594578
+OVERLAY_OK
+PY=/usr/bin/python3
+SELECTED 600 full
+SHARD device=1 n=100 file=/home/Temp_room/wj_cub_cube_ptr/runs_sweep/20260916_073629/shard_1.jsonl
+SHARD device=2 n=100 file=/home/Temp_room/wj_cub_cube_ptr/runs_sweep/20260916_073629/shard_2.jsonl
+SHARD device=3 n=100 file=/home/Temp_room/wj_cub_cube_ptr/runs_sweep/20260916_073629/shard_3.jsonl
+SHARD device=4 n=100 file=/home/Temp_room/wj_cub_cube_ptr/runs_sweep/20260916_073629/shard_4.jsonl
+SHARD device=5 n=100 file=/home/Temp_room/wj_cub_cube_ptr/runs_sweep/20260916_073629/shard_5.jsonl
+SHARD device=6 n=100 file=/home/Temp_room/wj_cub_cube_ptr/runs_sweep/20260916_073629/shard_6.jsonl
+PARALLEL devices=1,2,3,4,5,6 pids=1637293 1637294 1637295 1637298 1637300 1637303 cmake_jobs=2
+PARALLEL wait done fail_workers=0
+----- worker_1.log tail -----
+DONE fixpipe_177_fp32_m64n96k96_s7 device=1 verify=PASS
+==== fixpipe_183_fp32_m80n64k96_s7 device=1 ====
+DONE fixpipe_183_fp32_m80n64k96_s7 device=1 verify=PASS
+==== fixpipe_189_fp32_m96n32k96_s7 device=1 ====
+DONE fixpipe_189_fp32_m96n32k96_s7 device=1 verify=PASS
+==== fixpipe_195_fp32_m96n96k96_s7 device=1 ====
+DONE fixpipe_195_fp32_m96n96k96_s7 device=1 verify=PASS
+WORKER done device=1
+----- worker_2.log tail -----
+DONE fixpipe_178_fp32_m80n32k32_s7 device=2 verify=PASS
+==== fixpipe_184_fp32_m80n96k32_s7 device=2 ====
+DONE fixpipe_184_fp32_m80n96k32_s7 device=2 verify=PASS
+==== fixpipe_190_fp32_m96n64k32_s7 device=2 ====
+DONE fixpipe_190_fp32_m96n64k32_s7 device=2 verify=PASS
+==== fixpipe_196_fp32_m96n64k64_s6 device=2 ====
+DONE fixpipe_196_fp32_m96n64k64_s6 device=2 verify=PASS
+WORKER done device=2
+----- worker_3.log tail -----
+DONE fixpipe_179_fp32_m80n32k64_s7 device=3 verify=PASS
+==== fixpipe_185_fp32_m80n96k64_s7 device=3 ====
+DONE fixpipe_185_fp32_m80n96k64_s7 device=3 verify=PASS
+==== fixpipe_191_fp32_m96n64k64_s7 device=3 ====
+DONE fixpipe_191_fp32_m96n64k64_s7 device=3 verify=PASS
+==== fixpipe_197_fp32_m96n80k32_s6 device=3 ====
+DONE fixpipe_197_fp32_m96n80k32_s6 device=3 verify=PASS
+WORKER done device=3
+----- worker_4.log tail -----
+DONE fixpipe_180_fp32_m80n32k96_s7 device=4 verify=PASS
+==== fixpipe_186_fp32_m80n96k96_s7 device=4 ====
+DONE fixpipe_186_fp32_m80n96k96_s7 device=4 verify=PASS
+==== fixpipe_192_fp32_m96n64k96_s7 device=4 ====
+DONE fixpipe_192_fp32_m96n64k96_s7 device=4 verify=PASS
+==== fixpipe_198_fp32_m80n32k64_s7 device=4 ====
+DONE fixpipe_198_fp32_m80n32k64_s7 device=4 verify=PASS
+WORKER done device=4
+----- worker_5.log tail -----
+DONE fixpipe_181_fp32_m80n64k32_s7 device=5 verify=PASS
+==== fixpipe_187_fp32_m96n32k32_s7 device=5 ====
+DONE fixpipe_187_fp32_m96n32k32_s7 device=5 verify=PASS
+==== fixpipe_193_fp32_m96n96k32_s7 device=5 ====
+DONE fixpipe_193_fp32_m96n96k32_s7 device=5 verify=PASS
+==== fixpipe_199_fp32_m80n96k96_s6 device=5 ====
+DONE fixpipe_199_fp32_m80n96k96_s6 device=5 verify=PASS
+WORKER done device=5
+----- worker_6.log tail -----
+DONE fixpipe_182_fp32_m80n64k64_s7 device=6 verify=PASS
+==== fixpipe_188_fp32_m96n32k64_s7 device=6 ====
+DONE fixpipe_188_fp32_m96n32k64_s7 device=6 verify=PASS
+==== fixpipe_194_fp32_m96n96k64_s7 device=6 ====
+DONE fixpipe_194_fp32_m96n96k64_s7 device=6 verify=PASS
+==== fixpipe_200_fp32_m80n64k64_s7 device=6 ====
+DONE fixpipe_200_fp32_m80n64k64_s7 device=6 verify=PASS
+WORKER done device=6
+# CUBE ptr sweep
+
+- HEAD: 64c594578
+- ARCH: dav-2201
+- MODE: full
+- STAMP: 20260916_073629
+
+- verify PASS: **560**
+- FAIL: 40
+- total: 600
+
+ok 560 fail 40 n 600

@@ -1,0 +1,174 @@
+=== CUBE 950 matrix START 2026-09-16T15:21:37+00:00 ===
+WS=/home/Temp_room/wj_cub_cube_ptr_950 BRANCH=feature/cube-basic-api-pointerization STAMP=20260916_152136 ARCH=dav-3510 MODE=full
+ASCEND_HOME_PATH=/usr/local/Ascend/cann-9.1.0 CXX=/usr/bin/g++
+From https://gitcode.com/baibai_Uu/asc-devkit
+ * branch                feature/cube-basic-api-pointerization -> FETCH_HEAD
+   0252270bd..8455fa7b5  feature/cube-basic-api-pointerization -> origin/feature/cube-basic-api-pointerization
+Your branch is behind 'origin/feature/cube-basic-api-pointerization' by 1 commit, and can be fast-forwarded.
+  (use "git pull" to update your local branch)
+HEAD is now at 8455fa7b5 ci(950): drop 2dmx/mmad_mx from full gate (verify open)
+REPO_HEAD=8455fa7b5 @ /home/Temp_room/wj_cub_cube_ptr_950/helper_repo
+TEST_HEAD=8455fa7b5
+OVERLAY_OK
+PY=/usr/bin/python3.10
+CASE_COUNT=49 MODE=full
+==== RUN mmad s1 ====
+DONE mmad s1 verify=PASS
+==== RUN mmad s2 ====
+DONE mmad s2 verify=PASS
+==== RUN mmad s3 ====
+DONE mmad s3 verify=PASS
+==== RUN mmad s1_m16n16k32 ====
+DONE mmad s1_m16n16k32 verify=PASS
+==== RUN mmad s1_m64n64k64 ====
+DONE mmad s1_m64n64k64 verify=PASS
+==== RUN mmad s2_m32n32k64 ====
+DONE mmad s2_m32n32k64 verify=PASS
+==== RUN mmad s2_m48n32k64 ====
+DONE mmad s2_m48n32k64 verify=PASS
+==== RUN mmad s3_m32n32k64 ====
+DONE mmad s3_m32n32k64 verify=PASS
+==== RUN fixpipe_l0c2gm s1 ====
+DONE fixpipe_l0c2gm s1 verify=PASS
+==== RUN fixpipe_l0c2gm s2 ====
+DONE fixpipe_l0c2gm s2 verify=PASS
+==== RUN fixpipe_l0c2gm s3 ====
+DONE fixpipe_l0c2gm s3 verify=PASS
+==== RUN fixpipe_l0c2gm s4 ====
+DONE fixpipe_l0c2gm s4 verify=PASS
+==== RUN fixpipe_l0c2gm s5 ====
+DONE fixpipe_l0c2gm s5 verify=PASS
+==== RUN fixpipe_l0c2gm s6 ====
+DONE fixpipe_l0c2gm s6 verify=PASS
+==== RUN fixpipe_l0c2gm s7 ====
+DONE fixpipe_l0c2gm s7 verify=PASS
+==== RUN fixpipe_l0c2gm s1_m64n64k64 ====
+DONE fixpipe_l0c2gm s1_m64n64k64 verify=PASS
+==== RUN fixpipe_l0c2gm s3_m64n128k64 ====
+DONE fixpipe_l0c2gm s3_m64n128k64 verify=PASS
+==== RUN load_data_2dv2_l12l0 s1 ====
+DONE load_data_2dv2_l12l0 s1 verify=PASS
+==== RUN load_data_2dv2_l12l0 s2 ====
+DONE load_data_2dv2_l12l0 s2 verify=PASS
+==== RUN load_data_2dv2_l12l0 s3 ====
+DONE load_data_2dv2_l12l0 s3 verify=PASS
+==== RUN load_data_2dv2_l12l0 s4 ====
+DONE load_data_2dv2_l12l0 s4 verify=PASS
+==== RUN load_data_2dv2_l12l0 s5 ====
+DONE load_data_2dv2_l12l0 s5 verify=PASS
+==== RUN load_data_2dv2_l12l0 s6 ====
+DONE load_data_2dv2_l12l0 s6 verify=PASS
+==== RUN load_data_2dv2_l12l0 s7 ====
+DONE load_data_2dv2_l12l0 s7 verify=PASS
+==== RUN load_data_2dv2_l12l0 s1_m16n16k32 ====
+DONE load_data_2dv2_l12l0 s1_m16n16k32 verify=PASS
+==== RUN load_data_2dv2_l12l0 s1_m64n48k64 ====
+DONE load_data_2dv2_l12l0 s1_m64n48k64 verify=PASS
+==== RUN load_data_2dv2_l12l0 s3_m32n32k64 ====
+DONE load_data_2dv2_l12l0 s3_m32n32k64 verify=PASS
+==== RUN load_data_with_stride s1 ====
+DONE load_data_with_stride s1 verify=PASS
+==== RUN load_data_with_stride s2 ====
+DONE load_data_with_stride s2 verify=PASS
+==== RUN load_data_with_stride s3 ====
+DONE load_data_with_stride s3 verify=PASS
+==== RUN load_data_with_stride s4 ====
+DONE load_data_with_stride s4 verify=PASS
+==== RUN load_data_with_stride s5 ====
+DONE load_data_with_stride s5 verify=PASS
+==== RUN load_data_with_stride s6 ====
+DONE load_data_with_stride s6 verify=PASS
+==== RUN fixpipe_l0c2ub s1 ====
+DONE fixpipe_l0c2ub s1 verify=PASS
+==== RUN fixpipe_l0c2ub s2 ====
+DONE fixpipe_l0c2ub s2 verify=PASS
+==== RUN fixpipe_l0c2ub s3 ====
+DONE fixpipe_l0c2ub s3 verify=PASS
+==== RUN fixpipe_l0c2ub s4 ====
+DONE fixpipe_l0c2ub s4 verify=PASS
+==== RUN fixpipe_l0c2l1 s1 ====
+DONE fixpipe_l0c2l1 s1 verify=PASS
+==== RUN fixpipe_l0c2l1 s2 ====
+DONE fixpipe_l0c2l1 s2 verify=PASS
+==== RUN fixpipe_l0c2l1 s3 ====
+DONE fixpipe_l0c2l1 s3 verify=PASS
+==== RUN fixpipe_l0c2l1 s4 ====
+DONE fixpipe_l0c2l1 s4 verify=PASS
+==== RUN mmad_load3dv2 s1 ====
+DONE mmad_load3dv2 s1 verify=PASS
+==== RUN mmad_load3dv2 s2 ====
+DONE mmad_load3dv2 s2 verify=PASS
+==== RUN mmad_load3dv2 s3 ====
+DONE mmad_load3dv2 s3 verify=PASS
+==== RUN mmad_load3dv2 s4 ====
+DONE mmad_load3dv2 s4 verify=PASS
+==== RUN mmad_load3dv2 s5 ====
+DONE mmad_load3dv2 s5 verify=PASS
+==== RUN batch_matmul s1 ====
+DONE batch_matmul s1 verify=PASS
+==== RUN mmad_gemv s1 ====
+DONE mmad_gemv s1 verify=PASS
+==== RUN mmad_unitflag s1 ====
+DONE mmad_unitflag s1 verify=PASS
+# Ascend950 CUBE self-test matrix
+
+- HEAD: 8455fa7b5
+- ARCH: dav-3510
+- STAMP: 20260916_152136
+- MODE: full
+
+- verify PASS: **49**
+- FAIL: 0
+
+| case | scenario | arch | build | run | verify | note |
+|---|---|---|---|---|---|---|
+| mmad | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| mmad | 2 | dav-3510 | PASS | PASS | PASS | s2 |
+| mmad | 3 | dav-3510 | PASS | PASS | PASS | s3 |
+| mmad | 1 | dav-3510 | PASS | PASS | PASS | s1_m16n16k32 |
+| mmad | 1 | dav-3510 | PASS | PASS | PASS | s1_m64n64k64 |
+| mmad | 2 | dav-3510 | PASS | PASS | PASS | s2_m32n32k64 |
+| mmad | 2 | dav-3510 | PASS | PASS | PASS | s2_m48n32k64 |
+| mmad | 3 | dav-3510 | PASS | PASS | PASS | s3_m32n32k64 |
+| fixpipe_l0c2gm | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| fixpipe_l0c2gm | 2 | dav-3510 | PASS | PASS | PASS | s2 |
+| fixpipe_l0c2gm | 3 | dav-3510 | PASS | PASS | PASS | s3 |
+| fixpipe_l0c2gm | 4 | dav-3510 | PASS | PASS | PASS | s4 |
+| fixpipe_l0c2gm | 5 | dav-3510 | PASS | PASS | PASS | s5 |
+| fixpipe_l0c2gm | 6 | dav-3510 | PASS | PASS | PASS | s6 |
+| fixpipe_l0c2gm | 7 | dav-3510 | PASS | PASS | PASS | s7 |
+| fixpipe_l0c2gm | 1 | dav-3510 | PASS | PASS | PASS | s1_m64n64k64 |
+| fixpipe_l0c2gm | 3 | dav-3510 | PASS | PASS | PASS | s3_m64n128k64 |
+| load_data_2dv2_l12l0 | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| load_data_2dv2_l12l0 | 2 | dav-3510 | PASS | PASS | PASS | s2 |
+| load_data_2dv2_l12l0 | 3 | dav-3510 | PASS | PASS | PASS | s3 |
+| load_data_2dv2_l12l0 | 4 | dav-3510 | PASS | PASS | PASS | s4 |
+| load_data_2dv2_l12l0 | 5 | dav-3510 | PASS | PASS | PASS | s5 |
+| load_data_2dv2_l12l0 | 6 | dav-3510 | PASS | PASS | PASS | s6 |
+| load_data_2dv2_l12l0 | 7 | dav-3510 | PASS | PASS | PASS | s7 |
+| load_data_2dv2_l12l0 | 1 | dav-3510 | PASS | PASS | PASS | s1_m16n16k32 |
+| load_data_2dv2_l12l0 | 1 | dav-3510 | PASS | PASS | PASS | s1_m64n48k64 |
+| load_data_2dv2_l12l0 | 3 | dav-3510 | PASS | PASS | PASS | s3_m32n32k64 |
+| load_data_with_stride | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| load_data_with_stride | 2 | dav-3510 | PASS | PASS | PASS | s2 |
+| load_data_with_stride | 3 | dav-3510 | PASS | PASS | PASS | s3 |
+| load_data_with_stride | 4 | dav-3510 | PASS | PASS | PASS | s4 |
+| load_data_with_stride | 5 | dav-3510 | PASS | PASS | PASS | s5 |
+| load_data_with_stride | 6 | dav-3510 | PASS | PASS | PASS | s6 |
+| fixpipe_l0c2ub | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| fixpipe_l0c2ub | 2 | dav-3510 | PASS | PASS | PASS | s2 |
+| fixpipe_l0c2ub | 3 | dav-3510 | PASS | PASS | PASS | s3 |
+| fixpipe_l0c2ub | 4 | dav-3510 | PASS | PASS | PASS | s4 |
+| fixpipe_l0c2l1 | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| fixpipe_l0c2l1 | 2 | dav-3510 | PASS | PASS | PASS | s2 |
+| fixpipe_l0c2l1 | 3 | dav-3510 | PASS | PASS | PASS | s3 |
+| fixpipe_l0c2l1 | 4 | dav-3510 | PASS | PASS | PASS | s4 |
+| mmad_load3dv2 | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| mmad_load3dv2 | 2 | dav-3510 | PASS | PASS | PASS | s2 |
+| mmad_load3dv2 | 3 | dav-3510 | PASS | PASS | PASS | s3 |
+| mmad_load3dv2 | 4 | dav-3510 | PASS | PASS | PASS | s4 |
+| mmad_load3dv2 | 5 | dav-3510 | PASS | PASS | PASS | s5 |
+| batch_matmul | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| mmad_gemv | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| mmad_unitflag | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+bad_rows 0

@@ -321,6 +321,8 @@ __aicore__ inline CacheMode GetScalarCacheMode()
 #endif
 
 } // namespace AscendC
+#include "kernel_operator_common_ptr_impl.h"
+
 #endif // ASCENDC_MODULE_OPERATOR_COMMON_INTERFACE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_INTF_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

@@ -531,7 +531,9 @@ constexpr const char* FILL_INTRINSIC_NAME = "Fill";
 constexpr const char* INITCONSTVALUE_INTRINSIC_NAME = "InitConstValue";
 } // namespace Impl
 
-template <typename T, typename U, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type>
+template <
+    typename T, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
 __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParams<U>& initConstValueParams)
 {
     CheckInitParams(dst, initConstValueParams, Impl::FILL_INTRINSIC_NAME);
@@ -539,7 +541,9 @@ __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParam
 }
 
 // InitConstValue has been updated, please use Fill instead.
-template <typename T, typename U, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type>
+template <
+    typename T, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
 __aicore__ inline void InitConstValue(const LocalTensor<T>& dst, const InitConstValueParams<U>& initConstValueParams)
 {
     CheckInitParams(dst, initConstValueParams, Impl::INITCONSTVALUE_INTRINSIC_NAME);
@@ -734,6 +738,9 @@ __aicore__ inline void SetMMColumnMajor() { SetMMLayoutTransformImpl(false); }
 __aicore__ inline void SetMMLayoutTransform(bool mmLayoutMode) { SetMMLayoutTransformImpl(mmLayoutMode); }
 
 } // namespace AscendC
+
+#include "kernel_operator_mm_ptr_impl.h"
+
 #endif // ASCENDC_MODULE_OPERATOR_MM_INTERFACE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_INTF_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

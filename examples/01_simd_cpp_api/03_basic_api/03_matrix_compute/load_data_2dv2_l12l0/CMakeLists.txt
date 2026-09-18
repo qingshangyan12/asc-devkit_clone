@@ -34,8 +34,15 @@ if(NOT SCENARIO_NUM MATCHES "^[1-7]$")
     message(FATAL_ERROR "SCENARIO_NUM must be 1, 2, 3, 4, 5, 6 or 7, but got ${SCENARIO_NUM}")
 endif()
 
+set(CASE_M "40" CACHE STRING "matrix M")
+set(CASE_N "50" CACHE STRING "matrix N")
+set(CASE_K "70" CACHE STRING "matrix K")
+message(STATUS "[INFO] CASE_MNK=${CASE_M}x${CASE_N}x${CASE_K}")
 target_compile_definitions(demo PRIVATE
     SCENARIO_NUM=${SCENARIO_NUM}
+    CASE_M=${CASE_M}
+    CASE_N=${CASE_N}
+    CASE_K=${CASE_K}
 )
 
 target_compile_options(demo PRIVATE

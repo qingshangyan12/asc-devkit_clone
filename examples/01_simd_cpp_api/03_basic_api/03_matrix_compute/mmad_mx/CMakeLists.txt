@@ -11,7 +11,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-3510")
-set(SCENARIO_NUM "1" CACHE STRING "Scenario number: 1, 2, 3, or 4")
+set(SCENARIO_NUM "1" CACHE STRING "Scenario number: 1..8")
 
 if(NOT CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510")
     message(FATAL_ERROR "mmad_mx only supports dav-3510, but got ${CMAKE_ASC_ARCHITECTURES}")
@@ -25,11 +25,11 @@ add_executable(demo
     mmad_mx.asc
 )
 
-set(VALID_SCENARIOS "1" "2" "3" "4")
+set(VALID_SCENARIOS "1" "2" "3" "4" "5" "6" "7" "8")
 if(SCENARIO_NUM IN_LIST VALID_SCENARIOS)
     message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
 else()
-    message(FATAL_ERROR "Invalid SCENARIO_NUM: '${SCENARIO_NUM}'. Allowed values are: 1, 2, 3, 4.")
+    message(FATAL_ERROR "Invalid SCENARIO_NUM: '${SCENARIO_NUM}'. Allowed values are: 1..8.")
 endif()
 
 target_compile_definitions(demo PRIVATE

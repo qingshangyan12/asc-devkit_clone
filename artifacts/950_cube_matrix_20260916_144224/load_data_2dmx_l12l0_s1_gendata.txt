@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_144224/load_data_2dmx_l12l0_s1/scripts/gen_data.py", line 241, in <module>
+    scenario_num = int(sys.argv[1].split("=")[1])
+IndexError: list index out of range
+B/scaleB transpose

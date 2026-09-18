@@ -20,18 +20,29 @@ add_executable(demo
     mmad.asc
 )
 
-set(SCENARIO_NUM "1" CACHE STRING "SCENARIO_NUM, e.g. 1 2 3 4")
-if(NOT SCENARIO_NUM MATCHES "^[1-4]$")
-    message(FATAL_ERROR "SCENARIO_NUM must be 1, 2, 3 or 4, but got ${SCENARIO_NUM}")
+set(SCENARIO_NUM "1" CACHE STRING "SCENARIO_NUM, e.g. 1 2 3 4 5 6 7")
+if(NOT SCENARIO_NUM MATCHES "^[1-7]$")
+    message(FATAL_ERROR "SCENARIO_NUM must be 1..7, but got ${SCENARIO_NUM}")
 endif()
 
 if(SCENARIO_NUM STREQUAL "4" AND CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510")
     message(FATAL_ERROR "SCENARIO_NUM=${SCENARIO_NUM} only supports dav-2201, not dav-3510")
 endif()
 
-message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
+if((SCENARIO_NUM STREQUAL "6" OR SCENARIO_NUM STREQUAL "7") AND
+   NOT CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510")
+    message(FATAL_ERROR "SCENARIO_NUM=${SCENARIO_NUM} (fp8) only supports dav-3510")
+endif()
+
+set(CASE_M "30" CACHE STRING "matrix M")
+set(CASE_N "40" CACHE STRING "matrix N")
+set(CASE_K "70" CACHE STRING "matrix K")
+message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM} CASE_MNK=${CASE_M}x${CASE_N}x${CASE_K}")
 target_compile_definitions(demo PRIVATE
     SCENARIO_NUM=${SCENARIO_NUM}
+    CASE_M=${CASE_M}
+    CASE_N=${CASE_N}
+    CASE_K=${CASE_K}
 )
 
 target_compile_options(demo PRIVATE

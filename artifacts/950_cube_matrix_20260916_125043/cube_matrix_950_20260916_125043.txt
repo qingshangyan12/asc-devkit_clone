@@ -1,0 +1,35 @@
+=== CUBE 950 matrix START 2026-09-16T12:50:43+00:00 ===
+WS=/home/Temp_room/wj_cub_cube_ptr_950 BRANCH=feature/cube-basic-api-pointerization STAMP=20260916_125043 ARCH=dav-3510
+ASCEND_HOME_PATH=/usr/local/Ascend/cann-9.1.0-beta.3 CXX=/usr/bin/g++
+From https://gitcode.com/qq_53202098/asc-devkit
+ * branch                feature/cube-basic-api-pointerization -> FETCH_HEAD
+   170cc44d1..f1b7198a0  feature/cube-basic-api-pointerization -> origin/feature/cube-basic-api-pointerization
+Your branch is up to date with 'origin/feature/cube-basic-api-pointerization'.
+HEAD is now at f1b7198a0 fix(examples/950): unblock Ascend950 CUBE matrix build
+REPO_HEAD=f1b7198a0 @ /home/Temp_room/wj_cub_cube_ptr_950/helper_repo
+TEST_HEAD=2b3830d17
+patched /usr/local/Ascend/cann-9.1.0-beta.3/asc/impl/basic_api/kernel_operator_mm_intf_impl.h
+patched /usr/local/Ascend/cann-9.1.0-beta.3/asc/impl/basic_api/kernel_operator_fixpipe_intf_impl.h
+OVERLAY_OK
+==== RUN mmad s1 ====
+==== RUN fixpipe_l0c2gm s1 ====
+==== RUN load_data_l12l0 s1 ====
+==== RUN batch_matmul s1 ====
+==== RUN mmad_gemv s1 ====
+# Ascend950 CUBE self-test matrix
+
+- HEAD: 2b3830d17
+- ARCH: dav-3510
+- STAMP: 20260916_125043
+
+- verify PASS: **0**
+- FAIL: 5
+
+| case | scenario | arch | build | run | verify | note |
+|---|---|---|---|---|---|---|
+| mmad | 1 | dav-3510 | PASS | RUN_FAIL | - | exit=0 |
+| fixpipe_l0c2gm | 1 | dav-3510 | PASS | RUN_FAIL | - | exit=0 |
+| load_data_l12l0 | 1 | dav-3510 | BUILD_FAIL | - | - |  |
+| batch_matmul | 1 | dav-3510 | PASS | RUN_FAIL | - | exit=0 |
+| mmad_gemv | 1 | dav-3510 | PASS | RUN_FAIL | - | exit=0 |
+bad_rows 5

@@ -1,0 +1,25 @@
+api	case_id	arch	dtype	M	N	K	scenario	build	run	verify	note
+mmad	mmad_002_int8_m48n16k64_s1	dav-3510	int8	48	16	64	1	PASS	PASS	PASS	
+mmad	mmad_003_fp32_m16n80k16_s3	dav-3510	fp32	16	80	16	3	PASS	PASS	FAIL	
+mmad	mmad_004_bf16_m32n32k32_s2	dav-3510	bf16	32	32	32	2	PASS	PASS	FAIL	
+mmad	mmad_006_bf16_m16n32k16_s2	dav-3510	bf16	16	32	16	2	PASS	PASS	FAIL	
+mmad	mmad_007_fp32_m16n48k80_s3	dav-3510	fp32	16	48	80	3	PASS	PASS	FAIL	
+mmad	mmad_008_fp32_m64n32k64_s3	dav-3510	fp32	64	32	64	3	PASS	PASS	FAIL	
+mmad	mmad_009_bf16_m48n80k64_s2	dav-3510	bf16	48	80	64	2	PASS	PASS	FAIL	
+mmad	mmad_011_fp32_m32n80k80_s3	dav-3510	fp32	32	80	80	3	PASS	PASS	FAIL	
+load_data	load_data_001_fp32_m32n32k48_s5	dav-3510	fp32	32	32	48	5	PASS	PASS	PASS	
+load_data	load_data_003_int8_m80n48k64_s1	dav-3510	int8	80	48	64	1	PASS	PASS	PASS	
+load_data	load_data_004_int8_m64n48k64_s1	dav-3510	int8	64	48	64	1	PASS	PASS	PASS	
+load_data	load_data_005_half_m80n64k32_s3	dav-3510	half	80	64	32	3	PASS	PASS	PASS	
+load_data	load_data_006_fp32_m48n64k80_s5	dav-3510	fp32	48	64	80	5	PASS	PASS	PASS	
+load_data	load_data_007_fp32_m16n64k64_s5	dav-3510	fp32	16	64	64	5	PASS	PASS	PASS	
+load_data	load_data_009_fp32_m80n32k64_s5	dav-3510	fp32	80	32	64	5	PASS	PASS	PASS	
+load_data	load_data_010_fp32_m16n80k16_s5	dav-3510	fp32	16	80	16	5	PASS	PASS	PASS	
+fixpipe	fixpipe_001_fp32_m32n32k16_s2	dav-3510	fp32	32	32	16	2	PASS	PASS	FAIL	
+fixpipe	fixpipe_002_fp32_m48n64k48_s2	dav-3510	fp32	48	64	48	2	PASS	PASS	PASS	
+fixpipe	fixpipe_003_fp32_m16n48k16_s6	dav-3510	fp32	16	48	16	6	PASS	PASS	PASS	
+fixpipe	fixpipe_004_fp32_m64n80k32_s1	dav-3510	fp32	64	80	32	1	PASS	PASS	PASS	
+fixpipe	fixpipe_005_fp32_m32n64k16_s1	dav-3510	fp32	32	64	16	1	PASS	PASS	FAIL	
+fixpipe	fixpipe_006_fp32_m16n64k32_s7	dav-3510	fp32	16	64	32	7	PASS	PASS	FAIL	
+fixpipe	fixpipe_007_fp32_m32n32k80_s6	dav-3510	fp32	32	32	80	6	PASS	PASS	PASS	
+fixpipe	fixpipe_008_fp32_m32n64k80_s7	dav-3510	fp32	32	64	80	7	PASS	PASS	PASS	

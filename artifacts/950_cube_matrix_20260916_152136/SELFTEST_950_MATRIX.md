@@ -1,0 +1,61 @@
+# Ascend950 CUBE self-test matrix
+
+- HEAD: 8455fa7b5
+- ARCH: dav-3510
+- STAMP: 20260916_152136
+- MODE: full
+
+- verify PASS: **49**
+- FAIL: 0
+
+| case | scenario | arch | build | run | verify | note |
+|---|---|---|---|---|---|---|
+| mmad | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| mmad | 2 | dav-3510 | PASS | PASS | PASS | s2 |
+| mmad | 3 | dav-3510 | PASS | PASS | PASS | s3 |
+| mmad | 1 | dav-3510 | PASS | PASS | PASS | s1_m16n16k32 |
+| mmad | 1 | dav-3510 | PASS | PASS | PASS | s1_m64n64k64 |
+| mmad | 2 | dav-3510 | PASS | PASS | PASS | s2_m32n32k64 |
+| mmad | 2 | dav-3510 | PASS | PASS | PASS | s2_m48n32k64 |
+| mmad | 3 | dav-3510 | PASS | PASS | PASS | s3_m32n32k64 |
+| fixpipe_l0c2gm | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| fixpipe_l0c2gm | 2 | dav-3510 | PASS | PASS | PASS | s2 |
+| fixpipe_l0c2gm | 3 | dav-3510 | PASS | PASS | PASS | s3 |
+| fixpipe_l0c2gm | 4 | dav-3510 | PASS | PASS | PASS | s4 |
+| fixpipe_l0c2gm | 5 | dav-3510 | PASS | PASS | PASS | s5 |
+| fixpipe_l0c2gm | 6 | dav-3510 | PASS | PASS | PASS | s6 |
+| fixpipe_l0c2gm | 7 | dav-3510 | PASS | PASS | PASS | s7 |
+| fixpipe_l0c2gm | 1 | dav-3510 | PASS | PASS | PASS | s1_m64n64k64 |
+| fixpipe_l0c2gm | 3 | dav-3510 | PASS | PASS | PASS | s3_m64n128k64 |
+| load_data_2dv2_l12l0 | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| load_data_2dv2_l12l0 | 2 | dav-3510 | PASS | PASS | PASS | s2 |
+| load_data_2dv2_l12l0 | 3 | dav-3510 | PASS | PASS | PASS | s3 |
+| load_data_2dv2_l12l0 | 4 | dav-3510 | PASS | PASS | PASS | s4 |
+| load_data_2dv2_l12l0 | 5 | dav-3510 | PASS | PASS | PASS | s5 |
+| load_data_2dv2_l12l0 | 6 | dav-3510 | PASS | PASS | PASS | s6 |
+| load_data_2dv2_l12l0 | 7 | dav-3510 | PASS | PASS | PASS | s7 |
+| load_data_2dv2_l12l0 | 1 | dav-3510 | PASS | PASS | PASS | s1_m16n16k32 |
+| load_data_2dv2_l12l0 | 1 | dav-3510 | PASS | PASS | PASS | s1_m64n48k64 |
+| load_data_2dv2_l12l0 | 3 | dav-3510 | PASS | PASS | PASS | s3_m32n32k64 |
+| load_data_with_stride | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| load_data_with_stride | 2 | dav-3510 | PASS | PASS | PASS | s2 |
+| load_data_with_stride | 3 | dav-3510 | PASS | PASS | PASS | s3 |
+| load_data_with_stride | 4 | dav-3510 | PASS | PASS | PASS | s4 |
+| load_data_with_stride | 5 | dav-3510 | PASS | PASS | PASS | s5 |
+| load_data_with_stride | 6 | dav-3510 | PASS | PASS | PASS | s6 |
+| fixpipe_l0c2ub | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| fixpipe_l0c2ub | 2 | dav-3510 | PASS | PASS | PASS | s2 |
+| fixpipe_l0c2ub | 3 | dav-3510 | PASS | PASS | PASS | s3 |
+| fixpipe_l0c2ub | 4 | dav-3510 | PASS | PASS | PASS | s4 |
+| fixpipe_l0c2l1 | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| fixpipe_l0c2l1 | 2 | dav-3510 | PASS | PASS | PASS | s2 |
+| fixpipe_l0c2l1 | 3 | dav-3510 | PASS | PASS | PASS | s3 |
+| fixpipe_l0c2l1 | 4 | dav-3510 | PASS | PASS | PASS | s4 |
+| mmad_load3dv2 | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| mmad_load3dv2 | 2 | dav-3510 | PASS | PASS | PASS | s2 |
+| mmad_load3dv2 | 3 | dav-3510 | PASS | PASS | PASS | s3 |
+| mmad_load3dv2 | 4 | dav-3510 | PASS | PASS | PASS | s4 |
+| mmad_load3dv2 | 5 | dav-3510 | PASS | PASS | PASS | s5 |
+| batch_matmul | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| mmad_gemv | 1 | dav-3510 | PASS | PASS | PASS | s1 |
+| mmad_unitflag | 1 | dav-3510 | PASS | PASS | PASS | s1 |

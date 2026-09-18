@@ -1,0 +1,2 @@
+sync/ib_set_wait	0	dav-3510	BUILD_FAIL	-	-	/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/asc/impl/basic_api/kernel_operator_block_sync_ptr_impl.h:113:13: error:
+sync/sync_all	0	dav-3510	PASS	TIMEOUT	SKIP	to=30s

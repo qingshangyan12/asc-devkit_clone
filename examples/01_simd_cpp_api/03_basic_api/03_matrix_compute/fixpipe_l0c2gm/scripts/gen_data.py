@@ -134,10 +134,7 @@ def pre_quant_relu(golden, dst_type, m, n, pre_quant_mode, pre_relu_mode):
     return quant_golden
 
 
-def gen_golden_data(scenarioNum=1):
-    M = 128
-    K = 128
-    N = 256
+def gen_golden_data(scenarioNum=1, M=128, N=256, K=128):
     kRound = 2  # K轴切分2次
 
     input_type = np.dtype("float16")
@@ -189,5 +186,8 @@ def gen_golden_data(scenarioNum=1):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 8))
+    parser.add_argument("-M", type=int, default=128)
+    parser.add_argument("-N", type=int, default=256)
+    parser.add_argument("-K", type=int, default=128)
     args = parser.parse_args()
-    gen_golden_data(args.scenarioNum)
+    gen_golden_data(args.scenarioNum, args.M, args.N, args.K)

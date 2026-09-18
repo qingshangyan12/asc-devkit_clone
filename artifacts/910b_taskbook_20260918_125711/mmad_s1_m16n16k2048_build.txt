@@ -1,0 +1,32 @@
+-- System processer: aarch64
+-- CMAKE_ASC_COMPILER: /home/Temp_room/cann-9.1.0/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /home/Temp_room/wj_cub_cube_ptr/cann_local/aarch64-linux
+-- CMAKE_ASC_LLD_LINKER: /home/Temp_room/wj_cub_cube_ptr/cann_local/aarch64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 9.5.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /home/Temp_room/te_npu_30/tools/bin/g++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- [INFO] SCENARIO_NUM is 1 CASE_MNK=16x16x2048
+-- Configuring done
+-- Generating done
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_C_COMPILER
+
+
+-- Build files have been written to: /home/Temp_room/wj_cub_cube_ptr/runs_910b/taskbook_20260918_125711/mmad_s1_m16n16k2048/build
+[ 50%] Building ASC object CMakeFiles/demo.dir/mmad.asc.o
+/home/Temp_room/wj_cub_cube_ptr/runs_910b/taskbook_20260918_125711/mmad_s1_m16n16k2048/mmad.asc:371:24: error: no member named 'disableGemv' in 'AscendC::MmadParams'
+            mmadParams.disableGemv = true;
+            ~~~~~~~~~~ ^
+1 error generated.
+/home/Temp_room/wj_cub_cube_ptr/runs_910b/taskbook_20260918_125711/mmad_s1_m16n16k2048/mmad.asc:371:24: error: no member named 'disableGemv' in 'AscendC::MmadParams'
+            mmadParams.disableGemv = true;
+            ~~~~~~~~~~ ^
+1 error generated.
+gmake[2]: *** [CMakeFiles/demo.dir/build.make:76: CMakeFiles/demo.dir/mmad.asc.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:83: CMakeFiles/demo.dir/all] Error 2
+gmake: *** [Makefile:91: all] Error 2

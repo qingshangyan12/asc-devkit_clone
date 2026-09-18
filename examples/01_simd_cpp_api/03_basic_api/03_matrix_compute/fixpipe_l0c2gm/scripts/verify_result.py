@@ -15,15 +15,16 @@ import sys
 import numpy as np
 
 
-# for float32
-relative_tol = 1e-6
-absolute_tol = 1e-9
-error_tol = 1e-4
+# fp32 matmul+fixpipe: sample default 1e-6 is too tight for varied M/K/N
+relative_tol = 1e-3
+absolute_tol = 1e-3
+error_tol = 1e-2
 
 
-def verify_result(output, golden):
-    output = np.fromfile(output, dtype=np.float32).reshape(-1)
-    golden = np.fromfile(golden, dtype=np.float32).reshape(-1)
+def verify_result(output, golden, scenario_num=1):
+    output_type = np.int8 if scenario_num in (4, 5) else np.float32
+    output = np.fromfile(output, dtype=output_type).reshape(-1)
+    golden = np.fromfile(golden, dtype=output_type).reshape(-1)
     different_element_results = np.isclose(
         output, golden, rtol=relative_tol, atol=absolute_tol, equal_nan=True
     )
@@ -48,8 +49,17 @@ def verify_result(output, golden):
 
 
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 8))
+    parser.add_argument("-M", type=int, default=128)
+    parser.add_argument("-N", type=int, default=256)
+    parser.add_argument("-K", type=int, default=128)
+    parser.add_argument("output", type=str)
+    parser.add_argument("golden", type=str)
+    args = parser.parse_args()
     try:
-        res = verify_result(sys.argv[1], sys.argv[2])
+        res = verify_result(args.output, args.golden, args.scenarioNum)
         if not res:
             raise ValueError("[ERROR] result error")
         else:

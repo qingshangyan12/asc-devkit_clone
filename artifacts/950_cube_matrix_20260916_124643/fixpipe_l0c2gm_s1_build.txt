@@ -1,0 +1,143 @@
+-- System processer: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.1.0-beta.3/tools/ccec_compiler/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 11.4.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/g++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_124643/fixpipe_l0c2gm_s1/build
+[ 50%] Building ASC object CMakeFiles/demo.dir/fixpipe_l0c2gm.asc.o
+/home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_124643/fixpipe_l0c2gm_s1/fixpipe_l0c2gm.asc:14:54: error: unknown type name 'Fixpipe'
+ * \note 指针化改造：CUBE 计算接口（Mmad*/Fixpipe*/LoadData*）使用 GetPhyAddr() 及 __ca__/__cb__/__cc__/__cbuf__/__gm__ 强转；**DataCopy 仍用 Tensor**。
+                                          ^
+/home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_124643/fixpipe_l0c2gm_s1/fixpipe_l0c2gm.asc:14:62: error: expected unqualified-id
+ * \note 指针化改造：CUBE 计算接口（Mmad*/Fixpipe*/LoadData*）使用 GetPhyAddr() 及 __ca__/__cb__/__cc__/__cbuf__/__gm__ 强转；**DataCopy 仍用 Tensor**。
+                                                  ^
+/home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_124643/fixpipe_l0c2gm_s1/fixpipe_l0c2gm.asc:14:72: error: unexpected character <U+FF09>
+ * \note 指针化改造：CUBE 计算接口（Mmad*/Fixpipe*/LoadData*）使用 GetPhyAddr() 及 __ca__/__cb__/__cc__/__cbuf__/__gm__ 强转；**DataCopy 仍用 Tensor**。
+                                                            ^~
+/home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_124643/fixpipe_l0c2gm_s1/fixpipe_l0c2gm.asc:14:142: error: character <U+FF1B> not allowed in an identifier
+ * \note 指针化改造：CUBE 计算接口（Mmad*/Fixpipe*/LoadData*）使用 GetPhyAddr() 及 __ca__/__cb__/__cc__/__cbuf__/__gm__ 强转；**DataCopy 仍用 Tensor**。
+                                                                                                                            ^~
+/home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_124643/fixpipe_l0c2gm_s1/fixpipe_l0c2gm.asc:14:171: error: unexpected character <U+3002>
+ * \note 指针化改造：CUBE 计算接口（Mmad*/Fixpipe*/LoadData*）使用 GetPhyAddr() 及 __ca__/__cb__/__cc__/__cbuf__/__gm__ 强转；**DataCopy 仍用 Tensor**。
+                                                                                                                                                      ^~
+In file included from /home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_124643/fixpipe_l0c2gm_s1/fixpipe_l0c2gm.asc:17:
+In file included from /usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl.h:14:
+In file included from /usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_rt.h:17:
+In file included from /usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base.h:15:
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:42:56: error: unknown type name 'aclDataType'
+ACL_FUNC_VISIBILITY aclTensorDesc *aclCreateTensorDesc(aclDataType dataType,
+                                                       ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:45:56: error: unknown type name 'aclFormat'
+                                                       aclFormat format);
+                                                       ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:66:21: error: unknown type name 'aclError'
+ACL_FUNC_VISIBILITY aclError aclSetTensorShapeRange(aclTensorDesc* desc,
+                    ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:81:21: error: unknown type name 'aclError'
+ACL_FUNC_VISIBILITY aclError aclSetTensorValueRange(aclTensorDesc* desc,
+                    ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:93:21: error: unknown type name 'aclDataType'
+ACL_FUNC_VISIBILITY aclDataType aclGetTensorDescType(const aclTensorDesc *desc);
+                    ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:104:21: error: unknown type name 'aclFormat'
+ACL_FUNC_VISIBILITY aclFormat aclGetTensorDescFormat(const aclTensorDesc *desc);
+                    ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:164:21: error: unknown type name 'aclError'
+ACL_FUNC_VISIBILITY aclError aclGetTensorDescDimV2(const aclTensorDesc *desc, size_t index, int64_t *dimSize);
+                    ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:178:21: error: unknown type name 'aclError'
+ACL_FUNC_VISIBILITY aclError aclGetTensorDescDimRange(const aclTensorDesc *desc,
+                    ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:216:21: error: unknown type name 'aclError'
+ACL_FUNC_VISIBILITY aclError aclTransTensorDescFormat(const aclTensorDesc *srcDesc, aclFormat dstFormat,
+                    ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:216:85: error: unknown type name 'aclFormat'
+ACL_FUNC_VISIBILITY aclError aclTransTensorDescFormat(const aclTensorDesc *srcDesc, aclFormat dstFormat,
+                                                                                    ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:230:21: error: unknown type name 'aclError'
+ACL_FUNC_VISIBILITY aclError aclSetTensorStorageFormat(aclTensorDesc *desc, aclFormat format);
+                    ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:230:77: error: unknown type name 'aclFormat'
+ACL_FUNC_VISIBILITY aclError aclSetTensorStorageFormat(aclTensorDesc *desc, aclFormat format);
+                                                                            ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:244:21: error: unknown type name 'aclError'
+ACL_FUNC_VISIBILITY aclError aclSetTensorStorageShape(aclTensorDesc *desc, int numDims, const int64_t *dims);
+                    ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:256:21: error: unknown type name 'aclError'
+ACL_FUNC_VISIBILITY aclError aclSetTensorFormat(aclTensorDesc *desc, aclFormat format);
+                    ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+/home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_124643/fixpipe_l0c2gm_s1/fixpipe_l0c2gm.asc:14:54: error: unknown type name 'Fixpipe'
+ * \note 指针化改造：CUBE 计算接口（Mmad*/Fixpipe*/LoadData*）使用 GetPhyAddr() 及 __ca__/__cb__/__cc__/__cbuf__/__gm__ 强转；**DataCopy 仍用 Tensor**。
+                                          ^
+/home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_124643/fixpipe_l0c2gm_s1/fixpipe_l0c2gm.asc:14:62: error: expected unqualified-id
+ * \note 指针化改造：CUBE 计算接口（Mmad*/Fixpipe*/LoadData*）使用 GetPhyAddr() 及 __ca__/__cb__/__cc__/__cbuf__/__gm__ 强转；**DataCopy 仍用 Tensor**。
+                                                  ^
+/home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_124643/fixpipe_l0c2gm_s1/fixpipe_l0c2gm.asc:14:72: error: unexpected character <U+FF09>
+ * \note 指针化改造：CUBE 计算接口（Mmad*/Fixpipe*/LoadData*）使用 GetPhyAddr() 及 __ca__/__cb__/__cc__/__cbuf__/__gm__ 强转；**DataCopy 仍用 Tensor**。
+                                                            ^~
+/home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_124643/fixpipe_l0c2gm_s1/fixpipe_l0c2gm.asc:14:142: error: character <U+FF1B> not allowed in an identifier
+ * \note 指针化改造：CUBE 计算接口（Mmad*/Fixpipe*/LoadData*）使用 GetPhyAddr() 及 __ca__/__cb__/__cc__/__cbuf__/__gm__ 强转；**DataCopy 仍用 Tensor**。
+                                                                                                                            ^~
+/home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_124643/fixpipe_l0c2gm_s1/fixpipe_l0c2gm.asc:14:171: error: unexpected character <U+3002>
+ * \note 指针化改造：CUBE 计算接口（Mmad*/Fixpipe*/LoadData*）使用 GetPhyAddr() 及 __ca__/__cb__/__cc__/__cbuf__/__gm__ 强转；**DataCopy 仍用 Tensor**。
+                                                                                                                                                      ^~
+In file included from /home/Temp_room/wj_cub_cube_ptr_950/runs_950/20260916_124643/fixpipe_l0c2gm_s1/fixpipe_l0c2gm.asc:17:
+In file included from /usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl.h:14:
+In file included from /usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_rt.h:17:
+In file included from /usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base.h:15:
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:42:56: error: unknown type name 'aclDataType'
+ACL_FUNC_VISIBILITY aclTensorDesc *aclCreateTensorDesc(aclDataType dataType,
+                                                       ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:45:56: error: unknown type name 'aclFormat'
+                                                       aclFormat format);
+                                                       ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:66:21: error: unknown type name 'aclError'
+ACL_FUNC_VISIBILITY aclError aclSetTensorShapeRange(aclTensorDesc* desc,
+                    ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:81:21: error: unknown type name 'aclError'
+ACL_FUNC_VISIBILITY aclError aclSetTensorValueRange(aclTensorDesc* desc,
+                    ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:93:21: error: unknown type name 'aclDataType'
+ACL_FUNC_VISIBILITY aclDataType aclGetTensorDescType(const aclTensorDesc *desc);
+                    ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:104:21: error: unknown type name 'aclFormat'
+ACL_FUNC_VISIBILITY aclFormat aclGetTensorDescFormat(const aclTensorDesc *desc);
+                    ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:164:21: error: unknown type name 'aclError'
+ACL_FUNC_VISIBILITY aclError aclGetTensorDescDimV2(const aclTensorDesc *desc, size_t index, int64_t *dimSize);
+                    ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:178:21: error: unknown type name 'aclError'
+ACL_FUNC_VISIBILITY aclError aclGetTensorDescDimRange(const aclTensorDesc *desc,
+                    ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:216:21: error: unknown type name 'aclError'
+ACL_FUNC_VISIBILITY aclError aclTransTensorDescFormat(const aclTensorDesc *srcDesc, aclFormat dstFormat,
+                    ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:216:85: error: unknown type name 'aclFormat'
+ACL_FUNC_VISIBILITY aclError aclTransTensorDescFormat(const aclTensorDesc *srcDesc, aclFormat dstFormat,
+                                                                                    ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:230:21: error: unknown type name 'aclError'
+ACL_FUNC_VISIBILITY aclError aclSetTensorStorageFormat(aclTensorDesc *desc, aclFormat format);
+                    ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:230:77: error: unknown type name 'aclFormat'
+ACL_FUNC_VISIBILITY aclError aclSetTensorStorageFormat(aclTensorDesc *desc, aclFormat format);
+                                                                            ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:244:21: error: unknown type name 'aclError'
+ACL_FUNC_VISIBILITY aclError aclSetTensorStorageShape(aclTensorDesc *desc, int numDims, const int64_t *dims);
+                    ^
+/usr/local/Ascend/cann-9.1.0-beta.3/x86_64-linux/include/acl/acl_base_mdl.h:256:21: error: unknown type name 'aclError'
+ACL_FUNC_VISIBILITY aclError aclSetTensorFormat(aclTensorDesc *desc, aclFormat format);
+                    ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+make[2]: *** [CMakeFiles/demo.dir/build.make:76: CMakeFiles/demo.dir/fixpipe_l0c2gm.asc.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:83: CMakeFiles/demo.dir/all] Error 2
+make: *** [Makefile:91: all] Error 2

@@ -1,0 +1,72 @@
+=== CUBE ptr sweep START 2026-09-16T05:23:16+00:00 ARCH=dav-2201 SMOKE=1 WS=/home/Temp_room/wj_cub_cube_ptr ===
+ASCEND_HOME_PATH=/home/Temp_room/wj_cub_cube_ptr/cann_local CXX=/home/Temp_room/te_npu_30/tools/bin/g++
+From https://gitcode.com/qq_53202098/asc-devkit
+ * branch                feature/cube-basic-api-pointerization -> FETCH_HEAD
+M	scripts/cube_ptr_sweep/run_sweep.sh
+Your branch is up to date with 'origin/feature/cube-basic-api-pointerization'.
+HEAD is now at 60ef0837a feat(examples): CUBE ptr dtype/shape sweep (200 cases per API)
+REPO_HEAD=60ef0837a @ /home/Temp_room/wj_cub_cube_ptr/helper_repo
+TEST_HEAD=60ef0837a
+OVERLAY_OK
+PY=/usr/bin/python3
+SELECTED 24 smoke
+==== mmad_001_int4_m64n80k64_s4 ====
+DONE mmad_001_int4_m64n80k64_s4 verify=PASS
+==== mmad_002_int8_m48n16k64_s1 ====
+DONE mmad_002_int8_m48n16k64_s1 verify=PASS
+==== mmad_003_fp32_m16n80k16_s3 ====
+DONE mmad_003_fp32_m16n80k16_s3 verify=FAIL
+==== mmad_004_bf16_m32n32k32_s2 ====
+DONE mmad_004_bf16_m32n32k32_s2 verify=FAIL
+==== mmad_005_int4_m48n80k64_s4 ====
+DONE mmad_005_int4_m48n80k64_s4 verify=PASS
+==== mmad_006_bf16_m16n32k16_s2 ====
+DONE mmad_006_bf16_m16n32k16_s2 verify=FAIL
+==== mmad_007_fp32_m16n48k80_s3 ====
+DONE mmad_007_fp32_m16n48k80_s3 verify=FAIL
+==== mmad_008_fp32_m64n32k64_s3 ====
+DONE mmad_008_fp32_m64n32k64_s3 verify=FAIL
+==== load_data_001_fp32_m32n32k48_s5 ====
+DONE load_data_001_fp32_m32n32k48_s5 verify=PASS
+==== load_data_002_int4_m80n16k64_s1 ====
+DONE load_data_002_int4_m80n16k64_s1 verify=PASS
+==== load_data_003_int8_m80n48k64_s1 ====
+DONE load_data_003_int8_m80n48k64_s1 verify=PASS
+==== load_data_004_int8_m64n48k64_s1 ====
+DONE load_data_004_int8_m64n48k64_s1 verify=PASS
+==== load_data_005_half_m80n64k32_s3 ====
+DONE load_data_005_half_m80n64k32_s3 verify=PASS
+==== load_data_006_fp32_m48n64k80_s5 ====
+DONE load_data_006_fp32_m48n64k80_s5 verify=PASS
+==== load_data_007_fp32_m16n64k64_s5 ====
+DONE load_data_007_fp32_m16n64k64_s5 verify=PASS
+==== load_data_008_int4_m32n64k64_s1 ====
+DONE load_data_008_int4_m32n64k64_s1 verify=PASS
+==== fixpipe_001_fp32_m32n32k16_s2 ====
+DONE fixpipe_001_fp32_m32n32k16_s2 verify=FAIL
+==== fixpipe_002_fp32_m48n64k48_s2 ====
+DONE fixpipe_002_fp32_m48n64k48_s2 verify=PASS
+==== fixpipe_003_fp32_m16n48k16_s6 ====
+DONE fixpipe_003_fp32_m16n48k16_s6 verify=PASS
+==== fixpipe_004_fp32_m64n80k32_s1 ====
+DONE fixpipe_004_fp32_m64n80k32_s1 verify=PASS
+==== fixpipe_005_fp32_m32n64k16_s1 ====
+DONE fixpipe_005_fp32_m32n64k16_s1 verify=FAIL
+==== fixpipe_006_fp32_m16n64k32_s7 ====
+DONE fixpipe_006_fp32_m16n64k32_s7 verify=FAIL
+==== fixpipe_007_fp32_m32n32k80_s6 ====
+DONE fixpipe_007_fp32_m32n32k80_s6 verify=PASS
+==== fixpipe_008_fp32_m32n64k80_s7 ====
+DONE fixpipe_008_fp32_m32n64k80_s7 verify=PASS
+# CUBE ptr sweep
+
+- HEAD: 60ef0837a
+- ARCH: dav-2201
+- MODE: smoke
+- STAMP: 20260916_052316
+
+- verify PASS: **16**
+- FAIL: 8
+- total: 24
+
+ok 16 fail 8 n 24

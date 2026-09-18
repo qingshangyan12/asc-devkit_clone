@@ -191,6 +191,9 @@ __aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args)
 
 #endif // defined(__NPU_ARCH__)
 } // namespace AscendC
+
+#include "kernel_operator_dump_tensor_ptr_impl.h"
+
 #endif // END OF ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_INTERFACE_IMPL_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_INTF_IMPL_H__)

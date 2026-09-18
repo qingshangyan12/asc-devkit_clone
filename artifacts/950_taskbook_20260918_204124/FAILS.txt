@@ -1,0 +1,9 @@
+mmad	2	dav-3510	PASS	PASS	FAIL	s2_m16n16k2048
+mmad	3	dav-3510	PASS	PASS	FAIL	s3_m1n1k16
+mmad	3	dav-3510	PASS	PASS	FAIL	s3_m16n16k2048
+mmad	5	dav-3510	PASS	PASS	FAIL	s5_m16n16k2048
+mmad_mx	1	dav-3510	PASS	PASS	FAIL	s1_m32n32k32
+mmad_mx	1	dav-3510	PASS	PASS	FAIL	s1_m16n16k1024
+load_data_2dmx_l12l0	1	dav-3510	PASS	PASS	FAIL	s1_m32n32k32
+sync/ib_set_wait	0	dav-3510	BUILD_FAIL	-	-	/home/Temp_room/wj_cub_cube_ptr_950/runs_950/taskbook_20260918_204124/sync_ib_set_wait/ib_set_wait.asc:50:9: error: no m
+sync/sync_all	0	dav-3510	BUILD_FAIL	-	-	/home/Temp_room/wj_cub_cube_ptr_950/runs_950/taskbook_20260918_204124/sync_sync_all/sync_all.asc:57:9: error: no matchin

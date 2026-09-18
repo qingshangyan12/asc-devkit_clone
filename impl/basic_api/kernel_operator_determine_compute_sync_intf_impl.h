@@ -75,6 +75,9 @@ __aicore__ inline void NotifyNextBlock(GlobalTensor<int32_t>& gmWorkspace, Local
     NotifyNextBlockCalc(gmWorkspace, ubWorkspace);
 }
 } // namespace AscendC
+
+#include "kernel_operator_determine_compute_sync_ptr_impl.h"
+
 #endif // ASCENDC_MODULE_OPERATOR_DETERMINE_COMPUTE_SYNC_INTF_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DETERMINE_COMPUTE_SYNC_INTF_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

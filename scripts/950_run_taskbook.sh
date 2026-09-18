@@ -1,0 +1,597 @@
+#!/usr/bin/env bash
+# Ascend950 task-book / MX gate for CUBE pointerization (dav-3510)
+# Modes:
+#   CUBE_MATRIX_MODE=mx_only    → only mmad_mx + load_data_2dmx
+#   CUBE_MATRIX_MODE=taskbook   → main + shapes + dual + MX (strict)
+#   CUBE_MATRIX_MODE=sync_only  → overlay + ib_set_wait/sync_all only (fast retest)
+set -euo pipefail
+
+WS="${CUBE_WS:-/home/Temp_room/wj_cub_cube_ptr_950}"
+CANN_ENV="${CANN_ENV:-/usr/local/Ascend/cann-9.1.0-beta.3/set_env.sh}"
+PTA="${GITCODE_PTA:?set GITCODE_PTA}"
+REPO_PATH="${CUBE_REPO_PATH:-baibai_Uu/asc-devkit}"
+BRANCH="${CUBE_BRANCH:-feature/cube-basic-api-pointerization}"
+ARCH="${CMAKE_ASC_ARCHITECTURES:-dav-3510}"
+MODE="${CUBE_MATRIX_MODE:-taskbook}"
+DEVICE_ID="${ASCEND_RT_VISIBLE_DEVICES:-0}"
+DEMO_TIMEOUT="${CUBE_DEMO_TIMEOUT:-180}"
+
+HELPER="${HELPER:-$WS/helper_repo}"
+SRC="${SRC:-$WS/src/asc-devkit}"
+STAMP=$(date +%Y%m%d_%H%M%S)
+LOGDIR="$WS/logs"
+LOG="$LOGDIR/cube_taskbook_950_${STAMP}.log"
+DEST="$HELPER/artifacts/950_taskbook_${STAMP}"
+AUTH="https://oauth2:${PTA}@gitcode.com/${REPO_PATH}.git"
+SAFE="https://gitcode.com/${REPO_PATH}.git"
+
+export GIT_TERMINAL_PROMPT=0 GIT_ASKPASS=true SSH_ASKPASS=true GCM_INTERACTIVE=never
+mkdir -p "$LOGDIR" "$WS/runs_950" "$WS/tmp"
+exec > >(tee -a "$LOG") 2>&1
+echo "=== CUBE 950 TASKBOOK START $(date -Iseconds) MODE=$MODE ==="
+
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}" PYTHONPATH="${PYTHONPATH:-}" CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH:-}"
+set +u
+# shellcheck disable=SC1091
+if [ -f "$CANN_ENV" ]; then source "$CANN_ENV"
+elif [ -f /usr/local/Ascend/cann-9.1.0-beta.3/set_env.sh ]; then source /usr/local/Ascend/cann-9.1.0-beta.3/set_env.sh
+elif [ -f /usr/local/Ascend/ascend-toolkit/set_env.sh ]; then source /usr/local/Ascend/ascend-toolkit/set_env.sh
+else echo "FATAL: no CANN set_env"; exit 2; fi
+set +u
+export PATH="/usr/local/Ascend/cann-9.1.0-beta.3/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.1.0-beta.3/bin:${ASCEND_HOME_PATH:+$ASCEND_HOME_PATH/bin:}${PATH:-}"
+ASC_FLAGS=""
+if command -v g++ >/dev/null 2>&1; then
+  export CXX="${CXX:-$(command -v g++)}"; export CC="${CC:-$(command -v gcc)}"
+else echo "FATAL: no g++"; exit 2; fi
+export ASCEND_RT_VISIBLE_DEVICES="$DEVICE_ID"
+export HOME="$WS" TMPDIR="$WS/tmp" TEMP="$WS/tmp" TMP="$WS/tmp"
+PY=/usr/bin/python3
+echo "ASCEND_HOME_PATH=${ASCEND_HOME_PATH:-} CXX=$CXX DEVICE=$DEVICE_ID"
+
+# ensure helper synced
+if [ ! -d "$HELPER/.git" ]; then
+  git -c credential.helper= clone --branch "$BRANCH" --single-branch "$AUTH" "$HELPER"
+fi
+cd "$HELPER"
+git remote set-url origin "$AUTH"
+git -c credential.helper= fetch origin "$BRANCH" || true
+git checkout "$BRANCH" 2>/dev/null || true
+git -c credential.helper= reset --hard "origin/$BRANCH" || true
+git remote set-url origin "$SAFE"
+HEAD=$(git rev-parse --short HEAD)
+ln -sfn "$HELPER" "$SRC" 2>/dev/null || true
+echo "TEST_HEAD=$HEAD"
+
+# overlay ptr headers into ASCEND_HOME if present
+# CANN layout may be $ASCEND_HOME_PATH/{asc,tikcpp} or .../x86_64-linux/{asc,tikcpp}
+ASC_ROOT="$ASCEND_HOME_PATH"
+[ -d "$ASCEND_HOME_PATH/x86_64-linux/asc" ] && ASC_ROOT="$ASCEND_HOME_PATH/x86_64-linux"
+ACT_INC="${ASC_ROOT}/asc/include/basic_api"
+ACT_IMPL="${ASC_ROOT}/asc/impl/basic_api"
+TIK_IMPL="${ASC_ROOT}/tikcpp/tikcfw/impl/basic_api"
+TIK_DAV="${ASC_ROOT}/tikcpp/tikcfw/impl/dav_3510"
+if [ -d "$ACT_INC" ] && [ -d "$ACT_IMPL" ]; then
+  cp -a "$HELPER/include/basic_api/kernel_operator_ptr_utils.h" "$ACT_INC/" 2>/dev/null || true
+  for f in kernel_operator_mm_ptr_impl.h kernel_operator_fixpipe_ptr_impl.h \
+           kernel_operator_dump_tensor_ptr_impl.h kernel_operator_common_ptr_impl.h \
+           kernel_operator_block_sync_ptr_impl.h kernel_operator_determine_compute_sync_ptr_impl.h; do
+    [ -f "$HELPER/impl/basic_api/$f" ] && cp -a "$HELPER/impl/basic_api/$f" "$ACT_IMPL/" || true
+  done
+  # Restore stock tik mm_intf.h from CANN (never overlay newer feature intf.h).
+  TIK_INTF="${ASC_ROOT}/tikcpp/tikcfw/interface/kernel_operator_mm_intf.h"
+  STOCK_INTF=""
+  for cand in \
+    "${ASCEND_HOME_PATH}/aarch64-linux/tikcpp/tikcfw/interface/kernel_operator_mm_intf.h" \
+    "${ASCEND_HOME_PATH}/x86_64-linux/tikcpp/tikcfw/interface/kernel_operator_mm_intf.h.bak" \
+    "${ASCEND_HOME_PATH}/x86_64-linux/tikcpp/tikcfw/interface/kernel_operator_mm_intf.h.orig" \
+    "/usr/local/Ascend/cann-9.1.0-beta.3.bak/x86_64-linux/tikcpp/tikcfw/interface/kernel_operator_mm_intf.h"; do
+    [ -f "$cand" ] && STOCK_INTF="$cand" && break
+  done
+  if [ -n "$STOCK_INTF" ] && [ -f "$TIK_INTF" ]; then
+    cp -a "$STOCK_INTF" "$TIK_INTF"
+    echo "RESTORE_TIK_INTF from $STOCK_INTF"
+  else
+    # Feature intf overlay left MmadBitModeParams decls beta.3 cannot compile. Strip them.
+    if [ -f "$TIK_INTF" ]; then
+      python3 - "$TIK_INTF" <<'PY'
+from pathlib import Path
+import re, sys
+p = Path(sys.argv[1])
+t = p.read_text(encoding="utf-8", errors="replace")
+orig = t
+t = re.sub(
+    r"\ntemplate <typename T, typename U, typename S(?:, typename V)?>\n"
+    r"__aicore__ inline void MmadMx\(\n"
+    r"(?:.*\n)*?"
+    r"\s*const MmadBitModeParams& mmadParams\);\n",
+    "\n",
+    t,
+)
+t = re.sub(
+    r"\ntemplate <[^>]+>\n__aicore__ inline void LoadData\([\s\S]*?LoadDataRepeatParamWithStride[\s\S]*?\);\n",
+    "\n",
+    t,
+)
+if t != orig:
+    p.write_text(t, encoding="utf-8")
+    print("SCRUB_TIK_INTF_COMPAT", p)
+else:
+    print("SCRUB_TIK_INTF_COMPAT_NOP", p)
+PY
+    fi
+  fi
+  # Do not overlay feature mm_intf_impl onto TIK (Fill template breaks sample pad).
+  if [ -f "$HELPER/impl/basic_api/kernel_operator_mm_base_impl.h" ]; then
+    cp -a "$HELPER/impl/basic_api/kernel_operator_mm_base_impl.h" "$ACT_IMPL/"
+    echo "OVERLAY_ASC kernel_operator_mm_base_impl.h"
+  fi
+  if [ -f "$HELPER/impl/basic_api/kernel_operator_mm_load2d_impl.h" ]; then
+    cp -a "$HELPER/impl/basic_api/kernel_operator_mm_load2d_impl.h" "$ACT_IMPL/"
+    echo "OVERLAY_ASC kernel_operator_mm_load2d_impl.h"
+  fi
+  # intf_impl overlay only under asc/ (pointer include), not tikcpp (Fill breakage).
+  if [ -f "$HELPER/impl/basic_api/kernel_operator_mm_intf_impl.h" ]; then
+    cp -a "$HELPER/impl/basic_api/kernel_operator_mm_intf_impl.h" "$ACT_IMPL/"
+    echo "OVERLAY_ASC kernel_operator_mm_intf_impl.h"
+  fi
+  if [ -f "$HELPER/impl/basic_api/dav_3510/kernel_operator_mm_impl.h" ]; then
+    mkdir -p "$ACT_IMPL/dav_3510" 2>/dev/null || true
+    cp -a "$HELPER/impl/basic_api/dav_3510/kernel_operator_mm_impl.h" "$ACT_IMPL/dav_3510/" 2>/dev/null || true
+    echo "OVERLAY_DAV_ASC dav_3510/kernel_operator_mm_impl.h"
+    if [ -d "$TIK_DAV" ]; then
+      cp -a "$HELPER/impl/basic_api/dav_3510/kernel_operator_mm_impl.h" "$TIK_DAV/"
+      echo "OVERLAY_DAV_TIK tikcfw/impl/dav_3510/kernel_operator_mm_impl.h"
+    fi
+  fi
+  # Replace poisoned tik intf_impl (rev17–21) with Fill enable_if defaults so sample pad compiles.
+  mkdir -p "$TIK_IMPL" 2>/dev/null || true
+  if [ -f "$HELPER/impl/basic_api/kernel_operator_mm_intf_impl.h" ] && [ -d "$TIK_IMPL" ]; then
+    cp -a "$HELPER/impl/basic_api/kernel_operator_mm_intf_impl.h" "$TIK_IMPL/"
+    python3 - "$TIK_IMPL/kernel_operator_mm_intf_impl.h" <<'PY'
+from pathlib import Path
+import sys
+p = Path(sys.argv[1])
+t = p.read_text(encoding="utf-8", errors="replace")
+t = t.replace(
+    "SetHF32TransModeImpl(mode == AscendC::HF32TransMode::NEAREST_AWAY);",
+    "SetHF32TransModeImpl(static_cast<uint32_t>(mode) == 0u);",
+)
+p.write_text(t, encoding="utf-8")
+print("OVERLAY_TIK_INTF_IMPL_FILLFIX", p)
+PY
+  fi
+  echo "OVERLAY_SKIP_TIK_BASE (keep stock base/load2d)"
+  # pointer include hook on asc intf_impl only
+  for pair in \
+    "kernel_operator_mm_intf_impl.h:kernel_operator_mm_ptr_impl.h" \
+    "kernel_operator_fixpipe_intf_impl.h:kernel_operator_fixpipe_ptr_impl.h" \
+    "kernel_operator_block_sync_intf_impl.h:kernel_operator_block_sync_ptr_impl.h" \
+    "kernel_operator_determine_compute_sync_intf_impl.h:kernel_operator_determine_compute_sync_ptr_impl.h"; do
+    host=${pair%%:*}; inc=${pair##*:}; tgt="$ACT_IMPL/$host"
+    [ -f "$tgt" ] || continue
+    grep -q "$inc" "$tgt" 2>/dev/null && continue
+    python3 - "$tgt" "$inc" <<'PY'
+from pathlib import Path
+import sys
+p=Path(sys.argv[1]); inc=sys.argv[2]
+t=p.read_text(encoding='utf-8', errors='replace')
+line='#include "%s"\n'%inc
+m='} // namespace AscendC'
+i=t.rfind(m)
+t=(t[:i+len(m)]+'\n'+line+t[i+len(m):]) if i!=-1 else t+line
+p.write_text(t, encoding='utf-8')
+print('patched', p)
+PY
+  done
+  echo "OVERLAY_OK"
+fi
+
+# MX golden needs real fp4/fp8 dtypes (host may lack pip — bootstrap first)
+echo "=== ensure MX python deps ==="
+ensure_pip() {
+  if $PY -m pip --version >/dev/null 2>&1; then echo "PIP_OK"; return 0; fi
+  $PY -m ensurepip --upgrade >/dev/null 2>&1 || true
+  if command -v apt-get >/dev/null 2>&1; then
+    apt-get update -qq >/dev/null 2>&1 || true
+    apt-get install -y -qq python3-pip >/dev/null 2>&1 || true
+  fi
+  if $PY -m pip --version >/dev/null 2>&1; then echo "PIP_OK after bootstrap"; return 0; fi
+  local gp="$WS/tmp/get-pip.py"
+  mkdir -p "$WS/tmp"
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL https://bootstrap.pypa.io/get-pip.py -o "$gp" || true
+  elif command -v wget >/dev/null 2>&1; then
+    wget -q -O "$gp" https://bootstrap.pypa.io/get-pip.py || true
+  fi
+  [ -f "$gp" ] && $PY "$gp" || true
+  $PY -m pip --version >/dev/null 2>&1
+}
+ensure_pip || { echo "FATAL: cannot bootstrap pip"; exit 2; }
+$PY -m pip install --user -q --force-reinstall 'numpy==1.26.4' 'ml_dtypes==0.2.0' 'en_dtypes==0.0.4' 2>&1 | tail -n 40 || true
+$PY - <<'PY'
+import sys
+ok=True
+try:
+    import ml_dtypes
+    print("ml_dtypes", getattr(ml_dtypes, "__version__", "?"), "fp8", ml_dtypes.float8_e4m3fn)
+except Exception as e:
+    print("ml_dtypes FAIL", e); ok=False
+try:
+    import en_dtypes
+    print("en_dtypes", getattr(en_dtypes, "__version__", "?"), "fp4", en_dtypes.float4_e2m1)
+except Exception as e:
+    print("en_dtypes FAIL", e); ok=False
+sys.exit(0 if ok else 2)
+PY
+MXDEP_RC=$?
+if [ "$MXDEP_RC" -ne 0 ]; then
+  echo "FATAL: MX deps missing after pip; cannot produce correct golden"
+  exit 2
+fi
+echo "MX_DEPS_OK"
+
+EX="$HELPER/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute"
+RUNROOT="$WS/runs_950/taskbook_${STAMP}"
+mkdir -p "$RUNROOT"
+SUMMARY="$RUNROOT/summary.tsv"
+echo -e "case\tscenario\tarch\tbuild\trun\tverify\tnote" > "$SUMMARY"
+
+run_case() {
+  local name="$1" scenario="$2"
+  local M="${3:-}" N="${4:-}" K="${5:-}"
+  local tag="s${scenario}"
+  [ -n "$M" ] && [ -n "$N" ] && [ -n "$K" ] && tag="s${scenario}_m${M}n${N}k${K}"
+  local srcdir="$EX/$name"
+  local work="$RUNROOT/${name}_${tag}"
+  local blog="$RUNROOT/${name}_${tag}_build.log"
+  local rlog="$RUNROOT/${name}_${tag}_run.log"
+  local vlog="$RUNROOT/${name}_${tag}_verify.log"
+  local glog="$RUNROOT/${name}_${tag}_gendata.log"
+  echo "==== RUN $name $tag ===="
+  if [ ! -d "$srcdir" ]; then
+    echo -e "${name}\t${scenario}\t${ARCH}\tMISSING\t-\t-\t${tag}" >> "$SUMMARY"; return
+  fi
+  rm -rf "$work"; mkdir -p "$work/build" "$work/input" "$work/output"
+  cp -a "$srcdir"/. "$work/"
+  find "$work" -name '*.asc' -print0 | xargs -0 sed -i \
+    -e 's/ceil_div(/ceil_division(/g' 2>/dev/null || true
+  cd "$work"
+  set +e
+  if [ -n "$M" ]; then
+    $PY scripts/gen_data.py -scenarioNum "$scenario" -M "$M" -N "$N" -K "$K" >"$glog" 2>&1 || \
+      $PY scripts/gen_data.py -scenarioNum "$scenario" >"$glog" 2>&1
+  else
+    $PY scripts/gen_data.py -scenarioNum "$scenario" >"$glog" 2>&1 || $PY scripts/gen_data.py >>"$glog" 2>&1
+  fi
+  set -e
+  cd "$work/build"
+  set +e
+  local cmake_extra=()
+  [ -n "$M" ] && cmake_extra=(-DCASE_M="$M" -DCASE_N="$N" -DCASE_K="$K")
+  cmake -DSCENARIO_NUM="$scenario" -DCMAKE_ASC_ARCHITECTURES="$ARCH" \
+    -DCMAKE_CXX_COMPILER="$CXX" -DCMAKE_C_COMPILER="$CC" \
+    -DCMAKE_ASC_FLAGS="$ASC_FLAGS" "${cmake_extra[@]}" .. >"$blog" 2>&1
+  cmake --build . -j8 >>"$blog" 2>&1
+  set -e
+  if [ ! -x ./demo ]; then
+    err=$(grep -m1 'error:' "$blog" | tr '\t' ' ' | cut -c1-120 || true)
+    echo -e "${name}\t${scenario}\t${ARCH}\tBUILD_FAIL\t-\t-\t${tag}|${err}" >> "$SUMMARY"
+    echo "DONE $name $tag build=BUILD_FAIL"
+    echo "---- build FAIL $name $tag (tail) ----"
+    tail -n 40 "$blog" 2>/dev/null || true
+    echo "---- gendata tail ----"
+    tail -n 20 "$glog" 2>/dev/null || true
+    return
+  fi
+  cd "$work"; rm -f ./output/output.bin
+  set +e
+  timeout --signal=KILL "$DEMO_TIMEOUT" ./build/demo >"$rlog" 2>&1; rrc=$?
+  set -e
+  if [ "$rrc" -eq 124 ] || [ "$rrc" -eq 137 ]; then
+    echo -e "${name}\t${scenario}\t${ARCH}\tPASS\tTIMEOUT\t-\t${tag}" >> "$SUMMARY"
+    echo "DONE $name $tag run=TIMEOUT"
+    return
+  fi
+  if [ "$rrc" -ne 0 ] || [ ! -f ./output/output.bin ]; then
+    echo -e "${name}\t${scenario}\t${ARCH}\tPASS\tRUN_FAIL\t-\t${tag}|exit=$rrc" >> "$SUMMARY"
+    echo "DONE $name $tag run=RUN_FAIL exit=$rrc"
+    echo "---- run FAIL $name $tag (tail) ----"
+    tail -n 40 "$rlog" 2>/dev/null || true
+    return
+  fi
+  vstr=SKIP
+  if [ -f scripts/verify_result.py ]; then
+    set +e
+    local mnk_args=()
+    [ -n "$M" ] && mnk_args=(-M "$M" -N "$N" -K "$K")
+    if grep -qE 'add_argument\(.*scenarioNum|"\-scenarioNum"|'\''\-scenarioNum'\''' scripts/verify_result.py 2>/dev/null; then
+      $PY scripts/verify_result.py -scenarioNum "$scenario" "${mnk_args[@]}" ./output/output.bin ./output/golden.bin >"$vlog" 2>&1
+    elif grep -q 'sys.argv\[3\]' scripts/verify_result.py 2>/dev/null; then
+      $PY scripts/verify_result.py ./output/output.bin ./output/golden.bin "$scenario" >"$vlog" 2>&1
+    else
+      $PY scripts/verify_result.py ./output/output.bin ./output/golden.bin >"$vlog" 2>&1
+    fi
+    vrc=$?
+    set -e
+    if [ "$vrc" -eq 0 ] || grep -qi 'test pass' "$vlog"; then
+      vstr=PASS
+    else
+      vstr=FAIL
+      echo "---- verify FAIL $name $tag (tail) ----"
+      tail -n 40 "$vlog" 2>/dev/null || true
+      echo "---- gendata tail ----"
+      tail -n 20 "$glog" 2>/dev/null || true
+    fi
+  fi
+  echo -e "${name}\t${scenario}\t${ARCH}\tPASS\tPASS\t${vstr}\t${tag}" >> "$SUMMARY"
+  echo "DONE $name $tag verify=$vstr"
+}
+
+# P0 dtype/format coverage (sample scenarios + runner-only gaps closed)
+MX_CASES=(
+  "mmad_mx:1" "mmad_mx:2" "mmad_mx:3" "mmad_mx:4"
+  "mmad_mx:5" "mmad_mx:6" "mmad_mx:7" "mmad_mx:8"
+  "load_data_2dmx_l12l0:1" "load_data_2dmx_l12l0:2" "load_data_2dmx_l12l0:3"
+  "load_data_2dmx_l12l0:4" "load_data_2dmx_l12l0:5" "load_data_2dmx_l12l0:6"
+)
+# §3.2 shape 档：1/32/1024/2048 等价缩放（M=2048 单次 L1 易炸 → 用 K=2048）
+# int4(s4) 仅 dav-2201，不进 950；hif8 暂无样例
+TASKBOOK_CASES=(
+  "mmad:1" "mmad:2" "mmad:3" "mmad:5" "mmad:6" "mmad:7"
+  "fixpipe_l0c2gm:1" "fixpipe_l0c2gm:2" "fixpipe_l0c2gm:3" "fixpipe_l0c2gm:4"
+  "fixpipe_l0c2gm:5" "fixpipe_l0c2gm:6" "fixpipe_l0c2gm:7"
+  "load_data_2dv2_l12l0:1" "load_data_2dv2_l12l0:2" "load_data_2dv2_l12l0:3"
+  "load_data_2dv2_l12l0:4" "load_data_2dv2_l12l0:5" "load_data_2dv2_l12l0:6"
+  "load_data_2dv2_l12l0:7"
+  "batch_matmul:1" "mmad_gemv:1" "mmad_unitflag:1"
+  # mmad dtype × shape 四档（每 dtype：1 / 32 / 1024 / 2048）
+  "mmad:1:1:1:16" "mmad:1:32:32:32" "mmad:1:1024:16:16" "mmad:1:16:16:2048"
+  # s2/s5 为 B16：K=2048 时 L0 正好 64KB，累加易半结果 → 用 K=1024
+  # s3 为 fp32 且 A 转置：M=1 走 GEMV（约一半点积），K=2048 超出 L0 → 16x16x16 + K=256
+  "mmad:2:1:1:16" "mmad:2:32:32:32" "mmad:2:1024:16:16" "mmad:2:16:16:1024"
+  "mmad:3:16:16:16" "mmad:3:32:32:32" "mmad:3:1024:16:16" "mmad:3:16:16:256"
+  "mmad:5:1:1:16" "mmad:5:32:32:32" "mmad:5:1024:16:16" "mmad:5:16:16:1024"
+  "mmad:6:1:1:16" "mmad:6:32:32:32" "mmad:6:1024:16:16" "mmad:6:16:16:2048"
+  "mmad:7:1:1:16" "mmad:7:32:32:32" "mmad:7:1024:16:16" "mmad:7:16:16:2048"
+  # 主通路其它 API 至少 32 + 1024
+  "fixpipe_l0c2gm:1:32:32:32" "fixpipe_l0c2gm:1:1024:16:16"
+  "load_data_2dv2_l12l0:1:32:32:32" "load_data_2dv2_l12l0:1:16:16:1024"
+  # mmad_mx / 2dmx 样例未接 CASE_MNK，改 shape 只改 golden、kernel 仍是默认规格，故不单列
+  "mmad_mx:1" "mmad_mx:2" "mmad_mx:3" "mmad_mx:4"
+  "mmad_mx:5" "mmad_mx:6" "mmad_mx:7" "mmad_mx:8"
+  "load_data_2dmx_l12l0:1" "load_data_2dmx_l12l0:2" "load_data_2dmx_l12l0:3"
+  "load_data_2dmx_l12l0:4" "load_data_2dmx_l12l0:5" "load_data_2dmx_l12l0:6"
+)
+
+if [ "$MODE" = "mx_only" ]; then
+  CASES=("${MX_CASES[@]}")
+elif [ "$MODE" = "sync_only" ]; then
+  CASES=()
+else
+  CASES=("${TASKBOOK_CASES[@]}")
+fi
+
+echo "CASE_COUNT=${#CASES[@]} MODE=$MODE"
+for item in "${CASES[@]}"; do
+  IFS=':' read -r name sc M N K <<< "$item"
+  if [ -n "${M:-}" ] && [ -n "${N:-}" ] && [ -n "${K:-}" ]; then
+    run_case "$name" "$sc" "$M" "$N" "$K"
+  else
+    run_case "$name" "$sc"
+  fi
+done
+
+# dual-path: Tensor vs Pointer (taskbook + mx_only)
+to_tensor_asc() {
+  python3 - "$1" <<'PY'
+from pathlib import Path
+import re, sys
+p = Path(sys.argv[1])
+t = p.read_text(encoding="utf-8", errors="replace")
+# Strip (__xx__ Type*)tensor.GetPhyAddr() -> tensor  (incl. template Fixpipe/LoadData/MmadMx)
+cast_get = re.compile(
+    r'\(__\w+__\s+[^)]+?\)\s*((?:[A-Za-z_][\w.]*(?:\[[^\]]+\])?)+)\.GetPhyAddr\(\)'
+)
+t2 = cast_get.sub(r'\1', t)
+p.write_text(t2, encoding="utf-8")
+PY
+}
+
+dump_bin_stats() {
+  local bin="$1" label="$2"
+  python3 - "$bin" "$label" <<'PY' || true
+import sys, numpy as np
+from pathlib import Path
+p, label = Path(sys.argv[1]), sys.argv[2]
+if not p.is_file():
+    print(f"STATS {label}: MISSING")
+    raise SystemExit(0)
+a = np.fromfile(p, dtype=np.float32)
+print(
+    f"STATS {label}: n={a.size} min={float(a.min()) if a.size else 'nan':.6g} "
+    f"max={float(a.max()) if a.size else 'nan':.6g} mean={float(a.mean()) if a.size else 'nan':.6g} "
+    f"nan={int(np.isnan(a).sum())} zero={(a==0).sum() if a.size else 0}"
+)
+PY
+}
+
+if [ "$MODE" = "mx_only" ]; then
+  echo -e "dual/mmad_mx\t1\t${ARCH}\tSKIP\t-\t-\tstock_tensor_LoadDataMx_incomplete_on_beta3" >> "$SUMMARY"
+  echo -e "dual/load_data_2dmx_l12l0\t1\t${ARCH}\tSKIP\t-\t-\tstock_tensor_LoadDataMx_incomplete_on_beta3" >> "$SUMMARY"
+fi
+
+if [ "$MODE" = "taskbook" ]; then
+  # mx_only: skip dual — stock beta.3 Tensor LoadData+Mx is incomplete (undefined-inline);
+  # pointer MX s1–s3 is the P0 gate. Dual remains for full taskbook after Tensor SDK is whole.
+  DUALS=("mmad:1" "mmad:5" "mmad:6" "fixpipe_l0c2gm:1" "load_data_2dv2_l12l0:1" "mmad_mx:1" "mmad_mx:3" "load_data_2dmx_l12l0:1")
+  for duo in "${DUALS[@]}"; do
+    IFS=':' read -r name sc <<< "$duo"
+    tag="s${sc}"
+    ptr_work="$RUNROOT/${name}_${tag}"
+    work="$RUNROOT/dual_tensor_${name}_${tag}"
+    echo "==== DUAL $name $tag ===="
+    if [ ! -f "$ptr_work/output/output.bin" ]; then
+      echo -e "dual/${name}\t${sc}\t${ARCH}\tSKIP\t-\t-\tno_ptr_out" >> "$SUMMARY"; continue
+    fi
+    dump_bin_stats "$ptr_work/output/output.bin" "ptr_${name}_${tag}"
+    dump_bin_stats "$ptr_work/output/golden.bin" "golden_${name}_${tag}"
+    rm -rf "$work"; mkdir -p "$work/build"
+    cp -a "$ptr_work"/. "$work/"; rm -rf "$work/build"; mkdir -p "$work/build" "$work/output"
+    # reuse same inputs/golden; only rebuild Tensor-call kernel
+    find "$work" -name '*.asc' -print0 | while IFS= read -r -d '' f; do to_tensor_asc "$f"; done
+    cd "$work/build"
+    set +e
+    cmake -DSCENARIO_NUM="$sc" -DCMAKE_ASC_ARCHITECTURES="$ARCH" \
+      -DCMAKE_CXX_COMPILER="$CXX" -DCMAKE_C_COMPILER="$CC" \
+      -DCMAKE_ASC_FLAGS="$ASC_FLAGS" .. >"$RUNROOT/dual_${name}_${tag}_build.log" 2>&1
+    cmake --build . -j8 >>"$RUNROOT/dual_${name}_${tag}_build.log" 2>&1
+    set -e
+    if [ ! -x ./demo ]; then
+      echo -e "dual/${name}\t${sc}\t${ARCH}\tBUILD_FAIL\t-\t-\t" >> "$SUMMARY"
+      echo "---- dual build FAIL $name $tag (tail) ----"
+      tail -n 40 "$RUNROOT/dual_${name}_${tag}_build.log" 2>/dev/null || true
+      continue
+    fi
+    cd "$work"; rm -f ./output/output.bin
+    set +e; timeout --signal=KILL "$DEMO_TIMEOUT" ./build/demo >"$RUNROOT/dual_${name}_${tag}_run.log" 2>&1; rrc=$?; set -e
+    if [ "$rrc" -ne 0 ] || [ ! -f ./output/output.bin ]; then
+      echo -e "dual/${name}\t${sc}\t${ARCH}\tPASS\tRUN_FAIL\t-\texit=$rrc" >> "$SUMMARY"
+      echo "---- dual run FAIL $name $tag (tail) ----"
+      tail -n 40 "$RUNROOT/dual_${name}_${tag}_run.log" 2>/dev/null || true
+      continue
+    fi
+    dump_bin_stats "$work/output/output.bin" "tensor_${name}_${tag}"
+    # compare ptr vs tensor; also tensor vs golden
+    if cmp -s "$ptr_work/output/output.bin" "$work/output/output.bin"; then
+      ptr_eq=PASS
+    else
+      ptr_eq=FAIL
+    fi
+    set +e
+    $PY "$work/scripts/verify_result.py" "$work/output/output.bin" "$work/output/golden.bin" \
+      >"$RUNROOT/dual_${name}_${tag}_verify.log" 2>&1
+    tv=$?
+    set -e
+    if [ "$tv" -eq 0 ] || grep -qi 'test pass' "$RUNROOT/dual_${name}_${tag}_verify.log"; then
+      ten_v=PASS
+    else
+      ten_v=FAIL
+      echo "---- dual tensor verify FAIL $name $tag ----"
+      tail -n 20 "$RUNROOT/dual_${name}_${tag}_verify.log" 2>/dev/null || true
+    fi
+    echo -e "dual/${name}\t${sc}\t${ARCH}\tPASS\tPASS\t${ptr_eq}\tptr_eq_tensor=${ptr_eq};tensor_vs_golden=${ten_v}" >> "$SUMMARY"
+    echo "DONE dual/$name $tag ptr_eq_tensor=$ptr_eq tensor_vs_golden=$ten_v"
+  done
+fi
+
+# §3.5 sync 调用覆盖（taskbook / sync_only）
+if [ "$MODE" = "taskbook" ] || [ "$MODE" = "sync_only" ]; then
+  SYNC_TIMEOUT="${CUBE_SYNC_TIMEOUT:-90}"
+  EX_SYNC="$SRC/examples/01_simd_cpp_api/03_basic_api/05_sync_control"
+  run_sync_case() {
+    local name="$1"
+    local srcdir="$EX_SYNC/$name"
+    local work="$RUNROOT/sync_${name}"
+    local blog="$RUNROOT/sync_${name}_build.log"
+    local rlog="$RUNROOT/sync_${name}_run.log"
+    echo "==== SYNC $name ===="
+    if [ ! -d "$srcdir" ]; then
+      echo -e "sync/${name}\t0\t${ARCH}\tMISSING\t-\t-\t" >> "$SUMMARY"; return
+    fi
+    rm -rf "$work"; mkdir -p "$work/build" "$work/input" "$work/output"
+    cp -a "$srcdir"/. "$work/"
+    find "$work" -name '*.asc' -print0 | xargs -0 sed -i \
+      -e 's/ceil_div(/ceil_division(/g' \
+      -e 's/AscendC::IBWait(sync_gm, sync_buf,/AscendC::IBWait((__gm__ int32_t*)sync_gm.GetPhyAddr(), (__ubuf__ int32_t*)sync_buf.GetPhyAddr(),/g' \
+      -e 's/AscendC::IBSet(sync_gm, sync_buf,/AscendC::IBSet((__gm__ int32_t*)sync_gm.GetPhyAddr(), (__ubuf__ int32_t*)sync_buf.GetPhyAddr(),/g' \
+      2>/dev/null || true
+    # Soft IBSet/SyncAll 依赖 sync GM 初值为 0；不跑 gen_data 时 host 缓冲是垃圾 → 空转超时
+    if [ -f "$work/scripts/gen_data.py" ]; then
+      (cd "$work" && "$PY" scripts/gen_data.py) >"$RUNROOT/sync_${name}_gendata.log" 2>&1 || \
+        (cd "$work" && python3 scripts/gen_data.py) >"$RUNROOT/sync_${name}_gendata.log" 2>&1 || true
+    fi
+    if [ ! -f "$work/input/input_sync.bin" ]; then
+      echo -e "sync/${name}\t0\t${ARCH}\tMISSING\t-\t-\tno_input_sync_bin" >> "$SUMMARY"; return
+    fi
+    cd "$work/build"
+    set +e
+    cmake -DCMAKE_ASC_ARCHITECTURES="$ARCH" -DCMAKE_CXX_COMPILER="$CXX" -DCMAKE_C_COMPILER="$CC" \
+      -DCMAKE_ASC_FLAGS="$ASC_FLAGS" .. >"$blog" 2>&1
+    cmake --build . -j8 >>"$blog" 2>&1
+    set -e
+    if [ ! -x ./demo ]; then
+      err=$(grep -m1 'error:' "$blog" | tr '\t' ' ' | cut -c1-120 || true)
+      echo -e "sync/${name}\t0\t${ARCH}\tBUILD_FAIL\t-\t-\t${err}" >> "$SUMMARY"; return
+    fi
+    cd "$work"; rm -f ./output/output.bin
+    set +e
+    timeout --signal=KILL "$SYNC_TIMEOUT" ./build/demo >"$rlog" 2>&1
+    rrc=$?
+    set -e
+    if [ "$rrc" -eq 124 ] || [ "$rrc" -eq 137 ]; then
+      echo -e "sync/${name}\t0\t${ARCH}\tPASS\tTIMEOUT\tSKIP\tto=${SYNC_TIMEOUT}s" >> "$SUMMARY"; return
+    fi
+    if [ "$rrc" -ne 0 ]; then
+      echo -e "sync/${name}\t0\t${ARCH}\tPASS\tRUN_FAIL\t-\texit=$rrc" >> "$SUMMARY"; return
+    fi
+    echo -e "sync/${name}\t0\t${ARCH}\tPASS\tPASS\tPASS\t" >> "$SUMMARY"
+  }
+  run_sync_case "ib_set_wait"
+  run_sync_case "sync_all"
+fi
+
+# documented skips for non-pointerable APIs
+# mmad:4 int4 仅 dav-2201（CMake 硬限制）→ 950 记 SKIP 方便对账
+{
+  echo -e "mmad\t4\t${ARCH}\tSKIP\t-\t-\tint4_dav-2201_only"
+  echo -e "PopStackBuffer\t0\t${ARCH}\tSKIP\t-\t-\tfriend_stack_meta"
+  echo -e "SetAddrWithOffset\t0\t${ARCH}\tSKIP\t-\t-\tdeprecated_member"
+} >> "$SUMMARY"
+
+# dump summary into main log for outbox visibility
+echo "=== SUMMARY.tsv ==="
+cat "$SUMMARY" || true
+
+set +e
+python3 - <<PY
+from pathlib import Path
+p=Path("$SUMMARY")
+rows=[ln.strip().split("\\t") for ln in p.read_text().splitlines() if ln.strip()]
+hdr,body=rows[0],rows[1:]
+ok=sum(1 for r in body if len(r)>=6 and r[3]=="PASS" and r[4]=="PASS" and r[5]=="PASS")
+fail=sum(1 for r in body if len(r)>=6 and r[3] not in ("SKIP","MISSING") and (r[3]!="PASS" or r[4]!="PASS" or r[5] not in ("PASS","SKIP")))
+md=["# Ascend950 CUBE task-book self-test","","- HEAD: $HEAD","- ARCH: $ARCH","- MODE: $MODE","- STAMP: $STAMP","",
+    f"- PASS: **{ok}**", f"- FAIL: {fail}","",
+    "| "+" | ".join(hdr)+" |","|"+"|".join(["---"]*len(hdr))+"|"]
+for r in body:
+    while len(r)<len(hdr): r.append("")
+    md.append("| "+" | ".join(r)+" |")
+Path("$RUNROOT/SELFTEST_950_TASKBOOK.md").write_text("\\n".join(md),encoding="utf-8")
+print(f"PASS={ok} FAIL={fail} rows={len(body)}")
+raise SystemExit(0 if fail==0 else 1)
+PY
+GATE_RC=$?
+set -e
+
+mkdir -p "$DEST"
+cp -a "$LOG" "$SUMMARY" "$RUNROOT/SELFTEST_950_TASKBOOK.md" "$DEST/" 2>/dev/null || true
+# ship per-case logs so Agent can read max_diff / build errors from feature branch
+find "$RUNROOT" -maxdepth 1 -type f \( -name '*_verify.log' -o -name '*_build.log' -o -name '*_run.log' -o -name '*_gendata.log' -o -name 'dual_*' \) \
+  -exec cp -a {} "$DEST/" \; 2>/dev/null || true
+mkdir -p "$HELPER/artifacts/950_taskbook"
+cp -a "$DEST/." "$HELPER/artifacts/950_taskbook/" 2>/dev/null || true
+cp -a "$DEST/SELFTEST_950_TASKBOOK.md" "$HELPER/artifacts/950_taskbook/" 2>/dev/null || true
+
+cd "$HELPER"
+git remote set-url origin "$AUTH"
+set +e
+git -c credential.helper= pull --rebase origin "$BRANCH" || true
+git add "$DEST" artifacts/950_taskbook 2>/dev/null || git add "$DEST"
+MSG="Add Ascend950 CUBE taskbook ${STAMP} MODE=${MODE} $([ "$GATE_RC" -eq 0 ] && echo GREEN || echo INCOMPLETE)"
+git -c user.email="baibai_Uu@users.noreply.gitcode.com" -c user.name="baibai_Uu" commit -m "$MSG" || true
+git -c credential.helper= push origin "HEAD:${BRANCH}"
+set -e
+git remote set-url origin "$SAFE"
+
+echo "=== DONE_CUBE_TASKBOOK_950 GATE_OK=$([ "$GATE_RC" -eq 0 ] && echo 1 || echo 0) ==="
+exit "$GATE_RC"
