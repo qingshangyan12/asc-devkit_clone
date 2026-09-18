@@ -4,12 +4,11 @@
 
 本样例演示在SIMT编程下使用`printf()`接口实现上板打印进行功能调试的方法。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-- \>= CANN 9.1.0
+| 产品 | CANN软件版本 |
+|---|---|
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -24,18 +23,18 @@
 
 - 算子功能:
 
-  本样例详细展示了在SIMT核函数中使用`printf()`接口的实践方式，实现对算子执行过程中打印每个线程的变量信息。
+  本样例详细展示了在SIMT核函数中使用`printf()`接口的实践方式，实现在算子执行过程中打印线程的变量信息（示例通过`threadIdx.x < 3`限制仅打印部分线程）。
 
 
 - 算子实现:
   ```cpp
-  __global__ void  simt_printf(float* input, uint32_t in_shape)
+  __global__ void simt_printf(float* input, uint32_t in_shape)
   {
       // Calculate global thread ID
       int32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
       if (threadIdx.x < 3) {
-      printf("[SIMT %s] thread index[%u], input data shape: %u\n", "print 1", idx, in_shape);
-      printf("[SIMT %s] input addr: %p value[%u]: %f\n", "print 2",  input, idx, input[idx]);
+          printf("[SIMT %s] thread index[%u], input data shape: %u\n", "print 1", idx, in_shape);
+          printf("[SIMT %s] input addr: %p value[%u]: %f\n", "print 2", input, idx, input[idx]);
       }
   }
   ```
@@ -62,10 +61,20 @@
   ./demo                        # 执行样例
   ```
 
+  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
+
+  示例如下：
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
+
   编译选项说明
 
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
 
   执行后有如下打印信息，说明打印功能正常。

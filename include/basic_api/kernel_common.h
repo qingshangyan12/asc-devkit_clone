@@ -35,6 +35,7 @@
 #include "../../impl/basic_api/utils/kernel_utils_macros.h"
 #include "kernel_operator_swap_mem_intf.h"
 #include "kernel_operator_sys_var_intf.h"
+#include "../utils/base/helpers.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -49,14 +50,6 @@ class TPipe;
 template <typename T>
 class GlobalTensor;
 } // namespace AscendC
-
-template <auto funcPtr, typename... Args>
-__aicore__ inline void asc_vf_call(Args&&... args)
-{
-    if ASCEND_IS_AIV {
-        AscendC::AscVFCallImpl<funcPtr, AscendC::Internal::SimdVfDebugTag>(args...);
-    }
-}
 
 #if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 __BLOCK_LOCAL__ __inline__ uint32_t g_super_kernel_early_start_config;
@@ -83,7 +76,8 @@ __BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_tPipePtr;
 #endif // end ASCENDC_DEBUG
 
 #if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
-    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113
+    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
+    __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163
 __BLOCK_LOCAL__ __inline__ uint64_t g_maskCount;
 #if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113
 __BLOCK_LOCAL__ __inline__ half g_deqValue;
@@ -147,7 +141,8 @@ public:
     template <pipe_t pipe>
     static __aicore__ inline void Lock(MutexID id)
     {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
+                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
         ASCENDC_ASSERT((id <= MAX_MUTEXID), {
             KERNEL_LOG(KERNEL_ERROR, "For Mutex::Lock current id is %u, max MutexID is %u", id, MAX_MUTEXID);
         });
@@ -158,7 +153,8 @@ public:
     template <pipe_t pipe>
     static __aicore__ inline void Unlock(MutexID id)
     {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
+                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
         ASCENDC_ASSERT((id <= MAX_MUTEXID), {
             KERNEL_LOG(KERNEL_ERROR, "For Mutex::Unlock current id is %u, max MutexID is %u", id, MAX_MUTEXID);
         });
@@ -174,7 +170,7 @@ __aicore__ inline MutexID AllocMutexID()
     Internal::g_bufId = sbitset1(Internal::g_bufId, id);
     ASCENDC_ASSERT((id <= MAX_MUTEXID), {
         KERNEL_LOG(
-            KERNEL_ERROR, "current id is %u, max buffer ID allocated is %u", static_cast<uint32_t>(id),
+            KERNEL_ERROR, "current id is %u, max mutex ID allocated is %u", static_cast<uint32_t>(id),
             static_cast<uint32_t>(MAX_MUTEXID));
     });
     return id;
@@ -186,9 +182,9 @@ __aicore__ inline MutexID AllocMutexID()
 __aicore__ inline void ReleaseMutexID(MutexID id)
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-    ASCENDC_ASSERT((id < MAX_MUTEXID), {
+    ASCENDC_ASSERT((id <= MAX_MUTEXID), {
         KERNEL_LOG(
-            KERNEL_ERROR, "current id is %d, which should be larger than or equals to 0, and smaller than %d",
+            KERNEL_ERROR, "current id is %d, which should be larger than or equals to 0, and less than or equal to %d",
             static_cast<int32_t>(id), MAX_MUTEXID);
     });
     Internal::g_bufId = sbitset0(Internal::g_bufId, id);

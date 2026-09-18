@@ -21,7 +21,6 @@ namespace mc2_ops_hccl {
 constexpr uint64_t SMALL_COUNT_512KB = 512 * 1024;   // Byte, UB协议一次传输的最大size
 constexpr uint64_t LARGE_COUNT_1024KB = 1024 * 1024; // Byte, 可掩盖多mission尾块开销
 
-constexpr int RANK_SIZE_EIGHT = 8;
 constexpr u32 CCU_MS_MODE = 2;
 constexpr double DEFAULT_RANK_SIZE = 8.0;
 constexpr u64 RS_2D_SMALL_DATA_SIZE = 1024 * 1024;
@@ -32,19 +31,19 @@ enum class SelectorStatus { MATCH, NOT_MATCH };
 const std::map<HcclCMDType, std::string> OP_TYPE_TO_AICPU_SOLE_ALG_MAP = {
     {HcclCMDType::HCCL_CMD_ALLGATHER, "InsAllGatherMesh"},
     {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "InsReduceScatterNHR"},
-    {HcclCMDType::HCCL_CMD_ALLREDUCE, "InsAllReduceNHR"},
+    {HcclCMDType::HCCL_CMD_ALLREDUCE, "AicpuAllReduceSoleNHR"},
     {HcclCMDType::HCCL_CMD_ALLTOALL, "InsAlltoAllMesh"},
     {HcclCMDType::HCCL_CMD_ALLTOALLV, "InsAlltoAllvMesh"},
     {HcclCMDType::HCCL_CMD_ALLTOALLVC, "InsAlltoAllvcMesh"},
 };
 
 const std::map<HcclCMDType, std::string> OP_TYPE_TO_CCU_1D_ALG_MAP = {
-    {HcclCMDType::HCCL_CMD_ALLGATHER, "CcuAllGatherMesh1D"},
+    {HcclCMDType::HCCL_CMD_ALLGATHER, "CcuSchedAllGatherSoleMesh"},
     {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "CcuReduceScatterMesh1D"},
     {HcclCMDType::HCCL_CMD_ALLREDUCE, "CcuAllReduceMesh1D"},
     {HcclCMDType::HCCL_CMD_REDUCE, "CcuReduceMesh1D"},
-    {HcclCMDType::HCCL_CMD_ALLTOALL, "CcuAlltoAllMesh1D"},
-    {HcclCMDType::HCCL_CMD_ALLTOALLV, "CcuAlltoAllVMesh1D"},
+    {HcclCMDType::HCCL_CMD_ALLTOALL, "CcuSchedAllToAllSoleMesh"},
+    {HcclCMDType::HCCL_CMD_ALLTOALLV, "CcuSchedAllToAllVSoleMesh"},
     {HcclCMDType::HCCL_CMD_HALF_ALLTOALLV, "CcuHalfAll2AllVMesh1D"},
 };
 
@@ -63,13 +62,16 @@ const std::map<HcclCMDType, std::string> OP_TYPE_TO_DPU_ALG_MAP = {
 const std::unordered_map<std::string, std::string> RES_RESUSE_ALG = {
     {"InsReduceScatterMesh1D", "InsReduceScatterMeshClass"},
     {"InsReduceScatterMesh1DMeshChunk", "InsReduceScatterMeshClass"},
-    {"InsAllReduceMesh1DOneShot", "InsAllReduceMeshClass"},
-    {"InsAllReduceMesh1DTwoShot", "InsAllReduceMeshClass"},
+    {"AicpuAllReduceSoleMeshOneShot", "InsAllReduceMeshClass"},
+    {"AicpuAllReduceSoleMeshTwoShot", "InsAllReduceMeshClass"},
+    {"AicpuAllReduceSoleMeshChunkTwoShot", "InsAllReduceMeshClass"},
     {"InsSend", "InsSendRecv"},
     {"InsRecv", "InsSendRecv"}};
 
 class AutoSelectorBase {
 public:
+    virtual ~AutoSelectorBase() = default;
+
     SelectorStatus Select(OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo, std::string& selectAlgName) const;
     bool IsDefaultAlg(const HcclAlgoType algoType) const;
     bool IsSmallData(const u64 dataSize) const;

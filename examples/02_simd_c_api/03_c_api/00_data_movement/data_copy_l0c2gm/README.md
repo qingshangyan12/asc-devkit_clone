@@ -10,7 +10,7 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## 目录结构介绍
 
@@ -79,7 +79,7 @@ data_copy_l0c2gm
 - 输出：C `[128, 256]`，Nz格式`int8_t`
 - 实现：使用`VREQ8`模式并启用ReLU
 
-对于场景2、4和6，量化参数先通过`asc_copy_gm2l1`从GM搬运到L1 Buffer，再通过`asc_copy_l12fb`搬运到Fixpipe Buffer，最后调用`asc_set_l0c2gm_config`配置Vector量化参数地址。`asc_set_l0c2gm_config`的参数地址以128B为单位，因此参数文件需按128B向上对齐，不足部分补0。本样例的`[256] uint64_t`参数共2048B，已满足要求。量化参数从L1 Buffer搬运至Fixpipe Buffer时，需要搬运2048B数据，数据搬运单位为64B，对应`asc_copy_l12fb`的`len_burst`配置为32。量化参数从L1 Buffer搬运至Fixpipe Buffer后，通过`asc_sync_pipe(PIPE_FIX)`确保参数和配置生效，随后通过Fixpipe将L0C Buffer中的计算结果搬运到GM（Global Memory）。
+对于场景2、4和6，量化参数先通过`asc_copy_gm2l1`从GM搬运到L1 Buffer，再通过`asc_copy_l12fb`搬运到Fixpipe Buffer，最后调用`asc_set_l0c_copy_config`配置Vector量化参数地址。`asc_set_l0c_copy_config`的参数地址以128B为单位，因此参数文件需按128B向上对齐，不足部分补0。本样例的`[256] uint64_t`参数共2048B，已满足要求。量化参数从L1 Buffer搬运至Fixpipe Buffer时，需要搬运2048B数据，数据搬运单位为64B，对应`asc_copy_l12fb`的`len_burst`配置为32。量化参数从L1 Buffer搬运至Fixpipe Buffer后，通过`asc_sync_pipe(PIPE_FIX)`确保参数和配置生效，随后通过Fixpipe将L0C Buffer中的计算结果搬运到GM（Global Memory）。
 
 ## 编译运行
 

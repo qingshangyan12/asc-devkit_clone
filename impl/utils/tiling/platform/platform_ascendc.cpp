@@ -25,6 +25,8 @@
 
 namespace platform_ascendc {
 const static uint64_t LOCAL_RESERV_SIZE = 256;
+const static uint64_t KIRIN_UB_RESERVED_SIZE = 8 * 1024;
+const static uint32_t WORK_SPACE_SIZE_MC62 = 1024;
 const static uint32_t WORK_SPACE_SIZE_910B = 16 * 1024 * 1024;
 const static uint32_t WORK_SPACE_SIZE_950 = 16 * 1024 * 1024;
 const static uint32_t WORK_SPACE_SIZE = 2 * 1024 * 1024;
@@ -62,8 +64,13 @@ static const std::map<std::string, SocVersion> convertMap{
     {"MC61AM21A", SocVersion::MC61AM21A},
     {"MC62", SocVersion::MC62},
     {"SD3403", SocVersion::SD3403},
+    {"Ascend5162A", SocVersion::ASCEND5162A},
     {"KirinX90", SocVersion::KIRINX90},
     {"Kirin9030", SocVersion::KIRIN9030},
+    {"KirinDev0000", SocVersion::KIRINDEV0000},
+    {"KirinDev0001", SocVersion::KIRINDEV0001},
+    {"KirinDev0002", SocVersion::KIRINDEV0002},
+    {"KirinDev0003", SocVersion::KIRINDEV0003},
     {"MC32DM11A", SocVersion::MC32DM11A},
 };
 
@@ -157,6 +164,11 @@ void PlatformAscendC::GetCoreMemSize(const CoreMemType& memType, uint64_t& size)
     if (memType == CoreMemType::UB) {
         size -= reservedMemSize_;
     }
+    std::string socVerStr = "";
+    (void)GetPlatFormInfo()->GetPlatformResWithLock(LABEL_VERSION, LABEL_SHORT_SOC_VERSION, socVerStr);
+    if (memType == CoreMemType::UB && socVerStr.find("Kirin") == 0) {
+        size -= KIRIN_UB_RESERVED_SIZE;
+    }
 
     if (memType == CoreMemType::FB) {
         std::string sizeStr;
@@ -213,13 +225,8 @@ NpuArch PlatformAscendC::GetCurNpuArch(void) const
         PF_LOGE("platform do not support get npu arch!");
         return NpuArch::DAV_RESV;
     }
-    int32_t npuArchInt = 0;
-    try {
-        npuArchInt = std::atoi(npuArchStr.c_str());
-    } catch (...) {
-        PF_LOGE("npu str to int failed, NpuArch str is %s", npuArchStr.c_str());
-        return NpuArch::DAV_RESV;
-    }
+    // atoi不会抛异常，非法输入返回0
+    int32_t npuArchInt = std::atoi(npuArchStr.c_str());
     if (npuArchInt <= 0) {
         PF_LOGE("npu str to int failed, NpuArch str is %s", npuArchStr.c_str());
         return NpuArch::DAV_RESV;
@@ -269,6 +276,8 @@ uint32_t PlatformAscendC::GetLibApiWorkSpaceSize(void) const
     if (npuArch == NpuArch::DAV_RESV) {
         PF_LOGE("get platform failed, CurNpuArch is NpuArch::DAV_RESV");
         return -1;
+    } else if (npuArch == NpuArch::DAV_5102) {
+        return WORK_SPACE_SIZE_MC62;
     } else if (npuArch == NpuArch::DAV_2201) {
         return WORK_SPACE_SIZE_910B;
     } else if (npuArch == NpuArch::DAV_3510) {
@@ -318,6 +327,7 @@ const static std::map<std::string, std::string> convertMapInAicpu = {
     {"Ascend910_9392", "Ascend910B"},
     {"Ascend910_9382", "Ascend910B"},
     {"Ascend910_9362", "Ascend910B"},
+    {"Ascend910_9363", "Ascend910B"},
     {"Ascend910A", "Ascend910"}, // ascend910_list
     {"Ascend910ProA", "Ascend910"},
     {"Ascend910B", "Ascend910"},
@@ -349,6 +359,7 @@ const static std::map<std::string, std::string> convertMapInAicpu = {
     {"Ascend950DT_9596", "Ascend950"},
     {"Ascend950DT_9581", "Ascend950"},
     {"Ascend950DT_9582", "Ascend950"},
+    {"Ascend950DT_9581x", "Ascend950"},
     {"Ascend950DT_9582x", "Ascend950"},
     {"Ascend950DT_9583", "Ascend950"},
     {"Ascend950DT_9584", "Ascend950"},
@@ -384,6 +395,10 @@ const static std::map<std::string, std::string> convertMapInAicpu = {
     {"MC62DM22AF", "MC62"},
     {"KirinX90", "KirinX90"},
     {"Kirin9030", "Kirin9030"},
+    {"KirinDev0000", "KirinDev0000"},
+    {"KirinDev0001", "KirinDev0001"},
+    {"KirinDev0002", "KirinDev0002"},
+    {"KirinDev0003", "KirinDev0003"},
     {"MC32DM11AA", "MC32DM11A"},
     {"MC32DM11AB", "MC32DM11A"},
     {"MC32DM11AC", "MC32DM11A"},
@@ -391,10 +406,10 @@ const static std::map<std::string, std::string> convertMapInAicpu = {
 
 const static std::map<std::string, std::string> AICPUshortVersionToNpuArchMap = {
     {"Ascend910B", "2201"}, // ascend910b_list
-    {"Ascend910", "1001"},  {"Ascend310P", "2002"}, {"Ascend310B", "3002"},
-    {"Ascend950", "3510"},  {"Ascend350", "3510"},  {"MC62", "5102"},
-    {"KirinX90", "3003"},   {"Kirin9030", "3113"},  {"MC32DM11A", "5102"},
-};
+    {"Ascend910", "1001"},   {"Ascend310P", "2002"},   {"Ascend310B", "3002"},   {"Ascend950", "3510"},
+    {"Ascend350", "3510"},   {"MC62", "5102"},         {"KirinX90", "3003"},     {"Kirin9030", "3113"},
+    {"MC32DM11A", "5102"},   {"KirinDev0000", "5101"}, {"KirinDev0001", "5161"}, {"KirinDev0002", "5165"},
+    {"KirinDev0003", "5163"}};
 
 bool SwitchIntoShortSocVersion(const char* socVersionStr, std::string& shortSocVersion)
 {

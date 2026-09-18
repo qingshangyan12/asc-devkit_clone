@@ -1,14 +1,14 @@
-﻿# Div样例
+# Div样例
 
 ## 概述
 
-本样例基于C API编程接口实现Div运算，主要调用[asc_div](../../../../../docs/zh/api/SIMD-API/C-API/reg/arithmetic_compute/asc_div.md)接口。
+本样例基于C API编程接口实现Div运算，主要调用[asc_div](../../../../../docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_div.md)接口。
 
 ## 本样例支持的产品及CANN软件版本
 
 | 产品 | CANN软件版本 |
 | --- | --- |
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## 目录结构介绍
 
@@ -59,7 +59,7 @@ div
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
+  > **说明：** `${install_path}`为CANN包安装目录；root用户默认为`/usr/local/Ascend`，非root用户默认为`${HOME}/Ascend`。
 
 - 样例执行
 

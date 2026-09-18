@@ -8,7 +8,7 @@ This sample implements gather and adds computation based on SIMD and SIMT hybrid
 
 | Product | CANN Software Version |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.0.0-beta.2 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -55,7 +55,7 @@ This sample implements gather and adds computation based on SIMD and SIMT hybrid
 
   (1) simt_gather obtains data with specified indexes from GM (Global Memory) input.
   ```
-  int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
   ...
   uint32_t gather_idx = index[idx];
   ...
@@ -81,7 +81,7 @@ This sample implements gather and adds computation based on SIMD and SIMT hybrid
 
 Execute the following steps in the root directory of this sample to compile and execute the sample.
 - Configure Environment Variables  
-  Configure environment variables according to the [installation method](../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
+  Configure environment variables according to the [installation method](../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -107,7 +107,7 @@ Execute the following steps in the root directory of this sample to compile and 
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU simulation mode
   ```
 
-  > **Note:** Before switching compilation modes, you need to clear the cmake cache. You can execute `rm CMakeCache.txt` in the build directory and then run cmake again.
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
 
 - Compilation Options Description
 

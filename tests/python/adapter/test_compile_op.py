@@ -1059,6 +1059,104 @@ class TestCompileOp(unittest.TestCase):
                 op_compile_option,
             )
 
+    def test_sk_sub_combine_links_no_register_meta_file(self):
+        op_info = OpInfo(
+            kernel_name="TestKernel", op_type="TestOp", inputs=[], outputs=[]
+        )
+        compile_option_tuple = CompileOptionTuple([], [])
+        infered_info = InferChannelParamsFromIFile(
+            tiling_key_list=[0],
+            code_channel=CORE_TYPE_VEC,
+            hard_sync=False,
+            no_kfc_server_flag=False,
+            enable_deterministic=False,
+            tiling_key_kernel_type={},
+            no_set_kernel_type=False,
+            default_kernel_type=KernelMetaType.KERNEL_TYPE_MAX,
+            dump_info={},
+            template_tiling_info={},
+            default_tiling_struct="",
+            tiling_struct_expr_map={},
+            tiling_key_struct_map={},
+            register_tiling_struct=set(),
+            tpl_tiling_struct=set(),
+            super_kernel_early_start_set_flag=False,
+            super_kernel_early_start_wait_flag=False,
+            tiling_key_deterministic={},
+            tiling_key_group_map={},
+        )
+        tiling_info = TilingInfo()
+        dfx_generator = DFXSectionGenerator()
+
+        global_var_storage.set_variable("ascendc_tiling_no_register", True)
+        global_var_storage.set_variable("ascendc_enable_super_kernel", True)
+        try:
+            with tbe.common.context.op_context.OpContext() as ctx:
+                ctx.add_addition("super_kernel_sub_combine", True)
+                with (
+                    mock.patch.object(
+                        CommonUtility,
+                        "get_kernel_meta_dir",
+                        return_value="/tmp/kernel_meta",
+                    ),
+                    mock.patch.object(
+                        CommonUtility,
+                        "get_distinct_filename_tag",
+                        return_value="_tag",
+                    ),
+                    mock.patch.object(
+                        compile_op_module,
+                        "check_if_gen_placehoder",
+                        return_value=False,
+                    ),
+                    mock.patch.object(
+                        compile_op_module,
+                        "get_tiling_info_by_tiling",
+                        return_value=tiling_info,
+                    ),
+                    mock.patch.object(tiling_info, "save_file"),
+                    mock.patch.object(tiling_info, "remove_file"),
+                    mock.patch.object(compile_op_module, "handle_sk_codegen_options"),
+                    mock.patch.object(
+                        compile_op_module,
+                        "gen_op_stub_kernel_func",
+                        return_value=0,
+                    ),
+                    mock.patch.object(compile_op_module, "handle_compile_options"),
+                    mock.patch.object(compile_op_module, "compile_kernel_and_meta"),
+                    mock.patch.object(compile_op_module, "link_kernel_obj"),
+                    mock.patch.object(
+                        compile_op_module,
+                        "compile_sk_bind",
+                        return_value="/tmp/kernel_meta/sk_bind.o",
+                    ),
+                    mock.patch.object(
+                        compile_op_module, "link_sk_norm_combine"
+                    ) as mock_link,
+                    mock.patch.object(compile_op_module, "_json_post_process"),
+                    mock.patch.object(dfx_generator, "dfx_info_reset"),
+                    mock.patch.object(dfx_generator, "update_is_support"),
+                ):
+                    compile_op_common_part(
+                        "test.cpp",
+                        "test",
+                        op_info,
+                        compile_option_tuple,
+                        infered_info,
+                        {},
+                    )
+        finally:
+            global_var_storage.set_variable("ascendc_tiling_no_register", False)
+            global_var_storage.set_variable("ascendc_enable_super_kernel", False)
+
+        mock_link.assert_called_once_with(
+            "/tmp/kernel_meta/TestKernel.o",
+            "/tmp/kernel_meta/TestKernel_norm.o",
+            "/tmp/kernel_meta/sk_bind.o",
+            "/tmp/kernel_meta/TestKernel_tag_meta_info.o",
+            None,
+        )
+
     def test_compile_op_dynamic_c310_cube(self):
         SetCurrentSocInfo("Ascend950PR_9599")
         cce_file = os.path.join(
@@ -1717,6 +1815,7 @@ class TestCompileOp(unittest.TestCase):
         compile_cmd = gen_compile_cmd_v220(
             src_file, dst_file, compile_option_tuple, "dav-c310", tiling_file, True
         )
+        self.assertIn("--cce-enable-sanitizer", compile_cmd)
         self.assertEqual(compile_cmd[0], "/usr/bin/ccache")
         compile_op_module.global_var_storage.set_variable(
             "ascendc_enable_ccache", False
@@ -2395,6 +2494,7 @@ class TestCompileOp(unittest.TestCase):
         compile_log_path = None
         infered_info_from_ifile = (
             KernelInfoInfer.get_tiling_key_list_and_simple_infer_code_channel(
+                op_info,
                 cce_file,
                 os.path.join(kernel_meta_dir, op_info.kernel_name + ".i"),
                 compile_option_tuple,
@@ -2446,7 +2546,9 @@ class TestCompileOp(unittest.TestCase):
             os.remove(compile_info.gen_kernel_func_file)
         assert os.path.exists(compile_info.gen_kernel_func_file) == False
         self.assertFalse(os.path.exists(compile_info.gen_kernel_func_file))
+        global_var_storage.set_variable("ascendc_enable_super_kernel", False)
         global_var_storage.set_variable("ascendc_recognize_simtvf", True)
+        DFXSectionGenerator().dfx_info_reset(op_info)
         gen_kernel_fun(
             compile_info,
             origin_func_name,
@@ -2459,10 +2561,12 @@ class TestCompileOp(unittest.TestCase):
             "Problems Occurred during Kernel Function Generation!!!"
         )
         self.assertTrue(os.path.exists(compile_info.gen_kernel_func_file))
+        with open(compile_info.gen_kernel_func_file, "r") as generated_kernel_file:
+            self.assertNotIn(
+                "__ASCENDC_SUPER_KERNEL_DEBUG__",
+                generated_kernel_file.read(),
+            )
         os.remove(compile_info.gen_kernel_func_file)
-        compile_info.dump_info["dump_type"] = "assert"
-        set_dump_assert_flag(compile_info)
-        assert global_var_storage.get_variable("ascendc_dump_assert_only") is True
         assert "-DASCENDC_DUMP=0" not in compile_option_tuple.compile_options
         gen_kernel_fun(
             compile_info,
@@ -5861,6 +5965,39 @@ Contents of section
                 compile_info,
             )
         self.assertNotEqual(result, "")
+
+    def test_gen_usr_workspace_codes(self):
+        from adapter.compile_op import _gen_usr_workspace_codes
+
+        with (
+            mock.patch.object(CommonUtility, "is_c310", return_value=True),
+            mock.patch.object(
+                CommonUtility,
+                "is_support_workspace_offset",
+                return_value=True,
+            ),
+        ):
+            self.assertEqual(
+                _gen_usr_workspace_codes(),
+                "#if ENABLE_CV_COMM_VIA_SSBUF != 0 && __MIX_CORE_AIC_RATION__ != 1\n"
+                "    GM_ADDR usrWorkspace = workspace;\n"
+                "#else\n"
+                "    GM_ADDR usrWorkspace = workspace + AscendC::RESERVED_WORKSPACE;\n"
+                "#endif\n",
+            )
+
+        with (
+            mock.patch.object(CommonUtility, "is_c310", return_value=False),
+            mock.patch.object(
+                CommonUtility,
+                "is_support_workspace_offset",
+                return_value=True,
+            ),
+        ):
+            self.assertEqual(
+                _gen_usr_workspace_codes(),
+                "    GM_ADDR usrWorkspace = workspace + AscendC::RESERVED_WORKSPACE;\n",
+            )
 
     def test_dump_compile_log(self):
         with open(os.devnull, "a") as file:
@@ -9458,6 +9595,7 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
         compile_log_path = None
         infered_info_from_ifile = (
             KernelInfoInfer.get_tiling_key_list_and_simple_infer_code_channel(
+                op_info,
                 cce_file,
                 os.path.join(kernel_meta_dir, op_info.kernel_name + ".i"),
                 compile_option_tuple,
@@ -9515,6 +9653,7 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
             "ascendc_enable_super_kernel", True
         )
 
+        DFXSectionGenerator().dfx_info_reset(op_info)
         gen_kernel_fun(
             compile_info,
             origin_func_name,
@@ -9527,10 +9666,54 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
         )
         self.assertTrue(os.path.exists(compile_info.gen_kernel_func_file))
         with open(compile_info.gen_kernel_func_file, "r") as file:
+            self.assertNotIn("__ASCENDC_SUPER_KERNEL_DEBUG__", file.read())
+        os.remove(compile_info.gen_kernel_func_file)
+        compile_info.super_kernel_info["sp_options"]["debug-per-op-max-core-num"] = "1"
+        with tbe.common.context.op_context.OpContext() as ctx:
+            ctx.add_addition("super_kernel_sub_combine", True)
+            gen_kernel_fun(
+                compile_info,
+                origin_func_name,
+                op_info,
+                tiling_info,
+                CompileOptionTuple(compile_options, []),
+            )
+        self.assertTrue(os.path.exists(compile_info.gen_kernel_func_file))
+        with open(compile_info.gen_kernel_func_file, "r") as file:
             lines = file.readlines()  # 读取所有行，返回列表
             lines = " ".join(lines)
             self.assertNotEqual(lines.find(" __attribute__((aligned(512))) "), -1)
             self.assertNotEqual(lines.find(" __sk__"), -1)
+            self.assertNotIn("__ASCENDC_SUPER_KERNEL_DEBUG__", lines)
+            self.assertIn(
+                "AscendC::g_superKernelSetWaitFlagCountDifference = "
+                "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE;",
+                lines,
+            )
+            self.assertIn(
+                "if (AscendC::g_superKernelSetWaitFlagCountDifference > "
+                "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE)",
+                lines,
+            )
+            self.assertIn(
+                "else if (AscendC::g_superKernelSetWaitFlagCountDifference < "
+                "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE)",
+                lines,
+            )
+            self.assertIn(
+                'assert(false, "SuperKernel: current operator has %d more SetFlag '
+                'calls than WaitFlag calls; Please check synchronization within the current operator.\\n", '
+                "AscendC::g_superKernelSetWaitFlagCountDifference - "
+                "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE);",
+                lines,
+            )
+            self.assertIn(
+                'assert(false, "SuperKernel: current operator has %d more WaitFlag '
+                'calls than SetFlag calls; Please check synchronization within the current operator.\\n", '
+                "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE - "
+                "AscendC::g_superKernelSetWaitFlagCountDifference);",
+                lines,
+            )
         os.remove(compile_info.gen_kernel_func_file)
         global_var_storage.global_storage_reset()
 

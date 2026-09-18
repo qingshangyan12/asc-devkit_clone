@@ -22,14 +22,19 @@
 #include "impl/utils/debug/npu_arch_2002/asc_aicore_printf_utils.h"
 #elif __NPU_ARCH__ == 2201
 #include "impl/utils/debug/npu_arch_2201/asc_aicore_printf_utils.h"
+#elif __NPU_ARCH__ == 3002
+#include "impl/utils/debug/npu_arch_3002/asc_aicore_printf_utils.h"
 #elif __NPU_ARCH__ == 3510
 #include "impl/utils/debug/npu_arch_3510/asc_aicore_printf_utils.h"
 #elif __NPU_ARCH__ == 5102
 #include "impl/utils/debug/npu_arch_5102/asc_aicore_printf_utils.h"
+#elif __NPU_ARCH__ == 5162
+#include "impl/utils/debug/npu_arch_5162/asc_aicore_printf_utils.h"
 #endif
 
 namespace __asc_aicore {
-#if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || \
+    (__NPU_ARCH__ == 5102)
 template <typename T>
 __aicore__ inline void set_scalar_param(__gm__ uint8_t* paramAddr, uint32_t paramIdx, T scalar)
 {
@@ -257,11 +262,11 @@ static __attribute__((noinline)) __aicore__ void printf_impl_assert_msg(
     set_atomic_none();
 #ifdef __DAV_VEC__
     scalar_printf_impl(
-        DumpType::DUMP_ASSERT, fmt, "[AIV Block %u/%u] [ASSERT] %s:%u: %s: Assertion `%s' failed. ",
+        DumpType::DUMP_ASSERT, fmt, "[AIV Block %u/%u] [ASSERT] %s:%u: %s: Assertion '%s' failed. ",
         asc_debug_get_block_idx(), asc_debug_get_block_total_num(), __file, __line, __function, __assertion, args...);
 #else
     scalar_printf_impl(
-        DumpType::DUMP_ASSERT, fmt, "[AIC Block %u/%u] [ASSERT] %s:%u: %s: Assertion `%s' failed. ",
+        DumpType::DUMP_ASSERT, fmt, "[AIC Block %u/%u] [ASSERT] %s:%u: %s: Assertion '%s' failed. ",
         asc_debug_get_block_idx(), asc_debug_get_block_total_num(), __file, __line, __function, __assertion, args...);
 #endif
     set_ctrl(ctrlValue);
@@ -313,7 +318,7 @@ static __attribute__((noinline)) __aicore__ void printf_impl_assert_msg(
     const __gm__ char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-    std::printf("[ASSERT] %s:%u: %s: Assertion `%s' failed. ", __file, __line, __function, __assertion);
+    std::printf("[ASSERT] %s:%u: %s: Assertion '%s' failed. ", __file, __line, __function, __assertion);
     std::printf(fmt, args...);
 #endif
 }

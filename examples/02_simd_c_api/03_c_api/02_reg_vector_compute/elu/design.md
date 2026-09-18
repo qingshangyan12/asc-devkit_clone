@@ -56,11 +56,12 @@ elu_custom(src, dst, alpha, scale, input_scale)
 本算子为 C API 寄存器范式，无 op_host/op_kernel 三段式结构，交付目录结构如下：
 ```
 elu/
-├── op_kernel/
-│   └── elu.asc              // 核函数实现 + Host 调用 + 验证（C API 寄存器范式）
+├── elu.asc                 // 核函数实现 + Host 调用 + 验证（C API 寄存器范式）
+├── data_utils.h            // 数据读写辅助
 ├── scripts/
 │   ├── gen_data.py          // 测试数据生成脚本
-│   └── gen_screenshots.py   // 截图生成脚本
+│   ├── gen_screenshots.py   // 截图生成脚本
+│   └── test_elu.sh          // 一键测试脚本
 ├── screenshots/             // 自测报告截图（编译/精度/性能）
 │   ├── build.png
 │   ├── accuracy.png
@@ -74,7 +75,7 @@ elu/
 核心交付件说明：
 | 交付件 | 说明 |
 |--------|------|
-| `op_kernel/elu.asc` | 核函数实现 + Host 调用 + 验证（`__vector__ __global__` / `__simd_vf__`） |
+| `elu.asc` | 核函数实现 + Host 调用 + 验证（`__vector__ __global__` / `__simd_vf__`） |
 | `CMakeLists.txt` | 编译工程（dav-3510） |
 | `scripts/gen_data.py` | 测试数据生成脚本 |
 | `screenshots/` | 自测报告截图（编译/精度/性能） |

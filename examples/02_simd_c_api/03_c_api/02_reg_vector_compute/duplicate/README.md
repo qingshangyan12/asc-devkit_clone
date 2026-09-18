@@ -1,7 +1,7 @@
-﻿# duplicate样例
+# duplicate样例
 
 ## 概述
-本样例基于C API编程接口实现Duplicate运算（标量填充模式），主要调用[asc_duplicate_scalar](../../../../../docs/zh/api/SIMD-API/C-API/reg/data_fill/asc_duplicate_scalar.md)接口。
+本样例基于C API编程接口实现Duplicate运算（标量填充模式），主要调用[asc_duplicate_scalar](../../../../../docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_scalar.md)接口。
 - `asc_duplicate_scalar(矢量数据寄存器dst, scalar, mask)` 接口将一个标量值复制多次并填充到向量中
 - `asc_duplicate(矢量数据寄存器dst, 矢量数据寄存器src, mask)` 接口将源矢量数据寄存器的第一个元素复制多次并填充到向量中
 
@@ -9,13 +9,13 @@
 
 | 产品 | CANN软件版本 |
 | --- | --- |
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## 目录结构介绍
 ```
 ├── duplicate
 │   ├── scripts
-│   │   │   ├── gen_data.py            // 真值数据生成脚本
+│   │   ├── gen_data.py            // 真值数据生成脚本
 │   ├── CMakeLists.txt                 // 编译工程文件
 │   ├── data_utils.h                   // 数据读入写出函数
 │   ├── duplicate.asc                  // AscendC样例实现 & 调用样例
@@ -48,7 +48,7 @@
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
+  > **说明：** `${install_path}`为CANN包安装目录；root用户默认为`/usr/local/Ascend`，非root用户默认为`${HOME}/Ascend`。
 
 - 样例执行
 

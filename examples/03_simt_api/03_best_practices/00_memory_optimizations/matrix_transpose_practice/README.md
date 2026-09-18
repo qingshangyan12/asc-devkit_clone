@@ -4,13 +4,11 @@
 
 本样例以矩阵转置为例，介绍Ascend C SIMT编程方式下的访存优化思路。首先，通过一维连续复制建立GM连续读写的性能基线，并用直接全局内存转置暴露非连续写带来的主要开销；然后，引入UB中转与32×32分块，将非连续GM写转移为UB内转置访问；接着，对比按tile分组启动线程块（Thread Block）与固定线程块数两种配置方式，并结合2048线程配置下的寄存器溢出分析线程数选择；随后，增加UB padding消除转置读阶段的bank冲突；最终，借助双缓冲（Double Buffer）去除循环尾部同步，完整呈现SIMT矩阵转置的调优路径。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.1.0
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -19,8 +17,8 @@
 │   ├── figures                     // README中的图片资源
 │   ├── CMakeLists.txt              // 编译工程文件
 │   ├── matrix_transpose.asc        // SIMT矩阵转置优化路径实现
-│   ├── README.md
-│   └── README_en.md
+│   ├── README.md                   // 样例说明文档
+│   └── README_en.md                // 英文样例说明文档
 ```
 
 ## 样例描述
@@ -94,7 +92,7 @@ uint32_t index = x_index + width * y_index;              // 61 + 1024 * 66
 | -------------------- | ----------------------------------------------------------------------------------------- |
 | Task Duration(μs)   | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间                  |
 | aiv_time(μs)        | Task在AI Vector Core上的理论执行时间，单位为μs                                           |
-| aiv_total_cycles     | 该Task被分配到每个AI Vector Core计算单元上后，每个AI Vector Core计算单元上的执行cycle总数 |
+| aiv_total_cycles     | 该Task在每个AI Vector Core计算单元上的执行cycle总数 |
 | aiv_vec_time(μs)    | vec类型指令（向量类运算指令）耗时，单位为μs                                              |
 | aiv_vec_ratio        | vec类型指令（向量类运算指令）的cycle数在total cycle数中的占用比                           |
 | aiv_scalar_time(μs) | scalar类型指令（标量类运算指令）耗时，单位为μs                                           |
@@ -173,7 +171,7 @@ Case 2在保持GM连续读取的同时，直接将数据写入转置后的输出
 
 **优化目标**：引入UB与分块，将Case 2的非连续全局内存写转换为UB内访问，使全局内存读写均恢复连续；本Case按切分后的tile数量设置Thread Block数，每个Thread Block处理两个32×32的tile。
 
-**核心实现**：将矩阵划分为32×32的tile，总tile数为 `tiles=(W/32)×(H/32)`。本Case中每个Thread Block启动2048个线程，可同时处理两个tile，因此Thread Block数量设置为 `blocks_per_grid=ceil(tiles / 2)`。线程配置参数为 `dim3(32,64,1)`，其中 `threadIdx.y=0..31`的线程处理第一个tile，`threadIdx.y=32..63`的线程处理第二个tile；代码通过 `local_tile=threadIdx.y>>5`得到当前线程在Thread Block内负责的tile编号，通过 `ty=threadIdx.y&31`得到tile内行索引。线程先将tile按原布局写入UB，经 [`asc_syncthreads()`](../../../../../docs/zh/api/SIMT-API/同步与内存栅栏/同步接口/asc_syncthreads.md) 同步后，再按转置方向从UB读取并连续写入GM。
+**核心实现**：将矩阵划分为32×32的tile，总tile数为 `tiles=(W/32)×(H/32)`。本Case中每个Thread Block启动2048个线程，可同时处理两个tile，因此Thread Block数量设置为 `blocks_per_grid=ceil(tiles / 2)`。线程配置参数为 `dim3(32,64,1)`，其中 `threadIdx.y=0..31`的线程处理第一个tile，`threadIdx.y=32..63`的线程处理第二个tile；代码通过 `local_tile=threadIdx.y>>5`得到当前线程在Thread Block内负责的tile编号，通过 `ty=threadIdx.y&31`得到tile内行索引。线程先将tile按原布局写入UB，经 [`asc_syncthreads()`](../../../../../docs/zh/api/SIMT-API/sync_and_memory_fence/sync_interface/asc_syncthreads.md) 同步后，再按转置方向从UB读取并连续写入GM。
 
 UB中转的核心思想如下图所示：GM读取阶段按输入矩阵行方向连续读取至UB；GM写入阶段交换输出tile坐标，使同一个Warp向输出矩阵的一行写入数据。原本非连续的GM写被转移为UB内转置方向读取。
 
@@ -190,6 +188,7 @@ __ubuf__ float tile[TILES_PER_BLOCK][TILE_DIM][TILE_DIM];
 uint32_t local_tile = threadIdx.y >> 5;                // 0或1，区分Thread Block内两个tile
 uint32_t ty = threadIdx.y & (TILE_DIM - 1);
 uint32_t tx = threadIdx.x;
+uint32_t tiles_x = width / TILE_DIM;
 
 uint32_t tile_id = blockIdx.x * TILES_PER_BLOCK + local_tile;
 uint32_t tile_y = tile_id / tiles_x;
@@ -379,8 +378,6 @@ Case 6与Case 7的仿真指令流水图分别如图6、图7所示，其中耗时
 
 ## 性能对比总结
 
-### Ascend 950PR性能数据
-
 | Case | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | ---- | :----------------: | :-----------: | :--------------: | :---------------: | :-----------: | :------------------: | :--------------: |
 | 0    |       6.262       |     4.971     |      8201.7      |       4.516       |     0.909     |        0.443        |      0.089      |
@@ -429,10 +426,21 @@ Case 6与Case 7的仿真指令流水图分别如图6、图7所示，其中耗时
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # 编译工程
   ./matrix_transpose                                                        # 执行样例
   ```
+  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
+
+  示例如下：
+
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j; # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
+
 - 编译选项说明
 
   | 选项                        | 可选值       | 说明                                                       |
   | --------------------------- | ------------ | ---------------------------------------------------------- |
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构：本样例仅支持dav-3510（Ascend 950PR/Ascend 950DT） |
   | `SCENARIO_NUM`            | `0`-`7`  | 样例类型，默认为7                                          |
 
@@ -445,7 +453,11 @@ Case 6与Case 7的仿真指令流水图分别如图6、图7所示，其中耗时
   [Success] Case accuracy verification passed.
   ```
 
-## 性能分析
+## 性能调试
+
+### msOpProf工具介绍
+
+msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
 
 使用 `msOpProf` 工具获取详细性能数据：
 
@@ -468,29 +480,29 @@ msopprof ./matrix_transpose   # 分析case的性能
 └── visualize_data.bin         // MindStudio Insight呈现文件
 ```
 
-## 仿真调优
+- 仿真性能采集
 
-可以使用 `msopprof simulator` 进行仿真性能分析，生成可视化的指令流水图等信息。命令如下：
+  可以使用 `msopprof simulator` 进行仿真性能分析，生成可视化的指令流水图等信息。命令如下：
 
-```bash
-SCENARIO_NUM=7                                                                     # 选择执行场景，可选0-7
-mkdir -p build && cd build;                                                        # 创建并进入build目录
-cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # 编译工程
-msopprof simulator --soc-version=<soc_version> ./matrix_transpose
-```
+  ```bash
+  SCENARIO_NUM=7                                                                     # 选择执行场景，可选0-7
+  mkdir -p build && cd build;                                                        # 创建并进入build目录
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # 编译工程
+  msopprof simulator --soc-version=<soc_version> ./matrix_transpose
+  ```
 
-> 使用仿真调优功能前，需要在 `CMakeLists.txt` 中添加 `-g` 编译选项，用于生成调试信息，使仿真器能够采集指令流水图。`soc_version` 获取方式及仿真调优其他说明可参考[仿真调优样例](../../../01_utilities/07_simulator)。
+> 使用仿真调优功能前，需要在 CMakeLists.txt 中添加 `-g` 编译选项，用于生成调试信息，使仿真器能够采集指令流水图。`soc_version` 获取方式及仿真调优其他说明可参考[仿真调优样例](../../../01_utilities/07_simulator)。
 
-命令完成后，会在当前目录下生成以 `OPPROF_{timestamp}_XXX` 命名的文件夹，产物结构如下：
+  命令完成后，会在当前目录下生成以 `OPPROF_{timestamp}_XXX` 命名的文件夹，产物结构如下：
 
-```text
-OPPROF_{timestamp}_XXX/
-├── dump                    // 原始性能数据，用户无需关注
-└── simulator
-    ├── core*.veccore*/     // 各向量核的仿真指令流水图文件
-    └── visualize_data.bin  // MindStudio Insight呈现文件
-```
+  ```text
+  OPPROF_{timestamp}_XXX/
+  ├── dump                    // 原始性能数据，用户无需关注
+  └── simulator
+      ├── core*.veccore*/     // 各向量核的仿真指令流水图文件
+      └── visualize_data.bin  // MindStudio Insight呈现文件
+  ```
 
-执行后，可以在 **MindStudio Insight** 中打开 `visualize_data.bin` 查看可视化指令流水图。
+  执行后，可以在 **MindStudio Insight** 中打开 `visualize_data.bin` 查看可视化指令流水图。
 
 更多 `msOpProf` 工具使用方法，请参见[MindStudio工具调优（msOpProf）快速入门](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/quick_start/msopprof_quick_start.md)。

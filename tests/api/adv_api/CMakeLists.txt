@@ -191,7 +191,6 @@ file(GLOB ASCENDC_TEST_ascend910B1_AIC_CASE_SRC_FILES
     matmul/test_matmul_shape_info.cpp
     matmul/test_matmul_shape_info_left.cpp
     hccl/test_hccl.cpp
-    hcomm/test_hcomm.cpp
     matmul/copy_cube_in/test_copy_cube_in_norm.cpp
     matmul/copy_cube_in/test_copy_cube_in_mdl.cpp
     matmul/copy_cube_in/test_copy_cube_in_params.cpp
@@ -369,6 +368,7 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     index/arithprogression/test_operator_arithprogression.cpp
     #math
     math/clamp/test_operator_clamp.cpp
+    math/bessel_i0/test_operator_bessel_i0.cpp
     math/bitwise_and/test_operator_bitwise_and.cpp
     math/logical_and/test_operator_logical_and.cpp
     math/logical_ands/test_operator_logical_ands.cpp
@@ -388,6 +388,8 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     math/fmod/test_operator_fmod.cpp
     math/hypot/test_operator_hypot.cpp
     math/log/test_operator_log.cpp
+    math/ndtri/test_operator_ndtri.cpp
+    api_check/math/ndtri/kernel_ndtri_check.cpp
     math/philox/test_operator_philox_c310.cpp
     math/power/test_operator_power_c310.cpp
     math/sin/test_operator_sin_c310.cpp
@@ -457,8 +459,6 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     transpose/confusion_transpose/test_operator_confusion_transpose_c310.cpp
     # hccl
     hccl/test_hccl_aicpu_950.cpp
-    hcomm/test_hcomm_roce_950.cpp
-    hcomm/test_hcomm_urma_950.cpp
 )
 
 # ascend310B1 test cases
@@ -499,6 +499,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},Kirin9030_AIV>:__NPU_ARCH__=3113;__DAV_L311__;__DAV_L311_VEC__;__DAV_L311_VEC__>
         $<$<STREQUAL:${product_type},ascend310B1>:__NPU_ARCH__=3002;__DAV_M300__>
         __disable_kernel_type_autoinfer__=
+        __callee__=
     )
 
     target_include_directories(ascendc_ut_adv_api_kernel_${product_type} PRIVATE
@@ -563,6 +564,7 @@ file(GLOB ASCENDC_TILING_SRC_FILES
     ${ASCENDC_ADV_API_IMPL}/tiling/transpose/*.cpp
     ${ASCENDC_ADV_API_IMPL}/tiling/conv/*.cpp
     ${ASCENDC_ADV_API_IMPL}/tiling/conv_backprop/*.cpp
+    ${ASCENDC_ADV_API_IMPL}/tiling/experimental/math/*.cpp
     ${ASCENDC_ADV_API_IMPL}/detail/host_log.cpp
 )
 
@@ -637,5 +639,6 @@ foreach(product_type ${TILING_PRODUCT_TYPE_LIST})
 endforeach()
 
 add_subdirectory(hccl/cc)
+add_subdirectory(hccl/ccu)
 
 add_subdirectory(api_host_check)

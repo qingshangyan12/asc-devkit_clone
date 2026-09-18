@@ -8,9 +8,9 @@ This example implements per-token quantization group matrix multiplication (Quan
 
 | Products | CANN Software Version |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 training series products/Atlas A3 inference series products | >= CANN 9.0.0 |
-| Atlas A2 training series products/Atlas A2 inference series products | >= CANN 9.0.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+| Atlas A3 training series products/Atlas A3 inference series products | >= CANN 9.2.0 |
+| Atlas A2 training series products/Atlas A2 inference series products | >= CANN 9.2.0 |
 
 ## Introduction to directory structure
 
@@ -172,7 +172,7 @@ if ASCEND_IS_AIC {
     CrossCoreSetFlag<2, PIPE_FIX>(SYNC_AIC_TO_AIV);  // NotificationVector
 }
 if ASCEND_IS_AIV {
-    CrossCoreWaitFlag(SYNC_AIC_TO_AIV);  // Wait for Cube to complete
+    CrossCoreWaitFlag<2>(SYNC_AIC_TO_AIV);  // Wait for Cube to complete
     // Process data...
     CrossCoreSetFlag<2, PIPE_MTE2>(SYNC_AIV_TO_AIC);
 }
@@ -187,16 +187,16 @@ The Process function uses the **continuous polling across Group** strategy to al
 **Blocking dimension description**:
 
 - **GroupM**: The number of M-dimensional rows of the current Group, dynamically read from groupList. In this example, each group has GroupM=1024
-- **numBlocksM = Ceil(GroupM, SINGLE_M)**: The number of sub-blocks of the current Group in the M direction. Ceil(1024, 128) = 8 under Atlas A2, Ceil(1024, 256) = 4 under Ascend 950PR
-- **numBlocksN = Ceil(N, SINGLE_N)**: The number of sub-blocks in the N direction, the same for all Groups. Ceil(8192, 1024) = 8
+- **numBlocksM = AscendC::Std::ceil_div(GroupM, SINGLE_M)**: The number of sub-blocks of the current Group in the M direction. AscendC::Std::ceil_div(1024, 128) = 8 under Atlas A2, AscendC::Std::ceil_div(1024, 256) = 4 under Ascend 950PR
+- **numBlocksN = AscendC::Std::ceil_div(N, SINGLE_N)**: The number of sub-blocks in the N direction, the same for all Groups. AscendC::Std::ceil_div(8192, 1024) = 8
 
 Each Group has a total of `numBlocksM × numBlocksN` sub-blocks, which are positioned by `(mIdx, nIdx)` two-dimensional coordinates. The size of each sub-block is `[SINGLE_M, SINGLE_N]`, and the Cube internal calculation is based on `[BASE_M, BASE_N]` granularity (each sub-block requires `SINGLE_N/BASE_N × SINGLE_M/BASE_M` Iterate times).
 
 ```cpp
 for (groupIdx = 0, preCount = 0; groupIdx < GROUP_NUM; ++groupIdx) {
     groupM = groupListGlobal.GetValue(groupIdx);          // The number of rows in this group, in this example =1024
-    numBlocksM = Ceil(groupM, SINGLE_M);                   // Number of blocks in M ​​direction
-    numBlocksN = Ceil(N, SINGLE_N);                         // Number of blocks in N direction, same for all groups = 8
+    numBlocksM = AscendC::Std::ceil_div(groupM, SINGLE_M);                   // Number of blocks in M ​​direction
+    numBlocksN = AscendC::Std::ceil_div(N, SINGLE_N);                         // Number of blocks in N direction, same for all groups = 8
     curCount = preCount + numBlocksM * numBlocksN;          // The upper bound of consecutive numbers including the remainder of the previous group
 
     // Core allocation formula: determine the first block number of the current Core in this Group
@@ -348,7 +348,7 @@ workSpaceOffset = BASE_N × BASE_M × (coreIdx + (cubeTaskIdx % PIPELINE_DEPTH) 
 ```
 
 - When `cubeTaskIdx < PIPELINE_DEPTH`, Cube does not need to wait and directly writes the new Slot.
-- When `cubeTaskIdx >= PIPELINE_DEPTH`, Cube needs to wait for Vector to release the corresponding Slot (`CrossCoreWaitFlag(SYNC_AIV_TO_AIC)`)
+- When `cubeTaskIdx >= PIPELINE_DEPTH`, Cube needs to wait for Vector to release the corresponding Slot (`CrossCoreWaitFlag<2>(SYNC_AIV_TO_AIC)`)
 - The synchronization granularity is Iterate (=BASE_M×BASE_N), not sub-block (=SINGLE_M×SINGLE_N)
 
 **Level 4 pipeline timing**:
@@ -430,7 +430,7 @@ Although Atlas A2/A3 is still biased towards Vector bound in the end, the three-
 
 Perform the following steps in the root directory of this sample to compile and execute the sample.
 - Configure environment variables
-  Please configure the environment variables according to the [installation method ](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit package in the current environment.
+  Please configure the environment variables according to the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit package in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

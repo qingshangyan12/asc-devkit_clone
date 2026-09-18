@@ -4,14 +4,13 @@
 
 This example implements reduction sum for 1D `float` input based on the Ascend C SIMT programming model. Through 2 progressive scenarios, it demonstrates typical usage of intra-block synchronization and inter-block memory ordering control.
 
-The 2 scenarios correspond to reduction sum for small shape input and large shape input respectively, focusing on the usage of [`asc_syncthreads()`](../../../../../../docs/zh/api/SIMT-API/同步与内存栅栏/同步接口/asc_syncthreads.md) and [`asc_threadfence()`](../../../../../../docs/zh/api/SIMT-API/同步与内存栅栏/内存栅栏接口/asc_threadfence.md) under different reduction scales.
+The 2 scenarios correspond to reduction sum for small shape input and large shape input respectively, focusing on the usage of [`asc_syncthreads()`](../../../../../../docs/zh/api/SIMT-API/sync_and_memory_fence/sync_interface/asc_syncthreads.md) and [`asc_threadfence()`](../../../../../../docs/zh/api/SIMT-API/sync_and_memory_fence/memory_fence/asc_threadfence.md) under different reduction scales.
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Software Version
-- \>= CANN 9.1.0
+| Products | CANN Versions |
+|---|---|
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -21,7 +20,8 @@ The 2 scenarios correspond to reduction sum for small shape input and large shap
 │   ├── sync_barrier.asc      // Scenario 1: Small shape reduction example, demonstrating asc_syncthreads() intra-block synchronization usage
 │   ├── memory_fence.asc      // Scenario 2: Large shape reduction example, demonstrating asc_threadfence() and atomic counter inter-block coordination usage
 │   ├── CMakeLists.txt        // Build project file
-│   └── README.md
+│   ├── README.md
+│   └── README_en.md      // English version of the sample description
 ```
 
 ## Example Description
@@ -101,7 +101,7 @@ This example controls build branches through `SCENARIO_NUM`. The 2 scenarios are
 
 Each thread in a single thread block first reads one input element, then obtains the final result through **two-phase reduction sum**:
 
-- **Phase 1 (intra-warp reduction)**: Call the [`asc_reduce_add()`](../../../../../../docs/zh/api/SIMT-API/Warp函数/Warp-Reduce类函数/asc_reduce_add.md) interface to perform reduction on all thread values within the current warp, obtaining the sum of data within the warp, and write to shared memory.
+- **Phase 1 (intra-warp reduction)**: Call the [`asc_reduce_add()`](../../../../../../docs/zh/api/SIMT-API/Warp_functions/Warp_reduce_functions/asc_reduce_add.md) interface to perform reduction on all thread values within the current warp, obtaining the sum of data within the warp, and write to shared memory.
 - **Phase 2 (block-level sequential accumulation)**: After cross-warp synchronization, thread 0 sequentially accumulates the partial sums from each warp to obtain the final result.
 
 Taking 128 elements (4 warps) as an example, the two-phase reduction process is shown in Figure 1:
@@ -140,7 +140,7 @@ In the above flow, multiple thread blocks need to read and write the same global
 
 Run the following steps in the root directory of this example to build and execute the operator.
 - Configure Environment Variables  
-  Configure environment variables based on the [installation method](../../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -158,14 +158,24 @@ Run the following steps in the root directory of this example to build and execu
   ./demo                        # Run the example
   ```
 
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+
   Build Options Description
 
   | Option | Values | Description |
   |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
   | `SCENARIO_NUM` | `1`, `2` | Scenario number: 1 indicates small shape reduction scenario, 2 indicates large shape reduction scenario |
 
   The following output indicates that the accuracy verification is successful.
   ```
-  [Success] Case accuracy is verification passed.
+  [Success] Case accuracy verification passed.
   ```

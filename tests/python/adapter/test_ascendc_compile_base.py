@@ -13,6 +13,7 @@ import os
 import sys
 import unittest
 from unittest import mock
+from itertools import product
 import tbe
 from tbe.common.platform import set_current_compile_soc_info, get_soc_spec
 from tbe.common import buildcfg
@@ -72,6 +73,43 @@ class TestAscendCCompileBase(unittest.TestCase):
 
     def tearDown(self):
         pass
+
+    def test_link_sk_norm_combine_with_meta_file(self):
+        result = mock.Mock(returncode=0, stderr="")
+        with mock.patch.object(
+            CCECInfo, "get_exe", return_value="ld.lld"
+        ), mock.patch.object(
+            subprocess, "run", return_value=result
+        ) as mock_run, mock.patch.object(
+            os, "listdir", return_value=["sk.o"]
+        ), mock.patch.object(os, "makedirs"), mock.patch.object(
+            os, "getpid", return_value=123
+        ):
+            link_sk_norm_combine(
+                "kernel.o", "norm.o", "sk_bind.o", "meta_info.o", "compile.log"
+            )
+
+        relocatable_link_cmd = mock_run.call_args_list[1].args[0]
+        self.assertEqual(relocatable_link_cmd.count("meta_info.o"), 1)
+        self.assertEqual(
+            relocatable_link_cmd[-3:], ["norm.o", "sk_bind.o", "meta_info.o"]
+        )
+
+    def test_link_sk_norm_combine_without_meta_file(self):
+        result = mock.Mock(returncode=0, stderr="")
+        with mock.patch.object(
+            CCECInfo, "get_exe", return_value="ld.lld"
+        ), mock.patch.object(
+            subprocess, "run", return_value=result
+        ) as mock_run, mock.patch.object(
+            os, "listdir", return_value=["sk.o"]
+        ), mock.patch.object(os, "makedirs"), mock.patch.object(
+            os, "getpid", return_value=123
+        ):
+            link_sk_norm_combine("kernel.o", "norm.o", "sk_bind.o", "", "compile.log")
+
+        relocatable_link_cmd = mock_run.call_args_list[1].args[0]
+        self.assertEqual(relocatable_link_cmd[-2:], ["norm.o", "sk_bind.o"])
 
     def test_gen_file_header(self):
         file_header = gen_file_header(KernelMetaType.KERNEL_TYPE_AIV_ONLY, 1)
@@ -267,6 +305,83 @@ class TestAscendCCompileBase(unittest.TestCase):
                         "-D__ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__",
                         compile_option_tuple.compile_options,
                     )
+
+    def test_gen_sub_super_kernel_compile_options_inner_core_sync_check(self):
+        cases = (("0", True, False), ("1", True, True), ("1", False, False))
+        for option_value, is_aclgraph, should_enable in cases:
+            with self.subTest(option_value=option_value, is_aclgraph=is_aclgraph):
+                with tbe.common.context.op_context.OpContext() as ctx:
+                    ctx.add_addition("super_kernel_sub_combine", is_aclgraph)
+                    compile_option_tuple = CompileOptionTuple([], [])
+                    tiling_info = TilingInfo()
+                    tiling_info.static_shape_flag = False
+                    compile_info = CompileInfo()
+                    compile_info.super_kernel_info = {
+                        "sp_options": {
+                            "debug-per-op-max-core-num": option_value,
+                        }
+                    }
+                    gen_sub_super_kernel_compile_options(
+                        compile_option_tuple, tiling_info, compile_info
+                    )
+                macro = "-D__ASCENDC_SUPER_KERNEL_DEBUG__"
+                self.assertEqual(
+                    macro in compile_option_tuple.compile_options, should_enable
+                )
+
+    def test_global_tensor_gm_check_compile_options(self):
+        check_macro = "-D__ASCENDC_SUPER_KERNEL_DEBUG__"
+        dcci_macro = "-D__ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__"
+        dump_options = (
+            None,
+            "-DASCENDC_DUMP=0",
+            "-DASCENDC_DUMP=1",
+            "-DASCENDC_DUMP",
+            "-UASCENDC_DUMP",
+        )
+        for sub_combine, enabled, static_shape, dump_option in product(
+            (False, True), ("0", "1"), (False, True), dump_options
+        ):
+            with self.subTest(
+                sub_combine=sub_combine,
+                enabled=enabled,
+                static_shape=static_shape,
+                dump_option=dump_option,
+            ), tbe.common.context.op_context.OpContext():
+                ctx = tbe.common.context.get_context()
+                with mock.patch.object(
+                    ctx,
+                    "get_addition",
+                    side_effect=lambda key: sub_combine
+                    if key == "super_kernel_sub_combine"
+                    else None,
+                ):
+                    options = CompileOptionTuple(
+                        [dump_option] if dump_option else [], []
+                    )
+                    tiling = TilingInfo()
+                    tiling.static_shape_flag = static_shape
+                    info = CompileInfo()
+                    info.super_kernel_info = {
+                        "sp_options": {
+                            "debug-per-op-max-core-num": enabled,
+                            "stream-fusion": SuperKernelStreamFusionMode.StreamFusionEnable,
+                        }
+                    }
+                    gen_sub_super_kernel_compile_options(options, tiling, info)
+                    should_check = sub_combine and enabled == "1"
+                    self.assertEqual(
+                        check_macro in options.compile_options, should_check
+                    )
+                    self.assertNotIn("-DASCENDC_DEBUG", options.compile_options)
+                    actual_dump = [
+                        option
+                        for option in options.compile_options
+                        if option in dump_options
+                    ]
+                    self.assertEqual(actual_dump, [dump_option] if dump_option else [])
+                    if should_check:
+                        self.assertNotIn(dcci_macro, options.compile_options)
 
     def test_gen_sub_super_kernel_early_start_compile_options(self):
         # early start sub kernel disable

@@ -2,30 +2,29 @@
 
 ## Overview
 
-  This example quantitatively demonstrates **the impact of struct type alignment on Global Memory access**: leveraging the 1B, 2B, 4B, and 8B width memory access instructions supported by Ascend 950PR/Ascend 950DT, multiple structs of different sizes are constructed for element-wise data transfer, comparing the transfer efficiency differences brought by type alignment.
+  This example quantitatively demonstrates **the impact of struct type alignment on Global Memory access**: leveraging the 1B, 2B, 4B, 8B and 16B width memory access instructions supported by Ascend 950PR/Ascend 950DT, multiple structs of different sizes are constructed for element-wise data transfer, comparing the transfer efficiency differences brought by type alignment.
 
-## Supported Products
+## Supported Products and CANN Versions
 
-  - Ascend 950PR/Ascend 950DT
-
-## Supported CANN Software Version
-
-  - \>= CANN 9.1.0
+| Product | CANN Version |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
 
-  ```
-  ├── aligned_types
-  │   ├── aligned_types.asc      // SIMT implementation & invocation example
-  │   ├── CMakeLists.txt         // CMake build file
-  │   └── README.md
-  ```
+```text
+├── aligned_types
+│   ├── aligned_types.asc      // SIMT implementation & invocation example
+│   ├── CMakeLists.txt         // CMake build file
+│   ├── README.md              // Sample documentation
+│   └── README_en.md           // English sample documentation
+```
 
 ## Example Description
 
 This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B groups. Each group has aligned and non-aligned comparisons; the 4B group covers `alignof=1` and `alignof=2` narrow alignment levels, plus 2 mixed-field struct comparisons with inconsistent field types. During testing, an input array `d_idata` of length `num_elements` is copied entirely to `d_odata`, and transfer efficiency is compared.
 
-- Basic Concepts
+- Basic Concepts:
 
   **1. alignof**
 
@@ -51,7 +50,7 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
   struct Misalign3 { unsigned char r, g, b; }; // alignof=1 sizeof=3 (default)
   ```
 
-- Key Parameters
+- Key Parameters:
 
   | Parameter | Value | Description |
   |------|-----|------|
@@ -59,7 +58,7 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
   | THREAD_COUNT   | 2048   | 2048 threads per core, grid fixed at `<<<1, 2048>>>` |
   | num_elements   | MEM_BYTES / sizeof(TData) | Number of elements per case, automatically scales with struct size |
 
-- Example Specifications
+- Sample Specifications:
 
   | Name              | Fields                    | sizeof | alignof | num_elements  |
   |------------------|--------------------------|-------|--------|-----------|
@@ -78,36 +77,9 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
   | Align32          | 8 x u32                  |  32B  |  32B   | 16777216  |
   | Misalign32       | 8 x u32                  |  32B  | **4B** | 16777216  |
 
-- Example Implementation
+## Example Implementation
 
-  - Kernel Implementation  
-
-    This example has a fixed total data size of 512MiB, using 2048 threads on a single core to perform data transfer. The kernel function is implemented as a template, supporting different types and alignment structs, performing element-wise transfer operations. The specific implementation is as follows:
-
-    ```
-    constexpr uint32_t THREAD_COUNT = 2048;                  // threads per block
-    constexpr size_t MEM_BYTES = 512ULL * 1024ULL * 1024ULL; // total data size 512 MiB
-    uint32_t num_elements = static_cast<uint32_t>(MEM_BYTES / sizeof(TData));
-
-    template <class TData>
-    __global__ __launch_bounds__(THREAD_COUNT) void aligned_type_kernel(
-        TData* d_odata, TData* d_idata, uint32_t num_elements)
-    {
-        const uint32_t tid = blockIdx.x * blockDim.x + threadIdx.x;
-        const uint32_t num_threads = blockDim.x * gridDim.x;
-        for (uint32_t pos = tid; pos < num_elements; pos += num_threads) {
-            d_odata[pos] = d_idata[pos];
-        }
-    }
-    ```
-
-  - Invocation Implementation  
-
-    Use the kernel invocation operator <<<>>> to call the kernel function.
-
-## Performance Analysis
-
-- Performance Metrics Description
+### Performance Metrics Description
 
   |             Field Name          | Field Description                                             |
   |:---------------------------:|:-------------------------------------------------|
@@ -116,9 +88,32 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
 
   Except for Task Duration, all other metrics in this example show the average values across all blocks.
 
-- Performance Data
+### Kernel Implementation
 
-  |       TData       | Task Duration(us) | aiv_total_cycles |
+This example has a fixed total data size of 512MiB, using 2048 threads on a single core to perform data transfer. The kernel function is implemented as a template, supporting different types and alignment structs, performing element-wise transfer operations. The specific implementation is as follows:
+
+```
+constexpr uint32_t THREAD_COUNT = 2048;                  // threads per block
+constexpr size_t MEM_BYTES = 512ULL * 1024ULL * 1024ULL; // total data size 512 MiB
+uint32_t num_elements = static_cast<uint32_t>(MEM_BYTES / sizeof(TData));
+
+template <class TData>
+__global__ __launch_bounds__(THREAD_COUNT) void aligned_type_kernel(
+    TData* d_odata, TData* d_idata, uint32_t num_elements)
+{
+    const uint32_t tid = blockIdx.x * blockDim.x + threadIdx.x;
+    const uint32_t num_threads = blockDim.x * gridDim.x;
+    for (uint32_t pos = tid; pos < num_elements; pos += num_threads) {
+        d_odata[pos] = d_idata[pos];
+    }
+}
+```
+
+## Performance Comparison Summary
+
+### Performance Data
+
+  |       TData       | Task Duration(μs) | aiv_total_cycles |
   | :---------------: | :---------------: | :--------------: |
   |      Align4       |     27889.33      |   46005213.32    |
   |     Misalign4     |     81223.02      |   134028903.60   |
@@ -130,14 +125,14 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
   | MisalignU8PadU16  |     46664.42      |   76969440.94    |
   |      Align8       |     17417.23      |   28735088.65    |
   |     Misalign8     |     21287.91      |   35112582.91    |
-  |      Align16      |     32983.77      |   54417477.84    |
+  |      Align16      |     27931.29      |   46090787.94    |
   |    Misalign16     |     38353.60      |   63284236.16    |
-  |      Align32      |     60901.24      |   100477599.40   |
+  |      Align32      |     52357.78      |   86396567.61    |
   |    Misalign32     |     77790.93      |   128352303.30   |
 
-- Comprehensive Analysis
+### Comprehensive Analysis
 
-  The total data transferred in all test cases is uniformly 512MiB. Wider memory access instructions result in less total time and higher transfer efficiency. The latency differences between aligned and non-aligned groups are summarized as follows:
+  The total data transferred in all test cases is uniformly 512MiB; given the same struct size, type alignment makes memory access instructions wider, resulting in less total time and higher transfer efficiency. The latency differences between aligned and non-aligned groups are summarized as follows:
 
   | Struct Size                  | Aligned Task Duration(us) | Non-aligned Task Duration(us)  | Non-aligned / Aligned Task Duration |
   | :------------------------: | :-------------------: | :---------------------: | :---------: |
@@ -146,8 +141,8 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
   | 4B (2xu8 + u16)            | 27854.56 (alignof=4)  | 46666.11 (alignof=2)    | **1.68x**   |
   | 4B (u8 + 1B padding + u16) | 27809.72 (alignof=4)  | 46664.42 (alignof=2)    | **1.68x**   |
   | 8B                         | 17417.23 (alignof=8)  | 21287.91 (alignof=4)    | **1.22x**   |
-  | 16B                        | 32983.77 (alignof=16) | 38353.60 (alignof=4)    | **1.16x**   |
-  | 32B                        | 60901.24 (alignof=32) | 77790.93 (alignof=4)    | **1.28x**   |
+  | 16B                        | 27931.29 (alignof=16) | 38353.60 (alignof=4)    | **1.37x**   |
+  | 32B                        | 52357.78 (alignof=32) | 77790.93 (alignof=4)    | **1.49x**   |
 
   From the table above:
 
@@ -157,16 +152,16 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
 
   (2) The three 4B struct groups (2xu16, 2xu8 + u16, u8 + 1B padding + u16) show no difference in `Task Duration` when compared vertically, indicating that whether fields are the same type or mixed types, and whether padding exists, does not affect transfer efficiency. The compiler only cares about the overall `sizeof` and `alignof` of the struct.
 
-  In summary, with the same total data size, type alignment improves transfer efficiency for structs of the same size, and higher `alignof` yields higher efficiency, with an upper limit of 8B.
+  In summary, with the same total data size, type alignment improves transfer efficiency for structs of the same size, and higher `alignof` yields higher efficiency, with an upper limit of 16B.
 
-- Tuning Recommendations
+## Tuning Recommendations
 
-  Ascend 950PR/Ascend 950DT supports four memory access instruction widths: 1B, 2B, 4B, and 8B. Therefore, it is recommended to select the highest possible width that does not exceed the struct size.
+  Ascend 950PR/Ascend 950DT supports five memory access instruction widths: 1B, 2B, 4B, 8B and 16B. Therefore, it is recommended to select the highest possible width that does not exceed the struct size.
 
 ## Build and Run
 
 - Configure Environment Variables  
-  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -183,10 +178,20 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
   ./demo                                # Run the example
   ```
 
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+
 - Build Options Description
 
   | Option                      | Values     | Description                                                         |
   | ------------------------- | ---------- | ----------------------------------------------------------- |
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT)  |
 
 - Execution Result
@@ -197,7 +202,11 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
   [Success] Case accuracy is verification passed.
   ```
 
-## Performance Data Collection
+## Performance Debugging
+
+### Introduction to the msOpProf Tool
+
+`msOpProf` is a single-operator performance analysis tool. It offers two usage methods: `msopprof` and `msopprof simulator`. The tool helps users identify anomalies in operator memory, operator code, and operator instructions, enabling comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and different file types (executables or operator binary `.o` files).
 
   Use the `msOpProf` tool to collect performance data on a single component:
 

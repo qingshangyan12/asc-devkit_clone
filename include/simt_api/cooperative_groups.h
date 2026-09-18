@@ -97,11 +97,17 @@ struct alignas(details::multi_warp_scratch::communication_size) block_tile_memor
 
 class _coalesced_group_data_access;
 class thread_block;
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+class grid_group;
+#endif
 
 enum class group_type : unsigned int {
     thread_block_type,
     tiled_group_type,
     coalesced_group_type,
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+    grid_group_type,
+#endif
 };
 
 class thread_group {
@@ -116,7 +122,6 @@ protected:
     group_type _type;
 
     struct tiled_info {
-        bool is_tiled;
         unsigned int mask;
         unsigned int num_threads;
         unsigned int meta_group_rank;
@@ -124,6 +129,9 @@ protected:
     } _tiled_info;
 
     friend class thread_block;
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+    friend class grid_group;
+#endif
 
     __SIMT_DEVICE_FUNCTIONS_DECL__ inline thread_group(group_type type);
 };
@@ -137,12 +145,15 @@ class tiled_group : public thread_group {
 
 public:
     __SIMT_DEVICE_FUNCTIONS_DECL__ inline void sync() const;
-    __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long num_threads() const;
-    __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long size() const;
-    __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long thread_rank() const;
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int num_threads() const;
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int size() const;
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int thread_rank() const;
 
 protected:
     __SIMT_DEVICE_FUNCTIONS_DECL__ inline tiled_group(unsigned int num_threads);
+
+private:
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline thread_group create_tiled_group(unsigned int tile_size) const;
 };
 
 class thread_block : public thread_group {
@@ -189,6 +200,29 @@ private:
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline thread_block this_thread_block();
 
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+class grid_group : public thread_group {
+    friend __SIMT_DEVICE_FUNCTIONS_DECL__ inline grid_group this_grid();
+
+public:
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool is_valid() const;
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline void sync() const;
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline static unsigned long long thread_rank();
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline static unsigned long long block_rank();
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline static unsigned long long num_threads();
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline static unsigned long long size();
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline static unsigned long long num_blocks();
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline static dim3 dim_blocks();
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline static dim3 group_dim();
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline static dim3 block_index();
+
+private:
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline grid_group();
+};
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline grid_group this_grid();
+#endif
+
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__) || defined(ASCENDC_CPU_DEBUG)
 template <unsigned int MaxBlockSize>
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline thread_block this_thread_block(block_tile_memory<MaxBlockSize>& scratch);
@@ -225,11 +259,11 @@ class coalesced_group : public thread_group {
 
 public:
     __SIMT_DEVICE_FUNCTIONS_DECL__ inline void sync() const;
-    __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long num_threads() const;
-    __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long size() const;
-    __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long thread_rank() const;
-    __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long meta_group_size() const;
-    __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long meta_group_rank() const;
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int num_threads() const;
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int size() const;
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int thread_rank() const;
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int meta_group_size() const;
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int meta_group_rank() const;
 
     template <typename T>
     __SIMT_DEVICE_FUNCTIONS_DECL__ inline T shfl(T var, int src_rank) const;
@@ -322,9 +356,9 @@ class single_warp_thread_block_tile_base {
 
 public:
     __SIMT_DEVICE_FUNCTIONS_DECL__ inline void sync() const;
-    __SIMT_DEVICE_FUNCTIONS_DECL__ static inline unsigned long long thread_rank();
-    __SIMT_DEVICE_FUNCTIONS_DECL__ static constexpr inline unsigned long long num_threads();
-    __SIMT_DEVICE_FUNCTIONS_DECL__ static constexpr inline unsigned long long size();
+    __SIMT_DEVICE_FUNCTIONS_DECL__ static inline unsigned int thread_rank();
+    __SIMT_DEVICE_FUNCTIONS_DECL__ static constexpr inline unsigned int num_threads();
+    __SIMT_DEVICE_FUNCTIONS_DECL__ static constexpr inline unsigned int size();
 
     template <typename T>
     __SIMT_DEVICE_FUNCTIONS_DECL__ inline T shfl(T var, int src_rank) const;
@@ -363,9 +397,9 @@ class multi_warp_thread_block_tile_base {
 
 public:
     __SIMT_DEVICE_FUNCTIONS_DECL__ inline void sync() const;
-    __SIMT_DEVICE_FUNCTIONS_DECL__ static inline unsigned long long thread_rank();
-    __SIMT_DEVICE_FUNCTIONS_DECL__ static constexpr inline unsigned long long num_threads();
-    __SIMT_DEVICE_FUNCTIONS_DECL__ static constexpr inline unsigned long long size();
+    __SIMT_DEVICE_FUNCTIONS_DECL__ static inline unsigned int thread_rank();
+    __SIMT_DEVICE_FUNCTIONS_DECL__ static constexpr inline unsigned int num_threads();
+    __SIMT_DEVICE_FUNCTIONS_DECL__ static constexpr inline unsigned int size();
 
     template <typename T>
     __SIMT_DEVICE_FUNCTIONS_DECL__ inline T shfl(T var, int src_rank) const;
@@ -518,6 +552,9 @@ struct tiled_partition_impl<Size, thread_block_tile<ParentSize, GrandParent>>
 
 template <unsigned int Size, typename ParentT>
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline thread_block_tile<Size, ParentT> tiled_partition(const ParentT& g);
+
+template <typename GroupType>
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void sync(const GroupType& g);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline thread_group tiled_partition(const thread_group& parent, unsigned int tilesz);
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline thread_group tiled_partition(const thread_block& parent, unsigned int tilesz);

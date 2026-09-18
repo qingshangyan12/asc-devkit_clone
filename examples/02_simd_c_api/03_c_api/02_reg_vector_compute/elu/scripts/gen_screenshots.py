@@ -74,7 +74,7 @@ build_lines = [
     "-- Build files have been written to: .../elu/build",
     "",
     "$ make -j",
-    "[ 50%] Building ASC object CMakeFiles/demo.dir/op_kernel/elu.asc.o",
+    "[ 50%] Building ASC object CMakeFiles/demo.dir/elu.asc.o",
     "[100%] Linking ASC executable demo",
     "[100%] Built target demo",
     "",

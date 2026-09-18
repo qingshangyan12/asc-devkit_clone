@@ -11,7 +11,8 @@
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
 #include "tests/api/c_api/stub/cce_stub.h"
-#include "include/c_api/asc_simd.h"
+#include "c_api/cube_datamove/cube_datamove.h"
+#include "c_api/utils/sys_init.h"
 
 class TestSysVarSetL0c2gmReluAlpha : public testing::Test {
 protected:
@@ -20,14 +21,19 @@ protected:
 };
 
 namespace {
-void set_l0c2gm_relu_alpha_Stub(uint64_t config) { EXPECT_EQ(config, static_cast<uint64_t>(1)); }
+void set_l0c_copy_relu_alpha_float_stub(uint64_t config)
+{
+    asc_3d_padding_bitcode bitcode;
+    bitcode.output = 0;
+    bitcode.input_float = 1.0;
+    EXPECT_EQ(config, bitcode.output & 0xFFFFE000u);
+}
 } // namespace
 
-TEST_F(TestSysVarSetL0c2gmReluAlpha, c_api_set_l0c2gm_relu_alpha_Succ)
+TEST_F(TestSysVarSetL0c2gmReluAlpha, c_api_set_l0c_copy_relu_alpha_float_Succ)
 {
-    int64_t input = 1;
-    MOCKER_CPP(set_relu_alpha, void(uint64_t)).times(1).will(invoke(set_l0c2gm_relu_alpha_Stub));
-    asc_set_l0c2gm_relu_alpha(input);
-    asc_init();
+    MOCKER_CPP(set_relu_alpha, void(uint64_t)).times(1).will(invoke(set_l0c_copy_relu_alpha_float_stub));
+    float scalar_relu_pre_alpha = 1.0;
+    asc_set_l0c_copy_relu_alpha(scalar_relu_pre_alpha);
     GlobalMockObject::verify();
 }

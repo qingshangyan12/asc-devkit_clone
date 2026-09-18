@@ -79,6 +79,7 @@ bool AscendCheckSoCVersion(const char* socVersion, char* errMsg)
         {"ascend910b3", "ascend910b"},      {"ascend910b4", "ascend910b"},      {"ascend910b4-1", "ascend910b"},
         {"ascend910_9391", "ascend910b"},   {"ascend910_9381", "ascend910b"},   {"ascend910_9372", "ascend910b"},
         {"ascend910_9392", "ascend910b"},   {"ascend910_9382", "ascend910b"},   {"ascend910_9362", "ascend910b"},
+        {"ascend910_9363", "ascend910b"},
 
         {"ascend910a", "ascend910"},        {"ascend910proa", "ascend910"},     {"ascend910b", "ascend910"},
         {"ascend910prob", "ascend910"},     {"ascend910premiuma", "ascend910"},
@@ -88,7 +89,9 @@ bool AscendCheckSoCVersion(const char* socVersion, char* errMsg)
         {"ascend310p3vir04", "ascend310p"}, {"ascend310p3vir08", "ascend310p"},
 
         {"ascend310b1", "ascend310b"},      {"ascend310b2", "ascend310b"},      {"ascend310b3", "ascend310b"},
-        {"ascend310b4", "ascend310b"},      {"kirinx90", "kirinx90"},           {"kirin9030", "kirin9030"}};
+        {"ascend310b4", "ascend310b"},      {"kirinx90", "kirinx90"},           {"kirin9030", "kirin9030"},
+        {"kirindev0000", "kirindev0000"},   {"kirindev0001", "kirindev0001"},   {"kirindev0002", "kirindev0002"},
+        {"kirindev0003", "kirindev0003"}};
 
     static const std::unordered_map<std::string, std::string> ascendcOriSocVersionMap{
         {"ascend910b1", "Ascend910B1"},
@@ -103,6 +106,7 @@ bool AscendCheckSoCVersion(const char* socVersion, char* errMsg)
         {"ascend910_9392", "Ascend910_9392"},
         {"ascend910_9382", "Ascend910_9382"},
         {"ascend910_9362", "Ascend910_9362"},
+        {"ascend910_9363", "Ascend910_9363"},
 
         {"ascend910a", "Ascend910A"},
         {"ascend910proa", "Ascend910ProA"},
@@ -124,7 +128,11 @@ bool AscendCheckSoCVersion(const char* socVersion, char* errMsg)
         {"ascend310b3", "Ascend310B3"},
         {"ascend310b4", "Ascend310B4"},
         {"kirinx90", "KirinX90"},
-        {"kirin9030", "Kirin9030"}};
+        {"kirin9030", "Kirin9030"},
+        {"kirindev0000", "KirinDev0000"},
+        {"kirindev0001", "KirinDev0001"},
+        {"kirindev0002", "KirinDev0002"},
+        {"kirindev0003", "KirinDev0003"}};
 
     std::string compileSocVersion = std::string(socVersion);
 

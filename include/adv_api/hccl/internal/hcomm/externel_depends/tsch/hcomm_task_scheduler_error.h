@@ -28,11 +28,11 @@ typedef enum tag_ts_error {
     TS_ERROR_TASK_CMD_QUEUE_EMPTY = 0x6,                 /**< task cmd queue is empty */
     TS_ERROR_TASK_REPORT_QUEUE_FULL = 0x7,               /**< task report queue is full */
     TS_ERROR_TASK_REPORT_QUEUE_EMPTY = 0x8,              /**< task report queue is empty */
-    TS_ERROR_TASK_NODE_BUFF_ALL_OCCUPYED = 0x9,          /**< all the node of public task buff are occupyed */
+    TS_ERROR_TASK_NODE_BUFF_ALL_OCCUPYED = 0x9,          /**< all the node of public task buff are occupied */
     TS_ERROR_TASK_NODE_BUFF_ALL_FREED = 0xA,             /**< all the node of public task buff are free */
     TS_ERROR_L2_MEM_INSUFFICIENT_SPACE = 0xB,            /**< there is not enough space on l2 memory */
     TS_ERROR_L2_MALLOC_FAILED = 0xC,                     /**< malloc l2 failed */
-    TS_ERROR_DMA_CHANNEL_ALL_OCCUPYED = 0xD,             /**< all the dma channel are occupyed */
+    TS_ERROR_DMA_CHANNEL_ALL_OCCUPYED = 0xD,             /**< all the dma channel are occupied */
     TS_ERROR_MEMCPY_OP_FAILED = 0xE,                     /**< memcpy failed */
     TS_ERROR_BS_SLOT_ALL_OCCUPYED = 0xF,                 /**< there is not free bs slot for new task */
     TS_ERROR_TBS_SLOT_REPEAT_FREE = 0x10,                /**< one free bs slot cannot be freed again */
@@ -42,8 +42,8 @@ typedef enum tag_ts_error {
     TS_ERROR_REPEAT_MARK_STREAM_NEED_SERVICE = 0x14,     /**< repeat mark the stream list need service */
     TS_ERROR_SYS_DMA_CHANNEL_ALL_OCCUPAPYED = 0x15,      /**< system dma channel all occupapyed */
     TS_ERROR_NO_HBML2TASKNODE_FOUND = 0x16,              /**< no hbm l2 task node found */
-    TS_ERROR_SQNODE_NODE_SLOT_ALL_OCCUPAPYED = 0x17,     /**< all the node of the current sq are occupyed */
-    TS_ERROR_CQNODE_NODE_SLOT_ALL_OCCUPAPYED = 0x18,     /**< all the node of the current sq are occupyed */
+    TS_ERROR_SQNODE_NODE_SLOT_ALL_OCCUPAPYED = 0x17,     /**< all the node of the current sq are occupied */
+    TS_ERROR_CQNODE_NODE_SLOT_ALL_OCCUPAPYED = 0x18,     /**< all the node of the current sq are occupied */
     TS_ERROR_SQNODE_NOT_ENOUGH = 0x19,                   /**< the sq node is not enough for data transfer */
     TS_ERROR_SQNODE_SLOT_REPEAT_FREE = 0x1A,             /**< sq node slot repeat free */
     TS_ERROR_CQNODE_SLOT_REPEAT_FREE = 0x1B,             /**< cq node slot repeat free */
@@ -123,7 +123,7 @@ typedef enum tag_ts_error {
     TS_INVLD_CPY_DIR = 0x85,                        /**< invalid copy dir */
     TS_PCIE_DMA_INVLD_CQ_DES = 0x86,                /**< pcie dma invalid cq des */
     TS_PCIE_DMA_CPY_ERR = 0x87,                     /**< pcie dma copy error */
-    TS_PCIE_DMA_LNK_CHN_BUSY = 0x88,                /**< pcie dima link channal busy */
+    TS_PCIE_DMA_LNK_CHN_BUSY = 0x88,                /**< pcie dma link channel busy */
     TS_ERROR_PROFILE_BUFF_FULL = 0x89,              /**< profile buff full */
     TS_ERROR_PROFILE_MODE_CONFLICT = 0x8A,          /**< profile mode conflict */
     TS_ERROR_PROFILE_OTHER_PID_ON = 0x8B,           /**< profile other pid on */
@@ -165,7 +165,7 @@ typedef enum tag_ts_error {
     TS_ERROR_APP_QUEUE_FULL = 0x115,                /* app queue full*/
     TS_ERROR_ABORT_UNFINISHED = 0x116,              /* ts is aborting */
     TS_ERROR_STARS_QOS_ERROR = 0x117,
-    // the following error codes are define for error msg
+    // the following error codes are defined for error msg
     TS_ERR_MSG_EXCEED_MAX_SIZE = 0x200,
     TS_ERROR_MALLOC_MEM_FAILED = 0X201,               /**< malloc memory fail, system error */
     TS_ERROR_DELETE_NODE_FAILED = 0X202,              /* delete node from list error */
@@ -217,7 +217,7 @@ typedef enum tag_ts_error {
     TS_STREAM_RECYCLED = 0x908,                 /**< stream is recycled */
     TS_ERROR_TS_CLOSED = 0x909,                 /**< sentinel mode, ts is closed */
     TS_ERROR_FEATURE_NOT_SUPPORT = 0x90A,       /**< feature not support on this chip */
-    // thf following error codes are ts paas to log daemon, no need to runtime
+    // the following error codes are ts passes to log daemon, no need to runtime
     TS_LOG_DEAMON_RESET_ACC_SWITCH_INVALID = 0x90B,  /* log daemon reset acc switch param invalid */
     TS_LOG_DEAMON_CORE_SWITCH_INVALID = 0x90C,       /* core switch invalid */
     TS_LOG_DEAMON_CORE_ID_INVALID = 0x90D,           /* core id invalid */

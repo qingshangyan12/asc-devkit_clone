@@ -2,14 +2,13 @@
 
 ## Overview
 
-This example is based on the Gather operator and demonstrates how to collect on-board performance data using msProf. Users can quickly locate software and hardware performance bottlenecks of operators based on the output performance data, improving the efficiency of operator performance analysis.
+This example is based on the Gather operator and demonstrates how to collect on-board performance data using msOpProf. Users can quickly locate software and hardware performance bottlenecks of operators based on the output performance data, improving the efficiency of operator performance analysis.
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Software Version
-- \>= CANN 9.0.0
+| Products | CANN Versions |
+|---|---|
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -61,7 +60,7 @@ Users can open the `visualize_data.bin` file with MindStudio Insight to visually
 Run the following steps in the root directory of this example to build and execute the operator.
 - Configure Environment Variables  
 
-  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

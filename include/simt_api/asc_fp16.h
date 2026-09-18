@@ -163,6 +163,26 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __half2half_ru(const half x);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __half2half_rna(const half x);
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline signed char __half2char_rz(const half x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned char __half2uchar_rz(const half x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline short int __half2short_rn(const half x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline short int __half2short_rz(const half x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline short int __half2short_rd(const half x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline short int __half2short_ru(const half x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned short int __half2ushort_rn(const half x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned short int __half2ushort_rz(const half x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned short int __half2ushort_rd(const half x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned short int __half2ushort_ru(const half x);
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __half2uint_rn(const half x);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __half2uint_rz(const half x);
@@ -243,6 +263,22 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __int2half_rna(const int x);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __int2half_rna_sat(const int x);
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __short2half_rn(const short int x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __short2half_rz(const short int x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __short2half_rd(const short int x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __short2half_ru(const short int x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __ushort2half_rn(const unsigned short int x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __ushort2half_rz(const unsigned short int x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __ushort2half_rd(const unsigned short int x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __ushort2half_ru(const unsigned short int x);
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __ll2half_rn(const long long int x);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __ll2half_rz(const long long int x);
@@ -266,6 +302,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __ull2half_rna(const unsigned long lo
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __floats2half2_rn(const float x, const float y);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __float22half2_rn(const float2 x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __float2half2_rn(const float x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 __half2half2(const half x);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __low2float(const half2 x);
 
@@ -299,6 +339,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_atomic_add(__gm__ half2* address
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_atomic_sub(__ubuf__ half2* address, half2 val);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_atomic_sub(__gm__ half2* address, half2 val);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_atomic_sub(__ubuf__ half* address, half val);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_atomic_sub(__gm__ half* address, half val);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_atomic_exch(__ubuf__ half2* address, half2 val);
 
@@ -347,6 +391,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_atomic_add(half* address, half va
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_atomic_add(half2* address, half2 val);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_atomic_sub(half2* address, half2 val);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_atomic_sub(half* address, half val);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 asc_atomic_exch(half2* address, half2 val);
 
@@ -401,6 +447,12 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_reduce_max(half val);
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half asc_reduce_min(half val);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 make_half2(half x, half y);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline short int __half_as_short(const half x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned short int __half_as_ushort(const half x);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half __short_as_half(const short int x);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __ushort_as_half(const unsigned short int x);
 
@@ -543,6 +595,10 @@ static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hminx2_nan(const half2 x, const ha
 static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hfmax2_relu(const half2 x, const half2 y, const half2 z);
 
 static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __hcmadd(const half2 x, const half2 y, const half2 z);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ float2 __half22float2(const half2 x);
+
+static __SIMT_DEVICE_FUNCTIONS_DECL__ half2 __float22half2_rz(const float2 x);
 
 #include "impl/simt_api/asc_fp16_impl.h"
 

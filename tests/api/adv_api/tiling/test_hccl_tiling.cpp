@@ -173,6 +173,109 @@ TEST_F(TestHcclTiling, Mc2CcTilingConfig_multiTiling)
     EXPECT_NE(ccTilingConfig.GetTiling(ccTilingInner), EXIT_SUCCESS);
 }
 
+class TestHcclTilingCcuKfc : public TestHcclTiling {
+protected:
+    void ExpectInitTilingVersion(
+        uint32_t opType, const std::string& algConfig, uint8_t commEngine, uint32_t expectedVersion)
+    {
+        ::Mc2InitTiling initTiling{};
+        Mc2CcTilingConfig tilingConfig("test", opType, algConfig, 0, 0, 0, commEngine);
+
+        ASSERT_EQ(tilingConfig.GetTiling(initTiling), EXIT_SUCCESS);
+        const auto* tilingInner = reinterpret_cast<const Mc2InitTilingInner*>(&initTiling);
+        EXPECT_EQ(tilingInner->version, expectedVersion);
+    }
+};
+
+TEST_F(TestHcclTilingCcuKfc, AllToAllVCcuSchedUsesCcuNewVersion)
+{
+    ExpectInitTilingVersion(
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALLV), "CcuSchedAllToAllVSoleMesh", 6U,
+        INIT_TILING_CCU_NEW_VERSION);
+}
+
+TEST_F(TestHcclTilingCcuKfc, AllToAllCcuSchedUsesCcuNewVersion)
+{
+    ExpectInitTilingVersion(
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL), "CcuSchedAllToAllSoleMesh", 6U,
+        INIT_TILING_CCU_NEW_VERSION);
+}
+
+TEST_F(TestHcclTilingCcuKfc, AllToAllMultiJettyCcuSchedUsesCcuNewVersion)
+{
+    ExpectInitTilingVersion(
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL), "CcuSchedAllToAllMesh1DMultiJetty", 6U,
+        INIT_TILING_CCU_NEW_VERSION);
+}
+
+TEST_F(TestHcclTilingCcuKfc, UnsupportedCommEngineUsesDefaultVersion)
+{
+    ExpectInitTilingVersion(
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherSoleMesh", 4U, INIT_TILING_VERSION);
+}
+
+TEST_F(TestHcclTilingCcuKfc, UnregisteredAlgorithmUsesDefaultVersion)
+{
+    ExpectInitTilingVersion(
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuUnregisteredAlgorithm", 6U, INIT_TILING_VERSION);
+}
+
+TEST_F(TestHcclTilingCcuKfc, AllGatherCcuMsUsesCcuNewVersion)
+{
+    ExpectInitTilingVersion(
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherSoleMesh", 5U,
+        INIT_TILING_CCU_NEW_VERSION);
+}
+
+TEST_F(TestHcclTilingCcuKfc, AllGatherCcuSchedUsesCcuNewVersion)
+{
+    ExpectInitTilingVersion(
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherSoleMesh", 6U,
+        INIT_TILING_CCU_NEW_VERSION);
+}
+
+TEST_F(TestHcclTilingCcuKfc, KfcAllGatherCcuSchedUsesCcuNewVersion)
+{
+    ExpectInitTilingVersion(
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherSoleMesh", 6U,
+        INIT_TILING_CCU_NEW_VERSION);
+}
+
+TEST_F(TestHcclTilingCcuKfc, ReduceScatterCcuMsUsesCcuNewVersion)
+{
+    ExpectInitTilingVersion(
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterSoleMesh", 5U,
+        INIT_TILING_CCU_NEW_VERSION);
+}
+
+TEST_F(TestHcclTilingCcuKfc, ReduceScatterCcuSchedUsesCcuNewVersion)
+{
+    ExpectInitTilingVersion(
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterSoleMesh", 6U,
+        INIT_TILING_CCU_NEW_VERSION);
+}
+
+TEST_F(TestHcclTilingCcuKfc, ReduceScatterConcurMeshNHRMultiLinkCcuSchedUsesCcuNewVersion)
+{
+    ExpectInitTilingVersion(
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterConcurMeshNHRMultiLink", 6U,
+        INIT_TILING_CCU_NEW_VERSION);
+}
+
+TEST_F(TestHcclTilingCcuKfc, ReduceScatterPeerOnlyCcuSchedUsesCcuNewVersion)
+{
+    ExpectInitTilingVersion(
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterSoleMeshPeerOnly", 6U,
+        INIT_TILING_CCU_NEW_VERSION);
+}
+
+TEST_F(TestHcclTilingCcuKfc, ReduceScatterSoleNhrMultiLinkCcuSchedUsesCcuNewVersion)
+{
+    ExpectInitTilingVersion(
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterSoleNHRMultiLink", 6U,
+        INIT_TILING_CCU_NEW_VERSION);
+}
+
 // ============================================================================
 // 以下用例覆盖 commit aaa3d79e5 的改动:
 // 修复 hccl_tiling.cpp 中不安全的动态库加载。

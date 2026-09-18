@@ -27,6 +27,11 @@ using namespace hccl;
 using namespace mc2_ops_hccl;
 thread_local uint32_t curr_dev_id = UINT32_MAX;
 
+namespace mc2_ops_hccl {
+bool g_rejectDirectAclrtMemcpy = false;
+uint32_t g_aclrtMemcpyCallCount = 0;
+} // namespace mc2_ops_hccl
+
 extern "C" unsigned int HcclLaunchAicpuKernel(OpParam* param);
 
 #ifdef __cplusplus
@@ -62,9 +67,9 @@ aclError aclrtMalloc(void** devPtr, size_t size, aclrtMemMallocPolicy policy)
     u32 memType = static_cast<u32>(policy);
     HcclSim::SimNpu& simNpu = HcclSim::SimWorld::Global()->GetSimNpuByRankId(curr_dev_id);
     if (memType == BUFFER_INPUT_MARK) {
-        *devPtr = reinterpret_cast<void*>(simNpu.AllocMemory(BufferType::INPUT, size));
+        *devPtr = reinterpret_cast<void*>(simNpu.AllocMemory(HcclSim::BufferType::INPUT, size));
     } else if (memType == BUFFER_OUTPUT_MARK) {
-        *devPtr = reinterpret_cast<void*>(simNpu.AllocMemory(BufferType::OUTPUT, size));
+        *devPtr = reinterpret_cast<void*>(simNpu.AllocMemory(HcclSim::BufferType::OUTPUT, size));
     }
     return ACL_SUCCESS;
 }
@@ -77,6 +82,10 @@ aclError aclrtStreamGetId(aclrtStream stream, int32_t* streamId_)
 
 aclError aclrtMemcpy(void* dst, size_t destMax, const void* src, size_t count, aclrtMemcpyKind kind)
 {
+    ++mc2_ops_hccl::g_aclrtMemcpyCallCount;
+    if (mc2_ops_hccl::g_rejectDirectAclrtMemcpy) {
+        return ACL_ERROR_INTERNAL_ERROR;
+    }
     if (dst == nullptr || src == nullptr) {
         HCCL_ERROR("[aclrtMemcpy] invalid input dst or src");
         return ACL_ERROR_INVALID_PARAM;

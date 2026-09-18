@@ -64,7 +64,7 @@ A fused programming implementation with separate AIC and AIV cores, mainly intro
       - Wait for inter-core synchronization.
         ```cpp
         if ASCEND_IS_AIV {
-          AscendC::CrossCoreWaitFlag(3);
+          AscendC::CrossCoreWaitFlag<0x2>(3);
         }
         ```
       - Complete the LeakyRelu computation.
@@ -85,7 +85,7 @@ A fused programming implementation with separate AIC and AIV cores, mainly intro
 
 Run the following steps in the root directory of this example to build and run the example.
 - Configure Environment Variables
-  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

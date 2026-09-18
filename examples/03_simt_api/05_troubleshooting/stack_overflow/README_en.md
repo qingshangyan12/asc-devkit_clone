@@ -9,13 +9,11 @@ This example contains two cases:
 - Case 1: A large array in stack space causes stack overflow. You can increase the stack space through a configuration file, but using UB to store a large amount of temporary data is recommended.
 - Case 2: When recursive functions are used, an excessively large recursion depth causes stack overflow. You need to control the recursion depth or use an iterative algorithm instead of a recursive algorithm.
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Software Version
-
-- \>=CANN 9.1.0
+| Products | CANN Versions |
+|---|---|
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -41,7 +39,7 @@ This example contains two typical stack overflow scenarios, and reproduces and o
 
 > **Stack overflow issue description**
 >
-> The default stack space of SIMT threads is limited. When a large thread-local array is defined in a kernel function, or when the recursive call depth is too large, the required SIMT stack space keeps increasing. If the runtime stack requirement exceeds the configured upper limit, SIMT stack overflow is triggered. For details about stack space, see [Memory Hierarchy](../../../../docs/zh/guide/%E7%BC%96%E7%A8%8B%E6%8C%87%E5%8D%97/%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B/AI-Core-SIMT%E7%BC%96%E7%A8%8B/%E5%86%85%E5%AD%98%E5%B1%82%E7%BA%A7.md).
+> The default stack space of SIMT threads is limited. When a large thread-local array is defined in a kernel function, or when the recursive call depth is too large, the required SIMT stack space keeps increasing. If the runtime stack requirement exceeds the configured upper limit, SIMT stack overflow is triggered. For details about stack space, see [Memory Hierarchy](../../../../docs/zh/guide/programming_guide/programming_model/ai_core_simt_programming/memory_hierarchy.md).
 
 **Example specifications**:
 
@@ -92,7 +90,7 @@ __global__ void simt_stack_overflow(int32_t* input, float* output, uint32_t tota
 
 **Initial issue locating through log information**:
 
-- On the host side, call `aclGetRecentErrMsg()` after the `aclrtSynchronizeStream` API to obtain the error information on the device side. The implementation is as follows:
+- On the host side, call `aclGetRecentErrMsg()` after the `aclrtSynchronizeStream()` API to obtain the error information on the device side. The implementation is as follows:
 
     ```cpp
     const char* err = aclGetRecentErrMsg();
@@ -151,7 +149,7 @@ __global__ void simt_stack_overflow(int32_t* input, float* output, uint32_t tota
     For more configuration details, see the "SIMT operator stack space size configuration example" section in the [aclInit](https://hiascend.com/document/redirect/CannCommunityruntimeapiaclinit) API. The stack space size configuration field is `simt_stack_size`, and `simt_stack_size` specifies the stack space size of each thread of the SIMT operator.
 
     > [!NOTE]Note
-    > The default SIMT stack space is 1152B. In this example, the stack space of each SIMT thread is configured to 1280, namely 1280B. The maximum number of threads per warp is 32, the maximum number of warps per AIV core is 64, and the total number of cores is 72. Therefore, the total GM space occupied is `1280B * 32 * 64 * 72 = 180MB`.
+    > The default SIMT stack space is 1152B. In this example, the stack space of each SIMT thread is configured to 1280B. The maximum number of threads per Thread Block is 2048, and the maximum number of physical cores that can concurrently execute Thread Blocks in the test environment of this example is 72. Therefore, compared with the default configuration, the additional GM space occupied is `(1280B - 1152B) * 2048 * 72 = 18MB`.
 
 **Conclusion**:
 
@@ -189,7 +187,7 @@ __global__ void simt_recursive_stack_overflow(int32_t* input, float* output, uin
 
 **Initial issue locating through log information**:
 
-- On the host side, call `aclGetRecentErrMsg()` after the `aclrtSynchronizeStream` API to obtain the error information on the device side. The implementation is as follows:
+- On the host side, call `aclGetRecentErrMsg()` after the `aclrtSynchronizeStream()` API to obtain the error information on the device side. The implementation is as follows:
 
     ```cpp
     const char* err = aclGetRecentErrMsg();
@@ -309,10 +307,20 @@ Run the following steps in the root directory of this example to build and execu
     ./demo                               # Run the example
     ```
 
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+
 **Build options**:
 
 | Option                    | Valid Value | Description |
 |---------------------------|-------------|-------------|
+| `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
 | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`  | NPU architecture. This example supports only dav-3510 (Ascend 950PR/Ascend 950DT) |
 | `SCENARIO_NUM`            | `1-4`       | Example scenario number. The default value is 1. 1: overflow scenario of Case 1; 2: optimized scenario of Case 1; 3: overflow scenario of Case 2; 4: optimized scenario of Case 2 |
 

@@ -39,17 +39,17 @@ Sample running parameters: This sample uses 8 cores to complete the computation,
 
 The Add operator's computation logic follows the three-stage pipeline structure of "load-compute-store":
 
-1. Load input data x and y from [GM](../../../../../docs/zh/api/SIMD-API/基础API/数据结构/GlobalTensor/GlobalTensor简介.md) (Global Memory, the external global memory of the chip) to [UB](../../../../../docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor/LocalTensor简介.md) (Unified Buffer, the dedicated on-chip cache for vector computation);
+1. Load input data x and y from [GM](../../../../../docs/zh/api/SIMD-API/basic_api/data_structures/GlobalTensor/GlobalTensor_intro.md) (Global Memory, the external global memory of the chip) to [UB](../../../../../docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/LocalTensor_intro.md) (Unified Buffer, the dedicated on-chip cache for vector computation);
 2. Execute vector addition on xLocal and yLocal on UB, storing the result in zLocal;
 3. Store the computation result from UB back to GM.
 
 **Prerequisites**:
 
-- [GM (Global Memory)](../../../../../docs/zh/api/SIMD-API/基础API/数据结构/GlobalTensor/GlobalTensor简介.md): The global storage external to the AI Core, accessed via [GlobalTensor](../../../../../docs/zh/api/SIMD-API/基础API/数据结构/GlobalTensor/GlobalTensor简介.md), with large capacity but slower access speed.
-- [UB (Unified Buffer)](../../../../../docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor/LocalTensor简介.md): The dedicated on-chip cache for vector computation inside the AI Core, accessed via [LocalTensor](../../../../../docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor/LocalTensor简介.md), with limited capacity but fast access speed.
-- [DataCopy](../../../../../docs/zh/api/SIMD-API/基础API/Memory矢量计算/数据搬运/DataCopy_GMAndUB_continuous.md): The API used for data transfer between GM and UB, with the transfer direction determined by the parameter order.
-- [PipeBarrier](../../../../../docs/zh/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier_ISASI.md): Pipeline synchronization barrier, ensuring data transfer completes before subsequent operations to avoid read/write conflicts.
-- `block_idx`: A built-in variable representing the current core's index (equivalent to [GetBlockIdx()](../../../../../docs/zh/api/SIMD-API/基础API/工具接口/系统资源与变量/GetBlockIdx.md)), used for data partitioning in multi-core parallel computation.
+- [GM (Global Memory)](../../../../../docs/zh/api/SIMD-API/basic_api/data_structures/GlobalTensor/GlobalTensor_intro.md): The global storage external to the AI Core, accessed via [GlobalTensor](../../../../../docs/zh/api/SIMD-API/basic_api/data_structures/GlobalTensor/GlobalTensor_intro.md), with large capacity but slower access speed.
+- [UB (Unified Buffer)](../../../../../docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/LocalTensor_intro.md): The dedicated on-chip cache for vector computation inside the AI Core, accessed via [LocalTensor](../../../../../docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/LocalTensor_intro.md), with limited capacity but fast access speed.
+- [DataCopy](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_GMAndUB_continuous.md): The API used for data transfer between GM and UB, with the transfer direction determined by the parameter order.
+- [PipeBarrier](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/PipeBarrier_ISASI.md): Pipeline synchronization barrier, ensuring data transfer completes before subsequent operations to avoid read/write conflicts.
+- `block_idx`: A built-in variable representing the current core's index (equivalent to [GetBlockIdx()](../../../../../docs/zh/api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetBlockIdx.md)), used for data partitioning in multi-core parallel computation.
 
 The core code is as follows:
 
@@ -119,7 +119,7 @@ For the complete performance tuning process, please refer to the [Add Performanc
 
 This interface provides formatted output functionality for CPU/NPU domain debugging scenarios.
 
-Call the [printf](../../../../../docs/zh/api/Utils-API/调测接口/printf.md) interface at the location in the operator kernel-side implementation code where log information needs to be output.
+Call the [printf](../../../../../docs/zh/api/Utils-API/tuning_interface/printf.md) interface at the location in the operator kernel-side implementation code where log information needs to be output.
 
 Example:
 
@@ -131,9 +131,9 @@ AscendC::printf("add blockIdx=%d\n", AscendC::GetBlockIdx());
 
 ### DumpTensor
 
-For operators developed based on operator projects, this interface can be used to Dump the contents of a specified [LocalTensor](../../../../../docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor/LocalTensor简介.md). It also supports printing custom additional information (only uint32\_t data type information is supported), such as printing the current line number.
+For operators developed based on operator projects, this interface can be used to Dump the contents of a specified [LocalTensor](../../../../../docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/LocalTensor_intro.md). It also supports printing custom additional information (only uint32\_t data type information is supported), such as printing the current line number.
 
-Call the [DumpTensor](../../../../../docs/zh/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md) interface at the location in the operator kernel-side implementation code where Tensor data needs to be printed. Example:
+Call the [DumpTensor](../../../../../docs/zh/api/SIMD-API/basic_api/debug_interface/onboard_print/DumpTensor.md) interface at the location in the operator kernel-side implementation code where Tensor data needs to be printed. Example:
 
 ```cpp
 // Vector computation: z = x + y
@@ -188,7 +188,7 @@ For details, refer to the operator tuning (msOpProf) content in the [msOpProf Us
 Execute the following steps in the root directory of this sample to compile and execute the sample.
 
 - Configure Environment Variables
-  Configure environment variables according to the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
+  Configure environment variables according to the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

@@ -4,13 +4,11 @@
 
 This example uses matrix transpose to demonstrate memory access optimization strategies in the Ascend C SIMT programming model. First, it establishes a GM contiguous read/write baseline with 1D contiguous copy and uses direct global memory transpose to expose the main cost of non-contiguous writes. Then, it introduces UB staging and 32x32 tiling to move the non-contiguous GM write into a transpose-direction UB access. Next, it compares launching Thread Blocks per tile group with fixing the Thread Block count to the hardware vector core count, and analyzes thread count selection through register spill under the 2048-thread configuration. After that, it eliminates bank conflicts during the transpose read phase through UB padding. Finally, it uses double buffering (Double Buffer) to remove the trailing synchronization in the loop, presenting the complete tuning path for SIMT matrix transpose.
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Software Version
-
-- \>= CANN 9.1.0
+| Product | CANN Version |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -19,8 +17,8 @@ This example uses matrix transpose to demonstrate memory access optimization str
 │   ├── figures                     // Image resources for README
 │   ├── CMakeLists.txt              // Build project file
 │   ├── matrix_transpose.asc        // SIMT matrix transpose optimization path implementation
-│   ├── README.md
-│   └── README_en.md
+│   ├── README.md                   // Sample documentation
+│   └── README_en.md                // English sample documentation
 ```
 
 ## Example Description
@@ -95,7 +93,7 @@ Therefore, the input element coordinates processed by this thread in GM are `inp
 | --- | --- |
 | Task Duration(μs) | Total task duration, including scheduling time to the accelerator, execution time on the accelerator, and response completion time |
 | aiv_time(μs) | Theoretical execution time of the task on the AI Vector Core, in microseconds |
-| aiv_total_cycles | Total execution cycles on each AI Vector Core compute unit after the task is assigned |
+| aiv_total_cycles | Total execution cycles on each AI Vector Core compute unit |
 | aiv_vec_time(μs) | Duration of vec-type instructions (vector computation instructions), in microseconds |
 | aiv_vec_ratio | Ratio of vec-type instruction cycles to total cycles |
 | aiv_scalar_time(μs) | Duration of scalar-type instructions (scalar computation instructions), in microseconds |
@@ -170,7 +168,7 @@ Case 2 keeps the GM read contiguous while writing data directly to the transpose
 
 **Optimization Goal**: Introduce UB and tiling, converting the non-contiguous global memory write of Case 2 into UB-internal access, so that both GM read and write become contiguous again. This case sets the thread block count according to the number of partitioned tiles, with each thread block processing two 32x32 tiles.
 
-**Core Implementation**: The matrix is partitioned into 32x32 tiles, with the total tile count `tiles=(W/32)x(H/32)`. In this case, each thread block launches 2048 threads and can process two tiles at the same time, so the thread block count is set to `blocks_per_grid=ceil(tiles / 2)`. The thread configuration is `dim3(32,64,1)`, where `threadIdx.y=0..31` processes the first tile and `threadIdx.y=32..63` processes the second tile; the code obtains the tile index handled by the current thread within the thread block via `local_tile=threadIdx.y>>5`, and the in-tile row index via `ty=threadIdx.y&31`. Threads first write the tile into UB in the original layout, and after [`asc_syncthreads()`](../../../../../docs/zh/api/SIMT-API/同步与内存栅栏/同步接口/asc_syncthreads.md) synchronization, read it from UB in the transpose direction and write it back to GM contiguously.
+**Core Implementation**: The matrix is partitioned into 32x32 tiles, with the total tile count `tiles=(W/32)x(H/32)`. In this case, each thread block launches 2048 threads and can process two tiles at the same time, so the thread block count is set to `blocks_per_grid=ceil(tiles / 2)`. The thread configuration is `dim3(32,64,1)`, where `threadIdx.y=0..31` processes the first tile and `threadIdx.y=32..63` processes the second tile; the code obtains the tile index handled by the current thread within the thread block via `local_tile=threadIdx.y>>5`, and the in-tile row index via `ty=threadIdx.y&31`. Threads first write the tile into UB in the original layout, and after [`asc_syncthreads()`](../../../../../docs/zh/api/SIMT-API/sync_and_memory_fence/sync_interface/asc_syncthreads.md) synchronization, read it from UB in the transpose direction and write it back to GM contiguously.
 
 The core idea of UB staging is shown in the figure below: in the GM read phase, the tile is contiguously loaded into UB row by row according to the input matrix layout; in the GM writing phase, the output tile coordinates are swapped so that the same Warp writes one row of the output matrix. The originally non-contiguous GM write is transferred to a transpose-direction read within UB.
 
@@ -187,6 +185,7 @@ __ubuf__ float tile[TILES_PER_BLOCK][TILE_DIM][TILE_DIM];
 uint32_t local_tile = threadIdx.y >> 5;                // 0 or 1, distinguishing the two tiles in a thread block
 uint32_t ty = threadIdx.y & (TILE_DIM - 1);
 uint32_t tx = threadIdx.x;
+uint32_t tiles_x = width / TILE_DIM;
 
 uint32_t tile_id = blockIdx.x * TILES_PER_BLOCK + local_tile;
 uint32_t tile_y = tile_id / tiles_x;
@@ -376,8 +375,6 @@ The simulation instruction pipeline diagrams of Case 6 and Case 7 are shown in F
 
 ## Performance Comparison Summary
 
-### Ascend 950PR Performance Data
-
 | Case | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | --- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | 0 | 6.262 | 4.971 | 8201.7 | 4.516 | 0.909 | 0.443 | 0.089 |
@@ -407,7 +404,7 @@ After GM access becomes contiguous, the bottleneck shifts to UB access and synch
 Run the following steps in the root directory of this example to build and execute the example.
 
 - Configure Environment Variables  
-  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -424,11 +421,20 @@ Run the following steps in the root directory of this example to build and execu
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # Build the project
   ./matrix_transpose                                                        # Run the example
   ```
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  For example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j; # NPU simulation mode
+  ```
+
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
 
 - Build Options Description
 
   | Option                      | Values      | Description                                                        |
   | --------------------------- | ----------- | ------------------------------------------------------------------ |
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES`   | `dav-3510`  | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
   | `SCENARIO_NUM`              | `0`-`7`     | Example type, default is 7                                         |
 
@@ -440,7 +446,11 @@ Run the following steps in the root directory of this example to build and execu
   [Success] Case accuracy verification passed.
   ```
 
-## Performance Analysis
+## Performance Debugging
+
+### Introduction to the msOpProf Tool
+
+`msOpProf` is a single-operator performance analysis tool. It offers two usage methods: `msopprof` and `msopprof simulator`. The tool helps users identify anomalies in operator memory, operator code, and operator instructions, enabling comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and different file types (executables or operator binary `.o` files).
 
 Use the `msOpProf` tool to collect detailed performance data:
 
@@ -463,29 +473,29 @@ After the command completes, a folder named `OPPROF_{timestamp}_XXX` is generate
 └── visualize_data.bin         # MindStudio Insight presentation file
 ```
 
-## Simulation Tuning
+- Simulation performance collection
 
-Use `msopprof simulator` to perform simulation performance analysis and generate visualized instruction pipeline diagrams. The commands are as follows:
+  Use `msopprof simulator` to perform simulation performance analysis and generate visualized instruction pipeline diagrams. The commands are as follows:
 
-```bash
-SCENARIO_NUM=7                                                                     # Select the execution scenario, options 0-7
-mkdir -p build && cd build;                                                        # Create and enter the build directory
-cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # Build the project
-msopprof simulator --soc-version=<soc_version> ./matrix_transpose
-```
+  ```bash
+  SCENARIO_NUM=7                                                                     # Select the execution scenario, options 0-7
+  mkdir -p build && cd build;                                                        # Create and enter the build directory
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # Build the project
+  msopprof simulator --soc-version=<soc_version> ./matrix_transpose
+  ```
 
-> Before using simulation tuning, add the `-g` compilation option to `CMakeLists.txt` to generate debug information. This allows the simulator to collect instruction pipeline diagrams. For how to obtain `soc_version` and for more simulation tuning information, see the [simulator sample](../../../01_utilities/07_simulator).
+> Before using simulation tuning, add the `-g` compilation option to CMakeLists.txt to generate debug information. This allows the simulator to collect instruction pipeline diagrams. For how to obtain `soc_version` and for more simulation tuning information, see the [simulator sample](../../../01_utilities/07_simulator).
 
-After the command completes, a folder named `OPPROF_{timestamp}_XXX` is generated in the current directory. The artifact structure is as follows:
+  After the command completes, a folder named `OPPROF_{timestamp}_XXX` is generated in the current directory. The artifact structure is as follows:
 
-```text
-OPPROF_{timestamp}_XXX/
-├── dump                    // Raw performance data, which does not require user attention
-└── simulator
-    ├── core*.veccore*/     // Simulation instruction pipeline diagram files of each vector core
-    └── visualize_data.bin  // MindStudio Insight presentation file
-```
+  ```text
+  OPPROF_{timestamp}_XXX/
+  ├── dump                    // Raw performance data, which does not require user attention
+  └── simulator
+      ├── core*.veccore*/     // Simulation instruction pipeline diagram files of each vector core
+      └── visualize_data.bin  // MindStudio Insight presentation file
+  ```
 
-After the command completes, open `visualize_data.bin` in **MindStudio Insight** to view the visualized instruction pipeline diagrams.
+  After the command completes, open `visualize_data.bin` in **MindStudio Insight** to view the visualized instruction pipeline diagrams.
 
 For more information about how to use `msOpProf`, see [MindStudio Tool Tuning (msOpProf) Quick Start](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/quick_start/msopprof_quick_start.md).

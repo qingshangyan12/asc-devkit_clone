@@ -1,7 +1,7 @@
-﻿# compare样例
+# compare样例
 
 ## 概述
-本样例基于C API编程接口实现[asc_gt](../../../../../docs/zh/api/SIMD-API/C-API/reg/compare_and_select/asc_gt.md)、asc_gt_scalar接口完成多场景下的数据比较功能。  
+本样例基于C API编程接口实现[asc_gt](../../../../../docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_gt.md)、[asc_gt_scalar](../../../../../docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_gt_scalar.md)接口完成多场景下的数据比较功能。
 本样例支持两种比较场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
   | SCENARIO_NUM | 比较场景 |
   | --- | --- |
@@ -12,7 +12,7 @@
 
 | 产品 | CANN软件版本 |
 | --- | --- |
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## 目录结构介绍
 ```
@@ -75,7 +75,7 @@ asc_gt接口一般与asc_select接口配合使用，该样例仅演示asc_gt和a
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
+  > **说明：** `${install_path}`为CANN包安装目录；root用户默认为`/usr/local/Ascend`，非root用户默认为`${HOME}/Ascend`。
 
 - 样例执行
 

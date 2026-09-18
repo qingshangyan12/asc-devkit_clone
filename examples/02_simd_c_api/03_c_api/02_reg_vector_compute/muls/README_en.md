@@ -1,14 +1,14 @@
-﻿# muls Example
+# muls Example
 
 ## Overview
-This example implements the Muls operation based on the C API programming interface, primarily calling the [asc_mul_scalar](../../../../../docs/zh/api/SIMD-API/C-API/reg/arithmetic_compute/asc_mul_scalar.md) API.
+This example implements the Muls operation based on the C API programming interface, primarily calling the [asc_mul_scalar](../../../../../docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_mul_scalar.md) API.
 - The asc_add_scalar/asc_max_scalar/asc_min_scalar APIs can all refer to this example
 
 ## Supported Products and CANN Versions
 
 | Product | CANN Version |
 | --- | --- |
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
 ```
@@ -29,10 +29,10 @@ This example implements the Muls operation based on the C API programming interf
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="3" align="center">AIV Example</td></tr>
   <tr><td rowspan="3" align="center">Example Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
-  <tr><td align="center">x</td><td align="center">[1, 16384]</td><td align="center">float</td></tr>
+  <tr><td align="center">x</td><td align="center">[1, 256]</td><td align="center">float</td></tr>
   <tr><td align="center">scalar</td><td align="center">[1]</td><td align="center">float</td></tr>
   <tr><td rowspan="2" align="center">Example Output</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
-  <tr><td align="center">z</td><td align="center">[1, 16384]</td><td align="center">float</td></tr>
+  <tr><td align="center">z</td><td align="center">[1, 256]</td><td align="center">float</td></tr>
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="3" align="center">muls_custom</td></tr>
   </table>
 - Example implementation:
@@ -43,12 +43,12 @@ This example implements the Muls operation based on the C API programming interf
 ## Build and Run
 Run the following steps in the root directory of this example to build and run it.
 - Configure environment variables
-  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit on the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
+  > **Note:** `${install_path}` is the CANN package installation directory. The default is `/usr/local/Ascend` for the root user and `${HOME}/Ascend` for non-root users.
 
 - Run the example
 

@@ -9,13 +9,11 @@
 - Case 1：在栈空间中使用大数组导致栈溢出，可通过配置文件扩大栈空间，但更推荐使用UB存储大量临时数据。
 - Case 2：使用递归函数时，递归层数过大导致栈溢出，需控制递归层数或使用迭代算法替代递归算法。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-
-- \>=CANN 9.1.0
+| 产品 | CANN软件版本 |
+|---|---|
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -41,7 +39,7 @@
 
 > **栈溢出问题说明**
 >
-> SIMT线程的栈空间默认大小有限。当Kernel函数中定义较大的线程局部数组，或函数递归调用深度过大时，SIMT栈空间需求会持续增加。若运行时栈空间需求超过配置上限，就会触发SIMT栈溢出。栈空间详细说明请参考[内存层级](../../../../docs/zh/guide/%E7%BC%96%E7%A8%8B%E6%8C%87%E5%8D%97/%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B/AI-Core-SIMT%E7%BC%96%E7%A8%8B/%E5%86%85%E5%AD%98%E5%B1%82%E7%BA%A7.md)。
+> SIMT线程的栈空间默认大小有限。当Kernel函数中定义较大的线程局部数组，或函数递归调用深度过大时，SIMT栈空间需求会持续增加。若运行时栈空间需求超过配置上限，就会触发SIMT栈溢出。栈空间详细说明请参考[内存层级](../../../../docs/zh/guide/programming_guide/programming_model/ai_core_simt_programming/memory_hierarchy.md)。
 
 **样例规格**：
 
@@ -92,7 +90,7 @@ __global__ void simt_stack_overflow(int32_t* input, float* output, uint32_t tota
 
 **通过日志信息初步定位问题**：
 
-- Host侧在`aclrtSynchronizeStream`接口之后调用`aclGetRecentErrMsg()`接口获取Device侧的错误信息，实现如下：
+- Host侧在`aclrtSynchronizeStream()`接口之后调用`aclGetRecentErrMsg()`接口获取Device侧的错误信息，实现如下：
 
     ```cpp
     const char* err = aclGetRecentErrMsg();
@@ -151,7 +149,7 @@ __global__ void simt_stack_overflow(int32_t* input, float* output, uint32_t tota
     更多配置细节可参考[aclInit](https://hiascend.com/document/redirect/CannCommunityruntimeapiaclinit)接口中的“SIMT算子栈空间大小配置示例”章节，其中SIMT算子每个线程的栈空间大小配置字段为`simt_stack_size`。
 
     > [!NOTE]注意
-    > SIMT栈空间默认大小为1152B。本样例将SIMT的每个线程栈空间配置为1280，即1280B，每个warp最大线程数为32，每个AIV核最大warp数为64，总核数为72个，因此占用的GM总空间为`1280B * 32 * 64 * 72 = 180MB`。
+    > SIMT栈空间默认大小为1152B。本样例将SIMT的每个线程栈空间配置为1280B，每个Thread Block最大线程数为2048，本样例测试环境可并发执行Thread Block的最大物理核数为72个，因此相比默认配置额外占用的GM空间为`(1280B - 1152B) * 2048 * 72 = 18MB`。
 
 **结论**：
 
@@ -189,7 +187,7 @@ __global__ void simt_recursive_stack_overflow(int32_t* input, float* output, uin
 
 **通过日志信息初步定位问题**：
 
-- Host侧在`aclrtSynchronizeStream`接口之后调用`aclGetRecentErrMsg()`接口获取Device侧的错误信息，实现如下：
+- Host侧在`aclrtSynchronizeStream()`接口之后调用`aclGetRecentErrMsg()`接口获取Device侧的错误信息，实现如下：
 
     ```cpp
     const char* err = aclGetRecentErrMsg();
@@ -309,10 +307,20 @@ __global__ void simt_recursive_stack_overflow(int32_t* input, float* output, uin
     ./demo                               # 执行样例
     ```
 
+  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
+
+  示例如下：
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;   # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
+
 **编译选项说明**：
 
 | 选项                        | 可选值        | 说明                                                                   |
 |---------------------------|------------|----------------------------------------------------------------------|
+| `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
 | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构，本样例仅支持dav-3510（Ascend 950PR/Ascend 950DT）                      |
 | `SCENARIO_NUM`            | `1-4`      | 样例场景编号，默认值为1。1：Case 1的溢出场景，2：Case 1的优化场景，3：Case 2的溢出场景，4：Case 2的优化场景 |
 

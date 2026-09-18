@@ -38,10 +38,14 @@
 #include "dav_3510/kernel_operator_mm_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_mm_impl.h"
+#elif (__NPU_ARCH__ == 5162)
+#include "dav_v516/kernel_operator_mm_impl.h"
 #elif (__NPU_ARCH__ == 3003)
 #include "dav_l300/kernel_operator_mm_impl.h"
 #elif (__NPU_ARCH__ == 3113)
 #include "dav_l311/kernel_operator_mm_impl.h"
+#elif (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#include "dav_5161/kernel_operator_mm_impl.h"
 #endif
 #include "kernel_operator_mm_check.h"
 #include "kernel_operator_mm_load2d_impl.h"
@@ -357,7 +361,7 @@ __aicore__ inline void LoadDataImpl(
     CheckTensorAlign<T>(src, ONE_BLK_SIZE, "src", "LoadData with LoadData3DParams");
     CheckTensorAlign<T>(dst, VALUE_512, "dst", "LoadData with LoadData3DParams");
 
-    if constexpr (Src != TPosition::A1 && Src != TPosition::A2) {
+    if constexpr (Src != TPosition::A1 && Src != TPosition::B1) {
         ASCENDC_CHECK_TPOSITION(
             false, "src", "L1 Buffer(A1/B1)", "LoadData with LoadDataBitModeParams",
             GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));

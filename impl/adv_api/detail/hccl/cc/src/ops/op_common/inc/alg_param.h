@@ -15,22 +15,35 @@
 #include <map>
 #include <set>
 #include <unordered_set>
+#include <memory>
 #include <functional>
+#include <functional>
+#include <memory>
+#include <type_traits>
+#include "ccu_datatype_v1.h"
 #include "hccl_comm.h"
 #include "hccl_common.h"
 #include "hccl_types.h"
-#include "../../../common/alg_type.h"
-#include "hccl_res.h"
-#include "../../../common/hcomm_dlsym/hcomm_primitives_dl.h"
-#include "hccl_rank_graph.h"
-#include "../../../common/binary_stream.h"
-#include "hccl_ccu_res.h"
+#include "alg_type.h"
+#include "hccl_res_dl.h"
+#include "hcomm_primitives_dl.h"
+#include "hccl_rank_graph_dl.h"
+#include "hccl_host_comm_dl.h"
+#include "binary_stream.h"
+#include "hccl_ccu_res_dl.h"
+#include "ccu_types.h"
+#include "acl_base_rt.h"
 
 namespace mc2_ops_hccl {
 
 constexpr uint64_t UB_MAX_DATA_SIZE = 256 * 1024 * 1024; // Byte, UB协议一次传输的最大size
 
+constexpr u32 MAX_NUM_BLOCKS = 56; // 56-72
+
 constexpr u32 HCCL_LOGIC_TOPO_LEVEL_NUM = 4; // HCCL逻辑拓扑层级最多4级
+
+// physicalLevels的条目数上界。
+constexpr u32 PHYSICAL_LEVEL_NUM_LIMIT = 10;
 
 constexpr uint32_t DATATYPE_SIZE_TABLE[HCCL_DATA_TYPE_RESERVED] = {
     sizeof(int8_t),
@@ -78,7 +91,14 @@ constexpr u32 ALG_MAX_LENGTH = 128;
 constexpr u64 ALL_TO_ALL_V_VECTOR_NUM = 4;
 constexpr u64 REDUCE_SCATTER_V_VECTOR_NUM = 2;
 constexpr u64 ALL_GATHER_V_VECTOR_NUM = 2;
+
+constexpr uint64_t GE_PARALLEL = 36;
+
+constexpr uint64_t AICPU_ALIGN_SIZE = 4096;
+// Z axis detour 需要
 constexpr u32 MESH_CHANNELS_NUM = 1;
+
+constexpr uint64_t CCU_MAX_RANK_SIZE = 16;
 
 enum class TopoType {
     TOPO_TYPE_COMMON = 0,         // 普通拓扑类型 ，default单层拓扑使用
@@ -110,7 +130,7 @@ enum class OpExecuteConfig {
     CCU_FAIL
 };
 
-enum class OpMode { OPBASE = 0, OFFLOAD = 1 };
+enum class OpMode { OFFLOAD = 0, OPBASE = 1 };
 
 enum class Level0Shape {
     CLOS = 0,
@@ -140,6 +160,51 @@ struct TopoInstDetails {
     std::map<CommTopo, std::vector<u32>> rankNumForTopoType;
 };
 
+// 该Level是否知道整个通信域在这个粒度上的完整划分。这是RankGraph两组接口的能力差异, 无法互相推导:
+// 只有GetInstSizeListByLayer看得到兄弟NetInstance, GetTopoInstsByLayer只看得到本rank所在的那一个
+enum class PhysicalLevelView : u32 {
+    LOCAL = 0,  // 只知道当前rank所在的那一块; instSizeListByLayer恒为空
+    GLOBAL = 1, // 知道该netLayer的完整分区; instSizeListByLayer非空
+};
+
+// 该Level在RankGraph中的原始身份, 用于回查。
+// netLayer恒有效(每个Level必然归属某一层); topoInstId在该Level有TopoInstance支撑时才有效
+struct PhysicalSourceRef {
+    u32 netLayer = INVALID_UINT;
+    u32 topoInstId = INVALID_UINT;
+};
+
+// 范围链上的一环。整条链按三键排序, 相邻两环的rank集合满足包含关系(可以相等)
+struct PhysicalLevelInfo {
+    // 当前rank在该范围内可见的全部rank, 升序去重, 必然含当前rank。
+    // 局部量: 同一级上不同rank看到的集合不同(rank 0看到{0..7}, rank 9看到{8..15}),
+    std::vector<u32> localRanks;
+    PhysicalLevelView view = PhysicalLevelView::LOCAL;
+    // 该netLayer上全部NetInstance的大小, 按最小rankId升序, 即一份分区布局; view为LOCAL时恒为空。
+    // 原样透传HcclRankGraphGetInstSizeListByLayer的返回序, 不重排 —— 重排会毁掉布局语义。
+    // 全局量, 跨rank逐字节相同, 是本结构唯一可用的跨rank一致性锚点
+    std::vector<u32> instSizeListByLayer;
+    PhysicalSourceRef ref;
+
+    // ---- 以下为链路属性: 由该Level的TopoInstance提供, 全部随hasTopoInst一起生效 ----
+
+    // 该Level有无TopoInstance支撑。false时下面全部链路属性无意义, 各自保持无效值
+    bool hasTopoInst = false;
+    // 互联形态。同时是排序第三键: netLayer 0上同范围的Mesh与CLOS靠它定序
+    CommTopo topoType = CommTopo::COMM_TOPO_RESERVED;
+    // 该Level的链路落在Device还是Host。消费侧据此判断"是否需要使用host网卡"(看最高一级)。
+    EndpointLocType locType = EndpointLocType::ENDPOINT_LOC_TYPE_RESERVED;
+    // 该Level上出现的协议集合, 去重升序。是集合而不是单值: 同一个iface可以同时跑多种协议
+    // (如ub_ctp与ub_mem), HCOMM侧会为每种协议各生成一个EndpointDesc但它们指向同一个iface
+    std::vector<CommProtocol> protocols;
+    // 该Level上本卡各条物理链路的端口数, 降序, 按iface(commAddr)去重, 求和为本卡在该级的总端口数。
+    // 取自ENDPOINT_ATTR_BW_COEFF, HCOMM侧实现即iface->GetPorts().size()。
+    std::vector<u32> portNums;
+    // 当前rank在该Level上的Endpoint快照, 供建链侧回查。已按(protocol, locType, addr)排序:
+    // 原始返回是哈希序, 不排序会导致同一拓扑在不同进程下得到不同的字节流
+    std::vector<EndpointDesc> endpoints;
+};
+
 struct TopoInfo {
     u32 userRank;                                 // rankId
     u32 userRankSize;                             // 通信域rankSize
@@ -149,7 +214,7 @@ struct TopoInfo {
     u32 deviceNumPerModule = 0;                   // A2 每个module的卡数
     u32 serverNumPerSuperPod = 0;                 // 每个超节点的服务器个数
     u32 serverNum = 0;                            // 服务器数量
-    u32 moduleNum = 0;                            // A2 A+X场景moudleNum可能与serverNum不符
+    u32 moduleNum = 0;                            // A2 A+X场景moduleNum可能与serverNum不符
     u32 superPodNum = 0;                          // 超节点数量
     u32 moduleIdx = INVALID_UINT;                 // moduleId
     bool isDiffDeviceModule = false;              // A2 A+X
@@ -170,54 +235,63 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
     bool is2DieFullMesh{false};
     bool level0PcieMix{false};
     bool level0BigClosRange{false};
-    bool level2Uboe{false};
+    bool topLevelUboe{false};
+    bool level2UbRtp{false};
+    bool hostDpuOnly{false};
+    bool level0Symmetric{false};
+    bool level1Symmetric{false};
     u32 topoInstDetailsOfLayerSize = 0;
+    // 本卡是否为POD机型, 由CalcDeviceFormFactor查ACL_DEV_ATTR_DEVICE_FORM_FACTOR得到, 取不到停在false
+    bool isPod = false;
     Level0MeshType level0MeshType;
     NetLayerDetails netLayerDetails;
     std::vector<TopoInstDetails> topoInstDetailsOfLayer;
+    // physicalLevels的条目数, 由Serialize统一回填。
+    u32 physicalLevelNum = 0;
+    std::vector<PhysicalLevelInfo> physicalLevels;
+
+    // 全部定长字段与netLayerDetails, 按声明顺序列出一次。Serialize与DeSerialize共用本清单
+    template <typename Ar>
+    void VisitFields(Ar& ar)
+    {
+        ar & userRank & userRankSize & serverIdx & superPodIdx & deviceType & deviceNumPerModule;
+        ar & serverNumPerSuperPod & serverNum & moduleNum & superPodNum & moduleIdx;
+        ar & isDiffDeviceModule & multiModuleDiffDeviceNumMode & multiSuperPodDiffServerNumMode;
+        ar & isHCCSSWNumEqualToTwiceSIONum & mainThread & notifyNumOnMainThread;
+        ar & topoLevelNums & level0Topo & Level0Nhr & Level1Nhr & Level1Hd & is2DieFullMesh;
+        ar & level0PcieMix & level0BigClosRange & topLevelUboe & level2UbRtp & hostDpuOnly;
+        ar & level0Symmetric & level1Symmetric & topoInstDetailsOfLayerSize & isPod & level0MeshType;
+        ar & netLayerDetails.netLayerNum & netLayerDetails.netLayers & netLayerDetails.netInstNumOfLayer;
+        ar & netLayerDetails.instSizeListOfLayer & netLayerDetails.localNetInsSizeOfLayer;
+    }
+
+    template <typename Ar>
+    static void VisitTopoInstDetails(Ar& ar, TopoInstDetails& details)
+    {
+        ar & details.topoInstNum & details.sizeOfTopo & details.typeOfTopo & details.ranksInTopo;
+        ar & details.rankNumForTopoType;
+    }
+
+    template <typename Ar>
+    static void VisitPhysicalLevel(Ar& ar, PhysicalLevelInfo& level)
+    {
+        ar & level.localRanks & level.view & level.instSizeListByLayer;
+        ar & level.ref.netLayer & level.ref.topoInstId & level.hasTopoInst & level.topoType;
+        ar & level.locType & level.protocols & level.portNums & level.endpoints;
+    }
 
     std::vector<char> Serialize()
     {
         BinaryStream binaryStream;
-        binaryStream << userRank;
-        binaryStream << userRankSize;
-        binaryStream << serverIdx;
-        binaryStream << superPodIdx;
-        binaryStream << deviceType;
-        binaryStream << deviceNumPerModule;
-        binaryStream << serverNumPerSuperPod;
-        binaryStream << serverNum;
-        binaryStream << moduleNum;
-        binaryStream << superPodNum;
-        binaryStream << moduleIdx;
-        binaryStream << isDiffDeviceModule;
-        binaryStream << multiModuleDiffDeviceNumMode;
-        binaryStream << multiSuperPodDiffServerNumMode;
-        binaryStream << isHCCSSWNumEqualToTwiceSIONum;
-        binaryStream << mainThread;
-        binaryStream << notifyNumOnMainThread;
-        binaryStream << topoLevelNums;
-        binaryStream << level0Topo;
-        binaryStream << Level0Nhr;
-        binaryStream << Level1Nhr;
-        binaryStream << Level1Hd;
-        binaryStream << is2DieFullMesh;
-        binaryStream << level0PcieMix;
-        binaryStream << level0BigClosRange;
-        binaryStream << level2Uboe;
-        binaryStream << topoInstDetailsOfLayerSize;
-        binaryStream << level0MeshType;
-        binaryStream << netLayerDetails.netLayerNum;
-        binaryStream << netLayerDetails.netLayers;
-        binaryStream << netLayerDetails.netInstNumOfLayer;
-        binaryStream << netLayerDetails.instSizeListOfLayer;
-        binaryStream << netLayerDetails.localNetInsSizeOfLayer;
+        BinaryWriter ar(binaryStream);
+        VisitFields(ar);
         for (uint32_t idx = 0; idx < topoInstDetailsOfLayerSize; idx++) {
-            binaryStream << topoInstDetailsOfLayer[idx].topoInstNum;
-            binaryStream << topoInstDetailsOfLayer[idx].sizeOfTopo;
-            binaryStream << topoInstDetailsOfLayer[idx].typeOfTopo;
-            binaryStream << topoInstDetailsOfLayer[idx].ranksInTopo;
-            binaryStream << topoInstDetailsOfLayer[idx].rankNumForTopoType;
+            VisitTopoInstDetails(ar, topoInstDetailsOfLayer[idx]);
+        }
+        physicalLevelNum = static_cast<u32>(physicalLevels.size());
+        binaryStream << physicalLevelNum;
+        for (auto& level : physicalLevels) {
+            VisitPhysicalLevel(ar, level);
         }
         std::vector<char> result;
         binaryStream.Dump(result);
@@ -227,63 +301,67 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
     void DeSerialize(std::vector<char>& data)
     {
         BinaryStream binaryStream(data);
-        binaryStream >> userRank;
-        binaryStream >> userRankSize;
-        binaryStream >> serverIdx;
-        binaryStream >> superPodIdx;
-        binaryStream >> deviceType;
-        binaryStream >> deviceNumPerModule;
-        binaryStream >> serverNumPerSuperPod;
-        binaryStream >> serverNum;
-        binaryStream >> moduleNum;
-        binaryStream >> superPodNum;
-        binaryStream >> moduleIdx;
-        binaryStream >> isDiffDeviceModule;
-        binaryStream >> multiModuleDiffDeviceNumMode;
-        binaryStream >> multiSuperPodDiffServerNumMode;
-        binaryStream >> isHCCSSWNumEqualToTwiceSIONum;
-        binaryStream >> mainThread;
-        binaryStream >> notifyNumOnMainThread;
-        binaryStream >> topoLevelNums;
-        binaryStream >> level0Topo;
-        binaryStream >> Level0Nhr;
-        binaryStream >> Level1Nhr;
-        binaryStream >> Level1Hd;
-        binaryStream >> is2DieFullMesh;
-        binaryStream >> level0PcieMix;
-        binaryStream >> level0BigClosRange;
-        binaryStream >> level2Uboe;
-        binaryStream >> topoInstDetailsOfLayerSize;
-        binaryStream >> level0MeshType;
-        binaryStream >> netLayerDetails.netLayerNum;
-        binaryStream >> netLayerDetails.netLayers;
-        binaryStream >> netLayerDetails.netInstNumOfLayer;
-        binaryStream >> netLayerDetails.instSizeListOfLayer;
-        binaryStream >> netLayerDetails.localNetInsSizeOfLayer;
+        BinaryReader ar(binaryStream);
+        VisitFields(ar);
         if (topoInstDetailsOfLayerSize > HCCL_LOGIC_TOPO_LEVEL_NUM) {
             topoInstDetailsOfLayerSize = HCCL_LOGIC_TOPO_LEVEL_NUM;
         }
         topoInstDetailsOfLayer.resize(topoInstDetailsOfLayerSize);
         for (uint32_t idx = 0; idx < topoInstDetailsOfLayerSize; idx++) {
-            binaryStream >> topoInstDetailsOfLayer[idx].topoInstNum;
-            binaryStream >> topoInstDetailsOfLayer[idx].sizeOfTopo;
-            binaryStream >> topoInstDetailsOfLayer[idx].typeOfTopo;
-            binaryStream >> topoInstDetailsOfLayer[idx].ranksInTopo;
-            binaryStream >> topoInstDetailsOfLayer[idx].rankNumForTopoType;
+            VisitTopoInstDetails(ar, topoInstDetailsOfLayer[idx]);
+        }
+        physicalLevelNum = 0;
+        physicalLevels.clear();
+        binaryStream >> physicalLevelNum;
+        if (physicalLevelNum > PHYSICAL_LEVEL_NUM_LIMIT) {
+            HCCL_WARNING(
+                "[TopoInfo][DeSerialize] implausible physicalLevelNum[%u], drop the whole physical level section",
+                physicalLevelNum);
+            physicalLevelNum = 0;
+            return;
+        }
+        physicalLevels.resize(physicalLevelNum);
+        for (auto& level : physicalLevels) {
+            VisitPhysicalLevel(ar, level);
         }
     }
+};
+
+struct CcuKernelArgBase {
+    // std::vector<ChannelHandle> channels;
+    ChannelHandle channels[CCU_MAX_RANK_SIZE];
+    uint32_t channelCount;
+    // Host 编译 CCU 指令时使用；不序列化为设备 XN 参数。
+    // 框架只保留所有权并透传，具体算法在 dispatch 中解释。
+    uint32_t algSubType = 0;
+    std::shared_ptr<void> algArg;
 };
 
 // ccu kernel register所需信息
 struct CcuKernelInfo {
     // kernel资源组序号，group号不同时，资源复用
     u32 resGroup = 0;
-    // kernel构造函数
-    hcomm::KernelCreator creator;
-    // KernelArg实例
-    std::shared_ptr<hcomm::CcuKernelArg> kernelArg;
+    // kernel所属dieId，从channel所在die获取，由各算法在CalcRes中填充；单die算法默认为0
+    u32 dieId = 0;
+    // kernel名 string？
+    char kernelFuncName[64];
+    // kernel函数
+    void* kernelFunc;
+    // KernelArg实例指针
+    void* kernelArg;
     // kernel所需channel
     std::vector<HcclChannelDesc> channels;
+
+private:
+    std::shared_ptr<CcuKernelArgBase> kernelArgSmartPtr;
+
+public:
+    template <typename T>
+    void setKernelArg(std::shared_ptr<T> arg)
+    {
+        kernelArgSmartPtr = std::static_pointer_cast<CcuKernelArgBase>(arg);
+        kernelArg = static_cast<void*>(arg.get());
+    }
 };
 
 // 算法taskArg入参最大个数，用于快速下发缓存
@@ -297,6 +375,7 @@ struct CcuKernelSubmitInfo {
 // ccu快速下发上下文
 struct CcuFastLaunchCtx {
     char algName[OP_ALG_LENGTH];
+    u32 notifyNumOnMainThread = 0;
     u32 threadNum;
     u32 ccuKernelNum[MAX_TEMP_NUM_IN_ALGO]; // 每次调用template的KernelRun下发的kernel数量
     // 紧接ThreadHandle数组
@@ -322,15 +401,34 @@ struct CcuFastLaunchCtx {
     }
 };
 
+static_assert(
+    offsetof(CcuFastLaunchCtx, ccuKernelNum) + sizeof(u32) * MAX_TEMP_NUM_IN_ALGO == sizeof(CcuFastLaunchCtx),
+    "ccuKernelNum must be the last member of CcuFastLaunchCtx");
+static_assert(
+    sizeof(CcuFastLaunchCtx) % alignof(ThreadHandle) == 0, "CcuFastLaunchCtx must preserve ThreadHandle alignment");
+
+struct ParallelChannelPortInfo {
+    bool isValid = false;
+    bool isInterPod = false;
+    uint64_t intraPortGroupSize = 0;
+    uint64_t interPortGroupSize = 0;
+};
+
+static_assert(
+    std::is_trivially_copyable<ParallelChannelPortInfo>::value,
+    "ParallelChannelPortInfo must be trivially copyable for serialization");
+
 // A5用了cntNotify
 struct AlgResourceRequest {
     double dieSplitRatio = 0.0;
+    ParallelChannelPortInfo parallelPortInfo;
     u32 notifyNumOnMainThread = 0;
     u32 slaveThreadNum = 0;
     std::vector<u32> notifyNumPerThread;
     std::vector<std::vector<HcclChannelDesc>> channels;
     std::vector<CcuKernelInfo> ccuKernelInfos;
     std::vector<u32> ccuKernelNum;
+    std::vector<ChannelHandle> acquiredChannels;
 };
 
 struct SubCommInfo {
@@ -378,9 +476,24 @@ struct AlgResourceCtx {
     // ChannelInfo* channels; // 通信链路，数量可根据algHierarchyInfo字段进行推算
 };
 
+// 物理层索引，用于 physicalIdxForAlgoLevels
+enum class PhysicalLevelIndex : uint32_t {
+    PHYSICAL_LEVEL_IDX_0,
+    PHYSICAL_LEVEL_IDX_1,
+    PHYSICAL_LEVEL_IDX_2,
+    PHYSICAL_LEVEL_IDX_3,
+    PHYSICAL_LEVEL_IDX_4,
+    PHYSICAL_LEVEL_IDX_5,
+    PHYSICAL_LEVEL_IDX_6,
+    PHYSICAL_LEVEL_IDX_7,
+    PHYSICAL_LEVEL_IDX_8,
+    PHYSICAL_LEVEL_IDX_9,
+};
+
 // 如果能够序列化那么就是下面的结构体
 struct AlgHierarchyInfoForAllLevel {
     std::vector<std::vector<std::vector<u32>>> infos; // 第一维表示有多少level，第二维是每个level的rankID
+    std::vector<std::vector<PhysicalLevelIndex>> physicalIdxForAlgoLevels; // 每个算法层可对应多个物理层
 };
 // 如果能够序列化那么就是下面的结构体
 // 先序列化，把东西考到device，然后把指针存到OpParam，在device侧反序列该指针执行的内存
@@ -407,8 +520,11 @@ struct AlgResourceCtxSerializable {
     // ccu的
     std::vector<u32> ccuKernelNum;
     std::vector<CcuKernelHandle> ccuKernels;
+    ParallelChannelPortInfo parallelPortInfo;
     u32 topoInfoSeqSize = 0;
     TopoInfoWithNetLayerDetails topoInfo; // 提取的拓扑信息
+    std::vector<uint64_t> kfcServerArgs;  // kfc server算子入参
+    u32 kfcServerArgSize = 0;             // kfc server算子入参个数
 
     std::vector<char> Serialize()
     {
@@ -416,6 +532,7 @@ struct AlgResourceCtxSerializable {
 
         binaryStream << algType;
         binaryStream << algHierarchyInfo.infos;
+        binaryStream << algHierarchyInfo.physicalIdxForAlgoLevels;
         binaryStream << cclMem;
         binaryStream << notifyNumOnMainThread;
         binaryStream << slaveThreadNum;
@@ -435,6 +552,9 @@ struct AlgResourceCtxSerializable {
         binaryStream << ccuKernelNum;
         binaryStream << ccuKernels;
         binaryStream << dieSplitRatio;
+        binaryStream << parallelPortInfo;
+        binaryStream << kfcServerArgs;
+        binaryStream << kfcServerArgSize;
         std::vector<char> seq = topoInfo.Serialize();
         topoInfoSeqSize = seq.size();
         binaryStream << topoInfoSeqSize;
@@ -451,6 +571,7 @@ struct AlgResourceCtxSerializable {
 
         binaryStream >> algType;
         binaryStream >> algHierarchyInfo.infos;
+        binaryStream >> algHierarchyInfo.physicalIdxForAlgoLevels;
         binaryStream >> cclMem;
         binaryStream >> notifyNumOnMainThread;
         binaryStream >> slaveThreadNum;
@@ -470,7 +591,18 @@ struct AlgResourceCtxSerializable {
         binaryStream >> ccuKernelNum;
         binaryStream >> ccuKernels;
         binaryStream >> dieSplitRatio;
+        binaryStream >> parallelPortInfo;
+        binaryStream >> kfcServerArgs;
+        binaryStream >> kfcServerArgSize;
         binaryStream >> topoInfoSeqSize;
+        if ((topoInfoSeqSize == 0) || (topoInfoSeqSize > data.size())) {
+            HCCL_ERROR(
+                "[AlgResourceCtxSerializable::DeSerialize] invalid topo info size[%u], data size[%zu]", topoInfoSeqSize,
+                data.size());
+            topoInfoSeqSize = 0;
+            topoInfo = TopoInfoWithNetLayerDetails{};
+            return;
+        }
         size_t startPos = data.size() - topoInfoSeqSize;
         std::vector<char> tailData(data.begin() + startPos, data.end());
         TopoInfoWithNetLayerDetails topoTemp;
@@ -544,6 +676,7 @@ struct OpParam { // 不申请ctx，每个算子单独下发
             void* recvCounts;
             void* sdispls;
             void* rdispls; // 指向变长区指针
+            void* peerRdispls;
         } all2AllVDataDes;
         struct {
             HcclDataType sendType;
@@ -565,11 +698,18 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     u64 ctxSize = 0;
     void* resCtx = nullptr;
     ThreadHandle opThread = 0;
-    u32 aicpuRecordCpuIdx = 0; // aicpu record host的notifyIdx
-    u32 dataCount = 0;         // 算子上报dfx的数据量
-    DevAicpuOpConfig opConfig; // 收编算子配置类变量
+    u32 aicpuRecordCpuIdx = 0;              // aicpu record host的notifyIdx
+    u32 dataCount = 0;                      // 算子上报dfx的数据量
+    DevAicpuOpConfig opConfig;              // 收编算子配置类变量
+    bool aicpuCacheEnable = false;          // aicpu task cache开关
+    bool isCapture = false;                 // 是否为aclgraph
+    ThreadHandle exportHostOrderThread = 0; // host侧保序流映射到device
+    ThreadHandle deviceOrderThread = 0;     // device侧保序流
     u64 varMemSize{0};
     u8 varData[0];
+    u64 ccuKfcArgs[4];     // 测试，ccu-kfc作为通信算子
+    bool isKfc = false;    // 标记是否使用KFC Server kernel
+    bool checkRes = false; // 仅校验资源是否充足，不实际下发
 };
 
 struct AlgDesc {
@@ -611,6 +751,19 @@ struct HcomProInfo {
 // 图模式编译阶段资源计算入参
 struct OpParamGraphMode {
     char opType[64]; // 算子类型
+    u64 dataCount;
+    u32 rankSize;
+    u64 hcclBufferSize;
+    // Aiv参数
+    s64 comm;
+    char group[MAX_LENGTH];
+    u64 count = 0;
+    void* counts = nullptr;
+    HcclDataType dataType = HCCL_DATA_TYPE_RESERVED;
+    HcclReduceOp op = HcclReduceOp::HCCL_REDUCE_RESERVED;
+    HcclCMDType opTypeAiv = HcclCMDType::HCCL_CMD_INVALID;
+    u32 aivCoreLimit = 0;
+    bool ifAiv = false;
 };
 
 // 图模式编译阶段申请资源
@@ -627,6 +780,34 @@ struct ResPackGraphMode {
     std::vector<aclrtStream> streams;
     void* scratchMemAddr;
     u64 scratchMemSize;
+};
+
+// 图模式内存注册信息
+struct MemRegInfo {
+    char inputBuffTag[MAX_MEM_TAG_LENGTH];  // 输入缓冲区标签
+    char outputBuffTag[MAX_MEM_TAG_LENGTH]; // 输出缓冲区标签
+    std::vector<HcclMemHandle> memHandles;  // 内存句柄列表
+};
+
+// AIV模式参数存储结构
+struct AivParamStorage {
+    u32 aivCoreLimit = 0;
+    bool aivClearEnable = false;
+};
+
+// 算子参数一致性校验信息
+struct OpExchangeInfo {
+    uint64_t cclBufferSize{0};
+    u32 root = INVALID_VALUE_RANKID;
+    HcclCMDType opType = HcclCMDType::HCCL_CMD_INVALID;
+    CommEngine engine = CommEngine::COMM_ENGINE_RESERVED;
+    OpExecuteConfig opExecuteConfig = OpExecuteConfig::DEFAULT;
+    HcclReduceOp reduceType = HcclReduceOp::HCCL_REDUCE_RESERVED;
+    HcclDataType dataType = HcclDataType::HCCL_DATA_TYPE_RESERVED;
+    u64 count{0};
+    u32 aivCoreLimit = MAX_NUM_BLOCKS;
+    char group[MAX_LENGTH] = {0};
+    char tag[TAG_LENGTH] = {0};
 };
 
 } // namespace mc2_ops_hccl

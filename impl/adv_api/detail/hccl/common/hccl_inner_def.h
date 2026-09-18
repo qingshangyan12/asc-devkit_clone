@@ -25,7 +25,19 @@ constexpr int32_t HCCL_SUCCESS = 0;
 constexpr uint8_t HCCL_ONLY_COMPUTE = 1U;
 constexpr uint8_t HCCL_ASCEND910B = 1U;
 constexpr uint32_t MAX_DCCI_CNT = 64U;
-constexpr uint64_t DATA_TYPE_MAP[] = {1, 2, 4, 2, 4, 8, 8, 1, 8, 4, 8, 2, 0, 0, 1, 1, 1, 1, 0};
+constexpr uint64_t DATA_TYPE_MAP[] = {1, 2, 4, 2, 4, 8, 8, 1, 2, 4, 8, 2, 0, 0, 1, 1, 1, 1, 1};
+constexpr uint32_t DATA_TYPE_MAP_SIZE = sizeof(DATA_TYPE_MAP) / sizeof(DATA_TYPE_MAP[0]);
+static_assert(DATA_TYPE_MAP[HCCL_DATA_TYPE_UINT16] == 2U, "UINT16 elements occupy two bytes");
+static_assert(DATA_TYPE_MAP[HCCL_DATA_TYPE_MXFP8] == 1U, "MXFP8 elements occupy one byte");
+
+__aicore__ inline uint64_t GetHcclDataTypeSize(HcclDataType dataType)
+{
+    const uint32_t dataTypeIndex = static_cast<uint32_t>(dataType);
+    if (dataTypeIndex >= DATA_TYPE_MAP_SIZE) {
+        return 0U;
+    }
+    return DATA_TYPE_MAP[dataTypeIndex];
+}
 
 // Used to calc xor checksum for HcclMsg
 constexpr uint32_t HCCL_MSG_DATA_CNT = 16U;
@@ -85,6 +97,18 @@ struct IbVerbsData {
 
 constexpr uint32_t HCCL_MAX_RANK_NUM = 32U;
 constexpr uint32_t HCCL_MAX_RANK_NUM_V310 = 64U;
+constexpr uint32_t HCCL_CCU_MAX_RANK_NUM = HCCL_MAX_RANK_NUM_V310;
+
+__aicore__ inline constexpr bool IsValidCcuRankNum(uint32_t rankNum)
+{
+    return rankNum > 0U && rankNum <= HCCL_CCU_MAX_RANK_NUM;
+}
+
+__aicore__ inline constexpr bool IsValidMsgExtRankNum(uint32_t rankNum)
+{
+    return rankNum > 0U && rankNum <= HCCL_MAX_RANK_NUM_V2;
+}
+
 struct HcclCombineOpParam {
     uint64_t workSpace;     // Address for communication between client and server,
                             // hccl requests and clears
@@ -92,7 +116,7 @@ struct HcclCombineOpParam {
     uint32_t rankId;        // id of this rank
     uint32_t rankNum;       // num of ranks in this comm group
     uint64_t winSize;       // size of each windows memory
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
     uint64_t windowsIn[HCCL_MAX_RANK_NUM_V310];
     uint64_t windowsOut[HCCL_MAX_RANK_NUM_V310];
     GM_ADDR xnOffset;
@@ -140,7 +164,7 @@ struct HcclOpResParam {
 } // namespace HcclContextDef
 constexpr uint16_t CCU_CKE_SIZE = 8;
 constexpr uint64_t CCU_XN_DATA_SIZE = 8;       // Number of bytes per xn
-constexpr uint16_t CCU_USED_XN_NUM = 15;       // Currently xn are used
+constexpr uint16_t CCU_USED_XN_NUM = 32;       // Maximum parameters loaded from a KFC message
 constexpr uint16_t CCU_MAX_MSG_NUM = 64;       // The message queue length sent to CCU
 constexpr uint16_t CCU_MSG_XN_NUM = 64;        // Maximum xn number, each CCU message body occupies 8 registers
                                                // the message body length is 64*8B=512B
@@ -162,7 +186,7 @@ struct CCUMsg {
 };
 
 struct CCUMsgExt { // AllToAllv HcclMsgExt trans for ccu
-    uint64_t sendSize;
+    uint64_t tailSize;
     uint64_t loopNum = UINT64_MAX - 1;
     uint64_t sendOffset;
     uint64_t recvOffset;
@@ -178,10 +202,10 @@ struct CcuPrepareParam {
 };
 
 struct AlltoAllVParamCcu {
-    uint64_t sendCounts[HCCL_MAX_RANK_NUM];
-    uint64_t sdispls[HCCL_MAX_RANK_NUM];
-    uint64_t recvCounts[HCCL_MAX_RANK_NUM];
-    uint64_t rdispls[HCCL_MAX_RANK_NUM];
+    uint64_t sendCounts[HCCL_CCU_MAX_RANK_NUM];
+    uint64_t sdispls[HCCL_CCU_MAX_RANK_NUM];
+    uint64_t recvCounts[HCCL_CCU_MAX_RANK_NUM];
+    uint64_t rdispls[HCCL_CCU_MAX_RANK_NUM];
 };
 
 constexpr uint64_t CCU_MSG_EXT_RANK_OFFSET = sizeof(CCUMsgExt) * HCCL_MAX_RANK_NUM_V2;

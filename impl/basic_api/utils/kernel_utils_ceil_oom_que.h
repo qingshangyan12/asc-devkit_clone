@@ -22,30 +22,17 @@
 #define ASCENDC_MODULE_UTILS_CEIL_OOM_QUE_H
 #include "kernel_utils_macros.h"
 namespace AscendC {
-#ifdef ASCENDC_CPU_DEBUG
-#define PRELOAD(len) \
-    {}
-
-#else
-#define PRELOAD(len)                                  \
-    do {                                              \
-        uint64_t pc;                                  \
-        asm volatile("mov %0, pc \n" : "=l"(pc) : :); \
-        preload((void*)pc, len);                      \
-    } while (0)
-
-#endif
-
 __aicore__ constexpr inline uint32_t DivCeil(uint32_t a, uint32_t b) { return (a + b - 1) / b; }
 
 __aicore__ constexpr inline uint32_t AlignUp(uint32_t a, uint32_t b) { return DivCeil(a, b) * b; }
 
 __aicore__ constexpr inline uint32_t ConstCeil(uint32_t a, uint32_t b) { return (a + b - 1) / b; }
 
-__aicore__ inline uint32_t Ceil(uint32_t a, uint32_t b) { return (a + b - 1) / b; }
+__aicore__ constexpr inline uint32_t Ceil(uint32_t a, uint32_t b) { return (a + b - 1) / b; }
 
-#if defined(__NPU_ARCH__) &&                                                                                      \
-        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) ||  \
+                              (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) ||  \
+                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)) || \
     defined(__ASC_NPU_HOST__)
 __aicore__ constexpr inline int32_t CeilDivision(int32_t num1, int32_t num2)
 {
@@ -72,7 +59,7 @@ __aicore__ inline int32_t CeilDivision(int32_t num1, int32_t num2)
 __aicore__ inline void WriteBackOverflow(GM_ADDR overflowStatus)
 {
     (void)overflowStatus;
-#if (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
 #elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002))
     uint64_t statusOverflow[1] = {0};
     statusOverflow[0] = get_status();
@@ -270,7 +257,8 @@ __aicore__ constexpr TQueConfig GetTQueConfig(const TQueConfig* conf)
         .enableLoopQueue = conf->enableLoopQueue};
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)) || \
+    defined(__ASC_NPU_HOST__)
 __aicore__ constexpr bool UseAltBufId(TPosition queDstPos, TPosition dstConsumerPos, uint32_t consumerSize)
 {
     if (consumerSize <= 1) {
@@ -324,7 +312,6 @@ __aicore__ constexpr bool SupportEnum()
     return T == U;
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
 template <typename T>
 struct GetComplexElementType {
     using Type = T;
@@ -333,21 +320,21 @@ struct GetComplexElementType {
 template <class T>
 struct Complex {
     using EleType = typename GetComplexElementType<T>::Type;
-    __simd_callee__ inline Complex() : real(0), imag(0) {}
-    __simd_callee__ inline Complex(T realTmp, T imagTmp) : real(realTmp), imag(imagTmp) {}
+    __simd_callee__ inline constexpr Complex() : real(0), imag(0) {}
+    __simd_callee__ inline constexpr Complex(T realTmp, T imagTmp) : real(realTmp), imag(imagTmp) {}
 
     template <class U>
-    __simd_callee__ inline Complex(const U realTmp) : real(T(realTmp)), imag(0)
+    __simd_callee__ inline constexpr Complex(const U realTmp) : real(T(realTmp)), imag(0)
     {}
 
-    __simd_callee__ inline Complex(const Complex& other) : real(other.real), imag(other.imag) {}
+    __simd_callee__ inline constexpr Complex(const Complex& other) : real(other.real), imag(other.imag) {}
 
     __simd_callee__ inline bool operator==(const Complex& val) const
     {
         return (real == val.real) && (imag == val.imag);
     }
 
-    __simd_callee__ inline Complex& operator=(const Complex& other)
+    __simd_callee__ inline constexpr Complex& operator=(const Complex& other)
     {
         if (this == &other) {
             return *this;
@@ -360,7 +347,6 @@ struct Complex {
     T real;
     T imag;
 };
-#endif
 
 template <typename T, int U, int... Args>
 __aicore__ constexpr bool SupportBytes()
@@ -370,19 +356,14 @@ __aicore__ constexpr bool SupportBytes()
     }
     return sizeof(T) == U;
 }
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
-template <auto funcPtr, typename... Args>
-__aicore__ inline void VF_CALL(Args&&... args)
-{
-    __VEC_SCOPE__ { funcPtr(args...); }
-}
-#endif
 } // namespace AscendC
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
 using complex32 = AscendC::Complex<half>;
 using complex64 = AscendC::Complex<float>;
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) ||                          \
+    defined(__ASC_NPU_HOST__)
 namespace AscendC {
 template <typename T>
 class LocalTensor;
@@ -430,7 +411,10 @@ __aicore__ constexpr bool IsLocalTensorType()
 template <auto funcPtr, typename... Args>
 __aicore__ inline void VF_CALL(Args&&... args)
 {
-#if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 5102) || defined(SPLIT_CORE_VEC) || defined(ASCENDC_CPU_DEBUG)
+#if (                                                                                                  \
+    defined(__NPU_ARCH__) &&                                                                           \
+    (__NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)) || \
+    defined(SPLIT_CORE_VEC) || defined(ASCENDC_CPU_DEBUG)
     __VEC_SCOPE__ { funcPtr(args...); }
 #endif
 }

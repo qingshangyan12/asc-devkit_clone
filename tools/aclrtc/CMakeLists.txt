@@ -8,9 +8,15 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/ SRC)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/specialization SPECIALIZATION_SRC)
 
 add_library(acl_rtc SHARED
     ${SRC}
+    ${SPECIALIZATION_SRC}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../build/common/file_utils.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../build/common/manifest_constant.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../build/common/process_executor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../build/common/directory_cleanup_guard.cpp
 )
 
 if(BUILD_OPEN_PROJECT)
@@ -35,18 +41,35 @@ else()
     )
 endif()
 
+target_include_directories(acl_rtc PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/specialization
+    ${CMAKE_CURRENT_SOURCE_DIR}/../build/common
+)
+
 target_link_directories(acl_rtc PRIVATE
     ${CCEC_PATH}/../lib
 )
 
 target_link_libraries(acl_rtc PRIVATE
+    Boost::filesystem
     $<BUILD_INTERFACE:intf_pub>
+    $<BUILD_INTERFACE:mmpa_headers>
+    $<BUILD_INTERFACE:metadef_headers>
     dl
     c_sec_static
+    unified_dlog
+    mmpa
+    json
+)
+
+target_compile_definitions(acl_rtc PRIVATE
+    ACLRTC_FUNC_VISIBILITY
 )
 
 target_compile_options(acl_rtc PRIVATE
     -fPIE
+    -fvisibility=hidden
+    -fvisibility-inlines-hidden
     -fno-strict-aliasing
     -fno-common
     -Wall
@@ -61,6 +84,7 @@ target_compile_options(acl_rtc PRIVATE
 target_link_options(acl_rtc PRIVATE
     -Wl,-z,relro,-z,now,-z,noexecstack
     -Wl,-Bsymbolic
+    -Wl,--exclude-libs,ALL
     -Wl,--gc-sections
     $<$<CONFIG:Release>:-s>
 )

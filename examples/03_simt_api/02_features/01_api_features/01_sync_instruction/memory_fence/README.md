@@ -4,14 +4,13 @@
 
 本样例基于 Ascend C SIMT 编程方式实现一维 `float` 输入的归约求和，通过 2 个递进场景展示线程块内同步与线程块间内存顺序控制的典型用法。
 
-2 个场景分别对应小 shape 输入、大 shape 输入下的归约求和，重点说明[`asc_syncthreads()`](../../../../../../docs/zh/api/SIMT-API/同步与内存栅栏/同步接口/asc_syncthreads.md)和[`asc_threadfence()`](../../../../../../docs/zh/api/SIMT-API/同步与内存栅栏/内存栅栏接口/asc_threadfence.md)在不同归约规模下的使用方法。
+2 个场景分别对应小 shape 输入、大 shape 输入下的归约求和，重点说明[`asc_syncthreads()`](../../../../../../docs/zh/api/SIMT-API/sync_and_memory_fence/sync_interface/asc_syncthreads.md)和[`asc_threadfence()`](../../../../../../docs/zh/api/SIMT-API/sync_and_memory_fence/memory_fence/asc_threadfence.md)在不同归约规模下的使用方法。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-- \>= CANN 9.1.0
+| 产品 | CANN软件版本 |
+|---|---|
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -21,7 +20,8 @@
 │   ├── sync_barrier.asc      // 场景1：小shape归约样例，展示 asc_syncthreads() 的线程块内同步用法
 │   ├── memory_fence.asc      // 场景2：大shape归约样例，展示 asc_threadfence() 与原子计数的线程块间协作用法
 │   ├── CMakeLists.txt        // 编译工程文件
-│   └── README.md
+│   ├── README.md
+│   └── README_en.md      // 英文版样例说明
 ```
 
 ## 样例描述
@@ -101,7 +101,7 @@
 
 单个线程块内的每个线程先读取一个输入元素，通过**两阶段归约求和**得到最终结果：
 
-- **阶段 1（warp 内归约）**：调用[`asc_reduce_add()`](../../../../../../docs/zh/api/SIMT-API/Warp函数/Warp-Reduce类函数/asc_reduce_add.md)接口对当前warp内所有线程的值做归约，得到warp内数据的和，写入共享内存。
+- **阶段 1（warp 内归约）**：调用[`asc_reduce_add()`](../../../../../../docs/zh/api/SIMT-API/Warp_functions/Warp_reduce_functions/asc_reduce_add.md)接口对当前warp内所有线程的值做归约，得到warp内数据的和，写入共享内存。
 - **阶段 2（block 级顺序累加）**：跨warp同步后，0号线程按顺序将各warp的部分和累加，得到最终结果。
 
 以 128 个元素（4 个 warp）为例，两阶段归约过程如图 1 所示：
@@ -158,14 +158,24 @@
   ./demo                        # 执行样例
   ```
 
+  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
+
+  示例如下：
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;   # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
+
   编译选项说明
 
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
   | `SCENARIO_NUM` | `1`、`2` | 场景编号：1表示小shape归约场景，2表示大shape归约场景 |
 
   执行结果如下，说明精度对比成功。
   ```
-  [Success] Case accuracy is verification passed.
+  [Success] Case accuracy verification passed.
   ```

@@ -102,10 +102,16 @@ protected:
     static constexpr TPosition dstPosition = dst;
     static constexpr Hardware srcHardType = GetPhyType(src);
     static constexpr Hardware dstHardType = GetPhyType(dst);
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+    static constexpr HardEvent enQueEvt = GetQueEvt(srcPosition, dstPosition, true);
+    static constexpr HardEvent freeBufEvt = GetQueEvt(srcPosition, dstPosition, false);
+#else
     static constexpr HardEvent enQueEvt = GetQueEvt(srcHardType, dstHardType, true, nd2nz, nz2nd);
     static constexpr HardEvent freeBufEvt = GetQueEvt(srcHardType, dstHardType, false, nd2nz, nz2nd);
+#endif
     static constexpr int32_t queDepth = depth;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
     static constexpr bool enableGlobalManageQue = EnableGlobalManageQue<GetBufferPos(src, dst)>(config);
     static constexpr pipe_t srcPipe = GetPipe(srcHardType, dstHardType, true);
     static constexpr pipe_t dstPipe = GetPipe(srcHardType, dstHardType, false);
@@ -478,7 +484,7 @@ public:
     // NOTICE: GetAbsAddr has been deprecated and will be removed in the next version. Please do not use it!
     template <TPosition pos>
     __aicore__ inline TBuffAddr GetAbsAddr(int32_t offset, int32_t len) const;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
     __aicore__ inline MutexID AllocMutexID();
     __aicore__ inline void ReleaseMutexID(MutexID id);
 #endif

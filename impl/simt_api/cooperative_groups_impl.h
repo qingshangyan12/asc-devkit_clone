@@ -23,6 +23,8 @@
 #ifndef IMPL_SIMT_API_COOPERATIVE_GROUPS_IMPL_H
 #define IMPL_SIMT_API_COOPERATIVE_GROUPS_IMPL_H
 
+#include <type_traits>
+
 namespace cooperative_groups {
 
 template <typename T, typename... Args>
@@ -67,6 +69,21 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int __fns_internal(unsigned int m
 }
 namespace details {
 
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+static constexpr uint64_t grid_sync_counter_offset_bytes = 4U * 8U;
+static constexpr uint64_t grid_sync_counter_phase_bit = 1ULL << 63;
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t* get_grid_sync_counter()
+{
+    return reinterpret_cast<uint64_t*>(__cce_simt_get_para_base_imp() - grid_sync_counter_offset_bytes);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bool has_grid_sync_phase_flipped(uint64_t old_counter, uint64_t current_counter)
+{
+    return ((old_counter ^ current_counter) & grid_sync_counter_phase_bit) != 0U;
+}
+#endif
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void wait_warp_fully_active()
 {
     while (asc_activemask() != 0xFFFFFFFFU) {
@@ -89,9 +106,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void wait_multi_warp_barrier(
 {
     while ((*reinterpret_cast<tile_memory_pointer_t<MemoryType, volatile unsigned int>>(arrived_word) & warp_bit) !=
            0U) {
-#ifndef ASCENDC_CPU_DEBUG
         asc_nop();
-#endif
     }
 }
 
@@ -101,9 +116,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void wait_multi_warp_barrier_arrive(
 {
     while ((*reinterpret_cast<tile_memory_pointer_t<MemoryType, volatile unsigned int>>(arrived_word) & warp_bit) ==
            0U) {
-#ifndef ASCENDC_CPU_DEBUG
         asc_nop();
-#endif
     }
 }
 
@@ -190,6 +203,11 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long thread_group::size() co
         case group_type::coalesced_group_type: {
             return static_cast<const coalesced_group*>(this)->size();
         }
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+        case group_type::grid_group_type: {
+            return static_cast<const grid_group*>(this)->size();
+        }
+#endif
         case group_type::tiled_group_type: {
             return static_cast<const tiled_group*>(this)->size();
         }
@@ -210,6 +228,11 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long thread_group::thread_ra
         case group_type::coalesced_group_type: {
             return static_cast<const coalesced_group*>(this)->thread_rank();
         }
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+        case group_type::grid_group_type: {
+            return static_cast<const grid_group*>(this)->thread_rank();
+        }
+#endif
         case group_type::tiled_group_type: {
             return static_cast<const tiled_group*>(this)->thread_rank();
         }
@@ -230,6 +253,12 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void thread_group::sync() const
             static_cast<const coalesced_group*>(this)->sync();
             break;
         }
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+        case group_type::grid_group_type: {
+            static_cast<const grid_group*>(this)->sync();
+            break;
+        }
+#endif
         case group_type::tiled_group_type: {
             static_cast<const tiled_group*>(this)->sync();
             break;
@@ -243,22 +272,42 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void thread_group::sync() const
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline tiled_group::tiled_group(unsigned int num_threads)
     : thread_group(group_type::tiled_group_type)
 {
-    _tiled_info.is_tiled = true;
     _tiled_info.num_threads = num_threads;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void tiled_group::sync() const { asc_threadfence_block(); }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long tiled_group::num_threads() const
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int tiled_group::num_threads() const { return _tiled_info.num_threads; }
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int tiled_group::size() const { return num_threads(); }
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int tiled_group::thread_rank() const
 {
-    return static_cast<unsigned long long>(_tiled_info.num_threads);
+    return __popc(_tiled_info.mask & lanemask_lt());
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long tiled_group::size() const { return num_threads(); }
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long tiled_group::thread_rank() const
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline thread_group tiled_group::create_tiled_group(unsigned int tile_size) const
 {
-    return static_cast<unsigned long long>(__popc(_tiled_info.mask & lanemask_lt()));
+    const bool pow2 = ((tile_size & (tile_size - 1)) == 0);
+    if (tile_size == 0 || tile_size > warpSize || !pow2) {
+        __trap_internal();
+        return (*this);
+    }
+    if (num_threads() <= tile_size) {
+        return (*this);
+    }
+
+    unsigned int rank = thread_rank();
+    unsigned int base_offset = rank & ~(tile_size - 1);
+    unsigned int partition_size = min(num_threads() - base_offset, tile_size);
+    unsigned int mask = static_cast<unsigned int>(-1) >> (warpSize - partition_size);
+    mask <<= laneid() & ~(tile_size - 1);
+
+    tiled_group tile(partition_size);
+    tile._tiled_info.mask = mask;
+    tile._tiled_info.meta_group_rank = rank / tile_size;
+    tile._tiled_info.meta_group_size = (num_threads() + tile_size - 1) / tile_size;
+    return tile;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline thread_block::thread_block()
@@ -350,6 +399,65 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline thread_group thread_block::create_tiled_gr
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline thread_block this_thread_block() { return thread_block(); }
 
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline grid_group::grid_group() : thread_group(group_type::grid_group_type) {}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bool grid_group::is_valid() const { return true; }
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void grid_group::sync() const
+{
+    asc_syncthreads();
+    unsigned long long block_count = num_blocks();
+    if (thread_block::thread_rank() == 0U) {
+        auto sync_counter = details::get_grid_sync_counter();
+        uint64_t add_value = 1ULL;
+        if (block_rank() == 0U) {
+            add_value = details::grid_sync_counter_phase_bit - (static_cast<uint64_t>(block_count) - 1ULL);
+        }
+        uint64_t old_counter = __asc_simt_vf::asc_atomic_add(sync_counter, add_value);
+        auto volatile_counter = reinterpret_cast<volatile uint64_t*>(sync_counter);
+        while (!details::has_grid_sync_phase_flipped(old_counter, *volatile_counter)) {
+            asc_nop();
+        }
+    }
+    asc_syncthreads();
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long grid_group::num_blocks()
+{
+    return static_cast<unsigned long long>(gridDim.x) * gridDim.y * gridDim.z;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long grid_group::num_threads()
+{
+    return num_blocks() * static_cast<unsigned long long>(thread_block::num_threads());
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long grid_group::size() { return num_threads(); }
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long grid_group::block_rank()
+{
+    return blockIdx.x + static_cast<unsigned long long>(blockIdx.y) * gridDim.x +
+           static_cast<unsigned long long>(blockIdx.z) * gridDim.x * gridDim.y;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long grid_group::thread_rank()
+{
+    return block_rank() * static_cast<unsigned long long>(thread_block::num_threads()) + thread_block::thread_rank();
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline dim3 grid_group::dim_blocks() { return dim3(gridDim.x, gridDim.y, gridDim.z); }
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline dim3 grid_group::group_dim() { return dim_blocks(); }
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline dim3 grid_group::block_index()
+{
+    return dim3(blockIdx.x, blockIdx.y, blockIdx.z);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline grid_group this_grid() { return grid_group(); }
+#endif
+
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__) || defined(ASCENDC_CPU_DEBUG)
 template <unsigned int MaxBlockSize>
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline thread_block this_thread_block(block_tile_memory<MaxBlockSize>& scratch)
@@ -403,42 +511,29 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline coalesced_group coalesced_group::create_ti
         return (*this);
     }
 
-    if (_tiled_info.is_tiled) {
-        unsigned int base_offset = (thread_rank() & (~(tile_size - 1)));
-        unsigned int mask_length = min(static_cast<unsigned int>(num_threads()) - base_offset, tile_size);
-        unsigned int mask = static_cast<unsigned int>(-1) >> (warpSize - mask_length);
-        mask <<= (laneid() & ~(tile_size - 1));
-        coalesced_group coalesced_tile = coalesced_group(mask);
-        coalesced_tile._tiled_info.is_tiled = true;
-        coalesced_tile._tiled_info.meta_group_rank = thread_rank() / tile_size;
-        coalesced_tile._tiled_info.meta_group_size = num_threads() / tile_size;
-        return coalesced_tile;
-    } else {
-        unsigned int mask = 0;
-        unsigned int member_rank = 0;
-        int seen_lanes = (thread_rank() / tile_size) * tile_size;
+    unsigned int mask = 0;
+    unsigned int member_rank = 0;
+    int seen_lanes = (thread_rank() / tile_size) * tile_size;
 
-        for (unsigned int bit_idx = 0; bit_idx < warpSize; bit_idx++) {
-            unsigned int lane_bit = _tiled_info.mask & (1U << bit_idx);
-            if (lane_bit) {
-                if (seen_lanes <= 0 && member_rank < tile_size) {
-                    mask |= lane_bit;
-                    member_rank++;
-                }
-                seen_lanes--;
+    for (unsigned int bit_idx = 0; bit_idx < warpSize; bit_idx++) {
+        unsigned int lane_bit = _tiled_info.mask & (1U << bit_idx);
+        if (lane_bit) {
+            if (seen_lanes <= 0 && member_rank < tile_size) {
+                mask |= lane_bit;
+                member_rank++;
             }
+            seen_lanes--;
         }
-        coalesced_group coalesced_tile = coalesced_group(mask);
-        coalesced_tile._tiled_info.meta_group_rank = thread_rank() / tile_size;
-        coalesced_tile._tiled_info.meta_group_size = (num_threads() + tile_size - 1) / tile_size;
-        return coalesced_tile;
     }
+    coalesced_group coalesced_tile = coalesced_group(mask);
+    coalesced_tile._tiled_info.meta_group_rank = thread_rank() / tile_size;
+    coalesced_tile._tiled_info.meta_group_size = (num_threads() + tile_size - 1) / tile_size;
+    return coalesced_tile;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline coalesced_group::coalesced_group(unsigned int mask)
     : thread_group(group_type::coalesced_group_type)
 {
-    _tiled_info.is_tiled = false;
     _tiled_info.mask = mask;
     _tiled_info.num_threads = __popc(mask);
     _tiled_info.meta_group_rank = 0;
@@ -449,26 +544,26 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void coalesced_group::sync() const { asc_t
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int coalesced_group::get_mask() const { return _tiled_info.mask; }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long coalesced_group::num_threads() const
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int coalesced_group::num_threads() const
 {
-    return static_cast<unsigned long long>(_tiled_info.num_threads);
+    return _tiled_info.num_threads;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long coalesced_group::size() const { return num_threads(); }
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int coalesced_group::size() const { return num_threads(); }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long coalesced_group::thread_rank() const
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int coalesced_group::thread_rank() const
 {
-    return static_cast<unsigned long long>(__popc(_tiled_info.mask & lanemask_lt()));
+    return __popc(_tiled_info.mask & lanemask_lt());
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long coalesced_group::meta_group_size() const
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int coalesced_group::meta_group_size() const
 {
-    return static_cast<unsigned long long>(_tiled_info.meta_group_size);
+    return _tiled_info.meta_group_size;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long coalesced_group::meta_group_rank() const
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int coalesced_group::meta_group_rank() const
 {
-    return static_cast<unsigned long long>(_tiled_info.meta_group_rank);
+    return _tiled_info.meta_group_rank;
 }
 
 template <typename T>
@@ -611,20 +706,19 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void single_warp_thread_block_tile_base<Si
 }
 
 template <unsigned int Size>
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long single_warp_thread_block_tile_base<Size>::thread_rank()
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int single_warp_thread_block_tile_base<Size>::thread_rank()
 {
     return laneid() & (Size - 1);
 }
 
 template <unsigned int Size>
-__SIMT_DEVICE_FUNCTIONS_DECL__ constexpr inline unsigned long long
-single_warp_thread_block_tile_base<Size>::num_threads()
+__SIMT_DEVICE_FUNCTIONS_DECL__ constexpr inline unsigned int single_warp_thread_block_tile_base<Size>::num_threads()
 {
     return numThreads;
 }
 
 template <unsigned int Size>
-__SIMT_DEVICE_FUNCTIONS_DECL__ constexpr inline unsigned long long single_warp_thread_block_tile_base<Size>::size()
+__SIMT_DEVICE_FUNCTIONS_DECL__ constexpr inline unsigned int single_warp_thread_block_tile_base<Size>::size()
 {
     return numThreads;
 }
@@ -656,20 +750,19 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void multi_warp_thread_block_tile_base<Siz
 }
 
 template <unsigned int Size>
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long multi_warp_thread_block_tile_base<Size>::thread_rank()
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int multi_warp_thread_block_tile_base<Size>::thread_rank()
 {
     return thread_block::thread_rank() & (Size - 1);
 }
 
 template <unsigned int Size>
-__SIMT_DEVICE_FUNCTIONS_DECL__ constexpr inline unsigned long long
-multi_warp_thread_block_tile_base<Size>::num_threads()
+__SIMT_DEVICE_FUNCTIONS_DECL__ constexpr inline unsigned int multi_warp_thread_block_tile_base<Size>::num_threads()
 {
     return numThreads;
 }
 
 template <unsigned int Size>
-__SIMT_DEVICE_FUNCTIONS_DECL__ constexpr inline unsigned long long multi_warp_thread_block_tile_base<Size>::size()
+__SIMT_DEVICE_FUNCTIONS_DECL__ constexpr inline unsigned int multi_warp_thread_block_tile_base<Size>::size()
 {
     return numThreads;
 }
@@ -1084,9 +1177,15 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline thread_group tiled_partition(const thread_
     if (parent.get_type() == group_type::coalesced_group_type) {
         const coalesced_group* _cg = static_cast<const coalesced_group*>(&parent);
         return _cg->create_tiled_group(tilesz);
-    } else {
+    } else if (parent.get_type() == group_type::tiled_group_type) {
+        const tiled_group* _tg = static_cast<const tiled_group*>(&parent);
+        return _tg->create_tiled_group(tilesz);
+    } else if (parent.get_type() == group_type::thread_block_type) {
         const thread_block* _tb = static_cast<const thread_block*>(&parent);
         return _tb->create_tiled_group(tilesz);
+    } else {
+        __trap_internal();
+        return parent;
     }
 }
 
@@ -1139,6 +1238,12 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline coalesced_group __binary_partition_interna
     coalesced_group result = _coalesced_group_data_access::construct_result(sub_mask);
     _coalesced_group_data_access::modify_meta_group(result, pred ? 1 : 0, 2);
     return result;
+}
+
+template <typename GroupType>
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void sync(const GroupType& g)
+{
+    g.sync();
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline coalesced_group binary_partition(const coalesced_group& g, bool pred)

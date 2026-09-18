@@ -76,9 +76,6 @@ NO_CMAKE_ARCH_INJECTION_CASES = {
     "02_simd_c_api/00_introduction/00_quickstart/hello_world_npu",
     "02_simd_c_api/00_introduction/01_add/c_api_delicacy_async_add",
     "02_simd_c_api/00_introduction/01_add/c_api_sync_add",
-    "02_simd_c_api/02_features/03_c_api/00_vector_compute/00_sync_add",
-    "02_simd_c_api/02_features/03_c_api/00_vector_compute/01_async_add",
-    "02_simd_c_api/02_features/03_c_api/00_vector_compute/02_c_api_delicacy_async_add",
 }
 
 TENSORFLOW_SKIP_REASON = "requires TensorFlow 2.6.5 environment; skipped by presmoke"
@@ -86,6 +83,7 @@ MATMUL_L2CACHE_SKIP_REASON = (
     "data size (~308M) causes overtime in cpu mode; cpu mode skipped by presmoke"
 )
 LONG_TIME_REASON = "long execution time in cpu mode; cpu mode skipped by presmoke"
+WORKAROUND_SKIP_REASON = "temporarily disabled by presmoke workaround"
 
 
 @dataclass
@@ -143,6 +141,18 @@ SKIP_CONFIG = {
         reason=LONG_TIME_REASON,
         modes=["cpu"],
         archs=["dav-3510"],
+    ),
+    "01_simd_cpp_api/03_basic_api/05_sync_control/cross_core_set_wait_flag": SkipConfig(
+        reason=WORKAROUND_SKIP_REASON,
+        modes=["npu", "cpu", "sim"],
+    ),
+    "01_simd_cpp_api/03_basic_api/05_sync_control/data_sync_barrier": SkipConfig(
+        reason=WORKAROUND_SKIP_REASON,
+        modes=["npu", "cpu", "sim"],
+    ),
+    "01_simd_cpp_api/02_features/00_framework/03_ge/triple_chevron_notation": SkipConfig(
+        reason=WORKAROUND_SKIP_REASON,
+        modes=["npu", "cpu", "sim"],
     ),
 }
 

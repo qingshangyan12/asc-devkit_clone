@@ -24,12 +24,13 @@
 #define ASCENDC_KERNEL_REG_COMPUTE_INTF_IMPL_H
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 3003) || ((__NPU_ARCH__ == 3113)) || defined(__ASC_NPU_HOST__) || \
-    (__NPU_ARCH__ == 5102)
+    (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
 #include "kernel_reg_compute_maskreg_intf_impl.h"
 #include "kernel_reg_compute_addrreg_intf_impl.h"
 #include "kernel_reg_compute_common_intf_impl.h"
 #include "kernel_reg_compute_copy_intf_impl.h"
 #include "kernel_reg_compute_vec_duplicate_intf_impl.h"
+#include "kernel_reg_compute_vec_data_reorder_intf_impl.h"
 #include "kernel_reg_compute_datacopy_intf_impl.h"
 #include "kernel_reg_compute_gather_mask_intf_impl.h"
 #include "kernel_reg_compute_pack_intf_impl.h"

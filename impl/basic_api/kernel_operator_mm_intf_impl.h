@@ -110,10 +110,11 @@ __aicore__ inline void LoadData(
     LoadDataImpl(dst, src, loadDataParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-template <typename T, typename U>
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
+                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+template <typename T, typename U, typename V>
 __aicore__ inline void LoadData(
-    const LocalTensor<U>& dst, const LocalTensor<T>& src0, const LocalTensor<fp8_e8m0_t>& srcMx,
+    const LocalTensor<U>& dst, const LocalTensor<T>& src0, const LocalTensor<V>& srcMx,
     const LoadData2DParamsV2& loadDataParams, const LoadData2DMxParams& loadMxDataParams)
 {
     LoadDataImpl(dst, src0, srcMx, loadDataParams, loadMxDataParams);
@@ -697,14 +698,14 @@ __aicore__ inline void SetHF32Mode(bool hf32Mode) { SetHF32ModeImpl(hf32Mode); }
  */
 __aicore__ inline void SetHF32TransMode(HF32TransMode mode)
 {
-    SetHF32TransModeImpl(mode == AscendC::HF32TransMode::NEAREST_ZERO);
+    SetHF32TransModeImpl(mode == AscendC::HF32TransMode::NEAREST_AWAY);
 }
 
 /*
  * @brief Sets the rounding method for HF32 rounding mode
  * @param [in] hf32TransMode Control parameter for Mmad HF32 mode
  * @note Must Call SetHF32Mode to enable HF32 rounding mode first.When hf32TransMode is true, FP32 is rounded to HF32
- * with rounding towards zero; when false, rounded to nearest even
+ * with rounding to nearest, with ties away from zero; when false, rounded to nearest, with ties to even
  */
 // SetHF32TransMode(bool hf32TransMode) has been updated, please use SetHF32TransMode(HF32TransMode mode) instead.
 __aicore__ inline void SetHF32TransMode(bool hf32TransMode) { SetHF32TransModeImpl(hf32TransMode); }

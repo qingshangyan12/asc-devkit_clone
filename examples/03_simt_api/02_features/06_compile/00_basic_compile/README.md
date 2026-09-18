@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于Gather算子，演示了Host侧.cpp文件调用Host + Device混合.asc文件（含Kernel定义与<<<>>>内核调用）的基本编译流程。其中.asc文件中包含<<<>>>核函数调用的Host侧入口函数通过extern暴露给纯Host侧的.cpp。代码结构与调用关系如图 1 所示：
+本样例基于Gather算子，演示了Host侧.cpp文件调用Host + Device混合.asc文件（含Kernel定义与`<<<>>>`内核调用）的基本编译流程。其中.asc文件中包含`<<<>>>`核函数调用的Host侧入口函数通过extern暴露给纯Host侧的.cpp。代码结构与调用关系如图 1 所示：
 
 <p align="center">
   <img src="./figures/basic_compile.png" width="50%">
@@ -11,13 +11,11 @@
 图1：代码结构与调用关系
 </p>
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.1.0
+| 产品 | CANN软件版本 |
+|---|---|
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -34,7 +32,7 @@ gather算子实现了从长度为100000的一维输入向量中获取指定索�
 
 ## 异构编译介绍
 
-本样例采用**异构编译**方式，Host侧 `.cpp` 与Device侧 `.asc` 分开编译后再链接。AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成Host二进制，AI Core SIMT代码由Device编译器编译成SIMT二进制，先将SIMT二进制链接成Fatbin文件，再与Host二进制合并生成可执行二进制。
+本样例采用**异构编译**方式，Host侧`.cpp`与Device侧`.asc`分开编译后再链接。AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成Host二进制，AI Core SIMT代码由Device编译器编译成SIMT二进制，先将SIMT二进制链接成Fatbin文件，再与Host二进制合并生成可执行二进制。
 
 ### bisheng命令行编译
 
@@ -50,9 +48,9 @@ bisheng kernel.o host.o -o demo
 bisheng host.cpp kernel.asc -o demo --npu-arch=dav-3510 --enable-simt -I${ASCEND_HOME_PATH}/include
 ```
 
-其中，`--npu-arch`为编译时指定的AI处理器架构，本样例仅支持`dav-3510`，各产品型号对应的架构版本号请通过[对应关系表](../../../../../docs/zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)进行查询。`--enable-simt`用于指定SIMT方式编译。
+其中，`--npu-arch`为编译时指定的AI处理器架构，本样例仅支持`dav-3510`，各产品型号对应的架构版本号请通过[对应关系表](../../../../../docs/zh/guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)进行查询。`--enable-simt`用于指定SIMT方式编译。
 
-更多 bisheng 编译选项及用法说明，请参考[AI-Core算子编译基本用法](../../../../../docs/zh/guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.md)。
+更多 bisheng 编译选项及用法说明，请参考[AI-Core算子编译基本用法](../../../../../docs/zh/guide/programming_guide/compilation_and_execution/operator_compilation/ai_core_operator_compilation.md)。
 
 ### CMake方式编译
 
@@ -62,6 +60,8 @@ bisheng host.cpp kernel.asc -o demo --npu-arch=dav-3510 --enable-simt -I${ASCEND
 # 1、设置编译配置变量
 # CMAKE_ASC_ARCHITECTURES：指定NPU架构版本，本样例仅支持 dav-3510，可通过-DCMAKE_ASC_ARCHITECTURES=dav-xxxx配置
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture")
+# CMAKE_ASC_ENABLE_SIMT：启用SIMT编译模式
+set(CMAKE_ASC_ENABLE_SIMT ON)
 
 # 2、find_package(ASC)是CMake中用于查找和配置Ascend C编译工具链的命令
 find_package(ASC)
@@ -76,18 +76,6 @@ add_executable(demo
 
 # 5、设置链接器语言为ASC
 set_target_properties(demo PROPERTIES LINKER_LANGUAGE ASC)
-
-# 6、配置编译选项：--npu-arch指定架构版本，--enable-simt启用SIMT模式
-target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES} --enable-simt>)
-```
-
-在后续版本，可通过设置 `CMAKE_ASC_ENABLE_SIMT` 为ON启用SIMT模式替代上述步骤6的 `--enable-simt`编译选项：
-
-```cmake
-# 启用SIMT编译模式
-set(CMAKE_ASC_ENABLE_SIMT ON)
-```
 
 ## 编译运行
 
@@ -122,13 +110,13 @@ set(CMAKE_ASC_ENABLE_SIMT ON)
     ./demo                                                          # 执行样例
     ```
 
-    使用 NPU 仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。示例如下：
+    使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。示例如下：
 
     ```bash
     cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
     ```
 
-    > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+    > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
 
 - 执行结果
 

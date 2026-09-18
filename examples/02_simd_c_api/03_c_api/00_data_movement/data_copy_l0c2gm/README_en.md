@@ -10,7 +10,7 @@ This example applies to Ascend 950PR/Ascend 950DT (`dav-3510`) and can run in NP
 
 | Product | CANN version |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -79,7 +79,7 @@ The device-side flow is as follows. Each K chunk follows `GMâ†’L1 Buffer (MTE2)â
 - Output: C `[128, 256]` in Nz `int8_t`
 - Implementation: Use `VREQ8` and enable ReLU
 
-For scenarios 2, 4, and 6, the parameters are moved from GM to L1 Buffer with `asc_copy_gm2l1`, then from L1 Buffer to Fixpipe Buffer with `asc_copy_l12fb`. `asc_set_l0c2gm_config` configures the vector-quantization parameter address. Its parameter address is expressed in 128B units, so the parameter file must be rounded up to 128B and any padding must be zero-filled. The `[256] uint64_t` parameters in this example occupy 2048B and already meet this requirement. Moving these parameters from L1 Buffer to Fixpipe Buffer transfers 2048B of data in 64B data blocks, so `len_burst` in `asc_copy_l12fb` is set to 32. `asc_sync_pipe(PIPE_FIX)` completes the L1 Buffer-to-Fixpipe Buffer movement and parameter configuration before Fixpipe moves the L0C Buffer result to GM.
+For scenarios 2, 4, and 6, the parameters are moved from GM to L1 Buffer with `asc_copy_gm2l1`, then from L1 Buffer to Fixpipe Buffer with `asc_copy_l12fb`. `asc_set_l0c_copy_config` configures the vector-quantization parameter address. Its parameter address is expressed in 128B units, so the parameter file must be rounded up to 128B and any padding must be zero-filled. The `[256] uint64_t` parameters in this example occupy 2048B and already meet this requirement. Moving these parameters from L1 Buffer to Fixpipe Buffer transfers 2048B of data in 64B data blocks, so `len_burst` in `asc_copy_l12fb` is set to 32. `asc_sync_pipe(PIPE_FIX)` completes the L1 Buffer-to-Fixpipe Buffer movement and parameter configuration before Fixpipe moves the L0C Buffer result to GM.
 
 ## Build and Run
 

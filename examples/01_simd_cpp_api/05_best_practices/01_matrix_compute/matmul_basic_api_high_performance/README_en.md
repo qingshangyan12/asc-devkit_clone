@@ -8,9 +8,9 @@ This example is based on the static Tensor programming paradigm, implementing hi
 
 | Product | CANN Version |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.0.0 |
-| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.2.0 |
+| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -58,10 +58,10 @@ This example is based on the static Tensor programming paradigm, implementing hi
 | aic_mac_ratio | Cube computation unit time ratio, reflecting computation unit utilization |
 | aic_mte1_time(μs) | MTE1 (L1 to L0A/L0B transfer) execution time |
 | aic_mte1_ratio | MTE1 time ratio, reflecting L1 to L0 data transfer pressure |
-| aic_mte2_time(μs) | MTE2 ([GM](../../../../../docs/zh/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md) (Global Memory) to L1 transfer) execution time |
+| aic_mte2_time(μs) | MTE2 ([GM](../../../../../docs/zh/guide/programming_guide/programming_model/ai_core_simd_programming/abstract_hardware_architecture.md) (Global Memory) to L1 transfer) execution time |
 | aic_mte2_ratio | MTE2 time ratio, reflecting GM to L1 data loading pressure |
-| aic_fixpipe_time(μs) | [Fixpipe](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬出/Fixpipe_L0CToGM.md) (L0C to GM transfer) execution time |
-| aic_fixpipe_ratio | [Fixpipe](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬出/Fixpipe_L0CToGM.md) time ratio, reflecting result write-back memory access pressure |
+| aic_fixpipe_time(μs) | [Fixpipe](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM.md) (L0C to GM transfer) execution time |
+| aic_fixpipe_ratio | [Fixpipe](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM.md) time ratio, reflecting result write-back memory access pressure |
 
 
 ### Data Flow Path:
@@ -121,12 +121,12 @@ Four types of hardware event flags are used to implement precise pipeline synchr
 
 | Event Type | Direction | Purpose | Flag Number |
 |---------|------|------|----------|
-| [MTE2_MTE1](../../../../../docs/zh/api/SIMD-API/基础API/同步控制/核内同步/SetFlag_WaitFlag_ISASI.md) | Forward | L1 data readiness notification, DataCopyIn notifies DataLoad that data can be read | 0/1: A1 Ping/Pong; 2/3: B1 Ping/Pong |
-| [MTE1_MTE2](../../../../../docs/zh/api/SIMD-API/基础API/同步控制/核内同步/SetFlag_WaitFlag_ISASI.md) | Reverse | L1 buffer release notification, DataLoad notifies DataCopyIn that buffer can be written | Same as above |
-| [MTE1_M](../../../../../docs/zh/api/SIMD-API/基础API/同步控制/核内同步/SetFlag_WaitFlag_ISASI.md) | Forward | L0 data readiness notification, DataLoad notifies Compute that computation can start | mte1DBFlag (0/1 alternating) |
-| [M_MTE1](../../../../../docs/zh/api/SIMD-API/基础API/同步控制/核内同步/SetFlag_WaitFlag_ISASI.md) | Reverse | L0 buffer release notification, Compute notifies DataLoad that buffer can be written | mte1DBFlag (0/1 alternating) |
+| [MTE2_MTE1](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md) | Forward | L1 data readiness notification, DataCopyIn notifies DataLoad that data can be read | 0/1: A1 Ping/Pong; 2/3: B1 Ping/Pong |
+| [MTE1_MTE2](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md) | Reverse | L1 buffer release notification, DataLoad notifies DataCopyIn that buffer can be written | Same as above |
+| [MTE1_M](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md) | Forward | L0 data readiness notification, DataLoad notifies Compute that computation can start | mte1DBFlag (0/1 alternating) |
+| [M_MTE1](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md) | Reverse | L0 buffer release notification, Compute notifies DataLoad that buffer can be written | mte1DBFlag (0/1 alternating) |
 
-**Reverse synchronization must be preset**: Since reverse synchronization is "consumer [SetFlag](../../../../../docs/zh/api/SIMD-API/基础API/同步控制/核内同步/SetFlag_WaitFlag_ISASI.md) → producer [WaitFlag](../../../../../docs/zh/api/SIMD-API/基础API/同步控制/核内同步/SetFlag_WaitFlag_ISASI.md)", SetFlag must be preset before first use, otherwise the first WaitFlag will deadlock:
+**Reverse synchronization must be preset**: Since reverse synchronization is "consumer [SetFlag](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md) → producer [WaitFlag](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md)", SetFlag must be preset before first use, otherwise the first WaitFlag will deadlock:
 
 ```cpp
 // Initialization: Preset reverse synchronization flags to prevent first WaitFlag deadlock
@@ -156,7 +156,7 @@ if ((kOffsetInChunkA + 1) == stepKa) {
 Split the matrix evenly along the M/N directions for parallel computation across multiple cores. On Atlas A2/A3 (`dav-2201`), use a 4×6 splitting strategy (4 blocks in the M direction and 6 blocks in the N direction, 24 cores in total) to satisfy 512B address alignment and reduce same-address access conflicts. On Ascend 950PR/Ascend 950DT (`dav-3510`), use a 32-core split (see the performance data section below):
 
 ```cpp
-constexpr uint32_t mIter = DivCeil(M, singleCoreM);
+constexpr uint32_t mIter = AscendC::Std::ceil_div(M, singleCoreM);
 uint32_t mIterIdx = AscendC::GetBlockIdx() % mIter;
 uint32_t nIterIdx = AscendC::GetBlockIdx() / mIter;
 ```
@@ -189,7 +189,7 @@ nd2nzParams.dValue = baseK * stepKa;  // Large packet contains stepKa baseM * ba
 
 #### 6. LoadData3D Replacing LoadData2D — Reducing Instruction Queue Usage
 
-On Atlas A2/A3 architecture, this example uses [`LoadData3DParamsV2`](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/LoadData_3D.md) (that is, [LoadData3D](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/LoadData_3D.md)) to replace [`LoadData2DParams`](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/LoadData_2D.md) (that is, LoadData2D) for L1→L0 data transfer. This is a key instruction queue optimization.
+On Atlas A2/A3 architecture, this example uses [`LoadData3DParamsV2`](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_3D.md) (that is, [LoadData3D](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_3D.md)) to replace [`LoadData2DParams`](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_2D.md) (that is, LoadData2D) for L1→L0 data transfer. This is a key instruction queue optimization.
 
 **Problem Background**: MTE1 instruction queue depth is 32. When using LoadData2D, due to limited single instruction transfer granularity, transferring one baseM×baseK slice requires a for loop to dispatch multiple LoadData2D instructions. For example, with baseM=128 and baseK=64, at least `baseK/16 = 4` LoadData2D instructions need to be dispatched.
 
@@ -199,7 +199,7 @@ Before optimization, with `baseK=64`, loop count is 4:
 
 ```cpp
 AscendC::LoadData2DParams loadDataParams;
-for (int i = 0; i < DivCeil(baseK, CUBE_BLOCK); ++i) {
+for (int i = 0; i < AscendC::Std::ceil_div(baseK, CUBE_BLOCK); ++i) {
     AscendC::LoadData(b2Local[i * dstOffset], b1Local[srcAddr + i * srcOffset], loadDataParams);
 }
 ```
@@ -235,7 +235,7 @@ class KernelMmad { ... };
 
 #### 8. UnitFlag Optimization
 
-After enabling UnitFlag, [MMAD](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/Mmad计算/Mmad.md) and [FIXPIPE](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬出/Fixpipe_L0CToGM.md) achieve fine-grained (512B) pipeline parallelism instead of instruction-level synchronization. Whenever Cube completes computation of one 512B data result, FIXPIPE immediately transfers that data, with Cube computation and result write-back pipeline overlapping:
+After enabling UnitFlag, [MMAD](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad.md) and [FIXPIPE](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM.md) achieve fine-grained (512B) pipeline parallelism instead of instruction-level synchronization. Whenever Cube completes computation of one 512B data result, FIXPIPE immediately transfers that data, with Cube computation and result write-back pipeline overlapping:
 
 ```cpp
 mmadParams.unitFlag = (kBlockIdx != kLoopCount - 1) ? 2 : 3;  // Enable UnitFlag
@@ -252,8 +252,8 @@ The specific L2Cache splitting implementation is consistent with Case 6 in the [
 
 ```cpp
 // ProcessL2Cache: Split by M direction in rounds, each round 24 cores cover mIterPerRound M sub-blocks
-constexpr uint32_t mIterPerRound = DivCeil(M, singleCoreM * 2);
-constexpr uint32_t outerMLoopCount = DivCeil(mIterTotal, mIterPerRound);
+constexpr uint32_t mIterPerRound = AscendC::Std::ceil_div(M, singleCoreM * 2);
+constexpr uint32_t outerMLoopCount = AscendC::Std::ceil_div(mIterTotal, mIterPerRound);
 
 for (uint32_t outerMIdx = 0; outerMIdx < outerMLoopCount; outerMIdx++) {
     uint32_t mIterIdx = AscendC::GetBlockIdx() % mIterPerRound + outerMIdx * mIterPerRound;
@@ -428,7 +428,7 @@ Run the following steps in the root directory of this example to build and run t
 
 - Configure environment variables
 
-  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

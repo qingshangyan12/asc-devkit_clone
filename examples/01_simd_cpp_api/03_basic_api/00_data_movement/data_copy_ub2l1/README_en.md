@@ -8,7 +8,7 @@ This sample demonstrates data movement from UB (Unified Buffer) to L1 (L1 Buffer
 
 | Product | CANN Software Version |
 |---------|----------------------|
-| Ascend 950PR / Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR / Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -35,7 +35,7 @@ This sample demonstrates data movement from UB (Unified Buffer) to L1 (L1 Buffer
   | Contiguous Copy | 1 | `DataCopy(dst, src, DataCopyParams)` | NZ | Data content remains unchanged from UB to L1; input must be pre-converted to NZ format |
   | On-the-fly ND2NZ Copy | 2 | `DataCopy(ubDst, ubSrc, DataCopyParams)` + `DataCopy(l1Dst, ubNZ, DataCopyParams)` | ND | First perform ND→NZ conversion in UB by copying each C0 column block, then copy contiguously to L1 |
 
-  For API reference, see [UBToL1 Contiguous Data Copy](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/DataCopy_UBToL1_continuous.md) and [UBToL1 On-the-fly ND2NZ Copy](../../../../../docs/zh/api/SIMD-API/基础API/cube_compute_ISASI/矩阵计算的搬入/DataCopy_UBToL1_ND2NZ.md).
+  For API reference, see [UBToL1 Contiguous Data Copy](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_UBToL1_continuous.md) and [UBToL1 On-the-fly ND2NZ Copy](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_UBToL1_ND2NZ.md).
 
 - Notes on Scenario 2 Implementation:
 
@@ -72,7 +72,7 @@ This sample demonstrates data movement from UB (Unified Buffer) to L1 (L1 Buffer
 Execute the following steps in the sample root directory to build and run the sample.
 
 - Set Environment Variables
-  Configure environment variables according to the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit on your environment.
+  Configure environment variables according to the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on your environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

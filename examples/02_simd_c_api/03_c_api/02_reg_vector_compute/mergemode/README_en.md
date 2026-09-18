@@ -1,13 +1,13 @@
-﻿# mergemode Example
+# mergemode Example
 
 ## Overview
-This example verifies the behavior characteristics of the MaskMergeMode::MERGING mode based on the C API programming interface, demonstrating the mechanism where inactive mask bits preserve the original value of dst vector data register. The [asc_copy](../../../../../docs/zh/api/SIMD-API/C-API/reg/reg_load/asc_copy.md) API is used for verification.
+This example verifies the behavior characteristics of the MaskMergeMode::MERGING mode based on the C API programming interface, demonstrating the mechanism where inactive mask bits preserve the original value of dst vector data register. The [asc_copy](../../../../../docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md) API is used for verification.
 
 ## Supported Products and CANN Versions
 
 | Product | CANN Version |
 | --- | --- |
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
 ```
@@ -47,12 +47,12 @@ This example verifies the behavior characteristics of the MaskMergeMode::MERGING
 ## Build and Run
 Run the following steps in the root directory of this example to build and run it.
 - Configure environment variables
-  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit on the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
+  > **Note:** `${install_path}` is the CANN package installation directory. The default is `/usr/local/Ascend` for the root user and `${HOME}/Ascend` for non-root users.
 
 - Run the example
 

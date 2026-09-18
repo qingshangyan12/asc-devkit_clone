@@ -4,12 +4,11 @@
 
 本样例以Add计算为载体，展示Ascend C程序在CAmodel仿真模式下的编译、运行、结果校验与性能数据采集流程。用户可通过`msopprof simulator`获取仿真性能数据，用于分析性能瓶颈，提升性能分析效率。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-- \>= CANN 9.1.0
+| 产品 | CANN软件版本 |
+|---|---|
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -56,7 +55,7 @@
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
+  > **说明：** `${install_path}`为CANN包安装目录，未指定安装目录时默认安装至`/usr/local/Ascend`下。
 
 - 样例执行
 

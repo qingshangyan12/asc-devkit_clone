@@ -17,9 +17,9 @@ This example uses addition to introduce performance tuning methods based on stat
 
 | Product | CANN Version |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.0.0 |
-| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.2.0 |
+| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -607,7 +607,7 @@ The reasons why the Ascend 950 Series does not reach the theoretical vector dura
   - `6`: Double buffer + L2Cache bypass + Bank Conflict avoidance
 
 - Configure environment variables  
-  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -657,7 +657,7 @@ The reasons why the Ascend 950 Series does not reach the theoretical vector dura
 
 This interface provides formatted output function in CPU domain/NPU domain debugging scenarios.
 
-In the implementation code on the operator kernel side, call the [printf](../../../../../docs/zh/api/Utils-API/调测接口/printf.md) interface to print relevant content.
+In the implementation code on the operator kernel side, call the [printf](../../../../../docs/zh/api/Utils-API/tuning_interface/printf.md) interface to print relevant content.
 
 Examples are as follows:
 
@@ -669,9 +669,9 @@ AscendC::printf("add blockIdx=%d\n", AscendC::GetBlockIdx());
 
 ### DumpTensor
 
-For operators developed based on the operator project, you can use this interface Dump to specify the contents of [LocalTensor](../../../../../docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor/LocalTensor简介.md). It also supports printing of customized additional information (only uint32\_t data type information is supported), such as printing the current line number, etc.
+For operators developed based on the operator project, you can use this interface Dump to specify the contents of [LocalTensor](../../../../../docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/LocalTensor_intro.md). It also supports printing of customized additional information (only uint32\_t data type information is supported), such as printing the current line number, etc.
 
-In the operator kernel side implementation code, where Tensor data needs to be printed, call the [DumpTensor](../../../../../docs/zh/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md) interface to print relevant content. An example is as follows:
+In the operator kernel side implementation code, where Tensor data needs to be printed, call the [DumpTensor](../../../../../docs/zh/api/SIMD-API/basic_api/debug_interface/onboard_print/DumpTensor.md) interface to print relevant content. An example is as follows:
 
 ```cpp
 // Vector calculation: z = x + y

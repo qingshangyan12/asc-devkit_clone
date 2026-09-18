@@ -66,7 +66,8 @@ if(NOT "${DPRODUCT_SIDE}" STREQUAL "device")
     DIRECTORY ${ASCENDC_INCLUDE_DIR}/adv_api/
     DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/adv_api/
     ${INSTALL_OPTIONAL} COMPONENT asc-devkit
-    REGEX "hccl/internal" EXCLUDE)
+    REGEX "hccl/internal" EXCLUDE
+    PATTERN "experimental" EXCLUDE)
 
   install(
     FILES
@@ -98,6 +99,7 @@ endif()
 
 if (BUILD_OPEN_PROJECT)
     add_subdirectory(detail/hccl/cc)
+    include(${PROJECT_SOURCE_DIR}/cmake/third_party/asc-comm.cmake)
 endif()
 
 if(NOT BUILD_OPEN_PROJECT)

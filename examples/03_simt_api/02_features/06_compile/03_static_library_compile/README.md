@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于Gather算子，演示了将Host + Device混合.asc文件（含Kernel定义与<<<>>>内核调用）编译为**静态库（.a）**，再由Host侧.cpp链接调用的静态库编译流程。其中.asc文件的<<<>>>调用函数通过extern暴露给纯Host侧的.cpp。代码结构与调用关系如图 1 所示：
+本样例基于Gather算子，演示了将Host + Device混合.asc文件（含Kernel定义与`<<<>>>`内核调用）编译为**静态库（.a）**，再由Host侧.cpp链接调用的静态库编译流程。其中.asc文件的`<<<>>>`调用函数通过extern暴露给纯Host侧的.cpp。代码结构与调用关系如图 1 所示：
 
 <p align="center">
   <img src="./figures/static_library_compile.png" width="50%">
@@ -11,13 +11,11 @@
 图1：代码结构与调用关系
 </p>
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.1.0
+| 产品 | CANN软件版本 |
+|---|---|
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -34,7 +32,7 @@ gather算子实现了从长度为100000的一维输入向量中获取指定索�
 
 ## 静态库编译介绍
 
-通过静态库编译，`.asc` 混合文件被编译为独立的 **静态库（.a）**，Host侧 `.cpp` 通过链接该 `.a` 完成调用。
+通过静态库编译，`.asc`混合文件被编译为独立的 **静态库（.a）**，Host侧`.cpp`通过链接该`.a`完成调用。
 
 ### bisheng命令行编译
 
@@ -44,15 +42,17 @@ gather算子实现了从长度为100000的一维输入向量中获取指定索�
 bisheng -lib kernel.asc -o libkernel.a --npu-arch=dav-3510 --enable-simt
 ```
 
-其中，`--npu-arch` 为编译时指定的 AI 处理器架构，本样例仅支持 `dav-3510`，各产品型号对应的架构版本号请通过[对应关系表](../../../../../docs/zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)进行查询。`--enable-simt` 用于指定SIMT方式编译。
+其中，`--npu-arch` 为编译时指定的 AI 处理器架构，本样例仅支持 `dav-3510`，各产品型号对应的架构版本号请通过[对应关系表](../../../../../docs/zh/guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)进行查询。`--enable-simt` 用于指定SIMT方式编译。
 
-更多 bisheng 编译选项及用法说明，请参考[AI-Core算子编译基本用法](../../../../../docs/zh/guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.md)。
+更多 bisheng 编译选项及用法说明，请参考[AI-Core算子编译基本用法](../../../../../docs/zh/guide/programming_guide/compilation_and_execution/operator_compilation/ai_core_operator_compilation.md)。
 
 ### CMake方式编译
 
 在 CMake 工程中，使用 `add_library` 配置 `STATIC` 关键字即可将 `.asc` 文件编译为静态库：
 
 ```cmake
+# 启用SIMT编译模式
+set(CMAKE_ASC_ENABLE_SIMT ON)
 # 将.asc文件编译为静态库
 add_library(kernel STATIC
     kernel.asc)
@@ -91,13 +91,13 @@ add_library(kernel STATIC
     ./demo                                                          # 执行样例
     ```
 
-    使用 NPU 仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。示例如下：
+    使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。示例如下：
 
     ```bash
     cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
     ```
 
-    > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+    > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
 
 - 执行结果
 

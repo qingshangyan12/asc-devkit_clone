@@ -9,9 +9,9 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.2.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.2.0 |
 
 ## 目录结构介绍
 
@@ -173,7 +173,7 @@ if ASCEND_IS_AIC {
     CrossCoreSetFlag<2, PIPE_FIX>(SYNC_AIC_TO_AIV);  // 通知Vector
 }
 if ASCEND_IS_AIV {
-    CrossCoreWaitFlag(SYNC_AIC_TO_AIV);  // 等待Cube完成
+    CrossCoreWaitFlag<2>(SYNC_AIC_TO_AIV);  // 等待Cube完成
     // 处理数据...
     CrossCoreSetFlag<2, PIPE_MTE2>(SYNC_AIV_TO_AIC);
 }
@@ -188,16 +188,16 @@ Process函数采用**跨Group连续轮询**策略分配子块给多个Core。核
 **分块维度说明**：
 
 - **GroupM**：当前Group的M维度行数，从groupList动态读取。本样例每组GroupM=1024
-- **numBlocksM = Ceil(GroupM, SINGLE_M)**：当前Group在M方向的子块数。Atlas A2下 Ceil(1024, 128) = 8，Ascend 950PR下 Ceil(1024, 256) = 4
-- **numBlocksN = Ceil(N, SINGLE_N)**：N方向的子块数，所有Group相同。Ceil(8192, 1024) = 8
+- **numBlocksM = AscendC::Std::ceil_div(GroupM, SINGLE_M)**：当前Group在M方向的子块数。Atlas A2下 AscendC::Std::ceil_div(1024, 128) = 8，Ascend 950PR下 AscendC::Std::ceil_div(1024, 256) = 4
+- **numBlocksN = AscendC::Std::ceil_div(N, SINGLE_N)**：N方向的子块数，所有Group相同。AscendC::Std::ceil_div(8192, 1024) = 8
 
 每个Group共 `numBlocksM × numBlocksN` 个子块，通过`(mIdx, nIdx)`二维坐标定位。每个子块大小为 `[SINGLE_M, SINGLE_N]`，Cube内部按`[BASE_M, BASE_N]`粒度计算（每个子块需 `SINGLE_N/BASE_N × SINGLE_M/BASE_M` 次Iterate）。
 
 ```cpp
 for (groupIdx = 0, preCount = 0; groupIdx < GROUP_NUM; ++groupIdx) {
     groupM = groupListGlobal.GetValue(groupIdx);          // 本组行数, 本例=1024
-    numBlocksM = Ceil(groupM, SINGLE_M);                   // M方向分块数
-    numBlocksN = Ceil(N, SINGLE_N);                         // N方向分块数, 所有组相同=8
+    numBlocksM = AscendC::Std::ceil_div(groupM, SINGLE_M);                   // M方向分块数
+    numBlocksN = AscendC::Std::ceil_div(N, SINGLE_N);                         // N方向分块数, 所有组相同=8
     curCount = preCount + numBlocksM * numBlocksN;          // 含上组余数的连续编号上界
 
     // 核心分配公式：确定当前Core在本Group中的第一个块编号
@@ -349,7 +349,7 @@ workSpaceOffset = BASE_N × BASE_M × (coreIdx + (cubeTaskIdx % PIPELINE_DEPTH) 
 ```
 
 - 当`cubeTaskIdx < PIPELINE_DEPTH`时，Cube无需等待，直接写入新Slot
-- 当`cubeTaskIdx >= PIPELINE_DEPTH`时，Cube需等待Vector释放对应Slot（`CrossCoreWaitFlag(SYNC_AIV_TO_AIC)`）
+- 当`cubeTaskIdx >= PIPELINE_DEPTH`时，Cube需等待Vector释放对应Slot（`CrossCoreWaitFlag<2>(SYNC_AIV_TO_AIC)`）
 - 同步粒度为Iterate（=BASE_M×BASE_N），而非子块（=SINGLE_M×SINGLE_N）
 
 **4级流水时序**：

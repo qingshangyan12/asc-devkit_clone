@@ -4,12 +4,11 @@
 
 This example introduces the InsertHashTable operator, demonstrating a large-scale thread concurrent Global Memory access operator implementation based on SIMT.
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Software Version
-- \>= CANN 9.1.0
+| Products | CANN Versions |
+|---|---|
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -89,11 +88,11 @@ SIMT can efficiently process large amounts of data through concurrent execution 
 
 ### Multi-thread Write Conflict Problem
 
-When multiple threads operate on the same memory block, resource conflicts are inevitable. When two threads inserting keys produce a hash collision, multiple threads attempt to write data to the same position in the bucket array, so it is necessary to ensure that only one thread can obtain write permission to the bucket. In the implementation, a flag bit "flag" is added to the Bucket struct to mark the current bucket's write permission. Threads obtain bucket write permission by modifying the flag through the atomic instruction [`asc_atomic_cas()`](../../../../../../docs/zh/api/SIMT-API/原子操作/asc_atomic_cas.md).
+When multiple threads operate on the same memory block, resource conflicts are inevitable. When two threads inserting keys produce a hash collision, multiple threads attempt to write data to the same position in the bucket array, so it is necessary to ensure that only one thread can obtain write permission to the bucket. In the implementation, a flag bit "flag" is added to the Bucket struct to mark the current bucket's write permission. Threads obtain bucket write permission by modifying the flag through the atomic instruction [`asc_atomic_cas()`](../../../../../../docs/zh/api/SIMT-API/atomic_operations/asc_atomic_cas.md).
 
 ### Inter-core Data Synchronization Problem
 
-When a hash collision occurs, a thread needs to determine whether the key stored in the current bucket is the same as the key to be inserted. This requires the current thread to read data written by other threads and ensure data integrity. In the implementation, a flag bit "state" is added to the Bucket struct to identify the write status of the key value. After writing the key, the write thread sets the state flag to 1, and calls the [`asc_threadfence()`](../../../../../../docs/zh/api/SIMT-API/同步与内存栅栏/内存栅栏接口/asc_threadfence.md) interface between the two operations to ensure that when state is set to 1, the key write operation has already completed. In the read thread, a while loop polls the state value until state is set to 1, and then reads the key value.
+When a hash collision occurs, a thread needs to determine whether the key stored in the current bucket is the same as the key to be inserted. This requires the current thread to read data written by other threads and ensure data integrity. In the implementation, a flag bit "state" is added to the Bucket struct to identify the write status of the key value. After writing the key, the write thread sets the state flag to 1, and calls the [`asc_threadfence()`](../../../../../../docs/zh/api/SIMT-API/sync_and_memory_fence/memory_fence/asc_threadfence.md) interface between the two operations to ensure that when state is set to 1, the key write operation has already completed. In the read thread, a while loop polls the state value until state is set to 1, and then reads the key value.
 
 ## Operator Description
 
@@ -103,14 +102,10 @@ When a hash collision occurs, a thread needs to determine whether the key stored
 - Operator Specifications:  
   <table>
   <tr><td rowspan="1" align="center">OpType</td><td colspan="4" align="center">insert_hash_table</td></tr>
-  </tr>
   <tr><td rowspan="3" align="center">Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">keys</td><td align="center">[1,N]</td><td align="center">int64_t</td><td align="center">ND</td></tr>
   <tr><td align="center">values</td><td align="center">[N,M]</td><td align="center">float</td><td align="center">ND</td></tr>
-  </tr>
-  </tr>
   <tr><td rowspan="1" align="center">Output</td><td align="center">table_addr</td><td align="center">[1,Z]</td><td align="center">Bucket</td><td align="center">ND</td></tr>
-  </tr>
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">insert_hash_table</td></tr>
   </table>
 
@@ -124,7 +119,7 @@ When a hash collision occurs, a thread needs to determine whether the key stored
 
 Run the following steps in the root directory of this example to build and execute the operator.
 - Configure Environment Variables  
-  Configure environment variables based on the [installation method](../../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -141,10 +136,20 @@ Run the following steps in the root directory of this example to build and execu
   ./demo                        # Run the example
   ```
 
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+
   Build Options Description
 
   | Option | Values | Description |
   |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
 
   The following output indicates that the accuracy verification is successful.

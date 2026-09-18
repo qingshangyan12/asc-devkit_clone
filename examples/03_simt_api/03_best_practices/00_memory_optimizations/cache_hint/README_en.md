@@ -4,13 +4,11 @@
 
 This example uses table-lookup sin computation to demonstrate data cache optimization strategies in the Ascend C SIMT programming model. The example includes 1 baseline version and 1 optimized version. In the baseline version, all data is loaded using the default method, and input, output, and sin table data compete for DCache space. The optimized version specifies different cache strategies for different types of data, ensuring that the frequently accessed sin lookup table remains resident in DCache, reducing Global Memory access count, demonstrating the data cache optimization tuning path in the SIMT programming model.
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Software Version
-
-- \>= CANN 9.1.0
+| Product | CANN Version |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -19,7 +17,8 @@ This example uses table-lookup sin computation to demonstrate data cache optimiz
 │   ├── CMakeLists.txt              // CMake build file
 │   ├── data_cache_hint.asc         // SIMT data cache example implementation
 │   ├── figures                     // Image resources for README
-│   └── README.md
+│   ├── README.md                   // Sample documentation
+│   └── README_en.md                // English sample documentation
 ```
 
 ## Example Description
@@ -72,12 +71,12 @@ In this example, to demonstrate performance differences, a scenario with 32KB DC
 
 By default, loaded data is retained in DCache. During computation, some hot data is used multiple times by multiple threads, while other data is used only once during computation. This type of data does not need caching and should not compete with hot data for DCache space.
 
-- **`asc_ldcg`**: Loads data from Global Memory, suitable for input data that is traversed only once, reducing its occupation of DCache space
-- **`asc_ldca`**: Loads data preferentially from DCache, suitable for hot data that requires frequent access (such as lookup tables), ensuring hot data remains resident in DCache and reducing reloads from Global Memory
-- **`asc_stcg`**: Stores data directly to Global Memory space, suitable for data written to GM that will not be used again, avoiding unnecessary cache usage and preventing output data from occupying DCache space and affecting hot data caching
-- Input data is loaded directly from GM via `asc_ldcg`, not cached in DCache
-- sin_table data is preferentially loaded from DCache via `asc_ldca`, ensuring it remains resident in DCache
-- Output data is written directly to GM via `asc_stcg`, bypassing DCache caching
+- **`asc_ldcg()`**: Loads data from Global Memory, suitable for input data that is traversed only once, reducing its occupation of DCache space
+- **`asc_ldca()`**: Loads data preferentially from DCache, suitable for hot data that requires frequent access (such as lookup tables), ensuring hot data remains resident in DCache and reducing reloads from Global Memory
+- **`asc_stcg()`**: Stores data directly to Global Memory space, suitable for data written to GM that will not be used again, avoiding unnecessary cache usage and preventing output data from occupying DCache space and affecting hot data caching
+- Input data is loaded directly from GM via `asc_ldcg()`, not cached in DCache
+- sin_table data is preferentially loaded from DCache via `asc_ldca()`, ensuring it remains resident in DCache
+- Output data is written directly to GM via `asc_stcg()`, bypassing DCache caching
 
 Since sin_table is 32KB in size, it can be cached in DCache without being evicted. Hot data continues to reside in DCache, reducing repeated loading of sin_table data from GM to DCache.
 
@@ -146,9 +145,9 @@ Optimization direction: When loading input and output, do not cache in DCache, e
 **Optimization Goal**: Differentiate cache strategies for different data through memory access functions, ensuring the sin lookup table remains resident in DCache, reducing GM access count, and lowering end-to-end latency
 
 **Core Optimization**:
-- Use `asc_ldcg` to read data: each input data element is accessed only once, no DCache needed
-- Use `asc_ldca` to read sin table data: the sin table is hot data requiring frequent access, ensuring data remains resident in DCache
-- Use `asc_stcg` to write data: output data written to GM is not used again, no DCache needed
+- Use `asc_ldcg()` to read data: each input data element is accessed only once, no DCache needed
+- Use `asc_ldca()` to read sin table data: the sin table is hot data requiring frequent access, ensuring data remains resident in DCache
+- Use `asc_stcg()` to write data: output data written to GM is not used again, no DCache needed
 
 **Key Code**:
 
@@ -183,8 +182,6 @@ asc_stcg(&output[idx], y);
 
 ## Performance Comparison Summary
 
-### Ascend 950PR Performance Data
-
 **Overall Optimization Effect**:
 - From Case 0 baseline to Case 1 optimized version, Task Duration decreases from 56.82us to 50.895us, a reduction of approximately 10.4%
 - DCache Read GM decreases from 5064 to 3531, a reduction of approximately 30.2%, eliminating 1533 Global Memory accesses
@@ -197,21 +194,21 @@ asc_stcg(&output[idx], y);
 ## Tuning Recommendations
 
 1. **Identify hot data**: In table-lookup operators, the lookup table is frequently accessed hot data and should be prioritized for DCache residency.
-2. **Differentiate data access patterns**: For data accessed only once (such as input data), use `asc_ldcg` to avoid occupying DCache space; for data requiring frequent access (such as lookup tables), use `asc_ldca` to preferentially allocate cache space.
-3. **Avoid output data occupying cache**: For output data that is not read after writing, use `asc_stcg` to avoid occupying DCache space.
+2. **Differentiate data access patterns**: For data accessed only once (such as input data), use `asc_ldcg()` to avoid occupying DCache space; for data requiring frequent access (such as lookup tables), use `asc_ldca()` to preferentially allocate cache space.
+3. **Avoid output data occupying cache**: For output data that is not read after writing, use `asc_stcg()` to avoid occupying DCache space.
 4. **Monitor the DCache Read GM metric**: The reduction in DCache Read GM count directly reflects improved cache hit rate and reduced Global Memory access latency.
 
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and execute the example.
 - Configure Environment Variables  
-  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
 
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
+  > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, it defaults to `/usr/local/Ascend`.
 
 - Run the Example
 
@@ -224,10 +221,20 @@ Run the following steps in the root directory of this example to build and execu
   ./data_cache_hint                    # Run the example
   ```
 
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+
 - Build Options Description
 
   | Option                        | Values        | Description                                                |
   |---------------------------|------------|---------------------------------------------------|
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
   | `SCENARIO_NUM`            | `0`-`1`    | Example type, default is 0; 0: baseline version, 1: data cache optimized version                 |
 
@@ -237,7 +244,11 @@ Run the following steps in the root directory of this example to build and execu
   [Success] Case accuracy is verification passed.
   ```
 
-## Performance Analysis
+## Performance Debugging
+
+### Introduction to the msOpProf Tool
+
+`msOpProf` is a single-operator performance analysis tool. It offers two usage methods: `msopprof` and `msopprof simulator`. The tool helps users identify anomalies in operator memory, operator code, and operator instructions, enabling comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and different file types (executables or operator binary `.o` files).
 
 Use the `msOpProf` tool to collect detailed performance data:
 

@@ -120,7 +120,7 @@ __aicore__ inline void CompareNegZero(Reg::MaskReg& filterMask, Reg::RegTensor<f
 {
     Reg::RegTensor<uint32_t> tmpReg;
     Reg::ShiftRights(tmpReg, (Reg::RegTensor<uint32_t>&)srcReg, COMPARE_ZERO_OFFSET, mask);
-#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
+#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5162))
     Reg::CompareScalar<uint32_t, CMPMODE::EQ>(filterMask, tmpReg, 0, mask);
 #else
     Reg::CompareScalar<uint32_t, CMPMODE::EQ>(filterMask, tmpReg, 0.0f, mask);
@@ -675,8 +675,8 @@ __simd_callee__ inline void GetPowFIntrinsicCore(
     Reg::RegTensor<float> tmpReg;
     Reg::Abs(tmpReg, baseReg, mask);
     Reg::Ln(tmpReg, tmpReg, mask);
-    Reg::Mul(dstReg, expReg, tmpReg, mask);
-    Reg::Exp(dstReg, dstReg, mask);
+    Reg::Mul(tmpReg, expReg, tmpReg, mask);
+    Reg::Exp(dstReg, tmpReg, mask);
 }
 
 template <typename T>

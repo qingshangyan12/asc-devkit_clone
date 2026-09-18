@@ -9,10 +9,10 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
-    "impl/tensor_api/arch/vector/ub_to_l1/copy_impl/instruction.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
+#pragma message( \
+    "impl/tensor_api/arch/vector/ub_to_l1/copy_impl/instruction.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"tensor_api/tensor.h\"\" and use public functions or variables defined in interface headers files.")
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_L1_COPY_IMPL_INSTRUCTION_H
 #endif
 
 /*!
@@ -22,40 +22,34 @@
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_L1_COPY_IMPL_INSTRUCTION_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_L1_COPY_IMPL_INSTRUCTION_H
 
-#include "impl/tensor_api/tensor/pointer_pattern.h"
-#include "impl/tensor_api/tensor/tensor_impl.h"
 #include "impl/tensor_api/arch/utils/arch_utils.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-class CopyUbufToCbufInstr {
+class copy_ub_to_l1_instr {
 public:
-    template <typename T, typename U, typename... Params>
-    __aicore__ inline static void DataCopy(const T& dst, const U& src, const Params&... params)
+    template <typename DataType>
+    __aicore__ inline static void data_copy(
+        __cbuf__ DataType* dst, __ubuf__ DataType* src, const uint16_t block_count, const uint16_t block_len,
+        const uint16_t src_gap, const uint16_t dst_gap)
     {
-        CopyUbufToCbuf(dst.Data().Get(), src.Data().Get(), params...);
-    }
+        TENSOR_API_DEBUG_CHECK(debug_check_block_count, block_count, "block_count", "copy_ub_to_l1 instruction");
+        TENSOR_API_DEBUG_CHECK(debug_check_block_len, block_len, debug_block_len_max, "copy_ub_to_l1 instruction");
 
-    template <typename T>
-    __aicore__ inline static void CopyUbufToCbuf(
-        __cbuf__ T* dst, __ubuf__ T* src, const uint16_t blockCount, const uint16_t blockLen, const uint16_t srcStride,
-        const uint16_t dstStride)
-    {
-        if ASCEND_IS_AIC {
-            return;
-        }
-
-        asc_copy_ub2l1(dst, src, blockCount, blockLen, srcStride, dstStride);
+        asc_copy_ub2l1(
+            reinterpret_cast<__cbuf__ void*>(dst), reinterpret_cast<__ubuf__ void*>(src), block_count, block_len,
+            src_gap, dst_gap);
     }
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_L1_COPY_IMPL_INSTRUCTION_H
 
-#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#if defined( \
+    UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_L1_COPY_IMPL_INSTRUCTION_H)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_L1_COPY_IMPL_INSTRUCTION_H
 #endif

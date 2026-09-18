@@ -1,7 +1,7 @@
-﻿# duplicate Example
+# duplicate Example
 
 ## Overview
-This example implements the Duplicate operation (scalar fill mode) based on the C API programming interface, primarily calling the [asc_duplicate_scalar](../../../../../docs/zh/api/SIMD-API/C-API/reg/data_fill/asc_duplicate_scalar.md) API.
+This example implements the Duplicate operation (scalar fill mode) based on the C API programming interface, primarily calling the [asc_duplicate_scalar](../../../../../docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_scalar.md) API.
 - The `asc_duplicate_scalar(dst vector data register, scalar, mask)` API copies a scalar value multiple times and fills it into a vector
 - The `asc_duplicate(dst vector data register, src vector data register, mask)` API copies the first element of the source vector data register multiple times and fills it into a vector
 
@@ -9,13 +9,13 @@ This example implements the Duplicate operation (scalar fill mode) based on the 
 
 | Product | CANN Version |
 | --- | --- |
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
 ```
 ├── duplicate
 │   ├── scripts
-│   │   │   ├── gen_data.py            // Ground truth data generation script
+│   │   ├── gen_data.py            // Ground truth data generation script
 │   ├── CMakeLists.txt                 // Build configuration file
 │   ├── data_utils.h                   // Data read/write functions
 │   ├── duplicate.asc                  // Ascend C example implementation & invocation example
@@ -43,12 +43,12 @@ This example implements the Duplicate operation (scalar fill mode) based on the 
 ## Build and Run
 Run the following steps in the root directory of this example to build and run it.
 - Configure environment variables
-  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit on the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
+  > **Note:** `${install_path}` is the CANN package installation directory. The default is `/usr/local/Ascend` for the root user and `${HOME}/Ascend` for non-root users.
 
 - Run the example
 

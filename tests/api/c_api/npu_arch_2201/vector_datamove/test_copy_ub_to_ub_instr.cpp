@@ -22,14 +22,14 @@ protected:
 namespace {
 
 void copy_ubuf_to_ubuf_stub(
-    __ubuf__ void* dst, __ubuf__ void* src, uint8_t sid, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap,
+    __ubuf__ void* dst, __ubuf__ void* src, uint8_t sid, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap,
     uint16_t dst_gap)
 {
     EXPECT_EQ(dst, reinterpret_cast<__ubuf__ void*>(11));
     EXPECT_EQ(src, reinterpret_cast<__ubuf__ void*>(22));
     EXPECT_EQ(sid, static_cast<uint8_t>(0));
-    EXPECT_EQ(n_burst, static_cast<uint16_t>(1));
-    EXPECT_EQ(len_burst, static_cast<uint16_t>(1));
+    EXPECT_EQ(burst_count, static_cast<uint16_t>(1));
+    EXPECT_EQ(burst_len, static_cast<uint16_t>(1));
     EXPECT_EQ(src_gap, static_cast<uint16_t>(0));
     EXPECT_EQ(dst_gap, static_cast<uint16_t>(0));
 }
@@ -41,8 +41,8 @@ TEST_F(TestAscCopyUb2Ub, asc_copy_ub2ub_normal)
     __ubuf__ void* dst = reinterpret_cast<__ubuf__ void*>(11);
     __ubuf__ void* src = reinterpret_cast<__ubuf__ void*>(22);
 
-    uint16_t n_burst = static_cast<uint64_t>(1);
-    uint16_t len_burst = static_cast<uint64_t>(1);
+    uint16_t burst_count = static_cast<uint64_t>(1);
+    uint16_t burst_len = static_cast<uint64_t>(1);
     uint16_t src_gap = static_cast<uint64_t>(0);
     uint16_t dst_gap = static_cast<uint64_t>(0);
 
@@ -50,7 +50,7 @@ TEST_F(TestAscCopyUb2Ub, asc_copy_ub2ub_normal)
         .times(1)
         .will(invoke(copy_ubuf_to_ubuf_stub));
 
-    asc_copy_ub2ub(dst, src, n_burst, len_burst, src_gap, dst_gap);
+    asc_copy_ub2ub(dst, src, burst_count, burst_len, src_gap, dst_gap);
     GlobalMockObject::verify();
 }
 
@@ -112,7 +112,9 @@ void vcopy_stub(
         __ubuf__ data_type* dst = reinterpret_cast<__ubuf__ data_type*>(11);                                        \
         __ubuf__ data_type* src = reinterpret_cast<__ubuf__ data_type*>(22);                                        \
         uint32_t size = static_cast<uint32_t>(256 / sizeof(data_type));                                             \
-        MOCKER_CPP(asc_sync_post_process).times(sync_times);                                                        \
+        MOCKER_CPP(pipe_barrier, void(pipe_t)).times(sync_times).will(invoke(+[](pipe_t pipe) {                     \
+            EXPECT_EQ(static_cast<int>(pipe), static_cast<int>(pipe_t::PIPE_ALL));                                  \
+        }));                                                                                                        \
         MOCKER_CPP(                                                                                                 \
             vcopy, void(__ubuf__ data_type*, __ubuf__ data_type*, uint8_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
             .times(1)                                                                                               \
@@ -126,7 +128,7 @@ void vcopy_stub(
     {                                                                                                               \
         __ubuf__ data_type* dst = reinterpret_cast<__ubuf__ data_type*>(11);                                        \
         __ubuf__ data_type* src = reinterpret_cast<__ubuf__ data_type*>(22);                                        \
-        MOCKER_CPP(asc_sync_post_process).times(0);                                                                 \
+        MOCKER_CPP(pipe_barrier, void(pipe_t)).times(0);                                                            \
         MOCKER_CPP(                                                                                                 \
             vcopy, void(__ubuf__ data_type*, __ubuf__ data_type*, uint8_t, uint16_t, uint16_t, uint16_t, uint16_t)) \
             .times(1)                                                                                               \

@@ -12,12 +12,7 @@
 #include "ins_temp_all_gather_mesh_1D.h"
 #include "ins_temp_all_gather_nhr.h"
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
-#include "ccu_temp_all_gather_mesh_1D_mem2mem.h"
-#include "ccu_temp_all_gather_mesh_1D.h"
-#include "ccu_temp_all_gather_nhr_1D_mem2mem.h"
-#include "ccu_temp_all_gather_2dies_mesh_1d_mem2mem.h"
-#include "ccu_temp_all_gather_2dies_mesh_1D.h"
-#include "ccu_temp_all_gather_nhr_1D_multi_jetty_mem2mem.h"
+#include "ccu_temp_kfc_all_gather_mesh_1D_mem2mem.h"
 #endif
 #include "topo_match_ubx.h"
 #include <cstddef>
@@ -46,7 +41,7 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcRes(
     std::shared_ptr<InsAlgTemplate> algTemplate =
         std::make_shared<InsAlgTemplate>(param, topoInfo->userRank, algHierarchyInfo.infos[0]);
     // 调用计算资源的函数
-    algTemplate->CalcRes(comm, param, topoInfo, resourceRequest);
+    CHK_RET(algTemplate->CalcRes(comm, param, topoInfo, resourceRequest));
     myRank_ = topoInfo->userRank;
     HCCL_DEBUG(
         "[InsV2AllGatherSoleExecutor][CalcRes] myRank[%u], notifyNumOnMainThread[%u], slaveThreadNum[%u], "
@@ -90,7 +85,7 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     CHK_PRT_RET(
         ret != HCCL_SUCCESS,
         HCCL_ERROR(
-            "[InsV2AllGatherSoleExecutor][Orchestrate]errNo[0x%016llx] All Gather excutor kernel run failed",
+            "[InsV2AllGatherSoleExecutor][Orchestrate]errNo[0x%016llx] All Gather executor kernel run failed",
             HCCL_ERROR_CODE(ret)),
         ret);
     return HCCL_SUCCESS;
@@ -179,6 +174,14 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
             "tempAlgParams.buffInfo.outBuffBaseOff [%u]",
             myRank_, loop, tempAlgParams.buffInfo.inBuffBaseOff, tempAlgParams.buffInfo.outBuffBaseOff);
 
+        HCCL_INFO(
+            "[KFCAG_DEBUG][OrchestrateLoop] rank[%u] loop[%llu] dataCount[%llu] dataTypeSize[%llu] "
+            "strideCount[%llu] dataSize[%llu] currDataCount[%llu] sliceSize[%llu] outputSliceStride[%llu] "
+            "inBuffBaseOff[%llu] outBuffBaseOff[%llu] repeatNum[%llu]",
+            myRank_, loop, dataCount_, dataTypeSize_, strideCount_, dataSize_, currDataCount, tempAlgParams.sliceSize,
+            tempAlgParams.outputSliceStride, tempAlgParams.buffInfo.inBuffBaseOff,
+            tempAlgParams.buffInfo.outBuffBaseOff, tempAlgParams.repeatNum);
+
         CHK_RET(algTemplate.KernelRun(param, tempAlgParams, templateAlgRes));
         processedDataCount += currDataCount;
     }
@@ -191,39 +194,14 @@ REGISTER_EXEC_V2(
     InsTempAllGatherMesh1D);
 
 REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherNHR, InsV2AllGatherSoleExecutor, TopoMatch1D, InsTempAllGatherNHR);
+    HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherSoleNHR, InsV2AllGatherSoleExecutor, TopoMatch1D,
+    InsTempAllGatherNHR);
 
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
-REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherMesh1DMem2Mem, InsV2AllGatherSoleExecutor, TopoMatch1D,
-    CcuTempAllGatherMesh1DMem2Mem);
 
 REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherMesh1D, InsV2AllGatherSoleExecutor, TopoMatch1D,
-    CcuTempAllGatherMesh1D);
+    HcclCMDType::HCCL_CMD_ALLGATHER, CcuSchedAllGatherSoleMesh, InsV2AllGatherSoleExecutor, TopoMatch1D,
+    CcuTempKfcAllGatherMesh1DMem2Mem);
 
-REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherNHR1DMem2Mem, InsV2AllGatherSoleExecutor, TopoMatch1D,
-    CcuTempAllGatherNHR1DMem2Mem);
-
-REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_ALLGATHER, CcuKernelAllGather2DiesMeshMem2Mem1D, InsV2AllGatherSoleExecutor, TopoMatch1D,
-    CcuTempAllGather2DiesMeshMem2Mem1D);
-
-REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_ALLGATHER, CcuKernelAllGather2DiesMesh1D, InsV2AllGatherSoleExecutor, TopoMatch1D,
-    CcuTempAllGather2DiesMesh1D);
-
-REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherMesh1DUBX, InsV2AllGatherSoleExecutor, TopoMatchUBX,
-    CcuTempAllGatherMesh1D);
-
-REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherNHR1DMem2MemUBX, InsV2AllGatherSoleExecutor, TopoMatchUBX,
-    CcuTempAllGatherNHR1DMem2Mem);
-
-REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherMesh1DMem2MemUBX, InsV2AllGatherSoleExecutor, TopoMatchUBX,
-    CcuTempAllGatherMesh1DMem2Mem);
 #endif
 } // namespace mc2_ops_hccl

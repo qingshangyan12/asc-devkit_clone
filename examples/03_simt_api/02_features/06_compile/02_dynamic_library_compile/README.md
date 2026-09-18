@@ -11,13 +11,11 @@
 图1：代码结构与调用关系
 </p>
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.1.0
+| 产品 | CANN软件版本 |
+|---|---|
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -44,15 +42,17 @@ gather算子实现了从长度为100000的一维输入向量中获取指定索�
 bisheng -shared kernel.asc -o libkernel.so -fPIC --npu-arch=dav-3510 --enable-simt
 ```
 
-其中，`--npu-arch` 为编译时指定的AI处理器架构，本样例仅支持 `dav-3510`，各产品型号对应的架构版本号请通过[对应关系表](../../../../../docs/zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)进行查询。`--enable-simt` 用于指定SIMT方式编译。
+其中，`--npu-arch` 为编译时指定的AI处理器架构，本样例仅支持 `dav-3510`，各产品型号对应的架构版本号请通过[对应关系表](../../../../../docs/zh/guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)进行查询。`--enable-simt` 用于指定SIMT方式编译。
 
-更多 bisheng 编译选项及用法说明，请参考[AI-Core算子编译基本用法](../../../../../docs/zh/guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.md)。
+更多 bisheng 编译选项及用法说明，请参考[AI-Core算子编译基本用法](../../../../../docs/zh/guide/programming_guide/compilation_and_execution/operator_compilation/ai_core_operator_compilation.md)。
 
 ### CMake方式编译
 
 在 CMake 工程中，使用 `add_library` 配置 `SHARED` 关键字即可将 `.asc` 文件编译为动态共享库：
 
 ```cmake
+# 启用SIMT编译模式
+set(CMAKE_ASC_ENABLE_SIMT ON)
 # 将.asc文件编译为动态共享库
 add_library(gather_kernel SHARED
     gather_kernel.asc
@@ -93,13 +93,13 @@ add_library(gather_kernel SHARED
     ./demo                                                          # 执行样例
     ```
 
-    使用 NPU 仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。示例如下：
+    使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。示例如下：
 
     ```bash
     cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
     ```
 
-    > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+    > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
 
 - 执行结果
 

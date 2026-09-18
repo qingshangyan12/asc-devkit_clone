@@ -2,15 +2,13 @@
 
 ## 概述
 
-本样例以Sobel边缘检测为例，展示了如何通过Warp shuffle指令复用相邻线程加载的数据来完成 3×3 卷积计算，以及结合[asc_ballot()](../../../../../../docs/zh/api/SIMT-API/Warp函数/Warp-Vote类函数/asc_ballot.md)实现边缘像素的紧凑输出。
+本样例以Sobel边缘检测为例，展示了如何通过Warp shuffle指令复用相邻线程加载的数据来完成 3×3 卷积计算，以及结合[asc_ballot()](../../../../../../docs/zh/api/SIMT-API/Warp_functions/Warp_vote_functions/asc_ballot.md)实现边缘像素的紧凑输出。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.1.0
+| 产品 | CANN软件版本 |
+|---|---|
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -78,13 +76,13 @@ int y = warp_id / tiles_x;                          // 像素行号：第几行W
 </p>
 
 
-如上图所示，计算Sobel幅值需要获取当前像素周围3×3邻域共9个像素值。而相邻线程计算各自的Sobel幅值时，同样需要其周围3×3邻域的像素值，因此不同线程的3×3邻域存在重叠。利用这一特点，每个线程先从Global Memory读取同一x坐标上的上、中、下三个像素值，分别保存到寄存器变量top、mid和bot，对应当前像素3×3邻域的中间一列；然后通过[asc_shfl_up()](../../../../../../docs/zh/api/SIMT-API/Warp函数/Warp-Shfl类函数/asc_shfl_up.md)和[asc_shfl_down()](../../../../../../docs/zh/api/SIMT-API/Warp函数/Warp-Shfl类函数/asc_shfl_down.md)从相邻线程的寄存器中获取左右两列数据，避免再次从Global Memory读取。
+如上图所示，计算Sobel幅值需要获取当前像素周围3×3邻域共9个像素值。而相邻线程计算各自的Sobel幅值时，同样需要其周围3×3邻域的像素值，因此不同线程的3×3邻域存在重叠。利用这一特点，每个线程先从Global Memory读取同一x坐标上的上、中、下三个像素值，分别保存到寄存器变量top、mid和bot，对应当前像素3×3邻域的中间一列；然后通过[asc_shfl_up()](../../../../../../docs/zh/api/SIMT-API/Warp_functions/Warp_shfl_functions/asc_shfl_up.md)和[asc_shfl_down()](../../../../../../docs/zh/api/SIMT-API/Warp_functions/Warp_shfl_functions/asc_shfl_down.md)从相邻线程的寄存器中获取左右两列数据，避免再次从Global Memory读取。
 
 
 
 ```cpp
 // 每个线程先读取当前像素所在列的上、中、下三个像素。
-// in_image标识当前线程坐标是否在图像有效范围内（非边界像素），为false时像素值置0。
+// in_image标识当前线程坐标是否在图像有效范围内，为false时像素值置0。
 int top = in_image ? input[(y - 1) * width + x] : 0;
 int mid = in_image ? input[y * width + x] : 0;
 int bot = in_image ? input[(y + 1) * width + x] : 0;
@@ -114,7 +112,7 @@ int bot_right = (lane_id == 31) ? input[(y + 1) * width + (x + 1)] : shfl_bot_ri
 
 **asc_ballot实现紧凑输出**
 
-紧凑输出需要将满足阈值条件的边缘像素连续写入edge_list。对于同一个Warp，可能只有部分线程的边缘幅值满足阈值条件，如果每个边缘线程都单独执行[asc_atomic_add()](../../../../../../docs/zh/api/SIMT-API/原子操作/asc_atomic_add.md)申请输出位置，一个Warp内最多会产生32次原子操作。
+紧凑输出需要将满足阈值条件的边缘像素连续写入edge_list。对于同一个Warp，可能只有部分线程的边缘幅值满足阈值条件，如果每个边缘线程都单独执行[asc_atomic_add()](../../../../../../docs/zh/api/SIMT-API/atomic_operations/asc_atomic_add.md)申请输出位置，一个Warp内最多会产生32次原子操作。
 
 本样例使用`asc_ballot()`收集Warp内各线程是否满足阈值条件，并生成edge_mask。edge_mask中第i位为1，表示Warp内的第i号线程的边缘幅值满足阈值条件：
 
@@ -124,10 +122,10 @@ uint32_t edge_mask = asc_ballot(strength >= THRESHOLD);
 
 edge_mask用于完成两个操作：
 
-- 第0号线程通过[__popc(edge_mask)](../../../../../../docs/zh/api/SIMT-API/数学函数/整型数学库函数/__popc.md)统计本Warp内边缘线程数量，并通过一次`asc_atomic_add()`为整个Warp申请连续输出位置。
+- 第0号线程通过[__popc(edge_mask)](../../../../../../docs/zh/api/SIMT-API/math_functions/integer_math_functions/__popc.md)统计本Warp内边缘线程数量，并通过一次`asc_atomic_add()`为整个Warp申请连续输出位置。
 - 每个边缘线程根据edge_mask计算自己在Warp内的局部偏移，写入edge_list中的对应位置。
 
-第0号线程申请输出位置后，通过[asc_shfl()](../../../../../../docs/zh/api/SIMT-API/Warp函数/Warp-Shfl类函数/asc_shfl.md)将起始位置广播给Warp内所有线程：
+第0号线程申请输出位置后，通过[asc_shfl()](../../../../../../docs/zh/api/SIMT-API/Warp_functions/Warp_shfl_functions/asc_shfl.md)将起始位置广播给Warp内所有线程：
 
 ```cpp
 uint32_t warp_base = 0;
@@ -178,10 +176,20 @@ if (edge_mask & lanemask_eq()) {
   ./demo                                                   # 执行样例
   ```
 
+  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
+
+  示例如下：
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
+
   编译选项说明
 
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
 
   执行结果如下，说明精度对比成功。

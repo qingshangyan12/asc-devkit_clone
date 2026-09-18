@@ -64,8 +64,6 @@ This example introduces the usage of the asc_dump_xxx series APIs to enable tens
   - id: Custom identifier used to distinguish different dump data
   - dumpSize: Number of dump data elements
 
-  Notice: The `asc_dump_l1buf` API only supports Atlas A2 Training Series Products/Atlas A2 Inference Series Products/Atlas A3 Training Series Products/Atlas A3 Inference Series Products.
-
 - Invocation implementation
 
   Use the kernel launch syntax <<<>>> to call the kernel function.
@@ -74,7 +72,7 @@ This example introduces the usage of the asc_dump_xxx series APIs to enable tens
 
 Run the following steps in the root directory of this example to build and run the example.
 - Configure environment variables
-  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit on the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

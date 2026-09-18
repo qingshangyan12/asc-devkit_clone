@@ -1,7 +1,7 @@
-﻿# arange样例
+# arange样例
 
 ## 概述
-本样例基于C API编程接口实现Arange运算，主要调用[asc_arange](../../../../../docs/zh/api/SIMD-API/C-API/reg/index_operate/asc_arange.md)接口。
+本样例基于C API编程接口实现Arange运算，主要调用[asc_arange](../../../../../docs/zh/api/SIMD-API/c_api/reg_compute/reg_index/asc_arange.md)接口。
 - asc_arange接口以传入的标量值为起始值，生成递增/递减的索引序列
 - 本样例以递增模式为例，起始值为0
 
@@ -9,13 +9,13 @@
 
 | 产品 | CANN软件版本 |
 | --- | --- |
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## 目录结构介绍
 ```
 ├── arange
 │   ├── scripts
-│   │   │   ├── gen_data.py            // 真值数据生成脚本
+│   │   ├── gen_data.py            // 真值数据生成脚本
 │   ├── CMakeLists.txt                 // 编译工程文件
 │   ├── data_utils.h                   // 数据读入写出函数
 │   ├── arange.asc                     // AscendC样例实现 & 调用样例
@@ -53,7 +53,7 @@
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
+  > **说明：** `${install_path}`为CANN包安装目录；root用户默认为`/usr/local/Ascend`，非root用户默认为`${HOME}/Ascend`。
 
 - 样例执行
 

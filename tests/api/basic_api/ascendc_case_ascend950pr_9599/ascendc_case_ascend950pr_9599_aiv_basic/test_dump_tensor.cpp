@@ -12,6 +12,7 @@
 #include <mockcpp/mockcpp.hpp>
 #include <vector>
 #include "kernel_operator.h"
+#include "utils/debug/asc_dump.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) && !defined(ASCENDC_CPU_DEBUG)
 #include "impl/utils/debug/npu_arch_3510/asc_aicore_dump_utils.h"
@@ -199,6 +200,53 @@ TEST_F(TestDumpTensorSuite, InitDumpNullStartAddrReturns)
     EXPECT_EQ(AscendC::g_dumpWorkspaceReserved, nullptr);
 }
 
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+TEST_F(TestDumpTensorSuite, SimdVfDumpCpuFallbacks)
+{
+    constexpr uint32_t desc = 630;
+    constexpr uint32_t dumpSize = 1;
+    uint32_t ubInput[1] = {0};
+    vector_u32 regInput = {};
+
+#ifndef NDEBUG
+    EXPECT_DEATH(asc_dump_ubuf<uint32_t>(ubInput, desc, dumpSize), "asc_dump_ubuf is not supported in cpu mode");
+    EXPECT_DEATH(
+        __asc_simd_vf::asc_dump_ubuf<uint32_t>(ubInput, desc, dumpSize), "asc_dump_ubuf is not supported in cpu mode");
+    EXPECT_DEATH(asc_dump_reg<uint32_t>(regInput, desc, dumpSize), "asc_dump_reg is not supported in cpu mode");
+    EXPECT_DEATH(
+        __asc_simd_vf::asc_dump_reg<uint32_t>(regInput, desc, dumpSize), "asc_dump_reg is not supported in cpu mode");
+    EXPECT_DEATH(asc_dump<uint32_t>(ubInput, desc, dumpSize), "asc_dump is not supported in cpu mode");
+    EXPECT_DEATH(__asc_simd_vf::asc_dump<uint32_t>(ubInput, desc, dumpSize), "asc_dump is not supported in cpu mode");
+    EXPECT_DEATH(asc_dump<uint32_t>(regInput, desc, dumpSize), "asc_dump is not supported in cpu mode");
+    EXPECT_DEATH(__asc_simd_vf::asc_dump<uint32_t>(regInput, desc, dumpSize), "asc_dump is not supported in cpu mode");
+#else
+    asc_dump_ubuf<uint32_t>(ubInput, desc, dumpSize);
+    __asc_simd_vf::asc_dump_ubuf<uint32_t>(ubInput, desc, dumpSize);
+    asc_dump_reg<uint32_t>(regInput, desc, dumpSize);
+    __asc_simd_vf::asc_dump_reg<uint32_t>(regInput, desc, dumpSize);
+    asc_dump<uint32_t>(ubInput, desc, dumpSize);
+    __asc_simd_vf::asc_dump<uint32_t>(ubInput, desc, dumpSize);
+    asc_dump<uint32_t>(regInput, desc, dumpSize);
+    __asc_simd_vf::asc_dump<uint32_t>(regInput, desc, dumpSize);
+#endif
+}
+
+TEST_F(TestDumpTensorSuite, AicoreDumpCpuFallbacksRemainAvailable)
+{
+    uint32_t input[1] = {0};
+
+#ifndef NDEBUG
+    EXPECT_DEATH(__asc_aicore::asc_dump_ubuf<uint32_t>(input, 0, 1), "asc_dump_ubuf is not supported in cpu mode");
+    EXPECT_DEATH(__asc_aicore::asc_dump<uint32_t>(input, 0, 1), "asc_dump is not supported in cpu mode");
+    EXPECT_DEATH(asc_dump_gm<uint32_t>(input, 0, 1), "asc_dump_gm is not supported in cpu mode");
+#else
+    __asc_aicore::asc_dump_ubuf<uint32_t>(input, 0, 1);
+    __asc_aicore::asc_dump<uint32_t>(input, 0, 1);
+    asc_dump_gm<uint32_t>(input, 0, 1);
+#endif
+}
+#endif
+
 #if defined(ASCENDC_TEST_HAS_SIMD_VF_DUMP_POSITION)
 TEST_F(TestDumpTensorSuite, AscDumpUbufWritesUbPosition)
 {
@@ -225,5 +273,33 @@ TEST_F(TestDumpTensorSuite, AscDumpRegWritesRegPosition)
     EXPECT_EQ(dumpTlv->position, static_cast<uint16_t>(__asc_simd_vf::DumpTensorPosition::REG));
     EXPECT_EQ(dumpTlv->desc, TEST_SIMD_VF_DUMP_DESC);
     EXPECT_EQ(dumpTlv->blockIdx, TEST_SIMD_VF_BLOCK_IDX);
+}
+
+TEST_F(TestDumpTensorSuite, AscDumpRegClampsOversizedRequestToOneVectorLength)
+{
+    BlockVFBufInfo blockInfo;
+    auto* dumpTlv = GetSimdVfDumpTlv(blockInfo);
+    vector_u32 input = {};
+    constexpr uint32_t requestedSize = 65;
+    constexpr uint32_t maxSize = 64;
+
+    __asc_simd_vf::asc_dump_reg<uint32_t>(input, TEST_SIMD_VF_DUMP_DESC, requestedSize);
+
+    EXPECT_EQ(dumpTlv->dumpSize, maxSize * sizeof(uint32_t));
+    EXPECT_EQ(blockInfo.flag, 0);
+}
+
+TEST_F(TestDumpTensorSuite, AscDumpUbufKeepsRequestedSizeBeyondOneVectorLength)
+{
+    BlockVFBufInfo blockInfo;
+    auto* dumpTlv = GetSimdVfDumpTlv(blockInfo);
+    uint32_t input[65] = {};
+    constexpr uint32_t requestedSize = 65;
+
+    __asc_simd_vf::asc_dump_ubuf<uint32_t>(
+        reinterpret_cast<__ubuf__ uint32_t*>(input), TEST_SIMD_VF_DUMP_DESC, requestedSize);
+
+    EXPECT_EQ(dumpTlv->dumpSize, requestedSize * sizeof(uint32_t));
+    EXPECT_EQ(blockInfo.flag, 0);
 }
 #endif

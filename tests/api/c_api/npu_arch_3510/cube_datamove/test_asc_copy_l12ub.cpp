@@ -46,7 +46,7 @@ TEST_F(TestCubeDmamoveCopyL12UBCAPI, c_api_asc_copy_l12ub_Succ)
 {
     __ubuf__ void* dst = reinterpret_cast<__ubuf__ void*>(1);
     __cbuf__ void* src = reinterpret_cast<__cbuf__ void*>(2);
-    bool sub_blockid = false;
+    int8_t sub_blockid = 0;
     uint16_t n_burst = 3;
     uint16_t len_burst = 4;
     uint16_t src_gap_size = 5;

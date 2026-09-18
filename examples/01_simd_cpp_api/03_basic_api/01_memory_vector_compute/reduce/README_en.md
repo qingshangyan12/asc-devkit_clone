@@ -4,15 +4,15 @@
 
 This example describes how to call the `ReduceRepeat<SUM>` and `ReduceDataBlock<SUM>` basic APIs to implement the reduce operator, which accumulates data elements in contiguous memory and returns the accumulation result.
 
-Note: `ReduceRepeat` and `ReduceDataBlock` are APIs renamed in CANN 9.1.0. For CANN 9.0.0 and earlier versions, use `WholeReduceSum` and `BlockReduceSum` instead.
+Note: This example uses the renamed `ReduceRepeat` and `ReduceDataBlock` APIs. The old names are `WholeReduceSum` and `BlockReduceSum`.
 
 ## Supported Products and CANN Software Versions
 
 | Product | CANN Software Version |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.0.0 |
-| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.2.0 |
+| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -78,7 +78,7 @@ Note: `ReduceRepeat` and `ReduceDataBlock` are APIs renamed in CANN 9.1.0. For C
 Run the following steps in the root directory of this example to build and run the operator.
 
 - Configure environment variables
-  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
 
   ```bash
   source ${install_path}/cann/set_env.sh
