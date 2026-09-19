@@ -127,7 +127,8 @@ CcuResult DoAllToAll(KfcAllToAllContext& ctx)
     localDst.token = ctx.token;
     CCU_IF(ctx.sliceSize != 0)
     {
-        CCU_CHK_RET(ccu::LocalCopy(localDst, localSrc, ctx.sliceSize, ctx.localCopyEvent, 1));
+        CCU_CHK_RET(GroupCopy(ctx, localDst, localSrc, ctx.goSize));
+        CCU_CHK_RET(ccu::EventRecord(ctx.localCopyEvent, 1));
         CCU_CHK_RET(ccu::EventWait(ctx.localCopyEvent, 1));
     }
     CCU_CHK_RET(ccu::EventRecord(ctx.event, static_cast<uint16_t>(1U << ctx.rankId)));
@@ -167,6 +168,9 @@ CcuResult CcuKfcAllToAllMesh1DMultiJettyKernel(
     ctx.goSize.parallelParam = goSize2;
     ctx.goSize.residual = goSize3;
 
+    HCCL_INFO(
+        "[KFC][AllToAll][Kernel] rankId[%u], rankSize[%u], channelCount[%u], localCopy[groupCopy]", rankId, rankSize,
+        channelCount);
     CCU_CHK_RET(PreSync(ctx));
     CCU_CHK_RET(DoAllToAll(ctx));
     CCU_CHK_RET(PostSync(ctx));

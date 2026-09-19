@@ -94,8 +94,8 @@ HcclResult CcuTempKfcAllToAllMesh1DMultiJetty::KernelRun(
 
     HCCL_INFO(
         "[CcuTempKfcAllToAllMesh1DMultiJetty] inputAddr[%llu], outputAddr[%llu], sliceSize[%llu], "
-        "srcStride[%llu], srcOffset[%llu], dstOffset[%llu]",
-        inputAddr, outputAddr, sliceSize, srcStride, srcOffset, dstOffset);
+        "srcStride[%llu], srcOffset[%llu], dstOffset[%llu], goSize[%llu, %llu, %llu, %llu]",
+        inputAddr, outputAddr, sliceSize, srcStride, srcOffset, dstOffset, goSize[0], goSize[1], goSize[2], goSize[3]);
     return HCCL_SUCCESS;
 }
 

@@ -323,6 +323,7 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
                 param[KFC_A2A_MJ_LAST_SLICE_SIZE_PER_JETTY], ctx.arg->channels, ctx.arg->channelCount,
                 static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->jettyNum);
         } else if (ctx.arg->role == KfcServerRole::ALL_TO_ALL_MESH) {
+            HCCL_INFO("[KFC][AllToAll][Dispatch] route queue payload to CcuKfcAllToAllMesh1DMultiJettyKernel");
             CcuKfcAllToAllMesh1DMultiJettyKernel(
                 param[KFC_CONCURRENT_A2A_MESH_INPUT], param[KFC_CONCURRENT_A2A_MESH_OUTPUT], ctx.token,
                 param[KFC_CONCURRENT_A2A_MESH_SLICE_SIZE], param[KFC_CONCURRENT_A2A_MESH_SRC_STRIDE],
