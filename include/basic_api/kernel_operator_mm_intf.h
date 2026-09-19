@@ -338,6 +338,47 @@ __aicore__ inline void Mmad(
 #endif // __NPU_ARCH__ 2201|3510|5102
 #endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-PR2] LoadDataWithTranspose / MmadMx / BroadCast / Fill — Jessicaruan Wave1 */
+template <typename T>
+__aicore__ inline void LoadDataWithTranspose(
+    __ca__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParams);
+template <typename T>
+__aicore__ inline void LoadDataWithTranspose(
+    __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParams);
+/* V2: Tensor path only L0B — do NOT add L0A */
+template <typename T>
+__aicore__ inline void LoadDataWithTranspose(
+    __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParamsV2& loadDataParams);
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadMx(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadParams& mmadParams);
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void MmadMx(
+    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __biasbuf__ V* bias, const MmadParams& mmadParams);
+#endif // 3510 MmadMx
+
+template <typename T>
+__aicore__ inline __inout_pipe__(V) void BroadCastVecToMM(
+    __cc__ T* dst, __ubuf__ T* src, const int32_t blockCount, const uint8_t blockLen, const uint8_t srcGap,
+    const uint8_t dstGap);
+
+template <typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void Fill(__ca__ T* dst, const InitConstValueParams<U>& initConstValueParams);
+template <typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void Fill(__cb__ T* dst, const InitConstValueParams<U>& initConstValueParams);
+template <typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void Fill(__cbuf__ T* dst, const InitConstValueParams<U>& initConstValueParams);
+template <typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void InitConstValue(__ca__ T* dst, const InitConstValueParams<U>& initConstValueParams);
+template <typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void InitConstValue(__cb__ T* dst, const InitConstValueParams<U>& initConstValueParams);
+template <typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void InitConstValue(__cbuf__ T* dst, const InitConstValueParams<U>& initConstValueParams);
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
+
+
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
