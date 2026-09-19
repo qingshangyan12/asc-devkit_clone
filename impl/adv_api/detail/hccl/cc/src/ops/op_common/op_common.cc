@@ -103,8 +103,17 @@ HcclResult SetMultipleDimensionSplitRatio(HcclComm comm, OpParam& param);
 
 HcclResult GetOrCreateCcuCtx(HcclComm comm, const std::string& tag, uint64_t ctxSize, void** ctx)
 {
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[GetOrCreateCcuCtx] begin, tag[%s], engine[COMM_ENGINE_AIV], size[%llu].",
+        tag.c_str(), static_cast<unsigned long long>(ctxSize));
     uint64_t actualSize = ctxSize;
-    if (HcclEngineCtxGet(comm, tag.c_str(), COMM_ENGINE_AIV, ctx, &actualSize) == HCCL_SUCCESS) {
+    HcclResult getRet = HcclEngineCtxGet(comm, tag.c_str(), COMM_ENGINE_AIV, ctx, &actualSize);
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[HcclEngineCtxGet] end, tag[%s], requestedSize[%llu], actualSize[%llu], "
+        "ctx[%p], ret[%d].",
+        tag.c_str(), static_cast<unsigned long long>(ctxSize), static_cast<unsigned long long>(actualSize),
+        getRet == HCCL_SUCCESS ? *ctx : nullptr, getRet);
+    if (getRet == HCCL_SUCCESS) {
         CHK_PRT_RET(
             actualSize < ctxSize,
             HCCL_ERROR(
@@ -114,16 +123,35 @@ HcclResult GetOrCreateCcuCtx(HcclComm comm, const std::string& tag, uint64_t ctx
         HCCL_INFO(
             "[GetOrCreateCcuCtx] HcclEngineCtxGet success, tag[%s], ctxAddr[%p], ctxSize[%llu]", tag.c_str(), *ctx,
             static_cast<unsigned long long>(actualSize));
+        HCCL_RUN_INFO(
+            "[MC2_ALLOC_TRACE] stage[GetOrCreateCcuCtx] end, tag[%s], reused[1], ctx[%p], size[%llu], ret[%d].",
+            tag.c_str(), *ctx, static_cast<unsigned long long>(actualSize), HCCL_SUCCESS);
         return HCCL_SUCCESS;
     }
-    CHK_RET(HcclEngineCtxCreate(comm, tag.c_str(), COMM_ENGINE_AIV, ctxSize, ctx));
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[HcclEngineCtxCreate] begin, tag[%s], engine[COMM_ENGINE_AIV], size[%llu].",
+        tag.c_str(), static_cast<unsigned long long>(ctxSize));
+    HcclResult createRet = HcclEngineCtxCreate(comm, tag.c_str(), COMM_ENGINE_AIV, ctxSize, ctx);
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[HcclEngineCtxCreate] end, tag[%s], ctx[%p], size[%llu], ret[%d].", tag.c_str(),
+        createRet == HCCL_SUCCESS ? *ctx : nullptr, static_cast<unsigned long long>(ctxSize), createRet);
+    CHK_RET(createRet);
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[aclrtMemset] begin, tag[%s], ctx[%p], size[%llu].", tag.c_str(), *ctx,
+        static_cast<unsigned long long>(ctxSize));
     aclError aclRet = aclrtMemset(*ctx, ctxSize, 0, ctxSize);
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[aclrtMemset] end, tag[%s], ctx[%p], size[%llu], ret[%d].", tag.c_str(), *ctx,
+        static_cast<unsigned long long>(ctxSize), aclRet);
     CHK_PRT_RET(
         aclRet != ACL_SUCCESS,
         HCCL_ERROR(
             "[GetOrCreateCcuCtx] aclrtMemset failed, ret[%d], tag[%s], addr[%p], size[%llu].", aclRet, tag.c_str(),
             *ctx, static_cast<unsigned long long>(ctxSize)),
         HCCL_E_RUNTIME);
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[GetOrCreateCcuCtx] end, tag[%s], reused[0], ctx[%p], size[%llu], ret[%d].",
+        tag.c_str(), *ctx, static_cast<unsigned long long>(ctxSize), HCCL_SUCCESS);
     return HCCL_SUCCESS;
 }
 
