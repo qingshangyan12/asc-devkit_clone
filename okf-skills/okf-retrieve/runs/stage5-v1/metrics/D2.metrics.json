@@ -1,0 +1,68 @@
+{
+  "task_id": "D2",
+  "session_id": "ses_f4531ad2effeC08A368byh2nQL",
+  "model": "{\"id\":\"glm-5.3\",\"providerID\":\"cannbot\",\"variant\":\"default\"}",
+  "duration_s": 41.1,
+  "tokens_input": 18226,
+  "tokens_output": 1291,
+  "tokens_reasoning": 1380,
+  "tokens_total": 20897,
+  "tokens_cache_read": 64832,
+  "tokens_cache_write": 0,
+  "cost": 0.0,
+  "tool_calls": {
+    "bash": 7,
+    "read": 4,
+    "grep": 1,
+    "glob": 1
+  },
+  "docs_read_in_scope": 3,
+  "bytes_read_docs": 9121,
+  "source_files_read": 1,
+  "bytes_read_source": 4066,
+  "isolation_violations": [
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --stage in,out,compute\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --kw 填充\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --api asc_duplicate\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --api asc_copy_ub2gm\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --deps-of asc_duplicate; python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --deps-of asc_copy_ub2gm\"}"
+    },
+    {
+      "tool": "grep",
+      "severity": "leakage",
+      "detail": "/mnt/workspace/asc-devkit asc_duplicate；输出含范围外路径 examples/05_simd_simt_hybrid/02_best_practices/simd_simt_adaptive_max_pool3d_grad/adaptive_max_pool3d_grad_common.h",
+      "input": "{\"include\": \"*.h\", \"path\": \"/mnt/workspace/asc-devkit\", \"pattern\": \"asc_duplicate\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --gap 同步\"}"
+    }
+  ],
+  "isolation_ok": false
+}

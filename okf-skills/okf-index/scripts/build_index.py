@@ -312,7 +312,6 @@ def overview(index: dict[str, Any], gaps: dict[str, Any]) -> str:
     meta = index["meta"]
     lines = [
         "# OKF 索引概览（构建副产物，勿手改）", "",
-        f"- 来源提交：`{meta['source_commit']}`（{meta['commit_date']}）",
         f"- 文档总数：{meta['doc_count']}（主文档 {meta['primary_count']}、导航页 {meta['nav_page_count']}、架构页 {meta['arch_page_count']}）",
         f"- 范围外缺口登记：{len(meta['gap_ids'])} 条；关系缺口：{meta['relation_gap_count']} 条", "",
         "## 分阶段候选规模", "", "| 阶段 | 主文档数 |", "| --- | ---: |",
@@ -401,6 +400,17 @@ def build(root: Path, out_dir: Path) -> list[Path]:
     return written
 
 
+INFORMATIONAL_META = ("source_commit", "commit_date")
+
+
+def strip_informational(payload: dict) -> dict:
+    stripped = json.loads(json.dumps(payload))
+    for key in INFORMATIONAL_META:
+        stripped.pop(key, None)
+        stripped.get("meta", {}).pop(key, None)
+    return stripped
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=SKILL_ROOT.parents[1])
@@ -412,8 +422,13 @@ def main() -> int:
             with tempfile.TemporaryDirectory() as tmp:
                 fresh = build(args.root, Path(tmp))
                 for target in fresh:
-                    committed = (args.out / target.name).read_text(encoding="utf-8")
-                    if committed != target.read_text(encoding="utf-8"):
+                    if target.name.endswith(".json"):
+                        committed = strip_informational(json.loads((args.out / target.name).read_text(encoding="utf-8")))
+                        rebuilt = strip_informational(json.loads(target.read_text(encoding="utf-8")))
+                    else:
+                        committed = (args.out / target.name).read_text(encoding="utf-8")
+                        rebuilt = target.read_text(encoding="utf-8")
+                    if committed != rebuilt:
                         print(f"drift detected in {target.name}: index is stale, rerun build_index.py", file=sys.stderr)
                         return 1
             print("index is up to date")

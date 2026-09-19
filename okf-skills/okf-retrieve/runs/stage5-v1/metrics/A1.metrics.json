@@ -1,0 +1,56 @@
+{
+  "task_id": "A1",
+  "session_id": "ses_f454cb987ffe3ztpiFmJy7w2u7",
+  "model": "{\"id\":\"glm-5.3\",\"providerID\":\"cannbot\",\"variant\":\"default\"}",
+  "duration_s": 54.5,
+  "tokens_input": 28032,
+  "tokens_output": 1622,
+  "tokens_reasoning": 3343,
+  "tokens_total": 32997,
+  "tokens_cache_read": 94976,
+  "tokens_cache_write": 0,
+  "cost": 0.0,
+  "tool_calls": {
+    "bash": 4,
+    "read": 7,
+    "glob": 5,
+    "grep": 3
+  },
+  "docs_read_in_scope": 5,
+  "bytes_read_docs": 25017,
+  "source_files_read": 2,
+  "bytes_read_source": 67315,
+  "isolation_violations": [
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --stage in,out,compute\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --operation add\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --deps-of asc_add; python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --deps-of asc_copy_gm2ub; python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --deps-of asc_copy_ub2gm\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --gap 同步\"}"
+    },
+    {
+      "tool": "glob",
+      "severity": "leakage",
+      "detail": "输入指向 examples/",
+      "input": "{\"pattern\": \"examples/02_simd_c_api/00_introduction/04_reg_base_add_compute/**\"}"
+    }
+  ],
+  "isolation_ok": false
+}

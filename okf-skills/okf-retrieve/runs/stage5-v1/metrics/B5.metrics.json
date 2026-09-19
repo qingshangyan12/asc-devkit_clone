@@ -1,0 +1,68 @@
+{
+  "task_id": "B5",
+  "session_id": "ses_f4539bb16ffe8IQK3k9JEM8au4",
+  "model": "{\"id\":\"glm-5.3\",\"providerID\":\"cannbot\",\"variant\":\"default\"}",
+  "duration_s": 41.3,
+  "tokens_input": 17072,
+  "tokens_output": 1256,
+  "tokens_reasoning": 2457,
+  "tokens_total": 20785,
+  "tokens_cache_read": 55616,
+  "tokens_cache_write": 0,
+  "cost": 0.0,
+  "tool_calls": {
+    "bash": 5,
+    "read": 4,
+    "grep": 1,
+    "glob": 1
+  },
+  "docs_read_in_scope": 1,
+  "bytes_read_docs": 4421,
+  "source_files_read": 3,
+  "bytes_read_source": 56142,
+  "isolation_violations": [
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --stage compute --json\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --operation add --json\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --kw 配对,归约,求和 --json\"}"
+    },
+    {
+      "tool": "grep",
+      "severity": "leakage",
+      "detail": "/mnt/workspace/asc-devkit asc_pair_reduce_sum；输出含范围外路径 okf-skills/okf-tag-generate/taxonomy/core-v8-frozen.json",
+      "input": "{\"path\": \"/mnt/workspace/asc-devkit\", \"pattern\": \"asc_pair_reduce_sum\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --api asc_pair_reduce_sum --json\"}"
+    },
+    {
+      "tool": "glob",
+      "severity": "leakage",
+      "detail": "/mnt/workspace/asc-devkit/docs/zh/api/SIMD-API/c_api **/asc_pair_reduce_sum*.md；输出含范围外路径 docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_pair_reduce_sum_sync_deprecated.md",
+      "input": "{\"path\": \"/mnt/workspace/asc-devkit/docs/zh/api/SIMD-API/c_api\", \"pattern\": \"**/asc_pair_reduce_sum*.md\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --gap 配对 --json; python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --gap 归约 --json\"}"
+    }
+  ],
+  "isolation_ok": false
+}

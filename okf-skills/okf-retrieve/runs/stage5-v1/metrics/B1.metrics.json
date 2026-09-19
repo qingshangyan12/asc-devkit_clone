@@ -1,0 +1,43 @@
+{
+  "task_id": "B1",
+  "session_id": "ses_f453d24a2ffetKaatLxtNr6NDr",
+  "model": "{\"id\":\"glm-5.3\",\"providerID\":\"cannbot\",\"variant\":\"default\"}",
+  "duration_s": 38.2,
+  "tokens_input": 15457,
+  "tokens_output": 856,
+  "tokens_reasoning": 442,
+  "tokens_total": 16755,
+  "tokens_cache_read": 27584,
+  "tokens_cache_write": 0,
+  "cost": 0.0,
+  "tool_calls": {
+    "bash": 2,
+    "read": 3,
+    "grep": 1
+  },
+  "docs_read_in_scope": 3,
+  "bytes_read_docs": 26207,
+  "source_files_read": 0,
+  "bytes_read_source": 0,
+  "isolation_violations": [
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --stage in\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --kw 非对齐\"}"
+    },
+    {
+      "tool": "grep",
+      "severity": "leakage",
+      "detail": "/mnt/workspace/asc-devkit asc_copy_gm2ub_align；输出含范围外路径 examples/02_simd_c_api/02_features/00_data_movement/00_set_l2_cache_mode/set_l2_cache_mode.h",
+      "input": "{\"include\": \"*.h\", \"path\": \"/mnt/workspace/asc-devkit\", \"pattern\": \"asc_copy_gm2ub_align\"}"
+    }
+  ],
+  "isolation_ok": false
+}

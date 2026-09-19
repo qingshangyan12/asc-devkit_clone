@@ -1,0 +1,49 @@
+{
+  "task_id": "A8",
+  "session_id": "ses_f453ebe74ffeHHqafuY2YaA5Ml",
+  "model": "{\"id\":\"glm-5.3\",\"providerID\":\"cannbot\",\"variant\":\"default\"}",
+  "duration_s": 77.8,
+  "tokens_input": 21319,
+  "tokens_output": 1354,
+  "tokens_reasoning": 1732,
+  "tokens_total": 24405,
+  "tokens_cache_read": 83456,
+  "tokens_cache_write": 0,
+  "cost": 0.0,
+  "tool_calls": {
+    "bash": 3,
+    "read": 7,
+    "glob": 2
+  },
+  "docs_read_in_scope": 6,
+  "bytes_read_docs": 29226,
+  "source_files_read": 1,
+  "bytes_read_source": 4668,
+  "isolation_violations": [
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --stage in,out,compute\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --kw 收集,索引\"}"
+    },
+    {
+      "tool": "glob",
+      "severity": "leakage",
+      "detail": "/mnt/workspace/asc-devkit/docs/zh/api/SIMD-API/c_api **/asc_sync*.md；输出含范围外路径 docs/zh/api/SIMD-API/c_api/sync/asc_sync_pipe.md",
+      "input": "{\"path\": \"/mnt/workspace/asc-devkit/docs/zh/api/SIMD-API/c_api\", \"pattern\": \"**/asc_sync*.md\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --gap 同步\"}"
+    }
+  ],
+  "isolation_ok": false
+}

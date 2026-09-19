@@ -1,0 +1,49 @@
+{
+  "task_id": "E3",
+  "session_id": "ses_f452c9a04ffeEPiZyUlsvjfTtS",
+  "model": "{\"id\":\"glm-5.3\",\"providerID\":\"cannbot\",\"variant\":\"default\"}",
+  "duration_s": 28.7,
+  "tokens_input": 8766,
+  "tokens_output": 680,
+  "tokens_reasoning": 1492,
+  "tokens_total": 10938,
+  "tokens_cache_read": 36480,
+  "tokens_cache_write": 0,
+  "cost": 0.0,
+  "tool_calls": {
+    "bash": 5,
+    "grep": 2,
+    "read": 2
+  },
+  "docs_read_in_scope": 0,
+  "bytes_read_docs": 0,
+  "source_files_read": 2,
+  "bytes_read_source": 809978,
+  "isolation_violations": [
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --operation floor --json\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --gap 取整 --json\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --kw floor,向下取整 --json\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --stage compute --json\"}"
+    }
+  ],
+  "isolation_ok": false
+}

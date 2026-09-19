@@ -153,14 +153,21 @@ def deps_query(index: dict[str, Any], target: str, kind: str | None, reverse: bo
 
 
 def gap_query(gaps: dict[str, Any], keyword: str) -> list[dict[str, Any]]:
+    keywords = [k.strip().lower() for k in keyword.split(",") if k.strip()]
+    if not keywords:
+        raise ValueError("--gap requires a non-empty keyword")
+
+    def hit(haystack: str) -> bool:
+        return any(kw in haystack.lower() for kw in keywords)
+
     results = []
     for gap in gaps["scope_out_gaps"]:
-        haystack = " ".join([gap["id"], gap["conclusion"], *gap["keywords"]]).lower()
-        if keyword.lower() in haystack:
+        haystack = " ".join([gap["id"], gap["conclusion"], *gap["keywords"]])
+        if hit(haystack):
             results.append({"gap_id": gap["id"], "conclusion": gap["conclusion"], "hints": gap["hints"]})
     for gap in gaps["relation_gaps"]:
-        haystack = f"{gap['from']} {gap['note']}".lower()
-        if keyword.lower() in haystack:
+        haystack = f"{gap['from']} {gap['note']}"
+        if hit(haystack):
             results.append({"gap_id": f"relation:{Path(gap['from']).stem}", "conclusion": gap["note"],
                             "hints": [{"path": gap["from"], "note": "范围内部文档"}]})
     return results

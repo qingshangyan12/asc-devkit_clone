@@ -40,7 +40,8 @@ controller.py 路径变更时本 skill 同步调整 import（阶段 6 可收敛�
 3. 家族上卷：架构变体页（`_arch_*`）的 tags/signature/deps/examples 上卷到家族主页，
    视图只索引主文档（119 个），变体页经 `--api` 家族卡可达。
 4. 构建确定性：输出不含时钟，同输入两次构建字节一致；`build-meta.json` 记录 140 个文档
-   sha256 用于陈旧检测。
+   sha256 用于陈旧检测。`meta.source_commit`/`commit_date` 为信息性字段（记录构建时 HEAD，
+   提交索引后天然滞后一个提交），漂移比较时排除。
 5. 漂移检测：`python3 scripts/build_index.py --check`（文档改动未重建索引时退出码 1）。
 
 ## 查询接口
@@ -56,7 +57,7 @@ controller.py 路径变更时本 skill 同步调整 import（阶段 6 可收敛�
 --convert half int4,int32       # 类型转换对（B 类）
 --api asc_copy_gm2ub            # 家族卡：主页+架构变体+分类页
 --deps-of <api|path> [--kind K] [--reverse]   # 依赖图遍历（C 类）
---gap 同步                       # 范围外缺口登记（E 类）
+--gap 同步,寄存器               # 范围外缺口登记，逗号多关键词（E 类）
 --json                          # 机器可读输出
 ```
 

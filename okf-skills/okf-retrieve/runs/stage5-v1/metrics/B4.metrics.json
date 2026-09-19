@@ -1,0 +1,49 @@
+{
+  "task_id": "B4",
+  "session_id": "ses_f453a775cffeeRD4lo3mlAqCba",
+  "model": "{\"id\":\"glm-5.3\",\"providerID\":\"cannbot\",\"variant\":\"default\"}",
+  "duration_s": 19.4,
+  "tokens_input": 5205,
+  "tokens_output": 490,
+  "tokens_reasoning": 578,
+  "tokens_total": 6273,
+  "tokens_cache_read": 12352,
+  "tokens_cache_write": 0,
+  "cost": 0.0,
+  "tool_calls": {
+    "bash": 3,
+    "read": 1,
+    "grep": 1
+  },
+  "docs_read_in_scope": 1,
+  "bytes_read_docs": 3563,
+  "source_files_read": 0,
+  "bytes_read_source": 0,
+  "isolation_violations": [
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --convert half float --json\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --api asc_half2float --json\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --deps-of asc_half2float --json\"}"
+    },
+    {
+      "tool": "grep",
+      "severity": "scan_breach",
+      "detail": "/mnt/workspace/asc-devkit asc_half2float；输出无范围外内容",
+      "input": "{\"include\": \"*.h\", \"path\": \"/mnt/workspace/asc-devkit\", \"pattern\": \"asc_half2float\"}"
+    }
+  ],
+  "isolation_ok": false
+}

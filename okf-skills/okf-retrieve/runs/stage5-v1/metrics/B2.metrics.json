@@ -1,0 +1,31 @@
+{
+  "task_id": "B2",
+  "session_id": "ses_f453c127effe3SQmDE7yp9xhlt",
+  "model": "{\"id\":\"glm-5.3\",\"providerID\":\"cannbot\",\"variant\":\"default\"}",
+  "duration_s": 32.5,
+  "tokens_input": 10997,
+  "tokens_output": 796,
+  "tokens_reasoning": 1087,
+  "tokens_total": 12880,
+  "tokens_cache_read": 16192,
+  "tokens_cache_write": 0,
+  "cost": 0.0,
+  "tool_calls": {
+    "bash": 1,
+    "read": 3,
+    "grep": 1
+  },
+  "docs_read_in_scope": 3,
+  "bytes_read_docs": 13197,
+  "source_files_read": 0,
+  "bytes_read_source": 0,
+  "isolation_violations": [
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --api asc_copy_gm2ub --json\"}"
+    }
+  ],
+  "isolation_ok": false
+}

@@ -1,0 +1,55 @@
+{
+  "task_id": "C2",
+  "session_id": "ses_f4537c10affeEQFUI1K4uGRRGc",
+  "model": "{\"id\":\"glm-5.3\",\"providerID\":\"cannbot\",\"variant\":\"default\"}",
+  "duration_s": 48.2,
+  "tokens_input": 14518,
+  "tokens_output": 983,
+  "tokens_reasoning": 1214,
+  "tokens_total": 16715,
+  "tokens_cache_read": 36288,
+  "tokens_cache_write": 0,
+  "cost": 0.0,
+  "tool_calls": {
+    "bash": 5,
+    "read": 3,
+    "grep": 1
+  },
+  "docs_read_in_scope": 2,
+  "bytes_read_docs": 6962,
+  "source_files_read": 1,
+  "bytes_read_source": 19797,
+  "isolation_violations": [
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --api asc_deq_int322half\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --convert int32 half\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --deps-of asc_deq_int322half\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --kw scale,反量化,量化参数\"}"
+    },
+    {
+      "tool": "grep",
+      "severity": "leakage",
+      "detail": "/mnt/workspace/asc-devkit asc_deq_int322half|asc_set_deq_scale；输出含范围外路径 okf-skills/okf-index/tests/dryrun.yaml",
+      "input": "{\"path\": \"/mnt/workspace/asc-devkit\", \"pattern\": \"asc_deq_int322half|asc_set_deq_scale\"}"
+    }
+  ],
+  "isolation_ok": false
+}

@@ -42,11 +42,19 @@ class BuildTest(unittest.TestCase):
         self.assertEqual(first, second)
 
     def test_committed_index_fresh(self):
-        committed = {
-            name: (INDEX_DIR / name).read_text(encoding="utf-8")
-            for name in ("index.json", "build-meta.json", "概览.md")
-        }
-        self.assertEqual(committed, build_to_tmp())
+        committed = {}
+        for name in ("index.json", "build-meta.json", "概览.md"):
+            text = (INDEX_DIR / name).read_text(encoding="utf-8")
+            if name.endswith(".json"):
+                committed[name] = json.dumps(build_index.strip_informational(json.loads(text)))
+            else:
+                committed[name] = text
+        fresh = build_to_tmp()
+        for name, payload in committed.items():
+            if name.endswith(".json"):
+                self.assertEqual(payload, json.dumps(build_index.strip_informational(json.loads(fresh[name]))), name)
+            else:
+                self.assertEqual(payload, fresh[name], name)
 
     def test_scope_alignment(self):
         meta = self.index["meta"]
@@ -103,6 +111,9 @@ class BuildTest(unittest.TestCase):
         for keyword, gap_id in (("同步", "pipeline-event-sync"), ("寄存器", "register-load-store"), ("取整", "float-floor")):
             hits = query.gap_query(self.gaps, keyword)
             self.assertTrue(any(h["gap_id"] == gap_id for h in hits), keyword)
+        combo = query.gap_query(self.gaps, "同步,寄存器,pipe")
+        self.assertEqual({h["gap_id"] for h in combo},
+                         {"pipeline-event-sync", "register-load-store"})
 
     def test_relation_gap_registered(self):
         self.assertEqual(len(self.gaps["relation_gaps"]), 1)
