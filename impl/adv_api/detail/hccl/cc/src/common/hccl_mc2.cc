@@ -418,16 +418,30 @@ HcclResult AllocComResourceByTilingAicpu(
     HcclComm comm, void* stream, void* mc2Tiling, const void* ccTilingList[], uint32_t tilingNum, const char* commName,
     u32 rankSize, u32 userRank, void** opResCtx, std::string& ctxTag)
 {
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[AllocComResourceByTilingAicpu] begin, rank[%u], rankSize[%u], tilingNum[%u].",
+        userRank, rankSize, tilingNum);
     std::string topoTag[Hccl::MC2_MAX_OP_NUM];
-    CHK_RET(BuildTagsAndValidate(ccTilingList, tilingNum, commName, rankSize, userRank, topoTag, ctxTag));
+    HcclResult ret = BuildTagsAndValidate(ccTilingList, tilingNum, commName, rankSize, userRank, topoTag, ctxTag);
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[BuildTagsAndValidate/AICPU] end, rank[%u], ret[%d].", userRank, ret);
+    CHK_RET(ret);
 
     std::vector<OpParam> opParamVec(tilingNum);
     for (uint32_t i = 0U; i < tilingNum; ++i) {
-        CHK_RET(
-            GetOpParam(comm, stream, topoTag[i], static_cast<const Mc2CcTilingInner*>(ccTilingList[i]), opParamVec[i]));
+        ret = GetOpParam(
+            comm, stream, topoTag[i], static_cast<const Mc2CcTilingInner*>(ccTilingList[i]), opParamVec[i]);
+        HCCL_RUN_INFO(
+            "[MC2_ALLOC_TRACE] stage[GetOpParam/AICPU] end, rank[%u], tilingIndex[%u], ret[%d].", userRank, i,
+            ret);
+        CHK_RET(ret);
     }
 
-    CHK_RET(HcclAllocOpResCtx(comm, ctxTag, opParamVec, mc2Tiling, ccTilingList, opResCtx));
+    ret = HcclAllocOpResCtx(comm, ctxTag, opParamVec, mc2Tiling, ccTilingList, opResCtx);
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[HcclAllocOpResCtx/AICPU] end, rank[%u], opResCtx[%p], ret[%d].", userRank,
+        ret == HCCL_SUCCESS && opResCtx != nullptr ? *opResCtx : nullptr, ret);
+    CHK_RET(ret);
 
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
@@ -444,6 +458,9 @@ HcclResult AllocComResourceByTilingAicpu(
             static_cast<uint32_t>(dstDataType), static_cast<uint32_t>(opParam.engine));
     }
 
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[AllocComResourceByTilingAicpu] end, rank[%u], ret[%d].", userRank,
+        HCCL_SUCCESS);
     return HCCL_SUCCESS;
 }
 
@@ -452,45 +469,69 @@ HcclResult AllocComResourceByTilingCcu(
     HcclComm comm, void* stream, void* mc2Tiling, const void* ccTilingList[], uint32_t tilingNum, const char* commName,
     u32 rankSize, u32 userRank, void** opResCtx, std::string& ctxTag, bool checkOnly = false)
 {
-    HCCL_INFO("[AllocComResourceByTilingCcu]start AllocComResourceByTilingCcu!");
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[AllocComResourceByTilingCcu] begin, rank[%u], rankSize[%u], tilingNum[%u], "
+        "checkOnly[%u].",
+        userRank, rankSize, tilingNum, static_cast<uint32_t>(checkOnly));
     std::string topoTag[Hccl::MC2_MAX_OP_NUM];
-    CHK_RET(BuildTagsAndValidate(ccTilingList, tilingNum, commName, rankSize, userRank, topoTag, ctxTag));
-    HCCL_INFO("[AllocComResourceByTilingCcu]BuildTagsAndValidate successfully!");
+    HcclResult ret = BuildTagsAndValidate(ccTilingList, tilingNum, commName, rankSize, userRank, topoTag, ctxTag);
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[BuildTagsAndValidate/CCU] end, rank[%u], ret[%d].", userRank, ret);
+    CHK_RET(ret);
 
     // 构建 OpResCtx 基础字段（workspace、XN、CKE等）
     OpResCtx resCtx{};
     if (checkOnly) {
         resCtx.rankId = userRank;
         resCtx.rankSize = rankSize;
-        HCCL_INFO("[AllocComResourceByTilingCcu]checkOnly, skip AllocCcuOpResCtx.");
+        HCCL_RUN_INFO(
+            "[MC2_ALLOC_TRACE] stage[AllocCcuOpResCtx] skipped, rank[%u], checkOnly[1].", userRank);
     } else {
-        CHK_RET(AllocCcuOpResCtx(comm, ctxTag, rankSize, userRank, resCtx));
-        HCCL_INFO("[AllocComResourceByTilingCcu]AllocCcuOpResCtx successfully!");
-        HCCL_INFO(
-            "[AllocComResourceByTilingCcu]allocated: workspace[%p], size[%llu]", (void*)resCtx.workSpace,
-            resCtx.workSpaceSize);
+        ret = AllocCcuOpResCtx(comm, ctxTag, rankSize, userRank, resCtx);
+        HCCL_RUN_INFO(
+            "[MC2_ALLOC_TRACE] stage[AllocCcuOpResCtx] end, rank[%u], workspace[0x%llx], "
+            "workspaceSize[%llu], xnAddr[0x%llx], ckeAddr[0x%llx], ret[%d].",
+            userRank, static_cast<unsigned long long>(resCtx.workSpace),
+            static_cast<unsigned long long>(resCtx.workSpaceSize), static_cast<unsigned long long>(resCtx.xnAddr),
+            static_cast<unsigned long long>(resCtx.ckeAddr), ret);
+        CHK_RET(ret);
     }
 
     // 逐算子选择算法 + 资源准备（executor->CalcRes + GetAlgResCcu）
-    CHK_RET(CcuSelectAlg(comm, stream, topoTag, ccTilingList, tilingNum, mc2Tiling, resCtx, checkOnly));
-    HCCL_INFO("[AllocComResourceByTilingCcu]CcuSelectAlg successfully!");
+    ret = CcuSelectAlg(comm, stream, topoTag, ccTilingList, tilingNum, mc2Tiling, resCtx, checkOnly);
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[CcuSelectAlg] end, rank[%u], checkOnly[%u], ret[%d].", userRank,
+        static_cast<uint32_t>(checkOnly), ret);
+    CHK_RET(ret);
     if (checkOnly) {
-        HCCL_INFO("[AllocComResourceByTilingCcu]checkOnly, end AllocComResourceByTilingCcu!");
+        HCCL_RUN_INFO(
+            "[MC2_ALLOC_TRACE] stage[AllocComResourceByTilingCcu] end, rank[%u], checkOnly[1], ret[%d].",
+            userRank, HCCL_SUCCESS);
         return HCCL_SUCCESS;
     }
 
     // 申请OpResCtx硬件内存并写入
     std::string tagOpResCtx = ctxTag + "_opResCtx";
     uint64_t opResCtxSize = sizeof(OpResCtx);
-    CHK_RET(GetOrCreateCcuCtx(comm, tagOpResCtx, opResCtxSize, opResCtx));
+    ret = GetOrCreateCcuCtx(comm, tagOpResCtx, opResCtxSize, opResCtx);
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[GetOrCreateCcuCtx] end, rank[%u], size[%llu], opResCtx[%p], ret[%d].",
+        userRank, static_cast<unsigned long long>(opResCtxSize),
+        ret == HCCL_SUCCESS && opResCtx != nullptr ? *opResCtx : nullptr, ret);
+    CHK_RET(ret);
     aclError aclRet = aclrtMemcpy(*opResCtx, opResCtxSize, &resCtx, opResCtxSize, ACL_MEMCPY_HOST_TO_DEVICE);
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[aclrtMemcpyOpResCtx] end, rank[%u], dst[%p], size[%llu], ret[%d].", userRank,
+        *opResCtx, static_cast<unsigned long long>(opResCtxSize), aclRet);
     HCCL_INFO(
         "[CCU_DEBUG] opResCtxPtr=%p, *opResCtx=%p, size=%llu ws=0x%llx wsSize=0x%llx xn=0x%llx cke=0x%llx rankId=%llu "
         "rankSize=%llu",
         opResCtx, *opResCtx, opResCtxSize, resCtx.workSpace, resCtx.workSpaceSize, resCtx.xnAddr, resCtx.ckeAddr,
         resCtx.rankId, resCtx.rankSize);
     CHK_RET(aclRet == ACL_ERROR_NONE ? HCCL_SUCCESS : HCCL_E_RUNTIME);
-    HCCL_INFO("[AllocComResourceByTilingCcu]end AllocComResourceByTilingCcu!");
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[AllocComResourceByTilingCcu] end, rank[%u], checkOnly[0], ret[%d].", userRank,
+        HCCL_SUCCESS);
     return HCCL_SUCCESS;
 }
 
@@ -500,24 +541,37 @@ HcclResult DispatchAllocByCommEngine(
     HcclComm comm, void* stream, void* mc2Tiling, const void* ccTilingList[], uint32_t tilingNum, const char* commName,
     u32 rankSize, u32 userRank, uint8_t commEngine, void** opResCtx, bool checkOnly, HcclUs startut)
 {
-    // 根据commEngine类型分发到对应的资源分配流程
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[DispatchAllocByCommEngine] begin, rank[%u], commEngine[%u], tilingNum[%u], "
+        "checkOnly[%u].",
+        userRank, commEngine, tilingNum, static_cast<uint32_t>(checkOnly));
     std::string ctxTag;
+    HcclResult ret = HCCL_SUCCESS;
     if (commEngine == static_cast<uint8_t>(OpExecuteConfig::AICPU_TS)) {
-        HCCL_INFO("[HcclAllocComResourceByTiling]commEngine == AICPU_TS!");
-        CHK_RET(AllocComResourceByTilingAicpu(
-            comm, stream, mc2Tiling, ccTilingList, tilingNum, commName, rankSize, userRank, opResCtx, ctxTag));
+        ret = AllocComResourceByTilingAicpu(
+            comm, stream, mc2Tiling, ccTilingList, tilingNum, commName, rankSize, userRank, opResCtx, ctxTag);
+        HCCL_RUN_INFO(
+            "[MC2_ALLOC_TRACE] stage[AllocComResourceByTilingAicpu/dispatch] end, rank[%u], ret[%d].", userRank,
+            ret);
+        CHK_RET(ret);
     } else if (commEngine == static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
-        HCCL_INFO("[HcclAllocComResourceByTiling]commEngine == CCU_SCHED!");
-        if (!CheckCcuAlgorithmsRegistered(ccTilingList, tilingNum)) {
+        const bool algorithmsRegistered = CheckCcuAlgorithmsRegistered(ccTilingList, tilingNum);
+        HCCL_RUN_INFO(
+            "[MC2_ALLOC_TRACE] stage[CheckCcuAlgorithmsRegistered] end, rank[%u], registered[%u].", userRank,
+            static_cast<uint32_t>(algorithmsRegistered));
+        if (!algorithmsRegistered) {
             HCCL_INFO("[HcclAllocComResourceByTiling]Current ccu algorithm is not supported in mc2_client.");
             return HCCL_E_ALG_NOT_SUPPORTED;
         }
-        CHK_RET(CheckCcuKfcFlow(mc2Tiling, ccTilingList, tilingNum, rankSize));
-        HCCL_INFO("[MC2_DEBUG] before AllocComResourceByTilingCcu.");
-        HcclResult ret = AllocComResourceByTilingCcu(
+        ret = CheckCcuKfcFlow(mc2Tiling, ccTilingList, tilingNum, rankSize);
+        HCCL_RUN_INFO("[MC2_ALLOC_TRACE] stage[CheckCcuKfcFlow] end, rank[%u], ret[%d].", userRank, ret);
+        CHK_RET(ret);
+        ret = AllocComResourceByTilingCcu(
             comm, stream, mc2Tiling, ccTilingList, tilingNum, commName, rankSize, userRank, opResCtx, ctxTag,
             checkOnly);
-        HCCL_INFO("[MC2_DEBUG] after AllocComResourceByTilingCcu, ret[%d].", ret);
+        HCCL_RUN_INFO(
+            "[MC2_ALLOC_TRACE] stage[AllocComResourceByTilingCcu/dispatch] end, rank[%u], ret[%d].", userRank,
+            ret);
         CHK_PRT_RET(
             ret != HCCL_SUCCESS,
             HCCL_ERROR("[MC2_CCU_RESOURCE_ALLOC_FAIL] Failed to allocate CCU resource, please check topo information."),
@@ -527,8 +581,11 @@ HcclResult DispatchAllocByCommEngine(
         return HCCL_E_NOT_SUPPORT;
     }
 
-    // 记录退出日志和性能统计信息
-    CHK_RET(LogHcclExit("HcclAllocComResourceByTiling", ctxTag.c_str(), startut));
+    ret = LogHcclExit("HcclAllocComResourceByTiling", ctxTag.c_str(), startut);
+    HCCL_RUN_INFO("[MC2_ALLOC_TRACE] stage[LogHcclExit] end, rank[%u], ret[%d].", userRank, ret);
+    CHK_RET(ret);
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[DispatchAllocByCommEngine] end, rank[%u], ret[%d].", userRank, HCCL_SUCCESS);
     return HCCL_SUCCESS;
 }
 
@@ -537,72 +594,102 @@ HcclResult HcclAllocComResourceByTilingImpl(
     HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx, bool checkOnly = false)
 {
     HCCL_RUN_INFO(
-        "[MC2_CLIENT_A5] enter asc-devkit common HcclAllocComResourceByTiling, "
-        "comm[%p], stream[%p], tiling[%p].",
-        comm, stream, mc2Tiling);
-    // 记录开始时间，用于性能统计
+        "[MC2_ALLOC_TRACE] stage[HcclAllocComResourceByTilingImpl] begin, comm[%p], stream[%p], tiling[%p], "
+        "opResCtx[%p], checkOnly[%u].",
+        comm, stream, mc2Tiling, opResCtx, static_cast<uint32_t>(checkOnly));
     HcclUs startut = TIME_NOW();
 
-    // 获取设备类型
     DevType deviceType = DevType::DEV_TYPE_COUNT;
-    CHK_RET(hrtGetDeviceType(deviceType));
-    // 检查设备类型是否支持新流程，950或910_95支持新流程，其他设备走老流程
+    HcclResult ret = hrtGetDeviceType(deviceType);
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[hrtGetDeviceType] end, deviceType[%u], ret[%d].",
+        static_cast<uint32_t>(deviceType), ret);
+    CHK_RET(ret);
     if (deviceType != DevType::DEV_TYPE_950) {
         HCCL_ERROR("[%s] invalid deviceType[%u]", __func__, deviceType);
         return HCCL_E_NOT_SUPPORT;
     }
-    // 初始化环境变量配置，解析HCCL相关的环境变量
-    // 包括算子展开模式、确定性计算、通信方式、日志开关等配置
-    CHK_RET(InitEnvConfig());
-    // 检查输入参数的合法性（comm、sendBuf、recvBuf、stream不能为空）
-    CHK_RET(CheckInputParam(comm, mc2Tiling, stream));
 
-    // 获取通信域中的rank数量
+    ret = InitEnvConfig();
+    HCCL_RUN_INFO("[MC2_ALLOC_TRACE] stage[InitEnvConfig] end, ret[%d].", ret);
+    CHK_RET(ret);
+
+    ret = CheckInputParam(comm, mc2Tiling, stream);
+    HCCL_RUN_INFO("[MC2_ALLOC_TRACE] stage[CheckInputParam] end, ret[%d].", ret);
+    CHK_RET(ret);
+
     u32 rankSize = INVALID_VALUE_RANKSIZE;
-    CHK_RET(HcclGetRankSize(comm, &rankSize));
+    ret = HcclGetRankSize(comm, &rankSize);
+    HCCL_RUN_INFO("[MC2_ALLOC_TRACE] stage[HcclGetRankSize] end, rankSize[%u], ret[%d].", rankSize, ret);
+    CHK_RET(ret);
 
-    // 获取当前rank的ID
     u32 userRank = INVALID_VALUE_RANKID;
-    CHK_RET(HcclGetRankId(comm, &userRank));
+    ret = HcclGetRankId(comm, &userRank);
+    HCCL_RUN_INFO("[MC2_ALLOC_TRACE] stage[HcclGetRankId] end, rank[%u], ret[%d].", userRank, ret);
+    CHK_RET(ret);
 
-    // 获取通信域名称
-    char commName[COMM_INDENTIFIER_MAX_LENGTH];
-    CHK_RET(HcclGetCommName(comm, commName));
+    char commName[COMM_INDENTIFIER_MAX_LENGTH] = {0};
+    ret = HcclGetCommName(comm, commName);
+    HCCL_RUN_INFO("[MC2_ALLOC_TRACE] stage[HcclGetCommName] end, rank[%u], ret[%d].", userRank, ret);
+    CHK_RET(ret);
 
-    const void* ccTilingList[Hccl::MC2_MAX_OP_NUM];
-    uint32_t tilingNum;
-    CHK_RET(HcclGetTilingList(mc2Tiling, ccTilingList, tilingNum));
+    const void* ccTilingList[Hccl::MC2_MAX_OP_NUM] = {};
+    uint32_t tilingNum = 0U;
+    ret = HcclGetTilingList(mc2Tiling, ccTilingList, tilingNum);
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[HcclGetTilingList] end, rank[%u], tilingNum[%u], ret[%d].", userRank,
+        tilingNum, ret);
+    CHK_RET(ret);
 
-    // 校验commengine
-    uint8_t commEngine;
-    CHK_RET(ObtainCommEngine(ccTilingList, tilingNum, commEngine));
+    uint8_t commEngine = static_cast<uint8_t>(OpExecuteConfig::DEFAULT);
+    ret = ObtainCommEngine(ccTilingList, tilingNum, commEngine);
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[ObtainCommEngine] end, rank[%u], commEngine[%u], ret[%d].", userRank,
+        commEngine, ret);
+    CHK_RET(ret);
 
-    // onlyCheck场景：单rank必然资源充足、非CCU_SCHED引擎（AICPU_TS等）暂不支持，直接返回SUCCESS
-    // （rankSize为通信域属性，对所有tiling一致，此处统一提前返回）
     if (checkOnly && (rankSize == 1 || commEngine != static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED))) {
-        HCCL_INFO(
-            "[HcclAllocComResourceByTiling]checkOnly, rankSize[%u], commEngine[%u], return SUCCESS.", rankSize,
-            commEngine);
+        HCCL_RUN_INFO(
+            "[MC2_ALLOC_TRACE] stage[HcclAllocComResourceByTilingImpl] check skipped, rank[%u], rankSize[%u], "
+            "commEngine[%u], ret[%d].",
+            userRank, rankSize, commEngine, HCCL_SUCCESS);
         return HCCL_SUCCESS;
     }
-    return DispatchAllocByCommEngine(
+
+    ret = DispatchAllocByCommEngine(
         comm, stream, mc2Tiling, ccTilingList, tilingNum, commName, rankSize, userRank, commEngine, opResCtx, checkOnly,
         startut);
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[HcclAllocComResourceByTilingImpl] end, rank[%u], commEngine[%u], ret[%d].",
+        userRank, commEngine, ret);
+    return ret;
 }
 } // namespace
 
 HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTiling(
     HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
 {
-    return HcclAllocComResourceByTilingImpl(comm, stream, mc2Tiling, opResCtx);
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] api[HcclAllocComResourceByTiling] enter, comm[%p], stream[%p], tiling[%p], "
+        "opResCtx[%p].",
+        comm, stream, mc2Tiling, opResCtx);
+    HcclResult ret = HcclAllocComResourceByTilingImpl(comm, stream, mc2Tiling, opResCtx);
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] api[HcclAllocComResourceByTiling] leave, comm[%p], opResCtx[%p], ret[%d].", comm,
+        ret == HCCL_SUCCESS && opResCtx != nullptr ? *opResCtx : nullptr, ret);
+    return ret;
 }
 
 HcclResult __attribute__((visibility("default"))) CheckOpResSufficient(HcclComm comm, void* stream, void* mc2Tiling)
 {
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] api[CheckOpResSufficient/tiling] enter, comm[%p], stream[%p], tiling[%p].", comm,
+        stream, mc2Tiling);
     void* opResCtx = nullptr;
     HcclResult ret = HcclAllocComResourceByTilingImpl(comm, stream, mc2Tiling, &opResCtx, true);
     HCCL_RUN_INFO(
-        "[CheckOpResSufficient] finished, comm[%p], stream[%p], tiling[%p], ret[%d].", comm, stream, mc2Tiling, ret);
+        "[MC2_ALLOC_TRACE] api[CheckOpResSufficient/tiling] leave, comm[%p], stream[%p], tiling[%p], ret[%d].",
+        comm, stream, mc2Tiling, ret);
     return ret;
 }
 
@@ -849,11 +936,15 @@ CcuResult CcuKernelLaunch(const HcclComm comm, void* opResCtx)
 
 HcclResult __attribute__((visibility("default"))) CheckOpResSufficient(HcclComm comm, uint8_t ccType, void* ccArgs)
 {
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] api[CheckOpResSufficient/args] enter, comm[%p], ccType[%u], ccArgs[%p].", comm,
+        ccType, ccArgs);
     CHK_PTR_NULL(comm);
     CHK_PTR_NULL(ccArgs);
     HcclResult ret = HcclAllocCcResByArgsImpl(comm, ccType, ccArgs);
     HCCL_RUN_INFO(
-        "[CheckOpResSufficient] finished, comm[%p], ccType[%u], ccArgs[%p], ret[%d].", comm, ccType, ccArgs, ret);
+        "[MC2_ALLOC_TRACE] api[CheckOpResSufficient/args] leave, comm[%p], ccType[%u], ccArgs[%p], ret[%d].",
+        comm, ccType, ccArgs, ret);
     return ret;
 }
 

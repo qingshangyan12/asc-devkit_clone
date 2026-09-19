@@ -860,12 +860,18 @@ HcclResult HcclGetAlgRes(
     if (useCannBridge) {
         AlgAttrs algAttrs = executor->GetAlgoMeta(std::string(param.algName));
         HcclResult calcHierarchyRet = executor->CalcAlgHierarchyInfoV2(topoInfo, algHierarchyInfo, algAttrs);
+        HCCL_RUN_INFO(
+            "[MC2_ALLOC_TRACE] stage[CalcAlgHierarchyInfoV2] end, opType[%u], levelNum[%zu], ret[%d].",
+            static_cast<uint32_t>(param.opType), algHierarchyInfo.infos.size(), calcHierarchyRet);
         HCCL_INFO(
             "[asc][AlgoResource][HcclGetAlgRes] after CalcAlgHierarchyInfoV2, ret[%d], levelNum[%zu].",
             calcHierarchyRet, algHierarchyInfo.infos.size());
         CHK_RET(calcHierarchyRet);
     } else {
         HcclResult calcHierarchyRet = executor->CalcAlgHierarchyInfo(comm, topoInfo, algHierarchyInfo);
+        HCCL_RUN_INFO(
+            "[MC2_ALLOC_TRACE] stage[CalcAlgHierarchyInfo] end, opType[%u], levelNum[%zu], ret[%d].",
+            static_cast<uint32_t>(param.opType), algHierarchyInfo.infos.size(), calcHierarchyRet);
         HCCL_INFO(
             "[asc][AlgoResource][HcclGetAlgRes] after CalcAlgHierarchyInfo, ret[%d], levelNum[%zu].", calcHierarchyRet,
             algHierarchyInfo.infos.size());
@@ -877,6 +883,11 @@ HcclResult HcclGetAlgRes(
         "[asc][AlgoResource][HcclGetAlgRes] before CalcRes, opType[%d], algTag[%s], engine[%d].", param.opType,
         param.algTag, param.engine);
     HcclResult calcResRet = executor->CalcRes(comm, param, topoInfo, algHierarchyInfo, resRequest);
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[executor.CalcRes] end, opType[%u], engine[%u], slaveThreadNum[%u], "
+        "channelLevels[%zu], ccuKernelInfos[%zu], ret[%d].",
+        static_cast<uint32_t>(param.opType), static_cast<uint32_t>(param.engine), resRequest.slaveThreadNum,
+        resRequest.channels.size(), resRequest.ccuKernelInfos.size(), calcResRet);
     HCCL_INFO(
         "[asc][AlgoResource][HcclGetAlgRes] after CalcRes, ret[%d], slaveThreadNum[%u], "
         "notifyNumOnMainThread[%u], channelLevels[%zu].",
@@ -894,7 +905,13 @@ HcclResult HcclGetAlgRes(
         HCCL_INFO("[asc][AlgoResource][HcclGetAlgRes] generated ccuKfcExecutor!");
         CHK_PRT_RET(
             ccuKfcExecutor.get() == nullptr, HCCL_ERROR("Fail to find ccuKfcExecutor for CcuKfcServer"), HCCL_E_PARA);
-        CHK_RET(ccuKfcExecutor->CalcRes(comm, param, topoInfo, algHierarchyInfo, resRequest));
+        HcclResult kfcCalcResRet = ccuKfcExecutor->CalcRes(comm, param, topoInfo, algHierarchyInfo, resRequest);
+        HCCL_RUN_INFO(
+            "[MC2_ALLOC_TRACE] stage[CcuKfcServer.CalcRes] end, opType[%u], ccuKernelInfos[%zu], "
+            "ccuKernelGroups[%zu], ret[%d].",
+            static_cast<uint32_t>(param.opType), resRequest.ccuKernelInfos.size(), resRequest.ccuKernelNum.size(),
+            kfcCalcResRet);
+        CHK_RET(kfcCalcResRet);
         HCCL_INFO(
             "[asc][AlgoResource][HcclGetAlgRes] after CcuKfcServer CalcRes, "
             "ccuKernelInfos.size()[%zu], ccuKernelNum.size()[%zu]",
@@ -938,6 +955,10 @@ HcclResult HcclGetAlgRes(
             param.algTag);
         HcclResult ccuRet =
             GetAlgResCcu(comm, param, resRequest, resCtxHost, topoInfo, algHierarchyInfo, resCtxSequence, size);
+        HCCL_RUN_INFO(
+            "[MC2_ALLOC_TRACE] stage[GetAlgResCcu] end, opType[%u], checkRes[%u], ctxSize[%llu], ret[%d].",
+            static_cast<uint32_t>(param.opType), static_cast<uint32_t>(param.checkRes),
+            static_cast<unsigned long long>(size), ccuRet);
         HCCL_INFO(
             "[asc][AlgoResource][HcclGetAlgRes] after GetAlgResCcu, ret[%d], ctxSize[%llu], "
             "resCtxSequence[%p].",
@@ -1440,7 +1461,11 @@ HcclResult HcclAllocAlgResourceCcu(
     HCCL_ERROR("[HcclAllocAlgResourceCcu] CCU resource is not supported by mc2_client.");
     return HCCL_E_NOT_SUPPORT;
 #else
-    HCCL_INFO("Start to execute AllocAlgResource.");
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[HcclAllocAlgResourceCcu] begin, opType[%u], checkRes[%u], "
+        "ccuKernelInfos[%zu].",
+        static_cast<uint32_t>(param.opType), static_cast<uint32_t>(param.checkRes),
+        resRequest.ccuKernelInfos.size());
     // checkRes场景仅探测CCU kernel资源是否充足，不获取CCL buffer/token，也不申请thread与channel
     if (!param.checkRes) {
         void* cclBufferAddr;
@@ -1470,18 +1495,33 @@ HcclResult HcclAllocAlgResourceCcu(
     resCtxHost->notifyNumPerThread = resRequest.notifyNumPerThread;
     resCtxHost->parallelPortInfo = resRequest.parallelPortInfo;
     if (!param.checkRes) {
-        CHK_RET(HcclGetThread(comm, param, resRequest, resCtxHost));
-        CHK_RET(HcclGetChannelForCcu(comm, param, resRequest));
-        CHK_RET(HcclGetCcuKernel(comm, param, resRequest, resCtxHost));
+        HcclResult ret = HcclGetThread(comm, param, resRequest, resCtxHost);
+        HCCL_RUN_INFO("[MC2_ALLOC_TRACE] stage[HcclGetThread] end, ret[%d].", ret);
+        CHK_RET(ret);
+        ret = HcclGetChannelForCcu(comm, param, resRequest);
+        HCCL_RUN_INFO("[MC2_ALLOC_TRACE] stage[HcclGetChannelForCcu] end, checkRes[0], ret[%d].", ret);
+        CHK_RET(ret);
+        ret = HcclGetCcuKernel(comm, param, resRequest, resCtxHost);
+        HCCL_RUN_INFO("[MC2_ALLOC_TRACE] stage[HcclGetCcuKernel] end, checkRes[0], ret[%d].", ret);
+        CHK_RET(ret);
+        HCCL_RUN_INFO(
+            "[MC2_ALLOC_TRACE] stage[HcclAllocAlgResourceCcu] end, checkRes[0], ret[%d].", HCCL_SUCCESS);
         return HCCL_SUCCESS;
     }
     HcclResult ret = HcclGetChannelForCcu(comm, param, resRequest);
+    HCCL_RUN_INFO("[MC2_ALLOC_TRACE] stage[HcclGetChannelForCcu] end, checkRes[1], ret[%d].", ret);
     if (ret == HCCL_SUCCESS) {
         ret = HcclGetCcuKernel(comm, param, resRequest, resCtxHost);
+        HCCL_RUN_INFO("[MC2_ALLOC_TRACE] stage[HcclGetCcuKernel] end, checkRes[1], ret[%d].", ret);
     }
     // 资源预检查场景下，释放本次新建的channel
-    ReleaseCcuAcquiredChannels(comm, resRequest);
+    HcclResult releaseRet = ReleaseCcuAcquiredChannels(comm, resRequest);
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[ReleaseCcuAcquiredChannels] end, primaryRet[%d], releaseRet[%d].", ret,
+        releaseRet);
     CHK_RET(ret);
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[HcclAllocAlgResourceCcu] end, checkRes[1], ret[%d].", HCCL_SUCCESS);
     return HCCL_SUCCESS;
 #endif
 }
@@ -1520,6 +1560,9 @@ HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam& param, AlgResource
             // 需要资源回退。返回资源不够
             auto ret =
                 HcclChannelAcquire(comm, param.engine, kernelChannelRequest.data(), channelNum, kernelChannels.data());
+            HCCL_RUN_INFO(
+                "[MC2_ALLOC_TRACE] stage[HcclChannelAcquire] end, rank[%u], kernel[%s], channelNum[%u], ret[%d].",
+                userRank, kernelInfo.kernelFuncName, channelNum, ret);
             if (ret == HCCL_E_UNAVAIL) {
                 HCCL_WARNING("[HcclChannelAcquire] channel unavailable, channel num[%u].", channelNum);
                 // 释放当前kernel之前已申请的新增通道

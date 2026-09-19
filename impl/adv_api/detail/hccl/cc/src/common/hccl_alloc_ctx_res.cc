@@ -788,7 +788,10 @@ static HcclResult AcquireAlgResources(
     HcclComm comm, OpParam& opParam, std::unique_ptr<InsCollAlgBase>& executor, TopoInfoWithNetLayerDetails* topoInfo,
     std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, OpResCtx& opResCtx, void** resCtxOut)
 {
-    HCCL_INFO("[AcquireAlgResources]start AcquireAlgResources!");
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[AcquireAlgResources] begin, opType[%u], engine[%u], checkRes[%u], algName[%s].",
+        static_cast<uint32_t>(opParam.opType), static_cast<uint32_t>(opParam.engine),
+        static_cast<uint32_t>(opParam.checkRes), opParam.algName);
     bool isResourceReused = false;
     ThreadHandle cpuTsThread{0};
     ThreadHandle exportedAicpuTsThread{0};
@@ -811,6 +814,10 @@ static HcclResult AcquireAlgResources(
             missionNum, resCtxHost->kfcServerArgSize, static_cast<unsigned long long>(opResCtx.xnAddr),
             static_cast<unsigned long long>(opResCtx.ckeAddr));
         auto resRet = HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused);
+        HCCL_RUN_INFO(
+            "[MC2_ALLOC_TRACE] stage[HcclGetAlgRes/CCU] end, opType[%u], checkRes[%u], reused[%u], ret[%d].",
+            static_cast<uint32_t>(opParam.opType), static_cast<uint32_t>(opParam.checkRes),
+            static_cast<uint32_t>(isResourceReused), resRet);
         if (opParam.checkRes && resRet == HCCL_E_UNAVAIL) {
             HCCL_WARNING("[%s] HCCL_E_UNAVAIL, resource unavailable.", __func__);
             return HCCL_E_RES_NOT_SUFFICIENT;
@@ -818,10 +825,17 @@ static HcclResult AcquireAlgResources(
         CHK_RET(resRet);
         opParam.resCtx = *resCtxOut;
     } else {
-        CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
+        HcclResult resRet = HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused);
+        HCCL_RUN_INFO(
+            "[MC2_ALLOC_TRACE] stage[HcclGetAlgRes/nonCCU] end, opType[%u], engine[%u], reused[%u], ret[%d].",
+            static_cast<uint32_t>(opParam.opType), static_cast<uint32_t>(opParam.engine),
+            static_cast<uint32_t>(isResourceReused), resRet);
+        CHK_RET(resRet);
         opParam.resCtx = *resCtxOut;
     }
-    HCCL_INFO("[AcquireAlgResources]end AcquireAlgResources!");
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[AcquireAlgResources] end, opType[%u], ret[%d].",
+        static_cast<uint32_t>(opParam.opType), HCCL_SUCCESS);
     return HCCL_SUCCESS;
 }
 
@@ -1058,7 +1072,12 @@ HcclResult PrepareCcuAlgorithmResource(
 {
     uint32_t userRank = 0;
     HcclGetRankId(comm, &userRank);
-    CHK_RET(HandleSingleRankAndCommMode(comm, opParam, skipGetRes));
+    HcclResult ret = HandleSingleRankAndCommMode(comm, opParam, skipGetRes);
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[HandleSingleRankAndCommMode] end, rank[%u], tilingIndex[%u], "
+        "skipGetRes[%u], ret[%d].",
+        userRank, tilingIndex, static_cast<uint32_t>(skipGetRes), ret);
+    CHK_RET(ret);
     if (skipGetRes) {
         HCCL_INFO("[CcuSelectAlg] rank[%u] skip resource allocation for single rank/comm mode", userRank);
         return HCCL_SUCCESS;
@@ -1066,7 +1085,11 @@ HcclResult PrepareCcuAlgorithmResource(
     HCCL_INFO("[CcuSelectAlg]HandleSingleRankAndCommMode[%u] successfully! rank[%u]", tilingIndex, userRank);
 
     void* resCtxSequence = nullptr;
-    HcclResult ret = GetCcuOpParamResCtx(comm, algName, opParam, topoInfo, opResCtx, &resCtxSequence);
+    ret = GetCcuOpParamResCtx(comm, algName, opParam, topoInfo, opResCtx, &resCtxSequence);
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[GetCcuOpParamResCtx] end, rank[%u], tilingIndex[%u], algName[%s], "
+        "checkRes[%u], ret[%d].",
+        userRank, tilingIndex, algName.c_str(), static_cast<uint32_t>(opParam.checkRes), ret);
     if (ret != HCCL_SUCCESS) {
         HCCL_ERROR(
             "[CcuSelectAlg] rank[%u] GetCcuOpParamResCtx FAILED, ret[%d], algName[%s]", userRank, static_cast<int>(ret),
@@ -1113,13 +1136,23 @@ HcclResult ProcessCcuTiling(
     std::string algName;
     auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
     AlgorithmType algorithmType;
-    CHK_RET(SelectCcuAlgorithm(
-        comm, stream, topoTag, ccTiling, tilingIndex, opParam, algName, topoInfo, algorithmType, checkOnly));
+    HcclResult ret = SelectCcuAlgorithm(
+        comm, stream, topoTag, ccTiling, tilingIndex, opParam, algName, topoInfo, algorithmType, checkOnly);
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[SelectCcuAlgorithm] end, rank[%u], tilingIndex[%u], opType[%u], "
+        "algName[%s], checkOnly[%u], ret[%d].",
+        userRank, tilingIndex, ccTiling->opType, algName.c_str(), static_cast<uint32_t>(checkOnly), ret);
+    CHK_RET(ret);
 
     FillCcuAlgorithmInfo(tilingIndex, ccTiling, algName, algorithmType, opParam, opResCtx);
 
     bool skipGetRes = false;
-    CHK_RET(PrepareCcuAlgorithmResource(comm, tilingIndex, algName, opParam, topoInfo.get(), opResCtx, skipGetRes));
+    ret = PrepareCcuAlgorithmResource(comm, tilingIndex, algName, opParam, topoInfo.get(), opResCtx, skipGetRes);
+    HCCL_RUN_INFO(
+        "[MC2_ALLOC_TRACE] stage[PrepareCcuAlgorithmResource] end, rank[%u], tilingIndex[%u], "
+        "skipGetRes[%u], ret[%d].",
+        userRank, tilingIndex, static_cast<uint32_t>(skipGetRes), ret);
+    CHK_RET(ret);
     if (skipGetRes || checkOnly) {
         HCCL_INFO(
             "[CcuSelectAlg] rank[%u] ProcessCcuTiling[%u] DONE (skipGetRes), opType[%u]", userRank, tilingIndex,
