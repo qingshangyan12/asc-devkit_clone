@@ -20,6 +20,7 @@ namespace mc2_ops_hccl {
 struct CcuKernelArgKfcAllToAllMesh1DMultiJetty : CcuKernelArgBase {
     uint64_t rankSize = 0;
     uint32_t rankId = 0;
+    uint32_t jettyNum = 4U;
     OpParam opParam;
     std::vector<std::vector<uint32_t>> subCommRanks;
 };

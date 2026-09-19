@@ -13,6 +13,9 @@
 #include "ccu_temp_kfc_all_to_all_mesh1d_multi_jetty.h"
 
 namespace mc2_ops_hccl {
+namespace {
+constexpr uint32_t MESH_JETTY_NUM = 4U; // 与 prepare 侧 meshJettyNum（hccl_ccu_v0_prepare.h）保持一致
+} // namespace
 
 CcuTempKfcAllToAllMesh1DMultiJetty::CcuTempKfcAllToAllMesh1DMultiJetty(
     const OpParam& param, u32 rankId, const std::vector<std::vector<u32>>& subCommRanks)
@@ -45,6 +48,7 @@ HcclResult CcuTempKfcAllToAllMesh1DMultiJetty::CalcResByChannelDescsImpl(
     auto kernelArg = std::make_shared<CcuKernelArgKfcAllToAllMesh1DMultiJetty>();
     kernelArg->rankSize = tempRankSize_;
     kernelArg->rankId = mySubCommRank_;
+    kernelArg->jettyNum = MESH_JETTY_NUM;
     kernelArg->opParam = param;
     kernelArg->subCommRanks = subCommRanks_;
 
@@ -85,11 +89,14 @@ HcclResult CcuTempKfcAllToAllMesh1DMultiJetty::KernelRun(
     config.memSlice = CCU_MS_SIZE * LOCAL_COPY_MS_PER_LOOP;
     const auto goSize = CalGoSize(sliceSize, config);
 
+    const uint64_t sliceSizePerJetty = sliceSize / MESH_JETTY_NUM / HCCL_MIN_SLICE_ALIGN * HCCL_MIN_SLICE_ALIGN;
+    const uint64_t lastSliceSizePerJetty = sliceSize - sliceSizePerJetty * (MESH_JETTY_NUM - 1U);
+
     CcuKernelSubmitInfo submitInfo{};
     submitInfo.kernelHandle = templateResource.ccuKernels[0];
     CHK_RET(FillCachedArgs(
         submitInfo, 1ULL, inputAddr, outputAddr, sliceSize, srcStride, srcOffset, dstOffset, goSize[0], goSize[1],
-        goSize[2], goSize[3]));
+        goSize[2], goSize[3], sliceSizePerJetty, lastSliceSizePerJetty, MESH_JETTY_NUM));
     templateResource.submitInfos.push_back(submitInfo);
 
     HCCL_INFO(

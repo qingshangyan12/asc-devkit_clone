@@ -94,6 +94,7 @@ HcclResult InheritKfcServerKernelArg(
         CHK_PTR_NULL(srcArg);
         kfcArg->rankSize = srcArg->rankSize;
         kfcArg->rankId = srcArg->rankId;
+        kfcArg->jettyNum = srcArg->jettyNum;
         kfcArg->opParam = srcArg->opParam;
         kfcArg->subCommRanks = srcArg->subCommRanks;
     } else if (isAlltoAllMultiJetty) {
