@@ -340,13 +340,14 @@ __aicore__ inline void Mmad(
 
 #if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
 /* [CUBE-PTR-PR2] LoadDataWithTranspose / MmadMx / BroadCast / Fill — Jessicaruan Wave1 */
+/* Note: dav-3510 LoadData2DL12L0ATransposeCal is NOT_SUPPORT (assert); keep L0A V1 to mirror Tensor surface */
 template <typename T>
 __aicore__ inline void LoadDataWithTranspose(
     __ca__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParams);
 template <typename T>
 __aicore__ inline void LoadDataWithTranspose(
     __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParams);
-/* V2: Tensor path only L0B — do NOT add L0A */
+/* V2: Tensor path only L0B — do NOT add L0A (hongwei P1) */
 template <typename T>
 __aicore__ inline void LoadDataWithTranspose(
     __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParamsV2& loadDataParams);
