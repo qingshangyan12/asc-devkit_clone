@@ -161,7 +161,7 @@ __aicore__ inline uint32_t make_head(uint32_t sender) // __aicore__表示该函�
 
 ### 核间同步
 
-样例使用[`asc_sync_intra_arrive`](../../../../../api/SIMD-API/c_api/sync/asc_sync_intra_arrive.md)和[`asc_sync_intra_wait`](../../../../../api/SIMD-API/c_api/sync/asc_sync_intra_wait.md)。这两个接口属于核间同步，对应模式4，可以在同一AI Core内让AIC与单个AIV互相发送通知。
+样例使用[`asc_sync_intra_arrive`](../../../../../api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md)和[`asc_sync_intra_wait`](../../../../../api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md)。这两个接口属于核间同步，对应模式4，可以在同一AI Core内让AIC与单个AIV互相发送通知。
 
 ### 发布和确认顺序
 
