@@ -351,8 +351,9 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForConcurrentAllToAll(
     __gm__ CommonPrepareParamCcu* commParam)
 {
-    constexpr uint64_t meshBandwidth = 11U;
-    constexpr uint64_t totalBandwidth = 21U;
+    // 39:61 为 mesh 裸 LocalCopy(~30GB/s)与 clos 网写带宽平衡出的临时配比；mesh 拷贝流水化后须还原为网络带宽比(~11:10)
+    constexpr uint64_t meshBandwidth = 13U;
+    constexpr uint64_t totalBandwidth = 33U;
     constexpr uint64_t splitAlignment = 128U;
     constexpr uint64_t closJettyNum = 1U; // 与 CcuTempAllToAllMesh1DMultiJetty 的 A2A_JETTY_NUM 保持一致
     const uint64_t dataTypeSize = GetHcclDataTypeSize(commParam->dataType);

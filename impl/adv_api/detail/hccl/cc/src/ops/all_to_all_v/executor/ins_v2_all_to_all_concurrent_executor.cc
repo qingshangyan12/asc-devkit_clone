@@ -24,8 +24,9 @@ namespace mc2_ops_hccl {
 namespace {
 constexpr u32 CONCURRENT_TEMPLATE_NUM = 2U;
 constexpr u32 CLOS_PORT_NUM = 4U;
-constexpr u32 MESH_BW_CCU = 11U;
-constexpr u32 CLOS_BW_CCU = 10U;
+// 13:20(39:61) 与 hccl_ccu_v0_prepare.h 的 CcuPrepareForConcurrentAllToAll 对齐：mesh 裸 LocalCopy 限速下的临时配比，流水化后须还原
+constexpr u32 MESH_BW_CCU = 13U;
+constexpr u32 CLOS_BW_CCU = 20U;
 constexpr u32 MESH_BW_AICPU_TS = 10U;
 constexpr u32 CLOS_BW_AICPU_TS = 12U;
 
