@@ -336,9 +336,9 @@ __aicore__ inline void Fixpipe(__gm__ T* dst, __cc__ U* src, const FixpipeParams
 }
 #endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 
-#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__) && defined(__NPU_ARCH__) &&       \
-    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 3510 || \
-     __NPU_ARCH__ == 5102)
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+                              __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 /* [CUBE-PTR-PR2] Fixpipe L0C→L1/UB (V220) — Jessicaruan Wave1 */
 template <typename T, typename U, const FixpipeConfig& config>
 __aicore__ inline void Fixpipe(__cbuf__ T* dst, __cc__ U* src, const FixpipeParamsV220& intriParams)
@@ -350,25 +350,21 @@ __aicore__ inline void Fixpipe(__ubuf__ T* dst, __cc__ U* src, const FixpipePara
 {
     FixpipeL0C2UBImpl<PrimT<T>, PrimT<U>, config>(dst, src, intriParams);
 }
-#endif
-
-#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__) && defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#endif // V220 arches
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 /* [CUBE-PTR-PR2] Fixpipe L0C→L1/UB (Arch3510) — Jessicaruan Wave1 */
 template <typename T, typename U, const FixpipeConfig& config>
-__aicore__ inline void Fixpipe(
-    __cbuf__ T* dst, __cc__ U* src, const FixpipeParamsArch3510<config.format>& intriParams)
+__aicore__ inline void Fixpipe(__cbuf__ T* dst, __cc__ U* src, const FixpipeParamsArch3510<config.format>& intriParams)
 {
     FixpipeL0C2L1Impl<PrimT<T>, PrimT<U>, config>(dst, src, intriParams);
 }
 template <typename T, typename U, const FixpipeConfig& config>
-__aicore__ inline void Fixpipe(
-    __ubuf__ T* dst, __cc__ U* src, const FixpipeParamsArch3510<config.format>& intriParams)
+__aicore__ inline void Fixpipe(__ubuf__ T* dst, __cc__ U* src, const FixpipeParamsArch3510<config.format>& intriParams)
 {
     FixpipeL0C2UBImpl<PrimT<T>, PrimT<U>, config>(dst, src, intriParams);
 }
-#endif
-
+#endif // Arch3510
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 
 // L0C->GM deq tensor quant
 template <typename T, typename U, const FixpipeConfig& config>

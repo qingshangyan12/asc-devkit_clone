@@ -576,7 +576,6 @@ __aicore__ inline void InitConstValue(__cbuf__ T* dst, const InitConstValueParam
 }
 #endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 
-
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
