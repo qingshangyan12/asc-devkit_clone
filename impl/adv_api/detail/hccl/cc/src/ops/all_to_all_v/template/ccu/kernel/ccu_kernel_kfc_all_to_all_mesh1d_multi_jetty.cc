@@ -34,7 +34,6 @@ struct KfcAllToAllContext : CcuKernelCtxBase {
     ccu::Variable dstOffset;
     GroupOpSizeVars goSize;
     ccu::Event event;
-    ccu::Event localCopyEvent;
 };
 
 CcuResult InitResource(KfcAllToAllContext& ctx)
@@ -125,12 +124,12 @@ CcuResult DoAllToAll(KfcAllToAllContext& ctx)
     localDst.addr = ctx.output;
     localDst.addr += ctx.dstOffset;
     localDst.token = ctx.token;
+    const uint16_t localMask = static_cast<uint16_t>(1U << ctx.rankId);
     CCU_IF(ctx.sliceSize != 0)
     {
-        CCU_CHK_RET(ccu::LocalCopy(localDst, localSrc, ctx.sliceSize, ctx.localCopyEvent, 1));
-        CCU_CHK_RET(ccu::EventWait(ctx.localCopyEvent, 1));
+        CCU_CHK_RET(ccu::LocalCopy(localDst, localSrc, ctx.sliceSize, ctx.event, localMask));
     }
-    CCU_CHK_RET(ccu::EventRecord(ctx.event, static_cast<uint16_t>(1U << ctx.rankId)));
+    CCU_ELSE { CCU_CHK_RET(ccu::EventRecord(ctx.event, localMask)); }
 
     uint16_t waitMask = 0;
     for (uint32_t r = 0; r < ctx.rankSize; ++r) {
