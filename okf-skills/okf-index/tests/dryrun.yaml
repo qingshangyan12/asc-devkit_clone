@@ -1,0 +1,24 @@
+# 20 题索引 dry-run 清单：每题 ≤2 次查询（阶段5 okf-retrieve 检索策略的基线示范）
+# 断言口径：required 全覆盖（含家族等价展开）；替代组每组 ≥1 成员；E 类命中缺口登记。
+# 查询结果可含 required/optional/替代组之外的候选，检索阶段由 okf-retrieve 按需收敛。
+queries:
+  A1: ["--operation add", "--stage in,out"]
+  A2: ["--operation leaky_relu", "--stage in,out"]
+  A3: ["--category vector_compare", "--stage in,out"]
+  A4: ["--convert half int4,int32", "--stage in,out"]
+  A5: ["--operation divide", "--stage in,out"]
+  A6: ["--operation multiply", "--stage in,out"]
+  A7: ["--operation selection", "--stage in,out"]
+  A8: ["--operation gather", "--stage in,out"]
+  B1: ["--kw 非对齐"]
+  B2: ["--api asc_copy_gm2ub"]
+  B3: ["--category vector_mask_config"]
+  B4: ["--convert half float"]
+  B5: ["--kw 相邻"]
+  C1: ["--api asc_ndim_copy_gm2ub", "--deps-of asc_ndim_copy_gm2ub --kind requires"]
+  C2: ["--api asc_deq_int322half", "--deps-of asc_deq_int322half"]
+  D1: ["--operation reduction", "--stage in,out"]
+  D2: ["--kw 填充", "--stage out"]
+  E1: ["--gap 同步"]
+  E2: ["--gap 寄存器"]
+  E3: ["--gap 取整"]
