@@ -1,3 +1,34 @@
+---
+okftype: reference.api.cpp
+title: asc_int642float
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int642float.md
+description: 将int64_t类型数据转换为float类型。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: []
+signature:
+  - prototype_id: asc_int642float__v<dtype>_v<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_convert.h]
+    dtype:
+      values:
+        - float
+        - int64_t
+  - prototype_id: asc_int642float__v<dtype>_v<dtype>_u8_u16_u16_u16_u16
+    headers: [c_api/vector_compute/compute/vector_convert.h]
+    dtype:
+      values:
+        - float
+        - int64_t
+dependencies: []
+timestamp: '2026-09-19'
+---
 # asc_int642float
 
 ## 产品支持情况

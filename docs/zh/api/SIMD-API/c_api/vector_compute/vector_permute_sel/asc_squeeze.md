@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: asc_squeeze
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_squeeze.md
+description: 通过比较掩码src1，将src0中的向量压缩成更短的向量，存储到dst中。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [compact]
+  - objects: [mask, vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [masked]
+signature:
+  - prototype_id: asc_squeeze__v<dtype>_v<dtype>_v<dtype>_u8_u8_u8_u8_u8_u8_u8
+    headers: [c_api/vector_compute/compute/vector_permute_sel.h]
+    dtype:
+      values:
+        - uint16_t
+        - uint32_t
+dependencies: []
+timestamp: '2026-09-19'
+---
 # asc_squeeze
 
 ## 产品支持情况

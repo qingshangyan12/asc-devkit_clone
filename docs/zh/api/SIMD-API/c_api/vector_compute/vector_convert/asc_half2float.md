@@ -1,3 +1,34 @@
+---
+okftype: reference.api.cpp
+title: asc_half2float
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2float.md
+description: 将half类型转化为float类型，无舍入模式。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, high_dimensional]
+signature:
+  - prototype_id: asc_half2float__v<dtype>_v<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_convert.h]
+    dtype:
+      values:
+        - float
+        - half
+  - prototype_id: asc_half2float__v<dtype>_v<dtype>_u8_u16_u16_u16_u16
+    headers: [c_api/vector_compute/compute/vector_convert.h]
+    dtype:
+      values:
+        - float
+        - half
+dependencies: []
+timestamp: '2026-09-19'
+---
 # asc_half2float
 
 ## 产品支持情况

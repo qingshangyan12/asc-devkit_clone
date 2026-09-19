@@ -1,3 +1,34 @@
+---
+okftype: reference.api.cpp
+title: asc_datablock_reduce_min
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_min.md
+description: 执行数据块内的求最小值规约（Reduce Min）操作。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [reduction]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, high_dimensional]
+signature:
+  - prototype_id: asc_datablock_reduce_min__v<dtype>_v<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_reduce.h]
+    dtype:
+      values:
+        - half
+        - float
+  - prototype_id: asc_datablock_reduce_min__v<dtype>_v<dtype>_u8_u16_u16_u16
+    headers: [c_api/vector_compute/compute/vector_reduce.h]
+    dtype:
+      values:
+        - half
+        - float
+dependencies: []
+timestamp: '2026-09-19'
+---
 # asc_datablock_reduce_min
 
 ## 产品支持情况

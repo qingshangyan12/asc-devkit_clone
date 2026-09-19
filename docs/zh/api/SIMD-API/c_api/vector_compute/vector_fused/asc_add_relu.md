@@ -1,3 +1,38 @@
+---
+okftype: reference.api.cpp
+title: asc_add_relu
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_add_relu.md
+description: 按元素求和，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: [activation, arithmetic]
+  - operations: [add, relu]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, elementwise, high_dimensional]
+signature:
+  - prototype_id: asc_add_relu__v<dtype>_v<dtype>_v<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_fused.h]
+    dtype:
+      values:
+        - half
+        - float
+        - int16_t
+        - int8_t
+  - prototype_id: asc_add_relu__v<dtype>_v<dtype>_v<dtype>_u8_u8_u8_u8_u8_u8_u8
+    headers: [c_api/vector_compute/compute/vector_fused.h]
+    dtype:
+      values:
+        - half
+        - float
+        - int16_t
+        - int8_t
+dependencies: []
+timestamp: '2026-09-19'
+---
 # asc_add_relu
 
 ## 产品支持情况

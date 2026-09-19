@@ -1,3 +1,30 @@
+---
+okftype: reference.api.cpp
+title: asc_mrgsort4
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md
+description: 将已经排好序的最多4条队列，合并排列成1条队列，结果按照score域由大到小排序。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [sort]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: []
+signature:
+  - prototype_id: asc_mrgsort4__v<dtype>_v<dtype>_u8_u16_u16_u16_u16_bool_u8
+    headers: [c_api/vector_compute/compute/vector_sort.h]
+    dtype:
+      values:
+        - half
+        - float
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_bitsort.md
+    kind: related
+timestamp: '2026-09-19'
+---
 # asc_mrgsort4
 
 ## 产品支持情况

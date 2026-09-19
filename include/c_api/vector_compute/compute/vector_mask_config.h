@@ -26,10 +26,28 @@
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/reg_base_impl/vector_mask_config_intf_impl.h"
 #endif
+/**
+ * @brief 设置Mask模式为Counter模式。
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_count.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_norm.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md
+ */
 __aicore__ inline void asc_set_mask_count();
 
+/**
+ * @brief 设置Mask模式为Normal模式，该模式为系统默认模式。
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_count.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_norm.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md
+ */
 __aicore__ inline void asc_set_mask_norm();
 
+/**
+ * @brief 本API用于设置Mask值。
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_count.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_norm.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md
+ */
 __aicore__ inline void asc_set_vector_mask(uint64_t mask_high, uint64_t mask_low);
 
 #endif

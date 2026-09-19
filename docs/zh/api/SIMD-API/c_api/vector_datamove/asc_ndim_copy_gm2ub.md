@@ -1,3 +1,53 @@
+---
+okftype: reference.api.cpp
+title: asc_ndim_copy_gm2ub
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
+description: 该接口用于将多维数据从Global Memory（GM）搬运到Unified Buffer（UB）。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [global_memory]
+  - destination_locations: [unified_buffer]
+  - traits: [high_dimensional, padding]
+signature:
+  - prototype_id: asc_ndim_copy_gm2ub__vf16_vf16_u32_u32_u32_u32_u32_u8_u8_bool_asc_load_l2_cache_mode
+    archs: ['3510']
+    headers: [c_api/vector_datamove/vector_datamove.h]
+    dtype:
+      values:
+        - int8_t
+        - uint8_t
+        - fp4x2_e2m1_t
+        - fp4x2_e1m2_t
+        - fp8_e8m0_t
+        - fp8_e5m2_t
+        - fp8_e4m3fn_t
+        - int16_t
+        - uint16_t
+        - half
+        - bfloat16_t
+        - int32_t
+        - uint32_t
+        - float
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_dci.md
+    kind: requires
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_loop_stride.md
+    kind: requires
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md
+    kind: requires
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md
+    kind: requires
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_ub2l1
+    file: data_copy_ub2l1.asc
+    archs: ['3510']
+timestamp: '2026-09-19'
+---
 # asc_ndim_copy_gm2ub
 
 ## 产品支持情况

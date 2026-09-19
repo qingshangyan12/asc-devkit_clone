@@ -1,3 +1,58 @@
+---
+okftype: reference.arch.cpp
+title: asc_copy_gm2ub_align
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_2201.md
+description: 提供数据非对齐搬运的功能，将数据从Global Memory (GM)搬运到Unified Buffer（UB），并支持8位/16位/32位数据类型搬运。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [global_memory]
+  - destination_locations: [unified_buffer]
+  - traits: [high_dimensional, padding, unaligned_transfer]
+signature:
+  - prototype_id: asc_copy_gm2ub_align__v_v_u32
+    headers: [c_api/vector_datamove/vector_datamove.h]
+    archs: ['2201']
+    dtype:
+      values:
+        - int8_t
+        - uint8_t
+        - int16_t
+        - uint16_t
+        - half
+        - bfloat16_t
+        - int32_t
+        - uint32_t
+        - float
+  - prototype_id: asc_copy_gm2ub_align__v_v_u16_u32_u8_u8_u32_u32
+    headers: [c_api/vector_datamove/vector_datamove.h]
+    archs: ['2201']
+    dtype:
+      values:
+        - int8_t
+        - uint8_t
+        - int16_t
+        - uint16_t
+        - half
+        - bfloat16_t
+        - int32_t
+        - uint32_t
+        - float
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md
+    kind: requires
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop1_stride.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop2_stride.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop_size.md
+    kind: related
+timestamp: '2026-09-19'
+---
 # asc_copy_gm2ub_align
 
 ## 产品支持情况

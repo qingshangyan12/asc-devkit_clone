@@ -1,3 +1,50 @@
+---
+okftype: reference.arch.cpp
+title: asc_copy_ub2gm
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md
+description: 将数据从Unified Buffer（UB）搬运到Global Memory（GM）。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [unified_buffer]
+  - destination_locations: [global_memory]
+  - traits: [high_dimensional]
+signature:
+  - prototype_id: asc_copy_ub2gm__vp_vp_u32
+    archs: ['3510']
+    headers: [c_api/vector_datamove/vector_datamove.h]
+  - prototype_id: asc_copy_ub2gm__vp_vp_u16_u16_u16_u16
+    archs: ['3510']
+    headers: [c_api/vector_datamove/vector_datamove.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop2_stride.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop_size.md
+    kind: related
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_align
+    file: reg_load_store_align.asc
+    archs: ['3510']
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_mask
+    file: reg_load_store_mask.asc
+    archs: ['3510']
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_ub2l1
+    file: data_copy_ub2l1.asc
+    archs: ['3510']
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_gather
+    file: reg_load_gather.asc
+    archs: ['3510']
+  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/asc_copy_l0c2ub
+    file: asc_copy_l0c2ub.asc
+    archs: ['3510']
+timestamp: '2026-09-19'
+---
 # asc_copy_ub2gm
 
 ## 产品支持情况

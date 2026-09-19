@@ -1,3 +1,21 @@
+---
+okftype: reference.index.cpp
+title: 类型转换
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/vector_convert.md
+description: ''
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies: []
+timestamp: '2026-09-19'
+---
 # 类型转换
 
 - **[asc_bfloat162float](asc_bfloat162float.md)**

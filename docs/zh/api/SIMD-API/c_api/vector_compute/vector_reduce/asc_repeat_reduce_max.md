@@ -1,3 +1,72 @@
+---
+okftype: reference.api.cpp
+title: asc_repeat_reduce_max
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_max.md
+description: 对每个Repeat内所有元素求最大值，以及Repeat内的首个最大值元素在当前Repeat中的索引index。一次Repeat计算256字节。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [reduction]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, high_dimensional]
+signature:
+  - prototype_id: asc_repeat_reduce_max_index_value__v<dtype>_v<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_reduce.h]
+    dtype:
+      values:
+        - half
+        - float
+  - prototype_id: asc_repeat_reduce_max_value_index__v<dtype>_v<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_reduce.h]
+    dtype:
+      values:
+        - half
+        - float
+  - prototype_id: asc_repeat_reduce_max_only_value__v<dtype>_v<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_reduce.h]
+    dtype:
+      values:
+        - half
+        - float
+  - prototype_id: asc_repeat_reduce_max_only_index__v<dtype>_v<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_reduce.h]
+    dtype:
+      values:
+        - half
+        - float
+  - prototype_id: asc_repeat_reduce_max_index_value__v<dtype>_v<dtype>_u8_u16_u16_u16
+    headers: [c_api/vector_compute/compute/vector_reduce.h]
+    dtype:
+      values:
+        - half
+        - float
+  - prototype_id: asc_repeat_reduce_max_value_index__v<dtype>_v<dtype>_u8_u16_u16_u16
+    headers: [c_api/vector_compute/compute/vector_reduce.h]
+    dtype:
+      values:
+        - half
+        - float
+  - prototype_id: asc_repeat_reduce_max_only_value__v<dtype>_v<dtype>_u8_u16_u16_u16
+    headers: [c_api/vector_compute/compute/vector_reduce.h]
+    dtype:
+      values:
+        - half
+        - float
+  - prototype_id: asc_repeat_reduce_max_only_index__v<dtype>_v<dtype>_u8_u16_u16_u16
+    headers: [c_api/vector_compute/compute/vector_reduce.h]
+    dtype:
+      values:
+        - half
+        - float
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_max_cnt.md
+    kind: related
+timestamp: '2026-09-19'
+---
 # asc_repeat_reduce_max
 
 ## 产品支持情况

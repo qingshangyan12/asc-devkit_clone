@@ -1,3 +1,34 @@
+---
+okftype: reference.api.cpp
+title: asc_set_va_reg
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_set_va_reg.md
+description: 用于设置transpose的16个DataBlock地址，将操作数地址序列与地址寄存器关联，接口要求前8个和后8个地址序列与地址寄存器分别关联。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: [unified_buffer]
+  - destination_locations: []
+  - traits: []
+signature:
+  - prototype_id: asc_set_va_reg__ub_addr8_t_v<dtype>
+    headers: [c_api/vector_compute/compute/vector_permute_sel.h]
+    dtype:
+      values:
+        - int8_t
+        - uint8_t
+        - int16_t
+        - uint16_t
+        - half
+        - int32_t
+        - uint32_t
+        - float
+dependencies: []
+timestamp: '2026-09-19'
+---
 # asc_set_va_reg
 
 ## 产品支持情况

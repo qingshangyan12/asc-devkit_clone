@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: asc_get_rsvd_count
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_rsvd_count.md
+description: 此接口用于获取执行[asc_reduce](asc_reduce.md)操作后剩余的元素数量。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [query]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - prototype_id: asc_get_rsvd_count
+    headers: [c_api/vector_compute/compute/vector_reduce.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_reduce.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_reduce.md
+    kind: requires
+timestamp: '2026-09-19'
+---
 # asc_get_rsvd_count
 
 ## 产品支持情况

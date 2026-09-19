@@ -1,3 +1,34 @@
+---
+okftype: reference.api.cpp
+title: asc_rsqrt
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_rsqrt.md
+description: 按元素进行开方后取倒数的计算
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: [arithmetic]
+  - operations: [reciprocal_sqrt]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, elementwise, high_dimensional]
+signature:
+  - prototype_id: asc_rsqrt__v<dtype>_v<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_arith.h]
+    dtype:
+      values:
+        - half
+        - float
+  - prototype_id: asc_rsqrt__v<dtype>_v<dtype>_u8_u16_u16_u16_u16
+    headers: [c_api/vector_compute/compute/vector_arith.h]
+    dtype:
+      values:
+        - half
+        - float
+dependencies: []
+timestamp: '2026-09-19'
+---
 # asc_rsqrt
 
 ## 产品支持情况

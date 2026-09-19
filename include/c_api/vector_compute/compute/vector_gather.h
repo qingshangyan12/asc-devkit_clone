@@ -24,6 +24,11 @@
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "impl/c_api/memory_base_impl/vector_gather_intf_impl.h"
 #endif
+/**
+ * @brief 将src按照src_offset给定的偏移按元素收集到dst中。
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md
+ */
 __aicore__ inline void asc_gather(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
     uint8_t repeat);
@@ -72,6 +77,11 @@ __aicore__ inline void asc_gather(
 __aicore__ inline void asc_gather(
     __ubuf__ float* dst, __ubuf__ float* src, __ubuf__ uint32_t* src_offset, uint32_t count);
 
+/**
+ * @brief 给定一个输入的矢量和一个地址偏移矢量，根据偏移地址按照DataBlock的粒度将输入矢量收集到目的矢量中。
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md
+ */
 __aicore__ inline void asc_gather_datablock(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
     uint8_t dst_block_stride, uint8_t repeat);

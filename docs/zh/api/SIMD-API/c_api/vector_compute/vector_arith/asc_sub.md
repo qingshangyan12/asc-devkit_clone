@@ -1,3 +1,38 @@
+---
+okftype: reference.api.cpp
+title: asc_sub
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_sub.md
+description: 执行矢量减法运算。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: [arithmetic]
+  - operations: [subtract]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, elementwise, high_dimensional]
+signature:
+  - prototype_id: asc_sub__v<dtype>_v<dtype>_v<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_arith.h]
+    dtype:
+      values:
+        - int16_t
+        - half
+        - int32_t
+        - float
+  - prototype_id: asc_sub__v<dtype>_v<dtype>_v<dtype>_u8_u8_u8_u8_u8_u8_u8
+    headers: [c_api/vector_compute/compute/vector_arith.h]
+    dtype:
+      values:
+        - int16_t
+        - half
+        - int32_t
+        - float
+dependencies: []
+timestamp: '2026-09-19'
+---
 # asc_sub
 
 ## 产品支持情况

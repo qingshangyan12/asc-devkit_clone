@@ -1,3 +1,44 @@
+---
+okftype: reference.api.cpp
+title: asc_duplicate
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_duplicate.md
+description: 执行矢量复制（Duplicate）操作，将标量值复制填充到矢量中。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_initialization]
+  - families: []
+  - operations: [broadcast]
+  - objects: [scalar, vector]
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, high_dimensional, scalar_operand]
+signature:
+  - prototype_id: asc_duplicate__v<dtype>_<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_broadcast.h]
+    dtype:
+      values:
+        - half
+        - int16_t
+        - uint16_t
+        - bfloat16_t
+        - float
+        - int32_t
+        - uint32_t
+  - prototype_id: asc_duplicate__v<dtype>_<dtype>_u8_u16_u16
+    headers: [c_api/vector_compute/compute/vector_broadcast.h]
+    dtype:
+      values:
+        - half
+        - int16_t
+        - uint16_t
+        - bfloat16_t
+        - float
+        - int32_t
+        - uint32_t
+dependencies: []
+timestamp: '2026-09-19'
+---
 # asc_duplicate
 
 ## 产品支持情况

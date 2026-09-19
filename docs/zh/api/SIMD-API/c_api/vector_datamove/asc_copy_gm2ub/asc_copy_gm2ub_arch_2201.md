@@ -1,3 +1,38 @@
+---
+okftype: reference.arch.cpp
+title: asc_copy_gm2ub
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md
+description: 将数据从Global Memory (GM)搬运到Unified Buffer（UB）。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [global_memory]
+  - destination_locations: [unified_buffer]
+  - traits: [high_dimensional]
+signature:
+  - prototype_id: asc_copy_gm2ub__vp_vp_u32
+    headers: [c_api/vector_datamove/vector_datamove.h]
+    archs: ['2201']
+  - prototype_id: asc_copy_gm2ub__vp_vp_u16_u16_u16_u16
+    headers: [c_api/vector_datamove/vector_datamove.h]
+    archs: ['2201']
+dependencies: []
+examples:
+  - path: /examples/02_simd_c_api/00_introduction/01_add/c_api_async_add
+    file: c_api_add.asc
+    archs: ['2201']
+  - path: /examples/02_simd_c_api/00_introduction/01_add/c_api_delicacy_async_add
+    file: c_api_add.asc
+    archs: ['2201']
+  - path: /examples/02_simd_c_api/00_introduction/01_add/c_api_sync_add
+    file: c_api_add.asc
+    archs: ['2201']
+timestamp: '2026-09-19'
+---
 # asc_copy_gm2ub
 
 ## 产品支持情况

@@ -1,3 +1,38 @@
+---
+okftype: reference.api.cpp
+title: asc_mul
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_mul.md
+description: 执行矢量乘法运算。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: [arithmetic]
+  - operations: [multiply]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, elementwise, high_dimensional]
+signature:
+  - prototype_id: asc_mul__v<dtype>_v<dtype>_v<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_arith.h]
+    dtype:
+      values:
+        - int16_t
+        - half
+        - int32_t
+        - float
+  - prototype_id: asc_mul__v<dtype>_v<dtype>_v<dtype>_u8_u8_u8_u8_u8_u8_u8
+    headers: [c_api/vector_compute/compute/vector_arith.h]
+    dtype:
+      values:
+        - int16_t
+        - half
+        - int32_t
+        - float
+dependencies: []
+timestamp: '2026-09-19'
+---
 # asc_mul
 
 ## 产品支持情况

@@ -287,7 +287,7 @@ def blank_field(fields: dict[str, Any], field: str) -> None:
     elif field.startswith("tag."):
         namespace = field.split(".", 1)[1]
         updated = [
-            {namespace: [] if key == namespace else values}
+            {key: [] if key == namespace else values}
             for item in fields.get("tag", [])
             if isinstance(item, dict)
             for key, values in item.items()
@@ -497,7 +497,10 @@ def updated_document(
     return "---\n" + render_yaml(fields, namespaces, values, root, path, body, evidence, allowed_empty) + "---\n" + body
 
 
-def validate_auxiliary_patch(root: Path, patch: dict[str, Any], key: str) -> tuple[Path, str]:
+AUXILIARY_SUFFIXES = {".h", ".hpp", ".inc", ".asc", ".cpp", ".c"}
+
+
+def load_auxiliary_target(root: Path, patch: dict[str, Any], key: str) -> tuple[str, str, str]:
     path = patch.get("path")
     anchor = patch.get("anchor")
     text = patch.get("text")
@@ -508,16 +511,17 @@ def validate_auxiliary_patch(root: Path, patch: dict[str, Any], key: str) -> tup
         target.relative_to(root.resolve())
     except ValueError as exc:
         raise ValidationError(f"{key} patch escapes DevKit root: {path}") from exc
-    if not target.is_file() or target.suffix.lower() not in {".h", ".hpp", ".inc", ".asc", ".cpp", ".c"}:
+    if not target.is_file() or target.suffix.lower() not in AUXILIARY_SUFFIXES:
         raise ValidationError(f"{key} patch target is not an existing source file: {path}")
+    rel = repo_relative(root, target)
+    return rel, anchor, text
+
+
+def check_auxiliary_text(key: str, text: str) -> None:
     if key == "doxygen" and not text.lstrip().startswith("/**"):
         raise ValidationError("Doxygen patch must insert a /** comment")
     if key == "example_markers" and not COMMENT_RE.match(text):
         raise ValidationError("example marker must be a comment")
-    source = target.read_text(encoding="utf-8", errors="replace")
-    if source.count(anchor) != 1:
-        raise ValidationError(f"{key} anchor must occur exactly once: {path}")
-    return target, source.replace(anchor, text + "\n" + anchor, 1)
 
 
 def report_markdown(report: dict[str, Any]) -> str:
@@ -554,6 +558,44 @@ def validate(args: argparse.Namespace) -> int:
     issue_report: list[dict[str, Any]] = []
     patches: list[dict[str, Any]] = []
     requires_graph: dict[str, set[str]] = {}
+    originals: dict[str, tuple[str, str]] = {}
+    file_final: dict[str, dict[str, Any]] = {}
+    aux_anchors: set[tuple[str, str]] = set()
+
+    def stage_document(rel: str, before: str, content: str) -> None:
+        if rel in file_final:
+            raise ValidationError(f"multiple document patches for one file: {rel}")
+        file_final[rel] = {
+            "path": rel,
+            "before_sha256": before,
+            "content": content,
+            "kinds": ["document"],
+        }
+        patches.append({"kind": "document", "path": rel, "before_sha256": before, "content": content})
+
+    def apply_auxiliary(patch: dict[str, Any], key: str) -> None:
+        rel, anchor, text = load_auxiliary_target(root, patch, key)
+        check_auxiliary_text(key, text)
+        if (rel, anchor) in aux_anchors:
+            raise ValidationError(f"duplicate auxiliary anchor for {rel}: {anchor!r}")
+        aux_anchors.add((rel, anchor))
+        if rel not in originals:
+            target = (root / rel).resolve()
+            originals[rel] = (sha256(target), target.read_text(encoding="utf-8", errors="replace"))
+        if rel not in file_final:
+            file_final[rel] = {
+                "path": rel,
+                "before_sha256": originals[rel][0],
+                "content": originals[rel][1],
+                "kinds": [],
+            }
+        current = file_final[rel]["content"]
+        if current.count(anchor) != 1:
+            raise ValidationError(f"{key} anchor must occur exactly once: {rel}")
+        file_final[rel]["content"] = current.replace(anchor, text + "\n" + anchor, 1)
+        file_final[rel]["kinds"].append(key)
+        patches.append({"kind": key, "path": rel, "anchor": anchor})
+
     for document in documents:
         path = document["path"]
         target = relative_api_path(root, path)
@@ -584,11 +626,10 @@ def validate(args: argparse.Namespace) -> int:
             target.read_text(encoding="utf-8", errors="replace"), fields, namespaces, values,
             root, path, document.get("evidence", {}), allowed_empty,
         )
-        patches.append({"kind": "document", "path": path, "before_sha256": document["sha256"], "content": updated})
+        stage_document(path, document["sha256"], updated)
         for key in ("doxygen", "example_markers"):
             for auxiliary in document.get(key, []):
-                target_path, content = validate_auxiliary_patch(root, auxiliary, key)
-                patches.append({"kind": key, "path": repo_relative(root, target_path), "before_sha256": sha256(target_path), "content": content})
+                apply_auxiliary(auxiliary, key)
     states: dict[str, int] = {}
     stack: list[str] = []
 
@@ -610,9 +651,13 @@ def validate(args: argparse.Namespace) -> int:
     report = {"schema_version": 1, "run_id": manifest["run_id"], "issues": issue_report, "documents": manifest["documents"]}
     write_json(run_dir / "error-report.json", report)
     (run_dir / "error-report.md").write_text(report_markdown(report), encoding="utf-8")
-    write_json(run_dir / "write-plan.json", {"schema_version": 1, "run_id": manifest["run_id"], "patches": patches})
-    write_json(run_dir / "validation.json", {"schema_version": 1, "run_id": manifest["run_id"], "status": "ok", "patches": len(patches), "issues": len(issue_report)})
-    print(json.dumps({"status": "ok", "patches": len(patches), "issues": len(issue_report), "report": str(run_dir / 'error-report.md')}, ensure_ascii=False, indent=2))
+    files = sorted(file_final.values(), key=lambda item: item["path"])
+    write_json(
+        run_dir / "write-plan.json",
+        {"schema_version": 1, "run_id": manifest["run_id"], "patches": patches, "files": files},
+    )
+    write_json(run_dir / "validation.json", {"schema_version": 1, "run_id": manifest["run_id"], "status": "ok", "patches": len(patches), "files": len(files), "issues": len(issue_report)})
+    print(json.dumps({"status": "ok", "patches": len(patches), "files": len(files), "issues": len(issue_report), "report": str(run_dir / 'error-report.md')}, ensure_ascii=False, indent=2))
     return 0
 
 
@@ -624,16 +669,19 @@ def write(args: argparse.Namespace) -> int:
     manifest = read_json(run_dir / "manifest.json")
     root = Path(manifest["devkit_root"]).resolve()
     plan = read_json(run_dir / "write-plan.json")
+    files = plan.get("files") or []
+    if not files:
+        raise ValidationError("write plan has no files")
     with write_lock(root):
-        for patch in plan.get("patches", []):
-            target = (root / patch["path"]).resolve()
-            if sha256(target) != patch["before_sha256"]:
-                raise ValidationError(f"input changed after dry-run: {patch['path']}")
-        for patch in plan.get("patches", []):
-            target = (root / patch["path"]).resolve()
-            target.write_text(patch["content"], encoding="utf-8")
-    write_json(run_dir / "write-result.json", {"schema_version": 1, "run_id": manifest["run_id"], "written": len(plan.get("patches", []))})
-    print(json.dumps({"written": len(plan.get("patches", [])), "run_dir": str(run_dir)}, ensure_ascii=False, indent=2))
+        for entry in files:
+            target = (root / entry["path"]).resolve()
+            if sha256(target) != entry["before_sha256"]:
+                raise ValidationError(f"input changed after dry-run: {entry['path']}")
+        for entry in files:
+            target = (root / entry["path"]).resolve()
+            target.write_text(entry["content"], encoding="utf-8")
+    write_json(run_dir / "write-result.json", {"schema_version": 1, "run_id": manifest["run_id"], "written": len(files)})
+    print(json.dumps({"written": len(files), "run_dir": str(run_dir)}, ensure_ascii=False, indent=2))
     return 0
 
 

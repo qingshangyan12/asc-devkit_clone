@@ -1,3 +1,36 @@
+---
+okftype: reference.api.cpp
+title: asc_relu
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_relu.md
+description: 按元素做线性整流Relu
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: [activation]
+  - operations: [relu]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, elementwise, high_dimensional]
+signature:
+  - prototype_id: asc_relu__v<dtype>_v<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_fused.h]
+    dtype:
+      values:
+        - half
+        - int32_t
+        - float
+  - prototype_id: asc_relu__v<dtype>_v<dtype>_u8_u16_u16_u16_u16
+    headers: [c_api/vector_compute/compute/vector_fused.h]
+    dtype:
+      values:
+        - half
+        - int32_t
+        - float
+dependencies: []
+timestamp: '2026-09-19'
+---
 # asc_relu
 
 ## 产品支持情况

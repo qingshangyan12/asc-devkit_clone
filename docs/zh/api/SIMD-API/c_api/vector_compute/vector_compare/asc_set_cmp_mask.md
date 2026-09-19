@@ -1,3 +1,27 @@
+---
+okftype: reference.api.cpp
+title: asc_set_cmp_mask
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
+description: 为[asc_select](../vector_permute_sel/asc_select.md)操作设置作用于选择的Mask掩码。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [configuration]
+  - families: []
+  - operations: []
+  - objects: [mask]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: []
+  - traits: []
+signature:
+  - prototype_id: asc_set_cmp_mask__vp
+    headers: [c_api/vector_compute/compute/vector_compare.h]
+    archs: []
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_select.md
+    kind: configures
+timestamp: '2026-09-19'
+---
 # asc_set_cmp_mask
 
 ## 产品支持情况

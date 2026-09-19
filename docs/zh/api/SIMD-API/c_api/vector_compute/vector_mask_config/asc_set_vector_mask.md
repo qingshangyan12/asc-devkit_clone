@@ -1,3 +1,36 @@
+---
+okftype: reference.api.cpp
+title: asc_set_vector_mask
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md
+description: 本API用于设置Mask值。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [configuration]
+  - families: []
+  - operations: []
+  - objects: [mask]
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - prototype_id: asc_set_vector_mask__u64_u64
+    headers: [c_api/vector_compute/compute/vector_mask_config.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_get_mask_spr.md
+    kind: related
+    condition: 针对Ascend 950PR/Ascend 950DT
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/reg_mask.md
+    kind: related
+    condition: 针对Ascend 950PR/Ascend 950DT
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_count.md
+    kind: requires
+    condition: 针对Atlas A3训练系列产品/Atlas A3推理系列产品、Atlas A2训练系列产品/Atlas A2推理系列产品
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_norm.md
+    kind: requires
+    condition: 针对Atlas A3训练系列产品/Atlas A3推理系列产品、Atlas A2训练系列产品/Atlas A2推理系列产品
+timestamp: '2026-09-19'
+---
 # asc_set_vector_mask
 
 ## 产品支持情况

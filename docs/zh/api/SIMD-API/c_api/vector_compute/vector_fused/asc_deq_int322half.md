@@ -1,3 +1,36 @@
+---
+okftype: reference.api.cpp
+title: asc_deq_int322half
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int322half.md
+description: 对输入的int32_t类型的数据按元素做量化并转换为half类型。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, elementwise, high_dimensional]
+signature:
+  - prototype_id: asc_deq_int322half__v<dtype>_v<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_fused.h]
+    dtype:
+      values:
+        - half
+        - int32_t
+  - prototype_id: asc_deq_int322half__v<dtype>_v<dtype>_u8_u16_u16_u8_u8
+    headers: [c_api/vector_compute/compute/vector_fused.h]
+    dtype:
+      values:
+        - half
+        - int32_t
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md
+    kind: requires
+timestamp: '2026-09-19'
+---
 
 # asc_deq_int322half
 

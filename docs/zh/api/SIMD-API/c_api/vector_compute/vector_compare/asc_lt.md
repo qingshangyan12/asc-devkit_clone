@@ -1,3 +1,42 @@
+---
+okftype: reference.api.cpp
+title: asc_lt
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md
+description: 按元素判断src0 < src1是否成立，若成立则输出结果dst上的对应比特位为1，否则为0。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [comparison]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [high_dimensional]
+signature:
+  - prototype_id: asc_lt__v<dtype>_v<dtype>_u8_u8_u8_u8_u8_u8_u8
+    headers: [c_api/vector_compute/compute/vector_compare.h]
+    dtype:
+      values:
+        - half
+        - float
+  - prototype_id: asc_lt__vu8_v<dtype>_v<dtype>_u8_u8_u8_u8_u8_u8_u8
+    headers: [c_api/vector_compute/compute/vector_compare.h]
+    dtype:
+      values:
+        - half
+        - float
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md
+    kind: requires
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
+    kind: related
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/01_memory_vector_compute/compare
+    file: compare.asc
+    archs: [dav-2201]
+timestamp: '2026-09-19'
+---
 # asc_lt
 
 ## 产品支持情况

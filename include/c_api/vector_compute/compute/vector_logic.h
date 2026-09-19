@@ -24,6 +24,14 @@
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "impl/c_api/memory_base_impl/vector_logic_intf_impl.h"
 #endif
+/**
+ * @brief 将所有元素左移distance位。
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_and.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_not.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_or.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftleft.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md
+ */
 __aicore__ inline void asc_shiftleft(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint32_t distance, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
@@ -48,6 +56,14 @@ __aicore__ inline void asc_shiftleft(
 
 __aicore__ inline void asc_shiftleft(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t distance, uint32_t count);
 
+/**
+ * @brief 每对元素按位或运算
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_and.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_not.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_or.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftleft.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md
+ */
 __aicore__ inline void asc_or(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count);
 
 __aicore__ inline void asc_or(
@@ -62,6 +78,14 @@ __aicore__ inline void asc_or(
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @brief 按元素做按位取反
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_and.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_not.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_or.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftleft.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md
+ */
 __aicore__ inline void asc_not(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint32_t count);
 
 __aicore__ inline void asc_not(
@@ -74,6 +98,14 @@ __aicore__ inline void asc_not(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @brief 对src中的每个元素执行右移，右移大小为value。
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_and.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_not.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_or.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftleft.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md
+ */
 __aicore__ inline void asc_shiftright(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint32_t count);
 
 __aicore__ inline void asc_shiftright(
@@ -112,6 +144,14 @@ __aicore__ inline void asc_shiftright_round(
     __ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @brief 执行矢量与运算。
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_and.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_not.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_or.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftleft.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md
+ */
 __aicore__ inline void asc_and(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,

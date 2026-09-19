@@ -1,3 +1,36 @@
+---
+okftype: reference.api.cpp
+title: asc_bfloat162float
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_bfloat162float.md
+description: 将bfloat16_t类型数据转为float，无舍入模式。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, high_dimensional]
+signature:
+  - prototype_id: asc_bfloat162float__v<dtype>_v<dtype>_u32
+    dtype:
+      values:
+        - float
+        - bfloat16_t
+    headers: [c_api/vector_compute/compute/vector_convert.h]
+    archs: []
+  - prototype_id: asc_bfloat162float__v<dtype>_v<dtype>_u8_u16_u16_u16_u16
+    dtype:
+      values:
+        - float
+        - bfloat16_t
+    headers: [c_api/vector_compute/compute/vector_convert.h]
+    archs: []
+dependencies: []
+timestamp: '2026-09-19'
+---
 # asc_bfloat162float
 
 ## 产品支持情况

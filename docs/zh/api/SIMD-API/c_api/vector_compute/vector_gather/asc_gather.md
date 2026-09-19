@@ -1,3 +1,44 @@
+---
+okftype: reference.api.cpp
+title: asc_gather
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather.md
+description: 将src按照src_offset给定的偏移按元素收集到dst中。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [gather]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, high_dimensional]
+signature:
+  - prototype_id: asc_gather__v<dtype>_v<dtype>_vu32_u32
+    headers: [c_api/vector_compute/compute/vector_gather.h]
+    dtype:
+      values:
+        - int16_t
+        - uint16_t
+        - half
+        - bfloat16_t
+        - int32_t
+        - uint32_t
+        - float
+  - prototype_id: asc_gather__v<dtype>_v<dtype>_vu32_u16_u8
+    headers: [c_api/vector_compute/compute/vector_gather.h]
+    dtype:
+      values:
+        - int16_t
+        - uint16_t
+        - half
+        - bfloat16_t
+        - int32_t
+        - uint32_t
+        - float
+dependencies: []
+timestamp: '2026-09-19'
+---
 
 # asc_gather
 

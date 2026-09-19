@@ -1,3 +1,38 @@
+---
+okftype: reference.api.cpp
+title: asc_vdeq_int162b8
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_vdeq_int162b8.md
+description: 将int16_t类型转化为int8_t或uint8_t类型，并将数据存放在每个DataBlock的上半块或下半块。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, elementwise, high_dimensional]
+signature:
+  - prototype_id: asc_vdeq_int162b8__v<dtype>_v<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_fused.h]
+    dtype:
+      values:
+        - int8_t
+        - int16_t
+        - uint8_t
+  - prototype_id: asc_vdeq_int162b8__v<dtype>_v<dtype>_u8_u16_u16_u8_u8
+    headers: [c_api/vector_compute/compute/vector_fused.h]
+    dtype:
+      values:
+        - int8_t
+        - int16_t
+        - uint8_t
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md
+    kind: requires
+timestamp: '2026-09-19'
+---
 # asc_vdeq_int162b8
 
 ## 产品支持情况

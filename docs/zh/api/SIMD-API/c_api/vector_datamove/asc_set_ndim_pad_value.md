@@ -1,3 +1,44 @@
+---
+okftype: reference.api.cpp
+title: asc_set_ndim_pad_value
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md
+description: 本接口用于设置[asc_ndim_copy_gm2ub](asc_ndim_copy_gm2ub.md)在常数填充模式下使用的填充值。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement_configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: [high_dimensional]
+signature:
+  - prototype_id: asc_set_ndim_pad_value__dtype
+    archs: ['3510']
+    headers: [c_api/vector_datamove/vector_datamove.h]
+    dtype:
+      values:
+        - int8_t
+        - uint8_t
+        - int16_t
+        - uint16_t
+        - half
+        - bfloat16_t
+        - int32_t
+        - uint32_t
+        - float
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
+    kind: configures
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md
+    kind: related
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_ub2l1
+    file: data_copy_ub2l1.asc
+    archs: ['3510']
+timestamp: '2026-09-19'
+---
 # asc_set_ndim_pad_value
 
 ## 产品支持情况

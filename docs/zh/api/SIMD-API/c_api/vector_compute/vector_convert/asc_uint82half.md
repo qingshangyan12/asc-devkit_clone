@@ -1,3 +1,34 @@
+---
+okftype: reference.api.cpp
+title: asc_uint82half
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_uint82half.md
+description: 将uint8_t类型数据转换为half类型。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, high_dimensional]
+signature:
+  - prototype_id: asc_uint82half__v<dtype>_v<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_convert.h]
+    dtype:
+      values:
+        - half
+        - uint8_t
+  - prototype_id: asc_uint82half__v<dtype>_v<dtype>_u8_u16_u16_u16_u16
+    headers: [c_api/vector_compute/compute/vector_convert.h]
+    dtype:
+      values:
+        - half
+        - uint8_t
+dependencies: []
+timestamp: '2026-09-19'
+---
 # asc_uint82half
 
 ## 产品支持情况

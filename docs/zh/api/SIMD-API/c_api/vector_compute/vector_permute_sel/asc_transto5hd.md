@@ -1,3 +1,30 @@
+---
+okftype: reference.api.cpp
+title: asc_transto5hd
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md
+description: 数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。特别的，也可以用于二维矩阵数据块的转置。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [layout_transform, transpose]
+  - objects: [matrix]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: []
+signature:
+  - prototype_id: asc_transto5hd_b32__va_va_u8_u16_u16
+    headers: [c_api/vector_compute/compute/vector_permute_sel.h]
+  - prototype_id: asc_transto5hd_b16__va_va_u8_u16_u16
+    headers: [c_api/vector_compute/compute/vector_permute_sel.h]
+  - prototype_id: asc_transto5hd_b8__va_va_u8_u16_u16_bool_bool
+    headers: [c_api/vector_compute/compute/vector_permute_sel.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_set_va_reg.md
+    kind: requires
+timestamp: '2026-09-19'
+---
 # asc_transto5hd
 
 ## 产品支持情况

@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: asc_set_gm2ub_loop_size
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop_size.md
+description: 本接口用于设置[asc_copy_gm2ub_align](./asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)使用循环搬运模式时的两层循环迭代次数。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement_configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - prototype_id: asc_set_gm2ub_loop_size__u64_u64
+    archs: ['3510']
+    headers: [c_api/vector_datamove/vector_datamove.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md
+    kind: configures
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop1_stride.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop2_stride.md
+    kind: related
+timestamp: '2026-09-19'
+---
 # asc_set_gm2ub_loop_size
 
 ## 产品支持情况

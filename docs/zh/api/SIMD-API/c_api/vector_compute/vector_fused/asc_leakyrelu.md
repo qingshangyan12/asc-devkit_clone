@@ -1,3 +1,38 @@
+---
+okftype: reference.api.cpp
+title: asc_leakyrelu
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_leakyrelu.md
+description: 执行矢量Leaky Relu运算。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: [activation]
+  - operations: [leaky_relu]
+  - objects: [scalar, vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, elementwise, high_dimensional, scalar_operand]
+signature:
+  - prototype_id: asc_leakyrelu__v<dtype>_v<dtype>_<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_fused.h]
+    dtype:
+      values:
+        - half
+        - float
+  - prototype_id: asc_leakyrelu__v<dtype>_v<dtype>_<dtype>_u8_u16_u16_u16_u16
+    headers: [c_api/vector_compute/compute/vector_fused.h]
+    dtype:
+      values:
+        - half
+        - float
+dependencies: []
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/01_memory_vector_compute/fused_compute
+    file: fused_compute.asc
+    archs: [dav-2201]
+timestamp: '2026-09-19'
+---
 # asc_leakyrelu
 
 ## 产品支持情况

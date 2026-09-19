@@ -1,3 +1,21 @@
+---
+okftype: reference.index.cpp
+title: 基础算术
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/vector_arith.md
+description: ''
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies: []
+timestamp: '2026-09-19'
+---
 # 基础算术
 
 - **[asc_abs](asc_abs.md)**

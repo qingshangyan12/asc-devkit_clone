@@ -30,6 +30,10 @@
 #include "c_api/composite/vector_compute_composite.h"
 
 //===========asc_set_copy_pad_val(int8/uint8/int16/uint16/half/bfloat16/int32/uint32/float)===========
+/**
+ * @brief 该接口与[asc_copy_gm2ub_align](./asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)配合使用，用于设置连续搬运数据块左右两侧的填充值。
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md
+ */
 __aicore__ inline void asc_set_copy_pad_val(int8_t pad_value);
 
 __aicore__ inline void asc_set_copy_pad_val(uint8_t pad_value);
@@ -48,11 +52,19 @@ __aicore__ inline void asc_set_copy_pad_val(uint32_t pad_value);
 
 __aicore__ inline void asc_set_copy_pad_val(float pad_value);
 
+/**
+ * @brief 将数据从Unified Buffer（UB）搬运到UB。
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2ub.md
+ */
 __aicore__ inline void asc_copy_ub2ub(
     __ubuf__ void* dst, __ubuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap,
     uint16_t dst_gap);
 __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src, uint32_t size);
 
+/**
+ * @brief 将数据从Unified Buffer（UB）搬运到UB。支持高维切分。
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy.md
+ */
 __aicore__ inline void asc_copy(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint32_t count);
 
 __aicore__ inline void asc_copy(
@@ -77,15 +89,33 @@ __aicore__ inline void asc_copy(
     __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @brief 将数据从Global Memory (GM)搬运到Unified Buffer（UB）。
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md
+ */
 __aicore__ inline void asc_copy_gm2ub(
     __ubuf__ void* dst, __gm__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap);
 __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint32_t size);
 
+/**
+ * @brief 将数据从Unified Buffer（UB）搬运到Global Memory (GM)。
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_2201.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md
+ */
 __aicore__ inline void asc_copy_ub2gm(__gm__ void* dst, __ubuf__ void* src, uint32_t size);
 __aicore__ inline void asc_copy_ub2gm(
     __gm__ void* dst, __ubuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap);
 
 // asc_copy_gm2ub_align  int8_t / uint8_t / half / bfloat16_t / int16_t / uint16_t / float / int32_t / uint32_t
+/**
+ * @brief 提供数据非对齐搬运的功能，将数据从Global Memory (GM)搬运到Unified Buffer（UB），并支持8位/16位/32位数据类型搬运。
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_2201.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md
+ */
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ int8_t* dst, __gm__ int8_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap);
@@ -132,6 +162,12 @@ __aicore__ inline void asc_copy_gm2ub_align(
 __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t size);
 
 // asc_copy_ub2gm_align
+/**
+ * @brief 将数据从Unified Buffer（UB）搬运到Global Memory (GM)，支持8位/16位/32位分块拷贝操作。
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_2201.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md
+ */
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ uint8_t* dst, __ubuf__ uint8_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap);
@@ -297,21 +333,57 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__ fp8_e5m2_t* dst, __ubuf__ fp8
 
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ fp8_e4m3fn_t* dst, __ubuf__ fp8_e4m3fn_t* src, uint32_t size);
 
+/**
+ * @brief 本接口用于设置[asc_copy_ub2gm_align](./asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)使用循环搬运模式时的两层循环迭代次数。
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop_size.md
+ */
 __aicore__ inline void asc_set_ub2gm_loop_size(uint32_t loop1_size, uint32_t loop2_size);
+/**
+ * @brief 本接口用于设置[asc_copy_ub2gm_align](./asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)使用循环搬运模式时，内层循环中相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md
+ */
 __aicore__ inline void asc_set_ub2gm_loop1_stride(uint64_t loop1_src_stride, uint64_t loop1_dst_stride);
+/**
+ * @brief 本接口用于设置[asc_copy_ub2gm_align](./asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)使用循环搬运模式时，外层循环中相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop2_stride.md
+ */
 __aicore__ inline void asc_set_ub2gm_loop2_stride(uint64_t loop2_src_stride, uint64_t loop2_dst_stride);
+/**
+ * @brief 本接口用于设置[asc_copy_gm2ub_align](./asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)使用循环搬运模式时的两层循环迭代次数。
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop_size.md
+ */
 __aicore__ inline void asc_set_gm2ub_loop_size(uint64_t loop1_size, uint64_t loop2_size);
+/**
+ * @brief 本接口用于设置[asc_copy_gm2ub_align](./asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)使用循环搬运模式时，内层循环中相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop1_stride.md
+ */
 __aicore__ inline void asc_set_gm2ub_loop1_stride(uint64_t loop1_src_stride, uint64_t loop1_dst_stride);
+/**
+ * @brief 本接口用于设置[asc_copy_gm2ub_align](./asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)使用循环搬运模式时，外层循环中相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop2_stride.md
+ */
 __aicore__ inline void asc_set_gm2ub_loop2_stride(uint64_t loop2_src_stride, uint64_t loop2_dst_stride);
 // ==========asc_set_ndim_loop_stride==========
+/**
+ * @brief 本接口用于设置[asc_ndim_copy_gm2ub](asc_ndim_copy_gm2ub.md)进行NDDMA多维数据搬运时，`loop0`至`loop4`各循环维度的源操作数步长和目的操作数步长。
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_loop_stride.md
+ */
 __aicore__ inline void asc_set_ndim_loop0_stride(uint64_t dst_stride, uint64_t src_stride);
 __aicore__ inline void asc_set_ndim_loop1_stride(uint64_t dst_stride, uint64_t src_stride);
 __aicore__ inline void asc_set_ndim_loop2_stride(uint64_t dst_stride, uint64_t src_stride);
 __aicore__ inline void asc_set_ndim_loop3_stride(uint64_t dst_stride, uint64_t src_stride);
 __aicore__ inline void asc_set_ndim_loop4_stride(uint64_t dst_stride, uint64_t src_stride);
 //===========asc_set_ndim_pad_count===========
+/**
+ * @brief 本接口用于配置NDDMA高维切分搬运中`loop1`至`loop4`各维左右两侧的填充元素数。
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md
+ */
 __aicore__ inline void asc_set_ndim_pad_count(asc_ndim_pad_count_config& config);
 //===========asc_set_ndim_pad_value(int8/uint8/e2m1/e1m2/e8m0/e5m2/e4m3fn/int16/uint16/half/bfloat16/int32/uint32/float)===========
+/**
+ * @brief 本接口用于设置[asc_ndim_copy_gm2ub](asc_ndim_copy_gm2ub.md)在常数填充模式下使用的填充值。
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md
+ */
 __aicore__ inline void asc_set_ndim_pad_value(int8_t pad_value);
 __aicore__ inline void asc_set_ndim_pad_value(uint8_t pad_value);
 __aicore__ inline void asc_set_ndim_pad_value(int16_t pad_value);
@@ -322,6 +394,10 @@ __aicore__ inline void asc_set_ndim_pad_value(int32_t pad_value);
 __aicore__ inline void asc_set_ndim_pad_value(uint32_t pad_value);
 __aicore__ inline void asc_set_ndim_pad_value(float pad_value);
 //===========asc_ndim_copy_gm2ub(int8/uint8/e2m1/e1m2/e8m0/e5m2/e4m3fn/int16/uint16/half/bfloat16/int32/uint32/float)===========
+/**
+ * @brief 该接口用于将多维数据从Global Memory（GM）搬运到Unified Buffer（UB）。
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -379,8 +455,16 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     asc_load_l2_cache_mode l2_cache_mode);
 //======asc_ndim_copy_dci=====
+/**
+ * @brief 刷新NDDMA DataCache。
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_dci.md
+ */
 __aicore__ inline void asc_ndim_copy_dci();
 //======asc_copy_ub2l1=======
+/**
+ * @brief 提供数据搬运功能，将数据从Unified Buffer（UB）搬运到L1 Buffer。
+ * @see docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2l1.md
+ */
 __aicore__ inline void asc_copy_ub2l1(
     __cbuf__ void* dst, __ubuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap,
     uint16_t dst_gap);
