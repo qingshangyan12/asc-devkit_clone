@@ -216,9 +216,9 @@ __aicore__ inline void LoadData2DL12L0BCal(
 /* **************************************************************************************************
  * LoadDataWithDecomp                                             *
  * ************************************************************************************************* */
-__aicore__ inline void EnableS4ToS8Cal() { enable_s4_expand_s8_datacopy(); }
+__aicore__ inline void EnableS4ToS8Cal() { bisheng::cce::enable_s4_expand_s8_datacopy(); }
 
-__aicore__ inline void EnableS3ToS8Cal() { enable_s3_expand_s8_datacopy(); }
+__aicore__ inline void EnableS3ToS8Cal() { bisheng::cce::enable_s3_expand_s8_datacopy(); }
 
 template <typename T>
 __aicore__ inline void LoadData2DGM2L0BDecompCal(
