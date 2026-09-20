@@ -46,14 +46,14 @@ OOM_STORAGE_SHAPE_INIT_PATTERN = (
 OOM_TENSOR_REGISTER_PATTERN = (
     "    if (!hasOomStorageShape || "
     "!AscendC::OOMTryRegisterTensorWithStorageShape("
-    "oomStorageShapeCursor, {param_name}, {element_size})) {{\n"
+    "oomStorageShapeCursor, {param_name}, static_cast<uint64_t>({element_size}))) {{\n"
     "        AscendC::OOMCheckAddrRange({param_name}, {input_shape_len});\n"
     "    }}\n"
 )
 OOM_TENSOR_LIST_REGISTER_PATTERN = (
     "    if (!hasOomStorageShape || "
     "!AscendC::OOMTryRegisterTensorListWithStorageShape("
-    "oomStorageShapeCursor, {param_name}, {element_size})) {{\n"
+    "oomStorageShapeCursor, {param_name}, static_cast<uint64_t>({element_size}))) {{\n"
     "        AscendC::OOMCheckTensorListRange({param_name}, {element_size});\n"
     "    }}\n"
 )
