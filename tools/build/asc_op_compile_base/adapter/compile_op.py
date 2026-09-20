@@ -981,23 +981,9 @@ def compile_op_common_part(
         )
 
 
-def compile_op(
-    cce_file: str,
-    origin_func_name: str,
-    op_info: OpInfo,
-    compile_options: list = None,
-    code_channel: int = -1,
-    op_compile_option: str = "{}",
-    extend_options: dict = {},
+def _prepare_compile_op_options(
+    cce_file, op_info, compile_options, op_compile_option, extend_options
 ):
-    """get tiling_data/ generate tiling_data file/ compile cce to .o / generate .json file
-    Args:
-        cce_file (str): cce file to be compiled
-        origin_func_name (str): func_name written by user, without md5
-        op_info (OpInfo): operator info
-        compile_options (list): compile options for bisheng
-        code_channel (int): one of CORE_TYPE_MIX/CORE_TYPE_CUBE/CORE_TYPE_VEC
-    """
     LogUtil.detail_log_print(
         op_info.kernel_name,
         COMPILE_STAGE_MSG_INFO["compile_op_start"],
@@ -1038,6 +1024,29 @@ def compile_op(
 
     _update_compile_option(
         op_info.kernel_name, compile_option_tuple.compile_options, extend_options
+    )
+    return compile_option_tuple
+
+
+def compile_op(
+    cce_file: str,
+    origin_func_name: str,
+    op_info: OpInfo,
+    compile_options: list = None,
+    code_channel: int = -1,
+    op_compile_option: str = "{}",
+    extend_options: dict = {},
+):
+    """get tiling_data/ generate tiling_data file/ compile cce to .o / generate .json file
+    Args:
+        cce_file (str): cce file to be compiled
+        origin_func_name (str): func_name written by user, without md5
+        op_info (OpInfo): operator info
+        compile_options (list): compile options for bisheng
+        code_channel (int): one of CORE_TYPE_MIX/CORE_TYPE_CUBE/CORE_TYPE_VEC
+    """
+    compile_option_tuple = _prepare_compile_op_options(
+        cce_file, op_info, compile_options, op_compile_option, extend_options
     )
 
     value_depend_dict = extend_options.get("valueDepend")
@@ -1107,46 +1116,8 @@ def compile_op_with_customized_config(
         compile_options (list): compile options for bisheng
         code_channel (int): one of CORE_TYPE_MIX/CORE_TYPE_CUBE/CORE_TYPE_VEC
     """
-    LogUtil.detail_log_print(
-        op_info.kernel_name,
-        COMPILE_STAGE_MSG_INFO["compile_op_start"],
-        AscendCLogLevel.LOG_INFO,
-    )
-    LogUtil.detail_log_print(
-        op_info.kernel_name,
-        COMPILE_STAGE_MSG_INFO["preprocess_start"],
-        AscendCLogLevel.LOG_INFO,
-    )
-    # online compile reuses thread, dfx infos need to be reset.
-    global_var_storage.global_storage_reset()
-    if extend_options.get(
-        "opp_kernel_hidden_dat_path", None
-    ) is None and not os.path.exists(cce_file):
-        raise Exception("input cce file is not exists, file name: " + cce_file)
-
-    compile_option_tuple = CompileOptionTuple(
-        [] if compile_options is None else compile_options, []
-    )
-    need_impl_mode_macro = (
-        (CommonUtility.is_c310() or CommonUtility.is_m510())
-        and isinstance(op_info.impl_mode, str)
-        and op_info.impl_mode != ""
-    )
-    if need_impl_mode_macro:
-        impl_mode_def = f"-D{op_info.impl_mode.upper()}_"  # IMPL_MODE_IS
-        if impl_mode_def not in compile_option_tuple.compile_options:
-            compile_option_tuple.compile_options.append(impl_mode_def)
-
-    _add_op_compile_options_by_customized_json(op_compile_option, compile_option_tuple)
-
-    compile_option_tuple.compile_options = compile_pre_process(
-        op_info, compile_option_tuple.compile_options
-    )
-
-    DFXSectionGenerator().dfx_info_reset(op_info)
-
-    _update_compile_option(
-        op_info.kernel_name, compile_option_tuple.compile_options, extend_options
+    compile_option_tuple = _prepare_compile_op_options(
+        cce_file, op_info, compile_options, op_compile_option, extend_options
     )
 
     if customized_config is None:

@@ -331,6 +331,38 @@ def check_type_format(op_info, is_valid, op_info_key):
     return is_valid
 
 
+def _check_param_info(
+    op_input_info,
+    op_key,
+    op_info_key,
+    required_op_input_info_keys,
+    param_type_valid_value,
+    is_valid,
+):
+    missing_keys = []
+    for required_op_input_info_key in required_op_input_info_keys:
+        if required_op_input_info_key not in op_input_info:
+            missing_keys.append(required_op_input_info_key)
+    if len(missing_keys) > 0:
+        print(
+            "op: " + op_key + " " + op_info_key + " missing: " + ",".join(missing_keys)
+        )
+        is_valid = False
+    else:
+        if op_input_info["paramType"] not in param_type_valid_value:
+            print(
+                "op: "
+                + op_key
+                + " "
+                + op_info_key
+                + " paramType not valid, valid key:[dynamic, "
+                "optional, required]"
+            )
+            is_valid = False
+    is_valid = check_type_format(op_input_info, is_valid, op_info_key)
+    return is_valid
+
+
 def check_op_info(tbe_ops):
     """
     Function Description:
@@ -348,60 +380,24 @@ def check_op_info(tbe_ops):
         for op_info_key in op_dict:
             if op_info_key.startswith("input"):
                 op_input_info = op_dict[op_info_key]
-                missing_keys = []
-                for required_op_input_info_key in required_op_input_info_keys:
-                    if required_op_input_info_key not in op_input_info:
-                        missing_keys.append(required_op_input_info_key)
-                if len(missing_keys) > 0:
-                    print(
-                        "op: "
-                        + op_key
-                        + " "
-                        + op_info_key
-                        + " missing: "
-                        + ",".join(missing_keys)
-                    )
-                    is_valid = False
-                else:
-                    if op_input_info["paramType"] not in param_type_valid_value:
-                        print(
-                            "op: "
-                            + op_key
-                            + " "
-                            + op_info_key
-                            + " paramType not valid, valid key:[dynamic, "
-                            "optional, required]"
-                        )
-                        is_valid = False
-                is_valid = check_type_format(op_input_info, is_valid, op_info_key)
+                is_valid = _check_param_info(
+                    op_input_info,
+                    op_key,
+                    op_info_key,
+                    required_op_input_info_keys,
+                    param_type_valid_value,
+                    is_valid,
+                )
             if op_info_key.startswith("output"):
                 op_input_info = op_dict[op_info_key]
-                missing_keys = []
-                for required_op_input_info_key in required_op_output_info_keys:
-                    if required_op_input_info_key not in op_input_info:
-                        missing_keys.append(required_op_input_info_key)
-                if len(missing_keys) > 0:
-                    print(
-                        "op: "
-                        + op_key
-                        + " "
-                        + op_info_key
-                        + " missing: "
-                        + ",".join(missing_keys)
-                    )
-                    is_valid = False
-                else:
-                    if op_input_info["paramType"] not in param_type_valid_value:
-                        print(
-                            "op: "
-                            + op_key
-                            + " "
-                            + op_info_key
-                            + " paramType not valid, valid key:[dynamic, "
-                            "optional, required]"
-                        )
-                        is_valid = False
-                is_valid = check_type_format(op_input_info, is_valid, op_info_key)
+                is_valid = _check_param_info(
+                    op_input_info,
+                    op_key,
+                    op_info_key,
+                    required_op_output_info_keys,
+                    param_type_valid_value,
+                    is_valid,
+                )
         is_valid = check_attr(op_dict, is_valid)
         is_valid = check_bool_flag(op_dict, is_valid)
     print("==============check valid for ops info end================\n\n")

@@ -382,6 +382,44 @@ def process_gen_stream_send_code(super_operator, op, arch, need_flag, code):
     return code_str
 
 
+def _gen_aic_send_sync_code(op, arch, need_sync_self):
+    code = f"// Rule 1 : sync all {arch} must be insert behind each {arch} sub operator, when has real send info\n"
+    code += f"// sync all C->C kernel_name:{op.kernel_name}, send_info:{op.send_info}\n"
+    code += "ffts_cross_core_sync(PIPE_FIX, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));\n"
+    code += f"{get_wait_flag_for_chip('AscendC::SYNC_AIC_FLAG')}\n\n"
+
+    for single in op.send_info:
+        info_pairs = op.send_info[single].split(";")
+        if "cub:cub" in info_pairs or "vec:cub" in info_pairs:
+            need_sync_self = True
+        if "cub:vec" in info_pairs:
+            code += f"// Rule 3.1 : sync all c2v must be insert when sendinfo has c2v, \
+kernel_name:{op.kernel_name}, send_info:{op.send_info}\n"
+            code += "// send sync of C->V;\n"
+            code += "ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG));\n\n"
+            need_sync_self = True
+    return code, need_sync_self
+
+
+def _gen_aiv_send_sync_code(op, arch, need_sync_self):
+    code = f"// Rule 1 : sync all {arch} must be insert behind each {arch} sub operator, when has real send info\n"
+    code += f"// sync all V->V kernel_name:{op.kernel_name}, send_info:{op.send_info}\n"
+    code += "ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));\n"
+    code += f"{get_wait_flag_for_chip('AscendC::SYNC_AIV_ONLY_ALL')}\n\n"
+
+    for single in op.send_info:
+        info_pairs = op.send_info[single].split(";")
+        if "vec:vec" in info_pairs or "cub:vec" in info_pairs:
+            need_sync_self = True
+        if "vec:cub" in info_pairs:
+            code += f"// Rule 3.1 : sync all v2c must be insert when sendinfo has v2c, \
+kernel_name:{op.kernel_name}, send_info:{op.send_info}\n"
+            code += "// send sync of V->C;\n"
+            code += "ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));\n\n"
+            need_sync_self = True
+    return code, need_sync_self
+
+
 def gen_2_real_stream_send_code(super_operator, op, arch):
     super_kernel_file = ""
     need_sync_self = False
@@ -391,49 +429,13 @@ def gen_2_real_stream_send_code(super_operator, op, arch):
     if op.index == super_operator.info_base[-1].index:
         return super_kernel_file
     if arch == "aic":
-        code = f"// Rule 1 : sync all {arch} must be insert behind each {arch} sub operator, when has real send info\n"
-        code += (
-            f"// sync all C->C kernel_name:{op.kernel_name}, send_info:{op.send_info}\n"
-        )
-        code += "ffts_cross_core_sync(PIPE_FIX, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));\n"
-        code += f"{get_wait_flag_for_chip('AscendC::SYNC_AIC_FLAG')}\n\n"
-
-        for single in op.send_info:
-            info_pairs = op.send_info[single].split(";")
-            if "cub:cub" in info_pairs or "vec:cub" in info_pairs:
-                need_sync_self = True
-            if "cub:vec" in info_pairs:
-                code += (
-                    f"// Rule 3.1 : sync all c2v must be insert when sendinfo has c2v, \
-kernel_name:{op.kernel_name}, send_info:{op.send_info}\n"
-                )
-                code += "// send sync of C->V;\n"
-                code += "ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIC_AIV_FLAG));\n\n"
-                need_sync_self = True
+        code, need_sync_self = _gen_aic_send_sync_code(op, arch, need_sync_self)
 
         super_kernel_file += process_gen_stream_send_code(
             super_operator, op, arch, need_sync_self or need_sync_event_for_notify, code
         )
     else:
-        code = f"// Rule 1 : sync all {arch} must be insert behind each {arch} sub operator, when has real send info\n"
-        code += (
-            f"// sync all V->V kernel_name:{op.kernel_name}, send_info:{op.send_info}\n"
-        )
-        code += "ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));\n"
-        code += f"{get_wait_flag_for_chip('AscendC::SYNC_AIV_ONLY_ALL')}\n\n"
-
-        for single in op.send_info:
-            info_pairs = op.send_info[single].split(";")
-            if "vec:vec" in info_pairs or "cub:vec" in info_pairs:
-                need_sync_self = True
-            if "vec:cub" in info_pairs:
-                code += (
-                    f"// Rule 3.1 : sync all v2c must be insert when sendinfo has v2c, \
-kernel_name:{op.kernel_name}, send_info:{op.send_info}\n"
-                )
-                code += "// send sync of V->C;\n"
-                code += "ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x02, AscendC::SYNC_AIV_FLAG));\n\n"
-                need_sync_self = True
+        code, need_sync_self = _gen_aiv_send_sync_code(op, arch, need_sync_self)
 
         super_kernel_file += process_gen_stream_send_code(
             super_operator, op, arch, need_sync_self or need_sync_event_for_notify, code
@@ -478,6 +480,35 @@ def gen_2_real_stream_sync_code(super_operator, pre_op, cur_op, arch):
     return super_kernel_file
 
 
+def _append_post_event_sync_code(sub_operator, sync_and_event_code):
+    # add sync after notify/wait event
+    sync_and_event_code += (
+        "// two stream when has wait event, add sync by current operator kernel type\n"
+    )
+    if sub_operator.kernel_type in [
+        SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1,
+        SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2,
+    ]:
+        # add sync with sub_operator and sub_operator
+        sync_and_event_code += indent_code_func(
+            "AscendC::SyncAll<false>(); // reason3: for continues notify/wait event \n\n"
+        )
+    elif sub_operator.kernel_type in [
+        SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY,
+        SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0,
+    ]:
+        sync_and_event_code += "// reason3: for continues notify/wait event\n"
+        sync_and_event_code += "ffts_cross_core_sync(PIPE_FIX, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));\n"
+        sync_and_event_code += f"{get_wait_flag_for_chip('AscendC::SYNC_AIC_FLAG')}\n\n"
+    else:
+        sync_and_event_code += "// reason3: for continues notify/wait event\n"
+        sync_and_event_code += "ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));\n"
+        sync_and_event_code += (
+            f"{get_wait_flag_for_chip('AscendC::SYNC_AIV_ONLY_ALL')}\n\n"
+        )
+    return sync_and_event_code
+
+
 def gen_sync_and_event_code_for_two_stream(
     super_operator, pre_sub_operator, sub_operator, arch
 ):
@@ -500,35 +531,9 @@ def gen_sync_and_event_code_for_two_stream(
             if len(sub_operator.wait_block) != 0:
                 sync_and_event_code += indent_code_func(sub_operator.wait_block)
 
-                # add sync after notify/wait event
-                sync_and_event_code += "// two stream when has wait event, add sync by current operator kernel type\n"
-                if sub_operator.kernel_type in [
-                    SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1,
-                    SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2,
-                ]:
-                    # add sync with sub_operator and sub_operator
-                    sync_and_event_code += indent_code_func(
-                        "AscendC::SyncAll<false>(); // reason3: for continues notify/wait event \n\n"
-                    )
-                elif sub_operator.kernel_type in [
-                    SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY,
-                    SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0,
-                ]:
-                    sync_and_event_code += (
-                        "// reason3: for continues notify/wait event\n"
-                    )
-                    sync_and_event_code += "ffts_cross_core_sync(PIPE_FIX, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));\n"
-                    sync_and_event_code += (
-                        f"{get_wait_flag_for_chip('AscendC::SYNC_AIC_FLAG')}\n\n"
-                    )
-                else:
-                    sync_and_event_code += (
-                        "// reason3: for continues notify/wait event\n"
-                    )
-                    sync_and_event_code += "ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));\n"
-                    sync_and_event_code += (
-                        f"{get_wait_flag_for_chip('AscendC::SYNC_AIV_ONLY_ALL')}\n\n"
-                    )
+                sync_and_event_code = _append_post_event_sync_code(
+                    sub_operator, sync_and_event_code
+                )
     else:
         # pre op send inter-core sync, cur op recv inter-core sync
         sync_and_event_code += indent_code_func(
@@ -975,15 +980,8 @@ AscendC::g_superKernelAutoSyncAllConfigGmBaseAddr + {total_op_num} * 64 + {sub_o
     return code, True
 
 
-def gen_clear_syncall_worskspace(super_operator):
-    gen_code = ""
-    if (
-        super_operator.feed_sync_all_mode.value
-        == SuperKernelFeedSyncAllMode.FeedSyncAllDisable.value
-    ):
-        return gen_code
-    if super_operator.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0:
-        gen_code += f"""
+def _gen_aic_clear_syncall_code(gen_code, super_operator):
+    gen_code += f"""
 if ASCEND_IS_AIC {{
     uint32_t sizePerCore = {super_operator.workspace_size} / get_block_num();
     const uint32_t repeatTimes = sizePerCore / 512;
@@ -1000,8 +998,11 @@ if ASCEND_IS_AIC {{
     {get_wait_flag_for_chip("AscendC::SYNC_AIC_FLAG")}
 }}
 """
-    elif super_operator.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0:
-        gen_code += f"""
+    return gen_code
+
+
+def _gen_aiv_clear_syncall_code(gen_code, super_operator):
+    gen_code += f"""
 if ASCEND_IS_AIV {{
     uint32_t sizePerCore = {super_operator.workspace_size} / get_block_num();
     const uint32_t repeatTimes = sizePerCore / 512;
@@ -1018,13 +1019,11 @@ if ASCEND_IS_AIV {{
     {get_wait_flag_for_chip("AscendC::SYNC_AIV_ONLY_ALL")}
 }}
 """
-    else:
-        if super_operator.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1:
-            workspace_size = int(super_operator.workspace_size)
-        else:
-            workspace_size = int(super_operator.workspace_size / 2)
-        if CommonUtility.is_c310():
-            gen_code += f"""
+    return gen_code
+
+
+def _gen_c310_clear_syncall_code(gen_code, workspace_size):
+    gen_code += f"""
 if ASCEND_IS_AIV {{
     uint32_t sizePerCore = {workspace_size} / get_block_num();
     const uint32_t repeatTimes = sizePerCore / 512;
@@ -1046,8 +1045,11 @@ if ASCEND_IS_AIC {{
     {get_wait_flag_for_chip("AscendC::SYNC_AIV_FLAG")}
 }}
 """
-        else:
-            gen_code += f"""
+    return gen_code
+
+
+def _gen_default_clear_syncall_code(gen_code, workspace_size):
+    gen_code += f"""
 if ASCEND_IS_AIV {{
     uint32_t sizePerCore = {workspace_size} / get_block_num();
     const uint32_t repeatTimes = sizePerCore / 512;
@@ -1069,6 +1071,29 @@ if ASCEND_IS_AIC {{
    {get_wait_flag_for_chip("AscendC::SYNC_AIV_FLAG")}
 }}
 """
+    return gen_code
+
+
+def gen_clear_syncall_worskspace(super_operator):
+    gen_code = ""
+    if (
+        super_operator.feed_sync_all_mode.value
+        == SuperKernelFeedSyncAllMode.FeedSyncAllDisable.value
+    ):
+        return gen_code
+    if super_operator.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0:
+        gen_code = _gen_aic_clear_syncall_code(gen_code, super_operator)
+    elif super_operator.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0:
+        gen_code = _gen_aiv_clear_syncall_code(gen_code, super_operator)
+    else:
+        if super_operator.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1:
+            workspace_size = int(super_operator.workspace_size)
+        else:
+            workspace_size = int(super_operator.workspace_size / 2)
+        if CommonUtility.is_c310():
+            gen_code = _gen_c310_clear_syncall_code(gen_code, workspace_size)
+        else:
+            gen_code = _gen_default_clear_syncall_code(gen_code, workspace_size)
     return gen_code
 
 

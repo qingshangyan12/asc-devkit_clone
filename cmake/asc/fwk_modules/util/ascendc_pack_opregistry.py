@@ -20,6 +20,38 @@ import const_var
 from asc_op_compile_base.common.utils.log_utils import LogUtil, AscendCLogLevel
 
 
+def _run_objcopy_aarch64(in_file, out_file):
+    subprocess.run(
+        [
+            "llvm-objcopy",
+            "--input-target",
+            "binary",
+            "--output-target",
+            "elf64-littleaarch64",
+            "--binary-architecture",
+            "aarch64",
+            in_file,
+            out_file,
+        ]
+    )
+
+
+def _run_objcopy_x86(in_file, out_file):
+    subprocess.run(
+        [
+            "llvm-objcopy",
+            "--input-target",
+            "binary",
+            "--output-target",
+            "elf64-x86-64",
+            "--binary-architecture",
+            "i386",
+            in_file,
+            out_file,
+        ]
+    )
+
+
 class PackKernel:
     def __init__(self: any, args: any):
         self.registry_path = os.path.realpath(args.registry_file_path)
@@ -86,19 +118,7 @@ class PackKernel:
         # ascend610lite only support aarch64
         if path.find("ascend610lite") != -1:
             try:
-                subprocess.run(
-                    [
-                        "llvm-objcopy",
-                        "--input-target",
-                        "binary",
-                        "--output-target",
-                        "elf64-littleaarch64",
-                        "--binary-architecture",
-                        "aarch64",
-                        in_file,
-                        out_file,
-                    ]
-                )
+                _run_objcopy_aarch64(in_file, out_file)
             except Exception:
                 LogUtil.print_compile_log(
                     "",
@@ -116,33 +136,9 @@ class PackKernel:
             target_platform = uname
         try:
             if target_platform == "x86_64":
-                subprocess.run(
-                    [
-                        "llvm-objcopy",
-                        "--input-target",
-                        "binary",
-                        "--output-target",
-                        "elf64-x86-64",
-                        "--binary-architecture",
-                        "i386",
-                        in_file,
-                        out_file,
-                    ]
-                )
+                _run_objcopy_x86(in_file, out_file)
             elif target_platform == "aarch64":
-                subprocess.run(
-                    [
-                        "llvm-objcopy",
-                        "--input-target",
-                        "binary",
-                        "--output-target",
-                        "elf64-littleaarch64",
-                        "--binary-architecture",
-                        "aarch64",
-                        in_file,
-                        out_file,
-                    ]
-                )
+                _run_objcopy_aarch64(in_file, out_file)
             else:
                 subprocess.run(["echo", "unsupported environment!"])
         except Exception as e:
@@ -184,66 +180,68 @@ class PackKernel:
                 )
         self.op_info = op_info
 
+    def _write_registry_includes(self, fd, var_str):
+        fd.write("#include <stdint.h>\n")
+        fd.write("#include <map>\n")
+        fd.write("#include <tuple>\n")
+        fd.write("#include <vector>\n")
+        fd.write('#include "graph/ascend_string.h"\n')
+        fd.write('#include "register/op_bin_info.h"\n')
+        fd.write('#include "register/op_lib_register.h"\n')
+        fd.write("#include <dlfcn.h>\n")
+        fd.write('#include "../pkg_inc/base/dlog_pub.h"\n\n')
+        fd.write(var_str)
+        fd.write("\n")
+        fd.write("#define ASCENDC_MODULE_NAME static_cast<int32_t>(ASCENDCKERNEL)\n")
+        fd.write(
+            "#define LOG_ERROR(format, ...)                                                         \\\n"
+        )
+        fd.write(
+            "    do {                                                                               \\\n"
+        )
+        fd.write(
+            '        dlog_error(ASCENDC_MODULE_NAME, "[%s] " format "\\n", __FUNCTION__, '
+        )
+        fd.write("##__VA_ARGS__);  \\\n")
+        fd.write("    } while (0)\n")
+
+    def _write_registry_init_func(self, fd, macro_op):
+        fd.write("namespace {\n")
+        fd.write("uint32_t OpLibInitFunc(ge::AscendString& op_lib_path) {\n")
+        fd.write("    static " + macro_op)
+        fd.write(
+            '    static ops::OpBinInfo g_binInfo("'
+            + self.vendor_name
+            + '", __ascendc_op_info_'
+        )
+        fd.write(self.vendor_name + ");\n")
+        fd.write("Dl_info dlInfo;\n")
+        fd.write("if (!dladdr((void*)&OpLibInitFunc, &dlInfo)) {\n")
+        fd.write('    LOG_ERROR("dladdr failed: %s", dlerror());\n')
+        fd.write("    return 1;\n")
+        fd.write("}\n")
+        fd.write("std::string targetPath = dlInfo.dli_fname;\n")
+        fd.write("if (!ops::OpBinInfo::Check(targetPath)) {\n")
+        fd.write(
+            '    LOG_ERROR("Path %s only support shared library, but it is not.",targetPath.c_str());\n'
+        )
+        fd.write("    return 1;\n")
+        fd.write("}\n")
+        fd.write("    return g_binInfo.Generate(&op_lib_path, targetPath);\n")
+        fd.write("}\n")
+        fd.write(
+            "REGISTER_OP_LIB(" + self.vendor_name + ").RegOpLibInit(OpLibInitFunc);\n"
+        )
+        fd.write("}\n")
+
     def ascendc_gen_register(self, macro_op, var_str):
         registry_file = os.path.join(self.registry_path, "custom_op_registry_V2.cpp")
         try:
             with os.fdopen(
                 os.open(registry_file, const_var.WFLAGS, const_var.WMODES), "w"
             ) as fd:
-                fd.write("#include <stdint.h>\n")
-                fd.write("#include <map>\n")
-                fd.write("#include <tuple>\n")
-                fd.write("#include <vector>\n")
-                fd.write('#include "graph/ascend_string.h"\n')
-                fd.write('#include "register/op_bin_info.h"\n')
-                fd.write('#include "register/op_lib_register.h"\n')
-                fd.write("#include <dlfcn.h>\n")
-                fd.write('#include "../pkg_inc/base/dlog_pub.h"\n\n')
-                fd.write(var_str)
-                fd.write("\n")
-                fd.write(
-                    "#define ASCENDC_MODULE_NAME static_cast<int32_t>(ASCENDCKERNEL)\n"
-                )
-                fd.write(
-                    "#define LOG_ERROR(format, ...)                                                         \\\n"
-                )
-                fd.write(
-                    "    do {                                                                               \\\n"
-                )
-                fd.write(
-                    '        dlog_error(ASCENDC_MODULE_NAME, "[%s] " format "\\n", __FUNCTION__, '
-                )
-                fd.write("##__VA_ARGS__);  \\\n")
-                fd.write("    } while (0)\n")
-                fd.write("namespace {\n")
-                fd.write("uint32_t OpLibInitFunc(ge::AscendString& op_lib_path) {\n")
-                fd.write("    static " + macro_op)
-                fd.write(
-                    '    static ops::OpBinInfo g_binInfo("'
-                    + self.vendor_name
-                    + '", __ascendc_op_info_'
-                )
-                fd.write(self.vendor_name + ");\n")
-                fd.write("Dl_info dlInfo;\n")
-                fd.write("if (!dladdr((void*)&OpLibInitFunc, &dlInfo)) {\n")
-                fd.write('    LOG_ERROR("dladdr failed: %s", dlerror());\n')
-                fd.write("    return 1;\n")
-                fd.write("}\n")
-                fd.write("std::string targetPath = dlInfo.dli_fname;\n")
-                fd.write("if (!ops::OpBinInfo::Check(targetPath)) {\n")
-                fd.write(
-                    '    LOG_ERROR("Path %s only support shared library, but it is not.",targetPath.c_str());\n'
-                )
-                fd.write("    return 1;\n")
-                fd.write("}\n")
-                fd.write("    return g_binInfo.Generate(&op_lib_path, targetPath);\n")
-                fd.write("}\n")
-                fd.write(
-                    "REGISTER_OP_LIB("
-                    + self.vendor_name
-                    + ").RegOpLibInit(OpLibInitFunc);\n"
-                )
-                fd.write("}\n")
+                self._write_registry_includes(fd, var_str)
+                self._write_registry_init_func(fd, macro_op)
         except Exception as e:
             LogUtil.print_compile_log(
                 "",
@@ -252,7 +250,7 @@ class PackKernel:
                 LogUtil.Option.NON_SOC,
             )
 
-    def ascendc_gen_header(self: any):
+    def _build_ge_table_macro(self: any):
         socs_res = []
         var_str = ""
         macro_op = (
@@ -277,6 +275,10 @@ class PackKernel:
                     ["extern uint8_t {};\n".format(sym) for sym in op_syms]
                 )
         macro_op += "{{\n{}}}; \n".format("".join(socs_res))
+        return socs_res, var_str, macro_op
+
+    def ascendc_gen_header(self: any):
+        socs_res, var_str, macro_op = self._build_ge_table_macro()
         head_file = os.path.join(self.out_path, "ge_table_op_resource.h")
         try:
             with os.fdopen(

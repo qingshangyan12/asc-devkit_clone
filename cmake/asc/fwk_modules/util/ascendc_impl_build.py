@@ -353,6 +353,22 @@ class AdpBuilder(opdesc_parser.OpDesc):
         self.op_compile_option: str = "{}"
         super().__init__(op_type)
 
+    def _verify_kernel_src_exists(self: any, impl_path, src_file_path):
+        if os.environ.get("BUILD_BUILTIN_OPP") != "1" and impl_path != "":
+            if src_file_path is not None:
+                src_file = src_file_path
+            else:
+                src_file = os.path.join(impl_path, self.op_file + ".cpp")
+            if not os.path.exists(src_file):
+                src_file = os.path.join(
+                    impl_path, optype_snake(self.op_type), self.op_file + ".cpp"
+                )
+                if not os.path.exists(src_file):
+                    raise FileNotFoundError(
+                        f"operator: {src_file} source file does not found, "
+                        f"which should correctly set in {os.path.join(impl_path, 'CMakeLists.txt')}, please check."
+                    )
+
     def write_adapt(
         self: any,
         impl_path,
@@ -376,20 +392,7 @@ class AdpBuilder(opdesc_parser.OpDesc):
                             impl_path, src_ini_config.get(sub_sections, "kernel_file")
                         )
                     break
-        if os.environ.get("BUILD_BUILTIN_OPP") != "1" and impl_path != "":
-            if src_file_path is not None:
-                src_file = src_file_path
-            else:
-                src_file = os.path.join(impl_path, self.op_file + ".cpp")
-            if not os.path.exists(src_file):
-                src_file = os.path.join(
-                    impl_path, optype_snake(self.op_type), self.op_file + ".cpp"
-                )
-                if not os.path.exists(src_file):
-                    raise FileNotFoundError(
-                        f"operator: {src_file} source file does not found, "
-                        f"which should correctly set in {os.path.join(impl_path, 'CMakeLists.txt')}, please check."
-                    )
+        self._verify_kernel_src_exists(impl_path, src_file_path)
 
         out_path = os.path.abspath(path)
         if self.dynamic_shape and not out_path.endswith("dynamic"):
@@ -703,6 +706,69 @@ class AdpBuilder(opdesc_parser.OpDesc):
                                 )
         return src_file_dict
 
+    def _resolve_impl_api(self: any, src_ini_config):
+        impl_api = IMPL_API
+        if src_ini_config is not None:
+            for sub_sections in src_ini_config.sections():
+                if sub_sections[65:] == "IMPL_API":
+                    impl_api_file = src_ini_config.get(sub_sections, "impl_api")
+                    if os.path.exists(impl_api_file):
+                        with open(impl_api_file, "r", newline="") as fh:
+                            impl_api = fh.read()
+        return impl_api
+
+    def _write_built_in_compile_op_api(self: any, fd, impl_path, src, extend_opt):
+        relative_kernel_src_path = os.path.realpath(
+            self._get_kernel_source(
+                impl_path,
+                src,
+                optype_snake(self.op_type),
+                optype_snake_ex(self.op_type),
+            )
+        )
+        # to match src path in .dat file system, turn relative path into absolute path
+        abs_rel_kernel_src_path = os.path.join(
+            "/", os.path.relpath(relative_kernel_src_path, impl_path)
+        )
+
+        # compiling hidden src file requires src path before packaging .dat file,
+        # hard code such src path to <op_type>.py
+        fd.write(
+            COMPILE_OP_API_BUILT_IN.format(
+                self.op_type,
+                self.op_type,
+                self.impl_mode_op_info,
+                ", ".join(self.input_name),
+                ", ".join(self.output_name),
+                self.param_type_dynamic,
+                self._build_mc2_ctx(),
+                self.input_type + self.output_type,
+                self.output_init_value,
+                self.output_shape_depend_on_compute,
+                self.op_compile_option,
+                abs_rel_kernel_src_path,
+                repr(extend_opt),
+            )
+        )
+
+    def _write_default_compile_op_api(self: any, fd, extend_opt):
+        fd.write(
+            COMPILE_OP_API.format(
+                self.op_type,
+                self.op_type,
+                self.impl_mode_op_info,
+                ", ".join(self.input_name),
+                ", ".join(self.output_name),
+                self.param_type_dynamic,
+                self._build_mc2_ctx(),
+                self.input_type + self.output_type,
+                self.output_init_value,
+                self.output_shape_depend_on_compute,
+                self.op_compile_option,
+                repr(extend_opt),
+            )
+        )
+
     def _write_impl(self: any, fd: object, impl_path: str = "", src_ini_config=None):
         argsdef = self._build_paralist()
         argsval = self._build_paralist(False)
@@ -716,14 +782,7 @@ class AdpBuilder(opdesc_parser.OpDesc):
         src = self.op_file + ".cpp"
         virt_exprs = self._build_virtual()
 
-        impl_api = IMPL_API
-        if src_ini_config is not None:
-            for sub_sections in src_ini_config.sections():
-                if sub_sections[65:] == "IMPL_API":
-                    impl_api_file = src_ini_config.get(sub_sections, "impl_api")
-                    if os.path.exists(impl_api_file):
-                        with open(impl_api_file, "r", newline="") as fh:
-                            impl_api = fh.read()
+        impl_api = self._resolve_impl_api(src_ini_config)
 
         fd.write(
             impl_api.format(
@@ -750,55 +809,9 @@ class AdpBuilder(opdesc_parser.OpDesc):
         }
         extend_opt = {"valueDepend": value_depend_obj}
         if os.environ.get("BUILD_BUILTIN_OPP") == "1":
-            relative_kernel_src_path = os.path.realpath(
-                self._get_kernel_source(
-                    impl_path,
-                    src,
-                    optype_snake(self.op_type),
-                    optype_snake_ex(self.op_type),
-                )
-            )
-            # to match src path in .dat file system, turn relative path into absolute path
-            abs_rel_kernel_src_path = os.path.join(
-                "/", os.path.relpath(relative_kernel_src_path, impl_path)
-            )
-
-            # compiling hidden src file requires src path before packaging .dat file,
-            # hard code such src path to <op_type>.py
-            fd.write(
-                COMPILE_OP_API_BUILT_IN.format(
-                    self.op_type,
-                    self.op_type,
-                    self.impl_mode_op_info,
-                    ", ".join(self.input_name),
-                    ", ".join(self.output_name),
-                    self.param_type_dynamic,
-                    self._build_mc2_ctx(),
-                    self.input_type + self.output_type,
-                    self.output_init_value,
-                    self.output_shape_depend_on_compute,
-                    self.op_compile_option,
-                    abs_rel_kernel_src_path,
-                    repr(extend_opt),
-                )
-            )
+            self._write_built_in_compile_op_api(fd, impl_path, src, extend_opt)
         else:
-            fd.write(
-                COMPILE_OP_API.format(
-                    self.op_type,
-                    self.op_type,
-                    self.impl_mode_op_info,
-                    ", ".join(self.input_name),
-                    ", ".join(self.output_name),
-                    self.param_type_dynamic,
-                    self._build_mc2_ctx(),
-                    self.input_type + self.output_type,
-                    self.output_init_value,
-                    self.output_shape_depend_on_compute,
-                    self.op_compile_option,
-                    repr(extend_opt),
-                )
-            )
+            self._write_default_compile_op_api(fd, extend_opt)
 
     def _write_cap(self: any, cap_name: str, fd: object):
         argsdef = self._build_paralist()

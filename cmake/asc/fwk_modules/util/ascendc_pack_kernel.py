@@ -21,6 +21,38 @@ import ascendc_ops_config
 from asc_op_compile_base.common.utils.log_utils import LogUtil, AscendCLogLevel
 
 
+def _run_objcopy_aarch64(in_file, out_file):
+    subprocess.run(
+        [
+            "llvm-objcopy",
+            "--input-target",
+            "binary",
+            "--output-target",
+            "elf64-littleaarch64",
+            "--binary-architecture",
+            "aarch64",
+            in_file,
+            out_file,
+        ]
+    )
+
+
+def _run_objcopy_x86(in_file, out_file):
+    subprocess.run(
+        [
+            "llvm-objcopy",
+            "--input-target",
+            "binary",
+            "--output-target",
+            "elf64-x86-64",
+            "--binary-architecture",
+            "i386",
+            in_file,
+            out_file,
+        ]
+    )
+
+
 class PackKernel:
     def __init__(self: any, args: any):
         self.in_path = os.path.realpath(args.input_path)
@@ -54,19 +86,7 @@ class PackKernel:
         # ascend610lite only support aarch64
         if soc == "ascend610lite":
             try:
-                subprocess.run(
-                    [
-                        "llvm-objcopy",
-                        "--input-target",
-                        "binary",
-                        "--output-target",
-                        "elf64-littleaarch64",
-                        "--binary-architecture",
-                        "aarch64",
-                        in_file,
-                        out_file,
-                    ]
-                )
+                _run_objcopy_aarch64(in_file, out_file)
             except Exception:
                 LogUtil.print_compile_log(
                     "",
@@ -83,33 +103,9 @@ class PackKernel:
             target_platform = uname
         try:
             if target_platform == "x86_64":
-                subprocess.run(
-                    [
-                        "llvm-objcopy",
-                        "--input-target",
-                        "binary",
-                        "--output-target",
-                        "elf64-x86-64",
-                        "--binary-architecture",
-                        "i386",
-                        in_file,
-                        out_file,
-                    ]
-                )
+                _run_objcopy_x86(in_file, out_file)
             elif target_platform == "aarch64":
-                subprocess.run(
-                    [
-                        "llvm-objcopy",
-                        "--input-target",
-                        "binary",
-                        "--output-target",
-                        "elf64-littleaarch64",
-                        "--binary-architecture",
-                        "aarch64",
-                        in_file,
-                        out_file,
-                    ]
-                )
+                _run_objcopy_aarch64(in_file, out_file)
             else:
                 subprocess.run(["echo", "unsupported environment!"])
         except Exception as e:
@@ -179,19 +175,7 @@ class PackKernel:
             op_bin = op_obj.get("op_bin")
             socs_res = []
             op_syms = []
-            for soc in op_bin.keys():
-                soc_res = '{{ "{}", {{'.format(soc)
-                soc_syms = op_bin.get(soc)
-                soc_pairs = []
-                for pair_addr in soc_syms:
-                    pair_addr1 = ["&" + s for s in pair_addr]
-                    op_syms += pair_addr
-                    soc_pairs.append(
-                        "    {{ {} }} ".format(", \\\n      ".join(pair_addr1))
-                    )
-                soc_res += ", \\\n        ".join(soc_pairs)
-                soc_res += " } }"
-                socs_res.append(soc_res)
+            op_syms = self._collect_soc_resource_entries(op_bin, socs_res, op_syms)
             macro_op += "    {{ {} }}, \\\n".format(", \\\n      ".join(socs_res))
             macro_op += "    {{ {} }})\n\n".format(", ".join(op_obj.get("op_rkb")))
             macro_str = '#define {}_RESOURCES {{{{"{}", {}}}}}'.format(
@@ -207,27 +191,50 @@ class PackKernel:
                     "extern uint8_t " + ";\nextern uint8_t ".join(op_syms) + ";\n"
                 )
             head_file = os.path.join(self.out_path, "{}_op_resource.h".format(op_type))
-            try:
-                with os.fdopen(
-                    os.open(head_file, const_var.WFLAGS, const_var.WMODES), "w"
-                ) as fd:
-                    fd.write("#include <stdint.h>\n")
-                    fd.write("#include <map>\n")
-                    fd.write("#include <tuple>\n")
-                    fd.write("#include <vector>\n")
-                    fd.write('#include "graph/ascend_string.h"\n')
-                    fd.write('#include "register/op_impl_registry.h"\n\n')
-                    fd.write(var_str)
-                    fd.write("\n")
-                    fd.write(macro_op)
-                    fd.write(macro_str)
-            except Exception as e:
-                LogUtil.print_compile_log(
-                    "",
-                    f"{op_type}_op_resource.h create error: {e}!",
-                    AscendCLogLevel.LOG_ERROR,
-                    LogUtil.Option.NON_SOC,
+            self._write_op_resource_header(
+                head_file, var_str, macro_op, macro_str, op_type
+            )
+
+    def _collect_soc_resource_entries(self: any, op_bin, socs_res, op_syms):
+        for soc in op_bin.keys():
+            soc_res = '{{ "{}", {{'.format(soc)
+            soc_syms = op_bin.get(soc)
+            soc_pairs = []
+            for pair_addr in soc_syms:
+                pair_addr1 = ["&" + s for s in pair_addr]
+                op_syms += pair_addr
+                soc_pairs.append(
+                    "    {{ {} }} ".format(", \\\n      ".join(pair_addr1))
                 )
+            soc_res += ", \\\n        ".join(soc_pairs)
+            soc_res += " } }"
+            socs_res.append(soc_res)
+        return op_syms
+
+    def _write_op_resource_header(
+        self: any, head_file, var_str, macro_op, macro_str, op_type
+    ):
+        try:
+            with os.fdopen(
+                os.open(head_file, const_var.WFLAGS, const_var.WMODES), "w"
+            ) as fd:
+                fd.write("#include <stdint.h>\n")
+                fd.write("#include <map>\n")
+                fd.write("#include <tuple>\n")
+                fd.write("#include <vector>\n")
+                fd.write('#include "graph/ascend_string.h"\n')
+                fd.write('#include "register/op_impl_registry.h"\n\n')
+                fd.write(var_str)
+                fd.write("\n")
+                fd.write(macro_op)
+                fd.write(macro_str)
+        except Exception as e:
+            LogUtil.print_compile_log(
+                "",
+                f"{op_type}_op_resource.h create error: {e}!",
+                AscendCLogLevel.LOG_ERROR,
+                LogUtil.Option.NON_SOC,
+            )
 
     def ascendc_gen_lib(self: any):
         out_lib = os.path.join(self.out_path, "libkernels.a")

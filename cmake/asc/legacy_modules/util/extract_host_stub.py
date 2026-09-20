@@ -1209,14 +1209,7 @@ def format_params(func_sign: FuncSign):
     return result
 
 
-def generate_func_impl_code_cpu(
-    func_sign: FuncSign,
-    has_mode_func: bool,
-    func_key: int,
-    func_params_str: str,
-    new_func_sign: FuncSign,
-    kernel_name: str,
-) -> str:
+def _resolve_cpu_kernel_type(has_mode_func) -> str:
     aiv_conditions = [
         CodeMode.AIV,
         CodeMode.KERNEL_TYPE_AIV_ONLY,
@@ -1244,6 +1237,18 @@ def generate_func_impl_code_cpu(
         kernelType = "MIX_MODE"
     else:
         raise ValueError("[ERROR]: KernelMode does not support!")
+    return kernelType
+
+
+def generate_func_impl_code_cpu(
+    func_sign: FuncSign,
+    has_mode_func: bool,
+    func_key: int,
+    func_params_str: str,
+    new_func_sign: FuncSign,
+    kernel_name: str,
+) -> str:
+    kernelType = _resolve_cpu_kernel_type(has_mode_func)
 
     param_names = tuple(get_param_names_by_func_sign(func_sign))
     block_num_name = param_names[0]
@@ -2458,8 +2463,7 @@ def process_with_source_mapping(
     save_host_config_cmake_func(func_sign_groups, source_mapping, dst_dir)
 
 
-def main(argv: List[str]):
-    """Main process."""
+def _parse_stub_args(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("filepaths", nargs="+", help="Preprocessed file paths.")
     parser.add_argument(
@@ -2484,6 +2488,68 @@ def main(argv: List[str]):
     parser.add_argument("--run-mode", help="cpu or npu mode.")
 
     args = parser.parse_args(argv)
+    return args
+
+
+def _prepare_func_sign_groups(func_sign_groups, args):
+    type_definition = generate_type_definition_content_by_func_sign_groups(
+        func_sign_groups
+    )
+    func_sign_groups = list(
+        map(
+            get_func_sign_template_specialization_args,
+            func_sign_groups,
+            args.aiv_o,
+            args.aic_o,
+        )
+    )
+
+    new_func_sign_groups = list(map(trans_func_sign_group, func_sign_groups))
+    return type_definition, func_sign_groups, new_func_sign_groups
+
+
+def _resolve_modes_and_saver(args, func_sign_groups):
+    if args.dynamic_mode:
+        # Each preprocessed file corresponds to two .o files: aiv.o and aic.o.
+        kernel_types = [
+            func_sign_group.kernel_type for func_sign_group in func_sign_groups
+        ]
+        modes = list(
+            starmap(get_mode_dynamic, zip(args.aic_o, args.aiv_o, kernel_types))
+        )
+        save_device_config_cmake_func = save_aic_aiv_config_cmake
+    elif args.build_mode == "m200" and args.generate_definition:
+        modes = [func_sign_group.kernel_type for func_sign_group in func_sign_groups]
+        save_device_config_cmake_func = save_v200_config_cmake
+    else:
+        modes = repeat(CodeMode.NORMAL)
+        save_device_config_cmake_func = save_normal_config_cmake
+    return modes, save_device_config_cmake_func
+
+
+def _save_stub_sources(new_func_sign_groups, type_definition, dst_dir, args):
+    do_save_commands(
+        generate_save_stub_header_commands(
+            func_signs_in_groups(new_func_sign_groups), args.header_dir
+        )
+    )
+    if RUN_MODE == "cpu":
+        do_save_commands(
+            generate_save_stub_impl_cpp_cpu_commands(
+                new_func_sign_groups, type_definition, dst_dir
+            )
+        )
+    else:
+        do_save_commands(
+            generate_save_stub_impl_cpp_commands(
+                new_func_sign_groups, type_definition, dst_dir
+            )
+        )
+
+
+def main(argv: List[str]):
+    """Main process."""
+    args = _parse_stub_args(argv)
 
     dst_dir = os.path.realpath(args.dst_dir)
     if not os.path.exists(dst_dir):
@@ -2508,19 +2574,9 @@ def main(argv: List[str]):
         print(f"error: {ex.strerror}: '{ex.filename}'")
         return False
 
-    type_definition = generate_type_definition_content_by_func_sign_groups(
-        func_sign_groups
+    type_definition, func_sign_groups, new_func_sign_groups = _prepare_func_sign_groups(
+        func_sign_groups, args
     )
-    func_sign_groups = list(
-        map(
-            get_func_sign_template_specialization_args,
-            func_sign_groups,
-            args.aiv_o,
-            args.aic_o,
-        )
-    )
-
-    new_func_sign_groups = list(map(trans_func_sign_group, func_sign_groups))
 
     try:
         source_mapping, enable_ascendc_time_stamp = load_compile_commands(
@@ -2530,21 +2586,9 @@ def main(argv: List[str]):
         print(f"error: {ex}")
         return False
 
-    if args.dynamic_mode:
-        # Each preprocessed file corresponds to two .o files: aiv.o and aic.o.
-        kernel_types = [
-            func_sign_group.kernel_type for func_sign_group in func_sign_groups
-        ]
-        modes = list(
-            starmap(get_mode_dynamic, zip(args.aic_o, args.aiv_o, kernel_types))
-        )
-        save_device_config_cmake_func = save_aic_aiv_config_cmake
-    elif args.build_mode == "m200" and args.generate_definition:
-        modes = [func_sign_group.kernel_type for func_sign_group in func_sign_groups]
-        save_device_config_cmake_func = save_v200_config_cmake
-    else:
-        modes = repeat(CodeMode.NORMAL)
-        save_device_config_cmake_func = save_normal_config_cmake
+    modes, save_device_config_cmake_func = _resolve_modes_and_saver(
+        args, func_sign_groups
+    )
 
     base_keys = list(get_base_keys(func_sign_groups, modes))
     func_sign_groups = compose_mode_base_func_groups(func_sign_groups, modes, base_keys)
@@ -2553,23 +2597,7 @@ def main(argv: List[str]):
         new_func_sign_groups, modes, base_keys
     )
 
-    do_save_commands(
-        generate_save_stub_header_commands(
-            func_signs_in_groups(new_func_sign_groups), args.header_dir
-        )
-    )
-    if RUN_MODE == "cpu":
-        do_save_commands(
-            generate_save_stub_impl_cpp_cpu_commands(
-                new_func_sign_groups, type_definition, dst_dir
-            )
-        )
-    else:
-        do_save_commands(
-            generate_save_stub_impl_cpp_commands(
-                new_func_sign_groups, type_definition, dst_dir
-            )
-        )
+    _save_stub_sources(new_func_sign_groups, type_definition, dst_dir, args)
 
     process_with_source_mapping(
         func_sign_groups,

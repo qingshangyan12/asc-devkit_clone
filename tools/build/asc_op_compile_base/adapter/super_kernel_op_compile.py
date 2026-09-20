@@ -203,6 +203,61 @@ def super_kernel_gen_entry(entry, sk_fun, split_mode, kernel_type):
     return code
 
 
+def _resolve_spk_asc_path():
+    ascend_home_path = os.environ.get("ASCEND_HOME_PATH")
+    import platform
+
+    archlinux = platform.machine()
+    if ascend_home_path is None or ascend_home_path == "":
+        asc_opc_path = shutil.which("asc_opc")
+        if asc_opc_path is not None:
+            asc_opc_path_link = os.path.dirname(asc_opc_path)
+            asc_opc_real_path = os.path.realpath(asc_opc_path_link)
+            ascend_home_path = os.path.realpath(
+                os.path.join(asc_opc_real_path, "..", "..")
+            )
+        else:
+            ascend_home_path = "/usr/local/Ascend/cann"
+
+    if "x86" in archlinux:
+        asc_path = os.path.realpath(
+            os.path.join(ascend_home_path, "x86_64-linux", "asc")
+        )
+    else:
+        asc_path = os.path.realpath(
+            os.path.join(ascend_home_path, "aarch64-linux", "asc")
+        )
+    if asc_path is None:
+        asc_path = os.path.realpath(os.path.join(ascend_home_path, "compiler", "asc"))
+    return asc_path
+
+
+def _append_spk_include_options(cmds, asc_path):
+    cmds.append("-I" + os.path.join(asc_path, "impl", "adv_api"))
+    cmds.append("-I" + os.path.join(asc_path, "impl", "basic_api"))
+    cmds.append("-I" + os.path.join(asc_path, "impl", "c_api"))
+    cmds.append("-I" + os.path.join(asc_path, "impl", "basic_api", "reg_compute"))
+    cmds.append("-I" + os.path.join(asc_path, "impl", "simt_api"))
+    cmds.append("-I" + os.path.join(asc_path, "impl", "utils"))
+    cmds.append("-I" + os.path.join(asc_path, "include"))
+    cmds.append("-I" + os.path.join(asc_path, "include", "adv_api"))
+    cmds.append("-I" + os.path.join(asc_path, "include", "basic_api"))
+    cmds.append("-I" + os.path.join(asc_path, "include", "aicpu_api"))
+    cmds.append("-I" + os.path.join(asc_path, "include", "c_api"))
+    cmds.append("-I" + os.path.join(asc_path, "include", "basic_api", "reg_compute"))
+    cmds.append("-I" + os.path.join(asc_path, "include", "simt_api"))
+    cmds.append("-I" + os.path.join(asc_path, "include", "utils"))
+    cmds.append("-I" + os.path.join(asc_path, "..", "ascendc", "act"))
+    cmds.append("-I" + os.path.join(asc_path, "impl"))
+    cmds.append("-I" + asc_path)
+    cmds.append("-I" + os.path.join(asc_path, "..", "tikcpp"))
+    cmds.append("-I" + os.path.join(asc_path, "..", "..", "include"))
+    cmds.append("-I" + os.path.join(asc_path, "..", "..", "include", "ascendc"))
+    cmds.append("-I" + os.path.join(asc_path, "..", "tikcpp", "tikcfw"))
+    cmds.append("-I" + os.path.join(asc_path, "..", "tikcpp", "tikcfw", "impl"))
+    cmds.append("-I" + os.path.join(asc_path, "..", "tikcpp", "tikcfw", "interface"))
+
+
 def gen_spk_kernel_call(
     super_split_info: SuperSplitInfo, split_mode, kernel_type, compile_log_path=None
 ):
@@ -222,61 +277,9 @@ def gen_spk_kernel_call(
             _sk_arch = f"dav-{chip_version}-cube"
 
         cmds = ["ccec", "-x", "cce"]
-        ascend_home_path = os.environ.get("ASCEND_HOME_PATH")
-        import platform
+        asc_path = _resolve_spk_asc_path()
 
-        archlinux = platform.machine()
-        if ascend_home_path is None or ascend_home_path == "":
-            asc_opc_path = shutil.which("asc_opc")
-            if asc_opc_path is not None:
-                asc_opc_path_link = os.path.dirname(asc_opc_path)
-                asc_opc_real_path = os.path.realpath(asc_opc_path_link)
-                ascend_home_path = os.path.realpath(
-                    os.path.join(asc_opc_real_path, "..", "..")
-                )
-            else:
-                ascend_home_path = "/usr/local/Ascend/cann"
-
-        if "x86" in archlinux:
-            asc_path = os.path.realpath(
-                os.path.join(ascend_home_path, "x86_64-linux", "asc")
-            )
-        else:
-            asc_path = os.path.realpath(
-                os.path.join(ascend_home_path, "aarch64-linux", "asc")
-            )
-        if asc_path is None:
-            asc_path = os.path.realpath(
-                os.path.join(ascend_home_path, "compiler", "asc")
-            )
-
-        cmds.append("-I" + os.path.join(asc_path, "impl", "adv_api"))
-        cmds.append("-I" + os.path.join(asc_path, "impl", "basic_api"))
-        cmds.append("-I" + os.path.join(asc_path, "impl", "c_api"))
-        cmds.append("-I" + os.path.join(asc_path, "impl", "basic_api", "reg_compute"))
-        cmds.append("-I" + os.path.join(asc_path, "impl", "simt_api"))
-        cmds.append("-I" + os.path.join(asc_path, "impl", "utils"))
-        cmds.append("-I" + os.path.join(asc_path, "include"))
-        cmds.append("-I" + os.path.join(asc_path, "include", "adv_api"))
-        cmds.append("-I" + os.path.join(asc_path, "include", "basic_api"))
-        cmds.append("-I" + os.path.join(asc_path, "include", "aicpu_api"))
-        cmds.append("-I" + os.path.join(asc_path, "include", "c_api"))
-        cmds.append(
-            "-I" + os.path.join(asc_path, "include", "basic_api", "reg_compute")
-        )
-        cmds.append("-I" + os.path.join(asc_path, "include", "simt_api"))
-        cmds.append("-I" + os.path.join(asc_path, "include", "utils"))
-        cmds.append("-I" + os.path.join(asc_path, "..", "ascendc", "act"))
-        cmds.append("-I" + os.path.join(asc_path, "impl"))
-        cmds.append("-I" + asc_path)
-        cmds.append("-I" + os.path.join(asc_path, "..", "tikcpp"))
-        cmds.append("-I" + os.path.join(asc_path, "..", "..", "include"))
-        cmds.append("-I" + os.path.join(asc_path, "..", "..", "include", "ascendc"))
-        cmds.append("-I" + os.path.join(asc_path, "..", "tikcpp", "tikcfw"))
-        cmds.append("-I" + os.path.join(asc_path, "..", "tikcpp", "tikcfw", "impl"))
-        cmds.append(
-            "-I" + os.path.join(asc_path, "..", "tikcpp", "tikcfw", "interface")
-        )
+        _append_spk_include_options(cmds, asc_path)
 
         if CommonUtility.is_c310():
             cmds += ["-D__DAV_C310__"]
@@ -318,22 +321,9 @@ def split_spk_kernel_objs(
             _k_name = _o_name.split(".")[0]
             _no_mix = "_".join(_k_name.split("_")[:3])
             _n_name = _k_name.replace(_no_mix, "_sk")
-            for i in range(1, split_mode):
-                copy_cmd = ["cp", "{}".format(_obj), "{}.split{}.o".format(_obj, i)]
-                run_local_cmd(copy_cmd, compile_log_path)
-                redefine_sym_cmd = [
-                    "llvm-objcopy",
-                    "--redefine-sym",
-                    "{}={}_{}".format(_k_name, _n_name, i),
-                    "{}.split{}.o".format(_obj, i),
-                ]
-                run_local_cmd(redefine_sym_cmd, compile_log_path)
-                strip_sym_cmd = [
-                    "llvm-objcopy",
-                    "--strip-symbol=g_opSystemRunCfg",
-                    "{}.split{}.o".format(_obj, i),
-                ]
-                run_local_cmd(strip_sym_cmd, compile_log_path)
+            _copy_and_redefine_spk_splits(
+                _obj, _k_name, _n_name, split_mode, compile_log_path
+            )
             redefine_sym_cmd = [
                 "llvm-objcopy",
                 "--redefine-sym",
@@ -352,6 +342,31 @@ def split_spk_kernel_objs(
         super_split_info, split_mode, kernel_type, compile_log_path
     )
     _sk_all = ":".join(sub_objs)
+    _sk_all = _merge_spk_split_obj_paths(_sk_all, _sk_new, _sk_out, _sk_objs)
+    sub_objs = _sk_all.split(":")
+    return sub_objs, _sk_new
+
+
+def _copy_and_redefine_spk_splits(_obj, _k_name, _n_name, split_mode, compile_log_path):
+    for i in range(1, split_mode):
+        copy_cmd = ["cp", "{}".format(_obj), "{}.split{}.o".format(_obj, i)]
+        run_local_cmd(copy_cmd, compile_log_path)
+        redefine_sym_cmd = [
+            "llvm-objcopy",
+            "--redefine-sym",
+            "{}={}_{}".format(_k_name, _n_name, i),
+            "{}.split{}.o".format(_obj, i),
+        ]
+        run_local_cmd(redefine_sym_cmd, compile_log_path)
+        strip_sym_cmd = [
+            "llvm-objcopy",
+            "--strip-symbol=g_opSystemRunCfg",
+            "{}.split{}.o".format(_obj, i),
+        ]
+        run_local_cmd(strip_sym_cmd, compile_log_path)
+
+
+def _merge_spk_split_obj_paths(_sk_all, _sk_new, _sk_out, _sk_objs):
     for i in range(0, len(_sk_new)):
         _sk_new_files = [
             _sk_out[i],
@@ -362,8 +377,7 @@ def split_spk_kernel_objs(
         ]
         _sk_nobj = ":".join(_sk_new_files)
         _sk_all = _sk_all.replace(_sk_objs[i], _sk_nobj)
-    sub_objs = _sk_all.split(":")
-    return sub_objs, _sk_new
+    return _sk_all
 
 
 def localization_sub_op_func_sym(dst_file: str, sub_op_kernel_info):
@@ -406,7 +420,7 @@ def localize_symbol_of_sk(split_mode, sks, spk_dst_file, compile_log_path):
             run_local_cmd(local_synbol_cmds, compile_log_path)
 
 
-def compile_super_kernel(kernel_info, compile_log_path, enable_features: dict = None):
+def _prepare_super_kernel_compile(kernel_info, compile_log_path):
     global_var_storage.set_variable("super_kenel_save_sub_op_files", True)
     kernel_info["kernel_type"] = KernelMetaType(kernel_info["kernel_type"])
     op_info = OpInfo()
@@ -440,9 +454,20 @@ def compile_super_kernel(kernel_info, compile_log_path, enable_features: dict = 
                 / CommonUtility.get_dump_core_num()
             )
         )
+    return compile_info, tiling_info, compile_option_tuple
+
+
+def compile_super_kernel(kernel_info, compile_log_path, enable_features: dict = None):
+    compile_info, tiling_info, compile_option_tuple = _prepare_super_kernel_compile(
+        kernel_info, compile_log_path
+    )
     _compile_ascendc_cce_v220_with_kernel_type_for_static(
         compile_info, compile_option_tuple, tiling_info
     )
+    _link_super_kernel_objs(compile_info, kernel_info, tiling_info)
+
+
+def _link_super_kernel_objs(compile_info, kernel_info, tiling_info):
     sub_objs = gen_super_kernel_link_obj_sequence(
         compile_info,
         kernel_info["sub_operator"],
