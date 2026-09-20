@@ -34,7 +34,7 @@ $$
 dst_i = e^{(src0_i - src1_i)}
 $$
 
-float输入按连续元素计算。half输入可通过`src_pos`选择偶数位置或奇数位置；未指定`src_pos`时默认选择偶数位置。
+float输入按连续元素计算，无需指定`src_pos`。half输入必须指定`src_pos`，选择偶数位置或奇数位置。
 
 ## 函数原型
 
@@ -65,14 +65,14 @@ __simd_callee__ inline reg_tensor<U> exp_diff(
 | --- | --- | --- |
 | `src0` | 输入 | 被减数，类型为`reg_tensor<float>`或`reg_tensor<half>`。`src0.mask`按输出元素编号，对应位置为`1`时该输出元素参与计算，为`0`时不参与计算。 |
 | `src1` | 输入 | 减数，类型与`src0`相同。`src1.mask`不用于本次计算。 |
-| `src_pos` | 输入 | 仅用于half输入，支持`ASC_POSITION_EVEN`和`ASC_POSITION_ODD`，分别表示选择偶数位置和奇数位置。 |
+| `src_pos` | 输入 | half输入时必填，支持`ASC_POSITION_EVEN`和`ASC_POSITION_ODD`，分别表示选择偶数位置和奇数位置。 |
 
 ## 数据类型
 
 | 输入类型 | 返回类型 |
 | --- | --- |
-| `reg_tensor<float>` | `reg_tensor<float>` |
-| `reg_tensor<half>` | `reg_tensor<float>` |
+| `reg_tensor<float>`（不带`src_pos`） | `reg_tensor<float>` |
+| `reg_tensor<half>`（带`src_pos`） | `reg_tensor<float>` |
 
 ## 返回值说明
 
@@ -82,7 +82,7 @@ __simd_callee__ inline reg_tensor<U> exp_diff(
 
 - `src0.mask`需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
 - 输入为`half`时，mask按照输出`float`元素解释，应使用`all_mask<float>`、`make_mask<..., float>`或`update_mask<float>`生成。不要将mask设置成交替的奇偶位；源元素位置由`src_pos`选择。
-- 输入为`half`且未指定`src_pos`时，默认选择偶数位置参与计算。
+- 输入为`half`时必须传入`src_pos`；选择偶数位置时传入`ASC_POSITION_EVEN`。
 
 ## 调用示例
 

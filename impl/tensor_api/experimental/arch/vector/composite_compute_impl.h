@@ -44,16 +44,12 @@ __simd_callee__ inline reg_tensor<T> abs_diff(const reg_tensor<T>& src0, const r
 template <typename T, typename U>
 __simd_callee__ inline reg_tensor<U> exp_diff(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
-    static_assert(detail::supports_exp_diff_v<T, U>, "exp_diff does not support this input-output type combination");
-    if constexpr (::AscendC::Std::is_same_v<T, half> && ::AscendC::Std::is_same_v<U, float>) {
-        return exp_diff<T, U>(src0, src1, ASC_POSITION_EVEN);
-    } else if constexpr (::AscendC::Std::is_same_v<T, float> && ::AscendC::Std::is_same_v<U, float>) {
-        reg_tensor<U> dst(src0.mask);
-        dst.reg = asc_exp_sub(src0.reg, src1.reg, src0.mask);
-        return dst;
-    } else {
-        return {};
-    }
+    static_assert(
+        ::AscendC::Std::is_same_v<T, float> && ::AscendC::Std::is_same_v<U, float>,
+        "exp_diff without a position only supports float input and float output");
+    reg_tensor<U> dst(src0.mask);
+    dst.reg = asc_exp_sub(src0.reg, src1.reg, src0.mask);
+    return dst;
 }
 
 template <typename T, typename U, typename position_type>
@@ -70,15 +66,12 @@ __simd_callee__ inline reg_tensor<U> exp_diff(
             ::AscendC::Std::remove_cvref_t<decltype(ASC_POSITION_ODD)>>,
         "exp_diff position supports ASC_POSITION_EVEN and ASC_POSITION_ODD");
     reg_tensor<U> dst(src0.mask);
-    if constexpr (::AscendC::Std::is_same_v<T, half> && ::AscendC::Std::is_same_v<U, float>) {
-        dst.reg = asc_exp_sub_half2float(src0.reg, src1.reg, src0.mask, src_pos);
-    }
+    dst.reg = asc_exp_sub_half2float(src0.reg, src1.reg, src0.mask, src_pos);
     return dst;
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> madd(
-    reg_tensor<T>& dst, const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+__simd_callee__ inline reg_tensor<T> madd(reg_tensor<T>& dst, const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
     static_assert(detail::supports_madd_v<T>, "madd does not support this element type");
     asc_madd(dst.reg, src0.reg, src1.reg, dst.mask);
@@ -86,8 +79,7 @@ __simd_callee__ inline reg_tensor<T> madd(
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> mula(
-    reg_tensor<T>& dst, const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+__simd_callee__ inline reg_tensor<T> mula(reg_tensor<T>& dst, const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
     static_assert(detail::supports_mula_v<T>, "mula does not support this element type");
     asc_mula(dst.reg, src0.reg, src1.reg, dst.mask);

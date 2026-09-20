@@ -83,10 +83,6 @@ inline constexpr bool supports_axpy_v = ::AscendC::Std::is_one_of_v<T, half, flo
 template <typename T>
 inline constexpr bool supports_abs_diff_v = ::AscendC::Std::is_one_of_v<T, half, float>;
 
-template <typename T, typename U>
-inline constexpr bool supports_exp_diff_v =
-    ::AscendC::Std::is_one_of_v<T, half, float> && ::AscendC::Std::is_same_v<U, float>;
-
 template <typename T>
 inline constexpr bool supports_madd_v = ::AscendC::Std::is_one_of_v<T, half, bfloat16_t, float>;
 
