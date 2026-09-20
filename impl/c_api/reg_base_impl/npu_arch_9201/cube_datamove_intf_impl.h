@@ -19,9 +19,6 @@
 
 #include "impl/c_api/reg_base_impl/npu_arch_9201/utils_impl.h"
 
-constexpr uint8_t ASC_GM2L1_SID_DEFAULT = 0;
-constexpr uint8_t ASC_GM2L1_DECOMP_MODE_DEFAULT = 0;
-
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ void* dst, __gm__ void* src, uint32_t n_burst, uint32_t len_burst, asc_channel_pad_mode pad_mode,
     bool enable_pre_load_ignore_sync, uint64_t src_stride, uint32_t dst_stride)
