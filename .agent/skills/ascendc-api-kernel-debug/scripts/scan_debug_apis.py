@@ -29,7 +29,12 @@ SUPPORTED_PATTERNS = (
     ("printf", re.compile(r"\b(?:AscendC::)?(?:printf|PRINTF)\s*\(")),
     ("assert", re.compile(r"\b(?:assert|ascendc_assert)\s*\(")),
     ("__trap", re.compile(r"\b__trap\s*\(")),
-    ("asc_dump", re.compile(r"\basc_dump(?:_(?:gm|ubuf|l1buf|cbuf|reg))?\s*(?:<[^;{}()]*>)?\s*\(")),
+    (
+        "asc_dump",
+        re.compile(
+            r"\basc_dump(?:_(?:gm|ubuf|l1buf|cbuf|reg))?\s*(?:<[^;{}()]*>)?\s*\("
+        ),
+    ),
     ("clock", re.compile(r"\bclock\s*\(")),
     ("asc_time_stamp", re.compile(r"\basc_time_stamp\s*\(")),
 )
@@ -43,9 +48,7 @@ EXCLUDED_APIS = {
 }
 
 EXCLUDED_PATTERNS = {
-    api: re.compile(
-        r"\b" + re.escape(api) + r"(?:\s*<[^;{}()]*>)?\s*\("
-    )
+    api: re.compile(r"\b" + re.escape(api) + r"(?:\s*<[^;{}()]*>)?\s*\(")
     for api in EXCLUDED_APIS
 }
 
@@ -60,7 +63,11 @@ REQUIRED_HEADERS = {
 
 
 def _line_numbers(text: str, pattern: re.Pattern[str]) -> List[int]:
-    return [index for index, line in enumerate(text.splitlines(), start=1) if pattern.search(line)]
+    return [
+        index
+        for index, line in enumerate(text.splitlines(), start=1)
+        if pattern.search(line)
+    ]
 
 
 def scan_text(text: str, filename: str = "<memory>") -> Dict[str, object]:
@@ -85,11 +92,15 @@ def scan_text(text: str, filename: str = "<memory>") -> Dict[str, object]:
     headers = set(re.findall(r'#include\s*[<"]([^>"]+)[>"]', text))
     # kernel_operator.h is the umbrella header used by the repository's
     # examples and exposes the public debug entry points.
-    missing_headers = {} if "kernel_operator.h" in headers else {
-        api: REQUIRED_HEADERS[api]
-        for api in supported
-        if REQUIRED_HEADERS[api] not in headers
-    }
+    missing_headers = (
+        {}
+        if "kernel_operator.h" in headers
+        else {
+            api: REQUIRED_HEADERS[api]
+            for api in supported
+            if REQUIRED_HEADERS[api] not in headers
+        }
+    )
 
     return {
         "files": [filename],
@@ -129,8 +140,12 @@ def _merge_reports(reports: Iterable[Dict[str, object]]) -> Dict[str, object]:
 
 def main(argv: List[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("paths", nargs="*", type=Path, help="AscendC source files to scan")
-    parser.add_argument("--json", action="store_true", help="write a machine-readable JSON report")
+    parser.add_argument(
+        "paths", nargs="*", type=Path, help="AscendC source files to scan"
+    )
+    parser.add_argument(
+        "--json", action="store_true", help="write a machine-readable JSON report"
+    )
     parser.add_argument(
         "--fail-on-excluded",
         action="store_true",
@@ -157,7 +172,7 @@ def main(argv: List[str] | None = None) -> int:
             print(f"{path}: supported={supported}; excluded={excluded}")
             missing = file_report["missing_headers"]
             for api, header in missing.items():
-                print(f"  warning: {api} is missing #include \"{header}\"")
+                print(f'  warning: {api} is missing #include "{header}"')
 
     return 1 if args.fail_on_excluded and report["excluded"] else 0
 
