@@ -526,6 +526,40 @@ def get_compile_cmd_for_kernel_name(
     return compile_cmd
 
 
+def add_op_system_run_cfg_option(compile_cmd, compile_info, tiling_info, tiling_key, sub_arch, *, definition_key=None):
+    """Add the g_opSystemRunCfg definition macro to its designated compile command.
+
+    Args:
+        compile_cmd: Mutable compiler argument list to update.
+        compile_info: Compile metadata, including tiling keys and core channel.
+        tiling_info: Tiling metadata used to identify static shapes.
+        tiling_key: Tiling key associated with this compile command.
+        sub_arch: Target sub-architecture, such as ``davinci-c220-cube``.
+        definition_key: Optional tiling key that owns the global definition.
+    """
+    if not CommonUtility.is_v220():
+        return
+    option = "-D__ASCENDC_DEFINE_OP_SYSTEM_RUN_CFG__"
+    compile_cmd[:] = [arg for arg in compile_cmd if arg != option]
+    if definition_key is None:
+        definition_key = tiling_info.tiling_key if tiling_info.static_shape_flag else compile_info.tiling_key_list[0]
+    if str(tiling_key) != str(definition_key):
+        return
+    core_types = get_compile_core_types(compile_info, definition_key)
+    definition_core = "cube" if "cube" in core_types else "vec"
+    current_core = (
+        sub_arch.rsplit("-", 1)[-1] if sub_arch else ("cube" if compile_info.code_channel == CORE_TYPE_CUBE else "vec")
+    )
+    if current_core != definition_core:
+        return
+    source_index = (
+        compile_cmd.index(compile_info.gen_kernel_func_file)
+        if compile_info.gen_kernel_func_file in compile_cmd
+        else len(compile_cmd)
+    )
+    compile_cmd.insert(source_index, option)
+
+
 def call_bisheng_v220(
     compile_info: CompileInfo, compile_option_tuple, tiling_info: TilingInfo, sub_arch: str, code_channel: int
 ):
@@ -565,6 +599,7 @@ def call_bisheng_v220(
         CommonUtility().ascendc_write_file(compile_info.gen_kernel_func_file, new_sources)
 
         compile_cmd += [f"-D{TILING_KEY_MACRO}={tiling_info.tiling_key}UL"]
+        add_op_system_run_cfg_option(compile_cmd, compile_info, tiling_info, tiling_info.tiling_key, sub_arch)
         CommonUtility.run_cmd_inner(compile_cmd, CompileStage.COMPILE, compile_info.compile_log_path)
         return [f"{tiling_info.tiling_key}"]
     else:
@@ -578,6 +613,7 @@ def call_bisheng_v220(
                 tiling_key, compile_info, sub_arch, tiling_info, code_channel, compile_option_tuple
             )
             compile_cmd, kernel_name = compile_single_tiling_v220(param)
+            add_op_system_run_cfg_option(compile_cmd, compile_info, tiling_info, tiling_key, sub_arch)
             core_type = (
                 "cube"
                 if (sub_arch is None and code_channel == CORE_TYPE_CUBE)
