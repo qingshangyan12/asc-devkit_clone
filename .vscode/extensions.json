@@ -5,6 +5,5 @@
         "ms-vscode.cpptools",
         "ms-vscode.cmake-tools",
         "llvm-vs-code-extensions.vscode-clangd",
-        "xaver.clang-format"
     ]
 }
