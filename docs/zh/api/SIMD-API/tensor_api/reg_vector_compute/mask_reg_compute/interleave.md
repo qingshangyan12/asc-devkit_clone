@@ -32,7 +32,7 @@
  
 对于b8、b16和b32数据类型，接口分别以1 bit、2 bit和4 bit为一组进行交织。`src0`和`src1`前半部分的分组依次交替写入`first.reg`，后半部分的分组依次交替写入`second.reg`。
  
-本接口只处理`reg_tensor<bool>`寄存器。数据寄存器的交织接口参见[数据重排](../data_reorder/data_reorder.md)。
+本接口只处理输入为`reg_tensor<bool>`类型的寄存器。数据寄存器的交织接口参见[数据重排](../data_reorder/data_reorder.md)。
  
 ## 函数原型
  
