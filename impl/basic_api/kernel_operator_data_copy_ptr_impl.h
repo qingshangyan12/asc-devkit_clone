@@ -416,8 +416,7 @@ template <
 __aicore__ inline void DataCopy(
     __cc__ T* dst, __cbuf__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
 {
-    DataCopyL12L0CImpl(
-        (__cc__ half*)dst, (__cbuf__ float*)src, intriParams, enhancedParams);
+    DataCopyL12L0CImpl((__cc__ half*)dst, (__cbuf__ float*)src, intriParams, enhancedParams);
 }
 
 template <
@@ -426,8 +425,7 @@ template <
 __aicore__ inline void DataCopy(
     __ubuf__ T* dst, __cc__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
 {
-    DataCopyL0C2UBImpl(
-        (__ubuf__ half*)dst, (__cc__ float*)src, intriParams, enhancedParams);
+    DataCopyL0C2UBImpl((__ubuf__ half*)dst, (__cc__ float*)src, intriParams, enhancedParams);
 }
 
 template <
@@ -437,8 +435,7 @@ template <
 __aicore__ inline __inout_pipe__(V) void DataCopy(
     __ubuf__ T* dst, __cc__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
 {
-    DataCopyL0C2UBImpl(
-        (__ubuf__ int16_t*)dst, (__cc__ int32_t*)src, intriParams, enhancedParams);
+    DataCopyL0C2UBImpl((__ubuf__ int16_t*)dst, (__cc__ int32_t*)src, intriParams, enhancedParams);
 }
 
 template <
@@ -448,8 +445,7 @@ template <
 __aicore__ inline __inout_pipe__(V) void DataCopy(
     __ubuf__ T* dst, __cc__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
 {
-    DataCopyL0C2UBImpl(
-        (__ubuf__ int8_t*)dst, (__cc__ int32_t*)src, intriParams, enhancedParams);
+    DataCopyL0C2UBImpl((__ubuf__ int8_t*)dst, (__cc__ int32_t*)src, intriParams, enhancedParams);
 }
 
 template <
@@ -459,8 +455,7 @@ template <
 __aicore__ inline __inout_pipe__(V) void DataCopy(
     __ubuf__ T* dst, __cc__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
 {
-    DataCopyL0C2UBImpl(
-        (__ubuf__ uint8_t*)dst, (__cc__ int32_t*)src, intriParams, enhancedParams);
+    DataCopyL0C2UBImpl((__ubuf__ uint8_t*)dst, (__cc__ int32_t*)src, intriParams, enhancedParams);
 }
 
 template <
@@ -469,8 +464,7 @@ template <
 __aicore__ inline __inout_pipe__(V) void DataCopy(
     __cc__ T* dst, __ubuf__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
 {
-    DataCopyUB2L0CImpl(
-        (__cc__ float*)dst, (__ubuf__ half*)src, intriParams, enhancedParams);
+    DataCopyUB2L0CImpl((__cc__ float*)dst, (__ubuf__ half*)src, intriParams, enhancedParams);
 }
 
 template <
@@ -479,8 +473,7 @@ template <
 __aicore__ inline __inout_pipe__(V) void DataCopy(
     __ubuf__ T* dst, __cc__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
 {
-    DataCopyL0C2UBImpl(
-        (__ubuf__ half*)dst, (__cc__ int32_t*)src, intriParams, enhancedParams);
+    DataCopyL0C2UBImpl((__ubuf__ half*)dst, (__cc__ int32_t*)src, intriParams, enhancedParams);
 }
 
 #if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201))
@@ -491,8 +484,7 @@ template <
 __aicore__ inline void DataCopy(
     __cc__ T* dst, __cbuf__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
 {
-    DataCopyL12L0CImpl(
-        (__cc__ PrimT<T>*)dst, (__cbuf__ PrimT<U>*)src, intriParams, enhancedParams);
+    DataCopyL12L0CImpl((__cc__ PrimT<T>*)dst, (__cbuf__ PrimT<U>*)src, intriParams, enhancedParams);
 }
 #endif
 

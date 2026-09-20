@@ -34,8 +34,7 @@ __aicore__ inline __gm__ T* AscendCMixedGmPtr(const GlobalTensor<T>& tensor)
 }
 
 template <typename T>
-__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
-    const LocalTensor<T>& dst, __gm__ T* src, const uint32_t count)
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(const LocalTensor<T>& dst, __gm__ T* src, const uint32_t count)
 {
     GlobalTensor<T> srcTensor;
     srcTensor.SetGlobalBuffer(src);
@@ -43,22 +42,19 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
 }
 
 template <typename T>
-__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
-    __ubuf__ T* dst, const GlobalTensor<T>& src, const uint32_t count)
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(__ubuf__ T* dst, const GlobalTensor<T>& src, const uint32_t count)
 {
     DataCopy(dst, AscendCMixedGmPtr(src), count);
 }
 
 template <typename T>
-__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
-    __cbuf__ T* dst, const GlobalTensor<T>& src, const uint32_t count)
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(__cbuf__ T* dst, const GlobalTensor<T>& src, const uint32_t count)
 {
     DataCopy(dst, AscendCMixedGmPtr(src), count);
 }
 
 template <typename T>
-__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
-    __gm__ T* dst, const LocalTensor<T>& src, const uint32_t count)
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(__gm__ T* dst, const LocalTensor<T>& src, const uint32_t count)
 {
     GlobalTensor<T> dstTensor;
     dstTensor.SetGlobalBuffer(dst);
@@ -66,15 +62,13 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
 }
 
 template <typename T>
-__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
-    const GlobalTensor<T>& dst, __ubuf__ T* src, const uint32_t count)
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(const GlobalTensor<T>& dst, __ubuf__ T* src, const uint32_t count)
 {
     DataCopy(AscendCMixedGmPtr(dst), src, count);
 }
 
 template <typename T>
-__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
-    const GlobalTensor<T>& dst, __cbuf__ T* src, const uint32_t count)
+__aicore__ inline __inout_pipe__(MTE3) void DataCopy(const GlobalTensor<T>& dst, __cbuf__ T* src, const uint32_t count)
 {
     DataCopy(AscendCMixedGmPtr(dst), src, count);
 }
@@ -89,8 +83,9 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, __ubuf__ T* src, cons
     } else if (dstHW == Hardware::L1) {
         DataCopy((__cbuf__ Prim*)dst.GetPhyAddr(), src, count);
     } else {
-        ASCENDC_CHECK_TPOSITION(false, "dst", "UB(VECIN/VECOUT)/L1 Buffer(A1/B1)",
-            "DataCopy Mixed LocalTensor <- __ubuf__", GetPositionDisplay(static_cast<TPosition>(dst.GetPosition())));
+        ASCENDC_CHECK_TPOSITION(
+            false, "dst", "UB(VECIN/VECOUT)/L1 Buffer(A1/B1)", "DataCopy Mixed LocalTensor <- __ubuf__",
+            GetPositionDisplay(static_cast<TPosition>(dst.GetPosition())));
     }
 }
 
@@ -102,8 +97,9 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, __cbuf__ T* src, cons
     if (dstHW == Hardware::UB) {
         DataCopy((__ubuf__ Prim*)dst.GetPhyAddr(), src, count);
     } else {
-        ASCENDC_CHECK_TPOSITION(false, "dst", "UB(VECIN/VECOUT)",
-            "DataCopy Mixed LocalTensor <- __cbuf__", GetPositionDisplay(static_cast<TPosition>(dst.GetPosition())));
+        ASCENDC_CHECK_TPOSITION(
+            false, "dst", "UB(VECIN/VECOUT)", "DataCopy Mixed LocalTensor <- __cbuf__",
+            GetPositionDisplay(static_cast<TPosition>(dst.GetPosition())));
     }
 }
 
@@ -117,8 +113,9 @@ __aicore__ inline void DataCopy(__ubuf__ T* dst, const LocalTensor<T>& src, cons
     } else if (srcHW == Hardware::L1) {
         DataCopy(dst, (__cbuf__ Prim*)src.GetPhyAddr(), count);
     } else {
-        ASCENDC_CHECK_TPOSITION(false, "src", "UB/L1",
-            "DataCopy Mixed __ubuf__ <- LocalTensor", GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
+        ASCENDC_CHECK_TPOSITION(
+            false, "src", "UB/L1", "DataCopy Mixed __ubuf__ <- LocalTensor",
+            GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
     }
 }
 
@@ -130,8 +127,9 @@ __aicore__ inline void DataCopy(__cbuf__ T* dst, const LocalTensor<T>& src, cons
     if (srcHW == Hardware::UB) {
         DataCopy(dst, (__ubuf__ Prim*)src.GetPhyAddr(), count);
     } else {
-        ASCENDC_CHECK_TPOSITION(false, "src", "UB(VECIN/VECOUT)",
-            "DataCopy Mixed __cbuf__ <- LocalTensor", GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
+        ASCENDC_CHECK_TPOSITION(
+            false, "src", "UB(VECIN/VECOUT)", "DataCopy Mixed __cbuf__ <- LocalTensor",
+            GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
     }
 }
 
@@ -182,8 +180,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
 }
 
 template <typename T>
-__aicore__ inline void DataCopy(
-    const LocalTensor<T>& dst, __ubuf__ T* src, const DataCopyParams& repeatParams)
+__aicore__ inline void DataCopy(const LocalTensor<T>& dst, __ubuf__ T* src, const DataCopyParams& repeatParams)
 {
     using Prim = PrimT<T>;
     const Hardware dstHW = GetPhyType((TPosition)dst.GetPosition());
@@ -192,15 +189,14 @@ __aicore__ inline void DataCopy(
     } else if (dstHW == Hardware::L1) {
         DataCopy((__cbuf__ Prim*)dst.GetPhyAddr(), src, repeatParams);
     } else {
-        ASCENDC_CHECK_TPOSITION(false, "dst", "UB/L1",
-            "DataCopy Mixed Params LocalTensor <- __ubuf__",
+        ASCENDC_CHECK_TPOSITION(
+            false, "dst", "UB/L1", "DataCopy Mixed Params LocalTensor <- __ubuf__",
             GetPositionDisplay(static_cast<TPosition>(dst.GetPosition())));
     }
 }
 
 template <typename T>
-__aicore__ inline void DataCopy(
-    const LocalTensor<T>& dst, __cbuf__ T* src, const DataCopyParams& repeatParams)
+__aicore__ inline void DataCopy(const LocalTensor<T>& dst, __cbuf__ T* src, const DataCopyParams& repeatParams)
 {
     using Prim = PrimT<T>;
     const Hardware dstHW = GetPhyType((TPosition)dst.GetPosition());
@@ -209,15 +205,14 @@ __aicore__ inline void DataCopy(
     } else if (dstHW == Hardware::L1) {
         DataCopy((__cbuf__ Prim*)dst.GetPhyAddr(), src, repeatParams);
     } else {
-        ASCENDC_CHECK_TPOSITION(false, "dst", "UB/L1",
-            "DataCopy Mixed Params LocalTensor <- __cbuf__",
+        ASCENDC_CHECK_TPOSITION(
+            false, "dst", "UB/L1", "DataCopy Mixed Params LocalTensor <- __cbuf__",
             GetPositionDisplay(static_cast<TPosition>(dst.GetPosition())));
     }
 }
 
 template <typename T>
-__aicore__ inline void DataCopy(
-    __ubuf__ T* dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
+__aicore__ inline void DataCopy(__ubuf__ T* dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
 {
     using Prim = PrimT<T>;
     const Hardware srcHW = GetPhyType((TPosition)src.GetPosition());
@@ -226,15 +221,14 @@ __aicore__ inline void DataCopy(
     } else if (srcHW == Hardware::L1) {
         DataCopy(dst, (__cbuf__ Prim*)src.GetPhyAddr(), repeatParams);
     } else {
-        ASCENDC_CHECK_TPOSITION(false, "src", "UB/L1",
-            "DataCopy Mixed Params __ubuf__ <- LocalTensor",
+        ASCENDC_CHECK_TPOSITION(
+            false, "src", "UB/L1", "DataCopy Mixed Params __ubuf__ <- LocalTensor",
             GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
     }
 }
 
 template <typename T>
-__aicore__ inline void DataCopy(
-    __cbuf__ T* dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
+__aicore__ inline void DataCopy(__cbuf__ T* dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
 {
     using Prim = PrimT<T>;
     const Hardware srcHW = GetPhyType((TPosition)src.GetPosition());
@@ -243,8 +237,8 @@ __aicore__ inline void DataCopy(
     } else if (srcHW == Hardware::L1) {
         DataCopy(dst, (__cbuf__ Prim*)src.GetPhyAddr(), repeatParams);
     } else {
-        ASCENDC_CHECK_TPOSITION(false, "src", "UB/L1",
-            "DataCopy Mixed Params __cbuf__ <- LocalTensor",
+        ASCENDC_CHECK_TPOSITION(
+            false, "src", "UB/L1", "DataCopy Mixed Params __cbuf__ <- LocalTensor",
             GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
     }
 }
@@ -260,16 +254,16 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
 
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
-    __ubuf__ T* dst, const GlobalTensor<T>& src,
-    const DataCopyParams& dataCopyParams, const DataCopyPadParams& padParams)
+    __ubuf__ T* dst, const GlobalTensor<T>& src, const DataCopyParams& dataCopyParams,
+    const DataCopyPadParams& padParams)
 {
     DataCopyPad(dst, AscendCMixedGmPtr(src), dataCopyParams, padParams);
 }
 
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
-    __cbuf__ T* dst, const GlobalTensor<T>& src,
-    const DataCopyParams& dataCopyParams, const DataCopyPadParams& padParams)
+    __cbuf__ T* dst, const GlobalTensor<T>& src, const DataCopyParams& dataCopyParams,
+    const DataCopyPadParams& padParams)
 {
     DataCopyPad(dst, AscendCMixedGmPtr(src), dataCopyParams, padParams);
 }
@@ -399,8 +393,8 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, __ubuf__ T* src, cons
     if (dstHW == Hardware::L1) {
         DataCopy((__cbuf__ Prim*)dst.GetPhyAddr(), src, intriParams);
     } else {
-        ASCENDC_CHECK_TPOSITION(false, "dst", "L1 Buffer(A1/B1)",
-            "DataCopy Mixed Nd2Nz LocalTensor <- __ubuf__",
+        ASCENDC_CHECK_TPOSITION(
+            false, "dst", "L1 Buffer(A1/B1)", "DataCopy Mixed Nd2Nz LocalTensor <- __ubuf__",
             GetPositionDisplay(static_cast<TPosition>(dst.GetPosition())));
     }
 }
@@ -413,8 +407,8 @@ __aicore__ inline void DataCopy(__cbuf__ T* dst, const LocalTensor<T>& src, cons
     if (srcHW == Hardware::UB) {
         DataCopy(dst, (__ubuf__ Prim*)src.GetPhyAddr(), intriParams);
     } else {
-        ASCENDC_CHECK_TPOSITION(false, "src", "UB(VECIN/VECOUT)",
-            "DataCopy Mixed Nd2Nz __cbuf__ <- LocalTensor",
+        ASCENDC_CHECK_TPOSITION(
+            false, "src", "UB(VECIN/VECOUT)", "DataCopy Mixed Nd2Nz __cbuf__ <- LocalTensor",
             GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
     }
 }
@@ -480,8 +474,7 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, uint8_t dim, const NdDmaConfig& config = kDefaultNdDmaConfig>
-__aicore__ inline void DataCopy(
-    const LocalTensor<T>& dst, __gm__ T* src, const MultiCopyParams<T, dim>& params)
+__aicore__ inline void DataCopy(const LocalTensor<T>& dst, __gm__ T* src, const MultiCopyParams<T, dim>& params)
 {
     GlobalTensor<T> srcTensor;
     srcTensor.SetGlobalBuffer(src);
@@ -489,40 +482,35 @@ __aicore__ inline void DataCopy(
 }
 
 template <typename T, uint8_t dim, const NdDmaConfig& config = kDefaultNdDmaConfig>
-__aicore__ inline void DataCopy(
-    __ubuf__ T* dst, const GlobalTensor<T>& src, const MultiCopyParams<T, dim>& params)
+__aicore__ inline void DataCopy(__ubuf__ T* dst, const GlobalTensor<T>& src, const MultiCopyParams<T, dim>& params)
 {
     DataCopy<T, dim, config>(dst, AscendCMixedGmPtr(src), params);
 }
 #endif
 
 template <typename T, uint8_t subBlockId = 0>
-__aicore__ inline void DataCopyL1ToUB(
-    const LocalTensor<T>& dst, __cbuf__ T* src, const uint32_t count)
+__aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, __cbuf__ T* src, const uint32_t count)
 {
     using Prim = PrimT<T>;
     DataCopyL1ToUB<Prim, subBlockId>((__ubuf__ Prim*)dst.GetPhyAddr(), src, count);
 }
 
 template <typename T, uint8_t subBlockId = 0>
-__aicore__ inline void DataCopyL1ToUB(
-    __ubuf__ T* dst, const LocalTensor<T>& src, const uint32_t count)
+__aicore__ inline void DataCopyL1ToUB(__ubuf__ T* dst, const LocalTensor<T>& src, const uint32_t count)
 {
     using Prim = PrimT<T>;
     DataCopyL1ToUB<Prim, subBlockId>(dst, (__cbuf__ Prim*)src.GetPhyAddr(), count);
 }
 
 template <typename T, uint8_t subBlockId = 0>
-__aicore__ inline void DataCopyL1ToUB(
-    const LocalTensor<T>& dst, __cbuf__ T* src, const DataCopyParams& repeatParams)
+__aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, __cbuf__ T* src, const DataCopyParams& repeatParams)
 {
     using Prim = PrimT<T>;
     DataCopyL1ToUB<Prim, subBlockId>((__ubuf__ Prim*)dst.GetPhyAddr(), src, repeatParams);
 }
 
 template <typename T, uint8_t subBlockId = 0>
-__aicore__ inline void DataCopyL1ToUB(
-    __ubuf__ T* dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
+__aicore__ inline void DataCopyL1ToUB(__ubuf__ T* dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
 {
     using Prim = PrimT<T>;
     DataCopyL1ToUB<Prim, subBlockId>(dst, (__cbuf__ Prim*)src.GetPhyAddr(), repeatParams);
@@ -624,8 +612,8 @@ __aicore__ inline void DataCopy(
     } else if (dstHW == Hardware::L1) {
         DataCopy((__cbuf__ Prim*)dst.GetPhyAddr(), src, intriParams, enhancedParams);
     } else {
-        ASCENDC_CHECK_TPOSITION(false, "dst", "UB/L1",
-            "DataCopy Mixed Enhanced LocalTensor <- __ubuf__",
+        ASCENDC_CHECK_TPOSITION(
+            false, "dst", "UB/L1", "DataCopy Mixed Enhanced LocalTensor <- __ubuf__",
             GetPositionDisplay(static_cast<TPosition>(dst.GetPosition())));
     }
 }
@@ -640,15 +628,14 @@ __aicore__ inline void DataCopy(
     if (srcHW == Hardware::UB) {
         DataCopy(dst, (__ubuf__ Prim*)src.GetPhyAddr(), intriParams, enhancedParams);
     } else {
-        ASCENDC_CHECK_TPOSITION(false, "src", "UB",
-            "DataCopy Mixed Enhanced __ubuf__ <- LocalTensor",
+        ASCENDC_CHECK_TPOSITION(
+            false, "src", "UB", "DataCopy Mixed Enhanced __ubuf__ <- LocalTensor",
             GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
     }
 }
 
 template <typename T, typename U>
-__aicore__ inline void DataCopy(
-    __gm__ T* dst, const LocalTensor<U>& src, const DataCopyCO12DstParams& intriParams)
+__aicore__ inline void DataCopy(__gm__ T* dst, const LocalTensor<U>& src, const DataCopyCO12DstParams& intriParams)
 {
     GlobalTensor<T> dstTensor;
     dstTensor.SetGlobalBuffer(dst);
@@ -656,22 +643,19 @@ __aicore__ inline void DataCopy(
 }
 
 template <typename T, typename U>
-__aicore__ inline void DataCopy(
-    const GlobalTensor<T>& dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams)
+__aicore__ inline void DataCopy(const GlobalTensor<T>& dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams)
 {
     DataCopy(AscendCMixedGmPtr(dst), src, intriParams);
 }
 
 template <typename T, typename U>
-__aicore__ inline void DataCopy(
-    __cbuf__ T* dst, const LocalTensor<U>& src, const DataCopyCO12DstParams& intriParams)
+__aicore__ inline void DataCopy(__cbuf__ T* dst, const LocalTensor<U>& src, const DataCopyCO12DstParams& intriParams)
 {
     DataCopy(dst, (__cc__ U*)src.GetPhyAddr(), intriParams);
 }
 
 template <typename T, typename U>
-__aicore__ inline void DataCopy(
-    const LocalTensor<T>& dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams)
+__aicore__ inline void DataCopy(const LocalTensor<T>& dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams)
 {
     using Prim = PrimT<T>;
     DataCopy((__cbuf__ Prim*)dst.GetPhyAddr(), src, intriParams);
