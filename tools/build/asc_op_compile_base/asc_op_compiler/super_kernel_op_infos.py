@@ -518,6 +518,13 @@ class SuperOperatorInfos:
 
     def remove_crossed_line_sync(self):
         delete_event = []
+        self._collect_crossed_line_sync_cub(delete_event)
+        self._collect_crossed_line_sync_vec(delete_event)
+
+        for item in delete_event:
+            self.remove_info_by_name(item[0], item[1], item[2], item[3])
+
+    def _collect_crossed_line_sync_cub(self, delete_event):
         for sub_op in self.cub_op_list:
             for key, value in sub_op.send_info.items():
                 value_list = value.split(";")
@@ -544,6 +551,8 @@ class SuperOperatorInfos:
                                 ]
                             )
 
+
+    def _collect_crossed_line_sync_vec(self, delete_event):
         for sub_op in self.vec_op_list:
             for key, value in sub_op.send_info.items():
                 value_list = value.split(";")
@@ -570,10 +579,11 @@ class SuperOperatorInfos:
                                 ]
                             )
 
-        for item in delete_event:
-            self.remove_info_by_name(item[0], item[1], item[2], item[3])
-
     def remove_multi_send_info(self):
+        self._remove_multi_send_info_vec()
+        self._remove_multi_send_info_cub()
+
+    def _remove_multi_send_info_vec(self):
         delete_event = []
         for op in self.vec_op_list:
             if len(op.send_info) > 1:
@@ -604,6 +614,8 @@ class SuperOperatorInfos:
         for item in delete_event:
             self.remove_info_by_name(item[0], item[1], item[2], item[3])
 
+
+    def _remove_multi_send_info_cub(self):
         delete_event = []
         for op in self.cub_op_list:
             if len(op.send_info) > 1:
@@ -635,6 +647,10 @@ class SuperOperatorInfos:
             self.remove_info_by_name(item[0], item[1], item[2], item[3])
 
     def remove_multi_recv_info(self):
+        self._remove_multi_recv_info_vec()
+        self._remove_multi_recv_info_cub()
+
+    def _remove_multi_recv_info_vec(self):
         delete_event = []
         for op in self.vec_op_list:
             if len(op.recv_info) > 1:
@@ -665,6 +681,8 @@ class SuperOperatorInfos:
         for item in delete_event:
             self.remove_info_by_name(item[0], item[1], item[2], item[3])
 
+
+    def _remove_multi_recv_info_cub(self):
         delete_event = []
         for op in self.cub_op_list:
             if len(op.recv_info) > 1:
@@ -1015,6 +1033,46 @@ class SuperOperatorInfos:
 
         self.update_superkernel_blocknum_by_debug_options()
 
+    def _summarize_sub_kernel_type(
+        self, sub_operator, sub_aiv_num, sub_aic_num, final_kernel_type
+    ):
+        if sub_operator.kernel_type == SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY:
+            sub_aiv_num = sub_operator.block_num
+            final_kernel_type = final_kernel_type | 0b1
+        elif sub_operator.kernel_type == SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY:
+            sub_aic_num = sub_operator.block_num
+            final_kernel_type = final_kernel_type | 0b10
+        elif sub_operator.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0:
+            sub_aiv_num = sub_operator.block_num
+            final_kernel_type = final_kernel_type | 0b100
+        elif sub_operator.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0:
+            sub_aic_num = sub_operator.block_num
+            final_kernel_type = final_kernel_type | 0b1000
+        elif sub_operator.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1:
+            sub_aic_num = sub_operator.block_num
+            sub_aiv_num = sub_operator.block_num
+            final_kernel_type = final_kernel_type | 0b10000
+        elif sub_operator.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2:
+            sub_aic_num = sub_operator.block_num
+            sub_aiv_num = sub_operator.block_num * 2
+            final_kernel_type = final_kernel_type | 0b100000
+        return sub_aiv_num, sub_aic_num, final_kernel_type
+
+    def _merge_sub_debug_options(self, sub_operator):
+        if sub_operator.timestamp_option:
+            self.timestamp_option = True
+            if sub_operator.debug_size > self.debug_size:
+                self.debug_size = sub_operator.debug_size
+            if self.debug_option != "":
+                option_list = self.debug_option.split(",")
+                sub_option_list = sub_operator.debug_option.split(",")
+                for option in sub_option_list:
+                    if option not in option_list:
+                        self.debug_option += ","
+                        self.debug_option += f"{option}"
+            else:
+                self.debug_option += f"{sub_operator.debug_option}"
+
     def get_summary_type_and_options(self):
         """set superkernel kernel type and block num."""
         final_kernel_type = 0
@@ -1024,53 +1082,14 @@ class SuperOperatorInfos:
             sub_aiv_num = 0
             sub_aic_num = 0
             # summarize sub kernels kernel type infos
-            if sub_operator.kernel_type == SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY:
-                sub_aiv_num = sub_operator.block_num
-                final_kernel_type = final_kernel_type | 0b1
-            elif sub_operator.kernel_type == SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY:
-                sub_aic_num = sub_operator.block_num
-                final_kernel_type = final_kernel_type | 0b10
-            elif (
-                sub_operator.kernel_type
-                == SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0
-            ):
-                sub_aiv_num = sub_operator.block_num
-                final_kernel_type = final_kernel_type | 0b100
-            elif (
-                sub_operator.kernel_type
-                == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0
-            ):
-                sub_aic_num = sub_operator.block_num
-                final_kernel_type = final_kernel_type | 0b1000
-            elif (
-                sub_operator.kernel_type
-                == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
-            ):
-                sub_aic_num = sub_operator.block_num
-                sub_aiv_num = sub_operator.block_num
-                final_kernel_type = final_kernel_type | 0b10000
-            elif (
-                sub_operator.kernel_type
-                == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2
-            ):
-                sub_aic_num = sub_operator.block_num
-                sub_aiv_num = sub_operator.block_num * 2
-                final_kernel_type = final_kernel_type | 0b100000
+            sub_aiv_num, sub_aic_num, final_kernel_type = (
+                self._summarize_sub_kernel_type(
+                    sub_operator, sub_aiv_num, sub_aic_num, final_kernel_type
+                )
+            )
 
             # judge super kernel enable options
-            if sub_operator.timestamp_option:
-                self.timestamp_option = True
-                if sub_operator.debug_size > self.debug_size:
-                    self.debug_size = sub_operator.debug_size
-                if self.debug_option != "":
-                    option_list = self.debug_option.split(",")
-                    sub_option_list = sub_operator.debug_option.split(",")
-                    for option in sub_option_list:
-                        if option not in option_list:
-                            self.debug_option += ","
-                            self.debug_option += f"{option}"
-                else:
-                    self.debug_option += f"{sub_operator.debug_option}"
+            self._merge_sub_debug_options(sub_operator)
             max_aic_num = sub_aic_num if sub_aic_num > max_aic_num else max_aic_num
             max_aiv_num = sub_aiv_num if sub_aiv_num > max_aiv_num else max_aiv_num
 

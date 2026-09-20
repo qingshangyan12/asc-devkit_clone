@@ -365,54 +365,54 @@ class DFXSectionGenerator:
                     compile_info, op_info, tiling_info
                 )
 
+    def _gen_v220_kernel_type_section(
+        self, compile_info, kernel_name, section_var, short_soc_version
+    ):
+        if compile_info.code_channel == CORE_TYPE_MIX:
+            section_var += f"static const struct FunLevelMixCoreType {kernel_name}_kernel_type_section __attribute__ "
+            section_var += f'((used, section (".ascend.meta.{kernel_name}"))) = '
+            section_var += (
+                "{ {{F_TYPE_KTYPE, sizeof(unsigned int)}, K_TYPE_MIX_AIC_MAIN},\
+            {{F_TYPE_MIX_TASK_RATION, sizeof(unsigned int)}, 1, 2} };\n"
+            )
+        elif compile_info.hard_sync:
+            if compile_info.code_channel in [CORE_TYPE_VEC]:
+                section_var += f"static const struct FunLevelMixCoreType {kernel_name}_kernel_type_section __attribute__ "
+                section_var += f'((used, section (".ascend.meta.{kernel_name}"))) = '
+                section_var += "{ {{F_TYPE_KTYPE, sizeof(unsigned int)}, K_TYPE_MIX_AIV_MAIN},\
+                                    {{F_TYPE_MIX_TASK_RATION, sizeof(unsigned int)}, 0, 1} };\n"
+            elif compile_info.code_channel in [CORE_TYPE_CUBE]:
+                section_var += f"static const struct FunLevelMixCoreType {kernel_name}_kernel_type_section __attribute__ "
+                section_var += f'((used, section (".ascend.meta.{kernel_name}"))) = '
+                section_var += (
+                    "{ {{F_TYPE_KTYPE, sizeof(unsigned int)}, K_TYPE_MIX_AIC_MAIN},\
+                {{F_TYPE_MIX_TASK_RATION, sizeof(unsigned int)}, 1, 0} };\n"
+                )
+        elif compile_info.code_channel in [CORE_TYPE_VEC]:
+            section_var += f"static const struct FunLevelKType {kernel_name}_kernel_type_section __attribute__ "
+            section_var += f'((used, section (".ascend.meta.{kernel_name}"))) = '
+            section_var += "{ {{F_TYPE_KTYPE, sizeof(unsigned int)}, K_TYPE_AIV} };\n"
+        elif compile_info.code_channel in [CORE_TYPE_CUBE]:
+            section_var += f"static const struct FunLevelKType {kernel_name}_kernel_type_section __attribute__ "
+            section_var += f'((used, section (".ascend.meta.{kernel_name}"))) = '
+            section_var += "{ {{F_TYPE_KTYPE, sizeof(unsigned int)}, K_TYPE_AIC} };\n"
+        else:
+            CommonUtility().ascendc_raise_python_err(
+                TBE_DEFAULT_PYTHON_ERROR_CODE,
+                f"invalid kernel type in {short_soc_version}, kernel type: {compile_info.code_channel}, \
+                    is hard sync {compile_info.hard_sync}",
+            )
+        return section_var
+
     def generate_kernel_type_section(self, compile_info: CompileInfo, kernel_name: str):
         section_var = ""
         if CommonUtility.is_v220() or CommonUtility.is_c310():
             short_soc_version = global_var_storage.get_variable(
                 "ascendc_short_soc_version"
             )
-            if compile_info.code_channel == CORE_TYPE_MIX:
-                section_var += f"static const struct FunLevelMixCoreType {kernel_name}_kernel_type_section __attribute__ "
-                section_var += f'((used, section (".ascend.meta.{kernel_name}"))) = '
-                section_var += (
-                    "{ {{F_TYPE_KTYPE, sizeof(unsigned int)}, K_TYPE_MIX_AIC_MAIN},\
-            {{F_TYPE_MIX_TASK_RATION, sizeof(unsigned int)}, 1, 2} };\n"
-                )
-            elif compile_info.hard_sync:
-                if compile_info.code_channel in [CORE_TYPE_VEC]:
-                    section_var += f"static const struct FunLevelMixCoreType {kernel_name}_kernel_type_section __attribute__ "
-                    section_var += (
-                        f'((used, section (".ascend.meta.{kernel_name}"))) = '
-                    )
-                    section_var += "{ {{F_TYPE_KTYPE, sizeof(unsigned int)}, K_TYPE_MIX_AIV_MAIN},\
-                                    {{F_TYPE_MIX_TASK_RATION, sizeof(unsigned int)}, 0, 1} };\n"
-                elif compile_info.code_channel in [CORE_TYPE_CUBE]:
-                    section_var += f"static const struct FunLevelMixCoreType {kernel_name}_kernel_type_section __attribute__ "
-                    section_var += (
-                        f'((used, section (".ascend.meta.{kernel_name}"))) = '
-                    )
-                    section_var += (
-                        "{ {{F_TYPE_KTYPE, sizeof(unsigned int)}, K_TYPE_MIX_AIC_MAIN},\
-                {{F_TYPE_MIX_TASK_RATION, sizeof(unsigned int)}, 1, 0} };\n"
-                    )
-            elif compile_info.code_channel in [CORE_TYPE_VEC]:
-                section_var += f"static const struct FunLevelKType {kernel_name}_kernel_type_section __attribute__ "
-                section_var += f'((used, section (".ascend.meta.{kernel_name}"))) = '
-                section_var += (
-                    "{ {{F_TYPE_KTYPE, sizeof(unsigned int)}, K_TYPE_AIV} };\n"
-                )
-            elif compile_info.code_channel in [CORE_TYPE_CUBE]:
-                section_var += f"static const struct FunLevelKType {kernel_name}_kernel_type_section __attribute__ "
-                section_var += f'((used, section (".ascend.meta.{kernel_name}"))) = '
-                section_var += (
-                    "{ {{F_TYPE_KTYPE, sizeof(unsigned int)}, K_TYPE_AIC} };\n"
-                )
-            else:
-                CommonUtility().ascendc_raise_python_err(
-                    TBE_DEFAULT_PYTHON_ERROR_CODE,
-                    f"invalid kernel type in {short_soc_version}, kernel type: {compile_info.code_channel}, \
-                    is hard sync {compile_info.hard_sync}",
-                )
+            section_var = self._gen_v220_kernel_type_section(
+                compile_info, kernel_name, section_var, short_soc_version
+            )
         elif CommonUtility.is_v200() or CommonUtility.is_v300():
             section_var += f"static const struct FunLevelKType {kernel_name}_kernel_type_section __attribute__ "
             section_var += f'((used, section (".ascend.meta.{kernel_name}"))) = '
@@ -529,17 +529,7 @@ class DFXSectionGenerator:
             self._generate_binary_for_tiling(tiling_key, tiling_info, compile_info)
 
         section_content = f"// generate dfx section for tiling_key:{tiling_key}"
-        if CommonUtility.is_v220() or CommonUtility.is_c310():
-            if CommonUtility.is_v220():
-                cube_core_marco = "(defined(__DAV_CUBE__) && __NPU_ARCH__ == 2201)"
-                vec_core_marco = "(defined(__DAV_VEC__) && __NPU_ARCH__ == 2201)"
-            elif CommonUtility.is_c310():
-                cube_core_marco = "(defined(__DAV_CUBE__) && __NPU_ARCH__ == 3510)"
-                vec_core_marco = "(defined(__DAV_VEC__) && __NPU_ARCH__ == 3510)"
-        else:
-            # for v200 cube_core_type is aicore type
-            cube_core_marco = "defined(__DAV_M200__)"
-            vec_core_marco = "defined(__DAV_M200_VEC__)"
+        cube_core_marco, vec_core_marco = self._get_dfx_core_macros()
 
         section_content_body = self.generate_dfx_section_for_one_tiling_key(
             tiling_key, kernel_name, compile_info, kernel_type_section
@@ -565,6 +555,30 @@ class DFXSectionGenerator:
             section_content += f"\n#if {TILING_KEY_MACRO} == {tiling_key}UL\n"
 
         section_content += section_content_body
+        section_content = self._append_dfx_slave_sections(
+            section_content, tiling_key, compile_info, kernel_type_section
+        )
+
+        section_content += "#endif\n"
+        return section_content
+
+    def _get_dfx_core_macros(self):
+        if CommonUtility.is_v220() or CommonUtility.is_c310():
+            if CommonUtility.is_v220():
+                cube_core_marco = "(defined(__DAV_CUBE__) && __NPU_ARCH__ == 2201)"
+                vec_core_marco = "(defined(__DAV_VEC__) && __NPU_ARCH__ == 2201)"
+            elif CommonUtility.is_c310():
+                cube_core_marco = "(defined(__DAV_CUBE__) && __NPU_ARCH__ == 3510)"
+                vec_core_marco = "(defined(__DAV_VEC__) && __NPU_ARCH__ == 3510)"
+        else:
+            # for v200 cube_core_type is aicore type
+            cube_core_marco = "defined(__DAV_M200__)"
+            vec_core_marco = "defined(__DAV_M200_VEC__)"
+        return cube_core_marco, vec_core_marco
+
+    def _append_dfx_slave_sections(
+        self, section_content, tiling_key, compile_info, kernel_type_section
+    ):
         if compile_info.tiling_key_group_map is not None:
             if tiling_key in compile_info.tiling_key_group_map.keys():
                 for tiling_key_slave in compile_info.tiling_key_group_map[tiling_key]:
@@ -579,8 +593,6 @@ class DFXSectionGenerator:
                         compile_info,
                         kernel_type_section,
                     )
-
-        section_content += "#endif\n"
         return section_content
 
     def _generate_dfx_info_struct(self):
