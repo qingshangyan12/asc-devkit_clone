@@ -54,10 +54,6 @@ This sample uses softmax as an example to introduce tuning methods for in-row re
 
   > **Input Constraint:** The default shape of this sample is [8192, 197]. A custom shape can be specified through running arguments, and cols must be in the range 1 to 512.
 
-- Thread organization:
-
-  In the implementation, one Warp processes one row. The 32 threads in the Warp are respectively responsible for different columns of the row, and the in-row max and sum are completed with Warp reduction primitives. Take the default shape [8192, 197] as an example. The 197 columns of a row are processed by 32 threads in multiple rounds: each thread starts from the column equal to its thread ID and processes the following columns in steps of 32. Since 197 = 6 x 32 + 5, all 32 threads participate in the first six rounds, and in the seventh round only the first 5 threads still have data to process.
-
 ## Sample Implementation
 
 ### Case Implementation Description
@@ -92,7 +88,7 @@ Except for Task Duration, all other metrics are averages across all Thread Block
 
 **Optimization Goal**: Establish the functional correctness and performance baseline with the most direct implementation: the Warp reads input directly from GM, completes the in-row max, exp/sum, and normalization, and introduces no intermediate buffer.
 
-**Core Implementation**: The in-row softmax is completed in three passes: the row maximum, the exponential sum, and the normalized output, all reading GM directly. The thread organization is "one Warp processes one row": multiple Warps in a Thread Block each process different rows, and the row direction covers all rows through a grid-stride loop. The correspondence between the threads and the in-row data when one Warp processes one row is shown in the following figure.
+**Core Implementation**: The in-row softmax is completed in three passes: the row maximum, the exponential sum, and the normalized output, all reading GM directly. The thread organization is "one Warp processes one row": the 32 threads in a Warp are respectively responsible for different columns of the row, and the in-row max and sum are completed with Warp reduction primitives. Multiple Warps in a Thread Block each process different rows, and the row direction covers all rows through a grid-stride loop. Take the default shape [8192, 197] as an example. The 197 columns of a row are processed by 32 threads in multiple rounds: each thread starts from the column equal to its thread ID and processes the following columns in steps of 32. Since 197 = 6 x 32 + 5, all 32 threads participate in the first six rounds, and in the seventh round only the first 5 threads still have data to process. The correspondence between the threads and the in-row data is shown in the following figure.
 
 <img src="./figures/case0.png">
 
@@ -105,25 +101,25 @@ for (uint32_t row = blockIdx.x * warps_per_block + warp_in_block;  // One Warp p
     // Pass 1: read the whole row from GM to compute the maximum.
     // asc_reduce_max reduces the maximum across the 32 threads in the Warp.
     float max_value = -ASCRT_INF_F;
-    for (uint32_t col = thread_in_warp; col < cols; col += WARP_SIZE) {
+    for (uint32_t col = thread_in_warp; col < cols; col += warpSize) {
         const float value = static_cast<float>(input[row_offset + col]);
         max_value = max_value > value ? max_value : value;
     }
     max_value = asc_reduce_max(max_value);
 
-    // Pass 2: re-read GM, compute __expf(x - max), and reduce the sum with asc_reduce_add across the Warp.
+    // Pass 2: re-read GM, compute expf(x - max), and reduce the sum with asc_reduce_add across the Warp.
     float sum_value = 0.0F;
-    for (uint32_t col = thread_in_warp; col < cols; col += WARP_SIZE) {
+    for (uint32_t col = thread_in_warp; col < cols; col += warpSize) {
         const float value = static_cast<float>(input[row_offset + col]);
-        sum_value += __expf(value - max_value);
+        sum_value += expf(value - max_value);
     }
     sum_value = asc_reduce_add(sum_value);
 
     // Pass 3: re-read GM and complete the normalized write-back.
     // The three passes read the whole row three times and compute exp twice.
-    for (uint32_t col = thread_in_warp; col < cols; col += WARP_SIZE) {
+    for (uint32_t col = thread_in_warp; col < cols; col += warpSize) {
         const float value = static_cast<float>(input[row_offset + col]);
-        output[row_offset + col] = static_cast<half>(__expf(value - max_value) / sum_value);
+        output[row_offset + col] = static_cast<half>(expf(value - max_value) / sum_value);
     }
 }
 ```
@@ -156,21 +152,21 @@ The data flow of Case 1 is shown in the following figure.
 <img src="./figures/case1.png">
 
 ```cpp
-for (uint32_t tile_idx = 0; tile_idx < tile_count; ++tile_idx) {
+uint32_t tile_idx = 0;
+for (uint32_t row_base = first_row_base; row_base < rows; row_base += tile_stride) {
     const uint32_t slot = tile_idx & 1;
     const event_t event_id = slot == 0 ? EVENT_ID0 : EVENT_ID1;
-    const uint32_t row_base = first_row_base + tile_idx * tile_stride;
     const uint32_t rows_remaining = rows - row_base;
     const uint32_t rows_in_tile = rows_remaining < rows_per_tile ? rows_remaining : rows_per_tile;
     __ubuf__ half* input_tile_ub = slot == 0 ? input_tile_ub0 : input_tile_ub1;
     __ubuf__ half* output_tile_ub = slot == 0 ? output_tile_ub0 : output_tile_ub1;
 
     asc_sync_wait(PIPE_MTE2, PIPE_V, event_id);
-    if (tile_idx + 1 < tile_count) {
+    const uint32_t next_row_base = row_base + tile_stride;
+    if (next_row_base < rows) {
         // Before computing the current tile, move the next tile into the other input buffer set.
         const uint32_t next_slot = slot ^ 1;
         const event_t next_event_id = next_slot == 0 ? EVENT_ID0 : EVENT_ID1;
-        const uint32_t next_row_base = row_base + tile_stride;
         const uint32_t next_rows_remaining = rows - next_row_base;
         const uint32_t next_rows_in_tile =
             next_rows_remaining < rows_per_tile ? next_rows_remaining : rows_per_tile;
@@ -185,7 +181,7 @@ for (uint32_t tile_idx = 0; tile_idx < tile_count; ++tile_idx) {
 
     asc_sync_wait(PIPE_MTE3, PIPE_V, event_id);
     asc_vf_call<softmax_ub_vf>(
-        dim3(WARP_SIZE, rows_in_tile), output_tile_ub, input_tile_ub, rows_in_tile, cols, ub_stride);
+        dim3(warpSize, rows_in_tile), output_tile_ub, input_tile_ub, rows_in_tile, cols, ub_stride);
     asc_sync_notify(PIPE_V, PIPE_MTE2, event_id);
 
     asc_sync_notify(PIPE_V, PIPE_MTE3, event_id);
@@ -193,6 +189,7 @@ for (uint32_t tile_idx = 0; tile_idx < tile_count; ++tile_idx) {
     asc_copy_ub2gm_align(output + row_base * cols, output_tile_ub, static_cast<uint16_t>(rows_in_tile),
         row_bytes, asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, row_bytes, padded_row_bytes);
     asc_sync_notify(PIPE_MTE3, PIPE_V, event_id);
+    ++tile_idx;
 }
 ```
 
@@ -206,7 +203,7 @@ for (uint32_t tile_idx = 0; tile_idx < tile_count; ++tile_idx) {
 
 Case 1 moves GM access to the MTE pipeline and introduces double buffering, so the SIMT VF no longer reads GM directly. `aiv_mte2_time` and `aiv_mte3_time` increase from nearly 0 to 2.878μs and 0.587μs respectively, indicating that GM access has moved to the MTE movement path. `aiv_vec_time` decreases from 11.048μs to 7.235μs, a reduction of about 34.5%. `Task Duration` decreases from 13.039μs to 11.203μs, a reduction of about 14.1%. At this point, `aiv_vec_ratio` reaches 0.741, the highest proportion among all components. The bottleneck has shifted from GM access to the in-row computation, and the next step is to reduce the computation time.
 
-The computation time of Case 1 is mainly spent on how the in-row computation is organized: the in-row computation is organized in three passes: max, exp/sum, and normalization. Each pass re-reads the UB input row, and `exp` is computed twice. The direct way to eliminate the repeated reads and repeated computation is to cache the elements assigned to each thread in a local array and reuse the `exp` results. However, the loop that traverses the array is bounded by cols: cols is a runtime parameter, so neither the number of iterations nor the array indices accessed in each iteration can be determined at compile time. The compiler cannot unroll the loop, and an array with dynamic indices cannot be mapped to registers; it can only be allocated in stack space, whose access efficiency is lower than that of registers. If the column count is known at compile time, both the iteration count and the indices are constants. The compiler can then unroll the loop and allocate the array to registers, and one read completes the max, exp/sum, and normalization. cols can be any value, so generating a kernel for each value is not feasible. Using a small number of column upper bounds (64/128/256/384/512) to cover all values and masking the tail columns beyond the real cols in computation satisfies both compile-time fixed length and full value coverage.
+The computation time of Case 1 is mainly spent on how the in-row computation is organized: the in-row computation is organized in three passes: max, exp/sum, and normalization. Each pass re-reads the UB input row, and `exp` is computed twice. The next optimization direction is to cache the elements assigned to each thread in a local array to reuse the `exp` results and keep the array in registers.
 
 ---
 
@@ -216,7 +213,7 @@ The computation time of Case 1 is mainly spent on how the in-row computation is 
 
 **Core Implementation**:
 
-- Compile-time bucket: The cols covered by this sample does not exceed 512, and each thread is assigned at most 512/32 = 16 elements, which fits directly in registers. cols is divided into five buckets by the upper bounds 64/128/256/384/512, and a specialized kernel is instantiated per bucket: the bucket capacity is a compile-time constant, the array-access loops can be fully expanded, and the static array `elements[kWarpIterations]` stays in registers. Invalid tail columns are masked with `-ASCRT_INF_F` and excluded from the reduction and normalization.
+- Compile-time bucket: The cols covered by this sample does not exceed 512, and each thread is assigned at most 512/32 = 16 elements, which fits directly in registers. However, the loop that traverses the array is bounded by cols: cols is a runtime parameter, so neither the number of iterations nor the array indices accessed in each iteration can be determined at compile time. The compiler cannot unroll the loop, and an array with dynamic indices can only be allocated in stack space, whose access efficiency is lower than that of registers. Therefore, cols is divided into five buckets by the upper bounds 64/128/256/384/512, and a specialized kernel is instantiated per bucket: the bucket capacity is a compile-time constant, both the iteration count and the indices are constants, the array-access loops can be fully expanded, and the static array `elements[kWarpIterations]` stays in registers. Invalid tail columns are masked with `-ASCRT_INF_F` and excluded from the reduction and normalization.
 - UB layout: tile buffers are allocated by the bucket capacity `kBucketCols`. MTE moves each row based on the real cols at runtime, and the space after the real elements is left unused. The SIMT VF computes on the padded UB, and MTE3 moves the result back to GM by the real cols. The bucket classification and UB layout are shown in the following figure.
 
   <img src="./figures/case2.png">
@@ -231,9 +228,9 @@ __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
     __ubuf__ half* output_ub, __ubuf__ const half* input_ub, uint32_t row_count, uint32_t cols)
 {
     // Number of elements assigned to each thread, a compile-time constant.
-    constexpr uint32_t kWarpIterations = (kBucketCols + WARP_SIZE - 1) / WARP_SIZE;
-    const uint32_t row_in_tile = threadIdx.x / WARP_SIZE;
-    const uint32_t thread_in_warp = threadIdx.x % WARP_SIZE;
+    constexpr uint32_t kWarpIterations = (kBucketCols + warpSize - 1) / warpSize;
+    const uint32_t row_in_tile = threadIdx.x / warpSize;
+    const uint32_t thread_in_warp = threadIdx.x % warpSize;
     if (row_in_tile >= row_count) {
         return;
     }
@@ -248,7 +245,7 @@ __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
     // Read the elements assigned to this thread in one pass. Invalid tail
     // columns are masked with -inf and excluded from the following computation.
     for (uint32_t iter = 0; iter < kWarpIterations; ++iter) {
-        const uint32_t col = thread_in_warp + iter * WARP_SIZE;
+        const uint32_t col = thread_in_warp + iter * warpSize;
         elements[iter] = col < cols ? static_cast<float>(input_ub[row_offset + col]) : -ASCRT_INF_F;
     }
 
@@ -264,14 +261,14 @@ __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
     // and obtain the row exponential sum through the Warp reduction.
     float sum_value = 0.0F;
     for (uint32_t iter = 0; iter < kWarpIterations; ++iter) {
-        elements[iter] = __expf(elements[iter] - max_value);
+        elements[iter] = expf(elements[iter] - max_value);
         sum_value += elements[iter];
     }
     sum_value = asc_reduce_add(sum_value);
 
     // Normalized write-back, covering only the columns within the real cols.
     for (uint32_t iter = 0; iter < kWarpIterations; ++iter) {
-        const uint32_t col = thread_in_warp + iter * WARP_SIZE;
+        const uint32_t col = thread_in_warp + iter * warpSize;
         output_ub[row_offset + col] = static_cast<half>(elements[iter] / sum_value);
     }
 }
