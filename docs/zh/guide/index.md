@@ -380,9 +380,6 @@
     -   [新特性使用指导](cross_gen_migration_guide/instructions_for_new_features/3510_new_features.md)
         -   [3510新特性使用说明](cross_gen_migration_guide/instructions_for_new_features/3510_new_features.md)
 
--   [HCCL集合通信](hccl_communication/hccl_external_alg_config_guide.md)
-    -   [外部算法名配置指南](hccl_communication/hccl_external_alg_config_guide.md)
-
 -   [技术附录](./technical_appendix/concepts_and_terms/glossary.md)
     -   [概念原理和术语](./technical_appendix/concepts_and_terms/glossary.md)
         -   [术语表](./technical_appendix/concepts_and_terms/glossary.md)
