@@ -7,6 +7,9 @@
     "editor.trimWhitespaceOnDelete": true,
     "cmake.sourceDirectory": "${workspaceFolder}",
     "cmake.buildDirectory": "${workspaceFolder}/build",
+    "git.path": "C:\\Program Files\\Git\\bin\\git.exe",
+    "clang-format.executable": "C:\\Users\\lxy\\AppData\\Roaming\\Python\\Python314\\Scripts\\clang-format.exe",
+    "clang-format.style": "file",
     "files.associations": {
         "*.asc": "cpp",
         "*.aicpu": "cpp",
@@ -16,6 +19,14 @@
     },
     "[python]": {
         "editor.tabSize": 4
+    },
+    "[cpp]": {
+        "editor.defaultFormatter": "xaver.clang-format",
+        "editor.formatOnSave": true
+    },
+    "[c]": {
+        "editor.defaultFormatter": "xaver.clang-format",
+        "editor.formatOnSave": true
     },
     "clangd.path": "/usr/bin/clangd",
     "clangd.arguments": [

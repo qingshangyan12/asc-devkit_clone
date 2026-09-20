@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-头文件路径：`"tensor_api/experimental/vector_compute.h"`。
+头文件路径：`"tensor_api/experimental/arch/vector/basic_arithmetic.h"`。
 
 该接口根据src_reg.mask，对源操作数src_reg中的有效元素逐个求自然对数（以e为底），并返回计算结果。计算公式如下：
 

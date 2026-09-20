@@ -26,9 +26,9 @@
 
 ## 功能说明
 
-头文件路径：`"tensor_api/experimental/vector_compute.h"`。
+头文件路径为：`"tensor_api/experimental/arch/vector/compare_and_select.h"`。
 
-比较运算符对源操作数执行逐元素比较，并返回比较结果。支持reg_tensor与reg_tensor、reg_tensor与标量、标量与reg_tensor三种操作数组合。
+比较运算符对源操作数执行逐元素比较，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。支持reg_tensor与reg_tensor、reg_tensor与标量、标量与reg_tensor三种操作数组合。计算规则如下：
 
 | 运算符 | 计算规则 |
 | --- | --- |
@@ -149,14 +149,14 @@ __simd_callee__ inline reg_tensor<bool> operator>=(
 
 | 参数名 | 描述 |
 | --- | --- |
-| T | 操作数数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
+| T | 操作数数据类型。 |
 
 **表 2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| src0 | 输入 | 第一个源操作数，类型为reg_tensor&lt;T&gt;或标量T。类型为reg_tensor&lt;T&gt;时，其mask用于控制参与计算的元素。 |
-| src1 | 输入 | 第二个源操作数，类型为reg_tensor&lt;T&gt;或标量T。当src0为标量时，src1.mask用于控制参与计算的元素；当src0为reg_tensor&lt;T&gt;时，src1.mask不参与计算。 |
+| src0 | 输入 | 源操作数，类型为reg_tensor<T>或标量T。 |
+| src1 | 输入 | 源操作数，类型为reg_tensor<T>或标量T。 |
 
 ## 数据类型
 
@@ -164,13 +164,14 @@ __simd_callee__ inline reg_tensor<bool> operator>=(
 
 ## 返回值说明
 
-返回类型为reg_tensor&lt;bool&gt;。返回值的reg保存逐元素比较结果：对应位置为1表示比较结果成立，为0表示比较结果不成立。
+返回类型为reg_tensor<bool>;。返回值的reg保存逐元素比较结果：对应位置为1表示比较结果成立，为0表示比较结果不成立。当src0和src1都为reg_tensor类型时，返回值的mask和src0的mask值相同，当src0和src1分别为reg_tensor和标量形式时，，返回值的mask和reg_tensor操作数的mask相同。
 
 ## 约束说明
 
 - 用于控制计算的mask需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
-- reg_tensor与reg_tensor形式使用src0.mask；reg_tensor与标量形式使用reg_tensor操作数的mask。
-- 输入mask对应位置为0时，返回结果的对应位置为0。
+- 输入mask比特位为0时，计算结果对应比特位写0。
+- 浮点比较时，+0.0与-0.0视为相等。
+- 浮点比较输入含nan时，计算结果对应比特位写0。
 
 ## 调用示例
 
