@@ -12,7 +12,6 @@
 
 #include "tensor_api/stub/cce_stub.h"
 #include "tensor_api/experimental/vector_compute.h"
-#include "tensor_api/tensor.h"
 
 class tensor_api_vector_mask_reg_compute_3510 : public testing::Test {};
 

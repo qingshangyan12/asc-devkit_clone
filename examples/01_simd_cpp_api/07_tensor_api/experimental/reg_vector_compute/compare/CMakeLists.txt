@@ -35,7 +35,6 @@ target_compile_definitions(demo PRIVATE
     SCENARIO_NUM=${SCENARIO_NUM}
 )
 
-
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
     $<$<AND:$<COMPILE_LANGUAGE:ASC>,$<BOOL:${CANN_ASC_USE_EXPERIMENTAL}>>:-DCANN_ASC_USE_EXPERIMENTAL>
