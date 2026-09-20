@@ -178,7 +178,9 @@ inline __gm__ struct OpSystemRunCfg g_opL2CacheHintCfg = {0};
 static const struct BinaryMetaAscFeature __asc_feature_l2cache__
     __attribute__((used, section(".ascend.meta"))) = {4, 4, 3};
 #else  // ifndef __NPU_DEVICE__
+#ifndef ASCENDC_SKIP_OP_SYSTEM_RUN_CFG_EXTERN
 extern __gm__ struct OpSystemRunCfg g_opSystemRunCfg;
+#endif // ASCENDC_SKIP_OP_SYSTEM_RUN_CFG_EXTERN
 #endif // __NPU_DEVICE__
 #endif // L2_CACHE_HINT
 

@@ -874,6 +874,15 @@ def handle_compile_options(compile_info: CompileInfo, compile_option_tuple, tili
     ):
         compile_option_tuple.compile_options.append("-DL2_CACHE_HINT")
 
+    # The first AIV/AIC tiling-key compilation owns the generated static-inline
+    # runtime configuration. Suppress the legacy host-side extern declaration
+    # for that compilation unit.
+    if (
+        tiling_info.tiling_key == compile_info.tiling_key_list[0]
+        and compile_info.code_channel in [CORE_TYPE_VEC, CORE_TYPE_CUBE, CORE_TYPE_MIX]
+    ):
+        compile_option_tuple.compile_options.append("-DASCENDC_SKIP_OP_SYSTEM_RUN_CFG_EXTERN")
+
     if tiling_info.static_shape_flag:
         compile_option_tuple.compile_options.append("-DCONST_TILING")
 
