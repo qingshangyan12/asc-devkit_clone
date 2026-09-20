@@ -423,3 +423,64 @@ extern "C" __global__ __aicore__ void KernelTestResetLoopModePara1()
     AscendC::ResetLoopModePara(type);
 }
 #endif
+
+#if defined(ASCENDC_ENABLE_HW_PTR_API)
+extern "C" __global__ __aicore__ void KernelTestDataCopyPtrCount()
+{
+    __ubuf__ float* dst = nullptr;
+    __gm__ float* src = nullptr;
+    uint32_t count = 32;
+    AscendC::DataCopy(dst, src, count);
+}
+
+extern "C" __global__ __aicore__ void KernelTestDataCopyPtrCountRoundtrip()
+{
+    __ubuf__ float* dstUb = nullptr;
+    __gm__ float* srcGm = nullptr;
+    uint32_t count = 32;
+    AscendC::DataCopy(dstUb, srcGm, count);
+    AscendC::DataCopy(srcGm, dstUb, count);
+}
+
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || \
+    (__NPU_ARCH__ == 3002)
+extern "C" __global__ __aicore__ void KernelTestDataCopyPadPtrExt()
+{
+    __ubuf__ float* dst = nullptr;
+    __gm__ float* src = nullptr;
+    AscendC::DataCopyExtParams dataCopyParams{};
+    AscendC::DataCopyPadExtParams<float> padParams{};
+    AscendC::DataCopyPad(dst, src, dataCopyParams, padParams);
+}
+
+extern "C" __global__ __aicore__ void KernelTestDataCopyPadPtr()
+{
+    __ubuf__ float* dstUb = nullptr;
+    __gm__ float* srcGm = nullptr;
+    AscendC::DataCopyExtParams copyParams{1, 32, 0, 0, 0};
+    AscendC::DataCopyPadExtParams<float> padParams{false, 0, 0, 0};
+    AscendC::DataCopyPad(dstUb, srcGm, copyParams, padParams);
+    AscendC::DataCopyPad(srcGm, dstUb, copyParams);
+}
+#endif
+
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+extern "C" __global__ __aicore__ void KernelTestDataCopyPtrNdDma()
+{
+    __ubuf__ float* dst = nullptr;
+    __gm__ float* src = nullptr;
+    AscendC::MultiCopyParams<float, 1> params{};
+    AscendC::DataCopy(dst, src, params);
+}
+#endif
+
+#if (__NPU_ARCH__ == 3510)
+extern "C" __global__ __aicore__ void KernelTestDataCopyL1ToUBPtr()
+{
+    __ubuf__ float* dst = nullptr;
+    __cbuf__ float* src = nullptr;
+    uint32_t count = 32;
+    AscendC::DataCopyL1ToUB(dst, src, count);
+}
+#endif
+#endif
