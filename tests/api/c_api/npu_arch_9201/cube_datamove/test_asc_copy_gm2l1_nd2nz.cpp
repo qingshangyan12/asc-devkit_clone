@@ -36,40 +36,42 @@ protected:
     void TearDown() { g_coreType = C_API_AIV_TYPE; }
 };
 
-#define TEST_CUBE_DATAMOVE_COPY_GM2L1_ND2NZ(dtype)                                                                  \
-                                                                                                                    \
-    TEST_F(TEST_COPY_GM_TO_L1_ND2NZ, TEST_COPY_GM_TO_L1_ND2NZ_##dtype)                                              \
-    {                                                                                                               \
-        __cbuf__ dtype* dst = reinterpret_cast<__cbuf__ dtype*>(11);                                                \
-        __gm__ dtype* src = reinterpret_cast<__gm__ dtype*>(22);                                                    \
-                                                                                                                    \
-        uint64_t loop1_src_stride = static_cast<uint64_t>(33);                                                       \
-        asc_load_l2_cache_mode l2_cache_mode = asc_load_l2_cache_mode::NOTALLOC_KEEP;                               \
-        uint16_t n_value = static_cast<uint16_t>(55);                                                               \
-        uint32_t d_value = static_cast<uint32_t>(66);                                                               \
-        uint64_t loop4_src_stride = static_cast<uint64_t>(77);                                                      \
-        bool smallc0_en = static_cast<bool>(true);                                                                  \
-                                                                                                                    \
-        MOCKER_CPP(                                                                                                 \
-            copy_gm_to_cbuf_multi_nd2nz,                                                                            \
-            void(__cbuf__ dtype*, __gm__ dtype*, uint8_t, uint64_t, uint8_t, uint16_t, uint32_t, uint64_t, bool,    \
-                 bool))                                                                                              \
-            .times(1)                                                                                               \
-            .will(invoke(copy_gm_to_cbuf_multi_nd2nz_stub<dtype>));                                                 \
-                                                                                                                    \
-        asc_copy_gm2l1_nd2nz(dst, src, loop1_src_stride, l2_cache_mode, n_value, d_value, loop4_src_stride,         \
-            smallc0_en, true);                                                                                      \
-        GlobalMockObject::verify();                                                                                 \
+#define TEST_CUBE_DATAMOVE_COPY_GM2L1_ND2NZ(dtype)                                                                     \
+                                                                                                                       \
+    TEST_F(TEST_COPY_GM_TO_L1_ND2NZ, TEST_COPY_GM_TO_L1_ND2NZ_##dtype)                                                 \
+    {                                                                                                                  \
+        __cbuf__ dtype* dst = reinterpret_cast<__cbuf__ dtype*>(11);                                                   \
+        __gm__ dtype* src = reinterpret_cast<__gm__ dtype*>(22);                                                       \
+                                                                                                                       \
+        uint64_t loop1_src_stride = static_cast<uint64_t>(33);                                                         \
+        asc_load_l2_cache_mode l2_cache_mode = asc_load_l2_cache_mode::NOTALLOC_KEEP;                                  \
+        uint16_t n_value = static_cast<uint16_t>(55);                                                                  \
+        uint32_t d_value = static_cast<uint32_t>(66);                                                                  \
+        uint64_t loop4_src_stride = static_cast<uint64_t>(77);                                                         \
+        bool smallc0_en = static_cast<bool>(true);                                                                     \
+                                                                                                                       \
+        MOCKER_CPP(                                                                                                    \
+            copy_gm_to_cbuf_multi_nd2nz,                                                                               \
+            void(                                                                                                      \
+                __cbuf__ dtype*, __gm__ dtype*, uint8_t, uint64_t, uint8_t, uint16_t, uint32_t, uint64_t, bool, bool)) \
+            .times(1)                                                                                                  \
+            .will(invoke(copy_gm_to_cbuf_multi_nd2nz_stub<dtype>));                                                    \
+                                                                                                                       \
+        asc_copy_gm2l1_nd2nz(                                                                                          \
+            dst, src, loop1_src_stride, l2_cache_mode, n_value, d_value, loop4_src_stride, smallc0_en, true);          \
+        GlobalMockObject::verify();                                                                                    \
     }
 
 TEST_F(TEST_COPY_GM_TO_L1_ND2NZ, TEST_COPY_GM_TO_L1_ND2NZ_AIV_NOOP)
 {
     g_coreType = C_API_AIV_TYPE;
-    MOCKER_CPP(copy_gm_to_cbuf_multi_nd2nz,
+    MOCKER_CPP(
+        copy_gm_to_cbuf_multi_nd2nz,
         void(__cbuf__ half*, __gm__ half*, uint8_t, uint64_t, uint8_t, uint16_t, uint32_t, uint64_t, bool, bool))
         .times(0);
 
-    asc_copy_gm2l1_nd2nz(reinterpret_cast<__cbuf__ half*>(11), reinterpret_cast<__gm__ half*>(22), 33,
+    asc_copy_gm2l1_nd2nz(
+        reinterpret_cast<__cbuf__ half*>(11), reinterpret_cast<__gm__ half*>(22), 33,
         asc_load_l2_cache_mode::NORMAL_LAST_VICTIM, 55, 66, 77, false, false);
     GlobalMockObject::verify();
 }

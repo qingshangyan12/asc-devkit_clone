@@ -63,7 +63,7 @@ protected:
             .will(invoke(copy_gm_to_cbuf_align_v2_stub<dtype>));                                                \
                                                                                                                 \
         asc_copy_gm2l1_align(                                                                                   \
-            dst, src, n_burst, len_burst, left_padding_count, right_padding_count, data_select_bit, true,      \
+            dst, src, n_burst, len_burst, left_padding_count, right_padding_count, data_select_bit, true,       \
             l2_cache_mode, burst_src_stride, burst_dst_stride);                                                 \
         GlobalMockObject::verify();                                                                             \
     }
@@ -71,13 +71,15 @@ protected:
 TEST_F(TEST_COPY_GM_TO_L1_ALIGN, TEST_COPY_GM_TO_L1_ALIGN_AIV_NOOP)
 {
     g_coreType = C_API_AIV_TYPE;
-    MOCKER_CPP(copy_gm_to_cbuf_align_v2,
-        void(__cbuf__ half*, __gm__ half*, uint8_t, uint32_t, uint32_t, uint8_t, uint8_t, bool, bool, uint8_t,
-            uint64_t, uint32_t))
+    MOCKER_CPP(
+        copy_gm_to_cbuf_align_v2, void(
+                                      __cbuf__ half*, __gm__ half*, uint8_t, uint32_t, uint32_t, uint8_t, uint8_t, bool,
+                                      bool, uint8_t, uint64_t, uint32_t))
         .times(0);
 
-    asc_copy_gm2l1_align(reinterpret_cast<__cbuf__ half*>(11), reinterpret_cast<__gm__ half*>(22), 33, 44, 0, 0,
-        true, false, asc_load_l2_cache_mode::NORMAL_LAST_VICTIM, 88, 99);
+    asc_copy_gm2l1_align(
+        reinterpret_cast<__cbuf__ half*>(11), reinterpret_cast<__gm__ half*>(22), 33, 44, 0, 0, true, false,
+        asc_load_l2_cache_mode::NORMAL_LAST_VICTIM, 88, 99);
     GlobalMockObject::verify();
 }
 
