@@ -163,9 +163,10 @@ __aicore__ static inline void OOMCheckAddrRange(__gm__ T* gmAddr, const uint64_t
 __aicore__ static inline bool OOMHasStorageShapeHeader(__gm__ uint8_t* cursor)
 {
 #if defined(ASCENDC_OOM) && ASCENDC_OOM == 1
-    const uint8_t versionAndReserved = cursor[1];
-    const uint8_t version = versionAndReserved & g_oomNibbleMask;
-    return cursor[0] == g_oomStorageShapeMagic && version == g_oomStorageShapeVersion;
+    const uint8_t magicAndVersion = cursor[0];
+    const uint8_t magic = magicAndVersion & g_oomNibbleMask;
+    const uint8_t version = (magicAndVersion >> g_oomNibbleShift) & g_oomNibbleMask;
+    return magic == g_oomStorageShapeMagic && version == g_oomStorageShapeVersion;
 #else
     (void)cursor;
     return false;
@@ -226,9 +227,8 @@ __aicore__ static inline bool OOMTryRegisterTensorWithStorageShape(
     }
     uint64_t viewSize = 0;
     uint64_t storageSize = 0;
-    if (!OOMGetTensorViewStorageSize(
-            cursor + g_oomTensorDescriptorHeaderSize, blockSize - g_oomTensorDescriptorHeaderSize, elementSize,
-            viewSize, storageSize) ||
+    if (!OOMGetTensorViewStorageSize(cursor + g_oomTensorDescriptorHeaderSize,
+        blockSize - g_oomTensorDescriptorHeaderSize, elementSize, viewSize, storageSize) ||
         viewSize != blockSize - g_oomTensorDescriptorHeaderSize) {
         return false;
     }
@@ -254,8 +254,8 @@ __aicore__ static inline bool OOMTryRegisterTensorListWithStorageShape(
     }
     const uint8_t flag = OOMReadPackedValue<uint8_t>(cursor + sizeof(uint64_t) + sizeof(uint8_t));
     const uint16_t count = OOMReadPackedValue<uint16_t>(cursor + sizeof(uint64_t) + 2 * sizeof(uint8_t));
-    const uint64_t expectedBlockSize =
-        g_oomTensorListDescriptorHeaderSize + static_cast<uint64_t>(count) * g_oomTensorViewDescriptorSize;
+    const uint64_t expectedBlockSize = g_oomTensorListDescriptorHeaderSize +
+        static_cast<uint64_t>(count) * g_oomTensorViewDescriptorSize;
     if (blockSize != expectedBlockSize) {
         return false;
     }

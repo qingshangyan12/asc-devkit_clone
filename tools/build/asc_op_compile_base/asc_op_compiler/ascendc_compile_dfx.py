@@ -276,10 +276,7 @@ class DFXSectionGenerator:
                 # tiling need align to 8 bytes, dfx need 8 bytes for dfx point,
                 # oom needs 8 * (input + output + shape_tensor + workspace) plus its extension header
                 tiling_size = (
-                    ((tiling_size + 7) // 8) * 8
-                    + 8
-                    + 8 * self.param_placeholder_num
-                    + 2
+                    ((tiling_size + 7) // 8) * 8 + 8 + 8 * self.param_placeholder_num + 2
                 )
             else:
                 tiling_size = tiling_size + 8
