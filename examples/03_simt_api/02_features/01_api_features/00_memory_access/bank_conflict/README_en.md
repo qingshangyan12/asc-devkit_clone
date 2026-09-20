@@ -4,13 +4,11 @@
 
 This example introduces UB bank conflicts that may occur when multiple threads in the same Warp access UB in the Ascend C SIMT programming model. The example constructs 5 cases with different UB read address patterns, demonstrating typical scenarios such as same-address merge, cross-bank/subbank distributed access, same 8B-range merge for contiguous float access, same-subbank different-row conflicts, and same-index subbank conflicts within the same bank group.
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Software Version
-
-- \>= CANN 9.1.0
+| Products | CANN Versions |
+|---|---|
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -318,10 +316,21 @@ Run the following steps in the root directory of this example to build and execu
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;  # Build the project
   ./demo                               # Run the example
   ```
+
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+
 - Build Options Description
 
   | Option                      | Values       | Description                                                                       |
   | --------------------------- | ------------ | --------------------------------------------------------------------------------- |
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
   | `SCENARIO_NUM`            | `0`-`4`  | Example type, default value is 0                                                  |
 

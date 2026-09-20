@@ -4,13 +4,11 @@
 
 本样例介绍Ascend C SIMT编程方式下同一个Warp内多个线程访问UB时的bank冲突现象。样例通过5个case构造不同的UB读地址模式，展示同地址合并、跨bank/subbank分散访问、连续float访问中的同一8B范围合并、同subbank不同行冲突，以及同一bank group内同编号subbank冲突等典型场景。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.1.0
+| 产品 | CANN软件版本 |
+|---|---|
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -318,10 +316,21 @@ Case 0和Case 2用于说明可合并访问不会形成subbank冲突，Case 1作�
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;  # 编译工程
   ./demo                               # 执行样例
   ```
+
+  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
+
+  示例如下：
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;   # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
+
 - 编译选项说明
 
   | 选项                        | 可选值       | 说明                                                       |
   | --------------------------- | ------------ | ---------------------------------------------------------- |
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构：本样例仅支持dav-3510（Ascend 950PR/Ascend 950DT） |
   | `SCENARIO_NUM`            | `0`-`4`  | 样例类型，默认为0                                          |
 
