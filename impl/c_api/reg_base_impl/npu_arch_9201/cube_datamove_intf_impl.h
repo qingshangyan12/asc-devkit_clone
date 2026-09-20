@@ -20,12 +20,12 @@
 #include "impl/c_api/reg_base_impl/npu_arch_9201/utils_impl.h"
 
 __aicore__ inline void asc_copy_gm2l1(
-    __cbuf__ void* dst, __gm__ void* src, uint32_t n_burst, uint32_t len_burst, asc_channel_pad_mode pad_mode,
+    __cbuf__ void* dst, __gm__ void* src, uint32_t burst_count, uint32_t burst_len, asc_channel_pad_mode pad_mode,
     bool enable_pre_load_ignore_sync, uint64_t src_stride, uint32_t dst_stride)
 {
     if ASC_IS_AIC {
         copy_gm_to_cbuf_v2(
-            dst, src, 0, n_burst, len_burst, static_cast<uint8_t>(pad_mode), 0, src_stride, dst_stride,
+            dst, src, 0, burst_count, burst_len, static_cast<uint8_t>(pad_mode), 0, src_stride, dst_stride,
             enable_pre_load_ignore_sync);
     }
 }
