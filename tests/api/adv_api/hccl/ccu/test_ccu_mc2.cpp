@@ -33,6 +33,7 @@ extern bool g_stubCcuAlgExecNull;
 extern std::string g_stubCcuAlgExecNullName;
 extern std::string g_stubSelectorAlgName;
 extern bool g_stubCcuAlgResUnavailable;
+extern std::string g_stubCcuAlgResUnavailableName;
 extern bool g_stubAclrtMemcpyFail;
 extern uint32_t g_stubAclrtMemcpyCallCount;
 extern uint32_t g_stubAclrtMemcpyFailOnCall;
@@ -45,10 +46,13 @@ extern uint32_t g_stubHcommCcuKernelLaunchCallCount;
 // 夹具：ccu_mc2 目标不编 executor 文件，且 -DAICPU_COMPILE 使产品侧 CCU sidecar 注册行
 // （ins_v2_all_gather_sole_executor.cc 的 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU 块）
 // 无法生效，AlgMetaRegistry 无 (ALLGATHER, sole[mesh]) 的 CCU 行，resolver 无候选。
-// 按产品现场同款注册一行，供 EXTERNAL 闸门 C 成功链路用例使用。
+// 按产品现场同款注册，供 EXTERNAL 用例使用：CCU 行服务闸门 C 成功链路；
+// AICPU 行服务 GetOpParam（AICPU 链）的外部名定名与资源回退用例。
 namespace mc2_ops_hccl {
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLGATHER, CcuSchedAllGatherSoleMesh, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherMesh1D, AlgEngine::AICPU, "sole[mesh]", COND_NONE, FLAG_NONE);
 } // namespace mc2_ops_hccl
 
 namespace {
@@ -76,6 +80,7 @@ static void StubCleanup()
     mc2_ops_hccl::g_stubCcuAlgExecNullName.clear();
     mc2_ops_hccl::g_stubSelectorAlgName.clear();
     mc2_ops_hccl::g_stubCcuAlgResUnavailable = false;
+    mc2_ops_hccl::g_stubCcuAlgResUnavailableName.clear();
     mc2_ops_hccl::g_cannBridgeTestState = {};
     mc2_ops_hccl::g_stubAclrtMemcpyFail = false;
     mc2_ops_hccl::g_stubAclrtMemcpyCallCount = 0U;
@@ -794,6 +799,32 @@ TEST_F(CcuMc2TestSuite, TryForcedAlgExternalResolveFailIsStrict)
     // 会改写为 comm，复位断言钉住 opParam = opParamBackup 真正生效（engine 全程未变，弱断言仅留作旁证）
     EXPECT_EQ(opParam.hcclComm, nullptr);
     EXPECT_EQ(opParam.engine, CommEngine::COMM_ENGINE_AICPU_TS);
+}
+
+// EXTERNAL 资源失败回退（2026-09-19 决策：与裸名既有两级回退行为统一）：
+// 外部名定名成功 → GetOpParamResCtx 资源失败（按名桩限定定名算法）→
+// 回退默认 selector 重选（stub 指定回退算法）→ 二次资源申请成功 → GetOpParam 整体 SUCCESS。
+// 对应 GetOpParam 回退分支的 [MC2_EXT_ALG] fallback WARNING（三要素：外部名/定名/原因）。
+TEST_F(CcuMc2TestSuite, GetOpParam_ExternalNameResourceFallbackToSelector)
+{
+    Mc2CcTilingInner tiling{};
+    tiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
+    tiling.commEngine = static_cast<uint8_t>(OpExecuteConfig::AICPU_TS);
+    tiling.srcDataType = HCCL_DATA_TYPE_FP16;
+    tiling.dstDataType = HCCL_DATA_TYPE_FP16;
+    tiling.reduceType = HCCL_REDUCE_SUM;
+    strcpy(tiling.algConfig, "sole[mesh]");
+
+    // 仅定名算法（夹具 AICPU 行 InsAllGatherMesh1D）资源不足；回退算法资源正常
+    mc2_ops_hccl::g_stubCcuAlgResUnavailableName = "InsAllGatherMesh1D";
+    mc2_ops_hccl::g_stubSelectorAlgName = "AicpuAllGatherSoleNHR";
+
+    OpParam opParam{};
+    HcclResult ret = GetOpParam(comm_, stream_, "external_res_fallback_tag", &tiling, opParam);
+
+    // 回退后 selector 选定算法，作业继续（与裸名资源回退行为一致）
+    EXPECT_EQ(ret, HCCL_SUCCESS);
+    EXPECT_STREQ(opParam.algName, "AicpuAllGatherSoleNHR");
 }
 
 TEST_F(CcuMc2TestSuite, LocalForcedAlgorithmKeepsLegacyHierarchy)

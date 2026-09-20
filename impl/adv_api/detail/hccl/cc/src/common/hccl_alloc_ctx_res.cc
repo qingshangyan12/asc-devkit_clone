@@ -985,11 +985,16 @@ HcclResult GetOpParam(
     }
 
     void* resCtxSequence = nullptr;
-    // EXTERNAL 通道不参与资源失败回退（设计 §10: 定名后资源失败直接报错）
-    const bool isExternalForced = forcedAlgAccepted && ccTiling->algConfig[0] != '\0' &&
-                                  std::string(ccTiling->algConfig).find('[') != std::string::npos;
     HcclResult resRet = GetOpParamResCtx(comm, algName, opParam, topoInfo.get(), &resCtxSequence);
-    if (resRet != HCCL_SUCCESS && forcedAlgAccepted && !isExternalForced && resCtxSequence == nullptr) {
+    if (resRet != HCCL_SUCCESS && forcedAlgAccepted && resCtxSequence == nullptr) {
+        // EXTERNAL 通道资源失败同样回退默认 selector（2026-09-19 决策: 与裸名既有行为统一，
+        // 翻转原 D4 的资源半边；定名/输入类失败仍严格报错，见 TryForcedAlgAndPrepareEngine）
+        if (ccTiling->algConfig[0] != '\0' && std::string(ccTiling->algConfig).find('[') != std::string::npos) {
+            HCCL_WARNING(
+                "[MC2_EXT_ALG] fallback to default selector after resource failure, algConfig[%s], "
+                "resolvedAlgName[%s], ret[%d].",
+                ccTiling->algConfig, algName.c_str(), static_cast<int>(resRet));
+        }
         HCCL_WARNING(
             "[MC2_FORCE_ALG] fallback to default selector after resource failure, algName[%s], ret[%d].",
             algName.c_str(), static_cast<int>(resRet));
