@@ -642,8 +642,8 @@ TEST(ExtAlgResolver, SpecificityOrdering)
     EXPECT_EQ(cands[3].registeredName, "InsReduceScatterMesh1D");
 }
 
-// 7 参宏可用性：REGISTER_ALG_META_PRIORITY 显式 priority 注册（KFC cmd 不触碰满射断言的 5 个 COLL_CMDS）
-REGISTER_ALG_META_PRIORITY(
+// 显式 priority 注册可用性：REGISTER_ALG_META 第 7 参落库（KFC cmd 不触碰满射断言的 5 个 COLL_CMDS）
+REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_KFC_SERVER, TestPrioMacro, AlgEngine::AICPU, "test[prio]", COND_NONE, FLAG_NONE, 7);
 
 // 三键排序语义（specificity 降序 > priority 降序 > name 字典序）——纯函数构建器直接验证，

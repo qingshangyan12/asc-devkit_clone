@@ -486,17 +486,17 @@ REGISTER_EXECUTOR_BY_TWO_TEMPS(
     TopoMatchMultilevel, InsTempReduceScatterMesh1D, InsTempReduceScatterNHR);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterParallelMesh1DNHR, AlgEngine::AICPU, "parallel[mesh,nhr]",
-    COND_NONE, FLAG_MULTI_LEVEL);
+    COND_NONE, FLAG_MULTI_LEVEL, 0);
 REGISTER_EXECUTOR_BY_TWO_TEMPS(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, AicpuReduceScatterParallelMeshNHRUBX, InsReduceScatterParallelExecutor,
     TopoMatchUBX, InsTempReduceScatterMesh1D, InsTempReduceScatterNHR);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, AicpuReduceScatterParallelMeshNHRUBX, AlgEngine::AICPU, "parallel[mesh,nhr]",
-    COND_NONE, FLAG_UBX);
+    COND_NONE, FLAG_UBX, 0);
 REGISTER_EXECUTOR_BY_TWO_TEMPS(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterParallelMesh1DNHRPcie, InsReduceScatterParallelExecutor,
     TopoMatchPcieMix, InsTempReduceScatterMesh1D, InsTempReduceScatterNHR);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterParallelMesh1DNHRPcie, AlgEngine::AICPU, "parallel[mesh,nhr]",
-    COND_NONE, FLAG_PCIE_MIX);
+    COND_NONE, FLAG_PCIE_MIX, 0);
 } // namespace mc2_ops_hccl

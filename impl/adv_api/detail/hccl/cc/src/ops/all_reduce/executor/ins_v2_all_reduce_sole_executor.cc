@@ -277,27 +277,27 @@ REGISTER_EXEC_V2(
     InsTempAllReduceMesh1DTwoShot);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceSoleMeshTwoShot, AlgEngine::AICPU, "sole[mesh.two_shot]", COND_NONE,
-    FLAG_NONE);
+    FLAG_NONE, 0);
 
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceSoleNHR, InsV2AllReduceSoleExecutor, TopoMatch1D,
     InsTempAllReduceNHR);
 REGISTER_ALG_META(
-    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceSoleNHR, AlgEngine::AICPU, "sole[nhr]", COND_NONE, FLAG_NONE);
+    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceSoleNHR, AlgEngine::AICPU, "sole[nhr]", COND_NONE, FLAG_NONE, 0);
 
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceSoleMeshOneShot, InsV2AllReduceSoleExecutor, TopoMatch1D,
     InsTempAllReduceMesh1DOneShot);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceSoleMeshOneShot, AlgEngine::AICPU, "sole[mesh.one_shot]", COND_NONE,
-    FLAG_NONE);
+    FLAG_NONE, 0);
 
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLREDUCE, CcuSchedAllReduceSoleMesh, InsV2AllReduceSoleExecutor, TopoMatch1D,
     CcuTempKfcAllReduceMesh1DMem2Mem);
 REGISTER_ALG_META(
-    HcclCMDType::HCCL_CMD_ALLREDUCE, CcuSchedAllReduceSoleMesh, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE);
+    HcclCMDType::HCCL_CMD_ALLREDUCE, CcuSchedAllReduceSoleMesh, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE, 0);
 #endif
 
 REGISTER_EXEC_V2(
@@ -305,12 +305,12 @@ REGISTER_EXEC_V2(
     InsTempAllReduceAicpuReduceNHR);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceSoleNHRAicpuReduce, AlgEngine::AICPU, "sole[nhr]", COND_SPECIAL_DT,
-    FLAG_NONE);
+    FLAG_NONE, 0);
 
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceSoleMeshChunkTwoShot, InsV2AllReduceSoleExecutor, TopoMatch1D,
     InsTempAllReduceMesh1DTwoShotMeshChunk);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceSoleMeshChunkTwoShot, AlgEngine::AICPU, "sole[mesh.two_shot.chunk]",
-    COND_NONE, FLAG_NONE);
+    COND_NONE, FLAG_NONE, 0);
 } // namespace mc2_ops_hccl

@@ -50,18 +50,18 @@ extern uint32_t g_stubHcommCcuKernelLaunchCallCount;
 // AICPU 行服务 GetOpParam（AICPU 链）的外部名定名与资源回退用例。
 namespace mc2_ops_hccl {
 REGISTER_ALG_META(
-    HcclCMDType::HCCL_CMD_ALLGATHER, CcuSchedAllGatherSoleMesh, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE);
+    HcclCMDType::HCCL_CMD_ALLGATHER, CcuSchedAllGatherSoleMesh, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE, 0);
 REGISTER_ALG_META(
-    HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherMesh1D, AlgEngine::AICPU, "sole[mesh]", COND_NONE, FLAG_NONE);
+    HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherMesh1D, AlgEngine::AICPU, "sole[mesh]", COND_NONE, FLAG_NONE, 0);
 // D8 漂移探针夹具：(AR, sole[mesh]) 键注入一好一坏两个 CCU 候选——
 // CcuSchedAllReduceSoleMesh（algorithmMap 真身 + V2 stub 恒真 → 双名单过）+
 // UtDriftProbeCcuFake（不在 algorithmMap → 双名单不过，模拟 sidecar 与 build 漂移）。
 // 闸门 B 全量校验（校验范围须覆盖闸门 C 漏斗的选择范围）下该键整体拒绝；
 // GateBRejectsDriftedExternalCandidate 用例钉住此行为。无其它用例使用 (AR, sole[mesh]) 键。
 REGISTER_ALG_META(
-    HcclCMDType::HCCL_CMD_ALLREDUCE, CcuSchedAllReduceSoleMesh, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE);
+    HcclCMDType::HCCL_CMD_ALLREDUCE, CcuSchedAllReduceSoleMesh, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE, 0);
 REGISTER_ALG_META(
-    HcclCMDType::HCCL_CMD_ALLREDUCE, UtDriftProbeCcuFake, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE);
+    HcclCMDType::HCCL_CMD_ALLREDUCE, UtDriftProbeCcuFake, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE, 0);
 } // namespace mc2_ops_hccl
 
 // hccl_mc2.cc 闸门 B 入口（非 static 自由函数，符号可见；须在全局作用域声明）

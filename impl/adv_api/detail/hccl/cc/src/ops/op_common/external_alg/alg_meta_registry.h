@@ -65,27 +65,17 @@ private:
 // sidecar 注册宏（与 REGISTER_EXEC_V2 同款 static-init 套路，见
 // coll_alg_v2_exec_registry.h:46-48）。必须写在主注册同一条件编译块内，
 // 保证 sidecar 与主注册同生共死（守卫天然同步）。
-#define REGISTER_ALG_META_HELPER(ctr, cmd, regName, engine, extName, condId, flagId) \
-    static HcclResult g_alg_meta_##regName##_##ctr =                                 \
-        AlgMetaRegistry::Instance().Register(cmd, std::string(#regName), AlgMeta{engine, extName, condId, flagId})
-
-#define REGISTER_ALG_META_HELPER_1(ctr, cmd, regName, engine, extName, condId, flagId) \
-    REGISTER_ALG_META_HELPER(ctr, cmd, regName, engine, extName, condId, flagId)
-
-#define REGISTER_ALG_META(cmd, regName, engine, extName, condId, flagId) \
-    REGISTER_ALG_META_HELPER_1(__COUNTER__, cmd, regName, engine, extName, condId, flagId)
-
-// 7 参变体：显式指定 priority（默认宏恒为 0）。见 AlgMeta::priority 注释——
-// 排序键第二级，仅同 (op, 外部名) 键内、同特异性的候选之间生效。
-#define REGISTER_ALG_META_PRIORITY_HELPER(ctr, cmd, regName, engine, extName, condId, flagId, prio) \
-    static HcclResult g_alg_meta_##regName##_##ctr = AlgMetaRegistry::Instance().Register(          \
+// 第 7 参 priority 显式写出（无裁决意图恒填 0，见 AlgMeta::priority）：槽位在每行现场写好，
+// 平移/扩展时改数字即可；将来任何加参企图会在全部现场编译报错，签名冻结自执行。
+#define REGISTER_ALG_META_HELPER(ctr, cmd, regName, engine, extName, condId, flagId, prio) \
+    static HcclResult g_alg_meta_##regName##_##ctr = AlgMetaRegistry::Instance().Register( \
         cmd, std::string(#regName), AlgMeta{engine, extName, condId, flagId, prio})
 
-#define REGISTER_ALG_META_PRIORITY_HELPER_1(ctr, cmd, regName, engine, extName, condId, flagId, prio) \
-    REGISTER_ALG_META_PRIORITY_HELPER(ctr, cmd, regName, engine, extName, condId, flagId, prio)
+#define REGISTER_ALG_META_HELPER_1(ctr, cmd, regName, engine, extName, condId, flagId, prio) \
+    REGISTER_ALG_META_HELPER(ctr, cmd, regName, engine, extName, condId, flagId, prio)
 
-#define REGISTER_ALG_META_PRIORITY(cmd, regName, engine, extName, condId, flagId, prio) \
-    REGISTER_ALG_META_PRIORITY_HELPER_1(__COUNTER__, cmd, regName, engine, extName, condId, flagId, prio)
+#define REGISTER_ALG_META(cmd, regName, engine, extName, condId, flagId, prio) \
+    REGISTER_ALG_META_HELPER_1(__COUNTER__, cmd, regName, engine, extName, condId, flagId, prio)
 
 } // namespace mc2_ops_hccl
 #endif // ALG_META_REGISTRY_H
