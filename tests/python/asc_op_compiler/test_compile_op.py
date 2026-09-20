@@ -3827,6 +3827,7 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
 
         global_var_storage.set_variable("ascendc_meta_info", "// meta info\n")
         with (
+            mock.patch.object(CommonUtility, "is_v220", return_value=True),
             mock.patch.object(CommonUtility, "ascendc_read_file", return_value="#if 1\n#endif\n"),
             mock.patch.object(CommonUtility, "ascendc_write_file") as write_file,
             mock.patch.object(DFXSectionGenerator(), "generate_dfx_section", return_value=""),
@@ -3845,7 +3846,7 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
             recorded = compile_info.compile_command_session.records[0]
             self.assertEqual(recorded.tiling_key, "7")
             self.assertEqual(recorded.compiled_symbol, "record_kernel_7")
-            self.assertEqual(recorded.argv, compile_command)
+            self.assertEqual(recorded.argv, compile_command + ("-D__ASCENDC_DEFINE_OP_SYSTEM_RUN_CFG__",))
             self.assertEqual(recorded.output_path, "/tmp/record_kernel_7.o")
             compile_multi.assert_not_called()
             fatbin.assert_not_called()

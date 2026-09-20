@@ -60,6 +60,7 @@ from .ascendc_common_utility import (
 from .ascendc_compile_dfx import DFXParamType, DFXPointType, DFXArgInfo, DFXSectionGenerator
 from .ascendc_compile_v220 import (
     gen_compile_cmd_v220,
+    add_op_system_run_cfg_option,
     get_compile_core_types,
     get_compile_target_name,
     get_compile_target_options,
@@ -1613,6 +1614,8 @@ def _get_compile_cmd_and_section_content(
         arch,
         tiling_info.tiling_data_file_path,
     )
+
+    add_op_system_run_cfg_option(compile_cmd, compile_info, tiling_info, tiling_key, arch)
 
     current_kernel_name = ""
     kernel_type = compile_info.tiling_key_kernel_type[str(tiling_key)]
