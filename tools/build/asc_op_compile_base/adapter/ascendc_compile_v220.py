@@ -262,17 +262,24 @@ def get_compile_core_types(compile_info: CompileInfo, tiling_key: str):
     kernel_type = _kernel_type_for_key(compile_info, tiling_key)
     if kernel_type in {
         KernelMetaType.KERNEL_TYPE_AIC_ONLY,
+        KernelMetaType.KERNEL_TYPE_AICORE,
         KernelMetaType.KERNEL_TYPE_MIX_AIC_HARD_SYNC,
         KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0,
     }:
         return ("cube",)
     if kernel_type in {
         KernelMetaType.KERNEL_TYPE_AIV_ONLY,
+        KernelMetaType.KERNEL_TYPE_VECTORCORE,
         KernelMetaType.KERNEL_TYPE_MIX_AIV_HARD_SYNC,
         KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0,
     }:
         return ("vec",)
-    if kernel_type in {KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2}:
+    if kernel_type in {
+        KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1,
+        KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2,
+        KernelMetaType.KERNEL_TYPE_MIX_AICORE,
+        KernelMetaType.KERNEL_TYPE_MIX_VECTOR_CORE,
+    }:
         return ("cube", "vec")
     raise ValueError(f"unsupported kernel type: {kernel_type}")
 
@@ -525,6 +532,40 @@ def get_compile_cmd_for_kernel_name(
     return compile_cmd
 
 
+def add_op_system_run_cfg_option(compile_cmd, compile_info, tiling_info, tiling_key, sub_arch, *, definition_key):
+    """Add the g_opSystemRunCfg definition macro to its designated compile command.
+
+    Args:
+        compile_cmd: Mutable compiler argument list to update.
+        compile_info: Compile metadata, including tiling keys and core channel.
+        tiling_info: Tiling metadata used to identify static shapes.
+        tiling_key: Tiling key associated with this compile command.
+        sub_arch: Target sub-architecture, such as ``davinci-c220-cube``.
+        definition_key: Tiling key that owns the global definition.
+    """
+    if not (CommonUtility.is_v220() or CommonUtility.is_v200()):
+        return
+    option = "-D__ASCENDC_DEFINE_OP_SYSTEM_RUN_CFG__"
+    compile_cmd[:] = [arg for arg in compile_cmd if arg != option]
+    if str(tiling_key) != str(definition_key):
+        return
+    core_types = get_compile_core_types(compile_info, definition_key)
+    definition_core = "cube" if "cube" in core_types else "vec"
+    if sub_arch:
+        current_core = "cube" if sub_arch == "dav-m200" else sub_arch.rsplit("-", 1)[-1]
+    else:
+        current_core_types = get_compile_core_types(compile_info, tiling_key)
+        current_core = "cube" if "cube" in current_core_types else "vec"
+    if current_core != definition_core:
+        return
+    source_index = (
+        compile_cmd.index(compile_info.gen_kernel_func_file)
+        if compile_info.gen_kernel_func_file in compile_cmd
+        else len(compile_cmd)
+    )
+    compile_cmd.insert(source_index, option)
+
+
 def call_bisheng_v220(
     compile_info: CompileInfo, compile_option_tuple, tiling_info: TilingInfo, sub_arch: str, code_channel: int
 ):
@@ -564,6 +605,14 @@ def call_bisheng_v220(
         CommonUtility().ascendc_write_file(compile_info.gen_kernel_func_file, new_sources)
 
         compile_cmd += [f"-D{TILING_KEY_MACRO}={tiling_info.tiling_key}UL"]
+        add_op_system_run_cfg_option(
+            compile_cmd,
+            compile_info,
+            tiling_info,
+            tiling_info.tiling_key,
+            sub_arch,
+            definition_key=tiling_info.tiling_key,
+        )
         CommonUtility.run_cmd_inner(compile_cmd, CompileStage.COMPILE, compile_info.compile_log_path)
         return [f"{tiling_info.tiling_key}"]
     else:
@@ -577,6 +626,14 @@ def call_bisheng_v220(
                 tiling_key, compile_info, sub_arch, tiling_info, code_channel, compile_option_tuple
             )
             compile_cmd, kernel_name = compile_single_tiling_v220(param)
+            add_op_system_run_cfg_option(
+                compile_cmd,
+                compile_info,
+                tiling_info,
+                tiling_key,
+                sub_arch,
+                definition_key=compile_info.tiling_key_list[0],
+            )
             core_type = (
                 "cube"
                 if (sub_arch is None and code_channel == CORE_TYPE_CUBE)
