@@ -660,9 +660,17 @@ class ManifestPackageWriter:
     def _build_basic_object(self, kernel, records):
         commands = []
         outputs = []
-        for record in records:
+        for index, record in enumerate(records):
             output_name = f"{kernel.kernel_name}.{_core_suffix(record.core_type)}.o"
             command = {"type": "compile", "cmd": self._normalize_compile_command(record, output_name)}
+            # Replay is a new link unit: discard the original key's ownership.
+            command["cmd"] = [
+                arg for arg in command["cmd"] if arg != "-D__ASCENDC_DEFINE_OP_SYSTEM_RUN_CFG__"
+            ]
+            if index == 0:
+                source_reference = _resource_placeholder(self._resource_path, self._wrapper_paths[record.source_path])
+                source_index = command["cmd"].index(source_reference)
+                command["cmd"].insert(source_index, "-D__ASCENDC_DEFINE_OP_SYSTEM_RUN_CFG__")
             commands.append(command)
             self._wrapper_commands.append(command)
             outputs.append(_output_placeholder(output_name))
