@@ -41,9 +41,10 @@ struct ExternalAlgLayer {
 struct ExternalAlgSpec {
     ExternalExecutor executor = ExternalExecutor::SOLE;
     std::vector<ExternalAlgLayer> layers;
-    bool orderStrong = false; // 本期仅解析存储，不参与选名
+    bool orderStrong = false; // [order.strong] 后缀：收编进 canonical 主键（保序是名字身份的一部分）
 
-    // 规范化外部名（候选表主键；不含 [order.strong] 后缀）
+    // 规范化外部名（候选表主键；orderStrong 时含 [order.strong] 后缀——devkit 无保序注册行，
+    // 带后缀输入查表无候选 → 按 D7 语义 WARNING+回退，而非静默忽略）
     std::string canonical() const
     {
         static const char* EXECUTOR_NAME[] = {"sole", "sequence", "parallel", "concur", "pipeline"};
@@ -60,6 +61,9 @@ struct ExternalAlgSpec {
             }
         }
         text += ']';
+        if (orderStrong) {
+            text += "[order.strong]";
+        }
         return text;
     }
 };

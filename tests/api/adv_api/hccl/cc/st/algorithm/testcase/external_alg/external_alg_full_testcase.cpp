@@ -150,4 +150,13 @@ TEST(ExtAlgFailure, ErrorMessagesCarryThreeElements)
     ASSERT_TRUE(ParseExternalAlg("parallel[mesh,nhr]", okSpec, parseErr));
     EXPECT_EQ(ResolveExternalAlg(op, &flat, okSpec, resolvedName, errMsg), ResolveStatus::ERROR_INVALID);
     EXPECT_NE(errMsg.find("all candidates rejected by rules"), std::string::npos); // 全灭分叉文案
+
+    // [order.strong] 收编进 canonical 主键：devkit 无保序注册行，带后缀输入查表无候选
+    // （ERROR_INVALID 而非静默忽略；hccl 平移注册保序行后即命中，零机制改动）
+    ExternalAlgSpec strongSpec;
+    ASSERT_TRUE(ParseExternalAlg("sole[mesh] [order.strong]", strongSpec, parseErr));
+    EXPECT_EQ(strongSpec.canonical(), "sole[mesh][order.strong]");
+    EXPECT_EQ(ResolveExternalAlg(op, &flat, strongSpec, resolvedName, errMsg), ResolveStatus::ERROR_INVALID);
+    EXPECT_NE(errMsg.find("sole[mesh][order.strong]"), std::string::npos);              // 要素1: 主键含后缀
+    EXPECT_NE(errMsg.find("no candidate registered in this build"), std::string::npos); // 要素3: 无候选分叉
 }

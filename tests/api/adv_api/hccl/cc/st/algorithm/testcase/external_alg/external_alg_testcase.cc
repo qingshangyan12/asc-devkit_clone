@@ -28,7 +28,7 @@ namespace {
 // 变体条目（带空格 / [order.strong] 后缀）解析必须成功，且规范化后与对应规范名相等
 const struct {
     const char* name;              // 输入（可为带空格/后缀的变体）
-    const char* expectedCanonical; // 期望的规范化名（剥空格、去 [order.strong] 后缀）
+    const char* expectedCanonical; // 期望的规范化名（剥空格；[order.strong] 后缀收编进主键）
 } LEGAL_EXTERNAL_NAMES[] = {
     {"sole[mesh]", "sole[mesh]"},
     {"sole[nhr]", "sole[nhr]"},
@@ -48,7 +48,7 @@ const struct {
     {"concur[mesh,mesh]", "concur[mesh,mesh]"},
     {"pipeline[mesh,nhr]", "pipeline[mesh,nhr]"},
     {"parallel[mesh, nhr]", "parallel[mesh,nhr]"},
-    {"sole[mesh] [order.strong]", "sole[mesh]"},
+    {"sole[mesh] [order.strong]", "sole[mesh][order.strong]"},
     {"sequence[mesh, nhr, nhr]", "sequence[mesh,nhr,nhr]"},
 };
 } // namespace
@@ -68,7 +68,7 @@ TEST(ExtAlgParser, SpacesEverywhereAreStripped)
     ExternalAlgSpec spec;
     std::string errMsg;
     ASSERT_TRUE(ParseExternalAlg("  parallel [ mesh , nhr . multi_channel ]  [ order.strong ] ", spec, errMsg));
-    EXPECT_EQ(spec.canonical(), "parallel[mesh,nhr.multi_channel]");
+    EXPECT_EQ(spec.canonical(), "parallel[mesh,nhr.multi_channel][order.strong]");
     EXPECT_TRUE(spec.orderStrong);
     EXPECT_EQ(spec.executor, ExternalExecutor::PARALLEL);
     ASSERT_EQ(spec.layers.size(), 2U);
@@ -79,13 +79,13 @@ TEST(ExtAlgParser, SpacesEverywhereAreStripped)
     EXPECT_EQ(spec.layers[1].attrs[0], "multi_channel");
 }
 
-TEST(ExtAlgParser, OrderStrongIsParsedButNotInCanonical)
+TEST(ExtAlgParser, OrderStrongIsPartOfCanonical)
 {
     ExternalAlgSpec spec;
     std::string errMsg;
     ASSERT_TRUE(ParseExternalAlg("sole[mesh] [order.strong]", spec, errMsg));
     EXPECT_TRUE(spec.orderStrong);
-    EXPECT_EQ(spec.canonical(), "sole[mesh]");
+    EXPECT_EQ(spec.canonical(), "sole[mesh][order.strong]"); // 后缀是主键身份的一部分
 }
 
 TEST(ExtAlgParser, IllegalNamesAreRejectedWithReason)
