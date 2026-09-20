@@ -28,10 +28,10 @@ from doxygen_annotations import DoxygenValidationError, apply_records_to_text
 from extract_api_yaml_metadata import (
     _compare_signature_header_mappings,
     _macro_definitions,
-    _placeholder_values,
     _resource_declares_symbol,
     extract_api_metadata,
     extract_example_references,
+    extract_prototype_declarations,
     resolve_signature_header_mappings,
     supported_archs,
 )
@@ -40,9 +40,10 @@ from prototype_id import MACRO_ID_RE, PrototypeIdError, signature_identifier
 
 API_ROOT = Path("docs/zh/api/SIMD-API")
 API_SURFACES = {"c_api", "basic_api", "adv_api", "tensor_api"}
+OKF_TYPES = {"reference.api.cpp", "reference.arch.cpp", "reference.index.cpp"}
 ALLOWED_FIELDS = (
     "okftype", "title", "resource", "description", "tag", "signature",
-    "dtype", "dependencies", "examples", "api_kind", "headers", "declaration",
+    "dependencies", "examples", "api_kind", "headers", "declaration",
     "type_catalog", "timestamp",
 )
 DEFINITION_API_KINDS = {
@@ -53,7 +54,10 @@ DEFINITION_CATEGORIES = {"constant", "enum", "macro", "type", "union"}
 DEFINITIONS_ROOT = API_ROOT / "c_api" / "defs"
 MACRO_DEFINITION_SECTION_RE = re.compile(r"^\s{0,3}#{2,6}\s+宏定义(?:\s|<|$)", re.MULTILINE)
 DEPENDENCY_KINDS = {"requires", "configures", "constrained_by", "related"}
-SIGNATURE_KEYS = {"prototype_id", "override_id", "macro_id", "archs", "headers"}
+SIGNATURE_KEYS = {"prototype_id", "override_id", "macro_id", "archs", "headers", "dtype"}
+DEFAULT_WRITE_TARGETS = (
+    "front_matter", "tag", "dependencies", "include_doxygen", "example_markers",
+)
 ISSUE_TYPES = {"document_defect", "source_defect", "tool_defect", "unresolved"}
 RESOLUTIONS = {
     "blank_field", "report_source_defect", "report_unresolved", "tool_change_required",
@@ -225,45 +229,79 @@ def signature_id_key(identifier: str) -> str:
     return "prototype_id" if has_documented_placeholder else "override_id"
 
 
-def source_dtype_values(markdown: str) -> list[str]:
-    """Return documented <dtype> values in their source order."""
-    values = _placeholder_values(markdown).get("dtype", ())
+def dtype_values(value: Any) -> list[str]:
+    """Normalize a legacy dtype representation to the canonical string array."""
+    if isinstance(value, list):
+        candidates = value
+    elif isinstance(value, dict):
+        candidates = value.get("values")
+        if not isinstance(candidates, list):
+            candidates = [
+                item
+                for variant in value.get("variants", [])
+                if isinstance(variant, dict)
+                for item in variant.values()
+            ]
+    else:
+        candidates = []
     return list(dict.fromkeys(
-        value for value in values if isinstance(value, str) and value.strip()
+        item for item in candidates if isinstance(item, str) and item.strip()
     ))
 
 
-def legacy_dtype_values(front_matter: dict[str, Any]) -> list[str]:
-    """Migrate the former signature-local dtype shape without inventing values."""
-    top_level = front_matter.get("dtype")
-    if isinstance(top_level, list):
-        return list(dict.fromkeys(
-            value for value in top_level if isinstance(value, str) and value.strip()
-        ))
-
-    values: list[str] = []
-    signature = front_matter.get("signature")
-    if not isinstance(signature, list):
-        return values
-    for entry in signature:
-        if not isinstance(entry, dict):
+def source_signature_dtypes(markdown: str) -> dict[str, list[str]]:
+    """Bind documented dtype values to the exact generic prototype that uses them."""
+    values_by_signature: dict[str, list[str]] = {}
+    for declaration in extract_prototype_declarations(markdown):
+        function = declaration.prototype_function
+        if not function:
             continue
-        dtype = entry.get("dtype")
-        if isinstance(dtype, dict):
-            candidates = dtype.get("values")
-            if isinstance(candidates, list):
-                values.extend(value for value in candidates if isinstance(value, str) and value.strip())
-            variants = dtype.get("variants")
-            if isinstance(variants, list):
-                for variant in variants:
-                    if isinstance(variant, dict):
-                        values.extend(
-                            value for value in variant.values()
-                            if isinstance(value, str) and value.strip()
-                        )
-        elif isinstance(dtype, list):
-            values.extend(value for value in dtype if isinstance(value, str) and value.strip())
-    return list(dict.fromkeys(values))
+        try:
+            key, identifier = signature_identifier(
+                function,
+                template_parameters=declaration.template_parameters,
+            )
+        except PrototypeIdError:
+            continue
+        if key != "prototype_id" or "<dtype>" not in identifier:
+            continue
+        value = dict(declaration.placeholder_bindings).get("dtype")
+        if not isinstance(value, str) or not value.strip():
+            continue
+        values_by_signature.setdefault(identifier, []).append(value)
+    return {
+        identifier: list(dict.fromkeys(values))
+        for identifier, values in values_by_signature.items()
+    }
+
+
+def normalize_signature_dtypes(
+    signature: Any,
+    source_values: dict[str, list[str]],
+    legacy_top_level_dtype: Any,
+) -> Any:
+    """Place dtype beside its prototype_id and remove obsolete root-level forms."""
+    if not isinstance(signature, list):
+        return signature
+    legacy_top_level_values = dtype_values(legacy_top_level_dtype)
+    normalized = []
+    for item in signature:
+        if not isinstance(item, dict):
+            normalized.append(item)
+            continue
+        output = deepcopy(item)
+        identifier = output.get("prototype_id")
+        local_values = dtype_values(output.get("dtype"))
+        if isinstance(identifier, str) and "<dtype>" in identifier:
+            values = source_values.get(identifier) or local_values or legacy_top_level_values
+            if values:
+                output["dtype"] = values
+            else:
+                output.pop("dtype", None)
+        else:
+            output.pop("dtype", None)
+        normalized.append(output)
+    return normalized
 
 
 def strip_inline_api_signature_blocks(body: str) -> str:
@@ -312,6 +350,7 @@ def _source_signature_fields(
     comparison_statuses: dict[str, set[str]] = {}
     for comparison in comparisons:
         comparison_statuses.setdefault(comparison.document_parameters, set()).add(comparison.status)
+    document_archs = tuple(supported_archs(markdown))
 
     signatures: list[dict[str, Any]] = []
     doxygen_records: list[dict[str, Any]] = []
@@ -335,7 +374,8 @@ def _source_signature_fields(
                     f"函数原型 ID 无法生成：{exc}",
                 ))
                 continue
-            entry = {key: identifier, "archs": sorted(dict.fromkeys(mapping.archs))}
+            archs = sorted(dict.fromkeys(mapping.archs or document_archs))
+            entry = {key: identifier, "archs": archs}
             statuses = comparison_statuses.get(mapping.document_parameters, set())
             verified = (
                 mapping.status in VERIFIED_HEADER_STATUSES
@@ -355,7 +395,7 @@ def _source_signature_fields(
                 "header": mapping.headers[0].lstrip("/"),
                 "function": mapping.canonical_id,
                 "parameters": mapping.document_signature or mapping.canonical_id,
-                "archs": sorted(dict.fromkeys(mapping.archs)),
+                "archs": archs,
                 "template_parameters": list(mapping.template_parameters),
                 "doxygen": {},
             })
@@ -718,22 +758,33 @@ def build_worker_document(root: Path, path: str, namespaces: tuple[str, ...]) ->
         source_doxygen = definition["doxygen"]
         source_issues = definition["issues"]
         source_definition = definition
-    title = data.get("title") or first_heading(body, document.stem)
+    title = first_heading(body, document.stem)
     description = data.get("description")
     if not isinstance(description, str):
         description = ""
+    existing_timestamp = data.get("timestamp")
+    if isinstance(existing_timestamp, date):
+        timestamp = existing_timestamp.isoformat()
+    elif isinstance(existing_timestamp, str):
+        timestamp = existing_timestamp
+    else:
+        timestamp = date.today().isoformat()
     tags = normalize_tag(data.get("tag"), namespaces)
-    documented_dtype = source_dtype_values(body)
+    source_dtypes = source_signature_dtypes(body) if definition is None else {}
+    raw_signature = source_signature if definition is not None else source_signature or normalize_signature_ids(
+        data.get("signature") if isinstance(data.get("signature"), list) else []
+    )
     fields: dict[str, Any] = {
         "okftype": data.get("okftype") or "reference.api.cpp",
         "title": title,
-        "resource": data.get("resource") or f"asc-devkit/{path}",
+        "resource": f"asc-devkit/{path}",
         "description": description,
         "tag": tags,
-        "signature": source_signature if definition is not None else source_signature or normalize_signature_ids(
-            data.get("signature") if isinstance(data.get("signature"), list) else []
+        "signature": normalize_signature_dtypes(
+            raw_signature,
+            source_dtypes,
+            data.get("dtype"),
         ),
-        "dtype": documented_dtype or legacy_dtype_values(data),
         "dependencies": data.get("dependencies") if isinstance(data.get("dependencies"), list) else [],
         "examples": source_examples if definition is not None else source_examples or (
             data.get("examples") if isinstance(data.get("examples"), list) else []
@@ -742,7 +793,7 @@ def build_worker_document(root: Path, path: str, namespaces: tuple[str, ...]) ->
         "headers": source_definition["headers"],
         "declaration": source_definition["declaration"],
         "type_catalog": source_definition["type_catalog"],
-        "timestamp": data.get("timestamp") or date.today().isoformat(),
+        "timestamp": timestamp,
     }
     issues: list[dict[str, Any]] = list(source_issues)
     if not description:
@@ -796,6 +847,7 @@ def prepare(args: argparse.Namespace) -> int:
         "documents": selected,
         "batches": [],
         "taxonomy": str((Path(__file__).resolve().parents[1] / "taxonomy" / "core-v8-frozen.json").resolve()),
+        "write_targets": list(DEFAULT_WRITE_TARGETS),
     }
     for index, batch in enumerate(batches, 1):
         batch_id = f"batch-{index:02d}"
@@ -966,6 +1018,83 @@ def normalize_dependencies(root: Path, document_path: str, dependencies: Any) ->
     return sorted(normalized, key=lambda item: (item["path"], item["kind"], item.get("condition", "")))
 
 
+def normalize_examples(root: Path, document_path: str, examples: Any) -> list[dict[str, Any]]:
+    """Validate example links emitted by the legacy-compatible source resolver."""
+    if not isinstance(examples, list):
+        raise ValidationError(f"{document_path}: examples must be an array")
+    normalized = []
+    seen = set()
+    for index, item in enumerate(examples):
+        if not isinstance(item, dict):
+            raise ValidationError(f"{document_path}: examples[{index}] must be an object")
+        unknown = set(item) - {"path", "file", "archs", "override_id"}
+        if unknown:
+            raise ValidationError(f"{document_path}: examples[{index}] has unsupported fields: {sorted(unknown)}")
+        example_path = item.get("path")
+        if not isinstance(example_path, str) or not example_path.startswith("/examples/"):
+            raise ValidationError(f"{document_path}: examples[{index}].path must start with /examples/")
+        relative_path = Path(example_path.lstrip("/"))
+        if ".." in relative_path.parts:
+            raise ValidationError(f"{document_path}: examples[{index}].path must not escape the repository")
+        target = (root / relative_path).resolve()
+        try:
+            target.relative_to(root.resolve())
+        except ValueError as exc:
+            raise ValidationError(f"{document_path}: examples[{index}].path escapes the repository") from exc
+        if not target.exists():
+            raise ValidationError(f"{document_path}: examples[{index}].path does not exist")
+        file_name = item.get("file")
+        if file_name is not None:
+            if not isinstance(file_name, str) or not file_name or Path(file_name).is_absolute() or ".." in Path(file_name).parts:
+                raise ValidationError(f"{document_path}: examples[{index}].file must be a relative source path")
+            if not (target / file_name).is_file():
+                raise ValidationError(f"{document_path}: examples[{index}].file does not exist under its example path")
+        archs = item.get("archs")
+        if archs is not None and (
+            not isinstance(archs, list)
+            or not archs
+            or any(not isinstance(arch, str) or not arch for arch in archs)
+            or len(archs) != len(set(archs))
+        ):
+            raise ValidationError(f"{document_path}: examples[{index}].archs must be a non-empty unique string array")
+        override_id = item.get("override_id")
+        if override_id is not None:
+            if not isinstance(override_id, str) or signature_id_key(override_id) != "override_id":
+                raise ValidationError(f"{document_path}: examples[{index}].override_id must be a concrete override ID")
+        output = {"path": example_path}
+        if file_name is not None:
+            output["file"] = file_name
+        if archs is not None:
+            output["archs"] = archs
+        if override_id is not None:
+            output["override_id"] = override_id
+        identity = (example_path, file_name or "", override_id or "")
+        if identity in seen:
+            raise ValidationError(f"{document_path}: duplicate example entry")
+        seen.add(identity)
+        normalized.append(output)
+    return normalized
+
+
+def validate_base_fields(fields: dict[str, Any], path: str) -> None:
+    """Enforce the fixed top-level YAML contract before rendering."""
+    if fields.get("okftype") not in OKF_TYPES:
+        raise ValidationError(f"{path}: okftype must be one of {sorted(OKF_TYPES)}")
+    if not isinstance(fields.get("title"), str) or not fields["title"].strip():
+        raise ValidationError(f"{path}: title must be a non-empty string")
+    if fields.get("resource") != f"asc-devkit/{path}":
+        raise ValidationError(f"{path}: resource must equal asc-devkit/<document path>")
+    if not isinstance(fields.get("description"), str):
+        raise ValidationError(f"{path}: description must be a string")
+    timestamp = fields.get("timestamp")
+    if not isinstance(timestamp, str):
+        raise ValidationError(f"{path}: timestamp must be an ISO date string")
+    try:
+        date.fromisoformat(timestamp)
+    except ValueError as exc:
+        raise ValidationError(f"{path}: timestamp must be an ISO date string") from exc
+
+
 def validate_tags(
     fields: dict[str, Any],
     namespaces: tuple[str, ...],
@@ -1024,20 +1153,17 @@ def validate_signature(signature: Any, path: str) -> list[dict[str, Any]]:
             raise ValidationError(
                 f"{path}: signature[{index}] {reason} and must use {expected_key}"
             )
-        for key in ("archs", "headers"):
+        for key in ("archs", "headers", "dtype"):
             if key in item and (not isinstance(item[key], list) or any(not isinstance(value, str) for value in item[key])):
                 raise ValidationError(f"{path}: signature[{index}].{key} must be a string array")
+        if "dtype" in item:
+            if identifier_key != "prototype_id" or "<dtype>" not in item["prototype_id"]:
+                raise ValidationError(
+                    f"{path}: signature[{index}].dtype requires a prototype_id containing <dtype>"
+                )
+            if not item["dtype"] or len(item["dtype"]) != len(set(item["dtype"])):
+                raise ValidationError(f"{path}: signature[{index}].dtype must be a non-empty unique string array")
     return signature
-
-
-def validate_dtype(dtype: Any, path: str) -> list[str]:
-    if dtype in (None, []):
-        return []
-    if not isinstance(dtype, list) or any(not isinstance(value, str) or not value.strip() for value in dtype):
-        raise ValidationError(f"{path}: dtype must be a non-empty string array")
-    if len(dtype) != len(set(dtype)):
-        raise ValidationError(f"{path}: dtype must not contain duplicates")
-    return dtype
 
 
 def _validate_headers(headers: Any, path: str) -> list[str]:
@@ -1165,33 +1291,26 @@ def render_yaml(
     root: Path, path: str, body: str, evidence: dict[str, Any], allowed_empty: set[str],
 ) -> str:
     output = {key: deepcopy(fields.get(key)) for key in ALLOWED_FIELDS}
+    validate_base_fields(output, path)
     output["signature"] = normalize_signature_ids(output["signature"])
     output["tag"] = validate_tags(output, namespaces, values, path, body, evidence, allowed_empty)
     output["tag"] = [
         {namespace: InlineList(selected)} for item in output["tag"] for namespace, selected in item.items()
     ]
     output["dependencies"] = normalize_dependencies(root, path, output.get("dependencies", []))
-    output["dtype"] = validate_dtype(output.get("dtype"), path)
-    if output["dtype"]:
-        output["dtype"] = InlineList(output["dtype"])
     for signature in output["signature"]:
         if isinstance(signature, dict):
-            for key in ("archs", "headers"):
+            for key in ("archs", "headers", "dtype"):
                 if isinstance(signature.get(key), list):
                     signature[key] = InlineList(signature[key])
     for example in output["examples"]:
         if isinstance(example, dict) and isinstance(example.get("archs"), list):
             example["archs"] = InlineList(example["archs"])
     output["signature"] = validate_signature(output["signature"], path)
+    output["examples"] = normalize_examples(root, path, output["examples"])
     validate_definition_fields(output, path, allowed_empty)
-    if not isinstance(output["examples"], list):
-        raise ValidationError(f"{path}: examples must be an array")
     if not output["signature"]:
         output.pop("signature")
-    if not output["examples"]:
-        output.pop("examples")
-    if not output["dtype"]:
-        output.pop("dtype")
     for key in ("api_kind", "headers", "declaration", "type_catalog"):
         if output.get(key) in (None, [], {}):
             output.pop(key, None)

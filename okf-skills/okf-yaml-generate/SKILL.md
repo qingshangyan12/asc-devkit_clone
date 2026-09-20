@@ -85,7 +85,7 @@ python3 scripts/controller.py write \
 
 ## 字段和降级规则
 
-基础 YAML 字段为 `okftype`、`title`、`resource`、`description`、`tag`、`signature`、`dtype`、
+基础 YAML 字段为 `okftype`、`title`、`resource`、`description`、`tag`、`signature`、
 `dependencies`、`examples`、`timestamp`。`c_api/defs` 实体页还可有 source-derived 的 `api_kind`、
 `headers`、`declaration` 或 `type_catalog`；这些字段不由 worker 猜测，也不用于普通函数页。
 
@@ -93,8 +93,8 @@ python3 scripts/controller.py write \
 
 - description 无法确认：先运行 `okf-description-generate`；其 `unresolved` 结果才允许按决议写 `description: ""`，总控脚本不得自行从正文提取摘要。
 - signature 无法确认：`signature: []`
-- dtype 有正文明确类型列表时：仅写 front matter 顶层单行数组，例如 `dtype: [half, float]`；不得在
-  `signature` 内或函数原型前的 YAML 代码块写 dtype。
+- dtype 有正文明确类型列表时：仅写入对应 `prototype_id` 同级的单行数组，例如 `dtype: [half, float]`；
+  不得写为根级字段，也不得在函数原型前的 YAML 代码块写 dtype。
 - 非 callable 定义：保留其 `api_kind`；只有正文能解析出声明且唯一 header 确认时才写 `declaration` 和 `headers`。
   `type_catalog` 不要求 header；函数宏继续使用独立 `signature[].macro_id`，对象宏使用 `api_kind: macro` 的定义条目。
 - examples 无法确认：`examples: []`
@@ -127,9 +127,10 @@ Doxygen 记录不接受 `path/anchor/text` 自由补丁。主控按结构化声�
 
 ## 写入边界
 
-主控是唯一写入者。允许写入 API Markdown front matter、include Doxygen 注释和 example marker；
-它会移除先前生成的、仅含 `api_signature` 的 YAML 围栏。除该迁移外，禁止修改 Markdown 正文、声明、参数、
-类型、属性、实现代码、样例实现、索引和旧项目问题资产。
+主控是唯一写入者。用户请求生成或更新时，默认写入范围固定为 API front matter（含 tag、dependencies）、
+include Doxygen 注释和 example marker；不得逐字段再次请求写入许可。只有用户明确要求 dry-run 或禁止写入时，
+才不执行 `write`。它会移除先前生成的、仅含 `api_signature` 的 YAML 围栏。除该迁移外，禁止修改 Markdown
+正文、声明、参数、类型、属性、实现代码、样例实现、索引和旧项目问题资产。
 任何阶段 dry-run 失败都禁止写入。
 
 详细 artifact 和问题处理约定见：

@@ -19,7 +19,6 @@
         "description": "...",
         "tag": [{"api_surfaces": ["c_api"]}],
         "signature": [],
-        "dtype": [],
         "dependencies": [],
         "examples": [],
         "timestamp": "2026-09-18"
@@ -37,8 +36,8 @@
 ```
 
 每个文档只能由一个 worker 提交。`fields` 必须包含所有顶层字段；不能以缺键表示未知，未知值按
-字段规则写空。`dtype` 是正文明确支持类型的字符串数组，写入时渲染为顶层单行数组，绝不位于 `signature` 或
-Markdown 原型前的 YAML 围栏。证据必须带 source path 和逐字 excerpt。
+字段规则写空。`dtype` 是含 `<dtype>` 的 `signature` 条目中的字符串数组，写入时与 `prototype_id` 同级渲染为
+单行数组，绝不位于根级或 Markdown 原型前的 YAML 围栏。证据必须带 source path 和逐字 excerpt。
 
 `fields.description` 不由 worker 或总控脚本生成。它必须来自同一文档、同一哈希且已通过
 `okf-description-generate validate` 的 `description-result.json`；worker 将其中的 evidence 补充当前

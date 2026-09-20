@@ -70,6 +70,35 @@ class ControllerSmokeTest(unittest.TestCase):
             self.assertEqual(macro_signatures, [{"macro_id": "ASC_EXAMPLE__value"}])
             self.assertEqual(len(macro_doxygen), 1)
 
+    def test_signature_archs_fall_back_to_document_product_support(self):
+        module = self._controller_module()
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            document = root / "docs/zh/api/SIMD-API/c_api/foo/asc_example.md"
+            header = root / "include/c_api/asc_example.h"
+            document.parent.mkdir(parents=True)
+            header.parent.mkdir(parents=True)
+            header.write_text(
+                "__aicore__ inline void asc_example(uint32_t value);\n",
+                encoding="utf-8",
+            )
+            markdown = (
+                "## 产品支持情况\n\n<!-- npu=\"950\" -->\n- Ascend 950：支持\n\n"
+                "## 功能说明\n\n头文件路径为：`\"c_api/asc_example.h\"`。\n\n"
+                "## 函数原型\n\n```c\n"
+                "__aicore__ inline void asc_example(uint32_t value);\n"
+                "```\n"
+            )
+            document.write_text(markdown, encoding="utf-8")
+
+            signatures, _, _, doxygen, issues = module._source_signature_fields(
+                root, document, markdown
+            )
+
+            self.assertEqual(issues, [])
+            self.assertEqual(signatures[0]["archs"], ["3510"])
+            self.assertEqual(doxygen[0]["archs"], ["3510"])
+
     def test_definition_pages_extract_typed_metadata_without_function_signature_issues(self):
         module = self._controller_module()
         with tempfile.TemporaryDirectory() as temp:
@@ -389,7 +418,7 @@ constexpr uint8_t ASC_SIZE = 16;
         self.assertEqual(module.signature_id_key("asc_template__v<dtype>"), "prototype_id")
         self.assertEqual(module.signature_id_key("asc_cpp_template__v<T>"), "override_id")
 
-    def test_dtype_is_top_level_flow_array_and_inline_signature_yaml_is_removed(self):
+    def test_dtype_is_signature_level_flow_array_and_inline_signature_yaml_is_removed(self):
         module = self._controller_module()
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
@@ -408,7 +437,7 @@ api_signature:
 ```
 
 ```c
-vector_<dtype> asc_foo(vector_<dtype> src)
+__simd_callee__ inline vector_<dtype> asc_foo(vector_<dtype> src)
 ```
 
 ### dtype支持数据类型
@@ -420,7 +449,10 @@ example: true
 ```
 """
             document.write_text(body, encoding="utf-8")
-            self.assertEqual(module.source_dtype_values(body), ["half", "float"])
+            self.assertEqual(
+                module.source_signature_dtypes(body),
+                {"asc_foo__v<dtype>": ["half", "float"]},
+            )
             self.assertNotIn("api_signature:", module.strip_inline_api_signature_blocks(body))
             self.assertIn("example: true", module.strip_inline_api_signature_blocks(body))
 
@@ -431,8 +463,12 @@ example: true
                 "resource": f"asc-devkit/{path}",
                 "description": "执行测试计算。",
                 "tag": [{namespace: []} for namespace in namespaces],
-                "signature": [{"prototype_id": "asc_foo__v<dtype>", "archs": [], "headers": []}],
-                "dtype": ["half", "float"],
+                "signature": [{
+                    "prototype_id": "asc_foo__v<dtype>",
+                    "archs": [],
+                    "headers": [],
+                    "dtype": ["half", "float"],
+                }],
                 "dependencies": [],
                 "examples": [],
                 "api_kind": None,
@@ -445,18 +481,119 @@ example: true
             rendered = module.updated_document(
                 body, fields, namespaces, values, root, path, {}, allowed_empty
             )
-            self.assertIn("dtype: [half, float]", rendered)
-            self.assertNotIn("  dtype:", rendered)
+            self.assertIn("    dtype: [half, float]", rendered)
+            self.assertNotIn("\ndtype:", rendered)
             self.assertNotIn("api_signature:", rendered)
             self.assertIn("example: true", rendered)
 
-    def test_validate_signature_rejects_legacy_nested_dtype(self):
+    def test_validate_signature_rejects_non_array_dtype(self):
         module = self._controller_module()
         with self.assertRaises(module.ValidationError):
             module.validate_signature(
                 [{"prototype_id": "asc_foo__v<dtype>", "dtype": {"values": ["half"]}}],
                 "api.md",
             )
+
+    def test_source_dtype_values_stay_with_their_prototype(self):
+        module = self._controller_module()
+        markdown = """## 函数原型
+
+### 返回形式
+
+```c
+__simd_callee__ inline vector_<dtype> asc_mode(vector_<dtype> src)
+```
+
+#### dtype支持数据类型
+
+`dtype`取值为：`half`、`float`。
+
+### 引用形式
+
+```c
+__simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
+```
+
+#### dtype支持数据类型
+
+`dtype`取值为：`int16_t`、`uint16_t`。
+"""
+        self.assertEqual(
+            module.source_signature_dtypes(markdown),
+            {
+                "asc_mode__v<dtype>": ["half", "float"],
+                "asc_mode__Rv<dtype>_v<dtype>": ["int16_t", "uint16_t"],
+            },
+        )
+        normalized = module.normalize_signature_dtypes(
+            [
+                {"prototype_id": "asc_mode__v<dtype>"},
+                {"prototype_id": "asc_mode__Rv<dtype>_v<dtype>"},
+            ],
+            module.source_signature_dtypes(markdown),
+            None,
+        )
+        self.assertEqual(normalized[0]["dtype"], ["half", "float"])
+        self.assertEqual(normalized[1]["dtype"], ["int16_t", "uint16_t"])
+
+    def test_prepare_records_all_default_write_targets(self):
+        module = self._controller_module()
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / "devkit"
+            document = root / "docs/zh/api/SIMD-API/c_api/foo/foo.md"
+            document.parent.mkdir(parents=True)
+            document.write_text("# foo\n", encoding="utf-8")
+            run = Path(temp) / "run"
+            subprocess.run(
+                ["python3", str(CONTROLLER), "prepare", "--devkit-root", str(root),
+                 "--document", "docs/zh/api/SIMD-API/c_api/foo/foo.md", "--run-dir", str(run)],
+                check=True,
+            )
+            manifest = json.loads((run / "manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["write_targets"], list(module.DEFAULT_WRITE_TARGETS))
+
+    def test_base_and_example_fields_follow_the_okf_contract(self):
+        module = self._controller_module()
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            document_path = "docs/zh/api/SIMD-API/c_api/foo/foo.md"
+            document = root / document_path
+            sample = root / "examples/demo/foo.asc"
+            document.parent.mkdir(parents=True)
+            sample.parent.mkdir(parents=True)
+            document.write_text("# foo\n", encoding="utf-8")
+            sample.write_text("asc_foo();\n", encoding="utf-8")
+
+            fields = {
+                "okftype": "reference.api.cpp",
+                "title": "foo",
+                "resource": f"asc-devkit/{document_path}",
+                "description": "说明。",
+                "timestamp": "2026-09-20",
+            }
+            module.validate_base_fields(fields, document_path)
+            self.assertEqual(
+                module.normalize_examples(root, document_path, [{
+                    "path": "/examples/demo",
+                    "file": "foo.asc",
+                    "archs": ["3510"],
+                    "override_id": "asc_foo__u32",
+                }]),
+                [{
+                    "path": "/examples/demo",
+                    "file": "foo.asc",
+                    "archs": ["3510"],
+                    "override_id": "asc_foo__u32",
+                }],
+            )
+            fields["resource"] = "asc-devkit/docs/other.md"
+            with self.assertRaises(module.ValidationError):
+                module.validate_base_fields(fields, document_path)
+            with self.assertRaises(module.ValidationError):
+                module.normalize_examples(root, document_path, [{
+                    "path": "/examples/demo",
+                    "override_id": "asc_foo__v<dtype>",
+                }])
 
     def test_validate_renders_dependencies_after_verifying_evidence(self):
         with tempfile.TemporaryDirectory() as temp:

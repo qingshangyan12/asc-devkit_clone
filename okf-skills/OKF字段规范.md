@@ -15,8 +15,7 @@ YAML front matter 放在 Markdown 文件第一行，以 --- 包围。只使用�
 | resource | string | 是 | 全部 | 从 asc-devkit 开始的仓库相对路径，使用 /。 |
 | description | string | API/架构页必需，索引页可省略 | API/架构页 | 由 description Agent 基于功能说明等正文证据生成的检索摘要，不得引入正文没有的能力。 |
 | tag | object[] | 是 | API/架构页 | 受控检索标签，每项为 namespace 及其标签内容数组。 |
-| signature | object[] | API/架构页可选 | API/架构页 | 调用模式或 overload 组。函数项包含 prototype_id 或 override_id、archs、headers；函数宏项只包含 macro_id。 |
-| dtype | string[] | 正文明确列出时填写 | 函数 API | 文档 `dtype` 占位符支持的数据类型，顶层单行数组。 |
+| signature | object[] | API/架构页可选 | API/架构页 | 调用模式或 overload 组。函数项包含 prototype_id 或 override_id、archs、headers；含 `<dtype>` 的 prototype_id 在同一条目中添加 dtype；函数宏项只包含 macro_id。 |
 | dependencies | object[] | 含明确关联时填写 | 全部 | 有正文依据的关联文档，包含 path、kind，必要时包含 condition。 |
 | examples | object[] | 含示例时填写 | API/架构页 | 样例工程或源码位置和明确的示例架构，包含样例 path，可选 file、archs、override_id。 |
 | api_kind | string | 定义页必需 | `c_api/defs` 实体页 | 定义实体类型：constant、enum、struct、union、type_alias、type_catalog、function_macro 或 macro。 |
@@ -41,9 +40,10 @@ example marker 或函数 Doxygen。
 ## 签名与架构
 
 signature 必须按调用模式拆分，例如 contiguous、strided、scalar、mask、reduce 或 config。
-dtype 只在正文明确给出 `dtype` 占位符的类型列表时写为顶层单行数组，例如 `dtype: [half, float]`；
-不得按参数名嵌入 signature，也不得在函数原型前插入 YAML 代码块。archs 只记录正文、文件名或编译命令明确给出的
-dav-* 架构，不从产品状态推断。
+正文明确给出 `<dtype>` 占位符类型列表时，在对应 signature 条目中以与 `prototype_id` 同级的单行数组写入，
+例如 `dtype: [half, float]`；不得在函数原型前插入 YAML 代码块。不同原型的 dtype 集合必须分别保留，
+不得按整页合并。archs 只记录正文、文件名或编译命令明确给出的 dav-* 架构；产品支持区中机器可读的
+`<!-- npu="..." -->` 支持标记可按既有架构映射使用。不得从其他产品状态文案推断架构。
 
 headers 保存真实声明文件路径，例如 /include/c_api/vector_compute/compute/vector_arith.h。文档给出的
 聚合头只是查找范围；只有在该头或其递归 include 闭包中唯一匹配的声明 header 才能写入 signature。
@@ -125,7 +125,7 @@ archs。override_id 必须与 signature 和 include 中的具体声明一致，�
         archs: ["3510"]
         headers:
           - /include/c_api/reg_compute/compute/reg_arith.h
-    dtype: [half, float]
+        dtype: [half, float]
     dependencies:
       - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md
         kind: requires

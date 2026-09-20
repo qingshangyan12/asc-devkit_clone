@@ -1,3 +1,36 @@
+---
+okftype: reference.api.cpp
+title: asc_div
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_div.md
+description: 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: [arithmetic]
+  - operations: [divide]
+  - objects: [mask, vector]
+  - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
+  - traits: [elementwise, masked]
+signature:
+  - prototype_id: asc_div__Rv<dtype>_v<dtype>_v<dtype>_vb
+    archs: ["3510"]
+    headers: ["/include/c_api/reg_compute/compute/reg_arith.h"]
+    dtype: [int16_t, uint16_t, half, int32_t, uint32_t, float]
+  - prototype_id: asc_div__v<dtype>_v<dtype>_vb
+    archs: ["3510"]
+    headers: ["/include/c_api/reg_compute/compute/reg_arith.h"]
+    dtype: [int16_t, uint16_t, half, int32_t, uint32_t, float]
+dependencies: []
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/div"
+    file: div.asc
+    archs: ["3510"]
+    override_id: asc_div__Rvf32_vf32_vf32_vb
+timestamp: "2026-09-20"
+---
+
 # asc_div
 
 ## 产品支持情况
