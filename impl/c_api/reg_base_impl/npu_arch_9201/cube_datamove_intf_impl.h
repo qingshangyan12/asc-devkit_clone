@@ -397,16 +397,16 @@ __aicore__ inline void asc_copy_l0c2l1(
     }
 }
 
-// void  float (s4)
+// int4b_t  float (s4)
 __aicore__ inline void asc_copy_l0c2l1(
-    __cbuf__ void* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
+    __cbuf__ int4b_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
     bool enable_clip_relu_pre)
 {
     if ASC_IS_AIC {
         copy_matrix_cc_to_cbuf_s4(
-            dst, src, n_size, m_size, dst_stride, src_stride, false,
+            (__cbuf__ void*)dst, src, n_size, m_size, dst_stride, src_stride, false,
             static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode),
             static_cast<QuantMode_t>(static_cast<uint64_t>(quant_pre_mode)),
             static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd,
@@ -416,14 +416,14 @@ __aicore__ inline void asc_copy_l0c2l1(
 }
 
 __aicore__ inline void asc_copy_l0c2l1(
-    __cbuf__ void* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
+    __cbuf__ int4b_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, bool quant_pre_rnd, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
     bool enable_clip_relu_pre)
 {
     if ASC_IS_AIC {
         copy_matrix_cc_to_cbuf_s4(
-            dst, src, n_size, m_size, dst_stride, src_stride, quant_pre_rnd,
+            (__cbuf__ void*)dst, src, n_size, m_size, dst_stride, src_stride, quant_pre_rnd,
             static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode),
             static_cast<QuantMode_t>(static_cast<uint64_t>(quant_pre_mode)),
             static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd,
@@ -432,16 +432,16 @@ __aicore__ inline void asc_copy_l0c2l1(
     }
 }
 
-// void  int32_t (s4)
+// int4b_t  int32_t (s4)
 __aicore__ inline void asc_copy_l0c2l1(
-    __cbuf__ void* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
+    __cbuf__ int4b_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
     bool enable_clip_relu_pre)
 {
     if ASC_IS_AIC {
         copy_matrix_cc_to_cbuf_s4(
-            dst, src, n_size, m_size, dst_stride, src_stride, false,
+            (__cbuf__ void*)dst, src, n_size, m_size, dst_stride, src_stride, false,
             static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode),
             static_cast<QuantMode_t>(static_cast<uint64_t>(quant_pre_mode)),
             static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd,
@@ -451,14 +451,14 @@ __aicore__ inline void asc_copy_l0c2l1(
 }
 
 __aicore__ inline void asc_copy_l0c2l1(
-    __cbuf__ void* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
+    __cbuf__ int4b_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, bool quant_pre_rnd, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
     bool enable_clip_relu_pre)
 {
     if ASC_IS_AIC {
         copy_matrix_cc_to_cbuf_s4(
-            dst, src, n_size, m_size, dst_stride, src_stride, quant_pre_rnd,
+            (__cbuf__ void*)dst, src, n_size, m_size, dst_stride, src_stride, quant_pre_rnd,
             static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode),
             static_cast<QuantMode_t>(static_cast<uint64_t>(quant_pre_mode)),
             static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd,
