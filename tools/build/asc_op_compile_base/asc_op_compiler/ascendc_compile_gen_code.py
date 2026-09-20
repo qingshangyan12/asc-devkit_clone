@@ -146,11 +146,8 @@ def gen_global_isolation_macro(compile_info: CompileInfo, tiling_info: TilingInf
 
 
 def get_code_for_l2_cache(compile_info: CompileInfo, source, tiling_info: TilingInfo):
-    source += gen_global_isolation_macro(compile_info, tiling_info)
-    source += f"    __gm__ struct OpSystemRunCfg g_opSystemRunCfg = {{{0}}};\n"
-    source += "#else\n"
-    source += "    extern __gm__ struct OpSystemRunCfg g_opSystemRunCfg;\n"
-    source += "#endif\n\n"
+    source += f"    static inline __gm__ struct OpSystemRunCfg g_opSystemRunCfg = {{{0}}};\n"
+    source += "\n"
     return source
 
 
