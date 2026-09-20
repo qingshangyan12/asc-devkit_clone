@@ -1269,7 +1269,7 @@ __simd_callee__ inline void DivIEEE754HalfImpl(
     constexpr uint16_t F16_INF = 0x7C00;
 
     HalfUnion subnormalThreshold;
-    subnormalThreshold.i = 0x03FF;
+    subnormalThreshold.i = 0x0400;
 
     HalfUnion nan;
     nan.i = 0x7E00;

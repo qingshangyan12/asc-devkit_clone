@@ -28,41 +28,51 @@
 
 头文件路径为：`"c_api/reg_compute/compute/reg_permute_sel.h"`。
 
-将源操作数中每个元素的低半部分比特压缩后，依次写入目的操作数的高半部分，目的操作数的低半部分置0。对于b16源操作数，选取每个元素的低8位；对于b32源操作数，选取每个元素的低16位。对于掩码寄存器，选取源操作数中偶数索引的比特，依次写入目的操作数的高半部分。
+将源操作数中的元素选取低8位（b16）、低16位（b32）写入目的操作数的高半部分。
+当源操作数为vector_bool时，其按bit位进行压缩，每2bit将其中的低位bit存储至目的操作数的高半部分。
 
-支持通过引用参数或函数返回值输出结果。与[asc_pack_to_low](asc_pack_to_low.md)的区别是，本接口将压缩结果写入目的操作数的高半部分。
-
-**图1** asc_pack_to_high压缩过程
-
-![asc_pack_to_high压缩过程](../../../../figures/pack_high_draft.png)
+![](../../../../figures/pack_high_draft.png)
 
 本接口为Reg矢量计算接口，仅在AIV上生效。
 
 ## 函数原型
 
-```cpp
+```c
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_pack_to_high(vector_<dtype_dst>& dst,
                                              vector_<dtype_src> src)
 
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype_dst> asc_pack_to_high(vector_<dtype_src> src)
+
+// 操作数为掩码寄存器
+__simd_callee__ inline void asc_pack_to_high(vector_bool& dst,
+                                             vector_bool src)
+
+// 操作数为掩码寄存器，通过函数返回值返回结果
+__simd_callee__ inline vector_bool asc_pack_to_high(vector_bool src)
 ```
 
-**占位符说明如下：**
+### dtype支持数据类型
 
-- `<dtype_src>`取值为：`bool`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`。
-- `<dtype_dst>`由`<dtype_src>`确定：`bool`对应`bool`，`int16_t`和`uint16_t`对应`uint8_t`，`int32_t`和`uint32_t`对应`uint16_t`。
+dtype_src与dtype_dst支持的数据类型对如下：
+
+| dtype_src | dtype_dst |
+|---|---|
+| uint16_t | uint8_t |
+| int16_t | uint8_t |
+| uint32_t | uint16_t |
+| int32_t | uint16_t |
 
 ### 函数原型典型示例
 
-```cpp
-// 通过引用参数输出结果
-__simd_callee__ inline void asc_pack_to_high(vector_uint16_t& dst,
-                                             vector_uint32_t src)
+```c
+// 示例：将uint16_t矢量数据寄存器压缩为uint8_t。
+__simd_callee__ inline void asc_pack_to_high(vector_uint8_t& dst,
+                                             vector_uint16_t src)
 
-// 通过函数返回值返回结果
-__simd_callee__ inline vector_uint16_t asc_pack_to_high(vector_uint32_t src)
+// 示例：将uint16_t矢量数据寄存器压缩为uint8_t，通过函数返回值返回结果。
+__simd_callee__ inline vector_uint8_t asc_pack_to_high(vector_uint16_t src)
 ```
 
 ## 参数说明
@@ -70,41 +80,146 @@ __simd_callee__ inline vector_uint16_t asc_pack_to_high(vector_uint32_t src)
 **表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
-| --- | --- | --- |
-| dst | 输出 | 目的操作数，类型为矢量数据寄存器或掩码寄存器，仅通过引用参数输出结果的函数原型包含该参数。高半部分保存压缩结果，低半部分置0。数据类型需要与src满足函数原型中规定的对应关系。 |
-| src | 输入 | 源操作数，类型为矢量数据寄存器或掩码寄存器。对于矢量数据寄存器，提取每个元素的低半部分比特；对于掩码寄存器，提取偶数索引的比特。 |
+| --------- | ----- | ---------------- |
+| dst | 输出 | 目的操作数（矢量数据寄存器/掩码寄存器）。 |
+| src | 输入 | 源操作数（矢量数据寄存器/掩码寄存器）。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
 
 ## 返回值说明
 
 - 通过引用参数输出结果的函数原型无返回值，压缩结果写入`dst`。
-- 通过函数返回值输出结果的函数原型返回保存压缩结果的矢量数据寄存器或掩码寄存器，类型为与`dtype_dst`对应的`vector_<dtype_dst>`。
-
-## 流水类型
-
-PIPE_V
+- 通过函数返回值返回结果的函数原型返回压缩结果，类型为矢量数据寄存器或掩码寄存器，与`dst`的数据类型一致。
 
 ## 约束说明
 
-- 通过引用参数输出结果的函数原型在非AIV上调用时直接返回。
-- 通过函数返回值输出结果的函数原型在非AIV上调用时返回对应矢量类型的默认构造值。
-- 本接口只能在使用`__simd_vf__`标记的Vector Function内调用，不支持在`__aicore__`函数中直接调用。
-- 对矢量数据寄存器进行压缩时，仅保留每个源元素的低半部分比特，源元素的高半部分比特被丢弃，不进行饱和处理。
-- 同一寄存器的数据依赖由硬件保序，无需额外插入同步指令。本接口与前后Reg数据搬运接口之间，如果不同寄存器访问同一UB地址且存在写后读或写后写依赖，需要调用[asc_mem_bar](../reg_sync/asc_mem_bar.md)进行同步。
+- Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
+- 源操作数和目的操作数为矢量数据寄存器或掩码寄存器。
 
 ## 调用示例
 
-以下示例从`vector_uint32_t`源操作数的每个元素中提取低16位，并通过函数返回值将结果写入`vector_uint16_t`目的操作数的高半部分。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
+
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
+```
+<!-- end id8 -->
 
 ```cpp
-__simd_vf__ inline void pack_to_high(__ubuf__ uint16_t* dst, __ubuf__ uint32_t* src)
-{
-    vector_uint32_t src_reg;
-    asc_loadalign(src_reg, src);
-    vector_uint16_t dst_reg = asc_pack_to_high(src_reg);
+#include <cstdint>
+#include <iostream>
+#include <vector>
 
-    vector_bool mask = asc_create_mask_b16(PAT_ALL);
-    asc_storealign(dst, dst_reg, mask);
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+template <typename T>
+void PrintData(const char* label, const std::vector<T>& values)
+{
+    std::cout << label << ":";
+    const size_t count = values.size() < 8 ? values.size() : 8;
+    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
+    if (values.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+
+template <typename T>
+bool CompareRangeData(const std::vector<T>& actual, const std::vector<T>& expected,
+    size_t begin, size_t count, double tolerance = 0.0)
+{
+    if (begin + count > actual.size() || begin + count > expected.size()) return false;
+    for (size_t i = begin; i < begin + count; ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
+    }
+    return true;
+}
+
+constexpr uint32_t SRC_COUNT = 128;
+constexpr uint32_t DST_COUNT = 256;
+
+__simd_vf__ inline void Pack(__ubuf__ uint8_t* low, __ubuf__ uint8_t* high, __ubuf__ uint16_t* src)
+{
+    vector_uint8_t low_reg;
+    vector_uint8_t high_reg;
+    vector_uint16_t src_reg;
+    uint32_t count = DST_COUNT;
+    vector_bool dst_mask = asc_update_mask_b8(count);
+    asc_loadalign(src_reg, src);
+    asc_duplicate_scalar(low_reg, static_cast<uint8_t>(0), dst_mask);
+    asc_duplicate_scalar(high_reg, static_cast<uint8_t>(0), dst_mask);
+    
+    asc_pack_to_high(high_reg, src_reg);
+    
+    asc_storealign(high, high_reg, dst_mask);
+}
+
+__global__ __vector__ void AscPackToHighKernel(__gm__ uint8_t* low, __gm__ uint8_t* high, __gm__ uint16_t* src)
+{
+    asc_init();
+    __ubuf__ uint8_t low_local[DST_COUNT];
+    __ubuf__ uint8_t high_local[DST_COUNT];
+    __ubuf__ uint16_t src_local[SRC_COUNT];
+    asc_copy_gm2ub_align(src_local, src, SRC_COUNT * sizeof(uint16_t));
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    Pack(low_local, high_local, src_local);
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_copy_ub2gm_align(low, low_local, DST_COUNT);
+    asc_copy_ub2gm_align(high, high_local, DST_COUNT);
+    asc_sync();
+}
+} // namespace
+
+int main()
+{
+    std::vector<uint16_t> src(SRC_COUNT);
+    std::vector<uint8_t> low(DST_COUNT, 0);
+    std::vector<uint8_t> high(DST_COUNT, 0);
+    std::vector<uint8_t> golden_low(DST_COUNT, 0);
+    std::vector<uint8_t> golden_high(DST_COUNT, 0);
+    for (uint32_t i = 0; i < SRC_COUNT; ++i) {
+        src[i] = static_cast<uint16_t>(0x1200U + i);
+        
+        golden_high[SRC_COUNT + i] = static_cast<uint8_t>(src[i]);
+    }
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    uint16_t* src_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&src_device), (SRC_COUNT) * sizeof(uint16_t),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    uint8_t* low_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&low_device), (DST_COUNT) * sizeof(uint8_t),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    uint8_t* high_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&high_device), (DST_COUNT) * sizeof(uint8_t),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(src_device, src.size() * sizeof(uint16_t), src.data(), src.size() * sizeof(uint16_t),
+        ACL_MEMCPY_HOST_TO_DEVICE);
+    AscPackToHighKernel<<<1, 0>>>(low_device, high_device, src_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(low.data(), low.size() * sizeof(uint8_t), low_device, low.size() * sizeof(uint8_t),
+        ACL_MEMCPY_DEVICE_TO_HOST);
+    aclrtMemcpy(high.data(), high.size() * sizeof(uint8_t), high_device, high.size() * sizeof(uint8_t),
+        ACL_MEMCPY_DEVICE_TO_HOST);
+    PrintData("Input", src);
+    PrintData("Low output", low);
+    PrintData("Low Golden", golden_low);
+    PrintData("High output", high);
+    PrintData("High Golden", golden_high);
+    const bool passed = CompareRangeData(high, golden_high, SRC_COUNT, SRC_COUNT);
+    std::cout << (passed ? "[Success] asc_pack_to_high passed." : "[Failed] asc_pack_to_high failed.") << std::endl;
+    aclrtFree(high_device);
+    aclrtFree(low_device);
+    aclrtFree(src_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
 }
 ```
