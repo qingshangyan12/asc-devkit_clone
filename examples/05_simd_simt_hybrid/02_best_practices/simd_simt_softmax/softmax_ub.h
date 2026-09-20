@@ -21,9 +21,8 @@
 
 namespace softmax_ub_impl {
 
-constexpr uint32_t WARP_SIZE = 32;
 constexpr uint32_t THREADS_PER_BLOCK = 2048;
-constexpr uint32_t MAX_WARPS_PER_BLOCK = THREADS_PER_BLOCK / WARP_SIZE;
+constexpr uint32_t MAX_WARPS_PER_BLOCK = THREADS_PER_BLOCK / 32; // Warp内32个线程，设备侧内置变量为warpSize
 constexpr uint32_t DOUBLE_BUFFER = 2;
 constexpr uint32_t UB_TILE_BUFFER_COUNT = DOUBLE_BUFFER * 2;
 constexpr uint32_t BLOCK_SIZE_BYTES = 32;
@@ -88,22 +87,22 @@ __simt_vf__ __launch_bounds__(THREADS_PER_BLOCK) inline void softmax_ub_vf(
 
     const uint32_t row_offset = row * ub_stride;
     float max_value = -ASCRT_INF_F;
-    for (uint32_t col = thread_in_warp; col < cols; col += WARP_SIZE) {
+    for (uint32_t col = thread_in_warp; col < cols; col += warpSize) {
         const float value = static_cast<float>(input_ub[row_offset + col]);
         max_value = max_value > value ? max_value : value;
     }
     max_value = asc_reduce_max(max_value);
 
     float sum_value = 0.0F;
-    for (uint32_t col = thread_in_warp; col < cols; col += WARP_SIZE) {
+    for (uint32_t col = thread_in_warp; col < cols; col += warpSize) {
         const float value = static_cast<float>(input_ub[row_offset + col]);
-        sum_value += __expf(value - max_value);
+        sum_value += expf(value - max_value);
     }
     sum_value = asc_reduce_add(sum_value);
 
-    for (uint32_t col = thread_in_warp; col < cols; col += WARP_SIZE) {
+    for (uint32_t col = thread_in_warp; col < cols; col += warpSize) {
         const float value = static_cast<float>(input_ub[row_offset + col]);
-        output_ub[row_offset + col] = static_cast<half>(__expf(value - max_value) / sum_value);
+        output_ub[row_offset + col] = static_cast<half>(expf(value - max_value) / sum_value);
     }
 }
 
@@ -146,7 +145,6 @@ __global__ __vector__ void softmax_ub_kernel(
         return;
     }
 
-    const uint32_t tile_count = ceil_div(rows - first_row_base, tile_stride);
     const uint32_t row_bytes = cols * sizeof(uint16_t);
     const uint32_t padded_row_bytes = ub_stride * sizeof(uint16_t);
 
@@ -163,20 +161,20 @@ __global__ __vector__ void softmax_ub_kernel(
         asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, row_bytes, padded_row_bytes);
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
 
-    for (uint32_t tile_idx = 0; tile_idx < tile_count; ++tile_idx) {
+    uint32_t tile_idx = 0;
+    for (uint32_t row_base = first_row_base; row_base < rows; row_base += tile_stride) {
         const uint32_t slot = tile_idx & 1;
         const event_t event_id = slot == 0 ? EVENT_ID0 : EVENT_ID1;
-        const uint32_t row_base = first_row_base + tile_idx * tile_stride;
         const uint32_t rows_remaining = rows - row_base;
         const uint32_t rows_in_tile = rows_remaining < rows_per_tile ? rows_remaining : rows_per_tile;
         __ubuf__ half* input_tile_ub = slot == 0 ? input_tile_ub0 : input_tile_ub1;
         __ubuf__ half* output_tile_ub = slot == 0 ? output_tile_ub0 : output_tile_ub1;
 
         asc_sync_wait(PIPE_MTE2, PIPE_V, event_id);
-        if (tile_idx + 1 < tile_count) {
+        const uint32_t next_row_base = row_base + tile_stride;
+        if (next_row_base < rows) {
             const uint32_t next_slot = slot ^ 1;
             const event_t next_event_id = next_slot == 0 ? EVENT_ID0 : EVENT_ID1;
-            const uint32_t next_row_base = row_base + tile_stride;
             const uint32_t next_rows_remaining = rows - next_row_base;
             const uint32_t next_rows_in_tile =
                 next_rows_remaining < rows_per_tile ? next_rows_remaining : rows_per_tile;
@@ -191,7 +189,7 @@ __global__ __vector__ void softmax_ub_kernel(
 
         asc_sync_wait(PIPE_MTE3, PIPE_V, event_id);
         asc_vf_call<softmax_ub_vf>(
-            dim3(WARP_SIZE, rows_in_tile), output_tile_ub, input_tile_ub, rows_in_tile, cols, ub_stride);
+            dim3(warpSize, rows_in_tile), output_tile_ub, input_tile_ub, rows_in_tile, cols, ub_stride);
         asc_sync_notify(PIPE_V, PIPE_MTE2, event_id);
 
         asc_sync_notify(PIPE_V, PIPE_MTE3, event_id);
@@ -199,6 +197,7 @@ __global__ __vector__ void softmax_ub_kernel(
         asc_copy_ub2gm_align(output + row_base * cols, output_tile_ub, static_cast<uint16_t>(rows_in_tile),
             row_bytes, asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, row_bytes, padded_row_bytes);
         asc_sync_notify(PIPE_MTE3, PIPE_V, event_id);
+        ++tile_idx;
     }
 
     asc_sync_wait(PIPE_V, PIPE_MTE2, EVENT_ID0);
