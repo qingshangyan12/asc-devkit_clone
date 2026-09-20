@@ -79,4 +79,4 @@ TEST_SHIFTRIGHT_UNSIGNED_RETURN_INSTR(vector_int8_t, vector_uint8_t);
 TEST_SHIFTRIGHT_UNSIGNED_RETURN_INSTR(vector_uint16_t, vector_uint16_t);
 TEST_SHIFTRIGHT_UNSIGNED_RETURN_INSTR(vector_int16_t, vector_uint16_t);
 TEST_SHIFTRIGHT_UNSIGNED_RETURN_INSTR(vector_uint32_t, vector_uint32_t);
-TEST_SHIFTRIGHT_UNSIGNED_RETURN_INSTR(vector_int32_t, vector_int32_t);
+TEST_SHIFTRIGHT_UNSIGNED_RETURN_INSTR(vector_int32_t, vector_uint32_t);

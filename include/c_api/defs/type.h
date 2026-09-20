@@ -37,8 +37,11 @@ using vector_bfloat16_t = vector_bf16;
 using vector_hifloat8_t = vector_hif8;
 using vector_fp8_e4m3fn_t = vector_f8e4m3;
 using vector_fp8_e5m2_t = vector_f8e5m2;
+using vector_fp8_e6m2_t = vector_f8e6m2;
 using vector_fp8_e8m0_t = vector_f8e8m0;
 using vector_int4x2_t = vector_s4x2;
+using vector_uint4x2_t = vector_s4x2;
+using vector_hifloat4x2_t = vector_hif4x2;
 using vector_fp4x2_e2m1_t = vector_f4e2m1x2;
 using vector_fp4x2_e1m2_t = vector_f4e1m2x2;
 
