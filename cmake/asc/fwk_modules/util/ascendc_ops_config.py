@@ -178,7 +178,7 @@ def add_op_config(op_file, bin_info, config):
     op_cfg.get("binList").append(bin_info)
 
 
-def gen_ops_config(json_file, soc, binary_info_config, config):
+def _get_core_type_map():
     core_type_map = {
         "MIX": 0,
         "AiCore": 1,
@@ -187,6 +187,28 @@ def gen_ops_config(json_file, soc, binary_info_config, config):
         "MIX_VECTOR_CORE": 4,
         "MIX_AIV": 4,
     }
+    return core_type_map
+
+
+def _add_bin_info_modes(bin_info, support_info):
+    add_dict_key(bin_info, "dynamicParamMode", support_info.get("dynamicParamMode"))
+    bin_info["staticKey"] = support_info.get("staticKey")
+    bin_info["inputs"] = support_info.get("inputs")
+    bin_info["outputs"] = support_info.get("outputs")
+    if support_info.get("attrs"):
+        bin_info["attrs"] = support_info.get("attrs")
+
+    add_dict_key(bin_info, "opMode", support_info.get("opMode"))
+    add_dict_key(bin_info, "optionalInputMode", support_info.get("optionalInputMode"))
+    add_dict_key(bin_info, "deterministic", support_info.get("deterministic"))
+    if support_info.get("optionalOutputMode") is not None:
+        add_dict_key(
+            bin_info, "optionalOutputMode", support_info.get("optionalOutputMode")
+        )
+
+
+def gen_ops_config(json_file, soc, binary_info_config, config):
+    core_type_map = _get_core_type_map()
     contents = load_json(json_file)
     if ("binFileName" not in contents) or ("supportInfo" not in contents):
         return
@@ -224,20 +246,7 @@ def gen_ops_config(json_file, soc, binary_info_config, config):
         )
         add_simplified_config(op_info, binary_info_config, config)
 
-    add_dict_key(bin_info, "dynamicParamMode", support_info.get("dynamicParamMode"))
-    bin_info["staticKey"] = support_info.get("staticKey")
-    bin_info["inputs"] = support_info.get("inputs")
-    bin_info["outputs"] = support_info.get("outputs")
-    if support_info.get("attrs"):
-        bin_info["attrs"] = support_info.get("attrs")
-
-    add_dict_key(bin_info, "opMode", support_info.get("opMode"))
-    add_dict_key(bin_info, "optionalInputMode", support_info.get("optionalInputMode"))
-    add_dict_key(bin_info, "deterministic", support_info.get("deterministic"))
-    if support_info.get("optionalOutputMode") is not None:
-        add_dict_key(
-            bin_info, "optionalOutputMode", support_info.get("optionalOutputMode")
-        )
+    _add_bin_info_modes(bin_info, support_info)
 
     bin_info["binInfo"] = {"jsonFilePath": os.path.join(soc, op_dir, json_base_name)}
     add_op_config(op_file, bin_info, config)

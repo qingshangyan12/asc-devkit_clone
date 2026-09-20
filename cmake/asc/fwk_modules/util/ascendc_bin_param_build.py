@@ -177,6 +177,10 @@ class BinParamBuilder(opdesc_parser.OpDesc):
                     )
 
     def rm_cprs_cmb(self: any, dtype_list, format_list, input_size, output_size):
+        self._rm_cprs_cmb_inputs(dtype_list, format_list, input_size)
+        self._rm_cprs_cmb_outputs(dtype_list, format_list, input_size, output_size)
+
+    def _rm_cprs_cmb_inputs(self: any, dtype_list, format_list, input_size):
         for i in range(0, input_size):
             self.input_dtype_for_bin_list[i] = [
                 element
@@ -206,6 +210,10 @@ class BinParamBuilder(opdesc_parser.OpDesc):
             for fmt in new_format_list:
                 new_format_str += f"{fmt},"
             self.input_fmt[i] = new_format_str[:-1]
+
+    def _rm_cprs_cmb_outputs(
+        self: any, dtype_list, format_list, input_size, output_size
+    ):
         for i in range(0, output_size):
             self.output_dtype_for_bin_list[i] = [
                 element
@@ -528,6 +536,22 @@ grep -q "None of the given tiling keys are in the supported list"; then\n'
                 --output=$2 --impl_mode={impl} --op_mode=dynamic "
         )
 
+        build_cmd_var, enable_tiling_keys = self._gen_build_cmd_var(
+            bin_file, auto_gen_path, super_mode, hard_soc, bin_cmd_str, param_file
+        )
+
+        check_result = self._generate_check_result(enable_tiling_keys, bin_file)
+        build_cmd_var += check_result
+        build_cmd_var += f'echo "[{self.soc}] Generating {bin_file} Done"\n'
+
+        with os.fdopen(
+            os.open(compile_file, const_var.WFLAGS, const_var.WMODES), "w"
+        ) as fd:
+            fd.write(build_cmd_var)
+
+    def _gen_build_cmd_var(
+        self, bin_file, auto_gen_path, super_mode, hard_soc, bin_cmd_str, param_file
+    ):
         build_cmd_var = "#!/bin/bash\n"
         build_cmd_var += f'echo "[{self.soc}] Generating {bin_file} ..."\n'
         plog_level = os.environ.get("ASCEND_GLOBAL_LOG_LEVEL")
@@ -570,15 +594,7 @@ grep -q "None of the given tiling keys are in the supported list"; then\n'
 
         build_cmd_var += ")\n"
         build_cmd_var += "\n"
-
-        check_result = self._generate_check_result(enable_tiling_keys, bin_file)
-        build_cmd_var += check_result
-        build_cmd_var += f'echo "[{self.soc}] Generating {bin_file} Done"\n'
-
-        with os.fdopen(
-            os.open(compile_file, const_var.WFLAGS, const_var.WMODES), "w"
-        ) as fd:
-            fd.write(build_cmd_var)
+        return build_cmd_var, enable_tiling_keys
 
 
 def get_tiling_keys(tiling_keys: str) -> Set:

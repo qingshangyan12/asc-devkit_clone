@@ -46,9 +46,17 @@ def generate_pointer_directly_assess_data(
 
 """
     else:  # static tiling
-        # tiling define by micro
-        if is_micro:
-            code += f"""
+        code += _gen_static_tiling_ptr_macros(
+            is_micro, is_need_const, tiling_assign_str
+        )
+    return code
+
+
+def _gen_static_tiling_ptr_macros(is_micro, is_need_const, tiling_assign_str):
+    code = ""
+    # tiling define by micro
+    if is_micro:
+        code += f"""
 #define __tiling_data_ptr__ {is_need_const}
 
 #define GET_TILING_DATA_PTR_WITH_STRUCT(tiling_struct, dst_ptr, tiling_ptr)                                                     \
@@ -70,8 +78,8 @@ def generate_pointer_directly_assess_data(
 
 """
 
-        else:
-            code += f"""
+    else:
+        code += f"""
 #define __tiling_data_ptr__ {is_need_const}
 
 #define GET_TILING_DATA_PTR_WITH_STRUCT(tiling_struct, dst_ptr, tiling_ptr)                                                     \

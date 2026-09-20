@@ -56,6 +56,20 @@ def generate_host_stub_head_code(has_mix: bool, has_aic: bool, has_aiv: bool) ->
     ascend_kernel_struct = []
 
     buff = io.StringIO()
+    type_nums = _write_stub_includes_and_handles(
+        buff, has_mix, has_aic, has_aiv, type_nums
+    )
+    _write_stub_kernel_struct(
+        buff, has_mix, has_aic, has_aiv, type_nums, ascend_kernel_struct
+    )
+    _write_stub_extern_decls(buff, ascend_kernel_struct)
+    _write_stub_unregister_class(buff, has_mix, has_aic, has_aiv)
+    _write_stub_register_kernels(buff, has_mix, has_aic, has_aiv)
+
+    return buff.getvalue()
+
+
+def _write_stub_includes_and_handles(buff, has_mix, has_aic, has_aiv, type_nums):
     buff.write(r"""#include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -90,6 +104,12 @@ def generate_host_stub_head_code(has_mix: bool, has_aic: bool, has_aiv: bool) ->
 """)
         buff.write("\n")
 
+    return type_nums
+
+
+def _write_stub_kernel_struct(
+    buff, has_mix, has_aic, has_aiv, type_nums, ascend_kernel_struct
+):
     buff.write(r"""struct ascend_kernels {
     uint32_t version;
     uint32_t type_cnt;
@@ -134,6 +154,8 @@ def generate_host_stub_head_code(has_mix: bool, has_aic: bool, has_aiv: bool) ->
         ascend_kernel_struct.append("__replaced_aic_file_len")
         ascend_kernel_struct.append(r"{0}")
 
+
+def _write_stub_extern_decls(buff, ascend_kernel_struct):
     buff.write(
         '} __replaced_ascend_kernel __attribute__ ((section ("__replaced_ascend_section"))) = {'
     )
@@ -169,6 +191,8 @@ uint32_t LaunchAscendKernelForVectorCore(const char *opType, void *handle, const
 }
 """)
 
+
+def _write_stub_unregister_class(buff, has_mix, has_aic, has_aiv):
     buff.write("""
     class KernelHandleGradUnregister {
     private:
@@ -210,6 +234,8 @@ uint32_t LaunchAscendKernelForVectorCore(const char *opType, void *handle, const
 """)
     buff.write("\n")
 
+
+def _write_stub_register_kernels(buff, has_mix, has_aic, has_aiv):
     buff.write(r"""static void __register_kernels(void) __attribute__((constructor));
 void __register_kernels(void)
 {
@@ -263,5 +289,3 @@ void __register_kernels(void)
     buff.write("""    AscendProfRegister();
 }
 """)
-
-    return buff.getvalue()

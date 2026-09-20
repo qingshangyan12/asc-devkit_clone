@@ -459,17 +459,7 @@ def get_bytes_by_type(dtype):
         raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, (msg))
 
 
-def _decode_tiling_data(tiling_def, run_info_tiling_data, struct_tiling_def_base):
-    """decode tiling data by tiling field info and run_info_tiling_data
-
-    Args:
-        tiling_def: record tiling field info
-        run_info_tiling_data: src binary of tiling data
-        struct_tiling_def_base: used to decode struct tiling data
-    Return:
-        run_info_tiling_data: dict(name, type) such as {var0 : val0, var0:val1}
-        offset: point to the end location of binary_tiling_data
-    """
+def _get_tiling_cc2py_mapping():
     tiling_cc2py_mapping = {
         "int": "int",
         "int32_t": "int",
@@ -485,6 +475,21 @@ def _decode_tiling_data(tiling_def, run_info_tiling_data, struct_tiling_def_base
         "struct": "struct",
         "bool": "bool",
     }
+    return tiling_cc2py_mapping
+
+
+def _decode_tiling_data(tiling_def, run_info_tiling_data, struct_tiling_def_base):
+    """decode tiling data by tiling field info and run_info_tiling_data
+
+    Args:
+        tiling_def: record tiling field info
+        run_info_tiling_data: src binary of tiling data
+        struct_tiling_def_base: used to decode struct tiling data
+    Return:
+        run_info_tiling_data: dict(name, type) such as {var0 : val0, var0:val1}
+        offset: point to the end location of binary_tiling_data
+    """
+    tiling_cc2py_mapping = _get_tiling_cc2py_mapping()
     tiling_format = {}
     struct_binary_info_list = []
     struct_list = []
@@ -610,22 +615,13 @@ def is_struct_have_arr(struct_tiling_def, has_arr, struct_tiling_def_base):
     return has_arr
 
 
-def gen_all_dynamic_struct_def_except_self(
-    is_optype_self, tiling_key, tiling_key_list, optype, tiling_key_group_map
+def _collect_tiling_def_of_each_key(
+    tiling_def_list_of_key,
+    struct_tiling_def_base,
+    tiling_key_list,
+    optype,
+    tiling_key_group_map,
 ):
-    tiling_def_list_of_key = []
-    struct_tiling_def_base = {}
-
-    optype_tiling_def = get_tiling_def(optype)
-    if optype_tiling_def is None:
-        LogUtil.print_compile_log(
-            optype, "do not registe tiling struct!!!", AscendCLogLevel.LOG_ERROR
-        )
-        return ""
-    struct_tiling_def_base = get_struct_tiling_info(
-        optype_tiling_def, struct_tiling_def_base
-    )
-
     for one_tiling_key in tiling_key_list:
         optype_with_tilingkey = optype + "_" + one_tiling_key
         tiling_def = get_tiling_def(optype_with_tilingkey)
@@ -648,6 +644,32 @@ def gen_all_dynamic_struct_def_except_self(
             tiling_def_slave = copy.deepcopy(tiling_def)
             tiling_def_slave.tiling_key = tiling_key_slave
             tiling_def_list_of_key.append(tiling_def_slave)
+    return tiling_def_list_of_key, struct_tiling_def_base
+
+
+def gen_all_dynamic_struct_def_except_self(
+    is_optype_self, tiling_key, tiling_key_list, optype, tiling_key_group_map
+):
+    tiling_def_list_of_key = []
+    struct_tiling_def_base = {}
+
+    optype_tiling_def = get_tiling_def(optype)
+    if optype_tiling_def is None:
+        LogUtil.print_compile_log(
+            optype, "do not registe tiling struct!!!", AscendCLogLevel.LOG_ERROR
+        )
+        return ""
+    struct_tiling_def_base = get_struct_tiling_info(
+        optype_tiling_def, struct_tiling_def_base
+    )
+
+    tiling_def_list_of_key, struct_tiling_def_base = _collect_tiling_def_of_each_key(
+        tiling_def_list_of_key,
+        struct_tiling_def_base,
+        tiling_key_list,
+        optype,
+        tiling_key_group_map,
+    )
 
     optype_tiling_def.class_def = get_dynamic_tiling_struct(
         optype_tiling_def, struct_tiling_def_base
@@ -800,19 +822,9 @@ def gen_micro_assign_value_of_tiling_force_constexpr(tiling_struct: str):
     return class_body
 
 
-def gen_static_struct_body_v1_force_constexpr(
-    class_name, field_list, tiling_raw_data, struct_tiling_def_base
+def _gen_static_aux_class_body(
+    class_body, class_name, field_list, struct_tiling_def_base
 ):
-    tiling_size = len(tiling_raw_data)
-    tiling_format = {"tiling": [tiling_size, "uint8"]}
-
-    # decode tiling data without struct
-    tiling_data, _ = decode(tiling_raw_data, tiling_format)
-    tiling_arr_data = tiling_data["tiling"]
-    tiling_arr_data_str = ", ".join(f"{x}" for x in tiling_arr_data)
-
-    class_body = f"static constexpr uint8_t __ascendc_arr_tiling_data[{tiling_size}] = {{{tiling_arr_data_str}}};\n"
-
     class_body += f"class {class_name}Aux\n"
     class_body += "{\n"
     class_body += "public:\n"
@@ -838,13 +850,12 @@ def gen_static_struct_body_v1_force_constexpr(
                 class_body += f"{_TILING_NAMESPACE}::"
             class_body += f"{field.struct_type} {field.name};\n"
     class_body += "};\n\n"
+    return class_body, has_arr_aux, need_std_array
 
-    class_body += (
-        f"static constexpr {class_name}Aux __ascendc_tiling_aux = "
-        f"convert_from_bytes<{class_name}Aux>(__ascendc_arr_tiling_data);\n"
-    )
 
-    # the only one top-level struct of static-shape one itself
+def _gen_static_main_class_body(
+    class_body, class_name, field_list, struct_tiling_def_base
+):
     class_body += f"class {class_name}\n"
     class_body += "{\n"
     class_body += "public:\n"
@@ -869,6 +880,35 @@ def gen_static_struct_body_v1_force_constexpr(
             if struct_tiling_def_base[field.struct_type].is_api:
                 class_body += f"{_TILING_NAMESPACE}::"
             class_body += f"{field.struct_type} {field.name} = __ascendc_tiling_aux.{field.name};\n"
+    return class_body, has_arr
+
+
+def gen_static_struct_body_v1_force_constexpr(
+    class_name, field_list, tiling_raw_data, struct_tiling_def_base
+):
+    tiling_size = len(tiling_raw_data)
+    tiling_format = {"tiling": [tiling_size, "uint8"]}
+
+    # decode tiling data without struct
+    tiling_data, _ = decode(tiling_raw_data, tiling_format)
+    tiling_arr_data = tiling_data["tiling"]
+    tiling_arr_data_str = ", ".join(f"{x}" for x in tiling_arr_data)
+
+    class_body = f"static constexpr uint8_t __ascendc_arr_tiling_data[{tiling_size}] = {{{tiling_arr_data_str}}};\n"
+
+    class_body, has_arr_aux, need_std_array = _gen_static_aux_class_body(
+        class_body, class_name, field_list, struct_tiling_def_base
+    )
+
+    class_body += (
+        f"static constexpr {class_name}Aux __ascendc_tiling_aux = "
+        f"convert_from_bytes<{class_name}Aux>(__ascendc_arr_tiling_data);\n"
+    )
+
+    # the only one top-level struct of static-shape one itself
+    class_body, has_arr = _gen_static_main_class_body(
+        class_body, class_name, field_list, struct_tiling_def_base
+    )
 
     class_body += "};\n\n"
     body = gen_micro_assign_value_of_tiling_force_constexpr(class_name)
@@ -1472,6 +1512,18 @@ def get_tiling_data_func_head():
 def get_tiling_data_func():
     class_body = "{\n"
     class_body += "    constexpr uint64_t all_bytes = sizeof(T);\n"
+    class_body += _gen_tiling_copy_cube_or_cpu()
+    class_body += _gen_tiling_copy_gm_to_ub()
+    class_body += _gen_tiling_copy_ub_to_data()
+    class_body += "#ifndef ASCENDC_CPU_DEBUG\n"
+    class_body += "    pipe_barrier(PIPE_ALL);\n"
+    class_body += "#endif\n"
+    class_body += "}\n\n"
+    return class_body
+
+
+def _gen_tiling_copy_cube_or_cpu():
+    class_body = ""
     class_body += (
         "#if defined(ASCENDC_CPU_DEBUG) || (defined(__DAV_CUBE__) && __NPU_ARCH__ == 2201) || (defined \
     (__DAV_CUBE__) && __NPU_ARCH__ == 3510) || defined(__GET_CODE_CHANNEL__)\n"
@@ -1486,6 +1538,11 @@ p_tilingdata",
     class_body += "#else\n"
     class_body += "    copy_data_align64((uint8_t*)tilingdata, (__gm__ uint8_t *)p_tilingdata, all_bytes);\n"
     class_body += "#endif\n"
+    return class_body
+
+
+def _gen_tiling_copy_gm_to_ub():
+    class_body = ""
     class_body += "#else\n"
     class_body += "#if __NPU_ARCH__ == 3510 && defined(__ASCENDC_ENABLE_VEC_TAIL_TILING_COPY__) \n"
     class_body += "#if defined(__ASC_DISABLE_RESERVED_UBUF__)\n"
@@ -1529,6 +1586,11 @@ len_burst, 0, 0);\n"
     class_body += "#endif\n"
     class_body += "    set_flag(PIPE_MTE2, PIPE_S, EVENT_ID0);\n"
     class_body += "    wait_flag(PIPE_MTE2, PIPE_S, EVENT_ID0);\n"
+    return class_body
+
+
+def _gen_tiling_copy_ub_to_data():
+    class_body = ""
     class_body += "#if defined __DAV_C100__\n"
     class_body += get_dynamic_assign_tiling_data_by_size(
         "all_bytes", "__ubuf__", "(__ubuf__ uint8_t *)tilingdata_in_ub"
@@ -1548,10 +1610,6 @@ __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163\n"
     class_body += "#endif\n"
     class_body += "#endif // __ASCENDC_ENABLE_VEC_TAIL_TILING_COPY__ \n"
     class_body += "#endif\n"
-    class_body += "#ifndef ASCENDC_CPU_DEBUG\n"
-    class_body += "    pipe_barrier(PIPE_ALL);\n"
-    class_body += "#endif\n"
-    class_body += "}\n\n"
     return class_body
 
 
@@ -1688,6 +1746,62 @@ def _set_runtime_soc_version():
         return
 
 
+def _do_static_op_tiling_v2(op_info, optype, inputs, attrs, context):
+    _set_runtime_soc_version()
+    _change_param_name_to_name(inputs)
+    _change_param_name_to_name(op_info.origin_inputs)
+    compile_info = context.get_compile_info()
+    tiling_config = {
+        "name": "ascendc_op_para_size",
+        "dtype": "int",
+        "value": 2 * 1024 * 1024,
+    }
+    attrs.append(tiling_config)
+    run_info = do_op_tiling(
+        optype,
+        compile_info,
+        op_info.origin_inputs,
+        op_info.origin_outputs,
+        None,
+        None,
+        attrs,
+    )
+    return run_info
+
+
+def _fill_static_tiling_info_v2(
+    tiling_info, run_info, optype, context, tiling_struct_expr_map
+):
+    # bytes.fromhex(run_info['tiling_data']) can deserialization DumpByteBuffer
+    # save undecoded tiling data for replay
+    tiling_info.tiling_data = run_info["tiling_data"]
+    tiling_info.tiling_key = run_info["tiling_key"]
+    if "local_memory_size" in run_info:
+        tiling_info.local_memory_size = run_info["local_memory_size"]
+    tiling_info.block_num = run_info["block_dim"]
+    tiling_info.clear_atomic = run_info["clear_atomic"]
+    tiling_info.schedule_mode = run_info.get("schedule_mode", 0)
+    total_workspace_size = sum(run_info["workspaces"])
+    if not global_var_storage.get_variable("ascendc_tiling_no_register"):
+        tiling_info.file_content = gen_static_shape_v2(
+            optype,
+            tiling_struct_expr_map[str(tiling_info.tiling_key)],
+            run_info["tiling_data"],
+        )
+    else:
+        tiling_info.file_content = gen_static_shape_v2(
+            optype, "ascendc_trigger_tiling_struct", run_info["tiling_data"]
+        )
+    tiling_info.static_workspace_size = total_workspace_size
+    run_info["tiling_data"] = tiling_info.tiling_data.hex()
+    tiling_info.raw_run_info = run_info
+    if total_workspace_size > 0:
+        if len(run_info["workspaces"]) > 1:
+            msg = "the num of workspace can not large than 1"
+            raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, msg)
+        context.add_workspace("total_workspace", size=total_workspace_size)
+
+
 def get_tiling_info_v2(
     op_info: OpInfo,
     tiling_key_list: list,
@@ -1722,53 +1836,10 @@ def get_tiling_info_v2(
     )
     context = get_context()
     if static_shape:
-        _set_runtime_soc_version()
-        _change_param_name_to_name(inputs)
-        _change_param_name_to_name(op_info.origin_inputs)
-        compile_info = context.get_compile_info()
-        tiling_config = {
-            "name": "ascendc_op_para_size",
-            "dtype": "int",
-            "value": 2 * 1024 * 1024,
-        }
-        attrs.append(tiling_config)
-        run_info = do_op_tiling(
-            optype,
-            compile_info,
-            op_info.origin_inputs,
-            op_info.origin_outputs,
-            None,
-            None,
-            attrs,
+        run_info = _do_static_op_tiling_v2(op_info, optype, inputs, attrs, context)
+        _fill_static_tiling_info_v2(
+            tiling_info, run_info, optype, context, tiling_struct_expr_map
         )
-        # bytes.fromhex(run_info['tiling_data']) can deserialization DumpByteBuffer
-        # save undecoded tiling data for replay
-        tiling_info.tiling_data = run_info["tiling_data"]
-        tiling_info.tiling_key = run_info["tiling_key"]
-        if "local_memory_size" in run_info:
-            tiling_info.local_memory_size = run_info["local_memory_size"]
-        tiling_info.block_num = run_info["block_dim"]
-        tiling_info.clear_atomic = run_info["clear_atomic"]
-        tiling_info.schedule_mode = run_info.get("schedule_mode", 0)
-        total_workspace_size = sum(run_info["workspaces"])
-        if not global_var_storage.get_variable("ascendc_tiling_no_register"):
-            tiling_info.file_content = gen_static_shape_v2(
-                optype,
-                tiling_struct_expr_map[str(tiling_info.tiling_key)],
-                run_info["tiling_data"],
-            )
-        else:
-            tiling_info.file_content = gen_static_shape_v2(
-                optype, "ascendc_trigger_tiling_struct", run_info["tiling_data"]
-            )
-        tiling_info.static_workspace_size = total_workspace_size
-        run_info["tiling_data"] = tiling_info.tiling_data.hex()
-        tiling_info.raw_run_info = run_info
-        if total_workspace_size > 0:
-            if len(run_info["workspaces"]) > 1:
-                msg = "the num of workspace can not large than 1"
-                raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, msg)
-            context.add_workspace("total_workspace", size=total_workspace_size)
     else:
         tiling_info.static_shape_flag = False
         context.add_workspace("total_workspace", size=-1)
@@ -2059,24 +2130,15 @@ def get_custom_tiling_info(
     )
 
 
-def generate_dynamic_tiling_struct_file(
-    optype, tiling_info, tiling_key_list, tiling_key_group_map
+def _collect_dynamic_tiling_def_of_each_key(
+    struct_tiling_def_base,
+    tiling_def_list_of_key,
+    tiling_max_data_size,
+    tiling_info,
+    optype,
+    tiling_key_list,
+    tiling_key_group_map,
 ):
-    struct_tiling_def_base = {}
-    tiling_def_list_of_key = []
-    tiling_max_data_size = 0
-
-    optype_tiling_def = get_tiling_def(optype)
-    if optype_tiling_def is None:
-        LogUtil.print_compile_log(
-            optype, "do not registe tiling struct!!!", AscendCLogLevel.LOG_ERROR
-        )
-        return
-
-    struct_tiling_def_base = get_struct_tiling_info(
-        optype_tiling_def, struct_tiling_def_base
-    )
-
     for tiling_key in tiling_key_list:
         optype_with_tilingkey = optype + "_" + tiling_key
         tiling_def = get_tiling_def(optype_with_tilingkey)
@@ -2095,6 +2157,63 @@ def generate_dynamic_tiling_struct_file(
             tiling_def_list_of_key.append(tiling_def)
             tiling_max_data_size = max(tiling_max_data_size, tiling_def.data_size)
             tiling_info.tiling_key_data_size[tiling_key] = tiling_def.data_size
+    return struct_tiling_def_base, tiling_def_list_of_key, tiling_max_data_size
+
+
+def _gen_tiling_file_content_with_tiling_key(
+    tiling_info, optype_tiling_def, struct_tiling_def_base, tiling_def_list_of_key
+):
+    optype_tiling_def.class_def = get_dynamic_tiling_struct(
+        optype_tiling_def, struct_tiling_def_base
+    )
+
+    # begin tiling header file
+    tiling_info.file_content, end_body = get_header_and_sub_struct_def(
+        optype_tiling_def, struct_tiling_def_base
+    )
+
+    tiling_info.file_content += "// begin def of all tiling struct\n"
+    tiling_info.file_content += optype_tiling_def.class_def
+    tiling_struct_dict = set()
+    for tiling_def in tiling_def_list_of_key:
+        if tiling_def.class_name not in tiling_struct_dict:
+            tiling_info.file_content += tiling_def.class_def
+            tiling_struct_dict.add(tiling_def.class_name)
+    tiling_info.file_content += get_tiling_copy_func_and_micro(
+        optype_tiling_def.class_name
+    )
+    tiling_info.file_content += end_body
+
+
+def generate_dynamic_tiling_struct_file(
+    optype, tiling_info, tiling_key_list, tiling_key_group_map
+):
+    struct_tiling_def_base = {}
+    tiling_def_list_of_key = []
+    tiling_max_data_size = 0
+
+    optype_tiling_def = get_tiling_def(optype)
+    if optype_tiling_def is None:
+        LogUtil.print_compile_log(
+            optype, "do not registe tiling struct!!!", AscendCLogLevel.LOG_ERROR
+        )
+        return
+
+    struct_tiling_def_base = get_struct_tiling_info(
+        optype_tiling_def, struct_tiling_def_base
+    )
+
+    struct_tiling_def_base, tiling_def_list_of_key, tiling_max_data_size = (
+        _collect_dynamic_tiling_def_of_each_key(
+            struct_tiling_def_base,
+            tiling_def_list_of_key,
+            tiling_max_data_size,
+            tiling_info,
+            optype,
+            tiling_key_list,
+            tiling_key_group_map,
+        )
+    )
 
     # do not have tiling key return tiling header file of optype
     if len(tiling_def_list_of_key) == 0:
@@ -2103,26 +2222,9 @@ def generate_dynamic_tiling_struct_file(
         )
         tiling_info.file_content = optype_tiling_def.generate_code
     else:  # deal with tiling header file wiht tiling key
-        optype_tiling_def.class_def = get_dynamic_tiling_struct(
-            optype_tiling_def, struct_tiling_def_base
+        _gen_tiling_file_content_with_tiling_key(
+            tiling_info, optype_tiling_def, struct_tiling_def_base, tiling_def_list_of_key
         )
-
-        # begin tiling header file
-        tiling_info.file_content, end_body = get_header_and_sub_struct_def(
-            optype_tiling_def, struct_tiling_def_base
-        )
-
-        tiling_info.file_content += "// begin def of all tiling struct\n"
-        tiling_info.file_content += optype_tiling_def.class_def
-        tiling_struct_dict = set()
-        for tiling_def in tiling_def_list_of_key:
-            if tiling_def.class_name not in tiling_struct_dict:
-                tiling_info.file_content += tiling_def.class_def
-                tiling_struct_dict.add(tiling_def.class_name)
-        tiling_info.file_content += get_tiling_copy_func_and_micro(
-            optype_tiling_def.class_name
-        )
-        tiling_info.file_content += end_body
     tiling_info.tiling_data_size = max(
         tiling_max_data_size, optype_tiling_def.data_size
     )
@@ -2176,6 +2278,22 @@ def get_static_run_info(op_info, context):
     )
 
 
+def _resolve_static_tiling_def(optype, tiling_info, tiling_key_group_map):
+    tiling_key_master, has_tiling_key_group = get_master_tiling_key_from_group(
+        str(tiling_info.tiling_key), tiling_key_group_map
+    )
+    if has_tiling_key_group:
+        optype_with_tilingkey = optype + "_" + tiling_key_master
+        tiling_def = get_tiling_def(optype_with_tilingkey)
+        tiling_def = _get_tiling_def_with_group(
+            tiling_def, optype, tiling_key_master, tiling_key_group_map
+        )
+    else:
+        optype_with_tilingkey = optype + "_" + str(tiling_info.tiling_key)
+        tiling_def = get_tiling_def(optype_with_tilingkey)
+    return optype_with_tilingkey, tiling_def
+
+
 def generate_static_tiling_struct_file(
     optype,
     run_info,
@@ -2191,18 +2309,9 @@ def generate_static_tiling_struct_file(
     if "local_memory_size" in run_info:
         tiling_info.local_memory_size = run_info["local_memory_size"]
 
-    tiling_key_master, has_tiling_key_group = get_master_tiling_key_from_group(
-        str(tiling_info.tiling_key), tiling_key_group_map
+    optype_with_tilingkey, tiling_def = _resolve_static_tiling_def(
+        optype, tiling_info, tiling_key_group_map
     )
-    if has_tiling_key_group:
-        optype_with_tilingkey = optype + "_" + tiling_key_master
-        tiling_def = get_tiling_def(optype_with_tilingkey)
-        tiling_def = _get_tiling_def_with_group(
-            tiling_def, optype, tiling_key_master, tiling_key_group_map
-        )
-    else:
-        optype_with_tilingkey = optype + "_" + str(tiling_info.tiling_key)
-        tiling_def = get_tiling_def(optype_with_tilingkey)
 
     # judge the tilingkey of this shape now use if the tiling struct of optype itslef
     # or the special registered tilingkey struct

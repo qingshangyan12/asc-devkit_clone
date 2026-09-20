@@ -1203,13 +1203,9 @@ def _add_op_compile_options_by_customized_json(
                     compile_option_tuple.compile_options.append(opt)
 
 
-def _get_tiling_struct_size(compile_info):
-    tiling_struct_set = set()
-    tiling_struct_size_map = {}
-    max_tiling_size = 0
-    for _, tiling_struct in compile_info.tiling_key_struct_map.items():
-        tiling_struct_set.add(tiling_struct)
-
+def _scan_tiling_struct_sizes(
+    tiling_struct_set, tiling_struct_size_map, max_tiling_size, compile_info
+):
     for tiling_struct in tiling_struct_set:
         objdump_cmd = [
             "llvm-objdump",
@@ -1237,6 +1233,19 @@ def _get_tiling_struct_size(compile_info):
             dec_data = struct.unpack(">Q", bytes_data)[0]
             tiling_struct_size_map[tiling_struct] = dec_data
             max_tiling_size = max(max_tiling_size, dec_data)
+    return tiling_struct_size_map, max_tiling_size
+
+
+def _get_tiling_struct_size(compile_info):
+    tiling_struct_set = set()
+    tiling_struct_size_map = {}
+    max_tiling_size = 0
+    for _, tiling_struct in compile_info.tiling_key_struct_map.items():
+        tiling_struct_set.add(tiling_struct)
+
+    tiling_struct_size_map, max_tiling_size = _scan_tiling_struct_sizes(
+        tiling_struct_set, tiling_struct_size_map, max_tiling_size, compile_info
+    )
 
     # Preserve exact per-key sizes for Manifest constants before removing sections.
     compile_info.compiled_tiling_key_data_size_map = {
@@ -1271,31 +1280,9 @@ def _get_tiling_struct_size(compile_info):
     return max_tiling_size
 
 
-def _get_tiling_struct_without_register_size(compile_info: CompileInfo):
-    section_name_set = set()
-    tiling_key_struct_size_map = {}  # tiling_key -> (tiling_struct, struct_size)
-    max_tiling_size = 0
-    objdump_cmd = ["llvm-objdump", "-s", f"{compile_info.dst_file}"]
-    proc = subprocess.Popen(objdump_cmd, stdout=subprocess.PIPE, stderr=None)
-    (out, _) = proc.communicate()
-    tiling_str_info = out.decode("utf-8")
-    tiling_lines = [
-        line for line in tiling_str_info.splitlines() if ".ascendc_tiling" in line
-    ]
-    pattern = re.compile(r"\.ascendc_tiling\.[^\s]+")
-
-    for line in tiling_lines:
-        for match in pattern.findall(line):
-            # match eg. ".ascendc_tiling.optiling::TilingData1_2UL.0"
-            match = match.rstrip(":;,")
-            section_name_set.add(match)
-            name_part = match.split(".ascendc_tiling.", 1)[1]
-            name_part = name_part.rsplit(".", 1)[0]
-
-            tiling_key_struct_size_map = get_tiling_key_struct_size_map(
-                tiling_key_struct_size_map, name_part, compile_info, 0
-            )
-
+def _scan_tiling_sections_for_size(
+    section_name_set, tiling_key_struct_size_map, max_tiling_size, compile_info
+):
     for section_name in section_name_set:
         objdump_cmd = [
             "llvm-objdump",
@@ -1321,6 +1308,37 @@ def _get_tiling_struct_without_register_size(compile_info: CompileInfo):
                 tiling_key_struct_size_map, name_part, compile_info, dec_data
             )
             max_tiling_size = max(max_tiling_size, dec_data)
+    return tiling_key_struct_size_map, max_tiling_size
+
+
+def _get_tiling_struct_without_register_size(compile_info: CompileInfo):
+    section_name_set = set()
+    tiling_key_struct_size_map = {}  # tiling_key -> (tiling_struct, struct_size)
+    max_tiling_size = 0
+    objdump_cmd = ["llvm-objdump", "-s", f"{compile_info.dst_file}"]
+    proc = subprocess.Popen(objdump_cmd, stdout=subprocess.PIPE, stderr=None)
+    (out, _) = proc.communicate()
+    tiling_str_info = out.decode("utf-8")
+    tiling_lines = [
+        line for line in tiling_str_info.splitlines() if ".ascendc_tiling" in line
+    ]
+    pattern = re.compile(r"\.ascendc_tiling\.[^\s]+")
+
+    for line in tiling_lines:
+        for match in pattern.findall(line):
+            # match eg. ".ascendc_tiling.optiling::TilingData1_2UL.0"
+            match = match.rstrip(":;,")
+            section_name_set.add(match)
+            name_part = match.split(".ascendc_tiling.", 1)[1]
+            name_part = name_part.rsplit(".", 1)[0]
+
+            tiling_key_struct_size_map = get_tiling_key_struct_size_map(
+                tiling_key_struct_size_map, name_part, compile_info, 0
+            )
+
+    tiling_key_struct_size_map, max_tiling_size = _scan_tiling_sections_for_size(
+        section_name_set, tiling_key_struct_size_map, max_tiling_size, compile_info
+    )
     compile_info.max_tiling_size = max_tiling_size
     # REGISTER_NONE_TILING sections encode both the struct name and byte size.
     compile_info.compiled_tiling_key_data_size_map = {
