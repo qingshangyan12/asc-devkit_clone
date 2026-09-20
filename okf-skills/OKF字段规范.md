@@ -13,26 +13,45 @@ YAML front matter 放在 Markdown 文件第一行，以 --- 包围。只使用�
 | okftype | string | 是 | 全部 | 文档角色和 API 语言类型：reference.api.cpp、reference.arch.cpp 或 reference.index.cpp。 |
 | title | string | 是 | 全部 | 文档一级标题或 API 名称。 |
 | resource | string | 是 | 全部 | 从 asc-devkit 开始的仓库相对路径，使用 /。 |
-| description | string | API/架构页必需，索引页可省略 | API/架构页 | 从功能说明压缩得到的检索摘要，不得引入正文没有的能力。 |
+| description | string | API/架构页必需，索引页可省略 | API/架构页 | 由 description Agent 基于功能说明等正文证据生成的检索摘要，不得引入正文没有的能力。 |
 | tag | object[] | 是 | API/架构页 | 受控检索标签，每项为 namespace 及其标签内容数组。 |
-| signature | object[] | API/架构页可选 | API/架构页 | 调用模式或 overload 组。每项包含 prototype_id 或 override_id、archs、headers，可包含 dtype。 |
+| signature | object[] | API/架构页可选 | API/架构页 | 调用模式或 overload 组。函数项包含 prototype_id 或 override_id、archs、headers；函数宏项只包含 macro_id。 |
+| dtype | string[] | 正文明确列出时填写 | 函数 API | 文档 `dtype` 占位符支持的数据类型，顶层单行数组。 |
 | dependencies | object[] | 含明确关联时填写 | 全部 | 有正文依据的关联文档，包含 path、kind，必要时包含 condition。 |
 | examples | object[] | 含示例时填写 | API/架构页 | 样例工程或源码位置和明确的示例架构，包含样例 path，可选 file、archs、override_id。 |
+| api_kind | string | 定义页必需 | `c_api/defs` 实体页 | 定义实体类型：constant、enum、struct、union、type_alias、type_catalog、function_macro 或 macro。 |
+| headers | string[] | 可选 | 非 callable 定义页 | 唯一确认的真实声明头文件，使用 `/include/...` 路径。 |
+| declaration | object | 定义页可选 | enum、record、constant、type_alias、对象宏 | 从正文定义代码块提取的受限声明结构。 |
+| type_catalog | object | 类型目录页可选 | `c_api/defs/type` | 正文表格中的数据类型分组。 |
 | timestamp | string | 是 | 全部 | 元数据生成日期。 |
 
 空的可选数组或映射可以省略。不得添加未在本规范定义的顶层字段。
 
+## 定义页
+
+`c_api/defs` 的实体页不是函数 API。enum、struct/union、constant 和 `using` 类型别名必须写 `api_kind`，
+并仅在正文定义与唯一声明 header 同时确认时写 `declaration` 和 `headers`。`declaration` 至少包含
+`symbol`、`cpp`；enum 包含 `members`，record 包含 `fields` 和 `record_kind`，constant 可包含 `type`、`value`，
+type alias 包含 `target`。数据类型目录使用 `api_kind: type_catalog` 和 `type_catalog.groups`，不要求 header。
+
+函数宏仍使用 `signature` 中唯一的 `macro_id`，不附加 header；对象宏使用 `api_kind: macro`、`headers` 和
+`declaration.macros`。定义页没有函数原型、不可调用样例或 Doxygen 目标是正常情况，不能由此伪造 `signature`、
+example marker 或函数 Doxygen。
+
 ## 签名与架构
 
 signature 必须按调用模式拆分，例如 contiguous、strided、scalar、mask、reduce 或 config。
-prototypes 保存正文中的精确声明；dtypes 按声明中的参数名映射到数据类型数组，转换接口可以表达
-不同输入输出类型。archs 只记录正文、文件名或编译命令明确给出的 dav-* 架构，不从产品状态推断。
+dtype 只在正文明确给出 `dtype` 占位符的类型列表时写为顶层单行数组，例如 `dtype: [half, float]`；
+不得按参数名嵌入 signature，也不得在函数原型前插入 YAML 代码块。archs 只记录正文、文件名或编译命令明确给出的
+dav-* 架构，不从产品状态推断。
 
-headers 保存正文中的头文件字符串，例如 c_api/vector_compute/compute/vector_arith.h，不添加
-/include 前缀。signature 中的 headers 使用真实声明文件路径，并保持与正文和 include 声明一致。
+headers 保存真实声明文件路径，例如 /include/c_api/vector_compute/compute/vector_arith.h。文档给出的
+聚合头只是查找范围；只有在该头或其递归 include 闭包中唯一匹配的声明 header 才能写入 signature。
 
-prototype_id 标识模板或泛化原型，override_id 标识具体类型重载。遇到无法由正文、头文件或样例唯一证明的
-标识符、头文件、类型或架构时，保留可确认字段并省略不确定字段，不得猜测。
+标识符分类沿用生成器 `identifier_field` 规则：保留文档占位符时使用 prototype_id，表示模板或泛化原型；
+没有文档占位符时使用 override_id，表示具体类型重载。C++ 模板参数 T、S、U 不视为文档占位符。类型无关的函数宏
+使用 macro_id（形式为 `宏名__形参名...`），不混入函数 ID。遇到无法由正文、
+头文件或样例唯一证明的标识符、头文件、类型或架构时，保留可确认字段并省略不确定字段，不得猜测。
 
 ## 标签
 
@@ -81,6 +100,8 @@ examples.path 必须指向 DevKit 根目录下的样例工程目录或样例源�
 路径使用仓库根目录形式，通常以 `/examples/` 开头。file 是相对于该样例 path 的源码文件名；同一个样例工程
 包含多个重载时，可以使用多个 examples 项分别关联具体源码文件和 override_id。只有示例正文明确指定架构时才填写
 archs。override_id 必须与 signature 和 include 中的具体声明一致，并与样例源码中的调用标记对应。
+样例调用标记必须为成对的 ASCII `//! [override_id]`，直接包裹调用所在源码行；不得使用自定义 marker 文本、
+占位符 ID 或对同一调用编造多个标签。
 
 ## 示例
 
@@ -104,8 +125,7 @@ archs。override_id 必须与 signature 和 include 中的具体声明一致，�
         archs: ["3510"]
         headers:
           - /include/c_api/reg_compute/compute/reg_arith.h
-        dtype:
-          values: [half, float]
+    dtype: [half, float]
     dependencies:
       - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md
         kind: requires

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 from copy import deepcopy
+from dataclasses import asdict
 from datetime import date
 from contextlib import contextmanager
 import fcntl
@@ -18,20 +19,64 @@ from typing import Any
 import yaml
 
 
+SCRIPTS_DIR = Path(__file__).resolve().parent
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
+
+from example_snippet_markers import apply_insertions_to_text, candidate_insertions_for_documents
+from doxygen_annotations import DoxygenValidationError, apply_records_to_text
+from extract_api_yaml_metadata import (
+    _compare_signature_header_mappings,
+    _macro_definitions,
+    _placeholder_values,
+    _resource_declares_symbol,
+    extract_api_metadata,
+    extract_example_references,
+    resolve_signature_header_mappings,
+    supported_archs,
+)
+from prototype_id import MACRO_ID_RE, PrototypeIdError, signature_identifier
+
+
 API_ROOT = Path("docs/zh/api/SIMD-API")
 API_SURFACES = {"c_api", "basic_api", "adv_api", "tensor_api"}
 ALLOWED_FIELDS = (
     "okftype", "title", "resource", "description", "tag", "signature",
-    "dependencies", "examples", "timestamp",
+    "dtype", "dependencies", "examples", "api_kind", "headers", "declaration",
+    "type_catalog", "timestamp",
 )
+DEFINITION_API_KINDS = {
+    "constant", "enum", "struct", "union", "type_alias", "type_catalog",
+    "function_macro", "macro",
+}
+DEFINITION_CATEGORIES = {"constant", "enum", "macro", "type", "union"}
+DEFINITIONS_ROOT = API_ROOT / "c_api" / "defs"
+MACRO_DEFINITION_SECTION_RE = re.compile(r"^\s{0,3}#{2,6}\s+宏定义(?:\s|<|$)", re.MULTILINE)
 DEPENDENCY_KINDS = {"requires", "configures", "constrained_by", "related"}
-SIGNATURE_KEYS = {"prototype_id", "override_id", "archs", "headers", "dtype"}
+SIGNATURE_KEYS = {"prototype_id", "override_id", "macro_id", "archs", "headers"}
 ISSUE_TYPES = {"document_defect", "source_defect", "tool_defect", "unresolved"}
 RESOLUTIONS = {
     "blank_field", "report_source_defect", "report_unresolved", "tool_change_required",
 }
 TOP_KEY_RE = re.compile(r"^(?P<key>[A-Za-z_][A-Za-z0-9_-]*):(?:\s.*)?(?:\n|$)")
-COMMENT_RE = re.compile(r"^\s*(?://|/\*|\*)")
+INLINE_API_SIGNATURE_BLOCK_RE = re.compile(
+    r"(?ms)^```(?:yaml|yml)[ \t]*\n(?P<payload>.*?)^```[ \t]*(?:\n\n|\n|\Z)"
+)
+# Keep this aligned with api-yaml-metadata-guard/scripts/prototype_id.py.
+PLACEHOLDER_RE = re.compile(r"<(?P<name>[A-Za-z_][A-Za-z0-9_]*)>")
+TEMPLATE_VARIABLE_RE = re.compile(r"[STU](?:[0-9]+)?$")
+VERIFIED_HEADER_STATUSES = {
+    "hint_scope_single",
+    "scope_include_single",
+    "fallback_single",
+}
+UNSAFE_HEADER_COMPARISONS = {
+    "api_not_found_in_header",
+    "not_comparable",
+    "parameter_name_difference",
+    "parameter_type_mismatch",
+    "parameter_count_mismatch",
+}
 
 
 class InlineList(list):
@@ -93,6 +138,17 @@ def repo_relative(root: Path, path: Path) -> str:
     return path.resolve().relative_to(root.resolve()).as_posix()
 
 
+def is_definition_index(root: Path, path: Path) -> bool:
+    relative = Path(repo_relative(root, path))
+    prefix = DEFINITIONS_ROOT.parts
+    if relative.parts[: len(prefix)] != prefix:
+        return False
+    tail = relative.parts[len(prefix) :]
+    if len(tail) == 1:
+        return relative.stem == "defs"
+    return len(tail) == 2 and relative.stem == tail[0]
+
+
 def api_documents(root: Path, source_dir: str | None, document: list[str] | None) -> list[str]:
     if document and source_dir:
         raise ValidationError("--document and --source-dir cannot be combined")
@@ -107,7 +163,11 @@ def api_documents(root: Path, source_dir: str | None, document: list[str] | None
         directory = (root / base).resolve()
         if not directory.is_dir():
             raise ValidationError(f"source directory does not exist: {base}")
-        selected = [repo_relative(root, path) for path in directory.rglob("*.md")]
+        selected = [
+            repo_relative(root, path)
+            for path in directory.rglob("*.md")
+            if not is_definition_index(root, path)
+        ]
     return sorted(set(selected))
 
 
@@ -156,14 +216,472 @@ def first_heading(body: str, fallback: str) -> str:
     return match.group(1).strip() if match else fallback
 
 
-def description_from_body(body: str) -> str:
-    section = re.search(r"(?ms)^##\s*(?:功能说明|功能描述|说明)\s*$\n(.*?)(?=^##\s|\Z)", body)
-    text = section.group(1) if section else body
-    for line in text.splitlines():
-        value = line.strip()
-        if value and not value.startswith(("#", "```", "<!--", "|", "- ")):
-            return value
-    return ""
+def signature_id_key(identifier: str) -> str:
+    """Match the legacy generator's documented-placeholder discriminator."""
+    has_documented_placeholder = any(
+        TEMPLATE_VARIABLE_RE.fullmatch(name) is None
+        for name in PLACEHOLDER_RE.findall(identifier)
+    )
+    return "prototype_id" if has_documented_placeholder else "override_id"
+
+
+def source_dtype_values(markdown: str) -> list[str]:
+    """Return documented <dtype> values in their source order."""
+    values = _placeholder_values(markdown).get("dtype", ())
+    return list(dict.fromkeys(
+        value for value in values if isinstance(value, str) and value.strip()
+    ))
+
+
+def legacy_dtype_values(front_matter: dict[str, Any]) -> list[str]:
+    """Migrate the former signature-local dtype shape without inventing values."""
+    top_level = front_matter.get("dtype")
+    if isinstance(top_level, list):
+        return list(dict.fromkeys(
+            value for value in top_level if isinstance(value, str) and value.strip()
+        ))
+
+    values: list[str] = []
+    signature = front_matter.get("signature")
+    if not isinstance(signature, list):
+        return values
+    for entry in signature:
+        if not isinstance(entry, dict):
+            continue
+        dtype = entry.get("dtype")
+        if isinstance(dtype, dict):
+            candidates = dtype.get("values")
+            if isinstance(candidates, list):
+                values.extend(value for value in candidates if isinstance(value, str) and value.strip())
+            variants = dtype.get("variants")
+            if isinstance(variants, list):
+                for variant in variants:
+                    if isinstance(variant, dict):
+                        values.extend(
+                            value for value in variant.values()
+                            if isinstance(value, str) and value.strip()
+                        )
+        elif isinstance(dtype, list):
+            values.extend(value for value in dtype if isinstance(value, str) and value.strip())
+    return list(dict.fromkeys(values))
+
+
+def strip_inline_api_signature_blocks(body: str) -> str:
+    """Remove only generated api_signature metadata fences from Markdown bodies."""
+    def replacement(match: re.Match[str]) -> str:
+        try:
+            parsed = yaml.safe_load(match.group("payload"))
+        except yaml.YAMLError:
+            return match.group(0)
+        api_signature = parsed.get("api_signature") if isinstance(parsed, dict) else None
+        if isinstance(parsed, dict) and set(parsed) == {"api_signature"} and isinstance(api_signature, dict):
+            return ""
+        return match.group(0)
+
+    return INLINE_API_SIGNATURE_BLOCK_RE.sub(replacement, body)
+
+
+def _source_signature_fields(
+    root: Path,
+    document: Path,
+    markdown: str,
+) -> tuple[
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+]:
+    """Derive only source-proven signatures, headers, and example calls.
+
+    The parsing and header-resolution implementation is vendored from the
+    legacy guard.  This controller intentionally publishes only a unique,
+    in-scope header association; all other outcomes remain resolver issues.
+    """
+    try:
+        mappings, _ = resolve_signature_header_mappings(document, markdown, root)
+    except (PrototypeIdError, ValueError) as exc:
+        return [], [], [], [], [issue(
+            repo_relative(root, document),
+            "signature",
+            "document_defect",
+            f"函数原型或头文件映射无法解析：{exc}",
+        )]
+
+    comparisons = _compare_signature_header_mappings(markdown, mappings, root)
+    comparison_statuses: dict[str, set[str]] = {}
+    for comparison in comparisons:
+        comparison_statuses.setdefault(comparison.document_parameters, set()).add(comparison.status)
+
+    signatures: list[dict[str, Any]] = []
+    doxygen_records: list[dict[str, Any]] = []
+    mapping_issues: list[dict[str, Any]] = []
+    for mapping in mappings:
+        if mapping.macro_id:
+            entry = {"macro_id": mapping.macro_id}
+        else:
+            function = mapping.prototype_function or mapping.canonical_id
+            try:
+                key, identifier = signature_identifier(
+                    function,
+                    source=repo_relative(root, document),
+                    template_parameters=mapping.template_parameters,
+                )
+            except PrototypeIdError as exc:
+                mapping_issues.append(issue(
+                    repo_relative(root, document),
+                    "signature",
+                    "tool_defect",
+                    f"函数原型 ID 无法生成：{exc}",
+                ))
+                continue
+            entry = {key: identifier, "archs": sorted(dict.fromkeys(mapping.archs))}
+            statuses = comparison_statuses.get(mapping.document_parameters, set())
+            verified = (
+                mapping.status in VERIFIED_HEADER_STATUSES
+                and not statuses.intersection(UNSAFE_HEADER_COMPARISONS)
+            )
+            entry["headers"] = sorted(dict.fromkeys(mapping.headers)) if verified else []
+        if entry not in signatures:
+            signatures.append(entry)
+        if (
+            not mapping.macro_id
+            and entry.get("override_id")
+            and mapping.status in VERIFIED_HEADER_STATUSES
+            and len(mapping.headers) == 1
+        ):
+            doxygen_records.append({
+                "source_document": repo_relative(root, document),
+                "header": mapping.headers[0].lstrip("/"),
+                "function": mapping.canonical_id,
+                "parameters": mapping.document_signature or mapping.canonical_id,
+                "archs": sorted(dict.fromkeys(mapping.archs)),
+                "template_parameters": list(mapping.template_parameters),
+                "doxygen": {},
+            })
+        elif mapping.macro_id and len(mapping.headers) == 1:
+            doxygen_records.append({
+                "source_document": repo_relative(root, document),
+                "header": mapping.headers[0].lstrip("/"),
+                "function": mapping.canonical_id,
+                "parameters": mapping.document_signature or mapping.canonical_id,
+                "macro_id": mapping.macro_id,
+                "archs": [],
+                "template_parameters": [],
+                "doxygen": {},
+            })
+        if mapping.status not in VERIFIED_HEADER_STATUSES and mapping.status != "compiler_generated_macro":
+            mapping_issues.append(issue(
+                repo_relative(root, document),
+                "signature.headers",
+                "unresolved",
+                f"{mapping.name} 的头文件映射未唯一确认（{mapping.status}），已保留空 headers。",
+            ))
+
+    examples: list[dict[str, Any]] = []
+    marker_examples: list[dict[str, Any]] = []
+    try:
+        references = extract_example_references(
+            markdown,
+            document,
+            mappings,
+            supported_archs(markdown),
+            root,
+        )
+    except (OSError, ValueError) as exc:
+        mapping_issues.append(issue(
+            repo_relative(root, document),
+            "examples",
+            "unresolved",
+            f"样例关联无法解析：{exc}",
+        ))
+        return signatures, examples, marker_examples, doxygen_records, mapping_issues
+
+    for reference in references:
+        serialized = asdict(reference)
+        marker_examples.append(serialized)
+        if reference.confidence != "authoritative" or reference.issues or not reference.path:
+            continue
+        for call in reference.calls:
+            function = call.canonical_id or call.call_template
+            if not function:
+                continue
+            for binding in call.placeholder_bindings:
+                function = function.replace(f"<{binding['name']}>", binding["value"])
+            if PLACEHOLDER_RE.search(function):
+                continue
+            try:
+                key, identifier = signature_identifier(function)
+            except PrototypeIdError:
+                continue
+            if key != "override_id" or not call.file:
+                continue
+            file_name = call.file
+            if file_name.startswith(f"{reference.path}/"):
+                file_name = file_name[len(reference.path) + 1 :]
+            entry = {
+                "path": reference.path,
+                "archs": list(reference.archs),
+                "override_id": identifier,
+                "file": file_name,
+            }
+            if entry not in examples:
+                examples.append(entry)
+    return signatures, examples, marker_examples, doxygen_records, mapping_issues
+
+
+def _definition_category(root: Path, document: Path) -> str | None:
+    """Return the concrete c_api/defs category, never a directory index page."""
+    relative = Path(repo_relative(root, document))
+    prefix = DEFINITIONS_ROOT.parts
+    if relative.parts[: len(prefix)] != prefix or len(relative.parts) != len(prefix) + 2:
+        return None
+    category = relative.parts[len(prefix)]
+    if category not in DEFINITION_CATEGORIES or relative.stem == category:
+        return None
+    return category
+
+
+def _definition_header(
+    root: Path,
+    candidates: Any,
+    symbol: str,
+    path: str,
+) -> tuple[list[str], list[dict[str, Any]]]:
+    """Publish a definition header only when it uniquely declares the symbol."""
+    resources = sorted(dict.fromkeys(
+        resource for resource in candidates if isinstance(resource, str)
+    )) if isinstance(candidates, (list, tuple)) else []
+    if len(resources) != 1:
+        return [], [issue(
+            path,
+            "headers",
+            "unresolved",
+            "定义的头文件映射未唯一确认，已保留空 headers。",
+        )]
+    resource = resources[0]
+    if not _resource_declares_symbol(str(root), resource, symbol, None):
+        return [], [issue(
+            path,
+            "headers",
+            "source_defect",
+            f"{symbol} 未在文档关联的头文件 {resource} 中声明。",
+        )]
+    return [resource], []
+
+
+def _macro_definition_section(markdown: str) -> str:
+    match = MACRO_DEFINITION_SECTION_RE.search(markdown)
+    if match is None:
+        return ""
+    tail = markdown[match.end() :]
+    next_heading = re.search(r"^\s{0,3}#{2,6}\s+", tail, re.MULTILINE)
+    return tail[: next_heading.start()] if next_heading is not None else tail
+
+
+def _macro_declaration_entry(macro: Any) -> dict[str, Any]:
+    if macro.parameters is None:
+        cpp = f"#define {macro.symbol} {macro.body}".rstrip()
+        return {
+            "symbol": macro.symbol,
+            "cpp": cpp,
+            "macro_kind": "object",
+            "value": macro.body,
+        }
+    cpp = f"#define {macro.symbol}({macro.parameters}) {macro.body}".rstrip()
+    return {
+        "symbol": macro.symbol,
+        "cpp": cpp,
+        "macro_kind": "function",
+        "parameters": [
+            parameter.strip() for parameter in macro.parameters.split(",") if parameter.strip()
+        ],
+    }
+
+
+def _source_macro_definition_fields(
+    root: Path,
+    document: Path,
+    markdown: str,
+    metadata: Any,
+) -> dict[str, Any]:
+    path = repo_relative(root, document)
+    documented = list(_macro_definitions(_macro_definition_section(markdown)))
+    issues: list[dict[str, Any]] = []
+    if not documented:
+        issues.append(issue(path, "declaration", "document_defect", "正文没有可确认的宏定义。"))
+        return {
+            "api_kind": "macro",
+            "headers": [],
+            "declaration": None,
+            "type_catalog": None,
+            "signature": [],
+            "doxygen": [],
+            "issues": issues,
+        }
+
+    candidates = list(metadata.header_candidates)
+    headers = sorted(dict.fromkeys(resource for resource in candidates if isinstance(resource, str)))
+    header_macros = []
+    if len(headers) == 1:
+        header_path = root / headers[0].lstrip("/")
+        if header_path.is_file():
+            header_macros = list(_macro_definitions(header_path.read_text(encoding="utf-8", errors="replace")))
+    if len(headers) != 1:
+        issues.append(issue(path, "headers", "unresolved", "宏定义的头文件映射未唯一确认，已保留空 headers。"))
+        headers = []
+    else:
+        for macro in documented:
+            if not any(
+                candidate.symbol == macro.symbol and candidate.parameters == macro.parameters
+                for candidate in header_macros
+            ):
+                issues.append(issue(
+                    path,
+                    "headers",
+                    "source_defect",
+                    f"{macro.symbol} 未在文档关联的头文件 {headers[0]} 中以相同形参声明。",
+                ))
+                headers = []
+                break
+
+    signatures: list[dict[str, Any]] = []
+    doxygen: list[dict[str, Any]] = []
+    for macro in documented:
+        if macro.parameters is None:
+            continue
+        names = tuple(name.strip() for name in macro.parameters.split(",") if name.strip())
+        identifier = "__".join((macro.symbol, *names))
+        if MACRO_ID_RE.fullmatch(identifier) is None:
+            issues.append(issue(
+                path,
+                "signature",
+                "document_defect",
+                f"{macro.symbol} 的函数宏形参无法生成有效 macro_id。",
+            ))
+            continue
+        entry = {"macro_id": identifier}
+        if entry not in signatures:
+            signatures.append(entry)
+        if headers:
+            doxygen.append({
+                "source_document": path,
+                "header": headers[0].lstrip("/"),
+                "function": f"{macro.symbol}({macro.parameters})",
+                "parameters": f"{macro.symbol}({macro.parameters})",
+                "macro_id": identifier,
+                "archs": [],
+                "template_parameters": [],
+                "doxygen": {},
+            })
+
+    has_object_macro = any(macro.parameters is None for macro in documented)
+    if not has_object_macro and signatures:
+        return {
+            "api_kind": "function_macro",
+            "headers": [],
+            "declaration": None,
+            "type_catalog": None,
+            "signature": signatures,
+            "doxygen": doxygen,
+            "issues": issues,
+        }
+    return {
+        "api_kind": "macro",
+        "headers": headers,
+        "declaration": {"macros": [_macro_declaration_entry(macro) for macro in documented]},
+        "type_catalog": None,
+        "signature": signatures,
+        "doxygen": doxygen,
+        "issues": issues,
+    }
+
+
+def _source_definition_fields(
+    root: Path,
+    document: Path,
+    markdown: str,
+) -> dict[str, Any] | None:
+    """Extract source-proven metadata for concrete C API definition pages."""
+    category = _definition_category(root, document)
+    if category is None:
+        return None
+    path = repo_relative(root, document)
+    try:
+        metadata = extract_api_metadata(document, date.today().isoformat(), root)
+    except (OSError, ValueError) as exc:
+        return {
+            "api_kind": {"type": "type_catalog"}.get(category, category),
+            "headers": [],
+            "declaration": None,
+            "type_catalog": None,
+            "signature": [],
+            "doxygen": [],
+            "issues": [issue(path, "declaration", "tool_defect", f"定义解析失败：{exc}")],
+        }
+    if category == "macro":
+        return _source_macro_definition_fields(root, document, markdown, metadata)
+
+    expected_kinds = {
+        "constant": {"constant"},
+        "enum": {"enum", "type_alias"},
+        "type": {"type_catalog"},
+        "union": {"struct", "union"},
+    }
+    api_kind = metadata.api_kind
+    declaration = metadata.declaration
+    type_catalog = metadata.type_catalog
+    issues: list[dict[str, Any]] = []
+    if api_kind not in expected_kinds[category]:
+        api_kind = {"type": "type_catalog", "union": "union"}.get(category, category)
+        declaration = None
+        type_catalog = None
+        issues.append(issue(path, "declaration", "document_defect", "正文定义形式无法按该分类解析。"))
+    elif api_kind == "type_catalog":
+        if not type_catalog:
+            issues.append(issue(path, "type_catalog", "document_defect", "正文没有可确认的数据类型分组。"))
+    elif not isinstance(declaration, dict):
+        issues.append(issue(path, "declaration", "document_defect", "正文没有可确认的定义声明。"))
+
+    headers: list[str] = []
+    if api_kind != "type_catalog" and isinstance(declaration, dict):
+        symbol = declaration.get("symbol")
+        if isinstance(symbol, str) and symbol:
+            headers, header_issues = _definition_header(root, metadata.header_candidates, symbol, path)
+            issues.extend(header_issues)
+        else:
+            issues.append(issue(path, "declaration", "document_defect", "定义声明缺少符号名。"))
+    return {
+        "api_kind": api_kind,
+        "headers": headers,
+        "declaration": declaration,
+        "type_catalog": type_catalog,
+        "signature": [],
+        "doxygen": [],
+        "issues": issues,
+    }
+
+
+def normalize_signature_ids(signature: Any) -> Any:
+    """Convert legacy or worker-supplied signature keys to their canonical form."""
+    if not isinstance(signature, list):
+        return signature
+    normalized = []
+    for item in signature:
+        if not isinstance(item, dict):
+            normalized.append(item)
+            continue
+        output = deepcopy(item)
+        prototype_id = output.get("prototype_id")
+        override_id = output.get("override_id")
+        if isinstance(prototype_id, str) ^ isinstance(override_id, str):
+            current_key = "prototype_id" if isinstance(prototype_id, str) else "override_id"
+            identifier = output[current_key]
+            expected_key = signature_id_key(identifier)
+            if current_key != expected_key:
+                output[expected_key] = output.pop(current_key)
+        normalized.append(output)
+    return normalized
 
 
 def issue(path: str, field: str, issue_type: str, message: str, evidence: list[dict[str, str]] | None = None) -> dict[str, Any]:
@@ -182,30 +700,62 @@ def build_worker_document(root: Path, path: str, namespaces: tuple[str, ...]) ->
     document = relative_api_path(root, path)
     original = document.read_text(encoding="utf-8", errors="replace")
     data, _, body = split_front_matter(original)
+    definition = _source_definition_fields(root, document, body)
+    if definition is None:
+        source_signature, source_examples, marker_examples, source_doxygen, source_issues = _source_signature_fields(
+            root, document, body
+        )
+        source_definition: dict[str, Any] = {
+            "api_kind": None,
+            "headers": None,
+            "declaration": None,
+            "type_catalog": None,
+        }
+    else:
+        source_signature = definition["signature"]
+        source_examples = []
+        marker_examples = []
+        source_doxygen = definition["doxygen"]
+        source_issues = definition["issues"]
+        source_definition = definition
     title = data.get("title") or first_heading(body, document.stem)
     description = data.get("description")
     if not isinstance(description, str):
-        description = description_from_body(body)
+        description = ""
     tags = normalize_tag(data.get("tag"), namespaces)
+    documented_dtype = source_dtype_values(body)
     fields: dict[str, Any] = {
         "okftype": data.get("okftype") or "reference.api.cpp",
         "title": title,
         "resource": data.get("resource") or f"asc-devkit/{path}",
         "description": description,
         "tag": tags,
-        "signature": data.get("signature") if isinstance(data.get("signature"), list) else [],
+        "signature": source_signature if definition is not None else source_signature or normalize_signature_ids(
+            data.get("signature") if isinstance(data.get("signature"), list) else []
+        ),
+        "dtype": documented_dtype or legacy_dtype_values(data),
         "dependencies": data.get("dependencies") if isinstance(data.get("dependencies"), list) else [],
-        "examples": data.get("examples") if isinstance(data.get("examples"), list) else [],
+        "examples": source_examples if definition is not None else source_examples or (
+            data.get("examples") if isinstance(data.get("examples"), list) else []
+        ),
+        "api_kind": source_definition["api_kind"],
+        "headers": source_definition["headers"],
+        "declaration": source_definition["declaration"],
+        "type_catalog": source_definition["type_catalog"],
         "timestamp": data.get("timestamp") or date.today().isoformat(),
     }
-    issues: list[dict[str, Any]] = []
+    issues: list[dict[str, Any]] = list(source_issues)
     if not description:
-        issues.append(issue(path, "description", "document_defect", "正文没有可确认的功能说明。"))
-    if not fields["signature"] and not re.search(r"api_signature:|函数原型|函数声明", body):
+        issues.append(issue(path, "description", "document_defect", "缺少由 description agent 生成并验证的 API 描述。"))
+    if definition is None and not fields["signature"] and not re.search(r"函数原型|函数声明", body):
         issues.append(issue(path, "signature", "document_defect", "正文没有可确认的函数原型信息。"))
     for signature in fields["signature"]:
-        if not isinstance(signature, dict) or not (isinstance(signature.get("prototype_id"), str) ^ isinstance(signature.get("override_id"), str)):
-            issues.append(issue(path, "signature", "tool_defect", "signature 条目必须包含 prototype_id 或 override_id，不能写入原始 prototype 字段。"))
+        identifier_keys = [
+            key for key in ("prototype_id", "override_id", "macro_id")
+            if isinstance(signature, dict) and isinstance(signature.get(key), str)
+        ]
+        if len(identifier_keys) != 1:
+            issues.append(issue(path, "signature", "tool_defect", "signature 条目必须唯一包含 prototype_id、override_id 或 macro_id，不能写入原始 prototype 字段。"))
             break
     for item in fields["tag"]:
         namespace, selected = next(iter(item.items()))
@@ -215,10 +765,10 @@ def build_worker_document(root: Path, path: str, namespaces: tuple[str, ...]) ->
         "path": path,
         "sha256": sha256(document),
         "fields": fields,
-        "evidence": {"description": ([{"source_path": path, "excerpt": description}] if description else [])},
+        "evidence": {"description": []},
         "issues": issues,
-        "doxygen": [],
-        "example_markers": [],
+        "doxygen": source_doxygen,
+        "example_markers": marker_examples,
     }
 
 
@@ -297,6 +847,10 @@ def blank_field(fields: dict[str, Any], field: str) -> None:
         fields["tag"] = updated
     elif field in {"signature", "dependencies", "examples"}:
         fields[field] = []
+    elif field == "headers":
+        fields[field] = []
+    elif field in {"declaration", "type_catalog"}:
+        fields[field] = None
     elif field in fields:
         fields[field] = ""
 
@@ -451,14 +1005,159 @@ def validate_signature(signature: Any, path: str) -> list[dict[str, Any]]:
         unknown = set(item) - SIGNATURE_KEYS
         if unknown:
             raise ValidationError(f"{path}: signature[{index}] has unsupported fields: {sorted(unknown)}")
-        if not (isinstance(item.get("prototype_id"), str) ^ isinstance(item.get("override_id"), str)):
-            raise ValidationError(f"{path}: signature[{index}] must contain exactly one prototype_id or override_id")
+        identifier_keys = [
+            key for key in ("prototype_id", "override_id", "macro_id")
+            if isinstance(item.get(key), str)
+        ]
+        if len(identifier_keys) != 1:
+            raise ValidationError(
+                f"{path}: signature[{index}] must contain exactly one prototype_id, override_id or macro_id"
+            )
+        identifier_key = identifier_keys[0]
+        if identifier_key == "macro_id":
+            if set(item) != {"macro_id"} or MACRO_ID_RE.fullmatch(item["macro_id"]) is None:
+                raise ValidationError(f"{path}: signature[{index}].macro_id must be a valid standalone macro ID")
+            continue
+        if signature_id_key(item[identifier_key]) != identifier_key:
+            expected_key = signature_id_key(item[identifier_key])
+            reason = "retains a documented placeholder" if expected_key == "prototype_id" else "has no documented placeholder"
+            raise ValidationError(
+                f"{path}: signature[{index}] {reason} and must use {expected_key}"
+            )
         for key in ("archs", "headers"):
             if key in item and (not isinstance(item[key], list) or any(not isinstance(value, str) for value in item[key])):
                 raise ValidationError(f"{path}: signature[{index}].{key} must be a string array")
-        if "dtype" in item and not isinstance(item["dtype"], (dict, list)):
-            raise ValidationError(f"{path}: signature[{index}].dtype must be a mapping or array")
     return signature
+
+
+def validate_dtype(dtype: Any, path: str) -> list[str]:
+    if dtype in (None, []):
+        return []
+    if not isinstance(dtype, list) or any(not isinstance(value, str) or not value.strip() for value in dtype):
+        raise ValidationError(f"{path}: dtype must be a non-empty string array")
+    if len(dtype) != len(set(dtype)):
+        raise ValidationError(f"{path}: dtype must not contain duplicates")
+    return dtype
+
+
+def _validate_headers(headers: Any, path: str) -> list[str]:
+    if not isinstance(headers, list) or any(not isinstance(item, str) for item in headers):
+        raise ValidationError(f"{path}: headers must be a string array")
+    if len(headers) != len(set(headers)):
+        raise ValidationError(f"{path}: headers must not contain duplicates")
+    for header in headers:
+        candidate = Path(header)
+        if not header.startswith("/include/") or candidate.suffix not in {".h", ".hpp"}:
+            raise ValidationError(f"{path}: headers must be /include/ header resources")
+        if ".." in candidate.parts:
+            raise ValidationError(f"{path}: headers must not escape the repository")
+    return headers
+
+
+def _validate_declaration(api_kind: str, declaration: Any, path: str) -> None:
+    if not isinstance(declaration, dict):
+        raise ValidationError(f"{path}: declaration must be an object")
+    if api_kind == "macro":
+        macros = declaration.get("macros")
+        if set(declaration) != {"macros"} or not isinstance(macros, list) or not macros:
+            raise ValidationError(f"{path}: macro declaration must contain non-empty macros")
+        for index, macro in enumerate(macros):
+            if not isinstance(macro, dict):
+                raise ValidationError(f"{path}: declaration.macros[{index}] must be an object")
+            allowed = {"symbol", "cpp", "macro_kind", "parameters", "value"}
+            if set(macro) - allowed:
+                raise ValidationError(f"{path}: declaration.macros[{index}] has unsupported fields")
+            if not isinstance(macro.get("symbol"), str) or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", macro["symbol"]):
+                raise ValidationError(f"{path}: declaration.macros[{index}].symbol is invalid")
+            if not isinstance(macro.get("cpp"), str) or not macro["cpp"].startswith("#define "):
+                raise ValidationError(f"{path}: declaration.macros[{index}].cpp must be a macro definition")
+            if macro.get("macro_kind") not in {"function", "object"}:
+                raise ValidationError(f"{path}: declaration.macros[{index}].macro_kind is invalid")
+            if macro["macro_kind"] == "function" and (
+                not isinstance(macro.get("parameters"), list)
+                or any(not isinstance(item, str) for item in macro["parameters"])
+            ):
+                raise ValidationError(f"{path}: function macro parameters must be a string array")
+        return
+
+    if not isinstance(declaration.get("symbol"), str) or not re.fullmatch(
+        r"[A-Za-z_][A-Za-z0-9_]*", declaration["symbol"]
+    ):
+        raise ValidationError(f"{path}: declaration.symbol is invalid")
+    if not isinstance(declaration.get("cpp"), str) or not declaration["cpp"].strip():
+        raise ValidationError(f"{path}: declaration.cpp is required")
+    allowed = {
+        "constant": {"symbol", "cpp", "value", "type"},
+        "enum": {"symbol", "cpp", "members", "underlying_type"},
+        "struct": {"symbol", "cpp", "fields", "record_kind"},
+        "union": {"symbol", "cpp", "fields", "record_kind"},
+        "type_alias": {"symbol", "cpp", "target"},
+    }[api_kind]
+    if set(declaration) - allowed:
+        raise ValidationError(f"{path}: declaration has unsupported fields for {api_kind}")
+    if api_kind == "type_alias" and not isinstance(declaration.get("target"), str):
+        raise ValidationError(f"{path}: type_alias declaration.target is required")
+    if api_kind in {"struct", "union"} and declaration.get("record_kind") != api_kind:
+        raise ValidationError(f"{path}: {api_kind} declaration.record_kind is invalid")
+    collection = "members" if api_kind == "enum" else "fields" if api_kind in {"struct", "union"} else None
+    if collection is not None:
+        values = declaration.get(collection)
+        if not isinstance(values, list) or any(not isinstance(item, dict) for item in values):
+            raise ValidationError(f"{path}: declaration.{collection} must be an object array")
+        for index, item in enumerate(values):
+            if not isinstance(item.get("name"), str) or not item["name"]:
+                raise ValidationError(f"{path}: declaration.{collection}[{index}].name is required")
+
+
+def _validate_type_catalog(type_catalog: Any, path: str) -> None:
+    if not isinstance(type_catalog, dict) or set(type_catalog) != {"groups"}:
+        raise ValidationError(f"{path}: type_catalog must contain groups")
+    groups = type_catalog["groups"]
+    if not isinstance(groups, list) or not groups:
+        raise ValidationError(f"{path}: type_catalog.groups must be non-empty")
+    for index, group in enumerate(groups):
+        if not isinstance(group, dict) or set(group) != {"name", "types"}:
+            raise ValidationError(f"{path}: type_catalog.groups[{index}] is invalid")
+        if not isinstance(group["name"], str) or not isinstance(group["types"], list) or not group["types"]:
+            raise ValidationError(f"{path}: type_catalog.groups[{index}] must name non-empty types")
+        if any(not isinstance(item, str) for item in group["types"]):
+            raise ValidationError(f"{path}: type_catalog groups must contain string types")
+
+
+def validate_definition_fields(
+    fields: dict[str, Any], path: str, allowed_empty: set[str]
+) -> None:
+    api_kind = fields.get("api_kind")
+    if api_kind is None:
+        if any(fields.get(key) not in (None, [], {}) for key in ("headers", "declaration", "type_catalog")):
+            raise ValidationError(f"{path}: definition fields require api_kind")
+        return
+    if api_kind not in DEFINITION_API_KINDS:
+        raise ValidationError(f"{path}: unsupported api_kind: {api_kind!r}")
+    if api_kind != "type_catalog" and fields.get("type_catalog") not in (None, {}):
+        raise ValidationError(f"{path}: type_catalog is only valid for api_kind type_catalog")
+    headers = fields.get("headers")
+    if headers not in (None, []):
+        _validate_headers(headers, path)
+    if api_kind == "type_catalog":
+        if fields.get("declaration") not in (None, {}):
+            raise ValidationError(f"{path}: type_catalog must not contain declaration")
+        if not fields.get("type_catalog") and "type_catalog" not in allowed_empty:
+            raise ValidationError(f"{path}: type_catalog metadata is required")
+        if fields.get("type_catalog"):
+            _validate_type_catalog(fields["type_catalog"], path)
+        return
+    if api_kind == "function_macro":
+        if fields.get("headers") not in (None, []) or fields.get("declaration") not in (None, {}):
+            raise ValidationError(f"{path}: function_macro only uses signature metadata")
+        if not fields.get("signature") and "signature" not in allowed_empty:
+            raise ValidationError(f"{path}: function_macro signature is required")
+        return
+    if not fields.get("declaration"):
+        if "declaration" not in allowed_empty:
+            raise ValidationError(f"{path}: {api_kind} declaration is required")
+        return
+    _validate_declaration(api_kind, fields["declaration"], path)
 
 
 def render_yaml(
@@ -466,11 +1165,15 @@ def render_yaml(
     root: Path, path: str, body: str, evidence: dict[str, Any], allowed_empty: set[str],
 ) -> str:
     output = {key: deepcopy(fields.get(key)) for key in ALLOWED_FIELDS}
+    output["signature"] = normalize_signature_ids(output["signature"])
     output["tag"] = validate_tags(output, namespaces, values, path, body, evidence, allowed_empty)
     output["tag"] = [
         {namespace: InlineList(selected)} for item in output["tag"] for namespace, selected in item.items()
     ]
     output["dependencies"] = normalize_dependencies(root, path, output.get("dependencies", []))
+    output["dtype"] = validate_dtype(output.get("dtype"), path)
+    if output["dtype"]:
+        output["dtype"] = InlineList(output["dtype"])
     for signature in output["signature"]:
         if isinstance(signature, dict):
             for key in ("archs", "headers"):
@@ -480,12 +1183,20 @@ def render_yaml(
         if isinstance(example, dict) and isinstance(example.get("archs"), list):
             example["archs"] = InlineList(example["archs"])
     output["signature"] = validate_signature(output["signature"], path)
+    validate_definition_fields(output, path, allowed_empty)
     if not isinstance(output["examples"], list):
         raise ValidationError(f"{path}: examples must be an array")
     if not output["signature"]:
         output.pop("signature")
     if not output["examples"]:
         output.pop("examples")
+    if not output["dtype"]:
+        output.pop("dtype")
+    for key in ("api_kind", "headers", "declaration", "type_catalog"):
+        if output.get(key) in (None, [], {}):
+            output.pop(key, None)
+    if isinstance(output.get("headers"), list):
+        output["headers"] = InlineList(output["headers"])
     return yaml.dump(output, allow_unicode=True, sort_keys=False, default_flow_style=False, Dumper=DisplayDumper)
 
 
@@ -494,34 +1205,8 @@ def updated_document(
     root: Path, path: str, evidence: dict[str, Any], allowed_empty: set[str],
 ) -> str:
     _, _, body = split_front_matter(original)
-    return "---\n" + render_yaml(fields, namespaces, values, root, path, body, evidence, allowed_empty) + "---\n" + body
-
-
-AUXILIARY_SUFFIXES = {".h", ".hpp", ".inc", ".asc", ".cpp", ".c"}
-
-
-def load_auxiliary_target(root: Path, patch: dict[str, Any], key: str) -> tuple[str, str, str]:
-    path = patch.get("path")
-    anchor = patch.get("anchor")
-    text = patch.get("text")
-    if not all(isinstance(item, str) and item for item in (path, anchor, text)):
-        raise ValidationError(f"{key} patch requires path, anchor and text")
-    target = (root / Path(path)).resolve()
-    try:
-        target.relative_to(root.resolve())
-    except ValueError as exc:
-        raise ValidationError(f"{key} patch escapes DevKit root: {path}") from exc
-    if not target.is_file() or target.suffix.lower() not in AUXILIARY_SUFFIXES:
-        raise ValidationError(f"{key} patch target is not an existing source file: {path}")
-    rel = repo_relative(root, target)
-    return rel, anchor, text
-
-
-def check_auxiliary_text(key: str, text: str) -> None:
-    if key == "doxygen" and not text.lstrip().startswith("/**"):
-        raise ValidationError("Doxygen patch must insert a /** comment")
-    if key == "example_markers" and not COMMENT_RE.match(text):
-        raise ValidationError("example marker must be a comment")
+    cleaned_body = strip_inline_api_signature_blocks(body)
+    return "---\n" + render_yaml(fields, namespaces, values, root, path, cleaned_body, evidence, allowed_empty) + "---\n" + cleaned_body
 
 
 def report_markdown(report: dict[str, Any]) -> str:
@@ -558,9 +1243,10 @@ def validate(args: argparse.Namespace) -> int:
     issue_report: list[dict[str, Any]] = []
     patches: list[dict[str, Any]] = []
     requires_graph: dict[str, set[str]] = {}
-    originals: dict[str, tuple[str, str]] = {}
     file_final: dict[str, dict[str, Any]] = {}
-    aux_anchors: set[tuple[str, str]] = set()
+    doxygen_inputs: list[dict[str, Any]] = []
+    marker_inputs: list[tuple[str, list[dict[str, Any]]]] = []
+    marker_skips: list[dict[str, str]] = []
 
     def stage_document(rel: str, before: str, content: str) -> None:
         if rel in file_final:
@@ -573,28 +1259,16 @@ def validate(args: argparse.Namespace) -> int:
         }
         patches.append({"kind": "document", "path": rel, "before_sha256": before, "content": content})
 
-    def apply_auxiliary(patch: dict[str, Any], key: str) -> None:
-        rel, anchor, text = load_auxiliary_target(root, patch, key)
-        check_auxiliary_text(key, text)
-        if (rel, anchor) in aux_anchors:
-            raise ValidationError(f"duplicate auxiliary anchor for {rel}: {anchor!r}")
-        aux_anchors.add((rel, anchor))
-        if rel not in originals:
-            target = (root / rel).resolve()
-            originals[rel] = (sha256(target), target.read_text(encoding="utf-8", errors="replace"))
+    def stage_source(rel: str, before: str, content: str, kind: str) -> None:
         if rel not in file_final:
             file_final[rel] = {
                 "path": rel,
-                "before_sha256": originals[rel][0],
-                "content": originals[rel][1],
+                "before_sha256": before,
+                "content": content,
                 "kinds": [],
             }
-        current = file_final[rel]["content"]
-        if current.count(anchor) != 1:
-            raise ValidationError(f"{key} anchor must occur exactly once: {rel}")
-        file_final[rel]["content"] = current.replace(anchor, text + "\n" + anchor, 1)
-        file_final[rel]["kinds"].append(key)
-        patches.append({"kind": key, "path": rel, "anchor": anchor})
+        file_final[rel]["content"] = content
+        file_final[rel]["kinds"].append(kind)
 
     for document in documents:
         path = document["path"]
@@ -614,6 +1288,11 @@ def validate(args: argparse.Namespace) -> int:
                 "blank_field", "report_source_defect", "report_unresolved"
             }:
                 allowed_empty.add(found["field"])
+            if (
+                found["field"] in {"declaration", "type_catalog", "signature"}
+                and decision["resolution"] == "blank_field"
+            ):
+                allowed_empty.add(found["field"])
             if decision["resolution"] == "blank_field":
                 blank_field(fields, found["field"])
             if decision["resolution"] == "tool_change_required":
@@ -627,9 +1306,79 @@ def validate(args: argparse.Namespace) -> int:
             root, path, document.get("evidence", {}), allowed_empty,
         )
         stage_document(path, document["sha256"], updated)
-        for key in ("doxygen", "example_markers"):
-            for auxiliary in document.get(key, []):
-                apply_auxiliary(auxiliary, key)
+        doxygen = document.get("doxygen", [])
+        if not isinstance(doxygen, list) or any(not isinstance(record, dict) for record in doxygen):
+            raise ValidationError(f"{path}: doxygen must be structured declaration records")
+        for record in doxygen:
+            if record.get("source_document") not in {None, path}:
+                raise ValidationError(f"{path}: doxygen.source_document must match its worker document")
+            staged = deepcopy(record)
+            staged["source_document"] = path
+            doxygen_inputs.append(staged)
+        markers = document.get("example_markers", [])
+        if not isinstance(markers, list) or any(not isinstance(marker, dict) for marker in markers):
+            raise ValidationError(f"{path}: example_markers must be legacy example-call records")
+        marker_inputs.append((path, markers))
+
+    doxygen_by_header: dict[str, list[dict[str, Any]]] = {}
+    for record in doxygen_inputs:
+        header = record.get("header")
+        if not isinstance(header, str) or not header.endswith((".h", ".hpp")):
+            raise ValidationError("doxygen.header must be a repository-relative header path")
+        header_path = Path(header)
+        if header_path.is_absolute() or ".." in header_path.parts:
+            raise ValidationError("doxygen.header must be a repository-relative header path")
+        target = (root / header_path).resolve()
+        try:
+            target.relative_to(root.resolve())
+        except ValueError as exc:
+            raise ValidationError(f"doxygen header escapes DevKit root: {header}") from exc
+        if not target.is_file():
+            raise ValidationError(f"doxygen header does not exist: {header}")
+        doxygen_by_header.setdefault(repo_relative(root, target), []).append(record)
+    for rel, records in doxygen_by_header.items():
+        if rel in file_final:
+            raise ValidationError(f"Doxygen target already has a planned patch: {rel}")
+        target = (root / rel).resolve()
+        original = target.read_text(encoding="utf-8", errors="replace")
+        try:
+            updated, count = apply_records_to_text(original, records)
+        except DoxygenValidationError as exc:
+            raise ValidationError(f"Doxygen validation failed for {rel}: {exc}") from exc
+        if updated != original:
+            stage_source(rel, sha256(target), updated, "doxygen")
+        for record in records:
+            patches.append({"kind": "doxygen", "path": rel, "function": record.get("function")})
+
+    insertions, skips = candidate_insertions_for_documents(marker_inputs, root)
+    for skipped in skips:
+        marker_skips.append({
+            "path": repo_relative(root, skipped.file_path) if skipped.file_path else "",
+            "marker_id": skipped.marker_id,
+            "reason": skipped.reason,
+            "document_path": skipped.api_path,
+        })
+    by_file: dict[Path, list[Any]] = {}
+    for insertion in insertions:
+        by_file.setdefault(insertion.file_path, []).append(insertion)
+    for target, file_insertions in by_file.items():
+        rel = repo_relative(root, target)
+        if rel in file_final:
+            raise ValidationError(f"example marker target already has a planned patch: {rel}")
+        original = target.read_text(encoding="utf-8", errors="replace")
+        stage_source(
+            rel,
+            sha256(target),
+            apply_insertions_to_text(original, file_insertions),
+            "example_markers",
+        )
+        for insertion in file_insertions:
+            patches.append({
+                "kind": "example_markers",
+                "path": rel,
+                "marker_id": insertion.marker_id,
+                "existing_marker_id": insertion.existing_marker_id,
+            })
     states: dict[str, int] = {}
     stack: list[str] = []
 
@@ -654,7 +1403,13 @@ def validate(args: argparse.Namespace) -> int:
     files = sorted(file_final.values(), key=lambda item: item["path"])
     write_json(
         run_dir / "write-plan.json",
-        {"schema_version": 1, "run_id": manifest["run_id"], "patches": patches, "files": files},
+        {
+            "schema_version": 1,
+            "run_id": manifest["run_id"],
+            "patches": patches,
+            "files": files,
+            "marker_skips": marker_skips,
+        },
     )
     write_json(run_dir / "validation.json", {"schema_version": 1, "run_id": manifest["run_id"], "status": "ok", "patches": len(patches), "files": len(files), "issues": len(issue_report)})
     print(json.dumps({"status": "ok", "patches": len(patches), "files": len(files), "issues": len(issue_report), "report": str(run_dir / 'error-report.md')}, ensure_ascii=False, indent=2))

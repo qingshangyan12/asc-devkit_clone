@@ -1,3 +1,39 @@
+---
+okftype: reference.api.cpp
+api_kind: "union"
+title: "asc_l13d_fmatrix_config"
+resource: "asc-devkit/docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md"
+description: "asc_l13d_fmatrix_config用于设置[asc_copy_l12l0a](../../cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](../../cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口的Feature map属性参数。"
+declaration:
+  symbol: "asc_l13d_fmatrix_config"
+  cpp: "union asc_l13d_fmatrix_config {\n    uint64_t config = ASC_DEFAULT_L13D_FMATRIX_CONFIG_VALUE;\n    struct {\n        uint16_t l1_width;\n        uint16_t l1_height;\n        uint8_t padding_left_size;\n        uint8_t padding_right_size;\n        uint8_t padding_top_size;\n        uint8_t padding_bottom_size;\n    };\n};"
+  record_kind: "union"
+  fields:
+    - name: "l1_width"
+      type: "uint16_t"
+      description: "Feature map的width，取值范围：[1, 32767]。"
+    - name: "l1_height"
+      type: "uint16_t"
+      description: "Feature map的height，取值范围：[1, 32767]。"
+    - name: "padding_left_size"
+      type: "uint8_t"
+      description: "左侧填充的大小，取值范围：[0, 255]。"
+    - name: "padding_right_size"
+      type: "uint8_t"
+      description: "右侧填充的大小，取值范围：[0, 255]。"
+    - name: "padding_top_size"
+      type: "uint8_t"
+      description: "上侧填充的大小，取值范围：[0, 255]。"
+    - name: "padding_bottom_size"
+      type: "uint8_t"
+      description: "下侧填充的大小，取值范围：[0, 255]。"
+headers: ["/include/c_api/defs/union.h"]
+signature:
+  []
+examples: []
+timestamp: "2026-09-20"
+---
+
 # asc_l13d_fmatrix_config
 
 asc_l13d_fmatrix_config用于设置[asc_copy_l12l0a](../../cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](../../cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口的Feature map属性参数。
