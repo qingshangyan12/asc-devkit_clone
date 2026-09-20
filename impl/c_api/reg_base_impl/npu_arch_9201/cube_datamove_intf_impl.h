@@ -18,7 +18,7 @@
 #ifndef IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_9201_CUBE_DATAMOVE_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_NPU_ARCH_9201_CUBE_DATAMOVE_INTF_IMPL_H
 
-#include "impl/c_api/instr_impl/npu_arch_9201/utils_impl.h"
+#include "impl/c_api/reg_base_impl/utils_impl.h"
 
 constexpr uint8_t RELU_POST_DEFAULT = 0;
 

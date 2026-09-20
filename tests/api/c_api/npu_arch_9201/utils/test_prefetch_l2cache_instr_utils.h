@@ -14,7 +14,6 @@
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
 #include "tests/api/c_api/stub/cce_stub.h"
-#include "impl/c_api/instr_impl/npu_arch_9201/utils_impl/utils_impl.h"
 
 #ifndef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
