@@ -25,6 +25,10 @@ using namespace optiling;
 using namespace AscendC;
 using namespace HcclApi;
 
+namespace AscendC::HcclTilingInternal {
+uint8_t ResolveDevType(const char* socVersion);
+}
+
 class TestHcclTiling : public testing::Test {
 protected:
     static void SetUpTestCase() {}
@@ -276,6 +280,21 @@ TEST_F(TestHcclTilingCcuKfc, ReduceScatterSoleNhrMultiLinkCcuSchedUsesCcuNewVers
         INIT_TILING_CCU_NEW_VERSION);
 }
 
+TEST_F(TestHcclTilingCcuKfc, ResolveDevType_UsesPlatformNameSubstrings)
+{
+    EXPECT_EQ(HcclTilingInternal::ResolveDevType("Ascend910B4"), 1U);
+    EXPECT_EQ(HcclTilingInternal::ResolveDevType("Ascend950PR_958b"), 6U);
+    EXPECT_EQ(HcclTilingInternal::ResolveDevType("Ascend910_96"), 8U);
+    EXPECT_EQ(HcclTilingInternal::ResolveDevType("ascend910_96"), 8U);
+    EXPECT_EQ(HcclTilingInternal::ResolveDevType("prefix_Ascend910B4_suffix"), 1U);
+    EXPECT_EQ(HcclTilingInternal::ResolveDevType("prefix_Ascend950_suffix"), 6U);
+    EXPECT_EQ(HcclTilingInternal::ResolveDevType("prefix_Ascend910_96_suffix"), 8U);
+    EXPECT_EQ(HcclTilingInternal::ResolveDevType("Unknown96"), UINT8_MAX);
+    EXPECT_EQ(HcclTilingInternal::ResolveDevType("Ascend960"), UINT8_MAX);
+    EXPECT_EQ(HcclTilingInternal::ResolveDevType(""), UINT8_MAX);
+    EXPECT_EQ(HcclTilingInternal::ResolveDevType(nullptr), UINT8_MAX);
+}
+
 // ============================================================================
 // 以下用例覆盖 commit aaa3d79e5 的改动:
 // 修复 hccl_tiling.cpp 中不安全的动态库加载。
@@ -317,8 +336,8 @@ TEST_F(TestHcclSymbolLoader, Load_validPath_success)
     ASSERT_NE(homePath, nullptr);
     std::string pathName = std::string(homePath) + "/lib64/";
 
-    auto func =
-        HcclSymbolLoader::GetInstance().Load<void (*)(char*, uint32_t)>("libruntime.so", "rtGetSocVersion", pathName);
+    auto func = HcclSymbolLoader::GetInstance().Load<int32_t (*)(char*, uint32_t)>(
+        "libruntime.so", "rtGetSocVersion", pathName);
     EXPECT_NE(func, nullptr);
 }
 
@@ -329,10 +348,10 @@ TEST_F(TestHcclSymbolLoader, Load_cached_returnsSamePointer)
     ASSERT_NE(homePath, nullptr);
     std::string pathName = std::string(homePath) + "/lib64/";
 
-    auto func1 =
-        HcclSymbolLoader::GetInstance().Load<void (*)(char*, uint32_t)>("libruntime.so", "rtGetSocVersion", pathName);
-    auto func2 =
-        HcclSymbolLoader::GetInstance().Load<void (*)(char*, uint32_t)>("libruntime.so", "rtGetSocVersion", pathName);
+    auto func1 = HcclSymbolLoader::GetInstance().Load<int32_t (*)(char*, uint32_t)>(
+        "libruntime.so", "rtGetSocVersion", pathName);
+    auto func2 = HcclSymbolLoader::GetInstance().Load<int32_t (*)(char*, uint32_t)>(
+        "libruntime.so", "rtGetSocVersion", pathName);
     EXPECT_NE(func1, nullptr);
     EXPECT_EQ(func1, func2);
 }
@@ -341,7 +360,7 @@ TEST_F(TestHcclSymbolLoader, Load_cached_returnsSamePointer)
 TEST_F(TestHcclSymbolLoader, Load_invalidPath_returnsNull)
 {
     std::string pathName = "/path/that/does/not/exist/";
-    auto func = HcclSymbolLoader::GetInstance().Load<void (*)(char*, uint32_t)>(
+    auto func = HcclSymbolLoader::GetInstance().Load<int32_t (*)(char*, uint32_t)>(
         "libruntime_not_exist.so", "rtGetSocVersion", pathName);
     EXPECT_EQ(func, nullptr);
 }
@@ -350,7 +369,7 @@ TEST_F(TestHcclSymbolLoader, Load_invalidPath_returnsNull)
 TEST_F(TestHcclSymbolLoader, Load_emptyPath_returnsNull)
 {
     std::string pathName = "";
-    auto func = HcclSymbolLoader::GetInstance().Load<void (*)(char*, uint32_t)>(
+    auto func = HcclSymbolLoader::GetInstance().Load<int32_t (*)(char*, uint32_t)>(
         "libruntime_not_exist.so", "rtGetSocVersion", pathName);
     EXPECT_EQ(func, nullptr);
 }
@@ -362,7 +381,7 @@ TEST_F(TestHcclSymbolLoader, Load_invalidSymbol_returnsNull)
     ASSERT_NE(homePath, nullptr);
     std::string pathName = std::string(homePath) + "/lib64/";
 
-    auto func = HcclSymbolLoader::GetInstance().Load<void (*)(char*, uint32_t)>(
+    auto func = HcclSymbolLoader::GetInstance().Load<int32_t (*)(char*, uint32_t)>(
         "libruntime.so", "rtSymbolDefinitelyNotExist", pathName);
     EXPECT_EQ(func, nullptr);
 }
