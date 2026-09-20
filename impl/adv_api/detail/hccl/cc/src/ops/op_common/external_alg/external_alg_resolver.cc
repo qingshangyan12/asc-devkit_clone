@@ -126,13 +126,17 @@ ResolveStatus ResolveExternalAlg(
 {
     algName.clear();
     errMsg.clear();
-    const std::vector<AlgCandidate>& candidates = GetExternalCandidates(opParam.opType, spec.canonical());
-    const std::string candList = DescribeCandidates(candidates);
+    // 查表/日志/errMsg 共用一份 canonical（HCCL_INFO 为运行期级别过滤，参数构造不受宏保护，勿在参数处重复构造）
+    const std::string key = spec.canonical();
+    const std::vector<AlgCandidate>& candidates = GetExternalCandidates(opParam.opType, key);
 
-    // 选名审计日志（spec §12：一条 INFO 汇总；engine 打枚举名与 resolved 行风格一致）
-    HCCL_INFO(
-        "[MC2_EXT_ALG] op[%u] ext[%s] engine[%s] candidates(%zu): [%s]", static_cast<u32>(opParam.opType),
-        spec.canonical().c_str(), EngineName(opParam.engine), candidates.size(), candList.c_str());
+    // 选名审计日志（spec §12：一条 INFO 汇总；engine 打枚举名与 resolved 行风格一致）。
+    // 级别关闭时 DescribeCandidates 的拼接是纯浪费——按级别惰性构造
+    if (HcclCheckLogLevel(HCCL_LOG_INFO)) {
+        HCCL_INFO(
+            "[MC2_EXT_ALG] op[%u] ext[%s] engine[%s] candidates(%zu): [%s]", static_cast<u32>(opParam.opType),
+            key.c_str(), EngineName(opParam.engine), candidates.size(), DescribeCandidates(candidates).c_str());
+    }
 
     for (const AlgCandidate& cand : candidates) {
         if (!EngineMatch(cand.engine, opParam)) { // (1) 引擎
@@ -154,13 +158,14 @@ ResolveStatus ResolveExternalAlg(
         return ResolveStatus::RESOLVED;
     }
 
-    // 报错三要素：外部名原文 / 候选列表 / 失败原因（opType 无现成名字映射，保持数字）
+    // 报错三要素：外部名原文 / 候选列表 / 失败原因（opType 无现成名字映射，保持数字）。
+    // 候选串仅失败路径构造一次（errMsg 契约需要，与日志级别无关）
     const std::string reason =
         candidates.empty() ?
             "(no candidate registered in this build for engine " + std::string(EngineName(opParam.engine)) + ")" :
             "(all candidates rejected by rules for engine " + std::string(EngineName(opParam.engine)) + ")";
-    errMsg = "resolve failed, ext=\"" + spec.canonical() + "\" op=" + std::to_string(static_cast<u32>(opParam.opType)) +
-             ", candidates=[" + candList + "] " + reason;
+    errMsg = "resolve failed, ext=\"" + key + "\" op=" + std::to_string(static_cast<u32>(opParam.opType)) +
+             ", candidates=[" + DescribeCandidates(candidates) + "] " + reason;
     HCCL_ERROR("[MC2_EXT_ALG] ERROR: %s", errMsg.c_str());
     return ResolveStatus::ERROR_INVALID;
 }
