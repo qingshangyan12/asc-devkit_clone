@@ -1,3 +1,36 @@
+---
+okftype: reference.api.cpp
+title: asc_select
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_select.md
+description: 执行矢量选择操作，给定两个源操作数src0和src1，根据条件选择元素，得到目的操作数dst。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [selection]
+  - objects: [mask, vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, high_dimensional, masked]
+signature:
+  - prototype_id: asc_select__v<dtype>_v<dtype>_v<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_permute_sel.h]
+    dtype:
+      values:
+        - half
+        - float
+  - prototype_id: asc_select__v<dtype>_v<dtype>_v<dtype>_u8_u8_u8_u8_u8_u8_u8
+    headers: [c_api/vector_compute/compute/vector_permute_sel.h]
+    dtype:
+      values:
+        - half
+        - float
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
+    kind: requires
+timestamp: '2026-09-19'
+---
 # asc_select
 
 ## 产品支持情况

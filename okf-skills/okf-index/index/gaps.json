@@ -1,0 +1,53 @@
+{
+  "schema": "okf-gaps/1",
+  "scope_out_gaps": [
+    {
+      "id": "pipeline-event-sync",
+      "keywords": ["同步", "notify", "wait", "流水线", "sync", "事件通知"],
+      "conclusion": "流水线间事件同步（notify/wait）能力在 vector_datamove 与 vector_compute 两个目录内无文档",
+      "hints": [
+        {"path": "include/c_api/sync/sync.h", "note": "asc_sync_notify/asc_sync_wait 等声明位于 c_api/sync 源码"},
+        {"path": "docs/zh/api/SIMD-API/c_api/sync", "note": "对应文档目录（本期范围外）"}
+      ],
+      "evidence": [
+        {"path": "examples/02_simd_c_api/03_c_api/01_memory_vector_compute/fused_compute/fused_compute.asc", "note": "样例调用 asc_sync_notify/asc_sync_wait，文档位于范围外"},
+        {"path": "okf-skills/okf-evaluate/testset/tasks.yaml", "note": "E1 任务定义与 correct_behavior 口径"}
+      ]
+    },
+    {
+      "id": "register-load-store",
+      "keywords": ["寄存器", "loadalign", "storealign", "加载", "存储"],
+      "conclusion": "矢量寄存器加载/存储（loadalign/storealign）能力在两个目录内无文档，范围内仅有 Unified Buffer 形态的搬运接口",
+      "hints": [
+        {"path": "include/c_api/reg_compute/load/loadalign.h", "note": "asc_loadalign 等声明位于 c_api/reg_compute 源码"},
+        {"path": "docs/zh/api/SIMD-API/c_api/reg_compute", "note": "对应文档目录（本期范围外）"}
+      ],
+      "evidence": [
+        {"path": "examples/02_simd_c_api/03_c_api/02_reg_vector_compute/div/div.asc", "note": "样例调用 asc_loadalign/asc_storealign，文档位于范围外"},
+        {"path": "okf-skills/okf-evaluate/testset/tasks.yaml", "note": "E2 任务定义与 correct_behavior 口径"}
+      ]
+    },
+    {
+      "id": "float-floor",
+      "keywords": ["floor", "取整", "向下取整", "截断"],
+      "conclusion": "浮点向下取整（floor）计算能力在两个目录内无文档",
+      "hints": [
+        {"path": "include/c_api/reg_compute/reg_convert.h", "note": "asc_floor 声明位于 c_api/reg_compute 源码"},
+        {"path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_floor.md", "note": "对应文档（本期范围外）"}
+      ],
+      "evidence": [
+        {"path": "examples/02_simd_c_api/03_c_api/02_reg_vector_compute/truncate/truncate.asc", "note": "样例调用 asc_floor，文档位于范围外"},
+        {"path": "okf-skills/okf-evaluate/testset/tasks.yaml", "note": "E3 任务定义与 correct_behavior 口径"}
+      ]
+    }
+  ],
+  "relation_gaps": [
+    {
+      "from": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md",
+      "note": "正文约束说明「需和Compare操作配合使用」指向泛指的 Compare 操作，未链接到具体接口文档，依赖关系无法落在具体目标上；vector_compare 分类下的比较类 API（如 asc_lt/asc_gt）为候选配合对象",
+      "evidence": [
+        {"path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md", "note": "正文约束说明原文"}
+      ]
+    }
+  ]
+}

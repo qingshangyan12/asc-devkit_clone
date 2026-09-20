@@ -1,0 +1,62 @@
+{
+  "task_id": "E2",
+  "session_id": "ses_f452f310dffe88Jun8yOUPnUGk",
+  "model": "{\"id\":\"glm-5.3\",\"providerID\":\"cannbot\",\"variant\":\"default\"}",
+  "duration_s": 147.4,
+  "tokens_input": 34326,
+  "tokens_output": 1830,
+  "tokens_reasoning": 4903,
+  "tokens_total": 41059,
+  "tokens_cache_read": 186496,
+  "tokens_cache_write": 0,
+  "cost": 0.0,
+  "tool_calls": {
+    "bash": 12,
+    "grep": 3,
+    "glob": 2,
+    "read": 3
+  },
+  "docs_read_in_scope": 1,
+  "bytes_read_docs": 2199,
+  "source_files_read": 2,
+  "bytes_read_source": 148384,
+  "isolation_violations": [
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --kw 对齐,加载,矢量寄存器\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --stage in\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --kw 寄存器\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --gap 寄存器,loadalign,加载\"}"
+    },
+    {
+      "tool": "grep",
+      "severity": "leakage",
+      "detail": "/mnt/workspace/asc-devkit/docs/zh/api/SIMD-API loadalign|load_align|LoadAlign；输出含范围外路径 docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2half_deprecated.md",
+      "input": "{\"path\": \"/mnt/workspace/asc-devkit/docs/zh/api/SIMD-API\", \"pattern\": \"loadalign|load_align|LoadAlign\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --api asc_loadalign; python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --gap 寄存器; python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --gap 加载\"}"
+    }
+  ],
+  "isolation_ok": false
+}

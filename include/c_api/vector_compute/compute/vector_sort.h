@@ -26,12 +26,30 @@
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/reg_base_impl/vector_sort_intf_impl.h"
 #endif
+/**
+ * @brief 此接口用于获取执行[asc_mrgsort4](asc_mrgsort4.md)操作后的4个队列中，每个队列已经理过的Region Proposal个数。
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_bitsort.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md
+ */
 __aicore__ inline void asc_get_vms4_sr(uint16_t sorted_num[4]);
 
+/**
+ * @brief 位图排序函数，一次迭代可以完成32个元素的排序，数据按如下描述结构进行保存：
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_bitsort.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md
+ */
 __aicore__ inline void asc_bitsort(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat);
 
 __aicore__ inline void asc_bitsort(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, int32_t repeat);
 
+/**
+ * @brief 将已经排好序的最多4条队列，合并排列成1条队列，结果按照score域由大到小排序。
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_bitsort.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md
+ */
 __aicore__ inline void asc_mrgsort4(
     __ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0,
     uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension,

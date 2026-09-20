@@ -1,3 +1,38 @@
+---
+okftype: reference.api.cpp
+title: asc_max_scalar
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_max_scalar.md
+description: 矢量src的逐个元素与标量value比较大小，接着按照对应的比特位将最大值存入dst中。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: [arithmetic]
+  - operations: [maximum]
+  - objects: [scalar, vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, elementwise, high_dimensional, scalar_operand]
+signature:
+  - prototype_id: asc_max_scalar__v<dtype>_v<dtype>_<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_arith.h]
+    dtype:
+      values:
+        - int16_t
+        - half
+        - int32_t
+        - float
+  - prototype_id: asc_max_scalar__v<dtype>_v<dtype>_<dtype>_u8_u16_u16_u16_u16
+    headers: [c_api/vector_compute/compute/vector_arith.h]
+    dtype:
+      values:
+        - int16_t
+        - half
+        - int32_t
+        - float
+dependencies: []
+timestamp: '2026-09-19'
+---
 # asc_max_scalar
 
 ## 产品支持情况

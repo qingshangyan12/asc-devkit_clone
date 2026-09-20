@@ -1,3 +1,78 @@
+---
+okftype: reference.arch.cpp
+title: asc_copy_ub2gm_align
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md
+description: 提供数据非对齐搬运的功能，将数据从Unified Buffer（UB）搬运到Global Memory (GM)，并支持8位/16位/32位数据类型搬运。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [unified_buffer]
+  - destination_locations: [global_memory]
+  - traits: [high_dimensional, unaligned_transfer]
+signature:
+  - prototype_id: asc_copy_ub2gm_align__vdtype_vdtype_u32
+    archs: ['3510']
+    headers: [c_api/vector_datamove/vector_datamove.h]
+    dtype:
+      values:
+        - int8_t
+        - uint8_t
+        - hifloat8_t
+        - fp8_e5m2_t
+        - fp8_e4m3fn_t
+        - int16_t
+        - uint16_t
+        - half
+        - bfloat16_t
+        - int32_t
+        - uint32_t
+        - float
+  - prototype_id: asc_copy_ub2gm_align__vdtype_vdtype_u32_u32_l2cm_u64_u32
+    archs: ['3510']
+    headers: [c_api/vector_datamove/vector_datamove.h]
+    dtype:
+      values:
+        - int8_t
+        - uint8_t
+        - hifloat8_t
+        - fp8_e5m2_t
+        - fp8_e4m3fn_t
+        - int16_t
+        - uint16_t
+        - half
+        - bfloat16_t
+        - int32_t
+        - uint32_t
+        - float
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop2_stride.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop_size.md
+    kind: related
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/01_memory_vector_compute/cast
+    file: cast.asc
+    archs: ['2201']
+  - path: /examples/02_simd_c_api/03_c_api/01_memory_vector_compute/fused_compute
+    file: fused_compute.asc
+    archs: ['2201']
+  - path: /examples/02_simd_c_api/03_c_api/01_memory_vector_compute/reduce
+    file: reduce.asc
+    archs: ['2201']
+  - path: /examples/02_simd_c_api/03_c_api/01_memory_vector_compute/compare
+    file: compare.asc
+    archs: ['2201']
+  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/asc_copy_l0c2ub
+    file: asc_copy_l0c2ub.asc
+    archs: ['3510']
+timestamp: '2026-09-19'
+---
 # asc_copy_ub2gm_align
 
 ## 产品支持情况

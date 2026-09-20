@@ -1,3 +1,36 @@
+---
+okftype: reference.api.cpp
+title: asc_reduce
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_reduce.md
+description: 以内置固定模式对应的二进制或者用户自定义输入的数值对应的gather mask（数据收集的掩码），从源操作数中选取元素写入目的操作数中。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [gather]
+  - objects: [mask, vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, high_dimensional]
+signature:
+  - prototype_id: asc_reduce__v<dtype>_v<dtype>_v<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_reduce.h]
+    dtype:
+      values:
+        - uint16_t
+        - uint32_t
+  - prototype_id: asc_reduce__v<dtype>_v<dtype>_v<dtype>_u16_u8_u8_u16_u8
+    headers: [c_api/vector_compute/compute/vector_reduce.h]
+    dtype:
+      values:
+        - uint16_t
+        - uint32_t
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md
+    kind: related
+timestamp: '2026-09-19'
+---
 # asc_reduce
 
 ## 产品支持情况

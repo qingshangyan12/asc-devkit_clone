@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: asc_brcb
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_brcb.md
+description: 给定一个输入矢量，每一次取输入矢量中的8个数填充到结果矢量的8个datablock（32Bytes）中去，每个数对应一个datablock。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [broadcast]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [high_dimensional]
+signature:
+  - prototype_id: asc_brcb__v<dtype>_v<dtype>_u16_u16_u8
+    headers: [c_api/vector_compute/compute/vector_broadcast.h]
+    dtype:
+      values:
+        - uint16_t
+        - uint32_t
+dependencies: []
+timestamp: '2026-09-19'
+---
 # asc_brcb
 
 ## 产品支持情况

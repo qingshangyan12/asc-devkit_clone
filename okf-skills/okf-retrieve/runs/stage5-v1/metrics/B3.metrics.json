@@ -1,0 +1,50 @@
+{
+  "task_id": "B3",
+  "session_id": "ses_f453b1f33ffe6F9mVIsVvNJnJX",
+  "model": "{\"id\":\"glm-5.3\",\"providerID\":\"cannbot\",\"variant\":\"default\"}",
+  "duration_s": 19.9,
+  "tokens_input": 9434,
+  "tokens_output": 717,
+  "tokens_reasoning": 604,
+  "tokens_total": 10755,
+  "tokens_cache_read": 32832,
+  "tokens_cache_write": 0,
+  "cost": 0.0,
+  "tool_calls": {
+    "bash": 3,
+    "read": 4,
+    "grep": 1,
+    "glob": 1
+  },
+  "docs_read_in_scope": 4,
+  "bytes_read_docs": 12146,
+  "source_files_read": 0,
+  "bytes_read_source": 0,
+  "isolation_violations": [
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --kw 掩码 --json\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --kw 掩码,count模式 --json\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --kw 向量掩码配置 --json\"}"
+    },
+    {
+      "tool": "grep",
+      "severity": "scan_breach",
+      "detail": "/mnt/workspace/asc-devkit asc_set_mask_count|asc_set_mask_norm|asc_set_vector_mask；输出无范围外内容",
+      "input": "{\"include\": \"*.h\", \"path\": \"/mnt/workspace/asc-devkit\", \"pattern\": \"asc_set_mask_count|asc_set_mask_norm|asc_set_vector_mask\"}"
+    }
+  ],
+  "isolation_ok": false
+}

@@ -24,6 +24,10 @@
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "impl/c_api/memory_base_impl/vector_broadcast_intf_impl.h"
 #endif
+/**
+ * @brief 给定一个输入矢量，每一次取输入矢量中的8个数填充到结果矢量的8个datablock（32Bytes）中去，每个数对应一个datablock。
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_brcb.md
+ */
 __aicore__ inline void asc_brcb(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint16_t dst_block_stride, uint16_t dst_repeat_stride,
     uint8_t repeat);
@@ -32,6 +36,10 @@ __aicore__ inline void asc_brcb(
     __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint16_t dst_block_stride, uint16_t dst_repeat_stride,
     uint8_t repeat);
 
+/**
+ * @brief 执行矢量复制（Duplicate）操作，将标量值复制填充到矢量中。
+ * @see docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_duplicate.md
+ */
 __aicore__ inline void asc_duplicate(
     __ubuf__ half* dst, half src, uint8_t repeat, uint16_t dst_block_stride, uint16_t dst_repeat_stride);
 

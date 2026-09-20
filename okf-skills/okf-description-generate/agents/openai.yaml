@@ -1,0 +1,4 @@
+interface:
+  display_name: "OKF API Description"
+  short_description: "由 Agent 生成可追溯的 API 描述并受控写入"
+  default_prompt: "使用 $okf-description-generate 为指定 Ascend DevKit API 生成、校验并写入 description。"

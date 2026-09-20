@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: asc_transpose
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transpose.md
+description: 用于实现16*16的二维矩阵数据块转置。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [transpose]
+  - objects: [matrix, vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: []
+signature:
+  - prototype_id: asc_transpose__v<dtype>_v<dtype>
+    headers: [c_api/vector_compute/compute/vector_permute_sel.h]
+    dtype:
+      values:
+        - int16_t
+        - uint16_t
+dependencies: []
+timestamp: '2026-09-19'
+---
 # asc_transpose
 
 ## 产品支持情况

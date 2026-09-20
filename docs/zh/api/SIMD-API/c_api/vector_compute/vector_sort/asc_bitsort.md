@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: asc_bitsort
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_bitsort.md
+description: 位图排序函数，一次迭代可以完成32个元素的排序，数据按如下描述结构进行保存：
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [sort]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: []
+signature:
+  - prototype_id: asc_bitsort__v<dtype>_v<dtype>_vu32_i32
+    headers: [c_api/vector_compute/compute/vector_sort.h]
+    dtype:
+      values:
+        - half
+        - float
+dependencies: []
+timestamp: '2026-09-19'
+---
 # asc_bitsort
 
 ## 产品支持情况

@@ -1,3 +1,34 @@
+---
+okftype: reference.api.cpp
+title: asc_and
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_and.md
+description: 执行矢量与运算。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: [bitwise]
+  - operations: [bitwise_and]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, elementwise, high_dimensional]
+signature:
+  - prototype_id: asc_and__v<dtype>_v<dtype>_v<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_logic.h]
+    dtype:
+      values:
+        - int16_t
+        - uint16_t
+  - prototype_id: asc_and__v<dtype>_v<dtype>_v<dtype>_u8_u8_u8_u8_u8_u8_u8
+    headers: [c_api/vector_compute/compute/vector_logic.h]
+    dtype:
+      values:
+        - int16_t
+        - uint16_t
+dependencies: []
+timestamp: '2026-09-19'
+---
 # asc_and
 
 ## 产品支持情况

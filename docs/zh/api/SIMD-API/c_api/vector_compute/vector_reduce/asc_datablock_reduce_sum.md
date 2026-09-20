@@ -1,3 +1,38 @@
+---
+okftype: reference.api.cpp
+title: asc_datablock_reduce_sum
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_sum.md
+description: 对每个DataBlock内所有元素求和。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [reduction]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, high_dimensional, saturation_mode]
+signature:
+  - prototype_id: asc_datablock_reduce_sum__v<dtype>_v<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_reduce.h]
+    dtype:
+      values:
+        - half
+        - float
+  - prototype_id: asc_datablock_reduce_sum__v<dtype>_v<dtype>_u8_u16_u16_u16
+    headers: [c_api/vector_compute/compute/vector_reduce.h]
+    dtype:
+      values:
+        - half
+        - float
+dependencies: []
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/01_memory_vector_compute/reduce
+    file: reduce.asc
+    archs: [dav-2201]
+timestamp: '2026-09-19'
+---
 # asc_datablock_reduce_sum
 
 ## 产品支持情况

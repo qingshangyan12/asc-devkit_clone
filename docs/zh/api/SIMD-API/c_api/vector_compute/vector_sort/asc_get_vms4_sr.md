@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: asc_get_vms4_sr
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md
+description: 此接口用于获取执行[asc_mrgsort4](asc_mrgsort4.md)操作后的4个队列中，每个队列已经理过的Region Proposal个数。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [query]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - prototype_id: asc_get_vms4_sr__u16
+    headers: [c_api/vector_compute/compute/vector_sort.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md
+    kind: requires
+timestamp: '2026-09-19'
+---
 # asc_get_vms4_sr
 
 ## 产品支持情况

@@ -1,0 +1,4 @@
+interface:
+  display_name: "OKF Dependency Generate"
+  short_description: "根据正文证据生成 API dependencies 字段"
+  default_prompt: "使用 $okf-dependency-generate 为指定 API 生成 dependencies，先 dry-run 再写入。"

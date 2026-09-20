@@ -1,3 +1,42 @@
+---
+okftype: reference.api.cpp
+title: asc_set_copy_pad_val
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md
+description: 该接口与[asc_copy_gm2ub_align](./asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)配合使用，用于设置连续搬运数据块左右两侧的填充值。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement_configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - prototype_id: asc_set_copy_pad_val__dtype
+    archs: ['3510']
+    headers: [c_api/vector_datamove/vector_datamove.h]
+    dtype:
+      values:
+        - int8_t
+        - uint8_t
+        - int16_t
+        - uint16_t
+        - half
+        - bfloat16_t
+        - int32_t
+        - uint32_t
+        - float
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md
+    kind: configures
+examples:
+  - path: /examples/01_simd_cpp_api/07_tensor_api/experimental/reg_vector_compute/copy_vector
+    file: copy_vector.asc
+    archs: ['3510']
+timestamp: '2026-09-19'
+---
 # asc_set_copy_pad_val
 
 ## 产品支持情况

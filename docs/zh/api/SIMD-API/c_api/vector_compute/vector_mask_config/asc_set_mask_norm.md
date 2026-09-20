@@ -1,3 +1,26 @@
+---
+okftype: reference.api.cpp
+title: asc_set_mask_norm
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_norm.md
+description: 设置Mask模式为Normal模式，该模式为系统默认模式。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [configuration]
+  - families: []
+  - operations: []
+  - objects: [mask]
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - prototype_id: asc_set_mask_norm
+    headers: [c_api/vector_compute/compute/vector_mask_config.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md
+    kind: related
+timestamp: '2026-09-19'
+---
 # asc_set_mask_norm
 
 ## 产品支持情况

@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: asc_get_reduce_min_cnt
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_min_cnt.md
+description: 此接口用于获取执行[asc_repeat_reduce_min](asc_repeat_reduce_min.md)操作后的最小值，以及第一个最小值时的索引。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [query]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - prototype_id: asc_get_reduce_min_cnt__<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_reduce.h]
+    dtype:
+      values:
+        - half
+        - float
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_min.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_min.md
+    kind: requires
+timestamp: '2026-09-19'
+---
 # asc_get_reduce_min_cnt
 
 ## 产品支持情况

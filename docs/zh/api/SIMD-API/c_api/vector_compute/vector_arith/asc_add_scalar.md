@@ -1,3 +1,38 @@
+---
+okftype: reference.api.cpp
+title: asc_add_scalar
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_add_scalar.md
+description: 执行矢量加法运算。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: [arithmetic]
+  - operations: [add]
+  - objects: [scalar, vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, elementwise, high_dimensional, scalar_operand]
+signature:
+  - prototype_id: asc_add_scalar__v<dtype>_v<dtype>_<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_arith.h]
+    dtype:
+      values:
+        - int16_t
+        - half
+        - int32_t
+        - float
+  - prototype_id: asc_add_scalar__v<dtype>_v<dtype>_<dtype>_u8_u16_u16_u16_u16
+    headers: [c_api/vector_compute/compute/vector_arith.h]
+    dtype:
+      values:
+        - int16_t
+        - half
+        - int32_t
+        - float
+dependencies: []
+timestamp: '2026-09-19'
+---
 # asc_add_scalar
 
 ## 产品支持情况

@@ -1,3 +1,34 @@
+---
+okftype: reference.api.cpp
+title: asc_int162half
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int162half.md
+description: 将int16_t类型数据转换为half类型，支持多种舍入模式：
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, high_dimensional, rounding_mode]
+signature:
+  - prototype_id: asc_int162half__v<dtype>_v<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_convert.h]
+    dtype:
+      values:
+        - half
+        - int16_t
+  - prototype_id: asc_int162half__v<dtype>_v<dtype>_u8_u16_u16_u16_u16
+    headers: [c_api/vector_compute/compute/vector_convert.h]
+    dtype:
+      values:
+        - half
+        - int16_t
+dependencies: []
+timestamp: '2026-09-19'
+---
 # asc_int162half
 
 ## 产品支持情况

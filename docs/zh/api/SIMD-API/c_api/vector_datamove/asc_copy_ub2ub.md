@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: asc_copy_ub2ub
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2ub.md
+description: 将数据从Unified Buffer（UB）搬运到UB。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [high_dimensional]
+signature:
+  - prototype_id: asc_copy_ub2ub__vp_vp_u32
+    archs: ['3510']
+    headers: [c_api/vector_datamove/vector_datamove.h]
+  - prototype_id: asc_copy_ub2ub__vp_vp_u16_u16_u16_u16
+    archs: ['3510']
+    headers: [c_api/vector_datamove/vector_datamove.h]
+dependencies: []
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_ub2l1
+    file: data_copy_ub2l1.asc
+    archs: ['3510']
+timestamp: '2026-09-19'
+---
 # asc_copy_ub2ub
 
 ## 产品支持情况

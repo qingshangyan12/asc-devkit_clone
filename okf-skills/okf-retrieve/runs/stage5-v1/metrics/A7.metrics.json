@@ -1,0 +1,73 @@
+{
+  "task_id": "A7",
+  "session_id": "ses_f4540f13dffemNt3ZeKlYnFbdi",
+  "model": "{\"id\":\"glm-5.3\",\"providerID\":\"cannbot\",\"variant\":\"default\"}",
+  "duration_s": 109.0,
+  "tokens_input": 25749,
+  "tokens_output": 2004,
+  "tokens_reasoning": 4654,
+  "tokens_total": 32407,
+  "tokens_cache_read": 133696,
+  "tokens_cache_write": 0,
+  "cost": 0.0,
+  "tool_calls": {
+    "bash": 9,
+    "read": 5,
+    "grep": 5
+  },
+  "docs_read_in_scope": 5,
+  "bytes_read_docs": 17002,
+  "source_files_read": 0,
+  "bytes_read_source": 0,
+  "isolation_violations": [
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --stage in,out,compute\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --operation select,select_by_mask\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --api asc_select\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --deps-of asc_select; python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --deps-of asc_copy_gm2ub\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --kw 掩码,选择,比特位\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --api asc_copy_gm2ub; python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --api asc_copy_ub2gm\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --gap 同步,流水线,pipe\"}"
+    },
+    {
+      "tool": "grep",
+      "severity": "leakage",
+      "detail": "/mnt/workspace/asc-devkit/docs/zh/api/SIMD-API/c_api asc_sync_pipe|asc_set_flag|asc_wait；输出含范围外路径 docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md",
+      "input": "{\"include\": \"*.md\", \"path\": \"/mnt/workspace/asc-devkit/docs/zh/api/SIMD-API/c_api\", \"pattern\": \"asc_sync_pipe|asc_set_flag|asc_wait\"}"
+    }
+  ],
+  "isolation_ok": false
+}

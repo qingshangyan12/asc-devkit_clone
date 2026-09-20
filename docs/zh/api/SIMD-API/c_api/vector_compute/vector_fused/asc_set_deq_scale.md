@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: asc_set_deq_scale
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md
+description: 设置DEQSCALE（量化参数）寄存器的值。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [configuration]
+  - families: []
+  - operations: []
+  - objects: [scalar]
+  - execution_models: []
+  - source_locations: [unified_buffer]
+  - destination_locations: []
+  - traits: []
+signature:
+  - prototype_id: asc_set_deq_scale__vu64_f32arr_i16arr_boolarr
+    headers: [c_api/vector_compute/compute/vector_fused.h]
+  - prototype_id: asc_set_deq_scale__f32_i16_bool
+    headers: [c_api/vector_compute/compute/vector_fused.h]
+  - prototype_id: asc_set_deq_scale__f16
+    headers: [c_api/vector_compute/compute/vector_fused.h]
+dependencies: []
+timestamp: '2026-09-19'
+---
 # asc_set_deq_scale
 
 ## 产品支持情况

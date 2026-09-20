@@ -1,3 +1,38 @@
+---
+okftype: reference.api.cpp
+title: asc_half2int4
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int4.md
+description: 将half类型数据转换为int4类型，支持多种舍入模式：
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, high_dimensional, rounding_mode]
+signature:
+  - prototype_id: asc_half2int4__v<dtype>_v<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_convert.h]
+    dtype:
+      values:
+        - int4b_t
+        - half
+  - prototype_id: asc_half2int4__v<dtype>_v<dtype>_u8_u16_u16_u16_u16
+    headers: [c_api/vector_compute/compute/vector_convert.h]
+    dtype:
+      values:
+        - int4b_t
+        - half
+dependencies: []
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/01_memory_vector_compute/cast
+    file: cast.asc
+    archs: ['2201']
+timestamp: '2026-09-19'
+---
 # asc_half2int4
 
 ## 产品支持情况

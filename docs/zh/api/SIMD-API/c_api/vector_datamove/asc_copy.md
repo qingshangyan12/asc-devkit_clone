@@ -1,3 +1,38 @@
+---
+okftype: reference.api.cpp
+title: asc_copy
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy.md
+description: 将数据从Unified Buffer（UB）搬运到UB。支持高维切分。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: [vector]
+  - execution_models: []
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [high_dimensional]
+signature:
+  - prototype_id: asc_copy__v_v_u32
+    headers: [c_api/vector_datamove/vector_datamove.h]
+    dtype:
+      values:
+        - int16_t
+        - uint16_t
+        - int32_t
+        - uint32_t
+  - prototype_id: asc_copy__v_v_u8_u16_u16_u16_u16
+    headers: [c_api/vector_datamove/vector_datamove.h]
+    dtype:
+      values:
+        - int16_t
+        - uint16_t
+        - int32_t
+        - uint32_t
+dependencies: []
+timestamp: '2026-09-19'
+---
 
 # asc_copy
 

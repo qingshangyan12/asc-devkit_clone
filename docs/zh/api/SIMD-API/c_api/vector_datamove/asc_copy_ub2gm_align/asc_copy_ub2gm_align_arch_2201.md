@@ -1,3 +1,72 @@
+---
+okftype: reference.arch.cpp
+title: asc_copy_ub2gm_align
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_2201.md
+description: 将数据从Unified Buffer（UB）搬运到Global Memory (GM)，支持8位/16位/32位分块拷贝操作。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [unified_buffer]
+  - destination_locations: [global_memory]
+  - traits: [high_dimensional, unaligned_transfer]
+signature:
+  - prototype_id: asc_copy_ub2gm_align__vdtype_vdtype_u32
+    archs: ['2201']
+    headers: [c_api/vector_datamove/vector_datamove.h]
+    dtype:
+      values:
+        - uint8_t
+        - int8_t
+        - half
+        - uint16_t
+        - int16_t
+        - bfloat16_t
+        - uint32_t
+        - float
+        - int32_t
+        - double
+        - int64_t
+        - uint64_t
+  - prototype_id: asc_copy_ub2gm_align__vdtype_vdtype_u16_u32_u8_u8_u32_u32
+    archs: ['2201']
+    headers: [c_api/vector_datamove/vector_datamove.h]
+    dtype:
+      values:
+        - uint8_t
+        - int8_t
+        - half
+        - uint16_t
+        - int16_t
+        - bfloat16_t
+        - uint32_t
+        - float
+        - int32_t
+        - double
+        - int64_t
+        - uint64_t
+dependencies: []
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/01_memory_vector_compute/cast
+    file: cast.asc
+    archs: ['2201']
+  - path: /examples/02_simd_c_api/03_c_api/01_memory_vector_compute/fused_compute
+    file: fused_compute.asc
+    archs: ['2201']
+  - path: /examples/02_simd_c_api/03_c_api/01_memory_vector_compute/reduce
+    file: reduce.asc
+    archs: ['2201']
+  - path: /examples/02_simd_c_api/03_c_api/01_memory_vector_compute/compare
+    file: compare.asc
+    archs: ['2201']
+  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/asc_copy_l0c2ub
+    file: asc_copy_l0c2ub.asc
+    archs: ['3510']
+timestamp: '2026-09-19'
+---
 # asc_copy_ub2gm_align
 
 ## 产品支持情况

@@ -1,3 +1,34 @@
+---
+okftype: reference.api.cpp
+title: asc_mul_cast_half2int8
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_cast_half2int8.md
+description: 按元素求积，并将结果转换为int8_t类型。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: [arithmetic]
+  - operations: [conversion, multiply]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, elementwise, high_dimensional, rounding_mode, saturation_mode]
+signature:
+  - prototype_id: asc_mul_cast_half2int8__v<dtype>_v<dtype>_v<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_fused.h]
+    dtype:
+      values:
+        - int8_t
+        - half
+  - prototype_id: asc_mul_cast_half2int8__v<dtype>_v<dtype>_v<dtype>_u8_u8_u8_u8_u8_u8_u8
+    headers: [c_api/vector_compute/compute/vector_fused.h]
+    dtype:
+      values:
+        - int8_t
+        - half
+dependencies: []
+timestamp: '2026-09-19'
+---
 
 # asc_mul_cast_half2int8
 

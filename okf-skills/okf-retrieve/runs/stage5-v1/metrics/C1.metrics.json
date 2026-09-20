@@ -1,0 +1,50 @@
+{
+  "task_id": "C1",
+  "session_id": "ses_f4538bbb2ffenbhDGGTx5WJJeq",
+  "model": "{\"id\":\"glm-5.3\",\"providerID\":\"cannbot\",\"variant\":\"default\"}",
+  "duration_s": 38.0,
+  "tokens_input": 18850,
+  "tokens_output": 1315,
+  "tokens_reasoning": 1666,
+  "tokens_total": 21831,
+  "tokens_cache_read": 43776,
+  "tokens_cache_write": 0,
+  "cost": 0.0,
+  "tool_calls": {
+    "bash": 3,
+    "read": 4,
+    "glob": 1,
+    "grep": 1
+  },
+  "docs_read_in_scope": 4,
+  "bytes_read_docs": 36206,
+  "source_files_read": 0,
+  "bytes_read_source": 0,
+  "isolation_violations": [
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --api asc_ndim_copy_gm2ub --json\", \"workdir\": \"/mnt/workspace/asc-devkit\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --kw 填充,步长,非连续 --json\", \"workdir\": \"/mnt/workspace/asc-devkit\"}"
+    },
+    {
+      "tool": "bash",
+      "severity": "leakage",
+      "detail": "输入指向 okf-skills",
+      "input": "{\"command\": \"python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py --deps-of asc_ndim_copy_gm2ub --json\", \"workdir\": \"/mnt/workspace/asc-devkit\"}"
+    },
+    {
+      "tool": "grep",
+      "severity": "scan_breach",
+      "detail": "/mnt/workspace/asc-devkit asc_set_ndim_pad_count|asc_ndim_copy_gm2ub；输出无范围外内容",
+      "input": "{\"include\": \"*.h\", \"path\": \"/mnt/workspace/asc-devkit\", \"pattern\": \"asc_set_ndim_pad_count|asc_ndim_copy_gm2ub\"}"
+    }
+  ],
+  "isolation_ok": false
+}

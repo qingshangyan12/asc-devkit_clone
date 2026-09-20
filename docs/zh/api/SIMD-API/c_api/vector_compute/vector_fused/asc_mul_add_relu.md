@@ -1,3 +1,34 @@
+---
+okftype: reference.api.cpp
+title: asc_mul_add_relu
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_add_relu.md
+description: 按元素将src0和dst相乘并加上src1，再进行Relu计算（结果和0对比取较大值），最终结果存放进dst中。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: [activation, arithmetic]
+  - operations: [fused_multiply_add, relu]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, elementwise, high_dimensional]
+signature:
+  - prototype_id: asc_mul_add_relu__v<dtype>_v<dtype>_v<dtype>_u32
+    headers: [c_api/vector_compute/compute/vector_fused.h]
+    dtype:
+      values:
+        - half
+        - float
+  - prototype_id: asc_mul_add_relu__v<dtype>_v<dtype>_v<dtype>_u8_u8_u8_u8_u8_u8_u8
+    headers: [c_api/vector_compute/compute/vector_fused.h]
+    dtype:
+      values:
+        - half
+        - float
+dependencies: []
+timestamp: '2026-09-19'
+---
 # asc_mul_add_relu
 
 ## 产品支持情况

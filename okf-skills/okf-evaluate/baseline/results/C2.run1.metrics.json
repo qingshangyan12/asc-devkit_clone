@@ -1,0 +1,37 @@
+{
+  "task_id": "C2",
+  "session_id": "ses_f51953f91ffeZ06dmgbmYbCdkA",
+  "model": "{\"id\":\"glm-5.3\",\"providerID\":\"cannbot\",\"variant\":\"default\"}",
+  "duration_s": 48.0,
+  "tokens_input": 15431,
+  "tokens_output": 765,
+  "tokens_reasoning": 1043,
+  "tokens_total": 17239,
+  "tokens_cache_read": 18176,
+  "tokens_cache_write": 0,
+  "cost": 0.0,
+  "tool_calls": {
+    "grep": 4,
+    "read": 4,
+    "glob": 1
+  },
+  "docs_read_in_scope": 2,
+  "bytes_read_docs": 5061,
+  "source_files_read": 2,
+  "bytes_read_source": 53837,
+  "isolation_violations": [
+    {
+      "tool": "grep",
+      "severity": "leakage",
+      "detail": "/mnt/workspace/asc-devkit/docs/zh/api/SIMD-API/c_api deq_int322half；输出含范围外路径 docs/zh/api/SIMD-API/c_api/c_api.md",
+      "input": "{\"path\": \"/mnt/workspace/asc-devkit/docs/zh/api/SIMD-API/c_api\", \"pattern\": \"deq_int322half\"}"
+    },
+    {
+      "tool": "glob",
+      "severity": "scan_breach",
+      "detail": "/mnt/workspace/asc-devkit/docs/zh/api/SIMD-API/c_api **/asc_set_deq_scale*.md；输出无范围外内容",
+      "input": "{\"path\": \"/mnt/workspace/asc-devkit/docs/zh/api/SIMD-API/c_api\", \"pattern\": \"**/asc_set_deq_scale*.md\"}"
+    }
+  ],
+  "isolation_ok": false
+}

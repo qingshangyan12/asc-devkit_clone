@@ -1,3 +1,38 @@
+---
+okftype: reference.api.cpp
+title: asc_min_scalar
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_min_scalar.md
+description: 源操作数矢量逐元素与标量相比，如果比标量值大，则取标量值，比标量值小，则取源操作数值。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: [arithmetic]
+  - operations: [minimum]
+  - objects: [scalar, vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, elementwise, high_dimensional, scalar_operand]
+signature:
+  - prototype_id: asc_min_scalar__v<dtype>_v<dtype>_f16_u32
+    headers: [c_api/vector_compute/compute/vector_arith.h]
+    dtype:
+      values:
+        - half
+        - float
+        - int16_t
+        - int32_t
+  - prototype_id: asc_min_scalar__v<dtype>_v<dtype>_f16_u8_u16_u16_u16_u16
+    headers: [c_api/vector_compute/compute/vector_arith.h]
+    dtype:
+      values:
+        - half
+        - float
+        - int16_t
+        - int32_t
+dependencies: []
+timestamp: '2026-09-19'
+---
 # asc_min_scalar
 
 ## 产品支持情况

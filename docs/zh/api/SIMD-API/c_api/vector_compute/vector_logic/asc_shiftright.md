@@ -1,3 +1,38 @@
+---
+okftype: reference.api.cpp
+title: asc_shiftright
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md
+description: 对src中的每个元素执行右移，右移大小为value。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: [bitwise]
+  - operations: [bitwise_shift]
+  - objects: [scalar, vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [count_limited, elementwise, high_dimensional, scalar_operand]
+signature:
+  - prototype_id: asc_shiftright__v<dtype>_v<dtype>_i32_u32
+    headers: [c_api/vector_compute/compute/vector_logic.h]
+    dtype:
+      values:
+        - int16_t
+        - uint16_t
+        - int32_t
+        - uint32_t
+  - prototype_id: asc_shiftright__v<dtype>_v<dtype>_i32_u8_u16_u16_u16_u16
+    headers: [c_api/vector_compute/compute/vector_logic.h]
+    dtype:
+      values:
+        - int16_t
+        - uint16_t
+        - int32_t
+        - uint32_t
+dependencies: []
+timestamp: '2026-09-19'
+---
 
 # asc_shiftright
 

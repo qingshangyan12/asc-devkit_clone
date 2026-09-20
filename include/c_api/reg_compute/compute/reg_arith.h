@@ -353,73 +353,358 @@ __simd_callee__ inline void asc_exp(vector_half& dst, vector_half src, vector_bo
 
 __simd_callee__ inline void asc_exp(vector_float& dst, vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_add_scalar__Rvi8_vi8_i8_vb
+ * @archs 3510
+ * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline void asc_add_scalar(vector_int8_t& dst, vector_int8_t src, int8_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_add_scalar__Rvu8_vu8_u8_vb
+ * @archs 3510
+ * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline void asc_add_scalar(vector_uint8_t& dst, vector_uint8_t src, uint8_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_add_scalar__Rvi16_vi16_i16_vb
+ * @archs 3510
+ * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline void asc_add_scalar(vector_int16_t& dst, vector_int16_t src, int16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_add_scalar__Rvu16_vu16_u16_vb
+ * @archs 3510
+ * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline void asc_add_scalar(vector_uint16_t& dst, vector_uint16_t src, uint16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_add_scalar__Rvf16_vf16_f16_vb
+ * @archs 3510
+ * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline void asc_add_scalar(vector_half& dst, vector_half src, half value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_add_scalar__Rvbf16_vbf16_bf16_vb
+ * @archs 3510
+ * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline void asc_add_scalar(
     vector_bfloat16_t& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_add_scalar__Rvi32_vi32_i32_vb
+ * @archs 3510
+ * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline void asc_add_scalar(vector_int32_t& dst, vector_int32_t src, int32_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_add_scalar__Rvu32_vu32_u32_vb
+ * @archs 3510
+ * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline void asc_add_scalar(vector_uint32_t& dst, vector_uint32_t src, uint32_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_add_scalar__Rvf32_vf32_f32_vb
+ * @archs 3510
+ * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline void asc_add_scalar(vector_float& dst, vector_float src, float value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_add_scalar__vi8_i8_vb
+ * @archs 3510
+ * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline vector_int8_t asc_add_scalar(vector_int8_t src, int8_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_add_scalar__vu8_u8_vb
+ * @archs 3510
+ * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline vector_uint8_t asc_add_scalar(vector_uint8_t src, uint8_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_add_scalar__vi16_i16_vb
+ * @archs 3510
+ * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline vector_int16_t asc_add_scalar(vector_int16_t src, int16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_add_scalar__vu16_u16_vb
+ * @archs 3510
+ * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline vector_uint16_t asc_add_scalar(vector_uint16_t src, uint16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_add_scalar__vf16_f16_vb
+ * @archs 3510
+ * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline vector_half asc_add_scalar(vector_half src, half value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_add_scalar__vbf16_bf16_vb
+ * @archs 3510
+ * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline vector_bfloat16_t asc_add_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_add_scalar__vi32_i32_vb
+ * @archs 3510
+ * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline vector_int32_t asc_add_scalar(vector_int32_t src, int32_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_add_scalar__vu32_u32_vb
+ * @archs 3510
+ * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline vector_uint32_t asc_add_scalar(vector_uint32_t src, uint32_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_add_scalar__vf32_f32_vb
+ * @archs 3510
+ * @brief 根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline vector_float asc_add_scalar(vector_float src, float value, vector_bool mask);
 
 __simd_callee__ inline void asc_ln(vector_half& dst, vector_half src, vector_bool mask);
 
 __simd_callee__ inline void asc_ln(vector_float& dst, vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_div__vf16_vf16_vb
+ * @archs 3510
+ * @brief 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。
+ * @param [in] src0 源操作数（矢量数据寄存器）。
+ * @param [in] src1 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline vector_half asc_div(vector_half src0, vector_half src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_div__vf32_vf32_vb
+ * @archs 3510
+ * @brief 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。
+ * @param [in] src0 源操作数（矢量数据寄存器）。
+ * @param [in] src1 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline vector_float asc_div(vector_float src0, vector_float src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_div__vi16_vi16_vb
+ * @archs 3510
+ * @brief 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。
+ * @param [in] src0 源操作数（矢量数据寄存器）。
+ * @param [in] src1 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline vector_int16_t asc_div(vector_int16_t src0, vector_int16_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_div__vu16_vu16_vb
+ * @archs 3510
+ * @brief 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。
+ * @param [in] src0 源操作数（矢量数据寄存器）。
+ * @param [in] src1 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline vector_uint16_t asc_div(vector_uint16_t src0, vector_uint16_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_div__vi32_vi32_vb
+ * @archs 3510
+ * @brief 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。
+ * @param [in] src0 源操作数（矢量数据寄存器）。
+ * @param [in] src1 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline vector_int32_t asc_div(vector_int32_t src0, vector_int32_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_div__vu32_vu32_vb
+ * @archs 3510
+ * @brief 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。
+ * @param [in] src0 源操作数（矢量数据寄存器）。
+ * @param [in] src1 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline vector_uint32_t asc_div(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
 
 __simd_callee__ inline void asc_log(vector_half& dst, vector_half src, vector_bool mask);
 
 __simd_callee__ inline void asc_log(vector_float& dst, vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_div__Rvf16_vf16_vf16_vb
+ * @archs 3510
+ * @brief 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src0 源操作数（矢量数据寄存器）。
+ * @param [in] src1 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_div(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_div__Rvf32_vf32_vf32_vb
+ * @archs 3510
+ * @brief 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src0 源操作数（矢量数据寄存器）。
+ * @param [in] src1 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_div(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_div__Rvi16_vi16_vi16_vb
+ * @archs 3510
+ * @brief 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src0 源操作数（矢量数据寄存器）。
+ * @param [in] src1 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_div(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_div__Rvu16_vu16_vu16_vb
+ * @archs 3510
+ * @brief 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src0 源操作数（矢量数据寄存器）。
+ * @param [in] src1 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_div(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_div__Rvi32_vi32_vi32_vb
+ * @archs 3510
+ * @brief 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src0 源操作数（矢量数据寄存器）。
+ * @param [in] src1 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_div(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_div__Rvu32_vu32_vu32_vb
+ * @archs 3510
+ * @brief 该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。
+ * @param [out] dst 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。
+ * @param [in] src0 源操作数（矢量数据寄存器）。
+ * @param [in] src1 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_div(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
 
 __simd_callee__ inline void asc_max_scalar(vector_int8_t& dst, vector_int8_t src, int8_t value, vector_bool mask);

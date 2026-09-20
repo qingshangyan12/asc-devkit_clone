@@ -1,3 +1,27 @@
+---
+okftype: reference.api.cpp
+title: asc_ndim_copy_dci
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_dci.md
+description: 刷新NDDMA DataCache。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [control]
+  - families: [cache_management]
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - prototype_id: asc_ndim_copy_dci__
+    archs: ['3510']
+    headers: [c_api/vector_datamove/vector_datamove.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
+    kind: configures
+timestamp: '2026-09-19'
+---
 # asc_ndim_copy_dci
 
 ## 产品支持情况

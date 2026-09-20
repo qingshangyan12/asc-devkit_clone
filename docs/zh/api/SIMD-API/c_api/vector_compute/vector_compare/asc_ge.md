@@ -1,3 +1,38 @@
+---
+okftype: reference.api.cpp
+title: asc_ge
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ge.md
+description: Ge（greater than or equal to），逐元素比较src0 >= src1是否成立，成立则输出结果为1，否则输出结果为0，每个元素的比较结果占一个bit。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [comparison]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [high_dimensional]
+signature:
+  - prototype_id: asc_ge__v<dtype>_v<dtype>_u8_u8_u8_u8_u8_u8_u8
+    headers: [c_api/vector_compute/compute/vector_compare.h]
+    dtype:
+      values:
+        - half
+        - float
+  - prototype_id: asc_ge__vu8_v<dtype>_v<dtype>_u8_u8_u8_u8_u8_u8_u8
+    headers: [c_api/vector_compute/compute/vector_compare.h]
+    dtype:
+      values:
+        - half
+        - float
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md
+    kind: requires
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
+    kind: related
+timestamp: '2026-09-19'
+---
 # asc_ge
 
 ## 产品支持情况
