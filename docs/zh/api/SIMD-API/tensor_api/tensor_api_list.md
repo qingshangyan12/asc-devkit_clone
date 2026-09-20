@@ -129,7 +129,8 @@
 | [select](reg_vector_compute/compare_and_select/select.md) | 根据条件Mask从两个源寄存器中逐元素选择数据。 |
 | [数据填充](reg_vector_compute/data_padding/data_padding.md) | 根据mask将源操作数src的最低位元素或者一个scalar操作数填充到目的操作数。 |
 | [fill](reg_vector_compute/data_padding/fill.md) | 将标量或源寄存器最低位元素广播并填充到目的寄存器。 |
-| [数据重排](reg_vector_compute/data_reorder/data_reorder.md) | 给定源操作数src0和src1，将src0和src1中的元素解交织存入结果操作数。 |
+| [数据重排](reg_vector_compute/data_reorder/data_reorder.md) | 给定源操作数src0和src1，将src0和src1中的元素交织或解交织存入结果操作数。 |
+| [interleave（数据寄存器交织）](reg_vector_compute/data_reorder/interleave.md) | 将两个源寄存器中的元素交织到两个结果寄存器。 |
 | [deinterleave（数据寄存器解交织）](reg_vector_compute/data_reorder/deinterleave.md) | 将两个源寄存器中的元素解交织到两个结果寄存器。 |
 
 ## 工具接口

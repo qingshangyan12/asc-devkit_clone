@@ -1637,6 +1637,7 @@
             -   [数据填充](SIMD-API/tensor_api/reg_vector_compute/data_padding/data_padding.md)
                 -   [fill](SIMD-API/tensor_api/reg_vector_compute/data_padding/fill.md)
             -   [数据重排](SIMD-API/tensor_api/reg_vector_compute/data_reorder/data_reorder.md)
+                -   [interleave](SIMD-API/tensor_api/reg_vector_compute/data_reorder/interleave.md)
                 -   [deinterleave](SIMD-API/tensor_api/reg_vector_compute/data_reorder/deinterleave.md)
         -   [工具接口](SIMD-API/tensor_api/utils/tool_functions.md)
             -   [编译期整型别名](SIMD-API/tensor_api/utils/compile_time_integer_aliases.md)
