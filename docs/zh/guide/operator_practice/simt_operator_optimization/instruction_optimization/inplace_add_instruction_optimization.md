@@ -1,0 +1,129 @@
+# 原地加法指令优化
+
+【优先级】中
+
+【描述】原地加法（如`a[index] += b[index]`、`a[index] += b[index] * c[index]`）是算子中常见的数据更新形式。常规写法下，累加目标`a[index]`的旧值必须先从L2 Cache读入寄存器才能参与计算，加法在完成后再从寄存器写回L2 Cache，旧值在每个元素上经历一次“读入—写出”的寄存器往返。改用[原子加接口](../../../../api/SIMT-API/atomic_operations/atomic_operations_intro.md)（如`asc_atomic_add(&a[index], b[index])`）后，“读出旧值—计算新值—写回新值”三步作为一个不可分割的整体在L2 Cache侧完成，旧值不再进入寄存器，省去其进出寄存器的数据往返。
+
+【样例介绍】本节以[inplace_add_atomic样例](../../../../../../examples/03_simt_api/03_best_practices/03_instruction_optimizations/inplace_add_atomic/README.md)为载体说明上述优化方向：对三个形状为[4194304]的int32_t数组执行逐元素累加，包含三操作数乘加（`a[index] += b[index] * c[index]`）与两操作数加法（`a[index] += b[index]`）两组对照。样例启动64个线程块（运行时查询到的AIV核数）、每个线程块2048个线程，各组对照仅改变累加语句的写法（普通原地加或`asc_atomic_add`），其余保持一致。
+
+<!-- npu="950" id1 -->
+下文性能数据均使用msOpProf工具在Ascend 950PR产品上采集，指标为Task Duration（Task整体耗时，即算子端到端耗时）。
+<!-- end id1 -->
+
+**用原子加在L2 Cache侧完成原地累加**
+
+两组对照的原理相同：普通原地加中，累加目标的旧值需经L2 Cache读入寄存器，加法完成后新值再从寄存器写回L2 Cache；改用原子加后，旧值的读出、加法与写回均在L2 Cache侧作为一个不可分割的整体完成，旧值不再经“L2 Cache→寄存器→L2 Cache”的往返。两种累加方式的数据流转对比如下图所示，左侧为普通原地加，右侧为原子加。
+
+**图 1**  两种累加方式的数据流转对比
+
+![](../../../figures/inplace_add_atomic_dataflow.png)
+
+以三操作数乘加为例：普通原地加中`a[index]`、`b[index]`、`c[index]`三者都经L2 Cache读入寄存器，乘加完成后`a[index]`的新值再从寄存器写回L2 Cache，每个元素产生3次读、1次写；原子加中只有`b[index]`与`c[index]`读入寄存器并算出乘积，乘积作为原子加的操作数下发，`a[index]`不进入寄存器，每个元素的读从3次降为2次。`b`、`c`的读取与乘法计算完全相同，性能差异仅来自省去的`a[index]`旧值数据往返。
+
+**三操作数乘加**
+
+【反例】累加目标的旧值读入寄存器，在核内完成读改写。
+
+```cpp
+__global__ __launch_bounds__(THREADS_PER_BLOCK) void vector_muladd_plain(
+    int32_t* a, const int32_t* b, const int32_t* c, uint32_t element_count)
+{
+    uint32_t index = blockIdx.x * blockDim.x + threadIdx.x;
+    const uint32_t stride = gridDim.x * blockDim.x;
+    for (; index < element_count; index += stride) {
+        a[index] += b[index] * c[index];
+    }
+}
+```
+
+上述实现中，各线程按grid-stride方式遍历数组（即每个线程以总线程数为固定步长，分次处理数组中不同位置的元素），每个元素的乘加都需将`a[index]`旧值读入寄存器、加法完成后写回。该实现的性能数据如下：
+
+| 累加方式 | Task Duration（μs） | 耗时相对基线 |
+| :---: | :---: | :---: |
+| a[index] += b[index] * c[index] | 51.62 | 1× |
+
+【正例】改用原子加，将累加下发到L2 Cache侧完成。
+
+```cpp
+__global__ __launch_bounds__(THREADS_PER_BLOCK) void vector_muladd_atomic(
+    int32_t* a, const int32_t* b, const int32_t* c, uint32_t element_count)
+{
+    uint32_t index = blockIdx.x * blockDim.x + threadIdx.x;
+    const uint32_t stride = gridDim.x * blockDim.x;
+    for (; index < element_count; index += stride) {
+        asc_atomic_add(&a[index], b[index] * c[index]);
+    }
+}
+```
+
+上述实现的功能与反例一致，线程块数量、线程数、输入读取方式均相同，唯一变化是累加语句的写法。各线程访问互不重叠的地址，不存在同地址竞争，原子性本身并非功能需求。该实现的性能数据如下：
+
+| 累加方式 | Task Duration（μs） | 耗时相对基线 |
+| :---: | :---: | :---: |
+| asc_atomic_add | 47.51 | **0.92×** |
+
+根据Task Duration数据，改用原子加后执行耗时从51.62μs下降至47.51μs，降幅约8.0%。
+
+**两操作数加法**
+
+【反例】累加目标的旧值读入寄存器，在核内完成读改写。
+
+```cpp
+__global__ __launch_bounds__(THREADS_PER_BLOCK) void vector_add_plain(
+    int32_t* a, const int32_t* b, uint32_t element_count)
+{
+    uint32_t index = blockIdx.x * blockDim.x + threadIdx.x;
+    const uint32_t stride = gridDim.x * blockDim.x;
+    for (; index < element_count; index += stride) {
+        a[index] += b[index];
+    }
+}
+```
+
+该实现的性能数据如下：
+
+| 累加方式 | Task Duration（μs） | 耗时相对基线 |
+| :---: | :---: | :---: |
+| a[index] += b[index] | 39.18 | 1× |
+
+【正例】改用原子加，将累加下发到L2 Cache侧完成。
+
+```cpp
+__global__ __launch_bounds__(THREADS_PER_BLOCK) void vector_add_atomic(
+    int32_t* a, const int32_t* b, uint32_t element_count)
+{
+    uint32_t index = blockIdx.x * blockDim.x + threadIdx.x;
+    const uint32_t stride = gridDim.x * blockDim.x;
+    for (; index < element_count; index += stride) {
+        asc_atomic_add(&a[index], b[index]);
+    }
+}
+```
+
+该实现的核函数遍历方式、线程规模与反例完全一致，仅将累加语句改写为原子加。两操作数加法中每个元素的读从2次降为1次，数据往返的节省比例与三操作数乘加相当。该实现的性能数据如下：
+
+| 累加方式 | Task Duration（μs） | 耗时相对基线 |
+| :---: | :---: | :---: |
+| asc_atomic_add | 36.52 | **0.93×** |
+
+根据Task Duration数据，改用原子加后执行耗时从39.18μs下降至36.52μs，降幅约6.8%。
+
+两组对照的性能数据汇总如下：
+
+| 计算形式 | 累加方式 | Task Duration（μs） | 耗时相对基线 |
+| :---: | :---: | :---: | :---: |
+| **三操作数乘加** | **asc_atomic_add** | **47.51** | **0.92×** |
+| 三操作数乘加 | a[index] += b[index] * c[index] | 51.62 | 1× |
+| **两操作数加法** | **asc_atomic_add** | **36.52** | **0.93×** |
+| 两操作数加法 | a[index] += b[index] | 39.18 | 1× |
+
+**适用边界**
+
+该优化仅适用于逐元素原地更新，使用前需确认各线程原子操作的目标地址互不重叠：
+
+- **适用的逐元素原地更新**：每个线程只更新自己负责的元素，目标地址在线程间天然不重叠（如本样例的grid-stride遍历）。
+- **不适用的归约累加**：多个线程向同一地址累加（如直方图统计）时，同一地址上的原子操作只能排队串行执行，直接使用原子加会因地址竞争显著劣化性能，应采用[分层归约](./atomic_instruction_optimization.md)——先在各线程块的UB中局部累加，再向GM汇总。
+
+此外，原子加支持的数据类型必须是支持指令优化的数据类型；对int64_t等类型，该执行路径的收益需实测确认（不使用返回值时能否生成更优原子指令与数据类型相关，参见[asc_atomic_add约束说明](../../../../api/SIMT-API/atomic_operations/asc_atomic_add.md#约束说明)）。
+
+【总结】原地累加场景中，若累加目标的旧值仅用于累加、不参与其他计算，且各线程目标地址互不重叠，可优先考虑用原子加完成累加：旧值的读出、加法与写回均在L2 Cache侧作为一个不可分割的整体完成，省去旧值进出寄存器的数据往返，实测收益约7%~8%。使用前务必确认不存在同地址竞争；归约累加场景应改用分层归约方法。
