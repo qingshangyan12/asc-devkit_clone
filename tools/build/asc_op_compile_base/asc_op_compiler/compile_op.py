@@ -185,6 +185,80 @@ def _update_super_dfx_info(name, chip_version, sub_dfx_info, super_dfx_info):
             super_dfx_info[name] = [sub_dfx_info]
 
 
+def _fill_sub_dfx_basic(sub_dfx_info, sub_operater_infos, sub_op, compile_info, i):
+    sub_dfx_info["func_name"] = sub_operater_infos["kernelName"]
+    sub_dfx_info["split_mode"] = sub_operater_infos.get("split_mode")
+    sub_dfx_info["blockNum"] = sub_operater_infos["blockDim"]
+    sub_dfx_info["sub_operator_op_type"] = sub_operater_infos.get(
+        "sub_operator_op_type", ""
+    )
+    sub_dfx_info["sub_operator_kernel_type"] = sub_operater_infos[
+        "sub_operator_kernel_type"
+    ]
+    sub_dfx_info["sub_operator_early_start_set_flag"] = sub_operater_infos[
+        "sub_operator_early_start_set_flag"
+    ]
+    sub_dfx_info["sub_operator_early_start_wait_flag"] = sub_operater_infos[
+        "sub_operator_early_start_wait_flag"
+    ]
+    sub_dfx_info["sub_operator_call_dcci_before_kernel_start"] = (
+        sub_operater_infos.get("sub_operator_call_dcci_before_kernel_start", False)
+    )
+    sub_dfx_info["sub_operator_call_dcci_after_kernel_end"] = sub_operater_infos.get(
+        "sub_operator_call_dcci_after_kernel_end", False
+    )
+    sub_dfx_info["sub_operator_call_dcci_disable_on_kernel"] = sub_operater_infos.get(
+        "sub_operator_call_dcci_disable_on_kernel", False
+    )
+    sub_dfx_info["streamid"] = sub_op.get("stream_id")
+    sub_dfx_info["send_event_list"] = compile_info.super_kernel_info[
+        "send_event_list"
+    ][i]
+
+
+def _fill_sub_dfx_events(sub_dfx_info, arg_list, compile_info, i):
+    notify_before_call_event_list = compile_info.super_kernel_info.get(
+        "notify_before_call_event_list", []
+    )
+    if notify_before_call_event_list and notify_before_call_event_list[i]:
+        sub_dfx_info["notify_before_call_event_list"] = notify_before_call_event_list[i]
+    sub_dfx_info["recv_event_list"] = compile_info.super_kernel_info[
+        "recv_event_list"
+    ][i]
+    arg_list["param_offset"] = compile_info.super_kernel_info["param_offset"][i]
+    if compile_info.super_kernel_info["send_event_list"][i]:
+        arg_list["notify_param_offset"] = compile_info.super_kernel_info[
+            "notify_param_offset"
+        ][i]
+    else:
+        arg_list["notify_param_offset"] = None
+    if notify_before_call_event_list and notify_before_call_event_list[i]:
+        arg_list["notify_before_call_param_offset"] = compile_info.super_kernel_info[
+            "notify_before_call_param_offset"
+        ][i]
+    if compile_info.super_kernel_info["recv_event_list"][i]:
+        arg_list["wait_param_offset"] = compile_info.super_kernel_info[
+            "wait_param_offset"
+        ][i]
+    else:
+        arg_list["wait_param_offset"] = None
+
+
+def _load_sub_op_dfx_info(
+    sub_json_path, sub_op, compile_info, i, key, chip_version, sub_dfx_info, arg_list
+):
+    with open(sub_json_path, "r") as fd:
+        sub_operater_infos = json.load(fd)
+        _fill_sub_dfx_basic(sub_dfx_info, sub_operater_infos, sub_op, compile_info, i)
+        _fill_sub_dfx_events(sub_dfx_info, arg_list, compile_info, i)
+        sub_dfx_info["arg_list"] = arg_list
+        if "debugOptions" in sub_operater_infos:
+            sub_dfx_info["debug_option"] = sub_operater_infos["debugOptions"]
+            sub_dfx_info["debug_size"] = sub_operater_infos["debugBufSize"]
+        name = _infer_name(key, sub_operater_infos, chip_version)
+    return name
+
+
 def _json_except_info(compile_info: CompileInfo):
     super_dfx_info = {}
     super_dfx_list = {}
@@ -199,72 +273,16 @@ def _json_except_info(compile_info: CompileInfo):
         sub_json_path = sub_op.get("json_path")
         sub_dfx_info = {}
         arg_list = {}
-        with open(sub_json_path, "r") as fd:
-            sub_operater_infos = json.load(fd)
-            sub_dfx_info["func_name"] = sub_operater_infos["kernelName"]
-            sub_dfx_info["split_mode"] = sub_operater_infos.get("split_mode")
-            sub_dfx_info["blockNum"] = sub_operater_infos["blockDim"]
-            sub_dfx_info["sub_operator_op_type"] = sub_operater_infos.get(
-                "sub_operator_op_type", ""
-            )
-            sub_dfx_info["sub_operator_kernel_type"] = sub_operater_infos[
-                "sub_operator_kernel_type"
-            ]
-            sub_dfx_info["sub_operator_early_start_set_flag"] = sub_operater_infos[
-                "sub_operator_early_start_set_flag"
-            ]
-            sub_dfx_info["sub_operator_early_start_wait_flag"] = sub_operater_infos[
-                "sub_operator_early_start_wait_flag"
-            ]
-            sub_dfx_info["sub_operator_call_dcci_before_kernel_start"] = (
-                sub_operater_infos.get(
-                    "sub_operator_call_dcci_before_kernel_start", False
-                )
-            )
-            sub_dfx_info["sub_operator_call_dcci_after_kernel_end"] = (
-                sub_operater_infos.get("sub_operator_call_dcci_after_kernel_end", False)
-            )
-            sub_dfx_info["sub_operator_call_dcci_disable_on_kernel"] = (
-                sub_operater_infos.get(
-                    "sub_operator_call_dcci_disable_on_kernel", False
-                )
-            )
-            sub_dfx_info["streamid"] = sub_op.get("stream_id")
-            sub_dfx_info["send_event_list"] = compile_info.super_kernel_info[
-                "send_event_list"
-            ][i]
-            notify_before_call_event_list = compile_info.super_kernel_info.get(
-                "notify_before_call_event_list", []
-            )
-            if notify_before_call_event_list and notify_before_call_event_list[i]:
-                sub_dfx_info["notify_before_call_event_list"] = (
-                    notify_before_call_event_list[i]
-                )
-            sub_dfx_info["recv_event_list"] = compile_info.super_kernel_info[
-                "recv_event_list"
-            ][i]
-            arg_list["param_offset"] = compile_info.super_kernel_info["param_offset"][i]
-            if compile_info.super_kernel_info["send_event_list"][i]:
-                arg_list["notify_param_offset"] = compile_info.super_kernel_info[
-                    "notify_param_offset"
-                ][i]
-            else:
-                arg_list["notify_param_offset"] = None
-            if notify_before_call_event_list and notify_before_call_event_list[i]:
-                arg_list["notify_before_call_param_offset"] = (
-                    compile_info.super_kernel_info["notify_before_call_param_offset"][i]
-                )
-            if compile_info.super_kernel_info["recv_event_list"][i]:
-                arg_list["wait_param_offset"] = compile_info.super_kernel_info[
-                    "wait_param_offset"
-                ][i]
-            else:
-                arg_list["wait_param_offset"] = None
-            sub_dfx_info["arg_list"] = arg_list
-            if "debugOptions" in sub_operater_infos:
-                sub_dfx_info["debug_option"] = sub_operater_infos["debugOptions"]
-                sub_dfx_info["debug_size"] = sub_operater_infos["debugBufSize"]
-            name = _infer_name(key, sub_operater_infos, chip_version)
+        name = _load_sub_op_dfx_info(
+            sub_json_path,
+            sub_op,
+            compile_info,
+            i,
+            key,
+            chip_version,
+            sub_dfx_info,
+            arg_list,
+        )
         _update_super_dfx_info(name, chip_version, sub_dfx_info, super_dfx_info)
         i += 1
     super_dfx_list["kernelList"] = super_dfx_info
@@ -545,6 +563,44 @@ def _gen_kernel_func_declare_head(
     dfx_generator = DFXSectionGenerator()
     func_params = []
     super_kernel_params = []
+    workspace_idx = _collect_kernel_func_params(
+        is_mix,
+        is_single_and_using_hard_sync,
+        opinfo,
+        func_params,
+        super_kernel_params,
+        dfx_generator,
+    )
+    workspace_idx = _add_output_shape_tensor_param(
+        opinfo,
+        tiling_info,
+        func_params,
+        super_kernel_params,
+        dfx_generator,
+        workspace_idx,
+    )
+
+    # dynamic: must add workspace, static: if workspace_size >= 0 add workspace
+    if not tiling_info.static_shape_flag or tiling_info.static_workspace_size >= 0:
+        dfx_generator.insert_param(DFXArgInfo("workspace", DFXParamType.WORKSPACE))
+
+    super_kernel_params, func_params = _gen_kernel_func_declare_head_with_workspace(
+        tiling_info, super_kernel_params, func_params
+    )
+    source, called_func_params, called_func_params_type = (
+        _gen_kernel_func_params_source(source, func_params, super_kernel_params)
+    )
+    return source, workspace_idx, called_func_params, called_func_params_type
+
+
+def _collect_kernel_func_params(
+    is_mix,
+    is_single_and_using_hard_sync,
+    opinfo,
+    func_params,
+    super_kernel_params,
+    dfx_generator,
+):
     needs_ffts = (is_mix or is_single_and_using_hard_sync) and not (
         CommonUtility.is_c310() or CommonUtility.is_m510()
     )
@@ -580,6 +636,17 @@ def _gen_kernel_func_declare_head(
             DFXArgInfo(output["param_name"], DFXParamType.OUTPUT)
         )
 
+    return workspace_idx
+
+
+def _add_output_shape_tensor_param(
+    opinfo,
+    tiling_info,
+    func_params,
+    super_kernel_params,
+    dfx_generator,
+    workspace_idx,
+):
     if (
         opinfo.output_shape_depend_on_compute is not None
         and len(opinfo.output_shape_depend_on_compute) > 0
@@ -601,14 +668,10 @@ def _gen_kernel_func_declare_head(
             dfx_generator.set_size_of_dfx_info(
                 "shape_tensor", len(opinfo.output_shape_depend_on_compute) * 8 * 8
             )
+    return workspace_idx
 
-    # dynamic: must add workspace, static: if workspace_size >= 0 add workspace
-    if not tiling_info.static_shape_flag or tiling_info.static_workspace_size >= 0:
-        dfx_generator.insert_param(DFXArgInfo("workspace", DFXParamType.WORKSPACE))
 
-    super_kernel_params, func_params = _gen_kernel_func_declare_head_with_workspace(
-        tiling_info, super_kernel_params, func_params
-    )
+def _gen_kernel_func_params_source(source, func_params, super_kernel_params):
     if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
         global_var_storage.set_variable(
             "ascendc_sub_super_kernel_params", super_kernel_params
@@ -639,7 +702,7 @@ def _gen_kernel_func_declare_head(
         source += ", ".join(func_params) + ") {\n"
         called_func_params_type = ", ".join(func_params)
         called_func_params = called_func_params_type.replace("GM_ADDR ", "")
-    return source, workspace_idx, called_func_params, called_func_params_type
+    return source, called_func_params, called_func_params_type
 
 
 def _gen_usr_workspace_codes():
@@ -1879,14 +1942,7 @@ def _record_kernel_spec_sk_commands(
     )
 
 
-def compile_op_common_part(
-    cce_file: str,
-    origin_func_name: str,
-    op_info: OpInfo,
-    compile_option_tuple,
-    infered_info_from_ifile: InferChannelParamsFromIFile,
-    extend_options: dict,
-):
+def _prepare_compile_context(op_info, compile_option_tuple, extend_options):
     value_depend_dict = extend_options.get("valueDepend")
     kernel_meta_dir = CommonUtility.get_kernel_meta_dir()
     distinct_tag = CommonUtility.get_distinct_filename_tag()
@@ -1912,6 +1968,24 @@ def compile_op_common_part(
         "ascendc_tiling_const_propagation", is_const_propagation
     )
 
+    return (
+        value_depend_dict,
+        kernel_meta_dir,
+        distinct_tag,
+        compile_log_path,
+        input_gen_placehoder,
+        output_gen_placehoder,
+    )
+
+
+def _build_and_save_tiling_info(
+    op_info,
+    infered_info_from_ifile,
+    value_depend_dict,
+    origin_func_name,
+    kernel_meta_dir,
+    distinct_tag,
+):
     tiling_info: TilingInfo = get_tiling_info_by_tiling(
         op_info, infered_info_from_ifile, value_depend_dict, origin_func_name
     )
@@ -1928,9 +2002,10 @@ def compile_op_common_part(
     global_var_storage.set_variable(
         "ascendc_is_static_op", tiling_info.static_shape_flag
     )
-    # replace tiling key when tiling_key is set in compile params
-    tiling_key_list = infered_info_from_ifile.tiling_key_list
-    tiling_key_group_map = infered_info_from_ifile.tiling_key_group_map
+    return tiling_info
+
+
+def _apply_customized_tiling_keys(tiling_key_list, extend_options, op_info):
     context_tiling_key = get_context().get_addition("tiling_key")
     # override customized tiling key list if the input is passed from
     customize_tiling_key = "customized_tiling_key_list"
@@ -1956,7 +2031,20 @@ def compile_op_common_part(
                 op_info.kernel_name, msg_info, AscendCLogLevel.LOG_WARNING
             )
             sys.exit(1)
-    code_channel = infered_info_from_ifile.code_channel
+    return tiling_key_list
+
+
+def _infer_code_channel_if_needed(
+    code_channel,
+    infered_info_from_ifile,
+    kernel_meta_dir,
+    op_info,
+    cce_file,
+    compile_option_tuple,
+    tiling_key_list,
+    tiling_info,
+    compile_log_path,
+):
     hardware_sync_in_asm = False
     # code channel can not infer by .i neet infer by .o
     if code_channel == -1 and infered_info_from_ifile.no_set_kernel_type is True:
@@ -1985,12 +2073,21 @@ def compile_op_common_part(
             AscendCLogLevel.LOG_INFO,
         )
 
-    LogUtil.detail_log_print(
-        op_info.kernel_name,
-        COMPILE_STAGE_MSG_INFO["generate_tiling_end"],
-        AscendCLogLevel.LOG_INFO,
-    )
+    return code_channel, hardware_sync_in_asm
 
+
+def _build_compile_info(
+    cce_file,
+    origin_func_name,
+    op_info,
+    kernel_meta_dir,
+    code_channel,
+    tiling_key_list,
+    tiling_key_group_map,
+    compile_log_path,
+    infered_info_from_ifile,
+    hardware_sync_in_asm,
+):
     compile_info = CompileInfo()
     compile_info.src_file = cce_file
     compile_info.dst_file = os.path.join(kernel_meta_dir, op_info.kernel_name + ".o")
@@ -2015,158 +2112,296 @@ def compile_op_common_part(
     compile_info.register_tiling_struct = infered_info_from_ifile.register_tiling_struct
     compile_info.tpl_tiling_struct = infered_info_from_ifile.tpl_tiling_struct
 
+    return compile_info
+
+
+def compile_op_common_part(
+    cce_file: str,
+    origin_func_name: str,
+    op_info: OpInfo,
+    compile_option_tuple,
+    infered_info_from_ifile: InferChannelParamsFromIFile,
+    extend_options: dict,
+):
+    (
+        value_depend_dict,
+        kernel_meta_dir,
+        distinct_tag,
+        compile_log_path,
+        input_gen_placehoder,
+        output_gen_placehoder,
+    ) = _prepare_compile_context(op_info, compile_option_tuple, extend_options)
+
+    tiling_info = _build_and_save_tiling_info(
+        op_info,
+        infered_info_from_ifile,
+        value_depend_dict,
+        origin_func_name,
+        kernel_meta_dir,
+        distinct_tag,
+    )
+    # replace tiling key when tiling_key is set in compile params
+    tiling_key_list = infered_info_from_ifile.tiling_key_list
+    tiling_key_group_map = infered_info_from_ifile.tiling_key_group_map
+    tiling_key_list = _apply_customized_tiling_keys(
+        tiling_key_list, extend_options, op_info
+    )
+    code_channel = infered_info_from_ifile.code_channel
+    code_channel, hardware_sync_in_asm = _infer_code_channel_if_needed(
+        code_channel,
+        infered_info_from_ifile,
+        kernel_meta_dir,
+        op_info,
+        cce_file,
+        compile_option_tuple,
+        tiling_key_list,
+        tiling_info,
+        compile_log_path,
+    )
+
+    LogUtil.detail_log_print(
+        op_info.kernel_name,
+        COMPILE_STAGE_MSG_INFO["generate_tiling_end"],
+        AscendCLogLevel.LOG_INFO,
+    )
+
+    compile_info = _build_compile_info(
+        cce_file,
+        origin_func_name,
+        op_info,
+        kernel_meta_dir,
+        code_channel,
+        tiling_key_list,
+        tiling_key_group_map,
+        compile_log_path,
+        infered_info_from_ifile,
+        hardware_sync_in_asm,
+    )
+
     kernel_spec = KernelSpecCompilation.create(
         compile_info, compile_option_tuple, tiling_info
     )
 
     with kernel_spec:
         # generate tiling struct size, dfx section
-        if global_var_storage.get_variable("ascendc_tiling_no_register"):
-            file_name_tag = distinct_tag + "_meta_info.cpp"
-            compile_info.tiling_and_dfx_utils_file = os.path.join(
-                kernel_meta_dir, op_info.kernel_name + file_name_tag
-            )
-            file_name_tag = distinct_tag + "_meta_info.o"
-            compile_info.tiling_and_dfx_utils_bin_path = os.path.join(
-                kernel_meta_dir, op_info.kernel_name + file_name_tag
-            )
-        compile_info_origin = CompileInfo()
-        compile_option_tuple_origin = None
-        if (
-            get_context().get_addition("super_kernel_sub_combine") is True
-            and global_var_storage.get_variable("ascendc_enable_super_kernel") is True
-        ):
-            global_var_storage.set_variable("ascendc_sk_double_compile", True)
-            compile_info_origin = copy.deepcopy(compile_info)
-            compile_option_tuple_origin = copy.deepcopy(compile_option_tuple)
-        kernel_spec.select_basic_compile(
-            compile_info_origin, compile_option_tuple_origin
+        _set_meta_info_paths(compile_info, op_info, distinct_tag, kernel_meta_dir)
+        compile_info_origin, compile_option_tuple_origin = _prepare_sk_combine_origin(
+            compile_info, compile_option_tuple, kernel_spec
         )
-
-        # dump ktype handle
-        compile_info.raw_tiling_key_kernel_type = copy.deepcopy(
-            compile_info.tiling_key_kernel_type
-        )
-
-        # get super kernel option to compile info when enable super kernel
-        handle_sk_codegen_options(compile_info, infered_info_from_ifile)
-
-        # stub kernel func generation
-        workspace_idx = gen_op_stub_kernel_func(
+        workspace_idx = _run_basic_compile_pipeline(
             compile_info,
             op_info,
             compile_option_tuple,
             tiling_info,
             distinct_tag,
             kernel_meta_dir,
+            infered_info_from_ifile,
         )
-        # handle compile options
-        handle_compile_options(
-            compile_info, compile_option_tuple, tiling_info, workspace_idx
-        )
-
-        # compile cce file and set meta info in .o
-        compile_kernel_and_meta(
-            compile_info, op_info, compile_option_tuple, tiling_info
-        )
-
-        # link kernel obj
-        link_kernel_obj(compile_info, op_info, tiling_info)
 
         # aclnn sk combine compile workflow
         if (
             get_context().get_addition("super_kernel_sub_combine") is True
             and global_var_storage.get_variable("ascendc_enable_super_kernel") is True
         ):
-            # reset sk opt
-            global_var_storage.set_variable("ascendc_enable_super_kernel", False)
-            global_var_storage.set_variable(
-                "ascendc_sk_sub_combine_norm_workflow", True
-            )
-            DFXSectionGenerator().dfx_info_reset(op_info)
-            DFXSectionGenerator().update_is_support(op_info)
-            compile_info_origin.dst_file = os.path.join(
-                kernel_meta_dir, op_info.kernel_name + "_norm.o"
-            )
-
-            # dump ktype handle
-            compile_info.raw_tiling_key_kernel_type = copy.deepcopy(
-                compile_info_origin.tiling_key_kernel_type
-            )
-            handle_sk_codegen_options(compile_info_origin, infered_info_from_ifile)
-            workspace_idx = gen_op_stub_kernel_func(
+            workspace_idx = _compile_sk_sub_combine_norm(
+                compile_info,
                 compile_info_origin,
-                op_info,
+                compile_option_tuple,
                 compile_option_tuple_origin,
+                op_info,
                 tiling_info,
+                infered_info_from_ifile,
                 distinct_tag,
                 kernel_meta_dir,
             )
-            handle_compile_options(
-                compile_info_origin,
-                compile_option_tuple_origin,
-                tiling_info,
-                workspace_idx,
-            )
-            compile_kernel_and_meta(
-                compile_info_origin, op_info, compile_option_tuple_origin, tiling_info
-            )
 
-            # compile_sk_bind
-            sk_bind_dst_file = compile_sk_bind(
-                compile_info, compile_info_origin, compile_option_tuple, kernel_meta_dir
-            )
-
-            # link norm.o, sk.o, sk_bind.o and optional meta_info.o
-            link_sk_norm_combine(
-                compile_info.dst_file,
-                compile_info_origin.dst_file,
-                sk_bind_dst_file,
-                compile_info_origin.tiling_and_dfx_utils_bin_path,
-                compile_info.compile_log_path,
-            )
-
-            global_var_storage.set_variable("ascendc_enable_super_kernel", True)
-            global_var_storage.set_variable(
-                "ascendc_sk_sub_combine_norm_workflow", False
-            )
-            DFXSectionGenerator().update_is_support(op_info)
-
-        kernel_spec.attach_resource_id()
-
-        # generate opinfo json
-        _json_post_process(
+        _finalize_compile_op(
+            kernel_spec,
             compile_info,
             op_info,
             tiling_info,
             input_gen_placehoder,
             output_gen_placehoder,
             compile_log_path,
+            infered_info_from_ifile,
+            distinct_tag,
+            workspace_idx,
         )
-        if kernel_spec.record_sk_commands:
-            _record_kernel_spec_sk_commands(
-                kernel_spec,
-                op_info,
-                infered_info_from_ifile,
-                tiling_info,
-                distinct_tag,
-            )
-        kernel_spec.publish_manifest(tiling_info, workspace_idx)
-        if not global_var_storage.get_variable("ascendc_compile_debug_config"):
-            tiling_info.remove_file()
-            CommonUtility.remove_temp_file(compile_info.gen_kernel_func_file)
-            CommonUtility.remove_temp_file(compile_info.tiling_and_dfx_utils_file)
-        CommonUtility.print_compile_log(
-            "",
-            "compile Ascend C operator {} success".format(op_info.op_type),
-            AscendCLogLevel.LOG_INFO,
+
+
+def _set_meta_info_paths(compile_info, op_info, distinct_tag, kernel_meta_dir):
+    if global_var_storage.get_variable("ascendc_tiling_no_register"):
+        file_name_tag = distinct_tag + "_meta_info.cpp"
+        compile_info.tiling_and_dfx_utils_file = os.path.join(
+            kernel_meta_dir, op_info.kernel_name + file_name_tag
         )
-        msg_info = "<{}> <{}> compile op end".format(
-            compile_info.op_type, compile_info.tiling_key_list
+        file_name_tag = distinct_tag + "_meta_info.o"
+        compile_info.tiling_and_dfx_utils_bin_path = os.path.join(
+            kernel_meta_dir, op_info.kernel_name + file_name_tag
         )
-        LogUtil.detail_log_print(
-            op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO
+
+
+def _prepare_sk_combine_origin(compile_info, compile_option_tuple, kernel_spec):
+    compile_info_origin = CompileInfo()
+    compile_option_tuple_origin = None
+    if (
+        get_context().get_addition("super_kernel_sub_combine") is True
+        and global_var_storage.get_variable("ascendc_enable_super_kernel") is True
+    ):
+        global_var_storage.set_variable("ascendc_sk_double_compile", True)
+        compile_info_origin = copy.deepcopy(compile_info)
+        compile_option_tuple_origin = copy.deepcopy(compile_option_tuple)
+    kernel_spec.select_basic_compile(compile_info_origin, compile_option_tuple_origin)
+    return compile_info_origin, compile_option_tuple_origin
+
+
+def _run_basic_compile_pipeline(
+    compile_info,
+    op_info,
+    compile_option_tuple,
+    tiling_info,
+    distinct_tag,
+    kernel_meta_dir,
+    infered_info_from_ifile,
+):
+    # dump ktype handle
+    compile_info.raw_tiling_key_kernel_type = copy.deepcopy(
+        compile_info.tiling_key_kernel_type
+    )
+
+    # get super kernel option to compile info when enable super kernel
+    handle_sk_codegen_options(compile_info, infered_info_from_ifile)
+
+    # stub kernel func generation
+    workspace_idx = gen_op_stub_kernel_func(
+        compile_info,
+        op_info,
+        compile_option_tuple,
+        tiling_info,
+        distinct_tag,
+        kernel_meta_dir,
+    )
+    # handle compile options
+    handle_compile_options(
+        compile_info, compile_option_tuple, tiling_info, workspace_idx
+    )
+
+    # compile cce file and set meta info in .o
+    compile_kernel_and_meta(compile_info, op_info, compile_option_tuple, tiling_info)
+
+    # link kernel obj
+    link_kernel_obj(compile_info, op_info, tiling_info)
+    return workspace_idx
+
+
+def _compile_sk_sub_combine_norm(
+    compile_info,
+    compile_info_origin,
+    compile_option_tuple,
+    compile_option_tuple_origin,
+    op_info,
+    tiling_info,
+    infered_info_from_ifile,
+    distinct_tag,
+    kernel_meta_dir,
+):
+    # reset sk opt
+    global_var_storage.set_variable("ascendc_enable_super_kernel", False)
+    global_var_storage.set_variable("ascendc_sk_sub_combine_norm_workflow", True)
+    DFXSectionGenerator().dfx_info_reset(op_info)
+    DFXSectionGenerator().update_is_support(op_info)
+    compile_info_origin.dst_file = os.path.join(
+        kernel_meta_dir, op_info.kernel_name + "_norm.o"
+    )
+
+    # dump ktype handle
+    compile_info.raw_tiling_key_kernel_type = copy.deepcopy(
+        compile_info_origin.tiling_key_kernel_type
+    )
+    handle_sk_codegen_options(compile_info_origin, infered_info_from_ifile)
+    workspace_idx = gen_op_stub_kernel_func(
+        compile_info_origin,
+        op_info,
+        compile_option_tuple_origin,
+        tiling_info,
+        distinct_tag,
+        kernel_meta_dir,
+    )
+    handle_compile_options(
+        compile_info_origin,
+        compile_option_tuple_origin,
+        tiling_info,
+        workspace_idx,
+    )
+    compile_kernel_and_meta(
+        compile_info_origin, op_info, compile_option_tuple_origin, tiling_info
+    )
+
+    # compile_sk_bind
+    sk_bind_dst_file = compile_sk_bind(
+        compile_info, compile_info_origin, compile_option_tuple, kernel_meta_dir
+    )
+
+    # link norm.o, sk.o, sk_bind.o and optional meta_info.o
+    link_sk_norm_combine(
+        compile_info.dst_file,
+        compile_info_origin.dst_file,
+        sk_bind_dst_file,
+        compile_info_origin.tiling_and_dfx_utils_bin_path,
+        compile_info.compile_log_path,
+    )
+
+    global_var_storage.set_variable("ascendc_enable_super_kernel", True)
+    global_var_storage.set_variable("ascendc_sk_sub_combine_norm_workflow", False)
+    DFXSectionGenerator().update_is_support(op_info)
+    return workspace_idx
+
+
+def _finalize_compile_op(
+    kernel_spec,
+    compile_info,
+    op_info,
+    tiling_info,
+    input_gen_placehoder,
+    output_gen_placehoder,
+    compile_log_path,
+    infered_info_from_ifile,
+    distinct_tag,
+    workspace_idx,
+):
+    kernel_spec.attach_resource_id()
+
+    # generate opinfo json
+    _json_post_process(
+        compile_info,
+        op_info,
+        tiling_info,
+        input_gen_placehoder,
+        output_gen_placehoder,
+        compile_log_path,
+    )
+    if kernel_spec.record_sk_commands:
+        _record_kernel_spec_sk_commands(
+            kernel_spec,
+            op_info,
+            infered_info_from_ifile,
+            tiling_info,
+            distinct_tag,
         )
+    kernel_spec.publish_manifest(tiling_info, workspace_idx)
+    if not global_var_storage.get_variable("ascendc_compile_debug_config"):
+        tiling_info.remove_file()
+        CommonUtility.remove_temp_file(compile_info.gen_kernel_func_file)
+        CommonUtility.remove_temp_file(compile_info.tiling_and_dfx_utils_file)
+    CommonUtility.print_compile_log(
+        "",
+        "compile Ascend C operator {} success".format(op_info.op_type),
+        AscendCLogLevel.LOG_INFO,
+    )
+    msg_info = "<{}> <{}> compile op end".format(
+        compile_info.op_type, compile_info.tiling_key_list
+    )
+    LogUtil.detail_log_print(op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO)
 
 
 def compile_op(

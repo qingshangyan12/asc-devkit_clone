@@ -89,6 +89,24 @@ def calculate_resource_id(dynamic_object_path: str) -> str:
     return digest.hexdigest()
 
 
+def _cleanup_resource_id_temporaries(
+    object_fd, payload_fd, temporary_object, payload_path
+) -> None:
+    # Cover failures before descriptors are transferred to file objects.
+    for file_descriptor in (object_fd, payload_fd):
+        if file_descriptor is None:
+            continue
+        with suppress(OSError):
+            os.close(file_descriptor)
+    for path in (temporary_object, payload_path):
+        if path is None:
+            continue
+        try:
+            os.unlink(path)
+        except FileNotFoundError:
+            pass
+
+
 def write_resource_id_section(dynamic_object_path: str, resource_id: str) -> None:
     if not isinstance(resource_id, str) or not _RESOURCE_ID_PATTERN.fullmatch(
         resource_id
@@ -132,19 +150,9 @@ def write_resource_id_section(dynamic_object_path: str, resource_id: str) -> Non
             os.fsync(temporary_file.fileno())
         os.replace(temporary_object, dynamic_object_path)
     finally:
-        # Cover failures before descriptors are transferred to file objects.
-        for file_descriptor in (object_fd, payload_fd):
-            if file_descriptor is None:
-                continue
-            with suppress(OSError):
-                os.close(file_descriptor)
-        for path in (temporary_object, payload_path):
-            if path is None:
-                continue
-            try:
-                os.unlink(path)
-            except FileNotFoundError:
-                pass
+        _cleanup_resource_id_temporaries(
+            object_fd, payload_fd, temporary_object, payload_path
+        )
 
 
 def generate_and_write_resource_id(dynamic_object_path: str) -> str:

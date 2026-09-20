@@ -294,21 +294,25 @@ def parse_super_kernel_options(option_string: str) -> bool:
             )
             continue
 
-        if not key or not value:
-            CommonUtility().ascendc_raise_python_err(
-                ERR_CODE,
-                f"[Super Kernel] Invalid compile option: The key-value pair is missing for the option {pair}.",
-            )
-        if key in result_options:
-            CommonUtility().ascendc_raise_python_err(
-                ERR_CODE,
-                f"[Super Kernel] Invalid compile option: {key} option has been set.",
-            )
-        parser = factory.get_parse_func(key)
-        if not parser:
-            CommonUtility().ascendc_raise_python_err(
-                ERR_CODE,
-                f"[Super Kernel] Invalid compile option: {key} option is not supported.",
-            )
-        result_options[key] = parser.parse_option(value)
+        _parse_one_super_kernel_option(factory, result_options, key, value, pair)
     return result_options
+
+
+def _parse_one_super_kernel_option(factory, result_options, key, value, pair):
+    if not key or not value:
+        CommonUtility().ascendc_raise_python_err(
+            ERR_CODE,
+            f"[Super Kernel] Invalid compile option: The key-value pair is missing for the option {pair}.",
+        )
+    if key in result_options:
+        CommonUtility().ascendc_raise_python_err(
+            ERR_CODE,
+            f"[Super Kernel] Invalid compile option: {key} option has been set.",
+        )
+    parser = factory.get_parse_func(key)
+    if not parser:
+        CommonUtility().ascendc_raise_python_err(
+            ERR_CODE,
+            f"[Super Kernel] Invalid compile option: {key} option is not supported.",
+        )
+    result_options[key] = parser.parse_option(value)
