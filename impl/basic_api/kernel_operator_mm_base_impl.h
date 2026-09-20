@@ -575,8 +575,9 @@ __aicore__ inline void MmadImpl(
                               "L0C Buffer(CO1)/BiasTable Buffer(C2)");
         });
     }
-    // Keep backend updates local to this call.
+// Keep backend updates local to this call.
     MmadBitModeParams localMmadParams = mmadParams;
+    localMmadParams.SetCmatrixSource(cmatrixSource);
     MmadCal(
         (__cc__ PrimT<T>*)dst.GetPhyAddr(), (__ca__ PrimT<U>*)fm.GetPhyAddr(), (__cb__ PrimT<S>*)filter.GetPhyAddr(),
         (uint64_t)bias.GetPhyAddr(), localMmadParams);
@@ -663,8 +664,9 @@ __aicore__ inline void MmadMxImpl(
                               "L0C Buffer(CO1)/BiasTable Buffer(C2)");
         });
     }
-    // Keep backend updates local to this call.
+// Keep backend updates local to this call.
     MmadBitModeParams localMmadParams = mmadParams;
+    localMmadParams.SetCmatrixSource(cmatrixSource);
     MmadMxCal(
         (__cc__ PrimT<T>*)dst.GetPhyAddr(), (__ca__ PrimT<U>*)fm.GetPhyAddr(), (__cb__ PrimT<S>*)filter.GetPhyAddr(),
         (uint64_t)bias.GetPhyAddr(), localMmadParams);

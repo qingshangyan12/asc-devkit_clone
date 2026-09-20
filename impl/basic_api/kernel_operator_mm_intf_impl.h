@@ -764,6 +764,7 @@ template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(
     __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __biasbuf__ V* bias, MmadBitModeParams& mmadParams)
 {
+    mmadParams.SetCmatrixSource(true);
     MmadCal(dst, fm, filter, (uint64_t)bias, mmadParams);
 }
 template <typename T, typename U, typename S>
@@ -775,6 +776,7 @@ template <typename T, typename U, typename S, typename V>
 __aicore__ inline void MmadMx(
     __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __biasbuf__ V* bias, MmadBitModeParams& mmadParams)
 {
+    mmadParams.SetCmatrixSource(true);
     MmadMxCal(dst, fm, filter, (uint64_t)bias, mmadParams);
 }
 #endif
