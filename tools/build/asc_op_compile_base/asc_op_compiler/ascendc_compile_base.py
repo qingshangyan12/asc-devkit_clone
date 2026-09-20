@@ -210,6 +210,86 @@ def link_relocatable_meta_file(bin_file_path, meta_file_path, compile_log_path=N
     CommonUtility.run_cmd_inner(link_cmd, CompileStage.LINKRELOCATE, compile_log_path)
 
 
+def _extract_sk_archive(sk_bin_file, temp_extract_dir, compile_log_path):
+    # 解压 sk_bin_file 到临时目录
+    CommonUtility.print_compile_log(
+        "",
+        f"Extracting sk_bin_file: {sk_bin_file} to {temp_extract_dir}",
+        AscendCLogLevel.LOG_DEBUG,
+    )
+    extract_cmd = ["ar", "x", sk_bin_file]
+    CommonUtility.dump_compile_log(
+        extract_cmd, CompileStage.LINKRELOCATE, compile_log_path
+    )
+    result = subprocess.run(
+        extract_cmd, cwd=temp_extract_dir, capture_output=True, text=True
+    )
+    if result.returncode != 0:
+        raise Exception(f"Failed to extract sk_bin_file: {result.stderr}")
+
+    # 列出解压出的所有 .o 文件
+    extracted_objs = [
+        os.path.join(temp_extract_dir, f)
+        for f in os.listdir(temp_extract_dir)
+        if f.endswith(".o")
+    ]
+    CommonUtility.print_compile_log(
+        "",
+        f"Extracted object files: {[os.path.basename(f) for f in extracted_objs]}",
+        AscendCLogLevel.LOG_DEBUG,
+    )
+    return extracted_objs
+
+
+def _merge_and_self_link_sk(
+    sk_bin_file,
+    norm_bin_file,
+    sk_bind_dst_file,
+    meta_file_path,
+    temp_extract_dir,
+    extracted_objs,
+    compile_log_path,
+):
+    # Step 2: 将解压的 .o 文件、norm_bin_file、sk_bind_dst_file 和可选的 meta_file_path 合并
+    merged_obj = os.path.join(temp_extract_dir, "merged_sk_norm_bind.o")
+    link_cmd = [CCECInfo.get_exe("ld.lld"), "-r", "-o", merged_obj]
+    link_cmd.extend(extracted_objs)
+    link_cmd.extend([norm_bin_file, sk_bind_dst_file])
+    if meta_file_path:
+        link_cmd.append(meta_file_path)
+    CommonUtility.dump_compile_log(
+        link_cmd, CompileStage.LINKRELOCATE, compile_log_path
+    )
+    result = subprocess.run(link_cmd, capture_output=True, text=True)
+    if result.returncode != 0:
+        raise Exception(f"Failed to link merged objects: {result.stderr}")
+
+    # Step 3: 自连接 merged_obj 生成最终的 sk_bin_file
+    link_cmd = [
+        CCECInfo.get_exe("ld.lld"),
+        "-m",
+        "aicorelinux",
+        "-Ttext=0",
+        merged_obj,
+        "-static",
+        "-o",
+        sk_bin_file,
+        "-q",
+    ]
+    CommonUtility.dump_compile_log(
+        link_cmd, CompileStage.LINKRELOCATE, compile_log_path
+    )
+    result = subprocess.run(link_cmd, capture_output=True, text=True)
+    if result.returncode != 0:
+        raise Exception(f"Failed to self-link: {result.stderr}")
+
+    CommonUtility.print_compile_log(
+        "",
+        f"Successfully created final sk_bin_file: {sk_bin_file}",
+        AscendCLogLevel.LOG_INFO,
+    )
+
+
 def link_sk_norm_combine(
     sk_bin_file,
     norm_bin_file,
@@ -225,71 +305,18 @@ def link_sk_norm_combine(
     os.makedirs(temp_extract_dir, exist_ok=True)
 
     try:
-        # 解压 sk_bin_file 到临时目录
-        CommonUtility.print_compile_log(
-            "",
-            f"Extracting sk_bin_file: {sk_bin_file} to {temp_extract_dir}",
-            AscendCLogLevel.LOG_DEBUG,
-        )
-        extract_cmd = ["ar", "x", sk_bin_file]
-        CommonUtility.dump_compile_log(
-            extract_cmd, CompileStage.LINKRELOCATE, compile_log_path
-        )
-        result = subprocess.run(
-            extract_cmd, cwd=temp_extract_dir, capture_output=True, text=True
-        )
-        if result.returncode != 0:
-            raise Exception(f"Failed to extract sk_bin_file: {result.stderr}")
-
-        # 列出解压出的所有 .o 文件
-        extracted_objs = [
-            os.path.join(temp_extract_dir, f)
-            for f in os.listdir(temp_extract_dir)
-            if f.endswith(".o")
-        ]
-        CommonUtility.print_compile_log(
-            "",
-            f"Extracted object files: {[os.path.basename(f) for f in extracted_objs]}",
-            AscendCLogLevel.LOG_DEBUG,
+        extracted_objs = _extract_sk_archive(
+            sk_bin_file, temp_extract_dir, compile_log_path
         )
 
-        # Step 2: 将解压的 .o 文件、norm_bin_file、sk_bind_dst_file 和可选的 meta_file_path 合并
-        merged_obj = os.path.join(temp_extract_dir, "merged_sk_norm_bind.o")
-        link_cmd = [CCECInfo.get_exe("ld.lld"), "-r", "-o", merged_obj]
-        link_cmd.extend(extracted_objs)
-        link_cmd.extend([norm_bin_file, sk_bind_dst_file])
-        if meta_file_path:
-            link_cmd.append(meta_file_path)
-        CommonUtility.dump_compile_log(
-            link_cmd, CompileStage.LINKRELOCATE, compile_log_path
-        )
-        result = subprocess.run(link_cmd, capture_output=True, text=True)
-        if result.returncode != 0:
-            raise Exception(f"Failed to link merged objects: {result.stderr}")
-
-        # Step 3: 自连接 merged_obj 生成最终的 sk_bin_file
-        link_cmd = [
-            CCECInfo.get_exe("ld.lld"),
-            "-m",
-            "aicorelinux",
-            "-Ttext=0",
-            merged_obj,
-            "-static",
-            "-o",
+        _merge_and_self_link_sk(
             sk_bin_file,
-            "-q",
-        ]
-        CommonUtility.dump_compile_log(
-            link_cmd, CompileStage.LINKRELOCATE, compile_log_path
-        )
-        result = subprocess.run(link_cmd, capture_output=True, text=True)
-        if result.returncode != 0:
-            raise Exception(f"Failed to self-link: {result.stderr}")
-
-        CommonUtility.print_compile_log(
-            "",
-            f"Successfully created final sk_bin_file: {sk_bin_file}",
-            AscendCLogLevel.LOG_INFO,
+            norm_bin_file,
+            sk_bind_dst_file,
+            meta_file_path,
+            temp_extract_dir,
+            extracted_objs,
+            compile_log_path,
         )
 
     finally:
@@ -359,7 +386,7 @@ tilingkey parallel compile num is {ascendc_self_par_job_num}",
     return ascendc_self_par_job_num
 
 
-def compile_multi_tilingkey(tiling_key_list, cmds_list, dstfile_name, compile_log_path):
+def _check_parallel_compile_env():
     parallel_compile_check = os.getenv("TILINGKEY_PAR_COMPILE")
     if parallel_compile_check not in [None, "1", "0"]:
         CommonUtility.print_compile_log(
@@ -368,12 +395,10 @@ def compile_multi_tilingkey(tiling_key_list, cmds_list, dstfile_name, compile_lo
 TILINGKEY_PAR_COMPILE is {}".format(parallel_compile_check),
             AscendCLogLevel.LOG_WARNING,
         )
+    return parallel_compile_check
 
-    dstfile_with_pid = os.path.join(
-        CommonUtility.get_kernel_meta_dir(), dstfile_name + "_" + str(os.getpid())
-    )
-    write_mk(tiling_key_list, cmds_list, dstfile_with_pid, compile_log_path)
-    mk_file = f"{dstfile_with_pid}.mk"
+
+def _build_tilingkey_make_cmd(parallel_compile_check, mk_file, tiling_key_list):
     if parallel_compile_check == "1":
         _ignore_parallel_job_self_set()
         cmd = ["make", "-f", mk_file]
@@ -382,6 +407,37 @@ TILINGKEY_PAR_COMPILE is {}".format(parallel_compile_check),
             len(tiling_key_list)
         )
         cmd = ["make", "-f", mk_file, "-j", f"{ascendc_self_par_job_num}"]
+    return cmd
+
+
+def _report_multi_tilingkey_compile_error(file_name, kernel_name, hash_name):
+    file_name_parts = file_name.split(".")
+    new_file_name = file_name_parts[0] + "_error." + file_name_parts[-1]
+    os.rename(file_name, new_file_name)
+    CommonUtility.print_compile_log(
+        "",
+        "Operator {}_{}: errors occurred during compile phase \
+of {}, See also {}".format(
+            kernel_name, hash_name, str(CompileStage.COMPILE), new_file_name
+        ),
+        AscendCLogLevel.LOG_ERROR,
+    )
+    raise Exception(
+        "An error occurred during compile phases of {}".format(
+            str(CompileStage.COMPILE)
+        )
+    )
+
+
+def compile_multi_tilingkey(tiling_key_list, cmds_list, dstfile_name, compile_log_path):
+    parallel_compile_check = _check_parallel_compile_env()
+
+    dstfile_with_pid = os.path.join(
+        CommonUtility.get_kernel_meta_dir(), dstfile_name + "_" + str(os.getpid())
+    )
+    write_mk(tiling_key_list, cmds_list, dstfile_with_pid, compile_log_path)
+    mk_file = f"{dstfile_with_pid}.mk"
+    cmd = _build_tilingkey_make_cmd(parallel_compile_check, mk_file, tiling_key_list)
     cmd_str = " ".join(cmd)
     file_name = ""
     if global_var_storage.get_variable("ascendc_enable_build_log") is True:
@@ -403,22 +459,7 @@ TILINGKEY_PAR_COMPILE is {}".format(parallel_compile_check),
             )
     ret = os.system(f"{cmd_str} > /dev/null")
     if ret != 0 and global_var_storage.get_variable("ascendc_enable_build_log") is True:
-        file_name_parts = file_name.split(".")
-        new_file_name = file_name_parts[0] + "_error." + file_name_parts[-1]
-        os.rename(file_name, new_file_name)
-        CommonUtility.print_compile_log(
-            "",
-            "Operator {}_{}: errors occurred during compile phase \
-of {}, See also {}".format(
-                kernel_name, hash_name, str(CompileStage.COMPILE), new_file_name
-            ),
-            AscendCLogLevel.LOG_ERROR,
-        )
-        raise Exception(
-            "An error occurred during compile phases of {}".format(
-                str(CompileStage.COMPILE)
-            )
-        )
+        _report_multi_tilingkey_compile_error(file_name, kernel_name, hash_name)
     if not global_var_storage.get_variable("ascendc_compile_debug_config"):
         CommonUtility.remove_temp_file(mk_file)
 

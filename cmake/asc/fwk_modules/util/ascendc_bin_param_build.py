@@ -417,8 +417,7 @@ class BinParamBuilder(opdesc_parser.OpDesc):
             att["value"] = const_var.ATTR_DEF_VAL.get(atype)
             attrs.append(att)
 
-    def gen_input_json(self: any, auto_gen_path: str):
-        key_map = {}
+    def _resolve_bin_case_count(self: any):
         if len(self.input_dtype) == 0 and len(self.output_dtype) == 0:
             count = 1
         else:
@@ -431,6 +430,21 @@ class BinParamBuilder(opdesc_parser.OpDesc):
                 raise RuntimeError(
                     f"Op {self.op_type} must have at least one input or output"
                 )
+        return count
+
+    def _alloc_unique_bin_file(self: any, param, key_map):
+        objstr = json.dumps(param, indent="  ")
+        md5sum = hashlib.md5(objstr.encode("utf-8")).hexdigest()
+        while key_map.get(md5sum) is not None:
+            objstr += "1"
+            md5sum = hashlib.md5(objstr.encode("utf-8")).hexdigest()
+        key_map[md5sum] = md5sum
+        bin_file = self.op_type + "_" + md5sum
+        return bin_file
+
+    def gen_input_json(self: any, auto_gen_path: str):
+        key_map = {}
+        count = self._resolve_bin_case_count()
         required_parameters = set()
         index_value = -1
 
@@ -461,13 +475,7 @@ class BinParamBuilder(opdesc_parser.OpDesc):
             param = {}
             param["op_type"] = self.op_type
             param["op_list"] = [op_node]
-            objstr = json.dumps(param, indent="  ")
-            md5sum = hashlib.md5(objstr.encode("utf-8")).hexdigest()
-            while key_map.get(md5sum) is not None:
-                objstr += "1"
-                md5sum = hashlib.md5(objstr.encode("utf-8")).hexdigest()
-            key_map[md5sum] = md5sum
-            bin_file = self.op_type + "_" + md5sum
+            bin_file = self._alloc_unique_bin_file(param, key_map)
             op_node["bin_filename"] = bin_file
             param_file = os.path.join(self.out_path, bin_file + "_param.json")
             param_file = os.path.realpath(param_file)
@@ -779,6 +787,46 @@ def gen_option_config(debug_config, super_config, op_debug_config):
                 debug_config[_op_type].add(_option)
 
 
+def _apply_debug_and_super_config(op_desc, debug_config, super_config, all_soc_key):
+    if op_desc.op_type in debug_config:
+        op_desc.set_op_debug_config(debug_config[op_desc.op_type])
+    if all_soc_key in debug_config:
+        op_desc.set_op_debug_config(debug_config[all_soc_key])
+    if op_desc.op_type in super_config:
+        op_desc.set_op_super_config(super_config[op_desc.op_type])
+    if all_soc_key in super_config:
+        op_desc.set_op_super_config(super_config[all_soc_key])
+
+
+def _apply_tiling_and_json_config(
+    op_desc, tiling_key_info, kernel_json_file, all_soc_key
+):
+    if op_desc.op_type in tiling_key_info:
+        op_desc.set_tiling_key(tiling_key_info[op_desc.op_type])
+    if all_soc_key in tiling_key_info:
+        op_desc.set_tiling_key(tiling_key_info[all_soc_key])
+    if all_soc_key in kernel_json_file:
+        op_desc.json_file = kernel_json_file[all_soc_key]
+    if op_desc.op_type in kernel_json_file:
+        op_desc.json_file = kernel_json_file[op_desc.op_type]
+
+
+def _apply_simplified_key_and_template(
+    op_desc, simplified_key_mode_info, kernel_template_input_info, all_soc_key
+):
+    simplified_key_mode = None
+    if all_soc_key in simplified_key_mode_info:
+        simplified_key_mode = simplified_key_mode_info[all_soc_key]
+    if op_desc.op_type in simplified_key_mode_info:
+        simplified_key_mode = simplified_key_mode_info[op_desc.op_type]
+    if simplified_key_mode is not None:
+        op_desc.simplified_key_mode = int(simplified_key_mode)
+    if all_soc_key in kernel_template_input_info:
+        op_desc.set_kernel_template_input(kernel_template_input_info[all_soc_key])
+    if op_desc.op_type in kernel_template_input_info:
+        op_desc.set_kernel_template_input(kernel_template_input_info[op_desc.op_type])
+
+
 def gen_bin_param_file(
     cfgfile: str, out_dir: str, soc: str, opc_config_file: str = "", ops: list = None
 ):
@@ -806,35 +854,13 @@ def gen_bin_param_file(
     for op_desc in op_descs:
         op_desc.set_soc_version(soc)
         op_desc.set_out_path(out_dir)
-        if op_desc.op_type in debug_config:
-            op_desc.set_op_debug_config(debug_config[op_desc.op_type])
-        if all_soc_key in debug_config:
-            op_desc.set_op_debug_config(debug_config[all_soc_key])
-        if op_desc.op_type in super_config:
-            op_desc.set_op_super_config(super_config[op_desc.op_type])
-        if all_soc_key in super_config:
-            op_desc.set_op_super_config(super_config[all_soc_key])
-        if op_desc.op_type in tiling_key_info:
-            op_desc.set_tiling_key(tiling_key_info[op_desc.op_type])
-        if all_soc_key in tiling_key_info:
-            op_desc.set_tiling_key(tiling_key_info[all_soc_key])
-        if all_soc_key in kernel_json_file:
-            op_desc.json_file = kernel_json_file[all_soc_key]
-        if op_desc.op_type in kernel_json_file:
-            op_desc.json_file = kernel_json_file[op_desc.op_type]
-        simplified_key_mode = None
-        if all_soc_key in simplified_key_mode_info:
-            simplified_key_mode = simplified_key_mode_info[all_soc_key]
-        if op_desc.op_type in simplified_key_mode_info:
-            simplified_key_mode = simplified_key_mode_info[op_desc.op_type]
-        if simplified_key_mode is not None:
-            op_desc.simplified_key_mode = int(simplified_key_mode)
-        if all_soc_key in kernel_template_input_info:
-            op_desc.set_kernel_template_input(kernel_template_input_info[all_soc_key])
-        if op_desc.op_type in kernel_template_input_info:
-            op_desc.set_kernel_template_input(
-                kernel_template_input_info[op_desc.op_type]
-            )
+        _apply_debug_and_super_config(op_desc, debug_config, super_config, all_soc_key)
+        _apply_tiling_and_json_config(
+            op_desc, tiling_key_info, kernel_json_file, all_soc_key
+        )
+        _apply_simplified_key_and_template(
+            op_desc, simplified_key_mode_info, kernel_template_input_info, all_soc_key
+        )
 
         key_params = ""
         if op_desc.op_type in input_param_file:

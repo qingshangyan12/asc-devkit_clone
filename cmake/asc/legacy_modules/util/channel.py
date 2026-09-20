@@ -111,7 +111,7 @@ def v310_mode_vec_ofile(little_endian, binary_32) -> int:
     return 0
 
 
-def v310_mode_cube_ofile(little_endian, binary_32) -> int:
+def _v310_cube_opcode_maps():
     cube_high_low_map = {
         "0110000001": "10",  # SET_L1_2D
         "0110011000": "10",  # LOAD_OUT_TO_L1_2Dv2
@@ -136,6 +136,11 @@ def v310_mode_cube_ofile(little_endian, binary_32) -> int:
         "0110010100",
         "0110010101",
     }
+    return cube_high_low_map, cube_high_low2_map, cube_high_map
+
+
+def v310_mode_cube_ofile(little_endian, binary_32) -> int:
+    cube_high_low_map, cube_high_low2_map, cube_high_map = _v310_cube_opcode_maps()
     high_9 = binary_32[:9]
     high_10 = binary_32[:10]
     mid_36 = binary_32[25:29]
