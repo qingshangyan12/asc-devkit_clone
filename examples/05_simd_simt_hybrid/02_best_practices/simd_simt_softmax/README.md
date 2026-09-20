@@ -54,10 +54,6 @@
 
   > **输入约束：** 样例默认shape为[8192, 197]；支持通过运行参数指定自定义shape，cols取值范围为1~512。
 
-- 线程组织：
-
-  实现中一个Warp处理一行，Warp内32个线程分别负责同一行中不同列的数据，行内最大值与求和通过Warp归约原语完成。以默认规格 [8192, 197] 为例，一行197列由32个线程分多轮处理：每个线程从与自身线程号相同的列开始，以32列为步进依次处理后续列；197 = 6×32 + 5，前6轮32个线程全部参与计算，第7轮仅前5个线程存在待处理数据。
-
 ## 样例实现
 
 ### Case实现说明
@@ -92,7 +88,7 @@
 
 **优化目标**：以最直接的实现建立功能正确性和性能基线：Warp直接从GM读取输入，完成行内max、exp/sum和归一化，不引入任何中间缓冲。
 
-**核心实现**：行内softmax分三轮完成，依次求行最大值、指数和与归一化输出，三轮均直接读GM。线程组织采用“一个Warp处理一行”：一个Thread Block内的多个Warp各自处理不同的行，行方向按grid-stride循环覆盖全部行。一个Warp处理一行时线程与行内数据的对应关系如下图所示。
+**核心实现**：行内softmax分三轮完成，依次求行最大值、指数和与归一化输出，三轮均直接读GM。线程组织采用“一个Warp处理一行”：Warp内32个线程分别负责同一行中不同列的数据，行内最大值与求和通过Warp归约原语完成；一个Thread Block内的多个Warp各自处理不同的行，行方向按grid-stride循环覆盖全部行。以默认规格 [8192, 197] 为例，一行197列由32个线程分多轮处理：每个线程从与自身线程号相同的列开始，以32列为步进依次处理后续列；197 = 6×32 + 5，前6轮32个线程全部参与计算，第7轮仅前5个线程存在待处理数据。线程与行内数据的对应关系如下图所示。
 
 <img src="./figures/case0.png">
 
@@ -104,24 +100,24 @@ for (uint32_t row = blockIdx.x * warps_per_block + warp_in_block;  // 一个Warp
 
     // 第一轮：从GM读取整行求最大值，asc_reduce_max在Warp内32个线程间归约。
     float max_value = -ASCRT_INF_F;
-    for (uint32_t col = thread_in_warp; col < cols; col += WARP_SIZE) {
+    for (uint32_t col = thread_in_warp; col < cols; col += warpSize) {
         const float value = static_cast<float>(input[row_offset + col]);
         max_value = max_value > value ? max_value : value;
     }
     max_value = asc_reduce_max(max_value);
 
-    // 第二轮：重新读取GM，计算__expf(x - max)并用asc_reduce_add在Warp内归约求和。
+    // 第二轮：重新读取GM，计算expf(x - max)并用asc_reduce_add在Warp内归约求和。
     float sum_value = 0.0F;
-    for (uint32_t col = thread_in_warp; col < cols; col += WARP_SIZE) {
+    for (uint32_t col = thread_in_warp; col < cols; col += warpSize) {
         const float value = static_cast<float>(input[row_offset + col]);
-        sum_value += __expf(value - max_value);
+        sum_value += expf(value - max_value);
     }
     sum_value = asc_reduce_add(sum_value);
 
     // 第三轮：再次读取GM完成归一化写回。三轮循环读取整行三次、计算exp两次。
-    for (uint32_t col = thread_in_warp; col < cols; col += WARP_SIZE) {
+    for (uint32_t col = thread_in_warp; col < cols; col += warpSize) {
         const float value = static_cast<float>(input[row_offset + col]);
-        output[row_offset + col] = static_cast<half>(__expf(value - max_value) / sum_value);
+        output[row_offset + col] = static_cast<half>(expf(value - max_value) / sum_value);
     }
 }
 ```
@@ -154,21 +150,21 @@ Case 1的数据流如下图所示。
 <img src="./figures/case1.png">
 
 ```cpp
-for (uint32_t tile_idx = 0; tile_idx < tile_count; ++tile_idx) {
+uint32_t tile_idx = 0;
+for (uint32_t row_base = first_row_base; row_base < rows; row_base += tile_stride) {
     const uint32_t slot = tile_idx & 1;
     const event_t event_id = slot == 0 ? EVENT_ID0 : EVENT_ID1;
-    const uint32_t row_base = first_row_base + tile_idx * tile_stride;
     const uint32_t rows_remaining = rows - row_base;
     const uint32_t rows_in_tile = rows_remaining < rows_per_tile ? rows_remaining : rows_per_tile;
     __ubuf__ half* input_tile_ub = slot == 0 ? input_tile_ub0 : input_tile_ub1;
     __ubuf__ half* output_tile_ub = slot == 0 ? output_tile_ub0 : output_tile_ub1;
 
     asc_sync_wait(PIPE_MTE2, PIPE_V, event_id);
-    if (tile_idx + 1 < tile_count) {
+    const uint32_t next_row_base = row_base + tile_stride;
+    if (next_row_base < rows) {
         // 当前tile计算前，先把下一个tile搬入另一组输入缓冲区。
         const uint32_t next_slot = slot ^ 1;
         const event_t next_event_id = next_slot == 0 ? EVENT_ID0 : EVENT_ID1;
-        const uint32_t next_row_base = row_base + tile_stride;
         const uint32_t next_rows_remaining = rows - next_row_base;
         const uint32_t next_rows_in_tile =
             next_rows_remaining < rows_per_tile ? next_rows_remaining : rows_per_tile;
@@ -183,7 +179,7 @@ for (uint32_t tile_idx = 0; tile_idx < tile_count; ++tile_idx) {
 
     asc_sync_wait(PIPE_MTE3, PIPE_V, event_id);
     asc_vf_call<softmax_ub_vf>(
-        dim3(WARP_SIZE, rows_in_tile), output_tile_ub, input_tile_ub, rows_in_tile, cols, ub_stride);
+        dim3(warpSize, rows_in_tile), output_tile_ub, input_tile_ub, rows_in_tile, cols, ub_stride);
     asc_sync_notify(PIPE_V, PIPE_MTE2, event_id);
 
     asc_sync_notify(PIPE_V, PIPE_MTE3, event_id);
@@ -191,6 +187,7 @@ for (uint32_t tile_idx = 0; tile_idx < tile_count; ++tile_idx) {
     asc_copy_ub2gm_align(output + row_base * cols, output_tile_ub, static_cast<uint16_t>(rows_in_tile),
         row_bytes, asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, row_bytes, padded_row_bytes);
     asc_sync_notify(PIPE_MTE3, PIPE_V, event_id);
+    ++tile_idx;
 }
 ```
 
@@ -204,7 +201,7 @@ for (uint32_t tile_idx = 0; tile_idx < tile_count; ++tile_idx) {
 
 Case 1把GM访问交给MTE流水并引入双缓冲，SIMT VF不再直接读GM：`aiv_mte2_time` 和 `aiv_mte3_time` 从接近0变为2.878μs和0.587μs，说明GM访问已经转移到MTE搬运路径；`aiv_vec_time` 从11.048μs降至7.235μs，下降约34.5%；`Task Duration` 从13.039μs降至11.203μs，下降约14.1%。此时 `aiv_vec_ratio` 达到0.741，是各分项中占比最高的开销，瓶颈已从GM访存转移到行内计算，下一步需要优化计算耗时。
 
-Case 1的计算耗时主要集中在行内计算的组织方式上：行内计算按max、exp/sum、归一化三轮循环组织，每轮都重新读取一遍UB输入行，`exp` 被计算两次。消除重复读取与重复计算的直接做法，是把每个线程分到的元素缓存到局部数组中复用 `exp` 结果。但遍历数组的循环以cols为边界：cols是运行时参数，循环次数和每次迭代访问的数组下标在编译期均无法确定，编译器不能展开循环，动态下标的数组无法映射到寄存器，只能分配在栈空间，而栈空间的访问效率低于寄存器。若列数在编译期可知，循环次数和下标均为常量，编译器即可展开循环、将数组分配到寄存器，一轮读入就能完成max、exp/sum和归一化三步计算。cols取值任意，按每个取值实例化kernel并不可行；改用少量列上界（64/128/256/384/512）覆盖全部取值，并在计算中屏蔽超出真实cols的尾部列，即可同时满足编译期定长与全取值覆盖。
+Case 1的计算耗时主要集中在行内计算的组织方式上：行内计算按max、exp/sum、归一化三轮循环组织，每轮都重新读取一遍UB输入行，`exp` 被计算两次。下一步的优化方向是把每个线程分到的元素缓存到局部数组中复用 `exp` 结果，并让数组驻留寄存器。
 
 ---
 
@@ -214,7 +211,7 @@ Case 1的计算耗时主要集中在行内计算的组织方式上：行内计�
 
 **核心实现**：
 
-- 编译期bucket：本样例cols不超过512，一个线程分到的元素最多为512/32 = 16个，适合直接驻留寄存器。cols按上界划分为64/128/256/384/512五档bucket，按档位实例化特化kernel：bucket容量为编译期常量，访问数组的循环可完全展开，静态数组 `elements[kWarpIterations]` 驻留寄存器；尾部无效列用 `-ASCRT_INF_F` 屏蔽，不参与归约与归一化。
+- 编译期bucket：本样例cols不超过512，一个线程分到的元素最多为512/32 = 16个，适合直接驻留寄存器。但遍历数组的循环以cols为边界：cols是运行时参数，循环次数和每次迭代访问的数组下标在编译期均无法确定，编译器不能展开循环，动态下标的数组只能分配在栈空间，访问效率低于寄存器。为此将cols按上界划分为64/128/256/384/512五档bucket，按档位实例化特化kernel：bucket容量为编译期常量，循环次数和下标均为常量，访问数组的循环可完全展开，静态数组 `elements[kWarpIterations]` 驻留寄存器；尾部无效列用 `-ASCRT_INF_F` 屏蔽，不参与归约与归一化。
 - UB布局：tile缓冲区按bucket容量 `kBucketCols` 申请，MTE按运行时的真实cols搬运每行数据，真实元素之后的余量空置；SIMT VF在padded UB上计算，MTE3按真实cols将结果搬回GM。bucket分桶与UB布局如下图所示。
 
   <img src="./figures/case2.png">
@@ -229,9 +226,9 @@ __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
     __ubuf__ half* output_ub, __ubuf__ const half* input_ub, uint32_t row_count, uint32_t cols)
 {
     // 每个线程分到的元素个数，为编译期常量。
-    constexpr uint32_t kWarpIterations = (kBucketCols + WARP_SIZE - 1) / WARP_SIZE;
-    const uint32_t row_in_tile = threadIdx.x / WARP_SIZE;
-    const uint32_t thread_in_warp = threadIdx.x % WARP_SIZE;
+    constexpr uint32_t kWarpIterations = (kBucketCols + warpSize - 1) / warpSize;
+    const uint32_t row_in_tile = threadIdx.x / warpSize;
+    const uint32_t thread_in_warp = threadIdx.x % warpSize;
     if (row_in_tile >= row_count) {
         return;
     }
@@ -243,7 +240,7 @@ __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
 
     // 一轮读入线程分到的元素，尾部无效列用-inf屏蔽，不参与后续计算。
     for (uint32_t iter = 0; iter < kWarpIterations; ++iter) {
-        const uint32_t col = thread_in_warp + iter * WARP_SIZE;
+        const uint32_t col = thread_in_warp + iter * warpSize;
         elements[iter] = col < cols ? static_cast<float>(input_ub[row_offset + col]) : -ASCRT_INF_F;
     }
 
@@ -257,14 +254,14 @@ __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
     // exp只计算一次，结果写回数组复用，并经Warp归约得到行指数和。
     float sum_value = 0.0F;
     for (uint32_t iter = 0; iter < kWarpIterations; ++iter) {
-        elements[iter] = __expf(elements[iter] - max_value);
+        elements[iter] = expf(elements[iter] - max_value);
         sum_value += elements[iter];
     }
     sum_value = asc_reduce_add(sum_value);
 
     // 归一化写回，只处理真实cols内的列。
     for (uint32_t iter = 0; iter < kWarpIterations; ++iter) {
-        const uint32_t col = thread_in_warp + iter * WARP_SIZE;
+        const uint32_t col = thread_in_warp + iter * warpSize;
         output_ub[row_offset + col] = static_cast<half>(elements[iter] / sum_value);
     }
 }

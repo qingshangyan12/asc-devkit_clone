@@ -21,7 +21,6 @@
 
 namespace softmax_bucket_impl {
 
-constexpr uint32_t WARP_SIZE = 32;
 constexpr uint32_t BUCKET_THREAD_COUNT_SMALL = 512;
 constexpr uint32_t BUCKET_THREAD_COUNT_MID = 1024;
 constexpr uint32_t BUCKET_THREAD_COUNT_LARGE = 2048;
@@ -40,9 +39,9 @@ __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
     __ubuf__ half* output_ub, __ubuf__ const half* input_ub, uint32_t row_count, uint32_t cols)
 {
     // 每个线程分到的元素个数，为编译期常量。
-    constexpr uint32_t kWarpIterations = (kBucketCols + WARP_SIZE - 1) / WARP_SIZE;
-    const uint32_t row_in_tile = threadIdx.x / WARP_SIZE;
-    const uint32_t thread_in_warp = threadIdx.x % WARP_SIZE;
+    constexpr uint32_t kWarpIterations = (kBucketCols + warpSize - 1) / warpSize;
+    const uint32_t row_in_tile = threadIdx.x / warpSize;
+    const uint32_t thread_in_warp = threadIdx.x % warpSize;
     if (row_in_tile >= row_count) {
         return;
     }
@@ -54,7 +53,7 @@ __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
 
     // 一轮读入线程分到的元素，尾部无效列用-inf屏蔽，不参与后续计算。
     for (uint32_t iter = 0; iter < kWarpIterations; ++iter) {
-        const uint32_t col = thread_in_warp + iter * WARP_SIZE;
+        const uint32_t col = thread_in_warp + iter * warpSize;
         elements[iter] = col < cols ? static_cast<float>(input_ub[row_offset + col]) : -ASCRT_INF_F;
     }
 
@@ -68,14 +67,14 @@ __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
     // exp只计算一次，结果写回数组复用，并经Warp归约得到行指数和。
     float sum_value = 0.0F;
     for (uint32_t iter = 0; iter < kWarpIterations; ++iter) {
-        elements[iter] = __expf(elements[iter] - max_value);
+        elements[iter] = expf(elements[iter] - max_value);
         sum_value += elements[iter];
     }
     sum_value = asc_reduce_add(sum_value);
 
     // 归一化写回，只处理真实cols内的列。
     for (uint32_t iter = 0; iter < kWarpIterations; ++iter) {
-        const uint32_t col = thread_in_warp + iter * WARP_SIZE;
+        const uint32_t col = thread_in_warp + iter * warpSize;
         output_ub[row_offset + col] = static_cast<half>(elements[iter] / sum_value);
     }
 }
@@ -86,25 +85,23 @@ __global__ __vector__ void softmax_bucket_kernel(
 {
     asc_init();
 
-    constexpr uint32_t kRowsPerTile = kThreadCount / WARP_SIZE;
+    constexpr uint32_t kRowsPerTile = kThreadCount / warpSize;
     constexpr uint32_t kTileElements = kRowsPerTile * kBucketCols;
     __ubuf__ half input_tile_ub[2][kTileElements];
     __ubuf__ half output_tile_ub[2][kTileElements];
 
     const uint32_t tile_stride = static_cast<uint32_t>(block_num) * kRowsPerTile;
     const uint32_t first_row_base = static_cast<uint32_t>(block_idx) * kRowsPerTile;
-    const uint32_t tile_count =
-        first_row_base < rows ? (rows - first_row_base + tile_stride - 1) / tile_stride : 0;
 
     asc_sync_notify(PIPE_V, PIPE_MTE2, EVENT_ID0);
     asc_sync_notify(PIPE_V, PIPE_MTE2, EVENT_ID1);
     asc_sync_notify(PIPE_MTE3, PIPE_V, EVENT_ID0);
     asc_sync_notify(PIPE_MTE3, PIPE_V, EVENT_ID1);
 
-    for (uint32_t tile_idx = 0; tile_idx < tile_count; ++tile_idx) {
-        const event_t event_id = (tile_idx & 1) == 0 ? EVENT_ID0 : EVENT_ID1;
+    uint32_t tile_idx = 0;
+    for (uint32_t row_base = first_row_base; row_base < rows; row_base += tile_stride) {
         const uint32_t slot = tile_idx & 1;
-        const uint32_t row_base = first_row_base + tile_idx * tile_stride;
+        const event_t event_id = slot == 0 ? EVENT_ID0 : EVENT_ID1;
         const uint32_t rows_remaining = rows - row_base;
         const uint32_t rows_in_tile = rows_remaining >= kRowsPerTile ? kRowsPerTile : rows_remaining;
         const uint32_t row_bytes = cols * sizeof(half);
@@ -131,6 +128,7 @@ __global__ __vector__ void softmax_bucket_kernel(
         asc_copy_ub2gm_align(output + row_base * cols, output_tile_ub[slot], static_cast<uint16_t>(rows_in_tile),
             row_bytes, asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, row_bytes, padded_row_bytes);
         asc_sync_notify(PIPE_MTE3, PIPE_V, event_id);
+        ++tile_idx;
     }
 
     asc_sync_wait(PIPE_V, PIPE_MTE2, EVENT_ID0);
