@@ -211,6 +211,24 @@ TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
     EXPECT_EQ(total, 46U);
 }
 
+// 设计不变量 4：注册行 externalName 字面量必须自身就是规范形（"与 parser 产出同构"的机器契约）。
+// 手写字面量若带空格/词表外词/非规范拼写，将静默变死行——用户输入经 canonical() 规范化后永不相等，
+// 46 计数与 registeredName 满射断言均无法发现。往返自检：parse(字面量) 成功且 canonical() == 字面量。
+TEST(ExtAlgSurjectivity, ExternalNameLiteralsAreCanonical)
+{
+    const std::vector<AlgMetaRow> rows = AlgMetaRegistry::Instance().GetAll();
+    ASSERT_FALSE(rows.empty()); // 全量编译目标：46 行产品 sidecar + 测试夹具
+    for (const AlgMetaRow& row : rows) {
+        ExternalAlgSpec spec;
+        std::string errMsg;
+        EXPECT_TRUE(ParseExternalAlg(row.meta.externalName, spec, errMsg))
+            << "registeredName=" << row.registeredName << " externalName=\"" << row.meta.externalName
+            << "\" err=" << errMsg;
+        EXPECT_EQ(spec.canonical(), std::string(row.meta.externalName))
+            << "registeredName=" << row.registeredName << "（字面量非规范形，将成为死行）";
+    }
+}
+
 namespace {
 // ---- topo/opParam 夹具（写法蓝本 testcase/all_gather_aicpu_testcase.cc:34-77）----
 
@@ -642,9 +660,10 @@ TEST(ExtAlgResolver, SpecificityOrdering)
     EXPECT_EQ(cands[3].registeredName, "InsReduceScatterMesh1D");
 }
 
-// 显式 priority 注册可用性：REGISTER_ALG_META 第 7 参落库（KFC cmd 不触碰满射断言的 5 个 COLL_CMDS）
+// 显式 priority 注册可用性：REGISTER_ALG_META 第 7 参落库（KFC cmd 不触碰满射断言的 5 个 COLL_CMDS）。
+// externalName 须为规范形——ExternalNameLiteralsAreCanonical 往返自检覆盖所有注册行，含测试夹具
 REGISTER_ALG_META(
-    HcclCMDType::HCCL_CMD_KFC_SERVER, TestPrioMacro, AlgEngine::AICPU, "test[prio]", COND_NONE, FLAG_NONE, 7);
+    HcclCMDType::HCCL_CMD_KFC_SERVER, TestPrioMacro, AlgEngine::AICPU, "sole[mesh]", COND_NONE, FLAG_NONE, 7);
 
 // 三键排序语义（specificity 降序 > priority 降序 > name 字典序）——纯函数构建器直接验证，
 // 测试内构造行（KFC cmd）+ 逆序传入（同时验证顺序无关性）。
