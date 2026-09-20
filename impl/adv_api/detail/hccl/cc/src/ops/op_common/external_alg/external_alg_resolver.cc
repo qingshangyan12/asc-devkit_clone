@@ -116,12 +116,10 @@ ResolveStatus ResolveExternalAlg(
 {
     algName.clear();
     errMsg.clear();
-    // 查表/日志/errMsg 共用一份 canonical（HCCL_INFO 为运行期级别过滤，参数构造不受宏保护，勿在参数处重复构造）
+    // canonical 共用一份：HCCL_INFO 运行期过滤，参数构造不受宏保护
     const std::string key = spec.canonical();
     const std::vector<AlgCandidate>& candidates = GetExternalCandidates(opParam.opType, key);
 
-    // 选名审计日志（spec §12：一条 INFO 汇总；engine 打枚举名与 resolved 行风格一致）。
-    // 级别关闭时 DescribeCandidates 的拼接是纯浪费——按级别惰性构造
     if (HcclCheckLogLevel(HCCL_LOG_INFO)) {
         HCCL_INFO(
             "[MC2_EXT_ALG] op[%u] ext[%s] engine[%s] candidates(%zu): [%s]", static_cast<u32>(opParam.opType),
@@ -132,13 +130,12 @@ ResolveStatus ResolveExternalAlg(
         if (!EngineMatch(cand.engine, opParam)) { // (1) 引擎
             continue;
         }
-        // (2) 变体条件：ID 双边判断消除注册侧写错值的 OOB 调用面（不在 Register() 做值域校验，
-        // 因 rules.h 已 include alg_meta_registry.h，反向 include 会循环依赖）
+        // (2) 变体条件：双边判防注册侧笔误 OOB（不在 Register() 校验：rules.h 反向 include 循环依赖）
         if (cand.variantCondId >= 0 && cand.variantCondId < VARIANT_COND_COUNT &&
             !VARIANT_COND_TABLE[cand.variantCondId](topoInfo, opParam)) {
             continue;
         }
-        // (2') 机型 flag：同上双边判断
+        // (2') 机型 flag：同上
         if (cand.machineFlagId >= 0 && cand.machineFlagId < MACHINE_FLAG_COUNT &&
             !MACHINE_FLAG_TABLE[cand.machineFlagId](topoInfo)) {
             continue;
@@ -148,8 +145,7 @@ ResolveStatus ResolveExternalAlg(
         return ResolveStatus::RESOLVED;
     }
 
-    // 报错三要素：外部名原文 / 候选列表 / 失败原因（opType 无现成名字映射，保持数字）。
-    // 候选串仅失败路径构造一次（errMsg 契约需要，与日志级别无关）
+    // 报错三要素：外部名原文 / 候选列表 / 失败原因
     const std::string reason =
         candidates.empty() ?
             "(no candidate registered in this build for engine " + std::string(EngineName(opParam.engine)) + ")" :

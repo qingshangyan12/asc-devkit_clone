@@ -190,16 +190,13 @@ std::unique_ptr<InsCollAlgBase> GetAlgExecutorForOp(const OpParam& opParam, cons
 HcclResult CheckForcedAlgResource(
     HcclComm comm, const OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo, const std::string& algName);
 
-// algConfig 四态识别（NONE/LEGACY/EXTERNAL/BARE_NAME），tiling 层薄壳：空指针守卫 + 委托
-// ClassifyForcedAlgConfig（字符串层，external_alg_parser.h）+ LEGACY 补日志。EXTERNAL 解析失败时
-// spec 复位无效、extParseErrMsg 非空。现仅闸门 B（hccl_mc2.cc 存在性检查）使用；定名请走 GetForcedAlgName。
+// algConfig 四态识别（NONE/LEGACY/EXTERNAL/BARE_NAME；EXTERNAL 解析失败时 spec 复位无效、extParseErrMsg
+// 非空）。仅闸门 B（hccl_mc2.cc）使用；定名请走 GetForcedAlgName。
 ForcedAlgKind ClassifyForcedAlg(
     const Mc2CcTilingInner* ccTiling, std::string& algName, ExternalAlgSpec& extSpec, std::string& extParseErrMsg);
 
-// 强制算法定名（2026-09-20 重构，需求前 GetForcedAlgName 形状回归）：algConfig → 注册名。
-// true  = 已定名（裸名直取 / 外部名经三级漏斗解析），topoInfo 已备好，调用方接着 PrepareEngineForAlg；
-// false = 无强制配置 / legacy / 外部名坏（三要素 WARNING 已在函数内打印，opParam/topoInfo 与进入时一致）
-//         → 调用方走默认 selector。失败语义与 bare 同链同终态（设计 §10/D7）。
+// algConfig → 注册名。true = 已定名且 topoInfo 已备好，调用方接着 PrepareEngineForAlg；
+// false = 无强制 / legacy / 外部名坏 / topo 准备失败，opParam/topoInfo 与进入时一致。
 bool GetForcedAlgName(
     HcclComm comm, const Mc2CcTilingInner* ccTiling, OpParam& opParam,
     std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo, std::string& algName);

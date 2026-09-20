@@ -31,12 +31,7 @@ struct AlgMeta {
     const char* externalName = ""; // 规范化外部名（与 parser 产出同构），如 "sole[mesh]"
     int variantCondId = -1;
     int machineFlagId = -1;
-    // 同键内候选定序（hccl 平移的 flag 重叠场景逃生门，devkit 46 行当前全 0）：
-    // 排序键第二级（specificity 降序 > priority 降序 > registeredName 字典序），
-    // 数值大者先试漏斗。只影响排队顺序，不影响 ①②②′ 判定——priority 高的候选
-    // 条件不命中照样出局，裸名（双 -1）仍兜底；特异性第一级保证裸名永不被 priority
-    // 抬到特化候选之前。
-    int priority = 0;
+    int priority = 0; // 同键定序第二级（specificity > priority > name，见 BuildCandidateTable）
 };
 
 // 一行 sidecar 记录（枚举接口用）
@@ -65,8 +60,7 @@ private:
 // sidecar 注册宏（与 REGISTER_EXEC_V2 同款 static-init 套路，见
 // coll_alg_v2_exec_registry.h:46-48）。必须写在主注册同一条件编译块内，
 // 保证 sidecar 与主注册同生共死（守卫天然同步）。
-// 第 7 参 priority 显式写出（无裁决意图恒填 0，见 AlgMeta::priority）：槽位在每行现场写好，
-// 平移/扩展时改数字即可；将来任何加参企图会在全部现场编译报错，签名冻结自执行。
+// priority 显式写出（无裁决意图恒填 0）；加参须动全部现场，签名冻结由此自执行
 #define REGISTER_ALG_META_HELPER(ctr, cmd, regName, engine, extName, condId, flagId, prio) \
     static HcclResult g_alg_meta_##regName##_##ctr = AlgMetaRegistry::Instance().Register( \
         cmd, std::string(#regName), AlgMeta{engine, extName, condId, flagId, prio})

@@ -41,10 +41,9 @@ struct ExternalAlgLayer {
 struct ExternalAlgSpec {
     ExternalExecutor executor = ExternalExecutor::SOLE;
     std::vector<ExternalAlgLayer> layers;
-    bool orderStrong = false; // [order.strong] 后缀：收编进 canonical 主键（保序是名字身份的一部分）
+    bool orderStrong = false;
 
-    // 规范化外部名（候选表主键；orderStrong 时含 [order.strong] 后缀——devkit 无保序注册行，
-    // 带后缀输入查表无候选 → 按 D7 语义 WARNING+回退，而非静默忽略）
+    // 规范化外部名 = 候选表主键
     std::string canonical() const
     {
         static const char* EXECUTOR_NAME[] = {"sole", "sequence", "parallel", "concur", "pipeline"};
@@ -224,7 +223,7 @@ inline ForcedAlgKind ClassifyForcedAlgConfig(
         }
         return ForcedAlgKind::EXTERNAL;
     }
-    bareName = algConfig; // 裸名直拷（需求前 hccl_alloc_ctx_res.cc :696 同语义）
+    bareName = algConfig;
     return ForcedAlgKind::BARE_NAME;
 }
 
