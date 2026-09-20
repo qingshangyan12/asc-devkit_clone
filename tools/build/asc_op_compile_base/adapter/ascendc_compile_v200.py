@@ -34,6 +34,9 @@ from .ascendc_constants import (
 )
 
 
+from .ascendc_compile_v220 import add_op_system_run_cfg_option
+
+
 def judge_valid_for_v200(tiling_key_kernel_type):
     kernel_type_res = 0
     for kernel_type in tiling_key_kernel_type.values():
@@ -121,6 +124,14 @@ def call_bisheng_v200_dynamic(param: SingleTilingKeyCompileParams, kernel_type):
         param.tiling_info.tiling_data_file_path,
     )
     compile_cmd += [f"-D{TILING_KEY_MACRO}={param.tiling_key}UL"]
+    add_op_system_run_cfg_option(
+        compile_cmd,
+        param.compile_info,
+        param.tiling_info,
+        param.tiling_key,
+        param.sub_arch,
+        definition_key=param.compile_info.tiling_key_list[0],
+    )
     if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
         tiling_data_hash_src = param.tiling_info.tiling_data
         if isinstance(tiling_data_hash_src, str):
@@ -185,6 +196,9 @@ def call_bisheng_v200_static(
             f"{compile_info.origin_func_name}_{tiling_data_hash}_{tiling_info.tiling_key}_tilingkey"
         ]
     compile_cmd += [f"-D{TILING_KEY_MACRO}={tiling_info.tiling_key}UL"]
+    add_op_system_run_cfg_option(
+        compile_cmd, compile_info, tiling_info, tiling_info.tiling_key, sub_arch, definition_key=tiling_info.tiling_key
+    )
 
     sources = CommonUtility().ascendc_read_file(compile_info.gen_kernel_func_file)
     new_sources = sources[:-1]

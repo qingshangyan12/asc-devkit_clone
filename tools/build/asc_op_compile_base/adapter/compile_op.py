@@ -61,6 +61,7 @@ from .ascendc_common_utility import (
 from .ascendc_compile_dfx import DFXParamType, DFXPointType, DFXArgInfo, DFXSectionGenerator
 from .ascendc_compile_v220 import (
     gen_compile_cmd_v220,
+    add_op_system_run_cfg_option,
     get_compile_core_types,
     get_compile_target_name,
     get_compile_target_options,
@@ -1527,6 +1528,9 @@ def _compile_ascendc_cce(compile_info: CompileInfo, compile_option_tuple, tiling
                 f"{compile_info.origin_func_name}_{tiling_data_hash}_{tiling_info.tiling_key}_tilingkey"
             ]
         compile_cmd += [f"-D{TILING_KEY_MACRO}={tiling_info.tiling_key}UL"]
+        add_op_system_run_cfg_option(
+            compile_cmd, compile_info, tiling_info, tiling_info.tiling_key, None, definition_key=tiling_info.tiling_key
+        )
         new_sources += DFXSectionGenerator().generate_dfx_section(
             str(tiling_info.tiling_key), tiling_info, compile_info.get_kernel_func_name(), compile_info, True
         )
@@ -1546,6 +1550,9 @@ def _compile_ascendc_cce(compile_info: CompileInfo, compile_option_tuple, tiling
         for tiling_key in compile_info.tiling_key_list:
             compile_cmd, section_content = _compile_single_tiling(
                 tiling_key, compile_info, tiling_info, compile_option_tuple
+            )
+            add_op_system_run_cfg_option(
+                compile_cmd, compile_info, tiling_info, tiling_key, None, definition_key=compile_info.tiling_key_list[0]
             )
             cmds_list.append(compile_cmd)
             new_sources += section_content
@@ -1639,6 +1646,11 @@ def _get_compile_cmd_and_section_content(
         compile_option_tuple,
         arch,
         tiling_info.tiling_data_file_path,
+    )
+
+    definition_key = tiling_info.tiling_key if tiling_info.static_shape_flag else compile_info.tiling_key_list[0]
+    add_op_system_run_cfg_option(
+        compile_cmd, compile_info, tiling_info, tiling_key, arch, definition_key=definition_key
     )
 
     current_kernel_name = ""
