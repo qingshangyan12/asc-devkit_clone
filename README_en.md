@@ -1,7 +1,7 @@
 <div align="center">
 
 # Ascend C
-
+ 
 English | [简体中文](./README.md)
 
 <h4>Multi-layer APIs built on C/C++, unlocking full chip programmability for ultimate performance</h4>
