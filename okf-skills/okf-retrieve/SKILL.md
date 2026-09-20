@@ -95,7 +95,8 @@ description: 从用户算子需求出发，经 okf-index 持久化索引定位�
 
 ## 阶段5测试运行记录
 
-- 运行目录：`runs/stage5-v1/`（answers/、metrics、score、报告），执行方式对齐基线：
+- 原始运行目录：`runs/stage5-v1/`（answers/、metrics、score、timestamps.tsv）；评测报告归档在
+  `../okf-evaluate/reports/stage5-v1.md`。执行方式对齐基线：
   explore 子代理逐任务派发、并行度 = 1、同一 tasks.yaml 与输出格式。
 - 与基线的差异仅检索资产可用（索引 + front matter + 本 skill 模板）；
   读取范围按用户决策放开（可读 examples/ 等），但 okf-evaluate/ 与 okf-index/tests/

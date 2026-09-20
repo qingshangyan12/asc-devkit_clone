@@ -13,6 +13,7 @@
 | `scripts/collect_metrics.py` | 从 opencode 会话存储采集单任务 token/耗时/审计数据 |
 | `scripts/score.py` | 对照 gold 自动评分（E 类缺口正确性需人工终审） |
 | `baseline/` | 基线原始结果、逐任务指标、基线报告 |
+| `reports/` | 增强检索评测报告；原始运行产物保留在对应检索 skill 的 `runs/` 目录 |
 
 ## 运行流程（基线条件）
 
