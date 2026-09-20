@@ -29,9 +29,6 @@ from asc_op_compile_base.common.error_mgr import (
 )
 from asc_op_compile_base.common.context import get_context
 
-# compile_op 自身已不再使用，但 test_compile_op.py 有一处
-# patch.object(compile_op_module, "get_current_build_config")，删掉会变成 AttributeError
-from asc_op_compile_base.common.buildcfg import get_current_build_config  # noqa: F401
 from .get_op_tiling import TilingInfo, OpInfo, get_tiling_info_by_tiling
 from asc_op_compile_base.common.utils.log_utils import (
     LogUtil,
@@ -111,16 +108,14 @@ from .static_compile_resource_generator import (
 from .super_kernel_option_parse import parse_super_kernel_options
 from .kernel_info_infer import KernelInfoInfer
 from .ascendc_compile_utils import check_custom_dcci_end_false, check_if_gen_placehoder
-from .ascendc_compile_regbase import (  # noqa: F401
-    _compile_ascendc_cce_regbase,
-    _mssanitizer_link,
-)
-from .ascendc_compile_backend_kernel_type import (  # noqa: F401
+from .ascendc_compile_dispatch import (  # noqa: F401
     _compile_ascendc_cce,
     _compile_ascendc_cce_m510,
-    _compile_ascendc_cce_v220,
+    _compile_ascendc_cce_regbase,
     _compile_ascendc_cce_v200_with_kernel_type,
+    _compile_ascendc_cce_v220,
     _compile_ascendc_cce_v220_with_kernel_type,
+    _mssanitizer_link,
 )
 
 
