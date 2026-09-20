@@ -1481,7 +1481,7 @@ __aicore__ inline void asc_copy_gm2l1(
     uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode);
 
 __aicore__ inline void asc_copy_gm2l1(
-    __cbuf__ void* dst, __gm__ void* src, uint32_t n_burst, uint32_t len_burst, asc_channel_pad_mode pad_mode,
+    __cbuf__ void* dst, __gm__ void* src, uint32_t burst_count, uint32_t burst_len, asc_channel_pad_mode pad_mode,
     bool enable_pre_load_ignore_sync, uint64_t src_stride, uint32_t dst_stride);
 
 __aicore__ inline void asc_copy_gm2l1(
