@@ -42,22 +42,22 @@ __simd_callee__ inline reg_tensor<T> abs_diff(const reg_tensor<T>& src0, const r
 }
 
 template <typename T, typename U>
-__simd_callee__ inline reg_tensor<U> exp_diff(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+__simd_callee__ inline reg_tensor<T> exp_diff(const reg_tensor<U>& src0, const reg_tensor<U>& src1)
 {
     static_assert(
         ::AscendC::Std::is_same_v<T, float> && ::AscendC::Std::is_same_v<U, float>,
         "exp_diff without a position only supports float input and float output");
-    reg_tensor<U> dst(src0.mask);
+    reg_tensor<T> dst(src0.mask);
     dst.reg = asc_exp_sub(src0.reg, src1.reg, src0.mask);
     return dst;
 }
 
 template <typename T, typename U, typename position_type>
-__simd_callee__ inline reg_tensor<U> exp_diff(
-    const reg_tensor<T>& src0, const reg_tensor<T>& src1, position_type src_pos)
+__simd_callee__ inline reg_tensor<T> exp_diff(
+    const reg_tensor<U>& src0, const reg_tensor<U>& src1, position_type src_pos)
 {
     static_assert(
-        ::AscendC::Std::is_same_v<T, half> && ::AscendC::Std::is_same_v<U, float>,
+        ::AscendC::Std::is_same_v<T, float> && ::AscendC::Std::is_same_v<U, half>,
         "exp_diff with a position only supports half input and float output");
     using pos_type = ::AscendC::Std::remove_cvref_t<position_type>;
     static_assert(
@@ -65,7 +65,7 @@ __simd_callee__ inline reg_tensor<U> exp_diff(
             pos_type, ::AscendC::Std::remove_cvref_t<decltype(ASC_POSITION_EVEN)>,
             ::AscendC::Std::remove_cvref_t<decltype(ASC_POSITION_ODD)>>,
         "exp_diff position supports ASC_POSITION_EVEN and ASC_POSITION_ODD");
-    reg_tensor<U> dst(src0.mask);
+    reg_tensor<T> dst(src0.mask);
     dst.reg = asc_exp_sub_half2float(src0.reg, src1.reg, src0.mask, src_pos);
     return dst;
 }

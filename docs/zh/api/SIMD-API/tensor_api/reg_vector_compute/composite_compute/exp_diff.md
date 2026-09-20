@@ -40,13 +40,13 @@ float输入按连续元素计算，无需指定`src_pos`。half输入必须指�
 
 ```cpp
 template <typename T, typename U>
-__simd_callee__ inline reg_tensor<U> exp_diff(
-    const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+__simd_callee__ inline reg_tensor<T> exp_diff(
+    const reg_tensor<U>& src0, const reg_tensor<U>& src1)
 
 template <typename T, typename U, typename position_type>
-__simd_callee__ inline reg_tensor<U> exp_diff(
-    const reg_tensor<T>& src0,
-    const reg_tensor<T>& src1,
+__simd_callee__ inline reg_tensor<T> exp_diff(
+    const reg_tensor<U>& src0,
+    const reg_tensor<U>& src1,
     position_type src_pos)
 ```
 
@@ -56,8 +56,8 @@ __simd_callee__ inline reg_tensor<U> exp_diff(
 
 | 参数名 | 描述 |
 | --- | --- |
-| T | 源操作数的元素类型。支持的数据类型请参考[数据类型](#数据类型)。 |
-| U | 返回值的元素类型。当前仅支持`float`。调用时必须显式指定。 |
+| T | 返回值的元素类型，当前仅支持`float`。调用时必须显式指定。 |
+| U | 源操作数的元素类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 
 **表2**  参数说明
 
@@ -98,7 +98,7 @@ __simd_vf__ inline void exp_diff_example(
     auto mask = asc::te::experimental::all_mask<float>();
     auto src0 = asc::te::experimental::load(input0, asc::te::make_coord(0)).with_mask(mask);
     auto src1 = asc::te::experimental::load(input1, asc::te::make_coord(0)).with_mask(mask);
-    auto dst = asc::te::experimental::exp_diff<half, float>(src0, src1, ASC_POSITION_ODD);
+    auto dst = asc::te::experimental::exp_diff<float, half>(src0, src1, ASC_POSITION_ODD);
     asc::te::experimental::store(output, asc::te::make_coord(0), dst);
 }
 ```

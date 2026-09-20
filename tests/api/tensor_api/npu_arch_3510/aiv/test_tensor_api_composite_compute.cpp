@@ -90,12 +90,12 @@ __aicore__ inline void check_exp_diff_positions_and_muls_cast()
                 AscendC::Std::declval<const reg_type<float>&>(), AscendC::Std::declval<const reg_type<float>&>())),
             reg_type<float>>);
     static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::exp_diff<half, float>(
+                  decltype(asc::te::experimental::exp_diff<float, half>(
                       AscendC::Std::declval<const reg_type<half>&>(), AscendC::Std::declval<const reg_type<half>&>(),
                       ASC_POSITION_EVEN)),
                   reg_type<float>>);
     static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::exp_diff<half, float>(
+                  decltype(asc::te::experimental::exp_diff<float, half>(
                       AscendC::Std::declval<const reg_type<half>&>(), AscendC::Std::declval<const reg_type<half>&>(),
                       ASC_POSITION_ODD)),
                   reg_type<float>>);
@@ -112,8 +112,8 @@ __aicore__ inline void check_exp_diff_positions_and_muls_cast()
     reg_type<half> half_src1{};
     auto output_mask = asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::vl3, float>();
     half_src0.mask = output_mask.reg;
-    auto even_exp_diff = asc::te::experimental::exp_diff<half, float>(half_src0, half_src1, ASC_POSITION_EVEN);
-    auto odd_exp_diff = asc::te::experimental::exp_diff<half, float>(half_src0, half_src1, ASC_POSITION_ODD);
+    auto even_exp_diff = asc::te::experimental::exp_diff<float, half>(half_src0, half_src1, ASC_POSITION_EVEN);
+    auto odd_exp_diff = asc::te::experimental::exp_diff<float, half>(half_src0, half_src1, ASC_POSITION_ODD);
     EXPECT_EQ(even_exp_diff.mask, output_mask.reg);
     EXPECT_EQ(odd_exp_diff.mask, output_mask.reg);
 

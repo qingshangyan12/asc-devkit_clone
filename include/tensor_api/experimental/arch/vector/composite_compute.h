@@ -30,19 +30,17 @@ template <typename T>
 __simd_callee__ inline reg_tensor<T> abs_diff(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T, typename U>
-__simd_callee__ inline reg_tensor<U> exp_diff(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+__simd_callee__ inline reg_tensor<T> exp_diff(const reg_tensor<U>& src0, const reg_tensor<U>& src1);
 
 template <typename T, typename U, typename position_type>
-__simd_callee__ inline reg_tensor<U> exp_diff(
-    const reg_tensor<T>& src0, const reg_tensor<T>& src1, position_type src_pos);
+__simd_callee__ inline reg_tensor<T> exp_diff(
+    const reg_tensor<U>& src0, const reg_tensor<U>& src1, position_type src_pos);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> madd(
-    reg_tensor<T>& dst, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+__simd_callee__ inline reg_tensor<T> madd(reg_tensor<T>& dst, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> mula(
-    reg_tensor<T>& dst, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+__simd_callee__ inline reg_tensor<T> mula(reg_tensor<T>& dst, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> fma(
