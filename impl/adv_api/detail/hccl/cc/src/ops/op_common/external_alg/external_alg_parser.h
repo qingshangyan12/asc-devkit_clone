@@ -33,6 +33,9 @@ namespace mc2_ops_hccl {
 
 enum class ExternalExecutor { SOLE = 0, SEQUENCE, PARALLEL, CONCUR, PIPELINE };
 
+// 层数上限对齐系统最大拓扑层数（3 层网）
+constexpr size_t MAX_EXTERNAL_ALG_LAYERS = 3;
+
 struct ExternalAlgLayer {
     std::string atom;               // "mesh" | "nhr"
     std::vector<std::string> attrs; // 属性按书写顺序保留
@@ -197,8 +200,9 @@ inline bool ParseExternalAlg(const std::string& algConfig, ExternalAlgSpec& spec
         errMsg = "no layer in \"" + algConfig + "\"";
         return false;
     }
-    if (spec.layers.size() > 3) {
-        errMsg = "too many layers (" + std::to_string(spec.layers.size()) + ", max 3) in \"" + algConfig + "\"";
+    if (spec.layers.size() > MAX_EXTERNAL_ALG_LAYERS) {
+        errMsg = "too many layers (" + std::to_string(spec.layers.size()) + ", max " +
+                 std::to_string(MAX_EXTERNAL_ALG_LAYERS) + ") in \"" + algConfig + "\"";
         return false;
     }
     return true;
