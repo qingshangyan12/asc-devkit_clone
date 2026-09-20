@@ -56,7 +56,7 @@ def SetCurrentSocInfo(soc: str):
 
 
 from asc_op_compile_base.asc_op_compiler.compile_op import *
-from asc_op_compile_base.asc_op_compiler.ascendc_compile_backend_kernel_type import (
+from asc_op_compile_base.asc_op_compiler.ascendc_compile_dispatch import (
     _compile_ascendc_cce,
     _generate_section_content,
     _get_sub_kernel_name,
@@ -114,8 +114,8 @@ compile_op_module = importlib.import_module(
 super_kernel_compile_module = importlib.import_module(
     "asc_op_compile_base.asc_op_compiler.super_kernel_op_compile"
 )
-kernel_type_backend_module = importlib.import_module(
-    "asc_op_compile_base.asc_op_compiler.ascendc_compile_backend_kernel_type"
+dispatch_module = importlib.import_module(
+    "asc_op_compile_base.asc_op_compiler.ascendc_compile_dispatch"
 )
 from unittest.mock import Mock, patch
 from tempfile import TemporaryDirectory
@@ -2580,13 +2580,13 @@ class TestCompileOp(unittest.TestCase):
         compile_info.kernel_name = op_info.kernel_name
         tiling_info.static_shape_flag = True
         with mock.patch.object(
-            kernel_type_backend_module, "call_bisheng_v220", return_value=["1"]
+            dispatch_module, "call_bisheng_v220", return_value=["1"]
         ):
             with mock.patch.object(
-                kernel_type_backend_module, "_gen_non_mix_sub_json", return_value=None
+                dispatch_module, "_gen_non_mix_sub_json", return_value=None
             ):
                 with mock.patch.object(
-                    kernel_type_backend_module,
+                    dispatch_module,
                     "_dynamic_kernel_list_to_json",
                     return_value=None,
                 ):
@@ -2622,13 +2622,13 @@ class TestCompileOp(unittest.TestCase):
         compile_info.kernel_name = op_info.kernel_name
         tiling_info.static_shape_flag = False
         with mock.patch.object(
-            kernel_type_backend_module, "call_bisheng_v220", return_value=["1"]
+            dispatch_module, "call_bisheng_v220", return_value=["1"]
         ):
             with mock.patch.object(
-                kernel_type_backend_module, "_gen_non_mix_sub_json", return_value=None
+                dispatch_module, "_gen_non_mix_sub_json", return_value=None
             ):
                 with mock.patch.object(
-                    kernel_type_backend_module,
+                    dispatch_module,
                     "_dynamic_kernel_list_to_json",
                     return_value=None,
                 ):
@@ -2639,7 +2639,7 @@ class TestCompileOp(unittest.TestCase):
     @mock.patch("os.environ", {"ASCENDC_CCACHE_EXECUTABLE": "/usr/bin/ccache"})
     @mock.patch("shutil.which")
     def test_gen_compile_cmd_regbase_m510(self, mock_shutil):
-        from asc_op_compile_base.asc_op_compiler.ascendc_compile_regbase import (
+        from asc_op_compile_base.asc_op_compiler.ascendc_compile_dispatch import (
             _gen_compile_cmd_regbase,
         )
 
@@ -2900,7 +2900,7 @@ class TestCompileOp(unittest.TestCase):
     @mock.patch("os.environ", {"ASCENDC_CCACHE_EXECUTABLE": "/usr/bin/ccache"})
     @mock.patch("shutil.which")
     def test_gen_compile_cmd_regbase(self, mock_shutil):
-        from asc_op_compile_base.asc_op_compiler.ascendc_compile_regbase import (
+        from asc_op_compile_base.asc_op_compiler.ascendc_compile_dispatch import (
             _gen_compile_cmd_regbase,
         )
 
@@ -4440,7 +4440,7 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
         )
         arch = "dav-m300"
 
-        from asc_op_compile_base.asc_op_compiler.ascendc_compile_regbase import (
+        from asc_op_compile_base.asc_op_compiler.ascendc_compile_dispatch import (
             _call_bisheng_regbase,
         )
 
@@ -4854,37 +4854,35 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
             ),
             mock.patch.object(CommonUtility, "ascendc_write_file"),
             mock.patch.object(
-                kernel_type_backend_module,
+                dispatch_module,
                 "gen_compile_cmd_v220",
                 return_value=["bisheng", "-o", "/tmp/typed_record_kernel_7.o"],
             ),
             mock.patch.object(
-                kernel_type_backend_module,
+                dispatch_module,
                 "get_compile_target_options",
                 return_value=(),
             ),
             mock.patch.object(
-                kernel_type_backend_module,
+                dispatch_module,
                 "set_dynamic_sub_func_names_of_super_kernel_with_kernel_type_group",
             ),
             mock.patch.object(
-                kernel_type_backend_module, "_generate_section_content", return_value=""
+                dispatch_module, "_generate_section_content", return_value=""
             ),
             mock.patch.object(
-                kernel_type_backend_module, "compile_multi_tilingkey"
+                dispatch_module, "compile_multi_tilingkey"
             ) as compile_multi,
-            mock.patch.object(kernel_type_backend_module, "fatbin_objs") as fatbin,
-            mock.patch.object(
-                kernel_type_backend_module, "_generate_final_json"
-            ) as final_json,
+            mock.patch.object(dispatch_module, "fatbin_objs") as fatbin,
+            mock.patch.object(dispatch_module, "_generate_final_json") as final_json,
         ):
-            kernel_type_backend_module._compile_ascendc_cce_v220_with_kernel_type_for_dynamic(
+            dispatch_module._compile_ascendc_cce_v220_with_kernel_type_for_dynamic(
                 compile_info, compile_option_tuple, tiling_info
             )
             # 确认 patch 真的挂上了，否则下面三条 assert_not_called 是空洞的
-            assert kernel_type_backend_module.compile_multi_tilingkey is compile_multi
-            assert kernel_type_backend_module.fatbin_objs is fatbin
-            assert kernel_type_backend_module._generate_final_json is final_json
+            assert dispatch_module.compile_multi_tilingkey is compile_multi
+            assert dispatch_module.fatbin_objs is fatbin
+            assert dispatch_module._generate_final_json is final_json
 
         self.assertEqual(len(compile_info.compile_command_session.records), 1)
         recorded = compile_info.compile_command_session.records[0]
@@ -4910,14 +4908,10 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
 
         with (
             mock.patch.object(CommonUtility, "get_chip_version", return_value="c220"),
-            mock.patch.object(
-                kernel_type_backend_module, "call_bisheng_v220", return_value=["7"]
-            ),
-            mock.patch.object(
-                kernel_type_backend_module, "set_soc_spec"
-            ) as set_soc_spec_mock,
+            mock.patch.object(dispatch_module, "call_bisheng_v220", return_value=["7"]),
+            mock.patch.object(dispatch_module, "set_soc_spec") as set_soc_spec_mock,
         ):
-            kernel_type_backend_module._compile_ascendc_cce_v220(
+            dispatch_module._compile_ascendc_cce_v220(
                 compile_info, compile_option_tuple, tiling_info
             )
 
@@ -5149,7 +5143,7 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
         self.assertEqual(src_file, "/tmp/add_custom.cpp")
 
     def test_get_sub_compile_info(self):
-        from asc_op_compile_base.asc_op_compiler.ascendc_compile_backend_kernel_type import (
+        from asc_op_compile_base.asc_op_compiler.ascendc_compile_dispatch import (
             _get_sub_compile_info,
         )
 
@@ -5874,12 +5868,12 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
                         compile_info, compile_option_tuple, tiling_info
                     )
                     with mock.patch.object(
-                        kernel_type_backend_module,
+                        dispatch_module,
                         "call_bisheng_v220",
                         return_value=["1"],
                     ):
                         with mock.patch.object(
-                            kernel_type_backend_module,
+                            dispatch_module,
                             "fatbin_objs",
                             return_value=["1"],
                         ):
@@ -5989,7 +5983,7 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
 
         compile_option_tuple = CompileOptionTuple([], [])
         CommonUtility.get_ascendc_compiler_path()
-        from asc_op_compile_base.asc_op_compiler.ascendc_compile_backend_kernel_type import (
+        from asc_op_compile_base.asc_op_compiler.ascendc_compile_dispatch import (
             _compile_ascendc_cce_v200_with_kernel_type_for_static,
             _compile_ascendc_cce_v200_with_kernel_type,
         )
@@ -9521,10 +9515,10 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
             DFXSectionGenerator().get_param("tiling").args_dfx_info, golden_dfx_info
         )
 
-        module_name = "asc_op_compile_base.asc_op_compiler.compile_op"
-        compile_op_module = importlib.import_module(module_name)
+        module_name = "asc_op_compile_base.asc_op_compiler.ascendc_compile_dfx"
+        dfx_module = importlib.import_module(module_name)
         with mock.patch.object(
-            compile_op_module, "get_current_build_config", return_value=["oom"]
+            dfx_module, "get_current_build_config", return_value=["oom"]
         ):
             DFXSectionGenerator()._generate_binary_for_tiling(
                 "1", tiling_info, compile_info
