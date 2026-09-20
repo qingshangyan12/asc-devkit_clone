@@ -42,10 +42,9 @@ __aicore__ inline void asc_copy_gm2l1(__cbuf__ <dtype>* dst,
                                       uint32_t m_start_position,
                                       uint32_t k_start_position,
                                       uint16_t dst_stride,
-                                      uint16_t m_step,
-                                      uint16_t k_step,
-                                      uint8_t decomp_mode,
-                                      uint8_t l2_cache_ctl)
+                                       uint16_t m_step,
+                                       uint16_t k_step,
+                                       asc_load_l2_cache_mode l2_cache_mode)
 ```
 
 ### dtype支持的数据类型
@@ -61,10 +60,9 @@ __aicore__ inline void asc_copy_gm2l1(__cbuf__ bfloat16_t* dst,
                                       uint32_t m_start_position,
                                       uint32_t k_start_position,
                                       uint16_t dst_stride,
-                                      uint16_t m_step,
-                                      uint16_t k_step,
-                                      uint8_t decomp_mode,
-                                      uint8_t l2_cache_ctl)
+                                       uint16_t m_step,
+                                       uint16_t k_step,
+                                       asc_load_l2_cache_mode l2_cache_mode)
 ```
 
 ## 参数说明
@@ -80,17 +78,7 @@ __aicore__ inline void asc_copy_gm2l1(__cbuf__ bfloat16_t* dst,
 | dst_stride | 输入 | 目的矩阵列方向前一个分形起始地址与后一个分形起始地址的间隔，单位512字节。取值范围：[0, 4095]。 |
 | m_step | 输入 | 源矩阵行方向分形步长，即搬运的分形行数，单位为16个元素。取值范围：[1, 4095]。 |
 | k_step | 输入 | 源矩阵列方向分形步长，即搬运的分形列数，单位32字节。取值范围：[1, 4095]。 |
-| decomp_mode | 输入 | 预留参数，当前须设置为0。 |
-| l2_cache_ctl | 输入 | 配置数据在L2 Cache中的管理策略。取值说明请参见[表2](#table2)。 |
-
-**表2** l2_cache_ctl取值说明 <a id="table2"></a>
-
-| 取值 | 模式 | 含义 |
-|------|------|------|
-| 0 | Normal模式 | 启用L2 Cache，并将分配的Cache Line标记为高替换优先级。 |
-| 1 | Last模式 | &bull; 启用L2 Cache，并将分配的Cache Line标记为低替换优先级。<br>&bull; **Last模式暂不支持。**|
-| 2 | Persistent模式 | &bull; 启用L2 Cache。已存入L2 Cache中的数据可能被替换，若需确保特定GM的数据始终保留在L2 Cache中，可采用驻留模式。<br>&bull; 被标记为驻留模式的Cache Line只能被其他同样标记为驻留模式的Cache Line替换。<br>&bull; **Persistent模式暂不支持。**|
-| 4 | Disable模式 | 不启用L2 Cache，每次都直接从GM中读取，并保持已有Cache Line的状态不变。 |
+| l2_cache_mode | 输入 | 使用[asc_load_l2_cache_mode](../../defs/enum/asc_load_l2_cache_mode.md)枚举值配置数据在L2 Cache中的管理策略。 |
 
 ## 返回值说明
 
@@ -107,7 +95,7 @@ PIPE_MTE2
 - 本接口非AIC调用直接返回。
 - dst起始地址需32字节对齐（L1 Buffer对齐要求），否则会导致搬运异常。
 - src起始地址需1字节对齐（Global Memory对齐要求），否则会导致搬运异常。
-- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../../sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
 - L1 Buffer容量上限：L1 Buffer总容量512KB，dst偏移量与搬运大小之和不可越界，否则触发异常。
 
 ### 2D矩阵搬运模式约束
@@ -163,11 +151,13 @@ __global__ __cube__ void AscCopyGm2l1TwoDimNzKernel(
     // A、B在GM中已按Nz格式排布，2D搬运过程中不进行格式转换。
     for (uint16_t k_block = 0; k_block < K_FRACTALS; ++k_block) {
         const uint32_t offset = k_block * M * CUBE;
-        asc_copy_gm2l1(a_l1 + offset, a + offset, 0, 0, M_FRACTALS, M_FRACTALS, 1, 0, 0);
+        asc_copy_gm2l1(a_l1 + offset, a + offset, 0, 0, M_FRACTALS, M_FRACTALS, 1,
+            asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM);
     }
     for (uint16_t n_block = 0; n_block < N_FRACTALS; ++n_block) {
         const uint32_t offset = n_block * K * CUBE;
-        asc_copy_gm2l1(b_l1 + offset, b + offset, 0, 0, K_FRACTALS, K_FRACTALS, 1, 0, 0);
+        asc_copy_gm2l1(b_l1 + offset, b + offset, 0, 0, K_FRACTALS, K_FRACTALS, 1,
+            asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM);
     }
     asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
@@ -179,14 +169,13 @@ __global__ __cube__ void AscCopyGm2l1TwoDimNzKernel(
     asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
     asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);
 
-    asc_mmad(c_l0, a_l0, b_l0, M, K, N, 0, true, false, true);
+    asc_mmad(c_l0, a_l0, b_l0, M, K, N, asc_unit_flag_mode::DISABLE, true, false, true);
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
 
     // 关闭Nz2ND和Nz2DN，保持L0C Buffer中的Nz排布直接搬出至GM。
-    asc_copy_l0c2gm(output, c_l0, N, M, M * CUBE, M, 0, 0, 0,
-        static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, false,
-        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
+    asc_copy_l0c2gm(output, c_l0, N, M, M * CUBE, M, asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM,
+        asc_unit_flag_mode::DISABLE, QuantMode_t::NoQuant, asc_relu_pre_mode::NONE, false, false, false, false);
     asc_sync_pipe(PIPE_ALL);
 }
 

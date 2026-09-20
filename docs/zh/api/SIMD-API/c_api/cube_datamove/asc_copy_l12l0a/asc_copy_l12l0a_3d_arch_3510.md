@@ -130,7 +130,7 @@ PIPE_MTE1
 - 本接口非AIC调用直接返回。
 - dst起始地址需512字节对齐（L0A Buffer对齐要求），否则会导致搬运异常。
 - src起始地址需32字节对齐（L1 Buffer对齐要求），否则会导致搬运异常。
-- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../../sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
 - L0A Buffer容量上限：L0A Buffer总容量64KB，dst偏移量与搬运大小之和不可越界，否则触发异常。
 - L1 Buffer容量上限：L1 Buffer总容量512KB，src偏移量与源矩阵占用大小之和不可越界，否则触发异常。
 
@@ -302,7 +302,7 @@ __global__ __cube__ void Conv2dForwardCapi(
         fmap_l1, fmap + batch_idx * FMAP_BATCH_SIZE, CIN * sizeof(half), 0, H * W, CIN, 0, false);
 
     asc_set_gm2l1_nz_para(1, 1, K_ALIGN, 0);
-    asc_copy_gm2l1_nd2nz(weight_l1, weight, COUT * sizeof(half), 0, K, COUT, 0, false);
+    asc_copy_gm2l1_nd2nz(weight_l1, weight, COUT * sizeof(half), asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, K, COUT, 0, false);
     asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
 
@@ -336,7 +336,7 @@ __global__ __cube__ void Conv2dForwardCapi(
     asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
     asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);
 
-    asc_mmad(output_l0, fmap_l0, weight_l0, M, K_ALIGN, N, 0, false, false, true);
+    asc_mmad(output_l0, fmap_l0, weight_l0, M, K_ALIGN, N, asc_unit_flag_mode::DISABLE, false, false, true);
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
 

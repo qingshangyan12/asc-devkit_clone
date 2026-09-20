@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-根据`mask`将`src`中参与计算的`half`类型元素转换为`int4x2_t`类型，结果写入`dst`。
+根据`mask`将`src`中参与计算的`half`类型元素转换为`int4x2_t`类型，可通过引用参数或函数返回值输出结果。
 
 `src`中的每个`half`类型元素分别对应`mask`中的一个掩码位。两个连续的`half`类型元素转换为两个连续的4bit有符号整数，转换结果按输入顺序打包到同一个`int4x2_t`存储单元中，共占用1Byte。`mask`中的掩码位为0时，对应的4bit转换结果置0。
 
@@ -34,22 +34,34 @@
 
 关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。
 
-本接口为`reg`矢量计算接口，仅在AIV上生效。
+本接口为Reg矢量计算接口，仅在AIV上生效。
 
 ## 函数原型
 
 ```cpp
 // 占位符形式
-// 非饱和模式
+// 非饱和模式，通过引用参数输出结果
 __simd_callee__ inline void asc_half2int4x2_<round_mode>(
     vector_int4x2_t& dst,
     vector_half src,
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 
-// 饱和模式
+// 非饱和模式，通过函数返回值返回结果
+__simd_callee__ inline vector_int4x2_t asc_half2int4x2_<round_mode>(
+    vector_half src,
+    vector_bool mask,
+    std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
+
+// 饱和模式，通过引用参数输出结果
 __simd_callee__ inline void asc_half2int4x2_<round_mode>_sat(
     vector_int4x2_t& dst,
+    vector_half src,
+    vector_bool mask,
+    std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
+
+// 饱和模式，通过函数返回值返回结果
+__simd_callee__ inline vector_int4x2_t asc_half2int4x2_<round_mode>_sat(
     vector_half src,
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
@@ -75,14 +87,15 @@ __simd_callee__ inline void asc_half2int4x2_<round_mode>_sat(
 
 ## 返回值说明
 
-无。
+- 通过引用参数输出结果的函数原型无返回值。
+- 通过函数返回值输出结果的函数原型返回计算结果，返回值类型与对应引用输出函数原型中`dst`参数的类型一致（去除引用）。
 
 ## 约束说明
 
+- Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - 位置选择标签参数仅能使用上述编译期常量。
 - 开启饱和模式或非饱和模式时，需配置ctrl寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。
-- 本接口仅在AIV上生效，并在Vector Function（`__simd_vf__`标记的函数）内调用。
-- `mask`需通过掩码设置接口预先赋值后再传入；`mask`掩码位为0时，`dst`对应元素置0。
+- `mask`掩码位为0时，`dst`对应元素置0。
 
 ## 调用示例
 

@@ -92,7 +92,7 @@ PIPE_MTE2
 - 本接口非AIC调用直接返回。
 - `dst`起始地址需要按照32字节对齐（L1 Buffer对齐要求），否则触发地址对齐异常。
 - L1 Buffer总容量为512KB。`dst`偏移量与实际占用空间之和不可超过L1 Buffer容量，否则触发地址溢出异常。
-- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../sync/asc_sync_notify.md)和[asc_sync_wait](../sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
 - `value`的数据类型需与`dst`的数据类型满足函数原型章节中的组合关系。两者数据类型不相同时，需要根据`dst`的数据类型转换`value`的值，具体请参考调用示例。
 
 ## 调用示例
@@ -154,14 +154,13 @@ __global__ __cube__ void AscFillL1Kernel(__gm__ float* output)
     asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);
 
     // 计算矩阵乘；两个输入矩阵均为1，因此每个结果元素均为K。
-    asc_mmad(c_l0, a_l0, b_l0, M, K, N, 0, true, false, true);
+    asc_mmad(c_l0, a_l0, b_l0, M, K, N, asc_unit_flag_mode::DISABLE, true, false, true);
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
 
     asc_set_l0c_copy_nz_para(1, 0, 0);
-    asc_copy_l0c2gm(output, c_l0, N, M, N, M, 0, 0, 0,
-        static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
-        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
+    asc_copy_l0c2gm(output, c_l0, N, M, N, M, asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM,
+        asc_unit_flag_mode::DISABLE, QuantMode_t::NoQuant, asc_relu_pre_mode::NONE, false, true, false, false);
     asc_sync_pipe(PIPE_FIX);
 }
 

@@ -94,6 +94,7 @@ from asc_op_compile_base.asc_op_compiler.ascendc_compile_gen_code import (
     add_op_param_to_workspace,
     get_value,
 )
+from asc_op_compile_base.asc_op_compiler import ascendc_compile_gen_code
 from asc_op_compile_base.asc_op_compiler.super_kernel_constants import (
     SuperKernelStreamFusionMode,
     SuperKernelLinkMode,
@@ -270,6 +271,32 @@ def compile_manifest_resources(manifest, manifest_dir, source_file_path):
 
 
 class TestCompileOp(unittest.TestCase):
+    def test_oom_storage_shape_patterns(self):
+        init_source = ascendc_compile_gen_code.OOM_STORAGE_SHAPE_INIT_PATTERN.format(
+            legacy_len_offset=32
+        )
+        tensor_source = ascendc_compile_gen_code.OOM_TENSOR_REGISTER_PATTERN.format(
+            param_name="x", element_size=4, input_shape_len="inputShapeLen"
+        )
+        tensor_list_source = (
+            ascendc_compile_gen_code.OOM_TENSOR_LIST_REGISTER_PATTERN.format(
+                param_name="xs", element_size=2
+            )
+        )
+
+        self.assertIn("tmpTilingSizeForOOM + 32", init_source)
+        self.assertIn("OOMHasStorageShapeHeader(oomStorageShapeCursor)", init_source)
+        self.assertIn(
+            "OOMTryRegisterTensorWithStorageShape(oomStorageShapeCursor, x, 4)",
+            tensor_source,
+        )
+        self.assertIn("OOMCheckAddrRange(x, inputShapeLen)", tensor_source)
+        self.assertIn(
+            "OOMTryRegisterTensorListWithStorageShape(oomStorageShapeCursor, xs, 2)",
+            tensor_list_source,
+        )
+        self.assertIn("OOMCheckTensorListRange(xs, 2)", tensor_list_source)
+
     def setUp(self):
         # operator before each testcase
         print("-------------------SetUp----------------")
@@ -374,6 +401,7 @@ class TestCompileOp(unittest.TestCase):
         tiling_key_struct_map=None,
         register_tiling_struct=None,
         tpl_tiling_struct=None,
+        no_kfc_server_flag=False,
     ):
         op_info = OpInfo(
             kernel_name="TestKernel", op_type="TestOp", inputs=[], outputs=[]
@@ -382,7 +410,7 @@ class TestCompileOp(unittest.TestCase):
             tiling_key_list=[0],
             code_channel=CORE_TYPE_VEC,
             hard_sync=False,
-            no_kfc_server_flag=False,
+            no_kfc_server_flag=no_kfc_server_flag,
             enable_deterministic=False,
             tiling_key_kernel_type={},
             no_set_kernel_type=False,
@@ -2321,12 +2349,18 @@ class TestCompileOp(unittest.TestCase):
             op_info, tiling_info, old_source, compile_options, compile_info
         )
         self.assertNotEqual(new_source, old_source)
+        self.assertIn("OOMHasStorageShapeHeader", new_source)
+        self.assertLess(
+            new_source.rfind("OOMCheckAddrRange(workspace"),
+            new_source.rfind("#endif"),
+        )
         tiling_info.static_shape_flag = True
         compile_info.tiling_key_struct_map = {"1": 96, "2": 100}
         new_source = add_op_param_to_workspace(
             op_info, tiling_info, old_source, compile_options, compile_info
         )
         self.assertNotEqual(new_source, old_source)
+        self.assertNotIn("OOMHasStorageShapeHeader", new_source)
         tiling_info.tiling_key_data_size = {}
         new_source = add_op_param_to_workspace(
             op_info, tiling_info, old_source, compile_options, compile_info
@@ -7183,17 +7217,15 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
             "    GM_ADDR usrWorkspace = AscendC::GetUserWorkspace(workspace);\n",
             result,
         )
-        with mock.patch.object(
-            CommonUtility, "is_support_workspace_offset", return_value=True
-        ):
-            result = _gen_set_workspace_codes(
-                is_mix,
-                is_single_and_using_hard_sync,
-                op_info,
-                tiling_info,
-                compile_options,
-                compile_info,
-            )
+        global_var_storage.set_variable("ascendc_short_soc_version", "Ascend950")
+        result = _gen_set_workspace_codes(
+            is_mix,
+            is_single_and_using_hard_sync,
+            op_info,
+            tiling_info,
+            compile_options,
+            compile_info,
+        )
         self.assertIn(
             "#if ENABLE_CV_COMM_VIA_SSBUF != 0 && __MIX_CORE_AIC_RATION__ != 1\n"
             "    GM_ADDR usrWorkspace = workspace;\n"
@@ -7202,6 +7234,22 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
             "#endif\n",
             result,
         )
+        global_var_storage.set_variable("ascendc_short_soc_version", "MC62")
+        result = _gen_set_workspace_codes(
+            is_mix,
+            is_single_and_using_hard_sync,
+            op_info,
+            tiling_info,
+            compile_options,
+            compile_info,
+        )
+        self.assertTrue(
+            result.startswith(
+                "    GM_ADDR usrWorkspace = workspace + AscendC::RESERVED_WORKSPACE;\n"
+            )
+        )
+        self.assertNotIn("AscendC::GetUserWorkspace", result)
+        self.assertIn("AscendC::RESERVED_WORKSPACE", result)
         with buildcfg.build_config() as cfg:
             cfg.current()["tir.op_debug_config"] = ["oom"]
             result = _gen_set_workspace_codes(
@@ -9913,6 +9961,7 @@ void add_custom();
             self.assertEqual(
                 kernel_info.default_tiling_struct, "optiling::TilingData_A"
             )
+            self.assertTrue(kernel_info.no_kfc_server_flag)
 
         with open(src_file, "w") as file:
             context = """
@@ -9920,6 +9969,7 @@ auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR >= 1";
 auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR == 1";
 auto __enable_custom_tiling optiling::TilingData_A = default;
 auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR != 1";
+AscendC::KfcServer kfcServer;
 void add_custom();
 """
             file.write(context)
@@ -9935,6 +9985,7 @@ void add_custom();
                 self.assertEqual(
                     kernel_info.default_tiling_struct, "optiling::TilingData_A"
                 )
+                self.assertFalse(kernel_info.no_kfc_server_flag)
         global_var_storage.set_variable("ascendc_short_soc_version", get_soc)
 
     def test_infer_info_from_ifile_template_tiling(self):
@@ -10370,14 +10421,14 @@ void add_custom()
             cfg.current()["tir.op_debug_config"] = ["oom"]
             dfx_string = DFXSectionGenerator()._tran_dfx_info_to_string("tiling")
             compare_string = [
-                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 ) >> 56) & 0xff)",
-                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 ) >> 48) & 0xff)",
-                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 ) >> 40) & 0xff)",
-                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 ) >> 32) & 0xff)",
-                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 ) >> 24) & 0xff)",
-                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 ) >> 16) & 0xff)",
-                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 ) >> 8) & 0xff)",
-                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 ) >> 0) & 0xff)",
+                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 + 2) >> 56) & 0xff)",
+                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 + 2) >> 48) & 0xff)",
+                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 + 2) >> 40) & 0xff)",
+                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 + 2) >> 32) & 0xff)",
+                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 + 2) >> 24) & 0xff)",
+                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 + 2) >> 16) & 0xff)",
+                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 + 2) >> 8) & 0xff)",
+                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 + 2) >> 0) & 0xff)",
             ]
             self.assertEqual(dfx_string, compare_string)
 
@@ -10469,7 +10520,7 @@ void add_custom()
             )
 
             aligned_size = ((size_value + 7) // 8) * 8  # 16 -> 16
-            total_size = aligned_size + 8 + 8 * 0  # 16 + 8 + 0 = 24
+            total_size = aligned_size + 8 + 8 * 0 + 2  # 16 + 8 + 0 + 2 = 26
             expected_string = [
                 str((total_size >> 56) & 0xFF),
                 str((total_size >> 48) & 0xFF),

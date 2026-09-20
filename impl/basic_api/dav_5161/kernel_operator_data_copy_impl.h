@@ -23,7 +23,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
 #include "kernel_operator_common_impl.h"
-#include "kernel_utils.h"
+#include "../kernel_utils.h"
 
 namespace AscendC {
 // all input params: need conversion by *32
@@ -149,8 +149,38 @@ __aicore__ inline void CopyCbufToGmAlignV2(
     uint32_t burstLength = blockLen * BYTE_32_ALIGN;
     uint32_t actSrcStride = srcStride * BYTE_32_ALIGN + burstLength;
     uint64_t actDstStride = dstStride * BYTE_32_ALIGN + burstLength;
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
     copy_cbuf_to_gm_align_v2(
         (__gm__ T*)dst, (__cbuf__ T*)src, sid, blockCount, burstLength, actDstStride, actSrcStride);
+#endif
+
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+    // ISA/API: Is the ND matrix number to be moved
+    uint64_t ndNum = 1;
+    // ISA/API: unit of element
+    uint16_t loop2Size = burstLength / sizeof(T);
+    // ISA/API: unit of element
+    uint32_t loop3Size = blockCount;
+    // ISA: loop2SrcStride = 1, and does not to be set by programmer.
+    constexpr uint64_t loop2SrcStride = 1;
+    // ISA: unit of C0_size(32B)
+    uint64_t loop3SrcStride = DivCeil(actSrcStride, BYTE_32_ALIGN);
+    // ISA: unit of C0_size(32B)
+    uint64_t loop4SrcStride = 0;
+    // ISA: unit of byte
+    uint64_t loop2DstStride = actDstStride;
+    // ISA: unit of byte
+    uint64_t loop4DstStride = 0;
+
+    // SPR.FIXP_NZ_PARA
+    uint64_t config = ndNum | (loop4SrcStride << 16) | (loop4DstStride << 32);
+    set_fixp_nz_para(config);
+
+    fix_cbuf_to_gm(
+        dst, src, loop3Size, loop2Size, loop2DstStride, loop3SrcStride, loop2SrcStride, fixp_trans_mode_t::NORMAL_DMA,
+        sid);
+#endif
 }
 
 template <typename T>
@@ -250,9 +280,15 @@ __aicore__ inline void DataCopyL12FBImpl(uint64_t dst, __cbuf__ T* src, const Da
 {
     constexpr uint8_t POS_DST_MEM_BLOCK = 16;
     dst |= static_cast<uint64_t>(intriParams.postProcBufBlock) << POS_DST_MEM_BLOCK;
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
     copy_cbuf_to_fbuf_v2(
         (__fbuf__ void*)dst, (__cbuf__ void*)src, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride,
         intriParams.dstStride);
+#else
+    copy_cbuf_to_fbuf_v2(
+        (__fbuf__ void*)dst, (__cbuf__ void*)src, false, intriParams.blockCount, intriParams.blockLen,
+        intriParams.srcStride, intriParams.dstStride);
+#endif
 }
 
 template <typename T>
@@ -893,7 +929,7 @@ __aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, cons
     // ISA/API: Is the ND matrix number to be moved
     uint64_t ndNum = 1;
     // ISA/API: unit of element
-    uint16_t loop2Size = intriParams.blockLen;
+    uint16_t loop2Size = intriParams.blockLen / sizeof(T);
     // ISA/API: unit of element
     uint32_t loop3Size = intriParams.blockCount;
     // ISA: loop2SrcStride = 1, and does not to be set by programmer.
@@ -943,7 +979,7 @@ __aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, cons
     // ISA/API: Is the ND matrix number to be moved
     uint64_t ndNum = 1;
     // ISA/API: unit of element
-    uint16_t loop2Size = intriParams.blockLen;
+    uint16_t loop2Size = intriParams.blockLen / sizeof(T);
     // ISA/API: unit of element
     uint32_t loop3Size = intriParams.blockCount;
     // ISA: loop2SrcStride = 1, and does not to be set by programmer.
@@ -967,6 +1003,22 @@ __aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, cons
 #endif
 }
 
+#pragma begin_pipe(V)
+template <typename T>
+__aicore__ inline void DataCopyUB2UBIntf(
+    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const DataCopyParams& intriParams)
+{
+    DataCopyUB2UBImpl(
+        (__ubuf__ PrimT<T>*)dstLocal.GetPhyAddr(), (__ubuf__ PrimT<T>*)srcLocal.GetPhyAddr(), intriParams);
+}
+#pragma end_pipe
+
+template <typename T>
+__aicore__ inline void DataCopyL12UBIntf(
+    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const DataCopyParams& intriParams)
+{
+    DataCopyL12UBImpl((__ubuf__ T*)dstLocal.GetPhyAddr(), (__cbuf__ T*)srcLocal.GetPhyAddr(), intriParams);
+}
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
 
