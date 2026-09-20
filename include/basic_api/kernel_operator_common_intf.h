@@ -30,6 +30,48 @@
 #include "kernel_struct_mm.h"
 #include "kernel_base_types.h"
 
+#include <type_traits>
+
+namespace AscendC {
+// GetUnderlyingPtr: extracts raw hardware pointer from Tensor or passes through raw pointer
+template <typename T>
+__aicore__ inline auto GetUnderlyingPtr(const T& val) -> decltype(val.GetPhyAddr())
+{
+    return val.GetPhyAddr();
+}
+
+template <typename T>
+__aicore__ inline auto GetUnderlyingPtr(T* val) -> T*
+{
+    return val;
+}
+
+template <typename T>
+__aicore__ inline auto GetUnderlyingPtr(const T* val) -> const T*
+{
+    return val;
+}
+
+// ElementType: extracts element type from pointer or tensor type
+template <typename T>
+struct ElementType {
+    using type = T;
+};
+
+template <typename T>
+struct ElementType<T*> {
+    using type = T;
+};
+
+template <typename T>
+struct ElementType<const T*> {
+    using type = T;
+};
+
+template <typename T>
+using ElementTypeT = typename ElementType<T>::type;
+} // namespace AscendC
+
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
 #include "stub_def.h"
