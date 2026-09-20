@@ -33,31 +33,6 @@ from .global_storage import global_var_storage
 from .ascendc_compile_dfx import DFXSectionGenerator
 
 
-OOM_STORAGE_SHAPE_INIT_PATTERN = (
-    "    __gm__ uint8_t *oomStorageShapeCursor = (__gm__ uint8_t *)tiling + "
-    "tmpTilingSizeForOOM + {legacy_len_offset};\n"
-    "    bool hasOomStorageShape = "
-    "AscendC::OOMHasStorageShapeHeader(oomStorageShapeCursor);\n"
-    "    if (hasOomStorageShape) {{\n"
-    "        oomStorageShapeCursor += 2;\n"
-    "    }}\n"
-)
-OOM_TENSOR_REGISTER_PATTERN = (
-    "    if (!hasOomStorageShape || "
-    "!AscendC::OOMTryRegisterTensorWithStorageShape("
-    "oomStorageShapeCursor, {param_name}, {element_size})) {{\n"
-    "        AscendC::OOMCheckAddrRange({param_name}, {input_shape_len});\n"
-    "    }}\n"
-)
-OOM_TENSOR_LIST_REGISTER_PATTERN = (
-    "    if (!hasOomStorageShape || "
-    "!AscendC::OOMTryRegisterTensorListWithStorageShape("
-    "oomStorageShapeCursor, {param_name}, {element_size})) {{\n"
-    "        AscendC::OOMCheckTensorListRange({param_name}, {element_size});\n"
-    "    }}\n"
-)
-
-
 def add_time_stamp_codes(desc_id, space_len: int = 1):
     source = "#ifdef ASCENDC_TIME_STAMP_ON\n"
     source += (
@@ -379,7 +354,8 @@ def add_op_param_to_workspace(
     )
     source += skip_mc2_context_size(opinfo)
 
-    if not tiling_info.static_shape_flag:
+    has_storage_shape = not tiling_info.static_shape_flag
+    if has_storage_shape:
         legacy_len_count = (
             len([item for item in input_output_info if item is not None]) + 1
         )
@@ -388,23 +364,38 @@ def add_op_param_to_workspace(
             and len(opinfo.output_shape_depend_on_compute) > 0
         ):
             legacy_len_count += 1
-        source += OOM_STORAGE_SHAPE_INIT_PATTERN.format(
-            legacy_len_offset=8 * legacy_len_count
+        source += (
+            "    __gm__ uint8_t *oomStorageShapeCursor = (__gm__ uint8_t *)tiling + "
+            "tmpTilingSizeForOOM + {};\n".format(8 * legacy_len_count)
         )
+        source += (
+            "    bool hasOomStorageShape = "
+            "AscendC::OOMHasStorageShapeHeader(oomStorageShapeCursor);\n"
+        )
+        source += "    if (hasOomStorageShape) {\n"
+        source += "        oomStorageShapeCursor += 2;\n"
+        source += "    }\n"
 
     for io_index, op_param in enumerate(input_output_info):
         if op_param is None:
             continue
         if opinfo.param_type_list[io_index] == "dynamic":
             if dtype_int[io_index]:
-                if tiling_info.static_shape_flag:
+                if has_storage_shape:
+                    source += (
+                        "    if (!hasOomStorageShape || "
+                        "!AscendC::OOMTryRegisterTensorListWithStorageShape("
+                        "oomStorageShapeCursor, {}, {})) {{\n"
+                    ).format(op_param.get("param_name"), dtype_int[io_index])
+                    source += (
+                        "        AscendC::OOMCheckTensorListRange({}, {});\n".format(
+                            op_param.get("param_name"), dtype_int[io_index]
+                        )
+                    )
+                    source += "    }\n"
+                else:
                     source += "    AscendC::OOMCheckTensorListRange({}, {});\n".format(
                         op_param.get("param_name"), dtype_int[io_index]
-                    )
-                else:
-                    source += OOM_TENSOR_LIST_REGISTER_PATTERN.format(
-                        param_name=op_param.get("param_name"),
-                        element_size=dtype_int[io_index],
                     )
         else:
             if tiling_info.static_shape_flag:
@@ -412,21 +403,26 @@ def add_op_param_to_workspace(
                     lambda x, y: x * y, op_param.get("shape")
                 ) * INPUT_OUTPUT_DTYPE_LEN.get(op_param.get("dtype"))
                 input_shape_len = (input_shape_len + 32 - 1) // 32 * 32
-                source += "    AscendC::OOMCheckAddrRange({}, {});\n".format(
-                    op_param.get("param_name"), input_shape_len
-                )
             else:
                 input_shape_len = "*((__gm__ uint64_t *)((__gm__ uint8_t *)tiling + tmpTilingSizeForOOM))"
+            if has_storage_shape:
                 element_size = INPUT_OUTPUT_DTYPE_LEN.get(op_param.get("dtype"), 0)
-                source += OOM_TENSOR_REGISTER_PATTERN.format(
-                    param_name=op_param.get("param_name"),
-                    element_size=element_size,
-                    input_shape_len=input_shape_len,
+                source += (
+                    "    if (!hasOomStorageShape || "
+                    "!AscendC::OOMTryRegisterTensorWithStorageShape("
+                    "oomStorageShapeCursor, {}, {})) {{\n"
+                ).format(op_param.get("param_name"), element_size)
+                source += "        AscendC::OOMCheckAddrRange({}, {});\n".format(
+                    op_param.get("param_name"), input_shape_len
+                )
+                source += "    }\n"
+            else:
+                source += "    AscendC::OOMCheckAddrRange({}, {});\n".format(
+                    op_param.get("param_name"), input_shape_len
                 )
         source += "    tmpTilingSizeForOOM += 8;\n"
         count = count + 1
     source += set_workspace_param(opinfo, tiling_info)
-    source += "#endif\n"
     count = count + 1
     if count > 128:
         raise Exception("input and output num exceed 128")
