@@ -43,11 +43,10 @@ ResolveStatus ResolveExternalAlg(
     const OpParam& opParam, const TopoInfoWithNetLayerDetails* topoInfo, const ExternalAlgSpec& spec,
     std::string& algName, std::string& errMsg);
 
-// 候选表访问（闸门 A/B 与 UT 用；无候选返回空 vector）。
+// 候选表访问（闸门 B 与 UT 用；无候选返回空 vector）。
 // 候选表在进程首次访问时从 AlgMetaRegistry 聚合并固化；此后运行期 REGISTER_ALG_META 的
 // 新注册不可见（注册应全部发生在 static-init 期）。
 const std::vector<AlgCandidate>& GetExternalCandidates(HcclCMDType cmd, const std::string& canonicalExtName);
-bool HasCcuCandidate(HcclCMDType cmd, const std::string& canonicalExtName);
 
 // 纯函数构建器（UT 确定性断言用）：按 (Specificity 降序, priority 降序, registeredName 字典序) 三键排序。
 // Specificity = (condId != -1) + (flagId != -1)（约束多者先试，最特化者胜；cond/flag 各计 1 分等权）；

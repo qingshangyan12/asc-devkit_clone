@@ -110,16 +110,6 @@ const std::vector<AlgCandidate>& GetExternalCandidates(HcclCMDType cmd, const st
     return it == table.end() ? kEmpty : it->second;
 }
 
-bool HasCcuCandidate(HcclCMDType cmd, const std::string& canonicalExtName)
-{
-    for (const AlgCandidate& cand : GetExternalCandidates(cmd, canonicalExtName)) {
-        if (cand.engine == AlgEngine::CCU) {
-            return true;
-        }
-    }
-    return false;
-}
-
 ResolveStatus ResolveExternalAlg(
     const OpParam& opParam, const TopoInfoWithNetLayerDetails* topoInfo, const ExternalAlgSpec& spec,
     std::string& algName, std::string& errMsg)
