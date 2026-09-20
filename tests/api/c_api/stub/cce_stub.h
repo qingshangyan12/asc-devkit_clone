@@ -1241,20 +1241,6 @@ inline int64_t get_iqent(pipe_t pipe) { return 0; }
 #endif
 
 #if defined(__DAV_VEC__) && defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201))
-// fp8_e6m2 / hif4x2 host stubs (must be before defs/type.h include)
-#if !defined(fp8_e6m2_t)
-namespace float8_e6m2 {
-struct Fp8e6m2T {
-    uint8_t val;
-};
-} // namespace float8_e6m2
-using fp8_e6m2_t = float8_e6m2::Fp8e6m2T;
-using vector_f8e6m2 = std::array<fp8_e6m2_t, ConstantsInternal::b8EleSize>;
-struct hifloat4x2_t {
-    uint8_t val;
-};
-using vector_hif4x2 = std::array<hifloat4x2_t, ConstantsInternal::b8EleSize>;
-#endif
 #include "c_api/defs/type.h"
 inline void pstu(vector_store_unalign& ureg, vector_bool mask, __ubuf__ uint16_t*& dst) {}
 inline void pstu(vector_store_unalign& ureg, vector_bool mask, __ubuf__ uint32_t*& dst) {}
