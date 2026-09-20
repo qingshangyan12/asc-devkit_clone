@@ -190,9 +190,9 @@ C API同步方式见下表：
 
 | 模式 | 同步范围 | 在本节1:2场景中的使用方式 | 对应C API |
 | --- | --- | --- | --- |
-| 模式1 | 同一AI Core内的两个AIV。 | 两个AIV都上报后，各AIV再读取对方放入共享区域的数据。 | [asc_sync_subblock_arrive](../../../../api/SIMD-API/c_api/sync/asc_sync_subblock_arrive.md)、[asc_sync_subblock_wait](../../../../api/SIMD-API/c_api/sync/asc_sync_subblock_wait.md)。 |
-| 模式2 | 同一AI Core内的AIC与所有AIV。 | AIC等待两个AIV都上报；或AIC上报后让两个AIV继续。 | [asc_sync_block_arrive](../../../../api/SIMD-API/c_api/sync/asc_sync_block_arrive.md)、[asc_sync_block_wait](../../../../api/SIMD-API/c_api/sync/asc_sync_block_wait.md)。 |
-| 模式4 | 同一AI Core内的AIC与单个AIV。 | AIC与AIV0、AIC与AIV1分别通知和等待，适合独立队列收发。 | [asc_sync_intra_arrive](../../../../api/SIMD-API/c_api/sync/asc_sync_intra_arrive.md)、[asc_sync_intra_wait](../../../../api/SIMD-API/c_api/sync/asc_sync_intra_wait.md)。 |
+| 模式1 | 同一AI Core内的两个AIV。 | 两个AIV都上报后，各AIV再读取对方放入共享区域的数据。 | [asc_sync_subblock_arrive](../../../../api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md)、[asc_sync_subblock_wait](../../../../api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md)。 |
+| 模式2 | 同一AI Core内的AIC与所有AIV。 | AIC等待两个AIV都上报；或AIC上报后让两个AIV继续。 | [asc_sync_block_arrive](../../../../api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md)、[asc_sync_block_wait](../../../../api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md)。 |
+| 模式4 | 同一AI Core内的AIC与单个AIV。 | AIC与AIV0、AIC与AIV1分别通知和等待，适合独立队列收发。 | [asc_sync_intra_arrive](../../../../api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md)、[asc_sync_intra_wait](../../../../api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md)。 |
 
 ### 流水选择
 
