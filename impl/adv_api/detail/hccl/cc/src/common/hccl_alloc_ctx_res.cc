@@ -727,8 +727,12 @@ bool GetForcedAlgName(
         return false; // legacy 老语法（需求前日志逐字保留）
     }
     if (algConfig.find('[') == std::string::npos) {
-        // 裸名：名字即 algConfig，无解析；topo 统一在此备好（后续引擎准备/资源步骤均需 topoInfo）
-        CHK_RET(PrepareTopoInfoForOp(comm, opParam, topoInfo));
+        // 裸名：名字即 algConfig，无解析；topo 统一在此备好（后续引擎准备/资源步骤均需 topoInfo）。
+        // 须显式比较而非 CHK_RET：本函数返回 bool，CHK_RET 的 return hcclRet 会把非零错误码
+        // 隐式转为 true（"定名成功"），失败语义反转
+        if (PrepareTopoInfoForOp(comm, opParam, topoInfo) != HCCL_SUCCESS) {
+            return false;
+        }
         algName = algConfig;
         return true;
     }
