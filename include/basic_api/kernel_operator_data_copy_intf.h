@@ -524,11 +524,11 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(__cbuf__ T* dst, __gm__ T* 
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     __ubuf__ T* dst, __gm__ T* src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[],
-    const uint32_t dimValue);
+    const uint32_t dimValue = 1);
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
     __gm__ T* dst, __ubuf__ T* src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[],
-    const uint32_t dimValue);
+    const uint32_t dimValue = 1);
 
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(__ubuf__ T* dst, __gm__ T* src, const uint32_t count);
@@ -568,6 +568,70 @@ __aicore__ inline void DataCopy(
 template <typename T>
 __aicore__ inline void DataCopy(
     __ubuf__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
+
+// Heterogeneous Enhanced (D10): float -> half. Address spaces match Tensor-only path.
+template <
+    typename T, typename U,
+    typename Std::enable_if<Std::is_same<PrimT<T>, half>::value && Std::is_same<PrimT<U>, float>::value, bool>::type =
+        true>
+__aicore__ inline void DataCopy(
+    __cc__ T* dst, __cbuf__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
+template <
+    typename T, typename U,
+    typename Std::enable_if<Std::is_same<PrimT<T>, half>::value && Std::is_same<PrimT<U>, float>::value, bool>::type =
+        true>
+__aicore__ inline void DataCopy(
+    __ubuf__ T* dst, __cc__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
+
+// Heterogeneous Enhanced (D06): int32 -> int16, L0C->UB, V-pipe (mirror Tensor).
+template <
+    typename T, typename U,
+    typename Std::enable_if<
+        Std::is_same<PrimT<T>, int16_t>::value && Std::is_same<PrimT<U>, int32_t>::value, bool>::type = true>
+__aicore__ inline __inout_pipe__(V) void DataCopy(
+    __ubuf__ T* dst, __cc__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
+
+// Heterogeneous Enhanced (D07): int32 -> int8, L0C->UB, V-pipe.
+template <
+    typename T, typename U,
+    typename Std::enable_if<
+        Std::is_same<PrimT<T>, int8_t>::value && Std::is_same<PrimT<U>, int32_t>::value, bool>::type = true>
+__aicore__ inline __inout_pipe__(V) void DataCopy(
+    __ubuf__ T* dst, __cc__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
+
+// Heterogeneous Enhanced (D08): int32 -> uint8, L0C->UB, V-pipe.
+template <
+    typename T, typename U,
+    typename Std::enable_if<
+        Std::is_same<PrimT<T>, uint8_t>::value && Std::is_same<PrimT<U>, int32_t>::value, bool>::type = true>
+__aicore__ inline __inout_pipe__(V) void DataCopy(
+    __ubuf__ T* dst, __cc__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
+
+// Heterogeneous Enhanced (D09): half -> float, UB->L0C, V-pipe.
+template <
+    typename T, typename U,
+    typename Std::enable_if<Std::is_same<PrimT<T>, float>::value && Std::is_same<PrimT<U>, half>::value, bool>::type =
+        true>
+__aicore__ inline __inout_pipe__(V) void DataCopy(
+    __cc__ T* dst, __ubuf__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
+
+// Heterogeneous Enhanced (D11): int32 -> half, L0C->UB, V-pipe.
+template <
+    typename T, typename U,
+    typename Std::enable_if<Std::is_same<PrimT<T>, half>::value && Std::is_same<PrimT<U>, int32_t>::value, bool>::type =
+        true>
+__aicore__ inline __inout_pipe__(V) void DataCopy(
+    __ubuf__ T* dst, __cc__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
+
+#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201))
+// Heterogeneous Enhanced (D05): float -> bfloat16, L1->L0C (arch 2201 only).
+template <
+    typename T, typename U,
+    typename Std::enable_if<
+        Std::is_same<PrimT<T>, bfloat16_t>::value && Std::is_same<PrimT<U>, float>::value, bool>::type = true>
+__aicore__ inline void DataCopy(
+    __cc__ T* dst, __cbuf__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
+#endif
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, PaddingMode mode = PaddingMode::Normal>

@@ -410,6 +410,99 @@ __aicore__ inline void DataCopy(
     DataCopyUB2UBImpl(dst, src, intriParams);
 }
 
+// D10: float -> half (L1->L0C / L0C->UB), same *Impl as Tensor path.
+template <
+    typename T, typename U,
+    typename Std::enable_if<Std::is_same<PrimT<T>, half>::value && Std::is_same<PrimT<U>, float>::value, bool>::type>
+__aicore__ inline void DataCopy(
+    __cc__ T* dst, __cbuf__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
+{
+    DataCopyL12L0CImpl(
+        (__cc__ half*)dst, (__cbuf__ float*)src, intriParams, enhancedParams);
+}
+
+template <
+    typename T, typename U,
+    typename Std::enable_if<Std::is_same<PrimT<T>, half>::value && Std::is_same<PrimT<U>, float>::value, bool>::type>
+__aicore__ inline void DataCopy(
+    __ubuf__ T* dst, __cc__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
+{
+    DataCopyL0C2UBImpl(
+        (__ubuf__ half*)dst, (__cc__ float*)src, intriParams, enhancedParams);
+}
+
+// D06: int32 -> int16 (L0C->UB), V-pipe.
+template <
+    typename T, typename U,
+    typename Std::enable_if<
+        Std::is_same<PrimT<T>, int16_t>::value && Std::is_same<PrimT<U>, int32_t>::value, bool>::type>
+__aicore__ inline __inout_pipe__(V) void DataCopy(
+    __ubuf__ T* dst, __cc__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
+{
+    DataCopyL0C2UBImpl(
+        (__ubuf__ int16_t*)dst, (__cc__ int32_t*)src, intriParams, enhancedParams);
+}
+
+// D07: int32 -> int8 (L0C->UB), V-pipe.
+template <
+    typename T, typename U,
+    typename Std::enable_if<
+        Std::is_same<PrimT<T>, int8_t>::value && Std::is_same<PrimT<U>, int32_t>::value, bool>::type>
+__aicore__ inline __inout_pipe__(V) void DataCopy(
+    __ubuf__ T* dst, __cc__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
+{
+    DataCopyL0C2UBImpl(
+        (__ubuf__ int8_t*)dst, (__cc__ int32_t*)src, intriParams, enhancedParams);
+}
+
+// D08: int32 -> uint8 (L0C->UB), V-pipe.
+template <
+    typename T, typename U,
+    typename Std::enable_if<
+        Std::is_same<PrimT<T>, uint8_t>::value && Std::is_same<PrimT<U>, int32_t>::value, bool>::type>
+__aicore__ inline __inout_pipe__(V) void DataCopy(
+    __ubuf__ T* dst, __cc__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
+{
+    DataCopyL0C2UBImpl(
+        (__ubuf__ uint8_t*)dst, (__cc__ int32_t*)src, intriParams, enhancedParams);
+}
+
+// D09: half -> float (UB->L0C), V-pipe.
+template <
+    typename T, typename U,
+    typename Std::enable_if<Std::is_same<PrimT<T>, float>::value && Std::is_same<PrimT<U>, half>::value, bool>::type>
+__aicore__ inline __inout_pipe__(V) void DataCopy(
+    __cc__ T* dst, __ubuf__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
+{
+    DataCopyUB2L0CImpl(
+        (__cc__ float*)dst, (__ubuf__ half*)src, intriParams, enhancedParams);
+}
+
+// D11: int32 -> half (L0C->UB), V-pipe.
+template <
+    typename T, typename U,
+    typename Std::enable_if<Std::is_same<PrimT<T>, half>::value && Std::is_same<PrimT<U>, int32_t>::value, bool>::type>
+__aicore__ inline __inout_pipe__(V) void DataCopy(
+    __ubuf__ T* dst, __cc__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
+{
+    DataCopyL0C2UBImpl(
+        (__ubuf__ half*)dst, (__cc__ int32_t*)src, intriParams, enhancedParams);
+}
+
+#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201))
+// D05: float -> bfloat16 (L1->L0C), arch 2201 only.
+template <
+    typename T, typename U,
+    typename Std::enable_if<
+        Std::is_same<PrimT<T>, bfloat16_t>::value && Std::is_same<PrimT<U>, float>::value, bool>::type>
+__aicore__ inline void DataCopy(
+    __cc__ T* dst, __cbuf__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
+{
+    DataCopyL12L0CImpl(
+        (__cc__ PrimT<T>*)dst, (__cbuf__ PrimT<U>*)src, intriParams, enhancedParams);
+}
+#endif
+
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, PaddingMode mode>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
