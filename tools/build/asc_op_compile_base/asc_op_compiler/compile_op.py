@@ -874,6 +874,13 @@ def handle_compile_options(compile_info: CompileInfo, compile_option_tuple, tili
     ):
         compile_option_tuple.compile_options.append("-DL2_CACHE_HINT")
 
+    # Select the compilation that defines the runtime configuration.
+    if (
+        tiling_info.tiling_key == compile_info.tiling_key_list[0]
+        and compile_info.code_channel in [CORE_TYPE_VEC, CORE_TYPE_CUBE, CORE_TYPE_MIX]
+    ):
+        compile_option_tuple.compile_options.append("-DASCENDC_DEFINE_OP_SYSTEM_RUN_CFG")
+
     if tiling_info.static_shape_flag:
         compile_option_tuple.compile_options.append("-DCONST_TILING")
 
