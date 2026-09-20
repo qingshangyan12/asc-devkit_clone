@@ -2219,7 +2219,10 @@ def generate_dynamic_tiling_struct_file(
         tiling_info.file_content = optype_tiling_def.generate_code
     else:  # deal with tiling header file wiht tiling key
         _gen_tiling_file_content_with_tiling_key(
-            tiling_info, optype_tiling_def, struct_tiling_def_base, tiling_def_list_of_key
+            tiling_info,
+            optype_tiling_def,
+            struct_tiling_def_base,
+            tiling_def_list_of_key,
         )
     tiling_info.tiling_data_size = max(
         tiling_max_data_size, optype_tiling_def.data_size

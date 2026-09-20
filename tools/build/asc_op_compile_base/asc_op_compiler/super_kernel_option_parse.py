@@ -202,6 +202,7 @@ def _register_sk_code_and_mode_parsers(factory: ParserFactory) -> None:
         )
     )
 
+
 def _register_sk_sync_and_value_parsers(factory: ParserFactory) -> None:
     factory.register(
         EnumParser(

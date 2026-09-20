@@ -551,7 +551,6 @@ class SuperOperatorInfos:
                                 ]
                             )
 
-
     def _collect_crossed_line_sync_vec(self, delete_event):
         for sub_op in self.vec_op_list:
             for key, value in sub_op.send_info.items():
@@ -613,7 +612,6 @@ class SuperOperatorInfos:
 
         for item in delete_event:
             self.remove_info_by_name(item[0], item[1], item[2], item[3])
-
 
     def _remove_multi_send_info_cub(self):
         delete_event = []
@@ -680,7 +678,6 @@ class SuperOperatorInfos:
 
         for item in delete_event:
             self.remove_info_by_name(item[0], item[1], item[2], item[3])
-
 
     def _remove_multi_recv_info_cub(self):
         delete_event = []

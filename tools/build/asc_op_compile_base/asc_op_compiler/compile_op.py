@@ -201,8 +201,8 @@ def _fill_sub_dfx_basic(sub_dfx_info, sub_operater_infos, sub_op, compile_info, 
     sub_dfx_info["sub_operator_early_start_wait_flag"] = sub_operater_infos[
         "sub_operator_early_start_wait_flag"
     ]
-    sub_dfx_info["sub_operator_call_dcci_before_kernel_start"] = (
-        sub_operater_infos.get("sub_operator_call_dcci_before_kernel_start", False)
+    sub_dfx_info["sub_operator_call_dcci_before_kernel_start"] = sub_operater_infos.get(
+        "sub_operator_call_dcci_before_kernel_start", False
     )
     sub_dfx_info["sub_operator_call_dcci_after_kernel_end"] = sub_operater_infos.get(
         "sub_operator_call_dcci_after_kernel_end", False
@@ -211,9 +211,9 @@ def _fill_sub_dfx_basic(sub_dfx_info, sub_operater_infos, sub_op, compile_info, 
         "sub_operator_call_dcci_disable_on_kernel", False
     )
     sub_dfx_info["streamid"] = sub_op.get("stream_id")
-    sub_dfx_info["send_event_list"] = compile_info.super_kernel_info[
-        "send_event_list"
-    ][i]
+    sub_dfx_info["send_event_list"] = compile_info.super_kernel_info["send_event_list"][
+        i
+    ]
 
 
 def _fill_sub_dfx_events(sub_dfx_info, arg_list, compile_info, i):
@@ -222,9 +222,9 @@ def _fill_sub_dfx_events(sub_dfx_info, arg_list, compile_info, i):
     )
     if notify_before_call_event_list and notify_before_call_event_list[i]:
         sub_dfx_info["notify_before_call_event_list"] = notify_before_call_event_list[i]
-    sub_dfx_info["recv_event_list"] = compile_info.super_kernel_info[
-        "recv_event_list"
-    ][i]
+    sub_dfx_info["recv_event_list"] = compile_info.super_kernel_info["recv_event_list"][
+        i
+    ]
     arg_list["param_offset"] = compile_info.super_kernel_info["param_offset"][i]
     if compile_info.super_kernel_info["send_event_list"][i]:
         arg_list["notify_param_offset"] = compile_info.super_kernel_info[
@@ -2132,6 +2132,50 @@ def compile_op_common_part(
         output_gen_placehoder,
     ) = _prepare_compile_context(op_info, compile_option_tuple, extend_options)
 
+    tiling_info, compile_info = _prepare_compile_info_and_tiling(
+        cce_file,
+        origin_func_name,
+        op_info,
+        compile_option_tuple,
+        infered_info_from_ifile,
+        extend_options,
+        value_depend_dict,
+        kernel_meta_dir,
+        distinct_tag,
+        compile_log_path,
+    )
+
+    kernel_spec = KernelSpecCompilation.create(
+        compile_info, compile_option_tuple, tiling_info
+    )
+
+    _compile_with_kernel_spec(
+        kernel_spec,
+        compile_info,
+        compile_option_tuple,
+        op_info,
+        tiling_info,
+        distinct_tag,
+        kernel_meta_dir,
+        infered_info_from_ifile,
+        input_gen_placehoder,
+        output_gen_placehoder,
+        compile_log_path,
+    )
+
+
+def _prepare_compile_info_and_tiling(
+    cce_file,
+    origin_func_name,
+    op_info,
+    compile_option_tuple,
+    infered_info_from_ifile,
+    extend_options,
+    value_depend_dict,
+    kernel_meta_dir,
+    distinct_tag,
+    compile_log_path,
+):
     tiling_info = _build_and_save_tiling_info(
         op_info,
         infered_info_from_ifile,
@@ -2177,11 +2221,22 @@ def compile_op_common_part(
         infered_info_from_ifile,
         hardware_sync_in_asm,
     )
+    return tiling_info, compile_info
 
-    kernel_spec = KernelSpecCompilation.create(
-        compile_info, compile_option_tuple, tiling_info
-    )
 
+def _compile_with_kernel_spec(
+    kernel_spec,
+    compile_info,
+    compile_option_tuple,
+    op_info,
+    tiling_info,
+    distinct_tag,
+    kernel_meta_dir,
+    infered_info_from_ifile,
+    input_gen_placehoder,
+    output_gen_placehoder,
+    compile_log_path,
+):
     with kernel_spec:
         # generate tiling struct size, dfx section
         _set_meta_info_paths(compile_info, op_info, distinct_tag, kernel_meta_dir)

@@ -64,9 +64,7 @@ class SubOperatorInfos:
         # code_gen of dynamic op
         self._gen_code_for_dynamic_op()
 
-    def _init_kernel_state(
-        self, index, info_dict, stream_index: int, compile_log_path
-    ):
+    def _init_kernel_state(self, index, info_dict, stream_index: int, compile_log_path):
         self.json_path: str = info_dict["json_path"]
         self.bin_path: list = info_dict["bin_path"]
         self.compile_log_path: str = compile_log_path
