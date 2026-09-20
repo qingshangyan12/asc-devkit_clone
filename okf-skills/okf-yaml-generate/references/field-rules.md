@@ -9,8 +9,7 @@
   只有经过 issue/resolution 记录的字段才允许写 `[]`。每个非空值必须有 `namespace:value` 级逐字证据。
 - `dependencies` 是唯一依赖字段；无明确关系写 `[]`，删除旧 `usage_dependencies`。
 - `examples` 只记录真实存在且能关联到文档的样例；无法确认时为 `[]`。
-- `api_kind`、`headers`、`declaration`、`type_catalog` 只用于 `c_api/defs` 实体页，且必须完全来自本地解析器。
-  `api_kind` 只能是 `constant`、`enum`、`struct`、`union`、`type_alias`、`type_catalog`、`function_macro` 或 `macro`。
+- `headers`、`declaration`、`type_catalog` 只用于 `c_api/defs` 实体页，且必须完全来自本地解析器。
   非 callable 定义的 `headers` 是唯一验证过的 `/include/...` 声明文件；`type_catalog` 没有 header 要求。
   `declaration` 必须保留正文中可确认的 `symbol`、`cpp` 和成员/字段/值/别名目标；对象宏使用 `macros` 条目。
   函数宏只有 `signature[].macro_id`，不得附加 top-level `headers` 或 `declaration`。

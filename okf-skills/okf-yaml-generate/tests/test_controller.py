@@ -215,18 +215,18 @@ constexpr uint8_t ASC_SIZE = 16;
             macro = module._source_definition_fields(root, macro_doc, macro_doc.read_text(encoding="utf-8"))
             object_macro = module._source_definition_fields(root, object_macro_doc, object_macro_doc.read_text(encoding="utf-8"))
 
-            self.assertEqual(enum["api_kind"], "enum")
+            self.assertNotIn("api_kind", enum)
             self.assertEqual(enum["headers"], ["/include/c_api/defs/enum.h"])
             self.assertEqual(enum["declaration"]["members"][0]["name"], "DEFAULT")
-            self.assertEqual(alias["api_kind"], "type_alias")
+            self.assertNotIn("api_kind", alias)
             self.assertEqual(alias["declaration"]["target"], "asc_mode")
-            self.assertEqual(union["api_kind"], "union")
+            self.assertNotIn("api_kind", union)
             self.assertEqual(constant["declaration"]["value"], "16")
-            self.assertEqual(catalog["api_kind"], "type_catalog")
+            self.assertNotIn("api_kind", catalog)
             self.assertEqual(catalog["type_catalog"]["groups"][0]["types"], ["vector_int32_t", "vector_float"])
             self.assertEqual(macro["signature"], [{"macro_id": "ASC_WRAP__value"}])
             self.assertEqual(len(macro["doxygen"]), 1)
-            self.assertEqual(object_macro["api_kind"], "macro")
+            self.assertNotIn("api_kind", object_macro)
             self.assertEqual(object_macro["declaration"]["macros"][0]["macro_kind"], "object")
             worker = module.build_worker_document(
                 root,
@@ -249,7 +249,7 @@ constexpr uint8_t ASC_SIZE = 16;
             selected = module.api_documents(root, "docs/zh/api/SIMD-API/c_api/defs", None)
             self.assertEqual(selected, ["docs/zh/api/SIMD-API/c_api/defs/enum/asc_mode.md"])
 
-    def test_definition_yaml_renders_typed_fields_without_signature(self):
+    def test_definition_yaml_omits_legacy_api_kind_without_signature(self):
         module = self._controller_module()
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
@@ -279,7 +279,7 @@ constexpr uint8_t ASC_SIZE = 16;
             }
             allowed_empty = {f"tag.{namespace}" for namespace in namespaces}
             rendered = module.render_yaml(fields, namespaces, values, root, path, "# asc_mode\n", {}, allowed_empty)
-            self.assertIn("api_kind: enum", rendered)
+            self.assertNotIn("api_kind:", rendered)
             self.assertIn("headers: [/include/c_api/defs/enum.h]", rendered)
             self.assertIn("declaration:", rendered)
             self.assertNotIn("signature:", rendered)
@@ -471,7 +471,6 @@ example: true
                 }],
                 "dependencies": [],
                 "examples": [],
-                "api_kind": None,
                 "headers": None,
                 "declaration": None,
                 "type_catalog": None,

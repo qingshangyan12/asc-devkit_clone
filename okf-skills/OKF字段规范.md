@@ -18,7 +18,6 @@ YAML front matter 放在 Markdown 文件第一行，以 --- 包围。只使用�
 | signature | object[] | API/架构页可选 | API/架构页 | 调用模式或 overload 组。函数项包含 prototype_id 或 override_id、archs、headers；含 `<dtype>` 的 prototype_id 在同一条目中添加 dtype；函数宏项只包含 macro_id。 |
 | dependencies | object[] | 含明确关联时填写 | 全部 | 有正文依据的关联文档，包含 path、kind，必要时包含 condition。 |
 | examples | object[] | 含示例时填写 | API/架构页 | 样例工程或源码位置和明确的示例架构，包含样例 path，可选 file、archs、override_id。 |
-| api_kind | string | 定义页必需 | `c_api/defs` 实体页 | 定义实体类型：constant、enum、struct、union、type_alias、type_catalog、function_macro 或 macro。 |
 | headers | string[] | 可选 | 非 callable 定义页 | 唯一确认的真实声明头文件，使用 `/include/...` 路径。 |
 | declaration | object | 定义页可选 | enum、record、constant、type_alias、对象宏 | 从正文定义代码块提取的受限声明结构。 |
 | type_catalog | object | 类型目录页可选 | `c_api/defs/type` | 正文表格中的数据类型分组。 |
@@ -28,12 +27,12 @@ YAML front matter 放在 Markdown 文件第一行，以 --- 包围。只使用�
 
 ## 定义页
 
-`c_api/defs` 的实体页不是函数 API。enum、struct/union、constant 和 `using` 类型别名必须写 `api_kind`，
-并仅在正文定义与唯一声明 header 同时确认时写 `declaration` 和 `headers`。`declaration` 至少包含
+`c_api/defs` 的实体页不是函数 API。enum、struct/union、constant 和 `using` 类型别名仅在正文定义与唯一
+声明 header 同时确认时写 `declaration` 和 `headers`。`declaration` 至少包含
 `symbol`、`cpp`；enum 包含 `members`，record 包含 `fields` 和 `record_kind`，constant 可包含 `type`、`value`，
-type alias 包含 `target`。数据类型目录使用 `api_kind: type_catalog` 和 `type_catalog.groups`，不要求 header。
+type alias 包含 `target`。数据类型目录使用 `type_catalog.groups`，不要求 header。
 
-函数宏仍使用 `signature` 中唯一的 `macro_id`，不附加 header；对象宏使用 `api_kind: macro`、`headers` 和
+函数宏仍使用 `signature` 中唯一的 `macro_id`，不附加 header；对象宏使用 `headers` 和
 `declaration.macros`。定义页没有函数原型、不可调用样例或 Doxygen 目标是正常情况，不能由此伪造 `signature`、
 example marker 或函数 Doxygen。
 

@@ -86,8 +86,8 @@ python3 scripts/controller.py write \
 ## 字段和降级规则
 
 基础 YAML 字段为 `okftype`、`title`、`resource`、`description`、`tag`、`signature`、
-`dependencies`、`examples`、`timestamp`。`c_api/defs` 实体页还可有 source-derived 的 `api_kind`、
-`headers`、`declaration` 或 `type_catalog`；这些字段不由 worker 猜测，也不用于普通函数页。
+`dependencies`、`examples`、`timestamp`。`c_api/defs` 实体页还可有 source-derived 的 `headers`、
+`declaration` 或 `type_catalog`；这些字段不由 worker 猜测，也不用于普通函数页。
 
 问题只影响对应字段：
 
@@ -95,8 +95,9 @@ python3 scripts/controller.py write \
 - signature 无法确认：`signature: []`
 - dtype 有正文明确类型列表时：仅写入对应 `prototype_id` 同级的单行数组，例如 `dtype: [half, float]`；
   不得写为根级字段，也不得在函数原型前的 YAML 代码块写 dtype。
-- 非 callable 定义：保留其 `api_kind`；只有正文能解析出声明且唯一 header 确认时才写 `declaration` 和 `headers`。
-  `type_catalog` 不要求 header；函数宏继续使用独立 `signature[].macro_id`，对象宏使用 `api_kind: macro` 的定义条目。
+- 非 callable 定义：只有正文能解析出声明且唯一 header 确认时才写 `declaration` 和 `headers`。
+  `type_catalog` 不要求 header；函数宏继续使用独立 `signature[].macro_id`，对象宏使用 `headers` 和
+  `declaration.macros` 表达。
 - examples 无法确认：`examples: []`
 - dependencies 无法确认：`dependencies: []`
 - tag 某 namespace 无法确认：保留 namespace，值写空数组

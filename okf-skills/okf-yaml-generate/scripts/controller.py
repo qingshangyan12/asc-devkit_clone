@@ -43,13 +43,9 @@ API_SURFACES = {"c_api", "basic_api", "adv_api", "tensor_api"}
 OKF_TYPES = {"reference.api.cpp", "reference.arch.cpp", "reference.index.cpp"}
 ALLOWED_FIELDS = (
     "okftype", "title", "resource", "description", "tag", "signature",
-    "dependencies", "examples", "api_kind", "headers", "declaration",
+    "dependencies", "examples", "headers", "declaration",
     "type_catalog", "timestamp",
 )
-DEFINITION_API_KINDS = {
-    "constant", "enum", "struct", "union", "type_alias", "type_catalog",
-    "function_macro", "macro",
-}
 DEFINITION_CATEGORIES = {"constant", "enum", "macro", "type", "union"}
 DEFINITIONS_ROOT = API_ROOT / "c_api" / "defs"
 MACRO_DEFINITION_SECTION_RE = re.compile(r"^\s{0,3}#{2,6}\s+宏定义(?:\s|<|$)", re.MULTILINE)
@@ -551,7 +547,6 @@ def _source_macro_definition_fields(
     if not documented:
         issues.append(issue(path, "declaration", "document_defect", "正文没有可确认的宏定义。"))
         return {
-            "api_kind": "macro",
             "headers": [],
             "declaration": None,
             "type_catalog": None,
@@ -618,7 +613,6 @@ def _source_macro_definition_fields(
     has_object_macro = any(macro.parameters is None for macro in documented)
     if not has_object_macro and signatures:
         return {
-            "api_kind": "function_macro",
             "headers": [],
             "declaration": None,
             "type_catalog": None,
@@ -627,7 +621,6 @@ def _source_macro_definition_fields(
             "issues": issues,
         }
     return {
-        "api_kind": "macro",
         "headers": headers,
         "declaration": {"macros": [_macro_declaration_entry(macro) for macro in documented]},
         "type_catalog": None,
@@ -651,7 +644,6 @@ def _source_definition_fields(
         metadata = extract_api_metadata(document, date.today().isoformat(), root)
     except (OSError, ValueError) as exc:
         return {
-            "api_kind": {"type": "type_catalog"}.get(category, category),
             "headers": [],
             "declaration": None,
             "type_catalog": None,
@@ -668,23 +660,22 @@ def _source_definition_fields(
         "type": {"type_catalog"},
         "union": {"struct", "union"},
     }
-    api_kind = metadata.api_kind
+    definition_kind = metadata.api_kind
     declaration = metadata.declaration
     type_catalog = metadata.type_catalog
     issues: list[dict[str, Any]] = []
-    if api_kind not in expected_kinds[category]:
-        api_kind = {"type": "type_catalog", "union": "union"}.get(category, category)
+    if definition_kind not in expected_kinds[category]:
         declaration = None
         type_catalog = None
         issues.append(issue(path, "declaration", "document_defect", "正文定义形式无法按该分类解析。"))
-    elif api_kind == "type_catalog":
+    elif definition_kind == "type_catalog":
         if not type_catalog:
             issues.append(issue(path, "type_catalog", "document_defect", "正文没有可确认的数据类型分组。"))
     elif not isinstance(declaration, dict):
         issues.append(issue(path, "declaration", "document_defect", "正文没有可确认的定义声明。"))
 
     headers: list[str] = []
-    if api_kind != "type_catalog" and isinstance(declaration, dict):
+    if definition_kind != "type_catalog" and isinstance(declaration, dict):
         symbol = declaration.get("symbol")
         if isinstance(symbol, str) and symbol:
             headers, header_issues = _definition_header(root, metadata.header_candidates, symbol, path)
@@ -692,7 +683,6 @@ def _source_definition_fields(
         else:
             issues.append(issue(path, "declaration", "document_defect", "定义声明缺少符号名。"))
     return {
-        "api_kind": api_kind,
         "headers": headers,
         "declaration": declaration,
         "type_catalog": type_catalog,
@@ -746,7 +736,6 @@ def build_worker_document(root: Path, path: str, namespaces: tuple[str, ...]) ->
             root, document, body
         )
         source_definition: dict[str, Any] = {
-            "api_kind": None,
             "headers": None,
             "declaration": None,
             "type_catalog": None,
@@ -789,7 +778,6 @@ def build_worker_document(root: Path, path: str, namespaces: tuple[str, ...]) ->
         "examples": source_examples if definition is not None else source_examples or (
             data.get("examples") if isinstance(data.get("examples"), list) else []
         ),
-        "api_kind": source_definition["api_kind"],
         "headers": source_definition["headers"],
         "declaration": source_definition["declaration"],
         "type_catalog": source_definition["type_catalog"],
@@ -1180,10 +1168,10 @@ def _validate_headers(headers: Any, path: str) -> list[str]:
     return headers
 
 
-def _validate_declaration(api_kind: str, declaration: Any, path: str) -> None:
+def _validate_declaration(definition_kind: str, declaration: Any, path: str) -> None:
     if not isinstance(declaration, dict):
         raise ValidationError(f"{path}: declaration must be an object")
-    if api_kind == "macro":
+    if definition_kind == "macro":
         macros = declaration.get("macros")
         if set(declaration) != {"macros"} or not isinstance(macros, list) or not macros:
             raise ValidationError(f"{path}: macro declaration must contain non-empty macros")
@@ -1218,14 +1206,14 @@ def _validate_declaration(api_kind: str, declaration: Any, path: str) -> None:
         "struct": {"symbol", "cpp", "fields", "record_kind"},
         "union": {"symbol", "cpp", "fields", "record_kind"},
         "type_alias": {"symbol", "cpp", "target"},
-    }[api_kind]
+    }[definition_kind]
     if set(declaration) - allowed:
-        raise ValidationError(f"{path}: declaration has unsupported fields for {api_kind}")
-    if api_kind == "type_alias" and not isinstance(declaration.get("target"), str):
+        raise ValidationError(f"{path}: declaration has unsupported fields for {definition_kind}")
+    if definition_kind == "type_alias" and not isinstance(declaration.get("target"), str):
         raise ValidationError(f"{path}: type_alias declaration.target is required")
-    if api_kind in {"struct", "union"} and declaration.get("record_kind") != api_kind:
-        raise ValidationError(f"{path}: {api_kind} declaration.record_kind is invalid")
-    collection = "members" if api_kind == "enum" else "fields" if api_kind in {"struct", "union"} else None
+    if definition_kind in {"struct", "union"} and declaration.get("record_kind") != definition_kind:
+        raise ValidationError(f"{path}: {definition_kind} declaration.record_kind is invalid")
+    collection = "members" if definition_kind == "enum" else "fields" if definition_kind in {"struct", "union"} else None
     if collection is not None:
         values = declaration.get(collection)
         if not isinstance(values, list) or any(not isinstance(item, dict) for item in values):
@@ -1250,22 +1238,47 @@ def _validate_type_catalog(type_catalog: Any, path: str) -> None:
             raise ValidationError(f"{path}: type_catalog groups must contain string types")
 
 
+def _definition_kind_from_fields(fields: dict[str, Any]) -> str | None:
+    """Infer the validation shape without emitting a public discriminator field."""
+    if fields.get("type_catalog") not in (None, {}):
+        return "type_catalog"
+    declaration = fields.get("declaration")
+    if not isinstance(declaration, dict) or not declaration:
+        signature = fields.get("signature")
+        if isinstance(signature, list) and signature and all(
+            isinstance(item, dict) and isinstance(item.get("macro_id"), str)
+            for item in signature
+        ):
+            return "function_macro"
+        return None
+    if "macros" in declaration:
+        return "macro"
+    record_kind = declaration.get("record_kind")
+    if record_kind in {"struct", "union"}:
+        return record_kind
+    if "members" in declaration:
+        return "enum"
+    if "target" in declaration:
+        return "type_alias"
+    if "value" in declaration or "type" in declaration:
+        return "constant"
+    return None
+
+
 def validate_definition_fields(
     fields: dict[str, Any], path: str, allowed_empty: set[str]
 ) -> None:
-    api_kind = fields.get("api_kind")
-    if api_kind is None:
+    definition_kind = _definition_kind_from_fields(fields)
+    if definition_kind is None:
         if any(fields.get(key) not in (None, [], {}) for key in ("headers", "declaration", "type_catalog")):
-            raise ValidationError(f"{path}: definition fields require api_kind")
+            raise ValidationError(f"{path}: unsupported definition metadata structure")
         return
-    if api_kind not in DEFINITION_API_KINDS:
-        raise ValidationError(f"{path}: unsupported api_kind: {api_kind!r}")
-    if api_kind != "type_catalog" and fields.get("type_catalog") not in (None, {}):
-        raise ValidationError(f"{path}: type_catalog is only valid for api_kind type_catalog")
+    if definition_kind != "type_catalog" and fields.get("type_catalog") not in (None, {}):
+        raise ValidationError(f"{path}: type_catalog is only valid for type catalog metadata")
     headers = fields.get("headers")
     if headers not in (None, []):
         _validate_headers(headers, path)
-    if api_kind == "type_catalog":
+    if definition_kind == "type_catalog":
         if fields.get("declaration") not in (None, {}):
             raise ValidationError(f"{path}: type_catalog must not contain declaration")
         if not fields.get("type_catalog") and "type_catalog" not in allowed_empty:
@@ -1273,7 +1286,7 @@ def validate_definition_fields(
         if fields.get("type_catalog"):
             _validate_type_catalog(fields["type_catalog"], path)
         return
-    if api_kind == "function_macro":
+    if definition_kind == "function_macro":
         if fields.get("headers") not in (None, []) or fields.get("declaration") not in (None, {}):
             raise ValidationError(f"{path}: function_macro only uses signature metadata")
         if not fields.get("signature") and "signature" not in allowed_empty:
@@ -1281,9 +1294,9 @@ def validate_definition_fields(
         return
     if not fields.get("declaration"):
         if "declaration" not in allowed_empty:
-            raise ValidationError(f"{path}: {api_kind} declaration is required")
+            raise ValidationError(f"{path}: definition declaration is required")
         return
-    _validate_declaration(api_kind, fields["declaration"], path)
+    _validate_declaration(definition_kind, fields["declaration"], path)
 
 
 def render_yaml(
@@ -1311,7 +1324,7 @@ def render_yaml(
     validate_definition_fields(output, path, allowed_empty)
     if not output["signature"]:
         output.pop("signature")
-    for key in ("api_kind", "headers", "declaration", "type_catalog"):
+    for key in ("headers", "declaration", "type_catalog"):
         if output.get(key) in (None, [], {}):
             output.pop(key, None)
     if isinstance(output.get("headers"), list):

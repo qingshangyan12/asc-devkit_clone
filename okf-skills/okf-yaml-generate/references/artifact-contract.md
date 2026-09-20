@@ -48,8 +48,8 @@
 `level`、`brief` 或 `params`。`example_markers` 不是自由 comment；它复用样例调用的文件和偏移，控制器
 严格按旧规则生成或更新成对 `//! [override_id]` 标签。
 
-`c_api/defs` 实体页的 `fields` 可附加 source-derived 字段：`api_kind`、`headers`、`declaration`、
-`type_catalog`。`headers` 仅在唯一的真实声明 header 已验证时写入；`declaration` 记录 enum/record/constant/
+`c_api/defs` 实体页的 `fields` 可附加 source-derived 字段：`headers`、`declaration`、`type_catalog`。
+`headers` 仅在唯一的真实声明 header 已验证时写入；`declaration` 记录 enum/record/constant/
 type alias 或对象宏定义，`type_catalog` 记录数据类型分组。函数宏仍只通过 `signature[].macro_id` 表达，
 不写 top-level `headers` 或 `declaration`。定义页没有可调用签名时，不能产生“缺函数原型”问题。
 
