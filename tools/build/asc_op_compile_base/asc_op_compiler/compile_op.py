@@ -111,16 +111,14 @@ from .static_compile_resource_generator import (
 from .super_kernel_option_parse import parse_super_kernel_options
 from .kernel_info_infer import KernelInfoInfer
 from .ascendc_compile_utils import check_custom_dcci_end_false, check_if_gen_placehoder
-from .ascendc_compile_regbase import (  # noqa: F401
-    _compile_ascendc_cce_regbase,
-    _mssanitizer_link,
-)
-from .ascendc_compile_backend_kernel_type import (  # noqa: F401
+from .ascendc_compile_dispatch import (  # noqa: F401
     _compile_ascendc_cce,
     _compile_ascendc_cce_m510,
-    _compile_ascendc_cce_v220,
+    _compile_ascendc_cce_regbase,
     _compile_ascendc_cce_v200_with_kernel_type,
+    _compile_ascendc_cce_v220,
     _compile_ascendc_cce_v220_with_kernel_type,
+    _mssanitizer_link,
 )
 
 
