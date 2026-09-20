@@ -128,6 +128,7 @@ class DFXSectionGenerator:
             CommonUtility.is_v200()
             or CommonUtility.is_v220()
             or CommonUtility.is_c310()
+            or CommonUtility.is_920r1()
             or CommonUtility.is_v300()
         )
         option_support = True
@@ -367,7 +368,11 @@ class DFXSectionGenerator:
 
     def generate_kernel_type_section(self, compile_info: CompileInfo, kernel_name: str):
         section_var = ""
-        if CommonUtility.is_v220() or CommonUtility.is_c310():
+        if (
+            CommonUtility.is_v220()
+            or CommonUtility.is_c310()
+            or CommonUtility.is_920r1()
+        ):
             short_soc_version = global_var_storage.get_variable(
                 "ascendc_short_soc_version"
             )
