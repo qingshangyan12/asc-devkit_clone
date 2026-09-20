@@ -24,7 +24,6 @@
 
 #include "../kernel_utils.h"
 #include "../../../include/basic_api/kernel_struct_binary.h"
-#include "reg_compute/kernel_reg_compute_common_intf.h"
 
 // Forward declaration
 namespace AscendC {
