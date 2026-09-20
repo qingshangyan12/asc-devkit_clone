@@ -1044,14 +1044,7 @@ def replace_func_params_with_specialization_typename(
     return new_func_params
 
 
-def generate_func_impl_code(func_sign: FuncSign, func_key: int, mode: CodeMode) -> str:
-    """Generate func impl code."""
-    param_names = tuple(get_param_names_by_func_sign(func_sign))
-    block_num_name = param_names[0]
-    stream_name = param_names[1]
-    name = func_sign.func_name.replace("aclrtlaunch_", "")
-    buff = io.StringIO()
-    new_func_params = func_sign.func_params
+def _gen_impl_func_declare_code(func_sign, func_key, new_func_params):
     if func_sign.func_template_decl:
         # set start index 2 to skip numBlocks and stream definitions
         new_func_params = replace_func_params_with_specialization_typename(
@@ -1070,7 +1063,10 @@ template<>
         func_declare_code = add_extern_c(
             func_sign_to_string(func_sign, "", "", False, False)
         )
+    return new_func_params, func_declare_code
 
+
+def _write_impl_head(buff, func_declare_code, mode, func_sign, new_func_params):
     buff.write(f"{func_declare_code}\n")
     buff.write("{\n")
     args_declare_code = indent_code(
@@ -1091,24 +1087,8 @@ template<>
     AllocAscendMemDevice(&(__ascendc_args.__ascendc_overflow), __ascendc_overflow_status_size);
 """)
 
-    if mode in (
-        CodeMode.MIX,
-        CodeMode.KERNEL_TYPE_MIX_AIV_1_0,
-        CodeMode.KERNEL_TYPE_MIX_AIC_1_0,
-        CodeMode.KERNEL_TYPE_MIX_AIC_1_1,
-        CodeMode.KERNEL_TYPE_MIX_AIC_1_2,
-    ):
-        if not is_c310_mode():
-            get_sync_addr_code = indent_code(generate_get_sync_addr_code())
-            buff.write(get_sync_addr_code)
-            buff.write("\n")
 
-    args_assign_code = indent_code(generate_args_assign_code(mode, func_sign))
-    buff.write(args_assign_code)
-    buff.write("\n")
-    if mode == CodeMode.MIX_VECTOR_CORE:
-        buff.write('    const char *__ascendc_name = "{}";\n'.format(name))
-
+def _write_impl_launch_code(buff, mode, name, func_key, block_num_name, stream_name):
     if mode == CodeMode.MIX_VECTOR_CORE:
         mix_vector_core_launch_code = f"""
     uint32_t __ascendc_aicNumBlocks;
@@ -1136,6 +1116,41 @@ template<>
             f"    __ascendc_ret = launch_and_profiling_{name}({func_key}, {block_num_name}, \
 {stream_name}, (void **)&__ascendc_args, sizeof(__ascendc_args));\n"
         )
+
+
+def generate_func_impl_code(func_sign: FuncSign, func_key: int, mode: CodeMode) -> str:
+    """Generate func impl code."""
+    param_names = tuple(get_param_names_by_func_sign(func_sign))
+    block_num_name = param_names[0]
+    stream_name = param_names[1]
+    name = func_sign.func_name.replace("aclrtlaunch_", "")
+    buff = io.StringIO()
+    new_func_params = func_sign.func_params
+    new_func_params, func_declare_code = _gen_impl_func_declare_code(
+        func_sign, func_key, new_func_params
+    )
+
+    _write_impl_head(buff, func_declare_code, mode, func_sign, new_func_params)
+
+    if mode in (
+        CodeMode.MIX,
+        CodeMode.KERNEL_TYPE_MIX_AIV_1_0,
+        CodeMode.KERNEL_TYPE_MIX_AIC_1_0,
+        CodeMode.KERNEL_TYPE_MIX_AIC_1_1,
+        CodeMode.KERNEL_TYPE_MIX_AIC_1_2,
+    ):
+        if not is_c310_mode():
+            get_sync_addr_code = indent_code(generate_get_sync_addr_code())
+            buff.write(get_sync_addr_code)
+            buff.write("\n")
+
+    args_assign_code = indent_code(generate_args_assign_code(mode, func_sign))
+    buff.write(args_assign_code)
+    buff.write("\n")
+    if mode == CodeMode.MIX_VECTOR_CORE:
+        buff.write('    const char *__ascendc_name = "{}";\n'.format(name))
+
+    _write_impl_launch_code(buff, mode, name, func_key, block_num_name, stream_name)
 
     buff.write("""    KernelHandleGradUnregister::GetInstance();
 """)
@@ -1258,6 +1273,43 @@ template<>
     return buff.getvalue()
 
 
+def _gen_cpu_kernel_signs(func_sign, new_func_sign, kernel_name, key):
+    kernel_sign = ""
+    aclrt_sign = ""
+    func_param_str = ""
+    kernel_sign_name = kernel_name
+    if func_sign.func_template_decl:
+        for template_id, _ in enumerate(
+            new_func_sign.func_template_specialization_args, 0
+        ):
+            kernel_sign_name = f"{kernel_name}_template_{template_id}"
+            template_key = get_template_hash_tiling_key(template_id, key)
+            specialized_params = replace_func_params_with_specialization_typename(
+                new_func_sign, dehash_template_id(template_key), 2
+            )
+            new_params = tiling_add_ref_or_ptr_func_params(
+                func_sign, specialized_params
+            )
+            func_param_str = ", ".join(
+                map(
+                    partial(func_param_to_string, with_cce_attr=False),
+                    new_params,
+                )
+            )
+            kernel_sign = f"extern void {kernel_sign_name}({func_sign.func_params_specialization_args[0]});\n"
+            func_tmp_sign = func_sign_to_string(new_func_sign, "", "", False, False)
+            aclrt_sign = f"{generate_auto_gen_func_sign(func_sign, func_tmp_sign)};"
+    else:
+        new_params = tiling_remove_ref_or_ptr_func_params(
+            func_sign, remove_added_func_params(func_sign.func_params)
+        )
+        func_param_str = ", ".join(
+            map(partial(func_param_to_string, with_cce_attr=False), new_params)
+        )
+        kernel_sign = f'extern "C" void {kernel_name}({func_param_str});\n'
+    return kernel_sign_name, kernel_sign, aclrt_sign, func_param_str
+
+
 def generate_host_stub_code_cpu(
     func_groups: List[FuncSignGroupWithModeBase], type_definition: str
 ) -> str:
@@ -1272,45 +1324,9 @@ def generate_host_stub_code_cpu(
             stream_name = param_names[1]
             new_func_sign = replace_func_sign_stream_param(func_sign, stream_name)
             kernel_name = (func_sign.func_name).replace("aclrtlaunch_", "")
-            kernel_sign = ""
-            aclrt_sign = ""
-            func_param_str = ""
-            kernel_sign_name = kernel_name
-            if func_sign.func_template_decl:
-                for template_id, _ in enumerate(
-                    new_func_sign.func_template_specialization_args, 0
-                ):
-                    kernel_sign_name = f"{kernel_name}_template_{template_id}"
-                    template_key = get_template_hash_tiling_key(template_id, key)
-                    specialized_params = (
-                        replace_func_params_with_specialization_typename(
-                            new_func_sign, dehash_template_id(template_key), 2
-                        )
-                    )
-                    new_params = tiling_add_ref_or_ptr_func_params(
-                        func_sign, specialized_params
-                    )
-                    func_param_str = ", ".join(
-                        map(
-                            partial(func_param_to_string, with_cce_attr=False),
-                            new_params,
-                        )
-                    )
-                    kernel_sign = f"extern void {kernel_sign_name}({func_sign.func_params_specialization_args[0]});\n"
-                    func_tmp_sign = func_sign_to_string(
-                        new_func_sign, "", "", False, False
-                    )
-                    aclrt_sign = (
-                        f"{generate_auto_gen_func_sign(func_sign, func_tmp_sign)};"
-                    )
-            else:
-                new_params = tiling_remove_ref_or_ptr_func_params(
-                    func_sign, remove_added_func_params(func_sign.func_params)
-                )
-                func_param_str = ", ".join(
-                    map(partial(func_param_to_string, with_cce_attr=False), new_params)
-                )
-                kernel_sign = f'extern "C" void {kernel_name}({func_param_str});\n'
+            kernel_sign_name, kernel_sign, aclrt_sign, func_param_str = (
+                _gen_cpu_kernel_signs(func_sign, new_func_sign, kernel_name, key)
+            )
             buff.write(type_definition)
             buff.write("\n")
             buff.write(kernel_sign)
@@ -1328,11 +1344,7 @@ def generate_host_stub_code_cpu(
     return remove_comments(buff.getvalue())
 
 
-def generate_host_stub_code(
-    func_groups: List[FuncSignGroupWithModeBase], type_definition: str
-) -> str:
-    """Generate host_stub.cpp code."""
-    has_mode_func = partial(has_mode_in_func_groups, func_groups=func_groups)
+def _detect_host_stub_core_modes(has_mode_func):
     has_mix = (
         has_mode_func(CodeMode.MIX)
         or has_mode_func(CodeMode.NORMAL)
@@ -1350,6 +1362,15 @@ def generate_host_stub_code(
         or has_mode_func(CodeMode.KERNEL_TYPE_AIV_ONLY)
         or has_mode_func(CodeMode.KERNEL_TYPE_MIX_AIV_1_0)
     )
+    return has_mix, has_aic, has_aiv
+
+
+def generate_host_stub_code(
+    func_groups: List[FuncSignGroupWithModeBase], type_definition: str
+) -> str:
+    """Generate host_stub.cpp code."""
+    has_mode_func = partial(has_mode_in_func_groups, func_groups=func_groups)
+    has_mix, has_aic, has_aiv = _detect_host_stub_core_modes(has_mode_func)
     head_code = generate_host_stub_head_code(has_mix, has_aic, has_aiv)
     buff = io.StringIO()
     buff.write(head_code)
@@ -2265,6 +2286,74 @@ def generate_kernel_auto_gen_func_impl(
     return source
 
 
+def _gen_kernel_fun_file_header(src_without_ext, src_path, func_group):
+    source = f"#ifndef __{src_without_ext.upper()}__KERNEL_FUN_H__\n"
+    source += f"#define __{src_without_ext.upper()}__KERNEL_FUN_H__\n\n"
+
+    # replace __global micro for usr kernel function, and recover after usr kernel function
+    source += "#undef __global__\n"
+    source += "#define __global__ inline\n"
+
+    for func_sign in func_group.func_signs:
+        source += (
+            f"#define {func_sign.func_name} {add_origin_suffix(func_sign.func_name)}\n"
+        )
+        kernel_name = (func_sign.func_name).replace("aclrtlaunch_", "")
+
+    source += f'#include "{src_path}"\n\n'
+
+    for func_sign in func_group.func_signs:
+        source += f"#undef {func_sign.func_name}\n"
+
+    source += "#undef __global__\n"
+    source += "#if ASCENDC_CPU_DEBUG\n"
+    source += "#define __global__\n"
+    source += "#else\n"
+    source += "#define __global__ __attribute__((cce_kernel))\n"
+    source += "#endif\n\n"
+
+    dump_size = str(func_group.dump_info["dump_size"])
+    source += "#ifndef ONE_CORE_DUMP_SIZE\n"
+    source += f"#define ONE_CORE_DUMP_SIZE {dump_size} * 1\n"
+    source += "#endif\n\n"
+
+    if RUN_MODE == "cpu":
+        source += "#if defined(ASCENDC_CPU_DEBUG)\n"
+        for func_sign in func_group.func_signs:
+            kernel_name = (func_sign.func_name).replace("aclrtlaunch_", "")
+            if func_sign.func_template_decl:
+                for template_id, _ in enumerate(
+                    func_sign.func_template_specialization_args, 0
+                ):
+                    kernel_sign_name = f"{kernel_name}_template_{template_id}"
+                    autogen_name = f"auto_gen_{kernel_sign_name}_kernel"
+                    source += f"#define {autogen_name} {kernel_sign_name}\n"
+            else:
+                source += f"#define auto_gen_{kernel_name}_kernel {kernel_name}\n"
+        source += "#endif\n"
+    return source
+
+
+def _append_kernel_auto_gen_impls(source, func_group, is_mix, generate_ktype_section):
+    for func_sign in func_group.func_signs:
+        if func_sign.func_template_decl:
+            for template_id, _ in enumerate(
+                func_sign.func_template_specialization_args, 0
+            ):
+                source += generate_kernel_auto_gen_func_impl(
+                    func_group,
+                    func_sign,
+                    is_mix,
+                    template_id,
+                    generate_ktype_section,
+                )
+        else:
+            source += generate_kernel_auto_gen_func_impl(
+                func_group, func_sign, is_mix, 0, generate_ktype_section
+            )
+    return source
+
+
 def save_device_kernel_function(
     func_groups: List[FuncSignGroupWithModeBase],
     source_mapping: Dict[str, str],
@@ -2285,66 +2374,12 @@ def save_device_kernel_function(
         )
 
         # File Isolation Macro
-        source = f"#ifndef __{src_without_ext.upper()}__KERNEL_FUN_H__\n"
-        source += f"#define __{src_without_ext.upper()}__KERNEL_FUN_H__\n\n"
-
-        # replace __global micro for usr kernel function, and recover after usr kernel function
-        source += "#undef __global__\n"
-        source += "#define __global__ inline\n"
-
-        for func_sign in func_group.func_signs:
-            source += f"#define {func_sign.func_name} {add_origin_suffix(func_sign.func_name)}\n"
-            kernel_name = (func_sign.func_name).replace("aclrtlaunch_", "")
-
-        source += f'#include "{src_path}"\n\n'
-
-        for func_sign in func_group.func_signs:
-            source += f"#undef {func_sign.func_name}\n"
-
-        source += "#undef __global__\n"
-        source += "#if ASCENDC_CPU_DEBUG\n"
-        source += "#define __global__\n"
-        source += "#else\n"
-        source += "#define __global__ __attribute__((cce_kernel))\n"
-        source += "#endif\n\n"
-
-        dump_size = str(func_group.dump_info["dump_size"])
-        source += "#ifndef ONE_CORE_DUMP_SIZE\n"
-        source += f"#define ONE_CORE_DUMP_SIZE {dump_size} * 1\n"
-        source += "#endif\n\n"
-
-        if RUN_MODE == "cpu":
-            source += "#if defined(ASCENDC_CPU_DEBUG)\n"
-            for func_sign in func_group.func_signs:
-                kernel_name = (func_sign.func_name).replace("aclrtlaunch_", "")
-                if func_sign.func_template_decl:
-                    for template_id, _ in enumerate(
-                        func_sign.func_template_specialization_args, 0
-                    ):
-                        kernel_sign_name = f"{kernel_name}_template_{template_id}"
-                        autogen_name = f"auto_gen_{kernel_sign_name}_kernel"
-                        source += f"#define {autogen_name} {kernel_sign_name}\n"
-                else:
-                    source += f"#define auto_gen_{kernel_name}_kernel {kernel_name}\n"
-            source += "#endif\n"
+        source = _gen_kernel_fun_file_header(src_without_ext, src_path, func_group)
 
         # generate kernel function
-        for func_sign in func_group.func_signs:
-            if func_sign.func_template_decl:
-                for template_id, _ in enumerate(
-                    func_sign.func_template_specialization_args, 0
-                ):
-                    source += generate_kernel_auto_gen_func_impl(
-                        func_group,
-                        func_sign,
-                        is_mix,
-                        template_id,
-                        generate_ktype_section,
-                    )
-            else:
-                source += generate_kernel_auto_gen_func_impl(
-                    func_group, func_sign, is_mix, 0, generate_ktype_section
-                )
+        source = _append_kernel_auto_gen_impls(
+            source, func_group, is_mix, generate_ktype_section
+        )
 
         source += "#endif\n"
 
