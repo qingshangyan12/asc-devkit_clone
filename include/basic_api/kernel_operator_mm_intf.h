@@ -432,7 +432,7 @@ __aicore__ inline void Mmad(
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
-    MmadBitModeParams& mmadParams);
+    const MmadBitModeParams& mmadParams);
 
 #if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
 /* [CUBE-PTR-PR4] Mmad BitMode L0A×L0B→L0C — Jessicaruan Wave3 */
