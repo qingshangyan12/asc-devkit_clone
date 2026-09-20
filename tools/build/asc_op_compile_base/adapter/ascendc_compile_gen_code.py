@@ -13,8 +13,9 @@
 ascendc compile gen code
 """
 
-import re
+import math
 import os
+import re
 from functools import reduce
 from tbe.common.buildcfg import get_current_build_config
 from .get_op_tiling import TilingInfo
@@ -45,14 +46,14 @@ OOM_STORAGE_SHAPE_INIT_PATTERN = (
 OOM_TENSOR_REGISTER_PATTERN = (
     "    if (!hasOomStorageShape || "
     "!AscendC::OOMTryRegisterTensorWithStorageShape("
-    "oomStorageShapeCursor, {param_name}, {element_size})) {{\n"
+    "oomStorageShapeCursor, {param_name}, static_cast<uint64_t>({element_size}))) {{\n"
     "        AscendC::OOMCheckAddrRange({param_name}, {input_shape_len});\n"
     "    }}\n"
 )
 OOM_TENSOR_LIST_REGISTER_PATTERN = (
     "    if (!hasOomStorageShape || "
     "!AscendC::OOMTryRegisterTensorListWithStorageShape("
-    "oomStorageShapeCursor, {param_name}, {element_size})) {{\n"
+    "oomStorageShapeCursor, {param_name}, static_cast<uint64_t>({element_size}))) {{\n"
     "        AscendC::OOMCheckTensorListRange({param_name}, {element_size});\n"
     "    }}\n"
 )
@@ -411,6 +412,7 @@ def add_op_param_to_workspace(
                 input_shape_len = reduce(
                     lambda x, y: x * y, op_param.get("shape")
                 ) * INPUT_OUTPUT_DTYPE_LEN.get(op_param.get("dtype"))
+                input_shape_len = math.ceil(input_shape_len)
                 input_shape_len = (input_shape_len + 32 - 1) // 32 * 32
                 source += "    AscendC::OOMCheckAddrRange({}, {});\n".format(
                     op_param.get("param_name"), input_shape_len
