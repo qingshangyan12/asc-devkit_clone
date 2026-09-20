@@ -15,6 +15,7 @@ This sample demonstrates tuning methods for [Warp Divergence](../../../../../doc
 ```text
 ├── predicate_optimization
 │   ├── predicate_optimization.asc  // SIMT implementation & invocation sample
+│   ├── figures                     // Image resources for README
 │   ├── CMakeLists.txt              // cmake build script
 │   ├── README.md                   // Sample documentation (Chinese)
 │   └── README_en.md                // English sample documentation
@@ -40,24 +41,9 @@ This sample demonstrates tuning methods for [Warp Divergence](../../../../../doc
   }
   ```
 
-  The execution process and instruction stream of the above if-else are as follows:
+  The control flow of the above if-else under branch divergence is as follows:
 
-  ```text
-            if (cond)
-                │
-                ▼   Branch divergence: hardware pushes the reconvergence address
-    ┌───────────────────────────────────────────────┐
-    │ Pass 1: execute if body (r = a + b)           │
-    │   Active: 16 threads with cond=1              │
-    │   Idle: 16 threads with cond=0 (masked, wait) │
-    ├───────────────────────────────────────────────┤
-    │ Pass 2: execute else body (r = a - b)         │
-    │   Active: 16 threads with cond=0              │
-    │   Idle: 16 threads with cond=1 (masked, wait) │
-    └───────────────────────────────────────────────┘
-                │
-                ▼   Branch stack pop: restore full mask, Warp reconverges
-  ```
+  ![Control flow of Warp branch divergence](./figures/branch.png "Control flow of Warp branch divergence")
 
   The corresponding instruction stream:
 
@@ -80,24 +66,10 @@ This sample demonstrates tuning methods for [Warp Divergence](../../../../../doc
 
 - **Predicate Optimization**
 
-  To avoid the above overhead, the compiler can rewrite simpler branches into straight-line execution via predication (also known as if-conversion): the branch condition no longer drives a jump; instead it is evaluated into a per-thread predicate flag. Instructions in the branch body are rewritten as predicated instructions; all 32 threads in a Warp are issued, the instruction stream stays a single straight line, and only threads whose predicate is true write back the result — threads whose predicate is false discard it (no register write-back, no memory side effects). For the same if-else, the execution process and instruction stream after predicate optimization are as follows:
+  To avoid the above overhead, the compiler can rewrite simpler branches into straight-line execution via predication (also known as if-conversion): the branch condition no longer drives a jump; instead it is evaluated into a per-thread predicate flag. Instructions in the branch body are rewritten as predicated instructions; all 32 threads in a Warp are issued, the instruction stream stays a single straight line, and only threads whose predicate is true write back the result — threads whose predicate is false discard it (no register write-back, no memory side effects). For the same if-else, the control flow after predicate optimization is as follows:
 
-  ```text
-            if (cond)
-                │
-                ▼   The compiler converts branch bodies to predicated execution, no jump
-    ┌───────────────────────────────────────────────┐
-    │ add r4, r2, r3, p0                             │
-    │   Effective: 16 threads with p0=1 write back r4│
-    │   Discarded: 16 threads with p0=0 (issued but no write-back) │
-    ├───────────────────────────────────────────────┤
-    │ sub r4, r2, r3, ~p0                            │
-    │   Effective: 16 threads with p0=0 write back r4│
-    │   Discarded: 16 threads with p0=1 (issued but no write-back) │
-    └───────────────────────────────────────────────┘
-                │   No branch stack operations, no reconvergence synchronization, sequential execution
-                ▼
-  ```
+  ![Control flow after predicate optimization](./figures/predicate.png "Control flow after predicate optimization")
+
 
   The corresponding instruction stream:
 
