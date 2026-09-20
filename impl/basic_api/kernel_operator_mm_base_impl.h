@@ -524,7 +524,7 @@ __aicore__ inline void MmadImpl(
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void MmadImpl(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
-    const MmadBitModeParams& mmadParams)
+    MmadBitModeParams& mmadParams)
 {
 #if ASCENDC_CPU_DEBUG
     if (!CheckMmadParams(dst, fm, filter, bias, mmadParams.GetConfig0(), "Mmad with bias")) {
@@ -546,6 +546,7 @@ __aicore__ inline void MmadImpl(
                               "L0C Buffer(CO1)/BiasTable Buffer(C2)");
         });
     }
+    mmadParams.SetCmatrixSource(cmatrixSource);
     MmadCal(
         (__cc__ PrimT<T>*)dst.GetPhyAddr(), (__ca__ PrimT<U>*)fm.GetPhyAddr(), (__cb__ PrimT<S>*)filter.GetPhyAddr(),
         (uint64_t)bias.GetPhyAddr(), mmadParams);
@@ -608,7 +609,7 @@ __aicore__ inline void MmadMxImpl(
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void MmadMxImpl(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
-    const MmadBitModeParams& mmadParams)
+    MmadBitModeParams& mmadParams)
 {
 #if ASCENDC_CPU_DEBUG
     if (!CheckMmadParams(dst, fm, filter, bias, mmadParams.GetConfig0(), "MmadMx with bias")) {
@@ -630,6 +631,7 @@ __aicore__ inline void MmadMxImpl(
                               "L0C Buffer(CO1)/BiasTable Buffer(C2)");
         });
     }
+    mmadParams.SetCmatrixSource(cmatrixSource);
     MmadMxCal(
         (__cc__ PrimT<T>*)dst.GetPhyAddr(), (__ca__ PrimT<U>*)fm.GetPhyAddr(), (__cb__ PrimT<S>*)filter.GetPhyAddr(),
         (uint64_t)bias.GetPhyAddr(), mmadParams);
