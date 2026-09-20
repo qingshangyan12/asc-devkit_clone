@@ -738,14 +738,14 @@ inline void copy_gm_to_cbuf_align_v2(
 
 template <typename T>
 inline void copy_gm_to_cbuf_multi_dn2nz(
-    __cbuf__ T* dst, __gm__ T* src, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
-    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool enable_pre_load_ignore_sync)
+    __cbuf__ T* dst, __gm__ T* src, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
+    uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool enable_pre_load_ignore_sync)
 {}
 
 template <typename T>
 inline void copy_gm_to_cbuf_multi_nd2nz(
-    __cbuf__ T* dst, __gm__ T* src, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
-    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool enable_pre_load_ignore_sync)
+    __cbuf__ T* dst, __gm__ T* src, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
+    uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool enable_pre_load_ignore_sync)
 {}
 inline void img2colv2_cbuf_to_ca(
     __ca__ int16_t* dst, __cbuf__ int16_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m,

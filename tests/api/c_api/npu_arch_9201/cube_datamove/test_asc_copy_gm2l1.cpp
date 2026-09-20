@@ -37,9 +37,9 @@ protected:
 
 template <typename DTYPE>
 __aicore__ inline void load_gm_to_cbuf_2dv2_stub(
-    __cbuf__ DTYPE* dst, __gm__ DTYPE* src, uint32_t m_start_position, uint32_t k_start_position,
-    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode,
-    bool enable_pre_load_ignore_sync, uint8_t l2_cache_ctl)
+    __cbuf__ DTYPE* dst, __gm__ DTYPE* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
+    uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode, bool enable_pre_load_ignore_sync,
+    uint8_t l2_cache_ctl)
 {
     EXPECT_EQ(dst, reinterpret_cast<__cbuf__ DTYPE*>(11));
     EXPECT_EQ(src, reinterpret_cast<__gm__ DTYPE*>(22));
@@ -54,22 +54,23 @@ __aicore__ inline void load_gm_to_cbuf_2dv2_stub(
     EXPECT_EQ(l2_cache_ctl, static_cast<uint8_t>(4));
 }
 
-#define TEST_CUBE_DATAMOVE_COPY_GM2L1(cce_name, dtype)                                                          \
-                                                                                                                \
-    TEST_F(TEST_COPY_GM_TO_L1, TEST_COPY_GM_TO_L1_##dtype)                                                      \
-    {                                                                                                           \
-        __cbuf__ dtype* dst = reinterpret_cast<__cbuf__ dtype*>(11);                                            \
-        __gm__ dtype* src = reinterpret_cast<__gm__ dtype*>(22);                                                \
-        asc_load_l2_cache_mode l2_cache_mode = asc_load_l2_cache_mode::NOTALLOC_KEEP;                           \
-                                                                                                                \
-        MOCKER_CPP(cce_name, void(                                                                              \
-                                  __cbuf__ dtype*, __gm__ dtype*, uint32_t, uint32_t, uint16_t, uint16_t,       \
-                                  uint16_t, uint8_t, uint8_t, bool, uint8_t))                                   \
-            .times(1)                                                                                           \
-            .will(invoke(load_gm_to_cbuf_2dv2_stub<dtype>));                                                    \
-                                                                                                                \
-        asc_copy_gm2l1(dst, src, 33, 44, 55, 66, 77, true, l2_cache_mode);                                      \
-        GlobalMockObject::verify();                                                                             \
+#define TEST_CUBE_DATAMOVE_COPY_GM2L1(cce_name, dtype)                                                               \
+                                                                                                                     \
+    TEST_F(TEST_COPY_GM_TO_L1, TEST_COPY_GM_TO_L1_##dtype)                                                           \
+    {                                                                                                                \
+        __cbuf__ dtype* dst = reinterpret_cast<__cbuf__ dtype*>(11);                                                 \
+        __gm__ dtype* src = reinterpret_cast<__gm__ dtype*>(22);                                                     \
+        asc_load_l2_cache_mode l2_cache_mode = asc_load_l2_cache_mode::NOTALLOC_KEEP;                                \
+                                                                                                                     \
+        MOCKER_CPP(                                                                                                  \
+            cce_name, void(                                                                                          \
+                          __cbuf__ dtype*, __gm__ dtype*, uint32_t, uint32_t, uint16_t, uint16_t, uint16_t, uint8_t, \
+                          uint8_t, bool, uint8_t))                                                                   \
+            .times(1)                                                                                                \
+            .will(invoke(load_gm_to_cbuf_2dv2_stub<dtype>));                                                         \
+                                                                                                                     \
+        asc_copy_gm2l1(dst, src, 33, 44, 55, 66, 77, true, l2_cache_mode);                                           \
+        GlobalMockObject::verify();                                                                                  \
     }
 
 TEST_F(TEST_COPY_GM_TO_L1, TEST_COPY_GM_TO_L1_ENABLE_PRE_LOAD_IGNORE_SYNC)
@@ -80,7 +81,8 @@ TEST_F(TEST_COPY_GM_TO_L1, TEST_COPY_GM_TO_L1_ENABLE_PRE_LOAD_IGNORE_SYNC)
         .times(1)
         .will(invoke(copy_gm_to_cbuf_v2_enable_pre_load_ignore_sync_stub));
 
-    asc_copy_gm2l1(reinterpret_cast<__cbuf__ void*>(11), reinterpret_cast<__gm__ void*>(22), 33, 44,
+    asc_copy_gm2l1(
+        reinterpret_cast<__cbuf__ void*>(11), reinterpret_cast<__gm__ void*>(22), 33, 44,
         static_cast<asc_channel_pad_mode>(55), true, 66, 77);
     GlobalMockObject::verify();
 }
@@ -88,13 +90,15 @@ TEST_F(TEST_COPY_GM_TO_L1, TEST_COPY_GM_TO_L1_ENABLE_PRE_LOAD_IGNORE_SYNC)
 TEST_F(TEST_COPY_GM_TO_L1, TEST_COPY_GM_TO_L1_AIV_NOOP)
 {
     g_coreType = C_API_AIV_TYPE;
-    MOCKER_CPP(load_gm_to_cbuf_2dv2,
-        void(__cbuf__ half*, __gm__ half*, uint32_t, uint32_t, uint16_t, uint16_t, uint16_t, uint8_t, uint8_t, bool,
-            uint8_t))
+    MOCKER_CPP(
+        load_gm_to_cbuf_2dv2, void(
+                                  __cbuf__ half*, __gm__ half*, uint32_t, uint32_t, uint16_t, uint16_t, uint16_t,
+                                  uint8_t, uint8_t, bool, uint8_t))
         .times(0);
 
-    asc_copy_gm2l1(reinterpret_cast<__cbuf__ half*>(11), reinterpret_cast<__gm__ half*>(22), 33, 44, 55, 66, 77,
-        false, asc_load_l2_cache_mode::NORMAL_LAST_VICTIM);
+    asc_copy_gm2l1(
+        reinterpret_cast<__cbuf__ half*>(11), reinterpret_cast<__gm__ half*>(22), 33, 44, 55, 66, 77, false,
+        asc_load_l2_cache_mode::NORMAL_LAST_VICTIM);
     GlobalMockObject::verify();
 }
 
