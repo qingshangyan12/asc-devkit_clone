@@ -18,6 +18,7 @@
 
 #include "c_api/defs/macro.h"
 #include "utils/common_types.h"
+#include <array>
 
 using vector_uint8_t = vector_u8;
 using vector_uint16_t = vector_u16;
@@ -36,9 +37,24 @@ using vector_bfloat16_t = vector_bf16;
 using vector_hifloat8_t = vector_hif8;
 using vector_fp8_e4m3fn_t = vector_f8e4m3;
 using vector_fp8_e5m2_t = vector_f8e5m2;
-using vector_fp8_e6m2_t = vector_f8e6m2;
 using vector_fp8_e8m0_t = vector_f8e8m0;
 using vector_int4x2_t = vector_s4x2;
+
+// fp8_e6m2 / hif4x2 public stubs (host-side compiler does not provide these yet)
+#if !defined(__CLANG_CCE_VECTOR_TYPES_H)
+namespace float8_e6m2 {
+struct Fp8e6m2T {
+    uint8_t val;
+};
+} // namespace float8_e6m2
+using fp8_e6m2_t = float8_e6m2::Fp8e6m2T;
+using vector_f8e6m2 = std::array<fp8_e6m2_t, sizeof(vector_u8)>;
+struct hifloat4x2_t {
+    uint8_t val;
+};
+using vector_hif4x2 = std::array<hifloat4x2_t, sizeof(vector_u8)>;
+#endif
+using vector_fp8_e6m2_t = vector_f8e6m2;
 using vector_uint4x2_t = vector_s4x2;
 using vector_hifloat4x2_t = vector_hif4x2;
 using vector_fp4x2_e2m1_t = vector_f4e2m1x2;
