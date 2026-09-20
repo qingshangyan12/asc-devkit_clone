@@ -296,7 +296,7 @@ REGISTER_EXEC_V2(
     TopoMatch1D, CcuTempKfcReduceScatterNHR1DMultiJettyMem2Mem);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleNHRMultiLink, AlgEngine::CCU,
-    "sole[nhr.muti_channel]", COND_NONE, FLAG_NONE);
+    "sole[nhr.multi_channel]", COND_NONE, FLAG_NONE);
 #endif
 
 } // namespace mc2_ops_hccl

@@ -37,14 +37,14 @@ const struct {
     {"sole[mesh.two_shot]", "sole[mesh.two_shot]"},
     {"sole[mesh.two_shot.chunk]", "sole[mesh.two_shot.chunk]"},
     {"sole[mesh.single_channel]", "sole[mesh.single_channel]"},
-    {"sole[mesh.muti_channel]", "sole[mesh.muti_channel]"},
-    {"sole[nhr.muti_channel]", "sole[nhr.muti_channel]"},
+    {"sole[mesh.multi_channel]", "sole[mesh.multi_channel]"},
+    {"sole[nhr.multi_channel]", "sole[nhr.multi_channel]"},
     {"sequence[mesh,nhr]", "sequence[mesh,nhr]"},
     {"sequence[mesh,mesh]", "sequence[mesh,mesh]"},
     {"parallel[mesh,nhr]", "parallel[mesh,nhr]"},
-    {"parallel[mesh,nhr.muti_channel]", "parallel[mesh,nhr.muti_channel]"},
+    {"parallel[mesh,nhr.multi_channel]", "parallel[mesh,nhr.multi_channel]"},
     {"concur[mesh,nhr]", "concur[mesh,nhr]"},
-    {"concur[mesh,nhr.muti_channel]", "concur[mesh,nhr.muti_channel]"},
+    {"concur[mesh,nhr.multi_channel]", "concur[mesh,nhr.multi_channel]"},
     {"concur[mesh,mesh]", "concur[mesh,mesh]"},
     {"pipeline[mesh,nhr]", "pipeline[mesh,nhr]"},
     {"parallel[mesh, nhr]", "parallel[mesh,nhr]"},
@@ -67,8 +67,8 @@ TEST(ExtAlgParser, SpacesEverywhereAreStripped)
 {
     ExternalAlgSpec spec;
     std::string errMsg;
-    ASSERT_TRUE(ParseExternalAlg("  parallel [ mesh , nhr . muti_channel ]  [ order.strong ] ", spec, errMsg));
-    EXPECT_EQ(spec.canonical(), "parallel[mesh,nhr.muti_channel]");
+    ASSERT_TRUE(ParseExternalAlg("  parallel [ mesh , nhr . multi_channel ]  [ order.strong ] ", spec, errMsg));
+    EXPECT_EQ(spec.canonical(), "parallel[mesh,nhr.multi_channel]");
     EXPECT_TRUE(spec.orderStrong);
     EXPECT_EQ(spec.executor, ExternalExecutor::PARALLEL);
     ASSERT_EQ(spec.layers.size(), 2U);
@@ -76,7 +76,7 @@ TEST(ExtAlgParser, SpacesEverywhereAreStripped)
     EXPECT_TRUE(spec.layers[0].attrs.empty());
     EXPECT_EQ(spec.layers[1].atom, "nhr");
     ASSERT_EQ(spec.layers[1].attrs.size(), 1U);
-    EXPECT_EQ(spec.layers[1].attrs[0], "muti_channel");
+    EXPECT_EQ(spec.layers[1].attrs[0], "multi_channel");
 }
 
 TEST(ExtAlgParser, OrderStrongIsParsedButNotInCanonical)
@@ -99,7 +99,7 @@ TEST(ExtAlgParser, IllegalNamesAreRejectedWithReason)
         {"ring[mesh]", "executor"},
         {"sole[ring]", "atom"},
         {"sole[mesh.bigstep]", "attribute"},
-        {"sole[mesh.multi_channel]", "attribute"},
+        {"sole[mesh.muti_channel]", "attribute"}, // 旧拼写（需求文档笔误，2026-09-20 已纠正为 multi_channel）
         {"sole[mesh", "missing"},
         {"sole[]", "layer"},
         {"sole[mesh,]", "layer"},
@@ -414,7 +414,7 @@ TEST(ExtAlgResolver, GoldenAllEngines)
         {HcclCMDType::HCCL_CMD_ALLGATHER, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_AICPU_TS, "InsAllGatherMesh1D"},
         {HcclCMDType::HCCL_CMD_ALLGATHER, "sole[nhr]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
          "AicpuAllGatherSoleNHR"},
-        {HcclCMDType::HCCL_CMD_ALLGATHER, "parallel[mesh,nhr.muti_channel]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
+        {HcclCMDType::HCCL_CMD_ALLGATHER, "parallel[mesh,nhr.multi_channel]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
          "InsAllGatherParallelMesh1DNHRMultiJetty"},
         {HcclCMDType::HCCL_CMD_ALLGATHER, "concur[mesh,nhr]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
          "AicpuAllGatherConcurMeshNHR"},
@@ -445,18 +445,18 @@ TEST(ExtAlgResolver, GoldenAllEngines)
         // ---- 纯查表组合（CCU）----
         {HcclCMDType::HCCL_CMD_ALLGATHER, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_CCU,
          "CcuSchedAllGatherSoleMesh"},
-        {HcclCMDType::HCCL_CMD_ALLGATHER, "parallel[mesh,nhr.muti_channel]", &ubx, CommEngine::COMM_ENGINE_CCU,
+        {HcclCMDType::HCCL_CMD_ALLGATHER, "parallel[mesh,nhr.multi_channel]", &ubx, CommEngine::COMM_ENGINE_CCU,
          "CcuSchedAllGatherParallelMeshNHRMultiLink"},
-        {HcclCMDType::HCCL_CMD_ALLGATHER, "concur[mesh,nhr.muti_channel]", &ubx, CommEngine::COMM_ENGINE_CCU,
+        {HcclCMDType::HCCL_CMD_ALLGATHER, "concur[mesh,nhr.multi_channel]", &ubx, CommEngine::COMM_ENGINE_CCU,
          "CcuSchedAllGatherConcurMeshNHRMultiLink"},
-        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr.muti_channel]", &flat, CommEngine::COMM_ENGINE_CCU,
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr.multi_channel]", &flat, CommEngine::COMM_ENGINE_CCU,
          "CcuSchedReduceScatterSoleNHRMultiLink"},
-        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "concur[mesh,nhr.muti_channel]", &ubx, CommEngine::COMM_ENGINE_CCU,
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "concur[mesh,nhr.multi_channel]", &ubx, CommEngine::COMM_ENGINE_CCU,
          "CcuSchedReduceScatterConcurMeshNHRMultiLink"},
         {HcclCMDType::HCCL_CMD_ALLREDUCE, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_CCU,
          "CcuSchedAllReduceSoleMesh"},
         {HcclCMDType::HCCL_CMD_ALLTOALL, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_CCU, "CcuSchedAllToAllSoleMesh"},
-        {HcclCMDType::HCCL_CMD_ALLTOALL, "sole[mesh.muti_channel]", &ubx, CommEngine::COMM_ENGINE_CCU,
+        {HcclCMDType::HCCL_CMD_ALLTOALL, "sole[mesh.multi_channel]", &ubx, CommEngine::COMM_ENGINE_CCU,
          "CcuSchedAllToAllMesh1DMultiJetty"},
         {HcclCMDType::HCCL_CMD_ALLTOALL, "concur[mesh,mesh]", &ubx, CommEngine::COMM_ENGINE_CCU,
          "CcuSchedAllToAllSoleMeshConcurrent"},

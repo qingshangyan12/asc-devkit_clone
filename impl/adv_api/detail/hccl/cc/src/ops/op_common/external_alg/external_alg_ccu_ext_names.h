@@ -29,17 +29,17 @@ namespace mc2_ops_hccl {
 inline const std::set<std::pair<uint32_t, std::string>>& CcuExternalNameSet()
 {
     static const std::set<std::pair<uint32_t, std::string>> kSet = {
-        {6U, "sole[mesh]"},                      // AG: CcuSchedAllGatherSoleMesh
-        {6U, "parallel[mesh,nhr.muti_channel]"}, // AG: CcuSchedAllGatherParallelMeshNHRMultiLink
-        {6U, "concur[mesh,nhr.muti_channel]"},   // AG: CcuSchedAllGatherConcurMeshNHRMultiLink
-        {7U, "sole[mesh]"},                      // RS: CcuSchedReduceScatterSoleMesh(+PeerOnly)
-        {7U, "sole[nhr.muti_channel]"},          // RS: CcuSchedReduceScatterSoleNHRMultiLink
-        {7U, "concur[mesh,nhr.muti_channel]"},   // RS: CcuSchedReduceScatterConcurMeshNHRMultiLink
-        {2U, "sole[mesh]"},                      // AR: CcuSchedAllReduceSoleMesh
-        {10U, "sole[mesh]"},                     // A2A: CcuSchedAllToAllSoleMesh
-        {10U, "sole[mesh.muti_channel]"},        // A2A: CcuSchedAllToAllMesh1DMultiJetty
-        {10U, "concur[mesh,mesh]"},              // A2A: CcuSchedAllToAllSoleMeshConcurrent
-        {8U, "sole[mesh]"},                      // A2AV: CcuSchedAllToAllVSoleMesh
+        {6U, "sole[mesh]"},                       // AG: CcuSchedAllGatherSoleMesh
+        {6U, "parallel[mesh,nhr.multi_channel]"}, // AG: CcuSchedAllGatherParallelMeshNHRMultiLink
+        {6U, "concur[mesh,nhr.multi_channel]"},   // AG: CcuSchedAllGatherConcurMeshNHRMultiLink
+        {7U, "sole[mesh]"},                       // RS: CcuSchedReduceScatterSoleMesh(+PeerOnly)
+        {7U, "sole[nhr.multi_channel]"},          // RS: CcuSchedReduceScatterSoleNHRMultiLink
+        {7U, "concur[mesh,nhr.multi_channel]"},   // RS: CcuSchedReduceScatterConcurMeshNHRMultiLink
+        {2U, "sole[mesh]"},                       // AR: CcuSchedAllReduceSoleMesh
+        {10U, "sole[mesh]"},                      // A2A: CcuSchedAllToAllSoleMesh
+        {10U, "sole[mesh.multi_channel]"},        // A2A: CcuSchedAllToAllMesh1DMultiJetty
+        {10U, "concur[mesh,mesh]"},               // A2A: CcuSchedAllToAllSoleMeshConcurrent
+        {8U, "sole[mesh]"},                       // A2AV: CcuSchedAllToAllVSoleMesh
     };
     return kSet;
 }

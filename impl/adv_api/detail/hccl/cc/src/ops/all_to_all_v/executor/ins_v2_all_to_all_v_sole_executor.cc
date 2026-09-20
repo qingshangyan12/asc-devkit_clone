@@ -351,7 +351,7 @@ REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLTOALL, CcuSchedAllToAllMesh1DMultiJetty, InsV2AlltoAllVSoleExecutor, TopoMatchUBX1d,
     CcuTempAllToAllMesh1DMultiJetty);
 REGISTER_ALG_META(
-    HcclCMDType::HCCL_CMD_ALLTOALL, CcuSchedAllToAllMesh1DMultiJetty, AlgEngine::CCU, "sole[mesh.muti_channel]",
+    HcclCMDType::HCCL_CMD_ALLTOALL, CcuSchedAllToAllMesh1DMultiJetty, AlgEngine::CCU, "sole[mesh.multi_channel]",
     COND_NONE, FLAG_NONE);
 #endif
 #ifndef AICPU_COMPILE

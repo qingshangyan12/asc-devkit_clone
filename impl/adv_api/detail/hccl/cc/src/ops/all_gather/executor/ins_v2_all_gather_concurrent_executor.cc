@@ -413,7 +413,7 @@ REGISTER_EXECUTOR_BY_TWO_TEMPS(
     TopoMatchUBX, CcuTempKfcAllGatherMesh1DMem2Mem, CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLGATHER, CcuSchedAllGatherConcurMeshNHRMultiLink, AlgEngine::CCU,
-    "concur[mesh,nhr.muti_channel]", COND_NONE, FLAG_NONE);
+    "concur[mesh,nhr.multi_channel]", COND_NONE, FLAG_NONE);
 #endif
 
 } // namespace mc2_ops_hccl

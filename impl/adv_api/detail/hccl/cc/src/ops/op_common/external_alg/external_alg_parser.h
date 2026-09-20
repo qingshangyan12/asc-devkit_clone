@@ -21,7 +21,9 @@ namespace mc2_ops_hccl {
 //   executor := sole | sequence | parallel | concur | pipeline
 //   layer    := atom ('.' attr)*
 //   atom     := mesh | nhr
-//   attr     := chunk | one_shot | two_shot | muti_channel | single_channel
+//   attr     := chunk | one_shot | two_shot | multi_channel | single_channel
+//   （multi_channel：原始需求文档曾误写 muti_channel，2026-09-20 纠正——hccl/devkit
+//    内部注册名（MultiJetty/MultiLink）从来都是正确拼写，勘误记录见设计文档 §6）
 // 约束:
 //   - 空格/制表符全部忽略
 //   - 层数 1~3（系统最大 3 层物理拓扑，超过即语法错）
@@ -174,10 +176,10 @@ inline bool ParseExternalAlg(const std::string& algConfig, ExternalAlgSpec& spec
                 layer.atom = seg;
                 atomSeen = true;
             } else {
-                static const char* const ATTRS[] = {"chunk", "one_shot", "two_shot", "muti_channel", "single_channel"};
+                static const char* const ATTRS[] = {"chunk", "one_shot", "two_shot", "multi_channel", "single_channel"};
                 if (!external_alg_internal::WordInTable(seg, ATTRS, sizeof(ATTRS) / sizeof(ATTRS[0]))) {
                     errMsg = "unknown attribute \"" + seg + "\" in layer " + std::to_string(layerNo) +
-                             " (expected one of: chunk, one_shot, two_shot, muti_channel, single_channel) in \"" +
+                             " (expected one of: chunk, one_shot, two_shot, multi_channel, single_channel) in \"" +
                              algConfig + "\"";
                     return false;
                 }

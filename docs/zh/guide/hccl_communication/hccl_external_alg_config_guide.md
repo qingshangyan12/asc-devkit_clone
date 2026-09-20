@@ -13,7 +13,7 @@ external  := executor '[' layer (',' layer)* ']' ('[order.strong]')?
 executor  := sole | sequence | parallel | concur | pipeline
 layer     := atom ('.' attr)*
 atom      := mesh | nhr
-attr      := chunk | one_shot | two_shot | muti_channel | single_channel
+attr      := chunk | one_shot | two_shot | multi_channel | single_channel
 ```
 
 -   `executor`为编排方式，必填；
@@ -47,10 +47,10 @@ attr      := chunk | one_shot | two_shot | muti_channel | single_channel
 | `chunk` | 分chunk传输，减小scratch占用 | `mesh` |
 | `one_shot` | 一趟Mesh完成AllReduce | `mesh` |
 | `two_shot` | 同层先ReduceScatter再AllGather | `mesh` |
-| `muti_channel` | 多通道 | `mesh`、`nhr` |
+| `multi_channel` | 多通道 | `mesh`、`nhr` |
 | `single_channel` | 每对端仅1条通道 | `mesh` |
 
-属性写在原子之后、以`.`分隔，可按书写顺序叠加，如`mesh.two_shot.chunk`、`nhr.muti_channel`。
+属性写在原子之后、以`.`分隔，可按书写顺序叠加，如`mesh.two_shot.chunk`、`nhr.multi_channel`。
 
 ### 1.3 保序后缀
 
@@ -66,7 +66,7 @@ sole[mesh] [order.strong]  # 保序
 
 -   **层数限制**：1~3层。超过3层直接判为语法错误，不会进入候选查询。
 -   **空格容忍**：名称中的空格与制表符会被全部忽略，`parallel[mesh, nhr]`与`parallel[mesh,nhr]`等价。
--   **拼写警示**：多通道属性的拼写为`muti_channel`（不是`multi_channel`）。词表严格按拼写匹配，拼错即解析失败并报错。
+-   **拼写警示**：多通道属性的拼写为`multi_channel`。早期需求文档曾误写为`muti_channel`（少一个字母l），实现时已纠正；词表严格按拼写匹配，旧拼写`muti_channel`会解析失败并报错。
 -   **以下内容不要写进外部名**：
 
 **表4**  不要写进外部名的内容
@@ -79,7 +79,7 @@ sole[mesh] [order.strong]  # 保序
 | `mesh.2die`、`nhr.soft_reduce` | 运行时按拓扑与数据类型自动识别 |
 | `mesh.detour`、`mesh.peer_only` | 运行时按组网与链路条件自动识别 |
 | `pcie`、`ubx`等机型词 | 机型由组网自动识别 |
-| `nhr.multilink`、`mesh.multilink` | 旧写法，对应属性为`muti_channel` |
+| `nhr.multilink`、`mesh.multilink` | 旧写法，对应属性为`multi_channel` |
 
 ### 1.5 配置示例
 
@@ -89,7 +89,7 @@ sole[mesh.two_shot]         # 带属性
 sole[mesh] [order.strong]   # 保序后缀
 sole[mesh.single_channel]   # AllToAll单通道
 parallel[mesh, nhr]         # 两层并行
-parallel[mesh, nhr.muti_channel]
+parallel[mesh, nhr.multi_channel]
 concur[mesh, mesh]          # 两路Mesh并跑
 sequence[mesh, nhr]         # 两层串行
 ```
@@ -170,11 +170,11 @@ AscendC::Mc2CcTilingConfig mc2CcTilingConfig(groupName, opType, algConfig);
 | 外部名 | 引擎 | 解析结果（注册名） | 消歧说明 |
 | --- | --- | --- | --- |
 | `concur[mesh,nhr]` | AICPU | `AicpuAllGatherConcurMeshNHR` | 唯一候选 |
-| `concur[mesh,nhr.muti_channel]` | CCU | `CcuSchedAllGatherConcurMeshNHRMultiLink` | 唯一候选 |
+| `concur[mesh,nhr.multi_channel]` | CCU | `CcuSchedAllGatherConcurMeshNHRMultiLink` | 唯一候选 |
 | `pipeline[mesh,nhr]` | AICPU | `AicpuAllGatherPipeLinePcie` | 唯一候选 |
 | `parallel[mesh,nhr]` | AICPU | `InsAllGatherParallelMesh1DNHR` / `InsAllGatherParallelMesh1DNHRUBX` / `InsAllGatherParallelMesh1DNHRPcie` | 机型三选一：`FLAG_MULTI_LEVEL` / `FLAG_UBX` / `FLAG_PCIE_MIX`，均不命中则报错 |
-| `parallel[mesh,nhr.muti_channel]` | AICPU | `InsAllGatherParallelMesh1DNHRMultiJetty` | 唯一候选 |
-| `parallel[mesh,nhr.muti_channel]` | CCU | `CcuSchedAllGatherParallelMeshNHRMultiLink` | 唯一候选 |
+| `parallel[mesh,nhr.multi_channel]` | AICPU | `InsAllGatherParallelMesh1DNHRMultiJetty` | 唯一候选 |
+| `parallel[mesh,nhr.multi_channel]` | CCU | `CcuSchedAllGatherParallelMeshNHRMultiLink` | 唯一候选 |
 | `sequence[mesh,nhr]` | DPU | `InsAllGatherMeshNhrDPU` | 唯一候选（仅HOST CPU引擎生效） |
 | `sole[mesh]` | AICPU | `InsAllGatherMesh1D` | 唯一候选 |
 | `sole[mesh]` | CCU | `CcuSchedAllGatherSoleMesh` | 唯一候选 |
@@ -185,7 +185,7 @@ AscendC::Mc2CcTilingConfig mc2CcTilingConfig(groupName, opType, algConfig);
 | 外部名 | 引擎 | 解析结果（注册名） | 消歧说明 |
 | --- | --- | --- | --- |
 | `concur[mesh,nhr]` | AICPU | `AicpuReduceScatterConcurMeshNHR` | 唯一候选 |
-| `concur[mesh,nhr.muti_channel]` | CCU | `CcuSchedReduceScatterConcurMeshNHRMultiLink` | 唯一候选 |
+| `concur[mesh,nhr.multi_channel]` | CCU | `CcuSchedReduceScatterConcurMeshNHRMultiLink` | 唯一候选 |
 | `parallel[mesh,nhr]` | AICPU | `InsReduceScatterParallelMesh1DNHR` / `AicpuReduceScatterParallelMeshNHRUBX` / `InsReduceScatterParallelMesh1DNHRPcie` | 机型三选一：`FLAG_MULTI_LEVEL` / `FLAG_UBX` / `FLAG_PCIE_MIX`，均不命中则报错 |
 | `pipeline[mesh,nhr]` | AICPU | `AicpuReduceScatterPipeLinePcie` | 唯一候选 |
 | `sequence[mesh,nhr]` | AICPU | `InsReduceScatterSequenceMesh1DNhr` | 唯一候选 |
@@ -194,7 +194,7 @@ AscendC::Mc2CcTilingConfig mc2CcTilingConfig(groupName, opType, algConfig);
 | `sole[mesh]` | CCU | `CcuSchedReduceScatterSoleMeshPeerOnly` / `CcuSchedReduceScatterSoleMesh` | `COND_PEER_ONLY`命中选PeerOnly变体，否则裸名兜底 |
 | `sole[mesh.chunk]` | AICPU | `InsReduceScatterMesh1DMeshChunk` | 唯一候选 |
 | `sole[nhr]` | AICPU | `InsReduceScatterAicpuReduceNHR` / `InsReduceScatterNHR` | `COND_SPECIAL_DT`命中选AicpuReduce变体，否则裸名兜底 |
-| `sole[nhr.muti_channel]` | CCU | `CcuSchedReduceScatterSoleNHRMultiLink` | 唯一候选 |
+| `sole[nhr.multi_channel]` | CCU | `CcuSchedReduceScatterSoleNHRMultiLink` | 唯一候选 |
 
 **表10**  AllReduce（6组合）
 
@@ -215,7 +215,7 @@ AscendC::Mc2CcTilingConfig mc2CcTilingConfig(groupName, opType, algConfig);
 | `concur[mesh,mesh]` | CCU | `CcuSchedAllToAllSoleMeshConcurrent` | 唯一候选 |
 | `sole[mesh.single_channel]` | AICPU | `AicpuAllToAllSoleMeshSingleChannel` | 唯一候选 |
 | `sole[mesh]` | AICPU | `AicpuAllToAllSoleMesh` / `AicpuAllToAllSoleMeshUBX` | 机型二选一：`FLAG_FLAT_1D`（第0层非1D CLOS）/ `FLAG_UBX`，均不命中则报错 |
-| `sole[mesh.muti_channel]` | CCU | `CcuSchedAllToAllMesh1DMultiJetty` | 唯一候选 |
+| `sole[mesh.multi_channel]` | CCU | `CcuSchedAllToAllMesh1DMultiJetty` | 唯一候选 |
 | `sole[mesh]` | CCU | `CcuSchedAllToAllSoleMesh` | 唯一候选 |
 
 **表12**  AllToAllV（3组合）
@@ -266,7 +266,7 @@ AscendC::Mc2CcTilingConfig mc2CcTilingConfig(groupName, opType, algConfig);
 语法错误——属性拼写错误：
 
 ```text
-[MC2_EXT_ALG] ERROR: parse failed, algConfig[parallel[mesh, nhr.multi_channel]], opType[6], reason[unknown attribute "multi_channel" in layer 2 of "parallel[mesh, nhr.multi_channel]" (expected one of: chunk, one_shot, two_shot, muti_channel, single_channel) in "parallel[mesh, nhr.multi_channel]"].
+[MC2_EXT_ALG] ERROR: parse failed, algConfig[parallel[mesh, nhr.multi_channel]], opType[6], reason[unknown attribute "multi_channel" in layer 2 of "parallel[mesh, nhr.multi_channel]" (expected one of: chunk, one_shot, two_shot, multi_channel, single_channel) in "parallel[mesh, nhr.multi_channel]"].
 ```
 
 候选为空——外部名无对应注册：
