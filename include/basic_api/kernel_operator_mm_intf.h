@@ -336,6 +336,20 @@ __aicore__ inline void LoadDataWithTranspose(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2dTransposeParamsV2& loadDataParams);
 
 /* **************************************************************************************************
+ * LoadDataWithDecomp                                             *
+ * ************************************************************************************************* */
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+__aicore__ inline void EnableS4ToS8();
+
+__aicore__ inline void EnableS3ToS8();
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DDecompParamsV2& loadDataDecompParams);
+#endif
+
+/* **************************************************************************************************
  * Mmad                                             *
  * ************************************************************************************************* */
 /*
@@ -432,7 +446,7 @@ __aicore__ inline void Mmad(
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
-    MmadBitModeParams& mmadParams);
+    const MmadBitModeParams& mmadParams);
 
 #if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
 /* [CUBE-PTR-PR4] Mmad BitMode L0A×L0B→L0C — Jessicaruan Wave3 */
@@ -440,7 +454,7 @@ template <typename T, typename U, typename S>
 __aicore__ inline void Mmad(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadBitModeParams& mmadParams);
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(
-    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __biasbuf__ V* bias, MmadBitModeParams& mmadParams);
+    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __biasbuf__ V* bias, const MmadBitModeParams& mmadParams);
 #endif
 #endif
 
@@ -480,15 +494,15 @@ __aicore__ inline void MmadMx(
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void MmadMx(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
-    MmadBitModeParams& mmadParams);
+    const MmadBitModeParams& mmadParams);
 
 #if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__) && defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 /* [CUBE-PTR-PR4] MmadMx BitMode — Jessicaruan Wave3 */
 template <typename T, typename U, typename S>
-__aicore__ inline void MmadMx(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, MmadBitModeParams& mmadParams);
+__aicore__ inline void MmadMx(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadBitModeParams& mmadParams);
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void MmadMx(
-    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __biasbuf__ V* bias, MmadBitModeParams& mmadParams);
+    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __biasbuf__ V* bias, const MmadBitModeParams& mmadParams);
 #endif
 
 template <

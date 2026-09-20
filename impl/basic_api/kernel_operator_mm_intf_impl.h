@@ -527,6 +527,23 @@ __aicore__ inline void LoadDataWithTranspose(
 }
 
 /* **************************************************************************************************
+ * LoadDataWithDecomp                                             *
+ * ************************************************************************************************* */
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+__aicore__ inline void EnableS4ToS8() { EnableS4ToS8Impl(); }
+
+__aicore__ inline void EnableS3ToS8() { EnableS3ToS8Impl(); }
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DDecompParamsV2& loadDataDecompParams)
+{
+    LoadDataImpl<T>(dst, src, loadDataDecompParams);
+}
+#endif
+
+/* **************************************************************************************************
  * Mmad                                             *
  * ************************************************************************************************* */
 /*
@@ -667,7 +684,7 @@ __aicore__ inline void Mmad(
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
-    MmadBitModeParams& mmadParams)
+    const MmadBitModeParams& mmadParams)
 {
     MmadImpl(dst, fm, filter, bias, mmadParams);
 }
@@ -687,7 +704,7 @@ __aicore__ inline void MmadMx(
     MmadMxImpl(dst, fm, filter, bias, mmadParams);
 }
 
-template <typename T, typename U, typename S, typename R>
+template <typename T, typename U, typename S>
 __aicore__ inline void MmadMx(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
     const MmadBitModeParams& mmadParams)
@@ -695,10 +712,10 @@ __aicore__ inline void MmadMx(
     MmadMxImpl(dst, fm, filter, mmadParams);
 }
 
-template <typename T, typename U, typename S, typename V, typename R>
+template <typename T, typename U, typename S, typename V>
 __aicore__ inline void MmadMx(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
-    MmadBitModeParams& mmadParams)
+    const MmadBitModeParams& mmadParams)
 {
     MmadMxImpl(dst, fm, filter, bias, mmadParams);
 }
@@ -712,22 +729,25 @@ __aicore__ inline void Mmad(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const
 }
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(
-    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __biasbuf__ V* bias, MmadBitModeParams& mmadParams)
+    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __biasbuf__ V* bias, const MmadBitModeParams& mmadParams)
 {
-    mmadParams.SetCmatrixSource(true);
-    MmadCal(dst, fm, filter, (uint64_t)bias, mmadParams);
+    MmadBitModeParams localMmadParams = mmadParams;
+    localMmadParams.SetCmatrixSource(true);
+    MmadCal(dst, fm, filter, (uint64_t)bias, localMmadParams);
 }
 template <typename T, typename U, typename S>
-__aicore__ inline void MmadMx(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, MmadBitModeParams& mmadParams)
+__aicore__ inline void MmadMx(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadBitModeParams& mmadParams)
 {
-    MmadMxCal(dst, fm, filter, mmadParams);
+    MmadBitModeParams localMmadParams = mmadParams;
+    MmadMxCal(dst, fm, filter, localMmadParams);
 }
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void MmadMx(
-    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __biasbuf__ V* bias, MmadBitModeParams& mmadParams)
+    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __biasbuf__ V* bias, const MmadBitModeParams& mmadParams)
 {
-    mmadParams.SetCmatrixSource(true);
-    MmadMxCal(dst, fm, filter, (uint64_t)bias, mmadParams);
+    MmadBitModeParams localMmadParams = mmadParams;
+    localMmadParams.SetCmatrixSource(true);
+    MmadMxCal(dst, fm, filter, (uint64_t)bias, localMmadParams);
 }
 #endif
 #endif
