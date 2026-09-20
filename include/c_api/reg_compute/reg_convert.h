@@ -25,7 +25,6 @@
 #include "impl/c_api/reg_base_impl/reg_convert_intf_impl.h"
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 // ASC_RETURN_VALUE_VCONV_API
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_float2e4m3_rn(
     vector_float src, vector_bool mask,
@@ -3347,8 +3346,6 @@ __simd_callee__ inline void asc_cast(
     vector_uint8_t& dst, vector_uint32_t src, vector_bool mask,
     std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER> dst_pos);
-#endif
-
 // ==========asc_bfloat162half(rd/ru/rz/rn/rna)==========
 __simd_callee__ inline vector_half asc_bfloat162half_rd(vector_bfloat16_t src, vector_bool mask);
 
