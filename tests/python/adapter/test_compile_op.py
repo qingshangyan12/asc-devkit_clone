@@ -120,12 +120,14 @@ class TestCompileOp(unittest.TestCase):
         self.assertIn("tmpTilingSizeForOOM + 32", init_source)
         self.assertIn("OOMHasStorageShapeHeader(oomStorageShapeCursor)", init_source)
         self.assertIn(
-            "OOMTryRegisterTensorWithStorageShape(oomStorageShapeCursor, x, 4)",
+            "OOMTryRegisterTensorWithStorageShape("
+            "oomStorageShapeCursor, x, static_cast<uint64_t>(4))",
             tensor_source,
         )
         self.assertIn("OOMCheckAddrRange(x, inputShapeLen)", tensor_source)
         self.assertIn(
-            "OOMTryRegisterTensorListWithStorageShape(oomStorageShapeCursor, xs, 2)",
+            "OOMTryRegisterTensorListWithStorageShape("
+            "oomStorageShapeCursor, xs, static_cast<uint64_t>(2))",
             tensor_list_source,
         )
         self.assertIn("OOMCheckTensorListRange(xs, 2)", tensor_list_source)
