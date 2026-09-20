@@ -663,6 +663,10 @@ class ManifestPackageWriter:
         for record in records:
             output_name = f"{kernel.kernel_name}.{_core_suffix(record.core_type)}.o"
             command = {"type": "compile", "cmd": self._normalize_compile_command(record, output_name)}
+            if "-D__ASCENDC_DEFINE_OP_SYSTEM_RUN_CFG__" not in command["cmd"]:
+                source_reference = _resource_placeholder(self._resource_path, self._wrapper_paths[record.source_path])
+                source_index = command["cmd"].index(source_reference)
+                command["cmd"].insert(source_index, "-D__ASCENDC_DEFINE_OP_SYSTEM_RUN_CFG__")
             commands.append(command)
             self._wrapper_commands.append(command)
             outputs.append(_output_placeholder(output_name))

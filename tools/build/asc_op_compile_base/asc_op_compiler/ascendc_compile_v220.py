@@ -565,6 +565,8 @@ def call_bisheng_v220(
         CommonUtility().ascendc_write_file(compile_info.gen_kernel_func_file, new_sources)
 
         compile_cmd += [f"-D{TILING_KEY_MACRO}={tiling_info.tiling_key}UL"]
+        if CommonUtility.is_v220() and code_channel in (CORE_TYPE_VEC, CORE_TYPE_CUBE):
+            compile_cmd.append("-D__ASCENDC_DEFINE_OP_SYSTEM_RUN_CFG__")
         CommonUtility.run_cmd_inner(compile_cmd, CompileStage.COMPILE, compile_info.compile_log_path)
         return [f"{tiling_info.tiling_key}"]
     else:
@@ -578,6 +580,12 @@ def call_bisheng_v220(
                 tiling_key, compile_info, sub_arch, tiling_info, code_channel, compile_option_tuple
             )
             compile_cmd, kernel_name = compile_single_tiling_v220(param)
+            if (
+                CommonUtility.is_v220()
+                and code_channel in (CORE_TYPE_VEC, CORE_TYPE_CUBE)
+                and tiling_key == compile_info.tiling_key_list[0]
+            ):
+                compile_cmd.append("-D__ASCENDC_DEFINE_OP_SYSTEM_RUN_CFG__")
             core_type = (
                 "cube"
                 if (sub_arch is None and code_channel == CORE_TYPE_CUBE)

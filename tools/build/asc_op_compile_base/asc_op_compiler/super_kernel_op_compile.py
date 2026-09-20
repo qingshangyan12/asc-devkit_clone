@@ -118,15 +118,8 @@ def gen_super_kernel_link_obj_sequence(
 
 
 def gen_system_run_cfg(kernel_type):
-    file_header = ""
-    if kernel_type == KernelMetaType.KERNEL_TYPE_AIV_ONLY or kernel_type == KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0:
-        file_header += "#if (defined(__DAV_VEC__) && __NPU_ARCH__ == 2201)\n"
-    else:
-        file_header += "#if (defined(__DAV_CUBE__) && __NPU_ARCH__ == 2201)\n"
-
+    file_header = "#if __NPU_ARCH__ == 2201 && defined(__ASCENDC_DEFINE_OP_SYSTEM_RUN_CFG__)\n"
     file_header += f"    __gm__ struct OpSystemRunCfg g_opSystemRunCfg = {{{0}}};\n"
-    file_header += "#else\n"
-    file_header += "    extern __gm__ struct OpSystemRunCfg g_opSystemRunCfg;\n"
     file_header += "#endif\n\n"
     return file_header
 
