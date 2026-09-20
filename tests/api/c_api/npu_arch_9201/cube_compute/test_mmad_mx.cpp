@@ -45,9 +45,9 @@
     {                                                                                                                 \
         __cc__ float* c_matrix = reinterpret_cast<__cc__ float*>(1);                                                  \
         __ca__ a_type* a_matrix = reinterpret_cast<__ca__ a_type*>(2);                                                \
-        __ca__ a_scale_type* scale_a_matrix = reinterpret_cast<__ca__ a_scale_type*>(4);                              \
+        uint64_t scale_a_matrix = 4;                                                                                  \
         __cb__ b_type* b_matrix = reinterpret_cast<__cb__ b_type*>(3);                                                \
-        __cb__ b_scale_type* scale_b_matrix = reinterpret_cast<__cb__ b_scale_type*>(5);                              \
+        uint64_t scale_b_matrix = 5;                                                                                  \
         expected_bias_##type_prefix = 0;                                                                              \
                                                                                                                       \
         asc_mmad_mx(                                                                                                  \
@@ -60,9 +60,9 @@
     {                                                                                                                 \
         __cc__ float* c_matrix = reinterpret_cast<__cc__ float*>(1);                                                  \
         __ca__ a_type* a_matrix = reinterpret_cast<__ca__ a_type*>(2);                                                \
-        __ca__ a_scale_type* scale_a_matrix = reinterpret_cast<__ca__ a_scale_type*>(4);                              \
+        uint64_t scale_a_matrix = 4;                                                                                  \
         __cb__ b_type* b_matrix = reinterpret_cast<__cb__ b_type*>(3);                                                \
-        __cb__ b_scale_type* scale_b_matrix = reinterpret_cast<__cb__ b_scale_type*>(5);                              \
+        uint64_t scale_b_matrix = 5;                                                                                  \
         constexpr uint64_t bias = 7;                                                                                  \
         expected_bias_##type_prefix = bias;                                                                           \
                                                                                                                       \
