@@ -504,6 +504,35 @@ presmoke_verify_tiling_sink_task_log_for_pid 222 '{marker}'
         self.assertIn("308M", reason)
         self.assertEqual(modes, ["cpu"])
 
+    def test_validated_workaround_cases_are_enabled(self) -> None:
+        project_root = Path(__file__).resolve().parents[3]
+        manifest = json.loads(
+            (
+                project_root / "scripts/presmoke/reports/case_runner_manifest.json"
+            ).read_text(encoding="utf-8")
+        )
+        cases = [
+            "01_simd_cpp_api/02_features/00_framework/03_ge/triple_chevron_notation",
+            *(
+                f"01_simd_cpp_api/03_basic_api/05_sync_control/cross_core_set_wait_flag__scenario_{i}"
+                for i in range(3)
+            ),
+            "01_simd_cpp_api/03_basic_api/05_sync_control/data_sync_barrier",
+        ]
+        by_name = {item["case"]: item for item in manifest}
+        for name in cases:
+            with self.subTest(case=name):
+                entry = by_name[name]
+                self.assertFalse(entry["skip"])
+                self.assertEqual(entry["skip_reason"], "")
+                runner = (project_root / entry["runner"]).read_text(encoding="utf-8")
+                self.assertNotIn("SKIP_REASON=", runner)
+                self.assertNotIn("SKIP_MODES=", runner)
+                for arch in entry["supported_archs"]:
+                    self.assertEqual(
+                        explicit_skip_config(entry["source_case"], arch), ("", [], [])
+                    )
+
     def test_matmul_fp8_is_950_only(self) -> None:
         project_root = Path(__file__).resolve().parents[3]
         example_dir = (
