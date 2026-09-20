@@ -155,6 +155,13 @@ def setup_super_kernel_option_parsers_ge() -> ParserFactory:
     factory = ParserFactory()
 
     # register validation
+    _register_sk_code_and_mode_parsers(factory)
+    _register_sk_sync_and_value_parsers(factory)
+
+    return factory
+
+
+def _register_sk_code_and_mode_parsers(factory: ParserFactory) -> None:
     factory.register(CodeTextAlignParser("func-align"))
     factory.register(
         EnumParser(
@@ -194,6 +201,8 @@ def setup_super_kernel_option_parsers_ge() -> ParserFactory:
             },
         )
     )
+
+def _register_sk_sync_and_value_parsers(factory: ParserFactory) -> None:
     factory.register(
         EnumParser(
             "debug-sync-all",
@@ -230,8 +239,6 @@ def setup_super_kernel_option_parsers_ge() -> ParserFactory:
     factory.register(NumberParser("split-mode"))
     factory.register(BlockNumParser("debug-aic-num"))
     factory.register(BlockNumParser("debug-aiv-num"))
-
-    return factory
 
 
 def setup_super_kernel_option_parsers_aclgraph() -> ParserFactory:

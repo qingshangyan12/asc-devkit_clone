@@ -59,6 +59,14 @@ class SubOperatorInfos:
         self, index, info_dict, stream_index: int, op_options, compile_log_path=None
     ):
         keys_list = list(info_dict.keys())
+        self._init_kernel_state(index, info_dict, stream_index, compile_log_path)
+        self._init_option_state(op_options)
+        # code_gen of dynamic op
+        self._gen_code_for_dynamic_op()
+
+    def _init_kernel_state(
+        self, index, info_dict, stream_index: int, compile_log_path
+    ):
         self.json_path: str = info_dict["json_path"]
         self.bin_path: list = info_dict["bin_path"]
         self.compile_log_path: str = compile_log_path
@@ -93,6 +101,8 @@ class SubOperatorInfos:
         self.preload_call_block: str = ""
         self.early_start_complement_set_flag_block: str = ""
         self.early_start_complement_wait_flag_block: str = ""
+
+    def _init_option_state(self, op_options):
         self.early_start_mode: SuperKernelEarlyStartMode = op_options.get(
             "early-start", SuperKernelEarlyStartMode.EarlyStartEnableV2
         )
@@ -133,8 +143,6 @@ class SubOperatorInfos:
             for part_op in op_options.get("dcci-disable-on-kernel", "").split(",")
             if part_op.strip()
         ]
-        # code_gen of dynamic op
-        self._gen_code_for_dynamic_op()
 
     def _gen_code_for_dynamic_op(self):
         self.call_dynamic_switch_func: str = ""

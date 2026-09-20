@@ -175,30 +175,7 @@ def normalize_nop_ops(op_list):
 
 class SuperOperatorInfos:
     def __init__(self, kernel_infos, super_kernel_name):
-        self.sub_decl_list = {}
-        self.op_list = normalize_nop_ops(kernel_infos["op_list"])
-        self.kernel_name: str = super_kernel_name
-        self.compile_log_path = None
-        self.creat_compile_log()
-        self.info_base = []
-        self.super_kernel_params = []
-        self.enable_double_stream: bool = False
-        self.op_options = parse_super_kernel_options(
-            kernel_infos.get("super_kernel_options", "")
-        )
-        self.split_mode = self.op_options.get("split-mode", 4)
-        self.profiling_mode = self.op_options.get(
-            "profiling", SuperKernelProfilingMode.ProfilingDisable
-        )
-        self.stream_fusin_mode = self.op_options.get(
-            "stream-fusion", SuperKernelStreamFusionMode.StreamFusionDisable
-        )
-        self.feed_sync_all_mode = self.op_options.get(
-            "feed-sync-all", SuperKernelFeedSyncAllMode.FeedSyncAllDisable
-        )
-        self.debug_aic_num: int = self.op_options.get("debug-aic-num", 0)
-        self.debug_aiv_num: int = self.op_options.get("debug-aiv-num", 0)
-        self.inner_event_id_set = set()
+        self._init_base_fields(kernel_infos, super_kernel_name)
         for index, op_info in enumerate(self.op_list):
             if "json_path" not in op_info:
                 continue
@@ -230,15 +207,44 @@ class SuperOperatorInfos:
         self.vec_op_list: list = []
         self.gen_compile_info()
         if self.enable_double_stream is True:
-            self.split_op_by_kernel_type()
-            self.insert_sync_by_stream_idx()
-            self.print_send_recv_info("[Sync by stream idx]")
-            self.insert_sync_by_event()
-            self.print_send_recv_info("[Sync by evnet]")
-            self.insert_sync_for_notify()
-            self.print_send_recv_info("[Sync by notify]")
-            self.optimize_sync_pass()
-            self.print_send_recv_info("[After Optimize]")
+            self._sync_double_stream_ops()
+
+    def _init_base_fields(self, kernel_infos, super_kernel_name):
+        self.sub_decl_list = {}
+        self.op_list = normalize_nop_ops(kernel_infos["op_list"])
+        self.kernel_name: str = super_kernel_name
+        self.compile_log_path = None
+        self.creat_compile_log()
+        self.info_base = []
+        self.super_kernel_params = []
+        self.enable_double_stream: bool = False
+        self.op_options = parse_super_kernel_options(
+            kernel_infos.get("super_kernel_options", "")
+        )
+        self.split_mode = self.op_options.get("split-mode", 4)
+        self.profiling_mode = self.op_options.get(
+            "profiling", SuperKernelProfilingMode.ProfilingDisable
+        )
+        self.stream_fusin_mode = self.op_options.get(
+            "stream-fusion", SuperKernelStreamFusionMode.StreamFusionDisable
+        )
+        self.feed_sync_all_mode = self.op_options.get(
+            "feed-sync-all", SuperKernelFeedSyncAllMode.FeedSyncAllDisable
+        )
+        self.debug_aic_num: int = self.op_options.get("debug-aic-num", 0)
+        self.debug_aiv_num: int = self.op_options.get("debug-aiv-num", 0)
+        self.inner_event_id_set = set()
+
+    def _sync_double_stream_ops(self):
+        self.split_op_by_kernel_type()
+        self.insert_sync_by_stream_idx()
+        self.print_send_recv_info("[Sync by stream idx]")
+        self.insert_sync_by_event()
+        self.print_send_recv_info("[Sync by evnet]")
+        self.insert_sync_for_notify()
+        self.print_send_recv_info("[Sync by notify]")
+        self.optimize_sync_pass()
+        self.print_send_recv_info("[After Optimize]")
 
     def gen_op_options(self):
         self.link_mode: SuperKernelLinkMode = self.op_options.get(
@@ -1201,7 +1207,7 @@ class SuperOperatorInfos:
         for sub_external_option in external_option:
             options.append(sub_external_option)
 
-    def gen_compile_info(self):
+    def _gen_compile_options(self):
         options = ["-x", "cce"]
         ascend_home_path = os.environ.get("ASCEND_HOME_PATH")
         import platform
@@ -1231,6 +1237,10 @@ class SuperOperatorInfos:
                 os.path.join(ascend_home_path, "compiler", "asc")
             )
 
+        self._append_asc_include_options(options, asc_path)
+        return options
+
+    def _append_asc_include_options(self, options, asc_path):
         options.append("-I" + os.path.join(asc_path, "impl", "adv_api"))
         options.append("-I" + os.path.join(asc_path, "impl", "basic_api"))
         options.append("-I" + os.path.join(asc_path, "impl", "c_api"))
@@ -1260,8 +1270,36 @@ class SuperOperatorInfos:
         options.append(
             "-I" + os.path.join(asc_path, "..", "tikcpp", "tikcfw", "interface")
         )
-        exist_dynamic_sub_ops = False
 
+    def gen_compile_info(self):
+        options = self._gen_compile_options()
+        exist_dynamic_sub_ops = False
+        (
+            param_offset,
+            notify_param_offset,
+            notify_before_call_param_offset,
+            wait_param_offset,
+            recv_event_list,
+            send_event_list,
+            notify_before_call_event_list,
+        ) = self._collect_sub_operator_offsets()
+        sub_operator_info, exist_dynamic_sub_ops = self._collect_sub_operator_info(
+            exist_dynamic_sub_ops
+        )
+        self._fill_compile_info(
+            options,
+            sub_operator_info,
+            exist_dynamic_sub_ops,
+            param_offset,
+            notify_param_offset,
+            notify_before_call_param_offset,
+            wait_param_offset,
+            recv_event_list,
+            send_event_list,
+            notify_before_call_event_list,
+        )
+
+    def _collect_sub_operator_offsets(self):
         param_offset = []
         for sub_operator in self.info_base:
             param_offset.append(sub_operator.param_offset)
@@ -1294,6 +1332,17 @@ class SuperOperatorInfos:
                 sub_operator.notify_before_call_event_list
             )
 
+        return (
+            param_offset,
+            notify_param_offset,
+            notify_before_call_param_offset,
+            wait_param_offset,
+            recv_event_list,
+            send_event_list,
+            notify_before_call_event_list,
+        )
+
+    def _collect_sub_operator_info(self, exist_dynamic_sub_ops):
         sub_operator_info = []
         for sub_operator in self.info_base:
             operator_info = {}
@@ -1310,65 +1359,95 @@ class SuperOperatorInfos:
             )
             sub_operator_info.append(operator_info)
             if sub_operator.dynamic_bin is None and sub_operator.split_mode > 1:
-                for i in range(1, sub_operator.split_mode):
-                    cur_operator_info = {}
-                    new_sub_op_sub_kernel_names = []
-                    if sub_operator.aiv_bin is not None:
-                        if sub_operator.split_mode_in_json is None:
-                            split_o_path, new_kernel_name = (
-                                self.split_o_in_super_kernel(
-                                    sub_operator.aiv_bin, origin_aiv_kernel_name, i
-                                )
-                            )
-                        else:
-                            split_o_path = sub_operator.aiv_bin[:-2] + f"_split{i}.o"
-                            new_kernel_name = f"{origin_aiv_kernel_name}_split{i}"
-                        cur_operator_info["aiv_bin"] = split_o_path
-                        new_sub_op_sub_kernel_names.append(f"{new_kernel_name}")
-                    if sub_operator.aic_bin is not None:
-                        if sub_operator.split_mode_in_json is None:
-                            split_o_path, new_kernel_name = (
-                                self.split_o_in_super_kernel(
-                                    sub_operator.aic_bin, origin_aic_kernel_name, i
-                                )
-                            )
-                        else:
-                            split_o_path = sub_operator.aic_bin[:-2] + f"_split{i}.o"
-                            new_kernel_name = f"{origin_aic_kernel_name}_split{i}"
-                        cur_operator_info["aic_bin"] = split_o_path
-                        new_sub_op_sub_kernel_names.append(f"{new_kernel_name}")
-                    cur_operator_info["sub_kernel_names"] = new_sub_op_sub_kernel_names
-                    sub_operator_info.append(cur_operator_info)
-            elif sub_operator.split_mode > 1:
-                dynamic_func_names = sub_operator.called_kernel_name[
-                    "dynamic_func_names"
-                ]
-                kernel_meta_dir = CommonUtility.get_kernel_meta_dir()
-                rename_file_path_list = []
-                for i in range(1, sub_operator.split_mode):
-                    rename_file_name = f"{sub_operator.kernel_name}_rename_file_{i}.txt"
-                    rename_file_path_list.append(
-                        os.path.join(kernel_meta_dir, rename_file_name)
-                    )
-                new_kernel_names_list = gen_symbol_rename_file(
-                    dynamic_func_names, rename_file_path_list, sub_operator.split_mode
+                self._split_static_sub_op_bins(
+                    sub_operator,
+                    origin_aiv_kernel_name,
+                    origin_aic_kernel_name,
+                    sub_operator_info,
                 )
-                orign_bin_path = operator_info["dynamic_bin"]
-                for i in range(1, sub_operator.split_mode):
-                    cur_operator_info = {}
-                    split_o_path = split_dynamic_o_in_super_kernel(
-                        orign_bin_path,
-                        rename_file_path_list[i - 1],
-                        i,
-                        self.compile_log_path,
-                    )
-                    cur_operator_info["dynamic_bin"] = split_o_path
-                    cur_operator_info["sub_kernel_names"] = new_kernel_names_list[i - 1]
-                    sub_operator_info.append(cur_operator_info)
-                if "dump_cce" in get_op_debug_config():
-                    for rename_file in rename_file_path_list:
-                        os.remove(rename_file)
+            elif sub_operator.split_mode > 1:
+                self._split_dynamic_sub_op_bins(
+                    sub_operator, operator_info, sub_operator_info
+                )
 
+        return sub_operator_info, exist_dynamic_sub_ops
+
+    def _split_static_sub_op_bins(
+        self,
+        sub_operator,
+        origin_aiv_kernel_name,
+        origin_aic_kernel_name,
+        sub_operator_info,
+    ):
+        for i in range(1, sub_operator.split_mode):
+            cur_operator_info = {}
+            new_sub_op_sub_kernel_names = []
+            if sub_operator.aiv_bin is not None:
+                if sub_operator.split_mode_in_json is None:
+                    split_o_path, new_kernel_name = self.split_o_in_super_kernel(
+                        sub_operator.aiv_bin, origin_aiv_kernel_name, i
+                    )
+                else:
+                    split_o_path = sub_operator.aiv_bin[:-2] + f"_split{i}.o"
+                    new_kernel_name = f"{origin_aiv_kernel_name}_split{i}"
+                cur_operator_info["aiv_bin"] = split_o_path
+                new_sub_op_sub_kernel_names.append(f"{new_kernel_name}")
+            if sub_operator.aic_bin is not None:
+                if sub_operator.split_mode_in_json is None:
+                    split_o_path, new_kernel_name = self.split_o_in_super_kernel(
+                        sub_operator.aic_bin, origin_aic_kernel_name, i
+                    )
+                else:
+                    split_o_path = sub_operator.aic_bin[:-2] + f"_split{i}.o"
+                    new_kernel_name = f"{origin_aic_kernel_name}_split{i}"
+                cur_operator_info["aic_bin"] = split_o_path
+                new_sub_op_sub_kernel_names.append(f"{new_kernel_name}")
+            cur_operator_info["sub_kernel_names"] = new_sub_op_sub_kernel_names
+            sub_operator_info.append(cur_operator_info)
+
+    def _split_dynamic_sub_op_bins(
+        self, sub_operator, operator_info, sub_operator_info
+    ):
+        dynamic_func_names = sub_operator.called_kernel_name["dynamic_func_names"]
+        kernel_meta_dir = CommonUtility.get_kernel_meta_dir()
+        rename_file_path_list = []
+        for i in range(1, sub_operator.split_mode):
+            rename_file_name = f"{sub_operator.kernel_name}_rename_file_{i}.txt"
+            rename_file_path_list.append(
+                os.path.join(kernel_meta_dir, rename_file_name)
+            )
+        new_kernel_names_list = gen_symbol_rename_file(
+            dynamic_func_names, rename_file_path_list, sub_operator.split_mode
+        )
+        orign_bin_path = operator_info["dynamic_bin"]
+        for i in range(1, sub_operator.split_mode):
+            cur_operator_info = {}
+            split_o_path = split_dynamic_o_in_super_kernel(
+                orign_bin_path,
+                rename_file_path_list[i - 1],
+                i,
+                self.compile_log_path,
+            )
+            cur_operator_info["dynamic_bin"] = split_o_path
+            cur_operator_info["sub_kernel_names"] = new_kernel_names_list[i - 1]
+            sub_operator_info.append(cur_operator_info)
+        if "dump_cce" in get_op_debug_config():
+            for rename_file in rename_file_path_list:
+                os.remove(rename_file)
+
+    def _fill_compile_info(
+        self,
+        options,
+        sub_operator_info,
+        exist_dynamic_sub_ops,
+        param_offset,
+        notify_param_offset,
+        notify_before_call_param_offset,
+        wait_param_offset,
+        recv_event_list,
+        send_event_list,
+        notify_before_call_event_list,
+    ):
         self.add_define_options(exist_dynamic_sub_ops, options)
         self.calc_workspace_size()
         self.compile_info = {
