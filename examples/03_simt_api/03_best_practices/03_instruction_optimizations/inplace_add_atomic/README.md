@@ -227,7 +227,7 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void vector_add_atomic(
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU仿真模式
   ```
 
-  > **注意：**切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
+  > 注意：切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
 
   编译选项说明：
 
@@ -259,7 +259,7 @@ make -j
 msopprof ./inplace_add_atomic
 ```
 
-> **关于性能采集时的Validation failed：**本样例的累加目标`a`在host侧分配时写入初值，kernel仅在其上累加。`msopprof`的warmup+replay会在同一块GM内存上重复执行kernel，`a`被累加多次，因此严格校验模式下会报`Validation failed`。该现象是replay机制与校验逻辑的固有冲突。采集性能时建议先以`-DSKIP_VALIDATION=ON`重新编译再执行`msopprof`，跳过校验。
+> 关于性能采集时的Validation failed：本样例的累加目标`a`在host侧分配时写入初值，kernel仅在其上累加。`msopprof`的warmup+replay会在同一块GM内存上重复执行kernel，`a`被累加多次，因此严格校验模式下会报`Validation failed`。该现象是replay机制与校验逻辑的固有冲突。采集性能时建议先以`-DSKIP_VALIDATION=ON`重新编译再执行`msopprof`，跳过校验。
 
 命令完成后，会在默认目录下生成以"OPPROF_{timestamp}_XXX"命名的文件夹，性能数据文件夹结构示例如下：
 

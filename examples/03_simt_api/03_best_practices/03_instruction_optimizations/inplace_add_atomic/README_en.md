@@ -228,7 +228,7 @@ Run the following steps in the root directory of this sample to build and execut
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU simulation mode
   ```
 
-  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+  > Note: Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
 
   Build Options Description:
 
@@ -260,7 +260,7 @@ make -j
 msopprof ./inplace_add_atomic
 ```
 
-> **Regarding Validation failed during performance collection:** In this sample, the accumulation target `a` is initialized on the host side at allocation, and the kernel only accumulates on it. The `msopprof` warmup+replay re-executes the kernel on the same GM memory, causing `a` to be accumulated multiple times; therefore, strict validation mode reports `Validation failed`. This is an inherent conflict between the replay mechanism and the validation logic. When collecting performance, it is recommended to rebuild with `-DSKIP_VALIDATION=ON` before running `msopprof` to skip validation.
+> Regarding Validation failed during performance collection: In this sample, the accumulation target `a` is initialized on the host side at allocation, and the kernel only accumulates on it. The `msopprof` warmup+replay re-executes the kernel on the same GM memory, causing `a` to be accumulated multiple times; therefore, strict validation mode reports `Validation failed`. This is an inherent conflict between the replay mechanism and the validation logic. When collecting performance, it is recommended to rebuild with `-DSKIP_VALIDATION=ON` before running `msopprof` to skip validation.
 
 After the command completes, a folder named "OPPROF_{timestamp}_XXX" is generated in the default directory. The performance data folder structure is as follows:
 
