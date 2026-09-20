@@ -1,4 +1,4 @@
-# interleave(掩码交织)
+# interleave（掩码交织）
  
 ## 产品支持情况
  
@@ -46,9 +46,9 @@ __simd_callee__ inline reg_pair<bool> interleave(
  
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `DataType` | 输入 | 模板参数，用于确定Mask的元素分组宽度，支持b8、b16和b32数据类型。 |
-| `src0` | 输入 | 第一个源Mask寄存器，类型为`reg_tensor<bool>`，必须保证其`reg`成员已初始化。 |
-| `src1` | 输入 | 第二个源Mask寄存器，类型为`reg_tensor<bool>`，必须保证其`reg`成员已初始化。 |
+| DataType | 输入 | 模板参数，用于确定Mask的元素分组宽度，支持b8、b16和b32数据类型。 |
+| src0 | 输入 | 第一个源Mask寄存器，类型为`reg_tensor<bool>`，必须保证其`reg`成员已初始化。 |
+| src1 | 输入 | 第二个源Mask寄存器，类型为`reg_tensor<bool>`，必须保证其`reg`成员已初始化。 |
  
 ## 返回值说明
  
