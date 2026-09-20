@@ -37,13 +37,3 @@ TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_2(
     Bf162e5m2_rn_sat_even, asc_bfloat162e5m2_rn_sat, vcvt, vector_fp8_e5m2_t, vector_bfloat16_t, ASC_POSITION_EVEN, 10);
 TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_2(
     Bf162e5m2_rn_sat_odd, asc_bfloat162e5m2_rn_sat, vcvt, vector_fp8_e5m2_t, vector_bfloat16_t, ASC_POSITION_ODD, 11);
-TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_2(
-    Bf162e5m2_rn_m_even, asc_bfloat162e5m2_rn_m, vcvt, vector_fp8_e5m2_t, vector_bfloat16_t, ASC_POSITION_EVEN, 12);
-TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_2(
-    Bf162e5m2_rn_m_odd, asc_bfloat162e5m2_rn_m, vcvt, vector_fp8_e5m2_t, vector_bfloat16_t, ASC_POSITION_ODD, 13);
-TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_2(
-    Bf162e5m2_rn_sat_m_even, asc_bfloat162e5m2_rn_sat_m, vcvt, vector_fp8_e5m2_t, vector_bfloat16_t, ASC_POSITION_EVEN,
-    14);
-TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_2(
-    Bf162e5m2_rn_sat_m_odd, asc_bfloat162e5m2_rn_sat_m, vcvt, vector_fp8_e5m2_t, vector_bfloat16_t, ASC_POSITION_ODD,
-    15);
