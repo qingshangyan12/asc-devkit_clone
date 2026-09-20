@@ -13,6 +13,21 @@
 #include "stub_fun.h"
 #include "c_api/defs/enum.h"
 
+// fp8_e6m2 / hif4x2 host stubs (before defs/type.h include)
+#if !defined(fp8_e6m2_t)
+namespace float8_e6m2 {
+struct Fp8e6m2T {
+    uint8_t val;
+};
+} // namespace float8_e6m2
+using fp8_e6m2_t = float8_e6m2::Fp8e6m2T;
+using vector_f8e6m2 = std::array<fp8_e6m2_t, ConstantsInternal::b8EleSize>;
+struct hifloat4x2_t {
+    uint8_t val;
+};
+using vector_hif4x2 = std::array<hifloat4x2_t, ConstantsInternal::b8EleSize>;
+#endif
+
 template <typename C, typename A, typename B>
 inline void mad(
     __cc__ C* c_matrix, __ca__ A* a_matrix, __cb__ B* b_matrix, uint16_t left_height, uint16_t n_dim,
