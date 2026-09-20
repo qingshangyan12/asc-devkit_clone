@@ -209,6 +209,34 @@ template <
 __aicore__ inline void LoadDataWithStride(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV2<U>& loadDataParams);
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+/* [CUBE-PTR-PR3] LoadDataWithStride 3DV2 L1(__cbuf__) -> L0A/L0B — Jessicaruan Wave2 */
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadDataWithStride(
+    __ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams);
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadDataWithStride(
+    __cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams);
+
+/* [CUBE-PTR-PR3] LoadData 3DV2 L1(__cbuf__) -> L0A/L0B — Jessicaruan Wave2 */
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams);
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams);
+#endif // 3510|5102
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
+
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
                               (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <TPosition DstPos, TPosition SrcPos, typename T>
@@ -365,25 +393,20 @@ __aicore__ inline __inout_pipe__(V) void BroadCastVecToMM(
     __cc__ T* dst, __ubuf__ T* src, const int32_t blockCount, const uint8_t blockLen, const uint8_t srcGap,
     const uint8_t dstGap);
 
-template <
-    typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+template <typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
 __aicore__ inline void Fill(__ca__ T* dst, const InitConstValueParams<U>& initConstValueParams);
-template <
-    typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+template <typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
 __aicore__ inline void Fill(__cb__ T* dst, const InitConstValueParams<U>& initConstValueParams);
-template <
-    typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+template <typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
 __aicore__ inline void Fill(__cbuf__ T* dst, const InitConstValueParams<U>& initConstValueParams);
-template <
-    typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+template <typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
 __aicore__ inline void InitConstValue(__ca__ T* dst, const InitConstValueParams<U>& initConstValueParams);
-template <
-    typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+template <typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
 __aicore__ inline void InitConstValue(__cb__ T* dst, const InitConstValueParams<U>& initConstValueParams);
-template <
-    typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+template <typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
 __aicore__ inline void InitConstValue(__cbuf__ T* dst, const InitConstValueParams<U>& initConstValueParams);
 #endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
+
 
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(
