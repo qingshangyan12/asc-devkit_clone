@@ -155,8 +155,8 @@ __simd_callee__ inline reg_tensor<bool> operator>=(
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| src0 | 输入 | 源操作数，类型为reg_tensor<T>或标量T。 |
-| src1 | 输入 | 源操作数，类型为reg_tensor<T>或标量T。 |
+| src0 | 输入 | 源操作数，类型为`reg_tensor<T>`或标量T。 |
+| src1 | 输入 | 源操作数，类型为`reg_tensor<T>`或标量T。 |
 
 ## 数据类型
 
@@ -164,11 +164,12 @@ __simd_callee__ inline reg_tensor<bool> operator>=(
 
 ## 返回值说明
 
-返回类型为reg_tensor<bool>;。返回值的reg保存逐元素比较结果：对应位置为1表示比较结果成立，为0表示比较结果不成立。当src0和src1都为reg_tensor类型时，返回值的mask和src0的mask值相同，当src0和src1分别为reg_tensor和标量形式时，，返回值的mask和reg_tensor操作数的mask相同。
+返回类型为`reg_tensor<bool>`;。返回值的reg保存逐元素比较结果：对应位置为1表示比较结果成立，为0表示比较结果不成立。当src0和src1都为reg_tensor类型时，返回值的mask和src0的mask值相同，当src0和src1分别为reg_tensor和标量形式时，，返回值的mask和reg_tensor操作数的mask相同。
 
 ## 约束说明
 
 - 用于控制计算的mask需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
+- 本接口应在Vector Function（`__simd_vf__`标记的函数）内调用。
 - 输入mask比特位为0时，计算结果对应比特位写0。
 - 浮点比较时，+0.0与-0.0视为相等。
 - 浮点比较输入含nan时，计算结果对应比特位写0。
