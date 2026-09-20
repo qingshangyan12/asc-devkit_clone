@@ -682,31 +682,23 @@ HcclResult CheckForcedAlgResource(
     return HCCL_SUCCESS;
 }
 
-ForcedAlgKind GetForcedAlg(
+ForcedAlgKind ClassifyForcedAlg(
     const Mc2CcTilingInner* ccTiling, std::string& algName, ExternalAlgSpec& extSpec, std::string& extParseErrMsg)
 {
     algName.clear();
     extParseErrMsg.clear();
-    extSpec = ExternalAlgSpec();
-    if (ccTiling == nullptr || ccTiling->algConfig[0] == '\0') {
-        return ForcedAlgKind::NONE; // 空指针/空 algConfig → 非强制
+    extSpec = ExternalAlgSpec(); // 出参先复位（空指针路径也要干净出门）
+    if (ccTiling == nullptr) {
+        return ForcedAlgKind::NONE; // 空指针 → 非强制
     }
-
-    std::string algConfig(ccTiling->algConfig);
-    if (algConfig.find('=') != std::string::npos) {
-        HCCL_INFO("[MC2_FORCE_ALG] legacy algConfig[%s], use default selector.", algConfig.c_str());
-        return ForcedAlgKind::LEGACY; // 旧 :692 日志逐字保留
+    const std::string algConfig(ccTiling->algConfig);
+    // 空→NONE / '='→LEGACY / '['→EXTERNAL（含 parse）/ 裸名直拷→BARE_NAME（需求前 :696 同语义）
+    const ForcedAlgKind kind = ClassifyForcedAlgConfig(algConfig, algName, extSpec, extParseErrMsg);
+    if (kind == ForcedAlgKind::LEGACY) {
+        HCCL_INFO(
+            "[MC2_FORCE_ALG] legacy algConfig[%s], use default selector.", algConfig.c_str()); // 需求前日志逐字保留
     }
-
-    if (algConfig.find('[') != std::string::npos) {
-        if (!ParseExternalAlg(algConfig, extSpec, extParseErrMsg)) {
-            extSpec = ExternalAlgSpec(); // 失败态复位（ClassifyForcedAlgConfig 同款契约）
-        }
-        return ForcedAlgKind::EXTERNAL;
-    }
-
-    algName = algConfig; // 旧 :696 语义逐字保留
-    return ForcedAlgKind::BARE_NAME;
+    return kind;
 }
 
 // 强制算法定名（2026-09-20 重构，需求前 GetForcedAlgName 形状回归 + EXTERNAL 分支）：

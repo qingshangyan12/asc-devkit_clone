@@ -400,7 +400,7 @@ bool IsCcuForcedAlgUsable(const Mc2CcTilingInner* ccTiling)
     std::string algName;
     ExternalAlgSpec extSpec;
     std::string extParseErrMsg;
-    const ForcedAlgKind kind = GetForcedAlg(ccTiling, algName, extSpec, extParseErrMsg);
+    const ForcedAlgKind kind = ClassifyForcedAlg(ccTiling, algName, extSpec, extParseErrMsg);
     if (kind == ForcedAlgKind::NONE || kind == ForcedAlgKind::LEGACY) { // 现状拒绝（旧 :402-405）
         HCCL_WARNING("[AllocComResourceByTilingCcu] algName[%s] is not supported in mc2_client.", algName.c_str());
         return false;

@@ -54,17 +54,17 @@ TEST(ExtAlgForced, FourStateClassification)
     std::string errMsg;
 
     Mc2CcTilingInner empty = MakeTiling("");
-    EXPECT_EQ(GetForcedAlg(&empty, algName, spec, errMsg), ForcedAlgKind::NONE);
+    EXPECT_EQ(ClassifyForcedAlg(&empty, algName, spec, errMsg), ForcedAlgKind::NONE);
 
     Mc2CcTilingInner legacy = MakeTiling("allgather=level0:fullmesh");
-    EXPECT_EQ(GetForcedAlg(&legacy, algName, spec, errMsg), ForcedAlgKind::LEGACY);
+    EXPECT_EQ(ClassifyForcedAlg(&legacy, algName, spec, errMsg), ForcedAlgKind::LEGACY);
 
     Mc2CcTilingInner bare = MakeTiling("InsAllGatherMesh1D");
-    EXPECT_EQ(GetForcedAlg(&bare, algName, spec, errMsg), ForcedAlgKind::BARE_NAME);
+    EXPECT_EQ(ClassifyForcedAlg(&bare, algName, spec, errMsg), ForcedAlgKind::BARE_NAME);
     EXPECT_EQ(algName, "InsAllGatherMesh1D");
 
     Mc2CcTilingInner ext = MakeTiling("parallel[mesh, nhr]");
-    EXPECT_EQ(GetForcedAlg(&ext, algName, spec, errMsg), ForcedAlgKind::EXTERNAL);
+    EXPECT_EQ(ClassifyForcedAlg(&ext, algName, spec, errMsg), ForcedAlgKind::EXTERNAL);
     EXPECT_TRUE(errMsg.empty());
     EXPECT_EQ(spec.canonical(), "parallel[mesh,nhr]");
 
@@ -72,12 +72,12 @@ TEST(ExtAlgForced, FourStateClassification)
     // 复位 spec 的 canonical() 是 "sole[]"（executor 默认 SOLE）而非空串，
     // 失败态断言用默认值判据: layers 空 + orderStrong 复位
     Mc2CcTilingInner bad = MakeTiling("sole[ring]");
-    EXPECT_EQ(GetForcedAlg(&bad, algName, spec, errMsg), ForcedAlgKind::EXTERNAL);
+    EXPECT_EQ(ClassifyForcedAlg(&bad, algName, spec, errMsg), ForcedAlgKind::EXTERNAL);
     EXPECT_FALSE(errMsg.empty());
     EXPECT_TRUE(spec.layers.empty());
     EXPECT_FALSE(spec.orderStrong);
 
-    EXPECT_EQ(GetForcedAlg(nullptr, algName, spec, errMsg), ForcedAlgKind::NONE);
+    EXPECT_EQ(ClassifyForcedAlg(nullptr, algName, spec, errMsg), ForcedAlgKind::NONE);
 }
 
 // hccl_mc2.cc 内部自由函数，专属目标已编入该翻译单元，符号可见
@@ -125,12 +125,12 @@ TEST(ExtAlgFailure, ErrorMessagesCarryThreeElements)
     const void* badList[] = {&rsMeshChunk};
     EXPECT_FALSE(CheckCcuAlgorithmsRegistered(badList, 1U));
 
-    // GetForcedAlg 层 errMsg 三要素：解析失败消息含原文
+    // ClassifyForcedAlg 层 errMsg 三要素：解析失败消息含原文
     Mc2CcTilingInner bad = MakeTiling("sole[ring]", 6U);
     std::string algName;
     ExternalAlgSpec spec;
     std::string errMsg;
-    EXPECT_EQ(GetForcedAlg(&bad, algName, spec, errMsg), ForcedAlgKind::EXTERNAL);
+    EXPECT_EQ(ClassifyForcedAlg(&bad, algName, spec, errMsg), ForcedAlgKind::EXTERNAL);
     EXPECT_NE(errMsg.find("sole[ring]"), std::string::npos); // 要素1: 原文
     EXPECT_NE(errMsg.find("atom"), std::string::npos);       // 要素3: 原因（词表外原子）
 

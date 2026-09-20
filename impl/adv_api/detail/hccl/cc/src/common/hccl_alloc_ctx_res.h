@@ -190,9 +190,10 @@ std::unique_ptr<InsCollAlgBase> GetAlgExecutorForOp(const OpParam& opParam, cons
 HcclResult CheckForcedAlgResource(
     HcclComm comm, const OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo, const std::string& algName);
 
-// algConfig 四态识别（NONE/LEGACY/EXTERNAL/BARE_NAME）。EXTERNAL 解析失败时 spec 复位无效、
-// extParseErrMsg 非空。现仅闸门 B（hccl_mc2.cc 存在性检查）使用；定名请走 GetForcedAlgName。
-ForcedAlgKind GetForcedAlg(
+// algConfig 四态识别（NONE/LEGACY/EXTERNAL/BARE_NAME），tiling 层薄壳：空指针守卫 + 委托
+// ClassifyForcedAlgConfig（字符串层，external_alg_parser.h）+ LEGACY 补日志。EXTERNAL 解析失败时
+// spec 复位无效、extParseErrMsg 非空。现仅闸门 B（hccl_mc2.cc 存在性检查）使用；定名请走 GetForcedAlgName。
+ForcedAlgKind ClassifyForcedAlg(
     const Mc2CcTilingInner* ccTiling, std::string& algName, ExternalAlgSpec& extSpec, std::string& extParseErrMsg);
 
 // 强制算法定名（2026-09-20 重构，需求前 GetForcedAlgName 形状回归）：algConfig → 注册名。

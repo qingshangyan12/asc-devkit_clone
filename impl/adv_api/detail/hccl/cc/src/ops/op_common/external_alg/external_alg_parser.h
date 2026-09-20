@@ -220,7 +220,7 @@ inline ForcedAlgKind ClassifyForcedAlgConfig(
         }
         return ForcedAlgKind::EXTERNAL;
     }
-    bareName = algConfig;
+    bareName = algConfig; // 裸名直拷（需求前 hccl_alloc_ctx_res.cc :696 同语义）
     return ForcedAlgKind::BARE_NAME;
 }
 
