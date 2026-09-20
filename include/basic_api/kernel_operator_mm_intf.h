@@ -81,6 +81,14 @@ template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams);
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-PR4] LoadData 2D GM(__gm__) -> L1(__cbuf__) — Jessicaruan Wave3
+ * dav-3510: GM→L0A/L0B Cal is NOT_SUPPORT; only wire GM→L1 (bare __gm__* uses cacheMode=0). */
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    __cbuf__ T* dst, __gm__ T* src, const LoadData2DParams& loadDataParams);
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
+
 /* **************************************************************************************************
  * LoadData 2dV2                                             *
  * ************************************************************************************************* */
@@ -119,6 +127,13 @@ template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParamsV2& loadDataParams,
     const bool enablePreReadIgnoreSync);
+
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-PR4] LoadData 2DV2 GM(__gm__) -> L1(__cbuf__) — Jessicaruan Wave3 */
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    __cbuf__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParams);
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 
 #if defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
@@ -240,6 +255,13 @@ __aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData3D
 template <TPosition DstPos, TPosition SrcPos, typename T>
 __aicore__ inline void LoadData(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const Load3DBitModeParam& loadDataParams);
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-PR4] LoadData 3DV2 BitMode L1(__cbuf__) -> L0A/L0B — Jessicaruan Wave3 */
+template <typename T>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const Load3DBitModeParam& loadDataParams);
+template <typename T>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const Load3DBitModeParam& loadDataParams);
+#endif
 #endif
 /* **************************************************************************************************
  * LoadData 3dv2Pro                                             *
@@ -277,6 +299,13 @@ __aicore__ inline void LoadData(
 template <TPosition DstPos, TPosition SrcPos, typename T>
 __aicore__ inline void LoadData(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const Load2DBitModeParam& loadDataParams);
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-PR4] LoadData 2D BitMode L1(__cbuf__) -> L0A/L0B — Jessicaruan Wave3 */
+template <typename T>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const Load2DBitModeParam& loadDataParams);
+template <typename T>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const Load2DBitModeParam& loadDataParams);
+#endif
 #endif
 /* **************************************************************************************************
  * LoadDataWithTranspose                                             *
@@ -426,6 +455,15 @@ template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
     const MmadBitModeParams& mmadParams);
+
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-PR4] Mmad BitMode L0A×L0B→L0C — Jessicaruan Wave3 */
+template <typename T, typename U, typename S>
+__aicore__ inline void Mmad(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadBitModeParams& mmadParams);
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void Mmad(
+    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __biasbuf__ V* bias, MmadBitModeParams& mmadParams);
+#endif
 #endif
 
 /* **************************************************************************************************
@@ -465,6 +503,15 @@ template <typename T, typename U, typename S, typename V>
 __aicore__ inline void MmadMx(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
     const MmadBitModeParams& mmadParams);
+
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__) && defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+/* [CUBE-PTR-PR4] MmadMx BitMode — Jessicaruan Wave3 */
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadMx(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, MmadBitModeParams& mmadParams);
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void MmadMx(
+    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __biasbuf__ V* bias, MmadBitModeParams& mmadParams);
+#endif
 
 template <
     typename T = int32_t, typename U = int8_t,

@@ -105,6 +105,22 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadData(
 #endif
 }
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-PR4] LoadData 2D GM -> L1 — Jessicaruan Wave3 */
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    __cbuf__ T* dst, __gm__ T* src, const LoadData2DParams& loadDataParams)
+{
+    CheckLoadData2dDatatype<T>();
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+    // bare __gm__* cannot ExtractCacheMode — same policy as Fixpipe GM (cacheMode=0)
+    LoadData2DGM2L1Cal(dst, src, loadDataParams, /*cacheMode=*/0);
+#else
+    LoadData2DGM2L1Cal(dst, src, loadDataParams);
+#endif
+}
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
+
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
                               (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <TPosition Dst, TPosition Src, typename T>
@@ -114,6 +130,22 @@ __aicore__ inline void LoadData(
     CheckLoadData2dDatatype<T>();
     LoadDataImpl<Dst, Src, T>(dst, src, loadDataParams);
 }
+
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-PR4] LoadData 2D BitMode L1 -> L0A/L0B — Jessicaruan Wave3 */
+template <typename T>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const Load2DBitModeParam& loadDataParams)
+{
+    CheckLoadData2dDatatype<T>();
+    LoadData2DL12L0ACal(dst, src, loadDataParams);
+}
+template <typename T>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const Load2DBitModeParam& loadDataParams)
+{
+    CheckLoadData2dDatatype<T>();
+    LoadData2DL12L0BCal(dst, src, loadDataParams);
+}
+#endif
 #endif
 /* **************************************************************************************************
  * LoadData 2dV2                                             *
@@ -185,6 +217,21 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadData(
 #endif
     LoadDataImpl(dst, src, loadDataParams);
 }
+
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-PR4] LoadData 2DV2 GM -> L1 — Jessicaruan Wave3 */
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    __cbuf__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParams)
+{
+    CheckLoadData2dDatatype<T>();
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+    LoadData2DGM2L1Cal(dst, src, loadDataParams, /*cacheMode=*/0);
+#else
+    LoadData2DGM2L1Cal(dst, src, loadDataParams);
+#endif
+}
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
 template <typename T, typename U>
@@ -399,6 +446,20 @@ __aicore__ inline void LoadData(
 {
     LoadDataImpl<Dst, Src, T>(dst, src, loadDataParams);
 }
+
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-PR4] LoadData 3DV2 BitMode L1 -> L0A/L0B — Jessicaruan Wave3 */
+template <typename T>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const Load3DBitModeParam& loadDataParams)
+{
+    LoadData3DV2L12L0ACal(dst, src, loadDataParams);
+}
+template <typename T>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const Load3DBitModeParam& loadDataParams)
+{
+    LoadData3DV2L12L0BCal(dst, src, loadDataParams);
+}
+#endif
 #endif
 /* **************************************************************************************************
  * LoadData 3dv2Pro                                             *
@@ -691,6 +752,32 @@ __aicore__ inline void MmadMx(
 {
     MmadMxImpl(dst, fm, filter, bias, mmadParams);
 }
+
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-PR4] Mmad / MmadMx BitMode — Jessicaruan Wave3 */
+template <typename T, typename U, typename S>
+__aicore__ inline void Mmad(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadBitModeParams& mmadParams)
+{
+    MmadCal(dst, fm, filter, mmadParams);
+}
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void Mmad(
+    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __biasbuf__ V* bias, MmadBitModeParams& mmadParams)
+{
+    MmadCal(dst, fm, filter, (uint64_t)bias, mmadParams);
+}
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadMx(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, MmadBitModeParams& mmadParams)
+{
+    MmadMxCal(dst, fm, filter, mmadParams);
+}
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void MmadMx(
+    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __biasbuf__ V* bias, MmadBitModeParams& mmadParams)
+{
+    MmadMxCal(dst, fm, filter, (uint64_t)bias, mmadParams);
+}
+#endif
 #endif
 
 #if __NPU_ARCH__ == 2201
