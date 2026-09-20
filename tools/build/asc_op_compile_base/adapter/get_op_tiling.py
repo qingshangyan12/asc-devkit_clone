@@ -2232,6 +2232,8 @@ def static_post_process_of_workspace(context, run_info, workspace_size):
         if len(run_info["workspaces"]) > 1:
             msg = "the num of workspace can not large than 1"
             raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, msg)
+        if CommonUtility.is_c310() and workspace_size == 0:
+            return
         context.add_workspace("total_workspace", size=workspace_size)
 
 
