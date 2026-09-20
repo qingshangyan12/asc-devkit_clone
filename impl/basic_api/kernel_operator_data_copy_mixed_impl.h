@@ -10,9 +10,8 @@
 
 /*!
  * \file kernel_operator_data_copy_mixed_impl.h
- * \brief Scheme A Mixed Tensor/Pointer overloads for DMA DataCopy family.
- *        Thin adapters only: wrap __gm__* as GlobalTensor -> Tensor path, or
- *        extract GetPhyAddr -> existing Pointer-Pointer overload. No trait dispatcher.
+ * \brief Mixed Tensor/Pointer overloads for DMA DataCopy family.
+ *        Thin adapters: wrap __gm__* as GlobalTensor, or GetPhyAddr to Pointer path.
  */
 #ifndef ASCENDC_MODULE_OPERATOR_DATA_COPY_MIXED_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_DATA_COPY_MIXED_IMPL_H
@@ -34,8 +33,6 @@ __aicore__ inline __gm__ T* AscendCMixedGmPtr(const GlobalTensor<T>& tensor)
     return (__gm__ T*)tensor.GetPhyAddr();
 }
 
-
-/* -------- DataCopy count: GM <-> Local (D21 / D26) -------- */
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     const LocalTensor<T>& dst, __gm__ T* src, const uint32_t count)
@@ -82,8 +79,6 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
     DataCopy(AscendCMixedGmPtr(dst), src, count);
 }
 
-
-/* -------- DataCopy count: Local <-> Local (D30) -------- */
 template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T>& dst, __ubuf__ T* src, const uint32_t count)
 {
@@ -140,8 +135,6 @@ __aicore__ inline void DataCopy(__cbuf__ T* dst, const LocalTensor<T>& src, cons
     }
 }
 
-
-/* -------- DataCopy Params: GM <-> Local (D31 / D23) -------- */
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     const LocalTensor<T>& dst, __gm__ T* src, const DataCopyParams& repeatParams)
@@ -188,7 +181,6 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
     DataCopy(AscendCMixedGmPtr(dst), src, repeatParams);
 }
 
-/* -------- DataCopy Params: Local <-> Local (D28) -------- */
 template <typename T>
 __aicore__ inline void DataCopy(
     const LocalTensor<T>& dst, __ubuf__ T* src, const DataCopyParams& repeatParams)
@@ -201,7 +193,8 @@ __aicore__ inline void DataCopy(
         DataCopy((__cbuf__ Prim*)dst.GetPhyAddr(), src, repeatParams);
     } else {
         ASCENDC_CHECK_TPOSITION(false, "dst", "UB/L1",
-            "DataCopy Mixed Params LocalTensor <- __ubuf__", GetPositionDisplay(static_cast<TPosition>(dst.GetPosition())));
+            "DataCopy Mixed Params LocalTensor <- __ubuf__",
+            GetPositionDisplay(static_cast<TPosition>(dst.GetPosition())));
     }
 }
 
@@ -217,7 +210,8 @@ __aicore__ inline void DataCopy(
         DataCopy((__cbuf__ Prim*)dst.GetPhyAddr(), src, repeatParams);
     } else {
         ASCENDC_CHECK_TPOSITION(false, "dst", "UB/L1",
-            "DataCopy Mixed Params LocalTensor <- __cbuf__", GetPositionDisplay(static_cast<TPosition>(dst.GetPosition())));
+            "DataCopy Mixed Params LocalTensor <- __cbuf__",
+            GetPositionDisplay(static_cast<TPosition>(dst.GetPosition())));
     }
 }
 
@@ -233,7 +227,8 @@ __aicore__ inline void DataCopy(
         DataCopy(dst, (__cbuf__ Prim*)src.GetPhyAddr(), repeatParams);
     } else {
         ASCENDC_CHECK_TPOSITION(false, "src", "UB/L1",
-            "DataCopy Mixed Params __ubuf__ <- LocalTensor", GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
+            "DataCopy Mixed Params __ubuf__ <- LocalTensor",
+            GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
     }
 }
 
@@ -249,12 +244,11 @@ __aicore__ inline void DataCopy(
         DataCopy(dst, (__cbuf__ Prim*)src.GetPhyAddr(), repeatParams);
     } else {
         ASCENDC_CHECK_TPOSITION(false, "src", "UB/L1",
-            "DataCopy Mixed Params __cbuf__ <- LocalTensor", GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
+            "DataCopy Mixed Params __cbuf__ <- LocalTensor",
+            GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
     }
 }
 
-
-/* -------- DataCopyPad GM <-> Local (D35-D42 family) -------- */
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     const LocalTensor<T>& dst, __gm__ T* src, const DataCopyParams& dataCopyParams, const DataCopyPadParams& padParams)
@@ -266,14 +260,16 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
 
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
-    __ubuf__ T* dst, const GlobalTensor<T>& src, const DataCopyParams& dataCopyParams, const DataCopyPadParams& padParams)
+    __ubuf__ T* dst, const GlobalTensor<T>& src,
+    const DataCopyParams& dataCopyParams, const DataCopyPadParams& padParams)
 {
     DataCopyPad(dst, AscendCMixedGmPtr(src), dataCopyParams, padParams);
 }
 
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
-    __cbuf__ T* dst, const GlobalTensor<T>& src, const DataCopyParams& dataCopyParams, const DataCopyPadParams& padParams)
+    __cbuf__ T* dst, const GlobalTensor<T>& src,
+    const DataCopyParams& dataCopyParams, const DataCopyPadParams& padParams)
 {
     DataCopyPad(dst, AscendCMixedGmPtr(src), dataCopyParams, padParams);
 }
@@ -336,8 +332,6 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     DataCopyPad(AscendCMixedGmPtr(dst), src, dataCopyParams);
 }
 
-
-/* -------- Nd2Nz / Dn2Nz (D12 / D13 / D19 / D29) -------- */
 template <typename T, bool enableSmallC0 = false>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     const LocalTensor<T>& dst, __gm__ T* src, const Nd2NzParams& intriParams)
@@ -406,7 +400,8 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, __ubuf__ T* src, cons
         DataCopy((__cbuf__ Prim*)dst.GetPhyAddr(), src, intriParams);
     } else {
         ASCENDC_CHECK_TPOSITION(false, "dst", "L1 Buffer(A1/B1)",
-            "DataCopy Mixed Nd2Nz LocalTensor <- __ubuf__", GetPositionDisplay(static_cast<TPosition>(dst.GetPosition())));
+            "DataCopy Mixed Nd2Nz LocalTensor <- __ubuf__",
+            GetPositionDisplay(static_cast<TPosition>(dst.GetPosition())));
     }
 }
 
@@ -419,11 +414,11 @@ __aicore__ inline void DataCopy(__cbuf__ T* dst, const LocalTensor<T>& src, cons
         DataCopy(dst, (__ubuf__ Prim*)src.GetPhyAddr(), intriParams);
     } else {
         ASCENDC_CHECK_TPOSITION(false, "src", "UB(VECIN/VECOUT)",
-            "DataCopy Mixed Nd2Nz __cbuf__ <- LocalTensor", GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
+            "DataCopy Mixed Nd2Nz __cbuf__ <- LocalTensor",
+            GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
     }
 }
 
-/* -------- Slice (D20 / D25) -------- */
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     const LocalTensor<T>& dst, __gm__ T* src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[],
@@ -460,7 +455,6 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
     DataCopy(AscendCMixedGmPtr(dst), src, dstSliceInfo, srcSliceInfo, dimValue);
 }
 
-/* -------- Nz2Nd (D24) -------- */
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
     __gm__ T* dst, const LocalTensor<T>& src, const Nz2NdParamsFull& intriParams)
@@ -485,7 +479,6 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
 }
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
-/* -------- NDDMA (D17) -------- */
 template <typename T, uint8_t dim, const NdDmaConfig& config = kDefaultNdDmaConfig>
 __aicore__ inline void DataCopy(
     const LocalTensor<T>& dst, __gm__ T* src, const MultiCopyParams<T, dim>& params)
@@ -503,8 +496,6 @@ __aicore__ inline void DataCopy(
 }
 #endif
 
-
-/* -------- DataCopyL1ToUB (D32 / D33) -------- */
 template <typename T, uint8_t subBlockId = 0>
 __aicore__ inline void DataCopyL1ToUB(
     const LocalTensor<T>& dst, __cbuf__ T* src, const uint32_t count)
@@ -537,7 +528,6 @@ __aicore__ inline void DataCopyL1ToUB(
     DataCopyL1ToUB<Prim, subBlockId>(dst, (__cbuf__ Prim*)src.GetPhyAddr(), repeatParams);
 }
 
-/* -------- DataCopyPad UB->L1 Nd2Nz (D43 / D44) -------- */
 template <typename T>
 __aicore__ inline void DataCopyPad(
     const LocalTensor<T>& dst, __ubuf__ T* src, const DataCopyParams& dataCopyParams, const Nd2NzParams& nd2nzParams)
@@ -570,8 +560,6 @@ __aicore__ inline void DataCopyPad(
     DataCopyPad(dst, (__ubuf__ Prim*)src.GetPhyAddr(), dataCopyParams, nd2nzParams);
 }
 
-
-/* -------- Enhanced same-T (D18 / D22 / D27) -------- */
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     const LocalTensor<T>& dst, __gm__ T* src, const DataCopyParams& intriParams,
@@ -637,7 +625,8 @@ __aicore__ inline void DataCopy(
         DataCopy((__cbuf__ Prim*)dst.GetPhyAddr(), src, intriParams, enhancedParams);
     } else {
         ASCENDC_CHECK_TPOSITION(false, "dst", "UB/L1",
-            "DataCopy Mixed Enhanced LocalTensor <- __ubuf__", GetPositionDisplay(static_cast<TPosition>(dst.GetPosition())));
+            "DataCopy Mixed Enhanced LocalTensor <- __ubuf__",
+            GetPositionDisplay(static_cast<TPosition>(dst.GetPosition())));
     }
 }
 
@@ -652,12 +641,11 @@ __aicore__ inline void DataCopy(
         DataCopy(dst, (__ubuf__ Prim*)src.GetPhyAddr(), intriParams, enhancedParams);
     } else {
         ASCENDC_CHECK_TPOSITION(false, "src", "UB",
-            "DataCopy Mixed Enhanced __ubuf__ <- LocalTensor", GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
+            "DataCopy Mixed Enhanced __ubuf__ <- LocalTensor",
+            GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
     }
 }
 
-
-/* -------- CO12 (D14 / D15) -------- */
 template <typename T, typename U>
 __aicore__ inline void DataCopy(
     __gm__ T* dst, const LocalTensor<U>& src, const DataCopyCO12DstParams& intriParams)
@@ -689,8 +677,6 @@ __aicore__ inline void DataCopy(
     DataCopy((__cbuf__ Prim*)dst.GetPhyAddr(), src, intriParams);
 }
 
-
-/* -------- Heterogeneous Enhanced Mixed (D06-D11 / D10) -------- */
 template <
     typename T, typename U,
     typename Std::enable_if<Std::is_same<PrimT<T>, half>::value && Std::is_same<PrimT<U>, float>::value, bool>::type =
@@ -808,7 +794,6 @@ __aicore__ inline void DataCopy(
     DataCopy(dst, (__cbuf__ PrimT<U>*)src.GetPhyAddr(), intriParams, enhancedParams);
 }
 #endif
-
 
 } // namespace AscendC
 #endif // ASCENDC_ENABLE_HW_PTR_API

@@ -569,7 +569,6 @@ template <typename T>
 __aicore__ inline void DataCopy(
     __ubuf__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
 
-// Heterogeneous Enhanced (D10): float -> half. Address spaces match Tensor-only path.
 template <
     typename T, typename U,
     typename Std::enable_if<Std::is_same<PrimT<T>, half>::value && Std::is_same<PrimT<U>, float>::value, bool>::type =
@@ -583,7 +582,6 @@ template <
 __aicore__ inline void DataCopy(
     __ubuf__ T* dst, __cc__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
 
-// Heterogeneous Enhanced (D06): int32 -> int16, L0C->UB, V-pipe (mirror Tensor).
 template <
     typename T, typename U,
     typename Std::enable_if<
@@ -591,7 +589,6 @@ template <
 __aicore__ inline __inout_pipe__(V) void DataCopy(
     __ubuf__ T* dst, __cc__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
 
-// Heterogeneous Enhanced (D07): int32 -> int8, L0C->UB, V-pipe.
 template <
     typename T, typename U,
     typename Std::enable_if<
@@ -599,7 +596,6 @@ template <
 __aicore__ inline __inout_pipe__(V) void DataCopy(
     __ubuf__ T* dst, __cc__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
 
-// Heterogeneous Enhanced (D08): int32 -> uint8, L0C->UB, V-pipe.
 template <
     typename T, typename U,
     typename Std::enable_if<
@@ -607,7 +603,6 @@ template <
 __aicore__ inline __inout_pipe__(V) void DataCopy(
     __ubuf__ T* dst, __cc__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
 
-// Heterogeneous Enhanced (D09): half -> float, UB->L0C, V-pipe.
 template <
     typename T, typename U,
     typename Std::enable_if<Std::is_same<PrimT<T>, float>::value && Std::is_same<PrimT<U>, half>::value, bool>::type =
@@ -615,7 +610,6 @@ template <
 __aicore__ inline __inout_pipe__(V) void DataCopy(
     __cc__ T* dst, __ubuf__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
 
-// Heterogeneous Enhanced (D11): int32 -> half, L0C->UB, V-pipe.
 template <
     typename T, typename U,
     typename Std::enable_if<Std::is_same<PrimT<T>, half>::value && Std::is_same<PrimT<U>, int32_t>::value, bool>::type =
@@ -624,7 +618,6 @@ __aicore__ inline __inout_pipe__(V) void DataCopy(
     __ubuf__ T* dst, __cc__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams);
 
 #if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201))
-// Heterogeneous Enhanced (D05): float -> bfloat16, L1->L0C (arch 2201 only).
 template <
     typename T, typename U,
     typename Std::enable_if<
