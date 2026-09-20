@@ -146,10 +146,6 @@ SKIP_CONFIG = {
         reason=WORKAROUND_SKIP_REASON,
         modes=["npu", "cpu", "sim"],
     ),
-    "01_simd_cpp_api/03_basic_api/05_sync_control/data_sync_barrier": SkipConfig(
-        reason=WORKAROUND_SKIP_REASON,
-        modes=["npu", "cpu", "sim"],
-    ),
     "01_simd_cpp_api/02_features/00_framework/03_ge/triple_chevron_notation": SkipConfig(
         reason=WORKAROUND_SKIP_REASON,
         modes=["npu", "cpu", "sim"],
