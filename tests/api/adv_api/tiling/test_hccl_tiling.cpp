@@ -283,18 +283,20 @@ TEST_F(TestHcclTilingCcuKfc, ExternalAlgNameCcuCandidateUsesCcuNewVersion)
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "sole[mesh]", 6U, INIT_TILING_CCU_NEW_VERSION);
 }
 
-// 闸门 A 三段判定③: 外部名仅有 AICPU 候选（不在镜像对表）→ 默认版本（不设 101）
-TEST_F(TestHcclTilingCcuKfc, ExternalAlgNameAicpuOnlyUsesDefaultVersion)
+// 闸门 A ③（2026-09-20 简化为纯语法开关）: 外部名 + CCU 引擎即设 101——
+// 不再预判有无 CCU 候选（含 AICPU-only 外部名/opType 维度），精确判断在闸门 B
+// （三要素报错）。此用例钉住宽松放行行为：AICPU-only 外部名同样设 101。
+TEST_F(TestHcclTilingCcuKfc, ExternalAlgNameAicpuOnlyAlsoUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "pipeline[mesh,nhr]", 6U, INIT_TILING_VERSION);
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "pipeline[mesh,nhr]", 6U, INIT_TILING_CCU_NEW_VERSION);
 }
 
-// opType 维度负例：BROADCAST 的 sole[mesh] 无 CCU 候选，不得设 101
-TEST_F(TestHcclTilingCcuKfc, ExternalAlgNameOpTypeMismatchUsesDefaultVersion)
+// 语法错的外部名 + CCU 引擎：同样设 101（真报错在闸门 B，带具体词法错误）
+TEST_F(TestHcclTilingCcuKfc, ExternalAlgNameBadSyntaxStillUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_BROADCAST), "sole[mesh]", 6U, INIT_TILING_VERSION);
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_BROADCAST), "sole[ring", 6U, INIT_TILING_CCU_NEW_VERSION);
 }
 
 // ============================================================================

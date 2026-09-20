@@ -150,7 +150,6 @@ add_library(
 target_include_directories(tiling_api PRIVATE
   ${KERNEL_TILING_DIR}
   ${ASCENDC_DIR}/include
-  ${ASCENDC_DIR}/impl/adv_api/detail/hccl/cc/src/ops/op_common/external_alg
   ${ASCENDC_DIR}/include/utils/context
   ${ASCENDC_DIR}/include/utils/tiling/platform
   ${ASCENDC_DIR}/include/utils

@@ -13,7 +13,6 @@
 #include <utility>
 
 #include "alg_meta_registry.h"
-#include "external_alg_ccu_ext_names.h"
 #include "external_alg_parser.h"
 #include "external_alg_resolver.h"
 #include "external_alg_rules.h"
@@ -114,19 +113,8 @@ TEST(ExtAlgGateB, ExternalNameGate)
     EXPECT_FALSE(CheckCcuAlgorithmsRegistered(legacyList, 1U));
 }
 
-// 闸门 A 镜像漂移断言：镜像对表 ↔ sidecar 真值（engine==CCU 的 (opType, canonical外部名) 集合）逐项相等
-// 漂移时同步修改 external_alg_ccu_ext_names.h 的 CcuExternalNameSet（sidecar 加/改 CCU 行时）
-TEST(ExtAlgGateA, MirrorMatchesSidecar)
-{
-    std::set<std::pair<uint32_t, std::string>> truth;
-    for (const AlgMetaRow& row : AlgMetaRegistry::Instance().GetAll()) {
-        if (row.meta.engine != AlgEngine::CCU) {
-            continue;
-        }
-        truth.insert(std::make_pair(static_cast<uint32_t>(row.cmd), std::string(row.meta.externalName)));
-    }
-    EXPECT_EQ(CcuExternalNameSet(), truth);
-}
+// （2026-09-20 变体2）闸门 A 简化为纯语法开关后，镜像对表已删除——本用例随之退役。
+// CCU 候选存在性的精确判断由闸门 B 用 sidecar 真身数据完成（ExtAlgGateB/ExtAlgFailure 覆盖）。
 
 // 失败路径三要素（设计 §10/§12）：报错必须含 algConfig 原文/候选或定名/原因。
 // 闸门 B 行为层：语法错 / AICPU-only 候选 → 拒；errMsg 内容层：外部名原文必在。
