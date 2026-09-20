@@ -82,17 +82,20 @@ std::map<ExtAlgKey, std::vector<AlgCandidate>> BuildCandidateTable(const std::ve
 {
     std::map<ExtAlgKey, std::vector<AlgCandidate>> table;
     for (const AlgMetaRow& row : rows) {
-        table[std::make_pair(row.cmd, std::string(row.meta.externalName))].push_back(
-            AlgCandidate{row.registeredName, row.meta.engine, row.meta.variantCondId, row.meta.machineFlagId});
+        table[std::make_pair(row.cmd, std::string(row.meta.externalName))].push_back(AlgCandidate{
+            row.registeredName, row.meta.engine, row.meta.variantCondId, row.meta.machineFlagId, row.meta.priority});
     }
     for (auto& entry : table) {
         std::sort(entry.second.begin(), entry.second.end(), [](const AlgCandidate& a, const AlgCandidate& b) {
             const int specA = (a.variantCondId != -1 ? 1 : 0) + (a.machineFlagId != -1 ? 1 : 0);
             const int specB = (b.variantCondId != -1 ? 1 : 0) + (b.machineFlagId != -1 ? 1 : 0);
             if (specA != specB) {
-                return specA > specB; // 特异性降序
+                return specA > specB; // 键1: 特异性降序（约束多者先试，最特化者胜）
             }
-            return a.registeredName < b.registeredName; // 名字字典序
+            if (a.priority != b.priority) {
+                return a.priority > b.priority; // 键2: priority 降序（同特异性时业务声明谁先；当前全 0）
+            }
+            return a.registeredName < b.registeredName; // 键3: 名字字典序（确定性兜底）
         });
     }
     return table;

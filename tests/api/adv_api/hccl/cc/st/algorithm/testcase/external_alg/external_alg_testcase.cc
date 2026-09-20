@@ -600,9 +600,17 @@ TEST(ExtAlgResolver, CandidateTableIsDeterministic)
             }
         }
     }
-    // 覆盖数锚：30 个 (op,外部名) 键（46 行归并）；36 个 (引擎,op,外部名) 组合（键内引擎去重求和）
+    // 覆盖数锚（限 5 个集合通信 CMD）：30 个 (op,外部名) 键（46 行归并）；
+    // 36 个 (引擎,op,外部名) 组合（键内引擎去重求和）。
+    // 限定 COLL_CMDS 范围使锚不受测试内注册行（如 KFC cmd 的宏验证行）影响。
+    const std::set<HcclCMDType> collCmds(std::begin(COLL_CMDS), std::end(COLL_CMDS));
+    size_t keyCount = 0;
     size_t comboCount = 0;
     for (const auto& entry : table1) {
+        if (collCmds.find(entry.first.first) == collCmds.end()) {
+            continue; // 集合通信域外的注册（KFC/测试行）不计入锚
+        }
+        keyCount++;
         std::vector<AlgEngine> engines;
         for (const AlgCandidate& cand : entry.second) {
             if (std::find(engines.begin(), engines.end(), cand.engine) == engines.end()) {
@@ -611,7 +619,7 @@ TEST(ExtAlgResolver, CandidateTableIsDeterministic)
         }
         comboCount += engines.size();
     }
-    EXPECT_EQ(table1.size(), 30U);
+    EXPECT_EQ(keyCount, 30U);
     EXPECT_EQ(comboCount, 36U);
 }
 
@@ -632,6 +640,49 @@ TEST(ExtAlgResolver, SpecificityOrdering)
     EXPECT_EQ(cands[1].registeredName, "InsReduceScatterMesh1DZAxisDetour");
     EXPECT_EQ(cands[2].registeredName, "CcuSchedReduceScatterSoleMesh"); // 裸名字典序
     EXPECT_EQ(cands[3].registeredName, "InsReduceScatterMesh1D");
+}
+
+// 7 参宏可用性：REGISTER_ALG_META_PRIORITY 显式 priority 注册（KFC cmd 不触碰满射断言的 5 个 COLL_CMDS）
+REGISTER_ALG_META_PRIORITY(
+    HcclCMDType::HCCL_CMD_KFC_SERVER, TestPrioMacro, AlgEngine::AICPU, "test[prio]", COND_NONE, FLAG_NONE, 7);
+
+// 三键排序语义（specificity 降序 > priority 降序 > name 字典序）——纯函数构建器直接验证，
+// 测试内构造行（KFC cmd）+ 逆序传入（同时验证顺序无关性）。
+// 当前产品 46 行全 0（本用例回归意义：全 0 下三键退化双键，见 SpecificityOrdering/Determinism）。
+TEST(ExtAlgResolver, PriorityOrdering)
+{
+    // 宏注册行可查且 priority 落库
+    const AlgMeta* macroMeta = AlgMetaRegistry::Instance().Get(HcclCMDType::HCCL_CMD_KFC_SERVER, "TestPrioMacro");
+    ASSERT_NE(macroMeta, nullptr);
+    EXPECT_EQ(macroMeta->priority, 7);
+
+    std::vector<AlgMetaRow> rows = {
+        {HcclCMDType::HCCL_CMD_KFC_SERVER, "TestPrioLow", {AlgEngine::AICPU, "test[prio]", COND_NONE, FLAG_UBX, 1}},
+        {HcclCMDType::HCCL_CMD_KFC_SERVER, "TestPrioHigh", {AlgEngine::AICPU, "test[prio]", COND_NONE, FLAG_UBX, 5}},
+        {HcclCMDType::HCCL_CMD_KFC_SERVER, "TestPrioSameA", {AlgEngine::AICPU, "test[prio]", COND_NONE, FLAG_UBX, 5}},
+        // priority=99 的裸名：特异性第一级不可被 priority 越级，仍排单挂之后
+        {HcclCMDType::HCCL_CMD_KFC_SERVER, "TestBareName", {AlgEngine::AICPU, "test[prio]", COND_NONE, FLAG_NONE, 99}},
+        // 双挂（cond+flag）：特异性 2 分最特化，排最前
+        {HcclCMDType::HCCL_CMD_KFC_SERVER,
+         "TestDoubleSlot",
+         {AlgEngine::AICPU, "test[prio]", COND_SPECIAL_DT, FLAG_UBX, 0}},
+    };
+    std::reverse(rows.begin(), rows.end()); // 逆序传入：排序与输入序无关
+    const std::map<ExtAlgKey, std::vector<AlgCandidate>> table = BuildCandidateTable(rows);
+    const auto it = table.find(std::make_pair(HcclCMDType::HCCL_CMD_KFC_SERVER, std::string("test[prio]")));
+    ASSERT_NE(it, table.end());
+    const std::vector<AlgCandidate>& cands = it->second;
+    ASSERT_EQ(cands.size(), 5U);
+    // 键1 特异性：双挂(2) > 单挂(1) > 裸名(0)
+    EXPECT_EQ(cands[0].registeredName, "TestDoubleSlot");
+    // 键2 priority：同单挂特异性，5 > 1（大者优先）
+    EXPECT_EQ(cands[1].registeredName, "TestPrioHigh");
+    EXPECT_EQ(cands[1].priority, 5);
+    // 键3 字典序：同特异性同 priority(5)，"TestPrioHigh" < "TestPrioSameA"
+    EXPECT_EQ(cands[2].registeredName, "TestPrioSameA");
+    EXPECT_EQ(cands[3].registeredName, "TestPrioLow");
+    // 裸名兜底：priority=99 仍排最后（特异性不可越级）
+    EXPECT_EQ(cands[4].registeredName, "TestBareName");
 }
 
 // 评审备忘闭环：extern 表转发初始化器的运行时绑定断言

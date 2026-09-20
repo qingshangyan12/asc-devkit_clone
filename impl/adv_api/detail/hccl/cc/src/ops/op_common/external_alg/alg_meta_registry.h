@@ -31,7 +31,12 @@ struct AlgMeta {
     const char* externalName = ""; // 规范化外部名（与 parser 产出同构），如 "sole[mesh]"
     int variantCondId = -1;
     int machineFlagId = -1;
-    // 预留：int priority = 0;  flag 重叠场景的定序逃生门，本期不加
+    // 同键内候选定序（hccl 平移的 flag 重叠场景逃生门，devkit 46 行当前全 0）：
+    // 排序键第二级（specificity 降序 > priority 降序 > registeredName 字典序），
+    // 数值大者先试漏斗。只影响排队顺序，不影响 ①②②′ 判定——priority 高的候选
+    // 条件不命中照样出局，裸名（双 -1）仍兜底；特异性第一级保证裸名永不被 priority
+    // 抬到特化候选之前。
+    int priority = 0;
 };
 
 // 一行 sidecar 记录（枚举接口用）
@@ -69,6 +74,18 @@ private:
 
 #define REGISTER_ALG_META(cmd, regName, engine, extName, condId, flagId) \
     REGISTER_ALG_META_HELPER_1(__COUNTER__, cmd, regName, engine, extName, condId, flagId)
+
+// 7 参变体：显式指定 priority（默认宏恒为 0）。见 AlgMeta::priority 注释——
+// 排序键第二级，仅同 (op, 外部名) 键内、同特异性的候选之间生效。
+#define REGISTER_ALG_META_PRIORITY_HELPER(ctr, cmd, regName, engine, extName, condId, flagId, prio) \
+    static HcclResult g_alg_meta_##regName##_##ctr = AlgMetaRegistry::Instance().Register(          \
+        cmd, std::string(#regName), AlgMeta{engine, extName, condId, flagId, prio})
+
+#define REGISTER_ALG_META_PRIORITY_HELPER_1(ctr, cmd, regName, engine, extName, condId, flagId, prio) \
+    REGISTER_ALG_META_PRIORITY_HELPER(ctr, cmd, regName, engine, extName, condId, flagId, prio)
+
+#define REGISTER_ALG_META_PRIORITY(cmd, regName, engine, extName, condId, flagId, prio) \
+    REGISTER_ALG_META_PRIORITY_HELPER_1(__COUNTER__, cmd, regName, engine, extName, condId, flagId, prio)
 
 } // namespace mc2_ops_hccl
 #endif // ALG_META_REGISTRY_H

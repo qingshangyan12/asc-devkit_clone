@@ -26,6 +26,7 @@ struct AlgCandidate {
     AlgEngine engine;
     int variantCondId;
     int machineFlagId;
+    int priority; // 同键定序第二级（specificity 降序 > priority 降序 > name 字典序），见 AlgMeta::priority
 };
 
 // 候选表键: (opType, 规范化外部名)
@@ -48,8 +49,10 @@ ResolveStatus ResolveExternalAlg(
 const std::vector<AlgCandidate>& GetExternalCandidates(HcclCMDType cmd, const std::string& canonicalExtName);
 bool HasCcuCandidate(HcclCMDType cmd, const std::string& canonicalExtName);
 
-// 纯函数构建器（UT 确定性断言用）：按 (Specificity 降序, registeredName 字典序) 排序。
-// Specificity = (condId != -1) + (flagId != -1)。排序键是候选自带数据属性，
+// 纯函数构建器（UT 确定性断言用）：按 (Specificity 降序, priority 降序, registeredName 字典序) 三键排序。
+// Specificity = (condId != -1) + (flagId != -1)（约束多者先试，最特化者胜；cond/flag 各计 1 分等权）；
+// priority 仅同特异性时生效（业务声明维度裁决权，当前全 0，hccl 平移 flag 重叠场景启用）。
+// 排序键是候选自带数据属性，
 // 与注册顺序/链接顺序/static-init 顺序全部无关（跨 .cc static-init 顺序是 UB，不可依赖）。
 std::map<ExtAlgKey, std::vector<AlgCandidate>> BuildCandidateTable(const std::vector<AlgMetaRow>& rows);
 
