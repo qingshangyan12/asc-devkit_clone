@@ -18,6 +18,18 @@ struct hifloat4x2_t {
 };
 using hif4x2_t = hifloat4x2_t;
 
+// fp8_e6m2 / hif4x2 host stubs (before defs/type.h include)
+#if !defined(fp8_e6m2_t)
+namespace float8_e6m2 {
+struct Fp8e6m2T {
+    uint8_t val;
+};
+} // namespace float8_e6m2
+using fp8_e6m2_t = float8_e6m2::Fp8e6m2T;
+using vector_f8e6m2 = std::array<fp8_e6m2_t, ConstantsInternal::b8EleSize>;
+using vector_hif4x2 = std::array<hifloat4x2_t, ConstantsInternal::b8EleSize>;
+#endif
+
 inline void mad(
     __cc__ float* c_matrix, __ca__ half* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t m, uint16_t k, uint16_t n,
     uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
