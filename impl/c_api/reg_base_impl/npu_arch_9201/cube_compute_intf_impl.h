@@ -176,421 +176,361 @@ __aicore__ inline void asc_mmad(
 //=================================asc_mmad_mx======================================
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
-    __cb__ fp4x2_e1m2_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint16_t m, uint16_t k, uint16_t n,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+    __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, uint64_t scale_a_matrix, __cb__ fp4x2_e1m2_t* b_matrix,
+    uint64_t scale_b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv,
+    bool c_matrix_source, bool c_matrix_init_val)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, 0, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, 0, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
-    __cb__ fp4x2_e1m2_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+    __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, uint64_t scale_a_matrix, __cb__ fp4x2_e1m2_t* b_matrix,
+    uint64_t scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode,
+    bool disable_gemv)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, bias, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
-    __cb__ fp4x2_e2m1_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint16_t m, uint16_t k, uint16_t n,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+    __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, uint64_t scale_a_matrix, __cb__ fp4x2_e2m1_t* b_matrix,
+    uint64_t scale_b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv,
+    bool c_matrix_source, bool c_matrix_init_val)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, 0, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, 0, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
-    __cb__ fp4x2_e2m1_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+    __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, uint64_t scale_a_matrix, __cb__ fp4x2_e2m1_t* b_matrix,
+    uint64_t scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode,
+    bool disable_gemv)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, bias, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
-    __cb__ fp4x2_e1m2_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint16_t m, uint16_t k, uint16_t n,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+    __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, uint64_t scale_a_matrix, __cb__ fp4x2_e1m2_t* b_matrix,
+    uint64_t scale_b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv,
+    bool c_matrix_source, bool c_matrix_init_val)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, 0, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, 0, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
-    __cb__ fp4x2_e1m2_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+    __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, uint64_t scale_a_matrix, __cb__ fp4x2_e1m2_t* b_matrix,
+    uint64_t scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode,
+    bool disable_gemv)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, bias, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
-    __cb__ fp4x2_e2m1_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint16_t m, uint16_t k, uint16_t n,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+    __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, uint64_t scale_a_matrix, __cb__ fp4x2_e2m1_t* b_matrix,
+    uint64_t scale_b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv,
+    bool c_matrix_source, bool c_matrix_init_val)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, 0, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, 0, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
-    __cb__ fp4x2_e2m1_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+    __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, uint64_t scale_a_matrix, __cb__ fp4x2_e2m1_t* b_matrix,
+    uint64_t scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode,
+    bool disable_gemv)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, bias, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
-    __cb__ fp8_e4m3fn_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint16_t m, uint16_t k, uint16_t n,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, uint64_t scale_a_matrix, __cb__ fp8_e4m3fn_t* b_matrix,
+    uint64_t scale_b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv,
+    bool c_matrix_source, bool c_matrix_init_val)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, 0, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, 0, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
-    __cb__ fp8_e4m3fn_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, uint64_t scale_a_matrix, __cb__ fp8_e4m3fn_t* b_matrix,
+    uint64_t scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode,
+    bool disable_gemv)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, bias, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
-    __cb__ fp8_e5m2_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint16_t m, uint16_t k, uint16_t n,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, uint64_t scale_a_matrix, __cb__ fp8_e5m2_t* b_matrix,
+    uint64_t scale_b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv,
+    bool c_matrix_source, bool c_matrix_init_val)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, 0, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, 0, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
-    __cb__ fp8_e5m2_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, uint64_t scale_a_matrix, __cb__ fp8_e5m2_t* b_matrix,
+    uint64_t scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode,
+    bool disable_gemv)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, bias, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
-    __cb__ fp8_e4m3fn_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint16_t m, uint16_t k, uint16_t n,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+    __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, uint64_t scale_a_matrix, __cb__ fp8_e4m3fn_t* b_matrix,
+    uint64_t scale_b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv,
+    bool c_matrix_source, bool c_matrix_init_val)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, 0, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, 0, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
-    __cb__ fp8_e4m3fn_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+    __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, uint64_t scale_a_matrix, __cb__ fp8_e4m3fn_t* b_matrix,
+    uint64_t scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode,
+    bool disable_gemv)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, bias, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ hif4x2_t* a_matrix, __ca__ hif4_scale* scale_a_matrix, __cb__ hif4x2_t* b_matrix,
-    __cb__ hif4_scale* scale_b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode,
-    bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+    __cc__ float* c_matrix, __ca__ hif4x2_t* a_matrix, uint64_t scale_a_matrix, __cb__ hif4x2_t* b_matrix,
+    uint64_t scale_b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv,
+    bool c_matrix_source, bool c_matrix_init_val)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, 0, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, 0, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ hif4x2_t* a_matrix, __ca__ hif4_scale* scale_a_matrix, __cb__ hif4x2_t* b_matrix,
-    __cb__ hif4_scale* scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+    __cc__ float* c_matrix, __ca__ hif4x2_t* a_matrix, uint64_t scale_a_matrix, __cb__ hif4x2_t* b_matrix,
+    uint64_t scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode,
+    bool disable_gemv)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, bias, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix, __cb__ hif4x2_t* b_matrix,
-    __cb__ hif4_scale* scale_b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode,
-    bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, uint64_t scale_a_matrix, __cb__ hif4x2_t* b_matrix,
+    uint64_t scale_b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv,
+    bool c_matrix_source, bool c_matrix_init_val)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, 0, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, 0, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix, __cb__ hif4x2_t* b_matrix,
-    __cb__ hif4_scale* scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, uint64_t scale_a_matrix, __cb__ hif4x2_t* b_matrix,
+    uint64_t scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode,
+    bool disable_gemv)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, bias, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
-    __cb__ fp4x2_e2m1_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint16_t m, uint16_t k, uint16_t n,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, uint64_t scale_a_matrix, __cb__ fp4x2_e2m1_t* b_matrix,
+    uint64_t scale_b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv,
+    bool c_matrix_source, bool c_matrix_init_val)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, 0, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, 0, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
-    __cb__ fp4x2_e2m1_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, uint64_t scale_a_matrix, __cb__ fp4x2_e2m1_t* b_matrix,
+    uint64_t scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode,
+    bool disable_gemv)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, bias, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ half* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix, __cb__ fp4x2_e2m1_t* b_matrix,
-    __cb__ fp8_e8m0_t* scale_b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode,
-    bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+    __cc__ float* c_matrix, __ca__ half* a_matrix, uint64_t scale_a_matrix, __cb__ fp4x2_e2m1_t* b_matrix,
+    uint64_t scale_b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv,
+    bool c_matrix_source, bool c_matrix_init_val)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, 0, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, 0, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ half* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix, __cb__ fp4x2_e2m1_t* b_matrix,
-    __cb__ fp8_e8m0_t* scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+    __cc__ float* c_matrix, __ca__ half* a_matrix, uint64_t scale_a_matrix, __cb__ fp4x2_e2m1_t* b_matrix,
+    uint64_t scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode,
+    bool disable_gemv)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, bias, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ half* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix, __cb__ hif4x2_t* b_matrix,
-    __cb__ hif4_scale* scale_b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode,
-    bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+    __cc__ float* c_matrix, __ca__ half* a_matrix, uint64_t scale_a_matrix, __cb__ hif4x2_t* b_matrix,
+    uint64_t scale_b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv,
+    bool c_matrix_source, bool c_matrix_init_val)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, 0, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, 0, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ half* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix, __cb__ hif4x2_t* b_matrix,
-    __cb__ hif4_scale* scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+    __cc__ float* c_matrix, __ca__ half* a_matrix, uint64_t scale_a_matrix, __cb__ hif4x2_t* b_matrix,
+    uint64_t scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode,
+    bool disable_gemv)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, bias, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
-    __cb__ fp4x2_e2m1_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint16_t m, uint16_t k, uint16_t n,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+    __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, uint64_t scale_a_matrix, __cb__ fp4x2_e2m1_t* b_matrix,
+    uint64_t scale_b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv,
+    bool c_matrix_source, bool c_matrix_init_val)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, 0, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, 0, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix,
-    __cb__ fp4x2_e2m1_t* b_matrix, __cb__ fp8_e8m0_t* scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+    __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, uint64_t scale_a_matrix, __cb__ fp4x2_e2m1_t* b_matrix,
+    uint64_t scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode,
+    bool disable_gemv)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, bias, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix, __cb__ hif4x2_t* b_matrix,
-    __cb__ hif4_scale* scale_b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode,
-    bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+    __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, uint64_t scale_a_matrix, __cb__ hif4x2_t* b_matrix,
+    uint64_t scale_b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv,
+    bool c_matrix_source, bool c_matrix_init_val)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, 0, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, 0, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix, __cb__ hif4x2_t* b_matrix,
-    __cb__ hif4_scale* scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+    __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, uint64_t scale_a_matrix, __cb__ hif4x2_t* b_matrix,
+    uint64_t scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode,
+    bool disable_gemv)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, bias, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix, __cb__ fp8_e5m2_t* b_matrix,
-    __cb__ fp8_e8m0_t* scale_b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode,
-    bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+    __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, uint64_t scale_a_matrix, __cb__ fp8_e5m2_t* b_matrix,
+    uint64_t scale_b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv,
+    bool c_matrix_source, bool c_matrix_init_val)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, 0, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, 0, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source, c_matrix_init_val);
     }
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __ca__ fp8_e8m0_t* scale_a_matrix, __cb__ fp8_e5m2_t* b_matrix,
-    __cb__ fp8_e8m0_t* scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n,
-    asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+    __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, uint64_t scale_a_matrix, __cb__ fp8_e5m2_t* b_matrix,
+    uint64_t scale_b_matrix, uint64_t bias, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode,
+    bool disable_gemv)
 {
     if ASC_IS_AIC {
-        uint64_t l0a_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_a_matrix));
-        uint64_t l0b_mx_buffer_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(scale_b_matrix));
         mad_mx(
-            c_matrix, bias, a_matrix, l0a_mx_buffer_start_addr, b_matrix, l0b_mx_buffer_start_addr, m, k, n,
+            c_matrix, bias, a_matrix, scale_a_matrix, b_matrix, scale_b_matrix, m, k, n,
             static_cast<uint8_t>(unit_flag_mode), disable_gemv, true, false);
     }
 }
