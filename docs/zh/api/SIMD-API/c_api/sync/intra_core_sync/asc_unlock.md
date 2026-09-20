@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -49,7 +49,7 @@ __aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id, const asc_mutex
 
 | 参数名 | 输入/输出 | 描述 |
 | :---  | :--- | :--- |
-| pipe | 输入 | 指令的执行流水线。<br>参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](./intra_core_sync_overview.md#硬件流水类型)。|
+| pipe | 输入 | 指令的执行流水线。<br>参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](intra_core_sync_overview.md#硬件流水类型)。|
 | mutex_id | 输入 | mutex标号。取值范围[0, 31]。|
 | mode | 输入 | 可选参数，用于指定是否阻塞流水，默认值为`ASC_LOCK_BLOCK`。<br>&bull; `ASC_LOCK_BLOCK`：该指令等待`pipe`所对应的流水线中所有前置指令完成后执行。<br>&bull; `ASC_LOCK_NON_BLOCK`：该指令等待`pipe`所对应的流水线中所有前置指令完成且相同`mutex_id`的所有`asc_unlock`指令执行完成后执行。 |
 
@@ -79,7 +79,7 @@ PIPE_S
   | AIC | `PIPE_S`、`PIPE_M`、`PIPE_MTE1`、`PIPE_MTE2`、`PIPE_FIX` |
   | AIV | `PIPE_S`、`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_V` |
 
-- `mutex_id`由开发者自行管理。开发者需要根据同步依赖关系规划`mutex_id`，同一组同步依赖需要使用相同的`mutex_id`，不同同步依赖建议使用不同的`mutex_id`，否则实际同步行为可能与预期不符。例如[双缓冲样例](../../../../../../examples/02_simd_c_api/02_features/01_reg_vector_compute/00_add_double_buffer/README.md)中，ping缓冲和pong缓冲对应两组相互独立的搬入、计算、搬出流水，需要使用不同的`mutex_id`，才能保持两组流水的同步关系相互独立并行。
+- `mutex_id`由开发者自行管理。开发者需要根据同步依赖关系规划`mutex_id`，同一组同步依赖需要使用相同的`mutex_id`，不同同步依赖建议使用不同的`mutex_id`，否则实际同步行为可能与预期不符。例如[双缓冲样例](../../../../../../../examples/02_simd_c_api/02_features/01_reg_vector_compute/00_add_double_buffer/README.md)中，ping缓冲和pong缓冲对应两组相互独立的搬入、计算、搬出流水，需要使用不同的`mutex_id`，才能保持两组流水的同步关系相互独立并行。
 
 - `asc_lock`与`asc_unlock`必须严格成对使用，并使用相同的`pipe`、`mutex_id`和`mode`。此外，对应的`asc_unlock`必须始终写在`asc_lock`之后，否则属于未定义行为。
 

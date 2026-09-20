@@ -5,19 +5,19 @@
 AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以异步并行的方式运行，在读写同一存储资源时可能存在数据依赖关系。为确保数据一致性及计算正确性，需通过同步控制协调操作时序。
 
 <!-- npu="950" id2 -->
-针对[NPU架构3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)，硬件架构图如下，高亮部分展示了并行执行的计算单元和搬运单元。
+针对[NPU架构3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)，硬件架构图如下，高亮部分展示了并行执行的计算单元和搬运单元。
 
 **图1**  NPU架构3510架构图    
-![](../../../figures/npu_3510_hw_arch_sync.png)
+![](../../../../figures/npu_3510_hw_arch_sync.png)
 
 <!-- end id2 -->
 
 <!-- npu="A3,910b" id1 -->
 
-针对[NPU架构2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)，硬件架构图如下，高亮部分展示了并行执行的计算单元和搬运单元。
+针对[NPU架构2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)，硬件架构图如下，高亮部分展示了并行执行的计算单元和搬运单元。
 
 **图2**  NPU架构2201架构图    
-![](../../../figures/atlas_a2_a3_architecture.png)
+![](../../../../figures/atlas_a2_a3_architecture.png)
 
 <!-- end id1 -->
 
@@ -28,19 +28,19 @@ AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以
 3. 然后再通过DMA执行单元将计算结果从Local Memory搬出到GM。
 
 **图3**  Vector计算数据流示意图    
-![](../../../figures/vector_compute_data_flow.png)
+![](../../../../figures/vector_compute_data_flow.png)
 
 四个执行单元Scalar、Vector、DMA（MTE2）、DMA（MTE3）并行执行，若访问同一片Local Memory，需要同步机制来控制它们的访问时序：保证先搬入Local Memory后再计算，计算完成后再搬出。
 
 **图4**  核内并行流水执行时序示意图    
-![](../../../figures/intra_core_parallel_pipeline_execution_timing.png)
+![](../../../../figures/intra_core_parallel_pipeline_execution_timing.png)
 
 ## 硬件流水类型
 
 AI Core内部并行的指令流水类型和解释如下所示：
 
 > [!NOTE]说明
-> 不同的硬件架构，每一种硬件流水类型包含的具体流水会有所差异，详细介绍请参考[硬件实现](../../../../guide/programming_guide/advanced_programming/hardware_implementation/hardware_implementation.md)章节。
+> 不同的硬件架构，每一种硬件流水类型包含的具体流水会有所差异，详细介绍请参考[硬件实现](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/hardware_implementation.md)章节。
 
 **表1**  指令流水类型和相关说明
 
@@ -82,7 +82,7 @@ typedef enum {
         - `asc_sync_notify`：当源流水的前序指令的所有读写操作都完成之后，当前指令开始执行，并将硬件中的对应标志位设置为1。
         - `asc_sync_wait`：当目的流水执行到该指令时，如果发现硬件中对应标志位为0，目的流水的后续指令将一直被阻塞；如果发现硬件中对应标志位为1，则将硬件中对应标志位设置为0，同时目的流水的后续指令开始执行。
      <!-- npu="950" id3 -->
-     - Ascend 950PR/Ascend 950DT新增通过[asc_lock](asc_lock.md)/[asc_unlock](asc_unlock.md)接口进行不同流水间的同步控制。通过`asc_lock`锁定指定流水（阻塞后续指令），再通过`asc_unlock`释放流水，完成流水间的同步依赖。
+     - Ascend 950PR&950DT系列产品新增通过[asc_lock](asc_lock.md)/[asc_unlock](asc_unlock.md)接口进行不同流水间的同步控制。通过`asc_lock`锁定指定流水（阻塞后续指令），再通过`asc_unlock`释放流水，完成流水间的同步依赖。
         - `asc_lock`：根据`mutex_id`获取Mutex，若Mutex已被锁定，将阻塞后续指定流水指令队列，直到前序指令中对应`mutex_id`的Mutex被`asc_unlock`。
         - `asc_unlock`：当前流水的前置指令退出后，根据`mutex_id`释放对应Mutex。
      - `asc_lock`与`asc_unlock`与`asc_sync_notify`和`asc_sync_wait`相比，该组合内聚性更强、与其它流水解耦，可简化反向同步逻辑，具体说明请参考[功能说明](asc_lock.md#功能说明)。
@@ -97,7 +97,7 @@ typedef enum {
 - 通过[asc_sync_data_barrier](asc_sync_data_barrier.md)接口阻塞后续指令的执行，直到此前已发出但尚未完成的内存访问指令全部执行完成。开发者通过`arg`参数指定屏障作用的内存范围，确保屏障前后的内存访问指令按预期顺序完成。
 
 <!-- npu="A3,910b" id4 -->
-以[NPU架构2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)为例，该硬件架构下所有合法的核内同步组合如[表2](#aic_intra_core_sync_combinations)和[表3](#aiv_intra_core_sync_combinations)所示。其中，“不涉及”表示硬件层面不存在此种同步组合，“暂无应用场景”表示存在此种同步组合，但在实际开发场景中暂不需要使用。
+以[NPU架构2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)为例，该硬件架构下所有合法的核内同步组合如[表2](#aic_intra_core_sync_combinations)和[表3](#aiv_intra_core_sync_combinations)所示。其中，“不涉及”表示硬件层面不存在此种同步组合，“暂无应用场景”表示存在此种同步组合，但在实际开发场景中暂不需要使用。
 
 <a id="aic_intra_core_sync_combinations"></a>
 
