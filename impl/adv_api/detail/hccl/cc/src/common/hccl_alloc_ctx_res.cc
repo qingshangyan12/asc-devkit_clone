@@ -709,59 +709,76 @@ ForcedAlgKind GetForcedAlg(
     return ForcedAlgKind::BARE_NAME;
 }
 
+// 强制算法定名（2026-09-20 重构，需求前 GetForcedAlgName 形状回归 + EXTERNAL 分支）：
+// algConfig → 注册名，bool 出口。true = 已定名（裸名直取 / 外部名经三级漏斗解析），topoInfo 已备好，
+// 调用方接着 PrepareEngineForAlg 即可；false = 无强制 / legacy / 外部名坏（三要素 WARNING 已打，
+// opParam/topoInfo 与进入时一致）→ 调用方走默认 selector。失败语义与 bare 同链同终态（设计 §10/D7）。
+bool GetForcedAlgName(
+    HcclComm comm, const Mc2CcTilingInner* ccTiling, OpParam& opParam,
+    std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo, std::string& algName)
+{
+    algName.clear();
+    if (ccTiling == nullptr || ccTiling->algConfig[0] == '\0') {
+        return false; // 无强制配置（需求前语义）
+    }
+    std::string algConfig(ccTiling->algConfig);
+    if (algConfig.find('=') != std::string::npos) {
+        HCCL_INFO("[MC2_FORCE_ALG] legacy algConfig[%s], use default selector.", algConfig.c_str());
+        return false; // legacy 老语法（需求前日志逐字保留）
+    }
+    if (algConfig.find('[') == std::string::npos) {
+        // 裸名：名字即 algConfig，无解析；topo 统一在此备好（后续引擎准备/资源步骤均需 topoInfo）
+        CHK_RET(PrepareTopoInfoForOp(comm, opParam, topoInfo));
+        algName = algConfig;
+        return true;
+    }
+    // EXTERNAL：解析失败 = WARNING + false（宽容回退，D7；≈裸名未注册在预检段的下场）。
+    // 出口契约：false 时 opParam/topoInfo 与进入时一致（动手前备份、失败即还原）。
+    ExternalAlgSpec extSpec;
+    std::string extParseErrMsg;
+    if (!ParseExternalAlg(algConfig, extSpec, extParseErrMsg)) {
+        HCCL_WARNING(
+            "[MC2_EXT_ALG] fallback to default selector, algConfig[%s], opType[%u], reason[%s].", ccTiling->algConfig,
+            ccTiling->opType, extParseErrMsg.c_str());
+        return false;
+    }
+    OpParam opParamBackup = opParam; // topo 准备会写 opParam（hcclComm 等），动手前备份
+    if (PrepareTopoInfoForOp(comm, opParam, topoInfo) != HCCL_SUCCESS) {
+        opParam = opParamBackup; // 失败细节 PrepareTopoInfoForOp 内已打
+        return false;
+    }
+    std::string resolvedName;
+    std::string resolveErrMsg;
+    if (ResolveExternalAlg(opParam, topoInfo.get(), extSpec, resolvedName, resolveErrMsg) != ResolveStatus::RESOLVED) {
+        opParam = opParamBackup;
+        topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
+        HCCL_WARNING(
+            "[MC2_EXT_ALG] fallback to default selector, algConfig[%s], opType[%u], reason[%s].", ccTiling->algConfig,
+            ccTiling->opType, resolveErrMsg.c_str());
+        return false;
+    }
+    algName = resolvedName;
+    HCCL_INFO(
+        "[MC2_EXT_ALG] accepted, opType[%u], algConfig[%s] -> algName[%s].", static_cast<u32>(opParam.opType),
+        ccTiling->algConfig, algName.c_str());
+    return true;
+}
+
 HcclResult TryForcedAlgAndPrepareEngine(
     HcclComm comm, const Mc2CcTilingInner* ccTiling, OpParam& opParam, std::string& algName,
     std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo, bool& forcedAlgAccepted)
 {
     forcedAlgAccepted = false;
     std::string forcedAlgName;
-    ExternalAlgSpec extSpec;
-    std::string extParseErrMsg;
-    const ForcedAlgKind kind = GetForcedAlg(ccTiling, forcedAlgName, extSpec, extParseErrMsg);
-    if (kind == ForcedAlgKind::NONE || kind == ForcedAlgKind::LEGACY) {
-        return HCCL_SUCCESS; // 非强制 → 默认 selector（旧 :706-708 语义）
-    }
-
+    // GetForcedAlgName 内部含 topo 准备（会写 opParam），备份须在调用之前；
+    // false 出门时 opParam/topoInfo 已在函数内复原，无需善后
     OpParam opParamBackup = opParam;
-
-    if (kind == ForcedAlgKind::EXTERNAL) {
-        // 外部名通道：严格语义，无任何静默回退（设计 §10），跳过 CheckForcedAlgResource 预检（§8 注）。
-        // SelectCcuAlgorithm 分配路径与 hccl_mc2.cc 闸门 B 有同构严格分支，修改报错语义时三处同步。
-        if (!extParseErrMsg.empty()) {
-            HCCL_ERROR(
-                "[MC2_EXT_ALG] ERROR: parse failed, algConfig[%s], opType[%u], reason[%s].", ccTiling->algConfig,
-                ccTiling->opType, extParseErrMsg.c_str());
-            return HCCL_E_NOT_SUPPORT;
-        }
-        CHK_RET(PrepareTopoInfoForOp(comm, opParam, topoInfo));
-        std::string resolvedName;
-        std::string resolveErrMsg;
-        if (ResolveExternalAlg(opParam, topoInfo.get(), extSpec, resolvedName, resolveErrMsg) !=
-            ResolveStatus::RESOLVED) {
-            HCCL_ERROR(
-                "[MC2_EXT_ALG] ERROR: resolve failed, algConfig[%s], opType[%u], reason[%s].", ccTiling->algConfig,
-                ccTiling->opType, resolveErrMsg.c_str());
-            opParam = opParamBackup;
-            return HCCL_E_NOT_SUPPORT;
-        }
-        HcclResult ret = PrepareEngineForAlg(opParam, resolvedName);
-        if (ret != HCCL_SUCCESS) {
-            HCCL_ERROR(
-                "[MC2_EXT_ALG] ERROR: prepare engine failed, algConfig[%s], algName[%s], ret[%d].", ccTiling->algConfig,
-                resolvedName.c_str(), static_cast<int>(ret));
-            opParam = opParamBackup;
-            return ret;
-        }
-        algName = resolvedName;
-        forcedAlgAccepted = true;
-        HCCL_INFO(
-            "[MC2_EXT_ALG] accepted, opType[%u], algConfig[%s] -> algName[%s].", static_cast<u32>(opParam.opType),
-            ccTiling->algConfig, algName.c_str());
-        return HCCL_SUCCESS;
+    if (!GetForcedAlgName(comm, ccTiling, opParam, topoInfo, forcedAlgName)) {
+        return HCCL_SUCCESS; // 无强制 / legacy / 外部名坏（WARNING 已打）→ 调用方走默认 selector
     }
 
-    // BARE_NAME：现状流程逐字节保留（旧 :710-736），含 CheckForcedAlgResource 预检与静默回退
-    CHK_RET(PrepareTopoInfoForOp(comm, opParam, topoInfo));
+    // 裸名/外部名同路：引擎准备 + 资源预检 + 失败回退（需求前 BARE 段；topo 准备已上移至
+    // GetForcedAlgName；EXTERNAL 并入预检，D7 统一）
     HcclResult ret = PrepareEngineForAlg(opParam, forcedAlgName);
     if (ret != HCCL_SUCCESS) {
         opParam = opParamBackup;
@@ -987,14 +1004,8 @@ HcclResult GetOpParam(
     void* resCtxSequence = nullptr;
     HcclResult resRet = GetOpParamResCtx(comm, algName, opParam, topoInfo.get(), &resCtxSequence);
     if (resRet != HCCL_SUCCESS && forcedAlgAccepted && resCtxSequence == nullptr) {
-        // EXTERNAL 通道资源失败同样回退默认 selector（2026-09-19 决策: 与裸名既有行为统一，
-        // 翻转原 D4 的资源半边；定名/输入类失败仍严格报错，见 TryForcedAlgAndPrepareEngine）
-        if (ccTiling->algConfig[0] != '\0' && std::string(ccTiling->algConfig).find('[') != std::string::npos) {
-            HCCL_WARNING(
-                "[MC2_EXT_ALG] fallback to default selector after resource failure, algConfig[%s], "
-                "resolvedAlgName[%s], ret[%d].",
-                ccTiling->algConfig, algName.c_str(), static_cast<int>(resRet));
-        }
+        // 强制算法资源失败回退默认 selector（裸名/外部名同策略，D7）；
+        // 外部名的 algConfig→algName 映射见定名时的 [MC2_EXT_ALG] accepted 日志
         HCCL_WARNING(
             "[MC2_FORCE_ALG] fallback to default selector after resource failure, algName[%s], ret[%d].",
             algName.c_str(), static_cast<int>(resRet));
@@ -1061,9 +1072,9 @@ HcclResult FillCcuAlgTypeAndName(
 }
 
 // 选择CCU算法并回填algorithmType与opParam.algName。
-// onlyCheck为true时（校验路径）：algConfig为合法强制算法名时先尝试强制算法（注册/层级/资源计算均校验通过才接受），
-// 强制算法不可用或校验失败时回退默认selector；分配路径按四态分流（EXTERNAL 走闸门 C 真定名，严格报错），
-// BARE_NAME 直取强制名，NONE/LEGACY 走默认 selector。
+// onlyCheck为true时（校验路径）：强制算法 + 预检失败回退默认selector（探测与正式选名一致）；
+// 分配路径（需求前 if/else 形状回归）：定名成功直接 PrepareEngineForAlg（裸名/外部名同路，无预检，
+// topo 已在 GetForcedAlgName 内备好），无强制 / 外部名坏（WARNING 已打，D7）走默认 selector。
 HcclResult SelectCcuAlgorithm(
     HcclComm comm, void* stream, const std::string& topoTag, const Mc2CcTilingInner* ccTiling, uint32_t tilingIndex,
     OpParam& opParam, std::string& algName, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo,
@@ -1087,52 +1098,15 @@ HcclResult SelectCcuAlgorithm(
         return FillCcuAlgTypeAndName(tilingIndex, ccTiling, algName, opParam, algorithmType);
     }
 
-    std::string forcedAlgName;
-    ExternalAlgSpec extSpec;
-    std::string extParseErrMsg;
-    const ForcedAlgKind kind = GetForcedAlg(ccTiling, forcedAlgName, extSpec, extParseErrMsg);
-    if (kind == ForcedAlgKind::EXTERNAL) {
-        // 闸门 C：真定名（resolver ①引擎过滤留 CCU 行）→ KFC 衔接（FillCcuAlgTypeAndName 现有机制）。
-        // 与 TryForcedAlgAndPrepareEngine、hccl_mc2.cc 闸门 B 为同构严格分支，修改报错语义时三处同步。
-        if (!extParseErrMsg.empty()) {
-            HCCL_ERROR(
-                "[MC2_EXT_ALG] ERROR: parse failed, algConfig[%s], opType[%u], reason[%s].", ccTiling->algConfig,
-                ccTiling->opType, extParseErrMsg.c_str());
-            return HCCL_E_NOT_SUPPORT;
-        }
-        CHK_RET(PrepareTopoInfoForOp(comm, opParam, topoInfo));
-        std::string resolvedName;
-        std::string resolveErrMsg;
-        if (ResolveExternalAlg(opParam, topoInfo.get(), extSpec, resolvedName, resolveErrMsg) !=
-            ResolveStatus::RESOLVED) {
-            HCCL_ERROR(
-                "[MC2_EXT_ALG] ERROR: resolve failed, algConfig[%s], opType[%u], reason[%s].", ccTiling->algConfig,
-                ccTiling->opType, resolveErrMsg.c_str());
-            return HCCL_E_NOT_SUPPORT;
-        }
-        HcclResult prepRet = PrepareEngineForAlg(opParam, resolvedName);
-        if (prepRet != HCCL_SUCCESS) {
-            HCCL_ERROR(
-                "[MC2_EXT_ALG] ERROR: prepare engine failed, algConfig[%s], algName[%s], ret[%d].", ccTiling->algConfig,
-                resolvedName.c_str(), static_cast<int>(prepRet));
-            return prepRet;
-        }
-        algName = resolvedName;
-        HCCL_INFO(
-            "[CcuSelectAlg] use configured external algorithm[%s] for ccTiling[%u].", algName.c_str(), tilingIndex);
-        return FillCcuAlgTypeAndName(tilingIndex, ccTiling, algName, opParam, algorithmType);
-    }
-    if (kind == ForcedAlgKind::BARE_NAME) {
-        algName = forcedAlgName; // 现状 :1028-1031 逐字节保留
-        CHK_RET(PrepareTopoInfoForOp(comm, opParam, topoInfo));
+    // 分配路径：定名成功即引擎准备；无强制/外部名坏走默认 selector（需求前 if/else 形状）
+    if (GetForcedAlgName(comm, ccTiling, opParam, topoInfo, algName)) {
         CHK_RET(PrepareEngineForAlg(opParam, algName));
         HCCL_INFO("[CcuSelectAlg] use configured algorithm[%s] for ccTiling[%u].", algName.c_str(), tilingIndex);
-        return FillCcuAlgTypeAndName(tilingIndex, ccTiling, algName, opParam, algorithmType);
+    } else {
+        CHK_RET(SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo));
+        HCCL_INFO(
+            "[CcuSelectAlg]SelectAlgAndPrepareEngine[%u] successfully, algName = [%s]!", tilingIndex, algName.c_str());
     }
-    // NONE / LEGACY：默认 selector（现状 :1032-1036 逐字节保留）
-    CHK_RET(SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo));
-    HCCL_INFO(
-        "[CcuSelectAlg]SelectAlgAndPrepareEngine[%u] successfully, algName = [%s]!", tilingIndex, algName.c_str());
     return FillCcuAlgTypeAndName(tilingIndex, ccTiling, algName, opParam, algorithmType);
 }
 

@@ -191,9 +191,17 @@ HcclResult CheckForcedAlgResource(
     HcclComm comm, const OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo, const std::string& algName);
 
 // algConfig 四态识别（NONE/LEGACY/EXTERNAL/BARE_NAME）。EXTERNAL 解析失败时 spec 复位无效、
-// extParseErrMsg 非空，由调用方按严格语义报错（外部名通道零静默降级）。
+// extParseErrMsg 非空。现仅闸门 B（hccl_mc2.cc 存在性检查）使用；定名请走 GetForcedAlgName。
 ForcedAlgKind GetForcedAlg(
     const Mc2CcTilingInner* ccTiling, std::string& algName, ExternalAlgSpec& extSpec, std::string& extParseErrMsg);
+
+// 强制算法定名（2026-09-20 重构，需求前 GetForcedAlgName 形状回归）：algConfig → 注册名。
+// true  = 已定名（裸名直取 / 外部名经三级漏斗解析），topoInfo 已备好，调用方接着 PrepareEngineForAlg；
+// false = 无强制配置 / legacy / 外部名坏（三要素 WARNING 已在函数内打印，opParam/topoInfo 与进入时一致）
+//         → 调用方走默认 selector。失败语义与 bare 同链同终态（设计 §10/D7）。
+bool GetForcedAlgName(
+    HcclComm comm, const Mc2CcTilingInner* ccTiling, OpParam& opParam,
+    std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo, std::string& algName);
 
 HcclResult TryForcedAlgAndPrepareEngine(
     HcclComm comm, const Mc2CcTilingInner* ccTiling, OpParam& opParam, std::string& algName,

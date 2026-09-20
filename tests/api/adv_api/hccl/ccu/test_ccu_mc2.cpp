@@ -53,7 +53,19 @@ REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLGATHER, CcuSchedAllGatherSoleMesh, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherMesh1D, AlgEngine::AICPU, "sole[mesh]", COND_NONE, FLAG_NONE);
+// D8 漂移探针夹具：(AR, sole[mesh]) 键注入一好一坏两个 CCU 候选——
+// CcuSchedAllReduceSoleMesh（algorithmMap 真身 + V2 stub 恒真 → 双名单过）+
+// UtDriftProbeCcuFake（不在 algorithmMap → 双名单不过，模拟 sidecar 与 build 漂移）。
+// 闸门 B 全量校验（校验范围须覆盖闸门 C 漏斗的选择范围）下该键整体拒绝；
+// GateBRejectsDriftedExternalCandidate 用例钉住此行为。无其它用例使用 (AR, sole[mesh]) 键。
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_ALLREDUCE, CcuSchedAllReduceSoleMesh, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_ALLREDUCE, UtDriftProbeCcuFake, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE);
 } // namespace mc2_ops_hccl
+
+// hccl_mc2.cc 闸门 B 入口（非 static 自由函数，符号可见；须在全局作用域声明）
+bool CheckCcuAlgorithmsRegistered(const void* ccTilingList[], uint32_t tilingNum);
 
 namespace {
 
@@ -762,10 +774,10 @@ TEST_F(CcuMc2TestSuite, AutomaticAndLegacyConfigSkipForcedBridgePrecheck)
     }
 }
 
-// EXTERNAL 严格分支（Task 7 改造点②）：三态零静默回退
-TEST_F(CcuMc2TestSuite, TryForcedAlgExternalParseFailIsStrict)
+// EXTERNAL 坏配置（D7：与裸名未注册同链同终态，设计 §10）：WARNING + false → 调用方走默认 selector
+TEST_F(CcuMc2TestSuite, TryForcedAlgExternalParseFailFallsBackToSelector)
 {
-    // 语法错：直接报错，不回退 selector
+    // 语法错：不报错中止，回退 selector
     Mc2CcTilingInner tiling{};
     tiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
     tiling.commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED);
@@ -774,14 +786,14 @@ TEST_F(CcuMc2TestSuite, TryForcedAlgExternalParseFailIsStrict)
     std::string algName;
     auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
     bool accepted = true;
-    EXPECT_EQ(TryForcedAlgAndPrepareEngine(comm_, &tiling, opParam, algName, topoInfo, accepted), HCCL_E_NOT_SUPPORT);
+    EXPECT_EQ(TryForcedAlgAndPrepareEngine(comm_, &tiling, opParam, algName, topoInfo, accepted), HCCL_SUCCESS);
     EXPECT_FALSE(accepted);
     EXPECT_TRUE(algName.empty());
 }
 
-TEST_F(CcuMc2TestSuite, TryForcedAlgExternalResolveFailIsStrict)
+TEST_F(CcuMc2TestSuite, TryForcedAlgExternalResolveFailFallsBackToSelector)
 {
-    // 语义错（无 3 层注册候选）：报错且 opParam 复位
+    // 语义错（无 3 层注册候选）：WARNING + false 回退 selector，且 opParam 复位到入口现场
     Mc2CcTilingInner tiling{};
     tiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
     tiling.commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED);
@@ -792,13 +804,27 @@ TEST_F(CcuMc2TestSuite, TryForcedAlgExternalResolveFailIsStrict)
     std::string algName;
     auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
     bool accepted = true;
-    EXPECT_EQ(TryForcedAlgAndPrepareEngine(comm_, &tiling, opParam, algName, topoInfo, accepted), HCCL_E_NOT_SUPPORT);
+    EXPECT_EQ(TryForcedAlgAndPrepareEngine(comm_, &tiling, opParam, algName, topoInfo, accepted), HCCL_SUCCESS);
     EXPECT_FALSE(accepted);
     EXPECT_TRUE(algName.empty());
     // resolve 失败后 opParam 复位到入口现场：hcclComm 入口为 nullptr，PrepareTopoInfoForOp
-    // 会改写为 comm，复位断言钉住 opParam = opParamBackup 真正生效（engine 全程未变，弱断言仅留作旁证）
+    // 会改写为 comm，复位断言钉住 GetForcedAlgName 内 opParam = opParamBackup 真正生效
+    // （engine 全程未变，弱断言仅留作旁证）
     EXPECT_EQ(opParam.hcclComm, nullptr);
     EXPECT_EQ(opParam.engine, CommEngine::COMM_ENGINE_AICPU_TS);
+}
+
+// D8 全量校验：(AR, sole[mesh]) 候选集 = 真身（双名单过）+ 漂移探针（未注册）→ 整体拒绝。
+// 旧">=1 即放行"语义下真身命中会放行——本用例区分新旧语义：
+// 闸门 C 漏斗可能选中候选集中的任何一个，校验范围必须覆盖选择范围（闭环"B查X/C选Y"缺口）。
+TEST_F(CcuMc2TestSuite, GateBRejectsDriftedExternalCandidate)
+{
+    Mc2CcTilingInner tiling{};
+    tiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE);
+    tiling.commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED);
+    strcpy(tiling.algConfig, "sole[mesh]");
+    const void* ccTilingList[] = {&tiling};
+    EXPECT_FALSE(CheckCcuAlgorithmsRegistered(ccTilingList, 1U));
 }
 
 // EXTERNAL 资源失败回退（2026-09-19 决策：与裸名既有两级回退行为统一）：
