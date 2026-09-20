@@ -13,8 +13,9 @@
 ascendc compile gen code
 """
 
-import re
+import math
 import os
+import re
 from functools import reduce
 from tbe.common.buildcfg import get_current_build_config
 from .get_op_tiling import TilingInfo
@@ -411,6 +412,7 @@ def add_op_param_to_workspace(
                 input_shape_len = reduce(
                     lambda x, y: x * y, op_param.get("shape")
                 ) * INPUT_OUTPUT_DTYPE_LEN.get(op_param.get("dtype"))
+                input_shape_len = math.ceil(input_shape_len)
                 input_shape_len = (input_shape_len + 32 - 1) // 32 * 32
                 source += "    AscendC::OOMCheckAddrRange({}, {});\n".format(
                     op_param.get("param_name"), input_shape_len
@@ -418,11 +420,16 @@ def add_op_param_to_workspace(
             else:
                 input_shape_len = "*((__gm__ uint64_t *)((__gm__ uint8_t *)tiling + tmpTilingSizeForOOM))"
                 element_size = INPUT_OUTPUT_DTYPE_LEN.get(op_param.get("dtype"), 0)
-                source += OOM_TENSOR_REGISTER_PATTERN.format(
-                    param_name=op_param.get("param_name"),
-                    element_size=element_size,
-                    input_shape_len=input_shape_len,
-                )
+                if element_size < 1:
+                    source += "    AscendC::OOMCheckAddrRange({}, {});\n".format(
+                        op_param.get("param_name"), input_shape_len
+                    )
+                else:
+                    source += OOM_TENSOR_REGISTER_PATTERN.format(
+                        param_name=op_param.get("param_name"),
+                        element_size=element_size,
+                        input_shape_len=input_shape_len,
+                    )
         source += "    tmpTilingSizeForOOM += 8;\n"
         count = count + 1
     source += set_workspace_param(opinfo, tiling_info)
