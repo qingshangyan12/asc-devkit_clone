@@ -31,6 +31,9 @@ from .ascendc_constants import (
 from .get_op_tiling import OpInfo
 from .global_storage import global_var_storage
 from .ascendc_compile_dfx import DFXSectionGenerator
+import subprocess
+import struct
+from .log_utils import AscendCLogLevel
 
 
 def add_time_stamp_codes(desc_id, space_len: int = 1):
@@ -557,3 +560,134 @@ def gen_dfx_section_for_one_tiling_key_dynamic(
                 tiling_key, tiling_info, tiling_key_struct_size_map, kernel_name
             )
     return source
+
+
+TILING_KEY_SEARCH_KEYWORD = "Contents of section"  # used in new tiling to search tiling section lines
+
+
+def _get_tiling_struct_size(compile_info):
+    tiling_struct_set = set()
+    tiling_struct_size_map = {}
+    max_tiling_size = 0
+    for _, tiling_struct in compile_info.tiling_key_struct_map.items():
+        tiling_struct_set.add(tiling_struct)
+
+    for tiling_struct in tiling_struct_set:
+        objdump_cmd = [
+            "llvm-objdump",
+            "-s",
+            "-j",
+            ".ascendc_tiling.{}".format(tiling_struct),
+            "{}".format(compile_info.dst_file),
+        ]
+        proc = subprocess.Popen(objdump_cmd, stdout=subprocess.PIPE, stderr=None)
+        (out, _) = proc.communicate()
+        """
+        e.g.
+        Contents of section .ascend.meta.TilingData:         # main_tiling_info[0]
+        0000 50000000 00000000                    P.......   # main_tiling_info[1] that needs to be parsed
+        """
+        tiling_str_info = out.decode("utf-8")
+        if TILING_KEY_SEARCH_KEYWORD in tiling_str_info:  # key words from llvm-objdump .ascendc_tiling.
+            main_line_start_index = tiling_str_info.index(TILING_KEY_SEARCH_KEYWORD)
+            main_tiling_info = tiling_str_info[main_line_start_index:].split("\n")
+            hex_num = main_tiling_info[1].split(" ")[2:4]
+            hex_num_str = CommonUtility.parser_uint64_hex_num(hex_num)
+            bytes_data = bytes.fromhex(hex_num_str)
+            dec_data = struct.unpack(">Q", bytes_data)[0]
+            tiling_struct_size_map[tiling_struct] = dec_data
+            max_tiling_size = max(max_tiling_size, dec_data)
+
+    # Preserve exact per-key sizes for Manifest constants before removing sections.
+    compile_info.compiled_tiling_key_data_size_map = {
+        str(tiling_key): int(tiling_struct_size_map[tiling_struct])
+        for tiling_key, tiling_struct in compile_info.tiling_key_struct_map.items()
+        if tiling_struct in tiling_struct_size_map
+    }
+    # The sk sub operator failed to rm tiling section because llvm-objcopy could not correctly process the ar obj.
+    if (
+        global_var_storage.get_variable("ascendc_enable_super_kernel") is True
+        and compile_info.is_super_kernel_compile is False
+    ):
+        CommonUtility.print_compile_log(
+            compile_info.kernel_name,
+            "[Superkernel]In sk sub kernel compile, do not need rm tiling seciton!",
+            AscendCLogLevel.LOG_INFO,
+        )
+        return max_tiling_size
+    # remove ascendc_tiling section
+    objdump_cmd = ["llvm-objcopy", "--remove-section=.ascendc_tiling.*", "{}".format(compile_info.dst_file)]
+    proc = subprocess.Popen(objdump_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    CommonUtility.print_compile_log(compile_info.kernel_name, "need rm tiling seciton!", AscendCLogLevel.LOG_INFO)
+    (out, _) = proc.communicate()
+    return max_tiling_size
+
+
+def _get_tiling_struct_without_register_size(compile_info: CompileInfo):
+    section_name_set = set()
+    tiling_key_struct_size_map = {}  # tiling_key -> (tiling_struct, struct_size)
+    max_tiling_size = 0
+    objdump_cmd = ["llvm-objdump", "-s", f"{compile_info.dst_file}"]
+    proc = subprocess.Popen(objdump_cmd, stdout=subprocess.PIPE, stderr=None)
+    (out, _) = proc.communicate()
+    tiling_str_info = out.decode("utf-8")
+    tiling_lines = [line for line in tiling_str_info.splitlines() if ".ascendc_tiling" in line]
+    pattern = re.compile(r"\.ascendc_tiling\.[^\s]+")
+
+    for line in tiling_lines:
+        for match in pattern.findall(line):
+            # match eg. ".ascendc_tiling.optiling::TilingData1_2UL.0"
+            match = match.rstrip(":;,")
+            section_name_set.add(match)
+            name_part = match.split(".ascendc_tiling.", 1)[1]
+            name_part = name_part.rsplit(".", 1)[0]
+
+            tiling_key_struct_size_map = get_tiling_key_struct_size_map(
+                tiling_key_struct_size_map, name_part, compile_info, 0
+            )
+
+    for section_name in section_name_set:
+        objdump_cmd = ["llvm-objdump", "-s", "-j", "{}".format(section_name), "{}".format(compile_info.dst_file)]
+        proc = subprocess.Popen(objdump_cmd, stdout=subprocess.PIPE, stderr=None)
+        (out, _) = proc.communicate()
+        tiling_str_info = out.decode("utf-8")
+        if TILING_KEY_SEARCH_KEYWORD in tiling_str_info:  # key words from llvm-objdump .ascendc_tiling.
+            main_line_start_index = tiling_str_info.index(TILING_KEY_SEARCH_KEYWORD)
+            main_tiling_info = tiling_str_info[main_line_start_index:].split("\n")
+            hex_num = main_tiling_info[1].split(" ")[2:4]
+            hex_num_str = CommonUtility.parser_uint64_hex_num(hex_num)
+            bytes_data = bytes.fromhex(hex_num_str)
+            dec_data = struct.unpack(">Q", bytes_data)[0]
+            name_part = section_name.split(".ascendc_tiling.", 1)[1].rsplit(".", 1)[0]
+            tiling_key_struct_size_map = get_tiling_key_struct_size_map(
+                tiling_key_struct_size_map, name_part, compile_info, dec_data
+            )
+            max_tiling_size = max(max_tiling_size, dec_data)
+    compile_info.max_tiling_size = max_tiling_size
+    # REGISTER_NONE_TILING sections encode both the struct name and byte size.
+    compile_info.compiled_tiling_key_data_size_map = {
+        str(tiling_key): int(value[1])
+        for tiling_key, value in tiling_key_struct_size_map.items()
+        if isinstance(value, tuple) and len(value) == 2 and value[1] > 0
+    }
+    return tiling_key_struct_size_map
+
+
+def delete_tiling_section(compile_info: CompileInfo):
+    # The sk sub operator failed to rm tiling section because llvm-objcopy could not correctly process the ar obj.
+    if (
+        global_var_storage.get_variable("ascendc_enable_super_kernel") is True
+        and compile_info.is_super_kernel_compile is False
+    ):
+        CommonUtility.print_compile_log(
+            compile_info.kernel_name,
+            "[Superkernel]In sk sub kernel compile, do not need rm tiling seciton!",
+            AscendCLogLevel.LOG_INFO,
+        )
+        return
+    # remove ascendc_tiling section
+    objdump_cmd = ["llvm-objcopy", "--remove-section=.ascendc_tiling.*", "{}".format(compile_info.dst_file)]
+    proc = subprocess.Popen(objdump_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    CommonUtility.print_compile_log(compile_info.kernel_name, "need rm tiling seciton!", AscendCLogLevel.LOG_INFO)
+    (out, _) = proc.communicate()
+    return

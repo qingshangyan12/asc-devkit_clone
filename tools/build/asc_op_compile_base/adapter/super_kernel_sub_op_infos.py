@@ -421,56 +421,59 @@ operator inherits super kernel opton."
                 result += f"\n    {func_addr_str}_split{i} = (uint64_t)({aicore_kernel_name}_split{i});"
         return result
 
+    def _gen_single_core_case_block(self, aicore_kernel_name, func_addr_slot, kernel_type, params_with_type):
+        case_block = f"""
+{self.gen_select_addr_code(func_addr_slot, aicore_kernel_name)}
+dy_block_num = ((uint64_t){kernel_type.value}) << 32 | (*blockNumAddr);
+"""
+        self.sub_kernel_names.append(aicore_kernel_name)
+        self.kernel_declare += self._gen_sub_kernel_decare_once(aicore_kernel_name, params_with_type)
+        return case_block
+
+    def _gen_mix_aic_case_block(self, kernel_info_of_tiling_key, chip_version, kernel_type, params_with_type):
+        aiv_kernel_name = kernel_info_of_tiling_key[f"dav-{chip_version}-vec"]
+        aic_kernel_name = kernel_info_of_tiling_key[f"dav-{chip_version}-cube"]
+        case_block = f"""
+{self.gen_select_addr_code("aiv_func_addr", aiv_kernel_name)}
+{self.gen_select_addr_code("aic_func_addr", aic_kernel_name)}
+dy_block_num = ((uint64_t){kernel_type.value}) << 32 | (*blockNumAddr);
+"""
+        self.sub_kernel_names.append(aiv_kernel_name)
+        self.kernel_declare += self._gen_sub_kernel_decare_once(aiv_kernel_name, params_with_type)
+        self.sub_kernel_names.append(aic_kernel_name)
+        self.kernel_declare += self._gen_sub_kernel_decare_once(aic_kernel_name, params_with_type)
+        return case_block
+
     def gen_switch_case_block_of_dynamic_op(self, kernel_info_of_tiling_key, tiling_key, kernel_type):
         chip_version = CommonUtility.get_chip_version()
         params_with_type = ", ".join([f"GM_ADDR {param}" for param in self.kernel_params])
         if kernel_type is SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY:
             aicore_kernel_name = kernel_info_of_tiling_key["AiCore"]
-            case_block = f"""
-{self.gen_select_addr_code("aiv_func_addr", aicore_kernel_name)}
-dy_block_num = ((uint64_t){kernel_type.value}) << 32 | (*blockNumAddr);
-"""
-            self.sub_kernel_names.append(aicore_kernel_name)
-            self.kernel_declare += self._gen_sub_kernel_decare_once(aicore_kernel_name, params_with_type)
+            case_block = self._gen_single_core_case_block(
+                aicore_kernel_name, "aiv_func_addr", kernel_type, params_with_type
+            )
         elif kernel_type is SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY:
             aicore_kernel_name = kernel_info_of_tiling_key["AiCore"]
-            case_block = f"""
-{self.gen_select_addr_code("aic_func_addr", aicore_kernel_name)}
-dy_block_num = ((uint64_t){kernel_type.value}) << 32 | (*blockNumAddr);
-"""
-            self.sub_kernel_names.append(aicore_kernel_name)
-            self.kernel_declare += self._gen_sub_kernel_decare_once(aicore_kernel_name, params_with_type)
+            case_block = self._gen_single_core_case_block(
+                aicore_kernel_name, "aic_func_addr", kernel_type, params_with_type
+            )
         elif kernel_type is SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0:
             aicore_kernel_name = kernel_info_of_tiling_key[f"dav-{chip_version}-vec"]
-            case_block = f"""
-{self.gen_select_addr_code("aiv_func_addr", aicore_kernel_name)}
-dy_block_num = ((uint64_t){kernel_type.value}) << 32 | (*blockNumAddr);
-"""
-            self.sub_kernel_names.append(aicore_kernel_name)
-            self.kernel_declare += self._gen_sub_kernel_decare_once(aicore_kernel_name, params_with_type)
+            case_block = self._gen_single_core_case_block(
+                aicore_kernel_name, "aiv_func_addr", kernel_type, params_with_type
+            )
         elif kernel_type is SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0:
             aicore_kernel_name = kernel_info_of_tiling_key[f"dav-{chip_version}-cube"]
-            case_block = f"""
-{self.gen_select_addr_code("aic_func_addr", aicore_kernel_name)}
-dy_block_num = ((uint64_t){kernel_type.value}) << 32 | (*blockNumAddr);
-"""
-            self.sub_kernel_names.append(aicore_kernel_name)
-            self.kernel_declare += self._gen_sub_kernel_decare_once(aicore_kernel_name, params_with_type)
+            case_block = self._gen_single_core_case_block(
+                aicore_kernel_name, "aic_func_addr", kernel_type, params_with_type
+            )
         elif kernel_type in [
             SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1,
             SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2,
         ]:
-            aiv_kernel_name = kernel_info_of_tiling_key[f"dav-{chip_version}-vec"]
-            aic_kernel_name = kernel_info_of_tiling_key[f"dav-{chip_version}-cube"]
-            case_block = f"""
-{self.gen_select_addr_code("aiv_func_addr", aiv_kernel_name)}
-{self.gen_select_addr_code("aic_func_addr", aic_kernel_name)}
-dy_block_num = ((uint64_t){kernel_type.value}) << 32 | (*blockNumAddr);
-"""
-            self.sub_kernel_names.append(aiv_kernel_name)
-            self.kernel_declare += self._gen_sub_kernel_decare_once(aiv_kernel_name, params_with_type)
-            self.sub_kernel_names.append(aic_kernel_name)
-            self.kernel_declare += self._gen_sub_kernel_decare_once(aic_kernel_name, params_with_type)
+            case_block = self._gen_mix_aic_case_block(
+                kernel_info_of_tiling_key, chip_version, kernel_type, params_with_type
+            )
         else:
             CommonUtility().ascendc_raise_python_err(ERR_CODE, (f"kernel type {kernel_type} do not support!"))
         return case_block
