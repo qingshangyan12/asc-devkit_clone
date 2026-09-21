@@ -271,7 +271,7 @@ def _gen_compile_cmd_516r2(
         "-instcombine-code-sinking=false",
         "-mllvm",
         "-cce-aicore-mask-opt=false",
-        "cce-simd-vf-fusion=true"
+        "cce-simd-vf-fusion=true",
     ]
     if global_var_storage.get_variable("ascendc_enable_sanitizer"):
         compile_cmd += ["--cce-enable-sanitizer", "-gline-tables-only"]
@@ -528,7 +528,9 @@ def compile_single_tiling_v220(param: SingleTilingKeyCompileParams):
     kernel_func_name = get_compile_target_name(param.compile_info, param.tiling_key, core_type)
     compile_cmd.extend(
         get_compile_target_options(
-            param.compile_info, param.tiling_key, CommonUtility.is_c310() or CommonUtility.is_m510() or CommonUtility.is_516r2()
+            param.compile_info,
+            param.tiling_key,
+            CommonUtility.is_c310() or CommonUtility.is_m510() or CommonUtility.is_516r2(),
         )
     )
     compile_cmd += [f"-Dauto_gen_{param.compile_info.origin_func_name}_kernel={kernel_func_name}"]
