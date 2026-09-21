@@ -108,6 +108,49 @@ __aicore__ constexpr inline uint32_t div_ceil(uint32_t a, uint32_t b)
 
 __aicore__ constexpr inline uint32_t align_up(uint32_t a, uint32_t b) { return div_ceil(a, b) * b; }
 
+// Shared serialization for the existing FIFO producers. Length is the TLV value size.
+__aicore__ inline uint32_t set_super_tensor_header(
+    __gm__ uint8_t* record, uint64_t total, uint64_t offset, uint32_t size, uint32_t addr, uint32_t dataType,
+    uint32_t desc, uint16_t position, uint16_t blockIdx, const uint32_t* shape, uint32_t shapeDim)
+{
+    const uint32_t header = offset == 0 ? sizeof(DumpSuperTensorTlv) : sizeof(DumpSuperTensorBodyTlv);
+    const uint32_t span = align_up(header + size, 32);
+    // Initialize only the header and padding; payload is filled before publication.
+    for (uint32_t i = 0; i < header; ++i) {
+        record[i] = 0;
+    }
+    for (uint32_t i = header + size; i < span; ++i) {
+        record[i] = 0;
+    }
+    if (offset == 0) {
+        auto head = reinterpret_cast<__gm__ DumpSuperTensorTlv*>(record);
+        head->type = static_cast<uint32_t>(DumpType::DUMP_SUPER_TENSOR);
+        head->length = span - sizeof(uint32_t[2]);
+        head->tensorAddr = addr;
+        head->dataType = dataType;
+        head->desc = desc;
+        head->position = position;
+        head->blockIdx = blockIdx;
+        if (shape != nullptr && shapeDim <= K_MAX_SHAPE_DIM) {
+            head->dim = shapeDim;
+            for (uint32_t i = 0; i < shapeDim; ++i) {
+                head->shape[i] = shape[i];
+            }
+        }
+        head->tensorLength = total;
+        head->tensorOffset = offset;
+        head->dumpSize = size;
+    } else {
+        auto head = reinterpret_cast<__gm__ DumpSuperTensorBodyTlv*>(record);
+        head->type = static_cast<uint32_t>(DumpType::DUMP_SUPER_TENSOR_BODY);
+        head->length = span - sizeof(uint32_t[2]);
+        head->tensorLength = total;
+        head->tensorOffset = offset;
+        head->dumpSize = size;
+    }
+    return span;
+}
+
 __aicore__ inline void sync_all() { sync_all_impl(); }
 
 __aicore__ inline uint32_t mem_copy_gm_to_gm(__gm__ uint8_t* dst, __gm__ const uint8_t* src, const uint32_t& len)
