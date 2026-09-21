@@ -19,17 +19,11 @@ namespace mc2_ops_hccl {
 namespace {
 const AutoSelectorBase kRuleSelectorBase;
 
-// 对应 hccl RS_AICPU_1D_TWO_LEVEL_DATA_SIZE_THRESHOLD（reduce_scatter_auto_selector.cc:23）
-// 与 RS_2P_DETOUR_DATA_SIZE（:30）；命名去 AICPU 前缀因谓词引擎无关
 constexpr u64 RS_2P_DETOUR_DATA_SIZE = 4ULL * 1024 * 1024;                 // 4MB
 constexpr u64 RS_1D_TWO_LEVEL_DATA_SIZE_THRESHOLD = 1536ULL * 1024 * 1024; // 1536MB
 } // namespace
 
-// A1 蓝本（hccl 对齐）:
-//   hccl reduce_scatter_auto_selector.cc:483-485（SelectMeshAlgoAicpuForMesh1D）
-//   hccl all_gather_auto_selector.cc:360-362（SelectMeshAlgoAicpu）
-// AG 两层阈值是 1GB（AG_AICPU_1D_TWO_LEVEL_DATA_SIZE_THRESHOLD）与 RS 1536MB 不同；
-// COND_Z_AXIS 仅 RS 候选消费，统一取 RS 阈值。devkit RS:343-345 现状缺 2P 分支，按 hccl 补全。
+// 两层阈值取 RS 值 1536MB（AG 是 1GB；本条件仅 RS 候选消费）
 bool CondZAxis(const TopoInfoWithNetLayerDetails* topo, const OpParam& opParam)
 {
     if (topo == nullptr) {
@@ -45,9 +39,7 @@ bool CondZAxis(const TopoInfoWithNetLayerDetails* topo, const OpParam& opParam)
     return dataSize * topo->userRankSize > RS_1D_TWO_LEVEL_DATA_SIZE_THRESHOLD;
 }
 
-// A2 蓝本: devkit kernel ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem_peer_only.cc:38-44
-//   （rankSize==2 且 channelCount==1）。选型期用 HcclRankGraphGetLinks 查对端链路数
-//   （hccl_rank_graph.h:244）。查询前提不满足时保守不命中，裸名候选兜底。
+// 查询前提不满足或查询失败时保守不命中，裸名候选兜底
 bool CondPeerOnly(const TopoInfoWithNetLayerDetails* topo, const OpParam& opParam)
 {
     if (topo == nullptr || topo->userRankSize != 2U) {
@@ -70,15 +62,13 @@ bool CondPeerOnly(const TopoInfoWithNetLayerDetails* topo, const OpParam& opPara
     return linkNum == 1U;
 }
 
-// A3/A4 蓝本: hccl all_reduce_auto_selector.cc:427-434 / reduce_scatter_auto_selector.cc:377
-//   （devkit RS:230 相同）。soft_reduce 优先级语义由"特化候选在前 + 裸名兜底"自动成立。
+// soft_reduce 优先级语义由"特化候选在前 + 裸名兜底"的排序自动成立
 bool CondSpecialDt(const TopoInfoWithNetLayerDetails* topo, const OpParam& opParam)
 {
     (void)topo;
     return Is64BitDataType(opParam.DataDes.dataType) || opParam.reduceType == HcclReduceOp::HCCL_REDUCE_PROD;
 }
 
-// B 族蓝本: hccl all_gather_auto_selector.cc:84/:369-370（devkit AG:176-183 相同）
 bool FlagPcieMix(const TopoInfoWithNetLayerDetails* topo)
 {
     if (topo == nullptr) {
@@ -88,7 +78,6 @@ bool FlagPcieMix(const TopoInfoWithNetLayerDetails* topo)
            !kRuleSelectorBase.IsLayerAllConnetedWithTopo(topo, 0U, CommTopo::COMM_TOPO_1DMESH);
 }
 
-// 蓝本: hccl all_gather_auto_selector.cc:451（isUBX；devkit AG:184+ 同构）
 bool FlagUbx(const TopoInfoWithNetLayerDetails* topo)
 {
     if (topo == nullptr) {
@@ -97,7 +86,6 @@ bool FlagUbx(const TopoInfoWithNetLayerDetails* topo)
     return topo->level0Topo == Level0Shape::MESH_1D_CLOS && !topo->level0PcieMix;
 }
 
-// 蓝本: devkit AG:163-164（hccl AG:305 分支结构同构）
 bool FlagMultiLevel(const TopoInfoWithNetLayerDetails* topo)
 {
     if (topo == nullptr) {
@@ -106,7 +94,7 @@ bool FlagMultiLevel(const TopoInfoWithNetLayerDetails* topo)
     return topo->topoLevelNums > 1U && topo->level0Topo == Level0Shape::MESH_1D;
 }
 
-// B4 蓝本: TopoMatch1D 语义（topo_match_1d.cc:19-57，两仓同构）。A2A 裸名专用。
+// A2A 裸名专用
 bool FlagFlat1D(const TopoInfoWithNetLayerDetails* topo)
 {
     if (topo == nullptr) {
@@ -115,8 +103,7 @@ bool FlagFlat1D(const TopoInfoWithNetLayerDetails* topo)
     return topo->level0Topo != Level0Shape::MESH_1D_CLOS;
 }
 
-// ① 蓝本: auto_selector_base.cc:25-65（HostDPUOnly 切 COMM_ENGINE_CPU 只留 *DPU；CCU_SCHED 留 CCU；
-// AICPU/AICPU_TS 留 AICPU）
+// DPU 行服务 CPU 引擎请求；AICPU 行兼容 AICPU_TS
 bool EngineMatch(AlgEngine candEngine, const OpParam& opParam)
 {
     switch (candEngine) {

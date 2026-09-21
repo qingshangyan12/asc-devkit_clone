@@ -21,7 +21,7 @@
 namespace mc2_ops_hccl {
 
 // 候选引擎维度。显式声明，不按内部名前缀推导（前缀有历史包袱，如 InsAllGatherMeshNhrDPU 是
-// AICPU sequence 编排 + DPU 卸载）。扩展位：CcuMS、AIV（hccl 平移时加枚举值）。
+// AICPU sequence 编排 + DPU 卸载）。扩展位：CcuMS、AIV。
 enum class AlgEngine { AICPU, CCU, DPU };
 
 struct AlgMeta {

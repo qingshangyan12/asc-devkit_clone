@@ -34,11 +34,11 @@ using ExtAlgKey = std::pair<HcclCMDType, std::string>;
 
 enum class ResolveStatus {
     RESOLVED,      // 唯一定名，algName 有效
-    ERROR_INVALID, // 候选为空 / 规则全灭 / 引擎无候选；errMsg 含三要素
+    ERROR_INVALID, // 候选为空 / 规则全灭 / 引擎无候选；errMsg 含外部名原文与原因
 };
 
-// 消歧三级漏斗（纯函数，无资源操作——设计 P1: 选名与资源分离）:
-//   (1) 引擎匹配 -> (2) 变体条件 -> (2') 机型 flag；第一个全过的候选胜出，不做资源实测。
+// 消歧（纯函数，无资源操作——选名与资源分离）:
+//   引擎匹配 -> 变体条件 -> 机型 flag；第一个全过的候选胜出，不做资源实测。
 ResolveStatus ResolveExternalAlg(
     const OpParam& opParam, const TopoInfoWithNetLayerDetails* topoInfo, const ExternalAlgSpec& spec,
     std::string& algName, std::string& errMsg);
@@ -50,7 +50,7 @@ const std::vector<AlgCandidate>& GetExternalCandidates(HcclCMDType cmd, const st
 
 // 纯函数构建器：按 (Specificity 降序, priority 降序, registeredName 字典序) 三键排序。
 // Specificity = (condId != -1) + (flagId != -1)（约束多者先试，最特化者胜；cond/flag 各计 1 分等权）；
-// priority 仅同特异性时生效（业务声明维度裁决权，当前全 0，hccl 平移 flag 重叠场景启用）。
+// priority 仅同特异性时生效（业务声明维度裁决权，当前全 0；flag 重叠场景启用）。
 // 排序键是候选自带数据属性，
 // 与注册顺序/链接顺序/static-init 顺序全部无关（跨 .cc static-init 顺序是 UB，不可依赖）。
 std::map<ExtAlgKey, std::vector<AlgCandidate>> BuildCandidateTable(const std::vector<AlgMetaRow>& rows);

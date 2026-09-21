@@ -125,15 +125,15 @@ ResolveStatus ResolveExternalAlg(
     }
 
     for (const AlgCandidate& cand : candidates) {
-        if (!EngineMatch(cand.engine, opParam)) { // (1) 引擎
+        if (!EngineMatch(cand.engine, opParam)) {
             continue;
         }
-        // (2) 变体条件：双边判防注册侧笔误 OOB（不在 Register() 校验：rules.h 反向 include 循环依赖）
+        // 变体条件：下标双边判防注册侧笔误 OOB（Register() 无法校验：rules.h 反向 include 循环依赖）
         if (cand.variantCondId >= 0 && cand.variantCondId < VARIANT_COND_COUNT &&
             !VARIANT_COND_TABLE[cand.variantCondId](topoInfo, opParam)) {
             continue;
         }
-        // (2') 机型 flag：同上
+        // 机型 flag：同上
         if (cand.machineFlagId >= 0 && cand.machineFlagId < MACHINE_FLAG_COUNT &&
             !MACHINE_FLAG_TABLE[cand.machineFlagId](topoInfo)) {
             continue;

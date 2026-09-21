@@ -176,7 +176,7 @@ const HcclCMDType COLL_CMDS[] = {
 };
 } // namespace
 
-// 设计不变量 1：V2 注册表 ↔ AlgMetaRegistry 双向满射。本目标全量编译所有注册现场
+// 不变量：V2 注册表 ↔ AlgMetaRegistry 双向满射。本目标全量编译所有注册现场
 // （15 个 executor 文件，-DMC2_CLIENT_ENABLE_CCU=1 且无 AICPU_COMPILE 守卫裁剪），可见全部
 // 46 行 sidecar——按 cmd 分布：AG 12 / RS 16 / AR 8 / A2A 7 / A2AV 3。
 TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
@@ -211,7 +211,7 @@ TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
     EXPECT_EQ(total, 46U);
 }
 
-// 设计不变量 4：注册行 externalName 字面量必须自身就是规范形（"与 parser 产出同构"的机器契约）。
+// 不变量：注册行 externalName 字面量必须自身就是规范形（"与 parser 产出同构"的机器契约）。
 // 手写字面量若带空格/词表外词/非规范拼写，将静默变死行——用户输入经 canonical() 规范化后永不相等，
 // 46 计数与 registeredName 满射断言均无法发现。往返自检：parse(字面量) 成功且 canonical() == 字面量。
 TEST(ExtAlgSurjectivity, ExternalNameLiteralsAreCanonical)
@@ -230,7 +230,7 @@ TEST(ExtAlgSurjectivity, ExternalNameLiteralsAreCanonical)
 }
 
 namespace {
-// ---- topo/opParam 夹具（写法蓝本 testcase/all_gather_aicpu_testcase.cc:34-77）----
+// ---- topo/opParam 夹具 ----
 
 TopoInfoWithNetLayerDetails MakeFlatMesh1DTopo(u32 rankSize = 8U)
 {
@@ -287,8 +287,7 @@ TopoInfoWithNetLayerDetails MakeMultiLevelTopo(u32 rankSize = 16U)
     return topo;
 }
 
-// 两层网（IsTwoLevelNetLayer==true 的最小夹具，蓝本 auto_selector_base.cc:343-377 判定序:
-// netLayerNum>1 / level1 有 COMM_TOPO_CLOS / localNetInsSizeOfLayer[0]>1）
+// 两层网最小夹具（IsTwoLevelNetLayer 判定: netLayerNum>1 / level1 有 COMM_TOPO_CLOS / localNetInsSizeOfLayer[0]>1）
 TopoInfoWithNetLayerDetails MakeTwoLevelNetLayerTopo(u32 rankSize = 16U)
 {
     TopoInfoWithNetLayerDetails topo{};
@@ -318,19 +317,18 @@ OpParam MakeOpParam(
 
 TEST(ExtAlgRules, CondZAxisAlignsWithHccl)
 {
-    // hccl RS selector:483-485 / AG selector:338:
-    // IsTwoLevelNetLayer && (2P 且 dataSize>=4MB ∥ dataSize*rankSize>1536MB)
-    // dataSize = count × dtypeSize（hccl RS:508 同款公式），FP32 为 4B/元素
+    // IsTwoLevelNetLayer && (2P 且 dataSize>=4MB 或 dataSize*rankSize>1536MB)
+    // dataSize = count × dtypeSize，FP32 为 4B/元素
     TopoInfoWithNetLayerDetails twoLevel = MakeTwoLevelNetLayerTopo();
     TopoInfoWithNetLayerDetails flat = MakeFlatMesh1DTopo();
 
     EXPECT_FALSE(CondZAxis(&flat, MakeOpParam(HCCL_DATA_TYPE_FP32, 100U * 1024 * 1024))); // 非两层网
     EXPECT_FALSE(CondZAxis(&twoLevel, MakeOpParam(HCCL_DATA_TYPE_FP32, 1024U)));          // 两层网小数据
-    // 2P + 4MB 边界（RS_2P_DETOUR_DATA_SIZE，hccl RS:30）：1M FP32 元素恰为 4MB
+    // 2P + 4MB 边界：1M FP32 元素恰为 4MB
     TopoInfoWithNetLayerDetails twoRank = MakeTwoLevelNetLayerTopo(2U);
     EXPECT_TRUE(CondZAxis(&twoRank, MakeOpParam(HCCL_DATA_TYPE_FP32, 1024U * 1024)));
     EXPECT_FALSE(CondZAxis(&twoRank, MakeOpParam(HCCL_DATA_TYPE_FP32, 1024U * 1024 - 1)));
-    // 多 rank + 总量 1536MB 边界（RS_AICPU_1D_TWO_LEVEL_DATA_SIZE_THRESHOLD，hccl RS:23）：
+    // 多 rank + 总量 1536MB 边界：
     // 16 rank 时需 dataSize > 96MB；24M FP32 元素 = 96MB，×16 = 1536MB 恰不超阈值
     EXPECT_FALSE(CondZAxis(&twoLevel, MakeOpParam(HCCL_DATA_TYPE_FP32, 24U * 1024 * 1024)));
     EXPECT_TRUE(CondZAxis(&twoLevel, MakeOpParam(HCCL_DATA_TYPE_FP32, 24U * 1024 * 1024 + 1)));
@@ -351,7 +349,7 @@ TEST(ExtAlgRules, CondPeerOnlySemantics)
     TopoInfoWithNetLayerDetails twoRank = MakeFlatMesh1DTopo(2U);
     TopoInfoWithNetLayerDetails eightRank = MakeFlatMesh1DTopo(8U);
     OpParam op = MakeOpParam();                 // hcclComm 为空 -> 查询前提不满足，保守不命中
-    EXPECT_FALSE(CondPeerOnly(&eightRank, op)); // rankSize!=2 直接 false（peer_only.cc:38-44）
+    EXPECT_FALSE(CondPeerOnly(&eightRank, op)); // rankSize!=2 直接 false
     EXPECT_FALSE(CondPeerOnly(&twoRank, op));   // 无 comm 环境保守 false（真实链路走 ST）
 }
 
@@ -382,7 +380,7 @@ TEST(ExtAlgRules, MachineFlagsAreMutuallyExclusive)
 TEST(ExtAlgRules, EngineMatchMatrix)
 {
     OpParam op = MakeOpParam();
-    op.engine = CommEngine::COMM_ENGINE_CPU; // HostDPUOnly
+    op.engine = CommEngine::COMM_ENGINE_CPU; // DPU 行仅 CPU 引擎命中
     EXPECT_TRUE(EngineMatch(AlgEngine::DPU, op));
     EXPECT_FALSE(EngineMatch(AlgEngine::AICPU, op));
     EXPECT_FALSE(EngineMatch(AlgEngine::CCU, op));
@@ -479,37 +477,37 @@ TEST(ExtAlgResolver, GoldenAllEngines)
         {HcclCMDType::HCCL_CMD_ALLTOALLV, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_CCU,
          "CcuSchedAllToAllVSoleMesh"},
         // ---- 8 处一对多 ----
-        // A1 AICPU·RS·sole[mesh]：小数据走裸名（大数据触发在下一用例）
+        // AICPU·RS·sole[mesh]：小数据走裸名（大数据触发在下一用例）
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[mesh]", &twoLevel, CommEngine::COMM_ENGINE_AICPU_TS,
          "InsReduceScatterMesh1D"},
-        // A2 CCU·RS·sole[mesh]：UT 无真实 comm，COND_PEER_ONLY 保守不命中 -> 裸名兜底
+        // CCU·RS·sole[mesh]：UT 无真实 comm，COND_PEER_ONLY 保守不命中 -> 裸名兜底
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_CCU,
          "CcuSchedReduceScatterSoleMesh"},
-        // B1 AICPU·AG·parallel[mesh,nhr] 三 flag 互斥分流
+        // AICPU·AG·parallel[mesh,nhr] 三 flag 互斥分流
         {HcclCMDType::HCCL_CMD_ALLGATHER, "parallel[mesh,nhr]", &multi, CommEngine::COMM_ENGINE_AICPU_TS,
          "InsAllGatherParallelMesh1DNHR"},
         {HcclCMDType::HCCL_CMD_ALLGATHER, "parallel[mesh,nhr]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
          "InsAllGatherParallelMesh1DNHRUBX"},
         {HcclCMDType::HCCL_CMD_ALLGATHER, "parallel[mesh,nhr]", &pcie, CommEngine::COMM_ENGINE_AICPU_TS,
          "InsAllGatherParallelMesh1DNHRPcie"},
-        // B2 AICPU·RS·parallel[mesh,nhr]
+        // AICPU·RS·parallel[mesh,nhr]
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "parallel[mesh,nhr]", &multi, CommEngine::COMM_ENGINE_AICPU_TS,
          "InsReduceScatterParallelMesh1DNHR"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "parallel[mesh,nhr]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
          "AicpuReduceScatterParallelMeshNHRUBX"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "parallel[mesh,nhr]", &pcie, CommEngine::COMM_ENGINE_AICPU_TS,
          "InsReduceScatterParallelMesh1DNHRPcie"},
-        // B3 AICPU·AR·parallel[mesh,nhr]（无 UBX 变体）
+        // AICPU·AR·parallel[mesh,nhr]（无 UBX 变体）
         {HcclCMDType::HCCL_CMD_ALLREDUCE, "parallel[mesh,nhr]", &multi, CommEngine::COMM_ENGINE_AICPU_TS,
          "AicpuAllReduceParallelMeshNHR"},
         {HcclCMDType::HCCL_CMD_ALLREDUCE, "parallel[mesh,nhr]", &pcie, CommEngine::COMM_ENGINE_AICPU_TS,
          "AicpuAllreduceParallelMeshNHRPcie"},
-        // B4 AICPU·A2A·sole[mesh]
+        // AICPU·A2A·sole[mesh]
         {HcclCMDType::HCCL_CMD_ALLTOALL, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
          "AicpuAllToAllSoleMesh"},
         {HcclCMDType::HCCL_CMD_ALLTOALL, "sole[mesh]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
          "AicpuAllToAllSoleMeshUBX"},
-        // ---- HostDPUOnly（DPU 行只在 engine==COMM_ENGINE_CPU 命中）----
+        // ---- DPU 行只在 engine==COMM_ENGINE_CPU 命中 ----
         {HcclCMDType::HCCL_CMD_ALLGATHER, "sequence[mesh,nhr]", &multi, CommEngine::COMM_ENGINE_CPU,
          "InsAllGatherMeshNhrDPU"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sequence[mesh,mesh]", &multi, CommEngine::COMM_ENGINE_CPU,
@@ -536,7 +534,7 @@ TEST(ExtAlgResolver, VariantPairDisambiguation)
     TopoInfoWithNetLayerDetails twoLevel = MakeTwoLevelNetLayerTopo();
     TopoInfoWithNetLayerDetails multi = MakeMultiLevelTopo();
 
-    // A1: 两层网 + 大数据 -> ZAxisDetour；小数据 -> 裸 Mesh1D
+    // 两层网 + 大数据 -> ZAxisDetour；小数据 -> 裸 Mesh1D
     ASSERT_TRUE(ParseExternalAlg("sole[mesh]", spec, errMsg));
     OpParam big = MakeResolveParam(HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CommEngine::COMM_ENGINE_AICPU_TS);
     big.DataDes.dataType = HCCL_DATA_TYPE_FP32;
@@ -549,7 +547,7 @@ TEST(ExtAlgResolver, VariantPairDisambiguation)
     EXPECT_EQ(ResolveExternalAlg(small, &twoLevel, spec, algName, errMsg), ResolveStatus::RESOLVED);
     EXPECT_EQ(algName, "InsReduceScatterMesh1D");
 
-    // A3: specialDT -> AicpuReduceNHR；否则裸 NHR
+    // specialDT -> AicpuReduceNHR；否则裸 NHR
     ASSERT_TRUE(ParseExternalAlg("sole[nhr]", spec, errMsg));
     OpParam int64 = MakeResolveParam(HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CommEngine::COMM_ENGINE_AICPU_TS);
     int64.DataDes.dataType = HCCL_DATA_TYPE_INT64;
@@ -560,7 +558,7 @@ TEST(ExtAlgResolver, VariantPairDisambiguation)
     EXPECT_EQ(ResolveExternalAlg(fp32, &twoLevel, spec, algName, errMsg), ResolveStatus::RESOLVED);
     EXPECT_EQ(algName, "InsReduceScatterNHR");
 
-    // A4: AR sole[nhr]（devkit auto 无选择点，规则表补齐，蓝本 hccl AR:427-434）
+    // AR sole[nhr]
     OpParam arProd = MakeResolveParam(HcclCMDType::HCCL_CMD_ALLREDUCE, CommEngine::COMM_ENGINE_AICPU_TS);
     arProd.reduceType = HcclReduceOp::HCCL_REDUCE_PROD;
     EXPECT_EQ(ResolveExternalAlg(arProd, &twoLevel, spec, algName, errMsg), ResolveStatus::RESOLVED);
@@ -569,7 +567,7 @@ TEST(ExtAlgResolver, VariantPairDisambiguation)
     EXPECT_EQ(ResolveExternalAlg(arSum, &twoLevel, spec, algName, errMsg), ResolveStatus::RESOLVED);
     EXPECT_EQ(algName, "AicpuAllReduceSoleNHR");
 
-    // HostDPUOnly: AICPU 引擎下 DPU-only 外部名 -> 候选为空 -> ERROR_INVALID
+    // AICPU 引擎下 DPU-only 外部名 -> 候选为空 -> ERROR_INVALID
     ASSERT_TRUE(ParseExternalAlg("sequence[mesh,nhr]", spec, errMsg));
     OpParam aicpu = MakeResolveParam(HcclCMDType::HCCL_CMD_ALLGATHER, CommEngine::COMM_ENGINE_AICPU_TS);
     EXPECT_EQ(ResolveExternalAlg(aicpu, &multi, spec, algName, errMsg), ResolveStatus::ERROR_INVALID);

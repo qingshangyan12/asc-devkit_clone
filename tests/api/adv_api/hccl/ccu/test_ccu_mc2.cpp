@@ -662,6 +662,8 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_ReduceScatterCcuPath)
     EXPECT_EQ(ctx->algorithmType[0], static_cast<uint32_t>(AlgorithmType::CcuReduceScatterMeshMem2Mem1D));
 }
 
+// algConfig为合法强制算法名时：先尝试强制算法（注册/层级/资源计算校验），
+// 强制算法不可用或校验失败则回退到默认selector，由调用方重新选择算法得到algName。
 TEST_F(CcuMc2TestSuite, CcuSelectAlg_ForcedAlgFallbackToSelector)
 {
     SetCommEngineEnv(COMM_ENGINE_CCU);
@@ -672,8 +674,10 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_ForcedAlgFallbackToSelector)
     ccTiling.srcDataType = HCCL_DATA_TYPE_FP16;
     ccTiling.dstDataType = HCCL_DATA_TYPE_FP16;
     ccTiling.reduceType = HCCL_REDUCE_SUM;
+    // 合法强制算法名（已注册且可校验通过）
     strcpy(ccTiling.algConfig, "CcuAllGatherMesh1DMem2Mem");
 
+    // 场景1：强制算法执行器不可用 → CheckForcedAlgResource校验失败 → 回退到默认selector
     mc2_ops_hccl::g_stubCcuAlgExecNull = true;
     OpParam opParam{};
     ASSERT_EQ(InitOpParamByTiling(comm_, stream_, "allgather_tag", &ccTiling, opParam), HCCL_SUCCESS);
@@ -681,10 +685,12 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_ForcedAlgFallbackToSelector)
     auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
     bool forcedAlgAccepted = true;
     HcclResult ret = TryForcedAlgAndPrepareEngine(comm_, &ccTiling, opParam, algName, topoInfo, forcedAlgAccepted);
+    // 强制算法失败后回退，不向上报错，由调用方走默认selector重新选择
     EXPECT_EQ(ret, HCCL_SUCCESS);
     EXPECT_FALSE(forcedAlgAccepted);
     EXPECT_TRUE(algName.empty());
 
+    // 场景2：强制算法可用 → 接受强制算法
     mc2_ops_hccl::g_stubCcuAlgExecNull = false;
     OpParam opParam2{};
     ASSERT_EQ(InitOpParamByTiling(comm_, stream_, "allgather_tag", &ccTiling, opParam2), HCCL_SUCCESS);
@@ -1008,12 +1014,17 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_AllGatherMesh1D_KfcServerArgs)
     ASSERT_EQ(resourceCtx.kfcServerArgs.size(), 6U);
     EXPECT_EQ(resourceCtx.kfcServerArgSize, 6U);
 
+    // xnAddr
     EXPECT_EQ(resourceCtx.kfcServerArgs[0], opResCtx.xnAddr);
+    // ckeAddr
     EXPECT_EQ(resourceCtx.kfcServerArgs[1], opResCtx.ckeAddr);
+    // dieNum = 1
     EXPECT_EQ(resourceCtx.kfcServerArgs[2], 1U);
+    // missionNum = 1
     EXPECT_EQ(resourceCtx.kfcServerArgs[3], 1U);
+    // missionIndex = 0
     EXPECT_EQ(resourceCtx.kfcServerArgs[4], 0U);
-    // token: stub 的 GetTokenFromBuffInfo 返回 CCL buffer 地址 + 偏移
+    // token (由GetTokenFromBuffInfo获取，stub返回基于CCL buffer地址的非零值)
     uint64_t expectedToken = cclBufferAddr + 0x1234;
     EXPECT_EQ(resourceCtx.kfcServerArgs[5], expectedToken);
 }

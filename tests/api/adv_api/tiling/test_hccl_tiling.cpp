@@ -284,7 +284,7 @@ TEST_F(TestHcclTilingCcuKfc, ExternalAlgNameCcuCandidateUsesCcuNewVersion)
 }
 
 // 外部名 + CCU 引擎即设 101：tiling 侧不预判有无 CCU 候选，精确判断在
-// mc2 侧 CheckCcuAlgorithmsRegistered（三要素报错）。此用例钉住 AICPU-only 外部名同样设 101。
+// mc2 侧 CheckCcuAlgorithmsRegistered（报错含原文与原因）。此用例钉住 AICPU-only 外部名同样设 101。
 TEST_F(TestHcclTilingCcuKfc, ExternalAlgNameAicpuOnlyAlsoUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(

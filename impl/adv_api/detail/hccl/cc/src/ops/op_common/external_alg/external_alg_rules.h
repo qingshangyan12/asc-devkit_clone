@@ -47,7 +47,7 @@ bool FlagFlat1D(const TopoInfoWithNetLayerDetails* topo);
 
 bool EngineMatch(AlgEngine candEngine, const OpParam& opParam);
 
-// enum 下标函数指针表（规则两层结构：候选只带 ID，ID->函数绑定集中于此）
+// enum 下标函数指针表：候选只带 ID，ID->函数绑定集中于此
 extern const VariantCond VARIANT_COND_TABLE[VARIANT_COND_COUNT];
 extern const MachineFlag MACHINE_FLAG_TABLE[MACHINE_FLAG_COUNT];
 const char* VariantCondName(int id); // 日志可打印规则名

@@ -44,7 +44,7 @@ TEST(ExtAlgFull, CcuCandidatesAreInAlgorithmMap)
     }
 }
 
-// 四态识别：NONE/LEGACY/BARE_NAME 行为与旧两态强制名接口等价
+// 四态识别与解析失败契约
 TEST(ExtAlgForced, FourStateClassification)
 {
     std::string algName;
@@ -62,8 +62,8 @@ TEST(ExtAlgForced, FourStateClassification)
     EXPECT_TRUE(errMsg.empty());
     EXPECT_EQ(spec.canonical(), "parallel[mesh,nhr]");
 
-    // 解析失败: spec 复位无效 + errMsg 非空（ClassifyForcedAlgConfig 契约）。
-    // 复位 spec 的 canonical() 是 "sole[]"（executor 默认 SOLE）而非空串，
+    // 解析失败: spec 复位为默认值 + errMsg 非空（ClassifyForcedAlgConfig 契约）。
+    // 默认值 canonical() 是 "sole[]"（executor 默认 SOLE）而非空串，
     // 失败态断言用默认值判据: layers 空 + orderStrong 复位
     EXPECT_EQ(ClassifyForcedAlgConfig("sole[ring]", algName, spec, errMsg), ForcedAlgKind::EXTERNAL);
     EXPECT_FALSE(errMsg.empty());
@@ -115,7 +115,7 @@ TEST(ExtAlgFailure, ErrorMessagesCarryThreeElements)
     const void* badList[] = {&rsMeshChunk};
     EXPECT_FALSE(CheckCcuAlgorithmsRegistered(badList, 1U));
 
-    // ClassifyForcedAlg 层 errMsg 三要素：解析失败消息含原文
+    // 解析层 errMsg 三要素：解析失败消息含原文
     std::string algName;
     ExternalAlgSpec spec;
     std::string errMsg;
