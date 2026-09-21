@@ -16,7 +16,6 @@
 #include "alg_data_trans_wrapper.h"
 #include "ins_temp_all_to_all_v_mesh_1D.h"
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
-#include "ccu_temp_kfc_all_to_all_mesh1d_multi_jetty.h"
 #include "ccu_temp_all_to_all_mesh1d_multi_jetty.h"
 #endif
 #include "alg_meta_registry.h"
@@ -495,7 +494,7 @@ REGISTER_ALG_META(
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 REGISTER_EXECUTOR_BY_TWO_TEMPS(
     HcclCMDType::HCCL_CMD_ALLTOALL, CcuSchedAllToAllSoleMeshConcurrent, InsV2AllToAllConcurrentExecutor, TopoMatchUBX,
-    CcuTempKfcAllToAllMesh1DMultiJetty, CcuTempAllToAllMesh1DMultiJetty);
+    CcuTempAllToAllMesh1DMultiJetty, CcuTempAllToAllMesh1DMultiJetty);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLTOALL, CcuSchedAllToAllSoleMeshConcurrent, AlgEngine::CCU, "concur[mesh,mesh]", COND_NONE,
     FLAG_NONE, 0);
