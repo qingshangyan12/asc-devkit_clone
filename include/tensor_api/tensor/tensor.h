@@ -30,7 +30,7 @@ enum class cache_mode : uint8_t { normal = 0, disable = 4, last = 5, persistent 
 
 #include "tensor_api/tensor/layout_interface.h"
 #include "tensor_api/tensor/pointer.h"
-#include "impl/tensor_api/tensor/tuple_impl.h"
+#include "impl/tensor_api/tensor/tensor_tuple_impl.h"
 
 #if !defined(ASC_DEPRECATED)
 #define ASC_DEPRECATED(version, removal_date, replacement)                                                  \
