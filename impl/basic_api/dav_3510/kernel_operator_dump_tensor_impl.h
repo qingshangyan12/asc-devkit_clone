@@ -48,22 +48,32 @@ __aicore__ inline void DumpTensorLocal2GMImpl(
     if (g_sysPrintFifoSpace != nullptr) {
         const Hardware position = GetPhyType(static_cast<TPosition>(src.GetPosition()));
         if (position == Hardware::UB) {
-            __asc_aicore::asc_dump_ubuf((__ubuf__ T*)src.GetPhyAddr(), desc, dumpSize, shape, shapeDim);
+            __asc_aicore::asc_dump_ubuf(
+                (__ubuf__ T*)src.GetPhyAddr(), desc, dumpSize, shape, shapeDim,
+                static_cast<uint64_t>(src.GetSize()) * sizeof(T));
         } else if (position == Hardware::L1) {
             if ASCEND_IS_AIC {
-                __asc_aicore::asc_dump_l1buf((__cbuf__ T*)src.GetPhyAddr(), desc, dumpSize, shape, shapeDim);
+                __asc_aicore::asc_dump_l1buf(
+                    (__cbuf__ T*)src.GetPhyAddr(), desc, dumpSize, shape, shapeDim,
+                    static_cast<uint64_t>(src.GetSize()) * sizeof(T));
             }
         } else if (position == Hardware::L0C) {
             if ASCEND_IS_AIC {
-                __asc_aicore::asc_dump_cbuf((__cc__ T*)src.GetPhyAddr(), desc, dumpSize, shape, shapeDim);
+                __asc_aicore::asc_dump_cbuf(
+                    (__cc__ T*)src.GetPhyAddr(), desc, dumpSize, shape, shapeDim,
+                    static_cast<uint64_t>(src.GetSize()) * sizeof(T));
             }
         } else if (position == Hardware::BIAS) {
             if ASCEND_IS_AIC {
-                __asc_aicore::asc_dump((__biasbuf__ T*)src.GetPhyAddr(), desc, dumpSize, shape, shapeDim);
+                __asc_aicore::asc_dump(
+                    (__biasbuf__ T*)src.GetPhyAddr(), desc, dumpSize, shape, shapeDim,
+                    static_cast<uint64_t>(src.GetSize()) * sizeof(T));
             }
         } else if (position == Hardware::FIXBUF) {
             if ASCEND_IS_AIC {
-                __asc_aicore::asc_dump((__fbuf__ T*)src.GetPhyAddr(), desc, dumpSize, shape, shapeDim);
+                __asc_aicore::asc_dump(
+                    (__fbuf__ T*)src.GetPhyAddr(), desc, dumpSize, shape, shapeDim,
+                    static_cast<uint64_t>(src.GetSize()) * sizeof(T));
             }
         } else {
             ASCENDC_ASSERT(
