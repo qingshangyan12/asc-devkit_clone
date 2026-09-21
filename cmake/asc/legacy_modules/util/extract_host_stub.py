@@ -11,7 +11,6 @@
 """Extract and generate host_stub.cpp and headers."""
 
 import argparse
-import json
 import io
 import itertools
 import os
@@ -27,6 +26,20 @@ from typing import Callable, Dict, Iterator, List, NamedTuple, Optional, Set, Tu
 from channel import CODE_AIC, CODE_AIV, CODE_DEFAULT, get_code_channel
 from struct_parser import ParseError, parse_struct_by_str
 from gen_host_stub import generate_host_stub_head_code
+from host_stub_io import (
+    get_stub_impl_cpp_filepath,
+    # re-exported for `from extract_host_stub import *` in the aclrt_launch_kernel UT
+    get_triple_chevrons_impl_cpp_filepath,  # noqa: F401
+    get_normal_config_filepath,
+    get_host_config_filepath,
+    get_aic_config_filepath,
+    get_aiv_config_filepath,
+    save_file,
+    get_preprocessed_source_filepath,
+    trans_device_cpp_filename,
+    generate_config_content,
+    load_compile_commands,
+)
 from host_stub_util import (
     CodeMode,
     FuncMetaType,
@@ -1044,14 +1057,7 @@ def replace_func_params_with_specialization_typename(
     return new_func_params
 
 
-def generate_func_impl_code(func_sign: FuncSign, func_key: int, mode: CodeMode) -> str:
-    """Generate func impl code."""
-    param_names = tuple(get_param_names_by_func_sign(func_sign))
-    block_num_name = param_names[0]
-    stream_name = param_names[1]
-    name = func_sign.func_name.replace("aclrtlaunch_", "")
-    buff = io.StringIO()
-    new_func_params = func_sign.func_params
+def _gen_impl_func_declare_code(func_sign, func_key, new_func_params):
     if func_sign.func_template_decl:
         # set start index 2 to skip numBlocks and stream definitions
         new_func_params = replace_func_params_with_specialization_typename(
@@ -1070,7 +1076,10 @@ template<>
         func_declare_code = add_extern_c(
             func_sign_to_string(func_sign, "", "", False, False)
         )
+    return new_func_params, func_declare_code
 
+
+def _write_impl_head(buff, func_declare_code, mode, func_sign, new_func_params):
     buff.write(f"{func_declare_code}\n")
     buff.write("{\n")
     args_declare_code = indent_code(
@@ -1091,24 +1100,8 @@ template<>
     AllocAscendMemDevice(&(__ascendc_args.__ascendc_overflow), __ascendc_overflow_status_size);
 """)
 
-    if mode in (
-        CodeMode.MIX,
-        CodeMode.KERNEL_TYPE_MIX_AIV_1_0,
-        CodeMode.KERNEL_TYPE_MIX_AIC_1_0,
-        CodeMode.KERNEL_TYPE_MIX_AIC_1_1,
-        CodeMode.KERNEL_TYPE_MIX_AIC_1_2,
-    ):
-        if not is_c310_mode():
-            get_sync_addr_code = indent_code(generate_get_sync_addr_code())
-            buff.write(get_sync_addr_code)
-            buff.write("\n")
 
-    args_assign_code = indent_code(generate_args_assign_code(mode, func_sign))
-    buff.write(args_assign_code)
-    buff.write("\n")
-    if mode == CodeMode.MIX_VECTOR_CORE:
-        buff.write('    const char *__ascendc_name = "{}";\n'.format(name))
-
+def _write_impl_launch_code(buff, mode, name, func_key, block_num_name, stream_name):
     if mode == CodeMode.MIX_VECTOR_CORE:
         mix_vector_core_launch_code = f"""
     uint32_t __ascendc_aicNumBlocks;
@@ -1136,6 +1129,41 @@ template<>
             f"    __ascendc_ret = launch_and_profiling_{name}({func_key}, {block_num_name}, \
 {stream_name}, (void **)&__ascendc_args, sizeof(__ascendc_args));\n"
         )
+
+
+def generate_func_impl_code(func_sign: FuncSign, func_key: int, mode: CodeMode) -> str:
+    """Generate func impl code."""
+    param_names = tuple(get_param_names_by_func_sign(func_sign))
+    block_num_name = param_names[0]
+    stream_name = param_names[1]
+    name = func_sign.func_name.replace("aclrtlaunch_", "")
+    buff = io.StringIO()
+    new_func_params = func_sign.func_params
+    new_func_params, func_declare_code = _gen_impl_func_declare_code(
+        func_sign, func_key, new_func_params
+    )
+
+    _write_impl_head(buff, func_declare_code, mode, func_sign, new_func_params)
+
+    if mode in (
+        CodeMode.MIX,
+        CodeMode.KERNEL_TYPE_MIX_AIV_1_0,
+        CodeMode.KERNEL_TYPE_MIX_AIC_1_0,
+        CodeMode.KERNEL_TYPE_MIX_AIC_1_1,
+        CodeMode.KERNEL_TYPE_MIX_AIC_1_2,
+    ):
+        if not is_c310_mode():
+            get_sync_addr_code = indent_code(generate_get_sync_addr_code())
+            buff.write(get_sync_addr_code)
+            buff.write("\n")
+
+    args_assign_code = indent_code(generate_args_assign_code(mode, func_sign))
+    buff.write(args_assign_code)
+    buff.write("\n")
+    if mode == CodeMode.MIX_VECTOR_CORE:
+        buff.write('    const char *__ascendc_name = "{}";\n'.format(name))
+
+    _write_impl_launch_code(buff, mode, name, func_key, block_num_name, stream_name)
 
     buff.write("""    KernelHandleGradUnregister::GetInstance();
 """)
@@ -1194,14 +1222,7 @@ def format_params(func_sign: FuncSign):
     return result
 
 
-def generate_func_impl_code_cpu(
-    func_sign: FuncSign,
-    has_mode_func: bool,
-    func_key: int,
-    func_params_str: str,
-    new_func_sign: FuncSign,
-    kernel_name: str,
-) -> str:
+def _resolve_cpu_kernel_type(has_mode_func) -> str:
     aiv_conditions = [
         CodeMode.AIV,
         CodeMode.KERNEL_TYPE_AIV_ONLY,
@@ -1229,6 +1250,18 @@ def generate_func_impl_code_cpu(
         kernelType = "MIX_MODE"
     else:
         raise ValueError("[ERROR]: KernelMode does not support!")
+    return kernelType
+
+
+def generate_func_impl_code_cpu(
+    func_sign: FuncSign,
+    has_mode_func: bool,
+    func_key: int,
+    func_params_str: str,
+    new_func_sign: FuncSign,
+    kernel_name: str,
+) -> str:
+    kernelType = _resolve_cpu_kernel_type(has_mode_func)
 
     param_names = tuple(get_param_names_by_func_sign(func_sign))
     block_num_name = param_names[0]
@@ -1258,6 +1291,43 @@ template<>
     return buff.getvalue()
 
 
+def _gen_cpu_kernel_signs(func_sign, new_func_sign, kernel_name, key):
+    kernel_sign = ""
+    aclrt_sign = ""
+    func_param_str = ""
+    kernel_sign_name = kernel_name
+    if func_sign.func_template_decl:
+        for template_id, _ in enumerate(
+            new_func_sign.func_template_specialization_args, 0
+        ):
+            kernel_sign_name = f"{kernel_name}_template_{template_id}"
+            template_key = get_template_hash_tiling_key(template_id, key)
+            specialized_params = replace_func_params_with_specialization_typename(
+                new_func_sign, dehash_template_id(template_key), 2
+            )
+            new_params = tiling_add_ref_or_ptr_func_params(
+                func_sign, specialized_params
+            )
+            func_param_str = ", ".join(
+                map(
+                    partial(func_param_to_string, with_cce_attr=False),
+                    new_params,
+                )
+            )
+            kernel_sign = f"extern void {kernel_sign_name}({func_sign.func_params_specialization_args[0]});\n"
+            func_tmp_sign = func_sign_to_string(new_func_sign, "", "", False, False)
+            aclrt_sign = f"{generate_auto_gen_func_sign(func_sign, func_tmp_sign)};"
+    else:
+        new_params = tiling_remove_ref_or_ptr_func_params(
+            func_sign, remove_added_func_params(func_sign.func_params)
+        )
+        func_param_str = ", ".join(
+            map(partial(func_param_to_string, with_cce_attr=False), new_params)
+        )
+        kernel_sign = f'extern "C" void {kernel_name}({func_param_str});\n'
+    return kernel_sign_name, kernel_sign, aclrt_sign, func_param_str
+
+
 def generate_host_stub_code_cpu(
     func_groups: List[FuncSignGroupWithModeBase], type_definition: str
 ) -> str:
@@ -1272,45 +1342,9 @@ def generate_host_stub_code_cpu(
             stream_name = param_names[1]
             new_func_sign = replace_func_sign_stream_param(func_sign, stream_name)
             kernel_name = (func_sign.func_name).replace("aclrtlaunch_", "")
-            kernel_sign = ""
-            aclrt_sign = ""
-            func_param_str = ""
-            kernel_sign_name = kernel_name
-            if func_sign.func_template_decl:
-                for template_id, _ in enumerate(
-                    new_func_sign.func_template_specialization_args, 0
-                ):
-                    kernel_sign_name = f"{kernel_name}_template_{template_id}"
-                    template_key = get_template_hash_tiling_key(template_id, key)
-                    specialized_params = (
-                        replace_func_params_with_specialization_typename(
-                            new_func_sign, dehash_template_id(template_key), 2
-                        )
-                    )
-                    new_params = tiling_add_ref_or_ptr_func_params(
-                        func_sign, specialized_params
-                    )
-                    func_param_str = ", ".join(
-                        map(
-                            partial(func_param_to_string, with_cce_attr=False),
-                            new_params,
-                        )
-                    )
-                    kernel_sign = f"extern void {kernel_sign_name}({func_sign.func_params_specialization_args[0]});\n"
-                    func_tmp_sign = func_sign_to_string(
-                        new_func_sign, "", "", False, False
-                    )
-                    aclrt_sign = (
-                        f"{generate_auto_gen_func_sign(func_sign, func_tmp_sign)};"
-                    )
-            else:
-                new_params = tiling_remove_ref_or_ptr_func_params(
-                    func_sign, remove_added_func_params(func_sign.func_params)
-                )
-                func_param_str = ", ".join(
-                    map(partial(func_param_to_string, with_cce_attr=False), new_params)
-                )
-                kernel_sign = f'extern "C" void {kernel_name}({func_param_str});\n'
+            kernel_sign_name, kernel_sign, aclrt_sign, func_param_str = (
+                _gen_cpu_kernel_signs(func_sign, new_func_sign, kernel_name, key)
+            )
             buff.write(type_definition)
             buff.write("\n")
             buff.write(kernel_sign)
@@ -1328,11 +1362,7 @@ def generate_host_stub_code_cpu(
     return remove_comments(buff.getvalue())
 
 
-def generate_host_stub_code(
-    func_groups: List[FuncSignGroupWithModeBase], type_definition: str
-) -> str:
-    """Generate host_stub.cpp code."""
-    has_mode_func = partial(has_mode_in_func_groups, func_groups=func_groups)
+def _detect_host_stub_core_modes(has_mode_func):
     has_mix = (
         has_mode_func(CodeMode.MIX)
         or has_mode_func(CodeMode.NORMAL)
@@ -1350,6 +1380,15 @@ def generate_host_stub_code(
         or has_mode_func(CodeMode.KERNEL_TYPE_AIV_ONLY)
         or has_mode_func(CodeMode.KERNEL_TYPE_MIX_AIV_1_0)
     )
+    return has_mix, has_aic, has_aiv
+
+
+def generate_host_stub_code(
+    func_groups: List[FuncSignGroupWithModeBase], type_definition: str
+) -> str:
+    """Generate host_stub.cpp code."""
+    has_mode_func = partial(has_mode_in_func_groups, func_groups=func_groups)
+    has_mix, has_aic, has_aiv = _detect_host_stub_core_modes(has_mode_func)
     head_code = generate_host_stub_head_code(has_mix, has_aic, has_aiv)
     buff = io.StringIO()
     buff.write(head_code)
@@ -1430,47 +1469,6 @@ def get_base_keys(
     for func_group, mode in zip(func_groups, modes):
         yield cnt[get_ket_name(mode.name)]
         cnt[get_ket_name(mode.name)] += len(func_group.func_signs)
-
-
-def get_stub_impl_cpp_filepath(dst_dir: str) -> str:
-    """Get host_stub.cpp destination file path."""
-    return os.path.join(dst_dir, "host_stub.cpp")
-
-
-def get_triple_chevrons_impl_cpp_filepath(dst_dir: str) -> str:
-    """Get host_stub.cpp destination file path."""
-    return os.path.join(dst_dir, "triple_chevrons_config.cmake")
-
-
-def get_normal_config_filepath(dst_dir: str) -> str:
-    """Get normal_config.cmake destination file path."""
-    return os.path.join(dst_dir, "normal_config.cmake")
-
-
-def get_host_config_filepath(dst_dir: str) -> str:
-    """Get normal_config.cmake destination file path."""
-    return os.path.join(dst_dir, "host_config.cmake")
-
-
-def get_aic_config_filepath(dst_dir: str) -> str:
-    """Get aic_config.cmake destination file path."""
-    return os.path.join(dst_dir, "aic_config.cmake")
-
-
-def get_aiv_config_filepath(dst_dir: str) -> str:
-    """Get aiv_config.cmake destination file path."""
-    return os.path.join(dst_dir, "aiv_config.cmake")
-
-
-def save_file(filepath: str, content: str):
-    """Save file."""
-    try:
-        with open(filepath, "w", encoding="utf-8") as file:
-            os.chmod(filepath, stat.S_IRUSR + stat.S_IWUSR)
-            file.write(content)
-    except Exception as err:
-        print("[ERROR]: write file failed, filename is {}".format(filepath))
-        raise err
 
 
 def do_save_command(save_command: Tuple[str, str]):
@@ -1563,46 +1561,6 @@ def get_mode_dynamic(aic_o: str, aiv_o: str, kernel_type: CodeMode) -> CodeMode:
     return kernel_type
 
 
-def load_compile_commands(filepath: str) -> Tuple[Dict[str, str], Dict[str, bool]]:
-    """Load compile_commands.json."""
-    source_mapping = {}
-    enable_ascendc_time_stamp = {}
-    try:
-        with open(filepath, encoding="utf-8") as file:
-            compile_commands = json.load(file)
-    except Exception as err:
-        print("[ERROR]: read json file failed, json file is {}".format(filepath))
-        raise err
-
-    for compile_info in compile_commands:
-        command_list = compile_info["command"].split()
-        if "-o" in command_list:
-            directory = compile_info["directory"]
-            source = compile_info["file"]
-
-            index = command_list.index("-o")
-            output_file = command_list[index + 1]
-            absolute_obj = os.path.join(directory, output_file)
-
-            source_mapping[absolute_obj] = source
-            if "-DASCENDC_TIME_STAMP_ON" in command_list:
-                enable_ascendc_time_stamp[absolute_obj] = True
-            else:
-                enable_ascendc_time_stamp[absolute_obj] = False
-    return source_mapping, enable_ascendc_time_stamp
-
-
-def get_preprocessed_source_filepath(filepath: str, source_mapping: Dict) -> str:
-    """Get preprocessed file's source file path."""
-    absolute_filepath = os.path.abspath(filepath)
-    return source_mapping[absolute_filepath]
-
-
-def trans_device_cpp_filename(filename: str) -> str:
-    """Transform device cpp filename."""
-    return f"auto_gen_{filename}"
-
-
 def get_all_sources(func_groups: List[FuncSignGroup], source_mapping, dst_dir: str):
     """Get all sources."""
     all_sources = list(
@@ -1689,30 +1647,6 @@ def source_properties(
                 compile_section += ";__MIX_CORE_AIC_RATION__=1"
             definitions.append(compile_section)
         yield (source, definitions)
-
-
-def generate_config_content(
-    all_sources: List[Tuple[str, List[str]]],
-    all_definitions: List[Tuple[str, List[str]]],
-) -> str:
-    """Generate config.cmake content by all sources and all definitions."""
-    buff = io.StringIO()
-
-    for name, sources in all_sources:
-        buff.write(f"set({name}\n")
-        for source in sources:
-            buff.write(f"    {source}\n")
-        buff.write(")\n")
-
-    all_definitions.sort()
-    for source, definitions in all_definitions:
-        if definitions:
-            buff.write(f"set_source_files_properties({source}\n")
-            definitions_str = ";".join(definitions)
-            buff.write(f'    PROPERTIES COMPILE_DEFINITIONS "{definitions_str}"\n')
-            buff.write(")\n")
-
-    return buff.getvalue()
 
 
 def generate_normal_config_content(
@@ -2265,6 +2199,74 @@ def generate_kernel_auto_gen_func_impl(
     return source
 
 
+def _gen_kernel_fun_file_header(src_without_ext, src_path, func_group):
+    source = f"#ifndef __{src_without_ext.upper()}__KERNEL_FUN_H__\n"
+    source += f"#define __{src_without_ext.upper()}__KERNEL_FUN_H__\n\n"
+
+    # replace __global micro for usr kernel function, and recover after usr kernel function
+    source += "#undef __global__\n"
+    source += "#define __global__ inline\n"
+
+    for func_sign in func_group.func_signs:
+        source += (
+            f"#define {func_sign.func_name} {add_origin_suffix(func_sign.func_name)}\n"
+        )
+        kernel_name = (func_sign.func_name).replace("aclrtlaunch_", "")
+
+    source += f'#include "{src_path}"\n\n'
+
+    for func_sign in func_group.func_signs:
+        source += f"#undef {func_sign.func_name}\n"
+
+    source += "#undef __global__\n"
+    source += "#if ASCENDC_CPU_DEBUG\n"
+    source += "#define __global__\n"
+    source += "#else\n"
+    source += "#define __global__ __attribute__((cce_kernel))\n"
+    source += "#endif\n\n"
+
+    dump_size = str(func_group.dump_info["dump_size"])
+    source += "#ifndef ONE_CORE_DUMP_SIZE\n"
+    source += f"#define ONE_CORE_DUMP_SIZE {dump_size} * 1\n"
+    source += "#endif\n\n"
+
+    if RUN_MODE == "cpu":
+        source += "#if defined(ASCENDC_CPU_DEBUG)\n"
+        for func_sign in func_group.func_signs:
+            kernel_name = (func_sign.func_name).replace("aclrtlaunch_", "")
+            if func_sign.func_template_decl:
+                for template_id, _ in enumerate(
+                    func_sign.func_template_specialization_args, 0
+                ):
+                    kernel_sign_name = f"{kernel_name}_template_{template_id}"
+                    autogen_name = f"auto_gen_{kernel_sign_name}_kernel"
+                    source += f"#define {autogen_name} {kernel_sign_name}\n"
+            else:
+                source += f"#define auto_gen_{kernel_name}_kernel {kernel_name}\n"
+        source += "#endif\n"
+    return source
+
+
+def _append_kernel_auto_gen_impls(source, func_group, is_mix, generate_ktype_section):
+    for func_sign in func_group.func_signs:
+        if func_sign.func_template_decl:
+            for template_id, _ in enumerate(
+                func_sign.func_template_specialization_args, 0
+            ):
+                source += generate_kernel_auto_gen_func_impl(
+                    func_group,
+                    func_sign,
+                    is_mix,
+                    template_id,
+                    generate_ktype_section,
+                )
+        else:
+            source += generate_kernel_auto_gen_func_impl(
+                func_group, func_sign, is_mix, 0, generate_ktype_section
+            )
+    return source
+
+
 def save_device_kernel_function(
     func_groups: List[FuncSignGroupWithModeBase],
     source_mapping: Dict[str, str],
@@ -2285,66 +2287,12 @@ def save_device_kernel_function(
         )
 
         # File Isolation Macro
-        source = f"#ifndef __{src_without_ext.upper()}__KERNEL_FUN_H__\n"
-        source += f"#define __{src_without_ext.upper()}__KERNEL_FUN_H__\n\n"
-
-        # replace __global micro for usr kernel function, and recover after usr kernel function
-        source += "#undef __global__\n"
-        source += "#define __global__ inline\n"
-
-        for func_sign in func_group.func_signs:
-            source += f"#define {func_sign.func_name} {add_origin_suffix(func_sign.func_name)}\n"
-            kernel_name = (func_sign.func_name).replace("aclrtlaunch_", "")
-
-        source += f'#include "{src_path}"\n\n'
-
-        for func_sign in func_group.func_signs:
-            source += f"#undef {func_sign.func_name}\n"
-
-        source += "#undef __global__\n"
-        source += "#if ASCENDC_CPU_DEBUG\n"
-        source += "#define __global__\n"
-        source += "#else\n"
-        source += "#define __global__ __attribute__((cce_kernel))\n"
-        source += "#endif\n\n"
-
-        dump_size = str(func_group.dump_info["dump_size"])
-        source += "#ifndef ONE_CORE_DUMP_SIZE\n"
-        source += f"#define ONE_CORE_DUMP_SIZE {dump_size} * 1\n"
-        source += "#endif\n\n"
-
-        if RUN_MODE == "cpu":
-            source += "#if defined(ASCENDC_CPU_DEBUG)\n"
-            for func_sign in func_group.func_signs:
-                kernel_name = (func_sign.func_name).replace("aclrtlaunch_", "")
-                if func_sign.func_template_decl:
-                    for template_id, _ in enumerate(
-                        func_sign.func_template_specialization_args, 0
-                    ):
-                        kernel_sign_name = f"{kernel_name}_template_{template_id}"
-                        autogen_name = f"auto_gen_{kernel_sign_name}_kernel"
-                        source += f"#define {autogen_name} {kernel_sign_name}\n"
-                else:
-                    source += f"#define auto_gen_{kernel_name}_kernel {kernel_name}\n"
-            source += "#endif\n"
+        source = _gen_kernel_fun_file_header(src_without_ext, src_path, func_group)
 
         # generate kernel function
-        for func_sign in func_group.func_signs:
-            if func_sign.func_template_decl:
-                for template_id, _ in enumerate(
-                    func_sign.func_template_specialization_args, 0
-                ):
-                    source += generate_kernel_auto_gen_func_impl(
-                        func_group,
-                        func_sign,
-                        is_mix,
-                        template_id,
-                        generate_ktype_section,
-                    )
-            else:
-                source += generate_kernel_auto_gen_func_impl(
-                    func_group, func_sign, is_mix, 0, generate_ktype_section
-                )
+        source = _append_kernel_auto_gen_impls(
+            source, func_group, is_mix, generate_ktype_section
+        )
 
         source += "#endif\n"
 
@@ -2423,8 +2371,7 @@ def process_with_source_mapping(
     save_host_config_cmake_func(func_sign_groups, source_mapping, dst_dir)
 
 
-def main(argv: List[str]):
-    """Main process."""
+def _parse_stub_args(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("filepaths", nargs="+", help="Preprocessed file paths.")
     parser.add_argument(
@@ -2449,6 +2396,68 @@ def main(argv: List[str]):
     parser.add_argument("--run-mode", help="cpu or npu mode.")
 
     args = parser.parse_args(argv)
+    return args
+
+
+def _prepare_func_sign_groups(func_sign_groups, args):
+    type_definition = generate_type_definition_content_by_func_sign_groups(
+        func_sign_groups
+    )
+    func_sign_groups = list(
+        map(
+            get_func_sign_template_specialization_args,
+            func_sign_groups,
+            args.aiv_o,
+            args.aic_o,
+        )
+    )
+
+    new_func_sign_groups = list(map(trans_func_sign_group, func_sign_groups))
+    return type_definition, func_sign_groups, new_func_sign_groups
+
+
+def _resolve_modes_and_saver(args, func_sign_groups):
+    if args.dynamic_mode:
+        # Each preprocessed file corresponds to two .o files: aiv.o and aic.o.
+        kernel_types = [
+            func_sign_group.kernel_type for func_sign_group in func_sign_groups
+        ]
+        modes = list(
+            starmap(get_mode_dynamic, zip(args.aic_o, args.aiv_o, kernel_types))
+        )
+        save_device_config_cmake_func = save_aic_aiv_config_cmake
+    elif args.build_mode == "m200" and args.generate_definition:
+        modes = [func_sign_group.kernel_type for func_sign_group in func_sign_groups]
+        save_device_config_cmake_func = save_v200_config_cmake
+    else:
+        modes = repeat(CodeMode.NORMAL)
+        save_device_config_cmake_func = save_normal_config_cmake
+    return modes, save_device_config_cmake_func
+
+
+def _save_stub_sources(new_func_sign_groups, type_definition, dst_dir, args):
+    do_save_commands(
+        generate_save_stub_header_commands(
+            func_signs_in_groups(new_func_sign_groups), args.header_dir
+        )
+    )
+    if RUN_MODE == "cpu":
+        do_save_commands(
+            generate_save_stub_impl_cpp_cpu_commands(
+                new_func_sign_groups, type_definition, dst_dir
+            )
+        )
+    else:
+        do_save_commands(
+            generate_save_stub_impl_cpp_commands(
+                new_func_sign_groups, type_definition, dst_dir
+            )
+        )
+
+
+def main(argv: List[str]):
+    """Main process."""
+    args = _parse_stub_args(argv)
 
     dst_dir = os.path.realpath(args.dst_dir)
     if not os.path.exists(dst_dir):
@@ -2473,19 +2482,9 @@ def main(argv: List[str]):
         print(f"error: {ex.strerror}: '{ex.filename}'")
         return False
 
-    type_definition = generate_type_definition_content_by_func_sign_groups(
-        func_sign_groups
+    type_definition, func_sign_groups, new_func_sign_groups = _prepare_func_sign_groups(
+        func_sign_groups, args
     )
-    func_sign_groups = list(
-        map(
-            get_func_sign_template_specialization_args,
-            func_sign_groups,
-            args.aiv_o,
-            args.aic_o,
-        )
-    )
-
-    new_func_sign_groups = list(map(trans_func_sign_group, func_sign_groups))
 
     try:
         source_mapping, enable_ascendc_time_stamp = load_compile_commands(
@@ -2495,21 +2494,9 @@ def main(argv: List[str]):
         print(f"error: {ex}")
         return False
 
-    if args.dynamic_mode:
-        # Each preprocessed file corresponds to two .o files: aiv.o and aic.o.
-        kernel_types = [
-            func_sign_group.kernel_type for func_sign_group in func_sign_groups
-        ]
-        modes = list(
-            starmap(get_mode_dynamic, zip(args.aic_o, args.aiv_o, kernel_types))
-        )
-        save_device_config_cmake_func = save_aic_aiv_config_cmake
-    elif args.build_mode == "m200" and args.generate_definition:
-        modes = [func_sign_group.kernel_type for func_sign_group in func_sign_groups]
-        save_device_config_cmake_func = save_v200_config_cmake
-    else:
-        modes = repeat(CodeMode.NORMAL)
-        save_device_config_cmake_func = save_normal_config_cmake
+    modes, save_device_config_cmake_func = _resolve_modes_and_saver(
+        args, func_sign_groups
+    )
 
     base_keys = list(get_base_keys(func_sign_groups, modes))
     func_sign_groups = compose_mode_base_func_groups(func_sign_groups, modes, base_keys)
@@ -2518,23 +2505,7 @@ def main(argv: List[str]):
         new_func_sign_groups, modes, base_keys
     )
 
-    do_save_commands(
-        generate_save_stub_header_commands(
-            func_signs_in_groups(new_func_sign_groups), args.header_dir
-        )
-    )
-    if RUN_MODE == "cpu":
-        do_save_commands(
-            generate_save_stub_impl_cpp_cpu_commands(
-                new_func_sign_groups, type_definition, dst_dir
-            )
-        )
-    else:
-        do_save_commands(
-            generate_save_stub_impl_cpp_commands(
-                new_func_sign_groups, type_definition, dst_dir
-            )
-        )
+    _save_stub_sources(new_func_sign_groups, type_definition, dst_dir, args)
 
     process_with_source_mapping(
         func_sign_groups,

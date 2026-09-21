@@ -46,6 +46,37 @@ from .ascendc_compile_dfx import DFXSectionGenerator
 from .super_kernel_sub_op_compile import gen_sub_kernel_name
 
 
+def _append_c310_aicore_options(compile_cmd, src_file, dst_file, sub_arch):
+    compile_cmd += [
+        src_file,
+        "--cce-aicore-arch=%s" % sub_arch,
+        "-D__DAV_C310__",
+        "--cce-aicore-only",
+        "-o",
+        dst_file,
+        "-mllvm",
+        "-cce-aicore-stack-size=0x8000",
+        "-mllvm",
+        "-cce-aicore-function-stack-size=0x8000",
+        "-mllvm",
+        "-cce-aicore-record-overflow=false",
+        "-mllvm",
+        "-cce-aicore-addr-transform",
+        "-mllvm",
+        "--cce-aicore-jump-expand=true",
+        "-mllvm",
+        "-cce-aicore-dcci-insert-for-scalar=false",
+    ]
+    if global_var_storage.get_variable("ascendc_enable_sanitizer"):
+        compile_cmd += ["--cce-enable-sanitizer", "-gline-tables-only"]
+        compile_cmd += [
+            "-mllvm",
+            "-cce-aicore-long-call",
+            "-mllvm",
+            "-cce-aicore-jump-expand=true",
+        ]
+
+
 def _gen_compile_cmd_c310(
     src_file: str,
     dst_file: str,
@@ -78,34 +109,7 @@ def _gen_compile_cmd_c310(
 
     for option in compile_option_tuple.compile_options:
         compile_cmd += [option]
-    compile_cmd += [
-        src_file,
-        "--cce-aicore-arch=%s" % sub_arch,
-        "-D__DAV_C310__",
-        "--cce-aicore-only",
-        "-o",
-        dst_file,
-        "-mllvm",
-        "-cce-aicore-stack-size=0x8000",
-        "-mllvm",
-        "-cce-aicore-function-stack-size=0x8000",
-        "-mllvm",
-        "-cce-aicore-record-overflow=false",
-        "-mllvm",
-        "-cce-aicore-addr-transform",
-        "-mllvm",
-        "--cce-aicore-jump-expand=true",
-        "-mllvm",
-        "-cce-aicore-dcci-insert-for-scalar=false",
-    ]
-    if global_var_storage.get_variable("ascendc_enable_sanitizer"):
-        compile_cmd += ["--cce-enable-sanitizer", "-gline-tables-only"]
-        compile_cmd += [
-            "-mllvm",
-            "-cce-aicore-long-call",
-            "-mllvm",
-            "-cce-aicore-jump-expand=true",
-        ]
+    _append_c310_aicore_options(compile_cmd, src_file, dst_file, sub_arch)
 
     for opt in compile_option_tuple.mllvm_options:
         compile_cmd += [opt]
@@ -227,6 +231,20 @@ def _gen_compile_cmd_m510(
 
     for option in compile_option_tuple.compile_options:
         compile_cmd += [option]
+    _append_m510_aicore_options(compile_cmd, src_file, dst_file)
+
+    for opt in compile_option_tuple.mllvm_options:
+        compile_cmd += [opt]
+
+    if with_tiling_file and tiling_file != "":
+        compile_cmd += ["-include", tiling_file]
+    compile_cmd += ["-std=c++17"]
+    if "oom" in get_current_build_config("tir.op_debug_config"):
+        compile_cmd += [f"-D{ASCENDC_OOM}={1}"]
+    return compile_cmd
+
+
+def _append_m510_aicore_options(compile_cmd, src_file, dst_file):
     compile_cmd += [
         src_file,
         "--cce-aicore-arch=dav-510r2",
@@ -254,16 +272,6 @@ def _gen_compile_cmd_m510(
             "-mllvm",
             "-cce-aicore-jump-expand=true",
         ]
-
-    for opt in compile_option_tuple.mllvm_options:
-        compile_cmd += [opt]
-
-    if with_tiling_file and tiling_file != "":
-        compile_cmd += ["-include", tiling_file]
-    compile_cmd += ["-std=c++17"]
-    if "oom" in get_current_build_config("tir.op_debug_config"):
-        compile_cmd += [f"-D{ASCENDC_OOM}={1}"]
-    return compile_cmd
 
 
 def gen_compile_cmd_v220(

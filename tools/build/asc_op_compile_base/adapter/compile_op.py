@@ -228,6 +228,41 @@ def _add_op_compile_options_by_customized_json(
                     compile_option_tuple.compile_options.append(opt)
 
 
+def _append_asc_include_dirs(compile_options, asc_path):
+    compile_options.append("-I" + os.path.join(asc_path, "impl", "adv_api"))
+    compile_options.append("-I" + os.path.join(asc_path, "impl", "basic_api"))
+    compile_options.append("-I" + os.path.join(asc_path, "impl", "c_api"))
+    compile_options.append(
+        "-I" + os.path.join(asc_path, "impl", "basic_api", "reg_compute")
+    )
+    compile_options.append("-I" + os.path.join(asc_path, "impl", "simt_api"))
+    compile_options.append("-I" + os.path.join(asc_path, "impl", "utils"))
+    compile_options.append("-I" + asc_path)
+    compile_options.append("-I" + os.path.join(asc_path, "include"))
+    compile_options.append("-I" + os.path.join(asc_path, "include", "adv_api"))
+    compile_options.append("-I" + os.path.join(asc_path, "include", "basic_api"))
+    compile_options.append("-I" + os.path.join(asc_path, "include", "aicpu_api"))
+    compile_options.append("-I" + os.path.join(asc_path, "include", "c_api"))
+    compile_options.append(
+        "-I" + os.path.join(asc_path, "include", "basic_api", "reg_compute")
+    )
+    compile_options.append("-I" + os.path.join(asc_path, "include", "simt_api"))
+    compile_options.append("-I" + os.path.join(asc_path, "include", "utils"))
+    compile_options.append("-I" + os.path.join(asc_path, "..", "..", "include"))
+    compile_options.append(
+        "-I" + os.path.join(asc_path, "..", "..", "include", "ascendc")
+    )
+    compile_options.append("-I" + os.path.join(asc_path, "..", "ascendc", "act"))
+    compile_options.append("-I" + os.path.join(asc_path, "..", "tikcpp"))
+    compile_options.append("-I" + os.path.join(asc_path, "..", "tikcpp", "tikcfw"))
+    compile_options.append(
+        "-I" + os.path.join(asc_path, "..", "tikcpp", "tikcfw", "impl")
+    )
+    compile_options.append(
+        "-I" + os.path.join(asc_path, "..", "tikcpp", "tikcfw", "interface")
+    )
+
+
 def _update_compile_option(
     kernel_name: str, compile_options: list, extend_options: dict
 ):
@@ -260,38 +295,7 @@ def _update_compile_option(
         cann_version_file_path = os.path.join(
             asc_path, "..", "..", "include", "version", "asc_devkit_version.h"
         )
-        compile_options.append("-I" + os.path.join(asc_path, "impl", "adv_api"))
-        compile_options.append("-I" + os.path.join(asc_path, "impl", "basic_api"))
-        compile_options.append("-I" + os.path.join(asc_path, "impl", "c_api"))
-        compile_options.append(
-            "-I" + os.path.join(asc_path, "impl", "basic_api", "reg_compute")
-        )
-        compile_options.append("-I" + os.path.join(asc_path, "impl", "simt_api"))
-        compile_options.append("-I" + os.path.join(asc_path, "impl", "utils"))
-        compile_options.append("-I" + asc_path)
-        compile_options.append("-I" + os.path.join(asc_path, "include"))
-        compile_options.append("-I" + os.path.join(asc_path, "include", "adv_api"))
-        compile_options.append("-I" + os.path.join(asc_path, "include", "basic_api"))
-        compile_options.append("-I" + os.path.join(asc_path, "include", "aicpu_api"))
-        compile_options.append("-I" + os.path.join(asc_path, "include", "c_api"))
-        compile_options.append(
-            "-I" + os.path.join(asc_path, "include", "basic_api", "reg_compute")
-        )
-        compile_options.append("-I" + os.path.join(asc_path, "include", "simt_api"))
-        compile_options.append("-I" + os.path.join(asc_path, "include", "utils"))
-        compile_options.append("-I" + os.path.join(asc_path, "..", "..", "include"))
-        compile_options.append(
-            "-I" + os.path.join(asc_path, "..", "..", "include", "ascendc")
-        )
-        compile_options.append("-I" + os.path.join(asc_path, "..", "ascendc", "act"))
-        compile_options.append("-I" + os.path.join(asc_path, "..", "tikcpp"))
-        compile_options.append("-I" + os.path.join(asc_path, "..", "tikcpp", "tikcfw"))
-        compile_options.append(
-            "-I" + os.path.join(asc_path, "..", "tikcpp", "tikcfw", "impl")
-        )
-        compile_options.append(
-            "-I" + os.path.join(asc_path, "..", "tikcpp", "tikcfw", "interface")
-        )
+        _append_asc_include_dirs(compile_options, asc_path)
         if os.path.exists(cann_version_file_path):
             compile_options.append("-include" + cann_version_file_path)
         else:
@@ -367,22 +371,7 @@ def handle_compile_options(
         compile_option_tuple.compile_options.append("-DCONST_TILING")
 
 
-def compile_kernel_and_meta(
-    compile_info: CompileInfo,
-    op_info: OpInfo,
-    compile_option_tuple,
-    tiling_info: TilingInfo,
-):
-    CommonUtility.print_compile_log(
-        op_info.kernel_name, "start to compile cce file...", AscendCLogLevel.LOG_INFO
-    )
-    msg_info = "<{}> <{}> compile kernel start".format(
-        compile_info.op_type, compile_info.tiling_key_list
-    )
-    LogUtil.detail_log_print(op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO)
-
-    DFXSectionGenerator().generate_dfx_binary(compile_info, op_info, tiling_info)
-
+def _dispatch_cce_compile(compile_info, compile_option_tuple, tiling_info):
     if CommonUtility.is_v220() or CommonUtility.is_c310():
         if compile_info.no_set_kernel_type is True:
             _compile_ascendc_cce_v220(compile_info, compile_option_tuple, tiling_info)
@@ -402,6 +391,25 @@ def compile_kernel_and_meta(
         )
     else:
         _compile_ascendc_cce(compile_info, compile_option_tuple, tiling_info)
+
+
+def compile_kernel_and_meta(
+    compile_info: CompileInfo,
+    op_info: OpInfo,
+    compile_option_tuple,
+    tiling_info: TilingInfo,
+):
+    CommonUtility.print_compile_log(
+        op_info.kernel_name, "start to compile cce file...", AscendCLogLevel.LOG_INFO
+    )
+    msg_info = "<{}> <{}> compile kernel start".format(
+        compile_info.op_type, compile_info.tiling_key_list
+    )
+    LogUtil.detail_log_print(op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO)
+
+    DFXSectionGenerator().generate_dfx_binary(compile_info, op_info, tiling_info)
+
+    _dispatch_cce_compile(compile_info, compile_option_tuple, tiling_info)
 
     # Record-only replay stops before inspecting or generating physical objects.
     if not compile_info.compile_command_session.should_execute:
@@ -981,23 +989,9 @@ def compile_op_common_part(
         )
 
 
-def compile_op(
-    cce_file: str,
-    origin_func_name: str,
-    op_info: OpInfo,
-    compile_options: list = None,
-    code_channel: int = -1,
-    op_compile_option: str = "{}",
-    extend_options: dict = {},
+def _prepare_compile_op_options(
+    cce_file, op_info, compile_options, op_compile_option, extend_options
 ):
-    """get tiling_data/ generate tiling_data file/ compile cce to .o / generate .json file
-    Args:
-        cce_file (str): cce file to be compiled
-        origin_func_name (str): func_name written by user, without md5
-        op_info (OpInfo): operator info
-        compile_options (list): compile options for bisheng
-        code_channel (int): one of CORE_TYPE_MIX/CORE_TYPE_CUBE/CORE_TYPE_VEC
-    """
     LogUtil.detail_log_print(
         op_info.kernel_name,
         COMPILE_STAGE_MSG_INFO["compile_op_start"],
@@ -1038,6 +1032,29 @@ def compile_op(
 
     _update_compile_option(
         op_info.kernel_name, compile_option_tuple.compile_options, extend_options
+    )
+    return compile_option_tuple
+
+
+def compile_op(
+    cce_file: str,
+    origin_func_name: str,
+    op_info: OpInfo,
+    compile_options: list = None,
+    code_channel: int = -1,
+    op_compile_option: str = "{}",
+    extend_options: dict = {},
+):
+    """get tiling_data/ generate tiling_data file/ compile cce to .o / generate .json file
+    Args:
+        cce_file (str): cce file to be compiled
+        origin_func_name (str): func_name written by user, without md5
+        op_info (OpInfo): operator info
+        compile_options (list): compile options for bisheng
+        code_channel (int): one of CORE_TYPE_MIX/CORE_TYPE_CUBE/CORE_TYPE_VEC
+    """
+    compile_option_tuple = _prepare_compile_op_options(
+        cce_file, op_info, compile_options, op_compile_option, extend_options
     )
 
     value_depend_dict = extend_options.get("valueDepend")
@@ -1107,46 +1124,8 @@ def compile_op_with_customized_config(
         compile_options (list): compile options for bisheng
         code_channel (int): one of CORE_TYPE_MIX/CORE_TYPE_CUBE/CORE_TYPE_VEC
     """
-    LogUtil.detail_log_print(
-        op_info.kernel_name,
-        COMPILE_STAGE_MSG_INFO["compile_op_start"],
-        AscendCLogLevel.LOG_INFO,
-    )
-    LogUtil.detail_log_print(
-        op_info.kernel_name,
-        COMPILE_STAGE_MSG_INFO["preprocess_start"],
-        AscendCLogLevel.LOG_INFO,
-    )
-    # online compile reuses thread, dfx infos need to be reset.
-    global_var_storage.global_storage_reset()
-    if extend_options.get(
-        "opp_kernel_hidden_dat_path", None
-    ) is None and not os.path.exists(cce_file):
-        raise Exception("input cce file is not exists, file name: " + cce_file)
-
-    compile_option_tuple = CompileOptionTuple(
-        [] if compile_options is None else compile_options, []
-    )
-    need_impl_mode_macro = (
-        (CommonUtility.is_c310() or CommonUtility.is_m510())
-        and isinstance(op_info.impl_mode, str)
-        and op_info.impl_mode != ""
-    )
-    if need_impl_mode_macro:
-        impl_mode_def = f"-D{op_info.impl_mode.upper()}_"  # IMPL_MODE_IS
-        if impl_mode_def not in compile_option_tuple.compile_options:
-            compile_option_tuple.compile_options.append(impl_mode_def)
-
-    _add_op_compile_options_by_customized_json(op_compile_option, compile_option_tuple)
-
-    compile_option_tuple.compile_options = compile_pre_process(
-        op_info, compile_option_tuple.compile_options
-    )
-
-    DFXSectionGenerator().dfx_info_reset(op_info)
-
-    _update_compile_option(
-        op_info.kernel_name, compile_option_tuple.compile_options, extend_options
+    compile_option_tuple = _prepare_compile_op_options(
+        cce_file, op_info, compile_options, op_compile_option, extend_options
     )
 
     if customized_config is None:

@@ -285,6 +285,11 @@ def args_parse():
         "-t", "--tiling-lib", nargs="?", help="Tiling shared library file."
     )
 
+    _add_kernel_output_args(parser)
+    return parser.parse_args()
+
+
+def _add_kernel_output_args(parser):
     parser.add_argument(
         "-o", "--output-path", nargs="?", help="Output path of compile result."
     )
@@ -319,7 +324,6 @@ def args_parse():
     parser.add_argument(
         "-a", "--auto-gen-path", nargs="?", default=None, help="auto gen file path."
     )
-    return parser.parse_args()
 
 
 if __name__ == "__main__":
