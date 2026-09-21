@@ -114,6 +114,7 @@ HcclResult InheritKfcServerKernelArg(
     } else {
         HCCL_WARNING(
             "[InheritKfcServerKernelArg] unknown src kernel type[%s], no attributes inherited", srcName.c_str());
+        return HCCL_E_NOT_SUPPORT;
     }
 
     dstKernel.setKernelArg(kfcArg);

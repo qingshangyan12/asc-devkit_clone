@@ -127,7 +127,8 @@ CcuResult DoAllToAll(KfcAllToAllContext& ctx)
     localDst.token = ctx.token;
     CCU_IF(ctx.sliceSize != 0)
     {
-        CCU_CHK_RET(ccu::LocalCopy(localDst, localSrc, ctx.sliceSize, ctx.localCopyEvent, 1));
+        CCU_CHK_RET(ccu::LocalCopy(
+            localDst, localSrc, ctx.sliceSize, ctx.localCopyEvent, 1));
         CCU_CHK_RET(ccu::EventWait(ctx.localCopyEvent, 1));
     }
     CCU_CHK_RET(ccu::EventRecord(ctx.event, static_cast<uint16_t>(1U << ctx.rankId)));
