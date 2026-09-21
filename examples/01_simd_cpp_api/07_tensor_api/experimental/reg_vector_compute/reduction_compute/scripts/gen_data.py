@@ -19,10 +19,7 @@ import numpy as np
 def gen_golden_data():
     input_length = 64
     src = np.arange(input_length, dtype=np.float32) * np.float32(0.25) - np.float32(5.0)
-    golden = np.array(
-        [np.sum(src, dtype=np.float32), np.max(src), np.min(src)],
-        dtype=np.float32,
-    )
+    golden = np.array([np.sum(src, dtype=np.float32), np.max(src), np.min(src)], dtype=np.float32)
 
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
