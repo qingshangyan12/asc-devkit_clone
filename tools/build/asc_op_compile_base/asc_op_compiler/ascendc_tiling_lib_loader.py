@@ -73,18 +73,11 @@ def get_custom_opp_pathlist():
 def load_op_host_tiling_lib():
     LogUtil.print_compile_log("", "load op host tiling lib.", AscendCLogLevel.LOG_INFO)
     builtin_op_host_tiling_prefix = (
-        os.environ.get(_ASCEND_OPP_PATH_ENV, _ASCEND_OPP_PATH_DEFAULT)
-        + "/"
-        + op_impl_path
-        + "/ai_core/tbe/op_host/"
+        os.environ.get(_ASCEND_OPP_PATH_ENV, _ASCEND_OPP_PATH_DEFAULT) + "/" + op_impl_path + "/ai_core/tbe/op_host/"
     )
     builtin_op_host_tiling_pattern = builtin_op_host_tiling_prefix + "**/*.so"
-    builtin_op_host_tiling_file_path = glob.glob(
-        builtin_op_host_tiling_pattern, recursive=True
-    )
-    builtin_op_host_tiling_file_path.sort(
-        key=lambda x: os.path.basename(x) == "libophost_legacy.so"
-    )
+    builtin_op_host_tiling_file_path = glob.glob(builtin_op_host_tiling_pattern, recursive=True)
+    builtin_op_host_tiling_file_path.sort(key=lambda x: os.path.basename(x) == "libophost_legacy.so")
     import platform
 
     archlinux = platform.machine()
@@ -99,9 +92,7 @@ def load_op_host_tiling_lib():
             if os.path.exists(tiling_path):
                 lib_tiling_builtin = ctypes.CDLL(tiling_path)
                 tiling_path_str = str(tiling_path)
-                lib_tiling_builtin.TbeLoadSoAndSaveToRegistry(
-                    tiling_path_str.encode("utf-8")
-                )
+                lib_tiling_builtin.TbeLoadSoAndSaveToRegistry(tiling_path_str.encode("utf-8"))
         except OSError as e:
             LogUtil.print_compile_log(
                 "",
@@ -118,9 +109,7 @@ tiling_path: {tiling_path}",
 tiling_path: {tiling_path}",
                 AscendCLogLevel.LOG_ERROR,
             )
-            raise Exception(
-                f"An Unknown error occurred, tiling_path: {tiling_path}"
-            ) from e
+            raise Exception(f"An Unknown error occurred, tiling_path: {tiling_path}") from e
     return
 
 
@@ -162,9 +151,7 @@ def load_build_in_lib():
         if os.path.exists(builtin_optiling_ctlib_path):
             ctlib_optiling_builtin = ctypes.CDLL(builtin_optiling_ctlib_path)
             builtin_optiling_ctlib_path_str = str(builtin_optiling_ctlib_path)
-            ctlib_optiling_builtin.TbeLoadSoAndSaveToRegistry(
-                builtin_optiling_ctlib_path_str.encode("utf_8")
-            )
+            ctlib_optiling_builtin.TbeLoadSoAndSaveToRegistry(builtin_optiling_ctlib_path_str.encode("utf_8"))
     except AttributeError as e:
         # ascend c static load builtin opmaster ct so fail
         LogUtil.print_compile_log(
@@ -179,15 +166,11 @@ def load_build_in_lib():
         if os.path.exists(builtin_optiling_rtlib_path):
             lib_optiling_builtin = ctypes.CDLL(builtin_optiling_rtlib_path)
             builtin_optiling_lib_path_str = str(builtin_optiling_rtlib_path)
-            lib_optiling_builtin.TbeLoadSoAndSaveToRegistry(
-                builtin_optiling_lib_path_str.encode("utf_8")
-            )
+            lib_optiling_builtin.TbeLoadSoAndSaveToRegistry(builtin_optiling_lib_path_str.encode("utf_8"))
         elif os.path.exists(builtin_optiling_lib_path2):
             lib_optiling_builtin = ctypes.CDLL(builtin_optiling_lib_path2)
             builtin_optiling_lib_path2_str = str(builtin_optiling_lib_path2)
-            lib_optiling_builtin.TbeLoadSoAndSaveToRegistry(
-                builtin_optiling_lib_path2_str.encode("utf_8")
-            )
+            lib_optiling_builtin.TbeLoadSoAndSaveToRegistry(builtin_optiling_lib_path2_str.encode("utf_8"))
     except AttributeError as e:
         # ascend c static load builtin opmaster rt so fail, undefined symbol, then use 1.0 way
         LogUtil.print_compile_log(
@@ -211,15 +194,11 @@ def load_lib():
         try:
             custom_opp_so_path = os.path.join(_path, _TILING_SO_PATH)
             if not os.path.exists(custom_opp_so_path):
-                LogUtil.print_compile_log(
-                    "", f"{custom_opp_so_path} not exists", AscendCLogLevel.LOG_INFO
-                )
+                LogUtil.print_compile_log("", f"{custom_opp_so_path} not exists", AscendCLogLevel.LOG_INFO)
             else:
                 lib_optiling = ctypes.CDLL(custom_opp_so_path)
                 custom_opp_so_path_str = str(custom_opp_so_path)
-                lib_optiling.TbeLoadSoAndSaveToRegistry(
-                    custom_opp_so_path_str.encode("utf_8")
-                )
+                lib_optiling.TbeLoadSoAndSaveToRegistry(custom_opp_so_path_str.encode("utf_8"))
         except OSError as e:
             # Custom op tiling lib may not exists
             LogUtil.print_compile_log(
@@ -238,16 +217,12 @@ def load_lib():
 def load_custom_lib(custom_op_tiling_path):
     try:
         if not os.path.exists(custom_op_tiling_path):
-            LogUtil.print_compile_log(
-                "", f"{custom_op_tiling_path} not exists", AscendCLogLevel.LOG_INFO
-            )
+            LogUtil.print_compile_log("", f"{custom_op_tiling_path} not exists", AscendCLogLevel.LOG_INFO)
             return False
         else:
             lib_optiling = ctypes.CDLL(custom_op_tiling_path)
             custom_op_tiling_path_str = str(custom_op_tiling_path)
-            lib_optiling.TbeLoadSoAndSaveToRegistry(
-                custom_op_tiling_path_str.encode("utf_8")
-            )
+            lib_optiling.TbeLoadSoAndSaveToRegistry(custom_op_tiling_path_str.encode("utf_8"))
             return True
     except OSError as e:
         # Custom op tiling lib may not exists
@@ -257,9 +232,7 @@ def load_custom_lib(custom_op_tiling_path):
 tiling_path: {custom_op_tiling_path}",
             AscendCLogLevel.LOG_ERROR,
         )
-        raise Exception(
-            f"An OSError occurred, tiling_path: {custom_op_tiling_path}"
-        ) from e
+        raise Exception(f"An OSError occurred, tiling_path: {custom_op_tiling_path}") from e
     except Exception as e:
         # Custom op tiling lib may not exists
         LogUtil.print_compile_log(
@@ -268,7 +241,5 @@ tiling_path: {custom_op_tiling_path}",
 tiling_path: {custom_op_tiling_path}",
             AscendCLogLevel.LOG_ERROR,
         )
-        raise Exception(
-            f"An Unknown error occurred, tiling_path: {custom_op_tiling_path}"
-        ) from e
+        raise Exception(f"An Unknown error occurred, tiling_path: {custom_op_tiling_path}") from e
     return False

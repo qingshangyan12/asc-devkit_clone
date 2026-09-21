@@ -74,9 +74,7 @@ class TestOpc01(unittest.TestCase):
 
     def test_dir_02(self):
         parser = OpcOptionParser()
-        ret = parser.check_dir_valid(
-            "C:\\Program Files\\JetBrains\\PyCharm 2019.2\\helpers\\"
-        )
+        ret = parser.check_dir_valid("C:\\Program Files\\JetBrains\\PyCharm 2019.2\\helpers\\")
         self.assertEqual(ret, False)
 
 
@@ -131,9 +129,7 @@ class TestOpc02(unittest.TestCase):
 
     def test_options_parser_01(self):
         logger.info(current_dir)
-        logger.info(
-            "Start to execute ==============test_options_parser_01=============="
-        )
+        logger.info("Start to execute ==============test_options_parser_01==============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
 
@@ -167,9 +163,7 @@ class TestOpc02(unittest.TestCase):
         op path use relative path, which does not exist
         :return:
         """
-        logger.info(
-            "Start to execute ==============test_options_parser_02=============="
-        )
+        logger.info("Start to execute ==============test_options_parser_02==============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
 
@@ -203,9 +197,7 @@ class TestOpc02(unittest.TestCase):
         input param: matmul_test_false.json does not exist
         :return:
         """
-        logger.info(
-            "Start to execute ==============test_options_parser_03=============="
-        )
+        logger.info("Start to execute ==============test_options_parser_03==============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test_false.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
@@ -241,9 +233,7 @@ class TestOpc02(unittest.TestCase):
         considered as op path
         :return:
         """
-        logger.info(
-            "Start to execute ==============test_options_parser_04=============="
-        )
+        logger.info("Start to execute ==============test_options_parser_04==============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
 
@@ -276,9 +266,7 @@ class TestOpc02(unittest.TestCase):
         correct case
         :return:
         """
-        logger.info(
-            "Start to execute ==============test_options_parser_05=============="
-        )
+        logger.info("Start to execute ==============test_options_parser_05==============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
@@ -313,9 +301,7 @@ class TestOpc02(unittest.TestCase):
         soc version is empty
         :return:
         """
-        logger.info(
-            "Start to execute ==============test_options_parser_06=============="
-        )
+        logger.info("Start to execute ==============test_options_parser_06==============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
@@ -349,9 +335,7 @@ class TestOpc02(unittest.TestCase):
         main_func is empty, which is allowed
         :return:
         """
-        logger.info(
-            "Start to execute ==============test_options_parser_07=============="
-        )
+        logger.info("Start to execute ==============test_options_parser_07==============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
@@ -385,9 +369,7 @@ class TestOpc02(unittest.TestCase):
         output is empty, which will use current dir as output dir
         :return:
         """
-        logger.info(
-            "Start to execute ==============test_options_parser_08=============="
-        )
+        logger.info("Start to execute ==============test_options_parser_08==============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
@@ -422,9 +404,7 @@ class TestOpc02(unittest.TestCase):
         debug dir is empty, which will use current dir(./) as debug dir
         :return:
         """
-        logger.info(
-            "Start to execute ==============test_options_parser_09=============="
-        )
+        logger.info("Start to execute ==============test_options_parser_09==============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
@@ -459,9 +439,7 @@ class TestOpc02(unittest.TestCase):
         debug dir is not empty
         :return:
         """
-        logger.info(
-            "Start to execute ==============test_options_parser_09_01=============="
-        )
+        logger.info("Start to execute ==============test_options_parser_09_01==============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
@@ -499,9 +477,7 @@ class TestOpc02(unittest.TestCase):
         output not exist, opc will create
         :return:
         """
-        logger.info(
-            "Start to execute ==============test_options_parser_09_02=============="
-        )
+        logger.info("Start to execute ==============test_options_parser_09_02==============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
@@ -540,9 +516,7 @@ class TestOpc02(unittest.TestCase):
         log is not empty
         :return:
         """
-        logger.info(
-            "Start to execute ==============test_options_parser_10=============="
-        )
+        logger.info("Start to execute ==============test_options_parser_10==============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
@@ -579,9 +553,7 @@ class TestOpc02(unittest.TestCase):
         core_type is not empty
         :return:
         """
-        logger.info(
-            "Start to execute ==============test_options_parser_11=============="
-        )
+        logger.info("Start to execute ==============test_options_parser_11==============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
@@ -618,9 +590,7 @@ class TestOpc02(unittest.TestCase):
         core_type is not empty
         :return:
         """
-        logger.info(
-            "Start to execute ==============test_options_parser_12=============="
-        )
+        logger.info("Start to execute ==============test_options_parser_12==============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
@@ -657,9 +627,7 @@ class TestOpc02(unittest.TestCase):
         no arguments
         :return:
         """
-        logger.info(
-            "Start to execute ==============test_options_parser_13=============="
-        )
+        logger.info("Start to execute ==============test_options_parser_13==============")
         sys.argv = ["xx"]
         ret, opt_parser = opc.parse_args()
         opc.op_compile_classify(opt_parser)
@@ -683,9 +651,7 @@ class TestOpc02(unittest.TestCase):
         -h and --help only
         :return:
         """
-        logger.info(
-            "Start to execute ==============test_options_parser_14=============="
-        )
+        logger.info("Start to execute ==============test_options_parser_14==============")
         sys.argv = ["xx"]
         ret, opt_parser = opc.parse_args()
         opc.op_compile_classify(opt_parser)
@@ -708,9 +674,7 @@ class TestOpc02(unittest.TestCase):
         """
         test invalid core_type: ai_vector
         """
-        logger.info(
-            "Start to execute ==============test_options_parser_18=============="
-        )
+        logger.info("Start to execute ==============test_options_parser_18==============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
@@ -746,9 +710,7 @@ class TestOpc02(unittest.TestCase):
         """
         test invalid aicore_num: sih
         """
-        logger.info(
-            "Start to execute ==============test_options_parser_19=============="
-        )
+        logger.info("Start to execute ==============test_options_parser_19==============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
@@ -773,9 +735,7 @@ class TestOpc02(unittest.TestCase):
         """
         test invalid mdl_bank_path
         """
-        logger.info(
-            "Start to execute ==============test_options_parser_20=============="
-        )
+        logger.info("Start to execute ==============test_options_parser_20==============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
@@ -798,9 +758,7 @@ class TestOpc02(unittest.TestCase):
         """
         test invalid op_bank_path
         """
-        logger.info(
-            "Start to execute ==============test_options_parser_21=============="
-        )
+        logger.info("Start to execute ==============test_options_parser_21==============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
@@ -823,9 +781,7 @@ class TestOpc02(unittest.TestCase):
         """
         test invalid op_debug_level
         """
-        logger.info(
-            "Start to execute ==============test_options_parser_22=============="
-        )
+        logger.info("Start to execute ==============test_options_parser_22==============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
@@ -850,9 +806,7 @@ class TestOpc02(unittest.TestCase):
         """
         test invalid impl_mode: ascend
         """
-        logger.info(
-            "Start to execute ==============test_options_parser_23=============="
-        )
+        logger.info("Start to execute ==============test_options_parser_23==============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
@@ -876,9 +830,7 @@ class TestOpc02(unittest.TestCase):
         """
         test valid core_type, aicore_num, mdl_bank_path, op_bank_path, impl_mode
         """
-        logger.info(
-            "Start to execute ==============test_options_parse_24=============="
-        )
+        logger.info("Start to execute ==============test_options_parse_24==============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         path = test_root_dir + "/output"
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
@@ -905,9 +857,7 @@ class TestOpc02(unittest.TestCase):
         """
         test valid core_type, aicore_num, mdl_bank_path, op_bank_path, impl_mode
         """
-        logger.info(
-            "Start to execute ==============test_options_parse_25=============="
-        )
+        logger.info("Start to execute ==============test_options_parse_25==============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         path = test_root_dir + "/output"
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
@@ -936,9 +886,7 @@ class TestOpc02(unittest.TestCase):
         correct case
         :return:
         """
-        logger.info(
-            "Start to execute ==============ut_test_options_parser_debug_config=============="
-        )
+        logger.info("Start to execute ==============ut_test_options_parser_debug_config==============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
         op_path = test_root_dir + "/stub/files/mat_mul.py"
@@ -1006,9 +954,7 @@ class TestOpc02(unittest.TestCase):
                 self.assertTrue(result_parser.check_input_params())
                 options = result_parser.get_all_options()
                 self.assertEqual(options[OpcOptions.KERNEL_SPEC], mode)
-                self.assertEqual(
-                    options[OpcOptions.KERNEL_SPEC_DIR], os.path.realpath(output_dir)
-                )
+                self.assertEqual(options[OpcOptions.KERNEL_SPEC_DIR], os.path.realpath(output_dir))
 
     def test_kernel_spec_none_accepts_relocatable_binary(self):
         with RequiredValidArgs() as required_args:
@@ -1056,9 +1002,7 @@ class TestOpc02(unittest.TestCase):
         """
         test valid core_type, aicore_num, mdl_bank_path, op_bank_path, impl_mode
         """
-        logger.info(
-            "Start to execute ==============test_options_parse_24=============="
-        )
+        logger.info("Start to execute ==============test_options_parse_24==============")
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         path = test_root_dir + "/output"
         input_param_path = test_root_dir + "/stub/files/matmul_test.json"
@@ -1121,9 +1065,7 @@ class TestOpc02(unittest.TestCase):
 
     def test_check_op_optional_paramtype(self):
         """test check_op_optional_paramtype"""
-        logger.debug(
-            "Start to execute ============ test_check_op_optional_paramtype ============"
-        )
+        logger.debug("Start to execute ============ test_check_op_optional_paramtype ============")
 
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/apply_adam_v2.json"
@@ -1148,9 +1090,7 @@ class TestOpc02(unittest.TestCase):
             pass
         ret = check_op_optional_paramtype(json_dict, opc_compile_args)
         self.assertEqual(ret, True)
-        logger.debug(
-            "End to execute ============ test_check_op_optional_paramtype ============"
-        )
+        logger.debug("End to execute ============ test_check_op_optional_paramtype ============")
 
     def test_get_int64_mode(self):
         """test_get_int64_mode"""
@@ -1199,9 +1139,7 @@ class TestOpc02(unittest.TestCase):
 
     def test_compile_op_api_fail(self):
         """test_compile_op_api"""
-        logger.debug(
-            "Start to execute ============ test_compile_op_api_fail ============"
-        )
+        logger.debug("Start to execute ============ test_compile_op_api_fail ============")
 
         test_root_dir = os.path.abspath(os.path.dirname(__file__))
         input_param_path = test_root_dir + "/stub/files/MatMul_no_op_type.json"
@@ -1223,9 +1161,7 @@ class TestOpc02(unittest.TestCase):
         res = opc_api.compile_op(json_data, build_options)
         self.assertEqual(res, False)
 
-        logger.debug(
-            "End to execute ============ test_compile_op_api_fail ============"
-        )
+        logger.debug("End to execute ============ test_compile_op_api_fail ============")
 
 
 if __name__ == "__main__":

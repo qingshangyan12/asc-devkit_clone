@@ -86,11 +86,7 @@ def list_examples(report_path: Path) -> list[str]:
     data = read_json(report_path)
     if not data:
         return []
-    return [
-        str(result.get("example", ""))
-        for result in data.get("results", [])
-        if result.get("example")
-    ]
+    return [str(result.get("example", "")) for result in data.get("results", []) if result.get("example")]
 
 
 def shard_examples(
@@ -101,20 +97,14 @@ def shard_examples(
     jobs: int | None = None,
     fixed_shards: Path | None = None,
 ) -> list[tuple[str, str]]:
-    examples = [
-        example
-        for example in list_examples(report_path)
-        if example not in (excludes or set())
-    ]
+    examples = [example for example in list_examples(report_path) if example not in (excludes or set())]
     if not cards or not examples:
         return []
     if fixed_shards is not None:
         return load_fixed_shards(examples, cards, fixed_shards)
 
     schedule_report = schedule_report or builtin_timing_report(report_path)
-    stage_timings = (
-        load_pipeline_stage_seconds(schedule_report) if schedule_report else {}
-    )
+    stage_timings = load_pipeline_stage_seconds(schedule_report) if schedule_report else {}
     if stage_timings:
         return shard_examples_by_pipeline_makespan(
             examples,
@@ -129,17 +119,13 @@ def shard_examples(
     order_index = {example: index for index, example in enumerate(examples)}
     group_items = []
     for source, group_examples in groups.items():
-        group_weight = sum(
-            weights.get(example, default_weight) for example in group_examples
-        )
+        group_weight = sum(weights.get(example, default_weight) for example in group_examples)
         first_index = min(order_index[example] for example in group_examples)
         group_items.append((group_weight, first_index, source, group_examples))
 
     card_loads = {card: 0.0 for card in cards}
     card_groups: dict[str, list[list[str]]] = {card: [] for card in cards}
-    for group_weight, _, _, group_examples in sorted(
-        group_items, key=lambda item: (-item[0], item[1])
-    ):
+    for group_weight, _, _, group_examples in sorted(group_items, key=lambda item: (-item[0], item[1])):
         card = min(cards, key=lambda item: (card_loads[item], cards.index(item)))
         card_loads[card] += group_weight
         card_groups[card].append(group_examples)
@@ -151,9 +137,7 @@ def shard_examples(
     return assignments
 
 
-def load_fixed_shards(
-    examples: list[str], cards: list[str], shard_dir: Path
-) -> list[tuple[str, str]]:
+def load_fixed_shards(examples: list[str], cards: list[str], shard_dir: Path) -> list[tuple[str, str]]:
     assignments: list[tuple[str, str]] = []
     assigned_examples: set[str] = set()
     duplicate_examples: set[str] = set()
@@ -171,9 +155,7 @@ def load_fixed_shards(
             assignments.append((card, example))
 
     planned_examples = set(examples)
-    missing_examples = [
-        example for example in examples if example not in assigned_examples
-    ]
+    missing_examples = [example for example in examples if example not in assigned_examples]
     extra_examples = sorted(assigned_examples - planned_examples)
     errors = []
     if missing_examples:
@@ -183,9 +165,7 @@ def load_fixed_shards(
     if duplicate_examples:
         errors.append("duplicate cases: " + ", ".join(sorted(duplicate_examples)))
     if errors:
-        raise ValueError(
-            f"fixed shard coverage mismatch in {shard_dir}: " + "; ".join(errors)
-        )
+        raise ValueError(f"fixed shard coverage mismatch in {shard_dir}: " + "; ".join(errors))
     return assignments
 
 
@@ -200,18 +180,13 @@ def shard_examples_by_pipeline_makespan(
     default_timing = default_stage_timing(stage_timings, examples)
     group_items = []
     for source, group_examples in groups.items():
-        group_weight = sum(
-            sum(stage_timings.get(example, default_timing))
-            for example in group_examples
-        )
+        group_weight = sum(sum(stage_timings.get(example, default_timing)) for example in group_examples)
         first_index = min(order_index[example] for example in group_examples)
         group_items.append((group_weight, first_index, source, group_examples))
 
     card_groups: dict[str, list[list[str]]] = {card: [] for card in cards}
     card_makespans = {card: 0.0 for card in cards}
-    for _, first_index, _, group_examples in sorted(
-        group_items, key=lambda item: (-item[0], item[1])
-    ):
+    for _, first_index, _, group_examples in sorted(group_items, key=lambda item: (-item[0], item[1])):
         best_card = min(
             cards,
             key=lambda card: (
@@ -248,9 +223,7 @@ def estimate_card_makespan(
 ) -> float:
     examples = interleave_group_examples(groups, order_index)
     default_timing = default_stage_timing(stage_timings, examples)
-    return simulate_pipeline_makespan_for_examples(
-        examples, stage_timings, default_timing, jobs
-    )
+    return simulate_pipeline_makespan_for_examples(examples, stage_timings, default_timing, jobs)
 
 
 def simulate_pipeline_makespan_for_examples(
@@ -262,9 +235,7 @@ def simulate_pipeline_makespan_for_examples(
     worker_available = [0.0 for _ in range(max(jobs, 1))]
     build_finishes = []
     for index, example in enumerate(examples):
-        worker = min(
-            range(len(worker_available)), key=lambda idx: worker_available[idx]
-        )
+        worker = min(range(len(worker_available)), key=lambda idx: worker_available[idx])
         start = worker_available[worker]
         build_s = stage_timings.get(example, default_timing)[0]
         worker_available[worker] = start + build_s
@@ -272,23 +243,14 @@ def simulate_pipeline_makespan_for_examples(
 
     npu_available = 0.0
     verify_ready = []
-    for ready_at, index, example in sorted(
-        build_finishes, key=lambda item: (item[0], item[1])
-    ):
-        npu_available = (
-            max(npu_available, ready_at) + stage_timings.get(example, default_timing)[1]
-        )
+    for ready_at, index, example in sorted(build_finishes, key=lambda item: (item[0], item[1])):
+        npu_available = max(npu_available, ready_at) + stage_timings.get(example, default_timing)[1]
         verify_ready.append((npu_available, index, example))
 
     verify_workers = [0.0 for _ in range(max(jobs, 1))]
-    for ready_at, _, example in sorted(
-        verify_ready, key=lambda item: (item[0], item[1])
-    ):
+    for ready_at, _, example in sorted(verify_ready, key=lambda item: (item[0], item[1])):
         worker = min(range(len(verify_workers)), key=lambda idx: verify_workers[idx])
-        verify_workers[worker] = (
-            max(verify_workers[worker], ready_at)
-            + stage_timings.get(example, default_timing)[2]
-        )
+        verify_workers[worker] = max(verify_workers[worker], ready_at) + stage_timings.get(example, default_timing)[2]
     return max(npu_available, max(verify_workers) if verify_workers else 0.0)
 
 
@@ -299,9 +261,7 @@ def default_stage_timing(
     known = [stage_timings[example] for example in examples if example in stage_timings]
     if not known:
         return (1.0, 1.0, 0.0)
-    return tuple(
-        statistics.median(timing[index] for timing in known) for index in range(3)
-    )
+    return tuple(statistics.median(timing[index] for timing in known) for index in range(3))
 
 
 def builtin_timing_report(report_path: Path) -> Path | None:
@@ -322,9 +282,7 @@ def builtin_timing_report(report_path: Path) -> Path | None:
     mode = str(modes[0])
     candidate_root = Path(__file__).resolve().parents[2]
     for root in [Path.cwd(), candidate_root]:
-        candidate = (
-            root / "scripts" / "presmoke" / "schedules" / f"{arch}_{mode}_timings.tsv"
-        )
+        candidate = root / "scripts" / "presmoke" / "schedules" / f"{arch}_{mode}_timings.tsv"
         if candidate.exists():
             return candidate
     return None
@@ -344,21 +302,13 @@ def resolve_shard_jobs(report_path: Path, jobs: int | None) -> int:
 def group_examples_for_sharding(examples: list[str]) -> dict[str, list[str]]:
     groups: dict[str, list[str]] = {}
     for example in examples:
-        group = (
-            "__custom_op_dependency_group__"
-            if example in CUSTOM_OP_DEPENDENCY_GROUP
-            else example
-        )
+        group = "__custom_op_dependency_group__" if example in CUSTOM_OP_DEPENDENCY_GROUP else example
         groups.setdefault(group, []).append(example)
     return groups
 
 
-def interleave_group_examples(
-    groups: list[list[str]], order_index: dict[str, int]
-) -> list[str]:
-    queues = [
-        sorted(group, key=lambda item: order_index[item]) for group in groups if group
-    ]
+def interleave_group_examples(groups: list[list[str]], order_index: dict[str, int]) -> list[str]:
+    queues = [sorted(group, key=lambda item: order_index[item]) for group in groups if group]
     queues.sort(key=lambda group: order_index[group[0]])
     ordered: list[str] = []
     while queues:
@@ -510,11 +460,7 @@ def print_summary(root: Path) -> None:
 
 def log_summary_header(root: Path) -> None:
     effective_rc_path = root / "effective_rc.txt"
-    effective_rc = (
-        effective_rc_path.read_text(encoding="utf-8").strip()
-        if effective_rc_path.exists()
-        else "1"
-    )
+    effective_rc = effective_rc_path.read_text(encoding="utf-8").strip() if effective_rc_path.exists() else "1"
     LOG.info("========================================")
     LOG.info("Presmoke Summary:")
     LOG.info("  Output: %s", root)
@@ -598,9 +544,7 @@ def load_primary_runs(
             continue
         data = read_json(report)
         if data:
-            primary_runs.append(
-                (run_dir.name, run_dir, read_meta(run_dir / "meta.txt"), data)
-            )
+            primary_runs.append((run_dir.name, run_dir, read_meta(run_dir / "meta.txt"), data))
     return primary_runs
 
 
@@ -658,9 +602,7 @@ def merged_elapsed_sec(
     if starts and finishes:
         return str(int((max(finishes) - min(starts)).total_seconds()))
     elapsed_values = [
-        int(meta.get("elapsed_sec") or 0)
-        for _, _, meta, _ in runs
-        if str(meta.get("elapsed_sec") or "").isdigit()
+        int(meta.get("elapsed_sec") or 0) for _, _, meta, _ in runs if str(meta.get("elapsed_sec") or "").isdigit()
     ]
     return str(max(elapsed_values) if elapsed_values else "")
 
@@ -726,9 +668,7 @@ def collect_retry_results(
             continue
         results = data.get("results", [])
         if results:
-            retry_by_example.setdefault(results[0].get("example", ""), []).append(
-                (name, meta, results[0])
-            )
+            retry_by_example.setdefault(results[0].get("example", ""), []).append((name, meta, results[0]))
     return retry_by_example
 
 
@@ -762,9 +702,7 @@ def write_timings_tsv(
                 steps = result.get("steps", [])
                 npu_wait = sum(float(step.get("wait_s") or 0) for step in steps)
                 step_text = "; ".join(format_step(step) for step in steps)
-                commands = " && ".join(
-                    str(step.get("command", "")).replace("\n", " ") for step in steps
-                )
+                commands = " && ".join(str(step.get("command", "")).replace("\n", " ") for step in steps)
                 writer.writerow(
                     [
                         name,
@@ -813,9 +751,7 @@ def primary_failures(
     if not primary:
         return []
     _, _, _, data = primary
-    return [
-        result for result in data.get("results", []) if result.get("status") == "FAIL"
-    ]
+    return [result for result in data.get("results", []) if result.get("status") == "FAIL"]
 
 
 def failure_row(
@@ -855,18 +791,14 @@ def compute_effective_failures(
         if result.get("status") != "FAIL":
             continue
         retries = retry_by_example.get(result.get("example", ""), [])
-        retry_passed = any(
-            retry_result.get("status") == "PASS" for _, _, retry_result in retries
-        )
+        retry_passed = any(retry_result.get("status") == "PASS" for _, _, retry_result in retries)
         if result.get("reason") == "timeout" and retry_passed:
             continue
         effective_failures.append(result)
     return effective_failures
 
 
-def write_junit_xml(
-    path: Path, primary: tuple[str, Path, dict[str, str], dict[str, Any]] | None
-) -> None:
+def write_junit_xml(path: Path, primary: tuple[str, Path, dict[str, str], dict[str, Any]] | None) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     suites = ET.Element("testsuites")
     if primary:
@@ -885,9 +817,7 @@ def write_junit_xml(
     path.write_bytes(pretty)
 
 
-def append_junit_suite(
-    parent: ET.Element, arch: str, mode: str, results: list[dict[str, Any]]
-) -> None:
+def append_junit_suite(parent: ET.Element, arch: str, mode: str, results: list[dict[str, Any]]) -> None:
     failures = sum(1 for result in results if result.get("status") == "FAIL")
     skipped = sum(1 for result in results if result.get("status") == "SKIP")
     suite = ET.SubElement(
@@ -930,9 +860,7 @@ def append_junit_case(suite: ET.Element, result: dict[str, Any]) -> None:
                 "type": "PresmokeFailure",
             },
         )
-        failure.text = sanitize_xml_text(
-            f"reason={reason}\nrc={rc}\nfailing_step={failing_step}\n"
-        )
+        failure.text = sanitize_xml_text(f"reason={reason}\nrc={rc}\nfailing_step={failing_step}\n")
     elif status == "SKIP":
         skipped = ET.SubElement(case, "skipped", {"message": sanitize_xml_text(reason)})
         skipped.text = sanitize_xml_text(reason)
@@ -994,9 +922,7 @@ def append_log_tail(lines: list[str], label: str, raw_path: str) -> None:
         data = path.read_bytes()
         tail = data[-_JUNIT_LOG_TAIL_BYTES:]
         if len(data) > len(tail):
-            lines.append(
-                f"  ... log truncated to last {_JUNIT_LOG_TAIL_BYTES} bytes ..."
-            )
+            lines.append(f"  ... log truncated to last {_JUNIT_LOG_TAIL_BYTES} bytes ...")
         lines.append(tail.decode("utf-8", errors="replace"))
     except OSError as exc:
         lines.append(f"  unable to read log: {exc}")
@@ -1037,20 +963,12 @@ def render_markdown(context: MarkdownRenderContext) -> list[str]:
     append_failures(lines, data.get("results", []), context.retry_by_example)
     append_skips(lines, data.get("results", []))
     lines.extend(render_effective_status(context.effective_failures))
-    lines.extend(
-        render_artifacts(
-            context.root, run_dir, context.timings_path, context.failures_path
-        )
-    )
+    lines.extend(render_artifacts(context.root, run_dir, context.timings_path, context.failures_path))
     return lines
 
 
 def render_markdown_header(root: Path) -> list[str]:
-    generated_at = (
-        datetime.datetime.now(datetime.timezone.utc)
-        .astimezone()
-        .isoformat(timespec="seconds")
-    )
+    generated_at = datetime.datetime.now(datetime.timezone.utc).astimezone().isoformat(timespec="seconds")
     return [
         "# Presmoke Report",
         "",
@@ -1059,9 +977,7 @@ def render_markdown_header(root: Path) -> list[str]:
     ]
 
 
-def render_primary_run(
-    name: str, meta: dict[str, str], data: dict[str, Any]
-) -> list[str]:
+def render_primary_run(name: str, meta: dict[str, str], data: dict[str, Any]) -> list[str]:
     summary = data.get("summary", {})
     npu_stats = data.get("npu_stats") or {}
     parallel_config = data.get("parallel_config") or {}
@@ -1087,9 +1003,7 @@ def render_primary_run(
         f"- pass/fail/skip: `{summary.get('PASS', 0)}/{summary.get('FAIL', 0)}/{summary.get('SKIP', 0)}`",
     ]
     if npu_stats:
-        metric_prefix = (
-            "run_queue" if npu_stats.get("queue_model") == "pipeline-cpu" else "npu"
-        )
+        metric_prefix = "run_queue" if npu_stats.get("queue_model") == "pipeline-cpu" else "npu"
         lines.extend(
             [
                 f"- {metric_prefix}_busy_s: `{float(npu_stats.get('busy_s') or 0):.3f}`",
@@ -1111,9 +1025,7 @@ def render_effective_status(effective_failures: list[dict[str, Any]]) -> list[st
     return ["", "## Effective Status", "", "`PASS`: no unrecovered failed cases."]
 
 
-def render_artifacts(
-    root: Path, run_dir: Path, timings_path: Path, failures_path: Path
-) -> list[str]:
+def render_artifacts(root: Path, run_dir: Path, timings_path: Path, failures_path: Path) -> list[str]:
     return [
         "",
         "## Artifacts",
@@ -1138,17 +1050,13 @@ def append_failures(
     if not failures:
         lines.append("No failures.")
         return
-    lines.append(
-        "| example | status | reason | rc | duration_s | failing_step | retry |"
-    )
+    lines.append("| example | status | reason | rc | duration_s | failing_step | retry |")
     lines.append("|---|---:|---|---:|---:|---|---|")
     for result in failures:
         retry_text = [
             f"{retry_name} card={retry_meta.get('card', '')} {retry_result.get('status', '')}"
             f" {retry_result.get('reason', '')} rc={retry_result.get('rc', '')}"
-            for retry_name, retry_meta, retry_result in retry_by_example.get(
-                result.get("example", ""), []
-            )
+            for retry_name, retry_meta, retry_result in retry_by_example.get(result.get("example", ""), [])
         ]
         failing_step = str(result.get("failing_step", "")).replace("|", "\\|")
         lines.append(
@@ -1164,17 +1072,13 @@ def append_skips(lines: list[str], results: list[dict[str, Any]]) -> None:
     dry_run_skips = [result for result in skips if result.get("reason") == "dry-run"]
     real_skips = [result for result in skips if result.get("reason") != "dry-run"]
     if dry_run_skips:
-        lines.append(
-            f"- dry-run planned cases: `{len(dry_run_skips)}`; details are in `ALL_CASE_TIMINGS.tsv`."
-        )
+        lines.append(f"- dry-run planned cases: `{len(dry_run_skips)}`; details are in `ALL_CASE_TIMINGS.tsv`.")
     if real_skips:
         lines.append("")
         lines.append("| example | reason |")
         lines.append("|---|---|")
         for result in real_skips:
-            lines.append(
-                f"| {result.get('example', '')} | {result.get('reason', '')} |"
-            )
+            lines.append(f"| {result.get('example', '')} | {result.get('reason', '')} |")
     elif not dry_run_skips:
         lines.append("No skips.")
 

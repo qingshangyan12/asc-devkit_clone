@@ -31,9 +31,7 @@ def load2D(
 ):
     addr_calc_mode = 1 if addrMode == 0 else -1
     for i in range(repeatTimes):
-        src_tmp_addr = (
-            startIndex * fractal_size + addr_calc_mode * srcStride * fractal_size * i
-        )
+        src_tmp_addr = startIndex * fractal_size + addr_calc_mode * srcStride * fractal_size * i
         dst_tmp_addr = (dstGap + 1) * fractal_size * i
         for j in range(fractal_shape[0]):
             dst_block_addr = dst_tmp_addr + fractal_shape[1] * j

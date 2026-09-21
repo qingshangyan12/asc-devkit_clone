@@ -45,10 +45,7 @@ def gen_golden_data_simple(mode):
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
 
-    if (
-        mode == TransDataMode.NCDHW_FractalZ3D.value
-        or mode == TransDataMode.NCDHW_NDC1HWC0.value
-    ):
+    if mode == TransDataMode.NCDHW_FractalZ3D.value or mode == TransDataMode.NCDHW_NDC1HWC0.value:
         total_elements = n * c * d * h * w
         # 生成 NCDHW 格式的数组
         ncdhw_array = np.arange(total_elements).reshape(n, c, d, h, w).astype(dtype)
@@ -130,9 +127,7 @@ def gen_golden_data_simple(mode):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--mode", type=int, choices=range(1, 5), help="指定数据转换的场景，取值1~4"
-    )
+    parser.add_argument("--mode", type=int, choices=range(1, 5), help="指定数据转换的场景，取值1~4")
     args = parser.parse_args()
     mode = args.mode if args.mode else 1
     gen_golden_data_simple(mode)

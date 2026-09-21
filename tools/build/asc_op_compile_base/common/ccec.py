@@ -31,13 +31,9 @@ class CCECInfo:
             # using default path
             arch = os.popen("arch").read()
             if "x86" in arch:
-                exe_path = (
-                    "/usr/local/Ascend/cann/x86_64-linux/ccec_compiler/bin/%s" % exe
-                )
+                exe_path = "/usr/local/Ascend/cann/x86_64-linux/ccec_compiler/bin/%s" % exe
             else:
-                exe_path = (
-                    "/usr/local/Ascend/cann/aarch64-linux/ccec_compiler/bin/%s" % exe
-                )
+                exe_path = "/usr/local/Ascend/cann/aarch64-linux/ccec_compiler/bin/%s" % exe
         else:
             # exe is under current env
             exe_path = exe
@@ -46,9 +42,7 @@ class CCECInfo:
     @classmethod
     def get_exe(cls, item):
         if item not in cls._info:
-            raise_tbe_python_err(
-                TBE_DEFAULT_PYTHON_ERROR_CODE, "No item found for cls %s" % type(cls)
-            )
+            raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, "No item found for cls %s" % type(cls))
         if cls._info.get(item) is None:
             cls._info[item] = cls._get_exe_path(item)
         return cls._info.get(item)
@@ -158,9 +152,7 @@ def enable_sanitizer():
 
 
 # 'pylint: disable=too-many-branches, too-many-locals, too-many-statements
-def _build_aicore_compile_cmd(
-    src_file, dst_file, name="", is_ffts_needed=False, is_mix=False
-):
+def _build_aicore_compile_cmd(src_file, dst_file, name="", is_ffts_needed=False, is_mix=False):
     """Build the compile command for aicore op.
 
     Parameters
@@ -226,9 +218,7 @@ def _build_aicore_compile_cmd(
         if cce_arch == "dav-l300" or cce_arch == "dav-l311":
             optimization_level = "-O3"
         # 2 enable tbe debug : ccec compiler with "O0 - g"
-        if current_build_config().get(
-            tbe_debug_level
-        ) == 2 or "ccec_O0" in current_build_config().get(op_debug_config):
+        if current_build_config().get(tbe_debug_level) == 2 or "ccec_O0" in current_build_config().get(op_debug_config):
             optimization_level = "-O0"
         arch = "cce-aicore-only"
         cce_arch_prefix = "cce-aicore-arch"
@@ -242,19 +232,13 @@ def _build_aicore_compile_cmd(
             "-o",
             dst_file,
         ]
-        if (
-            is_c220
-            or is_enable_vector_core
-            or get_soc_spec("SHORT_SOC_VERSION") == ASCEND_950
-        ):
+        if is_c220 or is_enable_vector_core or get_soc_spec("SHORT_SOC_VERSION") == ASCEND_950:
             aicore_type = get_soc_spec("AICORE_TYPE")
             from asc_op_compile_base.common.buildcfg.buildcfg_mapping import (
                 enforce_mix_mode,
             )
 
-            is_need_modify = (is_ffts_needed or is_mix) or current_build_config().get(
-                enforce_mix_mode
-            )
+            is_need_modify = (is_ffts_needed or is_mix) or current_build_config().get(enforce_mix_mode)
             if is_need_modify and aicore_type == "AiCore":
                 cmd += [
                     "-D",
@@ -266,18 +250,12 @@ def _build_aicore_compile_cmd(
                     "%s=%s" % (ori_name, ori_name + cce_params.MIX_AIV_SUFFIX),
                 ]
         # 2 enable tbe debug : ccec compiler with "O0 - g"
-        if current_build_config().get(
-            tbe_debug_level
-        ) == 2 or "ccec_g" in current_build_config().get(op_debug_config):
+        if current_build_config().get(tbe_debug_level) == 2 or "ccec_g" in current_build_config().get(op_debug_config):
             cmd.append("-g")
         return cmd
 
     cmd = get_init_cmd()
-    if (
-        check_is_regbase_v2()
-        and current_build_config().get(tbe_debug_level) == 2
-        and "-O0" in cmd
-    ):
+    if check_is_regbase_v2() and current_build_config().get(tbe_debug_level) == 2 and "-O0" in cmd:
         cmd += ["--cce-ignore-always-inline=false"]
     is_vec_610B = get_soc_spec("SHORT_SOC_VERSION") + get_soc_spec("AICORE_TYPE") in [
         VEC_BS9SX1A,
@@ -334,14 +312,8 @@ def _build_aicore_compile_cmd(
         if cce_runtime.CceFlag.BatchBindOnly is True:
             cmd += ["-mllvm", "-cce-aicore-sk-transform"]
             cce_runtime.CceFlag.BatchBindOnly = False
-    if (
-        get_soc_spec("SHORT_SOC_VERSION") != ASCEND_610LITE
-        and get_soc_spec("SHORT_SOC_VERSION") != BS9SX2A
-    ):
-        if (
-            get_soc_spec("SHORT_SOC_VERSION") != MC61AM21A
-            and get_soc_spec("SHORT_SOC_VERSION") != ASCEND_950
-        ):
+    if get_soc_spec("SHORT_SOC_VERSION") != ASCEND_610LITE and get_soc_spec("SHORT_SOC_VERSION") != BS9SX2A:
+        if get_soc_spec("SHORT_SOC_VERSION") != MC61AM21A and get_soc_spec("SHORT_SOC_VERSION") != ASCEND_950:
             cmd += ["--cce-auto-sync=off"]
     if get_soc_spec("SHORT_SOC_VERSION") == ASCEND_950:
         cmd += ["--cce-long-scbz=true"]
@@ -372,13 +344,8 @@ def modify_cmd_by_enable_cce_debug_mode(cmd):
     from .buildcfg.buildcfg_mapping import enable_cce_debug_mode
 
     if current_build_config().get(enable_cce_debug_mode):
-        if not (
-            ASCEND_910 in get_soc_spec("SOC_VERSION")
-            or ASCEND_310 in get_soc_spec("SOC_VERSION")
-        ):
-            raise RuntimeError(
-                "%s doesn't support trace_store\n" % get_soc_spec("SOC_VERSION")
-            )
+        if not (ASCEND_910 in get_soc_spec("SOC_VERSION") or ASCEND_310 in get_soc_spec("SOC_VERSION")):
+            raise RuntimeError("%s doesn't support trace_store\n" % get_soc_spec("SOC_VERSION"))
         cmd += ["--cce-debug-mode"]
     return cmd
 
@@ -390,6 +357,4 @@ if sys.platform.startswith("linux"):
 elif sys.platform.startswith("win32"):
     PATH_DELIMITER = ";"
 else:
-    raise_tbe_python_err(
-        TBE_DEFAULT_PYTHON_ERROR_CODE, ("Platform % is not support now" % sys.platform)
-    )
+    raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("Platform % is not support now" % sys.platform))

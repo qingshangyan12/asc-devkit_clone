@@ -66,9 +66,7 @@ class IsolateTilingInfo:
             self.run_info["tiling_data"] = bytes.fromhex(self.run_info["tiling_data"])
         self.tiling_key_list = tiling_info_dict["tiling_key_list"]
         self.tiling_key_group_map = tiling_info_dict["tiling_key_group_map"]
-        self.tiling_const_propagation = tiling_info_dict.get(
-            "tiling_const_propagation", False
-        )
+        self.tiling_const_propagation = tiling_info_dict.get("tiling_const_propagation", False)
         self.tiling_info = TilingInfo()
 
     def dump_json(self):
@@ -161,9 +159,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     isolate_tiling_info = IsolateTilingInfo(tiling_info_dict, args.isolate_json)
-    LogUtil.print_compile_log(
-        args.op_type, "[Sub process] begin load tiling so.", AscendCLogLevel.LOG_INFO
-    )
+    LogUtil.print_compile_log(args.op_type, "[Sub process] begin load tiling so.", AscendCLogLevel.LOG_INFO)
     res = load_op_tiling_lib(isolate_tiling_info)
     if not res:
         LogUtil.print_compile_log(

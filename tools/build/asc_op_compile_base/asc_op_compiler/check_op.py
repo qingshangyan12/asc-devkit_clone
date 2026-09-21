@@ -19,9 +19,7 @@ import json
 from asc_op_compile_base.common.error_mgr.error_manager_util import raise_runtime_error
 
 
-def check_op_cap(
-    check_type: str, optype: str, inputs: list, outputs: list, attrs: list = None
-):
+def check_op_cap(check_type: str, optype: str, inputs: list, outputs: list, attrs: list = None):
     """Check whether an operator has a certain capability based on the operator type / inputs / outputs information.
 
     Args:

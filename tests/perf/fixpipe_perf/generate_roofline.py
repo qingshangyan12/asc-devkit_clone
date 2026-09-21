@@ -198,10 +198,7 @@ def generate_roofline(data, output_file, cfg):
     lines.append("搬出带宽与模型参数：")
     lines.append(f"  通路: {cfg['desc']}")
     lines.append(f"  目的类型: {cfg['dst_type']}（{dsize} 字节）")
-    lines.append(
-        f"  并行度: {parallel} out elem/cycle"
-        + (f" x {dual_factor}（双目标）" if dual_factor > 1 else "")
-    )
+    lines.append(f"  并行度: {parallel} out elem/cycle" + (f" x {dual_factor}（双目标）" if dual_factor > 1 else ""))
     lines.append(f"  峰值带宽: {peak_bw_bpc} Byte/cycle = {peak_bw_gbps:.2f} GB/s")
     lines.append(f"  主频: {freq} MHz")
     lines.append(f"  头开销（固定延迟）: {head} cycles = {head / freq:.4f} us")
@@ -222,9 +219,7 @@ def generate_roofline(data, output_file, cfg):
 
     chart_width = 70
     chart_height = 25
-    max_bw = max(
-        max(theory_bw), max(item["measured_bw"] for item in data), peak_bw_gbps
-    )
+    max_bw = max(max(theory_bw), max(item["measured_bw"] for item in data), peak_bw_gbps)
     bw_per_line = max_bw / chart_height
     kb_per_char = max_kb / chart_width if max_kb > 0 else 1.0
 
@@ -287,26 +282,18 @@ def generate_roofline(data, output_file, cfg):
         theory_bw_v, theory_time_us, theory_total_cycles = calc_theory_bandwidth(
             item["data_size"], peak_bw_bpc, head, freq
         )
-        utilization = (
-            item["measured_bw"] / theory_bw_v * 100 if theory_bw_v > 0 else 0.0
-        )
+        utilization = item["measured_bw"] / theory_bw_v * 100 if theory_bw_v > 0 else 0.0
 
         lines.append(f"\nTest {item['test_id']}: Shape [{m}, {item['k']}, {n}]")
         lines.append("-" * 80)
-        lines.append(
-            f"  搬出量: {item['data_size_kb']:.3f} KB ({item['data_size']:.0f} bytes)"
-        )
+        lines.append(f"  搬出量: {item['data_size_kb']:.3f} KB ({item['data_size']:.0f} bytes)")
         lines.append("")
         lines.append("  实际测量:")
-        lines.append(
-            f"    时间: {item['time_us']:.4f} us = {item['measured_cycles']:.2f} cycles"
-        )
+        lines.append(f"    时间: {item['time_us']:.4f} us = {item['measured_cycles']:.2f} cycles")
         lines.append(f"    带宽: {item['measured_bw']:.3f} GB/s")
         lines.append("")
         lines.append("  理论计算:")
-        lines.append(
-            f"    理论总cycle: {head} + {item['data_size']:.0f}/{peak_bw_bpc} = {theory_total_cycles:.2f}"
-        )
+        lines.append(f"    理论总cycle: {head} + {item['data_size']:.0f}/{peak_bw_bpc} = {theory_total_cycles:.2f}")
         lines.append(f"    理论耗时: {theory_time_us:.4f} us")
         lines.append(f"    理论带宽: {theory_bw_v:.3f} GB/s")
         lines.append("")
@@ -320,9 +307,7 @@ def generate_roofline(data, output_file, cfg):
     avg_util = 0.0
     cnt = 0
     for item in data:
-        theory_bw_v, _, _ = calc_theory_bandwidth(
-            item["data_size"], peak_bw_bpc, head, freq
-        )
+        theory_bw_v, _, _ = calc_theory_bandwidth(item["data_size"], peak_bw_bpc, head, freq)
         if theory_bw_v > 0:
             avg_util += item["measured_bw"] / theory_bw_v * 100
             cnt += 1
@@ -357,9 +342,7 @@ def generate_matplotlib_roofline(data, output_file, cfg):
 
         max_kb = max(item["data_size_kb"] for item in data)
         theory_sizes = np.linspace(0.01 * 1024, max_kb * 1.1 * 1024, 100)
-        theory_bw = [
-            calc_theory_bandwidth(s, peak_bw_bpc, head, freq)[0] for s in theory_sizes
-        ]
+        theory_bw = [calc_theory_bandwidth(s, peak_bw_bpc, head, freq)[0] for s in theory_sizes]
         theory_kb = theory_sizes / 1024
 
         fig, ax1 = plt.subplots(figsize=(11, 7.5))
@@ -435,9 +418,7 @@ def generate_matplotlib_roofline(data, output_file, cfg):
             ha="center",
             va="bottom",
             fontsize=11,
-            bbox=dict(
-                boxstyle="round,pad=0.6", facecolor="wheat", edgecolor="gray", alpha=0.9
-            ),
+            bbox=dict(boxstyle="round,pad=0.6", facecolor="wheat", edgecolor="gray", alpha=0.9),
         )
         fig.subplots_adjust(left=0.10, right=0.72, bottom=0.24, top=0.86)
 
@@ -479,9 +460,7 @@ def main():
   头开销取固定延迟（dav-2201=20、dav-3510=26），可用 --head-overhead 覆盖。
 """,
     )
-    parser.add_argument(
-        "--csv", "-c", type=str, help="CSV 文件路径（不指定则自动查找最新数据）"
-    )
+    parser.add_argument("--csv", "-c", type=str, help="CSV 文件路径（不指定则自动查找最新数据）")
     parser.add_argument(
         "--head-overhead",
         type=int,
@@ -494,9 +473,7 @@ def main():
         default=None,
         help="场景编号（不指定则从 CSV 文件名解析）",
     )
-    parser.add_argument(
-        "--output", "-o", type=str, help="输出文件前缀，默认按 perf_data 目录名"
-    )
+    parser.add_argument("--output", "-o", type=str, help="输出文件前缀，默认按 perf_data 目录名")
     parser.add_argument("csv_path", nargs="?", help="CSV 文件路径，等价于 --csv")
 
     args = parser.parse_args()
@@ -513,9 +490,7 @@ def main():
         print(f"错误: CSV 文件不存在: {csv_file}")
         sys.exit(1)
 
-    scenario = (
-        args.scenario if args.scenario is not None else get_scenario_from_csv(csv_file)
-    )
+    scenario = args.scenario if args.scenario is not None else get_scenario_from_csv(csv_file)
     if scenario not in SCENARIO_CONFIG:
         print(f"错误: 无法识别场景编号 {scenario}，无法确定搬出并行度")
         print(f"支持的场景: {sorted(SCENARIO_CONFIG.keys())}")

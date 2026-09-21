@@ -74,37 +74,25 @@ def gen_symbol_rename_file(dynamic_func_names, rename_file_path_list, split_mode
     return new_kernel_names_list
 
 
-def split_dynamic_o_in_super_kernel(
-    orign_bin_path, rename_file_path, i, compile_log_path
-):
+def split_dynamic_o_in_super_kernel(orign_bin_path, rename_file_path, i, compile_log_path):
     filename = os.path.basename(orign_bin_path)
     kernel_meta_dir = CommonUtility.get_kernel_meta_dir()
     new_bin_path = os.path.join(kernel_meta_dir, filename[:-2] + f"_split{i}.o")
     if os.path.exists(new_bin_path):
         str_lst = f"WARNING: ALLREADY EXISTS split .o path: {new_bin_path}"
-        CommonUtility.dump_compile_log(
-            [str_lst], CompileStage.SPLIT_SUB_OBJS, compile_log_path
-        )
+        CommonUtility.dump_compile_log([str_lst], CompileStage.SPLIT_SUB_OBJS, compile_log_path)
     cmds = ["cp"] + ["-rfL"] + [f"{orign_bin_path}"] + [f"{new_bin_path}"]
     try:
-        CommonUtility.dump_compile_log(
-            cmds, CompileStage.SPLIT_SUB_OBJS, compile_log_path
-        )
+        CommonUtility.dump_compile_log(cmds, CompileStage.SPLIT_SUB_OBJS, compile_log_path)
         subprocess.run(cmds)
     except Exception as err:
-        CommonUtility().ascendc_raise_python_err(
-            ERR_CODE, (f"{' '.join(cmds)} failed", err)
-        )
+        CommonUtility().ascendc_raise_python_err(ERR_CODE, (f"{' '.join(cmds)} failed", err))
     cmds = ["llvm-objcopy", f"--redefine-syms={rename_file_path}", f"{new_bin_path}"]
     try:
-        CommonUtility.dump_compile_log(
-            cmds, CompileStage.SPLIT_SUB_OBJS, compile_log_path
-        )
+        CommonUtility.dump_compile_log(cmds, CompileStage.SPLIT_SUB_OBJS, compile_log_path)
         subprocess.run(cmds)
     except Exception as err:
-        CommonUtility().ascendc_raise_python_err(
-            ERR_CODE, (f"{' '.join(cmds)} failed", err)
-        )
+        CommonUtility().ascendc_raise_python_err(ERR_CODE, (f"{' '.join(cmds)} failed", err))
     return new_bin_path
 
 
@@ -130,12 +118,8 @@ def normalize_nop_ops(op_list):
             stream_id = get_sub_op_streamid(normalized_op)
             pending_events = pending_events_by_stream.pop(stream_id, [])
             if pending_events:
-                notify_before_call_event_list = list(
-                    normalized_op.get("notify_before_call_event_list", [])
-                )
-                normalized_op["notify_before_call_event_list"] = (
-                    notify_before_call_event_list + pending_events
-                )
+                notify_before_call_event_list = list(normalized_op.get("notify_before_call_event_list", []))
+                normalized_op["notify_before_call_event_list"] = notify_before_call_event_list + pending_events
             normalized_ops.append(normalized_op)
             previous_op_by_stream[stream_id] = normalized_op
             continue
@@ -147,9 +131,7 @@ def normalize_nop_ops(op_list):
                 f"NOP op at index {index} must not have recv events: {recv_event_list}",
             )
         if index == len(op_list) - 1:
-            CommonUtility().ascendc_raise_python_err(
-                ERR_CODE, f"NOP op at index {index} must not be the last op"
-            )
+            CommonUtility().ascendc_raise_python_err(ERR_CODE, f"NOP op at index {index} must not be the last op")
 
         send_event_list = list(op_info.get("send_event_list", []))
         if not send_event_list:
@@ -157,9 +139,7 @@ def normalize_nop_ops(op_list):
         stream_id = get_sub_op_streamid(op_info)
         previous_op = previous_op_by_stream.get(stream_id)
         if previous_op is not None:
-            previous_op["send_event_list"] = (
-                list(previous_op.get("send_event_list", [])) + send_event_list
-            )
+            previous_op["send_event_list"] = list(previous_op.get("send_event_list", [])) + send_event_list
         else:
             pending_events_by_stream.setdefault(stream_id, []).extend(send_event_list)
 
@@ -167,8 +147,7 @@ def normalize_nop_ops(op_list):
         stream_id, event_list = next(iter(pending_events_by_stream.items()))
         CommonUtility().ascendc_raise_python_err(
             ERR_CODE,
-            f"NOP send events {event_list} have no following real op on stream "
-            f"{stream_id}",
+            f"NOP send events {event_list} have no following real op on stream {stream_id}",
         )
     return normalized_ops
 
@@ -180,11 +159,7 @@ class SuperOperatorInfos:
             if "json_path" not in op_info:
                 continue
             stream_id = get_sub_op_streamid(op_info)
-            self.info_base.append(
-                SubOperatorInfos(
-                    index, op_info, stream_id, self.op_options, self.compile_log_path
-                )
-            )
+            self.info_base.append(SubOperatorInfos(index, op_info, stream_id, self.op_options, self.compile_log_path))
         self.init_sub_operators()
         self.kernel_type: SuperKernelKernelType = SuperKernelKernelType.KERNEL_TYPE_MAX
         self.timestamp_option: bool = False
@@ -198,9 +173,7 @@ class SuperOperatorInfos:
         self.compile_info: json = None
         kernel_meta_dir = CommonUtility.get_kernel_meta_dir()
         file_name_tag = CommonUtility.get_distinct_filename_tag() + "_kernel.cpp"
-        self.kernel_file = os.path.realpath(
-            os.path.join(kernel_meta_dir, self.kernel_name + file_name_tag)
-        )
+        self.kernel_file = os.path.realpath(os.path.join(kernel_meta_dir, self.kernel_name + file_name_tag))
         self.gen_op_options()
         self.gen_super_kernel_params()
         self.cub_op_list: list = []
@@ -218,19 +191,11 @@ class SuperOperatorInfos:
         self.info_base = []
         self.super_kernel_params = []
         self.enable_double_stream: bool = False
-        self.op_options = parse_super_kernel_options(
-            kernel_infos.get("super_kernel_options", "")
-        )
+        self.op_options = parse_super_kernel_options(kernel_infos.get("super_kernel_options", ""))
         self.split_mode = self.op_options.get("split-mode", 4)
-        self.profiling_mode = self.op_options.get(
-            "profiling", SuperKernelProfilingMode.ProfilingDisable
-        )
-        self.stream_fusin_mode = self.op_options.get(
-            "stream-fusion", SuperKernelStreamFusionMode.StreamFusionDisable
-        )
-        self.feed_sync_all_mode = self.op_options.get(
-            "feed-sync-all", SuperKernelFeedSyncAllMode.FeedSyncAllDisable
-        )
+        self.profiling_mode = self.op_options.get("profiling", SuperKernelProfilingMode.ProfilingDisable)
+        self.stream_fusin_mode = self.op_options.get("stream-fusion", SuperKernelStreamFusionMode.StreamFusionDisable)
+        self.feed_sync_all_mode = self.op_options.get("feed-sync-all", SuperKernelFeedSyncAllMode.FeedSyncAllDisable)
         self.debug_aic_num: int = self.op_options.get("debug-aic-num", 0)
         self.debug_aiv_num: int = self.op_options.get("debug-aiv-num", 0)
         self.inner_event_id_set = set()
@@ -254,9 +219,7 @@ class SuperOperatorInfos:
             "preload-code", SuperKernelPreLoadMode.PreloadByAdanvanceStep
         )
         if self.enable_double_stream:
-            self.early_start_mode: SuperKernelEarlyStartMode = (
-                SuperKernelEarlyStartMode.EarlyStartDisable
-            )
+            self.early_start_mode: SuperKernelEarlyStartMode = SuperKernelEarlyStartMode.EarlyStartDisable
         else:
             self.early_start_mode: SuperKernelEarlyStartMode = self.op_options.get(
                 "early-start", SuperKernelEarlyStartMode.EarlyStartEnableV2
@@ -274,9 +237,7 @@ class SuperOperatorInfos:
         self.check_dcci_before_after_op_options()
 
     def print_send_recv_info(self, stage):
-        CommonUtility.dump_compile_log(
-            [stage], CompileStage.SPLIT_SUB_OBJS, self.compile_log_path
-        )
+        CommonUtility.dump_compile_log([stage], CompileStage.SPLIT_SUB_OBJS, self.compile_log_path)
         for sub_op in self.info_base:
             CommonUtility.dump_compile_log(
                 [
@@ -350,26 +311,18 @@ class SuperOperatorInfos:
         pre_type = self.get_task_type(pre_op)
         if pre_type == "mix" or pre_type == "vec":
             idx = self.vec_op_list.index(pre_op)
-            self.vec_op_list[idx].send_info[current_op.kernel_name_for_multi_stream] = (
-                sync_event
-            )
+            self.vec_op_list[idx].send_info[current_op.kernel_name_for_multi_stream] = sync_event
         if pre_type == "mix" or pre_type == "cub":
             idx = self.cub_op_list.index(pre_op)
-            self.cub_op_list[idx].send_info[current_op.kernel_name_for_multi_stream] = (
-                sync_event
-            )
+            self.cub_op_list[idx].send_info[current_op.kernel_name_for_multi_stream] = sync_event
 
         current_type = self.get_task_type(current_op)
         if current_type == "mix" or current_type == "vec":
             idx = self.vec_op_list.index(current_op)
-            self.vec_op_list[idx].recv_info[pre_op.kernel_name_for_multi_stream] = (
-                sync_event
-            )
+            self.vec_op_list[idx].recv_info[pre_op.kernel_name_for_multi_stream] = sync_event
         if current_type == "mix" or current_type == "cub":
             idx = self.cub_op_list.index(current_op)
-            self.cub_op_list[idx].recv_info[pre_op.kernel_name_for_multi_stream] = (
-                sync_event
-            )
+            self.cub_op_list[idx].recv_info[pre_op.kernel_name_for_multi_stream] = sync_event
 
     def insert_sync_by_stream_idx(self):
         """
@@ -422,8 +375,7 @@ class SuperOperatorInfos:
         for sub_op in self.info_base[:-1]:
             op_type = self.get_task_type(sub_op)
             if (op_type == "mix") and (
-                sub_op.notify_block.get("aic", "") != ""
-                or sub_op.notify_block.get("aiv", "") != ""
+                sub_op.notify_block.get("aic", "") != "" or sub_op.notify_block.get("aiv", "") != ""
             ):
                 sub_op_index = self.info_base.index(sub_op)
                 next_op = self.info_base[sub_op_index + 1]
@@ -439,9 +391,7 @@ class SuperOperatorInfos:
                     if flag is False:
                         self.insert_sync_event(sub_op, next_op)
 
-    def remove_info_by_name(
-        self, send_op_name, recv_op_name, is_delete_recv_info, update_content=""
-    ):
+    def remove_info_by_name(self, send_op_name, recv_op_name, is_delete_recv_info, update_content=""):
         """delete sync event
         Args:
             send_op_name (str): sent op name
@@ -496,9 +446,7 @@ class SuperOperatorInfos:
                 for key, value in sub_op.recv_info.items():
                     if "cub:vec" in value:
                         send_idx1 = self.get_idx(key, False)
-                        recv_idx1 = self.get_idx(
-                            sub_op.kernel_name_for_multi_stream, True
-                        )
+                        recv_idx1 = self.get_idx(sub_op.kernel_name_for_multi_stream, True)
                         if recv_idx1 < recv_idx and send_idx1 > send_idx:
                             return True
             return False
@@ -509,9 +457,7 @@ class SuperOperatorInfos:
                 for key, value in sub_op.recv_info.items():
                     if "vec:cub" in value:
                         send_idx1 = self.get_idx(key, True)
-                        recv_idx1 = self.get_idx(
-                            sub_op.kernel_name_for_multi_stream, False
-                        )
+                        recv_idx1 = self.get_idx(sub_op.kernel_name_for_multi_stream, False)
                         if recv_idx1 < recv_idx and send_idx1 > send_idx:
                             return True
             return False
@@ -530,9 +476,7 @@ class SuperOperatorInfos:
                 value_list = value.split(";")
                 for sub_value in value_list:
                     if sub_value in "cub:vec":
-                        flag = self.judge_remove(
-                            sub_op.kernel_name_for_multi_stream, key, True
-                        )
+                        flag = self.judge_remove(sub_op.kernel_name_for_multi_stream, key, True)
                         if flag is True:
                             delete_event.append(
                                 [
@@ -557,9 +501,7 @@ class SuperOperatorInfos:
                 value_list = value.split(";")
                 for sub_value in value_list:
                     if sub_value in "vec:cub":
-                        flag = self.judge_remove(
-                            sub_op.kernel_name_for_multi_stream, key, False
-                        )
+                        flag = self.judge_remove(sub_op.kernel_name_for_multi_stream, key, False)
                         if flag is True:
                             delete_event.append(
                                 [
@@ -714,15 +656,11 @@ class SuperOperatorInfos:
         CommonUtility.print_compile_log("", "[INIT STATE]:", AscendCLogLevel.LOG_DEBUG)
         self.print_vec_cub_list_info()
         self.remove_crossed_line_sync()
-        CommonUtility.print_compile_log(
-            "", "[AFTER REMOVE CORESS LINE SYNC]:", AscendCLogLevel.LOG_DEBUG
-        )
+        CommonUtility.print_compile_log("", "[AFTER REMOVE CORESS LINE SYNC]:", AscendCLogLevel.LOG_DEBUG)
         self.print_vec_cub_list_info()
         self.remove_multi_send_info()
         self.remove_multi_recv_info()
-        CommonUtility.print_compile_log(
-            "", "[AFTER REMOVE MULTI EVENT SYNC]:", AscendCLogLevel.LOG_DEBUG
-        )
+        CommonUtility.print_compile_log("", "[AFTER REMOVE MULTI EVENT SYNC]:", AscendCLogLevel.LOG_DEBUG)
         self.print_vec_cub_list_info()
 
     def print_vec_cub_list_info(self):
@@ -748,9 +686,7 @@ class SuperOperatorInfos:
     def creat_compile_log(self):
         kernel_meta_dir = CommonUtility.get_kernel_meta_dir()
         distinct_tag = CommonUtility.get_distinct_filename_tag()
-        self.compile_log_path = os.path.join(
-            kernel_meta_dir, self.kernel_name + distinct_tag + ".log"
-        )
+        self.compile_log_path = os.path.join(kernel_meta_dir, self.kernel_name + distinct_tag + ".log")
 
     def sub_op_connect_set(self, former_op, op):
         former_send_list = former_op.send_event_list
@@ -766,13 +702,8 @@ class SuperOperatorInfos:
             return
         for i in range(0, sub_num - 1):
             for j in range(i + 1, sub_num):
-                connect_set = self.sub_op_connect_set(
-                    self.info_base[i], self.info_base[j]
-                )
-                if (
-                    self.info_base[i].stream_index == self.info_base[j].stream_index
-                    and connect_set
-                ):
+                connect_set = self.sub_op_connect_set(self.info_base[i], self.info_base[j])
+                if self.info_base[i].stream_index == self.info_base[j].stream_index and connect_set:
                     CommonUtility().ascendc_raise_python_err(
                         ERR_CODE,
                         (
@@ -804,10 +735,7 @@ class SuperOperatorInfos:
                         ),
                     )
                 elif former_op.stream_index != op.stream_index and not connect_set:
-                    if (
-                        self.stream_fusin_mode.value
-                        == SuperKernelStreamFusionMode.StreamFusionEnable.value
-                    ):
+                    if self.stream_fusin_mode.value == SuperKernelStreamFusionMode.StreamFusionEnable.value:
                         CommonUtility.print_compile_log(
                             "",
                             f"enter into 2 real stream mode, oplist: {self.op_list} ",
@@ -918,9 +846,7 @@ class SuperOperatorInfos:
                 f"exceeds current platform max aiv num {max_aiv_num}.",
             )
 
-    def raise_exceed_sub_op_aic_aiv_num_error(
-        self, case_str, aic_or_aiv, debug_block_num, sub_op_block_num
-    ):
+    def raise_exceed_sub_op_aic_aiv_num_error(self, case_str, aic_or_aiv, debug_block_num, sub_op_block_num):
         CommonUtility().ascendc_raise_python_err(
             ERR_CODE,
             f"[Super Kernel][ERROR]: In super kernel {case_str} case, "
@@ -937,38 +863,26 @@ class SuperOperatorInfos:
             SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0,
         ]:
             if self.debug_aic_num < self.block_num:
-                self.raise_exceed_sub_op_aic_aiv_num_error(
-                    "aic", "aic", self.debug_aic_num, self.block_num
-                )
+                self.raise_exceed_sub_op_aic_aiv_num_error("aic", "aic", self.debug_aic_num, self.block_num)
 
         if self.kernel_type in [
             SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY,
             SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0,
         ]:
             if self.debug_aiv_num < self.block_num:
-                self.raise_exceed_sub_op_aic_aiv_num_error(
-                    "aiv", "aiv", self.debug_aiv_num, self.block_num
-                )
+                self.raise_exceed_sub_op_aic_aiv_num_error("aiv", "aiv", self.debug_aiv_num, self.block_num)
 
         if self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1:
             if self.debug_aic_num < self.block_num:
-                self.raise_exceed_sub_op_aic_aiv_num_error(
-                    "mix 1:1", "aic", self.debug_aic_num, self.block_num
-                )
+                self.raise_exceed_sub_op_aic_aiv_num_error("mix 1:1", "aic", self.debug_aic_num, self.block_num)
             if self.debug_aiv_num < self.block_num:
-                self.raise_exceed_sub_op_aic_aiv_num_error(
-                    "mix 1:1", "aiv", self.debug_aiv_num, self.block_num
-                )
+                self.raise_exceed_sub_op_aic_aiv_num_error("mix 1:1", "aiv", self.debug_aiv_num, self.block_num)
 
         if self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2:
             if self.debug_aic_num < self.block_num:
-                self.raise_exceed_sub_op_aic_aiv_num_error(
-                    "mix 1:2", "aic", self.debug_aic_num, self.block_num
-                )
+                self.raise_exceed_sub_op_aic_aiv_num_error("mix 1:2", "aic", self.debug_aic_num, self.block_num)
             if self.debug_aiv_num < self.block_num * 2:
-                self.raise_exceed_sub_op_aic_aiv_num_error(
-                    "mix 1:2", "aiv", self.debug_aiv_num, self.block_num * 2
-                )
+                self.raise_exceed_sub_op_aic_aiv_num_error("mix 1:2", "aiv", self.debug_aiv_num, self.block_num * 2)
 
     def update_superkernel_blocknum_by_debug_options(self):
         self.check_debug_aic_aiv_num_ratio()
@@ -996,9 +910,7 @@ class SuperOperatorInfos:
                 f"debug-aiv-num {self.debug_aiv_num} is invalid.",
             )
 
-    def get_finale_type_and_block_num(
-        self, final_kernel_type, max_aic_num, max_aiv_num
-    ):
+    def get_finale_type_and_block_num(self, final_kernel_type, max_aic_num, max_aiv_num):
         # get kernel type of super kernel
         if final_kernel_type == 0b1:
             self.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0
@@ -1022,17 +934,11 @@ class SuperOperatorInfos:
             else:
                 self.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2
                 max_1_2_aiv_block_num = math.ceil(max_aiv_num / 2)
-                self.block_num = (
-                    max_aic_num
-                    if max_aic_num >= max_1_2_aiv_block_num
-                    else max_1_2_aiv_block_num
-                )
+                self.block_num = max_aic_num if max_aic_num >= max_1_2_aiv_block_num else max_1_2_aiv_block_num
 
         self.update_superkernel_blocknum_by_debug_options()
 
-    def _summarize_sub_kernel_type(
-        self, sub_operator, sub_aiv_num, sub_aic_num, final_kernel_type
-    ):
+    def _summarize_sub_kernel_type(self, sub_operator, sub_aiv_num, sub_aic_num, final_kernel_type):
         if sub_operator.kernel_type == SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY:
             sub_aiv_num = sub_operator.block_num
             final_kernel_type = final_kernel_type | 0b1
@@ -1079,10 +985,8 @@ class SuperOperatorInfos:
             sub_aiv_num = 0
             sub_aic_num = 0
             # summarize sub kernels kernel type infos
-            sub_aiv_num, sub_aic_num, final_kernel_type = (
-                self._summarize_sub_kernel_type(
-                    sub_operator, sub_aiv_num, sub_aic_num, final_kernel_type
-                )
+            sub_aiv_num, sub_aic_num, final_kernel_type = self._summarize_sub_kernel_type(
+                sub_operator, sub_aiv_num, sub_aic_num, final_kernel_type
             )
 
             # judge super kernel enable options
@@ -1112,19 +1016,13 @@ class SuperOperatorInfos:
         new_bin_path = os.path.join(kernel_meta_dir, filename[:-2] + f"_split{i}.o")
         if os.path.exists(new_bin_path):
             str_lst = f"WARNING: ALLREADY EXISTS split .o path: {new_bin_path}"
-            CommonUtility.dump_compile_log(
-                [str_lst], CompileStage.SPLIT_SUB_OBJS, self.compile_log_path
-            )
+            CommonUtility.dump_compile_log([str_lst], CompileStage.SPLIT_SUB_OBJS, self.compile_log_path)
         cmds = ["cp"] + ["-rfL"] + [f"{orign_bin_path}"] + [f"{new_bin_path}"]
         try:
-            CommonUtility.dump_compile_log(
-                cmds, CompileStage.SPLIT_SUB_OBJS, self.compile_log_path
-            )
+            CommonUtility.dump_compile_log(cmds, CompileStage.SPLIT_SUB_OBJS, self.compile_log_path)
             subprocess.run(cmds)
         except Exception as err:
-            CommonUtility().ascendc_raise_python_err(
-                ERR_CODE, (f"{' '.join(cmds)} failed", err)
-            )
+            CommonUtility().ascendc_raise_python_err(ERR_CODE, (f"{' '.join(cmds)} failed", err))
         new_kernel_name = f"{origin_kernel_name}_split{i}"
         cmds = [
             "llvm-objcopy",
@@ -1132,14 +1030,10 @@ class SuperOperatorInfos:
             f"{new_bin_path}",
         ]
         try:
-            CommonUtility.dump_compile_log(
-                cmds, CompileStage.SPLIT_SUB_OBJS, self.compile_log_path
-            )
+            CommonUtility.dump_compile_log(cmds, CompileStage.SPLIT_SUB_OBJS, self.compile_log_path)
             subprocess.run(cmds)
         except Exception as err:
-            CommonUtility().ascendc_raise_python_err(
-                ERR_CODE, (f"{' '.join(cmds)} failed", err)
-            )
+            CommonUtility().ascendc_raise_python_err(ERR_CODE, (f"{' '.join(cmds)} failed", err))
         return new_bin_path, new_kernel_name
 
     def gen_super_kernel_params(self):
@@ -1164,10 +1058,7 @@ class SuperOperatorInfos:
         self.workspace_size = block_num * base_size
 
     def calc_workspace_size(self):
-        if (
-            self.feed_sync_all_mode.value
-            == SuperKernelFeedSyncAllMode.FeedSyncAllDisable.value
-        ):
+        if self.feed_sync_all_mode.value == SuperKernelFeedSyncAllMode.FeedSyncAllDisable.value:
             self.workspace_size = 0
             return
         if self.kernel_type in [
@@ -1182,32 +1073,20 @@ class SuperOperatorInfos:
             self.get_ws_size(self.block_num * 2)
 
     def add_define_options(self, exist_dynamic_sub_ops, options: list):
-        if (
-            self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
-            and CommonUtility.is_c310()
-        ):
+        if self.kernel_type == SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1 and CommonUtility.is_c310():
             options.append("-D__ASCENDC_DAVID_SPLIT_CORE__")
         if exist_dynamic_sub_ops:
             options.append("-D__SUPER_KERNEL_DYNAMIC_BLOCK_NUM__")
 
-        if (
-            self.early_start_mode.value
-            != SuperKernelEarlyStartMode.EarlyStartDisable.value
-        ):
+        if self.early_start_mode.value != SuperKernelEarlyStartMode.EarlyStartDisable.value:
             options.append("-D__ASCENDC_ENABLE_SET_NEXT_TASK_START")
             options.append("-D__ASCENDC_ENABLE_WAIT_PRE_TASK_END")
-            if (
-                self.early_start_mode.value
-                == SuperKernelEarlyStartMode.EarlyStartEnableV1.value
-            ):
+            if self.early_start_mode.value == SuperKernelEarlyStartMode.EarlyStartEnableV1.value:
                 options.append("-D__ASCENDC_SUPERKERNEL_EARLY_START_V1")
             else:
                 options.append("-D__ASCENDC_SUPERKERNEL_EARLY_START_V2")
 
-        if (
-            self.feed_sync_all_mode.value
-            == SuperKernelFeedSyncAllMode.FeedSyncAllEnable.value
-        ):
+        if self.feed_sync_all_mode.value == SuperKernelFeedSyncAllMode.FeedSyncAllEnable.value:
             options.append("-D__ASCENDC_SUPERKERNEL_AUTO_SYNC_ALL__")
 
         if self.timestamp_option:
@@ -1234,24 +1113,16 @@ class SuperOperatorInfos:
             if asc_opc_path is not None:
                 asc_opc_path_link = os.path.dirname(asc_opc_path)
                 asc_opc_real_path = os.path.realpath(asc_opc_path_link)
-                ascend_home_path = os.path.realpath(
-                    os.path.join(asc_opc_real_path, "..", "..")
-                )
+                ascend_home_path = os.path.realpath(os.path.join(asc_opc_real_path, "..", ".."))
             else:
                 ascend_home_path = "/usr/local/Ascend/cann"
 
         if "x86" in archlinux:
-            asc_path = os.path.realpath(
-                os.path.join(ascend_home_path, "x86_64-linux", "asc")
-            )
+            asc_path = os.path.realpath(os.path.join(ascend_home_path, "x86_64-linux", "asc"))
         else:
-            asc_path = os.path.realpath(
-                os.path.join(ascend_home_path, "aarch64-linux", "asc")
-            )
+            asc_path = os.path.realpath(os.path.join(ascend_home_path, "aarch64-linux", "asc"))
         if asc_path is None:
-            asc_path = os.path.realpath(
-                os.path.join(ascend_home_path, "compiler", "asc")
-            )
+            asc_path = os.path.realpath(os.path.join(ascend_home_path, "compiler", "asc"))
 
         self._append_asc_include_options(options, asc_path)
         return options
@@ -1260,9 +1131,7 @@ class SuperOperatorInfos:
         options.append("-I" + os.path.join(asc_path, "impl", "adv_api"))
         options.append("-I" + os.path.join(asc_path, "impl", "basic_api"))
         options.append("-I" + os.path.join(asc_path, "impl", "c_api"))
-        options.append(
-            "-I" + os.path.join(asc_path, "impl", "basic_api", "reg_compute")
-        )
+        options.append("-I" + os.path.join(asc_path, "impl", "basic_api", "reg_compute"))
         options.append("-I" + os.path.join(asc_path, "impl", "simt_api"))
         options.append("-I" + os.path.join(asc_path, "impl", "utils"))
         options.append("-I" + os.path.join(asc_path, "include"))
@@ -1270,9 +1139,7 @@ class SuperOperatorInfos:
         options.append("-I" + os.path.join(asc_path, "include", "basic_api"))
         options.append("-I" + os.path.join(asc_path, "include", "aicpu_api"))
         options.append("-I" + os.path.join(asc_path, "include", "c_api"))
-        options.append(
-            "-I" + os.path.join(asc_path, "include", "basic_api", "reg_compute")
-        )
+        options.append("-I" + os.path.join(asc_path, "include", "basic_api", "reg_compute"))
         options.append("-I" + os.path.join(asc_path, "include", "simt_api"))
         options.append("-I" + os.path.join(asc_path, "include", "utils"))
         options.append("-I" + os.path.join(asc_path, "..", "ascendc", "act"))
@@ -1283,9 +1150,7 @@ class SuperOperatorInfos:
         options.append("-I" + os.path.join(asc_path, "..", "..", "include", "ascendc"))
         options.append("-I" + os.path.join(asc_path, "..", "tikcpp", "tikcfw"))
         options.append("-I" + os.path.join(asc_path, "..", "tikcpp", "tikcfw", "impl"))
-        options.append(
-            "-I" + os.path.join(asc_path, "..", "tikcpp", "tikcfw", "interface")
-        )
+        options.append("-I" + os.path.join(asc_path, "..", "tikcpp", "tikcfw", "interface"))
 
     def gen_compile_info(self):
         options = self._gen_compile_options()
@@ -1299,9 +1164,7 @@ class SuperOperatorInfos:
             send_event_list,
             notify_before_call_event_list,
         ) = self._collect_sub_operator_offsets()
-        sub_operator_info, exist_dynamic_sub_ops = self._collect_sub_operator_info(
-            exist_dynamic_sub_ops
-        )
+        sub_operator_info, exist_dynamic_sub_ops = self._collect_sub_operator_info(exist_dynamic_sub_ops)
         self._fill_compile_info(
             options,
             sub_operator_info,
@@ -1326,9 +1189,7 @@ class SuperOperatorInfos:
 
         notify_before_call_param_offset = []
         for sub_operator in self.info_base:
-            notify_before_call_param_offset.append(
-                sub_operator.notify_before_call_param_offset
-            )
+            notify_before_call_param_offset.append(sub_operator.notify_before_call_param_offset)
 
         wait_param_offset = []
         for sub_operator in self.info_base:
@@ -1344,9 +1205,7 @@ class SuperOperatorInfos:
 
         notify_before_call_event_list = []
         for sub_operator in self.info_base:
-            notify_before_call_event_list.append(
-                sub_operator.notify_before_call_event_list
-            )
+            notify_before_call_event_list.append(sub_operator.notify_before_call_event_list)
 
         return (
             param_offset,
@@ -1370,9 +1229,7 @@ class SuperOperatorInfos:
                 operator_info["dynamic_bin"] = sub_operator.dynamic_bin
                 exist_dynamic_sub_ops = True
             operator_info["sub_kernel_names"] = sub_operator.sub_kernel_names
-            origin_aiv_kernel_name, origin_aic_kernel_name = self.find_sub_kernel_name(
-                sub_operator.sub_kernel_names
-            )
+            origin_aiv_kernel_name, origin_aic_kernel_name = self.find_sub_kernel_name(sub_operator.sub_kernel_names)
             sub_operator_info.append(operator_info)
             if sub_operator.dynamic_bin is None and sub_operator.split_mode > 1:
                 self._split_static_sub_op_bins(
@@ -1382,9 +1239,7 @@ class SuperOperatorInfos:
                     sub_operator_info,
                 )
             elif sub_operator.split_mode > 1:
-                self._split_dynamic_sub_op_bins(
-                    sub_operator, operator_info, sub_operator_info
-                )
+                self._split_dynamic_sub_op_bins(sub_operator, operator_info, sub_operator_info)
 
         return sub_operator_info, exist_dynamic_sub_ops
 
@@ -1421,17 +1276,13 @@ class SuperOperatorInfos:
             cur_operator_info["sub_kernel_names"] = new_sub_op_sub_kernel_names
             sub_operator_info.append(cur_operator_info)
 
-    def _split_dynamic_sub_op_bins(
-        self, sub_operator, operator_info, sub_operator_info
-    ):
+    def _split_dynamic_sub_op_bins(self, sub_operator, operator_info, sub_operator_info):
         dynamic_func_names = sub_operator.called_kernel_name["dynamic_func_names"]
         kernel_meta_dir = CommonUtility.get_kernel_meta_dir()
         rename_file_path_list = []
         for i in range(1, sub_operator.split_mode):
             rename_file_name = f"{sub_operator.kernel_name}_rename_file_{i}.txt"
-            rename_file_path_list.append(
-                os.path.join(kernel_meta_dir, rename_file_name)
-            )
+            rename_file_path_list.append(os.path.join(kernel_meta_dir, rename_file_name))
         new_kernel_names_list = gen_symbol_rename_file(
             dynamic_func_names, rename_file_path_list, sub_operator.split_mode
         )
@@ -1488,9 +1339,5 @@ class SuperOperatorInfos:
             "recv_event_list": recv_event_list,
         }
         if any(notify_before_call_event_list):
-            self.compile_info["notify_before_call_param_offset"] = (
-                notify_before_call_param_offset
-            )
-            self.compile_info["notify_before_call_event_list"] = (
-                notify_before_call_event_list
-            )
+            self.compile_info["notify_before_call_param_offset"] = notify_before_call_param_offset
+            self.compile_info["notify_before_call_event_list"] = notify_before_call_event_list

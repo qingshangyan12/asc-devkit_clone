@@ -66,9 +66,7 @@ class MatmulGenData:
         tf.compat.v1.disable_eager_execution()
         x1 = tf.compat.v1.placeholder(np.float32, shape=x1_gm_fp32.shape)
         x2 = tf.compat.v1.placeholder(np.float32, shape=x2_gm_fp32.shape)
-        res_tf = tf.matmul(
-            x1, x2, transpose_a=self.is_trans_a, transpose_b=self.is_trans_b
-        )
+        res_tf = tf.matmul(x1, x2, transpose_a=self.is_trans_a, transpose_b=self.is_trans_b)
         if self.is_bias:
             bias = tf.compat.v1.placeholder(np.float32, shape=bias_gm_fp32.shape)
             res_tf = tf.add(res_tf, bias)
@@ -106,9 +104,7 @@ class MatmulGenData:
         if self.is_bias:
             bias_gm.tofile(work_dir + "/input/bias_gm.bin")
 
-    def savetxtfile(
-        self, work_dir, x1_gm_fp32, x2_gm_fp32, y_gm_fp32, bias_gm_fp32=None
-    ):
+    def savetxtfile(self, work_dir, x1_gm_fp32, x2_gm_fp32, y_gm_fp32, bias_gm_fp32=None):
         if IS_OUTPUT_TXT:
             np.savetxt(
                 work_dir + "/input/x1_gm.txt",
@@ -206,9 +202,7 @@ class MatmulGenData:
 
 
 if __name__ == "__main__":
-    matmul_gen_data = MatmulGenData(
-        64, 256, 384, 1, False, False, False, "float16_float32"
-    )
+    matmul_gen_data = MatmulGenData(64, 256, 384, 1, False, False, False, "float16_float32")
     os.makedirs("./input", exist_ok=True)
     os.makedirs("./output", exist_ok=True)
     matmul_gen_data.gen_golden_data(".")

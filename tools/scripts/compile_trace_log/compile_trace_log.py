@@ -37,8 +37,7 @@ def extract_info_lines(filename):
     except PermissionError:
         frame = inspect.currentframe()
         print(
-            f"ERROR: {frame.f_code.co_filename}:line {frame.f_lineno}: "
-            f"Permission denied when reading '{filename}'.",
+            f"ERROR: {frame.f_code.co_filename}:line {frame.f_lineno}: Permission denied when reading '{filename}'.",
             file=sys.stderr,
         )
         raise
@@ -108,9 +107,7 @@ def save_info_lines(trace_events, output_file):
     return
 
 
-def build_traceEvents(
-    len_pid, optype, trace_events, timestamp, pid, tid, tilingtype, compile_stage
-):
+def build_traceEvents(len_pid, optype, trace_events, timestamp, pid, tid, tilingtype, compile_stage):
     for i in range(len_pid):
         num = int(i / 12) * 7  # 除12是因为，打12个时间点，只有7个tiling信息
         idx = i % 12
@@ -156,9 +153,7 @@ def build_traceEvents(
     return trace_events
 
 
-def common_trace_event(
-    trace_events, compile_stage, optype, timestamp, pid, tid, tilingtype
-):
+def common_trace_event(trace_events, compile_stage, optype, timestamp, pid, tid, tilingtype):
     name, stage = compile_stage.rsplit(" ", 1)
     if stage == "start":
         trace_events.append(
@@ -205,9 +200,7 @@ def group_lines_by_first_number_flat(lines):
         grouped[first_num].append(line)
 
     # 按 first_number 从小到大排序（None 放最后）
-    sorted_groups = sorted(
-        grouped.items(), key=lambda x: x[0] if x[0] is not None else float("inf")
-    )
+    sorted_groups = sorted(grouped.items(), key=lambda x: x[0] if x[0] is not None else float("inf"))
 
     # 将所有分组的行按顺序拼接成一个 flat 列表
     result = []
@@ -246,9 +239,7 @@ def extract_lines_with_condition(txtlist, result):
             with open("check_info.txt", "a", encoding="utf-8") as out_f:
                 for content in result[a:b]:
                     out_f.write(content + "\n")
-                out_f.write(
-                    "=======================================================================\n"
-                )
+                out_f.write("=======================================================================\n")
     if os.path.exists("check_info.txt") and os.path.getsize("check_info.txt") > 0:
         print(
             "[WARNING]: Some operator log reads failed.\n"
@@ -310,9 +301,7 @@ def compile_trace(input_file, output_file):
     # 构建 traceEvents 列表
     trace_events = []
     len_pid = len(pid)
-    build_traceEvents(
-        len_pid, optype, trace_events, timestamp, pid, tid, tilingtype, compile_stage
-    )
+    build_traceEvents(len_pid, optype, trace_events, timestamp, pid, tid, tilingtype, compile_stage)
     # 构建最终 JSON 结构
     save_info_lines(trace_events, output_file)
 
@@ -321,10 +310,7 @@ def compile_trace(input_file, output_file):
 if __name__ == "__main__":
     # 创建命令行解析器
     parser = argparse.ArgumentParser(
-        description=(
-            "Extract the line starting with [INFO] ASC from the "
-            "log file and output it as a JSON file."
-        )
+        description=("Extract the line starting with [INFO] ASC from the log file and output it as a JSON file.")
     )
 
     # 添加命令行参数

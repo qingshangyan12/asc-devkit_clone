@@ -181,9 +181,7 @@ def read_csv_data(csv_file, freq_mhz):
                 measured_cycles = float(cycle_val)
             else:
                 measured_cycles = time_us * freq_mhz
-            measured_throughput = (
-                total_macs / measured_cycles if measured_cycles > 0 else 0.0
-            )
+            measured_throughput = total_macs / measured_cycles if measured_cycles > 0 else 0.0
 
             data.append(
                 {
@@ -208,11 +206,7 @@ def calc_compute_cycles(m, n, k, cube_m, cube_n, cube_k, k_divisor=1):
     k_divisor>1（如 sparse 的 4:2 稀疏）时，硬件 K 方向实际只遍历 K/k_divisor 个分形，
     计算 cycle 相应减少，等效算力 = cube_m*cube_n*cube_k*k_divisor。
     """
-    return (
-        math.ceil(m / cube_m)
-        * math.ceil(n / cube_n)
-        * math.ceil(k / (cube_k * k_divisor))
-    )
+    return math.ceil(m / cube_m) * math.ceil(n / cube_n) * math.ceil(k / (cube_k * k_divisor))
 
 
 def calc_theory_throughput(total_macs, peak_mac_per_cycle, head_overhead):
@@ -234,9 +228,7 @@ def generate_roofline(data, output_file, cfg, head_overhead):
         cfg["freq"],
     )
     k_divisor = cfg.get("k_divisor", 1)
-    peak = (
-        cube_m * cube_n * cube_k * k_divisor
-    )  # MAC/cycle（sparse 含 k_divisor，等效算力翻倍）
+    peak = cube_m * cube_n * cube_k * k_divisor  # MAC/cycle（sparse 含 k_divisor，等效算力翻倍）
 
     max_macs_m = max(item["macs_m"] for item in data)
     min_macs_m = 0.01
@@ -260,14 +252,10 @@ def generate_roofline(data, output_file, cfg, head_overhead):
     lines.append(f"  并行度 (cube_m x cube_n x cube_k): {cube_m} x {cube_n} x {cube_k}")
     lines.append(f"  峰值算力: {peak} MAC/cycle")
     lines.append(f"  主频: {freq} MHz")
-    lines.append(
-        f"  头开销（固定延迟）: {head_overhead} cycles = {head_overhead / freq:.4f} us"
-    )
+    lines.append(f"  头开销（固定延迟）: {head_overhead} cycles = {head_overhead / freq:.4f} us")
     lines.append("")
     lines.append("理论公式：")
-    lines.append(
-        f"  计算cycle = ceil(M/{cube_m}) * ceil(N/{cube_n}) * ceil(K/{cube_k})"
-    )
+    lines.append(f"  计算cycle = ceil(M/{cube_m}) * ceil(N/{cube_n}) * ceil(K/{cube_k})")
     lines.append(f"  理论总cycle = {head_overhead} + 计算cycle")
     lines.append("  理论耗时(us) = 理论总cycle / 主频(MHz)")
     lines.append("  性能(MAC/cycle) = M*N*K / cycle")
@@ -282,9 +270,7 @@ def generate_roofline(data, output_file, cfg, head_overhead):
 
     chart_width = 70
     chart_height = 25
-    max_throughput = max(
-        max(theory_throughputs), max(item["measured_throughput"] for item in data), peak
-    )
+    max_throughput = max(max(theory_throughputs), max(item["measured_throughput"] for item in data), peak)
     tp_per_line = max_throughput / chart_height
     macs_per_char = max_macs_m / chart_width if max_macs_m > 0 else 1.0
 
@@ -348,34 +334,22 @@ def generate_roofline(data, output_file, cfg, head_overhead):
         theory_total_cycles = head_overhead + compute_cycles
         theory_time_us = theory_total_cycles / freq
         # 算力利用率：理论总 cycle / 实测 cycle（实测越接近理论越高）
-        utilization = (
-            theory_total_cycles / item["measured_cycles"] * 100
-            if item["measured_cycles"] > 0
-            else 0.0
-        )
-        theory_throughput = (
-            item["total_macs"] / theory_total_cycles if theory_total_cycles > 0 else 0.0
-        )
+        utilization = theory_total_cycles / item["measured_cycles"] * 100 if item["measured_cycles"] > 0 else 0.0
+        theory_throughput = item["total_macs"] / theory_total_cycles if theory_total_cycles > 0 else 0.0
 
         lines.append(f"\nTest {item['test_id']}: Shape [{m}, {k}, {n}]")
         lines.append("-" * 80)
-        lines.append(
-            f"  计算量: {item['macs_m']:.4f} MMAC ({item['total_macs']:.0f} MAC)"
-        )
+        lines.append(f"  计算量: {item['macs_m']:.4f} MMAC ({item['total_macs']:.0f} MAC)")
         lines.append("")
         lines.append("  实际测量:")
-        lines.append(
-            f"    时间: {item['time_us']:.4f} us = {item['measured_cycles']:.2f} cycles"
-        )
+        lines.append(f"    时间: {item['time_us']:.4f} us = {item['measured_cycles']:.2f} cycles")
         lines.append(f"    性能: {item['measured_throughput']:.1f} MAC/cycle")
         lines.append("")
         lines.append("  理论计算:")
         lines.append(
             f"    计算cycle: ceil({m}/{cube_m})*ceil({n}/{cube_n})*ceil({k}/{cube_k * k_divisor}) = {compute_cycles}"
         )
-        lines.append(
-            f"    理论总cycle: {head_overhead} + {compute_cycles} = {theory_total_cycles}"
-        )
+        lines.append(f"    理论总cycle: {head_overhead} + {compute_cycles} = {theory_total_cycles}")
         lines.append(f"    理论耗时: {theory_time_us:.4f} us")
         lines.append(f"    理论性能: {theory_throughput:.1f} MAC/cycle")
         lines.append("")
@@ -389,9 +363,7 @@ def generate_roofline(data, output_file, cfg, head_overhead):
     avg_util = 0.0
     cnt = 0
     for item in data:
-        compute_cycles = calc_compute_cycles(
-            item["m"], item["n"], item["k"], cube_m, cube_n, cube_k, k_divisor
-        )
+        compute_cycles = calc_compute_cycles(item["m"], item["n"], item["k"], cube_m, cube_n, cube_k, k_divisor)
         theory_total_cycles = head_overhead + compute_cycles
         if item["measured_cycles"] > 0:
             avg_util += theory_total_cycles / item["measured_cycles"] * 100
@@ -426,9 +398,7 @@ def generate_matplotlib_roofline(data, output_file, cfg, head_overhead):
 
         max_macs_m = max(item["macs_m"] for item in data)
         theory_macs = np.linspace(0.01 * 1e6, max_macs_m * 1.1 * 1e6, 100)
-        theory_throughputs = [
-            calc_theory_throughput(c, peak, head_overhead) for c in theory_macs
-        ]
+        theory_throughputs = [calc_theory_throughput(c, peak, head_overhead) for c in theory_macs]
         theory_macs_m = theory_macs / 1e6
 
         fig, ax1 = plt.subplots(figsize=(11, 7.5))
@@ -479,9 +449,7 @@ def generate_matplotlib_roofline(data, output_file, cfg, head_overhead):
                 bbox=dict(boxstyle="round,pad=0.5", facecolor="yellow", alpha=0.7),
             )
 
-        ax1.set_xlabel(
-            "Compute M*N*K (MMAC = million MACs)", fontsize=14, fontweight="bold"
-        )
+        ax1.set_xlabel("Compute M*N*K (MMAC = million MACs)", fontsize=14, fontweight="bold")
         ax1.set_ylabel("Throughput (MAC/cycle)", fontsize=14, fontweight="bold")
         ax1.set_title(
             f"Cube Throughput Roofline Model\n(precision: {cfg['precision']}, "
@@ -508,9 +476,7 @@ def generate_matplotlib_roofline(data, output_file, cfg, head_overhead):
             ha="center",
             va="bottom",
             fontsize=11,
-            bbox=dict(
-                boxstyle="round,pad=0.6", facecolor="wheat", edgecolor="gray", alpha=0.9
-            ),
+            bbox=dict(boxstyle="round,pad=0.6", facecolor="wheat", edgecolor="gray", alpha=0.9),
         )
         fig.subplots_adjust(left=0.10, right=0.72, bottom=0.24, top=0.86)
 
@@ -553,9 +519,7 @@ def main():
   --head-overhead 默认 0 cycle，--frequency 默认按场景自动取（2201=1800，3510=1650）。
 """,
     )
-    parser.add_argument(
-        "--csv", "-c", type=str, help="CSV 文件路径（不指定则自动查找最新数据）"
-    )
+    parser.add_argument("--csv", "-c", type=str, help="CSV 文件路径（不指定则自动查找最新数据）")
     parser.add_argument(
         "--head-overhead",
         type=int,
@@ -574,9 +538,7 @@ def main():
         default=None,
         help="场景编号（不指定则从 CSV 文件名解析）",
     )
-    parser.add_argument(
-        "--output", "-o", type=str, help="输出文件前缀，默认按 perf_data 目录名"
-    )
+    parser.add_argument("--output", "-o", type=str, help="输出文件前缀，默认按 perf_data 目录名")
     parser.add_argument("csv_path", nargs="?", help="CSV 文件路径，等价于 --csv")
 
     args = parser.parse_args()
@@ -593,9 +555,7 @@ def main():
         print(f"错误: CSV 文件不存在: {csv_file}")
         sys.exit(1)
 
-    scenario = (
-        args.scenario if args.scenario is not None else get_scenario_from_csv(csv_file)
-    )
+    scenario = args.scenario if args.scenario is not None else get_scenario_from_csv(csv_file)
     if scenario not in SCENARIO_CONFIG:
         print(f"错误: 无法识别场景编号 {scenario}，无法确定硬件并行度")
         print(f"支持的场景: {sorted(SCENARIO_CONFIG.keys())}")
@@ -605,9 +565,7 @@ def main():
     if args.frequency is not None:
         cfg["freq"] = args.frequency
     # 头开销：命令行未指定时按场景取（dav-2201=21，dav-3510=25）
-    head_overhead = (
-        args.head_overhead if args.head_overhead is not None else cfg.get("head", 0)
-    )
+    head_overhead = args.head_overhead if args.head_overhead is not None else cfg.get("head", 0)
 
     if args.output:
         output_prefix = args.output
@@ -626,17 +584,11 @@ def main():
     print("Roofline 模型参数")
     print("=" * 80)
     print(f"  场景编号: {scenario}（精度: {cfg['precision']}）")
-    print(
-        f"  并行度 (cube_m x cube_n x cube_k): {cfg['cube_m']} x {cfg['cube_n']} x {cfg['cube_k']}"
-    )
+    print(f"  并行度 (cube_m x cube_n x cube_k): {cfg['cube_m']} x {cfg['cube_n']} x {cfg['cube_k']}")
     _kdiv = cfg.get("k_divisor", 1)
     if _kdiv > 1:
-        print(
-            f"  K 方向缩减因子 (k_divisor): {_kdiv}（4:2 稀疏，硬件实际遍历 K/{_kdiv}）"
-        )
-    print(
-        f"  峰值算力: {cfg['cube_m'] * cfg['cube_n'] * cfg['cube_k'] * _kdiv} MAC/cycle"
-    )
+        print(f"  K 方向缩减因子 (k_divisor): {_kdiv}（4:2 稀疏，硬件实际遍历 K/{_kdiv}）")
+    print(f"  峰值算力: {cfg['cube_m'] * cfg['cube_n'] * cfg['cube_k'] * _kdiv} MAC/cycle")
     print(f"  主频: {cfg['freq']} MHz")
     print(f"  头开销: {head_overhead} cycles")
     print()

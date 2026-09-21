@@ -26,10 +26,7 @@ from constant import (
 
 CUSTOM_BINARY_JSON_META = "_ascendc_custom_binary_json"
 VALID_DTYPES = set(OpDataType.DtypeValueDict)
-VALID_FORMATS = {
-    value[0] if isinstance(value, tuple) else value
-    for value in OpFormatType.FormatValueDict
-}
+VALID_FORMATS = {value[0] if isinstance(value, tuple) else value for value in OpFormatType.FormatValueDict}
 
 
 def _check_binary_op(op, op_path):
@@ -38,18 +35,13 @@ def _check_binary_op(op, op_path):
         tensors = op.get(field)
         if not isinstance(tensors, list):
             raise ValueError(f"{op_path}.{field}: expected array")
-        stack.extend(
-            (tensor, f"{op_path}.{field}[{index}]")
-            for index, tensor in enumerate(tensors)
-        )
+        stack.extend((tensor, f"{op_path}.{field}[{index}]") for index, tensor in enumerate(tensors))
     while stack:
         tensor, path = stack.pop()
         if tensor is None or tensor == {}:
             continue
         if isinstance(tensor, list):
-            stack.extend(
-                (item, f"{path}[{index}]") for index, item in enumerate(tensor)
-            )
+            stack.extend((item, f"{path}[{index}]") for index, item in enumerate(tensor))
             continue
         if not isinstance(tensor, dict):
             raise ValueError(f"{path}: expected object, array, or null")
@@ -82,9 +74,7 @@ def check_op_optional_paramtype(json_dict, opc_compile_args):
         return True
     inputs_infos, output_infos = get_inout_info_from_opstore(json_dict.get("op_type"))
     if inputs_infos is None or output_infos is None:
-        logger.warn(
-            "get inputs_infos or output_infos from op_store is None, will not check by ops info store."
-        )
+        logger.warn("get inputs_infos or output_infos from op_store is None, will not check by ops info store.")
         return True
     op_list = json_dict.get("op_list")
     inputs = op_list[0].get("inputs")

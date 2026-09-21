@@ -259,9 +259,7 @@ def setup_super_kernel_option_parsers_aclgraph() -> ParserFactory:
 
 def parse_super_kernel_options(option_string: str) -> bool:
     context = get_context()
-    is_aclgraph = (
-        context.get_addition("super_kernel_sub_combine") is True if context else False
-    )
+    is_aclgraph = context.get_addition("super_kernel_sub_combine") is True if context else False
     if is_aclgraph:
         factory = setup_super_kernel_option_parsers_aclgraph()
     else:
@@ -270,11 +268,7 @@ def parse_super_kernel_options(option_string: str) -> bool:
         return {}
     # Strip leading and trailing quotes, which may be introduced by json.dumps
     option_string = option_string.strip('"')
-    pairs = [
-        part_option.strip()
-        for part_option in option_string.split(":")
-        if part_option.strip()
-    ]
+    pairs = [part_option.strip() for part_option in option_string.split(":") if part_option.strip()]
     result_options = {}
     for pair in pairs:
         if "=" not in pair:

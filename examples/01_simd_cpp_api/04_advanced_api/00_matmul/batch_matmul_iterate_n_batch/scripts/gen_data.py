@@ -26,12 +26,8 @@ def gen_golden_data():
     b_layout_info = {"b": 1, "s": n, "n": 1, "g": b, "d": k}
     c_layout_info = {"b": 1, "n": 1, "g": 1, "d": n}
 
-    x1_gm = np.random.uniform(
-        -1, 1, [a_layout_info["s"] * a_layout_info["g"], a_layout_info["d"]]
-    ).astype(src_type)
-    x2_gm = np.random.uniform(
-        -1, 1, [b_layout_info["d"], b_layout_info["g"] * b_layout_info["s"]]
-    ).astype(src_type)
+    x1_gm = np.random.uniform(-1, 1, [a_layout_info["s"] * a_layout_info["g"], a_layout_info["d"]]).astype(src_type)
+    x2_gm = np.random.uniform(-1, 1, [b_layout_info["d"], b_layout_info["g"] * b_layout_info["s"]]).astype(src_type)
     input_bias = np.random.uniform(-1, 1, [1, n]).astype(dst_type)
 
     a_shape = [

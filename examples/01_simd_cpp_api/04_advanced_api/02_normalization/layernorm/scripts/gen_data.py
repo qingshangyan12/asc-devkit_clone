@@ -42,9 +42,7 @@ def gen_layernorm_data():
     # 2. LayerNorm前向计算
     reduce_axis = 2
     mean = np.mean(inputX, axis=reduce_axis, keepdims=True)  # [B, S, 1]
-    variance = np.mean(
-        np.power((inputX - mean), 2), axis=reduce_axis, keepdims=True
-    )  # [B, S, 1]
+    variance = np.mean(np.power((inputX - mean), 2), axis=reduce_axis, keepdims=True)  # [B, S, 1]
 
     # 归一化
     x_minus_mean = inputX - mean
@@ -68,9 +66,7 @@ def gen_layernorm_data():
 
     # 计算pd_mean
     pd_mean = np.add(
-        np.sum(
-            np.multiply(np.multiply(-1.0, pd_xl), tmp2), axis=reduce_axis, keepdims=True
-        ),
+        np.sum(np.multiply(np.multiply(-1.0, pd_xl), tmp2), axis=reduce_axis, keepdims=True),
         np.multiply(
             np.multiply(pd_var, reciprocal),
             np.sum(np.multiply(-2.0, x_minus_mean), axis=reduce_axis, keepdims=True),

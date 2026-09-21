@@ -142,9 +142,7 @@ def nc1hwc0_im2col(
 
     n, c1, h_ori, w_ori, c0 = nc1hwc0_input.shape
     if h_ori != l1h or w_ori != l1w:
-        raise ValueError(
-            f"传入的L1尺寸({l1h},{l1w})与张量原始尺寸({h_ori},{w_ori})不匹配！"
-        )
+        raise ValueError(f"传入的L1尺寸({l1h},{l1w})与张量原始尺寸({h_ori},{w_ori})不匹配！")
     if c1 * c0 != channel_size:
         raise ValueError(f"通道数不匹配: C1*C0={c1 * c0} ≠ channel_size={channel_size}")
 
@@ -159,9 +157,7 @@ def nc1hwc0_im2col(
     # 4. 填充处理
     padleft, padright, padtop, padbottom = pad_list
     pad_width = ((0, 0), (0, 0), (padtop, padbottom), (padleft, padright), (0, 0))
-    nc1hwc0_padded = np.pad(
-        nc1hwc0_input, pad_width=pad_width, mode="constant", constant_values=pad_value
-    )
+    nc1hwc0_padded = np.pad(nc1hwc0_input, pad_width=pad_width, mode="constant", constant_values=pad_value)
     h_padded = l1h + padtop + padbottom
     w_padded = l1w + padleft + padright
 
@@ -174,9 +170,7 @@ def nc1hwc0_im2col(
     kernel_flat_dim = filter_h * filter_w
 
     # 6. 初始化结果
-    im2col_result = np.zeros(
-        (n, c1, kernel_flat_dim, hw_out, c0), dtype=nc1hwc0_input.dtype
-    )
+    im2col_result = np.zeros((n, c1, kernel_flat_dim, hw_out, c0), dtype=nc1hwc0_input.dtype)
 
     # 7. 向量化提取卷积窗口
     h_indices = np.arange(0, h_padded - kernel_h_dilated + 1, stride_h)
@@ -241,9 +235,7 @@ def _prepare_src_slice(
 
     # 重塑为分形格式
     m_aligned = ceil_aligned_to_16(src_slice.shape[2])
-    src_fractal_z = src_slice.reshape(
-        src_slice.shape[0], src_slice.shape[1], m_aligned // 16, 16, c0
-    )
+    src_fractal_z = src_slice.reshape(src_slice.shape[0], src_slice.shape[1], m_aligned // 16, 16, c0)
 
     return src_slice, src_fractal_z
 
@@ -260,9 +252,7 @@ def _process_b32_transpose(src_fractal_z: np.ndarray) -> np.ndarray:
     """
     # 维度重排: [N, C1*Hk*Wk, Wout_Hout//16, 16, C0] -> [N, Wout_Hout//16, 16, C1*Hk*Wk*C0]
     tmp = src_fractal_z.transpose(0, 2, 3, 1, 4)
-    src_fractal_z_transposed = tmp.reshape(
-        tmp.shape[0], tmp.shape[1], tmp.shape[2], tmp.shape[3] * tmp.shape[4]
-    )
+    src_fractal_z_transposed = tmp.reshape(tmp.shape[0], tmp.shape[1], tmp.shape[2], tmp.shape[3] * tmp.shape[4])
 
     # 16对齐填充
     dim3 = src_fractal_z_transposed.shape[3]
@@ -313,9 +303,7 @@ def move_to_l0a(
         np.ndarray: 填充后的目标数组
     """
     n, _, _, _, c0 = im2col_out.shape
-    _, src_fractal_z = _prepare_src_slice(
-        im2col_out, m_start_pt, k_start_pt, m_extension, k_extension, c0
-    )
+    _, src_fractal_z = _prepare_src_slice(im2col_out, m_start_pt, k_start_pt, m_extension, k_extension, c0)
 
     if not en_transpose:
         dst = src_fractal_z.transpose(0, 2, 1, 3, 4)
@@ -374,9 +362,7 @@ def move_to_l0b(
         np.ndarray: 填充后的目标数组
     """
     n, _, _, _, c0 = im2col_out.shape
-    _, src_fractal_z = _prepare_src_slice(
-        im2col_out, m_start_pt, k_start_pt, m_extension, k_extension, c0
-    )
+    _, src_fractal_z = _prepare_src_slice(im2col_out, m_start_pt, k_start_pt, m_extension, k_extension, c0)
 
     dtype_size = im2col_out.dtype.itemsize
     if dtype_size == DTYPE_SIZE_B16:
@@ -485,9 +471,7 @@ def load3d_to_l0a(
     )
     print(f"im2col输出shape: {im2col_out.shape}")
     print("im2col_out:", im2col_out)
-    dst = move_to_l0a(
-        dst, im2col_out, m_start_pt, k_start_pt, m_extension, k_extension, en_transpose
-    )
+    dst = move_to_l0a(dst, im2col_out, m_start_pt, k_start_pt, m_extension, k_extension, en_transpose)
     return dst
 
 
@@ -552,9 +536,7 @@ def load3d_to_l0b(
     )
     print(f"im2col输出shape: {im2col_out.shape}")
     print("im2col输出", im2col_out)
-    dst = move_to_l0b(
-        dst, im2col_out, m_start_pt, k_start_pt, m_extension, k_extension, en_transpose
-    )
+    dst = move_to_l0b(dst, im2col_out, m_start_pt, k_start_pt, m_extension, k_extension, en_transpose)
     return dst
 
 

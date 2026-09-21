@@ -423,9 +423,7 @@ class InputInfo(object):
     def display(self):
         import asc_op_compile_base.common.utils.log as logger
 
-        logger.debug(
-            "Input info: edge id[%s], edge type[%s].", self._edge_id, self._edge_type
-        )
+        logger.debug("Input info: edge id[%s], edge type[%s].", self._edge_id, self._edge_type)
 
 
 class AttrInfo(object):

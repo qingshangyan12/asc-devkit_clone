@@ -27,20 +27,14 @@ def check_file_size(file_path):
     expected_bytes = EXPECTED_ELEMENTS * np.dtype(np.float16).itemsize
     actual_bytes = os.path.getsize(file_path)
     if actual_bytes != expected_bytes:
-        raise ValueError(
-            f"size mismatch for {file_path}: expected={expected_bytes}, actual={actual_bytes}"
-        )
+        raise ValueError(f"size mismatch for {file_path}: expected={expected_bytes}, actual={actual_bytes}")
 
 
 def verify_result(output_path, golden_path):
     check_file_size(output_path)
     check_file_size(golden_path)
-    output = np.memmap(
-        output_path, dtype=np.float16, mode="r", shape=(EXPECTED_ELEMENTS,)
-    )
-    golden = np.memmap(
-        golden_path, dtype=np.float16, mode="r", shape=(EXPECTED_ELEMENTS,)
-    )
+    output = np.memmap(output_path, dtype=np.float16, mode="r", shape=(EXPECTED_ELEMENTS,))
+    golden = np.memmap(golden_path, dtype=np.float16, mode="r", shape=(EXPECTED_ELEMENTS,))
     mismatch_count = 0
     reported_count = 0
 
@@ -67,10 +61,7 @@ def verify_result(output_path, golden_path):
             )
             reported_count += 1
 
-    print(
-        f"mismatched elements: {mismatch_count}, "
-        f"rtol: {RELATIVE_TOL}, atol: {ABSOLUTE_TOL}"
-    )
+    print(f"mismatched elements: {mismatch_count}, rtol: {RELATIVE_TOL}, atol: {ABSOLUTE_TOL}")
     return mismatch_count == 0
 
 

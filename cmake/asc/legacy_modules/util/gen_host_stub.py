@@ -56,12 +56,8 @@ def generate_host_stub_head_code(has_mix: bool, has_aic: bool, has_aiv: bool) ->
     ascend_kernel_struct = []
 
     buff = io.StringIO()
-    type_nums = _write_stub_includes_and_handles(
-        buff, has_mix, has_aic, has_aiv, type_nums
-    )
-    _write_stub_kernel_struct(
-        buff, has_mix, has_aic, has_aiv, type_nums, ascend_kernel_struct
-    )
+    type_nums = _write_stub_includes_and_handles(buff, has_mix, has_aic, has_aiv, type_nums)
+    _write_stub_kernel_struct(buff, has_mix, has_aic, has_aiv, type_nums, ascend_kernel_struct)
     _write_stub_extern_decls(buff, ascend_kernel_struct)
     _write_stub_unregister_class(buff, has_mix, has_aic, has_aiv)
     _write_stub_register_kernels(buff, has_mix, has_aic, has_aiv)
@@ -107,9 +103,7 @@ def _write_stub_includes_and_handles(buff, has_mix, has_aic, has_aiv, type_nums)
     return type_nums
 
 
-def _write_stub_kernel_struct(
-    buff, has_mix, has_aic, has_aiv, type_nums, ascend_kernel_struct
-):
+def _write_stub_kernel_struct(buff, has_mix, has_aic, has_aiv, type_nums, ascend_kernel_struct):
     buff.write(r"""struct ascend_kernels {
     uint32_t version;
     uint32_t type_cnt;
@@ -156,9 +150,7 @@ def _write_stub_kernel_struct(
 
 
 def _write_stub_extern_decls(buff, ascend_kernel_struct):
-    buff.write(
-        '} __replaced_ascend_kernel __attribute__ ((section ("__replaced_ascend_section"))) = {'
-    )
+    buff.write('} __replaced_ascend_kernel __attribute__ ((section ("__replaced_ascend_section"))) = {')
 
     ascend_kernel_str = ",".join(ascend_kernel_struct)
     buff.write(f"{ascend_kernel_str}")

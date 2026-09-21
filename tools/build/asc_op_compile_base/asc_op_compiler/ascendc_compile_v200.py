@@ -43,9 +43,7 @@ def judge_valid_for_v200(tiling_key_kernel_type):
         elif kernel_type == KernelMetaType.KERNEL_TYPE_MIX_VECTOR_CORE:
             kernel_type_res |= 0b1000
         else:
-            raise Exception(
-                f"kernel type {KERNEL_TYPE_TO_STR[kernel_type]} is unvaild in v200"
-            )
+            raise Exception(f"kernel type {KERNEL_TYPE_TO_STR[kernel_type]} is unvaild in v200")
 
     if kernel_type_res == 0b1:
         return "AiCore"
@@ -59,9 +57,7 @@ def judge_valid_for_v200(tiling_key_kernel_type):
         raise Exception(f"kernel type {kernel_type_res} combination is unvaild in v200")
 
 
-def gen_compile_cmd_v200(
-    src_file: str, dst_file: str, compile_option_tuple, sub_arch: str, tiling_file: str
-):
+def gen_compile_cmd_v200(src_file: str, dst_file: str, compile_option_tuple, sub_arch: str, tiling_file: str):
     """
     Generate the compile command for the V200 compiler.
     :param src_file: the source file
@@ -151,16 +147,10 @@ def call_bisheng_v200_dynamic(param: SingleTilingKeyCompileParams, kernel_type):
         KernelMetaType.KERNEL_TYPE_MIX_AICORE,
         KernelMetaType.KERNEL_TYPE_MIX_VECTOR_CORE,
     ]:
-        kernel_func_name = (
-            param.compile_info.kernel_name[:-7]
-            + param.tiling_key
-            + param.compile_info.kernel_name[-8:]
-        )
+        kernel_func_name = param.compile_info.kernel_name[:-7] + param.tiling_key + param.compile_info.kernel_name[-8:]
     else:
         kernel_func_name = param.compile_info.kernel_name + "_%s" % param.tiling_key
-    compile_cmd += [
-        f"-Dauto_gen_{param.compile_info.origin_func_name}_kernel={kernel_func_name}"
-    ]
+    compile_cmd += [f"-Dauto_gen_{param.compile_info.origin_func_name}_kernel={kernel_func_name}"]
     section_content = DFXSectionGenerator().generate_dfx_section(
         param.tiling_key, param.tiling_info, kernel_func_name, param.compile_info, True
     )
@@ -220,7 +210,5 @@ def call_bisheng_v200_static(
     new_sources += "#endif\n"
     # add dfx info section to sourse file
     CommonUtility().ascendc_write_file(compile_info.gen_kernel_func_file, new_sources)
-    CommonUtility.run_cmd_inner(
-        compile_cmd, CompileStage.COMPILE, compile_info.compile_log_path
-    )
+    CommonUtility.run_cmd_inner(compile_cmd, CompileStage.COMPILE, compile_info.compile_log_path)
     return

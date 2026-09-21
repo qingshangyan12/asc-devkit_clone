@@ -32,9 +32,7 @@ from asc_op_compile_base.asc_op_compiler.global_storage import global_var_storag
 
 def SetCurrentSocInfo(soc: str):
     set_current_compile_soc_info(soc)
-    global_var_storage.set_variable(
-        "ascendc_short_soc_version", get_soc_spec("SHORT_SOC_VERSION")
-    )
+    global_var_storage.set_variable("ascendc_short_soc_version", get_soc_spec("SHORT_SOC_VERSION"))
 
 
 class TestLogUtils(unittest.TestCase):
@@ -83,17 +81,13 @@ class TestLogUtils(unittest.TestCase):
         self.assertEqual(LogUtil.fix_string_escapes("\t"), "\t")
         self.assertEqual(LogUtil.fix_string_escapes("\r\n"), "\r\n")
         # test C++ format symbols
-        self.assertEqual(
-            LogUtil.fix_string_escapes("Process 50% complete"), "Process 50%% complete"
-        )
+        self.assertEqual(LogUtil.fix_string_escapes("Process 50% complete"), "Process 50%% complete")
         self.assertEqual(LogUtil.fix_string_escapes("%% in config"), "%%%% in config")
         self.assertEqual(LogUtil.fix_string_escapes("%s %d"), "%%s %%d")
         self.assertEqual(LogUtil.fix_string_escapes(r"%A%%"), "%%A%%%%")
         # test backslash
         self.assertEqual(LogUtil.fix_string_escapes("Path\\to\\file"), "Path\\to\\file")
-        self.assertEqual(
-            LogUtil.fix_string_escapes(r"C:\\Users\test"), "C:\\\\Users\\test"
-        )
+        self.assertEqual(LogUtil.fix_string_escapes(r"C:\\Users\test"), "C:\\\\Users\\test")
         self.assertEqual(LogUtil.fix_string_escapes(r"\n"), "\\n")
         # test control symbols
         self.assertEqual(
