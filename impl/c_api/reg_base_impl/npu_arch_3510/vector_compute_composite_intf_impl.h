@@ -20,6 +20,11 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
+/**
+ * @brief asc_mrgsort4_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ half*.
+ * @param src Source type: __ubuf__ half*[ASC_C_API_MRGSORT_ELEMENT_LEN].
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mrgsort4 and asc_sync)
 __aicore__ inline void asc_mrgsort4_sync(
     __ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0,
@@ -28,18 +33,25 @@ __aicore__ inline void asc_mrgsort4_sync(
 {
     if ASC_IS_AIV {
         vmrgsort4(
+
             dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
             if_exhausted_suspension, valid_bit);
         asc_sync_post_process();
     }
 }
 
+/**
+ * @brief asc_mrgsort4_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ float*.
+ * @param src Source type: __ubuf__ float*[ASC_C_API_MRGSORT_ELEMENT_LEN].
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mrgsort4 and asc_sync)
 __aicore__ inline void asc_mrgsort4_sync(
     __ubuf__ float* dst, __ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0,
+
     uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension,
     uint8_t valid_bit)
-{ /* asc_mrgsort4_sync overload */
+{
     if ASC_IS_AIV {
         vmrgsort4(
             dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
@@ -59,10 +71,15 @@ __aicore__ inline void asc_bitsort_sync(
     }
 }
 
+/**
+ * @brief asc_bitsort_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ float*.
+ * @param src0 First source type: __ubuf__ float*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_bitsort and asc_sync)
 __aicore__ inline void asc_bitsort_sync(
     __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, int32_t repeat)
-{ /* asc_bitsort_sync overload */
+{
     if ASC_IS_AIV {
         uint64_t config = (static_cast<uint64_t>(repeat) & 0xff) << 56;
         vbs(dst, src0, src1, config);
@@ -70,8 +87,28 @@ __aicore__ inline void asc_bitsort_sync(
     }
 }
 
+/**
+ * @brief asc_transpose_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ int16_t*.
+ * @param src Source type: __ubuf__ int16_t*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_transpose and asc_sync)
 __aicore__ inline void asc_transpose_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src)
+{
+    if ASC_IS_AIV {
+        vtranspose(dst, src);
+
+        asc_sync_post_process();
+    }
+}
+
+/**
+ * @brief asc_transpose_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ uint16_t*.
+ * @param src Source type: __ubuf__ uint16_t*.
+ */
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_transpose and asc_sync)
+__aicore__ inline void asc_transpose_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src)
 {
     if ASC_IS_AIV {
         vtranspose(dst, src);
@@ -79,18 +116,15 @@ __aicore__ inline void asc_transpose_sync(__ubuf__ int16_t* dst, __ubuf__ int16_
     }
 }
 
-ASC_DEPRECATED(9.2.0, "2027/09/07", asc_transpose and asc_sync)
-__aicore__ inline void asc_transpose_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src)
-{ /* asc_transpose_sync overload */
-    if ASC_IS_AIV {
-        vtranspose(dst, src);
-        asc_sync_post_process();
-    }
-}
-
+/**
+ * @brief asc_transto5hd_b8_sync overload distinguished by the parameters below.
+ * @param dst Destination type: ub_addr8_t.
+ * @param src Source type: ub_addr8_t.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_transto5hd_b8 and asc_sync)
 __aicore__ inline void asc_transto5hd_b8_sync(
     ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride, bool dst_high_half,
+
     bool src_high_half)
 {
     if ASC_IS_AIV {
@@ -100,6 +134,7 @@ __aicore__ inline void asc_transto5hd_b8_sync(
                     if (!(dst_high_half)) {
                         if (!(src_high_half)) {
                             scatter_vnchwconv_b8(VA0, VA2, repeat, dst_stride, src_stride, false, false);
+
                         } else {
                             scatter_vnchwconv_b8(VA0, VA2, repeat, dst_stride, src_stride, false, true);
                         }
@@ -131,6 +166,7 @@ __aicore__ inline void asc_transto5hd_b8_sync(
                         } else {
                             scatter_vnchwconv_b8(VA0, VA6, repeat, dst_stride, src_stride, false, true);
                         }
+
                     } else if (!(src_high_half)) {
                         scatter_vnchwconv_b8(VA0, VA6, repeat, dst_stride, src_stride, true, false);
                     } else {
@@ -161,6 +197,7 @@ __aicore__ inline void asc_transto5hd_b8_sync(
                         } else {
                             scatter_vnchwconv_b8(VA2, VA4, repeat, dst_stride, src_stride, false, true);
                         }
+
                     } else if (!(src_high_half)) {
                         scatter_vnchwconv_b8(VA2, VA4, repeat, dst_stride, src_stride, true, false);
                     } else {
@@ -180,6 +217,7 @@ __aicore__ inline void asc_transto5hd_b8_sync(
                     } else {
                         scatter_vnchwconv_b8(VA2, VA6, repeat, dst_stride, src_stride, true, true);
                     }
+
                 } while (0);
             }
         } else if (dst == ub_addr8_t::VA4) {
@@ -191,6 +229,7 @@ __aicore__ inline void asc_transto5hd_b8_sync(
                         } else {
                             scatter_vnchwconv_b8(VA4, VA0, repeat, dst_stride, src_stride, false, true);
                         }
+
                     } else if (!(src_high_half)) {
                         scatter_vnchwconv_b8(VA4, VA0, repeat, dst_stride, src_stride, true, false);
                     } else {
@@ -210,7 +249,9 @@ __aicore__ inline void asc_transto5hd_b8_sync(
                     } else {
                         scatter_vnchwconv_b8(VA4, VA2, repeat, dst_stride, src_stride, true, true);
                     }
+
                 } while (0);
+
             } else if (src == ub_addr8_t::VA6) {
                 do {
                     if (!(dst_high_half)) {
@@ -221,6 +262,7 @@ __aicore__ inline void asc_transto5hd_b8_sync(
                         }
                     } else if (!(src_high_half)) {
                         scatter_vnchwconv_b8(VA4, VA6, repeat, dst_stride, src_stride, true, false);
+
                     } else {
                         scatter_vnchwconv_b8(VA4, VA6, repeat, dst_stride, src_stride, true, true);
                     }
@@ -240,7 +282,9 @@ __aicore__ inline void asc_transto5hd_b8_sync(
                     } else {
                         scatter_vnchwconv_b8(VA6, VA0, repeat, dst_stride, src_stride, true, true);
                     }
+
                 } while (0);
+
             } else if (src == ub_addr8_t::VA2) {
                 do {
                     if (!(dst_high_half)) {
@@ -251,6 +295,7 @@ __aicore__ inline void asc_transto5hd_b8_sync(
                         }
                     } else if (!(src_high_half)) {
                         scatter_vnchwconv_b8(VA6, VA2, repeat, dst_stride, src_stride, true, false);
+
                     } else {
                         scatter_vnchwconv_b8(VA6, VA2, repeat, dst_stride, src_stride, true, true);
                     }
@@ -260,6 +305,7 @@ __aicore__ inline void asc_transto5hd_b8_sync(
                     if (!(dst_high_half)) {
                         if (!(src_high_half)) {
                             scatter_vnchwconv_b8(VA6, VA4, repeat, dst_stride, src_stride, false, false);
+
                         } else {
                             scatter_vnchwconv_b8(VA6, VA4, repeat, dst_stride, src_stride, false, true);
                         }
@@ -276,10 +322,15 @@ __aicore__ inline void asc_transto5hd_b8_sync(
     }
 }
 
+/**
+ * @brief asc_transto5hd_b16_sync overload distinguished by the parameters below.
+ * @param dst Destination type: ub_addr8_t.
+ * @param src Source type: ub_addr8_t.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_transto5hd_b16 and asc_sync)
 __aicore__ inline void asc_transto5hd_b16_sync(
     ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride)
-{ /* asc_transto5hd overload */
+{
     if ASC_IS_AIV {
         if (dst == ub_addr8_t::VA0) {
             if (src == ub_addr8_t::VA2) {
@@ -289,6 +340,7 @@ __aicore__ inline void asc_transto5hd_b16_sync(
             } else if (src == ub_addr8_t::VA6) {
                 scatter_vnchwconv_b16(VA0, VA6, repeat, dst_stride, src_stride);
             }
+
         } else if (dst == ub_addr8_t::VA2) {
             if (src == ub_addr8_t::VA0) {
                 scatter_vnchwconv_b16(VA2, VA0, repeat, dst_stride, src_stride);
@@ -308,6 +360,7 @@ __aicore__ inline void asc_transto5hd_b16_sync(
         } else if (dst == ub_addr8_t::VA6) {
             if (src == ub_addr8_t::VA0) {
                 scatter_vnchwconv_b16(VA6, VA0, repeat, dst_stride, src_stride);
+
             } else if (src == ub_addr8_t::VA2) {
                 scatter_vnchwconv_b16(VA6, VA2, repeat, dst_stride, src_stride);
             } else if (src == ub_addr8_t::VA4) {
@@ -319,6 +372,11 @@ __aicore__ inline void asc_transto5hd_b16_sync(
     }
 }
 
+/**
+ * @brief asc_transto5hd_b32_sync overload distinguished by the parameters below.
+ * @param dst Destination type: ub_addr8_t.
+ * @param src Source type: ub_addr8_t.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_transto5hd_b32 and asc_sync)
 __aicore__ inline void asc_transto5hd_b32_sync(
     ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride)
@@ -329,6 +387,7 @@ __aicore__ inline void asc_transto5hd_b32_sync(
                 scatter_vnchwconv_b32(VA0, VA2, repeat, dst_stride, src_stride);
             } else if (src == ub_addr8_t::VA4) {
                 scatter_vnchwconv_b32(VA0, VA4, repeat, dst_stride, src_stride);
+
             } else if (src == ub_addr8_t::VA6) {
                 scatter_vnchwconv_b32(VA0, VA6, repeat, dst_stride, src_stride);
             }
@@ -348,6 +407,7 @@ __aicore__ inline void asc_transto5hd_b32_sync(
             } else if (src == ub_addr8_t::VA6) {
                 scatter_vnchwconv_b32(VA4, VA6, repeat, dst_stride, src_stride);
             }
+
         } else if (dst == ub_addr8_t::VA6) {
             if (src == ub_addr8_t::VA0) {
                 scatter_vnchwconv_b32(VA6, VA0, repeat, dst_stride, src_stride);
@@ -374,9 +434,14 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ uint8_t* dst, __gm__ u
     }
 }
 
+/**
+ * @brief asc_copy_gm2ub_align_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ int8_t*.
+ * @param src Source type: __gm__ int8_t*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2ub_align and asc_sync)
 __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t size)
-{ /* asc_copy_gm2ub_align_sync overload */
+{
     if ASC_IS_AIV {
         copy_gm_to_ubuf_align_v2(
             dst, src, 0, static_cast<uint32_t>(1), size, static_cast<uint8_t>(0), static_cast<uint8_t>(0), false,
@@ -386,6 +451,11 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ int8_t* dst, __gm__ in
     }
 }
 
+/**
+ * @brief asc_copy_gm2ub_align_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ uint16_t*.
+ * @param src Source type: __gm__ uint16_t*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2ub_align and asc_sync)
 __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t size)
 {
@@ -398,6 +468,11 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ uint16_t* dst, __gm__ 
     }
 }
 
+/**
+ * @brief asc_copy_gm2ub_align_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ int16_t*.
+ * @param src Source type: __gm__ int16_t*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2ub_align and asc_sync)
 __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ int16_t* dst, __gm__ int16_t* src, uint32_t size)
 {
@@ -410,6 +485,11 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ int16_t* dst, __gm__ i
     }
 }
 
+/**
+ * @brief asc_copy_gm2ub_align_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ uint32_t*.
+ * @param src Source type: __gm__ uint32_t*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2ub_align and asc_sync)
 __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t size)
 {
@@ -422,6 +502,11 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ uint32_t* dst, __gm__ 
     }
 }
 
+/**
+ * @brief asc_copy_gm2ub_align_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ int32_t*.
+ * @param src Source type: __gm__ int32_t*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2ub_align and asc_sync)
 __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ int32_t* dst, __gm__ int32_t* src, uint32_t size)
 {
@@ -434,6 +519,11 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ int32_t* dst, __gm__ i
     }
 }
 
+/**
+ * @brief asc_copy_gm2ub_align_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ half*.
+ * @param src Source type: __gm__ half*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2ub_align and asc_sync)
 __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ half* dst, __gm__ half* src, uint32_t size)
 {
@@ -446,6 +536,11 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ half* dst, __gm__ half
     }
 }
 
+/**
+ * @brief asc_copy_gm2ub_align_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ float*.
+ * @param src Source type: __gm__ float*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2ub_align and asc_sync)
 __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ float* dst, __gm__ float* src, uint32_t size)
 {
@@ -458,6 +553,11 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ float* dst, __gm__ flo
     }
 }
 
+/**
+ * @brief asc_copy_gm2ub_align_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ hifloat8_t*.
+ * @param src Source type: __gm__ hifloat8_t*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2ub_align and asc_sync)
 __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint32_t size)
 {
@@ -470,6 +570,11 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ hifloat8_t* dst, __gm_
     }
 }
 
+/**
+ * @brief asc_copy_gm2ub_align_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ bfloat16_t*.
+ * @param src Source type: __gm__ bfloat16_t*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2ub_align and asc_sync)
 __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t size)
 {
@@ -482,6 +587,11 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ bfloat16_t* dst, __gm_
     }
 }
 
+/**
+ * @brief asc_copy_gm2ub_align_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ fp8_e5m2_t*.
+ * @param src Source type: __gm__ fp8_e5m2_t*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2ub_align and asc_sync)
 __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint32_t size)
 {
@@ -494,6 +604,11 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ fp8_e5m2_t* dst, __gm_
     }
 }
 
+/**
+ * @brief asc_copy_gm2ub_align_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ fp8_e4m3fn_t*.
+ * @param src Source type: __gm__ fp8_e4m3fn_t*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2ub_align and asc_sync)
 __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint32_t size)
 {
@@ -518,9 +633,14 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ uint8_t* dst, __ubuf__ u
     }
 }
 
+/**
+ * @brief asc_copy_ub2gm_align_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ int8_t*.
+ * @param src Source type: __ubuf__ int8_t*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_ub2gm_align and asc_sync)
 __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ int8_t* dst, __ubuf__ int8_t* src, uint32_t size)
-{ /* asc_copy_ub2gm_align_sync overload */
+{
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_v2(
             (__gm__ void*)dst, (__ubuf__ void*)src, 0, static_cast<uint32_t>(1), size,
@@ -530,6 +650,11 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ int8_t* dst, __ubuf__ in
     }
 }
 
+/**
+ * @brief asc_copy_ub2gm_align_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ uint16_t*.
+ * @param src Source type: __ubuf__ uint16_t*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_ub2gm_align and asc_sync)
 __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t size)
 {
@@ -542,6 +667,11 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ uint16_t* dst, __ubuf__ 
     }
 }
 
+/**
+ * @brief asc_copy_ub2gm_align_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ int16_t*.
+ * @param src Source type: __ubuf__ int16_t*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_ub2gm_align and asc_sync)
 __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ int16_t* dst, __ubuf__ int16_t* src, uint32_t size)
 {
@@ -554,6 +684,11 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ int16_t* dst, __ubuf__ i
     }
 }
 
+/**
+ * @brief asc_copy_ub2gm_align_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ uint32_t*.
+ * @param src Source type: __ubuf__ uint32_t*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_ub2gm_align and asc_sync)
 __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t size)
 {
@@ -566,6 +701,11 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ uint32_t* dst, __ubuf__ 
     }
 }
 
+/**
+ * @brief asc_copy_ub2gm_align_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ int32_t*.
+ * @param src Source type: __ubuf__ int32_t*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_ub2gm_align and asc_sync)
 __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ int32_t* dst, __ubuf__ int32_t* src, uint32_t size)
 {
@@ -578,6 +718,11 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ int32_t* dst, __ubuf__ i
     }
 }
 
+/**
+ * @brief asc_copy_ub2gm_align_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ half*.
+ * @param src Source type: __ubuf__ half*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_ub2gm_align and asc_sync)
 __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ half* dst, __ubuf__ half* src, uint32_t size)
 {
@@ -590,6 +735,11 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ half* dst, __ubuf__ half
     }
 }
 
+/**
+ * @brief asc_copy_ub2gm_align_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ float*.
+ * @param src Source type: __ubuf__ float*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_ub2gm_align and asc_sync)
 __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ float* dst, __ubuf__ float* src, uint32_t size)
 {
@@ -602,6 +752,11 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ float* dst, __ubuf__ flo
     }
 }
 
+/**
+ * @brief asc_copy_ub2gm_align_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ hifloat8_t*.
+ * @param src Source type: __ubuf__ hifloat8_t*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_ub2gm_align and asc_sync)
 __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ hifloat8_t* dst, __ubuf__ hifloat8_t* src, uint32_t size)
 {
@@ -614,6 +769,11 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ hifloat8_t* dst, __ubuf_
     }
 }
 
+/**
+ * @brief asc_copy_ub2gm_align_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ bfloat16_t*.
+ * @param src Source type: __ubuf__ bfloat16_t*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_ub2gm_align and asc_sync)
 __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, uint32_t size)
 {
@@ -626,6 +786,11 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ bfloat16_t* dst, __ubuf_
     }
 }
 
+/**
+ * @brief asc_copy_ub2gm_align_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ fp8_e5m2_t*.
+ * @param src Source type: __ubuf__ fp8_e5m2_t*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_ub2gm_align and asc_sync)
 __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ fp8_e5m2_t* dst, __ubuf__ fp8_e5m2_t* src, uint32_t size)
 {
@@ -638,6 +803,11 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ fp8_e5m2_t* dst, __ubuf_
     }
 }
 
+/**
+ * @brief asc_copy_ub2gm_align_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ fp8_e4m3fn_t*.
+ * @param src Source type: __ubuf__ fp8_e4m3fn_t*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_ub2gm_align and asc_sync)
 __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ fp8_e4m3fn_t* dst, __ubuf__ fp8_e4m3fn_t* src, uint32_t size)
 {
@@ -661,6 +831,11 @@ __aicore__ inline void asc_copy_ub2l1_sync(__cbuf__ void* dst, __ubuf__ void* sr
     }
 }
 
+/**
+ * @brief asc_copy_gm2ub_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ void*.
+ * @param src Source type: __gm__ void*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2ub and asc_sync)
 __aicore__ inline void asc_copy_gm2ub_sync(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
 {
@@ -683,11 +858,17 @@ __aicore__ inline void asc_copy_ub2gm_sync(__gm__ void* dst, __ubuf__ void* src,
     }
 }
 
+/**
+ * @brief asc_copy_ub2ub_sync overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ void*.
+ * @param src Source type: __ubuf__ void*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_ub2ub and asc_sync)
 __aicore__ inline void asc_copy_ub2ub_sync(__ubuf__ void* dst, __ubuf__ void* src, uint32_t size)
 {
     if ASC_IS_AIV {
         copy_ubuf_to_ubuf(
+
             dst, src, 0, static_cast<uint16_t>(1), size / ASC_C_API_ONE_DATABLOCK_SIZE, static_cast<uint16_t>(0),
             static_cast<uint16_t>(0));
         asc_sync_post_process();
@@ -699,4 +880,5 @@ __aicore__ inline void asc_copy_ub2ub_sync(__ubuf__ void* dst, __ubuf__ void* sr
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+
 #endif
