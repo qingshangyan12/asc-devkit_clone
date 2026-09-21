@@ -17,6 +17,7 @@
 #define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_REG_DATA_LOAD_IMPL_H
 
 #include "impl/tensor_api/experimental/arch/utils/reg_utils.h"
+#include "impl/tensor_api/experimental/arch/vector/complex_ops_impl.h"
 #include "tensor_api/tensor/tensor.h"
 
 namespace asc {
@@ -218,6 +219,38 @@ __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor)
         "load_broadcast only supports tensors located in UB");
 
     return detail::load_broadcast_from_ptr<brc_mode, data_type>(tensor.engine().begin().get());
+}
+
+template <typename Tensor, typename Coord>
+__simd_callee__ inline decltype(auto) load_complex(const Tensor& tensor, const Coord& coord)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "load_complex only supports tensors located in UB");
+    static_assert(
+        Std::is_same_v<data_type, half> || Std::is_same_v<data_type, float>,
+        "load_complex requires tensor element type half or float (interleaved complex layout)");
+    TENSOR_API_DEBUG_CHECK(debug_check_coord, tensor.layout(), coord, "load_complex");
+
+    auto src_engine = tensor.engine() + tensor.layout()(coord);
+    return detail::load_complex_from_ptr<data_type>(src_engine.begin().get());
+}
+
+template <typename Tensor>
+__simd_callee__ inline decltype(auto) load_complex(const Tensor& tensor)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "load_complex only supports tensors located in UB");
+    static_assert(
+        Std::is_same_v<data_type, half> || Std::is_same_v<data_type, float>,
+        "load_complex requires tensor element type half or float (interleaved complex layout)");
+
+    return detail::load_complex_from_ptr<data_type>(tensor.engine().begin().get());
 }
 
 } // namespace experimental

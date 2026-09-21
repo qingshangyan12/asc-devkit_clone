@@ -20,6 +20,7 @@
 
 #include "tensor_api/experimental/arch/vector/reg_tensor.h"
 #include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
+#include "tensor_api/experimental/utils/reg_enum.h"
 
 namespace asc {
 namespace te {
@@ -27,23 +28,36 @@ namespace experimental {
 /**
  * @brief Fills masked elements of a register tensor with a scalar value.
  * @tparam N Number of register tensors to fill. Only 1 is supported.
+ * @tparam Mode zeroing (default) or merging (soft-emulated like basic_api Duplicate).
  * @tparam T Element type of the register tensor.
  * @param value Scalar value copied to each enabled element.
  * @param mask Mask that specifies the elements to fill.
  * @return A register tensor containing the filled elements and the input mask.
+ * @note When Mode is merging, inactive lanes keep a zero-initialized base (no prior dst in this overload).
  */
-template <size_t N = 1, typename T>
+template <size_t N = 1, merge_mode Mode = merge_mode::zeroing, typename T>
 __simd_callee__ inline reg_tensor<T> fill(const T& value, const reg_tensor<bool>& mask = all_mask<T>());
+
+/**
+ * @brief Fills a complex register tensor from a complex scalar (Duplicate).
+ * @tparam N Number of register tensors to fill. Only 1 is supported.
+ * @tparam Mode zeroing only for complex.
+ * @tparam Elem @c half or @c float.
+ */
+template <size_t N = 1, merge_mode Mode = merge_mode::zeroing, typename Elem>
+__simd_callee__ inline complex<Elem> fill(
+    const complex_scalar<Elem>& value, const reg_tensor<bool>& mask = all_mask<Elem>());
 
 /**
  * @brief Copies masked elements from a register tensor.
  * @tparam N Number of register tensors to fill. Only 1 is supported.
+ * @tparam Mode zeroing (default) or merging (soft-emulated like basic_api Duplicate).
  * @tparam T Element type of the register tensor.
- * @param val Source register tensor.
+ * @param src Source register tensor; also the merge base when Mode is merging.
  * @param mask Mask that specifies the elements to copy.
  * @return A register tensor containing the copied elements and the input mask.
  */
-template <size_t N = 1, typename T>
+template <size_t N = 1, merge_mode Mode = merge_mode::zeroing, typename T>
 __simd_callee__ inline reg_tensor<T> fill(const reg_tensor<T>& src, const reg_tensor<bool>& mask = all_mask<T>());
 } // namespace experimental
 } // namespace te

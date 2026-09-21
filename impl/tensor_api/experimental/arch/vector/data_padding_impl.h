@@ -20,6 +20,9 @@
 
 #include <cstdint>
 
+#include "impl/tensor_api/experimental/arch/utils/reg_utils.h"
+#include "impl/tensor_api/experimental/arch/vector/complex_ops_impl.h"
+
 namespace asc {
 namespace te {
 namespace experimental {
@@ -30,7 +33,7 @@ inline constexpr bool is_fill_support_type = Std::is_one_of_v<
     float>;
 }
 
-template <size_t N, typename T>
+template <size_t N, merge_mode Mode, typename T>
 __simd_callee__ inline reg_tensor<T> fill(const T& value, const reg_tensor<bool>& mask)
 {
     static_assert(
@@ -39,25 +42,40 @@ __simd_callee__ inline reg_tensor<T> fill(const T& value, const reg_tensor<bool>
         "fp8_e4m3fn_t, fp8_e8m0_t, fp8_e5m2_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t "
         "and float.");
     static_assert(N == 1, "fill only supports N==1.");
-    reg_tensor<T> dst;
-    asc_duplicate_scalar(dst.reg, value, mask.reg);
-    dst.mask = mask.reg;
-    return dst;
+    reg_tensor<T> base;
+    reg_tensor<T> computed;
+    asc_duplicate_scalar(computed.reg, value, mask.reg);
+    return detail::apply_merge_mode<Mode>(base, computed, mask.reg);
 }
 
-template <size_t N, typename T>
+template <size_t N, merge_mode Mode, typename Elem>
+__simd_callee__ inline complex<Elem> fill(const complex_scalar<Elem>& value, const reg_tensor<bool>& mask)
+{
+    static_assert(Std::is_same_v<Elem, half> || Std::is_same_v<Elem, float>, "complex fill supports half/float");
+    static_assert(N == 1, "fill only supports N==1.");
+    static_assert(Mode == merge_mode::zeroing, "complex fill currently supports zeroing only");
+    using Tag = typename complex_map<Elem>::type;
+    return detail::complex_fill_scalar<Tag>(value, mask);
+}
+
+template <size_t N, merge_mode Mode, typename T>
 __simd_callee__ inline reg_tensor<T> fill(const reg_tensor<T>& src, const reg_tensor<bool>& mask)
 {
-    static_assert(
-        detail::is_fill_support_type<T>,
-        "fill only supports uint8_t, int8_t, "
-        "fp8_e4m3fn_t, fp8_e8m0_t, fp8_e5m2_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t "
-        "and float.");
-    static_assert(N == 1, "fill only supports N==1.");
-    reg_tensor<T> dst;
-    asc_duplicate(dst.reg, src.reg, mask.reg);
-    dst.mask = mask.reg;
-    return dst;
+    if constexpr (is_complex_tag_v<T>) {
+        static_assert(N == 1, "fill only supports N==1.");
+        static_assert(Mode == merge_mode::zeroing, "complex fill currently supports zeroing only");
+        return detail::complex_fill_reg(src, mask);
+    } else {
+        static_assert(
+            detail::is_fill_support_type<T>,
+            "fill only supports uint8_t, int8_t, "
+            "fp8_e4m3fn_t, fp8_e8m0_t, fp8_e5m2_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t "
+            "and float.");
+        static_assert(N == 1, "fill only supports N==1.");
+        reg_tensor<T> computed;
+        asc_duplicate(computed.reg, src.reg, mask.reg);
+        return detail::apply_merge_mode<Mode>(src, computed, mask.reg);
+    }
 }
 } // namespace experimental
 } // namespace te

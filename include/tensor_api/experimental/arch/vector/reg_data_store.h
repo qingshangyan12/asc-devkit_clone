@@ -73,6 +73,17 @@ template <store_sideband_mode sideband_mode = store_sideband_mode::intlv, typena
 __simd_callee__ inline void store(
     Tensor& tensor, const reg_tensor<RegDataType>& src0, const reg_tensor<RegDataType>& src1);
 
+/**
+ * @brief Interleaves real/imag of a complex register and stores to UB.
+ * @tparam Tensor UB tensor whose @c data_type is @c half or @c float.
+ * @note half uses HW store-intlv; float uses soft interleave + two stores (HW float intlv unsupported).
+ */
+template <typename Tensor, typename Coord, typename Elem>
+__simd_callee__ inline void store_complex(Tensor& tensor, const Coord& coord, const complex<Elem>& src);
+
+template <typename Tensor, typename Elem>
+__simd_callee__ inline void store_complex(Tensor& tensor, const complex<Elem>& src);
+
 } // namespace experimental
 } // namespace te
 } // namespace asc

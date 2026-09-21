@@ -17,6 +17,7 @@
 #define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_REG_DATA_STORE_IMPL_H
 
 #include "impl/tensor_api/experimental/arch/utils/reg_utils.h"
+#include "impl/tensor_api/experimental/arch/vector/complex_ops_impl.h"
 #include "tensor_api/tensor/tensor.h"
 
 namespace asc {
@@ -158,6 +159,34 @@ __simd_callee__ inline void store(
     static_assert(Std::is_same_v<data_type, RegDataType>, "store requires matching tensor and register element types");
 
     detail::store_to_ptr<sideband_mode>(tensor.engine().begin().get(), src0, src1);
+}
+
+template <typename Tensor, typename Coord, typename Elem>
+__simd_callee__ inline void store_complex(Tensor& tensor, const Coord& coord, const complex<Elem>& src)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "store_complex only supports tensors located in UB");
+    static_assert(Std::is_same_v<data_type, Elem>, "store_complex requires matching tensor and complex element types");
+    TENSOR_API_DEBUG_CHECK(debug_check_coord, tensor.layout(), coord, "store_complex");
+
+    auto dst_engine = tensor.engine() + tensor.layout()(coord);
+    detail::store_complex_to_ptr<Elem>(dst_engine.begin().get(), src);
+}
+
+template <typename Tensor, typename Elem>
+__simd_callee__ inline void store_complex(Tensor& tensor, const complex<Elem>& src)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "store_complex only supports tensors located in UB");
+    static_assert(Std::is_same_v<data_type, Elem>, "store_complex requires matching tensor and complex element types");
+
+    detail::store_complex_to_ptr<Elem>(tensor.engine().begin().get(), src);
 }
 
 } // namespace experimental

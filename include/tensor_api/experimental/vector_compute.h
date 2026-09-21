@@ -31,6 +31,7 @@
 #include "tensor_api/experimental/utils/reg_enum.h"
 #include "tensor_api/experimental/arch/vector/reg_tensor.h"
 #include "tensor_api/experimental/arch/vector/type_conversion.h"
+#include "tensor_api/experimental/arch/vector/bitcast.h"
 #include "tensor_api/experimental/arch/vector/basic_arithmetic.h"
 #include "tensor_api/experimental/arch/vector/logical_compute.h"
 #include "tensor_api/experimental/arch/vector/composite_compute.h"
@@ -42,12 +43,15 @@
 #include "tensor_api/experimental/arch/vector/compare_and_select.h"
 #include "tensor_api/experimental/arch/vector/reg_data_load.h"
 #include "tensor_api/experimental/arch/vector/reg_data_store.h"
+#include "tensor_api/experimental/arch/vector/reg_move.h"
+#include "tensor_api/experimental/arch/vector/unalign.h"
 #endif
 #else
 #if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510))
 #include "tensor_api/experimental/utils/reg_enum.h"
 #include "tensor_api/experimental/arch/vector/reg_tensor.h"
 #include "tensor_api/experimental/arch/vector/type_conversion.h"
+#include "tensor_api/experimental/arch/vector/bitcast.h"
 #include "tensor_api/experimental/arch/vector/basic_arithmetic.h"
 #include "tensor_api/experimental/arch/vector/logical_compute.h"
 #include "tensor_api/experimental/arch/vector/composite_compute.h"
@@ -59,6 +63,8 @@
 #include "tensor_api/experimental/arch/vector/compare_and_select.h"
 #include "tensor_api/experimental/arch/vector/reg_data_load.h"
 #include "tensor_api/experimental/arch/vector/reg_data_store.h"
+#include "tensor_api/experimental/arch/vector/reg_move.h"
+#include "tensor_api/experimental/arch/vector/unalign.h"
 #endif
 #endif
 

@@ -52,11 +52,86 @@ enum class cast_sat_mode {
     sat,
 };
 
+/**
+ * @brief Mask write-back behavior for inactive lanes.
+ * @details
+ * - zeroing: inactive lanes in the result are set to zero.
+ * - merging: inactive lanes keep the destination register's original values.
+ */
+enum class merge_mode {
+    zeroing,
+    merging,
+};
+
 struct cast_options {
     cast_layout layout = cast_layout::zero;
     cast_round_mode round = cast_round_mode::rint;
     cast_sat_mode sat = cast_sat_mode::not_sat;
 };
+
+/**
+ * @brief Algorithm / Subnormal policy for register div (aligned with basic_api DivAlgo).
+ */
+enum class div_algo {
+    intrinsic = 0,
+    diff_compensation,
+    precision_1ulp_ftz_true,
+    precision_0ulp_ftz_true,
+    precision_0ulp_ftz_false,
+    precision_1ulp_ftz_false,
+};
+
+/**
+ * @brief Div precision options (aligned with basic_api DivSpecificMode / DivConfig).
+ * @details When @c precision_mode is true, high-precision paths are preferred
+ *          (diff-compensation / 0ulp), subject to @c algo and element type.
+ */
+struct div_options {
+    bool precision_mode = false;
+    div_algo algo = div_algo::intrinsic;
+};
+
+/**
+ * @brief Algorithm / Subnormal policy for register sqrt (aligned with basic_api SqrtAlgo).
+ */
+enum class sqrt_algo {
+    intrinsic = 0,
+    fast_inverse,
+    precision_1ulp_ftz_true,
+    precision_0ulp_ftz_false,
+    precision_1ulp_ftz_false,
+};
+
+/**
+ * @brief Sqrt precision options (aligned with basic_api SqrtSpecificMode / SqrtConfig).
+ * @details When @c precision_mode is true, fast-inverse (0ulp, float only) is used.
+ */
+struct sqrt_options {
+    bool precision_mode = false;
+    sqrt_algo algo = sqrt_algo::intrinsic;
+};
+
+/**
+ * @brief Algorithm / Subnormal policy for register rsqrt (aligned with basic_api RsqrtAlgo).
+ */
+enum class rsqrt_algo {
+    intrinsic = 0,
+    fast_inverse,
+    precision_1ulp_ftz_true,
+    precision_0ulp_ftz_false,
+    precision_1ulp_ftz_false,
+};
+
+/**
+ * @brief Rsqrt precision options (aligned with basic_api RsqrtConfig).
+ */
+struct rsqrt_options {
+    rsqrt_algo algo = rsqrt_algo::intrinsic;
+};
+
+constexpr div_options default_div_ops = {};
+constexpr sqrt_options default_sqrt_ops = {};
+constexpr rsqrt_options default_rsqrt_ops = {};
 
 enum class load_sideband_mode : uint8_t {
     direct,

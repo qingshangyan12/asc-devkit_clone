@@ -61,6 +61,23 @@ __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor, const
 template <broadcast_mode brc_mode = broadcast_mode::elem, typename Tensor>
 __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor);
 
+/**
+ * @brief Loads interleaved complex data from UB and deinterleaves into real/imag regs.
+ * @tparam Tensor UB tensor whose @c data_type is @c half or @c float (interleaved complex layout).
+ * @param tensor Source tensor located in UB.
+ * @param coord Coordinate of the first source element (real part of first complex).
+ * @return @c complex<half> or @c complex<float>.
+ * @note Corresponds to basic_api LoadAlign with DIST_DINTLV for complex32/complex64.
+ */
+template <typename Tensor, typename Coord>
+__simd_callee__ inline decltype(auto) load_complex(const Tensor& tensor, const Coord& coord);
+
+/**
+ * @brief Loads interleaved complex data from the beginning of a UB tensor.
+ */
+template <typename Tensor>
+__simd_callee__ inline decltype(auto) load_complex(const Tensor& tensor);
+
 } // namespace experimental
 } // namespace te
 } // namespace asc

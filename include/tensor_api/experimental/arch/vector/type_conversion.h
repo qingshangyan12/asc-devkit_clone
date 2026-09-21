@@ -34,12 +34,19 @@ constexpr cast_options default_cast_ops = {cast_layout::zero, cast_round_mode::r
 
 /**
  * @brief Converts the active elements of a register tensor to another element type.
+ * @tparam Mode zeroing (default): inactive lanes are zeroed;
+ *         merging: inactive lanes keep values from @p dst (aligned with basic_api Cast; soft-emulated).
+ * @param dst Destination base kept on inactive lanes when Mode is merging.
  * @param src Source register tensor.
  * @return The converted register tensor with the source mask preserved.
  * @note Source and destination element types must differ. Supported option combinations are architecture-dependent.
+ * @note Extends the original cast interface with an explicit @p dst so MERGING has a same-type merge base,
+ *       matching basic_api `Cast(dst, src, mask)`.
+ * @note Hardware B64 cast uses @c physical_int64_t (not soft @c int64_t {lo,hi}).
  */
-template <typename DstType, const cast_options& opt = default_cast_ops, typename SrcType>
-__simd_callee__ inline reg_tensor<DstType> cast(const reg_tensor<SrcType>& src);
+template <typename DstType, const cast_options& opt = default_cast_ops, merge_mode Mode = merge_mode::zeroing,
+    typename SrcType>
+__simd_callee__ inline reg_tensor<DstType> cast(reg_tensor<DstType>& dst, const reg_tensor<SrcType>& src);
 
 /**
  * @brief Truncates the fractional part of each active register element.
@@ -49,6 +56,42 @@ __simd_callee__ inline reg_tensor<DstType> cast(const reg_tensor<SrcType>& src);
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> trunc(const reg_tensor<T>& src);
+
+/**
+ * @brief Computes the ceiling of each active register element.
+ * @param src Source register tensor.
+ * @return The ceiled register tensor with the source mask preserved.
+ * @note Supported element types are half, bfloat16_t, and float.
+ */
+template <typename T>
+__simd_callee__ inline reg_tensor<T> ceil(const reg_tensor<T>& src);
+
+/**
+ * @brief Computes the floor of each active register element.
+ * @param src Source register tensor.
+ * @return The floored register tensor with the source mask preserved.
+ * @note Supported element types are half, bfloat16_t, and float.
+ */
+template <typename T>
+__simd_callee__ inline reg_tensor<T> floor(const reg_tensor<T>& src);
+
+/**
+ * @brief Rounds each active register element to the nearest integer (rint).
+ * @param src Source register tensor.
+ * @return The rounded register tensor with the source mask preserved.
+ * @note Supported element types are half, bfloat16_t, and float.
+ */
+template <typename T>
+__simd_callee__ inline reg_tensor<T> rint(const reg_tensor<T>& src);
+
+/**
+ * @brief Rounds each active register element to the nearest integer (round).
+ * @param src Source register tensor.
+ * @return The rounded register tensor with the source mask preserved.
+ * @note Supported element types are half, bfloat16_t, and float.
+ */
+template <typename T>
+__simd_callee__ inline reg_tensor<T> round(const reg_tensor<T>& src);
 
 } // namespace experimental
 } // namespace te

@@ -148,27 +148,27 @@ ASC_REG_CAST_OP(int32_t, float, zero, ceil, sat, asc_float2int32_ru_sat);
 ASC_REG_CAST_OP(int32_t, float, zero, trunc, not_sat, asc_float2int32_rz);
 ASC_REG_CAST_OP(int32_t, float, zero, trunc, sat, asc_float2int32_rz_sat);
 
-// float -> int64_t
-ASC_REG_CAST_OP(int64_t, float, zero, floor, not_sat, asc_float2int64_rd);
-ASC_REG_CAST_OP(int64_t, float, zero, floor, sat, asc_float2int64_rd_sat);
-ASC_REG_CAST_OP(int64_t, float, one, floor, not_sat, asc_float2int64_rd);
-ASC_REG_CAST_OP(int64_t, float, one, floor, sat, asc_float2int64_rd_sat);
-ASC_REG_CAST_OP(int64_t, float, zero, rint, not_sat, asc_float2int64_rn);
-ASC_REG_CAST_OP(int64_t, float, zero, rint, sat, asc_float2int64_rn_sat);
-ASC_REG_CAST_OP(int64_t, float, one, rint, not_sat, asc_float2int64_rn);
-ASC_REG_CAST_OP(int64_t, float, one, rint, sat, asc_float2int64_rn_sat);
-ASC_REG_CAST_OP(int64_t, float, zero, round, not_sat, asc_float2int64_rna);
-ASC_REG_CAST_OP(int64_t, float, zero, round, sat, asc_float2int64_rna_sat);
-ASC_REG_CAST_OP(int64_t, float, one, round, not_sat, asc_float2int64_rna);
-ASC_REG_CAST_OP(int64_t, float, one, round, sat, asc_float2int64_rna_sat);
-ASC_REG_CAST_OP(int64_t, float, zero, ceil, not_sat, asc_float2int64_ru);
-ASC_REG_CAST_OP(int64_t, float, zero, ceil, sat, asc_float2int64_ru_sat);
-ASC_REG_CAST_OP(int64_t, float, one, ceil, not_sat, asc_float2int64_ru);
-ASC_REG_CAST_OP(int64_t, float, one, ceil, sat, asc_float2int64_ru_sat);
-ASC_REG_CAST_OP(int64_t, float, zero, trunc, not_sat, asc_float2int64_rz);
-ASC_REG_CAST_OP(int64_t, float, zero, trunc, sat, asc_float2int64_rz_sat);
-ASC_REG_CAST_OP(int64_t, float, one, trunc, not_sat, asc_float2int64_rz);
-ASC_REG_CAST_OP(int64_t, float, one, trunc, sat, asc_float2int64_rz_sat);
+// float -> physical_int64_t
+ASC_REG_CAST_OP(physical_int64_t, float, zero, floor, not_sat, asc_float2int64_rd);
+ASC_REG_CAST_OP(physical_int64_t, float, zero, floor, sat, asc_float2int64_rd_sat);
+ASC_REG_CAST_OP(physical_int64_t, float, one, floor, not_sat, asc_float2int64_rd);
+ASC_REG_CAST_OP(physical_int64_t, float, one, floor, sat, asc_float2int64_rd_sat);
+ASC_REG_CAST_OP(physical_int64_t, float, zero, rint, not_sat, asc_float2int64_rn);
+ASC_REG_CAST_OP(physical_int64_t, float, zero, rint, sat, asc_float2int64_rn_sat);
+ASC_REG_CAST_OP(physical_int64_t, float, one, rint, not_sat, asc_float2int64_rn);
+ASC_REG_CAST_OP(physical_int64_t, float, one, rint, sat, asc_float2int64_rn_sat);
+ASC_REG_CAST_OP(physical_int64_t, float, zero, round, not_sat, asc_float2int64_rna);
+ASC_REG_CAST_OP(physical_int64_t, float, zero, round, sat, asc_float2int64_rna_sat);
+ASC_REG_CAST_OP(physical_int64_t, float, one, round, not_sat, asc_float2int64_rna);
+ASC_REG_CAST_OP(physical_int64_t, float, one, round, sat, asc_float2int64_rna_sat);
+ASC_REG_CAST_OP(physical_int64_t, float, zero, ceil, not_sat, asc_float2int64_ru);
+ASC_REG_CAST_OP(physical_int64_t, float, zero, ceil, sat, asc_float2int64_ru_sat);
+ASC_REG_CAST_OP(physical_int64_t, float, one, ceil, not_sat, asc_float2int64_ru);
+ASC_REG_CAST_OP(physical_int64_t, float, one, ceil, sat, asc_float2int64_ru_sat);
+ASC_REG_CAST_OP(physical_int64_t, float, zero, trunc, not_sat, asc_float2int64_rz);
+ASC_REG_CAST_OP(physical_int64_t, float, zero, trunc, sat, asc_float2int64_rz_sat);
+ASC_REG_CAST_OP(physical_int64_t, float, one, trunc, not_sat, asc_float2int64_rz);
+ASC_REG_CAST_OP(physical_int64_t, float, one, trunc, sat, asc_float2int64_rz_sat);
 
 // int16_t -> float
 ASC_REG_CAST_OP(float, int16_t, zero, rint, not_sat, asc_int162float);
@@ -181,17 +181,17 @@ ASC_REG_CAST_OP(float, int32_t, zero, round, not_sat, asc_int322float_rna);
 ASC_REG_CAST_OP(float, int32_t, zero, ceil, not_sat, asc_int322float_ru);
 ASC_REG_CAST_OP(float, int32_t, zero, trunc, not_sat, asc_int322float_rz);
 
-// int64_t -> float
-ASC_REG_CAST_OP(float, int64_t, zero, floor, not_sat, asc_int642float_rd);
-ASC_REG_CAST_OP(float, int64_t, one, floor, not_sat, asc_int642float_rd);
-ASC_REG_CAST_OP(float, int64_t, zero, rint, not_sat, asc_int642float_rn);
-ASC_REG_CAST_OP(float, int64_t, one, rint, not_sat, asc_int642float_rn);
-ASC_REG_CAST_OP(float, int64_t, zero, round, not_sat, asc_int642float_rna);
-ASC_REG_CAST_OP(float, int64_t, one, round, not_sat, asc_int642float_rna);
-ASC_REG_CAST_OP(float, int64_t, zero, ceil, not_sat, asc_int642float_ru);
-ASC_REG_CAST_OP(float, int64_t, one, ceil, not_sat, asc_int642float_ru);
-ASC_REG_CAST_OP(float, int64_t, zero, trunc, not_sat, asc_int642float_rz);
-ASC_REG_CAST_OP(float, int64_t, one, trunc, not_sat, asc_int642float_rz);
+// physical_int64_t -> float
+ASC_REG_CAST_OP(float, physical_int64_t, zero, floor, not_sat, asc_int642float_rd);
+ASC_REG_CAST_OP(float, physical_int64_t, one, floor, not_sat, asc_int642float_rd);
+ASC_REG_CAST_OP(float, physical_int64_t, zero, rint, not_sat, asc_int642float_rn);
+ASC_REG_CAST_OP(float, physical_int64_t, one, rint, not_sat, asc_int642float_rn);
+ASC_REG_CAST_OP(float, physical_int64_t, zero, round, not_sat, asc_int642float_rna);
+ASC_REG_CAST_OP(float, physical_int64_t, one, round, not_sat, asc_int642float_rna);
+ASC_REG_CAST_OP(float, physical_int64_t, zero, ceil, not_sat, asc_int642float_ru);
+ASC_REG_CAST_OP(float, physical_int64_t, one, ceil, not_sat, asc_int642float_ru);
+ASC_REG_CAST_OP(float, physical_int64_t, zero, trunc, not_sat, asc_int642float_rz);
+ASC_REG_CAST_OP(float, physical_int64_t, one, trunc, not_sat, asc_int642float_rz);
 
 // half -> int8_t
 ASC_REG_CAST_OP(int8_t, half, zero, floor, not_sat, asc_half2int8_rd);
@@ -262,15 +262,15 @@ ASC_REG_CAST_OP(int16_t, int32_t, zero, rint, sat, asc_int322int16_sat);
 ASC_REG_CAST_OP(int16_t, int32_t, one, rint, not_sat, asc_int322int16);
 ASC_REG_CAST_OP(int16_t, int32_t, one, rint, sat, asc_int322int16_sat);
 
-// int32_t -> int64_t
-ASC_REG_CAST_OP(int64_t, int32_t, zero, rint, not_sat, asc_int322int64);
-ASC_REG_CAST_OP(int64_t, int32_t, one, rint, not_sat, asc_int322int64);
+// int32_t -> physical_int64_t
+ASC_REG_CAST_OP(physical_int64_t, int32_t, zero, rint, not_sat, asc_int322int64);
+ASC_REG_CAST_OP(physical_int64_t, int32_t, one, rint, not_sat, asc_int322int64);
 
-// int64_t -> int32_t
-ASC_REG_CAST_OP(int32_t, int64_t, zero, rint, not_sat, asc_int642int32);
-ASC_REG_CAST_OP(int32_t, int64_t, zero, rint, sat, asc_int642int32_sat);
-ASC_REG_CAST_OP(int32_t, int64_t, one, rint, not_sat, asc_int642int32);
-ASC_REG_CAST_OP(int32_t, int64_t, one, rint, sat, asc_int642int32_sat);
+// physical_int64_t -> int32_t
+ASC_REG_CAST_OP(int32_t, physical_int64_t, zero, rint, not_sat, asc_int642int32);
+ASC_REG_CAST_OP(int32_t, physical_int64_t, zero, rint, sat, asc_int642int32_sat);
+ASC_REG_CAST_OP(int32_t, physical_int64_t, one, rint, not_sat, asc_int642int32);
+ASC_REG_CAST_OP(int32_t, physical_int64_t, one, rint, sat, asc_int642int32_sat);
 
 // int8_t -> int16_t
 ASC_REG_CAST_OP(int16_t, int8_t, zero, rint, not_sat, asc_int82int16);

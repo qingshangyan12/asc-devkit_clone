@@ -17,6 +17,7 @@
 #define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_UTILS_REG_UTILS_H
 
 #include "tensor_api/experimental/arch/vector/reg_tensor.h"
+#include "tensor_api/experimental/utils/reg_enum.h"
 #include "tensor_api/utils/utils.h"
 #include "utils/std/type_traits.h"
 
@@ -64,7 +65,7 @@ template <typename T>
 inline constexpr bool is_b32_type_v = AscendC::Std::is_one_of_v<T, int32_t, uint32_t, float>;
 
 template <typename T>
-inline constexpr bool is_b64_type_v = AscendC::Std::is_one_of_v<T, int64_t>;
+inline constexpr bool is_b64_type_v = AscendC::Std::is_one_of_v<T, int64_t, physical_int64_t>;
 
 template <typename T, typename U>
 __simd_callee__ inline reg_tensor<T> make_reg_operand(const U& value, const vector_bool& mask)
@@ -178,6 +179,43 @@ inline constexpr bool supports_exp_sub_v = ::AscendC::Std::is_one_of_v<T, half, 
 
 template <typename T>
 inline constexpr bool supports_fma_v = ::AscendC::Std::is_one_of_v<T, half, float>;
+
+/**
+ * @brief Soft-emulates MaskMergeMode::MERGING using asc_copy (vmov + MODE_MERGING).
+ * @details Writes active lanes from src into dst and keeps inactive lanes of dst unchanged.
+ * Mirrors basic_api Reg::CopyMerging.
+ */
+template <typename T>
+__simd_callee__ inline void copy_merging(typename reg_tensor<T>::reg_type& dst,
+    typename reg_tensor<T>::reg_type& src, vector_bool mask)
+{
+    if constexpr (Std::is_one_of_v<T, fp8_e4m3fn_t, fp8_e5m2_t, fp8_e8m0_t, hifloat8_t>) {
+        asc_copy(reinterpret_cast<vector_int8_t&>(dst), reinterpret_cast<vector_int8_t&>(src), mask);
+    } else {
+        asc_copy(dst, src, mask);
+    }
+}
+
+/**
+ * @brief Applies ZEROING or MERGING write-back for a computed temporary result.
+ * @param dst Base register kept for inactive lanes when Mode == merging.
+ * @param computed Result computed under ZEROING semantics.
+ * @param mask Active-lane mask used by the compute.
+ */
+template <merge_mode Mode, typename T>
+__simd_callee__ inline reg_tensor<T> apply_merge_mode(
+    const reg_tensor<T>& dst, reg_tensor<T> computed, vector_bool mask)
+{
+    if constexpr (Mode == merge_mode::zeroing) {
+        computed.mask = mask;
+        return computed;
+    } else {
+        reg_tensor<T> result = dst;
+        copy_merging<T>(result.reg, computed.reg, mask);
+        result.mask = mask;
+        return result;
+    }
+}
 
 } // namespace detail
 } // namespace experimental

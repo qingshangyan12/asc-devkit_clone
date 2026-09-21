@@ -34,6 +34,12 @@ struct cast_element_bits {
     static constexpr uint32_t value = is_b4_type_v<data_type> ? 4U : sizeof(data_type) * 8U;
 };
 
+/** @brief Empty tag @c physical_int64_t has sizeof==1; HW B64 cast width is 64 bits. */
+template <>
+struct cast_element_bits<physical_int64_t> {
+    static constexpr uint32_t value = 64U;
+};
+
 } // namespace detail
 } // namespace experimental
 } // namespace te
@@ -100,20 +106,24 @@ namespace te {
 namespace experimental {
 namespace detail {
 
-template <typename DstType, typename SrcType, cast_layout Layout, cast_round_mode Round, cast_sat_mode Sat>
-__simd_callee__ inline reg_tensor<DstType> cast_impl(const reg_tensor<SrcType>& src)
+template <merge_mode Mode, typename DstType, typename SrcType, cast_layout Layout, cast_round_mode Round,
+    cast_sat_mode Sat>
+__simd_callee__ inline reg_tensor<DstType> cast_impl(
+    reg_tensor<DstType>& dst, const reg_tensor<SrcType>& src)
 {
     static_assert(
         !AscendC::Std::is_same_v<DstType, SrcType>,
         "reg_tensor cast requires different source and destination element types");
+    static_assert(
+        !AscendC::Std::is_same_v<DstType, int64_t> && !AscendC::Std::is_same_v<SrcType, int64_t>,
+        "soft int64_t cast is not supported; use physical_int64_t for HW B64 cast");
 
     using op = reg_cast_op<DstType, SrcType, Layout, Round, Sat>;
     static_assert(op::supported, "register cast type or option combination is unsupported on the current architecture");
 
-    reg_tensor<DstType> dst;
-    op::run(dst.reg, src.reg, src.mask);
-    dst.mask = src.mask;
-    return dst;
+    reg_tensor<DstType> computed;
+    op::run(computed.reg, src.reg, src.mask);
+    return apply_merge_mode<Mode>(dst, computed, src.mask);
 }
 
 } // namespace detail
@@ -142,10 +152,10 @@ struct is_supported<float> {
 
 } // namespace detail
 
-template <typename DstType, const cast_options& opt, typename SrcType>
-__simd_callee__ inline reg_tensor<DstType> cast(const reg_tensor<SrcType>& src)
+template <typename DstType, const cast_options& opt, merge_mode Mode, typename SrcType>
+__simd_callee__ inline reg_tensor<DstType> cast(reg_tensor<DstType>& dst, const reg_tensor<SrcType>& src)
 {
-    return detail::cast_impl<DstType, SrcType, opt.layout, opt.round, opt.sat>(src);
+    return detail::cast_impl<Mode, DstType, SrcType, opt.layout, opt.round, opt.sat>(dst, src);
 }
 
 template <typename T>
@@ -158,6 +168,58 @@ __simd_callee__ inline reg_tensor<T> trunc(const reg_tensor<T>& src)
         return dst;
     } else {
         static_assert(detail::is_supported<T>::value, "reg_tensor trunc supports only half, bfloat16_t, and float");
+    }
+}
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> ceil(const reg_tensor<T>& src)
+{
+    if constexpr (detail::is_supported<T>::value) {
+        reg_tensor<T> dst;
+        asc_ceil(dst.reg, src.reg, src.mask);
+        dst.mask = src.mask;
+        return dst;
+    } else {
+        static_assert(detail::is_supported<T>::value, "reg_tensor ceil supports only half, bfloat16_t, and float");
+    }
+}
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> floor(const reg_tensor<T>& src)
+{
+    if constexpr (detail::is_supported<T>::value) {
+        reg_tensor<T> dst;
+        asc_floor(dst.reg, src.reg, src.mask);
+        dst.mask = src.mask;
+        return dst;
+    } else {
+        static_assert(detail::is_supported<T>::value, "reg_tensor floor supports only half, bfloat16_t, and float");
+    }
+}
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> rint(const reg_tensor<T>& src)
+{
+    if constexpr (detail::is_supported<T>::value) {
+        reg_tensor<T> dst;
+        asc_rint(dst.reg, src.reg, src.mask);
+        dst.mask = src.mask;
+        return dst;
+    } else {
+        static_assert(detail::is_supported<T>::value, "reg_tensor rint supports only half, bfloat16_t, and float");
+    }
+}
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> round(const reg_tensor<T>& src)
+{
+    if constexpr (detail::is_supported<T>::value) {
+        reg_tensor<T> dst;
+        asc_round(dst.reg, src.reg, src.mask);
+        dst.mask = src.mask;
+        return dst;
+    } else {
+        static_assert(detail::is_supported<T>::value, "reg_tensor round supports only half, bfloat16_t, and float");
     }
 }
 

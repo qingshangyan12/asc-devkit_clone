@@ -17,6 +17,9 @@
 #define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_BASIC_ARITHMETIC_IMPL_H
 
 #include "impl/tensor_api/experimental/arch/utils/reg_utils.h"
+#include "impl/tensor_api/experimental/arch/vector/precision_math_impl.h"
+#include "impl/tensor_api/experimental/arch/vector/complex_ops_impl.h"
+#include "impl/tensor_api/experimental/arch/vector/soft_int64_arith_impl.h"
 
 namespace asc {
 namespace te {
@@ -34,11 +37,15 @@ __simd_callee__ inline reg_tensor<T> log(const reg_tensor<T>& src)
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator+(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
-    static_assert(detail::supports_add_sub_v<T>, "operator+ does not support this element type");
-    reg_tensor<T> dst;
-    asc_add(dst.reg, src0.reg, src1.reg, src0.mask);
-    dst.mask = src0.mask;
-    return dst;
+    if constexpr (is_complex_tag_v<T>) {
+        return detail::complex_add(src0, src1);
+    } else if constexpr (Std::is_same_v<T, int64_t>) {
+        return detail::soft_int64_add(src0, src1);
+    } else {
+        static_assert(!Std::is_same_v<T, physical_int64_t>,
+            "physical_int64_t add is not supported; use soft reg_tensor<int64_t> for B64 add");
+        return add<merge_mode::zeroing>(src0, src1);
+    }
 }
 
 template <typename T>
@@ -51,6 +58,13 @@ __simd_callee__ inline reg_tensor<T> operator+(const reg_tensor<T>& src, const T
     return dst;
 }
 
+template <typename T, Std::enable_if_t<is_complex_tag_v<T>, int> = 0>
+__simd_callee__ inline reg_tensor<T> operator+(
+    const reg_tensor<T>& src, const complex_scalar<complex_elem_t<T>>& scalar)
+{
+    return detail::complex_adds(src, scalar);
+}
+
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator+(const T& scalar, const reg_tensor<T>& src)
 {
@@ -61,14 +75,44 @@ __simd_callee__ inline reg_tensor<T> operator+(const T& scalar, const reg_tensor
     return dst;
 }
 
+template <typename T, Std::enable_if_t<is_complex_tag_v<T>, int> = 0>
+__simd_callee__ inline reg_tensor<T> operator+(
+    const complex_scalar<complex_elem_t<T>>& scalar, const reg_tensor<T>& src)
+{
+    return detail::complex_adds(src, scalar);
+}
+
+template <merge_mode Mode, typename T>
+__simd_callee__ inline reg_tensor<T> add(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+{
+    if constexpr (is_complex_tag_v<T>) {
+        static_assert(Mode == merge_mode::zeroing, "complex add currently supports zeroing merge mode only");
+        return detail::complex_add(src0, src1);
+    } else if constexpr (Std::is_same_v<T, int64_t>) {
+        static_assert(Mode == merge_mode::zeroing, "soft int64 add currently supports zeroing merge mode only");
+        return detail::soft_int64_add(src0, src1);
+    } else {
+        static_assert(!Std::is_same_v<T, physical_int64_t>,
+            "physical_int64_t add is not supported; use soft reg_tensor<int64_t> for B64 add");
+        static_assert(detail::supports_add_sub_v<T>, "add does not support this element type");
+        reg_tensor<T> computed;
+        asc_add(computed.reg, src0.reg, src1.reg, src0.mask);
+        return detail::apply_merge_mode<Mode>(src0, computed, src0.mask);
+    }
+}
+
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator-(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
-    static_assert(detail::supports_add_sub_v<T>, "operator- does not support this element type");
-    reg_tensor<T> dst;
-    asc_sub(dst.reg, src0.reg, src1.reg, src0.mask);
-    dst.mask = src0.mask;
-    return dst;
+    if constexpr (is_complex_tag_v<T>) {
+        return detail::complex_sub(src0, src1);
+    } else {
+        static_assert(detail::supports_add_sub_v<T>, "operator- does not support this element type");
+        reg_tensor<T> dst;
+        asc_sub(dst.reg, src0.reg, src1.reg, src0.mask);
+        dst.mask = src0.mask;
+        return dst;
+    }
 }
 
 template <typename T>
@@ -96,11 +140,15 @@ __simd_callee__ inline reg_tensor<T> operator-(const T& scalar, const reg_tensor
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator*(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
-    static_assert(detail::supports_mul_v<T>, "operator* does not support this element type");
-    reg_tensor<T> dst;
-    asc_mul(dst.reg, src0.reg, src1.reg, src0.mask);
-    dst.mask = src0.mask;
-    return dst;
+    if constexpr (is_complex_tag_v<T>) {
+        return detail::complex_mul(src0, src1);
+    } else {
+        static_assert(detail::supports_mul_v<T>, "operator* does not support this element type");
+        reg_tensor<T> dst;
+        asc_mul(dst.reg, src0.reg, src1.reg, src0.mask);
+        dst.mask = src0.mask;
+        return dst;
+    }
 }
 
 template <typename T>
@@ -113,6 +161,13 @@ __simd_callee__ inline reg_tensor<T> operator*(const reg_tensor<T>& src, const T
     return dst;
 }
 
+template <typename T, Std::enable_if_t<is_complex_tag_v<T>, int> = 0>
+__simd_callee__ inline reg_tensor<T> operator*(
+    const reg_tensor<T>& src, const complex_scalar<complex_elem_t<T>>& scalar)
+{
+    return detail::complex_muls(src, scalar);
+}
+
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator*(const T& scalar, const reg_tensor<T>& src)
 {
@@ -123,40 +178,49 @@ __simd_callee__ inline reg_tensor<T> operator*(const T& scalar, const reg_tensor
     return dst;
 }
 
-template <typename T>
+template <typename T, Std::enable_if_t<is_complex_tag_v<T>, int> = 0>
+__simd_callee__ inline reg_tensor<T> operator*(
+    const complex_scalar<complex_elem_t<T>>& scalar, const reg_tensor<T>& src)
+{
+    return detail::complex_muls(src, scalar);
+}
+
+template <merge_mode Mode, typename T>
 __simd_callee__ inline reg_tensor<T> max(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
     static_assert(detail::supports_min_max_v<T>, "max does not support this element type");
-    reg_tensor<T> dst;
-    asc_max(dst.reg, src0.reg, src1.reg, src0.mask);
-    dst.mask = src0.mask;
-    return dst;
+    reg_tensor<T> computed;
+    asc_max(computed.reg, src0.reg, src1.reg, src0.mask);
+    return detail::apply_merge_mode<Mode>(src0, computed, src0.mask);
 }
 
-template <typename T>
+template <merge_mode Mode, typename T>
 __simd_callee__ inline reg_tensor<T> max(const reg_tensor<T>& src, const T& scalar)
 {
     static_assert(detail::supports_min_max_v<T>, "max does not support this element type");
-    reg_tensor<T> dst;
-    asc_max_scalar(dst.reg, src.reg, scalar, src.mask);
-    dst.mask = src.mask;
-    return dst;
+    reg_tensor<T> computed;
+    asc_max_scalar(computed.reg, src.reg, scalar, src.mask);
+    return detail::apply_merge_mode<Mode>(src, computed, src.mask);
 }
 
-template <typename T>
+template <merge_mode Mode, typename T>
 __simd_callee__ inline reg_tensor<T> max(const T& scalar, const reg_tensor<T>& src)
 {
-    return max(src, scalar);
+    return max<Mode>(src, scalar);
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> abs(const reg_tensor<T>& src)
+__simd_callee__ inline auto abs(const reg_tensor<T>& src)
 {
-    static_assert(detail::supports_abs_v<T>, "abs does not support this element type");
-    reg_tensor<T> dst;
-    asc_abs(dst.reg, src.reg, src.mask);
-    dst.mask = src.mask;
-    return dst;
+    if constexpr (is_complex_tag_v<T>) {
+        return detail::complex_abs(src);
+    } else {
+        static_assert(detail::supports_abs_v<T>, "abs does not support this element type");
+        reg_tensor<T> dst;
+        asc_abs(dst.reg, src.reg, src.mask);
+        dst.mask = src.mask;
+        return dst;
+    }
 }
 
 template <typename T>
@@ -169,14 +233,16 @@ __simd_callee__ inline reg_tensor<T> exp(const reg_tensor<T>& src)
     return dst;
 }
 
-template <typename T>
+template <const sqrt_options& opt, typename T>
 __simd_callee__ inline reg_tensor<T> sqrt(const reg_tensor<T>& src)
 {
-    static_assert(detail::supports_float_math_v<T>, "sqrt supports half and float");
-    reg_tensor<T> dst;
-    asc_sqrt(dst.reg, src.reg, src.mask);
-    dst.mask = src.mask;
-    return dst;
+    return detail::sqrt_dispatch<opt, T>(src);
+}
+
+template <const rsqrt_options& opt, typename T>
+__simd_callee__ inline reg_tensor<T> rsqrt(const reg_tensor<T>& src)
+{
+    return detail::rsqrt_dispatch<opt, T>(src);
 }
 
 template <typename T>
@@ -307,20 +373,30 @@ __simd_callee__ inline reg_tensor<T> mull(
 template <typename T, typename U>
 __simd_callee__ inline decltype(auto) operator/(const T& a, const U& b)
 {
-    using elem_type = detail::binary_elem_t<T, U>;
-    detail::check_binary_reg_types<T, U>();
-    static_assert(detail::supports_div_v<elem_type>, "operator/ does not support this element type");
-
-    vector_bool mask = detail::binary_mask(a, b);
-    auto left = detail::make_reg_operand<elem_type>(a, mask);
-    auto right = detail::make_reg_operand<elem_type>(b, mask);
-    reg_tensor<elem_type> dst;
-    asc_div(dst.reg, left.reg, right.reg, mask);
-    dst.mask = mask;
-    return dst;
+    return div<default_div_ops>(a, b);
 }
 
-template <typename T, typename U>
+template <const div_options& opt, typename T, typename U>
+__simd_callee__ inline decltype(auto) div(const T& a, const U& b)
+{
+    if constexpr (is_reg_tensor_v<T> && is_reg_tensor_v<U> &&
+                  is_complex_tag_v<detail::reg_elem_t<T>> &&
+                  Std::is_same_v<detail::reg_elem_t<T>, detail::reg_elem_t<U>>) {
+        (void)opt;
+        return detail::complex_div(a, b);
+    } else {
+        using elem_type = detail::binary_elem_t<T, U>;
+        detail::check_binary_reg_types<T, U>();
+        static_assert(detail::supports_div_v<elem_type>, "div does not support this element type");
+
+        vector_bool mask = detail::binary_mask(a, b);
+        auto left = detail::make_reg_operand<elem_type>(a, mask);
+        auto right = detail::make_reg_operand<elem_type>(b, mask);
+        return detail::div_dispatch<opt>(left, right);
+    }
+}
+
+template <merge_mode Mode, typename T, typename U>
 __simd_callee__ inline decltype(auto) min(const T& a, const U& b)
 {
     using elem_type = detail::binary_elem_t<T, U>;
@@ -330,10 +406,9 @@ __simd_callee__ inline decltype(auto) min(const T& a, const U& b)
     vector_bool mask = detail::binary_mask(a, b);
     auto left = detail::make_reg_operand<elem_type>(a, mask);
     auto right = detail::make_reg_operand<elem_type>(b, mask);
-    reg_tensor<elem_type> dst;
-    asc_min(dst.reg, left.reg, right.reg, mask);
-    dst.mask = mask;
-    return dst;
+    reg_tensor<elem_type> computed;
+    asc_min(computed.reg, left.reg, right.reg, mask);
+    return detail::apply_merge_mode<Mode>(left, computed, mask);
 }
 
 } // namespace experimental
