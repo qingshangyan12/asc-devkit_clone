@@ -89,6 +89,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+/* asc_copy_l12l0b_sync composite path 1. */
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap)
@@ -100,6 +101,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+/* asc_copy_l12l0b_sync composite path 2. */
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap)
@@ -111,6 +113,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+/* asc_copy_l12l0b_sync composite path 3. */
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ float* dst, __cbuf__ float* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
 {
@@ -147,6 +150,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
         asc_sync_post_process();
+        /* asc_copy_l12l0b_sync composite path 4. */
     }
 }
 
@@ -162,6 +166,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
         asc_sync_post_process();
+        /* asc_copy_l12l0b_sync composite path 5. */
     }
 }
 
@@ -177,6 +182,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
         asc_sync_post_process();
+        /* asc_copy_l12l0b_sync composite path 6. */
     }
 }
 
@@ -192,6 +198,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
         asc_sync_post_process();
+        /* asc_copy_l12l0b_sync composite path 7. */
     }
 }
 
@@ -250,6 +257,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+/* asc_copy_l12l0a_sync composite path 1. */
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ int32_t* dst, __cbuf__ int32_t* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap)
@@ -261,6 +269,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+/* asc_copy_l12l0a_sync composite path 2. */
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap)
@@ -272,6 +281,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+/* asc_copy_l12l0a_sync composite path 3. */
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ float* dst, __cbuf__ float* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
 {
@@ -323,6 +333,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
         asc_sync_post_process();
+        /* asc_copy_l12l0a_sync composite path 4. */
     }
 }
 
@@ -338,6 +349,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
         asc_sync_post_process();
+        /* asc_copy_l12l0a_sync composite path 5. */
     }
 }
 
@@ -353,6 +365,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
         asc_sync_post_process();
+        /* asc_copy_l12l0a_sync composite path 6. */
     }
 }
 
@@ -368,6 +381,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
         asc_sync_post_process();
+        /* asc_copy_l12l0a_sync composite path 7. */
     }
 }
 
@@ -383,6 +397,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
         asc_sync_post_process();
+        /* asc_copy_l12l0a_sync composite path 8. */
     }
 }
 
@@ -398,6 +413,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
         asc_sync_post_process();
+        /* asc_copy_l12l0a_sync composite path 9. */
     }
 }
 
@@ -878,6 +894,7 @@ __aicore__ inline void asc_copy_l12l0a_trans_sync(
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_trans and asc_sync)
+/* asc_copy_l12l0a_trans_sync composite path 1. */
 __aicore__ inline void asc_copy_l12l0a_trans_sync(
     __ca__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap,
     bool enable_addr_decrement, uint16_t dst_frac_gap)
@@ -889,6 +906,7 @@ __aicore__ inline void asc_copy_l12l0a_trans_sync(
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_trans and asc_sync)
+/* asc_copy_l12l0a_trans_sync composite path 2. */
 __aicore__ inline void asc_copy_l12l0a_trans_sync(
     __ca__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
@@ -900,6 +918,7 @@ __aicore__ inline void asc_copy_l12l0a_trans_sync(
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_trans and asc_sync)
+/* asc_copy_l12l0a_trans_sync composite path 3. */
 __aicore__ inline void asc_copy_l12l0a_trans_sync(
     __ca__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
@@ -955,6 +974,7 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
+/* asc_copy_l12l0b_trans_sync composite path 1. */
 __aicore__ inline void asc_copy_l12l0b_trans_sync(
     __cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap,
     bool enable_addr_decrement, uint16_t dst_frac_gap)
@@ -966,6 +986,7 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
+/* asc_copy_l12l0b_trans_sync composite path 2. */
 __aicore__ inline void asc_copy_l12l0b_trans_sync(
     __cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
@@ -977,6 +998,7 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
+/* asc_copy_l12l0b_trans_sync composite path 3. */
 __aicore__ inline void asc_copy_l12l0b_trans_sync(
     __cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
@@ -1115,6 +1137,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
+/* asc_copy_gm2l1_nd2nz_sync composite path 1. */
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
     uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride,
@@ -1140,6 +1163,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
             dst_nz_matrix_stride);
         asc_sync_post_process();
     }
+    /* asc_copy_gm2l1_nd2nz_sync composite path 2. */
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
@@ -1154,6 +1178,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
             dst_nz_matrix_stride);
         asc_sync_post_process();
     }
+    /* asc_copy_gm2l1_nd2nz_sync composite path 3. */
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
@@ -1182,6 +1207,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
             dst_nz_matrix_stride);
         asc_sync_post_process();
     }
+    /* asc_copy_gm2l1_nd2nz_sync composite path 4. */
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
@@ -1196,6 +1222,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
             dst_nz_matrix_stride);
         asc_sync_post_process();
     }
+    /* asc_copy_gm2l1_nd2nz_sync composite path 5. */
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12bt and asc_sync)
@@ -1249,6 +1276,7 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2gm and asc_sync)
+/* asc_copy_l0c2gm_sync composite path 1. */
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
@@ -1260,6 +1288,7 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
         asc_sync_post_process();
     }
+    /* asc_copy_l0c2gm_sync composite path 2. */
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2gm and asc_sync)
@@ -1274,6 +1303,7 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
         asc_sync_post_process();
     }
+    /* asc_copy_l0c2gm_sync composite path 3. */
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2gm and asc_sync)
@@ -1288,6 +1318,7 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
         asc_sync_post_process();
     }
+    /* asc_copy_l0c2gm_sync composite path 4. */
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2gm and asc_sync)
@@ -1302,6 +1333,7 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
         asc_sync_post_process();
     }
+    /* asc_copy_l0c2gm_sync composite path 5. */
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2gm and asc_sync)
@@ -1316,6 +1348,7 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
         asc_sync_post_process();
     }
+    /* asc_copy_l0c2gm_sync composite path 6. */
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2gm and asc_sync)
@@ -1330,6 +1363,7 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
         asc_sync_post_process();
     }
+    /* asc_copy_l0c2gm_sync composite path 7. */
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2gm and asc_sync)
@@ -1344,6 +1378,7 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
         asc_sync_post_process();
     }
+    /* asc_copy_l0c2gm_sync composite path 8. */
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2l1 and asc_sync)
@@ -1385,6 +1420,7 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
         asc_sync_post_process();
     }
 }
+/* asc_copy_l0c2l1_sync composite path 1. */
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2l1 and asc_sync)
 __aicore__ inline void asc_copy_l0c2l1_sync(
@@ -1398,6 +1434,7 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
         asc_sync_post_process();
     }
 }
+/* asc_copy_l0c2l1_sync composite path 2. */
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2l1 and asc_sync)
 __aicore__ inline void asc_copy_l0c2l1_sync(
@@ -1413,6 +1450,7 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
     }
 }
 
+/* asc_copy_l0c2l1_sync composite path 3. */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2l1 and asc_sync)
 __aicore__ inline void asc_copy_l0c2l1_sync(
     __cbuf__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
@@ -1425,6 +1463,7 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
             relu_pre, enable_channel_split, enable_nz2nd);
         asc_sync_post_process();
     }
+    /* asc_copy_l0c2l1_sync composite path 4. */
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2l1 and asc_sync)
@@ -1439,6 +1478,7 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
             relu_pre, enable_channel_split, enable_nz2nd);
         asc_sync_post_process();
     }
+    /* asc_copy_l0c2l1_sync composite path 5. */
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2l1 and asc_sync)
@@ -1466,6 +1506,7 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
         asc_sync_post_process();
     }
 }
+/* asc_copy_l0c2l1_sync composite path 6. */
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l0a and asc_sync)
 __aicore__ inline void asc_copy_gm2l0a_sync(
@@ -1623,6 +1664,7 @@ __aicore__ inline void asc_copy_l12l0c_sync(
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0c and asc_sync)
+/* asc_copy_l12l0c_sync composite path 1. */
 __aicore__ inline void asc_copy_l12l0c_sync(
     __cc__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap,
     uint16_t dst_gap)
@@ -1779,6 +1821,7 @@ __aicore__ inline void asc_copy_gm2l1_sync(
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
+/* asc_copy_gm2l1_sync composite path 1. */
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap)
@@ -1794,4 +1837,5 @@ __aicore__ inline void asc_copy_gm2l1_sync(
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+/* asc_copy_gm2l1_sync composite path 2. */
 #endif
