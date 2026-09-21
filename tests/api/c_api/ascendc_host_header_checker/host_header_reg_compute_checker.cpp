@@ -10,11 +10,16 @@
 
 #include "c_api/reg_compute/reg_compute.h"
 
+#if !defined(ASC_DEVKIT_VERSION_NUM)
+#error "ASC_DEVKIT_VERSION_NUM is not defined by the include chain: version/asc_devkit_version.h is missing"
+#endif
+
 static void test_host_c_api_reg_compute_0()
 {
     using ::asc_abs;
     using ::asc_abs_sub;
     using ::asc_add;
+    using ::asc_add_merge;
     using ::asc_add_scalar;
     using ::asc_addc;
     using ::asc_and;
@@ -576,8 +581,10 @@ static void test_host_c_api_reg_compute_16()
     using ::asc_lt_scalar;
     using ::asc_madd;
     using ::asc_max;
+    using ::asc_max_merge;
     using ::asc_max_scalar;
     using ::asc_min;
+    using ::asc_min_merge;
     using ::asc_min_scalar;
     using ::asc_mul;
     using ::asc_mul_scalar;

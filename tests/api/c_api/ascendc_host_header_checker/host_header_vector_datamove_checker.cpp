@@ -10,6 +10,10 @@
 
 #include "c_api/vector_datamove/vector_datamove.h"
 
+#if !defined(ASC_DEVKIT_VERSION_NUM)
+#error "ASC_DEVKIT_VERSION_NUM is not defined by the include chain: version/asc_devkit_version.h is missing"
+#endif
+
 static void test_host_c_api_vector_datamove_0()
 {
     using ::asc_copy;
@@ -25,8 +29,10 @@ static void test_host_c_api_vector_datamove_0()
     using ::asc_copy_ub2l1_sync;
     using ::asc_copy_ub2ub;
     using ::asc_copy_ub2ub_sync;
+    using ::asc_gather_gm2ub;
     using ::asc_ndim_copy_dci;
     using ::asc_ndim_copy_gm2ub;
+    using ::asc_scatter_ub2gm;
     using ::asc_set_copy_pad_val;
     using ::asc_set_gm2ub_loop1_stride;
     using ::asc_set_gm2ub_loop2_stride;

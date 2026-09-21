@@ -21,7 +21,7 @@
 #define INCLUDE_C_API_REG_COMPUTE_COMPUTE_REG_ARITH_H
 #include "c_api/defs/defs.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
 #include "impl/c_api/reg_base_impl/reg_arith_intf_impl.h"
 #endif
 
@@ -458,6 +458,80 @@ __simd_callee__ inline vector_half asc_max_scalar(vector_half src, half value, v
 __simd_callee__ inline vector_float asc_max_scalar(vector_float src, float value, vector_bool mask);
 
 __simd_callee__ inline vector_bfloat16_t asc_max_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
+
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
+__simd_callee__ inline void asc_max_merge(
+    vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask);
+
+__simd_callee__ inline void asc_max_merge(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask);
+
+__simd_callee__ inline void asc_max_merge(
+    vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask);
+
+__simd_callee__ inline void asc_max_merge(
+    vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask);
+
+__simd_callee__ inline void asc_max_merge(
+    vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask);
+
+__simd_callee__ inline void asc_max_merge(
+    vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
+
+__simd_callee__ inline void asc_max_merge(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
+
+__simd_callee__ inline void asc_max_merge(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
+
+__simd_callee__ inline void asc_max_merge(
+    vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+
+__simd_callee__ inline void asc_add_merge(
+    vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask);
+
+__simd_callee__ inline void asc_add_merge(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask);
+
+__simd_callee__ inline void asc_add_merge(
+    vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask);
+
+__simd_callee__ inline void asc_add_merge(
+    vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask);
+
+__simd_callee__ inline void asc_add_merge(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
+
+__simd_callee__ inline void asc_add_merge(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
+
+__simd_callee__ inline void asc_add_merge(
+    vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask);
+
+__simd_callee__ inline void asc_add_merge(
+    vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
+
+__simd_callee__ inline void asc_add_merge(
+    vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+
+__simd_callee__ inline void asc_min_merge(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask);
+
+__simd_callee__ inline void asc_min_merge(
+    vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask);
+
+__simd_callee__ inline void asc_min_merge(
+    vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask);
+
+__simd_callee__ inline void asc_min_merge(
+    vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask);
+
+__simd_callee__ inline void asc_min_merge(
+    vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask);
+
+__simd_callee__ inline void asc_min_merge(
+    vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
+
+__simd_callee__ inline void asc_min_merge(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
+
+__simd_callee__ inline void asc_min_merge(
+    vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
+
+__simd_callee__ inline void asc_min_merge(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
+#endif
 
 #endif
 

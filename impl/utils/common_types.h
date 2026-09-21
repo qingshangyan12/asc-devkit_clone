@@ -18,6 +18,15 @@
 #include <cstdint>
 #include <type_traits>
 #include "sys_macros_impl.h"
+// Prefer the generated version header; fall back to 0 (version gates closed) when it is not on the include path.
+#if defined(__has_include)
+#if __has_include("version/asc_devkit_version.h")
+#include "version/asc_devkit_version.h"
+#endif
+#endif
+#ifndef ASC_DEVKIT_VERSION_NUM
+#define ASC_DEVKIT_VERSION_NUM 0
+#endif
 
 namespace AscendC {
 enum class Hardware : uint8_t {
@@ -50,7 +59,7 @@ using fp4x2_e1m2_t = float4_e1m2x2_t;
 using fp8_e5m2_t = float8_e5m2_t;
 using fp8_e4m3fn_t = float8_e4m3_t;
 using fp8_e8m0_t = float8_e8m0_t;
-#if (ASC_DEVKIT_VERSION_NUM >= 902000000)
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 using hif4x2_t = hifloat4x2_t;
 #endif
 #endif
