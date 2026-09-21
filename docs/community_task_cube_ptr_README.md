@@ -51,7 +51,9 @@ cp -a impl/basic_api/.     "$ASC/impl/basic_api/"
 
 ## 已知限制
 
-1. 裸 `__gm__*`：`cacheMode=0`（Issue #1744；同类 #1686）  
+1. 裸 `__gm__*` 无 buffer 元数据，无法 `ExtractCacheMode`：
+   - **默认重载**（3 参）：`cacheMode=0`（Issue #1744 / discussions/27）
+   - **显式重载**（4 参）：`Fixpipe(dst, src, params, cacheMode)` / 带 workspace 同理，由调用方传入
 2. Sparse 等仅 `__NPU_ARCH__==2201`：950 台账 SKIP  
 3. Dump / 部分 SPM：底层仍依赖 Tensor Position → 登记缓做，不标 PASS
 
