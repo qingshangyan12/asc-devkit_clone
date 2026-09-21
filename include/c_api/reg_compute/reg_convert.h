@@ -21,7 +21,7 @@
 #define INCLUDE_C_API_REG_COMPUTE_REG_CONVERT_H
 #include "c_api/defs/defs.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
 #include "impl/c_api/reg_base_impl/reg_convert_intf_impl.h"
 #endif
 
@@ -4541,6 +4541,102 @@ __simd_callee__ inline void asc_float2half_ru_sat(
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos);
 
 __simd_callee__ inline void asc_float2half_ru_sat(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos);
+
+__simd_callee__ inline void asc_float2half_rd_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos);
+
+__simd_callee__ inline void asc_float2half_rd_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos);
+
+__simd_callee__ inline void asc_float2half_rd_sat_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos);
+
+__simd_callee__ inline void asc_float2half_rd_sat_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos);
+
+__simd_callee__ inline void asc_float2half_rn_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos);
+
+__simd_callee__ inline void asc_float2half_rn_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos);
+
+__simd_callee__ inline void asc_float2half_rn_sat_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos);
+
+__simd_callee__ inline void asc_float2half_rn_sat_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos);
+
+__simd_callee__ inline void asc_float2half_rna_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos);
+
+__simd_callee__ inline void asc_float2half_rna_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos);
+
+__simd_callee__ inline void asc_float2half_rna_sat_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos);
+
+__simd_callee__ inline void asc_float2half_rna_sat_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos);
+
+__simd_callee__ inline void asc_float2half_ro_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos);
+
+__simd_callee__ inline void asc_float2half_ro_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos);
+
+__simd_callee__ inline void asc_float2half_ro_sat_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos);
+
+__simd_callee__ inline void asc_float2half_ro_sat_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos);
+
+__simd_callee__ inline void asc_float2half_ru_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos);
+
+__simd_callee__ inline void asc_float2half_ru_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos);
+
+__simd_callee__ inline void asc_float2half_ru_sat_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos);
+
+__simd_callee__ inline void asc_float2half_ru_sat_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos);
+
+__simd_callee__ inline void asc_float2half_rz_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos);
+
+__simd_callee__ inline void asc_float2half_rz_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos);
+
+__simd_callee__ inline void asc_float2half_rz_sat_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos);
+
+__simd_callee__ inline void asc_float2half_rz_sat_merge(
     vector_half& dst, vector_float src, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos);
 
