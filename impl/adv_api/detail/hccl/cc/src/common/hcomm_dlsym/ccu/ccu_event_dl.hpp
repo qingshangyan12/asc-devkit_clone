@@ -11,9 +11,6 @@
 #ifndef CCU_EVENT_DL_HPP
 #define CCU_EVENT_DL_HPP
 
-#if CANN_VERSION_NUM >= 90100000
-#include "ccu_event.hpp"
-#else
 #include "ccu_types_dl.h"
 #include "ccu_primitives_impl_dl.h"
 #include "ccu_utils_dl.hpp"
@@ -48,5 +45,4 @@ private:
 } // namespace ccu
 } // namespace AscendC
 
-#endif // CANN_VERSION_NUM >= 90100000
 #endif // CCU_EVENT_DL_HPP
