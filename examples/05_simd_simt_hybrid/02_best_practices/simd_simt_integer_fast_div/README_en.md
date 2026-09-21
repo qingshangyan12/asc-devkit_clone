@@ -9,7 +9,7 @@ This example uses fixed-divisor integer division computation to demonstrate inte
 | Case | SCENARIO_NUM | Implementation | Description |
 |:---|:---:|:---|:---|
 | Case 0 | 0 | Standard division | SIMT threads directly use `/` for integer division, serving as the baseline version before fixed-divisor division optimization. |
-| Case 1 | 1 | Fast division | Precompute `magic` and `shift` for the fixed divisor. SIMT threads use multiplication and shift to replace standard division. |
+| Case 1 | 1 | Fast division | Call the [asc_get_uintdiv_magic_and_shift()](../../../../docs/zh/api/SIMT-API/math_functions/integer_math_functions/asc_get_uintdiv_magic_and_shift.md) API to precompute `magic` and `shift` for the fixed divisor. SIMT threads call the [asc_uintdiv()](../../../../docs/zh/api/SIMT-API/math_functions/integer_math_functions/asc_uintdiv.md) API to use multiplication and shift to replace standard division. |
 
 ## Supported Products and CANN Versions
 
@@ -132,8 +132,8 @@ uint32_t result = value / divisor;
 
 **Core Implementation**:
 
-- On the SIMD side, compute the `magic` and `shift` required for fast division based on the fixed divisor. The computation results can be reused by SIMT threads.
-- Each SIMT thread reads 1 input element from UB and uses `__umulhi` and right shift within the thread to complete the equivalent division computation.
+- In the SIMD scalar computation logic, call the [asc_get_uintdiv_magic_and_shift()](../../../../docs/zh/api/SIMT-API/math_functions/integer_math_functions/asc_get_uintdiv_magic_and_shift.md) API to compute the `magic` and `shift` required for fast division based on the fixed divisor. The computation results can be reused by SIMT threads.
+- Each SIMT thread reads 1 input element from UB and calls the [asc_uintdiv()](../../../../docs/zh/api/SIMT-API/math_functions/integer_math_functions/asc_uintdiv.md) API within the thread to complete the equivalent division computation using multiplication and shift.
 
 #### Fast Division Conversion Principle
 
@@ -162,24 +162,20 @@ $$
 $$
 
 Where `magic` and `shift` represent the multiplication magic number and shift bits required for fast division.
-In this example, based on the above division conversion approach, the SIMD part uses the `clz()` and `bcnt1()` scalar computation interfaces in the Scalar computation unit to obtain the `magic` and `shift` required for fast division, for reuse by SIMT threads.
+In this example, based on the above division conversion approach, the SIMD scalar computation logic calls the fast division precomputation API [asc_get_uintdiv_magic_and_shift()](../../../../docs/zh/api/SIMT-API/math_functions/integer_math_functions/asc_get_uintdiv_magic_and_shift.md) to obtain the `magic` and `shift` required for fast division, for reuse by SIMT threads; SIMT threads call the fast division API [asc_uintdiv()](../../../../docs/zh/api/SIMT-API/math_functions/integer_math_functions/asc_uintdiv.md) to complete the division computation.
 
 **Key Code**:
 
-The `calc_magic_shift()` function computes `magic` and `shift` for fast division:
+The `integer_div_kernel()` kernel function calls the `asc_get_uintdiv_magic_and_shift()` API to compute `magic` and `shift` for fast division:
 
 ```cpp
-int64_t pos = BIT_64_LEN - count_leading_zero(divisor);
-int64_t cnt1 = get_bit_count1(divisor);
-uint32_t shift = (cnt1 == 1) ? (pos - 1) : pos;
-uint32_t magic = (1l << BIT_32_LEN) * ((1l << shift) - divisor) / divisor + 1;
+asc_get_uintdiv_magic_and_shift(&magic, &shift, divisor);
 ```
 
-The `simt_fast_div()` function performs fast division on the input element `value` processed by the current thread:
+The `simt_fast_div()` function calls the `asc_uintdiv()` API to perform fast division on the input element `value` processed by the current thread:
 
 ```cpp
-uint32_t q = __umulhi(value, magic);
-uint32_t result = (value + q) >> shift;
+uint32_t result = asc_uintdiv(value, magic, shift);
 ```
 
 **Performance Data**:
@@ -212,8 +208,8 @@ uint32_t result = (value + q) >> shift;
 
 | Optimization Method | Core Principle | Example Demonstration |
 |:---|:---|:---|
-| Fixed divisor precomputation | When the divisor is fixed during kernel function execution, `magic` and `shift` can be computed in advance, and SIMT threads reuse these results for fast division. | Case 1 calls `calc_magic_shift()` in the kernel function, and SIMT threads no longer directly execute `/`. |
-| Multiplication and shift replacing standard division | Standard integer division instructions have high overhead. Using multiplication and shift operations reduces per-element computation overhead. | Case 1 reduces `Task Duration` from 117.229μs to 103.889μs compared to Case 0. |
+| Fixed divisor precomputation | When the divisor is fixed during kernel function execution, the `asc_get_uintdiv_magic_and_shift` API can be called in the SIMD scalar computation logic to compute `magic` and `shift`, and SIMT threads reuse these results for fast division. | Case 1 calls `asc_get_uintdiv_magic_and_shift()` in the kernel function, and SIMT threads no longer directly execute `/`. |
+| Multiplication and shift replacing standard division | Standard integer division instructions have high overhead. SIMT threads call the `asc_uintdiv` API to use multiplication and shift operations to reduce per-element computation overhead. | Case 1 reduces `Task Duration` from 117.229μs to 103.889μs compared to Case 0. |
 
 ## Build and Run
 
