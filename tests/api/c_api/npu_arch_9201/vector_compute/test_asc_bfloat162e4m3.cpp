@@ -21,15 +21,17 @@ TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_2(
 TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_2(
     Bf162e4m3_rn_sat_odd, asc_bfloat162e4m3_rn_sat, vcvt, vector_fp8_e4m3fn_t, vector_bfloat16_t, ASC_POSITION_ODD, 3);
 TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_2(
-    Bf162e4m3_rn_m_even, asc_bfloat162e4m3_rn_m, vcvt, vector_fp8_e4m3fn_t, vector_bfloat16_t, ASC_POSITION_EVEN, 4);
+    Bf162e4m3_rn_merge_even, asc_bfloat162e4m3_rn_merge, vcvt, vector_fp8_e4m3fn_t, vector_bfloat16_t,
+    ASC_POSITION_EVEN, 4);
 TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_2(
-    Bf162e4m3_rn_m_odd, asc_bfloat162e4m3_rn_m, vcvt, vector_fp8_e4m3fn_t, vector_bfloat16_t, ASC_POSITION_ODD, 5);
+    Bf162e4m3_rn_merge_odd, asc_bfloat162e4m3_rn_merge, vcvt, vector_fp8_e4m3fn_t, vector_bfloat16_t, ASC_POSITION_ODD,
+    5);
 TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_2(
-    Bf162e4m3_rn_sat_m_even, asc_bfloat162e4m3_rn_sat_m, vcvt, vector_fp8_e4m3fn_t, vector_bfloat16_t,
+    Bf162e4m3_rn_sat_merge_even, asc_bfloat162e4m3_rn_sat_merge, vcvt, vector_fp8_e4m3fn_t, vector_bfloat16_t,
     ASC_POSITION_EVEN, 6);
 TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_2(
-    Bf162e4m3_rn_sat_m_odd, asc_bfloat162e4m3_rn_sat_m, vcvt, vector_fp8_e4m3fn_t, vector_bfloat16_t, ASC_POSITION_ODD,
-    7);
+    Bf162e4m3_rn_sat_merge_odd, asc_bfloat162e4m3_rn_sat_merge, vcvt, vector_fp8_e4m3fn_t, vector_bfloat16_t,
+    ASC_POSITION_ODD, 7);
 TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_2(
     Bf162e4m3_rn_even, asc_bfloat162e4m3_rn, vcvt, vector_fp8_e4m3fn_t, vector_bfloat16_t, ASC_POSITION_EVEN, 8);
 TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_2(
