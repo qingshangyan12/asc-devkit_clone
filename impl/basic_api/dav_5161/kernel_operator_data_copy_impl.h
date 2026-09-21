@@ -23,7 +23,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
 #include "kernel_operator_common_impl.h"
-#include "kernel_utils.h"
+#include "../kernel_utils.h"
 
 namespace AscendC {
 // all input params: need conversion by *32
@@ -156,10 +156,12 @@ __aicore__ inline void CopyCbufToGmAlignV2(
 #endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+    static_assert(SupportBytes<T, 1, 2>(), "fix copy only support type b8/b16 on current device");
+
     // ISA/API: Is the ND matrix number to be moved
     uint64_t ndNum = 1;
     // ISA/API: unit of element
-    uint16_t loop2Size = burstLength;
+    uint16_t loop2Size = burstLength / sizeof(T);
     // ISA/API: unit of element
     uint32_t loop3Size = blockCount;
     // ISA: loop2SrcStride = 1, and does not to be set by programmer.
@@ -230,6 +232,8 @@ __aicore__ inline void DataCopyUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, const
 template <typename T>
 __aicore__ inline void DataCopyL12UBImpl(__ubuf__ T* dst, __cbuf__ T* src, const DataCopyParams& intriParams)
 {
+    static_assert(SupportBytes<T, 1, 2>(), "fix copy only support type b8/b16 on current device");
+
     constexpr uint32_t POS_LOOP3_SIZE = 40;
     constexpr uint32_t POS_MODE = 61;
     constexpr uint32_t POS_LOOP4_SRC_STRIDE = 48;
@@ -280,9 +284,15 @@ __aicore__ inline void DataCopyL12FBImpl(uint64_t dst, __cbuf__ T* src, const Da
 {
     constexpr uint8_t POS_DST_MEM_BLOCK = 16;
     dst |= static_cast<uint64_t>(intriParams.postProcBufBlock) << POS_DST_MEM_BLOCK;
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
     copy_cbuf_to_fbuf_v2(
         (__fbuf__ void*)dst, (__cbuf__ void*)src, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride,
         intriParams.dstStride);
+#else
+    copy_cbuf_to_fbuf_v2(
+        (__fbuf__ void*)dst, (__cbuf__ void*)src, false, intriParams.blockCount, intriParams.blockLen,
+        intriParams.srcStride, intriParams.dstStride);
+#endif
 }
 
 template <typename T>
@@ -432,121 +442,117 @@ __aicore__ inline void DataCopyGM2L1DN2NZImpl(
 template <typename T>
 __aicore__ inline void DataCopyL12GMNZ2NDImpl(__gm__ T* dst, __cbuf__ T* src, const Nz2NdParamsFull& intriParams)
 {
-    if constexpr (sizeof(T) == B8_BYTE_SIZE || sizeof(T) == B16_BYTE_SIZE) {
+    static_assert(SupportBytes<T, 1, 2>(), "fix copy only support type b8/b16 on current device");
+
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
-        // ISA/API: Is the ND matrix number to be moved
-        uint64_t ndNum = intriParams.ndNum;
-        // ISA/API: unit of element
-        uint16_t loop2Size = intriParams.nValue;
-        // ISA/API: unit of element
-        uint32_t loop3Size = intriParams.dValue;
-        // ISA: loop2SrcStride = 1, and does not to be set by programmer.
-        constexpr uint64_t loop2SrcStride = 1;
-        // ISA: unit of C0_size(32B)    API: unit of 16 elements
-        uint64_t loop3SrcStride = intriParams.srcNStride * sizeof(T) >> 1;
-        // ISA: unit of C0_size(32B)    API: unit of 256 elements
-        uint64_t loop4SrcStride = intriParams.srcNdMatrixStride * sizeof(T) * 8;
-        // ISA: unit of byte    API: unit of element
-        uint64_t loop2DstStride = intriParams.dstDStride * sizeof(T);
-        // ISA: unit of byte    API: unit of element
-        uint64_t loop4DstStride = intriParams.dstNdMatrixStride * sizeof(T);
+    // ISA/API: Is the ND matrix number to be moved
+    uint64_t ndNum = intriParams.ndNum;
+    // ISA/API: unit of element
+    uint16_t loop2Size = intriParams.nValue;
+    // ISA/API: unit of element
+    uint32_t loop3Size = intriParams.dValue;
+    // ISA: loop2SrcStride = 1, and does not to be set by programmer.
+    constexpr uint64_t loop2SrcStride = 1;
+    // ISA: unit of C0_size(32B)    API: unit of 16 elements
+    uint64_t loop3SrcStride = intriParams.srcNStride * sizeof(T) >> 1;
+    // ISA: unit of C0_size(32B)    API: unit of 256 elements
+    uint64_t loop4SrcStride = intriParams.srcNdMatrixStride * sizeof(T) * 8;
+    // ISA: unit of byte    API: unit of element
+    uint64_t loop2DstStride = intriParams.dstDStride * sizeof(T);
+    // ISA: unit of byte    API: unit of element
+    uint64_t loop4DstStride = intriParams.dstNdMatrixStride * sizeof(T);
 
-        // SPR.FIXP_NZ_PARA
-        uint64_t config = ndNum | (loop2SrcStride << 16) | (loop3SrcStride << 32) | (loop4SrcStride << 48);
-        set_fixp_nz_para(config);
+    // SPR.FIXP_NZ_PARA
+    uint64_t config = ndNum | (loop2SrcStride << 16) | (loop3SrcStride << 32) | (loop4SrcStride << 48);
+    set_fixp_nz_para(config);
 
-        fix_cbuf_to_gm(
-            dst, src, loop2DstStride, loop3Size, fixp_trans_mode_t::NZ2ND, loop4DstStride, loop2Size, intriParams.sid);
+    fix_cbuf_to_gm(
+        dst, src, loop2DstStride, loop3Size, fixp_trans_mode_t::NZ2ND, loop4DstStride, loop2Size, intriParams.sid);
 #endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
-        // ISA/API: Is the ND matrix number to be moved
-        uint64_t ndNum = intriParams.ndNum;
-        // ISA/API: unit of element
-        uint16_t loop2Size = intriParams.nValue;
-        // ISA/API: unit of element
-        uint32_t loop3Size = intriParams.dValue;
-        // ISA: loop2SrcStride = 1, and does not to be set by programmer.
-        constexpr uint64_t loop2SrcStride = 1;
-        // ISA: unit of C0_size(32B)    API: unit of 16 elements
-        uint64_t loop3SrcStride = intriParams.srcNStride * sizeof(T) >> 1;
-        // ISA: unit of C0_size(32B)    API: unit of 256 elements
-        uint64_t loop4SrcStride = intriParams.srcNdMatrixStride * sizeof(T) * 8;
-        // ISA: unit of byte    API: unit of element
-        uint64_t loop2DstStride = intriParams.dstDStride * sizeof(T);
-        // ISA: unit of byte    API: unit of element
-        uint64_t loop4DstStride = intriParams.dstNdMatrixStride * sizeof(T);
+    // ISA/API: Is the ND matrix number to be moved
+    uint64_t ndNum = intriParams.ndNum;
+    // ISA/API: unit of element
+    uint16_t loop2Size = intriParams.nValue;
+    // ISA/API: unit of element
+    uint32_t loop3Size = intriParams.dValue;
+    // ISA: loop2SrcStride = 1, and does not to be set by programmer.
+    constexpr uint64_t loop2SrcStride = 1;
+    // ISA: unit of C0_size(32B)    API: unit of 16 elements
+    uint64_t loop3SrcStride = intriParams.srcNStride * sizeof(T) >> 1;
+    // ISA: unit of C0_size(32B)    API: unit of 256 elements
+    uint64_t loop4SrcStride = intriParams.srcNdMatrixStride * sizeof(T) * 8;
+    // ISA: unit of byte    API: unit of element
+    uint64_t loop2DstStride = intriParams.dstDStride * sizeof(T);
+    // ISA: unit of byte    API: unit of element
+    uint64_t loop4DstStride = intriParams.dstNdMatrixStride * sizeof(T);
 
-        // SPR.FIXP_NZ_PARA
-        uint64_t config = ndNum | (loop4SrcStride << 16) | (loop4DstStride << 32);
-        set_fixp_nz_para(config);
+    // SPR.FIXP_NZ_PARA
+    uint64_t config = ndNum | (loop4SrcStride << 16) | (loop4DstStride << 32);
+    set_fixp_nz_para(config);
 
-        fix_cbuf_to_gm(
-            dst, src, loop3Size, loop2Size, loop2DstStride, loop3SrcStride, loop2SrcStride, fixp_trans_mode_t::NZ2ND,
-            intriParams.sid);
+    fix_cbuf_to_gm(
+        dst, src, loop3Size, loop2Size, loop2DstStride, loop3SrcStride, loop2SrcStride, fixp_trans_mode_t::NZ2ND,
+        intriParams.sid);
 #endif
-    } else {
-        ASSERT(false && "unsupported data type of copy L1 to GM NZ2ND on current device");
-    }
 }
 
 template <typename T>
 __aicore__ inline void DataCopyL12UBNZ2NDImpl(__ubuf__ T* dst, __cbuf__ T* src, const Nz2NdParamsFull& intriParams)
 {
-    if constexpr (sizeof(T) == B8_BYTE_SIZE || sizeof(T) == B16_BYTE_SIZE) {
+    static_assert(SupportBytes<T, 1, 2>(), "fix copy only support type b8/b16 on current device");
+
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
-        // ISA/API: Is the ND matrix number to be moved
-        uint64_t ndNum = intriParams.ndNum;
-        // ISA/API: unit of element
-        uint16_t loop2Size = intriParams.nValue;
-        // ISA/API: unit of element
-        uint32_t loop3Size = intriParams.dValue;
-        // ISA: loop2SrcStride = 1, and does not to be set by programmer.
-        constexpr uint64_t loop2SrcStride = 1;
-        // ISA: unit of C0_size(32B)    API: unit of 16 elements
-        uint64_t loop3SrcStride = intriParams.srcNStride * sizeof(T) >> 1;
-        // ISA: unit of C0_size(32B)    API: unit of 256 elements
-        uint64_t loop4SrcStride = intriParams.srcNdMatrixStride * sizeof(T) * 8;
-        // ISA: unit of byte    API: unit of element
-        uint64_t loop2DstStride = intriParams.dstDStride * sizeof(T);
-        // ISA: unit of byte    API: unit of element
-        uint64_t loop4DstStride = intriParams.dstNdMatrixStride * sizeof(T);
+    // ISA/API: Is the ND matrix number to be moved
+    uint64_t ndNum = intriParams.ndNum;
+    // ISA/API: unit of element
+    uint16_t loop2Size = intriParams.nValue;
+    // ISA/API: unit of element
+    uint32_t loop3Size = intriParams.dValue;
+    // ISA: loop2SrcStride = 1, and does not to be set by programmer.
+    constexpr uint64_t loop2SrcStride = 1;
+    // ISA: unit of C0_size(32B)    API: unit of 16 elements
+    uint64_t loop3SrcStride = intriParams.srcNStride * sizeof(T) >> 1;
+    // ISA: unit of C0_size(32B)    API: unit of 256 elements
+    uint64_t loop4SrcStride = intriParams.srcNdMatrixStride * sizeof(T) * 8;
+    // ISA: unit of byte    API: unit of element
+    uint64_t loop2DstStride = intriParams.dstDStride * sizeof(T);
+    // ISA: unit of byte    API: unit of element
+    uint64_t loop4DstStride = intriParams.dstNdMatrixStride * sizeof(T);
 
-        // SPR.FIXP_NZ_PARA
-        uint64_t config = ndNum | (loop2SrcStride << 16) | (loop3SrcStride << 32) | (loop4SrcStride << 48);
-        set_fixp_nz_para(config);
+    // SPR.FIXP_NZ_PARA
+    uint64_t config = ndNum | (loop2SrcStride << 16) | (loop3SrcStride << 32) | (loop4SrcStride << 48);
+    set_fixp_nz_para(config);
 
-        fix_cbuf_to_ubuf(dst, src, loop2DstStride, loop3Size, fixp_trans_mode_t::NZ2ND, loop4DstStride, loop2Size);
+    fix_cbuf_to_ubuf(dst, src, loop2DstStride, loop3Size, fixp_trans_mode_t::NZ2ND, loop4DstStride, loop2Size);
 #endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
-        // ISA/API: Is the ND matrix number to be moved
-        uint64_t ndNum = intriParams.ndNum;
-        // ISA/API: unit of element
-        uint16_t loop2Size = intriParams.nValue;
-        // ISA/API: unit of element
-        uint32_t loop3Size = intriParams.dValue;
-        // ISA: loop2SrcStride = 1, and does not to be set by programmer.
-        constexpr uint64_t loop2SrcStride = 1;
-        // ISA: unit of C0_size(32B)    API: unit of 16 elements
-        uint64_t loop3SrcStride = intriParams.srcNStride * sizeof(T) >> 1;
-        // ISA: unit of C0_size(32B)    API: unit of 256 elements
-        uint64_t loop4SrcStride = intriParams.srcNdMatrixStride * sizeof(T) * 8;
-        // ISA: unit of byte    API: unit of element
-        uint64_t loop2DstStride = intriParams.dstDStride * sizeof(T);
-        // ISA: unit of byte    API: unit of element
-        uint64_t loop4DstStride = intriParams.dstNdMatrixStride * sizeof(T);
+    // ISA/API: Is the ND matrix number to be moved
+    uint64_t ndNum = intriParams.ndNum;
+    // ISA/API: unit of element
+    uint16_t loop2Size = intriParams.nValue;
+    // ISA/API: unit of element
+    uint32_t loop3Size = intriParams.dValue;
+    // ISA: loop2SrcStride = 1, and does not to be set by programmer.
+    constexpr uint64_t loop2SrcStride = 1;
+    // ISA: unit of C0_size(32B)    API: unit of 16 elements
+    uint64_t loop3SrcStride = intriParams.srcNStride * sizeof(T) >> 1;
+    // ISA: unit of C0_size(32B)    API: unit of 256 elements
+    uint64_t loop4SrcStride = intriParams.srcNdMatrixStride * sizeof(T) * 8;
+    // ISA: unit of byte    API: unit of element
+    uint64_t loop2DstStride = intriParams.dstDStride * sizeof(T);
+    // ISA: unit of byte    API: unit of element
+    uint64_t loop4DstStride = intriParams.dstNdMatrixStride * sizeof(T);
 
-        // SPR.FIXP_NZ_PARA
-        uint64_t config = ndNum | (loop4SrcStride << 16) | (loop4DstStride << 32);
-        set_fixp_nz_para(config);
+    // SPR.FIXP_NZ_PARA
+    uint64_t config = ndNum | (loop4SrcStride << 16) | (loop4DstStride << 32);
+    set_fixp_nz_para(config);
 
-        fix_cbuf_to_ubuf(
-            dst, src, loop3Size, loop2Size, loop2DstStride, loop3SrcStride, loop2SrcStride, fixp_trans_mode_t::NZ2ND);
+    fix_cbuf_to_ubuf(
+        dst, src, loop3Size, loop2Size, loop2DstStride, loop3SrcStride, loop2SrcStride, fixp_trans_mode_t::NZ2ND);
 #endif
-    } else {
-        ASSERT(false && "unsupported data type of copy L1 to GM NZ2ND on current device");
-    }
 }
 
 template <typename T>
@@ -561,121 +567,117 @@ __aicore__ inline void DataCopyUB2GMNZ2NDImpl(__gm__ T* dst, __ubuf__ T* src, co
 template <typename T>
 __aicore__ inline void DataCopyL12GMNZ2DNImpl(__gm__ T* dst, __cbuf__ T* src, const Nz2DnParamsFull& intriParams)
 {
-    if constexpr (sizeof(T) == B8_BYTE_SIZE || sizeof(T) == B16_BYTE_SIZE) {
+    static_assert(SupportBytes<T, 1, 2>(), "fix copy only support type b8/b16 on current device");
+
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
-        // ISA/API: Is the ND matrix number to be moved
-        uint64_t dnNum = intriParams.dnNum;
-        // ISA/API: unit of element
-        uint16_t loop2Size = intriParams.nValue;
-        // ISA/API: unit of element
-        uint32_t loop3Size = intriParams.dValue;
-        // ISA: loop2SrcStride = 1, and does not to be set by programmer.
-        constexpr uint64_t loop2SrcStride = 1;
-        // ISA: unit of C0_size(32B)    API: unit of 16 elements
-        uint64_t loop3SrcStride = intriParams.srcNStride * sizeof(T) >> 1;
-        // ISA: unit of C0_size(32B)    API: unit of 256 elements
-        uint64_t loop4SrcStride = intriParams.srcNzMatrixStride * sizeof(T) * 8;
-        // ISA: unit of byte    API: unit of element
-        uint64_t loop2DstStride = intriParams.dstNStride * sizeof(T);
-        // ISA: unit of byte    API: unit of element
-        uint64_t loop4DstStride = intriParams.dstDnMatrixStride * sizeof(T);
+    // ISA/API: Is the ND matrix number to be moved
+    uint64_t dnNum = intriParams.dnNum;
+    // ISA/API: unit of element
+    uint16_t loop2Size = intriParams.nValue;
+    // ISA/API: unit of element
+    uint32_t loop3Size = intriParams.dValue;
+    // ISA: loop2SrcStride = 1, and does not to be set by programmer.
+    constexpr uint64_t loop2SrcStride = 1;
+    // ISA: unit of C0_size(32B)    API: unit of 16 elements
+    uint64_t loop3SrcStride = intriParams.srcNStride * sizeof(T) >> 1;
+    // ISA: unit of C0_size(32B)    API: unit of 256 elements
+    uint64_t loop4SrcStride = intriParams.srcNzMatrixStride * sizeof(T) * 8;
+    // ISA: unit of byte    API: unit of element
+    uint64_t loop2DstStride = intriParams.dstNStride * sizeof(T);
+    // ISA: unit of byte    API: unit of element
+    uint64_t loop4DstStride = intriParams.dstDnMatrixStride * sizeof(T);
 
-        // SPR.FIXP_NZ_PARA
-        uint64_t config = dnNum | (loop2SrcStride << 16) | (loop3SrcStride << 32) | (loop4SrcStride << 48);
-        set_fixp_nz_para(config);
+    // SPR.FIXP_NZ_PARA
+    uint64_t config = dnNum | (loop2SrcStride << 16) | (loop3SrcStride << 32) | (loop4SrcStride << 48);
+    set_fixp_nz_para(config);
 
-        fix_cbuf_to_gm(
-            dst, src, loop2DstStride, loop3Size, fixp_trans_mode_t::NZ2DN, loop4DstStride, loop2Size, intriParams.sid);
+    fix_cbuf_to_gm(
+        dst, src, loop2DstStride, loop3Size, fixp_trans_mode_t::NZ2DN, loop4DstStride, loop2Size, intriParams.sid);
 #endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
-        // ISA/API: Is the ND matrix number to be moved
-        uint64_t dnNum = intriParams.dnNum;
-        // ISA/API: unit of element
-        uint16_t loop2Size = intriParams.nValue;
-        // ISA/API: unit of element
-        uint32_t loop3Size = intriParams.dValue;
-        // ISA: loop2SrcStride = 1, and does not to be set by programmer.
-        constexpr uint64_t loop2SrcStride = 1;
-        // ISA: unit of C0_size(32B)    API: unit of 16 elements
-        uint64_t loop3SrcStride = intriParams.srcNStride * sizeof(T) >> 1;
-        // ISA: unit of C0_size(32B)    API: unit of 256 elements
-        uint64_t loop4SrcStride = intriParams.srcNzMatrixStride * sizeof(T) * 8;
-        // ISA: unit of byte    API: unit of element
-        uint64_t loop2DstStride = intriParams.dstNStride * sizeof(T);
-        // ISA: unit of byte    API: unit of element
-        uint64_t loop4DstStride = intriParams.dstDnMatrixStride * sizeof(T);
+    // ISA/API: Is the ND matrix number to be moved
+    uint64_t dnNum = intriParams.dnNum;
+    // ISA/API: unit of element
+    uint16_t loop2Size = intriParams.nValue;
+    // ISA/API: unit of element
+    uint32_t loop3Size = intriParams.dValue;
+    // ISA: loop2SrcStride = 1, and does not to be set by programmer.
+    constexpr uint64_t loop2SrcStride = 1;
+    // ISA: unit of C0_size(32B)    API: unit of 16 elements
+    uint64_t loop3SrcStride = intriParams.srcNStride * sizeof(T) >> 1;
+    // ISA: unit of C0_size(32B)    API: unit of 256 elements
+    uint64_t loop4SrcStride = intriParams.srcNzMatrixStride * sizeof(T) * 8;
+    // ISA: unit of byte    API: unit of element
+    uint64_t loop2DstStride = intriParams.dstNStride * sizeof(T);
+    // ISA: unit of byte    API: unit of element
+    uint64_t loop4DstStride = intriParams.dstDnMatrixStride * sizeof(T);
 
-        // SPR.FIXP_NZ_PARA
-        uint64_t config = dnNum | (loop4SrcStride << 16) | (loop4DstStride << 32);
-        set_fixp_nz_para(config);
+    // SPR.FIXP_NZ_PARA
+    uint64_t config = dnNum | (loop4SrcStride << 16) | (loop4DstStride << 32);
+    set_fixp_nz_para(config);
 
-        fix_cbuf_to_gm(
-            dst, src, loop3Size, loop2Size, loop2DstStride, loop3SrcStride, loop2SrcStride, fixp_trans_mode_t::NZ2DN,
-            intriParams.sid);
+    fix_cbuf_to_gm(
+        dst, src, loop3Size, loop2Size, loop2DstStride, loop3SrcStride, loop2SrcStride, fixp_trans_mode_t::NZ2DN,
+        intriParams.sid);
 #endif
-    } else {
-        ASSERT(false && "unsupported data type of copy L1 to GM NZ2ND on current device");
-    }
 }
 
 template <typename T>
 __aicore__ inline void DataCopyL12UBNZ2DNImpl(__ubuf__ T* dst, __cbuf__ T* src, const Nz2DnParamsFull& intriParams)
 {
-    if constexpr (sizeof(T) == B8_BYTE_SIZE || sizeof(T) == B16_BYTE_SIZE) {
+    static_assert(SupportBytes<T, 1, 2>(), "fix copy only support type b8/b16 on current device");
+
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
-        // ISA/API: Is the ND matrix number to be moved
-        uint64_t dnNum = intriParams.dnNum;
-        // ISA/API: unit of element
-        uint16_t loop2Size = intriParams.nValue;
-        // ISA/API: unit of element
-        uint32_t loop3Size = intriParams.dValue;
-        // ISA: loop2SrcStride = 1, and does not to be set by programmer.
-        constexpr uint64_t loop2SrcStride = 1;
-        // ISA: unit of C0_size(32B)    API: unit of 16 elements
-        uint64_t loop3SrcStride = intriParams.srcNStride * sizeof(T) >> 1;
-        // ISA: unit of C0_size(32B)    API: unit of 256 elements
-        uint64_t loop4SrcStride = intriParams.srcNzMatrixStride * sizeof(T) * 8;
-        // ISA: unit of byte    API: unit of element
-        uint64_t loop2DstStride = intriParams.dstNStride * sizeof(T);
-        // ISA: unit of byte    API: unit of element
-        uint64_t loop4DstStride = intriParams.dstDnMatrixStride * sizeof(T);
+    // ISA/API: Is the ND matrix number to be moved
+    uint64_t dnNum = intriParams.dnNum;
+    // ISA/API: unit of element
+    uint16_t loop2Size = intriParams.nValue;
+    // ISA/API: unit of element
+    uint32_t loop3Size = intriParams.dValue;
+    // ISA: loop2SrcStride = 1, and does not to be set by programmer.
+    constexpr uint64_t loop2SrcStride = 1;
+    // ISA: unit of C0_size(32B)    API: unit of 16 elements
+    uint64_t loop3SrcStride = intriParams.srcNStride * sizeof(T) >> 1;
+    // ISA: unit of C0_size(32B)    API: unit of 256 elements
+    uint64_t loop4SrcStride = intriParams.srcNzMatrixStride * sizeof(T) * 8;
+    // ISA: unit of byte    API: unit of element
+    uint64_t loop2DstStride = intriParams.dstNStride * sizeof(T);
+    // ISA: unit of byte    API: unit of element
+    uint64_t loop4DstStride = intriParams.dstDnMatrixStride * sizeof(T);
 
-        // SPR.FIXP_NZ_PARA
-        uint64_t config = dnNum | (loop2SrcStride << 16) | (loop3SrcStride << 32) | (loop4SrcStride << 48);
-        set_fixp_nz_para(config);
+    // SPR.FIXP_NZ_PARA
+    uint64_t config = dnNum | (loop2SrcStride << 16) | (loop3SrcStride << 32) | (loop4SrcStride << 48);
+    set_fixp_nz_para(config);
 
-        fix_cbuf_to_ubuf(dst, src, loop2DstStride, loop3Size, fixp_trans_mode_t::NZ2DN, loop4DstStride, loop2Size);
+    fix_cbuf_to_ubuf(dst, src, loop2DstStride, loop3Size, fixp_trans_mode_t::NZ2DN, loop4DstStride, loop2Size);
 #endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
-        // ISA/API: Is the ND matrix number to be moved
-        uint64_t dnNum = intriParams.dnNum;
-        // ISA/API: unit of element
-        uint16_t loop2Size = intriParams.nValue;
-        // ISA/API: unit of element
-        uint32_t loop3Size = intriParams.dValue;
-        // ISA: loop2SrcStride = 1, and does not to be set by programmer.
-        constexpr uint64_t loop2SrcStride = 1;
-        // ISA: unit of C0_size(32B)    API: unit of 16 elements
-        uint64_t loop3SrcStride = intriParams.srcNStride * sizeof(T) >> 1;
-        // ISA: unit of C0_size(32B)    API: unit of 256 elements
-        uint64_t loop4SrcStride = intriParams.srcNzMatrixStride * sizeof(T) * 8;
-        // ISA: unit of byte    API: unit of element
-        uint64_t loop2DstStride = intriParams.dstNStride * sizeof(T);
-        // ISA: unit of byte    API: unit of element
-        uint64_t loop4DstStride = intriParams.dstDnMatrixStride * sizeof(T);
+    // ISA/API: Is the ND matrix number to be moved
+    uint64_t dnNum = intriParams.dnNum;
+    // ISA/API: unit of element
+    uint16_t loop2Size = intriParams.nValue;
+    // ISA/API: unit of element
+    uint32_t loop3Size = intriParams.dValue;
+    // ISA: loop2SrcStride = 1, and does not to be set by programmer.
+    constexpr uint64_t loop2SrcStride = 1;
+    // ISA: unit of C0_size(32B)    API: unit of 16 elements
+    uint64_t loop3SrcStride = intriParams.srcNStride * sizeof(T) >> 1;
+    // ISA: unit of C0_size(32B)    API: unit of 256 elements
+    uint64_t loop4SrcStride = intriParams.srcNzMatrixStride * sizeof(T) * 8;
+    // ISA: unit of byte    API: unit of element
+    uint64_t loop2DstStride = intriParams.dstNStride * sizeof(T);
+    // ISA: unit of byte    API: unit of element
+    uint64_t loop4DstStride = intriParams.dstDnMatrixStride * sizeof(T);
 
-        // SPR.FIXP_NZ_PARA
-        uint64_t config = dnNum | (loop4SrcStride << 16) | (loop4DstStride << 32);
-        set_fixp_nz_para(config);
+    // SPR.FIXP_NZ_PARA
+    uint64_t config = dnNum | (loop4SrcStride << 16) | (loop4DstStride << 32);
+    set_fixp_nz_para(config);
 
-        fix_cbuf_to_ubuf(
-            dst, src, loop3Size, loop2Size, loop2DstStride, loop3SrcStride, loop2SrcStride, fixp_trans_mode_t::NZ2DN);
+    fix_cbuf_to_ubuf(
+        dst, src, loop3Size, loop2Size, loop2DstStride, loop3SrcStride, loop2SrcStride, fixp_trans_mode_t::NZ2DN);
 #endif
-    } else {
-        ASSERT(false && "unsupported data type of copy L1 to GM NZ2ND on current device");
-    }
 }
 
 template <typename T>
@@ -920,10 +922,12 @@ __aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, cons
 #endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+    static_assert(SupportBytes<T, 1, 2>(), "fix copy only support type b8/b16 on current device");
+
     // ISA/API: Is the ND matrix number to be moved
     uint64_t ndNum = 1;
     // ISA/API: unit of element
-    uint16_t loop2Size = intriParams.blockLen;
+    uint16_t loop2Size = intriParams.blockLen / sizeof(T);
     // ISA/API: unit of element
     uint32_t loop3Size = intriParams.blockCount;
     // ISA: loop2SrcStride = 1, and does not to be set by programmer.
@@ -970,10 +974,12 @@ __aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, cons
 #endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+    static_assert(SupportBytes<T, 1, 2>(), "fix copy only support type b8/b16 on current device");
+
     // ISA/API: Is the ND matrix number to be moved
     uint64_t ndNum = 1;
     // ISA/API: unit of element
-    uint16_t loop2Size = intriParams.blockLen;
+    uint16_t loop2Size = intriParams.blockLen / sizeof(T);
     // ISA/API: unit of element
     uint32_t loop3Size = intriParams.blockCount;
     // ISA: loop2SrcStride = 1, and does not to be set by programmer.
@@ -997,6 +1003,22 @@ __aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, cons
 #endif
 }
 
+#pragma begin_pipe(V)
+template <typename T>
+__aicore__ inline void DataCopyUB2UBIntf(
+    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const DataCopyParams& intriParams)
+{
+    DataCopyUB2UBImpl(
+        (__ubuf__ PrimT<T>*)dstLocal.GetPhyAddr(), (__ubuf__ PrimT<T>*)srcLocal.GetPhyAddr(), intriParams);
+}
+#pragma end_pipe
+
+template <typename T>
+__aicore__ inline void DataCopyL12UBIntf(
+    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const DataCopyParams& intriParams)
+{
+    DataCopyL12UBImpl((__ubuf__ T*)dstLocal.GetPhyAddr(), (__cbuf__ T*)srcLocal.GetPhyAddr(), intriParams);
+}
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
 
