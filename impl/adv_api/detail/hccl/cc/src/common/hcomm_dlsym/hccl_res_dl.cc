@@ -8,9 +8,64 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "hccl_res_dl.h"
+#include "mc2_thread_config_compat.h"
+#include <limits>
+#include <vector>
 #include <dlfcn.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+namespace {
+using Mc2ThreadAcquireFunc = HcclResult (*)(
+    HcclComm, CommEngine, uint32_t, mc2_thread_config::ThreadType, const mc2_thread_config::ThreadConfig*,
+    ThreadHandle*);
+Mc2ThreadAcquireFunc GetMc2ThreadAcquire()
+{
+    // Resolve locally on first use: another compat SO may interpose HcommDlInit.
+    static const Mc2ThreadAcquireFunc acquire = []() -> Mc2ThreadAcquireFunc {
+        void* handle = dlopen("libhcomm.so", RTLD_NOW);
+        if (handle == nullptr) {
+            const char* error = dlerror();
+            HCCL_WARNING(
+                "[MC2 profiling] Failed to load libhcomm.so: %s; use legacy resources without deferred association",
+                error != nullptr ? error : "unknown error");
+            return nullptr;
+        }
+        dlerror();
+        auto func = reinterpret_cast<Mc2ThreadAcquireFunc>(dlsym(handle, "HcclThreadAcquireWithConfig"));
+        const char* error = dlerror();
+        if (error != nullptr || func == nullptr) {
+            HCCL_WARNING(
+                "[MC2 profiling] Failed to resolve HcclThreadAcquireWithConfig: %s; "
+                "use legacy resources without deferred association",
+                error != nullptr ? error : "null symbol");
+            dlclose(handle);
+            return nullptr;
+        }
+        // Retain the dlopen reference for the lifetime of the cached function pointer.
+        HCCL_INFO("[MC2 profiling] HcclThreadAcquireWithConfig resolved; marked ThreadConfig path available");
+        return func;
+    }();
+    return acquire;
+}
+} // namespace
+
+HcclResult Mc2ThreadAcquireWithConfig(
+    HcclComm comm, CommEngine engine, uint32_t threadNum, uint32_t notifyNum, ThreadHandle* threads)
+{
+    if (notifyNum > std::numeric_limits<uint16_t>::max()) {
+        HCCL_ERROR("[Mc2ThreadAcquireWithConfig] notifyNum[%u] exceeds ThreadConfig v1 range", notifyNum);
+        return HCCL_E_PARA;
+    }
+    const auto acquire = GetMc2ThreadAcquire();
+    if (acquire == nullptr) {
+        const CommEngine legacyEngine = engine == COMM_ENGINE_AICPU ? COMM_ENGINE_AICPU_TS : engine;
+        return HcclThreadAcquire(comm, legacyEngine, threadNum, notifyNum, threads);
+    }
+    const std::vector<mc2_thread_config::ThreadConfig> configs(
+        threadNum, mc2_thread_config::MakeConfig(static_cast<uint16_t>(notifyNum)));
+    return acquire(comm, engine, threadNum, mc2_thread_config::THREAD_TYPE_TS, configs.data(), threads);
+}
 
 // ---------- 桩函数定义（签名与真实API完全一致）----------
 DEFINE_WEAK_FUNC(HcclResult, HcclGetRemoteIpcHcclBuf, HcclComm comm, uint64_t remoteRank, void** addr, uint64_t* size);
