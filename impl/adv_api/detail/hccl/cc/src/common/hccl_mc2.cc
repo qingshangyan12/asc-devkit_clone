@@ -403,17 +403,17 @@ bool IsCcuForcedAlgUsable(const Mc2CcTilingInner* ccTiling)
     std::string extParseErrMsg;
     const ForcedAlgKind kind = ClassifyForcedAlgConfig(ccTiling->algConfig, algName, extSpec, extParseErrMsg);
     if (kind == ForcedAlgKind::NONE || kind == ForcedAlgKind::LEGACY) {
-        HCCL_WARNING(
-            "[AllocComResourceByTilingCcu] algConfig[%s] is not supported in mc2_client.", ccTiling->algConfig);
+        HCCL_WARNING("[MC2_EXT_ALG] algConfig[%s] is not supported in mc2_client.", ccTiling->algConfig);
         return false;
     }
     if (kind == ForcedAlgKind::BARE_NAME) {
         if (!HcclIsCcuAlgorithmRegistered(ccTiling->opType, algName.c_str())) {
             HCCL_WARNING(
-                "[AllocComResourceByTilingCcu] algorithm[%s] is not registered in mc2_client for opType[%u].",
-                algName.c_str(), ccTiling->opType);
+                "[MC2_EXT_ALG] algorithm[%s] is not registered in mc2_client for opType[%u].", algName.c_str(),
+                ccTiling->opType);
             return false;
         }
+        HCCL_INFO("[MC2_EXT_ALG] ccu gate passed, algConfig[%s], algorithm registered.", ccTiling->algConfig);
         return true;
     }
     if (!extParseErrMsg.empty()) {
