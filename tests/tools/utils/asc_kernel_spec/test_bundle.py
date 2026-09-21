@@ -176,6 +176,23 @@ class SourceUniqueness(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     build_bundle.safe_source_path(bad)
 
+    def test_unmapped_relative_source_is_preserved(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            manifest = root / "kernel_manifest.json"
+            # The user may arrange this path only after installing the archive.
+            document = {
+                "source_file": "user/layout/kernel.cpp",
+                "resource_id": "a" * 64,
+            }
+            manifest.write_text(json.dumps(document))
+            resolved = build_bundle.validate_sources(root, [manifest])
+            self.assertEqual(resolved, {})
+            build_bundle.stage_unique_resources([manifest], root / "staged", resolved)
+            staged = root / "staged" / ("a" * 64) / "kernel_manifest.json"
+            self.assertEqual(json.loads(staged.read_text()), document)
+            self.assertEqual(json.loads(manifest.read_text()), document)
+
     def test_missing_source(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -189,6 +206,63 @@ class SourceUniqueness(unittest.TestCase):
             build_bundle.validate_sources(
                 Path("/nonexistent/source-validation-root"), []
             )
+
+    def test_source_move_invalidates_cached_bundle(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            sources = root / "sources"
+            resources = root / "resources"
+            (sources / "a").mkdir(parents=True)
+            resources.mkdir()
+            (sources / "a/kernel.cpp").write_text("// source")
+            manifest = resources / "kernel_manifest.json"
+            document = {"source_file": "kernel.cpp", "resource_id": "a" * 64}
+            manifest.write_text(json.dumps(document))
+            exporter = root / "exporter"
+            exporter.write_text(
+                "#!" + sys.executable + "\nimport pathlib,sys\n"
+                "args = sys.argv\n"
+                'source = pathlib.Path(args[args.index("--input-dir") + 1])\n'
+                'output = pathlib.Path(args[args.index("--output") + 1])\n'
+                'output.write_bytes(next(source.rglob("kernel_manifest.json")).read_bytes())\n'
+            )
+            exporter.chmod(0o755)
+            output = root / "bundle.o"
+            argv = [
+                sys.executable,
+                build_bundle.__file__,
+                "--input-dir",
+                str(resources),
+                "--source-dir",
+                str(sources),
+                "--source-map",
+                str(sources),
+                "share/package/src",
+                "--output",
+                str(output),
+                "--exporter",
+                str(exporter),
+                "--cxx",
+                "/bin/true",
+                "--make",
+                "/bin/true",
+            ]
+            for directory in ("a", "b"):
+                if directory == "b":
+                    (sources / "a").rename(sources / "b")
+                rebuilt = subprocess.run(
+                    argv, check=True, capture_output=True, text=True
+                )
+                self.assertIn("JIT bundle published", rebuilt.stdout)
+                self.assertEqual(
+                    json.loads(output.read_text())["source_file"],
+                    f"share/package/src/{directory}/kernel.cpp",
+                )
+                cached = subprocess.run(
+                    argv, check=True, capture_output=True, text=True
+                )
+                self.assertIn("JIT bundle unchanged", cached.stdout)
+            self.assertEqual(json.loads(manifest.read_text()), document)
 
     def test_duplicate_rejected_before_cached_bundle_is_reused(self):
         with tempfile.TemporaryDirectory() as tmp:

@@ -121,7 +121,11 @@ python3 tests/python/asc_op_compiler/test_static_compile_resource_generator.py
 
 1. RoiAlignV2 的 key 1 单独静态链接缺少 g_opSystemRunCfg。动态桩只在第一个 key 定义它；动态合并所有 key 时可用，单入口导出未完整处理此依赖。关闭常量化仍失败，说明不是常量化本身的问题。需要生成器保证每个独立链接结果恰好有一份定义；混合核/SK 也需验证。
 2. STATIC 打包不自动改写 source_file 为安装相对路径。使用方自行组织源码布局与检索；保留原值不代表运行时新增了任意目录搜索能力，也不新增 STATIC 专用的路径禁止规则。
-3. 同一进程多个含资源的库：SHARED 自动发现所有资源、STATIC 同名 getter 合并均未全面支持。
+3. 当前不满足同一进程使用多个含 JIT 资源的 SHARED/STATIC 库的要求，需要补齐后才能声明支持：
+   - SHARED：当前只通过进程句柄查找一次 `AscendcGetCompileResourceBundle`。多个全局加载的库只找到其中一个，局部加载的库不在该查找范围内；首次自动加载结果还会被缓存，后续新加载的库不会重新发现。
+   - STATIC：不同资源 object 定义同名全局入口。普通归档链接可能只提取第一份资源，强制保留全部资源会发生重复定义；不能通过增加 whole-archive 选项解决。
+   - 改进方向：exporter 为每份资源生成唯一链接标识，并处理生成的内部函数重名；CMake 保证每个静态库的资源 object 被保留；运行时逐库发现所有资源，并支持首次查询后新加载的库。具体注册或发现方式仍需设计和验证，不要求算子工程自行枚举资源。
+   - 验收至少覆盖两个 SHARED（全局及局部加载）、两个 STATIC、二者混用、查询后再加载新库，以及相同 resource_id 保留任意一份完整资源。
 4. RUN 实际安装、覆盖升级、卸载及 SK 上卡数值验证未完成。验证中使用 CMake install 和归档数据提取，不能代替安装生命周期验收。
 
 已验证 AddCustom 三种交付的离线静态编译。ops-cv Ascend910B 全量包有 9 份 manifest、13 个入口，26 次离线编译中 24 次成功，2 次为上述 key 1 错误。不能宣称所有生产算子已经可用。

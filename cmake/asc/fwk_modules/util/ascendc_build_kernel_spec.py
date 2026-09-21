@@ -66,6 +66,9 @@ def validate_sources(source_root, manifests, source_maps=()):
     resolved = {}
     for manifest in manifests:
         name = safe_source_path(json.loads(manifest.read_text()).get("source_file"))
+        # Without an installation map, the caller owns relative source layout.
+        if "/" in name and not source_maps:
+            continue
         candidates = (
             installed.get(name, set()) if "/" in name else files.get(name, set())
         )
@@ -214,6 +217,12 @@ def main():
         args.source_map,
     )
     digest.update(json.dumps(args.source_map, sort_keys=True).encode())
+    # Source layout can change without changing the manifest or mapping roots.
+    digest.update(
+        json.dumps(
+            sorted((str(path.resolve()), name) for path, name in source_paths.items())
+        ).encode()
+    )
     digest.update(Path(__file__).read_bytes())
 
     for tool in (args.exporter, args.cxx, args.make):

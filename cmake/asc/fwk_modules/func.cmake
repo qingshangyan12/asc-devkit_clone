@@ -1158,14 +1158,6 @@ function(npu_op_package_add target_package_name)
     get_property(KERNEL_TILING_LIBRARY GLOBAL PROPERTY _ASC_TGT_KERNEL_${_ascendc_kernel_target}_TILING_LIBRARY)
     set(KERNEL_DYNAMIC_PATH ${KERNEL_BINARY_PATH}/binary/dynamic/)
     get_property(kernel_spec_mode GLOBAL PROPERTY _ASC_PKG_${target_package_name}_KERNEL_SPEC_MODE)
-    # This kernel target owns its binary tree. Remove bundles from a previous package name as well.
-    file(REMOVE_RECURSE "${KERNEL_BINARY_PATH}/jit" "${KERNEL_BINARY_PATH}/kernel_spec_host" "${KERNEL_BINARY_PATH}/op_spec")
-    file(GLOB stale_spec_bundles
-      "${KERNEL_BINARY_PATH}/binary/*/lib*_compile_database.so"
-      "${KERNEL_BINARY_PATH}/binary/*/lib*_compile_database.so.stamp.json")
-    if(stale_spec_bundles)
-      file(REMOVE ${stale_spec_bundles})
-    endif()
     get_property(spec_owner GLOBAL PROPERTY _ASC_KERNEL_SPEC_AUTOGEN_OWNER)
     get_property(spec_participants GLOBAL PROPERTY _ASC_KERNEL_PACKAGE_PARTICIPANTS)
     if(spec_owner OR (spec_participants AND kernel_spec_mode AND NOT kernel_spec_mode STREQUAL "None"))
