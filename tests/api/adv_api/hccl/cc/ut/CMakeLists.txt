@@ -14,3 +14,4 @@ set(UT_COMMON_INCLUDE_LIST
 
 add_subdirectory(common/prepare_ut_env)
 add_subdirectory(../st/algorithm ${CMAKE_CURRENT_BINARY_DIR}/algorithm)
+add_subdirectory(../st/algorithm/testcase/external_alg ${CMAKE_CURRENT_BINARY_DIR}/external_alg)
