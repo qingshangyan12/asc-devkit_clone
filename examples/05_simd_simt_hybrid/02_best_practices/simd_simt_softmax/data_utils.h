@@ -8,19 +8,23 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#pragma once
+/* !
+ * \file data_utils.h
+ * \brief Utility functions for reading and writing binary files
+ */
 
+#ifndef DATA_UTILS_H
+#define DATA_UTILS_H
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
-
-#include <cstdio>
 #include <fstream>
+#include <cstdio>
 #include <string>
 
-#define ERROR_LOG(fmt, args...) std::fprintf(stderr, "[ERROR] " fmt "\n", ##args)
+#define ERROR_LOG(fmt, args...) fprintf(stdout, "[ERROR]  " fmt "\n", ##args)
 
-inline bool read_file(const std::string& file_path, size_t expected_size, void* buffer, size_t buffer_size)
+bool read_file(const std::string& file_path, size_t expected_size, void* buffer, size_t buffer_size)
 {
     struct stat stat_buf;
     if (stat(file_path.c_str(), &stat_buf) != 0) {
@@ -55,7 +59,7 @@ inline bool read_file(const std::string& file_path, size_t expected_size, void* 
     return true;
 }
 
-inline bool write_file(const std::string& file_path, const void* buffer, size_t size)
+bool write_file(const std::string& file_path, const void* buffer, size_t size)
 {
     if (buffer == nullptr) {
         ERROR_LOG("write file failed because buffer is nullptr");
@@ -76,3 +80,4 @@ inline bool write_file(const std::string& file_path, const void* buffer, size_t 
     }
     return true;
 }
+#endif // DATA_UTILS_H
