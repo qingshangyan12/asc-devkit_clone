@@ -156,7 +156,9 @@ __aicore__ inline void CopyCbufToGmAlignV2(
 #endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
-    static_assert(SupportBytes<T, 1, 2>(), "fix copy only support type b8/b16 on current device");
+    ASCENDC_ASSERT((SupportBytes<T, 1, 2>()), {
+        KERNEL_LOG(KERNEL_ERROR, "fix copy only support type b8/b16 on current device");
+    });
 
     // ISA/API: Is the ND matrix number to be moved
     uint64_t ndNum = 1;
@@ -232,7 +234,9 @@ __aicore__ inline void DataCopyUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, const
 template <typename T>
 __aicore__ inline void DataCopyL12UBImpl(__ubuf__ T* dst, __cbuf__ T* src, const DataCopyParams& intriParams)
 {
-    static_assert(SupportBytes<T, 1, 2>(), "fix copy only support type b8/b16 on current device");
+    ASCENDC_ASSERT((SupportBytes<T, 1, 2>()), {
+        KERNEL_LOG(KERNEL_ERROR, "fix copy only support type b8/b16 on current device");
+    });
 
     constexpr uint32_t POS_LOOP3_SIZE = 40;
     constexpr uint32_t POS_MODE = 61;
@@ -442,7 +446,9 @@ __aicore__ inline void DataCopyGM2L1DN2NZImpl(
 template <typename T>
 __aicore__ inline void DataCopyL12GMNZ2NDImpl(__gm__ T* dst, __cbuf__ T* src, const Nz2NdParamsFull& intriParams)
 {
-    static_assert(SupportBytes<T, 1, 2>(), "fix copy only support type b8/b16 on current device");
+    ASCENDC_ASSERT((SupportBytes<T, 1, 2>()), {
+        KERNEL_LOG(KERNEL_ERROR, "fix copy only support type b8/b16 on current device");
+    });
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
     // ISA/API: Is the ND matrix number to be moved
@@ -501,7 +507,9 @@ __aicore__ inline void DataCopyL12GMNZ2NDImpl(__gm__ T* dst, __cbuf__ T* src, co
 template <typename T>
 __aicore__ inline void DataCopyL12UBNZ2NDImpl(__ubuf__ T* dst, __cbuf__ T* src, const Nz2NdParamsFull& intriParams)
 {
-    static_assert(SupportBytes<T, 1, 2>(), "fix copy only support type b8/b16 on current device");
+    ASCENDC_ASSERT((SupportBytes<T, 1, 2>()), {
+        KERNEL_LOG(KERNEL_ERROR, "fix copy only support type b8/b16 on current device");
+    });
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
     // ISA/API: Is the ND matrix number to be moved
@@ -567,7 +575,9 @@ __aicore__ inline void DataCopyUB2GMNZ2NDImpl(__gm__ T* dst, __ubuf__ T* src, co
 template <typename T>
 __aicore__ inline void DataCopyL12GMNZ2DNImpl(__gm__ T* dst, __cbuf__ T* src, const Nz2DnParamsFull& intriParams)
 {
-    static_assert(SupportBytes<T, 1, 2>(), "fix copy only support type b8/b16 on current device");
+    ASCENDC_ASSERT((SupportBytes<T, 1, 2>()), {
+        KERNEL_LOG(KERNEL_ERROR, "fix copy only support type b8/b16 on current device");
+    });
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
     // ISA/API: Is the ND matrix number to be moved
@@ -626,7 +636,9 @@ __aicore__ inline void DataCopyL12GMNZ2DNImpl(__gm__ T* dst, __cbuf__ T* src, co
 template <typename T>
 __aicore__ inline void DataCopyL12UBNZ2DNImpl(__ubuf__ T* dst, __cbuf__ T* src, const Nz2DnParamsFull& intriParams)
 {
-    static_assert(SupportBytes<T, 1, 2>(), "fix copy only support type b8/b16 on current device");
+    ASCENDC_ASSERT((SupportBytes<T, 1, 2>()), {
+        KERNEL_LOG(KERNEL_ERROR, "fix copy only support type b8/b16 on current device");
+    });
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
     // ISA/API: Is the ND matrix number to be moved
@@ -922,7 +934,9 @@ __aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, cons
 #endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
-    static_assert(SupportBytes<T, 1, 2>(), "fix copy only support type b8/b16 on current device");
+    ASCENDC_ASSERT((SupportBytes<T, 1, 2>()), {
+        KERNEL_LOG(KERNEL_ERROR, "fix copy only support type b8/b16 on current device");
+    });
 
     // ISA/API: Is the ND matrix number to be moved
     uint64_t ndNum = 1;
@@ -974,7 +988,9 @@ __aicore__ inline void DataCopyPadL12GMImpl(__gm__ T* dst, __cbuf__ T* src, cons
 #endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
-    static_assert(SupportBytes<T, 1, 2>(), "fix copy only support type b8/b16 on current device");
+    ASCENDC_ASSERT((SupportBytes<T, 1, 2>()), {
+        KERNEL_LOG(KERNEL_ERROR, "fix copy only support type b8/b16 on current device");
+    });
 
     // ISA/API: Is the ND matrix number to be moved
     uint64_t ndNum = 1;
