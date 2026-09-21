@@ -40,7 +40,7 @@ This sample uses softmax as an example to introduce tuning methods for in-row re
 
 - Computation rule:
 
-  Softmax is computed row by row, and rows are independent of each other. For each row: first compute the in-row maximum, then subtract the maximum from each element and apply the exponential function (to avoid overflow), sum the exponential results across the row, and finally divide each exponential value by the row sum to obtain the normalized output.
+  Softmax is computed row by row, and rows are independent of each other. For each row: first compute the in-row maximum, then subtract the maximum from each element and apply the exponential function, sum the exponential results across the row, and finally divide each exponential value by the row sum to obtain the normalized output.
 
 - Sample specifications:
 
@@ -66,7 +66,7 @@ This sample constructs an optimization path through three cases. The kernel, Thr
 | 1 | softmax_ub_kernel | Dynamically calculated based on the data size | 32 x rows_per_tile, adaptive to rows and UB capacity, up to 2048 | Input is moved to UB through MTE for staging. Double tile buffers are used in rotation so that movement and computation overlap |
 | 2 | softmax_bucket_kernel | Dynamically calculated based on the data size | 512/1024/2048 (dynamically selected based on the shape) | The compile-time bucket keeps intermediate values in fixed-length arrays in registers. UB is padded to the bucket width |
 
-The Thread Block count is dynamically calculated on the Host side based on the data size: the hardware AIV core count is first queried through `aclrtGetDeviceInfo(ACL_DEV_ATTR_VECTOR_CORE_NUM)`, and the smaller value between the AIV core count and rows is used as the Thread Block count. One Warp processes one row. In Case 0 and Case 1, the number of Warps actually launched per Thread Block adapts to rows: when rows are fewer than the AIV core count, each Thread Block processes only one row. In Case 2, each Thread Block processes a fixed number of rows: when rows are small, some Thread Blocks have no rows to process and exit directly. The three cases are selected through the build option `SCENARIO_NUM`, where 0, 1, and 2 correspond to Case 0, Case 1, and Case 2 respectively. The default value is 2.
+The Thread Block count is dynamically calculated on the Host side based on the data size: the hardware AIV core count is first queried through `aclrtGetDeviceInfo(ACL_DEV_ATTR_VECTOR_CORE_NUM)`, and the smaller value between the AIV core count and rows is used as the Thread Block count. One Warp processes one row. In Case 0 and Case 1, the number of Warps actually launched per Thread Block adapts to rows: when rows are fewer than the AIV core count, each Thread Block processes only one row. In Case 2, the UB buffers are static arrays whose dimensions are determined by the thread count and the bucket capacity, so they must be determined at compile time. Therefore, the thread count can only take the fixed levels 512/1024/2048, and the actually launched thread count equals the selected level; it cannot vary arbitrarily with rows. Each Thread Block processes a fixed number of rows: when rows are small, some Thread Blocks have no rows to process and exit directly. The three cases are selected through the build option `SCENARIO_NUM`, where 0, 1, and 2 correspond to Case 0, Case 1, and Case 2 respectively. The default value is 2.
 
 ### Performance Metrics
 
@@ -142,7 +142,7 @@ The `aiv_vec_ratio` of Case 0 reaches 0.960, and the time is concentrated on GM 
 
 **Core Implementation**:
 
-- Each Thread Block processes row data in tiles. The number of rows in a tile determines the number of Warps launched by one VF call (one Warp processes one row). The row count takes the minimum of the following three values: the rows assigned to this Thread Block, the maximum number of rows that the four tile buffers can hold within the UB capacity, and the 64 rows corresponding to the thread count limit of a single VF call.
+- Each Thread Block processes row data in tiles. The number of rows in a tile determines the number of Warps launched by one VF call (one Warp processes one row). The row count takes the minimum of the following three values: the rows assigned to this Thread Block, the maximum number of rows that the four tile buffers can hold within the UB capacity, and the 64 rows corresponding to the limit that one Thread Block launches at most 2048 threads (64 Warps).
 - The kernel divides the dynamic UB into two input tile buffers and two output tile buffers. The two buffer sets are used alternately by tile, and their lifecycles are managed by separate events.
 - MTE2 uses the two-dimensional movement of `asc_copy_gm2ub_align` to move each GM row into UB by the real cols, and MTE3 moves the result back to GM in the same way.
 - The SIMT VF still completes the max, exp/sum, and normalization in three passes on UB, with one Warp processing one row.
@@ -209,7 +209,7 @@ The computation time of Case 1 is mainly spent on how the in-row computation is 
 
 ### Case 2: Compile-Time Bucket and Dynamic Thread Selection
 
-**Optimization Goal**: Eliminate the repeated reads of the input row and the repeated computation of `exp` in the Case 1 in-row computation. The first step is to introduce a static array that caches the whole row from UB, so that one read completes the max, exp/sum, and normalization. The second step is to make the array stay in registers to further reduce the memory access overhead. To this end, the implementation converges to a compile-time bucket template: specialized kernels are generated by cols upper bound 64/128/256/384/512 so that the fixed-length array `elements[kWarpIterations]` stays in registers. The Host side dynamically selects the thread count based on the shape.
+**Optimization Goal**: Eliminate the repeated reads of the input row and the repeated computation of `exp` in the Case 1 in-row computation. The first step is to introduce a static array that caches the whole row from UB, so that one read completes the max, exp/sum, and normalization. The second step is to make the array stay in registers to further reduce the memory access overhead. To this end, the implementation converges to compile-time buckets: cols upper bounds 64/128/256/384/512 are divided into five levels, a fixed-length specialized kernel is generated for each level so that all in-row intermediate values stay in registers, and the Host side dynamically selects the thread count based on the shape.
 
 **Core Implementation**:
 
@@ -220,7 +220,7 @@ The computation time of Case 1 is mainly spent on how the in-row computation is 
 
 - Dynamic thread selection: the Host selects the thread count based on the rows per core. 512/1024/2048 threads correspond to at most 16/32/64 rows per tile. When `cols > 256`, considering register pressure, at most 1024 threads are launched.
 
-The SIMT VF reads the whole row into a fixed-length array and completes all computation in registers:
+The SIMT VF reads the elements assigned to each thread into a fixed-length array and completes all computation in registers:
 
 ```cpp
 template <uint32_t kThreadCount, uint32_t kBucketCols>
