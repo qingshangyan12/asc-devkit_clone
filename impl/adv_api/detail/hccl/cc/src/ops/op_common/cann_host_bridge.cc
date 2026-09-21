@@ -142,7 +142,9 @@ const CannSyms& LoadCannSyms()
 bool UseCannBridge(const OpParam& param)
 {
     return (param.engine == COMM_ENGINE_AICPU_TS || param.engine == COMM_ENGINE_AICPU) &&
-           (param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV || param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE);
+           (param.opType == HcclCMDType::HCCL_CMD_ALLTOALL || param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV ||
+            param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE ||
+            param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER); // 实验开关：RS 走 CANN bridge
 }
 
 HcclResult SelectViaCann(OpParam& ascParam, TopoInfoWithNetLayerDetails* ascTopo, std::string& algName)

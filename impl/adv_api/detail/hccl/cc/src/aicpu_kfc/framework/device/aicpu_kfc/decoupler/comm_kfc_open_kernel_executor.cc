@@ -178,7 +178,11 @@ HcclResult LaunchOpenOpParamDataImpl(
 
     CHK_RET(RestoreVarDataIfNeeded(*param, resCtx));
 
-    const bool useCannBridge = (param->opType == HCCL_CMD_ALLTOALLV || param->opType == HCCL_CMD_ALLREDUCE);
+    // 实验开关：与 cann_host_bridge.cc 的 UseCannBridge 保持 RS 一致（ALLTOALL 的 host/device
+    // 不对称是既有状态，此处不顺带改动）。
+    const bool useCannBridge =
+        (param->opType == HCCL_CMD_ALLTOALLV || param->opType == HCCL_CMD_ALLREDUCE ||
+         param->opType == HCCL_CMD_REDUCE_SCATTER);
     if (useCannBridge) {
         HcclResult cannRet = mc2_ops_hccl::RunWithMc2TaskCache(
             *param, resCtx, [&]() -> HcclResult { return mc2_ops_hccl::LaunchViaCann(*param, resCtx); });
