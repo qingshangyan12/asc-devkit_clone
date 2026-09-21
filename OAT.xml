@@ -23,7 +23,6 @@
                 <filteritem type="filename" name="*.h.txt" desc="generated source fixture file"/>
                 <filteritem type="filename" name="*.ini.txt" desc="generated configuration fixture file"/>
                 <filteritem type="filename" name="*.xml" desc="configuration or metadata file"/>
-                <filteritem type="filename" name="*.drawio" desc="diagram source file"/>
                 <filteritem type="filename" name="*.yaml" desc="configuration file"/>
                 <filteritem type="filename" name="*.yml" desc="configuration file"/>
                 <filteritem type="filename" name=".clang-format" desc="tool configuration file"/>
@@ -49,7 +48,6 @@
                 <filteritem type="filename" name="*.h.txt" desc="generated source fixture file"/>
                 <filteritem type="filename" name="*.ini.txt" desc="generated configuration fixture file"/>
                 <filteritem type="filename" name="*.xml" desc="configuration or metadata file"/>
-                <filteritem type="filename" name="*.drawio" desc="diagram source file"/>
                 <filteritem type="filename" name="*.yaml" desc="configuration file"/>
                 <filteritem type="filename" name="*.yml" desc="configuration file"/>
                 <filteritem type="filename" name=".clang-format" desc="tool configuration file"/>
