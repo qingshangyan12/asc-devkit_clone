@@ -409,9 +409,7 @@ EOF
             self.assertIn("multi_card_start cards=0 1 2 cases=5", result.stdout)
             self.assertIn(
                 f"project_root={root}",
-                (root / "out/full_card0/meta.txt")
-                .read_text(encoding="utf-8")
-                .splitlines(),
+                (root / "out/full_card0/meta.txt").read_text(encoding="utf-8").splitlines(),
             )
             self.assertIn(
                 "device=0",
@@ -658,9 +656,7 @@ EOF
             )
 
             self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertEqual(
-                capture.read_text(encoding="utf-8").splitlines(), ["-j16", "binary"]
-            )
+            self.assertEqual(capture.read_text(encoding="utf-8").splitlines(), ["-j16", "binary"])
 
 
 if __name__ == "__main__":

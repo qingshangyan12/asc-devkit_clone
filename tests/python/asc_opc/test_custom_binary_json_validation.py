@@ -111,15 +111,11 @@ def _check(tmp_path, content, modules):
     output_dir = tmp_path / "split"
     output_dir.mkdir()
     try:
-        generated_files = split_json_files(
-            str(path), str(output_dir), expected_op_type="AddCustomTemplate"
-        )
+        generated_files = split_json_files(str(path), str(output_dir), expected_op_type="AddCustomTemplate")
     except ValueError:
         return False
     path = generated_files[0]
-    return check_module.check_op_compilation_json(
-        opc_options.INPUT_PARAM, {opc_options.INPUT_PARAM: str(path)}
-    )[0]
+    return check_module.check_op_compilation_json(opc_options.INPUT_PARAM, {opc_options.INPUT_PARAM: str(path)})[0]
 
 
 def test_accepts_valid_custom_binary_dtype_and_format(tmp_path, custom_binary_modules):
@@ -142,9 +138,7 @@ def test_accepts_format_stored_as_tuple_constant(tmp_path, custom_binary_modules
         ("format", {"name": "ND"}),
     ],
 )
-def test_rejects_invalid_custom_binary_dtype_or_format(
-    tmp_path, custom_binary_modules, field, value
-):
+def test_rejects_invalid_custom_binary_dtype_or_format(tmp_path, custom_binary_modules, field, value):
     content = _valid_config()
     content["op_list"][0]["inputs"][0][field] = value
 
@@ -168,9 +162,7 @@ def test_rejects_invalid_dynamic_tensor_dtype(tmp_path, custom_binary_modules):
     assert _check(tmp_path, content, custom_binary_modules) is False
 
 
-def test_invalid_value_message_contains_file_and_field_path(
-    tmp_path, monkeypatch, custom_binary_modules
-):
+def test_invalid_value_message_contains_file_and_field_path(tmp_path, monkeypatch, custom_binary_modules):
     check_module, split_json_files, opc_options = custom_binary_modules
     content = _valid_config()
     content["op_list"][0]["outputs"][0]["format"] = "NOT_A_FORMAT"
@@ -197,9 +189,7 @@ def test_invalid_value_message_contains_file_and_field_path(
     assert "NOT_A_FORMAT" in error
 
 
-def test_invalid_value_message_keeps_original_op_index(
-    tmp_path, monkeypatch, custom_binary_modules
-):
+def test_invalid_value_message_keeps_original_op_index(tmp_path, monkeypatch, custom_binary_modules):
     check_module, split_json_files, opc_options = custom_binary_modules
     content = _valid_config()
     second_op = json.loads(json.dumps(content["op_list"][0]))
@@ -228,9 +218,7 @@ def test_invalid_value_message_keeps_original_op_index(
     assert "op_list[1].inputs[0].dtype" in logger.errors[-1]
 
 
-def test_standard_mode_keeps_existing_validation_behavior(
-    tmp_path, custom_binary_modules
-):
+def test_standard_mode_keeps_existing_validation_behavior(tmp_path, custom_binary_modules):
     content = _valid_config()
     del content["op_list"][0]["simplified_key"]
     content["op_list"][0]["inputs"][0]["dtype"] = "legacy_custom_dtype"
@@ -238,26 +226,20 @@ def test_standard_mode_keeps_existing_validation_behavior(
     assert _check(tmp_path, content, custom_binary_modules) is True
 
 
-def test_simplified_key_presence_enables_custom_validation(
-    tmp_path, custom_binary_modules
-):
+def test_simplified_key_presence_enables_custom_validation(tmp_path, custom_binary_modules):
     _, split_json_files, _ = custom_binary_modules
     content = _valid_config()
     path = tmp_path / "binary.json"
     path.write_text(json.dumps(content), encoding="utf-8")
 
-    generated_files = split_json_files(
-        str(path), str(tmp_path), expected_op_type="AddCustomTemplate"
-    )
+    generated_files = split_json_files(str(path), str(tmp_path), expected_op_type="AddCustomTemplate")
 
     with open(generated_files[0], "r", encoding="utf-8") as split_file:
         split_json = json.load(split_file)
     assert split_json["_ascendc_custom_binary_json"] == [str(path), 0]
 
 
-def test_simplified_key_presence_requires_key_for_every_binary(
-    tmp_path, custom_binary_modules
-):
+def test_simplified_key_presence_requires_key_for_every_binary(tmp_path, custom_binary_modules):
     _, split_json_files, _ = custom_binary_modules
     content = _valid_config()
     second_op = json.loads(json.dumps(content["op_list"][0]))
@@ -285,16 +267,12 @@ def test_simplified_key_presence_requires_key_for_every_binary(
         ),
     ],
 )
-def test_rejects_invalid_binary_json_structure(
-    tmp_path, custom_binary_modules, content, expected_error
-):
+def test_rejects_invalid_binary_json_structure(tmp_path, custom_binary_modules, content, expected_error):
     _, split_json_files, _ = custom_binary_modules
     path = tmp_path / "binary.json"
     path.write_text(json.dumps(content), encoding="utf-8")
 
-    with pytest.raises(
-        ValueError, match=expected_error.replace("[", r"\[").replace("]", r"\]")
-    ):
+    with pytest.raises(ValueError, match=expected_error.replace("[", r"\[").replace("]", r"\]")):
         split_json_files(
             str(path),
             str(tmp_path),
@@ -317,9 +295,7 @@ def test_rejects_duplicate_binary_filename(tmp_path, custom_binary_modules):
         )
 
 
-def test_rejects_binary_filename_without_op_type_prefix(
-    tmp_path, custom_binary_modules
-):
+def test_rejects_binary_filename_without_op_type_prefix(tmp_path, custom_binary_modules):
     _, split_json_files, _ = custom_binary_modules
     content = _valid_config()
     content["op_list"][0]["bin_filename"] = "Kernel_FP16"
@@ -354,9 +330,7 @@ def test_rejects_duplicate_simplified_key(tmp_path, custom_binary_modules):
         )
 
 
-def test_rejects_binary_filenames_with_same_output_name(
-    tmp_path, custom_binary_modules
-):
+def test_rejects_binary_filenames_with_same_output_name(tmp_path, custom_binary_modules):
     _, split_json_files, _ = custom_binary_modules
     content = _valid_config()
     second_op = json.loads(json.dumps(content["op_list"][0]))
@@ -379,9 +353,7 @@ def test_incremental_split_truncates_existing_json(tmp_path, custom_binary_modul
     output_dir = tmp_path / "split"
     output_dir.mkdir()
     path.write_text(json.dumps(_valid_config()), encoding="utf-8")
-    generated_files = split_json_files(
-        str(path), str(output_dir), expected_op_type="AddCustomTemplate"
-    )
+    generated_files = split_json_files(str(path), str(output_dir), expected_op_type="AddCustomTemplate")
 
     shorter_config = {
         "op_type": "AddCustomTemplate",

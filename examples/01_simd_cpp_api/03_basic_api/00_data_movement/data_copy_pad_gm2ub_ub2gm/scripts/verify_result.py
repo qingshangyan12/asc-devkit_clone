@@ -48,10 +48,7 @@ def verify_result(output, golden, scenarioNum=1):
         real_index = different_element_indexes[index]
         golden_data = golden.flatten()[real_index]
         output_data = output.flatten()[real_index]
-        print(
-            "data index: %06d, expected: %-.9f, actual: %-.9f"
-            % (real_index, golden_data, output_data)
-        )
+        print("data index: %06d, expected: %-.9f, actual: %-.9f" % (real_index, golden_data, output_data))
         if index == 100:
             break
 

@@ -235,13 +235,9 @@ def typenames_in_func_groups(func_sign_groups: Iterator[FuncSignGroup]) -> Set[s
     return set(typenames_in_func_signs(func_signs_in_groups(func_sign_groups)))
 
 
-def compose_mode_base(
-    func_group: FuncSignGroup, mode: CodeMode, base_key: int
-) -> FuncSignGroupWithModeBase:
+def compose_mode_base(func_group: FuncSignGroup, mode: CodeMode, base_key: int) -> FuncSignGroupWithModeBase:
     """Compose mode, base_key into FuncSignGroup."""
-    return FuncSignGroupWithModeBase(
-        func_group.filepath, func_group.func_signs, func_group.dump_info, mode, base_key
-    )
+    return FuncSignGroupWithModeBase(func_group.filepath, func_group.func_signs, func_group.dump_info, mode, base_key)
 
 
 def compose_mode_base_func_groups(
@@ -330,11 +326,7 @@ def parse_func_param(func_param: str) -> FuncParam:
         raise TooFewFuncParamParts()
 
     cce_global = CCE_GLOBAL == func_param_parts[0]
-    parts = tuple(
-        part
-        for part in func_param_parts
-        if part != CCE_GLOBAL and part not in FUNC_PARAM_SKIPS
-    )
+    parts = tuple(part for part in func_param_parts if part != CCE_GLOBAL and part not in FUNC_PARAM_SKIPS)
 
     return FuncParam(parts, cce_global=cce_global)
 
@@ -344,35 +336,23 @@ def match_tiling_struct(func_param: FuncParam, structs: Dict[str, StructRaw]) ->
     return not func_param.cce_global and get_func_param_type(func_param) in structs
 
 
-def parse_func_signature(
-    func_sign_str: Tuple[str, str], structs: Dict[str, StructRaw]
-) -> FuncSign:
+def parse_func_signature(func_sign_str: Tuple[str, str], structs: Dict[str, StructRaw]) -> FuncSign:
     """
     Parse function signature. Return FuncSing struct.
     """
     func_template_decl = func_sign_str[0]
     return_type, func_name, func_params = parse_func_signature_parts(func_sign_str[1])
     if func_params == "":
-        return FuncSign(
-            return_type, func_name, func_template_decl, tuple(), tuple(), tuple()
-        )
+        return FuncSign(return_type, func_name, func_template_decl, tuple(), tuple(), tuple())
     func_params = tuple(map(parse_func_param, split_func_params(func_params)))
     # any struct arg could be tiling struct
     for idx, func_param in enumerate(func_params):
         if match_tiling_struct(func_param, structs):
-            func_params = (
-                func_params[:idx]
-                + (func_params[idx]._replace(tiling_struct=True),)
-                + func_params[idx + 1 :]
-            )
-    return FuncSign(
-        return_type, func_name, func_template_decl, tuple(), tuple(), func_params
-    )
+            func_params = func_params[:idx] + (func_params[idx]._replace(tiling_struct=True),) + func_params[idx + 1 :]
+    return FuncSign(return_type, func_name, func_template_decl, tuple(), tuple(), func_params)
 
 
-def parse_func_signature_by_source(
-    data: str, structs: Dict[str, StructRaw]
-) -> Iterator[FuncSign]:
+def parse_func_signature_by_source(data: str, structs: Dict[str, StructRaw]) -> Iterator[FuncSign]:
     """Parse function signature by source code.
     Return iterator of function signature.
     """
@@ -387,9 +367,7 @@ def find_kernel_type_by_source(path: str, data: str, build_mode: str) -> CodeMod
     is_c310 = build_mode == "c310"
     is_m200 = build_mode == "m200"
     is_v220 = build_mode == "c220"
-    match = re.search(
-        r"__enable_feature_for_compile_default\s*=\s*([0-9a-zA-Z_]{1,})\s*;", data
-    )
+    match = re.search(r"__enable_feature_for_compile_default\s*=\s*([0-9a-zA-Z_]{1,})\s*;", data)
     if match:
         kernel_type = match.group(1)
         if (kernel_type in STR_TO_KERNEL_TYPE_V200) and is_m200:
@@ -399,9 +377,7 @@ def find_kernel_type_by_source(path: str, data: str, build_mode: str) -> CodeMod
         elif (kernel_type in STR_TO_KERNEL_TYPE_C310) and is_c310:
             return STR_TO_KERNEL_TYPE_C310[kernel_type]
         else:
-            print(
-                f"[WARNING]: {kernel_type} in path: {path} do not support in soc {build_mode}!"
-            )
+            print(f"[WARNING]: {kernel_type} in path: {path} do not support in soc {build_mode}!")
             if is_v220 or is_c310:
                 return None
             else:
@@ -413,9 +389,7 @@ def find_kernel_type_by_source(path: str, data: str, build_mode: str) -> CodeMod
             return CodeMode.AIC
 
 
-def parse_func_signature_group_by_source(
-    path: str, data: str, build_mode: str
-) -> FuncSignGroup:
+def parse_func_signature_group_by_source(path: str, data: str, build_mode: str) -> FuncSignGroup:
     """Parse function signature group by source."""
     structs = map_structs_to_dict(cut_struct(data))
     func_signs = list(parse_func_signature_by_source(data, structs))
@@ -437,9 +411,7 @@ def parse_func_signature_group_by_source(
     return FuncSignGroup(path, func_signs, dump_info, kernel_type, structs)
 
 
-def parse_func_signature_by_filepaths(
-    filepaths: List[str], build_mode: str
-) -> Iterator[FuncSignGroup]:
+def parse_func_signature_by_filepaths(filepaths: List[str], build_mode: str) -> Iterator[FuncSignGroup]:
     """Parse function signature by source file paths.
     Return iterator of function signature.
     """
@@ -447,9 +419,7 @@ def parse_func_signature_by_filepaths(
         try:
             with open(path, encoding="utf-8") as file:
                 data = file.read()
-                func_sign_group = parse_func_signature_group_by_source(
-                    path, data, build_mode
-                )
+                func_sign_group = parse_func_signature_group_by_source(path, data, build_mode)
                 yield func_sign_group
         except Exception as err:
             print("[ERROR]: read file failed, filename is: {}".format(path))
@@ -475,9 +445,7 @@ def convert_to_void(param_type: str) -> str:
     return "void"
 
 
-def convert_param_parts_type(
-    parts: Tuple[str, ...], convert_func: Callable[[str], str]
-) -> Tuple[str, ...]:
+def convert_param_parts_type(parts: Tuple[str, ...], convert_func: Callable[[str], str]) -> Tuple[str, ...]:
     """Convert type in function parameter parts."""
     idx, param_type = get_func_param_type_by_parts(parts)
     new_param_type = convert_func(param_type)
@@ -520,9 +488,7 @@ def tiling_add_pointer(func_param: FuncParam) -> FuncParam:
     """Tiling parameter type add pointer."""
     if func_param.tiling_struct:
         idx, param_type = get_func_param_type_and_idx(func_param)
-        parts = (
-            func_param.parts[:idx] + (f"{param_type}*",) + func_param.parts[idx + 1 :]
-        )
+        parts = func_param.parts[:idx] + (f"{param_type}*",) + func_param.parts[idx + 1 :]
         return func_param._replace(parts=parts)
     return func_param
 
@@ -534,9 +500,7 @@ def tiling_remove_pointer(func_param: FuncParam) -> FuncParam:
         if not param_type.endswith("*"):
             return func_param
 
-        parts = (
-            func_param.parts[:idx] + (param_type[:-1],) + func_param.parts[idx + 1 :]
-        )
+        parts = func_param.parts[:idx] + (param_type[:-1],) + func_param.parts[idx + 1 :]
         return func_param._replace(parts=parts)
     return func_param
 
@@ -559,9 +523,7 @@ def tiling_add_reference(func_param: FuncParam) -> FuncParam:
     """Tiling parameter type add reference."""
     if func_param.tiling_struct:
         idx, param_type = get_func_param_type_and_idx(func_param)
-        parts = (
-            func_param.parts[:idx] + (f"{param_type}&",) + func_param.parts[idx + 1 :]
-        )
+        parts = func_param.parts[:idx] + (f"{param_type}&",) + func_param.parts[idx + 1 :]
         return func_param._replace(parts=parts)
     return func_param
 
@@ -573,16 +535,12 @@ def tiling_remove_reference(func_param: FuncParam) -> FuncParam:
         if not param_type.endswith("&"):
             return func_param
 
-        parts = (
-            func_param.parts[:idx] + (param_type[:-1],) + func_param.parts[idx + 1 :]
-        )
+        parts = func_param.parts[:idx] + (param_type[:-1],) + func_param.parts[idx + 1 :]
         return func_param._replace(parts=parts)
     return func_param
 
 
-def tiling_add_ref_or_ptr_func_params(
-    func_sign: FuncSign, func_params: Tuple[FuncParam, ...]
-) -> Tuple[FuncParam, ...]:
+def tiling_add_ref_or_ptr_func_params(func_sign: FuncSign, func_params: Tuple[FuncParam, ...]) -> Tuple[FuncParam, ...]:
     """Add reference for template func sign, add pointer for normal func sign at tiling parameter."""
     if func_sign.func_template_decl:
         return tuple(map(tiling_add_reference, func_params))
@@ -600,13 +558,9 @@ def tiling_remove_ref_or_ptr_func_params(
         return tuple(map(tiling_remove_pointer, func_params))
 
 
-def replace_func_param_stream(
-    func_params: Tuple[FuncParam, ...], stream_name: str
-) -> Tuple[FuncParam, ...]:
+def replace_func_param_stream(func_params: Tuple[FuncParam, ...], stream_name: str) -> Tuple[FuncParam, ...]:
     """Replace stream param type."""
-    new_func_params = (func_params[0], FuncParam(("void*", stream_name))) + func_params[
-        2:
-    ]
+    new_func_params = (func_params[0], FuncParam(("void*", stream_name))) + func_params[2:]
     return new_func_params
 
 
@@ -617,9 +571,7 @@ def remove_added_func_params(
     return func_params[2:]
 
 
-def add_ffts_addr_func_param_by_mode(
-    mode: CodeMode, func_params: Tuple[FuncParam, ...]
-) -> Iterator[FuncParam]:
+def add_ffts_addr_func_param_by_mode(mode: CodeMode, func_params: Tuple[FuncParam, ...]) -> Iterator[FuncParam]:
     """Add ffts_addr function parameter by mode."""
     if mode in (
         CodeMode.MIX,
@@ -660,14 +612,9 @@ def trans_func_sign(func_sign: FuncSign) -> FuncSign:
     """Transform function signature.
     convert function parameters type, add function parameters, etc.
     """
-    func_params = tuple(
-        convert_func_param_cce_param_type(func_param)
-        for func_param in func_sign.func_params
-    )
+    func_params = tuple(convert_func_param_cce_param_type(func_param) for func_param in func_sign.func_params)
 
-    new_func_params = tiling_add_ref_or_ptr_func_params(
-        func_sign, add_block_num_and_stream_func_params(func_params)
-    )
+    new_func_params = tiling_add_ref_or_ptr_func_params(func_sign, add_block_num_and_stream_func_params(func_params))
     new_func_name = add_aclrt_prefix_snake(func_sign.func_name)
     return func_sign._replace(
         return_type="uint32_t",
@@ -691,16 +638,12 @@ def trans_func_sign_group(func_sign_group: FuncSignGroup) -> FuncSignGroup:
 import subprocess
 
 
-def get_func_template_specialization_mangle_name(
-    src_file: str, kernel_sign: str
-) -> str:
+def get_func_template_specialization_mangle_name(src_file: str, kernel_sign: str) -> str:
     if not os.path.isfile(src_file):
         return False, "", f"file {src_file} doesn't exist."
 
     objdump_cmd = ["llvm-objdump", "-tC", src_file]
-    proc = subprocess.run(
-        objdump_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, check=False
-    )
+    proc = subprocess.run(objdump_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, check=False)
     out = proc.stdout.decode()
 
     if proc.returncode != 0:
@@ -712,9 +655,7 @@ def get_func_template_specialization_mangle_name(
     return True, matches, ""
 
 
-def add_template_specialization_args(
-    func_sign: FuncSign, aiv_o: str, aic_o: str
-) -> FuncSign:
+def add_template_specialization_args(func_sign: FuncSign, aiv_o: str, aic_o: str) -> FuncSign:
     """Add function template specialization args."""
     if func_sign.func_template_decl:
         ret, tmp_spec_names, err_msg = get_func_template_specialization_mangle_name(
@@ -735,9 +676,7 @@ def add_template_specialization_args(
     return func_sign
 
 
-def get_func_sign_template_specialization_args(
-    func_sign_group: FuncSignGroup, aiv_o: str, aic_o: str
-):
+def get_func_sign_template_specialization_args(func_sign_group: FuncSignGroup, aiv_o: str, aic_o: str):
     func_signs = tuple(
         map(
             lambda x: add_template_specialization_args(x, aiv_o, aic_o),
@@ -828,17 +767,11 @@ def generate_kernel_header_code(func_sign: FuncSign) -> str:
 
     template_parts = func_sign.func_template_decl.split(",")
 
-    func_sign_str_hold = (
-        f"inline {func_sign_to_string(replace_func_void_param(new_func_sign, 'hold'))}"
-    )
+    func_sign_str_hold = f"inline {func_sign_to_string(replace_func_void_param(new_func_sign, 'hold'))}"
     func_template_var_names = ""
     if func_sign.func_template_decl:
-        func_sign_str_hold = (
-            f"template<{func_sign.func_template_decl}>\n{func_sign_str_hold}"
-        )
-        func_template_var_names = (
-            f"<{extract_variable_names(func_sign.func_template_decl)}>"
-        )
+        func_sign_str_hold = f"template<{func_sign.func_template_decl}>\n{func_sign_str_hold}"
+        func_template_var_names = f"<{extract_variable_names(func_sign.func_template_decl)}>"
 
     struct_pre_declaration = ""
     for func_param in tiling_remove_ref_or_ptr_func_params(
@@ -871,9 +804,7 @@ def indent_code(code: str, indent: str = "    "):
     return re.sub(r"^(?=.+)", indent, code, flags=re.MULTILINE)
 
 
-def generate_args_declare_code(
-    mode: CodeMode, func_params: Tuple[FuncParam, ...]
-) -> str:
+def generate_args_declare_code(mode: CodeMode, func_params: Tuple[FuncParam, ...]) -> str:
     """Generate args declare code."""
     buff = io.StringIO()
     buff.write("struct {\n")
@@ -882,12 +813,8 @@ def generate_args_declare_code(
     for func_param in add_ffts_addr_func_param_by_mode(mode, func_params):
         param_type = get_func_param_type(func_param)
         param_name = get_func_param_name(func_param)
-        buff.write(
-            f"    alignas(((alignof({param_type}) + 3) >> 2) << 2) {param_type} {param_name};\n"
-        )
-    buff.write(
-        "    alignas(((alignof(void*) + 3) >> 2) << 2) void* __ascendc_overflow;\n"
-    )
+        buff.write(f"    alignas(((alignof({param_type}) + 3) >> 2) << 2) {param_type} {param_name};\n")
+    buff.write("    alignas(((alignof(void*) + 3) >> 2) << 2) void* __ascendc_overflow;\n")
     buff.write("} __ascendc_args;\n")
     return buff.getvalue()
 
@@ -907,9 +834,7 @@ if (__ascendc_ret != 0) {
 def generate_args_assign_code(mode: CodeMode, func_sign: FuncSign) -> str:
     """Generate args assign code."""
     buff = io.StringIO()
-    for func_param in add_ffts_addr_func_param_by_mode(
-        mode, remove_added_func_params(func_sign.func_params)
-    ):
+    for func_param in add_ffts_addr_func_param_by_mode(mode, remove_added_func_params(func_sign.func_params)):
         param_name = get_func_param_name(func_param)
         if func_sign.func_template_decl:
             param_name_ptr = f"&{param_name}"
@@ -926,9 +851,7 @@ def generate_args_assign_code(mode: CodeMode, func_sign: FuncSign) -> str:
     return buff.getvalue()
 
 
-def generate_launch_kernel_code(
-    mode: CodeMode, func_key: int, block_num: str, stream: str
-) -> str:
+def generate_launch_kernel_code(mode: CodeMode, func_key: int, block_num: str, stream: str) -> str:
     """Generate LaunchAscendKernel code."""
     buff = io.StringIO()
 
@@ -984,9 +907,7 @@ def generate_launch_kernel_code(
     return buff.getvalue()
 
 
-def generate_aclrtlaunch_for_normal(
-    func_sign: FuncSign, func_key: int, mode: CodeMode
-) -> str:
+def generate_aclrtlaunch_for_normal(func_sign: FuncSign, func_key: int, mode: CodeMode) -> str:
     param_names = tuple(get_param_names_by_func_sign(func_sign))
     block_num_name = param_names[0]
     stream_name = param_names[1]
@@ -1002,13 +923,9 @@ uint32_t launch_and_profiling_{name}(uint64_t func_key, uint32_t {block_num_name
     }}
     '''
 
-    launch_code += generate_launch_kernel_code(
-        mode, func_key, block_num_name, stream_name
-    )
+    launch_code += generate_launch_kernel_code(mode, func_key, block_num_name, stream_name)
     launch_code += "    if (profStatus) {\n"
-    launch_code += (
-        f"        ReportAscendProf(name, {block_num_name}, {mode.value}, startTime);\n"
-    )
+    launch_code += f"        ReportAscendProf(name, {block_num_name}, {mode.value}, startTime);\n"
     launch_code += "    }\n"
     launch_code += "    return ret;\n"
     launch_code += "}\n\n"
@@ -1054,31 +971,23 @@ def generate_func_impl_code(func_sign: FuncSign, func_key: int, mode: CodeMode) 
     new_func_params = func_sign.func_params
     if func_sign.func_template_decl:
         # set start index 2 to skip numBlocks and stream definitions
-        new_func_params = replace_func_params_with_specialization_typename(
-            func_sign, dehash_template_id(func_key), 2
-        )
+        new_func_params = replace_func_params_with_specialization_typename(func_sign, dehash_template_id(func_key), 2)
         new_func_params = tiling_add_ref_or_ptr_func_params(func_sign, new_func_params)
 
-        func_params_str = ", ".join(
-            map(partial(func_param_to_string, with_cce_attr=False), new_func_params)
-        )
+        func_params_str = ", ".join(map(partial(func_param_to_string, with_cce_attr=False), new_func_params))
         func_declare_code = f"""
 template<>
 {func_sign.return_type} {func_sign.func_name}\
 <{func_sign.func_template_specialization_args[dehash_template_id(func_key)]}>({func_params_str})"""
     else:
-        func_declare_code = add_extern_c(
-            func_sign_to_string(func_sign, "", "", False, False)
-        )
+        func_declare_code = add_extern_c(func_sign_to_string(func_sign, "", "", False, False))
 
     buff.write(f"{func_declare_code}\n")
     buff.write("{\n")
     args_declare_code = indent_code(
         generate_args_declare_code(
             mode,
-            tiling_remove_ref_or_ptr_func_params(
-                func_sign, remove_added_func_params(new_func_params)
-            ),
+            tiling_remove_ref_or_ptr_func_params(func_sign, remove_added_func_params(new_func_params)),
         )
     )
     buff.write(args_declare_code)
@@ -1152,9 +1061,7 @@ def remove_comments(code: str) -> str:
     return COMMENT.sub("", code)
 
 
-def has_mode_in_func_groups(
-    mode: CodeMode, func_groups: Iterator[FuncSignGroupWithModeBase]
-) -> bool:
+def has_mode_in_func_groups(mode: CodeMode, func_groups: Iterator[FuncSignGroupWithModeBase]) -> bool:
     """Has mode in function groups."""
     return any(map(lambda x: x.mode == mode, func_groups))
 
@@ -1250,17 +1157,13 @@ template<>
     printf("[%s:%s]\n", __FILE__, __FUNCTION__);
     AscendC::SetKernelMode(KernelMode::""")
     buff.write(f"{kernelType});\n")
-    buff.write(
-        f"    ICPU_RUN_KF({kernel_name}, {block_num_name}, {', '.join(format_params(new_func_sign)[2:])});\n"
-    )
+    buff.write(f"    ICPU_RUN_KF({kernel_name}, {block_num_name}, {', '.join(format_params(new_func_sign)[2:])});\n")
     buff.write("    return 1;\n")
     buff.write("}")
     return buff.getvalue()
 
 
-def generate_host_stub_code_cpu(
-    func_groups: List[FuncSignGroupWithModeBase], type_definition: str
-) -> str:
+def generate_host_stub_code_cpu(func_groups: List[FuncSignGroupWithModeBase], type_definition: str) -> str:
     """Generate host_stub.cpp code for cpu."""
     buff = io.StringIO()
     buff.write(generate_host_stub_head_code_cpu())
@@ -1277,19 +1180,13 @@ def generate_host_stub_code_cpu(
             func_param_str = ""
             kernel_sign_name = kernel_name
             if func_sign.func_template_decl:
-                for template_id, _ in enumerate(
-                    new_func_sign.func_template_specialization_args, 0
-                ):
+                for template_id, _ in enumerate(new_func_sign.func_template_specialization_args, 0):
                     kernel_sign_name = f"{kernel_name}_template_{template_id}"
                     template_key = get_template_hash_tiling_key(template_id, key)
-                    specialized_params = (
-                        replace_func_params_with_specialization_typename(
-                            new_func_sign, dehash_template_id(template_key), 2
-                        )
+                    specialized_params = replace_func_params_with_specialization_typename(
+                        new_func_sign, dehash_template_id(template_key), 2
                     )
-                    new_params = tiling_add_ref_or_ptr_func_params(
-                        func_sign, specialized_params
-                    )
+                    new_params = tiling_add_ref_or_ptr_func_params(func_sign, specialized_params)
                     func_param_str = ", ".join(
                         map(
                             partial(func_param_to_string, with_cce_attr=False),
@@ -1297,19 +1194,13 @@ def generate_host_stub_code_cpu(
                         )
                     )
                     kernel_sign = f"extern void {kernel_sign_name}({func_sign.func_params_specialization_args[0]});\n"
-                    func_tmp_sign = func_sign_to_string(
-                        new_func_sign, "", "", False, False
-                    )
-                    aclrt_sign = (
-                        f"{generate_auto_gen_func_sign(func_sign, func_tmp_sign)};"
-                    )
+                    func_tmp_sign = func_sign_to_string(new_func_sign, "", "", False, False)
+                    aclrt_sign = f"{generate_auto_gen_func_sign(func_sign, func_tmp_sign)};"
             else:
                 new_params = tiling_remove_ref_or_ptr_func_params(
                     func_sign, remove_added_func_params(func_sign.func_params)
                 )
-                func_param_str = ", ".join(
-                    map(partial(func_param_to_string, with_cce_attr=False), new_params)
-                )
+                func_param_str = ", ".join(map(partial(func_param_to_string, with_cce_attr=False), new_params))
                 kernel_sign = f'extern "C" void {kernel_name}({func_param_str});\n'
             buff.write(type_definition)
             buff.write("\n")
@@ -1328,9 +1219,7 @@ def generate_host_stub_code_cpu(
     return remove_comments(buff.getvalue())
 
 
-def generate_host_stub_code(
-    func_groups: List[FuncSignGroupWithModeBase], type_definition: str
-) -> str:
+def generate_host_stub_code(func_groups: List[FuncSignGroupWithModeBase], type_definition: str) -> str:
     """Generate host_stub.cpp code."""
     has_mode_func = partial(has_mode_in_func_groups, func_groups=func_groups)
     has_mix = (
@@ -1363,9 +1252,7 @@ def generate_host_stub_code(
             buff.write("\n")
 
             # use void* stream in host_stub.cpp
-            normal_launch_code = generate_aclrtlaunch_for_normal(
-                func_sign, key, func_group.mode
-            )
+            normal_launch_code = generate_aclrtlaunch_for_normal(func_sign, key, func_group.mode)
             buff.write(normal_launch_code)
 
             param_names = tuple(get_param_names_by_func_sign(func_sign))
@@ -1374,23 +1261,15 @@ def generate_host_stub_code(
             new_func_sign = replace_func_sign_stream_param(func_sign, stream_name)
 
             if new_func_sign.func_template_decl:
-                func_template_declare_code = (
-                    f"template<{new_func_sign.func_template_decl}>\n\
+                func_template_declare_code = f"template<{new_func_sign.func_template_decl}>\n\
 {func_sign_to_string(new_func_sign, '', '', False, False)};"
-                )
                 buff.write(f"{func_template_declare_code}\n")
-                for template_id, _ in enumerate(
-                    new_func_sign.func_template_specialization_args, 0
-                ):
+                for template_id, _ in enumerate(new_func_sign.func_template_specialization_args, 0):
                     template_key = get_template_hash_tiling_key(template_id, key)
-                    func_impl_code = generate_func_impl_code(
-                        new_func_sign, template_key, func_group.mode
-                    )
+                    func_impl_code = generate_func_impl_code(new_func_sign, template_key, func_group.mode)
                     buff.write(func_impl_code)
             else:
-                func_impl_code = generate_func_impl_code(
-                    new_func_sign, key, func_group.mode
-                )
+                func_impl_code = generate_func_impl_code(new_func_sign, key, func_group.mode)
                 buff.write(func_impl_code)
 
     return remove_comments(buff.getvalue())
@@ -1422,9 +1301,7 @@ def get_ket_name(name: str):
     return name_map[name]
 
 
-def get_base_keys(
-    func_groups: Iterator[FuncSignGroup], modes: Iterator[CodeMode]
-) -> Iterator[int]:
+def get_base_keys(func_groups: Iterator[FuncSignGroup], modes: Iterator[CodeMode]) -> Iterator[int]:
     """Get base keys."""
     cnt = {"AIC": 0, "AIV": 0, "MIX": 0, "NORMAL": 0, "MIX_VECTOR_CORE": 0}
     for func_group, mode in zip(func_groups, modes):
@@ -1484,9 +1361,7 @@ def do_save_commands(save_commands: Iterator[Tuple[str, str]]):
     tuple(map(do_save_command, save_commands))
 
 
-def generate_save_stub_header_commands(
-    func_signs: Iterator[FuncSign], dst_dir: str
-) -> Iterator[Tuple[str, str]]:
+def generate_save_stub_header_commands(func_signs: Iterator[FuncSign], dst_dir: str) -> Iterator[Tuple[str, str]]:
     """Generate save stub header commands."""
     triple_chevrons_func_headers = ""
     for func_sign in func_signs:
@@ -1609,11 +1484,7 @@ def get_all_sources(func_groups: List[FuncSignGroup], source_mapping, dst_dir: s
         os.path.join(
             dst_dir,
             trans_device_cpp_filename(
-                os.path.basename(
-                    get_preprocessed_source_filepath(
-                        func_group.filepath, source_mapping
-                    )
-                )
+                os.path.basename(get_preprocessed_source_filepath(func_group.filepath, source_mapping))
             ),
         )
         for func_group in func_groups
@@ -1653,36 +1524,24 @@ def source_properties(
         for idx, func_sign in enumerate(func_group.func_signs, func_group.base_key):
             compile_section = ""
             if func_sign.func_template_decl:
-                for template_id, _ in enumerate(
-                    func_sign.func_template_specialization_args, 0
-                ):
+                for template_id, _ in enumerate(func_sign.func_template_specialization_args, 0):
                     template_func_name = f"{func_sign.func_name}_template_{template_id}"
-                    compile_section += (
-                        f";{add_auto_gen_prefix_and_kernel_suffix(template_func_name)}="
-                    )
+                    compile_section += f";{add_auto_gen_prefix_and_kernel_suffix(template_func_name)}="
                     template_key = get_template_hash_tiling_key(template_id, idx)
                     if generate_definition:
                         if RUN_MODE == "cpu":
-                            compile_section += (
-                                f"{func_sign.func_name}_template_{template_key}{suffix}"
-                            )
+                            compile_section += f"{func_sign.func_name}_template_{template_key}{suffix}"
                         else:
-                            compile_section += (
-                                f"{func_sign.func_name}_{template_key}{suffix}"
-                            )
+                            compile_section += f"{func_sign.func_name}_{template_key}{suffix}"
                     else:
                         compile_section += f"{func_sign.func_name}{suffix}"
             else:
-                compile_section += (
-                    f";{add_auto_gen_prefix_and_kernel_suffix(func_sign.func_name)}="
-                )
+                compile_section += f";{add_auto_gen_prefix_and_kernel_suffix(func_sign.func_name)}="
                 if generate_definition:
                     compile_section += f"{func_sign.func_name}_{idx}{suffix}"
                 else:
                     compile_section += f"{func_sign.func_name}{suffix}"
-            compile_section += (
-                f";ONE_CORE_DUMP_SIZE={str(func_group.dump_info['dump_size'])}"
-            )
+            compile_section += f";ONE_CORE_DUMP_SIZE={str(func_group.dump_info['dump_size'])}"
             if func_group.mode.value >= 9 and func_group.mode.value <= 10:
                 compile_section += f";{MIX_CORE_MACRO}={1}"
             if is_one_to_one:
@@ -1723,11 +1582,7 @@ def generate_normal_config_content(
 ) -> str:
     """Generate normal_config.cmake content."""
     all_sources = get_all_sources(func_groups, source_mapping, dst_dir)
-    all_definitions = list(
-        source_properties(
-            func_groups, all_sources, CodeMode.NORMAL, generate_definition
-        )
-    )
+    all_definitions = list(source_properties(func_groups, all_sources, CodeMode.NORMAL, generate_definition))
 
     return generate_config_content(
         [
@@ -1750,12 +1605,8 @@ def generate_aic_config_content(
 
     all_definitions = list(
         chain(
-            source_properties(
-                mix_groups, mix_sources, CodeMode.AIC, generate_definition
-            ),
-            source_properties(
-                aic_groups, aic_sources, CodeMode.AIC, generate_definition
-            ),
+            source_properties(mix_groups, mix_sources, CodeMode.AIC, generate_definition),
+            source_properties(aic_groups, aic_sources, CodeMode.AIC, generate_definition),
         )
     )
 
@@ -1781,12 +1632,8 @@ def generate_aiv_config_content(
 
     all_definitions = list(
         chain(
-            source_properties(
-                mix_groups, mix_sources, CodeMode.AIV, generate_definition
-            ),
-            source_properties(
-                aiv_groups, aiv_sources, CodeMode.AIV, generate_definition
-            ),
+            source_properties(mix_groups, mix_sources, CodeMode.AIV, generate_definition),
+            source_properties(aiv_groups, aiv_sources, CodeMode.AIV, generate_definition),
         )
     )
 
@@ -1808,9 +1655,7 @@ def save_normal_config_cmake(
     """Save normal_config.cmake."""
     save_file(
         get_normal_config_filepath(dst_dir),
-        generate_normal_config_content(
-            func_groups, source_mapping, dst_dir, generate_definition
-        ),
+        generate_normal_config_content(func_groups, source_mapping, dst_dir, generate_definition),
     )
 
 
@@ -1826,9 +1671,7 @@ def save_v200_config_cmake(
     mix_func_groups = mode_groups.get(CodeMode.MIX_VECTOR_CORE, [])
 
     if mix_func_groups:
-        aiv_content = generate_aiv_config_content(
-            mix_func_groups, [], source_mapping, dst_dir, generate_definition
-        )
+        aiv_content = generate_aiv_config_content(mix_func_groups, [], source_mapping, dst_dir, generate_definition)
     else:
         aiv_content = ""
     save_file(get_aiv_config_filepath(dst_dir), aiv_content)
@@ -1846,16 +1689,12 @@ def save_v200_config_cmake(
     save_file(get_aic_config_filepath(dst_dir), aic_content)
 
 
-def generate_host_config_content(
-    func_groups: List[FuncSignGroupWithBase], source_mapping
-) -> str:
+def generate_host_config_content(func_groups: List[FuncSignGroupWithBase], source_mapping) -> str:
     """Generate host_config.cmake content."""
     buff = io.StringIO()
 
     for func_group in func_groups:
-        buff.write(
-            f"set_source_files_properties({source_mapping[func_group.filepath]}\n"
-        )
+        buff.write(f"set_source_files_properties({source_mapping[func_group.filepath]}\n")
         buff.write("    PROPERTIES COMPILE_DEFINITIONS ")
         buff.write(f'"ONE_CORE_DUMP_SIZE={str(func_group.dump_info["dump_size"])}"\n')
         buff.write(")\n")
@@ -1863,9 +1702,7 @@ def generate_host_config_content(
     return buff.getvalue()
 
 
-def save_host_config_cmake(
-    func_groups: List[FuncSignGroupWithBase], source_mapping, dst_dir: str
-):
+def save_host_config_cmake(func_groups: List[FuncSignGroupWithBase], source_mapping, dst_dir: str):
     """Save host_config.cmake."""
     save_file(
         get_host_config_filepath(dst_dir),
@@ -1987,16 +1824,10 @@ def get_ktype_section_variable(
         CodeMode.MIX,
     ):
         if "mix_aic" in variable_name:
-            section_var += (
-                "#if defined(__DAV_C220_CUBE__) || defined(__DAV_C310_CUBE__)\n"
-            )
+            section_var += "#if defined(__DAV_C220_CUBE__) || defined(__DAV_C310_CUBE__)\n"
         elif "mix_aiv" in variable_name:
-            section_var += (
-                "#if defined(__DAV_C220_VEC__) || defined(__DAV_C310_VEC__)\n"
-            )
-    section_var += (
-        f"static const struct {type_struc_name} {variable_name} __attribute__ "
-    )
+            section_var += "#if defined(__DAV_C220_VEC__) || defined(__DAV_C310_VEC__)\n"
+    section_var += f"static const struct {type_struc_name} {variable_name} __attribute__ "
     section_var += f'((used, section (".ascend.meta.{section_func_name}"))) = '
     section_var += f"{{ {{ {{{get_func_meta_type(func_meta_type)}, sizeof(unsigned int)}}, {k_type}}}"
     if func_code_mode == CodeMode.KERNEL_TYPE_MIX_AIV_1_0:
@@ -2019,9 +1850,7 @@ def get_ktype_section_variable(
     return section_var
 
 
-def gen_ktype_section(
-    func_sign: FuncSign, base_key: int, genmode: CodeMode, generate_ktype_section: bool
-) -> str:
+def gen_ktype_section(func_sign: FuncSign, base_key: int, genmode: CodeMode, generate_ktype_section: bool) -> str:
     cur_kernel_name = func_sign.func_name
     section = ""
     if not generate_ktype_section:
@@ -2110,9 +1939,7 @@ def _generate_matmul_clear_source(is_mix: bool) -> str:
     return ""
 
 
-def _generate_sub_source(
-    func_group: FuncSignGroupWithModeBase, is_mix: bool, param_names
-):
+def _generate_sub_source(func_group: FuncSignGroupWithModeBase, is_mix: bool, param_names):
     source = ""
     if not RUN_MODE == "cpu":
         source += _generate_ffts_source(is_mix)
@@ -2141,9 +1968,7 @@ def _generate_sub_source(
 def _get_auto_gen_func_name(func_sign: FuncSign, template_id: int) -> tuple:
     if func_sign.func_template_decl:
         auto_gen_func_name = f"{func_sign.func_name}_template_{template_id}"
-        new_func_params = replace_func_params_with_specialization_typename(
-            func_sign, template_id, 0
-        )
+        new_func_params = replace_func_params_with_specialization_typename(func_sign, template_id, 0)
     else:
         auto_gen_func_name = func_sign.func_name
         new_func_params = func_sign.func_params
@@ -2165,8 +1990,7 @@ def _create_new_func_sign(
     if is_mix and is_v220_mode():
         if not RUN_MODE == "cpu":
             new_func_sign = new_func_sign._replace(
-                func_params=(FuncParam(("GM_ADDR", "ffts_addr")),)
-                + new_func_sign.func_params,
+                func_params=(FuncParam(("GM_ADDR", "ffts_addr")),) + new_func_sign.func_params,
             )
     return new_func_sign
 
@@ -2193,16 +2017,12 @@ def _generate_func_decl(
         source = 'extern "C" __global__ __aicore__ '
     else:
         source = 'extern "C" __global__ [aicore] '
-    source += (
-        f"{func_sign_to_string(new_func_sign, extra_param, suffix_extra_param, True)} "
-    )
+    source += f"{func_sign_to_string(new_func_sign, extra_param, suffix_extra_param, True)} "
     source += "{\n"
     return source
 
 
-def _generate_origin_func_call(
-    func_sign: FuncSign, param_names: tuple, template_id: int
-) -> str:
+def _generate_origin_func_call(func_sign: FuncSign, param_names: tuple, template_id: int) -> str:
     param_names_str = ", ".join(param_names)
     if func_sign.func_template_decl:
         return f"    {add_origin_suffix(func_sign.func_name)}\
@@ -2221,13 +2041,7 @@ def _generate_overflow_status_check() -> str:
 
 
 def _generate_barrier_sync() -> str:
-    return (
-        "#if defined(__DAV_C310__)\n"
-        "    pipe_barrier(PIPE_ALL);\n"
-        "    dsb(mem_dsb_t::DSB_ALL);\n"
-        "    dci();\n"
-        "#endif\n"
-    )
+    return "#if defined(__DAV_C310__)\n    pipe_barrier(PIPE_ALL);\n    dsb(mem_dsb_t::DSB_ALL);\n    dci();\n#endif\n"
 
 
 def generate_kernel_auto_gen_func_impl(
@@ -2238,20 +2052,14 @@ def generate_kernel_auto_gen_func_impl(
     generate_ktype_section: bool = False,
 ):
     source = ""
-    auto_gen_func_name, new_func_params = _get_auto_gen_func_name(
-        func_sign, template_id
-    )
-    new_func_sign = _create_new_func_sign(
-        func_sign, auto_gen_func_name, new_func_params, func_group, is_mix
-    )
+    auto_gen_func_name, new_func_params = _get_auto_gen_func_name(func_sign, template_id)
+    new_func_sign = _create_new_func_sign(func_sign, auto_gen_func_name, new_func_params, func_group, is_mix)
 
     param_names = tuple(get_param_names_by_func_sign(func_sign))
     extra_param = "\n"
     suffix_extra_param = _get_suffix_extra_param(extra_param, new_func_sign.func_params)
 
-    source += _generate_func_decl(
-        func_sign, new_func_sign, extra_param, suffix_extra_param
-    )
+    source += _generate_func_decl(func_sign, new_func_sign, extra_param, suffix_extra_param)
     source += _generate_sub_source(func_group, is_mix, param_names)
     source += _generate_origin_func_call(func_sign, param_names, template_id)
     source += _generate_overflow_status_check()
@@ -2259,9 +2067,7 @@ def generate_kernel_auto_gen_func_impl(
     source += "}\n\n"
 
     if (template_id == 0) and (generate_ktype_section or func_group.mode.value >= 5):
-        source += gen_ktype_section(
-            func_sign, func_group.base_key, func_group.mode, generate_ktype_section
-        )
+        source += gen_ktype_section(func_sign, func_group.base_key, func_group.mode, generate_ktype_section)
     return source
 
 
@@ -2318,9 +2124,7 @@ def save_device_kernel_function(
             for func_sign in func_group.func_signs:
                 kernel_name = (func_sign.func_name).replace("aclrtlaunch_", "")
                 if func_sign.func_template_decl:
-                    for template_id, _ in enumerate(
-                        func_sign.func_template_specialization_args, 0
-                    ):
+                    for template_id, _ in enumerate(func_sign.func_template_specialization_args, 0):
                         kernel_sign_name = f"{kernel_name}_template_{template_id}"
                         autogen_name = f"auto_gen_{kernel_sign_name}_kernel"
                         source += f"#define {autogen_name} {kernel_sign_name}\n"
@@ -2331,9 +2135,7 @@ def save_device_kernel_function(
         # generate kernel function
         for func_sign in func_group.func_signs:
             if func_sign.func_template_decl:
-                for template_id, _ in enumerate(
-                    func_sign.func_template_specialization_args, 0
-                ):
+                for template_id, _ in enumerate(func_sign.func_template_specialization_args, 0):
                     source += generate_kernel_auto_gen_func_impl(
                         func_group,
                         func_sign,
@@ -2342,9 +2144,7 @@ def save_device_kernel_function(
                         generate_ktype_section,
                     )
             else:
-                source += generate_kernel_auto_gen_func_impl(
-                    func_group, func_sign, is_mix, 0, generate_ktype_section
-                )
+                source += generate_kernel_auto_gen_func_impl(func_group, func_sign, is_mix, 0, generate_ktype_section)
 
         source += "#endif\n"
 
@@ -2359,9 +2159,7 @@ def save_device_kernel_function(
             raise err
 
 
-def search_undefined_types(
-    typenames: Set[str], structs: Dict[str, StructRaw]
-) -> Iterator[str]:
+def search_undefined_types(typenames: Set[str], structs: Dict[str, StructRaw]) -> Iterator[str]:
     """Search undefined types."""
     visited = set()
 
@@ -2385,9 +2183,7 @@ def search_undefined_types(
             yield from search_recursively(typename)
 
 
-def generate_type_definition_content(
-    types_need_defined: Iterator[str], structs: Dict[str, StructRaw]
-) -> str:
+def generate_type_definition_content(types_need_defined: Iterator[str], structs: Dict[str, StructRaw]) -> str:
     """Generate type define content."""
     defs = (structs[name].content for name in types_need_defined)
     return "\n\n".join(defs)
@@ -2414,12 +2210,8 @@ def process_with_source_mapping(
     generate_ktype_section: bool = False,
 ):
     """Process with source mapping."""
-    save_device_kernel_function(
-        func_sign_groups, source_mapping, dst_dir, generate_ktype_section
-    )
-    save_device_config_cmake_func(
-        func_sign_groups, source_mapping, dst_dir, generate_definition
-    )
+    save_device_kernel_function(func_sign_groups, source_mapping, dst_dir, generate_ktype_section)
+    save_device_config_cmake_func(func_sign_groups, source_mapping, dst_dir, generate_definition)
     save_host_config_cmake_func(func_sign_groups, source_mapping, dst_dir)
 
 
@@ -2427,24 +2219,14 @@ def main(argv: List[str]):
     """Main process."""
     parser = argparse.ArgumentParser()
     parser.add_argument("filepaths", nargs="+", help="Preprocessed file paths.")
-    parser.add_argument(
-        "--dynamic-mode", action="store_true", help="Get code mode dynamically."
-    )
+    parser.add_argument("--dynamic-mode", action="store_true", help="Get code mode dynamically.")
     parser.add_argument("-d", "--dst-dir", default=".", help="Destination directory.")
-    parser.add_argument(
-        "-hd", "--header-dir", default=".", help="Header destination directory."
-    )
+    parser.add_argument("-hd", "--header-dir", default=".", help="Header destination directory.")
     parser.add_argument("--aiv-o", nargs="+", help="Aiv ofile paths.")
     parser.add_argument("--aic-o", nargs="+", help="Aic ofile paths.")
-    parser.add_argument(
-        "--compile-commands", required=True, help="compile_commands.json file path."
-    )
-    parser.add_argument(
-        "--generate-definition", action="store_true", help="generate definition"
-    )
-    parser.add_argument(
-        "--generate-ktype-section", action="store_true", help="generate ktype section"
-    )
+    parser.add_argument("--compile-commands", required=True, help="compile_commands.json file path.")
+    parser.add_argument("--generate-definition", action="store_true", help="generate definition")
+    parser.add_argument("--generate-ktype-section", action="store_true", help="generate ktype section")
     parser.add_argument("--build-mode", help="Get chip type.")
     parser.add_argument("--run-mode", help="cpu or npu mode.")
 
@@ -2466,16 +2248,12 @@ def main(argv: List[str]):
     IS_C310_MODE = args.build_mode == "c310"
     RUN_MODE = args.run_mode
     try:
-        func_sign_groups = list(
-            parse_func_signature_by_filepaths(args.filepaths, args.build_mode)
-        )
+        func_sign_groups = list(parse_func_signature_by_filepaths(args.filepaths, args.build_mode))
     except OSError as ex:
         print(f"error: {ex.strerror}: '{ex.filename}'")
         return False
 
-    type_definition = generate_type_definition_content_by_func_sign_groups(
-        func_sign_groups
-    )
+    type_definition = generate_type_definition_content_by_func_sign_groups(func_sign_groups)
     func_sign_groups = list(
         map(
             get_func_sign_template_specialization_args,
@@ -2488,21 +2266,15 @@ def main(argv: List[str]):
     new_func_sign_groups = list(map(trans_func_sign_group, func_sign_groups))
 
     try:
-        source_mapping, enable_ascendc_time_stamp = load_compile_commands(
-            args.compile_commands
-        )
+        source_mapping, enable_ascendc_time_stamp = load_compile_commands(args.compile_commands)
     except FileNotFoundError as ex:
         print(f"error: {ex}")
         return False
 
     if args.dynamic_mode:
         # Each preprocessed file corresponds to two .o files: aiv.o and aic.o.
-        kernel_types = [
-            func_sign_group.kernel_type for func_sign_group in func_sign_groups
-        ]
-        modes = list(
-            starmap(get_mode_dynamic, zip(args.aic_o, args.aiv_o, kernel_types))
-        )
+        kernel_types = [func_sign_group.kernel_type for func_sign_group in func_sign_groups]
+        modes = list(starmap(get_mode_dynamic, zip(args.aic_o, args.aiv_o, kernel_types)))
         save_device_config_cmake_func = save_aic_aiv_config_cmake
     elif args.build_mode == "m200" and args.generate_definition:
         modes = [func_sign_group.kernel_type for func_sign_group in func_sign_groups]
@@ -2514,27 +2286,13 @@ def main(argv: List[str]):
     base_keys = list(get_base_keys(func_sign_groups, modes))
     func_sign_groups = compose_mode_base_func_groups(func_sign_groups, modes, base_keys)
 
-    new_func_sign_groups = compose_mode_base_func_groups(
-        new_func_sign_groups, modes, base_keys
-    )
+    new_func_sign_groups = compose_mode_base_func_groups(new_func_sign_groups, modes, base_keys)
 
-    do_save_commands(
-        generate_save_stub_header_commands(
-            func_signs_in_groups(new_func_sign_groups), args.header_dir
-        )
-    )
+    do_save_commands(generate_save_stub_header_commands(func_signs_in_groups(new_func_sign_groups), args.header_dir))
     if RUN_MODE == "cpu":
-        do_save_commands(
-            generate_save_stub_impl_cpp_cpu_commands(
-                new_func_sign_groups, type_definition, dst_dir
-            )
-        )
+        do_save_commands(generate_save_stub_impl_cpp_cpu_commands(new_func_sign_groups, type_definition, dst_dir))
     else:
-        do_save_commands(
-            generate_save_stub_impl_cpp_commands(
-                new_func_sign_groups, type_definition, dst_dir
-            )
-        )
+        do_save_commands(generate_save_stub_impl_cpp_commands(new_func_sign_groups, type_definition, dst_dir))
 
     process_with_source_mapping(
         func_sign_groups,

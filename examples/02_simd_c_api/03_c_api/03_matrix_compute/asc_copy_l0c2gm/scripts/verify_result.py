@@ -27,14 +27,9 @@ def verify_result(scenario_num, output, golden):
     output = np.fromfile(output, dtype=output_dtype).reshape(-1)
     golden = np.fromfile(golden, dtype=output_dtype).reshape(-1)
     if output.size != golden.size:
-        print(
-            "element count mismatch: expected %d, actual %d"
-            % (golden.size, output.size)
-        )
+        print("element count mismatch: expected %d, actual %d" % (golden.size, output.size))
         return False
-    different_element_results = np.isclose(
-        output, golden, rtol=relative_tol, atol=absolute_tol, equal_nan=True
-    )
+    different_element_results = np.isclose(output, golden, rtol=relative_tol, atol=absolute_tol, equal_nan=True)
     different_element_indexes = np.where(different_element_results == False)[0]
     for index in range(len(different_element_indexes)):
         real_index = different_element_indexes[index]

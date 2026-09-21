@@ -25,12 +25,8 @@ from .model import Cell
 
 
 CUSTOM_OP_CASE = "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op"
-CUSTOM_OP_STATIC_LIB_CASE = (
-    "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op_static_lib"
-)
-PARALLEL_OPS_PACKAGE_CASE = (
-    "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/parallel_ops_package"
-)
+CUSTOM_OP_STATIC_LIB_CASE = "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op_static_lib"
+PARALLEL_OPS_PACKAGE_CASE = "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/parallel_ops_package"
 CUSTOM_OP_DEPENDENT_CASES = {
     "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclnn_invocation",
     "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclop_invocation",
@@ -50,9 +46,7 @@ class ScheduleOptions:
     jobs: int = 1
 
 
-def schedule_cells(
-    cells: Iterable[Cell], options: ScheduleOptions = ScheduleOptions()
-) -> List[Cell]:
+def schedule_cells(cells: Iterable[Cell], options: ScheduleOptions = ScheduleOptions()) -> List[Cell]:
     cells_list = list(cells)
     schedule = options.schedule
     if schedule == "default":
@@ -60,9 +54,7 @@ def schedule_cells(
     if schedule == "fixed":
         if options.schedule_file is None:
             return enforce_required_order(cells_list)
-        return enforce_required_order(
-            apply_fixed_schedule(cells_list, options.schedule_file)
-        )
+        return enforce_required_order(apply_fixed_schedule(cells_list, options.schedule_file))
     if schedule not in {"build-desc", "frontload-build-desc", "npu-idle-min"}:
         raise ValueError(f"unknown schedule: {schedule}")
     if options.schedule_report is None:
@@ -80,14 +72,10 @@ def schedule_cells(
 
     frontload = [cell for _, cell in ranked_pairs[: max(options.frontload_count, 0)]]
     frontloaded = {cell.key for cell in frontload}
-    return enforce_required_order(
-        frontload + [cell for cell in cells_list if cell.key not in frontloaded]
-    )
+    return enforce_required_order(frontload + [cell for cell in cells_list if cell.key not in frontloaded])
 
 
-def schedule_npu_idle_min(
-    cells: List[Cell], report_path: Path, jobs: int
-) -> List[Cell]:
+def schedule_npu_idle_min(cells: List[Cell], report_path: Path, jobs: int) -> List[Cell]:
     timings = load_pipeline_stage_seconds(report_path)
     if not timings:
         return enforce_required_order(cells)
@@ -144,15 +132,9 @@ def build_npu_idle_candidates(
     jobs: int,
 ) -> List[List[Cell]]:
     indexed = list(enumerate(cells))
-    build_seconds = with_default_seconds(
-        {case: timing[0] for case, timing in timings.items()}, cells
-    )
-    run_seconds = with_default_seconds(
-        {case: timing[1] for case, timing in timings.items()}, cells
-    )
-    verify_seconds = with_default_seconds(
-        {case: timing[2] for case, timing in timings.items()}, cells
-    )
+    build_seconds = with_default_seconds({case: timing[0] for case, timing in timings.items()}, cells)
+    run_seconds = with_default_seconds({case: timing[1] for case, timing in timings.items()}, cells)
+    verify_seconds = with_default_seconds({case: timing[2] for case, timing in timings.items()}, cells)
 
     candidates: List[List[Cell]] = [
         cells,
@@ -189,10 +171,7 @@ def build_npu_idle_candidates(
             for _, cell in sorted(
                 indexed,
                 key=lambda item: (
-                    -(
-                        run_seconds[item[1].example.rel_path]
-                        + verify_seconds[item[1].example.rel_path]
-                    ),
+                    -(run_seconds[item[1].example.rel_path] + verify_seconds[item[1].example.rel_path]),
                     item[0],
                 ),
             )
@@ -200,18 +179,12 @@ def build_npu_idle_candidates(
     ]
     candidates.append(frontload_long_builds(cells, build_seconds, jobs))
     for long_count in range(1, max(jobs, 1)):
-        candidates.append(
-            mix_long_and_short_builds(
-                cells, build_seconds, long_count, jobs - long_count
-            )
-        )
+        candidates.append(mix_long_and_short_builds(cells, build_seconds, long_count, jobs - long_count))
 
     deduped: List[List[Cell]] = []
     seen: set[tuple[str, ...]] = set()
     for candidate in candidates:
-        ordered = delay_custom_op_dependents(
-            enforce_required_order(candidate), timings, jobs
-        )
+        ordered = delay_custom_op_dependents(enforce_required_order(candidate), timings, jobs)
         key = tuple(cell.key for cell in ordered)
         if key not in seen:
             deduped.append(ordered)
@@ -241,9 +214,7 @@ def mix_long_and_short_builds(
     return result
 
 
-def frontload_long_builds(
-    cells: List[Cell], build_seconds: dict[str, float], jobs: int
-) -> List[Cell]:
+def frontload_long_builds(cells: List[Cell], build_seconds: dict[str, float], jobs: int) -> List[Cell]:
     first_screen_count = min(max(jobs, 1), len(cells))
     ranked = sorted(
         cells,
@@ -254,9 +225,7 @@ def frontload_long_builds(
     return first_screen + [cell for cell in cells if cell.key not in first_screen_keys]
 
 
-def add_next_from(
-    cells: List[Cell], used: set[str], result: List[Cell], count: int
-) -> None:
+def add_next_from(cells: List[Cell], used: set[str], result: List[Cell], count: int) -> None:
     for _ in range(count):
         next_cell = next((cell for cell in cells if cell.key not in used), None)
         if next_cell is None:
@@ -265,39 +234,25 @@ def add_next_from(
         used.add(next_cell.key)
 
 
-def simulate_pipeline_npu_idle(
-    cells: List[Cell], report_path: Path, jobs: int = 1
-) -> float:
+def simulate_pipeline_npu_idle(cells: List[Cell], report_path: Path, jobs: int = 1) -> float:
     return simulate_pipeline(cells, report_path, jobs)[0]
 
 
-def simulate_pipeline_makespan(
-    cells: List[Cell], report_path: Path, jobs: int = 1
-) -> float:
+def simulate_pipeline_makespan(cells: List[Cell], report_path: Path, jobs: int = 1) -> float:
     return simulate_pipeline(cells, report_path, jobs)[1]
 
 
-def simulate_pipeline(
-    cells: List[Cell], report_path: Path, jobs: int = 1
-) -> tuple[float, float]:
+def simulate_pipeline(cells: List[Cell], report_path: Path, jobs: int = 1) -> tuple[float, float]:
     timings = load_pipeline_stage_seconds(report_path)
-    build_seconds = with_default_seconds(
-        {case: timing[0] for case, timing in timings.items()}, cells
-    )
-    run_seconds = with_default_seconds(
-        {case: timing[1] for case, timing in timings.items()}, cells
-    )
-    verify_seconds = with_default_seconds(
-        {case: timing[2] for case, timing in timings.items()}, cells
-    )
+    build_seconds = with_default_seconds({case: timing[0] for case, timing in timings.items()}, cells)
+    run_seconds = with_default_seconds({case: timing[1] for case, timing in timings.items()}, cells)
+    verify_seconds = with_default_seconds({case: timing[2] for case, timing in timings.items()}, cells)
     build_finishes = simulate_build_finishes(cells, build_seconds, jobs)
 
     npu_available = 0.0
     idle_s = 0.0
     verify_ready: list[tuple[float, int, Cell]] = []
-    for ready_at, index, cell in sorted(
-        build_finishes, key=lambda item: (item[0], item[1])
-    ):
+    for ready_at, index, cell in sorted(build_finishes, key=lambda item: (item[0], item[1])):
         if npu_available < ready_at:
             idle_s += ready_at - npu_available
             npu_available = ready_at
@@ -317,21 +272,15 @@ def simulate_verify_done(
 ) -> float:
     worker_available = [0.0 for _ in range(max(jobs, 1))]
     for ready_at, _, cell in sorted(verify_ready, key=lambda item: (item[0], item[1])):
-        worker = min(
-            range(len(worker_available)), key=lambda idx: worker_available[idx]
-        )
+        worker = min(range(len(worker_available)), key=lambda idx: worker_available[idx])
         start = max(worker_available[worker], ready_at)
         worker_available[worker] = start + verify_seconds[cell.example.rel_path]
     return max(worker_available) if worker_available else 0.0
 
 
-def custom_op_dependency_violation_s(
-    cells: List[Cell], report_path: Path, jobs: int = 1
-) -> float:
+def custom_op_dependency_violation_s(cells: List[Cell], report_path: Path, jobs: int = 1) -> float:
     timings = load_stage_seconds(report_path)
-    build_seconds = with_default_seconds(
-        {case: build_s for case, (build_s, _) in timings.items()}, cells
-    )
+    build_seconds = with_default_seconds({case: build_s for case, (build_s, _) in timings.items()}, cells)
     return custom_op_dependency_violation_from_builds(cells, build_seconds, jobs)
 
 
@@ -362,35 +311,21 @@ def delay_custom_op_dependents(
     if CUSTOM_OP_CASE not in names or not (CUSTOM_OP_DEPENDENT_CASES & names):
         return cells
 
-    build_seconds = with_default_seconds(
-        {case: timing[0] for case, timing in timings.items()}, cells
-    )
+    build_seconds = with_default_seconds({case: timing[0] for case, timing in timings.items()}, cells)
     if custom_op_dependency_violation_from_builds(cells, build_seconds, jobs) <= 0:
         return cells
 
-    dependents = [
-        cell for cell in cells if cell.example.rel_path in CUSTOM_OP_DEPENDENT_CASES
-    ]
-    base = [
-        cell for cell in cells if cell.example.rel_path not in CUSTOM_OP_DEPENDENT_CASES
-    ]
+    dependents = [cell for cell in cells if cell.example.rel_path in CUSTOM_OP_DEPENDENT_CASES]
+    base = [cell for cell in cells if cell.example.rel_path not in CUSTOM_OP_DEPENDENT_CASES]
     custom_index = next(
-        (
-            idx
-            for idx, cell in enumerate(base)
-            if cell.example.rel_path == CUSTOM_OP_CASE
-        ),
+        (idx for idx, cell in enumerate(base) if cell.example.rel_path == CUSTOM_OP_CASE),
         len(base),
     )
     best = base + dependents
-    best_violation = custom_op_dependency_violation_from_builds(
-        best, build_seconds, jobs
-    )
+    best_violation = custom_op_dependency_violation_from_builds(best, build_seconds, jobs)
     for insert_at in range(custom_index + 1, len(base) + 1):
         candidate = base[:insert_at] + dependents + base[insert_at:]
-        violation = custom_op_dependency_violation_from_builds(
-            candidate, build_seconds, jobs
-        )
+        violation = custom_op_dependency_violation_from_builds(candidate, build_seconds, jobs)
         if violation < best_violation:
             best = candidate
             best_violation = violation
@@ -405,10 +340,7 @@ def simulate_build_finishes(
     jobs: int,
 ) -> List[tuple[float, int, Cell]]:
     windows = simulate_build_windows(cells, build_seconds, jobs)
-    return [
-        (windows[cell.example.rel_path][1], index, cell)
-        for index, cell in enumerate(cells)
-    ]
+    return [(windows[cell.example.rel_path][1], index, cell) for index, cell in enumerate(cells)]
 
 
 def simulate_build_windows(
@@ -419,9 +351,7 @@ def simulate_build_windows(
     worker_available = [0.0 for _ in range(max(jobs, 1))]
     windows: dict[str, tuple[float, float]] = {}
     for cell in cells:
-        worker = min(
-            range(len(worker_available)), key=lambda idx: worker_available[idx]
-        )
+        worker = min(range(len(worker_available)), key=lambda idx: worker_available[idx])
         start = worker_available[worker]
         finish = start + build_seconds[cell.example.rel_path]
         worker_available[worker] = finish
@@ -429,15 +359,10 @@ def simulate_build_windows(
     return windows
 
 
-def with_default_seconds(
-    values: dict[str, float], cells: List[Cell]
-) -> dict[str, float]:
+def with_default_seconds(values: dict[str, float], cells: List[Cell]) -> dict[str, float]:
     known = [value for value in values.values() if value > 0]
     default = statistics.median(known) if known else 0.0
-    return {
-        cell.example.rel_path: values.get(cell.example.rel_path, default)
-        for cell in cells
-    }
+    return {cell.example.rel_path: values.get(cell.example.rel_path, default) for cell in cells}
 
 
 def enforce_required_order(cells: List[Cell]) -> List[Cell]:
@@ -455,9 +380,7 @@ def enforce_required_order(cells: List[Cell]) -> List[Cell]:
     )
 
 
-def stable_topological_order(
-    cells: List[Cell], dependencies: dict[str, set[str]]
-) -> List[Cell]:
+def stable_topological_order(cells: List[Cell], dependencies: dict[str, set[str]]) -> List[Cell]:
     present = {cell.example.rel_path for cell in cells}
     remaining = list(cells)
     ordered: List[Cell] = []
@@ -480,16 +403,11 @@ def stable_topological_order(
 
 
 def load_build_seconds(report_path: Path) -> dict[str, float]:
-    return {
-        case: build_s for case, (build_s, _) in load_stage_seconds(report_path).items()
-    }
+    return {case: build_s for case, (build_s, _) in load_stage_seconds(report_path).items()}
 
 
 def load_stage_seconds(report_path: Path) -> dict[str, tuple[float, float]]:
-    return {
-        case: (timing[0], timing[1])
-        for case, timing in load_pipeline_stage_seconds(report_path).items()
-    }
+    return {case: (timing[0], timing[1]) for case, timing in load_pipeline_stage_seconds(report_path).items()}
 
 
 def load_pipeline_stage_seconds(

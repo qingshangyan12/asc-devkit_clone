@@ -27,9 +27,7 @@ def verify_result(scenario_num, output, golden):
         output_type = np.float32
     output = np.fromfile(output, dtype=output_type).reshape(-1)
     golden = np.fromfile(golden, dtype=output_type).reshape(-1)
-    different_element_results = np.isclose(
-        output, golden, rtol=relative_tol, atol=absolute_tol, equal_nan=True
-    )
+    different_element_results = np.isclose(output, golden, rtol=relative_tol, atol=absolute_tol, equal_nan=True)
     different_element_indexes = np.where(np.logical_not(different_element_results))[0]
     for index in range(len(different_element_indexes)):
         real_index = different_element_indexes[index]

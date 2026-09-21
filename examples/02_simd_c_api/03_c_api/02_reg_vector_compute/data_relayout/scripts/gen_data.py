@@ -59,9 +59,7 @@ def gen_golden_data_pack():
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Generate golden data for data_relayout sample"
-    )
+    parser = argparse.ArgumentParser(description="Generate golden data for data_relayout sample")
     parser.add_argument(
         "-scenarioNum",
         type=int,

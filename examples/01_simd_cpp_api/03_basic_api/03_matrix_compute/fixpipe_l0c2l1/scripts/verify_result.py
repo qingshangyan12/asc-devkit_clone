@@ -24,11 +24,7 @@ N = 128
 
 
 def nz_to_nd(data, block_cols):
-    return (
-        data.reshape((N // block_cols, M // 16, 16, block_cols))
-        .transpose(1, 2, 0, 3)
-        .reshape(-1)
-    )
+    return data.reshape((N // block_cols, M // 16, 16, block_cols)).transpose(1, 2, 0, 3).reshape(-1)
 
 
 def verify_result(output, golden, scenarioNum):
@@ -46,9 +42,7 @@ def verify_result(output, golden, scenarioNum):
             output = nz_to_nd(output, 32)
         else:
             output = np.fromfile(output, dtype=np.int32).reshape(-1)
-    different_element_results = np.isclose(
-        output, golden, rtol=relative_tol, atol=absolute_tol, equal_nan=True
-    )
+    different_element_results = np.isclose(output, golden, rtol=relative_tol, atol=absolute_tol, equal_nan=True)
     different_element_indexes = np.where(different_element_results == False)[0]
     for index in range(len(different_element_indexes)):
         real_index = different_element_indexes[index]

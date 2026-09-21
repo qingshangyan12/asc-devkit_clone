@@ -76,9 +76,7 @@ class PlannerTest(unittest.TestCase):
             ["npu"],
             "readme",
         )
-        cells, suggestions, skipped = build_cells_with_skips(
-            [spec], "dav-2201", ["npu"]
-        )
+        cells, suggestions, skipped = build_cells_with_skips([spec], "dav-2201", ["npu"])
         self.assertEqual(cells, [])
         self.assertEqual(len(suggestions), 1)
         self.assertEqual(skipped, [])

@@ -35,9 +35,9 @@ def gen_golden_data(fused_iterations):
     os.makedirs("output", exist_ok=True)
     rng = np.random.default_rng(RANDOM_SEED)
 
-    with open("./input/input_x.bin", "wb") as input_x_file, open(
-        "./input/input_y.bin", "wb"
-    ) as input_y_file, open("./output/golden.bin", "wb") as golden_file:
+    with open("./input/input_x.bin", "wb") as input_x_file, open("./input/input_y.bin", "wb") as input_y_file, open(
+        "./output/golden.bin", "wb"
+    ) as golden_file:
         for row_start in range(0, M, ROWS_PER_CHUNK):
             row_count = min(ROWS_PER_CHUNK, M - row_start)
             chunk_shape = (row_count, N)

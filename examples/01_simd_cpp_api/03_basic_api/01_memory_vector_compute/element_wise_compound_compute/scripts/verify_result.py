@@ -31,17 +31,12 @@ def verify_result(output_path, golden_path, dtype=np.float16):
         different_element_indexes = np.where(output != golden)[0]
         for index in range(len(different_element_indexes)):
             real_index = different_element_indexes[index]
-            print(
-                "data index: %06d, expected: %d, actual: %d"
-                % (real_index, golden[real_index], output[real_index])
-            )
+            print("data index: %06d, expected: %d, actual: %d" % (real_index, golden[real_index], output[real_index]))
             if index == 100:
                 break
     else:
         # 浮点类型使用isclose比较
-        different_element_results = np.isclose(
-            output, golden, rtol=RELATIVE_TOL, atol=ABSOLUTE_TOL, equal_nan=True
-        )
+        different_element_results = np.isclose(output, golden, rtol=RELATIVE_TOL, atol=ABSOLUTE_TOL, equal_nan=True)
         different_element_indexes = np.where(different_element_results == False)[0]
         for index in range(len(different_element_indexes)):
             real_index = different_element_indexes[index]

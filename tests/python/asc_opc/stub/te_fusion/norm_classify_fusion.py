@@ -145,9 +145,7 @@ class NormClassifyFusion:
                 input_shape_type.append(1)
 
         extra_params["input_shape_type"] = input_shape_type
-        self._add_disable_fuse_axes(
-            norm_format, norm_shape_size, self.axes, extra_params
-        )
+        self._add_disable_fuse_axes(norm_format, norm_shape_size, self.axes, extra_params)
 
     def _update_axes(self):
         if self.norm_op is None:
@@ -209,9 +207,7 @@ class NormClassifyFusion:
                 if input_descs is not None and len(input_descs) > 0:
                     norm_input_name = input_descs[0].get("name")
                 if node.get("attr_desc") is not None:
-                    if len(node.get("attr_desc")) > 0 and isinstance(
-                        node.get("attr_desc")[-1], list
-                    ):
+                    if len(node.get("attr_desc")) > 0 and isinstance(node.get("attr_desc")[-1], list):
                         self.axes = node.get("attr_desc")[-1]
 
         input_desc_vec = []

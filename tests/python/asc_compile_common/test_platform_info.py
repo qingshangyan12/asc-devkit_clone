@@ -86,9 +86,7 @@ class TestPlatformInfo(unittest.TestCase):
 
     @patch("asc_op_compile_base.common.platform.platform_info._te_update_version")
     @patch("asc_op_compile_base.common.platform.platform_info._set_platform_info_res")
-    @patch(
-        "asc_op_compile_base.common.platform.platform_info._set_core_num_by_core_type"
-    )
+    @patch("asc_op_compile_base.common.platform.platform_info._set_core_num_by_core_type")
     def test_update_soc_infos(
         self,
         _set_core_num_by_core_type_mock,

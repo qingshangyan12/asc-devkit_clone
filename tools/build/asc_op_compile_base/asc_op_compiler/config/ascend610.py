@@ -97,9 +97,7 @@ class ArchRuntimeConfig(RuntimeConfig):
         compile_type = CompileType.COMPILE_TYPE_DEFAULT
 
         # Genrate Config
-        initializer_config = InitializerConfig(
-            support_impl_mode, is_support_dfx, support_super_kernel
-        )
+        initializer_config = InitializerConfig(support_impl_mode, is_support_dfx, support_super_kernel)
         compile_info_generator_config = CompileInfoGeneratorConfig(
             pre_compile_type,
             set_default_code_channel,
