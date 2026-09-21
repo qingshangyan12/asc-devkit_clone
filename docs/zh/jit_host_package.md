@@ -50,6 +50,8 @@ npu_op_kernel_options(ascendc_kernels ALL OPTIONS --save-temp-files)
 
 一个 manifest 对应一次动态编译资源，其中 `kernels` 可有多个 tiling key 的入口，因此 manifest 数和 kernel 数不必相同。运行时先按 resource_id 定位资源，再按 kernelEntry 选择入口。
 
+当 OPC 开启 `--op_relocatable_kernel_binary=true` 时，忽略 `KERNEL_SPEC_MODE` 的 manifest 生成配置，输出 Info 日志，继续原 relocatable 编译；该任务不生成 manifest，也不要求 manifest 输出目录。包内其他普通动态编译任务仍按配置导出资源。
+
 只记录动态编译资料。后续静态编译结果不回流到打包阶段。聚合工具不扫描动态 ELF，不执行 readelf，不接受 --binary-dir。
 
 ## 4. 构建依赖和产物位置
