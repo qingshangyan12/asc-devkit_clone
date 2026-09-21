@@ -47,6 +47,42 @@ __aicore__ inline uint32_t LocalAddr(PtrT ptr)
 {
     return static_cast<uint32_t>(reinterpret_cast<uintptr_t>(ptr));
 }
+
+template <AscendC::Hardware hard, typename T, typename U>
+__aicore__ inline void DumpHw(U src, uint32_t desc, uint32_t dumpSize, const uint32_t* shape = nullptr,
+    uint32_t shapeDim = 0)
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    __gm__ __asc_aicore::DebugBlockHeadInfo* blockInfo = __asc_aicore::get_block_info();
+    if (dumpSize == 0 || blockInfo == nullptr) {
+        return;
+    }
+    constexpr uint32_t dataBlockSize = 32;
+    uint32_t alignDumpLen = __asc_aicore::align_up(static_cast<uint32_t>(dumpSize * sizeof(T)), dataBlockSize);
+    uint32_t tlvLen = static_cast<uint32_t>(sizeof(__asc_aicore::DumpTensorTlv)) + alignDumpLen;
+    if (!__asc_aicore::check_ringbuf_space(blockInfo, tlvLen)) {
+        return;
+    }
+    __gm__ __asc_aicore::DumpTensorTlv* dumpTlv = reinterpret_cast<__gm__ __asc_aicore::DumpTensorTlv*>(
+        __asc_aicore::get_ringbuf_tlv_addr(blockInfo));
+    __asc_aicore::set_dump_tlv_info<hard, T>(src, dumpTlv, alignDumpLen, desc, dumpSize);
+    if (shape != nullptr && shapeDim > 0) {
+        __asc_aicore::set_dump_shape_info(dumpTlv, shapeDim, shape);
+    }
+    uint32_t copyRet = __asc_aicore::debug_bus_copy_local_to_gm_impl<hard>(
+        reinterpret_cast<__gm__ T*>(dumpTlv + 1), src, alignDumpLen, __asc_aicore::get_debug_bus_addr_impl());
+    if (copyRet != 0) {
+        return;
+    }
+    __asc_aicore::update_write_info(__asc_aicore::get_block_write_info(blockInfo), tlvLen);
+#else
+    (void)src;
+    (void)desc;
+    (void)dumpSize;
+    (void)shape;
+    (void)shapeDim;
+#endif
+}
 } // namespace CubePtrDetail
 
 template <typename T>
@@ -66,8 +102,12 @@ __aicore__ inline void DumpTensor(__ubuf__ T* tensor, uint32_t desc, uint32_t du
 template <typename T>
 __aicore__ inline void DumpTensor(__cbuf__ T* tensor, uint32_t desc, uint32_t dumpSize)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    CubePtrDetail::DumpHw<Hardware::L1, T>(tensor, desc, dumpSize);
+#else
     auto tmp = CubePtrDetail::BindLocal<T>(TPosition::A1, CubePtrDetail::LocalAddr(tensor), dumpSize);
     DumpTensorLocal2GMImpl(tmp, desc, dumpSize);
+#endif
 }
 
 template <typename T>
@@ -80,15 +120,23 @@ __aicore__ inline void DumpTensor(__cc__ T* tensor, uint32_t desc, uint32_t dump
 template <typename T>
 __aicore__ inline void DumpTensor(__ca__ T* tensor, uint32_t desc, uint32_t dumpSize)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    CubePtrDetail::DumpHw<Hardware::L0A, T>(tensor, desc, dumpSize);
+#else
     auto tmp = CubePtrDetail::BindLocal<T>(TPosition::A2, CubePtrDetail::LocalAddr(tensor), dumpSize);
     DumpTensorLocal2GMImpl(tmp, desc, dumpSize);
+#endif
 }
 
 template <typename T>
 __aicore__ inline void DumpTensor(__cb__ T* tensor, uint32_t desc, uint32_t dumpSize)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    CubePtrDetail::DumpHw<Hardware::L0B, T>(tensor, desc, dumpSize);
+#else
     auto tmp = CubePtrDetail::BindLocal<T>(TPosition::B2, CubePtrDetail::LocalAddr(tensor), dumpSize);
     DumpTensorLocal2GMImpl(tmp, desc, dumpSize);
+#endif
 }
 
 template <typename T>
@@ -120,6 +168,9 @@ __aicore__ inline void DumpTensor(__ubuf__ T* tensor, uint32_t desc, uint32_t du
 template <typename T>
 __aicore__ inline void DumpTensor(__cbuf__ T* tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    CubePtrDetail::DumpHw<Hardware::L1, T>(tensor, desc, dumpSize, shapeInfo.shape, shapeInfo.shapeDim);
+#else
     auto tmp = CubePtrDetail::BindLocal<T>(TPosition::A1, CubePtrDetail::LocalAddr(tensor), dumpSize);
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || \
                               (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3102))
@@ -127,6 +178,7 @@ __aicore__ inline void DumpTensor(__cbuf__ T* tensor, uint32_t desc, uint32_t du
     DumpTensorLocal2GMImpl(tmp, desc, dumpSize);
 #else
     DumpTensorLocal2GMImpl(tmp, desc, dumpSize, shapeInfo.shape, shapeInfo.shapeDim);
+#endif
 #endif
 }
 
@@ -146,6 +198,9 @@ __aicore__ inline void DumpTensor(__cc__ T* tensor, uint32_t desc, uint32_t dump
 template <typename T>
 __aicore__ inline void DumpTensor(__ca__ T* tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    CubePtrDetail::DumpHw<Hardware::L0A, T>(tensor, desc, dumpSize, shapeInfo.shape, shapeInfo.shapeDim);
+#else
     auto tmp = CubePtrDetail::BindLocal<T>(TPosition::A2, CubePtrDetail::LocalAddr(tensor), dumpSize);
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || \
                               (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3102))
@@ -154,11 +209,15 @@ __aicore__ inline void DumpTensor(__ca__ T* tensor, uint32_t desc, uint32_t dump
 #else
     DumpTensorLocal2GMImpl(tmp, desc, dumpSize, shapeInfo.shape, shapeInfo.shapeDim);
 #endif
+#endif
 }
 
 template <typename T>
 __aicore__ inline void DumpTensor(__cb__ T* tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    CubePtrDetail::DumpHw<Hardware::L0B, T>(tensor, desc, dumpSize, shapeInfo.shape, shapeInfo.shapeDim);
+#else
     auto tmp = CubePtrDetail::BindLocal<T>(TPosition::B2, CubePtrDetail::LocalAddr(tensor), dumpSize);
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || \
                               (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3102))
@@ -166,6 +225,7 @@ __aicore__ inline void DumpTensor(__cb__ T* tensor, uint32_t desc, uint32_t dump
     DumpTensorLocal2GMImpl(tmp, desc, dumpSize);
 #else
     DumpTensorLocal2GMImpl(tmp, desc, dumpSize, shapeInfo.shape, shapeInfo.shapeDim);
+#endif
 #endif
 }
 
