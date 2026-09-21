@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "hccl_alloc_ctx_res.h"
+#include "external_alg_resolver.h"
 #include "kfc_server_protocol.h"
 
 #include <limits>
@@ -681,19 +682,55 @@ HcclResult CheckForcedAlgResource(
     return HCCL_SUCCESS;
 }
 
-bool GetForcedAlgName(const Mc2CcTilingInner* ccTiling, std::string& algName)
+bool GetForcedAlgName(
+    HcclComm comm, const Mc2CcTilingInner* ccTiling, OpParam& opParam,
+    std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo, std::string& algName)
 {
+    algName.clear();
     if (ccTiling == nullptr || ccTiling->algConfig[0] == '\0') {
         return false;
     }
-
     std::string algConfig(ccTiling->algConfig);
     if (algConfig.find('=') != std::string::npos) {
         HCCL_INFO("[MC2_FORCE_ALG] legacy algConfig[%s], use default selector.", algConfig.c_str());
         return false;
     }
-
-    algName = algConfig;
+    if (algConfig.find('[') == std::string::npos) {
+        OpParam opParamBackup = opParam;
+        if (PrepareTopoInfoForOp(comm, opParam, topoInfo) != HCCL_SUCCESS) {
+            opParam = opParamBackup;
+            return false;
+        }
+        algName = algConfig;
+        return true;
+    }
+    ExternalAlgSpec extSpec;
+    std::string extParseErrMsg;
+    if (!ParseExternalAlg(algConfig, extSpec, extParseErrMsg)) {
+        HCCL_WARNING(
+            "[MC2_EXT_ALG] fallback to default selector, algConfig[%s], opType[%u], reason[%s].", ccTiling->algConfig,
+            ccTiling->opType, extParseErrMsg.c_str());
+        return false;
+    }
+    OpParam opParamBackup = opParam;
+    if (PrepareTopoInfoForOp(comm, opParam, topoInfo) != HCCL_SUCCESS) {
+        opParam = opParamBackup;
+        return false;
+    }
+    std::string resolvedName;
+    std::string resolveErrMsg;
+    if (ResolveExternalAlg(opParam, topoInfo.get(), extSpec, resolvedName, resolveErrMsg) != ResolveStatus::RESOLVED) {
+        opParam = opParamBackup;
+        topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
+        HCCL_WARNING(
+            "[MC2_EXT_ALG] fallback to default selector, algConfig[%s], opType[%u], reason[%s].", ccTiling->algConfig,
+            ccTiling->opType, resolveErrMsg.c_str());
+        return false;
+    }
+    algName = resolvedName;
+    HCCL_INFO(
+        "[MC2_EXT_ALG] accepted, opType[%u], algConfig[%s] -> algName[%s].", static_cast<u32>(opParam.opType),
+        ccTiling->algConfig, algName.c_str());
     return true;
 }
 
@@ -703,12 +740,12 @@ HcclResult TryForcedAlgAndPrepareEngine(
 {
     forcedAlgAccepted = false;
     std::string forcedAlgName;
-    if (!GetForcedAlgName(ccTiling, forcedAlgName)) {
+    // GetForcedAlgName 内含 topo 准备会写 opParam，备份须在调用之前
+    OpParam opParamBackup = opParam;
+    if (!GetForcedAlgName(comm, ccTiling, opParam, topoInfo, forcedAlgName)) {
         return HCCL_SUCCESS;
     }
 
-    OpParam opParamBackup = opParam;
-    CHK_RET(PrepareTopoInfoForOp(comm, opParam, topoInfo));
     HcclResult ret = PrepareEngineForAlg(opParam, forcedAlgName);
     if (ret != HCCL_SUCCESS) {
         opParam = opParamBackup;
@@ -999,9 +1036,8 @@ HcclResult FillCcuAlgTypeAndName(
     return HCCL_SUCCESS;
 }
 
-// 选择CCU算法并回填algorithmType与opParam.algName。
-// onlyCheck为true时（校验路径）：algConfig为合法强制算法名时先尝试强制算法（注册/层级/资源计算均校验通过才接受），
-// 强制算法不可用或校验失败时回退默认selector；分配路径保持GetForcedAlgName直取语义。
+// 选择CCU算法并回填 algorithmType 与 opParam.algName。
+// onlyCheck=true 为探测路径：与正式选名同一逻辑，强制算法失败同样回退默认 selector。
 HcclResult SelectCcuAlgorithm(
     HcclComm comm, void* stream, const std::string& topoTag, const Mc2CcTilingInner* ccTiling, uint32_t tilingIndex,
     OpParam& opParam, std::string& algName, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo,
@@ -1025,8 +1061,7 @@ HcclResult SelectCcuAlgorithm(
         return FillCcuAlgTypeAndName(tilingIndex, ccTiling, algName, opParam, algorithmType);
     }
 
-    if (GetForcedAlgName(ccTiling, algName)) {
-        CHK_RET(PrepareTopoInfoForOp(comm, opParam, topoInfo));
+    if (GetForcedAlgName(comm, ccTiling, opParam, topoInfo, algName)) {
         CHK_RET(PrepareEngineForAlg(opParam, algName));
         HCCL_INFO("[CcuSelectAlg] use configured algorithm[%s] for ccTiling[%u].", algName.c_str(), tilingIndex);
     } else {
@@ -1034,7 +1069,6 @@ HcclResult SelectCcuAlgorithm(
         HCCL_INFO(
             "[CcuSelectAlg]SelectAlgAndPrepareEngine[%u] successfully, algName = [%s]!", tilingIndex, algName.c_str());
     }
-
     return FillCcuAlgTypeAndName(tilingIndex, ccTiling, algName, opParam, algorithmType);
 }
 
@@ -1150,8 +1184,8 @@ HcclResult CcuSelectAlg(
         if (i > 0U && opResCtx.algorithmType[i] != opResCtx.algorithmType[0]) {
             HCCL_ERROR(
                 "[CcuSelectAlg] all tilings in one KFC context must use the same static server algorithm, "
-                "algorithmType[0]=[%u], algorithmType[%u]=[%u].",
-                opResCtx.algorithmType[0], i, opResCtx.algorithmType[i]);
+                "algorithmType[0]=[%u], tiling[%u] algorithmType=[%u], opType[%u], algConfig[%s].",
+                opResCtx.algorithmType[0], i, opResCtx.algorithmType[i], ccTiling->opType, ccTiling->algConfig);
             return HCCL_E_NOT_SUPPORT;
         }
     }

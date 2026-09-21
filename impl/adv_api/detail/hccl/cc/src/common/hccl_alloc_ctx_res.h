@@ -23,6 +23,7 @@
 #include "mc2_type.h"
 #include "ccu_assist_pub.h"
 #include "hccl_tiling_msg.h"
+#include "external_alg_parser.h"
 
 #include <vector>
 #include <memory>
@@ -189,7 +190,9 @@ std::unique_ptr<InsCollAlgBase> GetAlgExecutorForOp(const OpParam& opParam, cons
 HcclResult CheckForcedAlgResource(
     HcclComm comm, const OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo, const std::string& algName);
 
-bool GetForcedAlgName(const Mc2CcTilingInner* ccTiling, std::string& algName);
+bool GetForcedAlgName(
+    HcclComm comm, const Mc2CcTilingInner* ccTiling, OpParam& opParam,
+    std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo, std::string& algName);
 
 HcclResult TryForcedAlgAndPrepareEngine(
     HcclComm comm, const Mc2CcTilingInner* ccTiling, OpParam& opParam, std::string& algName,
