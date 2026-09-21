@@ -51,7 +51,7 @@ __simd_callee__ inline reg_pair<T> interleave(reg_tensor<T> src0, reg_tensor<T> 
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| src0<br>src1 | 输入 | 源操作数。<br>类型为[reg_tensor]。 |
+| src0<br>src1 | 输入 | 源操作数。<br>类型为[reg_tensor](../reg_tensor/reg_tensor.md)。 |
 
 ## 数据类型
 
