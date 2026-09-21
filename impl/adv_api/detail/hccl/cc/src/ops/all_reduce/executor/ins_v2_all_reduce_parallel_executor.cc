@@ -1035,7 +1035,7 @@ REGISTER_ALG_META(
     FLAG_MULTI_LEVEL, 0);
 
 REGISTER_EXECUTOR_BY_FOUR_TEMPS(
-    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllreduceParallelMeshNHRPcie, InsAllReduceParallelExecutor, TopoMatchPcieMix,
+    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceParallelMeshNHRPcie, InsAllReduceParallelExecutor, TopoMatchPcieMix,
     InsTempReduceScatterMesh1D, InsTempReduceScatterNHR, InsTempAllGatherMesh1D, InsTempAllGatherNHR);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllreduceParallelMeshNHRPcie, AlgEngine::AICPU, "parallel[mesh,nhr]",
