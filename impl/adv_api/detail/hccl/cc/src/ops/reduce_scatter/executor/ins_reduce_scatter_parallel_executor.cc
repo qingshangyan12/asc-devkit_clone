@@ -58,6 +58,41 @@ HcclResult InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
             }
         }
         temp1HierarchyInfo = {closRanks};
+    } else if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && topoInfo->level0PcieMix) {
+        // PCIE 定制机型：TopoMatchPcieMix 产出的 infos[0] 是全网 mesh 合并名单，infos[1] 依赖
+        // CLOS 实例（PCIE 机组间无 CLOS 实例时为空）。参照上游两级语义重新推导两级分组：
+        // 框内组 = 我所在的 mesh 组（rank/组大小 同商）；框间组 = 跨组同位卡（%组大小 同余，含自己）。
+        u32 meshGroupSize = 0;
+        if (!topoInfo->topoInstDetailsOfLayer.empty()) {
+            const auto& instDetails = topoInfo->topoInstDetailsOfLayer[0];
+            auto instIt = instDetails.rankNumForTopoType.find(CommTopo::COMM_TOPO_1DMESH);
+            if (instIt != instDetails.rankNumForTopoType.end() && !instIt->second.empty()) {
+                meshGroupSize = instIt->second[0];
+            }
+        }
+        CHK_PRT_RET(
+            meshGroupSize == 0,
+            HCCL_ERROR("[%s] mesh group size is unavailable on pcie mix topo, rank[%u].", __func__,
+                topoInfo->userRank),
+            HcclResult::HCCL_E_PARA);
+        std::vector<u32> intraRanks;
+        std::vector<u32> interRanks;
+        for (u32 rank : algHierarchyInfo.infos[0][0]) {
+            if (rank / meshGroupSize == topoInfo->userRank / meshGroupSize) {
+                intraRanks.push_back(rank);
+            }
+            if (rank % meshGroupSize == topoInfo->userRank % meshGroupSize) {
+                interRanks.push_back(rank);
+            }
+        }
+        CHK_PRT_RET(
+            intraRanks.empty() || interRanks.empty(),
+            HCCL_ERROR(
+                "[%s] hierarchy re-split failed on pcie mix topo, rank[%u], groupSize[%u].", __func__,
+                topoInfo->userRank, meshGroupSize),
+            HcclResult::HCCL_E_PARA);
+        temp0HierarchyInfo = {intraRanks};
+        temp1HierarchyInfo = {interRanks};
     } else {
         temp0HierarchyInfo = algHierarchyInfo.infos[0];
         temp1HierarchyInfo = algHierarchyInfo.infos[1];
