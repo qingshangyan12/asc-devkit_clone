@@ -402,100 +402,6 @@ __aicore__ inline void WriteRingBufTlvData(
     MemCopyGm2Gm(dst, reinterpret_cast<__gm__ const uint8_t*>(src.GetPhyAddr()), dumpSize * sizeof(T));
 }
 
-template <typename T>
-__aicore__ inline void CopySuperTensorLocalData(
-    const LocalTensor<T>& src, __gm__ uint8_t* dst, Hardware position, uint32_t copySize)
-{
-    DataCopyParams params = GetDataCopyParamImpl(copySize);
-    PipeBarrier<PIPE_ALL>();
-    if (position == Hardware::UB) {
-        DataCopyUB2GMImpl(dst, reinterpret_cast<__ubuf__ uint8_t*>(src.GetPhyAddr()), params);
-    } else if (position == Hardware::L1) {
-        DataCopyL12GMImpl(dst, reinterpret_cast<__cbuf__ uint8_t*>(src.GetPhyAddr()), params);
-    } else {
-        DumpTensorL0C2GMImpl(src, dst, copySize / sizeof(uint32_t));
-    }
-    PipeBarrier<PIPE_ALL>();
-}
-
-template <template <typename> class Tensor, typename T>
-__aicore__ inline void DumpSuperTensorRingBufImpl(
-    __gm__ BlockRingBufInfo* block, const Tensor<T>& src, uint32_t desc, uint64_t total, const uint32_t* shape,
-    uint32_t shapeDim)
-{
-    using __asc_aicore::DumpSuperTensorBodyTlv;
-    using __asc_aicore::DumpSuperTensorTlv;
-    constexpr bool isLocal = IsSameType<Tensor<T>, LocalTensor<T>>::value;
-    Hardware position = Hardware::GM;
-    if constexpr (isLocal) {
-        position = GetPhyType(static_cast<TPosition>(src.GetPosition()));
-    }
-    const uint32_t copyAlign = position == Hardware::L0C ? 1024 : 32;
-    if constexpr (isLocal) {
-        const uint64_t required = position == Hardware::UB ? total : (total + copyAlign - 1) / copyAlign * copyAlign;
-        if (required > static_cast<uint64_t>(src.GetSize()) * sizeof(T)) {
-            return;
-        }
-    }
-    const uint32_t copies = isLocal ? 3 : 1;
-    for (uint64_t offset = 0; offset < total;) {
-        const uint32_t header = offset == 0 ? sizeof(DumpSuperTensorTlv) : sizeof(DumpSuperTensorBodyTlv);
-        const uint32_t overhead = AlignUp(header, ONE_BLK_SIZE) + (isLocal ? 32 : 0) + 1;
-        if (block->ringBufLen <= overhead) {
-            return;
-        }
-        uint32_t capacity = (block->ringBufLen - overhead) / copies / copyAlign * copyAlign;
-        const uint32_t maxChunk = isLocal ? 1024 : 16384;
-        capacity = capacity > maxChunk ? maxChunk : capacity;
-        if (capacity == 0) {
-            return;
-        }
-        const uint32_t size = total - offset < capacity ? static_cast<uint32_t>(total - offset) : capacity;
-        const uint32_t copySize = AlignUp(size, copyAlign);
-        const uint32_t span = AlignUp(header + size, ONE_BLK_SIZE);
-        const uint32_t reserve = span + (isLocal ? 32 + copySize * 2 : 0);
-        auto writeInfo = GetRingBufWriteInfo(block);
-        if (writeInfo->bufOffset > block->ringBufLen || reserve > block->ringBufLen) {
-            return;
-        }
-        if (!CheckAndWaitRingBufSpace(block, reserve)) {
-            return;
-        }
-        auto record = GetRingBufTlv(block);
-        __asc_aicore::set_super_tensor_header(
-            record, total, offset, size, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(src.GetPhyAddr())),
-            static_cast<uint32_t>(GetTensorDataType<T>()), desc, static_cast<uint16_t>(position),
-            static_cast<uint16_t>(GetBlockIdxImpl()), shape, shapeDim);
-        PipeBarrier<PIPE_ALL>();
-        __asc_aicore::asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(record));
-        if constexpr (isLocal) {
-            auto scratch =
-                reinterpret_cast<__gm__ uint8_t*>((reinterpret_cast<uintptr_t>(record + span) + 31) / 32 * 32);
-            const auto slice = src[static_cast<uint32_t>(offset / sizeof(T))];
-            if (position == Hardware::UB) {
-                const uint32_t aligned = size / ONE_BLK_SIZE * ONE_BLK_SIZE;
-                if (aligned != 0) {
-                    CopySuperTensorLocalData(slice, scratch, position, aligned);
-                }
-                auto source = reinterpret_cast<__ubuf__ uint8_t*>(slice.GetPhyAddr());
-                for (uint32_t i = aligned; i < size; ++i) {
-                    scratch[i] = source[i];
-                }
-            } else {
-                CopySuperTensorLocalData(slice, scratch, position, copySize);
-            }
-            __asc_aicore::asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(scratch));
-            MemCopyGm2Gm(record + header, scratch, size);
-        } else {
-            MemCopyGm2Gm(record + header, reinterpret_cast<__gm__ const uint8_t*>(src.GetPhyAddr()) + offset, size);
-        }
-        PipeBarrier<PIPE_ALL>();
-        __asc_aicore::asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(record));
-        UpdateWriteInfo(GetRingBufWriteInfo(block), span);
-        offset += size;
-    }
-}
-
 template <template <typename> class Tensor, typename T>
 __aicore__ static __attribute__((noinline)) void DumpTensorRingBufImpl(
     const Tensor<T>& src, uint32_t desc, uint32_t dumpSize, const uint32_t* shape, const uint32_t shapeDim)
@@ -521,13 +427,6 @@ __aicore__ static __attribute__((noinline)) void DumpTensorRingBufImpl(
         return;
     }
     constexpr uint32_t blockSize = 16 * 16 * sizeof(uint32_t);
-    const uint64_t total = static_cast<uint64_t>(dumpSize) * sizeof(T);
-    const uint64_t ordinaryReserve =
-        sizeof(DumpTensorTlvInfoHead) + ((total + blockSize - 1) / blockSize) * blockSize * 2;
-    if (ordinaryReserve > blockRingBufInfo->ringBufLen || ordinaryReserve > UINT32_MAX) {
-        DumpSuperTensorRingBufImpl(blockRingBufInfo, src, desc, total, shape, shapeDim);
-        return;
-    }
     uint32_t alignDumpDataLen = AlignUp(dumpSize * sizeof(T), ONE_BLK_SIZE);
     uint32_t tlvLen = sizeof(DumpTensorTlvInfoHead) + alignDumpDataLen;
     uint32_t maxResvLen = sizeof(DumpTensorTlvInfoHead) + AlignUp(alignDumpDataLen, blockSize) * 2; // resv tmp space
