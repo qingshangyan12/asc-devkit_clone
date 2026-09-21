@@ -40,7 +40,7 @@
 
 - 计算规则：
 
-  softmax按行独立计算，行与行之间互不依赖。对每一行：先求行内最大值，再将行内每个元素减去该最大值后做指数运算（避免溢出），并对指数结果按行求和，最后用每个指数值除以该行和，得到归一化输出。
+  softmax按行独立计算，行与行之间互不依赖。对每一行：先求行内最大值，再将行内每个元素减去该最大值后做指数运算，并对指数结果按行求和，最后用每个指数值除以该行和，得到归一化输出。
 
 - 样例规格：
 
@@ -64,9 +64,9 @@
 | ---- | ----------------------------------- | ------------------ | ----------------------------------------- | -------------------------------------------------------------------- |
 | 0    | softmax_gm_kernel   | 根据数据量动态计算 | 32 × warps_per_block，随rows自适应，最多2048 | SIMT VF直接读GM，一个Warp处理一行，Warp归约完成行内max和sum          |
 | 1    | softmax_ub_kernel | 根据数据量动态计算 | 32 × rows_per_tile，随rows和UB容量自适应，最多2048 | 输入经MTE搬入UB中转，双份tile缓冲区轮换，搬运与计算重叠              |
-| 2    | softmax_bucket_kernel | 根据数据量动态计算 | 512/1024/2048（按shape动态选择） | 编译期bucket使中间值以定长数组驻留寄存器；UB按bucket宽度padding |
+| 2    | softmax_bucket_kernel | 根据数据量动态计算 | 512/1024/2048（按shape动态选择） | 编译期bucket使中间值以定长数组驻留寄存器；UB按bucket宽度补齐 |
 
-其中线程块数量在Host侧根据数据量动态计算：先通过 `aclrtGetDeviceInfo(ACL_DEV_ATTR_VECTOR_CORE_NUM)` 查询硬件AIV核数，再取AIV核数与rows的较小值作为线程块数量。一个Warp处理一行：Case 0和Case 1中每个Thread Block实际启动的Warp数随rows自适应，rows不足AIV核数时每个Thread Block只处理一行；Case 2中每个Thread Block按固定行数处理数据，rows较小时部分Thread Block无行可处理、直接退出。三个Case通过编译选项 `SCENARIO_NUM` 选择，0、1、2分别对应Case 0、Case 1和Case 2，默认为2。
+其中线程块数量在Host侧根据数据量动态计算：先通过 `aclrtGetDeviceInfo(ACL_DEV_ATTR_VECTOR_CORE_NUM)` 查询硬件AIV核数，再取AIV核数与rows的较小值作为线程块数量。一个Warp处理一行：Case 0和Case 1中每个Thread Block实际启动的Warp数随rows自适应，rows不足AIV核数时每个Thread Block只处理一行；Case 2的UB缓冲区为静态数组，维度由线程数与bucket容量共同决定，必须编译期确定，因此线程数只能取512/1024/2048固定档位、实际启动的线程数与档位一致，不能随rows任意变化，每个Thread Block按固定行数处理数据，rows较小时部分Thread Block无行可处理、直接退出。三个Case通过编译选项 `SCENARIO_NUM` 选择，0、1、2分别对应Case 0、Case 1和Case 2，默认为2。
 
 ### 性能指标说明
 
@@ -126,11 +126,11 @@ for (uint32_t row = blockIdx.x * warps_per_block + warp_in_block;  // 一个Warp
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| 13.039 | 11.513 | 18997.2 | 11.048 | 0.960 | 0.461 | 0.040 | 0.005 | 0.000 | 0.002 | 0.000 |
+| 23.578 | 11.368 | 18757.7 | 10.957 | 0.964 | 0.407 | 0.036 | 0.005 | 0.000 | 0.002 | 0.000 |
 
 **分析**：
 
-Case 0的 `aiv_vec_ratio` 达到0.960，耗时集中在SIMT线程的GM读写和行内计算上。从实现看，同一行输入在三轮循环中被重复读取三次，`exp` 被计算两次，且GM访问与计算串行在同一段SIMT线程内，无法与搬运流水重叠。下一步将数据搬运与计算拆开，由MTE把输入搬入UB中转。
+Case 0的 `aiv_vec_ratio` 达到0.964，耗时集中在SIMT线程的GM读写和行内计算上。从实现看，同一行输入在三轮循环中被重复读取三次，`exp` 被计算两次，且GM访问与计算串行在同一段SIMT线程内，无法与搬运流水重叠。下一步将数据搬运与计算拆开，由MTE把输入搬入UB中转。
 
 ---
 
@@ -140,7 +140,7 @@ Case 0的 `aiv_vec_ratio` 达到0.960，耗时集中在SIMT线程的GM读写和�
 
 **核心实现**：
 
-- 每个Thread Block按tile处理行数据。tile内的行数决定一次VF调用启动的Warp数量（一个Warp处理一行），该行数取以下三者中的最小值：本Thread Block分到的行数、UB容量内四份tile缓冲区可容纳的行数、单次VF调用线程数上限对应的64行。
+- 每个Thread Block按tile处理行数据。tile内的行数决定一次VF调用启动的Warp数量（一个Warp处理一行），该行数取以下三者中的最小值：本Thread Block分到的行数、UB容量内四份tile缓冲区可容纳的行数、一个Thread Block最多启动2048个线程（64个Warp）对应的64行。
 - kernel将动态UB划分为双份输入tile缓冲区与双份输出tile缓冲区，两组缓冲区随tile交替使用，各自的生命周期由独立的事件管理。
 - MTE2使用 `asc_copy_gm2ub_align` 二维搬运，按真实cols把GM每行搬入UB；MTE3按同样方式把结果搬回GM。
 - SIMT VF仍按一个Warp一行的方式在UB上完成max、exp/sum和归一化三轮循环。
@@ -195,11 +195,11 @@ for (uint32_t row_base = first_row_base; row_base < rows; row_base += tile_strid
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| 11.203 | 9.782 | 16140.2 | 7.235 | 0.741 | 0.521 | 0.053 | 2.878 | 0.294 | 0.587 | 0.060 |
+| 20.634 | 10.375 | 17119.3 | 7.833 | 0.756 | 0.514 | 0.049 | 2.787 | 0.269 | 0.599 | 0.058 |
 
 **分析**：
 
-Case 1把GM访问交给MTE流水并引入双缓冲，SIMT VF不再直接读GM：`aiv_mte2_time` 和 `aiv_mte3_time` 从接近0变为2.878μs和0.587μs，说明GM访问已经转移到MTE搬运路径；`aiv_vec_time` 从11.048μs降至7.235μs，下降约34.5%；`Task Duration` 从13.039μs降至11.203μs，下降约14.1%。此时 `aiv_vec_ratio` 达到0.741，是各分项中占比最高的开销，瓶颈已从GM访存转移到行内计算，下一步需要优化计算耗时。
+Case 1把GM访问交给MTE流水并引入双缓冲，SIMT VF不再直接读GM：`aiv_mte2_time` 和 `aiv_mte3_time` 从接近0变为2.787μs和0.599μs，说明GM访问已经转移到MTE搬运路径；`aiv_vec_time` 从10.957μs降至7.833μs，下降约28.5%；`Task Duration` 从23.578μs降至20.634μs，下降约12.5%。此时 `aiv_vec_ratio` 达到0.756，是各分项中占比最高的开销，瓶颈已从GM访存转移到行内计算，下一步需要优化计算耗时。
 
 Case 1的计算耗时主要集中在行内计算的组织方式上：行内计算按max、exp/sum、归一化三轮循环组织，每轮都重新读取一遍UB输入行，`exp` 被计算两次。下一步的优化方向是把每个线程分到的元素缓存到局部数组中复用 `exp` 结果，并让数组驻留寄存器。
 
@@ -207,7 +207,7 @@ Case 1的计算耗时主要集中在行内计算的组织方式上：行内计�
 
 ### Case 2：编译期bucket与动态线程选择
 
-**优化目标**：消除Case 1行内计算对输入行的重复读取和对 `exp` 的重复计算。第一步先引入静态数组，把整行元素从UB缓存下来，一次读入完成max、exp/sum和归一化；第二步再设法让数组驻留寄存器，进一步降低访存开销。为此将实现收敛为编译期bucket模板：按cols上界64/128/256/384/512生成特化kernel，使定长数组 `elements[kWarpIterations]` 驻留寄存器；Host侧按shape动态选择线程数。
+**优化目标**：消除Case 1行内计算对输入行的重复读取和对 `exp` 的重复计算。第一步先引入静态数组，把整行元素从UB缓存下来，一次读入完成max、exp/sum和归一化；第二步再设法让数组驻留寄存器，进一步降低访存开销。为此将实现收敛为编译期bucket：按cols上界64/128/256/384/512分成五档，每档生成定长特化kernel，使整行中间值驻留寄存器；Host侧按shape动态选择线程数。
 
 **核心实现**：
 
@@ -218,7 +218,7 @@ Case 1的计算耗时主要集中在行内计算的组织方式上：行内计�
 
 - 动态线程选择：Host按每核行数选择线程数，512/1024/2048线程对应每个tile最多处理16/32/64行；`cols > 256` 时考虑寄存器压力，最多启动1024个线程。
 
-SIMT VF将整行元素读入定长数组，在寄存器中完成全部计算：
+SIMT VF将线程分到的元素读入定长数组，在寄存器中完成全部计算：
 
 ```cpp
 template <uint32_t kThreadCount, uint32_t kBucketCols>
@@ -271,11 +271,11 @@ __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| 8.465 | 7.055 | 11640.3 | 4.520 | 0.642 | 0.467 | 0.066 | 2.885 | 0.410 | 0.589 | 0.084 |
+| 14.128 | 7.077 | 11676.7 | 4.593 | 0.651 | 0.420 | 0.059 | 2.848 | 0.403 | 0.593 | 0.084 |
 
 **分析**：
 
-Case 2相对Case 1的主要变化是“运行时cols”变为“编译期bucket上界”：定长数组的长度和下标在编译期确定，编译器将整行中间值暂存在寄存器中，输入行与 `exp` 均只处理一次。`aiv_vec_time` 从7.235μs进一步降至4.520μs，下降约37.5%；`Task Duration` 从11.203μs降至8.465μs，下降约24.4%。bucket只影响UB布局的步长，MTE仍按真实cols搬运，`aiv_mte2_time` 与Case 1基本持平；总耗时下降使 `aiv_vec_ratio` 从0.741降至0.642、`aiv_mte2_ratio` 从0.294升至0.410，行内计算与MTE2搬运的耗时占比已接近。相对Case 0，`Task Duration` 从13.039μs降至8.465μs，整体下降约35.1%。
+Case 2相对Case 1的主要变化是“运行时cols”变为“编译期bucket上界”：定长数组的长度和下标在编译期确定，编译器将整行中间值暂存在寄存器中，输入行与 `exp` 均只处理一次。`aiv_vec_time` 从7.833μs进一步降至4.593μs，下降约41.4%；`Task Duration` 从20.634μs降至14.128μs，下降约31.5%。bucket只影响UB布局的步长，MTE仍按真实cols搬运，`aiv_mte2_time` 与Case 1基本持平；总耗时下降使 `aiv_vec_ratio` 从0.756降至0.651、`aiv_mte2_ratio` 从0.269升至0.403，行内计算与MTE2搬运的耗时占比已接近。相对Case 0，`Task Duration` 从23.578μs降至14.128μs，整体下降约40.1%。
 
 ## 性能对比总结
 
@@ -283,19 +283,19 @@ Case 2相对Case 1的主要变化是“运行时cols”变为“编译期bucket�
 
 | Case | 优化手段                   | Task Duration(μs) | aiv_time(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_mte2_time(μs) | aiv_mte3_time(μs) |
 | ---- | -------------------------- | :---: | :---: | :---: | :---: | :---: | :---: |
-| 0    | SIMT直接读GM基线           | 13.039 | 11.513 | 11.048 | 0.960 | 0.005 | 0.002 |
-| 1    | UB中转与MTE双缓冲          | 11.203 | 9.782  | 7.235  | 0.741 | 2.878 | 0.587 |
-| 2    | 编译期bucket与动态线程选择 | 8.465  | 7.055  | 4.520  | 0.642 | 2.885 | 0.589 |
+| 0    | SIMT直接读GM基线           | 23.578 | 11.368 | 10.957 | 0.964 | 0.005 | 0.002 |
+| 1    | UB中转与MTE双缓冲          | 20.634 | 10.375 | 7.833  | 0.756 | 2.787 | 0.599 |
+| 2    | 编译期bucket与动态线程选择 | 14.128 | 7.077  | 4.593  | 0.651 | 2.848 | 0.593 |
 
-调优主路径Case 0 -> Case 1 -> Case 2，`Task Duration` 由13.039μs依次降至11.203μs、8.465μs，Case 2相对Case 0整体下降约35.1%。
+调优主路径Case 0 -> Case 1 -> Case 2，`Task Duration` 由23.578μs依次降至20.634μs、14.128μs，Case 2相对Case 0整体下降约40.1%。
 
-从指标变化可以观察各阶段瓶颈的转移：Case 0的耗时集中在SIMT线程直接读写GM（`aiv_vec_ratio` 0.960，MTE接近0）；Case 1把GM访问转移到MTE2后，`aiv_vec_time` 下降34.5%，但三轮循环仍重复读取UB输入行并重复计算 `exp`；Case 2通过编译期bucket让整行中间值驻留寄存器后，`aiv_vec_time` 再下降37.5%，`aiv_vec_ratio` 降至0.642，同时 `aiv_mte2_ratio` 升至0.410，行内计算与MTE2搬运的耗时占比已接近。
+从指标变化可以观察各阶段瓶颈的转移：Case 0的耗时集中在SIMT线程直接读写GM（`aiv_vec_ratio` 0.964，MTE接近0）；Case 1把GM访问转移到MTE2后，`aiv_vec_time` 下降28.5%，但三轮循环仍重复读取UB输入行并重复计算 `exp`；Case 2通过编译期bucket让整行中间值驻留寄存器后，`aiv_vec_time` 再下降41.4%，`aiv_vec_ratio` 降至0.651，同时 `aiv_mte2_ratio` 升至0.403，行内计算与MTE2搬运的耗时占比已接近。
 
 固定rows为8192、逐渐增大一行数据量（cols从64到512），Case 1与Case 2的 `Task Duration` 变化如下图所示，图中竖直虚线为bucket档位边界。
 
 <img src="./figures/perf_trend.png">
 
-Case 1的 `Task Duration` 随cols增大持续上升：行内计算三轮串行遍历，每个线程处理的元素数与cols成正比。Case 2的增长呈阶梯状：同一bucket档位内基本持平——每线程的计算量由 `kWarpIterations` 决定、保持不变，只有MTE按真实cols搬运的数据量随cols小幅增长；跨过bucket边界时计算量跳升一档，`Task Duration` 随之跳升。全部cols区间Case 2均优于Case 1，且cols越大优势越明显，cols=512时 `Task Duration` 约为Case 1的54%；bucket上界超出真实cols较多的档位中部（如cols=96、197），Case 2需要多处理尾部无效列，相对优势小于档位边界处（如cols=128、384、512）。
+Case 1的 `Task Duration` 随cols增大持续上升：行内计算三轮串行遍历，每个线程处理的元素数与cols成正比。Case 2的增长呈阶梯状：同一bucket档位内基本持平——每线程的计算量由 `kWarpIterations` 决定、保持不变，只有MTE按真实cols搬运的数据量随cols小幅增长；跨过bucket边界时计算量跳升一档，`Task Duration` 随之跳升。全部cols区间Case 2均优于Case 1，且cols越大优势越明显，cols=512时 `Task Duration` 约为Case 1的65%；bucket上界超出真实cols较多的档位中部（如cols=96、197），Case 2需要多处理尾部无效列，相对优势小于档位边界处（如cols=128、384、512）。
 
 ## 调优建议
 
