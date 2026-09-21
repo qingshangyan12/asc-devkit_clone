@@ -49,6 +49,7 @@ __aicore__ inline void asc_mmad_mx_sync(
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad_mx and asc_sync)
+/* asc_mmad_mx_sync composite path 1. */
 __aicore__ inline void asc_mmad_mx_sync(
     __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, __cb__ fp4x2_e1m2_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -60,6 +61,7 @@ __aicore__ inline void asc_mmad_mx_sync(
             c_matrix_init_val);
         asc_sync_post_process();
     }
+    /* asc_mmad_mx_sync composite path 2. */
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad_mx and asc_sync)
@@ -74,6 +76,7 @@ __aicore__ inline void asc_mmad_mx_sync(
             c_matrix_init_val);
         asc_sync_post_process();
     }
+    /* asc_mmad_mx_sync composite path 3. */
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad_mx and asc_sync)
@@ -88,6 +91,7 @@ __aicore__ inline void asc_mmad_mx_sync(
             c_matrix_init_val);
         asc_sync_post_process();
     }
+    /* asc_mmad_mx_sync composite path 4. */
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad_mx and asc_sync)
@@ -102,6 +106,7 @@ __aicore__ inline void asc_mmad_mx_sync(
             c_matrix_init_val);
         asc_sync_post_process();
     }
+    /* asc_mmad_mx_sync composite path 5. */
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad_mx and asc_sync)
@@ -116,6 +121,7 @@ __aicore__ inline void asc_mmad_mx_sync(
             c_matrix_init_val);
         asc_sync_post_process();
     }
+    /* asc_mmad_mx_sync composite path 6. */
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad_mx and asc_sync)
@@ -130,6 +136,7 @@ __aicore__ inline void asc_mmad_mx_sync(
             c_matrix_init_val);
         asc_sync_post_process();
     }
+    /* asc_mmad_mx_sync composite path 7. */
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad and asc_sync)
@@ -157,6 +164,7 @@ __aicore__ inline void asc_mmad_sync(
         asc_sync_post_process();
     }
 }
+/* asc_mmad_sync composite path 6. */
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad and asc_sync)
 __aicore__ inline void asc_mmad_sync(
@@ -170,6 +178,7 @@ __aicore__ inline void asc_mmad_sync(
         asc_sync_post_process();
     }
 }
+/* asc_mmad_sync composite path 7. */
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad and asc_sync)
 __aicore__ inline void asc_mmad_sync(
@@ -183,6 +192,7 @@ __aicore__ inline void asc_mmad_sync(
         asc_sync_post_process();
     }
 }
+/* asc_mmad_sync composite path 8. */
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad and asc_sync)
 __aicore__ inline void asc_mmad_sync(
@@ -196,6 +206,7 @@ __aicore__ inline void asc_mmad_sync(
         asc_sync_post_process();
     }
 }
+/* asc_mmad_sync composite path 9. */
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad and asc_sync)
 __aicore__ inline void asc_mmad_sync(
@@ -210,6 +221,7 @@ __aicore__ inline void asc_mmad_sync(
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad and asc_sync)
+/* asc_mmad_sync composite path 10. */
 __aicore__ inline void asc_mmad_sync(
     __cc__ float* c_matrix, __ca__ float* a_matrix, __cb__ float* b_matrix, uint16_t left_height, uint16_t n_dim,
     uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
@@ -221,6 +233,7 @@ __aicore__ inline void asc_mmad_sync(
     }
 }
 
+/* asc_mmad_sync composite path 11. */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad and asc_sync)
 __aicore__ inline void asc_mmad_sync(
     __cc__ int32_t* c_matrix, __ca__ int8_t* a_matrix, __cb__ int8_t* b_matrix, uint16_t left_height, uint16_t n_dim,
@@ -233,6 +246,7 @@ __aicore__ inline void asc_mmad_sync(
     }
 }
 
+/* asc_mmad_sync composite path 12. */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mmad and asc_sync)
 __aicore__ inline void asc_mmad_sync(
     __cc__ float* c_matrix, __ca__ hifloat8_t* a_matrix, __cb__ hifloat8_t* b_matrix, uint16_t left_height,
@@ -245,6 +259,7 @@ __aicore__ inline void asc_mmad_sync(
         asc_sync_post_process();
     }
 }
+/* asc_mmad_sync composite path 13. */
 
 #endif
 

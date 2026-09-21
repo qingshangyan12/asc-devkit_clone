@@ -816,6 +816,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
             dst_nz_matrix_stride);
     }
 }
+/* asc_copy_gm2l1_nd2nz interface path 21. */
 
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
@@ -840,6 +841,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
             dst_nz_matrix_stride);
     }
 }
+/* asc_copy_gm2l1_nd2nz interface path 22. */
 
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
@@ -852,6 +854,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
             dst_nz_matrix_stride);
     }
 }
+/* asc_copy_gm2l1_nd2nz interface path 23. */
 
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ float* dst, __gm__ float* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
@@ -876,6 +879,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
             dst_nz_matrix_stride);
     }
 }
+/* asc_copy_gm2l1_nd2nz interface path 24. */
 
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
@@ -888,6 +892,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
             dst_nz_matrix_stride);
     }
 }
+/* asc_copy_gm2l1_nd2nz interface path 25. */
 
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
@@ -923,6 +928,7 @@ __aicore__ inline void asc_copy_l0c2l1(
     }
 }
 
+/* asc_copy_l0c2l1 interface path 1. */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool enable_channel_split, bool enable_nz2nd)
@@ -934,6 +940,7 @@ __aicore__ inline void asc_copy_l0c2l1(
     }
 }
 
+/* asc_copy_l0c2l1 interface path 2. */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int16_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool enable_channel_split,
@@ -945,6 +952,7 @@ __aicore__ inline void asc_copy_l0c2l1(
             relu_pre, enable_channel_split, enable_nz2nd);
     }
 }
+/* asc_copy_l0c2l1 interface path 3. */
 
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
@@ -957,6 +965,7 @@ __aicore__ inline void asc_copy_l0c2l1(
             relu_pre, enable_channel_split, enable_nz2nd);
     }
 }
+/* asc_copy_l0c2l1 interface path 4. */
 
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
@@ -969,6 +978,7 @@ __aicore__ inline void asc_copy_l0c2l1(
             relu_pre, enable_channel_split, enable_nz2nd);
     }
 }
+/* asc_copy_l0c2l1 interface path 5. */
 
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ void* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
@@ -1099,6 +1109,7 @@ __aicore__ inline void asc_copy_l12l0a(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    /* asc_copy_l12l0a interface path 13. */
 }
 
 __aicore__ inline void asc_copy_l12l0a(
@@ -1112,6 +1123,7 @@ __aicore__ inline void asc_copy_l12l0a(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    /* asc_copy_l12l0a interface path 14. */
 }
 
 __aicore__ inline void asc_copy_l12l0a(
@@ -1125,6 +1137,7 @@ __aicore__ inline void asc_copy_l12l0a(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    /* asc_copy_l12l0a interface path 15. */
 }
 
 __aicore__ inline void asc_copy_l12l0a(
@@ -1138,6 +1151,7 @@ __aicore__ inline void asc_copy_l12l0a(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    /* asc_copy_l12l0a interface path 16. */
 }
 
 __aicore__ inline void asc_copy_l12l0a(
@@ -1151,6 +1165,7 @@ __aicore__ inline void asc_copy_l12l0a(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    /* asc_copy_l12l0a interface path 17. */
 }
 
 __aicore__ inline void asc_copy_l12l0a(
@@ -1164,6 +1179,7 @@ __aicore__ inline void asc_copy_l12l0a(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    /* asc_copy_l12l0a interface path 18. */
 }
 
 __aicore__ inline void asc_copy_l12l0b(
@@ -1260,6 +1276,7 @@ __aicore__ inline void asc_copy_l12l0b(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    /* asc_copy_l12l0b interface path 13. */
 }
 
 __aicore__ inline void asc_copy_l12l0b(
@@ -1273,6 +1290,7 @@ __aicore__ inline void asc_copy_l12l0b(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    /* asc_copy_l12l0b interface path 14. */
 }
 
 __aicore__ inline void asc_copy_l12l0b(
@@ -1286,6 +1304,7 @@ __aicore__ inline void asc_copy_l12l0b(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    /* asc_copy_l12l0b interface path 15. */
 }
 
 __aicore__ inline void asc_copy_l12l0b(
@@ -1299,6 +1318,7 @@ __aicore__ inline void asc_copy_l12l0b(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    /* asc_copy_l12l0b interface path 16. */
 }
 
 __aicore__ inline void asc_copy_l0c2gm(
@@ -1324,6 +1344,7 @@ __aicore__ inline void asc_copy_l0c2gm(
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
     }
 }
+/* asc_copy_l0c2gm interface path 1. */
 
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
@@ -1336,6 +1357,7 @@ __aicore__ inline void asc_copy_l0c2gm(
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
     }
 }
+/* asc_copy_l0c2gm interface path 2. */
 
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
@@ -1348,6 +1370,7 @@ __aicore__ inline void asc_copy_l0c2gm(
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
     }
 }
+/* asc_copy_l0c2gm interface path 3. */
 
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
@@ -1360,6 +1383,7 @@ __aicore__ inline void asc_copy_l0c2gm(
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
     }
 }
+/* asc_copy_l0c2gm interface path 4. */
 
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
@@ -1372,6 +1396,7 @@ __aicore__ inline void asc_copy_l0c2gm(
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
     }
 }
+/* asc_copy_l0c2gm interface path 5. */
 
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int16_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
@@ -1384,6 +1409,7 @@ __aicore__ inline void asc_copy_l0c2gm(
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
     }
 }
+/* asc_copy_l0c2gm interface path 6. */
 
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
@@ -1396,6 +1422,7 @@ __aicore__ inline void asc_copy_l0c2gm(
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
     }
 }
+/* asc_copy_l0c2gm interface path 7. */
 
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
@@ -1408,6 +1435,7 @@ __aicore__ inline void asc_copy_l0c2gm(
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
     }
 }
+/* asc_copy_l0c2gm interface path 8. */
 
 __aicore__ inline void asc_copy_l12gm(
     __gm__ void* dst, __cbuf__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
