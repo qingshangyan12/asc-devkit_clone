@@ -144,7 +144,7 @@ Each case shares an identical launch configuration and input generation scheme (
 
 Except for Task Duration, all metrics are averages over all blocks. execute cycle is printed directly by `clock()` inside the kernel; Task Duration and aiv_total_cycles are collected via msOpProf, see [Performance Profiling](#performance-profiling).
 
-### Case 0: hlog10 Baseline (Branch Divergence)
+### Case 0: hlog10 Branch Divergence Baseline
 
 **Implementation**: First correct the six special values with precision deviations, returning the corrected result immediately upon a hit; if none hit, continue with the normal path.
 
@@ -182,7 +182,7 @@ __aicore__ inline half hlog10_case0(half x)
 
 - A minority of threads in a Warp hit special values and return early, while the majority continue along the normal path. Early-returning threads cannot make the Warp skip subsequent instructions; they still wait at the reconvergence point for other threads to finish the normal path, wasting compute resources; the branch stack overhead of the 6-level real-jump judgment chain also exists unconditionally. Together these form the comparison baseline for the optimized versions below.
 
-### Case 1: hlog10 Optimized (Predicate Optimization)
+### Case 1: hlog10 Predication Optimized Version
 
 **Implementation**: First fully execute the normal path to get temp, then correct the six special values with precision deviations, overwriting temp, and finally return temp uniformly. Each correction branch body is only one assignment statement, and the whole chain shares a unified return exit.
 
@@ -222,7 +222,7 @@ __aicore__ inline half hlog10_case1(half x)
 - With the unified return, the compiler converts the branches in the correction chain into predicated straight-line execution; jumps and branch stack operations are reduced, and execute cycle drops from Case 0's 1890 to 1406.
 - With the normal path moved before the branch divergence region, threads hitting special values wait less at the reconvergence point; when the special-value proportion is small, the extra execution from predication is tiny, and aiv_total_cycles drops from Case 0's 5232.88 to 5194.75, a clear performance gain.
 
-### Case 2: j0f Baseline (Branch Divergence)
+### Case 2: j0f Branch Divergence Baseline
 
 **Implementation**: First check NaN/Inf special values and return immediately; then match segments in order of low, middle, and high value segments, returning that segment's result upon a hit. Each branch returns independently, with no unified exit.
 
@@ -287,7 +287,7 @@ Early returns implicitly carry else branches, and the jump and branch stack over
 - Most of the regular-batch inputs skip the two special-value checks and hit the low-segment branch, while a small amount of NaN/Inf input hits and returns at the first branch; the missed checks still incur jump and branch stack overhead, but each thread executes only the hit direction's segment body, with an execute cycle of 2345;
 - aiv_total_cycles is the average over all blocks, where the first block includes the extra overhead of kernel launch (same below).
 
-### Case 3: j0f Fully Predicated Version (Predicate Optimization)
+### Case 3: j0f Fully Predicated Version
 
 **Implementation**: First compute result by the high-value segment, then execute the middle segment, low segment, and NaN/Inf special-value handling in turn, overwriting result upon a hit, and finally return uniformly.
 
@@ -325,7 +325,7 @@ __aicore__ inline float j0f_case3(float x)
 - Execute cycle rises from Case 2's 2345 to 14692, Task Duration from 14.567μs to 22.726μs, and aiv_total_cycles from 5025.12 to 19514.88. Case 3 is significantly slower than the baseline because of predicating long branch bodies: in the hlog10 group (Case 1) each correction branch body is only one assignment statement, so the extra issue cost is tiny; whereas the three segment bodies of j0f are each polynomial evaluations of dozens of instructions — after predication every input unconditionally executes the high-segment computation, and most low-segment inputs additionally execute the middle segment, so the extra execution far exceeds the saved jump and branch stack overhead.
 - The Case 2 versus Case 3 comparison shows: the control overhead saved by predication is fixed, while the extra issue cost is proportional to branch body length; for long branch bodies the cost exceeds the gain. Case 4 further incorporates hit situations to explore the applicable boundary of predication.
 
-### Case 4: j0f Optimized (Real Jumps and Predicate Optimization Combined)
+### Case 4: j0f Combined Real-Jump and Predication Optimized Version
 
 **Implementation**: The low and middle segments cover wide ranges and have long branch bodies, returning upon hit; inputs that miss compute result by the high segment, then overwrite result via NaN/Inf special-value handling, and finally return uniformly.
 
