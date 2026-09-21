@@ -51,6 +51,9 @@ set(HCCL_SELECTOR_PRODUCT_SOURCES
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem_peer_only.cc
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_nhr1d_multi_jetty_mem2mem.cc
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu/kernel/ccu_kernel_kfc_all_to_all_mesh1d_multi_jetty.cc
+    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_mesh1d_multi_jetty.cc
+    # executor 注册项经 vtable 急切实例化引用 sliced 模板 out-of-line 虚函数符号，必须编入
+    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu/ccu_temp_all_to_all_mesh1d_multi_jetty.cc
     ${HCCL_CC_SRC_DIR}/ops/all_reduce/selector/all_reduce_auto_selector.cc
     ${HCCL_CC_SRC_DIR}/ops/all_reduce/executor/ins_v2_all_reduce_sole_executor.cc
     ${HCCL_CC_SRC_DIR}/ops/all_reduce/template/ccu/ccu_temp_kfc_all_reduce_mesh_1D_mem2mem.cc
@@ -59,6 +62,7 @@ set(HCCL_SELECTOR_PRODUCT_SOURCES
     ${HCCL_CC_SRC_DIR}/ops/all_reduce/template/aicpu/ins_temp_all_reduce_mesh_1D_one_shot.cc
     ${HCCL_CC_SRC_DIR}/ops/all_reduce/template/aicpu/ins_temp_all_reduce_aicpu_reduce_nhr.cc
     ${HCCL_CC_SRC_DIR}/ops/all_reduce/template/aicpu/ins_temp_all_reduce_mesh_1D_two_shot_mesh_chunk.cc
+    ${HCCL_CC_SRC_DIR}/ops/all_reduce/template/aicpu/ins_temp_all_reduce_nhr.cc
     ${HCCL_CC_SRC_DIR}/ops/kfc_server/executor/ins_kfc_server_sole_executor.cc
     ${HCCL_CC_SRC_DIR}/ops/kfc_server/template/ccu/ccu_temp_kfc_server.cc
     ${HCCL_CC_SRC_DIR}/ops/kfc_server/template/ccu/kernel/ccu_kernel_kfc_server.cc
@@ -103,6 +107,7 @@ add_executable(
     ${HCCL_MC2_CCU_ALL_TO_ALL_V_DIR}/ccu_all_to_all_v.cc
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/all_to_all_testcase.cpp
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/ccu_all_to_all_mesh1d_adapter.cc
+    ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/ccu_all_to_all_mj_adapter.cc
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/ccu_all_to_all.cc
     ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/reduce_scatter_testcase.cpp
     ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/ccu_reduce_scatter.cc
@@ -112,6 +117,7 @@ add_executable(
     ${HCCL_MC2_CCU_ALL_REDUCE_DIR}/ccu_all_reduce_mesh1d_mem2mem_adapter.cc
     ${HCCL_MC2_CCU_ALL_REDUCE_DIR}/ccu_all_reduce.cc
     ${HCCL_MC2_CCU_ALL_GATHER_DIR}/all_gather_testcase.cpp
+    ${HCCL_MC2_CCU_ALL_GATHER_DIR}/parallel_migration_testcase.cpp
     ${HCCL_MC2_CCU_ALL_GATHER_DIR}/ccu_all_gather_kfc_server_adapter.cc
     ${HCCL_MC2_CCU_ALL_GATHER_DIR}/ccu_all_gather.cc
     ${UTILS_DIR}/ccu_scenario/ccu_fixture.cc

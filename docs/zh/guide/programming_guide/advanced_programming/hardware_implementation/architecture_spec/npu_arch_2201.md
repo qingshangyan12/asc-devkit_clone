@@ -3,10 +3,10 @@
 本节介绍\_\_NPU\_ARCH\_\_版本号为2201的硬件架构和其功能说明。对应的产品型号为：
 
 <!-- npu="A3" id1 -->
--   Atlas A3 训练系列产品/Atlas A3 推理系列产品
+-   Atlas A3系列产品
 <!-- end id1 -->
 <!-- npu="910b" id2 -->
--   Atlas A2 训练系列产品/Atlas A2 推理系列产品
+-   Atlas A2系列产品
 <!-- end id2 -->
 
 ## 硬件架构图<a name="section2189135013710"></a>
@@ -92,7 +92,7 @@
 
 **支持跨卡数据搬运（Hccs物理链路）**
 
-在跨卡通信算子开发场景，DataCopy类接口支持跨卡数据搬运，在Atlas A2 训练系列产品/Atlas A2 推理系列产品设备上，仅支持Hccs物理链路，不支持其他通路；开发者开发过程中，请关注涉及卡间通信的物理通路；通过npu-smi  info -t topo指令查询Hccs 物理通路。
+在跨卡通信算子开发场景，DataCopy类接口支持跨卡数据搬运，在Atlas A2系列产品设备上，仅支持Hccs物理链路，不支持其他通路；开发者开发过程中，请关注涉及卡间通信的物理通路；通过npu-smi  info -t topo指令查询Hccs 物理通路。
 
 **支持Fixpipe硬件化加速**
 
@@ -214,7 +214,7 @@ Fixpipe是NPU将典型操作进行硬化的加速模块，位于AIC内部，配�
 
     -   **与其它接口的flagId冲突**
 
-        Matmul高阶API和SyncAll硬件同步接口内部实现中使用了CrossCoreSetFlag和CrossCoreWaitFlag会占用一部分flagId，开发者同时使用以上两个接口与CrossCoreSetFlag/CrossCoreWaitFlag时，需注意避免flagId使用冲突，具体情况参考[CrossCoreSetFlag的flagId冲突说明](../../../../../api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreSetFlag_ISASI.md#flagId冲突说明)。
+        部分接口内部实现中使用了CrossCoreSetFlag和CrossCoreWaitFlag，会占用一部分flagId，开发者同时使用这些接口与CrossCoreSetFlag/CrossCoreWaitFlag时，需注意避免flagId使用冲突，各接口flagId占用的完整说明（含各NPU架构版本的差异）参考[核间同步flagId占用说明](../../../../../api/SIMD-API/basic_api/sync_control/inter_core_sync/key_features.md#inter_core_sync_flagid_usage)。
 
     -   **计数器限制**
 

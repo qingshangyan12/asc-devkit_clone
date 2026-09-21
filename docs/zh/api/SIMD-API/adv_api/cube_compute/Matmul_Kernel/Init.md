@@ -5,23 +5,23 @@
 ### Tiling参数传入栈地址的接口
 
 <!-- npu="950" id5 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id5 -->
 <!-- npu="A3" id6 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id6 -->
 <!-- npu="910b" id7 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id7 -->
 <!-- npu="310b" id8 -->
-- Atlas 200I/500 A2 推理产品：支持
+- Atlas 200I/500 A2推理产品：支持
 <!-- end id8 -->
 <!-- npu="310p" id9 -->
-- Atlas 推理系列产品AI Core：支持
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品AI Core：支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id9 -->
 <!-- npu="910" id10 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id10 -->
 <!-- npu="x90" id1 -->
 - Kirin X90：支持
@@ -34,23 +34,23 @@
 ### Tiling参数传入GM地址的接口
 
 <!-- npu="950" id11 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id11 -->
 <!-- npu="A3" id12 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id12 -->
 <!-- npu="910b" id13 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id13 -->
 <!-- npu="310b" id14 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id14 -->
 <!-- npu="310p" id15 -->
-- Atlas 推理系列产品AI Core：不支持
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品AI Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id15 -->
 <!-- npu="910" id16 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id16 -->
 <!-- npu="x90" id3 -->
 - Kirin X90：支持
@@ -88,14 +88,14 @@ Init主要用于对Matmul对象中的Tiling数据进行初始化，根据Tiling�
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| cubeTiling | 输入 | Matmul Tiling参数，TCubeTiling结构体定义请参见[表1 TCubeTiling结构说明](../Matmul_Tiling/TCubeTiling_struct.md#tcubetiling-struct)。<br><br>Tiling参数可以通过host侧[GetTiling](../Matmul_Tiling/GetTiling.md)接口获取，并传递到kernel侧使用。在kernel侧调用[GET_TILING_DATA](../../../basic_api/Kernel-Tiling/GET_TILING_DATA.md)实现将Tiling参数搬运到AI Core内的栈空间中，本接口传入Tiling参数中TCubeTiling结构体的栈地址。 |
+| cubeTiling | 输入 | Matmul Tiling参数，TCubeTiling结构体定义请参见[表1 TCubeTiling结构说明](../Matmul_Tiling/TCubeTiling_struct.md#tcubetiling-struct)。<br><br>Tiling参数可以通过host侧[GetTiling](../Matmul_Tiling/GetTiling.md)接口获取，并传递到核函数（Kernel）侧使用。在核函数（Kernel）侧调用[GET_TILING_DATA](../../../basic_api/Kernel-Tiling/GET_TILING_DATA.md)实现将Tiling参数搬运到AI Core内的栈空间中，本接口传入Tiling参数中TCubeTiling结构体的栈地址。 |
 | tpipe | 输入 | Tpipe对象。 |
 
 **表2**  Tiling参数传入GM地址接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| gmCubeTiling | 输入 | Matmul Tiling参数，该参数指向gm上的一块内存地址，其中的数据类型是TCubeTiling结构体，TCubeTiling结构体定义请参见[表1 TCubeTiling结构说明](../Matmul_Tiling/TCubeTiling_struct.md#tcubetiling-struct)。<br><br>Tiling参数可以通过host侧[GetTiling](../Matmul_Tiling/GetTiling.md)接口获取，并传递到kernel侧使用。在kernel侧调用[GET_TILING_DATA_PTR_WITH_STRUCT](../../../basic_api/Kernel-Tiling/GET_TILING_DATA_PTR_WITH_STRUCT.md)获取gm上Tiling参数的指针，本接口传入Tiling参数中TCubeTiling结构体的GM地址。 |
+| gmCubeTiling | 输入 | Matmul Tiling参数，该参数指向gm上的一块内存地址，其中的数据类型是TCubeTiling结构体，TCubeTiling结构体定义请参见[表1 TCubeTiling结构说明](../Matmul_Tiling/TCubeTiling_struct.md#tcubetiling-struct)。<br><br>Tiling参数可以通过host侧[GetTiling](../Matmul_Tiling/GetTiling.md)接口获取，并传递到核函数（Kernel）侧使用。在核函数（Kernel）侧调用[GET_TILING_DATA_PTR_WITH_STRUCT](../../../basic_api/Kernel-Tiling/GET_TILING_DATA_PTR_WITH_STRUCT.md)获取gm上Tiling参数的指针，本接口传入Tiling参数中TCubeTiling结构体的GM地址。 |
 | tpipe | 输入 | Tpipe对象。 |
 
 ## 返回值说明

@@ -17,6 +17,8 @@ install(DIRECTORY ${ASCENDC_IMPL_DIR}/tensor_api
   DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl ${INSTALL_OPTIONAL} COMPONENT asc-devkit
 )
 
-# Keep legacy installed include paths available during the compatibility period.
+# Compatibility links for legacy tensor API header names.
 install(CODE "file(CREATE_LINK cube_copy_op.h \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/tensor_api/arch/cube/copy_op.h SYMBOLIC)" COMPONENT asc-devkit)
+install(CODE "file(CREATE_LINK cube_copy_trait.h \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/tensor_api/arch/cube/copy_trait.h SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK vector_copy_op.h \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/tensor_api/arch/vector/copy_op.h SYMBOLIC)" COMPONENT asc-devkit)
+install(CODE "file(CREATE_LINK vector_copy_trait.h \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/tensor_api/arch/vector/copy_trait.h SYMBOLIC)" COMPONENT asc-devkit)
