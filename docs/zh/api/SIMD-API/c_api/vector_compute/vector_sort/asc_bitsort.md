@@ -60,13 +60,13 @@ __aicore__ inline void asc_bitsort(__ubuf__ float* dst, __ubuf__ float* src0, __
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数在UB中的起始地址，类型与`src0`相同。 |
-| src0 | 输入 | Score在UB中的起始地址，类型为half或float。 |
-| src1 | 输入 | Index在UB中的起始地址，类型固定为uint32_t。 |
+| dst | 输出 | 目的操作数在UB中的起始地址。 |
+| src0 | 输入 | Score在UB中的起始地址。 |
+| src1 | 输入 | Index在UB中的起始地址。 |
 | repeat | 输入 | 迭代次数，取值范围为[0, 255]。每次迭代处理32个元素；下次迭代时，`src0`和`src1`各跳过32个元素，`dst`跳过256字节。不同迭代之间不进行排序。 |
 
 ## 返回值说明
