@@ -46,7 +46,7 @@ template <typename T>
 __simd_callee__ inline reg_tensor<T> fma(
     const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<T>& src2);
 
-template <cast_layout Layout = cast_layout::zero, typename T = half, typename U>
+template <cast_layout Layout = cast_layout::zero, typename T, typename U>
 __simd_callee__ inline reg_tensor<T> muls_cast(const reg_tensor<U>& src, const U& scalar);
 
 } // namespace experimental
