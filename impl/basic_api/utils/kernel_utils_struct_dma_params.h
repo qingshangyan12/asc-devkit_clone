@@ -142,8 +142,6 @@ struct FixpipeParams {
     uint8_t unitFlag = 0;
 };
 
-enum class lut_mode_t { Gelu, Silu, Sigmoid, Tanh };
-
 template <typename T = int16_t>
 struct FixPipePreQuantParams {
     __aicore__ FixPipePreQuantParams() {}

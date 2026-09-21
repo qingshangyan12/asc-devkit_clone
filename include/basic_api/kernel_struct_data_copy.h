@@ -38,6 +38,16 @@
 namespace AscendC {
 #ifndef ASCC_ENUM_DATAFORMAT
 #define ASCC_ENUM_DATAFORMAT
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+enum class DstMemBlockMode : uint8_t {
+    PRE_QUANT = 0,
+    PRE_RELU = 1,
+    POST_RELU = 2,
+    POST_SHIFT_QUANT = 3,
+    ANTI_QUANT = 4,
+};
+#endif
+
 enum class DataFormat : uint8_t {
     ND = 0,
     NZ,
@@ -64,12 +74,50 @@ struct DataCopyParams {
     __aicore__ DataCopyParams() {}
 
     __aicore__ DataCopyParams(
-        const uint16_t count, const uint16_t len, const uint16_t srcStrideIn, const uint16_t dstStrideIn)
-        : blockCount(count), blockLen(len), srcStride(srcStrideIn), dstStride(dstStrideIn)
+        const uint16_t count, const uint16_t len, const uint16_t srcStrideIn, const uint16_t dstStrideIn, const uint16_t sidIn = 0
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+        , const DstMemBlockMode dstMemBlockIn = DstMemBlockMode::PRE_QUANT
+#endif
+    )
+        : blockCount(count), blockLen(len), srcStride(srcStrideIn), dstStride(dstStrideIn), sid(sidIn)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+        , dstMemBlock(dstMemBlockIn)
+#endif
     {}
+    __aicore__ inline void SetBlockCount(const uint16_t blockCount_) {
+        blockCount = blockCount_t;
+    }
+
+    __aicore__ inline void SetBlockLen(const uint16_t blockLen_) 
+    {
+        blockLen = blockLen_;
+    }
+
+    __aicore__ inline void SetSrcStride(const uint16_t srcStride_)
+    {
+        srcStride = srcStride_;
+    }
+
+    __aicore__ inline void SetDstStride(const uint16_t dstStride_)
+    {
+        dstStride = dstStride_;
+    }
+
+    __aicore__ inline void SetSid(const uint16_t sid_)
+    {
+        sid = sid_;
+    }
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+    __aicore__ inline void SetDstMemBlock(const DstMemBlockMode dstMemBlock_)
+    {
+        dstMemBlock = dstMemBlock_;
+    }
+#endif
 
     uint16_t blockCount = DEFAULT_DATA_COPY_NBURST;
     uint16_t blockLen = 0;
+    uint16_t sid = 0;
     // srcStride and dstStride will be deprecated, use srcGap and dstGap instead.
     union {
         uint16_t srcGap = 0;
@@ -82,6 +130,9 @@ struct DataCopyParams {
         // dstStride will be deprecated, use dstGap instead
         uint16_t dstStride;
     };
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+    DstMemBlockMode dstMemBlock = DstMemBlockMode::PRE_QUANT;
+#endif
 #ifdef CANN_ASC_ENABLE_FIX_SHIFT
     uint8_t fixShiftVal = 0;
 #endif
@@ -294,8 +345,53 @@ struct Nd2NzParams {
           srcDValue(srcDValueIn),
           dstNzC0Stride(dstNzC0StrideIn),
           dstNzNStride(dstNzNStrideIn),
-          dstNzMatrixStride(dstNzMatrixStrideIn)
+          dstNzMatrixStride(dstNzMatrixStrideIn),
+          sid(sidIn)
     {}
+    __aicore__ inline void SetNdNum(const uint16_t ndNum_)
+    {
+        ndNum = ndNum_;
+    }
+
+    __aicore__ inline void SetNValue(const uint16_t nValue_)
+    {
+        nValue = nValue_;
+    }
+
+    __aicore__ inline void SetDValue(const uint32_t dValue_)
+    {
+        dValue = dValue_;
+    }
+
+    __aicore__ inline void SetSrcNdMatrixStride(const uint32_t srcNdMatrixStride_)
+    {
+        srcNdMatrixStride = srcNdMatrixStride__;
+    }
+
+    __aicore__ inline void SetSrcDValue(const uint64_t srcDValue_)
+    {
+        srcDValue = srcDValue_;
+    }
+
+    __aicore__ inline void SetDstNzC0Stride(const uint16_t dstNzC0Stride_)
+    {
+        dstNzC0Stride = dstNzC0Stride_;
+    }
+
+    __aicore__ inline void SetDstNzNStride(const uint16_t dstNzNStride_)
+    {
+        dstNzNStride = dstNzNStride_;
+    }
+
+    __aicore__ inline void SetDstNzMatrixStride(const uint32_t dstNzMatrixStride_)
+    {
+        dstNzMatrixStride = dstNzMatrixStride_;
+    }
+
+    __aicore__ inline void SetSid(const uint8_t sid_)
+    {
+        sid = sid_;
+    }
 
     uint16_t ndNum = 0;
     uint16_t nValue = 0;
