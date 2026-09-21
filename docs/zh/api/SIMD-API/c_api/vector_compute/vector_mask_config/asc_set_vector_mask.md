@@ -35,19 +35,19 @@
 <!-- end id8 -->
 
 <!-- npu="A3,910b" id9 -->
-针对如下产品型号：
+- 针对如下产品型号：
 
-<!-- npu="A3" id10 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-<!-- end id10 -->
-<!-- npu="910b" id11 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
-<!-- end id11 -->
+  <!-- npu="A3" id10 -->
+  Atlas A3系列产品
+  <!-- end id10 -->
+  <!-- npu="910b" id11 -->
+  Atlas A2系列产品
+  <!-- end id11 -->
 
-该接口支持Normal模式和Counter模式。使用前需要先调用[asc_set_mask_count](asc_set_mask_count.md)或[asc_set_mask_norm](asc_set_mask_norm.md)设置Mask模式。在不同的模式下Mask的含义如下：
+  该接口支持Normal模式和Counter模式。使用前需要先调用[asc_set_mask_count](asc_set_mask_count.md)或[asc_set_mask_norm](asc_set_mask_norm.md)设置Mask模式。在不同的模式下Mask的含义如下：
 
-- Normal模式：用于高维切分计算类API。该模式下，Mask参数用来控制单次迭代内参与计算的元素，可以按位控制哪些元素参与计算：bit位的值为1表示参与计算，0表示不参与。Mask参数分为mask_high（高位Mask）和mask_low（低位Mask）。参数取值范围和操作数的数据类型有关，数据类型不同，每次迭代内能够处理的元素个数最大值不同。当操作数为16位时，mask_high、mask_low∈$[0, 2^{64}-1]$，并且不同时为0；当操作数为32位时，mask_high为0，mask_low∈$(0, 2^{64}-1]$；当操作数为64位时，mask_high为0，mask_low∈$(0, 2^{32}-1]$。
-- Counter模式：用于前n个数据计算类API。该模式下，Mask参数用于控制整个计算过程中参与计算的元素个数。前n个数据计算类接口中已经实现了Normal模式和Counter模式的转换，用户不需要自行设置。
+  - Normal模式：用于高维切分计算类API。该模式下，Mask参数用来控制单次迭代内参与计算的元素，可以按位控制哪些元素参与计算：bit位的值为1表示参与计算，0表示不参与。Mask参数分为mask_high（高位Mask）和mask_low（低位Mask）。参数取值范围和操作数的数据类型有关，数据类型不同，每次迭代内能够处理的元素个数最大值不同。当操作数为16位时，mask_high、mask_low∈$[0, 2^{64}-1]$，并且不同时为0；当操作数为32位时，mask_high为0，mask_low∈$(0, 2^{64}-1]$；当操作数为64位时，mask_high为0，mask_low∈$(0, 2^{32}-1]$。
+  - Counter模式：用于前n个数据计算类API。该模式下，Mask参数用于控制整个计算过程中参与计算的元素个数。前n个数据计算类接口中已经实现了Normal模式和Counter模式的转换，用户不需要自行设置。
 <!-- end id9 -->
 
 ## 函数原型
@@ -87,20 +87,20 @@ PIPE_S
 ## 约束说明
 
 <!-- npu="950" id14 -->
-针对Ascend 950PR/Ascend 950DT，该接口用于在VF场景外设置掩码寄存器。在Reg矢量计算配置时，通过[asc_get_mask_spr](../../reg_compute/reg_mask/asc_get_mask_spr.md)接口中的`asc_get_mask_spr_b16`或`asc_get_mask_spr_b32`配合获取掩码寄存器的值。更推荐用户使用VF场景内[掩码寄存器操作](../../reg_compute/reg_mask/reg_mask.md)章节中的接口完成Reg矢量计算掩码配置。
+- 针对Ascend 950PR&950DT系列产品：该接口用于在VF场景外设置掩码寄存器。在Reg矢量计算配置时，通过[asc_get_mask_spr](../../reg_compute/reg_mask/asc_get_mask_spr.md)接口中的`asc_get_mask_spr_b16`或`asc_get_mask_spr_b32`配合获取掩码寄存器的值。更推荐用户使用VF场景内[掩码寄存器操作](../../reg_compute/reg_mask/reg_mask.md)章节中的接口完成Reg矢量计算掩码配置。
 <!-- end id14 -->
 
 <!-- npu="A3,910b" id15 -->
-针对如下产品型号：
+- 针对如下产品型号：
 
-<!-- npu="A3" id16 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-<!-- end id16 -->
-<!-- npu="910b" id17 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
-<!-- end id17 -->
+  <!-- npu="A3" id16 -->
+  Atlas A3系列产品
+  <!-- end id16 -->
+  <!-- npu="910b" id17 -->
+  Atlas A2系列产品
+  <!-- end id17 -->
 
-需先调用[asc_set_mask_count](asc_set_mask_count.md)或[asc_set_mask_norm](asc_set_mask_norm.md)设置Mask模式。
+  需先调用[asc_set_mask_count](asc_set_mask_count.md)或[asc_set_mask_norm](asc_set_mask_norm.md)设置Mask模式。
 <!-- end id15 -->
 
 ## 调用示例
@@ -108,13 +108,13 @@ PIPE_S
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id18 -->
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510; ./main
 ```
 
-以下调用示例代码仅Ascend 950PR/Ascend 950DT产品支持。示例在VF场景外调用本接口设置掩码寄存器（低64bit全1、高64bit全0，即b16模式下前64个元素参与计算），并在VF场景内通过[asc_get_mask_spr](../../reg_compute/reg_mask/asc_get_mask_spr.md)读取掩码值后完成Reg矢量计算，最终仅有前64个元素被写为广播值。
+以下调用示例代码仅Ascend 950PR&950DT系列产品支持。示例在VF场景外调用本接口设置掩码寄存器（低64bit全1、高64bit全0，即b16模式下前64个元素参与计算），并在VF场景内通过[asc_get_mask_spr](../../reg_compute/reg_mask/asc_get_mask_spr.md)读取掩码值后完成Reg矢量计算，最终仅有前64个元素被写为广播值。
 
 ```cpp
 #include <cstdint>
@@ -188,11 +188,13 @@ int main()
 
 <!-- npu="A3,910b" id19 -->
 - 针对如下产品型号：
+
   <!-- npu="A3" id20 -->
-  - Atlas A3系列产品
+  Atlas A3系列产品
   <!-- end id20 -->
   <!-- npu="910b" id21 -->
-  - Atlas A2系列产品
+  Atlas A2系列产品
   <!-- end id21 -->
+
   请参考[asc_set_mask_count](asc_set_mask_count.md#调用示例)或[asc_set_mask_norm](asc_set_mask_norm.md#调用示例)。
 <!-- end id19 -->
