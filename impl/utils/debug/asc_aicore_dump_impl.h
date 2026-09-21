@@ -108,12 +108,136 @@ __aicore__ inline uint32_t set_dump_tlv_data(
 }
 
 template <AscendC::Hardware hardware, typename T, typename U>
+__aicore__ inline uint32_t copy_super_tensor_data(__gm__ uint8_t* dst, U src, uint32_t bytes)
+{
+    if constexpr (hardware == AscendC::Hardware::GM) {
+        return mem_copy_gm_to_gm(dst, reinterpret_cast<__gm__ const uint8_t*>(src), bytes);
+    } else if constexpr (hardware == AscendC::Hardware::UB) {
+        const uint32_t aligned = bytes / 32 * 32;
+        if (aligned != 0 && mem_copy_ub_to_gm_impl(reinterpret_cast<__gm__ T*>(dst), src, aligned / 32) != 0) {
+            return 1;
+        }
+        sync_all();
+        // Scalar tail loads avoid reading beyond a byte-sized LocalTensor view.
+        auto source = reinterpret_cast<__ubuf__ uint8_t*>(src);
+        for (uint32_t i = aligned; i < bytes; ++i) {
+            dst[i] = source[i];
+        }
+        asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(dst));
+        return 0;
+    } else if constexpr (hardware == AscendC::Hardware::L1) {
+#if __NPU_ARCH__ == 2201
+        // copy_cbuf_to_gm uses 32-byte blocks on this architecture.
+        return mem_copy_l1buf_to_gm_impl(reinterpret_cast<__gm__ T*>(dst), src, bytes / 32);
+#else
+        return mem_copy_l1buf_to_gm_impl(reinterpret_cast<__gm__ T*>(dst), src, bytes);
+#endif
+    } else if constexpr (hardware == AscendC::Hardware::L0C) {
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 5102
+        // These matrix helpers take a count of 32-bit accumulator elements.
+        return mem_copy_cbuf_to_gm_impl(reinterpret_cast<__gm__ T*>(dst), src, bytes / sizeof(uint32_t));
+#else
+        return mem_copy_cbuf_to_gm_impl(reinterpret_cast<__gm__ T*>(dst), src, bytes);
+#endif
+    } else if constexpr (hardware == AscendC::Hardware::L0A) {
+        return mem_copy_abuf_to_gm_impl(reinterpret_cast<__gm__ T*>(dst), src, bytes);
+    } else if constexpr (hardware == AscendC::Hardware::L0B) {
+        return mem_copy_bbuf_to_gm_impl(reinterpret_cast<__gm__ T*>(dst), src, bytes);
+    } else if constexpr (hardware == AscendC::Hardware::BIAS) {
+        return mem_copy_biasbuf_to_gm_impl(reinterpret_cast<__gm__ T*>(dst), src, bytes);
+    } else if constexpr (hardware == AscendC::Hardware::FIXBUF) {
+        return mem_copy_fbuf_to_gm_impl(reinterpret_cast<__gm__ T*>(dst), src, bytes);
+    }
+    return 1;
+}
+
+template <AscendC::Hardware hardware, typename T, typename U>
+__aicore__ inline void asc_dump_super_tensor(
+    __gm__ DebugBlockHeadInfo* blockInfo, U src, uint32_t desc, uint64_t total, const uint32_t* shape,
+    uint32_t shapeDim)
+{
+    constexpr bool isGm = hardware == AscendC::Hardware::GM;
+    constexpr uint32_t copyAlign = hardware == AscendC::Hardware::L0C ? 1024 : 32;
+    constexpr uint32_t copies = isGm ? 1 : 2;
+    for (uint64_t offset = 0; offset < total;) {
+        const uint32_t header = offset == 0 ? sizeof(DumpSuperTensorTlv) : sizeof(DumpSuperTensorBodyTlv);
+        // Extra 32 bytes allow absolute alignment of the private DMA destination.
+        const uint32_t overhead = align_up(header, 32) + (isGm ? 0 : 32) + 1;
+        if (blockInfo->ringBufLen <= overhead) {
+            return;
+        }
+        uint32_t capacity = (blockInfo->ringBufLen - overhead) / copies / copyAlign * copyAlign;
+        capacity = capacity > 16384 ? 16384 : capacity;
+        if (capacity == 0) {
+            return;
+        }
+        const uint32_t size = total - offset < capacity ? static_cast<uint32_t>(total - offset) : capacity;
+        const uint32_t span = align_up(header + size, 32);
+        const uint32_t copySize = align_up(size, copyAlign);
+        const uint32_t reserve = span + (isGm ? 0 : 32 + copySize);
+        auto writeInfo = get_block_write_info(blockInfo);
+        if (writeInfo->bufOffset > blockInfo->ringBufLen || reserve > blockInfo->ringBufLen) {
+            return;
+        }
+        if (!check_ringbuf_space(blockInfo, reserve)) {
+            return;
+        }
+        auto record = get_ringbuf_tlv_addr(blockInfo);
+        set_super_tensor_header(
+            record, total, offset, size, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(src)),
+            static_cast<uint32_t>(get_dump_datatype<T>()), desc, static_cast<uint16_t>(hardware),
+            static_cast<uint16_t>(asc_debug_get_block_idx()), shape, shapeDim);
+        sync_all();
+        asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(record));
+        uint32_t ret;
+        if constexpr (isGm) {
+            ret = copy_super_tensor_data<hardware, T>(record + header, src + offset / sizeof(T), size);
+        } else {
+            // Do not DMA into the unaligned wire payload. Scratch is reserved but never published.
+            auto scratch =
+                reinterpret_cast<__gm__ uint8_t*>((reinterpret_cast<uintptr_t>(record + span) + 31) / 32 * 32);
+            ret = copy_super_tensor_data<hardware, T>(
+                scratch, src + offset / sizeof(T), hardware == AscendC::Hardware::UB ? size : copySize);
+            sync_all();
+            if (ret == 0) {
+                asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(scratch));
+                ret = mem_copy_gm_to_gm(record + header, scratch, size);
+            }
+        }
+        if (ret != 0) {
+            return;
+        }
+        sync_all();
+        asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(record));
+        update_write_info(get_block_write_info(blockInfo), span);
+        offset += size;
+    }
+}
+
+template <AscendC::Hardware hardware, typename T, typename U>
 __aicore__ inline void asc_dump_impl(
-    U src, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim)
+    U src, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim,
+    uint64_t availableBytes = 0)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     __gm__ DebugBlockHeadInfo* blockInfo = get_block_info();
     if (dump_size <= 0 || blockInfo == nullptr) {
+        return;
+    }
+    const uint64_t total = static_cast<uint64_t>(dump_size) * sizeof(T);
+    const uint64_t ordinarySpan = sizeof(DumpTensorTlv) + ((total + 31) / 32) * 32;
+    if (ordinarySpan > blockInfo->ringBufLen || ordinarySpan > UINT32_MAX) {
+        if constexpr (hardware != AscendC::Hardware::GM) {
+            constexpr uint32_t sourceAlign =
+                hardware == AscendC::Hardware::L0C ? 1024 : (hardware == AscendC::Hardware::UB ? 1 : 32);
+            const uint64_t required = (total + sourceAlign - 1) / sourceAlign * sourceAlign;
+            // Raw pointer callers can prove only dump_size elements; tensor callers pass GetSize().
+            const uint64_t available = availableBytes == 0 ? total : availableBytes;
+            if (required > available) {
+                return;
+            }
+        }
+        asc_dump_super_tensor<hardware, T>(blockInfo, src, desc, total, shape, shapeDim);
         return;
     }
     constexpr uint16_t dataBlockSize = 32;
@@ -163,71 +287,80 @@ __aicore__ inline void asc_dump_shape_impl(const uint32_t shapeDim, const uint32
 
 template <AscendC::Hardware hardware, typename T, typename U>
 __aicore__ inline void asc_dump_local_impl(
-    U input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim)
+    U input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim,
+    uint64_t availableBytes = 0)
 {
     uint64_t ctrlValue = get_ctrl();
     set_atomic_none();
     enable_asc_diagnostics();
     if (g_sysPrintFifoSpace != nullptr) {
-        asc_dump_impl<hardware, T>(input, desc, dump_size, shape, shapeDim);
+        asc_dump_impl<hardware, T>(input, desc, dump_size, shape, shapeDim, availableBytes);
     }
     set_ctrl(ctrlValue);
 }
 
 template <typename T>
 __aicore__ static __attribute__((noinline)) void asc_dump_gm(
-    __gm__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim)
+    __gm__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim,
+    uint64_t availableBytes = 0)
 {
-    asc_dump_local_impl<AscendC::Hardware::GM, T>(input, desc, dump_size, shape, shapeDim);
+    asc_dump_local_impl<AscendC::Hardware::GM, T>(input, desc, dump_size, shape, shapeDim, availableBytes);
 }
 
 template <typename T>
 __aicore__ static __attribute__((noinline)) void asc_dump_ubuf(
-    __ubuf__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim)
+    __ubuf__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim,
+    uint64_t availableBytes = 0)
 {
-    asc_dump_local_impl<AscendC::Hardware::UB, T>(input, desc, dump_size, shape, shapeDim);
+    asc_dump_local_impl<AscendC::Hardware::UB, T>(input, desc, dump_size, shape, shapeDim, availableBytes);
 }
 
 template <typename T>
 __aicore__ static __attribute__((noinline)) void asc_dump_abuf(
-    __ca__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim)
+    __ca__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim,
+    uint64_t availableBytes = 0)
 {
-    asc_dump_local_impl<AscendC::Hardware::L0A, T>(input, desc, dump_size, shape, shapeDim);
+    asc_dump_local_impl<AscendC::Hardware::L0A, T>(input, desc, dump_size, shape, shapeDim, availableBytes);
 }
 
 template <typename T>
 __aicore__ static __attribute__((noinline)) void asc_dump_bbuf(
-    __cb__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim)
+    __cb__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim,
+    uint64_t availableBytes = 0)
 {
-    asc_dump_local_impl<AscendC::Hardware::L0B, T>(input, desc, dump_size, shape, shapeDim);
+    asc_dump_local_impl<AscendC::Hardware::L0B, T>(input, desc, dump_size, shape, shapeDim, availableBytes);
 }
 
 template <typename T>
 __aicore__ static __attribute__((noinline)) void asc_dump_cbuf(
-    __cc__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim)
+    __cc__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim,
+    uint64_t availableBytes = 0)
 {
-    asc_dump_local_impl<AscendC::Hardware::L0C, T>(input, desc, dump_size, shape, shapeDim);
+    asc_dump_local_impl<AscendC::Hardware::L0C, T>(input, desc, dump_size, shape, shapeDim, availableBytes);
 }
 
 template <typename T>
 __aicore__ static __attribute__((noinline)) void asc_dump_l1buf(
-    __cbuf__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim)
+    __cbuf__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim,
+    uint64_t availableBytes = 0)
 {
-    asc_dump_local_impl<AscendC::Hardware::L1, T>(input, desc, dump_size, shape, shapeDim);
+    asc_dump_local_impl<AscendC::Hardware::L1, T>(input, desc, dump_size, shape, shapeDim, availableBytes);
 }
 
 template <typename T>
 __aicore__ static __attribute__((noinline)) void asc_dump(
-    __biasbuf__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim)
+    __biasbuf__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim,
+    uint64_t availableBytes = 0)
 {
-    asc_dump_local_impl<AscendC::Hardware::BIAS, T>(input, desc, dump_size, shape, shapeDim);
+    asc_dump_local_impl<AscendC::Hardware::BIAS, T>(input, desc, dump_size, shape, shapeDim, availableBytes);
 }
 
 template <typename T>
 __aicore__ static __attribute__((noinline)) void asc_dump(
-    __fbuf__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim)
+    __fbuf__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim,
+    uint64_t availableBytes = 0)
 {
-    asc_dump_local_impl<AscendC::Hardware::FIXBUF, T>(input, desc, dump_size, shape, shapeDim);
+    asc_dump_local_impl<AscendC::Hardware::FIXBUF, T>(input, desc, dump_size, shape, shapeDim, availableBytes);
 }
 
 template <typename T>
@@ -332,28 +465,32 @@ __aicore__ static __attribute__((noinline)) void asc_dump_l1buf(__cbuf__ T* inpu
 
 template <typename T>
 __aicore__ static __attribute__((noinline)) void asc_dump_gm(
-    __gm__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim)
+    __gm__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim,
+    uint64_t availableBytes = 0)
 {
     assert(false && "asc_dump_gm is not supported in cpu mode.");
 }
 
 template <typename T>
 __aicore__ static __attribute__((noinline)) void asc_dump_ubuf(
-    __ubuf__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim)
+    __ubuf__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim,
+    uint64_t availableBytes = 0)
 {
     assert(false && "asc_dump_ubuf is not supported in cpu mode.");
 }
 
 template <typename T>
 __aicore__ static __attribute__((noinline)) void asc_dump_cbuf(
-    __cc__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim)
+    __cc__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim,
+    uint64_t availableBytes = 0)
 {
     assert(false && "asc_dump_cbuf is not supported in cpu mode.");
 }
 
 template <typename T>
 __aicore__ static __attribute__((noinline)) void asc_dump_l1buf(
-    __cbuf__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim)
+    __cbuf__ T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim,
+    uint64_t availableBytes = 0)
 {
     assert(false && "asc_dump_l1buf is not supported in cpu mode.");
 }
@@ -366,7 +503,8 @@ __aicore__ static __attribute__((noinline)) void asc_dump(T* input, uint32_t des
 
 template <typename T>
 __aicore__ static __attribute__((noinline)) void asc_dump(
-    T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim)
+    T* input, uint32_t desc, uint32_t dump_size, const uint32_t* shape, const uint32_t shapeDim,
+    uint64_t availableBytes = 0)
 {
     assert(false && "asc_dump is not supported in cpu mode.");
 }

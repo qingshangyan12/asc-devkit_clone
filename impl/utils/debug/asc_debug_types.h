@@ -113,7 +113,9 @@ enum class DumpType : uint8_t {
     DUMP_SIMT,
     DUMP_BUFI,
     DUMP_BUFO,
-    DUMP_SKIP
+    DUMP_SKIP,
+    DUMP_SUPER_TENSOR = 11,
+    DUMP_SUPER_TENSOR_BODY = 12
 };
 
 struct DebugBlockHeadInfo {
@@ -171,6 +173,37 @@ struct DumpTensorTlv {
     uint32_t dumpSize = 0U;   // Length of dumpData
                               // dumpData[dumpSize], Tensor data
 };
+
+// FIFO wire format: payload immediately follows these headers. No implicit padding.
+struct __attribute__((packed, aligned(4))) DumpSuperTensorTlv {
+    uint32_t type;
+    uint32_t length;
+    uint32_t tensorAddr;
+    uint32_t dataType;
+    uint32_t desc;
+    uint32_t bufferId;
+    uint16_t position;
+    uint16_t blockIdx;
+    uint32_t dim;
+    uint32_t shape[8];
+    uint32_t resv;
+    uint64_t tensorLength;
+    uint64_t tensorOffset;
+    uint32_t dumpSize;
+};
+
+struct __attribute__((packed, aligned(4))) DumpSuperTensorBodyTlv {
+    uint32_t type;
+    uint32_t length;
+    uint32_t resv1;
+    uint32_t resv2;
+    uint64_t tensorLength;
+    uint64_t tensorOffset;
+    uint32_t dumpSize;
+};
+
+static_assert(sizeof(DumpSuperTensorTlv) == 88, "Invalid super Tensor wire header");
+static_assert(sizeof(DumpSuperTensorBodyTlv) == 36, "Invalid super Tensor body header");
 
 struct DumpShapeTlv {
     uint32_t type = static_cast<uint32_t>(DumpType::DUMP_SHAPE); // DumpType = DUMP_SHAPE
