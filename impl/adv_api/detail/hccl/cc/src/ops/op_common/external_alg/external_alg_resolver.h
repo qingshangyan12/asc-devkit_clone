@@ -48,7 +48,7 @@ ResolveStatus ResolveExternalAlg(
 // 新注册不可见（注册应全部发生在 static-init 期）。
 const std::vector<AlgCandidate>& GetExternalCandidates(HcclCMDType cmd, const std::string& canonicalExtName);
 
-// 纯函数构建器（UT 确定性断言用）：按 (Specificity 降序, priority 降序, registeredName 字典序) 三键排序。
+// 纯函数构建器：按 (Specificity 降序, priority 降序, registeredName 字典序) 三键排序。
 // Specificity = (condId != -1) + (flagId != -1)（约束多者先试，最特化者胜；cond/flag 各计 1 分等权）；
 // priority 仅同特异性时生效（业务声明维度裁决权，当前全 0，hccl 平移 flag 重叠场景启用）。
 // 排序键是候选自带数据属性，

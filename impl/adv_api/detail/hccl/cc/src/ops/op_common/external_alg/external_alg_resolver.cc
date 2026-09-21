@@ -115,7 +115,6 @@ ResolveStatus ResolveExternalAlg(
 {
     algName.clear();
     errMsg.clear();
-    // canonical 共用一份：HCCL_INFO 运行期过滤，参数构造不受宏保护
     const std::string key = spec.canonical();
     const std::vector<AlgCandidate>& candidates = GetExternalCandidates(opParam.opType, key);
 
