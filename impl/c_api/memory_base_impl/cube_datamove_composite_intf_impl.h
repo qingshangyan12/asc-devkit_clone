@@ -56,10 +56,16 @@ __aicore__ inline void asc_copy_l12l0b_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0b_sync; parameters below identify this variant.
+ * @param dst Destination type: __cb__ uint8_t*.
+ * @param src Source type: __cbuf__ uint8_t*.
+ * @note 6-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
-    uint16_t dst_gap) /* asc_copy_l12l0b_sync overload */
+    uint16_t dst_gap)
 {
     if ASC_IS_AIC {
         load_cbuf_to_cb(dst, src, start_index, repeat, src_stride, dst_gap, 0, false, inc);
@@ -77,40 +83,62 @@ __aicore__ inline void asc_copy_l12l0b_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0b_sync; parameters below identify this variant.
+ * @param dst Destination type: __cb__ bfloat16_t*.
+ * @param src Source type: __cbuf__ bfloat16_t*.
+ * @note 6-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __cb__ bfloat16_t*.
         load_cbuf_to_cb(dst, src, start_index, repeat, src_stride, dst_gap, 0, false, inc);
         asc_sync_post_process();
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0b_sync; parameters below identify this variant.
+ * @param dst Destination type: __cb__ int32_t*.
+ * @param src Source type: __cbuf__ int32_t*.
+ * @note 6-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __cb__ int32_t*.
         load_cbuf_to_cb(dst, src, start_index, repeat, src_stride, dst_gap, 0, false, inc);
         asc_sync_post_process();
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0b_sync; parameters below identify this variant.
+ * @param dst Destination type: __cb__ uint32_t*.
+ * @param src Source type: __cbuf__ uint32_t*.
+ * @note 6-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __cb__ uint32_t*.
         load_cbuf_to_cb(dst, src, start_index, repeat, src_stride, dst_gap, 0, false, inc);
         asc_sync_post_process();
     }
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
+
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ float* dst, __cbuf__ float* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
 {
@@ -135,6 +163,12 @@ __aicore__ inline void asc_copy_l12l0b_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0b_sync; parameters below identify this variant.
+ * @param dst Destination type: __cb__ bfloat16_t*.
+ * @param src Source type: __cbuf__ bfloat16_t*.
+ * @note 17-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
@@ -143,6 +177,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
     bool f_matrix_ctrl, uint16_t channel_size)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __cb__ bfloat16_t*.
         img2colv2_cbuf_to_cb(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
@@ -150,6 +185,12 @@ __aicore__ inline void asc_copy_l12l0b_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0b_sync; parameters below identify this variant.
+ * @param dst Destination type: __cb__ int32_t*.
+ * @param src Source type: __cbuf__ int32_t*.
+ * @note 17-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
@@ -158,6 +199,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
     bool f_matrix_ctrl, uint16_t channel_size)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __cb__ int32_t*.
         img2colv2_cbuf_to_cb(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
@@ -165,6 +207,12 @@ __aicore__ inline void asc_copy_l12l0b_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0b_sync; parameters below identify this variant.
+ * @param dst Destination type: __cb__ uint32_t*.
+ * @param src Source type: __cbuf__ uint32_t*.
+ * @note 17-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
@@ -173,6 +221,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
     bool f_matrix_ctrl, uint16_t channel_size)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __cb__ uint32_t*.
         img2colv2_cbuf_to_cb(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
@@ -180,6 +229,12 @@ __aicore__ inline void asc_copy_l12l0b_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0b_sync; parameters below identify this variant.
+ * @param dst Destination type: __cb__ float*.
+ * @param src Source type: __cbuf__ float*.
+ * @note 17-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b and asc_sync)
 __aicore__ inline void asc_copy_l12l0b_sync(
     __cb__ float* dst, __cbuf__ float* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
@@ -188,6 +243,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
     bool f_matrix_ctrl, uint16_t channel_size)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __cb__ float*.
         img2colv2_cbuf_to_cb(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
@@ -217,10 +273,16 @@ __aicore__ inline void asc_copy_l12l0a_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0a_sync; parameters below identify this variant.
+ * @param dst Destination type: __ca__ uint8_t*.
+ * @param src Source type: __cbuf__ uint8_t*.
+ * @note 6-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
-    uint16_t dst_gap) /* asc_copy_l12l0a_sync overload */
+    uint16_t dst_gap)
 {
     if ASC_IS_AIC {
         load_cbuf_to_ca(dst, src, start_index, repeat, src_stride, dst_gap, 0, false, inc);
@@ -238,40 +300,62 @@ __aicore__ inline void asc_copy_l12l0a_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0a_sync; parameters below identify this variant.
+ * @param dst Destination type: __ca__ bfloat16_t*.
+ * @param src Source type: __cbuf__ bfloat16_t*.
+ * @note 6-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __ca__ bfloat16_t*.
         load_cbuf_to_ca(dst, src, start_index, repeat, src_stride, dst_gap, 0, false, inc);
         asc_sync_post_process();
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0a_sync; parameters below identify this variant.
+ * @param dst Destination type: __ca__ int32_t*.
+ * @param src Source type: __cbuf__ int32_t*.
+ * @note 6-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ int32_t* dst, __cbuf__ int32_t* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __ca__ int32_t*.
         load_cbuf_to_ca(dst, src, start_index, repeat, src_stride, dst_gap, 0, false, inc);
         asc_sync_post_process();
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0a_sync; parameters below identify this variant.
+ * @param dst Destination type: __ca__ uint32_t*.
+ * @param src Source type: __cbuf__ uint32_t*.
+ * @note 6-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __ca__ uint32_t*.
         load_cbuf_to_ca(dst, src, start_index, repeat, src_stride, dst_gap, 0, false, inc);
         asc_sync_post_process();
     }
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
+
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ float* dst, __cbuf__ float* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
 {
@@ -311,6 +395,12 @@ __aicore__ inline void asc_copy_l12l0a_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0a_sync; parameters below identify this variant.
+ * @param dst Destination type: __ca__ uint8_t*.
+ * @param src Source type: __cbuf__ uint8_t*.
+ * @note 17-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
@@ -319,6 +409,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
     bool f_matrix_ctrl, uint16_t channel_size)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __ca__ uint8_t*.
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
@@ -326,6 +417,12 @@ __aicore__ inline void asc_copy_l12l0a_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0a_sync; parameters below identify this variant.
+ * @param dst Destination type: __ca__ half*.
+ * @param src Source type: __cbuf__ half*.
+ * @note 17-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ half* dst, __cbuf__ half* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
@@ -334,6 +431,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
     bool f_matrix_ctrl, uint16_t channel_size)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __ca__ half*.
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
@@ -341,6 +439,12 @@ __aicore__ inline void asc_copy_l12l0a_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0a_sync; parameters below identify this variant.
+ * @param dst Destination type: __ca__ bfloat16_t*.
+ * @param src Source type: __cbuf__ bfloat16_t*.
+ * @note 17-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
@@ -349,6 +453,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
     bool f_matrix_ctrl, uint16_t channel_size)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __ca__ bfloat16_t*.
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
@@ -356,6 +461,12 @@ __aicore__ inline void asc_copy_l12l0a_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0a_sync; parameters below identify this variant.
+ * @param dst Destination type: __ca__ int32_t*.
+ * @param src Source type: __cbuf__ int32_t*.
+ * @note 17-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ int32_t* dst, __cbuf__ int32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
@@ -364,6 +475,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
     bool f_matrix_ctrl, uint16_t channel_size)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __ca__ int32_t*.
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
@@ -371,6 +483,12 @@ __aicore__ inline void asc_copy_l12l0a_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0a_sync; parameters below identify this variant.
+ * @param dst Destination type: __ca__ uint32_t*.
+ * @param src Source type: __cbuf__ uint32_t*.
+ * @note 17-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
@@ -379,6 +497,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
     bool f_matrix_ctrl, uint16_t channel_size)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __ca__ uint32_t*.
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
@@ -386,6 +505,12 @@ __aicore__ inline void asc_copy_l12l0a_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0a_sync; parameters below identify this variant.
+ * @param dst Destination type: __ca__ float*.
+ * @param src Source type: __cbuf__ float*.
+ * @note 17-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a and asc_sync)
 __aicore__ inline void asc_copy_l12l0a_sync(
     __ca__ float* dst, __cbuf__ float* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
@@ -394,6 +519,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
     bool f_matrix_ctrl, uint16_t channel_size)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __ca__ float*.
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
@@ -414,13 +540,17 @@ __aicore__ inline void asc_load_image_to_cbuf_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_load_image_to_cbuf_sync; parameters below identify this variant.
+ * @param dst Destination type: __cbuf__ int8_t*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_load_image_to_cbuf and asc_sync)
 __aicore__ inline void asc_load_image_to_cbuf_sync(
     __cbuf__ int8_t* dst, uint16_t hor_size, uint16_t ver_size, uint16_t hor_start_pos, uint16_t ver_start_pos,
-    uint16_t src_hor_size, uint8_t top_pad_size, uint8_t bot_pad_size, uint16_t left_pad_size,
-    uint16_t right_pad_size) /* asc_load_image_to_cbuf_sync overload */
+    uint16_t src_hor_size, uint8_t top_pad_size, uint8_t bot_pad_size, uint16_t left_pad_size, uint16_t right_pad_size)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __cbuf__ int8_t*.
         load_image_to_cbuf(
             dst, static_cast<uint16_t>(hor_size - 1), static_cast<uint16_t>(ver_size - 1), hor_start_pos, ver_start_pos,
             static_cast<uint16_t>(src_hor_size - 1), top_pad_size, bot_pad_size, left_pad_size, right_pad_size, 0);
@@ -855,31 +985,14 @@ __aicore__ inline void asc_copy_l12l0a_trans_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0a_trans_sync; parameters below identify this variant.
+ * @param dst Destination type: __ca__ float*.
+ * @param src Source type: __cbuf__ float*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_trans and asc_sync)
 __aicore__ inline void asc_copy_l12l0a_trans_sync(
     __ca__ float* dst, __cbuf__ float* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap,
-    bool enable_addr_decrement, uint16_t dst_frac_gap) /* asc_copy_l12l0a_trans_sync overload */
-{
-    if ASC_IS_AIC {
-        load_cbuf_to_ca_transpose(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
-        asc_sync_post_process();
-    }
-}
-
-ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_trans and asc_sync)
-__aicore__ inline void asc_copy_l12l0a_trans_sync(
-    __ca__ int32_t* dst, __cbuf__ int32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
-    uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
-{
-    if ASC_IS_AIC {
-        load_cbuf_to_ca_transpose(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
-        asc_sync_post_process();
-    }
-}
-
-ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_trans and asc_sync)
-__aicore__ inline void asc_copy_l12l0a_trans_sync(
-    __ca__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap,
     bool enable_addr_decrement, uint16_t dst_frac_gap)
 {
     if ASC_IS_AIC {
@@ -888,18 +1001,59 @@ __aicore__ inline void asc_copy_l12l0a_trans_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0a_trans_sync; parameters below identify this variant.
+ * @param dst Destination type: __ca__ int32_t*.
+ * @param src Source type: __cbuf__ int32_t*.
+ */
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_trans and asc_sync)
+__aicore__ inline void asc_copy_l12l0a_trans_sync(
+    __ca__ int32_t* dst, __cbuf__ int32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
+    uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
+{
+    if ASC_IS_AIC {
+        // Memory sync overload: dst uses __ca__ int32_t*.
+        load_cbuf_to_ca_transpose(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
+        asc_sync_post_process();
+    }
+}
+
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0a_trans_sync; parameters below identify this variant.
+ * @param dst Destination type: __ca__ int8_t*.
+ * @param src Source type: __cbuf__ int8_t*.
+ */
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_trans and asc_sync)
+__aicore__ inline void asc_copy_l12l0a_trans_sync(
+    __ca__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap,
+    bool enable_addr_decrement, uint16_t dst_frac_gap)
+{
+    if ASC_IS_AIC {
+        // Memory sync overload: dst uses __ca__ int8_t*.
+        load_cbuf_to_ca_transpose(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
+        asc_sync_post_process();
+    }
+}
+
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0a_trans_sync; parameters below identify this variant.
+ * @param dst Destination type: __ca__ uint32_t*.
+ * @param src Source type: __cbuf__ uint32_t*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_trans and asc_sync)
 __aicore__ inline void asc_copy_l12l0a_trans_sync(
     __ca__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __ca__ uint32_t*.
         load_cbuf_to_ca_transpose(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
         asc_sync_post_process();
     }
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0a_trans and asc_sync)
+
 __aicore__ inline void asc_copy_l12l0a_trans_sync(
     __ca__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
@@ -932,51 +1086,80 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0b_trans_sync; parameters below identify this variant.
+ * @param dst Destination type: __cb__ float*.
+ * @param src Source type: __cbuf__ float*.
+ * @param enable_addr_decrement Overload-specific type: bool.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
 __aicore__ inline void asc_copy_l12l0b_trans_sync(
     __cb__ float* dst, __cbuf__ float* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap,
-    bool enable_addr_decrement, uint16_t dst_frac_gap) /* asc_copy_l12l0b_trans_sync overload */
+    bool enable_addr_decrement, uint16_t dst_frac_gap)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __cb__ float*.
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
         asc_sync_post_process();
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0b_trans_sync; parameters below identify this variant.
+ * @param dst Destination type: __cb__ int32_t*.
+ * @param src Source type: __cbuf__ int32_t*.
+ * @param enable_addr_decrement Overload-specific type: bool.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
 __aicore__ inline void asc_copy_l12l0b_trans_sync(
     __cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __cb__ int32_t*.
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
         asc_sync_post_process();
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0b_trans_sync; parameters below identify this variant.
+ * @param dst Destination type: __cb__ int8_t*.
+ * @param src Source type: __cbuf__ int8_t*.
+ * @param enable_addr_decrement Overload-specific type: bool.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
 __aicore__ inline void asc_copy_l12l0b_trans_sync(
     __cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap,
     bool enable_addr_decrement, uint16_t dst_frac_gap)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __cb__ int8_t*.
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
         asc_sync_post_process();
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0b_trans_sync; parameters below identify this variant.
+ * @param dst Destination type: __cb__ uint32_t*.
+ * @param src Source type: __cbuf__ uint32_t*.
+ * @param enable_addr_decrement Overload-specific type: bool.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
 __aicore__ inline void asc_copy_l12l0b_trans_sync(
     __cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __cb__ uint32_t*.
         load_cbuf_to_cb_transpose(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
         asc_sync_post_process();
     }
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_trans and asc_sync)
+
 __aicore__ inline void asc_copy_l12l0b_trans_sync(
     __cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
@@ -1100,21 +1283,28 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_gm2l1_nd2nz_sync; parameters below identify this variant.
+ * @param dst Destination type: __cbuf__ uint8_t*.
+ * @param src Source type: __gm__ uint8_t*.
+ * @note 10-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
     uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride,
     uint16_t dst_nz_matrix_stride)
-{ /* asc_copy_gm2l1_nd2nz_sync overload */
+{
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_nd2nz_b8(
             dst, src, 0, nd_num, n_value, d_value, src_nd_matrix_stride, src_d_value, dst_nz_c0_stride, dst_nz_n_stride,
-            dst_nz_matrix_stride);
+            dst_nz_matrix_stride); // Memory sync overload: dst uses __cbuf__ uint8_t*.
         asc_sync_post_process();
     }
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
+
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
     uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride,
@@ -1128,6 +1318,12 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_gm2l1_nd2nz_sync; parameters below identify this variant.
+ * @param dst Destination type: __cbuf__ half*.
+ * @param src Source type: __gm__ half*.
+ * @note 10-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ half* dst, __gm__ half* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
@@ -1137,11 +1333,17 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_nd2nz_b16(
             dst, src, 0, nd_num, n_value, d_value, src_nd_matrix_stride, src_d_value, dst_nz_c0_stride, dst_nz_n_stride,
-            dst_nz_matrix_stride);
+            dst_nz_matrix_stride); // Memory sync overload: dst uses __cbuf__ half*.
         asc_sync_post_process();
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_gm2l1_nd2nz_sync; parameters below identify this variant.
+ * @param dst Destination type: __cbuf__ int16_t*.
+ * @param src Source type: __gm__ int16_t*.
+ * @note 10-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
@@ -1151,7 +1353,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_nd2nz_b16(
             dst, src, 0, nd_num, n_value, d_value, src_nd_matrix_stride, src_d_value, dst_nz_c0_stride, dst_nz_n_stride,
-            dst_nz_matrix_stride);
+            dst_nz_matrix_stride); // Memory sync overload: dst uses __cbuf__ int16_t*.
         asc_sync_post_process();
     }
 }
@@ -1170,6 +1372,12 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_gm2l1_nd2nz_sync; parameters below identify this variant.
+ * @param dst Destination type: __cbuf__ int32_t*.
+ * @param src Source type: __gm__ int32_t*.
+ * @note 10-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
@@ -1179,11 +1387,17 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_nd2nz_b32s(
             dst, src, 0, nd_num, n_value, d_value, src_nd_matrix_stride, src_d_value, dst_nz_c0_stride, dst_nz_n_stride,
-            dst_nz_matrix_stride);
+            dst_nz_matrix_stride); // Memory sync overload: dst uses __cbuf__ int32_t*.
         asc_sync_post_process();
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_gm2l1_nd2nz_sync; parameters below identify this variant.
+ * @param dst Destination type: __cbuf__ uint32_t*.
+ * @param src Source type: __gm__ uint32_t*.
+ * @note 10-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1_nd2nz and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
@@ -1193,7 +1407,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     if ASC_IS_AIC {
         copy_gm_to_cbuf_multi_nd2nz_b32s(
             dst, src, 0, nd_num, n_value, d_value, src_nd_matrix_stride, src_d_value, dst_nz_c0_stride, dst_nz_n_stride,
-            dst_nz_matrix_stride);
+            dst_nz_matrix_stride); // Memory sync overload: dst uses __cbuf__ uint32_t*.
         asc_sync_post_process();
     }
 }
@@ -1234,13 +1448,20 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l0c2gm_sync; parameters below identify this variant.
+ * @param dst Destination type: __gm__ bfloat16_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 11-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2gm and asc_sync)
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
     bool nz2nd_en)
-{ /* asc_copy_l0c2gm_sync overload */
+{
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __gm__ bfloat16_t*.
         copy_matrix_cc_to_gm(
             dst, src, 0, n_size, m_size, dst_stride_dst_d, src_stride, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
@@ -1248,6 +1469,12 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l0c2gm_sync; parameters below identify this variant.
+ * @param dst Destination type: __gm__ int8_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 11-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2gm and asc_sync)
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
@@ -1255,6 +1482,7 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
     bool nz2nd_en)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst/src are gm int8_t*/cc float*.
         copy_matrix_cc_to_gm(
             dst, src, 0, n_size, m_size, dst_stride_dst_d, src_stride, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
@@ -1262,6 +1490,12 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l0c2gm_sync; parameters below identify this variant.
+ * @param dst Destination type: __gm__ uint8_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 11-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2gm and asc_sync)
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
@@ -1269,6 +1503,7 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
     bool nz2nd_en)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __gm__ uint8_t*.
         copy_matrix_cc_to_gm(
             dst, src, 0, n_size, m_size, dst_stride_dst_d, src_stride, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
@@ -1276,6 +1511,12 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l0c2gm_sync; parameters below identify this variant.
+ * @param dst Destination type: __gm__ float*.
+ * @param src Source type: __cc__ float*.
+ * @note 11-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2gm and asc_sync)
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
@@ -1283,6 +1524,7 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
     bool nz2nd_en)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __gm__ float*.
         copy_matrix_cc_to_gm(
             dst, src, 0, n_size, m_size, dst_stride_dst_d, src_stride, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
@@ -1290,6 +1532,12 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l0c2gm_sync; parameters below identify this variant.
+ * @param dst Destination type: __gm__ half*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 11-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2gm and asc_sync)
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
@@ -1297,6 +1545,7 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
     bool nz2nd_en)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst/src are gm half*/cc int32_t*.
         copy_matrix_cc_to_gm(
             dst, src, 0, n_size, m_size, dst_stride_dst_d, src_stride, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
@@ -1304,6 +1553,12 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l0c2gm_sync; parameters below identify this variant.
+ * @param dst Destination type: __gm__ int16_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 11-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2gm and asc_sync)
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ int16_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
@@ -1311,6 +1566,7 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
     bool nz2nd_en)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __gm__ int16_t*.
         copy_matrix_cc_to_gm(
             dst, src, 0, n_size, m_size, dst_stride_dst_d, src_stride, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
@@ -1318,6 +1574,12 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l0c2gm_sync; parameters below identify this variant.
+ * @param dst Destination type: __gm__ int8_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 11-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2gm and asc_sync)
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
@@ -1325,6 +1587,7 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
     bool nz2nd_en)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst/src are gm int8_t*/cc int32_t*.
         copy_matrix_cc_to_gm(
             dst, src, 0, n_size, m_size, dst_stride_dst_d, src_stride, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
@@ -1332,6 +1595,12 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l0c2gm_sync; parameters below identify this variant.
+ * @param dst Destination type: __gm__ int32_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 11-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2gm and asc_sync)
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
@@ -1339,6 +1608,7 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
     bool nz2nd_en)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __gm__ int32_t*.
         copy_matrix_cc_to_gm(
             dst, src, 0, n_size, m_size, dst_stride_dst_d, src_stride, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
@@ -1359,20 +1629,32 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l0c2l1_sync; parameters below identify this variant.
+ * @param dst Destination type: __cbuf__ bfloat16_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 11-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2l1 and asc_sync)
 __aicore__ inline void asc_copy_l0c2l1_sync(
     __cbuf__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool enable_channel_split,
     bool enable_nz2nd)
 {
-    if ASC_IS_AIC { /* asc_copy_l0c2l1_sync overload */
+    if ASC_IS_AIC {
         copy_matrix_cc_to_cbuf(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, unit_flag_mode, static_cast<QuantMode_t>(quant_pre),
-            relu_pre, enable_channel_split, enable_nz2nd);
+            relu_pre, enable_channel_split, enable_nz2nd); // Memory sync overload: dst uses __cbuf__ bfloat16_t*.
         asc_sync_post_process();
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l0c2l1_sync; parameters below identify this variant.
+ * @param dst Destination type: __cbuf__ int8_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 11-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2l1 and asc_sync)
 __aicore__ inline void asc_copy_l0c2l1_sync(
     __cbuf__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
@@ -1381,11 +1663,17 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
     if ASC_IS_AIC {
         copy_matrix_cc_to_cbuf(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, unit_flag_mode, static_cast<QuantMode_t>(quant_pre),
-            relu_pre, enable_channel_split, enable_nz2nd);
+            relu_pre, enable_channel_split, enable_nz2nd); // Memory sync overload: dst/src are cbuf int8_t*/cc float*.
         asc_sync_post_process();
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l0c2l1_sync; parameters below identify this variant.
+ * @param dst Destination type: __cbuf__ half*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 11-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2l1 and asc_sync)
 __aicore__ inline void asc_copy_l0c2l1_sync(
     __cbuf__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
@@ -1394,11 +1682,17 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
     if ASC_IS_AIC {
         copy_matrix_cc_to_cbuf(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, unit_flag_mode, static_cast<QuantMode_t>(quant_pre),
-            relu_pre, enable_channel_split, enable_nz2nd);
+            relu_pre, enable_channel_split, enable_nz2nd); // Memory sync overload: dst/src are cbuf half*/cc int32_t*.
         asc_sync_post_process();
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l0c2l1_sync; parameters below identify this variant.
+ * @param dst Destination type: __cbuf__ int16_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 11-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2l1 and asc_sync)
 __aicore__ inline void asc_copy_l0c2l1_sync(
     __cbuf__ int16_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
@@ -1408,11 +1702,17 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
     if ASC_IS_AIC {
         copy_matrix_cc_to_cbuf(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, unit_flag_mode, static_cast<QuantMode_t>(quant_pre),
-            relu_pre, enable_channel_split, enable_nz2nd);
+            relu_pre, enable_channel_split, enable_nz2nd); // Memory sync overload: dst uses __cbuf__ int16_t*.
         asc_sync_post_process();
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l0c2l1_sync; parameters below identify this variant.
+ * @param dst Destination type: __cbuf__ int8_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 11-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2l1 and asc_sync)
 __aicore__ inline void asc_copy_l0c2l1_sync(
     __cbuf__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
@@ -1420,6 +1720,7 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
     bool enable_nz2nd)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst/src are cbuf int8_t*/cc int32_t*.
         copy_matrix_cc_to_cbuf(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, unit_flag_mode, static_cast<QuantMode_t>(quant_pre),
             relu_pre, enable_channel_split, enable_nz2nd);
@@ -1427,6 +1728,12 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l0c2l1_sync; parameters below identify this variant.
+ * @param dst Destination type: __cbuf__ uint8_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 11-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2l1 and asc_sync)
 __aicore__ inline void asc_copy_l0c2l1_sync(
     __cbuf__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
@@ -1436,7 +1743,7 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
     if ASC_IS_AIC {
         copy_matrix_cc_to_cbuf(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, unit_flag_mode, static_cast<QuantMode_t>(quant_pre),
-            relu_pre, enable_channel_split, enable_nz2nd);
+            relu_pre, enable_channel_split, enable_nz2nd); // Memory sync overload: dst uses __cbuf__ uint8_t*.
         asc_sync_post_process();
     }
 }
@@ -1454,6 +1761,12 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l0c2l1_sync; parameters below identify this variant.
+ * @param dst Destination type: __cbuf__ void*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 11-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l0c2l1 and asc_sync)
 __aicore__ inline void asc_copy_l0c2l1_sync(
     __cbuf__ void* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
@@ -1462,7 +1775,7 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
     if ASC_IS_AIC {
         copy_matrix_cc_to_cbuf_b4(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, unit_flag_mode, static_cast<QuantMode_t>(quant_pre),
-            relu_pre, enable_channel_split, enable_nz2nd);
+            relu_pre, enable_channel_split, enable_nz2nd); // Memory sync overload: dst/src are cbuf void*/cc int32_t*.
         asc_sync_post_process();
     }
 }
@@ -1528,12 +1841,18 @@ __aicore__ inline void asc_copy_gm2l0a_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_gm2l0a_sync; parameters below identify this variant.
+ * @param dst Destination type: __ca__ uint32_t*.
+ * @param src Source type: __gm__ uint32_t*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l0a and asc_sync)
 __aicore__ inline void asc_copy_gm2l0a_sync(
     __ca__ uint32_t* dst, __gm__ uint32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride,
-    uint16_t dst_gap) /* asc_copy_gm2l0a_sync overload */
+    uint16_t dst_gap)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __ca__ uint32_t*.
         load_gm_to_ca(dst, src, base_idx, repeat, src_stride, dst_gap, 0, inc);
         asc_sync_post_process();
     }
@@ -1544,6 +1863,7 @@ __aicore__ inline void asc_copy_gm2l0a_sync(
     __ca__ int4b_t* dst, __gm__ int4b_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __ca__ int4b_t*.
         load_gm_to_ca_s4((__ca__ void*)dst, (__gm__ void*)src, base_idx, repeat, src_stride, dst_gap, 0, inc);
         asc_sync_post_process();
     }
@@ -1590,12 +1910,18 @@ __aicore__ inline void asc_copy_l12l0c_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0c_sync; parameters below identify this variant.
+ * @param dst Destination type: __cc__ bfloat16_t*.
+ * @param src Source type: __cbuf__ float*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0c and asc_sync)
 __aicore__ inline void asc_copy_l12l0c_sync(
     __cc__ bfloat16_t* dst, __cbuf__ float* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap,
-    uint16_t dst_gap) /* asc_copy_l12l0c_sync overload */
+    uint16_t dst_gap)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __cc__ bfloat16_t*.
         copy_matrix_cbuf_to_cc(dst, src, n_burst, len_burst, src_gap, dst_gap);
         asc_sync_post_process();
     }
@@ -1606,11 +1932,17 @@ __aicore__ inline void asc_copy_l12l0c_sync(
     __cc__ float* dst, __cbuf__ float* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __cc__ float*.
         copy_matrix_cbuf_to_cc(dst, src, n_burst, len_burst, src_gap, dst_gap);
         asc_sync_post_process();
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_l12l0c_sync; parameters below identify this variant.
+ * @param dst Destination type: __cc__ int32_t*.
+ * @param src Source type: __cbuf__ int32_t*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0c and asc_sync)
 __aicore__ inline void asc_copy_l12l0c_sync(
     __cc__ int32_t* dst, __cbuf__ int32_t* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap,
@@ -1623,6 +1955,7 @@ __aicore__ inline void asc_copy_l12l0c_sync(
 }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0c and asc_sync)
+
 __aicore__ inline void asc_copy_l12l0c_sync(
     __cc__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap,
     uint16_t dst_gap)
@@ -1684,12 +2017,18 @@ __aicore__ inline void asc_copy_gm2l0b_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_gm2l0b_sync; parameters below identify this variant.
+ * @param dst Destination type: __cb__ uint32_t*.
+ * @param src Source type: __gm__ uint32_t*.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l0b and asc_sync)
 __aicore__ inline void asc_copy_gm2l0b_sync(
     __cb__ uint32_t* dst, __gm__ uint32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride,
-    uint16_t dst_gap) /* asc_copy_gm2l0b_sync overload */
+    uint16_t dst_gap)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __cb__ uint32_t*.
         load_gm_to_cb(dst, src, base_idx, repeat, src_stride, dst_gap, 0, addr_cal_mode_t::inc);
         asc_sync_post_process();
     }
@@ -1700,6 +2039,7 @@ __aicore__ inline void asc_copy_gm2l0b_sync(
     __cb__ uint8_t* dst, __gm__ uint8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __cb__ uint8_t*.
         load_gm_to_cb(dst, src, base_idx, repeat, src_stride, dst_gap, 0, addr_cal_mode_t::inc);
         asc_sync_post_process();
     }
@@ -1746,12 +2086,19 @@ __aicore__ inline void asc_copy_gm2l1_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_gm2l1_sync; parameters below identify this variant.
+ * @param dst Destination type: __cbuf__ int32_t*.
+ * @param src Source type: __gm__ int32_t*.
+ * @note 6-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride,
-    uint16_t dst_gap) /* asc_copy_gm2l1_sync overload */
+    uint16_t dst_gap)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __cbuf__ int32_t*.
         load_gm_to_cbuf(dst, src, base_idx, repeat, src_stride, dst_gap, static_cast<uint8_t>(0), addr_cal_mode_t::inc);
         asc_sync_post_process();
     }
@@ -1762,11 +2109,18 @@ __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap)
 {
     if ASC_IS_AIC {
+        // Memory sync overload: dst uses __cbuf__ int8_t*.
         load_gm_to_cbuf(dst, src, base_idx, repeat, src_stride, dst_gap, static_cast<uint8_t>(0), addr_cal_mode_t::inc);
         asc_sync_post_process();
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_gm2l1_sync; parameters below identify this variant.
+ * @param dst Destination type: __cbuf__ uint32_t*.
+ * @param src Source type: __gm__ uint32_t*.
+ * @note 6-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride,
@@ -1778,6 +2132,12 @@ __aicore__ inline void asc_copy_gm2l1_sync(
     }
 }
 
+/**
+ * @brief Memory-based sync overload of asc_copy_gm2l1_sync; parameters below identify this variant.
+ * @param dst Destination type: __cbuf__ uint8_t*.
+ * @param src Source type: __gm__ uint8_t*.
+ * @note 6-parameter form.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_gm2l1 and asc_sync)
 __aicore__ inline void asc_copy_gm2l1_sync(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride,
@@ -1794,4 +2154,5 @@ __aicore__ inline void asc_copy_gm2l1_sync(
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+
 #endif
