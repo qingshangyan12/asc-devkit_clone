@@ -128,11 +128,11 @@ for (uint32_t row = blockIdx.x * warps_per_block + warp_in_block;  // One Warp p
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| 13.039 | 11.513 | 18997.2 | 11.048 | 0.960 | 0.461 | 0.040 | 0.005 | 0.000 | 0.002 | 0.000 |
+| 12.975 | 11.553 | 19063.1 | 10.917 | 0.946 | 0.633 | 0.054 | 0.005 | 0.000 | 0.002 | 0.000 |
 
 **Analysis**:
 
-The `aiv_vec_ratio` of Case 0 reaches 0.960, and the time is concentrated on GM reads/writes and in-row computation of the SIMT threads. In terms of implementation, the same input row is read three times in the three passes, `exp` is computed twice, and GM access is serialized with computation in the same SIMT thread, so it cannot overlap with the movement pipeline. The next step separates data movement from computation and moves the input to UB through MTE for staging.
+The `aiv_vec_ratio` of Case 0 reaches 0.946, and the time is concentrated on GM reads/writes and in-row computation of the SIMT threads. In terms of implementation, the same input row is read three times in the three passes, `exp` is computed twice, and GM access is serialized with computation in the same SIMT thread, so it cannot overlap with the movement pipeline. The next step separates data movement from computation and moves the input to UB through MTE for staging.
 
 ---
 
@@ -197,11 +197,11 @@ for (uint32_t row_base = first_row_base; row_base < rows; row_base += tile_strid
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| 11.203 | 9.782 | 16140.2 | 7.235 | 0.741 | 0.521 | 0.053 | 2.878 | 0.294 | 0.587 | 0.060 |
+| 11.923 | 10.362 | 17096.9 | 7.833 | 0.758 | 0.721 | 0.069 | 2.495 | 0.241 | 0.568 | 0.055 |
 
 **Analysis**:
 
-Case 1 moves GM access to the MTE pipeline and introduces double buffering, so the SIMT VF no longer reads GM directly. `aiv_mte2_time` and `aiv_mte3_time` increase from nearly 0 to 2.878μs and 0.587μs respectively, indicating that GM access has moved to the MTE movement path. `aiv_vec_time` decreases from 11.048μs to 7.235μs, a reduction of about 34.5%. `Task Duration` decreases from 13.039μs to 11.203μs, a reduction of about 14.1%. At this point, `aiv_vec_ratio` reaches 0.741, the highest proportion among all components. The bottleneck has shifted from GM access to the in-row computation, and the next step is to reduce the computation time.
+Case 1 moves GM access to the MTE pipeline and introduces double buffering, so the SIMT VF no longer reads GM directly. `aiv_mte2_time` and `aiv_mte3_time` increase from nearly 0 to 2.495μs and 0.568μs respectively, indicating that GM access has moved to the MTE movement path. `aiv_vec_time` decreases from 10.917μs to 7.833μs, a reduction of about 28.2%. `Task Duration` decreases from 12.975μs to 11.923μs, a reduction of about 8.1%. At this point, `aiv_vec_ratio` reaches 0.758, the highest proportion among all components. The bottleneck has shifted from GM access to the in-row computation, and the next step is to reduce the computation time.
 
 The computation time of Case 1 is mainly spent on how the in-row computation is organized: the in-row computation is organized in three passes: max, exp/sum, and normalization. Each pass re-reads the UB input row, and `exp` is computed twice. The next optimization direction is to cache the elements assigned to each thread in a local array to reuse the `exp` results and keep the array in registers.
 
@@ -278,11 +278,11 @@ __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| 8.465 | 7.055 | 11640.3 | 4.520 | 0.642 | 0.467 | 0.066 | 2.885 | 0.410 | 0.589 | 0.084 |
+| 8.588 | 7.067 | 11661.3 | 4.593 | 0.653 | 0.583 | 0.081 | 2.557 | 0.362 | 0.570 | 0.081 |
 
 **Analysis**:
 
-The main change of Case 2 over Case 1 is that "runtime cols" becomes "compile-time bucket upper bound": the length and indices of the fixed-length array are determined at compile time, the compiler keeps all in-row intermediate values in registers, and both the input row and `exp` are processed only once. `aiv_vec_time` further decreases from 7.235μs to 4.520μs, a reduction of about 37.5%. `Task Duration` decreases from 11.203μs to 8.465μs, a reduction of about 24.4%. The bucket only affects the stride of the UB layout. MTE still moves data by the real cols, and `aiv_mte2_time` stays nearly the same as Case 1. The reduction of the total time makes `aiv_vec_ratio` drop from 0.741 to 0.642 and `aiv_mte2_ratio` rise from 0.294 to 0.410. The time proportions of in-row computation and MTE2 movement are already close. Compared with Case 0, `Task Duration` decreases from 13.039μs to 8.465μs, an overall reduction of about 35.1%.
+The main change of Case 2 over Case 1 is that "runtime cols" becomes "compile-time bucket upper bound": the length and indices of the fixed-length array are determined at compile time, the compiler keeps all in-row intermediate values in registers, and both the input row and `exp` are processed only once. `aiv_vec_time` further decreases from 7.833μs to 4.593μs, a reduction of about 41.4%. `Task Duration` decreases from 11.923μs to 8.588μs, a reduction of about 28.0%. The bucket only affects the stride of the UB layout. MTE still moves data by the real cols, and `aiv_mte2_time` stays nearly the same as Case 1. The reduction of the total time makes `aiv_vec_ratio` drop from 0.758 to 0.653 and `aiv_mte2_ratio` rise from 0.241 to 0.362. The time proportions of in-row computation and MTE2 movement are already close. Compared with Case 0, `Task Duration` decreases from 12.975μs to 8.588μs, an overall reduction of about 33.8%.
 
 ## Performance Comparison Summary
 
@@ -290,19 +290,19 @@ The following table shows the performance data of each case with the default sha
 
 | Case | Optimization | Task Duration(μs) | aiv_time(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_mte2_time(μs) | aiv_mte3_time(μs) |
 | ---- | ------------ | :---: | :---: | :---: | :---: | :---: | :---: |
-| 0 | SIMT direct GM read baseline | 13.039 | 11.513 | 11.048 | 0.960 | 0.005 | 0.002 |
-| 1 | UB staging with MTE double buffering | 11.203 | 9.782  | 7.235  | 0.741 | 2.878 | 0.587 |
-| 2 | Compile-time bucket and dynamic thread selection | 8.465  | 7.055  | 4.520  | 0.642 | 2.885 | 0.589 |
+| 0 | SIMT direct GM read baseline | 12.975 | 11.553 | 10.917 | 0.946 | 0.005 | 0.002 |
+| 1 | UB staging with MTE double buffering | 11.923 | 10.362 | 7.833  | 0.758 | 2.495 | 0.568 |
+| 2 | Compile-time bucket and dynamic thread selection | 8.588  | 7.067  | 4.593  | 0.653 | 2.557 | 0.570 |
 
-In the main tuning path Case 0 -> Case 1 -> Case 2, `Task Duration` decreases from 13.039μs to 11.203μs and then to 8.465μs. Case 2 achieves an overall reduction of about 35.1% over Case 0.
+In the main tuning path Case 0 -> Case 1 -> Case 2, `Task Duration` decreases from 12.975μs to 11.923μs and then to 8.588μs. Case 2 achieves an overall reduction of about 33.8% over Case 0.
 
-The metric changes show how the bottleneck shifts at each stage. In Case 0, the time is concentrated on SIMT threads directly reading and writing GM (`aiv_vec_ratio` is 0.960, and MTE is close to 0). After Case 1 moves GM access to MTE2, `aiv_vec_time` decreases by 34.5%, but the three passes still re-read the UB input rows and re-compute `exp`. After Case 2 keeps all in-row intermediate values in registers through the compile-time bucket, `aiv_vec_time` decreases by another 37.5%, `aiv_vec_ratio` drops to 0.642, and `aiv_mte2_ratio` rises to 0.410. The time proportions of in-row computation and MTE2 movement are already close.
+The metric changes show how the bottleneck shifts at each stage. In Case 0, the time is concentrated on SIMT threads directly reading and writing GM (`aiv_vec_ratio` is 0.946, and MTE is close to 0). After Case 1 moves GM access to MTE2, `aiv_vec_time` decreases by 28.2%, but the three passes still re-read the UB input rows and re-compute `exp`. After Case 2 keeps all in-row intermediate values in registers through the compile-time bucket, `aiv_vec_time` decreases by another 41.4%, `aiv_vec_ratio` drops to 0.653, and `aiv_mte2_ratio` rises to 0.362. The time proportions of in-row computation and MTE2 movement are already close.
 
 With rows fixed at 8192 and the per-row data size gradually increasing (cols from 64 to 512), the `Task Duration` of Case 1 and Case 2 changes as shown in the following figure, where the vertical dotted lines indicate the bucket boundaries.
 
 <img src="./figures/perf_trend.png">
 
-The `Task Duration` of Case 1 keeps rising as cols increases: the in-row computation traverses the row three times in series, and the number of elements processed by each thread is proportional to cols. The growth of Case 2 is staircase-like: within the same bucket, the `Task Duration` stays nearly flat, because the per-thread computation is determined by `kWarpIterations` and remains unchanged, and only the data volume moved by MTE with the real cols grows slightly with cols. When crossing a bucket boundary, the computation jumps by one level, and the `Task Duration` jumps accordingly. Case 2 outperforms Case 1 across the whole cols range, and the advantage grows with cols. At cols = 512, the `Task Duration` of Case 2 is about 54% of Case 1. In the middle of a bucket where the bucket upper bound exceeds the real cols by a large margin (for example, cols = 96 and 197), Case 2 has to process more invalid tail columns, and its relative advantage is smaller than at bucket boundaries (for example, cols = 128, 384, and 512).
+The `Task Duration` of Case 1 keeps rising as cols increases: the in-row computation traverses the row three times in series, and the number of elements processed by each thread is proportional to cols. The growth of Case 2 is staircase-like: within the same bucket, the `Task Duration` stays nearly flat, because the per-thread computation is determined by `kWarpIterations` and remains unchanged, and only the data volume moved by MTE with the real cols grows slightly with cols. When crossing a bucket boundary, the computation jumps by one level, and the `Task Duration` jumps accordingly. Case 2 outperforms Case 1 across the whole cols range, and the advantage grows with cols. At cols = 512, the `Task Duration` of Case 2 is about 48% of Case 1. In the middle of a bucket where the bucket upper bound exceeds the real cols by a large margin (for example, cols = 96 and 197), Case 2 has to process more invalid tail columns, and its relative advantage is smaller than at bucket boundaries (for example, cols = 128, 384, and 512).
 
 ## Tuning Recommendations
 
