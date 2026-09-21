@@ -402,13 +402,9 @@ bool IsCcuForcedAlgUsable(const Mc2CcTilingInner* ccTiling)
     ExternalAlgSpec extSpec;
     std::string extParseErrMsg;
     const ForcedAlgKind kind = ClassifyForcedAlgConfig(ccTiling->algConfig, algName, extSpec, extParseErrMsg);
-    if (kind == ForcedAlgKind::LEGACY) {
-        HCCL_INFO(
-            "[MC2_FORCE_ALG] legacy algConfig[%s], use default selector.",
-            ccTiling->algConfig); // 老路径日志，文本保持原样
-    }
     if (kind == ForcedAlgKind::NONE || kind == ForcedAlgKind::LEGACY) {
-        HCCL_WARNING("[AllocComResourceByTilingCcu] algName[%s] is not supported in mc2_client.", algName.c_str());
+        HCCL_WARNING(
+            "[AllocComResourceByTilingCcu] algConfig[%s] is not supported in mc2_client.", ccTiling->algConfig);
         return false;
     }
     if (kind == ForcedAlgKind::BARE_NAME) {
