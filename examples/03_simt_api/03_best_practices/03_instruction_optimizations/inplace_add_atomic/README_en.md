@@ -107,9 +107,11 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void vector_muladd_atomic(
 
 The performance data shows one phenomenon: switching to atomic add reduces the Task Duration by 8.0%. The difference comes solely from the data path of the old value of the accumulation target `a[index]`.
 
-The following figure compares the data flow of the two accumulation methods in this sample: the left side is Scenario 0 (plain in-place add), the right side is Scenario 1 (atomic add), and GM on both sides holds the three arrays `a`, `b`, and `c`.
+The following figures show the data flow of the two accumulation methods in this sample respectively; GM in both figures holds the three arrays `a`, `b`, and `c`.
 
-![Data flow comparison of the two accumulation methods](figures/inplace_add_atomic_dataflow.png)
+![Data flow of plain in-place add (Scenario 0)](figures/inplace_add_atomic_dataflow_plain.png)
+
+![Data flow of atomic add (Scenario 1)](figures/inplace_add_atomic_dataflow_atomic.png)
 
 - **In-place add (Scenario 0)**: `a[index]`, `b[index]`, and `c[index]` are all read into registers through L2 Cache, and after the multiply-add completes, the new value of `a[index]` is written back from the registers to L2 Cache.
 - **Atomic add (Scenario 1)**: only `b[index]` and `c[index]` are read into registers to compute the product, which is issued as the operand of the atomic add; reading the old value, the addition, and the write-back are completed as one indivisible unit at the L2 Cache side, so `a[index]` never enters the registers and the round trip above does not happen.

@@ -106,9 +106,15 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void vector_muladd_atomic(
 
 性能数据呈现出一个现象：改用原子加后，Task Duration下降8.0%。差异只来自累加目标`a[index]`旧值的数据路径。
 
-本样例两种累加方式的数据流转对比如下图所示，左侧为场景0（普通原地加），右侧为场景1（原子加），两侧的GM均存放`a`、`b`、`c`三个数组。
+本样例两种累加方式的数据流转分别如下图所示，两图的GM均存放`a`、`b`、`c`三个数组。
 
-![两种累加方式的数据流转对比](figures/inplace_add_atomic_dataflow.png)
+普通原地加的数据流转如下图：
+
+![普通原地加（场景0）的数据流转](figures/inplace_add_atomic_dataflow_plain.png)
+
+原子加的数据流转如下图：
+
+![原子加（场景1）的数据流转](figures/inplace_add_atomic_dataflow_atomic.png)
 
 - **原地加法（场景0）**：`a[index]`、`b[index]`、`c[index]`三者都经L2 Cache读入寄存器，乘加完成后，`a[index]`的新值再从寄存器写回L2 Cache。
 - **原子加法（场景1）**：只有`b[index]`与`c[index]`读入寄存器并算出乘积，乘积作为原子加的操作数下发；读旧值、加法、写回三步作为一个不可分割的整体在L2 Cache侧完成，`a[index]`不进入寄存器，上述往返不再发生。
