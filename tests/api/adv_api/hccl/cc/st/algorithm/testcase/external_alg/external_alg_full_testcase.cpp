@@ -51,31 +51,24 @@ TEST(ExtAlgForced, FourStateClassification)
     ExternalAlgSpec spec;
     std::string errMsg;
 
-    Mc2CcTilingInner empty = MakeTiling("");
-    EXPECT_EQ(ClassifyForcedAlg(&empty, algName, spec, errMsg), ForcedAlgKind::NONE);
+    EXPECT_EQ(ClassifyForcedAlgConfig("", algName, spec, errMsg), ForcedAlgKind::NONE);
 
-    Mc2CcTilingInner legacy = MakeTiling("allgather=level0:fullmesh");
-    EXPECT_EQ(ClassifyForcedAlg(&legacy, algName, spec, errMsg), ForcedAlgKind::LEGACY);
+    EXPECT_EQ(ClassifyForcedAlgConfig("allgather=level0:fullmesh", algName, spec, errMsg), ForcedAlgKind::LEGACY);
 
-    Mc2CcTilingInner bare = MakeTiling("InsAllGatherMesh1D");
-    EXPECT_EQ(ClassifyForcedAlg(&bare, algName, spec, errMsg), ForcedAlgKind::BARE_NAME);
+    EXPECT_EQ(ClassifyForcedAlgConfig("InsAllGatherMesh1D", algName, spec, errMsg), ForcedAlgKind::BARE_NAME);
     EXPECT_EQ(algName, "InsAllGatherMesh1D");
 
-    Mc2CcTilingInner ext = MakeTiling("parallel[mesh, nhr]");
-    EXPECT_EQ(ClassifyForcedAlg(&ext, algName, spec, errMsg), ForcedAlgKind::EXTERNAL);
+    EXPECT_EQ(ClassifyForcedAlgConfig("parallel[mesh, nhr]", algName, spec, errMsg), ForcedAlgKind::EXTERNAL);
     EXPECT_TRUE(errMsg.empty());
     EXPECT_EQ(spec.canonical(), "parallel[mesh,nhr]");
 
     // 解析失败: spec 复位无效 + errMsg 非空（ClassifyForcedAlgConfig 契约）。
     // 复位 spec 的 canonical() 是 "sole[]"（executor 默认 SOLE）而非空串，
     // 失败态断言用默认值判据: layers 空 + orderStrong 复位
-    Mc2CcTilingInner bad = MakeTiling("sole[ring]");
-    EXPECT_EQ(ClassifyForcedAlg(&bad, algName, spec, errMsg), ForcedAlgKind::EXTERNAL);
+    EXPECT_EQ(ClassifyForcedAlgConfig("sole[ring]", algName, spec, errMsg), ForcedAlgKind::EXTERNAL);
     EXPECT_FALSE(errMsg.empty());
     EXPECT_TRUE(spec.layers.empty());
     EXPECT_FALSE(spec.orderStrong);
-
-    EXPECT_EQ(ClassifyForcedAlg(nullptr, algName, spec, errMsg), ForcedAlgKind::NONE);
 }
 
 // hccl_mc2.cc 内部自由函数，专属目标已编入该翻译单元，符号可见
@@ -99,6 +92,10 @@ TEST(ExtAlgGateB, ExternalNameGate)
     const void* badSyntaxList[] = {&badSyntax};
     EXPECT_FALSE(CheckCcuAlgorithmsRegistered(badSyntaxList, 1U));
 
+    // null tiling 守卫
+    const void* nullList[] = {nullptr};
+    EXPECT_FALSE(CheckCcuAlgorithmsRegistered(nullList, 1U));
+
     // 裸名/空名/legacy 现状语义不变
     Mc2CcTilingInner bare = MakeTiling("CcuSchedAllGatherSoleMesh", 6U);
     const void* bareList[] = {&bare};
@@ -119,11 +116,10 @@ TEST(ExtAlgFailure, ErrorMessagesCarryThreeElements)
     EXPECT_FALSE(CheckCcuAlgorithmsRegistered(badList, 1U));
 
     // ClassifyForcedAlg 层 errMsg 三要素：解析失败消息含原文
-    Mc2CcTilingInner bad = MakeTiling("sole[ring]", 6U);
     std::string algName;
     ExternalAlgSpec spec;
     std::string errMsg;
-    EXPECT_EQ(ClassifyForcedAlg(&bad, algName, spec, errMsg), ForcedAlgKind::EXTERNAL);
+    EXPECT_EQ(ClassifyForcedAlgConfig("sole[ring]", algName, spec, errMsg), ForcedAlgKind::EXTERNAL);
     EXPECT_NE(errMsg.find("sole[ring]"), std::string::npos); // 要素1: 原文
     EXPECT_NE(errMsg.find("atom"), std::string::npos);       // 要素3: 原因（词表外原子）
 

@@ -682,25 +682,6 @@ HcclResult CheckForcedAlgResource(
     return HCCL_SUCCESS;
 }
 
-ForcedAlgKind ClassifyForcedAlg(
-    const Mc2CcTilingInner* ccTiling, std::string& algName, ExternalAlgSpec& extSpec, std::string& extParseErrMsg)
-{
-    algName.clear();
-    extParseErrMsg.clear();
-    extSpec = ExternalAlgSpec();
-    if (ccTiling == nullptr) {
-        return ForcedAlgKind::NONE;
-    }
-    const std::string algConfig(ccTiling->algConfig);
-    const ForcedAlgKind kind = ClassifyForcedAlgConfig(algConfig, algName, extSpec, extParseErrMsg);
-    if (kind == ForcedAlgKind::LEGACY) {
-        HCCL_INFO(
-            "[MC2_FORCE_ALG] legacy algConfig[%s], use default selector.",
-            algConfig.c_str()); // 老路径日志，文本保持原样
-    }
-    return kind;
-}
-
 bool GetForcedAlgName(
     HcclComm comm, const Mc2CcTilingInner* ccTiling, OpParam& opParam,
     std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo, std::string& algName)

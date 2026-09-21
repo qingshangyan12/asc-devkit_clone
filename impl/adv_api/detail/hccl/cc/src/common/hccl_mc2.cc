@@ -394,10 +394,19 @@ namespace {
 // 全部 CCU 候选都须过双名单：定名时 ResolveExternalAlg 按引擎/条件/机型筛选，任何一个都可能被选中
 bool IsCcuForcedAlgUsable(const Mc2CcTilingInner* ccTiling)
 {
+    if (ccTiling == nullptr) {
+        HCCL_WARNING("[AllocComResourceByTilingCcu] algName[] is not supported in mc2_client.");
+        return false;
+    }
     std::string algName;
     ExternalAlgSpec extSpec;
     std::string extParseErrMsg;
-    const ForcedAlgKind kind = ClassifyForcedAlg(ccTiling, algName, extSpec, extParseErrMsg);
+    const ForcedAlgKind kind = ClassifyForcedAlgConfig(ccTiling->algConfig, algName, extSpec, extParseErrMsg);
+    if (kind == ForcedAlgKind::LEGACY) {
+        HCCL_INFO(
+            "[MC2_FORCE_ALG] legacy algConfig[%s], use default selector.",
+            ccTiling->algConfig); // 老路径日志，文本保持原样
+    }
     if (kind == ForcedAlgKind::NONE || kind == ForcedAlgKind::LEGACY) {
         HCCL_WARNING("[AllocComResourceByTilingCcu] algName[%s] is not supported in mc2_client.", algName.c_str());
         return false;
