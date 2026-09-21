@@ -11,7 +11,6 @@
 """Extract and generate host_stub.cpp and headers."""
 
 import argparse
-import json
 import io
 import itertools
 import os
@@ -27,6 +26,20 @@ from typing import Callable, Dict, Iterator, List, NamedTuple, Optional, Set, Tu
 from channel import CODE_AIC, CODE_AIV, CODE_DEFAULT, get_code_channel
 from struct_parser import ParseError, parse_struct_by_str
 from gen_host_stub import generate_host_stub_head_code
+from host_stub_io import (
+    get_stub_impl_cpp_filepath,
+    # re-exported for `from extract_host_stub import *` in the aclrt_launch_kernel UT
+    get_triple_chevrons_impl_cpp_filepath,  # noqa: F401
+    get_normal_config_filepath,
+    get_host_config_filepath,
+    get_aic_config_filepath,
+    get_aiv_config_filepath,
+    save_file,
+    get_preprocessed_source_filepath,
+    trans_device_cpp_filename,
+    generate_config_content,
+    load_compile_commands,
+)
 from host_stub_util import (
     CodeMode,
     FuncMetaType,
@@ -1458,47 +1471,6 @@ def get_base_keys(
         cnt[get_ket_name(mode.name)] += len(func_group.func_signs)
 
 
-def get_stub_impl_cpp_filepath(dst_dir: str) -> str:
-    """Get host_stub.cpp destination file path."""
-    return os.path.join(dst_dir, "host_stub.cpp")
-
-
-def get_triple_chevrons_impl_cpp_filepath(dst_dir: str) -> str:
-    """Get host_stub.cpp destination file path."""
-    return os.path.join(dst_dir, "triple_chevrons_config.cmake")
-
-
-def get_normal_config_filepath(dst_dir: str) -> str:
-    """Get normal_config.cmake destination file path."""
-    return os.path.join(dst_dir, "normal_config.cmake")
-
-
-def get_host_config_filepath(dst_dir: str) -> str:
-    """Get normal_config.cmake destination file path."""
-    return os.path.join(dst_dir, "host_config.cmake")
-
-
-def get_aic_config_filepath(dst_dir: str) -> str:
-    """Get aic_config.cmake destination file path."""
-    return os.path.join(dst_dir, "aic_config.cmake")
-
-
-def get_aiv_config_filepath(dst_dir: str) -> str:
-    """Get aiv_config.cmake destination file path."""
-    return os.path.join(dst_dir, "aiv_config.cmake")
-
-
-def save_file(filepath: str, content: str):
-    """Save file."""
-    try:
-        with open(filepath, "w", encoding="utf-8") as file:
-            os.chmod(filepath, stat.S_IRUSR + stat.S_IWUSR)
-            file.write(content)
-    except Exception as err:
-        print("[ERROR]: write file failed, filename is {}".format(filepath))
-        raise err
-
-
 def do_save_command(save_command: Tuple[str, str]):
     """Do save command."""
     filepath, content = save_command
@@ -1589,46 +1561,6 @@ def get_mode_dynamic(aic_o: str, aiv_o: str, kernel_type: CodeMode) -> CodeMode:
     return kernel_type
 
 
-def load_compile_commands(filepath: str) -> Tuple[Dict[str, str], Dict[str, bool]]:
-    """Load compile_commands.json."""
-    source_mapping = {}
-    enable_ascendc_time_stamp = {}
-    try:
-        with open(filepath, encoding="utf-8") as file:
-            compile_commands = json.load(file)
-    except Exception as err:
-        print("[ERROR]: read json file failed, json file is {}".format(filepath))
-        raise err
-
-    for compile_info in compile_commands:
-        command_list = compile_info["command"].split()
-        if "-o" in command_list:
-            directory = compile_info["directory"]
-            source = compile_info["file"]
-
-            index = command_list.index("-o")
-            output_file = command_list[index + 1]
-            absolute_obj = os.path.join(directory, output_file)
-
-            source_mapping[absolute_obj] = source
-            if "-DASCENDC_TIME_STAMP_ON" in command_list:
-                enable_ascendc_time_stamp[absolute_obj] = True
-            else:
-                enable_ascendc_time_stamp[absolute_obj] = False
-    return source_mapping, enable_ascendc_time_stamp
-
-
-def get_preprocessed_source_filepath(filepath: str, source_mapping: Dict) -> str:
-    """Get preprocessed file's source file path."""
-    absolute_filepath = os.path.abspath(filepath)
-    return source_mapping[absolute_filepath]
-
-
-def trans_device_cpp_filename(filename: str) -> str:
-    """Transform device cpp filename."""
-    return f"auto_gen_{filename}"
-
-
 def get_all_sources(func_groups: List[FuncSignGroup], source_mapping, dst_dir: str):
     """Get all sources."""
     all_sources = list(
@@ -1715,30 +1647,6 @@ def source_properties(
                 compile_section += ";__MIX_CORE_AIC_RATION__=1"
             definitions.append(compile_section)
         yield (source, definitions)
-
-
-def generate_config_content(
-    all_sources: List[Tuple[str, List[str]]],
-    all_definitions: List[Tuple[str, List[str]]],
-) -> str:
-    """Generate config.cmake content by all sources and all definitions."""
-    buff = io.StringIO()
-
-    for name, sources in all_sources:
-        buff.write(f"set({name}\n")
-        for source in sources:
-            buff.write(f"    {source}\n")
-        buff.write(")\n")
-
-    all_definitions.sort()
-    for source, definitions in all_definitions:
-        if definitions:
-            buff.write(f"set_source_files_properties({source}\n")
-            definitions_str = ";".join(definitions)
-            buff.write(f'    PROPERTIES COMPILE_DEFINITIONS "{definitions_str}"\n')
-            buff.write(")\n")
-
-    return buff.getvalue()
 
 
 def generate_normal_config_content(
