@@ -1,11 +1,9 @@
-# SSBuffer核间存储高级特性
+# 使用SSBuffer实现核间通信
 
 本文介绍SSBuffer的存储范围、地址空间、访问方式以及配合核间同步进行消息交换的编程方法。消息队列的具体设计、Host侧校验和完整算子实现请参见[基于SSBuffer的核间通信特性](../../../operator_practice/simd_operator_impl/fusion_operator_programming/cv_fusion/ssbuffer_feature_scenarios.md)。
 
 >[!NOTE]说明
 >阅读前，请先了解[地址空间限定符](../../language_extension/simd_builtin_keywords.md#section1624210295308)和[内存一致性](../memory_model/memory_consistency.md)中的读写顺序与同步概念。
->本节适用于如下产品型号：
->
 >本节内容的产品支持情况如下：
 ><!-- npu="950" id1 -->
 >- Ascend 950PR&950DT系列产品：支持
@@ -31,9 +29,9 @@
 
 ## 特性概述
 
-SSBuffer是AI Core内部的物理存储单元，具有独立的地址空间。在分离模式下，同一个Mix任务中的AIC与对应的AIV可以通过Scalar单元读写SSBuffer，交换控制信息、地址、长度和少量标量数据。硬件架构及与其他存储单元的关系请参见[NPU架构版本3510](../hardware_implementation/architecture_spec/npu_arch_3510.md)。
+SSBuffer是AI Core内部的物理存储单元，具有独立的地址空间。在分离模式下，使用`__mix__(1, 2)`配置核函数时（MIX任务），同一AI Core上的AIC与两个AIV共享SSBuffer，可以通过Scalar单元读写SSBuffer，交换控制消息、地址、长度和少量标量数据。硬件架构及与其他存储单元的关系请参见[NPU架构版本3510](../hardware_implementation/architecture_spec/npu_arch_3510.md)。
 
-CV融合算子中的通信包含消息交换和业务数据搬运。例如，AIV将向量计算结果作为Cube计算的输入时，需要告诉AIC输入位置、矩阵形状等信息，还需要将输入数据搬运至L1 Buffer。SSBuffer可以保存这些消息，矩阵数据本身则通过UB到L1 Buffer等数据通路搬运。SSBuffer容量有限，不用于保存大块中间计算结果，也不能替代Global Memory（GM）、Unified Buffer（UB）或L1 Buffer。
+Cube（矩阵计算）和Vector（矢量计算）融合算子（以下简称CV融合算子）中的通信包含消息交换和业务数据搬运。例如，AIV将向量计算结果作为Cube计算的输入时，需要告诉AIC输入位置、矩阵形状等消息，还需要将输入数据搬运至L1 Buffer。SSBuffer可以保存这些消息，矩阵数据本身则通过UB到L1 Buffer等数据通路搬运。SSBuffer容量有限，不用于保存大块中间计算结果，也不能替代Global Memory（GM）、Unified Buffer（UB）或L1 Buffer。
 
 SSBuffer读写与核间同步是两个相关但不同的操作：写入消息用于传递内容，核间同步用于保证另一侧在消息或数据准备完成后再读取。SSBuffer不会自动生成消息队列、有效标记或完成通知，开发者需要通过接口或通信规则建立这些关系。
 
@@ -47,12 +45,12 @@ SSBuffer适用于同一AI Core内的小数据量通信，常见场景如下。
 
 | 场景 | SSBuffer中传递的内容 | 需要配合的操作 |
 | --- | --- | --- |
-| AIV向AIC提交计算任务 | 功能号、输入地址、矩阵形状、任务序号等。 | AIV准备输入，AIC等待相应通知后读取消息并执行计算。 |
-| AIC向AIV反馈信息 | 目标L1 Buffer地址、下一轮任务参数、处理结果等。 | AIV等待消息准备完成通知，再使用地址或参数。 |
-| AIC与单个AIV交换消息 | 一侧产生、另一侧消费的控制信息。 | 使用模式4分别协调AIC与AIV0、AIC与AIV1。 |
-| AIC与两个AIV协同处理 | 两个AIV分别产生的参数，或AIC提供给两个AIV的参数。 | 根据依赖关系选择模式2的共同同步，或模式4的分别同步。 |
-| 同一AI Core内两个AIV交换信息 | 放在约定区域的少量标量数据。 | 在共享SSBuffer的Mix任务中，使用模式1等匹配的同步方式保证读写顺序。 |
-| 连续任务通信 | 按顺序产生的多条消息。 | 使用消息队列、处理完成确认和队列回绕，在有限空间中重复收发。 |
+| AIV向AIC提交计算任务 | 计算方式、输入地址、矩阵形状、任务序号等。 | AIV准备输入，AIC通过核间同步[模式2](../../../../api/SIMD-API/basic_api/sync_control/inter_core_sync/inter_core_sync_overview.md)或[模式4](../../../../api/SIMD-API/basic_api/sync_control/inter_core_sync/inter_core_sync_overview.md)等待相应通知后读取消息并执行计算。 |
+| AIC向AIV反馈消息 | 目标L1 Buffer地址、下一轮任务参数、处理结果等。 | AIC通过核间同步模式4通知单个AIV，或通过模式2通知两个AIV；AIV等待通知后再使用地址或参数。 |
+| AIC与单个AIV交换消息 | 一侧产生、另一侧消费的控制消息。 | 使用核间同步模式4分别协调AIC与AIV0、AIC与AIV1。 |
+| AIC与两个AIV协同处理 | 两个AIV分别产生的参数，或AIC提供给两个AIV的参数。 | 根据依赖关系选择核间同步模式2，使AIC与两个AIV同步；或选择模式4，使AIC分别与各AIV同步。 |
+| 同一AI Core内两个AIV交换消息 | 放在约定区域的少量标量数据。 | 在共享SSBuffer的MIX任务中，使用核间同步[模式1](../../../../api/SIMD-API/basic_api/sync_control/inter_core_sync/inter_core_sync_overview.md)保证读写顺序。 |
+| 连续任务通信 | 按顺序产生的多条消息。 | 为各AIV分别建立消息队列，通过核间同步模式4通知消息就绪和处理完成，配合队列回绕重复收发。 |
 
 非MIX模式下每个核独占的SSBuffer空间不能按上述共享方式使用。不同AI Core之间、不同任务之间以及Host与Device之间的数据交换，也不应使用本节介绍的SSBuffer共享布局。
 
@@ -68,11 +66,8 @@ SSBuffer适用于同一AI Core内的小数据量通信，常见场景如下。
 
 | 使用方式 | 适用场景 | 开发者需要处理的内容 |
 | --- | --- | --- |
-| 显式SSBuffer通信 | AIC/AIV需要交换自定义控制信息或少量标量数据。 | 获取SSBuffer基地址，自行规划消息布局、初始化、核间同步、空间复用及退出条件。 |
+| 显式SSBuffer通信 | AIC/AIV需要交换自定义控制消息或少量标量数据。 | 获取SSBuffer基地址，自行规划消息布局、初始化、核间同步、空间复用及退出条件。 |
 | 基于Matmul高阶API的CV融合 | AIV发起Matmul计算，并与Vector计算组合。 | 使用[REGIST_MATMUL_OBJ](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/REGIST_MATMUL_OBJ.md)等公开接口，由框架管理相应的KFC调用及消息。SSBuffer路径下不要直接修改内部消息结构。 |
-| 基于资源管理API的核间通信 | 需要按资源管理API的编程方式组织Cube资源和通信队列。 | 遵守[KfcWorkspace](../../../../api/SIMD-API/basic_api/cube_group_mgmt_ISASI/KfcWorkspace/constructor_and_destructor.md)及[CubeResGroupHandle](../../../../api/SIMD-API/basic_api/cube_group_mgmt_ISASI/CubeResGroupHandle/CubeResGroupHandle_usage.md)的接口约束；KfcWorkspace接收的是GM消息空间，不是SSBuffer分配接口。 |
-
-KFC（kernel function call）表示核间通信调用，并不专指SSBuffer通信。KfcWorkspace的消息空间需要满足GM地址对齐和清零要求，且不能与REGIST_MATMUL_OBJ同时使用。显式SSBuffer通信也不应直接使用框架内部的KFC消息类型或清理函数。
 
 ## 存储规格与访问约束
 
@@ -92,7 +87,7 @@ KFC（kernel function call）表示核间通信调用，并不专指SSBuffer通�
 | 访问方式 | 通过Scalar单元读写。 |
 | 对齐要求 | SSBuffer只支持通过读写指令32字节的对齐访问。通信区域起始偏移、消息布局和访问范围需要满足该要求。 |
 | 初始内容 | 可能存在脏数据，不保证为0。读取消息之前必须完成本次消息写入或必要的状态初始化。 |
-| 任务约束 | AIC和AIV启动不同任务时，不能访问同一SSBuffer进行通信；任务配置应开启所需能力。 |
+| 任务约束 | AIC和AIV启动不同任务时，不能访问同一SSBuffer进行通信；共享通信应采用`__mix__(1, 2)`核函数配置，工程化算子的对应核函数类型为`KERNEL_TYPE_MIX_AIC_1_2`。 |
 | 越界访问 | 访问超过可用空间的最末端地址会产生异常。除消息内容外，还需计入结构体填充、对齐、队列和反馈信息的空间。 |
 | 并发写入 | 不同生产者应使用互不重叠的消息区域。同一消息空间在交给消费者后，生产者不能在消费完成前覆盖。 |
 
@@ -100,17 +95,21 @@ KFC（kernel function call）表示核间通信调用，并不专指SSBuffer通�
 
 使用[函数执行空间限定符](../../language_extension/simd_builtin_keywords.md#section1074418132518)明确核函数的执行方式。`__mix__(1, 2)`表示每组AIC/AIV按1:2配比运行，多组执行时，各组访问其各自的SSBuffer。工程化算子应配置与`__mix__(1, 2)`对应的[核函数类型](../../../../api/SIMD-API/basic_api/Kernel-Tiling/set_Kernel_type.md)，即`KERNEL_TYPE_MIX_AIC_1_2`。
 
-基础API及Matmul相关路径通过[ENABLE_CV_COMM_VIA_SSBUF](../../compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#内置编译宏开关)选择SSBuffer通信和UB到L1 Buffer硬通道，该开关默认关闭。编译配置示意如下：
+编译宏[ENABLE_CV_COMM_VIA_SSBUF](../../compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#section57020345148)默认关闭。在上述1:2混合核函数配置下，将该宏设置为`true`具有以下作用：
+
+- 对于Matmul高阶API，将AIV向AIC发送调用消息的存储空间由GM切换为SSBuffer，消息空间由Matmul框架管理。
+- 对于基础API中UB到L1 Buffer的DataCopy和DataCopyPad，将经GM中转的软件仿真搬运切换为UB到L1 Buffer的硬通道搬运。
+
+编译配置示意如下：
 
 ```bash
 bisheng <source_file>.asc -o <output_file> --npu-arch=dav-3510 -DENABLE_CV_COMM_VIA_SSBUF=true
 ```
 
-需要区分以下情况：
+需要注意：
 
-- 使用基础API/Matmul的SSBuffer路径时，应配置该开关并使用匹配的Mix任务，不能只打开宏而忽略核函数类型。
-- C API的[asc_copy_ub2l1](../../../../api/SIMD-API/c_api/vector_datamove/asc_copy_ub2l1.md)直接使用硬件通道，不通过该宏选择GM软件仿真路径。显式`__ssbuf__`指针访问和C API核间同步也不依赖Matmul注册来分配消息空间。
-- 该开关不会为自定义消息划分空间、清理状态或插入完整收发协议，也不表示所有数据搬运API都需要打开它。
+- `ENABLE_CV_COMM_VIA_SSBUF`不负责设置核函数类型，也不会为自定义消息划分空间、清理状态或插入收发同步。
+- C API的[asc_copy_ub2l1](../../../../api/SIMD-API/c_api/vector_datamove/asc_copy_ub2l1.md)直接使用硬件通道，该宏对其无效。
 
 版本差异及数据通路的选择请参见[3510新特性使用说明](../../../cross_gen_migration_guide/instructions_for_new_features/3510_new_features.md#section_ssbuf)。
 
@@ -182,27 +181,19 @@ CPU调试时应使用GetSsbufBaseAddr返回的模拟地址。设备侧将0转换
 
 ### 同步方式选择
 
-基础API使用[CrossCoreSetFlag](../../../../api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreSetFlag_ISASI.md)和[CrossCoreWaitFlag](../../../../api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreWaitFlag_ISASI.md)配对进行核间同步，并通过模板参数选择同步模式。
+### 基础API同步方式
 
-C API同步方式见下表：
+基础API使用[CrossCoreSetFlag](../../../../api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreSetFlag_ISASI.md)和[CrossCoreWaitFlag](../../../../api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreWaitFlag_ISASI.md)配对进行核间同步，通过`modeId`模板参数选择模式，通过`pipe`模板参数选择流水。
 
-**表4**  C API中与SSBuffer共享访问相关的同步模式
+### C API同步方式
 
-| 模式 | 同步范围 | 在本节1:2场景中的使用方式 | 对应C API |
-| --- | --- | --- | --- |
-| 模式1 | 同一AI Core内的两个AIV。 | 两个AIV都上报后，各AIV再读取对方放入共享区域的数据。 | [asc_sync_subblock_arrive](../../../../api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md)、[asc_sync_subblock_wait](../../../../api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md)。 |
-| 模式2 | 同一AI Core内的AIC与所有AIV。 | AIC等待两个AIV都上报；或AIC上报后让两个AIV继续。 | [asc_sync_block_arrive](../../../../api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md)、[asc_sync_block_wait](../../../../api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md)。 |
-| 模式4 | 同一AI Core内的AIC与单个AIV。 | AIC与AIV0、AIC与AIV1分别通知和等待，适合独立队列收发。 | [asc_sync_intra_arrive](../../../../api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md)、[asc_sync_intra_wait](../../../../api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md)。 |
+C API通过不同的接口选择同步模式，通过`pipe`参数选择流水：
 
-### 流水选择
-
-SSBuffer由Scalar单元访问。模式4的发送和等待均支持`PIPE_S`，因此可以直接表达“消息写完后通知”和“等待通知后读取”。基础API使用`CrossCoreSetFlag<4, PIPE_S>`与`CrossCoreWaitFlag<4, PIPE_S>`；C API使用`asc_sync_intra_arrive(PIPE_S, sync_id)`与`asc_sync_intra_wait(PIPE_S, sync_id)`。
-
-模式4的CrossCoreWaitFlag必须显式传入`modeId=4`，不能省略后使用默认模式。支持的流水应与执行核匹配：AIC可使用`PIPE_S`、`PIPE_M`、`PIPE_MTE1`、`PIPE_MTE2`、`PIPE_FIX`，AIV可使用`PIPE_S`、`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_V`，不支持`PIPE_ALL`。
-
-模式1、模式2的Set端不支持`PIPE_S`。需要先通过[SetFlag/WaitFlag](../../../../api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md)建立Scalar写入到支持流水的核内顺序，再发核间通知，例如AIV侧使用`S_V`同步后从`PIPE_V`上报。3510的Wait端支持`PIPE_S`；若在其他流水等待，还需建立等待与后续Scalar读取之间的顺序。
-
-模式2下，AIC等待所有AIV时，即使只有AIV0生产消息，AIV1也必须参与对应上报。只需要与单个AIV交接时，应选用模式4。模式0用于AI Core核间同步，不会把各执行组合的SSBuffer变成共同可访问的存储空间。
+| 模式 | 发送通知 | 等待通知 |
+| --- | --- | --- |
+| 模式1 | [asc_sync_subblock_arrive](../../../../api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md) | [asc_sync_subblock_wait](../../../../api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md) |
+| 模式2 | [asc_sync_block_arrive](../../../../api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md) | [asc_sync_block_wait](../../../../api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md) |
+| 模式4 | [asc_sync_intra_arrive](../../../../api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md) | [asc_sync_intra_wait](../../../../api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md) |
 
 ### 发布、读取与空间复用
 
@@ -261,7 +252,7 @@ if ASCEND_IS_AIC {
 2. **初始化状态**：由AIC作为唯一初始化方清理消息头，避免将旧有效位当成新消息。通过[InitSocState](../../../../api/SIMD-API/basic_api/tool_interface/system_init/InitSocState.md)或C API的[asc_init](../../../../api/SIMD-API/c_api/utils/sys_init/asc_init.md)恢复控制状态，不能代替自定义SSBuffer队列初始化。
 3. **建立启动顺序**：AIC清理完成后分别通知AIV0、AIV1。两个AIV收到各自的启动通知后，才能开始向队列写入，避免初始化覆盖新消息。
 4. **发布消息**：生产者先确保当前位置可写，写入本次消息体，再设置消息头中的有效标记，最后发送消息准备完成通知。
-5. **消费消息**：AIC等待所选AIV的通知，读取消息头和消息体，校验功能号、发送方和序号，再处理消息。不能只看到有效标记就忽略协议要求的通知。
+5. **消费消息**：AIC等待所选AIV的通知，读取消息头和消息体，校验计算方式、发送方和序号，再处理消息。不能只看到有效标记就忽略协议要求的通知。
 6. **确认完成**：AIC完成该消息所需的读取后清理消息头，向原发送方返回ACK。返回ACK前，必须保证后续操作不再依赖即将被覆盖的消息内容。
 7. **复用或退出**：AIV在相应ACK到达后复用消息空间；发送结束后等待所有尚未确认的消息。AIC按双方约定的数量或结束消息退出，不能自行提前停止服务。
 
@@ -282,15 +273,15 @@ AIV：               等待启动通知 → 写消息并通知 → 使用下一�
 
 确认消息空间可复用，并不表示消息所指向的UB、L1 Buffer或GM数据也可覆盖。异步搬运和矩阵计算仍需满足输入消费、输出完成及缓冲区复用条件。
 
-两条深度为8的队列各发送12条消息、回绕并完成24条结果校验的具体实现，参见[基于SSBuffer的核间通信特性](../../../operator_practice/simd_operator_impl/fusion_operator_programming/cv_fusion/ssbuffer_feature_scenarios.md)。其中128B消息、2KB队列工作区和剩余1KB空间都是该算子的设计，不是SSBuffer的固定格式或框架保留规则。
+环形队列的空间划分、消息收发、队列回绕和结果校验的完整实现，参见[基于SSBuffer的核间通信特性](../../../operator_practice/simd_operator_impl/fusion_operator_programming/cv_fusion/ssbuffer_feature_scenarios.md)。消息大小和队列深度由算子设计决定，应根据实际消息布局计算空间占用，并满足SSBuffer容量和同步计数器的约束。
 
 ## 与数据搬运和Matmul高阶API配合
 
 ### 业务数据搬运
 
-SSBuffer传递控制信息，大块数据使用相应搬运接口。根据CV融合算子的数据流选择如下通路，具体数据类型、格式、长度和对齐要求参见接口说明。
+SSBuffer传递控制消息，大块数据使用相应搬运接口。根据CV融合算子的数据流选择如下通路，具体数据类型、格式、长度和对齐要求参见接口说明。
 
-**表5**  相关数据通路
+**表4**  相关数据通路
 
 | 数据流 | 基础API | C API | 与通信的关系 |
 | --- | --- | --- | --- |
@@ -303,7 +294,7 @@ SSBuffer传递控制信息，大块数据使用相应搬运接口。根据CV融�
 对应的实际数据流为：
 
 ```text
-控制信息：AIV Scalar ↔ SSBuffer ↔ AIC Scalar
+控制消息：AIV Scalar ↔ SSBuffer ↔ AIC Scalar
 Vector作为Cube输入：UB → L1 Buffer → L0A/L0B Buffer → Cube计算
 Cube作为Vector输入：Cube计算 → L0C Buffer → UB → Vector计算
 ```
@@ -320,11 +311,11 @@ Cube作为Vector输入：Cube计算 → L0C Buffer → UB → Vector计算
 
 配套的搬运服务也会传递GM到L1 Buffer搬运所需的地址、块长和步长等描述，实际矩阵内容仍在数据通路上搬运。
 
-SSBuffer相关路径还配合UB/TSCM输入、MX矩阵计算及scale输入等能力。例如[SetTensorScaleA](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetTensorScaleA.md)、[SetTensorScaleB](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetTensorScaleB.md)需要匹配支持该能力的配置。TSCM表示相关队列使用的L1 Buffer位置，不是SSBuffer中的矩阵存储区。设置UB/TSCM、AB共享、批量迭代或双主模式时，还需遵守对应Matmul配置的支持范围，不能认为开启SSBuffer后所有组合都适用。当前SSBuffer通信实现每个AIV使用8个命令位置，支持的Matmul对象数上限为4；命令位置数不等于对象数。UB来源的TSCM队列还会占用核间同步资源，当前框架对所用TSCM Buffer数与Matmul对象数之和检查上限为10，不能分别按各自最大值独立配置。
+Matmul使用SSBuffer通信时，还支持UB/TSCM输入、MX矩阵计算及scale输入等能力。例如[SetTensorScaleA](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetTensorScaleA.md)、[SetTensorScaleB](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetTensorScaleB.md)需要匹配支持该能力的配置。TSCM表示相关队列使用的L1 Buffer位置，不是SSBuffer中的矩阵存储区。设置UB/TSCM、AB共享、批量迭代或双主模式时，还需遵守对应Matmul配置的支持范围，不能认为开启SSBuffer后所有组合都适用。当前SSBuffer通信实现每个AIV使用8个命令位置，支持的Matmul对象数上限为4；命令位置数不等于对象数。UB来源的TSCM队列还会占用核间同步资源，当前框架对所用TSCM Buffer数与Matmul对象数之和检查上限为10，不能分别按各自最大值独立配置。
 
 可结合以下样例了解不同用法：
 
-- [MatmulLeakyRelu](../../../../../../examples/01_simd_cpp_api/00_introduction/03_fusion_operation/matmul_leakyrelu_advanced_api)：矩阵计算与Vector激活融合，3510构建配置开启SSBuffer相关路径。
+- [MatmulLeakyRelu](../../../../../../examples/01_simd_cpp_api/00_introduction/03_fusion_operation/matmul_leakyrelu_advanced_api)：矩阵计算与Vector激活融合，3510构建配置通过`ENABLE_CV_COMM_VIA_SSBUF=true`启用SSBuffer通信。
 - [matmul_vecout](../../../../../../examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_vecout)：以Vector侧VECOUT作为矩阵输入。
 - [matmul_mx](../../../../../../examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_mx)、[matmul_mx_scale_cache](../../../../../../examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_mx_scale_cache)：MX计算及scale相关场景。
 - [matmul_mx_ub_tscm_nz](../../../../../../examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_mx_ub_tscm_nz)：UB、TSCM和NZ格式的MX矩阵输入。
