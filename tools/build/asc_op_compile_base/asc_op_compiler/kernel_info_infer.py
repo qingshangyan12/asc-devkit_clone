@@ -152,7 +152,7 @@ processed as numeric variables in the precompilation phase. please use numeric c
 
     @staticmethod
     def get_kernel_type_enum(kernel_type, compile_log_path):
-        if CommonUtility.is_v220() or CommonUtility.is_c310():
+        if CommonUtility.is_v220() or CommonUtility.is_c310() or CommonUtility.is_516r2():
             if kernel_type in STR_TO_KERNEL_TYPE_V220.keys():
                 return STR_TO_KERNEL_TYPE_V220[kernel_type]
             else:
@@ -681,7 +681,7 @@ REGISTER_TILING_DEFAULT"
             # chmod sub core .i file permission
             os.chmod(dis_i_file_cube, stat.S_IRUSR + stat.S_IWUSR)
             os.chmod(dis_i_file_vec, stat.S_IRUSR + stat.S_IWUSR)
-        elif CommonUtility.is_m510():
+        elif CommonUtility.is_m510() or CommonUtility.is_516r2():
             pre_compile_cmd = gen_compile_cmd_v220(cce_file, dst_i_file, compile_option_tuple_pre, None, "", False)
             CommonUtility.run_cmd_inner(pre_compile_cmd, CompileStage.PRECOMPILE, compile_log_path)
         else:

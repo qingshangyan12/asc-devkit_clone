@@ -68,6 +68,7 @@ constexpr const char* OP_ACLNN_SOC_INFO = "enum SocType {\n"
                                           "    SOC_VERSION_KIRINDEV0001 = 18,\n"
                                           "    SOC_VERSION_KIRINDEV0002 = 19,\n"
                                           "    SOC_VERSION_KIRINDEV0003 = 20,\n"
+                                          "    SOC_VERSION_ASCEND5162A = 21,\n"
                                           "    SOC_VERSION_INVALID = 99\n"
                                           "};\n";
 constexpr const char* OP_ACLNN_SOC_MATCH_HELPER =
@@ -168,7 +169,8 @@ const std::map<std::string, std::string> SOC_SUPPORT_MAP = {
     {"kirindev0001", "SOC_VERSION_KIRINDEV0001"},
     {"kirindev0002", "SOC_VERSION_KIRINDEV0002"},
     {"kirindev0003", "SOC_VERSION_KIRINDEV0003"},
-    {"ascend350", "SOC_VERSION_ASCEND350"}};
+    {"ascend350", "SOC_VERSION_ASCEND350"},
+    {"ascend5162a", "SOC_VERSION_ASCEND5162A"}};
 
 const std::map<int, std::string> DTYPE_SUPPORT_MAP = {
     {ge::DT_FLOAT, "ge::DT_FLOAT"},
