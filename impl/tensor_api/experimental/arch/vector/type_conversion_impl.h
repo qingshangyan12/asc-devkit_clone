@@ -34,6 +34,12 @@ struct cast_element_bits {
     static constexpr uint32_t value = is_b4_type_v<data_type> ? 4U : sizeof(data_type) * 8U;
 };
 
+/** @brief Empty tag @c physical_int64_t has sizeof==1; HW B64 cast width is 64 bits. */
+template <>
+struct cast_element_bits<physical_int64_t> {
+    static constexpr uint32_t value = 64U;
+};
+
 } // namespace detail
 } // namespace experimental
 } // namespace te
@@ -108,6 +114,9 @@ __simd_callee__ inline reg_tensor<DstType> cast_impl(
     static_assert(
         !AscendC::Std::is_same_v<DstType, SrcType>,
         "reg_tensor cast requires different source and destination element types");
+    static_assert(
+        !AscendC::Std::is_same_v<DstType, int64_t> && !AscendC::Std::is_same_v<SrcType, int64_t>,
+        "soft int64_t cast is not supported; use physical_int64_t for HW B64 cast");
 
     using op = reg_cast_op<DstType, SrcType, Layout, Round, Sat>;
     static_assert(op::supported, "register cast type or option combination is unsupported on the current architecture");

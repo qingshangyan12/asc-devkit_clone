@@ -17,6 +17,7 @@
 #define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_TYPE_GET_H
 
 #include "c_api/asc_simd.h"
+#include "tensor_api/experimental/arch/vector/physical_int64.h"
 
 namespace asc {
 namespace te {
@@ -68,8 +69,15 @@ struct type_get<int32_t> {
     using type = vector_int32_t;
 };
 
+// Retained for non-reg_tensor consumers. Soft reg_tensor<int64_t> does not use
+// this mapping for storage; physical B64 storage uses type_get<physical_int64_t>.
 template <>
 struct type_get<int64_t> {
+    using type = vector_int64_t;
+};
+
+template <>
+struct type_get<physical_int64_t> {
     using type = vector_int64_t;
 };
 

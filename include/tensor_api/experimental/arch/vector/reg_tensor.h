@@ -23,6 +23,7 @@
 #include "tensor_api/utils/utils.h"
 #include "impl/tensor_api/experimental/arch/vector/type_get.h"
 #include "tensor_api/experimental/arch/vector/complex_types.h"
+#include "tensor_api/experimental/arch/vector/physical_int64.h"
 
 namespace asc {
 namespace te {
@@ -114,6 +115,48 @@ DEFINE_REG_TENSOR_COMPLEX(complex_half, vector_half, half);
 DEFINE_REG_TENSOR_COMPLEX(complex_float, vector_float, float);
 
 #undef DEFINE_REG_TENSOR_COMPLEX
+
+/**
+ * @brief Soft B64: logical @c int64_t split into two @c int32 parts (lo/hi) plus a sticky soft-mask.
+ * @note Does not store a physical @c vector_int64 register. Prefer @c physical_int64_t when a
+ *       single hardware B64 register is required.
+ */
+template <>
+struct reg_tensor<int64_t> {
+    using elem_type = int64_t;
+    using part_type = reg_tensor<int32_t>;
+
+    __simd_callee__ reg_tensor() = default;
+
+    /** @brief Propagates the same soft-mask into lo/hi so part masks stay in sync. */
+    __simd_callee__ reg_tensor(const vector_bool& maskValue)
+        : lo(maskValue), hi(maskValue), mask(maskValue)
+    {}
+
+    __simd_callee__ inline reg_tensor& with_mask(const reg_tensor<bool>& maskReg);
+
+    part_type lo;
+    part_type hi;
+    vector_bool mask;
+};
+
+/**
+ * @brief Physical B64: single hardware @c vector_int64 register + soft-mask.
+ * @note Do not mix with @c reg_tensor<int64_t> soft {lo,hi} representation.
+ */
+template <>
+struct reg_tensor<physical_int64_t> {
+    using elem_type = physical_int64_t;
+    using reg_type = typename detail::type_get<elem_type>::type;
+
+    __simd_callee__ reg_tensor() = default;
+    __simd_callee__ reg_tensor(const vector_bool& maskValue) : mask(maskValue) {}
+
+    __simd_callee__ inline reg_tensor& with_mask(const reg_tensor<bool>& maskReg);
+
+    reg_type reg;
+    vector_bool mask;
+};
 
 /**
  * @brief Alias: @c complex<half> / @c complex<float> → specialized reg_tensor.

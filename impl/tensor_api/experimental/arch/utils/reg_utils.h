@@ -65,7 +65,7 @@ template <typename T>
 inline constexpr bool is_b32_type_v = AscendC::Std::is_one_of_v<T, int32_t, uint32_t, float>;
 
 template <typename T>
-inline constexpr bool is_b64_type_v = AscendC::Std::is_one_of_v<T, int64_t>;
+inline constexpr bool is_b64_type_v = AscendC::Std::is_one_of_v<T, int64_t, physical_int64_t>;
 
 template <typename T, typename U>
 __simd_callee__ inline reg_tensor<T> make_reg_operand(const U& value, const vector_bool& mask)

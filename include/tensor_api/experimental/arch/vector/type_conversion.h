@@ -42,6 +42,7 @@ constexpr cast_options default_cast_ops = {cast_layout::zero, cast_round_mode::r
  * @note Source and destination element types must differ. Supported option combinations are architecture-dependent.
  * @note Extends the original cast interface with an explicit @p dst so MERGING has a same-type merge base,
  *       matching basic_api `Cast(dst, src, mask)`.
+ * @note Hardware B64 cast uses @c physical_int64_t (not soft @c int64_t {lo,hi}).
  */
 template <typename DstType, const cast_options& opt = default_cast_ops, merge_mode Mode = merge_mode::zeroing,
     typename SrcType>

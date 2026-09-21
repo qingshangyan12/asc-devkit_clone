@@ -47,6 +47,8 @@ __simd_callee__ inline reg_tensor<complex_float>& reg_tensor<complex_float>::wit
 } // namespace te
 } // namespace asc
 
+#include "impl/tensor_api/experimental/arch/vector/reg_tensor_int64_impl.h"
+
 #endif // IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_REG_TENSOR_IMPL_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_TENSOR_IMPL_H)

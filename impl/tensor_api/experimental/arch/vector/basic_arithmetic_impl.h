@@ -19,6 +19,7 @@
 #include "impl/tensor_api/experimental/arch/utils/reg_utils.h"
 #include "impl/tensor_api/experimental/arch/vector/precision_math_impl.h"
 #include "impl/tensor_api/experimental/arch/vector/complex_ops_impl.h"
+#include "impl/tensor_api/experimental/arch/vector/soft_int64_arith_impl.h"
 
 namespace asc {
 namespace te {
@@ -38,7 +39,11 @@ __simd_callee__ inline reg_tensor<T> operator+(const reg_tensor<T>& src0, const 
 {
     if constexpr (is_complex_tag_v<T>) {
         return detail::complex_add(src0, src1);
+    } else if constexpr (Std::is_same_v<T, int64_t>) {
+        return detail::soft_int64_add(src0, src1);
     } else {
+        static_assert(!Std::is_same_v<T, physical_int64_t>,
+            "physical_int64_t add is not supported; use soft reg_tensor<int64_t> for B64 add");
         return add<merge_mode::zeroing>(src0, src1);
     }
 }
@@ -83,7 +88,12 @@ __simd_callee__ inline reg_tensor<T> add(const reg_tensor<T>& src0, const reg_te
     if constexpr (is_complex_tag_v<T>) {
         static_assert(Mode == merge_mode::zeroing, "complex add currently supports zeroing merge mode only");
         return detail::complex_add(src0, src1);
+    } else if constexpr (Std::is_same_v<T, int64_t>) {
+        static_assert(Mode == merge_mode::zeroing, "soft int64 add currently supports zeroing merge mode only");
+        return detail::soft_int64_add(src0, src1);
     } else {
+        static_assert(!Std::is_same_v<T, physical_int64_t>,
+            "physical_int64_t add is not supported; use soft reg_tensor<int64_t> for B64 add");
         static_assert(detail::supports_add_sub_v<T>, "add does not support this element type");
         reg_tensor<T> computed;
         asc_add(computed.reg, src0.reg, src1.reg, src0.mask);
