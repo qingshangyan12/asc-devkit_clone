@@ -58,6 +58,12 @@ ASC_DEPRECATED(
         asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
         asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
         bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ half*.
+ * @param src Source type: __cc__ float*.
+ * @note 21-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
@@ -72,6 +78,7 @@ __aicore__ inline void asc_copy_l0c2gm(
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
 }
+// Continue the asc_copy_l0c2gm interface variant (section 9).
 
 ASC_DEPRECATED(
     9.2.0, "2027/09/07",
@@ -80,6 +87,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode,
         asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
         bool enable_nz2dn, bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ fp8_e4m3fn_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 21-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ fp8_e4m3fn_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -91,6 +104,7 @@ __aicore__ inline void asc_copy_l0c2gm(
         copy_matrix_cc_to_gm(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
@@ -103,6 +117,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode,
         asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
         bool enable_nz2dn, bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ hifloat8_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 21-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ hifloat8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -114,6 +134,8 @@ __aicore__ inline void asc_copy_l0c2gm(
         copy_matrix_cc_to_gm(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            // Continue the asc_copy_l0c2gm interface variant (section 10).
+
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
@@ -126,6 +148,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode,
         asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
         bool enable_nz2dn, bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ int8_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 21-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
@@ -137,6 +165,7 @@ __aicore__ inline void asc_copy_l0c2gm(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
 }
@@ -148,6 +177,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode,
         asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
         bool enable_nz2dn, bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ uint8_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 21-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
@@ -159,6 +194,8 @@ __aicore__ inline void asc_copy_l0c2gm(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            // Continue the asc_copy_l0c2gm interface variant (section 11).
+
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
 }
@@ -170,6 +207,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode,
         asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
         bool enable_nz2dn, bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ float*.
+ * @param src Source type: __cc__ float*.
+ * @note 21-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
@@ -181,6 +224,8 @@ __aicore__ inline void asc_copy_l0c2gm(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            // Continue the asc_copy_l0c2gm interface variant (section 12).
+
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
 }
@@ -192,6 +237,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode,
         asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
         bool enable_nz2dn, bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ bfloat16_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 21-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ bfloat16_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -203,6 +254,8 @@ __aicore__ inline void asc_copy_l0c2gm(
         copy_matrix_cc_to_gm(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            // Continue the asc_copy_l0c2gm interface variant (section 13).
+
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
@@ -215,6 +268,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode,
         asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
         bool enable_nz2dn, bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ half*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 21-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
@@ -226,6 +285,8 @@ __aicore__ inline void asc_copy_l0c2gm(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            // Continue the asc_copy_l0c2gm interface variant (section 14).
+
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
 }
@@ -237,6 +298,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode,
         asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
         bool enable_nz2dn, bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ int8_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 21-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
@@ -248,6 +315,8 @@ __aicore__ inline void asc_copy_l0c2gm(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            // Continue the asc_copy_l0c2gm interface variant (section 15).
+
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
 }
@@ -259,6 +328,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode,
         asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
         bool enable_nz2dn, bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ uint8_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 21-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -270,6 +345,8 @@ __aicore__ inline void asc_copy_l0c2gm(
         copy_matrix_cc_to_gm(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            // Continue the asc_copy_l0c2gm interface variant (section 16).
+
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
@@ -282,6 +359,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode,
         asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
         bool enable_nz2dn, bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ int32_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 21-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -293,6 +376,8 @@ __aicore__ inline void asc_copy_l0c2gm(
         copy_matrix_cc_to_gm(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            // Continue the asc_copy_l0c2gm interface variant (section 17).
+
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
@@ -327,6 +412,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode,
         asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
         bool enable_nz2dn, bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ int4b_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 21-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int4b_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -342,6 +433,7 @@ __aicore__ inline void asc_copy_l0c2gm(
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
 }
+// Continue the asc_copy_l0c2gm interface variant (section 18).
 
 ASC_DEPRECATED(
     9.2.0, "2027/09/07",
@@ -362,6 +454,7 @@ __aicore__ inline void asc_copy_l0c2ub(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            // Continue the asc_copy_l0c2ub interface variant (section 1).
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
 }
@@ -373,6 +466,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
         asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
         bool enable_nz2dn, bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2ub overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ half*.
+ * @param src Source type: __cc__ float*.
+ * @note 22-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -383,8 +482,10 @@ __aicore__ inline void asc_copy_l0c2ub(
     if ASC_IS_AIC {
         copy_matrix_cc_to_ub(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
+            // Continue the asc_copy_l0c2ub interface variant (section 2).
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
 }
@@ -396,6 +497,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
         asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
         bool enable_nz2dn, bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2ub overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ fp8_e4m3fn_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 22-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ fp8_e4m3fn_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -407,6 +514,7 @@ __aicore__ inline void asc_copy_l0c2ub(
         copy_matrix_cc_to_ub(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
@@ -419,6 +527,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
         asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
         bool enable_nz2dn, bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2ub overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ hifloat8_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 22-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ hifloat8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -430,6 +544,8 @@ __aicore__ inline void asc_copy_l0c2ub(
         copy_matrix_cc_to_ub(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            // Continue the asc_copy_l0c2ub interface variant (section 3).
+
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
@@ -442,6 +558,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
         asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
         bool enable_nz2dn, bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2ub overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ int8_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 22-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -453,6 +575,8 @@ __aicore__ inline void asc_copy_l0c2ub(
         copy_matrix_cc_to_ub(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+
+            // Continue the asc_copy_l0c2ub interface variant (section 4).
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
@@ -465,6 +589,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
         asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
         bool enable_nz2dn, bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2ub overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ uint8_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 22-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -476,6 +606,8 @@ __aicore__ inline void asc_copy_l0c2ub(
         copy_matrix_cc_to_ub(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            // Continue the asc_copy_l0c2ub interface variant (section 5).
+
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
@@ -488,6 +620,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
         asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
         bool enable_nz2dn, bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2ub overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ float*.
+ * @param src Source type: __cc__ float*.
+ * @note 22-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -499,6 +637,8 @@ __aicore__ inline void asc_copy_l0c2ub(
         copy_matrix_cc_to_ub(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            // Continue the asc_copy_l0c2ub interface variant (section 6).
+
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
@@ -511,6 +651,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
         asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
         bool enable_nz2dn, bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2ub overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ bfloat16_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 22-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ bfloat16_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -522,6 +668,8 @@ __aicore__ inline void asc_copy_l0c2ub(
         copy_matrix_cc_to_ub(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            // Continue the asc_copy_l0c2ub interface variant (section 7).
+
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
@@ -534,6 +682,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
         asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
         bool enable_nz2dn, bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2ub overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ half*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 22-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -545,6 +699,8 @@ __aicore__ inline void asc_copy_l0c2ub(
         copy_matrix_cc_to_ub(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            // Continue the asc_copy_l0c2ub interface variant (section 8).
+
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
@@ -557,6 +713,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
         asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
         bool enable_nz2dn, bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2ub overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ int8_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 22-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -568,6 +730,8 @@ __aicore__ inline void asc_copy_l0c2ub(
         copy_matrix_cc_to_ub(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            // Continue the asc_copy_l0c2ub interface variant (section 9).
+
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
@@ -580,6 +744,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
         asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
         bool enable_nz2dn, bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2ub overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ uint8_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 22-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -591,6 +761,8 @@ __aicore__ inline void asc_copy_l0c2ub(
         copy_matrix_cc_to_ub(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            // Continue the asc_copy_l0c2ub interface variant (section 10).
+
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
@@ -603,6 +775,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
         asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
         bool enable_nz2dn, bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2ub overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ int32_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 22-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -614,6 +792,8 @@ __aicore__ inline void asc_copy_l0c2ub(
         copy_matrix_cc_to_ub(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+            // Continue the asc_copy_l0c2ub interface variant (section 11).
+
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
@@ -649,6 +829,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
         asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
         bool enable_nz2dn, bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2ub overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ int4b_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 22-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ int4b_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -660,6 +846,7 @@ __aicore__ inline void asc_copy_l0c2ub(
         copy_matrix_cc_to_ub_s4(
             (__ubuf__ void*)dst, src, 0, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid,
             enable_clip_relu_pre, unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode,
+
             enable_channel_split, enable_nz2nd, static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post,
             false, eltwise_op, eltwise_antq_en, false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
@@ -694,6 +881,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
         asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
         bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ bfloat16_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 18-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
@@ -708,6 +901,7 @@ __aicore__ inline void asc_copy_l0c2l1(
             false, c0_pad_en, false, false, false);
     }
 }
+// Continue the asc_copy_l0c2l1 interface variant (section 6).
 
 ASC_DEPRECATED(
     9.2.0, "2027/09/07",
@@ -716,6 +910,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
         asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
         bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int8_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 18-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
@@ -727,6 +927,7 @@ __aicore__ inline void asc_copy_l0c2l1(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, 0, enable_clip_relu_pre, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+
             false, c0_pad_en, false, false, false);
     }
 }
@@ -738,6 +939,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
         asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
         bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint8_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 18-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
@@ -749,8 +956,10 @@ __aicore__ inline void asc_copy_l0c2l1(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, 0, enable_clip_relu_pre, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+
             false, c0_pad_en, false, false, false);
     }
+    // Continue the asc_copy_l0c2l1 interface variant (section 7).
 }
 
 ASC_DEPRECATED(
@@ -760,6 +969,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
         asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
         bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ float*.
+ * @param src Source type: __cc__ float*.
+ * @note 18-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
@@ -771,6 +986,8 @@ __aicore__ inline void asc_copy_l0c2l1(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, 0, enable_clip_relu_pre, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            // Continue the asc_copy_l0c2l1 interface variant (section 8).
+
             false, c0_pad_en, false, false, false);
     }
 }
@@ -782,6 +999,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
         asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
         bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ half*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 18-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
@@ -793,6 +1016,8 @@ __aicore__ inline void asc_copy_l0c2l1(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, 0, enable_clip_relu_pre, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            // Continue the asc_copy_l0c2l1 interface variant (section 9).
+
             false, c0_pad_en, false, false, false);
     }
 }
@@ -804,6 +1029,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
         asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
         bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int8_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 18-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
@@ -815,6 +1046,8 @@ __aicore__ inline void asc_copy_l0c2l1(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, 0, enable_clip_relu_pre, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            // Continue the asc_copy_l0c2l1 interface variant (section 10).
+
             false, c0_pad_en, false, false, false);
     }
 }
@@ -826,6 +1059,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
         asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
         bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint8_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 18-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
@@ -837,6 +1076,8 @@ __aicore__ inline void asc_copy_l0c2l1(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, 0, enable_clip_relu_pre, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            // Continue the asc_copy_l0c2l1 interface variant (section 11).
+
             false, c0_pad_en, false, false, false);
     }
 }
@@ -848,6 +1089,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
         asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
         bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int32_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 18-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
@@ -859,6 +1106,8 @@ __aicore__ inline void asc_copy_l0c2l1(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, 0, enable_clip_relu_pre, unit_flag_mode,
             static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
+            // Continue the asc_copy_l0c2l1 interface variant (section 12).
+
             false, c0_pad_en, false, false, false);
     }
 }
@@ -893,6 +1142,12 @@ ASC_DEPRECATED(
         uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
         asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
         bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int4b_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 21-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int4b_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -904,6 +1159,7 @@ __aicore__ inline void asc_copy_l0c2l1(
         copy_matrix_cc_to_cbuf_s4(
             (__cbuf__ void*)dst, src, 0, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre,
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre_mode), relu_pre_mode, enable_channel_split, enable_nz2nd,
+
             static_cast<QuantMode_post>(quant_post), relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en,
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
@@ -915,7 +1171,14 @@ ASC_DEPRECATED(
         __cbuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
         uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
         asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
+
         bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ half*.
+ * @param src Source type: __cc__ float*.
+ * @note 21-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
@@ -937,7 +1200,14 @@ ASC_DEPRECATED(
         __cbuf__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
         uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
         asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
+
         bool enable_clip_relu_pre))
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ bfloat16_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 21-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -953,6 +1223,7 @@ __aicore__ inline void asc_copy_l0c2l1(
             false, c0_pad_en, false, broadcast_en, enable_nz2dn);
     }
 }
+// Continue the asc_copy_l0c2l1 interface variant (section 13).
 
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
@@ -970,6 +1241,12 @@ __aicore__ inline void asc_copy_l0c2gm(
     }
 }
 
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ half*.
+ * @param src Source type: __cc__ float*.
+ * @note 14-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
@@ -984,8 +1261,15 @@ __aicore__ inline void asc_copy_l0c2gm(
             static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT, false,
             ELTWISE_OP_DEFAULT, false, false, false, false, false, enable_nz2dn);
     }
+    // Continue the asc_copy_l0c2gm interface variant (section 19).
 }
 
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ fp8_e4m3fn_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 14-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ fp8_e4m3fn_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode,
@@ -997,11 +1281,18 @@ __aicore__ inline void asc_copy_l0c2gm(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(l2_cache_mode),
             static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode), quant_pre_mode,
             static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd,
+
             static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT, false,
             ELTWISE_OP_DEFAULT, false, false, false, false, false, enable_nz2dn);
     }
 }
 
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ hifloat8_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 14-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ hifloat8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode,
@@ -1013,11 +1304,19 @@ __aicore__ inline void asc_copy_l0c2gm(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(l2_cache_mode),
             static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode), quant_pre_mode,
             static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd,
+            // Continue the asc_copy_l0c2gm interface variant (section 20).
+
             static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT, false,
             ELTWISE_OP_DEFAULT, false, false, false, false, false, enable_nz2dn);
     }
 }
 
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ int8_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 14-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
@@ -1029,11 +1328,19 @@ __aicore__ inline void asc_copy_l0c2gm(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(l2_cache_mode),
             static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode), quant_pre_mode,
             static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd,
+
             static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT, false,
             ELTWISE_OP_DEFAULT, false, false, false, false, false, enable_nz2dn);
+        // Continue the asc_copy_l0c2gm interface variant (section 21).
     }
 }
 
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ uint8_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 14-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
@@ -1045,11 +1352,19 @@ __aicore__ inline void asc_copy_l0c2gm(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(l2_cache_mode),
             static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode), quant_pre_mode,
             static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd,
+            // Continue the asc_copy_l0c2gm interface variant (section 22).
+
             static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT, false,
             ELTWISE_OP_DEFAULT, false, false, false, false, false, enable_nz2dn);
     }
 }
 
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ float*.
+ * @param src Source type: __cc__ float*.
+ * @note 14-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
@@ -1061,11 +1376,19 @@ __aicore__ inline void asc_copy_l0c2gm(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(l2_cache_mode),
             static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode), quant_pre_mode,
             static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd,
+            // Continue the asc_copy_l0c2gm interface variant (section 23).
+
             static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT, false,
             ELTWISE_OP_DEFAULT, false, false, false, false, false, enable_nz2dn);
     }
 }
 
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ bfloat16_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 14-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ bfloat16_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode,
@@ -1077,11 +1400,19 @@ __aicore__ inline void asc_copy_l0c2gm(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(l2_cache_mode),
             static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode), quant_pre_mode,
             static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd,
+            // Continue the asc_copy_l0c2gm interface variant (section 24).
+
             static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT, false,
             ELTWISE_OP_DEFAULT, false, false, false, false, false, enable_nz2dn);
     }
 }
 
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ half*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 14-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
@@ -1093,11 +1424,19 @@ __aicore__ inline void asc_copy_l0c2gm(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(l2_cache_mode),
             static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode), quant_pre_mode,
             static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd,
+            // Continue the asc_copy_l0c2gm interface variant (section 25).
+
             static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT, false,
             ELTWISE_OP_DEFAULT, false, false, false, false, false, enable_nz2dn);
     }
 }
 
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ int8_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 14-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
@@ -1109,11 +1448,19 @@ __aicore__ inline void asc_copy_l0c2gm(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(l2_cache_mode),
             static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode), quant_pre_mode,
             static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd,
+            // Continue the asc_copy_l0c2gm interface variant (section 26).
+
             static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT, false,
             ELTWISE_OP_DEFAULT, false, false, false, false, false, enable_nz2dn);
     }
 }
 
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ uint8_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 14-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode,
@@ -1125,11 +1472,19 @@ __aicore__ inline void asc_copy_l0c2gm(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(l2_cache_mode),
             static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode), quant_pre_mode,
             static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd,
+            // Continue the asc_copy_l0c2gm interface variant (section 27).
+
             static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT, false,
             ELTWISE_OP_DEFAULT, false, false, false, false, false, enable_nz2dn);
     }
 }
 
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ int32_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 14-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode,
@@ -1141,6 +1496,8 @@ __aicore__ inline void asc_copy_l0c2gm(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(l2_cache_mode),
             static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode), quant_pre_mode,
             static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd,
+            // Continue the asc_copy_l0c2gm interface variant (section 28).
+
             static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT, false,
             ELTWISE_OP_DEFAULT, false, false, false, false, false, enable_nz2dn);
     }
@@ -1162,6 +1519,12 @@ __aicore__ inline void asc_copy_l0c2gm(
     }
 }
 
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ int4b_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 14-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int4b_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode,
@@ -1176,6 +1539,7 @@ __aicore__ inline void asc_copy_l0c2gm(
             static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT, false,
             ELTWISE_OP_DEFAULT, false, false, false, false, false, enable_nz2dn);
     }
+    // Continue the asc_copy_l0c2gm interface variant (section 29).
 }
 
 __aicore__ inline void asc_copy_l0c2l1(
@@ -1192,6 +1556,12 @@ __aicore__ inline void asc_copy_l0c2l1(
     }
 }
 
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ bfloat16_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 13-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
@@ -1206,7 +1576,14 @@ __aicore__ inline void asc_copy_l0c2l1(
             false, false, false, false, false, false, false, false, enable_nz2dn);
     }
 }
+// Continue the asc_copy_l0c2l1 interface variant (section 14).
 
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int8_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 13-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode,
@@ -1218,9 +1595,16 @@ __aicore__ inline void asc_copy_l0c2l1(
             static_cast<uint8_t>(unit_flag_mode), quant_pre_mode, static_cast<uint8_t>(relu_pre_mode),
             enable_channel_split, enable_nz2nd, static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT,
             false, false, false, false, false, false, false, false, enable_nz2dn);
+        // Continue the asc_copy_l0c2l1 interface variant (section 15).
     }
 }
 
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint8_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 13-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
@@ -1232,10 +1616,17 @@ __aicore__ inline void asc_copy_l0c2l1(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, 0, static_cast<uint8_t>(enable_clip_relu_pre),
             static_cast<uint8_t>(unit_flag_mode), quant_pre_mode, static_cast<uint8_t>(relu_pre_mode),
             enable_channel_split, enable_nz2nd, static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT,
+
             false, false, false, false, false, false, false, false, enable_nz2dn);
     }
 }
 
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ float*.
+ * @param src Source type: __cc__ float*.
+ * @note 13-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode,
@@ -1247,9 +1638,16 @@ __aicore__ inline void asc_copy_l0c2l1(
             static_cast<uint8_t>(unit_flag_mode), quant_pre_mode, static_cast<uint8_t>(relu_pre_mode),
             enable_channel_split, enable_nz2nd, static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT,
             false, false, false, false, false, false, false, false, enable_nz2dn);
+        // Continue the asc_copy_l0c2l1 interface variant (section 16).
     }
 }
 
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ hifloat8_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 13-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ hifloat8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
@@ -1261,10 +1659,18 @@ __aicore__ inline void asc_copy_l0c2l1(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, 0, static_cast<uint8_t>(enable_clip_relu_pre),
             static_cast<uint8_t>(unit_flag_mode), quant_pre_mode, static_cast<uint8_t>(relu_pre_mode),
             enable_channel_split, enable_nz2nd, static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT,
+            // Continue the asc_copy_l0c2l1 interface variant (section 17).
+
             false, false, false, false, false, false, false, false, enable_nz2dn);
     }
 }
 
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ fp8_e4m3fn_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 13-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ fp8_e4m3fn_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
@@ -1276,10 +1682,18 @@ __aicore__ inline void asc_copy_l0c2l1(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, 0, static_cast<uint8_t>(enable_clip_relu_pre),
             static_cast<uint8_t>(unit_flag_mode), quant_pre_mode, static_cast<uint8_t>(relu_pre_mode),
             enable_channel_split, enable_nz2nd, static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT,
+            // Continue the asc_copy_l0c2l1 interface variant (section 18).
+
             false, false, false, false, false, false, false, false, enable_nz2dn);
     }
 }
 
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ half*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 13-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode,
@@ -1291,9 +1705,16 @@ __aicore__ inline void asc_copy_l0c2l1(
             static_cast<uint8_t>(unit_flag_mode), quant_pre_mode, static_cast<uint8_t>(relu_pre_mode),
             enable_channel_split, enable_nz2nd, static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT,
             false, false, false, false, false, false, false, false, enable_nz2dn);
+        // Continue the asc_copy_l0c2l1 interface variant (section 19).
     }
 }
 
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ bfloat16_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 13-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ bfloat16_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
@@ -1305,10 +1726,18 @@ __aicore__ inline void asc_copy_l0c2l1(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, 0, static_cast<uint8_t>(enable_clip_relu_pre),
             static_cast<uint8_t>(unit_flag_mode), quant_pre_mode, static_cast<uint8_t>(relu_pre_mode),
             enable_channel_split, enable_nz2nd, static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT,
+            // Continue the asc_copy_l0c2l1 interface variant (section 20).
+
             false, false, false, false, false, false, false, false, enable_nz2dn);
     }
 }
 
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int8_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 13-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
@@ -1320,10 +1749,18 @@ __aicore__ inline void asc_copy_l0c2l1(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, 0, static_cast<uint8_t>(enable_clip_relu_pre),
             static_cast<uint8_t>(unit_flag_mode), quant_pre_mode, static_cast<uint8_t>(relu_pre_mode),
             enable_channel_split, enable_nz2nd, static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT,
+            // Continue the asc_copy_l0c2l1 interface variant (section 21).
+
             false, false, false, false, false, false, false, false, enable_nz2dn);
     }
 }
 
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint8_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 13-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
@@ -1335,10 +1772,18 @@ __aicore__ inline void asc_copy_l0c2l1(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, 0, static_cast<uint8_t>(enable_clip_relu_pre),
             static_cast<uint8_t>(unit_flag_mode), quant_pre_mode, static_cast<uint8_t>(relu_pre_mode),
             enable_channel_split, enable_nz2nd, static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT,
+            // Continue the asc_copy_l0c2l1 interface variant (section 22).
+
             false, false, false, false, false, false, false, false, enable_nz2dn);
     }
 }
 
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int32_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 13-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
@@ -1350,6 +1795,8 @@ __aicore__ inline void asc_copy_l0c2l1(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, 0, static_cast<uint8_t>(enable_clip_relu_pre),
             static_cast<uint8_t>(unit_flag_mode), quant_pre_mode, static_cast<uint8_t>(relu_pre_mode),
             enable_channel_split, enable_nz2nd, static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT,
+            // Continue the asc_copy_l0c2l1 interface variant (section 23).
+
             false, false, false, false, false, false, false, false, enable_nz2dn);
     }
 }
@@ -1370,6 +1817,12 @@ __aicore__ inline void asc_copy_l0c2l1(
     }
 }
 
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int4b_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 13-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int4b_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
@@ -1381,6 +1834,7 @@ __aicore__ inline void asc_copy_l0c2l1(
             (__cbuf__ void*)dst, src, 0, n_size, m_size, dst_stride, src_stride, 0,
             static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode), quant_pre_mode,
             static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd,
+
             static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT, false, false, false, false, false,
             false, false, false, enable_nz2dn);
     }
@@ -1402,6 +1856,12 @@ __aicore__ inline void asc_copy_l0c2ub(
     }
 }
 
+/**
+ * @brief asc_copy_l0c2ub overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ half*.
+ * @param src Source type: __cc__ float*.
+ * @note 15-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
@@ -1414,10 +1874,17 @@ __aicore__ inline void asc_copy_l0c2ub(
             static_cast<bool>(sub_blockid), static_cast<uint8_t>(enable_clip_relu_pre),
             static_cast<uint8_t>(unit_flag_mode), quant_pre_mode, static_cast<uint8_t>(relu_pre_mode),
             enable_channel_split, enable_nz2nd, static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT,
+
             CLIP_RELU_POST_DEFAULT, false, ELTWISE_OP_DEFAULT, false, false, false, false, false, enable_nz2dn);
     }
 }
 
+/**
+ * @brief asc_copy_l0c2ub overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ fp8_e4m3fn_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 15-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ fp8_e4m3fn_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
@@ -1429,11 +1896,18 @@ __aicore__ inline void asc_copy_l0c2ub(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(dual_dst_ctrl),
             static_cast<bool>(sub_blockid), static_cast<uint8_t>(enable_clip_relu_pre),
             static_cast<uint8_t>(unit_flag_mode), quant_pre_mode, static_cast<uint8_t>(relu_pre_mode),
+
             enable_channel_split, enable_nz2nd, static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT,
             CLIP_RELU_POST_DEFAULT, false, ELTWISE_OP_DEFAULT, false, false, false, false, false, enable_nz2dn);
     }
 }
 
+/**
+ * @brief asc_copy_l0c2ub overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ hifloat8_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 15-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ hifloat8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
@@ -1445,11 +1919,19 @@ __aicore__ inline void asc_copy_l0c2ub(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(dual_dst_ctrl),
             static_cast<bool>(sub_blockid), static_cast<uint8_t>(enable_clip_relu_pre),
             static_cast<uint8_t>(unit_flag_mode), quant_pre_mode, static_cast<uint8_t>(relu_pre_mode),
+            // Continue the asc_copy_l0c2ub interface variant (section 12).
+
             enable_channel_split, enable_nz2nd, static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT,
             CLIP_RELU_POST_DEFAULT, false, ELTWISE_OP_DEFAULT, false, false, false, false, false, enable_nz2dn);
     }
 }
 
+/**
+ * @brief asc_copy_l0c2ub overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ int8_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 15-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
@@ -1461,11 +1943,19 @@ __aicore__ inline void asc_copy_l0c2ub(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(dual_dst_ctrl),
             static_cast<bool>(sub_blockid), static_cast<uint8_t>(enable_clip_relu_pre),
             static_cast<uint8_t>(unit_flag_mode), quant_pre_mode, static_cast<uint8_t>(relu_pre_mode),
+
+            // Continue the asc_copy_l0c2ub interface variant (section 13).
             enable_channel_split, enable_nz2nd, static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT,
             CLIP_RELU_POST_DEFAULT, false, ELTWISE_OP_DEFAULT, false, false, false, false, false, enable_nz2dn);
     }
 }
 
+/**
+ * @brief asc_copy_l0c2ub overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ uint8_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 15-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
@@ -1477,11 +1967,19 @@ __aicore__ inline void asc_copy_l0c2ub(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(dual_dst_ctrl),
             static_cast<bool>(sub_blockid), static_cast<uint8_t>(enable_clip_relu_pre),
             static_cast<uint8_t>(unit_flag_mode), quant_pre_mode, static_cast<uint8_t>(relu_pre_mode),
+            // Continue the asc_copy_l0c2ub interface variant (section 14).
+
             enable_channel_split, enable_nz2nd, static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT,
             CLIP_RELU_POST_DEFAULT, false, ELTWISE_OP_DEFAULT, false, false, false, false, false, enable_nz2dn);
     }
 }
 
+/**
+ * @brief asc_copy_l0c2ub overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ float*.
+ * @param src Source type: __cc__ float*.
+ * @note 15-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
@@ -1493,11 +1991,19 @@ __aicore__ inline void asc_copy_l0c2ub(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(dual_dst_ctrl),
             static_cast<bool>(sub_blockid), static_cast<uint8_t>(enable_clip_relu_pre),
             static_cast<uint8_t>(unit_flag_mode), quant_pre_mode, static_cast<uint8_t>(relu_pre_mode),
+            // Continue the asc_copy_l0c2ub interface variant (section 15).
+
             enable_channel_split, enable_nz2nd, static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT,
             CLIP_RELU_POST_DEFAULT, false, ELTWISE_OP_DEFAULT, false, false, false, false, false, enable_nz2dn);
     }
 }
 
+/**
+ * @brief asc_copy_l0c2ub overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ bfloat16_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 15-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ bfloat16_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
@@ -1509,11 +2015,19 @@ __aicore__ inline void asc_copy_l0c2ub(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(dual_dst_ctrl),
             static_cast<bool>(sub_blockid), static_cast<uint8_t>(enable_clip_relu_pre),
             static_cast<uint8_t>(unit_flag_mode), quant_pre_mode, static_cast<uint8_t>(relu_pre_mode),
+            // Continue the asc_copy_l0c2ub interface variant (section 16).
+
             enable_channel_split, enable_nz2nd, static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT,
             CLIP_RELU_POST_DEFAULT, false, ELTWISE_OP_DEFAULT, false, false, false, false, false, enable_nz2dn);
     }
 }
 
+/**
+ * @brief asc_copy_l0c2ub overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ half*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 15-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
@@ -1525,11 +2039,19 @@ __aicore__ inline void asc_copy_l0c2ub(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(dual_dst_ctrl),
             static_cast<bool>(sub_blockid), static_cast<uint8_t>(enable_clip_relu_pre),
             static_cast<uint8_t>(unit_flag_mode), quant_pre_mode, static_cast<uint8_t>(relu_pre_mode),
+            // Continue the asc_copy_l0c2ub interface variant (section 17).
+
             enable_channel_split, enable_nz2nd, static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT,
             CLIP_RELU_POST_DEFAULT, false, ELTWISE_OP_DEFAULT, false, false, false, false, false, enable_nz2dn);
     }
 }
 
+/**
+ * @brief asc_copy_l0c2ub overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ int8_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 15-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
@@ -1541,11 +2063,19 @@ __aicore__ inline void asc_copy_l0c2ub(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(dual_dst_ctrl),
             static_cast<bool>(sub_blockid), static_cast<uint8_t>(enable_clip_relu_pre),
             static_cast<uint8_t>(unit_flag_mode), quant_pre_mode, static_cast<uint8_t>(relu_pre_mode),
+            // Continue the asc_copy_l0c2ub interface variant (section 18).
+
             enable_channel_split, enable_nz2nd, static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT,
             CLIP_RELU_POST_DEFAULT, false, ELTWISE_OP_DEFAULT, false, false, false, false, false, enable_nz2dn);
     }
 }
 
+/**
+ * @brief asc_copy_l0c2ub overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ uint8_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 15-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
@@ -1557,11 +2087,19 @@ __aicore__ inline void asc_copy_l0c2ub(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(dual_dst_ctrl),
             static_cast<bool>(sub_blockid), static_cast<uint8_t>(enable_clip_relu_pre),
             static_cast<uint8_t>(unit_flag_mode), quant_pre_mode, static_cast<uint8_t>(relu_pre_mode),
+            // Continue the asc_copy_l0c2ub interface variant (section 19).
+
             enable_channel_split, enable_nz2nd, static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT,
             CLIP_RELU_POST_DEFAULT, false, ELTWISE_OP_DEFAULT, false, false, false, false, false, enable_nz2dn);
     }
 }
 
+/**
+ * @brief asc_copy_l0c2ub overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ int32_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 15-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
@@ -1573,6 +2111,8 @@ __aicore__ inline void asc_copy_l0c2ub(
             dst, src, 0, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(dual_dst_ctrl),
             static_cast<bool>(sub_blockid), static_cast<uint8_t>(enable_clip_relu_pre),
             static_cast<uint8_t>(unit_flag_mode), quant_pre_mode, static_cast<uint8_t>(relu_pre_mode),
+            // Continue the asc_copy_l0c2ub interface variant (section 20).
+
             enable_channel_split, enable_nz2nd, static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT,
             CLIP_RELU_POST_DEFAULT, false, ELTWISE_OP_DEFAULT, false, false, false, false, false, enable_nz2dn);
     }
@@ -1594,6 +2134,12 @@ __aicore__ inline void asc_copy_l0c2ub(
     }
 }
 
+/**
+ * @brief asc_copy_l0c2ub overload distinguished by the parameters below.
+ * @param dst Destination type: __ubuf__ int4b_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 15-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ int4b_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
@@ -1605,6 +2151,7 @@ __aicore__ inline void asc_copy_l0c2ub(
             (__ubuf__ void*)dst, src, 0, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(dual_dst_ctrl),
             static_cast<bool>(sub_blockid), static_cast<uint8_t>(enable_clip_relu_pre),
             static_cast<uint8_t>(unit_flag_mode), quant_pre_mode, static_cast<uint8_t>(relu_pre_mode),
+
             enable_channel_split, enable_nz2nd, static_cast<QuantMode_post>(QUANT_POST_DEFAULT), RELU_POST_DEFAULT,
             CLIP_RELU_POST_DEFAULT, false, ELTWISE_OP_DEFAULT, false, false, false, false, false, enable_nz2dn);
     }

@@ -74,19 +74,33 @@ constexpr uint8_t ASC_L3D_RPT_B_DST_STRIDE_K_SHIFT = 32;
 
 constexpr uint8_t ASC_L3D_RPT_B_DST_START_POS_M_SHIFT = 48;
 
+/**
+ * @brief asc_copy_l12l0a overload distinguished by the parameters below.
+ * @param dst Destination type: __ca__ bfloat16_t*.
+ * @param src Source type: __cbuf__ bfloat16_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
+    // Continue the asc_copy_l12l0a interface variant (section 1).
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size)
 {
     if ASC_IS_AIC {
         img2colv2_cbuf_to_ca(
+
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
 
+/**
+ * @brief asc_copy_l12l0a overload distinguished by the parameters below.
+ * @param dst Destination type: __ca__ fp8_e4m3fn_t*.
+ * @param src Source type: __cbuf__ fp8_e4m3fn_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ fp8_e4m3fn_t* dst, __cbuf__ fp8_e4m3fn_t* src, uint16_t k_extension, uint16_t m_extension,
     uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -99,7 +113,14 @@ __aicore__ inline void asc_copy_l12l0a(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
+// Continue the asc_copy_l12l0a interface variant (section 2).
 
+/**
+ * @brief asc_copy_l12l0a overload distinguished by the parameters below.
+ * @param dst Destination type: __ca__ fp8_e5m2_t*.
+ * @param src Source type: __cbuf__ fp8_e5m2_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ fp8_e5m2_t* dst, __cbuf__ fp8_e5m2_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -111,26 +132,47 @@ __aicore__ inline void asc_copy_l12l0a(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    // Continue the asc_copy_l12l0a interface variant (section 3).
 }
 
+/**
+ * @brief asc_copy_l12l0a overload distinguished by the parameters below.
+ * @param dst Destination type: __ca__ half*.
+ * @param src Source type: __cbuf__ half*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0a(
+    // Continue the asc_copy_l12l0a interface variant (section 24).
     __ca__ half* dst, __cbuf__ half* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
+    // Continue the asc_copy_l12l0a interface variant (section 4).
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size)
 {
     if ASC_IS_AIC {
         img2colv2_cbuf_to_ca(
+
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
+        // Continue the asc_copy_l12l0a interface variant (section 25).
     }
+    // Continue the asc_copy_l12l0a interface variant (section 5).
 }
 
+/**
+ * @brief asc_copy_l12l0a overload distinguished by the parameters below.
+ * @param dst Destination type: __ca__ float*.
+ * @param src Source type: __cbuf__ float*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0a(
+    // Continue the asc_copy_l12l0a interface variant (section 26).
     __ca__ float* dst, __cbuf__ float* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
+    // Continue the asc_copy_l12l0a interface variant (section 6).
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size)
+
 {
     if ASC_IS_AIC {
         img2colv2_cbuf_to_ca(
@@ -139,6 +181,13 @@ __aicore__ inline void asc_copy_l12l0a(
     }
 }
 
+/**
+ * @note asc_copy_l12l0a interface variant section 7.
+ * @brief asc_copy_l12l0a overload distinguished by the parameters below.
+ * @param dst Destination type: __ca__ hifloat8_t*.
+ * @param src Source type: __cbuf__ hifloat8_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -150,8 +199,15 @@ __aicore__ inline void asc_copy_l12l0a(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    // Continue the asc_copy_l12l0a interface variant (section 8).
 }
 
+/**
+ * @brief asc_copy_l12l0a overload distinguished by the parameters below.
+ * @param dst Destination type: __ca__ int16_t*.
+ * @param src Source type: __cbuf__ int16_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ int16_t* dst, __cbuf__ int16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -163,26 +219,46 @@ __aicore__ inline void asc_copy_l12l0a(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    // Continue the asc_copy_l12l0a interface variant (section 9).
 }
 
+/**
+ * @brief asc_copy_l12l0a overload distinguished by the parameters below.
+ * @param dst Destination type: __ca__ int32_t*.
+ * @param src Source type: __cbuf__ int32_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0a(
+    // Continue the asc_copy_l12l0a interface variant (section 27).
     __ca__ int32_t* dst, __cbuf__ int32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
+    // Continue the asc_copy_l12l0a interface variant (section 10).
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size)
 {
     if ASC_IS_AIC {
         img2colv2_cbuf_to_ca(
+
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
+        // Continue the asc_copy_l12l0a interface variant (section 28).
     }
+    // Continue the asc_copy_l12l0a interface variant (section 11).
 }
 
+/**
+ * @brief asc_copy_l12l0a overload distinguished by the parameters below.
+ * @param dst Destination type: __ca__ int8_t*.
+ * @param src Source type: __cbuf__ int8_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ int8_t* dst, __cbuf__ int8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
+
     bool f_matrix_ctrl, uint16_t channel_size)
+
 {
     if ASC_IS_AIC {
         img2colv2_cbuf_to_ca(
@@ -190,7 +266,14 @@ __aicore__ inline void asc_copy_l12l0a(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
+// Continue the asc_copy_l12l0a interface variant (section 12).
 
+/**
+ * @brief asc_copy_l12l0a overload distinguished by the parameters below.
+ * @param dst Destination type: __ca__ uint16_t*.
+ * @param src Source type: __cbuf__ uint16_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -202,31 +285,55 @@ __aicore__ inline void asc_copy_l12l0a(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    // Continue the asc_copy_l12l0a interface variant (section 13).
 }
 
+/**
+ * @brief asc_copy_l12l0a overload distinguished by the parameters below.
+ * @param dst Destination type: __ca__ uint32_t*.
+ * @param src Source type: __cbuf__ uint32_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0a(
+    // Continue the asc_copy_l12l0a interface variant (section 29).
     __ca__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
+    // Continue the asc_copy_l12l0a interface variant (section 14).
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size)
 {
     if ASC_IS_AIC {
         img2colv2_cbuf_to_ca(
+
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
+        // Continue the asc_copy_l12l0a interface variant (section 30).
     }
+    // Continue the asc_copy_l12l0a interface variant (section 15).
 }
 
+/**
+ * @brief asc_copy_l12l0a overload distinguished by the parameters below.
+ * @param dst Destination type: __ca__ uint8_t*.
+ * @param src Source type: __cbuf__ uint8_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0a(
+    // Continue the asc_copy_l12l0a interface variant (section 31).
     __ca__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
+    // Continue the asc_copy_l12l0a interface variant (section 16).
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
+
     bool f_matrix_ctrl, uint16_t channel_size)
+
 {
     if ASC_IS_AIC {
         img2colv2_cbuf_to_ca(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
+            // Continue the asc_copy_l12l0a interface variant (section 32).
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
+        // Continue the asc_copy_l12l0a interface variant (section 17).
     }
 }
 
@@ -509,6 +616,13 @@ __aicore__ inline void asc_copy_l12l0a_mx(
     }
 }
 
+/**
+ * @brief asc_copy_l12l0b overload distinguished by the parameters below.
+ * @param dst Destination type: __cb__ bfloat16_t*.
+ * @param src Source type: __cbuf__ bfloat16_t*.
+ * @note 17-parameter form.
+ * @note asc_copy_l12l0b interface variant section 1.
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -517,11 +631,20 @@ __aicore__ inline void asc_copy_l12l0b(
 {
     if ASC_IS_AIC {
         img2colv2_cbuf_to_cb(
+            // Continue the asc_copy_l12l0b interface variant (section 25).
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
+            // Continue the asc_copy_l12l0b interface variant (section 20).
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
+        // Continue the asc_copy_l12l0b interface variant (section 2).
     }
 }
 
+/**
+ * @brief asc_copy_l12l0b overload distinguished by the parameters below.
+ * @param dst Destination type: __cb__ fp8_e4m3fn_t*.
+ * @param src Source type: __cbuf__ fp8_e4m3fn_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ fp8_e4m3fn_t* dst, __cbuf__ fp8_e4m3fn_t* src, uint16_t k_extension, uint16_t m_extension,
     uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -534,7 +657,14 @@ __aicore__ inline void asc_copy_l12l0b(
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
+// Continue the asc_copy_l12l0b interface variant (section 3).
 
+/**
+ * @brief asc_copy_l12l0b overload distinguished by the parameters below.
+ * @param dst Destination type: __cb__ fp8_e5m2_t*.
+ * @param src Source type: __cbuf__ fp8_e5m2_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ fp8_e5m2_t* dst, __cbuf__ fp8_e5m2_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -546,8 +676,15 @@ __aicore__ inline void asc_copy_l12l0b(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    // Continue the asc_copy_l12l0b interface variant (section 4).
 }
 
+/**
+ * @brief asc_copy_l12l0b overload distinguished by the parameters below.
+ * @param dst Destination type: __cb__ half*.
+ * @param src Source type: __cbuf__ half*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ half* dst, __cbuf__ half* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -556,16 +693,25 @@ __aicore__ inline void asc_copy_l12l0b(
 {
     if ASC_IS_AIC {
         img2colv2_cbuf_to_cb(
+
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
 }
 
+/**
+ * @brief asc_copy_l12l0b overload distinguished by the parameters below.
+ * @param dst Destination type: __cb__ float*.
+ * @param src Source type: __cbuf__ float*.
+ * @note asc_copy_l12l0b interface variant section 5.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ float* dst, __cbuf__ float* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size)
+
 {
     if ASC_IS_AIC {
         img2colv2_cbuf_to_cb(
@@ -574,6 +720,13 @@ __aicore__ inline void asc_copy_l12l0b(
     }
 }
 
+/**
+ * @note asc_copy_l12l0b interface variant section 6.
+ * @brief asc_copy_l12l0b overload distinguished by the parameters below.
+ * @param dst Destination type: __cb__ hifloat8_t*.
+ * @param src Source type: __cbuf__ hifloat8_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -585,8 +738,15 @@ __aicore__ inline void asc_copy_l12l0b(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    // Continue the asc_copy_l12l0b interface variant (section 7).
 }
 
+/**
+ * @brief asc_copy_l12l0b overload distinguished by the parameters below.
+ * @param dst Destination type: __cb__ int16_t*.
+ * @param src Source type: __cbuf__ int16_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ int16_t* dst, __cbuf__ int16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -598,21 +758,39 @@ __aicore__ inline void asc_copy_l12l0b(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    // Continue the asc_copy_l12l0b interface variant (section 8).
 }
 
+/**
+ * @brief asc_copy_l12l0b overload distinguished by the parameters below.
+ * @param dst Destination type: __cb__ int32_t*.
+ * @param src Source type: __cbuf__ int32_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0b(
+    // Continue the asc_copy_l12l0b interface variant (section 21).
     __cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
+    // Continue the asc_copy_l12l0b interface variant (section 9).
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size)
 {
     if ASC_IS_AIC {
         img2colv2_cbuf_to_cb(
+
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
+        // Continue the asc_copy_l12l0b interface variant (section 22).
     }
+    // Continue the asc_copy_l12l0b interface variant (section 10).
 }
 
+/**
+ * @brief asc_copy_l12l0b overload distinguished by the parameters below.
+ * @param dst Destination type: __cb__ int8_t*.
+ * @param src Source type: __cbuf__ int8_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -624,8 +802,15 @@ __aicore__ inline void asc_copy_l12l0b(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    // Continue the asc_copy_l12l0b interface variant (section 11).
 }
 
+/**
+ * @brief asc_copy_l12l0b overload distinguished by the parameters below.
+ * @param dst Destination type: __cb__ uint16_t*.
+ * @param src Source type: __cbuf__ uint16_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -637,21 +822,39 @@ __aicore__ inline void asc_copy_l12l0b(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    // Continue the asc_copy_l12l0b interface variant (section 12).
 }
 
+/**
+ * @brief asc_copy_l12l0b overload distinguished by the parameters below.
+ * @param dst Destination type: __cb__ uint32_t*.
+ * @param src Source type: __cbuf__ uint32_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0b(
+    // Continue the asc_copy_l12l0b interface variant (section 23).
     __cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
+    // Continue the asc_copy_l12l0b interface variant (section 13).
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size)
 {
     if ASC_IS_AIC {
         img2colv2_cbuf_to_cb(
+
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
+        // Continue the asc_copy_l12l0b interface variant (section 24).
     }
+    // Continue the asc_copy_l12l0b interface variant (section 14).
 }
 
+/**
+ * @brief asc_copy_l12l0b overload distinguished by the parameters below.
+ * @param dst Destination type: __cb__ uint8_t*.
+ * @param src Source type: __cbuf__ uint8_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -663,6 +866,7 @@ __aicore__ inline void asc_copy_l12l0b(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    // Continue the asc_copy_l12l0b interface variant (section 15).
 }
 
 __aicore__ inline void asc_copy_l12l0b(
@@ -1087,6 +1291,12 @@ __aicore__ inline void asc_copy_gm2l1_align(
     }
 }
 
+/**
+ * @brief asc_copy_gm2l1_align overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ half*.
+ * @param src Source type: __gm__ half*.
+ * @param burst_count Overload-specific type: uint32_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ half* dst, __gm__ half* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count,
     uint8_t right_padding_count, bool enable_data_select, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
@@ -1098,7 +1308,14 @@ __aicore__ inline void asc_copy_gm2l1_align(
             static_cast<uint8_t>(l2_cache_mode), src_stride, dst_stride);
     }
 }
+// Continue the asc_copy_gm2l1_align interface variant (section 1).
 
+/**
+ * @brief asc_copy_gm2l1_align overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ float*.
+ * @param src Source type: __gm__ float*.
+ * @param burst_count Overload-specific type: uint32_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ float* dst, __gm__ float* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count,
     uint8_t right_padding_count, bool enable_data_select, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
@@ -1110,7 +1327,14 @@ __aicore__ inline void asc_copy_gm2l1_align(
             static_cast<uint8_t>(l2_cache_mode), src_stride, dst_stride);
     }
 }
+// Continue the asc_copy_gm2l1_align interface variant (section 2).
 
+/**
+ * @brief asc_copy_gm2l1_align overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ hifloat8_t*.
+ * @param src Source type: __gm__ hifloat8_t*.
+ * @param burst_count Overload-specific type: uint32_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint32_t burst_count, uint32_t burst_len,
     uint8_t left_padding_count, uint8_t right_padding_count, bool enable_data_select,
@@ -1122,7 +1346,14 @@ __aicore__ inline void asc_copy_gm2l1_align(
             static_cast<uint8_t>(l2_cache_mode), src_stride, dst_stride);
     }
 }
+// Continue the asc_copy_gm2l1_align interface variant (section 3).
 
+/**
+ * @brief asc_copy_gm2l1_align overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int16_t*.
+ * @param src Source type: __gm__ int16_t*.
+ * @param burst_count Overload-specific type: uint32_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count,
     uint8_t right_padding_count, bool enable_data_select, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
@@ -1134,7 +1365,14 @@ __aicore__ inline void asc_copy_gm2l1_align(
             static_cast<uint8_t>(l2_cache_mode), src_stride, dst_stride);
     }
 }
+// Continue the asc_copy_gm2l1_align interface variant (section 4).
 
+/**
+ * @brief asc_copy_gm2l1_align overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int32_t*.
+ * @param src Source type: __gm__ int32_t*.
+ * @param burst_count Overload-specific type: uint32_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count,
     uint8_t right_padding_count, bool enable_data_select, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
@@ -1146,7 +1384,14 @@ __aicore__ inline void asc_copy_gm2l1_align(
             static_cast<uint8_t>(l2_cache_mode), src_stride, dst_stride);
     }
 }
+// Continue the asc_copy_gm2l1_align interface variant (section 5).
 
+/**
+ * @brief asc_copy_gm2l1_align overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int8_t*.
+ * @param src Source type: __gm__ int8_t*.
+ * @param burst_count Overload-specific type: uint32_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count,
     uint8_t right_padding_count, bool enable_data_select, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
@@ -1158,7 +1403,14 @@ __aicore__ inline void asc_copy_gm2l1_align(
             static_cast<uint8_t>(l2_cache_mode), src_stride, dst_stride);
     }
 }
+// Continue the asc_copy_gm2l1_align interface variant (section 6).
 
+/**
+ * @brief asc_copy_gm2l1_align overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint16_t*.
+ * @param src Source type: __gm__ uint16_t*.
+ * @param burst_count Overload-specific type: uint32_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count,
     uint8_t right_padding_count, bool enable_data_select, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
@@ -1170,7 +1422,14 @@ __aicore__ inline void asc_copy_gm2l1_align(
             static_cast<uint8_t>(l2_cache_mode), src_stride, dst_stride);
     }
 }
+// Continue the asc_copy_gm2l1_align interface variant (section 7).
 
+/**
+ * @brief asc_copy_gm2l1_align overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint32_t*.
+ * @param src Source type: __gm__ uint32_t*.
+ * @param burst_count Overload-specific type: uint32_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count,
     uint8_t right_padding_count, bool enable_data_select, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
@@ -1182,6 +1441,7 @@ __aicore__ inline void asc_copy_gm2l1_align(
             static_cast<uint8_t>(l2_cache_mode), src_stride, dst_stride);
     }
 }
+// Continue the asc_copy_gm2l1_align interface variant (section 8).
 
 ASC_DEPRECATED(
     9.2.0, "2027/09/07",
@@ -1207,6 +1467,12 @@ ASC_DEPRECATED(
         __cbuf__ half* dst, __gm__ half* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count,
         uint8_t right_padding_count, bool enable_data_select, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
         uint32_t dst_stride))
+/**
+ * @brief asc_copy_gm2l1_align overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ half*.
+ * @param src Source type: __gm__ half*.
+ * @param n_burst Overload-specific type: uint32_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ half* dst, __gm__ half* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -1218,6 +1484,7 @@ __aicore__ inline void asc_copy_gm2l1_align(
             burst_src_stride, burst_dst_stride);
     }
 }
+// Continue the asc_copy_gm2l1_align interface variant (section 9).
 
 ASC_DEPRECATED(
     9.2.0, "2027/09/07",
@@ -1225,6 +1492,12 @@ ASC_DEPRECATED(
         __cbuf__ float* dst, __gm__ float* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count,
         uint8_t right_padding_count, bool enable_data_select, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
         uint32_t dst_stride))
+/**
+ * @brief asc_copy_gm2l1_align overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ float*.
+ * @param src Source type: __gm__ float*.
+ * @param n_burst Overload-specific type: uint32_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ float* dst, __gm__ float* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -1236,6 +1509,7 @@ __aicore__ inline void asc_copy_gm2l1_align(
             burst_src_stride, burst_dst_stride);
     }
 }
+// Continue the asc_copy_gm2l1_align interface variant (section 10).
 
 ASC_DEPRECATED(
     9.2.0, "2027/09/07",
@@ -1243,6 +1517,12 @@ ASC_DEPRECATED(
         __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint32_t burst_count, uint32_t burst_len,
         uint8_t left_padding_count, uint8_t right_padding_count, bool enable_data_select,
         asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride, uint32_t dst_stride))
+/**
+ * @brief asc_copy_gm2l1_align overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ hifloat8_t*.
+ * @param src Source type: __gm__ hifloat8_t*.
+ * @param n_burst Overload-specific type: uint32_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -1254,6 +1534,7 @@ __aicore__ inline void asc_copy_gm2l1_align(
             burst_src_stride, burst_dst_stride);
     }
 }
+// Continue the asc_copy_gm2l1_align interface variant (section 11).
 
 ASC_DEPRECATED(
     9.2.0, "2027/09/07",
@@ -1261,6 +1542,12 @@ ASC_DEPRECATED(
         __cbuf__ int16_t* dst, __gm__ int16_t* src, uint32_t burst_count, uint32_t burst_len,
         uint8_t left_padding_count, uint8_t right_padding_count, bool enable_data_select,
         asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride, uint32_t dst_stride))
+/**
+ * @brief asc_copy_gm2l1_align overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int16_t*.
+ * @param src Source type: __gm__ int16_t*.
+ * @param n_burst Overload-specific type: uint32_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -1272,6 +1559,7 @@ __aicore__ inline void asc_copy_gm2l1_align(
             burst_src_stride, burst_dst_stride);
     }
 }
+// Continue the asc_copy_gm2l1_align interface variant (section 12).
 
 ASC_DEPRECATED(
     9.2.0, "2027/09/07",
@@ -1279,6 +1567,12 @@ ASC_DEPRECATED(
         __cbuf__ int32_t* dst, __gm__ int32_t* src, uint32_t burst_count, uint32_t burst_len,
         uint8_t left_padding_count, uint8_t right_padding_count, bool enable_data_select,
         asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride, uint32_t dst_stride))
+/**
+ * @brief asc_copy_gm2l1_align overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int32_t*.
+ * @param src Source type: __gm__ int32_t*.
+ * @param n_burst Overload-specific type: uint32_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -1290,6 +1584,7 @@ __aicore__ inline void asc_copy_gm2l1_align(
             burst_src_stride, burst_dst_stride);
     }
 }
+// Continue the asc_copy_gm2l1_align interface variant (section 13).
 
 ASC_DEPRECATED(
     9.2.0, "2027/09/07",
@@ -1297,6 +1592,12 @@ ASC_DEPRECATED(
         __cbuf__ int8_t* dst, __gm__ int8_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count,
         uint8_t right_padding_count, bool enable_data_select, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
         uint32_t dst_stride))
+/**
+ * @brief asc_copy_gm2l1_align overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int8_t*.
+ * @param src Source type: __gm__ int8_t*.
+ * @param n_burst Overload-specific type: uint32_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -1308,6 +1609,7 @@ __aicore__ inline void asc_copy_gm2l1_align(
             burst_src_stride, burst_dst_stride);
     }
 }
+// Continue the asc_copy_gm2l1_align interface variant (section 14).
 
 ASC_DEPRECATED(
     9.2.0, "2027/09/07",
@@ -1315,6 +1617,12 @@ ASC_DEPRECATED(
         __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t burst_count, uint32_t burst_len,
         uint8_t left_padding_count, uint8_t right_padding_count, bool enable_data_select,
         asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride, uint32_t dst_stride))
+/**
+ * @brief asc_copy_gm2l1_align overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint16_t*.
+ * @param src Source type: __gm__ uint16_t*.
+ * @param n_burst Overload-specific type: uint32_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -1326,6 +1634,7 @@ __aicore__ inline void asc_copy_gm2l1_align(
             burst_src_stride, burst_dst_stride);
     }
 }
+// Continue the asc_copy_gm2l1_align interface variant (section 15).
 
 ASC_DEPRECATED(
     9.2.0, "2027/09/07",
@@ -1333,6 +1642,12 @@ ASC_DEPRECATED(
         __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t burst_count, uint32_t burst_len,
         uint8_t left_padding_count, uint8_t right_padding_count, bool enable_data_select,
         asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride, uint32_t dst_stride))
+/**
+ * @brief asc_copy_gm2l1_align overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint32_t*.
+ * @param src Source type: __gm__ uint32_t*.
+ * @param n_burst Overload-specific type: uint32_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -1344,6 +1659,7 @@ __aicore__ inline void asc_copy_gm2l1_align(
             burst_src_stride, burst_dst_stride);
     }
 }
+// Continue the asc_copy_gm2l1_align interface variant (section 16).
 
 ASC_DEPRECATED(
     9.2.0, "2027/09/07",
@@ -1351,6 +1667,12 @@ ASC_DEPRECATED(
         __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t burst_count, uint32_t burst_len,
         uint8_t left_padding_count, uint8_t right_padding_count, bool enable_data_select,
         asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride, uint32_t dst_stride))
+/**
+ * @brief asc_copy_gm2l1_align overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint8_t*.
+ * @param src Source type: __gm__ uint8_t*.
+ * @param n_burst Overload-specific type: uint32_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -1362,6 +1684,7 @@ __aicore__ inline void asc_copy_gm2l1_align(
             burst_src_stride, burst_dst_stride);
     }
 }
+// Continue the asc_copy_gm2l1_align interface variant (section 17).
 
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
@@ -1374,6 +1697,12 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
     }
 }
 
+/**
+ * @brief asc_copy_gm2l1_dn2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ fp8_e4m3fn_t*.
+ * @param src Source type: __gm__ fp8_e4m3fn_t*.
+ * @param src_d_value Overload-specific type: uint64_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
@@ -1385,6 +1714,13 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
     }
 }
 
+// Continue the asc_copy_gm2l1_dn2nz interface variant (section 1).
+/**
+ * @brief asc_copy_gm2l1_dn2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ fp8_e5m2_t*.
+ * @param src Source type: __gm__ fp8_e5m2_t*.
+ * @param src_d_value Overload-specific type: uint64_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
@@ -1407,6 +1743,13 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
     }
 }
 
+/**
+ * @note asc_copy_gm2l1_dn2nz interface variant section 2.
+ * @brief asc_copy_gm2l1_dn2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ float*.
+ * @param src Source type: __gm__ float*.
+ * @param src_d_value Overload-specific type: uint64_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ float* dst, __gm__ float* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
@@ -1418,6 +1761,13 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
     }
 }
 
+// Continue the asc_copy_gm2l1_dn2nz interface variant (section 3).
+/**
+ * @brief asc_copy_gm2l1_dn2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ hifloat8_t*.
+ * @param src Source type: __gm__ hifloat8_t*.
+ * @param src_d_value Overload-specific type: uint64_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
@@ -1429,6 +1779,13 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
     }
 }
 
+// Continue the asc_copy_gm2l1_dn2nz interface variant (section 4).
+/**
+ * @brief asc_copy_gm2l1_dn2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int16_t*.
+ * @param src Source type: __gm__ int16_t*.
+ * @param src_d_value Overload-specific type: uint64_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
@@ -1440,6 +1797,13 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
     }
 }
 
+// Continue the asc_copy_gm2l1_dn2nz interface variant (section 5).
+/**
+ * @brief asc_copy_gm2l1_dn2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int32_t*.
+ * @param src Source type: __gm__ int32_t*.
+ * @param src_d_value Overload-specific type: uint64_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
@@ -1451,6 +1815,13 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
     }
 }
 
+// Continue the asc_copy_gm2l1_dn2nz interface variant (section 6).
+/**
+ * @brief asc_copy_gm2l1_dn2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int8_t*.
+ * @param src Source type: __gm__ int8_t*.
+ * @param src_d_value Overload-specific type: uint64_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
@@ -1462,6 +1833,13 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
     }
 }
 
+// Continue the asc_copy_gm2l1_dn2nz interface variant (section 7).
+/**
+ * @brief asc_copy_gm2l1_dn2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint16_t*.
+ * @param src Source type: __gm__ uint16_t*.
+ * @param src_d_value Overload-specific type: uint64_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
@@ -1473,6 +1851,13 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
     }
 }
 
+// Continue the asc_copy_gm2l1_dn2nz interface variant (section 8).
+/**
+ * @brief asc_copy_gm2l1_dn2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint32_t*.
+ * @param src Source type: __gm__ uint32_t*.
+ * @param src_d_value Overload-specific type: uint64_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
@@ -1484,6 +1869,7 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
     }
 }
 
+// Continue the asc_copy_gm2l1_dn2nz interface variant (section 9).
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
@@ -1516,6 +1902,12 @@ ASC_DEPRECATED(
         __cbuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint64_t src_d_value,
         asc_load_l2_cache_mode l2_cache_mode, uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride,
         bool enable_small_c0))
+/**
+ * @brief asc_copy_gm2l1_dn2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ fp8_e4m3fn_t*.
+ * @param src Source type: __gm__ fp8_e4m3fn_t*.
+ * @param loop1_src_stride Overload-specific type: uint64_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
     uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -1528,9 +1920,16 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
 
 ASC_DEPRECATED(
     9.2.0, "2027/09/07",
+
     asc_copy_gm2l1_dn2nz(
         __cbuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
         uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0))
+/**
+ * @brief asc_copy_gm2l1_dn2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ fp8_e5m2_t*.
+ * @param src Source type: __gm__ fp8_e5m2_t*.
+ * @param loop1_src_stride Overload-specific type: uint64_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -1542,10 +1941,17 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
 }
 
 ASC_DEPRECATED(
+
     9.2.0, "2027/09/07",
     asc_copy_gm2l1_dn2nz(
         __cbuf__ half* dst, __gm__ half* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
         uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0))
+/**
+ * @brief asc_copy_gm2l1_dn2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ half*.
+ * @param src Source type: __gm__ half*.
+ * @param loop1_src_stride Overload-specific type: uint64_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ half* dst, __gm__ half* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -1557,10 +1963,18 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
 }
 
 ASC_DEPRECATED(
+    // Continue the asc_copy_gm2l1_dn2nz interface variant (section 10).
+
     9.2.0, "2027/09/07",
     asc_copy_gm2l1_dn2nz(
         __cbuf__ float* dst, __gm__ float* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
         uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0))
+/**
+ * @brief asc_copy_gm2l1_dn2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ float*.
+ * @param src Source type: __gm__ float*.
+ * @param loop1_src_stride Overload-specific type: uint64_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ float* dst, __gm__ float* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -1572,10 +1986,18 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
 }
 
 ASC_DEPRECATED(
+    // Continue the asc_copy_gm2l1_dn2nz interface variant (section 11).
+
     9.2.0, "2027/09/07",
     asc_copy_gm2l1_dn2nz(
         __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
         uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0))
+/**
+ * @brief asc_copy_gm2l1_dn2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ hifloat8_t*.
+ * @param src Source type: __gm__ hifloat8_t*.
+ * @param loop1_src_stride Overload-specific type: uint64_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -1587,10 +2009,18 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
 }
 
 ASC_DEPRECATED(
+    // Continue the asc_copy_gm2l1_dn2nz interface variant (section 12).
+
     9.2.0, "2027/09/07",
     asc_copy_gm2l1_dn2nz(
         __cbuf__ int16_t* dst, __gm__ int16_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
         uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0))
+/**
+ * @brief asc_copy_gm2l1_dn2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int16_t*.
+ * @param src Source type: __gm__ int16_t*.
+ * @param loop1_src_stride Overload-specific type: uint64_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -1602,10 +2032,18 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
 }
 
 ASC_DEPRECATED(
+    // Continue the asc_copy_gm2l1_dn2nz interface variant (section 13).
+
     9.2.0, "2027/09/07",
     asc_copy_gm2l1_dn2nz(
         __cbuf__ int32_t* dst, __gm__ int32_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
         uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0))
+/**
+ * @brief asc_copy_gm2l1_dn2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int32_t*.
+ * @param src Source type: __gm__ int32_t*.
+ * @param loop1_src_stride Overload-specific type: uint64_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -1617,10 +2055,18 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
 }
 
 ASC_DEPRECATED(
+    // Continue the asc_copy_gm2l1_dn2nz interface variant (section 14).
+
     9.2.0, "2027/09/07",
     asc_copy_gm2l1_dn2nz(
         __cbuf__ int8_t* dst, __gm__ int8_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
         uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0))
+/**
+ * @brief asc_copy_gm2l1_dn2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int8_t*.
+ * @param src Source type: __gm__ int8_t*.
+ * @param loop1_src_stride Overload-specific type: uint64_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -1632,10 +2078,18 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
 }
 
 ASC_DEPRECATED(
+    // Continue the asc_copy_gm2l1_dn2nz interface variant (section 15).
+
     9.2.0, "2027/09/07",
     asc_copy_gm2l1_dn2nz(
         __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
         uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0))
+/**
+ * @brief asc_copy_gm2l1_dn2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint16_t*.
+ * @param src Source type: __gm__ uint16_t*.
+ * @param loop1_src_stride Overload-specific type: uint64_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -1647,10 +2101,18 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
 }
 
 ASC_DEPRECATED(
+    // Continue the asc_copy_gm2l1_dn2nz interface variant (section 16).
+
     9.2.0, "2027/09/07",
     asc_copy_gm2l1_dn2nz(
         __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
         uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0))
+/**
+ * @brief asc_copy_gm2l1_dn2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint32_t*.
+ * @param src Source type: __gm__ uint32_t*.
+ * @param loop1_src_stride Overload-specific type: uint64_t.
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -1662,6 +2124,8 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
 }
 
 ASC_DEPRECATED(
+    // Continue the asc_copy_gm2l1_dn2nz interface variant (section 17).
+
     9.2.0, "2027/09/07",
     asc_copy_gm2l1_dn2nz(
         __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
@@ -1687,6 +2151,13 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     }
 }
 
+/**
+ * @brief asc_copy_gm2l1_nd2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ fp8_e4m3fn_t*.
+ * @param src Source type: __gm__ fp8_e4m3fn_t*.
+ * @param src_d_value Overload-specific type: uint64_t.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
@@ -1698,6 +2169,14 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     }
 }
 
+// Continue the asc_copy_gm2l1_nd2nz interface variant (section 1).
+/**
+ * @brief asc_copy_gm2l1_nd2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ fp8_e5m2_t*.
+ * @param src Source type: __gm__ fp8_e5m2_t*.
+ * @param src_d_value Overload-specific type: uint64_t.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
@@ -1720,6 +2199,14 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     }
 }
 
+/**
+ * @note asc_copy_gm2l1_nd2nz interface variant section 2.
+ * @brief asc_copy_gm2l1_nd2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ float*.
+ * @param src Source type: __gm__ float*.
+ * @param src_d_value Overload-specific type: uint64_t.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ float* dst, __gm__ float* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
@@ -1731,6 +2218,14 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     }
 }
 
+// Continue the asc_copy_gm2l1_nd2nz interface variant (section 3).
+/**
+ * @brief asc_copy_gm2l1_nd2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ hifloat8_t*.
+ * @param src Source type: __gm__ hifloat8_t*.
+ * @param src_d_value Overload-specific type: uint64_t.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
@@ -1742,6 +2237,14 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     }
 }
 
+// Continue the asc_copy_gm2l1_nd2nz interface variant (section 4).
+/**
+ * @brief asc_copy_gm2l1_nd2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int16_t*.
+ * @param src Source type: __gm__ int16_t*.
+ * @param src_d_value Overload-specific type: uint64_t.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
@@ -1753,6 +2256,14 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     }
 }
 
+// Continue the asc_copy_gm2l1_nd2nz interface variant (section 5).
+/**
+ * @brief asc_copy_gm2l1_nd2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int32_t*.
+ * @param src Source type: __gm__ int32_t*.
+ * @param src_d_value Overload-specific type: uint64_t.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
@@ -1764,6 +2275,14 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     }
 }
 
+// Continue the asc_copy_gm2l1_nd2nz interface variant (section 6).
+/**
+ * @brief asc_copy_gm2l1_nd2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int8_t*.
+ * @param src Source type: __gm__ int8_t*.
+ * @param src_d_value Overload-specific type: uint64_t.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
@@ -1775,6 +2294,14 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     }
 }
 
+// Continue the asc_copy_gm2l1_nd2nz interface variant (section 7).
+/**
+ * @brief asc_copy_gm2l1_nd2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint16_t*.
+ * @param src Source type: __gm__ uint16_t*.
+ * @param src_d_value Overload-specific type: uint64_t.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
@@ -1786,6 +2313,14 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     }
 }
 
+// Continue the asc_copy_gm2l1_nd2nz interface variant (section 8).
+/**
+ * @brief asc_copy_gm2l1_nd2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint32_t*.
+ * @param src Source type: __gm__ uint32_t*.
+ * @param src_d_value Overload-specific type: uint64_t.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
@@ -1797,6 +2332,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     }
 }
 
+// Continue the asc_copy_gm2l1_nd2nz interface variant (section 9).
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
@@ -1829,6 +2365,13 @@ ASC_DEPRECATED(
         __cbuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint64_t src_d_value,
         asc_load_l2_cache_mode l2_cache_mode, uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride,
         bool enable_small_c0))
+/**
+ * @brief asc_copy_gm2l1_nd2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ fp8_e4m3fn_t*.
+ * @param src Source type: __gm__ fp8_e4m3fn_t*.
+ * @param loop1_src_stride Overload-specific type: uint64_t.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
     uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -1841,9 +2384,17 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
 
 ASC_DEPRECATED(
     9.2.0, "2027/09/07",
+
     asc_copy_gm2l1_nd2nz(
         __cbuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
         uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0))
+/**
+ * @brief asc_copy_gm2l1_nd2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ fp8_e5m2_t*.
+ * @param src Source type: __gm__ fp8_e5m2_t*.
+ * @param loop1_src_stride Overload-specific type: uint64_t.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -1855,10 +2406,18 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
 }
 
 ASC_DEPRECATED(
+
     9.2.0, "2027/09/07",
     asc_copy_gm2l1_nd2nz(
         __cbuf__ half* dst, __gm__ half* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
         uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0))
+/**
+ * @brief asc_copy_gm2l1_nd2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ half*.
+ * @param src Source type: __gm__ half*.
+ * @param loop1_src_stride Overload-specific type: uint64_t.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ half* dst, __gm__ half* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -1870,10 +2429,19 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
 }
 
 ASC_DEPRECATED(
+    // Continue the asc_copy_gm2l1_nd2nz interface variant (section 10).
+
     9.2.0, "2027/09/07",
     asc_copy_gm2l1_nd2nz(
         __cbuf__ float* dst, __gm__ float* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
         uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0))
+/**
+ * @brief asc_copy_gm2l1_nd2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ float*.
+ * @param src Source type: __gm__ float*.
+ * @param loop1_src_stride Overload-specific type: uint64_t.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ float* dst, __gm__ float* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -1885,10 +2453,19 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
 }
 
 ASC_DEPRECATED(
+    // Continue the asc_copy_gm2l1_nd2nz interface variant (section 11).
+
     9.2.0, "2027/09/07",
     asc_copy_gm2l1_nd2nz(
         __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
         uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0))
+/**
+ * @brief asc_copy_gm2l1_nd2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ hifloat8_t*.
+ * @param src Source type: __gm__ hifloat8_t*.
+ * @param loop1_src_stride Overload-specific type: uint64_t.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -1900,10 +2477,19 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
 }
 
 ASC_DEPRECATED(
+    // Continue the asc_copy_gm2l1_nd2nz interface variant (section 12).
+
     9.2.0, "2027/09/07",
     asc_copy_gm2l1_nd2nz(
         __cbuf__ int16_t* dst, __gm__ int16_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
         uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0))
+/**
+ * @brief asc_copy_gm2l1_nd2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int16_t*.
+ * @param src Source type: __gm__ int16_t*.
+ * @param loop1_src_stride Overload-specific type: uint64_t.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -1915,10 +2501,19 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
 }
 
 ASC_DEPRECATED(
+    // Continue the asc_copy_gm2l1_nd2nz interface variant (section 13).
+
     9.2.0, "2027/09/07",
     asc_copy_gm2l1_nd2nz(
         __cbuf__ int32_t* dst, __gm__ int32_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
         uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0))
+/**
+ * @brief asc_copy_gm2l1_nd2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int32_t*.
+ * @param src Source type: __gm__ int32_t*.
+ * @param loop1_src_stride Overload-specific type: uint64_t.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -1930,10 +2525,19 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
 }
 
 ASC_DEPRECATED(
+    // Continue the asc_copy_gm2l1_nd2nz interface variant (section 14).
+
     9.2.0, "2027/09/07",
     asc_copy_gm2l1_nd2nz(
         __cbuf__ int8_t* dst, __gm__ int8_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
         uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0))
+/**
+ * @brief asc_copy_gm2l1_nd2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int8_t*.
+ * @param src Source type: __gm__ int8_t*.
+ * @param loop1_src_stride Overload-specific type: uint64_t.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -1945,10 +2549,19 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
 }
 
 ASC_DEPRECATED(
+    // Continue the asc_copy_gm2l1_nd2nz interface variant (section 15).
+
     9.2.0, "2027/09/07",
     asc_copy_gm2l1_nd2nz(
         __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
         uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0))
+/**
+ * @brief asc_copy_gm2l1_nd2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint16_t*.
+ * @param src Source type: __gm__ uint16_t*.
+ * @param loop1_src_stride Overload-specific type: uint64_t.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -1960,10 +2573,19 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
 }
 
 ASC_DEPRECATED(
+    // Continue the asc_copy_gm2l1_nd2nz interface variant (section 16).
+
     9.2.0, "2027/09/07",
     asc_copy_gm2l1_nd2nz(
         __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
         uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0))
+/**
+ * @brief asc_copy_gm2l1_nd2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint32_t*.
+ * @param src Source type: __gm__ uint32_t*.
+ * @param loop1_src_stride Overload-specific type: uint64_t.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -1975,10 +2597,19 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
 }
 
 ASC_DEPRECATED(
+    // Continue the asc_copy_gm2l1_nd2nz interface variant (section 17).
+
     9.2.0, "2027/09/07",
     asc_copy_gm2l1_nd2nz(
         __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
         uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0))
+/**
+ * @brief asc_copy_gm2l1_nd2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint8_t*.
+ * @param src Source type: __gm__ uint8_t*.
+ * @param loop1_src_stride Overload-specific type: uint64_t.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -1990,6 +2621,8 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
 }
 
 ASC_DEPRECATED(
+    // Continue the asc_copy_gm2l1_nd2nz interface variant (section 18).
+
     9.2.0, "2027/09/07",
     asc_copy_gm2l1(
         __cbuf__ void* dst, __gm__ void* src, uint32_t n_burst, uint32_t len_burst, asc_channel_pad_mode pad_mode,
@@ -2053,6 +2686,12 @@ __aicore__ inline void asc_copy_gm2l1(
     }
 }
 
+/**
+ * @brief asc_copy_gm2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ float*.
+ * @param src Source type: __gm__ float*.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ float* dst, __gm__ float* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
     uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
@@ -2065,6 +2704,7 @@ __aicore__ inline void asc_copy_gm2l1(
 }
 
 ASC_DEPRECATED(
+
     9.2.0, "2027/09/07",
     asc_copy_gm2l1(
         __cbuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint32_t m_start_position, uint32_t k_start_position,
@@ -2079,6 +2719,12 @@ __aicore__ inline void asc_copy_gm2l1(
     }
 }
 
+/**
+ * @brief asc_copy_gm2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ fp8_e4m3fn_t*.
+ * @param src Source type: __gm__ fp8_e4m3fn_t*.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
@@ -2090,6 +2736,7 @@ __aicore__ inline void asc_copy_gm2l1(
     }
 }
 
+// Continue the asc_copy_gm2l1 interface variant (section 1).
 ASC_DEPRECATED(
     9.2.0, "2027/09/07",
     asc_copy_gm2l1(
@@ -2105,6 +2752,13 @@ __aicore__ inline void asc_copy_gm2l1(
     }
 }
 
+/**
+ * @note asc_copy_gm2l1 interface variant section 2.
+ * @brief asc_copy_gm2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ fp8_e5m2_t*.
+ * @param src Source type: __gm__ fp8_e5m2_t*.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
@@ -2116,6 +2770,7 @@ __aicore__ inline void asc_copy_gm2l1(
     }
 }
 
+// Continue the asc_copy_gm2l1 interface variant (section 3).
 ASC_DEPRECATED(
     9.2.0, "2027/09/07",
     asc_copy_gm2l1(
@@ -2131,6 +2786,13 @@ __aicore__ inline void asc_copy_gm2l1(
     }
 }
 
+/**
+ * @note asc_copy_gm2l1 interface variant section 4.
+ * @brief asc_copy_gm2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ half*.
+ * @param src Source type: __gm__ half*.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ half* dst, __gm__ half* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
     uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
@@ -2142,6 +2804,7 @@ __aicore__ inline void asc_copy_gm2l1(
     }
 }
 
+// Continue the asc_copy_gm2l1 interface variant (section 5).
 ASC_DEPRECATED(
     9.2.0, "2027/09/07",
     asc_copy_gm2l1(
@@ -2157,6 +2820,13 @@ __aicore__ inline void asc_copy_gm2l1(
     }
 }
 
+/**
+ * @note asc_copy_gm2l1 interface variant section 6.
+ * @brief asc_copy_gm2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ hifloat8_t*.
+ * @param src Source type: __gm__ hifloat8_t*.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
@@ -2168,6 +2838,7 @@ __aicore__ inline void asc_copy_gm2l1(
     }
 }
 
+// Continue the asc_copy_gm2l1 interface variant (section 7).
 ASC_DEPRECATED(
     9.2.0, "2027/09/07",
     asc_copy_gm2l1(
@@ -2183,6 +2854,13 @@ __aicore__ inline void asc_copy_gm2l1(
     }
 }
 
+/**
+ * @note asc_copy_gm2l1 interface variant section 8.
+ * @brief asc_copy_gm2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int16_t*.
+ * @param src Source type: __gm__ int16_t*.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
@@ -2194,6 +2872,7 @@ __aicore__ inline void asc_copy_gm2l1(
     }
 }
 
+// Continue the asc_copy_gm2l1 interface variant (section 9).
 ASC_DEPRECATED(
     9.2.0, "2027/09/07",
     asc_copy_gm2l1(
@@ -2209,6 +2888,13 @@ __aicore__ inline void asc_copy_gm2l1(
     }
 }
 
+/**
+ * @note asc_copy_gm2l1 interface variant section 10.
+ * @brief asc_copy_gm2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int32_t*.
+ * @param src Source type: __gm__ int32_t*.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
@@ -2220,6 +2906,7 @@ __aicore__ inline void asc_copy_gm2l1(
     }
 }
 
+// Continue the asc_copy_gm2l1 interface variant (section 11).
 ASC_DEPRECATED(
     9.2.0, "2027/09/07",
     asc_copy_gm2l1(
@@ -2235,6 +2922,13 @@ __aicore__ inline void asc_copy_gm2l1(
     }
 }
 
+/**
+ * @note asc_copy_gm2l1 interface variant section 12.
+ * @brief asc_copy_gm2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int8_t*.
+ * @param src Source type: __gm__ int8_t*.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
     uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
@@ -2246,6 +2940,7 @@ __aicore__ inline void asc_copy_gm2l1(
     }
 }
 
+// Continue the asc_copy_gm2l1 interface variant (section 13).
 ASC_DEPRECATED(
     9.2.0, "2027/09/07",
     asc_copy_gm2l1(
@@ -2261,6 +2956,13 @@ __aicore__ inline void asc_copy_gm2l1(
     }
 }
 
+/**
+ * @note asc_copy_gm2l1 interface variant section 14.
+ * @brief asc_copy_gm2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint16_t*.
+ * @param src Source type: __gm__ uint16_t*.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
@@ -2272,6 +2974,7 @@ __aicore__ inline void asc_copy_gm2l1(
     }
 }
 
+// Continue the asc_copy_gm2l1 interface variant (section 15).
 ASC_DEPRECATED(
     9.2.0, "2027/09/07",
     asc_copy_gm2l1(
@@ -2287,6 +2990,13 @@ __aicore__ inline void asc_copy_gm2l1(
     }
 }
 
+/**
+ * @note asc_copy_gm2l1 interface variant section 16.
+ * @brief asc_copy_gm2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint32_t*.
+ * @param src Source type: __gm__ uint32_t*.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
@@ -2298,6 +3008,7 @@ __aicore__ inline void asc_copy_gm2l1(
     }
 }
 
+// Continue the asc_copy_gm2l1 interface variant (section 17).
 ASC_DEPRECATED(
     9.2.0, "2027/09/07",
     asc_copy_gm2l1(
@@ -2313,6 +3024,13 @@ __aicore__ inline void asc_copy_gm2l1(
     }
 }
 
+/**
+ * @note asc_copy_gm2l1 interface variant section 18.
+ * @brief asc_copy_gm2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint8_t*.
+ * @param src Source type: __gm__ uint8_t*.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
@@ -2324,6 +3042,7 @@ __aicore__ inline void asc_copy_gm2l1(
     }
 }
 
+// Continue the asc_copy_gm2l1 interface variant (section 19).
 ASC_DEPRECATED(
     9.2.0, "2027/09/07",
     asc_copy_gm2l1(
@@ -2365,6 +3084,12 @@ __aicore__ inline void asc_copy_gm2l1(
     }
 }
 
+/**
+ * @brief asc_copy_gm2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ fp4x2_e2m1_t*.
+ * @param src Source type: __gm__ fp4x2_e2m1_t*.
+ * @note 8-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ fp4x2_e2m1_t* dst, __gm__ fp4x2_e2m1_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
@@ -2376,6 +3101,7 @@ __aicore__ inline void asc_copy_gm2l1(
     }
 }
 
+// Continue the asc_copy_gm2l1 interface variant (section 20).
 ASC_DEPRECATED(
     9.2.0, "2027/09/07",
     asc_copy_gm2l1(
@@ -2402,6 +3128,12 @@ __aicore__ inline void asc_copy_gm2l1(
     }
 }
 
+/**
+ * @brief asc_copy_l12fb overload distinguished by the parameters below.
+ * @param dst Destination type: __fbuf__ void*.
+ * @param src Source type: __cbuf__ void*.
+ * @note 6-parameter form.
+ */
 __aicore__ inline void asc_copy_l12fb(
     __fbuf__ void* dst, __cbuf__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap_size,
     uint16_t dst_gap_size)
@@ -2411,11 +3143,17 @@ __aicore__ inline void asc_copy_l12fb(
     }
 }
 
+// Continue the asc_copy_l12fb interface variant (section 1).
 __aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size)
 {
     asc_copy_l12fb(dst, src, 1, size / ASC_C_API_ONE_DATABLOCK_SIZE, 0, 0);
 }
 
+/**
+ * @brief asc_copy_l12bt overload distinguished by the parameters below.
+ * @param src Source type: __cbuf__ void*.
+ * @note 7-parameter form.
+ */
 __aicore__ inline void asc_copy_l12bt(
     uint64_t dst, __cbuf__ void* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst, uint16_t source_gap,
     uint16_t dst_gap)
@@ -2425,6 +3163,7 @@ __aicore__ inline void asc_copy_l12bt(
     }
 }
 
+// Continue the asc_copy_l12bt interface variant (section 1).
 __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint32_t size)
 {
     asc_copy_l12bt(dst, src, 0, 1, size / ASC_C_API_ONE_DATABLOCK_SIZE, 0, 0);
@@ -2495,6 +3234,11 @@ __aicore__ inline void asc_copy_l12ub(
     }
 }
 
+/**
+ * @brief asc_fill_l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ half*.
+ * @param value Overload-specific type: half.
+ */
 __aicore__ inline void asc_fill_l1(__cbuf__ half* dst, half value, const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
@@ -2504,18 +3248,30 @@ __aicore__ inline void asc_fill_l1(__cbuf__ half* dst, half value, const asc_fil
 
 __aicore__ inline void asc_fill_l1(__cbuf__ half* dst, uint32_t value, const asc_fill_value_config& config)
 {
+    // Continue the asc_fill_l1 interface variant (section 1).
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
     }
 }
 
+/**
+ * @brief asc_fill_l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ float*.
+ * @param value Overload-specific type: half.
+ */
 __aicore__ inline void asc_fill_l1(__cbuf__ float* dst, half value, const asc_fill_value_config& config)
+
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
     }
 }
 
+/**
+ * @brief asc_fill_l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ float*.
+ * @param value Overload-specific type: uint32_t.
+ */
 __aicore__ inline void asc_fill_l1(__cbuf__ float* dst, uint32_t value, const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
@@ -2523,6 +3279,11 @@ __aicore__ inline void asc_fill_l1(__cbuf__ float* dst, uint32_t value, const as
     }
 }
 
+/**
+ * @brief asc_fill_l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int16_t*.
+ * @param value Overload-specific type: half.
+ */
 __aicore__ inline void asc_fill_l1(__cbuf__ int16_t* dst, half value, const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
@@ -2530,13 +3291,24 @@ __aicore__ inline void asc_fill_l1(__cbuf__ int16_t* dst, half value, const asc_
     }
 }
 
+/**
+ * @brief asc_fill_l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int16_t*.
+ * @param value Overload-specific type: uint32_t.
+ */
 __aicore__ inline void asc_fill_l1(__cbuf__ int16_t* dst, uint32_t value, const asc_fill_value_config& config)
+
 {
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
     }
 }
 
+/**
+ * @brief asc_fill_l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int32_t*.
+ * @param value Overload-specific type: half.
+ */
 __aicore__ inline void asc_fill_l1(__cbuf__ int32_t* dst, half value, const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
@@ -2544,6 +3316,11 @@ __aicore__ inline void asc_fill_l1(__cbuf__ int32_t* dst, half value, const asc_
     }
 }
 
+/**
+ * @brief asc_fill_l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int32_t*.
+ * @param value Overload-specific type: uint32_t.
+ */
 __aicore__ inline void asc_fill_l1(__cbuf__ int32_t* dst, uint32_t value, const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
@@ -2553,11 +3330,17 @@ __aicore__ inline void asc_fill_l1(__cbuf__ int32_t* dst, uint32_t value, const 
 
 __aicore__ inline void asc_fill_l1(__cbuf__ uint16_t* dst, half value, const asc_fill_value_config& config)
 {
+    // Continue the asc_fill_l1 interface variant (section 2).
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
     }
 }
 
+/**
+ * @brief asc_fill_l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint16_t*.
+ * @param value Overload-specific type: uint32_t.
+ */
 __aicore__ inline void asc_fill_l1(__cbuf__ uint16_t* dst, uint32_t value, const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
@@ -2565,6 +3348,11 @@ __aicore__ inline void asc_fill_l1(__cbuf__ uint16_t* dst, uint32_t value, const
     }
 }
 
+/**
+ * @brief asc_fill_l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint32_t*.
+ * @param value Overload-specific type: half.
+ */
 __aicore__ inline void asc_fill_l1(__cbuf__ uint32_t* dst, half value, const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
@@ -2574,18 +3362,30 @@ __aicore__ inline void asc_fill_l1(__cbuf__ uint32_t* dst, half value, const asc
 
 __aicore__ inline void asc_fill_l1(__cbuf__ uint32_t* dst, uint32_t value, const asc_fill_value_config& config)
 {
+    // Continue the asc_fill_l1 interface variant (section 3).
     if ASC_IS_AIC {
         create_cbuf_matrix(dst, config.config, value);
     }
 }
 
+/**
+ * @brief asc_fill_l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ bfloat16_t*.
+ * @param value Overload-specific type: bfloat16_t.
+ */
 __aicore__ inline void asc_fill_l1(__cbuf__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config)
+
 {
     if ASC_IS_AIC {
         create_cbuf_matrix_bf16(dst, config.config, value);
     }
 }
 
+/**
+ * @brief asc_fill_l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ bfloat16_t*.
+ * @param value Overload-specific type: half.
+ */
 __aicore__ inline void asc_fill_l1(__cbuf__ bfloat16_t* dst, half value, const asc_fill_value_config& config)
 {
     if ASC_IS_AIC {
@@ -2595,11 +3395,16 @@ __aicore__ inline void asc_fill_l1(__cbuf__ bfloat16_t* dst, half value, const a
 
 __aicore__ inline void asc_fill_l1(__cbuf__ bfloat16_t* dst, uint32_t value, const asc_fill_value_config& config)
 {
+    // Continue the asc_fill_l1 interface variant (section 4).
     if ASC_IS_AIC {
         create_cbuf_matrix_ui(dst, config.config, value);
     }
 }
 
+/**
+ * @brief asc_set_l12l0a_3d_padding overload distinguished by the parameters below.
+ * @param config Overload-specific type: uint64_t.
+ */
 __aicore__ inline void asc_set_l12l0a_3d_padding(uint64_t config)
 {
     if ASC_IS_AIC {
@@ -2609,15 +3414,24 @@ __aicore__ inline void asc_set_l12l0a_3d_padding(uint64_t config)
 
 __aicore__ inline void asc_set_l12l0a_3d_padding(int8_t padding_value)
 {
+    // Continue the asc_set_l12l0a_3d_padding interface variant (section 1).
     uint64_t value = static_cast<uint64_t>(static_cast<uint8_t>(padding_value));
     asc_set_l12l0a_3d_padding((value << ASC_3D_PADDING_SHIFT_BIT) | value);
 }
 
+/**
+ * @brief asc_set_l12l0a_3d_padding overload distinguished by the parameters below.
+ * @param padding_value Overload-specific type: uint8_t.
+ */
 __aicore__ inline void asc_set_l12l0a_3d_padding(uint8_t padding_value)
 {
     asc_set_l12l0a_3d_padding((static_cast<uint64_t>(padding_value) << ASC_3D_PADDING_SHIFT_BIT) | padding_value);
 }
 
+/**
+ * @brief asc_set_l12l0a_3d_padding overload distinguished by the parameters below.
+ * @param padding_value Overload-specific type: int16_t.
+ */
 __aicore__ inline void asc_set_l12l0a_3d_padding(int16_t padding_value)
 {
     asc_3d_padding_bitcode bitcode;
@@ -2627,6 +3441,7 @@ __aicore__ inline void asc_set_l12l0a_3d_padding(int16_t padding_value)
 }
 
 __aicore__ inline void asc_set_l12l0a_3d_padding(uint16_t padding_value)
+// Continue the asc_set_l12l0a_3d_padding interface variant (section 2).
 {
     asc_3d_padding_bitcode bitcode;
     bitcode.output = 0;
@@ -2634,7 +3449,12 @@ __aicore__ inline void asc_set_l12l0a_3d_padding(uint16_t padding_value)
     asc_set_l12l0a_3d_padding(bitcode.output);
 }
 
+/**
+ * @brief asc_set_l12l0a_3d_padding overload distinguished by the parameters below.
+ * @param padding_value Overload-specific type: half.
+ */
 __aicore__ inline void asc_set_l12l0a_3d_padding(half padding_value)
+
 {
     asc_3d_padding_bitcode bitcode;
     bitcode.output = 0;
@@ -2642,22 +3462,37 @@ __aicore__ inline void asc_set_l12l0a_3d_padding(half padding_value)
     asc_set_l12l0a_3d_padding(bitcode.output);
 }
 
+/**
+ * @brief asc_set_l12l0a_3d_padding overload distinguished by the parameters below.
+ * @param padding_value Overload-specific type: bfloat16_t.
+ */
 __aicore__ inline void asc_set_l12l0a_3d_padding(bfloat16_t padding_value)
 {
     asc_3d_padding_bitcode bitcode;
+
     bitcode.output = 0;
+
     bitcode.input_bfloat16 = padding_value;
     asc_set_l12l0a_3d_padding(bitcode.output);
 }
 
+/**
+ * @brief asc_set_l12l0a_3d_padding overload distinguished by the parameters below.
+ * @param padding_value Overload-specific type: int32_t.
+ */
 __aicore__ inline void asc_set_l12l0a_3d_padding(int32_t padding_value)
 {
     asc_3d_padding_bitcode bitcode;
     bitcode.output = 0;
     bitcode.input_int32 = padding_value;
+
     asc_set_l12l0a_3d_padding(bitcode.output);
 }
 
+/**
+ * @brief asc_set_l12l0a_3d_padding overload distinguished by the parameters below.
+ * @param padding_value Overload-specific type: uint32_t.
+ */
 __aicore__ inline void asc_set_l12l0a_3d_padding(uint32_t padding_value)
 {
     asc_3d_padding_bitcode bitcode;
@@ -2667,6 +3502,7 @@ __aicore__ inline void asc_set_l12l0a_3d_padding(uint32_t padding_value)
 }
 
 __aicore__ inline void asc_set_l12l0a_3d_padding(float padding_value)
+// Continue the asc_set_l12l0a_3d_padding interface variant (section 3).
 {
     asc_3d_padding_bitcode bitcode;
     bitcode.output = 0;
@@ -2748,6 +3584,12 @@ __aicore__ inline void asc_set_l12l0b_3d_padding(float padding_value)
     asc_set_l12l0b_3d_padding(bitcode.output);
 }
 
+/**
+ * @brief Configures preprocessing for the L0C-to-GM copy interface.
+ * @param relu_pre ReLU preprocessing configuration.
+ * @param quant_pre Quantization preprocessing configuration.
+ * @param enable_unit_flag Unit-flag enable control.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_set_l0c_copy_config)
 __aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag)
 {
@@ -2755,6 +3597,7 @@ __aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre, uint64_t quant_p
         asc_capi_fpc_reg_config config;
         config.config = 0;
         config.relu_units = relu_pre;
+
         config.quant_units = quant_pre;
         config.unit_flag = enable_unit_flag;
         set_fpc(config.config);
@@ -2770,12 +3613,19 @@ __aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num, uint64_t src_nd_str
     }
 }
 
+/**
+ * @brief Configures preprocessing for the L0C copy interface.
+ * @param relu_pre_addr ReLU preprocessing configuration address.
+ * @param quant_pre_addr Quantization preprocessing configuration address.
+ * @param is_clean_unit_flag Unit-flag cleanup control.
+ */
 __aicore__ inline void asc_set_l0c_copy_config(uint64_t relu_pre_addr, uint64_t quant_pre_addr, bool is_clean_unit_flag)
 {
     if ASC_IS_AIC {
         asc_capi_fpc_reg_config config;
         config.config = 0;
         config.relu_units = relu_pre_addr;
+
         config.quant_units = quant_pre_addr;
         config.unit_flag = is_clean_unit_flag;
         set_fpc(config.config);
@@ -2792,6 +3642,10 @@ __aicore__ inline void asc_set_l0c_copy_nz_para(
     }
 }
 
+/**
+ * @brief asc_set_l0c_copy_prequant overload distinguished by the parameters below.
+ * @note 1-parameter form.
+ */
 __aicore__ inline void asc_set_l0c_copy_prequant(uint64_t config)
 {
     if ASC_IS_AIC {
@@ -2863,42 +3717,62 @@ __aicore__ inline void asc_set_gm2l1_nz_para(
     }
 }
 
+/**
+ * @brief asc_set_l13d_padding overload distinguished by the parameters below.
+ * @param config Overload-specific type: uint64_t.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_set_l12l0a_3d_padding)
 __aicore__ inline void asc_set_l13d_padding(uint64_t config)
 {
     if ASC_IS_AIC {
         uint64_t paddingValue = 0;
         uint64_t padValueShiftBit = 8;
+
         paddingValue = (config << padValueShiftBit) | (config & 0xFF);
         set_padding(paddingValue);
     }
 }
 
+/**
+ * @brief asc_set_l13d_padding overload distinguished by the parameters below.
+ * @param config Overload-specific type: half.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_set_l12l0a_3d_padding)
 __aicore__ inline void asc_set_l13d_padding(half config)
 {
     if ASC_IS_AIC {
         asc_scalar_bitcode bitcode;
+
         bitcode.input_half = config;
         set_padding(bitcode.output);
     }
 }
 
+/**
+ * @brief asc_set_l13d_padding overload distinguished by the parameters below.
+ * @param config Overload-specific type: int16_t.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_set_l12l0a_3d_padding)
 __aicore__ inline void asc_set_l13d_padding(int16_t config)
 {
     if ASC_IS_AIC {
         asc_scalar_bitcode bitcode;
+
         bitcode.input_int16_t = config;
         set_padding(bitcode.output);
     }
 }
 
+/**
+ * @brief asc_set_l13d_padding overload distinguished by the parameters below.
+ * @param config Overload-specific type: uint16_t.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_set_l12l0a_3d_padding)
 __aicore__ inline void asc_set_l13d_padding(uint16_t config)
 {
     if ASC_IS_AIC {
         asc_scalar_bitcode bitcode;
+
         bitcode.input_uint16_t = config;
         set_padding(bitcode.output);
     }
@@ -3046,6 +3920,10 @@ __aicore__ inline void asc_set_gm2l1_pad(uint32_t pad_val)
     }
 }
 
+/**
+ * @brief asc_set_l13d_rpt overload distinguished by the parameters below.
+ * @note 1-parameter form.
+ */
 __aicore__ inline void asc_set_l13d_rpt(asc_load3d_v2_config& config)
 {
     if ASC_IS_AIC {
@@ -3053,6 +3931,10 @@ __aicore__ inline void asc_set_l13d_rpt(asc_load3d_v2_config& config)
     }
 }
 
+/**
+ * @brief asc_set_l13d_rpt overload distinguished by the parameters below.
+ * @note 5-parameter form.
+ */
 __aicore__ inline void asc_set_l13d_rpt(
     uint16_t repeat_stride, uint8_t repeat_times, asc_l13d_repeat_direction repeat_direction, uint16_t dst_stride_k,
     uint16_t dst_start_pos_m)
@@ -3062,7 +3944,9 @@ __aicore__ inline void asc_set_l13d_rpt(
                           (static_cast<uint64_t>(dst_stride_k) << ASC_L13D_RPT_DST_STRIDE_K_SHIFT) |
                           (static_cast<uint64_t>(repeat_direction) << ASC_L13D_RPT_DIRECTION_SHIFT) |
                           (static_cast<uint64_t>(repeat_times) << ASC_L13D_RPT_REPEAT_TIMES_SHIFT) |
+
                           static_cast<uint64_t>(repeat_stride);
+
         set_l3d_rpt(config);
     }
 }
@@ -3074,7 +3958,12 @@ __aicore__ inline void asc_set_l13d_fmatrix(asc_l13d_fmatrix_config& config)
     }
 }
 
+/**
+ * @brief asc_set_l13d_fmatrix overload distinguished by the parameters below.
+ * @note 6-parameter form.
+ */
 __aicore__ inline void asc_set_l13d_fmatrix(
+
     uint16_t fmatrix_w, uint16_t fmatrix_h, uint8_t pad_left, uint8_t pad_right, uint8_t pad_top, uint8_t pad_bottom)
 {
     if ASC_IS_AIC {
@@ -3084,10 +3973,15 @@ __aicore__ inline void asc_set_l13d_fmatrix(
                           (static_cast<uint64_t>(pad_right) << ASC_L13D_FMATRIX_PAD_RIGHT_SHIFT) |
                           (static_cast<uint64_t>(pad_top) << ASC_L13D_FMATRIX_PAD_TOP_SHIFT) |
                           (static_cast<uint64_t>(pad_bottom) << ASC_L13D_FMATRIX_PAD_BOTTOM_SHIFT);
+
         set_fmatrix(config);
     }
 }
 
+/**
+ * @brief asc_set_l13d_fmatrix_b overload distinguished by the parameters below.
+ * @note 1-parameter form.
+ */
 __aicore__ inline void asc_set_l13d_fmatrix_b(asc_l13d_fmatrix_config& config)
 {
     if ASC_IS_AIC {
@@ -3095,12 +3989,17 @@ __aicore__ inline void asc_set_l13d_fmatrix_b(asc_l13d_fmatrix_config& config)
     }
 }
 
+/**
+ * @brief asc_set_l13d_fmatrix_b overload distinguished by the parameters below.
+ * @note 6-parameter form.
+ */
 __aicore__ inline void asc_set_l13d_fmatrix_b(
     uint16_t fmatrix_w, uint16_t fmatrix_h, uint8_t pad_left, uint8_t pad_right, uint8_t pad_top, uint8_t pad_bottom)
 {
     if ASC_IS_AIC {
         uint64_t config = static_cast<uint64_t>(fmatrix_w) |
                           (static_cast<uint64_t>(fmatrix_h) << ASC_L13D_FMATRIX_B_H_SHIFT) |
+
                           (static_cast<uint64_t>(pad_left) << ASC_L13D_FMATRIX_B_PAD_LEFT_SHIFT) |
                           (static_cast<uint64_t>(pad_right) << ASC_L13D_FMATRIX_B_PAD_RIGHT_SHIFT) |
                           (static_cast<uint64_t>(pad_top) << ASC_L13D_FMATRIX_B_PAD_TOP_SHIFT) |
@@ -3109,6 +4008,10 @@ __aicore__ inline void asc_set_l13d_fmatrix_b(
     }
 }
 
+/**
+ * @brief asc_set_l0c2gm_lrelu_alpha overload distinguished by the parameters below.
+ * @param config Overload-specific type: half&.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_set_l0c_copy_lrelu_alpha)
 __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config)
 {
@@ -3117,6 +4020,10 @@ __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config)
     }
 }
 
+/**
+ * @brief asc_set_l0c2gm_lrelu_alpha overload distinguished by the parameters below.
+ * @param config Overload-specific type: float&.
+ */
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_set_l0c_copy_lrelu_alpha)
 __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(float& config)
 {
@@ -3125,6 +4032,10 @@ __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(float& config)
     }
 }
 
+/**
+ * @brief Sets the leaky-ReLU alpha for the L0C copy interface.
+ * @param scalar_relu_pre_alpha Leaky-ReLU alpha value.
+ */
 __aicore__ inline void asc_set_l0c_copy_lrelu_alpha(float scalar_relu_pre_alpha)
 {
     if ASC_IS_AIC {
@@ -3134,7 +4045,9 @@ __aicore__ inline void asc_set_l0c_copy_lrelu_alpha(float scalar_relu_pre_alpha)
 
 #endif
 
+// Continue the asc_set_l0c_copy_lrelu_alpha interface variant (section 1).
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif

@@ -29,8 +29,14 @@ __simd_callee__ inline void asc_load(vector_int8_t& dst, __ubuf__ int8_t* src)
     }
 }
 
+/**
+ * @brief asc_load overload distinguished by the parameters below.
+ * @param dst Destination type: vector_uint8_t&.
+ * @param src Source type: __ubuf__ uint8_t*.
+ * @note 2-parameter form.
+ */
 __simd_callee__ inline void asc_load(vector_uint8_t& dst, __ubuf__ uint8_t* src)
-{ /* asc_load overload */
+{
     if ASC_IS_AIV {
         vector_load_unalign ureg;
         vldas(ureg, src);

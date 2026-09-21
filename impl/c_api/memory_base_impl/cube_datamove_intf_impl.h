@@ -805,6 +805,12 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     }
 }
 
+/**
+ * @brief asc_copy_gm2l1_nd2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint8_t*.
+ * @param src Source type: __gm__ uint8_t*.
+ * @note 10-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
     uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride,
@@ -816,6 +822,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
             dst_nz_matrix_stride);
     }
 }
+// Continue the asc_copy_gm2l1_nd2nz interface variant (section 19).
 
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
@@ -829,6 +836,12 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     }
 }
 
+/**
+ * @brief asc_copy_gm2l1_nd2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ half*.
+ * @param src Source type: __gm__ half*.
+ * @note 10-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ half* dst, __gm__ half* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
     uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride,
@@ -840,7 +853,14 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
             dst_nz_matrix_stride);
     }
 }
+// Continue the asc_copy_gm2l1_nd2nz interface variant (section 20).
 
+/**
+ * @brief asc_copy_gm2l1_nd2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int16_t*.
+ * @param src Source type: __gm__ int16_t*.
+ * @note 10-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
     uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride,
@@ -852,6 +872,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
             dst_nz_matrix_stride);
     }
 }
+// Continue the asc_copy_gm2l1_nd2nz interface variant (section 21).
 
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ float* dst, __gm__ float* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
@@ -865,6 +886,12 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     }
 }
 
+/**
+ * @brief asc_copy_gm2l1_nd2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int32_t*.
+ * @param src Source type: __gm__ int32_t*.
+ * @note 10-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
     uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride,
@@ -876,7 +903,14 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
             dst_nz_matrix_stride);
     }
 }
+// Continue the asc_copy_gm2l1_nd2nz interface variant (section 22).
 
+/**
+ * @brief asc_copy_gm2l1_nd2nz overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint32_t*.
+ * @param src Source type: __gm__ uint32_t*.
+ * @note 10-parameter form.
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
     uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride,
@@ -888,6 +922,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
             dst_nz_matrix_stride);
     }
 }
+// Continue the asc_copy_gm2l1_nd2nz interface variant (section 23).
 
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
@@ -912,6 +947,12 @@ __aicore__ inline void asc_copy_l0c2l1(
     }
 }
 
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int8_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 11-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool enable_channel_split, bool enable_nz2nd)
@@ -923,6 +964,13 @@ __aicore__ inline void asc_copy_l0c2l1(
     }
 }
 
+/**
+ * @note asc_copy_l0c2l1 interface variant section 1.
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ half*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 11-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool enable_channel_split, bool enable_nz2nd)
@@ -934,6 +982,13 @@ __aicore__ inline void asc_copy_l0c2l1(
     }
 }
 
+// Continue the asc_copy_l0c2l1 interface variant (section 2).
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int16_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 11-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int16_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool enable_channel_split,
@@ -945,7 +1000,14 @@ __aicore__ inline void asc_copy_l0c2l1(
             relu_pre, enable_channel_split, enable_nz2nd);
     }
 }
+// Continue the asc_copy_l0c2l1 interface variant (section 3).
 
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ int8_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 11-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool enable_channel_split,
@@ -957,7 +1019,14 @@ __aicore__ inline void asc_copy_l0c2l1(
             relu_pre, enable_channel_split, enable_nz2nd);
     }
 }
+// Continue the asc_copy_l0c2l1 interface variant (section 4).
 
+/**
+ * @brief asc_copy_l0c2l1 overload distinguished by the parameters below.
+ * @param dst Destination type: __cbuf__ uint8_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 11-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool enable_channel_split,
@@ -969,6 +1038,7 @@ __aicore__ inline void asc_copy_l0c2l1(
             relu_pre, enable_channel_split, enable_nz2nd);
     }
 }
+// Continue the asc_copy_l0c2l1 interface variant (section 5).
 
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ void* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
@@ -1088,6 +1158,12 @@ __aicore__ inline void asc_copy_l12l0a(
     }
 }
 
+/**
+ * @brief asc_copy_l12l0a overload distinguished by the parameters below.
+ * @param dst Destination type: __ca__ uint8_t*.
+ * @param src Source type: __cbuf__ uint8_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1099,8 +1175,15 @@ __aicore__ inline void asc_copy_l12l0a(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    // Continue the asc_copy_l12l0a interface variant (section 18).
 }
 
+/**
+ * @brief asc_copy_l12l0a overload distinguished by the parameters below.
+ * @param dst Destination type: __ca__ half*.
+ * @param src Source type: __cbuf__ half*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ half* dst, __cbuf__ half* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1112,8 +1195,15 @@ __aicore__ inline void asc_copy_l12l0a(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    // Continue the asc_copy_l12l0a interface variant (section 19).
 }
 
+/**
+ * @brief asc_copy_l12l0a overload distinguished by the parameters below.
+ * @param dst Destination type: __ca__ bfloat16_t*.
+ * @param src Source type: __cbuf__ bfloat16_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1125,8 +1215,15 @@ __aicore__ inline void asc_copy_l12l0a(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    // Continue the asc_copy_l12l0a interface variant (section 20).
 }
 
+/**
+ * @brief asc_copy_l12l0a overload distinguished by the parameters below.
+ * @param dst Destination type: __ca__ int32_t*.
+ * @param src Source type: __cbuf__ int32_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ int32_t* dst, __cbuf__ int32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1138,8 +1235,15 @@ __aicore__ inline void asc_copy_l12l0a(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    // Continue the asc_copy_l12l0a interface variant (section 21).
 }
 
+/**
+ * @brief asc_copy_l12l0a overload distinguished by the parameters below.
+ * @param dst Destination type: __ca__ uint32_t*.
+ * @param src Source type: __cbuf__ uint32_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1151,8 +1255,15 @@ __aicore__ inline void asc_copy_l12l0a(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    // Continue the asc_copy_l12l0a interface variant (section 22).
 }
 
+/**
+ * @brief asc_copy_l12l0a overload distinguished by the parameters below.
+ * @param dst Destination type: __ca__ float*.
+ * @param src Source type: __cbuf__ float*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ float* dst, __cbuf__ float* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1164,6 +1275,7 @@ __aicore__ inline void asc_copy_l12l0a(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    // Continue the asc_copy_l12l0a interface variant (section 23).
 }
 
 __aicore__ inline void asc_copy_l12l0b(
@@ -1249,6 +1361,12 @@ __aicore__ inline void asc_copy_l12l0b(
     }
 }
 
+/**
+ * @brief asc_copy_l12l0b overload distinguished by the parameters below.
+ * @param dst Destination type: __cb__ bfloat16_t*.
+ * @param src Source type: __cbuf__ bfloat16_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1260,8 +1378,15 @@ __aicore__ inline void asc_copy_l12l0b(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    // Continue the asc_copy_l12l0b interface variant (section 16).
 }
 
+/**
+ * @brief asc_copy_l12l0b overload distinguished by the parameters below.
+ * @param dst Destination type: __cb__ int32_t*.
+ * @param src Source type: __cbuf__ int32_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1273,8 +1398,15 @@ __aicore__ inline void asc_copy_l12l0b(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    // Continue the asc_copy_l12l0b interface variant (section 17).
 }
 
+/**
+ * @brief asc_copy_l12l0b overload distinguished by the parameters below.
+ * @param dst Destination type: __cb__ uint32_t*.
+ * @param src Source type: __cbuf__ uint32_t*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1286,8 +1418,15 @@ __aicore__ inline void asc_copy_l12l0b(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    // Continue the asc_copy_l12l0b interface variant (section 18).
 }
 
+/**
+ * @brief asc_copy_l12l0b overload distinguished by the parameters below.
+ * @param dst Destination type: __cb__ float*.
+ * @param src Source type: __cbuf__ float*.
+ * @note 17-parameter form.
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ float* dst, __cbuf__ float* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1299,6 +1438,7 @@ __aicore__ inline void asc_copy_l12l0b(
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h,
             dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);
     }
+    // Continue the asc_copy_l12l0b interface variant (section 19).
 }
 
 __aicore__ inline void asc_copy_l0c2gm(
@@ -1313,6 +1453,12 @@ __aicore__ inline void asc_copy_l0c2gm(
     }
 }
 
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ bfloat16_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 11-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
@@ -1324,7 +1470,14 @@ __aicore__ inline void asc_copy_l0c2gm(
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
     }
 }
+// Continue the asc_copy_l0c2gm interface variant (section 1).
 
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ int8_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 11-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
@@ -1336,7 +1489,14 @@ __aicore__ inline void asc_copy_l0c2gm(
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
     }
 }
+// Continue the asc_copy_l0c2gm interface variant (section 2).
 
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ uint8_t*.
+ * @param src Source type: __cc__ float*.
+ * @note 11-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
@@ -1348,7 +1508,14 @@ __aicore__ inline void asc_copy_l0c2gm(
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
     }
 }
+// Continue the asc_copy_l0c2gm interface variant (section 3).
 
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ float*.
+ * @param src Source type: __cc__ float*.
+ * @note 11-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
@@ -1360,7 +1527,14 @@ __aicore__ inline void asc_copy_l0c2gm(
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
     }
 }
+// Continue the asc_copy_l0c2gm interface variant (section 4).
 
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ half*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 11-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
@@ -1372,7 +1546,14 @@ __aicore__ inline void asc_copy_l0c2gm(
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
     }
 }
+// Continue the asc_copy_l0c2gm interface variant (section 5).
 
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ int16_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 11-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int16_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
@@ -1384,7 +1565,14 @@ __aicore__ inline void asc_copy_l0c2gm(
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
     }
 }
+// Continue the asc_copy_l0c2gm interface variant (section 6).
 
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ int8_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 11-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
@@ -1396,7 +1584,14 @@ __aicore__ inline void asc_copy_l0c2gm(
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
     }
 }
+// Continue the asc_copy_l0c2gm interface variant (section 7).
 
+/**
+ * @brief asc_copy_l0c2gm overload distinguished by the parameters below.
+ * @param dst Destination type: __gm__ int32_t*.
+ * @param src Source type: __cc__ int32_t*.
+ * @note 11-parameter form.
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
@@ -1408,6 +1603,7 @@ __aicore__ inline void asc_copy_l0c2gm(
             static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, nz2nd_en);
     }
 }
+// Continue the asc_copy_l0c2gm interface variant (section 8).
 
 __aicore__ inline void asc_copy_l12gm(
     __gm__ void* dst, __cbuf__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
