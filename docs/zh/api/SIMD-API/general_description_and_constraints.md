@@ -39,13 +39,13 @@ Ascend C API的操作数通常为[GlobalTensor](basic_api/data_structures/Global
 | A2 | L0A Buffer |
 | B1 | L1 Buffer |
 | B2 | L0B Buffer |
-| C1 | <!-- npu="950" id1 -->Ascend 950PR/Ascend 950DT，L1 Buffer。<br><!-- end id1 --><!-- npu="910" id2 -->Atlas 训练系列产品，Unified Buffer（UB）。<br><!-- end id2 --><!-- npu="310p" id3 -->Atlas 推理系列产品AI Core，UB。<br><!-- end id3 --><!-- npu="910b" id4 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品，L1 Buffer。<br><!-- end id4 --><!-- npu="A3" id5 -->Atlas A3 训练系列产品/Atlas A3 推理系列产品，L1 Buffer。<br><!-- end id5 --><!-- npu="310b" id6 -->Atlas 200I/500 A2 推理产品，UB。<!-- end id6 --> |
-| C2 | <!-- npu="950" id7 -->Ascend 950PR/Ascend 950DT，BiasTable Buffer。<br><!-- end id7 --><!-- npu="910" id8 -->Atlas 训练系列产品，L0C Buffer。<br><!-- end id8 --><!-- npu="310p" id9 -->Atlas 推理系列产品AI Core，L0C Buffer。<br><!-- end id9 --><!-- npu="910b" id10 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品，BiasTable Buffer。<br><!-- end id10 --><!-- npu="A3" id11 -->Atlas A3 训练系列产品/Atlas A3 推理系列产品，BiasTable Buffer。<br><!-- end id11 --><!-- npu="310b" id12 -->Atlas 200I/500 A2 推理产品，BiasTable Buffer。<!-- end id12 --> |
+| C1 | <!-- npu="950" id1 -->Ascend 950PR&950DT系列产品，L1 Buffer。<br><!-- end id1 --><!-- npu="910" id2 -->Atlas训练系列产品，Unified Buffer（UB）。<br><!-- end id2 --><!-- npu="310p" id3 -->Atlas推理系列产品AI Core，UB。<br><!-- end id3 --><!-- npu="910b" id4 -->Atlas A2系列产品，L1 Buffer。<br><!-- end id4 --><!-- npu="A3" id5 -->Atlas A3系列产品，L1 Buffer。<br><!-- end id5 --><!-- npu="310b" id6 -->Atlas 200I/500 A2推理产品，UB。<!-- end id6 --> |
+| C2 | <!-- npu="950" id7 -->Ascend 950PR&950DT系列产品，BiasTable Buffer。<br><!-- end id7 --><!-- npu="910" id8 -->Atlas训练系列产品，L0C Buffer。<br><!-- end id8 --><!-- npu="310p" id9 -->Atlas推理系列产品AI Core，L0C Buffer。<br><!-- end id9 --><!-- npu="910b" id10 -->Atlas A2系列产品，BiasTable Buffer。<br><!-- end id10 --><!-- npu="A3" id11 -->Atlas A3系列产品，BiasTable Buffer。<br><!-- end id11 --><!-- npu="310b" id12 -->Atlas 200I/500 A2推理产品，BiasTable Buffer。<!-- end id12 --> |
 | CO1 | L0C Buffer |
-| CO2 | <!-- npu="950" id13 -->Ascend 950PR/Ascend 950DT，Global Memory。<br><!-- end id13 --><!-- npu="910" id14 -->Atlas 训练系列产品，UB。<br><!-- end id14 --><!-- npu="310p" id15 -->Atlas 推理系列产品AI Core，UB。<br><!-- end id15 --><!-- npu="910b" id16 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品，Global Memory。<br><!-- end id16 --><!-- npu="A3" id17 -->Atlas A3 训练系列产品/Atlas A3 推理系列产品，Global Memory。<br><!-- end id17 --><!-- npu="310b" id18 -->Atlas 200I/500 A2 推理产品，Global Memory。<!-- end id18 --> |
+| CO2 | <!-- npu="950" id13 -->Ascend 950PR&950DT系列产品，Global Memory。<br><!-- end id13 --><!-- npu="910" id14 -->Atlas训练系列产品，UB。<br><!-- end id14 --><!-- npu="310p" id15 -->Atlas推理系列产品AI Core，UB。<br><!-- end id15 --><!-- npu="910b" id16 -->Atlas A2系列产品，Global Memory。<br><!-- end id16 --><!-- npu="A3" id17 -->Atlas A3系列产品，Global Memory。<br><!-- end id17 --><!-- npu="310b" id18 -->Atlas 200I/500 A2推理产品，Global Memory。<!-- end id18 --> |
 | TSCM | L1 Buffer |
-| SPM | <!-- npu="950" id19 -->Ascend 950PR/Ascend 950DT，Global Memory。<br><!-- end id19 --><!-- npu="910" id20 -->Atlas 训练系列产品，L1 Buffer。<br><!-- end id20 --><!-- npu="310p" id21 -->Atlas 推理系列产品AI Core，L1 Buffer。<br><!-- end id21 --><!-- npu="910b" id22 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品，Global Memory。<br><!-- end id22 --><!-- npu="A3" id23 -->Atlas A3 训练系列产品/Atlas A3 推理系列产品，Global Memory。<!-- end id23 --> |
-| C2PIPE2GM | <!-- npu="950" id24 -->Ascend 950PR/Ascend 950DT，Fixpipe Buffer。<br><!-- end id24 --><!-- npu="910b" id25 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品，Fixpipe Buffer。<br><!-- end id25 --><!-- npu="A3" id26 -->Atlas A3 训练系列产品/Atlas A3 推理系列产品，Fixpipe Buffer。<!-- end id26 --> |
+| SPM | <!-- npu="950" id19 -->Ascend 950PR&950DT系列产品，Global Memory。<br><!-- end id19 --><!-- npu="910" id20 -->Atlas训练系列产品，L1 Buffer。<br><!-- end id20 --><!-- npu="310p" id21 -->Atlas推理系列产品AI Core，L1 Buffer。<br><!-- end id21 --><!-- npu="910b" id22 -->Atlas A2系列产品，Global Memory。<br><!-- end id22 --><!-- npu="A3" id23 -->Atlas A3系列产品，Global Memory。<!-- end id23 --> |
+| C2PIPE2GM | <!-- npu="950" id24 -->Ascend 950PR&950DT系列产品，Fixpipe Buffer。<br><!-- end id24 --><!-- npu="910b" id25 -->Atlas A2系列产品，Fixpipe Buffer。<br><!-- end id25 --><!-- npu="A3" id26 -->Atlas A3系列产品，Fixpipe Buffer。<!-- end id26 --> |
 
 ## 通用地址对齐约束<a name="section796754519912"></a>
 
@@ -71,6 +71,7 @@ AI Core上的存储单元用于存储矢量计算、矩阵计算的源操作数�
 
 -   单次迭代内：源操作数与目的操作数必须100%完全重叠，不支持部分重叠。
 -   多次迭代间：不支持前序迭代的目的操作数与后序迭代的源操作数重叠。例如，第N次迭代的目的操作数是第N+1次的源操作数（如下图所示）。在这种情况下，第N次迭代可能会改写覆盖源操作数的数值，导致无法得到预期结果。特别地，对于部分双目计算类的API（Add、Sub、Mul、Max、Min、AddRelu、SubRelu），当数据类型为half、int32\_t、float时，支持前序迭代的目的操作数与后序迭代的源操作数重叠：仅针对目的操作数和第二个源操作数重叠的情况，且src1RepStride或者dstRepStride必须为0。
+-   多次迭代间：不支持前序迭代的目的操作数与后序迭代的目的操作数重叠。例如，第一轮循环写入的DataBlock编号为0、2、4、6、8、10、12、14，第二轮循环写入的编号为8、10、12、14、16、18、20、22，即上一轮迭代会踩踏前一轮迭代的后4个DataBlock，导致无法得到预期的结果。
 
 **图1**  地址重叠示例（不支持）<a name="fig12654416181216"></a>  
 ![](../figures/address_overlap_unsupported.png "地址重叠示例（不支持）")

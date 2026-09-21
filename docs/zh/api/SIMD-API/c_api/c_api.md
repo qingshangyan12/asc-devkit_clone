@@ -22,7 +22,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_dual_dst_mode](defs/enum/asc_dual_dst_mode.md)|表示L0C Buffer数据搬出时的双目标拆分模式。|`c_api/defs/enum.h`|
 |[asc_hf32_round_mode](defs/enum/asc_hf32_round_mode.md)|表示Mmad计算开启HF32模式时由FP32舍入到HF32的舍入模式管理策略。|`c_api/defs/enum.h`|
 |[asc_l13d_repeat_direction](defs/enum/asc_l13d_repeat_direction.md)|表示3D img2col搬运的repeat迭代方向。|`c_api/defs/enum.h`|
-|[asc_load_l2_cache_mode](defs/enum/asc_load_l2_cache_mode.md)|表示数据从GM搬运到UB时的L2 cache策略，也可用于标量load策略配置。|`c_api/defs/enum.h`|
+|[asc_load_l2_cache_mode](defs/enum/asc_load_l2_cache_mode.md)|表示数据从GM搬运到UB时的L2 Cache策略，也可用于标量load策略配置。|`c_api/defs/enum.h`|
 |[asc_mutex_execute_mode](defs/enum/asc_mutex_execute_mode.md)|表示互斥锁的阻塞或非阻塞执行模式。|`c_api/defs/enum.h`|
 |[asc_override_strategy](defs/enum/asc_override_strategy.md)|表示饱和控制策略。|`c_api/defs/enum.h`|
 |[asc_position_mode](defs/enum/asc_position_mode.md)|表示源或目的操作数在寄存器中的奇偶位置。|`c_api/defs/enum.h`|
@@ -30,7 +30,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_quant_mode](defs/enum/asc_quant_mode.md)|表示L0C Buffer数据搬出时的类型转换或量化模式。|`c_api/defs/enum.h`|
 |[asc_relu_pre_mode](defs/enum/asc_relu_pre_mode.md)|表示L0C Buffer数据搬出时的随路ReLU模式。|`c_api/defs/enum.h`|
 |[asc_saturation_mode](defs/enum/asc_saturation_mode.md)|表示饱和控制模式。|`c_api/defs/enum.h`|
-|[asc_store_l2_cache_mode](defs/enum/asc_store_l2_cache_mode.md)|表示数据从UB搬运到GM时的L2 cache策略，也可用于标量store策略配置。|`c_api/defs/enum.h`|
+|[asc_store_l2_cache_mode](defs/enum/asc_store_l2_cache_mode.md)|表示数据从UB搬运到GM时的L2 Cache策略，也可用于标量store策略配置。|`c_api/defs/enum.h`|
 |[asc_unit_flag_mode](defs/enum/asc_unit_flag_mode.md)|表示矩阵计算或矩阵搬出接口执行后的UnitFlag行为。|`c_api/defs/enum.h`|
 
 ### 数据类型
@@ -85,7 +85,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_get_system_cycle](utils/sys_var/asc_get_system_cycle.md)|获取当前系统cycle数。|`c_api/utils/sys_var.h`|
 |[asc_get_system_clock](utils/sys_var/asc_get_system_clock.md)|获取当前系统时钟时间值（微秒）。|`c_api/utils/sys_var.h`|
 |[asc_get_vf_len](utils/sys_var/asc_get_vf_len.md)|获取Tensor位宽VL（Vector Length）的大小。|`c_api/utils/sys_var.h`|
-|[asc_set_ffts_base_addr](utils/sys_var/asc_set_ffts_base_addr.md)|在[asc_sync_block_arrive](sync/asc_sync_block_arrive.md)和[asc_sync_block_wait](sync/asc_sync_block_wait.md)之前使用，设置核间同步寄存器的基地址。|`c_api/utils/sys_var.h`|
+|[asc_set_ffts_base_addr](utils/sys_var/asc_set_ffts_base_addr.md)|在[asc_sync_block_arrive](sync/inter_core_sync/asc_sync_block_arrive.md)和[asc_sync_block_wait](sync/inter_core_sync/asc_sync_block_wait.md)之前使用，设置核间同步寄存器的基地址。|`c_api/utils/sys_var.h`|
 
 ## 矩阵计算
 
@@ -93,16 +93,13 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 
 |API名称|说明|最细粒度公共头文件|
 |---|---|---|
-|[asc_enable_fp8](cube_compute/asc_enable_fp8.md)|用于设置Mmad计算开启FP8模式，开启该模式后L0A Buffer/L0B Buffer中的FP8数据在参与Mmad计算之前不会被转化为hifloat8_t类型数据。|`c_api/cube_compute/cube_compute.h`|
 |[asc_enable_hf32](cube_compute/asc_enable_hf32.md)|用于设置Mmad计算开启HF32模式，开启该模式后L0A Buffer/L0B Buffer中的FP32数据将在参与Mmad计算之前被舍入为HF32。|`c_api/cube_compute/cube_compute.h`|
-|[asc_enable_hf32_trans](cube_compute/asc_enable_hf32_trans.md)|设置HF32模式取整方式，需要先使用asc_enable_hf32开启HF32取整模式。|`c_api/cube_compute/cube_compute.h`|
 |[asc_enable_hif8](cube_compute/asc_enable_hif8.md)|开启HiF8模式。左矩阵A和右矩阵B均为fp8_e4m3fn_t类型时，数据参与矩阵乘法运算前转换为hifloat8_t类型。|`c_api/cube_compute/cube_compute.h`|
 |[asc_disable_hif8](cube_compute/asc_disable_hif8.md)|用于设置Mmad计算关闭HiF8模式。左矩阵A和右矩阵B均为fp8_e4m3fn_t类型时，数据不转换为hifloat8_t类型，直接以fp8_e4m3fn_t类型参与矩阵乘法运算。|`c_api/cube_compute/cube_compute.h`|
 |[asc_disable_hf32](cube_compute/asc_disable_hf32.md)|用于设置Mmad计算关闭HF32模式，设置该模式后L0A Buffer/L0B Buffer中的FP32数据在参与Mmad计算之前不做舍入处理。|`c_api/cube_compute/cube_compute.h`|
 |[asc_mmad](cube_compute/asc_mmad.md)|完成矩阵乘加操作。|`c_api/cube_compute/cube_compute.h`|
 |[asc_mmad_mx](cube_compute/asc_mmad_mx.md)|完成包含放缩功能的矩阵乘加操作。|`c_api/cube_compute/cube_compute.h`|
 |[asc_mmad_sparse](cube_compute/asc_mmad_sparse.md)|完成矩阵乘加操作，传入的左矩阵A为稀疏矩阵，右矩阵B为稠密矩阵。|`c_api/cube_compute/cube_compute.h`|
-|[asc_set_fp32_mode](cube_compute/asc_set_fp32_mode.md)|用于设置Mmad计算开启FP32模式，开启该模式后L0A Buffer/L0B Buffer中的FP32数据在参与Mmad计算之前不做舍入处理。|`c_api/cube_compute/cube_compute.h`|
 |[asc_set_hf32_round_mode](cube_compute/asc_set_hf32_round_mode.md)|设置HF32模式舍入方式，该配置仅在HF32模式开启期间生效。|`c_api/cube_compute/cube_compute.h`|
 |[asc_set_mmad_direction_m](cube_compute/asc_set_mmad_direction_m.md)|设置mmad计算时优先通过M/N中的M方向生成结果，然后通过N方向产生结果，M为矩阵的行，N为矩阵的列。|`c_api/cube_compute/cube_compute.h`|
 |[asc_set_mmad_direction_n](cube_compute/asc_set_mmad_direction_n.md)|设置mmad计算时优先通过M/N中的N方向生成结果，然后通过M方向产生结果，M为矩阵的行，N为矩阵的列。|`c_api/cube_compute/cube_compute.h`|
@@ -138,23 +135,15 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_set_gm2l1_pad](cube_datamove/asc_set_gm2l1_pad.md)|设置[asc_copy_gm2l1_align](cube_datamove/asc_copy_gm2l1_align.md)接口的常量填充值。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c_copy_nz_para](cube_datamove/asc_set_l0c_copy_nz_para.md)|数据搬运过程中进行随路格式转换（NZ格式转换为ND格式）时，设置格式转换的相关配置。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c_copy_channel_para](cube_datamove/asc_set_l0c_copy_channel_para.md)|配置Nz2DN格式转换时源Nz矩阵中相邻行的地址偏移。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l0c2gm_channel_para](cube_datamove/asc_set_l0c2gm_channel_para.md)|对通道步长参数的专用寄存器的比特位进行设置。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l0c2gm_config](cube_datamove/asc_set_l0c2gm_config.md)|数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的矢量量化参数。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l0c2gm_lrelu_alpha](cube_datamove/asc_set_l0c2gm_lrelu_alpha.md)|用于设置asc_copy_l0c2l1或asc_copy_l0c2gm接口计算过程中使用的Leaky ReLU alpha值。该值只支持half和float两种数据类型。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l0c2gm_nz2nd](cube_datamove/asc_set_l0c2gm_nz2nd.md)|数据搬运过程中进行随路格式转换（NZ格式转换为ND格式）时，设置格式转换的相关配置。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l0c2gm_quant_post](cube_datamove/asc_set_l0c2gm_quant_post.md)|设置QUANT_POST寄存器的值。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l0c2gm_relu_alpha](cube_datamove/asc_set_l0c2gm_relu_alpha.md)|设置RELU_ALPHA寄存器的值。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c_copy_config](cube_datamove/asc_set_l0c_copy_config.md)|设置L0C Buffer搬出场景下随路tensor量化、随路tensor激活和UnitFlag功能的相关配置。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c_copy_lrelu_alpha](cube_datamove/asc_set_l0c_copy_lrelu_alpha.md)|在L0C Buffer搬出过程中进行随路Scalar激活时，配置激活计算所需的缩放系数。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c_copy_relu_alpha](cube_datamove/asc_set_l0c_copy_relu_alpha.md)|在L0C Buffer搬出过程中进行随路Scalar激活时，配置激活计算所需的缩放系数。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c_copy_params](cube_datamove/asc_set_l0c_copy_params.md)|DataCopy从L0C Buffer搬运到Global Memory或L1 Buffer过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c_copy_prequant](cube_datamove/asc_set_l0c_copy_prequant.md)|数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的标量量化参数。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l12l0_padding_val](cube_datamove/asc_set_l12l0_padding_val.md)|设置PADDING_B寄存器的值。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l13d_fmatrix](cube_datamove/asc_set_l13d_fmatrix.md)|配置3D img2col搬运模式下左矩阵的Feature Map属性描述参数。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l13d_fmatrix_b](cube_datamove/asc_set_l13d_fmatrix_b.md)|配置3D img2col搬运模式下右矩阵的Feature Map属性描述参数。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l12l0a_3d_padding](cube_datamove/asc_set_l12l0a_3d_padding.md)|设置3D左矩阵搬运填充值。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l12l0b_3d_padding](cube_datamove/asc_set_l12l0b_3d_padding.md)|设置3D右矩阵搬运填充值。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l13d_padding](cube_datamove/asc_set_l13d_padding.md)|设置Pad属性描述，用于在调用asc_copy_l12l0a接口时配置填充数值。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l13d_rpt](cube_datamove/asc_set_l13d_rpt.md)|配置3D img2col搬运模式下使用repeat模式搬运左矩阵所需的参数。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l13d_rpt_b](cube_datamove/asc_set_l13d_rpt_b.md)|配置3D img2col搬运模式下使用repeat模式搬运右矩阵所需的参数。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l13d_size](cube_datamove/asc_set_l13d_size.md)|设置[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md)的3D格式搬运接口在L1 Buffer的边界值。|`c_api/cube_datamove/cube_datamove.h`|
@@ -696,7 +685,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_atomic_sub](atomic/scalar_atomic/asc_atomic_sub.md)|对Global Memory中的数据与指定数据执行原子减操作。|`c_api/atomic/scalar_atomic.h`|
 |[asc_atomic_xor](atomic/scalar_atomic/asc_atomic_xor.md)|对Global Memory中的数据与指定数据执行原子异或操作。|`c_api/atomic/scalar_atomic.h`|
 |[asc_get_store_atomic_config](atomic/scalar_atomic/asc_get_store_atomic_config.md)|获取原子操作启用位与原子操作类型的值。|`c_api/atomic/scalar_atomic.h`|
-|[asc_set_store_atomic_config_v1](atomic/scalar_atomic/asc_set_store_atomic_config_v1.md)|设置原子操作启用位与原子操作类型的值，适用于Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品。|`c_api/atomic/scalar_atomic.h`|
+|[asc_set_store_atomic_config_v1](atomic/scalar_atomic/asc_set_store_atomic_config_v1.md)|设置原子操作启用位与原子操作类型的值，适用于Atlas A3系列产品和Atlas A2系列产品。|`c_api/atomic/scalar_atomic.h`|
 
 ## 缓存控制
 
@@ -713,26 +702,33 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 
 ## 同步控制
 
+### 核内同步
+
 |API名称|说明|最细粒度公共头文件|
 |---|---|---|
-|[asc_lock](sync/asc_lock.md)|用于AI Core内部异步流水线同步的接口。|`c_api/sync/sync.h`|
-|[asc_sync](sync/asc_sync.md)|等待所有流水线操作完成。|`c_api/sync/sync.h`|
-|[asc_sync_block_arrive](sync/asc_sync_block_arrive.md)|该指令用于发送同步信息数据到核间同步寄存器，设置同步点。|`c_api/sync/sync.h`|
-|[asc_sync_block_wait](sync/asc_sync_block_wait.md)|和[asc_sync_block_arrive](sync/asc_sync_block_arrive.md)配合使用（通过flag_id关联），用于等待所有同步对象到达flag_id对应的同步点。|`c_api/sync/sync.h`|
-|[asc_sync_data_barrier](sync/asc_sync_data_barrier.md)|用于阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可以通过参数控制）执行结束。|`c_api/sync/sync.h`|
-|[asc_sync_inter_arrive](sync/asc_sync_inter_arrive.md)|和[asc_sync_inter_wait](sync/asc_sync_inter_wait.md)配合使用（通过flag_id关联），用于组间block的信号同步。|`c_api/sync/sync.h`|
-|[asc_sync_inter_wait](sync/asc_sync_inter_wait.md)|等待block内同步标志。|`c_api/sync/sync.h`|
-|[asc_sync_intra_arrive](sync/asc_sync_intra_arrive.md)|向核间同步寄存器发送同步信号。|`c_api/sync/sync.h`|
-|[asc_sync_intra_wait](sync/asc_sync_intra_wait.md)|等待核间同步寄存器同步标志。|`c_api/sync/sync.h`|
-|[asc_sync_mte2](sync/asc_sync_mte2.md)|等待PIPE_MTE2流水完成。|`c_api/sync/sync.h`|
-|[asc_sync_mte3](sync/asc_sync_mte3.md)|等待PIPE_MTE3流水完成。|`c_api/sync/sync.h`|
-|[asc_sync_notify](sync/asc_sync_notify.md)|设置同步标志。|`c_api/sync/sync.h`|
-|[asc_sync_pipe](sync/asc_sync_pipe.md)|等待指定流水线操作完成。|`c_api/sync/sync.h`|
-|[asc_sync_subblock_arrive](sync/asc_sync_subblock_arrive.md)|和[asc_sync_subblock_wait](sync/asc_sync_subblock_wait.md)配合使用（通过flag_id关联），用于组内subblock间的信号同步。|`c_api/sync/sync.h`|
-|[asc_sync_subblock_wait](sync/asc_sync_subblock_wait.md)|等待subblock间同步标志。|`c_api/sync/sync.h`|
-|[asc_sync_vec](sync/asc_sync_vec.md)|同步所有流水线。|`c_api/sync/sync.h`|
-|[asc_sync_wait](sync/asc_sync_wait.md)|等待同步标志。|`c_api/sync/sync.h`|
-|[asc_unlock](sync/asc_unlock.md)|释放缓存。|`c_api/sync/sync.h`|
+|[asc_lock](sync/intra_core_sync/asc_lock.md)|用于AI Core内部异步流水线同步的接口。|`c_api/sync/sync.h`|
+|[asc_sync](sync/intra_core_sync/asc_sync.md)|等待所有流水线操作完成。|`c_api/sync/sync.h`|
+|[asc_sync_data_barrier](sync/intra_core_sync/asc_sync_data_barrier.md)|用于阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可以通过参数控制）执行结束。|`c_api/sync/sync.h`|
+|[asc_sync_mte2](sync/intra_core_sync/asc_sync_mte2.md)|等待PIPE_MTE2流水完成。|`c_api/sync/sync.h`|
+|[asc_sync_mte3](sync/intra_core_sync/asc_sync_mte3.md)|等待PIPE_MTE3流水完成。|`c_api/sync/sync.h`|
+|[asc_sync_notify](sync/intra_core_sync/asc_sync_notify.md)|设置同步标志。|`c_api/sync/sync.h`|
+|[asc_sync_pipe](sync/intra_core_sync/asc_sync_pipe.md)|等待指定流水线操作完成。|`c_api/sync/sync.h`|
+|[asc_sync_vec](sync/intra_core_sync/asc_sync_vec.md)|同步所有流水线。|`c_api/sync/sync.h`|
+|[asc_sync_wait](sync/intra_core_sync/asc_sync_wait.md)|等待同步标志。|`c_api/sync/sync.h`|
+|[asc_unlock](sync/intra_core_sync/asc_unlock.md)|释放缓存。|`c_api/sync/sync.h`|
+
+### 核间同步
+
+|API名称|说明|最细粒度公共头文件|
+|---|---|---|
+|[asc_sync_block_arrive](sync/inter_core_sync/asc_sync_block_arrive.md)|该指令用于发送同步信息数据到核间同步寄存器，设置同步点。|`c_api/sync/sync.h`|
+|[asc_sync_block_wait](sync/inter_core_sync/asc_sync_block_wait.md)|和[asc_sync_block_arrive](sync/inter_core_sync/asc_sync_block_arrive.md)配合使用（通过flag_id关联），用于等待所有同步对象到达flag_id对应的同步点。|`c_api/sync/sync.h`|
+|[asc_sync_inter_arrive](sync/inter_core_sync/asc_sync_inter_arrive.md)|和[asc_sync_inter_wait](sync/inter_core_sync/asc_sync_inter_wait.md)配合使用（通过flag_id关联），用于组间block的信号同步。|`c_api/sync/sync.h`|
+|[asc_sync_inter_wait](sync/inter_core_sync/asc_sync_inter_wait.md)|等待block内同步标志。|`c_api/sync/sync.h`|
+|[asc_sync_intra_arrive](sync/inter_core_sync/asc_sync_intra_arrive.md)|向核间同步寄存器发送同步信号。|`c_api/sync/sync.h`|
+|[asc_sync_intra_wait](sync/inter_core_sync/asc_sync_intra_wait.md)|等待核间同步寄存器同步标志。|`c_api/sync/sync.h`|
+|[asc_sync_subblock_arrive](sync/inter_core_sync/asc_sync_subblock_arrive.md)|和[asc_sync_subblock_wait](sync/inter_core_sync/asc_sync_subblock_wait.md)配合使用（通过flag_id关联），用于组内subblock间的信号同步。|`c_api/sync/sync.h`|
+|[asc_sync_subblock_wait](sync/inter_core_sync/asc_sync_subblock_wait.md)|等待subblock间同步标志。|`c_api/sync/sync.h`|
 
 ## 其他操作
 
@@ -787,10 +783,8 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 | [asc_copy_gm2ub_sync_arch_2201（废弃）](deprecated_interface/asc_copy_gm2ub_sync_arch_2201_deprecated.md) | 该接口已废弃，替代关系及迁移方式请参见接口文档。 |
 | [asc_copy_gm2ub_sync_arch_3510（废弃）](deprecated_interface/asc_copy_gm2ub_sync_arch_3510_deprecated.md) | 该接口已废弃，替代关系及迁移方式请参见接口文档。 |
 | [asc_copy_l0c2gm_sync_arch_2201（废弃）](deprecated_interface/asc_copy_l0c2gm_sync_arch_2201_deprecated.md) | 该接口已废弃，替代关系及迁移方式请参见接口文档。 |
-| [asc_copy_l0c2gm_sync_arch_3510（废弃）](deprecated_interface/asc_copy_l0c2gm_sync_arch_3510_deprecated.md) | 该接口已废弃，替代关系及迁移方式请参见接口文档。 |
 | [asc_copy_l0c2l1_sync_arch_2201（废弃）](deprecated_interface/asc_copy_l0c2l1_sync_arch_2201_deprecated.md) | 该接口已废弃，替代关系及迁移方式请参见接口文档。 |
 | [asc_copy_l0c2l1_sync_arch_3510（废弃）](deprecated_interface/asc_copy_l0c2l1_sync_arch_3510_deprecated.md) | 该接口已废弃，替代关系及迁移方式请参见接口文档。 |
-| [asc_copy_l0c2ub_sync（废弃）](deprecated_interface/asc_copy_l0c2ub_sync_deprecated.md) | 该接口已废弃，替代关系及迁移方式请参见接口文档。 |
 | [asc_copy_l12bt_sync_arch_2201（废弃）](deprecated_interface/asc_copy_l12bt_sync_arch_2201_deprecated.md) | 该接口已废弃，替代关系及迁移方式请参见接口文档。 |
 | [asc_copy_l12bt_sync_arch_3510（废弃）](deprecated_interface/asc_copy_l12bt_sync_arch_3510_deprecated.md) | 该接口已废弃，替代关系及迁移方式请参见接口文档。 |
 | [asc_copy_l12fb_sync_arch_2201（废弃）](deprecated_interface/asc_copy_l12fb_sync_arch_2201_deprecated.md) | 该接口已废弃，替代关系及迁移方式请参见接口文档。 |

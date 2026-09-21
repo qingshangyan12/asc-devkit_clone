@@ -5,13 +5,13 @@
 >[!NOTE]说明 
 >该性能优化指导适用于如下产品型号：
 ><!-- npu="950" id1 -->
->- Ascend 950PR/Ascend 950DT
+>- Ascend 950PR&950DT系列产品
 ><!-- end id1 -->
 ><!-- npu="A3" id2 -->
->- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+>- Atlas A3系列产品
 ><!-- end id2 -->
 ><!-- npu="910b" id3 -->
->- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+>- Atlas A2系列产品
 ><!-- end id3 -->
 
 【描述】L2 Cache常用于缓存频繁访问的数据，其物理位置如下图所示：
@@ -69,7 +69,7 @@ zGm.SetGlobalBuffer((__gm__ half *)z + startM * totalN + startN, bufferSize);</p
 <td class="cellrowborder" valign="top" width="50.51104837924658%" headers="mcps1.1.4.1.3 "><a name="screen271414925813"></a><a name="screen271414925813"></a><pre class="screen" codetype="Cpp" id="screen271414925813">xGm.SetGlobalBuffer((__gm__ half *)x + startM * totalN + startN, bufferSize);
 yGm.SetGlobalBuffer((__gm__ half *)y + startM * totalN + startN, bufferSize);
 zGm.SetGlobalBuffer((__gm__ half *)z + startM * totalN + startN, bufferSize);
-// disable the L2 cache mode of x and y
+// disable the L2 Cache mode of x and y
 xGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
 yGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);</pre>
 </td>
