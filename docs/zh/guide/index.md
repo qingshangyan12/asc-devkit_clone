@@ -243,6 +243,7 @@
             -   [CV融合](operator_practice/simd_operator_impl/fusion_operator_programming/cv_fusion/basics.md)
                 -   [基础知识](operator_practice/simd_operator_impl/fusion_operator_programming/cv_fusion/basics.md)
                 -   [算子实现](operator_practice/simd_operator_impl/fusion_operator_programming/cv_fusion/operator_impl.md)
+                -   [基于SSBuffer的核间通信特性](operator_practice/simd_operator_impl/fusion_operator_programming/cv_fusion/ssbuffer_feature_scenarios.md)
 
             -   [通算融合](operator_practice/simd_operator_impl/fusion_operator_programming/general_fusion/basics.md)
                 -   [基础知识](operator_practice/simd_operator_impl/fusion_operator_programming/general_fusion/basics.md)
@@ -331,6 +332,7 @@
             -   [同一Warp内避免分支跳转](operator_practice/simt_operator_optimization/control_flow/avoid_warp_branch.md)
         -   [指令优化](operator_practice/simt_operator_optimization/instruction_optimization/atomic_instruction_optimization.md)
             -   [原子操作指令优化](operator_practice/simt_operator_optimization/instruction_optimization/atomic_instruction_optimization.md)
+            -   [原地加法指令优化](operator_practice/simt_operator_optimization/instruction_optimization/inplace_add_instruction_optimization.md)
 
     -   [SIMD与SIMT混合算子性能优化](operator_practice/simd_simt_hybrid_optimization/simd_simt_hybrid_optimization.md)
         -   [概述](operator_practice/simd_simt_hybrid_optimization/overview.md)

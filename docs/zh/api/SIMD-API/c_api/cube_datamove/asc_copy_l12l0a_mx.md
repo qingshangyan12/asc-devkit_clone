@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -96,7 +96,7 @@ PIPE_MTE1
 - `dst`起始地址需要按照32字节对齐，否则触发地址对齐异常。
 - `src`起始地址需要按照32字节对齐（L1 Buffer对齐要求），否则触发地址对齐异常。
 - `src`位于L1 Buffer，`dst`指向L0A_MX Buffer，两者分属不同的物理存储单元，不存在源操作数与目的操作数地址重叠的场景。
-- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../sync/asc_sync_notify.md)和[asc_sync_wait](../sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
 - L0A_MX Buffer容量上限：L0A_MX Buffer总容量4KB，`dst`偏移量与搬运大小之和不可越界，否则触发地址溢出异常。
 - L1 Buffer容量上限：L1 Buffer总容量512KB，`src`偏移量与源矩阵占用大小之和不可越界，否则触发地址溢出异常。
 
@@ -113,7 +113,7 @@ PIPE_MTE1
 将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-Ascend 950PR/Ascend 950DT产品对应的NPU架构为`dav-3510`，编译运行命令如下：
+Ascend 950PR&950DT系列产品产品对应的NPU架构为`dav-3510`，编译运行命令如下：
 
 ```bash
 bisheng examples.asc -o main --npu-arch=dav-3510 && ./main
