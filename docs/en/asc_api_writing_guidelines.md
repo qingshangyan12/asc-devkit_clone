@@ -256,7 +256,7 @@ The content of Neg_ISASI.md is as follows:
 
 [Level] Mandatory
 
-[Description] The md file of each interface must organize sections in the following order (all second-level headings). The Data Type, Key Features, and Required Header Files sections are optional based on the actual interface. For example, the Sin interface in the advanced API supports the same data types across different chips, so no separate section is needed to describe the differences. The description can be included with the parameter description. For another example, the basic API uniformly describes the required header files in the function description, so the "Required Header Files" section is not needed. APIs of the same type should maintain a consistent section structure.
+[Description] The md file of each interface must organize sections in the following order (all second-level headings). The Data Type and Key Features sections are optional based on the actual interface. For example, the Sin interface in the advanced API supports the same data types across different chips, so no separate section is needed to describe the differences. The description can be included with the parameter description. APIs of the same type should maintain a consistent section structure.
 
 ```text
 Product Support
@@ -266,7 +266,6 @@ Parameter Description
 Data Type
 Return Value Description
 Constraints
-Required Header Files
 Key Features
 Usage Example
 ```
@@ -295,13 +294,13 @@ Some interfaces are Host interfaces that do not differentiate by product. In thi
 ## Product Support
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT: Supported
+- Ascend 950PR&950DT products: Supported
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 Training Series Products/Atlas A3 Inference Series Products: Not supported
+- Atlas A3 products: Not supported
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 Training Series Products/Atlas A2 Inference Series Products: Not supported
+- Atlas A2 products: Not supported
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 Inference Products: Not supported
@@ -329,13 +328,13 @@ Some interfaces are Host interfaces that do not differentiate by product. In thi
 ## Product Support
 
 <!-- npu="950" id8 -->
-- Ascend 950PR/Ascend 950DT: Supported
+- Ascend 950PR&950DT products: Supported
 <!-- end id8 -->
 <!-- npu="A3" id9 -->
-- Atlas A3 Training Series Products/Atlas A3 Inference Series Products: Not supported
+- Atlas A3 products: Not supported
 <!-- end id9 -->
 <!-- npu="910b" id10 -->
-- Atlas A2 Training Series Products/Atlas A2 Inference Series Products: Not supported
+- Atlas A2 products: Not supported
 <!-- end id10 -->
 <!-- npu="310b" id11 -->
 - Atlas 200I/500 A2 Inference Products: Not supported
@@ -388,13 +387,12 @@ Obtain the preload status of ICache.
 
 [Level] Mandatory
 
-[Description] The header file where the interface is located and the header files that need to be included when using the interface must be provided. If a general introduction has been provided in an earlier section by API category or in a separate section, the function description does not need to repeat this information. The header file path must be wrapped in backticks.
+[Description] The header file where the interface is located and the header files that need to be included when using the interface must be provided. If a general introduction has been provided in an earlier section by API category, the function description does not need to repeat this information. The header file path must be wrapped in backticks.
 
 [Positive Example]  
 The header file path is: `"basic_api/kernel_operator_vec_binary_intf.h"`.
 
 [Exception]  
-- If a separate "Required Header Files" section exists to describe the required header files, this section is not needed.
 - If the required header files for a class of interfaces have been described in an earlier section, this section is not needed.
 
 ### API-FUNC-02 New Concepts Must Include Necessary Explanations or Hyperlinks
@@ -599,15 +597,15 @@ For scenarios with too many function prototypes, using only unordered lists woul
 - This prototype supports the following product models:
 
     <!-- npu="950" id16 -->
-    Ascend 950PR/Ascend 950DT 
+    Ascend 950PR&950DT products 
     <!-- end id16 -->
 
     <!-- npu="A3" id17 -->
-    Atlas A3 Training Series Products/Atlas A3 Inference Series Products 
+    Atlas A3 products 
     <!-- end id17 -->
 
     <!-- npu="910b" id18 -->
-    Atlas A2 Training Series Products/Atlas A2 Inference Series Products 
+    Atlas A2 products 
     <!-- end id18 -->
 
     <!-- npu="310b" id19 -->
@@ -615,11 +613,11 @@ For scenarios with too many function prototypes, using only unordered lists woul
     <!-- end id19 -->
 
     <!-- npu="x90" id20 -->
-    Kirin X90 
+    Kirin X90 Processor Series Products 
     <!-- end id20 -->
 
     <!-- npu="9030" id21 -->
-    Kirin 9030 
+    Kirin 9030 Processor Series Products 
     <!-- end id21 -->
 
     ```cpp
@@ -790,7 +788,7 @@ Only lists the parameter units as 16 Bytes and 32 Bytes without the necessary pr
 
 - When the inter-core synchronization mode is mode 0, 1, or 2, the supported value range is 0-15.
 <!-- npu="950" id26 -->
-- For Ascend 950PR/Ascend 950DT, when the inter-core synchronization mode is mode 4, the supported value range is as follows:
+- For Ascend 950PR&950DT products, when the inter-core synchronization mode is mode 4, the supported value range is as follows:
     - CrossCoreSetFlag operations with flagId 0-10 initiated by AIV0 correspond to CrossCoreWaitFlag operations with flagId 0-10 on AIC.
     - CrossCoreSetFlag operations with flagId 0-10 initiated by AIV1 correspond to CrossCoreWaitFlag operations with flagId 16-26 on AIC.
     - CrossCoreSetFlag operations with flagId 0-10 initiated by AIC correspond to CrossCoreWaitFlag operations with flagId 0-10 on AIV0.
@@ -1195,7 +1193,7 @@ Content customization refers to the ability to dynamically display different con
 
 ```text
 <!-- npu="950" id27 -->
-This interface supports counter mode on Ascend 950PR/Ascend 950DT.
+This interface supports counter mode on Ascend 950PR&950DT products.
 <!-- end id27 -->
 ```
 

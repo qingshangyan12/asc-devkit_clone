@@ -1,13 +1,17 @@
 # AI Core编译基本用法<a name="section229217121411"></a>
+
 当开发者完成一个核函数（Kernel）的编写，并在Host侧通过<<<\>\>\>方式完成核函数（Kernel）的启动调用后，就需要进行算子源码编译与算子运行，接下来我们介绍通过bisheng编译器完成算子编译的基本用法。
 
 ## AI Core SIMD编译
+
 使用bisheng编译Ascend C源文件的基本命令如下，其中--npu-arch=dav-\<npu architecture\>用于指定AI处理器架构版本：
+
 ```shell
   bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture>
 ```
 
 bisheng可以通过-I \<path\>指定头文件路径、-L \<path\> 指定链接库路径、-l \<library\>指定需要链接的动态库或静态库、-D\<macro\>=\<value\>指定宏定义，示例如下：
+
 ```shell
   bisheng add_kernel.asc -I <path_to_include> -L <path_to_library> -l <library> -o <output_file> -D<macro>=<value> --npu-arch=dav-<npu architecture>
 ```
@@ -16,6 +20,7 @@ AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成
 ![aicore编译流程示意图](../../../figures/aicore_compilation.png)
 
 - 异构编译，完整样例请参考[LINK](../../../../../../examples/01_simd_cpp_api/02_features/04_compile/00_basic_compile/README.md)。
+
   ```shell
   // ----- add_kernel.asc -----
   //  指定核函数（Kernel）在AI Core上执行
@@ -43,6 +48,7 @@ AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成
   - 所有Ascend C源文件（.asc）都必须使用`-dc`选项编译。
 
   下方示例中，add_compute.asc定义了变量和函数，add_kernel.asc对其进行引用；两个文件将分别编译，最终链接为完整可执行文件。
+
   ```c++
   // ------- add_compute.asc -------
   __gm__ int dev_var = 5;
@@ -63,15 +69,18 @@ AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成
   bisheng -c main.cpp -o main.o -I${INSTALL_DIR}/include
   bisheng add_compute.o add_kernel.o main.o -o program
   ```
+
   > [!NOTE]说明
   > `${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。以root用户安装为例，安装后文件默认存储路径为：/usr/local/Ascend/cann。
 
 - 动态库编译，完整样例请参考[LINK](../../../../../../examples/01_simd_cpp_api/02_features/04_compile/02_dynamic_library_compile/README.md)。
+
    ```shell
   bisheng -shared add_kernel.asc -o libadd_kernel.so -fPIC --npu-arch=dav-xxxx
   ```
 
 - 静态库编译，完整样例请参考[LINK](../../../../../../examples/01_simd_cpp_api/02_features/04_compile/03_static_library_compile/README.md)。
+
   ```shell
   bisheng -lib add_kernel.asc -o libadd_kernel.a --npu-arch=dav-xxxx
   ```
@@ -129,57 +138,55 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 ><!-- npu="A3,910b,910,310p,310b" id13 -->
 >- 针对如下产品：不支持使用编译选项：--cce-ftz，--cce-prec-div，--cce-prec-sqrt，--cce-use-fast-math。<br><br>
 >    <!-- npu="A3" id18 -->
->    Atlas A3 训练系列产品/Atlas A3 推理系列产品
+>    Atlas A3系列产品
 >    <!-- end id18 -->
 >
 >    <!-- npu="910b" id14 -->
->    Atlas A2 训练系列产品/Atlas A2 推理系列产品  
+>    Atlas A2系列产品  
 >    <!-- end id14 -->
 >
 >    <!-- npu="310b" id15 -->
->    Atlas 200I/500 A2 推理产品  
+>    Atlas 200I/500 A2推理产品  
 >    <!-- end id15 -->
 >
 >    <!-- npu="310p" id16 -->
->    Atlas 推理系列产品  
+>    Atlas推理系列产品  
 >    <!-- end id16 -->
 >
 >    <!-- npu="910" id17 -->
->    Atlas 训练系列产品<br><br> 
+>    Atlas训练系列产品<br><br> 
 >    <!-- end id17 -->
 ><!-- end id13 -->
 ><!-- npu="950" id19 -->
->- 针对Ascend 950PR/Ascend 950DT，支持使用编译选项：--cce-ftz，--cce-prec-div，--cce-prec-sqrt，--cce-use-fast-math。
+>- 针对Ascend 950PR&950DT系列产品，支持使用编译选项：--cce-ftz，--cce-prec-div，--cce-prec-sqrt，--cce-use-fast-math。
 ><!-- end id19 -->
 
 更多的编译命令和用法可以参见[《毕昇编译器用户指南》](https://www.hiascend.com/document/redirect/CannCommunityBiSheng)。
 
-<a id="note-reference"></a>
-
->[!NOTE]说明 
+>[!NOTE]说明<a id="note-reference"></a>
 ><!-- npu="910b,910,310p,310b" id1 -->
 >- 针对如下产品：在安装AI处理器的服务器执行`npu-smi info`命令进行查询，获取Name信息。实际配置值为AscendName，例如Name取值为xxxyy，实际配置值为Ascendxxxyy。<br><br>
 >    <!-- npu="910b" id2 -->
->    Atlas A2 训练系列产品/Atlas A2 推理系列产品  
+>    Atlas A2系列产品  
 >    <!-- end id2 -->
 >
 >    <!-- npu="310b" id3 -->
->    Atlas 200I/500 A2 推理产品  
+>    Atlas 200I/500 A2推理产品  
 >    <!-- end id3 -->
 >
 >    <!-- npu="310p" id4 -->
->    Atlas 推理系列产品  
+>    Atlas推理系列产品  
 >    <!-- end id4 -->
 >
 >    <!-- npu="910" id5 -->
->    Atlas 训练系列产品<br><br> 
+>    Atlas训练系列产品<br><br> 
 >    <!-- end id5 -->
 ><!-- end id1 -->
 ><!-- npu="A3" id6 -->
->- 针对<term>Atlas A3 训练系列产品</term>/<term>Atlas A3 推理系列产品</term>，在安装AI处理器的服务器执行`npu-smi info -t board -i <id> -c <chip_id>`命令进行查询，获取Chip Name和NPU Name信息，实际配置值为`Chip Name_NPU Name`。例如Chip Name取值为Ascendxxx，NPU Name取值为1234，实际配置值为Ascendxxx_1234。其中：<br>`id`：设备id，通过`npu-smi info -l`命令查出的NPU ID即为设备id，命令中表示为`<id>`。<br>`chip_id`：芯片id，通过`npu-smi info -m`命令查出的Chip ID即为芯片id，命令中表示为`<chip_id>`。<br><br>
+>- 针对Atlas A3系列产品，在安装AI处理器的服务器执行`npu-smi info -t board -i <id> -c <chip_id>`命令进行查询，获取Chip Name和NPU Name信息，实际配置值为`Chip Name_NPU Name`。例如Chip Name取值为Ascendxxx，NPU Name取值为1234，实际配置值为Ascendxxx_1234。其中：<br>`id`：设备id，通过`npu-smi info -l`命令查出的NPU ID即为设备id，命令中表示为`<id>`。<br>`chip_id`：芯片id，通过`npu-smi info -m`命令查出的Chip ID即为芯片id，命令中表示为`<chip_id>`。<br><br>
 ><!-- end id6 -->
 ><!-- npu="950" id7 -->
->- 针对Ascend 950PR/Ascend 950DT，在安装AI处理器的服务器执行`npu-smi info -t board -i <id>`命令进行查询，获取Chip Name和NPU Name信息，实际配置值为`Chip Name_NPU Name`。例如Chip Name取值为Ascendxxx，NPU Name取值为1234，实际配置值为Ascendxxx_1234。<br>其中：`id`为设备id，通过`npu-smi info -l`命令查出的NPU ID即为设备id，命令中表示为`<id>`。
+>- 针对Ascend 950PR&950DT系列产品，在安装AI处理器的服务器执行`npu-smi info -t board -i <id>`命令进行查询，获取Chip Name和NPU Name信息，实际配置值为`Chip Name_NPU Name`。例如Chip Name取值为Ascendxxx，NPU Name取值为1234，实际配置值为Ascendxxx_1234。<br>其中：`id`为设备id，通过`npu-smi info -l`命令查出的NPU ID即为设备id，命令中表示为`<id>`。
 ><!-- end id7 -->
 
 
@@ -245,6 +252,7 @@ add_executable(demo
           mix.asc
     )
     ```
+
 **表1常用的CMAKE配置变量说明**
 
 | 变量名称 | 配置说明 |
@@ -288,10 +296,10 @@ add_executable(demo
      ```
      当前ASCENDC\_DEBUG功能支持的产品型号为：
      <!-- npu="310p" id9 -->
-     Atlas 推理系列产品
+     Atlas推理系列产品
      <!-- end id9 -->
      <!-- npu="910b" id10 -->
-     Atlas A2 训练系列产品/Atlas A2 推理系列产品
+     Atlas A2系列产品
      <!-- end id10 -->
  <!-- end id8 -->
 
@@ -300,22 +308,22 @@ add_executable(demo
      ```shell
      bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture> -DENABLE_CV_COMM_VIA_SSBUF=true
      ```
-     仅在Ascend 950PR/Ascend 950DT支持该选项。
+     仅在Ascend 950PR&950DT系列产品支持该选项。
      -   从其它硬件平台移植到此平台的算子，开关默认关闭以保持兼容性。
-     -   在该平台新开发的算子，以下场景需要打开：使用矩阵计算Matmul高阶API，且使用SetTensorScaleA等接口，这些接口属于Ascend 950PR/Ascend 950DT新增的功能，其内部实现使用了SSBuffer；使用DataCopy接口从UB拷贝数据到L1 Buffer。
+     -   在该平台新开发的算子，以下场景需要打开：使用矩阵计算Matmul高阶API，且使用SetTensorScaleA等接口，这些接口属于Ascend 950PR&950DT系列产品新增的功能，其内部实现使用了SSBuffer；使用DataCopy接口从UB拷贝数据到L1 Buffer。
  <!-- end id11 -->
 
  <!-- npu="950" id12 -->
  -   **NO\_OVERLAP\_IN\_MULTI\_REPEAT**
-  该编译选项用于在没有地址重叠的情况下移除不必要的内存同步指令，以提升性能。针对Ascend 950PR/Ascend 950DT，使用基础API的高维切分计算API时，默认会插入内存同步指令以确保在地址重叠等复杂场景下的数据正确性，但这些同步指令会带来性能开销。在追求极致性能的场景下，如果您可以确定代码在任何情况下都不会发生内存重叠，可以使用此选项。
+  该编译选项用于在没有地址重叠的情况下移除不必要的内存同步指令，以提升性能。针对Ascend 950PR&950DT系列产品，使用基础API的高维切分计算API时，默认会插入内存同步指令以确保在地址重叠等复杂场景下的数据正确性，但这些同步指令会带来性能开销。在追求极致性能的场景下，如果您可以确定代码在任何情况下都不会发生内存重叠，可以使用此选项。
  <!-- end id12 -->
 
  <!-- npu="950" id20 -->
- -   **ASCENDC\_USE\_LEGACY\_PRECISION** 用于控制SIMT API的实现版本，默认开关关闭。针对Ascend 950PR/Ascend 950DT，CANN 9.2.0版本对部分SIMT API的实现做了精度提升。如果您的算子对精度不敏感且发现性能发生劣化，可以开启此宏，让相关SIMT API回退到旧版本实现，以恢复原有性能水平，示例如下：
+ -   **ASCENDC\_USE\_LEGACY\_PRECISION** 用于控制SIMT API的实现版本，默认开关关闭。针对Ascend 950PR&950DT系列产品，CANN 9.2.0版本对部分SIMT API的实现做了精度提升。如果您的算子对精度不敏感且发现性能发生劣化，可以开启此宏，让相关SIMT API回退到旧版本实现，以恢复原有性能水平，示例如下：
      ```shell
      bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture> -DASCENDC_USE_LEGACY_PRECISION
      ```
-     仅在Ascend 950PR/Ascend 950DT支持该选项。
+     该选项仅在Ascend 950PR&950DT系列产品上支持，且用于保证CANN 9.2.0之前版本开发的算子在SIMT API实现变更后仍保持兼容；在CANN 9.2.0版本之后开发的算子不推荐使用该选项。
  <!-- end id20 -->
 
 
@@ -336,6 +344,7 @@ add_executable(demo
 | libascendcl.so | acl相关接口库。 |
 
 ### 高阶API常用链接库
+
 在使用高阶API时，必须链接以下库，因为这些库是高阶API功能所依赖的。在其他场景下，可以根据具体需求选择是否链接这些库。
 
 |链接库名称|作用描述|使用场景|动态库路径|

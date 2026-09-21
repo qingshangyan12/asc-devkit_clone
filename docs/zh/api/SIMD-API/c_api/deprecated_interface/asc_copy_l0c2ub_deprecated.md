@@ -3,30 +3,30 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
 
-**`asc_copy_l0c2ub`的旧参数形式及`asc_copy_l0c2ub_sync`接口已废弃。请使用[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)接口和[asc_sync](../sync/asc_sync.md)接口替代。**
+**`asc_copy_l0c2ub`的旧参数形式及`asc_copy_l0c2ub_sync`接口已废弃。请使用[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)接口和[asc_sync](../sync/intra_core_sync/asc_sync.md)接口替代。**
 
 头文件路径为：`"c_api/cube_datamove/cube_datamove.h"`。
 
@@ -80,9 +80,10 @@
 
 ## 函数原型
 
-### 模板原型（占位符形式）
+### 模板原型
 
 ```cpp
+// 占位符形式
 __aicore__ inline void asc_copy_l0c2ub(__ubuf__ <dst_dtype>* dst,
                                        __cc__ <src_dtype>* src,
                                        uint16_t n_size,
@@ -208,7 +209,7 @@ PIPE_FIX
 - 本接口非AIC调用直接返回。
 - `dst`起始地址需要按照32字节对齐，否则触发异常。
 - `src`起始地址需要按照64字节对齐，否则触发异常。
-- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../sync/asc_sync_notify.md)和[asc_sync_wait](../sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
 - UB容量上限：UB总容量为256KB，默认预留6KB SIMD VF栈与2KB Ascend C预留空间后可用248KB；SIMD与SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少。dst偏移量与搬运大小之和不可超过实际可用容量，否则触发写溢出异常。
 - L0C Buffer容量上限：L0C Buffer总容量256KB，src偏移量与搬运大小之和不可超过L0C Buffer容量，否则触发读溢出异常。
 - Nz矩阵以16×16个元素为一个基本分形。边界分形中超出`n_size`或`m_size`指定范围的数据不属于有效搬运结果。
@@ -231,7 +232,7 @@ PIPE_FIX
 本示例占用32KB L1 Buffer、16KB L0A Buffer、16KB L0B Buffer、64KB L0C Buffer和64KB UB，并使用`EVENT_ID0`与同步资源编号`0x8`完成流水及核间同步。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng examples.asc -o main --npu-arch=dav-3510 && ./main

@@ -1,8 +1,7 @@
 # 优化建议总览表<a name="ZH-CN_TOPIC_0000002351966029"></a>
 
-**表1**  性能优化建议总览表
+**表1**  性能优化建议总览表<a name="table1318114421218"></a>
 
-<a name="table1318114421218"></a>
 <table><thead align="left"><tr id="row8182944131211"><th class="cellrowborder" valign="top" width="12.55%" id="mcps1.2.4.1.1"><p id="p918218445121"><a name="p918218445121"></a><a name="p918218445121"></a>分类</p>
 </th>
 <th class="cellrowborder" valign="top" width="42.89%" id="mcps1.2.4.1.2"><p id="p1165171215245"><a name="p1165171215245"></a><a name="p1165171215245"></a>分类描述</p>
@@ -98,11 +97,14 @@
 <tr id="row14158230103211"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p12515651494"><a name="p12515651494"></a><a name="p12515651494"></a><a href="vector_compute/low_latency_instruction.md">选择低延迟指令，优化归约操作性能</a></p>
 </td>
 </tr>
-<tr id="row8338204923918"><td class="cellrowborder" rowspan="5" valign="top" width="12.55%" headers="mcps1.2.4.1.1 "><p id="p0844172803015"><a name="p0844172803015"></a><a name="p0844172803015"></a><a href="matrix_compute/matrix_compute.md">矩阵计算</a></p>
+<tr id="row8338204923918"><td class="cellrowborder" rowspan="6" valign="top" width="12.55%" headers="mcps1.2.4.1.1 "><p id="p0844172803015"><a name="p0844172803015"></a><a name="p0844172803015"></a><a href="matrix_compute/matrix_compute.md">矩阵计算</a></p>
 </td>
-<td class="cellrowborder" rowspan="5" valign="top" width="42.89%" headers="mcps1.2.4.1.2 "><p id="p112817307307"><a name="p112817307307"></a><a name="p112817307307"></a>矩阵计算相关优化建议。</p>
+<td class="cellrowborder" rowspan="6" valign="top" width="42.89%" headers="mcps1.2.4.1.2 "><p id="p112817307307"><a name="p112817307307"></a><a name="p112817307307"></a>矩阵计算相关优化建议。</p>
 </td>
-<td class="cellrowborder" valign="top" width="44.56%" headers="mcps1.2.4.1.3 "><p id="p9338134917391"><a name="p9338134917391"></a><a name="p9338134917391"></a><a href="matrix_compute/bt_buffer_bias_compute.md">通过BT Buffer实现高效的bias计算</a></p>
+<td class="cellrowborder" valign="top" width="44.56%" headers="mcps1.2.4.1.3 "><p id="p194051412301"><a name="p194051412301"></a><a name="p194051412301"></a><a href="matrix_compute/hifloat8_matmul_optimization.md">使用hifloat8_t实现Matmul性能优化</a></p>
+</td>
+</tr>
+<tr id="row194051412300"><td class="cellrowborder" valign="top" width="44.56%" headers="mcps1.2.4.1.3 "><p id="p9338134917391"><a name="p9338134917391"></a><a name="p9338134917391"></a><a href="matrix_compute/bt_buffer_bias_compute.md">通过BT Buffer实现高效的bias计算</a></p>
 </td>
 </tr>
 <tr id="row86314411522"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p1663104165214"><a name="p1663104165214"></a><a name="p1663104165214"></a><a href="matrix_compute/fp_buffer_quantization.md">通过FP Buffer存放量化参数实现高效随路量化</a></p>

@@ -3,32 +3,32 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
 
 头文件路径为：`"c_api/cube_compute/cube_compute.h"`。
 
-**入参`unit_flag`类型为`uint8_t`的`asc_mmad_mx`接口和`asc_mmad_mx_sync`接口已废弃。请使用入参`unit_flag_mode`类型为`asc_unit_flag_mode`的[asc_mmad_mx](../cube_compute/asc_mmad_mx.md)接口替代；原`asc_mmad_mx_sync`接口的同步功能请通过新`asc_mmad_mx`接口和`asc_sync()`实现，具体请参见[asc_sync](../sync/asc_sync.md)。**
+**入参`unit_flag`类型为`uint8_t`的`asc_mmad_mx`接口和`asc_mmad_mx_sync`接口已废弃。请使用入参`unit_flag_mode`类型为`asc_unit_flag_mode`的[asc_mmad_mx](../cube_compute/asc_mmad_mx.md)接口替代；原`asc_mmad_mx_sync`接口的同步功能请通过新`asc_mmad_mx`接口和`asc_sync()`实现，具体请参见[asc_sync](../sync/intra_core_sync/asc_sync.md)。**
 
 本接口用于完成带有量化系数的矩阵乘加计算（MmadMx），即左矩阵A和右矩阵B均有对应的量化系数矩阵，左量化系数矩阵ScaleA和右量化系数矩阵ScaleB。在MmadMx场景中，左量化系数矩阵与左矩阵相乘，右量化系数矩阵与右矩阵相乘，然后对两个乘积的结果做矩阵乘法，其计算公式如下：
 
@@ -57,9 +57,8 @@ $$
 
 ## 函数原型
 
-**占位符形式：**
-
 ```c
+// 占位符形式
 __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
                                    __ca__ <a_dtype>* a_matrix,
                                    __cb__ <b_dtype>* b_matrix,
@@ -158,7 +157,7 @@ PIPE_M
 
 - 同步约束说明：
 
-  针对输入矩阵沿K轴分块计算，并将结果累加到同一块L0C Buffer的场景，当`(left_height / 16) * (right_width / 16) < 10`时，需在相邻两次矩阵乘加指令之间调用[asc_sync_pipe](../sync/asc_sync_pipe.md)，并将入参`pipe`设置为`PIPE_M`。
+  针对输入矩阵沿K轴分块计算，并将结果累加到同一块L0C Buffer的场景，当`(left_height / 16) * (right_width / 16) < 10`时，需在相邻两次矩阵乘加指令之间调用[asc_sync_pipe](../sync/intra_core_sync/asc_sync_pipe.md)，并将入参`pipe`设置为`PIPE_M`。
 
 - UnitFlag约束说明：
 

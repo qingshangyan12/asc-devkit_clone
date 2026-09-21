@@ -38,6 +38,8 @@
 #include "dav_3510/kernel_operator_sys_var_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_sys_var_impl.h"
+#elif (__NPU_ARCH__ == 5162)
+#include "dav_v516/kernel_operator_sys_var_impl.h"
 #elif __NPU_ARCH__ == 3003
 #include "dav_l300/kernel_operator_sys_var_impl.h"
 #elif __NPU_ARCH__ == 3113
@@ -46,25 +48,11 @@
 #include "dav_5161/kernel_operator_sys_var_impl.h"
 #endif
 
-#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
 #ifdef __SUPER_KERNEL_DYNAMIC_BLOCK_NUM__
 __BLOCK_LOCAL__ __inline__ uint32_t g_super_kernel_dynamic_block_num;
 #endif
 #endif
-
-namespace sk {
-// transmit block local variable information in SK "sub-kernel"
-struct SkSystemArgs {
-    uint16_t skBlockIdx;    // sub-kernel block idx
-    uint16_t skNumBlocks;   // sub-kernel block num
-    uint16_t skTaskSyncCfg; // sync type for "early-start"
-    uint8_t reserve[10];
-    inline __aicore__ uint16_t SkGetBlockIdx() { return skBlockIdx; }
-    inline __aicore__ uint16_t SkGetNumBlocks() { return skNumBlocks; }
-    inline __aicore__ uint16_t SkGetTaskSyncCfg() { return skTaskSyncCfg; }
-    inline __aicore__ void SkSetTaskSyncCfg(uint16_t config) { skTaskSyncCfg = config; }
-};
-} // namespace sk
 
 namespace AscendC {
 __aicore__ inline int64_t GetTaskRation() { return GetTaskRatio(); }
@@ -97,7 +85,8 @@ __aicore__ inline void Trap() { TrapImpl(); }
 
 __aicore__ inline int64_t GetSystemCycle() { return GetSystemCycleImpl(); }
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+    (__NPU_ARCH__ == 3113)
 template <SpecialPurposeReg spr>
 __aicore__ inline int64_t GetSpr()
 {

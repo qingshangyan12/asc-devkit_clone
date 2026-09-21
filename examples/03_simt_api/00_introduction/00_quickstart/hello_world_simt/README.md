@@ -8,7 +8,7 @@
 
 | 产品 | CANN软件版本 |
 |---|---|
-| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
+| Ascend 950PR&950DT系列产品 | \>= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -53,18 +53,19 @@
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR&950DT系列产品） |
 
 - 执行结果
+
   执行结果如下，说明执行成功。
 
   ```bash
-  [blockIdx (0/2)][threadIdx (2/32)]: Hello World!
-  [blockIdx (0/2)][threadIdx (1/32)]: Hello World!
   [blockIdx (0/2)][threadIdx (0/32)]: Hello World!
-  [blockIdx (1/2)][threadIdx (2/32)]: Hello World!
-  [blockIdx (1/2)][threadIdx (1/32)]: Hello World!
+  [blockIdx (0/2)][threadIdx (1/32)]: Hello World!
+  [blockIdx (0/2)][threadIdx (2/32)]: Hello World!
   [blockIdx (1/2)][threadIdx (0/32)]: Hello World!
+  [blockIdx (1/2)][threadIdx (1/32)]: Hello World!
+  [blockIdx (1/2)][threadIdx (2/32)]: Hello World!
   ```
 
   输出共6行，每行对应一个线程的打印结果。`[blockIdx (X/2)]` 表示当前为第X个线程块（共2个线程块），`[threadIdx (Y/32)]` 表示线程块内第Y个线程，说明核函数已成功在AIV Core上执行。

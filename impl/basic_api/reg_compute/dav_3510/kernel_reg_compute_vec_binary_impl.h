@@ -302,6 +302,7 @@ __simd_callee__ inline void ComplexMulKernel(U& dstReg, U& srcReg0, U& srcReg1, 
     RegTensor<typename ActualT::EleType>& dstReal = (RegTensor<typename ActualT::EleType>&)dstReg.reg[0];
     RegTensor<typename ActualT::EleType>& dstImag = (RegTensor<typename ActualT::EleType>&)dstReg.reg[1];
     if constexpr (SupportType<ActualT, complex32>()) {
+        // (a + bi) * (c + di) = (ac - bd) + (bc + ad)i.
         RegTensor<typename ActualT::EleType> e;
         RegTensor<typename ActualT::EleType> f;
         RegTensor<typename ActualT::EleType> g;
@@ -313,6 +314,9 @@ __simd_callee__ inline void ComplexMulKernel(U& dstReg, U& srcReg0, U& srcReg1, 
         Sub(dstReal, e, f, mask);
         Add(dstImag, g, h, mask);
     } else {
+        // FMA path for (a + bi) * (c + di):
+        // first Mul initializes real = (-b)d and imag = bc,
+        // then MulAddDst accumulates ac and ad.
         RegTensor<typename ActualT::EleType> src0ImagMinus;
         Muls(src0ImagMinus, src0Imag, -1, mask);
         Mul(dstReal, src0ImagMinus, src1Imag, mask);
@@ -928,38 +932,27 @@ __simd_callee__ inline void DivPrecisionImpl(U& dstReg, U& srcReg0, U& srcReg1, 
     RegTensor<uint32_t> src0ExpBits, src0Reg;
     RegTensor<int32_t> src0Exp;
     RegTensor<uint32_t> scaleBits;
-    RegTensor<ActualT> scale;
     RegTensor<ActualT> aScaled, bScaled;
     MaskReg needScaleMask;
-    MaskReg noScaleMask;
 
     vdup(src0Reg, exponentMask, mask, modeValue);
     And(src0ExpBits, (RegTensor<uint32_t>&)srcReg0, src0Reg, mask);
     vshrs(src0ExpBits, src0ExpBits, (int16_t)23, mask, modeValue);
-    vdup(src0Reg, exponentBias, mask, modeValue);
-    vsub(src0Exp, (RegTensor<int32_t>&)src0ExpBits, (RegTensor<int32_t>&)src0Reg, mask, modeValue);
+    vadds(src0Exp, (RegTensor<int32_t>&)src0ExpBits, -exponentBias, mask, modeValue);
 
     Compares<int32_t, CMPMODE::LT>(needScaleMask, src0Exp, precisionThreshold, mask);
-    MaskNot(noScaleMask, needScaleMask, mask);
 
     RegTensor<int32_t> k;
     RegTensor<int32_t> thresholdVec;
-    RegTensor<int32_t> zeroVec;
     vdup(thresholdVec, precisionThreshold, mask, modeValue);
-    vdup(zeroVec, 0, mask, modeValue);
-    vsub(k, thresholdVec, src0Exp, mask, modeValue);
-    vmax(k, k, zeroVec, mask, modeValue);
+    vsub(k, thresholdVec, src0Exp, needScaleMask, modeValue);
 
     RegTensor<int32_t> newExp;
-    vadds(newExp, k, exponentBias, needScaleMask, modeValue);
-    vshls(scaleBits, (RegTensor<uint32_t>&)newExp, (int16_t)23, needScaleMask, modeValue);
+    vadds(newExp, k, exponentBias, mask, modeValue);
+    vshls(scaleBits, (RegTensor<uint32_t>&)newExp, (int16_t)23, mask, modeValue);
 
-    RegTensor<ActualT> scaleOne;
-    vdup(scaleOne, 1.0f, mask, modeValue);
-    vsel(scale, (RegTensor<ActualT>&)scaleBits, scaleOne, needScaleMask);
-
-    vmul(aScaled, srcReg0, scale, mask, modeValue);
-    vmul(bScaled, srcReg1, scale, mask, modeValue);
+    vmul(aScaled, srcReg0, (RegTensor<ActualT>&)scaleBits, mask, modeValue);
+    vmul(bScaled, srcReg1, (RegTensor<ActualT>&)scaleBits, mask, modeValue);
 
     vmuls(y, bScaled, -1.0f, mask, modeValue);
     r = aScaled;
@@ -1280,7 +1273,7 @@ __simd_callee__ inline void DivIEEE754HalfImpl(
     constexpr uint16_t F16_INF = 0x7C00;
 
     HalfUnion subnormalThreshold;
-    subnormalThreshold.i = 0x03FF;
+    subnormalThreshold.i = 0x0400; // minimum positive normal
 
     HalfUnion nan;
     nan.i = 0x7E00;
