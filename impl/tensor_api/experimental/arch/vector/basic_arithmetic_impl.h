@@ -34,11 +34,7 @@ __simd_callee__ inline reg_tensor<T> log(const reg_tensor<T>& src)
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator+(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
-    static_assert(detail::supports_add_sub_v<T>, "operator+ does not support this element type");
-    reg_tensor<T> dst;
-    asc_add(dst.reg, src0.reg, src1.reg, src0.mask);
-    dst.mask = src0.mask;
-    return dst;
+    return add<merge_mode::zeroing>(src0, src1);
 }
 
 template <typename T>
@@ -59,6 +55,15 @@ __simd_callee__ inline reg_tensor<T> operator+(const T& scalar, const reg_tensor
     asc_add_scalar(dst.reg, src.reg, scalar, src.mask);
     dst.mask = src.mask;
     return dst;
+}
+
+template <merge_mode Mode, typename T>
+__simd_callee__ inline reg_tensor<T> add(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+{
+    static_assert(detail::supports_add_sub_v<T>, "add does not support this element type");
+    reg_tensor<T> computed;
+    asc_add(computed.reg, src0.reg, src1.reg, src0.mask);
+    return detail::apply_merge_mode<Mode>(src0, computed, src0.mask);
 }
 
 template <typename T>
@@ -123,30 +128,28 @@ __simd_callee__ inline reg_tensor<T> operator*(const T& scalar, const reg_tensor
     return dst;
 }
 
-template <typename T>
+template <merge_mode Mode, typename T>
 __simd_callee__ inline reg_tensor<T> max(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
     static_assert(detail::supports_min_max_v<T>, "max does not support this element type");
-    reg_tensor<T> dst;
-    asc_max(dst.reg, src0.reg, src1.reg, src0.mask);
-    dst.mask = src0.mask;
-    return dst;
+    reg_tensor<T> computed;
+    asc_max(computed.reg, src0.reg, src1.reg, src0.mask);
+    return detail::apply_merge_mode<Mode>(src0, computed, src0.mask);
 }
 
-template <typename T>
+template <merge_mode Mode, typename T>
 __simd_callee__ inline reg_tensor<T> max(const reg_tensor<T>& src, const T& scalar)
 {
     static_assert(detail::supports_min_max_v<T>, "max does not support this element type");
-    reg_tensor<T> dst;
-    asc_max_scalar(dst.reg, src.reg, scalar, src.mask);
-    dst.mask = src.mask;
-    return dst;
+    reg_tensor<T> computed;
+    asc_max_scalar(computed.reg, src.reg, scalar, src.mask);
+    return detail::apply_merge_mode<Mode>(src, computed, src.mask);
 }
 
-template <typename T>
+template <merge_mode Mode, typename T>
 __simd_callee__ inline reg_tensor<T> max(const T& scalar, const reg_tensor<T>& src)
 {
-    return max(src, scalar);
+    return max<Mode>(src, scalar);
 }
 
 template <typename T>
@@ -320,7 +323,7 @@ __simd_callee__ inline decltype(auto) operator/(const T& a, const U& b)
     return dst;
 }
 
-template <typename T, typename U>
+template <merge_mode Mode, typename T, typename U>
 __simd_callee__ inline decltype(auto) min(const T& a, const U& b)
 {
     using elem_type = detail::binary_elem_t<T, U>;
@@ -330,10 +333,9 @@ __simd_callee__ inline decltype(auto) min(const T& a, const U& b)
     vector_bool mask = detail::binary_mask(a, b);
     auto left = detail::make_reg_operand<elem_type>(a, mask);
     auto right = detail::make_reg_operand<elem_type>(b, mask);
-    reg_tensor<elem_type> dst;
-    asc_min(dst.reg, left.reg, right.reg, mask);
-    dst.mask = mask;
-    return dst;
+    reg_tensor<elem_type> computed;
+    asc_min(computed.reg, left.reg, right.reg, mask);
+    return detail::apply_merge_mode<Mode>(left, computed, mask);
 }
 
 } // namespace experimental

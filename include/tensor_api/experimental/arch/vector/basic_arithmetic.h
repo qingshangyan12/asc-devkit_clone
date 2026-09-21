@@ -18,6 +18,7 @@
 
 #include "tensor_api/tensor/tensor.h"
 #include "tensor_api/experimental/arch/vector/reg_tensor.h"
+#include "tensor_api/experimental/utils/reg_enum.h"
 
 namespace asc {
 namespace te {
@@ -34,6 +35,14 @@ __simd_callee__ inline reg_tensor<T> operator+(const reg_tensor<T>& src, const T
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator+(const T& scalar, const reg_tensor<T>& src);
+
+/**
+ * @brief Element-wise add with configurable mask merge mode.
+ * @tparam Mode zeroing (default): inactive lanes are zeroed;
+ *         merging: inactive lanes keep values from @p src0 (soft-emulated like basic_api).
+ */
+template <merge_mode Mode = merge_mode::zeroing, typename T>
+__simd_callee__ inline reg_tensor<T> add(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator-(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
@@ -53,13 +62,18 @@ __simd_callee__ inline reg_tensor<T> operator*(const reg_tensor<T>& src, const T
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator*(const T& scalar, const reg_tensor<T>& src);
 
-template <typename T>
+/**
+ * @brief Element-wise max with configurable mask merge mode.
+ * @tparam Mode zeroing (default): inactive lanes are zeroed;
+ *         merging: inactive lanes keep values from @p src0 / @p src (soft-emulated like basic_api).
+ */
+template <merge_mode Mode = merge_mode::zeroing, typename T>
 __simd_callee__ inline reg_tensor<T> max(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
-template <typename T>
+template <merge_mode Mode = merge_mode::zeroing, typename T>
 __simd_callee__ inline reg_tensor<T> max(const reg_tensor<T>& src, const T& scalar);
 
-template <typename T>
+template <merge_mode Mode = merge_mode::zeroing, typename T>
 __simd_callee__ inline reg_tensor<T> max(const T& scalar, const reg_tensor<T>& src);
 
 template <typename T>
@@ -111,7 +125,12 @@ __simd_callee__ inline reg_tensor<T> mull(
 template <typename T, typename U>
 __simd_callee__ inline decltype(auto) operator/(const T& a, const U& b);
 
-template <typename T, typename U>
+/**
+ * @brief Element-wise min with configurable mask merge mode.
+ * @tparam Mode zeroing (default): inactive lanes are zeroed;
+ *         merging: inactive lanes keep values from the first reg_tensor operand.
+ */
+template <merge_mode Mode = merge_mode::zeroing, typename T, typename U>
 __simd_callee__ inline decltype(auto) min(const T& a, const U& b);
 
 } // namespace experimental

@@ -52,6 +52,17 @@ enum class cast_sat_mode {
     sat,
 };
 
+/**
+ * @brief Mask write-back behavior for inactive lanes.
+ * @details
+ * - zeroing: inactive lanes in the result are set to zero.
+ * - merging: inactive lanes keep the destination register's original values.
+ */
+enum class merge_mode {
+    zeroing,
+    merging,
+};
+
 struct cast_options {
     cast_layout layout = cast_layout::zero;
     cast_round_mode round = cast_round_mode::rint;

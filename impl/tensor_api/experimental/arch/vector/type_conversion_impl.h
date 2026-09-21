@@ -100,8 +100,10 @@ namespace te {
 namespace experimental {
 namespace detail {
 
-template <typename DstType, typename SrcType, cast_layout Layout, cast_round_mode Round, cast_sat_mode Sat>
-__simd_callee__ inline reg_tensor<DstType> cast_impl(const reg_tensor<SrcType>& src)
+template <merge_mode Mode, typename DstType, typename SrcType, cast_layout Layout, cast_round_mode Round,
+    cast_sat_mode Sat>
+__simd_callee__ inline reg_tensor<DstType> cast_impl(
+    reg_tensor<DstType>& dst, const reg_tensor<SrcType>& src)
 {
     static_assert(
         !AscendC::Std::is_same_v<DstType, SrcType>,
@@ -110,10 +112,9 @@ __simd_callee__ inline reg_tensor<DstType> cast_impl(const reg_tensor<SrcType>& 
     using op = reg_cast_op<DstType, SrcType, Layout, Round, Sat>;
     static_assert(op::supported, "register cast type or option combination is unsupported on the current architecture");
 
-    reg_tensor<DstType> dst;
-    op::run(dst.reg, src.reg, src.mask);
-    dst.mask = src.mask;
-    return dst;
+    reg_tensor<DstType> computed;
+    op::run(computed.reg, src.reg, src.mask);
+    return apply_merge_mode<Mode>(dst, computed, src.mask);
 }
 
 } // namespace detail
@@ -142,10 +143,10 @@ struct is_supported<float> {
 
 } // namespace detail
 
-template <typename DstType, const cast_options& opt, typename SrcType>
-__simd_callee__ inline reg_tensor<DstType> cast(const reg_tensor<SrcType>& src)
+template <typename DstType, const cast_options& opt, merge_mode Mode, typename SrcType>
+__simd_callee__ inline reg_tensor<DstType> cast(reg_tensor<DstType>& dst, const reg_tensor<SrcType>& src)
 {
-    return detail::cast_impl<DstType, SrcType, opt.layout, opt.round, opt.sat>(src);
+    return detail::cast_impl<Mode, DstType, SrcType, opt.layout, opt.round, opt.sat>(dst, src);
 }
 
 template <typename T>
