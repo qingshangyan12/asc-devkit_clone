@@ -6,7 +6,7 @@
 |----|------|
 | 账号 | Jessicaruan（`gcw_DmEcQNNx`） |
 | Fork | https://gitcode.com/gcw_DmEcQNNx/asc-devkit |
-| **合入唯一入口（伞 PR）** | （开 PR 后填）`cann/asc-devkit#????` |
+| **合入唯一入口（伞 PR）** | https://gitcode.com/cann/asc-devkit/pull/6269 |
 | 全集 tip 分支 | `feat/cube-ptr-pr4-gm-bitmode`（PR0–4 累加；伞分支在其上加 docs） |
 | 历史分波（已 CI 绿，评审请看伞 PR） | #6177 #6196 #6218 #6266 #6268 |
 | 基线 | CANN 9.1.0 · 对照 `master` |

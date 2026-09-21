@@ -1,6 +1,6 @@
 # CUBE 指针化签名台账（Jessicaruan · 950 / dav-3510）
 
-任务：`09-AscendC-Basic-API-CUBE` · **合入以伞 PR / `feat/cube-ptr-pr4-gm-bitmode` tip 为准**  
+任务：`09-AscendC-Basic-API-CUBE` · **合入唯一入口：[#6269](https://gitcode.com/cann/asc-devkit/pull/6269)**  
 路线：显式 AS 指针重载 → `*Cal`/`*Impl`（**不用** `GetUnderlyingPtr` 主路径）
 
 标记：`P`=代码已加指针重载 · `T`=950 真机 BIT-EXACT（或注明烟测）· `S`=架构 SKIP · `W`=代码有/真机未跑 · `D`=底层仍吃 Tensor
@@ -44,4 +44,4 @@ English: [cube_ptr_signature_ledger_en.md](./cube_ptr_signature_ledger_en.md)
 
 ## 历史分波 PR（CI 绿，请审伞 PR）
 
-#6177 #6196 #6218 #6266 #6268 → 由伞 PR 承接合入。
+#6177 #6196 #6218 #6266 #6268 → 由 [#6269](https://gitcode.com/cann/asc-devkit/pull/6269) 承接合入。
