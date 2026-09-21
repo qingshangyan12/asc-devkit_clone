@@ -327,12 +327,34 @@ __aicore__ inline void Fixpipe(
 }
 
 #if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
-/* [CUBE-PTR-PR1] Fixpipe L0C→GM (FixpipeParamsArch3510) — Jessicaruan PR-1 */
+/* [CUBE-PTR-PR1] Fixpipe L0C→GM (FixpipeParamsArch3510) — Jessicaruan
+ * Bare __gm__: no ExtractCacheMode on the pointer itself.
+ * - 3-arg: default cacheMode=0 (Issue #1744 / discussions/27)
+ * - 4-arg: caller supplies cacheMode explicitly */
 template <typename T, typename U, const FixpipeConfig& config>
 __aicore__ inline void Fixpipe(__gm__ T* dst, __cc__ U* src, const FixpipeParamsArch3510<config.format>& intriParams)
 {
-    // Bare __gm__: no ExtractCacheMode; cacheMode=0 (see usability note / Issue #1686)
     FixpipeL0C2GMImpl<PrimT<T>, PrimT<U>, config>(dst, src, intriParams, 0);
+}
+template <typename T, typename U, const FixpipeConfig& config>
+__aicore__ inline void Fixpipe(
+    __gm__ T* dst, __cc__ U* src, const FixpipeParamsArch3510<config.format>& intriParams, const uint8_t cacheMode)
+{
+    FixpipeL0C2GMImpl<PrimT<T>, PrimT<U>, config>(dst, src, intriParams, cacheMode);
+}
+template <typename T, typename U, const FixpipeConfig& config>
+__aicore__ inline void Fixpipe(
+    __gm__ T* dst, __cc__ U* src, __cbuf__ uint64_t* cbufWorkspace,
+    const FixpipeParamsArch3510<config.format>& intriParams)
+{
+    FixpipeL0C2GMImpl<PrimT<T>, PrimT<U>, config>(dst, src, cbufWorkspace, intriParams, 0);
+}
+template <typename T, typename U, const FixpipeConfig& config>
+__aicore__ inline void Fixpipe(
+    __gm__ T* dst, __cc__ U* src, __cbuf__ uint64_t* cbufWorkspace,
+    const FixpipeParamsArch3510<config.format>& intriParams, const uint8_t cacheMode)
+{
+    FixpipeL0C2GMImpl<PrimT<T>, PrimT<U>, config>(dst, src, cbufWorkspace, intriParams, cacheMode);
 }
 #endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 
