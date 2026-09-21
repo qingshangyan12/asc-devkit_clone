@@ -213,7 +213,7 @@ static SocVersion GetSocVersion()
     if (std::strncmp(socName, "Ascend960DT", sizeof("Ascend960DT") - 1) == 0) {
         return SocVersion::ASCEND960DT;
     }
-    if (std::strncmp(socName, "Ascend960PR", sizeof("Ascend960PR") - 1) == 0) {
+    if (std::strncmp(socName, "Ascend960", sizeof("Ascend960") - 1) == 0) {
         return SocVersion::ASCEND960PR;
     }
     ASCENDLOGE("unsupport soc name: %s\n", socName);
@@ -238,12 +238,12 @@ int32_t AscendLaunchKernelWithHostArgs(
     }
     if (currentSoc == SocVersion::ASCEND910B ||
         ((currentSoc == SocVersion::ASCEND950 || currentSoc == SocVersion::ASCEND350 ||
-          currentSoc == SocVersion::Ascend960DT || currentSoc == SocVersion::ASCEND960PR) &&
+          currentSoc == SocVersion::ASCEND960DT || currentSoc == SocVersion::ASCEND960PR) &&
          ubufDynamicSize == 0)) {
         return aclrtLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, nullptr, hostArgs, argsSize, nullptr, 0);
     }
     if ((currentSoc == SocVersion::ASCEND950 || currentSoc == SocVersion::ASCEND350 ||
-         currentSoc == SocVersion::Ascend960DT || currentSoc == SocVersion::ASCEND960PR) &&
+         currentSoc == SocVersion::ASCEND960DT || currentSoc == SocVersion::ASCEND960PR) &&
         ubufDynamicSize != 0) {
         constexpr uint32_t attrLen = 1;
         aclrtLaunchKernelAttrValue attrValue{};

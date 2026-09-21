@@ -893,7 +893,11 @@ of {}, See also "{}"'.format(kernel_name, hash_name, str(stage), new_file_name),
 
     @staticmethod
     def get_dump_core_num():
-        if CommonUtility.is_c310():
+        if (
+            CommonUtility.is_c310()
+            or CommonUtility.is_920r1()
+            or CommonUtility.is_920r2()
+        ):
             return 108
         return 75
 
